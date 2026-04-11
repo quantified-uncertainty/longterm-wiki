@@ -1,7 +1,7 @@
 /**
- * Claims routes — propose claims for source-checking + poll status.
+ * Claims routes — propose claims for sourcing + poll status.
  *
- * Part of the claims-first source-check architecture (#3253).
+ * Part of the claims-first sourcing architecture (#3253).
  * Uses raw SQL via postgres.js for simplicity.
  */
 
@@ -73,10 +73,10 @@ function generateBatchId(): string {
 /** Rough estimate of seconds per pending claim for polling UX. */
 export const SECONDS_PER_CLAIM_ESTIMATE = 3;
 
-/** Job priority for claim source-check (higher than default page-improve). */
+/** Job priority for claim sourcing (higher than default page-improve). */
 export const CLAIM_SOURCE_CHECK_JOB_PRIORITY = 10;
 
-/** Maximum claims per source-check job — the GET /by-ids endpoint rejects >200 IDs. */
+/** Maximum claims per sourcing job — the GET /by-ids endpoint rejects >200 IDs. */
 export const MAX_CLAIMS_PER_JOB = 200;
 
 // ---------------------------------------------------------------------------
@@ -93,7 +93,7 @@ export interface ClaimGroupEntry {
  * Group inserted claims by resource_id (or by source_url when resource_id is null),
  * then chunk each group into slices of maxPerJob.
  *
- * Returns one entry per chunk — each becomes a source-check job.
+ * Returns one entry per chunk — each becomes a sourcing job.
  */
 export function groupAndChunkClaims(
   insertedClaims: Array<{ id: number; resource_id: string | null; source_url: string }>,
@@ -147,7 +147,7 @@ function formatClaim(row: ProposedClaimRow) {
 
 const claimsApp = new Hono()
 
-  // ---- POST /propose (submit claims for source-checking) ----
+  // ---- POST /propose (submit claims for sourcing) ----
 
   .post("/propose", zv("json", ProposeClaimsSchema), async (c) => {
     const { entityId, targetTable, agentSessionId, claims } = c.req.valid("json");
@@ -156,7 +156,7 @@ const claimsApp = new Hono()
 
     logger.info(
       { batchId, entityId, targetTable, claimCount: claims.length },
-      "proposing claims for source-checking",
+      "proposing claims for sourcing",
     );
 
     // 1. Validate resource references exist (if provided)
@@ -185,7 +185,7 @@ const claimsApp = new Hono()
     await beginTransaction(async (tx) => {
       // 2. Insert all claims in a single batch
       // postgres.js returns bigserial id as string — coerce to number for
-      // downstream job params (claim-source-check handler expects number[]).
+      // downstream job params (claim-sourcing handler expects number[]).
       const rawRows = await tx<InsertedClaimRow[]>`
         INSERT INTO proposed_claims (
           batch_id, claim_text, entity_id, target_table, target_field,
@@ -234,7 +234,7 @@ const claimsApp = new Hono()
         const jobRows = await tx<InsertedJobRow[]>`
           INSERT INTO jobs (type, params, priority, max_retries)
           VALUES (
-            'claim-source-check',
+            'claim-sourcing',
             ${JSON.stringify(jobParams)}::jsonb,
             ${CLAIM_SOURCE_CHECK_JOB_PRIORITY},
             3
@@ -247,7 +247,7 @@ const claimsApp = new Hono()
         }
       }
 
-      // 5. Update claims with their source-check job_id
+      // 5. Update claims with their sourcing job_id
       for (const entry of jobEntries) {
         await tx`
           UPDATE proposed_claims
@@ -265,7 +265,7 @@ const claimsApp = new Hono()
       }
     }
 
-    const estimatedSourceCheckTime = insertedClaims.length * SECONDS_PER_CLAIM_ESTIMATE;
+    const estimatedSourcingTime = insertedClaims.length * SECONDS_PER_CLAIM_ESTIMATE;
 
     return c.json(
       {
@@ -273,16 +273,16 @@ const claimsApp = new Hono()
         claims: insertedClaims.map((row) => ({
           id: row.id,
           status: "pending" as const,
-          sourceCheckJobId: claimIdToJobId.get(row.id) ?? null,
+          sourcingJobId: claimIdToJobId.get(row.id) ?? null,
         })),
         jobCount: jobEntries.length,
-        estimatedSourceCheckTime,
+        estimatedSourcingTime,
       },
       201,
     );
   })
 
-  // ---- POST /verdicts (batch update claim source-check results) ----
+  // ---- POST /verdicts (batch update claim sourcing results) ----
 
   .post("/verdicts", zv("json", ClaimVerdictBatchSchema), async (c) => {
     const { verdicts } = c.req.valid("json");
@@ -320,7 +320,7 @@ const claimsApp = new Hono()
     return c.json({ updated: result.length, total: verdicts.length });
   })
 
-  // ---- GET /by-ids (fetch claims by ID list, used by source-check worker) ----
+  // ---- GET /by-ids (fetch claims by ID list, used by sourcing worker) ----
 
   .get("/by-ids", async (c) => {
     const idsParam = c.req.query("ids");
@@ -359,7 +359,7 @@ const claimsApp = new Hono()
     return c.json({ claims });
   })
 
-  // ---- GET /status/:batchId (poll source-check progress) ----
+  // ---- GET /status/:batchId (poll sourcing progress) ----
 
   .get("/status/:batchId", async (c) => {
     const batchId = c.req.param("batchId");

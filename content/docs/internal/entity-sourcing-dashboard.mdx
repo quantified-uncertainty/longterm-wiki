@@ -1,0 +1,13 @@
+---
+wikiId: E2200
+title: "Source Checks"
+description: "Consolidated sourcing dashboard: verdicts, FactBase source checks, and entity type coverage."
+subcategory: dashboards
+contentFormat: dashboard
+hideSidebar: true
+lastEdited: "2026-03-22"
+---
+
+Verdict counts for sourcinged FactBase facts, grouped by entity. Each fact is checked against its cited source URL and receives a verdict: **confirmed** (source supports the claim), **contradicted** (source disagrees), or **undecidable** (source doesn't address the claim). Prioritize contradicted facts for correction, then undecidable for re-sourcing. Run `pnpm crux fb sourcing --entity=<id>` to check a specific entity.
+
+<EntitySourcingContent />

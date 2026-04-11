@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/directory-utils";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import type { FundingConnection } from "../people-utils";
@@ -70,7 +70,7 @@ export function FundingConnections({
                     filledFieldCount: (conn.amount ? 1 : 0) + (conn.date ? 1 : 0) + (conn.source ? 1 : 0),
                   })}
                   verdict={verdict}
-                  sourcingHref={getSourceCheckHref("grant", String(conn.key))}
+                  sourcingHref={getSourcingHref("grant", String(conn.key))}
                 />
               </div>
               <div className="flex items-center gap-2 flex-wrap">

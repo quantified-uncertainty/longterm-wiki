@@ -970,7 +970,7 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(400);
     });
 
-    it("dual-writes to source-check tables (#3671)", async () => {
+    it("dual-writes to sourcing tables (#3671)", async () => {
       await upsertQuote(app, "dual-write-page", 1, "Claim about AI safety");
 
       const res = await postJson(app, "/api/citations/quotes/mark-accuracy", {

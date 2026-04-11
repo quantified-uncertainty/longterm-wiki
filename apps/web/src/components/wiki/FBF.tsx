@@ -24,7 +24,7 @@ import {
   isUrl,
   shortDomain,
 } from "./factbase/format";
-import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
+import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 import styles from "./tooltip.module.css";
 
 interface FBFProps {
@@ -178,7 +178,7 @@ export function FBF({
           </span>
         )}
 
-        <FactSourceCheckDot factId={fact.id} className="mt-1" />
+        <FactSourcingDot factId={fact.id} className="mt-1" />
 
         {/* Fact detail link */}
         <span className="block mt-1.5">

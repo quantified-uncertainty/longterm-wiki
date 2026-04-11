@@ -106,8 +106,8 @@ export async function syncToServer(
     );
 
     const result = await syncGrants(batch, {
-      forceSkipSourceCheck: true,
-      forceSkipSourceCheckReason: 'bulk-import: grant import pipeline syncs raw data before source-check',
+      forceSkipSourcing: true,
+      forceSkipSourcingReason: 'bulk-import: grant import pipeline syncs raw data before sourcing',
     });
 
     if (result.ok) {

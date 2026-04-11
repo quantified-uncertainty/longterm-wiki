@@ -123,7 +123,7 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
 
   // Check wiki server availability upfront so the session log can record if the
   // server was unreachable (which means cross-reference checks and citation
-  // source-checks were silently skipped during this run).
+  // sourcing were silently skipped during this run).
   const serverAvailable = await isServerAvailable();
   if (!serverAvailable) {
     console.warn('  Warning: wiki server unavailable — cross-reference checks and citation data will be skipped.');

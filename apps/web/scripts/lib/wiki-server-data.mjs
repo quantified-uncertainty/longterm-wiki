@@ -579,7 +579,7 @@ export async function fetchRecordVerdicts() {
     const verdicts = {};
     let offset = 0;
     while (true) {
-      const url = `${serverUrl}/api/source-checks/verdicts?limit=${pageSize}&offset=${offset}`;
+      const url = `${serverUrl}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
       if (!resp.ok) {
         logWikiServerWarning('record-verdicts', `HTTP ${resp.status}`);

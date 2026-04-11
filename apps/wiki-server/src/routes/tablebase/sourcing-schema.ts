@@ -1,8 +1,8 @@
 import { z } from "zod";
 
 /**
- * Optional source-check data that can be submitted alongside any TableBase record.
- * When present, a source_check_verdict is written atomically with the record.
+ * Optional sourcing data that can be submitted alongside any TableBase record.
+ * When present, a sourcing_verdict is written atomically with the record.
  */
 export const InlineSourcingSchema = z.object({
   verdict: z.enum([

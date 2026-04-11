@@ -6,7 +6,7 @@ import Link from "next/link";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingProgramCoverage } from "@/components/coverage/coverage-score";
 import { PROGRAM_TYPE_LABELS, PROGRAM_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
@@ -131,7 +131,7 @@ export function FundingProgramsSection({
                         description: p.description,
                       })}
                       verdict={verdict?.verdict}
-                      sourcingHref={verdict?.verdict ? getSourceCheckHref("funding-program", String(p.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourcingHref("funding-program", String(p.key)) : undefined}
                     />
                   </td>
                 </tr>

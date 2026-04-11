@@ -21,7 +21,7 @@ import {
 } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
+import { writeInlineVerdicts, logSourcingCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
@@ -474,7 +474,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           .where(inArray(predictionMarketQuestions.id, questionIds));
       }
 
-      // Write inline source-check verdicts atomically within the same transaction
+      // Write inline sourcing verdicts atomically within the same transaction
       snapshotVerdictsResult = await writeInlineVerdicts(
         tx,
         items.map((item) => ({
@@ -487,7 +487,7 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       );
     });
 
-    logSourceCheckCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
+    logSourcingCoverage("prediction-markets/snapshots/sync", items.length, snapshotVerdictsResult.written);
 
     return c.json({ upserted, verdictsWritten: snapshotVerdictsResult.written });
   })

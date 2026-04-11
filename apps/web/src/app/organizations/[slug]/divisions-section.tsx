@@ -9,7 +9,7 @@ import { SectionHeader, safeHref } from "./org-shared";
 import type { ParsedDivisionRecord } from "./org-data";
 import { getDivisionHref } from "@/app/divisions/[slug]/division-data";
 import { getRecordVerdict } from "@/data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeDivisionCoverage } from "@/components/coverage/coverage-score";
 
@@ -99,8 +99,8 @@ function DivisionCard({
 
   const divHref = getDivisionHref(d);
   const cardVerdict = getRecordVerdict("division", String(d.key))?.verdict;
-  const cardSourceCheckHref = cardVerdict
-    ? `/source-checks/division/${encodeURIComponent(String(d.key))}`
+  const cardSourcingHref = cardVerdict
+    ? `/sourcing/division/${encodeURIComponent(String(d.key))}`
     : undefined;
 
   return (
@@ -130,7 +130,7 @@ function DivisionCard({
               hasData: !!(d.lead || d.source),
             })}
             verdict={cardVerdict}
-            sourcingHref={cardSourceCheckHref}
+            sourcingHref={cardSourcingHref}
             className="relative z-10"
           />
           {d.website && (
@@ -415,7 +415,7 @@ export function DivisionsSection({
                         hasData: !!(d.lead || d.source),
                       })}
                       verdict={verdict?.verdict}
-                      sourcingHref={verdict?.verdict ? getSourceCheckHref("division", String(d.key)) : undefined}
+                      sourcingHref={verdict?.verdict ? getSourcingHref("division", String(d.key)) : undefined}
                     />
                   </td>
                 </tr>

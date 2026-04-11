@@ -44,9 +44,9 @@ export interface CitationRecord {
   contentSnippet: string | null;
   /** Byte length of the fetched content */
   contentLength: number | null;
-  /** Overall source-check status */
+  /** Overall sourcing status */
   status: CheckStatus;
-  /** Human or automated note about source-check */
+  /** Human or automated note about sourcing */
   note: string | null;
 }
 
@@ -60,7 +60,7 @@ export interface CitationArchiveFile {
   citations: CitationRecord[];
 }
 
-/** Raw citation extracted from MDX content (before source-check) */
+/** Raw citation extracted from MDX content (before sourcing) */
 export interface ExtractedCitation {
   /** Footnote identifier: "1" for [^1], "rc-fec0" for [^rc-fec0], "kb-abc" for [^kb-abc] */
   footnote: string;

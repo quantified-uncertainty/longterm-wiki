@@ -136,7 +136,7 @@ facts:
     value: "Risk Thresholds for Frontier AI — proposes framework for when frontier AI capabilities warrant regulatory intervention"
     asOf: 2024
     source: https://arxiv.org/abs/2406.14713
-    notes: "arXiv:2406.14713 (June 2024). Verified correct — source-check flagged wrong arXiv ID (2311.14368 was a different paper)."
+    notes: "arXiv:2406.14713 (June 2024). Verified correct — sourcing flagged wrong arXiv ID (2311.14368 was a different paper)."
 
   - id: f_4BkaaQZD2q
     property: legal-identifier

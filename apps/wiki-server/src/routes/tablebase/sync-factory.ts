@@ -3,7 +3,7 @@
  *
  * Implements the 7-phase pipeline shared by all TableBase sync routes:
  *   1. Parse JSON body
- *   2. Validate (Zod schema, natural key, source-check, entity FK, claims, custom preValidate)
+ *   2. Validate (Zod schema, natural key, sourcing, entity FK, claims, custom preValidate)
  *   3. Upsert (batch INSERT...ON CONFLICT, auto-chunked for Postgres param limit)
  *   4. Audit log (single batch insert per chunk; existing-row pre-fetch in batch)
  *   5. Entity FK resolve (post-upsert backfill via resolveEntityFKs)
@@ -45,7 +45,7 @@ import {
   validateEntityRefs,
   type EntityRefField,
 } from "../shared/validate-entity-refs.js";
-import { enforceSourceCheck } from "../shared/source-check-enforcement.js";
+import { enforceSourcing } from "../shared/sourcing-enforcement.js";
 import {
   validateClaimRefs,
   linkClaimsToRecords,
@@ -62,7 +62,7 @@ import {
 import { logAuditEntries } from "./audit-log.js";
 import {
   writeInlineVerdicts,
-  logSourceCheckCoverage,
+  logSourcingCoverage,
 } from "./write-inline-verdicts.js";
 import type { InlineSourcing } from "./sourcing-schema.js";
 
@@ -83,7 +83,7 @@ type RawDb = ReturnType<typeof getDb>;
 /** A record-shaped object the factory will write to the table. */
 type Row = Record<string, unknown>;
 
-/** Inline source-check verdict input shape (matches writeInlineVerdicts). */
+/** Inline sourcing verdict input shape (matches writeInlineVerdicts). */
 export interface VerdictInput {
   recordType: string;
   recordId: string;
@@ -187,10 +187,10 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
 
   /**
    * Source-check enforcement. Set to `true` to enforce based on the route name
-   * (looked up in source-check-enforcement.ts SOURCE_CHECK_REQUIRED). Pass a
+   * (looked up in sourcing-enforcement.ts SOURCE_CHECK_REQUIRED). Pass a
    * string to override the table name used for the lookup.
    */
-  enforceSourceCheck?: boolean | string;
+  enforceSourcing?: boolean | string;
 
   /**
    * Entity FK fields to validate pre-insert. Returns one EntityRefField per
@@ -274,7 +274,7 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
 
   /**
    * Map an item to a verdict record for `writeInlineVerdicts()`. Setting this
-   * enables inline source-check verdict writing within the same transaction.
+   * enables inline sourcing verdict writing within the same transaction.
    */
   toVerdict?: (item: TItem) => VerdictInput;
 
@@ -326,7 +326,7 @@ export type SyncPhase =
   | "parse"
   | "validate"
   | "naturalKey"
-  | "enforceSourceCheck"
+  | "enforceSourcing"
   | "validateEntityRefs"
   | "validateClaimRefs"
   | "preValidate"
@@ -480,14 +480,14 @@ export function createSyncHandler<
     }
     const items = parsed.data.items as TItem[];
 
-    // ---- Phase 2: enforceSourceCheck ----
-    if (config.enforceSourceCheck) {
+    // ---- Phase 2: enforceSourcing ----
+    if (config.enforceSourcing) {
       const tableName =
-        typeof config.enforceSourceCheck === "string"
-          ? config.enforceSourceCheck
+        typeof config.enforceSourcing === "string"
+          ? config.enforceSourcing
           : name;
-      const err = await runPhase(name, "enforceSourceCheck", async () =>
-        enforceSourceCheck(c, tableName, items as Array<{ sourcing?: unknown }>),
+      const err = await runPhase(name, "enforceSourcing", async () =>
+        enforceSourcing(c, tableName, items as Array<{ sourcing?: unknown }>),
       );
       if (err) return err;
     }
@@ -689,7 +689,7 @@ export function createSyncHandler<
     });
 
     if (config.toVerdict) {
-      logSourceCheckCoverage(`${name}/sync`, items.length, verdictsResult.written);
+      logSourcingCoverage(`${name}/sync`, items.length, verdictsResult.written);
     }
 
     // ---- Post-tx: link verified claims to records ----

@@ -5,7 +5,7 @@
  * 1. Validates all cited claim IDs exist and are verified
  * 2. Creates claim_record_links rows in the same transaction
  *
- * Part of the claims-first source-check architecture (#3253, Component 5).
+ * Part of the claims-first sourcing architecture (#3253, Component 5).
  */
 
 import { sql } from "drizzle-orm";
@@ -132,7 +132,7 @@ export async function linkClaimsToRecords(
   if (unverifiedCount > 0) {
     logger.info(
       { unverifiedCount, totalRecords: records.length, linkedRecords: withClaims.length },
-      "sync: records submitted without claim source-check",
+      "sync: records submitted without claim sourcing",
     );
   }
 

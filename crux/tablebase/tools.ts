@@ -10,7 +10,7 @@ import { readFileSync } from 'fs';
 import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
-import { getVerdictsByEntity } from '../lib/wiki-server/source-checks.ts';
+import { getVerdictsByEntity } from '../lib/wiki-server/sourcing.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
@@ -37,7 +37,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
   const sourceDiscoveryTools = [
     {
       name: 'query_unverifiable_records',
-      description: 'Fetch records with unverifiable source-check verdicts for an entity. Returns the record type, record ID, reasoning why source-check failed, and current source URL.',
+      description: 'Fetch records with unverifiable sourcing verdicts for an entity. Returns the record type, record ID, reasoning why sourcing failed, and current source URL.',
       input_schema: {
         type: 'object',
         properties: {
@@ -48,7 +48,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
     },
     {
       name: 'suggest_resource',
-      description: 'Propose a URL as a resource that could verify one or more records. Registers the URL in the resource database and fetches its content for future source-check.',
+      description: 'Propose a URL as a resource that could verify one or more records. Registers the URL in the resource database and fetches its content for future sourcing.',
       input_schema: {
         type: 'object',
         properties: {
@@ -156,7 +156,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
       },
       {
         name: 'submit_claims',
-        description: 'Submit structured claims for async source-check. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
+        description: 'Submit structured claims for async sourcing. Each claim asserts a fact about an entity with a source URL. Claims are verified by a background worker before they can be used to submit records. Returns a batchId for polling via check_claim_status.',
         input_schema: {
           type: 'object',
           properties: {
@@ -183,7 +183,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
       },
       {
         name: 'check_claim_status',
-        description: 'Check source-check status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
+        description: 'Check sourcing status of previously submitted claims. Returns per-claim verdicts and aggregate counts.',
         input_schema: {
           type: 'object',
           properties: {
@@ -387,7 +387,7 @@ async function handleSubmitClaims(
       claimCount: data.claims.length,
       jobCount: data.jobCount,
       estimatedCheckTime: data.estimatedCheckTime,
-      message: `Submitted ${data.claims.length} claims (${data.jobCount} source-check jobs created). Use check_claim_status with batchId "${data.batchId}" to poll source-check progress.`,
+      message: `Submitted ${data.claims.length} claims (${data.jobCount} sourcing jobs created). Use check_claim_status with batchId "${data.batchId}" to poll sourcing progress.`,
     }, null, 2);
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -423,7 +423,7 @@ async function handleSubmitRecords(
   input: Record<string, unknown>,
   task: EnrichmentTask,
   dryRun: boolean,
-  skipSourceCheck: boolean = false,
+  skipSourcing: boolean = false,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -544,21 +544,21 @@ async function handleSubmitRecords(
   // Source-check gate: check records against their source URLs before submission.
   // Catches hallucinated data (e.g., wrong roles, fabricated affiliations).
   let recordsToSubmit = deduped;
-  let sourceCheckSummary = '';
-  if (!skipSourceCheck && !dryRun) {
-    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('./pre-submit-source-check.ts');
+  let sourcingSummary = '';
+  if (!skipSourcing && !dryRun) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('./pre-submit-sourcing.ts');
     const verifyResult = await verifyBeforeSubmit(table, deduped);
     console.log(formatPreSubmitSummary(verifyResult));
 
     if (verifyResult.rejected.length > 0) {
-      sourceCheckSummary = ` (${verifyResult.rejected.length} rejected by source-check)`;
+      sourcingSummary = ` (${verifyResult.rejected.length} rejected by sourcing)`;
     }
 
     // Combine accepted records and no-source records for submission
     recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
 
     if (recordsToSubmit.length === 0) {
-      return `All ${deduped.length} records were rejected by source-check.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`;
+      return `All ${deduped.length} records were rejected by sourcing.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`;
     }
   }
 
@@ -569,12 +569,12 @@ async function handleSubmitRecords(
   const syncConfig = getTableConfig(table);
   if (!syncConfig) return `Error: Unknown table "${table}"`;
 
-  // Build sync URL with source-check params
+  // Build sync URL with sourcing params
   const syncParams = new URLSearchParams();
-  if (syncConfig.requireSourceCheck) syncParams.set('requireSourceCheck', 'true');
-  if (skipSourceCheck) {
-    syncParams.set('forceSkipSourceCheck', 'true');
-    syncParams.set('reason', 'agent-tool: --skipSourceCheck flag set by caller');
+  if (syncConfig.requireSourcing) syncParams.set('requireSourcing', 'true');
+  if (skipSourcing) {
+    syncParams.set('forceSkipSourcing', 'true');
+    syncParams.set('reason', 'agent-tool: --skipSourcing flag set by caller');
   }
   const syncQs = syncParams.toString();
   const syncUrl = syncQs ? `${syncConfig.syncPath}?${syncQs}` : syncConfig.syncPath;
@@ -591,7 +591,7 @@ async function handleSubmitRecords(
 
   const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
   const dupCount = records.length - deduped.length;
-  return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${sourceCheckSummary}.`;
+  return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${sourcingSummary}.`;
 }
 
 // ---------------------------------------------------------------------------
@@ -658,7 +658,7 @@ async function handleSuggestResource(
   }
 }
 
-/** Map source-check recordType to table-registry table name */
+/** Map sourcing recordType to table-registry table name */
 function recordTypeToTable(recordType: string): string {
   switch (recordType) {
     case 'personnel': return 'personnel';
@@ -722,9 +722,9 @@ async function handleLinkSource(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipSourceCheck?: boolean; apply?: boolean } = {},
+  options: { skipSourcing?: boolean; apply?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
-  const skipSourceCheck = options.skipSourceCheck ?? false;
+  const skipSourcing = options.skipSourcing ?? false;
   const isSourceDiscovery = task.taskType === 'source-discovery';
 
   const handlers: Record<string, (input: Record<string, unknown>) => Promise<string>> = {
@@ -734,7 +734,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourceCheck),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),

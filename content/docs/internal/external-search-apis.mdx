@@ -9,7 +9,7 @@ lastEdited: "2026-04-07"
 
 ## Overview
 
-The wiki uses several external APIs for web search, content extraction, and fact verification across its research, enrichment, and source-check pipelines. This page documents each service, its costs, where it's integrated, and what we've learned from production use.
+The wiki uses several external APIs for web search, content extraction, and fact verification across its research, enrichment, and sourcing pipelines. This page documents each service, its costs, where it's integrated, and what we've learned from production use.
 
 ## Services We Use
 
@@ -142,7 +142,7 @@ The wiki uses several external APIs for web search, content extraction, and fact
 - **Per-query cost**: \$0.005
 - **Why we might use it**: Combines search + extraction in one API call. Token-efficient output format. Independent index (not Google/Bing).
 - **Why we don't currently**: New service (Feb 2026), hasn't been tested. Would need integration work in research-agent.ts.
-- **Verdict**: Promising. The smart-chunk format could reduce token costs in LLM verification. Worth testing, especially for the source-check pipeline where we need both search and content extraction.
+- **Verdict**: Promising. The smart-chunk format could reduce token costs in LLM verification. Worth testing, especially for the sourcing pipeline where we need both search and content extraction.
 
 ### Jina Reader (URL-to-Markdown)
 
@@ -157,9 +157,9 @@ The wiki uses several external APIs for web search, content extraction, and fact
 
 - **What it does**: AI fact retrieval and verification API. "World's most accurate search" on OpenAI's SimpleQA benchmark. Returns verified facts with source URLs.
 - **Pricing**: \$5 free credits on signup, topped up monthly. Per-request pricing varies by depth parameter.
-- **Why we might use it**: Purpose-built for fact verification, which is literally our source-check use case. Could replace the Haiku-based source verification with a single API call.
+- **Why we might use it**: Purpose-built for fact verification, which is literally our sourcing use case. Could replace the Haiku-based source verification with a single API call.
 - **Why we don't currently**: New, limited documentation on pricing at scale. Would need testing to see if it handles our specific claim types (personnel roles, grant amounts, funding rounds).
-- **Verdict**: Worth evaluating for the source-check pipeline specifically. If it can verify "Person X has Role Y at Org Z" reliably, it could replace several steps in our verification pipeline.
+- **Verdict**: Worth evaluating for the sourcing pipeline specifically. If it can verify "Person X has Role Y at Org Z" reliably, it could replace several steps in our verification pipeline.
 
 ### Crawl4AI (Self-hosted Crawler)
 
@@ -204,7 +204,7 @@ Source Fetcher (crux/lib/search/source-fetcher.ts)
 Citation Content Cache (wiki-server citation_content table)
         │
         ▼
-Source Check Pipeline (crux/lib/source-check/)
+Source Check Pipeline (crux/lib/sourcing/)
   └── Claude Haiku  (ANTHROPIC_API_KEY)
 ```
 
@@ -213,5 +213,5 @@ Source Check Pipeline (crux/lib/source-check/)
 1. **Install Firecrawl by default** in all agent slots. It's already a declared dependency — just needs `pnpm install --force` to install the optional package.
 2. **Add Jina Reader as a fallback** in `source-fetcher.ts` for when Firecrawl isn't available. Zero integration cost (just an HTTP fetch).
 3. **Evaluate Tavily** as a cheaper search alternative to Exa for batch operations (source discovery, auto-update).
-4. **Evaluate Linkup** for the source-check pipeline — if it can verify personnel claims directly, it could replace the fetch + Haiku verification two-step.
+4. **Evaluate Linkup** for the sourcing pipeline — if it can verify personnel claims directly, it could replace the fetch + Haiku verification two-step.
 5. **Use per-person Exa queries** for source discovery instead of the Sonnet agent loop — 100x cheaper with comparable hit rate.

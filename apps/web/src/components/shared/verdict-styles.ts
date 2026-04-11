@@ -3,10 +3,10 @@
  *
  * Two distinct verdict domains exist in the codebase:
  *
- * 1. **Source-check verdicts** — entity/FactBase source-check results.
+ * 1. **Source-check verdicts** — entity/FactBase sourcing results.
  *    Keys: confirmed, contradicted, outdated, partial, unverifiable, unchecked.
- *    Used by: entity-detail-components, SourceCheckStatus, source-checks pages,
- *    entity-source-checks dashboards.
+ *    Used by: entity-detail-components, SourcingStatus, sourcing pages,
+ *    entity-sourcing dashboards.
  *
  * 2. **Citation verdicts** — wiki page citation accuracy checks.
  *    Keys: accurate, minor_issues, inaccurate, unsupported, not_verifiable.
@@ -18,7 +18,7 @@
 
 // ── Source-check verdict types ──────────────────────────────────────────
 
-export type SourceCheckVerdictType =
+export type SourcingVerdictType =
   | "confirmed"
   | "contradicted"
   | "outdated"
@@ -27,12 +27,12 @@ export type SourceCheckVerdictType =
   | "unchecked";
 
 /**
- * Full style set for source-check verdicts, covering all shape variants
+ * Full style set for sourcing verdicts, covering all shape variants
  * used across the codebase:
  * - `label` + `className`: entity-detail-components badge
- * - `bg` + `text` + `dot`: SourceCheckStatus, source-checks-shared, action-queue
+ * - `bg` + `text` + `dot`: SourcingStatus, sourcing-shared, action-queue
  */
-export interface SourceCheckVerdictStyle {
+export interface SourcingVerdictStyle {
   /** Human-readable label (e.g. "Confirmed") */
   label: string;
   /** Combined Tailwind className for the entity-detail badge variant */
@@ -41,11 +41,11 @@ export interface SourceCheckVerdictStyle {
   bg: string;
   /** Text color class (e.g. "text-emerald-600") */
   text: string;
-  /** Dot color class used by SourceCheckStatus (e.g. "bg-emerald-500") */
+  /** Dot color class used by SourcingStatus (e.g. "bg-emerald-500") */
   dot: string;
 }
 
-export const SOURCE_CHECK_VERDICT_STYLES: Record<SourceCheckVerdictType, SourceCheckVerdictStyle> = {
+export const SOURCE_CHECK_VERDICT_STYLES: Record<SourcingVerdictType, SourcingVerdictStyle> = {
   confirmed: {
     label: "Confirmed",
     className: "bg-emerald-100 text-emerald-800 dark:bg-emerald-900/40 dark:text-emerald-300",
@@ -90,8 +90,8 @@ export const SOURCE_CHECK_VERDICT_STYLES: Record<SourceCheckVerdictType, SourceC
   },
 };
 
-/** Tooltip descriptions for source-check verdict types. */
-export const SOURCE_CHECK_VERDICT_DESCRIPTIONS: Record<SourceCheckVerdictType, string> = {
+/** Tooltip descriptions for sourcing verdict types. */
+export const SOURCE_CHECK_VERDICT_DESCRIPTIONS: Record<SourcingVerdictType, string> = {
   confirmed: "Source evidence supports this claim.",
   contradicted: "Source evidence contradicts this claim.",
   outdated: "Source evidence suggests this information is no longer current.",
@@ -100,7 +100,7 @@ export const SOURCE_CHECK_VERDICT_DESCRIPTIONS: Record<SourceCheckVerdictType, s
   unchecked: "This claim has not yet been checked against sources.",
 };
 
-/** Sort priority for source-check verdicts: most actionable first. Lower = higher priority. */
+/** Sort priority for sourcing verdicts: most actionable first. Lower = higher priority. */
 export const SOURCE_CHECK_VERDICT_PRIORITY: Record<string, number> = {
   contradicted: 0,
   outdated: 1,
@@ -112,7 +112,7 @@ export const SOURCE_CHECK_VERDICT_PRIORITY: Record<string, number> = {
 
 // ── Citation verdict types ──────────────────────────────────────────────
 
-/** Canonical citation verdict keys used by the citation source-check system. */
+/** Canonical citation verdict keys used by the citation sourcing system. */
 export const CITATION_VERDICT_KEYS = [
   "accurate",
   "minor_issues",
@@ -170,15 +170,15 @@ export interface VerdictRow {
   sourcesChecked: number | null;
   needsRecheck: boolean | null;
   lastComputedAt: string | null;
-  /** Present in SourceCheckStatus and entity-source-checks views */
+  /** Present in SourcingStatus and entity-sourcing views */
   fieldName?: string | null;
-  /** Present in SourceCheckStatus and entity-source-checks views */
+  /** Present in SourcingStatus and entity-sourcing views */
   entityId?: string | null;
   /** Present in action-queue */
   nextCheckDue?: string | null;
-  /** Present in entity-source-checks-viewer */
+  /** Present in entity-sourcing-viewer */
   createdAt?: string | null;
-  /** Present in entity-source-checks-viewer */
+  /** Present in entity-sourcing-viewer */
   updatedAt?: string | null;
 }
 
@@ -190,7 +190,7 @@ export interface VerdictsResponse {
 
 // ── Helpers ─────────────────────────────────────────────────────────────
 
-/** Look up a source-check verdict style, falling back to `unchecked`. */
-export function getSourceCheckVerdictStyle(verdict: string): SourceCheckVerdictStyle {
-  return SOURCE_CHECK_VERDICT_STYLES[verdict as SourceCheckVerdictType] ?? SOURCE_CHECK_VERDICT_STYLES.unchecked;
+/** Look up a sourcing verdict style, falling back to `unchecked`. */
+export function getSourcingVerdictStyle(verdict: string): SourcingVerdictStyle {
+  return SOURCE_CHECK_VERDICT_STYLES[verdict as SourcingVerdictType] ?? SOURCE_CHECK_VERDICT_STYLES.unchecked;
 }

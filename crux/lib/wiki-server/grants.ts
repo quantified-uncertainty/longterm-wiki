@@ -44,16 +44,16 @@ export async function getGrantsByEntity(
 export async function syncGrants(
   items: Array<Record<string, unknown>>,
   options?: {
-    /** Bypass server-side source-check enforcement. Requires reason for audit logging. */
-    forceSkipSourceCheck?: boolean;
-    forceSkipSourceCheckReason?: string;
+    /** Bypass server-side sourcing enforcement. Requires reason for audit logging. */
+    forceSkipSourcing?: boolean;
+    forceSkipSourcingReason?: string;
   },
 ): Promise<ApiResult<GrantsSyncResult>> {
   const params = new URLSearchParams();
-  if (options?.forceSkipSourceCheck) {
-    params.set('forceSkipSourceCheck', 'true');
-    if (options.forceSkipSourceCheckReason) {
-      params.set('reason', options.forceSkipSourceCheckReason);
+  if (options?.forceSkipSourcing) {
+    params.set('forceSkipSourcing', 'true');
+    if (options.forceSkipSourcingReason) {
+      params.set('reason', options.forceSkipSourcingReason);
     }
   }
   const qs = params.toString();

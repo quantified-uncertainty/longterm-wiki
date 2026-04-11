@@ -18,8 +18,8 @@
 
 import { runResearch } from '../lib/search/research-agent.ts';
 import type { ResearchResult } from '../lib/search/research-agent.ts';
-import { getFailures } from '../lib/wiki-server/source-checks.ts';
-import type { FailuresResponse } from '../lib/wiki-server/source-checks.ts';
+import { getFailures } from '../lib/wiki-server/sourcing.ts';
+import type { FailuresResponse } from '../lib/wiki-server/sourcing.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import type { ProposeClaims } from '../../apps/wiki-server/src/api-types.ts';

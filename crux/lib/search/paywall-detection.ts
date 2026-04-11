@@ -3,7 +3,7 @@
  *
  * Shared module for detecting paywalled content and unverifiable domains.
  * Used by both source-fetcher.ts (citation checking) and kb-verify.ts
- * (KB fact source-check).
+ * (KB fact sourcing).
  */
 
 // ---------------------------------------------------------------------------
@@ -39,7 +39,7 @@ export const NEGATIVE_PAYWALL_SIGNALS = [
 
 /**
  * Structured error types for source fetch failures.
- * Used in source-check notes to provide machine-readable error classification.
+ * Used in sourcing notes to provide machine-readable error classification.
  */
 export type SourceFetchErrorType =
   | 'paywall'

@@ -30,7 +30,7 @@ export interface GrantRow {
   funderHref?: string | null;
   /** Source-check verdict (null if not checked) */
   sourcingVerdict?: string | null;
-  /** Link to source-check detail page */
+  /** Link to sourcing detail page */
   sourcingHref?: string;
 }
 
@@ -94,7 +94,7 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.id}` : null,
     sourcingVerdict: g.sourcing?.verdict ?? null,
     sourcingHref: g.sourcing?.verdict
-      ? `/source-checks/grant/${encodeURIComponent(g.id)}`
+      ? `/sourcing/grant/${encodeURIComponent(g.id)}`
       : undefined,
   };
 }

@@ -2,7 +2,7 @@
  * Auto-Verify Stakeholder Positions
  *
  * Fetches source URLs for stakeholder positions on policy entities,
- * sends the content to an LLM for source-check, and records results
+ * sends the content to an LLM for sourcing, and records results
  * via the wiki-server API.
  *
  * Subcommands:
@@ -18,7 +18,7 @@
 import { readFileSync } from 'fs';
 import { join } from 'path';
 import { parse as parseYaml } from 'yaml';
-import type { SourceCheckVerdict } from '../../../apps/wiki-server/src/api-types.ts';
+import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { PROJECT_ROOT } from '../../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../../lib/llm.ts';
 import { CostTracker } from '../../lib/cost-tracker.ts';
@@ -26,11 +26,11 @@ import { fetchSource } from '../../lib/search/source-fetcher.ts';
 import {
   getVerdictByRecord,
   type VerdictByRecordResult,
-} from '../../lib/wiki-server/source-check-client.ts';
+} from '../../lib/wiki-server/sourcing-client.ts';
 import {
-  storeSourceCheckEvidence,
+  storeSourcingEvidence,
   storeAggregateVerdict,
-} from '../../lib/source-check/verdict-handler.ts';
+} from '../../lib/sourcing/verdict-handler.ts';
 import { apiRequest } from '../../lib/wiki-server/client.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
@@ -57,14 +57,14 @@ interface PolicyEntity {
   stakeholders?: Stakeholder[];
 }
 
-interface SourceCheckResult {
+interface SourcingResult {
   policyId: string;
   policyTitle: string;
   stakeholderName: string;
   position: string;
   reason?: string;
   sourceUrl: string;
-  verdict: SourceCheckVerdict;
+  verdict: SourcingVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -169,11 +169,11 @@ async function getExistingVerdict(recordId: string): Promise<ExistingVerdict | n
 }
 
 // ---------------------------------------------------------------------------
-// LLM source-check
+// LLM sourcing
 // ---------------------------------------------------------------------------
 
-interface LlmSourceCheckResult {
-  verdict: SourceCheckVerdict;
+interface LlmSourcingResult {
+  verdict: SourcingVerdict;
   confidence: number;
   extractedEvidence: string;
   notes: string;
@@ -185,7 +185,7 @@ async function verifyStakeholderPosition(
   stakeholder: Stakeholder,
   policyTitle: string,
   sourceContent: string,
-): Promise<LlmSourceCheckResult> {
+): Promise<LlmSourcingResult> {
   const prompt = `You are verifying a stakeholder position claim against a source document.
 
 CLAIM TO VERIFY:
@@ -240,9 +240,9 @@ If the position matches but the reason is different, use "partial".`;
       notes?: string;
     };
 
-    const validVerdicts: SourceCheckVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
-    const verdict = validVerdicts.includes(parsed.verdict as SourceCheckVerdict)
-      ? (parsed.verdict as SourceCheckVerdict)
+    const validVerdicts: SourcingVerdict[] = ['confirmed', 'contradicted', 'partial', 'unverifiable'];
+    const verdict = validVerdicts.includes(parsed.verdict as SourcingVerdict)
+      ? (parsed.verdict as SourcingVerdict)
       : 'unverifiable';
 
     const confidence = typeof parsed.confidence === 'number'
@@ -271,13 +271,13 @@ If the position matches but the reason is different, use "partial".`;
 // Recording results to wiki-server
 // ---------------------------------------------------------------------------
 
-interface PostSourceCheckBody {
+interface PostSourcingBody {
   recordType: string;
   recordId: string;
   sourceUrl: string;
   fieldName: string;
   expectedValue: string;
-  verdict: SourceCheckVerdict;
+  verdict: SourcingVerdict;
   confidence: number;
   extractedValue: string;
   checkerModel: string;
@@ -288,16 +288,16 @@ interface PostSourceCheckBody {
 interface PostVerdictBody {
   recordType: string;
   recordId: string;
-  verdict: SourceCheckVerdict | 'unchecked';
+  verdict: SourcingVerdict | 'unchecked';
   confidence: number;
   reasoning: string;
   sourcesChecked: number;
 }
 
-async function recordSourceCheck(body: PostSourceCheckBody): Promise<boolean> {
+async function recordSourcing(body: PostSourcingBody): Promise<boolean> {
   try {
-    await storeSourceCheckEvidence({
-      recordType: body.recordType as Parameters<typeof storeSourceCheckEvidence>[0]['recordType'],
+    await storeSourcingEvidence({
+      recordType: body.recordType as Parameters<typeof storeSourcingEvidence>[0]['recordType'],
       recordId: body.recordId,
       sourceUrl: body.sourceUrl,
       verdict: body.verdict,
@@ -311,7 +311,7 @@ async function recordSourceCheck(body: PostSourceCheckBody): Promise<boolean> {
     }, '[auto-verify]');
     return true;
   } catch (e: unknown) {
-    console.warn(`[auto-verify] Failed to record source-check: ${e instanceof Error ? e.message : String(e)}`);
+    console.warn(`[auto-verify] Failed to record sourcing: ${e instanceof Error ? e.message : String(e)}`);
     return false;
   }
 }
@@ -334,7 +334,7 @@ async function recordVerdict(verdict: PostVerdictBody): Promise<boolean> {
 }
 
 // ---------------------------------------------------------------------------
-// Main source-check pipeline
+// Main sourcing pipeline
 // ---------------------------------------------------------------------------
 
 interface VerifyOptions {
@@ -427,7 +427,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
   // 4. Filter out already-verified stakeholders
   const toVerify: StakeholderWithPolicy[] = [];
-  const skippedAlreadyChecked: SourceCheckResult[] = [];
+  const skippedAlreadyChecked: SourcingResult[] = [];
 
   for (const item of allStakeholders) {
     if (dryRun) {
@@ -445,7 +445,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
         position: item.stakeholder.position,
         reason: item.stakeholder.reason,
         sourceUrl: item.stakeholder.source!,
-        verdict: existingVerdict.verdict as SourceCheckVerdict,
+        verdict: existingVerdict.verdict as SourcingVerdict,
         confidence: existingVerdict.confidence ?? 0,
         extractedEvidence: '',
         notes: 'Already verified — skipped',
@@ -514,7 +514,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   const tracker = new CostTracker();
 
   // 8. Process each stakeholder
-  const results: SourceCheckResult[] = [...skippedAlreadyChecked];
+  const results: SourcingResult[] = [...skippedAlreadyChecked];
   let verified = 0;
   let failed = 0;
 
@@ -587,8 +587,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 8b. LLM source-check
-    let llmResult: LlmSourceCheckResult;
+    // 8b. LLM sourcing
+    let llmResult: LlmSourcingResult;
     try {
       llmResult = await verifyStakeholderPosition(
         client,
@@ -619,8 +619,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 8c. Record source-check to wiki-server
-    const recordedSourceCheck = await recordSourceCheck({
+    // 8c. Record sourcing to wiki-server
+    const recordedSourcing = await recordSourcing({
       recordType: STAKEHOLDER_RECORD_TYPE,
       recordId: thingId,
       sourceUrl,
@@ -634,8 +634,8 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       notes: llmResult.notes.slice(0, 10000),
     });
 
-    if (!recordedSourceCheck) {
-      console.log(`    ${c.yellow}warning: failed to record source-check to wiki-server${c.reset}`);
+    if (!recordedSourcing) {
+      console.log(`    ${c.yellow}warning: failed to record sourcing to wiki-server${c.reset}`);
     }
 
     // 8d. Update aggregate verdict
@@ -736,7 +736,7 @@ Commands:
 Options:
   --policy=<id>      Only verify stakeholders for one policy (e.g., --policy=california-sb1047)
   --dry-run          Show what would be verified without making any API calls
-  --budget=<N>       Maximum number of LLM source-check calls (default: unlimited)
+  --budget=<N>       Maximum number of LLM sourcing calls (default: unlimited)
   --json             Output results as JSON
 
 Examples:

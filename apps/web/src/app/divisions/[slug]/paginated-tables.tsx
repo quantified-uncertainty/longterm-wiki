@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 // ── Pagination controls ─────────────────────────────────────────────
 
@@ -79,7 +79,7 @@ export interface GrantRow {
   date: string | null;
   /** Source-check verdict (null if not checked) */
   sourcingVerdict?: string | null;
-  /** Link to source-check detail page */
+  /** Link to sourcing detail page */
   sourcingHref?: string;
 }
 
@@ -136,7 +136,7 @@ export function PaginatedGrantsTable({ grants }: { grants: GrantRow[] }) {
                     {g.date ?? ""}
                   </td>
                   <td className="py-1.5 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(g.sourcingVerdict ?? undefined)}
                       originalVerdict={g.sourcingVerdict ?? undefined}
                       size="md"

@@ -15,8 +15,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import * as HoverCard from "@radix-ui/react-hover-card";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
@@ -589,7 +589,7 @@ function ProfileSection({
         </div>
         {section.recordType && (
           <Link
-            href={`/internal/entity-source-checks`}
+            href={`/internal/entity-sourcing`}
             onClick={(e) => e.stopPropagation()}
             className="shrink-0 text-[10px] text-muted-foreground/50 hover:text-muted-foreground mr-1"
             title="Review source checks"
@@ -718,11 +718,11 @@ function ProfileSection({
                     })}
                     {section.recordType && (
                       <td className="px-2 py-2 align-top">
-                        <SourceCheckDot
+                        <SourcingDot
                           status={verdict ? recordVerdictToStatus(verdict.verdict) : "not_run"}
                           originalVerdict={verdict?.verdict}
                           size="md"
-                          href={verdict && recordId ? `/source-checks/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}` : undefined}
+                          href={verdict && recordId ? `/sourcing/${encodeURIComponent(section.recordType)}/${encodeURIComponent(recordId)}` : undefined}
                         />
                       </td>
                     )}

@@ -41,8 +41,8 @@ import SafetyGeneralizabilityTableView from "@/components/tables/views/SafetyGen
 // Summary components
 import { KeyTakeaways } from "@/components/wiki/KeyTakeaways";
 
-// Source check status — entity-level source-check verdict summary
-import { SourceCheckStatus } from "@/components/wiki/SourceCheckStatus";
+// Source check status — entity-level sourcing verdict summary
+import { SourcingStatus } from "@/components/wiki/SourcingStatus";
 
 // Epic tracking — use on multi-issue coordination pages (see content/docs/internal/epic-page-conventions.mdx)
 // Usage: <EpicTracker issues={[1043, 1065, 1074]} /> — renders live GitHub issue status table
@@ -75,7 +75,7 @@ import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
 import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
-import { EntitySourceChecksContent } from "@/app/internal/entity-source-checks/entity-source-checks-content";
+import { EntitySourcingContent } from "@/app/internal/entity-sourcing/entity-sourcing-content";
 import { DataQualityContent } from "@/app/internal/data-quality/data-quality-content";
 import { TalentFlowsContent } from "@/app/internal/talent-flows/talent-flows-content";
 import { JobsDashboardContent } from "@/app/internal/jobs/jobs-content";
@@ -205,8 +205,8 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   KBCompareChart: FBCompareChart,
 
   // Source check status
-  SourceCheckStatus,
-  VerificationStatus: SourceCheckStatus, // backwards compat alias
+  SourcingStatus,
+  VerificationStatus: SourcingStatus, // backwards compat alias
 
   // Epic tracking
   EpicTracker,
@@ -238,7 +238,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   PeopleCoverageContent,
   AgentActivityContent,
   EntityProfileContent,
-  EntitySourceChecksContent,
+  EntitySourcingContent,
   DataQualityContent,
   TalentFlowsContent,
   JobsDashboardContent,

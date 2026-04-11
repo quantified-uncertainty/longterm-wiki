@@ -8,7 +8,7 @@
  * Usage:
  *   crux w citations verify <page-id>         Verify citations for a page
  *   crux w citations verify --all             Verify all pages with citations
- *   crux w citations status <page-id>         Show source-check status
+ *   crux w citations status <page-id>         Show sourcing status
  *   crux w citations report                   Summary across all archived pages
  *
  * Part of the hallucination risk reduction initiative (issue #200).
@@ -42,7 +42,7 @@ const SCRIPTS = {
   },
   'quote-report': {
     script: 'citations/quote-report.ts',
-    description: 'Report on quote extraction and source-check coverage',
+    description: 'Report on quote extraction and sourcing coverage',
     passthrough: ['ci', 'json', 'broken'],
   },
   'verify-quotes': {
@@ -133,7 +133,7 @@ Examples:
   crux w citations verify existential-risk                    Verify one page
   crux w citations verify existential-risk --content-verify  Also check claim support
   crux w citations verify --all --limit=20                   Verify top 20 pages
-  crux w citations status existential-risk           Show source-check results
+  crux w citations status existential-risk           Show sourcing results
   crux w citations report                            Summary across all pages
   crux w citations report --broken                   List all broken citations
   crux w citations extract-quotes existential-risk   Extract quotes for a page

@@ -18,7 +18,7 @@ import { findPageById } from '../lib/page-resolution.ts';
 import { extractClaims } from '../lib/semantic-diff/claim-extractor.ts';
 import type { ExtractedClaim } from '../lib/semantic-diff/types.ts';
 import { createLlmClient, callLlm, runLlmAgent, MODELS } from '../lib/llm.ts';
-import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
+import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
 import { parseJsonFromLlm } from '../lib/json-parsing.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 
@@ -159,7 +159,7 @@ async function fetchSourceContent(url: string): Promise<string | null> {
   return result.content;
 }
 
-// ── Independent claim source-check ───────────────────────────────────
+// ── Independent claim sourcing ───────────────────────────────────
 
 type VerifyVerdict = 'supported' | 'contradicted' | 'insufficient';
 

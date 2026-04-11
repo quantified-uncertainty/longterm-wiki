@@ -100,8 +100,8 @@ export interface LoopOptions {
   entityTypes?: string[];
   /** Override the LLM model (e.g., "haiku", "sonnet", "opus"). Default: sonnet. */
   model?: string;
-  /** Skip source-check before submitting records */
-  skipSourceCheck?: boolean;
+  /** Skip sourcing before submitting records */
+  skipSourcing?: boolean;
 }
 
 /**

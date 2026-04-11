@@ -21,7 +21,7 @@ import {
   UpsertCitationContentSchema,
   CITATION_CONTENT_PREVIEW_MAX,
   type AccuracyVerdict,
-  type SourceCheckVerdict,
+  type SourcingVerdict,
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -31,9 +31,9 @@ import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.j
 const BROKEN_SCORE_THRESHOLD = 0.5;
 const MAX_PAGE_SIZE = 5000;
 
-// ---- Verdict mapping: citation accuracy -> source-check (#3671) ----
+// ---- Verdict mapping: citation accuracy -> sourcing (#3671) ----
 
-const ACCURACY_TO_SOURCE_CHECK_VERDICT: Record<AccuracyVerdict, SourceCheckVerdict> = {
+const ACCURACY_TO_SOURCE_CHECK_VERDICT: Record<AccuracyVerdict, SourcingVerdict> = {
   accurate: "confirmed",
   inaccurate: "contradicted",
   unsupported: "unverifiable",
@@ -46,13 +46,13 @@ function buildCitationRecordId(pageSlug: string, footnote: number): string {
 }
 
 /**
- * Dual-write citation accuracy to the unified source-check system.
+ * Dual-write citation accuracy to the unified sourcing system.
  *
  * Wrapped in a Drizzle transaction so the evidence and verdict rows are
  * written atomically — a partial failure can't leave evidence without a
  * verdict or vice versa. Issue #4017 Phase C4.
  */
-async function dualWriteToSourceCheck(
+async function dualWriteToSourcing(
   db: ReturnType<typeof getDrizzleDb>,
   params: {
     pageSlug: string;
@@ -624,7 +624,7 @@ const citationsApp = new Hono()
     const intId = await resolvePageIntId(db, pageId);
     if (intId === null) return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
 
-    // Get the claim text and URL before updating (needed for source-check dual-write)
+    // Get the claim text and URL before updating (needed for sourcing dual-write)
     const [quoteRow] = await db
       .select({ claimText: citationQuotes.claimText, url: citationQuotes.url })
       .from(citationQuotes)
@@ -657,7 +657,7 @@ const citationsApp = new Hono()
       return notFoundError(c, `No quote for page=${pageId} footnote=${footnote}`);
     }
 
-    // Dual-write to unified source-check system (#3671).
+    // Dual-write to unified sourcing system (#3671).
     // Issue #4017 C4: now awaited (was fire-and-forget) and wrapped in a
     // transaction internally. Failure is still non-fatal for the response
     // (the citation accuracy update already succeeded above), but we log
@@ -665,7 +665,7 @@ const citationsApp = new Hono()
     // response after the write attempt completes.
     if (quoteRow) {
       try {
-        await dualWriteToSourceCheck(db, {
+        await dualWriteToSourcing(db, {
           pageSlug: pageId, footnote, accuracyVerdict: verdict,
           accuracyScore: score, claimText: quoteRow.claimText,
           issues: issues ?? null, url: quoteRow.url,
@@ -673,7 +673,7 @@ const citationsApp = new Hono()
       } catch (e: unknown) {
         logger.warn(
           { error: e instanceof Error ? e.message : String(e), pageId, footnote },
-          "Dual-write to source-check failed for citation accuracy (#3671)"
+          "Dual-write to sourcing failed for citation accuracy (#3671)"
         );
       }
     }
@@ -1349,7 +1349,7 @@ const citationsApp = new Hono()
 
   // NOTE: POST /quotes/propagate-from-claims was removed in #1310.
   // Backward propagation from claims → citation_quotes is no longer needed
-  // since claims is now the single source of truth for source-check data.
+  // since claims is now the single source of truth for sourcing data.
 
   // ---- GET /source-type-stats ----
   .get("/source-type-stats", async (c) => {

@@ -248,7 +248,7 @@ export function ThingsTable({
                     verdict={row.verdict}
                     sourcingHref={
                       row.verdict
-                        ? `/source-checks/${encodeURIComponent(row.sourceTable)}/${encodeURIComponent(row.sourceId)}`
+                        ? `/sourcing/${encodeURIComponent(row.sourceTable)}/${encodeURIComponent(row.sourceId)}`
                         : undefined
                     }
                     size="sm"

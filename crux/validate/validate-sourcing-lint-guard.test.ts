@@ -25,7 +25,7 @@ describe('countInText', () => {
   });
 
   it('subtracts route matches from hyphenated count to avoid double counting', () => {
-    const c = countInText(`fetch("/api/source-check/verdicts")`);
+    const c = countInText(`fetch("/api/source-checks/verdicts")`);
     expect(c.route).toBe(1);
     expect(c.hyphenated).toBe(0);
     expect(c.total).toBe(1);
@@ -34,7 +34,7 @@ describe('countInText', () => {
   it('handles a mix of hyphenated and route references', () => {
     const text = `
       // wire up the source-check pipeline
-      const url = "/api/source-check/run";
+      const url = "/api/source-checks/run";
       console.log("source-check done");
     `;
     const c = countInText(text);
@@ -52,7 +52,7 @@ describe('countInText', () => {
   });
 
   it('does not double-count camel/pascal when the prefix happens to also match hyphenated', () => {
-    // "sourceCheck" and "SourceCheck" do not contain a hyphen, so they are
+    // "sourceCheckX" and "SourceCheckY" do not contain a hyphen, so they are
     // categorized separately from `source-check`.
     const c = countInText('sourceCheckX SourceCheckY source-check');
     expect(c.camelCase).toBe(1);
@@ -97,7 +97,7 @@ describe('countInText', () => {
     // hyphenated reference with a camelCase one should leave the total
     // unchanged even though individual buckets shift.
     const before = countInText('source-check source-check source-check');
-    const after = countInText('source-check source-check sourceCheck');
+    const after = countInText('source-check source-check sourceCheckX');
     expect(before.total).toBe(after.total);
     expect(before.hyphenated).toBe(3);
     expect(after.hyphenated).toBe(2);
@@ -106,9 +106,9 @@ describe('countInText', () => {
 
   it('counts route once per occurrence even if it appears inside strings', () => {
     const c = countInText(`
-      const r1 = "/api/source-check";
-      const r2 = '/api/source-check';
-      const r3 = \`/api/source-check\`;
+      const r1 = "/api/source-checks";
+      const r2 = '/api/source-checks';
+      const r3 = \`/api/source-checks\`;
     `);
     expect(c.route).toBe(3);
     expect(c.hyphenated).toBe(0);

@@ -7,7 +7,7 @@ import { getEntityHref } from "@/data/entity-nav";
 import { getRecordVerdict } from "@data/tablebase";
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 import { SectionHeader, Badge } from "./org-shared";
@@ -217,7 +217,7 @@ export function AiModelsSection({
                         wikiId: model.wikiId,
                       })}
                       verdict={modelVerdict}
-                      sourcingHref={getSourceCheckHref("model-release", model.id)}
+                      sourcingHref={getSourcingHref("model-release", model.id)}
                     />
                   </td>
                 </tr>

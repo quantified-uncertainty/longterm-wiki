@@ -33,14 +33,14 @@ import {
   SectionHeader,
   CategoryFactSection,
   GenericCollectionTable,
-  SourceCheckSummary,
+  SourcingSummary,
 } from "@/components/factbase/entity-detail-components";
 
 // ─── Data helpers ────────────────────────────────────────────────────
 
 async function fetchEntityVerdicts(entityId: string): Promise<Map<string, VerdictRow>> {
   const data = await fetchFromWikiServer<VerdictsResponse>(
-    `/api/source-checks/verdicts?record_type=fact&entity_id=${encodeURIComponent(entityId)}&limit=200`,
+    `/api/sourcing/verdicts?record_type=fact&entity_id=${encodeURIComponent(entityId)}&limit=200`,
     { revalidate: 300 }
   );
   const map = new Map<string, VerdictRow>();
@@ -170,7 +170,7 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
       {/* Source check summary */}
       {verdicts.size > 0 && (
         <div className="mb-6">
-          <SourceCheckSummary verdicts={verdicts} totalFacts={structuredFacts.length} />
+          <SourcingSummary verdicts={verdicts} totalFacts={structuredFacts.length} />
         </div>
       )}
 

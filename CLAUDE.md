@@ -47,7 +47,7 @@ pnpm crux w fix markdown                     # After any page edit
 
 # FactBase (fb = factbase)
 pnpm crux fb show <entity>                   # Show FactBase entity
-pnpm crux fb source-check                    # Source-check FactBase facts against URLs
+pnpm crux fb sourcing                    # Source-check FactBase facts against URLs
 
 # TableBase (tb = tablebase)
 pnpm crux tb ids allocate <slug>             # Wiki entity: allocate numericId + stableId
@@ -171,7 +171,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
-- **Wiki-server: ALWAYS use prod from agent slots**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. **Every `pnpm crux` command that touches the wiki-server MUST be prefixed with `WIKI_SERVER_ENV=prod`**. Without this, commands fail with "Wiki server is not reachable" and waste time. This applies to: `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb source-check`, `w source-check-wiki-pages`, `sys` commands, and any command that hits `/api/`. The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available. Usage: `WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"`
+- **Wiki-server: ALWAYS use prod from agent slots**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. **Every `pnpm crux` command that touches the wiki-server MUST be prefixed with `WIKI_SERVER_ENV=prod`**. Without this, commands fail with "Wiki server is not reachable" and waste time. This applies to: `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb sourcing`, `w sourcing-wiki-pages`, `sys` commands, and any command that hits `/api/`. The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available. Usage: `WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"`
 - **No new bash scripts**: Write new scripts/tools as TypeScript in `crux/`. Bash is only acceptable for git hooks (`.githooks/`), Claude Code hooks (`.claude/hooks/`), and CI glue where Node.js isn't available.
 
 ## Detailed Guides (loaded automatically by Claude Code)
@@ -198,7 +198,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 
 These are "mental model" maps. They list the components, endpoints, helpers, and conventions that already exist in each subsystem so agents don't re-implement things. **Read the relevant map at task-start, not after writing code.**
 
-- `.claude/rules/source-check-system.md` — Source-check, verdict, and coverage scoring (if touching verdict UI, coverage scores, or `/api/source-checks/*`)
+- `.claude/rules/sourcing-system.md` — Source-check, verdict, and coverage scoring (if touching verdict UI, coverage scores, or `/api/sourcing/*`)
 - `.claude/rules/entity-sync-pipeline.md` — TableBase sync infrastructure, shared helpers (`sqlInList`, `validateEntityRefs`, `deleteBatchHandler`, `resolveEntityFKs`)
 - `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase naming and which layer owns what
 - `.claude/rules/id-system.md` — `numericId` vs `stableId` vs `tableId`, allocation, validation

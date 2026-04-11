@@ -258,8 +258,8 @@ export function getInternalNav(): NavSection[] {
       title: "Verification",
       defaultOpen: true,
       items: [
-        { label: "Overview", href: internalHref("verification-source-checking-hub") },
-        { label: "Source Checks", href: internalHref("entity-source-checks-dashboard") },
+        { label: "Overview", href: internalHref("verification-sourcing-hub") },
+        { label: "Source Checks", href: internalHref("entity-sourcing-dashboard") },
         { label: "Citation Accuracy", href: internalHref("citation-accuracy-dashboard") },
         { label: "Citation Content", href: internalHref("citation-content-dashboard") },
         { label: "Hallucination Risk", href: internalHref("hallucination-risk-dashboard") },

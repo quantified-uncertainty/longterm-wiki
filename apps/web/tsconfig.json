@@ -24,7 +24,7 @@
       "@wiki-server/api-types": ["../wiki-server/src/api-types.ts"],
       "@wiki-server/api-response-types": ["../wiki-server/src/api-response-types.ts"],
       "@wiki-server/facts-route": ["../wiki-server/src/routes/factbase/facts.ts"],
-      "@wiki-server/source-checks-route": ["../wiki-server/src/routes/source-check/source-checks.ts"],
+      "@wiki-server/sourcing-route": ["../wiki-server/src/routes/sourcing/sourcing.ts"],
       "@wiki-server/grants-route": ["../wiki-server/src/routes/tablebase/grants.ts"],
       "@wiki-server/divisions-route": ["../wiki-server/src/routes/tablebase/divisions.ts"],
       "@wiki-server/funding-programs-route": ["../wiki-server/src/routes/tablebase/funding-programs.ts"],

@@ -190,7 +190,7 @@ BEGIN
   RAISE NOTICE 'Remaining source_check_verdicts rows: %', remaining_verdicts;
   RAISE NOTICE '';
   RAISE NOTICE 'Next steps:';
-  RAISE NOTICE '  1. Re-run source-check: pnpm crux tb source-check-records --table=investments';
+  RAISE NOTICE '  1. Re-run sourcing: pnpm crux tb sourcing-records --table=investments';
   RAISE NOTICE '  2. Use enrichment to find correct source URLs: pnpm crux tb enrich --task=investment-linking';
 END $$;
 

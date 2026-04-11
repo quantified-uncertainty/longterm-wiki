@@ -1,7 +1,7 @@
 /**
  * Shared HTML-to-text utilities used across the fetch pipeline.
  *
- * Combines main-content scoping (from source-check) with structural
+ * Combines main-content scoping (from sourcing) with structural
  * newline preservation (from search) into a single implementation.
  */
 

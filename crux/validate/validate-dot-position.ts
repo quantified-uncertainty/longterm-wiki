@@ -1,8 +1,8 @@
 /**
  * Validate dot indicators never appear as the first column in a table.
  *
- * Detects both `SourceCheckDot` (direct) and `RecordStatusDots` (wrapper
- * that renders SourceCheckDot internally).
+ * Detects both `SourcingDot` (direct) and `RecordStatusDots` (wrapper
+ * that renders SourcingDot internally).
  *
  * Checks two patterns:
  * 1. HTML tables: dot component inside the first <td> of a <tr>
@@ -16,8 +16,8 @@ import { readFileSync, readdirSync } from "fs";
 import { join, relative } from "path";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 
-/** Components that render status dots (SourceCheckDot or wrappers around it) */
-const DOT_COMPONENTS = ["SourceCheckDot", "RecordStatusDots"];
+/** Components that render status dots (SourcingDot or wrappers around it) */
+const DOT_COMPONENTS = ["SourcingDot", "RecordStatusDots"];
 
 function hasDotComponent(text: string): boolean {
   return DOT_COMPONENTS.some((c) => text.includes(c));
@@ -270,7 +270,7 @@ export function runCheck() {
   const violations = allFiles.flatMap(checkFile);
 
   if (violations.length === 0) {
-    console.log("Dot-position check passed (SourceCheckDot / RecordStatusDots)");
+    console.log("Dot-position check passed (SourcingDot / RecordStatusDots)");
   } else {
     console.error(`Dot-position violations (${violations.length}):\n`);
     for (const v of violations) {

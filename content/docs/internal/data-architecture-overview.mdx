@@ -53,8 +53,8 @@ The Resources layer is the wiki's interface with the outside world. It collects,
 |-------|---------------|-------------------|
 | `resources` | Metadata for external papers, blog posts, reports | PG-native; populated via wiki-server API and build-data sync |
 | `resource_tabular_sources` | Configured data sources (grant databases, career pages, etc.) | Manual configuration per tracked website |
-| `citation_content` | Latest HTML/text from cited URLs (hot cache) | Fetched on-demand during source-checks and citation verification |
-| `resource_content_versions` | **Versioned** content snapshots with content-hash dedup | Fetched by source-check pipeline and website monitors |
+| `citation_content` | Latest HTML/text from cited URLs (hot cache) | Fetched on-demand during sourcing and citation verification |
+| `resource_content_versions` | **Versioned** content snapshots with content-hash dedup | Fetched by sourcing pipeline and website monitors |
 | `website_source_pages` | Monitored pages from tracked websites | Configured per `resource_tabular_sources` entry |
 | `website_source_page_snapshots` | Point-in-time snapshots of monitored pages | Periodic fetches; diffed against previous to detect changes |
 | `auto_update_news_items` | Discovered news items from RSS/web search | Auto-update pipeline (daily) |
@@ -129,7 +129,7 @@ pnpm crux w check-links                   # Check external URL health
 | `crux/auto-update/orchestrator.ts` | End-to-end pipeline orchestration |
 | `crux/auto-update/feed-fetcher.ts` | RSS/Atom feed fetching with caching |
 | `crux/auto-update/page-router.ts` | Routes items to wiki pages by topic |
-| `crux/lib/source-check/source-fetcher.ts` | Fetches and caches source content (Firecrawl, HTTP, YouTube) |
+| `crux/lib/sourcing/source-fetcher.ts` | Fetches and caches source content (Firecrawl, HTTP, YouTube) |
 | `apps/wiki-server/src/routes/citations.ts` | Citation content fetch and cache API |
 | `apps/wiki-server/src/routes/resources.ts` | Resource metadata and content versions API |
 
@@ -192,23 +192,23 @@ Each verdict carries a **confidence score** (0.0 to 1.0) and is timestamped so s
 
 ```bash
 # FactBase facts
-pnpm crux fb source-check --entity=anthropic      # Check all facts for an entity
-pnpm crux fb source-check --fact=f_dW5cR9mJ8q     # Check a single fact
+pnpm crux fb sourcing --entity=anthropic      # Check all facts for an entity
+pnpm crux fb sourcing --fact=f_dW5cR9mJ8q     # Check a single fact
 
 # Wiki page claims
-pnpm crux w source-check-wiki-pages --page=anthropic        # Check one page
-pnpm crux w source-check-wiki-pages --limit=5 --budget=2    # Batch with budget
+pnpm crux w sourcing-wiki-pages --page=anthropic        # Check one page
+pnpm crux w sourcing-wiki-pages --limit=5 --budget=2    # Batch with budget
 ```
 
 ### Key Files
 
 | File | Role |
 |------|------|
-| `crux/lib/source-check/orchestrator.ts` | Main orchestration logic |
-| `crux/lib/source-check/item-verifier.ts` | LLM-based claim verification |
-| `crux/lib/source-check/deterministic-matcher.ts` | Cross-references claims to footnotes |
-| `crux/lib/source-check/verdict-handler.ts` | Stores evidence and computes aggregate verdicts |
-| `crux/lib/source-check/wiki-page-claims.ts` | Extracts claims from MDX prose via LLM |
+| `crux/lib/sourcing/orchestrator.ts` | Main orchestration logic |
+| `crux/lib/sourcing/item-verifier.ts` | LLM-based claim verification |
+| `crux/lib/sourcing/deterministic-matcher.ts` | Cross-references claims to footnotes |
+| `crux/lib/sourcing/verdict-handler.ts` | Stores evidence and computes aggregate verdicts |
+| `crux/lib/sourcing/wiki-page-claims.ts` | Extracts claims from MDX prose via LLM |
 
 ---
 
@@ -313,7 +313,7 @@ The `things` table is a **universal search index** that gives every identifiable
 
 ### How Each Base Gets Populated
 
-Most data entry is automated. The goal is a **defensive pipeline**: data enters through verification gates so records are born with green source-check dots, rather than being verified after the fact. See [Discussion \#3958](https://github.com/quantified-uncertainty/longterm-wiki/discussions/3958) for the full strategy.
+Most data entry is automated. The goal is a **defensive pipeline**: data enters through verification gates so records are born with green sourcing dots, rather than being verified after the fact. See [Discussion \#3958](https://github.com/quantified-uncertainty/longterm-wiki/discussions/3958) for the full strategy.
 
 #### WikiBase: Page Creation and Improvement
 
@@ -433,7 +433,7 @@ The gate (`pnpm crux w validate gate --fix`) runs ~50 checks. Most are blocking 
 
 ## How Data Flows End-to-End
 
-Putting it all together — here's the **auto-update path** (the most common flow) from a real-world event to a reader seeing updated information. Other paths exist: TableBase enrichment (scan → rank → agent → pre-submit verify → PG), on-demand source-checks, and manual edits.
+Putting it all together — here's the **auto-update path** (the most common flow) from a real-world event to a reader seeing updated information. Other paths exist: TableBase enrichment (scan → rank → agent → pre-submit verify → PG), on-demand sourcing, and manual edits.
 
 1. **Resources**: Auto-update pipeline fetches RSS feeds, discovers "Anthropic announces new model"
 2. **Resources**: Source fetcher downloads the blog post content and caches it in `resource_content_versions`
@@ -455,7 +455,7 @@ flowchart TB
         NEWS["Auto-update finds\nnew Anthropic blog post"]
         CACHED["Blog post cached in\nresource_content_versions"]
     end
-    subgraph SourceCheck["Source-Check Layer"]
+    subgraph Sourcing["Source-Check Layer"]
         CHECK["Verifies revenue claim\nagainst cached Reuters article"]
     end
     subgraph ThreeBases["Three Bases Layer"]
@@ -492,7 +492,7 @@ This is a critical distinction: **content pages make zero runtime API calls**, w
 | Consumer | Reads From | When | Examples |
 |----------|-----------|------|---------|
 | **Wiki content pages** | `database.json`, `factbase-data.json` | Build time (static) | Entity pages, articles, comparison tables |
-| **Internal dashboards** | Wiki-server API via Hono RPC | Runtime (ISR, 300s cache) | Grants, personnel, source-checks, jobs |
+| **Internal dashboards** | Wiki-server API via Hono RPC | Runtime (ISR, 300s cache) | Grants, personnel, sourcing, jobs |
 | **Auto-update pipeline** | RSS feeds + wiki-server API | Scheduled (daily) | News digest, page routing, run recording |
 | **Source-check pipeline** | Local data files + wiki-server + external URLs | On-demand / scheduled | Fact verification, claim extraction |
 | **Crux CLI commands** | Local files and/or wiki-server API | On-demand | `crux query search`, `crux fb show` |
@@ -513,8 +513,8 @@ Internal dashboard pages use Next.js Incremental Static Regeneration. Most pages
 |--------------|----------|-----------|
 | **Add a new organization** | `WIKI_SERVER_ENV=prod pnpm crux tb ids allocate my-org` → edit `data/entities/organizations.yaml` → `pnpm crux w create "My Org" --tier=standard` | `data/entities/organizations.yaml`, new MDX page |
 | **Add structured facts about an entity** | `pnpm crux fb add-fact` or edit `packages/factbase/data/things/<entity>.yaml` directly | `packages/factbase/data/things/` |
-| **Check if a fact is accurately sourced** | `WIKI_SERVER_ENV=prod pnpm crux fb source-check --entity=anthropic` | `crux/lib/source-check/` |
-| **Find why a page shows stale data** | Check `update_frequency` in frontmatter → `WIKI_SERVER_ENV=prod pnpm crux w auto-update history` → check source-check verdicts | `data/auto-update/sources.yaml` |
+| **Check if a fact is accurately sourced** | `WIKI_SERVER_ENV=prod pnpm crux fb sourcing --entity=anthropic` | `crux/lib/sourcing/` |
+| **Find why a page shows stale data** | Check `update_frequency` in frontmatter → `WIKI_SERVER_ENV=prod pnpm crux w auto-update history` → check sourcing verdicts | `data/auto-update/sources.yaml` |
 | **Create a new PG-primary table** | Add Drizzle schema → generate migration → add wiki-server route → add to `things` sync | `apps/wiki-server/src/schema.ts` |
 | **Add a new directory page** | Schema in `entity-schemas.ts` → transform in `entity-transform.mjs` → route in `entity-nav.ts` → App Router pages | `apps/web/src/data/entity-schemas.ts` |
 | **Run all validations before a PR** | `pnpm crux w validate gate --fix` → `pnpm build` → `pnpm test` | `crux/validate/` |
@@ -593,9 +593,9 @@ flowchart TB
 
 | Group | Key Subcommands | Purpose |
 |-------|----------------|---------|
-| **`w` (wiki)** | `create`, `improve`, `validate gate`, `fix escaping`, `auto-update`, `source-check-wiki-pages`, `citations`, `qa-sweep` | Content authoring, validation, automated updates |
-| **`fb` (factbase)** | `show`, `validate`, `search`, `add-fact`, `source-check`, `coverage` | Structured fact management and verification |
-| **`tb` (tablebase)** | `ids allocate`, `tablebase scan/gaps/improve/loop`, `ensure-entities`, `people discover`, `benchmarks`, `source-check` | Entity catalog, PG table enrichment, ID allocation |
+| **`w` (wiki)** | `create`, `improve`, `validate gate`, `fix escaping`, `auto-update`, `sourcing-wiki-pages`, `citations`, `qa-sweep` | Content authoring, validation, automated updates |
+| **`fb` (factbase)** | `show`, `validate`, `search`, `add-fact`, `sourcing`, `coverage` | Structured fact management and verification |
+| **`tb` (tablebase)** | `ids allocate`, `tablebase scan/gaps/improve/loop`, `ensure-entities`, `people discover`, `benchmarks`, `sourcing` | Entity catalog, PG table enrichment, ID allocation |
 | **`gh` (github)** | `issues start/done/create`, `pr create/detect`, `ci status`, `epic create`, `release create`, `deploy-tasks` | Issue tracking, PR management, CI monitoring |
 | **`sys` (system)** | `agent-checklist`, `agent-reset`, `audits`, `health`, `wiki-server sync`, `jobs` | Agent workflow, background jobs, system health |
 | **`query`** | `search`, `entity`, `facts`, `related`, `risk`, `stats`, `blocks` | Cross-domain search and data queries |
@@ -615,7 +615,7 @@ The architecture has known limitations and missing pieces. Documenting them prev
 | **No incremental builds** | `build-data.mjs` rebuilds everything from scratch each time (≈30s for content-only, ~2min full). No caching or dirty-file detection | Use `--scope=content` for faster content-only builds |
 | **No real-time updates** | Wiki content is fully static — changes require a build + deploy cycle. ISR helps dashboards but content pages are build-time only | Deploy pipeline; auto-update runs daily |
 | **No FactBase → WikiBase auto-sync** | When a FactBase fact changes, the wiki page prose isn't automatically updated to match | `crux w improve` can update pages, but must be triggered manually |
-| **Source-check coverage is partial** | Only about 15% of wiki pages have been source-checked. Many facts lack source URLs entirely | `crux fb source-check` and `crux w source-check-wiki-pages` are available but expensive (about \$0.07/page) |
+| **Source-check coverage is partial** | Only about 15% of wiki pages have been sourcinged. Many facts lack source URLs entirely | `crux fb sourcing` and `crux w sourcing-wiki-pages` are available but expensive (about \$0.07/page) |
 | **No rollback for PG-primary data** | YAML-primary data has full git history. PG-primary data (grants, personnel) has no version history beyond edit logs | Consider adding a changelog table for PG-primary records |
 | **`things` table can go stale** | The cross-base index is synced at build time. Between builds, newly created PG records won't appear in `things` search | Rebuild or wait for next deploy |
 

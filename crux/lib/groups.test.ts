@@ -141,7 +141,7 @@ describe('resolveGroupRouting', () => {
   const mockHasCommand = (domain: string, cmd: string) => {
     const cmds: Record<string, string[]> = {
       content: ['improve', 'create', 'grade'],
-      factbase: ['show', 'list', 'source-check'],
+      factbase: ['show', 'list', 'sourcing'],
       tablebase: ['scan', 'gaps', 'backfill-grantee-ids'],
       issues: ['search', 'start', 'done'],
     };

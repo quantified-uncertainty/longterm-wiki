@@ -16,7 +16,7 @@ This section contains internal documentation for maintaining and contributing to
 Start here. Each hub gives you the dashboards, CLI commands, decision tables, and architecture deep-dives for one part of the wiki.
 
 - <EntityLink id="E2166" name="research-discovery-hub">Research & Discovery</EntityLink> — finding new information (web search, news ingestion, context bundles)
-- <EntityLink id="E2167" name="verification-source-checking-hub">Verification & Source-Checking</EntityLink> — keeping facts correct (citations, source-checks, hallucination risk)
+- <EntityLink id="E2167" name="verification-sourcing-hub">Verification & Source-Checking</EntityLink> — keeping facts correct (citations, sourcing, hallucination risk)
 - <EntityLink id="E2168" name="factbase-entities-hub">FactBase & Entities</EntityLink> — structured data layer (FactBase, TableBase, IDs, queries)
 - <EntityLink id="E2169" name="content-pipelines-hub">Content Pipelines</EntityLink> — page creation, improvement, validation, auto-update
 

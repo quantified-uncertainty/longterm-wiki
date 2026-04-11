@@ -170,7 +170,7 @@ export async function CitationAccuracyContent() {
   return (
     <>
       <p className="text-muted-foreground">
-        Accuracy source-check results from LLM-powered citation checking.{" "}
+        Accuracy sourcing results from LLM-powered citation checking.{" "}
         <span className="font-medium text-foreground">
           {summary.checkedCitations}
         </span>{" "}

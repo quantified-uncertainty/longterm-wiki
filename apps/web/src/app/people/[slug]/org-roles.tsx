@@ -3,7 +3,7 @@ import { formatDateRange, fieldStr } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge, FounderBadge } from "@/components/directory";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
@@ -44,7 +44,7 @@ export function OrgRoles({ orgRoles }: { orgRoles: OrgRole[] }) {
                     filledFieldCount: (title ? 1 : 0) + (start ? 1 : 0) + (end ? 1 : 0),
                   })}
                   verdict={verdict?.verdict}
-                  sourcingHref={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
+                  sourcingHref={verdict?.verdict ? getSourcingHref("personnel", String(record.key)) : undefined}
                 />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">

@@ -56,7 +56,7 @@ const StatsQuery = z.object({
   parent_id: z.string().max(100).optional(),
 });
 
-// Source-check schemas live in the unified /api/source-checks route. See discussion #2950.
+// Source-check schemas live in the unified /api/sourcing route. See discussion #2950.
 
 // ---- Raw SQL row types ----
 
@@ -131,8 +131,8 @@ function formatThing(
   };
 }
 
-// formatSourcing and formatVerdict removed — source-checks live in
-// the unified /api/source-checks route. See discussion #2950.
+// formatSourcing and formatVerdict removed — sourcing live in
+// the unified /api/sourcing route. See discussion #2950.
 
 const sortColumns = {
   title: things.title,
@@ -436,7 +436,7 @@ const thingsApp = new Hono()
     });
   })
 
-  // Source-check endpoints live in the unified /api/source-checks route.
+  // Source-check endpoints live in the unified /api/sourcing route.
   // See discussion #2950.
 
   // ---- GET /:id ----

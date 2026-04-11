@@ -314,7 +314,7 @@ export async function handleResourceIngest(
     // Chain: enqueue resource-enrich job for reachable resources with content.
     // Skip if content is empty — fetchSource returns ok but no content for some
     // pages (JS-only shells, empty responses). Enriching without content is wasteful
-    // and source-check would still see not_cached.
+    // and sourcing would still see not_cached.
     if (status === 'reachable' && result.content.length > 0) {
       createJob({
         type: 'resource-enrich',

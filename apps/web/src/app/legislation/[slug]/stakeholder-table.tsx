@@ -3,8 +3,8 @@
 import { useState } from "react";
 import Link from "next/link";
 import * as Popover from "@radix-ui/react-popover";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 const POSITION_COLORS: Record<string, string> = {
   support:
@@ -189,7 +189,7 @@ export interface StakeholderRow {
   sourceName?: string;
   context?: string[];
   href: string | null;
-  /** Pre-resolved source-check verdict (serializable). Resolved server-side. */
+  /** Pre-resolved sourcing verdict (serializable). Resolved server-side. */
   verdict: { verdict: string; confidence: number | null } | null;
 }
 
@@ -308,7 +308,7 @@ export function StakeholderTable({
                   )}
                 </td>
                 <td className="py-1.5 px-1">
-                  <SourceCheckDot
+                  <SourcingDot
                     status={recordVerdictToStatus(stakeholder.verdict?.verdict)}
                     originalVerdict={stakeholder.verdict?.verdict}
                     size="md"

@@ -163,7 +163,7 @@ const SCRIPTS = {
   },
   'dot-position': {
     script: 'validate/validate-dot-position.ts',
-    description: 'Check that SourceCheckDot / RecordStatusDots are never the first column',
+    description: 'Check that SourcingDot / RecordStatusDots are never the first column',
     passthrough: [],
   },
   'to-rdjsonl': {
