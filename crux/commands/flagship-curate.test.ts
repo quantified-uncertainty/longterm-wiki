@@ -30,7 +30,7 @@ vi.mock('../lib/wiki-server/entities.ts', () => ({
   searchEntities: vi.fn(async () => ({ ok: true, data: { entities: [], total: 0 } })),
 }));
 
-vi.mock('../lib/wiki-server/source-checks.ts', () => ({
+vi.mock('../lib/wiki-server/sourcing.ts', () => ({
   getVerdictsByEntity: (...args: unknown[]) => mockGetVerdictsByEntity(...args),
 }));
 
@@ -39,7 +39,7 @@ vi.mock('../lib/wiki-server/personnel.ts', () => ({
   syncPersonnel: (...args: unknown[]) => mockSyncPersonnel(...args),
 }));
 
-vi.mock('../lib/wiki-server/source-check-client.ts', () => ({
+vi.mock('../lib/wiki-server/sourcing-client.ts', () => ({
   storeVerdict: (...args: unknown[]) => mockStoreVerdict(...args),
 }));
 
@@ -78,7 +78,7 @@ vi.mock('../lib/prompt-utils.ts', () => ({
 }));
 
 // Mock the orchestrate command for verification step
-vi.mock('./source-check-orchestrate.ts', () => ({
+vi.mock('./sourcing-orchestrate.ts', () => ({
   orchestrateCommand: vi.fn(async () => ({
     exitCode: 0,
     output: 'Verified 5 items. confirmed 3 partial 2 Cost: $0.025',
