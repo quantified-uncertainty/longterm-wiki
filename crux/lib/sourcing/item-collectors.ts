@@ -22,6 +22,17 @@ import {
 import { buildRecordDescription, extractRecordFields } from './record-descriptions.ts';
 import { computeFactPriority, computeRecordPriority } from './priority.ts';
 
+/** Extract a raw string representation of a fact's value (before display formatting). */
+function extractRawValue(fact: Fact): string | undefined {
+  const v = fact.value;
+  if (v.type === 'number') return String(v.value);
+  if (v.type === 'text') return v.value;
+  if (v.type === 'range') return `${v.low}–${v.high}`;
+  if (v.type === 'date') return v.value;
+  if (v.type === 'boolean') return String(v.value);
+  return undefined;
+}
+
 // ── Web search for entities without sources ──────────────────────────
 
 /**
@@ -201,6 +212,7 @@ export function collectFactItems(
           fact,
           propertyName: property?.name ?? fact.propertyId,
           formattedValue,
+          rawValue: extractRawValue(fact),
         },
       });
     }
