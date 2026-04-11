@@ -1198,6 +1198,13 @@
       "when": 1784188800000,
       "tag": "0170_investments_display_name_dedup",
       "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1784275200000,
+      "tag": "0171_create_coverage_scans",
+      "breakpoints": true
     }
   ]
 }
