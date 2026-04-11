@@ -4,7 +4,7 @@
  */
 import Link from "next/link";
 import { getEntityHref } from "@/data/entity-nav";
-import { getRecordVerdict } from "@data/tablebase";
+
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
@@ -145,7 +145,7 @@ export function AiModelsSection({
           <tbody className="divide-y divide-border/50">
             {models.map((model) => {
               const href = model.wikiId ? `/wiki/${model.wikiId}` : getEntityHref(model.id, model.entityType);
-              const modelVerdict = getRecordVerdict("model-release", model.id)?.verdict;
+              const modelVerdict = null; // model-release has no sourcing verdicts yet (QUA-211)
               const benchmarks = benchmarksByModel?.get(model.id);
               const topBenchmarks = benchmarks
                 ? pickTopBenchmarks(benchmarks)

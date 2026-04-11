@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, getTypedEntityById, isAiModel } from "@/data";
-import { getRecordVerdict } from "@/data/tablebase";
+
 import { AiModelsTable, type AiModelRow } from "./ai-models-table";
 import { isModelFamily } from "./ai-model-utils";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
@@ -109,7 +109,7 @@ function apiEntityToRow(e: DirectoryEntity): AiModelRow {
     isFamily,
     openWeight: (meta.openWeight as boolean | undefined) ?? null,
     parameterCount: (meta.parameterCount as string | undefined) ?? null,
-    verdictString: getRecordVerdict("ai-model", e.id)?.verdict ?? null,
+    verdictString: null, // ai-model has no sourcing verdicts yet (QUA-211)
   };
 }
 
@@ -174,7 +174,7 @@ function loadFromLocal(): AiModelsPageData {
       isFamily,
       openWeight: entity.openWeight ?? null,
       parameterCount: entity.parameterCount ?? null,
-      verdictString: getRecordVerdict("ai-model", entity.id)?.verdict ?? null,
+      verdictString: null, // ai-model has no sourcing verdicts yet (QUA-211)
     };
   });
 

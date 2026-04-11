@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import type { PoliticalScore } from "./types";
 
 // ── Score color logic ────────────────────────────────────────────────
@@ -240,17 +240,12 @@ function ScoreRow({ score }: { score: PoliticalScore }) {
         )}
       </td>
       <td className="px-4 py-2.5 text-center">
-        {(() => {
-          const verdict = getRecordVerdict("political-score", String(score.id))?.verdict;
-          return (
-            <SourcingDot
-              status={recordVerdictToStatus(verdict)}
-              originalVerdict={verdict}
-              size="md"
-              href={getSourcingHref("political-score", String(score.id))}
-            />
-          );
-        })()}
+        {/* political-score has no sourcing verdicts yet (QUA-211) */}
+        <SourcingDot
+          status={recordVerdictToStatus(null)}
+          originalVerdict={null}
+          size="md"
+        />
       </td>
     </tr>
   );

@@ -16,8 +16,8 @@ import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
 import { getEntityHref } from "@/data/entity-nav";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import type { PoliticalVoteRecord } from "./types";
 
 // ── Vote styling ────────────────────────────────────────────────────
@@ -422,17 +422,12 @@ function LegislationVoteRow({ vote }: { vote: PoliticalVoteRecord }) {
         )}
       </td>
       <td className="px-4 py-2.5 text-center">
-        {(() => {
-          const verdict = getRecordVerdict("political-vote", String(vote.id))?.verdict;
-          return (
-            <SourcingDot
-              status={recordVerdictToStatus(verdict)}
-              originalVerdict={verdict}
-              size="md"
-              href={getSourcingHref("political-vote", String(vote.id))}
-            />
-          );
-        })()}
+        {/* political-vote has no sourcing verdicts yet (QUA-211) */}
+        <SourcingDot
+          status={recordVerdictToStatus(null)}
+          originalVerdict={null}
+          size="md"
+        />
       </td>
     </tr>
   );

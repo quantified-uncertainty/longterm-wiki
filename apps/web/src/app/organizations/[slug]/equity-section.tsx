@@ -5,8 +5,8 @@
  * Pledge % is joined from charitable-pledges KB records by holder ID.
  */
 import Link from "next/link";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { formatCompactCurrency } from "@/lib/format-compact";
@@ -143,7 +143,7 @@ export function EquityPositionsSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {enriched.map((pos) => {
-              const verdict = getRecordVerdict("equity-position", String(pos.key));
+              // equity-position has no sourcing verdicts yet (QUA-211)
               return (
                 <tr key={pos.key} className="hover:bg-muted/20 transition-colors">
                   <td className="py-2 px-3">
@@ -203,8 +203,8 @@ export function EquityPositionsSection({
                       coverageScore={computeGenericCoverage({
                         filledFieldCount: (pos.stake != null ? 1 : 0) + (pos.source ? 1 : 0) + (pos.notes ? 1 : 0),
                       })}
-                      verdict={verdict?.verdict}
-                      sourcingHref={verdict?.verdict ? getSourcingHref("equity-position", String(pos.key)) : undefined}
+                      verdict={undefined}
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>
