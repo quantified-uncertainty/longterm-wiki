@@ -588,13 +588,20 @@ export async function fetchRecordVerdicts() {
       const data = await resp.json();
       const items = data.verdicts || [];
       for (const v of items) {
-        verdicts[`${v.recordType}:${v.recordId}`] = {
+        const entry = {
           verdict: v.verdict,
           confidence: v.confidence,
           sourcesChecked: v.sourcesChecked,
           needsRecheck: v.needsRecheck,
           lastComputedAt: v.lastComputedAt,
         };
+        if (v.fieldName) {
+          // Per-field verdict: keyed as "recordType:recordId:fieldName"
+          verdicts[`${v.recordType}:${v.recordId}:${v.fieldName}`] = entry;
+        } else {
+          // Whole-row verdict: keyed as "recordType:recordId"
+          verdicts[`${v.recordType}:${v.recordId}`] = entry;
+        }
       }
       if (items.length < pageSize) break;
       offset += pageSize;
