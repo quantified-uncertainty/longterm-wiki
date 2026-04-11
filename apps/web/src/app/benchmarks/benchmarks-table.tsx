@@ -6,6 +6,7 @@ import { compareByValue, type SortDir } from "@/lib/sort-utils";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeBenchmarkCoverage } from "@/components/coverage/coverage-score";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface BenchmarkRow {
   id: string;
@@ -234,6 +235,7 @@ export function BenchmarksTable({ rows }: { rows: BenchmarkRow[] }) {
                   <RecordStatusDots
                     coverageScore={computeBenchmarkCoverage(row)}
                     verdict={row.verdictString}
+                    sourcingHref={row.verdictString ? getSourcingHref("benchmark", row.id) : undefined}
                   />
                 </td>
               </tr>

@@ -191,6 +191,8 @@ export interface StakeholderRow {
   href: string | null;
   /** Pre-resolved sourcing verdict (serializable). Resolved server-side. */
   verdict: { verdict: string; confidence: number | null } | null;
+  /** Link to the sourcing detail page for this stakeholder. */
+  sourcingHref?: string;
 }
 
 interface StakeholderTableProps {
@@ -312,6 +314,7 @@ export function StakeholderTable({
                     status={recordVerdictToStatus(stakeholder.verdict?.verdict)}
                     originalVerdict={stakeholder.verdict?.verdict}
                     size="md"
+                    href={stakeholder.sourcingHref}
                   />
                 </td>
               </tr>

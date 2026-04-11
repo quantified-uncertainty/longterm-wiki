@@ -135,19 +135,19 @@ export function FBFactValue({
                 >
                   Link
                 </a>
-                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
+                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" href={`/sourcing/fact/${encodeURIComponent(fact.id)}`} />}
               </span>
             ) : (
               <span className="inline-flex items-center gap-1">
                 Source: {fact.source}
-                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
+                {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" href={`/sourcing/fact/${encodeURIComponent(fact.id)}`} />}
               </span>
             )}
           </span>
         )}
         {sourcing && (
           <span className="block text-muted-foreground/80 mt-0.5">
-            <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />
+            <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" href={`/sourcing/fact/${encodeURIComponent(fact.id)}`} />
           </span>
         )}
         {/* Fact detail link */}
