@@ -6,8 +6,8 @@ import Link from "next/link";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { SectionHeader } from "./org-shared";
 import type { RelatedOrg } from "./org-data";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
@@ -40,8 +40,8 @@ export function RelatedOrganizationsSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {displayed.map((org, idx) => {
-              const recordId = `${parentOrgId}:${org.id}`;
-              const verdict = getRecordVerdict("entity-relationship", recordId)?.verdict;
+              // entity-relationship has no sourcing verdicts yet (QUA-211)
+              const verdict = null as string | null;
               return (
                 <tr key={`${org.id}-${idx}`} className="hover:bg-muted/20 transition-colors">
                   <td className="py-1.5 px-3">
@@ -65,7 +65,7 @@ export function RelatedOrganizationsSection({
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={verdict ? getSourcingHref("entity-relationship", recordId) : undefined}
+                      href={undefined}
                     />
                   </td>
                 </tr>

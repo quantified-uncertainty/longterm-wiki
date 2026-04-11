@@ -18,8 +18,8 @@ import { cn } from "@/lib/utils";
 import { safeHref, formatCompactCurrency } from "@/lib/format-compact";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import type { CampaignFinanceRecord } from "./types";
 import { toNum } from "./utils";
 
@@ -318,17 +318,12 @@ function PreviousCyclesTable({
                   )}
                 </td>
                 <td className="px-4 py-2 text-center">
-                  {(() => {
-                    const verdict = getRecordVerdict("campaign-finance", String(record.id))?.verdict;
-                    return (
-                      <SourcingDot
-                        status={recordVerdictToStatus(verdict)}
-                        originalVerdict={verdict}
-                        size="md"
-                        href={getSourcingHref("campaign-finance", String(record.id))}
-                      />
-                    );
-                  })()}
+                  {/* campaign-finance has no sourcing verdicts yet (QUA-211) */}
+                  <SourcingDot
+                    status={recordVerdictToStatus(null)}
+                    originalVerdict={null}
+                    size="md"
+                  />
                 </td>
               </tr>
             ))}

@@ -14,8 +14,8 @@ import { cn } from "@/lib/utils";
 import { safeHref } from "@/lib/format-compact";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import type { PoliticalOffice } from "./types";
 
 // ── Status styling ───────────────────────────────────────────────────
@@ -193,17 +193,12 @@ export function OfficeHistory({ offices }: OfficeHistoryProps) {
                     <span className="font-medium text-sm">
                       {officeTypeLabel(office.officeType)}
                     </span>
-                    {(() => {
-                      const verdict = getRecordVerdict("political-office", String(office.id))?.verdict;
-                      return (
-                        <SourcingDot
-                          status={recordVerdictToStatus(verdict)}
-                          originalVerdict={verdict}
-                          size="md"
-                          href={getSourcingHref("political-office", String(office.id))}
-                        />
-                      );
-                    })()}
+                    {/* political-office has no sourcing verdicts yet (QUA-211) */}
+                    <SourcingDot
+                      status={recordVerdictToStatus(null)}
+                      originalVerdict={null}
+                      size="md"
+                    />
                     <span
                       className={cn(
                         "inline-block px-2 py-0.5 rounded-full text-[10px] font-semibold",

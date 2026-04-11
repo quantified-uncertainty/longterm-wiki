@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { fetchFromWikiServer } from "@/lib/wiki-server";
-import { getRecordVerdict, pickWorstVerdict } from "@/data/tablebase";
+import { pickWorstVerdict } from "@/data/tablebase";
 import { ProfileStatCard } from "@/components/directory";
 import { RACE_LEVEL_LABELS } from "./races-constants";
 import { RacesTable, type RaceRow, type CandidateRow } from "./races-table";
@@ -57,7 +57,7 @@ export default async function RacesPage() {
     const list = candidatesByRace.get(c.raceId) ?? [];
     list.push({
       ...c,
-      verdictString: getRecordVerdict("race-candidate", String(c.id))?.verdict ?? null,
+      verdictString: null, // race-candidate has no sourcing verdicts yet (QUA-211)
     });
     candidatesByRace.set(c.raceId, list);
   }

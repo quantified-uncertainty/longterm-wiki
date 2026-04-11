@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, getTypedEntityById, isProject } from "@/data";
-import { getRecordVerdict } from "@/data/tablebase";
+
 import { getEntityHref } from "@/data/entity-nav";
 import { ProfileStatCard } from "@/components/directory";
 import { getKBLatest } from "@/data/factbase";
@@ -107,7 +107,7 @@ function apiEntityToRow(e: DirectoryEntity): ProjectRow {
     clusters: e.tags ?? [],
     orgName,
     orgHref,
-    verdictString: getRecordVerdict("project", e.id)?.verdict ?? null,
+    verdictString: null, // project has no sourcing verdicts yet (QUA-211)
   };
 }
 
@@ -195,7 +195,7 @@ function loadFromLocal(): ProjectsPageData {
       clusters: p.clusters,
       orgName,
       orgHref,
-      verdictString: getRecordVerdict("project", p.id)?.verdict ?? null,
+      verdictString: null, // project has no sourcing verdicts yet (QUA-211)
     };
   });
 
