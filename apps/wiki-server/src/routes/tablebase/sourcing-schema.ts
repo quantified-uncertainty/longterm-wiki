@@ -33,7 +33,12 @@ export const InlineSourcingSchema = z.object({
    * When present, additional source_check_verdicts rows are written with field_name set.
    * The row-level verdict (field_name = NULL) is always written regardless.
    */
-  fieldVerdicts: z.record(z.string(), FieldVerdictSchema).optional(),
+  fieldVerdicts: z
+    .record(
+      z.string().regex(/^[a-z_][a-z0-9_]*$/).max(63),
+      FieldVerdictSchema,
+    )
+    .optional(),
 });
 
 export type InlineSourcing = z.infer<typeof InlineSourcingSchema>;

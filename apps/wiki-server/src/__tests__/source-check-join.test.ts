@@ -48,13 +48,17 @@ const { fetchFieldVerdicts } = await import(
   "../routes/shared/source-check-join.js"
 );
 
+// Get the Drizzle instance from the mock to pass as db parameter
+const dbModule = await import("../db.js");
+const db = (dbModule as any).getDrizzleDb();
+
 // ---------------------------------------------------------------------------
 
 describe("fetchFieldVerdicts", () => {
   beforeEach(resetStores);
 
   it("returns empty map for empty recordIds", async () => {
-    const result = await fetchFieldVerdicts("grant", []);
+    const result = await fetchFieldVerdicts(db, "grant", []);
     expect(result.size).toBe(0);
   });
 
@@ -94,7 +98,7 @@ describe("fetchFieldVerdicts", () => {
       },
     ];
 
-    const result = await fetchFieldVerdicts("grant", ["g1", "g2"]);
+    const result = await fetchFieldVerdicts(db, "grant", ["g1", "g2"]);
 
     expect(result.size).toBe(2);
 
@@ -126,7 +130,7 @@ describe("fetchFieldVerdicts", () => {
       },
     ];
 
-    const result = await fetchFieldVerdicts("grant", ["g1"]);
+    const result = await fetchFieldVerdicts(db, "grant", ["g1"]);
     expect(result.size).toBe(0);
   });
 });

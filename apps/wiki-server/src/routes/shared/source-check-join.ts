@@ -2,10 +2,10 @@
  * Shared helpers for LEFT JOINing source_check_verdicts into queries
  * and formatting the result into the API response shape.
  */
-import { and, eq, isNotNull, inArray, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, inArray } from "drizzle-orm";
 import type { Column } from "drizzle-orm";
+import type { PostgresJsDatabase } from "drizzle-orm/postgres-js";
 import { sourceVerdicts } from "../../schema.js";
-import { getDrizzleDb } from "../../db.js";
 
 /**
  * Build the LEFT JOIN condition for source_check_verdicts.
@@ -15,7 +15,7 @@ export function verdictJoinCondition(recordType: string, idColumn: Column) {
   return and(
     eq(sourceVerdicts.recordType, recordType),
     eq(sourceVerdicts.recordId, idColumn),
-    sql`${sourceVerdicts.fieldName} IS NULL`,
+    isNull(sourceVerdicts.fieldName),
   );
 }
 
@@ -64,14 +64,17 @@ export type FieldVerdictsByRecord = Map<string, FieldVerdictRow[]>;
  *
  * This is separate from the row-level verdict JOIN (which filters field_name IS NULL)
  * so that callers can render both the row-level verdict and per-field breakdowns.
+ *
+ * Accepts `db` as parameter to respect transaction boundaries.
+ * PR #4131 will replace this implementation with one using `sqlInList()`.
  */
 export async function fetchFieldVerdicts(
+  db: PostgresJsDatabase<any>,
   recordType: string,
   recordIds: string[],
 ): Promise<FieldVerdictsByRecord> {
   if (recordIds.length === 0) return new Map();
 
-  const db = getDrizzleDb();
   const rows = await db
     .select({
       recordId: sourceVerdicts.recordId,
