@@ -61,9 +61,9 @@ function computeForEntity(entity: TypedEntity, facts: Map<string, Fact[]>, orgPe
     }
     case "ai-model": {
       const e = entity as Record<string, unknown>;
-      const i = { developer: (e.developer as string) ?? null, releaseDate: (e.releaseDate as string) ?? null, contextWindow: (e.contextWindow as number) ?? null, parameterCount: (e.parameterCount as string) ?? null, safetyLevel: (e.safetyLevel as string) ?? null, wikiId: entity.wikiId ?? null };
+      const i = { developer: (e.developer as string) ?? null, releaseDate: (e.releaseDate as string) ?? null, inputPrice: (e.inputPrice as number) ?? null, outputPrice: (e.outputPrice as number) ?? null, contextWindow: (e.contextWindow as number) ?? null, parameterCount: (e.parameterCount as string) ?? null, safetyLevel: (e.safetyLevel as string) ?? null, wikiId: entity.wikiId ?? null };
       score = computeAiModelCoverage(i);
-      signals = { pricing: i.contextWindow != null, contextWindow: i.contextWindow != null, parameterCount: !!i.parameterCount, safetyLevel: !!i.safetyLevel, wikiPage: !!i.wikiId }; break;
+      signals = { pricing: i.inputPrice != null || i.outputPrice != null, contextWindow: i.contextWindow != null, parameterCount: !!i.parameterCount, safetyLevel: !!i.safetyLevel, wikiPage: !!i.wikiId }; break;
     }
     case "policy": {
       const e = entity as Record<string, unknown>;
@@ -90,7 +90,7 @@ function computeForEntity(entity: TypedEntity, facts: Map<string, Fact[]>, orgPe
     }
   }
   const { filled, total } = countSignals(signals);
-  return { entityType: entity.entityType, entityId: entity.id, coverageScore: score, signalsFilled: filled, signalsTotal: total, signals, scannedAt: now };
+  return { entityType: entity.entityType, entityId: entity.stableId ?? entity.id, coverageScore: score, signalsFilled: filled, signalsTotal: total, signals, scannedAt: now };
 }
 
 async function main() {

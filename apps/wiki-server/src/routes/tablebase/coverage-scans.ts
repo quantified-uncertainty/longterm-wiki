@@ -1,12 +1,11 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, desc, count, sql } from "drizzle-orm";
+import { eq, desc, count } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { tablebaseCoverageScans } from "../../schema.js";
-import { zv, clampedLimit, parseJsonBody, validationError, invalidJsonError } from "../shared/utils.js";
+import { zv, clampedLimit } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
-import { logger } from "../../logger.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 const MAX_PAGE_SIZE = 500;
 const MAX_BATCH_SIZE = 2000;
@@ -18,6 +17,7 @@ const ListQuery = z.object({
 });
 
 const SyncItemSchema = z.object({
+  id: z.string().optional(), // Satisfies factory TItem constraint; not stored — entityId is the natural key
   entityType: z.string().min(1).max(100),
   entityId: z.string().min(1).max(200),
   coverageScore: z.number().int().min(1).max(4),
@@ -30,6 +30,8 @@ const SyncItemSchema = z.object({
 const SyncBatchSchema = z.object({
   items: z.array(SyncItemSchema).min(1).max(MAX_BATCH_SIZE),
 });
+
+type SyncItem = z.infer<typeof SyncItemSchema>;
 
 interface CoverageScanRow {
   id: number;
@@ -71,47 +73,31 @@ const coverageScansApp = new Hono()
       .groupBy(tablebaseCoverageScans.entityType, tablebaseCoverageScans.coverageScore);
     return c.json({ stats: rows });
   })
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.errors.map((e) => e.message).join("; "));
-    const { items } = parsed.data;
-    const now = new Date();
-    const db = getDrizzleDb();
-
-    // Check for duplicate entityIds in batch
-    const seen = new Set<string>();
-    for (const item of items) {
-      if (seen.has(item.entityId)) return validationError(c, `Duplicate entityId in batch: ${item.entityId}`);
-      seen.add(item.entityId);
-    }
-
-    // Validate entity references
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
-
-    const rows = items.map((item) => ({
-      entityType: item.entityType, entityId: item.entityId,
-      coverageScore: item.coverageScore, signalsFilled: item.signalsFilled,
-      signalsTotal: item.signalsTotal, signals: item.signals,
-      scannedAt: item.scannedAt ? new Date(item.scannedAt) : now, updatedAt: now,
-    }));
-
-    await db.insert(tablebaseCoverageScans).values(rows).onConflictDoUpdate({
-      target: tablebaseCoverageScans.entityId,
-      set: {
-        entityType: sql`excluded.entity_type`, coverageScore: sql`excluded.coverage_score`,
-        signalsFilled: sql`excluded.signals_filled`, signalsTotal: sql`excluded.signals_total`,
-        signals: sql`excluded.signals`, scannedAt: sql`excluded.scanned_at`, updatedAt: sql`excluded.updated_at`,
-      },
-    });
-    logger.info({ count: items.length }, "coverage-scans: synced");
-    return c.json({ upserted: items.length });
-  })
-  .post("/delete-batch", deleteBatchHandler(tablebaseCoverageScans, "coverage_scans"));
+  .post(
+    "/sync",
+    createSyncHandler<SyncItem, typeof tablebaseCoverageScans>({
+      name: "coverage-scans",
+      table: tablebaseCoverageScans,
+      batchSchema: SyncBatchSchema as z.ZodType<{ items: SyncItem[] }>,
+      toRow: (item, now) => ({
+        entityType: item.entityType,
+        entityId: item.entityId,
+        coverageScore: item.coverageScore,
+        signalsFilled: item.signalsFilled,
+        signalsTotal: item.signalsTotal,
+        signals: item.signals,
+        scannedAt: item.scannedAt ? new Date(item.scannedAt) : now,
+        updatedAt: now,
+      }),
+      conflictTarget: tablebaseCoverageScans.entityId,
+      naturalKey: (item) => item.entityId,
+      naturalKeyError: "Duplicate entityId in batch",
+      entityRefFields: (items) => [
+        { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+      ],
+    }),
+  )
+  .post("/delete-batch", deleteBatchHandler(tablebaseCoverageScans, null));
 
 export const coverageScansRoute = coverageScansApp;
 export type CoverageScansRoute = typeof coverageScansApp;
