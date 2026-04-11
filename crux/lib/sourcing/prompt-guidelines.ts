@@ -18,7 +18,8 @@ export const SOURCE_CHECK_FALSE_POSITIVE_GUIDELINES = `IMPORTANT — avoid these
 - **Temporal mismatch**: Only compare values from the same time period. If the claim is "as of 2024" but the source discusses 2025 projections (or vice versa), that is "unverifiable" or "outdated", NOT contradicted.
 - **Wrong source relevance**: The source must actually discuss the specific claim. If the source is about entity X's own page but the claim is about a person's prior employment at entity Y, the source cannot contradict that — it's "unverifiable".
 - **Approximate values**: A claimed value within 10% of the source value is "partial" or "confirmed", not "contradicted". Only use "contradicted" when values clearly conflict (e.g., source says 500, claim says 2000).
-- **Rounded display values**: The claim may show a rounded display format (e.g., "$19B") with an exact stored value in parentheses (e.g., "exact stored value: 19000000000"). Compare against the exact stored value, not the rounded display. "$19B" and "$19,000,000,000" and "19 billion" are all equivalent — use "confirmed".
+- **Rounded display values**: The claim may show a rounded display format (e.g., "$1.2B") with an exact stored value in parentheses (e.g., "exact stored value: 1,234,000,000 (i.e. ~1.23 billion)"). ALWAYS compare against the exact stored value, not the rounded display. The rounded display loses precision: "$1.2B" is the display version of "$1,234,000,000". If the source says "$1.234 billion" or "$1,234,000,000" and we display "$1.2B", that is "confirmed", NOT contradicted.
+- **Numeric format equivalence**: All of these represent the same value and should be treated as equivalent: "$1.234B", "$1.234 billion", "$1,234,000,000", "1234000000", "1.234e9". Differences in notation (compact vs. full, abbreviation vs. word, with vs. without commas) are NEVER contradictions.
 - **URL format**: "example.com", "https://www.example.com", and "http://example.com" all refer to the same website. Differences in protocol (http/https), "www" prefix, or trailing slashes are NOT contradictions — use "confirmed".
 - **Date precision**: "2016-08" and "30 August 2016" are equivalent. Month-level vs day-level dates for the same month are NOT contradictions — use "confirmed".
 - **Archive URLs**: A web.archive.org URL for a defunct/dissolved organization is intentional — not a contradiction with the original URL. Use "confirmed".
@@ -33,7 +34,7 @@ Reserve "contradicted" ONLY for cases where the source clearly and directly stat
  * Provides softer guidance on edge cases.
  */
 export const SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS = `Other considerations:
-- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B")
+- Numbers may be expressed differently (e.g., "1 billion" vs "1e9" vs "$1B" vs "1,000,000,000"). Rounding differences are expected — the claim may display a rounded value like "$1.2B" while the source says "$1.234 billion". If the exact stored value (shown in parentheses) matches the source, use "confirmed".
 - Names may differ slightly (abbreviations, legal names vs common names)
 - Dates may be approximate
 - If the source discusses the topic but the specific data point isn't mentioned, that's "unverifiable"
