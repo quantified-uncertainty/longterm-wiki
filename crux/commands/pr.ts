@@ -240,8 +240,8 @@ async function detect(_args: string[], options: CommandOptions): Promise<Command
  *   --body="PR body"        Body as inline string (vulnerable to shell expansion).
  *   --body-file=<path>      Body from a file (safe for markdown with backticks).
  *   --base=main             Base branch (default: main).
- *   --draft                 Create as draft PR (default: true).
- *   --no-draft              Create as ready PR (not draft).
+ *   --draft                 Create as draft PR.
+ *   (default: ready — agents verify before creating PRs)
  *
  * If a PR already exists for this branch, reports it instead of creating a duplicate.
  */
@@ -254,8 +254,9 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
   const bodyFile = (options.bodyFile ?? options['body-file']) as string | undefined;
   let body = options.body as string | undefined;
   const base = (options.base as string) || 'main';
-  // Default to draft unless --no-draft is explicitly passed
-  const draft = options.noDraft === true || options['no-draft'] === true ? false : true;
+  // Default to ready (non-draft). Agents run build/test/gate before PR creation,
+  // so the PR is already verified. Draft PRs block PR patrol and Linear automation.
+  const draft = options.draft === true ? true : false;
 
   // --body-file takes precedence (avoids shell expansion of backticks in markdown)
   if (bodyFile) {
@@ -1015,7 +1016,7 @@ export function getHelp(): string {
 PR Domain — GitHub Pull Request utilities
 
 Commands:
-  create                        Create a draft PR for the current branch (corruption-safe).
+  create                        Create a PR for the current branch (corruption-safe).
   ready [--pr=N]                Mark PR as ready (validates eligibility, removes draft status).
   detect                        Detect open PR for current branch (returns URL + number).
   check <N>                     Check a single PR for issues and merge eligibility.
@@ -1031,7 +1032,7 @@ Options (create):
   --body="..."        PR body (inline — avoid for multi-line bodies; use --body-file or stdin).
   --body-file=<path>  PR body from file (safe for markdown with backticks).
   --base=main         Base branch (default: main).
-  --no-draft          Create as ready PR (default: draft).
+  --draft             Create as draft PR (default: ready).
   --allow-empty-body  Allow creating PR without a description (not recommended).
   --skip-test-plan    Skip test plan validation (not recommended).
   --linear=QUA-NNN    Inject Linear issue references (comma-separated for epics: QUA-155,QUA-151).
