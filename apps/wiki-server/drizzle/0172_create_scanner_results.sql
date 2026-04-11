@@ -23,3 +23,4 @@ CREATE INDEX IF NOT EXISTS idx_scanner_results_run_id ON tablebase_scanner_resul
 CREATE INDEX IF NOT EXISTS idx_scanner_results_entity ON tablebase_scanner_results (entity_id);
 CREATE INDEX IF NOT EXISTS idx_scanner_results_scanned_at ON tablebase_scanner_results (scanned_at);
 CREATE INDEX IF NOT EXISTS idx_scanner_results_type_entity ON tablebase_scanner_results (record_type, entity_id);
+CREATE UNIQUE INDEX IF NOT EXISTS uq_scanner_results_natural_key ON tablebase_scanner_results (scan_run_id, record_type, entity_id);

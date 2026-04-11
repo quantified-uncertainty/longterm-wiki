@@ -3947,5 +3947,6 @@ export const tablebaseScannerResults = pgTable(
     index("idx_scanner_results_entity").on(table.entityId),
     index("idx_scanner_results_scanned_at").on(table.scannedAt),
     index("idx_scanner_results_type_entity").on(table.recordType, table.entityId),
+    uniqueIndex("uq_scanner_results_natural_key").on(table.scanRunId, table.recordType, table.entityId),
   ],
 );
