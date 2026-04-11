@@ -716,6 +716,8 @@ export default async function OrgProfilePage({
     wikiPageId: entity.wikiPageId,
   };
 
+  const entityVerdict = getRecordVerdict("entity", entity.id);
+
   const headerData = {
     id: entity.id,
     name: entity.name,
@@ -729,6 +731,7 @@ export default async function OrgProfilePage({
     wikiHref: data.wikiHref,
     founders: data.founders,
     coverageInput,
+    verdict: entityVerdict?.verdict ?? null,
   };
 
   return (
