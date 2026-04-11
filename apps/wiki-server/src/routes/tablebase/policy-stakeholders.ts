@@ -10,6 +10,7 @@ import {
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 
 // ---- Constants ----
 
@@ -30,6 +31,7 @@ const SyncStakeholderItemSchema = z.object({
   reason: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   context: z.array(z.string()).nullable().optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const ByPolicyQuery = z.object({
@@ -112,6 +114,7 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     name: "policy-stakeholders",
     table: policyStakeholders,
     syncSchema: SyncStakeholderItemSchema,
+    enforceSourcing: true,
     entityRefs: ["policyEntityId"],
     toThing: (item, titleMap) => ({
       id: item.id,
@@ -122,6 +125,13 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
       parentThingId: item.policyEntityId,
       parentTitle: titleMap.get(item.policyEntityId) ?? item.policyEntityId,
       sourceUrl: item.source ?? null,
+    }),
+    toVerdict: (item) => ({
+      recordType: "policy-stakeholder",
+      recordId: item.id,
+      entityId: item.stakeholderEntityId ?? item.policyEntityId,
+      sourceUrl: item.source ?? null,
+      sourcing: item.sourcing ?? null,
     }),
     thingsTitleIds: (items) => [...new Set(items.map((i) => i.policyEntityId))],
   }))

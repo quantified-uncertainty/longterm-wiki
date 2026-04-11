@@ -11,6 +11,7 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 
 // ---- Constants ----
 
@@ -52,6 +53,7 @@ const SyncFundingProgramItemSchema = z.object({
   status: z.enum(VALID_STATUSES).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 const SyncFundingProgramsBatchSchema = z.object({
@@ -263,6 +265,7 @@ const fundingProgramsApp = new Hono()
     name: "funding-programs",
     table: fundingPrograms,
     batchSchema: SyncFundingProgramsBatchSchema,
+    enforceSourcing: true,
     toRow: (item) => ({
       id: item.id,
       orgId: item.orgId,
@@ -309,6 +312,13 @@ const fundingProgramsApp = new Hono()
       description: item.description || null,
       sourceUrl: item.source,
       parentTitle: titleMap.get(item.orgId) ?? item.orgId,
+    }),
+    toVerdict: (item) => ({
+      recordType: "funding-program",
+      recordId: item.id,
+      entityId: item.orgId,
+      sourceUrl: item.source ?? null,
+      sourcing: item.sourcing ?? null,
     }),
     thingsTitleIds: (items) => [...new Set(items.map((fp) => fp.orgId))],
   }))

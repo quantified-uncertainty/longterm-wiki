@@ -447,6 +447,7 @@ describe("Entity FK validation", () => {
             id: "Fabcde1234",
             companyId: "nonexistent-company",
             name: "Series A",
+            sourcing: { verdict: "confirmed" },
           },
         ],
       });
@@ -466,6 +467,7 @@ describe("Entity FK validation", () => {
             id: "Fabcde1234",
             companyId: "company-z",
             name: "Series A",
+            sourcing: { verdict: "confirmed" },
           },
         ],
       });
