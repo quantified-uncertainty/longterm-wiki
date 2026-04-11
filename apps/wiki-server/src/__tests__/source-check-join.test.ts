@@ -27,11 +27,19 @@ function resetStores() {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // Handle Drizzle query builder SELECT from source_check_verdicts
+  // Handle Drizzle query builder SELECT from source_check_verdicts.
+  // Honor bound params so the test verifies that fetchFieldVerdicts actually
+  // filters by record_type and record_ids — not just field_name IS NOT NULL.
   if (q.includes("source_check_verdicts")) {
-    // Filter by record_type and field_name IS NOT NULL
+    // Extract the record_type param (first string param) and record_ids (remaining strings)
+    const stringParams = params.filter((p): p is string => typeof p === "string");
+    const recordType = stringParams.length > 0 ? stringParams[0] : null;
+    const recordIds = stringParams.length > 1 ? new Set(stringParams.slice(1)) : null;
+
     return verdictRows
       .filter((r) => r.field_name !== null)
+      .filter((r) => !recordType || r.record_type === recordType)
+      .filter((r) => !recordIds || recordIds.has(r.record_id))
       .sort((a, b) => {
         const cmp = a.record_id.localeCompare(b.record_id);
         if (cmp !== 0) return cmp;
@@ -95,6 +103,24 @@ describe("fetchFieldVerdicts", () => {
         verdict: "partial",
         confidence: 0.6,
         last_computed_at: new Date("2025-01-02"),
+      },
+      // Out-of-scope row: different record_type — mock filter must exclude it.
+      {
+        record_type: "investment",
+        record_id: "inv-1",
+        field_name: "amount",
+        verdict: "confirmed",
+        confidence: 0.9,
+        last_computed_at: new Date("2025-01-03"),
+      },
+      // Out-of-scope row: right type but not in the requested record_ids.
+      {
+        record_type: "grant",
+        record_id: "g99",
+        field_name: "amount",
+        verdict: "confirmed",
+        confidence: 0.85,
+        last_computed_at: new Date("2025-01-04"),
       },
     ];
 
