@@ -42,6 +42,13 @@ export const FAIL_PENDING = 500;
 /** WARN tier: pending count above this is logged. */
 export const WARN_PENDING = 100;
 
+/**
+ * Job types excluded from health evaluation.
+ * auto-update is intentionally disabled (PR #2592) but still shows 100% failure
+ * rate in job stats, causing recurring false-positive wellness issues (#4086, #4068, #4107).
+ */
+export const EXCLUDED_JOB_TYPES = new Set(['auto-update']);
+
 // ---------------------------------------------------------------------------
 // Types (exported for tests)
 // ---------------------------------------------------------------------------
@@ -87,6 +94,10 @@ export function evaluateJobStats(data: JobStatsResponse): EvaluationResult {
   const byType = data.byType ?? {};
 
   for (const [jobType, stats] of Object.entries(byType)) {
+    if (EXCLUDED_JOB_TYPES.has(jobType)) {
+      detail.push(`SKIP  ${jobType}: excluded (intentionally disabled)`);
+      continue;
+    }
     const statusCounts = stats.byStatus ?? {};
     const pending = statusCounts['pending'] ?? 0;
     const running = statusCounts['running'] ?? 0;

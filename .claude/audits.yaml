@@ -102,9 +102,9 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-08"
+    last_checked: "2026-04-11"
     last_result: fail
-    last_result_note: "scheduled-maintenance.yml failed 2026-03-19 — Anthropic API credit balance too low"
+    last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
       - date: "2026-03-29"
         result: pass
@@ -132,6 +132,10 @@ audits:
         result: fail
         checked_by: "manual"
         notes: "ci-pr-health.yml failing 2026-04-07 (2 failures), scheduled-maintenance 2026-04-08 in progress (null result)"
+      - date: "2026-04-11"
+        result: fail
+        checked_by: "manual"
+        notes: "server-api-health OK, frontend-data-health OK, server-health-monitor OK. ci-pr-health failing (auto-update 100% failure flagged as job queue issue, #4107 open). scheduled-maintenance hit max turns (60) on 2026-04-10."
   - id: vercel-production-only
     category: infrastructure
     description: "Vercel ONLY builds the production branch — no builds for main, claude/*, issue branches, or PR previews"
@@ -255,6 +259,9 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
+    last_checked: "2026-04-11"
+    last_result: pass
+    last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
       - date: "2026-03-30"
         result: pass
@@ -293,6 +300,10 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "0 overrides out of 50 merged PRs in last 30 days (0%)"
+      - date: "2026-04-11"
+        result: pass
+        checked_by: "manual"
+        notes: "10% (10/100 PRs) — well under 20% threshold"
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -304,6 +315,9 @@ audits:
       4. Also check crux/lib/llm.ts for any hardcoded model references.
     frequency: monthly
     added: "2026-03-30"
+    last_checked: "2026-04-11"
+    last_result: pass
+    last_result_note: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. Current."
     history:
       - date: "2026-04-01"
         result: pass
@@ -326,6 +340,10 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. All match latest Claude 4.5/4.6 family per system context."
+      - date: "2026-04-11"
+        result: pass
+        checked_by: "manual"
+        notes: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. Current per system context."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"

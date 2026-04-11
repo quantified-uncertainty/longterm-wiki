@@ -23,6 +23,7 @@ import {
   WARN_RATE_PCT,
   FAIL_PENDING,
   WARN_PENDING,
+  EXCLUDED_JOB_TYPES,
   type JobStatsResponse,
 } from './job-queue.ts';
 
@@ -296,6 +297,40 @@ describe('multiple job types', () => {
     expect(result.failures[0]).toMatch(/resource-ingest/);
     // ping should still show PASS
     expect(result.detail.some(l => l.includes('PASS') && l.includes('ping'))).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Edge cases
+// ---------------------------------------------------------------------------
+
+// ---------------------------------------------------------------------------
+// Excluded job types
+// ---------------------------------------------------------------------------
+
+describe('excluded job types', () => {
+  it('auto-update is excluded and does not trigger failure', () => {
+    const data: JobStatsResponse = {
+      totalJobs: 100,
+      byType: {
+        'auto-update': makeStats({
+          pending: 0,
+          failureRate: 1.0,
+          recentTotal: 50,
+          recentFailed: 50,
+        }),
+        'ping': makeStats({ pending: 0, failureRate: 0, recentTotal: 10, recentFailed: 0 }),
+      },
+    };
+
+    const result = evaluateJobStats(data);
+    expect(result.failures).toEqual([]);
+    expect(result.detail.some(l => l.includes('SKIP') && l.includes('auto-update'))).toBe(true);
+    expect(result.detail.some(l => l.includes('PASS') && l.includes('ping'))).toBe(true);
+  });
+
+  it('EXCLUDED_JOB_TYPES contains auto-update', () => {
+    expect(EXCLUDED_JOB_TYPES.has('auto-update')).toBe(true);
   });
 });
 
