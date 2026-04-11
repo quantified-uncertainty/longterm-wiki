@@ -15,17 +15,27 @@ import { mockDbModule, postJson } from "./test-utils.js";
 // ---- In-memory store ----
 
 let insertedRows: Record<string, unknown>[];
+/** Known entity IDs — validateEntityRefs checks these exist */
+let knownEntityIds: Set<string>;
 
 function resetStores() {
   insertedRows = [];
+  // Pre-populate with the entity IDs used in test fixtures
+  knownEntityIds = new Set(["sid_abc1234567", "sid_def7654321"]);
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // validateEntityRefs: unnest + entities check
+  if (q.includes("unnest") && q.includes("from entities")) {
+    return params
+      .filter((p) => knownEntityIds.has(p as string))
+      .map((p) => ({ ref: p }));
+  }
+
   // INSERT
   if (q.includes("insert into")) {
-    // Track inserted rows (we don't need to parse individual rows)
     insertedRows.push({ query: q, params });
     return [];
   }
