@@ -119,6 +119,7 @@ import * as usagePatternsCommands from './commands/usage-patterns.ts';
 import * as entityResourcesCommands from './commands/entity-resources.ts';
 import * as docsCommands from './commands/docs.ts';
 import * as linearCommands from './commands/linear.ts';
+import * as flagshipCurateCommands from './commands/flagship-curate.ts';
 import * as sessionFinalizeCommands from './commands/session-finalize.ts';
 
 const domains = {
@@ -203,6 +204,7 @@ const domains = {
   'usage-patterns': usagePatternsCommands,
   docs: docsCommands,
   linear: linearCommands,
+  'flagship-curate': flagshipCurateCommands,
   'session-finalize': sessionFinalizeCommands,
 };
 
