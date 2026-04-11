@@ -2,7 +2,22 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, or, and, count, asc, sql } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { wikiPages, entityIds } from "../../schema.js";
+import {
+  wikiPages,
+  entityIds,
+  citationQuotes,
+  citationAccuracySnapshots,
+  editLogs,
+  hallucinationRiskSnapshots,
+  autoUpdateResults,
+  resourceCitations,
+  pageLinks,
+  pageImproveRuns,
+  pageCitations,
+  things,
+  wikibasePageSimilarity,
+  wikibasePageAssessments,
+} from "../../schema.js";
 import {
   validationError,
   notFoundError,
@@ -261,8 +276,14 @@ const pagesApp = new Hono()
 
     // Fetch the page before deleting so we can log identifying info.
     // Per code-review-guidelines: destructive endpoints must log before executing.
+    // We need the integer PK (wikiPages.id) for FK cleanup of related tables.
     const existing = await db
-      .select({ id: wikiPages.slug, wikiId: wikiPages.wikiId, title: wikiPages.title })
+      .select({
+        intId: wikiPages.id,
+        slug: wikiPages.slug,
+        wikiId: wikiPages.wikiId,
+        title: wikiPages.title,
+      })
       .from(wikiPages)
       .where(eq(wikiPages.slug, id));
 
@@ -271,9 +292,62 @@ const pagesApp = new Hono()
     }
 
     const page = existing[0];
-    logger.info({ pageId: page.id, wikiId: page.wikiId, title: page.title }, "Deleting page");
+    logger.info(
+      { pageId: page.slug, intId: page.intId, wikiId: page.wikiId, title: page.title },
+      "Deleting page and cleaning up related records"
+    );
 
-    await db.delete(wikiPages).where(eq(wikiPages.slug, id));
+    try {
+      await db.transaction(async (tx) => {
+        const pageIntId = page.intId;
+
+        // Delete from tables with NOT NULL pageId FK (no cascade) — these would
+        // cause FK violations if we deleted the page first.
+        await tx.delete(citationQuotes).where(eq(citationQuotes.pageId, pageIntId));
+        await tx.delete(resourceCitations).where(eq(resourceCitations.pageId, pageIntId));
+
+        // Delete from tables with nullable pageId FK (no cascade) — cleaning up
+        // orphaned records rather than leaving dangling references.
+        await tx.delete(citationAccuracySnapshots).where(eq(citationAccuracySnapshots.pageId, pageIntId));
+        await tx.delete(editLogs).where(eq(editLogs.pageId, pageIntId));
+        await tx.delete(hallucinationRiskSnapshots).where(eq(hallucinationRiskSnapshots.pageId, pageIntId));
+        await tx.delete(autoUpdateResults).where(eq(autoUpdateResults.pageId, pageIntId));
+        await tx.delete(pageCitations).where(eq(pageCitations.pageId, pageIntId));
+        await tx.delete(pageImproveRuns).where(eq(pageImproveRuns.pageId, pageIntId));
+        await tx.delete(wikibasePageSimilarity).where(eq(wikibasePageSimilarity.pageId, pageIntId));
+        await tx.delete(wikibasePageSimilarity).where(eq(wikibasePageSimilarity.similarPageId, pageIntId));
+        await tx.delete(wikibasePageAssessments).where(eq(wikibasePageAssessments.pageId, pageIntId));
+
+        // pageLinks references pageId in both sourceId and targetId columns
+        await tx.delete(pageLinks).where(
+          or(eq(pageLinks.sourceId, pageIntId), eq(pageLinks.targetId, pageIntId))
+        );
+
+        // Clean up things table entries that reference this page.
+        // The things table uses (source_table, source_id) text columns, not a direct FK.
+        await tx.delete(things).where(
+          and(eq(things.sourceTable, "wiki_pages"), eq(things.sourceId, id))
+        );
+
+        // Tables with onDelete: "cascade" are handled automatically by Postgres:
+        //   - sessionPages
+        //   - agentSessionPages
+        //   - claimPageReferences (archived)
+        //   - statementPageReferences (archived)
+        //
+        // Tables with onDelete: "set null" are handled automatically by Postgres:
+        //   - autoUpdateNewsItems.routedToPageId
+        //
+        // source_check_evidence and source_check_verdicts use text-based
+        // (record_type, record_id) columns, not FK references to wiki_pages.
+        // They are left intact as historical audit records.
+
+        // Finally, delete the page itself.
+        await tx.delete(wikiPages).where(eq(wikiPages.slug, id));
+      });
+    } catch (err) {
+      return dbError(c, "page delete", err, { pageId: id });
+    }
 
     return c.json({ deleted: 1 });
   })

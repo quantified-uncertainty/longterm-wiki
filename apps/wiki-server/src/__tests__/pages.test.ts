@@ -239,6 +239,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return row ? [row] : [];
   }
 
+  // --- Related tables: DELETE during page deletion (FK cleanup) ---
+  // These tables are cleaned up in the transactional page delete handler.
+  // The mock just returns an empty result (no rows affected is fine).
+  const relatedDeleteTables = [
+    "citation_quotes", "resource_citations", "citation_accuracy_snapshots",
+    "edit_logs", "hallucination_risk_snapshots", "auto_update_results",
+    "page_citations", "page_improve_runs", "wikibase_page_similarity",
+    "wikibase_page_assessments", "page_links", "things",
+  ];
+  if (q.includes("delete from")) {
+    for (const table of relatedDeleteTables) {
+      if (q.includes(table)) return [];
+    }
+  }
+
   // --- wiki_pages: DELETE WHERE slug = ? (with or without RETURNING) ---
   if (q.includes("delete from") && q.includes("wiki_pages")) {
     const slug = params[0] as string;

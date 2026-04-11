@@ -103,6 +103,12 @@ const idsApp = new Hono()
     const db = getDrizzleDb();
 
     // Try to allocate — if slug already exists, ON CONFLICT DO NOTHING returns []
+    // NOTE: nextval('entity_id_seq') is called before the conflict check, so a
+    // sequence value is consumed even when the slug already exists. This is an accepted
+    // tradeoff: E-numbers are display IDs (E42, E1334) where gaps are harmless and
+    // expected. Avoiding sequence burning would require a SELECT-then-INSERT pattern
+    // that introduces a TOCTOU race, which is worse than wasting a sequence value.
+    // See QUA-157 for discussion.
     const inserted = await db
       .insert(entityIds)
       .values({
@@ -151,6 +157,9 @@ const idsApp = new Hono()
     await db.transaction(async (tx) => {
       for (const item of items) {
         // Try to allocate — if slug already exists, ON CONFLICT DO NOTHING returns []
+        // NOTE: nextval('entity_id_seq') is called before the conflict check, so a
+        // sequence value is consumed even when the slug already exists. This is an accepted
+        // tradeoff — see the comment in the single /allocate endpoint (QUA-157).
         const inserted = await tx
           .insert(entityIds)
           .values({
