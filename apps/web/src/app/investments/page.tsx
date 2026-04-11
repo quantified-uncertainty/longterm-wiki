@@ -36,29 +36,41 @@ interface InvestmentRow {
 export default function InvestmentsPage() {
   const allRecords = getAllKBRecords("investments");
 
-  const allRows: InvestmentRow[] = allRecords.map((record) => {
-    const f = record.fields;
-    const company = resolveEntityLink(record.ownerEntityId);
-    const investorId =
-      typeof f.investor === "string" ? f.investor : null;
-    const investor = investorId
-      ? resolveEntityLink(investorId)
-      : { name: record.displayName ?? "", href: null };
+  const allRows: InvestmentRow[] = allRecords
+    .map((record) => {
+      const f = record.fields;
+      const company = resolveEntityLink(record.ownerEntityId);
+      const investorId =
+        typeof f.investor === "string" ? f.investor : null;
+      const investor = investorId
+        ? resolveEntityLink(investorId)
+        : { name: record.displayName ?? "", href: null };
 
-    return {
-      key: record.key,
-      companyName: company.name,
-      companyHref: company.href,
-      investorName: investor.name,
-      investorHref: investor.href,
-      roundName: typeof f.round_name === "string" ? f.round_name : null,
-      date: typeof f.date === "string" ? f.date : null,
-      amount: typeof f.amount === "number" ? f.amount : null,
-      instrument: typeof f.instrument === "string" ? f.instrument : null,
-      role: typeof f.role === "string" ? f.role : null,
-      verdictString: getRecordVerdict("investment", record.key)?.verdict ?? null,
-    };
-  });
+      return {
+        key: record.key,
+        companyName: company.name,
+        companyHref: company.href,
+        investorName: investor.name,
+        investorHref: investor.href,
+        roundName: typeof f.round_name === "string" ? f.round_name : null,
+        date: typeof f.date === "string" ? f.date : null,
+        amount: typeof f.amount === "number" ? f.amount : null,
+        instrument: typeof f.instrument === "string" ? f.instrument : null,
+        role: typeof f.role === "string" ? f.role : null,
+        verdictString:
+          getRecordVerdict("investment", record.key)?.verdict ?? null,
+      };
+    })
+    // Filter out rows where BOTH investor and company are "Unknown" — these
+    // have no informational value. Rows with only one "Unknown" side are kept
+    // and displayed as "Undisclosed" (see rendering below).
+    .filter(
+      (row) =>
+        !(
+          row.investorName.toLowerCase() === "unknown" &&
+          row.companyName.toLowerCase() === "unknown"
+        )
+    );
 
   // Deduplicate investment rows. The PG data can contain near-duplicate rows
   // (e.g., a "YC round" record with a resolved investor entity link and a
