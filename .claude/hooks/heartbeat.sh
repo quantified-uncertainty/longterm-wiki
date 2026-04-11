@@ -25,8 +25,18 @@ fi
 
 # Read agent ID and env vars
 AGENT_ID=$(cat "$AGENT_ID_FILE" 2>/dev/null || true)
-WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
-API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
+
+# Heartbeats always target the prod wiki-server (the active-agents dashboard
+# lives there). Agent slots don't run a local wiki-server, so the default
+# LONGTERMWIKI_SERVER_URL (localhost:311x) is unreachable. Use PROD_* vars
+# when available, falling back to the default vars for local-dev setups.
+if [ -n "${PROD_LONGTERMWIKI_SERVER_URL:-}" ]; then
+  WIKI_SERVER_URL="$PROD_LONGTERMWIKI_SERVER_URL"
+  API_KEY="${PROD_LONGTERMWIKI_SERVER_API_KEY:-${LONGTERMWIKI_SERVER_API_KEY:-}}"
+else
+  WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
+  API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
+fi
 
 # Validate inputs
 [[ "$AGENT_ID" =~ ^[0-9]+$ ]] || exit 0
