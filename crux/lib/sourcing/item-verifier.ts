@@ -46,10 +46,14 @@ export function buildFactSourcingPrompt(
 ): string {
   const asOfStr = data.fact.asOf ? ` (as of ${data.fact.asOf})` : '';
   const notesStr = data.fact.notes ? `\nAdditional context: ${data.fact.notes}` : '';
+  // Include exact stored value when it differs from the display value to avoid rounding false positives
+  const rawSuffix = data.rawValue && data.rawValue !== data.formattedValue
+    ? ` (exact stored value: ${data.rawValue})`
+    : '';
 
   return `You are a fact-checker. Given the source text below, verify this claim.
 
-Claim: ${data.entity.name}'s ${data.propertyName} = ${data.formattedValue}${asOfStr}${notesStr}
+Claim: ${data.entity.name}'s ${data.propertyName} = ${data.formattedValue}${rawSuffix}${asOfStr}${notesStr}
 
 Source URL: ${data.fact.source}
 

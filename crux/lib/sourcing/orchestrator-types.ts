@@ -63,6 +63,8 @@ export interface FactItemData {
   fact: Fact;
   propertyName: string;
   formattedValue: string;
+  /** Raw numeric/text value from YAML, before display formatting (avoids rounding false positives) */
+  rawValue?: string;
 }
 
 export interface RecordItemData {
