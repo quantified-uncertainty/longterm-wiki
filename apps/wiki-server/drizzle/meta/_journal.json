@@ -1191,6 +1191,27 @@
       "when": 1784102400000,
       "tag": "0169_add_check_constraints_status_fields",
       "breakpoints": true
+    },
+    {
+      "idx": 170,
+      "version": "7",
+      "when": 1784188800000,
+      "tag": "0170_investments_display_name_dedup",
+      "breakpoints": true
+    },
+    {
+      "idx": 171,
+      "version": "7",
+      "when": 1784275200000,
+      "tag": "0171_create_coverage_scans",
+      "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1784361600000,
+      "tag": "0172_create_scanner_results",
+      "breakpoints": true
     }
   ]
 }

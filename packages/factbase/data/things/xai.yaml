@@ -86,17 +86,17 @@ facts:
 
   - id: f_5bVJIucEHg
     property: user-count
-    value: 3e+7
-    asOf: "2025"
+    value: 6.4e+7
+    asOf: "2025-12"
     source: https://www.businessofapps.com/data/grok-statistics/
-    notes: "Grok monthly active users; nearly doubled since Q1 2025"
+    notes: "Grok monthly active users as of Q4 2025"
 
   - id: f_XLWbsNoong
     property: cumulative-downloads
-    value: 3e+7
+    value: 1e+8
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
-    notes: "Grok cumulative downloads since launch; previously listed as 60M in error. See f_5bVJIucEHg for monthly active users."
+    notes: "Close to 100 million Grok downloads since launch"
 
   - id: f_FSDfBi1tjw
     property: product-revenue

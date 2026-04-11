@@ -4,18 +4,14 @@ import { eq, and, count, desc, sql, sum } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
-import { logger } from "../../logger.js";
 import { campaignFinance, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -54,10 +50,6 @@ const SyncItemSchema = z.object({
   sourceUrl: z.string().max(2000).nullable().optional(),
   dataAsOf: z.string().max(20).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(200),
 });
 
 // ---- Helpers ----
@@ -216,89 +208,43 @@ const campaignFinanceApp = new Hono()
     return c.json({ records: rows.map(formatRow), total: rows.length });
   })
 
-  // POST /sync
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "politicianEntityId", ids: items.map((i) => i.politicianEntityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
-
-    logger.info(`sync campaign-finance: upserting ${items.length} records`);
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
+  // POST /sync — uses sync-factory
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "campaign-finance",
+      table: campaignFinance,
+      syncSchema: SyncItemSchema,
+      entityRefs: ["politicianEntityId"],
+      toRow: (item, now) => {
         const numericOrNull = (v: number | null | undefined): string | null =>
           v != null ? String(v) : null;
-
-        await tx
-          .insert(campaignFinance)
-          .values({
-            id: item.id,
-            politicianEntityId: item.politicianEntityId ?? null,
-            politicianDisplayName: item.politicianDisplayName ?? null,
-            cycle: item.cycle,
-            totalRaised: numericOrNull(item.totalRaised),
-            totalSpent: numericOrNull(item.totalSpent),
-            cashOnHand: numericOrNull(item.cashOnHand),
-            individualContributions: numericOrNull(item.individualContributions),
-            pacContributions: numericOrNull(item.pacContributions),
-            smallDonorContributions: numericOrNull(item.smallDonorContributions),
-            selfFunding: numericOrNull(item.selfFunding),
-            party: item.party ?? null,
-            officeType: item.officeType ?? null,
-            state: item.state ?? null,
-            district: item.district ?? null,
-            fecCandidateId: item.fecCandidateId ?? null,
-            sourceUrl: item.sourceUrl ?? null,
-            dataAsOf: item.dataAsOf ?? null,
-            notes: item.notes ?? null,
-            updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: campaignFinance.id,
-            set: {
-              politicianEntityId: item.politicianEntityId ?? null,
-              politicianDisplayName: item.politicianDisplayName ?? null,
-              cycle: item.cycle,
-              totalRaised: numericOrNull(item.totalRaised),
-              totalSpent: numericOrNull(item.totalSpent),
-              cashOnHand: numericOrNull(item.cashOnHand),
-              individualContributions: numericOrNull(
-                item.individualContributions,
-              ),
-              pacContributions: numericOrNull(item.pacContributions),
-              smallDonorContributions: numericOrNull(
-                item.smallDonorContributions,
-              ),
-              selfFunding: numericOrNull(item.selfFunding),
-              party: item.party ?? null,
-              officeType: item.officeType ?? null,
-              state: item.state ?? null,
-              district: item.district ?? null,
-              fecCandidateId: item.fecCandidateId ?? null,
-              sourceUrl: item.sourceUrl ?? null,
-              dataAsOf: item.dataAsOf ?? null,
-              notes: item.notes ?? null,
-              updatedAt: new Date(),
-            },
-          });
-        upserted++;
-      }
-    });
-
-    return c.json({ upserted });
-  })
+        return {
+          id: item.id,
+          politicianEntityId: item.politicianEntityId ?? null,
+          politicianDisplayName: item.politicianDisplayName ?? null,
+          cycle: item.cycle,
+          totalRaised: numericOrNull(item.totalRaised),
+          totalSpent: numericOrNull(item.totalSpent),
+          cashOnHand: numericOrNull(item.cashOnHand),
+          individualContributions: numericOrNull(item.individualContributions),
+          pacContributions: numericOrNull(item.pacContributions),
+          smallDonorContributions: numericOrNull(item.smallDonorContributions),
+          selfFunding: numericOrNull(item.selfFunding),
+          party: item.party ?? null,
+          officeType: item.officeType ?? null,
+          state: item.state ?? null,
+          district: item.district ?? null,
+          fecCandidateId: item.fecCandidateId ?? null,
+          sourceUrl: item.sourceUrl ?? null,
+          dataAsOf: item.dataAsOf ?? null,
+          notes: item.notes ?? null,
+          syncedAt: now,
+          updatedAt: now,
+        };
+      },
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(campaignFinance, null));
 

@@ -4,9 +4,11 @@ argument-hint: "[--dry-run] [--limit=N]"
 effort: low
 ---
 
-# Score Issues — LLM-Powered Issue Triage
+# Score Issues — LLM-Powered Issue Triage (Legacy GitHub)
 
-Read open issues, use your judgment to assess priority/effort/model, and apply labels so `crux gh issues next` ranks them correctly.
+**Note:** Linear is now the primary issue tracker and has its own priority system. This command applies to legacy GitHub issues that haven't been migrated to Linear yet.
+
+Read open GitHub issues, use your judgment to assess priority/effort/model, and apply labels so `crux gh issues next` ranks them correctly.
 
 ## When to use
 

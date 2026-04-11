@@ -277,8 +277,9 @@ async function runBatchExecution(
     preparedCount++;
     const progress = `[${preparedCount}/${itemsToVerify.length}]`;
 
-    // Handle deterministic matching for grants and investments first
-    if (item.data.kind === 'record' && (item.data.recordType === 'grant' || item.data.recordType === 'investment')) {
+    // Handle deterministic matching for any record type first (falls through
+    // to LLM when no manifest matches the source URL)
+    if (item.data.kind === 'record') {
       try {
         const deterministicResult = await tryDeterministicMatch(item);
         if (deterministicResult) {

@@ -10,9 +10,9 @@ import {
   zv,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 import {
   researchAreas,
   researchAreaOrganizations,
@@ -66,10 +66,6 @@ const SyncResearchAreaItemSchema = z.object({
   metadata: z.record(z.unknown()).optional().default({}),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncResearchAreaBatchSchema = z.object({
-  items: z.array(SyncResearchAreaItemSchema).min(1).max(200),
 });
 
 const SyncOrgLinkSchema = z.object({
@@ -405,82 +401,24 @@ const researchAreasApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncResearchAreaBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(
-        c,
-        parsed.error.issues.map((i) => i.message).join(", ")
-      );
-    }
-
-    const db = getDrizzleDb();
-    const now = new Date();
-    const { items } = parsed.data;
-
-    const allVals = items.map((item) => ({
-      id: item.id,
-      wikiId: item.wikiId ?? null,
-      title: item.title,
-      description: item.description ?? null,
-      status: item.status,
-      cluster: item.cluster ?? null,
-      parentAreaId: item.parentAreaId ?? null,
-      firstProposed: item.firstProposed ?? null,
-      firstProposedYear: item.firstProposedYear ?? null,
-      tags: item.tags,
-      metadata: item.metadata,
-      source: item.source ?? null,
-      notes: item.notes ?? null,
-      syncedAt: now,
-      updatedAt: now,
-    }));
-
-    await db.transaction(async (tx) => {
-      await tx
-        .insert(researchAreas)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: researchAreas.id,
-          set: {
-            wikiId: sql`excluded.wiki_id`,
-            title: sql`excluded.title`,
-            description: sql`excluded.description`,
-            status: sql`excluded.status`,
-            cluster: sql`excluded.cluster`,
-            parentAreaId: sql`excluded.parent_area_id`,
-            firstProposed: sql`excluded.first_proposed`,
-            firstProposedYear: sql`excluded.first_proposed_year`,
-            tags: sql`excluded.tags`,
-            metadata: sql`excluded.metadata`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`excluded.synced_at`,
-            updatedAt: sql`excluded.updated_at`,
-          },
-        });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((ra) => ({
-          id: ra.id,
-          thingType: "research-area" as const,
-          title: ra.title,
-          sourceTable: "research_areas",
-          sourceId: ra.id,
-          description: ra.description,
-          sourceUrl: ra.source,
-          href: `/research-areas/${ra.id}`,
-        }))
-      );
-    });
-
-    return c.json({ upserted: items.length });
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "research-areas",
+      table: researchAreas,
+      syncSchema: SyncResearchAreaItemSchema,
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "research-area" as const,
+        title: item.title,
+        sourceTable: "research_areas",
+        sourceId: item.id,
+        description: item.description,
+        sourceUrl: item.source,
+        href: `/research-areas/${item.id}`,
+      }),
+    }),
+  )
 
   // ---- POST /sync-organizations ----
   .post("/sync-organizations", async (c) => {

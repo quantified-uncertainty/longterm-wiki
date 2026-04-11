@@ -43,7 +43,7 @@ facts:
 
   - id: f_2nM7F6dimB
     property: infrastructure
-    value: "Compute cluster with 80+ NVIDIA A100 GPUs available for AI safety researchers"
+    value: "Compute cluster with 256 NVIDIA A100 GPUs available for AI safety researchers"
     asOf: 2024
     source: https://www.safe.ai/compute
     notes: "Major infrastructure investment; provides compute to safety researchers who may lack institutional access"

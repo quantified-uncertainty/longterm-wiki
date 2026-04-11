@@ -220,12 +220,11 @@ export async function verifySingleItem(
   useWebSearch: boolean,
 ): Promise<VerifyResult | VerifyError> {
   // ── Deterministic matching path (Discussion #3567 Phase 3) ──
-  // For record-type items (grants, investments), try deterministic row-matching
-  // against a source snapshot before falling back to LLM source-check.
-  // Note: investments are included for when investment manifests are added to the
-  // grant-import registry. Until then, tryDeterministicMatch returns null (no manifest
-  // match) and falls through to LLM source-check — this is intentional scaffolding.
-  if (item.data.kind === 'record' && (item.data.recordType === 'grant' || item.data.recordType === 'investment')) {
+  // For any record-type item, try deterministic row-matching against a source
+  // snapshot before falling back to LLM source-check. tryDeterministicMatch
+  // returns null when no manifest matches the source URL, so this is safe for
+  // record types that don't have manifests yet — they fall through to LLM.
+  if (item.data.kind === 'record') {
     try {
       const deterministicResult = await tryDeterministicMatch(item);
       if (deterministicResult) return deterministicResult;

@@ -36,17 +36,15 @@ describe("validate-tablebase-completeness", () => {
     expect(blockingDeleteViolations).toHaveLength(0);
   });
 
-  it("flags files where sync count exceeds delete count", () => {
+  it("has zero advisory delete violations after mass factory migration", () => {
     const result = runCheck();
     const advisoryDeleteViolations = result.violations.filter(
       (v) => v.check === "delete" && !v.blocking
     );
-    // Files with more sync endpoints than delete endpoints get advisory warnings
-    // (e.g., political-races.ts has /sync + /candidates/sync but only one delete)
-    expect(advisoryDeleteViolations.length).toBeGreaterThan(0);
-    for (const v of advisoryDeleteViolations) {
-      expect(v.message).toContain("/sync endpoints but only");
-    }
+    // After the sync-factory migration, all routes have proper delete handlers
+    // via createSyncHandler's built-in /delete-batch. Previously, routes like
+    // political-races.ts had more /sync endpoints than delete endpoints.
+    expect(advisoryDeleteViolations).toHaveLength(0);
   });
 
   it("does not flag exempt routes", () => {

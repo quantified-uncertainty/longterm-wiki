@@ -54,18 +54,26 @@ pnpm crux tb ids allocate <slug>             # Wiki entity: allocate numericId +
 pnpm crux tb ensure-entities --type=person   # Lightweight: stableId only (no wiki page)
 pnpm crux tb people discover                 # Discover people entities
 
-# GitHub (gh)
-pnpm crux gh issues start <N>               # Signal work start on issue
-pnpm crux gh issues done <N> --pr=URL       # Signal completion
+# Linear (primary issue tracker)
+pnpm crux linear search "query"              # Search Linear issues
+pnpm crux linear create "title" --description="..."  # Create a new Linear issue
+pnpm crux linear start QUA-NNN              # Signal work start on issue
+pnpm crux linear done QUA-NNN --pr=URL      # Signal completion
+pnpm crux linear view QUA-NNN              # View issue details
+
+# GitHub (gh) — PRs, CI, legacy issues
 pnpm crux gh ci status --wait               # Poll CI until green
 pnpm crux gh deploy-tasks detect             # Auto-detect deploy tasks from diff
 pnpm crux gh deploy-tasks pending            # Find unchecked tasks from merged PRs
 pnpm crux gh deploy-tasks inject --pr=N      # Inject deploy checklist into PR
+pnpm crux gh issues start <N>               # Signal work start (legacy GitHub issues only)
+pnpm crux gh issues done <N> --pr=URL       # Signal completion (legacy GitHub issues only)
 
 # System (sys = system)
 pnpm crux sys audits list                    # Show audit items, highlight overdue
 pnpm crux sys audits check <id> --pass       # Record a check result
-pnpm crux sys agent-checklist init --issue=N # Init session checklist
+pnpm crux sys agent-checklist init --linear=QUA-NNN  # Init session checklist (Linear)
+pnpm crux sys agent-checklist init --issue=N # Init session checklist (legacy GitHub)
 pnpm crux sys agent-reset                   # Show stale processes (MCP, dev servers)
 pnpm crux sys agent-reset --kill             # Kill stale processes
 
@@ -154,7 +162,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
 - **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/things/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
-- **GitHub API**: Use `crux gh issues/pr/ci/epic` commands — never raw `curl`
+- **Issue tracking**: **Linear is the primary issue tracker** — use `crux linear` commands for issue creation, tracking, and updates. GitHub is used for PRs, CI, and legacy issues only. Use `crux gh pr/ci/epic` commands for GitHub — never raw `curl`
 - **Entity IDs — two tiers**:
   - **Wiki entities** (orgs, concepts, important people with their own pages): Use `pnpm crux tb ids allocate <slug>` to get a `numericId` (E-number) + `stableId` (`sid_` prefix, e.g. `sid_1LcLlMGLbw`). These get wiki pages at `/wiki/E<N>`. Only ~200-300 entities should have these.
   - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only (`sid_` prefix). NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
@@ -172,8 +180,8 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/environment-setup.md` — Worktree + LSP setup
 - `.claude/rules/page-authoring.md` — Content pipeline, self-review checklist
 - `.claude/rules/code-review-guidelines.md` — Code review rules
-- `.claude/rules/github-issue-tracking.md` — Issue tracking with `crux issues`
-- `.claude/rules/proactive-github-filing.md` — When/how to file issues
+- `.claude/rules/github-issue-tracking.md` — Issue tracking (Linear primary, GitHub legacy)
+- `.claude/rules/proactive-github-filing.md` — When/how to file issues (in Linear)
 - `.claude/rules/pr-review-guidelines.md` — PR review and ship process
 - `.claude/rules/pre-pr-verification.md` — Build/test/gate checks before PRs
 - `.claude/rules/session-logging.md` — Session log format and storage
@@ -184,6 +192,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+- `.claude/rules/linear-integration.md` — Linear-GitHub integration, branch naming, auto-close, `crux linear` commands
 
 ## Subsystem Maps — Read BEFORE proposing work in these areas
 

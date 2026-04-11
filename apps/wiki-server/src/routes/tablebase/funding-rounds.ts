@@ -1,28 +1,20 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc, inArray, or } from "drizzle-orm";
+import { eq, count, sql, desc } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb, getDb } from "../../db.js";
-import { logger } from "../../logger.js";
+import { getDrizzleDb } from "../../db.js";
 import { fundingRounds, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   parseRange,
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -205,83 +197,24 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncFundingRoundsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Check for natural key collisions within the batch itself.
-    // Natural key: (companyId, name)
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.companyId}::${item.name}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (companyId, name) in batch: ` +
-          `companyId=${item.companyId}, name="${item.name}". ` +
-          `Each funding round must have a unique name within its company.`
-        );
-      }
-      batchKeys.add(key);
-    }
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-    ]);
-    if (refError) return refError;
-
-    // Validate claim references
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    // Resolve companyId and leadInvestor values (slugs or stableIds) to proper stableIds
-    // for the FK columns. This ensures companyEntityId and leadInvestorEntityId are populated
-    // so the JOINs on GET /all work correctly.
-    const uniqueCompanyIds = [...new Set(items.map((i) => i.companyId).filter(Boolean))];
-    const uniqueLeadInvestorIds = [...new Set(
-      items.map((i) => i.leadInvestor).filter((id): id is string => id != null && id !== "")
-    )];
-    const allUniqueIds = [...new Set([...uniqueCompanyIds, ...uniqueLeadInvestorIds])];
-    const entityRows = allUniqueIds.length > 0
-      ? await db
-          .select({ id: entities.id, stableId: entities.stableId })
-          .from(entities)
-          .where(or(inArray(entities.id, allUniqueIds), inArray(entities.stableId, allUniqueIds)))
-      : [];
-
-    const entityStableIdMap = new Map<string, string>();
-    for (const row of entityRows) {
-      if (row.stableId) {
-        entityStableIdMap.set(row.id, row.stableId);
-        entityStableIdMap.set(row.stableId, row.stableId);
-      }
-    }
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => {
+  // ---- POST /sync — uses sync-factory ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "funding-rounds",
+      table: fundingRounds,
+      batchSchema: SyncFundingRoundsBatchSchema,
+      naturalKey: (item) => `${item.companyId}::${item.name}`,
+      naturalKeyError:
+        "Duplicate (companyId, name) in batch",
+      entityRefs: ["companyId"],
+      toRow: (item, now) => {
         const raisedRange = parseRange(item.raised);
         const valuationRange = parseRange(item.valuation);
-        // Strip "new:" prefix from leadInvestor raw ID for entity resolution
-        const rawLI = item.leadInvestor?.startsWith("new:") ? item.leadInvestor.slice(4).trim() : item.leadInvestor;
         return {
           id: item.id,
           companyId: item.companyId,
-          companyEntityId: entityStableIdMap.get(item.companyId) ?? null,
+          companyEntityId: null, // populated by fkResolve post-upsert
           companyDisplayName: item.companyDisplayName ?? null,
           name: item.name,
           date: item.date ?? null,
@@ -293,113 +226,70 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           valuationHigh: valuationRange.high,
           instrument: item.instrument ?? null,
           leadInvestor: item.leadInvestor ?? null,
-          leadInvestorEntityId: rawLI ? (entityStableIdMap.get(rawLI) ?? null) : null,
+          leadInvestorEntityId: null, // populated by fkResolve post-upsert
           leadInvestorDisplayName: item.leadInvestorDisplayName ?? null,
           source: item.source ?? null,
           notes: item.notes ?? null,
+          syncedAt: now,
+          updatedAt: now,
         };
-      });
-
-      await tx
-        .insert(fundingRounds)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: fundingRounds.id,
-          set: {
-            companyId: sql`excluded.company_id`,
-            companyEntityId: sql`COALESCE(excluded.company_entity_id, ${fundingRounds.companyEntityId})`,
-            companyDisplayName: sql`COALESCE(excluded.company_display_name, ${fundingRounds.companyDisplayName})`,
-            name: sql`excluded.name`,
-            date: sql`excluded.date`,
-            raised: sql`excluded.raised`,
-            raisedLow: sql`excluded.raised_low`,
-            raisedHigh: sql`excluded.raised_high`,
-            valuation: sql`excluded.valuation`,
-            valuationLow: sql`excluded.valuation_low`,
-            valuationHigh: sql`excluded.valuation_high`,
-            instrument: sql`excluded.instrument`,
-            leadInvestor: sql`excluded.lead_investor`,
-            leadInvestorEntityId: sql`COALESCE(excluded.lead_investor_entity_id, ${fundingRounds.leadInvestorEntityId})`,
-            leadInvestorDisplayName: sql`COALESCE(excluded.lead_investor_display_name, ${fundingRounds.leadInvestorDisplayName})`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Post-sync: resolve entity FKs as safety net (pre-insert JS resolution above
-      // may miss entities added after the initial query)
-      await resolveEntityFKs(tx, {
+      },
+      conflictSet: {
+        companyId: sql.raw(`excluded.company_id`),
+        companyEntityId: sql`COALESCE(excluded.company_entity_id, ${fundingRounds.companyEntityId})`,
+        companyDisplayName: sql`COALESCE(excluded.company_display_name, ${fundingRounds.companyDisplayName})`,
+        name: sql.raw(`excluded.name`),
+        date: sql.raw(`excluded.date`),
+        raised: sql.raw(`excluded.raised`),
+        raisedLow: sql.raw(`excluded.raised_low`),
+        raisedHigh: sql.raw(`excluded.raised_high`),
+        valuation: sql.raw(`excluded.valuation`),
+        valuationLow: sql.raw(`excluded.valuation_low`),
+        valuationHigh: sql.raw(`excluded.valuation_high`),
+        instrument: sql.raw(`excluded.instrument`),
+        leadInvestor: sql.raw(`excluded.lead_investor`),
+        leadInvestorEntityId: sql`COALESCE(excluded.lead_investor_entity_id, ${fundingRounds.leadInvestorEntityId})`,
+        leadInvestorDisplayName: sql`COALESCE(excluded.lead_investor_display_name, ${fundingRounds.leadInvestorDisplayName})`,
+        source: sql.raw(`excluded.source`),
+        notes: sql.raw(`excluded.notes`),
+        syncedAt: sql`now()`,
+        updatedAt: sql`now()`,
+      },
+      fkResolve: {
         tableName: "funding_rounds",
         fields: [
           { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
           { rawIdColumn: "lead_investor", entityIdColumn: "lead_investor_entity_id", displayNameColumn: "lead_investor_display_name" },
         ],
-        scopeIds: items.map((i) => i.id),
-      });
-
-      // Resolve company slugs to human-readable titles for search
-      const companySlugs = [...new Set(items.map((fr) => fr.companyId))];
-      const titleMap = await resolveEntityTitles(tx, companySlugs);
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((fr) => ({
-          id: fr.id,
-          thingType: "funding-round" as const,
-          title: fr.name + (fr.date ? ` (${fr.date})` : ""),
-          sourceTable: "funding_rounds",
-          sourceId: fr.id,
-          sourceUrl: fr.source,
-          parentTitle: titleMap.get(fr.companyId) ?? fr.companyDisplayName ?? fr.companyId,
-          description: [
-            fr.raised != null ? `raised $${Number(fr.raised).toLocaleString()}` : null,
-            fr.instrument,
-            fr.leadInvestor ? `led by ${fr.leadInvestorDisplayName ?? fr.leadInvestor}` : null,
-          ].filter(Boolean).join(", ") || null,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "funding-round",
-          recordId: item.id,
-          entityId: item.companyId,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("funding-rounds/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "funding-rounds",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  })
+      },
+      toThing: (item, titleMap) => ({
+        id: item.id,
+        thingType: "funding-round" as const,
+        title: item.name + (item.date ? ` (${item.date})` : ""),
+        sourceTable: "funding_rounds",
+        sourceId: item.id,
+        sourceUrl: item.source,
+        parentTitle: titleMap.get(item.companyId) ?? item.companyDisplayName ?? item.companyId,
+        description: [
+          item.raised != null ? `raised $${Number(item.raised).toLocaleString()}` : null,
+          item.instrument,
+          item.leadInvestor ? `led by ${item.leadInvestorDisplayName ?? item.leadInvestor}` : null,
+        ].filter(Boolean).join(", ") || null,
+      }),
+      thingsTitleIds: (items) => [...new Set(items.map((fr) => fr.companyId))],
+      toVerdict: (item) => ({
+        recordType: "funding-round",
+        recordId: item.id,
+        entityId: item.companyId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+      claimSupport: {
+        recordType: "funding-rounds",
+        getClaimIds: (item) => item.claimIds ?? [],
+      },
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(fundingRounds, "funding_rounds"));
 

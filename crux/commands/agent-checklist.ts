@@ -29,7 +29,7 @@ import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agent
 import { syncToMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
 import { commands as linearCommands } from './linear.ts';
-import { resolveLinearId } from '../lib/linear/parse-id.ts';
+import { resolveLinearId, parseLinearId } from '../lib/linear/parse-id.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -157,12 +157,44 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
     if (detected) linearId = detected;
   }
 
+  // Warn if Linear ID detected but branch name doesn't encode it.
+  // Linear's GitHub integration auto-moves issues on PR merge only when it can
+  // link the PR — which requires the branch name to contain the issue ID.
+  let linearBranchWarning = '';
+  if (linearId && !parseLinearId(branch)) {
+    const suggested = `claude/${linearId.toLowerCase()}-${task.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/,'').slice(0, 40)}`;
+    linearBranchWarning =
+      `\n${c.yellow}⚠ Branch "${branch}" does not contain the Linear ID ${linearId}.${c.reset}\n` +
+      `  Linear's GitHub integration won't auto-close the issue on PR merge.\n` +
+      `  ${c.dim}Suggested: git checkout -b ${suggested}${c.reset}\n` +
+      `  ${c.dim}Or: include "Fixes ${linearId}" in the PR description (done automatically by \`crux gh pr create\`).${c.reset}\n`;
+  }
+
+  // ── Preserve existing manual checks ────────────────────────────────────────
+  // If a checklist already exists, read its checked/N/A items so they survive
+  // re-initialization. Prevents the "reset on new commit" bug (#3906).
+  let priorItems: ReturnType<typeof parseChecklist>['items'] | null = null;
+  if (existsSync(CHECKLIST_PATH)) {
+    priorItems = parseChecklist(readFileSync(CHECKLIST_PATH, 'utf-8')).items;
+  }
+
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
   let markdown = buildChecklist(type, metadata);
 
   if (!issue) {
     const naResult = checkItems(markdown, ['issue-tracking'], '~', 'no GitHub issue for this session');
     markdown = naResult.markdown;
+  }
+
+  // Reapply preserved checks from prior checklist in a single pass
+  if (priorItems) {
+    for (const item of priorItems) {
+      const marker = item.status === 'checked' ? 'x' as const : item.status === 'na' ? '~' as const : null;
+      if (marker) {
+        const result = checkItems(markdown, [item.id], marker, item.naReason);
+        if (result.checked.length > 0) markdown = result.markdown;
+      }
+    }
   }
 
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
@@ -294,6 +326,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
+  if (linearBranchWarning) output += linearBranchWarning;
   if (issueStartOutput) output += `\n${issueStartOutput}`;
   if (linearStartOutput) output += `\n${linearStartOutput}`;
 

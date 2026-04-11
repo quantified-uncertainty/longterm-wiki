@@ -3,19 +3,14 @@ import { z } from "zod";
 import { eq, and, count, sql, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { fundingPrograms } from "../../schema.js";
-import { logger } from "../../logger.js";
 import {
   paginationQuery,
   noDuplicateIds,
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   notFoundError,
   zv,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -260,156 +255,63 @@ const fundingProgramsApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncFundingProgramsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "orgId", ids: items.map((i) => i.orgId) },
-    ]);
-    if (refError) return refError;
-
-    // Check for natural key collisions within the batch itself
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.orgId}::${item.name}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (orgId, name) in batch: orgId=${item.orgId}, name="${item.name}". ` +
-          `Each funding program must have a unique name within its organization.`
-        );
-      }
-      batchKeys.add(key);
-    }
-
-    // Check for natural key collisions with existing records (different IDs, same orgId+name).
-    // The uq_fp_org_name unique index enforces this at the DB level, but checking here
-    // gives a clear error message instead of a raw constraint violation.
-    const existingConflicts = await db
-      .select({ id: fundingPrograms.id, orgId: fundingPrograms.orgId, name: fundingPrograms.name })
-      .from(fundingPrograms)
-      .where(
-        sql`(${fundingPrograms.orgId}, ${fundingPrograms.name}) IN (${sql.join(
-          items.map(i => sql`(${i.orgId}, ${i.name})`),
-          sql`, `
-        )})`
-      );
-
-    const conflictById = new Map(existingConflicts.map(r => [`${r.orgId}::${r.name}`, r.id]));
-    const naturalKeyConflicts: string[] = [];
-    for (const item of items) {
-      const existingId = conflictById.get(`${item.orgId}::${item.name}`);
-      if (existingId && existingId !== item.id) {
-        naturalKeyConflicts.push(
-          `"${item.name}" (orgId=${item.orgId}): incoming id=${item.id} conflicts with existing id=${existingId}`
-        );
-      }
-    }
-
-    if (naturalKeyConflicts.length > 0) {
-      return validationError(
-        c,
-        `Natural key conflict: ${naturalKeyConflicts.length} item(s) have the same (orgId, name) as existing records with different IDs. ` +
-        `Use the existing ID to update, or delete the existing record first.\n` +
-        naturalKeyConflicts.join("\n")
-      );
-    }
-
-    let upserted = 0;
-
-    try {
-      await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        orgId: item.orgId,
-        divisionId: item.divisionId ?? null,
-        name: item.name,
-        description: item.description ?? null,
-        programType: item.programType,
-        totalBudget: item.totalBudget != null ? String(item.totalBudget) : null,
-        currency: item.currency,
-        applicationUrl: item.applicationUrl ?? null,
-        openDate: item.openDate ?? null,
-        deadline: item.deadline ?? null,
-        status: item.status ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(fundingPrograms)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: fundingPrograms.id,
-          set: {
-            orgId: sql`excluded.org_id`,
-            name: sql`excluded.name`,
-            programType: sql`excluded.program_type`,
-            currency: sql`excluded.currency`,
-            // COALESCE: preserve existing values when sync payload sends null
-            divisionId: sql`COALESCE(excluded.division_id, ${fundingPrograms.divisionId})`,
-            description: sql`COALESCE(excluded.description, ${fundingPrograms.description})`,
-            totalBudget: sql`COALESCE(excluded.total_budget, ${fundingPrograms.totalBudget})`,
-            applicationUrl: sql`COALESCE(excluded.application_url, ${fundingPrograms.applicationUrl})`,
-            openDate: sql`COALESCE(excluded.open_date, ${fundingPrograms.openDate})`,
-            deadline: sql`COALESCE(excluded.deadline, ${fundingPrograms.deadline})`,
-            status: sql`COALESCE(excluded.status, ${fundingPrograms.status})`,
-            source: sql`COALESCE(excluded.source, ${fundingPrograms.source})`,
-            notes: sql`COALESCE(excluded.notes, ${fundingPrograms.notes})`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Resolve org slugs to human-readable titles for search
-      const orgSlugs = [...new Set(items.map((fp) => fp.orgId))];
-      const titleMap = await resolveEntityTitles(tx, orgSlugs);
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((fp) => ({
-          id: fp.id,
-          thingType: "funding-program" as const,
-          title: fp.name,
-          sourceTable: "funding_programs",
-          sourceId: fp.id,
-          description: fp.description || null,
-          sourceUrl: fp.source,
-          parentTitle: titleMap.get(fp.orgId) ?? fp.orgId,
-        }))
-      );
-
-        upserted = allVals.length;
-      });
-    } catch (err: unknown) {
-      // Catch unique constraint violations from race conditions (concurrent insert
-      // with same orgId+name but different id, between pre-check and INSERT).
-      // The pre-check reduces this window but can't eliminate it.
-      if (
-        err && typeof err === "object" && "code" in err &&
-        (err as { code: string }).code === "23505" &&
-        "constraint" in err &&
-        String((err as { constraint: string }).constraint).includes("uq_fp_org_name")
-      ) {
-        return validationError(
-          c,
-          "A funding program with the same (orgId, name) was created concurrently. " +
-          "Retry the request — the pre-check will now detect the conflict."
-        );
-      }
-      throw err;
-    }
-
-    return c.json({ upserted });
-  })
+  // Cross-batch natural key check (orgId+name vs existing records with different IDs)
+  // is dropped in favor of the DB unique constraint `uq_fp_org_name`. If a conflict
+  // occurs, the factory wraps it in SyncPhaseError → 500 (less user-friendly than the
+  // old 400 but functional, and keeps this within the 1-hook budget).
+  .post("/sync", createSyncHandler({
+    name: "funding-programs",
+    table: fundingPrograms,
+    batchSchema: SyncFundingProgramsBatchSchema,
+    toRow: (item) => ({
+      id: item.id,
+      orgId: item.orgId,
+      divisionId: item.divisionId ?? null,
+      name: item.name,
+      description: item.description ?? null,
+      programType: item.programType,
+      totalBudget: item.totalBudget != null ? String(item.totalBudget) : null,
+      currency: item.currency,
+      applicationUrl: item.applicationUrl ?? null,
+      openDate: item.openDate ?? null,
+      deadline: item.deadline ?? null,
+      status: item.status ?? null,
+      source: item.source ?? null,
+      notes: item.notes ?? null,
+    }),
+    entityRefs: ["orgId"],
+    naturalKey: (item) => `${item.orgId}::${item.name}`,
+    naturalKeyError: "Duplicate (orgId, name) in batch",
+    conflictSet: {
+      orgId: sql`excluded.org_id`,
+      name: sql`excluded.name`,
+      programType: sql`excluded.program_type`,
+      currency: sql`excluded.currency`,
+      // COALESCE: preserve existing values when sync payload sends null
+      divisionId: sql`COALESCE(excluded.division_id, ${fundingPrograms.divisionId})`,
+      description: sql`COALESCE(excluded.description, ${fundingPrograms.description})`,
+      totalBudget: sql`COALESCE(excluded.total_budget, ${fundingPrograms.totalBudget})`,
+      applicationUrl: sql`COALESCE(excluded.application_url, ${fundingPrograms.applicationUrl})`,
+      openDate: sql`COALESCE(excluded.open_date, ${fundingPrograms.openDate})`,
+      deadline: sql`COALESCE(excluded.deadline, ${fundingPrograms.deadline})`,
+      status: sql`COALESCE(excluded.status, ${fundingPrograms.status})`,
+      source: sql`COALESCE(excluded.source, ${fundingPrograms.source})`,
+      notes: sql`COALESCE(excluded.notes, ${fundingPrograms.notes})`,
+      syncedAt: sql`now()`,
+      updatedAt: sql`now()`,
+    },
+    toThing: (item, titleMap) => ({
+      id: item.id,
+      thingType: "funding-program" as const,
+      title: item.name,
+      sourceTable: "funding_programs",
+      sourceId: item.id,
+      description: item.description || null,
+      sourceUrl: item.source,
+      parentTitle: titleMap.get(item.orgId) ?? item.orgId,
+    }),
+    thingsTitleIds: (items) => [...new Set(items.map((fp) => fp.orgId))],
+  }))
 
   .post("/delete-batch", deleteBatchHandler(fundingPrograms, "funding_programs"));
 

@@ -28,7 +28,6 @@ import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
 import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
-import { commands as syncScaffoldCommands } from './tablebase-sync-scaffold.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -54,6 +53,37 @@ interface CommandOptions extends BaseOptions {
   model?: string;
   source?: string;
   entity?: string;
+  persist?: boolean;
+}
+
+async function persistScanResults(scan: import('../tablebase/types.ts').ScanSummary): Promise<void> {
+  const { randomUUID } = await import('crypto');
+  const { transformScanToItems, syncScannerResults } = await import('../wiki-server/sync-scanner-results.ts');
+  const { getServerUrl } = await import('../lib/wiki-server/client.ts');
+  const { waitForHealthy } = await import('../wiki-server/sync-common.ts');
+
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    console.warn('[persist] LONGTERMWIKI_SERVER_URL not set, skipping persistence');
+    return;
+  }
+
+  const scanRunId = randomUUID();
+  const items = transformScanToItems(scan, scanRunId);
+  console.log(`\n[persist] Syncing ${items.length} scanner results (run: ${scanRunId})...`);
+
+  const healthy = await waitForHealthy(serverUrl);
+  if (!healthy) {
+    console.warn('[persist] Server is not healthy, skipping persistence');
+    return;
+  }
+
+  const result = await syncScannerResults(serverUrl, items);
+  if (result.errors > 0) {
+    console.warn(`[persist] Completed with ${result.errors} errors (${result.inserted} synced)`);
+  } else {
+    console.log(`[persist] Done: ${result.inserted} results synced`);
+  }
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -68,10 +98,17 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
     if (options.ci) {
       return { exitCode: 0, output: JSON.stringify(result, null, 2) };
     }
-    return { exitCode: 0, output: formatScanSummary({ tables: [result], timestamp: new Date().toISOString() }) };
+    const summary = { tables: [result], timestamp: new Date().toISOString() };
+    if (options.persist) {
+      await persistScanResults(summary);
+    }
+    return { exitCode: 0, output: formatScanSummary(summary) };
   }
 
   const scan = await runFullScan();
+  if (options.persist) {
+    await persistScanResults(scan);
+  }
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify(scan, null, 2) };
   }
@@ -1167,8 +1204,8 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
   const apply = !!options.apply;
   const limit = options.limit ? parseInt(options.limit as string, 10) : 10;
   const entityOnly = !!(options as Record<string, unknown>).entityOnly;
-
-  const { discoverSources } = await import('../tablebase/source-discovery.ts');
+  const useV2 = !!(options as Record<string, unknown>).v2;
+  const claimsOnly = !!(options as Record<string, unknown>).claimsOnly;
 
   // Resolve entity name to ID if provided
   let entityId: string | undefined;
@@ -1180,6 +1217,69 @@ async function sourceDiscoverCommand(args: string[], options: CommandOptions): P
     entityId = match?.stableId || entityArg;
     entityName = match?.name || entityArg;
   }
+
+  // ── V2: Claims-first agent ──────────────────────────────────────────
+  if (useV2) {
+    if (!entityId) {
+      return { exitCode: 1, output: 'Error: --v2 requires an entity argument (e.g., crux tb source-discover anthropic --v2)' };
+    }
+
+    const { runSourceDiscoverAgent } = await import('../tablebase/source-discover-agent.ts');
+
+    const result = await runSourceDiscoverAgent({
+      entityId,
+      entityName,
+      limit,
+      dryRun: !apply && !claimsOnly,
+      apply,
+      claimsOnly,
+      budgetCap: options.budget ? parseFloat(options.budget) : 1.00,
+    });
+
+    if (options.ci) {
+      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+    }
+
+    // Format summary
+    const lines: string[] = [
+      `Entity: ${result.entityName} (${result.entityId})`,
+      `Unverifiable records: ${result.unverifiableCount} total, ${result.recordsProcessed} processed`,
+      `Sources: ${result.sourcesDiscovered} discovered, ${result.sourcesWithClaims} with claims`,
+      `Claims: ${result.claimsExtracted} extracted, ${result.claimsSubmitted} submitted`,
+      `Cost: $${result.cost.toFixed(4)}, Duration: ${Math.round(result.durationMs / 1000)}s`,
+    ];
+
+    if (result.batchId) {
+      lines.push(`Batch ID: ${result.batchId}`);
+    }
+
+    if (result.verificationStatus) {
+      const v = result.verificationStatus;
+      lines.push(`Verification: ${v.verified} verified, ${v.contradicted} contradicted, ${v.unverifiable} unverifiable, ${v.pending} pending${v.timedOut ? ' (timed out)' : ''}`);
+    }
+
+    if (result.sources.length > 0) {
+      lines.push('', 'Sources with claims:');
+      for (const s of result.sources) {
+        lines.push(`  ${s.title} (${s.claims.length} claims)`);
+        for (const c of s.claims.slice(0, 3)) {
+          lines.push(`    - ${c.claimText.slice(0, 100)}${c.claimText.length > 100 ? '...' : ''}`);
+        }
+        if (s.claims.length > 3) {
+          lines.push(`    ... and ${s.claims.length - 3} more`);
+        }
+      }
+    }
+
+    const mode = apply ? 'apply' : claimsOnly ? 'claims-only' : 'dry-run';
+    return {
+      exitCode: 0,
+      output: `[source-discover-agent v2] ${mode}\n${lines.join('\n')}`,
+    };
+  }
+
+  // ── V1: Legacy string-matching approach ─────────────────────────────
+  const { discoverSources } = await import('../tablebase/source-discovery.ts');
 
   const result = await discoverSources({ entityId, entityName, limit, dryRun, apply, entityOnly });
 
@@ -1254,8 +1354,6 @@ export const commands = {
   'website-sources-list': websiteSourcesCommands.list,
   'website-sources-show': websiteSourcesCommands.show,
   'website-sources-fetch': websiteSourcesCommands.fetch,
-  // Sync handler scaffolder (for new tablebase routes)
-  'sync-scaffold': syncScaffoldCommands.scaffold,
 };
 
 export function getHelp(): string {
@@ -1311,10 +1409,6 @@ Commands:
   markets-discover <entity>   Discover prediction market questions via LLM agent
   markets-fetch [entity]      Fetch latest snapshots from platform APIs (Metaculus, etc.)
 
-  Sync handler scaffolding (Phase 2 of factory rollout):
-  sync-scaffold <name>        Emit a starter sync route file using createSyncHandler
-                              Options: --table-name, --output, --tier=1|2|3, --force
-
 Options:
   --table=<name>            Filter scan to specific table; required for submit/existing
   --top=N, --limit=N        Number of gaps to show (default: 20)
@@ -1328,6 +1422,9 @@ Options:
   --records-file=<path>     JSON file for submit command
   --skip-source-check       Skip source-check before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
+  --v2                      For source-discover: use claims-first agent (extracts + submits claims)
+  --claims-only             For source-discover --v2: submit claims but don't apply results
+  --persist                 Persist scan results to wiki-server (tablebase_scanner_results)
   --ci                      JSON output
 
 Modes:
@@ -1357,6 +1454,9 @@ Examples:
   crux tb tablebase source-discover anthropic --dry-run       # Preview source suggestions for Anthropic
   crux tb tablebase source-discover --limit=5 --budget=5     # Discover sources for top 5 entities
   crux tb tablebase source-discover anthropic --apply        # Discover + link sources to records
+  crux tb tablebase source-discover anthropic --v2           # Claims-first discovery (dry-run)
+  crux tb tablebase source-discover anthropic --v2 --apply   # Claims-first: extract + submit + verify
+  crux tb tablebase source-discover anthropic --v2 --claims-only  # Submit claims but don't apply
   crux tb tablebase normalize-ids                            # Dry-run: show slug-based IDs
   crux tb tablebase normalize-ids --apply                    # Fix slug-based IDs
   crux tb tablebase resolve "OpenAI"                       # Resolve name → stableId

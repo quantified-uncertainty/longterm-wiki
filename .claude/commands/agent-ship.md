@@ -116,16 +116,9 @@ This is **automatic** and **deterministic** — the detector scans the diff for 
 
 For infrastructure changes that the detector does **not** cover (DNS changes, external service configuration, manual database operations), also add a `post_merge` entry to `.claude/audits.yaml` with the PR number, what to verify, and a deadline.
 
-## Step 5: Update GitHub issue
+## Step 5: Update Linear issue (primary — if applicable)
 
-If working on a GitHub issue:
-```bash
-pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
-```
-
-## Step 5b: Update Linear issue (if applicable)
-
-If this session was tracking a Linear issue, move it to In Review so the Linear backlog reflects the open PR. Set `PR_URL` to the PR created/updated in step 4 first:
+**Linear is the primary issue tracker.** If this session was tracking a Linear issue, move it to In Review so the Linear backlog reflects the open PR. Set `PR_URL` to the PR created/updated in step 4 first:
 
 ```bash
 # PR_URL must be set by the ship flow — it's the URL of the PR just pushed.
@@ -141,7 +134,14 @@ if [ -n "$LINEAR_ID" ] && [ -n "$PR_URL" ]; then
 fi
 ```
 
-Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` keeps this best-effort so a missing key doesn't abort the ship flow. Linear → Done happens automatically when the PR merges, via the release workflow.
+Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` keeps this best-effort so a missing key doesn't abort the ship flow. Linear → Done happens automatically when the PR merges, via Linear's native GitHub integration — **but only if** the branch name contains `qua-NNN` or the PR body contains `Fixes QUA-NNN`. `crux gh pr create` auto-injects the latter from the branch name, checklist metadata, and `--linear` flag.
+
+## Step 5b: Update legacy GitHub issue (if applicable)
+
+If working on a legacy GitHub issue (not a Linear issue):
+```bash
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
+```
 
 ## Step 6: Session log
 

@@ -25,7 +25,7 @@
  */
 
 import type { Context } from "hono";
-import type { z } from "zod";
+import { z } from "zod";
 import { sql, inArray, getTableColumns } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import type { PgTable, PgColumn } from "drizzle-orm/pg-core";
@@ -95,8 +95,13 @@ export interface VerdictInput {
 /**
  * SyncConfig — declarative configuration for a TableBase sync handler.
  *
- * The minimum required fields are: name, table, batchSchema, toRow.
- * Every other field is optional and gates a phase of the pipeline.
+ * The minimum required fields are: name, table, and ONE of:
+ *   - `batchSchema` (full batch schema outputting `{ items: TItem[] }`)
+ *   - `syncSchema` (per-item schema; factory wraps in `{ items: [...] }`)
+ *
+ * `toRow` is optional — if omitted, the factory treats each validated item
+ * as a row directly, applying `?? null` for nullable columns and adding
+ * `syncedAt`/`updatedAt` from `getTableColumns(table)`.
  *
  * @typeParam TItem - The validated item shape (inferred from batchSchema).
  * @typeParam TTable - The Drizzle table type.
@@ -116,19 +121,35 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
    * `ZodEffects`) and schemas with extra batch-level fields.
    *
    * The factory validates against this and unwraps `parsed.data.items`.
+   *
+   * Mutually exclusive with `syncSchema` — provide one or the other.
    */
-  batchSchema: z.ZodType<{ items: TItem[] }>;
+  batchSchema?: z.ZodType<{ items: TItem[] }>;
+
+  /**
+   * Per-item Zod schema. The factory wraps it in `z.object({ items: z.array(schema).min(1).max(500) })`
+   * automatically. Use this instead of `batchSchema` for the common case where
+   * the batch body is simply `{ items: [...] }` with no batch-level refinements.
+   *
+   * Mutually exclusive with `batchSchema` — provide one or the other.
+   */
+  syncSchema?: z.ZodType<TItem>;
 
   /**
    * Map a validated item to a row that can be inserted into `table`.
    * The `now` parameter is a single Date passed to all items in the batch
    * so all rows have identical syncedAt/updatedAt values.
    *
-   * Routes that need range parsing (parseRange), display-name backfill, or
-   * other computed columns do them here. The output keys are used to
-   * auto-derive the ON CONFLICT SET clause.
+   * **Optional.** If omitted, the factory treats each item as the row directly,
+   * applying `?? null` for nullable columns and adding `syncedAt: now` and
+   * `updatedAt: now` if those columns exist on the table. This works for routes
+   * where the Zod schema's field names match the Drizzle table's JS column names
+   * (the common case for simple routes).
+   *
+   * Provide `toRow` when you need custom coercion (e.g., `String(item.amount)`
+   * for NUMERIC columns, `parseRange()` for range fields, or computed columns).
    */
-  toRow: (item: TItem, now: Date) => Row;
+  toRow?: (item: TItem, now: Date) => Row;
 
   // ---- Conflict resolution ----
 
@@ -176,6 +197,19 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
    * FK field. Each field's IDs are batch-checked against the entities table.
    */
   entityRefFields?: (items: TItem[]) => EntityRefField[];
+
+  /**
+   * Shorthand for `entityRefFields`: just list the field names as strings.
+   * The factory will auto-build the EntityRefField array by extracting IDs
+   * from `item[fieldName]`, filtering out null/undefined values.
+   *
+   * Example: `entityRefs: ["politicianEntityId", "scorerEntityId"]`
+   *
+   * Use the full `entityRefFields` callback when you need custom filtering
+   * or when the field name in the item doesn't match the error message.
+   * If both `entityRefs` and `entityRefFields` are provided, `entityRefFields` wins.
+   */
+  entityRefs?: string[];
 
   /**
    * Custom pre-validation hook. Runs AFTER schema validation and entity ref
@@ -402,18 +436,25 @@ async function runPhase<T>(
  * Returns `async (c: Context) => Promise<Response>`. Use it inside a Hono
  * method-chain like:
  *
- *     const myApp = new Hono()
- *       .get("/stats", ...)
- *       .post("/sync", createSyncHandler({
- *         name: "my-table",
- *         table: myTable,
- *         batchSchema: SyncBatchSchema,
- *         toRow: (item, now) => ({ ...item, syncedAt: now, updatedAt: now }),
- *       }))
- *       .post("/delete-batch", deleteBatchHandler(myTable, "my_table"));
+ *     // Minimal (5 lines — for routes where item shape ≈ row shape):
+ *     .post("/sync", createSyncHandler({
+ *       name: "political-scores",
+ *       table: politicalScores,
+ *       syncSchema: SyncItemSchema,
+ *       entityRefs: ["politicianEntityId", "scorerEntityId"],
+ *     }))
+ *
+ *     // Full (when custom coercion is needed):
+ *     .post("/sync", createSyncHandler({
+ *       name: "investments",
+ *       table: investments,
+ *       batchSchema: SyncBatchSchema,
+ *       toRow: (item, now) => ({ ...parseRange(item.amount), syncedAt: now }),
+ *       entityRefFields: (items) => [...],
+ *     }))
  */
 export function createSyncHandler<
-  TItem extends { id?: string },
+  TItem extends Record<string, unknown>,
   TTable extends PgTable,
 >(config: SyncConfig<TItem, TTable>) {
   return async (c: Context): Promise<Response> => {
@@ -424,8 +465,15 @@ export function createSyncHandler<
     if (!body) return invalidJsonError(c);
 
     // ---- Phase 2: validate (schema) ----
+    // Resolve the batch schema: either provided directly or auto-wrapped from syncSchema
+    const batchSchema = config.batchSchema ?? (config.syncSchema
+      ? z.object({ items: z.array(config.syncSchema).min(1).max(500) }) as z.ZodType<{ items: TItem[] }>
+      : null);
+    if (!batchSchema) {
+      throw new SyncPhaseError(name, "validate", new Error("SyncConfig must provide either batchSchema or syncSchema"));
+    }
     const parsed = await runPhase(name, "validate", async () =>
-      config.batchSchema.safeParse(body),
+      batchSchema.safeParse(body),
     );
     if (!parsed.success) {
       return validationError(c, parsed.error.message);
@@ -462,8 +510,17 @@ export function createSyncHandler<
     const db = getDrizzleDb() as unknown as Db; // as-any-ok: schema generic mismatch between getDrizzleDb's return and Db type alias
 
     // ---- Phase 2: validateEntityRefs ----
-    if (config.entityRefFields) {
-      const fields = config.entityRefFields(items);
+    // Support both callback form (entityRefFields) and shorthand (entityRefs: string[])
+    const entityRefFieldsFn = config.entityRefFields ?? (config.entityRefs
+      ? (items: TItem[]) => config.entityRefs!.map((fieldName) => ({
+          fieldName,
+          ids: items
+            .map((i) => (i as Record<string, unknown>)[fieldName])
+            .filter((id): id is string => typeof id === "string" && id.length > 0),
+        }))
+      : null);
+    if (entityRefFieldsFn) {
+      const fields = entityRefFieldsFn(items);
       const refError = await runPhase(name, "validateEntityRefs", async () =>
         validateEntityRefs(c, db, fields),
       );
@@ -494,7 +551,27 @@ export function createSyncHandler<
 
     // ---- Phase 3-6: transaction ----
     const now = new Date();
-    const allVals = items.map((item) => config.toRow(item, now));
+
+    // Resolve toRow: either the provided callback or the default identity mapper.
+    // The default mapper copies all item fields, applies ?? null for nullable
+    // columns, and adds syncedAt/updatedAt if those columns exist on the table.
+    const toRowFn = config.toRow ?? ((item: TItem, _now: Date): Row => {
+      const cols = getTableColumns(table) as Record<string, PgColumn>;
+      const row: Row = {};
+      for (const [key, col] of Object.entries(cols)) {
+        if (key === "createdAt") continue; // never set on upsert
+        if (key === "syncedAt" || key === "updatedAt") {
+          row[key] = _now;
+          continue;
+        }
+        const val = (item as Record<string, unknown>)[key];
+        // Apply ?? null for nullable columns when value is undefined
+        row[key] = val !== undefined ? val : (col.notNull ? undefined : null);
+      }
+      return row;
+    });
+
+    const allVals = items.map((item) => toRowFn(item, now));
     const columnCount = Object.keys(allVals[0] ?? {}).length;
     const chunkSize = computeChunkSize(columnCount);
 

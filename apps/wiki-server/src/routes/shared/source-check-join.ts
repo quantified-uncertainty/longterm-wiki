@@ -2,9 +2,11 @@
  * Shared helpers for LEFT JOINing source_check_verdicts into queries
  * and formatting the result into the API response shape.
  */
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { Column } from "drizzle-orm";
 import { sourceVerdicts } from "../../schema.js";
+import type { getDrizzleDb } from "../../db.js";
+import { sqlInList } from "./query-helpers.js";
 
 /**
  * Build the LEFT JOIN condition for source_check_verdicts.
@@ -14,7 +16,7 @@ export function verdictJoinCondition(recordType: string, idColumn: Column) {
   return and(
     eq(sourceVerdicts.recordType, recordType),
     eq(sourceVerdicts.recordId, idColumn),
-    sql`${sourceVerdicts.fieldName} IS NULL`,
+    isNull(sourceVerdicts.fieldName),
   );
 }
 
@@ -43,4 +45,60 @@ export function formatSourcing(row: VerdictJoinFields) {
     sourcesChecked: row.sourcingSourcesChecked ?? 0,
     checkedAt: row.sourcingCheckedAt?.toISOString() ?? null,
   };
+}
+
+/** Per-field verdict shape returned by fetchFieldVerdicts(). */
+export interface FieldVerdict {
+  verdict: string;
+  confidence: number | null;
+  sourcesChecked: number;
+  checkedAt: string | null;
+}
+
+/**
+ * Fetch per-field verdicts for a batch of records of a given record type.
+ * Returns a map keyed by recordId -> { fieldName -> FieldVerdict }.
+ *
+ * This queries source_check_verdicts WHERE field_name IS NOT NULL,
+ * filtering to only per-field (not whole-row) verdicts.
+ */
+export async function fetchFieldVerdicts(
+  db: ReturnType<typeof getDrizzleDb>,
+  recordType: string,
+  recordIds: string[],
+): Promise<Record<string, Record<string, FieldVerdict>>> {
+  if (recordIds.length === 0) return {};
+
+  const rows = await db
+    .select({
+      recordId: sourceVerdicts.recordId,
+      fieldName: sourceVerdicts.fieldName,
+      verdict: sourceVerdicts.verdict,
+      confidence: sourceVerdicts.confidence,
+      sourcesChecked: sourceVerdicts.sourcesChecked,
+      lastComputedAt: sourceVerdicts.lastComputedAt,
+    })
+    .from(sourceVerdicts)
+    .where(
+      and(
+        eq(sourceVerdicts.recordType, recordType),
+        sql`${sourceVerdicts.recordId} IN (${sqlInList(recordIds)})`,
+        isNotNull(sourceVerdicts.fieldName),
+      ),
+    );
+
+  const result: Record<string, Record<string, FieldVerdict>> = {};
+  for (const row of rows) {
+    if (!row.fieldName) continue;
+    if (!result[row.recordId]) {
+      result[row.recordId] = {};
+    }
+    result[row.recordId][row.fieldName] = {
+      verdict: row.verdict,
+      confidence: row.confidence,
+      sourcesChecked: row.sourcesChecked,
+      checkedAt: row.lastComputedAt?.toISOString() ?? null,
+    };
+  }
+  return result;
 }

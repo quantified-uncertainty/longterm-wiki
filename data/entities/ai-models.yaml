@@ -197,6 +197,27 @@
   modality:
     - text
     - image
+  benchmarks:
+    - name: MMLU
+      score: 79.0
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: HumanEval
+      score: 73.0
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: GPQA Diamond
+      score: 40.4
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: MATH
+      score: 40.5
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
   capabilities:
     - tool-use
   description: >-
@@ -233,6 +254,27 @@
   modality:
     - text
     - image
+  benchmarks:
+    - name: MMLU
+      score: 75.2
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: HumanEval
+      score: 75.9
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: GPQA Diamond
+      score: 33.3
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
+    - name: MATH
+      score: 38.9
+      unit: "%"
+      date: "2024-03"
+      source: "https://www-cdn.anthropic.com/de8ba9b01c9ab7cbabf5c33b80b7bbc618857627/Model_Card_Claude_3.pdf"
   capabilities:
     - tool-use
   description: >-
@@ -315,6 +357,11 @@
     - name: TAU-bench
       score: 58.8
       unit: "%"
+    - name: SWE-bench Verified
+      score: 49.0
+      unit: "%"
+      date: "2024-10"
+      source: "https://www.anthropic.com/news/3-5-models-and-computer-use"
   capabilities:
     - tool-use
     - computer-use
@@ -576,6 +623,17 @@
   modality:
     - text
     - image
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 74.5
+      unit: "%"
+      date: "2025-08"
+      source: "https://www.anthropic.com/news/claude-opus-4-1"
+    - name: GPQA Diamond
+      score: 81.0
+      unit: "%"
+      date: "2025-08"
+      source: "https://www.anthropic.com/news/claude-opus-4-1"
   capabilities:
     - tool-use
     - extended-thinking
@@ -624,6 +682,16 @@
     - name: OSWorld
       score: 61.4
       unit: "%"
+    - name: GPQA Diamond
+      score: 83.4
+      unit: "%"
+      date: "2025-09"
+      source: "https://www.anthropic.com/news/claude-sonnet-4-5"
+    - name: AIME 2025
+      score: 87.0
+      unit: "%"
+      date: "2025-09"
+      source: "https://www.anthropic.com/news/claude-sonnet-4-5"
   capabilities:
     - tool-use
     - extended-thinking
@@ -663,6 +731,12 @@
   modality:
     - text
     - image
+  benchmarks:
+    - name: SWE-bench Verified
+      score: 73.3
+      unit: "%"
+      date: "2025-10"
+      source: "https://assets.anthropic.com/m/99128ddd009bdcb/Claude-Haiku-4-5-System-Card.pdf"
   capabilities:
     - tool-use
     - extended-thinking

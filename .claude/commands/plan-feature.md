@@ -294,11 +294,10 @@ Verify before posting:
 pnpm crux gh epic create "[Feature Name] — Implementation Plan" --body-file=/tmp/feature-plan.md
 ```
 
-Create GitHub issues for Phase 1 tasks and link to the epic:
+Create Linear issues for Phase 1 tasks:
 
 ```bash
-pnpm crux gh issues create "Task title" --problem="..." --label=enhancement
-pnpm crux gh epic link <DISCUSSION_NUM> --issue=<ISSUE_NUM>
+pnpm crux linear create "Task title" --description="..."
 ```
 
 ### 7d. CHECKPOINT 3 — Final report

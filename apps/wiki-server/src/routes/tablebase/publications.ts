@@ -4,9 +4,6 @@ import { eq, count, desc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { publications } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
@@ -14,14 +11,9 @@ import {
   resolveEntityId,
   type ResolvedEntityVars,
 } from "../shared/resolve-entity-middleware.js";
-import {
-  upsertThingsInTx,
-  resolveEntityTitles,
-} from "../shared/thing-sync.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -70,10 +62,6 @@ const SyncItemSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   sourcing: InlineSourcingSchema.optional(),
-});
-
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(500),
 });
 
 // ---- Route ----
@@ -168,111 +156,39 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
   )
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
-
-    const now = new Date();
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const entityIds = [...new Set(items.map((i) => i.entityId))];
-      const titleMap = await resolveEntityTitles(tx, entityIds);
-
-      for (const item of items) {
-        await tx
-          .insert(publications)
-          .values({
-            id: item.id,
-            entityId: item.entityId,
-            entityDisplayName: item.entityDisplayName ?? null,
-            resourceId: item.resourceId ?? null,
-            title: item.title,
-            authors: item.authors ?? null,
-            url: item.url ?? null,
-            venue: item.venue ?? null,
-            publishedDate: item.publishedDate ?? null,
-            publicationType: item.publicationType,
-            citationCount: item.citationCount ?? null,
-            isFlagship: item.isFlagship,
-            abstract: item.abstract ?? null,
-            source: item.source ?? null,
-            notes: item.notes ?? null,
-            syncedAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: publications.id,
-            set: {
-              entityId: item.entityId,
-              entityDisplayName: item.entityDisplayName ?? null,
-              resourceId: item.resourceId ?? null,
-              title: item.title,
-              authors: item.authors ?? null,
-              url: item.url ?? null,
-              venue: item.venue ?? null,
-              publishedDate: item.publishedDate ?? null,
-              publicationType: item.publicationType,
-              citationCount: item.citationCount ?? null,
-              isFlagship: item.isFlagship,
-              abstract: item.abstract ?? null,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
-
-      const entityTitle = (id: string) => titleMap.get(id) ?? id;
-
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "publication" as const,
-          title: i.title,
-          sourceTable: "publications",
-          sourceId: i.id,
-          parentThingId: i.entityId,
-          parentTitle: entityTitle(i.entityId),
-          sourceUrl: i.url ?? i.source ?? null,
-          description:
-            [i.authors, i.venue, i.publishedDate].filter(Boolean).join(", ") ||
-            null,
-        }))
-      );
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "publication",
-          recordId: item.id,
-          entityId: item.entityId,
-          sourceUrl: item.url ?? item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-    });
-
-    logSourceCheckCoverage("publications/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "publications",
+      table: publications,
+      syncSchema: SyncItemSchema,
+      entityRefs: ["entityId"],
+      toThing: (item, titleMap) => ({
+        id: item.id,
+        thingType: "publication" as const,
+        title: item.title,
+        sourceTable: "publications",
+        sourceId: item.id,
+        parentThingId: item.entityId,
+        parentTitle: titleMap.get(item.entityId) ?? item.entityId,
+        sourceUrl: item.url ?? item.source ?? null,
+        description:
+          [item.authors, item.venue, item.publishedDate]
+            .filter(Boolean)
+            .join(", ") || null,
+      }),
+      thingsTitleIds: (items) => [
+        ...new Set(items.map((i) => i.entityId)),
+      ],
+      toVerdict: (item) => ({
+        recordType: "publication",
+        recordId: item.id,
+        entityId: item.entityId,
+        sourceUrl: item.url ?? item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(publications, "publications"));
 

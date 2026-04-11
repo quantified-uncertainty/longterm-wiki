@@ -1,17 +1,18 @@
 /**
- * Linear Command Handlers
+ * Linear Command Handlers — Primary Issue Tracker
  *
- * Track Claude Code work on Linear issues: list, search, comment,
- * signal start/done. Mirrors `crux gh issues` for Linear.
+ * Linear is the primary issue tracker for longterm-wiki. All new issues
+ * should be created here, not in GitHub Issues.
  *
  * Usage:
  *   crux linear view <QUA-NNN>          Show full issue + comments
  *   crux linear search <query>          Search QUA team issues
+ *   crux linear create <title>          Create a new issue
  *   crux linear comment <QUA-NNN> <msg> Post a comment
  *   crux linear start <QUA-NNN>         Move to In Progress + start comment
  *   crux linear done <QUA-NNN> --pr=URL Move to In Review + done comment
- *   crux linear states-list                    Print current QUA team workflow states
- *   crux linear parse <string>                 Extract a Linear ID from a string (debug)
+ *   crux linear states-list             Print current QUA team workflow states
+ *   crux linear parse <string>          Extract a Linear ID from a string (debug)
  */
 
 import { readFileSync } from 'fs';
@@ -19,6 +20,7 @@ import { createLogger } from '../lib/output.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
   commentOnIssue,
+  createIssue,
   getComments,
   getIssue,
   searchIssues,
@@ -34,6 +36,9 @@ interface CommandOptions extends BaseOptions {
   pr?: string;
   limit?: string;
   bodyFile?: string;
+  description?: string;
+  descriptionFile?: string;
+  priority?: string;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -252,6 +257,46 @@ async function parse(args: string[], options: CommandOptions): Promise<CommandRe
   return { output: `${id}\n`, exitCode: 0 };
 }
 
+async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const title = args.filter((a) => !a.startsWith('--')).join(' ').trim();
+  if (!title) {
+    return {
+      output: `${c.red}Usage: crux linear create "Issue title" [--description="..."] [--description-file=<path>] [--priority=1-4]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Resolve description from flag or file
+  const descFromFile = readBodyFlag(options.descriptionFile);
+  const description = descFromFile ?? options.description ?? '';
+
+  // Parse priority (Linear: 1=urgent, 2=high, 3=medium, 4=low)
+  let priority: number | undefined;
+  if (options.priority) {
+    priority = parseInt(options.priority, 10);
+    if (Number.isNaN(priority) || priority < 1 || priority > 4) {
+      return {
+        output: `${c.red}Invalid priority "${options.priority}" — must be 1 (urgent), 2 (high), 3 (medium), or 4 (low)${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
+
+  const result = await createIssue({ title, description, priority });
+
+  if (options.json) {
+    return { output: JSON.stringify(result, null, 2) + '\n', exitCode: 0 };
+  }
+
+  let out = '';
+  out += `${c.green}✓${c.reset} Created ${c.cyan}${result.identifier}${c.reset} — ${title}\n`;
+  out += `  ${result.url}\n`;
+  return { output: out, exitCode: 0 };
+}
+
 // ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
@@ -261,6 +306,7 @@ export const commands = {
   view,
   search,
   comment,
+  create,
   start,
   done,
   'states-list': statesList,
@@ -269,16 +315,22 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Linear Domain — Track Claude Code work on Linear issues
+Linear Domain — Primary issue tracker for longterm-wiki
 
 Commands:
   view <QUA-NNN>                Show full issue + recent comments (default)
   search <query>                Search QUA team issues
+  create <title>                Create a new issue in the QUA team
   comment <QUA-NNN> <message>   Post a comment on an issue
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
   states-list                   Show current QUA team workflow state IDs
   parse <string>                Extract a Linear ID from a string (debug helper)
+
+Options (create):
+  --description=<text>       Issue description (inline)
+  --description-file=<path>  Issue description from file (safe for multiline)
+  --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
 
 Options (comment):
   --body-file=<path>  Comment body from file (safe for multiline / escaped content)
@@ -294,6 +346,8 @@ Environment:
   LINEAR_API_KEY      Required. Stored in .env.base at the workspace root.
 
 Examples:
+  crux linear create "Broken login page" --description="The login form crashes on submit"
+  crux linear create "Add retry logic" --description-file=/tmp/desc.md --priority=3
   crux linear view QUA-184
   crux linear search "agent checklist"
   crux linear start QUA-184

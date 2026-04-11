@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeClosesSyntax, validateTestPlan, bigramSimilarity } from './pr.ts';
+import { normalizeClosesSyntax, validateTestPlan, bigramSimilarity, injectLinearRefs } from './pr.ts';
 
 describe('normalizeClosesSyntax', () => {
   it('rewrites comma-separated Closes to one-per-line', () => {
@@ -117,6 +117,67 @@ describe('validateTestPlan', () => {
     const result = validateTestPlan('');
     expect(result.status).toBe('block');
     expect(result.hasTestPlanSection).toBe(false);
+  });
+});
+
+describe('injectLinearRefs', () => {
+  it('injects from branch name', () => {
+    const result = injectLinearRefs('## Summary\nSome changes', 'claude/qua-184-linear-integration', undefined, null);
+    expect(result.injected).toEqual(['QUA-184']);
+    expect(result.body).toContain('Fixes QUA-184');
+  });
+
+  it('injects from explicit --linear flag', () => {
+    const result = injectLinearRefs('## Summary\nSome changes', 'claude/tier0-data-integrity', 'QUA-155', null);
+    expect(result.injected).toEqual(['QUA-155']);
+    expect(result.body).toContain('Fixes QUA-155');
+  });
+
+  it('injects multiple from comma-separated --linear flag', () => {
+    const result = injectLinearRefs('## Summary', 'claude/some-branch', 'QUA-155,QUA-151', null);
+    expect(result.injected).toEqual(['QUA-155', 'QUA-151']);
+    expect(result.body).toContain('Fixes QUA-155');
+    expect(result.body).toContain('Fixes QUA-151');
+  });
+
+  it('injects from checklist metadata', () => {
+    const result = injectLinearRefs('## Summary', 'claude/some-branch', undefined, 'QUA-110');
+    expect(result.injected).toEqual(['QUA-110']);
+    expect(result.body).toContain('Fixes QUA-110');
+  });
+
+  it('deduplicates across sources', () => {
+    const result = injectLinearRefs('## Summary', 'claude/qua-184-fix', 'QUA-184', 'QUA-184');
+    expect(result.injected).toEqual(['QUA-184']);
+    expect(result.body.match(/Fixes QUA-184/g)?.length).toBe(1);
+  });
+
+  it('skips already-referenced IDs', () => {
+    const body = '## Summary\n\nFixes QUA-184';
+    const result = injectLinearRefs(body, 'claude/qua-184-fix', undefined, null);
+    expect(result.injected).toEqual([]);
+    expect(result.body).toBe(body);
+  });
+
+  it('skips Closes/Resolves variants too', () => {
+    const body = '## Summary\n\nCloses QUA-155\nResolves QUA-151';
+    const result = injectLinearRefs(body, 'claude/qua-155-fix', 'QUA-151', null);
+    expect(result.injected).toEqual([]);
+  });
+
+  it('returns original body when no IDs found', () => {
+    const body = '## Summary';
+    const result = injectLinearRefs(body, 'claude/some-feature', undefined, null);
+    expect(result.injected).toEqual([]);
+    expect(result.body).toBe(body);
+  });
+
+  it('combines branch + explicit + checklist IDs', () => {
+    const result = injectLinearRefs('## Summary', 'claude/qua-184-fix', 'QUA-155', 'QUA-110');
+    expect(result.injected).toEqual(['QUA-184', 'QUA-155', 'QUA-110']);
+    expect(result.body).toContain('Fixes QUA-184');
+    expect(result.body).toContain('Fixes QUA-155');
+    expect(result.body).toContain('Fixes QUA-110');
   });
 });
 

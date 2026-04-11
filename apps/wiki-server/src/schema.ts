@@ -2004,10 +2004,11 @@ export const investments = pgTable(
     index("idx_inv_company_entity").on(table.companyEntityId),
     index("idx_inv_investor_entity").on(table.investorEntityId),
     index("idx_inv_date").on(table.date),
-    // Natural key uniqueness: uq_investments_natural_key
-    // Expression index on (investor_entity_id, company_entity_id, COALESCE(round_name, ''))
-    // WHERE investor_entity_id IS NOT NULL AND company_entity_id IS NOT NULL
-    // Managed in migration 0108_natural_key_uniqueness.sql (not representable in Drizzle API).
+    // Natural key uniqueness: uq_investments_entity_key
+    // Expression index on (LOWER(COALESCE(investor_entity_id, investor_id)),
+    //   LOWER(COALESCE(company_entity_id, company_id)), LOWER(COALESCE(round_name, '')))
+    // Non-partial — covers ALL rows. Uses entity_id when resolved, raw_id as fallback.
+    // Managed in migration 0170_investments_display_name_dedup.sql (not representable in Drizzle API).
   ]
 );
 
@@ -3897,4 +3898,54 @@ export const politicalVotes = pgTable(
       table.congressNumber,
     ),
   ]
+);
+
+// ── Coverage Scans ─────────────────────────────────────────────────
+
+export const tablebaseCoverageScans = pgTable(
+  "tablebase_coverage_scans",
+  {
+    id: serial("id").primaryKey(),
+    entityType: text("entity_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    coverageScore: integer("coverage_score").notNull(),
+    signalsFilled: integer("signals_filled").notNull().default(0),
+    signalsTotal: integer("signals_total").notNull().default(0),
+    signals: jsonb("signals").notNull().default({}),
+    scannedAt: timestamp("scanned_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_coverage_scans_entity").on(table.entityId),
+    index("idx_coverage_scans_type_score").on(table.entityType, table.coverageScore),
+    index("idx_coverage_scans_scanned_at").on(table.scannedAt),
+  ],
+);
+
+// ── Scanner Results ──────────────────────────────────────────────
+
+export const tablebaseScannerResults = pgTable(
+  "tablebase_scanner_results",
+  {
+    id: serial("id").primaryKey(),
+    scanRunId: text("scan_run_id").notNull(),
+    recordType: text("record_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    entityName: text("entity_name").notNull(),
+    entityType: text("entity_type").notNull(),
+    totalRecords: integer("total_records").notNull().default(0),
+    verifiedRecords: integer("verified_records").notNull().default(0),
+    completenessPct: real("completeness_pct").notNull().default(0),
+    missingFields: jsonb("missing_fields").notNull().default([]),
+    entityImportance: real("entity_importance"),
+    scannedAt: timestamp("scanned_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_scanner_results_run_id").on(table.scanRunId),
+    index("idx_scanner_results_entity").on(table.entityId),
+    index("idx_scanner_results_scanned_at").on(table.scannedAt),
+    index("idx_scanner_results_type_entity").on(table.recordType, table.entityId),
+  ],
 );

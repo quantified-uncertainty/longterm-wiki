@@ -58,10 +58,10 @@ facts:
 
   - id: f_vfOPhOwJQP
     property: partner-count
-    value: "138"
+    value: "143"
     asOf: 2026-03
     source: https://partnershiponai.org/partners/
-    notes: "138 partner organizations across tech companies, civil society, academia, and media"
+    notes: "143 partner organizations across tech companies, civil society, academia, and media"
 
   - id: f_7cjV8ehCYn
     property: country

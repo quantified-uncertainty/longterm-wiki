@@ -4,16 +4,9 @@ The `createSyncHandler<T>()` factory in `apps/wiki-server/src/routes/tablebase/s
 
 ## When to use it
 
-**Always use the factory for new sync routes.** Use the scaffolder:
+**Always use the factory for new sync routes.** Copy an existing factory-using route (e.g., `political-scores.ts` for a simple route, `personnel.ts` for a complex one) and adapt it. Hand-write the Zod schema directly — it's typically 10-15 lines and captures business rules (min/max, enums, regex) that cannot be auto-derived from the Drizzle table definition.
 
-```bash
-pnpm crux tb sync-scaffold <route-name>             # Tier 2 (default)
-pnpm crux tb sync-scaffold <route-name> --tier=1    # Full features
-pnpm crux tb sync-scaffold <route-name> --tier=3    # Minimal
-pnpm crux tb sync-scaffold <route-name> --output=apps/wiki-server/src/routes/tablebase/<route-name>.ts
-```
-
-The scaffolder emits a starter route file with the minimum factory config. Replace the `TODO` placeholders with the real schema and field mappings.
+> **Why no scaffolder or schema inference?** A `drizzle-zod` spike (Phase 3, April 2026) showed that auto-derived schemas require ~90 lines of overrides for a 12-line hand-written schema. The override surface is larger than what it replaces. Similarly, a code generator (`crux tb sync-scaffold`) was deleted because it produced TODO-riddled templates that amounted to automated copy-paste. Hand-written Zod schemas are shorter, clearer, and capture business constraints correctly.
 
 ## When NOT to use it
 
@@ -134,3 +127,4 @@ When you migrate a route to the factory, write a new test in `apps/wiki-server/s
 - Factory source: `apps/wiki-server/src/routes/tablebase/sync-factory.ts`
 - Feature flag: `apps/wiki-server/src/routes/tablebase/sync-factory-flag.ts`
 - Type-level test: `apps/wiki-server/src/routes/tablebase/sync-factory.test-d.ts`
+- Phase 3 spike results: closed PRs #4099, #4103, #4106, #4108 (v1 migrations archived for reference). drizzle-zod spike showed schema inference is too lossy for this codebase — hand-written schemas are the right choice.

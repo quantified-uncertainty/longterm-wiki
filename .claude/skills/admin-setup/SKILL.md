@@ -69,54 +69,13 @@ If unhealthy or unreachable, surface that prominently — admin needs to know im
 
 ### Section 4: Stale work detection
 
-**4a. Stale Linear "In Progress" issues** — issues marked In Progress for >3 days with no recent commits on the matching branch.
+**4a. Stale Linear "In Progress" + ready-for-dispatch queue** — uses the maintain triage-linear command which detects stale In Progress (>3 days), stuck In Review (>5 days), and surfaces P1/P2 backlog items.
 
 ```bash
-set -a && source /Users/ozziegooen/Documents/GitHub.nosync/lw/.env.base && set +a
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -d '{"query": "{ issues(filter: { team: { key: { eq: \"QUA\" } }, state: { type: { eq: \"started\" } } }, first: 50) { nodes { identifier title updatedAt } } }"}' \
-  | python3 -c "
-import json, sys
-from datetime import datetime, timezone, timedelta
-d = json.load(sys.stdin)
-cutoff = datetime.now(timezone.utc) - timedelta(days=3)
-stale = []
-for n in d['data']['issues']['nodes']:
-    updated = datetime.fromisoformat(n['updatedAt'].replace('Z', '+00:00'))
-    if updated < cutoff:
-        days = (datetime.now(timezone.utc) - updated).days
-        stale.append((days, n['identifier'], n['title'][:70]))
-stale.sort(reverse=True)
-if stale:
-    print(f'⚠ {len(stale)} stale In Progress issue(s) (>3 days):')
-    for days, ident, title in stale[:10]:
-        print(f'  {ident:>8} ({days}d) {title}')
-else:
-    print('✓ No stale In Progress issues')
-"
+pnpm crux sys maintain triage-linear
 ```
 
-**4b. Ready-for-dispatch queue** — P1/P2 issues in Backlog/Todo, ready to assign.
-
-Open the saved Linear view: `Ready for dispatch (P1/P2 backlog)` (already created in workspace). Or query directly:
-
-```bash
-curl -s -X POST https://api.linear.app/graphql \
-  -H "Content-Type: application/json" \
-  -H "Authorization: $LINEAR_API_KEY" \
-  -d '{"query": "{ issues(filter: { team: { key: { eq: \"QUA\" } }, priority: { in: [1, 2] }, state: { type: { in: [\"backlog\", \"unstarted\"] } } }, first: 15, orderBy: priority) { nodes { identifier title priority } } }"}' \
-  | python3 -c "
-import json, sys
-d = json.load(sys.stdin)
-nodes = d['data']['issues']['nodes']
-print(f'Ready for dispatch: {len(nodes)} P1/P2 issue(s):')
-for n in nodes:
-    p = ['  ','P1','P2','P3','P4'][n['priority']]
-    print(f'  {p} {n[\"identifier\"]:>8} {n[\"title\"][:75]}')
-"
-```
+This replaces the manual GraphQL queries. If `LINEAR_API_KEY` is not set, it reports that and skips gracefully.
 
 **4c. Stale agent slots** — slots on a non-main branch with no recent activity.
 

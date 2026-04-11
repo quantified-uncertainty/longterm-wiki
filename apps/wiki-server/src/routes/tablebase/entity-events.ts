@@ -4,9 +4,6 @@ import { eq, and, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { entityEvents } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
@@ -14,13 +11,9 @@ import {
   resolveEntityId,
   type ResolvedEntityVars,
 } from "../shared/resolve-entity-middleware.js";
-import {
-  upsertThingsInTx,
-  resolveEntityTitles,
-} from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -69,10 +62,6 @@ const SyncItemSchema = z.object({
   notes: z.string().max(5000).nullable().optional(),
 });
 
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(500),
-});
-
 // ---- Route ----
 
 const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
@@ -118,84 +107,24 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
   )
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
-
-    const now = new Date();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      const entityIds = [...new Set(items.map((i) => i.entityId))];
-      const titleMap = await resolveEntityTitles(tx, entityIds);
-
-      for (const item of items) {
-        await tx
-          .insert(entityEvents)
-          .values({
-            id: item.id,
-            entityId: item.entityId,
-            entityDisplayName: item.entityDisplayName ?? null,
-            date: item.date,
-            title: item.title,
-            description: item.description ?? null,
-            eventType: item.eventType,
-            significance: item.significance ?? null,
-            source: item.source ?? null,
-            notes: item.notes ?? null,
-            syncedAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: entityEvents.id,
-            set: {
-              entityId: item.entityId,
-              entityDisplayName: item.entityDisplayName ?? null,
-              date: item.date,
-              title: item.title,
-              description: item.description ?? null,
-              eventType: item.eventType,
-              significance: item.significance ?? null,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
-
-      const entityTitle = (id: string) => titleMap.get(id) ?? id;
-
-      await upsertThingsInTx(
-        tx,
-        items.map((i) => ({
-          id: i.id,
-          thingType: "entity-event" as const,
-          title: `${i.title} (${i.date})`,
-          sourceTable: "entity_events",
-          sourceId: i.id,
-          parentThingId: i.entityId,
-          parentTitle: entityTitle(i.entityId),
-          sourceUrl: i.source ?? null,
-          description: i.description ?? null,
-        }))
-      );
-    });
-
-    return c.json({ upserted });
-  })
+  .post("/sync", createSyncHandler({
+    name: "entity-events",
+    table: entityEvents,
+    syncSchema: SyncItemSchema,
+    entityRefs: ["entityId"],
+    toThing: (item, titleMap) => ({
+      id: item.id,
+      thingType: "entity-event" as const,
+      title: `${item.title} (${item.date})`,
+      sourceTable: "entity_events",
+      sourceId: item.id,
+      parentThingId: item.entityId,
+      parentTitle: titleMap.get(item.entityId) ?? item.entityId,
+      sourceUrl: item.source ?? null,
+      description: item.description ?? null,
+    }),
+    thingsTitleIds: (items) => [...new Set(items.map((i) => i.entityId))],
+  }))
 
   .post("/delete-batch", deleteBatchHandler(entityEvents, "entity_events"));
 

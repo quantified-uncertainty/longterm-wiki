@@ -6,6 +6,10 @@ import {
   commentOnIssue,
   createIssue,
   searchIssues,
+  scoreLinearIssue,
+  isLinearIssueBlocked,
+  rankReadyIssues,
+  type ReadyIssue,
 } from '../issues.ts';
 
 // Helper: fake a fetch response with a JSON body.
@@ -344,5 +348,164 @@ describe('issues.ts — transport helpers', () => {
       const body = JSON.parse((init as RequestInit).body as string);
       expect(body.variables.limit).toBe(7);
     });
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Pure scoring / ranking helpers (no API mocking needed)
+// ---------------------------------------------------------------------------
+
+function makeReadyIssue(overrides: Partial<ReadyIssue> = {}): ReadyIssue {
+  return {
+    id: 'id-1',
+    identifier: 'QUA-100',
+    title: 'Test issue',
+    description: null,
+    priority: 3, // medium
+    url: 'https://linear.app/quantifieduncertainty/issue/QUA-100',
+    createdAt: '2026-03-01T00:00:00Z',
+    updatedAt: '2026-03-01T00:00:00Z',
+    state: { name: 'Todo', type: 'unstarted' },
+    assignee: null,
+    labels: { nodes: [] },
+    parent: null,
+    project: null,
+    ...overrides,
+  };
+}
+
+describe('scoreLinearIssue', () => {
+  it('scores urgent higher than high higher than medium', () => {
+    const urgent = scoreLinearIssue(makeReadyIssue({ priority: 1 }));
+    const high = scoreLinearIssue(makeReadyIssue({ priority: 2 }));
+    const medium = scoreLinearIssue(makeReadyIssue({ priority: 3 }));
+    const low = scoreLinearIssue(makeReadyIssue({ priority: 4 }));
+    const none = scoreLinearIssue(makeReadyIssue({ priority: 0 }));
+
+    expect(urgent).toBeGreaterThan(high);
+    expect(high).toBeGreaterThan(medium);
+    expect(medium).toBeGreaterThan(low);
+    expect(low).toBeGreaterThan(none);
+  });
+
+  it('applies bug label bonus', () => {
+    const base = scoreLinearIssue(makeReadyIssue({ priority: 3 }));
+    const withBug = scoreLinearIssue(
+      makeReadyIssue({ priority: 3, labels: { nodes: [{ name: 'Bug' }] } }),
+    );
+    expect(withBug).toBe(base + 50);
+  });
+
+  it('applies agent-ready 1.5x multiplier', () => {
+    const base = scoreLinearIssue(makeReadyIssue({ priority: 2 }));
+    const ready = scoreLinearIssue(
+      makeReadyIssue({ priority: 2, labels: { nodes: [{ name: 'claude-ready' }] } }),
+    );
+    // 500 base → 500 * 1.5 = 750. Age/recency bonuses identical.
+    expect(ready).toBeGreaterThan(base);
+    expect(ready - base).toBeGreaterThanOrEqual(Math.round(500 * 0.5) - 1); // ~250
+  });
+
+  it('gives recency bonus for recently updated issues', () => {
+    const stale = scoreLinearIssue(
+      makeReadyIssue({ updatedAt: '2025-01-01T00:00:00Z' }),
+    );
+    const recent = scoreLinearIssue(
+      makeReadyIssue({ updatedAt: new Date().toISOString() }),
+    );
+    expect(recent).toBe(stale + 15);
+  });
+
+  it('gives age bonus capped at 10', () => {
+    const fresh = scoreLinearIssue(
+      makeReadyIssue({ createdAt: new Date().toISOString(), updatedAt: '2025-01-01T00:00:00Z' }),
+    );
+    const old = scoreLinearIssue(
+      makeReadyIssue({ createdAt: '2020-01-01T00:00:00Z', updatedAt: '2025-01-01T00:00:00Z' }),
+    );
+    // Old issue should have +10 (capped), fresh issue +0
+    expect(old - fresh).toBe(10);
+  });
+});
+
+describe('isLinearIssueBlocked', () => {
+  it('returns false for a clean issue', () => {
+    expect(isLinearIssueBlocked(makeReadyIssue())).toBe(false);
+  });
+
+  it('returns true for blocked label', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ labels: { nodes: [{ name: 'blocked' }] } })),
+    ).toBe(true);
+  });
+
+  it('returns true for waiting label', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ labels: { nodes: [{ name: 'waiting' }] } })),
+    ).toBe(true);
+  });
+
+  it('returns true when description says "blocked by"', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ description: 'This is blocked by QUA-50' })),
+    ).toBe(true);
+  });
+
+  it('returns true when description says "waiting for"', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ description: 'Waiting for upstream fix' })),
+    ).toBe(true);
+  });
+
+  it('returns true when description says "depends on"', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ description: 'Depends on QUA-222 shipping first' })),
+    ).toBe(true);
+  });
+
+  it('returns false for unrelated description content', () => {
+    expect(
+      isLinearIssueBlocked(makeReadyIssue({ description: 'This feature adds a new command' })),
+    ).toBe(false);
+  });
+});
+
+describe('rankReadyIssues', () => {
+  it('sorts by score descending', () => {
+    const issues = [
+      makeReadyIssue({ identifier: 'QUA-1', priority: 4 }), // low
+      makeReadyIssue({ identifier: 'QUA-2', priority: 1 }), // urgent
+      makeReadyIssue({ identifier: 'QUA-3', priority: 3 }), // medium
+    ];
+    const ranked = rankReadyIssues(issues);
+    expect(ranked[0].identifier).toBe('QUA-2'); // urgent first
+    expect(ranked[1].identifier).toBe('QUA-3'); // then medium
+    expect(ranked[2].identifier).toBe('QUA-1'); // then low
+  });
+
+  it('uses creation date as tiebreaker (oldest first)', () => {
+    const issues = [
+      makeReadyIssue({ identifier: 'QUA-NEW', priority: 3, createdAt: '2026-04-01T00:00:00Z' }),
+      makeReadyIssue({ identifier: 'QUA-OLD', priority: 3, createdAt: '2026-01-01T00:00:00Z' }),
+    ];
+    const ranked = rankReadyIssues(issues);
+    expect(ranked[0].identifier).toBe('QUA-OLD');
+    expect(ranked[1].identifier).toBe('QUA-NEW');
+  });
+
+  it('marks blocked issues correctly', () => {
+    const issues = [
+      makeReadyIssue({ identifier: 'QUA-OK' }),
+      makeReadyIssue({ identifier: 'QUA-BLOCKED', labels: { nodes: [{ name: 'blocked' }] } }),
+    ];
+    const ranked = rankReadyIssues(issues);
+    const ok = ranked.find((r) => r.identifier === 'QUA-OK');
+    const blocked = ranked.find((r) => r.identifier === 'QUA-BLOCKED');
+    expect(ok!.blocked).toBe(false);
+    expect(blocked!.blocked).toBe(true);
+  });
+
+  it('returns empty array for empty input', () => {
+    expect(rankReadyIssues([])).toEqual([]);
   });
 });

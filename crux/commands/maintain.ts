@@ -25,6 +25,7 @@ import type {
   GitHubIssue,
   CruftItem,
   TriageCategory,
+  LinearTriageCategory,
   FixChainPR,
 } from '../lib/maintain/types.ts';
 import { loadSessionLogsSince } from '../lib/maintain/session-logs.ts';
@@ -398,6 +399,162 @@ async function triageIssues(_args: string[], options: CommandOptions): Promise<C
 }
 
 /**
+ * Triage Linear issues — detect stale In Progress, stuck In Review, and
+ * surface the ready-for-dispatch queue. Mirrors triageIssues() for GitHub.
+ */
+async function triageLinear(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  let output = '';
+  output += `${c.bold}${c.blue}Linear Queue Triage${c.reset}\n\n`;
+
+  // Check if LINEAR_API_KEY is available
+  if (!process.env.LINEAR_API_KEY) {
+    output += `${c.yellow}LINEAR_API_KEY not set — skipping Linear triage.${c.reset}\n`;
+    output += `${c.dim}Set it in .env.base and sync to slot .env to enable.${c.reset}\n`;
+    return { output, exitCode: 0 };
+  }
+
+  let listIssuesByStateType: typeof import('../lib/linear/issues.ts').listIssuesByStateType;
+  try {
+    const linearMod = await import('../lib/linear/issues.ts');
+    listIssuesByStateType = linearMod.listIssuesByStateType;
+  } catch (e) {
+    output += `${c.red}Failed to load Linear library: ${e instanceof Error ? e.message : String(e)}${c.reset}\n`;
+    return { output, exitCode: 0 };
+  }
+
+  // Fetch active issues (In Progress + In Review) and backlog (Backlog + Todo)
+  const [activeIssues, backlogIssues] = await Promise.all([
+    listIssuesByStateType(['started']),       // In Progress + In Review
+    listIssuesByStateType(['backlog', 'unstarted']), // Backlog + Todo
+  ]);
+
+  const STALE_DAYS = 3;
+  const STUCK_REVIEW_DAYS = 5;
+  const priorityLabels: Record<number, string> = {
+    0: 'none', 1: 'urgent', 2: 'high', 3: 'medium', 4: 'low',
+  };
+
+  const categories: Record<LinearTriageCategory, Array<{
+    identifier: string;
+    title: string;
+    priority: string;
+    state: string;
+    daysInactive: number;
+    reason: string;
+    parent?: string;
+  }>> = {
+    'stale-in-progress': [],
+    'stuck-in-review': [],
+    'ready-dispatch': [],
+    'active': [],
+  };
+
+  // Categorize active issues
+  for (const issue of activeIssues) {
+    const daysInactive = daysSince(issue.updatedAt);
+    const pLabel = priorityLabels[issue.priority] ?? `p${issue.priority}`;
+    const parent = issue.parent ? `${issue.parent.identifier}` : undefined;
+    const entry = {
+      identifier: issue.identifier,
+      title: issue.title,
+      priority: pLabel,
+      state: issue.state.name,
+      daysInactive,
+      reason: '',
+      parent,
+    };
+
+    if (issue.state.name === 'In Review' && daysInactive > STUCK_REVIEW_DAYS) {
+      entry.reason = `In Review for ${daysInactive} days — may need merge or follow-up`;
+      categories['stuck-in-review'].push(entry);
+    } else if (issue.state.name === 'In Progress' && daysInactive > STALE_DAYS) {
+      entry.reason = `In Progress for ${daysInactive} days with no updates`;
+      categories['stale-in-progress'].push(entry);
+    } else {
+      entry.reason = `Active (updated ${daysInactive}d ago)`;
+      categories['active'].push(entry);
+    }
+  }
+
+  // Surface ready-for-dispatch (P1/P2 in Backlog/Todo)
+  for (const issue of backlogIssues) {
+    if (issue.priority <= 2 && issue.priority > 0) { // urgent or high
+      const pLabel = priorityLabels[issue.priority] ?? `p${issue.priority}`;
+      const parent = issue.parent ? `${issue.parent.identifier}` : undefined;
+      categories['ready-dispatch'].push({
+        identifier: issue.identifier,
+        title: issue.title,
+        priority: pLabel,
+        state: issue.state.name,
+        daysInactive: daysSince(issue.updatedAt),
+        reason: `${pLabel} priority, ready to pick up`,
+        parent,
+      });
+    }
+  }
+
+  // Sort each category: stale ones by days descending, dispatch by priority then age
+  categories['stale-in-progress'].sort((a, b) => b.daysInactive - a.daysInactive);
+  categories['stuck-in-review'].sort((a, b) => b.daysInactive - a.daysInactive);
+  categories['ready-dispatch'].sort((a, b) => {
+    // Lower priority number = more urgent
+    const pa = Object.entries(priorityLabels).find(([, v]) => v === a.priority)?.[0] ?? '4';
+    const pb = Object.entries(priorityLabels).find(([, v]) => v === b.priority)?.[0] ?? '4';
+    return Number(pa) - Number(pb) || b.daysInactive - a.daysInactive;
+  });
+
+  const totalActive = activeIssues.length;
+  const totalBacklog = backlogIssues.length;
+  output += `${c.bold}Active issues: ${totalActive}${c.reset} (In Progress + In Review)`;
+  output += `  ${c.dim}Backlog: ${totalBacklog}${c.reset}\n\n`;
+
+  const categoryMeta: Record<LinearTriageCategory, { label: string; color: string; desc: string }> = {
+    'stale-in-progress': {
+      label: 'Stale In Progress',
+      color: c.red,
+      desc: `In Progress for >${STALE_DAYS} days with no updates. Move to Todo or update with progress.`,
+    },
+    'stuck-in-review': {
+      label: 'Stuck In Review',
+      color: c.yellow,
+      desc: `In Review for >${STUCK_REVIEW_DAYS} days. Check if PR was merged — may need to move to Done.`,
+    },
+    'ready-dispatch': {
+      label: 'Ready for Dispatch (P1/P2)',
+      color: c.cyan,
+      desc: 'High-priority items in Backlog/Todo ready for an agent to pick up.',
+    },
+    'active': {
+      label: 'Active (healthy)',
+      color: c.green,
+      desc: 'Currently being worked on with recent activity.',
+    },
+  };
+
+  for (const [cat, items] of Object.entries(categories) as Array<[LinearTriageCategory, typeof categories[LinearTriageCategory]]>) {
+    if (items.length === 0) continue;
+    const meta = categoryMeta[cat];
+    output += `${c.bold}${meta.color}${meta.label} (${items.length}):${c.reset}\n`;
+    output += `${c.dim}${meta.desc}${c.reset}\n`;
+    for (const item of items) {
+      const parentTag = item.parent ? ` ${c.dim}[${item.parent}]${c.reset}` : '';
+      output += `  ${meta.color}${item.identifier}${c.reset} [${item.state}] ${item.priority} — ${item.title}${parentTag}\n`;
+      output += `    ${c.dim}${item.reason}${c.reset}\n`;
+    }
+    output += '\n';
+  }
+
+  if (options.json || options.ci) {
+    return { output: JSON.stringify(categories, null, 2), exitCode: 0 };
+  }
+
+  return { output, exitCode: 0 };
+}
+
+/**
  * Detect codebase cruft: stale TODOs, large files, commented-out code.
  */
 async function detectCruft(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -503,6 +660,7 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
   if (options.json || options.ci) {
     const prResult = await reviewPrs(args, { ...options, json: true });
     const issueResult = await triageIssues(args, { ...options, json: true });
+    const linearResult = await triageLinear(args, { ...options, json: true });
     const cruftResult = await detectCruft(args, { ...options, json: true });
 
     if (prResult.exitCode !== 0 || issueResult.exitCode !== 0 || cruftResult.exitCode !== 0) {
@@ -514,12 +672,13 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
       return { output: `One or more sub-reports failed:\n${errors.join('\n')}`, exitCode: 1 };
     }
 
-    const combined = {
+    const combined: Record<string, unknown> = {
       timestamp: new Date().toISOString(),
       prReview: JSON.parse(prResult.output),
       issueTriage: JSON.parse(issueResult.output),
       cruftDetection: JSON.parse(cruftResult.output),
     };
+    try { combined.linearTriage = JSON.parse(linearResult.output); } catch { /* non-JSON = skipped */ }
 
     writeFileSync(LAST_RUN_FILE, new Date().toISOString().slice(0, 10) + '\n');
     return { output: JSON.stringify(combined, null, 2), exitCode: 0 };
@@ -532,11 +691,14 @@ async function report(args: string[], options: CommandOptions): Promise<CommandR
 
   const prResult = await reviewPrs(args, options);
   const issueResult = await triageIssues(args, options);
+  const linearResult = await triageLinear(args, options);
   const cruftResult = await detectCruft(args, options);
 
   output += prResult.output;
   output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
   output += issueResult.output;
+  output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
+  output += linearResult.output;
   output += `${c.dim}${'─'.repeat(60)}${c.reset}\n\n`;
   output += cruftResult.output;
 
@@ -773,6 +935,7 @@ export const commands = {
   report,
   'review-prs': reviewPrs,
   'triage-issues': triageIssues,
+  'triage-linear': triageLinear,
   'detect-cruft': detectCruft,
   'fix-chains': fixChains,
   'health-snapshot': healthSnapshot,
@@ -791,6 +954,7 @@ Commands:
   report           Run full maintenance report (default)
   review-prs       Review merged PRs and session logs since last run
   triage-issues    Triage open GitHub issues for staleness/resolution
+  triage-linear    Triage Linear queue (stale In Progress, stuck In Review, dispatch queue)
   detect-cruft     Find dead code, TODOs, large files, commented-out code
   fix-chains       Detect feature PRs followed by fix PRs (quality signal)
   health-snapshot  Quantified code health metrics (TODOs, any types, fix ratio, etc.)
@@ -821,6 +985,7 @@ Examples:
   crux sys maintain status                   Show when maintenance last ran
   crux sys maintain review-prs               Just review PRs + session logs
   crux sys maintain triage-issues            Just triage GitHub issues
+  crux sys maintain triage-linear            Just triage Linear queue
   crux sys maintain detect-cruft             Just find codebase cruft
   crux sys maintain fix-chains               Detect fix chains (feature → fix → fix)
   crux sys maintain fix-chains --json        JSON output for trend tracking

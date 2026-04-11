@@ -5,7 +5,7 @@ effort: medium
 
 # Maintenance Sweep
 
-Run a prioritized maintenance session: review recent PRs, analyze session logs, triage GitHub issues, detect codebase cruft, and take action.
+Run a prioritized maintenance session: review recent PRs, analyze session logs, triage Linear/GitHub issues, detect codebase cruft, and take action.
 
 ## Overview
 
@@ -26,7 +26,8 @@ pnpm crux sys maintain
 
 This produces a combined report covering:
 - **PR & Session Log Review**: Merged PRs, session log issues/learnings, recurring problems, multi-edited pages
-- **GitHub Issue Triage**: Issues categorized as potentially-resolved, stale, actionable, or keep
+- **Linear Queue Triage** (primary): Stale In Progress, stuck In Review, and P1/P2 ready-for-dispatch items
+- **Legacy GitHub Issue Triage**: Issues categorized as potentially-resolved, stale, actionable, or keep
 - **Codebase Cruft**: TODO/FIXME comments, large files, commented-out code
 
 Additionally, check page content health:
@@ -46,7 +47,7 @@ The report categorizes work into priority tiers. Review the output and decide wh
 | **P0** | Fix broken things | Always | CI failures, blocking validation errors, broken imports |
 | **P1** | Close resolved issues | ~1 min each | Issues that recent PRs already fixed — verify and close |
 | **P2** | Propagate learnings | ~5 min | Add recurring session log issues to `common-issues.md` or rules |
-| **P3** | Work actionable issues | Varies | Fix small issues directly; **file new GitHub issues** for larger tasks found during the sweep |
+| **P3** | Work actionable issues | Varies | Fix small issues directly; **file new Linear issues** for larger tasks found during the sweep |
 | **P4** | Cruft cleanup | ~5 min each | Dead code removal, TODO resolution, file splitting |
 | **P5** | Page content updates | Delegate | Run `pnpm crux w updates run` for content freshness |
 
@@ -54,26 +55,37 @@ The report categorizes work into priority tiers. Review the output and decide wh
 
 ### Filing new issues
 
-When the sweep reveals problems too large to fix now, **create GitHub issues** so they aren't lost. Use `jq` to safely construct the JSON payload (avoids shell injection from titles/descriptions containing quotes or special characters):
+When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost:
 ```bash
-TITLE="<title>"
-BODY="<description>"
-curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues" \
-  -d "$(jq -n --arg t "$TITLE" --arg b "$BODY" '{title: $t, body: $b, labels: ["enhancement"]}')"
+pnpm crux linear create "Descriptive title" \
+  --description="What's wrong and why it matters"
+```
+
+To update existing Linear issues with context:
+```bash
+pnpm crux linear comment QUA-NNN "Status update from maintenance sweep"
 ```
 
 This is a key output of maintenance — converting discovered problems into tracked work items.
 
 ### Issue tracking cleanup
 
-Check for stale `agent:working` labels on issues where the session has ended:
+**GitHub:** Check for stale `agent:working` labels on issues where the session has ended:
 ```bash
 pnpm crux gh issues list   # shows "In Progress" section with agent:working issues
 ```
 For each orphaned in-progress issue:
 - If work completed: `pnpm crux gh issues done <N> --pr=<URL>` (posts comment + removes label)
 - If work abandoned: post a comment explaining, then remove label via `crux gh issues done <N>`
+
+**Linear:** Check the `triage-linear` report for stale issues:
+```bash
+pnpm crux sys maintain triage-linear   # shows stale In Progress, stuck In Review, dispatch queue
+```
+For stale In Progress issues with no active session:
+- Move to Todo: `pnpm crux linear done QUA-NNN` then re-open, or use the API directly
+- If PR was merged but issue not closed: `pnpm crux linear done QUA-NNN --pr=<URL>`
+- Post context: `pnpm crux linear comment QUA-NNN "Maintenance: moved to Todo — no active session"`
 
 ## Phase 3: Execute
 
@@ -82,17 +94,13 @@ Work through the prioritized list:
 ### Closing resolved issues
 For each issue the triage report flagged as "Potentially Resolved," verify it was actually fixed, then comment and close:
 ```bash
-NUMBER=<issue number>
-COMMENT="Resolved by #<PR_NUMBER>. <brief explanation>"
+# GitHub issues
+pnpm crux gh issues done <NUMBER> --pr=<PR_URL>
 
-# Comment explaining resolution
-curl -s -X POST -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${NUMBER}/comments" \
-  -d "$(jq -n --arg b "$COMMENT" '{body: $b}')"
-# Close the issue
-curl -s -X PATCH -H "Authorization: token $GITHUB_TOKEN" -H "Accept: application/vnd.github+json" \
-  "https://api.github.com/repos/quantified-uncertainty/longterm-wiki/issues/${NUMBER}" \
-  -d '{"state": "closed", "state_reason": "completed"}'
+# Linear issues (if PR merged but issue still open)
+pnpm crux linear done QUA-NNN --pr=<PR_URL>
+# Or move directly to Done if already merged:
+pnpm crux linear done QUA-NNN
 ```
 
 ### Propagating learnings
@@ -100,7 +108,7 @@ Edit `.claude/common-issues.md` or `.claude/rules/` files with patterns found in
 
 ### Fixing actionable issues
 For small issues: fix the code, following the standard workflow (edit, validate, test).
-For larger discoveries: file a GitHub issue (see above) and move on.
+For larger discoveries: file a Linear issue (see above) and move on.
 
 ### Cruft cleanup
 Only remove things you're confident are unused — grep thoroughly before deleting. Each change should be a focused, reviewable unit.
@@ -117,5 +125,5 @@ Only remove things you're confident are unused — grep thoroughly before deleti
 - **Be conservative with issue closures.** When in doubt, comment with status rather than closing. The triage report's "potentially resolved" classification uses heuristic matching and can have false positives.
 - **For cruft removal**, only remove things you're confident are unused. Grep thoroughly before deleting.
 - **Don't modify wiki content directly.** Page updates go through the Crux pipeline (`crux w updates run` or `crux w content improve`).
-- **If the sweep finds many items (>10 actionable)**, work on the top 5 and file the rest as GitHub issues.
+- **If the sweep finds many items (>10 actionable)**, work on the top 5 and file the rest as Linear issues.
 - **If a maintenance run takes >5 actions**, prefer multiple focused commits over one large commit.

@@ -225,12 +225,11 @@ facts:
   # ── Product Revenue ───────────────────────────────────────────
   - id: f_F6F2FrPKGg
     property: product-revenue
-    value: 1.31e+10
+    value: 2e+10
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Full-year 2025 revenue ~$13.1B. Consumer subscriptions ~75% ($9.8B),
-      API revenue exceeded $1B ARR. Annualized run rate hit $20B by end of 2025,
-      rising to $25B by Feb 2026."
+    notes: "Full-year 2025 revenue ~$20B per CFO Sarah Friar. Consumer subscriptions
+      ~75%, API revenue exceeded $1B ARR. Annualized run rate rose to $25B by Feb 2026."
 
   # ── Cash Burn ─────────────────────────────────────────────────
   - id: f_Fy9eOKxsbA
@@ -246,9 +245,8 @@ facts:
     value: 8.5e+9
     asOf: 2025-12
     source: https://sacra.com/c/openai/
-    notes: "Cash burn of ~$8.5B on $13.1B in revenue for 2025; cash burn rate
-      approximately 65% of revenue. Spending approximately $13.8M per day
-      in H1 2025."
+    notes: "Cash burn of ~$8.5B on ~$20B in revenue for 2025; cash burn rate
+      approximately 43% of revenue."
 
   # ── Enterprise Market Share ───────────────────────────────────
   - id: f_wwhRjMvagg
