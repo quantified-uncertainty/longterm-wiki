@@ -96,6 +96,11 @@ export default async function PublicationDetailPage({ params }: PageProps) {
     };
   });
 
+  // Hide the Published column when fewer than 10% of resources have dates
+  const datesPopulated = resourceRows.filter((r) => r.publishedDate).length;
+  const showPublishedDate =
+    resourceRows.length === 0 || datesPopulated / resourceRows.length >= 0.1;
+
   return (
     <div className="max-w-4xl mx-auto px-6 py-8">
       {/* Back link */}
@@ -227,7 +232,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
             <FileText className="w-4 h-4 inline mr-1.5 -mt-0.5" />
             Resources ({resources.length})
           </h2>
-          <PublicationResourcesTable resources={resourceRows} />
+          <PublicationResourcesTable resources={resourceRows} showPublishedDate={showPublishedDate} />
         </section>
       )}
 

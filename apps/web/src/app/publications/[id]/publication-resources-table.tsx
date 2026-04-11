@@ -152,10 +152,20 @@ function makeColumns(): ColumnDef<PublicationResourceRow>[] {
 
 export function PublicationResourcesTable({
   resources,
+  showPublishedDate = true,
 }: {
   resources: PublicationResourceRow[];
+  showPublishedDate?: boolean;
 }) {
-  const columns = useMemo(() => makeColumns(), []);
+  const columns = useMemo(() => {
+    const all = makeColumns();
+    if (!showPublishedDate) {
+      return all.filter(
+        (c) => (c as { accessorKey?: string }).accessorKey !== "publishedDate",
+      );
+    }
+    return all;
+  }, [showPublishedDate]);
 
   const [sorting, setSorting] = useState<SortingState>([
     { id: "citingPageCount", desc: true },
