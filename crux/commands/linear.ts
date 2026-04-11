@@ -269,12 +269,21 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     };
   }
 
-  // Resolve description from flag, file, or stdin
+  // Resolve description from flag or file
   const descFromFile = readBodyFlag(options.descriptionFile);
   const description = descFromFile ?? options.description ?? '';
 
-  // Parse priority (Linear: 0=none, 1=urgent, 2=high, 3=medium, 4=low)
-  const priority = options.priority ? parseInt(options.priority, 10) : undefined;
+  // Parse priority (Linear: 1=urgent, 2=high, 3=medium, 4=low)
+  let priority: number | undefined;
+  if (options.priority) {
+    priority = parseInt(options.priority, 10);
+    if (Number.isNaN(priority) || priority < 1 || priority > 4) {
+      return {
+        output: `${c.red}Invalid priority "${options.priority}" — must be 1 (urgent), 2 (high), 3 (medium), or 4 (low)${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
 
   const result = await createIssue({ title, description, priority });
 
