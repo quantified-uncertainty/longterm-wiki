@@ -153,6 +153,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifiable: false  # X.com/Twitter blocks automated access
 
   google-scholar:
     name: Google Scholar
@@ -174,6 +175,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifiable: false  # Self-referential: the fact IS the URL
 
   founded-by:
     name: Founded By
@@ -608,6 +610,7 @@ properties:
     dataType: text
     category: general
     appliesTo: [organization, person, project, funder, safety-agenda]
+    verifiable: false  # Self-referential: the fact IS the URL
 
   country:
     name: Country

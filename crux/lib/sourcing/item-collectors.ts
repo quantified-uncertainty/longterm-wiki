@@ -10,7 +10,7 @@ import type { Fact, Entity as FBEntity } from '../../../packages/factbase/src/ty
 import { formatFactValue } from '../../../packages/factbase/src/format.ts';
 import { apiRequest } from '../wiki-server/client.ts';
 import { listVerdicts } from '../wiki-server/sourcing-client.ts';
-import { VALID_RECORD_TYPES, type RecordType, isSourcingExempt } from '../../../apps/wiki-server/src/api-types.ts';
+import { VALID_RECORD_TYPES, type RecordType } from '../../../apps/wiki-server/src/api-types.ts';
 import { resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from './record-fields.ts';
 import {
   ENTITY_TYPE_PRIORITY,
@@ -191,11 +191,8 @@ export function collectFactItems(
       if (!fact.source || fact.id.startsWith('inv_')) continue;
 
       const property = graph.getProperty(fact.propertyId);
-
-      // Skip facts whose property is marked nonVerifiable (e.g. secondary-valuation,
-      // equity-stake-percent) — these come from private/proprietary data that the
-      // sourcing system cannot verify. QUA-247.
-      if (property?.nonVerifiable) continue;
+      // Skip properties marked as not verifiable (e.g., social media handles, self-referential URLs)
+      if (property?.verifiable === false) continue;
       const formattedValue = formatFactValue(fact, property, graph);
       const existing = existingVerdicts.get(fact.id);
 
@@ -238,14 +235,11 @@ export async function collectRecordItems(
 
   // Determine which record types to scan
   // --table filters to a specific record type (e.g. "personnel", "grant")
-  // Exempt types are excluded — their data comes from canonical APIs and
-  // doesn't benefit from sourcing verification (see SOURCING_EXEMPT_TYPES).
-  const typesToScan = (tableFilter
+  const typesToScan = tableFilter
     ? VALID_RECORD_TYPES.filter(t => t === tableFilter)
     : entityTypeFilter
       ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
-      : [...VALID_RECORD_TYPES]
-  ).filter(t => !isSourcingExempt(t));
+      : [...VALID_RECORD_TYPES];
 
   for (const recordType of typesToScan) {
     let apiBasePath: string;
