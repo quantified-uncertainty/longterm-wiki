@@ -10,10 +10,10 @@ facts:
 
   - id: f_xZ7bD2nM4c
     property: revenue
-    value: 9e+8
+    value: 1e+9
     asOf: 2024-06
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
-    notes: "ARR mid-2024"
+    notes: "Approximately $1B ARR by mid-2024"
 
   - id: f_i59sRXPSZw
     property: revenue

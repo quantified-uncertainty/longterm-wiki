@@ -53,10 +53,10 @@ facts:
 
   - id: f_CSa0ePCYZw
     property: headcount
-    value: 862
-    asOf: 2026-02
+    value: 783
+    asOf: 2026-01
     source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
-    notes: "862 employees as of Feb 28, 2026 per Tracxn"
+    notes: "783 employees as of Jan 31, 2026 per Tracxn"
 
   # ── Funding ─────────────────────────────────────────────────────
   - id: f_AAtA1On16g
@@ -94,7 +94,7 @@ facts:
     value: 2.6e+8
     asOf: 2023-06
     source: https://aifundingtracker.com/mistral-ai-funding-unicorn-valuation/
-    notes: "Seed round post-money valuation; $260M valuation on $117M raised"
+    notes: "Seed round post-money valuation; $260M valuation on $113M raised"
 
   - id: f_DxtX0AahVA
     property: valuation
