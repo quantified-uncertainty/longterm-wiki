@@ -4,8 +4,7 @@ import {
   type FetchResult,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
-import { getTypedEntityById } from "@data/tablebase";
-import { getEntityHref } from "@/data/entity-nav";
+import { getTypedEntityById, getEntityHref } from "@/data";
 import { CoverageTable, type CoverageRow } from "./coverage-table";
 
 // ── Types (match the wiki-server coverage-scans route response shapes) ──
@@ -53,16 +52,17 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
     }),
   ]);
 
-  if (!allResult.ok) return allResult;
-  if (!statsResult.ok) return statsResult;
+  // Degrade gracefully: show whatever data we got rather than failing the
+  // whole dashboard because one endpoint is down.
+  const items = allResult.ok ? allResult.data.items : [];
+  const stats = statsResult.ok ? statsResult.data.stats : [];
 
-  return {
-    ok: true,
-    data: {
-      items: allResult.data.items,
-      stats: statsResult.data.stats,
-    },
-  };
+  if (!allResult.ok && !statsResult.ok) {
+    // Both failed — bubble up the first error
+    return allResult;
+  }
+
+  return { ok: true, data: { items, stats } };
 }
 
 function emptyFallback(): DashboardData {

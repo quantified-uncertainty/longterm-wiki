@@ -194,6 +194,7 @@ export function CoverageTable({ data, entityTypes }: CoverageTableProps) {
           <input
             type="text"
             placeholder="Search entities..."
+            aria-label="Search entities by name"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             className="w-full rounded-md border border-border bg-background pl-9 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
@@ -202,6 +203,7 @@ export function CoverageTable({ data, entityTypes }: CoverageTableProps) {
         <select
           value={typeFilter}
           onChange={(e) => setTypeFilter(e.target.value)}
+          aria-label="Filter by entity type"
           className="rounded-md border border-border bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
         >
           <option value="all">All types ({data.length})</option>
