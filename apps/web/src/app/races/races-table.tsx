@@ -9,9 +9,9 @@ import {
   AI_STANCE_LABELS,
   RACE_LEVEL_LABELS,
 } from "./races-constants";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface RaceRow {
   id: string;
@@ -205,11 +205,11 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                       if (e.key === "Enter" || e.key === " ") e.stopPropagation();
                     }}
                   >
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(race.verdictString)}
                       originalVerdict={race.verdictString}
                       size="md"
-                      href={getSourceCheckHref("race", String(race.id))}
+                      href={getSourcingHref("race", String(race.id))}
                     />
                   </td>
                 </tr>
@@ -291,11 +291,11 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                     : "—"}
                                 </td>
                                 <td className="py-1 px-1">
-                                  <SourceCheckDot
+                                  <SourcingDot
                                     status={recordVerdictToStatus(c.verdictString)}
                                     originalVerdict={c.verdictString}
                                     size="md"
-                                    href={getSourceCheckHref("race-candidate", String(c.id))}
+                                    href={getSourcingHref("race-candidate", String(c.id))}
                                   />
                                 </td>
                               </tr>

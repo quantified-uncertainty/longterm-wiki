@@ -15,10 +15,10 @@
 
 import { cn } from "@/lib/utils";
 import { safeHref, formatIntroducedDate } from "@/lib/format-compact";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import type { PoliticalVoteRecord } from "./types";
 
 // ── Vote styling ────────────────────────────────────────────────────
@@ -193,11 +193,11 @@ function VoteRow({ vote }: { vote: PoliticalVoteRecord }) {
         {(() => {
           const verdict = getRecordVerdict("political-vote", String(vote.id))?.verdict;
           return (
-            <SourceCheckDot
+            <SourcingDot
               status={recordVerdictToStatus(verdict)}
               originalVerdict={verdict}
               size="md"
-              href={getSourceCheckHref("political-vote", String(vote.id))}
+              href={getSourcingHref("political-vote", String(vote.id))}
             />
           );
         })()}

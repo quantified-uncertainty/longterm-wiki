@@ -21,7 +21,7 @@ import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
-import { FactSourceCheckDot } from "@/components/source-check/FactSourceCheckDot";
+import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
 interface FBEntitySidebarProps {
   /** KB entity ID (e.g., "anthropic") */
@@ -188,7 +188,7 @@ export function FBEntitySidebar({
             <div className="flex-1 text-xs break-words">
               <span className="inline-flex items-center gap-1">
                 <FBFactValueDisplay fact={fact} property={property} className="font-semibold text-foreground" />
-                <FactSourceCheckDot factId={fact.id} />
+                <FactSourcingDot factId={fact.id} />
               </span>
               {fact.asOf && (
                 <span className="block text-xs text-muted-foreground/60 mt-0.5">

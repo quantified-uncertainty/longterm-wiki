@@ -11,8 +11,8 @@ import {
 } from "@/data";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import {
   PublicationResourcesTable,
   type PublicationResourceRow,
@@ -116,11 +116,11 @@ export default async function PublicationDetailPage({ params }: PageProps) {
       <div className="mb-8">
         <div className="flex items-start gap-3 mb-2">
           <h1 className="text-2xl font-bold flex-1">{pub.name}</h1>
-          <SourceCheckDot
+          <SourcingDot
             status={recordVerdictToStatus(pubVerdict?.verdict)}
             originalVerdict={pubVerdict?.verdict}
             size="md"
-            href={pubVerdict?.verdict ? `/source-checks/publication/${encodeURIComponent(pub.id)}` : undefined}
+            href={pubVerdict?.verdict ? `/sourcing/publication/${encodeURIComponent(pub.id)}` : undefined}
           />
         </div>
 

@@ -49,6 +49,7 @@ export const VALID_RECORD_TYPES = [
   "secondary-market-price",
   "citation",
   "wiki-page",
+  "fact",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
@@ -61,7 +62,7 @@ export const VALID_SOURCE_CHECK_VERDICTS = [
   "partial",
 ] as const;
 
-export type SourceCheckVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
+export type SourcingVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
 
 // ---------------------------------------------------------------------------
 // Edit Logs

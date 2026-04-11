@@ -92,7 +92,7 @@ const SECTION_ROW_LIMIT = 500;
  */
 const FETCH_LIMIT = SECTION_ROW_LIMIT + 1;
 
-// ---- Record type mapping (for source-check detail page URLs) ----
+// ---- Record type mapping (for sourcing detail page URLs) ----
 
 const SECTION_RECORD_TYPE: Record<string, string> = {
   personnel: "personnel",
@@ -100,7 +100,6 @@ const SECTION_RECORD_TYPE: Record<string, string> = {
   grantsReceived: "grant",
   fundingRounds: "funding-round",
   investments: "investment",
-  equityPositions: "equity-position",
   divisions: "division",
   fundingPrograms: "funding-program",
   policyStakeholders: "policy-stakeholder",
@@ -321,7 +320,7 @@ for (const section of SECTIONS) {
 // Sections that have record verdicts
 const VERDICT_SECTIONS = new Set([
   "personnel", "grantsGiven", "grantsReceived", "fundingRounds",
-  "investments", "equityPositions", "divisions", "fundingPrograms", "facts",
+  "investments", "divisions", "fundingPrograms", "policyStakeholders", "facts",
 ]);
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----

@@ -40,10 +40,10 @@ function computePriorityScore(row: {
   return Math.round(importance * qualityDeficit * stalenessFactor * riskFactor * 1000) / 1000;
 }
 
-/** Fetch per-entity source-check summary from wiki-server. Returns a map keyed by entity slug. */
-async function loadSourceCheckSummary(): Promise<Map<string, RpcEntitySummaryRow>> {
+/** Fetch per-entity sourcing summary from wiki-server. Returns a map keyed by entity slug. */
+async function loadSourcingSummary(): Promise<Map<string, RpcEntitySummaryRow>> {
   const result = await fetchDetailed<{ summaries: RpcEntitySummaryRow[] }>(
-    "/api/source-checks/entity-summary",
+    "/api/sourcing/entity-summary",
     { revalidate: 300 }
   );
 
@@ -71,8 +71,8 @@ export async function EntitiesContent() {
   const coverageById = new Map(coverageItems.map((c) => [c.id, c]));
   const rankingById = new Map(rankings.map((r) => [r.id, r]));
 
-  // Fetch source-check data (graceful degradation if unavailable)
-  const scSummary = await loadSourceCheckSummary();
+  // Fetch sourcing data (graceful degradation if unavailable)
+  const scSummary = await loadSourcingSummary();
 
   const rows: UnifiedEntityRow[] = entities.map((e) => {
     const page = getPageById(e.id);
@@ -89,15 +89,15 @@ export async function EntitiesContent() {
     const lastUpdated = cov?.lastUpdated ?? (e.lastUpdated ?? null);
     const riskLevel = cov?.riskLevel ?? null;
 
-    // Compute derived source-check metrics
+    // Compute derived sourcing metrics
     let scAccuracyRate: number | null = null;
-    let scSourceCheckCoverage: number | null = null;
+    let scSourcingCoverage: number | null = null;
     if (sc) {
       const checkedDenom = sc.confirmed + sc.contradicted + sc.outdated + sc.partial + sc.unverifiable;
       scAccuracyRate = checkedDenom > 0
         ? Math.round((sc.confirmed / checkedDenom) * 1000) / 1000
         : null;
-      scSourceCheckCoverage = sc.totalRecords > 0
+      scSourcingCoverage = sc.totalRecords > 0
         ? Math.round((sc.totalVerdicts / sc.totalRecords) * 1000) / 1000
         : null;
     }
@@ -191,7 +191,7 @@ export async function EntitiesContent() {
       scTotalVerdicts: sc?.totalVerdicts ?? null,
       scAvgConfidence: sc?.avgConfidence ?? null,
       scAccuracyRate,
-      scSourceCheckCoverage,
+      scSourcingCoverage,
       resourceLinkCount,
     };
   });
@@ -200,7 +200,7 @@ export async function EntitiesContent() {
   const withPages = rows.filter((r) => r.hasPage).length;
   const withImportance = rows.filter((r) => r.readerImportance != null).length;
   const withCoverage = rows.filter((r) => r.coverageScore != null).length;
-  const withSourceChecks = rows.filter((r) => r.scTotalVerdicts != null && r.scTotalVerdicts > 0).length;
+  const withSourcing = rows.filter((r) => r.scTotalVerdicts != null && r.scTotalVerdicts > 0).length;
 
   return (
     <>
@@ -212,11 +212,11 @@ export async function EntitiesContent() {
         have importance scores,{" "}
         <span className="font-medium text-foreground">{withCoverage}</span>{" "}
         have coverage data,{" "}
-        <span className="font-medium text-foreground">{withSourceChecks}</span>{" "}
-        have source-check verdicts,{" "}
+        <span className="font-medium text-foreground">{withSourcing}</span>{" "}
+        have sourcing verdicts,{" "}
         <span className="font-medium text-foreground">{withResourceLinks}</span>{" "}
         have resource links. Use <strong>preset buttons</strong> to switch views.
-        The <strong>Source Check</strong> preset shows source-check accuracy and coverage.
+        The <strong>Source Check</strong> preset shows sourcing accuracy and coverage.
       </p>
       <EntitiesDataTable entities={rows} />
     </>

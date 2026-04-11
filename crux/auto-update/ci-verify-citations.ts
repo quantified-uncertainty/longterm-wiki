@@ -35,7 +35,7 @@ export interface PageCitationResult {
   brokenUrls: Array<{ url: string; httpStatus: number | null }>;
 }
 
-export interface CitationSourceCheckResult {
+export interface CitationSourcingResult {
   pages: PageCitationResult[];
   totalVerified: number;
   totalBroken: number;
@@ -159,7 +159,7 @@ export function buildCitationSummary(pages: PageCitationResult[]): string {
 
 export async function verifyCitationsForPages(
   pageIds: string[],
-): Promise<CitationSourceCheckResult> {
+): Promise<CitationSourcingResult> {
   const pages: PageCitationResult[] = [];
 
   for (let i = 0; i < pageIds.length; i++) {

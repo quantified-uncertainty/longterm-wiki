@@ -1,0 +1,10 @@
+- id: automation-landscape
+  stableId: sid_gypDxvCnjw
+  wikiId: E2214
+  type: internal
+  title: Automation Landscape
+  description: >-
+    Complete map of all background processes: GitHub Actions workflows,
+    groundskeeper tasks, job queue handlers, K8s services, and scheduled
+    maintenance.
+  lastUpdated: 2026-04

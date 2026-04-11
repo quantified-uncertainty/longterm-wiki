@@ -3,7 +3,7 @@ import { formatDateRange, fieldStr } from "@/lib/directory-utils";
 import { getKBEntitySlug } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
 import { CurrentBadge } from "@/components/directory";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 
@@ -43,7 +43,7 @@ export function BoardSeats({ boardSeats }: { boardSeats: BoardSeat[] }) {
                     filledFieldCount: (role ? 1 : 0) + (appointed ? 1 : 0) + (departed ? 1 : 0),
                   })}
                   verdict={verdict?.verdict}
-                  sourcingHref={verdict?.verdict ? getSourceCheckHref("personnel", String(record.key)) : undefined}
+                  sourcingHref={verdict?.verdict ? getSourcingHref("personnel", String(record.key)) : undefined}
                 />
               </div>
               <div className="flex items-center gap-1.5 flex-wrap">

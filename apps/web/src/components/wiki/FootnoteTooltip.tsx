@@ -119,7 +119,7 @@ function ClaimContent({ entry }: { entry: RefMapEntry }) {
 }
 
 /**
- * Content displayed for a regular citation (no claim source-check data).
+ * Content displayed for a regular citation (no claim sourcing data).
  * Shows title, domain, and note if available.
  */
 function CitationContent({ entry }: { entry: RefMapEntry }) {

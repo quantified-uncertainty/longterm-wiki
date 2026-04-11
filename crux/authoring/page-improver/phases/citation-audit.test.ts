@@ -186,7 +186,7 @@ describe('citationAuditPhase', () => {
 
     await citationAuditPhase(mockPage, 'content', undefined, {});
 
-    expect(getLogMessages()).toContain('No citations found — skipping source-check');
+    expect(getLogMessages()).toContain('No citations found — skipping sourcing');
   });
 
   it('logs "Citation audit passed" when audit passes with citations', async () => {

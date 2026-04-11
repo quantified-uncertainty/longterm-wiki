@@ -259,7 +259,7 @@ export function DivisionsTable({
                     <RecordStatusDots
                       coverageScore={computeDivisionCoverage(row)}
                       verdict={row.verdict?.verdict}
-                      sourcingHref={row.verdict?.verdict ? `/source-checks/division/${encodeURIComponent(row.key)}` : undefined}
+                      sourcingHref={row.verdict?.verdict ? `/sourcing/division/${encodeURIComponent(row.key)}` : undefined}
                     />
                   </td>
                 </tr>

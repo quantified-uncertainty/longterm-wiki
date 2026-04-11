@@ -181,16 +181,16 @@ async function healthCommand(_args: string[], _options: Options): Promise<Comman
     const hasSnapshot = source?.lastSnapshotAt != null;
     const hasFields = manifest.schema.fields.length > 0;
 
-    // Check persisted column mapping and source-check config
+    // Check persisted column mapping and sourcing config
     const hasColumnMapping = source?.columnMapping != null && Object.keys(source.columnMapping as Record<string, unknown>).length > 0;
-    const hasSourceCheckConfig = source?.verificationConfig != null && Object.keys(source.verificationConfig as Record<string, unknown>).length > 0;
+    const hasSourcingConfig = source?.verificationConfig != null && Object.keys(source.verificationConfig as Record<string, unknown>).length > 0;
 
     const status = [];
     if (!isRegistered) { status.push('NOT REGISTERED'); issues++; }
     if (!hasSnapshot) { status.push('NO SNAPSHOT'); issues++; }
     if (!hasFields) { status.push('NO SCHEMA'); issues++; }
     if (isRegistered && !hasColumnMapping) { status.push('NO COLUMN MAPPING'); issues++; }
-    if (isRegistered && !hasSourceCheckConfig) { status.push('NO VERIFICATION CONFIG'); issues++; }
+    if (isRegistered && !hasSourcingConfig) { status.push('NO VERIFICATION CONFIG'); issues++; }
 
     const icon = status.length === 0 ? '✓' : '✗';
     console.log(`  ${icon} ${id.padEnd(25)} ${status.length > 0 ? status.join(', ') : 'OK'}`);

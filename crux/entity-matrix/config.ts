@@ -329,16 +329,16 @@ export const DIMENSIONS: DimensionDef[] = [
 
   // --- Quality Quality & Source-Check Source-Check ---
   {
-    id: "source_check_tables",
+    id: "sourcing_tables",
     label: "Source-Check Tables",
     group: "quality",
-    description: "Whether source-check DB tables exist for this data type",
+    description: "Whether sourcing DB tables exist for this data type",
     detection: "filesystem",
     valueType: "boolean",
     importance: 5,
   },
   {
-    id: "source_check_coverage",
+    id: "sourcing_coverage",
     label: "Source-Check Coverage",
     group: "quality",
     description: "Percentage of records with non-unchecked verdicts",
@@ -759,10 +759,10 @@ export function scoreDimension(dimensionId: string, raw: unknown): number {
       return 15;
 
     // Quality
-    case "source_check_tables":
+    case "sourcing_tables":
     case "hallucination_scored":
       return scoreBoolean(raw as boolean);
-    case "source_check_coverage":
+    case "sourcing_coverage":
       return scorePercentage(raw as number);
 
     // Testing

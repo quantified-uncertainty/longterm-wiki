@@ -157,7 +157,7 @@ function makeColumns(): ColumnDef<PublicationRow>[] {
         <RecordStatusDots
           coverageScore={computePublicationCoverage(row.original)}
           verdict={row.original.verdictString}
-          sourcingHref={row.original.verdictString ? `/source-checks/publication/${encodeURIComponent(row.original.id)}` : undefined}
+          sourcingHref={row.original.verdictString ? `/sourcing/publication/${encodeURIComponent(row.original.id)}` : undefined}
         />
       ),
     },

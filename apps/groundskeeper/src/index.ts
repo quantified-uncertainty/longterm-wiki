@@ -12,6 +12,7 @@ import { dataQualitySnapshot } from "./tasks/data-quality-snapshot.js";
 import { jobWorkerHealth } from "./tasks/job-worker-health.js";
 import { autoUpdateEnqueue } from "./tasks/auto-update-enqueue.js";
 import { jobFailureTriage } from "./tasks/job-failure-triage.js";
+import { tablebaseScan } from "./tasks/tablebase-scan.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -59,6 +60,10 @@ logger.info({
     jobFailureTriage: {
       enabled: config.tasks.jobFailureTriage.enabled,
       schedule: config.tasks.jobFailureTriage.schedule,
+    },
+    tablebaseScan: {
+      enabled: config.tasks.tablebaseScan.enabled,
+      schedule: config.tasks.tablebaseScan.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -137,6 +142,14 @@ registerTask(
   config.tasks.jobFailureTriage.schedule,
   config.tasks.jobFailureTriage.enabled,
   () => jobFailureTriage(config)
+);
+
+registerTask(
+  config,
+  "tablebase-scan",
+  config.tasks.tablebaseScan.schedule,
+  config.tasks.tablebaseScan.enabled,
+  () => tablebaseScan(config)
 );
 
 // Register as an active agent (best-effort)

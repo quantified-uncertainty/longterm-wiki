@@ -35,11 +35,11 @@ import type { RefMapEntry as PreprocessorRefMapEntry, KBFactRefData } from "@/li
 import { getDomain } from "@/components/wiki/resource-utils";
 import { formatFactValueForFootnote } from "@/lib/reference-preprocessor";
 import { References } from "@/components/wiki/References";
-import { getCitationQuotes, computeCitationHealth, getSourceCheckVerdicts, computeHealthFromSourceCheck } from "@/lib/citation-data";
+import { getCitationQuotes, computeCitationHealth, getSourcingVerdicts, computeHealthFromSourcing } from "@/lib/citation-data";
 import type { CitationQuote } from "@/lib/citation-data";
 
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
-import { SourceCheckStatus } from "@/components/wiki/SourceCheckStatus";
+import { SourcingStatus } from "@/components/wiki/SourcingStatus";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 
 /**
@@ -98,7 +98,7 @@ function buildReferenceMap(
     }
   }
 
-  // Layer citation quotes on top (they have richer source-check data)
+  // Layer citation quotes on top (they have richer sourcing data)
   if (citationQuotes) {
     for (const q of citationQuotes) {
       map.set(q.footnote, {
@@ -351,10 +351,10 @@ async function ContentView({
       })()
     : pageData?.citationHealth ?? undefined;
 
-  // Try unified source-check verdicts first; fall back to citation_quotes
-  const sourceVerdicts = !isInternal ? await getSourceCheckVerdicts(slug) : [];
+  // Try unified sourcing verdicts first; fall back to citation_quotes
+  const sourceVerdicts = !isInternal ? await getSourcingVerdicts(slug) : [];
   const citationHealthSummary = sourceVerdicts.length > 0
-    ? computeHealthFromSourceCheck(sourceVerdicts, citationQuotes?.length ?? 0)
+    ? computeHealthFromSourcing(sourceVerdicts, citationQuotes?.length ?? 0)
     : citationQuotes && citationQuotes.length > 0
       ? computeCitationHealth(citationQuotes)
       : null;
@@ -424,8 +424,8 @@ async function ContentView({
       </CitationQuotesProvider>
       {/* KB facts section: auto-rendered for entities with substantive KB data */}
       {isArticle && !isInternal && entity && <FBAutoFacts entityId={slug} />}
-      {/* Source check status: shows entity-level source-check verdicts when available */}
-      {isArticle && !isInternal && entity && <SourceCheckStatus entityId={slug} />}
+      {/* Source check status: shows entity-level sourcing verdicts when available */}
+      {isArticle && !isInternal && entity && <SourcingStatus entityId={slug} />}
       {/* Related pages rendered outside prose to avoid inherited link styles */}
       {isArticle && !isInternal && <RelatedPages entityId={slug} entity={entity} />}
     </InfoBoxVisibilityProvider>

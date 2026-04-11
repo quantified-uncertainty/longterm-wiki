@@ -33,7 +33,7 @@ export interface ExtractedClaim {
   type: ClaimType;
   /** Confidence in extraction quality. */
   confidence: ExtractionConfidence;
-  /** Source sentence or paragraph this was extracted from (for source-check). */
+  /** Source sentence or paragraph this was extracted from (for sourcing). */
   sourceContext: string;
   /** Any specific value (number, date, name) that is the core of the claim. */
   keyValue?: string;

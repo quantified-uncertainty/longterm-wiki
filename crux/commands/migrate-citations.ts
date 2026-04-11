@@ -14,8 +14,8 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { storeSourceCheckEvidence, storeAggregateVerdict } from '../lib/source-check/index.ts';
-import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/index.ts';
+import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import {
   getAllQuotes,
   getQuotesByPage,
@@ -24,7 +24,7 @@ import {
   type QuotesByPageResult,
 } from '../lib/wiki-server/citations.ts';
 import { listPages, type PageListResult } from '../lib/wiki-server/pages.ts';
-import { getVerdictByRecord } from '../lib/wiki-server/source-check-client.ts';
+import { getVerdictByRecord } from '../lib/wiki-server/sourcing-client.ts';
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -80,7 +80,7 @@ interface AllQuotesResponse {
 
 // ── Verdict Mapping ──────────────────────────────────────────────────
 
-const VERDICT_MAP: Record<string, SourceCheckVerdict> = {
+const VERDICT_MAP: Record<string, SourcingVerdict> = {
   accurate: 'confirmed',
   inaccurate: 'contradicted',
   unsupported: 'unverifiable',
@@ -88,12 +88,12 @@ const VERDICT_MAP: Record<string, SourceCheckVerdict> = {
   not_verifiable: 'unverifiable',
 };
 
-function mapVerdict(accuracyVerdict: string): SourceCheckVerdict | null {
+function mapVerdict(accuracyVerdict: string): SourcingVerdict | null {
   return VERDICT_MAP[accuracyVerdict] ?? null;
 }
 
 /**
- * Build a recordId for a citation in the unified source-check system.
+ * Build a recordId for a citation in the unified sourcing system.
  * Format: page:<pageSlug>:fn<footnote>
  */
 function buildRecordId(pageSlug: string, footnote: number): string {
@@ -166,7 +166,7 @@ async function fetchQuotesForPage(pageSlug: string): Promise<CitationQuoteRow[]>
 }
 
 /**
- * Check if a source-check verdict already exists for a given record.
+ * Check if a sourcing verdict already exists for a given record.
  */
 async function hasExistingVerdict(recordId: string): Promise<boolean> {
   const result = await getVerdictByRecord('citation', recordId);
@@ -270,7 +270,7 @@ async function migrateCommand(
 
     try {
       // Store evidence
-      await storeSourceCheckEvidence({
+      await storeSourcingEvidence({
         recordType: 'citation',
         recordId,
         sourceUrl: quote.url || '',
@@ -326,7 +326,7 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Migrate Citations — copy citation accuracy verdicts into the unified source-check system
+Migrate Citations — copy citation accuracy verdicts into the unified sourcing system
 
 Usage:
   crux tb migrate-citations                     Migrate all citation accuracy verdicts
@@ -340,7 +340,7 @@ Options:
   --limit=N          Maximum number of citations to migrate
 
 This is a one-time additive migration. The citation_quotes table is NOT modified.
-Safe to run multiple times — existing source-check verdicts are skipped.
+Safe to run multiple times — existing sourcing verdicts are skipped.
 
 Verdict mapping:
   accurate       -> confirmed

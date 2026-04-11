@@ -177,7 +177,7 @@ Commands:
   resource-refs  Validate resource authorEntityIds and publicationId references (advisory)
   display-names  Detect raw machine IDs in entity display fields (titles)
   display-formatting Detect serialization bugs and unescaped MDX in entity data
-  dot-position   Check that SourceCheckDot / RecordStatusDots are never the first column
+  dot-position   Check that SourcingDot / RecordStatusDots are never the first column
   to-rdjsonl     Convert unified --ci JSON to Reviewdog rdjsonl (reads stdin)
 
 Options:
@@ -218,7 +218,7 @@ Commands:
   status           Show citation checking status
   report           Summary report of citation checking across all pages
   extract-quotes   Extract supporting quotes from cited sources
-  quote-report     Report on quote extraction and source-check coverage
+  quote-report     Report on quote extraction and sourcing coverage
   verify-quotes    Re-verify stored quotes against fresh source content
   check-accuracy   Check if wiki claims accurately represent cited sources
   normalize-footnotes Report/fix inconsistent footnote formats across pages
@@ -246,7 +246,7 @@ Examples:
   crux w citations verify existential-risk                    Verify one page
   crux w citations verify existential-risk --content-verify  Also check claim support
   crux w citations verify --all --limit=20                   Verify top 20 pages
-  crux w citations status existential-risk           Show source-check results
+  crux w citations status existential-risk           Show sourcing results
   crux w citations report                            Summary across all pages
   crux w citations report --broken                   List all broken citations
   crux w citations extract-quotes existential-risk   Extract quotes for a page
@@ -900,7 +900,7 @@ Extract Structured Data from Wiki Pages
 
 ```
 Extracts structured data from wiki page prose for any entity type and
-optionally writes to the YAML entity data layer after source-check
+optionally writes to the YAML entity data layer after sourcing
 against footnote sources.
 
 Supported entity types:
@@ -961,15 +961,15 @@ Exit Codes:
   1 = Warnings or errors found
 ```
 
-### `source-check-wiki-pages`
+### `sourcing-wiki-pages`
 
 Wiki Page Source-Check — verify prose claims in wiki pages against their cited sources
 
 ```
 Usage:
-  crux w source-check-wiki-pages [options]             Check top pages by importance
-  crux w source-check-wiki-pages --page=anthropic      Check a specific page
-  crux w source-check-wiki-pages --dry-run             Preview what would be checked
+  crux w sourcing-wiki-pages [options]             Check top pages by importance
+  crux w sourcing-wiki-pages --page=anthropic      Check a specific page
+  crux w sourcing-wiki-pages --dry-run             Preview what would be checked
 
 Options:
   --limit=N               Max number of pages to process (default: 10)
@@ -985,7 +985,7 @@ For each page, the command:
   3. Cross-references claims against FactBase data
   4. Detects stale temporal references
   5. For sourced claims: fetches the source URL and verifies the claim via LLM
-  6. Stores results in the wiki-server source-check system
+  6. Stores results in the wiki-server sourcing system
 
 Record type: wiki-page
 Record IDs: page slugs (e.g., "anthropic", "openai")
@@ -1017,7 +1017,7 @@ Commands:
   import-990 --discover <query>         Search ProPublica by org name
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
-  source-check          Check KB facts against source URLs using LLM
+  sourcing          Check KB facts against source URLs using LLM
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
 
@@ -1027,9 +1027,9 @@ Options:
   --ci                  JSON output (sync-sources: dry-run, lists URLs only)
   --errors-only         Show only errors (validate)
   --rule=X              Filter by rule name (validate)
-  --entity=X            (source-check) Check all facts for one entity
-  --fact=X              (source-check) Check a single fact by ID
-  --dry-run             Preview changes without writing (source-check, import-990)
+  --entity=X            (sourcing) Check all facts for one entity
+  --fact=X              (sourcing) Check a single fact by ID
+  --dry-run             Preview changes without writing (sourcing, import-990)
   --ein=XXXXXXXXX       (import-990) Specify EIN directly
   --force               (import-990, add-fact) Overwrite existing facts
   --asOf=YYYY-MM        (add-fact) Temporal anchor date
@@ -1050,8 +1050,8 @@ Examples:
   crux fb import-990 givewell --ein=208625442  Import GiveWell 990 data
   crux fb import-990 --discover "Machine Intelligence Research"  Search ProPublica
   crux fb sync-sources                Sync source URLs to wiki-server resources
-  crux fb source-check --entity=anthropic   Check Anthropic facts against sources
-  crux fb source-check --dry-run --limit=5  Preview 5 facts that would be checked
+  crux fb sourcing --entity=anthropic   Check Anthropic facts against sources
+  crux fb sourcing --dry-run --limit=5  Preview 5 facts that would be checked
 ```
 
 ### `wikidata-enrich`
@@ -1114,7 +1114,7 @@ Commands:
   create-entity  Create a new entity (person, org, etc.) with allocated ID
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
-  source-check-records Batch source-check records using deterministic checks + Batch API
+  sourcing-records Batch sourcing records using deterministic checks + Batch API
   source-discover      Find better sources for records with unverifiable verdicts
   sync-careers   Sync FactBase career data to the personnel table
   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
@@ -1163,7 +1163,7 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
-  --skip-source-check       Skip source-check before submit (for testing)
+  --skip-sourcing       Skip sourcing before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
   --ci                      JSON output
 
@@ -1188,9 +1188,9 @@ Examples:
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
-  crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
-  crux tb tablebase source-check-records --table=personnel --source=batch --limit=100  # LLM check 100 records
-  crux tb tablebase source-check-records --table=personnel --source=all   # Full source-check
+  crux tb tablebase sourcing-records --table=personnel --source=deterministic  # Fast structural checks
+  crux tb tablebase sourcing-records --table=personnel --source=batch --limit=100  # LLM check 100 records
+  crux tb tablebase sourcing-records --table=personnel --source=all   # Full sourcing
   crux tb tablebase source-discover anthropic --dry-run       # Preview source suggestions for Anthropic
   crux tb tablebase source-discover --limit=5 --budget=5     # Discover sources for top 5 entities
   crux tb tablebase source-discover anthropic --apply        # Discover + link sources to records
@@ -1200,7 +1200,7 @@ Examples:
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
-  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-source-check  # Submit without source-check
+  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-sourcing  # Submit without sourcing
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing
@@ -1396,17 +1396,17 @@ Examples:
   crux tb orgs enrich --source=wikidata --limit=10 --dry-run
 ```
 
-### `source-check`
+### `sourcing`
 
 Commands: `stats`
 
 ### `legislation`
 
-Legislation — Policy stakeholder source-check
+Legislation — Policy stakeholder sourcing
 
 ```
 Commands:
-  verify-stakeholders     Populate source-check evidence for stakeholder positions
+  verify-stakeholders     Populate sourcing evidence for stakeholder positions
 
 Options:
   --policy=<id>          Only verify stakeholders for this policy (e.g. california-sb1047)
@@ -2091,7 +2091,7 @@ Examples:
 
 ### `quality`
 
-Data Quality Domain — Track data coverage and source-check metrics
+Data Quality Domain — Track data coverage and sourcing metrics
 
 ```
 Commands:

@@ -169,9 +169,9 @@ export const wikiPages = pgTable(
 );
 
 // ============================================================================
-// Operational — Citation & source-check tables
+// Operational — Citation & sourcing tables
 //
-// These tables are not part of any Base. They track citation source-checks,
+// These tables are not part of any Base. They track citation sourcing,
 // fetched source content, accuracy scoring, and hallucination risk.
 // ============================================================================
 
@@ -799,7 +799,7 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
  * Type-specific metadata for tabular data sources (~16 resources).
  *
  * Follows the resourcePapers/resourceForumPosts/resourcePolicyDocs sub-table pattern.
- * Stores import-pipeline configuration (column mappings, schemas, source-check config)
+ * Stores import-pipeline configuration (column mappings, schemas, sourcing config)
  * for structured data sources (CSVs, HTML tables, JSON APIs, spreadsheets).
  *
  * The `sourceSlug` preserves the human-readable identifier (e.g., 'coefficient-giving')
@@ -1502,11 +1502,11 @@ export const statements = pgTable(
     attributedTo: text("attributed_to").references(() => entities.id, {
       onDelete: "set null",
     }),
-    // --- Verdict / source-check ---
+    // --- Verdict / sourcing ---
     verdict: text("verdict"), // "verified", "unsupported", "disputed", "unverified"
     verdictScore: real("verdict_score"), // 0–1 confidence
     verdictQuotes: text("verdict_quotes"), // external source quotes supporting verdict
-    verdictModel: text("verdict_model"), // LLM model used for source-check
+    verdictModel: text("verdict_model"), // LLM model used for sourcing
     verifiedAt: timestamp("verified_at", { withTimezone: true }),
     claimCategory: text("claim_category"), // factual, opinion, analytical, speculative, relational
     // --- Metadata ---
@@ -1643,7 +1643,7 @@ export const pageCitations = pgTable(
 
 // ── Unified Source-Check System ──────────────────────────────────────────
 //
-// Two tables replace the previous six legacy source-check tables
+// Two tables replace the previous six legacy sourcing tables
 // (kb_fact_resource_*, record_*, thing_resource_* variants).
 // See discussion #2950 for architecture decisions.
 
@@ -1651,7 +1651,7 @@ export const pageCitations = pgTable(
  * Per-source check evidence — one row per source×claim check.
  *
  * Supports both row-level (fieldName=NULL) and cell-level (fieldName='amount')
- * source-checking for any record type (facts, grants, personnel, etc.).
+ * sourcing for any record type (facts, grants, personnel, etc.).
  */
 export const recordSources = pgTable(
   "source_check_evidence",
@@ -2322,11 +2322,11 @@ export const fundingPrograms = pgTable(
 
 // ── Record Source-Checking ─────────────────────────────────────────────
 //
-// Unified source-checking for structured data records (grants, personnel,
+// Unified sourcing for structured data records (grants, personnel,
 // divisions, funding programs, etc.). Mirrors the two-tier fact
-// source-check model: evidence (per-source checks) → verdicts (aggregate).
+// sourcing model: evidence (per-source checks) → verdicts (aggregate).
 
-// Legacy record source-check tables removed — replaced by
+// Legacy record sourcing tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables above.
 // See migration 0127 and discussion #2950.
 
@@ -2495,7 +2495,7 @@ export const publications = pgTable(
 // ── Cross-Base: Unified Things Table ──────────────────────────────────
 //
 // Every identifiable item in the system gets a single row here. Enables
-// cross-domain queries, unified source-check status, and a single browse UI.
+// cross-domain queries, unified sourcing status, and a single browse UI.
 //
 // NAMING NOTE: This PG `things` table is a cross-base universal index.
 // It is NOT related to the FactBase "things" directory
@@ -2543,7 +2543,7 @@ export const things = pgTable(
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
     parentTitle: text("parent_title"),
-    // verdict, verdict_confidence, verdict_at columns removed — source-check
+    // verdict, verdict_confidence, verdict_at columns removed — sourcing
     // verdicts now live in the unified source_check_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
@@ -2566,7 +2566,7 @@ export const things = pgTable(
   ]
 );
 
-// Legacy thing source-check tables removed — replaced by
+// Legacy thing sourcing tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables.
 // See migration 0127 and discussion #2950.
 
@@ -3259,7 +3259,7 @@ export const predictionMarketSnapshots = pgTable(
 // Operational — Data Quality Snapshots
 //
 // Point-in-time snapshots of data quality metrics across all bases.
-// Captured periodically to track coverage and source-check trends.
+// Captured periodically to track coverage and sourcing trends.
 // ============================================================================
 
 export const dataQualitySnapshots = pgTable(
@@ -3548,9 +3548,9 @@ export const raceCandidates = pgTable(
 );
 
 // ============================================================================
-// Claims-first source-check — proposed_claims + claim_record_links
+// Claims-first sourcing — proposed_claims + claim_record_links
 //
-// Research agents propose structured claims about entities. A source-check
+// Research agents propose structured claims about entities. A sourcing
 // worker checks each claim against source evidence and records a verdict.
 // claim_record_links connects approved claims to the records they affected.
 //
@@ -3559,7 +3559,7 @@ export const raceCandidates = pgTable(
 
 /**
  * Proposed claims — structured assertions submitted by research agents
- * for source-checking before being applied to TableBase records.
+ * for sourcing before being applied to TableBase records.
  */
 export const proposedClaims = pgTable(
   "proposed_claims",

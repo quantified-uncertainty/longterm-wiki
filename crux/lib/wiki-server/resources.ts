@@ -124,7 +124,7 @@ export async function findResourcesByContentHash(
 }
 
 // ---------------------------------------------------------------------------
-// Suggest resources (claims-first source-check pipeline)
+// Suggest resources (claims-first sourcing pipeline)
 // ---------------------------------------------------------------------------
 
 export type SuggestResourcesResult = InferResponseType<RpcClient['suggest']['$post'], 200>;

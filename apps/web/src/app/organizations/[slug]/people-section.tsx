@@ -32,7 +32,7 @@ export interface PersonEntry {
   roleType?: "key-person" | "board" | "career";
   /** Source-check verdict (null if not checked) */
   sourcingVerdict?: string | null;
-  /** Link to source-check detail page */
+  /** Link to sourcing detail page */
   sourcingHref?: string;
 }
 
@@ -147,7 +147,7 @@ export function pgPersonnelToEntries(rows: RpcPersonnelRow[]): PgPersonnelResult
         : undefined,
       sourcingVerdict: row.sourcing?.verdict ?? null,
       sourcingHref: row.sourcing?.verdict
-        ? `/source-checks/personnel/${encodeURIComponent(row.id)}`
+        ? `/sourcing/personnel/${encodeURIComponent(row.id)}`
         : undefined,
     });
   }

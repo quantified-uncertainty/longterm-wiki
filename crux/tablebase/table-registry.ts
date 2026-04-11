@@ -27,10 +27,10 @@ export interface TableConfig {
   thingsSourceTable: string | null;
   /**
    * When true, the sync endpoint requires every record to include inline
-   * source-check. Set for tables that have reached Phase 5 hard enforcement
-   * (Discussion #3875). The CLI appends ?requireSourceCheck=true to the sync path.
+   * sourcing. Set for tables that have reached Phase 5 hard enforcement
+   * (Discussion #3875). The CLI appends ?requireSourcing=true to the sync path.
    */
-  requireSourceCheck?: boolean;
+  requireSourcing?: boolean;
 }
 
 const TABLE_CONFIGS: Record<string, TableConfig> = {
@@ -43,7 +43,7 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncBodyKey: 'items',
     deletePath: '/api/personnel/delete',
     thingsSourceTable: 'personnel',
-    requireSourceCheck: true,
+    requireSourcing: true,
   },
   grants: {
     fetchByEntityPath: (id) => `/api/grants/by-entity/${encodeURIComponent(id)}`,
@@ -53,7 +53,7 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncBodyKey: 'items',
     deletePath: '/api/grants/delete-batch',
     thingsSourceTable: 'grants',
-    requireSourceCheck: true,
+    requireSourcing: true,
   },
   'funding-rounds': {
     fetchByEntityPath: (id) => `/api/funding-rounds/by-entity/${encodeURIComponent(id)}`,

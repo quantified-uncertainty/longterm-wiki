@@ -2,7 +2,7 @@
  * Per-Entity Source-Check Command
  *
  * Discovers all checkable claims about a specific entity (FactBase facts +
- * TableBase records), source-checks each against its source, stores evidence,
+ * TableBase records), sourcing each against its source, stores evidence,
  * and computes aggregate verdicts.
  *
  * Usage:
@@ -11,7 +11,7 @@
  *   crux verify <entity> --budget=5                Limit spending to ~$5
  *   crux verify <entity> --type=fact               Only check FactBase facts
  *   crux verify <entity> --type=record             Only check TableBase records
- *   crux verify stats                              Show source-check stats
+ *   crux verify stats                              Show sourcing stats
  *   crux verify all --budget=10 --limit=100        Check across all entities
  */
 
@@ -23,11 +23,11 @@ import { formatFactValue } from '../../packages/factbase/src/format.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
-import { getSourceCheckStats } from '../lib/wiki-server/source-check-client.ts';
+import { getSourcingStats } from '../lib/wiki-server/sourcing-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import { fetchSourceContent as fetchCachedContent } from '../lib/source-check/source-fetcher.ts';
-import { storeSourceCheckEvidence, storeAggregateVerdict } from '../lib/source-check/verdict-handler.ts';
-import type { SourceCheckVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
+import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/verdict-handler.ts';
+import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -40,22 +40,22 @@ const DEFAULT_LIMIT = 50;
 interface VerifiableClaim {
   recordType: string;      // 'fact', 'grant', 'personnel', 'division', etc.
   recordId: string;        // PK in the source table
-  fieldName?: string;      // specific field for cell-level source-check
+  fieldName?: string;      // specific field for cell-level sourcing
   entityId: string;        // entity this claim is about
   description: string;     // human-readable claim text
   sourceUrl: string;       // URL to verify against
   expectedValue?: string;  // what the record says
 }
 
-interface SourceCheckResult {
+interface SourcingResult {
   claim: VerifiableClaim;
-  verdict: SourceCheckVerdict;
+  verdict: SourcingVerdict;
   confidence: number;
   extractedValue: string;
   reasoning: string;
 }
 
-interface SourceCheckError {
+interface SourcingError {
   claim: VerifiableClaim;
   error: string;
   errorType?: string;
@@ -186,14 +186,14 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
   return claims;
 }
 
-// ── LLM source-check ────────────────────────────────────────────────
+// ── LLM sourcing ────────────────────────────────────────────────
 
-async function sourceCheckClaim(
+async function sourcingClaim(
   claim: VerifiableClaim,
   sourceText: string,
   client: ReturnType<typeof createLlmClient>,
   tracker: CostTracker,
-): Promise<SourceCheckResult | SourceCheckError> {
+): Promise<SourcingResult | SourcingError> {
   const prompt = `You are a fact-checker. Given the source text below, verify this claim.
 
 Claim: ${claim.description}
@@ -223,7 +223,7 @@ Respond with ONLY a JSON object:
     });
 
     const parsed = parseJsonResponse(result.text) as {
-      verdict?: SourceCheckVerdict;
+      verdict?: SourcingVerdict;
       confidence?: number;
       extracted_value?: string;
       reasoning?: string;
@@ -251,9 +251,9 @@ Respond with ONLY a JSON object:
 
 // ── Storage ─────────────────────────────────────────────────────────
 
-async function storeEvidence(result: SourceCheckResult): Promise<void> {
+async function storeEvidence(result: SourcingResult): Promise<void> {
   try {
-    await storeSourceCheckEvidence({
+    await storeSourcingEvidence({
       recordType: result.claim.recordType,
       recordId: result.claim.recordId,
       entityId: result.claim.entityId,
@@ -276,7 +276,7 @@ async function storeLocalAggregateVerdict(
   recordType: string,
   recordId: string,
   entityId: string,
-  verdict: SourceCheckVerdict,
+  verdict: SourcingVerdict,
   confidence: number,
   reasoning: string,
 ): Promise<void> {
@@ -307,7 +307,7 @@ const c = {
 };
 
 async function statsCommand(): Promise<CommandResult> {
-  const response = await getSourceCheckStats();
+  const response = await getSourcingStats();
 
   if (!response.ok) {
     return { exitCode: 1, output: `Failed to fetch stats: ${response.error}` };
@@ -385,11 +385,11 @@ async function verifyEntityCommand(
     return { exitCode: 0, output: lines.join('\n') };
   }
 
-  // Execute source-checks
+  // Execute sourcing
   const client = createLlmClient();
   const tracker = new CostTracker();
-  const results: SourceCheckResult[] = [];
-  const errors: SourceCheckError[] = [];
+  const results: SourcingResult[] = [];
+  const errors: SourcingError[] = [];
 
   for (let i = 0; i < toVerify.length; i++) {
     const claim = toVerify[i];
@@ -411,7 +411,7 @@ async function verifyEntityCommand(
     }
 
     // Source-check via LLM
-    const result = await sourceCheckClaim(claim, sourceResult.text, client, tracker);
+    const result = await sourcingClaim(claim, sourceResult.text, client, tracker);
     if ('error' in result) {
       errors.push(result);
       console.log(`${c.red}ERROR${c.reset}`);
@@ -488,7 +488,7 @@ ${c.bold}Usage:${c.reset}
   crux verify <entity> --limit=50          Max items to check (default: 50)
   crux verify <entity> --type=fact         Only check FactBase facts
   crux verify <entity> --type=record       Only check TableBase records
-  crux verify stats                        Show source-check stats
+  crux verify stats                        Show sourcing stats
   crux verify all --budget=10              Check across all entities (uses orchestrator)
 
 ${c.bold}Examples:${c.reset}
@@ -502,7 +502,7 @@ ${c.bold}Examples:${c.reset}
   crux verify page <page-id> --fix --dry-run  Preview what citations would be added
   crux verify page --all                   Fast citation density audit across all pages
   crux verify page --all --limit=100       Show top 100 worst-cited pages
-  crux verify stats                        Show overall source-check statistics`,
+  crux verify stats                        Show overall sourcing statistics`,
       };
     }
 
@@ -528,12 +528,12 @@ ${c.bold}Examples:${c.reset}
     }
 
     if (subcommand === 'all') {
-      // Delegate to the orchestrator for cross-entity source-checking
-      const { orchestrateCommand } = await import('./source-check-orchestrate.ts');
+      // Delegate to the orchestrator for cross-entity sourcing
+      const { orchestrateCommand } = await import('./sourcing-orchestrate.ts');
       return orchestrateCommand(args.slice(1), options);
     }
 
-    // Per-entity source-check
+    // Per-entity sourcing
     return verifyEntityCommand(subcommand, options);
   },
 

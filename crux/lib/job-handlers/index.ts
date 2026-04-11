@@ -86,10 +86,10 @@ const handlers: Record<string, JobHandler> = {
   'auto-update-digest': lazyHandler(async () =>
     (await import('./auto-update-digest.ts')).handleAutoUpdateDigest),
 
-  // Claims-first source-check (#3253) — lazy to avoid Anthropic SDK cycle
+  // Claims-first sourcing (#3253) — lazy to avoid Anthropic SDK cycle
   // Note: job type key 'claim-verification' matches the server-side job type name
   'claim-verification': lazyHandler(async () =>
-    (await import('./claim-source-check.ts')).handleClaimSourceCheck),
+    (await import('./claim-sourcing.ts')).handleClaimSourcing),
 
   // Resource ingestion: fetch, cache content, persist metadata (#3209)
   'resource-ingest': lazyHandler(async () =>

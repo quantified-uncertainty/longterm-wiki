@@ -49,7 +49,7 @@ export const NAV_ITEMS: NavItem[] = [
     items: [
       { href: "/resources", label: "Resources" },
       { href: "/publications", label: "Publications" },
-      { href: "/source-checks", label: "Source Checks" },
+      { href: "/sourcing", label: "Source Checks" },
       { href: "/data-sources", label: "Data Sources" },
       { href: "/things", label: "Things" },
     ],

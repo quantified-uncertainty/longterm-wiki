@@ -8,8 +8,8 @@ import {
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { Breadcrumbs } from "@/components/directory";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
@@ -130,11 +130,11 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
               {titleCase(grant.status)}
             </span>
           )}
-          <SourceCheckDot
+          <SourcingDot
             status={recordVerdictToStatus(grantVerdict?.verdict)}
             originalVerdict={grantVerdict?.verdict}
             size="md"
-            href={grantVerdict?.verdict ? `/source-checks/grant/${encodeURIComponent(String(grant.key))}` : undefined}
+            href={grantVerdict?.verdict ? `/sourcing/grant/${encodeURIComponent(String(grant.key))}` : undefined}
           />
         </div>
 

@@ -39,7 +39,7 @@ interface CommandOptions extends BaseOptions {
   skipEntityValidation?: boolean;
   /** Required when --skipEntityValidation is set. */
   skipEntityValidationReason?: string;
-  skipSourceCheck?: boolean;
+  skipSourcing?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -181,7 +181,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
   const result = await runEnrichmentAgent(task, {
     dryRun,
     model,
-    skipSourceCheck: !!options.skipSourceCheck,
+    skipSourcing: !!options.skipSourcing,
   });
 
   if (!dryRun) {
@@ -289,22 +289,22 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
 
   // Source-check gate: check records against their source URLs before submission.
   let recordsToSubmit = records;
-  let sourceCheckNote = '';
-  if (!options.skipSourceCheck) {
-    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-source-check.ts');
+  let sourcingNote = '';
+  if (!options.skipSourcing) {
+    const { verifyBeforeSubmit, formatPreSubmitSummary } = await import('../tablebase/pre-submit-sourcing.ts');
     const verifyResult = await verifyBeforeSubmit(table, records);
     console.log(formatPreSubmitSummary(verifyResult));
 
     recordsToSubmit = [...verifyResult.accepted, ...verifyResult.noSource];
 
     if (verifyResult.rejected.length > 0) {
-      sourceCheckNote = ` (${verifyResult.rejected.length} rejected by source-check)`;
+      sourcingNote = ` (${verifyResult.rejected.length} rejected by sourcing)`;
     }
 
     if (recordsToSubmit.length === 0) {
       return {
         exitCode: 1,
-        output: `All ${records.length} records were rejected by source-check.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
+        output: `All ${records.length} records were rejected by sourcing.${verifyResult.rejected.map(r => `\n  - ${r.record.id ?? '?'}: ${r.skipReason}`).join('')}`,
       };
     }
   }
@@ -325,7 +325,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     params.set('skipEntityValidation', 'true'); // skipEntityValidation-ok: CLI flag enforces reason above
     params.set('skipEntityValidationReason', reason);
   }
-  if (tableConfig.requireSourceCheck) params.set('requireSourceCheck', 'true');
+  if (tableConfig.requireSourcing) params.set('requireSourcing', 'true');
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
@@ -356,9 +356,9 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     recordCount: recordsToSubmit.length,
     recordsRejected: records.length - recordsToSubmit.length,
     submittedAt: now.toISOString(),
-    sourceCheckSummary: {
-      withSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => r.sourcing).length,
-      withoutSourceCheck: recordsToSubmit.filter((r: Record<string, unknown>) => !r.sourcing).length,
+    sourcingSummary: {
+      withSourcing: recordsToSubmit.filter((r: Record<string, unknown>) => r.sourcing).length,
+      withoutSourcing: recordsToSubmit.filter((r: Record<string, unknown>) => !r.sourcing).length,
       verdicts: {
         verified: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourcing as Record<string, unknown> | undefined)?.verdict === 'confirmed').length,
         contradicted: recordsToSubmit.filter((r: Record<string, unknown>) => (r.sourcing as Record<string, unknown> | undefined)?.verdict === 'contradicted').length,
@@ -393,7 +393,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     exitCode: 0,
     output: options.ci
       ? JSON.stringify({ submitted: count, table })
-      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${sourceCheckNote}\n  Manifest: ${manifestPath}`,
+      : `\x1b[32m✓\x1b[0m Submitted ${count} records to ${table}${sourcingNote}\n  Manifest: ${manifestPath}`,
   };
 }
 
@@ -679,7 +679,7 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
       // Uses raw apiRequest instead of syncPersonnel() because this is a generic
       // data-quality fix path, not a full personnel sync. The CLI-level --fix flag
       // already enforces the reason context. See issue #4017 Phase A.
-      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync?forceSkipSourceCheck=true&reason=verify-fix%3A+personnel+data+normalization', { items: batch });
+      const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync?forceSkipSourcing=true&reason=verify-fix%3A+personnel+data+normalization', { items: batch });
       if (fixR.ok) {
         fixed += fixR.data.upserted;
       } else {
@@ -988,7 +988,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     taskTypes,
     entityTypes,
     model,
-    skipSourceCheck: !!options.skipSourceCheck,
+    skipSourcing: !!options.skipSourcing,
   });
 
   if (options.ci) {
@@ -1008,15 +1008,15 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
 const PERSONNEL_SYNC_BATCH_SIZE = 200;
 
 // ---------------------------------------------------------------------------
-// source-check-records: Batch source-checking of enriched records
+// sourcing-records: Batch sourcing of enriched records
 // ---------------------------------------------------------------------------
 
-async function sourceCheckRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { verifyRecords, formatSourceCheckReport } = await import('../tablebase/source-check.ts');
+async function sourcingRecordsCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const { verifyRecords, formatSourcingReport } = await import('../tablebase/sourcing.ts');
 
   const table = options.table as string | undefined;
   if (!table) {
-    return { exitCode: 1, output: 'Usage: crux tb source-check-records --table=<personnel|funding-rounds|investments|benchmark-results> [--source=deterministic|batch|all] [--limit=N] [--model=haiku]' };
+    return { exitCode: 1, output: 'Usage: crux tb sourcing-records --table=<personnel|funding-rounds|investments|benchmark-results> [--source=deterministic|batch|all] [--limit=N] [--model=haiku]' };
   }
 
   const limit = options.limit ? parseInt(options.limit as string, 10) : undefined;
@@ -1029,7 +1029,7 @@ async function sourceCheckRecordsCommand(args: string[], options: CommandOptions
     return { exitCode: 0, output: JSON.stringify(result, null, 2) };
   }
 
-  return { exitCode: 0, output: formatSourceCheckReport(result) };
+  return { exitCode: 0, output: formatSourcingReport(result) };
 }
 
 async function syncCareersCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1119,7 +1119,7 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
 
     const result = await apiRequest<{ upserted: number }>(
       'POST',
-      '/api/personnel/sync?forceSkipSourceCheck=true&reason=bulk-import%3A+career+data+sync+from+FactBase',
+      '/api/personnel/sync?forceSkipSourcing=true&reason=bulk-import%3A+career+data+sync+from+FactBase',
       { items: batch },
     );
 
@@ -1317,9 +1317,9 @@ export const commands = {
   'create-entity': createEntityCommand,
   'ensure-entities': ensureEntitiesCommand,
   'fetch-page': fetchPageCommand,
-  verify: verifyCommand, // personnel ID integrity check (not source-checking)
-  'source-check-records': sourceCheckRecordsCommand,
-  'verify-records': sourceCheckRecordsCommand, // deprecated alias
+  verify: verifyCommand, // personnel ID integrity check (not sourcing)
+  'sourcing-records': sourcingRecordsCommand,
+  'verify-records': sourcingRecordsCommand, // deprecated alias
   'source-discover': sourceDiscoverCommand,
   prepare: prepareCommand,
   'sync-careers': syncCareersCommand,
@@ -1371,7 +1371,7 @@ Commands:
   create-entity  Create a new entity (person, org, etc.) with allocated ID
   submit         Submit records to a table (for Claude Code skill)
   existing       Query existing records for an entity (for Claude Code skill)
-  source-check-records Batch source-check records using deterministic checks + Batch API
+  sourcing-records Batch sourcing records using deterministic checks + Batch API
   source-discover      Find better sources for records with unverifiable verdicts
   sync-careers   Sync FactBase career data to the personnel table
   normalize-ids [--apply]  Fix slug-based entity IDs in personnel/grant records
@@ -1420,7 +1420,7 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
-  --skip-source-check       Skip source-check before submit (for testing)
+  --skip-sourcing       Skip sourcing before submit (for testing)
   --apply                   For source-discover: also link discovered resources to records
   --v2                      For source-discover: use claims-first agent (extracts + submits claims)
   --claims-only             For source-discover --v2: submit claims but don't apply results
@@ -1448,9 +1448,9 @@ Examples:
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
-  crux tb tablebase source-check-records --table=personnel --source=deterministic  # Fast structural checks
-  crux tb tablebase source-check-records --table=personnel --source=batch --limit=100  # LLM check 100 records
-  crux tb tablebase source-check-records --table=personnel --source=all   # Full source-check
+  crux tb tablebase sourcing-records --table=personnel --source=deterministic  # Fast structural checks
+  crux tb tablebase sourcing-records --table=personnel --source=batch --limit=100  # LLM check 100 records
+  crux tb tablebase sourcing-records --table=personnel --source=all   # Full sourcing
   crux tb tablebase source-discover anthropic --dry-run       # Preview source suggestions for Anthropic
   crux tb tablebase source-discover --limit=5 --budget=5     # Discover sources for top 5 entities
   crux tb tablebase source-discover anthropic --apply        # Discover + link sources to records
@@ -1463,7 +1463,7 @@ Examples:
   crux tb tablebase resolve "OpenAI" --ci                  # JSON output
   crux tb tablebase existing A4XoubikkQ --table=personnel  # Show existing records
   echo '[{...}]' | crux tb tablebase submit --table=personnel  # Submit records via pipe
-  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-source-check  # Submit without source-check
+  echo '[{...}]' | crux tb tablebase submit --table=personnel --skip-sourcing  # Submit without sourcing
   crux tb tablebase mark-done abc123def                    # Exclude from future runs
   crux tb tablebase sync-careers                           # Populate personnel table from FactBase
   crux tb tablebase sync-careers --dry-run                 # Preview extraction without writing

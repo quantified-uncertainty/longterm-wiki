@@ -432,7 +432,7 @@ describe("internal sidebar completeness (real data)", () => {
       // Skip the catch-all route (handles MDX pages)
       if (entry.name.startsWith("[[")) continue;
       // Skip pages not yet migrated to Pattern A (no entity ID allocated)
-      if (entry.name === "source-check-coverage") continue; // #3634
+      if (entry.name === "sourcing-coverage") continue; // #3634
 
       const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
       if (fs.existsSync(pagePath)) {
@@ -604,7 +604,7 @@ describe("internal sidebar completeness (real data)", () => {
 
       // This is a migrated dashboard — it should have a *-content.tsx file
       // UNLESS it's a pure backward-compat redirect to a dashboard whose
-      // content component lives in a different directory (e.g., entity-source-checks).
+      // content component lives in a different directory (e.g., entity-sourcing).
       const dirPath = path.join(APP_INTERNAL_DIR, entry.name);
       const files = fs.readdirSync(dirPath);
       const hasContentFile = files.some(f => f.endsWith("-content.tsx"));

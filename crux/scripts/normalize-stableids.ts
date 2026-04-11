@@ -174,7 +174,7 @@ if (generateSql) {
     ["divisions", ["parent_org_id"], []],
     ["division_members", ["person_id"], []],
     ["entity_profile_descriptions", ["entity_id"], []],
-    ["source_checks", ["entity_id"], []],
+    ["sourcing", ["entity_id"], []],
     ["data_quality_snapshots", ["entity_id"], []],
     ["research_area_evaluations", ["entity_id"], []],
     ["websites", ["entity_id"], []],

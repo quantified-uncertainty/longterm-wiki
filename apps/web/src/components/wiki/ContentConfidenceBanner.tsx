@@ -115,7 +115,7 @@ const RISK_CONFIG: Record<
  * Per-page confidence banner that replaces the old binary LlmWarningBanner.
  *
  * Shows tiered warnings based on computed hallucination risk. The risk data
- * is also available in pages.json for AI agents to use for source-check triage.
+ * is also available in pages.json for AI agents to use for sourcing triage.
  *
  * Machine-readable data is embedded as data-* attributes for automated consumers.
  */

@@ -26,6 +26,7 @@ export interface CoverageRow {
   completenessPct: number;
   missingFields: string[];
   entityImportance: number | null;
+  enrichmentPriority: number;
   scannedAt: string;
   href: string | null;
 }
@@ -44,11 +45,36 @@ function completenessBadgeClass(pct: number): string {
   return "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
 }
 
+function priorityBadgeClass(priority: number): string {
+  if (priority >= 0.5)
+    return "bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300";
+  if (priority >= 0.2)
+    return "bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300";
+  if (priority >= 0.05)
+    return "bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300";
+  return "bg-gray-100 text-gray-600 dark:bg-gray-800/40 dark:text-gray-400";
+}
+
 // ---------------------------------------------------------------------------
 // Columns
 // ---------------------------------------------------------------------------
 
 const columns: ColumnDef<CoverageRow>[] = [
+  {
+    accessorKey: "enrichmentPriority",
+    header: ({ column }) => <SortableHeader column={column}>Priority</SortableHeader>,
+    cell: ({ row }) => {
+      const p = row.original.enrichmentPriority;
+      return (
+        <span
+          className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium tabular-nums ${priorityBadgeClass(p)}`}
+        >
+          {p.toFixed(3)}
+        </span>
+      );
+    },
+    size: 90,
+  },
   {
     accessorKey: "entityName",
     header: ({ column }) => <SortableHeader column={column}>Entity</SortableHeader>,
@@ -62,7 +88,7 @@ const columns: ColumnDef<CoverageRow>[] = [
         <span>{row.original.entityName}</span>
       );
     },
-    size: 240,
+    size: 220,
   },
   {
     accessorKey: "recordType",
@@ -96,21 +122,21 @@ const columns: ColumnDef<CoverageRow>[] = [
     size: 120,
   },
   {
+    accessorKey: "entityImportance",
+    header: ({ column }) => <SortableHeader column={column}>Importance</SortableHeader>,
+    cell: ({ row }) => {
+      const imp = row.original.entityImportance;
+      if (imp === null) return <span className="text-xs text-muted-foreground">-</span>;
+      return <span className="tabular-nums text-sm">{imp}</span>;
+    },
+    size: 100,
+  },
+  {
     accessorKey: "totalRecords",
     header: ({ column }) => <SortableHeader column={column}>Records</SortableHeader>,
     cell: ({ row }) => (
       <span className="tabular-nums text-sm">
         {row.original.totalRecords.toLocaleString()}
-      </span>
-    ),
-    size: 90,
-  },
-  {
-    accessorKey: "verifiedRecords",
-    header: ({ column }) => <SortableHeader column={column}>Verified</SortableHeader>,
-    cell: ({ row }) => (
-      <span className="tabular-nums text-sm">
-        {row.original.verifiedRecords.toLocaleString()}
       </span>
     ),
     size: 90,
@@ -157,7 +183,7 @@ interface CoverageTableProps {
 
 export function CoverageTable({ data, recordTypes, entityTypes }: CoverageTableProps) {
   const [sorting, setSorting] = useState<SortingState>([
-    { id: "completenessPct", desc: false },
+    { id: "enrichmentPriority", desc: true },
   ]);
   const [searchQuery, setSearchQuery] = useState("");
   const [recordTypeFilter, setRecordTypeFilter] = useState<string>("all");

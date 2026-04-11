@@ -1,7 +1,7 @@
 /**
  * Clean Contradicted Records — export + delete records with contradicted verdicts.
  *
- * Fetches all contradicted source-check verdicts, exports the underlying
+ * Fetches all contradicted sourcing verdicts, exports the underlying
  * records to a JSON backup, and optionally deletes them.
  *
  * Usage:
@@ -11,7 +11,7 @@
  */
 
 import type { CommandResult } from '../lib/command-types.ts';
-import { getFailures, type VerdictEntry } from '../lib/wiki-server/source-checks.ts';
+import { getFailures, type VerdictEntry } from '../lib/wiki-server/sourcing.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { deleteBatch } from '../lib/wiki-server/delete-batch.ts';
 import * as fs from 'node:fs';

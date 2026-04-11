@@ -431,7 +431,7 @@ export function parseGroundedResult(
     ...invalidClaims,
   ];
 
-  // ── Content-level source-check (strict mode only) ──────────────────────
+  // ── Content-level sourcing (strict mode only) ──────────────────────
   // When allowTrainingKnowledge === false, verify the actual content output:
   //  1. Footnote markers in content should have corresponding claim map entries
   //  2. Unsourceable claim text should not appear verbatim in the content (#675)

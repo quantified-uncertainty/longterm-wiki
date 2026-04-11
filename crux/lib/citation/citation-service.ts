@@ -16,7 +16,7 @@
  *   // Quick HTTP check
  *   const httpResult = await verifyCitations({ content, mode: 'http' });
  *
- *   // Full LLM source-check
+ *   // Full LLM sourcing
  *   const llmResult = await verifyCitations({ content, mode: 'llm', fetchMissing: true });
  *
  * Part of the citation consolidation initiative (#1479).
@@ -63,7 +63,7 @@ export interface HttpCitationResult {
 }
 
 /** Aggregate result for HTTP-mode check. */
-export interface HttpSourceCheckResult {
+export interface HttpSourcingResult {
   mode: 'http';
   citations: HttpCitationResult[];
   summary: {
@@ -75,7 +75,7 @@ export interface HttpSourceCheckResult {
 }
 
 /** Aggregate result for LLM-mode check. */
-export interface LlmSourceCheckResult {
+export interface LlmSourcingResult {
   mode: 'llm';
   /** Per-citation LLM verdicts (from citation-auditor). */
   citations: CitationAudit[];
@@ -85,14 +85,14 @@ export interface LlmSourceCheckResult {
 }
 
 /** Union result type — discriminated on `mode`. */
-export type SourceCheckResult = HttpSourceCheckResult | LlmSourceCheckResult;
+export type SourcingResult = HttpSourcingResult | LlmSourcingResult;
 
 /** Options for verifyCitations(). */
 export interface VerifyCitationsRequest {
   /** Raw MDX content (with or without frontmatter). */
   content: string;
 
-  /** Check mode: 'http' for quick status check, 'llm' for claim source-check. */
+  /** Check mode: 'http' for quick status check, 'llm' for claim sourcing. */
   mode: CheckMode;
 
   // ---- HTTP mode options ----
@@ -112,7 +112,7 @@ export interface VerifyCitationsRequest {
   fetchMissing?: boolean;
   /** Fraction of citations that must be verified for pass=true. Default: 0.8. */
   passThreshold?: number;
-  /** LLM model for source-check. LLM mode only. */
+  /** LLM model for sourcing. LLM mode only. */
   model?: string;
   /** Max concurrent LLM calls. Default: 3. LLM mode only. */
   llmConcurrency?: number;
@@ -136,7 +136,7 @@ function httpStatusToCheck(httpStatus: number): HttpCheckStatus {
 async function verifyHttp(
   content: string,
   opts: VerifyCitationsRequest,
-): Promise<HttpSourceCheckResult> {
+): Promise<HttpSourcingResult> {
   const concurrency = opts.concurrency ?? 5;
   const delayMs = opts.delayMs ?? 1000;
   const verbose = opts.verbose ?? false;
@@ -205,13 +205,13 @@ async function verifyHttp(
 }
 
 // ---------------------------------------------------------------------------
-// LLM source-check (delegates to citation-auditor)
+// LLM sourcing (delegates to citation-auditor)
 // ---------------------------------------------------------------------------
 
 async function verifyLlm(
   content: string,
   opts: VerifyCitationsRequest,
-): Promise<LlmSourceCheckResult> {
+): Promise<LlmSourcingResult> {
   const request: AuditRequest = {
     content,
     sourceCache: opts.sourceCache,
@@ -242,14 +242,14 @@ async function verifyLlm(
  * Verify citations in MDX content.
  *
  * @param request - Check options including content and mode.
- * @returns SourceCheckResult discriminated by mode ('http' or 'llm').
+ * @returns SourcingResult discriminated by mode ('http' or 'llm').
  *
  * HTTP mode: Fetches each URL and checks HTTP status. Fast, no LLM cost.
  * LLM mode: Fetches sources and verifies claims against source text via LLM.
  */
 export async function verifyCitations(
   request: VerifyCitationsRequest,
-): Promise<SourceCheckResult> {
+): Promise<SourcingResult> {
   if (request.mode === 'http') {
     return verifyHttp(request.content, request);
   }

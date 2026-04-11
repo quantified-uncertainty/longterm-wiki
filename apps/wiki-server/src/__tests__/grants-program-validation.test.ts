@@ -72,10 +72,10 @@ vi.mock("../db.js", () => mockDbModule(dispatch));
 
 const { createApp } = await import("../app.js");
 
-// Source-check bypass for tests that focus on programId validation, not source-check enforcement.
-// Grants have server-side source-check enforcement; this bypass ensures these tests
-// exercise FK validation without being blocked by source-check.
-const SC_BYPASS = "forceSkipSourceCheck=true&reason=test";
+// Source-check bypass for tests that focus on programId validation, not sourcing enforcement.
+// Grants have server-side sourcing enforcement; this bypass ensures these tests
+// exercise FK validation without being blocked by sourcing.
+const SC_BYPASS = "forceSkipSourcing=true&reason=test";
 
 // ---- Helpers ----
 

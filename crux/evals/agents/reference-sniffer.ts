@@ -97,7 +97,7 @@ export function extractClaims(content: string): ExtractedClaim[] {
 }
 
 // ---------------------------------------------------------------------------
-// LLM-based deep source-check
+// LLM-based deep sourcing
 // ---------------------------------------------------------------------------
 
 /**
@@ -116,7 +116,7 @@ export async function verifyClaimsBatch(
   try {
     client = createLlmClient();
   } catch {
-    console.warn('[reference-sniffer] No API key — skipping LLM source-check');
+    console.warn('[reference-sniffer] No API key — skipping LLM sourcing');
     return [];
   }
 
@@ -234,7 +234,7 @@ export async function sniffPage(
     });
   }
 
-  // Step 3: LLM-based deep source-check (optional, costs money)
+  // Step 3: LLM-based deep sourcing (optional, costs money)
   if (useLlm && claims.length > 0) {
     const llmFindings = await verifyClaimsBatch(claims, content, pageId);
     findings.push(...llmFindings);

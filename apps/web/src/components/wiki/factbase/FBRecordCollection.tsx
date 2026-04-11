@@ -27,9 +27,9 @@ import {
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBRecords, getKBRecordSchema, type FactBaseRecordEntry } from "@data/factbase";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { titleCase, sortKBRecords } from "./format";
 import { FBCellValue } from "./FBCellValue";
 
@@ -203,11 +203,11 @@ export function FBRecordCollection({
                     );
                   })}
                   <TableCell className="w-8 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={verdict?.verdict ? getSourceCheckHref(collection, recordId) : undefined}
+                      href={verdict?.verdict ? getSourcingHref(collection, recordId) : undefined}
                     />
                   </TableCell>
                 </TableRow>

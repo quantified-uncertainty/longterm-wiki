@@ -93,11 +93,11 @@ import * as backfillStableIdsCommand from './commands/backfill-stable-ids.ts';
 import * as backfillYamlStableIdsCommand from './commands/backfill-yaml-stable-ids.ts';
 import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts';
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
-import * as verifyOrchestrateCommands from './commands/source-check-orchestrate.ts';
-import * as sourceCheckRecheckCommands from './commands/source-check-recheck.ts';
+import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
+import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
 import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
-import * as sourceCheckWikiPagesCommands from './commands/source-check-wiki-pages.ts';
+import * as sourcingWikiPagesCommands from './commands/sourcing-wiki-pages.ts';
 import * as qaSweepCommands from './commands/qa-sweep.ts';
 import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
@@ -119,6 +119,7 @@ import * as usagePatternsCommands from './commands/usage-patterns.ts';
 import * as entityResourcesCommands from './commands/entity-resources.ts';
 import * as docsCommands from './commands/docs.ts';
 import * as linearCommands from './commands/linear.ts';
+import * as sessionFinalizeCommands from './commands/session-finalize.ts';
 
 const domains = {
   validate: validateCommands,
@@ -179,9 +180,9 @@ const domains = {
   'factbase-migrate-entities': factbaseMigrateEntitiesCommands,
   verify: verifyEntityCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
-  'source-check-recheck': sourceCheckRecheckCommands,
+  'sourcing-recheck': sourcingRecheckCommands,
   'migrate-citations': migrateCitationsCommands,
-  'source-check-wiki-pages': sourceCheckWikiPagesCommands,
+  'sourcing-wiki-pages': sourcingWikiPagesCommands,
   'qa-sweep': qaSweepCommands,
   'qa-checks': qaChecksCommands,
   matrix: matrixCommands,
@@ -202,6 +203,7 @@ const domains = {
   'usage-patterns': usagePatternsCommands,
   docs: docsCommands,
   linear: linearCommands,
+  'session-finalize': sessionFinalizeCommands,
 };
 
 const shortcutMap = buildShortcutMap();

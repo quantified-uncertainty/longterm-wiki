@@ -7,9 +7,9 @@ import { formatKBDate } from "@/components/wiki/factbase/format";
 import { SectionHeader } from "./org-shared";
 import type { RelatedOrg } from "./org-data";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 const MAX_RELATED = 15;
 
@@ -61,11 +61,11 @@ export function RelatedOrganizationsSection({
                     {org.date ? formatKBDate(org.date) : ""}
                   </td>
                   <td className="py-1.5 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={verdict ? getSourceCheckHref("entity-relationship", recordId) : undefined}
+                      href={verdict ? getSourcingHref("entity-relationship", recordId) : undefined}
                     />
                   </td>
                 </tr>

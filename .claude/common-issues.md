@@ -164,7 +164,7 @@ When entity data contains slug reassignments (same slug pointing to a new stable
 
 **Root cause**: The sync endpoint tries to INSERT before cleaning up stale slug rows, or the unique constraint on slugs prevents the upsert pattern.
 
-**Prevention**: After any PR that modifies entity sync logic, run `pnpm crux tb sync` end-to-end with a test slug reassignment before merging. Consider adding an integration test for slug reassignment in `entities.ts`.
+**Prevention**: After any PR that modifies entity sync logic, run `pnpm crux sys wiki-server` end-to-end with a test slug reassignment before merging. Consider adding an integration test for slug reassignment in `entities.ts`.
 
 **Fix pattern when it happens**: Clear stale slug rows before the batch INSERT, or drop/re-add the unique constraint inside the transaction. See PRs #3096-#3105 for the progression of fixes.
 

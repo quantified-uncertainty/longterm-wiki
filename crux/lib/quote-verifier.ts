@@ -8,7 +8,7 @@
  *   3. Fuzzy match — sliding window with Jaccard similarity on word sets (score: 0.0-0.9)
  */
 
-export interface SourceCheckResult {
+export interface SourcingResult {
   verified: boolean;
   method: 'exact' | 'normalized' | 'fuzzy' | 'none';
   score: number;
@@ -63,7 +63,7 @@ function jaccardSimilarity(a: Set<string>, b: Set<string>): number {
 export function verifyQuoteInSource(
   quote: string,
   fullText: string,
-): SourceCheckResult {
+): SourcingResult {
   if (!quote || !fullText) {
     return { verified: false, method: 'none', score: 0 };
   }

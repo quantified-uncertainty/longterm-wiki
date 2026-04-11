@@ -13,7 +13,7 @@ import {
 import { DIVISION_TYPE_LABELS } from "./division-constants";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { DivisionsTable, type DivisionRow, type TypeSummary } from "./divisions-table";
-import { SourceCheckSummaryBanner } from "@/components/directory/SourceCheckSummaryBanner";
+import { SourcingSummaryBanner } from "@/components/directory/SourcingSummaryBanner";
 
 export const metadata: Metadata = {
   title: "Divisions",
@@ -145,7 +145,7 @@ export default function DivisionsPage() {
         </p>
       </div>
 
-      <SourceCheckSummaryBanner recordType="division" totalOverride={totalDivisions} />
+      <SourcingSummaryBanner recordType="division" totalOverride={totalDivisions} />
 
       <DivisionsTable
         rows={rows}

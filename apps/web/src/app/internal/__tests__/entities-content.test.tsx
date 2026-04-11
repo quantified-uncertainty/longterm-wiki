@@ -2,7 +2,7 @@
  * Render smoke tests for the Entities dashboard content component.
  *
  * EntitiesContent reads from local database.json via multiple data functions
- * and fetches source-check data from wiki-server. These tests verify the
+ * and fetches sourcing data from wiki-server. These tests verify the
  * component renders without throwing for typical and edge-case data shapes.
  */
 
@@ -172,7 +172,7 @@ describe("EntitiesContent", () => {
     expect(element).toBeTruthy();
   });
 
-  it("merges source-check data when API is available", async () => {
+  it("merges sourcing data when API is available", async () => {
     vi.mocked(getTypedEntities).mockReturnValue(mockEntities as never);
     vi.mocked(fetchDetailed).mockResolvedValue({
       ok: true,

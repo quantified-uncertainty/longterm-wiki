@@ -150,6 +150,8 @@ const ENTITY_REF_PATTERNS = [
   /parentOrgId/,
   /divisionId/,
   /stakeholderEntityId/,
+  /publisherEntityId/,
+  /entityStableId/,
 ];
 
 function analyzeRoute(filePath: string): RouteAnalysis {

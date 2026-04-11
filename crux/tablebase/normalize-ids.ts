@@ -299,7 +299,7 @@ export async function normalizeIds(
         const batch = items.slice(i, i + BATCH_SIZE);
         const r = await apiRequest<{ upserted: number }>(
           "POST",
-          `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}&forceSkipSourceCheck=true&reason=normalize-ids%3A+fixing+broken+FK+refs`, // skipEntityValidation-ok: normalize-ids backfill, see SKIP_REASON above
+          `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}&forceSkipSourcing=true&reason=normalize-ids%3A+fixing+broken+FK+refs`, // skipEntityValidation-ok: normalize-ids backfill, see SKIP_REASON above
           { items: batch }
         );
         if (r.ok) {

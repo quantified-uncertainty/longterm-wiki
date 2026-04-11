@@ -3,9 +3,9 @@
   "recordCount": 2,
   "recordsRejected": 0,
   "submittedAt": "2026-04-09T11:22:56.989Z",
-  "sourceCheckSummary": {
-    "withSourceCheck": 0,
-    "withoutSourceCheck": 2,
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
     "verdicts": {
       "verified": 0,
       "contradicted": 0,

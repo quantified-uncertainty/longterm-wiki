@@ -110,8 +110,8 @@ All verification data lives in two tables (replacing the previous six). See [dis
 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
-| `source_check_evidence` | `sourceCheckEvidence` | Per-source checks for any record type. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) source-checking. |
-| `source_check_verdicts` | `sourceCheckVerdicts` | Aggregate verdicts per claim. Keyed by `(record_type, record_id, COALESCE(field_name, ''))`. |
+| `source_check_evidence` | `sourcingEvidence` | Per-source checks for any record type. Supports row-level (`field_name` = NULL) and cell-level (`field_name` = column name) sourcing. |
+| `source_check_verdicts` | `sourcingVerdicts` | Aggregate verdicts per claim. Keyed by `(record_type, record_id, COALESCE(field_name, ''))`. |
 
 ### Operational tables
 

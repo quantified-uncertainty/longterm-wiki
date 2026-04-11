@@ -1,6 +1,6 @@
 import type { ExpertPosition } from "@/data/tablebase";
 import { getRecordVerdict } from "@data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { topicLabel } from "@/data/topic-labels";
@@ -160,7 +160,7 @@ export function ExpertPositions({
                         filledFieldCount: (pos.confidence ? 1 : 0) + (pos.source ? 1 : 0) + (pos.date ? 1 : 0),
                       })}
                       verdict={verdict}
-                      sourcingHref={getSourceCheckHref("expert-position", recordId)}
+                      sourcingHref={getSourcingHref("expert-position", recordId)}
                     />
                   </td>
                 </tr>

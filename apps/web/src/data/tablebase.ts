@@ -398,7 +398,7 @@ interface TableBaseShape {
     topFactors: Array<{ factor: string; count: number }>;
   };
   /** Policy stakeholder PG IDs, keyed by "policyEntityStableId:stakeholderDisplayName" -> stakeholder 10-char ID.
-   *  Used to look up source-check verdicts for stakeholder rows on legislation pages. */
+   *  Used to look up sourcing verdicts for stakeholder rows on legislation pages. */
   policyStakeholderIds?: Record<string, string>;
   /** Entity→resource relationship links from entity_resources table */
   entityResourceLinks?: Record<string, { authored: string[]; subject: string[] }>;
@@ -1061,7 +1061,7 @@ export function getResearchAreaDetail(areaId: string): ResearchAreaDetail | null
 
 // ============================================================================
 // RECORD VERDICTS
-// Used by SourceCheckBadge on organization, grant, and funding-round detail pages.
+// Used by SourcingBadge on organization, grant, and funding-round detail pages.
 // ============================================================================
 
 export interface RecordVerdict {
@@ -1088,7 +1088,7 @@ function getRecordVerdicts(): Record<string, RecordVerdict> {
   }
 }
 
-/** Get the source-check verdict for a specific record */
+/** Get the sourcing verdict for a specific record */
 export function getRecordVerdict(recordType: string, recordId: string): RecordVerdict | null {
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
@@ -1114,7 +1114,7 @@ export function getFieldVerdicts(recordType: string, recordId: string): Record<s
   return result;
 }
 
-/** Get source-check stats for a specific record type */
+/** Get sourcing stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): {
   total: number;
   confirmed: number;
@@ -1143,7 +1143,7 @@ export function getRecordVerdictStats(recordType: string): {
 // ============================================================================
 // POLICY STAKEHOLDER IDS
 // Maps "policyEntityStableId:stakeholderDisplayName" -> PG stakeholder ID.
-// Used by legislation pages to look up source-check verdicts for stakeholder rows.
+// Used by legislation pages to look up sourcing verdicts for stakeholder rows.
 // ============================================================================
 
 /** Get the PG stakeholder ID for a YAML stakeholder on a specific policy entity. */
@@ -1156,8 +1156,8 @@ export function getPolicyStakeholderId(
   return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
-// Severity order for source-check record verdicts. Lower index = worse.
-// Mirrors the display mapping in source-check-status.ts:
+// Severity order for sourcing record verdicts. Lower index = worse.
+// Mirrors the display mapping in sourcing-status.ts:
 //   contradicted/unverifiable → failed (red)
 //   outdated/partial          → trouble (orange)
 //   confirmed                 → verified (green)
@@ -1189,13 +1189,13 @@ export function pickWorstVerdict(
 }
 
 /**
- * Roll up per-child source-check verdicts to a single worst-case verdict
+ * Roll up per-child sourcing verdicts to a single worst-case verdict
  * string. Generic across any parent→child relationship (e.g. policy→stakeholder,
  * org→personnel, publication→citation). Callers are responsible for resolving
  * their domain-specific name→id mapping before calling this.
  *
  * This is a workaround for parent record types that lack their own
- * source-check coverage yet (QUA-214). When coverage lands, call sites should
+ * sourcing coverage yet (QUA-214). When coverage lands, call sites should
  * prefer the parent's own verdict and/or combine it with the aggregated
  * children via pickWorstVerdict.
  *

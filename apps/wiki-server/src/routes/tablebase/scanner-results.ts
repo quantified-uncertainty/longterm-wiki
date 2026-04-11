@@ -179,6 +179,62 @@ const scannerResultsApp = new Hono()
       entityTrends,
     });
   })
+  // GET /trends-by-type — per-recordType trend data across scan runs (for sparklines)
+  .get("/trends-by-type", zv("query", z.object({ limit: clampedLimit(20, 7) })), async (c) => {
+    const { limit } = c.req.valid("query");
+    const db = getDrizzleDb();
+
+    // Get the N most recent distinct scan run IDs (same approach as /trends)
+    const recentRuns = await db
+      .select({
+        scanRunId: tablebaseScannerResults.scanRunId,
+        scannedAt: sql<string>`MIN(${tablebaseScannerResults.scannedAt})`.as("scanned_at"),
+      })
+      .from(tablebaseScannerResults)
+      .groupBy(tablebaseScannerResults.scanRunId)
+      .orderBy(desc(sql`MIN(${tablebaseScannerResults.scannedAt})`))
+      .limit(limit);
+
+    if (recentRuns.length === 0) {
+      return c.json({ byType: [] });
+    }
+
+    const runIds = recentRuns.map((r) => r.scanRunId);
+
+    // Get avg completeness per (recordType, scanRunId) for those runs
+    const rows = await db
+      .select({
+        recordType: tablebaseScannerResults.recordType,
+        scanRunId: tablebaseScannerResults.scanRunId,
+        scannedAt: sql<string>`MIN(${tablebaseScannerResults.scannedAt})`.as("scanned_at"),
+        avgCompleteness: sql<number>`ROUND(AVG(${tablebaseScannerResults.completenessPct})::numeric, 1)`.as("avg_completeness"),
+        entityCount: count(),
+      })
+      .from(tablebaseScannerResults)
+      .where(sql`${tablebaseScannerResults.scanRunId} = ANY(${runIds})`)
+      .groupBy(tablebaseScannerResults.recordType, tablebaseScannerResults.scanRunId)
+      .orderBy(tablebaseScannerResults.recordType, sql`MIN(${tablebaseScannerResults.scannedAt})`);
+
+    // Group by recordType
+    const byTypeMap = new Map<string, Array<{ scanRunId: string; scannedAt: string; avgCompleteness: number; entityCount: number }>>();
+    for (const row of rows) {
+      const existing = byTypeMap.get(row.recordType) ?? [];
+      existing.push({
+        scanRunId: row.scanRunId,
+        scannedAt: row.scannedAt,
+        avgCompleteness: row.avgCompleteness,
+        entityCount: row.entityCount,
+      });
+      byTypeMap.set(row.recordType, existing);
+    }
+
+    const byType = [...byTypeMap.entries()].map(([recordType, points]) => ({
+      recordType,
+      points,
+    }));
+
+    return c.json({ byType });
+  })
   // POST /sync — accepts batch scan results and upserts them
   .post("/sync", zv("json", SyncBatchSchema), async (c) => {
     const { items } = c.req.valid("json");

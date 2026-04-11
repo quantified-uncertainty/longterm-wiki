@@ -1,9 +1,9 @@
 import { getKBRecordSchema } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
 import { getRecordVerdict } from "@/data/tablebase";
-import { getSourceCheckHref } from "@/app/source-checks/source-checks-shared";
-import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
-import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { titleCase } from "@/components/wiki/factbase/format";
 import { FBCellValue } from "@/components/wiki/factbase/FBCellValue";
 
@@ -74,11 +74,11 @@ export function GenericCollectionTable({
                     );
                   })}
                   <td className="w-8 px-1">
-                    <SourceCheckDot
+                    <SourcingDot
                       status={recordVerdictToStatus(verdict?.verdict)}
                       originalVerdict={verdict?.verdict}
                       size="md"
-                      href={getSourceCheckHref(collectionName, recordId)}
+                      href={getSourcingHref(collectionName, recordId)}
                     />
                   </td>
                 </tr>

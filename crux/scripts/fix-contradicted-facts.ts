@@ -22,7 +22,7 @@
 import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 import { createLlmClient, callLlm, MODELS } from "../lib/llm.ts";
-import { getFailures, type FailuresResponse } from "../lib/wiki-server/source-checks.ts";
+import { getFailures, type FailuresResponse } from "../lib/wiki-server/sourcing.ts";
 import { escapeXml } from "../lib/prompt-utils.ts";
 import type Anthropic from "@anthropic-ai/sdk";
 
@@ -191,7 +191,7 @@ export function buildFactIndex(
 // Step 2: LLM extraction — get the correct value from reasoning
 // ---------------------------------------------------------------------------
 
-const EXTRACTION_SYSTEM_PROMPT = `You are a data extraction assistant. Given a source-check verdict reasoning about a factual claim, extract the CORRECT value according to the source.
+const EXTRACTION_SYSTEM_PROMPT = `You are a data extraction assistant. Given a sourcing verdict reasoning about a factual claim, extract the CORRECT value according to the source.
 
 Rules:
 - For monetary values, return the EXACT number without currency symbols or abbreviations. Example: if the source says "$115,576,357", return "115576357".
