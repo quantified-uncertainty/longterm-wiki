@@ -137,7 +137,7 @@ async function fetchNullEntityVerdicts(): Promise<VerdictRow[]> {
   while (rows.length < total) {
     const res = await apiFetch(
       "GET",
-      `/api/sourcing/verdicts?record_type=fact&limit=${PAGE}&offset=${offset}`,
+      `/api/source-checks/verdicts?record_type=fact&limit=${PAGE}&offset=${offset}`,
     );
     if (!res.ok) {
       console.error(`Failed to fetch verdicts: ${res.error}`);
@@ -245,7 +245,7 @@ async function main() {
       sourcesChecked: row.sourcesChecked ?? undefined,
     };
 
-    const res = await apiFetch("POST", "/api/sourcing/verdicts", body);
+    const res = await apiFetch("POST", "/api/source-checks/verdicts", body);
 
     if (res.ok) {
       success++;
