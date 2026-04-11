@@ -4,14 +4,11 @@ import { eq, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { benchmarks } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -50,10 +47,6 @@ const SyncBenchmarkItemSchema = z.object({
   introducedDate: z.string().max(20).nullable().optional(),
   maintainer: z.string().max(500).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
-});
-
-const SyncBenchmarkBatchSchema = z.object({
-  items: z.array(SyncBenchmarkItemSchema).min(1).max(200),
 });
 
 // ---- Helpers ----
@@ -142,76 +135,24 @@ const benchmarksApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncBenchmarkBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(c, parsed.error.issues.map((i) => i.message).join(", "));
-    }
-
-    const db = getDrizzleDb();
-    const now = new Date();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of parsed.data.items) {
-        await tx
-          .insert(benchmarks)
-          .values({
-            id: item.id,
-            slug: item.slug,
-            name: item.name,
-            category: item.category ?? null,
-            description: item.description ?? null,
-            website: item.website ?? null,
-            scoringMethod: item.scoringMethod ?? null,
-            higherIsBetter: item.higherIsBetter,
-            introducedDate: item.introducedDate ?? null,
-            maintainer: item.maintainer ?? null,
-            source: item.source ?? null,
-            syncedAt: now,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: benchmarks.id,
-            set: {
-              slug: item.slug,
-              name: item.name,
-              category: item.category ?? null,
-              description: item.description ?? null,
-              website: item.website ?? null,
-              scoringMethod: item.scoringMethod ?? null,
-              higherIsBetter: item.higherIsBetter,
-              introducedDate: item.introducedDate ?? null,
-              maintainer: item.maintainer ?? null,
-              source: item.source ?? null,
-              syncedAt: now,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        parsed.data.items.map((b) => ({
-          id: b.id,
-          thingType: "benchmark" as const,
-          title: b.name,
-          sourceTable: "benchmarks",
-          sourceId: b.id,
-          description: b.description,
-          sourceUrl: b.website,
-          wikiId: b.slug,
-        }))
-      );
-    });
-
-    return c.json({ upserted });
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "benchmarks",
+      table: benchmarks,
+      syncSchema: SyncBenchmarkItemSchema,
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "benchmark" as const,
+        title: item.name,
+        sourceTable: "benchmarks",
+        sourceId: item.id,
+        description: item.description,
+        sourceUrl: item.website,
+        wikiId: item.slug,
+      }),
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(benchmarks, "benchmarks"));
 

@@ -18,9 +18,10 @@ import {
   zv,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -97,10 +98,6 @@ const SyncRaceItemSchema = z.object({
   measureDescription: z.string().max(5000).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncRacesBatchSchema = z.object({
-  items: z.array(SyncRaceItemSchema).min(1).max(100),
 });
 
 const SyncCandidateItemSchema = z.object({
@@ -394,103 +391,26 @@ const politicalRacesApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncRacesBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "policyEntityId", ids: items.map((i) => i.policyEntityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
-
-    logger.info(`sync political-races: upserting ${items.length} races`);
-
-    // Resolve entity titles for things table
-    const entityIds = items
-      .map((item) => item.policyEntityId)
-      .filter((id): id is string => id != null);
-    const entityTitleMap = await resolveEntityTitles(db, entityIds);
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(politicalRaces)
-          .values({
-            id: item.id,
-            name: item.name,
-            raceType: item.raceType,
-            party: item.party ?? null,
-            level: item.level,
-            state: item.state ?? null,
-            district: item.district ?? null,
-            electionDate: item.electionDate ?? null,
-            status: item.status,
-            outcome: item.outcome ?? null,
-            outcomeDetails: item.outcomeDetails ?? null,
-            aiAngle: item.aiAngle ?? null,
-            aiAngleSummary: item.aiAngleSummary ?? null,
-            policyEntityId: item.policyEntityId ?? null,
-            measureTitle: item.measureTitle ?? null,
-            measureDescription: item.measureDescription ?? null,
-            source: item.source ?? null,
-            notes: item.notes ?? null,
-            syncedAt: new Date(),
-            updatedAt: new Date(),
-          })
-          .onConflictDoUpdate({
-            target: politicalRaces.id,
-            set: {
-              name: item.name,
-              raceType: item.raceType,
-              party: item.party ?? null,
-              level: item.level,
-              state: item.state ?? null,
-              district: item.district ?? null,
-              electionDate: item.electionDate ?? null,
-              status: item.status,
-              outcome: item.outcome ?? null,
-              outcomeDetails: item.outcomeDetails ?? null,
-              aiAngle: item.aiAngle ?? null,
-              aiAngleSummary: item.aiAngleSummary ?? null,
-              policyEntityId: item.policyEntityId ?? null,
-              measureTitle: item.measureTitle ?? null,
-              measureDescription: item.measureDescription ?? null,
-              source: item.source ?? null,
-              notes: item.notes ?? null,
-              syncedAt: new Date(),
-              updatedAt: new Date(),
-            },
-          });
-        upserted++;
-      }
-
-      // Upsert into things table for cross-base indexing
-      await upsertThingsInTx(
-        tx,
-        items.map((item) => ({
-          id: item.id,
-          thingType: "political-race" as const,
-          title: item.name,
-          sourceTable: "political_races",
-          sourceId: item.id,
-          parentThingId: null,
-          parentTitle: item.state ?? null,
-          description: item.aiAngle ?? null,
-          sourceUrl: item.source ?? null,
-        })),
-      );
-    });
-
-    return c.json({ upserted });
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "political-races",
+      table: politicalRaces,
+      syncSchema: SyncRaceItemSchema,
+      entityRefs: ["policyEntityId"],
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "political-race" as const,
+        title: item.name,
+        sourceTable: "political_races",
+        sourceId: item.id,
+        parentThingId: null,
+        parentTitle: item.state ?? null,
+        description: item.aiAngle ?? null,
+        sourceUrl: item.source ?? null,
+      }),
+    }),
+  )
 
   // ---- POST /candidates/sync ----
   .post("/candidates/sync", async (c) => {

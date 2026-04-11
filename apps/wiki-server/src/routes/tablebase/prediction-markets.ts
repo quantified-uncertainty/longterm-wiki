@@ -23,7 +23,7 @@ import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { writeInlineVerdicts, logSourceCheckCoverage } from "./write-inline-verdicts.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -91,10 +91,6 @@ const SyncQuestionItemSchema = z.object({
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
   sourcing: InlineSourcingSchema.optional(),
-});
-
-const SyncQuestionsBatchSchema = z.object({
-  items: z.array(SyncQuestionItemSchema).min(1).max(500),
 });
 
 const SyncSnapshotItemSchema = z.object({
@@ -364,27 +360,19 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     }
   )
 
-  // ---- POST /questions/sync ----
-  .post("/questions/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncQuestionsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId).filter((id): id is string => id != null) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
+  // ---- POST /questions/sync — uses sync-factory ----
+  .post(
+    "/questions/sync",
+    createSyncHandler({
+      name: "prediction-market-questions",
+      table: predictionMarketQuestions,
+      syncSchema: SyncQuestionItemSchema,
+      entityRefs: ["entityId"],
+      conflictTarget: [
+        predictionMarketQuestions.platform,
+        predictionMarketQuestions.platformQuestionId,
+      ],
+      toRow: (item, now) => ({
         id: item.id,
         platform: item.platform,
         platformQuestionId: item.platformQuestionId,
@@ -403,56 +391,18 @@ const predictionMarketsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         discoveryMethod: item.discoveryMethod ?? null,
         source: item.source ?? null,
         notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(predictionMarketQuestions)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: [
-            predictionMarketQuestions.platform,
-            predictionMarketQuestions.platformQuestionId,
-          ],
-          set: {
-            entityId: sql`excluded.entity_id`,
-            entityDisplayName: sql`excluded.entity_display_name`,
-            questionText: sql`excluded.question_text`,
-            questionUrl: sql`excluded.question_url`,
-            resolutionDate: sql`excluded.resolution_date`,
-            resolutionCriteria: sql`excluded.resolution_criteria`,
-            questionType: sql`excluded.question_type`,
-            category: sql`excluded.category`,
-            isResolved: sql`excluded.is_resolved`,
-            resolutionValue: sql`excluded.resolution_value`,
-            resolutionNotes: sql`excluded.resolution_notes`,
-            currentProbability: sql`excluded.current_probability`,
-            discoveryMethod: sql`excluded.discovery_method`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Write inline source-check verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "prediction-market-question",
-          recordId: item.id,
-          entityId: item.entityId ?? null,
-          sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourceCheckCoverage("prediction-markets/questions/sync", items.length, verdictsResult.written);
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written });
-  })
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      toVerdict: (item) => ({
+        recordType: "prediction-market-question",
+        recordId: item.id,
+        entityId: item.entityId ?? null,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+    }),
+  )
 
   // ---- POST /snapshots/sync ----
   .post("/snapshots/sync", async (c) => {

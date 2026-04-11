@@ -20,6 +20,7 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
 
@@ -64,10 +65,6 @@ const SyncSourceSchema = z.object({
   refreshIntervalDays: z.coerce.number().int().min(1).max(365).default(30),
   enabled: z.boolean().default(true),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncSourceBatchSchema = z.object({
-  items: z.array(SyncSourceSchema).min(1).max(200),
 });
 
 const SyncPageSchema = z.object({
@@ -259,61 +256,30 @@ const websiteSourcesApp = new Hono()
     return c.json({ sourceId, pages });
   })
 
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncSourceBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    const entityIds = items.map((i) => i.entityId).filter((id): id is string => id != null);
-    if (entityIds.length > 0) {
-      const refError = await validateEntityRefs(c, db, [
-        { fieldName: "entityId", ids: entityIds },
-      ]);
-      if (refError) return refError;
-    }
-
-    const now = new Date();
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      for (const item of items) {
-        await tx
-          .insert(websiteSources)
-          .values({
-            id: item.id,
-            domain: item.domain,
-            entityId: item.entityId ?? null,
-            entityDisplayName: item.entityDisplayName ?? null,
-            reliability: item.reliability,
-            refreshIntervalDays: item.refreshIntervalDays,
-            enabled: item.enabled,
-            notes: item.notes ?? null,
-            updatedAt: now,
-          })
-          .onConflictDoUpdate({
-            target: websiteSources.id,
-            set: {
-              domain: item.domain,
-              entityId: item.entityId ?? null,
-              entityDisplayName: item.entityDisplayName ?? null,
-              reliability: item.reliability,
-              refreshIntervalDays: item.refreshIntervalDays,
-              enabled: item.enabled,
-              notes: item.notes ?? null,
-              updatedAt: now,
-            },
-          });
-        upserted++;
-      }
-    });
-
-    return c.json({ upserted });
-  })
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "website-sources",
+      table: websiteSources,
+      syncSchema: SyncSourceSchema,
+      entityRefs: ["entityId"],
+      // Explicit toRow: only set sync-controlled fields. The table has
+      // operational columns (lastRunAt, lastError, consecutiveFailures)
+      // that must be preserved on conflict — omitting them from the row
+      // keeps them out of the auto-derived SET clause.
+      toRow: (item, now) => ({
+        id: item.id,
+        domain: item.domain,
+        entityId: item.entityId ?? null,
+        entityDisplayName: item.entityDisplayName ?? null,
+        reliability: item.reliability,
+        refreshIntervalDays: item.refreshIntervalDays,
+        enabled: item.enabled,
+        notes: item.notes ?? null,
+        updatedAt: now,
+      }),
+    }),
+  )
 
   .post("/sync-pages", async (c) => {
     const body = await parseJsonBody(c);

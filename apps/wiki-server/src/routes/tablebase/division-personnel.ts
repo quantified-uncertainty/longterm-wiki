@@ -5,15 +5,10 @@ import { getDrizzleDb } from "../../db.js";
 import { divisionPersonnel } from "../../schema.js";
 import {
   paginationQuery,
-  noDuplicateIds,
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
 } from "../shared/utils.js";
-import { upsertThingsInTx } from "../shared/thing-sync.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Query schemas ----
 
@@ -31,14 +26,6 @@ const SyncDivisionPersonnelItemSchema = z.object({
   endDate: z.string().max(20).nullable().optional(),
   source: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncDivisionPersonnelBatchSchema = z.object({
-  items: z
-    .array(SyncDivisionPersonnelItemSchema)
-    .min(1)
-    .max(500)
-    .refine(noDuplicateIds, { message: "Duplicate id values in items array" }),
 });
 
 // ---- Helpers ----
@@ -162,73 +149,34 @@ const divisionPersonnelApp = new Hono()
   })
 
   // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncDivisionPersonnelBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "personId", ids: items.map((i) => i.personId) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
-        id: item.id,
-        divisionId: item.divisionId,
-        personId: item.personId,
-        role: item.role,
-        startDate: item.startDate ?? null,
-        endDate: item.endDate ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }));
-
-      await tx
-        .insert(divisionPersonnel)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: divisionPersonnel.id,
-          set: {
-            divisionId: sql`excluded.division_id`,
-            personId: sql`excluded.person_id`,
-            role: sql`excluded.role`,
-            // COALESCE: preserve existing values when sync payload sends null
-            startDate: sql`COALESCE(excluded.start_date, ${divisionPersonnel.startDate})`,
-            endDate: sql`COALESCE(excluded.end_date, ${divisionPersonnel.endDate})`,
-            source: sql`COALESCE(excluded.source, ${divisionPersonnel.source})`,
-            notes: sql`COALESCE(excluded.notes, ${divisionPersonnel.notes})`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Dual-write to things table
-      await upsertThingsInTx(
-        tx,
-        items.map((dp) => ({
-          id: dp.id,
-          thingType: "division-personnel" as const,
-          title: `${dp.personId} — ${dp.role}`,
-          sourceTable: "division_personnel",
-          sourceId: dp.id,
-          sourceUrl: dp.source,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    return c.json({ upserted });
-  })
+  .post("/sync", createSyncHandler({
+    name: "division-personnel",
+    table: divisionPersonnel,
+    syncSchema: SyncDivisionPersonnelItemSchema,
+    entityRefs: ["personId"],
+    naturalKey: (item) => item.id,
+    naturalKeyError: "Duplicate id values in items array",
+    conflictSet: {
+      divisionId: sql`excluded.division_id`,
+      personId: sql`excluded.person_id`,
+      role: sql`excluded.role`,
+      // COALESCE: preserve existing values when sync payload sends null
+      startDate: sql`COALESCE(excluded.start_date, ${divisionPersonnel.startDate})`,
+      endDate: sql`COALESCE(excluded.end_date, ${divisionPersonnel.endDate})`,
+      source: sql`COALESCE(excluded.source, ${divisionPersonnel.source})`,
+      notes: sql`COALESCE(excluded.notes, ${divisionPersonnel.notes})`,
+      syncedAt: sql`now()`,
+      updatedAt: sql`now()`,
+    },
+    toThing: (item) => ({
+      id: item.id,
+      thingType: "division-personnel" as const,
+      title: `${item.personId} — ${item.role}`,
+      sourceTable: "division_personnel",
+      sourceId: item.id,
+      sourceUrl: item.source ?? null,
+    }),
+  }))
 
   .post("/delete-batch", deleteBatchHandler(divisionPersonnel, "division_personnel"));
 
