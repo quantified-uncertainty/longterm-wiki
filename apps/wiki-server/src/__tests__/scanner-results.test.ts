@@ -5,6 +5,8 @@
  *   1. POST /sync inserts items and returns count
  *   2. Schema validation rejects invalid payloads
  *   3. Empty batch rejected (min 1 item)
+ *   4. POST /run triggers server-side scan and persists results
+ *   5. GET /latest returns empty when no data
  */
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
@@ -45,7 +47,58 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: insertedRows.length }];
   }
 
-  // SELECT for latest
+  // Entity queries for the /run endpoint
+  // organizations query
+  if (q.includes('"entities"') && q.includes("organization")) {
+    return [
+      { stable_id: "sid_org001", title: "TestOrg", entity_type: "organization" },
+    ];
+  }
+
+  // ai-model entities
+  if (q.includes('"entities"') && q.includes("ai-model")) {
+    return [
+      { stable_id: "sid_model001", title: "TestModel", entity_type: "ai-model" },
+    ];
+  }
+
+  // Grants grouped by org
+  if (q.includes('"grants"')) {
+    return [
+      { entity_id: "sid_org001", entity_name: "TestOrg", total: "3", linked: "2" },
+    ];
+  }
+
+  // Personnel grouped by org
+  if (q.includes('"personnel"')) {
+    return [
+      { entity_id: "sid_org001", entity_name: "TestOrg", total: "10" },
+    ];
+  }
+
+  // Funding rounds
+  if (q.includes('"funding_rounds"')) {
+    return [];
+  }
+
+  // Investments
+  if (q.includes('"investments"')) {
+    return [];
+  }
+
+  // Benchmark results
+  if (q.includes('"benchmark_results"')) {
+    return [
+      { entity_id: "sid_model001", entity_name: "TestModel", total: "5" },
+    ];
+  }
+
+  // Source check verdicts
+  if (q.includes('"source_check_verdicts"')) {
+    return [];
+  }
+
+  // SELECT for latest (generic select from tablebase_scanner_results)
   if (q.includes("select") && q.includes("from")) {
     return [];
   }
@@ -157,5 +210,23 @@ describe("scanner-results route", () => {
     expect(body.items).toEqual([]);
     expect(body.total).toBe(0);
     expect(body.scanRunId).toBeNull();
+  });
+
+  it("POST /run triggers server-side scan and returns summary", async () => {
+    const app = buildApp();
+    const res = await app.request("/api/scanner-results/run", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.scanRunId).toBeDefined();
+    expect(typeof body.scanRunId).toBe("string");
+    expect(body.scanRunId.length).toBeGreaterThan(0);
+    expect(typeof body.inserted).toBe("number");
+    expect(body.inserted).toBeGreaterThanOrEqual(0);
+    expect(typeof body.tables).toBe("number");
+    expect(body.scannedAt).toBeDefined();
   });
 });

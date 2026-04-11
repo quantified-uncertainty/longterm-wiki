@@ -82,6 +82,7 @@ function makeConfig(): Config {
         maxPages: 5,
       },
       jobFailureTriage: { enabled: true, schedule: "0 */6 * * *" },
+      tablebaseScan: { enabled: false, schedule: "0 5 * * *" },
     },
   };
 }

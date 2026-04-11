@@ -39,6 +39,7 @@ export interface Config {
     jobWorkerHealth: TaskConfig;
     autoUpdateEnqueue: AutoUpdateEnqueueConfig;
     jobFailureTriage: TaskConfig;
+    tablebaseScan: TaskConfig;
   };
 }
 
@@ -134,6 +135,11 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_JOB_FAILURE_TRIAGE_ENABLED", true),
         schedule:
           process.env["TASK_JOB_FAILURE_TRIAGE_SCHEDULE"] ?? "0 */6 * * *", // every 6 hours
+      },
+      tablebaseScan: {
+        enabled: envBool("TASK_TABLEBASE_SCAN_ENABLED", true),
+        schedule:
+          process.env["TASK_TABLEBASE_SCAN_SCHEDULE"] ?? "0 5 * * *", // daily at 5am UTC
       },
     },
   };
