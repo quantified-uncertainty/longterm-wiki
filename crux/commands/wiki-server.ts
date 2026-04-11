@@ -48,6 +48,16 @@ const SCRIPTS = {
     description: 'Sync page assessments (quality, importance, ratings) to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
+  'sync-coverage-scans': {
+    script: 'wiki-server/sync-coverage-scans.ts',
+    description: 'Compute entity coverage scores and sync to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
+  'sync-scanner-results': {
+    script: 'wiki-server/sync-scanner-results.ts',
+    description: 'Run full TableBase scan and persist results to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'snapshot-resources': {
     script: 'wiki-server/snapshot-resources.ts',
     description: 'Export PG resources to data/resources-snapshot.json',

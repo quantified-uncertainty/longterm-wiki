@@ -34,6 +34,7 @@ import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 import { dataSourcesRoute } from "./routes/tablebase/data-sources.js";
 import { platformAccountsRoute } from "./routes/tablebase/platform-accounts.js";
 import { coverageScansRoute } from "./routes/tablebase/coverage-scans.js";
+import { scannerResultsRoute } from "./routes/tablebase/scanner-results.js";
 
 // Unified source-check system (replaces legacy factbase + record source-checks)
 import { sourceChecksRoute } from "./routes/source-check/source-checks.js";
@@ -251,6 +252,7 @@ export function createApp() {
   app.route("/api/website-sources", websiteSourcesRoute);
   app.route("/api/entity-resources", entityResourcesRoute);
   app.route("/api/coverage-scans", coverageScansRoute);
+  app.route("/api/scanner-results", scannerResultsRoute);
 
   // Aggregated entity profile (reads from all TableBase tables)
   app.route("/api/entity-profile", entityProfileRoute);

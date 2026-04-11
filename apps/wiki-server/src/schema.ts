@@ -3922,3 +3922,30 @@ export const tablebaseCoverageScans = pgTable(
     index("idx_coverage_scans_scanned_at").on(table.scannedAt),
   ],
 );
+
+// ── Scanner Results ──────────────────────────────────────────────
+
+export const tablebaseScannerResults = pgTable(
+  "tablebase_scanner_results",
+  {
+    id: serial("id").primaryKey(),
+    scanRunId: text("scan_run_id").notNull(),
+    recordType: text("record_type").notNull(),
+    entityId: text("entity_id").notNull(),
+    entityName: text("entity_name").notNull(),
+    entityType: text("entity_type").notNull(),
+    totalRecords: integer("total_records").notNull().default(0),
+    verifiedRecords: integer("verified_records").notNull().default(0),
+    completenessPct: real("completeness_pct").notNull().default(0),
+    missingFields: jsonb("missing_fields").notNull().default([]),
+    entityImportance: real("entity_importance"),
+    scannedAt: timestamp("scanned_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_scanner_results_run_id").on(table.scanRunId),
+    index("idx_scanner_results_entity").on(table.entityId),
+    index("idx_scanner_results_scanned_at").on(table.scannedAt),
+    index("idx_scanner_results_type_entity").on(table.recordType, table.entityId),
+  ],
+);

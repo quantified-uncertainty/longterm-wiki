@@ -53,6 +53,37 @@ interface CommandOptions extends BaseOptions {
   model?: string;
   source?: string;
   entity?: string;
+  persist?: boolean;
+}
+
+async function persistScanResults(scan: import('../tablebase/types.ts').ScanSummary): Promise<void> {
+  const { randomUUID } = await import('crypto');
+  const { transformScanToItems, syncScannerResults } = await import('../wiki-server/sync-scanner-results.ts');
+  const { getServerUrl } = await import('../lib/wiki-server/client.ts');
+  const { waitForHealthy } = await import('../wiki-server/sync-common.ts');
+
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    console.warn('[persist] LONGTERMWIKI_SERVER_URL not set, skipping persistence');
+    return;
+  }
+
+  const scanRunId = randomUUID();
+  const items = transformScanToItems(scan, scanRunId);
+  console.log(`\n[persist] Syncing ${items.length} scanner results (run: ${scanRunId})...`);
+
+  const healthy = await waitForHealthy(serverUrl);
+  if (!healthy) {
+    console.warn('[persist] Server is not healthy, skipping persistence');
+    return;
+  }
+
+  const result = await syncScannerResults(serverUrl, items);
+  if (result.errors > 0) {
+    console.warn(`[persist] Completed with ${result.errors} errors (${result.inserted} synced)`);
+  } else {
+    console.log(`[persist] Done: ${result.inserted} results synced`);
+  }
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -67,10 +98,17 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
     if (options.ci) {
       return { exitCode: 0, output: JSON.stringify(result, null, 2) };
     }
-    return { exitCode: 0, output: formatScanSummary({ tables: [result], timestamp: new Date().toISOString() }) };
+    const summary = { tables: [result], timestamp: new Date().toISOString() };
+    if (options.persist) {
+      await persistScanResults(summary);
+    }
+    return { exitCode: 0, output: formatScanSummary(summary) };
   }
 
   const scan = await runFullScan();
+  if (options.persist) {
+    await persistScanResults(scan);
+  }
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify(scan, null, 2) };
   }
@@ -1386,6 +1424,7 @@ Options:
   --apply                   For source-discover: also link discovered resources to records
   --v2                      For source-discover: use claims-first agent (extracts + submits claims)
   --claims-only             For source-discover --v2: submit claims but don't apply results
+  --persist                 Persist scan results to wiki-server (tablebase_scanner_results)
   --ci                      JSON output
 
 Modes:
