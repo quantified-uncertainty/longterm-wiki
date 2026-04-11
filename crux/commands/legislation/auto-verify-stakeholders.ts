@@ -31,6 +31,7 @@ import {
   storeSourceCheckEvidence,
   storeAggregateVerdict,
 } from '../../lib/source-check/verdict-handler.ts';
+import { apiRequest } from '../../lib/wiki-server/client.ts';
 import { createLogger } from '../../lib/output.ts';
 import { parseIntOpt, type CommandResult } from '../../lib/cli.ts';
 
@@ -94,15 +95,53 @@ function loadPolicyEntities(): PolicyEntity[] {
   );
 }
 
+const STAKEHOLDER_RECORD_TYPE = 'policy-stakeholder';
+
 /**
- * Build a record ID for a stakeholder position source-check.
+ * Fetch all policy-stakeholder things from the wiki-server API.
+ * Returns a map of "policyStableId:stakeholderName" -> thing.id (the 10-char hash).
+ * This must match the ID format used by syncPolicyStakeholders in build-data.
  */
-function buildStakeholderRecordId(policyId: string, stakeholderName: string): string {
-  const slug = stakeholderName.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-  return `${policyId}:${slug}`;
+interface ThingItem {
+  id: string;
+  title: string;
+  parentThingId: string | null;
+  sourceId: string;
 }
 
-const STAKEHOLDER_RECORD_TYPE = 'policy-stakeholder';
+interface ThingsListResponse {
+  things: ThingItem[];
+  total: number;
+}
+
+async function fetchStakeholderThingsMap(): Promise<Map<string, string>> {
+  const map = new Map<string, string>();
+  const pageSize = 200;
+  let offset = 0;
+
+  while (true) {
+    const result = await apiRequest<ThingsListResponse>(
+      'GET',
+      `/api/things?thing_type=policy-stakeholder&limit=${pageSize}&offset=${offset}`,
+    );
+    if (!result.ok) {
+      throw new Error(`Failed to fetch policy-stakeholder things: ${result.message}`);
+    }
+    const items = result.data.things;
+    for (const t of items) {
+      // title format: "Stakeholder Name on Policy Title"
+      const onIdx = t.title.indexOf(' on ');
+      if (onIdx > 0 && t.parentThingId) {
+        const stakeholderName = t.title.substring(0, onIdx);
+        map.set(`${t.parentThingId}:${stakeholderName}`, t.id);
+      }
+    }
+    if (items.length < pageSize) break;
+    offset += pageSize;
+  }
+
+  return map;
+}
 
 // ---------------------------------------------------------------------------
 // Existing verdict check
@@ -327,7 +366,24 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     return { output: msg, exitCode: 1 };
   }
 
-  // 2. Collect all stakeholders with source URLs
+  // 2. Fetch the things map to resolve stakeholder IDs.
+  //    The things table stores the canonical 10-char hash IDs that match
+  //    what getPolicyStakeholderId and getRecordVerdict expect.
+  //    In dry-run mode, gracefully degrade if the server is unreachable.
+  let thingsMap: Map<string, string> | null = null;
+  try {
+    thingsMap = await fetchStakeholderThingsMap();
+    console.log(`${c.dim}Fetched ${thingsMap.size} policy-stakeholder thing IDs from wiki-server${c.reset}`);
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (dryRun) {
+      console.log(`${c.yellow}  warning: could not fetch thing IDs (${msg}) — dry-run will show placeholder IDs${c.reset}`);
+    } else {
+      return { output: `Failed to fetch stakeholder things: ${msg}`, exitCode: 1 };
+    }
+  }
+
+  // 3. Collect all stakeholders with source URLs
   interface StakeholderWithPolicy {
     policy: PolicyEntity;
     stakeholder: Stakeholder;
@@ -335,12 +391,27 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   }
 
   const allStakeholders: StakeholderWithPolicy[] = [];
+  let missingThings = 0;
   for (const policy of filtered) {
     for (const stakeholder of policy.stakeholders || []) {
       if (!stakeholder.source) continue;
-      const thingId = buildStakeholderRecordId(policy.id, stakeholder.name);
-      allStakeholders.push({ policy, stakeholder, thingId });
+      if (thingsMap) {
+        const key = `${policy.stableId}:${stakeholder.name}`;
+        const thingId = thingsMap.get(key);
+        if (!thingId) {
+          console.warn(`${c.yellow}  warning: no thing found for "${stakeholder.name}" on policy ${policy.id} (key: ${key})${c.reset}`);
+          missingThings++;
+          continue;
+        }
+        allStakeholders.push({ policy, stakeholder, thingId });
+      } else {
+        // Dry-run fallback: use a placeholder ID (not used for actual API calls)
+        allStakeholders.push({ policy, stakeholder, thingId: `${policy.id}:${stakeholder.name}` });
+      }
     }
+  }
+  if (missingThings > 0) {
+    console.log(`${c.yellow}  ${missingThings} stakeholders skipped (no matching thing in DB — run build-data first)${c.reset}`);
   }
 
   if (allStakeholders.length === 0) {
@@ -354,7 +425,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     console.log(`\n${c.yellow}DRY RUN — no API calls will be made${c.reset}\n`);
   }
 
-  // 3. Filter out already-verified stakeholders
+  // 4. Filter out already-verified stakeholders
   const toVerify: StakeholderWithPolicy[] = [];
   const skippedAlreadyChecked: SourceCheckResult[] = [];
 
@@ -391,7 +462,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     console.log(`${c.dim}Skipping ${skippedAlreadyChecked.length} already-verified stakeholders${c.reset}`);
   }
 
-  // 4. Apply budget limit
+  // 5. Apply budget limit
   const effectiveBudget = budgetLimit > 0 ? budgetLimit : toVerify.length;
   const limited = toVerify.slice(0, effectiveBudget);
 
@@ -401,7 +472,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
   console.log(`\n${c.bold}Processing ${limited.length} stakeholders...${c.reset}\n`);
 
-  // 5. Dry run output
+  // 6. Dry run output
   if (dryRun) {
     let output = `\n${c.bold}Stakeholders to verify:${c.reset}\n\n`;
     for (const item of limited) {
@@ -432,7 +503,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     return { output, exitCode: 0 };
   }
 
-  // 6. Create LLM client and cost tracker
+  // 7. Create LLM client and cost tracker
   let client: ReturnType<typeof createLlmClient>;
   try {
     client = createLlmClient();
@@ -442,7 +513,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
   }
   const tracker = new CostTracker();
 
-  // 7. Process each stakeholder
+  // 8. Process each stakeholder
   const results: SourceCheckResult[] = [...skippedAlreadyChecked];
   let verified = 0;
   let failed = 0;
@@ -453,7 +524,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
 
     console.log(`  ${c.dim}[${verified + failed + 1}/${limited.length}]${c.reset} ${policy.id} / ${stakeholder.name}...`);
 
-    // 7a. Fetch source content
+    // 8a. Fetch source content
     let sourceContent: string;
     let sourceStatus: string;
     try {
@@ -516,7 +587,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 7b. LLM source-check
+    // 8b. LLM source-check
     let llmResult: LlmSourceCheckResult;
     try {
       llmResult = await verifyStakeholderPosition(
@@ -548,7 +619,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       continue;
     }
 
-    // 7c. Record source-check to wiki-server
+    // 8c. Record source-check to wiki-server
     const recordedSourceCheck = await recordSourceCheck({
       recordType: STAKEHOLDER_RECORD_TYPE,
       recordId: thingId,
@@ -567,7 +638,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
       console.log(`    ${c.yellow}warning: failed to record source-check to wiki-server${c.reset}`);
     }
 
-    // 7d. Update aggregate verdict
+    // 8d. Update aggregate verdict
     const recordedVerdict = await recordVerdict({
       recordType: STAKEHOLDER_RECORD_TYPE,
       recordId: thingId,
@@ -609,7 +680,7 @@ async function verify(_args: string[], options: VerifyOptions): Promise<CommandR
     verified++;
   }
 
-  // 8. Summary output
+  // 9. Summary output
   const activeResults = results.filter((r) => !r.skipped);
   const confirmed = activeResults.filter((r) => r.verdict === 'confirmed').length;
   const contradicted = activeResults.filter((r) => r.verdict === 'contradicted').length;
