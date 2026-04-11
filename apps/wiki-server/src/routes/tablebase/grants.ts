@@ -10,6 +10,7 @@ import {
   verdictJoinCondition,
   verdictSelectFields,
   formatSourcing,
+  fetchFieldVerdicts,
   type VerdictJoinFields,
 } from "../shared/source-check-join.js";
 import {
@@ -232,8 +233,15 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .from(grants);
     const total = countResult[0].count;
 
+    // Fetch per-field verdicts for all returned grants
+    const grantIds = rows.map((r) => r.grants.id);
+    const fieldVerdictsMap = await fetchFieldVerdicts(db, "grant", grantIds);
+
     return c.json({
-      grants: rows.map(formatRow),
+      grants: rows.map((r) => ({
+        ...formatRow(r),
+        fieldVerdicts: fieldVerdictsMap[r.grants.id] ?? {},
+      })),
       total,
       limit,
       offset,
@@ -309,9 +317,16 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       .limit(limit)
       .offset(offset);
 
+    // Fetch per-field verdicts for all returned grants
+    const grantIds = rows.map((r) => r.grants.id);
+    const fieldVerdictsMap = await fetchFieldVerdicts(db, "grant", grantIds);
+
     return c.json({
       entityId: resolvedId,
-      grants: rows.map(formatRow),
+      grants: rows.map((r) => ({
+        ...formatRow(r),
+        fieldVerdicts: fieldVerdictsMap[r.grants.id] ?? {},
+      })),
       total,
       limit,
       offset,

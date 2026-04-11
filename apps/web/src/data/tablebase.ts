@@ -1093,6 +1093,27 @@ export function getRecordVerdict(recordType: string, recordId: string): RecordVe
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
 
+/** Get the sourcing verdict for a specific field of a record.
+ * Returns null if no per-field verdict exists for this field. */
+export function getFieldVerdict(recordType: string, recordId: string, fieldName: string): RecordVerdict | null {
+  return getRecordVerdicts()[`${recordType}:${recordId}:${fieldName}`] ?? null;
+}
+
+/** Get all per-field verdicts for a specific record.
+ * Returns a map of fieldName -> RecordVerdict. */
+export function getFieldVerdicts(recordType: string, recordId: string): Record<string, RecordVerdict> {
+  const all = getRecordVerdicts();
+  const prefix = `${recordType}:${recordId}:`;
+  const result: Record<string, RecordVerdict> = {};
+  for (const [key, v] of Object.entries(all)) {
+    if (key.startsWith(prefix)) {
+      const fieldName = key.slice(prefix.length);
+      result[fieldName] = v;
+    }
+  }
+  return result;
+}
+
 /** Get source-check stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): {
   total: number;
@@ -1108,6 +1129,9 @@ export function getRecordVerdictStats(recordType: string): {
   const validVerdicts = new Set(['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked']);
   for (const [key, v] of Object.entries(verdicts)) {
     if (!key.startsWith(`${recordType}:`)) continue;
+    // Skip per-field entries (three segments: "grant:g_abc123:amount")
+    // Only count row-level entries (two segments: "grant:g_abc123")
+    if (key.split(":").length > 2) continue;
     stats.total++;
     if (validVerdicts.has(v.verdict)) {
       stats[v.verdict as 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial' | 'unchecked']++;
