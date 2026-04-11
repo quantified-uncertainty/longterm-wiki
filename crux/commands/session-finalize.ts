@@ -84,11 +84,8 @@ async function finalizeCommand(
       title: result.title,
       summary: result.summary?.slice(0, 500),
       model: result.model,
-      cost: result.cost.costString,
-      costCents: result.cost.totalCostCents,
       durationMinutes: result.durationMinutes,
       branch: result.branch,
-      messageCount: result.cost.messageCount,
       lineCount: result.lineCount,
     }, null, 2);
 
@@ -109,7 +106,7 @@ async function finalizeCommand(
     return {
       exitCode: 0,
       output: `${c.yellow}Wiki server not reachable — skipping session finalize.${c.reset}\n` +
-        `${c.dim}Parsed: ${result.cost.costString}, ${result.durationMinutes ?? '?'}min, model=${result.model ?? 'unknown'}${c.reset}`,
+        `${c.dim}Parsed: ${result.durationMinutes ?? '?'}min, model=${result.model ?? 'unknown'}${c.reset}`,
     };
   }
 
@@ -128,7 +125,7 @@ async function finalizeCommand(
       return {
         exitCode: 0,
         output: `${c.yellow}No feature branch detected — skipping session finalize.${c.reset}\n` +
-          `${c.dim}Parsed: ${result.cost.costString}, ${result.durationMinutes ?? '?'}min${c.reset}`,
+          `${c.dim}Parsed: ${result.durationMinutes ?? '?'}min${c.reset}`,
       };
     }
 
@@ -137,7 +134,7 @@ async function finalizeCommand(
       return {
         exitCode: 0,
         output: `${c.yellow}No agent session found for branch "${branch}" — skipping.${c.reset}\n` +
-          `${c.dim}Parsed: ${result.cost.costString}, ${result.durationMinutes ?? '?'}min${c.reset}`,
+          `${c.dim}Parsed: ${result.durationMinutes ?? '?'}min${c.reset}`,
       };
     }
 
@@ -150,10 +147,6 @@ async function finalizeCommand(
   if (result.title) updates.title = result.title;
   if (result.summary) updates.summary = result.summary;
   if (result.model) updates.model = result.model;
-  if (result.cost.totalCostCents > 0) {
-    updates.costCents = result.cost.totalCostCents;
-    updates.cost = result.cost.costString;
-  }
   if (result.durationMinutes !== null) {
     updates.durationMinutes = result.durationMinutes;
     // Also produce a human-readable duration string
@@ -189,10 +182,8 @@ async function finalizeCommand(
 
   const lines = [
     `${c.green}✓${c.reset} Session #${agentSessionId} finalized`,
-    `  Cost: ${c.bold}${result.cost.costString}${c.reset}`,
     `  Model: ${result.model ?? 'unknown'}`,
     `  Duration: ${result.durationMinutes ?? '?'} min`,
-    `  Messages: ${result.cost.messageCount}`,
   ];
   if (result.title) lines.push(`  Title: ${result.title.slice(0, 80)}`);
 
@@ -211,7 +202,7 @@ export function getHelp(): string {
   return `
 Session Finalize — parse JSONL transcript and PATCH agent session metadata
 
-Extracts title, summary, cost, model, and duration from the Claude Code
+Extracts title, summary, model, and duration from the Claude Code
 session transcript and writes them to the agent_sessions database.
 
 Usage:

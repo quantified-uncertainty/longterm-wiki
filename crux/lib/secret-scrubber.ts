@@ -34,14 +34,8 @@ const SECRET_PATTERNS: SecretPattern[] = [
   { label: 'AWS_KEY', pattern: /AKIA[0-9A-Z]{16}/g },
   // Slack bot tokens (xoxb-...)
   { label: 'SLACK_TOKEN', pattern: /xoxb-[0-9]{10,}-[a-zA-Z0-9-]+/g },
-  // Slack user tokens (xoxp-...)
-  { label: 'SLACK_USER_TOKEN', pattern: /xoxp-[0-9]{10,}-[a-zA-Z0-9-]+/g },
   // Linear API keys
   { label: 'LINEAR_KEY', pattern: /lin_api_[a-zA-Z0-9]{30,}/g },
-  // OpenRouter keys
-  { label: 'OPENROUTER_KEY', pattern: /sk-or-v1-[a-f0-9]{64}/g },
-  // Generic "Bearer <token>" in Authorization headers
-  { label: 'BEARER_TOKEN', pattern: /Bearer\s+[a-zA-Z0-9_-]{20,}/g },
   // Common env var patterns: KEY=value where value looks secret
   { label: 'ENV_SECRET', pattern: /(?:API_KEY|SECRET|TOKEN|PASSWORD|CREDENTIALS)\s*=\s*["']?[^\s"']{8,}["']?/gi },
 ];

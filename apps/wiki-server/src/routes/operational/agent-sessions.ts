@@ -211,7 +211,6 @@ const agentSessionsApp = new Hono()
       const missing: string[] = [];
       if (!result.title) missing.push("title");
       if (!result.summary) missing.push("summary");
-      if (result.costCents === null && !result.cost) missing.push("cost");
       if (missing.length > 0) {
         logger.warn({ sessionId: id, missing }, "Session marked completed with missing required fields");
         return c.json({

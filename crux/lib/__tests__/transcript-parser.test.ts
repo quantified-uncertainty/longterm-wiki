@@ -1,16 +1,8 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as os from 'os';
 import { parseTranscript, findLatestTranscript } from '../transcript-parser.ts';
-
-// Suppress pricing warnings for unknown models
-beforeEach(() => {
-  vi.spyOn(console, 'warn').mockImplementation(() => {});
-});
-afterEach(() => {
-  vi.restoreAllMocks();
-});
 
 function makeJsonl(entries: Record<string, unknown>[]): string {
   return entries.map((e) => JSON.stringify(e)).join('\n');
@@ -94,7 +86,7 @@ describe('parseTranscript', () => {
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
 
-  it('computes cost from usage data', () => {
+  it('extracts primary model from assistant messages', () => {
     const filePath = writeTmpFile(makeJsonl([
       {
         type: 'assistant',
@@ -107,9 +99,6 @@ describe('parseTranscript', () => {
       },
     ]));
     const result = parseTranscript(filePath);
-    // 1M input * $3/M + 100K output * $15/M = $4.50
-    expect(result.cost.totalCostUsd).toBeCloseTo(4.50, 2);
-    expect(result.cost.costString).toBe('$4.50');
     expect(result.model).toBe('claude-sonnet-4-6');
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
@@ -171,7 +160,7 @@ describe('parseTranscript', () => {
     const result = parseTranscript(filePath);
     expect(result.title).toBeNull();
     expect(result.summary).toBeNull();
-    expect(result.cost.totalCostUsd).toBe(0);
+    expect(result.model).toBeNull();
     expect(result.durationMinutes).toBeNull();
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
