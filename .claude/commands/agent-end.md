@@ -29,23 +29,9 @@ pnpm crux sys agent-checklist complete 2>/dev/null || true
 
 If the checklist doesn't exist (e.g., quick fix session), that's fine — skip it.
 
-## Step 2: Update GitHub issue (if applicable)
+## Step 2: Update Linear issue (primary — if applicable)
 
-If this session was working on a GitHub issue and a PR was created:
-
-```bash
-pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
-```
-
-If no PR was created (research/abandoned), just remove the working label:
-
-```bash
-gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
-```
-
-## Step 2b: Update Linear issue (if applicable)
-
-If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate.
+**Linear is the primary issue tracker.** If the session was working on a Linear issue (look for `> Linear: QUA-NNN` in `.claude/wip-checklist.md`, or if the branch matches `claude/qua-NNN-*`), move it to the right terminal state so the Linear backlog stays accurate.
 
 Set `PR_URL` first — if a PR was created during this session, export it; if not, leave it empty so the issue goes straight to `Done`:
 
@@ -75,6 +61,20 @@ fi
 ```
 
 Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` suffix makes the Linear update best-effort so a missing key doesn't interrupt the rest of `/agent-end`. If Linear updates fail, fix the key and rerun `pnpm crux linear done <QUA-NNN>` manually — Linear is the source of truth for project status and leaving "In Progress" drift is bad.
+
+## Step 2b: Update legacy GitHub issue (if applicable)
+
+If this session was working on a legacy GitHub issue (not a Linear issue) and a PR was created:
+
+```bash
+pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
+```
+
+If no PR was created (research/abandoned), just remove the working label:
+
+```bash
+gh api repos/quantified-uncertainty/longterm-wiki/issues/<N>/labels/agent:working -X DELETE 2>/dev/null || true
+```
 
 ## Step 3: Stop patrol daemon (if running)
 

@@ -6,7 +6,7 @@ effort: medium
 
 # Adversarial QA Sweep
 
-Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions, and data integrity issues. Produces a prioritized findings report and files GitHub issues for real bugs.
+Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions, and data integrity issues. Produces a prioritized findings report and files Linear issues for real bugs.
 
 **Schedule:** `/loop 24h /maintain-qa-sweep` for daily runs using your Claude Code subscription.
 
@@ -32,7 +32,7 @@ Systematic adversarial audit of the wiki. Finds bugs, broken pages, regressions,
 1. `pnpm crux qa-sweep` runs deterministic checks (duplicate IDs, broken refs, tests, gate)
 2. This skill adds LLM-driven agents on top (production site audit, code review of recent changes)
 3. Findings are compiled into a P0/P1/P2 report
-4. P0 bugs get fixed; P1/P2 get filed as GitHub issues
+4. P0 bugs get fixed; P1/P2 get filed as Linear issues
 
 **Relationship to other commands:**
 - `/maintain` — day-to-day cleanup (close issues, fix cruft)
@@ -322,12 +322,11 @@ Include the coverage table in the report.
 
 **QA sweeps override the normal conservative filing limits.** The whole purpose of a sweep is to find and file issues. Rules:
 
-- **File one GitHub issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
+- **File one Linear issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
 - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
-- Use `pnpm crux issues create` with `--model=haiku` for each.
-- **Expected volume:** 5-15 issues per deep sweep is normal. The daily cap of 5 from `proactive-github-filing.md` does NOT apply to QA sweeps.
-- Label all issues with the appropriate severity label if available.
-- **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a GitHub issue. If you compiled it into the report, file it.
+- Use `pnpm crux linear create "title" --description="..."` for each.
+- **Expected volume:** 5-15 issues per deep sweep is normal.
+- **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a Linear issue. If you compiled it into the report, file it.
 
 ### Persist the full report to a GitHub Discussion
 
@@ -355,8 +354,8 @@ If #2650 has been closed or replaced for some reason (verify by running `pnpm cr
 | Severity | Action |
 |----------|--------|
 | **P0** (active bug) | Fix it now in a branch, open a PR |
-| **P1** (latent bug) | File a GitHub issue (already done above) |
-| **P2** (quality/UX) | File a GitHub issue (already done above) |
+| **P1** (latent bug) | File a Linear issue (already done above) |
+| **P2** (quality/UX) | File a Linear issue (already done above) |
 
 After fixing P0s, run `/agent-push-and-verify` to ship.
 

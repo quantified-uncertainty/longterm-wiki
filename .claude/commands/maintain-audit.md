@@ -232,7 +232,7 @@ Produce a structured report. Be specific and evidence-based — include line cou
 
 For each recommendation:
 - **Quick wins** (< 30 min, safe): Do them in this session if time allows
-- **Medium items**: File a GitHub issue with the evidence from the report (`pnpm crux gh issues create`)
+- **Medium items**: File a Linear issue with the evidence from the report (`pnpm crux linear create`)
 - **Architectural decisions**: Note them for the user to discuss — don't file issues for things that need human judgment
 
 ## Guardrails

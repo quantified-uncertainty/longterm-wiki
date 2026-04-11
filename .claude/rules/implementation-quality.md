@@ -4,7 +4,7 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 
 ## Persistence
 
-- When stuck after 3 approaches, stop and document what failed. Research alternatives or file a GitHub issue with findings and ask the user — do not ship a broken version.
+- When stuck after 3 approaches, stop and document what failed. Research alternatives or file a Linear issue with findings and ask the user — do not ship a broken version.
 - If scope is too large to do thoroughly, split into independently-shippable pieces. A thorough version of a smaller thing beats a shallow version of the whole thing.
 
 ## Testing Depth

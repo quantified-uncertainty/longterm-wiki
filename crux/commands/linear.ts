@@ -1,17 +1,18 @@
 /**
- * Linear Command Handlers
+ * Linear Command Handlers — Primary Issue Tracker
  *
- * Track Claude Code work on Linear issues: list, search, comment,
- * signal start/done. Mirrors `crux gh issues` for Linear.
+ * Linear is the primary issue tracker for longterm-wiki. All new issues
+ * should be created here, not in GitHub Issues.
  *
  * Usage:
  *   crux linear view <QUA-NNN>          Show full issue + comments
  *   crux linear search <query>          Search QUA team issues
+ *   crux linear create <title>          Create a new issue
  *   crux linear comment <QUA-NNN> <msg> Post a comment
  *   crux linear start <QUA-NNN>         Move to In Progress + start comment
  *   crux linear done <QUA-NNN> --pr=URL Move to In Review + done comment
- *   crux linear states-list                    Print current QUA team workflow states
- *   crux linear parse <string>                 Extract a Linear ID from a string (debug)
+ *   crux linear states-list             Print current QUA team workflow states
+ *   crux linear parse <string>          Extract a Linear ID from a string (debug)
  */
 
 import { readFileSync } from 'fs';
@@ -19,17 +20,15 @@ import { createLogger } from '../lib/output.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
   commentOnIssue,
+  createIssue,
   getComments,
   getIssue,
-  listReadyIssues,
-  rankReadyIssues,
   searchIssues,
   updateIssueState,
 } from '../lib/linear/issues.ts';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
-import { githubApi, REPO } from '../lib/github.ts';
 
 interface CommandOptions extends BaseOptions {
   ci?: boolean;
@@ -37,6 +36,9 @@ interface CommandOptions extends BaseOptions {
   pr?: string;
   limit?: string;
   bodyFile?: string;
+  description?: string;
+  descriptionFile?: string;
+  priority?: string;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -210,27 +212,11 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   // If there's a PR, move to In Review and let the merge move it to Done later.
-  // Without a PR, auto-detect an open PR for the current branch before going to Done.
-  // This prevents subagents from prematurely moving issues to Done when a PR is open.
-  let prUrl = options.pr;
-  if (!prUrl) {
-    try {
-      const branch = currentBranch();
-      const prs = await githubApi<Array<{ html_url: string }>>(
-        `/repos/${REPO}/pulls?head=quantified-uncertainty:${branch}&state=open`
-      );
-      if (prs.length > 0) {
-        prUrl = prs[0].html_url;
-      }
-    } catch {
-      // Best-effort — if GitHub is unreachable, fall through to Done
-    }
-  }
-
-  const targetState = prUrl ? 'In Review' : 'Done';
+  // Without a PR, go straight to Done (coordinator sessions, docs-only, etc.).
+  const targetState = options.pr ? 'In Review' : 'Done';
   await updateIssueState(id, targetState);
 
-  const prLine = prUrl ? `\n**PR:** ${prUrl}` : '';
+  const prLine = options.pr ? `\n**PR:** ${options.pr}` : '';
   await commentOnIssue(
     id,
     `🤖 Claude Code finished work on this issue.${prLine}`,
@@ -238,10 +224,7 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
 
   let out = '';
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → ${targetState}\n`;
-  if (prUrl) {
-    out += `  PR: ${prUrl}\n`;
-    if (!options.pr) out += `  ${c.dim}(auto-detected from branch)${c.reset}\n`;
-  }
+  if (options.pr) out += `  PR: ${options.pr}\n`;
   return { output: out, exitCode: 0 };
 }
 
@@ -274,99 +257,34 @@ async function parse(args: string[], options: CommandOptions): Promise<CommandRe
   return { output: `${id}\n`, exitCode: 0 };
 }
 
-// ---------------------------------------------------------------------------
-// Next / List — agent dispatch helpers
-// ---------------------------------------------------------------------------
-
-async function list(_args: string[], options: CommandOptions): Promise<CommandResult> {
+async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const limit = options.limit ? parseInt(options.limit, 10) : 50;
-  const issues = await listReadyIssues(limit);
-  const ranked = rankReadyIssues(issues);
+  const title = args.filter((a) => !a.startsWith('--')).join(' ').trim();
+  if (!title) {
+    return {
+      output: `${c.red}Usage: crux linear create "Issue title" [--description="..."] [--description-file=<path>] [--priority=1-4]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  // Resolve description from flag, file, or stdin
+  const descFromFile = readBodyFlag(options.descriptionFile);
+  const description = descFromFile ?? options.description ?? '';
+
+  // Parse priority (Linear: 0=none, 1=urgent, 2=high, 3=medium, 4=low)
+  const priority = options.priority ? parseInt(options.priority, 10) : undefined;
+
+  const result = await createIssue({ title, description, priority });
 
   if (options.json) {
-    return { output: JSON.stringify(ranked, null, 2) + '\n', exitCode: 0 };
+    return { output: JSON.stringify(result, null, 2) + '\n', exitCode: 0 };
   }
-
-  if (ranked.length === 0) {
-    return { output: `${c.dim}No ready issues found (Todo/Backlog) in QUA team.${c.reset}\n`, exitCode: 0 };
-  }
-
-  let out = `${c.bold}${ranked.length} ready issue(s) in QUA team:${c.reset}\n\n`;
-  for (const r of ranked) {
-    const pri = priorityLabel(r.priority);
-    const blocked = r.blocked ? ` ${c.red}[blocked]${c.reset}` : '';
-    const assignee = r.assignee ? ` ${c.dim}(${r.assignee.name})${c.reset}` : '';
-    const state = r.state.name;
-    const labels = r.labels.nodes.map((l) => l.name).join(', ');
-    out += `  ${c.cyan}${r.identifier}${c.reset} [${state}] ${pri} (score: ${r.score})${blocked}${assignee}\n`;
-    out += `    ${r.title}\n`;
-    if (labels) out += `    ${c.dim}labels: ${labels}${c.reset}\n`;
-    out += '\n';
-  }
-  return { output: out, exitCode: 0 };
-}
-
-async function next(_args: string[], options: CommandOptions): Promise<CommandResult> {
-  const log = createLogger(options.ci);
-  const c = log.colors;
-
-  const issues = await listReadyIssues(50);
-  const ranked = rankReadyIssues(issues);
-  const available = ranked.filter((i) => !i.blocked);
-
-  if (options.json) {
-    return { output: JSON.stringify(available[0] ?? null, null, 2) + '\n', exitCode: 0 };
-  }
-
-  if (available.length === 0) {
-    const blockedCount = ranked.filter((i) => i.blocked).length;
-    let out = `${c.yellow}No available issues.${c.reset}\n`;
-    if (ranked.length > 0) {
-      out += `  ${c.dim}${ranked.length} ready issue(s) found, but ${blockedCount} blocked.${c.reset}\n`;
-    } else {
-      out += `  ${c.dim}No issues in Todo/Backlog states.${c.reset}\n`;
-    }
-    return { output: out, exitCode: 1 };
-  }
-
-  const top = available[0];
-  const pri = priorityLabel(top.priority);
-  const labels = top.labels.nodes.map((l) => l.name).join(', ');
 
   let out = '';
-  out += `${c.bold}Next issue:${c.reset}\n\n`;
-  out += `  ${c.bold}${c.cyan}${top.identifier}${c.reset} ${top.title}\n`;
-  out += `  ${c.dim}state:${c.reset} ${top.state.name}  ${c.dim}priority:${c.reset} ${pri}  ${c.dim}score:${c.reset} ${top.score}\n`;
-  out += `  ${c.dim}url:${c.reset} ${top.url}\n`;
-  if (labels) out += `  ${c.dim}labels:${c.reset} ${labels}\n`;
-  if (top.parent) out += `  ${c.dim}parent:${c.reset} ${top.parent.identifier} — ${top.parent.title}\n`;
-  if (top.project) out += `  ${c.dim}project:${c.reset} ${top.project.name}\n`;
-  if (top.assignee) out += `  ${c.dim}assignee:${c.reset} ${top.assignee.name}\n`;
-
-  if (top.description) {
-    const desc = top.description.slice(0, 600);
-    out += `\n${desc}${top.description.length > 600 ? '\n…(truncated)' : ''}\n`;
-  }
-
-  // Show the rest of the queue
-  const rest = available.slice(1, 4);
-  if (rest.length > 0) {
-    out += `\n${c.dim}Next in queue:${c.reset}\n`;
-    for (const r of rest) {
-      out += `  ${c.cyan}${r.identifier}${c.reset} ${priorityLabel(r.priority)} — ${r.title}\n`;
-    }
-  }
-
-  const blocked = ranked.filter((i) => i.blocked);
-  if (blocked.length > 0) {
-    out += `\n${c.dim}${blocked.length} blocked issue(s) skipped.${c.reset}\n`;
-  }
-
-  out += `\n${c.bold}To start:${c.reset} pnpm crux linear start ${top.identifier}\n`;
-
+  out += `${c.green}✓${c.reset} Created ${c.cyan}${result.identifier}${c.reset} — ${title}\n`;
+  out += `  ${result.url}\n`;
   return { output: out, exitCode: 0 };
 }
 
@@ -379,28 +297,31 @@ export const commands = {
   view,
   search,
   comment,
+  create,
   start,
   done,
-  next,
-  list,
   'states-list': statesList,
   parse,
 };
 
 export function getHelp(): string {
   return `
-Linear Domain — Track Claude Code work on Linear issues
+Linear Domain — Primary issue tracker for longterm-wiki
 
 Commands:
-  next                          Pick the highest-priority ready issue (Todo/Backlog)
-  list                          List all ready issues ranked by priority
   view <QUA-NNN>                Show full issue + recent comments (default)
   search <query>                Search QUA team issues
+  create <title>                Create a new issue in the QUA team
   comment <QUA-NNN> <message>   Post a comment on an issue
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
   states-list                   Show current QUA team workflow state IDs
   parse <string>                Extract a Linear ID from a string (debug helper)
+
+Options (create):
+  --description=<text>       Issue description (inline)
+  --description-file=<path>  Issue description from file (safe for multiline)
+  --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
 
 Options (comment):
   --body-file=<path>  Comment body from file (safe for multiline / escaped content)
@@ -410,14 +331,14 @@ Options (done):
 
 Global options:
   --json              Machine-readable output where supported
-  --limit=N           Max results for search/list (default: 20/50)
+  --limit=N           Max results for search (default: 20)
 
 Environment:
   LINEAR_API_KEY      Required. Stored in .env.base at the workspace root.
 
 Examples:
-  crux linear next                                           # Pick top issue
-  crux linear list                                           # See all ready issues
+  crux linear create "Broken login page" --description="The login form crashes on submit"
+  crux linear create "Add retry logic" --description-file=/tmp/desc.md --priority=3
   crux linear view QUA-184
   crux linear search "agent checklist"
   crux linear start QUA-184

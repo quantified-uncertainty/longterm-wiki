@@ -8,15 +8,15 @@ Always work on a `claude/short-description` branch. Never commit directly to `ma
 
 ### Naming convention when the task is tracked in an issue tracker
 
-When the session is working on a tracked issue, encode the issue ID in the branch name so `/agent-init` can auto-detect it and post start/done signals without manual flags:
+**Linear is the primary issue tracker.** Most work is tracked there. Encode the issue ID in the branch name so `/agent-init` can auto-detect it and post start/done signals without manual flags:
 
 | Source | Pattern | Example |
 |--------|---------|---------|
-| GitHub issue | `claude/fix-NNN-description` | `claude/fix-239-broken-scoring` |
-| Linear issue | `claude/qua-NNN-description` | `claude/qua-184-linear-integration` |
+| Linear issue (primary) | `claude/qua-NNN-description` | `claude/qua-184-linear-integration` |
+| Legacy GitHub issue | `claude/fix-NNN-description` | `claude/fix-239-broken-scoring` |
 | No tracker | `claude/<verb>-<noun>` | `claude/refactor-gate-helpers` |
 
-Both GitHub (`fix-NNN`) and Linear (`qua-NNN`) patterns are auto-detected by `crux sys agent-checklist init`. Linear detection also falls back to any bare `QUA-NNN` token in the task description, and can be overridden with `--linear=QUA-NNN`.
+Both Linear (`qua-NNN`) and GitHub (`fix-NNN`) patterns are auto-detected by `crux sys agent-checklist init`. Linear detection also falls back to any bare `QUA-NNN` token in the task description, and can be overridden with `--linear=QUA-NNN`.
 
 **Linear branch naming is critical for auto-close.** Linear's GitHub integration auto-moves issues to Done on PR merge, but only if the branch name contains `qua-NNN`. If you name the branch `claude/tier0-data-integrity` instead of `claude/qua-155-tier0-data-integrity`, Linear won't link the PR and the issue stays open after merge. `agent-checklist init` warns about this. As a fallback, `crux gh pr create` auto-injects `Fixes QUA-NNN` into the PR body.
 
@@ -40,11 +40,11 @@ This prevents the duplicate-work pattern where multiple agents independently rac
 Run `/agent-init` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
 
 ```bash
-# If working on a GitHub issue (auto-starts tracking):
-pnpm crux sys agent-checklist init --issue=N
-
-# If working on a Linear issue (auto-detected from branch, or explicit):
+# If working on a Linear issue (primary — auto-detected from branch, or explicit):
 pnpm crux sys agent-checklist init "Task description" --linear=QUA-184
+
+# If working on a legacy GitHub issue:
+pnpm crux sys agent-checklist init --issue=N
 
 # If not on any tracked issue:
 pnpm crux sys agent-checklist init "Task description" --type=X
@@ -52,7 +52,7 @@ pnpm crux sys agent-checklist init "Task description" --type=X
 
 Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`. Default: `infrastructure`.
 
-`init` automatically signals start on both GitHub (`gh issues start`) and Linear (`linear issues start`) when the respective IDs are known — you do not need to call them by hand. Both calls are best-effort: a GitHub or Linear outage never fails init.
+`init` automatically signals start on both Linear (`linear start`) and GitHub (`gh issues start`) when the respective IDs are known — you do not need to call them by hand. Both calls are best-effort: a Linear or GitHub outage never fails init.
 
 Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
@@ -60,7 +60,7 @@ Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
 **If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
 
-**If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates GitHub issues, and cleans up local artifacts.
+**If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.
 
 Every session should end with one of these. See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
 

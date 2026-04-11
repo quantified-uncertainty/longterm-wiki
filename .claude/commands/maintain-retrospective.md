@@ -160,7 +160,7 @@ Each recommendation should state:
 
 For each recommendation:
 - **Process changes** (updating rules, CLAUDE.md, or conventions): Make the change now if it's clear-cut, or note it for user discussion if it involves tradeoffs.
-- **Tooling fixes**: File a GitHub issue if you can't fix it in this session.
+- **Tooling fixes**: File a Linear issue if you can't fix it in this session.
 - **Propagate learnings**: Update `.claude/rules/` or `CLAUDE.md` with any recurring patterns identified.
 
 ## Guardrails

@@ -1,10 +1,12 @@
-# Proactive GitHub Filing — When Agents Should Create Issues, Comments, and Discussions
+# Proactive Issue Filing — When Agents Should Create Issues
 
-Agents should **actively contribute to the project's issue tracker** — not just consume issues, but create them. When you encounter friction, bugs, tech debt, missing docs, or improvement opportunities during a session, capture them in GitHub so they're not lost.
+**Linear is the primary issue tracker.** All new issues go in Linear (QUA team), not GitHub Issues.
+
+Agents should **actively contribute to the project's issue tracker** — not just consume issues, but create them. When you encounter friction, bugs, tech debt, missing docs, or improvement opportunities during a session, capture them in Linear so they're not lost.
 
 ## When to File a New Issue
 
-File a GitHub issue when you encounter any of the following during normal work:
+File an issue when you encounter any of the following during normal work:
 
 | Trigger | Example | Priority |
 |---------|---------|----------|
@@ -39,35 +41,28 @@ File a GitHub issue when you encounter any of the following during normal work:
 **This is mandatory.** Before creating any issue, check if it already exists:
 
 ```bash
-pnpm crux gh issues search "your topic here"
-pnpm crux gh issues search "your topic here" --closed   # also check resolved issues
+pnpm crux linear search "your topic here"
 ```
 
-- **Match found (open)** → Add a comment: `pnpm crux gh issues comment <N> "your finding"`
-- **Match found (closed)** → Check if the fix resolved your concern. If not, file a new issue referencing it.
+- **Match found (open)** → Add a comment: `pnpm crux linear comment QUA-NNN "your finding"`
 - **No match** → File a new issue
 
 ## How to File
 
 ```bash
-pnpm crux gh issues create "Descriptive title" \
-  --problem="What's wrong and why it matters" \
-  --model=haiku \
-  --criteria="Fix applied|Tests pass|CI green" \
-  --label=enhancement
+pnpm crux linear create "Descriptive title" \
+  --description="What's wrong and why it matters"
 ```
 
-For longer descriptions, use `--problem-file=/tmp/problem.md`. Run `crux gh issues create --help` for full options.
+For longer descriptions, use `--description-file=/tmp/description.md`.
 
 **File issues immediately when you notice them** — don't defer. The search + create flow takes under 30 seconds. Then continue your primary work.
 
 ## Guardrails
 
-- **Evidence required**: `crux gh issues create` requires `--problem`, `--file`, or `--evidence`. You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
-- **Soft daily warning**: After 5 issues/day, `crux gh issues create` shows a warning suggesting you batch remaining items into an umbrella issue. There is no hard block.
-- **Agent-labeled**: All agent-filed issues are auto-labeled `agent:filed` for tracking.
+- **Evidence required**: You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
 
 ## GitHub Discussions
 
-Use `crux gh epic create` for **open-ended questions** that don't have a clear fix ("Should we restructure X?", "What's our strategy for Y?"). Issues are for concrete actionable tasks; discussions are for decisions that need human input.
+Use `crux gh epic create` for **open-ended questions** that don't have a clear fix ("Should we restructure X?", "What's our strategy for Y?"). Issues are for concrete actionable tasks; discussions are for decisions that need human input. Discussions stay on GitHub — they are not tracked in Linear.
