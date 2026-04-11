@@ -21,6 +21,8 @@ import {
   commentOnIssue,
   getComments,
   getIssue,
+  listReadyIssues,
+  rankReadyIssues,
   searchIssues,
   updateIssueState,
 } from '../lib/linear/issues.ts';
@@ -253,6 +255,102 @@ async function parse(args: string[], options: CommandOptions): Promise<CommandRe
 }
 
 // ---------------------------------------------------------------------------
+// Next / List — agent dispatch helpers
+// ---------------------------------------------------------------------------
+
+async function list(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const limit = options.limit ? parseInt(options.limit, 10) : 50;
+  const issues = await listReadyIssues(limit);
+  const ranked = rankReadyIssues(issues);
+
+  if (options.json) {
+    return { output: JSON.stringify(ranked, null, 2) + '\n', exitCode: 0 };
+  }
+
+  if (ranked.length === 0) {
+    return { output: `${c.dim}No ready issues found (Todo/Backlog) in QUA team.${c.reset}\n`, exitCode: 0 };
+  }
+
+  let out = `${c.bold}${ranked.length} ready issue(s) in QUA team:${c.reset}\n\n`;
+  for (const r of ranked) {
+    const pri = priorityLabel(r.priority);
+    const blocked = r.blocked ? ` ${c.red}[blocked]${c.reset}` : '';
+    const assignee = r.assignee ? ` ${c.dim}(${r.assignee.name})${c.reset}` : '';
+    const state = r.state.name;
+    const labels = r.labels.nodes.map((l) => l.name).join(', ');
+    out += `  ${c.cyan}${r.identifier}${c.reset} [${state}] ${pri} (score: ${r.score})${blocked}${assignee}\n`;
+    out += `    ${r.title}\n`;
+    if (labels) out += `    ${c.dim}labels: ${labels}${c.reset}\n`;
+    out += '\n';
+  }
+  return { output: out, exitCode: 0 };
+}
+
+async function next(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const issues = await listReadyIssues(50);
+  const ranked = rankReadyIssues(issues);
+  const available = ranked.filter((i) => !i.blocked);
+
+  if (options.json) {
+    return { output: JSON.stringify(available[0] ?? null, null, 2) + '\n', exitCode: 0 };
+  }
+
+  if (available.length === 0) {
+    const blockedCount = ranked.filter((i) => i.blocked).length;
+    let out = `${c.yellow}No available issues.${c.reset}\n`;
+    if (ranked.length > 0) {
+      out += `  ${c.dim}${ranked.length} ready issue(s) found, but ${blockedCount} blocked.${c.reset}\n`;
+    } else {
+      out += `  ${c.dim}No issues in Todo/Backlog states.${c.reset}\n`;
+    }
+    return { output: out, exitCode: 1 };
+  }
+
+  const top = available[0];
+  const pri = priorityLabel(top.priority);
+  const labels = top.labels.nodes.map((l) => l.name).join(', ');
+
+  let out = '';
+  out += `${c.bold}Next issue:${c.reset}\n\n`;
+  out += `  ${c.bold}${c.cyan}${top.identifier}${c.reset} ${top.title}\n`;
+  out += `  ${c.dim}state:${c.reset} ${top.state.name}  ${c.dim}priority:${c.reset} ${pri}  ${c.dim}score:${c.reset} ${top.score}\n`;
+  out += `  ${c.dim}url:${c.reset} ${top.url}\n`;
+  if (labels) out += `  ${c.dim}labels:${c.reset} ${labels}\n`;
+  if (top.parent) out += `  ${c.dim}parent:${c.reset} ${top.parent.identifier} — ${top.parent.title}\n`;
+  if (top.project) out += `  ${c.dim}project:${c.reset} ${top.project.name}\n`;
+  if (top.assignee) out += `  ${c.dim}assignee:${c.reset} ${top.assignee.name}\n`;
+
+  if (top.description) {
+    const desc = top.description.slice(0, 600);
+    out += `\n${desc}${top.description.length > 600 ? '\n…(truncated)' : ''}\n`;
+  }
+
+  // Show the rest of the queue
+  const rest = available.slice(1, 4);
+  if (rest.length > 0) {
+    out += `\n${c.dim}Next in queue:${c.reset}\n`;
+    for (const r of rest) {
+      out += `  ${c.cyan}${r.identifier}${c.reset} ${priorityLabel(r.priority)} — ${r.title}\n`;
+    }
+  }
+
+  const blocked = ranked.filter((i) => i.blocked);
+  if (blocked.length > 0) {
+    out += `\n${c.dim}${blocked.length} blocked issue(s) skipped.${c.reset}\n`;
+  }
+
+  out += `\n${c.bold}To start:${c.reset} pnpm crux linear start ${top.identifier}\n`;
+
+  return { output: out, exitCode: 0 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -263,6 +361,8 @@ export const commands = {
   comment,
   start,
   done,
+  next,
+  list,
   'states-list': statesList,
   parse,
 };
@@ -272,6 +372,8 @@ export function getHelp(): string {
 Linear Domain — Track Claude Code work on Linear issues
 
 Commands:
+  next                          Pick the highest-priority ready issue (Todo/Backlog)
+  list                          List all ready issues ranked by priority
   view <QUA-NNN>                Show full issue + recent comments (default)
   search <query>                Search QUA team issues
   comment <QUA-NNN> <message>   Post a comment on an issue
@@ -288,12 +390,14 @@ Options (done):
 
 Global options:
   --json              Machine-readable output where supported
-  --limit=N           Max results for search (default: 20)
+  --limit=N           Max results for search/list (default: 20/50)
 
 Environment:
   LINEAR_API_KEY      Required. Stored in .env.base at the workspace root.
 
 Examples:
+  crux linear next                                           # Pick top issue
+  crux linear list                                           # See all ready issues
   crux linear view QUA-184
   crux linear search "agent checklist"
   crux linear start QUA-184
