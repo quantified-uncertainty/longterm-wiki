@@ -235,5 +235,58 @@ export async function searchIssues(
   return data.searchIssues.nodes;
 }
 
+/**
+ * Fetch issues filtered by workflow state type(s).
+ *
+ * Uses Linear's `issues` query with a filter, not the free-text `searchIssues`.
+ * `stateTypes` maps to Linear's internal type enum: "backlog", "unstarted",
+ * "started", "completed", "canceled".
+ */
+export async function listIssuesByStateType(
+  stateTypes: string[],
+  limit = 50,
+  teamId: string = QUA_TEAM_ID,
+): Promise<LinearTriageIssue[]> {
+  const data = await linearGraphQL<{
+    issues: { nodes: LinearTriageIssue[] };
+  }>(
+    `query IssuesByState($filter: IssueFilter!, $limit: Int!) {
+      issues(filter: $filter, first: $limit, orderBy: updatedAt) {
+        nodes {
+          identifier
+          title
+          priority
+          updatedAt
+          state { name type }
+          assignee { name }
+          parent { identifier title }
+          project { name }
+          labels { nodes { name } }
+        }
+      }
+    }`,
+    {
+      filter: {
+        team: { id: { eq: teamId } },
+        state: { type: { in: stateTypes } },
+      },
+      limit,
+    },
+  );
+  return data.issues.nodes;
+}
+
+export interface LinearTriageIssue {
+  identifier: string;
+  title: string;
+  priority: number;
+  updatedAt: string;
+  state: { name: string; type: string };
+  assignee: { name: string } | null;
+  parent: { identifier: string; title: string } | null;
+  project: { name: string } | null;
+  labels: { nodes: Array<{ name: string }> };
+}
+
 /** Convenience re-export so callers import everything from one module. */
 export { linearIssueUrl };

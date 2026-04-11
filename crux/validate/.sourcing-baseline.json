@@ -1,9 +1,9 @@
 {
-  "hyphenated": 859,
-  "camelCase": 138,
-  "PascalCase": 298,
+  "hyphenated": 864,
+  "camelCase": 135,
+  "PascalCase": 301,
   "route": 66,
-  "total": 1361,
-  "updatedAt": "2026-04-10T21:08:51.315Z",
+  "total": 1366,
+  "updatedAt": "2026-04-10T22:36:38.754Z",
   "notes": "Ratchet baseline for source-check → sourcing rename. Only lower this value; never raise without justification. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella)."
 }

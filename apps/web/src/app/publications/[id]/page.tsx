@@ -9,7 +9,10 @@ import {
   getPageById,
   getEntityHref,
 } from "@/data";
+import { getRecordVerdict } from "@/data/tablebase";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
+import { SourceCheckDot } from "@/components/source-check/SourceCheckDot";
+import { recordVerdictToStatus } from "@/components/source-check/source-check-status";
 import {
   PublicationResourcesTable,
   type PublicationResourceRow,
@@ -73,6 +76,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
 
   if (!pub) notFound();
 
+  const pubVerdict = getRecordVerdict("publication", pub.id);
   const resources = getResourcesForPublication(pub.id);
 
   const pageSet = new Set<string>();
@@ -105,7 +109,15 @@ export default async function PublicationDetailPage({ params }: PageProps) {
 
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold mb-2">{pub.name}</h1>
+        <div className="flex items-start gap-3 mb-2">
+          <h1 className="text-2xl font-bold flex-1">{pub.name}</h1>
+          <SourceCheckDot
+            status={recordVerdictToStatus(pubVerdict?.verdict)}
+            originalVerdict={pubVerdict?.verdict}
+            size="md"
+            href={pubVerdict?.verdict ? `/source-checks/publication/${encodeURIComponent(pub.id)}` : undefined}
+          />
+        </div>
 
         <div className="flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm text-muted-foreground">
           <span className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded bg-muted">
