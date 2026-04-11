@@ -19,6 +19,11 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
   personnel: true,
   // Grants: 99.5% coverage (5078 confirmed / 5102 actionable), enabled 2026-04-08
   grants: true,
+  // Phase 7 expansion (QUA-248), enabled 2026-04-11:
+  "funding-rounds": true,
+  "funding-programs": true,
+  divisions: true,
+  "policy-stakeholders": true,
 };
 
 /**
