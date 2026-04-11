@@ -27,6 +27,7 @@ import {
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
+import { githubApi, REPO } from '../lib/github.ts';
 
 interface CommandOptions extends BaseOptions {
   ci?: boolean;
@@ -207,11 +208,27 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   // If there's a PR, move to In Review and let the merge move it to Done later.
-  // Without a PR, go straight to Done (coordinator sessions, docs-only, etc.).
-  const targetState = options.pr ? 'In Review' : 'Done';
+  // Without a PR, auto-detect an open PR for the current branch before going to Done.
+  // This prevents subagents from prematurely moving issues to Done when a PR is open.
+  let prUrl = options.pr;
+  if (!prUrl) {
+    try {
+      const branch = currentBranch();
+      const prs = await githubApi<Array<{ html_url: string }>>(
+        `/repos/${REPO}/pulls?head=quantified-uncertainty:${branch}&state=open`
+      );
+      if (prs.length > 0) {
+        prUrl = prs[0].html_url;
+      }
+    } catch {
+      // Best-effort — if GitHub is unreachable, fall through to Done
+    }
+  }
+
+  const targetState = prUrl ? 'In Review' : 'Done';
   await updateIssueState(id, targetState);
 
-  const prLine = options.pr ? `\n**PR:** ${options.pr}` : '';
+  const prLine = prUrl ? `\n**PR:** ${prUrl}` : '';
   await commentOnIssue(
     id,
     `🤖 Claude Code finished work on this issue.${prLine}`,
@@ -219,7 +236,10 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
 
   let out = '';
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → ${targetState}\n`;
-  if (options.pr) out += `  PR: ${options.pr}\n`;
+  if (prUrl) {
+    out += `  PR: ${prUrl}\n`;
+    if (!options.pr) out += `  ${c.dim}(auto-detected from branch)${c.reset}\n`;
+  }
   return { output: out, exitCode: 0 };
 }
 
