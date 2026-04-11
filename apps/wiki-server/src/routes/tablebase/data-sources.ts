@@ -16,6 +16,7 @@ import { getDrizzleDb } from "../../db.js";
 import { sourceSnapshots, resources, resourceTabularSources } from "../../schema.js";
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Zod schemas ----
 
@@ -219,6 +220,17 @@ const dataSourcesApp = new Hono()
   .post("/sync", zv("json", SyncDataSourceSchema), async (c) => {
     const db = getDrizzleDb();
     const body = c.req.valid("json");
+
+    // Validate entity FK references (publisherEntityId is a soft FK to entities)
+    const entityIds = [body.publisherEntityId].filter(
+      (id): id is string => typeof id === "string" && id.length > 0,
+    );
+    if (entityIds.length > 0) {
+      const refError = await validateEntityRefs(c, db, [
+        { fieldName: "publisherEntityId", ids: entityIds },
+      ]);
+      if (refError) return refError;
+    }
 
     // 1. Write to new tables (PRIMARY)
     const url = body.fetchUrl ?? `urn:lw:tabular-source:${body.id}`;
