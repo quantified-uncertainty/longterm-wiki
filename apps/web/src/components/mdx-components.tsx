@@ -81,6 +81,7 @@ import { TalentFlowsContent } from "@/app/internal/talent-flows/talent-flows-con
 import { JobsDashboardContent } from "@/app/internal/jobs/jobs-content";
 import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
+import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -244,6 +245,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   JobsDashboardContent,
   DataSourcesContent,
   TablebaseCoverageContent,
+  AutomationLandscapeContent,
 
   // Table view components
   SafetyApproachesTableView,

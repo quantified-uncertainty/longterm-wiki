@@ -308,6 +308,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Data Quality", href: internalHref("data-quality-dashboard") },
         { label: "PR Dashboard", href: internalHref("pr-dashboard") },
         { label: "Agent Activity", href: internalHref("agent-activity-dashboard") },
+        { label: "Automation Landscape", href: internalHref("automation-landscape") },
       ],
     },
     {
