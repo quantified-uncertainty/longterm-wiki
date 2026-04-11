@@ -86,6 +86,9 @@ export interface AgentResult {
   cost: number;
   /** Duration in ms */
   durationMs: number;
+  /** Non-null when the run exited early — distinguishes "no unverifiable
+   *  records" from "research failed" or "no usable sources found". */
+  skipReason?: string;
 }
 
 export interface VerificationPollResult {
@@ -185,7 +188,7 @@ export async function runSourceDiscoverAgent(
 
   if (records.length === 0) {
     console.log(`[source-discover-agent] ${entityName}: no unverifiable records found.`);
-    return emptyResult(entityId, entityName, startMs);
+    return emptyResult(entityId, entityName, startMs, 'no unverifiable records');
   }
 
   // Log record type breakdown
@@ -223,7 +226,7 @@ export async function runSourceDiscoverAgent(
     console.warn(
       `[source-discover-agent] Research failed: ${err instanceof Error ? err.message : String(err)}`,
     );
-    return emptyResult(entityId, entityName, startMs);
+    return emptyResult(entityId, entityName, startMs, `research failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 
   const fetchedSources = researchResult.sources.filter(s => s.content && s.content.length >= 50);
@@ -232,7 +235,7 @@ export async function runSourceDiscoverAgent(
   );
 
   if (fetchedSources.length === 0) {
-    return emptyResult(entityId, entityName, startMs);
+    return emptyResult(entityId, entityName, startMs, 'no sources with usable content (all < 50 chars)');
   }
 
   // ─── Step 3: Register resources ───────────────────────────────────
@@ -316,37 +319,48 @@ export async function runSourceDiscoverAgent(
       }
     }
 
-    // Submit claims for each target table
+    // Submit claims for each target table, batching at 100 (API limit).
+    // All batch IDs are collected so none are silently lost.
+    const allBatchIds: string[] = [];
+
     for (const [targetTable, claims] of claimsByTable) {
       if (claims.length === 0) continue;
 
-      // Cap at 100 per batch (API limit)
-      const batch = claims.slice(0, 100);
+      // Submit in 100-claim chunks instead of silently truncating
+      for (let offset = 0; offset < claims.length; offset += 100) {
+        const batch = claims.slice(offset, offset + 100);
 
-      try {
-        const result = await proposeClaims({
-          entityId,
-          targetTable,
-          claims: batch,
-        });
+        try {
+          const result = await proposeClaims({
+            entityId,
+            targetTable,
+            claims: batch,
+          });
 
-        if (result.ok) {
-          claimsSubmitted += batch.length;
-          // Use the last batch ID (if multiple tables, they get separate batches)
-          batchId = result.data.batchId;
-          console.log(
-            `[source-discover-agent] ${entityName}: submitted ${batch.length} claims for ${targetTable} (batch: ${batchId})`,
-          );
-        } else {
+          if (result.ok) {
+            claimsSubmitted += batch.length;
+            allBatchIds.push(result.data.batchId);
+            batchId = result.data.batchId; // keep last for polling
+            console.log(
+              `[source-discover-agent] ${entityName}: submitted ${batch.length}/${claims.length} claims for ${targetTable} (batch: ${batchId})`,
+            );
+          } else {
+            console.warn(
+              `[source-discover-agent] ${entityName}: claim submission failed for ${targetTable}: ${result.message}`,
+            );
+          }
+        } catch (err: unknown) {
           console.warn(
-            `[source-discover-agent] ${entityName}: claim submission failed for ${targetTable}: ${result.message}`,
+            `[source-discover-agent] ${entityName}: claim submission error for ${targetTable}: ${err instanceof Error ? err.message : String(err)}`,
           );
         }
-      } catch (err: unknown) {
-        console.warn(
-          `[source-discover-agent] ${entityName}: claim submission error for ${targetTable}: ${err instanceof Error ? err.message : String(err)}`,
-        );
       }
+    }
+
+    if (allBatchIds.length > 1) {
+      console.log(
+        `[source-discover-agent] ${entityName}: ${allBatchIds.length} batches submitted: ${allBatchIds.join(', ')}`,
+      );
     }
   }
 
@@ -449,7 +463,12 @@ async function pollForVerification(
 // Helpers
 // ---------------------------------------------------------------------------
 
-function emptyResult(entityId: string, entityName: string, startMs: number): AgentResult {
+function emptyResult(
+  entityId: string,
+  entityName: string,
+  startMs: number,
+  skipReason?: string,
+): AgentResult {
   return {
     entityId,
     entityName,
@@ -464,5 +483,6 @@ function emptyResult(entityId: string, entityName: string, startMs: number): Age
     sources: [],
     cost: 0,
     durationMs: Date.now() - startMs,
+    ...(skipReason ? { skipReason } : {}),
   };
 }
