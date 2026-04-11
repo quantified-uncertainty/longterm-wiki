@@ -108,6 +108,10 @@ export interface Property {
   computed?: boolean;
   /** If true, values change over time (revenue, headcount). asOf = "measured at". */
   temporal?: boolean;
+  /** If true, facts with this property come from private/proprietary data and
+   *  cannot be verified by the sourcing system. The orchestrator skips them
+   *  instead of marking them "unverifiable". */
+  nonVerifiable?: boolean;
 }
 
 // ── Type Schemas ────────────────────────────────────────────────────
