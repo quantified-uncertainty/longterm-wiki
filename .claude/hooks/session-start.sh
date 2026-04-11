@@ -99,7 +99,12 @@ fi
 
 # ─── 3. Wiki server connectivity ───────────────────────────────────────────────
 
-WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
+# Prefer PROD_* vars (agent slots don't run a local wiki-server)
+if [ -n "${PROD_LONGTERMWIKI_SERVER_URL:-}" ]; then
+  WIKI_SERVER_URL="$PROD_LONGTERMWIKI_SERVER_URL"
+else
+  WIKI_SERVER_URL="${LONGTERMWIKI_SERVER_URL:-}"
+fi
 if [ -z "$WIKI_SERVER_URL" ]; then
   CONTEXT_LINES+=("ℹ Wiki server: LONGTERMWIKI_SERVER_URL not set (crux query commands unavailable)")
 else
@@ -182,7 +187,12 @@ fi
 # Runs on every session start AND resume, keeping the heartbeat fresh.
 
 if [ -n "$WIKI_SERVER_URL" ] && [ "$BRANCH" != "main" ] && [ "$BRANCH" != "detached" ]; then
-  API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
+  # Use prod API key when targeting prod server
+  if [ -n "${PROD_LONGTERMWIKI_SERVER_API_KEY:-}" ]; then
+    API_KEY="$PROD_LONGTERMWIKI_SERVER_API_KEY"
+  else
+    API_KEY="${LONGTERMWIKI_SERVER_API_KEY:-}"
+  fi
   if [ -z "$API_KEY" ]; then
     CONTEXT_LINES+=("⚠ Active agent registration skipped: LONGTERMWIKI_SERVER_API_KEY not set")
   else
