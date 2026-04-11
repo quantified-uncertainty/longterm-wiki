@@ -2,7 +2,7 @@
  * Shared helpers for LEFT JOINing source_check_verdicts into queries
  * and formatting the result into the API response shape.
  */
-import { and, eq, sql } from "drizzle-orm";
+import { and, eq, isNotNull, isNull, sql } from "drizzle-orm";
 import type { Column } from "drizzle-orm";
 import { sourceVerdicts } from "../../schema.js";
 import type { getDrizzleDb } from "../../db.js";
@@ -16,7 +16,7 @@ export function verdictJoinCondition(recordType: string, idColumn: Column) {
   return and(
     eq(sourceVerdicts.recordType, recordType),
     eq(sourceVerdicts.recordId, idColumn),
-    sql`${sourceVerdicts.fieldName} IS NULL`,
+    isNull(sourceVerdicts.fieldName),
   );
 }
 
@@ -83,7 +83,7 @@ export async function fetchFieldVerdicts(
       and(
         eq(sourceVerdicts.recordType, recordType),
         sql`${sourceVerdicts.recordId} IN (${sqlInList(recordIds)})`,
-        sql`${sourceVerdicts.fieldName} IS NOT NULL`,
+        isNotNull(sourceVerdicts.fieldName),
       ),
     );
 

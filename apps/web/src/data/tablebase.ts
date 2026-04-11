@@ -1129,6 +1129,9 @@ export function getRecordVerdictStats(recordType: string): {
   const validVerdicts = new Set(['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked']);
   for (const [key, v] of Object.entries(verdicts)) {
     if (!key.startsWith(`${recordType}:`)) continue;
+    // Skip per-field entries (three segments: "grant:g_abc123:amount")
+    // Only count row-level entries (two segments: "grant:g_abc123")
+    if (key.split(":").length > 2) continue;
     stats.total++;
     if (validVerdicts.has(v.verdict)) {
       stats[v.verdict as 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial' | 'unchecked']++;

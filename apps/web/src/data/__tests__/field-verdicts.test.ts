@@ -7,7 +7,7 @@ vi.mock("js-yaml", () => ({
   default: { load: vi.fn(() => []) },
 }));
 vi.mock("@lib/yaml", () => ({
-  loadYaml: vi.fn(() => ({})),
+  loadYaml: vi.fn(() => []),
 }));
 vi.mock("@lib/wiki-server", () => ({
   fetchFromWikiServer: vi.fn(async () => null),
@@ -15,7 +15,7 @@ vi.mock("@lib/wiki-server", () => ({
     async (_apiLoader: unknown, localLoader: () => unknown) => ({
       data: localLoader(),
       source: "local" as const,
-    })
+    }),
   ),
   fetchDetailed: vi.fn(async () => ({
     ok: false,
@@ -23,151 +23,152 @@ vi.mock("@lib/wiki-server", () => ({
   })),
   getWikiServerConfig: vi.fn(() => null),
   dataSourceLabel: vi.fn((source: string) =>
-    source === "api" ? "wiki-server API" : "local files"
+    source === "api" ? "wiki-server API" : "local files",
   ),
 }));
 
-// Sample record-verdicts.json data that includes per-field entries
-const mockRecordVerdicts = {
-  // Whole-row verdict
-  "grant:g_abc123": {
-    verdict: "confirmed",
-    confidence: 0.95,
-    sourcesChecked: 2,
-    needsRecheck: false,
-    lastComputedAt: "2026-04-01T00:00:00Z",
-  },
-  // Per-field verdicts for the same record
-  "grant:g_abc123:amount": {
-    verdict: "confirmed",
-    confidence: 0.99,
-    sourcesChecked: 1,
-    needsRecheck: false,
-    lastComputedAt: "2026-04-01T00:00:00Z",
-  },
-  "grant:g_abc123:date": {
-    verdict: "outdated",
-    confidence: 0.7,
-    sourcesChecked: 1,
-    needsRecheck: true,
-    lastComputedAt: "2026-03-15T00:00:00Z",
-  },
-  "grant:g_abc123:grantee": {
-    verdict: "contradicted",
-    confidence: 0.8,
-    sourcesChecked: 1,
-    needsRecheck: true,
-    lastComputedAt: "2026-03-20T00:00:00Z",
-  },
-  // A different record with only a row-level verdict
-  "grant:g_xyz789": {
-    verdict: "partial",
-    confidence: 0.6,
-    sourcesChecked: 1,
-    needsRecheck: false,
-    lastComputedAt: "2026-04-02T00:00:00Z",
-  },
-};
+/**
+ * Build a mock record-verdicts.json with both row-level and per-field entries.
+ *
+ * Row-level keys are two segments:  "grant:g_abc123"
+ * Per-field keys are three segments: "grant:g_abc123:amount"
+ */
+function buildMockVerdicts() {
+  return {
+    // Row-level entries (should be counted)
+    "grant:g_001": {
+      verdict: "confirmed",
+      confidence: 0.9,
+      sourcesChecked: 2,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+    "grant:g_002": {
+      verdict: "contradicted",
+      confidence: 0.8,
+      sourcesChecked: 1,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+    "grant:g_003": {
+      verdict: "partial",
+      confidence: 0.7,
+      sourcesChecked: 3,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+    // Per-field entries (should NOT be counted by getRecordVerdictStats)
+    "grant:g_001:amount": {
+      verdict: "confirmed",
+      confidence: 0.95,
+      sourcesChecked: 1,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+    "grant:g_001:recipient": {
+      verdict: "contradicted",
+      confidence: 0.6,
+      sourcesChecked: 1,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+    "grant:g_002:amount": {
+      verdict: "outdated",
+      confidence: 0.5,
+      sourcesChecked: 1,
+      needsRecheck: true,
+      lastComputedAt: "2026-03-01",
+    },
+    // Different record type (should not be counted for "grant")
+    "investment:i_001": {
+      verdict: "confirmed",
+      confidence: 0.9,
+      sourcesChecked: 2,
+      needsRecheck: false,
+      lastComputedAt: "2026-04-01",
+    },
+  };
+}
 
-// Mock minimal database.json (required by tablebase.ts module load)
+// Minimal database.json mock — just enough fields to avoid import crashes
 const mockDatabase = {
   entities: [],
   typedEntities: [],
   pages: [],
+  resources: [],
+  insights: [],
+  entityLinks: {},
+  backlinks: {},
+  redirects: {},
+  deadLinks: {},
+  externalLinksMap: {},
+  exploreItems: [],
   idRegistry: {},
   reverseIdRegistry: {},
+  graphs: [],
+  policyStakeholderIds: {},
 };
 
-beforeEach(() => {
-  vi.resetModules();
-  const mockedFs = vi.mocked(fs);
-  mockedFs.existsSync.mockReturnValue(true);
-  mockedFs.readFileSync.mockImplementation((filePath: fs.PathOrFileDescriptor) => {
-    const p = String(filePath);
-    if (p.endsWith("record-verdicts.json")) {
-      return JSON.stringify(mockRecordVerdicts);
-    }
-    if (p.endsWith("database.json")) {
-      return JSON.stringify(mockDatabase);
-    }
-    return "{}";
-  });
-});
+describe("getRecordVerdictStats — per-field entry filtering", () => {
+  beforeEach(() => {
+    // Reset module cache so the singleton _recordVerdicts is cleared between tests
+    vi.resetModules();
 
-describe("getFieldVerdict", () => {
-  it("returns the per-field verdict for a known field", async () => {
-    const { getFieldVerdict } = await import("../tablebase");
-    const verdict = getFieldVerdict("grant", "g_abc123", "amount");
-    expect(verdict).not.toBeNull();
-    expect(verdict!.verdict).toBe("confirmed");
-    expect(verdict!.confidence).toBe(0.99);
-  });
+    const mockVerdicts = buildMockVerdicts();
 
-  it("returns null for an unknown field", async () => {
-    const { getFieldVerdict } = await import("../tablebase");
-    const verdict = getFieldVerdict("grant", "g_abc123", "nonexistent");
-    expect(verdict).toBeNull();
+    // Mock readFileSync to return our test data
+    vi.mocked(fs.readFileSync).mockImplementation((filePath: unknown) => {
+      const p = String(filePath);
+      if (p.includes("record-verdicts.json")) {
+        return JSON.stringify(mockVerdicts);
+      }
+      if (p.includes("database.json")) {
+        return JSON.stringify(mockDatabase);
+      }
+      if (p.includes("factbase-data.json")) {
+        return JSON.stringify({
+          entities: {},
+          facts: {},
+          slugToEntityId: {},
+        });
+      }
+      return "{}";
+    });
+
+    vi.mocked(fs.existsSync).mockReturnValue(true);
   });
 
-  it("returns null for a record with no per-field verdicts", async () => {
-    const { getFieldVerdict } = await import("../tablebase");
-    const verdict = getFieldVerdict("grant", "g_xyz789", "amount");
-    expect(verdict).toBeNull();
+  it("counts only row-level entries, not per-field entries", async () => {
+    const { getRecordVerdictStats } = await import("../tablebase");
+
+    const stats = getRecordVerdictStats("grant");
+
+    // Should only count the 3 row-level grant entries, not the 3 per-field ones
+    expect(stats.total).toBe(3);
+    expect(stats.confirmed).toBe(1); // g_001
+    expect(stats.contradicted).toBe(1); // g_002
+    expect(stats.partial).toBe(1); // g_003
+    expect(stats.outdated).toBe(0);
+    expect(stats.unverifiable).toBe(0);
+    expect(stats.unchecked).toBe(0);
   });
 
-  it("returns null for a completely unknown record", async () => {
-    const { getFieldVerdict } = await import("../tablebase");
-    const verdict = getFieldVerdict("grant", "g_unknown", "amount");
-    expect(verdict).toBeNull();
+  it("does not count entries from other record types", async () => {
+    const { getRecordVerdictStats } = await import("../tablebase");
+
+    const stats = getRecordVerdictStats("investment");
+
+    expect(stats.total).toBe(1);
+    expect(stats.confirmed).toBe(1);
   });
 
-  it("does not confuse row-level and field-level verdicts", async () => {
-    const { getRecordVerdict, getFieldVerdict } = await import("../tablebase");
-    // Row-level should return the whole-row verdict
-    const rowVerdict = getRecordVerdict("grant", "g_abc123");
-    expect(rowVerdict).not.toBeNull();
-    expect(rowVerdict!.verdict).toBe("confirmed");
+  it("returns all zeros for a record type with no entries", async () => {
+    const { getRecordVerdictStats } = await import("../tablebase");
 
-    // Field-level for "amount" should return a different confidence
-    const fieldVerdict = getFieldVerdict("grant", "g_abc123", "amount");
-    expect(fieldVerdict).not.toBeNull();
-    expect(fieldVerdict!.confidence).toBe(0.99);
-  });
-});
+    const stats = getRecordVerdictStats("nonexistent");
 
-describe("getFieldVerdicts", () => {
-  it("returns all per-field verdicts for a record", async () => {
-    const { getFieldVerdicts } = await import("../tablebase");
-    const verdicts = getFieldVerdicts("grant", "g_abc123");
-    expect(Object.keys(verdicts)).toHaveLength(3);
-    expect(verdicts).toHaveProperty("amount");
-    expect(verdicts).toHaveProperty("date");
-    expect(verdicts).toHaveProperty("grantee");
-    expect(verdicts.amount.verdict).toBe("confirmed");
-    expect(verdicts.date.verdict).toBe("outdated");
-    expect(verdicts.grantee.verdict).toBe("contradicted");
-  });
-
-  it("returns an empty object for a record with no field verdicts", async () => {
-    const { getFieldVerdicts } = await import("../tablebase");
-    const verdicts = getFieldVerdicts("grant", "g_xyz789");
-    expect(verdicts).toEqual({});
-  });
-
-  it("returns an empty object for an unknown record", async () => {
-    const { getFieldVerdicts } = await import("../tablebase");
-    const verdicts = getFieldVerdicts("grant", "g_unknown");
-    expect(verdicts).toEqual({});
-  });
-
-  it("does not include the row-level verdict in the field verdicts map", async () => {
-    const { getFieldVerdicts } = await import("../tablebase");
-    const verdicts = getFieldVerdicts("grant", "g_abc123");
-    // The key "grant:g_abc123" (no field name) should not appear
-    // as a field in the result
-    for (const key of Object.keys(verdicts)) {
-      expect(key).not.toBe("");
-      expect(key).not.toContain(":");
-    }
+    expect(stats.total).toBe(0);
+    expect(stats.confirmed).toBe(0);
+    expect(stats.contradicted).toBe(0);
   });
 });
