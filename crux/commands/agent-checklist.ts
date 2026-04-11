@@ -170,12 +170,31 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
       `  ${c.dim}Or: include "Fixes ${linearId}" in the PR description (done automatically by \`crux gh pr create\`).${c.reset}\n`;
   }
 
+  // ── Preserve existing manual checks ────────────────────────────────────────
+  // If a checklist already exists, read its checked/N/A items so they survive
+  // re-initialization. Prevents the "reset on new commit" bug (#3906).
+  let priorItems: ReturnType<typeof parseChecklist>['items'] | null = null;
+  if (existsSync(CHECKLIST_PATH)) {
+    priorItems = parseChecklist(readFileSync(CHECKLIST_PATH, 'utf-8')).items;
+  }
+
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
   let markdown = buildChecklist(type, metadata);
 
   if (!issue) {
     const naResult = checkItems(markdown, ['issue-tracking'], '~', 'no GitHub issue for this session');
     markdown = naResult.markdown;
+  }
+
+  // Reapply preserved checks from prior checklist in a single pass
+  if (priorItems) {
+    for (const item of priorItems) {
+      const marker = item.status === 'checked' ? 'x' as const : item.status === 'na' ? '~' as const : null;
+      if (marker) {
+        const result = checkItems(markdown, [item.id], marker, item.naReason);
+        if (result.checked.length > 0) markdown = result.markdown;
+      }
+    }
   }
 
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
