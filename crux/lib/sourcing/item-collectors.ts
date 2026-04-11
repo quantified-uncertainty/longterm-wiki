@@ -191,6 +191,8 @@ export function collectFactItems(
       if (!fact.source || fact.id.startsWith('inv_')) continue;
 
       const property = graph.getProperty(fact.propertyId);
+      // Skip properties marked as not verifiable (e.g., social media handles, self-referential URLs)
+      if (property?.verifiable === false) continue;
       const formattedValue = formatFactValue(fact, property, graph);
       const existing = existingVerdicts.get(fact.id);
 
