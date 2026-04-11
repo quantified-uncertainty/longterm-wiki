@@ -49,21 +49,41 @@ interface TrendsResponse {
   }>;
 }
 
+interface TrendsByTypePoint {
+  scanRunId: string;
+  scannedAt: string;
+  avgCompleteness: number;
+  entityCount: number;
+}
+
+interface TrendsByTypeEntry {
+  recordType: string;
+  points: TrendsByTypePoint[];
+}
+
+interface TrendsByTypeResponse {
+  byType: TrendsByTypeEntry[];
+}
+
 interface DashboardData {
   items: ScannerResultItem[];
   total: number;
   scanRunId: string | null;
   trendRuns: TrendRun[];
+  trendsByType: TrendsByTypeEntry[];
 }
 
 // ── Data Loading ────────────────────────────────────────────────────
 
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
-  const [latestResult, trendsResult] = await Promise.all([
+  const [latestResult, trendsResult, trendsByTypeResult] = await Promise.all([
     fetchDetailed<LatestResponse>("/api/scanner-results/latest?limit=500", {
       revalidate: 60,
     }),
     fetchDetailed<TrendsResponse>("/api/scanner-results/trends?limit=10", {
+      revalidate: 60,
+    }),
+    fetchDetailed<TrendsByTypeResponse>("/api/scanner-results/trends-by-type?limit=7", {
       revalidate: 60,
     }),
   ]);
@@ -72,16 +92,17 @@ async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const total = latestResult.ok ? latestResult.data.total : 0;
   const scanRunId = latestResult.ok ? latestResult.data.scanRunId : null;
   const trendRuns = trendsResult.ok ? trendsResult.data.runs : [];
+  const trendsByType = trendsByTypeResult.ok ? trendsByTypeResult.data.byType : [];
 
   if (!latestResult.ok && !trendsResult.ok) {
     return latestResult;
   }
 
-  return { ok: true, data: { items, total, scanRunId, trendRuns } };
+  return { ok: true, data: { items, total, scanRunId, trendRuns, trendsByType } };
 }
 
 function emptyFallback(): DashboardData {
-  return { items: [], total: 0, scanRunId: null, trendRuns: [] };
+  return { items: [], total: 0, scanRunId: null, trendRuns: [], trendsByType: [] };
 }
 
 // ── Stats computation ────────────────────────────────────────────────
@@ -93,6 +114,10 @@ interface RecordTypeStats {
   avgCompleteness: number;
   /** Count of entities by completeness tier */
   byTier: { stub: number; basic: number; moderate: number; comprehensive: number };
+  /** Sparkline data points (avg completeness per scan run) */
+  sparkline: number[];
+  /** Change from previous scan run */
+  trendDelta: number | null;
 }
 
 function completenessTier(pct: number): "stub" | "basic" | "moderate" | "comprehensive" {
@@ -102,7 +127,10 @@ function completenessTier(pct: number): "stub" | "basic" | "moderate" | "compreh
   return "stub";
 }
 
-function computeRecordTypeStats(items: ScannerResultItem[]): RecordTypeStats[] {
+function computeRecordTypeStats(
+  items: ScannerResultItem[],
+  trendsByType: TrendsByTypeEntry[],
+): RecordTypeStats[] {
   const byType = new Map<string, {
     entityCount: number;
     totalRecords: number;
@@ -124,8 +152,23 @@ function computeRecordTypeStats(items: ScannerResultItem[]): RecordTypeStats[] {
     byType.set(item.recordType, existing);
   }
 
+  // Index sparkline data by recordType
+  const sparklineMap = new Map<string, TrendsByTypePoint[]>();
+  for (const entry of trendsByType) {
+    sparklineMap.set(entry.recordType, entry.points);
+  }
+
   const result: RecordTypeStats[] = [];
   for (const [recordType, data] of byType) {
+    const points = sparklineMap.get(recordType) ?? [];
+    const sparkline = points.map((p) => p.avgCompleteness);
+
+    // Compute trend delta from last two scan runs
+    let trendDelta: number | null = null;
+    if (points.length >= 2) {
+      trendDelta = points[points.length - 1].avgCompleteness - points[points.length - 2].avgCompleteness;
+    }
+
     result.push({
       recordType,
       entityCount: data.entityCount,
@@ -134,11 +177,76 @@ function computeRecordTypeStats(items: ScannerResultItem[]): RecordTypeStats[] {
         ? Math.round((data.completenessSum / data.entityCount) * 10) / 10
         : 0,
       byTier: data.byTier,
+      sparkline,
+      trendDelta,
     });
   }
 
   result.sort((a, b) => b.entityCount - a.entityCount);
   return result;
+}
+
+// ── Enrichment Priority ─────────────────────────────────────────────
+
+/**
+ * Compute enrichment priority score for an entity-record pair.
+ * Higher score = more important to enrich.
+ *
+ * Formula: importance * coverageGap * recordCountWeight
+ * - importance: entityImportance (0-100 scale, default 10)
+ * - coverageGap: (100 - completenessPct) / 100
+ * - recordCountWeight: log2(totalRecords + 1) to boost entities with more records
+ */
+function computeEnrichmentPriority(item: ScannerResultItem): number {
+  const importance = (item.entityImportance ?? 10) / 100;
+  const coverageGap = (100 - item.completenessPct) / 100;
+  const recordWeight = Math.log2(item.totalRecords + 1) / Math.log2(100); // normalize: ~1.0 for 100 records
+  return Math.round(importance * coverageGap * Math.max(recordWeight, 0.1) * 1000) / 1000;
+}
+
+// ── Sparkline Component ─────────────────────────────────────────────
+
+function Sparkline({ values, width = 80, height = 24 }: { values: number[]; width?: number; height?: number }) {
+  if (values.length < 2) {
+    return <span className="text-xs text-muted-foreground">-</span>;
+  }
+
+  const min = Math.min(...values);
+  const max = Math.max(...values);
+  const range = max - min || 1;
+
+  const padding = 2;
+  const innerWidth = width - padding * 2;
+  const innerHeight = height - padding * 2;
+
+  const points = values.map((v, i) => {
+    const x = padding + (i / (values.length - 1)) * innerWidth;
+    const y = padding + innerHeight - ((v - min) / range) * innerHeight;
+    return `${x},${y}`;
+  }).join(" ");
+
+  // Color based on trend direction
+  const isUp = values[values.length - 1] >= values[0];
+  const color = isUp ? "#10b981" : "#ef4444";
+
+  return (
+    <svg width={width} height={height} className="inline-block">
+      <polyline
+        points={points}
+        fill="none"
+        stroke={color}
+        strokeWidth="1.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      {/* End dot */}
+      {(() => {
+        const lastX = padding + ((values.length - 1) / (values.length - 1)) * innerWidth;
+        const lastY = padding + innerHeight - ((values[values.length - 1] - min) / range) * innerHeight;
+        return <circle cx={lastX} cy={lastY} r="2" fill={color} />;
+      })()}
+    </svg>
+  );
 }
 
 // ── Completeness Bar ────────────────────────────────────────────────
@@ -185,6 +293,24 @@ function CompletenessBar({ stats }: { stats: RecordTypeStats }) {
 
 // ── Trend Indicator ────────────────────────────────────────────────
 
+function TrendDelta({ delta }: { delta: number | null }) {
+  if (delta === null) return null;
+
+  if (Math.abs(delta) < 0.5) {
+    return <span className="text-xs text-muted-foreground">flat</span>;
+  }
+
+  return delta > 0 ? (
+    <span className="text-xs text-emerald-600 dark:text-emerald-400">
+      +{delta.toFixed(1)}%
+    </span>
+  ) : (
+    <span className="text-xs text-red-600 dark:text-red-400">
+      {delta.toFixed(1)}%
+    </span>
+  );
+}
+
 function TrendIndicator({ runs }: { runs: TrendRun[] }) {
   if (runs.length < 2) return null;
 
@@ -192,19 +318,7 @@ function TrendIndicator({ runs }: { runs: TrendRun[] }) {
   const previous = runs[1];
   const diff = latest.avgCompleteness - previous.avgCompleteness;
 
-  if (Math.abs(diff) < 0.5) {
-    return <span className="text-xs text-muted-foreground">flat</span>;
-  }
-
-  return diff > 0 ? (
-    <span className="text-xs text-emerald-600 dark:text-emerald-400">
-      +{diff.toFixed(1)}%
-    </span>
-  ) : (
-    <span className="text-xs text-red-600 dark:text-red-400">
-      {diff.toFixed(1)}%
-    </span>
-  );
+  return <TrendDelta delta={diff} />;
 }
 
 // ── Content Component ────────────────────────────────────────────────
@@ -215,8 +329,8 @@ export async function TablebaseCoverageContent() {
     emptyFallback,
   );
 
-  const { items, scanRunId, trendRuns } = data;
-  const typeStats = computeRecordTypeStats(items);
+  const { items, scanRunId, trendRuns, trendsByType } = data;
+  const typeStats = computeRecordTypeStats(items, trendsByType);
 
   // Compute global summary
   const totalEntities = items.length;
@@ -226,7 +340,16 @@ export async function TablebaseCoverageContent() {
   const totalRecords = items.reduce((s, i) => s + i.totalRecords, 0);
   const totalVerified = items.reduce((s, i) => s + i.verifiedRecords, 0);
 
-  // Transform items for enrichment queue table
+  // Worst tables (lowest avg completeness with at least 2 entities)
+  const worstTables = [...typeStats]
+    .filter((t) => t.entityCount >= 2)
+    .sort((a, b) => a.avgCompleteness - b.avgCompleteness)
+    .slice(0, 3);
+
+  // Count entities below 25% completeness
+  const belowThreshold = items.filter((i) => i.completenessPct < 25).length;
+
+  // Transform items for enrichment queue table with priority scores
   const rows: CoverageRow[] = items.map((item) => ({
     entityId: item.entityId,
     entityName: item.entityName,
@@ -237,6 +360,7 @@ export async function TablebaseCoverageContent() {
     completenessPct: item.completenessPct,
     missingFields: item.missingFields,
     entityImportance: item.entityImportance,
+    enrichmentPriority: computeEnrichmentPriority(item),
     scannedAt: item.scannedAt,
     href: getEntityHref(item.entityId),
   }));
@@ -254,7 +378,7 @@ export async function TablebaseCoverageContent() {
         <code className="text-xs bg-muted px-1 py-0.5 rounded">
           {scanRunId ?? "none"}
         </code>
-        . Use the enrichment queue below to prioritize data enrichment.
+        . Entities are ranked by <strong>enrichment priority</strong> (importance x coverage gap x record weight).
       </p>
 
       {/* Summary stats */}
@@ -264,9 +388,31 @@ export async function TablebaseCoverageContent() {
           <TrendIndicator runs={trendRuns} />
         </StatCard>
         <StatCard label="Total Records" value={totalRecords.toLocaleString()} />
-        <StatCard label="Verified Records" value={totalVerified.toLocaleString()} />
+        <StatCard label="Below 25%" value={belowThreshold.toLocaleString()} subtitle="stub tier" />
         <StatCard label="Record Types" value={typeStats.length.toLocaleString()} />
       </div>
+
+      {/* Worst-performing tables callout */}
+      {worstTables.length > 0 && (
+        <div className="rounded-lg border border-amber-200 dark:border-amber-800/50 bg-amber-50 dark:bg-amber-950/20 p-4 my-6">
+          <p className="text-sm font-medium text-amber-900 dark:text-amber-200 mb-2">
+            Lowest coverage record types
+          </p>
+          <div className="flex flex-wrap gap-4">
+            {worstTables.map((t) => (
+              <div key={t.recordType} className="text-sm">
+                <span className="font-medium">{t.recordType}</span>
+                <span className="text-amber-700 dark:text-amber-400 ml-1">
+                  {t.avgCompleteness}% avg
+                </span>
+                <span className="text-muted-foreground ml-1">
+                  ({t.entityCount} entities)
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Completeness tier legend */}
       <div className="flex flex-wrap gap-4 mb-6">
@@ -283,7 +429,7 @@ export async function TablebaseCoverageContent() {
         })}
       </div>
 
-      {/* Coverage by record type */}
+      {/* Coverage by record type with sparklines */}
       {typeStats.length > 0 && (
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-3">Coverage by Record Type</h2>
@@ -291,7 +437,11 @@ export async function TablebaseCoverageContent() {
             {typeStats.map((ts) => (
               <div key={ts.recordType}>
                 <div className="flex items-center justify-between mb-1">
-                  <span className="text-sm font-medium">{ts.recordType}</span>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-medium">{ts.recordType}</span>
+                    <Sparkline values={ts.sparkline} />
+                    <TrendDelta delta={ts.trendDelta} />
+                  </div>
                   <span className="text-xs text-muted-foreground tabular-nums">
                     {ts.entityCount} entities, {ts.totalRecords.toLocaleString()} records, avg {ts.avgCompleteness}%
                   </span>
@@ -299,6 +449,25 @@ export async function TablebaseCoverageContent() {
                 <CompletenessBar stats={ts} />
               </div>
             ))}
+          </div>
+        </div>
+      )}
+
+      {/* Overall trend sparkline */}
+      {trendRuns.length >= 2 && (
+        <div className="my-6">
+          <h2 className="text-lg font-semibold mb-3">Overall Trend</h2>
+          <div className="flex items-center gap-4 rounded-lg border border-border/60 p-4">
+            <Sparkline
+              values={[...trendRuns].reverse().map((r) => r.avgCompleteness)}
+              width={200}
+              height={40}
+            />
+            <div className="text-sm text-muted-foreground">
+              {trendRuns.length} scan runs,{" "}
+              from {new Date(trendRuns[trendRuns.length - 1].scannedAt).toLocaleDateString()}{" "}
+              to {new Date(trendRuns[0].scannedAt).toLocaleDateString()}
+            </div>
           </div>
         </div>
       )}
@@ -353,8 +522,8 @@ export async function TablebaseCoverageContent() {
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-1">Enrichment Queue</h2>
           <p className="text-sm text-muted-foreground mb-3">
-            Entities ranked by lowest completeness. Use this to prioritize data
-            enrichment work.
+            Entities ranked by enrichment priority (importance x coverage gap x record weight).
+            Higher priority = more impactful to enrich. Default sort shows highest priority first.
           </p>
           <CoverageTable
             data={rows}
@@ -385,10 +554,12 @@ export async function TablebaseCoverageContent() {
 function StatCard({
   label,
   value,
+  subtitle,
   children,
 }: {
   label: string;
   value: string;
+  subtitle?: string;
   children?: React.ReactNode;
 }) {
   return (
@@ -398,6 +569,9 @@ function StatCard({
         <p className="text-2xl font-bold tabular-nums">{value}</p>
         {children}
       </div>
+      {subtitle && (
+        <p className="text-xs text-muted-foreground mt-0.5">{subtitle}</p>
+      )}
     </div>
   );
 }
