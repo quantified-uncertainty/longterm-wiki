@@ -133,22 +133,22 @@ const entries: AutomationEntry[] = [
     file: "scheduled-maintenance.yml",
   },
   {
-    name: "Source-Check",
+    name: "Sourcing",
     type: "GHA (scheduled)",
     schedule: "Weekly Monday 04:00 UTC",
     description:
-      "Periodic source-checking of facts and records against cited URLs using Anthropic Batch API (50% cost discount).",
+      "Periodic sourcing verification of facts and records against cited URLs using Anthropic Batch API (50% cost discount).",
     status: "active",
-    file: "source-check.yml",
+    file: "sourcing.yml",
   },
   {
-    name: "Source-Check Recheck",
+    name: "Sourcing Recheck",
     type: "GHA (scheduled)",
     schedule: "Weekly Monday 08:00 UTC",
     description:
-      "Re-verifies stale source-check verdicts. Detects when previously-verified data becomes contradicted by updated sources.",
+      "Re-verifies stale sourcing verdicts. Detects when previously-verified data becomes contradicted by updated sources.",
     status: "active",
-    file: "source-check-recheck.yml",
+    file: "sourcing-recheck.yml",
   },
   {
     name: "Wiki Server Dead-Man-Switch",
