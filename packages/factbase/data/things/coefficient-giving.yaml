@@ -3,11 +3,10 @@ facts:
   # ── Total Grants ──────────────────────────────────────────────
   - id: f_AGyevCSUAA
     property: total-funding
-    value: 4e+9
+    value: 5e+9
     asOf: "2025-06"
     source: https://coefficientgiving.org/
-    notes: "Total grants disbursed since 2014 across all cause areas; lower bound
-      ($4B+)"
+    notes: "Over $5 billion in grants directed since inception across all cause areas"
 
   - id: f_r91eebAciw
     property: total-funding

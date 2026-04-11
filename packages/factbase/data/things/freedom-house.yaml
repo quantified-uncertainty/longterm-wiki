@@ -55,7 +55,7 @@ facts:
 
   - id: f_vp0kpHX4Xa
     property: staff-count
-    value: "Approximately 230 staff members worldwide with field offices in about a dozen countries including Ukraine, Hungary, Serbia, Jordan, Mexico, and Central Asia"
+    value: "Approximately 300 staff members worldwide with field offices in about a dozen countries including Ukraine, Hungary, Serbia, Jordan, Mexico, and Central Asia"
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Freedom_House
     notes: "Pre-2025 aid freeze figure. Significant reductions occurred in 2025 after >80% of programs were terminated."

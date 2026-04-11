@@ -82,18 +82,17 @@ facts:
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_adHc2022ws
     property: headcount
-    value: 15500
+    value: 25000
     asOf: 2022-12
     source: https://www.macrotrends.net/stocks/charts/AMD/amd/number-of-employees
-    notes: "15,500 employees at end of 2022; reflects partial-year Xilinx integration"
+    notes: "25,000 employees at end of 2022; reflects Xilinx acquisition integration"
 
   - id: f_adHc2023vr
     property: headcount
-    value: 25000
+    value: 26000
     asOf: 2023-12
     source: https://www.macrotrends.net/stocks/charts/AMD/amd/number-of-employees
-    notes: "25,000 employees at end of 2023; 61% increase from 2022 due to Xilinx
-      and Pensando acquisitions fully integrated"
+    notes: "26,000 employees at end of 2023; 4% increase from 2022"
 
   - id: KBIIVQuAlQ
     property: headcount

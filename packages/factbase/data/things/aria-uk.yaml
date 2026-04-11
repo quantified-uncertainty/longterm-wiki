@@ -57,8 +57,8 @@ facts:
   # ── Key Personnel ──────────────────────────────────────────────
   - id: f_PbXY92etig
     property: description
-    value: "Programme Director: David 'davidad' Dalrymple (since 2023)"
-    asOf: 2023
+    value: "Programme Director: David 'davidad' Dalrymple (since 2022)"
+    asOf: 2022
     source: https://www.aria.org.uk/programme-safeguarded-ai/
 
   - id: f_ZLM6Wsw64w
