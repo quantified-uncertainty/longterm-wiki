@@ -34,14 +34,14 @@ export type VerdictListEntry = ListVerdictsResult['verdicts'][number];
 export async function storeEvidence(
   body: Record<string, unknown>,
 ): Promise<ApiResult<StoreEvidenceResult>> {
-  return apiRequest<StoreEvidenceResult>('POST', '/api/sourcing/evidence', body);
+  return apiRequest<StoreEvidenceResult>('POST', '/api/source-checks/evidence', body);
 }
 
 /** Store an aggregate verdict for a record. */
 export async function storeVerdict(
   body: Record<string, unknown>,
 ): Promise<ApiResult<StoreVerdictResult>> {
-  return apiRequest<StoreVerdictResult>('POST', '/api/sourcing/verdicts', body);
+  return apiRequest<StoreVerdictResult>('POST', '/api/source-checks/verdicts', body);
 }
 
 /** List verdicts with optional filters. */
@@ -56,7 +56,7 @@ export async function listVerdicts(
   const qs = params.toString();
   return apiRequest<ListVerdictsResult>(
     'GET',
-    `/api/sourcing/verdicts${qs ? `?${qs}` : ''}`,
+    `/api/source-checks/verdicts${qs ? `?${qs}` : ''}`,
   );
 }
 
@@ -67,7 +67,7 @@ export async function getVerdictByRecord(
 ): Promise<ApiResult<VerdictByRecordResult>> {
   return apiRequest<VerdictByRecordResult>(
     'GET',
-    `/api/sourcing/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
+    `/api/source-checks/verdicts/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`,
   );
 }
 
@@ -82,13 +82,13 @@ export async function getEvidenceByRecord(
   const qs = params.toString();
   return apiRequest<EvidenceByRecordResult>(
     'GET',
-    `/api/sourcing/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
+    `/api/source-checks/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
   );
 }
 
 /** Get sourcing statistics. */
 export async function getSourcingStats(): Promise<ApiResult<SourcingStatsResult>> {
-  return apiRequest<SourcingStatsResult>('GET', '/api/sourcing/stats');
+  return apiRequest<SourcingStatsResult>('GET', '/api/source-checks/stats');
 }
 
 /** Get records due for re-check. */
@@ -101,6 +101,6 @@ export async function getDueForRecheck(
   const qs = params.toString();
   return apiRequest<DueForRecheckResult>(
     'GET',
-    `/api/sourcing/due-for-recheck${qs ? `?${qs}` : ''}`,
+    `/api/source-checks/due-for-recheck${qs ? `?${qs}` : ''}`,
   );
 }

@@ -52,7 +52,7 @@ export async function validateSourcingNames(): Promise<{
     // Fetch a sample of verdicts
     const verdictsResult = await apiRequest<VerdictsResponse>(
       'GET',
-      `/api/sourcing/verdicts?record_type=${recordType}&limit=20`
+      `/api/source-checks/verdicts?record_type=${recordType}&limit=20`
     );
 
     if (!verdictsResult.ok) {
@@ -92,7 +92,7 @@ export async function validateSourcingNames(): Promise<{
     const idList = [...recordIds].join(',');
     const namesResult = await apiRequest<ResolveNamesResponse>(
       'GET',
-      `/api/sourcing/resolve-names?record_type=${recordType}&record_ids=${encodeURIComponent(idList)}`
+      `/api/source-checks/resolve-names?record_type=${recordType}&record_ids=${encodeURIComponent(idList)}`
     );
 
     if (!namesResult.ok) {
