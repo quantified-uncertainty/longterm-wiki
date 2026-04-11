@@ -17,6 +17,7 @@ import type { PeopleSortKey } from "./people-sort";
 import { isPersonMeaningful } from "./people-filter";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computePersonCoverage } from "@/components/coverage/coverage-score";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface PersonRow {
   id: string;
@@ -668,7 +669,7 @@ export function PeopleTable({
                     )}
                     {/* Coverage */}
                     <td className="py-2.5 px-3 text-center">
-                      <RecordStatusDots coverageScore={computePersonCoverage(row)} verdict={row.verdictString} />
+                      <RecordStatusDots coverageScore={computePersonCoverage(row)} verdict={row.verdictString} sourcingHref={row.verdictString ? getSourcingHref("entity", row.id) : undefined} />
                     </td>
                   </tr>
                 ))}

@@ -104,7 +104,7 @@ function TimeSeriesProperty({
               </span>
               {item.fact.source && isUrl(item.fact.source) && (
                 <span className="inline-flex items-center gap-1 whitespace-nowrap">
-                  {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
+                  {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" href={`/sourcing/fact/${encodeURIComponent(item.fact.id)}`} />}
                   <a
                     href={item.fact.source}
                     className="text-xs text-primary/60 hover:text-primary hover:underline"
@@ -161,7 +161,7 @@ function SingleValueProperty({
             ({formatKBDate(fact.asOf)})
           </span>
         )}
-        {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" />}
+        {sourcing && <SourcingDot status={factbaseVerdictToStatus(sourcing)} originalVerdict={sourcing} size="sm" href={`/sourcing/fact/${encodeURIComponent(fact.id)}`} />}
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface ApproachRow {
   id: string;
@@ -142,6 +143,7 @@ export function ApproachesTable({ rows }: { rows: ApproachRow[] }) {
                   <RecordStatusDots
                     coverageScore={computeGenericCoverage({ description: row.description, tags: row.tags, wikiId: row.wikiId })}
                     verdict={row.verdictString}
+                    sourcingHref={row.verdictString ? getSourcingHref("approach", row.id) : undefined}
                   />
                 </td>
 

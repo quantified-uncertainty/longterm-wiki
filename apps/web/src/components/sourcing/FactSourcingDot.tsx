@@ -13,11 +13,14 @@ export function FactSourcingDot({
   sourceUrl,
   size = "sm",
   className,
+  href,
 }: {
   factId: string;
   sourceUrl?: string | null;
   size?: "sm" | "md";
   className?: string;
+  /** Link to sourcing detail page. Defaults to `/sourcing/fact/<factId>` when a verdict exists. */
+  href?: string;
 }) {
   const sourcing = getFactBaseFactSourcing(factId);
   if (!sourcing) return null;
@@ -28,6 +31,7 @@ export function FactSourcingDot({
       sourceUrl={sourceUrl}
       size={size}
       className={className}
+      href={href ?? `/sourcing/fact/${encodeURIComponent(factId)}`}
     />
   );
 }
