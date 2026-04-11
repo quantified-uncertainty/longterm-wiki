@@ -624,11 +624,18 @@ async function curateEntity(
       const batchSize = 10;
       for (let i = 0; i < records.length; i += batchSize) {
         const batch = records.slice(i, i + batchSize);
+        // Recompute remaining budget at each batch — research calls accumulate
+        // cost in the tracker, so a stale captured value underestimates what's left.
+        const remaining = budget - tracker.totalCost;
+        if (remaining <= 0) {
+          console.log(`  ${c.yellow}Budget exhausted during research${c.reset}`);
+          break;
+        }
         const batchResults = await researchSourcesForRecords(
           entity,
           batch,
           tracker,
-          budgetRemaining - tracker.totalCost,
+          remaining,
         );
         researched.push(...batchResults);
 
