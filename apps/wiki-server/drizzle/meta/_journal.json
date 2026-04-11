@@ -1205,6 +1205,13 @@
       "when": 1784275200000,
       "tag": "0171_create_coverage_scans",
       "breakpoints": true
+    },
+    {
+      "idx": 172,
+      "version": "7",
+      "when": 1784361600000,
+      "tag": "0172_create_scanner_results",
+      "breakpoints": true
     }
   ]
 }
