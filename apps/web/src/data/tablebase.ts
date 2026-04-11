@@ -1093,6 +1093,27 @@ export function getRecordVerdict(recordType: string, recordId: string): RecordVe
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
 
+/** Get the sourcing verdict for a specific field of a record.
+ * Returns null if no per-field verdict exists for this field. */
+export function getFieldVerdict(recordType: string, recordId: string, fieldName: string): RecordVerdict | null {
+  return getRecordVerdicts()[`${recordType}:${recordId}:${fieldName}`] ?? null;
+}
+
+/** Get all per-field verdicts for a specific record.
+ * Returns a map of fieldName -> RecordVerdict. */
+export function getFieldVerdicts(recordType: string, recordId: string): Record<string, RecordVerdict> {
+  const all = getRecordVerdicts();
+  const prefix = `${recordType}:${recordId}:`;
+  const result: Record<string, RecordVerdict> = {};
+  for (const [key, v] of Object.entries(all)) {
+    if (key.startsWith(prefix)) {
+      const fieldName = key.slice(prefix.length);
+      result[fieldName] = v;
+    }
+  }
+  return result;
+}
+
 /** Get source-check stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): {
   total: number;
