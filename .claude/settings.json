@@ -79,6 +79,12 @@
             "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/cleanup-worktrees.sh\"",
             "timeout": 60,
             "async": true
+          },
+          {
+            "type": "command",
+            "command": "bash \"$CLAUDE_PROJECT_DIR/.claude/hooks/session-finalize.sh\"",
+            "timeout": 30,
+            "async": true
           }
         ]
       }

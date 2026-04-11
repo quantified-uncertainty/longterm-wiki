@@ -151,6 +151,9 @@ const dispatch: SqlDispatcher = (query, params) => {
           case "title":
             store[idx].title = params[pIdx] as string | null;
             break;
+          case "summary":
+            store[idx].summary = params[pIdx] as string | null;
+            break;
           case "model":
             store[idx].model = params[pIdx] as string | null;
             break;
@@ -487,11 +490,14 @@ describe("Agent Sessions API", () => {
       expect(body.checklistMd).toBe("# Updated\n\n- [x] Done");
     });
 
-    it("updates status to completed", async () => {
+    it("updates status to completed with required fields", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1", {
         status: "completed",
+        title: "Fix widget rendering bug",
+        summary: "Fixed the widget rendering by updating the CSS selector",
+        cost: "$0.50",
       });
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -499,26 +505,43 @@ describe("Agent Sessions API", () => {
       expect(body.completedAt).not.toBeNull();
     });
 
-    it("updates both checklist and status", async () => {
+    it("rejects status=completed without required fields (hard-fail)", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        status: "completed",
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("incomplete_session");
+      expect(body.missing).toContain("title");
+      expect(body.missing).toContain("summary");
+      expect(body.missing).toContain("cost");
+    });
+
+    it("updates both checklist and status with required fields", async () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1", {
         checklistMd: "# Final",
         status: "completed",
+        title: "Fix widget rendering bug",
+        summary: "Fixed the widget rendering",
+        cost: "$0.50",
       });
       expect(res.status).toBe(200);
     });
 
     it("returns 404 for unknown session id", async () => {
       const res = await patchJson(app, "/api/agent-sessions/999", {
-        status: "completed",
+        checklistMd: "# Updated",
       });
       expect(res.status).toBe(404);
     });
 
     it("rejects non-numeric id", async () => {
       const res = await patchJson(app, "/api/agent-sessions/abc", {
-        status: "completed",
+        checklistMd: "# Updated",
       });
       expect(res.status).toBe(400);
     });
@@ -552,7 +575,7 @@ describe("Agent Sessions API", () => {
       await postJson(app, "/api/agent-sessions", sampleSession);
 
       const res = await patchJson(app, "/api/agent-sessions/1.5", {
-        status: "completed",
+        checklistMd: "# Updated",
       });
       expect(res.status).toBe(400);
     });
