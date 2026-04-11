@@ -5,6 +5,7 @@ import { getDrizzleDb } from "../../db.js";
 import { tablebaseScannerResults } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 const MAX_PAGE_SIZE = 500;
 const MAX_BATCH_SIZE = 5000;
@@ -183,6 +184,12 @@ const scannerResultsApp = new Hono()
     const { items } = c.req.valid("json");
     const db = getDrizzleDb();
     const now = new Date();
+
+    // Validate entity FK references
+    const refError = await validateEntityRefs(c, db, [
+      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
+    ]);
+    if (refError) return refError;
 
     const rows = items.map((item: SyncItem) => ({
       scanRunId: item.scanRunId,
