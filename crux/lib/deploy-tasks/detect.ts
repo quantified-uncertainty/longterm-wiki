@@ -614,6 +614,16 @@ export interface ParsedDeployTasks {
  * is found. Uses an em-dash (U+2014) as the command separator since that's what
  * `formatDeployTasksSection` writes.
  */
+/**
+ * Extract the category prefix from a deploy task line.
+ * Task lines look like: `` `migration` Verify migration 0158 applied ``
+ * Returns the category string (e.g. "migration") or "unknown" if no prefix.
+ */
+export function extractCategory(text: string): string {
+  const match = text.match(/^`([a-z][\w-]*)`\s/);
+  return match ? match[1] : "unknown";
+}
+
 export function extractVerifyCommand(text: string): string | null {
   // Strip trailing sub-PR attribution before matching
   const cleaned = text.replace(/\s*_\(from PR #\d+\)_\s*$/, "").trim();
@@ -622,6 +632,116 @@ export function extractVerifyCommand(text: string): string | null {
   // doesn't produce them).
   const match = cleaned.match(/—\s+`([^`]+)`\s*$/);
   return match ? match[1] : null;
+}
+
+// ---------------------------------------------------------------------------
+// interpretResult — interpret a verify-command's output by category
+// ---------------------------------------------------------------------------
+
+interface CommandOutput {
+  ok: boolean;
+  stdout: string;
+  stderr: string;
+  code: number;
+}
+
+interface InterpretedResult {
+  passed: boolean;
+  summary: string;
+}
+
+/**
+ * Interpret a deploy-task verification command's output.
+ *
+ * Uses the task category to apply domain-specific parsing:
+ *   - ci: parse `gh run list/view` JSON for workflow conclusion
+ *   - schema: parse health-endpoint JSON for status
+ *   - migration: check psql exit code and output
+ *   - route: parse HTTP status code from curl output
+ *   - generic: exit code 0 = pass
+ */
+export function interpretResult(
+  category: string,
+  command: string,
+  output: CommandOutput,
+): InterpretedResult {
+  // Timeout / signal detection
+  if (output.stderr.includes("timed out") || output.code === 124) {
+    return { passed: false, summary: "timed out" };
+  }
+
+  // CI workflow checks (gh run list / gh run view)
+  if (
+    category === "ci" &&
+    (command.includes("gh run list") || command.includes("gh run view"))
+  ) {
+    try {
+      const data = JSON.parse(output.stdout);
+      const run = Array.isArray(data) ? data[0] : data;
+      if (!run) return { passed: false, summary: "unexpected output" };
+      if (run.conclusion === "success") return { passed: true, summary: "workflow succeeded" };
+      if (run.conclusion === "failure") return { passed: false, summary: "workflow failed" };
+      if (run.status === "in_progress" || run.status === "queued")
+        return { passed: false, summary: "workflow still running" };
+      return { passed: false, summary: `unexpected: ${JSON.stringify(run).slice(0, 100)}` };
+    } catch {
+      return { passed: false, summary: "unexpected output" };
+    }
+  }
+
+  // Health endpoint checks (curl ... /health | jq)
+  if (command.includes("/health")) {
+    try {
+      const health = JSON.parse(output.stdout);
+      if (health.status === "healthy" || health.status === "ok")
+        return { passed: true, summary: "healthy" };
+      if (health.status === "degraded")
+        return { passed: false, summary: "server in degraded mode" };
+      // Unknown status but command succeeded — pass with status in summary
+      return { passed: output.code === 0, summary: health.status ?? "unknown" };
+    } catch {
+      if (output.stdout.includes("ok")) return { passed: true, summary: "ok" };
+      return { passed: false, summary: `could not parse health: ${output.stdout.slice(0, 120)}` };
+    }
+  }
+
+  // Migration checks (psql)
+  if (category === "migration" && command.includes("psql")) {
+    if (output.code !== 0) {
+      if (output.stderr.includes("not found") || output.stderr.includes("command not found"))
+        return { passed: false, summary: "psql not available locally — use health endpoint instead" };
+      if (output.stderr.includes("connection") || output.stderr.includes("could not connect"))
+        return { passed: false, summary: "connection to server failed" };
+      return { passed: false, summary: `psql failed (exit ${output.code})` };
+    }
+    return { passed: true, summary: "migration verified" };
+  }
+
+  // HTTP status checks (curl -o /dev/null -w "%{http_code}")
+  if (category === "route" && command.includes("curl")) {
+    const statusMatch = output.stdout.match(/^(\d{3})$/m) || output.stdout.match(/(\d{3})/);
+    if (statusMatch) {
+      const code = parseInt(statusMatch[1], 10);
+      if (code >= 200 && code < 300) return { passed: true, summary: `HTTP ${code}` };
+      return { passed: false, summary: `HTTP ${code}` };
+    }
+  }
+
+  // Generic: exit code determines pass/fail
+  if (output.code === 0) {
+    // Use stdout content as summary if available, otherwise "ok"
+    const trimmed = output.stdout.trim();
+    return { passed: true, summary: trimmed ? trimmed.slice(0, 120) : "ok" };
+  }
+  // stderr-only output — use it as the summary
+  if (output.stderr && !output.stdout.trim()) {
+    return { passed: false, summary: output.stderr.slice(0, 120) };
+  }
+  // stdout has content — use it
+  if (output.stdout.trim()) {
+    return { passed: false, summary: output.stdout.trim().slice(0, 120) };
+  }
+  return { passed: false, summary: `exit code ${output.code}` };
 }
 
 /**
