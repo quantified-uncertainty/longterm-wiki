@@ -202,6 +202,27 @@ const agentSessionsApp = new Hono()
       return rows[0];
     });
     if (!result) return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);
+
+    // Hard-fail validation: when status is being SET to 'completed', required fields
+    // must be present on the resulting row. Fires only when this PATCH explicitly
+    // transitions status → completed (not when updating other fields on an
+    // already-completed session).
+    if (status === "completed") {
+      const missing: string[] = [];
+      if (!result.title) missing.push("title");
+      if (!result.summary) missing.push("summary");
+      if (result.costCents === null && !result.cost) missing.push("cost");
+      if (missing.length > 0) {
+        logger.warn({ sessionId: id, missing }, "Session marked completed with missing required fields");
+        return c.json({
+          error: "incomplete_session",
+          message: `Sessions with status='completed' require: ${missing.join(", ")}. ` +
+            `Run 'crux sys session-finalize' to populate these fields from the transcript.`,
+          missing,
+        }, 400);
+      }
+    }
+
     return c.json(result);
   })
   .get("/", zv("query", ListSessionsQuery), async (c) => {
