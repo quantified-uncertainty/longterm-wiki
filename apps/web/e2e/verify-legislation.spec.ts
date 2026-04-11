@@ -5,14 +5,13 @@
  * against https://www.longtermwiki.com
  *
  * Run:
- *   cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
  *   PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com \
- *   npx playwright test /tmp/verify-legislation.spec.ts --project=chromium --reporter=list
+ *   npx playwright test apps/web/e2e/verify-legislation.spec.ts --project=chromium --reporter=list
  */
 
 import { test, expect, type Page } from "@playwright/test";
 
-const BASE_URL = "https://www.longtermwiki.com";
+const BASE_URL = process.env.PLAYWRIGHT_BASE_URL || "https://www.longtermwiki.com";
 
 // ─── Helpers ────────────────────────────────────────────────────────────────
 

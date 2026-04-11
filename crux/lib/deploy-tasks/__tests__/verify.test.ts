@@ -225,14 +225,15 @@ describe('interpretResult — health checks', () => {
     expect(result.summary).toBe('server in degraded mode');
   });
 
-  it('reports unknown health status with output', () => {
+  it('fails on unknown health status (starting, maintenance, etc.)', () => {
     const result = interpretResult('schema', healthCmd, {
       ok: true,
       stdout: '{"status":"starting"}',
       stderr: '',
       code: 0,
     });
-    expect(result.passed).toBe(true); // ok=true, unknown status
+    // Unknown status should NOT pass — operator needs to investigate
+    expect(result.passed).toBe(false);
     expect(result.summary).toContain('starting');
   });
 });

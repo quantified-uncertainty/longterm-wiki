@@ -689,16 +689,20 @@ export function interpretResult(
     }
   }
 
-  // Health endpoint checks (curl ... /health | jq)
-  if (command.includes("/health")) {
+  // Health endpoint checks — only match actual health-check commands
+  // (curl to /health piped to jq), not route checks that happen to
+  // contain "/health" in the URL path.
+  if (category === "schema" && command.includes("/health") && command.includes("jq")) {
     try {
       const health = JSON.parse(output.stdout);
       if (health.status === "healthy" || health.status === "ok")
         return { passed: true, summary: "healthy" };
       if (health.status === "degraded")
         return { passed: false, summary: "server in degraded mode" };
-      // Unknown status but command succeeded — pass with status in summary
-      return { passed: output.code === 0, summary: health.status ?? "unknown" };
+      // Unknown status — don't assume healthy just because exit code was 0.
+      // An unexpected status like "starting" or "maintenance" should fail
+      // so the operator investigates.
+      return { passed: false, summary: `unexpected status: ${health.status ?? "unknown"}` };
     } catch {
       if (output.stdout.includes("ok")) return { passed: true, summary: "ok" };
       return { passed: false, summary: `could not parse health: ${output.stdout.slice(0, 120)}` };

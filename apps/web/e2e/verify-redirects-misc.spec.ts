@@ -7,9 +7,8 @@ import { test, expect, type Page } from "@playwright/test";
  * #3679, #3641, #3688, #3675, #3610
  *
  * Run:
- *   cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
  *   PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com \
- *   npx playwright test /tmp/verify-redirects-misc.spec.ts --project=chromium --reporter=list
+ *   npx playwright test apps/web/e2e/verify-redirects-misc.spec.ts --project=chromium --reporter=list
  */
 
 // ─── 1. Legislation redirects ────────────────────────────────────────────────
