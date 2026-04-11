@@ -31,6 +31,8 @@ interface CoverageMatrixResult {
     };
     coveragePercent: number;
     greenPercent: number;
+    /** Whether this record type is exempt from sourcing verification */
+    exempt?: boolean;
   }>;
   totals: {
     totalRecords: number;
@@ -38,6 +40,8 @@ interface CoverageMatrixResult {
     confirmedPercent: number;
     coveragePercent: number;
   };
+  /** Record types that are exempt from sourcing verification */
+  exemptTypes?: string[];
 }
 
 /** Shape returned by GET /api/sourcing/verdict-matrix */
@@ -377,7 +381,12 @@ export async function SourcingCoverageContent() {
       )}
 
       {/* ── (d) Coverage Matrix ──────────────────────────────────────── */}
-      {coverageMatrix.tables.length > 0 && (
+      {coverageMatrix.tables.length > 0 && (() => {
+        const exemptSet = new Set(coverageMatrix.exemptTypes ?? []);
+        const nonExemptTables = coverageMatrix.tables.filter((t) => !t.exempt && !exemptSet.has(t.recordType));
+        const exemptTables = coverageMatrix.tables.filter((t) => t.exempt || exemptSet.has(t.recordType));
+
+        return (
         <div className="not-prose mb-8">
           <h2 className="text-lg font-semibold mb-3">
             Coverage Matrix
@@ -385,6 +394,9 @@ export async function SourcingCoverageContent() {
           <p className="text-sm text-muted-foreground mb-3">
             Per-record-type breakdown: total records in each table vs how many have been sourcinged,
             and what percentage are confirmed green.
+            {exemptTables.length > 0 && (
+              <> Exempt types (data ingested from canonical APIs) are shown separately and excluded from totals.</>
+            )}
           </p>
           <div className="overflow-x-auto">
             <table className="w-full text-sm border-collapse">
@@ -399,7 +411,7 @@ export async function SourcingCoverageContent() {
                 </tr>
               </thead>
               <tbody>
-                {coverageMatrix.tables.map((t) => {
+                {nonExemptTables.map((t) => {
                   const checked =
                     t.checkedRecords ??
                     (t.verdicts.confirmed +
@@ -447,10 +459,41 @@ export async function SourcingCoverageContent() {
                     </tr>
                   );
                 })}
+                {exemptTables.length > 0 && (
+                  <>
+                    <tr className="border-t border-border/40">
+                      <td colSpan={6} className="py-2 px-3 text-xs font-medium text-muted-foreground uppercase tracking-wide">
+                        Exempt (canonical API sources)
+                      </td>
+                    </tr>
+                    {exemptTables.map((t) => (
+                      <tr
+                        key={t.recordType}
+                        className="border-b border-border/30 hover:bg-muted/30 opacity-60"
+                      >
+                        <td className="py-2 px-3 font-medium text-muted-foreground">
+                          {t.recordType}
+                          <span className="ml-2 text-xs bg-muted px-1.5 py-0.5 rounded">exempt</span>
+                        </td>
+                        <td className="text-right py-2 px-3 tabular-nums text-muted-foreground">
+                          {t.totalRecords.toLocaleString()}
+                        </td>
+                        <td colSpan={4} className="text-center py-2 px-3 text-xs text-muted-foreground italic">
+                          Not subject to sourcing verification
+                        </td>
+                      </tr>
+                    ))}
+                  </>
+                )}
               </tbody>
               <tfoot>
                 <tr className="border-t-2 border-border/60 font-semibold">
-                  <td className="py-2 px-3">Totals</td>
+                  <td className="py-2 px-3">
+                    Totals
+                    {exemptTables.length > 0 && (
+                      <span className="ml-2 text-xs font-normal text-muted-foreground">(excl. exempt)</span>
+                    )}
+                  </td>
                   <td className="text-right py-2 px-3 tabular-nums">
                     {coverageMatrix.totals.totalRecords.toLocaleString()}
                   </td>
@@ -468,7 +511,8 @@ export async function SourcingCoverageContent() {
             </table>
           </div>
         </div>
-      )}
+        );
+      })()}
 
       {/* ── (e) Verdict Heatmap ──────────────────────────────────────── */}
       {(Object.keys(verdictMatrix.matrix).length > 0 || coverageMatrix.tables.length > 0) && (() => {
