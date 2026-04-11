@@ -184,6 +184,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
+- `.claude/rules/linear-integration.md` — Linear-GitHub integration, branch naming, auto-close, `crux linear` commands
 
 ## Subsystem Maps — Read BEFORE proposing work in these areas
 
