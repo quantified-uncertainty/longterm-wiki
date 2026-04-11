@@ -1354,7 +1354,7 @@ export const groundskeeperRuns = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     taskName: text("task_name").notNull(),
-    event: text("event").notNull(), // success | failure | error | circuit_breaker_tripped | skipped
+    event: text("event").notNull(), // success | failure | error | circuit_breaker_tripped | circuit_breaker_reset | half_open_attempt | half_open_success | skipped
     success: boolean("success").notNull(),
     durationMs: integer("duration_ms"),
     summary: text("summary"),
