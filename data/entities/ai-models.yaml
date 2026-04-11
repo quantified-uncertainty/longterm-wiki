@@ -91,7 +91,10 @@
   generation: "2"
   developer: anthropic
   releaseDate: "2023-07-11"
+  inputPrice: 8
+  outputPrice: 24
   contextWindow: 100000
+  safetyLevel: ASL-2
   openWeight: false
   modality:
     - text
