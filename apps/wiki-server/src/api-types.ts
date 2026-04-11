@@ -49,6 +49,7 @@ export const VALID_RECORD_TYPES = [
   "secondary-market-price",
   "citation",
   "wiki-page",
+  "fact",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
