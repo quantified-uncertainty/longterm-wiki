@@ -48,7 +48,7 @@ Check for an existing PR patrol process:
 pgrep -f "pr-patrol" && echo "✓ PR patrol already running" || echo "✗ not running"
 ```
 
-If the user wants it started, follow the standard PR patrol startup procedure (typically `pnpm crux pr-patrol watch` from `lw/coord` or `lw/main`). Do NOT start it without user confirmation — PR patrol uses real LLM budget.
+If the user wants it started, follow the standard PR patrol startup procedure (typically `pnpm crux gh pr-patrol` from `lw/coord` or `lw/main`). Do NOT start it without user confirmation — PR patrol uses real LLM budget.
 
 ### Section 2: Pull latest
 
