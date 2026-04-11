@@ -66,7 +66,7 @@ Fire-and-forget (async call without awaiting) is acceptable **only** when ALL of
 1. The call is for **telemetry, metrics, or status updates** (not user-facing functionality)
 2. Failure does **not affect correctness** of the main operation
 3. The error is **logged** (at warn level or higher, unless high-frequency)
-4. There is a **fallback notification channel** (e.g., Discord, GitHub issues) for critical failures
+4. There is a **fallback notification channel** (e.g., Discord, Linear issues) for critical failures
 
 Examples of acceptable fire-and-forget:
 - `recordRunToServer()` — groundskeeper run recording to wiki-server
@@ -75,7 +75,7 @@ Examples of acceptable fire-and-forget:
 
 Examples where fire-and-forget is NOT acceptable:
 - Database writes that affect user-visible data
-- GitHub issue creation (the primary notification channel)
+- Linear issue creation (the primary notification channel)
 - File writes (data integrity)
 
 ## Fail-Open vs Fail-Closed Defaults
