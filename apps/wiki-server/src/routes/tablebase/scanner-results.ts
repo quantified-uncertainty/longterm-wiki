@@ -43,21 +43,8 @@ const SyncBatchSchema = z.object({
 
 type SyncItem = z.infer<typeof SyncItemSchema>;
 
-interface ScannerResultRow {
-  id: number;
-  scanRunId: string;
-  recordType: string;
-  entityId: string;
-  entityName: string;
-  entityType: string;
-  totalRecords: number;
-  verifiedRecords: number;
-  completenessPct: number;
-  missingFields: string[] | null;
-  entityImportance: number | null;
-  scannedAt: Date;
-  createdAt: Date;
-}
+// Drizzle-inferred row type from the table definition
+type ScannerResultRow = typeof tablebaseScannerResults.$inferSelect;
 
 function formatRow(r: ScannerResultRow) {
   return {
@@ -77,6 +64,9 @@ function formatRow(r: ScannerResultRow) {
   };
 }
 
+// Not using createSyncHandler factory: this table uses auto-increment integer PK
+// and pure INSERT semantics without a string ID field, which doesn't fit the
+// factory's TItem constraint (requires { id?: string }).
 const scannerResultsApp = new Hono()
   // GET /latest — returns the most recent scan run's results
   .get("/latest", zv("query", LatestQuery), async (c) => {
@@ -113,7 +103,7 @@ const scannerResultsApp = new Hono()
     ]);
 
     return c.json({
-      items: rows.map((r) => formatRow(r as ScannerResultRow)),
+      items: rows.map(formatRow),
       // count() may return bigint as string from postgres.js — coerce to number
       total: Number(totalRows[0]?.count ?? 0),
       scanRunId: runId,
@@ -194,8 +184,8 @@ const scannerResultsApp = new Hono()
       existing.push({
         scanRunId: row.scanRunId,
         scannedAt: row.scannedAt,
-        avgCompleteness: row.avgCompleteness,
-        entityCount: row.entityCount,
+        avgCompleteness: Number(row.avgCompleteness),
+        entityCount: Number(row.entityCount),
       });
       byTypeMap.set(row.recordType, existing);
     }

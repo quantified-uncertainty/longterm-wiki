@@ -4,7 +4,7 @@
 -- grouped by scan_run_id for trend analysis.
 
 CREATE TABLE IF NOT EXISTS tablebase_scanner_results (
-  id             SERIAL PRIMARY KEY,
+  id             BIGSERIAL PRIMARY KEY,
   scan_run_id    TEXT         NOT NULL,
   record_type    TEXT         NOT NULL,
   entity_id      TEXT         NOT NULL,

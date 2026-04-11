@@ -3265,7 +3265,7 @@ export const predictionMarketSnapshots = pgTable(
 export const dataQualitySnapshots = pgTable(
   "data_quality_snapshots",
   {
-    id: serial("id").primaryKey(),
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     capturedAt: timestamp("captured_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -3905,7 +3905,7 @@ export const politicalVotes = pgTable(
 export const tablebaseCoverageScans = pgTable(
   "tablebase_coverage_scans",
   {
-    id: serial("id").primaryKey(),
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     entityType: text("entity_type").notNull(),
     entityId: text("entity_id").notNull(),
     coverageScore: integer("coverage_score").notNull(),
@@ -3928,7 +3928,7 @@ export const tablebaseCoverageScans = pgTable(
 export const tablebaseScannerResults = pgTable(
   "tablebase_scanner_results",
   {
-    id: serial("id").primaryKey(),
+    id: bigserial("id", { mode: "number" }).primaryKey(),
     scanRunId: text("scan_run_id").notNull(),
     recordType: text("record_type").notNull(),
     entityId: text("entity_id").notNull(),
