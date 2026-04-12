@@ -1,12 +1,12 @@
 ---
 wikiId: E822
 title: AI Governance & Policy (Overview)
-description: Overview of governance approaches to AI safety, spanning legislation, compute governance, international coordination, and industry self-regulation across multiple jurisdictions.
+description: Overview of governance approaches to AI safety—legislation, compute governance, international coordination, and industry self-regulation—with enforcement details, measurable outcomes, and 2025–2026 developments across jurisdictions.
 sidebar:
   label: Overview
   order: 0
 subcategory: governance
-summary: A structured index/overview of AI governance approaches across jurisdictions, compute governance, international coordination, and industry self-regulation as of early 2026, identifying key tensions (speed vs. thoroughness, national vs. international, voluntary vs. mandatory). Functions primarily as a navigation hub with minimal original analysis or sourced claims.
+summary: Comprehensive reference overview of AI governance mechanisms across jurisdictions as of mid-2026, covering mandatory legislation, compute controls, international coordination, and industry self-regulation with specific enforcement details, penalty ranges, staffing figures, and documented circumvention cases. The page is well-sourced and relatively neutral but is fundamentally a compilation of existing frameworks with minimal original analysis, and has structural redundancies between Limitations and Key Tensions sections.
 clusters:
   - ai-safety
   - governance
@@ -15,71 +15,232 @@ import {EntityLink} from '@components/wiki';
 
 ## Overview
 
-AI governance encompasses the policies, regulations, standards, and coordination mechanisms aimed at managing risks from advanced AI systems. The governance landscape is rapidly evolving, with approaches ranging from national legislation to international treaties to voluntary industry commitments. As of early 2026, no single governance framework has achieved comprehensive coverage of frontier AI risks, but multiple overlapping efforts are creating an increasingly dense regulatory environment.
+AI governance encompasses the policies, regulations, standards, and coordination mechanisms aimed at managing risks from advanced AI systems. The governance landscape is evolving across multiple dimensions simultaneously: national governments are enacting legislation at varying speeds, international bodies are attempting coordination that has so far produced voluntary rather than binding agreements, and industry is developing internal safety frameworks without external verification requirements.
+
+As of mid-2026, no single governance framework covers all frontier AI risks comprehensively. Multiple overlapping mechanisms—mandatory legislation in some jurisdictions, voluntary industry commitments in others, international declarations with limited enforcement authority—are operating in parallel. The degree to which this proliferation of frameworks produces meaningful risk reduction is subject to active debate among researchers and policymakers, with critics pointing to enforcement gaps, pace mismatches, and verification failures, and proponents arguing that the frameworks establish norms that constrain industry behavior even absent direct enforcement.
+
+## Quick Assessment
+
+The following table summarizes major governance mechanisms by type, enforcer, and current status. Qualitative labels are avoided in favor of measurable evidence where available.
+
+| Mechanism | Type | Primary Enforcer | Scope / Status (mid-2026) |
+|-----------|------|-----------------|--------------------------|
+| EU AI Act (GPAI phase) | Mandatory | <EntityLink id="E1016">EU AI Office</EntityLink> (125+ staff)[^rc-0767] | GPAI obligations active Aug 2025; fines begin Aug 2026[^rc-9b72] |
+| EU AI Act (high-risk systems) | Mandatory | 27 national market surveillance authorities | Requirements fully applicable Aug 2026[^rc-9b72] |
+| <EntityLink id="E216">NIST AI Risk Management Framework</EntityLink> | Voluntary | None | Referenced by CFPB, FDA, SEC, FTC, EEOC; no public adoption count[^rc-bf7a] |
+| US Executive Order on AI (Biden) | Executive | Agency-by-agency | Revoked Jan 20, 2025; replacement policies not finalized as of mid-2026[^rc-3a05] |
+| Texas TRAIGA | Mandatory | Texas Attorney General | \$10K–\$200K per violation; effective Jan 1, 2026[^rc-7ee9] |
+| <EntityLink id="E62">Colorado AI Act</EntityLink> | Mandatory | Colorado Attorney General | 60-day cure period before enforcement; effective June 30, 2026[^rc-cc93] |
+| <EntityLink id="E457">California SB 53</EntityLink> | Mandatory | California Attorney General | Frontier model transparency; signed Sept 2025[^rc-6912] |
+| Seoul Frontier AI Safety Commitments | Voluntary | None (reputational) | 16 companies signed; no external verification mechanism[^rc-92d9] |
+| Biden White House Voluntary Commitments | Voluntary | None | 15 companies signed (July–Sept 2023); politically superseded after EO revocation[^rc-7877] |
+| <EntityLink id="E2953">Council of Europe</EntityLink> AI Convention | Treaty | National courts | 37 signatories; US signed but not ratified; not in force as of 2026[^rc-20e9] |
+| <EntityLink id="E136">US AI Chip Export Controls</EntityLink> | Mandatory | <EntityLink id="E2611">Bureau of Industry and Security</EntityLink> | Active enforcement with documented circumvention[^rc-f078] |
+| <EntityLink id="E58">China AI Regulations</EntityLink> (Generative AI Measures) | Mandatory | <EntityLink id="E2961">Cyberspace Administration of China (CAC)</EntityLink> | Thousands of algorithm filings approved; new labeling rules Sept 2025[^rc-7567] |
+| <EntityLink id="E49">Canada AIDA</EntityLink> | — | — | Bill died when Parliament prorogued Jan 6, 2025[^rc-7672] |
+
+For a systematic evaluation of governance effectiveness with evidence ratings across mechanisms, see the [AI Governance Effectiveness Analysis](./ai-governance-effectiveness-analysis) page. For analysis of actors, funding flows, and decision-making authority shaping governance outcomes, see the [AI Power and Influence Map](./ai-power-and-influence-map) page.
+
+## How It Works
+
+### Regulatory Trigger Mechanisms
+
+AI governance frameworks use different criteria to identify which systems come under their requirements:
+
+**Risk-tier classification** (EU AI Act model): Systems are classified by use case into risk tiers. The <EntityLink id="E127">EU AI Act</EntityLink> designates uses such as hiring, credit scoring, and critical infrastructure as "high-risk," triggering conformity assessments, technical documentation, and human oversight requirements. General-purpose AI (GPAI) models above 10²⁵ training FLOPs face transparency obligations and, for models deemed to pose systemic risk, additional safety evaluations.[^rc-9b72]
+
+**Compute thresholds**: Training compute (measured in floating-point operations) serves as a measurable proxy for model capability. The Biden Executive Order used a similar threshold structure before its revocation.[^rc-3a05] Critics of threshold-based approaches note that algorithmic efficiency improvements can allow comparable capabilities to be reached with lower compute, potentially allowing high-capability models to fall below regulatory thresholds.
+
+**Capability-based triggers**: Responsible Scaling Policies use demonstrated capabilities rather than compute alone—for example, whether a model can provide meaningful uplift to someone attempting to create biological, chemical, nuclear, or radiological weapons. <EntityLink id="E22">Anthropic</EntityLink> defines AI Safety Levels analogous to biosafety levels; models must remain below capability thresholds or additional safeguards must be implemented before further development.[^rc-587b]
+
+**Use-case and deployment rules**: Some frameworks focus on how AI is deployed rather than on underlying model properties. Colorado's AI Act requires developers and deployers of high-risk AI—systems making consequential decisions about housing, employment, credit, or healthcare—to conduct impact assessments.[^rc-cc93] Texas TRAIGA similarly focuses on deployer disclosure obligations and consumer notification for AI used in consequential decisions.[^rc-7ee9]
+
+### Enforcement Flow
+
+For mandatory frameworks, enforcement typically follows a chain from legislation to designated agency to regulated entity:
+
+- **EU**: The <EntityLink id="E2909">European Commission</EntityLink>, acting through the AI Office, enforces GPAI rules. National market surveillance authorities in each EU member state handle enforcement for non-GPAI systems, meaning 27 national bodies of varying technical capacity bear responsibility for most of the EU AI Act's practical implementation.[^rc-9b72][^rc-0767]
+- **US states**: State attorneys general enforce state AI laws directly. Texas's AG has exclusive enforcement authority under TRAIGA (with exceptions for some licensing agencies).[^rc-7ee9] Colorado's AG has similar authority under the Colorado AI Act.[^rc-cc93]
+- **China**: The Cyberspace Administration of China (CAC) administers algorithm filing requirements, content standards, and labeling rules for AI services offered to Chinese users.[^rc-7567]
+
+For voluntary frameworks, accountability is primarily reputational: public disclosure of commitments, scrutiny from civil society and researchers, and participation in international evaluation processes such as AI Safety Institute assessments. No external enforcement mechanism compels compliance.
 
 ## Legislation and Regulation
 
 Major regulatory frameworks and legislation across jurisdictions:
 
 **International:**
-- **EU AI Act**: The world's first comprehensive AI regulation, adopting a risk-based approach to regulate foundation models and general-purpose AI
-- **Council of Europe Framework Convention on AI**: First legally binding international AI treaty, establishing human rights standards
+- **<EntityLink id="E127">EU AI Act</EntityLink>**: The first comprehensive AI regulation adopting a risk-based approach. The EU AI Office (125+ staff)[^rc-0767] enforces GPAI rules; national authorities handle the remainder. For the phased rollout timeline (August 2025–2027 obligations) and details on the GPAI Code of Practice, see [EU AI Act Phased Enforcement](#eu-ai-act-phased-enforcement) in the Emergent Trends section below.[^rc-9b72]
+- **<EntityLink id="E2953">Council of Europe</EntityLink> Framework Convention on AI**: The first legally binding international AI treaty, establishing human rights standards across AI system lifecycles. Signed by the US and 36 other signatories as of January 2025. The treaty is not yet in force, pending ratification by five states; the European Commission proposed formal EU ratification on June 3, 2025.[^rc-20e9]
 
 **United States:**
-- **<EntityLink id="E48" name="california-sb1047">California SB 1047</EntityLink>**: Pioneering state-level frontier AI safety bill (vetoed but influential)
-- **California SB 53**: First US state law regulating frontier AI models through transparency requirements
-- **<EntityLink id="E366" name="us-executive-order">US Executive Order on AI</EntityLink>**: Federal executive action on AI safety and security
-- **<EntityLink id="E216" name="nist-ai-rmf">NIST AI Risk Management Framework</EntityLink>**: Voluntary framework for managing AI risks
-- **<EntityLink id="E367" name="us-state-legislation">US State AI Legislation</EntityLink>**: Growing landscape of state-level AI regulation
-- **New York RAISE Act**: State legislation requiring safety protocols for frontier AI
-- **Texas TRAIGA**: Comprehensive AI governance act signed in 2025
+- **<EntityLink id="E48">California SB 1047</EntityLink>**: The first US state bill targeting frontier AI model developers directly; vetoed by Governor Newsom on September 29, 2024. Newsom cited the bill's failure to differentiate between high-risk and low-risk deployment contexts and its potential to create a "false sense of security" by overlooking smaller models presenting similar risks.[^rc-e27d]
+- **<EntityLink id="E457">California SB 53</EntityLink>**: Signed September 29, 2025; described by the Governor's office as the first enforceable US regulatory framework for the most advanced AI systems, developed with input from an advisory group including AI researchers at Stanford and UC Berkeley.[^rc-6912]
+- **<EntityLink id="E366">US Executive Order on AI</EntityLink>**: Biden's Executive Order 14110 (October 2023) directed agencies to develop AI risk management standards and used compute thresholds to define frontier models. Trump revoked EO 14110 on January 20, 2025, directing agencies to rescind actions inconsistent with new policy goals emphasizing reduced regulatory barriers. Agency-specific guidance already issued under the Biden EO remained in effect unless individually rescinded.[^rc-3a05]
+- **<EntityLink id="E216">NIST AI Risk Management Framework</EntityLink>**: Voluntary framework released January 2023. Referenced in sector-specific AI expectations by the CFPB, FDA, SEC, FTC, and EEOC. A Generative AI Profile (NIST-AI-600-1) was released July 2024.[^rc-bf7a] No public data is available on the count of organizations that have formally adopted the framework.
+- **<EntityLink id="E367">US State AI Legislation</EntityLink>**: As of mid-2026, Colorado, Texas, and California have enacted AI governance laws with enforcement mechanisms.
+- **<EntityLink id="E471">New York RAISE Act</EntityLink>**: State legislation requiring safety protocols for frontier AI systems; legislative status as of mid-2026 varies.
+- **Texas TRAIGA**: Signed June 22, 2025, effective January 1, 2026. Enforced by the Texas AG with civil penalties of \$10,000–\$200,000 per violation. The statute creates a Texas AI Advisory Council, which is expressly prohibited from issuing binding regulations.[^rc-7ee9]
+- **<EntityLink id="E62">Colorado AI Act</EntityLink>**: First passed May 2024; implementation delayed to June 30, 2026 by an August 2025 amendment. Requires developers and deployers of high-risk AI to conduct risk-management programs and impact assessments. Colorado AG has exclusive enforcement authority with a 60-day cure period before action.[^rc-cc93]
 
 **Other jurisdictions:**
-- **<EntityLink id="E49" name="canada-aida">Canada AIDA</EntityLink>**: Canada's Artificial Intelligence and Data Act
-- **<EntityLink id="E62" name="colorado-ai-act">Colorado AI Act</EntityLink>**: State-level AI regulation focused on high-risk systems
-- **<EntityLink id="E58" name="china-ai-regulations">China AI Regulations</EntityLink>**: China's evolving approach to AI governance including generative AI rules
+- **<EntityLink id="E49">Canada AIDA</EntityLink>**: Canada's proposed Artificial Intelligence and Data Act (part of Bill C-27) died when Prime Minister Trudeau's resignation caused parliamentary prorogation on January 6, 2025, leaving Canada without comprehensive federal AI legislation.[^rc-7672]
+- **<EntityLink id="E58">China AI Regulations</EntityLink>**: China's Generative AI Measures took effect August 15, 2023, requiring algorithm registration with the CAC, content labeling, and user verification for public-facing generative AI. As of late 2025, the CAC had approved thousands of algorithm filings and registered hundreds of generative AI platforms. New mandatory labeling rules for AI-generated content took effect September 1, 2025.[^rc-7567]
 
 **Analysis:**
-- **<EntityLink id="E137" name="failed-stalled-proposals">Failed and Stalled AI Policy Proposals</EntityLink>**: Tracking proposals that did not advance and why
+- **<EntityLink id="E137">Failed and Stalled AI Policy Proposals</EntityLink>**: Tracking proposals that did not advance and why.
 
 ## Compute Governance
 
 Technical governance approaches leveraging the physical infrastructure of AI:
 
-- **<EntityLink id="E136" name="export-controls">AI Chip Export Controls</EntityLink>**: US policies restricting advanced AI chip exports, particularly to China
-- **<EntityLink id="E465" name="thresholds">Compute Thresholds</EntityLink>**: Using training compute as a measurable threshold for regulatory triggers
-- **<EntityLink id="E464" name="monitoring">Compute Monitoring</EntityLink>**: Approaches to tracking and verifying AI training runs
-- **Hardware-Enabled Governance**: Technical mechanisms in AI hardware for monitoring and enforcement
-- **<EntityLink id="E473" name="international-regimes">International Compute Regimes</EntityLink>**: Proposals for international coordination on compute governance
+- **<EntityLink id="E136">AI Chip Export Controls</EntityLink>**: US Bureau of Industry and Security restrictions on advanced AI chip exports, initially implemented October 2022 and expanded in 2023 and 2024. The controls face documented circumvention: a smuggling network involving at least \$160 million in <EntityLink id="E693">NVIDIA</EntityLink> H100 and H200 GPUs operated between October 2024 and May 2025; the co-founder of Super Micro Computer was arrested in March 2026 for conspiring to divert chip-equipped servers to China via intermediaries using falsified end-user certificates; and at least 8 Chinese AI chip-smuggling networks with transactions over \$100 million each were identified as of 2025. The <EntityLink id="E1189">Center for a New American Security</EntityLink> estimated 10,000 to hundreds of thousands of AI chips were smuggled to China in 2024 alone.[^rc-f078]
+- **<EntityLink id="E465">Compute Thresholds</EntityLink>**: Using training compute as a measurable threshold for regulatory triggers. The EU AI Act uses 10²⁵ FLOPs as the threshold above which GPAI models are presumed to pose systemic risk. Critics note that algorithmic efficiency improvements may allow high-capability models to remain below such thresholds over time.
+- **<EntityLink id="E464">Compute Monitoring</EntityLink>**: Approaches to tracking and verifying AI training runs, including proposals for cloud service provider reporting requirements and Know Your Customer requirements for large compute purchases.
+- **<EntityLink id="E463">Hardware-Enabled Governance</EntityLink>**: Technical mechanisms proposed for embedding monitoring or enforcement capabilities directly in AI hardware, such as location-verified compute usage and hardware-level model auditing.
+- **<EntityLink id="E473">International Compute Regimes</EntityLink>**: Proposals for international coordination on compute governance, including analogues to the IAEA or CERN. No such regime has been established as of mid-2026.
 
 ## International Coordination
 
 Mechanisms for cross-border cooperation on AI safety:
 
-- **<EntityLink id="E173" name="international-summits">International AI Safety Summits</EntityLink>**: Series of international summits on AI safety starting with Bletchley Park (2023)
-- **Bletchley Declaration**: First international agreement on AI safety signed by 28 countries
-- **<EntityLink id="E279" name="seoul-declaration">Seoul Declaration</EntityLink>**: Follow-up international commitment on frontier AI safety
-- **International Coordination Mechanisms**: Bilateral dialogues, multilateral treaties, and institutional networks
+- **<EntityLink id="E173">International AI Safety Summits</EntityLink>**: A series of international summits beginning with Bletchley Park (November 2023), continuing at Seoul (May 2024) and Paris (February 2025).
+- **<EntityLink id="E469">Bletchley Declaration</EntityLink>**: First international agreement on AI safety, signed by 28 countries at the Bletchley Summit (November 2023). Established the principle of international AI safety cooperation without binding commitments.
+- **<EntityLink id="E279">Seoul Declaration</EntityLink>**: Follow-up international commitment on frontier AI safety, adopted at the Seoul Summit (May 21–22, 2024). The summit secured "Frontier AI Safety Commitments" from 16 leading AI companies—the first time companies signed specific commitments to define risk thresholds and implement mitigations when capabilities could pose "severe risks."[^rc-92d9] An International Network of AI Safety Institutes was also announced at Seoul.[^rc-92d9]
+- **<EntityLink id="E2605">Paris AI Action Summit (February 2025)</EntityLink>**: Held February 10–12, 2025, with over 1,000 participants from more than 100 countries. A "Statement on Inclusive and Sustainable Artificial Intelligence for People and the Planet" was signed by approximately 60 nations and supranational organizations including China, India, the EU, and the African Union. The US and UK were notable non-signatories to the main declaration.[^rc-fd6e] French President Macron announced €109 billion in private-sector AI investment commitments; the EU announced €200 billion in AI-related investment.[^rc-fd6e] The summit revealed divergent priorities among major AI-developing nations, with the US emphasizing reduced regulatory burden and the EU and Global South emphasizing inclusive and sustainable development.
+- **<EntityLink id="E470">International Coordination Mechanisms</EntityLink>**: Bilateral dialogues, multilateral treaties, and institutional networks for ongoing coordination beyond summit declarations.
 
 ## Industry Self-Regulation
 
 Voluntary commitments and industry-led safety frameworks:
 
-- **<EntityLink id="E461" name="rsp">Responsible Scaling Policies</EntityLink>**: Framework pioneered by Anthropic tying safety requirements to capability levels
-- **<EntityLink id="E369" name="voluntary-commitments">Voluntary Industry Commitments</EntityLink>**: Commitments secured by the Biden administration from major AI labs
-- **Model Registries**: Centralized databases for tracking frontier AI models
+- **<EntityLink id="E461">Responsible Scaling Policies</EntityLink>**: Framework first published by Anthropic, subsequently adopted in broadly similar form by <EntityLink id="E218">OpenAI</EntityLink> and <EntityLink id="E98">Google DeepMind</EntityLink>. RSPs define capability thresholds at which additional safeguards must be implemented before continued development. Anthropic's RSP version 3.0, released in 2025, refined evaluation processes using "safety case" methodologies and acknowledged that the science of model evaluation was not yet well-developed enough for precisely defined capability thresholds.[^rc-587b] Proponents argue RSPs represent the most technically sophisticated governance mechanism in operation. Critics note that labs conduct their own capability evaluations, that no RSP threshold has been publicly reported as triggered, and that no external body verifies compliance. Both OpenAI and Google DeepMind test models on their ability to assist with biological weapons development as part of their frameworks.[^rc-587b]
+- **<EntityLink id="E369">Voluntary Industry Commitments</EntityLink>**: Commitments secured by the Biden administration from initially seven companies (<EntityLink id="E2940">Amazon</EntityLink>, Anthropic, Google, Inflection, Meta, Microsoft, OpenAI) in July 2023, with eight more companies joining in September 2023.[^rc-7877] Commitments included pre-deployment security testing, information sharing on AI risks, research into content provenance systems, and investments in cybersecurity safeguards. No verification mechanism was established and no accountability procedure was specified.[^rc-7877]
+- **<EntityLink id="E472">Model Registries</EntityLink>**: Proposals for centralized databases tracking frontier AI models, their capabilities, and deployment status. No binding international model registry exists as of mid-2026; China's algorithm filing system with the CAC functions as a national-level analogue.[^rc-7567]
+
+## 2025–2026 Emergent Trends
+
+### EU AI Act Phased Enforcement
+
+The EU AI Act is rolling out in phases rather than taking immediate full effect:
+
+- **August 2, 2025**: GPAI model obligations entered application for new models placed on market after this date. The GPAI Code of Practice was endorsed by the Commission on August 1, 2025 as a voluntary compliance tool.[^rc-9b72]
+- **August 2, 2026**: Commission enforcement powers (including fines) for GPAI providers become active; high-risk AI system requirements for healthcare, finance, employment, and critical infrastructure also become fully applicable.[^rc-9b72]
+- **August 2, 2027**: Legacy GPAI models placed on market before August 2025 must comply.[^rc-9b72]
+
+The EU AI Office, responsible for GPAI enforcement, employed more than 125 staff as of 2025, with plans to exceed 140 by end of 2025, organized into five units covering regulation, AI safety, innovation, and societal applications.[^rc-0767]
+
+### US Federal Policy Reversal
+
+Trump's administration revoked Biden's Executive Order 14110 on January 20, 2025, its first day in office, directing agencies to suspend, revise, or rescind prior AI policies inconsistent with the new administration's emphasis on reducing regulatory barriers to AI development. As of mid-2026, replacement federal AI policies remain incomplete.[^rc-3a05] In December 2025, the administration issued an executive order directing federal agencies to challenge state AI laws and establish a minimally burdensome national standard, creating potential conflict with state-level legislation enacted in the same period.[^rc-6912]
+
+### State-Level Law Proliferation
+
+Following the veto of California SB 1047 in September 2024, US AI governance activity shifted substantially toward deployment-focused state legislation:
+
+- **California SB 53** (signed September 2025): Targets frontier model developers with transparency and capability assessment requirements.[^rc-6912]
+- **Texas TRAIGA** (signed June 2025, effective January 2026): Focuses on deployer disclosure obligations and consumer notification requirements for AI used in consequential decisions.[^rc-7ee9]
+- **Colorado AI Act** (effective June 2026): Requires impact assessments for high-risk AI affecting individuals in consequential decisions; further amendments anticipated in the 2026 legislative session.[^rc-cc93]
+- **Canada AIDA** died in January 2025 without passage.[^rc-7672]
+
+The movement from SB 1047's model-developer-focused approach to deployment-focused frameworks reflects a pattern in which legislators focused on observable deployments rather than underlying model capabilities—a choice with implications for which risks governance mechanisms can address.
+
+### Seoul-to-Paris Summit Trajectory
+
+The international AI safety summit series has moved through three phases:
+
+1. **Bletchley (November 2023)**: Established the principle of international AI safety cooperation; 28-country declaration; no binding commitments.
+2. **Seoul (May 2024)**: First time companies signed specific safety commitments with defined risk thresholds; 16 companies; International Network of AI Safety Institutes announced.[^rc-92d9]
+3. **Paris (February 2025)**: Largest summit in the series (~100 countries); ~60-nation investment and sustainability declaration; US and UK did not sign the main declaration; investment pledges totaling €109B announced.[^rc-fd6e]
+
+The trajectory shows expanding participation but also diverging national priorities: the US has increasingly prioritized AI development speed over safety-focused coordination, while the EU and signatories from the Global South have emphasized inclusive and sustainable AI. No subsequent summit has been announced as the canonical next step as of mid-2026.
+
+## Risks Addressed
+
+AI governance mechanisms address different categories of risk with uneven coverage:
+
+| Risk Category | Mechanisms Addressing It | Coverage as of Mid-2026 |
+|---------------|--------------------------|------------------------|
+| Discriminatory automated decisions (hiring, credit, housing) | <EntityLink id="E127">EU AI Act</EntityLink> (high-risk requirements), <EntityLink id="E62">Colorado AI Act</EntityLink>, Texas TRAIGA | Mandatory in EU and two US states; impact assessments required |
+| AI-enabled weapons development (CBRN) | <EntityLink id="E461">RSPs</EntityLink> (capability thresholds), Seoul commitments (16 companies) | Voluntary frameworks only; no binding prohibition |
+| Malicious AI use (fraud, disinformation) | National content laws, China's labeling requirements, content moderation policies | Patchy; varies significantly by jurisdiction |
+| Concentration of AI capabilities and market power | General antitrust review | No AI-specific governance mechanism |
+| Frontier model catastrophic or existential risks | <EntityLink id="E461">RSPs</EntityLink> (voluntary), AI Safety Institute evaluations | Voluntary only; no mandatory regime as of mid-2026 |
+| Unauthorized technology transfer | <EntityLink id="E136">US chip export controls</EntityLink> | Active enforcement with documented significant evasion[^rc-f078] |
+
+Significant governance gaps remain. No binding international regime covers catastrophic risks from frontier AI systems. No governance mechanism directly addresses <EntityLink id="E93">deceptive alignment</EntityLink> or <EntityLink id="E274">scheming</EntityLink> risks in deployed models. No framework addresses recursive self-improvement scenarios. The risk categories attracting the most governance attention (discriminatory decisions, content harms) are not the same as the risk categories AI safety researchers assess as highest-stakes (catastrophic or irreversible harm from advanced systems).
+
+## Limitations
+
+### Enforcement Capacity Gaps
+
+Most governance frameworks assume enforcement capacity that may not exist at the required scale. The EU AI Office has 125+ staff to oversee GPAI models used by hundreds of millions of EU residents, while 27 national market surveillance authorities of varying technical sophistication handle enforcement for most other AI systems. State attorneys general in the US similarly lack dedicated technical staff to evaluate AI system capabilities or deployment contexts independently.
+
+### Pace Mismatch
+
+Legislative processes in most democracies operate on 1–3 year timescales. The EU AI Act took approximately three years from initial proposal to GPAI obligations entering force. During that period, frontier AI capability advanced substantially. Regulations calibrated to 2023-era systems may require revision before full enforcement even begins.
+
+### Jurisdictional Arbitrage
+
+AI development is global, but governance is primarily national. Companies can in principle site frontier training runs in jurisdictions with less stringent requirements. The absence of binding international coordination agreements as of mid-2026 means no mechanism prevents this. The Paris 2025 summit illustrated the limits of consensus-building: the world's largest AI-developing nation did not sign the main declaration.[^rc-fd6e]
+
+### Technical Expertise Deficits
+
+Regulatory agencies lack staff with expertise to independently evaluate advanced AI systems. Capability evaluations under RSPs are conducted by the labs themselves, supplemented by some external red-teaming at AI Safety Institutes; no mandatory independent auditing requirement exists for any framework. This creates a dependency on self-reporting that is structural rather than temporary.
+
+### Verification Challenges
+
+Independent verification of compliance is limited across both voluntary and mandatory frameworks. The Biden administration's 2023 voluntary commitments specified no verification mechanism.[^rc-7877] Chip export controls face organized circumvention—see [Compute Governance](#compute-governance) above for documented cases including smuggling networks and falsified end-user certificates.[^rc-f078]
+
+### Competing Perspectives on Governance Expansion
+
+Critics of expanded AI governance include: (1) those who argue that compliance costs advantage large incumbent firms over smaller competitors and startups; (2) those concerned about regulatory capture, where capable AI developers shape rules that entrench their market position; (3) those who contend that regulations calibrated to current capabilities misallocate compliance costs without meaningfully addressing risks from future, qualitatively more capable systems; and (4) those who argue that international AI governance coordination is unlikely to succeed given US-China strategic competition, making unilateral Western regulation costly without global benefit. Proponents of governance frameworks contend that even imperfect voluntary commitments establish norms that constrain industry behavior, that mandatory requirements create accountability infrastructure useful when higher-stakes decisions arise, and that early governance frameworks can be refined as capabilities and risks become clearer.
 
 ## Governance Assessment
 
-- **<EntityLink id="E154" name="governance-policy">AI Governance and Policy</EntityLink>**: Broader analysis of governance approaches and their effectiveness
-- **<EntityLink id="E113" name="effectiveness-assessment">Policy Effectiveness Assessment</EntityLink>**: Evaluating which governance interventions actually reduce risk
+- **<EntityLink id="E154">AI Governance and Policy</EntityLink>**: Broader analysis of governance approaches and their effectiveness
+- **<EntityLink id="E113">Policy Effectiveness Assessment</EntityLink>**: Evaluating which governance interventions actually reduce risk
+- **[AI Governance Effectiveness Analysis](./ai-governance-effectiveness-analysis)**: Systematic cross-mechanism analysis with evidence ratings for each governance approach
+- **[AI Power and Influence Map](./ai-power-and-influence-map)**: Mapping of actors, funding flows, and decision-making authority shaping AI governance outcomes
 
 ## Key Tensions
 
-**Speed vs. thoroughness**: The pace of AI capability development outstrips the pace of legislative and regulatory processes in most jurisdictions.
+**Speed vs. thoroughness**: The pace of AI capability development has outstripped the pace of legislative and regulatory processes in most jurisdictions. The EU AI Act took approximately three years from proposal to GPAI obligations entering force; frontier AI capability advanced substantially in that interval. Regulatory update mechanisms exist in some frameworks but have not yet been tested in practice.
 
-**National vs. international**: AI development is global but governance is primarily national, creating coordination challenges and regulatory arbitrage risks.
+**National vs. international**: AI development is global, but governance is primarily national, creating coordination challenges and regulatory arbitrage risks. International agreements through the summit process (Bletchley, Seoul, Paris) have been voluntary; no binding international treaty with enforcement mechanisms covers frontier AI risks as of mid-2026. The Paris 2025 summit's main declaration being unsigned by the US and UK illustrates the limits of multilateral consensus-building.[^rc-fd6e]
 
-**Voluntary vs. mandatory**: Industry self-regulation (RSPs, voluntary commitments) is faster to implement but lacks enforcement mechanisms. Legislation provides enforcement but is slower and harder to update.
+**Voluntary vs. mandatory**: Industry self-regulation (RSPs, voluntary commitments) can be implemented faster and may be more technically sophisticated than legislation, which takes years to develop and may be written without deep AI expertise. Proponents of voluntary frameworks argue they are more adaptive and technically credible. Critics note that voluntary commitments lack third-party verification and can be superseded by political changes, as occurred with the Biden voluntary commitments after the EO revocation.[^rc-7877][^rc-3a05] Mandatory frameworks address the enforcement gap but face their own challenges: regulatory agencies lack the technical capacity to evaluate advanced AI systems independently, and enforcement has lagged capability development in every jurisdiction that has enacted mandatory rules.
 
-**Compute governance as bottleneck**: Compute is the most governable input to AI development (physical, concentrated, measurable), but effective compute governance requires international coordination that remains elusive.
+**Compute governance as potential leverage point**: Some analysts argue that compute is among the more tractable inputs to govern because it is physical, concentrated in supply chains, and measurable. Others contend that algorithm efficiency improvements (which allow comparable capabilities at lower compute) and the importance of talent, data, and software make compute governance insufficient as a standalone approach. The debate over whether compute governance is the most promising intervention remains active. As of mid-2026, compute governance has not achieved international coordination, and US export controls face documented circumvention through organized smuggling networks operating at significant scale.[^rc-f078]
+
+[^rc-9b72]: [EU AI Act Implementation Timeline](https://artificialintelligenceact.eu/implementation-timeline/) (2025); [Latham & Watkins, "EU AI Act: GPAI Model Obligations in Force and Final GPAI Code of Practice in Place"](https://www.lw.com/en/insights/eu-ai-act-gpai-model-obligations-in-force-and-final-gpai-code-of-practice-in-place) (August 2025); [DLA Piper, "Latest wave of obligations under the EU AI Act take effect"](https://www.dlapiper.com/en-us/insights/publications/2025/08/latest-wave-of-obligations-under-the-eu-ai-act-take-effect) (August 2025).
+
+[^rc-0767]: [European Artificial Intelligence Office, Wikipedia](https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office) (2025); [European Commission, "European AI Office"](https://digital-strategy.ec.europa.eu/en/policies/ai-office) (2025).
+
+[^rc-fd6e]: [AI Action Summit, Wikipedia](https://en.wikipedia.org/wiki/AI_Action_Summit) (2025); [TechPolicy.Press, "At Paris AI Summit, US, EU, Other Nations Lay Out Divergent Goals"](https://www.techpolicy.press/at-paris-ai-summit-us-eu-other-nations-lay-out-divergent-goals/) (February 2025).
+
+[^rc-92d9]: [UK Government, "Frontier AI Safety Commitments, AI Seoul Summit 2024"](https://www.gov.uk/government/publications/frontier-ai-safety-commitments-ai-seoul-summit-2024/frontier-ai-safety-commitments-ai-seoul-summit-2024) (May 2024); [techUK, "Key Outcomes of the AI Seoul Summit"](https://www.techuk.org/resource/key-outcomes-of-the-ai-seoul-summit.html) (May 2024).
+
+[^rc-7ee9]: [Baker Botts, "Texas Enacts Responsible AI Governance Act: What Companies Need to Know"](https://www.bakerbotts.com/thought-leadership/publications/2025/july/texas-enacts-responsible-ai-governance-act-what-companies-need-to-know) (July 2025); [Greenberg Traurig, "TRAIGA: Key Provisions of Texas' New Artificial Intelligence Governance Act"](https://www.gtlaw.com/en/insights/2025/6/traiga-key-provisions-of-texas-new-artificial-intelligence-governance-act) (June 2025).
+
+[^rc-cc93]: [Baker Botts, "Colorado AI Act Implementation Delayed"](https://www.bakerbotts.com/thought-leadership/publications/2025/september/colorado-ai-act-implementation-delayed) (September 2025); [National Law Review, "Colorado Delays AI Act Implementation to June 2026"](https://natlawreview.com/article/colorado-delays-comprehensive-ai-law-further-changes-anticipated) (2025).
+
+[^rc-e27d]: [Governor Gavin Newsom, SB 1047 Veto Message](https://www.gov.ca.gov/wp-content/uploads/2024/09/SB-1047-Veto-Message.pdf) (September 29, 2024).
+
+[^rc-6912]: [Office of Governor Newsom, "Governor Newsom signs SB 53"](https://www.gov.ca.gov/2025/09/29/governor-newsom-signs-sb-53-advancing-californias-world-leading-artificial-intelligence-industry/) (September 29, 2025).
+
+[^rc-7877]: [Biden White House, "FACT SHEET: Biden-Harris Administration Secures Voluntary Commitments from Leading Artificial Intelligence Companies"](https://bidenwhitehouse.archives.gov/briefing-room/statements-releases/2023/07/21/fact-sheet-biden-harris-administration-secures-voluntary-commitments-from-leading-artificial-intelligence-companies-to-manage-the-risks-posed-by-ai/) (July 21, 2023); [FedScoop, "Where Biden's voluntary AI commitments go from here"](https://fedscoop.com/voluntary-ai-commitments-biden-trump-white-house/) (2025).
+
+[^rc-3a05]: [Trump White House, "Removing Barriers to American Leadership in Artificial Intelligence"](https://www.whitehouse.gov/presidential-actions/2025/01/removing-barriers-to-american-leadership-in-artificial-intelligence/) (January 20, 2025); [Skadden, "AI: Broad Biden Order Is Withdrawn, but Replacement Policies Are Yet To Be Drafted"](https://www.skadden.com/insights/publications/executive-briefing/ai-broad-biden-order-is-withdrawn) (2025).
+
+[^rc-20e9]: [Framework Convention on Artificial Intelligence, Wikipedia](https://en.wikipedia.org/wiki/Framework_Convention_on_Artificial_Intelligence) (2025); [US Department of State, "The Council of Europe's Framework Convention on AI"](https://www.state.gov/bureau-of-democracy-human-rights-and-labor/the-council-of-europes-framework-convention-on-artificial-intelligence-and-human-rights-democracy-and-the-rule-of-law) (2024).
+
+[^rc-7567]: [White & Case, "AI Watch: Global Regulatory Tracker – China"](https://www.whitecase.com/insight-our-thinking/ai-watch-global-regulatory-tracker-china) (2025).
+
+[^rc-7672]: [Montreal AI Ethics Institute, "The Death of Canada's Artificial Intelligence and Data Act"](https://montrealethics.ai/the-death-of-canadas-artificial-intelligence-and-data-act-what-happened-and-whats-next-for-ai-regulation-in-canada/) (2025).
+
+[^rc-f078]: [AI Frontiers, "How US Export Controls Have (and Haven't) Curbed Chinese AI"](https://ai-frontiers.org/articles/us-chip-export-controls-china-ai) (2025); [CNBC, "How \$160 million worth of export-controlled Nvidia chips were allegedly smuggled into China"](https://www.cnbc.com/2025/12/31/160-million-export-controlled-nvidia-gpus-allegedly-smuggled-to-china.html) (December 31, 2025); [CSIS, "The Limits of Chip Export Controls in Meeting the China Challenge"](https://www.csis.org/analysis/limits-chip-export-controls-meeting-china-challenge) (2025).
+
+[^rc-587b]: [Anthropic, "Responsible Scaling Policy Version 3.0"](https://www.anthropic.com/news/responsible-scaling-policy-v3) (2025); [Federation of American Scientists, "Can Preparedness Frameworks Pull Their Weight?"](https://fas.org/publication/scaling-ai-safety/) (2024).
+
+[^rc-bf7a]: [NIST, "AI Risk Management Framework"](https://www.nist.gov/itl/ai-risk-management-framework) (2025).

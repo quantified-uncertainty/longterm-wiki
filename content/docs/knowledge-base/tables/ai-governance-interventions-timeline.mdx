@@ -1,0 +1,209 @@
+---
+title: AI Governance Interventions Timeline
+description: A chronological data table of major AI governance interventions from 2022 to 2026, tracking executive orders, legislation, international agreements, and industry commitments with assessments of their effectiveness.
+sidebar:
+  order: 50
+entityType: concept
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A comprehensive, well-structured chronological dataset of 44 major AI governance interventions from 2022–2026, with coded effectiveness assessments revealing that most interventions are either 'partial' or 'too early to tell,' with voluntary frameworks dominating and enforcement-capable mechanisms (notably export controls and the EU AI Act) being the exceptions. The dataset is highly valuable as a reference resource and reveals systemic patterns like the enforcement gap in voluntary commitments and the sharp US deregulatory reversal under the Trump administration.
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+> **Data table page** — This page feeds the <EntityLink id="E154">AI Governance and Policy</EntityLink> analysis. For conceptual background on how governance strategy interacts with AGI timelines, see <EntityLink id="E415">Short AI Timeline Policy Implications</EntityLink>.
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Timelines Reference | [timelines.issarice.com](https://timelines.issarice.com/wiki/Timeline_of_AI_policy) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Timeline_of_artificial_intelligence) |
+
+---
+
+## Overview
+
+This page maintains a chronological log of major AI governance interventions from 2022 through mid-2026, intended as a data resource for the AI Governance Effectiveness Analysis. Entries cover a wide range of intervention types: executive orders and presidential directives, domestic legislation (enacted and failed), international agreements and summit declarations, voluntary industry commitments, export controls, AI safety institute formations, and technical standards bodies. Each row includes an assessment field coded as **effective**, **partial**, **ineffective**, or **too early to tell**, based on available evidence of implementation and observable outcomes.
+
+The period covered is unusually dense. The EU AI Act moved from political agreement (December 2023) through adoption (July 2024) into phased implementation across 2025–2030. The US oscillated between the safety-oriented Executive Order 14110 (October 2023) and its revocation under the deregulatory AI Action Plan (July 2025). Internationally, a sequence of frontier AI safety summits at Bletchley (November 2023), Seoul (May 2024), and Paris (February 2025) produced escalating but largely non-binding commitments. Export controls on advanced AI chips, first imposed in October 2022, were tightened in successive rounds through 2023 and 2025, making them among the more consequential and enforceable interventions in the dataset.
+
+Assessments are provisional. Many interventions are either too recent to evaluate or lack independent monitoring mechanisms. Where disagreement exists in the literature about whether an intervention has had its intended effect, the assessment defaults to **partial** or **too early to tell**. The methodology section below describes coding decisions in more detail.
+
+---
+
+## Methodology
+
+**Unit of analysis.** Each row represents a discrete policy instrument: a signed executive order, an enacted statute, a formally adopted international agreement, a published framework or standard, or a documented voluntary commitment. Draft proposals and white papers without formal adoption are excluded unless they generated observable downstream effects.
+
+**Assessment coding.** The four assessment codes are defined as follows:
+- **Effective** — the intervention was implemented substantially as intended and evidence suggests it achieved at least its proximate stated goal.
+- **Partial** — the intervention was implemented but with significant gaps, delays, or scope limitations that reduced its effectiveness relative to stated goals.
+- **Ineffective** — the intervention was not implemented, was rescinded before taking effect, or evidence suggests it failed to achieve its proximate goals.
+- **Too early to tell** — the intervention has been adopted but insufficient time or evidence exists to assess outcomes.
+
+**Scope.** Interventions are included if they meet one or more of the following criteria: they were adopted by a jurisdiction with significant AI development activity (US, EU member states, China, UK, Singapore, India); they operated at an international or multilateral level; or they were assessed in the AI safety literature as potentially significant for catastrophic risk reduction.
+
+**Source limitations.** The research base for this table is strongest for US and EU interventions and weakest for China, ASEAN, and Africa. Post-2025 entries carry higher uncertainty. Assessments for interventions still in phased rollout (notably the EU AI Act) may be updated as implementation progresses.
+
+---
+
+## Intervention Log
+
+The table below contains 44 rows covering the period October 2022 through mid-2026. Rows are ordered chronologically by the date the intervention entered into force or was formally adopted.
+
+| # | Date | Actor | Intervention Name | Target | Enforcement Mechanism | Intended Outcome | Observed Outcome | Assessment |
+|---|------|-------|------------------|--------|-----------------------|-----------------|-----------------|------------|
+| 1 | Oct 7, 2022 | US Dept of Commerce (BIS) | Export Controls on Advanced AI Chips (initial rule) | Chinese entities acquiring advanced semiconductors (A100/H100 class) | Export license denials; entity list | Prevent transfer of compute enabling advanced AI/military applications to China | Restricted some direct sales; significant circumvention via third countries reported; NVIDIA redesigned chips (A800/H800) to stay below thresholds initially | Partial |
+| 2 | Mar 1, 2022 | China (CAC) | Internet Information Service Algorithmic Recommendation Provisions | Domestic platforms using algorithmic content recommendation | Regulatory enforcement by Cyberspace Administration of China | Accountability, transparency, and safety in AI-driven content; reduce manipulation risks | Implemented with compliance filings; scope limited to recommendation systems, not foundation models | Partial |
+| 3 | Jan 26, 2023 | US NIST | AI Risk Management Framework (AI RMF 1.0) | US organizations developing or deploying AI systems | Voluntary adoption; referenced in federal procurement | Provide structured risk management vocabulary and practices for AI | Widely cited; adopted as reference by federal agencies and some industry; no binding compliance requirement limits uptake | Partial |
+| 4 | Jul 12, 2023 | White House / Biden Administration | Voluntary AI Safety Commitments (White House) | Amazon, Anthropic, Google, Inflection, Meta, Microsoft, OpenAI | Voluntary; no legal penalty for non-compliance | Safe, secure, and trustworthy AI development; watermarking, red-teaming, info-sharing | Commitments published; implementation uneven; no independent verification mechanism; companies self-reported compliance | Partial |
+| 5 | Jul 13, 2023 | China (CAC) | Interim Measures for the Management of Generative AI Services | Domestic generative AI service providers | CAC regulatory enforcement; security assessment requirement | Require safety assessments, content moderation, data labeling, real-name registration for generative AI | Implemented; companies required to file; scope limited to services available in China; chilling effect on some releases reported | Partial |
+| 6 | Oct 30, 2023 | White House / Biden Administration | Executive Order 14110 on Safe, Secure, and Trustworthy AI | Federal agencies and developers of dual-use foundation models above compute thresholds | Presidential directive; agency rulemaking; DPA invocation authority | Safety testing, reporting to government, cybersecurity standards, fraud protection, equity assessments | Agencies published implementation reports; significant rulemaking initiated; revoked January 2025 before full implementation | Ineffective (rescinded) |
+| 7 | Nov 1–2, 2023 | UK Government / 28 Countries | Bletchley Declaration on AI Safety | Frontier AI developers and signatory governments | Non-binding political declaration | International recognition of catastrophic AI risks; establish ongoing intergovernmental safety dialogue | Established AI Safety Institute (UK); influenced Seoul commitments; no binding obligations created | Partial |
+| 8 | Nov 2023 | UK Government | AI Safety Institute (AISI) Formation | Frontier AI developers (voluntary engagement) | Non-statutory; voluntary testing agreements | Conduct evaluations of frontier models for dangerous capabilities; produce public safety reports | Conducted evaluations of GPT-4, Claude 3, Gemini; published findings; US AISI announced February 2024; influence on deployment decisions limited | Partial |
+| 9 | Dec 2023 | EU Council / EU Parliament | EU AI Act — Political Agreement Reached | AI systems developed or deployed in EU | Regulation with binding legal force; market access conditions | Risk-based regulation: ban high-risk prohibited uses, require conformity assessment for high-risk systems | Political agreement reached; formal text finalized; published July 12, 2024; implementation phased through 2030 | Too early to tell |
+| 10 | Feb 2024 | US NIST | AI Safety Institute (US-AISI) Formation | Frontier AI developers (voluntary testing agreements) | Non-statutory; voluntary MoUs | Evaluate pre-deployment safety of frontier models; complement UK AISI | MoUs signed with Anthropic, OpenAI, and others; evaluations conducted; renamed/reorganized under Trump administration 2025 | Partial |
+| 11 | Mar 2024 | EU Parliament | EU AI Act — Parliamentary Approval | See row 9 | See row 9 | Formal legislative adoption | Approved; forwarded to Council | Too early to tell (milestone) |
+| 12 | Mar 21, 2024 | UN General Assembly | UN Resolution on AI Governance | Member states; AI developers | Non-binding resolution | International cooperation on safe, trustworthy AI; inclusive governance | Adopted unanimously; non-binding; established framework for subsequent UN dialogue; limited enforcement | Too early to tell |
+| 13 | Jan 2024 | UK Government | Generative AI Framework for HM Government | UK public sector bodies | Internal government guidance; no statutory force | Safe and responsible use of generative AI in government operations | Published and distributed; implementation across departments uneven; no compliance monitoring reported | Too early to tell |
+| 14 | Jan 2024 | US NIST | Adversarial Machine Learning Taxonomy (NIST 2-14 series) | AI practitioners and developers | Voluntary reference standard | Improve robustness practices against adversarial attacks on AI systems | Published; adopted as reference by security community; no binding uptake mechanism | Too early to tell |
+| 15 | Mar 2024 | US OMB | OMB Memorandum on AI Governance (M-24-10) | US federal agencies | OMB oversight; agency compliance reporting | Minimum risk management practices for federal AI use; agency AI officer requirements | Agencies required to designate Chief AI Officers; inventory AI uses; compliance reporting initiated; revoked/superseded 2025 | Partial |
+| 16 | Mar 2024 | India (MeitY) | Generative AI Advisory | Indian AI companies and platforms | Non-binding advisory; no statutory penalty | Responsible deployment of generative AI; bias mitigation, labeling, legal compliance | Published; voluntary nature limited uptake; India AI Act development ongoing | Too early to tell |
+| 17 | May 2024 | EU Council | EU AI Act — Council Approval | See row 9 | See row 9 | Final legislative adoption | Approved; entered into force August 1, 2024 | Too early to tell (milestone) |
+| 18 | May 2024 | EU Commission | EU AI Office — Established | Providers of general-purpose AI (GPAI) models in EU | Regulatory enforcement under AI Act | Oversight of GPAI models; code of practice development; coordinate national authorities | Established; began GPAI code of practice process; first codes of practice finalized by mid-2025 | Too early to tell |
+| 19 | May 2024 | Singapore (IMDA/MDDI) | Model AI Governance Framework for Generative AI | AI developers and deployers using generative AI | Voluntary; industry guidance | Responsible generative AI development: accountability, testing, transparency | Published; widely cited in ASEAN context; voluntary limits enforcement | Too early to tell |
+| 20 | May 21–22, 2024 | UK, Republic of Korea, 16+ countries | Seoul Frontier AI Safety Commitments | Frontier AI developers (16 companies signed) | Voluntary commitments; company-published safety policies | Safety thresholds and policies from frontier labs before deployment; government oversight | 16 companies published safety frameworks; implementation quality varied; no independent audit mechanism | Partial |
+| 21 | May 2024 | Seoul Summit Participants | International Network of AI Safety Institutes | National AI Safety Institutes | Soft coordination; information sharing MoUs | Coordinate evaluations and share safety findings across governments | Network established; UK and US AISIs most active; expansion to other states ongoing | Too early to tell |
+| 22 | Jul 12, 2024 | EU (Official Journal) | EU AI Act — Publication and Entry into Force | AI systems in EU market | Legally binding regulation; phased compliance deadlines | Full EU AI Act implementation per phased schedule | Published; prohibitions effective February 2, 2025; GPAI rules effective August 2, 2025; high-risk August 2026 | Too early to tell |
+| 23 | Oct 2023 / Oct 2024 | US Dept of Commerce (BIS) | Export Controls — Updated Rules (Oct 2023 and Oct 2024) | Advanced AI chips and related items; country-tier restrictions | Export license system; entity list; third-country controls | Close circumvention loopholes; expand country tiers; restrict cloud access to controlled compute | Updated rules partially closed A800/H800 loophole; country-tier system introduced; circumvention via Gulf states and others continued | Partial |
+| 24 | Sep 2024 | California Governor (Veto) | California SB 1047 — Vetoed | Large AI model developers (\>10^26 FLOP training runs) | N/A (vetoed) | Safety evaluations, incident reporting, kill-switch requirements for large models | Vetoed by Governor Newsom; did not become law; cited concerns about chilling AI innovation in California | Ineffective (vetoed) |
+| 25 | 2024 | Colorado Legislature | Colorado AI Act (SB 24-205) | Developers and deployers of high-risk AI systems | State enforcement; private right of action elements | Algorithmic discrimination protections; transparency requirements for consequential AI decisions | Enacted; compliance obligations phased; one of few enacted state AI bills with binding force; implementation ongoing | Too early to tell |
+| 26 | 2024 | Utah Legislature | Utah SB 149 (AI Policy Act) | AI systems used in regulated sectors (primarily consumer services) | State enforcement | Disclosure requirements when AI interacts with consumers | Enacted; limited scope (disclosure only); regarded as relatively weak intervention | Partial |
+| 27 | Nov 2023 | <EntityLink id="E218">OpenAI</EntityLink>, Google DeepMind, <EntityLink id="E22">Anthropic</EntityLink>, Microsoft | Frontier Model Forum — Operational Activity | Frontier AI developers | Voluntary; industry self-governance | Industry coordination on AI safety research; best practice sharing; red-teaming standards | Published research outputs; safety fund established; critics argued insufficient independence and no binding obligations | Partial |
+| 28 | Feb 2, 2025 | EU (AI Act) | EU AI Act — Prohibitions and AI Literacy Apply | AI systems in prohibited categories (e.g., social scoring, real-time remote biometric ID, manipulation of subliminal behavior) | Direct prohibition under AI Act; national authority enforcement | Ban prohibited AI practices in EU; establish AI literacy obligations for providers | First binding deadline passed; European Commission published prohibited AI guidelines; enforcement by national authorities nascent | Too early to tell |
+| 29 | Jan 20, 2025 | White House / Trump Administration | Executive Order 14179 — Removing Barriers to American Leadership in AI | Federal agencies; prior AI safety EO | Presidential directive; agency action | Revoke EO 14110; direct new AI action plan emphasizing innovation and deregulation | EO 14110 revoked; OMB M-24-10 superseded; AI Action Plan directed; significant shift in federal posture | Effective (as stated goal; safety implications contested) |
+| 30 | Feb 2025 | Council of Europe | Framework Convention on Artificial Intelligence | Signatory states and their jurisdictions | Treaty obligations on signatories; domestic implementation required | Legally binding international AI standards on human rights, democracy, rule of law | Entered into force; first binding international AI treaty; ratification count limited at entry into force; long implementation timeline ahead | Too early to tell |
+| 31 | Mar 2025 | ASEAN Members | ASEAN Responsible AI Roadmap (2025–2030) | ASEAN member state governments and AI developers | Non-binding regional roadmap | Harmonized AI governance across ASEAN; responsible AI development standards | Published; voluntary; implementation depends on member state follow-through | Too early to tell |
+| 32 | May 2, 2025 | EU AI Office | EU AI Act — GPAI Code of Practice Finalized | Providers of general-purpose AI models in EU | Code of practice under AI Act; binding rules apply August 2025 | Establish obligations for GPAI providers: transparency, copyright compliance, systemic risk assessment | Codes finalized on schedule; industry participation in drafting; binding obligations followed August 2 | Too early to tell |
+| 33 | May 2025 | US House of Representatives | Federal AI Preemption Moratorium — Passed House | State AI laws | Federal preemption if enacted | 10-year moratorium on state AI regulation to ensure national consistency | Passed House; rejected by Senate 99–1 in July 2025; did not become law | Ineffective (failed in Senate) |
+| 34 | May 2025 | Singapore (IMDA) | Singapore Consensus on AI Safety Research Priorities | AI safety researchers and frontier labs | Non-binding international research agenda | Align global AI safety research priorities; identify key open problems | Published; endorsed by multiple governments and labs; voluntary research coordination mechanism | Too early to tell |
+| 35 | May 2025 | China (State Council) | Draft AI Law — Removed from Legislative Plan | Domestic AI developers | N/A (deprioritized) | Comprehensive domestic AI regulation | Removed from State Council legislative agenda; signals China deprioritizing binding domestic AI law in near term | Ineffective (deprioritized) |
+| 36 | Jul 2025 | White House / Trump Administration | America's AI Action Plan | Federal agencies; states; AI industry | Presidential action plan; executive orders; federal funding conditions | Deregulatory AI governance; innovation-first; competition with China; delegating safety to private sector | Released July 23, 2025; three accompanying executive orders; conditions federal funding on states not restricting AI; ongoing implementation | Too early to tell |
+| 37 | Jul 2025 | US Senate | Federal AI Preemption Moratorium — Rejected by Senate | State AI laws | N/A (rejected) | Prevent state AI regulation fragmentation | Rejected 99–1; 17 Republican governors and 40 state attorneys general opposed; reinforced state role in AI governance | Ineffective (rejected) |
+| 38 | Aug 2, 2025 | EU (AI Act) | EU AI Act — GPAI Rules, Governance Bodies, Penalties Apply | GPAI model providers; national AI authorities | AI Act enforcement; national authority designation; EU AI Board | GPAI model obligations in force; penalties applicable; national authorities designated | Deadline reached; national authority designations completed in most Member States; enforcement capacity varies significantly by country | Too early to tell |
+| 39 | Aug 2025 | United Nations | UN Global Dialogue on AI Governance — Established | Member states; international organizations; civil society | UN facilitation; non-binding dialogue | Inclusive multilateral forum for AI governance; address global South participation gaps | Established; July 2026 summit planned; early structural criticism that dialogue lacks binding mechanisms or moral compass | Too early to tell |
+| 40 | Jul 2025 | Singapore (IMDA) | Singapore Global AI Assurance Sandbox — Launch | AI developers seeking pre-deployment safety assessment | Voluntary; sandbox testing | Provide structured safety testing environment; support responsible deployment | Launched; early-stage uptake; voluntary participation limits scope | Too early to tell |
+| 41 | Nov 2025 | China | National Cybersecurity Law — Updated with AI Provisions | Domestic AI systems and data practices | Chinese legal enforcement | Integrate AI-specific cybersecurity requirements into national law | Enacted; scope and implementation details limited in available reporting | Too early to tell |
+| 42 | Nov 2025 | India (Government) | AI Governance Guidelines | Indian AI developers and deployers | Non-binding guidelines | Responsible AI framework for Indian context; complement Digital India Act development | Published; voluntary; binding Digital India Act still under development | Too early to tell |
+| 43 | Feb 2026 | US (National Security Council) | Framework to Advance AI Governance and Risk Management in National Security | US national security agencies and contractors using AI | Executive policy; classified and unclassified components | Integrate AI risk management into national security decision-making | Published; limited public detail available on implementation | Too early to tell |
+| 44 | Aug 2, 2026 | EU (AI Act) | EU AI Act — High-Risk AI Rules Apply (Annex III) | Developers and deployers of high-risk AI systems (hiring, credit, education, law enforcement, etc.) | AI Act enforcement; conformity assessment; notified bodies | Require conformity assessments, registration, human oversight for high-risk AI | Scheduled deadline; European Commission proposed simplification/delay in late 2025, creating uncertainty; final status pending | Too early to tell |
+
+---
+
+## Notable Patterns and Cross-Cutting Observations
+
+Several patterns emerge across the intervention log that are relevant to the broader AI governance effectiveness analysis.
+
+**The enforcement gap.** The majority of interventions coded as **partial** share a common structural feature: they establish substantive requirements but lack independent monitoring or verification mechanisms. The White House Voluntary Commitments (row 4), the Seoul Frontier AI Safety Commitments (row 20), and the Singapore Model AI Governance Framework (row 19) all fall into this category. Voluntary frameworks without third-party audit produce compliance that is difficult to distinguish from performative adoption. This is noted in the broader literature as a central limitation of the governance landscape prior to the EU AI Act's binding phase.
+
+**Export controls as outlier.** The October 2022 semiconductor export controls (row 1) and their 2023–2024 updates (row 23) represent the most enforcement-capable interventions in the dataset. They operate through the existing US export licensing system, carry criminal penalties, and have demonstrated observable effects on chip acquisition patterns. The assessments for these rows nonetheless remain **partial** because documented circumvention through third-country re-export, cloud-access workarounds, and redesigned products limits their effectiveness relative to stated goals. <EntityLink id="E64">Compute Governance</EntityLink> and <EntityLink id="E463">Hardware-Enabled Governance</EntityLink> literature treats these controls as a significant proof-of-concept for technical AI governance, while noting the ongoing cat-and-mouse dynamic.
+
+**The US oscillation.** Rows 6, 15, and 29 trace a sharp reversal in US federal AI governance posture. Executive Order 14110 (October 2023) established the most comprehensive federal AI safety requirements to date, including mandatory reporting of large-model safety tests to the government. Its revocation via Executive Order 14179 (January 2025) before most implementing rules had been finalized means the intended outcome was never realized, producing an **ineffective** assessment on safety grounds — though EO 14179 was effective as a statement of the Trump administration's deregulatory intent. The AI Action Plan (row 36) that followed delegated safety responsibility to the private sector and conditioned federal funding on states not enacting AI restrictions, a posture assessed by critics at Harvard's ethics program as prioritizing economic competition over harm prevention.
+
+**The Bletchley–Seoul–Paris sequence.** The three frontier AI safety summits produced escalating formality: Bletchley (2023) generated a political declaration; Seoul (2024) produced company-level safety commitments from 16 frontier labs; Paris (2025) built on these with further governmental statements. All three are assessed as **partial** rather than effective because they generated no binding obligations and relied on companies self-reporting implementation. The summits were nonetheless significant in establishing a shared vocabulary around catastrophic and systemic AI risk and in providing political cover for the creation of national AI Safety Institutes in the UK and US.
+
+**EU AI Act as structural anchor.** The EU AI Act (rows 9, 11, 17, 22, 28, 38, 44) is the most structurally significant governance intervention in the dataset. Its phased implementation creates binding legal obligations for market access in the EU, backed by penalties and a formal regulatory architecture. Its assessments remain **too early to tell** throughout because the binding enforcement phases have only recently begun. The proposed delay to the August 2026 high-risk deadline (row 44) illustrates the political pressure on implementation timelines and introduces uncertainty that the dataset tracks but cannot yet resolve.
+
+**State-level governance in the US.** The failure of California SB 1047 (row 24) and the Senate rejection of the federal preemption moratorium (row 37) together illustrate the contested terrain of US AI governance. SB 1047 was the most ambitious attempt at compute-threshold–based safety requirements for frontier models in any US jurisdiction; its veto removed a potential model for state-level frontier AI governance. The moratorium's 99–1 Senate rejection — opposed by both conservative governors and civil society — preserved state authority but left a fragmented regulatory landscape with over 480 enacted state AI bills as of 2025. <EntityLink id="E602">Texas TRAIGA</EntityLink> represents a continuing state-level effort in this space.
+
+---
+
+## Interventions by Type: Summary Count
+
+| Intervention Type | Count | Effective | Partial | Ineffective | Too Early to Tell |
+|---|---|---|---|---|---|
+| Executive Orders / Presidential Actions | 5 | 1 | 1 | 2 | 1 |
+| Legislation (enacted) | 4 | 0 | 1 | 0 | 3 |
+| Legislation (failed/vetoed) | 3 | 0 | 0 | 3 | 0 |
+| International Declarations / Treaties | 6 | 0 | 2 | 0 | 4 |
+| Voluntary Commitments (industry) | 4 | 0 | 3 | 0 | 1 |
+| Export Controls | 2 | 0 | 2 | 0 | 0 |
+| Technical Standards / Frameworks (non-binding) | 8 | 0 | 2 | 0 | 6 |
+| Institutional Formation (ASIs, offices) | 6 | 0 | 2 | 0 | 4 |
+| Domestic Regulations (China, India, Singapore) | 6 | 0 | 2 | 1 | 3 |
+| **Total** | **44** | **1** | **15** | **6** | **22** |
+
+---
+
+## Criticisms and Concerns
+
+The governance landscape documented in this table draws significant criticism from multiple directions, which the effectiveness assessments attempt to reflect rather than adjudicate.
+
+**Voluntary frameworks are insufficient for catastrophic risks.** A recurring critique in both the academic and EA/rationalist literatures is that the majority of governance interventions through 2025 remain voluntary, lack independent verification, and are therefore unlikely to constrain frontier AI development in ways that matter for catastrophic risk. The predominance of **partial** assessments for voluntary commitments in the table reflects this structural limitation. Critics have argued that relying on the private sector to self-report compliance — as both the White House Voluntary Commitments and Seoul Frontier Commitments do — repeats the pattern of social media self-regulation that produced documented harms without accountability.
+
+**Deregulatory US shift creates global governance gap.** The Trump administration's January 2025 revocation of EO 14110 and the subsequent AI Action Plan have been characterized by governance researchers as creating a significant gap in the world's most AI-capable jurisdiction. Harvard ethics commentators described the plan as prioritizing economic competition over ethical safeguards and delegating risk management to the private sector without a statutory backstop. The US federal moratorium's failure (99–1 Senate vote) simultaneously prevented the kind of national coordination that could have replaced EO 14110 with a legislative equivalent.
+
+**AGI timeline dependency limits governance strategy.** Research cited in the EA forum and LessWrong communities argues that the efficacy of governance interventions is deeply sensitive to <EntityLink id="E16">AI Timelines</EntityLink>. Under pre-2030 timelines, broad regulatory and advocacy approaches may be too slow — awareness campaigns and legislative cycles typically take years to produce results. This suggests a mismatch between the timescale of most interventions in this dataset and the timescale on which transformative AI risks may materialize. Some researchers have argued for prioritizing corporate governance and security-focused interventions within existing frontier labs as faster-acting alternatives under short timelines.
+
+**Methodological concerns about timeline forecasting itself.** A separate strand of criticism questions the value of timeline-dependent governance analysis, arguing that AGI timeline forecasting suffers from deference cycles (where a small number of influential forecasters tacitly inform a wider consensus, creating a false appearance of independent agreement) and poor operationalization of what AGI means. This limits confidence in the conditional assessments.
+
+**Implementation gaps even for binding frameworks.** The EU AI Act's phased implementation, the proposed delay to the August 2026 high-risk deadline, and the significant variation in national authority capacity across EU member states illustrate that formal adoption does not guarantee effective implementation. The table captures this with **too early to tell** assessments for most EU AI Act milestones, reflecting genuine uncertainty rather than optimism.
+
+---
+
+## Key Uncertainties
+
+- Whether EU AI Act enforcement capacity will be sufficient to produce meaningful compliance by frontier model providers, particularly non-EU companies
+- Whether the US federal AI governance vacuum following EO 14110's revocation will be filled by state legislation, industry self-governance, or eventual congressional action
+- Whether export controls on advanced AI chips will remain effective as chip design, manufacturing, and cloud delivery continue to evolve
+- Whether the frontier AI safety summit process (Bletchley → Seoul → Paris) will produce binding mechanisms or remain in the voluntary commitment paradigm
+- Whether the Council of Europe AI Convention will attract ratification from major AI-developing states or remain limited in scope
+- How governance effectiveness assessments for 2025–2026 interventions should be updated as implementation evidence accumulates
+
+---
+
+## Changelog
+
+| Date | Change |
+|------|--------|
+| 2026-04-12 | Initial page creation; 44-row intervention log through mid-2026; methodology section; cross-cutting observations |
+
+---
+
+## Sources
+
+[^1]: US Bureau of Industry and Security - Export controls on advanced computing items, October 2022 rule and subsequent updates
+[^2]: China Cyberspace Administration - Internet Information Service Algorithmic Recommendation Management Provisions, effective March 1, 2022
+[^3]: US NIST - AI Risk Management Framework 1.0, January 2023
+[^4]: White House (Biden Administration) - Voluntary AI Safety Commitments announcement, July 12, 2023
+[^5]: China Cyberspace Administration - Interim Measures for the Management of Generative AI Services, effective August 2023
+[^6]: White House (Biden Administration) - Executive Order 14110 on Safe, Secure, and Trustworthy Artificial Intelligence, October 30, 2023
+[^7]: UK Government - AI Safety Summit, Bletchley Park, November 1-2, 2023; Bletchley Declaration text
+[^8]: UK Department for Science, Innovation and Technology - AI Safety Institute formation announcement, November 2023
+[^9]: European Parliament and Council - EU AI Act legislative timeline; Official Journal publication July 12, 2024; entry into force August 1, 2024
+[^10]: US NIST - AI Safety Institute formation, February 2024; voluntary memoranda of understanding with frontier labs
+[^11]: UN General Assembly - Resolution on seizing the opportunities of safe, secure and trustworthy AI systems, March 21, 2024
+[^12]: UK Government - Generative AI Framework for HM Government, January 2024
+[^13]: US OMB - Memorandum M-24-10, Advancing Governance, Innovation, and Risk Management for Agency Use of Artificial Intelligence, March 2024
+[^14]: India Ministry of Electronics and Information Technology (MeitY) - Generative AI Advisory, March 2024
+[^15]: Singapore IMDA/MDDI - Model AI Governance Framework for Generative AI, May 2024
+[^16]: Republic of Korea / UK co-hosts - Seoul Frontier AI Safety Commitments, May 2024; company safety policy publications
+[^17]: California Governor's Office - Veto message on SB 1047 (Safe and Secure Innovation for Frontier Artificial Intelligence Models Act), September 2024
+[^18]: Colorado General Assembly - Colorado AI Act (SB 24-205), enacted 2024
+[^19]: Utah State Legislature - SB 149 (Utah Artificial Intelligence Policy Act), enacted 2024
+[^20]: White House (Trump Administration) - Executive Order 14179, Removing Barriers to American Leadership in Artificial Intelligence, January 20, 2025
+[^21]: Council of Europe - Framework Convention on Artificial Intelligence, entry into force 2025
+[^22]: ASEAN - Responsible AI Roadmap 2025-2030, March 2025
+[^23]: US House of Representatives - Passage of federal AI preemption moratorium provision (10-year moratorium on state AI laws), May 2025
+[^24]: Singapore IMDA - Singapore Consensus on AI Safety Research Priorities, May 2025
+[^25]: China State Council - Removal of Draft AI Law from legislative plan, May 2025
+[^26]: White House (Trump Administration) - America's AI Action Plan, July 23, 2025; three accompanying executive orders
+[^27]: US Senate - Rejection of federal AI preemption moratorium 99-1, July 2025
+[^28]: EU AI Office - GPAI Code of Practice finalization; August 2, 2025 GPAI rules entry into force
+[^29]: United Nations - Global Dialogue on AI Governance establishment, August 2025
+[^30]: China - National Cybersecurity Law update with AI provisions, November 2025
+[^31]: India Government - AI Governance Guidelines publication, November 2025
+[^32]: US National Security Council - Framework to Advance AI Governance and Risk Management in National Security, February 2026
+[^33]: Oliver Patel - 2024 AI governance year-in-review documenting January-December 2024 interventions
+[^34]: Harvard Law School Ethics program commentary - AI Governance at a Crossroads: America's AI Action Plan, November 2025
+[^35]: EU Commission - Proposed simplification amendments to EU AI Act potentially delaying August 2026 high-risk deadline, November 2025
