@@ -94,22 +94,71 @@ describe('parseTranscript', () => {
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
 
-  it('computes cost from usage data', () => {
+  it('extracts primary model from assistant messages', () => {
     const filePath = writeTmpFile(makeJsonl([
       {
         type: 'assistant',
         message: {
-          content: [{ type: 'text', text: 'done' }],
+          content: [{ type: 'text', text: 'first' }],
           model: 'claude-sonnet-4-6',
-          usage: { input_tokens: 1_000_000, output_tokens: 100_000 },
+          usage: { input_tokens: 100, output_tokens: 50 },
         },
         timestamp: '2026-04-11T10:00:00Z',
       },
+      {
+        type: 'assistant',
+        message: {
+          content: [{ type: 'text', text: 'second' }],
+          model: 'claude-sonnet-4-6',
+          usage: { input_tokens: 100, output_tokens: 50 },
+        },
+        timestamp: '2026-04-11T10:00:01Z',
+      },
+      {
+        type: 'assistant',
+        message: {
+          content: [{ type: 'text', text: 'haiku' }],
+          model: 'claude-haiku-4-5',
+          usage: { input_tokens: 100, output_tokens: 50 },
+        },
+        timestamp: '2026-04-11T10:00:02Z',
+      },
     ]));
     const result = parseTranscript(filePath);
-    // 1M input * $3/M + 100K output * $15/M = $4.50
-    expect(result.cost.totalCostUsd).toBeCloseTo(4.50, 2);
-    expect(result.cost.costString).toBe('$4.50');
+    // Sonnet appears twice, haiku once -> primary model is sonnet
+    expect(result.model).toBe('claude-sonnet-4-6');
+    fs.rmSync(path.dirname(filePath), { recursive: true });
+  });
+
+  it('ignores synthetic model for primary model extraction', () => {
+    const filePath = writeTmpFile(makeJsonl([
+      {
+        type: 'assistant',
+        message: {
+          content: [{ type: 'text', text: 'real' }],
+          model: 'claude-sonnet-4-6',
+          usage: { input_tokens: 100, output_tokens: 50 },
+        },
+        timestamp: '2026-04-11T10:00:00Z',
+      },
+      {
+        type: 'assistant',
+        message: {
+          content: [{ type: 'text', text: 'synthetic 1' }],
+          model: '<synthetic>',
+        },
+        timestamp: '2026-04-11T10:00:01Z',
+      },
+      {
+        type: 'assistant',
+        message: {
+          content: [{ type: 'text', text: 'synthetic 2' }],
+          model: '<synthetic>',
+        },
+        timestamp: '2026-04-11T10:00:02Z',
+      },
+    ]));
+    const result = parseTranscript(filePath);
     expect(result.model).toBe('claude-sonnet-4-6');
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
@@ -171,8 +220,9 @@ describe('parseTranscript', () => {
     const result = parseTranscript(filePath);
     expect(result.title).toBeNull();
     expect(result.summary).toBeNull();
-    expect(result.cost.totalCostUsd).toBe(0);
+    expect(result.model).toBeNull();
     expect(result.durationMinutes).toBeNull();
+    expect(result.lineCount).toBe(0);
     fs.rmSync(path.dirname(filePath), { recursive: true });
   });
 

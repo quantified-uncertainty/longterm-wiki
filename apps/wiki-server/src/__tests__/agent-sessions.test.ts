@@ -497,7 +497,6 @@ describe("Agent Sessions API", () => {
         status: "completed",
         title: "Fix widget rendering bug",
         summary: "Fixed the widget rendering by updating the CSS selector",
-        cost: "$0.50",
       });
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -516,7 +515,7 @@ describe("Agent Sessions API", () => {
       expect(body.error).toBe("incomplete_session");
       expect(body.missing).toContain("title");
       expect(body.missing).toContain("summary");
-      expect(body.missing).toContain("cost");
+      expect(body.missing).not.toContain("cost");
     });
 
     it("validates inside the transaction (throws before commit) on status=completed without required fields", async () => {
@@ -544,7 +543,6 @@ describe("Agent Sessions API", () => {
         status: "completed",
         title: "Fix widget rendering bug",
         summary: "Fixed the widget rendering",
-        cost: "$0.50",
       });
       expect(res.status).toBe(200);
     });
