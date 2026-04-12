@@ -74,6 +74,25 @@ Most migrations: adding columns, creating tables, adding indexes on small tables
 
 See `apps/wiki-server/drizzle/0048_add_slug_and_integer_id.sql` (no-op) and `apps/wiki-server/scripts/phase4a-manual-migration.sql` (actual DDL) for a reference implementation.
 
+### Pattern: `ADD CONSTRAINT ... NOT VALID` + separate `VALIDATE CONSTRAINT`
+
+For CHECK constraints on large tables (>100 MB or >1M rows), plain `ALTER TABLE ... ADD CONSTRAINT CHECK (...)` scans every row while holding ACCESS EXCLUSIVE — any concurrent reader (especially materialized-view refreshes) can keep the migration client waiting past the 60s `lock_timeout`. Split the DDL in two:
+
+```sql
+-- Phase 1: register the constraint as unchecked metadata.
+-- Acquires ACCESS EXCLUSIVE for milliseconds; no row scan.
+ALTER TABLE my_big_table
+  ADD CONSTRAINT my_constraint CHECK (col IN ('a','b','c')) NOT VALID;
+
+-- Phase 2: validate against existing rows.
+-- Only needs SHARE UPDATE EXCLUSIVE — concurrent SELECT/INSERT/UPDATE are allowed.
+ALTER TABLE my_big_table VALIDATE CONSTRAINT my_constraint;
+```
+
+Both phases enforce the constraint on new writes once Phase 1 lands. Phase 2 can follow in the same migration, a follow-up migration, or a manual script.
+
+**Post-mortem — 2026-04-12 incident (QUA-302, QUA-156):** Migration 0173 added `chk_hrs_level CHECK (...)` directly on `hallucination_risk_snapshots` (905 MB, 3.3M rows). The concurrent `REFRESH MATERIALIZED VIEW hallucination_risk_latest` held AccessShareLock continuously, so every deploy retry exhausted the 60s `lock_timeout` and rolled back the whole PreSync job. The failure cascaded into ~7 symptom-management PRs before root cause was identified — prod was stuck on a ~12-hour-old image the whole time. Unstick path: manually applied the constraint with `NOT VALID` (milliseconds), then `VALIDATE CONSTRAINT` (5.8s, non-blocking), then re-ran the deploy. Follow-up: QUA-294 proposes a gate validator that flags `ADD CONSTRAINT` on a hot list of large tables unless `NOT VALID` is used.
+
 ### Pattern: batched UPDATE for large backfills
 
 For UPDATE operations on large tables, process in batches to avoid statement_timeout and reduce lock contention:
