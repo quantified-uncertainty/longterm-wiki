@@ -764,6 +764,11 @@ export async function syncPolicyStakeholders(typedEntities) {
   }
 
   // Sync individually to handle FK errors gracefully (some entityIds may not exist in PG)
+  // Bypass sourcing enforcement: stakeholder YAML does not yet carry sourcing data;
+  // hard enforcement was enabled in QUA-248 before coverage was backfilled.
+  // TODO(QUA-248): remove forceSkipSourcing once stakeholder sourcing is backfilled.
+  const skipSourcing =
+    'forceSkipSourcing=true&reason=build-data%3Apolicy-stakeholder-sync';
   let synced = 0;
   let skipped = 0;
   try {
@@ -771,7 +776,7 @@ export async function syncPolicyStakeholders(typedEntities) {
     const batchSize = 50;
     for (let i = 0; i < items.length; i += batchSize) {
       const batch = items.slice(i, i + batchSize);
-      const resp = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
+      const resp = await fetch(`${serverUrl}/api/policy-stakeholders/sync?${skipSourcing}`, {
         method: 'POST',
         headers,
         body: JSON.stringify({ items: batch }),
@@ -784,7 +789,7 @@ export async function syncPolicyStakeholders(typedEntities) {
         // Batch failed — try items individually to skip bad FK references
         for (const item of batch) {
           try {
-            const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync`, {
+            const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync?${skipSourcing}`, {
               method: 'POST',
               headers,
               body: JSON.stringify({ items: [item] }),

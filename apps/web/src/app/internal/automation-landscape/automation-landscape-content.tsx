@@ -374,6 +374,15 @@ const entries: AutomationEntry[] = [
     status: "disabled",
     file: "apps/groundskeeper/src/tasks/issue-responder.ts",
   },
+  {
+    name: "GK: TableBase Scan",
+    type: "Groundskeeper",
+    schedule: "Daily 05:00 UTC",
+    description:
+      "Scans TableBase records for sourcing coverage and writes scanner-results artifacts used by the coverage dashboard.",
+    status: "active",
+    file: "apps/groundskeeper/src/tasks/tablebase-scan.ts",
+  },
 
   // -- K8s Long-Running Services --
   {
@@ -610,6 +619,7 @@ export function AutomationLandscapeContent() {
               <li>03:00 -- Snapshot retention cleanup (GK)</li>
               <li>04:00 -- Wiki-server data export + Source-check (Mon)</li>
               <li>04:30 -- Resources snapshot refresh</li>
+              <li>05:00 -- TableBase scan (GK)</li>
               <li>06:00 -- Data quality snapshot (GK) + Auto-update enqueue (GK)</li>
               <li>07:00 -- Daily data validation + Entity/fact sync (Mon)</li>
               <li>07:30 -- Scheduled maintenance (weekdays)</li>
