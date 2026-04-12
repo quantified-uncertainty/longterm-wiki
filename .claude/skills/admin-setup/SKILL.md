@@ -13,8 +13,8 @@ The skill is **idempotent** — it can be re-run safely. Background loops are on
 
 ## What this skill does
 
-1. Starts background loops (tmux rename, optionally PR patrol)
-2. Pulls latest `main/` and `ops/` to get current state
+1. Starts background loops (tmux rename, ws refresh, optionally PR patrol)
+2. Pulls latest `main/` and `ops/` and runs a one-shot `./ws refresh` to reset merged-PR slots
 3. Prints orientation: production health, stale work, ready-for-dispatch queue
 4. Reports what's running and what's stale
 
@@ -41,7 +41,24 @@ echo "Started rename loop, PID $!"
 
 If `scripts/tmux-rename-loop.sh` doesn't exist, fall back to running `./ws fix-tabs` once and noting that the loop script needs to be created.
 
-**1b. PR patrol loop** (optional — ask user before starting)
+**1b. ws refresh loop** — every 15 minutes, resets slots whose PRs merged and pulls latest main in idle slots. Only touches idle/merged slots; never disturbs active work.
+
+Check if it's already running:
+```bash
+pgrep -f ws-refresh-loop.sh && echo "✓ ws-refresh loop already running" || echo "✗ not running"
+```
+
+If not running, start it:
+```bash
+cd /Users/ozziegooen/Documents/GitHub.nosync/lw
+nohup ./scripts/ws-refresh-loop.sh > /tmp/lw-ws-refresh.log 2>&1 &
+disown
+echo "Started ws-refresh loop, PID $!"
+```
+
+If `scripts/ws-refresh-loop.sh` doesn't exist, fall back to noting that the loop script needs to be created; Section 2 still runs a one-shot refresh.
+
+**1c. PR patrol loop** (optional — ask user before starting)
 
 Check for an existing PR patrol process:
 ```bash
@@ -50,7 +67,7 @@ pgrep -f "pr-patrol" && echo "✓ PR patrol already running" || echo "✗ not ru
 
 If the user wants it started, follow the standard PR patrol startup procedure (typically `pnpm crux gh pr-patrol` from `lw/coord` or `lw/main`). Do NOT start it without user confirmation — PR patrol uses real LLM budget.
 
-### Section 2: Pull latest
+### Section 2: Pull latest + refresh slots
 
 ```bash
 git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/main pull --ff-only
@@ -58,6 +75,14 @@ git -C /Users/ozziegooen/Documents/GitHub.nosync/lw/ops pull --ff-only
 ```
 
 If either pull fails (diverged), report it and ask the user how to proceed — do not auto-resolve.
+
+Then do a one-shot `./ws refresh` so the coordinator starts with a clean slot map (the loop from Section 1b catches subsequent merges, but the first run gives immediate feedback):
+
+```bash
+/Users/ozziegooen/Documents/GitHub.nosync/lw/ws refresh 2>&1 | tail -20
+```
+
+This only resets slots whose PRs have merged; slots with active work are left alone.
 
 ### Section 3: Production health
 
@@ -104,7 +129,7 @@ Print a single concise summary block:
 ```
 === Admin session ready ===
 Date:        2026-04-10
-Background:  rename-loop ✓ | pr-patrol [✓ or –]
+Background:  rename-loop ✓ | ws-refresh ✓ | pr-patrol [✓ or –]
 Production:  healthy | uptime Xs
 Linear:      N stale In Progress | M ready P1/P2
 CI (main):   N failures in last 24h
