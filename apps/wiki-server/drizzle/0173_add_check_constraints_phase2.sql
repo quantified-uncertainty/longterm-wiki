@@ -152,7 +152,7 @@ END $$;
 DO $$ BEGIN
   ALTER TABLE "service_health_incidents"
     ADD CONSTRAINT chk_shi_severity
-    CHECK (severity IN ('P0', 'P1', 'P2'));
+    CHECK (severity IN ('critical', 'warning', 'info'));
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 
