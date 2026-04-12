@@ -2490,3 +2490,40 @@
     - ai-governance
     - political-stability
   lastUpdated: 2026-03
+- id: ai-actor-feedback-loops
+  stableId: sid_08pVKM0y5g
+  wikiId: E2224
+  type: analysis
+  title: AI Actor Feedback Loops
+  description: >-
+    Causal graph analysis of feedback loops between AI lab behavior, governance responses, talent flows,
+    capital incentives, and capability diffusion that shape the AI safety landscape.
+  tags:
+    - ai-governance
+    - causal-models
+  lastUpdated: 2026-04
+- id: ai-governance-effectiveness-analysis
+  stableId: sid_vIwkZynajQ
+  wikiId: E2225
+  type: analysis
+  title: AI Governance Effectiveness Analysis
+  description: >-
+    Comparative analysis of AI governance intervention types — from hard regulation and export controls to
+    voluntary commitments and international coordination — graded on theory of change, enforcement strength,
+    counterfactual impact, and failure modes.
+  tags:
+    - ai-governance
+    - regulation
+  lastUpdated: 2026-04
+- id: ai-power-and-influence-map
+  stableId: sid_EwYivsAX4g
+  wikiId: E2226
+  type: analysis
+  title: AI Power and Influence Map
+  description: >-
+    A scoring framework mapping the major actors who shape AI development and governance, assessing their
+    likelihood of exerting meaningful power, magnitude of influence, key mechanisms, and time horizons.
+  tags:
+    - ai-governance
+    - power-mapping
+  lastUpdated: 2026-04
