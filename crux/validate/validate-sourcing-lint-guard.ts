@@ -14,7 +14,14 @@
  *   - hyphenated  — literal `source-check` anywhere in scanned files
  *   - camelCase   — `sourceCheck` identifier-style
  *   - PascalCase  — `SourceCheck` type/class-style
- *   - route       — `/api/source-checks` URL path
+ *   - route       — `/api/source-checks` URL path (PAUSED — see note below)
+ *
+ * NOTE: The `route` axis is counted but intentionally NOT included in the
+ * enforced total. The production wiki-server's backward-compat alias at
+ * `app.ts:207` does not route `/api/sourcing/*` correctly on the deployed
+ * image, so clients must keep calling `/api/source-checks/` until the alias
+ * is fixed (tracked in #4193). Re-enable route enforcement once that is
+ * resolved and we can migrate clients back to `/api/sourcing/`.
  *
  * Scope: crux/, apps/web/src/, apps/wiki-server/src/
  * Extensions: .ts, .tsx, .mts, .mjs
@@ -115,7 +122,10 @@ export function countInText(text: string): Counts {
   const hyphenated = Math.max(0, hyphenAll - routeMatches);
   const camelCase = text.match(CAMEL_RE)?.length ?? 0;
   const PascalCase = text.match(PASCAL_RE)?.length ?? 0;
-  const total = hyphenated + routeMatches + camelCase + PascalCase;
+  // Route references are intentionally excluded from the enforced total
+  // until the prod alias is fixed (#4193). They're still reported in the
+  // `route` field for visibility.
+  const total = hyphenated + camelCase + PascalCase;
   return { hyphenated, camelCase, PascalCase, route: routeMatches, total };
 }
 

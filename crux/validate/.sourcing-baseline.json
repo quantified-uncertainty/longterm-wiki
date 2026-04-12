@@ -3,7 +3,7 @@
   "camelCase": 1,
   "PascalCase": 0,
   "route": 18,
-  "total": 23,
-  "updatedAt": "2026-04-12T03:02:06.560Z",
-  "notes": "Ratchet baseline for source-check → sourcing rename. Only lower this value; never raise without justification. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella)."
+  "total": 5,
+  "updatedAt": "2026-04-12T04:35:25.985Z",
+  "notes": "Ratchet baseline for source-check → sourcing rename. Only lower this value; never raise without justification. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella). NOTE: `route` is tracked for visibility but NOT included in `total` — the prod /api/sourcing/ alias is broken (#4193) so client route refs are intentional until fixed."
 }

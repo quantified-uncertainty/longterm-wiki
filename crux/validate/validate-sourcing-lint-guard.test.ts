@@ -24,11 +24,12 @@ describe('countInText', () => {
     expect(c.hyphenated).toBe(2);
   });
 
-  it('subtracts route matches from hyphenated count to avoid double counting', () => {
+  it('tracks route matches but excludes them from total (paused per #4193)', () => {
     const c = countInText(`fetch("/api/source-checks/verdicts")`);
     expect(c.route).toBe(1);
     expect(c.hyphenated).toBe(0);
-    expect(c.total).toBe(1);
+    // Route axis is paused: reported but not counted toward the enforced total.
+    expect(c.total).toBe(0);
   });
 
   it('handles a mix of hyphenated and route references', () => {
@@ -40,7 +41,8 @@ describe('countInText', () => {
     const c = countInText(text);
     expect(c.route).toBe(1);
     expect(c.hyphenated).toBe(2);
-    expect(c.total).toBe(3);
+    // Total excludes route (paused); only the two hyphenated occurrences count.
+    expect(c.total).toBe(2);
   });
 
   it('counts camelCase identifiers only when followed by another identifier char', () => {
@@ -112,6 +114,8 @@ describe('countInText', () => {
     `);
     expect(c.route).toBe(3);
     expect(c.hyphenated).toBe(0);
+    // Route axis is paused — these do not contribute to total.
+    expect(c.total).toBe(0);
   });
 
   it('runCheck passes on the current codebase (baseline must not regress)', () => {
