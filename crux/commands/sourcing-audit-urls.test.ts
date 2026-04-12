@@ -79,6 +79,40 @@ describe('classifyByUrl', () => {
     expect(classifyByUrl('https://example.com/#deep-anchor-ref').purpose).toBeNull();
   });
 
+  it('ignores short/common fragments like #top', () => {
+    // '#top' has length 4; threshold is > 4 → still a homepage
+    expect(classifyByUrl('https://example.com/#top').purpose).toBe('homepage');
+    expect(classifyByUrl('https://example.com/#').purpose).toBe('homepage');
+  });
+
+  it('returns reason=query-data-param for data-like query params', () => {
+    const r = classifyByUrl('https://example.com/?id=42');
+    expect(r.reasons).toContain('query-data-param');
+  });
+
+  it('is case-insensitive for homepage paths', () => {
+    expect(classifyByUrl('https://example.com/ABOUT').purpose).toBe('homepage');
+    expect(classifyByUrl('https://example.com/Index.HTML').purpose).toBe('homepage');
+  });
+
+  it('returns confidence 0 with reason=unparseable for bad input', () => {
+    const r = classifyByUrl('not a url');
+    expect(r.confidence).toBe(0);
+    expect(r.reasons).toContain('unparseable');
+  });
+
+  it('handles IPv6 hosts without crashing', () => {
+    // Node accepts http://[::1]/ — classifier should not throw
+    const r = classifyByUrl('http://[::1]/');
+    expect(r.purpose).toBe('homepage');
+  });
+
+  it('ignores userinfo in URL', () => {
+    // Credentials in URL should not affect classification
+    const r = classifyByUrl('https://user:pass@example.com/');
+    expect(r.purpose).toBe('homepage');
+  });
+
   // ── Wayback-prefixed ──
   it('unwraps Wayback URLs and classifies the inner URL', () => {
     const r1 = classifyByUrl('https://web.archive.org/web/20240101000000/https://example.com/');

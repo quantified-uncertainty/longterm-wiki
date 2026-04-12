@@ -16,6 +16,75 @@
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { listVerdicts, getEvidenceByRecord } from '../lib/wiki-server/sourcing-client.ts';
 
+// ── Module constants ──
+
+/** Confidence threshold: classifyByUrl score ≥ this marks a row as "flagged homepage". */
+const FLAG_THRESHOLD = 0.7;
+
+/** Parallel evidence-fetch requests. Keeps the wiki-server load light. */
+const CONCURRENCY = 8;
+
+/** Evidence rows fetched per verdict record. Most records have 1–2. */
+const EVIDENCE_PER_RECORD = 5;
+
+/** Default verdicts to audit. */
+const DEFAULT_VERDICTS = ['unverifiable', 'partial'];
+
+/** Default per-verdict fetch limit; capped to CLAMP_LIMIT. */
+const DEFAULT_LIMIT = 100;
+const CLAMP_LIMIT = 2000;
+
+/** Output-truncation limits (human-readable mode only). */
+const TOP_DOMAINS_SHOWN = 30;
+const TOP_SAMPLES_SHOWN = 20;
+const SAMPLE_IDS_PER_DOMAIN = 3;
+
+/** Query parameters that indicate tracking, not data content. */
+const TRACKING_PREFIXES = ['utm_', 'mc_', 'oly_'];
+const TRACKING_EXACT = new Set(['fbclid', 'gclid', 'yclid', 'msclkid', '_ga']);
+
+/** Query parameters that indicate specific content (force non-homepage classification). */
+const DATA_PARAM_KEYS = new Set(['id', 'v', 'q', 'search', 'article', 'item', 'page', 'post']);
+
+/** Known URL shorteners — cannot classify without following the redirect. */
+const SHORTENERS = new Set([
+  'bit.ly', 't.co', 'goo.gl', 'tinyurl.com', 'ow.ly', 'buff.ly',
+  'is.gd', 'shorturl.at', 'rb.gy', 'cutt.ly',
+]);
+
+/** Single-segment paths that act as homepages on most sites. */
+const HOMEPAGE_PATHS = new Set([
+  '/about', '/about-us', '/about_us', '/aboutus',
+  '/contact', '/contact-us', '/contactus',
+  '/home', '/home.html', '/index', '/index.html', '/index.htm',
+  '/welcome', '/main',
+]);
+
+/** True if the caller wants ANSI color codes (TTY and NO_COLOR unset). */
+function useColor(): boolean {
+  if (process.env.NO_COLOR) return false;
+  return !!process.stdout.isTTY;
+}
+
+const ANSI = {
+  bold: '\x1b[1m',
+  reset: '\x1b[0m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+} as const;
+
+const bold = (s: string) => (useColor() ? `${ANSI.bold}${s}${ANSI.reset}` : s);
+const yellow = (s: string) => (useColor() ? `${ANSI.yellow}${s}${ANSI.reset}` : s);
+
+/** Parse and clamp a user-supplied `--limit`. Guards against NaN, negative, oversize. */
+function clampLimit(raw: unknown): number {
+  if (raw === undefined) return DEFAULT_LIMIT;
+  const n = parseInt(String(raw), 10);
+  if (!Number.isFinite(n) || n <= 0) return DEFAULT_LIMIT;
+  return Math.min(n, CLAMP_LIMIT);
+}
+
 // ── URL classifier (inline; extracted to crux/lib/sourcing/url-quality.ts in QUA-312) ──
 
 /**
@@ -62,11 +131,6 @@ export function classifyByUrl(raw: string): {
     return { purpose: null, confidence: 0.2, reasons: ['wayback-unresolved'] };
   }
 
-  // Known URL shorteners — cannot classify without following
-  const SHORTENERS = new Set([
-    'bit.ly', 't.co', 'goo.gl', 'tinyurl.com', 'ow.ly', 'buff.ly',
-    'is.gd', 'shorturl.at', 'rb.gy', 'cutt.ly',
-  ]);
   if (SHORTENERS.has(host)) {
     return { purpose: null, confidence: 0, reasons: ['shortener'] };
   }
@@ -79,32 +143,21 @@ export function classifyByUrl(raw: string): {
   // Normalize path for analysis
   const path = url.pathname.replace(/\/+$/, '') || '/';
   const depth = path === '/' ? 0 : path.split('/').filter(Boolean).length;
-  const hasFragment = url.hash.length > 0 && url.hash !== '#';
-
-  // Meaningful fragment (Twitter status, deep anchor) — not homepage, regardless of depth.
-  // Short fragments like "#top" or "#" are ignored.
-  if (hasFragment && url.hash.length > 3) {
+  // Meaningful fragment (e.g., Twitter status ID, deep anchor) — not homepage.
+  // Ignore `#`, `#top`, or anything ≤ 4 characters including the leading `#`.
+  if (url.hash.length > 4) {
     return { purpose: null, confidence: 0.3, reasons: ['deep-fragment'] };
   }
 
-  // Query strings: distinguish tracking-only (utm_*, fbclid, etc.) from data params.
-  const TRACKING_PREFIXES = ['utm_', 'mc_', 'oly_'];
-  const TRACKING_EXACT = new Set(['fbclid', 'gclid', 'yclid', 'msclkid', '_ga']);
-  const DATA_PARAM_KEYS = new Set(['id', 'v', 'q', 'search', 'article', 'item', 'page', 'post']);
-  let hasDataParam = false;
+  // Named data params (?id=, ?q=, ?v=, ...) force NOT-homepage even at root.
+  // Tracking-only queries (utm_*, fbclid, ...) are ignored. Other non-tracking,
+  // non-data params (e.g., ?campaign=x) are treated as benign — imperfect but
+  // keeps false-positive rate low.
   for (const k of url.searchParams.keys()) {
     const keyLower = k.toLowerCase();
-    if (TRACKING_EXACT.has(keyLower)) continue;
-    if (TRACKING_PREFIXES.some((p) => keyLower.startsWith(p))) continue;
-    // Any non-tracking param is "content-bearing" — most specifically, data-param keys
-    // force NOT-homepage even at root.
     if (DATA_PARAM_KEYS.has(keyLower)) {
-      hasDataParam = true;
-      break;
+      return { purpose: null, confidence: 0.2, reasons: ['query-data-param'] };
     }
-  }
-  if (hasDataParam) {
-    return { purpose: null, confidence: 0.2, reasons: ['query-data-param'] };
   }
 
   // Depth 0: bare domain or root path (tracking-only query is fine)
@@ -113,13 +166,6 @@ export function classifyByUrl(raw: string): {
     return { purpose: 'homepage', confidence: 0.95, reasons };
   }
 
-  // Known homepage-adjacent single-segment paths
-  const HOMEPAGE_PATHS = new Set([
-    '/about', '/about-us', '/about_us', '/aboutus',
-    '/contact', '/contact-us', '/contactus',
-    '/home', '/home.html', '/index', '/index.html', '/index.htm',
-    '/welcome', '/main',
-  ]);
   if (depth === 1 && HOMEPAGE_PATHS.has(path.toLowerCase())) {
     reasons.push(`homepage-path:${path.toLowerCase()}`);
     return { purpose: 'homepage', confidence: 0.85, reasons };
@@ -161,14 +207,12 @@ export function normalizeUrlForJoin(raw: string): string {
       ? ''
       : `:${url.port}`;
 
-  // Strip common tracking params
-  const TRACKING_PARAM_PREFIXES = ['utm_', 'mc_', 'oly_'];
-  const TRACKING_PARAM_EXACT = new Set(['fbclid', 'gclid', 'yclid', 'msclkid', '_ga']);
+  // Strip common tracking params (utm_*, fbclid, etc.); preserve data params.
   const filteredParams = new URLSearchParams();
   for (const [k, v] of url.searchParams.entries()) {
     const keyLower = k.toLowerCase();
-    if (TRACKING_PARAM_EXACT.has(keyLower)) continue;
-    if (TRACKING_PARAM_PREFIXES.some((p) => keyLower.startsWith(p))) continue;
+    if (TRACKING_EXACT.has(keyLower)) continue;
+    if (TRACKING_PREFIXES.some((p) => keyLower.startsWith(p))) continue;
     filteredParams.append(k, v);
   }
   const qs = filteredParams.toString();
@@ -220,21 +264,18 @@ interface DomainSummary {
   sampleRecordIds: string[];
 }
 
-/** Minimum confidence from classifyByUrl to mark as flagged homepage. */
-const FLAG_THRESHOLD = 0.7;
-
 async function auditCommand(
   _args: string[],
   options: AuditOptions,
 ): Promise<CommandResult> {
-  const verdictFilterRaw = options.verdict ?? 'unverifiable,partial';
+  const verdictFilterRaw = options.verdict ?? DEFAULT_VERDICTS.join(',');
   const verdicts = verdictFilterRaw.split(',').map((v) => v.trim()).filter(Boolean);
-  const limit = options.limit ? parseInt(String(options.limit), 10) : 100;
+  const limit = clampLimit(options.limit);
   const badUrlOnly = options['bad-url-only'] || options.badUrlOnly;
   const isJson = options.json;
 
   if (!isJson) {
-    console.log('\x1b[1mSource-Check URL Audit\x1b[0m');
+    console.log(bold('Source-Check URL Audit'));
     console.log(`Verdicts: ${verdicts.join(', ')}`);
     console.log(`Limit:    ${limit} verdicts`);
     console.log('');
@@ -263,7 +304,9 @@ async function auditCommand(
   if (verdictRecords.length === 0) {
     return {
       exitCode: 0,
-      output: isJson ? JSON.stringify({ rows: [], domains: [], total: 0 }) : 'No verdicts matched.',
+      output: isJson
+        ? JSON.stringify({ rows: [], domains: [], total: 0, totalFlagged: 0 })
+        : 'No verdicts matched.',
     };
   }
 
@@ -307,11 +350,10 @@ async function auditCommand(
     for (const r of results) rows.push(...r);
   }
 
-  const filteredRows = badUrlOnly ? rows.filter((r) => r.flagged) : rows;
-
-  // ── Step 3: aggregate by domain ──
+  // ── Step 3: aggregate by domain (over ALL rows, so totals are accurate
+  // regardless of --bad-url-only; callers can filter the sample rows client-side).
   const domainMap = new Map<string, DomainSummary>();
-  for (const r of filteredRows) {
+  for (const r of rows) {
     let d = domainMap.get(r.host);
     if (!d) {
       d = {
@@ -326,33 +368,39 @@ async function auditCommand(
     d.total++;
     if (r.flagged) d.flagged++;
     d.byRecordType[r.recordType] = (d.byRecordType[r.recordType] ?? 0) + 1;
-    if (d.sampleRecordIds.length < 3) {
+    if (d.sampleRecordIds.length < SAMPLE_IDS_PER_DOMAIN) {
       d.sampleRecordIds.push(`${r.recordType}/${r.recordId}`);
     }
   }
 
-  const domains = [...domainMap.values()].sort((a, b) => {
-    // Rank by flagged-count first (most "homepage-like"), then by total
-    if (b.flagged !== a.flagged) return b.flagged - a.flagged;
-    return b.total - a.total;
-  });
+  const domains = [...domainMap.values()]
+    // When --bad-url-only, drop domains with no flagged rows so the table isn't noise.
+    .filter((d) => (badUrlOnly ? d.flagged > 0 : true))
+    .sort((a, b) => {
+      // Rank by flagged-count first (most "homepage-like"), then by total
+      if (b.flagged !== a.flagged) return b.flagged - a.flagged;
+      return b.total - a.total;
+    });
+
+  const sampleRows = badUrlOnly ? rows.filter((r) => r.flagged) : rows;
+  const totalFlagged = rows.filter((r) => r.flagged).length;
 
   // ── Step 4: output ──
   if (isJson) {
     return {
       exitCode: 0,
       output: JSON.stringify({
-        rows: filteredRows,
+        rows: sampleRows,
         domains,
-        total: filteredRows.length,
-        totalFlagged: rows.filter((r) => r.flagged).length,
+        total: sampleRows.length,
+        totalFlagged,
       }),
     };
   }
 
   return {
     exitCode: 0,
-    output: formatHumanOutput(filteredRows, domains, rows.filter((r) => r.flagged).length, verdicts),
+    output: formatHumanOutput(sampleRows, domains, totalFlagged, verdicts),
   };
 }
 
@@ -364,34 +412,34 @@ function formatHumanOutput(
 ): string {
   const lines: string[] = [];
   lines.push('');
-  lines.push('\x1b[1m=== Audit Summary ===\x1b[0m');
+  lines.push(bold('=== Audit Summary ==='));
   lines.push(`Evidence rows:       ${rows.length}`);
   lines.push(`Flagged as homepage: ${totalFlaggedOverall}`);
   lines.push(`Unique domains:      ${domains.length}`);
   lines.push(`Verdict filter:      ${verdicts.join(', ')}`);
   lines.push('');
 
-  lines.push('\x1b[1mTop domains (by flagged count, then total):\x1b[0m');
+  lines.push(bold('Top domains (by flagged count, then total):'));
   lines.push('-'.repeat(100));
-  const header = `${'Flagged'.padStart(7)}  ${'Total'.padStart(5)}  ${'Domain'.padEnd(40)}  Record types`;
-  lines.push(`\x1b[1m${header}\x1b[0m`);
-  for (const d of domains.slice(0, 30)) {
+  lines.push(bold(`${'Flagged'.padStart(7)}  ${'Total'.padStart(5)}  ${'Domain'.padEnd(40)}  Record types`));
+  for (const d of domains.slice(0, TOP_DOMAINS_SHOWN)) {
     const types = Object.entries(d.byRecordType)
       .sort((a, b) => b[1] - a[1])
       .map(([t, n]) => `${t}:${n}`)
       .join(' ');
-    const flaggedStr = d.flagged > 0 ? `\x1b[33m${String(d.flagged).padStart(7)}\x1b[0m` : String(d.flagged).padStart(7);
+    const flaggedStr = d.flagged > 0
+      ? yellow(String(d.flagged).padStart(7))
+      : String(d.flagged).padStart(7);
     lines.push(`${flaggedStr}  ${String(d.total).padStart(5)}  ${d.host.padEnd(40)}  ${types}`);
   }
-  if (domains.length > 30) {
-    lines.push(`  ... and ${domains.length - 30} more domains`);
+  if (domains.length > TOP_DOMAINS_SHOWN) {
+    lines.push(`  ... and ${domains.length - TOP_DOMAINS_SHOWN} more domains`);
   }
   lines.push('');
 
-  // Show first 20 flagged rows with their URLs
-  const flagged = rows.filter((r) => r.flagged).slice(0, 20);
+  const flagged = rows.filter((r) => r.flagged).slice(0, TOP_SAMPLES_SHOWN);
   if (flagged.length > 0) {
-    lines.push('\x1b[1mSample flagged evidence:\x1b[0m');
+    lines.push(bold('Sample flagged evidence:'));
     lines.push('-'.repeat(100));
     for (const r of flagged) {
       const id = r.recordId.length > 24 ? r.recordId.slice(0, 22) + '..' : r.recordId;
