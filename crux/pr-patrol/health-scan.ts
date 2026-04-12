@@ -111,10 +111,13 @@ export interface HealthScanResult {
  * whether the deploy pipeline is healthy.
  *
  * Rules:
- *  - ≥ DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES failures at the head of the list → unhealthy
- *  - Last successful deploy older than DEPLOY_STALE_THRESHOLD_HOURS with at least
- *    one failure since → unhealthy (catches the "nothing deploying" case too)
+ *  - ≥ DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES failures at the head → unhealthy
+ *  - Last successful deploy older than DEPLOY_STALE_THRESHOLD_HOURS AND at least
+ *    one failure since → unhealthy (age + hint of breakage)
  *  - Otherwise healthy, even if there's a single old failure buried in the list
+ *
+ * Note: "no deploys in 6h" alone is not flagged — the repo may simply be quiet.
+ * A failure since the last success is required to rule out "nothing to deploy".
  */
 export function evaluateDeployStatus(
   runs: WorkflowRun[],
@@ -129,18 +132,25 @@ export function evaluateDeployStatus(
     };
   }
 
+  // Skip LEADING in-progress runs (conclusion null). An in-progress run at the
+  // head shouldn't hide a failing streak underneath — treat it as "not yet
+  // resolved" and look at what's already settled.
+  let headIdx = 0;
+  while (headIdx < runs.length && runs[headIdx].conclusion === null) headIdx++;
+  const resolved = runs.slice(headIdx);
+
   let consecutiveFailures = 0;
-  for (const run of runs) {
+  for (const run of resolved) {
     if (run.conclusion === 'failure') consecutiveFailures++;
     else break;
   }
 
-  const lastSuccess = runs.find((r) => r.conclusion === 'success') ?? null;
+  const lastSuccess = resolved.find((r) => r.conclusion === 'success') ?? null;
   const lastSuccessfulDeployAt = lastSuccess ? new Date(lastSuccess.createdAt) : null;
-  const failingDeploys = runs.slice(0, consecutiveFailures);
+  const failingDeploys = resolved.slice(0, consecutiveFailures);
 
   if (consecutiveFailures >= DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES) {
-    const last = runs[0];
+    const last = resolved[0];
     const reason =
       `${consecutiveFailures} consecutive production deploy failures ` +
       `(most recent: ${last.displayTitle} at ${last.createdAt})`;
@@ -183,7 +193,18 @@ export function evaluateDeployStatus(
  * Pending checks at the head are skipped (not counted as either pass or fail).
  */
 export function evaluateMainCi(commits: CommitStatus[]): MainCiResult {
-  const resolved = commits.filter((c) => c.conclusion !== 'pending' && c.conclusion !== null);
+  // Skip LEADING pending / null commits only. Stripping pending globally would
+  // collapse [fail, pending, fail, fail] into a fake 3-streak. Pending in the
+  // middle of the list breaks the streak like any other non-failure would.
+  let start = 0;
+  while (
+    start < commits.length &&
+    (commits[start].conclusion === 'pending' || commits[start].conclusion === null)
+  ) {
+    start++;
+  }
+  const resolved = commits.slice(start);
+
   if (resolved.length === 0) {
     return {
       healthy: true,
@@ -299,7 +320,8 @@ export async function checkDeployStatus(
   const limit = options.limit ?? 5;
 
   const resp = await githubApi<ListRunsResponse>(
-    `/repos/${REPO}/actions/workflows/${workflow}/runs?branch=${branch}&per_page=${limit}`,
+    `/repos/${REPO}/actions/workflows/${encodeURIComponent(workflow)}/runs` +
+      `?branch=${encodeURIComponent(branch)}&per_page=${limit}`,
   );
 
   const runs: WorkflowRun[] = resp.workflow_runs.map((r) => ({
@@ -325,7 +347,7 @@ interface MainCommitsGql {
             committedDate: string;
             url: string;
             statusCheckRollup: {
-              state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED';
+              state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL';
             } | null;
           }>;
         };
@@ -388,20 +410,28 @@ export async function checkMainCi(
   return evaluateMainCi(commits);
 }
 
-function mapRollupState(
-  state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | null,
+export function mapRollupState(
+  state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL' | null,
 ): CommitStatus['conclusion'] {
   if (state === 'SUCCESS') return 'success';
   if (state === 'FAILURE' || state === 'ERROR') return 'failure';
   if (state === 'PENDING' || state === 'EXPECTED') return 'pending';
+  if (state === 'NEUTRAL') return 'neutral';
   return null;
 }
 
 /**
  * Run both scanners and combine into one HealthScanResult. Intended to be
  * called at the start of each patrol cycle (Phase 3 wiring).
+ *
+ * Throws if either GitHub call fails (5xx, rate limit, network). Phase 3 is
+ * responsible for deciding policy on scanner failure — a transient API hiccup
+ * shouldn't silently look like "healthy".
  */
-export async function healthScan(): Promise<HealthScanResult> {
-  const [deploy, mainCi] = await Promise.all([checkDeployStatus(), checkMainCi()]);
-  return combineHealth(deploy, mainCi);
+export async function healthScan(now: Date = new Date()): Promise<HealthScanResult> {
+  const [deploy, mainCi] = await Promise.all([
+    checkDeployStatus({ now }),
+    checkMainCi(),
+  ]);
+  return combineHealth(deploy, mainCi, now);
 }
