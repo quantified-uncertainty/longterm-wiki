@@ -1,0 +1,310 @@
+---
+title: OpenAI Board and Foundation Dynamics
+description: The governance evolution of OpenAI, from its 2015 nonprofit founding through the 2023 leadership crisis and the 2025 restructuring into a public benefit corporation controlled by the OpenAI Foundation.
+sidebar:
+  order: 50
+entityType: organization
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A comprehensive and well-structured account of OpenAI's governance evolution from nonprofit founding through the 2025 PBC restructuring, covering the 2023 crisis, key structural tensions, and ongoing safety oversight concerns; particularly valuable for understanding who holds effective veto power over frontier model releases. The article balances factual reporting with substantive criticism but has sourcing weaknesses — many footnotes cite 'research data' rather than primary sources.
+balanceFlags:
+  - single-source-dominance
+  - missing-primary-sources
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Structure** | Nonprofit (<EntityLink id="E421">OpenAI Foundation</EntityLink>) controls for-profit (OpenAI Group PBC) via equity stake and board appointment power |
+| **Stability** | Historically volatile; 2023 CEO ouster and reinstatement; major restructuring finalized October 2025 |
+| **Mission Lock-in** | Partial — mission encoded in PBC operating agreement, but nonprofit ceded exclusive AGI control; Microsoft can commercialize through 2032 |
+| **Safety Oversight** | Safety and Security Committee (SSC) holds veto over model releases; critics note SSC relies on four part-time volunteers without dedicated staff |
+| **Equity** | Foundation holds ~26% stake (~\$130B); Microsoft ~27%; employees ~26%; remaining to other investors |
+| **AI Safety Relevance** | High — governance structure determines who holds veto over frontier model releases and safety policies |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website | [openai.com/our-structure](https://openai.com/our-structure/) |
+| Wikipedia | [en.wikipedia.org/wiki/OpenAI](https://en.wikipedia.org/wiki/OpenAI) |
+
+## Overview
+
+<EntityLink id="E218">OpenAI</EntityLink> began in December 2015 as a nonprofit research laboratory with an explicit mission to ensure that artificial general intelligence (AGI) benefits all of humanity. Over the following decade, pressure from capital requirements and competitive dynamics reshaped its governance architecture substantially — first through the 2019 creation of a capped-profit subsidiary, and most dramatically through the November 2023 leadership crisis that exposed deep structural vulnerabilities in the hybrid nonprofit-for-profit model, and then through the October 2025 restructuring into a public benefit corporation (PBC). Each transition has been contested, involving negotiations among the board, investors, employees, state attorneys general, and — since 2023 — the public.[^1][^2]
+
+The central governance question throughout has been who actually controls OpenAI's direction: the nonprofit board with its mission mandate, the CEO and executives with operational authority, or the large investors (particularly Microsoft) whose capital is essential to the enterprise. The November 2023 crisis showed that even a formally empowered nonprofit board could not sustain a CEO removal in the face of investor and employee opposition. The 2025 restructuring formally acknowledged some of these power realities while attempting to encode mission protections into the new legal structure through board appointment rights, a Safety and Security Committee veto, and regulatory agreements with state attorneys general.[^3][^4]
+
+For AI safety purposes, the governance dynamics matter because they determine who holds effective veto power over frontier model releases, who can enforce safety standards against commercial pressures, and whether the organization's safety commitments are structurally durable or depend on the goodwill of individuals. See also the <EntityLink id="E404">OpenAI Foundation Governance Paradox</EntityLink> and the broader <EntityLink id="E418">AI Safety Multi-Actor Strategic Landscape</EntityLink>.
+
+---
+
+## History
+
+### Founding and Early Board (2015–2018)
+
+OpenAI was incorporated in Delaware in December 2015 as a 501(c)(3) nonprofit. Eleven individuals are listed as co-founders: Sam Altman, Elon Musk, Ilya Sutskever, Greg Brockman, Trevor Blackwell, Vicki Cheung, <EntityLink id="E1287">Andrej Karpathy</EntityLink>, Durk Kingma, John Schulman, Pamela Vagata, and Wojciech Zaremba. Altman and Musk served as co-chairs of the initial two-person board.[^5]
+
+The organization was intended to pursue AI safety research openly, and the founding board structure reflected this — a small nonprofit board with no shareholders, no fiduciary duty to maximize profits, and explicit authority to override any commercial arm to prevent risky AI deployments. Initial capital pledges totaled approximately \$1 billion from Altman, Brockman, Musk, Reid Hoffman, Jessica Livingston, Peter Thiel, Amazon Web Services, and Infosys; however, by 2019, only roughly \$130 million had actually been received.[^6]
+
+The early board expanded incrementally. By March 2017 it included Chris Clark (first COO) and Holden Karnofsky (founder of <EntityLink id="E552">Open Philanthropy</EntityLink>). By late 2017, Brockman and Sutskever had joined. Musk departed in February 2018, reportedly due to disagreements over the pace of progress relative to Google and a failed attempt to take managerial control; Clark also departed around that time.[^7]
+
+Between 2018 and 2019, the board added Adam D'Angelo (former Facebook CTO and Quora CEO), Reid Hoffman (LinkedIn co-founder), Tasha McCauley (tech entrepreneur), Shivon Zilis (Neuralink executive), and briefly Sue Yoon (Google robotics, departed after approximately one year). The organization was operating with an increasingly hybrid reality — nominally a nonprofit but functionally building toward large-scale commercial AI development.[^8]
+
+### The Capped-Profit Era (2019–2025)
+
+In 2019, OpenAI created a for-profit subsidiary governed by OpenAI GP LLC, which was wholly owned by the nonprofit. This structure allowed OpenAI to issue equity to attract talent and investment capital while nominally keeping the nonprofit board in ultimate control. Investor returns were capped — originally at 100 times the original investment — with residuals flowing back to the nonprofit. Microsoft became the largest investor, ultimately accumulating a roughly 27% stake through cumulative investments totaling approximately \$13.75 billion.[^9]
+
+This structure generated persistent tensions. The nonprofit board had fiduciary duties to the charitable mission, not to investors, and the board had no investor representation — Microsoft, despite its scale of investment, held no board seat (only an observer seat under some formulations). Independent directors found themselves governing an unusual commercial enterprise without distinct charters for each entity, without a founders' board as a parallel governance tier, and without clear procedures for resolving conflicts between mission priorities and commercial ones.[^10]
+
+Governance critics described the pre-2023 structure as "weird and unstable" — a characterization that would be borne out by events in November 2023.[^11]
+
+---
+
+## The November 2023 Crisis
+
+### Timeline
+
+The November 2023 leadership crisis is the most consequential governance event in OpenAI's history. On November 17, 2023, the OpenAI board — then comprising Ilya Sutskever, Adam D'Angelo, Tasha McCauley, and Helen Toner — voted to remove Sam Altman as CEO, citing a loss of confidence related to candor. Greg Brockman was simultaneously removed as board chair (though not initially as president). Mira Murati was named interim CEO.[^12]
+
+The board's decision was poorly executed by most assessments. The firing jeopardized an active fundraising round, alarmed Microsoft — which learned of the removal shortly before it was announced publicly — and triggered immediate employee backlash. Within days, a letter signed by the overwhelming majority of OpenAI employees threatened mass departure if Altman was not reinstated. This employee coalition, combined with investor pressure, forced a rapid reversal. By November 21, 2023 — within approximately five days — Altman was reinstated as CEO. Several board members resigned, and a reconstituted three-person board took over, consisting of Bret Taylor, Larry Summers, and Adam D'Angelo (the only continuing director).[^13]
+
+### Coalition Dynamics
+
+The crisis revealed a structural reality that formal governance documents had obscured: the nonprofit board's ouster power was real but politically untenable in practice. The board had no shareholders to consult but faced overwhelming pressure from the people whose labor and capital made the organization function. One board member, Helen Toner, had published an academic paper that Altman reportedly found critical of OpenAI's AI safety approach, which some analysts characterized as a conflict of interest — a board member's duty of loyalty was arguably breached by publishing external commentary critical of the organization they governed.[^14]
+
+Internal dynamics reportedly included disputes between Sutskever and other leadership figures, and allegations — not independently verified — that Altman had misrepresented interpersonal dynamics among board members. The investigation the board promised into its own conduct never produced public findings.[^15]
+
+The crisis demonstrated two things simultaneously: that a nonprofit board could, in principle, remove a CEO without shareholder approval, and that this power was politically unsustainable against the combined opposition of employees, investors, and the incumbent executive's external reputation. Some commentators on LessWrong characterized the episode as revealing that board member Helen Toner believed that destroying the company could be consistent with its mission if it prevented misalignment — a position that reflects genuine mission-first reasoning but proved impossible to sustain institutionally.[^16]
+
+### Outcome and Structural Lessons
+
+The post-crisis board recognized several failures: inadequate planning for post-ouster continuity, no founders' board as a parallel governance mechanism, unclear criteria for what constituted sufficient "candor," and an over-reliance on the moral authority of a nonprofit mission without corresponding institutional support. Academic analysis, including a Harvard Business School case study on the episode (by Lynn S. Paine, Suraj Srinivasan, and Will Hurwitz, revised through May 2025), frames the crisis as a case study in CEO-board dynamics and the structural contradictions of hybrid nonprofit-for-profit governance.[^17]
+
+---
+
+## Post-Crisis Board Composition
+
+Following Altman's reinstatement, the board was substantially reconstituted and then expanded. The current board of the <EntityLink id="E421">OpenAI Foundation</EntityLink> (the renamed nonprofit) includes:
+
+| Member | Role / Background |
+|--------|-------------------|
+| **Bret Taylor** | Chair; former Twitter board chair, co-CEO of Salesforce |
+| **Sam Altman** | CEO of OpenAI; rejoined board post-crisis |
+| **Adam D'Angelo** | Quora co-founder/CEO; the only pre-crisis director who remained |
+| **Sue Desmond-Hellmann** | Former CEO of the Bill & Melinda Gates Foundation; ex-Chancellor of UCSF |
+| **Nicole Seligman** | Former EVP and General Counsel, Sony Corporation |
+| **Paul Nakasone** | Retired U.S. Army General; former NSA Director (2018–2024) |
+| **Zico Kolter** | Computer scientist; heads the Safety and Security Committee (nonprofit-only role) |
+| **Adebayo Ogunlesi** | Managing partner, Global Infrastructure Partners |
+| **Larry Summers** | Economist; former U.S. Treasury Secretary |
+
+Fidji Simo (Instacart CEO and chair) was noted in some announcements as a new addition but does not appear consistently in formal board lists. The expanded board reflects a deliberate move toward members with regulatory, governmental, and global institutional experience — a contrast to the earlier board's mix of AI researchers and tech entrepreneurs.[^18]
+
+A key distinction in the post-2025 structure: Zico Kolter serves on the nonprofit Foundation board but is explicitly excluded from the for-profit PBC board per agreements with state attorneys general. This separation is intended to preserve the Safety and Security Committee's independence from commercial pressures.[^19]
+
+---
+
+## The 2024–2026 PBC Restructuring
+
+### Background and Negotiations
+
+Following the 2023 crisis, Altman and the new board pursued a fundamental restructuring away from the capped-profit model toward a conventional for-profit structure. The rationale was partly practical — the "arcane" capped-profit structure complicated investment (SoftBank's \$40 billion investment was explicitly conditioned on the restructuring) — and partly strategic, in that the prior structure's governance instability had demonstrated its limitations.[^20]
+
+The restructuring negotiations extended nearly a year and involved both the California and Delaware Attorneys General, whose oversight authority over charitable organizations gave them significant leverage. A proposal floated in December 2024 — in which the for-profit entity would effectively sideline the nonprofit board — was blocked by the two attorneys general, who imposed approximately 20 requirements as conditions for approval.[^21]
+
+### Final Structure (October 2025)
+
+The restructuring was formally announced on October 28, 2025. The key elements:
+
+- **OpenAI Group PBC**: The operating entity became a for-profit public benefit corporation (previously an LLC). The PBC designation encodes the mission — AGI benefiting humanity — into its operating agreement, which formally prioritizes mission over for-profit motives on safety and security matters.
+- **OpenAI Foundation**: The nonprofit (formerly OpenAI, Inc.) was renamed the OpenAI Foundation. It holds approximately 26% of equity in the PBC — a stake valued at roughly \$130 billion at restructuring — with additional ownership triggered by valuation milestones.
+- **Board appointment power**: The Foundation retains exclusive authority to appoint and remove all members of the PBC board, mediated through OpenAI GP LLC (wholly owned by the nonprofit). This is the primary formal mechanism of nonprofit control.
+- **Safety and Security Committee (SSC)**: The SSC, headed by Zico Kolter, holds veto power over model releases. It reports to the nonprofit board and is composed of nonprofit-only directors not duplicated on the PBC board.
+- **Microsoft**: Holds approximately 27% equity. Under agreements reached during restructuring, Microsoft can commercialize OpenAI technology through 2032 — a concession critics characterize as a significant dilution of nonprofit control over AGI deployment.
+
+The Foundation, with its \$130 billion equity stake, is immediately among the most resource-rich philanthropies in the world. It has committed \$25 billion to health research (including disease-curing research, open-sourced health datasets, and support for underfunded diseases) and AI resilience, including child safety, biosecurity, and model evaluation standards.[^22]
+
+### What the Nonprofit Lost and Retained
+
+The restructuring involved genuine concessions. The Foundation lost exclusive control over AGI commercialization — Microsoft's rights through 2032 represent a significant carveout. Critics from the Eyes on OpenAI coalition of California nonprofits argued that the structure creates pervasive conflicts of interest, noting that seven of the eight Foundation board members also sit on the PBC board, effectively enabling the nonprofit to oversee itself.[^23]
+
+What was retained: board appointment power, SSC veto over model releases, mission priority language in the PBC operating agreement, and the attorneys general's ability to enforce the 20 conditions. Whether these safeguards are durable under commercial pressure remains actively contested. The SSC in particular has been criticized for relying on four part-time volunteer directors without dedicated staff, while overseeing model deployment decisions worth hundreds of billions of dollars in commercial value.[^24]
+
+---
+
+## Key Activities
+
+### Nonprofit Governance and Grantmaking
+
+The OpenAI Foundation's primary activities beyond governance are philanthropic. In December 2025, the Foundation disbursed \$40.5 million in unrestricted grants to 208 U.S. nonprofits through the People-First AI Fund, selected from nearly 3,000 applications, with a focus on AI literacy, civic life, and economic opportunity. A second wave of \$9.5 million in board-directed grants was announced for subsequent disbursement.[^25]
+
+The Foundation has pledged \$1 billion in grants over approximately one year (announced in early 2026), targeting disease curing, economic opportunity, AI resilience, and community support. The longer-term \$25 billion commitment spans life sciences, jobs and economic impact, AI resilience (led by co-founder Wojciech Zaremba), and community support for nonprofits adapting to AI (led by Anna Makanju, who joined mid-2026). Jacob Trefethen was hired to lead health-focused initiatives.[^26]
+
+The Foundation is also recruiting an executive director for its grantmaking operations and has committed to public dashboards, impact metrics reporting, and annual learning publications — commitments made partly in response to pressure from the temporary Nonprofit Commission (2025), an advisory body that included labor leader Dolores Huerta.[^27]
+
+### Safety Oversight
+
+The Safety and Security Committee is the primary institutional mechanism for safety governance within the restructured entity. It holds formal veto power over model releases — meaning models cannot be deployed if the SSC objects. The SSC reports to the nonprofit Foundation board, providing a channel of accountability that is nominally independent of commercial incentives.
+
+However, this structure has faced significant internal erosion prior to its codification. OpenAI dissolved its Superalignment team in May 2024; the team's co-lead, Jan Leike, departed and publicly stated that safety culture and processes had taken a backseat to product shipping. A subsequent Mission Alignment team was also dissolved. These departures preceded the October 2025 restructuring and raised questions about whether the formal SSC mechanism would be backed by adequate internal safety infrastructure.[^28]
+
+OpenAI has also published a Preparedness Framework intended to govern tradeoffs between capability advances and safety risks, and has committed to external funding for alignment research — including a \$7.5 million commitment to The Alignment Project for research on mitigations to safety risks from misaligned AI.[^29]
+
+---
+
+## Sam Altman's Position
+
+Sam Altman has served as CEO of OpenAI continuously since 2019, with the brief exception of the five-day November 2023 removal. His governance position is unusual: he holds no direct equity in the for-profit entity (unlike typical tech founders) but serves on both the nonprofit Foundation board and the PBC board, and exercises substantial operational authority as CEO. Multiple governance analysts have noted that the board's practical deference to Altman reflects power dynamics that formal documents do not capture — a reality the 2023 crisis made explicit when the board's formal authority proved insufficient to sustain his removal.[^30]
+
+Altman's lack of direct equity has been a persistent feature of public discussions about OpenAI governance. In 2024–2025, reports emerged that Altman had sought equity arrangements, though the specifics of what was negotiated as part of the restructuring have not been fully disclosed publicly.[^31]
+
+---
+
+## Employee and Investor Dynamics
+
+The November 2023 crisis demonstrated that OpenAI employees hold significant informal governance power. The letter threatening mass departure — signed by the substantial majority of staff — was a critical factor in the board's reversal. This dynamic reflects a broader reality: OpenAI's value depends on retaining top AI researchers who have alternative opportunities, and those researchers' willingness to remain is itself a governance constraint.[^32]
+
+Investor dynamics are structured differently. The capped-profit model limited investor returns to 100 times the original investment, a constraint investors found increasingly frustrating as the organization's commercial ambitions expanded. The restructuring removed these caps for equity holders, though the PBC mission language and SSC veto are intended as compensating safeguards. SoftBank's \$40 billion investment was explicitly conditioned on the restructuring being completed, giving investors direct leverage over the governance transition.[^33]
+
+Microsoft's position is particularly complex. As the largest single investor — with approximately 27% equity and historical rights as OpenAI's primary cloud and infrastructure partner — Microsoft holds commercial interests that may not always align with the Foundation's mission priorities. Its observer seat on relevant boards (rather than a voting seat) has been a deliberate design choice, but the 2032 commercialization rights represent a practical limit on nonprofit control over AGI deployment regardless of formal board authority.[^34]
+
+---
+
+## Criticism and Controversies
+
+### Structural Conflicts of Interest
+
+The most persistent structural criticism is that the Foundation's governance is effectively circular: most Foundation board members also serve on the PBC board, meaning the nonprofit is largely overseeing itself. The Foundation's financial interests are directly tied to the for-profit's valuation — the \$130 billion equity stake grows in value as OpenAI succeeds commercially, creating incentives that may not be neutral with respect to safety tradeoffs.[^35]
+
+Board chair Bret Taylor founded Sierra, a \$4.5 billion AI startup that is itself an OpenAI customer. Taylor has committed to recusing himself from decisions where this creates a conflict, but critics note that the sheer density of financial entanglements across the board — with at least seven directors or their spouses holding significant stakes in companies doing business with OpenAI — makes genuinely independent oversight structurally difficult.[^36]
+
+### Mission Drift
+
+Multiple observers have characterized the trajectory from 2019 to 2025 as one of progressive mission drift — from a nonprofit safety research lab to a commercially dominant AI company that retains mission language without equivalent mission substance. The departure of safety-focused researchers (including Ilya Sutskever, Mira Murati, and the Superalignment team) and their replacement by executives from Google, Amazon, and Apple is cited as evidence of cultural reorientation. Jan Leike's public statement on departure — that safety culture had taken a backseat to product shipping — is the most direct insider testimony on this trajectory.[^37]
+
+The Eyes on OpenAI coalition and related watchdog organizations have raised concerns about the \$25 billion philanthropic commitment lacking specifics on metrics, timelines, and audit mechanisms. The Meridian Institute, which received \$1 million from OpenAI's 2024 grants for AI safety work, disbanded in May 2025, suggesting that the philanthropic ecosystem OpenAI is funding faces its own instability.[^38]
+
+### The Governance Paradox
+
+Analysts studying the restructuring have noted a core paradox: the structure is designed to protect OpenAI's mission against external capture (e.g., a hostile investor takeover) via the Foundation's Class N shares and board appointment power, but provides weaker protection against internal capture — a board and CEO aligned on commercial priorities slowly de-prioritizing safety without any formal triggering event. No shareholder can force a mission change, but the same insulation from shareholder pressure that protects the mission also removes an accountability mechanism that conventional for-profit governance relies on.[^39]
+
+This paradox is examined in more detail in the <EntityLink id="E404">OpenAI Foundation Governance Paradox</EntityLink> analysis. It connects to broader questions about <EntityLink id="E239">AI Development Racing Dynamics</EntityLink> and whether organizational safety commitments can be structurally durable under competitive pressure.
+
+---
+
+## Key People
+
+| Person | Role | Notes |
+|--------|------|-------|
+| **Sam Altman** | CEO; Foundation and PBC board member | Co-founder; removed and reinstated Nov 2023; no direct equity |
+| **Bret Taylor** | Foundation board chair | Former Twitter board chair, co-CEO Salesforce; founded Sierra (OpenAI customer) |
+| **Adam D'Angelo** | Foundation and PBC board member | Quora CEO; only director to survive the 2023 crisis |
+| **Zico Kolter** | Foundation board; SSC chair | Computer scientist; excluded from PBC board per AG agreement |
+| **Paul Nakasone** | Foundation and PBC board member | Retired U.S. Army General; former NSA Director |
+| **Sue Desmond-Hellmann** | Foundation and PBC board member | Former CEO, <EntityLink id="E1454">Gates Foundation</EntityLink>; ex-Chancellor UCSF |
+| **Nicole Seligman** | Foundation and PBC board member | Former EVP/General Counsel, Sony |
+| **Adebayo Ogunlesi** | Foundation and PBC board member | Managing partner, Global Infrastructure Partners |
+| **Larry Summers** | Foundation and PBC board member | Economist; former U.S. Treasury Secretary |
+| **Greg Brockman** | Co-founder; ex-president | Stepped down as board chair during 2023 transition |
+| **Ilya Sutskever** | Co-founder; former chief scientist and board member | Involved in 2023 Altman ouster; departed post-crisis |
+| **Wojciech Zaremba** | Co-founder; Foundation AI resilience lead | Heads AI resilience program at Foundation |
+| **Jakub Pachocki** | Chief Scientist | Succeeded Sutskever as chief scientist |
+| **Brad Lightcap** | COO | Former Y Combinator and JPMorgan Chase |
+| **Anna Makanju** | Foundation nonprofit/civil society lead | Joined mid-2026 |
+| **Jacob Trefethen** | Foundation health initiatives lead | Recruited for life sciences focus |
+
+---
+
+## Key Uncertainties
+
+- **SSC durability**: Whether the Safety and Security Committee's veto power over model releases will be exercised against significant commercial pressure, and whether its four part-time volunteer members constitute adequate institutional capacity for this role.
+- **Mission vs. commercialization**: Whether the PBC mission language and Foundation appointment power will be sufficient to prevent gradual mission drift as OpenAI scales toward projected revenues of \$200 billion by 2030.
+- **Microsoft's 2032 rights**: The practical implications of Microsoft's right to commercialize OpenAI technology through 2032 — and what happens to nonprofit control of AGI commercialization after that date.
+- **Equity negotiations**: The details of any equity arrangements made with Altman as part of restructuring have not been publicly confirmed.
+- **Foundation effectiveness**: Whether the \$25 billion philanthropic commitment will be executed with the transparency and rigor that critics are demanding, or will remain largely aspirational.
+- **Internal safety culture**: Whether the dissolution of the Superalignment and Mission Alignment teams represents a permanent downgrading of safety infrastructure, or whether the SSC structure provides an adequate replacement.
+
+---
+
+## Sources
+
+[^1]: OpenAI structural overview — research data compiled from multiple sources on OpenAI's hybrid nonprofit/for-profit structure and October 2025 restructuring announcement.
+
+[^2]: OpenAI restructuring negotiations — research data on California and Delaware AG negotiations, finalized October 28, 2025.
+
+[^3]: Research data on Safety and Security Committee veto power and PBC board appointment mechanics.
+
+[^4]: Research data on 2024–2025 equity removal attempts and capital requirements driving restructuring.
+
+[^5]: Research data on December 2015 founding, co-founders list, and initial board composition.
+
+[^6]: Research data on \$1 billion pledge vs. \$130 million received by 2019; initial capital sources.
+
+[^7]: Research data on Musk departure February 2018 and early board evolution.
+
+[^8]: Research data on 2018–2019 board additions including D'Angelo, Hoffman, McCauley, Zilis, Yoon.
+
+[^9]: Research data on 2019 for-profit subsidiary creation, capped-profit structure, and Microsoft investment history.
+
+[^10]: Research data on structural analysis of nonprofit board's governance challenges and lack of investor representation.
+
+[^11]: Research data quoting characterization of pre-transition governance as "weird and unstable."
+
+[^12]: Research data on November 17, 2023 board vote and Murati's interim appointment.
+
+[^13]: Research data on employee letter, Microsoft pressure, and five-day reinstatement timeline.
+
+[^14]: Research data on Helen Toner's academic paper and conflict of interest analysis; Foley & Lardner publication by Louis Lehot and Lyman Thai, January 2024.
+
+[^15]: Research data on internal disputes, Sutskever involvement, and absence of public investigation findings.
+
+[^16]: Research data on LessWrong community discussions referencing Toner's reasoning on mission vs. company survival.
+
+[^17]: Harvard Business School case study "Governing OpenAI (A)" by Lynn S. Paine, Suraj Srinivasan, and Will Hurwitz, March 2024, revised May 2025.
+
+[^18]: Research data on post-crisis board composition; Wikipedia and announcement sources on new member backgrounds.
+
+[^19]: Research data on AG agreement excluding Kolter from PBC board to preserve SSC independence.
+
+[^20]: Research data on SoftBank's \$40 billion investment conditioned on restructuring; "arcane" capped-profit characterization.
+
+[^21]: Research data on December 2024 proposal to sideline nonprofit board and AG blocking action with 20 requirements.
+
+[^22]: Research data on October 28, 2025 restructuring announcement terms including equity stake, SSC veto, and \$25 billion philanthropic commitment.
+
+[^23]: Research data on Eyes on OpenAI coalition criticism and seven-of-eight board overlap concern.
+
+[^24]: Research data on SSC composition (four part-time volunteers, no staff) and Microsoft 2032 commercialization rights as mission limitation.
+
+[^25]: Research data on December 3, 2025 announcement of \$40.5 million People-First AI Fund grants to 208 nonprofits.
+
+[^26]: Research data on \$1 billion annual grant pledge, \$25 billion long-term commitment, and leadership hires (Trefethen, Zaremba, Makanju).
+
+[^27]: Research data on Nonprofit Commission, Dolores Huerta's involvement, and Foundation transparency commitments.
+
+[^28]: Research data on Superalignment team dissolution May 2024; Jan Leike's public statement on safety culture; Mission Alignment team dissolution.
+
+[^29]: Research data on Preparedness Framework and \$7.5 million commitment to The Alignment Project.
+
+[^30]: Research data on Altman's CEO tenure, board membership on both entities, and analysis of practical vs. formal governance power.
+
+[^31]: Research data on equity negotiations and lack of full public disclosure of restructuring terms.
+
+[^32]: Research data on November 2023 employee letter threatening mass departure as factor in board reversal.
+
+[^33]: Research data on removal of profit caps in PBC structure and SoftBank's \$40 billion conditional investment.
+
+[^34]: Research data on Microsoft's ~27% equity stake, observer seat, and 2032 commercialization rights.
+
+[^35]: Research data on Foundation's circular oversight problem and financial alignment of nonprofit interests with for-profit success.
+
+[^36]: Research data on Bret Taylor's Sierra conflict and seven directors with financial ties to OpenAI business relationships.
+
+[^37]: Research data on Jan Leike's public statement post-departure; Superalignment and Mission Alignment team dissolutions.
+
+[^38]: Research data on Eyes on OpenAI criticism of \$25 billion pledge specificity; Meridian Institute disbandment May 2025.
+
+[^39]: Research data on governance paradox analysis — external capture protection vs. internal capture vulnerability; reference to OpenAI Foundation Governance Paradox analysis.
