@@ -10,7 +10,7 @@ import type { Fact, Entity as FBEntity } from '../../../packages/factbase/src/ty
 import { formatFactValue } from '../../../packages/factbase/src/format.ts';
 import { apiRequest } from '../wiki-server/client.ts';
 import { listVerdicts } from '../wiki-server/sourcing-client.ts';
-import { VALID_RECORD_TYPES, type RecordType } from '../../../apps/wiki-server/src/api-types.ts';
+import { VALID_RECORD_TYPES, type RecordType, isSourcingExempt } from '../../../apps/wiki-server/src/api-types.ts';
 import { resolveName, isResolvableName, extractEntityId, extractEntityDisplayName } from './record-fields.ts';
 import {
   ENTITY_TYPE_PRIORITY,
@@ -235,11 +235,14 @@ export async function collectRecordItems(
 
   // Determine which record types to scan
   // --table filters to a specific record type (e.g. "personnel", "grant")
-  const typesToScan = tableFilter
+  // Exempt types are excluded — their data comes from canonical APIs and
+  // doesn't benefit from sourcing verification (see SOURCING_EXEMPT_TYPES).
+  const typesToScan = (tableFilter
     ? VALID_RECORD_TYPES.filter(t => t === tableFilter)
     : entityTypeFilter
       ? VALID_RECORD_TYPES.filter(t => t === entityTypeFilter)
-      : [...VALID_RECORD_TYPES];
+      : [...VALID_RECORD_TYPES]
+  ).filter(t => !isSourcingExempt(t));
 
   for (const recordType of typesToScan) {
     let apiBasePath: string;
