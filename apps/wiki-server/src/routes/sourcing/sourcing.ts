@@ -406,7 +406,14 @@ const sourcingApp = new Hono()
         ? sql`AND v.record_type = ${record_type}`
         : sql``;
 
-      const [statsRow] = (await db.execute(sql`
+      // count(*) with no GROUP BY always returns exactly one row, so statsRow
+      // is non-null in practice. The ?? 0 fallbacks guard against a defensive
+      // ceiling in the response contract.
+      const statsRows = await db.execute<{
+        total: number;
+        needs_recheck: number;
+        avg_confidence: number;
+      }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         SELECT
           count(*)::int AS total,
@@ -416,13 +423,10 @@ const sourcingApp = new Hono()
         INNER JOIN live_records lr
           ON lr.record_type = v.record_type AND lr.record_id = v.record_id
         WHERE 1=1 ${typeFilterSql}
-      `)) as Array<{
-        total: number;
-        needs_recheck: number;
-        avg_confidence: number;
-      }>;
+      `);
+      const statsRow = statsRows[0];
 
-      const byVerdictRows = (await db.execute(sql`
+      const byVerdictRows = await db.execute<{ verdict: string; cnt: number }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         SELECT v.verdict, count(*)::int AS cnt
         FROM source_check_verdicts v
@@ -430,7 +434,7 @@ const sourcingApp = new Hono()
           ON lr.record_type = v.record_type AND lr.record_id = v.record_id
         WHERE 1=1 ${typeFilterSql}
         GROUP BY v.verdict
-      `)) as Array<{ verdict: string; cnt: number }>;
+      `);
 
       const byVerdict: Record<string, number> = {};
       for (const row of byVerdictRows) {
@@ -439,14 +443,14 @@ const sourcingApp = new Hono()
 
       // by_type is always unfiltered by record_type (shows all types for the
       // type-filter tabs) but still excludes orphans.
-      const byTypeRows = (await db.execute(sql`
+      const byTypeRows = await db.execute<{ record_type: string; cnt: number }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         SELECT v.record_type, count(*)::int AS cnt
         FROM source_check_verdicts v
         INNER JOIN live_records lr
           ON lr.record_type = v.record_type AND lr.record_id = v.record_id
         GROUP BY v.record_type
-      `)) as Array<{ record_type: string; cnt: number }>;
+      `);
 
       const byType: Record<string, number> = {};
       for (const row of byTypeRows) {
@@ -461,12 +465,12 @@ const sourcingApp = new Hono()
         .from(recordSources);
 
       return c.json({
-        total: Number(statsRow.total),
+        total: Number(statsRow?.total ?? 0),
         by_verdict: byVerdict,
         by_type: byType,
-        needs_recheck: Number(statsRow.needs_recheck),
+        needs_recheck: Number(statsRow?.needs_recheck ?? 0),
         avg_confidence:
-          Math.round(Number(statsRow.avg_confidence) * 100) / 100,
+          Math.round(Number(statsRow?.avg_confidence ?? 0) * 100) / 100,
         stale_evidence_count: Number(evidenceStats.staleCount),
         dead_link_count: Number(evidenceStats.deadLinkCount),
         current_checker_model: CURRENT_CHECKER_MODEL,
