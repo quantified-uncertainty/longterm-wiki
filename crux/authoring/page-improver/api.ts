@@ -150,7 +150,7 @@ function buildToolHandlers(): Record<string, ToolHandler> {
 
 // ── CLI-based agent execution ────────────────────────────────────────────────
 
-const CLI_TIMEOUT_MS = 10 * 60 * 1000; // 10 minutes
+const CLI_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes — deep-tier improves on large pages (30KB+) commonly need 15-20 min
 
 /**
  * Run a prompt through the Claude CLI subprocess.
