@@ -22,6 +22,8 @@ pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an 
 
 At session end, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not). Never push directly to `main`.
 
+**Track what you discover.** Before ending any session, enumerate every problem you observed and mark each `fixed | filed:QUA-NNN | deferred:<reason>`. Certain red flags (prod incidents, symptom patches, misdiagnoses, premature "Done", N+ repeated symptoms) MUST produce a Linear ticket — "I'll remember" is not a valid disposition. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking" and `.claude/rules/agent-session-workflow.md` § "Step 2a".
+
 ## Quick Reference
 
 Commands are organized into groups by data layer. Use short prefixes for convenience:
