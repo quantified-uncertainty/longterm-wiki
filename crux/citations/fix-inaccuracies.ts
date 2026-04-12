@@ -4,6 +4,25 @@
  * Reads flagged citations from the dashboard YAML (for discovery), then
  * enriches each with full source text from the wiki-server API before generating fixes.
  *
+ * SCOPE — narrow by design
+ *
+ * The primary (Gemini Flash) pass requires the `original` field to be an
+ * EXACT substring of the page MDX and the replacement to be comparable in
+ * length. The Claude Sonnet escalation permits section-level rewrites but is
+ * instructed not to change section length or introduce new claims. In
+ * practice this means the tool handles:
+ *   - small numeric/date corrections where a short substring can be swapped
+ *   - minor overclaim softening
+ *
+ * It does NOT handle severely-contradicted claims where faithful correction
+ * requires rewording or removing substantive narrative (e.g. attribution
+ * errors, hallucinated details, source says X but claim says Y with no
+ * cleanly-replaceable substring). Those return 0 proposals — see QUA-314.
+ *
+ * If your backlog is dominated by semantic contradictions, expect zero
+ * proposals. Prompt-level false-positive fixes (QUA-246 family) or page
+ * regeneration via `crux w improve --tier=deep` are usually the right path.
+ *
  * Usage:
  *   pnpm crux citations fix-inaccuracies                        # Dry run all
  *   pnpm crux citations fix-inaccuracies --apply                 # Apply all
@@ -1687,6 +1706,14 @@ async function main() {
 
     if (!apply && totalProposed > 0) {
       console.log(`\n${c.dim}Run with --apply to write changes and auto-re-verify.${c.reset}`);
+    }
+    if (totalProposed === 0 && allResults.length > 0) {
+      console.log(
+        `\n${c.dim}Note: this tool handles small numeric/date corrections and minor overclaim softening. ` +
+        `It produces 0 proposals for severely-contradicted claims where faithful correction requires ` +
+        `rewording or removing substantive narrative. For those, see QUA-246 (prompt false-positive fixes) ` +
+        `or page regeneration via \`crux w improve --tier=deep\`.${c.reset}`,
+      );
     }
     console.log('');
   }

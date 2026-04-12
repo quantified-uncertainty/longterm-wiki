@@ -5,9 +5,16 @@
  * value from the verdict reasoning using Haiku, and updates the YAML files
  * in packages/factbase/data/things/ automatically.
  *
- * Many contradictions are rounding issues (stored $116M when source says
- * $115,576,357). We store exact values and let the display layer handle
- * formatting.
+ * SCOPE — narrow by design
+ *
+ * This tool handles ONLY numeric-value contradictions (rounding drift like
+ * stored $116M when source says $115,576,357). Facts with non-numeric values
+ * — URLs, names, descriptions, multi-line strings, ranges like "200 - 300" —
+ * are skipped and reported under "Needs Manual Review".
+ *
+ * If your backlog is dominated by semantic contradictions (wrong URL, wrong
+ * person, hallucinated narrative), this tool will produce zero fixes. See
+ * the sourcing prompt fixes (QUA-246 family) or manual review instead.
  *
  * Usage:
  *   WIKI_SERVER_ENV=prod node --import tsx/esm crux/scripts/fix-contradicted-facts.ts [--apply] [--entity=<slug>]
@@ -610,6 +617,13 @@ async function main(): Promise<void> {
     console.log(`Would apply: ${wouldApply}`);
     if (wouldApply > 0) {
       console.log("\nRun with --apply to write changes.");
+    } else if (matched.length > 0 && skipped === matched.length) {
+      console.log(
+        "\nNote: this tool only fixes numeric-value contradictions. " +
+        "All matched facts were skipped (non-numeric, multi-line, or already correct). " +
+        "For semantic contradictions (wrong URL/name/description), prompt fixes " +
+        "via the sourcing pipeline (QUA-246 family) or manual review is the path.",
+      );
     }
   }
 
