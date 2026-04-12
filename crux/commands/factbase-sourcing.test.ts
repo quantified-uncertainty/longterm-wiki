@@ -122,6 +122,30 @@ describe('crux fb sourcing --dry-run', () => {
       expect(fact.source).toMatch(/^https?:\/\//);
     }
   });
+
+  it('skips facts with nonVerifiable properties (QUA-247)', async () => {
+    // Anthropic has secondary-valuation, equity-stake-percent, equity-value,
+    // and employee-tender-offer facts — all marked nonVerifiable in properties.yaml.
+    // These should be excluded from the dry-run output.
+    const NON_VERIFIABLE_PROPERTIES = [
+      'secondary-valuation',
+      'equity-stake-percent',
+      'equity-value',
+      'employee-tender-offer',
+    ];
+
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+    });
+    expect(result.exitCode).toBe(0);
+    const data = JSON.parse(result.output) as Array<{ propertyId: string }>;
+
+    for (const fact of data) {
+      expect(NON_VERIFIABLE_PROPERTIES).not.toContain(fact.propertyId);
+    }
+  });
 });
 
 // ---------------------------------------------------------------------------
