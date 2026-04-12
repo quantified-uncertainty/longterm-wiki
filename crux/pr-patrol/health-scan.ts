@@ -437,14 +437,20 @@ export function combineRatchetDrift(drifts: RatchetDriftForFile[]): RatchetDrift
 export function checkRatchetDriftForFile(
   config: RatchetConfig,
   options: { now?: Date; windowHours?: number; minBumps?: number } = {},
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
 ): RatchetDriftForFile {
+  const now = options.now ?? new Date();
   const windowHours = options.windowHours ?? RATCHET_DRIFT_WINDOW_HOURS;
-  const since = `${windowHours} hours ago`;
+
+  // Thread `now` into git's --since so the window used by git log matches the
+  // window used by the evaluator. Without this, a custom `now` (e.g. a test
+  // clock) would desync from git's wall-clock --since interpretation.
+  const sinceIso = new Date(now.getTime() - windowHours * 3_600_000).toISOString();
 
   // One commit per line: `<sha> <unix-ts>`
-  const logResult = gitSafe(
+  const logResult = runGit(
     'log',
-    `--since=${since}`,
+    `--since=${sinceIso}`,
     '--format=%H %ct',
     '--',
     config.file,
@@ -474,9 +480,14 @@ export function checkRatchetDriftForFile(
   const observations: BaselineObservation[] = [];
 
   if (firstCommit) {
-    const parentTotal = readBaselineTotal(`${firstCommit}^`, config);
+    // Try to include the "before" state: the parent of the earliest in-window
+    // commit. If the parent doesn't exist (root commit) or the file didn't
+    // exist there (newly created mid-window), we just skip — the observation
+    // chain starts at firstCommit itself. That means commit #1 in the window
+    // can't be counted as a bump (no "from" value), but commits #2+ still are.
+    const parentTotal = readBaselineTotal(`${firstCommit}^`, config, runGit);
     if (parentTotal !== null) {
-      const parentTs = commitTimestamp(`${firstCommit}^`);
+      const parentTs = commitTimestamp(`${firstCommit}^`, runGit);
       if (parentTs) {
         observations.push({
           commit: `${firstCommit}^`,
@@ -493,13 +504,13 @@ export function checkRatchetDriftForFile(
     observations.push({
       commit: sha,
       committedAt: new Date(Number.parseInt(ts, 10) * 1000),
-      total: readBaselineTotal(sha, config),
+      total: readBaselineTotal(sha, config, runGit),
     });
   }
 
   return evaluateRatchetDrift(config.file, config.name, observations, {
     badDirection: config.badDirection,
-    now: options.now,
+    now,
     windowHours,
     minBumps: options.minBumps,
   });
@@ -509,25 +520,43 @@ export function checkRatchetDriftForFile(
 export function checkRatchetDrift(
   options: { now?: Date; windowHours?: number; minBumps?: number } = {},
   baselines: readonly RatchetConfig[] = RATCHET_BASELINES,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
 ): RatchetDriftResult {
-  const drifts = baselines.map((cfg) => checkRatchetDriftForFile(cfg, options));
+  const drifts = baselines.map((cfg) => checkRatchetDriftForFile(cfg, options, runGit));
   return combineRatchetDrift(drifts);
 }
 
-function readBaselineTotal(ref: string, config: RatchetConfig): number | null {
-  const result = gitSafe('show', `${ref}:${config.file}`);
+/**
+ * Exported for testing. Accepts numbers AND numeric strings — some validators
+ * serialize totals as strings to avoid precision loss, and silently dropping
+ * those would let drift go undetected.
+ */
+export function readBaselineTotal(
+  ref: string,
+  config: RatchetConfig,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): number | null {
+  const result = runGit('show', `${ref}:${config.file}`);
   if (!result.ok) return null;
   try {
     const parsed = JSON.parse(result.output);
-    const value = (parsed as Record<string, unknown>)[config.totalField];
-    return typeof value === 'number' && Number.isFinite(value) ? value : null;
+    const raw = (parsed as Record<string, unknown>)[config.totalField];
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const coerced = Number(raw);
+      return Number.isFinite(coerced) ? coerced : null;
+    }
+    return null;
   } catch {
     return null;
   }
 }
 
-function commitTimestamp(ref: string): Date | null {
-  const result = gitSafe('show', '-s', '--format=%ct', ref);
+function commitTimestamp(
+  ref: string,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): Date | null {
+  const result = runGit('show', '-s', '--format=%ct', ref);
   if (!result.ok) return null;
   const ts = Number.parseInt(result.output, 10);
   if (!Number.isFinite(ts)) return null;
