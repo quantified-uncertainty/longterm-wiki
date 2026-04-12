@@ -48,7 +48,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
-    nonVerifiable: true
+    verifiable: false
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -466,7 +466,7 @@ properties:
     unit: percent
     category: financial
     temporal: true
-    nonVerifiable: true
+    verifiable: false
     appliesTo: [person, organization]
     display:
       suffix: "%"
@@ -478,7 +478,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
-    nonVerifiable: true
+    verifiable: false
     appliesTo: [person, organization]
     display:
       divisor: 1e9
@@ -626,7 +626,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
-    nonVerifiable: true
+    verifiable: false
     appliesTo: [organization]
     display:
       divisor: 1e9
