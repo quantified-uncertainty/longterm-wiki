@@ -13,7 +13,7 @@ The skill is **idempotent** — it can be re-run safely. Background loops are on
 
 ## What this skill does
 
-1. Starts background loops (tmux rename, ws refresh, optionally PR patrol)
+1. Starts background loops (tmux rename, ws refresh, PR patrol)
 2. Pulls latest `main/` and `ops/` and runs a one-shot `./ws refresh` to reset merged-PR slots
 3. Prints orientation: production health, stale work, ready-for-dispatch queue
 4. Reports what's running and what's stale
@@ -58,14 +58,23 @@ echo "Started ws-refresh loop, PID $!"
 
 If `scripts/ws-refresh-loop.sh` doesn't exist, fall back to noting that the loop script needs to be created; Section 2 still runs a one-shot refresh.
 
-**1c. PR patrol loop** (optional — ask user before starting)
+**1c. PR patrol loop** — scans open PRs and dispatches fix agents for broken CI, conflicts, stale branches, and similar patrolable issues. Coordinator is a documented singleton (`README.md`: "Don't run multiple ops sessions"), so duplicate risk is low, and spend is surfaced in Section 6. Auto-start like 1a/1b.
 
-Check for an existing PR patrol process:
+Check if it's already running:
 ```bash
-pgrep -f "pr-patrol" && echo "✓ PR patrol already running" || echo "✗ not running"
+pgrep -f "crux gh pr-patrol run" && echo "✓ PR patrol already running" || echo "✗ not running"
 ```
 
-If the user wants it started, follow the standard PR patrol startup procedure (typically `pnpm crux gh pr-patrol` from `lw/coord` or `lw/main`). Do NOT start it without user confirmation — PR patrol uses real LLM budget.
+If not running, start it:
+```bash
+cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main
+nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
+echo $! > /tmp/lw-pr-patrol.pid
+disown
+echo "Started PR patrol, PID $!"
+```
+
+The PID lockfile at `/tmp/lw-pr-patrol.pid` lets re-runs adopt the existing process instead of starting a duplicate — the `pgrep` guard above is the primary defense. If `--no-loops` is passed, skip this block entirely.
 
 ### Section 2: Pull latest + refresh slots
 
@@ -124,12 +133,40 @@ cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && pnpm crux sys audits lis
 
 ### Section 6: Print orientation summary
 
-Print a single concise summary block:
+**6a. Compute PR patrol 24h activity.** PR patrol doesn't currently log dollar cost (see QUA-324 — follow-up to add `cost_usd` to `runs.jsonl`). As a proxy until that lands, count `pr_result` entries in the last 24h from `~/.cache/pr-patrol/runs.jsonl`:
+
+```bash
+if pgrep -f "crux gh pr-patrol run" > /dev/null; then
+  RUNS_24H=$(awk -v cutoff="$(date -u -v-24H +%Y-%m-%dT%H:%M:%S 2>/dev/null || date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%S)" '
+    /"type":"pr_result"/ {
+      # extract timestamp
+      if (match($0, /"timestamp":"[^"]+"/)) {
+        ts = substr($0, RSTART+13, RLENGTH-14)
+        if (ts >= cutoff) count++
+      }
+    }
+    END { print count+0 }
+  ' ~/.cache/pr-patrol/runs.jsonl 2>/dev/null || echo 0)
+  # Warn threshold: >40 fix attempts in 24h is unusually high (normal is ~5-15).
+  # Chosen because each attempt takes ~3-10min of Claude time — 40+ suggests a
+  # runaway loop or an oscillating PR. Downgrade to raw dollars once QUA-324 lands.
+  if [ "$RUNS_24H" -gt 40 ]; then
+    PATROL_STATUS="⚠ pr-patrol ✓ (${RUNS_24H} runs/24h — unusually high)"
+  else
+    PATROL_STATUS="pr-patrol ✓ (${RUNS_24H} runs/24h)"
+  fi
+else
+  PATROL_STATUS="pr-patrol –"
+fi
+echo "$PATROL_STATUS"
+```
+
+**6b. Print the summary block:**
 
 ```
 === Admin session ready ===
 Date:        2026-04-10
-Background:  rename-loop ✓ | ws-refresh ✓ | pr-patrol [✓ or –]
+Background:  rename-loop ✓ | ws-refresh ✓ | <PATROL_STATUS from 6a>
 Production:  healthy | uptime Xs
 Linear:      N stale In Progress | M ready P1/P2
 CI (main):   N failures in last 24h
@@ -147,7 +184,7 @@ Then ask the user: "What would you like to work on?"
 ## Important
 
 - **Idempotent**: re-running this skill should not start duplicate loops or change state. Always check `pgrep` before starting a process.
-- **Read-only by default**: sections 2-6 only read state. Section 1 starts processes; section 1b requires user confirmation.
+- **Section 1 starts background processes** (rename loop, ws-refresh loop, PR patrol). Each is guarded by `pgrep` to prevent duplicates. Sections 2-6 are read-only. Use `--no-loops` to skip Section 1 for read-only audits.
 - **Don't dispatch work automatically**: this skill prepares the session, then asks the user what to do.
 - **Logs**: background loop logs go to `/tmp/lw-*.log`. Show their tail in the orientation summary if they have errors.
 - **Reboot persistence**: the rename loop dies on reboot or coordinator session end. To survive reboots, add `/admin-setup` to your post-reboot routine, or set up Full Disk Access for launchd separately.
