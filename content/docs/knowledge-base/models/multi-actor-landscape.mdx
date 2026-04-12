@@ -1,11 +1,11 @@
 ---
 wikiId: E418
 title: Multi-Actor Strategic Landscape
-description: Analyzes how AI risk varies by which actors develop TAI, finding actor identity may determine 40-60% of total risk variance.
+description: Analyzes how AI risk varies by which actors develop TAI, finding actor identity may determine 40-60% of total risk variance. Updated with 2025-2026 investment asymmetries, near-parity capability data, and governance spend estimates.
 subcategory: governance-models
-lastEdited: 2025-12-28
+lastEdited: 2026-04-12
 update_frequency: 90
-summary: Analyzes how AI x-risk depends on which actors develop TAI, finding US-China capability gap narrowed from 9.26% to 1.70% (2024-2025) while open-source closed to within 1.70% of frontier. Estimates actor identity determines 40-60% of total risk variance across four pathways (singleton 8%, conflict 6%, lock-in 5%, misuse 7%), with 25% combined x-risk.
+summary: "Analyzes AI risk through the lens of which actors develop TAI, finding actor identity may account for 40-60% of total risk variance, with detailed quantitative data on US-China capability convergence (benchmark gap narrowed from 9.26% to 1.70% in ~13 months), investment asymmetries (\\$222B US vs \\$98B China VC), and four risk pathways summing to ~25% combined x-risk. The framework is well-populated with 2025-2026 data but the core model parameters (risk estimates, variance attribution) are explicitly acknowledged as illustrative rather than empirically derived."
 clusters:
   - ai-safety
   - governance
@@ -46,10 +46,10 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
         label: 'China Lab Capability',
         description: 'Aggregate capability of leading Chinese AI labs.',
         type: 'cause',
-        confidence: 0.65,
+        confidence: 0.83,
         confidenceLabel: 'vs frontier',
-        details: 'ByteDance, Baidu, Alibaba, DeepSeek, etc. Currently ~0.65 of US frontier.',
-        relatedConcepts: ['DeepSeek', 'Baidu', 'Alibaba', 'ByteDance']
+        details: 'ByteDance, Baidu, Alibaba, DeepSeek, Zhipu AI. Near-parity with US frontier by early 2026; benchmark gap narrowed from 9.26% (Jan 2024) to ~1.70% (Feb 2025), with Chinese models (GLM-5, Kimi K2.5) reaching top Chatbot Arena positions by April 2026.',
+        relatedConcepts: ['DeepSeek', 'Baidu', 'Alibaba', 'ByteDance', 'Zhipu AI']
       }
     },
     {
@@ -60,10 +60,10 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
         label: 'Open-Source Capability',
         description: 'Best freely available AI models.',
         type: 'cause',
-        confidence: 0.55,
+        confidence: 0.83,
         confidenceLabel: 'vs frontier',
-        details: 'Llama, Mistral, etc. Currently ~0.55 of frontier, closing gap rapidly.',
-        relatedConcepts: ['Llama', 'Mistral', 'Hugging Face', 'Open weights']
+        details: 'GLM-5, Llama 4, Qwen3.5, DeepSeek V3.2. Near-zero gap on knowledge benchmarks by early 2026; GLM-5 holds highest open-weight Chatbot Arena Elo (~1,451); Qwen3.5-397B-A17B leads open-weight GPQA Diamond at 88.4%.',
+        relatedConcepts: ['Llama', 'Qwen', 'DeepSeek', 'GLM', 'Hugging Face', 'Open weights']
       }
     },
     {
@@ -118,7 +118,7 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
         type: 'cause',
         confidence: 0.35,
         confidenceLabel: 'strength (0-1)',
-        details: 'Congressional oversight, public input, transparency requirements. Currently weak (~0.35).',
+        details: 'Congressional oversight, public input, transparency requirements. Stanford AI Index 2026 reports 47 countries with active AI legislation but only 12 with enforcement mechanisms; model parameter estimated at ~0.35.',
         relatedConcepts: ['Congress', 'FOIA', 'Public comment']
       }
     },
@@ -188,7 +188,7 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
         type: 'intermediate',
         confidence: 0.35,
         confidenceLabel: 'quality (0-1)',
-        details: 'Less transparency, different values. Currently ~0.35 (lower than US).',
+        details: 'Lower external transparency to Western research community; different values context. Model parameter estimated at ~0.35. Chinese labs have published model cards and safety system cards; affiliated universities conduct alignment research.',
         relatedConcepts: ['CCP values', 'Censorship', 'State priorities']
       }
     },
@@ -363,36 +363,65 @@ import {Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-This model analyzes how AI existential risk depends on which actors—US frontier labs, Chinese developers, open-source communities, or malicious actors—develop transformative AI first, and under what competitive conditions. The core insight is that actor identity and incentive structures may matter as much as technical alignment progress in determining outcomes.
+This model analyzes how AI existential risk depends on which actors—US frontier labs, Chinese developers, open-source communities, or malicious actors—develop <EntityLink id="E357" name="transformative-ai">Transformative AI</EntityLink> first, and under what competitive conditions. The core insight is that actor identity and incentive structures may matter as much as technical alignment progress in determining outcomes. For a relational network analysis of how these actors connect and influence each other, see the <EntityLink id="E3720" name="ai-power-and-influence-map">AI Power and Influence Map</EntityLink>.
 
-The strategic landscape shifted dramatically in 2024-2025. According to <R id="M2QyNzg3Nm">Recorded Future analysis</R>, the gap in overall model performance between the best US and Chinese models narrowed from **9.26% in January 2024 to just 1.70% by February 2025**. This was catalyzed by DeepSeek's R1 release in January 2025, which <R id="OTVmZmIzMW">matched <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 performance</R> while training for just \$1.6 million—a fraction of US costs. Similarly, <R id="ZjI5N2FmMD">open-source models closed to within 1.70%</R> of frontier closed models on Chatbot Arena, fundamentally changing <EntityLink id="E232" name="proliferation">proliferation</EntityLink> dynamics.
+The strategic landscape shifted substantially in 2024-2025. According to <R id="M2QyNzg3Nm">Recorded Future analysis</R>, the gap in overall model performance between the best US and Chinese models narrowed from **9.26% in January 2024 to just 1.70% by February 2025**. <EntityLink id="E512" name="ai-impacts">AI Impacts</EntityLink> documented the <EntityLink id="E1100" name="mmlu">MMLU</EntityLink> benchmark gap narrowing from 17.5 percentage points (end 2023) to 0.3 percentage points (end 2024).[^rc-2247] This convergence was catalyzed by DeepSeek's R1 release in January 2025, which <R id="OTVmZmIzMW">matched <EntityLink id="E218" name="openai">OpenAI</EntityLink>'s o1 performance</R> while training for just \$1.6 million. By April 2026, the top six <EntityLink id="E1237" name="chatbot-arena-elo">Chatbot Arena Elo</EntityLink> models were separated by only 20 Elo points, with Chinese models (Moonshot's Kimi K2.5, DeepSeek V3.2) occupying top positions.[^rc-c76f] Similarly, <R id="ZjI5N2FmMD">open-source models closed to within 1.70%</R> of frontier closed models on Chatbot Arena by early 2025, and the gap had effectively reached near-zero on knowledge benchmarks by early 2026,[^rc-cac8] fundamentally changing <EntityLink id="E232" name="proliferation">proliferation</EntityLink> dynamics.
 
-Despite narrowing capability gaps, structural asymmetries persist. US private AI investment topped <R id="ODJiMGRkYz">\$109 billion in 2024</R>—over 12 times China's figure. The US maintains roughly 4,049 data centers versus China's 379, representing the <R id="ZDE4NDEyMG">largest single advantage</R> the US enjoys. Yet China leads in deployment: it installed approximately 295,000 industrial robots in 2024 alone—more than the rest of the world combined—and accounts for 69.7% of all AI patents.
+Despite narrowing capability gaps, structural asymmetries persist in investment and compute infrastructure. US AI/ML venture capital investment reached approximately \$222 billion in 2025—65.6% of total US VC deal value[^rc-7e5a]—while China's AI capital spending reached approximately \$98 billion (including government investment).[^rc-9293] On compute infrastructure, the US holds approximately 74.5% of global GPU cluster performance versus China's 14.1%, according to <EntityLink id="E125" name="epoch-ai">Epoch AI</EntityLink> analysis covering ~417 GPU clusters (May 2025).[^rc-eb4e] China leads in deployment: it installed approximately 295,000 industrial robots in 2024—more than the rest of the world combined—and accounts for 69.7% of all AI patents.
 
-## Capability Gap Estimates (2024-2025)
+## Conceptual Framework
 
-The following table synthesizes publicly available data on relative AI capabilities across actor categories. Estimates draw from benchmark performance, investment levels, and expert assessments.
+The Multi-Actor Strategic Landscape model structures AI risk analysis around four actor categories, three competitive pressure mechanisms, and four risk pathways. Unlike purely technical alignment models, it treats actor identity and incentive structures as primary determinants of AI risk outcomes.
+
+**Four actor categories:**
+
+- **US Frontier Labs** (<EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, Meta): Currently at the capability frontier; highest identified investment in both capabilities and safety research; subject to democratic accountability, though institutional oversight mechanisms remain underdeveloped (model parameter: ~0.35/1.0).
+- **Chinese Labs** (<EntityLink id="E1098" name="deepseek">DeepSeek</EntityLink>, <EntityLink id="E2886" name="baidu">Baidu</EntityLink>, Alibaba, ByteDance, Zhipu AI): Reached near-parity with US frontier labs on standard benchmarks by early 2026; development priorities shaped by government strategic objectives and different alignment research contexts.
+- **Open-Source Ecosystem** (<EntityLink id="E1062" name="llama">Llama</EntityLink>, Qwen, DeepSeek open weights, <EntityLink id="E1063" name="mistral-ai-models">Mistral</EntityLink>): Near-zero capability gap on knowledge benchmarks as of early 2026; enables broad proliferation but also distributed safety research and external verification.
+- **Malicious Actors** (cybercriminals, non-state armed groups, rogue states): Access capabilities primarily through open-source releases, jailbreaks, and API access; currently estimated at 40–60% of frontier capability.
+
+**Three competitive pressure mechanisms:**
+
+1. **Racing dynamics**: Strategic competition between US and Chinese labs (model intensity parameter: 0.75/1.0) creates pressure to accelerate development timelines, potentially reducing safety investment.
+2. **Capability diffusion**: Open-source releases and technology transfer spread frontier capabilities to a broader set of actors, including potential malicious users.
+3. **Safety investment tradeoffs**: Profit pressure (model parameter: ~0.80/1.0) competes with safety investment, creating tension between deployment speed and risk reduction.
+
+**Four risk pathways** (model estimates; see Limitations for caveats):
+
+The four pathways—Unaligned Singleton (8%), Multi-Agent Conflict (6%), Authoritarian Lock-in (5%), and Catastrophic Misuse (7%)—sum to approximately 25% combined x-risk. These are model parameters rather than empirically derived estimates; they are illustrative of how actor identity affects pathway probabilities rather than precise forecasts.
+
+Actor identity is estimated to account for 40–60% of total risk variance across these pathways, meaning differences in which actors lead AI development may matter comparably to technical alignment quality in determining outcomes. For governance frameworks relevant to these pathways, see the <EntityLink id="E3719" name="ai-governance-effectiveness-analysis">AI Governance Effectiveness Analysis</EntityLink>.
+
+## Capability Gap Estimates (2025-2026)
+
+The following table synthesizes publicly available data on relative AI capabilities across actor categories, updated with 2026 data. Estimates draw from benchmark performance, investment levels, and expert assessments.
 
 | Actor Category | Capability vs Frontier | Trend | Key Evidence | Source |
 |----------------|----------------------|-------|--------------|--------|
-| **US Frontier Labs** | 100% (reference) | Stable | GPT-4.5, Claude 3.5, Gemini 2.0 define frontier | Industry consensus |
-| **Chinese Labs (aggregate)** | 98.3% | Rapidly closing | Gap narrowed from 9.26% to 1.70% (Jan 2024 - Feb 2025) | <R id="M2QyNzg3Nm">Recorded Future</R> |
-| **DeepSeek specifically** | ≈100% on benchmarks | Matched frontier | R1 matched o1 at \$1.6M training cost; gold medal at IMO 2025 | <R id="M2M0YTZjOT">CSIS</R> |
-| **Open-Source (Llama, Qwen)** | 98.3% | Rapidly closing | Gap narrowed from 8.04% to 1.70% on Chatbot Arena | <R id="ZjI5N2FmMD">State of Open-Source AI</R> |
+| **US Frontier Labs** | 100% (reference) | Stable | GPT-4.5, Claude 3.5, Gemini 2.0 define frontier; top Chatbot Arena positions | Industry consensus |
+| **Chinese Labs (aggregate)** | ≥99% on standard benchmarks | Converged | Gap narrowed from 9.26% (Jan 2024) to ≈1.70% (Feb 2025); Chinese models in top-6 Chatbot Arena (Apr 2026) | <R id="M2QyNzg3Nm">Recorded Future</R>;[^rc-c76f] |
+| **DeepSeek specifically** | ≈100% on standard benchmarks | At frontier | R1 matched o1 at \$1.6M training cost; V3.2-Speciale gold at IMO 2025 and IOI 2025; V3.2 third-highest Arena Elo (≈1,421) | <R id="M2M0YTZjOT">CSIS</R>;[^rc-692c] |
+| **Open-Source (Llama, Qwen, GLM-5)** | ≥99% on knowledge benchmarks | Near-zero gap | GLM-5 top open-weight Arena Elo (≈1,451); Qwen3.5 leads open-weight GPQA at 88.4% (Feb 2026) | <R id="ZjI5N2FmMD">State of Open-Source AI</R>;[^rc-cac8][^rc-5980] |
 | **Malicious Actor Access** | ≈40-60% | Increasing | Access via open-source, jailbreaks, or theft | Expert estimate |
 
-### Investment and Infrastructure Asymmetries
+### Investment and Infrastructure Asymmetries (2024-2025)
 
-| Dimension | United States | China | Ratio | Implications |
-|-----------|--------------|-------|-------|--------------|
-| Private AI Investment (2024) | \$109 billion | ≈\$1 billion | **12:1** | US leads funding despite capability parity |
-| Data Centers | 4,049 | 379 | **11:1** | Largest structural US advantage |
-| New Data Center Capacity (2024) | 5.8 GW | Lower | — | Continued infrastructure expansion |
-| Industrial Robot Installations (2024) | 34,000 | 295,000 | **1:9** | China leads deployment/application |
-| AI Patents (2023) | 13% of global | 69.7% of global | **1:5** | China dominates IP filings |
-| AI Research Citations (2023) | 13% of global | 22.6% of global | **1:2** | China leads academic output |
+| Dimension | United States | China | Notes |
+|-----------|--------------|-------|-------|
+| Private AI investment (2024) | \$109 billion | ≈\$9.3 billion | Stanford HAI 2025 AI Index; US figure is ≈12× China[^rc-2247] |
+| AI/ML VC investment (2025) | ≈\$222 billion | — | 65.6% of \$339B total US VC; PitchBook Q4 2025[^rc-7e5a] |
+| AI capital spending (2025) | — | ≈\$98 billion | Includes government investment; 48% YoY increase[^rc-9293] |
+| Stargate / infrastructure commitment | \$500B (4-year) | ¥380B (≈\$52B, tech giants) | OpenAI Jan 2025[^rc-5250]; includes immediate \$100B deployment |
+| US hyperscaler data center capex (2025-2026) | >\$350B / ≈\$400B | — | Alphabet, Amazon, Microsoft, Meta, Oracle combined[^rc-2f18] |
+| GPU cluster performance share | 74.5% of global | 14.1% of global | Epoch AI, May 2025; covers ≈417 identified clusters[^rc-eb4e] |
+| Data Centers | 4,049 | 379 | ≈11:1; <R id="ZDE4NDEyMG">RAND</R> |
+| Industrial robot installations (2024) | 34,000 | 295,000 | 1:9; China leads deployment |
+| AI patents (2023) | 13% of global | 69.7% of global | China dominates IP filings |
+| AI research citations (2023) | 13% of global | 22.6% of global | China leads academic output |
 
-*Sources: <R id="ODJiMGRkYz">CFR</R>, <R id="ZDE4NDEyMG">RAND</R>, <R id="Yzg2OTY5M2">Stanford HAI</R>*
+*Sources: <R id="ODJiMGRkYz">CFR</R>, <R id="ZDE4NDEyMG">RAND</R>, <R id="Yzg2OTY5M2">Stanford HAI</R>, Epoch AI, PitchBook*
+
+*Note: 2024 and 2025 investment figures use different methodologies (private investment vs. VC deal value vs. capital spending including government) and are not directly comparable across years or countries. China's 2025 figure includes substantial government-directed investment absent from the US VC measure.*
 
 ## Key Dynamics
 
@@ -448,7 +477,7 @@ The key mechanisms are:
 
 1. **Competition intensity → Safety shortcuts → Misalignment risk**: As US-China competition intensifies (currently 0.75 on normalized scale), labs face pressure to accelerate timelines, potentially cutting safety corners.
 
-2. **Capability diffusion → Malicious access → Misuse risk**: Open-source releases (now within 1.70% of frontier) enable rapid proliferation to actors who may lack safety constraints or beneficial intent.
+2. **Capability diffusion → Malicious access → Misuse risk**: Open-source releases (now near-zero gap from frontier on knowledge benchmarks) enable rapid proliferation to actors who may lack safety constraints or beneficial intent.
 
 3. **First-mover advantage → Winner-take-all → Reduced caution**: If decisive strategic advantage exists for first-mover, actors rationally accept higher alignment risk to capture it.
 
@@ -456,23 +485,85 @@ The key mechanisms are:
 
 5. **Transparency → Better coordination → Reduced racing**: Conversely, capability transparency and safety research sharing (currently ~0.6 openness) can reduce competitive pressure.
 
+## Quantitative Analysis
+
+### US-China Benchmark Gap: Trajectory (2023-2026)
+
+Benchmark gaps between US and Chinese frontier models narrowed substantially across all major evaluations.[^rc-2247]
+
+| Benchmark | US–China Gap (End 2023) | US–China Gap (End 2024) | Direction |
+|-----------|------------------------|------------------------|-----------|
+| MMLU | 17.5 pp | 0.3 pp | Near-parity |
+| <EntityLink id="E2616" name="mmmu">MMMU</EntityLink> | 13.5 pp | 8.1 pp | Closing |
+| <EntityLink id="E1102" name="math-benchmark">MATH</EntityLink> | 24.3 pp | 1.6 pp | Near-parity |
+| <EntityLink id="E1103" name="humaneval">HumanEval</EntityLink> | 31.6 pp | 3.7 pp | Near-parity |
+| Composite benchmark | 9.26% (Jan 2024) | 1.70% (Feb 2025) | Near-parity |
+
+By April 2026, the top six Chatbot Arena models were separated by only 20 Elo points, with Chinese models (Kimi K2.5, DeepSeek V3.2 at Arena Elo ~1,421) occupying top-tier positions alongside Western models.[^rc-c76f] DeepSeek V3.2-Speciale achieved gold-level results at IMO 2025, CMO, ICPC World Finals, and IOI 2025.[^rc-692c]
+
+### Open-Source vs. Frontier Gap (2025-2026)
+
+By early 2026, the gap between open-source and proprietary AI had effectively closed on knowledge benchmarks:[^rc-cac8]
+
+| Model | Organization | <EntityLink id="E1104" name="gpqa-diamond">GPQA Diamond</EntityLink> | Arena Elo | Status |
+|-------|-------------|-------------|-----------|--------|
+| GLM-5 (Reasoning) | Zhipu AI | 94% | ≈1,451 (top open-weight) | Open-weight |
+| Qwen3.5-397B-A17B | Alibaba | 88.4% | Top open-weight tier | Open-weight |
+| DeepSeek V3.2 | DeepSeek | — | ≈1,421 (3rd overall) | Open-weight |
+| Top proprietary (reference) | Various | ≈90-92% | ≈1,440-1,460 | Proprietary |
+
+Single-digit gaps remain on frontier reasoning tasks (e.g., OpenAI o3-class models on competition mathematics).[^rc-5980]
+
+### AI Safety and Alignment Research Funding (2024-2025)
+
+| Funding Source | Amount | Year | Notes |
+|----------------|--------|------|-------|
+| <EntityLink id="E552" name="open-philanthropy">Open Philanthropy</EntityLink> (technical AI safety) | ≈\$50M committed | 2024 | Largest single philanthropic funder; grants to CAIS, <EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>, <EntityLink id="E202" name="miri">Machine Intelligence Research Institute (MIRI)</EntityLink> |
+| Open Philanthropy (RFP) | \$40M available | 2025 | Dedicated request for proposals |
+| <EntityLink id="E567" name="sff">Survival and Flourishing Fund (SFF)</EntityLink> (SFF) | \$34.33M distributed | 2025 | 86% to AI safety |
+| <EntityLink id="E543" name="ltff">Long-Term Future Fund (LTFF)</EntityLink> (LTFF) | \$8.4M total | 2024 | Over \$5M to AI safety |
+| Total philanthropic AI safety | ≈\$83.6M | 2024 | Open Philanthropy ≈76%; individual donors (<EntityLink id="E577" name="jaan-tallinn">Jaan Tallinn</EntityLink> ≈\$20M) ~24% |
+| Alignment research funding (all sources) | \$150-170M | Mid-2025 | 36% increase from \$110-130M in 2024 |
+| Broader AI safety market | >\$1 billion | 2025 | Includes commercial/VC safety-focused startups; Safe Superintelligence raised \$2B in 2025 |
+
+*Source: [Stephen McAleese, LessWrong, January 2025](https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation)[^rc-cf25]; [AI Safety Market Funding Trends 2022-2026](https://newmarketpitch.com/blogs/news/ai-safety-funding-trends)[^rc-a9b0]*
+
+### AI Governance Institutional Capacity (2025-2026)
+
+| Institution | Funding | Year | Notes |
+|-------------|---------|------|-------|
+| NIST AI Safety Institute (US) | ≈\$47.7M | FY2025 | AI research, standards, and testing |
+| NIST AI Safety Institute (US) | ≈\$55M | FY2026 | Includes AI Standards and Innovation Center (\$10M) |
+| UK AI Security Institute (AISI) research programme | £15M+ | 2025 | Initial £4M pot expanding to £8.5M; ranges from £50K to £1M per grant |
+| UK DSIT/AISI foundation investment | £100M | 2023-2024 | Original Frontier AI Taskforce commitment |
+| <EntityLink id="E1016" name="eu-ai-office">EU AI Office</EntityLink> | Operational | Aug 2025 | 125+ staff; no public budget figure available |
+| Global public AI governance (US + UK + EU combined est.) | ≈\$72.3M (projected) | 2025 | Federal agencies; does not include EU AI Office |
+
+*Sources: [NIST FY2026 budget announcement](https://grantedai.com/news/nist-55m-ai-standards-safety-research-2026)[^rc-8af5]; [UK AISI research programme](https://myresearchconnect.com/ai-security-institute-opens-15-million-funding-programme-to-tackle-risks-from-misaligned-ai-systems/)[^rc-5919]; [EU AI Office](https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office)[^rc-7460]*
+
+### Safety Spend as Share of Total AI Investment
+
+Identified alignment research funding (\$150-170M in mid-2025) and public governance budgets (≈\$72M) together represent approximately 0.06-0.09% of global AI VC investment (\$243.9B in 2025).[^rc-ab7a] Actor-focused governance specifically—covering capability intelligence, game-theoretic analysis of lab incentives, and policy engagement—is estimated as a smaller subset of this total. Lab-level safety investment percentages are not publicly disclosed; estimates in the literature (e.g., Anthropic ≈30%, OpenAI ≈15%) are inferred from organizational statements and cannot be independently verified.
+
 ## Risk Pathways
 
-| Pathway | Description | Estimate |
-|---------|-------------|----------|
+| Pathway | Description | Model Estimate |
+|---------|-------------|----------------|
 | **Unaligned Singleton** | One misaligned AI gains decisive advantage | 8% |
 | **Multi-Agent Conflict** | Multiple powerful AI systems in conflict | 6% |
 | **Authoritarian Lock-in** | AI enables permanent authoritarian control | 5% |
 | **Catastrophic Misuse** | Intentional misuse causes catastrophe | 7% |
 | **Combined X-Risk** | Total from all pathways | ≈25% |
 
+*These are model parameters illustrating how actor identity affects pathway probabilities. They are not empirically derived forecasts.*
+
 ## Actor Categories
 
 | Category | Key Actors |
 |----------|------------|
 | **Leading US** | OpenAI, Anthropic, Google DeepMind, Meta |
-| **Leading China** | DeepSeek, Baidu, Alibaba, ByteDance |
-| **Open-Source** | Meta (Llama), Mistral, Hugging Face ecosystem |
+| **Leading China** | DeepSeek, Baidu, Alibaba, ByteDance, Zhipu AI |
+| **Open-Source** | Meta (Llama), Mistral, Hugging Face ecosystem, Alibaba (Qwen) |
 | **Malicious** | Cybercriminals, terrorists, rogue states |
 | **Governments** | US (NSA, DARPA), China (PLA, MSS), EU |
 
@@ -486,7 +577,7 @@ This diagram simplifies the full model. The complete Multi-Actor Strategic Lands
 
 **Information & Transparency (7 variables)**: Capability disclosure, safety sharing, incident reporting, capability intelligence, dual-use publication norms, evaluation standards, third-party verification.
 
-**Alignment & Control (8 variables)**: US actor alignment, China actor alignment, Constitutional AI effectiveness, human oversight scalability, kill switch reliability, containment protocols, red-teaming, post-deployment monitoring.
+**Alignment & Control (8 variables)**: US actor alignment, China actor alignment, <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> effectiveness, human oversight scalability, kill switch reliability, containment protocols, red-teaming, post-deployment monitoring.
 
 **Strategic Outcomes (8 variables)**: First-mover advantage, winner-take-all dynamics, diffusion speed, multipolar vs bipolar, offense-defense balance, escalation control, governance lock-in, misuse probability.
 
@@ -500,31 +591,38 @@ The multi-actor landscape determines whether AI development is coordinated or co
 
 | Dimension | Assessment | Quantitative Estimate |
 |-----------|------------|----------------------|
-| **Potential severity** | High - multipolar dynamics drive racing and proliferation | Actor landscape contributes 40-60% of total risk variance |
-| **Probability-weighted importance** | High - currently in competitive multipolar phase | 75% probability of continued multipolar competition through 2030 |
-| **Comparative ranking** | Essential context for governance and coordination strategies | #2 priority behind technical alignment |
-| **Malleability** | Medium - actor incentives partially shiftable | 20-30% of racing dynamics addressable via policy |
+| **Potential severity** | Multipolar dynamics drive racing and proliferation | Actor landscape estimated to contribute 40-60% of total risk variance (model parameter) |
+| **Probability-weighted importance** | Currently in competitive multipolar phase | 75% model-estimated probability of continued multipolar competition through 2030 |
+| **Comparative ranking** | Essential context for governance and coordination strategies | Priority comparable to technical alignment in governance-focused analyses; ordering varies by framework |
+| **Malleability** | Actor incentives partially shiftable via policy | 20-30% of racing dynamics estimated as addressable via policy (model parameter; unverified benchmark) |
 
 ### Actor Safety Assessment
 
-| Actor Category | Safety Investment | Safety Culture | Transparency | Overall Safety Grade |
-|----------------|-------------------|----------------|--------------|---------------------|
-| Anthropic | ≈30% of budget | Strong | High | A- |
-| OpenAI | ≈15% of budget | Declining | Medium | B- |
-| Google DeepMind | ≈20% of budget | Strong | Medium | B+ |
-| Meta AI | ≈10% of budget | Moderate | High (open-source) | B- |
-| Chinese Labs | ≈5% of budget | Unknown | Low | C- (estimated) |
-| Open-Source Ecosystem | Minimal | Variable | Very high | C |
+Lab-level safety investment percentages are not publicly disclosed. The following table describes observable indicators rather than inferred grades. For governance effectiveness context, see the <EntityLink id="E3719" name="ai-governance-effectiveness-analysis">AI Governance Effectiveness Analysis</EntityLink>.
+
+| Actor Category | Observable Safety Indicators | External Transparency | Notes |
+|----------------|-----------------------------|-----------------------|-------|
+| Anthropic | Responsible Scaling Policy published; Constitutional AI methodology; regular system cards | High | Organization states safety as core mission; ≈1,500 employees (early 2026); valuation grew to \$380B (2025 Series G) |
+| OpenAI | Safety council established 2025; Head of Preparedness role created (late 2025); Preparedness team active | Medium | Safety team structure changed during 2024-2025; targeting ≈8,000 employees by end 2026 |
+| Google DeepMind | Published AGI safety and security strategy (2025); multiple alignment papers; ≈6,000 employees (Aug 2025) | Medium | DeepMind and Google Brain merged 2023; safety research is published |
+| Meta AI | Open-source model releases with safety evaluations; FAIR research published | High (open-source) | Reduced AI safety research headcount Oct 2025; ≈3,400 lab staff (Jul 2025) |
+| Chinese Labs | Model cards and safety system cards published (DeepSeek, Alibaba Qwen); affiliated university alignment research | Lower relative to Western labs in Western-accessible venues | Have published safety research; Chinese labs have lower external transparency to Western research community |
+| Open-Source Ecosystem | Distributed responsibility; community red-teaming; open safety research | Very High | Variable implementation across projects; no central coordinating body |
+
+*Note: Safety investment percentages (e.g., "30% of budget") circulate in AI governance literature but are not drawn from public financial disclosures. No lab has confirmed specific safety budget percentages.*
 
 ### Diffusion Timeline Estimates
 
 | Capability Level | US Labs | Chinese Labs | Open-Source | Malicious Actors |
 |-----------------|---------|--------------|-------------|------------------|
-| GPT-4 class | 2023 | 2024-2025 | 2024-2025 | 2025-2026 |
-| GPT-5 class (projected) | 2025 | 2026-2027 | 2027-2028 | 2028-2030 |
-| Autonomous agents (dangerous) | 2025-2026 | 2026-2027 | 2027-2028 | 2028-2029 |
+| GPT-4 class | 2023 | 2024-2025 ✓ | 2024-2025 ✓ | 2025-2026 |
+| Frontier reasoning (o1/R1 class) | 2024-2025 | 2025 ✓ (DeepSeek R1) | 2025-2026 | 2027-2028 |
+| GPT-5 class (projected) | 2025 | 2026 (approaching) | 2027-2028 | 2028-2030 |
+| Autonomous agents (dangerous capability threshold) | 2025-2026 | 2026-2027 | 2027-2028 | 2028-2029 |
 
-**Key Finding:** The open-source lag has collapsed. As of late 2025, the center of gravity for open-weight models has <R id="ZjI5N2FmMD">shifted toward China</R>, with DeepSeek and Qwen becoming household names. US firms released fewer open-weight models citing commercial and safety constraints, while Chinese labs treated open-weight leadership as a deliberate catch-up strategy. Meta—long a champion of frontier open models—has <R id="MGE0OGI3NW">delayed release of Llama Behemoth</R> and suggested it may keep future "superintelligence" models behind paywalls.
+**Key Finding:** The open-source and Chinese lab lags have collapsed on standard benchmarks. As of late 2025, the center of gravity for open-weight models has <R id="ZjI5N2FmMD">shifted toward China</R>, with DeepSeek and Qwen becoming leading providers. US firms released fewer open-weight models citing commercial and safety constraints, while Chinese labs treated open-weight leadership as a deliberate strategy. Meta—long a champion of frontier open models—has <R id="MGE0OGI3NW">delayed release of Llama Behemoth</R> and indicated it may keep future frontier models behind paywalls.
+
+The "GPT-5 class" row should be interpreted cautiously: Chinese labs achieved near-parity with GPT-4o-comparable models in 2025, making the "GPT-5 class" timeline dependent on where proprietary labs define the next capability threshold.
 
 ### First-Mover Advantage: Evidence Assessment
 
@@ -532,29 +630,31 @@ The model's risk estimates depend critically on the magnitude of first-mover adv
 
 | Evidence Type | Finding | Implication for FMA |
 |--------------|---------|---------------------|
-| Historical analysis | First movers have 47% failure rate; only 11% become market leaders (<R id="ZDBkNzdjNj">Golder & Tellis</R>) | **Weak FMA** |
-| AI competitive landscape | 2,011 companies in 2024 ML/AI landscape, 578 new entrants since 2023 | **Weak FMA** |
-| Model replication | 11 different developers globally achieved GPT-4-level models in 2024 | **Weak FMA** |
-| Cloud market | AWS and Azure trading leadership position; "more than one winner" possible | **Moderate FMA** |
-| Network effects | AI systems less network-effect-driven than social platforms | **Weak FMA** |
-| TAI-specific dynamics | Decisive strategic advantage at TAI level remains uncertain | **Unknown** |
+| Historical analysis | First movers have 47% failure rate; only 11% become market leaders (<R id="ZDBkNzdjNj">Golder & Tellis</R>) | Suggests weak FMA |
+| AI competitive landscape | 2,011 companies in 2024 ML/AI landscape, 578 new entrants since 2023 | Suggests weak FMA |
+| Model replication | 11 different developers globally achieved GPT-4-level models in 2024 | Suggests weak FMA |
+| Cloud market | AWS, Azure, and Google Cloud trading leadership position; "more than one winner" possible | Suggests moderate FMA |
+| Network effects | AI systems less network-effect-driven than social platforms | Suggests weak FMA |
+| TAI-specific dynamics | Decisive strategic advantage at TAI level remains uncertain | Unknown |
 
-**Key insight:** Evidence from the <R id="NzZlNzM1NW">Abundance Institute</R> suggests "no signs of winner-take-all dynamics" in the current AI ecosystem. However, TAI (transformative AI) may differ qualitatively if it enables rapid capability improvements or strategic advantages not available to followers. The model's 0.7 first-mover advantage estimate may be too high based on current evidence, but TAI-level dynamics remain highly uncertain.
+Evidence from the <R id="NzZlNzM1NW">Abundance Institute</R> suggests "no signs of winner-take-all dynamics" in the current AI ecosystem. However, TAI (transformative AI) may differ qualitatively if it enables rapid capability improvements or strategic advantages not available to followers. The model's 0.7 first-mover advantage estimate may be calibrated too high based on current evidence, but TAI-level dynamics remain highly uncertain.
 
 ### Resource Implications
 
-Understanding actor landscape enables:
+Understanding the actor landscape enables targeted governance strategies:
 - Targeted engagement with highest-leverage actors: Focus on top 3-4 US labs could cover 70% of frontier capability
 - Coalition-building for safety standards: Anthropic-OpenAI-DeepMind coalition would set de facto standards
 - Monitoring of capability diffusion: \$50-100M/year for comprehensive capability intelligence
-- Anticipation of strategic behavior and reactions: Game-theoretic modeling investment ≈\$10-20M/year
+- Anticipation of strategic behavior: Game-theoretic modeling estimated at ≈\$10-20M/year
 
-**Recommended investment:** \$100-200M/year in actor-focused governance work (vs. ≈\$20-30M current).
+**Estimated investment required for comprehensive coverage:** Analyses estimate that actor-focused governance—capability intelligence, lab engagement, diffusion monitoring—may require \$100-200M/year. Current philanthropic alignment research funding reached approximately \$150-170M by mid-2025, though most is oriented toward technical safety rather than actor-focused governance specifically.[^rc-cf25] The \$20-30M estimate for current actor-focused governance work specifically is an analytical estimate without a publicly verified benchmark.
 
 ### Key Cruxes
 
-| Crux | If True | If False | Current Probability |
-|------|---------|----------|---------------------|
+These probability estimates are model author estimates; they are not drawn from formal elicitation surveys.
+
+| Crux | If True | If False | Model Estimate |
+|------|---------|----------|----------------|
 | Leading coalition is stable | Top 3 can set norms | Racing to bottom | 45% |
 | Safety can be coordination point | Voluntary standards viable | Regulation required | 35% |
 | China is engageable on safety | Global coordination possible | Bifurcated governance | 30% |
@@ -575,15 +675,17 @@ Current research from <R id="MDY5MjMzZG">AI Impacts</R> identifies key research 
 
 ## Limitations
 
-1. **Capability estimates rapidly outdating**: The 2024-2025 data showing near-parity may not persist; breakthrough capabilities could restore gaps.
+1. **Capability estimates rapidly outdating**: The 2025-2026 data showing near-parity may not persist; breakthrough capabilities could restore gaps. The near-zero benchmark gap reflects standard evaluations and may not extend to capabilities at the frontier of reasoning, agentic tasks, or future benchmark domains.
 
-2. **Safety investment data opaque**: Lab safety budgets are not publicly disclosed; estimates are inferential.
+2. **Safety investment data opaque**: Lab safety budgets are not publicly disclosed; estimates in circulation are inferential and unverified. The Actor Safety Assessment table reflects observable indicators rather than confirmed investment levels.
 
 3. **TAI dynamics uncertain**: Current competitive patterns may not predict TAI-level dynamics where decisive advantages could differ fundamentally.
 
-4. **Geopolitical volatility**: US-China relations, export control effectiveness, and regulatory trajectories are highly uncertain.
+4. **Geopolitical volatility**: US-China relations, export control effectiveness, and regulatory trajectories are highly uncertain. Export controls on advanced chips may slow Chinese compute accumulation in ways not yet reflected in 2026 data.
 
 5. **Malicious actor access hard to estimate**: Underground markets and state-sponsored theft create significant uncertainty in capability diffusion.
+
+6. **Model parameters are illustrative**: The causal graph confidence values and risk pathway percentages are analytical estimates to illustrate model structure, not empirically derived posterior probabilities. The 40-60% risk variance attribution figure is a model claim without a published methodology or independent verification.
 
 ## Sources
 
@@ -596,3 +698,20 @@ Current research from <R id="MDY5MjMzZG">AI Impacts</R> identifies key research 
 - <R id="NzZlNzM1NW">Abundance Institute: AI Competitive Landscape</R>
 - <R id="MDY5MjMzZG">AI Impacts: Multipolar Research Projects</R>
 - <R id="OGQ0YWE3NW">Frontier Model Forum: Progress Update 2024</R>
+
+[^rc-2247]: Stanford HAI, *2025 AI Index Report: Technical Performance*, April 2025. MMLU gap narrowed from 17.5pp (end 2023) to 0.3pp (end 2024); composite benchmark gap from 9.26% (Jan 2024) to 1.70% (Feb 2025).
+[^rc-c76f]: LMSYS Chatbot Arena leaderboard, April 2026. Top six models separated by only 20 Elo points; Moonshot's Kimi K2.5 debuted at #15; Chinese models occupy multiple top-tier positions.
+[^rc-cac8]: futurehumanism.co, "Open Source vs Closed AI: Where the Battle Stands in 2026," 2026. By early 2026, gap between open-source and proprietary AI effectively zero on knowledge benchmarks; GLM-5 holds #1 open-weight Arena Elo (~1,451).
+[^rc-7e5a]: PitchBook-NVCA Q4 2025 Venture Monitor, January 2026. AI/ML deals captured 65.6% of all US VC deal value in 2025 (\$222B of \$339B total US VC); global AI VC investment \$243.9B.
+[^rc-9293]: TechWire Asia, "China AI investment hits \$98B in 2025 as tech war with US intensifies," June 2025. Up 48% from 2024.
+[^rc-eb4e]: Epoch AI, "The US hosts the majority of GPU cluster performance," May 2025. Dataset covers ~417 GPU clusters with known country locations; represents 10-20% of total AI computing capacity.
+[^rc-692c]: DeepSeek, V3.2-Speciale release notes, September 29, 2025. Gold-level results at IMO 2025, CMO, ICPC World Finals, and IOI 2025. V3.2 Chatbot Arena rating ~1,421 (third-highest overall).
+[^rc-5980]: Alibaba Qwen Team, "Qwen3.5: Benchmarks and Capabilities," DataCamp, February-March 2026. Qwen3.5-397B-A17B GPQA Diamond 88.4%; AIME 2026 91.3%.
+[^rc-5250]: OpenAI, "Announcing the Stargate Project," January 21, 2025. \$500B planned over 4 years; \$100B deployed immediately; initial partners SoftBank, OpenAI, Oracle, MGX.
+[^rc-2f18]: Next Big Future, "China AI Chip and AI Data Centers Versus US AI Data Centers," October 2025. US hyperscalers (Alphabet, Amazon, Microsoft, Meta) plan >\$350B in data centers in 2025 and ≈\$400B in 2026.
+[^rc-cf25]: Stephen McAleese, "An Overview of the AI Safety Funding Situation," LessWrong, January 2025. Philanthropic AI safety ≈\$83.6M in 2024 (Open Philanthropy \$63.6M); alignment research funding increased 36% to \$150-170M by mid-2025.
+[^rc-a9b0]: AI Safety Market Funding Trends (2022-2026), newmarketpitch.com, 2026. Core alignment research \$110-130M in 2024; Safe Superintelligence raised \$2B in 2025; broader AI safety market >\$1B including commercial safety startups.
+[^rc-8af5]: Granted AI, "NIST Secures \$55 Million for AI Standards and Safety Research," 2026. NIST FY2025: \$47.7M for AI research, standards, testing; FY2026: \$55M including \$10M AI Standards and Innovation Center.
+[^rc-5919]: myresearchconnect.com, "AI Security Institute Opens £15 Million Funding Programme," 2025. Initial £4M pot expanding to £8.5M; original Frontier AI Taskforce backed by £100M.
+[^rc-7460]: Wikipedia, "European Artificial Intelligence Office." Became operational August 2, 2025; 125+ staff; established by European Commission decision January 24, 2024.
+[^rc-ab7a]: PitchBook Q4 2025 Venture Monitor: global AI VC investment \$243.9B in 2025. Safety and governance spend as percentage calculated from combined identified funding (≈\$150-170M alignment research + ≈\$72M public governance) divided by \$243.9B global AI VC.
