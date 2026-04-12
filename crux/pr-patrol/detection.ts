@@ -32,10 +32,12 @@ import { ADVISORY_ISSUES } from '../lib/pr-analysis/types.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
+  appendJsonlLocked,
   cl,
   clearAbandoned,
   clearPendingCICheck,
   clearTotalFixAttempts,
+  countConsecutiveCycles,
   getAbandonedSha,
   isAbandoned,
   isPendingCICheck,
@@ -46,6 +48,7 @@ import {
   markProcessed,
   recordFailure,
   resetFailCount,
+  stateFingerprint,
 } from './state.ts';
 
 // ── Bot / release PR skip lists ──────────────────────────────────────────────
@@ -241,6 +244,124 @@ export function detectAllPrIssuesFromNodes(
       };
     })
     .filter((pr) => pr.issues.length > 0);
+}
+
+// ── Stuck-cycle detection ────────────────────────────────────────────────────
+
+/**
+ * Minimum consecutive cycles (inclusive of current) before a PR is flagged as
+ * stuck. At this point the coordinator escalation path runs instead of another
+ * fix dispatch.
+ */
+export const STUCK_CYCLE_THRESHOLD = 3;
+
+/**
+ * Collapse the status-check rollup into a single conclusion string suitable
+ * for fingerprinting. We want something that changes when a previously-failing
+ * check passes (or vice versa) but tolerates minor flux in pending states.
+ *
+ * Returns one of: 'FAIL' | 'PENDING' | 'PASS' | 'NONE'.
+ */
+export function computeRollupConclusion(pr: GqlPrNode): string {
+  const contexts =
+    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+  if (contexts.length === 0) return 'NONE';
+
+  const hasFailure = contexts.some(
+    (c) =>
+      c.conclusion === 'FAILURE' ||
+      c.conclusion === 'CANCELLED' ||
+      c.state === 'FAILURE' ||
+      c.state === 'ERROR',
+  );
+  if (hasFailure) return 'FAIL';
+
+  const hasPending = contexts.some(
+    (c) =>
+      (c.conclusion === null || c.conclusion === undefined) &&
+      c.state !== 'SUCCESS',
+  );
+  if (hasPending) return 'PENDING';
+
+  return 'PASS';
+}
+
+/**
+ * Annotate detected PRs with stuck-cycle metadata.
+ *
+ * For each detected PR this function:
+ *   1. Builds a coarse state fingerprint that deliberately EXCLUDES headSha
+ *      (so pushes without real progress still count as stuck).
+ *   2. Counts consecutive prior matching snapshots in the JSONL log.
+ *   3. Persists the current snapshot (locked append).
+ *   4. When `(prior + 1) >= STUCK_CYCLE_THRESHOLD`, attaches `stuckCycles`,
+ *      `stuckReason`, and pushes `'stuck'` onto `pr.issues` so downstream
+ *      scoring + execution routes it to the coordinator escalation path.
+ *
+ * Writes are best-effort: any I/O error is logged but never thrown — the
+ * main scan must not fail just because we can't record a snapshot.
+ */
+export async function applyStuckCycleDetection(
+  detected: DetectedPr[],
+  prNodes: GqlPrNode[],
+  /**
+   * Override the JSONL path — primarily for tests so they don't pollute the
+   * real patrol log. Defaults to the canonical JSONL_FILE.
+   */
+  jsonlFile: string = JSONL_FILE,
+): Promise<void> {
+  // Index raw GqlPrNode by number so we can read headRefOid + rollup contexts.
+  const nodeByNumber = new Map<number, GqlPrNode>();
+  for (const pr of prNodes) nodeByNumber.set(pr.number, pr);
+
+  for (const pr of detected) {
+    const node = nodeByNumber.get(pr.number);
+    if (!node) continue;
+
+    const mergeable = node.mergeable;
+    const rollupConclusion = computeRollupConclusion(node);
+    const blockingCommentCount = pr.blockingComments?.length ?? 0;
+    const fingerprint = stateFingerprint({
+      mergeable,
+      rollupConclusion,
+      blockingCommentCount,
+    });
+
+    let priorMatching = 0;
+    try {
+      priorMatching = countConsecutiveCycles(pr.number, fingerprint, jsonlFile);
+    } catch (e) {
+      log(`  ${cl.yellow}Warning: could not count prior cycles for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    }
+    const stuckCycles = priorMatching + 1; // include the current cycle
+
+    // Persist snapshot with a file lock so concurrent patrol runs don't
+    // interleave writes. Best-effort — any failure falls back to an
+    // unlocked append inside appendJsonlLocked.
+    await appendJsonlLocked(jsonlFile, {
+      type: 'pr_cycle_snapshot',
+      pr_num: pr.number,
+      fingerprint,
+      head_sha: node.headRefOid,
+      mergeable,
+      rollup_conclusion: rollupConclusion,
+      blocking_comment_count: blockingCommentCount,
+    }).catch((e: unknown) => {
+      log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    });
+
+    if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+      pr.stuckCycles = stuckCycles;
+      pr.stuckReason = fingerprint;
+      if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
+      log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
+    } else if (stuckCycles >= 2) {
+      // Not yet at threshold but trending — annotate so the fix prompt can
+      // warn the agent.
+      pr.stuckCycles = stuckCycles;
+      pr.stuckReason = fingerprint;
+    }
+  }
 }
 
 // ── Stacked branch detection helpers ─────────────────────────────────────────

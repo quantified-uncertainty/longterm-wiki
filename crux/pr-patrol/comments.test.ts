@@ -10,6 +10,7 @@ import {
   buildAbandonmentComment,
   buildTimeoutComment,
   buildNoOpComment,
+  buildStuckEscalationComment,
 } from './comments.ts';
 import type { GqlPrNode } from './index.ts';
 
@@ -319,5 +320,21 @@ describe('event comment builders', () => {
     const result = buildNoOpComment(['ci-failure']);
     expect(result).toContain('escalation to coordinator');
     expect(result).toContain('ci-failure');
+  });
+
+  it('buildStuckEscalationComment routes through coordinator (Opus) escalation wording (QUA-286)', () => {
+    const result = buildStuckEscalationComment(4, 'CONFLICTING:FAIL:2', ['stuck', 'ci-failure']);
+    // Must match the existing abandonment path wording so coordinator pickup
+    // treats it identically (see bf77960b6).
+    expect(result).toContain('Escalating to coordinator (Opus)');
+    expect(result).toContain('4 consecutive cycles');
+    expect(result).toContain('CONFLICTING:FAIL:2');
+    // Non-stuck issues are listed for operator context; 'stuck' itself is filtered.
+    expect(result).toContain('ci-failure');
+  });
+
+  it('buildStuckEscalationComment handles the case where only "stuck" is detected', () => {
+    const result = buildStuckEscalationComment(3, 'MERGEABLE:PENDING:0', ['stuck']);
+    expect(result).toContain('(none other than stuck)');
   });
 });

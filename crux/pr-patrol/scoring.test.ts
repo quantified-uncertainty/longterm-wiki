@@ -81,6 +81,14 @@ describe('computeScore', () => {
     expect(computeScore(mergeBlocked)).toBeGreaterThan(computeScore(botMajor));
     expect(computeScore(ciFailure)).toBeGreaterThan(computeScore(mergeBlocked));
   });
+
+  it('stuck scores at 85 (above ci-failure, below self-authored-feedback) — QUA-286', () => {
+    const stuck = makeDetectedPr({ issues: ['stuck'] });
+    const ciFailure = makeDetectedPr({ issues: ['ci-failure'] });
+    const selfAuthored = makeDetectedPr({ issues: ['self-authored-feedback'] });
+    expect(computeScore(stuck)).toBeGreaterThan(computeScore(ciFailure));
+    expect(computeScore(selfAuthored)).toBeGreaterThan(computeScore(stuck));
+  });
 });
 
 // ── computeBudget ────────────────────────────────────────────────────────────
@@ -152,6 +160,16 @@ describe('computeBudget', () => {
     const budget = computeBudget(['self-authored-feedback']);
     expect(budget.maxTurns).toBe(20);
     expect(budget.timeoutMinutes).toBe(15);
+  });
+
+  it('gives tiny safety-net budget for stuck — stuck PRs are intercepted before Claude dispatch (QUA-286)', () => {
+    // Stuck is intercepted in fixPr() before any Claude dispatch, so the
+    // budget here only matters as a defense-in-depth safety net. The entry
+    // in ISSUE_BUDGETS is 3/2 but computeBudget() floors to the default
+    // minimum of 5/3, which is still tiny compared to other issue types.
+    const budget = computeBudget(['stuck']);
+    expect(budget.maxTurns).toBeLessThanOrEqual(5);
+    expect(budget.timeoutMinutes).toBeLessThanOrEqual(3);
   });
 });
 

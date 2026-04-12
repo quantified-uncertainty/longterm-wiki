@@ -18,7 +18,15 @@ export type PrIssueType =
   | 'bot-review-major'
   | 'bot-review-nitpick'
   | 'merge-blocked'
-  | 'self-authored-feedback';
+  | 'self-authored-feedback'
+  /**
+   * PR has been in the same (mergeable, rollupConclusion, blockingCommentCount)
+   * state for 3+ consecutive patrol cycles. Indicates the agent is looping
+   * (pushing new commits without changing the signal, or ignoring maintainer
+   * feedback). Routes to the existing coordinator (Opus) escalation path —
+   * the patrol does NOT attempt another fix.
+   */
+  | 'stuck';
 
 /** Issues that are logged but not fixed — advisory only.
  *  These are still detected by the shared library but filtered out by the
@@ -101,6 +109,19 @@ export interface DetectedPr {
   mergeStateStatus?: string;
   /** True when the PR was authored by the patrol/agent itself (e.g., claude/ branch). */
   isSelfAuthored?: boolean;
+  /**
+   * How many consecutive patrol cycles this PR has been in the same
+   * (mergeable, rollupConclusion, blockingCommentCount) state, including
+   * the current cycle. Populated by the daemon after writing the current
+   * cycle's snapshot. Unset when history is unavailable or the count is 0.
+   */
+  stuckCycles?: number;
+  /**
+   * Human-readable description of why the PR is stuck — e.g. the fingerprint
+   * itself. Used by prompts and escalation comments. Populated iff `stuckCycles`
+   * is set.
+   */
+  stuckReason?: string;
 }
 
 export interface ScoredPr extends DetectedPr {
