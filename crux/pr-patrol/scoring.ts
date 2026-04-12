@@ -21,6 +21,17 @@ export {
   rankPrs,
 } from '../lib/pr-analysis/index.ts';
 
+// ── Fleet-level health scores (QUA-298 Phase 1) ──────────────────────────────
+// Health-gate signals are not per-PR issues — they're surfaced here so the
+// two score constants live alongside ISSUE_SCORES for discoverability.
+// Phase 3 wires them into the patrol loop as a precondition gate.
+export {
+  DEPLOY_STUCK_SCORE,
+  MAIN_CI_RED_SCORE,
+  type HealthIssueType,
+  type HealthIssue,
+} from './health-scan.ts';
+
 // ── Cross-PR dependency priority boost (QUA-287 Phase 3) ─────────────────────
 
 /**
