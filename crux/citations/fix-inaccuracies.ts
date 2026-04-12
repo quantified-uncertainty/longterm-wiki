@@ -486,17 +486,26 @@ Where:
 
 /** Parse the second opinion response. */
 function parseSecondOpinionResponse(text: string): { agree: boolean; verdict: string; reason: string } {
+  const cleaned = stripCodeFences(text);
+  let parsed: unknown = null;
   try {
-    const cleaned = stripCodeFences(text);
-    const parsed = JSON.parse(cleaned) as { agree?: boolean; verdict?: string; reason?: string };
-    return {
-      agree: parsed.agree !== false,
-      verdict: typeof parsed.verdict === 'string' ? parsed.verdict : 'not_verifiable',
-      reason: typeof parsed.reason === 'string' ? parsed.reason : '',
-    };
+    parsed = JSON.parse(cleaned);
   } catch {
+    try {
+      parsed = JSON.parse(repairJsonBackslashEscapes(cleaned));
+    } catch {
+      return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
   }
+  const obj = parsed as { agree?: boolean; verdict?: string; reason?: string };
+  return {
+    agree: obj.agree !== false,
+    verdict: typeof obj.verdict === 'string' ? obj.verdict : 'not_verifiable',
+    reason: typeof obj.reason === 'string' ? obj.reason : '',
+  };
 }
 
 export interface SecondOpinionResult {
@@ -905,30 +914,68 @@ function buildSourceEvidence(c: EnrichedFlaggedCitation): string | null {
   return parts.length > 0 ? parts.join('\n') : null;
 }
 
+/**
+ * Repair invalid JSON backslash escapes by doubling backslashes that precede
+ * a character which is not a valid JSON escape (`"`, `\`, `/`, `b`, `f`, `n`,
+ * `r`, `t`, `u`). LLMs frequently mirror MDX-escaped text like `\$100K` into
+ * JSON strings literally, producing `"\$100K"` — which is not valid JSON.
+ * Preserving the literal backslash requires rewriting that to `"\\$100K"`.
+ */
+export function repairJsonBackslashEscapes(input: string): string {
+  return input.replace(/\\(.)/g, (_m, c: string) => {
+    if ('"\\/bfnrtu'.includes(c)) return '\\' + c;
+    return '\\\\' + c;
+  });
+}
+
 /** Parse LLM response into fix proposals. */
 export function parseLLMFixResponse(content: string): FixProposal[] {
   const cleaned = stripCodeFences(content);
-  try {
-    const parsed = JSON.parse(cleaned);
-    if (!Array.isArray(parsed)) return [];
+  const parsed = tryParseJson(cleaned);
+  if (!Array.isArray(parsed)) return [];
 
-    return parsed
-      .filter(
-        (p: Record<string, unknown>) =>
-          typeof p.original === 'string' &&
-          typeof p.replacement === 'string' &&
-          p.original.length > 0 &&
-          p.original !== p.replacement,
-      )
-      .map((p: Record<string, unknown>) => ({
-        footnote: typeof p.footnote === 'number' ? p.footnote : 0,
-        original: p.original as string,
-        replacement: p.replacement as string,
-        explanation: typeof p.explanation === 'string' ? p.explanation : '',
-        fixType: typeof p.fix_type === 'string' ? p.fix_type : 'unknown',
-      }));
-  } catch {
-    return [];
+  return parsed
+    .filter(
+      (p: Record<string, unknown>) =>
+        typeof p.original === 'string' &&
+        typeof p.replacement === 'string' &&
+        p.original.length > 0 &&
+        p.original !== p.replacement,
+    )
+    .map((p: Record<string, unknown>) => ({
+      footnote: typeof p.footnote === 'number' ? p.footnote : 0,
+      original: p.original as string,
+      replacement: p.replacement as string,
+      explanation: typeof p.explanation === 'string' ? p.explanation : '',
+      fixType: typeof p.fix_type === 'string' ? p.fix_type : 'unknown',
+    }));
+}
+
+/**
+ * Attempt to JSON.parse `s`; on failure, repair invalid backslash escapes and
+ * retry. Returns `null` on unrecoverable failure. Emits a warning if the
+ * initial parse failed so silent breakage (e.g., the `\$` bug that produced
+ * 0 proposals in prod) is visible.
+ */
+function tryParseJson(s: string): unknown {
+  try {
+    return JSON.parse(s);
+  } catch (err1) {
+    const repaired = repairJsonBackslashEscapes(s);
+    try {
+      const result = JSON.parse(repaired);
+      console.warn(
+        `  [warn] LLM returned JSON with invalid backslash escapes — repaired. ` +
+        `First error: ${err1 instanceof Error ? err1.message : String(err1)}`,
+      );
+      return result;
+    } catch (err2) {
+      console.warn(
+        `  [warn] Failed to parse LLM JSON response (even after escape repair): ` +
+        `${err2 instanceof Error ? err2.message : String(err2)}`,
+      );
+      return null;
+    }
   }
 }
 

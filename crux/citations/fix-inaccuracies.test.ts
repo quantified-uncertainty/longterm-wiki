@@ -12,6 +12,7 @@ import {
   parseLLMFixResponse,
   applyFixes,
   enrichFromApi,
+  repairJsonBackslashEscapes,
 } from './fix-inaccuracies.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import type { SectionRewrite } from './fix-inaccuracies.ts';
@@ -102,6 +103,57 @@ describe('parseLLMFixResponse', () => {
 
   it('returns empty array for non-array JSON', () => {
     expect(parseLLMFixResponse('{"key": "value"}')).toEqual([]);
+  });
+
+  // Regression: prod LLM responses mirrored MDX-escaped `\$100K` verbatim
+  // into JSON strings as `"\$100K"` — invalid JSON that previously produced
+  // 0 proposals (QUA-314). parseLLMFixResponse must recover via escape repair.
+  it('recovers from invalid backslash escapes (e.g. \\$ in MDX-escaped claims)', () => {
+    const input = `[
+      {
+        "footnote": 9,
+        "original": "Awards of ≈\\$100K each distributed through milestone-based contracts.",
+        "replacement": "Awards distributed through milestone-based contracts.",
+        "explanation": "source does not support \\$100K figure",
+        "fix_type": "rewrite"
+      }
+    ]`;
+    const result = parseLLMFixResponse(input);
+    expect(result).toHaveLength(1);
+    expect(result[0].footnote).toBe(9);
+    expect(result[0].original).toBe('Awards of ≈\\$100K each distributed through milestone-based contracts.');
+    expect(result[0].replacement).toBe('Awards distributed through milestone-based contracts.');
+  });
+
+  it('recovers from invalid backslash escapes inside code fences', () => {
+    const input = '```json\n' + `[{"footnote":1,"original":"a \\$ b","replacement":"c","explanation":"","fix_type":""}]` + '\n```';
+    const result = parseLLMFixResponse(input);
+    expect(result).toHaveLength(1);
+    expect(result[0].original).toBe('a \\$ b');
+  });
+});
+
+describe('repairJsonBackslashEscapes', () => {
+  it('preserves valid JSON escapes', () => {
+    const s = '"a\\n\\t\\r\\"\\\\\\/b"';
+    expect(repairJsonBackslashEscapes(s)).toBe(s);
+    expect(() => JSON.parse(repairJsonBackslashEscapes(s))).not.toThrow();
+  });
+
+  it('doubles backslashes before invalid escape chars', () => {
+    const s = '"\\$100K"';
+    const repaired = repairJsonBackslashEscapes(s);
+    expect(JSON.parse(repaired)).toBe('\\$100K');
+  });
+
+  it('handles multiple invalid escapes in one string', () => {
+    const s = '"\\$ \\< \\%"';
+    expect(JSON.parse(repairJsonBackslashEscapes(s))).toBe('\\$ \\< \\%');
+  });
+
+  it('handles mixed valid and invalid escapes', () => {
+    const s = '"line\\n\\$val"';
+    expect(JSON.parse(repairJsonBackslashEscapes(s))).toBe('line\n\\$val');
   });
 });
 
