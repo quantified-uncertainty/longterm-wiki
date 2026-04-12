@@ -51,6 +51,25 @@ Reference implementations: `0108_natural_key_uniqueness.sql`, `0143_dedup_fundin
 
 The gate check (`validate-drizzle-journal.ts`) warns if it detects CREATE UNIQUE INDEX with hardcoded DELETEs.
 
+## Adding CHECK constraints on enum columns — MANDATORY pattern
+
+**Never write a CHECK constraint's allowed-value list from code or memory.** Enumerate against prod data first, or the migration will fail when it encounters values the author didn't know existed.
+
+Incident context: Migrations 0173 (`chk_hrs_level`) and `service_health_incidents.severity` both shipped CHECK constraints whose `IN (...)` lists excluded live values already present in the table. 0173 cascaded into a ~12h prod outage (QUA-302); severity required a follow-up fix (#4202). Both root-caused to "author inspected the schema/enum type and didn't query actual column values."
+
+**Required procedure before writing any `CHECK (col IN (...))` constraint:**
+
+1. Query prod for the full distinct-value set:
+   ```sql
+   SELECT col, count(*) FROM my_table GROUP BY col ORDER BY count DESC;
+   ```
+2. Paste the output into the PR description under a `### Enum enumeration` heading.
+3. Build the `IN (...)` list from that output, not from an enum type, TypeScript union, or your recollection of "the valid values."
+4. If the live set contains values you think should be invalid, **add them to the constraint anyway** and file a separate cleanup ticket. A migration is not the place to retroactively narrow an enum.
+5. For large tables, combine with the `NOT VALID` + `VALIDATE CONSTRAINT` pattern below.
+
+This applies equally to new constraints and to ALTERing existing ones to a tighter set.
+
 ## When Drizzle migrations work fine
 
 Most migrations: adding columns, creating tables, adding indexes on small tables, inserting rows. These complete in seconds and work through the normal Drizzle migration runner.
