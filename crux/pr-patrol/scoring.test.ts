@@ -58,11 +58,28 @@ describe('computeScore', () => {
     const issueTypes: PrIssueType[] = [
       'conflict', 'ci-failure', 'bot-review-major',
       'missing-issue-ref', 'stale', 'missing-testplan', 'bot-review-nitpick',
+      'merge-blocked', 'self-authored-feedback',
     ];
     for (const issue of issueTypes) {
       const pr = makeDetectedPr({ issues: [issue] });
       expect(computeScore(pr)).toBeGreaterThan(0);
     }
+  });
+
+  it('self-authored-feedback scores above merge-blocked and bot-review-major', () => {
+    const selfAuthored = makeDetectedPr({ issues: ['self-authored-feedback'] });
+    const mergeBlocked = makeDetectedPr({ issues: ['merge-blocked'] });
+    const botMajor = makeDetectedPr({ issues: ['bot-review-major'] });
+    expect(computeScore(selfAuthored)).toBeGreaterThan(computeScore(mergeBlocked));
+    expect(computeScore(selfAuthored)).toBeGreaterThan(computeScore(botMajor));
+  });
+
+  it('merge-blocked scores above bot-review-major but below ci-failure', () => {
+    const mergeBlocked = makeDetectedPr({ issues: ['merge-blocked'] });
+    const botMajor = makeDetectedPr({ issues: ['bot-review-major'] });
+    const ciFailure = makeDetectedPr({ issues: ['ci-failure'] });
+    expect(computeScore(mergeBlocked)).toBeGreaterThan(computeScore(botMajor));
+    expect(computeScore(ciFailure)).toBeGreaterThan(computeScore(mergeBlocked));
   });
 });
 
@@ -123,6 +140,18 @@ describe('computeBudget', () => {
     const budget = computeBudget(['stale']);
     expect(budget.maxTurns).toBe(10);
     expect(budget.timeoutMinutes).toBe(5);
+  });
+
+  it('gives merge-blocked budget', () => {
+    const budget = computeBudget(['merge-blocked']);
+    expect(budget.maxTurns).toBe(10);
+    expect(budget.timeoutMinutes).toBe(5);
+  });
+
+  it('gives self-authored-feedback budget', () => {
+    const budget = computeBudget(['self-authored-feedback']);
+    expect(budget.maxTurns).toBe(20);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 });
 

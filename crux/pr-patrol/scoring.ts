@@ -39,6 +39,12 @@ const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
   stale:               { maxTurns: 10, timeoutMinutes: 5 },
   'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
   'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },
+  // Merge-blocked usually requires adding a label, clearing a review request,
+  // or coordinating with a maintainer — lightweight work, not code changes.
+  'merge-blocked':     { maxTurns: 10, timeoutMinutes: 5 },
+  // Self-authored feedback requires reading the maintainer comment and
+  // addressing it; keep modest but non-trivial budget.
+  'self-authored-feedback': { maxTurns: 20, timeoutMinutes: 15 },
 };
 
 /** Compute the budget for a PR based on its hardest issue. */

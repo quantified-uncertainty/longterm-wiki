@@ -12,13 +12,18 @@
 import { githubApi } from '../lib/github.ts';
 import {
   detectIssues as libDetectIssues,
+  diffCheckRunsVsRollup,
   extractBotComments as libExtractBotComments,
+  extractBlockingComments as libExtractBlockingComments,
+  isSelfAuthored as libIsSelfAuthored,
+  fetchFreshCheckRuns as libFetchFreshCheckRuns,
   fetchOpenPrs as libFetchOpenPrs,
   fetchSinglePr as libFetchSinglePr,
   detectOverlaps as libDetectOverlaps,
 } from '../lib/pr-analysis/index.ts';
 import type {
   DetectedPr,
+  FreshCheckRun,
   GqlPrNode,
   PatrolConfig,
 } from './types.ts';
@@ -62,6 +67,9 @@ const SKIP_BRANCH_PREFIXES = [
 // ── Re-exports for backward compatibility ────────────────────────────────────
 
 export { libExtractBotComments as extractBotComments };
+export { libExtractBlockingComments as extractBlockingComments };
+export { libIsSelfAuthored as isSelfAuthored };
+export { libFetchFreshCheckRuns as fetchFreshCheckRuns };
 export { libDetectIssues as detectIssues };
 
 // ── PR fetching (daemon wrappers with logging) ───────────────────────────────
@@ -82,9 +90,60 @@ export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null>
 
 // ── Daemon-specific: filter PRs by labels/draft and detect issues ────────────
 
+/**
+ * Fetch fresh check-runs for each PR's head SHA and return them keyed by OID.
+ * Used by daemon entry points before calling `detectAllPrIssuesFromNodes` so
+ * stale-rollup false positives are avoided automatically.
+ */
+export async function fetchFreshCheckRunsByOid(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<Map<string, FreshCheckRun[]>> {
+  const result = new Map<string, FreshCheckRun[]>();
+  if (prs.length === 0) return result;
+  const [owner, repo] = config.repo.split('/');
+  if (!owner || !repo) return result;
+  const seen = new Set<string>();
+  await Promise.all(
+    prs
+      .filter((pr) => pr.headRefOid && !seen.has(pr.headRefOid) && seen.add(pr.headRefOid))
+      .map(async (pr) => {
+        try {
+          const runs = await libFetchFreshCheckRuns(owner, repo, pr.headRefOid);
+          result.set(pr.headRefOid, runs);
+        } catch (e: unknown) {
+          // Fresh fetch is advisory — on failure, detectIssues falls back to rollup.
+          log(`  ${cl.dim}fetchFreshCheckRuns failed for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        }
+      }),
+  );
+  return result;
+}
+
+/**
+ * Async entry point for daemon callers: fetches fresh check-runs for every PR
+ * up front so detection never silently falls back to the stale rollup. Test
+ * code can keep using `detectAllPrIssuesFromNodes` directly with a fake map.
+ */
+export async function detectAllPrIssues(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<DetectedPr[]> {
+  const freshCheckRunsByOid = await fetchFreshCheckRunsByOid(prs, config);
+  return detectAllPrIssuesFromNodes(prs, config, freshCheckRunsByOid);
+}
+
 export function detectAllPrIssuesFromNodes(
   prs: GqlPrNode[],
   config: PatrolConfig,
+  /**
+   * Optional map of headRefOid → fresh check-runs. When provided, detectIssues
+   * uses the fresh data to avoid stale-rollup false positives, and a
+   * discrepancy between fresh and rollup is logged. Production daemon entry
+   * points should use `detectAllPrIssues` (async) which builds this map via
+   * `fetchFreshCheckRunsByOid`; tests and one-shot callers can omit it.
+   */
+  freshCheckRunsByOid?: Map<string, FreshCheckRun[]>,
 ): DetectedPr[] {
   const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
 
@@ -107,7 +166,8 @@ export function detectAllPrIssuesFromNodes(
   // PRs that were "fixed" in a previous cycle need their CI status verified.
   for (const pr of prs) {
     if (!isPendingCICheck(pr.number)) continue;
-    const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs);
+    const fresh = freshCheckRunsByOid?.get(pr.headRefOid);
+    const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs, fresh);
     const hasCiFailure = currentIssues.includes('ci-failure');
     if (!hasCiFailure) {
       // CI passed — the fix worked, reset the fail counter
@@ -145,7 +205,21 @@ export function detectAllPrIssuesFromNodes(
       return true;
     })
     .map((pr) => {
-      const { issues: allIssues, botComments, failingChecks } = libDetectIssues(pr, staleThresholdMs);
+      const fresh = freshCheckRunsByOid?.get(pr.headRefOid);
+
+      // Log any discrepancy between fresh check-runs and the (possibly stale)
+      // rollup so operators can track false-positive rates.
+      if (fresh && fresh.length > 0) {
+        const rollupContexts =
+          pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+        const diff = diffCheckRunsVsRollup(fresh, rollupContexts);
+        if (diff.length > 0) {
+          log(`  ${cl.dim}PR #${pr.number}: rollup vs fresh check-runs disagree on: ${diff.join(', ')} (using fresh)${cl.reset}`);
+        }
+      }
+
+      const { issues: allIssues, botComments, failingChecks, blockingComments } =
+        libDetectIssues(pr, staleThresholdMs, fresh);
       const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
       const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
       if (advisoryIssues.length > 0) {
@@ -160,6 +234,10 @@ export function detectAllPrIssuesFromNodes(
         botComments,
         labels: pr.labels.nodes.map((l) => l.name),
         failingChecks: failingChecks.length > 0 ? failingChecks : undefined,
+        blockingComments: blockingComments.length > 0 ? blockingComments : undefined,
+        freshCheckRuns: fresh,
+        mergeStateStatus: pr.mergeStateStatus,
+        isSelfAuthored: libIsSelfAuthored(pr),
       };
     })
     .filter((pr) => pr.issues.length > 0);
