@@ -39,7 +39,7 @@ export async function getVerdictsByType(
 ): Promise<ApiResult<VerdictsResponse>> {
   return apiRequest<VerdictsResponse>(
     'GET',
-    `/api/source-checks/verdicts?verdict=${encodeURIComponent(verdict)}&limit=${limit}`,
+    `/api/sourcing/verdicts?verdict=${encodeURIComponent(verdict)}&limit=${limit}`,
   );
 }
 
@@ -57,7 +57,7 @@ export async function getVerdictsByEntity(
   const qs = params.toString();
   return apiRequest<ByEntityResponse>(
     'GET',
-    `/api/source-checks/by-entity/${encodeURIComponent(entityId)}${qs ? `?${qs}` : ''}`,
+    `/api/sourcing/by-entity/${encodeURIComponent(entityId)}${qs ? `?${qs}` : ''}`,
   );
 }
 
@@ -74,7 +74,7 @@ export async function getVerdictsByPage(
   const qs = params.toString();
   return apiRequest<ByPageResponse>(
     'GET',
-    `/api/source-checks/by-page/${encodeURIComponent(pageSlug)}${qs ? `?${qs}` : ''}`,
+    `/api/sourcing/by-page/${encodeURIComponent(pageSlug)}${qs ? `?${qs}` : ''}`,
   );
 }
 
@@ -99,7 +99,7 @@ export async function getFailures(
   const qs = params.toString();
   return apiRequest<FailuresResponse>(
     'GET',
-    `/api/source-checks/failures${qs ? `?${qs}` : ''}`,
+    `/api/sourcing/failures${qs ? `?${qs}` : ''}`,
   );
 }
 
@@ -124,7 +124,7 @@ export async function getStaleVerdicts(
   const qs = params.toString();
   return apiRequest<StaleResponse>(
     'GET',
-    `/api/source-checks/stale${qs ? `?${qs}` : ''}`,
+    `/api/sourcing/stale${qs ? `?${qs}` : ''}`,
   );
 }
 

@@ -64,7 +64,7 @@ async function fetchActionableVerdicts(
     ACTIONABLE_VERDICTS.map((verdict) =>
       apiRequest<VerdictsResponse>(
         'GET',
-        `/api/source-checks/verdicts?entity_id=${encodeURIComponent(entityId)}&verdict=${verdict}&limit=50`,
+        `/api/sourcing/verdicts?entity_id=${encodeURIComponent(entityId)}&verdict=${verdict}&limit=50`,
       )
     )
   );
