@@ -834,12 +834,11 @@ describe('checkRatchetDriftForFile (mocked git)', () => {
     expect(result.reason).toContain('no commits');
   });
 
-  it('returns stable when git log fails (propagates reason, not a false-positive drift)', () => {
+  it('throws when git log fails so runHealthGate counts it as a scanner error (not fail-open)', () => {
     const runGit = () => ({ ok: false, output: '', stderr: 'fatal: not a git repository' });
-    const result = checkRatchetDriftForFile(cfg, { now: NOW }, runGit);
-    expect(result.drifted).toBe(false);
-    expect(result.reason).toContain('git log failed');
-    expect(result.reason).toContain('not a git repository');
+    expect(() => checkRatchetDriftForFile(cfg, { now: NOW }, runGit)).toThrow(
+      /git log failed.*not a git repository/,
+    );
   });
 
   it('uses --since=<iso> derived from `now` (not git wall-clock relative date)', () => {

@@ -17,7 +17,13 @@ Before scanning or fixing any PR, check fleet-level health. The daemon (`crux/pr
 pnpm exec tsx -e "import('./crux/pr-patrol/health-gate.ts').then(m => m.runHealthGate().then(d => { console.log(JSON.stringify({ proceed: d.proceed, reason: d.reason, emitted: d.emittedIssues.length }, null, 2)); process.exit(d.proceed ? 0 : 2); }))"
 ```
 
-If the gate returns `proceed: false` (exit code 2), it has already logged the escalation and written a `health_gate_tripped` JSONL event. **Do NOT then go fix PRs** — the gate's entire purpose is to stop the symptom-patch cycle.
+If the gate returns `proceed: false` (exit code 2), **do NOT then go fix PRs** — the gate's entire purpose is to stop the symptom-patch cycle. Note: `proceed: false` can result from any of three conditions, which emit different JSONL events (or none):
+
+- **A new unhealthy fingerprint** → emits `health_gate_tripped` + `cycle_summary{health_gate_tripped: true}`.
+- **All unhealthy fingerprints cooldown-suppressed** → still halts PR work, but emits only `cycle_summary{health_gate_tripped: true}` (no new `health_gate_tripped` event, because the same escalation was emitted within the last 30 min).
+- **Third consecutive scanner error** → emits `health_scan_error` + halts. No `health_gate_tripped` in this path.
+
+Check `~/.cache/pr-patrol/runs.jsonl` for the specific event to understand why the gate tripped before deciding how to respond.
 
 When the gate is red, **DO NOT**:
 - Bump a ratchet baseline to unblock a CI signal

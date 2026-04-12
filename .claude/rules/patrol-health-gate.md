@@ -75,12 +75,24 @@ cat ~/.cache/pr-patrol/state/health-gate-cooldown.json | jq '.["__scan_error_cou
 
 If ≥ 3, the scanner has been failing for multiple cycles and the gate has flipped to halt. Inspect recent `health_scan_error` entries in `~/.cache/pr-patrol/runs.jsonl`.
 
-**Gate trips repeatedly after the underlying issue is fixed.** The cooldown file is the source of truth:
+**Gate keeps returning `proceed: false` after you think the issue is fixed.** The cooldown file only rate-limits escalation emission — it does *not* control whether `runHealthGate()` trips. If the scanners still report unhealthy, the gate will still halt regardless of cooldown state. Inspect the scanners directly:
 
 ```bash
-# Clear everything:
+# See exactly which scanner is unhealthy and why:
+pnpm crux gh pr-patrol health-scan
+
+# Drill into the signals:
+pnpm crux gh pr-patrol health-scan --deploy    # deploy-stuck
+pnpm crux gh pr-patrol health-scan --ci        # main-ci-red
+pnpm crux gh pr-patrol health-scan --ratchet   # ratchet-drift
+```
+
+If a scanner is still flagging, fix the underlying condition (unstick the deploy, unbreak main CI, revert a bad ratchet bump). Only clear the cooldown file to reset *escalation rate-limiting* (e.g., to force a fresh JSONL `health_gate_tripped` event once you've fixed the issue):
+
+```bash
+# Reset escalation rate-limit only (does NOT stop the gate from tripping):
 rm ~/.cache/pr-patrol/state/health-gate-cooldown.json
-# Or clear one fingerprint:
+# Or reset one fingerprint:
 jq 'del(.["deploy-stuck"])' ~/.cache/pr-patrol/state/health-gate-cooldown.json | sponge ~/.cache/pr-patrol/state/health-gate-cooldown.json
 ```
 

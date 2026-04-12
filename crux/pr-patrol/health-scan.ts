@@ -337,11 +337,19 @@ export function evaluateRatchetDrift(
   const minBumps = options.minBumps ?? RATCHET_DRIFT_MIN_BUMPS;
   const windowStart = now.getTime() - windowHours * 3_600_000;
 
-  // Keep only observations inside the window — sorted oldest → newest so
-  // consecutive-pair deltas flow naturally.
-  const inWindow = observations
-    .filter((o) => o.committedAt.getTime() >= windowStart)
-    .sort((a, b) => a.committedAt.getTime() - b.committedAt.getTime());
+  // Sort oldest → newest so consecutive-pair deltas flow naturally. Keep
+  // the most recent observation immediately before windowStart (if any) as
+  // the baseline — checkRatchetDriftForFile() intentionally adds `firstCommit^`
+  // so bump #1 can be compared against its pre-window parent. Filtering it out
+  // would undercount sequences like parent(26h) → bump(23h) → bump(12h) → bump(1h).
+  const ordered = [...observations].sort(
+    (a, b) => a.committedAt.getTime() - b.committedAt.getTime(),
+  );
+  const firstInWindowIdx = ordered.findIndex(
+    (o) => o.committedAt.getTime() >= windowStart,
+  );
+  const inWindow =
+    firstInWindowIdx <= 0 ? ordered : ordered.slice(firstInWindowIdx - 1);
 
   // A good-direction bump resets the counter; bad-direction bumps accumulate.
   // Track the counter + the bumps that contributed to the current streak so
@@ -456,7 +464,16 @@ export function checkRatchetDriftForFile(
     config.file,
   );
 
-  if (!logResult.ok || !logResult.output) {
+  // Scanner failure ≠ healthy. If git log fails we can't judge drift, so throw
+  // to let runHealthGate()'s consecutive-error counter halt patrol — rather
+  // than returning drifted:false and silently disabling this scanner.
+  if (!logResult.ok) {
+    throw new Error(
+      `ratchet-drift scanner: git log failed for ${config.file}: ${logResult.stderr || 'unknown error'}`,
+    );
+  }
+
+  if (!logResult.output) {
     return {
       file: config.file,
       name: config.name,
@@ -464,10 +481,7 @@ export function checkRatchetDriftForFile(
       bumpCount: 0,
       bumps: [],
       drifted: false,
-      reason:
-        !logResult.ok
-          ? `git log failed for ${config.file}: ${logResult.stderr || 'unknown error'}`
-          : `${config.name} baseline: no commits in the last ${windowHours}h`,
+      reason: `${config.name} baseline: no commits in the last ${windowHours}h`,
     };
   }
 

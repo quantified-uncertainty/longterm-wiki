@@ -682,6 +682,9 @@ export function readRecentLogs(count: number): string {
           `  Overlap: PR #${entry.pr_a} ↔ PR #${entry.pr_b} (${entry.shared_files} shared files)`,
         );
       } else if (entry.type === 'cycle_summary') {
+        const gateInfo = entry.health_gate_tripped
+          ? `, health_gate=tripped (${entry.health_gate_reason ?? 'unknown'})`
+          : '';
         const mainFix = entry.main_branch_fix ? ', main_branch_fix=true' : '';
         const enqueueInfo = entry.prs_enqueued?.length
           ? `, enqueued=[${entry.prs_enqueued.map((n: number) => `#${n}`).join(', ')}]`
@@ -692,7 +695,7 @@ export function readRecentLogs(count: number): string {
             ? `, merge-blocked=${entry.merge_candidates}`
             : '';
         output.push(
-          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${mainFix}${enqueueInfo}${mergeInfo}`,
+          `  Cycle #${entry.cycle_number}: scanned=${entry.prs_scanned}, queue=${entry.queue_size}, processed=${entry.pr_processed ?? 'none'}${gateInfo}${mainFix}${enqueueInfo}${mergeInfo}`,
         );
       }
     } catch {
