@@ -12,9 +12,6 @@ import {
   type RpcPredictionQuestion,
 } from "@/lib/wiki-server";
 import { formatCompactCurrency } from "@/lib/format-compact";
-
-import { SourcingDot } from "@/components/sourcing/SourcingDot";
-import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { SectionHeader } from "./org-shared";
 
 // ── Data Fetching ────────────────────────────────────────────────────
@@ -142,57 +139,44 @@ function SecondaryMarketSection({
               <th className="text-right py-2 px-3 font-medium">Valuation</th>
               <th className="text-left py-2 px-3 font-medium">Type</th>
               <th className="text-left py-2 px-3 font-medium">Source</th>
-              <th className="py-2 px-1 w-8" />
             </tr>
           </thead>
           <tbody className="divide-y divide-border/50">
-            {prices.map((p) => {
-              const verdict = null; // secondary-market-price has no sourcing verdicts yet (QUA-211)
-              return (
-                <tr
-                  key={p.id}
-                  className="hover:bg-muted/20 transition-colors"
-                >
-                  <td className="py-2 px-3 capitalize font-medium">
-                    {p.platform}
-                  </td>
-                  <td className="py-2 px-3 text-muted-foreground">
-                    {p.date}
-                  </td>
-                  <td className="py-2 px-3 text-right tabular-nums">
-                    {p.impliedValuation != null
-                      ? formatCompactCurrency(p.impliedValuation)
-                      : "–"}
-                  </td>
-                  <td className="py-2 px-3">
-                    <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
-                      {p.priceType}
-                    </span>
-                  </td>
-                  <td className="py-2 px-3">
-                    {p.source && (
-                      <a
-                        href={p.source}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline"
-                      >
-                        link
-                      </a>
-                    )}
-                  </td>
-                  <td className="py-2 px-1">
-                    <SourcingDot
-                      status={recordVerdictToStatus(verdict)}
-                      originalVerdict={verdict}
-                      size="md"
-                      // QUA-540: secondary-market-price has no sourcing verdicts → /sourcing 404s.
-                      href={undefined}
-                    />
-                  </td>
-                </tr>
-              );
-            })}
+            {prices.map((p) => (
+              <tr
+                key={p.id}
+                className="hover:bg-muted/20 transition-colors"
+              >
+                <td className="py-2 px-3 capitalize font-medium">
+                  {p.platform}
+                </td>
+                <td className="py-2 px-3 text-muted-foreground">
+                  {p.date}
+                </td>
+                <td className="py-2 px-3 text-right tabular-nums">
+                  {p.impliedValuation != null
+                    ? formatCompactCurrency(p.impliedValuation)
+                    : "–"}
+                </td>
+                <td className="py-2 px-3">
+                  <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
+                    {p.priceType}
+                  </span>
+                </td>
+                <td className="py-2 px-3">
+                  {p.source && (
+                    <a
+                      href={p.source}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs text-primary hover:underline"
+                    >
+                      link
+                    </a>
+                  )}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </div>
@@ -252,7 +236,6 @@ function PredictionMarketSection({
                 <th className="text-left py-2 px-3 font-medium w-28">
                   Resolves
                 </th>
-                <th className="py-2 px-1 w-8" />
               </tr>
             </thead>
             <tbody className="divide-y divide-border/50">
@@ -282,13 +265,10 @@ function PredictionMarketSection({
                   <th className="text-left py-2 px-3 font-medium w-24">
                     Platform
                   </th>
-                  <th className="py-2 px-1 w-8" />
                 </tr>
               </thead>
               <tbody className="divide-y divide-border/50">
-                {resolved.map((q) => {
-                  const verdict = null; // prediction-question has no sourcing verdicts yet (QUA-211)
-                  return (
+                {resolved.map((q) => (
                   <tr
                     key={q.id}
                     className="hover:bg-muted/20 transition-colors opacity-60"
@@ -319,18 +299,8 @@ function PredictionMarketSection({
                     <td className="py-2 px-3">
                       {PLATFORM_LABELS[q.platform] ?? q.platform}
                     </td>
-                    <td className="py-2 px-1">
-                      <SourcingDot
-                        status={recordVerdictToStatus(verdict)}
-                        originalVerdict={verdict}
-                        size="md"
-                        // QUA-540: prediction-question has no sourcing verdicts → /sourcing 404s.
-                        href={undefined}
-                      />
-                    </td>
                   </tr>
-                  );
-                })}
+                ))}
               </tbody>
             </table>
           </div>
@@ -342,7 +312,6 @@ function PredictionMarketSection({
 
 function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
   const prob = q.currentProbability;
-  const verdict = null; // prediction-question has no sourcing verdicts yet (QUA-211)
 
   return (
     <tr className="hover:bg-muted/20 transition-colors">
@@ -381,15 +350,6 @@ function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
       </td>
       <td className="py-2.5 px-3 text-xs text-muted-foreground">
         {q.resolutionDate ?? "–"}
-      </td>
-      <td className="py-2.5 px-1">
-        <SourcingDot
-          status={recordVerdictToStatus(verdict)}
-          originalVerdict={verdict}
-          size="md"
-          // QUA-540: prediction-question has no sourcing verdicts → /sourcing 404s.
-          href={undefined}
-        />
       </td>
     </tr>
   );
