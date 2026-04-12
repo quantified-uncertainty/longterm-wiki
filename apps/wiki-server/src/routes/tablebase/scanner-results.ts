@@ -465,26 +465,31 @@ const scannerResultsApp = new Hono()
     }
 
     const CHUNK_SIZE = 500;
-    let inserted = 0;
-    for (let i = 0; i < scanRows.length; i += CHUNK_SIZE) {
-      const chunk = scanRows.slice(i, i + CHUNK_SIZE);
-      await db.insert(tablebaseScannerResults).values(
-        chunk.map((row) => ({
-          scanRunId,
-          recordType: row.recordType,
-          entityId: row.entityId,
-          entityName: row.entityName,
-          entityType: row.entityType,
-          totalRecords: row.totalRecords,
-          verifiedRecords: row.verifiedRecords,
-          completenessPct: row.completenessPct,
-          missingFields: row.missingFields,
-          entityImportance: null,
-          scannedAt: now,
-        })),
-      );
-      inserted += chunk.length;
-    }
+    // Wrap all chunks in one transaction so a mid-run failure doesn't leave a
+    // partial scanRunId visible to /latest.
+    const inserted = await db.transaction(async (tx) => {
+      let total = 0;
+      for (let i = 0; i < scanRows.length; i += CHUNK_SIZE) {
+        const chunk = scanRows.slice(i, i + CHUNK_SIZE);
+        await tx.insert(tablebaseScannerResults).values(
+          chunk.map((row) => ({
+            scanRunId,
+            recordType: row.recordType,
+            entityId: row.entityId,
+            entityName: row.entityName,
+            entityType: row.entityType,
+            totalRecords: row.totalRecords,
+            verifiedRecords: row.verifiedRecords,
+            completenessPct: row.completenessPct,
+            missingFields: row.missingFields,
+            entityImportance: null,
+            scannedAt: now,
+          })),
+        );
+        total += chunk.length;
+      }
+      return total;
+    });
 
     const recordTypes = [...new Set(scanRows.map((r) => r.recordType))];
     const avgCompleteness = scanRows.length > 0
