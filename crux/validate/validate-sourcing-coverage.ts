@@ -32,6 +32,11 @@ const HARD_ENFORCED_TABLES: string[] = [
   // Phase 5 hard enforcement (Discussion #3875), enabled 2026-04-08:
   'personnel',
   'grants',
+  // Phase 7 expansion (QUA-248), enabled 2026-04-11:
+  'funding-rounds',
+  'funding-programs',
+  'divisions',
+  'policy-stakeholders',
 ];
 
 const cliArgs = process.argv.slice(2);

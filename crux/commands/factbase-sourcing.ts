@@ -261,6 +261,12 @@ export async function storeSourcingResult(result: SourcingResult): Promise<void>
 /**
  * Collect facts to sourcing based on the command options.
  */
+/** Check if a fact's property is marked as not verifiable in the property registry. */
+function isNonVerifiable(graph: Graph, fact: Fact): boolean {
+  const property = graph.getProperty(fact.propertyId);
+  return property?.verifiable === false;
+}
+
 function collectFacts(
   kb: LoadedKB,
   options: VerifyCommandOptions,
@@ -274,7 +280,7 @@ function collectFacts(
       const facts = graph.getFacts(entity.id);
       const match = facts.find((f: Fact) => f.id === options.fact);
       if (match) {
-        if (match.source) {
+        if (match.source && !isNonVerifiable(graph, match)) {
           factsToVerify.push({ entity, fact: match });
         }
         break;
@@ -286,7 +292,7 @@ function collectFacts(
     if (entity) {
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
-        if (fact.source && !fact.id.startsWith('inv_')) {
+        if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
           factsToVerify.push({ entity, fact });
         }
       }
@@ -296,7 +302,7 @@ function collectFacts(
     for (const entity of graph.getAllEntities()) {
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
-        if (fact.source && !fact.id.startsWith('inv_')) {
+        if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
           factsToVerify.push({ entity, fact });
         }
       }

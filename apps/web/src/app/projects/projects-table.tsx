@@ -5,6 +5,7 @@ import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeProjectCoverage } from "@/components/coverage/coverage-score";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface ProjectRow {
   id: string;
@@ -148,6 +149,7 @@ export function ProjectsTable({ rows }: { rows: ProjectRow[] }) {
                   <RecordStatusDots
                     coverageScore={computeProjectCoverage(row)}
                     verdict={row.verdictString}
+                    sourcingHref={row.verdictString ? getSourcingHref("project", row.id) : undefined}
                   />
                 </td>
 

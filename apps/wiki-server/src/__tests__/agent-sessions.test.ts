@@ -497,7 +497,6 @@ describe("Agent Sessions API", () => {
         status: "completed",
         title: "Fix widget rendering bug",
         summary: "Fixed the widget rendering by updating the CSS selector",
-        cost: "$0.50",
       });
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -516,7 +515,24 @@ describe("Agent Sessions API", () => {
       expect(body.error).toBe("incomplete_session");
       expect(body.missing).toContain("title");
       expect(body.missing).toContain("summary");
-      expect(body.missing).toContain("cost");
+      expect(body.missing).not.toContain("cost");
+    });
+
+    it("validates inside the transaction (throws before commit) on status=completed without required fields", async () => {
+      // This test documents the expected behavior: when validation fails,
+      // an IncompleteSessionError is thrown inside the transaction so that
+      // the UPDATE rolls back rather than committing.
+      //
+      // The mock dispatcher does not implement transaction rollback, so we
+      // can only assert the 400 response here. See `docs/session-finalize-validation.md`
+      // for the full invariant — a live DB integration test would cover rollback.
+      await postJson(app, "/api/agent-sessions", sampleSession);
+      const res = await patchJson(app, "/api/agent-sessions/1", {
+        status: "completed",
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.error).toBe("incomplete_session");
     });
 
     it("updates both checklist and status with required fields", async () => {
@@ -527,7 +543,6 @@ describe("Agent Sessions API", () => {
         status: "completed",
         title: "Fix widget rendering bug",
         summary: "Fixed the widget rendering",
-        cost: "$0.50",
       });
       expect(res.status).toBe(200);
     });

@@ -1,6 +1,6 @@
 import type { ExpertPosition } from "@/data/tablebase";
-import { getRecordVerdict } from "@data/tablebase";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+
+
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGenericCoverage } from "@/components/coverage/coverage-score";
 import { topicLabel } from "@/data/topic-labels";
@@ -86,8 +86,7 @@ export function ExpertPositions({
             </thead>
             <tbody>
               {positions.map((pos) => {
-              const recordId = `${personSlug}:${pos.topic}`;
-              const verdict = getRecordVerdict("expert-position", recordId)?.verdict;
+              // expert-position has no sourcing verdicts yet (QUA-211)
               return (
                 <tr
                   key={pos.topic}
@@ -159,8 +158,8 @@ export function ExpertPositions({
                         description: pos.estimate,
                         filledFieldCount: (pos.confidence ? 1 : 0) + (pos.source ? 1 : 0) + (pos.date ? 1 : 0),
                       })}
-                      verdict={verdict}
-                      sourcingHref={getSourcingHref("expert-position", recordId)}
+                      verdict={undefined}
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>

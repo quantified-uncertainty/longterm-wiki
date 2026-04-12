@@ -37,7 +37,7 @@ import {
   titleCase,
   sortKBRecords,
 } from "@/components/wiki/factbase/format";
-import { getRecordVerdict } from "@/data/tablebase";
+
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { extractDomain, extractDateFromUrl } from "@/lib/resource-types";
 import type { OrgHeaderData } from "./org-profile-header";
@@ -1555,8 +1555,6 @@ export function loadOrgHeaderData(entity: OrgEntity, slug: string): OrgHeaderDat
     founders.push(resolveEntityName(foundedByFact.value.value));
   }
 
-  const entityVerdict = getRecordVerdict("entity", entity.id);
-
   return {
     id: entity.id,
     name: entity.name,
@@ -1569,7 +1567,8 @@ export function loadOrgHeaderData(entity: OrgEntity, slug: string): OrgHeaderDat
     websiteUrl: orgData?.website ?? null,
     wikiHref,
     founders,
-    verdict: entityVerdict?.verdict ?? null,
+    // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
+    verdict: null,
   };
 }
 

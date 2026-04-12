@@ -173,55 +173,72 @@ const agentSessionsApp = new Hono()
     if (recommendationsJson !== undefined) updates.recommendationsJson = recommendationsJson;
     if (reviewed !== undefined) updates.reviewed = reviewed;
     const db = getDrizzleDb();
-    const result = await db.transaction(async (tx) => {
-      const rows = await tx.update(agentSessions).set(updates)
-        .where(eq(agentSessions.id, id)).returning();
-      if (rows.length === 0) return null;
-      if (pages !== undefined) {
-        await tx.delete(agentSessionPages).where(eq(agentSessionPages.agentSessionId, id));
-        if (pages.length > 0) {
-          const uniquePages = [...new Set(pages)];
-          const intIdMap = await resolvePageIntIds(tx, uniquePages);
-          const resolved = uniquePages
-            .map((slug) => ({ agentSessionId: id, pageId: intIdMap.get(slug)! }))
-            .filter((v) => v.pageId != null);
-          if (resolved.length > 0) {
-            await tx.insert(agentSessionPages).values(resolved);
-          }
-        }
-      }
-      if (entities !== undefined) {
-        await tx.delete(agentSessionEntities).where(eq(agentSessionEntities.agentSessionId, id));
-        if (entities.length > 0) {
-          const uniqueEntities = [...new Set(entities)];
-          await tx.insert(agentSessionEntities).values(
-            uniqueEntities.map((stableId) => ({ agentSessionId: id, entityStableId: stableId })),
-          );
-        }
-      }
-      return rows[0];
-    });
-    if (!result) return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);
-
-    // Hard-fail validation: when status is being SET to 'completed', required fields
-    // must be present on the resulting row. Fires only when this PATCH explicitly
-    // transitions status → completed (not when updating other fields on an
-    // already-completed session).
-    if (status === "completed") {
-      const missing: string[] = [];
-      if (!result.title) missing.push("title");
-      if (!result.summary) missing.push("summary");
-      if (result.costCents === null && !result.cost) missing.push("cost");
-      if (missing.length > 0) {
-        logger.warn({ sessionId: id, missing }, "Session marked completed with missing required fields");
-        return c.json({
-          error: "incomplete_session",
-          message: `Sessions with status='completed' require: ${missing.join(", ")}. ` +
-            `Run 'crux sys session-finalize' to populate these fields from the transcript.`,
-          missing,
-        }, 400);
+    // Sentinel error used to roll back the transaction when status='completed'
+    // is attempted with missing required fields. Thrown inside the transaction
+    // so the UPDATE is rolled back rather than committed then rejected.
+    class IncompleteSessionError extends Error {
+      constructor(public readonly missing: string[]) {
+        super("incomplete_session");
       }
     }
+    let result;
+    try {
+      result = await db.transaction(async (tx) => {
+        const rows = await tx.update(agentSessions).set(updates)
+          .where(eq(agentSessions.id, id)).returning();
+        if (rows.length === 0) return null;
+        const row = rows[0];
+
+        // Hard-fail validation: when status is being SET to 'completed', required
+        // fields must be present on the resulting row. Runs INSIDE the transaction
+        // so a violation rolls back the UPDATE (otherwise the DB would end up with
+        // status='completed' despite the 400 response).
+        if (status === "completed") {
+          const missing: string[] = [];
+          if (!row.title) missing.push("title");
+          if (!row.summary) missing.push("summary");
+          if (missing.length > 0) {
+            throw new IncompleteSessionError(missing);
+          }
+        }
+
+        if (pages !== undefined) {
+          await tx.delete(agentSessionPages).where(eq(agentSessionPages.agentSessionId, id));
+          if (pages.length > 0) {
+            const uniquePages = [...new Set(pages)];
+            const intIdMap = await resolvePageIntIds(tx, uniquePages);
+            const resolved = uniquePages
+              .map((slug) => ({ agentSessionId: id, pageId: intIdMap.get(slug)! }))
+              .filter((v) => v.pageId != null);
+            if (resolved.length > 0) {
+              await tx.insert(agentSessionPages).values(resolved);
+            }
+          }
+        }
+        if (entities !== undefined) {
+          await tx.delete(agentSessionEntities).where(eq(agentSessionEntities.agentSessionId, id));
+          if (entities.length > 0) {
+            const uniqueEntities = [...new Set(entities)];
+            await tx.insert(agentSessionEntities).values(
+              uniqueEntities.map((stableId) => ({ agentSessionId: id, entityStableId: stableId })),
+            );
+          }
+        }
+        return row;
+      });
+    } catch (err) {
+      if (err instanceof IncompleteSessionError) {
+        logger.warn({ sessionId: id, missing: err.missing }, "Session marked completed with missing required fields — rolled back");
+        return c.json({
+          error: "incomplete_session",
+          message: `Sessions with status='completed' require: ${err.missing.join(", ")}. ` +
+            `Run 'crux sys session-finalize' to populate these fields from the transcript.`,
+          missing: err.missing,
+        }, 400);
+      }
+      throw err;
+    }
+    if (!result) return c.json({ error: "not_found", message: `No session with id: ${id}` }, 404);
 
     return c.json(result);
   })

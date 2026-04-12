@@ -41,6 +41,10 @@ import {
   invalidJsonError,
   escapeIlike,
 } from "../shared/utils.js";
+import {
+  SOURCING_EXEMPT_TYPES,
+  isSourcingExempt,
+} from "../../api-types.js";
 
 // ---- Constants ----
 
@@ -418,6 +422,7 @@ const sourcingApp = new Hono()
         stale_evidence_count: Number(evidenceStats.staleCount),
         dead_link_count: Number(evidenceStats.deadLinkCount),
         current_checker_model: CURRENT_CHECKER_MODEL,
+        exempt_types: [...SOURCING_EXEMPT_TYPES],
       });
     }
   )
@@ -1617,13 +1622,14 @@ const sourcingApp = new Hono()
       .map((recordType) => {
         const total = totalsByType[recordType] ?? 0;
         const verified = verifiedByType[recordType] ?? 0;
+        const exempt = isSourcingExempt(recordType);
         const percentage =
           total > 0 ? Math.round((verified / total) * 10000) / 100 : 0;
-        return { recordType, total, verified, percentage };
+        return { recordType, total, verified, percentage, exempt };
       })
       .sort((a, b) => a.recordType.localeCompare(b.recordType));
 
-    return c.json({ coverage });
+    return c.json({ coverage, exemptTypes: [...SOURCING_EXEMPT_TYPES] });
   })
 
   // ---- GET /due-for-recheck ----
@@ -1652,6 +1658,15 @@ const sourcingApp = new Hono()
     const conditions = [dueConditions];
     if (record_type) {
       conditions.push(eq(sourceVerdicts.recordType, record_type));
+    }
+    // Exclude exempt types from the recheck queue — they don't need verification
+    if (SOURCING_EXEMPT_TYPES.length > 0) {
+      conditions.push(
+        sql`${sourceVerdicts.recordType} NOT IN (${sql.join(
+          SOURCING_EXEMPT_TYPES.map((t) => sql`${t}`),
+          sql`, `,
+        )})`,
+      );
     }
     // Push min_priority into SQL so the total count and pagination are correct.
     // The CASE expression is wrapped in a subquery to avoid repeating it.
@@ -1918,6 +1933,7 @@ const sourcingApp = new Hono()
       ...Object.keys(verdictsByType),
     ]);
 
+    // Grand totals exclude exempt types — they don't participate in coverage metrics
     let grandTotalRecords = 0;
     let grandCheckedRecords = 0;
     let grandTotalVerdicts = 0;
@@ -1928,6 +1944,7 @@ const sourcingApp = new Hono()
         const totalRecords = totalsByType[recordType] ?? 0;
         const verdicts = verdictsByType[recordType] ?? {};
         const checkedRecords = checkedByType[recordType] ?? 0;
+        const exempt = isSourcingExempt(recordType);
 
         const confirmed = verdicts["confirmed"] ?? 0;
         const partial = verdicts["partial"] ?? 0;
@@ -1949,10 +1966,13 @@ const sourcingApp = new Hono()
             ? Math.round((confirmed / totalVerdicts) * 1000) / 10
             : 0;
 
-        grandTotalRecords += totalRecords;
-        grandCheckedRecords += checkedRecords;
-        grandTotalVerdicts += totalVerdicts;
-        grandConfirmed += confirmed;
+        // Only non-exempt types contribute to grand totals
+        if (!exempt) {
+          grandTotalRecords += totalRecords;
+          grandCheckedRecords += checkedRecords;
+          grandTotalVerdicts += totalVerdicts;
+          grandConfirmed += confirmed;
+        }
 
         return {
           recordType,
@@ -1968,6 +1988,7 @@ const sourcingApp = new Hono()
           },
           coveragePercent,
           greenPercent,
+          exempt,
         };
       })
       .sort((a, b) => b.totalRecords - a.totalRecords);
@@ -1986,6 +2007,7 @@ const sourcingApp = new Hono()
             ? Math.round((grandCheckedRecords / grandTotalRecords) * 1000) / 10
             : 0,
       },
+      exemptTypes: [...SOURCING_EXEMPT_TYPES],
     });
   })
 
@@ -2035,7 +2057,7 @@ const sourcingApp = new Hono()
       totals[row.verdict] = (totals[row.verdict] ?? 0) + row.cnt;
     }
 
-    return c.json({ matrix, totals });
+    return c.json({ matrix, totals, exemptTypes: [...SOURCING_EXEMPT_TYPES] });
   });
 
 // ---- Exports ----

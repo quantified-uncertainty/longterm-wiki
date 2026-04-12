@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getTypedEntities, isEvent } from "@/data";
-import { getRecordVerdict } from "@/data/tablebase";
+
 import { ProfileStatCard } from "@/components/directory";
 import { EventsTable, type EventRow } from "./events-table";
 
@@ -25,7 +25,7 @@ export default function EventsPage() {
       lastUpdated: e.lastUpdated ?? null,
       tags: e.tags ?? [],
       wikiId: e.wikiId ?? null,
-      verdictString: getRecordVerdict("event", e.id)?.verdict ?? null,
+      verdictString: null, // event has no sourcing verdicts yet (QUA-211)
     };
   });
 

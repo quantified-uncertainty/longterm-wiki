@@ -272,7 +272,7 @@ export function ProductsSection({
               const launched = field(prod, "launched");
               const description = field(prod, "description");
               const source = field(prod, "source");
-              const prodVerdict = getRecordVerdict("product", String(prod.key))?.verdict;
+              const prodVerdict = null; // product has no sourcing verdicts yet (QUA-211)
 
               return (
                 <tr key={prod.key} className="hover:bg-muted/20 transition-colors">
@@ -354,7 +354,7 @@ export function SafetyMilestonesSection({
               const msType = field(ms, "type");
               const description = field(ms, "description");
               const source = field(ms, "source");
-              const msVerdict = getRecordVerdict("safety-milestone", String(ms.key))?.verdict;
+              const msVerdict = null; // safety-milestone has no sourcing verdicts yet (QUA-211)
 
               return (
                 <tr key={ms.key} className="hover:bg-muted/20 transition-colors">
@@ -454,7 +454,7 @@ export function StrategicPartnershipsSection({
               const investmentAmount = sp.fields.investment_amount;
               const computeCommitment = sp.fields.compute_commitment;
               const notes = field(sp, "notes");
-              const spVerdict = getRecordVerdict("strategic-partnership", String(sp.key))?.verdict;
+              const spVerdict = null; // strategic-partnership has no sourcing verdicts yet (QUA-211)
 
               return (
                 <tr key={sp.key} className="hover:bg-muted/20 transition-colors">

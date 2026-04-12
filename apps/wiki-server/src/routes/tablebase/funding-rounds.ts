@@ -204,6 +204,7 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       name: "funding-rounds",
       table: fundingRounds,
       batchSchema: SyncFundingRoundsBatchSchema,
+      enforceSourcing: true,
       naturalKey: (item) => `${item.companyId}::${item.name}`,
       naturalKeyError:
         "Duplicate (companyId, name) in batch",

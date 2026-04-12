@@ -5,9 +5,9 @@ effort: medium
 
 # PR Patrol
 
-Scan all open PRs for issues and fix them in priority order. One-shot version of the `pnpm crux gh pr-patrol` daemon.
+Scan all open PRs for issues and fix them in priority order.
 
-**When to use:** Periodically, or when you want to clean up the PR backlog. It can also be run as a daemon via `pnpm crux gh pr-patrol`.
+**CONTINUOUS OPERATION:** After completing a scan+fix cycle, wait 2-3 minutes then scan again. Keep looping until the user says to stop or switches tasks. Do NOT stop after one pass and wait for re-invocation — "patrol" means continuous monitoring.
 
 ## Branch Agent mode (Phase 1 — per-PR watchdog)
 
@@ -38,7 +38,7 @@ gh pr list --repo quantified-uncertainty/longterm-wiki --state open --limit 50 \
   --json number,title,headRefName,mergeable,statusCheckRollup,updatedAt,body,labels
 ```
 
-For each PR, check:
+For each PR, check **ALL THREE** of these on every cycle (not just CI):
 
 | Issue | Detection | Priority |
 |-------|-----------|----------|
@@ -49,6 +49,11 @@ For each PR, check:
 | **Stale** (>48h no update) | `updatedAt` comparison | P3 (score: 30) |
 | **Missing test plan** | PR body lacks `## Test plan` section | P3 (score: 20) |
 | **Bot review (nitpick)** | Unresolved nitpick-only bot comments | P3 (score: 15) |
+
+**CRITICAL: The scan loop MUST check unresolved review threads via GraphQL on every cycle.** Checking only `gh pr checks` for CI failures misses CodeRabbit threads entirely. Use this query every cycle:
+```bash
+gh api graphql -f query='{ repository(owner: "quantified-uncertainty", name: "longterm-wiki") { pullRequests(states: OPEN, first: 20) { nodes { number reviewThreads(first: 20) { nodes { isResolved } } } } } }' --jq '.data.repository.pullRequests.nodes[] | select(.reviewThreads.nodes | map(select(.isResolved == false)) | length > 0) | "PR #\(.number): \(.reviewThreads.nodes | map(select(.isResolved == false)) | length) unresolved"'
+```
 
 **Skip PRs with the `agent:working` label** — another session is already on them.
 

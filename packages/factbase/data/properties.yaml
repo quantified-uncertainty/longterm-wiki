@@ -48,6 +48,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
+    verifiable: false
     appliesTo: [organization]
     display:
       divisor: 1e9
@@ -152,6 +153,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifiable: false  # X.com/Twitter blocks automated access
 
   google-scholar:
     name: Google Scholar
@@ -173,6 +175,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifiable: false  # Self-referential: the fact IS the URL
 
   founded-by:
     name: Founded By
@@ -463,6 +466,7 @@ properties:
     unit: percent
     category: financial
     temporal: true
+    verifiable: false
     appliesTo: [person, organization]
     display:
       suffix: "%"
@@ -474,6 +478,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
+    verifiable: false
     appliesTo: [person, organization]
     display:
       divisor: 1e9
@@ -605,6 +610,7 @@ properties:
     dataType: text
     category: general
     appliesTo: [organization, person, project, funder, safety-agenda]
+    verifiable: false  # Self-referential: the fact IS the URL
 
   country:
     name: Country
@@ -620,6 +626,7 @@ properties:
     unit: USD
     category: financial
     temporal: true
+    verifiable: false
     appliesTo: [organization]
     display:
       divisor: 1e9

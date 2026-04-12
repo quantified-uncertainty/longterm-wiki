@@ -196,6 +196,7 @@ const divisionsApp = new Hono()
       name: "divisions",
       table: divisions,
       batchSchema: SyncDivisionsBatchSchema,
+      enforceSourcing: true,
       toRow: (item) => ({
         id: item.id,
         slug: item.slug ?? null,

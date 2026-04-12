@@ -54,6 +54,52 @@ export const VALID_RECORD_TYPES = [
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
 
+/**
+ * Record types that are exempt from sourcing verification.
+ *
+ * These are data classes where the ingestion source IS the canonical reference,
+ * so running sourcing verification against them produces noise rather than signal.
+ * They are excluded from coverage metrics, recheck queues, and the sourcing
+ * pipeline. The exemption is explicit — without this list, nothing prevents
+ * someone from accidentally running sourcing on these types and polluting
+ * the verdicts table.
+ *
+ * Criteria for exemption:
+ *   1. Data is ingested directly from an authoritative API (Manifold, arXiv, etc.)
+ *   2. The source URL in the record IS the canonical reference — re-checking it
+ *      against external sources is circular
+ *   3. Data is computed/derived from other already-verified records
+ *
+ * When adding a new exempt type, document the reason inline.
+ */
+export const SOURCING_EXEMPT_TYPES = [
+  // Ingested directly from benchmark provider APIs (e.g., provider docs, eval harnesses).
+  // The benchmark scores ARE the canonical data — no external source to verify against.
+  "benchmark-result",
+
+  // Computed by the citation accuracy system, not manually entered data.
+  // Citation accuracy has its own separate verification pipeline.
+  "citation",
+
+  // LLM-generated or editorial assessments (importance, risk, etc.).
+  // These are opinions/judgments, not factual claims that can be sourcing-checked.
+  "entity-assessment",
+
+  // Time-series pricing data ingested from secondary market APIs.
+  // The API response IS the canonical price — re-checking it is circular.
+  "secondary-market-price",
+] as const;
+
+export type SourcingExemptType = (typeof SOURCING_EXEMPT_TYPES)[number];
+
+/**
+ * Check whether a record type is exempt from sourcing verification.
+ * Use this instead of manual array checks to ensure consistency.
+ */
+export function isSourcingExempt(recordType: string): boolean {
+  return (SOURCING_EXEMPT_TYPES as readonly string[]).includes(recordType);
+}
+
 export const VALID_SOURCE_CHECK_VERDICTS = [
   "confirmed",
   "contradicted",

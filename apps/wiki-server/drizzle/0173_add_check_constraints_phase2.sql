@@ -144,7 +144,7 @@ END $$;
 DO $$ BEGIN
   ALTER TABLE "groundskeeper_runs"
     ADD CONSTRAINT chk_gkr_event
-    CHECK (event IN ('success', 'failure', 'error', 'circuit_breaker_tripped', 'skipped'));
+    CHECK (event IN ('success', 'failure', 'error', 'circuit_breaker_tripped', 'circuit_breaker_reset', 'half_open_attempt', 'half_open_success', 'skipped'));
 EXCEPTION WHEN duplicate_object THEN NULL;
 END $$;
 

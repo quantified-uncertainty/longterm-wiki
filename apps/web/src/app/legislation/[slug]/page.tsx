@@ -48,6 +48,7 @@ import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
 import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -68,17 +69,20 @@ export async function generateMetadata({
   };
 }
 
-/** Resolve sourcing verdict for a stakeholder (server-side only). */
-function resolveVerdict(
+/** Resolve sourcing verdict and sourcing href for a stakeholder (server-side only). */
+function resolveStakeholderSourcing(
   policyStableId: string | undefined,
   stakeholderName: string,
-): { verdict: string; confidence: number | null } | null {
-  if (!policyStableId) return null;
+): { verdict: { verdict: string; confidence: number | null } | null; sourcingHref: string | undefined } {
+  if (!policyStableId) return { verdict: null, sourcingHref: undefined };
   const stakeholderId = getPolicyStakeholderId(policyStableId, stakeholderName);
-  if (!stakeholderId) return null;
+  if (!stakeholderId) return { verdict: null, sourcingHref: undefined };
   const v = getRecordVerdict("policy-stakeholder", stakeholderId);
-  if (!v) return null;
-  return { verdict: v.verdict, confidence: v.confidence };
+  if (!v) return { verdict: null, sourcingHref: undefined };
+  return {
+    verdict: { verdict: v.verdict, confidence: v.confidence },
+    sourcingHref: getSourcingHref("policy-stakeholder", stakeholderId),
+  };
 }
 
 /** Status pipeline stages for the visual timeline. */
@@ -160,19 +164,23 @@ export default async function LegislationDetailPage({
     (importanceOrder[a.importance ?? ""] ?? 3) - (importanceOrder[b.importance ?? ""] ?? 3);
 
   // Convert raw stakeholders to StakeholderRow with resolved hrefs, source names, and verdicts
-  const toRow = (s: (typeof entity.stakeholders)[number]): StakeholderRow => ({
-    name: s.name,
-    entityId: s.entityId,
-    position: s.position,
-    role: s.role,
-    importance: s.importance,
-    reason: s.reason,
-    source: s.source,
-    sourceName: s.source ? getSourceDisplayName(s.source) : undefined,
-    context: s.context,
-    href: resolveEntityHref(s.entityId),
-    verdict: resolveVerdict(entity.stableId, s.name),
-  });
+  const toRow = (s: (typeof entity.stakeholders)[number]): StakeholderRow => {
+    const sourcing = resolveStakeholderSourcing(entity.stableId, s.name);
+    return {
+      name: s.name,
+      entityId: s.entityId,
+      position: s.position,
+      role: s.role,
+      importance: s.importance,
+      reason: s.reason,
+      source: s.source,
+      sourceName: s.source ? getSourceDisplayName(s.source) : undefined,
+      context: s.context,
+      href: resolveEntityHref(s.entityId),
+      verdict: sourcing.verdict,
+      sourcingHref: sourcing.sourcingHref,
+    };
+  };
 
   const supporters = entity.stakeholders.filter((s) => s.position === "support").sort(byImportance).map(toRow);
   const opponents = entity.stakeholders.filter((s) => s.position === "oppose").sort(byImportance).map(toRow);

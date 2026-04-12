@@ -35,6 +35,56 @@ import type {
 
 const { PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 
+// ── Numeric formatting for LLM prompts ─────────────────────────────
+
+/**
+ * Format a large number as a human-readable string for LLM prompts.
+ * The LLM needs to match "1234000000" against "$1.234 billion" in source text —
+ * showing just the raw number leads to false-positive contradictions.
+ *
+ * Examples:
+ *   formatNumericForPrompt(1234000000) → "1,234,000,000 (i.e. ~1.23 billion)"
+ *   formatNumericForPrompt(50000000)   → "50,000,000 (i.e. ~50 million)"
+ *   formatNumericForPrompt(1500)       → "1,500"
+ *   formatNumericForPrompt(42)         → "42"
+ */
+export function formatNumericForPrompt(value: number): string {
+  const formatted = value.toLocaleString('en-US');
+
+  const abs = Math.abs(value);
+  const sign = value < 0 ? '-' : '';
+
+  if (abs >= 1e12) {
+    const trillions = abs / 1e12;
+    return `${formatted} (i.e. ${sign}~${trimTrailingZero(trillions.toFixed(2))} trillion)`;
+  }
+  if (abs >= 1e9) {
+    const billions = abs / 1e9;
+    return `${formatted} (i.e. ${sign}~${trimTrailingZero(billions.toFixed(2))} billion)`;
+  }
+  if (abs >= 1e6) {
+    const millions = abs / 1e6;
+    return `${formatted} (i.e. ${sign}~${trimTrailingZero(millions.toFixed(2))} million)`;
+  }
+  return formatted;
+}
+
+/** Remove trailing zeros after decimal: "1.20" → "1.2", "1.00" → "1" */
+function trimTrailingZero(s: string): string {
+  if (!s.includes('.')) return s;
+  return s.replace(/\.?0+$/, '');
+}
+
+/**
+ * Known monetary field names used in record sourcing.
+ * When these fields contain numbers, we annotate them with human-readable equivalents
+ * in the LLM prompt to prevent rounding false positives.
+ */
+const MONETARY_FIELDS = new Set([
+  'amount', 'raised', 'valuation', 'budget', 'impliedValuation',
+  'pricePerShare', 'totalBudget',
+]);
+
 /** Cache parsed snapshots to avoid re-fetching and re-parsing per grant */
 export const snapshotCache = new Map<string, { rawContent: string; manifest: DataSourceManifest } | null>();
 
@@ -46,10 +96,18 @@ export function buildFactSourcingPrompt(
 ): string {
   const asOfStr = data.fact.asOf ? ` (as of ${data.fact.asOf})` : '';
   const notesStr = data.fact.notes ? `\nAdditional context: ${data.fact.notes}` : '';
-  // Include exact stored value when it differs from the display value to avoid rounding false positives
-  const rawSuffix = data.rawValue && data.rawValue !== data.formattedValue
-    ? ` (exact stored value: ${data.rawValue})`
-    : '';
+  // Include exact stored value when it differs from the display value to avoid rounding false positives.
+  // Format the raw value with human-readable annotation so the LLM can match it against source text
+  // (e.g., "1,234,000,000 (i.e. ~1.23 billion)" instead of just "1234000000").
+  let rawSuffix = '';
+  if (data.rawValue && data.rawValue !== data.formattedValue) {
+    const numericRaw = Number(data.rawValue);
+    if (Number.isFinite(numericRaw) && Math.abs(numericRaw) >= 1e6) {
+      rawSuffix = ` (exact stored value: ${formatNumericForPrompt(numericRaw)})`;
+    } else {
+      rawSuffix = ` (exact stored value: ${data.rawValue})`;
+    }
+  }
 
   return `You are a fact-checker. Given the source text below, verify this claim.
 
@@ -78,7 +136,15 @@ export function buildRecordSourcingPrompt(
 ): string {
   const fieldsStr = Object.entries(data.fields)
     .filter(([, v]) => v != null)
-    .map(([k, v]) => `  ${k}: ${v}`)
+    .map(([k, v]) => {
+      // Annotate large monetary fields with human-readable equivalents to prevent
+      // false-positive contradictions. Without this, the LLM sees "amount: 1234000000"
+      // and must figure out on its own that it equals "$1.234 billion" from the source.
+      if (typeof v === 'number' && MONETARY_FIELDS.has(k) && Math.abs(v) >= 1e6) {
+        return `  ${k}: ${formatNumericForPrompt(v)}`;
+      }
+      return `  ${k}: ${v}`;
+    })
     .join('\n');
 
   return `You are a fact-checker. Given the source text below, verify this structured data record.

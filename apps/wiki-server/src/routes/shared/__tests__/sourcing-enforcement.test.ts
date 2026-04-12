@@ -96,6 +96,34 @@ describe('enforceSourcing', () => {
     expect(res.status).toBe(200);
   });
 
+  // --- Server-side enforcement for Phase 7 tables (QUA-248) ---
+  it.each([
+    'funding-rounds',
+    'funding-programs',
+    'divisions',
+    'policy-stakeholders',
+  ])('rejects unchecked %s records via server policy', async (table) => {
+    const app = createTestApp(table);
+    const res = await makeRequest(app, [{ id: '1' }]);
+    expect(res.status).toBe(400);
+    const body = await res.json() as { message: string };
+    expect(body.message).toContain('server policy');
+    expect(body.message).toContain('1/1 records lack sourcing');
+  });
+
+  it.each([
+    'funding-rounds',
+    'funding-programs',
+    'divisions',
+    'policy-stakeholders',
+  ])('allows fully checked %s records', async (table) => {
+    const app = createTestApp(table);
+    const res = await makeRequest(app, [
+      { id: '1', sourcing: { verdict: 'confirmed' } },
+    ]);
+    expect(res.status).toBe(200);
+  });
+
   // --- forceSkipSourcing escape hatch ---
   it('respects forceSkipSourcing escape hatch for server-enforced tables', async () => {
     const app = createTestApp('personnel');

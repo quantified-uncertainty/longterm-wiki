@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import type { Metadata } from "next";
 import { getKBLatest, getKBFacts, getKBRecords, getKBEntities, resolveSlugAlias } from "@/data/factbase";
-import { getTypedEntities, isOrganization, getPageById, getTypedEntityById, getRecordVerdict, type OrganizationEntity } from "@/data";
+import { getTypedEntities, isOrganization, getPageById, getTypedEntityById, type OrganizationEntity } from "@/data";
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
@@ -203,7 +203,7 @@ async function loadFromApi(
 
       peopleCount: null, // Not available from API
       completionScore: computeOrgCoverage(org),
-      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
+      verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
       searchText: searchParts.join(" ").toLowerCase(),
     };
@@ -254,7 +254,7 @@ async function loadFromApi(
 
       peopleCount: null,
       completionScore: computeOrgCoverage({ foundedDate }),
-      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
+      verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
       searchText: searchParts.join(" ").toLowerCase(),
     });
@@ -342,7 +342,7 @@ function loadFromLocal(): OrgPageData {
         peopleCount,
         wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
       }),
-      verdictString: getRecordVerdict("entity", org.id)?.verdict ?? null,
+      verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
       searchText: buildOrgSearchText(org, orgToEmployeeNames),
     };

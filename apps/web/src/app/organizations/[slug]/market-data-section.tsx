@@ -12,7 +12,7 @@ import {
   type RpcPredictionQuestion,
 } from "@/lib/wiki-server";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { getRecordVerdict } from "@data/tablebase";
+
 import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
@@ -148,7 +148,7 @@ function SecondaryMarketSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {prices.map((p) => {
-              const verdict = getRecordVerdict("secondary-market-price", String(p.id))?.verdict;
+              const verdict = null; // secondary-market-price has no sourcing verdicts yet (QUA-211)
               return (
                 <tr
                   key={p.id}
@@ -287,7 +287,7 @@ function PredictionMarketSection({
               </thead>
               <tbody className="divide-y divide-border/50">
                 {resolved.map((q) => {
-                  const verdict = getRecordVerdict("prediction-question", String(q.id))?.verdict;
+                  const verdict = null; // prediction-question has no sourcing verdicts yet (QUA-211)
                   return (
                   <tr
                     key={q.id}
@@ -341,7 +341,7 @@ function PredictionMarketSection({
 
 function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
   const prob = q.currentProbability;
-  const verdict = getRecordVerdict("prediction-question", String(q.id))?.verdict;
+  const verdict = null; // prediction-question has no sourcing verdicts yet (QUA-211)
 
   return (
     <tr className="hover:bg-muted/20 transition-colors">

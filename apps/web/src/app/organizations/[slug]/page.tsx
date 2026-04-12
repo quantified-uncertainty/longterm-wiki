@@ -2,7 +2,7 @@ import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
-import { getRecordVerdict } from "@data/tablebase";
+
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
@@ -518,17 +518,10 @@ export default async function OrgProfilePage({
   }
 
   // ── Build resource verdict maps (server-side, passed to client components) ──
-  function buildResourceVerdicts(resources: typeof data.resourcePublications): Record<string, string | null> {
-    const map: Record<string, string | null> = {};
-    for (const r of resources) {
-      const v = getRecordVerdict("resource", r.id);
-      map[r.id] = v?.verdict ?? null;
-    }
-    return map;
-  }
-  const pubVerdicts = buildResourceVerdicts(data.resourcePublications);
-  const announcementVerdicts = buildResourceVerdicts(data.resourceAnnouncements);
-  const pressVerdicts = buildResourceVerdicts(data.resourcesAboutOrg);
+  // resource has no sourcing verdicts yet (QUA-211); pass empty maps
+  const pubVerdicts: Record<string, string | null> = {};
+  const announcementVerdicts: Record<string, string | null> = {};
+  const pressVerdicts: Record<string, string | null> = {};
 
   // ── Publications tab (research papers from entity_resources) ──
   if (data.resourcePublications.length > 0) {
@@ -650,7 +643,7 @@ export default async function OrgProfilePage({
                   const websiteFact = getKBLatest(p.id, "website");
                   const pUrl = (websiteFact?.value.type === "text" ? websiteFact.value.value : null) ?? p.projectUrl ?? p.website;
                   const pStatus = p.projectStatus ?? p.status;
-                  const projectVerdict = getRecordVerdict("project", p.id)?.verdict;
+                  const projectVerdict = null; // project has no sourcing verdicts yet (QUA-211)
                   return (
                     <tr key={p.id} className="hover:bg-muted/20 transition-colors">
                       <td className="py-2.5 px-3 font-medium">
@@ -716,8 +709,6 @@ export default async function OrgProfilePage({
     wikiPageId: entity.wikiPageId,
   };
 
-  const entityVerdict = getRecordVerdict("entity", entity.id);
-
   const headerData = {
     id: entity.id,
     name: entity.name,
@@ -731,7 +722,9 @@ export default async function OrgProfilePage({
     wikiHref: data.wikiHref,
     founders: data.founders,
     coverageInput,
-    verdict: entityVerdict?.verdict ?? null,
+    // entity has no sourcing verdicts yet; needs server-side roll-up from
+    // personnel/grant/division children (QUA-136)
+    verdict: null,
   };
 
   return (

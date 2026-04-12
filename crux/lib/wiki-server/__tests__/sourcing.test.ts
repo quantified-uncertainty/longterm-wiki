@@ -47,7 +47,7 @@ describe('getVerdictsByEntity', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/by-entity/sid_abc123',
+      '/api/source-checks/by-entity/sid_abc123',
     );
   });
 
@@ -64,7 +64,7 @@ describe('getVerdictsByEntity', () => {
     });
 
     const url = mockApiRequest.mock.calls[0][1];
-    expect(url).toContain('/api/sourcing/by-entity/sid_abc123?');
+    expect(url).toContain('/api/source-checks/by-entity/sid_abc123?');
     expect(url).toContain('limit=10');
     expect(url).toContain('offset=20');
     expect(url).toContain('verdict=contradicted');
@@ -91,7 +91,7 @@ describe('getVerdictsByEntity', () => {
     await getVerdictsByEntity('sid_abc123');
 
     const url = mockApiRequest.mock.calls[0][1];
-    expect(url).toBe('/api/sourcing/by-entity/sid_abc123');
+    expect(url).toBe('/api/source-checks/by-entity/sid_abc123');
     expect(url).not.toContain('?');
   });
 });
@@ -117,7 +117,7 @@ describe('getVerdictsByPage', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/by-page/anthropic',
+      '/api/source-checks/by-page/anthropic',
     );
   });
 
@@ -156,7 +156,7 @@ describe('getFailures', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/failures',
+      '/api/source-checks/failures',
     );
   });
 
@@ -210,7 +210,7 @@ describe('getStaleVerdicts', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/stale',
+      '/api/source-checks/stale',
     );
   });
 
@@ -264,7 +264,7 @@ describe('getVerdictsByType', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/verdicts?verdict=contradicted&limit=200',
+      '/api/source-checks/verdicts?verdict=contradicted&limit=200',
     );
   });
 
@@ -278,7 +278,7 @@ describe('getVerdictsByType', () => {
 
     expect(mockApiRequest).toHaveBeenCalledWith(
       'GET',
-      '/api/sourcing/verdicts?verdict=confirmed&limit=50',
+      '/api/source-checks/verdicts?verdict=confirmed&limit=50',
     );
   });
 });

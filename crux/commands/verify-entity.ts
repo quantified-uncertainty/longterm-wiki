@@ -107,6 +107,10 @@ async function discoverFactClaims(entityId: string): Promise<VerifiableClaim[]> 
     for (const fact of facts) {
       if (!fact.source) continue;
       const property = graph.getProperty(fact.propertyId);
+      // Skip facts whose property is marked as not verifiable (e.g. secondary-valuation,
+      // equity-stake-percent) — these come from private/proprietary data that the
+      // sourcing system cannot verify. QUA-247.
+      if (property?.verifiable === false) continue;
       const value = formatFactValue(fact, property, graph);
       claims.push({
         recordType: 'fact',

@@ -274,6 +274,9 @@ describe('funding-round name resolution guard', () => {
 });
 
 // ── Benchmark result name resolution guard ───────────────────────────
+// Note: benchmark-result is now a SOURCE_CHECK_EXEMPT_TYPE (data ingested from
+// benchmark provider APIs). The exempt filter runs before name resolution, so
+// these tests verify that exempt types produce no items regardless of name quality.
 
 describe('benchmark-result name resolution guard', () => {
   function setupBenchmarkMock(records: Record<string, unknown>[]) {
@@ -284,18 +287,19 @@ describe('benchmark-result name resolution guard', () => {
     });
   }
 
-  it('includes records where model name is resolvable', async () => {
+  it('skips benchmark-result entirely because it is an exempt type', async () => {
     setupBenchmarkMock([{
       id: 'br-1',
       modelResolvedName: 'GPT-4',
       sourceUrl: 'https://example.com/benchmarks',
     }]);
 
+    // benchmark-result is exempt from sourcing verification — no items should be collected
     const items = await collectRecordItems(new Map(), undefined, 'benchmark-result');
-    expect(items).toHaveLength(1);
+    expect(items).toHaveLength(0);
   });
 
-  it('skips records where model name is unresolvable', async () => {
+  it('skips records where model name is unresolvable (also exempt)', async () => {
     setupBenchmarkMock([{
       id: 'br-2',
       modelId: 'NPPTvNqRXA',
@@ -304,5 +308,20 @@ describe('benchmark-result name resolution guard', () => {
 
     const items = await collectRecordItems(new Map(), undefined, 'benchmark-result');
     expect(items).toHaveLength(0);
+  });
+});
+
+// ── Exempt type filtering ────────────────────────────────────────────
+
+describe('exempt type filtering', () => {
+  it('skips all exempt types when scanning without table filter', async () => {
+    // Mock all API endpoints to return empty arrays
+    mockApiRequest.mockResolvedValue(mockEmptyResponse());
+
+    const items = await collectRecordItems(new Map());
+    // The function should not call APIs for exempt types, so no items.
+    // This test primarily verifies the function doesn't crash when
+    // exempt types are filtered out.
+    expect(items).toEqual([]);
   });
 });
