@@ -70,6 +70,39 @@ const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
 export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
 export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
 
+// ---- Shared CTE ----
+
+/**
+ * CTE listing every (record_type, record_id) pair currently present in its
+ * source table. Used to filter orphan verdicts — rows in source_verdicts
+ * that reference records which have since been deleted from their source
+ * table. `INNER JOIN` against this CTE excludes orphans.
+ *
+ * `citation` rows only count when they still carry an accuracy verdict;
+ * `fact` uses fact_id (not the serial PK) because source_verdicts.record_id
+ * stores the fact_id for facts.
+ */
+const LIVE_RECORDS_CTE = sql`
+  live_records AS (
+    SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+    UNION ALL SELECT 'division', id::text FROM divisions
+    UNION ALL SELECT 'grant', id::text FROM grants
+    UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
+    UNION ALL SELECT 'investment', id::text FROM investments
+    UNION ALL SELECT 'funding-program', id::text FROM funding_programs
+    UNION ALL SELECT 'publication', id::text FROM publications
+    UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+    UNION ALL SELECT 'equity-position', id::text FROM equity_positions
+    UNION ALL SELECT 'entity-event', id::text FROM entity_events
+    UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
+    UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
+    UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+    UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+    UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
+    UNION ALL SELECT 'fact', fact_id FROM facts
+  )
+`;
+
 // ---- Query schemas ----
 
 const EvidenceBody = z.object({
@@ -364,45 +397,60 @@ const sourcingApp = new Hono()
       const { record_type } = c.req.valid("query");
       const db = getDrizzleDb();
 
-      const typeCondition = record_type
-        ? eq(sourceVerdicts.recordType, record_type)
-        : undefined;
+      // All verdict aggregations filter orphan verdicts (rows referencing records
+      // that have been deleted from their source table) via LIVE_RECORDS_CTE, to
+      // stay consistent with /coverage-matrix and /verdict-matrix. Without this
+      // filter the dashboard over-reports contradicted/partial/etc. counts by
+      // including verdicts for records that no longer exist.
+      const typeFilterSql = record_type
+        ? sql`AND v.record_type = ${record_type}`
+        : sql``;
 
-      const [statsRow] = await db
-        .select({
-          total: count(),
-          needsRecheck: sql<number>`count(*) filter (where ${sourceVerdicts.needsRecheck} = true)`,
-          avgConfidence: sql<number>`coalesce(avg(${sourceVerdicts.confidence}), 0)`,
-        })
-        .from(sourceVerdicts)
-        .where(typeCondition);
+      const [statsRow] = (await db.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT
+          count(*)::int AS total,
+          count(*) FILTER (WHERE v.needs_recheck = true)::int AS needs_recheck,
+          coalesce(avg(v.confidence), 0)::float AS avg_confidence
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        WHERE 1=1 ${typeFilterSql}
+      `)) as Array<{
+        total: number;
+        needs_recheck: number;
+        avg_confidence: number;
+      }>;
 
-      const byVerdictRows = await db
-        .select({
-          verdict: sourceVerdicts.verdict,
-          count: count(),
-        })
-        .from(sourceVerdicts)
-        .where(typeCondition)
-        .groupBy(sourceVerdicts.verdict);
+      const byVerdictRows = (await db.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT v.verdict, count(*)::int AS cnt
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        WHERE 1=1 ${typeFilterSql}
+        GROUP BY v.verdict
+      `)) as Array<{ verdict: string; cnt: number }>;
 
       const byVerdict: Record<string, number> = {};
       for (const row of byVerdictRows) {
-        byVerdict[row.verdict] = row.count;
+        byVerdict[row.verdict] = row.cnt;
       }
 
-      // by_type is always unfiltered (shows all types for the type-filter tabs)
-      const byTypeRows = await db
-        .select({
-          recordType: sourceVerdicts.recordType,
-          count: count(),
-        })
-        .from(sourceVerdicts)
-        .groupBy(sourceVerdicts.recordType);
+      // by_type is always unfiltered by record_type (shows all types for the
+      // type-filter tabs) but still excludes orphans.
+      const byTypeRows = (await db.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT v.record_type, count(*)::int AS cnt
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        GROUP BY v.record_type
+      `)) as Array<{ record_type: string; cnt: number }>;
 
       const byType: Record<string, number> = {};
       for (const row of byTypeRows) {
-        byType[row.recordType] = row.count;
+        byType[row.record_type] = row.cnt;
       }
 
       const [evidenceStats] = await db
@@ -413,12 +461,12 @@ const sourcingApp = new Hono()
         .from(recordSources);
 
       return c.json({
-        total: statsRow.total,
+        total: Number(statsRow.total),
         by_verdict: byVerdict,
         by_type: byType,
-        needs_recheck: Number(statsRow.needsRecheck),
+        needs_recheck: Number(statsRow.needs_recheck),
         avg_confidence:
-          Math.round(Number(statsRow.avgConfidence) * 100) / 100,
+          Math.round(Number(statsRow.avg_confidence) * 100) / 100,
         stale_evidence_count: Number(evidenceStats.staleCount),
         dead_link_count: Number(evidenceStats.deadLinkCount),
         current_checker_model: CURRENT_CHECKER_MODEL,
@@ -1849,49 +1897,10 @@ const sourcingApp = new Hono()
     // 3. Distinct checked records per type
     //
     // Both queries filter out orphaned verdicts (verdict rows referencing records
-    // that have been deleted from their source table) by JOINing against a CTE
-    // of all live (record_type, record_id) pairs.
-    //
-    // Note: for 'fact' type, record_id stores fact_id (not the serial PK),
-    // and for 'citation' type, record_id stores citation_quotes.id::text.
-    const liveRecordsCte = sql`
-      live_records AS (
-        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
-        UNION ALL
-        SELECT 'division', id::text FROM divisions
-        UNION ALL
-        SELECT 'grant', id::text FROM grants
-        UNION ALL
-        SELECT 'funding-round', id::text FROM funding_rounds
-        UNION ALL
-        SELECT 'investment', id::text FROM investments
-        UNION ALL
-        SELECT 'funding-program', id::text FROM funding_programs
-        UNION ALL
-        SELECT 'publication', id::text FROM publications
-        UNION ALL
-        SELECT 'secondary-market-price', id::text FROM secondary_market_prices
-        UNION ALL
-        SELECT 'equity-position', id::text FROM equity_positions
-        UNION ALL
-        SELECT 'entity-event', id::text FROM entity_events
-        UNION ALL
-        SELECT 'entity-assessment', id::text FROM entity_assessments
-        UNION ALL
-        SELECT 'benchmark-result', id::text FROM benchmark_results
-        UNION ALL
-        SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
-        UNION ALL
-        SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
-        UNION ALL
-        SELECT 'wiki-page', id::text FROM wiki_pages
-        UNION ALL
-        SELECT 'fact', fact_id FROM facts
-      )
-    `;
-
+    // that have been deleted from their source table) by JOINing against the
+    // shared LIVE_RECORDS_CTE.
     const verdictRows = (await db.execute(sql`
-      WITH ${liveRecordsCte}
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, v.verdict, count(*)::int AS cnt
       FROM source_check_verdicts v
       INNER JOIN live_records lr
@@ -1904,7 +1913,7 @@ const sourcingApp = new Hono()
     // A record can have multiple verdict rows (one per fieldName), so we use
     // COUNT(DISTINCT record_id) to avoid exceeding 100%.
     const checkedRows = (await db.execute(sql`
-      WITH ${liveRecordsCte}
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
       FROM source_check_verdicts v
       INNER JOIN live_records lr
@@ -2017,26 +2026,9 @@ const sourcingApp = new Hono()
   .get("/verdict-matrix", async (c) => {
     const db = getDrizzleDb();
 
-    // Exclude orphaned verdicts for deleted records (same CTE pattern as /coverage-matrix)
+    // Exclude orphaned verdicts for deleted records via the shared LIVE_RECORDS_CTE.
     const rows = (await db.execute(sql`
-      WITH live_records AS (
-        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
-        UNION ALL SELECT 'division', id::text FROM divisions
-        UNION ALL SELECT 'grant', id::text FROM grants
-        UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
-        UNION ALL SELECT 'investment', id::text FROM investments
-        UNION ALL SELECT 'funding-program', id::text FROM funding_programs
-        UNION ALL SELECT 'publication', id::text FROM publications
-        UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
-        UNION ALL SELECT 'equity-position', id::text FROM equity_positions
-        UNION ALL SELECT 'entity-event', id::text FROM entity_events
-        UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
-        UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
-        UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
-        UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
-        UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
-        UNION ALL SELECT 'fact', fact_id FROM facts
-      )
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, v.verdict, count(*)::int AS cnt
       FROM source_check_verdicts v
       INNER JOIN live_records lr
