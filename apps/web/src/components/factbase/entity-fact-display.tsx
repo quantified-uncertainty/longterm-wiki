@@ -167,11 +167,15 @@ export function CategoryFactSection({
                             <FactValueDisplay fact={fact} property={property} />
                           </td>
                           <td className="py-1.5 pr-3">
+                            {/* The factId is an internal identifier; we keep it in the href
+                                for deep links but render a short label so raw `f_...` IDs don't
+                                leak into visible page text (caught by the no-raw-ids e2e spec). */}
                             <Link
                               href={`/factbase/fact/${fact.id}`}
-                              className="text-blue-600 hover:underline dark:text-blue-400 font-mono text-xs"
+                              className="text-blue-600 hover:underline dark:text-blue-400 text-xs"
+                              title={fact.id}
                             >
-                              {fact.id}
+                              view &rarr;
                             </Link>
                           </td>
                           <td className="py-1.5 pl-1">
