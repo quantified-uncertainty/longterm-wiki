@@ -468,22 +468,24 @@ Where:
 /** Parse the second opinion response. */
 function parseSecondOpinionResponse(text: string): { agree: boolean; verdict: string; reason: string } {
   const cleaned = stripCodeFences(text);
-  let parsed: { agree?: boolean; verdict?: string; reason?: string } | null = null;
+  let parsed: unknown = null;
   try {
-    parsed = JSON.parse(cleaned) as { agree?: boolean; verdict?: string; reason?: string };
+    parsed = JSON.parse(cleaned);
   } catch {
     try {
-      parsed = JSON.parse(repairJsonBackslashEscapes(cleaned)) as {
-        agree?: boolean; verdict?: string; reason?: string;
-      };
+      parsed = JSON.parse(repairJsonBackslashEscapes(cleaned));
     } catch {
       return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
     }
   }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
+  }
+  const obj = parsed as { agree?: boolean; verdict?: string; reason?: string };
   return {
-    agree: parsed.agree !== false,
-    verdict: typeof parsed.verdict === 'string' ? parsed.verdict : 'not_verifiable',
-    reason: typeof parsed.reason === 'string' ? parsed.reason : '',
+    agree: obj.agree !== false,
+    verdict: typeof obj.verdict === 'string' ? obj.verdict : 'not_verifiable',
+    reason: typeof obj.reason === 'string' ? obj.reason : '',
   };
 }
 
