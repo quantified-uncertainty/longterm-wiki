@@ -25,7 +25,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
         author { login }
         labels(first: 20) { nodes { name } }
         commits(last: 1) { nodes { commit {
-          pushedDate committedDate
+          committedDate
           statusCheckRollup {
             contexts(first: 50) { nodes {
               ... on CheckRun { name conclusion }
@@ -65,7 +65,7 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
       author { login }
       labels(first: 20) { nodes { name } }
       commits(last: 1) { nodes { commit {
-        pushedDate committedDate
+        committedDate
         statusCheckRollup {
           contexts(first: 50) { nodes {
             ... on CheckRun { name conclusion }
@@ -171,10 +171,11 @@ export function extractBlockingComments(pr: GqlPrNode): BlockingComment[] {
   const comments = pr.comments?.nodes ?? [];
   if (comments.length === 0) return [];
 
-  // Determine the last-push timestamp. Prefer pushedDate (set when commits land
-  // on the remote) but fall back to committedDate if pushedDate is absent.
+  // Determine the last-push timestamp. `committedDate` is the best proxy
+  // available on the GraphQL API now that `pushedDate` is deprecated; fall
+  // back to pr.updatedAt if the commit's date is missing.
   const commit = pr.commits?.nodes?.[0]?.commit;
-  const lastPushIso = commit?.pushedDate ?? commit?.committedDate ?? pr.updatedAt;
+  const lastPushIso = commit?.committedDate ?? pr.updatedAt;
   const lastPushMs = lastPushIso ? new Date(lastPushIso).getTime() : 0;
 
   const blocking: BlockingComment[] = [];
@@ -317,19 +318,24 @@ export function diffCheckRunsVsRollup(
 ): string[] {
   const normalize = (v: string | null | undefined): string | null =>
     v == null ? null : v.toLowerCase();
-  const freshByName = new Map(fresh.map((r) => [r.name, normalize(r.conclusion)]));
+  // Index fresh runs by lowercased name so matching is case-insensitive
+  // (rollup may report `Build` where REST reports `build`, etc.).
+  const freshByName = new Map(
+    fresh.map((r) => [r.name.toLowerCase(), normalize(r.conclusion)] as const),
+  );
   const discrepancies: string[] = [];
   for (const ctx of rollupContexts) {
-    const name = ctx.name ?? ctx.context;
-    if (!name) continue;
-    if (!freshByName.has(name)) continue;
+    const rawName = ctx.name ?? ctx.context;
+    if (!rawName) continue;
+    const key = rawName.toLowerCase();
+    if (!freshByName.has(key)) continue;
     // Rollup's conclusion is UPPERCASE (CheckRun) or state is UPPERCASE
     // (StatusContext); fresh is always lowercase. Normalize both before
     // comparing so we don't flag false positives from mere case differences.
     const rollupConclusion = normalize(ctx.conclusion ?? ctx.state ?? null);
-    const freshConclusion = freshByName.get(name) ?? null;
+    const freshConclusion = freshByName.get(key) ?? null;
     if (rollupConclusion !== freshConclusion) {
-      discrepancies.push(name);
+      discrepancies.push(rawName);
     }
   }
   return discrepancies;
@@ -412,24 +418,26 @@ export function detectIssues(
     // Vercel) that doesn't appear in check-runs would be silently ignored.
     let shouldEmitCiFailure = true;
     if (freshCheckRuns && freshCheckRuns.length > 0) {
-      const freshByName = new Map(freshCheckRuns.map((r) => [r.name, r]));
+      // Case-insensitive matching (rollup may report `Build`, REST `build`).
+      const freshByName = new Map(
+        freshCheckRuns.map((r) => [r.name.toLowerCase(), r] as const),
+      );
       const allFailingCoveredByFresh = failingContexts.every((c) => {
-        const name = c.name ?? c.context;
+        const name = (c.name ?? c.context)?.toLowerCase();
         return name != null && freshByName.has(name);
       });
       if (allFailingCoveredByFresh) {
-        const freshFailingNames = failingContexts
-          .map((c) => c.name ?? c.context)
-          .filter((n): n is string => n != null)
-          .filter((n) => {
-            const run = freshByName.get(n);
-            return (
-              run?.conclusion === 'failure' ||
-              run?.conclusion === 'timed_out' ||
-              run?.conclusion === 'action_required'
-            );
-          });
-        if (freshFailingNames.length === 0) {
+        // Only suppress when EVERY fresh run for a failing rollup check is
+        // explicitly green (completed + success). An in-progress rerun or a
+        // null conclusion must NOT be treated as recovery — otherwise we hide
+        // failures that haven't actually been fixed yet.
+        const allFreshExplicitlyGreen = failingContexts.every((c) => {
+          const name = (c.name ?? c.context)?.toLowerCase();
+          if (name == null) return false;
+          const run = freshByName.get(name);
+          return run?.status === 'completed' && run.conclusion === 'success';
+        });
+        if (allFreshExplicitlyGreen) {
           shouldEmitCiFailure = false;
         }
       }

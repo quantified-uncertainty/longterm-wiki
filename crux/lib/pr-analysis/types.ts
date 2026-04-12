@@ -205,10 +205,11 @@ export interface GqlPrNode {
     nodes: Array<{
       commit: {
         /**
-         * ISO timestamp of the last push for the head ref, used to decide
-         * whether comments arrived after the latest code push.
+         * ISO timestamp of the last commit on the head ref, used to decide
+         * whether comments arrived after the latest code push. Note: GitHub's
+         * GraphQL `pushedDate` field was deprecated and removed; `committedDate`
+         * is the best available proxy.
          */
-        pushedDate?: string | null;
         committedDate?: string | null;
         statusCheckRollup: {
           contexts: {

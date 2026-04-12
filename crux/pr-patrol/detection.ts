@@ -90,14 +90,58 @@ export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null>
 
 // ── Daemon-specific: filter PRs by labels/draft and detect issues ────────────
 
+/**
+ * Fetch fresh check-runs for each PR's head SHA and return them keyed by OID.
+ * Used by daemon entry points before calling `detectAllPrIssuesFromNodes` so
+ * stale-rollup false positives are avoided automatically.
+ */
+export async function fetchFreshCheckRunsByOid(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<Map<string, FreshCheckRun[]>> {
+  const result = new Map<string, FreshCheckRun[]>();
+  if (prs.length === 0) return result;
+  const [owner, repo] = config.repo.split('/');
+  if (!owner || !repo) return result;
+  const seen = new Set<string>();
+  await Promise.all(
+    prs
+      .filter((pr) => pr.headRefOid && !seen.has(pr.headRefOid) && seen.add(pr.headRefOid))
+      .map(async (pr) => {
+        try {
+          const runs = await libFetchFreshCheckRuns(owner, repo, pr.headRefOid);
+          result.set(pr.headRefOid, runs);
+        } catch (e: unknown) {
+          // Fresh fetch is advisory — on failure, detectIssues falls back to rollup.
+          log(`  ${cl.dim}fetchFreshCheckRuns failed for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        }
+      }),
+  );
+  return result;
+}
+
+/**
+ * Async entry point for daemon callers: fetches fresh check-runs for every PR
+ * up front so detection never silently falls back to the stale rollup. Test
+ * code can keep using `detectAllPrIssuesFromNodes` directly with a fake map.
+ */
+export async function detectAllPrIssues(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<DetectedPr[]> {
+  const freshCheckRunsByOid = await fetchFreshCheckRunsByOid(prs, config);
+  return detectAllPrIssuesFromNodes(prs, config, freshCheckRunsByOid);
+}
+
 export function detectAllPrIssuesFromNodes(
   prs: GqlPrNode[],
   config: PatrolConfig,
   /**
    * Optional map of headRefOid → fresh check-runs. When provided, detectIssues
    * uses the fresh data to avoid stale-rollup false positives, and a
-   * discrepancy between fresh and rollup is logged. Callers that don't care
-   * about rollup freshness can omit this.
+   * discrepancy between fresh and rollup is logged. Production daemon entry
+   * points should use `detectAllPrIssues` (async) which builds this map via
+   * `fetchFreshCheckRunsByOid`; tests and one-shot callers can omit it.
    */
   freshCheckRunsByOid?: Map<string, FreshCheckRun[]>,
 ): DetectedPr[] {

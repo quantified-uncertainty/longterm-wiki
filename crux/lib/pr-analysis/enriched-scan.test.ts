@@ -38,7 +38,6 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     commits: {
       nodes: [{
         commit: {
-          pushedDate: '2026-04-10T00:00:00Z',
           committedDate: '2026-04-10T00:00:00Z',
           statusCheckRollup: { contexts: { nodes: [{ conclusion: 'SUCCESS' }] } },
         },
@@ -59,7 +58,6 @@ describe('extractBlockingComments', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T00:00:00Z',
             committedDate: '2026-04-10T00:00:00Z',
             statusCheckRollup: { contexts: { nodes: [] } },
           },
@@ -119,7 +117,6 @@ describe('extractBlockingComments', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T12:00:00Z',
             committedDate: '2026-04-10T12:00:00Z',
             statusCheckRollup: { contexts: { nodes: [] } },
           },
@@ -166,13 +163,12 @@ describe('extractBlockingComments', () => {
     expect(extractBlockingComments(pr)).toEqual([]);
   });
 
-  it('uses updatedAt as last-push fallback when pushedDate/committedDate are missing', () => {
+  it('uses updatedAt as last-push fallback when committedDate is missing', () => {
     const pr = makePrNode({
       updatedAt: '2026-04-10T00:00:00Z',
       commits: {
         nodes: [{
           commit: {
-            pushedDate: null,
             committedDate: null,
             statusCheckRollup: { contexts: { nodes: [] } },
           },
@@ -343,7 +339,6 @@ describe('detectIssues — fresh check-runs override stale rollup', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T00:00:00Z',
             committedDate: '2026-04-10T00:00:00Z',
             statusCheckRollup: { contexts: { nodes: [{ name: 'build', conclusion: 'FAILURE' }] } },
           },
@@ -362,7 +357,6 @@ describe('detectIssues — fresh check-runs override stale rollup', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T00:00:00Z',
             committedDate: '2026-04-10T00:00:00Z',
             statusCheckRollup: { contexts: { nodes: [{ name: 'build', conclusion: 'FAILURE' }] } },
           },
@@ -381,7 +375,6 @@ describe('detectIssues — fresh check-runs override stale rollup', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T00:00:00Z',
             committedDate: '2026-04-10T00:00:00Z',
             statusCheckRollup: { contexts: { nodes: [{ name: 'build', conclusion: 'FAILURE' }] } },
           },
@@ -400,7 +393,6 @@ describe('detectIssues — fresh check-runs override stale rollup', () => {
       commits: {
         nodes: [{
           commit: {
-            pushedDate: '2026-04-10T00:00:00Z',
             committedDate: '2026-04-10T00:00:00Z',
             statusCheckRollup: { contexts: { nodes: [
               { context: 'vercel', state: 'FAILURE' },

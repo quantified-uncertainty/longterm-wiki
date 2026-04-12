@@ -33,7 +33,7 @@ import {
   setParallelState,
 } from './state.ts';
 import {
-  detectAllPrIssuesFromNodes,
+  detectAllPrIssues,
   fetchOpenPrs,
 } from './detection.ts';
 import { rankPrs, computeEffectiveBudget } from './scoring.ts';
@@ -503,7 +503,7 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
 
   // 1. Detect: Fetch open PRs and find issues
   const allPrs = await fetchOpenPrs(config);
-  const detected = detectAllPrIssuesFromNodes(allPrs, config);
+  const detected = await detectAllPrIssues(allPrs, config);
 
   if (detected.length === 0) {
     log(`${cl.green}All PRs clean${cl.reset} — nothing to fix`);

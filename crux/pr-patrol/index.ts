@@ -92,7 +92,7 @@ import {
   setCodeRabbitRetryTime,
 } from './state.ts';
 import {
-  detectAllPrIssuesFromNodes,
+  detectAllPrIssues,
   detectPrOverlaps,
   fetchOpenPrs as daemonFetchOpenPrs,
 } from './detection.ts';
@@ -339,7 +339,7 @@ async function runCheckCycle(
 
   // ── Fix phase ──────────────────────────────────────────────────────
 
-  const detected = detectAllPrIssuesFromNodes(allPrs, config);
+  const detected = await detectAllPrIssues(allPrs, config);
   let fixedPr: number | null = null;
 
   // 1b. Check for PR file overlaps (informational — posts warnings)
