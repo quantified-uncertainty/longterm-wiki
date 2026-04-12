@@ -48,6 +48,21 @@ If an agent claims to have simplified code, fixed bugs, or applied review findin
 
 See `.claude/memory/feedback_verify_agent_claims.md` for the pattern.
 
+### Subagent permission limitation (mitigated)
+
+Claude Code has a known regression (v2.1.56+) where subagents do not inherit
+the parent's `permissions.allow` list — see
+[#18950](https://github.com/anthropics/claude-code/issues/18950),
+[#37730](https://github.com/anthropics/claude-code/issues/37730),
+[#28584](https://github.com/anthropics/claude-code/issues/28584). Without a
+workaround, Edit/Write on `.claude/commands/*`, `.claude/agents/*`, and
+`.claude/skills/*` silently fails in dispatched subagents.
+
+**Mitigation in this repo**: `.claude/hooks/approve-claude-configs.sh` is a
+PreToolUse hook that auto-approves Edit/Write on those three paths. Hooks
+fire for subagents (unlike `permissions.allow`), so this restores the
+expected behavior. The hook is narrowly scoped to those paths only.
+
 ## Anti-patterns to avoid
 
 **Bad dispatch prompt:**
