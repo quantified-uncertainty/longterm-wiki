@@ -4,6 +4,7 @@ import {
   evaluateDeployStatus,
   evaluateMainCi,
   combineHealth,
+  mapRollupState,
   DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES,
   MAIN_CI_RED_STREAK_MIN,
   DEPLOY_STALE_THRESHOLD_HOURS,
@@ -291,5 +292,100 @@ describe('combineHealth', () => {
   it('both issue scores outrank the highest per-PR issue score (conflict=100)', () => {
     expect(DEPLOY_STUCK_SCORE).toBeGreaterThan(100);
     expect(MAIN_CI_RED_SCORE).toBeGreaterThan(100);
+  });
+});
+
+// ── Regression: leading in-progress deploy does not hide failing streak ─────
+
+describe('evaluateDeployStatus — in-progress at head', () => {
+  it('skips a leading null-conclusion run and still sees the failing streak under it', () => {
+    const result = evaluateDeployStatus([
+      run({ id: 9, conclusion: null, status: 'in_progress', createdAt: '2026-04-12T07:00:00Z' }),
+      run({ id: 1, conclusion: 'failure', createdAt: '2026-04-12T06:01:00Z' }),
+      run({ id: 2, conclusion: 'failure', createdAt: '2026-04-11T22:57:00Z' }),
+      run({ id: 3, conclusion: 'success', createdAt: '2026-04-11T18:29:00Z' }),
+    ]);
+    expect(result.healthy).toBe(false);
+    expect(result.failingDeploys.map((r) => r.id)).toEqual([1, 2]);
+  });
+
+  it('treats all-pending as healthy (nothing resolved yet)', () => {
+    const result = evaluateDeployStatus([
+      run({ id: 1, conclusion: null, status: 'in_progress' }),
+      run({ id: 2, conclusion: null, status: 'queued' }),
+    ]);
+    expect(result.healthy).toBe(true);
+  });
+});
+
+// ── Regression: pending mid-list does not collapse into fake streak ─────────
+
+describe('evaluateMainCi — mid-list pending interruption', () => {
+  it('does NOT collapse [fail, pending, fail, fail] into a 3-streak', () => {
+    // Pre-fix this returned streak=3. Post-fix: only LEADING pending is skipped;
+    // a pending mid-list breaks the streak the same way a success would.
+    const result = evaluateMainCi([
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'pending' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+      commit({ sha: 'd', conclusion: 'failure' }),
+    ]);
+    expect(result.healthy).toBe(true);
+    expect(result.failingCount).toBe(1);
+  });
+
+  it('skips only the leading pending when it precedes a 3-failure streak', () => {
+    const result = evaluateMainCi([
+      commit({ sha: 'pending', conclusion: 'pending' }),
+      commit({ sha: 'a', conclusion: 'failure', createdAt: '2026-04-12T06:00:00Z' }),
+      commit({ sha: 'b', conclusion: 'failure' }),
+      commit({ sha: 'c', conclusion: 'failure', createdAt: '2026-04-12T04:00:00Z' }),
+    ]);
+    expect(result.healthy).toBe(false);
+    expect(result.failingCount).toBe(3);
+  });
+
+  it('treats null conclusion the same as pending at the head', () => {
+    const result = evaluateMainCi([
+      commit({ sha: 'unknown', conclusion: null }),
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'failure' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+    ]);
+    expect(result.healthy).toBe(false);
+    expect(result.failingCount).toBe(3);
+  });
+
+  it('treats a neutral conclusion as not-failure (breaks streak)', () => {
+    const result = evaluateMainCi([
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'neutral' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+      commit({ sha: 'd', conclusion: 'failure' }),
+    ]);
+    expect(result.healthy).toBe(true);
+    expect(result.failingCount).toBe(1);
+  });
+});
+
+// ── mapRollupState — GraphQL enum coverage ──────────────────────────────────
+
+describe('mapRollupState', () => {
+  it('maps SUCCESS → success', () => {
+    expect(mapRollupState('SUCCESS')).toBe('success');
+  });
+  it('maps FAILURE and ERROR → failure', () => {
+    expect(mapRollupState('FAILURE')).toBe('failure');
+    expect(mapRollupState('ERROR')).toBe('failure');
+  });
+  it('maps PENDING and EXPECTED → pending', () => {
+    expect(mapRollupState('PENDING')).toBe('pending');
+    expect(mapRollupState('EXPECTED')).toBe('pending');
+  });
+  it('maps NEUTRAL → neutral (not dropped to null)', () => {
+    expect(mapRollupState('NEUTRAL')).toBe('neutral');
+  });
+  it('maps null → null', () => {
+    expect(mapRollupState(null)).toBeNull();
   });
 });
