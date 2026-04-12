@@ -450,7 +450,7 @@ async function scanSourceQuality(): Promise<TableScanResult> {
   while (true) {
     const result = await apiRequest<{ verdicts: VerdictRow[]; total: number }>(
       'GET',
-      `/api/source-checks/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
+      `/api/sourcing/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
     );
     if (!result.ok) {
       console.warn(`[tablebase] Failed to fetch unverifiable verdicts: ${result.message}`);
