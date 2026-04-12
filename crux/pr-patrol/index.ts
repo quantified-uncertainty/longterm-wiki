@@ -98,6 +98,7 @@ import {
   fetchOpenPrs as daemonFetchOpenPrs,
 } from './detection.ts';
 import { detectCodeRabbitRateLimited } from '../lib/pr-analysis/detection.ts';
+import { applyDependencySurfacing } from '../lib/pr-analysis/dependency-surfacing.ts';
 import { rankPrs as daemonRankPrs } from './scoring.ts';
 import {
   findMergeCandidates as daemonFindMergeCandidates,
@@ -348,6 +349,10 @@ async function runCheckCycle(
   // inside applyStuckCycleDetection and do not abort the cycle.
   await applyStuckCycleDetection(detected, allPrs);
 
+  // Surface cross-PR dependencies (QUA-287 Phase 3). Must run after stuck
+  // detection so `blocksOthers` + `stuckCycles` can jointly drive the hub boost.
+  applyDependencySurfacing(detected, allPrs);
+
   let fixedPr: number | null = null;
 
   // 1b. Check for PR file overlaps (informational — posts warnings)
@@ -380,8 +385,14 @@ async function runCheckCycle(
         log('');
         log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
         for (const pr of ranked) {
+          const chain = pr.blockedOnPrs && pr.blockedOnPrs.length > 0
+            ? `  ${cl.dim}→ ${pr.blockedOnPrs.map((r) => `#${r.pr}`).join(', ')}${cl.reset}`
+            : '';
+          const hub = (pr.blocksOthers ?? 0) >= 2
+            ? `  ${cl.yellow}blocks ${pr.blocksOthers}${cl.reset}`
+            : '';
           log(
-            `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}`,
+            `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}${chain}${hub}`,
           );
         }
         log('');

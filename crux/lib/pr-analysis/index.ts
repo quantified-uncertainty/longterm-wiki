@@ -36,8 +36,10 @@ export type {
   GqlReviewThread,
   GqlIssueComment,
   GqlCrossReferencedEvent,
+  GqlCrossReferencedEventSource,
   GqlPrNode,
   PrOverlap,
+  PrDependencyReason,
   AutoRebaseResult,
 } from './types.ts';
 
@@ -70,9 +72,19 @@ export {
 export {
   ISSUE_SCORES,
   APPROVED_BONUS,
+  HUB_BOOST,
+  HUB_BLOCKS_THRESHOLD,
   computeScore,
   rankPrs,
 } from './scoring.ts';
+
+// ── Cross-PR dependency surfacing ────────────────────────────────────────────
+
+export {
+  applyDependencySurfacing,
+  extractPrReferences,
+  extractPrRefsFromText,
+} from './dependency-surfacing.ts';
 
 // ── CI status ────────────────────────────────────────────────────────────────
 

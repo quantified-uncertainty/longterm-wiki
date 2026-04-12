@@ -122,7 +122,28 @@ export interface DetectedPr {
    * is set.
    */
   stuckReason?: string;
+  /**
+   * Other open PRs this PR has an outgoing dependency on — extracted from
+   * CrossReferencedEvent timeline items and from `#NNNN` tokens in the PR
+   * body and failing-check messages. Only PRs present in the current open
+   * scan are recorded (merged/closed refs are filtered). QUA-287 Phase 3.
+   */
+  blockedOnPrs?: Array<{ pr: number; reason: PrDependencyReason }>;
+  /**
+   * Number of other open PRs that list this PR in their `blockedOnPrs`.
+   * Computed in the second pass of `applyDependencySurfacing`. Used by
+   * scoring to boost priority of hub PRs blocking multiple others.
+   */
+  blocksOthers?: number;
 }
+
+export type PrDependencyReason =
+  /** GitHub CrossReferencedEvent — structural evidence this PR mentions the other */
+  | 'timeline-reference'
+  /** `#NNNN` token found in the PR body */
+  | 'body-reference'
+  /** `#NNNN` token found in a failing check's context/output */
+  | 'gate-error';
 
 export interface ScoredPr extends DetectedPr {
   score: number;
@@ -199,9 +220,23 @@ export interface GqlIssueComment {
   viewerDidAuthor: boolean;
 }
 
+export interface GqlCrossReferencedEventSource {
+  __typename?: 'PullRequest' | 'Issue';
+  /** PR or issue number of the referencing item. */
+  number?: number;
+  /** PR state (OPEN, CLOSED, MERGED) — only populated for PullRequest sources. */
+  state?: string;
+}
+
 export interface GqlCrossReferencedEvent {
   __typename?: 'CrossReferencedEvent';
-  source?: unknown;
+  /**
+   * The item that referenced this PR. `source.number` is the PR/issue number
+   * that mentioned this PR (the referencer). Note this is an *incoming*
+   * cross-reference: on PR A, a CrossReferencedEvent with source=B means
+   * "B referenced A", i.e. B → A.
+   */
+  source?: GqlCrossReferencedEventSource;
   createdAt?: string;
 }
 

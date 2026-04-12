@@ -34,6 +34,16 @@ export const ISSUE_SCORES: Record<PrIssueType, number> = {
 /** Bonus for PRs with stage:approved — they're one fix away from merging. */
 export const APPROVED_BONUS = 100;
 
+/**
+ * Priority bump for stuck "hub" PRs — a PR that has been stuck for several
+ * cycles AND is referenced by ≥2 other open PRs is blocking the queue, so we
+ * bump it past a plain stuck PR to get it resolved first. QUA-287 Phase 3.
+ */
+export const HUB_BOOST = 150;
+
+/** Threshold for counting as a hub (see HUB_BOOST). */
+export const HUB_BLOCKS_THRESHOLD = 2;
+
 /** Pure function — computes priority score for a detected PR. */
 export function computeScore(pr: DetectedPr): number {
   let score = 0;
@@ -46,6 +56,14 @@ export function computeScore(pr: DetectedPr): number {
   // Approved PRs get a priority boost — fixing them unblocks a merge
   if (pr.labels?.includes(LABELS.STAGE_APPROVED)) {
     score += APPROVED_BONUS;
+  }
+
+  // Hub boost: stuck PR blocking ≥2 other open PRs goes to the front of the queue.
+  if (
+    (pr.stuckCycles ?? 0) >= 3 &&
+    (pr.blocksOthers ?? 0) >= HUB_BLOCKS_THRESHOLD
+  ) {
+    score += HUB_BOOST;
   }
 
   return score;
