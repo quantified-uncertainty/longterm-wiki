@@ -41,12 +41,6 @@ interface TrendRun {
 
 interface TrendsResponse {
   runs: TrendRun[];
-  entityTrends: Array<{
-    scanRunId: string;
-    completenessPct: number;
-    totalRecords: number;
-    scannedAt: string;
-  }>;
 }
 
 interface TrendsByTypePoint {
@@ -384,7 +378,7 @@ export async function TablebaseCoverageContent() {
       {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-5 gap-4 my-6">
         <StatCard label="Entities Scanned" value={totalEntities.toLocaleString()} />
-        <StatCard label="Avg Completeness" value={`${globalAvgCompleteness}%`}>
+        <StatCard label="Avg Completeness" value={`${globalAvgCompleteness.toFixed(1)}%`}>
           <TrendIndicator runs={trendRuns} />
         </StatCard>
         <StatCard label="Total Records" value={totalRecords.toLocaleString()} />
@@ -443,7 +437,7 @@ export async function TablebaseCoverageContent() {
                     <TrendDelta delta={ts.trendDelta} />
                   </div>
                   <span className="text-xs text-muted-foreground tabular-nums">
-                    {ts.entityCount} entities, {ts.totalRecords.toLocaleString()} records, avg {ts.avgCompleteness}%
+                    {ts.entityCount} entities, {ts.totalRecords.toLocaleString()} records, avg {ts.avgCompleteness.toFixed(1)}%
                   </span>
                 </div>
                 <CompletenessBar stats={ts} />
@@ -504,7 +498,7 @@ export async function TablebaseCoverageContent() {
                       {run.totalItems.toLocaleString()}
                     </td>
                     <td className="py-2 pr-4 text-right tabular-nums">
-                      {run.avgCompleteness}%
+                      {run.avgCompleteness.toFixed(1)}%
                     </td>
                     <td className="py-2 text-right tabular-nums">
                       {run.totalRecordsSum.toLocaleString()}

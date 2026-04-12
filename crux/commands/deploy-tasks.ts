@@ -457,3 +457,40 @@ Examples:
   pnpm crux gh deploy-tasks verify                # Run verify commands for pending tasks
   pnpm crux gh deploy-tasks verify --dry-run      # Show what would run`;
 }
+
+// ---------------------------------------------------------------------------
+// Command injection prevention for deploy-task verification
+// ---------------------------------------------------------------------------
+
+const ALLOWED_PATTERNS: RegExp[] = [
+  // gh run list/view — only for workflow status checks
+  /^gh run (?:list|view) --workflow="[\w.-]+" --limit=\d+ --json [\w,]+$/,
+  // Health endpoint — only $WIKI_SERVER_URL/health piped to jq
+  /^curl -sf "\$WIKI_SERVER_URL\/health" \| jq \.$/,
+  // Migration check — only SELECT from drizzle migrations
+  /^psql "\$DATABASE_URL" -c "SELECT \* FROM drizzle\.__drizzle_migrations ORDER BY created_at DESC LIMIT \d+;"$/,
+  // Route check — only $WIKI_SERVER_URL paths, no traversal
+  /^curl -sf "\$WIKI_SERVER_URL\/[\w/.-]+" -o \/dev\/null -w "%\{http_code\}"$/,
+  // Build check — specific pnpm commands
+  /^pnpm build-data:content && echo "Build data OK"$/,
+];
+
+/**
+ * Validate a deploy-task verification command against allowed patterns.
+ * Prevents command injection by only allowing known-safe patterns.
+ */
+export function isAllowedCommand(cmd: string): boolean {
+  if (!cmd) return false;
+  // Block command substitution
+  if (/\$\(|`/.test(cmd)) return false;
+  // Block path traversal
+  if (/\.\.\//.test(cmd)) return false;
+  // Block multiple pipes (beyond the single allowed health-check pipe)
+  if ((cmd.match(/\|/g) || []).length > 1) return false;
+  // Block unquoted semicolons (command chaining). Semicolons inside
+  // double-quoted strings (like psql -c "...;") are safe.
+  if (/;(?=(?:[^"]*"[^"]*")*[^"]*$)/.test(cmd)) return false;
+  // Block && except in approved build patterns
+  if (/&&/.test(cmd) && !ALLOWED_PATTERNS.some((p) => p.test(cmd))) return false;
+  return ALLOWED_PATTERNS.some((p) => p.test(cmd));
+}
