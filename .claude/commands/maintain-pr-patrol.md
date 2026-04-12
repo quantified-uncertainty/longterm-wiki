@@ -9,6 +9,26 @@ Scan all open PRs for issues and fix them in priority order.
 
 **CONTINUOUS OPERATION:** After completing a scan+fix cycle, wait 2-3 minutes then scan again. Keep looping until the user says to stop or switches tasks. Do NOT stop after one pass and wait for re-invocation — "patrol" means continuous monitoring.
 
+## Health gate — MANDATORY first step each cycle
+
+Before scanning or fixing any PR, check fleet-level health. The daemon (`crux/pr-patrol/index.ts`) does this automatically at the start of `runCheckCycle`, but if you're running patrol by hand, invoke it explicitly:
+
+```bash
+pnpm exec tsx -e "import('./crux/pr-patrol/health-gate.ts').then(m => m.runHealthGate().then(d => { console.log(JSON.stringify({ proceed: d.proceed, reason: d.reason, emitted: d.emittedIssues.length }, null, 2)); process.exit(d.proceed ? 0 : 2); }))"
+```
+
+If the gate returns `proceed: false` (exit code 2), it has already logged the escalation and written a `health_gate_tripped` JSONL event. **Do NOT then go fix PRs** — the gate's entire purpose is to stop the symptom-patch cycle.
+
+When the gate is red, **DO NOT**:
+- Bump a ratchet baseline to unblock a CI signal
+- Revert a rename because endpoints are 404ing on prod (the deploy is probably stuck, not the rename)
+- Dispatch an agent to fix a PR whose failure is a symptom of the fleet-level issue
+- Merge a "fix the fix" PR into a pipeline that's already broken
+
+Instead: escalate to the coordinator. The escalation reason names the specific subsystem (deploy pipeline, main CI, ratchet drift) and points at the prescriptive fix pattern. See `.claude/rules/patrol-health-gate.md`.
+
+Emergency escape hatch: `PATROL_DISABLE_HEALTH_GATE=1` bypasses the gate entirely. Use ONLY when the gate itself is broken, never to work around a red prod.
+
 ## Branch Agent mode (Phase 1 — per-PR watchdog)
 
 For PRs needing sustained attention, use **branch-agent** instead of waiting for the daemon:

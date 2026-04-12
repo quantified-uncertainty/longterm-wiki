@@ -113,6 +113,7 @@ import {
 } from './execution.ts';
 import { checkDeployHealth as libCheckDeployHealth } from '../lib/pr-analysis/deploy-status.ts';
 import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
+import { runHealthGate } from './health-gate.ts';
 import { runReflection } from './reflection.ts';
 
 const cl = getColors();
@@ -275,6 +276,25 @@ async function runCheckCycle(
   config: PatrolConfig,
 ): Promise<void> {
   logHeader(`Check cycle #${cycleCount}`);
+
+  // 0. Health gate (QUA-300 Phase 3) — check fleet-level signals FIRST.
+  // If any of deploy-stuck / main-ci-red / ratchet-drift fires, skip PR work
+  // this cycle and escalate. This is the precondition that keeps patrol from
+  // churning out symptom-fix PRs while a deploy is stuck or a ratchet is
+  // drifting. See .claude/rules/patrol-health-gate.md for the rationale.
+  const gate = await runHealthGate();
+  if (!gate.proceed) {
+    appendJsonl(JSONL_FILE_INTERNAL, {
+      type: 'cycle_summary',
+      cycle_number: cycleCount,
+      prs_scanned: 0,
+      queue_size: 0,
+      pr_processed: null,
+      health_gate_tripped: true,
+      health_gate_reason: gate.reason,
+    });
+    return;
+  }
 
   // 0a. Check if a tracked main-branch fix PR has been merged
   let skipMainFix = false;
