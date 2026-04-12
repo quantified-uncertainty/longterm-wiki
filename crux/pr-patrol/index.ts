@@ -92,12 +92,13 @@ import {
   setCodeRabbitRetryTime,
 } from './state.ts';
 import {
-  detectAllPrIssuesFromNodes,
+  applyStuckCycleDetection,
+  detectAllPrIssues,
   detectPrOverlaps,
   fetchOpenPrs as daemonFetchOpenPrs,
 } from './detection.ts';
 import { detectCodeRabbitRateLimited } from '../lib/pr-analysis/detection.ts';
-import { rankPrs as daemonRankPrs } from './scoring.ts';
+import { rankPrsWithDeps as daemonRankPrs } from './scoring.ts';
 import {
   findMergeCandidates as daemonFindMergeCandidates,
   enqueuePr,
@@ -339,7 +340,14 @@ async function runCheckCycle(
 
   // ── Fix phase ──────────────────────────────────────────────────────
 
-  const detected = detectAllPrIssuesFromNodes(allPrs, config);
+  const detected = await detectAllPrIssues(allPrs, config);
+
+  // Annotate detected PRs with stuck-cycle metadata and persist per-PR
+  // snapshots. Runs after detection so stuckCycles / stuck issue are
+  // available to scoring and dispatch. Best-effort — errors are logged
+  // inside applyStuckCycleDetection and do not abort the cycle.
+  await applyStuckCycleDetection(detected, allPrs);
+
   let fixedPr: number | null = null;
 
   // 1b. Check for PR file overlaps (informational — posts warnings)
@@ -372,8 +380,18 @@ async function runCheckCycle(
         log('');
         log(`${cl.bold}Fix queue${cl.reset} (${ranked.length} items):`);
         for (const pr of ranked) {
+          // Render dependency chain `#A → #B` when blockedOnPrs is populated,
+          // so operators see which open PRs this one is waiting on. Cap at 3
+          // to keep lines readable; common case is 1–2.
+          const deps = (pr.blockedOnPrs ?? []).slice(0, 3);
+          const depChain = deps.length > 0
+            ? ` ${cl.yellow}→ blocked on ${deps.map((d) => `#${d.pr}`).join(', ')}${cl.reset}`
+            : '';
+          const moreDeps = (pr.blockedOnPrs?.length ?? 0) > 3
+            ? ` ${cl.dim}(+${(pr.blockedOnPrs?.length ?? 0) - 3} more)${cl.reset}`
+            : '';
           log(
-            `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')} ${cl.dim}—${cl.reset} ${pr.title}`,
+            `  [score=${pr.score}] PR ${cl.cyan}#${pr.number}${cl.reset}: ${pr.issues.join(',')}${depChain}${moreDeps} ${cl.dim}—${cl.reset} ${pr.title}`,
           );
         }
         log('');

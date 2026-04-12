@@ -51,6 +51,27 @@ Reference implementations: `0108_natural_key_uniqueness.sql`, `0143_dedup_fundin
 
 The gate check (`validate-drizzle-journal.ts`) warns if it detects CREATE UNIQUE INDEX with hardcoded DELETEs.
 
+## Adding CHECK constraints on enum columns — MANDATORY pattern
+
+**Never write a CHECK constraint's allowed-value list from code or memory.** Enumerate against prod data first, or the migration will fail when it encounters values the author didn't know existed.
+
+Incident context: two enum-gap incidents in the same week. Migration 0173's `groundskeeper_runs.event` constraint omitted three valid values already in prod (`circuit_breaker_reset`, `half_open_attempt`, `half_open_success`), blocking the #4167 release at ArgoCD PreSync until #4178 landed. `service_health_incidents.severity` shipped with a similarly incomplete allowlist and needed #4202. Both root-caused to the same mistake: author inspected the TypeScript enum / Zod schema instead of querying the column's live distinct values.
+
+(Note: migration 0173's `chk_hrs_level` *also* caused a separate ~12h outage (QUA-302), but that was lock contention, not an enum gap — see the `NOT VALID` pattern below.)
+
+**Required procedure before writing any `CHECK (col IN (...))` constraint:**
+
+1. Query prod for the full distinct-value set:
+   ```sql
+   SELECT col, count(*) FROM my_table GROUP BY col ORDER BY count DESC;
+   ```
+2. Paste the output into the PR description under a `### Enum enumeration` heading.
+3. Build the `IN (...)` list from that output, not from an enum type, TypeScript union, or your recollection of "the valid values."
+4. If the live set contains values you think should be invalid, **add them to the constraint anyway** and file a separate cleanup ticket. A migration is not the place to retroactively narrow an enum.
+5. For large tables, combine with the `NOT VALID` + `VALIDATE CONSTRAINT` pattern below.
+
+This applies equally to new constraints and to ALTERing existing ones to a tighter set.
+
 ## When Drizzle migrations work fine
 
 Most migrations: adding columns, creating tables, adding indexes on small tables, inserting rows. These complete in seconds and work through the normal Drizzle migration runner.
@@ -73,6 +94,25 @@ Most migrations: adding columns, creating tables, adding indexes on small tables
 5. Apply via `psql "$DATABASE_MIGRATION_URL" -f apps/wiki-server/scripts/<name>.sql`
 
 See `apps/wiki-server/drizzle/0048_add_slug_and_integer_id.sql` (no-op) and `apps/wiki-server/scripts/phase4a-manual-migration.sql` (actual DDL) for a reference implementation.
+
+### Pattern: `ADD CONSTRAINT ... NOT VALID` + separate `VALIDATE CONSTRAINT`
+
+For CHECK constraints on large tables (>100 MB or >1M rows), plain `ALTER TABLE ... ADD CONSTRAINT CHECK (...)` scans every row while holding ACCESS EXCLUSIVE — any concurrent reader (especially materialized-view refreshes) can keep the migration client waiting past the 60s `lock_timeout`. Split the DDL in two:
+
+```sql
+-- Phase 1: register the constraint as unchecked metadata.
+-- Acquires ACCESS EXCLUSIVE for milliseconds; no row scan.
+ALTER TABLE my_big_table
+  ADD CONSTRAINT my_constraint CHECK (col IN ('a','b','c')) NOT VALID;
+
+-- Phase 2: validate against existing rows.
+-- Only needs SHARE UPDATE EXCLUSIVE — concurrent SELECT/INSERT/UPDATE are allowed.
+ALTER TABLE my_big_table VALIDATE CONSTRAINT my_constraint;
+```
+
+Both phases enforce the constraint on new writes once Phase 1 lands. Phase 2 can follow in the same migration, a follow-up migration, or a manual script.
+
+**Post-mortem — 2026-04-12 incident (QUA-302, QUA-156):** Migration 0173 added `chk_hrs_level CHECK (...)` directly on `hallucination_risk_snapshots` (905 MB, 3.3M rows). The concurrent `REFRESH MATERIALIZED VIEW hallucination_risk_latest` held AccessShareLock continuously, so every deploy retry exhausted the 60s `lock_timeout` and rolled back the whole PreSync job. The failure cascaded into ~7 symptom-management PRs before root cause was identified — prod was stuck on a ~12-hour-old image the whole time. Unstick path: manually applied the constraint with `NOT VALID` (milliseconds), then `VALIDATE CONSTRAINT` (5.8s, non-blocking), then re-ran the deploy. Follow-up: QUA-294 proposes a gate validator that flags `ADD CONSTRAINT` on a hot list of large tables unless `NOT VALID` is used.
 
 ### Pattern: batched UPDATE for large backfills
 

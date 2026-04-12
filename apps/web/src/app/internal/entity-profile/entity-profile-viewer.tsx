@@ -20,6 +20,7 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
+import { isEntityRefColumn } from "./entity-ref-columns";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -41,12 +42,6 @@ interface Section {
   total: number;
   error?: string;
   recordType?: string;
-}
-
-interface DisplayNameEntry {
-  title: string;
-  slug: string;
-  entityType: string;
 }
 
 interface DisplayNameEntry {
@@ -169,6 +164,10 @@ const HIDDEN_COLUMNS: Record<string, Set<string>> = {
   fundingRounds: new Set(["company_id", "company_display_name", "lead_investor", "lead_investor_display_name", "raised_low", "raised_high", "valuation_low", "valuation_high"]),
   policyStakeholders: new Set(["stakeholder_display_name"]),
   divisionPersonnel: new Set(["person_display_name"]),
+  // Hide redundant entity_id (always the entity being viewed) and internal IDs
+  facts: new Set(["entity_id"]),
+  entityResources: new Set(["entity_id"]),
+  things: new Set(["parent_thing_id", "source_table", "source_id"]),
 };
 
 /** Human-readable header overrides for entity reference columns */
@@ -184,8 +183,10 @@ const COLUMN_HEADER_OVERRIDES: Record<string, string> = {
   policy_entity_id: "Policy",
   entity_id: "Entity",
   parent_org_id: "Parent Org",
+  parent_thing_id: "Parent",
   person_id: "Person",
   organization_id: "Organization",
+  subject: "Subject Entity",
 };
 
 // ── Entity ref hover card ──────────────────────────────────────────────────
@@ -339,13 +340,7 @@ function CellValue({
   }
 
   // Entity reference columns -> show resolved name as link
-  const isEntityRef =
-    columnName.endsWith("EntityId") ||
-    columnName.endsWith("_entity_id") ||
-    columnName === "stableId" ||
-    columnName === "stable_id" ||
-    columnName === "parentOrgId" ||
-    columnName === "parent_org_id";
+  const isEntityRef = isEntityRefColumn(columnName);
 
   if (isEntityRef && typeof value === "string" && isAnySid(value)) {
     const resolved = displayNames?.[value];

@@ -1253,3 +1253,32 @@
     - ai-governance
     - political-stability
   lastUpdated: 2026-03
+
+- id: actor-power-scorecard
+  stableId: sid_aMPsEgUMdg
+  wikiId: E2236
+  type: concept
+  title: Actor Power Scorecard
+  description: >-
+    An interactive reference table scoring specific AI-era actors — governments, labs,
+    investors, compute providers, military bodies, and civil-society organizations — on
+    their likelihood of exerting power, the magnitude of that power, and the expected
+    impact on AI development trajectories.
+  tags:
+    - ai-governance
+    - power-mapping
+  lastUpdated: 2026-04
+
+- id: ai-governance-interventions-timeline
+  stableId: sid_GXw69xloQw
+  wikiId: E2237
+  type: concept
+  title: AI Governance Interventions Timeline
+  description: >-
+    A chronological data table of major AI governance interventions from 2022 to 2026,
+    tracking executive orders, legislation, international agreements, and industry
+    commitments with assessments of their effectiveness.
+  tags:
+    - ai-governance
+    - regulation
+  lastUpdated: 2026-04

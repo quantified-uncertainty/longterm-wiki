@@ -1226,6 +1226,13 @@
       "when": 1784534400000,
       "tag": "0174_fix_groundskeeper_event_constraint",
       "breakpoints": true
+    },
+    {
+      "idx": 175,
+      "version": "7",
+      "when": 1784620800000,
+      "tag": "0175_fix_shi_severity_constraint",
+      "breakpoints": true
     }
   ]
 }

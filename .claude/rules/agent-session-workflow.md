@@ -58,6 +58,28 @@ Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
 ## Step 2: Session End — BEFORE considering work complete
 
+### Step 2a: Enumerate every problem you observed this session — MANDATORY
+
+Before running `/agent-ship` or `/agent-end`, produce an explicit list of **every problem you noticed during the session**, including ones that weren't part of your task. For each, mark one of three dispositions:
+
+- `fixed` — resolved inside the PR(s) this session shipped. No ticket needed.
+- `filed:QUA-NNN` — a Linear (or legacy GitHub) ticket exists. Paste the ID. If you're the one filing, file before ending.
+- `deferred:<reason>` — knowingly not fixed and not filed. Reason must be one the user would accept (e.g., "out of scope and already known — see QUA-NNN", "speculative, no observed impact yet"). "I'll remember" is not a valid deferral.
+
+This list should appear in your session-end summary to the user, verbatim. Example:
+
+```
+Observed this session:
+- Build fails for entities without lastEdited         → filed:QUA-412
+- Duplicate validation block in gate.ts               → deferred: tech debt, not blocking
+- /internal/facts 404 on prod                         → fixed (this PR)
+- QUA-156 marked Done but migration actually stuck    → filed:QUA-302 (Urgent)
+```
+
+You cannot end the session until every observation has a disposition. **"I'll remember for next time" is explicitly forbidden** — the 2026-04-11 incident cascade happened because problems were noticed but never tracked. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags" for which observations *must* be filed (not just deferred).
+
+### Step 2b: Close out
+
 **If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
 
 **If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.

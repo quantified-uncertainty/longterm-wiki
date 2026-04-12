@@ -22,6 +22,8 @@ pnpm crux sys agent-checklist init "Task description" --type=X   # if not on an 
 
 At session end, run `/agent-ship` (if shipping a PR) or `/agent-end` (if not). Never push directly to `main`.
 
+**Track what you discover.** Before ending any session, enumerate every problem you observed and mark each `fixed | filed:QUA-NNN | deferred:<reason>`. Certain red flags (prod incidents, symptom patches, misdiagnoses, premature "Done", N+ repeated symptoms) MUST produce a Linear ticket — "I'll remember" is not a valid disposition. See `.claude/rules/proactive-github-filing.md` § "Mandatory tracking" and `.claude/rules/agent-session-workflow.md` § "Step 2a".
+
 ## Quick Reference
 
 Commands are organized into groups by data layer. Use short prefixes for convenience:
@@ -152,8 +154,21 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 
 - **Thorough over fast.** Robust implementations that handle edge cases beat quick ones that only cover the happy path. See `.claude/rules/implementation-quality.md`.
 
+## Problem-Solving: Fix Systems, Not Instances
+
+When you encounter any problem — a bug, a process failure, a repeated mistake — **do not jump to fixing the specific instance.** First, think one or more levels up:
+
+1. **What class of problem is this?** (e.g., "patrol missed a check" → "check name matching is brittle")
+2. **What systemic change prevents the entire class?** (e.g., use substring matching instead of exact strings)
+3. **Can you go even more meta?** (e.g., "why do we have hardcoded names at all? Can we derive them from the API?")
+4. **Implement the systemic fix** — update code, rules, hooks, docs, or tests
+5. **Then** fix the specific instance
+
+This applies to everything: code bugs, process failures, documentation gaps, agent behavior issues. The goal is that each problem you encounter makes the system permanently more robust, not just patches the symptom. Inspired by Toyota's 5 Whys, Google SRE blameless postmortems, and the principle that you can't fix behavior but you can fix systems.
+
 ## Key Conventions
 
+- **Slot isolation — CRITICAL**: Each agent slot (`a1`–`a20`) is an independent workspace that may have an active Claude session. **NEVER** interact with slots you don't own: no `cd` into them, no dispatching subagents to them, no killing their tmux windows, no running commands in their directories. If you need branch isolation for PR fixes, use `/tmp/` worktrees from the `main/` clone. If you need to kill a process or tmux window, **ask the user first** — what looks idle from outside may have active work. Violating this rule has caused data loss (destroyed active sessions with in-progress work). See `.claude/rules/slot-isolation.md`.
 - **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. **Do NOT use `isolation: "worktree"` in Agent calls** — it has a [confirmed Claude Code bug](https://github.com/anthropics/claude-code/issues/42282) that corrupts the parent session's working directory and bricks the session. For branch isolation, use agent workspace slots (`lw/a1`–`lw/a15`). See `.claude/rules/worktree-isolation-bug.md`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
 - **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
 - **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`

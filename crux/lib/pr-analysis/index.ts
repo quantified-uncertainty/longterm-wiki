@@ -25,6 +25,9 @@
 export type {
   PrIssueType,
   BotComment,
+  BlockingComment,
+  BlockedOnPr,
+  FreshCheckRun,
   DetectedPr,
   ScoredPr,
   MergeBlockReason,
@@ -32,6 +35,9 @@ export type {
   MainBranchStatus,
   RecentMerge,
   GqlReviewThread,
+  GqlIssueComment,
+  GqlCrossReferencedEvent,
+  GqlCrossReferencedEventSource,
   GqlPrNode,
   PrOverlap,
   AutoRebaseResult,
@@ -43,10 +49,14 @@ export { ADVISORY_ISSUES } from './types.ts';
 
 export {
   extractBotComments,
+  extractBlockingComments,
+  isSelfAuthored,
   detectIssues,
   detectCodeRabbitRateLimited,
   fetchOpenPrs,
   fetchSinglePr,
+  fetchFreshCheckRuns,
+  diffCheckRunsVsRollup,
   detectOverlaps,
 } from './detection.ts';
 
@@ -78,3 +88,13 @@ export type { DeployHealthStatus } from './deploy-status.ts';
 // ── Automated rebase ─────────────────────────────────────────────────────────
 
 export { tryAutomatedRebase } from './rebase.ts';
+
+// ── Cross-PR dependencies (QUA-287 Phase 3) ─────────────────────────────────
+
+export {
+  extractPrRefTokens,
+  validatePrRefs,
+  extractCrossReferencedPrs,
+  populateBlockedOnPrs,
+  computeBlocksCount,
+} from './cross-pr-deps.ts';

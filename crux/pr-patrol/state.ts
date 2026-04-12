@@ -4,6 +4,7 @@
 
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, unlinkSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import lockfile from 'proper-lockfile';
 import { getColors } from '../lib/output.ts';
 
 // ── Paths ────────────────────────────────────────────────────────────────────
@@ -71,6 +72,60 @@ export function appendJsonl(file: string, entry: Record<string, unknown>): void 
     file,
     JSON.stringify({ ...entry, timestamp: new Date().toISOString() }) + '\n',
   );
+}
+
+/**
+ * Append a JSONL entry while holding an exclusive file lock, so concurrent
+ * patrol runs (e.g., two slots calling `pr-patrol once` simultaneously) don't
+ * produce interleaved / truncated lines.
+ *
+ * Uses a sibling `.lock` directory next to the target file. Each call retries
+ * briefly on contention and always releases the lock in a finally block.
+ *
+ * Falls back to a plain appendFileSync on any lock-setup error so writes are
+ * never lost — worst case, we risk corruption of a single line, which the
+ * readAllEntries skip-malformed-line tolerance already handles.
+ */
+export async function appendJsonlLocked(
+  file: string,
+  entry: Record<string, unknown>,
+): Promise<void> {
+  const line =
+    JSON.stringify({ ...entry, timestamp: new Date().toISOString() }) + '\n';
+
+  // proper-lockfile requires the locked file to exist; create it if missing.
+  if (!existsSync(file)) {
+    try {
+      writeFileSync(file, '', { flag: 'a' });
+    } catch {
+      /* best-effort; fall through */
+    }
+  }
+
+  let release: (() => Promise<void>) | null = null;
+  try {
+    release = await lockfile.lock(file, {
+      retries: { retries: 10, minTimeout: 20, maxTimeout: 200 },
+      stale: 10_000, // stale locks expire after 10s
+    });
+    appendFileSync(file, line);
+  } catch {
+    // Lock acquisition failed — fall back to unlocked append.
+    // The reader already skips malformed lines, so a rare interleave is tolerable.
+    try {
+      appendFileSync(file, line);
+    } catch {
+      /* best-effort */
+    }
+  } finally {
+    if (release) {
+      try {
+        await release();
+      } catch {
+        /* best-effort */
+      }
+    }
+  }
 }
 
 // ── Cooldown tracking ────────────────────────────────────────────────────────
@@ -484,4 +539,131 @@ export function getParallelState(): ParallelState | null {
 
 export function setParallelState(state: ParallelState): void {
   writeFileSync(PARALLEL_STATE_FILE, JSON.stringify(state, null, 2));
+}
+
+// ── Stuck-cycle detection (same-state consecutive cycles) ───────────────────
+//
+// A PR is "stuck" when the same (mergeable, rollupConclusion, blockingCommentCount)
+// signal repeats for N cycles without change — even if the agent pushed new
+// commits. This catches:
+//   - Silent gate-blocked retries (push, CI still fails the same way)
+//   - Maintainer-blocking-comment loops where patrol rebases past feedback
+//   - Same CI-failure reason after supposed "fix"
+//
+// IMPORTANT: the fingerprint deliberately EXCLUDES headSha. Including it would
+// reset the counter on every push, which is exactly the oscillation pattern we
+// want to detect (push → still broken → push → still broken).
+
+export interface PrCycleSnapshot {
+  type: 'pr_cycle_snapshot';
+  timestamp: string;
+  pr_num: number;
+  /** `${mergeable}:${rollupConclusion}:${blockingCommentCount}` — see stateFingerprint() */
+  fingerprint: string;
+  head_sha?: string;
+  mergeable?: string;
+  rollup_conclusion?: string;
+  blocking_comment_count?: number;
+}
+
+/**
+ * Compute the stability fingerprint for a PR's current state.
+ *
+ * The fingerprint is deliberately coarse so that:
+ *   - Pushing new commits (new headSha) still counts as "stuck" if the
+ *     mergeable / rollup / comment signal didn't change.
+ *   - Tiny rollup timing variations (SUCCESS ↔ EXPECTED, PENDING ↔ null)
+ *     resolve to a single bucket.
+ */
+export function stateFingerprint(parts: {
+  mergeable?: string | null;
+  rollupConclusion?: string | null;
+  blockingCommentCount?: number | null;
+}): string {
+  const m = (parts.mergeable ?? 'UNKNOWN').toString().toUpperCase();
+  const r = (parts.rollupConclusion ?? 'NONE').toString().toUpperCase();
+  const c = Number.isFinite(parts.blockingCommentCount ?? NaN)
+    ? Number(parts.blockingCommentCount)
+    : 0;
+  return `${m}:${r}:${c}`;
+}
+
+/**
+ * Read the most-recent N `pr_cycle_snapshot` entries for a PR from JSONL,
+ * in newest-first order. Malformed lines are skipped.
+ *
+ * Reads the whole file (patrol JSONL is small — thousands of lines at most
+ * and rotates implicitly via patrol retention). If the file grows very large
+ * in the future we can add a tail-window optimization.
+ */
+export function readRecentPrCycles(
+  prNumber: number,
+  limit = 50,
+  file: string = JSONL_FILE,
+): PrCycleSnapshot[] {
+  if (!existsSync(file)) return [];
+  const content = (() => {
+    try {
+      return readFileSync(file, 'utf-8');
+    } catch {
+      return '';
+    }
+  })();
+  if (!content) return [];
+
+  const out: PrCycleSnapshot[] = [];
+  // Iterate lines back-to-front so we can early-exit when we hit `limit`.
+  const lines = content.split('\n');
+  for (let i = lines.length - 1; i >= 0 && out.length < limit; i--) {
+    const raw = lines[i];
+    if (!raw) continue;
+    try {
+      const parsed = JSON.parse(raw);
+      if (
+        parsed &&
+        typeof parsed === 'object' &&
+        parsed.type === 'pr_cycle_snapshot' &&
+        parsed.pr_num === prNumber &&
+        typeof parsed.fingerprint === 'string'
+      ) {
+        out.push(parsed as PrCycleSnapshot);
+      }
+    } catch {
+      // Skip malformed lines (pre-lock corruption, partial writes, etc.)
+    }
+  }
+  return out;
+}
+
+/**
+ * Count how many of the most-recent consecutive snapshots match
+ * `currentFingerprint` in newest-first order. Stops at the first mismatch.
+ *
+ * **Important**: this counts snapshots already persisted to the JSONL log.
+ * Callers should decide whether to write the current cycle's snapshot
+ * before or after invoking this — the convention used in detection.ts is:
+ *   1. Call this with the current fingerprint → get `priorMatching`
+ *   2. Compute `stuckCycles = priorMatching + 1` (includes current cycle)
+ *   3. Persist the current snapshot
+ *
+ * Example returns:
+ *   - 0 → no recorded cycles match the fingerprint (first occurrence)
+ *   - 1 → last snapshot matches, one before it differs
+ *   - 3 → last 3 snapshots match, a 4th differs (so this is the 4th stuck cycle)
+ */
+export function countConsecutiveCycles(
+  prNumber: number,
+  currentFingerprint: string,
+  file: string = JSONL_FILE,
+): number {
+  const history = readRecentPrCycles(prNumber, 50, file);
+  let n = 0;
+  for (const snap of history) {
+    if (snap.fingerprint === currentFingerprint) {
+      n++;
+    } else {
+      break; // streak broken
+    }
+  }
+  return n;
 }

@@ -1,0 +1,13 @@
+{
+  "table": "personnel",
+  "recordCount": 42,
+  "submittedAt": "2026-04-12T00:00:00Z",
+  "organization": "FAR AI (sid_lCiT37k9pA)",
+  "source": "https://www.far.ai/about/team",
+  "notes": "Full team enrichment from FAR AI team page. 42 new personnel records added covering leadership, operations, technical staff, communications, events/programs, and board members.",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 42,
+    "bypass": "forceSkipSourceCheck - new enrichment, manually verified from team page 2026-04-12"
+  }
+}

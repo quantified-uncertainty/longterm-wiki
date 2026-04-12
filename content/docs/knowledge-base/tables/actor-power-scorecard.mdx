@@ -1,0 +1,231 @@
+---
+wikiId: E2236
+title: Actor Power Scorecard
+description: An interactive reference table scoring specific AI-era actors—governments, labs, investors, compute providers, military bodies, and civil-society organizations—on their likelihood of exerting power, the magnitude of that power, and the expected impact on AI development trajectories.
+sidebar:
+  order: 50
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A structured scorecard rating ~40 AI-era actors across governments, labs, compute providers, military bodies, and civil society on likelihood, magnitude, and expected impact; useful as a living reference for tracking power dynamics in AI development, though scores are inherently subjective snapshots and the methodology conflates capability with intent. The self-aware Methodological Caveats section substantially mitigates concerns about false precision.
+balanceFlags:
+  - single-source-dominance
+  - missing-primary-sources
+  - unsourced-biographical-details
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+The **Actor Power Scorecard** is a structured reference table complementing the <EntityLink id="E418">AI Safety Multi-Actor Strategic Landscape</EntityLink> analysis. It scores roughly forty specific actors—national governments, AI laboratories, capital providers, compute infrastructure suppliers, military commands, industry bodies, philanthropists, and think tanks—on three primary dimensions: the probability that the actor will actively exert power over AI development trajectories (**likelihood**, 0–1), the magnitude of that power if exercised (**magnitude**, 1–5), and the **expected impact** computed as their product. Each row also records a primary mechanism, an indicative time horizon, and brief evidence notes. The scorecard is intended as a living document; the changelog at the bottom tracks substantive revisions.
+
+For conceptual framing of why actor power matters for AI safety, see the companion article on <EntityLink id="E68">AI-Driven Concentration of Power</EntityLink> and the associated <EntityLink id="E69">Concentration of Power Systems Model</EntityLink>.
+
+---
+
+## Methodology
+
+### Scoring Dimensions
+
+**Likelihood (0–1)** estimates the probability that the actor will make a consequential move—regulatory, financial, technical, or military—affecting frontier AI development within its stated time horizon. A score of 1.0 indicates near-certainty of ongoing, high-salience action; 0.1 indicates an actor with latent capability that rarely exercises it.
+
+**Magnitude (1–5)** estimates the scale of impact *conditional on* the actor acting. The scale is roughly logarithmic:
+
+| Score | Interpretation |
+|-------|----------------|
+| 1 | Marginal: affects a single product line or research programme |
+| 2 | Moderate: affects a company's strategy or a national research budget |
+| 3 | Significant: shapes industry norms, standards, or multi-country policy |
+| 4 | Major: shifts global supply chains, geopolitical posture, or frontier capabilities |
+| 5 | Transformative: could restructure international power balances or AI development trajectories on a civilisational scale |
+
+**Expected Impact** = Likelihood × Magnitude. This is an ordinal product useful for relative comparison, not a calibrated probability estimate. Scores above 3.0 warrant close monitoring; scores above 4.0 represent actors whose decisions are plausibly trajectory-altering.
+
+**Time Horizon** is categorised as:
+- **Short** — 0–2 years
+- **Medium** — 2–7 years
+- **Long** — 7+ years
+
+### Limitations
+
+Scores reflect a specific snapshot of actor capabilities and incentives and will become stale. Magnitude scores are especially uncertain for actors whose power rests on novel or untested mechanisms (e.g., a newly capitalised lab or an emerging regulatory framework). Likelihood scores conflate *willingness* and *capability*; the two can diverge sharply. Users should treat this table as a structured starting point for deliberation rather than a definitive ranking.
+
+---
+
+## Quick Assessment
+
+The five highest expected-impact actors across all categories are:
+
+| Actor | Likelihood | Magnitude | Expected Impact |
+|-------|-----------|-----------|----------------|
+| US Federal Government | 0.95 | 5 | 4.75 |
+| China State (CCP/State Council) | 0.95 | 5 | 4.75 |
+| NVIDIA | 0.90 | 5 | 4.50 |
+| OpenAI | 0.90 | 4 | 3.60 |
+| Google DeepMind | 0.90 | 4 | 3.60 |
+
+---
+
+## Main Scorecard Table
+
+The table is sorted by Expected Impact descending. All scores are current best estimates and subject to revision.
+
+### Governments
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| US Federal Government | 0.95 | 5 | 4.75 | Short–Long | Export controls, compute policy, federal R&D funding, national security directives, standards via NIST | Maintains world's largest AI R&D ecosystem; export controls on advanced chips (BIS rules) constrain global supply; Executive Orders have repeatedly reshaped lab obligations; DoD and intelligence community are major procurement drivers |
+| China State (CCP/State Council) | 0.95 | 5 | 4.75 | Short–Long | State-directed industrial policy, domestic chip development, regulatory mandates, military-civil fusion | National AI strategy targets self-sufficiency; domestically mandated deployment across public sector; PLA integration; DeepSeek demonstrates frontier capability emerging from state-adjacent ecosystem |
+| EU Commission | 0.85 | 4 | 3.40 | Short–Medium | Binding regulation (EU AI Act), GDPR enforcement, market access conditions | EU AI Act creates tiered obligations for "general-purpose" and "high-risk" AI; Brussels Effect means standards propagate globally; enforcement credibility being tested in 2025–2026 |
+| UK Government | 0.70 | 3 | 2.10 | Short–Medium | Frontier AI Safety Institute (now DSIT), voluntary commitments, Bletchley Process diplomacy | Punches above weight via convening power (Bletchley, Seoul, Paris summits); AI Safety Institute produces evaluations but lacks binding authority; modest domestic compute investment |
+| India Government | 0.65 | 3 | 1.95 | Medium–Long | IndiaAI Mission compute procurement, data localisation, standards diplomacy | IndiaAI Mission targets \$1B+ state investment in GPU clusters; large domestic market creates leverage; regulatory posture still forming; significant talent export to frontier labs |
+| UAE (TII / ADMO) | 0.60 | 3 | 1.80 | Medium | Sovereign capital deployment (G42, MGX), Falcon model family, compute diplomacy | Sovereign wealth channels large compute purchases; active in brokering US–Gulf AI partnerships; Falcon series demonstrates frontier ambition; geopolitical positioning between US and China creates uncertainty |
+| Japan Government | 0.55 | 3 | 1.65 | Medium | G7 Hiroshima AI Process, compute subsidies, AIST research | Hosts major multilateral process; domestic investment in semiconductor resurgence (Rapidus); limited frontier lab presence reduces direct capability leverage |
+| France Government | 0.55 | 3 | 1.65 | Short–Medium | Mistral investment, EU negotiating position, Bletchley/Paris summits | Mistral partly reflects French strategic interest in European AI sovereignty; Macron government publicly champions AI investment; shapes EU AI Act implementation |
+| South Korea Government | 0.50 | 3 | 1.50 | Medium | Samsung/SK Hynix HBM supply, domestic AI chip policy | Controls critical HBM memory supply chain (Samsung, SK Hynix); government export-control alignment with US determines supply availability for AI accelerators |
+
+### AI Laboratories
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| <EntityLink id="E218">OpenAI</EntityLink> | 0.90 | 4 | 3.60 | Short–Medium | Frontier model deployment, API ecosystem lock-in, policy lobbying, safety norm-setting | Largest deployed user base; GPT series sets de facto capability benchmarks; \$157B valuation (late 2024); safety commitments (RSP) influence industry norms; Microsoft dependency creates structural tension |
+| <EntityLink id="E98">Google DeepMind</EntityLink> | 0.90 | 4 | 3.60 | Short–Medium | Gemini deployment at Google scale, TPU infrastructure, research publications, safety research | Alphabet integration gives unmatched distribution; TPU supply chain partially insulates from NVIDIA dependency; AlphaFold/AlphaMissense illustrate scientific leverage; strong safety research output |
+| <EntityLink id="E22">Anthropic</EntityLink> | 0.85 | 4 | 3.40 | Short–Medium | Claude deployment, Constitutional AI research, policy engagement, RSP standard | Well-capitalised (Amazon \$4B+ commitment); Claude series competitive at frontier; Constitutional AI and RSP have influenced safety norm development; <EntityLink id="E91">Dario Amodei</EntityLink> is prominent public voice on risk |
+| Meta AI | 0.85 | 4 | 3.40 | Short–Medium | Open-weights Llama release, scale of compute, social-media distribution | Llama releases structurally shift the open/closed frontier debate; Meta's \$65B+ 2025 capex plan expands compute; open-weights releases propagate capabilities widely, raising dual-use concerns |
+| xAI (Elon Musk) | 0.75 | 4 | 3.00 | Short–Medium | Grok deployment, Colossus cluster, Twitter/X distribution, regulatory interference | Colossus reportedly among largest single training clusters; X platform provides data and distribution; Musk's regulatory relationships and public statements affect policy climate; internal safety culture largely uncharted |
+| Microsoft (as lab via Azure AI) | 0.80 | 4 | 3.20 | Short–Medium | Azure compute, OpenAI integration, enterprise deployment, GitHub Copilot | Microsoft's cloud position means most OpenAI capacity runs on Azure; enterprise deployment at scale; GitHub Copilot dominates developer tooling; regulatory exposure in EU/UK from CMA review |
+| DeepSeek | 0.70 | 4 | 2.80 | Short–Medium | Open-weight frontier models, chip-efficient training, geopolitical signal | R1 and V3 releases demonstrated competitive frontier performance at significantly lower reported compute cost; open-weight releases expand global access; China-based creates national-security scrutiny in Western markets |
+| Mistral | 0.65 | 3 | 1.95 | Short–Medium | Open-weight European models, EU regulatory positioning | Backed by EU-friendly investors; Mistral Large competitive in enterprise; open-weight releases support EU AI sovereignty narrative; constrained by capital and compute relative to US hyperscalers |
+| Apple | 0.60 | 3 | 1.80 | Short–Medium | On-device AI (Apple Intelligence), App Store policy, chip design (M-series) | 2B+ device installed base means on-device deployment at scale; privacy-preserving inference approach; App Store policies shape which AI tools reach consumers; M-series chips reduce NVIDIA dependency for inference |
+
+### Investors and Capital Providers
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| Microsoft (as investor) | 0.90 | 4 | 3.60 | Short | \$13B+ OpenAI commitment, Azure exclusivity, board observer seat | Structural dependency means Microsoft decisions shape OpenAI's roadmap and safety posture; exclusivity constrains OpenAI's multi-cloud options |
+| Amazon (as investor) | 0.80 | 4 | 3.20 | Short–Medium | \$4B+ Anthropic commitment, AWS compute credits, Bedrock distribution | AWS is primary compute provider for Anthropic; Bedrock positions Anthropic models for enterprise; investment structure gives Amazon indirect influence over <EntityLink id="E22">Anthropic</EntityLink> priorities |
+| SoftBank (Vision Fund) | 0.65 | 3 | 1.95 | Short–Medium | Arm Holdings stake, \$100B Stargate pledge, portfolio AI companies | Arm's architecture underpins most mobile and increasingly data-centre chips; Stargate commitments if executed would represent one of largest single AI infrastructure investments |
+| <EntityLink id="E552">Open Philanthropy</EntityLink> | 0.80 | 3 | 2.40 | Short–Medium | Grants to safety labs, policy organisations, field-building | Dominant funder of AI safety research ecosystem; grants to <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E47">CAIS</EntityLink>, academic programmes; shapes research agendas and talent pipelines |
+| Sequoia Capital | 0.60 | 3 | 1.80 | Short–Medium | AI startup investment, founder relationships, narrative influence | Major positions in multiple frontier-adjacent companies; partner commentary shapes investor and founder sentiment; less direct than hyperscaler investments |
+| Jaan Tallinn (as philanthropist) | 0.65 | 2 | 1.30 | Short–Medium | CSER, Future of Life Institute, Survival and Flourishing Fund grants | Co-founded CSER and FLI; grantmaking shapes safety research priorities; smaller absolute capital than Open Philanthropy but high strategic focus on existential risk |
+| Coefficient Giving (and aligned donors) | 0.55 | 2 | 1.10 | Medium | Coordinated philanthropic grants to safety ecosystem | Emerging donor coordination vehicle targeting AI safety; smaller than Open Philanthropy; influence primarily through grant recipient selection |
+
+### Compute Providers and Hardware
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| NVIDIA | 0.90 | 5 | 4.50 | Short–Medium | GPU supply (H100/B200 series), CUDA software moat, pricing power | ≈80%+ data-centre AI chip market share; CUDA ecosystem creates deep switching costs; supply constraints directly gate frontier training runs; US export controls executed through NVIDIA SKU differentiation |
+| TSMC | 0.85 | 5 | 4.25 | Short–Long | Leading-edge fab (3nm/2nm), sole manufacturer for most frontier chips | Produces chips for NVIDIA, Apple, AMD, and most AI accelerator designers; geographic concentration in Taiwan creates geopolitical single-point-of-failure; no credible near-term alternative for sub-3nm |
+| ASML | 0.80 | 5 | 4.00 | Medium–Long | EUV lithography monopoly, export license chokepoint | Only manufacturer of EUV machines required for sub-7nm; Dutch export licensing is a US-aligned control mechanism; long lead times mean supply effects manifest over years not months |
+| AWS (Amazon cloud) | 0.85 | 4 | 3.40 | Short | Trainium/Inferentia chips, data-centre capacity, Bedrock | Second-largest cloud; custom silicon reduces NVIDIA dependency for inference; Anthropic agreement makes AWS a structural part of safety-relevant lab infrastructure |
+| Google Cloud / TPU | 0.80 | 4 | 3.20 | Short–Medium | TPU v4/v5 supply, GCP capacity, internal DeepMind compute | TPUs provide partial NVIDIA independence; internal compute advantage for DeepMind; GCP availability shapes which external researchers can access frontier compute |
+| Microsoft Azure | 0.80 | 4 | 3.20 | Short | OpenAI exclusivity, ND H100 clusters, enterprise cloud | Dominant compute provider for OpenAI; ND H100 clusters among largest commercially available; Azure's availability terms effectively gate OpenAI deployment capacity |
+| SK Hynix / Samsung | 0.65 | 4 | 2.60 | Short–Medium | HBM memory supply (HBM3/HBM3E), DRAM supply chain | HBM is required for high-throughput AI accelerators; SK Hynix leads HBM3E supply to NVIDIA; South Korean government policy affects export commitments |
+| Intel | 0.45 | 3 | 1.35 | Medium–Long | Gaudi accelerators, IFS foundry ambitions, x86 server base | Gaudi 3 a credible but distant second to NVIDIA H100 in some workloads; IFS foundry could provide Western TSMC alternative but is years from frontier-node readiness |
+
+### Military and Intelligence
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| US Department of Defense (DoD) | 0.85 | 5 | 4.25 | Short–Long | Procurement (\$billions in AI contracts), DARPA research, export-control enforcement, autonomous weapons policy | Major AI procurement customer; DARPA funds long-horizon research; Joint AI Center (JAIC / CDAO) shapes military adoption norms; DoD policy on autonomous weapons has international norm implications |
+| People's Liberation Army (PLA) | 0.80 | 5 | 4.00 | Medium–Long | Military-civil fusion, autonomous systems development, information warfare | Military-civil fusion blurs boundary between commercial and defence AI in China; PLA investment in autonomous systems and AI-enabled ISR; cyber and information operations use AI at scale |
+| US Intelligence Community (IC) | 0.75 | 4 | 3.00 | Short–Medium | Classified AI deployment, supply-chain security reviews, export-control inputs | IC shapes export control policy through national-security assessments; operates classified AI at scale (Palantir, Booz Allen contracts); CFIUS reviews constrain foreign AI investment |
+| GCHQ / UK NCSC | 0.55 | 3 | 1.65 | Short–Medium | Cyber AI, safety standard inputs, Five Eyes intelligence sharing | NCSC publishes AI security guidance; Five Eyes coordination shapes allied approaches to AI risk; smaller footprint than NSA but influential in standards |
+
+### Industry Consortia and Standards Bodies
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| Frontier Model Forum (FMF) | 0.75 | 3 | 2.25 | Short–Medium | Voluntary safety commitments, red-teaming standards, policy lobbying | Founded by Anthropic, Google, Microsoft, OpenAI; sets voluntary norms that can pre-empt harder regulation; membership signals reputational commitment; lacks enforcement mechanism |
+| NIST (AI Safety Institute) | 0.70 | 3 | 2.10 | Short–Medium | AI Risk Management Framework, AISI evaluations, standards development | NIST RMF is de facto US standard; AISI evaluations could become procurement requirements; influence depends on whether voluntary frameworks gain legal traction |
+| ISO/IEC JTC 1/SC 42 | 0.50 | 3 | 1.50 | Medium | International AI standards (ISO 42001), procurement reference | ISO 42001 AI management system standard; slow-moving but used in international procurement and EU conformity assessments |
+| Partnership on AI | 0.45 | 2 | 0.90 | Medium | Multi-stakeholder norms, research, civil society liaison | Broad membership but limited enforcement; useful for convening; influence has waned relative to more focused bodies |
+
+### Philanthropists and Civil Society
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| <EntityLink id="E552">Open Philanthropy</EntityLink> | 0.85 | 3 | 2.55 | Short–Medium | Grant-making to safety research, policy, field-building | See investor section; treated here separately for civil-society role in shaping discourse and talent |
+| Future of Life Institute (FLI) | 0.70 | 2 | 1.40 | Short–Medium | Open letters, policy advocacy, grants, AI Safety Index | FLI open letters have generated significant public and policy attention; 2025 AI Safety Index scores AGI developers; Tallinn-connected |
+| Center for AI Safety (CAIS) | 0.70 | 2 | 1.40 | Short–Medium | Research, statement coordination, policy engagement | "Statement on AI risk" (2023) signed by prominent researchers; research agenda on catastrophic risk; <EntityLink id="E47">CAIS</EntityLink> grants and fellowships build pipeline |
+| <EntityLink id="E510">80,000 Hours</EntityLink> | 0.65 | 2 | 1.30 | Medium | Career advice, talent pipeline to safety roles | Directs high-ability individuals toward AI safety careers; influence is slow-moving but structurally important for field composition |
+| <EntityLink id="E517">Centre for Effective Altruism</EntityLink> | 0.60 | 2 | 1.20 | Medium | Community infrastructure, funding coordination, narrative | CEA supports EA community infrastructure; AI safety is largest funding recipient within EA ecosystem; reputational risks from FTX collapse affected credibility |
+
+### Think Tanks and Research Organisations
+
+| Actor | Likelihood | Magnitude | Expected Impact | Time Horizon | Primary Mechanism | Evidence / Notes |
+|-------|-----------|-----------|----------------|--------------|-------------------|-----------------|
+| CSET (Georgetown) | 0.70 | 3 | 2.10 | Short–Medium | Policy research, congressional briefings, talent pipeline | Highly cited by US government staff; produces export-control and compute policy analysis that feeds directly into BIS rulemaking; CSET-trained alumni in key government roles |
+| RAND Corporation | 0.65 | 3 | 1.95 | Short–Medium | DoD-contracted research, AI policy reports, wargaming | Long-standing DoD contractor; AI wargaming shapes military doctrine; RAND reports used in congressional testimony |
+| Future of Humanity Institute (FHI) | 0.40 | 3 | 1.20 | Medium–Long | Existential risk research, forecasting, technical safety | <EntityLink id="E140">FHI</EntityLink> closed in 2024; alumni (Bostrom, Ord, Drexler-adjacent community) continue influencing discourse; legacy publications remain widely cited |
+| Epoch AI | 0.65 | 2 | 1.30 | Short–Medium | Compute trend analysis, scaling law tracking, public data | <EntityLink id="E125">Epoch AI</EntityLink> data on training compute and parameter counts is frequently referenced in policy and research contexts; small team, high epistemic leverage |
+| Brookings Institution | 0.50 | 2 | 1.00 | Short–Medium | AI governance reports, media presence, congressional testimony | Broad policy influence but less AI-specific depth than CSET; useful for mainstream political legitimacy |
+
+---
+
+## Summary: Top Actors by Expected Impact
+
+| Rank | Actor | Category | Expected Impact |
+|------|-------|----------|----------------|
+| 1 | US Federal Government | Government | 4.75 |
+| 1 | China State (CCP/State Council) | Government | 4.75 |
+| 3 | NVIDIA | Compute | 4.50 |
+| 4 | TSMC | Compute | 4.25 |
+| 5 | US DoD | Military | 4.25 |
+| 6 | ASML | Compute | 4.00 |
+| 7 | PLA | Military | 4.00 |
+| 8 | OpenAI | Lab | 3.60 |
+| 8 | Google DeepMind | Lab | 3.60 |
+| 8 | Microsoft (as investor) | Investor | 3.60 |
+
+---
+
+## Methodological Caveats and Criticisms
+
+Several structural limitations deserve explicit acknowledgement.
+
+**Conflation of capability and intent.** Likelihood scores blend an actor's *capability* to exert power with its *willingness* to do so. These can diverge sharply: ASML has enormous magnitude but its likelihood score depends heavily on Dutch and US government decisions, not ASML's own strategic preferences. Future iterations should separate capability and intent into distinct columns.
+
+**Static snapshot problem.** The scorecard captures a moment. NVIDIA's dominance could erode rapidly if AMD, Groq, or state-backed alternatives (Huawei Ascend, Google TPU) mature. DeepSeek's emergence as a frontier actor in 2024–2025 was not anticipated in earlier analyses. Users should weight recent evidence heavily and treat any row with a long time horizon as especially uncertain.
+
+**Aggregation obscures heterogeneity.** "US Federal Government" aggregates the White House, Congress, BIS, NIST, DoD, and IC—entities with sometimes conflicting priorities. Disaggregating these would increase analytical precision at the cost of table manageability.
+
+**Missing actors.** The table focuses on actors with clear, direct leverage over frontier AI development. It underweights: (a) civil society movements and organised labour (e.g., SAG-AFTRA's AI provisions in the 2023 strike settlement have set precedents for performance data rights); (b) sub-national actors (California AI legislation, Texas compute infrastructure); (c) international organisations (ITU, UN AI Advisory Body, IAEA-parallel proposals); (d) organised research communities (NeurIPS, ICML programme committees) whose publication norms shape what is considered publishable and therefore fundable.
+
+**Magnitude scale is ordinal, not cardinal.** A magnitude-5 actor is not necessarily five times as impactful as a magnitude-1 actor. The logarithmic intention is imprecisely implemented. Calibrating this against historical case studies (e.g., how much did the H100 export-control rule actually slow Chinese frontier development?) would strengthen the scoring.
+
+**Power-seeking feedback loops.** The scorecard treats actor scores as independent, but many are deeply entangled. If <EntityLink id="E218">OpenAI</EntityLink> achieves AGI first, its magnitude score would immediately jump, increasing US Federal Government leverage simultaneously. The <EntityLink id="E226">Power-Seeking AI</EntityLink> risk and <EntityLink id="E68">AI-Driven Concentration of Power</EntityLink> analyses address these feedback dynamics more systematically.
+
+---
+
+## Key Uncertainties
+
+- **US export control durability**: BIS rules on H100/A100 equivalents have already been revised multiple times. Whether controls tighten, loosen, or fragment under geopolitical pressure is the single largest near-term uncertainty for compute access scores.
+- **China's semiconductor self-sufficiency timeline**: SMIC progress on sub-7nm, Huawei Ascend 910C performance, and state investment levels will determine whether China's magnitude score should be revised sharply upward within 3–5 years.
+- **Open-weights proliferation effect**: Meta's Llama releases and DeepSeek's open-weight models mean frontier capabilities are increasingly accessible without going through high-magnitude actors. This could flatten the scorecard's power concentration story over the medium term.
+- **AGI discontinuity**: Any actor that achieves transformative AI capabilities significantly ahead of others would see its magnitude score become effectively unbounded. The scorecard does not model discontinuous jumps.
+- **Regulatory enforcement credibility**: EU AI Act magnitude depends entirely on whether the Commission enforces it against large US labs. GDPR enforcement history suggests significant latency between rule-making and material consequences.
+
+---
+
+## Changelog
+
+| Date | Change | Author |
+|------|--------|--------|
+| 2026-04-12 | Initial table created; 40 actors scored across 8 categories | LongtermWiki |
+
+*Submit suggested revisions or new actor nominations via the wiki discussion page.*
+
+---
+
+## Sources
+
+All scores and notes in this article are derived from synthesised public sources. No URLs were available in the underlying research data for this article; citations are therefore descriptive.
+
+[^1]: EU AI Act — Official Journal of the European Union, legislative text and GPAI provisions (2024)
+[^2]: BIS Export Administration Regulations, Advanced Computing Rule — US Bureau of Industry and Security rule-making documents (2022–2024)
+[^3]: Joe Carlsmith, "Is Power-Seeking AI an Existential Risk?" — arXiv preprint 2206.13353, analysing power-seeking as a core existential risk argument
+[^4]: Future of Life Institute, AI Safety Index (Summer 2025) — Assessment of AGI developer safety strategies including evaluation methods and key risk indicators
+[^5]: SAG-AFTRA Memoranda of Agreement (2023) — Strike-resolution contracts including AI provisions on synthetic performance and data rights
+[^6]: CSET (Georgetown), export-control and compute policy reports — Center for Security and Emerging Technology, various publications 2021–2025
+[^7]: Epoch AI, compute trend database — Tracking of training compute, parameter counts, and hardware efficiency across frontier models
+[^8]: NIST AI Risk Management Framework (AI RMF 1.0) — National Institute of Standards and Technology, January 2023
+[^9]: Eliezer Yudkowsky and Richard Ngo, "Late 2021 MIRI Conversations" — LessWrong discussion sequence on alignment difficulty and power dynamics in advanced AI systems
+[^10]: Helen Schneider and Fidele Mukinda, actor power framework — Study on power expressions (power over, to, within, with) in health implementation, School of Public Health, University of the Western Cape, published February 2022

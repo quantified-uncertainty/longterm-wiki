@@ -12,13 +12,19 @@
 import { githubApi } from '../lib/github.ts';
 import {
   detectIssues as libDetectIssues,
+  diffCheckRunsVsRollup,
   extractBotComments as libExtractBotComments,
+  extractBlockingComments as libExtractBlockingComments,
+  isSelfAuthored as libIsSelfAuthored,
+  fetchFreshCheckRuns as libFetchFreshCheckRuns,
   fetchOpenPrs as libFetchOpenPrs,
   fetchSinglePr as libFetchSinglePr,
   detectOverlaps as libDetectOverlaps,
+  populateBlockedOnPrs as libPopulateBlockedOnPrs,
 } from '../lib/pr-analysis/index.ts';
 import type {
   DetectedPr,
+  FreshCheckRun,
   GqlPrNode,
   PatrolConfig,
 } from './types.ts';
@@ -27,10 +33,12 @@ import { ADVISORY_ISSUES } from '../lib/pr-analysis/types.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import {
   appendJsonl,
+  appendJsonlLocked,
   cl,
   clearAbandoned,
   clearPendingCICheck,
   clearTotalFixAttempts,
+  countConsecutiveCycles,
   getAbandonedSha,
   isAbandoned,
   isPendingCICheck,
@@ -41,6 +49,7 @@ import {
   markProcessed,
   recordFailure,
   resetFailCount,
+  stateFingerprint,
 } from './state.ts';
 
 // ── Bot / release PR skip lists ──────────────────────────────────────────────
@@ -62,6 +71,9 @@ const SKIP_BRANCH_PREFIXES = [
 // ── Re-exports for backward compatibility ────────────────────────────────────
 
 export { libExtractBotComments as extractBotComments };
+export { libExtractBlockingComments as extractBlockingComments };
+export { libIsSelfAuthored as isSelfAuthored };
+export { libFetchFreshCheckRuns as fetchFreshCheckRuns };
 export { libDetectIssues as detectIssues };
 
 // ── PR fetching (daemon wrappers with logging) ───────────────────────────────
@@ -82,9 +94,60 @@ export async function fetchSinglePr(prNumber: number): Promise<GqlPrNode | null>
 
 // ── Daemon-specific: filter PRs by labels/draft and detect issues ────────────
 
+/**
+ * Fetch fresh check-runs for each PR's head SHA and return them keyed by OID.
+ * Used by daemon entry points before calling `detectAllPrIssuesFromNodes` so
+ * stale-rollup false positives are avoided automatically.
+ */
+export async function fetchFreshCheckRunsByOid(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<Map<string, FreshCheckRun[]>> {
+  const result = new Map<string, FreshCheckRun[]>();
+  if (prs.length === 0) return result;
+  const [owner, repo] = config.repo.split('/');
+  if (!owner || !repo) return result;
+  const seen = new Set<string>();
+  await Promise.all(
+    prs
+      .filter((pr) => pr.headRefOid && !seen.has(pr.headRefOid) && seen.add(pr.headRefOid))
+      .map(async (pr) => {
+        try {
+          const runs = await libFetchFreshCheckRuns(owner, repo, pr.headRefOid);
+          result.set(pr.headRefOid, runs);
+        } catch (e: unknown) {
+          // Fresh fetch is advisory — on failure, detectIssues falls back to rollup.
+          log(`  ${cl.dim}fetchFreshCheckRuns failed for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        }
+      }),
+  );
+  return result;
+}
+
+/**
+ * Async entry point for daemon callers: fetches fresh check-runs for every PR
+ * up front so detection never silently falls back to the stale rollup. Test
+ * code can keep using `detectAllPrIssuesFromNodes` directly with a fake map.
+ */
+export async function detectAllPrIssues(
+  prs: GqlPrNode[],
+  config: PatrolConfig,
+): Promise<DetectedPr[]> {
+  const freshCheckRunsByOid = await fetchFreshCheckRunsByOid(prs, config);
+  return detectAllPrIssuesFromNodes(prs, config, freshCheckRunsByOid);
+}
+
 export function detectAllPrIssuesFromNodes(
   prs: GqlPrNode[],
   config: PatrolConfig,
+  /**
+   * Optional map of headRefOid → fresh check-runs. When provided, detectIssues
+   * uses the fresh data to avoid stale-rollup false positives, and a
+   * discrepancy between fresh and rollup is logged. Production daemon entry
+   * points should use `detectAllPrIssues` (async) which builds this map via
+   * `fetchFreshCheckRunsByOid`; tests and one-shot callers can omit it.
+   */
+  freshCheckRunsByOid?: Map<string, FreshCheckRun[]>,
 ): DetectedPr[] {
   const staleThresholdMs = Date.now() - config.staleHours * 3600 * 1000;
 
@@ -107,7 +170,8 @@ export function detectAllPrIssuesFromNodes(
   // PRs that were "fixed" in a previous cycle need their CI status verified.
   for (const pr of prs) {
     if (!isPendingCICheck(pr.number)) continue;
-    const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs);
+    const fresh = freshCheckRunsByOid?.get(pr.headRefOid);
+    const { issues: currentIssues } = libDetectIssues(pr, staleThresholdMs, fresh);
     const hasCiFailure = currentIssues.includes('ci-failure');
     if (!hasCiFailure) {
       // CI passed — the fix worked, reset the fail counter
@@ -122,7 +186,11 @@ export function detectAllPrIssuesFromNodes(
     }
   }
 
-  return prs
+  // Retain the filtered node list so we can cross-reference against all
+  // currently-open PRs when populating blockedOnPrs. Note: we validate against
+  // the FULL open-PR set (including drafts, bot PRs, etc.) — those can still
+  // legitimately block another PR even when we don't patrol them ourselves.
+  const detected: DetectedPr[] = prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
       if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) return false;
@@ -145,7 +213,21 @@ export function detectAllPrIssuesFromNodes(
       return true;
     })
     .map((pr) => {
-      const { issues: allIssues, botComments, failingChecks } = libDetectIssues(pr, staleThresholdMs);
+      const fresh = freshCheckRunsByOid?.get(pr.headRefOid);
+
+      // Log any discrepancy between fresh check-runs and the (possibly stale)
+      // rollup so operators can track false-positive rates.
+      if (fresh && fresh.length > 0) {
+        const rollupContexts =
+          pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+        const diff = diffCheckRunsVsRollup(fresh, rollupContexts);
+        if (diff.length > 0) {
+          log(`  ${cl.dim}PR #${pr.number}: rollup vs fresh check-runs disagree on: ${diff.join(', ')} (using fresh)${cl.reset}`);
+        }
+      }
+
+      const { issues: allIssues, botComments, failingChecks, blockingComments } =
+        libDetectIssues(pr, staleThresholdMs, fresh);
       const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
       const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
       if (advisoryIssues.length > 0) {
@@ -160,9 +242,139 @@ export function detectAllPrIssuesFromNodes(
         botComments,
         labels: pr.labels.nodes.map((l) => l.name),
         failingChecks: failingChecks.length > 0 ? failingChecks : undefined,
+        blockingComments: blockingComments.length > 0 ? blockingComments : undefined,
+        freshCheckRuns: fresh,
+        mergeStateStatus: pr.mergeStateStatus,
+        isSelfAuthored: libIsSelfAuthored(pr),
       };
     })
     .filter((pr) => pr.issues.length > 0);
+
+  // Post-process: populate blockedOnPrs from CrossReferencedEvent timeline
+  // items + validated `#NNNN` tokens in failing check names / bot-comment
+  // bodies. Validation uses the FULL open-PR set (prs) so even PRs we skipped
+  // above (drafts, bot PRs) can still legitimately be counted as blockers.
+  libPopulateBlockedOnPrs(detected, prs);
+
+  return detected;
+}
+
+// ── Stuck-cycle detection ────────────────────────────────────────────────────
+
+/**
+ * Minimum consecutive cycles (inclusive of current) before a PR is flagged as
+ * stuck. At this point the coordinator escalation path runs instead of another
+ * fix dispatch.
+ */
+export const STUCK_CYCLE_THRESHOLD = 3;
+
+/**
+ * Collapse the status-check rollup into a single conclusion string suitable
+ * for fingerprinting. We want something that changes when a previously-failing
+ * check passes (or vice versa) but tolerates minor flux in pending states.
+ *
+ * Returns one of: 'FAIL' | 'PENDING' | 'PASS' | 'NONE'.
+ */
+export function computeRollupConclusion(pr: GqlPrNode): string {
+  const contexts =
+    pr.commits?.nodes?.[0]?.commit?.statusCheckRollup?.contexts?.nodes ?? [];
+  if (contexts.length === 0) return 'NONE';
+
+  const hasFailure = contexts.some(
+    (c) =>
+      c.conclusion === 'FAILURE' ||
+      c.conclusion === 'CANCELLED' ||
+      c.state === 'FAILURE' ||
+      c.state === 'ERROR',
+  );
+  if (hasFailure) return 'FAIL';
+
+  const hasPending = contexts.some(
+    (c) =>
+      (c.conclusion === null || c.conclusion === undefined) &&
+      c.state !== 'SUCCESS',
+  );
+  if (hasPending) return 'PENDING';
+
+  return 'PASS';
+}
+
+/**
+ * Annotate detected PRs with stuck-cycle metadata.
+ *
+ * For each detected PR this function:
+ *   1. Builds a coarse state fingerprint that deliberately EXCLUDES headSha
+ *      (so pushes without real progress still count as stuck).
+ *   2. Counts consecutive prior matching snapshots in the JSONL log.
+ *   3. Persists the current snapshot (locked append).
+ *   4. When `(prior + 1) >= STUCK_CYCLE_THRESHOLD`, attaches `stuckCycles`,
+ *      `stuckReason`, and pushes `'stuck'` onto `pr.issues` so downstream
+ *      scoring + execution routes it to the coordinator escalation path.
+ *
+ * Writes are best-effort: any I/O error is logged but never thrown — the
+ * main scan must not fail just because we can't record a snapshot.
+ */
+export async function applyStuckCycleDetection(
+  detected: DetectedPr[],
+  prNodes: GqlPrNode[],
+  /**
+   * Override the JSONL path — primarily for tests so they don't pollute the
+   * real patrol log. Defaults to the canonical JSONL_FILE.
+   */
+  jsonlFile: string = JSONL_FILE,
+): Promise<void> {
+  // Index raw GqlPrNode by number so we can read headRefOid + rollup contexts.
+  const nodeByNumber = new Map<number, GqlPrNode>();
+  for (const pr of prNodes) nodeByNumber.set(pr.number, pr);
+
+  for (const pr of detected) {
+    const node = nodeByNumber.get(pr.number);
+    if (!node) continue;
+
+    const mergeable = node.mergeable;
+    const rollupConclusion = computeRollupConclusion(node);
+    const blockingCommentCount = pr.blockingComments?.length ?? 0;
+    const fingerprint = stateFingerprint({
+      mergeable,
+      rollupConclusion,
+      blockingCommentCount,
+    });
+
+    let priorMatching = 0;
+    try {
+      priorMatching = countConsecutiveCycles(pr.number, fingerprint, jsonlFile);
+    } catch (e) {
+      log(`  ${cl.yellow}Warning: could not count prior cycles for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    }
+    const stuckCycles = priorMatching + 1; // include the current cycle
+
+    // Persist snapshot with a file lock so concurrent patrol runs don't
+    // interleave writes. Best-effort — any failure falls back to an
+    // unlocked append inside appendJsonlLocked.
+    await appendJsonlLocked(jsonlFile, {
+      type: 'pr_cycle_snapshot',
+      pr_num: pr.number,
+      fingerprint,
+      head_sha: node.headRefOid,
+      mergeable,
+      rollup_conclusion: rollupConclusion,
+      blocking_comment_count: blockingCommentCount,
+    }).catch((e: unknown) => {
+      log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    });
+
+    if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+      pr.stuckCycles = stuckCycles;
+      pr.stuckReason = fingerprint;
+      if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
+      log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
+    } else if (stuckCycles >= 2) {
+      // Not yet at threshold but trending — annotate so the fix prompt can
+      // warn the agent.
+      pr.stuckCycles = stuckCycles;
+      pr.stuckReason = fingerprint;
+    }
+  }
 }
 
 // ── Stacked branch detection helpers ─────────────────────────────────────────
