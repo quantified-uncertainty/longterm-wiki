@@ -11,7 +11,14 @@ import { LABELS } from '../labels.ts';
 
 export const ISSUE_SCORES: Record<PrIssueType, number> = {
   conflict: 100,
+  // Self-authored feedback outranks everything else: a maintainer already told
+  // the agent the PR is wrong. Rebasing past that would be actively harmful.
+  'self-authored-feedback': 90,
   'ci-failure': 80,
+  // Branch-protection / required-review blocks. Score below CI so a failing
+  // CI gets fixed first, but above stale/bot-nitpick because the PR won't
+  // merge until this is addressed.
+  'merge-blocked': 70,
   'bot-review-major': 55,
   'missing-issue-ref': 40,
   stale: 30,

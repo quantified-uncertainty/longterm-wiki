@@ -25,6 +25,8 @@
 export type {
   PrIssueType,
   BotComment,
+  BlockingComment,
+  FreshCheckRun,
   DetectedPr,
   ScoredPr,
   MergeBlockReason,
@@ -32,6 +34,8 @@ export type {
   MainBranchStatus,
   RecentMerge,
   GqlReviewThread,
+  GqlIssueComment,
+  GqlCrossReferencedEvent,
   GqlPrNode,
   PrOverlap,
   AutoRebaseResult,
@@ -43,10 +47,14 @@ export { ADVISORY_ISSUES } from './types.ts';
 
 export {
   extractBotComments,
+  extractBlockingComments,
+  isSelfAuthored,
   detectIssues,
   detectCodeRabbitRateLimited,
   fetchOpenPrs,
   fetchSinglePr,
+  fetchFreshCheckRuns,
+  diffCheckRunsVsRollup,
   detectOverlaps,
 } from './detection.ts';
 
