@@ -205,6 +205,42 @@ describe('buildPrompt', () => {
   });
 });
 
+describe('buildPrompt — stuck-cycle warnings (QUA-286)', () => {
+  it('does NOT include stuck warning when stuckCycles is 0 or undefined', () => {
+    const pr = makeDetectedPr({ issues: ['ci-failure'] });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).not.toContain('Stuck-Cycle Warning');
+  });
+
+  it('does NOT include stuck warning at stuckCycles=1 (first sighting)', () => {
+    const pr = makeDetectedPr({ issues: ['ci-failure'], stuckCycles: 1, stuckReason: 'CONFLICTING:FAIL:0' });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).not.toContain('Stuck-Cycle Warning');
+  });
+
+  it('includes stuck warning at stuckCycles=2 (trending)', () => {
+    const pr = makeDetectedPr({ issues: ['ci-failure'], stuckCycles: 2, stuckReason: 'CONFLICTING:FAIL:0' });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('Stuck-Cycle Warning');
+    expect(prompt).toContain('2 consecutive patrol cycles');
+    expect(prompt).toContain('CONFLICTING:FAIL:0');
+    expect(prompt).toContain('escalate instead of retrying');
+  });
+
+  it('includes stuck warning at stuckCycles>=3', () => {
+    const pr = makeDetectedPr({ issues: ['ci-failure', 'stuck'], stuckCycles: 4, stuckReason: 'CONFLICTING:FAIL:1' });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('4 consecutive patrol cycles');
+  });
+
+  it('falls back to "unknown" when stuckReason is missing', () => {
+    const pr = makeDetectedPr({ issues: ['ci-failure'], stuckCycles: 2 });
+    const prompt = buildPrompt(pr, REPO);
+    expect(prompt).toContain('Stuck-Cycle Warning');
+    expect(prompt).toContain('unknown');
+  });
+});
+
 describe('buildMainBranchPrompt', () => {
   it('includes run ID', () => {
     const prompt = buildMainBranchPrompt(12345, REPO);

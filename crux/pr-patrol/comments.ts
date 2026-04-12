@@ -336,3 +336,26 @@ export function buildNoOpComment(issues: string[]): string {
     `**Issues**: ${issues.join(', ')}`,
   ].join('\n');
 }
+
+/**
+ * Posted when a PR has been in the same (mergeable, rollupConclusion,
+ * blockingCommentCount) state for `stuckCycles` patrol cycles. Uses the same
+ * "Escalating to coordinator (Opus)" wording as buildAbandonmentComment so the
+ * coordinator pickup pipeline routes it identically. The stuck-reason
+ * fingerprint is included for operator debugging.
+ */
+export function buildStuckEscalationComment(
+  stuckCycles: number,
+  stuckReason: string,
+  issues: string[],
+): string {
+  return [
+    `\u{1F916} **PR Patrol** \u{2014} Stuck for ${stuckCycles} consecutive cycles without signal change. Escalating to coordinator (Opus).`,
+    '',
+    `**Stuck signal**: \`${stuckReason}\` (mergeable : rollup : blocking-comment-count)`,
+    '',
+    `**Issues**: ${issues.filter((i) => i !== 'stuck').join(', ') || '(none other than stuck)'}`,
+    '',
+    'Further automated fix attempts have been paused on this PR. The coordinator will review and either push code changes, close the PR, or clear the stuck state with a new commit.',
+  ].join('\n');
+}

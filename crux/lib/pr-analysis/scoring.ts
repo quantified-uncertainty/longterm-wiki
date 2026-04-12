@@ -14,6 +14,11 @@ export const ISSUE_SCORES: Record<PrIssueType, number> = {
   // Self-authored feedback outranks everything else: a maintainer already told
   // the agent the PR is wrong. Rebasing past that would be actively harmful.
   'self-authored-feedback': 90,
+  // Stuck-cycle: 3+ consecutive cycles with the same signal. Scored high so
+  // the escalation path runs before the patrol re-dispatches a wasteful fix
+  // session, but below conflict/self-authored-feedback because those are
+  // better-grounded signals.
+  stuck: 85,
   'ci-failure': 80,
   // Branch-protection / required-review blocks. Score below CI so a failing
   // CI gets fixed first, but above stale/bot-nitpick because the PR won't

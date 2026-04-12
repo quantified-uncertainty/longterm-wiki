@@ -92,6 +92,7 @@ import {
   setCodeRabbitRetryTime,
 } from './state.ts';
 import {
+  applyStuckCycleDetection,
   detectAllPrIssues,
   detectPrOverlaps,
   fetchOpenPrs as daemonFetchOpenPrs,
@@ -340,6 +341,13 @@ async function runCheckCycle(
   // ── Fix phase ──────────────────────────────────────────────────────
 
   const detected = await detectAllPrIssues(allPrs, config);
+
+  // Annotate detected PRs with stuck-cycle metadata and persist per-PR
+  // snapshots. Runs after detection so stuckCycles / stuck issue are
+  // available to scoring and dispatch. Best-effort — errors are logged
+  // inside applyStuckCycleDetection and do not abort the cycle.
+  await applyStuckCycleDetection(detected, allPrs);
+
   let fixedPr: number | null = null;
 
   // 1b. Check for PR file overlaps (informational — posts warnings)

@@ -22,6 +22,7 @@ import {
   buildFixAttemptComment,
   buildFixCompleteComment,
   buildNoOpComment,
+  buildStuckEscalationComment,
   buildTimeoutComment,
   postEventComment,
 } from './comments.ts';
@@ -487,6 +488,40 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   log(`${cl.bold}→${cl.reset} Fixing PR ${cl.cyan}#${pr.number}${cl.reset} (${pr.title})`);
   log(`  Issues: ${cl.yellow}${pr.issues.join(', ')}${cl.reset}`);
   log(`  Branch: ${cl.dim}${pr.branch}${cl.reset}`);
+
+  // ── Stuck-cycle escalation (QUA-286) ────────────────────────────────
+  // Route through the EXISTING abandonment/coordinator escalation path
+  // (see bf77960b6). No Claude dispatch — the coordinator (Opus) will
+  // review and decide how to unstick the PR. A new push resets the
+  // fingerprint via detectAllPrIssuesFromNodes() and clears abandonment.
+  if (pr.issues.includes('stuck') && (pr.stuckCycles ?? 0) >= 3) {
+    log(`  ${cl.red}✗ PR #${pr.number} stuck for ${pr.stuckCycles} cycles — escalating to coordinator (no Claude dispatch)${cl.reset}`);
+    const headSha = git('ls-remote', 'origin', pr.branch).split(/\s/)[0] || undefined;
+    markAbandoned(pr.number, headSha);
+    markProcessed(pr.number);
+
+    if (!config.dryRun) {
+      await postEventComment(
+        pr.number,
+        config.repo,
+        buildStuckEscalationComment(pr.stuckCycles ?? 0, pr.stuckReason ?? 'unknown', pr.issues),
+      ).catch((e: unknown) =>
+        log(`  ${cl.yellow}Warning: could not post stuck-escalation comment: ${e instanceof Error ? e.message : String(e)}${cl.reset}`),
+      );
+    }
+
+    appendJsonl(JSONL_FILE, {
+      type: 'pr_result',
+      pr_num: pr.number,
+      issues: pr.issues,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: `Stuck-cycle escalation — ${pr.stuckCycles} cycles at fingerprint "${pr.stuckReason}"`,
+      stuck_cycles: pr.stuckCycles,
+      stuck_reason: pr.stuckReason,
+    });
+    return { mainIsRootCause: false };
+  }
 
   // ── Anti-oscillation: check total fix attempts (#3755, #3757, #3826) ──
   if (hasExceededMaxAttempts(pr.number)) {

@@ -17,8 +17,28 @@ export function buildPrompt(pr: DetectedPr, repo: string): string {
   const { number: num, title, branch, issues } = pr;
   const sections: string[] = [];
 
-  sections.push(`You are a PR maintenance agent for the ${repo} repository.
+  const stuckCycles = pr.stuckCycles ?? 0;
+  const stuckWarning =
+    stuckCycles >= 2
+      ? `
 
+## ⚠ Stuck-Cycle Warning
+
+This PR has been in the same \`(mergeable : rollupConclusion : blockingCommentCount)\`
+state for **${stuckCycles} consecutive patrol cycles** (signal: \`${pr.stuckReason ?? 'unknown'}\`).
+**If your next action would not change this signal, escalate instead of retrying.**
+The patrol auto-escalates to the coordinator at 3 cycles — further rebases or
+force-pushes without a real diagnosis make things worse, not better.
+
+Before taking any action:
+- Identify exactly which part of the signal you expect to change (mergeable?
+  a specific CI check? a review comment resolving?).
+- If you cannot point to one, output a short summary of what's blocked and stop.
+`
+      : '';
+
+  sections.push(`You are a PR maintenance agent for the ${repo} repository.
+${stuckWarning}
 ## Target
 PR #${num}: "${title}" (branch: ${branch})
 

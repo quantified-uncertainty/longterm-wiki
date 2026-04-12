@@ -45,6 +45,10 @@ const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
   // Self-authored feedback requires reading the maintainer comment and
   // addressing it; keep modest but non-trivial budget.
   'self-authored-feedback': { maxTurns: 20, timeoutMinutes: 15 },
+  // Stuck-cycle PRs are routed to escalation (no Claude dispatch), so the
+  // budget here is a safety net for the rare case they reach fixPr() without
+  // being intercepted. Keep it tiny so a misconfig doesn't burn compute.
+  stuck: { maxTurns: 3, timeoutMinutes: 2 },
 };
 
 /** Compute the budget for a PR based on its hardest issue. */
