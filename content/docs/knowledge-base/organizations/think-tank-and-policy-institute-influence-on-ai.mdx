@@ -1,0 +1,175 @@
+---
+wikiId: E2235
+title: Think Tank and Policy Institute Influence on AI
+description: How think tanks and policy institutes across the ideological spectrum shape AI governance, safety policy, and public discourse through research, advocacy, funding networks, and the revolving door to government.
+sidebar:
+  order: 50
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A well-structured and unusually candid overview of how think tanks shape AI policy, with strong coverage of funding networks, revolving-door dynamics, and ideological fault lines; particularly valuable for mapping Open Philanthropy's concentrated influence across CSET, RAND, IAPS, and GovAI, and for documenting tensions between existential-risk and near-term-harm framings.
+balanceFlags:
+  - missing-source-incentives
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| Policy reach | High — think tanks have influenced major EOs, legislation, and international declarations |
+| Funding transparency | Mixed — varies widely by organization and disclosure practices |
+| Safety vs. innovation balance | Contested — funding sources strongly shape positioning |
+| Revolving door activity | Substantial — especially between CSET/RAND/IAPS and executive branch |
+| Community trust (EA/LessWrong) | Moderate — valued for policy access, critiqued for technical shallowness |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Official Website (IAPS) | [iaps.ai](https://www.iaps.ai) |
+| Wikipedia | [en.wikipedia.org](https://en.wikipedia.org/wiki/Think_tank) |
+
+## Overview
+
+Think tanks and policy institutes have become central nodes in the global ecosystem shaping how governments, corporations, and publics understand and regulate artificial intelligence. Ranging from safety-focused research nonprofits to mainstream foreign-policy institutions and civil-liberties advocacy groups, these organizations produce white papers, host policymakers, run fellowship pipelines into government, conduct public polling, and advise on legislation. Their influence is neither uniform nor neutral: funding sources — whether philanthropic networks like <EntityLink id="E552">Open Philanthropy</EntityLink>, foreign governments, Pentagon contractors, or Silicon Valley donors — measurably shape institutional positioning on questions ranging from existential risk to labor displacement to civil liberties.
+
+The think tank ecosystem relevant to AI can be divided into several rough clusters: safety- and existential-risk-focused institutes (e.g., <EntityLink id="E524">CSET</EntityLink>, <EntityLink id="E1985">RAND AI</EntityLink>, <EntityLink id="E528">Future of Life Institute</EntityLink>, <EntityLink id="E1193">IAPS</EntityLink>); mainstream foreign-policy and geopolitics institutions (Brookings, Carnegie, <EntityLink id="E1990">CSIS</EntityLink>); tech-industry-adjacent research centers (Stanford HAI, MIT); civil liberties and democracy organizations (<EntityLink id="E1988">Center for Democracy and Technology</EntityLink>, <EntityLink id="E1980">AI Now Institute</EntityLink>); and a growing set of regional institutes in the UK and Europe (<EntityLink id="E1979">Ada Lovelace Institute</EntityLink>, the Alan Turing Institute). Each cluster has distinct funders, personnel pipelines, and policy priorities, and understanding these distinctions is essential for evaluating the research and advocacy they produce.
+
+A secondary and increasingly important dynamic is the reciprocal effect: AI tools are disrupting think tanks themselves. Generative AI compresses research timelines, floods the information environment with competing content, and enables individual researchers to produce outputs previously requiring institutional infrastructure. This creates pressure on traditional organizations to justify their added value through human relationships and trusted brands rather than sheer research volume.[^1]
+
+## History and Background
+
+The involvement of think tanks in AI policy is largely a post-2010 phenomenon, accelerating dramatically after 2017 with the advent of transformer architectures and again after 2022 with the public release of ChatGPT. Prior to this period, AI-adjacent policy work was handled mainly by government agencies — DARPA funded the foundational laboratory research of the 1950s through 1980s, and government-commissioned reports such as the 1966 ALPAC report and the 1974 Lighthill report shaped (and curtailed) AI funding — rather than by independent think tanks.[^2]
+
+The <EntityLink id="E524">Center for Security and Emerging Technology (CSET)</EntityLink> at Georgetown University, established with over \$80 million from <EntityLink id="E552">Open Philanthropy</EntityLink>, represents perhaps the clearest example of philanthropically seeded institutional infrastructure designed to place AI-informed personnel inside government. CSET populated executive agencies and congressional committees with fellows, and its executive director Dewey Murdick testified on AI long-term risks. This model — creating a think tank specifically to be a talent pipeline — has since been replicated by the <EntityLink id="E2021">Horizon Institute for Public Service</EntityLink>, which received nearly \$3 million from Open Philanthropy in 2022 to fund an initial cohort of fellows placed in the Department of Defense, Department of Homeland Security, State Department, and congressional committees.[^3]
+
+The <EntityLink id="E528">Future of Life Institute (FLI)</EntityLink> played a different but complementary role, elevating existential risk as a legitimate policy concern. FLI's Asilomar AI governance principles established early norms, and its March 2023 open letter calling for a six-month pause on training AI systems more capable than GPT-4 sparked the largest public debate on AI risk to that point, drawing signatures from AI lab researchers and prominent technologists alike.[^4] FLI was also instrumental in connecting AI safety concerns to nuclear, biological, and cyber threat frameworks familiar to traditional national security policy audiences.
+
+The Brookings Institution's Artificial Intelligence and Emerging Technology Initiative entered the space with a 2018 analysis of AI's societal and political impacts, and has since grown into a significant conveying and research platform, hosting events with senior officials and conducting public surveys on AI governance attitudes.[^5] RAND, with a long history in defense research, received over \$15 million in AI-related grants from Open Philanthropy in 2023 alone — \$5.5 million for research on potential risks from advanced AI and \$10 million for biosecurity research overlapping with AI-bioweapon concerns — and was also designated as a planned recipient of NIST AI safety research funding, raising congressional transparency concerns.[^6]
+
+## Key Activities and Policy Influence
+
+### Safety-Focused Institutes
+
+The <EntityLink id="E524">Center for Security and Emerging Technology</EntityLink> and the <EntityLink id="E1193">Institute for AI Policy and Strategy (IAPS)</EntityLink> represent the most direct pipelines between the effective altruism-adjacent AI safety community and U.S. government. IAPS, funded in part through Rethink Priorities (which itself received \$2.7 million from Open Philanthropy in 2022), focuses on AI implications from current models to AGI and superintelligence, covering national security, supply chain security, and international coordination.[^7] It explicitly cultivates policy talent for Congress, the executive branch, and industry. The <EntityLink id="E1185">RAND Corporation</EntityLink>'s AI policy programs apply machine learning to policy questions including mental health intervention analysis, climate, and healthcare reform, functioning as a broad-spectrum technical advisory body to government.
+
+The <EntityLink id="E528">Future of Life Institute</EntityLink> and the <EntityLink id="E140">Future of Humanity Institute (FHI)</EntityLink> (now defunct) pioneered the intellectual framework around existential risk from advanced AI that subsequently migrated into mainstream policy discourse. FHI's closure left a gap partly filled by the <EntityLink id="E1187">Global Priorities Institute</EntityLink> at Oxford and the Centre for the Governance of AI (GovAI), which is backed by Open Philanthropy and the Leverhulme Centre at Cambridge and has influenced UK parliamentary briefings and global tech diplomacy.[^8] The <EntityLink id="E202">Machine Intelligence Research Institute (MIRI)</EntityLink>, an early mover in AI alignment research, has seen its direct policy influence wane as the field has grown and more institutionally connected organizations have entered the space.
+
+The <EntityLink id="E47">Center for AI Safety (CAIS)</EntityLink>, funded partly by the <EntityLink id="E567">Survival and Flourishing Fund</EntityLink> (\$1.1 million) rather than Open Philanthropy, registered its first federal lobbyist in 2023, marking a transition from pure research to active advocacy. Yoshua Bengio's role chairing the International Scientific Report on the Safety of Advanced AI — a panel involving 30 countries, the EU, and the UN, synthesizing findings from over 70 international experts — exemplifies how think-tank-affiliated researchers shape international policy conversations.[^9]
+
+### Mainstream Policy Institutes
+
+<EntityLink id="E1984">Brookings Institution's AI Initiative</EntityLink> has distinguished itself through public opinion research alongside conventional policy analysis. Its August 2023 survey found that 56% of Americans oppose companies solely setting AI ethical standards, with majorities favoring multi-stakeholder governance including government agencies, universities, and ethicists — findings that have been used to argue for regulatory authority beyond industry self-governance.[^10] Brookings has also built an internal AI capability hub, equipping its scholars with data-enriched analytical tools and positioning the institution at the intersection of policy expertise and technical implementation.
+
+The <EntityLink id="E1990">CSIS Wadhwani Center for AI and Advanced Technologies</EntityLink>, led by senior advisor Gregory C. Allen, has served as a convening venue for major policy announcements. CSIS provided the platform for Senate Majority Leader Chuck Schumer to announce his SAFE Innovation Framework for AI (covering Security, Accountability, and Democratic Foundations), and hosts the biweekly AI Policy Podcast covering regulation, innovation, national security, and geopolitics. Carnegie Endowment for International Peace's Technology and International Affairs program focuses on the intersection of AI and great-power competition, particularly U.S.-China dynamics over chip supply chains and AI governance standards.
+
+The Manhattan Institute has staked out a distinctive position as an advocate for U.S. strategic primacy in AI, publishing a playbook arguing for federal investments in AI research departments, talent recruitment, energy deregulation, domestic chip production, and export restrictions to adversaries. Its framing prioritizes competitive advantage over precautionary regulation.[^11]
+
+### Tech-Industry-Adjacent Research Centers
+
+<EntityLink id="E1986">Stanford HAI</EntityLink> occupies a unique position as both a research institution and a convening body with deep ties to Silicon Valley. It is funded by a combination of federal grants, private philanthropists (including Phil Knight and Reid Hoffman), and corporate donors — a funding mix that critics argue shapes its tendency toward innovation-friendly framing. MIT's Institute for Productivity and Competitiveness (IPC) has contributed technical groundwork referenced in policy documents including the NIST AI Risk Management Framework, published in January 2023.[^12] Both institutions benefit from proximity to frontier AI development while maintaining nominal independence, a tension that shapes how their outputs are received by civil society critics.
+
+### Civil Liberties and Democracy-Focused Organizations
+
+The <EntityLink id="E1988">Center for Democracy and Technology (CDT)</EntityLink>, the <EntityLink id="E1980">AI Now Institute</EntityLink>, and the <EntityLink id="E2891">DAIR Institute</EntityLink> (founded by Timnit Gebru) represent a distinct cluster prioritizing algorithmic harm, surveillance, labor, and civil liberties over existential risk. The AI Now Institute's annual reports have been cited in congressional testimony on automated hiring systems, facial recognition, and benefits algorithms. CDT has been active on deepfakes legislation — in March 2024, Representatives Anna Eshoo and Neal Dunn released deepfakes legislation that drew on civil liberties framing — and on surveillance and content moderation policy.[^13]
+
+These organizations have also directly challenged the existential-risk framing dominant in Open Philanthropy-funded circles. In March 2023, Timnit Gebru, Emily M. Bender, Angelina McMillan-Major, and Margaret Mitchell issued a response to the FLI pause letter arguing it overhyped imagined future risks at the expense of practical recommendations addressing present harms.[^14] This disagreement reflects a genuine strategic and empirical divide within the broader AI policy community about where attention and resources should be directed.
+
+### Regional Institutes
+
+The <EntityLink id="E1979">Ada Lovelace Institute</EntityLink> in the UK has established itself as a leading voice on algorithmic accountability, data rights, and the governance of biometric technologies, frequently contributing to UK parliamentary inquiries. The Alan Turing Institute serves as the UK's national institute for data science and AI, with significant government funding and academic partnerships. In Europe, a range of policy institutes — including AlgorithmWatch in Germany and the Future of Life Institute's European operations — feed into the EU AI Act's development and implementation. The Centre for the Governance of AI (GovAI), while originally Oxford-affiliated, has developed a semi-independent global profile and contributed directly to the Bletchley Declaration, signed by 28 countries at the UK government's AI Safety Summit, which acknowledged the potential for "serious, even catastrophic harm" from frontier models.[^15]
+
+## Funding Sources and Transparency
+
+The funding landscape for AI policy think tanks is dominated by a small number of philanthropic actors, most prominently <EntityLink id="E552">Open Philanthropy</EntityLink>, backed by Facebook co-founder Dustin Moskovitz and Cari Tuna. Open Philanthropy has spent over \$330 million to prevent future AI harms, with major grants including over \$80 million to establish CSET, nearly \$3 million to seed Horizon Institute fellows, and \$15+ million to RAND in 2023 alone.[^16] This concentration has generated criticism that the resulting network of think tanks, fellows, and government advisors constitutes a coordinated influence effort prioritizing long-term existential risk framings over near-term regulatory interventions — a concern that has been raised by journalists, congressional staff, and competing civil society organizations.
+
+A 2025 Quincy Institute report found that Washington's mainstream think tanks also carry significant foreign-government funding: the Atlantic Council received \$21 million and the Brookings Institution received \$17 million from 54 foreign governments, including Saudi Arabia and Qatar, in addition to funding from Pentagon contractors.[^17] These relationships create their own influence asymmetries, particularly on questions of AI in defense applications and export controls.
+
+The following table summarizes approximate funding transparency levels across key organizations, based on public disclosures:
+
+| Organization | Primary Funder Type | Transparency Rating | Notes |
+|---|---|---|---|
+| <EntityLink id="E524">CSET</EntityLink> | Philanthropic (Open Philanthropy) | Medium | Grants disclosed; influence network less visible |
+| <EntityLink id="E1185">RAND AI</EntityLink> | Government + Philanthropic | Medium | NIST grant process criticized for lack of competition |
+| <EntityLink id="E1193">IAPS</EntityLink> | Philanthropic (via Rethink Priorities) | Medium | Funding chain partially disclosed |
+| <EntityLink id="E528">FLI</EntityLink> | Philanthropic (mixed) | Medium | Some donor disclosure; past Musk ties |
+| <EntityLink id="E1984">Brookings AI</EntityLink> | Foreign govt + corporate | Low-Medium | Quincy report highlights gaps |
+| <EntityLink id="E1990">CSIS</EntityLink> | Foreign govt + corporate | Low-Medium | Atlantic Council-level concerns apply |
+| <EntityLink id="E1986">Stanford HAI</EntityLink> | Corporate + federal + private | Medium | Corporate donors listed; influence pathways unclear |
+| <EntityLink id="E1980">AI Now Institute</EntityLink> | Foundation grants | Medium-High | Mozilla, Ford Foundation typical |
+| <EntityLink id="E1979">Ada Lovelace Institute</EntityLink> | Nuffield Foundation | High | Single primary funder, publicly disclosed |
+| <EntityLink id="E47">CAIS</EntityLink> | SFF + other philanthropy | Medium | Registering lobbyists increases visibility |
+| Manhattan Institute | Conservative donors | Low-Medium | Donor list partially disclosed |
+
+## The Policy Influence Pipeline
+
+The mechanism by which think tanks translate research into policy is often described as the "ideas-to-action pipeline," but in practice it operates through several overlapping channels. The most direct is the revolving door: CSET's Horizon fellows were placed in the Department of Defense, DHS, State Department, and both chambers of Congress, giving Open Philanthropy-funded analysis direct access to regulatory drafting and executive agency decision-making.[^18] RAND's CEO Jason Matheny, himself affiliated with the effective altruism community, was simultaneously appointed to <EntityLink id="E22">Anthropic</EntityLink>'s Long-Term Benefit Trust, illustrating how institutional and philanthropic networks interpenetrate.[^19]
+
+A second channel is public opinion shaping. The <EntityLink id="E1982">AI Policy Institute</EntityLink>, launched in August 2023 by Daniel Colson, conducts regular national polling — a July 2023 YouGov survey of 1,001 U.S. voters found voters more concerned than excited about AI, and a separate poll found 72% of voters support slowing AI advancement — and feeds these findings to journalists and congressional staff to frame the political viability of safety-oriented regulation.[^20] Brookings' parallel public surveys serve a similar legitimating function for multi-stakeholder governance proposals.
+
+A third channel is direct advocacy and convening. By hosting Senate Majority Leader Schumer's SAFE Innovation Framework announcement or providing the institutional home for international expert panels, think tanks like CSIS and GovAI become the venues in which policy is effectively negotiated before it reaches formal legislative or regulatory processes. The Bletchley Declaration, the NIST AI Risk Management Framework, and the Biden AI executive order of October 2023 all bear the visible fingerprints of think-tank research and advocacy.[^21]
+
+## Criticisms and Concerns
+
+### Funding-Driven Agenda Distortion
+
+The most sustained criticism of AI policy think tanks concerns the degree to which funding shapes research outputs. Open Philanthropy's own 2016 internal assessment acknowledged the risk of "intellectually insulated" grant decisions driven by personal relationships with grantees — a risk that critics argue has materialized in a cluster of organizations that reinforce each other's views on existential risk without serious engagement with dissenting perspectives.[^22] The congressional scrutiny of the RAND-NIST AI safety grant — which was planned as a non-competitive award, omitted from public listening sessions, and lacking standard notice requirements — exemplifies the governance risks that arise when philanthropic and government funding channels become entangled.[^23]
+
+### The Existential Risk vs. Near-Term Harms Divide
+
+A structurally significant tension runs through the AI policy ecosystem between organizations primarily concerned with long-term catastrophic or existential risks (CSET, RAND AI programs, GovAI, FLI) and those focused on present-tense algorithmic harms, surveillance, and labor displacement (AI Now, CDT, DAIR, Ada Lovelace). Critics including Gebru and Bender have argued that the philanthropic dominance of the existential-risk framing has distorted policy attention and resources, steering discourse toward speculative future scenarios at the expense of communities experiencing AI-related harm today.[^24] Yoshua Bengio has taken an intermediate position, arguing that near-term concerns and existential risk considerations both deserve serious attention as AI systems grow more capable.[^25]
+
+### Political Bias in AI Evaluations
+
+A report from the American Enterprise Institute (AEI) found that large language models tend to rate right-leaning think tanks lower on morality, objectivity, and quality compared to left-leaning ones — a finding that, if robust, has significant implications for how AI systems will characterize and distribute policy research as they become embedded in information retrieval and summarization.[^26]
+
+### Foreign Funding and Influence
+
+The 2025 Quincy Institute report documenting substantial foreign government funding at Brookings and the Atlantic Council raised pointed questions about whether think tanks selling "policy influence and access to policymakers" can credibly claim donor-agnostic independence, particularly on AI questions touching on export controls, defense applications, and geopolitical competition with funders' home countries.[^27]
+
+### Credibility Gaps in Internal Practice
+
+Several observers have noted a credibility gap between think tanks' external AI governance advocacy and their internal practices: organizations producing public guidance on AI transparency, accountability, and ethical use often lack their own internal AI governance frameworks, using tools like ChatGPT for research and memo drafting without disclosed protocols. Advisors including AI strategist Dr. Tony Bader have recommended that think tanks adopt internal "AI Constitutions" — explicit governance documents for tool use — to avoid this contradiction.[^28]
+
+### Disruption of Traditional Think Tank Functions
+
+A State Policy Network analysis identified four structural threats AI poses to traditional think tanks: productivity gains that compress research advantages, attention scarcity as AI floods the information environment, a trust premium that advantages established brands but disadvantages new entrants, and "individual bypass" — the capacity of AI-empowered solo researchers and analysts to produce institutional-quality outputs without institutional backing. These pressures are reshaping hiring strategies toward relationship builders over writers, and pushing organizations toward distinctive roles that AI cannot easily replicate.[^29]
+
+## Key Uncertainties
+
+- **Counterfactual policy impact**: It remains difficult to isolate the specific contribution of any think tank to legislative or regulatory outcomes, as opposed to broader political and industry forces.
+- **Open Philanthropy's long-term strategy**: Whether the current concentration of AI safety funding in one philanthropic network represents a temporary feature of an immature field or a durable structural bias is contested.
+- **Regional convergence**: Whether European and UK policy institutes will converge with U.S. frameworks or develop distinct regulatory paradigms — particularly post-EU AI Act — has significant implications for global AI governance.
+- **AI disruption of think tanks**: The degree to which generative AI will hollow out traditional institutional advantages in policy research versus primarily shifting which organizations can compete remains unclear.
+
+## Sources
+
+[^1]: State Policy Network analysis on AI's disruption of think tank functions — research on attention scarcity, productivity gains, and "individual bypass" by AI-empowered solo influencers.
+[^2]: Overview of early AI funding history — DARPA-driven research from the 1950s through 1980s; ALPAC (1966) and Lighthill (1974) reports as government-driven funding inflection points.
+[^3]: Open Philanthropy grants to CSET (\$80M+) and Horizon Institute (≈\$3M, 2022) — fellow placements in DoD, DHS, State Department, and congressional committees; Dewey Murdick congressional testimony on AI risks.
+[^4]: Future of Life Institute open letter (March 29, 2023) calling for pause on AI systems more powerful than GPT-4; FLI's Asilomar AI governance principles.
+[^5]: Brookings Institution AI and Emerging Technology Initiative — 2018 analysis of AI's societal/political impacts; August 2023 survey on AI governance attitudes.
+[^6]: RAND Corporation — Open Philanthropy grants of \$5.5 million (April 2023) for advanced AI risk research and \$10 million (May 2023) for biosecurity/AI overlap; planned NIST AI safety grant; congressional scrutiny over lack of competitive process.
+[^7]: Institute for AI Policy and Strategy (IAPS) — funded via Rethink Priorities (\$2.7 million from Open Philanthropy, 2022); focus on AGI, national security, supply chain, international coordination.
+[^8]: Centre for the Governance of AI (GovAI) — backed by Open Philanthropy and Leverhulme Centre at Cambridge; influence on UK parliamentary briefings and global tech diplomacy.
+[^9]: Yoshua Bengio — chairs International Scientific Report on the Safety of Advanced AI, 30-country panel with 70+ international experts; position that existential and near-term risks both merit serious attention.
+[^10]: Brookings Institution August 2023 survey — 56% of Americans oppose companies solely setting AI ethical standards; majority favor multi-stakeholder governance roles.
+[^11]: Manhattan Institute "A Playbook for AI Policy" — advocates federal AI research investments, talent recruitment, energy deregulation, domestic chip production, and export restrictions to adversaries.
+[^12]: MIT contributions to NIST AI Risk Management Framework, published January 2023; Stanford HAI funding from Phil Knight, Reid Hoffman, federal grants, and corporate donors.
+[^13]: Center for Democracy and Technology and AI Now Institute — work on algorithmic hiring, facial recognition, and benefits algorithms; March 2024 deepfakes legislation (Reps. Eshoo and Dunn).
+[^14]: Gebru, Bender, McMillan-Major, and Mitchell response (March 31, 2023) to FLI pause letter — criticism of fearmongering and overemphasis on speculative "human-competitive intelligence" risks.
+[^15]: Bletchley Declaration — signed by 28 countries at UK AI Safety Summit, acknowledging potential for "serious, even catastrophic harm" from frontier models; GovAI contribution to drafting process.
+[^16]: Open Philanthropy total AI harm prevention spending (over \$330 million); major grants to CSET (\$80M+), Horizon (≈\$3M, 2022), RAND (\$15M+, 2023); Dustin Moskovitz and Cari Tuna as primary funders.
+[^17]: Quincy Institute for Responsible Statecraft 2025 report (released early January 2025) — Atlantic Council (\$21M) and Brookings (\$17M) from 54 foreign governments including Saudi Arabia and Qatar; Pentagon contractors as major donors.
+[^18]: Horizon Institute fellow placements (2022 cohort) — DoD, DHS, State Department, House Science Committee, Senate Commerce Committee, RAND, and CSET.
+[^19]: Jason Matheny — RAND CEO; effective altruist community figure; appointed to Anthropic's Long-Term Benefit Trust.
+[^20]: AI Policy Institute — launched August 2023 by Daniel Colson; July 2023 YouGov survey of 1,001 U.S. voters; 72% voter support for slowing AI advancement finding.
+[^21]: CSIS platform for Schumer SAFE Innovation Framework announcement (June, year of announcement); NIST AI Risk Management Framework (January 2023); Biden AI executive order (October 30, 2023).
+[^22]: Open Philanthropy 2016 internal acknowledgment of risks of "intellectually insulated" grant decisions driven by personal relationships with grantees.
+[^23]: RAND-NIST AI safety grant — planned as non-competitive award; omitted from November 17, 2023 NIST listening session and December 11 briefing; congressional scrutiny led by Rep. Darin LaHood's office (spokesperson Heather Vaughan).
+[^24]: Gebru et al. (March 31, 2023) — argument that existential-risk funding framing distorts attention away from present-day harms to marginalized communities.
+[^25]: Yoshua Bengio — position that near-term and existential risk concerns both require serious attention; sourced from International Scientific Report on the Safety of Advanced AI context.
+[^26]: American Enterprise Institute (AEI) report — LLMs rate right-leaning think tanks lower on morality, objectivity, and quality compared to left-leaning think tanks; no specific date specified in source data.
+[^27]: Quincy Institute 2025 report — foreign funding scale at mainstream Washington think tanks; question of whether donor-independence claims are credible given funding relationships.
+[^28]: Dr. Tony Bader (AI Strategist) — recommendation for think tanks to adopt internal "AI Constitutions" for ethical AI tool use, including anonymized summarization with human review; noted as advice given over approximately two years prior to early 2026.
+[^29]: State Policy Network analysis — four structural threats from AI to think tanks: productivity gains, attention scarcity, trust premiums, and "individual bypass" by AI-empowered solo researchers; recommendation to hire relationship builders over writers.

@@ -9040,3 +9040,90 @@
     generative AI regulations, algorithm registration requirements, and deepfake rules.
   tags: [government, china, ai-regulation]
   lastUpdated: 2026-04
+
+- id: government-ai-actors-overview
+  stableId: sid_AdO0HkD9kQ
+  wikiId: E2231
+  type: organization
+  orgType: generic
+  title: Government AI Actors Overview
+  description: >-
+    A structured overview of the governmental bodies shaping AI policy, governance, and
+    regulation across executive, legislative, regulatory, standards, and judicial functions.
+  tags:
+    - ai-governance
+    - government
+  lastUpdated: 2026-04
+
+- id: military-and-defense-ai-actors
+  stableId: sid_dWAH9SHB1g
+  wikiId: E2233
+  type: organization
+  orgType: generic
+  title: Military and Defense AI Actors
+  description: >-
+    Overview of key government agencies, military branches, and private contractors
+    shaping AI development and deployment for defense applications globally.
+  tags:
+    - ai-governance
+    - military
+  lastUpdated: 2026-04
+
+- id: shareholder-and-board-influence-in-ai-labs
+  stableId: sid_uLLfsfaNiQ
+  wikiId: E2234
+  type: organization
+  orgType: generic
+  title: Shareholder and Board Influence in AI Labs
+  description: >-
+    Analysis of how shareholders, boards, and investors shape governance, safety priorities,
+    and strategic direction at frontier AI laboratories including OpenAI, Anthropic, Google
+    DeepMind, Meta, xAI, and Microsoft.
+  tags:
+    - ai-governance
+    - corporate-governance
+  lastUpdated: 2026-04
+
+- id: industry-consortia-and-self-regulation
+  stableId: sid_rOjmU4ov8Q
+  wikiId: E2232
+  type: organization
+  orgType: generic
+  title: Industry Consortia and Self-Regulation
+  description: >-
+    Analysis of voluntary industry bodies governing AI development, including the Frontier
+    Model Forum, Partnership on AI, MLCommons, and others — their memberships, commitments,
+    measurable outcomes, and effectiveness.
+  tags:
+    - ai-governance
+    - self-regulation
+  lastUpdated: 2026-04
+
+- id: think-tank-and-policy-institute-influence-on-ai
+  stableId: sid_PUCzNfP96Q
+  wikiId: E2235
+  type: organization
+  orgType: generic
+  title: Think Tank and Policy Institute Influence on AI
+  description: >-
+    How think tanks and policy institutes across the ideological spectrum shape AI governance,
+    safety policy, and public discourse through research, advocacy, funding networks, and the
+    revolving door to government.
+  tags:
+    - ai-governance
+    - think-tanks
+  lastUpdated: 2026-04
+
+- id: compute-supply-chain-actors
+  stableId: sid_qiFHkDrA8Q
+  wikiId: E2230
+  type: organization
+  orgType: generic
+  title: Compute Supply Chain Actors
+  description: >-
+    An overview of the organizations controlling the compute supply chain for AI development,
+    from lithography equipment to cloud hyperscalers, and their role as governance chokepoints.
+  tags:
+    - ai-governance
+    - compute
+  lastUpdated: 2026-04
