@@ -261,10 +261,10 @@ export async function storeSourcingResult(result: SourcingResult): Promise<void>
 /**
  * Collect facts to sourcing based on the command options.
  */
-/** Check if a fact's property is marked nonVerifiable in the property registry. */
+/** Check if a fact's property is marked as not verifiable in the property registry. */
 function isNonVerifiable(graph: Graph, fact: Fact): boolean {
   const property = graph.getProperty(fact.propertyId);
-  return property?.nonVerifiable === true;
+  return property?.verifiable === false;
 }
 
 function collectFacts(

@@ -191,11 +191,8 @@ export function collectFactItems(
       if (!fact.source || fact.id.startsWith('inv_')) continue;
 
       const property = graph.getProperty(fact.propertyId);
-
-      // Skip facts whose property is marked nonVerifiable (e.g. secondary-valuation,
-      // equity-stake-percent) — these come from private/proprietary data that the
-      // sourcing system cannot verify. QUA-247.
-      if (property?.nonVerifiable) continue;
+      // Skip properties marked as not verifiable (e.g., social media handles, self-referential URLs)
+      if (property?.verifiable === false) continue;
       const formattedValue = formatFactValue(fact, property, graph);
       const existing = existingVerdicts.get(fact.id);
 

@@ -123,9 +123,9 @@ describe('crux fb sourcing --dry-run', () => {
     }
   });
 
-  it('skips facts with nonVerifiable properties (QUA-247)', async () => {
+  it('skips facts with non-verifiable properties (QUA-247)', async () => {
     // Anthropic has secondary-valuation, equity-stake-percent, equity-value,
-    // and employee-tender-offer facts — all marked nonVerifiable in properties.yaml.
+    // and employee-tender-offer facts — all marked verifiable:false in properties.yaml.
     // These should be excluded from the dry-run output.
     const NON_VERIFIABLE_PROPERTIES = [
       'secondary-valuation',
