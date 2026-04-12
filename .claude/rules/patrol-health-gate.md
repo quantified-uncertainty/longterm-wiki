@@ -65,7 +65,37 @@ If you're mid-way through a PR and notice:
 
 **Stop.** File a Linear ticket describing the pattern and escalate to the coordinator. This is exactly what the 2026-04-11 cascade looked like in its second PR; everyone who continued past that signal spent effort on a problem that wasn't the real one.
 
-See also:
+## Troubleshooting
+
+**Gate seems stuck "green" while prod is red.** Check the scan-error counter:
+
+```bash
+cat ~/.cache/pr-patrol/state/health-gate-cooldown.json | jq '.["__scan_error_count__"]'
+```
+
+If ≥ 3, the scanner has been failing for multiple cycles and the gate has flipped to halt. Inspect recent `health_scan_error` entries in `~/.cache/pr-patrol/runs.jsonl`.
+
+**Gate trips repeatedly after the underlying issue is fixed.** The cooldown file is the source of truth:
+
+```bash
+# Clear everything:
+rm ~/.cache/pr-patrol/state/health-gate-cooldown.json
+# Or clear one fingerprint:
+jq 'del(.["deploy-stuck"])' ~/.cache/pr-patrol/state/health-gate-cooldown.json | sponge ~/.cache/pr-patrol/state/health-gate-cooldown.json
+```
+
+**Reading escalation events**:
+
+```bash
+# Most recent gate trips:
+jq -c 'select(.type == "health_gate_tripped")' ~/.cache/pr-patrol/runs.jsonl | tail -10
+
+# Scan errors:
+jq -c 'select(.type == "health_scan_error")' ~/.cache/pr-patrol/runs.jsonl | tail -10
+```
+
+## See also
+
 - `.claude/rules/proactive-github-filing.md` § "Mandatory tracking — red flags"
 - QUA-297 — Health-Gate Patrol parent issue + retrospective
 - `crux/pr-patrol/health-scan.ts` — the scanners

@@ -18,7 +18,7 @@
  * so the gate is unit-testable without network or filesystem.
  */
 
-import { existsSync, readFileSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { join } from 'path';
 import { healthScan as realHealthScan, type HealthScanResult, type HealthIssue } from './health-scan.ts';
 import { appendJsonl, JSONL_FILE, STATE_DIR, ensureDirs, cl, log as realLog } from './state.ts';
@@ -33,11 +33,22 @@ import { appendJsonl, JSONL_FILE, STATE_DIR, ensureDirs, cl, log as realLog } fr
  */
 export const HEALTH_GATE_COOLDOWN_MINUTES = 30;
 
+/**
+ * After this many consecutive scan failures, the gate flips from fail-open
+ * ("proceed with caution") to fail-closed ("halt, something's wrong"). Without
+ * this, a misconfigured env or removed GitHub endpoint would let patrol run
+ * forever while pretending prod is healthy.
+ */
+export const MAX_CONSECUTIVE_SCAN_ERRORS = 3;
+
 /** Env var to bypass the gate. Value `1` disables it. */
 export const DISABLE_ENV_VAR = 'PATROL_DISABLE_HEALTH_GATE';
 
 /** State file where last-emission timestamps per fingerprint are kept. */
 const HEALTH_GATE_STATE_FILE = join(STATE_DIR, 'health-gate-cooldown.json');
+
+/** Reserved fingerprint used to track consecutive scan-error count. */
+const SCAN_ERROR_COUNTER_KEY = '__scan_error_count__';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -68,6 +79,10 @@ export interface HealthGateDeps {
   cooldownStore?: {
     get: (fingerprint: string) => Date | null;
     set: (fingerprint: string, at: Date) => void;
+    /** Read a plain numeric counter (for consecutive scan-error tracking). */
+    getCount?: (key: string) => number;
+    /** Write a plain numeric counter. */
+    setCount?: (key: string, n: number) => void;
   };
 }
 
@@ -93,37 +108,72 @@ export function fingerprintIssue(issue: HealthIssue): string {
 
 // ── Cooldown store (filesystem-backed) ───────────────────────────────────────
 
+function readStore(): Record<string, string> {
+  if (!existsSync(HEALTH_GATE_STATE_FILE)) return {};
+  try {
+    return JSON.parse(readFileSync(HEALTH_GATE_STATE_FILE, 'utf-8')) as Record<string, string>;
+  } catch {
+    return {};
+  }
+}
+
+/**
+ * Write atomically so concurrent patrol cycles can't clobber each other
+ * mid-update: write to a unique temp file, then rename onto the target.
+ * `rename` is atomic on POSIX (same filesystem). Race between readStore and
+ * writeStore can still lose a concurrent update (last-writer-wins), but that's
+ * acceptable for cooldown — worst case is one extra escalation emitted.
+ */
+function writeStore(store: Record<string, string>): void {
+  ensureDirs();
+  const tmp = `${HEALTH_GATE_STATE_FILE}.${process.pid}.${Date.now()}.tmp`;
+  writeFileSync(tmp, JSON.stringify(store, null, 2));
+  renameSync(tmp, HEALTH_GATE_STATE_FILE);
+}
+
 function defaultCooldownStore() {
   return {
     get(fingerprint: string): Date | null {
-      if (!existsSync(HEALTH_GATE_STATE_FILE)) return null;
-      try {
-        const raw = JSON.parse(readFileSync(HEALTH_GATE_STATE_FILE, 'utf-8')) as Record<
-          string,
-          string
-        >;
-        const iso = raw[fingerprint];
-        return iso ? new Date(iso) : null;
-      } catch {
-        return null;
-      }
+      const iso = readStore()[fingerprint];
+      return iso ? new Date(iso) : null;
     },
     set(fingerprint: string, at: Date): void {
-      ensureDirs();
-      let store: Record<string, string> = {};
-      if (existsSync(HEALTH_GATE_STATE_FILE)) {
-        try {
-          store = JSON.parse(readFileSync(HEALTH_GATE_STATE_FILE, 'utf-8')) as Record<
-            string,
-            string
-          >;
-        } catch {
-          /* ignore parse errors — treat as empty */
-        }
-      }
+      const store = readStore();
       store[fingerprint] = at.toISOString();
-      writeFileSync(HEALTH_GATE_STATE_FILE, JSON.stringify(store, null, 2));
+      writeStore(store);
     },
+    getCount(key: string): number {
+      const raw = readStore()[key];
+      const n = raw ? Number.parseInt(raw, 10) : 0;
+      return Number.isFinite(n) ? n : 0;
+    },
+    setCount(key: string, n: number): void {
+      const store = readStore();
+      store[key] = String(n);
+      writeStore(store);
+    },
+  };
+}
+
+/** Build a stub HealthScanResult for the "scan failed" / "bypassed" paths. */
+function syntheticScanFailureResult(message: string): HealthScanResult {
+  return {
+    healthy: true,
+    deploy: {
+      healthy: true,
+      reason: `scan failed: ${message}`,
+      lastSuccessfulDeployAt: null,
+      failingDeploys: [],
+    },
+    mainCi: {
+      healthy: true,
+      reason: `scan failed: ${message}`,
+      failingCount: 0,
+      redStreakStarted: null,
+      failingCommits: [],
+    },
+    ratchet: { healthy: true, reason: `scan failed: ${message}`, drifts: [] },
+    issues: [],
   };
 }
 
@@ -144,37 +194,21 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
 
   const now = nowFn();
 
-  // Escape hatch first — if disabled, we never even run the scan.
+  // Escape hatch first — if disabled, we never even run the scan. Rate-limit
+  // the bypass warning via a dedicated fingerprint so the log isn't flooded
+  // every cycle during an extended outage.
   if (env[DISABLE_ENV_VAR] === '1') {
-    log(`${cl.yellow}⚠ ${DISABLE_ENV_VAR}=1 — health gate BYPASSED${cl.reset}`);
-    // Build a minimal synthetic "healthy" result so downstream consumers don't
-    // have to special-case the bypass path.
-    const synthetic: HealthScanResult = {
-      healthy: true,
-      deploy: {
-        healthy: true,
-        reason: 'health gate bypassed',
-        lastSuccessfulDeployAt: null,
-        failingDeploys: [],
-      },
-      mainCi: {
-        healthy: true,
-        reason: 'health gate bypassed',
-        failingCount: 0,
-        redStreakStarted: null,
-        failingCommits: [],
-      },
-      ratchet: {
-        healthy: true,
-        reason: 'health gate bypassed',
-        drifts: [],
-      },
-      issues: [],
-    };
+    const BYPASS_FP = '__bypass_warning__';
+    const lastBypassLog = cooldown.get(BYPASS_FP);
+    const cooldownMs = HEALTH_GATE_COOLDOWN_MINUTES * 60_000;
+    if (!lastBypassLog || now.getTime() - lastBypassLog.getTime() >= cooldownMs) {
+      log(`${cl.yellow}⚠ ${DISABLE_ENV_VAR}=1 — health gate BYPASSED${cl.reset}`);
+      cooldown.set(BYPASS_FP, now);
+    }
     return {
       proceed: true,
       reason: '',
-      result: synthetic,
+      result: syntheticScanFailureResult('health gate bypassed'),
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: true,
@@ -184,39 +218,48 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
   let result: HealthScanResult;
   try {
     result = await scan();
+    // Successful scan — reset the consecutive-error counter so the halt-
+    // threshold only fires on a true streak, not cumulative failures over days.
+    cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
   } catch (e) {
-    // Scanner failed (GitHub 5xx, rate limit, network). Don't silently look
-    // healthy — log and let the patrol proceed. Policy choice: a transient
-    // GitHub hiccup shouldn't halt PR work, but it also shouldn't masquerade
-    // as "all clear". Record the failure, keep going.
+    // Scanner failed. Policy: a transient GitHub hiccup shouldn't halt PR
+    // work. But if the scanner fails N consecutive times, something's wrong
+    // with our observability — flip to halt to prevent silent forever-proceed.
     const message = e instanceof Error ? e.message : String(e);
-    log(`${cl.yellow}⚠ Health scan failed — proceeding with caution: ${message}${cl.reset}`);
+    const prevCount = cooldown.getCount?.(SCAN_ERROR_COUNTER_KEY) ?? 0;
+    const newCount = prevCount + 1;
+    cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, newCount);
+
     writeEvent({
       type: 'health_scan_error',
       timestamp: now.toISOString(),
       error: message,
+      consecutive_errors: newCount,
     });
+
+    if (newCount >= MAX_CONSECUTIVE_SCAN_ERRORS) {
+      log(
+        `${cl.red}✗ Health scan has failed ${newCount}× in a row — HALTING patrol work. ` +
+          `Last error: ${message}${cl.reset}`,
+      );
+      return {
+        proceed: false,
+        reason: `scan failed ${newCount}× consecutively: ${message}`,
+        result: syntheticScanFailureResult(message),
+        emittedIssues: [],
+        suppressedIssues: [],
+        bypassed: false,
+      };
+    }
+
+    log(
+      `${cl.yellow}⚠ Health scan failed (${newCount}/${MAX_CONSECUTIVE_SCAN_ERRORS}) — ` +
+        `proceeding with caution: ${message}${cl.reset}`,
+    );
     return {
       proceed: true,
       reason: '',
-      result: {
-        healthy: true,
-        deploy: {
-          healthy: true,
-          reason: `scan failed: ${message}`,
-          lastSuccessfulDeployAt: null,
-          failingDeploys: [],
-        },
-        mainCi: {
-          healthy: true,
-          reason: `scan failed: ${message}`,
-          failingCount: 0,
-          redStreakStarted: null,
-          failingCommits: [],
-        },
-        ratchet: { healthy: true, reason: `scan failed: ${message}`, drifts: [] },
-        issues: [],
-      },
+      result: syntheticScanFailureResult(message),
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: false,

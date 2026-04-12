@@ -4,6 +4,7 @@ import {
   runHealthGate,
   fingerprintIssue,
   HEALTH_GATE_COOLDOWN_MINUTES,
+  MAX_CONSECUTIVE_SCAN_ERRORS,
   DISABLE_ENV_VAR,
   type HealthGateDeps,
 } from './health-gate.ts';
@@ -79,12 +80,18 @@ function deployStuckIssue(overrides: Partial<HealthIssue> = {}): HealthIssue {
  */
 function inMemoryCooldown() {
   const map = new Map<string, Date>();
+  const counts = new Map<string, number>();
   return {
     get: (fp: string) => map.get(fp) ?? null,
     set: (fp: string, at: Date) => {
       map.set(fp, at);
     },
+    getCount: (key: string) => counts.get(key) ?? 0,
+    setCount: (key: string, n: number) => {
+      counts.set(key, n);
+    },
     _map: map,
+    _counts: counts,
   };
 }
 
@@ -140,6 +147,27 @@ describe('runHealthGate — env escape hatch', () => {
     });
     expect(decision.bypassed).toBe(false);
   });
+
+  it('rate-limits the bypass warning across cycles (log spam mitigation)', async () => {
+    const store = inMemoryCooldown();
+    const logs: string[] = [];
+    const common = {
+      env: { [DISABLE_ENV_VAR]: '1' },
+      writeEvent: () => {},
+      log: (msg: string) => logs.push(msg),
+      cooldownStore: store,
+      scan: async () => healthyScan(),
+    };
+
+    await runHealthGate({ ...common, now: () => NOW });
+    const soonAfter = new Date(NOW.getTime() + 5 * 60_000);
+    await runHealthGate({ ...common, now: () => soonAfter });
+    const wayLater = new Date(NOW.getTime() + (HEALTH_GATE_COOLDOWN_MINUTES + 1) * 60_000);
+    await runHealthGate({ ...common, now: () => wayLater });
+
+    const bypassLogs = logs.filter((l) => l.includes('BYPASSED'));
+    expect(bypassLogs).toHaveLength(2); // first, and one after cooldown elapsed
+  });
 });
 
 // ── Healthy path ─────────────────────────────────────────────────────────────
@@ -157,7 +185,7 @@ describe('runHealthGate — healthy', () => {
 // ── Scanner failure ──────────────────────────────────────────────────────────
 
 describe('runHealthGate — scanner error', () => {
-  it('logs + records an error event + lets patrol proceed (does not masquerade as healthy)', async () => {
+  it('logs + records an error event + lets patrol proceed on the first failure', async () => {
     const deps = makeDeps();
     const decision = await runHealthGate({
       ...deps,
@@ -170,7 +198,45 @@ describe('runHealthGate — scanner error', () => {
     expect(deps.events[0]).toMatchObject({
       type: 'health_scan_error',
       error: 'GitHub API 503',
+      consecutive_errors: 1,
     });
+  });
+
+  it(`HALTS patrol after ${MAX_CONSECUTIVE_SCAN_ERRORS} consecutive failures (regression: fail-open-forever risk)`, async () => {
+    const store = inMemoryCooldown();
+    const deps = { ...makeDeps({ cooldownStore: store }) };
+    const scan = async () => {
+      throw new Error('missing API key');
+    };
+
+    let lastDecision;
+    for (let i = 0; i < MAX_CONSECUTIVE_SCAN_ERRORS; i++) {
+      lastDecision = await runHealthGate({ ...deps, scan });
+    }
+    // First N-1 proceed; Nth halts
+    expect(lastDecision!.proceed).toBe(false);
+    expect(lastDecision!.reason).toContain('consecutively');
+    expect(store.getCount('__scan_error_count__')).toBe(MAX_CONSECUTIVE_SCAN_ERRORS);
+  });
+
+  it('resets the error counter on a successful scan (so the halt only fires on a true streak)', async () => {
+    const store = inMemoryCooldown();
+    // Pre-populate: 2 consecutive errors (1 short of halt)
+    store.setCount('__scan_error_count__', MAX_CONSECUTIVE_SCAN_ERRORS - 1);
+    const deps = { ...makeDeps({ cooldownStore: store }) };
+
+    // One successful scan clears the counter
+    await runHealthGate({ ...deps, scan: async () => healthyScan() });
+    expect(store.getCount('__scan_error_count__')).toBe(0);
+
+    // Now a single failure should NOT halt (counter restarted from 0)
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        throw new Error('transient');
+      },
+    });
+    expect(decision.proceed).toBe(true);
   });
 });
 
