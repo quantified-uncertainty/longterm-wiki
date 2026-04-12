@@ -2527,3 +2527,42 @@
     - ai-governance
     - power-mapping
   lastUpdated: 2026-04
+- id: export-controls-effectiveness-analysis
+  stableId: sid_9AhkwVSzwg
+  wikiId: E2264
+  type: analysis
+  title: Export Controls Effectiveness Analysis
+  description: >-
+    Assessment of whether US AI chip export controls actually slow China's AI development,
+    covering the 2022–2025 control timeline, theory of change, observed outcomes, smuggling
+    evidence, and counterfactual impact.
+  tags:
+    - ai-governance
+    - export-controls
+  lastUpdated: 2026-04
+- id: regulatory-capture-risks-in-ai
+  stableId: sid_gfIgD5rc4w
+  wikiId: E2265
+  type: analysis
+  title: Regulatory Capture Risks in AI
+  description: >-
+    Analysis of how dominant AI companies influence regulators to protect market dominance
+    through revolving doors, lobbying, complexity moats, and industry-written rules — covering
+    mechanisms, evidence, historical analogues, and proposed reforms.
+  tags:
+    - ai-governance
+    - regulatory-capture
+  lastUpdated: 2026-04
+- id: ai-revolving-door-analysis
+  stableId: sid_Iimozpj8xA
+  wikiId: E2263
+  type: analysis
+  title: AI Revolving Door Analysis
+  description: >-
+    Analysis of personnel flows between AI laboratories, government agencies, think tanks,
+    and safety organizations, examining regulatory capture risks, expertise transfer, and
+    governance implications.
+  tags:
+    - ai-governance
+    - revolving-door
+  lastUpdated: 2026-04
