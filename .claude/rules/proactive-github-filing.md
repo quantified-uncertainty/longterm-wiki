@@ -63,6 +63,28 @@ For longer descriptions, use `--description-file=/tmp/description.md`.
 - **Evidence required**: You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
 
+## Mandatory tracking — red flags that MUST produce a ticket
+
+The patterns below have a documented history of getting lost when an agent "just flags it verbally" or "assumes someone else will handle it." If you observe any of these, **you must file or reopen a Linear ticket before ending the session.** Not doing so is a violation of this rule, not a judgement call.
+
+| Red flag | Required action | Rationale |
+|---|---|---|
+| **Prod incident observed** (failed deploy, stuck migration, 5xx spike, prod endpoint returning wrong status) | File **Urgent/P0** Linear ticket with root cause + prescribed fix + link to evidence. Do NOT just mention it in PR comments or chat. | 2026-04-11 incident: wiki-server deploy stuck 12+h because the failure was "noticed" but never ticketed. |
+| **Symptom patch** (baseline bump, `test.skip()`, catch-and-swallow in an error path that previously threw, commented-out code, `// TODO` without issue number, silencing a validator you don't understand) | File a separate ticket naming (a) the symptom that was patched, (b) the suspected root cause, (c) what would let us unpatch. Link from the patching PR. | Symptom patches are permanent by default. Without a ticket, nobody ever unpatches them. |
+| **Misdiagnosis discovered** (you or another session filed a ticket with the wrong root cause, or a ticket's scope turned out to be pointing at the wrong thing) | Close the wrong ticket with a "misdiagnosed — actual cause is X" comment **and** file the correct ticket. Don't silently abandon. | Abandoned wrong tickets waste future agent time (they're still in the backlog). |
+| **Premature "Done"** (parent/epic ticket was closed while residual work remains — e.g., PR merged closing the ticket but a follow-up piece is still needed) | Reopen the parent ticket with a "partial completion — see remaining work" comment, OR file a follow-up ticket and link it before ending the session. | 2026-04-11 incident: QUA-156 closed Done when its migration actually bricked the deploy. Closure masked the failure. |
+| **N+ related symptoms in a narrow window** (≥2 consecutive baseline bumps in the same file, ≥2 PRs reverting each other, ≥2 patches silencing the same validator) | **Stop patching.** File a ticket describing the pattern and why you stopped. Escalate to the coordinator. | 2026-04-11 incident: 7 PRs in 24h patched sourcing-ratchet symptoms while the real problem (stuck deploy) was untracked. Any one agent stopping at symptom #2 would have caught it. |
+
+### When in doubt, file
+
+If you're unsure whether something meets the bar above, **file it.** False-positive tickets are cheap (close with "actually fine"). False-negative missed root causes are expensive — see the 2026-04-11 cascade.
+
+### Not a red flag
+
+- Things you fix completely in this session — no ticket needed, the PR is the record.
+- Style/cleanup observations you have no evidence hurt anyone — use the "Do NOT file issues for..." list above.
+- Work you're about to ship in the same PR — not a follow-up, just part of the PR.
+
 ## GitHub Discussions
 
 Use `crux gh epic create` for **open-ended questions** that don't have a clear fix ("Should we restructure X?", "What's our strategy for Y?"). Issues are for concrete actionable tasks; discussions are for decisions that need human input. Discussions stay on GitHub — they are not tracked in Linear.
