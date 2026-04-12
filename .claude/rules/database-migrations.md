@@ -51,6 +51,27 @@ Reference implementations: `0108_natural_key_uniqueness.sql`, `0143_dedup_fundin
 
 The gate check (`validate-drizzle-journal.ts`) warns if it detects CREATE UNIQUE INDEX with hardcoded DELETEs.
 
+## Adding CHECK constraints on enum columns — MANDATORY pattern
+
+**Never write a CHECK constraint's allowed-value list from code or memory.** Enumerate against prod data first, or the migration will fail when it encounters values the author didn't know existed.
+
+Incident context: two enum-gap incidents in the same week. Migration 0173's `groundskeeper_runs.event` constraint omitted three valid values already in prod (`circuit_breaker_reset`, `half_open_attempt`, `half_open_success`), blocking the #4167 release at ArgoCD PreSync until #4178 landed. `service_health_incidents.severity` shipped with a similarly incomplete allowlist and needed #4202. Both root-caused to the same mistake: author inspected the TypeScript enum / Zod schema instead of querying the column's live distinct values.
+
+(Note: migration 0173's `chk_hrs_level` *also* caused a separate ~12h outage (QUA-302), but that was lock contention, not an enum gap — see the `NOT VALID` pattern below.)
+
+**Required procedure before writing any `CHECK (col IN (...))` constraint:**
+
+1. Query prod for the full distinct-value set:
+   ```sql
+   SELECT col, count(*) FROM my_table GROUP BY col ORDER BY count DESC;
+   ```
+2. Paste the output into the PR description under a `### Enum enumeration` heading.
+3. Build the `IN (...)` list from that output, not from an enum type, TypeScript union, or your recollection of "the valid values."
+4. If the live set contains values you think should be invalid, **add them to the constraint anyway** and file a separate cleanup ticket. A migration is not the place to retroactively narrow an enum.
+5. For large tables, combine with the `NOT VALID` + `VALIDATE CONSTRAINT` pattern below.
+
+This applies equally to new constraints and to ALTERing existing ones to a tighter set.
+
 ## When Drizzle migrations work fine
 
 Most migrations: adding columns, creating tables, adding indexes on small tables, inserting rows. These complete in seconds and work through the normal Drizzle migration runner.
