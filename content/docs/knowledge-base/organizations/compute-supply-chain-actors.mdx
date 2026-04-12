@@ -117,7 +117,19 @@ Beyond the major hyperscalers and established neoclouds, a layer of more special
 
 ## Supply Chain Flow
 
-The following diagram illustrates the flow of compute from raw inputs to AI laboratories:
+The flow of compute from raw inputs to AI laboratories runs roughly:
+
+```mermaid
+flowchart LR
+  EUV[ASML — EUV lithography monopoly] --> FAB[TSMC / Samsung / Intel — fabs]
+  FAB --> DESIGN[NVIDIA / AMD / Google TPU / Amazon Trainium — chip designers]
+  MEM[SK Hynix / Samsung / Micron — HBM memory] --> DESIGN
+  DESIGN --> CLOUD[AWS / Azure / GCP / Oracle / CoreWeave — hyperscalers]
+  DESIGN --> LAB1[Frontier AI labs — direct purchase]
+  CLOUD --> LAB2[Frontier AI labs — via cloud]
+```
+
+Each hop concentrates further, creating well-known chokepoints: ASML for EUV-class lithography, TSMC for leading-edge fabrication, NVIDIA for AI accelerators at scale, and a small number of hyperscalers for on-demand compute.
 
 [^1]: Semiconductor Industry Association and various industry analyses - Market share and supply chain concentration data for AI compute, including TSMC, NVIDIA, ASML, SK Hynix, and cloud hyperscaler positions, drawn from publicly available industry reports and company disclosures (2022–2024)
 
