@@ -150,7 +150,7 @@ audits:
     frequency: weekly
     added: "2026-03-04"
     added_by_pr: 1630
-    last_checked: "2026-04-05"
+    last_checked: "2026-04-12"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -160,6 +160,10 @@ audits:
       - date: "2026-04-05"
         result: pass
         checked_by: "manual"
+      - date: "2026-04-12"
+        result: pass
+        checked_by: "agent-maintain"
+        notes: "vercel.json ignoreCommand is correct (apps/web/vercel.json: exits 1 only when VERCEL_GIT_COMMIT_REF=production, else exits 0 to skip). Dashboard verification not performed (requires Vercel UI auth)."
   - id: active-agents-dashboard-adoption
     category: feature-health
     description: "Agent Activity dashboard (E1281) is populated with data and referenced by maintenance or agent sessions"
