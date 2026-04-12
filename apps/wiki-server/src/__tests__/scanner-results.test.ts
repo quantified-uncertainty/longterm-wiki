@@ -208,6 +208,25 @@ describe("scanner-results route", () => {
     expect(body.scanRunId).toBeNull();
   });
 
-  // POST /run test removed — route not yet implemented.
-  // Re-add when the server-side scan endpoint is built.
+  it("POST /run triggers server-side scan and returns summary", async () => {
+    const app = buildApp();
+    const res = await app.request("/api/scanner-results/run", { method: "POST" });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(typeof body.scanRunId).toBe("string");
+    expect(body.scanRunId.length).toBeGreaterThan(0);
+    expect(typeof body.inserted).toBe("number");
+    expect(body.inserted).toBeGreaterThan(0);
+    expect(typeof body.tables).toBe("number");
+    expect(body.tables).toBeGreaterThan(0);
+    expect(Array.isArray(body.recordTypes)).toBe(true);
+    expect(body.recordTypes).toContain("grants");
+    expect(typeof body.avgCompleteness).toBe("number");
+    expect(typeof body.scannedAt).toBe("string");
+
+    // Scan rows should have been inserted (one INSERT call per chunk)
+    expect(insertedRows.length).toBeGreaterThan(0);
+  });
+
 });
