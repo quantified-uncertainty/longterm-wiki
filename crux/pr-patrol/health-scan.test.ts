@@ -3,16 +3,30 @@ import { describe, it, expect } from 'vitest';
 import {
   evaluateDeployStatus,
   evaluateMainCi,
+  evaluateRatchetDrift,
   combineHealth,
+  combineRatchetDrift,
+  checkRatchetDriftForFile,
+  readBaselineTotal,
   mapRollupState,
   DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES,
   MAIN_CI_RED_STREAK_MIN,
   DEPLOY_STALE_THRESHOLD_HOURS,
   DEPLOY_STUCK_SCORE,
   MAIN_CI_RED_SCORE,
+  RATCHET_DRIFT_SCORE,
+  RATCHET_DRIFT_MIN_BUMPS,
+  RATCHET_DRIFT_WINDOW_HOURS,
   type WorkflowRun,
   type CommitStatus,
+  type BaselineObservation,
+  type RatchetDriftResult,
 } from './health-scan.ts';
+import type { RatchetConfig } from './ratchet-config.ts';
+
+function emptyRatchet(): RatchetDriftResult {
+  return combineRatchetDrift([]);
+}
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -237,7 +251,7 @@ describe('combineHealth', () => {
   it('returns healthy with empty issues when both sub-scanners are healthy', () => {
     const deploy = evaluateDeployStatus([run({ conclusion: 'success' })]);
     const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(true);
     expect(combined.issues).toHaveLength(0);
   });
@@ -248,7 +262,7 @@ describe('combineHealth', () => {
       run({ id: 2, conclusion: 'failure' }),
     ]);
     const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(false);
     expect(combined.issues).toHaveLength(1);
     expect(combined.issues[0].type).toBe('deploy-stuck');
@@ -264,7 +278,7 @@ describe('combineHealth', () => {
       commit({ sha: 'b', conclusion: 'failure' }),
       commit({ sha: 'c', conclusion: 'failure' }),
     ]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(false);
     expect(combined.issues).toHaveLength(1);
     expect(combined.issues[0].type).toBe('main-ci-red');
@@ -282,7 +296,7 @@ describe('combineHealth', () => {
       commit({ sha: 'b', conclusion: 'failure' }),
       commit({ sha: 'c', conclusion: 'failure' }),
     ]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.issues).toHaveLength(2);
     expect(combined.issues[0].type).toBe('deploy-stuck');
     expect(combined.issues[1].type).toBe('main-ci-red');
@@ -369,6 +383,480 @@ describe('evaluateMainCi — mid-list pending interruption', () => {
 });
 
 // ── mapRollupState — GraphQL enum coverage ──────────────────────────────────
+
+// ── evaluateRatchetDrift (pure) ──────────────────────────────────────────────
+
+describe('evaluateRatchetDrift', () => {
+  const NOW = new Date('2026-04-12T20:00:00Z');
+
+  function obs(hoursAgo: number, total: number | null, commit = `c${hoursAgo}`): BaselineObservation {
+    return {
+      commit,
+      committedAt: new Date(NOW.getTime() - hoursAgo * 3_600_000),
+      total,
+    };
+  }
+
+  it('fires on 3 monotonic upward bumps within 24h (bad direction = up)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 5), obs(5, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+    expect(result.direction).toBe('up');
+    expect(result.bumps.map((b) => [b.from, b.to])).toEqual([
+      [2, 5],
+      [5, 10],
+      [10, 23],
+    ]);
+  });
+
+  it('does NOT fire with only 2 bumps in window (below threshold of 3)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(5, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(2);
+  });
+
+  it('does NOT fire when 3 bumps span a 48h window (rate-limited)', () => {
+    // 3 bumps, but spread across 48h — only the last one is in the 24h window.
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(48, 2), obs(36, 5), obs(30, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW, windowHours: 24 },
+    );
+    expect(result.drifted).toBe(false);
+    // Only the 30h→1h transition is seen as a bump in the windowed view,
+    // because the pre-window parent observation was filtered out.
+    expect(result.bumpCount).toBeLessThan(3);
+  });
+
+  it('does NOT fire on alternating-direction bumps', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 5), obs(8, 20), obs(5, 7), obs(1, 30)],
+      { badDirection: 'up', now: NOW },
+    );
+    // Sequence: 5→20 (up), 20→7 (down, reset), 7→30 (up) → bad-direction streak=1
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(1);
+  });
+
+  it('resets the streak when a good-direction bump interrupts (fix landed mid-window)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 5), obs(6, 10), obs(4, 4), obs(2, 8)],
+      { badDirection: 'up', now: NOW },
+    );
+    // 2→5 up, 5→10 up (streak=2), 10→4 DOWN (reset), 4→8 up (streak=1)
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(1);
+  });
+
+  it('ignores no-op commits (total unchanged) without counting them as bumps', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 2), obs(6, 5), obs(4, 5), obs(2, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3); // 2→5, 5→10, 10→23
+  });
+
+  it('skips observations with null total (file absent at that commit)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, null), obs(8, 2), obs(5, 5), obs(3, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+  });
+
+  it('validates constants', () => {
+    expect(RATCHET_DRIFT_MIN_BUMPS).toBe(3);
+    expect(RATCHET_DRIFT_WINDOW_HOURS).toBe(24);
+  });
+
+  it('fires on 3 downward bumps when bad direction = down (e.g., coverage ratchet)', () => {
+    const result = evaluateRatchetDrift(
+      'coverage.json',
+      'coverage',
+      [obs(10, 100), obs(8, 95), obs(5, 90), obs(1, 80)],
+      { badDirection: 'down', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.direction).toBe('down');
+    expect(result.bumpCount).toBe(3);
+    expect(result.reason).toContain('↓');
+  });
+
+  it('returns a stable-reason for empty observations', () => {
+    const result = evaluateRatchetDrift('x.json', 'x', [], {
+      badDirection: 'up',
+      now: NOW,
+    });
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(0);
+    expect(result.reason).toContain('stable');
+  });
+});
+
+// ── combineRatchetDrift ──────────────────────────────────────────────────────
+
+describe('combineRatchetDrift', () => {
+  it('is healthy when no ratchets are registered', () => {
+    const result = combineRatchetDrift([]);
+    expect(result.healthy).toBe(true);
+    expect(result.reason).toContain('no ratchet');
+  });
+
+  it('is healthy when all registered ratchets are within thresholds', () => {
+    const result = combineRatchetDrift([
+      {
+        file: 'a.json',
+        name: 'a',
+        direction: null,
+        bumpCount: 0,
+        bumps: [],
+        drifted: false,
+        reason: 'ok',
+      },
+    ]);
+    expect(result.healthy).toBe(true);
+  });
+
+  it('is unhealthy when any ratchet drifted', () => {
+    const result = combineRatchetDrift([
+      {
+        file: 'a.json',
+        name: 'a',
+        direction: 'up',
+        bumpCount: 3,
+        bumps: [],
+        drifted: true,
+        reason: 'a bumped 3×',
+      },
+      {
+        file: 'b.json',
+        name: 'b',
+        direction: null,
+        bumpCount: 0,
+        bumps: [],
+        drifted: false,
+        reason: 'ok',
+      },
+    ]);
+    expect(result.healthy).toBe(false);
+    expect(result.reason).toBe('a bumped 3×');
+  });
+});
+
+// ── combineHealth + ratchet integration ──────────────────────────────────────
+
+describe('combineHealth with ratchet drift', () => {
+  const now = new Date('2026-04-12T07:00:00Z');
+
+  it('emits a ratchet-drift issue when a baseline drifted', () => {
+    const deploy = evaluateDeployStatus([run({ conclusion: 'success' })]);
+    const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
+    const ratchet: RatchetDriftResult = {
+      healthy: false,
+      reason: 'sourcing bumped 3× ↑',
+      drifts: [
+        {
+          file: 'sourcing.json',
+          name: 'sourcing',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'sourcing bumped 3× ↑',
+        },
+      ],
+    };
+    const combined = combineHealth(deploy, mainCi, ratchet, now);
+    expect(combined.healthy).toBe(false);
+    expect(combined.issues).toHaveLength(1);
+    expect(combined.issues[0].type).toBe('ratchet-drift');
+    expect(combined.issues[0].score).toBe(RATCHET_DRIFT_SCORE);
+    expect(combined.issues[0].reason).toBe('sourcing bumped 3× ↑');
+  });
+
+  it('ranks deploy-stuck > main-ci-red > ratchet-drift', () => {
+    expect(DEPLOY_STUCK_SCORE).toBeGreaterThan(MAIN_CI_RED_SCORE);
+    expect(MAIN_CI_RED_SCORE).toBeGreaterThan(RATCHET_DRIFT_SCORE);
+    // And ratchet-drift still outranks per-PR conflict (100)
+    expect(RATCHET_DRIFT_SCORE).toBeGreaterThan(100);
+  });
+
+  it('emits all three issues when everything is unhealthy', () => {
+    const deploy = evaluateDeployStatus([
+      run({ id: 1, conclusion: 'failure' }),
+      run({ id: 2, conclusion: 'failure' }),
+    ]);
+    const mainCi = evaluateMainCi([
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'failure' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+    ]);
+    const ratchet: RatchetDriftResult = {
+      healthy: false,
+      reason: 'drift',
+      drifts: [
+        {
+          file: 'x.json',
+          name: 'x',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'x bumped 3×',
+        },
+      ],
+    };
+    const combined = combineHealth(deploy, mainCi, ratchet, now);
+    expect(combined.issues.map((i) => i.type)).toEqual([
+      'deploy-stuck',
+      'main-ci-red',
+      'ratchet-drift',
+    ]);
+    // Issues are pushed in the order they're checked — which is also the
+    // priority order. Verify scores are monotonically decreasing.
+    const scores = combined.issues.map((i) => i.score);
+    expect(scores[0]).toBeGreaterThan(scores[1]);
+    expect(scores[1]).toBeGreaterThan(scores[2]);
+  });
+});
+
+// ── readBaselineTotal (numeric-type handling) ────────────────────────────────
+
+describe('readBaselineTotal', () => {
+  const cfg: RatchetConfig = {
+    file: 'x.json',
+    name: 'x',
+    totalField: 'total',
+    badDirection: 'up',
+  };
+
+  it('reads a numeric total', () => {
+    const runGit = () => ({ ok: true, output: '{"total": 23}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBe(23);
+  });
+
+  it('coerces a numeric-string total (regression: validators may serialize as string)', () => {
+    const runGit = () => ({ ok: true, output: '{"total": "23"}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBe(23);
+  });
+
+  it('returns null for non-numeric string', () => {
+    const runGit = () => ({ ok: true, output: '{"total": "pending"}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBeNull();
+  });
+
+  it('returns null when the field is missing', () => {
+    const runGit = () => ({ ok: true, output: '{"other": 1}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBeNull();
+  });
+
+  it('returns null on malformed JSON', () => {
+    const runGit = () => ({ ok: true, output: 'not-json', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBeNull();
+  });
+
+  it('returns null when git show fails (file absent at ref)', () => {
+    const runGit = () => ({ ok: false, output: '', stderr: 'fatal: path not in tree' });
+    expect(readBaselineTotal('HEAD', cfg, runGit)).toBeNull();
+  });
+
+  it('returns null for Infinity / NaN (both JSON and string forms)', () => {
+    // JSON doesn't allow Infinity, but the string-coercion branch could hit it.
+    const runGit1 = () => ({ ok: true, output: '{"total": "Infinity"}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit1)).toBeNull();
+    const runGit2 = () => ({ ok: true, output: '{"total": "NaN"}', stderr: '' });
+    expect(readBaselineTotal('HEAD', cfg, runGit2)).toBeNull();
+  });
+});
+
+// ── checkRatchetDriftForFile (I/O wrapper, mocked gitSafe) ───────────────────
+
+describe('checkRatchetDriftForFile (mocked git)', () => {
+  const NOW = new Date('2026-04-12T20:00:00Z');
+  const cfg: RatchetConfig = {
+    file: 'crux/validate/.sourcing-baseline.json',
+    name: 'sourcing',
+    totalField: 'total',
+    badDirection: 'up',
+  };
+
+  function makeGit(
+    logOutput: string,
+    showResponses: Record<string, { ok: boolean; output: string; stderr?: string }> = {},
+  ) {
+    return (...args: string[]) => {
+      if (args[0] === 'log') {
+        return { ok: true, output: logOutput, stderr: '' };
+      }
+      if (args[0] === 'show' && args[1] === '-s') {
+        // commitTimestamp: `git show -s --format=%ct <ref>`
+        const ref = args[3];
+        const resp = showResponses[`ts:${ref}`];
+        return resp ?? { ok: false, output: '', stderr: 'not found' };
+      }
+      if (args[0] === 'show') {
+        // readBaselineTotal: `git show <ref>:<file>`
+        const spec = args[1];
+        const resp = showResponses[spec];
+        return resp ?? { ok: false, output: '', stderr: 'not found' };
+      }
+      return { ok: false, output: '', stderr: 'unexpected git call' };
+    };
+  }
+
+  function epoch(iso: string): string {
+    return String(Math.floor(new Date(iso).getTime() / 1000));
+  }
+
+  it('fires when 3 upward bumps appear in the window (file existed before window)', () => {
+    const c1 = { iso: '2026-04-12T10:00:00Z' };
+    const c2 = { iso: '2026-04-12T14:00:00Z' };
+    const c3 = { iso: '2026-04-12T18:00:00Z' };
+    // git log newest-first:
+    const logOutput = [
+      `c3 ${epoch(c3.iso)}`,
+      `c2 ${epoch(c2.iso)}`,
+      `c1 ${epoch(c1.iso)}`,
+    ].join('\n');
+    const showResponses = {
+      'c1^:crux/validate/.sourcing-baseline.json': {
+        ok: true,
+        output: '{"total": 2}',
+        stderr: '',
+      },
+      'ts:c1^': { ok: true, output: epoch('2026-04-11T23:00:00Z'), stderr: '' },
+      'c1:crux/validate/.sourcing-baseline.json': {
+        ok: true,
+        output: '{"total": 5}',
+        stderr: '',
+      },
+      'c2:crux/validate/.sourcing-baseline.json': {
+        ok: true,
+        output: '{"total": 10}',
+        stderr: '',
+      },
+      'c3:crux/validate/.sourcing-baseline.json': {
+        ok: true,
+        output: '{"total": 23}',
+        stderr: '',
+      },
+    };
+    const result = checkRatchetDriftForFile(cfg, { now: NOW }, makeGit(logOutput, showResponses));
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+    expect(result.bumps.map((b) => [b.from, b.to])).toEqual([
+      [2, 5],
+      [5, 10],
+      [10, 23],
+    ]);
+  });
+
+  it('handles a file created mid-window (parent-of-first-commit has no file) — 3 later bumps still fire', () => {
+    // File is created by c1 at total=2. Parent c1^ doesn't have the file.
+    // Subsequent commits c2=5, c3=10, c4=23. The evaluator sees observations
+    // [c1=2, c2=5, c3=10, c4=23] — parent is skipped cleanly.
+    const logOutput = [
+      `c4 ${epoch('2026-04-12T18:00:00Z')}`,
+      `c3 ${epoch('2026-04-12T15:00:00Z')}`,
+      `c2 ${epoch('2026-04-12T12:00:00Z')}`,
+      `c1 ${epoch('2026-04-12T09:00:00Z')}`,
+    ].join('\n');
+    const showResponses = {
+      // Parent of c1 has no file — git show returns non-ok
+      'c1^:crux/validate/.sourcing-baseline.json': {
+        ok: false,
+        output: '',
+        stderr: 'fatal: path not in tree',
+      },
+      'c1:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 2}', stderr: '' },
+      'c2:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 5}', stderr: '' },
+      'c3:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 10}', stderr: '' },
+      'c4:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 23}', stderr: '' },
+    };
+    const result = checkRatchetDriftForFile(cfg, { now: NOW }, makeGit(logOutput, showResponses));
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+  });
+
+  it('handles a comment-only commit (touches file but leaves total unchanged)', () => {
+    // c1 touches file but keeps total at 5; c2 bumps to 10; c3 bumps to 23.
+    // Only c1→c2 (up) and c2→c3 (up) are bumps. Plus parent→c1 (2→5, up) if
+    // parent is readable. That gives 3 bumps total.
+    const logOutput = [
+      `c3 ${epoch('2026-04-12T18:00:00Z')}`,
+      `c2 ${epoch('2026-04-12T15:00:00Z')}`,
+      `c1 ${epoch('2026-04-12T12:00:00Z')}`,
+    ].join('\n');
+    const showResponses = {
+      'c1^:crux/validate/.sourcing-baseline.json': {
+        ok: true,
+        output: '{"total": 5}',
+        stderr: '',
+      },
+      'ts:c1^': { ok: true, output: epoch('2026-04-12T09:00:00Z'), stderr: '' },
+      // c1 touched the file but didn't change the total
+      'c1:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 5}', stderr: '' },
+      'c2:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 10}', stderr: '' },
+      'c3:crux/validate/.sourcing-baseline.json': { ok: true, output: '{"total": 23}', stderr: '' },
+    };
+    const result = checkRatchetDriftForFile(cfg, { now: NOW }, makeGit(logOutput, showResponses));
+    // Bumps: parent→c1 (5=5, no bump), c1→c2 (5→10 up), c2→c3 (10→23 up) = 2
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(2);
+  });
+
+  it('returns stable+zero-bumps when git log has no commits in the window', () => {
+    const runGit = makeGit('');
+    const result = checkRatchetDriftForFile(cfg, { now: NOW }, runGit);
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(0);
+    expect(result.reason).toContain('no commits');
+  });
+
+  it('returns stable when git log fails (propagates reason, not a false-positive drift)', () => {
+    const runGit = () => ({ ok: false, output: '', stderr: 'fatal: not a git repository' });
+    const result = checkRatchetDriftForFile(cfg, { now: NOW }, runGit);
+    expect(result.drifted).toBe(false);
+    expect(result.reason).toContain('git log failed');
+    expect(result.reason).toContain('not a git repository');
+  });
+
+  it('uses --since=<iso> derived from `now` (not git wall-clock relative date)', () => {
+    // Capture the --since arg to verify it matches `now - windowHours`.
+    let capturedSince: string | null = null;
+    const runGit = (...args: string[]) => {
+      if (args[0] === 'log') {
+        const sinceArg = args.find((a) => a.startsWith('--since='));
+        capturedSince = sinceArg?.replace('--since=', '') ?? null;
+        return { ok: true, output: '', stderr: '' };
+      }
+      return { ok: false, output: '', stderr: '' };
+    };
+    checkRatchetDriftForFile(cfg, { now: NOW, windowHours: 24 }, runGit);
+    expect(capturedSince).toBe(new Date(NOW.getTime() - 24 * 3_600_000).toISOString());
+  });
+});
 
 describe('mapRollupState', () => {
   it('maps SUCCESS → success', () => {

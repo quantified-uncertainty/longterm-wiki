@@ -14,6 +14,8 @@
  */
 
 import { REPO, githubApi, githubGraphQL } from '../lib/github.ts';
+import { gitSafe } from '../lib/git.ts';
+import { RATCHET_BASELINES, type RatchetConfig } from './ratchet-config.ts';
 
 // ── Constants ────────────────────────────────────────────────────────────────
 
@@ -50,6 +52,26 @@ export const DEPLOY_STUCK_SCORE = 200;
 /** Score bonus for a main-CI red streak. Below deploy-stuck but above per-PR. */
 export const MAIN_CI_RED_SCORE = 180;
 
+/**
+ * Min bumps in the bad direction within the window before ratchet-drift fires.
+ * Chosen at 3 because 2 can easily be legitimate rebase-flurry; 3+ is when
+ * the "we're papering over something" pattern emerges.
+ */
+export const RATCHET_DRIFT_MIN_BUMPS = 3;
+
+/**
+ * Sliding window for ratchet-drift detection. 24h aligns with the retrospective
+ * incident where a baseline moved 3+ times in the same night.
+ */
+export const RATCHET_DRIFT_WINDOW_HOURS = 24;
+
+/**
+ * Score bonus for a ratchet-drift signal. Below deploy-stuck + main-ci-red but
+ * still above every per-PR issue so it surfaces before the patrol re-dispatches
+ * another bump attempt.
+ */
+export const RATCHET_DRIFT_SCORE = 150;
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface WorkflowRun {
@@ -85,7 +107,7 @@ export interface MainCiResult {
   failingCommits: CommitStatus[];
 }
 
-export type HealthIssueType = 'deploy-stuck' | 'main-ci-red';
+export type HealthIssueType = 'deploy-stuck' | 'main-ci-red' | 'ratchet-drift';
 
 export interface HealthIssue {
   type: HealthIssueType;
@@ -97,10 +119,47 @@ export interface HealthIssue {
   detectedAt: string;
 }
 
+/**
+ * One observation of a ratchet baseline at a specific commit.
+ * `total === null` means the file didn't exist at that commit (or couldn't be
+ * read / parsed) — the evaluator treats it as "no data point" and skips it.
+ */
+export interface BaselineObservation {
+  commit: string;
+  committedAt: Date;
+  total: number | null;
+}
+
+export interface RatchetDriftForFile {
+  file: string;
+  name: string;
+  /** How the total moved — only populated when drift is flagged. */
+  direction: 'up' | 'down' | null;
+  /** Number of bumps in the bad direction within the window. */
+  bumpCount: number;
+  /** The specific bumps that tripped the threshold (oldest → newest). */
+  bumps: Array<{
+    commit: string;
+    committedAt: string;
+    from: number;
+    to: number;
+  }>;
+  /** True when the count exceeds the threshold in the bad direction. */
+  drifted: boolean;
+  reason: string;
+}
+
+export interface RatchetDriftResult {
+  healthy: boolean;
+  reason: string;
+  drifts: RatchetDriftForFile[];
+}
+
 export interface HealthScanResult {
   healthy: boolean;
   deploy: DeployStatusResult;
   mainCi: MainCiResult;
+  ratchet: RatchetDriftResult;
   issues: HealthIssue[];
 }
 
@@ -250,12 +309,268 @@ export function evaluateMainCi(commits: CommitStatus[]): MainCiResult {
 }
 
 /**
+ * Given observations of a ratchet baseline (oldest → newest) and a window,
+ * decide whether the file has drifted in the bad direction.
+ *
+ * Rules:
+ *  - Only observations within `windowHours` of `now` are considered.
+ *  - Consecutive observations where `total` changed and both values are
+ *    non-null form a "bump". Direction = sign(to - from).
+ *  - Bumps in the bad direction count; bumps in the good direction RESET
+ *    the counter — we only care about unchecked drift. (A legitimate fix
+ *    that moves the number down shouldn't be hidden by yesterday's bad bump.)
+ *  - Drift fires when bad-direction bumps ≥ `minBumps`.
+ */
+export function evaluateRatchetDrift(
+  file: string,
+  name: string,
+  observations: BaselineObservation[],
+  options: {
+    badDirection: 'up' | 'down';
+    now?: Date;
+    windowHours?: number;
+    minBumps?: number;
+  },
+): RatchetDriftForFile {
+  const now = options.now ?? new Date();
+  const windowHours = options.windowHours ?? RATCHET_DRIFT_WINDOW_HOURS;
+  const minBumps = options.minBumps ?? RATCHET_DRIFT_MIN_BUMPS;
+  const windowStart = now.getTime() - windowHours * 3_600_000;
+
+  // Keep only observations inside the window — sorted oldest → newest so
+  // consecutive-pair deltas flow naturally.
+  const inWindow = observations
+    .filter((o) => o.committedAt.getTime() >= windowStart)
+    .sort((a, b) => a.committedAt.getTime() - b.committedAt.getTime());
+
+  // A good-direction bump resets the counter; bad-direction bumps accumulate.
+  // Track the counter + the bumps that contributed to the current streak so
+  // the escalation message can name them.
+  let badBumps: RatchetDriftForFile['bumps'] = [];
+
+  for (let i = 1; i < inWindow.length; i++) {
+    const prev = inWindow[i - 1];
+    const curr = inWindow[i];
+    if (prev.total === null || curr.total === null) continue;
+    if (curr.total === prev.total) continue;
+
+    const direction: 'up' | 'down' = curr.total > prev.total ? 'up' : 'down';
+    if (direction === options.badDirection) {
+      badBumps.push({
+        commit: curr.commit,
+        committedAt: curr.committedAt.toISOString(),
+        from: prev.total,
+        to: curr.total,
+      });
+    } else {
+      // A fix in the good direction invalidates the streak.
+      badBumps = [];
+    }
+  }
+
+  const bumpCount = badBumps.length;
+  const drifted = bumpCount >= minBumps;
+
+  if (drifted) {
+    const arrow = options.badDirection === 'up' ? '↑' : '↓';
+    const first = badBumps[0];
+    const last = badBumps[bumpCount - 1];
+    return {
+      file,
+      name,
+      direction: options.badDirection,
+      bumpCount,
+      bumps: badBumps,
+      drifted: true,
+      reason:
+        `${name} baseline bumped ${bumpCount}× ${arrow} in the last ${windowHours}h ` +
+        `(${first.from} → ${last.to}). Do NOT bump again — investigate the underlying cause.`,
+    };
+  }
+
+  return {
+    file,
+    name,
+    direction: bumpCount > 0 ? options.badDirection : null,
+    bumpCount,
+    bumps: badBumps,
+    drifted: false,
+    reason:
+      bumpCount === 0
+        ? `${name} baseline stable over the last ${windowHours}h`
+        : `${name} baseline bumped ${bumpCount}× (below ≥${minBumps} threshold — monitoring)`,
+  };
+}
+
+/**
+ * Collapse a list of per-file drift results into the aggregate RatchetDriftResult.
+ * Pure.
+ */
+export function combineRatchetDrift(drifts: RatchetDriftForFile[]): RatchetDriftResult {
+  const drifted = drifts.filter((d) => d.drifted);
+  if (drifted.length === 0) {
+    return {
+      healthy: true,
+      reason:
+        drifts.length === 0
+          ? 'no ratchet baselines registered'
+          : 'all ratchet baselines within thresholds',
+      drifts,
+    };
+  }
+
+  return {
+    healthy: false,
+    reason: drifted.map((d) => d.reason).join(' | '),
+    drifts,
+  };
+}
+
+/**
+ * Read a registered ratchet's history over the last `windowHours` via git log
+ * and evaluate for drift. Each commit that touched the file contributes one
+ * observation; the file is read at that commit via `git show`.
+ *
+ * Unlike `checkDeployStatus` / `checkMainCi`, this scanner is local-only — no
+ * network, no GitHub API. It runs against the current working tree's git repo.
+ */
+export function checkRatchetDriftForFile(
+  config: RatchetConfig,
+  options: { now?: Date; windowHours?: number; minBumps?: number } = {},
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): RatchetDriftForFile {
+  const now = options.now ?? new Date();
+  const windowHours = options.windowHours ?? RATCHET_DRIFT_WINDOW_HOURS;
+
+  // Thread `now` into git's --since so the window used by git log matches the
+  // window used by the evaluator. Without this, a custom `now` (e.g. a test
+  // clock) would desync from git's wall-clock --since interpretation.
+  const sinceIso = new Date(now.getTime() - windowHours * 3_600_000).toISOString();
+
+  // One commit per line: `<sha> <unix-ts>`
+  const logResult = runGit(
+    'log',
+    `--since=${sinceIso}`,
+    '--format=%H %ct',
+    '--',
+    config.file,
+  );
+
+  if (!logResult.ok || !logResult.output) {
+    return {
+      file: config.file,
+      name: config.name,
+      direction: null,
+      bumpCount: 0,
+      bumps: [],
+      drifted: false,
+      reason:
+        !logResult.ok
+          ? `git log failed for ${config.file}: ${logResult.stderr || 'unknown error'}`
+          : `${config.name} baseline: no commits in the last ${windowHours}h`,
+    };
+  }
+
+  // git log is newest-first; we want oldest-first for evaluation.
+  const lines = logResult.output.split('\n').filter(Boolean).reverse();
+
+  // Include the "before" state: the parent of the earliest in-window commit.
+  // Without it we'd miss bump #1 (can't compute from/to for the first commit).
+  const firstCommit = lines[0]?.split(' ')[0];
+  const observations: BaselineObservation[] = [];
+
+  if (firstCommit) {
+    // Try to include the "before" state: the parent of the earliest in-window
+    // commit. If the parent doesn't exist (root commit) or the file didn't
+    // exist there (newly created mid-window), we just skip — the observation
+    // chain starts at firstCommit itself. That means commit #1 in the window
+    // can't be counted as a bump (no "from" value), but commits #2+ still are.
+    const parentTotal = readBaselineTotal(`${firstCommit}^`, config, runGit);
+    if (parentTotal !== null) {
+      const parentTs = commitTimestamp(`${firstCommit}^`, runGit);
+      if (parentTs) {
+        observations.push({
+          commit: `${firstCommit}^`,
+          committedAt: parentTs,
+          total: parentTotal,
+        });
+      }
+    }
+  }
+
+  for (const line of lines) {
+    const [sha, ts] = line.split(' ');
+    if (!sha || !ts) continue;
+    observations.push({
+      commit: sha,
+      committedAt: new Date(Number.parseInt(ts, 10) * 1000),
+      total: readBaselineTotal(sha, config, runGit),
+    });
+  }
+
+  return evaluateRatchetDrift(config.file, config.name, observations, {
+    badDirection: config.badDirection,
+    now,
+    windowHours,
+    minBumps: options.minBumps,
+  });
+}
+
+/** Run the drift scan across every registered baseline. */
+export function checkRatchetDrift(
+  options: { now?: Date; windowHours?: number; minBumps?: number } = {},
+  baselines: readonly RatchetConfig[] = RATCHET_BASELINES,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): RatchetDriftResult {
+  const drifts = baselines.map((cfg) => checkRatchetDriftForFile(cfg, options, runGit));
+  return combineRatchetDrift(drifts);
+}
+
+/**
+ * Exported for testing. Accepts numbers AND numeric strings — some validators
+ * serialize totals as strings to avoid precision loss, and silently dropping
+ * those would let drift go undetected.
+ */
+export function readBaselineTotal(
+  ref: string,
+  config: RatchetConfig,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): number | null {
+  const result = runGit('show', `${ref}:${config.file}`);
+  if (!result.ok) return null;
+  try {
+    const parsed = JSON.parse(result.output);
+    const raw = (parsed as Record<string, unknown>)[config.totalField];
+    if (typeof raw === 'number' && Number.isFinite(raw)) return raw;
+    if (typeof raw === 'string') {
+      const coerced = Number(raw);
+      return Number.isFinite(coerced) ? coerced : null;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+function commitTimestamp(
+  ref: string,
+  runGit: (...args: string[]) => { ok: boolean; output: string; stderr: string } = gitSafe,
+): Date | null {
+  const result = runGit('show', '-s', '--format=%ct', ref);
+  if (!result.ok) return null;
+  const ts = Number.parseInt(result.output, 10);
+  if (!Number.isFinite(ts)) return null;
+  return new Date(ts * 1000);
+}
+
+/**
  * Combine deploy + main-CI evaluations into a single HealthScanResult.
  * Pure — takes the two sub-results and assembles the issue list for the queue.
  */
 export function combineHealth(
   deploy: DeployStatusResult,
   mainCi: MainCiResult,
+  ratchet: RatchetDriftResult,
   now: Date = new Date(),
 ): HealthScanResult {
   const issues: HealthIssue[] = [];
@@ -281,10 +596,21 @@ export function combineHealth(
     });
   }
 
+  for (const drift of ratchet.drifts) {
+    if (!drift.drifted) continue;
+    issues.push({
+      type: 'ratchet-drift',
+      score: RATCHET_DRIFT_SCORE,
+      reason: drift.reason,
+      detectedAt,
+    });
+  }
+
   return {
-    healthy: deploy.healthy && mainCi.healthy,
+    healthy: deploy.healthy && mainCi.healthy && ratchet.healthy,
     deploy,
     mainCi,
+    ratchet,
     issues,
   };
 }
@@ -433,5 +759,6 @@ export async function healthScan(now: Date = new Date()): Promise<HealthScanResu
     checkDeployStatus({ now }),
     checkMainCi(),
   ]);
-  return combineHealth(deploy, mainCi, now);
+  const ratchet = checkRatchetDrift({ now });
+  return combineHealth(deploy, mainCi, ratchet, now);
 }
