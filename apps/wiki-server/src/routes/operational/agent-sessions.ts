@@ -197,7 +197,6 @@ const agentSessionsApp = new Hono()
           const missing: string[] = [];
           if (!row.title) missing.push("title");
           if (!row.summary) missing.push("summary");
-          if (row.costCents === null && !row.cost) missing.push("cost");
           if (missing.length > 0) {
             throw new IncompleteSessionError(missing);
           }

@@ -1,8 +1,8 @@
 /**
  * Transcript Parser — parse Claude Code JSONL session transcripts.
  *
- * Extracts structured session metadata: title, summary, learnings,
- * cost, model info, and timestamps from the JSONL transcript file.
+ * Extracts structured session metadata: title, summary, model info,
+ * timestamps, and branch from the JSONL transcript file.
  *
  * JSONL format: one JSON object per line, with types:
  *   - "user": user messages
@@ -15,7 +15,6 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { computeCostFromLines, type CostResult } from './cost-extractor.ts';
 import { scrubSecrets } from './secret-scrubber.ts';
 
 /** Parsed transcript result. */
@@ -26,9 +25,7 @@ export interface TranscriptResult {
   title: string | null;
   /** Summary from the final assistant message (last text block). */
   summary: string | null;
-  /** Cost computation result. */
-  cost: CostResult;
-  /** Primary model used. */
+  /** Primary model used (most frequent assistant message model). */
   model: string | null;
   /** ISO timestamp of first event. */
   startedAt: string | null;
@@ -92,6 +89,7 @@ export function parseTranscript(filePath: string): TranscriptResult {
   let firstUserMessage: string | null = null;
   let lastAssistantText: string | null = null;
   let branch: string | null = null;
+  const modelCounts: Record<string, number> = {};
 
   for (const line of lines) {
     let parsed: Record<string, unknown>;
@@ -126,6 +124,10 @@ export function parseTranscript(filePath: string): TranscriptResult {
         if (text.trim()) {
           lastAssistantText = text;
         }
+        const model = msg.model as string | undefined;
+        if (model && model !== '<synthetic>') {
+          modelCounts[model] = (modelCounts[model] ?? 0) + 1;
+        }
       }
     }
 
@@ -135,8 +137,15 @@ export function parseTranscript(filePath: string): TranscriptResult {
     }
   }
 
-  // Compute cost from raw lines
-  const cost = computeCostFromLines(lines);
+  // Determine primary model (most frequent)
+  let primaryModel: string | null = null;
+  let maxCount = 0;
+  for (const [model, count] of Object.entries(modelCounts)) {
+    if (count > maxCount) {
+      maxCount = count;
+      primaryModel = model;
+    }
+  }
 
   // Compute duration
   let durationMinutes: number | null = null;
@@ -167,8 +176,7 @@ export function parseTranscript(filePath: string): TranscriptResult {
     sessionId,
     title,
     summary,
-    cost,
-    model: cost.primaryModel,
+    model: primaryModel,
     startedAt: firstTimestamp,
     endedAt: lastTimestamp,
     durationMinutes,

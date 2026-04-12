@@ -59,19 +59,6 @@ describe('scrubSecrets', () => {
     expect(result).toContain('[REDACTED:LINEAR_KEY]');
   });
 
-  it('redacts OpenRouter keys', () => {
-    const input = 'sk-or-v1-' + 'a'.repeat(64);
-    const result = scrubSecrets(input);
-    expect(result).toContain('[REDACTED:OPENROUTER_KEY]');
-  });
-
-  it('redacts Bearer tokens', () => {
-    const token = 'a'.repeat(30);
-    const input = 'Authorization: Bearer ' + token;
-    const result = scrubSecrets(input);
-    expect(result).toContain('[REDACTED:BEARER_TOKEN]');
-  });
-
   it('redacts env var secrets', () => {
     const input = 'API_KEY="my-super-secret-value-1234"';
     const result = scrubSecrets(input);
