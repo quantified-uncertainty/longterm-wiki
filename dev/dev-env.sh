@@ -108,7 +108,23 @@ restart_dev() {
 }
 
 psql_dev() {
-    docker compose -f "$COMPOSE_FILE" exec db psql -U postgres -d longterm_wiki "$@"
+    # Use -T to disable TTY so piped stdin works: cat file.sql | ./dev/dev-env.sh psql
+    docker compose -f "$COMPOSE_FILE" exec -T db psql -U postgres -d longterm_wiki "$@"
+}
+
+psql_prod() {
+    # Load PROD_DATABASE_URL from .env
+    local env_file="$REPO_ROOT/.env"
+    if [ -f "$env_file" ]; then
+        local prod_url
+        prod_url=$(grep '^PROD_DATABASE_URL=' "$env_file" | cut -d= -f2-)
+        if [ -n "$prod_url" ]; then
+            docker run --network=host --rm -i postgres:16 psql "$prod_url" "$@"
+            return
+        fi
+    fi
+    echo "PROD_DATABASE_URL not found in .env"
+    exit 1
 }
 
 import_prod() {
@@ -174,11 +190,15 @@ case "${1:-start}" in
         shift
         psql_dev "$@"
         ;;
+    psql-prod)
+        shift
+        psql_prod "$@"
+        ;;
     import-prod)
         import_prod
         ;;
     *)
-        echo "Usage: $0 [start|stop|status|attach|restart|psql|import-prod]"
+        echo "Usage: $0 [start|stop|status|attach|restart|psql|psql-prod|import-prod]"
         exit 1
         ;;
 esac

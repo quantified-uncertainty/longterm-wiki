@@ -22,6 +22,7 @@ import { TABLEBASE_MOUNTS } from "./routes/tablebase/mount-registry.js";
 // Unified sourcing system (replaces legacy factbase + record sourcing)
 import { sourcingRoute } from "./routes/sourcing/sourcing.js";
 import { urlSuggestionsRoute } from "./routes/sourcing/url-suggestions.js";
+import { missingSourcesRoute } from "./routes/sourcing/missing-sources.js";
 
 // Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
@@ -194,6 +195,7 @@ export function createApp() {
   app.route("/api/facts", factsRoute);
   // Unified sourcing system — mount sub-routes before the catch-all parent.
   app.route("/api/sourcing/url-suggestions", urlSuggestionsRoute);
+  app.route("/api/sourcing/missing-sources", missingSourcesRoute);
   app.route("/api/sourcing", sourcingRoute);
 
   // WikiBase routes — prose content and page metadata
