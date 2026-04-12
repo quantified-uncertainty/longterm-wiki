@@ -69,12 +69,11 @@ If not running, start it:
 ```bash
 cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main
 nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
-echo $! > /tmp/lw-pr-patrol.pid
 disown
 echo "Started PR patrol, PID $!"
 ```
 
-The PID lockfile at `/tmp/lw-pr-patrol.pid` lets re-runs adopt the existing process instead of starting a duplicate — the `pgrep` guard above is the primary defense. If `--no-loops` is passed, skip this block entirely.
+The daemon itself manages its own PID at `~/.cache/pr-patrol/daemon.pid` (see `crux/pr-patrol/index.ts`) — the `pgrep` guard above is what prevents duplicate starts from this skill. If `--no-loops` is passed, skip this block entirely.
 
 ### Section 2: Pull latest + refresh slots
 
