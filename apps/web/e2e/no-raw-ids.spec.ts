@@ -24,6 +24,11 @@ const RAW_ID_PATTERNS = [
     pattern: /\bsid_[A-Za-z0-9]{3,}\b/,
   },
   {
+    name: "f_ FactBase ID",
+    // FactBase fact IDs like f_0PxEB2yv45 — internal identifiers
+    pattern: /\bf_[A-Za-z0-9]{8,}\b/,
+  },
+  {
     name: "[object Object]",
     // React/JS rendering bug where an object is coerced to string
     pattern: /\[object Object\]/,
@@ -82,19 +87,8 @@ function checkTextForRawIds(text: string, url: string, label?: string) {
   }
 }
 
-async function assertNoRawIds(page: Page, url: string) {
-  await loadPage(page, url);
-  const text = await getMainText(page);
-  checkTextForRawIds(text, url);
-}
-
-/**
- * Variant that clicks through tabs before scanning — tab content is
- * lazily rendered and won't be visible without clicking.
- */
-async function assertNoRawIdsWithTabs(page: Page, url: string) {
-  await loadPage(page, url);
-
+/** Collect visible text from all tabs, clicking through each one. */
+async function collectTextAcrossTabs(page: Page): Promise<{ text: string; tabCount: number }> {
   const tabs = page.locator("[role='tab'], button[data-state]");
   const tabCount = await tabs.count();
   const texts: string[] = [];
@@ -113,7 +107,23 @@ async function assertNoRawIdsWithTabs(page: Page, url: string) {
     texts.push(await getMainText(page));
   }
 
-  checkTextForRawIds(texts.join("\n"), url, `across ${tabCount} tabs`);
+  return { text: texts.join("\n"), tabCount };
+}
+
+async function assertNoRawIds(page: Page, url: string) {
+  await loadPage(page, url);
+  const text = await getMainText(page);
+  checkTextForRawIds(text, url);
+}
+
+/**
+ * Variant that clicks through tabs before scanning — tab content is
+ * lazily rendered and won't be visible without clicking.
+ */
+async function assertNoRawIdsWithTabs(page: Page, url: string) {
+  await loadPage(page, url);
+  const { text, tabCount } = await collectTextAcrossTabs(page);
+  checkTextForRawIds(text, url, `across ${tabCount} tabs`);
 }
 
 // ─── Test suites by page type ───────────────────────────────────────────────
@@ -291,6 +301,97 @@ test.describe("Project & event pages — no raw IDs", () => {
   for (const url of DETAIL_PAGES) {
     test(`${url}`, async ({ page }) => {
       await assertNoRawIds(page, url);
+    });
+  }
+});
+
+/**
+ * Helper for pages that require wiki-server data.
+ *
+ * Separates page loading (which may fail without wiki-server) from ID
+ * assertions (which must always propagate). Only skips on load failures
+ * (connection refused, HTTP 500+), never on assertion failures.
+ */
+async function assertNoRawIdsRequiresServer(page: Page, url: string, withTabs = false) {
+  try {
+    await loadPage(page, url);
+  } catch {
+    // Page failed to load — wiki-server likely unavailable
+    test.skip();
+    return;
+  }
+  // Page loaded — assertions must NOT be swallowed
+  if (withTabs) {
+    const { text, tabCount } = await collectTextAcrossTabs(page);
+    checkTextForRawIds(text, url, `across ${tabCount} tabs`);
+  } else {
+    const text = await getMainText(page);
+    checkTextForRawIds(text, url);
+  }
+}
+
+/**
+ * Organization data/database pages (EntityProfileViewer).
+ *
+ * These pages render raw database records in tables — facts, things,
+ * entity resources, personnel, grants, etc. Entity reference columns
+ * (entity_id, subject, parent_thing_id) must be resolved to display names.
+ *
+ * This was the ORIGINAL location of the entity_id endsWith() bug:
+ * endsWith("_entity_id") does not match bare "entity_id" (10 > 9 chars).
+ *
+ * Requires wiki-server for data — tests skip gracefully if page can't load.
+ */
+test.describe("Organization data pages — no raw IDs", () => {
+  const DATA_PAGES = [
+    "/organizations/anthropic/data?tab=database",
+    "/organizations/openai/data?tab=database",
+    "/organizations/deepmind/data?tab=database",
+    "/organizations/meta-ai/data?tab=database",
+  ];
+
+  for (const url of DATA_PAGES) {
+    test(`${url}`, async ({ page }) => {
+      await assertNoRawIdsRequiresServer(page, url, true);
+    });
+  }
+});
+
+/**
+ * People data pages.
+ *
+ * Person profile database views show entity references (org affiliations,
+ * equity positions, etc.) that must be resolved.
+ */
+test.describe("People data pages — no raw IDs", () => {
+  const DATA_PAGES = [
+    "/people/dario-amodei/data?tab=database",
+    "/people/sam-altman/data?tab=database",
+    "/people/demis-hassabis/data?tab=database",
+  ];
+
+  for (const url of DATA_PAGES) {
+    test(`${url}`, async ({ page }) => {
+      await assertNoRawIdsRequiresServer(page, url, true);
+    });
+  }
+});
+
+/**
+ * FactBase structured data pages.
+ *
+ * These show structured facts with entity references in Subject and
+ * Entity columns. The facts table is a common location for raw ID leaks.
+ */
+test.describe("FactBase structured data — no raw IDs", () => {
+  const STRUCTURED_PAGES = [
+    "/organizations/anthropic/data?tab=structured",
+    "/organizations/openai/data?tab=structured",
+  ];
+
+  for (const url of STRUCTURED_PAGES) {
+    test(`${url}`, async ({ page }) => {
+      await assertNoRawIdsRequiresServer(page, url);
     });
   }
 });
