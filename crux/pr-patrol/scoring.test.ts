@@ -1,5 +1,15 @@
 import { describe, it, expect, vi, afterEach } from 'vitest';
-import { computeScore, computeBudget, rankPrs, APPROVED_BONUS, getRetryBudgetMultiplier, computeEffectiveBudget } from './scoring.ts';
+import {
+  computeScore,
+  computeBudget,
+  rankPrs,
+  rankPrsWithDeps,
+  BLOCKING_STUCK_BONUS,
+  MIN_BLOCKED_COUNT_FOR_BOOST,
+  APPROVED_BONUS,
+  getRetryBudgetMultiplier,
+  computeEffectiveBudget,
+} from './scoring.ts';
 import type { DetectedPr, PrIssueType } from './types.ts';
 
 function makeDetectedPr(overrides: Partial<DetectedPr> = {}): DetectedPr {
@@ -265,5 +275,111 @@ describe('rankPrs', () => {
     const prs = [makeDetectedPr({ number: 1, issues: ['conflict'] })];
     const ranked = rankPrs(prs);
     expect(ranked[0].score).toBeGreaterThanOrEqual(100);
+  });
+});
+
+// ── rankPrsWithDeps (QUA-287 Phase 3) ────────────────────────────────────────
+
+describe('rankPrsWithDeps', () => {
+  it('applies BLOCKING_STUCK_BONUS when a PR is stuck AND blocks ≥2 others', () => {
+    const now = new Date().toISOString();
+    // PR 100 is stuck (3 cycles) and 2 other PRs list it in their blockedOnPrs
+    const blocker = makeDetectedPr({
+      number: 100,
+      issues: ['stuck'],
+      stuckCycles: 3,
+      createdAt: now,
+    });
+    const dep1 = makeDetectedPr({
+      number: 1,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'cross-referenced' }],
+    });
+    const dep2 = makeDetectedPr({
+      number: 2,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'gate error' }],
+    });
+    const ranked = rankPrsWithDeps([blocker, dep1, dep2]);
+    const blockerScored = ranked.find((p) => p.number === 100)!;
+    // Base score for stuck issue is 85. With bonus = 85 + 50 = 135.
+    expect(blockerScored.score).toBeGreaterThanOrEqual(85 + BLOCKING_STUCK_BONUS);
+  });
+
+  it('does NOT apply bonus when PR is stuck but blocks only 1 other PR', () => {
+    const now = new Date().toISOString();
+    const blocker = makeDetectedPr({
+      number: 100,
+      issues: ['stuck'],
+      stuckCycles: 3,
+      createdAt: now,
+    });
+    const dep1 = makeDetectedPr({
+      number: 1,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'cross-referenced' }],
+    });
+    const ranked = rankPrsWithDeps([blocker, dep1]);
+    const blockerScored = ranked.find((p) => p.number === 100)!;
+    // No bonus — just the base stuck score
+    expect(blockerScored.score).toBeLessThan(85 + BLOCKING_STUCK_BONUS);
+  });
+
+  it('does NOT apply bonus when PR blocks 2+ others but is NOT stuck', () => {
+    const now = new Date().toISOString();
+    const blocker = makeDetectedPr({
+      number: 100,
+      issues: ['ci-failure'],
+      createdAt: now,
+    });
+    const dep1 = makeDetectedPr({
+      number: 1,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'cross-referenced' }],
+    });
+    const dep2 = makeDetectedPr({
+      number: 2,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'gate error' }],
+    });
+    const ranked = rankPrsWithDeps([blocker, dep1, dep2]);
+    const blockerScored = ranked.find((p) => p.number === 100)!;
+    // Base score = ci-failure (80) + age ≈ 0. No bonus.
+    expect(blockerScored.score).toBeLessThan(80 + BLOCKING_STUCK_BONUS);
+  });
+
+  it('sorts blocker to the top of the queue when boost applies', () => {
+    const now = new Date().toISOString();
+    const blocker = makeDetectedPr({
+      number: 100,
+      issues: ['stuck'],
+      stuckCycles: 5,
+      createdAt: now,
+    });
+    const dep1 = makeDetectedPr({
+      number: 1,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'cross-referenced' }],
+    });
+    const dep2 = makeDetectedPr({
+      number: 2,
+      issues: ['ci-failure'],
+      createdAt: now,
+      blockedOnPrs: [{ pr: 100, reason: 'gate error' }],
+    });
+    const ranked = rankPrsWithDeps([dep1, dep2, blocker]);
+    // blocker (stuck + blocks 2) should outrank the ci-failure PRs
+    expect(ranked[0].number).toBe(100);
+  });
+
+  it('exports the expected threshold constants', () => {
+    expect(MIN_BLOCKED_COUNT_FOR_BOOST).toBe(2);
+    expect(BLOCKING_STUCK_BONUS).toBeGreaterThan(0);
   });
 });

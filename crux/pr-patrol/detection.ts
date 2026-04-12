@@ -20,6 +20,7 @@ import {
   fetchOpenPrs as libFetchOpenPrs,
   fetchSinglePr as libFetchSinglePr,
   detectOverlaps as libDetectOverlaps,
+  populateBlockedOnPrs as libPopulateBlockedOnPrs,
 } from '../lib/pr-analysis/index.ts';
 import type {
   DetectedPr,
@@ -185,7 +186,11 @@ export function detectAllPrIssuesFromNodes(
     }
   }
 
-  return prs
+  // Retain the filtered node list so we can cross-reference against all
+  // currently-open PRs when populating blockedOnPrs. Note: we validate against
+  // the FULL open-PR set (including drafts, bot PRs, etc.) — those can still
+  // legitimately block another PR even when we don't patrol them ourselves.
+  const detected: DetectedPr[] = prs
     .filter((pr) => {
       const labels = pr.labels.nodes.map((l) => l.name);
       if (ANY_WORKING_LABELS.some((wl) => labels.includes(wl))) return false;
@@ -244,6 +249,14 @@ export function detectAllPrIssuesFromNodes(
       };
     })
     .filter((pr) => pr.issues.length > 0);
+
+  // Post-process: populate blockedOnPrs from CrossReferencedEvent timeline
+  // items + validated `#NNNN` tokens in failing check names / bot-comment
+  // bodies. Validation uses the FULL open-PR set (prs) so even PRs we skipped
+  // above (drafts, bot PRs) can still legitimately be counted as blockers.
+  libPopulateBlockedOnPrs(detected, prs);
+
+  return detected;
 }
 
 // ── Stuck-cycle detection ────────────────────────────────────────────────────

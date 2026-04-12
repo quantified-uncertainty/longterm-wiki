@@ -6,7 +6,11 @@
  * the daemon-specific budget computation (max-turns + timeout per issue type).
  */
 
-import type { PrIssueType } from './types.ts';
+import type { DetectedPr, PrIssueType, ScoredPr } from './types.ts';
+import {
+  computeScore as libComputeScore,
+  computeBlocksCount,
+} from '../lib/pr-analysis/index.ts';
 
 // ── Re-exports from lib ──────────────────────────────────────────────────────
 
@@ -16,6 +20,45 @@ export {
   computeScore,
   rankPrs,
 } from '../lib/pr-analysis/index.ts';
+
+// ── Cross-PR dependency priority boost (QUA-287 Phase 3) ─────────────────────
+
+/**
+ * Score bonus applied to a PR that BOTH:
+ *   - has `stuckCycles >= 3` (escalation threshold), AND
+ *   - blocks ≥2 other detected PRs (computed from reverse `blockedOnPrs`).
+ *
+ * Rationale: a stuck PR that's already holding up multiple siblings costs the
+ * patrol more than its own issue score implies, so surfacing it earlier pays
+ * off. Chosen to sit between `conflict` (100) and `self-authored-feedback`
+ * (90) — important, but not so large it buries all other signals.
+ */
+export const BLOCKING_STUCK_BONUS = 50;
+
+/** Minimum number of blocked PRs before the BLOCKING_STUCK_BONUS applies. */
+export const MIN_BLOCKED_COUNT_FOR_BOOST = 2;
+
+/**
+ * Rank a list of detected PRs, applying the QUA-287 cross-PR priority boost
+ * for stuck PRs that block ≥2 siblings. Uses the shared `computeScore` as
+ * the base and adds `BLOCKING_STUCK_BONUS` on top when the criteria are met.
+ *
+ * This differs from the plain `rankPrs()` re-export above — callers that want
+ * dependency-aware ordering should use this instead.
+ */
+export function rankPrsWithDeps(prs: DetectedPr[]): ScoredPr[] {
+  const blocksCount = computeBlocksCount(prs);
+  return prs
+    .map((pr) => {
+      let score = libComputeScore(pr);
+      const blocks = blocksCount.get(pr.number) ?? 0;
+      if ((pr.stuckCycles ?? 0) >= 3 && blocks >= MIN_BLOCKED_COUNT_FOR_BOOST) {
+        score += BLOCKING_STUCK_BONUS;
+      }
+      return { ...pr, score };
+    })
+    .sort((a, b) => b.score - a.score);
+}
 
 // ── Issue-type-specific resource limits (daemon-specific) ────────────────────
 // Scale max-turns and timeout based on the hardest issue in a PR.

@@ -598,3 +598,97 @@ describe('detectCodeRabbitRateLimited', () => {
     expect(detectCodeRabbitRateLimited(pr)).toBe(true);
   });
 });
+
+// ── detectAllPrIssuesFromNodes — blockedOnPrs (QUA-287 Phase 3) ─────────────
+
+describe('detectAllPrIssuesFromNodes — blockedOnPrs cross-PR deps', () => {
+  it('populates blockedOnPrs for the #4157/#4188 fixture', () => {
+    // PR #4157 has a failing CI check + a cross-reference to PR #4188
+    const pr4157 = makePrNode({
+      number: 4157,
+      headRefName: 'claude/feature-a',
+      author: { login: 'humanuser' },
+      body: '## Test plan\nstuff\nCloses #100',
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [{ name: 'build', conclusion: 'FAILURE' }] },
+            },
+          },
+        }],
+      },
+      timelineItems: {
+        nodes: [
+          {
+            __typename: 'CrossReferencedEvent',
+            source: { __typename: 'PullRequest', number: 4188, state: 'OPEN' },
+          },
+        ],
+      },
+    });
+    const pr4188 = makePrNode({
+      number: 4188,
+      headRefName: 'claude/feature-b',
+      author: { login: 'humanuser' },
+      body: '## Test plan\nstuff\nCloses #200',
+    });
+
+    const result = detectAllPrIssuesFromNodes([pr4157, pr4188], defaultConfig);
+    const detected4157 = result.find((r) => r.number === 4157);
+    expect(detected4157).toBeDefined();
+    expect(detected4157!.blockedOnPrs).toEqual([
+      { pr: 4188, reason: 'cross-referenced' },
+    ]);
+  });
+
+  it('leaves blockedOnPrs undefined when no cross-PR refs found', () => {
+    const pr = makePrNode({
+      number: 4157,
+      author: { login: 'humanuser' },
+      body: '## Test plan\nx\nCloses #1',
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: { nodes: [{ name: 'build', conclusion: 'FAILURE' }] },
+            },
+          },
+        }],
+      },
+    });
+    const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
+    const detected = result.find((r) => r.number === 4157);
+    expect(detected).toBeDefined();
+    expect(detected!.blockedOnPrs).toBeUndefined();
+  });
+
+  it('drops #NNNN tokens that do not correspond to open PRs', () => {
+    // PR references #99999 (not open) and #4188 (open) in failing check output
+    const pr4157 = makePrNode({
+      number: 4157,
+      author: { login: 'humanuser' },
+      body: '## Test plan\nx\nCloses #1',
+      commits: {
+        nodes: [{
+          commit: {
+            statusCheckRollup: {
+              contexts: {
+                nodes: [
+                  { name: 'gate: conflicts with #99999 and #4188', conclusion: 'FAILURE' },
+                ],
+              },
+            },
+          },
+        }],
+      },
+    });
+    const pr4188 = makePrNode({ number: 4188, author: { login: 'humanuser' } });
+
+    const result = detectAllPrIssuesFromNodes([pr4157, pr4188], defaultConfig);
+    const detected = result.find((r) => r.number === 4157);
+    expect(detected).toBeDefined();
+    // Only #4188 survives validation — #99999 is not in the open-PR list
+    expect(detected!.blockedOnPrs).toEqual([{ pr: 4188, reason: 'gate error' }]);
+  });
+});
