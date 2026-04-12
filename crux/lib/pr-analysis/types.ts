@@ -122,6 +122,14 @@ export interface DetectedPr {
    * is set.
    */
   stuckReason?: string;
+  /**
+   * Other open PRs that this PR appears to depend on or be blocked by.
+   * Derived from GitHub cross-reference events (timelineItems) and from
+   * `#NNNN` tokens found in CI / gate error output that validate against the
+   * live open-PR list. Empty/undefined means no cross-PR dependency detected.
+   * Populated by `populateBlockedOnPrs` during scan post-processing.
+   */
+  blockedOnPrs?: BlockedOnPr[];
 }
 
 export interface ScoredPr extends DetectedPr {
@@ -199,10 +207,41 @@ export interface GqlIssueComment {
   viewerDidAuthor: boolean;
 }
 
+/**
+ * GraphQL CrossReferencedEvent — fired when another issue/PR mentions this PR.
+ * Phase 3 (QUA-287) uses these to surface cross-PR dependencies in the queue.
+ *
+ * `source` is a union: `Issue | PullRequest`. We only care about PR refs, so the
+ * inline fragment in the query only requests PullRequest fields. When the source
+ * is an Issue, `source.number` will still be populated but `__typename` will be
+ * `'Issue'` and callers must filter.
+ */
+export interface GqlCrossReferencedEventSource {
+  __typename?: 'PullRequest' | 'Issue';
+  /** PR or issue number. Only use when `__typename === 'PullRequest'`. */
+  number?: number;
+  /** PR state: OPEN, CLOSED, or MERGED. Only present on PullRequest. */
+  state?: string;
+}
+
 export interface GqlCrossReferencedEvent {
   __typename?: 'CrossReferencedEvent';
-  source?: unknown;
+  source?: GqlCrossReferencedEventSource;
   createdAt?: string;
+}
+
+// ── Cross-PR dependencies (QUA-287 Phase 3) ──────────────────────────────────
+
+/**
+ * A reference from a stuck PR to another open PR that it appears to depend on.
+ * Sources include GitHub cross-reference events and `#NNNN` tokens in CI error
+ * output — the latter validated against the open-PR list to cut false positives.
+ */
+export interface BlockedOnPr {
+  /** PR number this PR is blocked on. */
+  pr: number;
+  /** Short human-readable reason, e.g. "cross-referenced" or "gate error". */
+  reason: string;
 }
 
 export interface GqlPrNode {

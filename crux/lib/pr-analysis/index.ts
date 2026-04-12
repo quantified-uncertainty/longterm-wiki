@@ -26,6 +26,7 @@ export type {
   PrIssueType,
   BotComment,
   BlockingComment,
+  BlockedOnPr,
   FreshCheckRun,
   DetectedPr,
   ScoredPr,
@@ -36,6 +37,7 @@ export type {
   GqlReviewThread,
   GqlIssueComment,
   GqlCrossReferencedEvent,
+  GqlCrossReferencedEventSource,
   GqlPrNode,
   PrOverlap,
   AutoRebaseResult,
@@ -86,3 +88,13 @@ export type { DeployHealthStatus } from './deploy-status.ts';
 // ── Automated rebase ─────────────────────────────────────────────────────────
 
 export { tryAutomatedRebase } from './rebase.ts';
+
+// ── Cross-PR dependencies (QUA-287 Phase 3) ─────────────────────────────────
+
+export {
+  extractPrRefTokens,
+  validatePrRefs,
+  extractCrossReferencedPrs,
+  populateBlockedOnPrs,
+  computeBlocksCount,
+} from './cross-pr-deps.ts';

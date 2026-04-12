@@ -51,6 +51,11 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
           __typename
           ... on CrossReferencedEvent {
             createdAt
+            source {
+              __typename
+              ... on PullRequest { number state }
+              ... on Issue { number }
+            }
           }
         }}
       }
@@ -91,6 +96,11 @@ const SINGLE_PR_QUERY = `query($owner: String!, $name: String!, $number: Int!) {
         __typename
         ... on CrossReferencedEvent {
           createdAt
+          source {
+            __typename
+            ... on PullRequest { number state }
+            ... on Issue { number }
+          }
         }
       }}
     }

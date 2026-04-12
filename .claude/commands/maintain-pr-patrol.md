@@ -67,6 +67,29 @@ Priority queue (N items):
   [score=40]  PR #456: missing-issue-ref — Update entity types
 ```
 
+### Cross-PR dependency chain (QUA-287 Phase 3)
+
+When a PR appears to depend on another open PR (detected via GitHub cross-reference events or `#NNNN` tokens in CI/gate error output that validate against the open-PR list), the queue renders a dependency arrow:
+
+```text
+Priority queue (N items):
+  [score=135] PR #4188: stuck                                    — Baseline schema bump
+  [score=80]  PR #4157: ci-failure → blocked on #4188            — Feature A on new schema
+  [score=80]  PR #4162: ci-failure → blocked on #4188, #4190     — Feature B on new schema
+```
+
+This surfaces "Miss #4" from QUA-284: when one baseline-bump PR holds up multiple siblings, the queue now makes that explicit. Sources of the cross-PR link (in order of trust):
+
+1. **GitHub `CrossReferencedEvent` timeline items** (reason: `cross-referenced`) — most reliable; fired when another PR mentions this one.
+2. **`#NNNN` tokens in failing check/gate output** (reason: `gate error`) — validated against the open-PR list to drop incidental mentions.
+3. **`#NNNN` tokens in bot-review comment bodies** (reason: `bot comment`) — same validation.
+
+### Priority boost for stuck blockers
+
+If a PR has `stuckCycles >= 3` AND is listed as `blocked on` by ≥2 other PRs, it gets a `BLOCKING_STUCK_BONUS` (+50) on top of its issue-based score. This ensures a stuck baseline-bump PR that's holding up multiple siblings surfaces at the top of the queue, not buried behind individual CI-failure PRs.
+
+Implementation: `rankPrsWithDeps()` in `crux/pr-patrol/scoring.ts`.
+
 ## Phase 3: Fix (one PR at a time)
 
 Work through the queue starting with the highest-priority PR.
