@@ -55,7 +55,9 @@ The gate check (`validate-drizzle-journal.ts`) warns if it detects CREATE UNIQUE
 
 **Never write a CHECK constraint's allowed-value list from code or memory.** Enumerate against prod data first, or the migration will fail when it encounters values the author didn't know existed.
 
-Incident context: Migrations 0173 (`chk_hrs_level`) and `service_health_incidents.severity` both shipped CHECK constraints whose `IN (...)` lists excluded live values already present in the table. 0173 cascaded into a ~12h prod outage (QUA-302); severity required a follow-up fix (#4202). Both root-caused to "author inspected the schema/enum type and didn't query actual column values."
+Incident context: two enum-gap incidents in the same week. Migration 0173's `groundskeeper_runs.event` constraint omitted three valid values already in prod (`circuit_breaker_reset`, `half_open_attempt`, `half_open_success`), blocking the #4167 release at ArgoCD PreSync until #4178 landed. `service_health_incidents.severity` shipped with a similarly incomplete allowlist and needed #4202. Both root-caused to the same mistake: author inspected the TypeScript enum / Zod schema instead of querying the column's live distinct values.
+
+(Note: migration 0173's `chk_hrs_level` *also* caused a separate ~12h outage (QUA-302), but that was lock contention, not an enum gap — see the `NOT VALID` pattern below.)
 
 **Required procedure before writing any `CHECK (col IN (...))` constraint:**
 
