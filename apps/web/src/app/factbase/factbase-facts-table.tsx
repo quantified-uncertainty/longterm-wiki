@@ -320,17 +320,19 @@ const allColumns: ColumnDef<FactRow>[] = [
     header: ({ column }) => (
       <SortableHeader column={column}>ID</SortableHeader>
     ),
+    // The factId itself is an internal identifier; we keep it in the href
+    // for deep links but render a short badge so raw `f_...` IDs don't leak
+    // into visible page text (caught by the no-raw-ids e2e spec).
     cell: ({ row }) => (
       <Link
         href={`/factbase/fact/${row.original.factId}`}
         className="text-primary hover:underline text-xs font-mono"
+        title={row.original.factId}
       >
-        {row.original.factId.length > 12
-          ? row.original.factId.slice(0, 12) + "\u2026"
-          : row.original.factId}
+        view →
       </Link>
     ),
-    size: 110,
+    size: 70,
   },
 ];
 
