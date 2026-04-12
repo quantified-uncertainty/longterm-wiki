@@ -2,8 +2,8 @@
   "hyphenated": 4,
   "camelCase": 1,
   "PascalCase": 0,
-  "route": 2,
-  "total": 7,
-  "updatedAt": "2026-04-11T22:54:19.786Z",
+  "route": 18,
+  "total": 23,
+  "updatedAt": "2026-04-12T00:06:46.068Z",
   "notes": "Ratchet baseline for source-check → sourcing rename. Only lower this value; never raise without justification. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella)."
 }
