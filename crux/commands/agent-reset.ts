@@ -234,6 +234,25 @@ function execSafe(cmd: string, timeoutMs = 10000): string | null {
   }
 }
 
+/**
+ * Fast-forward pull origin/main and restore the .agent-slot marker.
+ * Caller must ensure the working tree is clean and HEAD is on main.
+ * Throws on pull failure; the slot-marker write is best-effort.
+ */
+function pullMainAndRestoreSlot(): void {
+  exec('git pull origin main --ff-only', 30000);
+  // git pull may overwrite .agent-slot if it's still tracked; rewrite from cwd.
+  const cwd = process.cwd();
+  const slotMatch = cwd.match(/\/a(\d+)\/?$/);
+  if (slotMatch) {
+    try {
+      writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
+    } catch {
+      // Non-fatal: the slot marker is a convenience, the pull already succeeded.
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Git scanning
 // ---------------------------------------------------------------------------
@@ -427,13 +446,7 @@ async function resetCommand(
     // and clobbering WIP. Destructive cleanup still lives behind --kill.
     if (!killMode && git.currentBranch === 'main' && !git.isDirty) {
       try {
-        exec('git pull origin main --ff-only', 30000);
-        // Repair .agent-slot — git pull may overwrite it if still tracked
-        const cwd = process.cwd();
-        const slotMatch = cwd.match(/\/a(\d+)\/?$/);
-        if (slotMatch) {
-          writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
-        }
+        pullMainAndRestoreSlot();
         output += `  ${c.green}✓ Pulled ${git.behindMain} commit${git.behindMain > 1 ? 's' : ''} from origin/main${c.reset}\n`;
         git.behindMain = 0;
       } catch (e: unknown) {
@@ -666,13 +679,7 @@ async function resetCommand(
           exec('git checkout main');
           output += `  ${c.green}✓${c.reset} Checked out main\n`;
         }
-        exec('git pull origin main --ff-only', 30000);
-        // Repair .agent-slot — git pull may overwrite it if still tracked
-        const cwd = process.cwd();
-        const slotMatch = cwd.match(/\/a(\d+)\/?$/);
-        if (slotMatch) {
-          writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
-        }
+        pullMainAndRestoreSlot();
         output += `  ${c.green}✓${c.reset} Pulled latest main\n`;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
