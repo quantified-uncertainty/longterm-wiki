@@ -1,0 +1,68 @@
+---
+title: Export Controls Effectiveness Analysis
+description: Assessment of whether US AI chip export controls actually slow China's AI development, covering the 2022–2025 control timeline, theory of change, observed outcomes, smuggling evidence, and counterfactual impact.
+sidebar:
+  order: 50
+entityType: model
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A well-structured effectiveness analysis of US AI chip export controls estimating a 6–18 month delay on Chinese AI development, with documented supply friction but accelerating indigenous capability development and significant enforcement gaps; article is incomplete as it cuts off mid-framework and lacks observed outcomes, smuggling evidence, and counterfactual sections promised in the description.
+balanceFlags:
+  - no-criticism-section
+  - one-sided-framing
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Rating | Notes |
+|-----------|--------|-------|
+| **Overall Effectiveness Grade** | C+ | Partially effective; harder-tier controls show diminishing returns |
+| **Short-term Supply Restriction** | B | Documented import reductions; PRC firms paying premium for smuggled chips |
+| **Long-term Strategic Delay** | C | Indigenous capability development accelerating; 6–18 month counterfactual delay estimated |
+| **Multilateral Coherence** | C+ | Netherlands/Japan aligned on lithography; broader coordination strained |
+| **Enforcement Integrity** | D+ | Significant smuggling through Singapore, UAE; cloud workarounds persist |
+| **Cost to US Firms** | Poor | \$130 billion market cap loss; broad supplier decoupling |
+
+*See [E136] for the underlying policy page.*
+
+---
+
+## Overview
+
+<EntityLink id="E136">US AI Chip Export Controls</EntityLink> represent the most ambitious attempt in modern history to throttle a rival nation's access to the compute infrastructure underlying frontier AI development. Beginning in October 2022, the United States Bureau of Industry and Security (BIS) introduced a cascade of restrictions targeting advanced graphics processing units (GPUs), semiconductor manufacturing equipment, and related memory technologies — all aimed at slowing the People's Republic of China's capacity to train and deploy frontier AI systems.
+
+The policy rests on a single empirical bet: that compute is the binding constraint on AI progress, and that if China cannot access sufficient compute, its ability to develop transformative or dangerous AI systems will be meaningfully delayed. This article assesses whether that bet is paying off. The evidence is mixed. Controls have demonstrably increased the cost and friction of Chinese AI development, and PRC firms' reliance on smuggled chips and cloud workarounds confirms that the restrictions are not illusory. At the same time, Chinese AI labs have demonstrated frontier-adjacent capabilities using pre-ban stockpiles and domestically developed alternatives, and indigenous progress in chip fabrication — while still behind — is accelerating. The counterfactual estimate most consistent with available evidence is that controls have bought approximately 6–18 months of delay, not permanent exclusion.
+
+This analysis is relevant to the AI safety community because the theory of change behind export controls is ultimately a theory about AI risk timelines and differential development. If controls succeed in keeping transformative AI capabilities concentrated in jurisdictions with stronger safety norms and governance frameworks, they reduce some categories of catastrophic risk. If they primarily antagonize China, accelerate indigenous development, and fragment global cooperation on AI governance, they may worsen the overall risk landscape. Both possibilities remain live.
+
+---
+
+## History: Control Timeline (Oct 2022 – 2025)
+
+The US export control regime targeting AI compute evolved rapidly across several distinct waves.
+
+**October 2022 — The Initial Shock.** BIS issued rules restricting exports of advanced computing chips, including Nvidia's A100 and H100 GPUs, to China without a license. Simultaneously, controls extended to semiconductor manufacturing equipment and supercomputer-related technology. Major chip firms with Chinese operations — Intel, Samsung, SK Hynix, TSMC — received temporary waivers to continue supplying existing facilities, but expansion and upgrades were prohibited.
+
+**2023 — The H800 Loophole and Its Closure.** Nvidia responded to the 2022 rules by producing the H800 and A800, chips modified to fall below BIS performance thresholds by reducing chip-to-chip interconnect speeds. BIS closed this loophole in October 2023 with updated rules that tightened the performance parameters defining controlled chips. BIS simultaneously imposed the first export controls on leading-edge quantum technology (September 2024 context) and introduced ECCN 3A904, targeting cryogenic and quantum-adjacent components. Following ECCN 3A904's November 2023 effective date, Chinese imports of covered items dropped 31.8% — though analysts noted it was too early for a full assessment given gaps in Harmonized System trade codes.
+
+**2024 — Memory, HBM, and the Diffusion Framework.** Controls extended to high-bandwidth memory (HBM) and dynamic random-access memory (DRAM) of sufficient sophistication to support frontier model training. BIS also moved toward what enforcement observers called a "structural compliance" model, replacing simple list-screening with rules targeting ownership structures: the 2025 "50% rule" extended entity list obligations to unlisted subsidiaries with 50% or greater holding percentages. This closed a significant evasion vector whereby nominally independent front companies sourced controlled goods on behalf of listed entities.
+
+**Late 2025 — VEU Revocation.** BIS revoked export control exemptions for certain Chinese semiconductor fabrication facilities previously holding Validated End-User status. Former VEU participants received 120 days to apply for individual licenses. BIS indicated intent to grant licenses for existing fab operations but not for expansion or upgrades — a policy designed to freeze Chinese fab capability at its current level rather than permit incremental advancement.
+
+---
+
+## Conceptual Framework
+
+### Theory of Change: The Compute Bottleneck
+
+The export control regime's implicit theory of change runs as follows:
+
+1. **Compute scarcity constrains training.** Frontier AI model training is currently compute-intensive. Larger, more capable models require exponentially more compute to train (scaling laws). Therefore, restricting access to high-performance training chips constrains the capability frontier accessible to Chinese labs.
+
+2. **China cannot quickly substitute.** Domestic Chinese chipmakers (primarily SMIC) lack the fabrication nodes and equipment necessary to produce A100/H100-class chips at volume. Equipment controls on deep ultraviolet (DUV) and extreme ultraviolet (EUV) lithography machines — enforced via Dutch (ASML) and Japanese (Nikon, Tokyo Electron) alignment with US controls — prevent China from acquiring the tools needed to close this gap quickly.
+
+3. **The delay buys time.** Even a 12–24 month delay in China reaching frontier capability allows the United States to invest in AI safety research, establish governance norms, and potentially develop technical alignment solutions before the capability threshold is crossed globally.
+
+4. **Democratic advantage compounds.** Keeping frontier compute concentrated in the United States and allied democracies means that the first developers of potentially transformative AI operate under voluntary safety frameworks and regulatory oversight, reducing tail risks.
+
