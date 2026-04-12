@@ -43,21 +43,8 @@ const SyncBatchSchema = z.object({
 
 type SyncItem = z.infer<typeof SyncItemSchema>;
 
-interface ScannerResultRow {
-  id: number;
-  scanRunId: string;
-  recordType: string;
-  entityId: string;
-  entityName: string;
-  entityType: string;
-  totalRecords: number;
-  verifiedRecords: number;
-  completenessPct: number;
-  missingFields: unknown;
-  entityImportance: number | null;
-  scannedAt: Date;
-  createdAt: Date;
-}
+// Drizzle-inferred row type from the table definition
+type ScannerResultRow = typeof tablebaseScannerResults.$inferSelect;
 
 function formatRow(r: ScannerResultRow) {
   return {
@@ -77,6 +64,9 @@ function formatRow(r: ScannerResultRow) {
   };
 }
 
+// Not using createSyncHandler factory: this table uses auto-increment integer PK
+// and pure INSERT semantics without a string ID field, which doesn't fit the
+// factory's TItem constraint (requires { id?: string }).
 const scannerResultsApp = new Hono()
   // GET /latest — returns the most recent scan run's results
   .get("/latest", zv("query", LatestQuery), async (c) => {
@@ -113,14 +103,15 @@ const scannerResultsApp = new Hono()
     ]);
 
     return c.json({
-      items: rows.map((r) => formatRow(r as ScannerResultRow)),
-      total: totalRows[0]?.count ?? 0,
+      items: rows.map(formatRow),
+      // count() may return bigint as string from postgres.js — coerce to number
+      total: Number(totalRows[0]?.count ?? 0),
       scanRunId: runId,
     });
   })
   // GET /trends — scan results grouped by scan_run_id for trend analysis
   .get("/trends", zv("query", TrendsQuery), async (c) => {
-    const { entityId, recordType, limit } = c.req.valid("query");
+    const { limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
     // Get distinct scan runs ordered by recency
@@ -139,44 +130,15 @@ const scannerResultsApp = new Hono()
 
     const runs = await runsQuery;
 
-    // If entityId or recordType filter is requested, also get per-run details for that filter
-    let entityTrends: Array<{ scanRunId: string; completenessPct: number; totalRecords: number; scannedAt: string }> = [];
-    if (entityId || recordType) {
-      const conditions = [];
-      if (entityId) conditions.push(eq(tablebaseScannerResults.entityId, entityId));
-      if (recordType) conditions.push(eq(tablebaseScannerResults.recordType, recordType));
-      const combinedWhere = conditions.length === 1
-        ? conditions[0]
-        : sql`${sql.join(conditions, sql` AND `)}`;
-
-      const details = await db
-        .select({
-          scanRunId: tablebaseScannerResults.scanRunId,
-          completenessPct: tablebaseScannerResults.completenessPct,
-          totalRecords: tablebaseScannerResults.totalRecords,
-          scannedAt: tablebaseScannerResults.scannedAt,
-        })
-        .from(tablebaseScannerResults)
-        .where(combinedWhere)
-        .orderBy(desc(tablebaseScannerResults.scannedAt));
-
-      entityTrends = details.map((d) => ({
-        scanRunId: d.scanRunId,
-        completenessPct: d.completenessPct,
-        totalRecords: d.totalRecords,
-        scannedAt: d.scannedAt.toISOString(),
-      }));
-    }
-
     return c.json({
       runs: runs.map((r) => ({
         scanRunId: r.scanRunId,
         scannedAt: r.scannedAt,
-        totalItems: r.totalItems,
-        avgCompleteness: r.avgCompleteness,
-        totalRecordsSum: r.totalRecordsSum,
+        // count()/SUM()/AVG() may return bigint as string from postgres.js — coerce to number
+        totalItems: Number(r.totalItems),
+        avgCompleteness: Number(r.avgCompleteness),
+        totalRecordsSum: Number(r.totalRecordsSum),
       })),
-      entityTrends,
     });
   })
   // GET /trends-by-type — per-recordType trend data across scan runs (for sparklines)
@@ -222,8 +184,8 @@ const scannerResultsApp = new Hono()
       existing.push({
         scanRunId: row.scanRunId,
         scannedAt: row.scannedAt,
-        avgCompleteness: row.avgCompleteness,
-        entityCount: row.entityCount,
+        avgCompleteness: Number(row.avgCompleteness),
+        entityCount: Number(row.entityCount),
       });
       byTypeMap.set(row.recordType, existing);
     }
@@ -261,16 +223,37 @@ const scannerResultsApp = new Hono()
       scannedAt: item.scannedAt ? new Date(item.scannedAt) : now,
     }));
 
-    // Insert in chunks to avoid exceeding PG parameter limit
+    // Upsert in chunks to avoid exceeding PG parameter limit.
+    // ON CONFLICT on the natural key (scan_run_id, record_type, entity_id)
+    // prevents duplicates if sync runs twice.
     const CHUNK_SIZE = 500;
-    let inserted = 0;
+    let upserted = 0;
     for (let i = 0; i < rows.length; i += CHUNK_SIZE) {
       const chunk = rows.slice(i, i + CHUNK_SIZE);
-      await db.insert(tablebaseScannerResults).values(chunk);
-      inserted += chunk.length;
+      await db
+        .insert(tablebaseScannerResults)
+        .values(chunk)
+        .onConflictDoUpdate({
+          target: [
+            tablebaseScannerResults.scanRunId,
+            tablebaseScannerResults.recordType,
+            tablebaseScannerResults.entityId,
+          ],
+          set: {
+            entityName: sql`excluded.entity_name`,
+            entityType: sql`excluded.entity_type`,
+            totalRecords: sql`excluded.total_records`,
+            verifiedRecords: sql`excluded.verified_records`,
+            completenessPct: sql`excluded.completeness_pct`,
+            missingFields: sql`excluded.missing_fields`,
+            entityImportance: sql`excluded.entity_importance`,
+            scannedAt: sql`excluded.scanned_at`,
+          },
+        });
+      upserted += chunk.length;
     }
 
-    return c.json({ upserted: inserted });
+    return c.json({ upserted });
   })
   // POST /delete-batch — standard delete handler
   .post("/delete-batch", deleteBatchHandler(tablebaseScannerResults, null));

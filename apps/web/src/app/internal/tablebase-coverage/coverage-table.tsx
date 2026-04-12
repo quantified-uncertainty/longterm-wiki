@@ -115,7 +115,7 @@ const columns: ColumnDef<CoverageRow>[] = [
         <span
           className={`inline-flex items-center rounded-full px-2 py-0.5 text-xs font-medium ${completenessBadgeClass(pct)}`}
         >
-          {pct}%
+          {pct.toFixed(1)}%
         </span>
       );
     },
@@ -189,6 +189,23 @@ export function CoverageTable({ data, recordTypes, entityTypes }: CoverageTableP
   const [recordTypeFilter, setRecordTypeFilter] = useState<string>("all");
   const [entityTypeFilter, setEntityTypeFilter] = useState<string>("all");
 
+  // Precompute filter option counts once per data change (avoids O(n*m) on every render)
+  const recordTypeCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of data) {
+      counts.set(r.recordType, (counts.get(r.recordType) ?? 0) + 1);
+    }
+    return counts;
+  }, [data]);
+
+  const entityTypeCounts = useMemo(() => {
+    const counts = new Map<string, number>();
+    for (const r of data) {
+      counts.set(r.entityType, (counts.get(r.entityType) ?? 0) + 1);
+    }
+    return counts;
+  }, [data]);
+
   const filtered = useMemo(() => {
     let rows = data;
     if (recordTypeFilter !== "all") {
@@ -241,7 +258,7 @@ export function CoverageTable({ data, recordTypes, entityTypes }: CoverageTableP
           <option value="all">All record types ({data.length})</option>
           {recordTypes.map((t) => (
             <option key={t} value={t}>
-              {t} ({data.filter((r) => r.recordType === t).length})
+              {t} ({recordTypeCounts.get(t) ?? 0})
             </option>
           ))}
         </select>
@@ -254,7 +271,7 @@ export function CoverageTable({ data, recordTypes, entityTypes }: CoverageTableP
           <option value="all">All entity types</option>
           {entityTypes.map((t) => (
             <option key={t} value={t}>
-              {t} ({data.filter((r) => r.entityType === t).length})
+              {t} ({entityTypeCounts.get(t) ?? 0})
             </option>
           ))}
         </select>
