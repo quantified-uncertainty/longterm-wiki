@@ -404,7 +404,9 @@ const entityProfileApp = new Hono()
       }
     }
 
-    // Collect all entity stableIds from entity reference columns across all sections
+    // Collect all entity stableIds from entity reference columns across all sections.
+    // SYNC: this key list must match isEntityRefKey() in
+    // apps/web/src/app/internal/entity-profile/entity-ref-columns.ts
     const entityRefIds = new Set<string>();
     for (const section of sectionResults) {
       for (const row of section.rows) {
@@ -412,7 +414,7 @@ const entityProfileApp = new Hono()
           if (
             typeof value === "string" &&
             isAnySid(value) &&
-            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId" || key === "orgId" || key === "entityId" || key === "parentThingId")
+            (key.endsWith("EntityId") || key === "stableId" || key === "personId" || key === "parentOrgId" || key === "orgId" || key === "entityId" || key === "parentThingId" || key === "modelId" || key === "subject")
           ) {
             entityRefIds.add(value);
           }
