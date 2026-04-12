@@ -3,16 +3,27 @@ import { describe, it, expect } from 'vitest';
 import {
   evaluateDeployStatus,
   evaluateMainCi,
+  evaluateRatchetDrift,
   combineHealth,
+  combineRatchetDrift,
   mapRollupState,
   DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES,
   MAIN_CI_RED_STREAK_MIN,
   DEPLOY_STALE_THRESHOLD_HOURS,
   DEPLOY_STUCK_SCORE,
   MAIN_CI_RED_SCORE,
+  RATCHET_DRIFT_SCORE,
+  RATCHET_DRIFT_MIN_BUMPS,
+  RATCHET_DRIFT_WINDOW_HOURS,
   type WorkflowRun,
   type CommitStatus,
+  type BaselineObservation,
+  type RatchetDriftResult,
 } from './health-scan.ts';
+
+function emptyRatchet(): RatchetDriftResult {
+  return combineRatchetDrift([]);
+}
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
 
@@ -237,7 +248,7 @@ describe('combineHealth', () => {
   it('returns healthy with empty issues when both sub-scanners are healthy', () => {
     const deploy = evaluateDeployStatus([run({ conclusion: 'success' })]);
     const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(true);
     expect(combined.issues).toHaveLength(0);
   });
@@ -248,7 +259,7 @@ describe('combineHealth', () => {
       run({ id: 2, conclusion: 'failure' }),
     ]);
     const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(false);
     expect(combined.issues).toHaveLength(1);
     expect(combined.issues[0].type).toBe('deploy-stuck');
@@ -264,7 +275,7 @@ describe('combineHealth', () => {
       commit({ sha: 'b', conclusion: 'failure' }),
       commit({ sha: 'c', conclusion: 'failure' }),
     ]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.healthy).toBe(false);
     expect(combined.issues).toHaveLength(1);
     expect(combined.issues[0].type).toBe('main-ci-red');
@@ -282,7 +293,7 @@ describe('combineHealth', () => {
       commit({ sha: 'b', conclusion: 'failure' }),
       commit({ sha: 'c', conclusion: 'failure' }),
     ]);
-    const combined = combineHealth(deploy, mainCi, now);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
     expect(combined.issues).toHaveLength(2);
     expect(combined.issues[0].type).toBe('deploy-stuck');
     expect(combined.issues[1].type).toBe('main-ci-red');
@@ -369,6 +380,263 @@ describe('evaluateMainCi — mid-list pending interruption', () => {
 });
 
 // ── mapRollupState — GraphQL enum coverage ──────────────────────────────────
+
+// ── evaluateRatchetDrift (pure) ──────────────────────────────────────────────
+
+describe('evaluateRatchetDrift', () => {
+  const NOW = new Date('2026-04-12T20:00:00Z');
+
+  function obs(hoursAgo: number, total: number | null, commit = `c${hoursAgo}`): BaselineObservation {
+    return {
+      commit,
+      committedAt: new Date(NOW.getTime() - hoursAgo * 3_600_000),
+      total,
+    };
+  }
+
+  it('fires on 3 monotonic upward bumps within 24h (bad direction = up)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 5), obs(5, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+    expect(result.direction).toBe('up');
+    expect(result.bumps.map((b) => [b.from, b.to])).toEqual([
+      [2, 5],
+      [5, 10],
+      [10, 23],
+    ]);
+  });
+
+  it('does NOT fire with only 2 bumps in window (below threshold of 3)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(5, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(2);
+  });
+
+  it('does NOT fire when 3 bumps span a 48h window (rate-limited)', () => {
+    // 3 bumps, but spread across 48h — only the last one is in the 24h window.
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(48, 2), obs(36, 5), obs(30, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW, windowHours: 24 },
+    );
+    expect(result.drifted).toBe(false);
+    // Only the 30h→1h transition is seen as a bump in the windowed view,
+    // because the pre-window parent observation was filtered out.
+    expect(result.bumpCount).toBeLessThan(3);
+  });
+
+  it('does NOT fire on alternating-direction bumps', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 5), obs(8, 20), obs(5, 7), obs(1, 30)],
+      { badDirection: 'up', now: NOW },
+    );
+    // Sequence: 5→20 (up), 20→7 (down, reset), 7→30 (up) → bad-direction streak=1
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(1);
+  });
+
+  it('resets the streak when a good-direction bump interrupts (fix landed mid-window)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 5), obs(6, 10), obs(4, 4), obs(2, 8)],
+      { badDirection: 'up', now: NOW },
+    );
+    // 2→5 up, 5→10 up (streak=2), 10→4 DOWN (reset), 4→8 up (streak=1)
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(1);
+  });
+
+  it('ignores no-op commits (total unchanged) without counting them as bumps', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, 2), obs(8, 2), obs(6, 5), obs(4, 5), obs(2, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3); // 2→5, 5→10, 10→23
+  });
+
+  it('skips observations with null total (file absent at that commit)', () => {
+    const result = evaluateRatchetDrift(
+      'sourcing.json',
+      'sourcing',
+      [obs(10, null), obs(8, 2), obs(5, 5), obs(3, 10), obs(1, 23)],
+      { badDirection: 'up', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.bumpCount).toBe(3);
+  });
+
+  it('validates constants', () => {
+    expect(RATCHET_DRIFT_MIN_BUMPS).toBe(3);
+    expect(RATCHET_DRIFT_WINDOW_HOURS).toBe(24);
+  });
+
+  it('fires on 3 downward bumps when bad direction = down (e.g., coverage ratchet)', () => {
+    const result = evaluateRatchetDrift(
+      'coverage.json',
+      'coverage',
+      [obs(10, 100), obs(8, 95), obs(5, 90), obs(1, 80)],
+      { badDirection: 'down', now: NOW },
+    );
+    expect(result.drifted).toBe(true);
+    expect(result.direction).toBe('down');
+    expect(result.bumpCount).toBe(3);
+    expect(result.reason).toContain('↓');
+  });
+
+  it('returns a stable-reason for empty observations', () => {
+    const result = evaluateRatchetDrift('x.json', 'x', [], {
+      badDirection: 'up',
+      now: NOW,
+    });
+    expect(result.drifted).toBe(false);
+    expect(result.bumpCount).toBe(0);
+    expect(result.reason).toContain('stable');
+  });
+});
+
+// ── combineRatchetDrift ──────────────────────────────────────────────────────
+
+describe('combineRatchetDrift', () => {
+  it('is healthy when no ratchets are registered', () => {
+    const result = combineRatchetDrift([]);
+    expect(result.healthy).toBe(true);
+    expect(result.reason).toContain('no ratchet');
+  });
+
+  it('is healthy when all registered ratchets are within thresholds', () => {
+    const result = combineRatchetDrift([
+      {
+        file: 'a.json',
+        name: 'a',
+        direction: null,
+        bumpCount: 0,
+        bumps: [],
+        drifted: false,
+        reason: 'ok',
+      },
+    ]);
+    expect(result.healthy).toBe(true);
+  });
+
+  it('is unhealthy when any ratchet drifted', () => {
+    const result = combineRatchetDrift([
+      {
+        file: 'a.json',
+        name: 'a',
+        direction: 'up',
+        bumpCount: 3,
+        bumps: [],
+        drifted: true,
+        reason: 'a bumped 3×',
+      },
+      {
+        file: 'b.json',
+        name: 'b',
+        direction: null,
+        bumpCount: 0,
+        bumps: [],
+        drifted: false,
+        reason: 'ok',
+      },
+    ]);
+    expect(result.healthy).toBe(false);
+    expect(result.reason).toBe('a bumped 3×');
+  });
+});
+
+// ── combineHealth + ratchet integration ──────────────────────────────────────
+
+describe('combineHealth with ratchet drift', () => {
+  const now = new Date('2026-04-12T07:00:00Z');
+
+  it('emits a ratchet-drift issue when a baseline drifted', () => {
+    const deploy = evaluateDeployStatus([run({ conclusion: 'success' })]);
+    const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
+    const ratchet: RatchetDriftResult = {
+      healthy: false,
+      reason: 'sourcing bumped 3× ↑',
+      drifts: [
+        {
+          file: 'sourcing.json',
+          name: 'sourcing',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'sourcing bumped 3× ↑',
+        },
+      ],
+    };
+    const combined = combineHealth(deploy, mainCi, ratchet, now);
+    expect(combined.healthy).toBe(false);
+    expect(combined.issues).toHaveLength(1);
+    expect(combined.issues[0].type).toBe('ratchet-drift');
+    expect(combined.issues[0].score).toBe(RATCHET_DRIFT_SCORE);
+    expect(combined.issues[0].reason).toBe('sourcing bumped 3× ↑');
+  });
+
+  it('ranks deploy-stuck > main-ci-red > ratchet-drift', () => {
+    expect(DEPLOY_STUCK_SCORE).toBeGreaterThan(MAIN_CI_RED_SCORE);
+    expect(MAIN_CI_RED_SCORE).toBeGreaterThan(RATCHET_DRIFT_SCORE);
+    // And ratchet-drift still outranks per-PR conflict (100)
+    expect(RATCHET_DRIFT_SCORE).toBeGreaterThan(100);
+  });
+
+  it('emits all three issues when everything is unhealthy', () => {
+    const deploy = evaluateDeployStatus([
+      run({ id: 1, conclusion: 'failure' }),
+      run({ id: 2, conclusion: 'failure' }),
+    ]);
+    const mainCi = evaluateMainCi([
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'failure' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+    ]);
+    const ratchet: RatchetDriftResult = {
+      healthy: false,
+      reason: 'drift',
+      drifts: [
+        {
+          file: 'x.json',
+          name: 'x',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'x bumped 3×',
+        },
+      ],
+    };
+    const combined = combineHealth(deploy, mainCi, ratchet, now);
+    expect(combined.issues.map((i) => i.type)).toEqual([
+      'deploy-stuck',
+      'main-ci-red',
+      'ratchet-drift',
+    ]);
+    // Issues are pushed in the order they're checked — which is also the
+    // priority order. Verify scores are monotonically decreasing.
+    const scores = combined.issues.map((i) => i.score);
+    expect(scores[0]).toBeGreaterThan(scores[1]);
+    expect(scores[1]).toBeGreaterThan(scores[2]);
+  });
+});
 
 describe('mapRollupState', () => {
   it('maps SUCCESS → success', () => {
