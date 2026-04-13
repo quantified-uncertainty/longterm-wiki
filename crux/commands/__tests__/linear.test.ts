@@ -18,6 +18,8 @@ const {
   getProjectMock,
   updateProjectMock,
   createProjectUpdateMock,
+  githubApiMock,
+  getSessionContextMock,
 } = vi.hoisted(() => ({
   getIssueMock: vi.fn(),
   getCommentsMock: vi.fn(),
@@ -29,6 +31,13 @@ const {
   getProjectMock: vi.fn(),
   updateProjectMock: vi.fn(),
   createProjectUpdateMock: vi.fn(),
+  githubApiMock: vi.fn(),
+  getSessionContextMock: vi.fn(() => ({
+    slot: 5 as number | null,
+    branch: 'claude/qua-184-test-branch',
+    host: 'test-host' as string | null,
+    agentId: null as number | null,
+  })),
 }));
 
 vi.mock('../../lib/linear/issues.ts', () => ({
@@ -49,6 +58,29 @@ vi.mock('../../lib/linear/projects.ts', () => ({
 vi.mock('../../lib/linear/workflow-states.ts', () => ({
   fetchRemoteWorkflowStates: fetchRemoteWorkflowStatesMock,
 }));
+
+// Mock the GitHub transport so the dedup PR search doesn't hit the network.
+vi.mock('../../lib/github.ts', () => ({
+  githubApi: githubApiMock,
+  REPO: 'quantified-uncertainty/longterm-wiki',
+}));
+
+// Mock the session context so the slot is deterministic. Without this,
+// `getSessionContext()` walks ancestor dirs and picks up whatever `a<N>`
+// the test runner happens to sit in — which is `a5` on the dev laptop
+// but `null` on GitHub Actions runners at `/home/runner/work/...`.
+// That divergence makes same-slot vs cross-slot dedup tests flaky.
+// `buildStartCommentBody` is passed through via importActual since we
+// want the production formatting.
+vi.mock('../../lib/session/session-context.ts', async () => {
+  const actual = await vi.importActual<typeof import('../../lib/session/session-context.ts')>(
+    '../../lib/session/session-context.ts',
+  );
+  return {
+    ...actual,
+    getSessionContext: getSessionContextMock,
+  };
+});
 
 vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/qua-184-test-branch'),
@@ -72,6 +104,15 @@ const mockIssue = {
 
 beforeEach(() => {
   vi.clearAllMocks();
+  // Reset mock implementations too — clearAllMocks only clears call records
+  // and leaves queued `mockResolvedValueOnce` values intact. Without this,
+  // a test that queues a Once value without consuming it will poison the
+  // next test's mock queue.
+  getCommentsMock.mockReset();
+  githubApiMock.mockReset();
+  // Default: dedup checks find nothing. Individual tests override.
+  getCommentsMock.mockResolvedValue([]);
+  githubApiMock.mockResolvedValue({ items: [] });
 });
 
 // ---------------------------------------------------------------------------
@@ -206,6 +247,192 @@ describe('linear start', () => {
     expect(commentBody).not.toContain('⚠');
     // Host is always set (from os.hostname()) — assert the field label is present
     expect(commentBody).toContain('**Host:**');
+  });
+
+  // ── Dedup (QUA-406) ──────────────────────────────────────────────────────
+
+  it('blocks with exit=2 when another slot has a recent unreleased start claim', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    // Recent start from a9 (different slot) — no finish comment after it.
+    getCommentsMock.mockResolvedValueOnce([
+      {
+        id: 'c1',
+        body:
+          '🤖 Claude Code starting work on this issue.\n\n' +
+          '**Slot:** a9\n' +
+          '**Branch:** `claude/qua-184-other-work`\n' +
+          '**Host:** MacBook-Pro-4.local\n',
+        createdAt: new Date().toISOString(),
+        user: { name: 'bot' },
+      },
+    ]);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('already claimed');
+    expect(r.output).toContain('a9');
+    expect(r.output).toContain('claude/qua-184-other-work');
+    expect(r.output).toContain('--force');
+    // No state change or comment should have been posted.
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+    expect(commentOnIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('allows re-running start from the same slot (init crash recovery)', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    // Prior start from the SAME slot as the test runner. The tests run from
+    // `.../lw/a5/...` so `getSessionContext().slot === 5`. A prior claim from
+    // a5 is treated as our own earlier session resuming, not a collision.
+    getCommentsMock.mockResolvedValueOnce([
+      {
+        id: 'c1',
+        body:
+          '🤖 Claude Code starting work on this issue.\n\n' +
+          '**Slot:** a5\n' +
+          '**Branch:** `claude/qua-184-earlier-attempt`\n',
+        createdAt: new Date().toISOString(),
+        user: { name: 'bot' },
+      },
+    ]);
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalled();
+  });
+
+  it('treats stale (>24h) start comments as released', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const oldTs = new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString();
+    getCommentsMock.mockResolvedValueOnce([
+      {
+        id: 'c1',
+        body:
+          '🤖 Claude Code starting work on this issue.\n\n' +
+          '**Slot:** a9\n**Branch:** `claude/qua-184-stale`\n',
+        createdAt: oldTs,
+        user: { name: 'bot' },
+      },
+    ]);
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(0);
+  });
+
+  it('treats a finish comment as releasing prior start claims', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const now = Date.now();
+    getCommentsMock.mockResolvedValueOnce([
+      {
+        id: 'c1',
+        body:
+          '🤖 Claude Code starting work on this issue.\n\n' +
+          '**Slot:** a9\n**Branch:** `claude/qua-184-done`\n',
+        createdAt: new Date(now - 3 * 60 * 60 * 1000).toISOString(),
+        user: { name: 'bot' },
+      },
+      {
+        id: 'c2',
+        body: '🤖 Claude Code finished work on this issue.',
+        createdAt: new Date(now - 2 * 60 * 60 * 1000).toISOString(),
+        user: { name: 'bot' },
+      },
+    ]);
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(0);
+  });
+
+  it('blocks with exit=2 when an open PR mentions the Linear ID', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    githubApiMock.mockResolvedValueOnce({
+      items: [
+        {
+          number: 4296,
+          title: 'fix(sourcing): eliminate raw ID leaks (QUA-184)',
+          html_url: 'https://github.com/quantified-uncertainty/longterm-wiki/pull/4296',
+          body: 'Fixes QUA-184',
+          pull_request: {},
+        },
+      ],
+    });
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('#4296');
+    expect(r.output).toContain('already claimed');
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+    expect(commentOnIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('--force bypasses dedup and annotates the start comment', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    getCommentsMock.mockResolvedValueOnce([
+      {
+        id: 'c1',
+        body:
+          '🤖 Claude Code starting work on this issue.\n\n' +
+          '**Slot:** a9\n**Branch:** `claude/qua-184-other`\n',
+        createdAt: new Date().toISOString(),
+        user: { name: 'bot' },
+      },
+    ]);
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true, force: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalled();
+    const commentBody = commentOnIssueMock.mock.calls[0][1];
+    expect(commentBody).toContain('Claimed with `--force`');
+    // When --force is set, the dedup API shouldn't have been called at all.
+    expect(getCommentsMock).not.toHaveBeenCalled();
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  it('fails open when the Linear comments API throws', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    getCommentsMock.mockRejectedValueOnce(new Error('Linear is down'));
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalled();
+  });
+
+  it('fails open when the GitHub search API throws', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    githubApiMock.mockRejectedValueOnce(new Error('rate limit exceeded'));
+    updateIssueStateMock.mockResolvedValueOnce({
+      identifier: 'QUA-184',
+      state: 'In Progress',
+    });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands.start(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalled();
   });
 });
 

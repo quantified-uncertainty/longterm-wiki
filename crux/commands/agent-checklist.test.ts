@@ -8,7 +8,7 @@
  * - check: marks items, handles --na
  */
 
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 // Mock fs operations
 vi.mock('fs', () => ({
@@ -33,11 +33,32 @@ vi.mock('child_process', () => ({
 // Mock the Linear command module so auto-start doesn't hit the network.
 // `vi.mock` is hoisted above imports, so the mock factory uses `vi.hoisted`
 // to expose the spy back to the test body.
-const { linearStartMock } = vi.hoisted(() => ({
-  linearStartMock: vi.fn(async () => ({ output: '', exitCode: 0 })),
+const { linearStartMock, linearCheckDedupMock, getLinearIssueMock, getSessionContextMock } = vi.hoisted(() => ({
+  linearStartMock: vi.fn<(...a: unknown[]) => Promise<{ output: string; exitCode: number }>>(
+    async () => ({ output: '', exitCode: 0 }),
+  ),
+  linearCheckDedupMock: vi.fn<(...a: unknown[]) => Promise<{ output: string; exitCode: number } | null>>(
+    async () => null,
+  ),
+  getLinearIssueMock: vi.fn<(...a: unknown[]) => Promise<Record<string, unknown> | null>>(
+    async () => null,
+  ),
+  getSessionContextMock: vi.fn(() => ({
+    slot: null as number | null,
+    branch: 'claude/test-branch-ABC',
+    host: 'test-host' as string | null,
+    agentId: null as number | null,
+  })),
 }));
 vi.mock('./linear.ts', () => ({
   commands: { start: linearStartMock },
+  checkDedup: linearCheckDedupMock,
+}));
+vi.mock('../lib/linear/issues.ts', () => ({
+  getIssue: getLinearIssueMock,
+}));
+vi.mock('../lib/session/session-context.ts', () => ({
+  getSessionContext: getSessionContextMock,
 }));
 
 // Mock wiki-server agent-sessions (best-effort DB sync)
@@ -351,6 +372,125 @@ describe('agent-checklist init', () => {
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('> Linear: QUA-999');
     expect(writtenContent).not.toContain('> Linear: QUA-184');
+  });
+
+  // ── Dedup pre-check (QUA-406) ────────────────────────────────────────────
+
+  describe('Linear dedup pre-check', () => {
+    const originalKey = process.env.LINEAR_API_KEY;
+
+    beforeEach(() => {
+      // Reset implementations, not just call records. `clearAllMocks` in the
+      // outer `beforeEach` doesn't clear queued `mockResolvedValueOnce` values,
+      // so without this a test that sets a Once and doesn't consume it (e.g.
+      // the `--force` test) will poison the next test's mock queue.
+      linearCheckDedupMock.mockReset();
+      linearCheckDedupMock.mockResolvedValue(null);
+      getLinearIssueMock.mockReset();
+      linearStartMock.mockReset();
+      linearStartMock.mockResolvedValue({ output: '', exitCode: 0 });
+
+      process.env.LINEAR_API_KEY = 'test-key';
+      getLinearIssueMock.mockResolvedValue({
+        id: 'uuid-1',
+        identifier: 'QUA-406',
+        title: 'Test',
+        url: 'https://linear.app/qua/QUA-406',
+        description: '',
+        priority: 2,
+        state: { id: 's1', name: 'Backlog', type: 'backlog' },
+        team: { id: 't1', key: 'QUA' },
+        parent: null,
+        project: null,
+        labels: { nodes: [] },
+      });
+    });
+
+    afterEach(() => {
+      if (originalKey === undefined) delete process.env.LINEAR_API_KEY;
+      else process.env.LINEAR_API_KEY = originalKey;
+    });
+
+    it('hard-fails with exit 2 when another session has claimed the issue', async () => {
+      linearCheckDedupMock.mockResolvedValueOnce({
+        output: 'Active claim from slot a9 on branch claude/qua-406-other',
+        exitCode: 2,
+      });
+
+      const result = await initNoSideEffects(['Work on QUA-406'], {
+        type: 'bugfix',
+        linear: 'QUA-406',
+      });
+
+      expect(result.exitCode).toBe(2);
+      expect(result.output).toContain('Refusing to initialize session');
+      expect(result.output).toContain('QUA-406');
+      expect(result.output).toContain('--force');
+      // CRITICAL: the checklist must NOT have been written.
+      expect(mockWriteFileSync).not.toHaveBeenCalled();
+      // And the later linear start should not have run either.
+      expect(linearStartMock).not.toHaveBeenCalled();
+    });
+
+    it('proceeds normally when pre-check finds no collision', async () => {
+      linearCheckDedupMock.mockResolvedValueOnce(null);
+
+      const result = await initNoSideEffects(['Work on QUA-406'], {
+        type: 'bugfix',
+        linear: 'QUA-406',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+      expect(linearCheckDedupMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('bypasses the pre-check when --force is set', async () => {
+      linearCheckDedupMock.mockResolvedValueOnce({
+        output: 'Active claim',
+        exitCode: 2,
+      });
+
+      const result = await initNoSideEffects(['Work on QUA-406'], {
+        type: 'bugfix',
+        linear: 'QUA-406',
+        force: true,
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+      // Pre-check should not have been consulted at all.
+      expect(linearCheckDedupMock).not.toHaveBeenCalled();
+      // But the later linear start should still run (with force=true).
+      expect(linearStartMock).toHaveBeenCalledWith(
+        ['QUA-406'],
+        expect.objectContaining({ force: true }),
+      );
+    });
+
+    it('fails open when the pre-check helper throws', async () => {
+      linearCheckDedupMock.mockRejectedValueOnce(new Error('Linear down'));
+
+      const result = await initNoSideEffects(['Work on QUA-406'], {
+        type: 'bugfix',
+        linear: 'QUA-406',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(mockWriteFileSync).toHaveBeenCalledTimes(1);
+    });
+
+    it('skips the pre-check when LINEAR_API_KEY is not set', async () => {
+      delete process.env.LINEAR_API_KEY;
+
+      const result = await initNoSideEffects(['Work on QUA-406'], {
+        type: 'bugfix',
+        linear: 'QUA-406',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(linearCheckDedupMock).not.toHaveBeenCalled();
+    });
   });
 });
 

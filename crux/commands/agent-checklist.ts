@@ -28,7 +28,9 @@ import { upsertAgentSession, updateAgentSession, getAgentSessionByBranch } from 
 import { registerAgent, listActiveAgents } from '../lib/wiki-server/active-agents.ts';
 import { syncToMain } from '../lib/git.ts';
 import { commands as issuesCommands } from './issues.ts';
-import { commands as linearCommands } from './linear.ts';
+import { commands as linearCommands, checkDedup as linearCheckDedup } from './linear.ts';
+import { getIssue as getLinearIssue } from '../lib/linear/issues.ts';
+import { getSessionContext } from '../lib/session/session-context.ts';
 import { resolveLinearId, parseLinearId } from '../lib/linear/parse-id.ts';
 
 // ---------------------------------------------------------------------------
@@ -57,6 +59,9 @@ interface CommandOptions extends BaseOptions {
   noIssueStart?: boolean;
   /** Skip the auto-call to `linear issues start <QUA-NNN>`. Used by tests. */
   noLinearStart?: boolean;
+  /** Pass --force through to `linear start` to bypass the dedup check. Also
+   *  disarms the hard-fail path on dedup collisions. */
+  force?: boolean;
 }
 
 interface GitHubIssueResponse {
@@ -155,6 +160,43 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   if (!linearId) {
     const detected = resolveLinearId([branch, task]);
     if (detected) linearId = detected;
+  }
+
+  // ── Dedup pre-check ───────────────────────────────────────────────────────
+  // If the issue is already claimed by another session, refuse to write ANY
+  // local state (checklist, DB row, active-agent registration). Running this
+  // BEFORE any file writes prevents half-initialized session state when two
+  // agents race on the same ticket. See QUA-406.
+  //
+  // The check is gated on LINEAR_API_KEY being present (same conditions as
+  // the later auto-call to `linear start`). If the key is missing or the
+  // Linear API is unreachable, we fail-open — better than wedging init.
+  if (
+    linearId &&
+    !options.noLinearStart &&
+    !options.force &&
+    process.env.LINEAR_API_KEY
+  ) {
+    try {
+      const issue = await getLinearIssue(linearId);
+      if (issue) {
+        const ctx = getSessionContext();
+        const collision = await linearCheckDedup(linearId, issue.url, ctx, c);
+        if (collision) {
+          return {
+            output:
+              `${c.red}✗ Refusing to initialize session — Linear ${linearId} is already claimed.${c.reset}\n\n` +
+              collision.output +
+              `\n${c.dim}Re-run with ${c.bold}--force${c.reset}${c.dim} to claim anyway:${c.reset}\n` +
+              `  ${c.cyan}crux sys agent-checklist init ${args.map((a) => JSON.stringify(a)).join(' ')} --force${c.reset}\n`,
+            exitCode: 2,
+          };
+        }
+      }
+    } catch {
+      // Fail-open on pre-check errors (missing helper, network glitch).
+      // The later `linear start` call will still run and post a start comment.
+    }
   }
 
   // Warn if Linear ID detected but branch name doesn't encode it.
@@ -281,8 +323,11 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   // ── Auto-call `linear issues start <QUA-NNN>` ────────────────────────────
-  // Same best-effort semantics as the GitHub start above: failure (missing
-  // LINEAR_API_KEY, network error, issue already Done) never fails the init.
+  // Dedup collisions (exit code 2) are hard-fail: the checklist is NOT
+  // written, and init returns non-zero so the user sees the collision
+  // before committing to a session. All other errors (missing key, network
+  // glitch, issue-not-found) remain best-effort warnings — we don't want
+  // a transient API blip to wedge every init.
   let linearStartOutput = '';
   if (linearId && !options.noLinearStart) {
     if (!process.env.LINEAR_API_KEY) {
@@ -291,9 +336,24 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
         `skipping auto-start. Sync .env.base or export the key to enable.${c.reset}\n`;
     } else {
       try {
-        const startResult = await linearCommands.start([linearId], { ci: options.ci });
+        const startResult = await linearCommands.start(
+          [linearId],
+          { ci: options.ci, force: options.force },
+        );
         if (startResult.exitCode === 0) {
           linearStartOutput = startResult.output;
+        } else if (startResult.exitCode === 2) {
+          // Dedup collision — refuse to create the checklist. The start
+          // output contains a rich diagnostic (active claims + open PRs)
+          // that tells the user exactly what's blocking them.
+          return {
+            output:
+              `${c.red}✗ Refusing to create session checklist — Linear ${linearId} is already claimed.${c.reset}\n\n` +
+              startResult.output +
+              `\n${c.dim}Re-run with ${c.bold}--force${c.reset}${c.dim} to claim anyway:${c.reset}\n` +
+              `  ${c.cyan}crux sys agent-checklist init ${args.map((a) => JSON.stringify(a)).join(' ')} --force${c.reset}\n`,
+            exitCode: 2,
+          };
         } else {
           linearStartOutput =
             `${c.yellow}⚠ Auto-start of Linear ${linearId} returned non-zero exit:${c.reset}\n` +
