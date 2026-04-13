@@ -695,13 +695,14 @@ async function curateEntity(
 
     totalRecordsCurated += records.length;
 
-    // Check if we improved
+    // Check if we improved vs. the previous iteration. Early-stop if the
+    // confirmed count didn't advance — but don't double-count across iterations
+    // (totalRecordsImproved is derived from the net before/after delta below).
     const midVerdicts = await snapshotVerdicts(entity);
-    const confirmedBefore = beforeVerdicts['confirmed'] ?? 0;
+    const confirmedStart = beforeVerdicts['confirmed'] ?? 0;
     const confirmedNow = midVerdicts['confirmed'] ?? 0;
-    totalRecordsImproved += Math.max(0, confirmedNow - confirmedBefore);
 
-    if (confirmedNow === confirmedBefore && iter > 0) {
+    if (confirmedNow === confirmedStart && iter > 0) {
       console.log(`  ${c.yellow}No improvement in iteration ${iter + 1} — stopping early${c.reset}`);
       break;
     }
@@ -709,6 +710,12 @@ async function curateEntity(
 
   // Snapshot after
   const afterVerdicts = await snapshotVerdicts(entity);
+  // Net improvement from the whole entity run, not a sum of per-iteration
+  // deltas measured against the fixed start snapshot (which would overcount).
+  totalRecordsImproved = Math.max(
+    0,
+    (afterVerdicts['confirmed'] ?? 0) - (beforeVerdicts['confirmed'] ?? 0),
+  );
   const duration = Date.now() - startTime;
 
   return {
@@ -992,6 +999,13 @@ Options:
       ? Math.min((budget - tracker.totalCost) / Math.max(1, entities.length - results.length), budget - tracker.totalCost)
       : budget;
 
+    // Snapshot the tracker totals before and after this entity so per-entity
+    // cost reflects actual incremental spend rather than the cumulative
+    // CostTracker total (which would double-count earlier entities in batch
+    // mode and miss verification cost that lands after curateEntity returns).
+    const costBefore = tracker.totalCost;
+    const researchBefore = tracker.breakdown()['flagship-curate-research'] ?? 0;
+
     const result = await curateEntity(entity, {
       budget: entityBudget,
       recordLimit,
@@ -1001,6 +1015,11 @@ Options:
       iterations,
       tracker,
     });
+
+    const researchAfter = tracker.breakdown()['flagship-curate-research'] ?? 0;
+    result.totalCost = tracker.totalCost - costBefore;
+    result.researchCost = researchAfter - researchBefore;
+    result.verifyCost = result.totalCost - result.researchCost;
 
     results.push(result);
   }

@@ -94,16 +94,24 @@ jobs:
           set -euo pipefail
           # Reject non-numeric inputs before they reach the CLI to prevent
           # whitespace-based argument smuggling via workflow_dispatch.
-          for var_name in INPUT_LIMIT INPUT_BUDGET INPUT_RECORD_LIMIT INPUT_ITERATIONS; do
+          # Integers only — the CLI uses parseInt, so floats would be silently
+          # truncated. Mirror the CLI's actual constraints: non-negative integers
+          # for counts, strictly positive integer for budget.
+          for var_name in INPUT_LIMIT INPUT_RECORD_LIMIT INPUT_ITERATIONS; do
             value="${!var_name}"
-            if ! [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
-              echo "::error::$var_name must be a non-negative number, got: '$value'"
+            if ! [[ "$value" =~ ^[0-9]+$ ]]; then
+              echo "::error::$var_name must be a non-negative integer, got: '$value'"
               exit 1
             fi
           done
-          # Linear issue must be canonical QUA-NNN form (validated again CLI-side).
-          if ! [[ "$INPUT_LINEAR_ISSUE" =~ ^QUA-[0-9]+$ ]]; then
-            echo "::error::INPUT_LINEAR_ISSUE must look like QUA-NNN, got: '$INPUT_LINEAR_ISSUE'"
+          if ! [[ "$INPUT_BUDGET" =~ ^[0-9]+$ ]] || [[ "$INPUT_BUDGET" == "0" ]]; then
+            echo "::error::INPUT_BUDGET must be a positive integer, got: '$INPUT_BUDGET'"
+            exit 1
+          fi
+          # Linear issue must be canonical QUA-NNN form with a bounded digit
+          # count — parseLinearId() rejects longer IDs, so reject them here too.
+          if ! [[ "$INPUT_LINEAR_ISSUE" =~ ^QUA-[0-9]{1,6}$ ]]; then
+            echo "::error::INPUT_LINEAR_ISSUE must look like QUA-NNN (1-6 digits), got: '$INPUT_LINEAR_ISSUE'"
             exit 1
           fi
 
