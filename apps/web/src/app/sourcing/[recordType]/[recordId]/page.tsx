@@ -20,6 +20,7 @@ import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
+import { UncheckedSourcingState } from "@/components/sourcing/UncheckedSourcingState";
 
 import { canonicalizeSourcingRecordType } from "./canonicalize-record-type";
 
@@ -292,6 +293,21 @@ export default async function SourcingDetailPage({ params }: PageProps) {
       detailResult.error.type === "server-error" &&
       detailResult.error.status === 404
     ) {
+      // QUA-419: No verdicts yet is the common case — render an empty
+      // state when the record itself exists in the source table. Only
+      // notFound() when the record is genuinely missing.
+      if (recordResult.ok) {
+        const rawName = namesResult.ok ? namesResult.data.names[recordId] : null;
+        const stripped = rawName?.startsWith("new:") ? rawName.slice(4).trim() : rawName;
+        return (
+          <UncheckedSourcingState
+            recordType={recordType}
+            recordId={recordId}
+            displayName={stripped ?? `${formatRecordType(recordType)} ${recordId}`}
+            recordHref={getRecordHref(recordType, recordId)}
+          />
+        );
+      }
       notFound();
     }
     return (
