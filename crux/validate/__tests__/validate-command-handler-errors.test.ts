@@ -165,6 +165,62 @@ async function nested(args: string[], options: CommandOptions): Promise<CommandR
     expect(findings[0].status).toBe('unsafe');
   });
 
+  // QUA-363 hostile-review HIGH-1: brace counter was fooled by unbalanced
+  // `{` or `}` inside string literals. Regression tests for each shape.
+  it('is not fooled by `{` inside a double-quoted string literal', () => {
+    const code = `
+async function stringBrace(x: S, o: O): Promise<CommandResult> {
+  const s = "{ not a real brace }";
+  try {
+    return { exitCode: 0, output: s };
+  } catch {
+    return { exitCode: 1, output: '' };
+  }
+}
+`;
+    expect(scanHandlers(PATH, code)[0].status).toBe('safe');
+  });
+
+  it('is not fooled by `}` inside a single-quoted string literal', () => {
+    const code = `
+async function stringCloseBrace(x: S, o: O): Promise<CommandResult> {
+  const s = '}';
+  try {
+    return { exitCode: 0, output: s };
+  } catch {
+    return { exitCode: 1, output: '' };
+  }
+}
+`;
+    expect(scanHandlers(PATH, code)[0].status).toBe('safe');
+  });
+
+  it('is not fooled by escape sequences inside strings (`"\\""`)', () => {
+    const code = `
+async function escaped(x: S, o: O): Promise<CommandResult> {
+  const s = "escaped \\" and {";
+  try {
+    return { exitCode: 0, output: s };
+  } catch {
+    return { exitCode: 1, output: '' };
+  }
+}
+`;
+    expect(scanHandlers(PATH, code)[0].status).toBe('safe');
+  });
+
+  it('is not fooled by a `try` token that appears inside a string', () => {
+    // `"please try again"` used to incorrectly match the `try ` pattern.
+    // After stripStringLiterals the string contents become spaces.
+    const code = `
+async function tryInString(x: S, o: O): Promise<CommandResult> {
+  const msg = "please try again";
+  return { exitCode: 1, output: msg };
+}
+`;
+    expect(scanHandlers(PATH, code)[0].status).toBe('unsafe');
+  });
+
   it('is not fooled by `{` inside a line comment', () => {
     // Regression: pre-fix brace counter treated `// {` as an unbalanced
     // open brace, shifting depth and causing the real try to appear

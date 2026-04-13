@@ -214,34 +214,54 @@ export function getItemsForType(type: SessionType): ChecklistItem[] {
 // Pattern-triggered checklist items (QUA-363, option B)
 // ---------------------------------------------------------------------------
 
+export interface DiffResult {
+  /** Raw unified-diff text. Empty string if the diff is genuinely empty
+   *  (branch equals main). */
+  diff: string;
+  /** Error message if EVERY attempt to read the diff failed. Callers
+   *  MUST check this — a silent `''` used to mean both "no changes" AND
+   *  "we couldn't read it", which let pattern detection invisibly
+   *  disable on huge (16MB+) diffs. (QUA-363 hostile-review HIGH-2.) */
+  error: string | null;
+}
+
 /**
  * Read the current diff against origin/main (or main if origin unreachable).
- * Returns an empty string on any failure — pattern detection becomes a no-op
- * rather than blocking checklist init when git state is weird.
  *
- * Hard-capped at a 10s timeout per attempt so a hung git command cannot
- * block `agent-checklist init`. On huge repos the 16MB maxBuffer should
- * comfortably cover realistic diffs (~a few MB worst case).
+ * Returns a tri-state result: `{diff, error}`. `error` is only set when
+ * EVERY attempted git command failed — that's the case callers should
+ * treat as "pattern detection is broken, do not trust a clean result".
+ *
+ * Hard-capped at a 15s timeout per attempt so a hung git command cannot
+ * block `agent-checklist init`. maxBuffer is 64MB — release PRs on this
+ * repo regularly hit 10-20MB and we don't want the detection to silently
+ * disappear on the largest, most-bug-prone PRs (HIGH-2 root cause).
  */
-export function getDiffAgainstMain(cwd: string = process.cwd()): string {
+export function getDiffAgainstMain(cwd: string = process.cwd()): DiffResult {
   const attempts = [
     'git diff origin/main...HEAD',
     'git diff main...HEAD',
     'git diff HEAD',
   ];
+  let lastError: string | null = null;
   for (const cmd of attempts) {
     try {
       const out = execSync(cmd, {
         cwd,
         encoding: 'utf-8',
-        maxBuffer: 16 * 1024 * 1024,
-        timeout: 10_000,
+        maxBuffer: 64 * 1024 * 1024,
+        timeout: 15_000,
         stdio: ['ignore', 'pipe', 'ignore'],
       });
-      if (out.length > 0) return out;
-    } catch { /* try next */ }
+      // Success — whatever the output (empty or not), this IS the diff.
+      return { diff: out, error: null };
+    } catch (e) {
+      lastError = e instanceof Error ? e.message : String(e);
+      // Try the next fallback. If all fail, we fall through to the
+      // error branch below.
+    }
   }
-  return '';
+  return { diff: '', error: lastError ?? 'all git diff attempts failed' };
 }
 
 /**
@@ -263,25 +283,45 @@ export function buildPatternItems(detections: PatternDetection[]): ChecklistItem
   }));
 }
 
-/**
- * Convenience: run the full diff → patterns → items pipeline against
- * the current working directory. Returns both the items and the raw
- * detections (so callers can include pattern metadata in the checklist).
- */
-export function detectPatternItems(cwd?: string): {
+export interface PatternDetectionResult {
   items: ChecklistItem[];
   detections: PatternDetection[];
-} {
-  const diff = getDiffAgainstMain(cwd);
-  if (!diff) return { items: [], detections: [] };
+  /**
+   * Set when the diff could not be read (all `git diff` attempts failed,
+   * e.g. maxBuffer overflow, hung git, missing origin/main ref).
+   *
+   * Callers that need a trustworthy "all clear" signal (the freshness
+   * check in `crux gh review-patterns check`) MUST fail closed when this
+   * is set — a clean attestation against a broken detector is worse than
+   * no detector at all.
+   */
+  diffError: string | null;
+}
+
+/**
+ * Run the full diff → patterns → items pipeline against the current
+ * working directory. Returns items, raw detections, and an explicit
+ * `diffError` so callers can distinguish "no patterns triggered" from
+ * "detection failed to run".
+ */
+export function detectPatternItems(cwd?: string): PatternDetectionResult {
+  const { diff, error } = getDiffAgainstMain(cwd);
+  if (error != null) {
+    return { items: [], detections: [], diffError: error };
+  }
+  if (!diff) return { items: [], detections: [], diffError: null };
   // Pattern detection runs over untrusted diff text; a malformed diff
   // must NEVER block `agent-checklist init`. Fall back to no items if
   // anything in the parse/detect pipeline throws.
   try {
     const detections = detectAllPatterns(parseDiff(diff));
-    return { items: buildPatternItems(detections), detections };
-  } catch {
-    return { items: [], detections: [] };
+    return { items: buildPatternItems(detections), detections, diffError: null };
+  } catch (e) {
+    return {
+      items: [],
+      detections: [],
+      diffError: e instanceof Error ? e.message : String(e),
+    };
   }
 }
 

@@ -127,26 +127,79 @@ export function scanHandlers(filePath: string, content: string): HandlerFinding[
 }
 
 /**
+ * Strip string and template literals so brace-counting scanners don't
+ * mistake `"{"` or `'}'` or `` `${...}` `` content for real braces.
+ * Replaces every character inside a literal with a space (preserving
+ * positions so subsequent line-level offsets stay accurate — not used
+ * today but cheap insurance).
+ *
+ * Handles:
+ *   - `"..."` double-quoted strings, including escaped quotes
+ *   - `'...'` single-quoted strings
+ *   - `` `...` `` template literals (including `${}` interpolations —
+ *     we treat the whole literal as opaque, which is wrong for nested
+ *     braces inside `${}` but the common case is a string on one line)
+ *
+ * Does NOT strip block comments or handle template literals that span
+ * multiple lines. Those edge cases stay as known failure modes of the
+ * advisory validator.
+ */
+function stripStringLiterals(line: string): string {
+  const out: string[] = [];
+  let i = 0;
+  while (i < line.length) {
+    const ch = line[i];
+    if (ch === '"' || ch === "'" || ch === '`') {
+      out.push(' '); // opening delimiter → space
+      i += 1;
+      while (i < line.length) {
+        const c = line[i];
+        if (c === '\\' && i + 1 < line.length) {
+          // Preserve width (2 chars) for escapes like \" or \\
+          out.push('  ');
+          i += 2;
+          continue;
+        }
+        if (c === ch) {
+          out.push(' '); // closing delimiter → space
+          i += 1;
+          break;
+        }
+        // Inside the literal: everything becomes a space
+        out.push(' ');
+        i += 1;
+      }
+      continue;
+    }
+    out.push(ch);
+    i += 1;
+  }
+  return out.join('');
+}
+
+/**
  * Strip line comments from a source line so brace-counting scanners
  * don't mistake `// {` for a real opening brace. Rough heuristic: cuts
  * from the first `//` not preceded by `:` (to spare protocol-ish
- * `http://`) and not inside a string. We don't try to fully tokenize;
- * the handler bodies we care about rarely have both string literals
- * AND `//` on the same line.
+ * `http://`) and not inside a string. We apply `stripStringLiterals`
+ * first so `// inside "a string"` isn't mis-detected as a comment.
  */
 function stripLineComment(line: string): string {
-  const idx = line.indexOf('//');
-  if (idx < 0) return line;
-  if (idx > 0 && line[idx - 1] === ':') return line; // e.g., http://
-  return line.slice(0, idx);
+  // Strip string contents first so a `//` inside a string isn't
+  // treated as a comment start.
+  const stripped = stripStringLiterals(line);
+  const idx = stripped.indexOf('//');
+  if (idx < 0) return stripped;
+  if (idx > 0 && stripped[idx - 1] === ':') return stripped; // e.g., http://
+  return stripped.slice(0, idx);
 }
 
 /**
  * Given the line index of a function body's opening `{`, find the line
  * index of its matching `}`. Best-effort: counts `{` / `}` occurrences
- * after stripping single-line comments. Doesn't handle block comments
- * or string literals — handler bodies are usually simple enough for
- * this to be fine, and the red-team tests exercise the failure modes.
+ * after stripping single-line comments and string literal contents.
+ * Doesn't handle block comments or template literals that span multiple
+ * lines — those are known failure modes documented in the test file.
  */
 function findMatchingBrace(lines: string[], openLine: number): number {
   let depth = 0;
@@ -199,9 +252,14 @@ function collectCommandFiles(root: string): string[] {
     if (!statSync(root).isDirectory()) return out;
   } catch { return out; }
   for (const entry of readdirSync(root, { withFileTypes: true })) {
+    // crux/commands/ has a flat layout but skip nested dirs (including
+    // __tests__/) for safety if a future refactor adds one.
+    if (entry.isDirectory()) continue;
     if (!entry.isFile()) continue;
     if (!entry.name.endsWith('.ts')) continue;
-    if (entry.name.endsWith('.test.ts')) continue;
+    // Match the filter used elsewhere in the codebase (validate-github-
+    // conclusion-enum.ts): both `.test.ts` and `.spec.ts` are test files.
+    if (entry.name.endsWith('.test.ts') || entry.name.endsWith('.spec.ts')) continue;
     out.push(join(root, entry.name));
   }
   return out;

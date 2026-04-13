@@ -110,7 +110,36 @@ async function check(_args: string[], options: CommandOptions): Promise<CommandR
   // commits introduced a new bug shape), any newly-triggered pattern would
   // be invisible to the old checklist. Fail closed and point at `init` so
   // the reviewer picks up the new items before shipping.
-  const { items: freshPatternItems } = detectPatternItems(PROJECT_ROOT);
+  //
+  // CRITICAL (QUA-363 hostile-review HIGH-2): if the re-detect fails to
+  // read the diff (maxBuffer overflow, hung git, missing origin/main),
+  // we MUST fail closed. A silent 0-detections result against a broken
+  // detector is exactly the invisible-failure bug class the pattern
+  // system exists to prevent.
+  const {
+    items: freshPatternItems,
+    diffError: freshDiffError,
+  } = detectPatternItems(PROJECT_ROOT);
+  if (freshDiffError != null) {
+    const msg = `Freshness check could not re-read the current diff: ${freshDiffError}`;
+    if (options.json) {
+      return {
+        exitCode: 1,
+        output: JSON.stringify(
+          { ok: false, reason: 'diff-unreadable', error: freshDiffError },
+          null,
+          2,
+        ),
+      };
+    }
+    return {
+      exitCode: 1,
+      output:
+        `${c.red}✗ ${msg}${c.reset}\n` +
+        `  ${c.dim}Cannot verify the checklist is up to date. Refusing to attest a clean state${c.reset}\n` +
+        `  ${c.dim}against a broken detector. Fix the underlying git/filesystem issue, then retry.${c.reset}\n`,
+    };
+  }
   const existingReviewIds = new Set(
     items.filter((i) => i.id.startsWith('review-')).map((i) => i.id),
   );

@@ -154,27 +154,31 @@ export const PATTERNS: ReviewPattern[] = [
     origin: 'QUA-339 pass-2 bug MED-3',
     mechanical: true,
     detect(diff) {
-      // Look for new `async function <name>(..., options: ...Options): Promise<CommandResult>`
-      // entries in crux/commands/*.ts that don't start with a `try {`.
+      // Iterate per-file addedLines directly. This replaces an earlier
+      // O(N*M) pass that re-scanned `diff.raw` for every file and used
+      // `line.includes(file.path)` to re-attribute matches — ironic,
+      // since substring-matching paths is the exact bug class the
+      // `numeric-id-substring-match` pattern below warns against. Now
+      // we trust parseDiff's per-file attribution instead.
+      // (QUA-363 hostile-review LOW-7.)
       const hits: PatternHit[] = [];
+      // Note: no leading `+` needed — `file.addedLines` already contains
+      // stripped content.
       const HANDLER_RE =
-        /^\+\s*(?:export\s+)?async\s+function\s+(\w+)\s*\([^)]*\)\s*:\s*Promise<CommandResult>/;
+        /^\s*(?:export\s+)?async\s+function\s+(\w+)\s*\([^)]*\)\s*:\s*Promise<CommandResult>/;
       for (const file of diff.files) {
         if (!file.path.startsWith('crux/commands/')) continue;
-        if (!file.path.endsWith('.ts') || file.path.endsWith('.test.ts')) continue;
-        // Scan the raw diff for added handler signatures; we'll verify
-        // the handler body at gate time (the mechanical validator has
-        // full file context).
-        const lines = diff.raw.split('\n');
-        for (let i = 0; i < lines.length; i++) {
-          const m = lines[i].match(HANDLER_RE);
+        if (!file.path.endsWith('.ts')) continue;
+        if (file.path.endsWith('.test.ts') || file.path.endsWith('.spec.ts')) continue;
+        if (file.path.includes('/__tests__/')) continue;
+        for (const line of file.addedLines) {
+          const m = line.content.match(HANDLER_RE);
           if (!m) continue;
-          // Only count if this line is part of the current file's hunk
-          // (simple heuristic: look backward for the last `diff --git`).
-          let j = i;
-          while (j > 0 && !lines[j].startsWith('diff --git')) j--;
-          if (!lines[j].includes(file.path)) continue;
-          hits.push({ file: file.path, line: 0, snippet: m[0].slice(1).trim() });
+          hits.push({
+            file: file.path,
+            line: line.newLineNumber,
+            snippet: m[0].trim(),
+          });
         }
       }
       return hits;
@@ -267,6 +271,14 @@ export function parseDiff(raw: string): DiffBlob {
   const lines = raw.split('\n');
   let current: DiffFile | null = null;
   let newLineNo = 0;
+  /**
+   * True once we're inside a hunk (after `@@ ... @@`). Before any
+   * hunk, lines like `+++ b/path` are file headers; after a hunk,
+   * every `+` / `-` / ` ` line is CONTENT (including content that
+   * literally begins with `+++` or `---`). This state split avoids
+   * the ambiguity that caused QUA-363 hostile-review MED-4.
+   */
+  let inHunk = false;
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
@@ -277,6 +289,7 @@ export function parseDiff(raw: string): DiffBlob {
       if (current) files.push(current);
       current = { path: fileMatch[2], added: false, addedLines: [] };
       newLineNo = 0;
+      inHunk = false;
       continue;
     }
     if (!current) continue;
@@ -287,21 +300,27 @@ export function parseDiff(raw: string): DiffBlob {
       continue;
     }
 
-    // Hunk header: `@@ -a,b +c,d @@` — reset new-line counter
+    // Hunk header: `@@ -a,b +c,d @@` — reset new-line counter, enter hunk mode
     const hunkMatch = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
     if (hunkMatch) {
       newLineNo = Number(hunkMatch[1]) - 1;
+      inHunk = true;
       continue;
     }
 
-    // Added line (not the `+++` header)
-    if (line.startsWith('+') && !line.startsWith('+++')) {
+    // Before any hunk: skip file-header lines (`+++ b/path`, `--- a/path`).
+    // These never match inside a hunk because by then `inHunk` is true.
+    if (!inHunk) continue;
+
+    // Inside a hunk: every `+` line is content, even literal `+++`.
+    if (line.startsWith('+')) {
       newLineNo += 1;
       current.addedLines.push({ newLineNumber: newLineNo, content: line.slice(1) });
       continue;
     }
-    // Context line — advances new-file line counter
-    if (!line.startsWith('-') && !line.startsWith('---')) {
+    // Context line — advances new-file line counter. `-` lines (removed)
+    // don't advance it.
+    if (!line.startsWith('-')) {
       newLineNo += 1;
     }
   }

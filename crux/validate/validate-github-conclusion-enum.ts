@@ -46,12 +46,17 @@ const CONCLUSION_KEYWORDS = /conclusion|statusCheck|check[_\s]?run|ci[_\s]?run/i
  * Includes truncated forms (`fail`, `cancel`) because the pass-1 QUA-339
  * bug literally used those — that's the whole point of the check.
  *
- * Does NOT include success-flavored tokens (`success`, `neutral`, `skipped`,
- * `stale`) — a regex matching those is probably the inverse check and
- * shouldn't be forced to include failing names.
+ * Deliberately EXCLUDES `error` — it's not a GitHub check-run conclusion
+ * value, and including it caused false positives where a regex targeting
+ * log levels (e.g. `/error|fatal/`) happened to appear on a line
+ * mentioning the word "conclusion" in a comment. (QUA-363 hostile-review
+ * LOW-6.)
+ *
+ * Also excludes success-flavored tokens (`success`, `neutral`, `skipped`,
+ * `stale`) — a regex matching those is probably the inverse check.
  */
 const FAILING_FLAVORED_TOKEN_RE =
-  /(failure|fail|cancelled|cancel|error|timed_out|timeout|action_required|startup_failure)/i;
+  /(failure|fail|cancelled|cancel|timed_out|timeout|action_required|startup_failure)/i;
 
 /** The suppression marker, e.g. `// conclusion-enum-ok: see QUA-xxx` */
 const SUPPRESSION_RE = /\/\/\s*conclusion-enum-ok\b/;

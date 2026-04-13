@@ -81,6 +81,19 @@ describe('scanFileContent — github conclusion enum exhaustiveness', () => {
     expect(scanFileContent(PATH, code)).toHaveLength(0);
   });
 
+  // QUA-363 hostile-review LOW-6: `error` isn't a canonical GitHub
+  // check-run conclusion, but the old flavored-token regex flagged any
+  // error-matching regex that happened to be on a line containing
+  // "conclusion" in a comment. Dropping `error` from the trigger set
+  // eliminates the false positive.
+  it('does not flag log-level regexes that happen to be near a "conclusion" word', () => {
+    const code = `
+      // this line mentions conclusion in a comment for prefilter trip
+      const logErrors = /error|fatal/.test(message);
+    `;
+    expect(scanFileContent(PATH, code)).toHaveLength(0);
+  });
+
   it('catches multiple violations in one file', () => {
     const code = `
       const a = /failure|cancelled/.test(x.conclusion);

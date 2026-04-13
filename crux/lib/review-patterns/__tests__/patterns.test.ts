@@ -149,6 +149,48 @@ describe('parseDiff', () => {
     const weirdHeaders = d.files[0].addedLines.filter((l) => l.content.startsWith('++'));
     expect(weirdHeaders).toHaveLength(0);
   });
+
+  // QUA-363 hostile-review MED-4: a content line that literally starts
+  // with `+++` (e.g., 4+ plus signs in source code, MDX bullets, ASCII
+  // art separators) used to be misclassified as the `+++` file header
+  // via .startsWith('+++'). The fix requires the trailing space that
+  // distinguishes `+++ b/path` from `+++ content`.
+  it('classifies content lines starting with `+++` as added, not headers', () => {
+    const d = parseDiff(`diff --git a/foo.ts b/foo.ts
+index abc..def 100644
+--- a/foo.ts
++++ b/foo.ts
+@@ -1,2 +1,4 @@
+ normal context
++++ three pluses at start of content
+++++ four pluses at start of content
+ more context
+`);
+    expect(d.files).toHaveLength(1);
+    const added = d.files[0].addedLines.map((l) => l.content);
+    expect(added).toContain('++ three pluses at start of content');
+    expect(added).toContain('+++ four pluses at start of content');
+  });
+
+  it('classifies context lines starting with `---` as context, not headers', () => {
+    // Mirror of the above for the `---` side: a content line beginning
+    // with `---` (e.g., MDX frontmatter delimiter) must not be treated
+    // as the file-header form `--- a/path`.
+    const d = parseDiff(`diff --git a/foo.mdx b/foo.mdx
+index abc..def 100644
+--- a/foo.mdx
++++ b/foo.mdx
+@@ -1,3 +1,4 @@
+ ---
+ title: Foo
++description: A page
+ ---
+`);
+    // The frontmatter `---` on context lines should not corrupt line numbers
+    expect(d.files[0].path).toBe('foo.mdx');
+    const added = d.files[0].addedLines.find((l) => l.content.includes('description'));
+    expect(added).toBeDefined();
+  });
 });
 
 // ---------------------------------------------------------------------------

@@ -183,8 +183,21 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   // ── Pattern-triggered items (QUA-363, option B) ──────────────────────────
   // Scan the current diff for bug shapes and append forced checklist items.
-  // Best-effort: if git fails or no patterns trigger, this is a no-op.
-  const { items: patternItems, detections } = detectPatternItems(PROJECT_ROOT);
+  // Best-effort: if no patterns trigger, this is a no-op. If the diff
+  // cannot be read at all (e.g., 64MB+ release PR overflow, missing
+  // origin/main ref), we surface a visible warning — invisible detection
+  // failure is the whole bug class HIGH-2 addresses.
+  const { items: patternItems, detections, diffError } = detectPatternItems(PROJECT_ROOT);
+
+  let diffWarning = '';
+  if (diffError) {
+    diffWarning =
+      `\n${c.yellow}⚠ Pattern detection could not read the current diff:${c.reset}\n` +
+      `  ${c.dim}${diffError}${c.reset}\n` +
+      `  ${c.dim}Pattern items are NOT in the checklist. If this is a large PR,${c.reset}\n` +
+      `  ${c.dim}review-pattern attestation is disabled for this session.${c.reset}\n` +
+      `  ${c.dim}Fix: ensure \`git fetch origin main\` succeeds, then re-run init.${c.reset}\n`;
+  }
 
   let markdown = buildChecklist(type, metadata, patternItems);
 
@@ -366,6 +379,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   output += `  Items: ${status.totalItems}\n`;
   if (dbSynced) output += `  ${c.dim}Synced to wiki-server DB${c.reset}\n`;
   if (directoryWarning) output += directoryWarning;
+  if (diffWarning) output += diffWarning;
   if (linearBranchWarning) output += linearBranchWarning;
   if (issueStartOutput) output += `\n${issueStartOutput}`;
   if (linearStartOutput) output += `\n${linearStartOutput}`;
