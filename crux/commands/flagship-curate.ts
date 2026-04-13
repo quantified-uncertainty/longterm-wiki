@@ -389,16 +389,29 @@ If you cannot find a good URL for a record, omit it from the array.`;
 
 // ── Source Registration & Ingest ────────────────────────────────────────
 
+interface IngestResult {
+  registered: number;
+  ingested: number;
+  errors: number;
+  /**
+   * Record IDs that had at least one URL successfully registered and ingested
+   * (fresh from cache or freshly fetched with status='ok'). Only these records
+   * are safe to reset in Step 4 — records whose URLs all errored out would lose
+   * their prior verdicts for no gain.
+   */
+  successfulRecordIds: Set<string>;
+}
+
 /**
  * Register discovered URLs as resources and wait for content ingestion.
  */
 async function registerAndIngestSources(
   researched: ResearchedSource[],
   entityId: string,
-): Promise<{ registered: number; ingested: number; errors: number }> {
+): Promise<IngestResult> {
   const allUrls = researched.flatMap((r) => r.urls);
   if (allUrls.length === 0) {
-    return { registered: 0, ingested: 0, errors: 0 };
+    return { registered: 0, ingested: 0, errors: 0, successfulRecordIds: new Set() };
   }
 
   // Deduplicate
@@ -417,16 +430,29 @@ async function registerAndIngestSources(
     const ingested = result.fetchedCount + result.cachedCount;
     const errors = result.errorCount;
 
+    // Map URL -> suggest-resources status so we can tell which records got
+    // *something* usable back.
+    const urlStatus = new Map<string, string>();
+    for (const r of result.resources) {
+      urlStatus.set(r.url, r.status);
+    }
+
+    const successfulRecordIds = new Set<string>();
+    for (const r of researched) {
+      const anyOk = r.urls.some((u) => urlStatus.get(u) === 'ok');
+      if (anyOk) successfulRecordIds.add(r.recordId);
+    }
+
     console.log(
-      `  Registered: ${registered} | Ingested: ${ingested} | Cached: ${result.cachedCount} | Errors: ${errors}`,
+      `  Registered: ${registered} | Ingested: ${ingested} | Cached: ${result.cachedCount} | Errors: ${errors} | Records with new sources: ${successfulRecordIds.size}`,
     );
 
-    return { registered, ingested, errors };
+    return { registered, ingested, errors, successfulRecordIds };
   } catch (e: unknown) {
     console.warn(
       `${LOG_PREFIX} Source registration failed: ${e instanceof Error ? e.message : String(e)}`,
     );
-    return { registered: 0, ingested: 0, errors: uniqueUrls.length };
+    return { registered: 0, ingested: 0, errors: uniqueUrls.length, successfulRecordIds: new Set() };
   }
 }
 
@@ -483,15 +509,21 @@ async function updatePersonnelSources(
 /**
  * Reset stale verdicts (unverifiable/partial/outdated) to unchecked
  * so the verification pass rechecks them with the new sources.
+ *
+ * If `allowedRecordIds` is provided, only records whose IDs are in that set
+ * will be reset. Pass `null` to allow all records (used in `--skip-research`
+ * mode where the user explicitly opted in to re-verify existing sources).
  */
 async function resetStaleVerdicts(
   records: RecordNeedingCuration[],
+  allowedRecordIds: Set<string> | null,
 ): Promise<number> {
   let resetCount = 0;
   const resettable = new Set(['unverifiable', 'partial', 'outdated']);
 
   for (const record of records) {
     if (!resettable.has(record.verdict)) continue;
+    if (allowedRecordIds !== null && !allowedRecordIds.has(record.recordId)) continue;
 
     try {
       await storeVerdict({
@@ -691,9 +723,10 @@ async function curateEntity(
     }
 
     // Step 3: Register new sources and wait for ingest
+    let ingestResult: IngestResult | null = null;
     if (researched.length > 0) {
       console.log(`\n  ${c.bold}Step 3: Registering and ingesting sources...${c.reset}`);
-      await registerAndIngestSources(researched, entity.stableId);
+      ingestResult = await registerAndIngestSources(researched, entity.stableId);
 
       // Step 3b: Update personnel records with new source URLs
       const updatedCount = await updatePersonnelSources(entity, researched, records);
@@ -704,13 +737,38 @@ async function curateEntity(
       console.log(`\n  ${c.bold}Step 3: No new sources to register${c.reset}`);
     }
 
-    // Step 4: Reset stale verdicts
-    console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts...${c.reset}`);
-    const resetCount = await resetStaleVerdicts(records);
-    console.log(`  Reset ${resetCount} verdicts to unchecked`);
+    // Step 5 budget — computed before Step 4 so we don't reset records we
+    // have no budget to re-verify.
+    const verifyBudget = Math.min(budget - tracker.totalCost, 2.0); // Cap per-entity verify at $2
+
+    // Step 4: Reset stale verdicts — atomically guarded on Step 3 success and
+    // Step 5 budget availability. See QUA-382.
+    //
+    // Eligibility rules:
+    //   * `--skip-research`: reset everything (user opted in to re-verify
+    //     existing sources)
+    //   * Otherwise: only reset records whose URLs were successfully ingested
+    //     by Step 3. If no record got new sources, skip the reset entirely.
+    //   * In either case: if Step 5 has no budget, skip the reset — a reset
+    //     without re-verification strictly degrades the entity.
+    if (verifyBudget <= 0) {
+      console.log(`\n  ${c.bold}Step 4: Skipping reset (no verify budget — would strand records at unchecked)${c.reset}`);
+    } else if (skipResearch) {
+      console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts (--skip-research mode)...${c.reset}`);
+      const resetCount = await resetStaleVerdicts(records, null);
+      console.log(`  Reset ${resetCount} verdicts to unchecked`);
+    } else {
+      const allowed = ingestResult?.successfulRecordIds ?? new Set<string>();
+      if (allowed.size === 0) {
+        console.log(`\n  ${c.bold}Step 4: Skipping reset (no records got new sources from Step 3)${c.reset}`);
+      } else {
+        console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts for ${allowed.size} records with new sources...${c.reset}`);
+        const resetCount = await resetStaleVerdicts(records, allowed);
+        console.log(`  Reset ${resetCount} verdicts to unchecked`);
+      }
+    }
 
     // Step 5: Run verification
-    const verifyBudget = Math.min(budget - tracker.totalCost, 2.0); // Cap per-entity verify at $2
     if (verifyBudget > 0) {
       console.log(`\n  ${c.bold}Step 5: Running sourcing verification ($${verifyBudget.toFixed(2)} budget)...${c.reset}`);
       const verifyResult = await runVerification(entity, verifyBudget, recordLimit, tableFilter);
