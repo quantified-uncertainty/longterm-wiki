@@ -4,6 +4,8 @@ Subsystem map for the TableBase / FactBase / WikiBase architecture. **Read this 
 
 **Canonical source**: the wiki page at `content/docs/internal/data-architecture.mdx` (E1334) has the full version with mermaid diagrams, table inventories, and migration history. This file is the *agent cheat-sheet* — read this first, follow the link if you need depth.
 
+> **For the cross-base `things` table specifically**: see `docs/audits/things-denormalization-audit.md` for the full write-site inventory, the `search_vector` GENERATED column constraint, and the `*_display_name` sibling pattern audit. Directly informs how [QUA-408](https://linear.app/quantifieduncertainty/issue/QUA-408) Tier 4b will normalize this layer.
+
 ---
 
 ## The three layers
