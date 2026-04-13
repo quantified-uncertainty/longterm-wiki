@@ -10,17 +10,23 @@
  *
  * This detector is an advisory review-time hint, not a gate check. It fires at
  * MEDIUM severity when the added lines contain BOTH:
- *   1. A column-name-literal equality gate, e.g. `columnName === "fact_id"` or
- *      `column.name === "x"` or `field.name === "y"`.
- *   2. A value-signature probe: `.startsWith(`, `.endsWith(`, `.test(`,
- *      `.match(`, `.includes(` on the value itself.
+ *   1. A column-name-literal equality gate — the column identifier
+ *      (columnName, fieldName, column.name, field.name, etc.) compared for
+ *      strict equality against a quoted literal.
+ *   2. A value-signature probe — one of the string/regex methods startsWith,
+ *      endsWith, includes, test, match, search, or exec called on the value.
+ *
+ * The examples are deliberately written in prose here instead of as code
+ * fragments, so the detector does not self-fire on its own docstring. See the
+ * tests for the canonical code shapes.
  *
  * False-positive guards:
- *   - Pure formatting blocks (`toFixed`, `Intl.NumberFormat`, `formatCurrency`,
- *     `formatPercent`, `toLocaleString`) that do NOT probe the value's signature
- *     are allowed through — they transform the value rather than masking it.
+ *   - Both patterns must appear in the same CONTIGUOUS run of added lines.
+ *     Two unrelated changes in one hunk (one adding a column gate elsewhere,
+ *     one adding a value probe) never co-fire.
  *   - Diffs without both a column-name gate AND a value probe never fire.
  *   - Test files are skipped (test fixtures deliberately contain the signature).
+ *   - Non-code files (markdown, YAML, SQL, config) are skipped.
  *
  * Output shape matches the hostile-reviewer finding format in
  * `.claude/commands/agent-review-pr.md` Phase 3.
@@ -35,21 +41,18 @@ export interface NarrowPatchFinding {
   relatedIncidents: string[];
 }
 
-// Matches `columnName === "fact_id"`, `column.name === 'x'`, `field.name === \`y\``,
-// and the loose `key === "literal"` shape. Uses `===` or `==`.
+// Matches a column identifier (columnName, fieldName, column.name, col.name,
+// field.name, colName, or any `<receiver>.column`) strict-equality tested
+// against a quoted string literal. The `key` alternative was removed after
+// review — too broad (common object-lookup idiom).
 const COLUMN_NAME_GATE_RE =
-  /\b(?:columnName|fieldName|column\.name|col\.name|field\.name|colName|key)\s*===?\s*["'`][A-Za-z_][\w-]*["'`]/;
+  /\b(?:columnName|fieldName|colName|column\.name|col\.name|field\.name|\w+\.column)\s*===?\s*["'`][A-Za-z_][\w-]*["'`]/;
 
-// Matches `.startsWith(`, `.endsWith(`, `.test(`, `.match(`, `.includes(` on any
-// receiver. These are "probe the value for a signature" calls — the exact
-// anti-pattern in QUA-316/QUA-346.
-const VALUE_SIGNATURE_RE = /\.\s*(?:startsWith|endsWith|includes|test|match)\s*\(/;
-
-// Pure-formatting calls that transform (not probe) the value. If an added block
-// only contains these (and no VALUE_SIGNATURE_RE match), we ignore it. This is
-// defensive — the primary filter is requiring a VALUE_SIGNATURE_RE hit.
-const FORMATTING_RE =
-  /\b(?:toFixed|toLocaleString|Intl\.NumberFormat|formatCurrency|formatPercent|formatNumber|formatValue)\b/;
+// Matches a method call that probes a value's signature: one of startsWith,
+// endsWith, includes, test, match, search, or exec invoked via dot-call on any
+// receiver. This is the exact anti-pattern in QUA-316/QUA-346.
+const VALUE_SIGNATURE_RE =
+  /\.\s*(?:startsWith|endsWith|includes|test|match|search|exec)\s*\(/;
 
 // File paths that look like generic renderers/column rules/formatters/validators.
 // Used only to strengthen the message — the detector fires regardless of path.
@@ -64,20 +67,52 @@ interface ParsedHunk {
 
 /**
  * Parse a unified diff into per-file hunks with line numbers for the added side.
+ *
+ * Uses the `+++ b/<path>` line for the filename (NOT the `diff --git a/X b/Y`
+ * header) because the `diff --git` header is whitespace-split and breaks on
+ * paths that contain spaces or `/b/` segments. The `+++ b/<path>` line is the
+ * canonical new-file path and is always present for modified/added files.
+ *
+ * CRLF line endings are normalized at input so Windows-sourced diffs parse
+ * identically to Unix diffs.
  */
 export function parseDiff(diff: string): ParsedHunk[] {
   const hunks: ParsedHunk[] = [];
-  const parts = diff.split(/^diff --git /m);
+  // Normalize CRLF → LF so trailing \r doesn't fall through to the unknown-line
+  // branch and silently abort a hunk.
+  const normalized = diff.replace(/\r\n/g, "\n").replace(/\r/g, "");
+  const parts = normalized.split(/^diff --git /m);
+
   for (let i = 1; i < parts.length; i++) {
     const block = parts[i];
-    const firstNewline = block.indexOf("\n");
-    const header = firstNewline === -1 ? block : block.slice(0, firstNewline);
-    const bMatch = header.match(/\bb\/(.+)$/);
-    if (!bMatch) continue;
-    const file = bMatch[1].trim();
-
     const lines = block.split("\n");
+
+    // Walk once: pick up the `+++ b/<path>` filename, then parse hunks. If the
+    // block has `+++ /dev/null` (file deleted), skip — there are no added lines.
+    let file: string | null = null;
     let j = 0;
+    while (j < lines.length) {
+      const line = lines[j];
+      if (line.startsWith("+++ b/")) {
+        file = line.slice("+++ b/".length);
+        j++;
+        break;
+      }
+      if (line.startsWith("+++ /dev/null")) {
+        file = null;
+        j++;
+        break;
+      }
+      if (line.startsWith("@@ ")) {
+        // Reached hunks without finding a +++ b/ line (binary diff, rename with
+        // no content change, etc.) — nothing to collect.
+        break;
+      }
+      j++;
+    }
+    if (file == null) continue;
+
+    // Now parse hunks.
     while (j < lines.length) {
       const line = lines[j];
       const hunkHeader = line.match(/^@@ -\d+(?:,\d+)? \+(\d+)(?:,\d+)? @@/);
@@ -91,10 +126,6 @@ export function parseDiff(diff: string): ParsedHunk[] {
       j++;
       while (j < lines.length && !lines[j].startsWith("@@ ")) {
         const raw = lines[j];
-        if (raw.startsWith("+++") || raw.startsWith("---")) {
-          j++;
-          continue;
-        }
         if (raw.startsWith("+")) {
           added.push({ line: cursor, text: raw.slice(1) });
           cursor++;
@@ -105,8 +136,10 @@ export function parseDiff(diff: string): ParsedHunk[] {
         } else if (raw === "\\ No newline at end of file") {
           // ignore
         } else if (raw === "") {
-          cursor++;
+          // Blank entry from trailing split — don't advance cursor (empty
+          // context lines show up as a single space in unified diff, not as "").
         } else {
+          // Unknown content — we've walked off the hunk (rare).
           break;
         }
         j++;
@@ -120,9 +153,38 @@ export function parseDiff(diff: string): ParsedHunk[] {
 }
 
 /**
+ * Split a hunk's added lines into contiguous runs — groups of lines with
+ * consecutive new-file line numbers. Two unrelated changes in the same hunk
+ * end up as separate runs, which lets the detector avoid cross-change false
+ * positives.
+ */
+function contiguousRuns(
+  hunk: ParsedHunk
+): Array<Array<{ line: number; text: string }>> {
+  const runs: Array<Array<{ line: number; text: string }>> = [];
+  let current: Array<{ line: number; text: string }> = [];
+  let prevLine = -1;
+  for (const entry of hunk.addedLines) {
+    if (current.length === 0 || entry.line === prevLine + 1) {
+      current.push(entry);
+    } else {
+      runs.push(current);
+      current = [entry];
+    }
+    prevLine = entry.line;
+  }
+  if (current.length > 0) runs.push(current);
+  return runs;
+}
+
+/**
  * Scans a unified diff for the narrow-patch signature and returns MEDIUM
  * findings for each match. Never returns CRITICAL/HIGH — this rule is a hint,
  * not a blocker.
+ *
+ * Fires once per contiguous added-line run (not once per hunk): two unrelated
+ * edits in the same hunk do NOT co-fire unless both the column-name gate and
+ * the value-signature probe appear in the SAME added-line run.
  */
 export function detectNarrowPatches(diff: string): NarrowPatchFinding[] {
   const findings: NarrowPatchFinding[] = [];
@@ -133,37 +195,37 @@ export function detectNarrowPatches(diff: string): NarrowPatchFinding[] {
     if (!isCodeFile(hunk.file)) continue;
     if (isTestFile(hunk.file)) continue;
 
-    const addedText = hunk.addedLines.map((l) => l.text).join("\n");
+    const runs = contiguousRuns(hunk);
+    for (const run of runs) {
+      const runText = run.map((l) => l.text).join("\n");
 
-    const hasColumnGate = COLUMN_NAME_GATE_RE.test(addedText);
-    const hasValueProbe = VALUE_SIGNATURE_RE.test(addedText);
+      if (!COLUMN_NAME_GATE_RE.test(runText)) continue;
+      if (!VALUE_SIGNATURE_RE.test(runText)) continue;
 
-    if (!hasColumnGate || !hasValueProbe) continue;
-
-    const isPureFormatter =
-      FORMATTING_RE.test(addedText) && !VALUE_SIGNATURE_RE.test(addedText);
-    if (isPureFormatter) continue;
-
-    let lineNo = hunk.newStartLine;
-    for (const entry of hunk.addedLines) {
-      if (COLUMN_NAME_GATE_RE.test(entry.text)) {
-        lineNo = entry.line;
-        break;
+      // Locate the specific line with the column-name gate, for a precise
+      // pointer. Fall back to the first line of the run if the gate spans
+      // multiple lines.
+      let lineNo = run[0].line;
+      for (const entry of run) {
+        if (COLUMN_NAME_GATE_RE.test(entry.text)) {
+          lineNo = entry.line;
+          break;
+        }
       }
+
+      const snippet = trimmedSnippet(runText);
+      const isRendererFile = RENDERER_PATH_RE.test(hunk.file);
+      const message = buildMessage(isRendererFile);
+
+      findings.push({
+        severity: "MEDIUM",
+        file: hunk.file,
+        line: lineNo,
+        message,
+        snippet,
+        relatedIncidents: ["QUA-316", "QUA-346"],
+      });
     }
-
-    const snippet = trimmedSnippet(addedText);
-    const isRendererFile = RENDERER_PATH_RE.test(hunk.file);
-    const message = buildMessage(isRendererFile);
-
-    findings.push({
-      severity: "MEDIUM",
-      file: hunk.file,
-      line: lineNo,
-      message,
-      snippet,
-      relatedIncidents: ["QUA-316", "QUA-346"],
-    });
   }
 
   return findings;

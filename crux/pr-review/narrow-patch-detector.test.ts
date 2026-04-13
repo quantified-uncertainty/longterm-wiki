@@ -339,6 +339,212 @@ describe("detectNarrowPatches — variants of the same signature", () => {
   });
 });
 
+// ─── Regression tests for issues found during self-review ────────────────
+
+describe("detectNarrowPatches — regressions from review", () => {
+  it("handles paths that contain `/b/` segments (uses +++ b/ for filename)", () => {
+    // Regression: original parseDiff used `\bb/(.+)$` against the `diff --git`
+    // header, which greedily matched the first `b/` in the path.
+    const diff = `diff --git a/src/b/component.tsx b/src/b/component.tsx
+index 1111..2222 100644
+--- a/src/b/component.tsx
++++ b/src/b/component.tsx
+@@ -10,0 +11,5 @@
++  if (columnName === "fact_id" && value.startsWith("f_")) {
++    return <Link>view →</Link>;
++  }
++
+`;
+    const hunks = parseDiff(diff);
+    expect(hunks).toHaveLength(1);
+    expect(hunks[0].file).toBe("src/b/component.tsx");
+    const findings = detectNarrowPatches(diff);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].file).toBe("src/b/component.tsx");
+  });
+
+  it("handles CRLF line endings", () => {
+    // Regression: split("\n") leaves trailing \r, which used to fall into the
+    // unknown-line branch and silently abort the hunk.
+    const unixDiff = `diff --git a/src/render.tsx b/src/render.tsx
+--- a/src/render.tsx
++++ b/src/render.tsx
+@@ -5,0 +6,5 @@
++  if (columnName === "fact_id" && value.startsWith("f_")) {
++    return <Link>view →</Link>;
++  }
++
+`;
+    const crlfDiff = unixDiff.replace(/\n/g, "\r\n");
+    const findings = detectNarrowPatches(crlfDiff);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].file).toBe("src/render.tsx");
+    expect(findings[0].line).toBeGreaterThanOrEqual(6);
+  });
+
+  it("does NOT co-fire when two unrelated changes sit in the same hunk", () => {
+    // Regression: the old implementation joined all added lines per hunk and
+    // tested the regexes against the joined text, so an unrelated column gate
+    // in one edit and an unrelated value probe in another would co-fire.
+    // Now the detector splits into contiguous runs.
+    const diff = `diff --git a/src/render.tsx b/src/render.tsx
+--- a/src/render.tsx
++++ b/src/render.tsx
+@@ -10,6 +10,14 @@
+   if (value == null) return null;
+
++  // unrelated format change — gates on column name, no probe
++  if (columnName === "revenue") {
++    return formatCurrency(value);
++  }
++
+   return <span>{value}</span>;
+ }
+
++// totally separate helper added lower in the same hunk — uses .startsWith but
++// does NOT gate on a column name, so by itself it's fine.
++export function hasFactPrefix(v: string): boolean {
++  return v.startsWith("f_");
++}
+`;
+    const findings = detectNarrowPatches(diff);
+    expect(findings).toHaveLength(0);
+  });
+
+  it("flags `field.name === 'x'` specifically (not `name === 'x'`)", () => {
+    // Regression: `name === "x"` is too broad (common object-lookup idiom).
+    // The `key` alternative was also removed for the same reason.
+    const nakedName = `diff --git a/src/helper.ts b/src/helper.ts
+--- a/src/helper.ts
++++ b/src/helper.ts
+@@ -5,0 +6,5 @@
++  if (name === "fact_id" && value.startsWith("f_")) {
++    return "masked";
++  }
++
+`;
+    expect(detectNarrowPatches(nakedName)).toHaveLength(0);
+
+    const nakedKey = `diff --git a/src/helper.ts b/src/helper.ts
+--- a/src/helper.ts
++++ b/src/helper.ts
+@@ -5,0 +6,5 @@
++  if (key === "fact_id" && value.startsWith("f_")) {
++    return "masked";
++  }
++
+`;
+    expect(detectNarrowPatches(nakedKey)).toHaveLength(0);
+
+    // But the qualified forms (field.name, row.column) still flag.
+    const qualified = `diff --git a/src/helper.ts b/src/helper.ts
+--- a/src/helper.ts
++++ b/src/helper.ts
+@@ -5,0 +6,5 @@
++  if (field.name === "fact_id" && value.startsWith("f_")) {
++    return "masked";
++  }
++
+`;
+    expect(detectNarrowPatches(qualified)).toHaveLength(1);
+  });
+
+  it("flags `.search(` and `.exec(` value probes (added in review)", () => {
+    const diffSearch = `diff --git a/src/render.tsx b/src/render.tsx
+--- a/src/render.tsx
++++ b/src/render.tsx
+@@ -5,0 +6,5 @@
++  if (columnName === "slug" && value.search(/^sid_/) >= 0) {
++    return <Link>view →</Link>;
++  }
++
+`;
+    expect(detectNarrowPatches(diffSearch)).toHaveLength(1);
+
+    const diffExec = `diff --git a/src/render.tsx b/src/render.tsx
+--- a/src/render.tsx
++++ b/src/render.tsx
+@@ -5,0 +6,5 @@
++  if (columnName === "slug" && /^sid_/.exec(value)) {
++    return <Link>view →</Link>;
++  }
++
+`;
+    expect(detectNarrowPatches(diffExec)).toHaveLength(1);
+  });
+
+  it("skips deleted files (+++ /dev/null) without crashing", () => {
+    const diff = `diff --git a/src/old.tsx b/src/old.tsx
+deleted file mode 100644
+index 1111..0000
+--- a/src/old.tsx
++++ /dev/null
+@@ -1,5 +0,0 @@
+-if (columnName === "fact_id" && value.startsWith("f_")) {
+-  return <Link>view →</Link>;
+-}
+`;
+    expect(() => detectNarrowPatches(diff)).not.toThrow();
+    expect(detectNarrowPatches(diff)).toHaveLength(0);
+  });
+
+  it("handles multi-file diffs (each file parsed independently)", () => {
+    const diff = `diff --git a/src/a.tsx b/src/a.tsx
+--- a/src/a.tsx
++++ b/src/a.tsx
+@@ -5,0 +6,5 @@
++  if (columnName === "fact_id" && value.startsWith("f_")) {
++    return null;
++  }
++
+diff --git a/src/b.tsx b/src/b.tsx
+--- a/src/b.tsx
++++ b/src/b.tsx
+@@ -10,0 +11,3 @@
++export function unrelated() {
++  return 42;
++}
+`;
+    const findings = detectNarrowPatches(diff);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].file).toBe("src/a.tsx");
+  });
+
+  it("handles hunk headers without line-count commas (@@ -1 +1 @@)", () => {
+    const diff = `diff --git a/src/x.ts b/src/x.ts
+--- a/src/x.ts
++++ b/src/x.ts
+@@ -1 +1,5 @@
+-export const x = 1;
++if (columnName === "fact_id" && value.startsWith("f_")) {
++  return null;
++}
++export const x = 2;
+`;
+    const findings = detectNarrowPatches(diff);
+    expect(findings).toHaveLength(1);
+    expect(findings[0].line).toBeGreaterThanOrEqual(1);
+  });
+
+  it("reports a precise line number for the column-gate line", () => {
+    const diff = `diff --git a/src/render.tsx b/src/render.tsx
+--- a/src/render.tsx
++++ b/src/render.tsx
+@@ -10,0 +11,6 @@
++  // a comment
++  const prefix = "f_";
++  if (columnName === "fact_id" && value.startsWith(prefix)) {
++    return <Link>view →</Link>;
++  }
++
+`;
+    const findings = detectNarrowPatches(diff);
+    expect(findings).toHaveLength(1);
+    // The gate is on the 3rd added line (line 13 in the new file).
+    expect(findings[0].line).toBe(13);
+  });
+});
+
 // ─── formatFindings ───────────────────────────────────────────────────────
 
 describe("formatFindings", () => {
