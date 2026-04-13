@@ -786,7 +786,22 @@ function formatDuration(ms: number): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-function formatSummary(results: CurationResult[]): string {
+/**
+ * Render a per-org delta label with distinct, color-coded states for
+ * improvement / regression / no-change. Previously this was a two-way
+ * branch (`improved` OR `no change`), which silently hid regressions
+ * where confirmed-record counts dropped during a run. See QUA-379 for
+ * the incident evidence (Anthropic 37→33, CEA 96→94, etc.) that led to
+ * operators missing multi-percentage-point quality drops.
+ */
+export function formatConfirmedDelta(confirmedBefore: number, confirmedAfter: number): string {
+  const delta = confirmedAfter - confirmedBefore;
+  if (delta > 0) return `${c.green}+${delta}${c.reset}`;
+  if (delta < 0) return `${c.red}${delta}${c.reset}`;
+  return `${c.dim}no change${c.reset}`;
+}
+
+export function formatSummary(results: CurationResult[]): string {
   const lines: string[] = [];
   lines.push('');
   lines.push(`${c.bold}=== Flagship Curate Summary ===${c.reset}`);
@@ -794,24 +809,27 @@ function formatSummary(results: CurationResult[]): string {
 
   let totalCost = 0;
   let totalRecords = 0;
-  let totalImproved = 0;
+  // Signed net delta in confirmed records across all entities — distinct
+  // from totalRecordsImproved which is clamped to ≥0 per-entity. The Markdown
+  // summary has used this signed formulation since day 1; the console
+  // summary was lagging behind until QUA-379.
+  let totalConfirmedDelta = 0;
   let totalDuration = 0;
 
   for (const r of results) {
     totalCost += r.totalCost;
     totalRecords += r.recordsCurated;
-    totalImproved += r.recordsImproved;
     totalDuration += r.duration;
 
     const confirmedBefore = r.beforeVerdicts['confirmed'] ?? 0;
     const confirmedAfter = r.afterVerdicts['confirmed'] ?? 0;
+    totalConfirmedDelta += confirmedAfter - confirmedBefore;
     const totalBefore = Object.values(r.beforeVerdicts).reduce((s, v) => s + v, 0);
     const totalAfter = Object.values(r.afterVerdicts).reduce((s, v) => s + v, 0);
     const pctBefore = totalBefore > 0 ? ((confirmedBefore / totalBefore) * 100).toFixed(0) : '0';
     const pctAfter = totalAfter > 0 ? ((confirmedAfter / totalAfter) * 100).toFixed(0) : '0';
 
-    const improved = confirmedAfter > confirmedBefore;
-    const arrow = improved ? `${c.green}+${confirmedAfter - confirmedBefore}${c.reset}` : `${c.dim}no change${c.reset}`;
+    const arrow = formatConfirmedDelta(confirmedBefore, confirmedAfter);
 
     lines.push(
       `  ${c.bold}${r.entity.title}${c.reset}: ${pctBefore}% → ${pctAfter}% confirmed (${arrow}) — ` +
@@ -819,11 +837,25 @@ function formatSummary(results: CurationResult[]): string {
     );
   }
 
+  // Color the net-delta total so a red "−2" is as visible as the individual
+  // regressions, not lost in a green total that happens to be zero or
+  // positive due to other orgs.
+  const totalDeltaColor = totalConfirmedDelta > 0
+    ? c.green
+    : totalConfirmedDelta < 0
+      ? c.red
+      : c.dim;
+  const totalDeltaStr = totalConfirmedDelta > 0
+    ? `+${totalConfirmedDelta}`
+    : totalConfirmedDelta < 0
+      ? `${totalConfirmedDelta}`  // already has minus sign
+      : '0';
+
   lines.push('');
   lines.push(`${c.bold}Totals:${c.reset}`);
   lines.push(`  Entities processed: ${results.length}`);
   lines.push(`  Records curated: ${totalRecords}`);
-  lines.push(`  Records improved: ${totalImproved}`);
+  lines.push(`  Confirmed delta: ${totalDeltaColor}${totalDeltaStr}${c.reset}`);
   lines.push(`  Total cost: $${totalCost.toFixed(3)}`);
   lines.push(`  Total duration: ${formatDuration(totalDuration)}`);
 
