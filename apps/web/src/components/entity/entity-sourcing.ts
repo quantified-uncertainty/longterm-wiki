@@ -1,29 +1,46 @@
+import { cache } from "react";
 import { fetchFromWikiServer, type RpcEntitySummaryRow, type RpcEntitySummaryResult } from "@/lib/wiki-server";
 import { SOURCE_CHECK_VERDICT_PRIORITY } from "@/components/shared/verdict-styles";
 
+const SUMMARY_REVALIDATE_SECONDS = 300;
+
 /**
- * Fetches the per-entity sourcing summary for a single entity from the
- * wiki-server `/api/sourcing/entity-summary` endpoint.
+ * Fetches the full `/api/sourcing/entity-summary` response once per request.
  *
- * The upstream endpoint returns ALL entity summaries in one call — Next.js ISR
- * caches that response for `revalidateSeconds` so subsequent per-page calls
- * share a single fetch.
+ * Wrapped in React's per-request `cache()` so concurrent entity-profile page
+ * renders in the same build/ISR pass share one network fetch instead of
+ * each triggering their own (the upstream endpoint returns ALL entity
+ * summaries, so per-page scatter-fetching is wasteful).
+ *
+ * Next.js ISR also caches the underlying `fetch()` across requests for
+ * `SUMMARY_REVALIDATE_SECONDS` (5 minutes), so successive builds also share
+ * the result at the HTTP layer. Returns null when the wiki-server is
+ * unreachable (fetchFromWikiServer catches network/HTTP errors internally).
+ */
+const fetchSourcingSummaryList = cache(
+  async (): Promise<RpcEntitySummaryResult | null> =>
+    fetchFromWikiServer<RpcEntitySummaryResult>(
+      "/api/sourcing/entity-summary",
+      { revalidate: SUMMARY_REVALIDATE_SECONDS, timeoutMs: 10_000 },
+    ),
+);
+
+/**
+ * Looks up the sourcing summary row for a single entity.
  *
  * The upstream row's `entityId` may be either a slug or a stableId depending
- * on how each verdict was recorded. Pass any known identifiers for the
- * entity (slug, stableId, numericId) and the helper will match on any.
+ * on how each verdict was recorded. Pass any known identifiers for the entity
+ * (slug, stableId, numericId) and the helper will match on any.
  */
 export async function fetchEntitySourcingSummary(
   candidateIds: string | readonly string[],
-  { revalidateSeconds = 300 }: { revalidateSeconds?: number } = {},
 ): Promise<RpcEntitySummaryRow | null> {
   const ids = Array.isArray(candidateIds) ? candidateIds : [candidateIds];
-  const filtered = ids.filter((id): id is string => typeof id === "string" && id.length > 0);
-  if (filtered.length === 0) return null;
-  const result = await fetchFromWikiServer<RpcEntitySummaryResult>(
-    "/api/sourcing/entity-summary",
-    { revalidate: revalidateSeconds, timeoutMs: 10_000 },
+  const filtered = ids.filter(
+    (id): id is string => typeof id === "string" && id.length > 0,
   );
+  if (filtered.length === 0) return null;
+  const result = await fetchSourcingSummaryList();
   if (!result) return null;
   const idSet = new Set(filtered);
   return result.summaries.find((row) => idSet.has(row.entityId)) ?? null;

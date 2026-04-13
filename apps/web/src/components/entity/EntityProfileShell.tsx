@@ -171,7 +171,7 @@ export function EntityProfileShell({
                       if (link.external) {
                         return (
                           <a
-                            key={link.href}
+                            key={link.label}
                             href={link.href}
                             target="_blank"
                             rel="noopener noreferrer"
@@ -182,7 +182,7 @@ export function EntityProfileShell({
                         );
                       }
                       return (
-                        <Link key={link.href} href={link.href} className={className}>
+                        <Link key={link.label} href={link.href} className={className}>
                           {link.label}
                         </Link>
                       );

@@ -15,7 +15,10 @@ import {
   formatContext,
 } from "../ai-model-constants";
 import { ProfileStatCard } from "@/components/directory";
-import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
+import {
+  computeAiModelCoverage,
+  getAiModelSignals,
+} from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
   fetchEntitySourcingSummary,
@@ -57,7 +60,7 @@ export default async function AiModelDetailPage({
     return notFound();
   }
 
-  const sourcingSummary = await fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]);
+  const sourcingSummary = await fetchEntitySourcingSummary([entity.id, entity.stableId ?? entity.id, slug]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
@@ -148,7 +151,7 @@ export default async function AiModelDetailPage({
     { label: "Data", href: `/ai-models/${slug}/data` },
   ];
 
-  const coverageScore = computeAiModelCoverage({
+  const coverageInput = {
     developer: entity.developer,
     releaseDate: entity.releaseDate,
     inputPrice: entity.inputPrice,
@@ -158,14 +161,9 @@ export default async function AiModelDetailPage({
     safetyLevel: entity.safetyLevel,
     benchmarkCount: entity.benchmarks.length,
     wikiId: entity.wikiId,
-  });
-  const coverageSignals: string[] = [];
-  if (entity.inputPrice != null || entity.outputPrice != null) coverageSignals.push("Pricing");
-  if (entity.contextWindow != null) coverageSignals.push("Context window");
-  if (entity.parameterCount) coverageSignals.push("Parameter count");
-  if (entity.safetyLevel) coverageSignals.push("Safety level");
-  if (entity.benchmarks.length >= 3) coverageSignals.push("Benchmarks");
-  if (entity.wikiId) coverageSignals.push("Wiki page");
+  };
+  const coverageScore = computeAiModelCoverage(coverageInput);
+  const coverageSignals = getAiModelSignals(coverageInput);
 
   const statCards = stats.length > 0 && (
     <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
@@ -267,174 +265,172 @@ export default async function AiModelDetailPage({
     >
       <div className="space-y-8">
         {/* Pricing */}
-          {(entity.inputPrice != null || entity.outputPrice != null) && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Pricing
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Type
-                      </th>
-                      <th className="py-2.5 px-4 text-right font-medium">
-                        Price per MTok
-                      </th>
+        {(entity.inputPrice != null || entity.outputPrice != null) && (
+          <section>
+            <h2 className="text-lg font-bold tracking-tight mb-4">Pricing</h2>
+            <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                    <th className="py-2.5 px-4 text-left font-medium">Type</th>
+                    <th className="py-2.5 px-4 text-right font-medium">
+                      Price per MTok
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {entity.inputPrice != null && (
+                    <tr className="hover:bg-muted/20 transition-colors">
+                      <td className="py-2.5 px-4">Input</td>
+                      <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
+                        {formatPrice(entity.inputPrice)}
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {entity.inputPrice != null && (
-                      <tr className="hover:bg-muted/20 transition-colors">
-                        <td className="py-2.5 px-4">Input</td>
-                        <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                          {formatPrice(entity.inputPrice)}
+                  )}
+                  {entity.outputPrice != null && (
+                    <tr className="hover:bg-muted/20 transition-colors">
+                      <td className="py-2.5 px-4">Output</td>
+                      <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
+                        {formatPrice(entity.outputPrice)}
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
+
+        {/* Benchmarks */}
+        {entity.benchmarks.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold tracking-tight mb-4">
+              Benchmarks
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {entity.benchmarks.length}
+              </span>
+            </h2>
+            <BenchmarkScorecard
+              benchmarks={entity.benchmarks}
+              modelId={entity.id}
+            />
+          </section>
+        )}
+
+        {/* Family models */}
+        {sameFamily.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold tracking-tight mb-4">
+              {entity.modelFamily} Family
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {sameFamily.length}
+              </span>
+            </h2>
+            <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                    <th className="py-2.5 px-4 text-left font-medium">Model</th>
+                    <th className="py-2.5 px-4 text-left font-medium">Tier</th>
+                    <th className="py-2.5 px-4 text-left font-medium">
+                      Released
+                    </th>
+                    <th className="py-2.5 px-4 text-right font-medium">
+                      Input $/MTok
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {sameFamily
+                    .sort((a, b) =>
+                      (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
+                    )
+                    .map((m) => (
+                      <tr
+                        key={m.id}
+                        className="hover:bg-muted/20 transition-colors"
+                      >
+                        <td className="py-2.5 px-4">
+                          <Link
+                            href={`/ai-models/${m.id}`}
+                            className="font-medium hover:text-primary transition-colors"
+                          >
+                            {m.title}
+                          </Link>
+                        </td>
+                        <td className="py-2.5 px-4 text-muted-foreground capitalize">
+                          {m.modelTier ?? (
+                            <span className="text-muted-foreground/40">&mdash;</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-4 text-muted-foreground">
+                          {m.releaseDate ?? (
+                            <span className="text-muted-foreground/40">&mdash;</span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-4 text-right tabular-nums">
+                          {m.inputPrice != null ? (
+                            formatPrice(m.inputPrice)
+                          ) : (
+                            <span className="text-muted-foreground/40">&mdash;</span>
+                          )}
                         </td>
                       </tr>
-                    )}
-                    {entity.outputPrice != null && (
-                      <tr className="hover:bg-muted/20 transition-colors">
-                        <td className="py-2.5 px-4">Output</td>
-                        <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                          {formatPrice(entity.outputPrice)}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+                    ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        )}
 
-          {/* Benchmarks */}
-          {entity.benchmarks.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Benchmarks
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {entity.benchmarks.length}
-                </span>
-              </h2>
-              <BenchmarkScorecard
-                benchmarks={entity.benchmarks}
-                modelId={entity.id}
-              />
-            </section>
-          )}
-
-          {/* Family models */}
-          {sameFamily.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                {entity.modelFamily} Family
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sameFamily.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Model
-                      </th>
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Tier
-                      </th>
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Released
-                      </th>
-                      <th className="py-2.5 px-4 text-right font-medium">
-                        Input $/MTok
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {sameFamily
-                      .sort((a, b) =>
-                        (b.releaseDate ?? "").localeCompare(
-                          a.releaseDate ?? "",
-                        ),
-                      )
-                      .map((m) => (
-                        <tr
-                          key={m.id}
-                          className="hover:bg-muted/20 transition-colors"
-                        >
-                          <td className="py-2.5 px-4">
-                            <Link
-                              href={`/ai-models/${m.id}`}
-                              className="font-medium hover:text-primary transition-colors"
-                            >
-                              {m.title}
-                            </Link>
-                          </td>
-                          <td className="py-2.5 px-4 text-muted-foreground capitalize">
-                            {m.modelTier ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                          <td className="py-2.5 px-4 text-muted-foreground">
-                            {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                          <td className="py-2.5 px-4 text-right tabular-nums">
-                            {m.inputPrice != null
-                              ? formatPrice(m.inputPrice)
-                              : <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* Other models from same developer */}
-          {sameDeveloper.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Other {developerEntity?.title ?? "Developer"} Models
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sameDeveloper.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {sameDeveloper
-                  .sort((a, b) =>
-                    (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
-                  )
-                  .slice(0, 10)
-                  .map((m) => (
-                    <div key={m.id} className="px-4 py-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <Link
-                          href={`/ai-models/${m.id}`}
-                          className="font-medium text-sm hover:text-primary transition-colors"
-                        >
-                          {m.title}
-                        </Link>
-                        <span className="text-xs text-muted-foreground tabular-nums">
-                          {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                        </span>
-                      </div>
-                      {m.modelFamily && (
-                        <div className="text-xs text-muted-foreground/60 mt-0.5">
-                          {m.modelFamily}{" "}
-                          {m.modelTier ? `(${m.modelTier})` : ""}
-                        </div>
-                      )}
+        {/* Other models from same developer */}
+        {sameDeveloper.length > 0 && (
+          <section>
+            <h2 className="text-lg font-bold tracking-tight mb-4">
+              Other {developerEntity?.title ?? "Developer"} Models
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {sameDeveloper.length}
+              </span>
+            </h2>
+            <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
+              {sameDeveloper
+                .sort((a, b) =>
+                  (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
+                )
+                .slice(0, 10)
+                .map((m) => (
+                  <div key={m.id} className="px-4 py-3">
+                    <div className="flex items-center justify-between gap-2">
+                      <Link
+                        href={`/ai-models/${m.id}`}
+                        className="font-medium text-sm hover:text-primary transition-colors"
+                      >
+                        {m.title}
+                      </Link>
+                      <span className="text-xs text-muted-foreground tabular-nums">
+                        {m.releaseDate ?? (
+                          <span className="text-muted-foreground/40">&mdash;</span>
+                        )}
+                      </span>
                     </div>
-                  ))}
-                {sameDeveloper.length > 10 && (
-                  <div className="px-4 py-3 text-center">
-                    <span className="text-xs text-muted-foreground">
-                      Showing 10 of {sameDeveloper.length} models
-                    </span>
+                    {m.modelFamily && (
+                      <div className="text-xs text-muted-foreground/60 mt-0.5">
+                        {m.modelFamily}{" "}
+                        {m.modelTier ? `(${m.modelTier})` : ""}
+                      </div>
+                    )}
                   </div>
-                )}
-              </div>
-            </section>
-          )}
+                ))}
+              {sameDeveloper.length > 10 && (
+                <div className="px-4 py-3 text-center">
+                  <span className="text-xs text-muted-foreground">
+                    Showing 10 of {sameDeveloper.length} models
+                  </span>
+                </div>
+              )}
+            </div>
+          </section>
+        )}
       </div>
     </EntityProfileShell>
   );

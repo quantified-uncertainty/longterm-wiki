@@ -106,8 +106,7 @@ import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
 import Markdown from "react-markdown";
 
-// Client-side tabs
-import { type OrgTab } from "./org-tabs";
+import type { ProfileTab as OrgTab } from "@/components/directory";
 
 // ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
 export const revalidate = 3600;

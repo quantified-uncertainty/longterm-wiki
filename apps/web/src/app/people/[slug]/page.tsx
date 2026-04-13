@@ -236,7 +236,7 @@ export default async function PersonProfilePage({
     fetchPoliticalOffices(entity.id),
     fetchCampaignFinance(entity.id),
     fetchPoliticalVotes(entity.id),
-    fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
+    fetchEntitySourcingSummary([entity.id, entity.stableId ?? entity.id, slug]),
   ]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
@@ -398,7 +398,7 @@ export default async function PersonProfilePage({
   };
 
   const avatar = (
-    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xl font-bold text-primary/70">
+    <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70">
       {initials}
     </div>
   );
