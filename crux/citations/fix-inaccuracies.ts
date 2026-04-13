@@ -1072,7 +1072,7 @@ export async function findReplacementSources(
           // Strict: only accept "accurate" verdicts with high scores
           if (accuracyCheck.verdict !== 'accurate' || accuracyCheck.score < 0.85) {
             if (opts?.verbose) {
-              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${accuracyCheck.verdict}, ${(quoteMatch.score * 100).toFixed(0)}%)`);
+              console.log(`  [^${cit.footnote}] Rejected candidate: ${best.title.slice(0, 50)} (${accuracyCheck.verdict}, ${(accuracyCheck.score * 100).toFixed(0)}%)`);
             }
             continue; // Skip — candidate doesn't clearly support the claim
           }

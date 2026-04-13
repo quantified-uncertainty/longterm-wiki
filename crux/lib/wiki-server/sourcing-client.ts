@@ -5,7 +5,7 @@
  * Response types are inferred from the Hono RPC route type via InferResponseType<>.
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { SourcingRoute } from '../../../apps/wiki-server/src/routes/sourcing/sourcing.ts';
 import type {
@@ -26,6 +26,7 @@ export type ListVerdictsResult = InferResponseType<RpcClient['verdicts']['$get']
 export type VerdictByRecordResult = InferResponseType<RpcClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
 export type DueForRecheckResult = InferResponseType<RpcClient['due-for-recheck']['$get'], 200>;
 export type EvidenceByRecordResult = InferResponseType<RpcClient['evidence'][':recordType'][':recordId']['$get'], 200>;
+export type EvidenceByRecordsResult = InferResponseType<RpcClient['evidence']['by-records']['$post'], 200>;
 export type SourcingStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 export type CleanupOrphansResult = InferResponseType<RpcClient['cleanup-orphans']['$post'], 200>;
 
@@ -90,6 +91,48 @@ export async function getEvidenceByRecord(
     'GET',
     `/api/sourcing/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
   );
+}
+
+/**
+ * Max records per batch evidence request. Must match the server's
+ * `MAX_EVIDENCE_BY_RECORDS` in
+ * `apps/wiki-server/src/routes/sourcing/sourcing.ts`. Callers that
+ * might exceed this (e.g. scans driven by `--limit` flags) should
+ * chunk their input and call `getEvidenceByRecords` per chunk.
+ */
+export const MAX_EVIDENCE_BY_RECORDS = 1000;
+
+/**
+ * Batch-fetch evidence for many records in a single request.
+ * Replaces N+1 loops over `getEvidenceByRecord`. The server groups by
+ * `recordType` and issues one `IN (...)` query per type.
+ *
+ * Returns `evidenceByKey[recordKey(rt, rid)]` — records with no evidence
+ * are absent from the map (not empty arrays), so callers can distinguish
+ * "queried, no evidence" from "skipped".
+ *
+ * `limitPerRecord` is required: it caps the number of evidence rows
+ * returned per record and forces callers to be explicit about payload
+ * size. Callers that just need the first `sourceUrl` pass a small value
+ * (e.g. 5); auditors that classify every URL pass something larger.
+ *
+ * Uses `batchedRequest` (30s timeout) because the batched endpoint is
+ * inherently slower than a point lookup.
+ */
+export async function getEvidenceByRecords(
+  records: Array<{ recordType: string; recordId: string }>,
+  options: { limitPerRecord: number },
+): Promise<ApiResult<EvidenceByRecordsResult>> {
+  return batchedRequest<EvidenceByRecordsResult>(
+    'POST',
+    '/api/sourcing/evidence/by-records',
+    { records, limitPerRecord: options.limitPerRecord },
+  );
+}
+
+/** Must match `evidenceRecordKey` in apps/wiki-server/src/routes/sourcing/sourcing.ts. */
+export function evidenceRecordKey(recordType: string, recordId: string): string {
+  return `${recordType}|${recordId}`;
 }
 
 /** Get sourcing statistics. */

@@ -389,16 +389,34 @@ If you cannot find a good URL for a record, omit it from the array.`;
 
 // ── Source Registration & Ingest ────────────────────────────────────────
 
+interface IngestResult {
+  registered: number;
+  ingested: number;
+  errors: number;
+  /**
+   * Record IDs that had at least one URL come back with status='ok' from
+   * suggestResources — i.e. freshly fetched OR fresh-cache hits (the cached
+   * path in suggest-resources.ts coerces to status 'ok' with contentLength
+   * null). Only these records are safe to reset in Step 4.
+   *
+   * Intentionally excluded: 'error' | 'paywall' | 'dead'. Content is missing
+   * or unusable for those — resetting would let the verifier re-run against
+   * nothing and strand the record at 'unchecked' (the original QUA-382 bug).
+   * If paywall-detected records ever become safe to re-verify, revisit.
+   */
+  successfulRecordIds: Set<string>;
+}
+
 /**
  * Register discovered URLs as resources and wait for content ingestion.
  */
 async function registerAndIngestSources(
   researched: ResearchedSource[],
   entityId: string,
-): Promise<{ registered: number; ingested: number; errors: number }> {
+): Promise<IngestResult> {
   const allUrls = researched.flatMap((r) => r.urls);
   if (allUrls.length === 0) {
-    return { registered: 0, ingested: 0, errors: 0 };
+    return { registered: 0, ingested: 0, errors: 0, successfulRecordIds: new Set() };
   }
 
   // Deduplicate
@@ -417,16 +435,29 @@ async function registerAndIngestSources(
     const ingested = result.fetchedCount + result.cachedCount;
     const errors = result.errorCount;
 
+    // Map URL -> suggest-resources status so we can tell which records got
+    // *something* usable back.
+    const urlStatus = new Map<string, string>();
+    for (const r of result.resources) {
+      urlStatus.set(r.url, r.status);
+    }
+
+    const successfulRecordIds = new Set<string>();
+    for (const r of researched) {
+      const anyOk = r.urls.some((u) => urlStatus.get(u) === 'ok');
+      if (anyOk) successfulRecordIds.add(r.recordId);
+    }
+
     console.log(
-      `  Registered: ${registered} | Ingested: ${ingested} | Cached: ${result.cachedCount} | Errors: ${errors}`,
+      `  Registered: ${registered} | Ingested: ${ingested} | Cached: ${result.cachedCount} | Errors: ${errors} | Records with new sources: ${successfulRecordIds.size}`,
     );
 
-    return { registered, ingested, errors };
+    return { registered, ingested, errors, successfulRecordIds };
   } catch (e: unknown) {
     console.warn(
       `${LOG_PREFIX} Source registration failed: ${e instanceof Error ? e.message : String(e)}`,
     );
-    return { registered: 0, ingested: 0, errors: uniqueUrls.length };
+    return { registered: 0, ingested: 0, errors: uniqueUrls.length, successfulRecordIds: new Set() };
   }
 }
 
@@ -483,15 +514,21 @@ async function updatePersonnelSources(
 /**
  * Reset stale verdicts (unverifiable/partial/outdated) to unchecked
  * so the verification pass rechecks them with the new sources.
+ *
+ * If `allowedRecordIds` is provided, only records whose IDs are in that set
+ * will be reset. Pass `null` to allow all records (used in `--skip-research`
+ * mode where the user explicitly opted in to re-verify existing sources).
  */
 async function resetStaleVerdicts(
   records: RecordNeedingCuration[],
+  allowedRecordIds: Set<string> | null,
 ): Promise<number> {
   let resetCount = 0;
   const resettable = new Set(['unverifiable', 'partial', 'outdated']);
 
   for (const record of records) {
     if (!resettable.has(record.verdict)) continue;
+    if (allowedRecordIds !== null && !allowedRecordIds.has(record.recordId)) continue;
 
     try {
       await storeVerdict({
@@ -691,9 +728,10 @@ async function curateEntity(
     }
 
     // Step 3: Register new sources and wait for ingest
+    let ingestResult: IngestResult | null = null;
     if (researched.length > 0) {
       console.log(`\n  ${c.bold}Step 3: Registering and ingesting sources...${c.reset}`);
-      await registerAndIngestSources(researched, entity.stableId);
+      ingestResult = await registerAndIngestSources(researched, entity.stableId);
 
       // Step 3b: Update personnel records with new source URLs
       const updatedCount = await updatePersonnelSources(entity, researched, records);
@@ -704,13 +742,38 @@ async function curateEntity(
       console.log(`\n  ${c.bold}Step 3: No new sources to register${c.reset}`);
     }
 
-    // Step 4: Reset stale verdicts
-    console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts...${c.reset}`);
-    const resetCount = await resetStaleVerdicts(records);
-    console.log(`  Reset ${resetCount} verdicts to unchecked`);
+    // Step 5 budget — computed before Step 4 so we don't reset records we
+    // have no budget to re-verify.
+    const verifyBudget = Math.min(budget - tracker.totalCost, 2.0); // Cap per-entity verify at $2
+
+    // Step 4: Reset stale verdicts — atomically guarded on Step 3 success and
+    // Step 5 budget availability. See QUA-382.
+    //
+    // Eligibility rules:
+    //   * `--skip-research`: reset everything (user opted in to re-verify
+    //     existing sources)
+    //   * Otherwise: only reset records whose URLs were successfully ingested
+    //     by Step 3. If no record got new sources, skip the reset entirely.
+    //   * In either case: if Step 5 has no budget, skip the reset — a reset
+    //     without re-verification strictly degrades the entity.
+    if (verifyBudget <= 0) {
+      console.log(`\n  ${c.bold}Step 4: Skipping reset (no verify budget — would strand records at unchecked)${c.reset}`);
+    } else if (skipResearch) {
+      console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts (--skip-research mode)...${c.reset}`);
+      const resetCount = await resetStaleVerdicts(records, null);
+      console.log(`  Reset ${resetCount} verdicts to unchecked`);
+    } else {
+      const allowed = ingestResult?.successfulRecordIds ?? new Set<string>();
+      if (allowed.size === 0) {
+        console.log(`\n  ${c.bold}Step 4: Skipping reset (no records got new sources from Step 3)${c.reset}`);
+      } else {
+        console.log(`\n  ${c.bold}Step 4: Resetting stale verdicts for ${allowed.size} records with new sources...${c.reset}`);
+        const resetCount = await resetStaleVerdicts(records, allowed);
+        console.log(`  Reset ${resetCount} verdicts to unchecked`);
+      }
+    }
 
     // Step 5: Run verification
-    const verifyBudget = Math.min(budget - tracker.totalCost, 2.0); // Cap per-entity verify at $2
     if (verifyBudget > 0) {
       console.log(`\n  ${c.bold}Step 5: Running sourcing verification ($${verifyBudget.toFixed(2)} budget)...${c.reset}`);
       const verifyResult = await runVerification(entity, verifyBudget, recordLimit, tableFilter);
@@ -786,7 +849,22 @@ function formatDuration(ms: number): string {
   return `${minutes}m ${remainingSeconds}s`;
 }
 
-function formatSummary(results: CurationResult[]): string {
+/**
+ * Render a per-org delta label with distinct, color-coded states for
+ * improvement / regression / no-change. Previously this was a two-way
+ * branch (`improved` OR `no change`), which silently hid regressions
+ * where confirmed-record counts dropped during a run. See QUA-379 for
+ * the incident evidence (Anthropic 37→33, CEA 96→94, etc.) that led to
+ * operators missing multi-percentage-point quality drops.
+ */
+export function formatConfirmedDelta(confirmedBefore: number, confirmedAfter: number): string {
+  const delta = confirmedAfter - confirmedBefore;
+  if (delta > 0) return `${c.green}+${delta}${c.reset}`;
+  if (delta < 0) return `${c.red}${delta}${c.reset}`;
+  return `${c.dim}no change${c.reset}`;
+}
+
+export function formatSummary(results: CurationResult[]): string {
   const lines: string[] = [];
   lines.push('');
   lines.push(`${c.bold}=== Flagship Curate Summary ===${c.reset}`);
@@ -794,24 +872,27 @@ function formatSummary(results: CurationResult[]): string {
 
   let totalCost = 0;
   let totalRecords = 0;
-  let totalImproved = 0;
+  // Signed net delta in confirmed records across all entities — distinct
+  // from totalRecordsImproved which is clamped to ≥0 per-entity. The Markdown
+  // summary has used this signed formulation since day 1; the console
+  // summary was lagging behind until QUA-379.
+  let totalConfirmedDelta = 0;
   let totalDuration = 0;
 
   for (const r of results) {
     totalCost += r.totalCost;
     totalRecords += r.recordsCurated;
-    totalImproved += r.recordsImproved;
     totalDuration += r.duration;
 
     const confirmedBefore = r.beforeVerdicts['confirmed'] ?? 0;
     const confirmedAfter = r.afterVerdicts['confirmed'] ?? 0;
+    totalConfirmedDelta += confirmedAfter - confirmedBefore;
     const totalBefore = Object.values(r.beforeVerdicts).reduce((s, v) => s + v, 0);
     const totalAfter = Object.values(r.afterVerdicts).reduce((s, v) => s + v, 0);
     const pctBefore = totalBefore > 0 ? ((confirmedBefore / totalBefore) * 100).toFixed(0) : '0';
     const pctAfter = totalAfter > 0 ? ((confirmedAfter / totalAfter) * 100).toFixed(0) : '0';
 
-    const improved = confirmedAfter > confirmedBefore;
-    const arrow = improved ? `${c.green}+${confirmedAfter - confirmedBefore}${c.reset}` : `${c.dim}no change${c.reset}`;
+    const arrow = formatConfirmedDelta(confirmedBefore, confirmedAfter);
 
     lines.push(
       `  ${c.bold}${r.entity.title}${c.reset}: ${pctBefore}% → ${pctAfter}% confirmed (${arrow}) — ` +
@@ -819,11 +900,25 @@ function formatSummary(results: CurationResult[]): string {
     );
   }
 
+  // Color the net-delta total so a red "−2" is as visible as the individual
+  // regressions, not lost in a green total that happens to be zero or
+  // positive due to other orgs.
+  const totalDeltaColor = totalConfirmedDelta > 0
+    ? c.green
+    : totalConfirmedDelta < 0
+      ? c.red
+      : c.dim;
+  const totalDeltaStr = totalConfirmedDelta > 0
+    ? `+${totalConfirmedDelta}`
+    : totalConfirmedDelta < 0
+      ? `${totalConfirmedDelta}`  // already has minus sign
+      : '0';
+
   lines.push('');
   lines.push(`${c.bold}Totals:${c.reset}`);
   lines.push(`  Entities processed: ${results.length}`);
   lines.push(`  Records curated: ${totalRecords}`);
-  lines.push(`  Records improved: ${totalImproved}`);
+  lines.push(`  Confirmed delta: ${totalDeltaColor}${totalDeltaStr}${c.reset}`);
   lines.push(`  Total cost: $${totalCost.toFixed(3)}`);
   lines.push(`  Total duration: ${formatDuration(totalDuration)}`);
 

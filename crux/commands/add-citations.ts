@@ -453,11 +453,11 @@ export async function addCitationsCommand(
 
       // Step C: Independently verify the claim against fetched content
       const claimCheck = await verifyClaimAgainstContent(claim, sourceContent, client, costTracker);
-      if (accuracyCheck.verdict !== 'supported') {
+      if (claimCheck.verdict !== 'supported') {
         const domain = new URL(source.url).hostname;
         avoidDomains.push(domain);
         if (attempt < MAX_SOURCE_ATTEMPTS - 1) {
-          console.log(`    [↻] Source doesn't verify (${accuracyCheck.verdict}) — retrying...`);
+          console.log(`    [↻] Source doesn't verify (${claimCheck.verdict}) — retrying...`);
         } else {
           console.log(`    [✗] No verified source found: ${claim.text.slice(0, 50)}...`);
           if (claimCheck.reasoning) console.log(`        ${claimCheck.reasoning}`);

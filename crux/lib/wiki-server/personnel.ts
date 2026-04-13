@@ -7,6 +7,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { PersonnelRoute } from '../../../apps/wiki-server/src/routes/tablebase/personnel.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -16,7 +17,9 @@ type RpcClient = ReturnType<typeof hc<PersonnelRoute>>;
 
 export type PersonnelByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
 export type PersonnelAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
-export type PersonnelSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+// createSyncHandler returns Promise<Response>, erasing the typed shape for
+// InferResponseType — import the concrete factory response type instead.
+export type PersonnelSyncResult = SyncResponse;
 export type PersonnelDeleteResult = InferResponseType<RpcClient['delete']['$post'], 200>;
 export type PersonnelStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 

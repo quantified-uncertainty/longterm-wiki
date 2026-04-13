@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ArrowLeft, Database, ExternalLink } from "lucide-react";
@@ -20,6 +20,8 @@ import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
+
+import { canonicalizeSourcingRecordType } from "./canonicalize-record-type";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -220,6 +222,11 @@ export async function generateMetadata({
   const recordType = decodeURIComponent(rawParams.recordType);
   const recordId = decodeURIComponent(rawParams.recordId);
 
+  const canonicalType = canonicalizeSourcingRecordType(recordType);
+  if (canonicalType) {
+    permanentRedirect(`/sourcing/${canonicalType}/${encodeURIComponent(recordId)}`);
+  }
+
   // Try to resolve a human-readable name
   const namesResult = await fetchDetailed<RpcSourcingResolveNamesResult>(
     `/api/sourcing/resolve-names?record_type=${encodeURIComponent(recordType)}&record_ids=${encodeURIComponent(recordId)}`,
@@ -245,6 +252,11 @@ export default async function SourcingDetailPage({ params }: PageProps) {
   // recordId (e.g. "page:1day-sooner:fn3" instead of "page%3A1day-sooner%3Afn3").
   const recordType = decodeURIComponent(rawParams.recordType);
   const recordId = decodeURIComponent(rawParams.recordId);
+
+  const canonicalType = canonicalizeSourcingRecordType(recordType);
+  if (canonicalType) {
+    permanentRedirect(`/sourcing/${canonicalType}/${encodeURIComponent(recordId)}`);
+  }
 
   // Map recordType back to source table name for record-lookup API
   const RECORD_TYPE_TO_TABLE: Record<string, string> = {
