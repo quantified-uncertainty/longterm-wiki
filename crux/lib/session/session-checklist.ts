@@ -111,7 +111,7 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     label: 'Crux TypeScript check (auto-verify)',
     applicableTypes: ['infrastructure', 'commands', 'refactor'],
     priority: 'blocking',
-    verifyCommand: 'cd crux && npx tsc --noEmit',
+    verifyCommand: 'npx tsx crux/validate/validate-crux-tsc.ts',
   },
   // --- Manual items (genuinely enforced or essential) ---
   {
