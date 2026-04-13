@@ -15,7 +15,7 @@
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 import { hostname } from 'os';
-import { basename, join } from 'path';
+import { basename, dirname, join } from 'path';
 
 export interface SessionContext {
   slot: number | null;
@@ -34,6 +34,19 @@ export interface SessionContextDeps {
   readFile?: (p: string) => string;
 }
 
+/**
+ * Strict non-negative integer parse: requires the entire trimmed string to be
+ * digits. Rejects `"1234garbage"`, `"-5"`, `""`, and non-finite numbers. Used
+ * for reading `.agent-slot` and `.claude/agent-id` where a typo or stray byte
+ * shouldn't silently become a valid number.
+ */
+function parseStrictNonNegativeInt(raw: string): number | null {
+  const trimmed = raw.trim();
+  if (!/^\d+$/.test(trimmed)) return null;
+  const n = Number.parseInt(trimmed, 10);
+  return Number.isSafeInteger(n) ? n : null;
+}
+
 function readIntFile(
   path: string,
   fileExists: (p: string) => boolean,
@@ -41,12 +54,55 @@ function readIntFile(
 ): number | null {
   try {
     if (!fileExists(path)) return null;
-    const raw = readFile(path).trim();
-    const n = Number.parseInt(raw, 10);
-    return Number.isFinite(n) ? n : null;
+    return parseStrictNonNegativeInt(readFile(path));
   } catch {
     return null;
   }
+}
+
+/**
+ * Walk up from `cwd` looking for a directory named `a<N>` (the agent-slot
+ * root). Returns the slot number when found. Agents sometimes run crux from
+ * subdirectories of their slot (apps/web, crux, etc.) — without this walk,
+ * the slot field would silently go missing from start comments.
+ */
+function findSlotFromAncestors(cwd: string): number | null {
+  let current = cwd;
+  for (let i = 0; i < 10; i++) {
+    const match = basename(current).match(/^a(\d+)$/);
+    if (match) {
+      const n = Number.parseInt(match[1], 10);
+      if (Number.isSafeInteger(n)) return n;
+    }
+    const parent = dirname(current);
+    if (parent === current) return null;
+    current = parent;
+  }
+  return null;
+}
+
+/**
+ * Escape a value for safe inclusion inside a markdown backtick code span.
+ * A branch name containing a backtick would break out of the span and turn
+ * the rest of the comment into rendered markdown. Control characters
+ * (newlines especially) would split the code span across lines. Branches
+ * with such characters are rare but valid under git's ref rules, so strip
+ * rather than reject. Caps length to guard against pathological input.
+ */
+function sanitizeForCodeSpan(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  return value.replace(/`/g, "'").replace(/[\x00-\x1f\x7f]/g, '').slice(0, 200);
+}
+
+/**
+ * Escape a value for safe inclusion as inline markdown text. Strips the
+ * few characters that could introduce formatting or links when the value
+ * comes from an untrusted-enough source (git, os.hostname), plus control
+ * characters and enforces a length cap.
+ */
+function sanitizeForInlineText(value: string): string {
+  // eslint-disable-next-line no-control-regex
+  return value.replace(/[`*_\[\]<>]/g, '').replace(/[\x00-\x1f\x7f]/g, '').slice(0, 200);
 }
 
 export function getSessionContext(deps: SessionContextDeps = {}): SessionContext {
@@ -56,39 +112,21 @@ export function getSessionContext(deps: SessionContextDeps = {}): SessionContext
 
   const gitBranch =
     deps.gitBranch ??
-    (() => {
-      try {
-        return execSync('git branch --show-current', { encoding: 'utf-8' }).trim();
-      } catch {
-        return 'unknown-branch';
-      }
-    });
+    (() => execSync('git branch --show-current', { encoding: 'utf-8' }).trim());
 
-  const hostnameFn =
-    deps.hostnameFn ??
-    (() => {
-      try {
-        return hostname();
-      } catch {
-        return '';
-      }
-    });
+  const hostnameFn = deps.hostnameFn ?? hostname;
 
   let branch: string;
   try {
-    branch = gitBranch() || 'unknown-branch';
+    branch = gitBranch().trim() || 'unknown-branch';
   } catch {
     branch = 'unknown-branch';
   }
 
-  // Slot resolution: directory basename is canonical (self-healing, set by
-  // workspace layout). `.agent-slot` is a fallback for legacy layouts.
-  let slot: number | null = null;
-  const dirName = basename(cwd);
-  const dirMatch = dirName.match(/^a(\d+)$/);
-  if (dirMatch) {
-    slot = Number.parseInt(dirMatch[1], 10);
-  } else {
+  // Slot resolution: walk ancestors for `a<N>` first (canonical). Fall back
+  // to `.agent-slot` for legacy layouts that don't use the a<N> convention.
+  let slot = findSlotFromAncestors(cwd);
+  if (slot === null) {
     const slotFilePath = deps.slotFilePath ?? join(cwd, '.agent-slot');
     slot = readIntFile(slotFilePath, fileExists, readFile);
   }
@@ -99,7 +137,13 @@ export function getSessionContext(deps: SessionContextDeps = {}): SessionContext
   const agentIdPath = deps.agentIdPath ?? join(cwd, '.claude/agent-id');
   const agentId = readIntFile(agentIdPath, fileExists, readFile);
 
-  const host = hostnameFn().trim() || null;
+  let host: string | null;
+  try {
+    const raw = hostnameFn().trim();
+    host = raw || null;
+  } catch {
+    host = null;
+  }
 
   return { slot, branch, host, agentId };
 }
@@ -114,6 +158,9 @@ export interface BuildStartCommentOptions {
  * Includes slot + branch + host + agent-id when available, and flags
  * `main` / `master` branches with a visible warning so audits can distinguish
  * orphan claims from real sessions.
+ *
+ * Branch and host are sanitized to prevent markdown injection from unusual
+ * git ref names or hostname characters.
  */
 export function buildStartCommentBody(
   ctx: SessionContext,
@@ -128,18 +175,19 @@ export function buildStartCommentBody(
     lines.push(`**Slot:** a${ctx.slot}`);
   }
 
-  const branchDisplay = ctx.branch || 'unknown-branch';
-  const isMainish = branchDisplay === 'main' || branchDisplay === 'master';
+  const branchRaw = ctx.branch || 'unknown-branch';
+  const branchSafe = sanitizeForCodeSpan(branchRaw);
+  const isMainish = branchRaw === 'main' || branchRaw === 'master';
   if (isMainish) {
     lines.push(
-      `**Branch:** \`${branchDisplay}\` ⚠ (init'd before feature branch was created — expect a follow-up comment when the branch appears)`,
+      `**Branch:** \`${branchSafe}\` ⚠ (init'd before feature branch was created — expect a follow-up comment when the branch appears)`,
     );
   } else {
-    lines.push(`**Branch:** \`${branchDisplay}\``);
+    lines.push(`**Branch:** \`${branchSafe}\``);
   }
 
   if (ctx.host) {
-    lines.push(`**Host:** ${ctx.host}`);
+    lines.push(`**Host:** ${sanitizeForInlineText(ctx.host)}`);
   }
 
   if (ctx.agentId !== null) {

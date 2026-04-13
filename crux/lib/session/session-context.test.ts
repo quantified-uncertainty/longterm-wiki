@@ -79,6 +79,47 @@ describe('getSessionContext', () => {
     expect(ctx.slot).toBeNull();
   });
 
+  it('rejects mixed-content .agent-slot (leading digits then garbage)', () => {
+    // parseInt('10abc') silently returns 10; strict parser must reject it.
+    const files = new Map<string, string>([
+      ['/tmp/wat/.agent-slot', '10abc'],
+    ]);
+    const ctx = getSessionContext({
+      cwd: '/tmp/wat',
+      gitBranch: () => 'main',
+      hostnameFn: () => 'dev-mbp',
+      fileExists: (p) => files.has(p),
+      readFile: (p) => files.get(p)!,
+    });
+    expect(ctx.slot).toBeNull();
+  });
+
+  it('rejects negative slot numbers', () => {
+    const files = new Map<string, string>([
+      ['/tmp/wat/.agent-slot', '-5'],
+    ]);
+    const ctx = getSessionContext({
+      cwd: '/tmp/wat',
+      gitBranch: () => 'main',
+      hostnameFn: () => 'dev-mbp',
+      fileExists: (p) => files.has(p),
+      readFile: (p) => files.get(p)!,
+    });
+    expect(ctx.slot).toBeNull();
+  });
+
+  it('finds slot by walking up from a subdirectory', () => {
+    // Agents sometimes run crux from e.g. /lw/a10/apps/web
+    const ctx = getSessionContext({
+      cwd: '/Users/dev/Documents/GitHub.nosync/lw/a10/apps/web',
+      gitBranch: () => 'claude/qua-336-test',
+      hostnameFn: () => 'dev-mbp',
+      fileExists: () => false,
+      readFile: () => { throw new Error(); },
+    });
+    expect(ctx.slot).toBe(10);
+  });
+
   it('reads agent ID from .claude/agent-id when present', () => {
     const files = new Map<string, string>([
       ['/Users/dev/Documents/GitHub.nosync/lw/a10/.claude/agent-id', '1234\n'],
@@ -215,5 +256,30 @@ describe('buildStartCommentBody', () => {
     const body1 = buildStartCommentBody(ctx({ agentId: 42 }));
     const body2 = buildStartCommentBody(ctx({ agentId: 42 }));
     expect(body1).toBe(body2);
+  });
+
+  // Security: the branch name comes from `git branch --show-current` and the
+  // host from os.hostname(). Neither is fully trusted — a branch containing a
+  // backtick would break out of the markdown code span and could inject
+  // formatting into the posted comment.
+
+  it('sanitizes backticks in branch names (markdown code-span safety)', () => {
+    const body = buildStartCommentBody(ctx({ branch: 'claude/qua-1-`evil`' }));
+    expect(body).not.toContain('`claude/qua-1-`evil`'); // the backtick was stripped
+    expect(body).toContain("`claude/qua-1-'evil'`"); // replaced with single quote
+  });
+
+  it('sanitizes backticks and markdown metacharacters in host', () => {
+    const body = buildStartCommentBody(ctx({ host: 'weird-`host`-with-[brackets]' }));
+    expect(body).toContain('**Host:** weird-host-with-brackets');
+  });
+
+  it('renders a malicious branch without breaking out of the code span', () => {
+    const body = buildStartCommentBody(ctx({ branch: 'evil`\n## Injected Heading' }));
+    // No raw backtick survives inside the branch span — verifies the code span stays closed
+    const branchLine = body.split('\n').find((l) => l.startsWith('**Branch:**'))!;
+    // Count backticks on the branch line: exactly two (the opening and closing code span)
+    const backticks = (branchLine.match(/`/g) ?? []).length;
+    expect(backticks).toBe(2);
   });
 });
