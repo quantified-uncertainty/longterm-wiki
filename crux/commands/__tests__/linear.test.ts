@@ -14,6 +14,10 @@ const {
   commentOnIssueMock,
   searchIssuesMock,
   fetchRemoteWorkflowStatesMock,
+  listProjectsMock,
+  getProjectMock,
+  updateProjectMock,
+  createProjectUpdateMock,
 } = vi.hoisted(() => ({
   getIssueMock: vi.fn(),
   getCommentsMock: vi.fn(),
@@ -21,6 +25,10 @@ const {
   commentOnIssueMock: vi.fn(),
   searchIssuesMock: vi.fn(),
   fetchRemoteWorkflowStatesMock: vi.fn(),
+  listProjectsMock: vi.fn(),
+  getProjectMock: vi.fn(),
+  updateProjectMock: vi.fn(),
+  createProjectUpdateMock: vi.fn(),
 }));
 
 vi.mock('../../lib/linear/issues.ts', () => ({
@@ -29,6 +37,13 @@ vi.mock('../../lib/linear/issues.ts', () => ({
   updateIssueState: updateIssueStateMock,
   commentOnIssue: commentOnIssueMock,
   searchIssues: searchIssuesMock,
+}));
+
+vi.mock('../../lib/linear/projects.ts', () => ({
+  listProjects: listProjectsMock,
+  getProject: getProjectMock,
+  updateProject: updateProjectMock,
+  createProjectUpdate: createProjectUpdateMock,
 }));
 
 vi.mock('../../lib/linear/workflow-states.ts', () => ({
@@ -345,5 +360,219 @@ describe('linear parse', () => {
     const r = await commands.parse(['claude/qua-184-foo', '--json'], { ci: true });
     expect(r.exitCode).toBe(0);
     expect(r.output.trim()).toBe('QUA-184');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// project
+// ---------------------------------------------------------------------------
+
+const mockProject = {
+  id: '6f9c8f44-7d33-4573-a017-a2200b8b22da',
+  name: 'Content Quality & Enrichment',
+  description: 'Editorial workstreams.',
+  content: '# Long-form body',
+  state: 'backlog',
+  progress: 0.2,
+  startDate: null,
+  targetDate: '2026-05-01',
+  url: 'https://linear.app/quantifieduncertainty/project/content-quality-enrichment-xyz',
+  updatedAt: '2026-04-13T00:00:00Z',
+  lead: null,
+};
+
+describe('linear project', () => {
+  it('prints help when no subcommand given', async () => {
+    const r = await commands.project([], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Usage');
+    expect(r.output).toContain('list');
+    expect(r.output).toContain('view');
+    expect(r.output).toContain('update');
+    expect(r.output).toContain('comment');
+  });
+
+  it('prints help for "help" subcommand with exit 0', async () => {
+    const r = await commands.project(['help'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('Usage');
+  });
+
+  it('rejects unknown subcommand', async () => {
+    const r = await commands.project(['foo'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Unknown subcommand');
+  });
+
+  describe('list', () => {
+    it('prints all projects grouped by state', async () => {
+      listProjectsMock.mockResolvedValueOnce([
+        mockProject,
+        { ...mockProject, id: 'x', name: 'Done Project', state: 'completed', progress: 1 },
+      ]);
+      const r = await commands.project(['list'], { ci: true });
+      expect(r.exitCode).toBe(0);
+      expect(r.output).toContain('Content Quality & Enrichment');
+      expect(r.output).toContain('Done Project');
+    });
+
+    it('emits JSON with --json', async () => {
+      listProjectsMock.mockResolvedValueOnce([mockProject]);
+      const r = await commands.project(['list'], { ci: true, json: true });
+      const parsed = JSON.parse(r.output);
+      expect(parsed).toHaveLength(1);
+      expect(parsed[0].name).toBe('Content Quality & Enrichment');
+    });
+  });
+
+  describe('view', () => {
+    it('prints usage when no ref given', async () => {
+      const r = await commands.project(['view'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Usage');
+    });
+
+    it('prints not-found when project is missing', async () => {
+      getProjectMock.mockResolvedValueOnce(null);
+      const r = await commands.project(['view', 'Nope'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('not found');
+    });
+
+    it('prints the project body on success', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      const r = await commands.project(['view', 'Content Quality & Enrichment'], { ci: true });
+      expect(r.exitCode).toBe(0);
+      expect(r.output).toContain('Content Quality & Enrichment');
+      expect(r.output).toContain('Long-form body');
+      expect(r.output).toContain('Editorial workstreams');
+    });
+
+    it('emits JSON with --json', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      const r = await commands.project(['view', 'Content Quality & Enrichment'], { ci: true, json: true });
+      const parsed = JSON.parse(r.output);
+      expect(parsed.name).toBe('Content Quality & Enrichment');
+    });
+  });
+
+  describe('update', () => {
+    it('prints usage when no ref given', async () => {
+      const r = await commands.project(['update'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Usage');
+    });
+
+    it('rejects when no fields to update', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      const r = await commands.project(['update', 'Content Quality & Enrichment'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Nothing to update');
+      expect(updateProjectMock).not.toHaveBeenCalled();
+    });
+
+    it('applies inline --description and --content updates', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      updateProjectMock.mockResolvedValueOnce({ ...mockProject, description: 'New', content: 'New body' });
+      const r = await commands.project(
+        ['update', 'Content Quality & Enrichment'],
+        { ci: true, description: 'New', content: 'New body' },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(updateProjectMock).toHaveBeenCalledWith(mockProject.id, {
+        description: 'New',
+        content: 'New body',
+      });
+    });
+
+    it('reads content from --content-file', async () => {
+      // writeFileSync before import: use a temp file path that exists
+      const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+      const file = join(dir, 'content.md');
+      writeFileSync(file, '# From file');
+
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      updateProjectMock.mockResolvedValueOnce({ ...mockProject, content: '# From file' });
+
+      const r = await commands.project(
+        ['update', 'Content Quality & Enrichment'],
+        { ci: true, contentFile: file },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(updateProjectMock).toHaveBeenCalledWith(mockProject.id, {
+        content: '# From file',
+      });
+      unlinkSync(file);
+    });
+
+    it('content-file takes precedence over inline --content', async () => {
+      const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+      const file = join(dir, 'content.md');
+      writeFileSync(file, 'from file');
+
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      updateProjectMock.mockResolvedValueOnce(mockProject);
+
+      await commands.project(
+        ['update', 'Content Quality & Enrichment'],
+        { ci: true, content: 'inline', contentFile: file },
+      );
+      expect(updateProjectMock).toHaveBeenCalledWith(mockProject.id, {
+        content: 'from file',
+      });
+      unlinkSync(file);
+    });
+  });
+
+  describe('comment', () => {
+    it('prints usage when no ref given', async () => {
+      const r = await commands.project(['comment'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Usage');
+    });
+
+    it('rejects empty body', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      const r = await commands.project(['comment', 'Content Quality & Enrichment'], { ci: true });
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Empty body');
+      expect(createProjectUpdateMock).not.toHaveBeenCalled();
+    });
+
+    it('posts an inline comment', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      createProjectUpdateMock.mockResolvedValueOnce(undefined);
+      const r = await commands.project(
+        ['comment', 'Content Quality & Enrichment', 'Shipped', 'phase', '5'],
+        { ci: true },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(createProjectUpdateMock).toHaveBeenCalledWith(mockProject.id, 'Shipped phase 5');
+    });
+
+    it('reads comment body from --body-file', async () => {
+      const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+      const file = join(dir, 'body.md');
+      writeFileSync(file, 'From file body');
+
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      createProjectUpdateMock.mockResolvedValueOnce(undefined);
+      const r = await commands.project(
+        ['comment', 'Content Quality & Enrichment'],
+        { ci: true, bodyFile: file },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(createProjectUpdateMock).toHaveBeenCalledWith(mockProject.id, 'From file body');
+      unlinkSync(file);
+    });
   });
 });
