@@ -1,9 +1,9 @@
 {
-  "hyphenated": 4,
+  "hyphenated": 0,
   "camelCase": 1,
   "PascalCase": 0,
-  "route": 2,
-  "total": 7,
-  "updatedAt": "2026-04-12T19:16:58.756Z",
-  "notes": "FROZEN per QUA-296. The 5 non-route references (hyphenated + camelCase) are structural: they bind to DB columns source_check_evidence and source_check_verdicts via Drizzle. Driving total below 5 requires renaming those tables (rejected as high-risk for cosmetic gain — see QUA-296). Route references (currently 2) will drop to 0 once QUA-301 client migration completes. Until then, do not lower the total without first reading QUA-296. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella), QUA-296 (freeze decision)."
+  "route": 0,
+  "total": 1,
+  "updatedAt": "2026-04-13T00:00:00.000Z",
+  "notes": "FROZEN at 1 per QUA-358 + QUA-303. The single remaining ref is the Drizzle binding `sourceCheckedAt` on `claim_sources.source_checked_at` (schema.ts). Driving total to 0 requires renaming that column, which is gated by QUA-303 (DO NOT START YET — see QUA-351 for precondition tracker). Do not lower without completing the column rename. Route + hyphenated axes previously held 6 refs (2 alias routes + 4 flagship-curate comments); both were zeroed by QUA-358. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella), QUA-296 (freeze decision), QUA-303 (DB column rename), QUA-358 (alias drop)."
 }
