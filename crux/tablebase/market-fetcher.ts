@@ -124,13 +124,20 @@ async function fetchMetaculusQuestion(
 
 interface ManifoldMarketResponse {
   id: string;
+  outcomeType?: string;
   probability?: number;
   totalLiquidity?: number;
   volume?: number;
   uniqueBettorCount?: number;
 }
 
-async function fetchManifoldQuestion(
+// Manifold only populates `probability` for BINARY markets. Every other
+// outcomeType (MULTIPLE_CHOICE, PSEUDO_NUMERIC, NUMERIC, FREE_RESPONSE, POLL,
+// STONK, BOUNTIED_QUESTION) returns null and cannot be stored as a single
+// scalar probability snapshot. Tracked by QUA-187 (warn) and QUA-188 (schema).
+const MANIFOLD_BINARY_OUTCOME_TYPE = "BINARY";
+
+export async function fetchManifoldQuestion(
   platformQuestionId: string
 ): Promise<SnapshotData | null> {
   // Discovery stores IDs as "user/slug" or just "slug" — API needs just the slug
@@ -153,9 +160,28 @@ async function fetchManifoldQuestion(
     }
 
     const data = (await response.json()) as ManifoldMarketResponse;
+    const outcomeType = data.outcomeType ?? "UNKNOWN";
+    const probability = data.probability ?? null;
+
+    // Warn (don't silently drop) when Manifold returns a non-scalar market.
+    // Only BINARY markets carry a `probability` field — everything else needs
+    // the multi-outcome schema work tracked in QUA-188. Without this warning
+    // such markets disappear into `skippedCount` and the frontend shows "–"
+    // with no diagnostic trail.
+    if (probability == null) {
+      if (outcomeType !== MANIFOLD_BINARY_OUTCOME_TYPE) {
+        console.warn(
+          `  ⚠ Manifold market ${platformQuestionId} skipped: outcomeType=${outcomeType} has no scalar probability (only BINARY is supported; see QUA-188 for multi-outcome support)`
+        );
+      } else {
+        console.warn(
+          `  ⚠ Manifold market ${platformQuestionId} skipped: BINARY market returned null probability (possibly resolved or closed)`
+        );
+      }
+    }
 
     return {
-      probability: data.probability ?? null,
+      probability,
       probabilityLow: null,
       probabilityHigh: null,
       numForecasters: data.uniqueBettorCount ?? null,
