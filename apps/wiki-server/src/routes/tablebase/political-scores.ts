@@ -17,19 +17,6 @@ import { createSyncHandler } from "./sync-factory.js";
 
 const MAX_PAGE_SIZE = 500;
 
-const VALID_SCORE_TYPES = [
-  "environmental",
-  "animal_welfare",
-  "foreign_policy",
-  "nuclear",
-  "civil_liberties",
-  "conservative",
-  "progressive",
-  "business",
-  "labor",
-  "overall",
-] as const;
-
 // ---- Query schemas ----
 
 const ListQuery = z.object({
@@ -55,10 +42,6 @@ const SyncItemSchema = z.object({
   scoreType: z.string().max(100).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
-});
-
-const SyncBatchSchema = z.object({
-  items: z.array(SyncItemSchema).min(1).max(200),
 });
 
 // ---- Helpers ----
@@ -217,7 +200,12 @@ const politicalScoresApp = new Hono()
     createSyncHandler({
       name: "political-scores",
       table: politicalScores,
-      batchSchema: SyncBatchSchema,
+      syncSchema: SyncItemSchema,
+      entityRefs: ["politicianEntityId", "scorerEntityId"],
+      // Drizzle's numeric() insert type is `string`; Zod schema emits
+      // numbers. Keep a minimal toRow just for the coercion — all other
+      // fields could use the default mapper, but toRow must be complete
+      // when provided.
       toRow: (item, now) => ({
         id: item.id,
         politicianEntityId: item.politicianEntityId,
@@ -233,18 +221,6 @@ const politicalScoresApp = new Hono()
         syncedAt: now,
         updatedAt: now,
       }),
-      entityRefFields: (items) => [
-        {
-          fieldName: "politicianEntityId",
-          ids: items.map((i) => i.politicianEntityId),
-        },
-        {
-          fieldName: "scorerEntityId",
-          ids: items
-            .map((i) => i.scorerEntityId)
-            .filter((id): id is string => id != null),
-        },
-      ],
     }),
   )
 

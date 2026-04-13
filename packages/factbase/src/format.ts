@@ -1,5 +1,8 @@
 /**
- * Shared formatting utilities for KB data.
+ * Shared formatting utilities for KB data. Contains the canonical, property-driven
+ * `formatValue` (takes a Property definition for display config). For raw
+ * unit-tagged numbers without a Property, see `formatNumberWithUnit` in
+ * apps/web/src/lib/format-value.ts.
  *
  * Used by CLI tools, frontend components, and any other consumer
  * that needs human-readable representations of KB values.

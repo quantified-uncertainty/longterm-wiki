@@ -1,11 +1,11 @@
 /**
  * Shared formatting utilities for KB rendering components.
  *
- * Uses the smart `formatValue` from format-value.ts for numbers with known
+ * Uses `formatNumberWithUnit` from format-value.ts for numbers with known
  * units, and falls back to PropertyDisplay (divisor/prefix/suffix) otherwise.
  */
 
-import { formatValue as smartFormatValue } from "@lib/format-value";
+import { formatNumberWithUnit as smartFormatValue } from "@lib/format-value";
 import { CURRENCIES } from "@longterm-wiki/factbase/currencies";
 import type { Fact, FieldDef, PropertyDisplay } from "@longterm-wiki/factbase";
 import type { FactBaseRecordEntry } from "@data/factbase";

@@ -258,6 +258,13 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 /** Max rows to show initially before "Show all" */
 const INITIAL_ROW_LIMIT = 20;
 
+// ── ID detection ──────────────────────────────────────────────────────────
+
+// FactBase fact IDs are `f_` + 8-12 alphanumeric chars (e.g. `f_dW5cR9mJ8q`).
+// Used by the cell renderer to detect raw fact IDs in any column and link them
+// to /factbase/fact/<id> instead of leaking the raw ID as visible text.
+const FACT_ID_RE = /^f_[A-Za-z0-9]{8,}$/;
+
 // ── Numeric formatting columns ────────────────────────────────────────────
 
 /** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
@@ -337,6 +344,22 @@ function CellValue({
 
   if (typeof value === "object") {
     return <JsonValue value={value} />;
+  }
+
+  // FactBase fact IDs (f_xxx) -> render as link with "view →" label instead of leaking raw ID.
+  // Content-based, not column-name-gated: any cell value matching the fact-ID format gets
+  // rendered as a link, no matter which column it lives in. Mirrors how isAnySid() handles
+  // stableIds below, and prevents the recurring per-column patch loop (QUA-316, QUA-346).
+  if (typeof value === "string" && FACT_ID_RE.test(value)) {
+    return (
+      <Link
+        href={`/factbase/fact/${encodeURIComponent(value)}`}
+        className="text-blue-600 dark:text-blue-400 hover:underline text-[11px]"
+        title={value}
+      >
+        view →
+      </Link>
+    );
   }
 
   // Entity reference columns -> show resolved name as link

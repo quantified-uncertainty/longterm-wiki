@@ -71,8 +71,14 @@ export const SOURCE_CHECK_CONSTANTS = {
    *  (smarter extraction, search within page). DB stores unlimited text. */
   MAX_CONTENT_LENGTH: 500_000,
   FETCH_TIMEOUT_MS: 15_000,
-  /** Max chars of source text to include in LLM sourcing prompts */
-  PROMPT_CONTENT_LENGTH: 12000,
+  /**
+   * Max chars of source text to include in LLM sourcing prompts.
+   * 30K ≈ 7-8K Haiku input tokens. QUA-342 investigation found stuck
+   * verdicts were dominated by content truncation — the relevant section of
+   * long documents (SEC proxies, arXiv, long Wikipedia articles) sat past
+   * the previous 12K/4K cutoffs. Sources beyond this still need chunking.
+   */
+  PROMPT_CONTENT_LENGTH: 30_000,
   /** Estimated cost per LLM sourcing call in USD */
   ESTIMATED_COST_PER_VERIFICATION: 0.01,
 } as const;

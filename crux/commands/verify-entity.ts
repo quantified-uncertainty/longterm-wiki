@@ -27,11 +27,12 @@ import { getSourcingStats } from '../lib/wiki-server/sourcing-client.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
 import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/verdict-handler.ts';
+import { SOURCE_CHECK_CONSTANTS } from '../lib/sourcing/types.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
-const PROMPT_CONTENT_LENGTH = 4000;
+const { PROMPT_CONTENT_LENGTH } = SOURCE_CHECK_CONSTANTS;
 const DEFAULT_BUDGET = 5;
 const DEFAULT_LIMIT = 50;
 

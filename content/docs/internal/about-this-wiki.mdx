@@ -5,9 +5,9 @@ description: Technical documentation of the Longterm Wiki - how pages are genera
 sidebar:
   order: -1
   label: About This Wiki
-lastEdited: 2026-02-17
+lastEdited: 2026-04-12
 update_frequency: 30
-summary: Technical documentation for the Longterm Wiki platform covering content architecture (~550 MDX pages, ~100 entities), quality scoring system (6 dimensions on 0-10 scale), data layer (YAML databases generating JSON artifacts), cross-linking system with stable entity IDs, and development workflows using unified CLI tools. Provides comprehensive reference for contributors on page types, validation rules, and automation commands.
+summary: Technical documentation for the Longterm Wiki platform covering content architecture (~700 MDX pages, structured entities), quality scoring system (6 dimensions on 0-10 scale), data layer (YAML sources plus a FactBase compiling to JSON artifacts), cross-linking system with stable entity IDs, and development workflows using the unified Crux CLI. Provides a comprehensive reference for contributors on page types, validation rules, and automation commands.
 ---
 import {EntityLink, Mermaid} from '@components/wiki';
 
@@ -35,9 +35,9 @@ This page documents the technical side—how the wiki is built, how content is o
 ### Content Volume
 
 The wiki contains approximately:
-- **~550 MDX pages** across all sections
-- **~100 structured data entities** (experts, organizations, cruxes, estimates)
-- **~80 analytical model pages** with causal diagrams
+- **~700 MDX pages** across all sections
+- **Hundreds of structured data entities** (organizations, people, AI models, legislation, grants, projects)
+- Analytical model pages with causal diagrams
 
 ---
 
@@ -90,11 +90,8 @@ These combine into an overall **quality score (0-100)**.
 Quality must only be set through the grading pipeline, never manually:
 
 ```bash
-# Grade a specific page
-npm run crux -- content grade --page scheming --apply
-
-# Grade all ungraded pages
-node scripts/content/grade-content.mjs --skip-graded --apply
+# Improve a specific page (includes grading)
+pnpm crux w improve <page-id> --tier=standard --apply
 ```
 
 **For grading criteria and workflows, see <EntityLink id="E741" name="rating-system">Content Quality</EntityLink>.**
@@ -103,32 +100,45 @@ node scripts/content/grade-content.mjs --skip-graded --apply
 
 ## Data Layer
 
+### Three Bases
+
+The wiki is organized around three complementary data layers:
+
+| Base | What it stores | Where it lives |
+|------|----------------|----------------|
+| **TableBase** | Typed relational records (entities, grants, publications, etc.) | `data/entities/*.yaml` and PG-primary tables |
+| **FactBase** | Structured triples with temporal data and provenance | `packages/factbase/data/things/*.yaml` |
+| **WikiBase** | Long-form prose MDX articles | `content/docs/**/*.mdx` |
+
+YAML and MDX are the source of truth; Postgres (via the wiki-server) keeps read mirrors for querying.
+
 ### Structured Data Sources
 
-The wiki maintains YAML databases in `src/data/`:
+Legacy YAML catalogs live under `data/`:
 
-| File | Contents |
+| File or directory | Contents |
 |------|----------|
-| `experts.yaml` | AI safety researchers and their positions on cruxes |
-| `organizations.yaml` | Labs, research orgs, funders |
-| `estimates.yaml` | Probability distributions for key variables |
-| `publications.yaml` | Research papers and reports |
-| `external-links.yaml` | Curated resource database |
+| `data/entities/*.yaml` | Lightweight entity catalog (orgs, people, concepts, projects) |
+| `data/experts.yaml` | AI safety researchers and their positions on cruxes |
+| `data/organizations.yaml` | Labs, research orgs, funders |
+| `data/estimates.yaml` | Probability distributions for key variables |
+| `data/publications.yaml` | Research papers and reports |
+| `data/external-links.yaml` | Curated resource database |
 
 ### Generated Data
 
-Running `npm run build:data` generates:
+Running `pnpm build-data:content` (or `pnpm build`, which runs it first) compiles YAML + MDX into:
 
 | Output | Purpose |
 |--------|---------|
-| `database.json` | All entities merged for browser use |
-| `pathRegistry.json` | Entity ID → URL path mapping |
-| `backlinks.json` | Reverse reference indices |
-| `tagIndex.json` | Searchable tag index |
+| `database.json` | All entities + page metadata merged for build-time use |
+| `factbase-data.json` | Compiled FactBase triples with provenance |
+
+The Next.js app reads these JSON artifacts directly at build time—content pages make zero runtime API calls.
 
 ### Data-Aware Components
 
-Components pull from YAML databases to display structured information. For example, `EntityLink` provides stable cross-references, while `DataInfoBox` displays expert or organization profiles from YAML.
+React components pull from the generated JSON to display structured information. For example, `EntityLink` provides stable cross-references, `<FBF>` and `<Calc>` render FactBase facts, and `DataInfoBox` displays entity profiles.
 
 **For database details and component usage, see <EntityLink id="E759" name="content-database">Content Database</EntityLink>.**
 
@@ -151,25 +161,17 @@ Benefits:
 - Automatic title lookup from database
 - Entity type icons
 - Backlink tracking
-- Link validity checked during CI
-
-### Backlinks
-
-Every page can display incoming links:
-
-```mdx
-
-```
+- Link validity checked by the gate
 
 ### Post-Edit Linking Check
 
-After creating or editing a page, verify cross-linking:
+After creating or editing a page, verify cross-linking with the validation gate:
 
 ```bash
-npm run crux -- analyze entity-links <entity-id>
+pnpm crux w validate gate --scope=content --fix
 ```
 
-This shows inbound links, missing inbound links (pages that mention but don't link), and outbound links.
+This runs link integrity, EntityLink resolution, and related checks in ~15 seconds.
 
 ---
 
@@ -192,7 +194,7 @@ Flowcharts, sequences, and graphs for static illustrations:
 Interactive causal diagrams using ReactFlow for complex causal models:
 
 ```mdx
-import {CauseEffectGraph} from '@components/CauseEffectGraph';
+import {CauseEffectGraph} from '@components/wiki';
 
 <CauseEffectGraph
   initialNodes={graphNodes}
@@ -211,42 +213,45 @@ Features: zoom, pan, minimap, node highlighting, path tracing, entity linking.
 
 ### Unified CLI
 
-All tools are accessible via the `crux` CLI:
+All tools are accessible via the `crux` CLI, organized into groups by data layer:
 
 ```bash
-npm run crux -- --help           # Show all domains
-npm run crux -- validate         # Run all validators
-npm run crux -- analyze          # Analysis and reporting
-npm run crux -- fix              # Auto-fix common issues
-npm run crux -- content          # Page management
-npm run crux -- generate         # Content generation
-npm run crux -- resources        # External resource management
+pnpm crux --help            # Full CLI reference
+pnpm crux w --help          # Wiki (content) commands
+pnpm crux fb --help         # FactBase commands
+pnpm crux tb --help         # TableBase commands
+pnpm crux linear --help     # Linear issue tracker
+pnpm crux gh --help         # GitHub (PRs, CI, deploy tasks)
+pnpm crux sys --help        # System / agent tools
 ```
 
 ### Common Workflows
 
 | Task | Command |
 |------|---------|
-| Validate before commit | `npm run precommit` |
-| Full validation suite | `npm run validate` |
-| Rebuild entity database | `npm run build:data` |
-| Grade a specific page | `npm run crux -- content grade --page <id>` |
-| Find unlinked mentions | `npm run crux -- analyze mentions` |
-| Fix escaping issues | `npm run crux -- fix escaping` |
+| Create a new page | `pnpm crux w create "Title" --tier=standard` |
+| Improve an existing page | `pnpm crux w improve <id> --tier=standard --apply` |
+| Pre-push validation gate | `pnpm crux w validate gate --fix` |
+| Fast content-only gate | `pnpm crux w validate gate --scope=content --fix` |
+| Fix escaping issues | `pnpm crux w fix escaping` |
+| Fix markdown issues | `pnpm crux w fix markdown` |
+| Full-text search | `pnpm crux query search "topic"` |
+| Rebuild content JSON | `pnpm build-data:content` |
 
 ### Validation Rules
 
-The validation suite includes 20+ rules:
+The gate check runs 50+ validators in parallel. CI-blocking rules include:
 
 | Validator | What It Checks |
 |-----------|----------------|
-| `compile` | MDX syntax and compilation |
+| `mdx-compile` | MDX syntax and compilation |
 | `frontmatter-schema` | YAML frontmatter validity |
 | `dollar-signs` | LaTeX escaping (`\$100` not `$100`) |
 | `comparison-operators` | JSX escaping (`\<100ms` not `<100ms`) |
-| `entitylink-ids` | All EntityLink references exist |
-| `quality-source` | Quality set by pipeline, not manually |
-| `mermaid` | Diagram syntax validation |
+| `entity-links` | All EntityLink references resolve |
+| `wiki-id-integrity` | Page wikiIds are unique and well-formed |
+| `factbase-entity-ids` | FactBase ↔ TableBase entity ID consistency |
+| `kb-entity-slugs` | FactBase refs have matching entity registry entries |
 
 **For complete tool reference, see <EntityLink id="E757" name="automation-tools">Automation Tools</EntityLink>.**
 
@@ -258,48 +263,64 @@ The validation suite includes 20+ rules:
 
 | Layer | Technology |
 |-------|------------|
-| **Framework** | Astro 5 with Starlight theme |
-| **Components** | React 19 |
-| **Styling** | Tailwind CSS 4 |
+| **Framework** | Next.js 15 with App Router |
+| **Components** | React 19 + next-mdx-remote |
+| **Styling** | Tailwind CSS v4 + shadcn/ui |
 | **Type Safety** | TypeScript + Zod schemas |
-| **Graphs** | ReactFlow (XYFlow) + Dagre/ELK layout |
+| **Graphs** | ReactFlow (XYFlow) + Dagre layout |
 | **Diagrams** | Mermaid 11 |
 | **Math** | KaTeX |
-| **Data** | YAML sources → JSON build artifacts |
+| **Search** | PostgreSQL full-text search (wiki-server) |
+| **CLI** | Crux (custom multi-domain CLI) |
+| **Data** | YAML sources + FactBase → JSON build artifacts |
+| **Package manager** | pnpm workspaces |
 
 ### Project Structure
 
 ```
-apps/longterm/
-├── src/
-│   ├── content/docs/           # ~550 MDX pages
-│   │   ├── knowledge-base/     # Main content (risks, responses, orgs, people)
-│   │   ├── project/            # Public project documentation
-│   │   └── internal/           # Contributor docs and style guides
-│   ├── components/
-│   │   ├── wiki/               # 50+ content components
-│   │   ├── CauseEffectGraph/   # Interactive graph system
-│   │   └── ui/                 # shadcn components
-│   ├── data/
-│   │   ├── *.yaml              # Source data files
-│   │   └── *.json              # Generated (build artifacts)
-│   └── pages/                  # Astro dynamic routes
-├── scripts/
-│   ├── crux.mjs                # CLI entry point
-│   ├── build-data.mjs          # Data compilation pipeline
-│   ├── commands/               # CLI domain handlers
-│   └── validate/               # 23 validators
-└── astro.config.mjs            # Sidebar and site config
+longterm-wiki/
+├── apps/
+│   ├── web/                    # Next.js 15 frontend (longterm-next)
+│   │   ├── src/
+│   │   │   ├── app/            # App Router pages and API routes
+│   │   │   ├── components/     # React components (wiki/, ui/, ...)
+│   │   │   ├── data/           # Data-layer modules (tablebase, factbase)
+│   │   │   └── lib/            # Shared utilities
+│   │   └── scripts/
+│   │       ├── build-data.mjs  # Data compilation pipeline
+│   │       └── assign-ids.mjs  # Wiki ID allocation
+│   ├── wiki-server/            # Hono API server (Postgres, Drizzle ORM)
+│   ├── discord-bot/            # Discord integration
+│   └── groundskeeper/          # Background maintenance jobs
+├── packages/
+│   ├── factbase/               # FactBase types, YAML loading, serialization
+│   │   └── data/things/        # FactBase entity YAML (authoritative)
+│   └── id-utils/               # Stable ID helpers (sid_ prefix)
+├── content/
+│   └── docs/                   # ~700 MDX pages
+│       ├── knowledge-base/     # Risks, responses, organizations, people
+│       ├── project/            # Public project documentation
+│       └── internal/           # Contributor docs and style guides
+├── data/
+│   ├── entities/               # Lightweight entity YAML catalog
+│   ├── *.yaml                  # Legacy YAML data sources
+│   └── schema.ts               # Shared data schema
+└── crux/                       # Crux CLI + 50+ validators
+    ├── commands/               # CLI command handlers (w, fb, tb, linear, ...)
+    ├── validate/               # Validators (gate, data, daily)
+    └── crux.mjs                # CLI entry point
 ```
 
 ### Key Configuration Files
 
 | File | Purpose |
 |------|---------|
-| `astro.config.mjs` | Sidebar structure, Starlight setup |
-| `src/content.config.ts` | MDX frontmatter schema |
-| `src/data/schema.ts` | Entity type definitions (Zod) |
-| `package.json` | Dependencies and npm scripts |
+| `package.json` | Workspace root: dependencies, scripts |
+| `pnpm-workspace.yaml` | Workspace package list |
+| `apps/web/next.config.ts` | Next.js configuration |
+| `apps/wiki-server/drizzle.config.ts` | Drizzle ORM schema config |
+| `crux/lib/rules/frontmatter-schema.ts` | MDX frontmatter Zod schema |
+| `data/schema.ts` | Legacy YAML entity schema (Zod) |
 
 ---
 
@@ -308,32 +329,38 @@ apps/longterm/
 ### Getting Started
 
 ```bash
-# Install dependencies
-npm install
+# Install dependencies (pnpm is required)
+pnpm install
 
-# Start development server (auto-runs build:data)
-npm run dev
+# First-time setup: install + build data
+pnpm setup:quick
+
+# Start development server on port 3001
+pnpm dev
 
 # Build for production
-npm run build
+pnpm build
 ```
 
 ### After Editing Content
 
 ```bash
-# After editing YAML data files
-npm run build:data
+# After editing any page, clean up formatting
+pnpm crux w fix escaping
+pnpm crux w fix markdown
 
-# After editing any content
-npm run precommit        # Quick validation
-npm run validate         # Full validation
+# Run the pre-push gate (CI-blocking checks)
+pnpm crux w validate gate --fix
+
+# For content-only edits, use the faster content scope (~15s)
+pnpm crux w validate gate --scope=content --fix
 ```
 
 ### Creating New Content
 
-1. **New pages**: Follow the appropriate <EntityLink id="E763" name="knowledge-base">style guide</EntityLink>
-2. **New entities**: Add to relevant YAML in `src/data/`, run `npm run build:data`
-3. **New components**: Add to `src/components/wiki/`, use path aliases
+1. **New pages**: use the Crux content pipeline — `pnpm crux w create "Title" --tier=standard` — rather than writing MDX by hand. It handles frontmatter, IDs, citations, and EntityLink validation.
+2. **New entities**: add a YAML file to `data/entities/` (lightweight) or allocate a wiki entity ID with `pnpm crux tb ids allocate <slug>` for entities that deserve their own page.
+3. **New components**: add to `apps/web/src/components/wiki/` and reference via the `@components/wiki` path alias.
 
 **For content generation workflows, see <EntityLink id="E748" name="research-reports">Research Reports</EntityLink>.**
 

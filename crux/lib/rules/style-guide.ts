@@ -262,11 +262,6 @@ export const styleGuideRule = {
     const body = contentFile.body || '';
     const raw = contentFile.raw || '';
 
-    // Skip style guide pages themselves
-    if (filePath.includes('/style-guides/')) {
-      return issues;
-    }
-
     // Skip index pages
     if (contentFile.isIndex) {
       return issues;
@@ -313,7 +308,7 @@ export const styleGuideRule = {
           issues.push(new Issue({
             rule: 'style-guide',
             file: filePath,
-            message: 'Model explains mechanism but lacks strategic importance/magnitude assessment — add a "Strategic Importance" section with magnitude, comparative ranking, and resource implications (see style-guides/models.mdx)',
+            message: 'Model explains mechanism but lacks strategic importance/magnitude assessment — add a "Strategic Importance" section with magnitude, comparative ranking, and resource implications (see models-style-guide.md)',
             severity: Severity.WARNING,
           }));
         }

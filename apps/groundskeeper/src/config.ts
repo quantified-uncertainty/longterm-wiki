@@ -8,7 +8,7 @@ export interface ShadowbanCheckConfig extends TaskConfig {
 }
 
 export interface SnapshotRetentionConfig extends TaskConfig {
-  /** Number of snapshots to keep per page (default: 100). */
+  /** Number of snapshots to keep per page (default: 30). */
   keep: number;
 }
 
@@ -107,7 +107,7 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_SNAPSHOT_RETENTION_ENABLED", true),
         schedule:
           process.env["TASK_SNAPSHOT_RETENTION_SCHEDULE"] ?? "0 3 * * *", // daily at 3am UTC
-        keep: envInt("TASK_SNAPSHOT_RETENTION_KEEP", 100),
+        keep: envInt("TASK_SNAPSHOT_RETENTION_KEEP", 30),
       },
       sessionSweep: {
         enabled: envBool("TASK_SESSION_SWEEP_ENABLED", true),

@@ -1,7 +1,23 @@
 import type { Config } from "../config.js";
 import { logger as rootLogger } from "../logger.js";
+import { sendDiscordNotification } from "../notify.js";
 
 const logger = rootLogger.child({ task: "snapshot-retention" });
+
+const ONE_DAY_MS = 24 * 60 * 60 * 1000;
+
+// Module-level state so the missing-API-key Discord alert fires at most once
+// per day even if the task is configured to run more often than daily. Resets
+// on process restart, which is desirable — a pod restart warrants a fresh
+// warning so operators know the key is still missing. Assumes the groundskeeper
+// runs as a singleton deployment (replicas=1); multi-replica scaling would
+// produce up to N alerts per day, one per replica.
+let lastMissingKeyWarnAt = 0;
+
+/** Test-only: reset the missing-API-key rate-limit counter. */
+export function __resetMissingKeyRateLimitForTest(): void {
+  lastMissingKeyWarnAt = 0;
+}
 
 interface CleanupResult {
   deleted: number;
@@ -81,12 +97,36 @@ export async function snapshotRetention(
 ): Promise<{ success: boolean; summary?: string }> {
   const keep = config.tasks.snapshotRetention.keep;
 
-  // Check for API key early — missing config is a graceful skip, not a failure.
-  // Treating it as failure trips the circuit breaker on every run (see #1770).
+  // Missing API key is treated as a non-crashing failure. Historical context
+  // (#1770, QUA-352): this handler originally returned {success: true} on a
+  // missing key to avoid tripping the groundskeeper circuit breaker on every
+  // run. That hid the failure indefinitely and let hallucination_risk_snapshots
+  // grow unbounded to 3.3M rows. The fix: still return without calling the
+  // cleanup endpoints (so the circuit breaker is not hammered by a config
+  // error the task cannot resolve), but mark success=false so monitoring
+  // catches it AND emit a Discord alert (rate-limited to once per day) so the
+  // on-call sees it.
   const apiKey = getWikiServerApiKey();
   if (!apiKey) {
-    logger.warn("LONGTERMWIKI_SERVER_API_KEY is not set — skipping cleanup.");
-    return { success: true, summary: "Skipped: no API key configured (see #1770)" };
+    const summary =
+      "Skipped: LONGTERMWIKI_SERVER_API_KEY is not set. Snapshot retention " +
+      "cannot run — hallucination_risk_snapshots and citation_accuracy_snapshots " +
+      "will grow unbounded until this is fixed.";
+    logger.error({ reason: "missing_api_key" }, summary);
+
+    const now = Date.now();
+    if (now - lastMissingKeyWarnAt >= ONE_DAY_MS) {
+      lastMissingKeyWarnAt = now;
+      void sendDiscordNotification(
+        config,
+        "⚠️ **Groundskeeper: snapshot retention disabled** — " +
+          "`LONGTERMWIKI_SERVER_API_KEY` is not set in the groundskeeper pod. " +
+          "`hallucination_risk_snapshots` and `citation_accuracy_snapshots` will " +
+          "grow unbounded until this is fixed. Check that the secret is synced " +
+          "from 1Password into the groundskeeper deployment. See QUA-352.",
+      );
+    }
+    return { success: false, summary };
   }
 
   const results: string[] = [];

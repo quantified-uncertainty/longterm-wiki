@@ -59,14 +59,10 @@ Some documentation can be auto-generated from code:
 
 | Content Type | Generation Method |
 |--------------|-------------------|
-| CLI help text | `npm run crux -- --help` |
+| CLI help text | `pnpm crux --help` |
 | Database schema | Extract from wiki-server API types |
-| Validation rules | List from `scripts/validate/` |
+| Validation rules | List from `crux/validate/` |
 | Cost estimates | Pull from actual API usage |
-
-<Aside type="tip">
-Consider adding a `npm run generate-docs` script that updates generated sections.
-</Aside>
 
 ### 4. PR Checklist
 
@@ -187,13 +183,13 @@ Consider adding CODEOWNERS-style assignment:
 
 ```bash
 # Check for docs older than 6 months
-npm run crux -- validate docs-freshness
+pnpm crux validate docs-freshness
 
 # Check that documented commands still exist
-npm run crux -- validate docs-commands
+pnpm crux validate docs-commands
 
 # Check that documented files still exist
-npm run crux -- validate docs-paths
+pnpm crux validate docs-paths
 ```
 
 These don't exist yet but could be valuable additions.

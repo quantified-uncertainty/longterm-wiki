@@ -130,6 +130,14 @@ export interface OrchestrationSummary {
   byKind: Record<VerifyItemKind, { total: number; verified: number }>;
   results: VerifyResult[];
   failures: VerifyError[];
+  /**
+   * Non-fatal warnings surfaced during orchestration setup (e.g., a
+   * --concurrency value that was clamped to the safe max). Captured so
+   * machine-readable --ci output surfaces them alongside the summary;
+   * without this field the stderr warning was silently dropped from
+   * JSON callers. QUA-150 review follow-up.
+   */
+  warnings?: string[];
 }
 
 export interface SourcingedFactInfo {

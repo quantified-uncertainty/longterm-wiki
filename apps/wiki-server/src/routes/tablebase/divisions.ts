@@ -55,6 +55,8 @@ const SyncDivisionItemSchema = z.object({
   sourcing: InlineSourcingSchema.optional(),
 });
 
+// Batch schema keeps both `id` and `slug` uniqueness refinements.
+// `naturalKey` could cover one, but not both, so we stay on batchSchema.
 const SyncDivisionsBatchSchema = z.object({
   items: z
     .array(SyncDivisionItemSchema)
@@ -197,22 +199,10 @@ const divisionsApp = new Hono()
       table: divisions,
       batchSchema: SyncDivisionsBatchSchema,
       enforceSourcing: true,
-      toRow: (item) => ({
-        id: item.id,
-        slug: item.slug ?? null,
-        parentOrgId: item.parentOrgId,
-        name: item.name,
-        divisionType: item.divisionType,
-        lead: item.lead ?? null,
-        status: item.status ?? null,
-        startDate: item.startDate ?? null,
-        endDate: item.endDate ?? null,
-        website: item.website ?? null,
-        source: item.source ?? null,
-        notes: item.notes ?? null,
-      }),
-      // COALESCE preservation: preserve existing values when sync payload sends null.
-      // This is the only escape hatch divisions needs (its 1-hook budget per Phase 0 audit).
+      entityRefs: ["parentOrgId"],
+      // COALESCE preservation: preserve existing values when sync payload
+      // sends null. Conflicts with the auto-derived SET clause, so we
+      // override it here (divisions' 1-hook escape hatch per Phase 0 audit).
       conflictSet: {
         slug: sql`excluded.slug`,
         parentOrgId: sql`excluded.parent_org_id`,
@@ -228,9 +218,6 @@ const divisionsApp = new Hono()
         syncedAt: sql`now()`,
         updatedAt: sql`now()`,
       },
-      entityRefFields: (items) => [
-        { fieldName: "parentOrgId", ids: items.map((i) => i.parentOrgId) },
-      ],
       thingsTitleIds: (items) => [...new Set(items.map((d) => d.parentOrgId))],
       toThing: (item, titleMap) => ({
         id: item.id,

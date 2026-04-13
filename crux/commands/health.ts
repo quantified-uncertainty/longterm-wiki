@@ -32,13 +32,15 @@ Commands:
 
 Options:
   --check=<name>  Run only a specific check:
-                    server       Server & DB health
-                    api          API smoke tests
-                    actions      GitHub Actions workflow health
-                    frontend     Public frontend availability
-                    freshness    Data freshness
-                    job-queue    Job queue health
-                    pr-quality   PR & issue quality
+                    server              Server & DB health
+                    api                 API smoke tests
+                    actions             GitHub Actions workflow health
+                    ci-main             CI runs on main branch
+                    wiki-server-deploy  Last wiki-server deploy status (QUA-295)
+                    frontend            Public frontend availability
+                    freshness           Data freshness
+                    job-queue           Job queue health
+                    pr-quality          PR & issue quality
   --json          JSON output (all results as structured data)
   --report        Aggregate markdown report to stdout
   --auto-issue    Manage GitHub wellness issue (create/update/close)

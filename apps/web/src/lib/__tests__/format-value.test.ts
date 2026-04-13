@@ -2,219 +2,219 @@ import { describe, expect, it } from "vitest";
 
 import {
   formatStructuredValue,
-  formatValue,
+  formatNumberWithUnit,
   formatValueRange,
 } from "../format-value";
 
-describe("formatValue", () => {
+describe("formatNumberWithUnit", () => {
   describe("USD (prefix currency)", () => {
     it("formats sub-million values with $ prefix", () => {
-      expect(formatValue(500, "USD")).toBe("$500");
+      expect(formatNumberWithUnit(500, "USD")).toBe("$500");
     });
 
     it("formats thousands with comma separator", () => {
-      expect(formatValue(1500, "USD")).toBe("$1,500");
+      expect(formatNumberWithUnit(1500, "USD")).toBe("$1,500");
     });
 
     it("formats millions", () => {
-      expect(formatValue(2.5e6, "USD")).toBe("$2.5 million");
+      expect(formatNumberWithUnit(2.5e6, "USD")).toBe("$2.5 million");
     });
 
     it("formats billions", () => {
-      expect(formatValue(30e9, "USD")).toBe("$30 billion");
+      expect(formatNumberWithUnit(30e9, "USD")).toBe("$30 billion");
     });
 
     it("formats trillions", () => {
-      expect(formatValue(1.5e12, "USD")).toBe("$1.5 trillion");
+      expect(formatNumberWithUnit(1.5e12, "USD")).toBe("$1.5 trillion");
     });
 
     it("formats zero", () => {
-      expect(formatValue(0, "USD")).toBe("$0");
+      expect(formatNumberWithUnit(0, "USD")).toBe("$0");
     });
 
     it("cleans trailing .0 from round numbers", () => {
-      expect(formatValue(380e9, "USD")).toBe("$380 billion");
-      expect(formatValue(100e6, "USD")).toBe("$100 million");
-      expect(formatValue(1e12, "USD")).toBe("$1 trillion");
+      expect(formatNumberWithUnit(380e9, "USD")).toBe("$380 billion");
+      expect(formatNumberWithUnit(100e6, "USD")).toBe("$100 million");
+      expect(formatNumberWithUnit(1e12, "USD")).toBe("$1 trillion");
     });
 
     it("preserves meaningful decimals", () => {
-      expect(formatValue(2.5e9, "USD")).toBe("$2.5 billion");
-      expect(formatValue(1.5e12, "USD")).toBe("$1.5 trillion");
-      expect(formatValue(3.7e6, "USD")).toBe("$3.7 million");
+      expect(formatNumberWithUnit(2.5e9, "USD")).toBe("$2.5 billion");
+      expect(formatNumberWithUnit(1.5e12, "USD")).toBe("$1.5 trillion");
+      expect(formatNumberWithUnit(3.7e6, "USD")).toBe("$3.7 million");
     });
   });
 
   describe("negative values with prefix currency", () => {
     it("places negative sign before the currency symbol", () => {
-      expect(formatValue(-850e6, "USD")).toBe("-$850 million");
+      expect(formatNumberWithUnit(-850e6, "USD")).toBe("-$850 million");
     });
 
     it("handles negative billions", () => {
-      expect(formatValue(-30e9, "USD")).toBe("-$30 billion");
+      expect(formatNumberWithUnit(-30e9, "USD")).toBe("-$30 billion");
     });
 
     it("handles negative trillions", () => {
-      expect(formatValue(-1.5e12, "USD")).toBe("-$1.5 trillion");
+      expect(formatNumberWithUnit(-1.5e12, "USD")).toBe("-$1.5 trillion");
     });
 
     it("handles negative sub-million values", () => {
-      expect(formatValue(-500, "USD")).toBe("-$500");
+      expect(formatNumberWithUnit(-500, "USD")).toBe("-$500");
     });
   });
 
   describe("boundary values at magnitude thresholds", () => {
     it("formats exactly 1e6 as million", () => {
-      expect(formatValue(1e6, "USD")).toBe("$1 million");
+      expect(formatNumberWithUnit(1e6, "USD")).toBe("$1 million");
     });
 
     it("formats exactly 1e9 as billion", () => {
-      expect(formatValue(1e9, "USD")).toBe("$1 billion");
+      expect(formatNumberWithUnit(1e9, "USD")).toBe("$1 billion");
     });
 
     it("formats exactly 1e12 as trillion", () => {
-      expect(formatValue(1e12, "USD")).toBe("$1 trillion");
+      expect(formatNumberWithUnit(1e12, "USD")).toBe("$1 trillion");
     });
 
     it("formats just below 1e6 as a plain number", () => {
-      expect(formatValue(999999, "USD")).toBe("$999,999");
+      expect(formatNumberWithUnit(999999, "USD")).toBe("$999,999");
     });
   });
 
   describe("suffix currencies (SEK, NOK)", () => {
     it("formats SEK with suffix kr", () => {
-      expect(formatValue(100e6, "SEK")).toBe("100 million kr");
+      expect(formatNumberWithUnit(100e6, "SEK")).toBe("100 million kr");
     });
 
     it("formats SEK billions with suffix kr", () => {
-      expect(formatValue(5e9, "SEK")).toBe("5 billion kr");
+      expect(formatNumberWithUnit(5e9, "SEK")).toBe("5 billion kr");
     });
 
     it("formats SEK trillions with suffix kr", () => {
-      expect(formatValue(2e12, "SEK")).toBe("2 trillion kr");
+      expect(formatNumberWithUnit(2e12, "SEK")).toBe("2 trillion kr");
     });
 
     it("formats NOK sub-million with suffix kr", () => {
-      expect(formatValue(5000, "NOK")).toBe("5,000 kr");
+      expect(formatNumberWithUnit(5000, "NOK")).toBe("5,000 kr");
     });
 
     it("places negative sign correctly for suffix currencies", () => {
-      expect(formatValue(-100e6, "SEK")).toBe("-100 million kr");
+      expect(formatNumberWithUnit(-100e6, "SEK")).toBe("-100 million kr");
     });
   });
 
   describe("other prefix currencies", () => {
     it("formats GBP with pound sign", () => {
-      expect(formatValue(100e6, "GBP")).toBe("\u00A3100 million");
+      expect(formatNumberWithUnit(100e6, "GBP")).toBe("\u00A3100 million");
     });
 
     it("formats EUR with euro sign", () => {
-      expect(formatValue(50e9, "EUR")).toBe("\u20AC50 billion");
+      expect(formatNumberWithUnit(50e9, "EUR")).toBe("\u20AC50 billion");
     });
 
     it("formats JPY with yen sign", () => {
-      expect(formatValue(1e12, "JPY")).toBe("\u00A51 trillion");
+      expect(formatNumberWithUnit(1e12, "JPY")).toBe("\u00A51 trillion");
     });
 
     it("formats CAD with C$ prefix", () => {
-      expect(formatValue(200e6, "CAD")).toBe("C$200 million");
+      expect(formatNumberWithUnit(200e6, "CAD")).toBe("C$200 million");
     });
   });
 
   describe("percent unit", () => {
     it("formats whole numbers", () => {
-      expect(formatValue(40, "percent")).toBe("40%");
+      expect(formatNumberWithUnit(40, "percent")).toBe("40%");
     });
 
     it("formats decimal percentages", () => {
-      expect(formatValue(99.9, "percent")).toBe("99.9%");
+      expect(formatNumberWithUnit(99.9, "percent")).toBe("99.9%");
     });
 
     it("formats 100%", () => {
-      expect(formatValue(100, "percent")).toBe("100%");
+      expect(formatNumberWithUnit(100, "percent")).toBe("100%");
     });
 
     it("formats 0%", () => {
-      expect(formatValue(0, "percent")).toBe("0%");
+      expect(formatNumberWithUnit(0, "percent")).toBe("0%");
     });
   });
 
   describe("count and tokens units", () => {
     it("formats count with comma separator", () => {
-      expect(formatValue(1500, "count")).toBe("1,500");
+      expect(formatNumberWithUnit(1500, "count")).toBe("1,500");
     });
 
     it("formats count millions", () => {
-      expect(formatValue(2.5e6, "count")).toBe("2.5 million");
+      expect(formatNumberWithUnit(2.5e6, "count")).toBe("2.5 million");
     });
 
     it("formats count billions", () => {
-      expect(formatValue(2.5e9, "count")).toBe("2.5 billion");
+      expect(formatNumberWithUnit(2.5e9, "count")).toBe("2.5 billion");
     });
 
     it("formats count trillions", () => {
-      expect(formatValue(1e12, "count")).toBe("1 trillion");
+      expect(formatNumberWithUnit(1e12, "count")).toBe("1 trillion");
     });
 
     it("formats tokens the same as count", () => {
-      expect(formatValue(200000, "tokens")).toBe("200,000");
-      expect(formatValue(1e9, "tokens")).toBe("1 billion");
+      expect(formatNumberWithUnit(200000, "tokens")).toBe("200,000");
+      expect(formatNumberWithUnit(1e9, "tokens")).toBe("1 billion");
     });
   });
 
   describe("currency override parameter", () => {
     it("overrides unit currency with explicit currency", () => {
-      expect(formatValue(100e6, "USD", "GBP")).toBe("\u00A3100 million");
+      expect(formatNumberWithUnit(100e6, "USD", "GBP")).toBe("\u00A3100 million");
     });
 
     it("does not apply currency override when unit is percent", () => {
-      expect(formatValue(40, "percent", "GBP")).toBe("40%");
+      expect(formatNumberWithUnit(40, "percent", "GBP")).toBe("40%");
     });
 
     it("does not apply currency override when unit is count", () => {
-      expect(formatValue(1500, "count", "GBP")).toBe("1,500");
+      expect(formatNumberWithUnit(1500, "count", "GBP")).toBe("1,500");
     });
 
     it("applies currency override when unit is also a currency", () => {
-      expect(formatValue(50e6, "USD", "EUR")).toBe("\u20AC50 million");
+      expect(formatNumberWithUnit(50e6, "USD", "EUR")).toBe("\u20AC50 million");
     });
   });
 
   describe("fallback (no unit or unknown unit)", () => {
     it("formats with no unit", () => {
-      expect(formatValue(1500)).toBe("1,500");
+      expect(formatNumberWithUnit(1500)).toBe("1,500");
     });
 
     it("formats millions with no unit", () => {
-      expect(formatValue(5e6)).toBe("5 million");
+      expect(formatNumberWithUnit(5e6)).toBe("5 million");
     });
 
     it("formats billions with no unit", () => {
-      expect(formatValue(3e9)).toBe("3 billion");
+      expect(formatNumberWithUnit(3e9)).toBe("3 billion");
     });
 
     it("formats trillions with no unit", () => {
-      expect(formatValue(2e12)).toBe("2 trillion");
+      expect(formatNumberWithUnit(2e12)).toBe("2 trillion");
     });
 
     it("handles null unit", () => {
-      expect(formatValue(1000, null)).toBe("1,000");
+      expect(formatNumberWithUnit(1000, null)).toBe("1,000");
     });
 
     it("handles undefined unit", () => {
-      expect(formatValue(1000, undefined)).toBe("1,000");
+      expect(formatNumberWithUnit(1000, undefined)).toBe("1,000");
     });
 
     it("uses scientific notation for very large numbers (>= 1e15)", () => {
-      expect(formatValue(1e26, "FLOP")).toBe("10^26");
+      expect(formatNumberWithUnit(1e26, "FLOP")).toBe("10^26");
     });
 
     it("includes mantissa when not exactly 1", () => {
-      expect(formatValue(2.5e20)).toBe("2.5 × 10^20");
+      expect(formatNumberWithUnit(2.5e20)).toBe("2.5 × 10^20");
     });
 
     it("omits mantissa when approximately 1", () => {
-      expect(formatValue(1e18)).toBe("10^18");
+      expect(formatNumberWithUnit(1e18)).toBe("10^18");
     });
   });
 });

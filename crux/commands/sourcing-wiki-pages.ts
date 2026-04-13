@@ -38,6 +38,7 @@ import {
   SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from '../lib/sourcing/prompt-guidelines.ts';
+import { SOURCE_CHECK_CONSTANTS } from '../lib/sourcing/types.ts';
 import type { WikiPageVerifyItem } from '../lib/sourcing/types.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 import type { FactBaseFact } from '../lib/sourcing/wiki-page-claims.ts';
@@ -235,7 +236,7 @@ Source URL: ${item.sourceUrl}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, SOURCE_CHECK_CONSTANTS.PROMPT_CONTENT_LENGTH)}
 ---
 
 Context from the wiki page where this claim appears:

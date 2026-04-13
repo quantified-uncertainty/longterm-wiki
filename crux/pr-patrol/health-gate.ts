@@ -84,6 +84,12 @@ export interface HealthGateDeps {
     /** Write a plain numeric counter. */
     setCount?: (key: string, n: number) => void;
   };
+  /**
+   * Override the GitHub repo scanned by the default `realHealthScan`. Has no
+   * effect when a custom `scan` is provided. Defaults to the package's
+   * `REPO` constant. (QUA-309)
+   */
+  repo?: string;
 }
 
 // ── Fingerprinting ───────────────────────────────────────────────────────────
@@ -93,8 +99,15 @@ export interface HealthGateDeps {
  * Collapses `deploy-stuck` issues to a single key per cycle even if the
  * failing run URL differs, so retries of the same deploy failure don't
  * keep resetting the cooldown.
+ *
+ * Prefers `issue.fingerprintKey` when set (structured, populated by
+ * `combineHealth`). Falls back to regex-parsing `issue.reason` for backward
+ * compatibility with older HealthIssue objects in the cooldown store. (QUA-309)
  */
 export function fingerprintIssue(issue: HealthIssue): string {
+  if (issue.fingerprintKey) {
+    return `${issue.type}:${issue.fingerprintKey}`;
+  }
   // For ratchet drift we want separate cooldowns per file — include the reason
   // snippet that names the file. For deploy-stuck / main-ci-red, the type
   // alone is stable enough.
@@ -185,7 +198,7 @@ function syntheticScanFailureResult(message: string): HealthScanResult {
  * update) happen via the injected deps.
  */
 export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGateDecision> {
-  const scan = deps.scan ?? realHealthScan;
+  const scan = deps.scan ?? (() => realHealthScan({ repo: deps.repo }));
   const nowFn = deps.now ?? (() => new Date());
   const env = deps.env ?? process.env;
   const writeEvent = deps.writeEvent ?? ((entry) => appendJsonl(JSONL_FILE, entry));

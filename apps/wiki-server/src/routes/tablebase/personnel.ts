@@ -71,6 +71,9 @@ const SyncPersonnelItemSchema = z.object({
   claimIds: z.array(z.number().int().positive()).optional(),
 });
 
+// Batch schema retains the `noDuplicateIds` refinement. `naturalKey`
+// covers the (personId, organizationId, role, roleType) composite, so
+// we can't also use it for the id-level dedup check.
 const SyncPersonnelBatchSchema = z.object({
   items: z
     .array(SyncPersonnelItemSchema)
@@ -352,15 +355,17 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         `${item.personId}::${item.organizationId}::${item.role}::${item.roleType}`,
       naturalKeyError:
         "Duplicate (personId, organizationId, role, roleType) in batch — each personnel record must be unique by person + org + role",
-      entityRefFields: (items) => [
-        { fieldName: "personId", ids: items.map((i) => i.personId) },
-        { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
-      ],
+      entityRefs: ["personId", "organizationId"],
       auditRecordType: "personnel",
       claimSupport: {
         recordType: "personnel",
         getClaimIds: (item) => item.claimIds ?? [],
       },
+      // toRow is kept so the auto-derived SET clause only touches fields
+      // owned by the sync payload. Dropping it would let the default mapper
+      // include personEntityId/personDisplayName/orgEntityId/orgDisplayName
+      // (which are NOT in the item schema), null them on upsert, and
+      // temporarily clobber state before fkResolve re-populates them.
       toRow: (item) => ({
         id: item.id,
         personId: item.personId,

@@ -15,7 +15,7 @@ import { cn } from "@/lib/utils";
 import { getKBFacts, getKBLatest, getKBProperty, getKBFactSourcing } from "@data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
 import { CURRENCIES, resolveCurrency } from "@longterm-wiki/factbase/currencies";
-import { formatValue } from "@lib/format-value";
+import { formatNumberWithUnit } from "@lib/format-value";
 import { formatKBFactValue, formatKBDate, isUrl } from "./format";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { factbaseVerdictToStatus } from "@/components/sourcing/sourcing-status";
@@ -108,7 +108,7 @@ export function FBFactValue({
           <span className="block text-muted-foreground">
             Currency: {CURRENCIES[currencyCode].name} ({currencyCode})
             {fact.usdEquivalent != null && (
-              <> (~{formatValue(fact.usdEquivalent, "USD")})</>
+              <> (~{formatNumberWithUnit(fact.usdEquivalent, "USD")})</>
             )}
           </span>
         )}

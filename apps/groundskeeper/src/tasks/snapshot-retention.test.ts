@@ -10,8 +10,18 @@ vi.mock("../logger.js", () => ({
   },
 }));
 
-import { snapshotRetention } from "./snapshot-retention.js";
+vi.mock("../notify.js", () => ({
+  sendDiscordNotification: vi.fn().mockResolvedValue(undefined),
+}));
+
+import {
+  snapshotRetention,
+  __resetMissingKeyRateLimitForTest,
+} from "./snapshot-retention.js";
+import { sendDiscordNotification } from "../notify.js";
 import type { Config } from "../config.js";
+
+const sendDiscordNotificationMock = vi.mocked(sendDiscordNotification);
 
 function makeConfig(keep = 100): Config {
   return {
@@ -45,6 +55,8 @@ describe("snapshotRetention", () => {
   beforeEach(() => {
     config = makeConfig();
     process.env["LONGTERMWIKI_SERVER_API_KEY"] = "test-key";
+    sendDiscordNotificationMock.mockClear();
+    __resetMissingKeyRateLimitForTest();
   });
 
   afterEach(() => {
@@ -109,13 +121,68 @@ describe("snapshotRetention", () => {
     expect(result.summary).toContain("citation_accuracy: FAILED (HTTP 500)");
   });
 
-  it("returns success (skipped) when no API key is set", async () => {
+  it("returns failure and emits Discord warning when no API key is set", async () => {
     delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
+    // Make sure we don't actually hit fetch
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
 
     const result = await snapshotRetention(config);
 
-    expect(result.success).toBe(true);
+    expect(result.success).toBe(false);
     expect(result.summary).toContain("Skipped");
+    expect(result.summary).toContain("LONGTERMWIKI_SERVER_API_KEY");
+    // No cleanup endpoints should be called when the key is missing.
+    expect(fetchMock).not.toHaveBeenCalled();
+    // Discord warning should fire on first missing-key run.
+    expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(1);
+    const message = sendDiscordNotificationMock.mock.calls[0]?.[1] as string;
+    expect(message).toContain("snapshot retention disabled");
+    expect(message).toContain("LONGTERMWIKI_SERVER_API_KEY");
+  });
+
+  it("rate-limits the missing-API-key Discord warning to once per day", async () => {
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    // First call fires a Discord warning.
+    const r1 = await snapshotRetention(config);
+    expect(r1.success).toBe(false);
+    expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(1);
+
+    // Second call within the same process/day must NOT fire a second warning.
+    const r2 = await snapshotRetention(config);
+    expect(r2.success).toBe(false);
+    expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(1);
+  });
+
+  it("re-fires the missing-API-key Discord warning after 24h elapses", async () => {
+    delete process.env["LONGTERMWIKI_SERVER_API_KEY"];
+    const fetchMock = vi.fn();
+    vi.stubGlobal("fetch", fetchMock);
+
+    vi.useFakeTimers();
+    try {
+      const t0 = new Date("2026-04-12T00:00:00Z").getTime();
+      vi.setSystemTime(t0);
+
+      // First call at t=0 fires.
+      await snapshotRetention(config);
+      expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(1);
+
+      // Just under 24h later — still suppressed.
+      vi.setSystemTime(t0 + 24 * 60 * 60 * 1000 - 1000);
+      await snapshotRetention(config);
+      expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(1);
+
+      // Just over 24h later — fires again.
+      vi.setSystemTime(t0 + 24 * 60 * 60 * 1000 + 1000);
+      await snapshotRetention(config);
+      expect(sendDiscordNotificationMock).toHaveBeenCalledTimes(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 
   it("still runs second cleanup when first throws", async () => {
