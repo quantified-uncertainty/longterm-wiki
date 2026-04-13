@@ -20,10 +20,6 @@ import {
   getAiModelSignals,
 } from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
-import {
-  fetchEntitySourcingSummary,
-  rollupVerdictFromSummary,
-} from "@/components/entity/entity-sourcing";
 import { BenchmarkScorecard } from "./benchmark-scorecard";
 
 export function generateStaticParams() {
@@ -59,9 +55,6 @@ export default async function AiModelDetailPage({
     if (canonical) permanentRedirect(`/ai-models/${canonical}`);
     return notFound();
   }
-
-  const sourcingSummary = await fetchEntitySourcingSummary([entity.id, entity.stableId ?? entity.id, slug]);
-  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
   const developerEntity = entity.developer
@@ -145,7 +138,7 @@ export default async function AiModelDetailPage({
   );
 
   const headerLinks = [
-    ...(entity.wikiId && getPageById(entity.id)
+    ...(entity.wikiId && getPageById(entity.wikiId)
       ? [{ label: "Wiki page", href: `/wiki/${entity.wikiId}` }]
       : []),
     { label: "Data", href: `/ai-models/${slug}/data` },
@@ -257,7 +250,6 @@ export default async function AiModelDetailPage({
       title={entity.title}
       titlePills={titlePills}
       coverage={{ score: coverageScore, signals: coverageSignals }}
-      verdict={rollupVerdict}
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}

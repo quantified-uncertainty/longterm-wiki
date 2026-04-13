@@ -137,12 +137,14 @@ export function EntityProfileShell({
                   size="md"
                 />
               )}
-              <SourcingDot
-                status={recordVerdictToStatus(verdict ?? null)}
-                originalVerdict={verdict ?? null}
-                size="md"
-                href={getSourcingHref("entity", entityId)}
-              />
+              {verdict !== undefined && (
+                <SourcingDot
+                  status={recordVerdictToStatus(verdict ?? null)}
+                  originalVerdict={verdict ?? null}
+                  size="md"
+                  href={getSourcingHref("entity", entityId)}
+                />
+              )}
             </div>
 
             {aliases && aliases.length > 0 && (
