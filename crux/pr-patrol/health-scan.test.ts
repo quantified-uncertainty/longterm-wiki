@@ -595,6 +595,59 @@ describe('combineHealth with ratchet drift', () => {
     expect(combined.issues[0].reason).toBe('sourcing bumped 3× ↑');
   });
 
+  // ── QUA-309: structured fingerprintKey ──────────────────────────────────────
+
+  it('populates fingerprintKey on ratchet-drift issues from drift.name', () => {
+    const deploy = evaluateDeployStatus([run({ conclusion: 'success' })]);
+    const mainCi = evaluateMainCi([commit({ conclusion: 'success' })]);
+    const ratchet: RatchetDriftResult = {
+      healthy: false,
+      reason: 'two files drifted',
+      drifts: [
+        {
+          file: 'sourcing.json',
+          name: 'sourcing',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'sourcing bumped 3× ↑',
+        },
+        {
+          file: 'review-marker.json',
+          name: 'review-marker',
+          direction: 'up',
+          bumpCount: 3,
+          bumps: [],
+          drifted: true,
+          reason: 'review-marker bumped 3× ↑',
+        },
+      ],
+    };
+    const combined = combineHealth(deploy, mainCi, ratchet, now);
+    const driftIssues = combined.issues.filter((i) => i.type === 'ratchet-drift');
+    expect(driftIssues).toHaveLength(2);
+    expect(driftIssues[0].fingerprintKey).toBe('sourcing');
+    expect(driftIssues[1].fingerprintKey).toBe('review-marker');
+  });
+
+  it('does not populate fingerprintKey on deploy-stuck or main-ci-red issues', () => {
+    const deploy = evaluateDeployStatus([
+      run({ id: 1, conclusion: 'failure' }),
+      run({ id: 2, conclusion: 'failure' }),
+    ]);
+    const mainCi = evaluateMainCi([
+      commit({ sha: 'a', conclusion: 'failure' }),
+      commit({ sha: 'b', conclusion: 'failure' }),
+      commit({ sha: 'c', conclusion: 'failure' }),
+    ]);
+    const combined = combineHealth(deploy, mainCi, emptyRatchet(), now);
+    const deployStuck = combined.issues.find((i) => i.type === 'deploy-stuck');
+    const mainCiRed = combined.issues.find((i) => i.type === 'main-ci-red');
+    expect(deployStuck?.fingerprintKey).toBeUndefined();
+    expect(mainCiRed?.fingerprintKey).toBeUndefined();
+  });
+
   it('ranks deploy-stuck > main-ci-red > ratchet-drift', () => {
     expect(DEPLOY_STUCK_SCORE).toBeGreaterThan(MAIN_CI_RED_SCORE);
     expect(MAIN_CI_RED_SCORE).toBeGreaterThan(RATCHET_DRIFT_SCORE);
