@@ -12,6 +12,7 @@ import {
   getIssueChildren,
   listIssuesByStateType,
   type LinearChildIssue,
+  type LinearChildrenResult,
   type LinearTriageIssue,
 } from './issues.ts';
 
@@ -71,7 +72,7 @@ const CLOSE_KEYWORDS =
  */
 function closesReferenceRegex(id: string): RegExp {
   const escaped = id.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return new RegExp(`(?:${CLOSE_KEYWORDS})\\b\\s*:?\\s*${escaped}\\b`, 'i');
+  return new RegExp(`\\b(?:${CLOSE_KEYWORDS})\\b\\s*:?\\s*${escaped}\\b`, 'i');
 }
 
 /**
@@ -206,9 +207,10 @@ function daysSince(iso: string): number {
 export function classifyEntry(
   issue: LinearTriageIssue,
   items: GhSearchItem[],
-  children: LinearChildIssue[],
+  childrenResult: LinearChildrenResult,
 ): AuditEntry {
   const { openPRs, mergedPRs } = classifyPRs(items);
+  const children = childrenResult.nodes;
   const unresolvedChildren = children.filter(
     (c) => !RESOLVED_STATE_TYPES.has(c.state.type),
   );
@@ -226,7 +228,14 @@ export function classifyEntry(
     // mergedPRs is sorted newest-first by classifyPRs.
     const latest = mergedPRs[0];
     reason = `PR #${latest.number} merged ${daysSince(latest.mergedAt)}d ago but state not updated`;
-  } else if (children.length > 0 && unresolvedChildren.length === 0) {
+  } else if (
+    children.length > 0 &&
+    unresolvedChildren.length === 0 &&
+    !childrenResult.hasMore
+  ) {
+    // Only treat a parent as "safe to close" when we've seen the full child
+    // list — otherwise an unfetched child could still be unresolved and
+    // `audit --fix` would close the parent prematurely.
     bucket = 'parent-epic';
     reason = `${children.length} sub-issues all resolved — safe to close`;
   } else if (daysInactive > STALE_DAYS) {
@@ -275,10 +284,11 @@ export async function auditInProgress(): Promise<AuditEntry[]> {
     ),
   ]);
   const childrenMap = new Map(childrenPairs);
+  const emptyChildren: LinearChildrenResult = { nodes: [], hasMore: false };
 
   return issues.map((issue) => {
     const items = prMap.get(issue.identifier) ?? [];
-    const children = childrenMap.get(issue.identifier) ?? [];
+    const children = childrenMap.get(issue.identifier) ?? emptyChildren;
     return classifyEntry(issue, items, children);
   });
 }
@@ -298,7 +308,7 @@ export async function auditInProgress(): Promise<AuditEntry[]> {
  */
 export function extractFixesIds(prBody: string): string[] {
   const re = new RegExp(
-    `(?:${CLOSE_KEYWORDS})\\b\\s*:?\\s*(QUA-\\d+)`,
+    `\\b(?:${CLOSE_KEYWORDS})\\b\\s*:?\\s*(QUA-\\d+)`,
     'gi',
   );
   const ids = new Set<string>();

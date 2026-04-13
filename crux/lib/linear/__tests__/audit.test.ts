@@ -1,6 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { classifyEntry, classifyPRs, extractFixesIds, STALE_DAYS } from '../audit.ts';
-import type { LinearChildIssue, LinearTriageIssue } from '../issues.ts';
+import type { LinearChildIssue, LinearChildrenResult, LinearTriageIssue } from '../issues.ts';
+
+function makeChildrenResult(nodes: LinearChildIssue[], hasMore = false): LinearChildrenResult {
+  return { nodes, hasMore };
+}
 
 function makeIssue(overrides: Partial<LinearTriageIssue> = {}): LinearTriageIssue {
   return {
@@ -118,7 +122,7 @@ describe('classifyEntry — bucket assignment', () => {
       makePr({ number: 10, state: 'open' }),
       makePr({ number: 9, state: 'closed', mergedAt: '2026-04-01T00:00:00Z' }),
     ];
-    const e = classifyEntry(issue, items, []);
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
     expect(e.bucket).toBe('active');
     expect(e.reason).toContain('#10');
   });
@@ -126,7 +130,7 @@ describe('classifyEntry — bucket assignment', () => {
   it('returns SHIPPED when only merged PRs exist', () => {
     const issue = makeIssue();
     const items = [makePr({ number: 5, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' })];
-    const e = classifyEntry(issue, items, []);
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
     expect(e.bucket).toBe('shipped');
     expect(e.reason).toContain('#5');
     expect(e.reason).toContain('merged');
@@ -138,7 +142,7 @@ describe('classifyEntry — bucket assignment', () => {
       makePr({ number: 1, state: 'closed', mergedAt: '2026-04-01T00:00:00Z' }),
       makePr({ number: 2, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
     ];
-    const e = classifyEntry(issue, items, []);
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
     expect(e.reason).toContain('#2');
     expect(e.mergedPRs[0].number).toBe(2);
   });
@@ -149,7 +153,7 @@ describe('classifyEntry — bucket assignment', () => {
       makeChild({ name: 'Done', type: 'completed' }),
       makeChild({ name: 'Canceled', type: 'canceled' }),
     ];
-    const e = classifyEntry(issue, [], children);
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
     expect(e.bucket).toBe('parent-epic');
     expect(e.childCount).toBe(2);
     expect(e.unresolvedChildren).toEqual([]);
@@ -161,33 +165,33 @@ describe('classifyEntry — bucket assignment', () => {
       makeChild({ name: 'Done', type: 'completed' }),
       makeChild({ name: 'In Progress', type: 'started' }),
     ];
-    const e = classifyEntry(issue, [], children);
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
     expect(e.bucket).not.toBe('parent-epic');
     expect(e.unresolvedChildren).toHaveLength(1);
   });
 
   it('returns ORPHAN when stale beyond STALE_DAYS with no PR or children', () => {
     const issue = makeIssue({ updatedAt: daysAgo(STALE_DAYS + 5) });
-    const e = classifyEntry(issue, [], []);
+    const e = classifyEntry(issue, [], makeChildrenResult([]));
     expect(e.bucket).toBe('orphan');
     expect(e.reason).toContain('Backlog');
   });
 
   it('returns STUCK when recent with no PR or children', () => {
     const issue = makeIssue({ updatedAt: daysAgo(1) });
-    const e = classifyEntry(issue, [], []);
+    const e = classifyEntry(issue, [], makeChildrenResult([]));
     expect(e.bucket).toBe('stuck');
   });
 
   it('boundary: exactly STALE_DAYS old is still STUCK, not ORPHAN', () => {
     const issue = makeIssue({ updatedAt: daysAgo(STALE_DAYS) });
-    const e = classifyEntry(issue, [], []);
+    const e = classifyEntry(issue, [], makeChildrenResult([]));
     expect(e.bucket).toBe('stuck');
   });
 
   it('an empty children list does NOT trigger PARENT-EPIC', () => {
     const issue = makeIssue();
-    const e = classifyEntry(issue, [], []);
+    const e = classifyEntry(issue, [], makeChildrenResult([]));
     expect(e.bucket).not.toBe('parent-epic');
   });
 
@@ -198,8 +202,8 @@ describe('classifyEntry — bucket assignment', () => {
       makePr({ number: 2, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
     ];
     const children = [makeChild({ name: 'Done', type: 'completed' })];
-    expect(classifyEntry(issue, items, children).bucket).toBe('active');
-    expect(classifyEntry(issue, [items[1]], children).bucket).toBe('shipped');
-    expect(classifyEntry(issue, [], children).bucket).toBe('parent-epic');
+    expect(classifyEntry(issue, items, makeChildrenResult(children)).bucket).toBe('active');
+    expect(classifyEntry(issue, [items[1]], makeChildrenResult(children)).bucket).toBe('shipped');
+    expect(classifyEntry(issue, [], makeChildrenResult(children)).bucket).toBe('parent-epic');
   });
 });

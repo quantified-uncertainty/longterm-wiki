@@ -67,7 +67,7 @@ Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` suffix makes 
 Scan the session for Linear IDs beyond the primary issue that may have been worked on but not properly closed:
 
 ```bash
-pnpm crux linear leak-check
+pnpm crux linear leak-check || true
 ```
 
 This inspects the branch name, `.claude/wip-*` files, and commit messages for `QUA-NNN` references, then checks Linear state for each. If any secondary issue is still "In Progress" (and isn't being closed by an open PR), the command flags it.

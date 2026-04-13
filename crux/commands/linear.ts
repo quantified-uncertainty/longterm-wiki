@@ -490,20 +490,20 @@ async function verifyPr(args: string[], options: CommandOptions): Promise<Comman
   let failures = 0;
 
   for (const id of ids) {
-    const issue = await getIssue(id);
-    if (!issue) {
-      out += `  ${c.yellow}?${c.reset} ${id} — not found\n`;
-      continue;
-    }
-    // Only reconcile from active workflow states (In Progress / In Review).
-    // If a user has deliberately moved the issue elsewhere — Backlog, Todo,
-    // Canceled, Duplicate, or already Done — respect that. The watchdog's
-    // job is recovering from missed webhooks, not overriding human decisions.
-    if (issue.state.type !== 'started') {
-      out += `  ${c.dim}—${c.reset} ${id} [${issue.state.name}] — not in active state, skipping\n`;
-      continue;
-    }
     try {
+      const issue = await getIssue(id);
+      if (!issue) {
+        out += `  ${c.yellow}?${c.reset} ${id} — not found\n`;
+        continue;
+      }
+      // Only reconcile from active workflow states (In Progress / In Review).
+      // If a user has deliberately moved the issue elsewhere — Backlog, Todo,
+      // Canceled, Duplicate, or already Done — respect that. The watchdog's
+      // job is recovering from missed webhooks, not overriding human decisions.
+      if (issue.state.type !== 'started') {
+        out += `  ${c.dim}—${c.reset} ${id} [${issue.state.name}] — not in active state, skipping\n`;
+        continue;
+      }
       await updateIssueState(id, 'Done');
       await commentOnIssue(
         id,
