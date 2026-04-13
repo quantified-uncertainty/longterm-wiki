@@ -1,9 +1,11 @@
+import { Suspense } from "react";
 import {
   fetchDetailed,
   withApiFallback,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { getTypedEntities } from "@data/tablebase";
+import { WorstEntitiesWidget } from "./worst-entities";
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -262,6 +264,17 @@ export async function SourcingCoverageContent() {
           </div>
         );
       })()}
+
+      {/* ── (a2) Worst entities leaderboard (QUA-153) ───────────────── */}
+      <Suspense
+        fallback={
+          <div className="not-prose mb-8 text-sm text-muted-foreground py-6 text-center border border-border/60 rounded-lg">
+            Loading worst-entities leaderboard…
+          </div>
+        }
+      >
+        <WorstEntitiesWidget />
+      </Suspense>
 
       {/* ── (b) Entities by Type ────────────────────────────────── */}
       <div className="not-prose mb-8">
