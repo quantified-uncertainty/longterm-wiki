@@ -7,7 +7,6 @@ import {
 import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 /**
  * `EntityProfileShell` is the canonical layout for every entity profile page
@@ -39,8 +38,12 @@ export interface EntityProfileShellProps {
   breadcrumbs: Array<{ label: string; href?: string }>;
 
   // ── Header ──────────────────────────────────────────────────────────
-  /** Entity identifier passed to SourcingDot (`getSourcingHref("entity", entityId)`). */
-  entityId: string;
+  /**
+   * @deprecated QUA-418 — no longer used. Entity-level rollup pages are
+   * deferred to QUA-408 Phase 2. Kept in the interface so callers don't
+   * need to churn; safe to remove when a caller cleanup ships.
+   */
+  entityId?: string;
   /** Optional avatar node (e.g. initials circle). Omitted when null/undefined. */
   avatar?: React.ReactNode;
   /** Main entity title. */
@@ -92,7 +95,6 @@ export interface EntityProfileShellProps {
 
 export function EntityProfileShell({
   breadcrumbs,
-  entityId,
   avatar,
   title,
   aliases,
@@ -142,7 +144,9 @@ export function EntityProfileShell({
                   status={recordVerdictToStatus(verdict ?? null)}
                   originalVerdict={verdict ?? null}
                   size="md"
-                  href={getSourcingHref("entity", entityId)}
+                  // QUA-418: no href — "entity" is not a real record_type in
+                  // VALID_RECORD_TYPES, so /sourcing/entity/<id> always 404s.
+                  // Entity-level rollup pages are deferred to QUA-408 Phase 2.
                 />
               )}
             </div>
