@@ -556,4 +556,9 @@ export async function runLlmAgent(
 
 // Re-export commonly used dependencies so consumers don't need multiple imports
 export { MODELS } from './anthropic.ts';
-export { withRetry, startHeartbeat } from './resilience.ts';
+export {
+  withRetry,
+  startHeartbeat,
+  CreditExhaustedError,
+  isCreditExhaustedError,
+} from './resilience.ts';

@@ -93,6 +93,9 @@ vi.mock('./sourcing-orchestrate.ts', () => ({
 // ── Import after mocks ─────────────────────────────────────────────────
 
 import { commands, formatSummaryMarkdown } from './flagship-curate.ts';
+import { CreditExhaustedError } from '../lib/resilience.ts';
+import { callLlm } from '../lib/llm.ts';
+import { orchestrateCommand } from './sourcing-orchestrate.ts';
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -374,6 +377,161 @@ describe('flagship-curate', () => {
       // Should not have tried to research or update anything
       expect(mockSuggestResources).not.toHaveBeenCalled();
       expect(mockSyncPersonnel).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Credit-exhaustion handling (QUA-378) ────────────────────────────
+  describe('credit exhaustion (QUA-378)', () => {
+    it('aborts with exit code 2 when research throws CreditExhaustedError', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      // Make the research call fail with credit-exhausted on the first attempt.
+      (callLlm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new CreditExhaustedError(
+          '400 invalid_request_error: Your credit balance is too low',
+          null,
+        ),
+      );
+
+      // Silence stderr for the abort banner.
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(2);
+      const bannerText = errorSpy.mock.calls.map((c) => c.join(' ')).join('\n');
+      expect(bannerText).toContain('ABORTED');
+      expect(bannerText).toContain('credit balance');
+      expect(bannerText).toContain('QUA-378');
+      // Reset at Step 4 must not have run (Step 2 threw before we got there).
+      expect(mockStoreVerdict).not.toHaveBeenCalled();
+    });
+
+    it('aborts with exit code 2 when verification output contains credit-balance error', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+
+      // Make orchestrate-sourcing return output with the credit-exhausted
+      // fingerprint (simulating every per-item LLM call returning a 400).
+      (orchestrateCommand as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        exitCode: 0,
+        output:
+          '[1/1] RECORD Personnel: Alice\n' +
+          '  ERROR: LLM call failed: 400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."},"request_id":"req_X"}\n' +
+          'Verification complete. Cost: $0.000',
+      });
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+        // Skip research so we reach verification with an empty researched set.
+        'skip-research': true,
+      });
+
+      expect(result.exitCode).toBe(2);
+      expect(
+        errorSpy.mock.calls.map((c) => c.join(' ')).join('\n'),
+      ).toContain('ABORTED');
+    });
+
+    it('batch mode: halts remaining orgs after the first credit-exhausted org', async () => {
+      // Three candidate orgs; findEntitiesNeedingCuration fetches all and
+      // then sorts by non-confirmed verdict count. We give each the same
+      // count so order is stable (insertion order wins on ties).
+      mockApiRequest.mockResolvedValue({
+        ok: true,
+        data: {
+          entities: [
+            { id: 'alpha', stableId: 'sid_alpha', title: 'Alpha', entityType: 'organization' },
+            { id: 'bravo', stableId: 'sid_bravo', title: 'Bravo', entityType: 'organization' },
+            { id: 'charlie', stableId: 'sid_charlie', title: 'Charlie', entityType: 'organization' },
+          ],
+          total: 3,
+        },
+      });
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'X' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+
+      // First call succeeds (alpha processes normally). Second call — during
+      // bravo's research — throws credit-exhausted. Everything after must
+      // be skipped without invoking callLlm again.
+      (callLlm as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          text: '[]',
+          usage: { input_tokens: 10, output_tokens: 10 },
+          model: 'claude-haiku-4-5-20251001',
+        })
+        .mockRejectedValueOnce(new CreditExhaustedError('credit balance is too low', null))
+        .mockImplementation(async () => {
+          throw new Error('callLlm should not be invoked after credit exhaustion');
+        });
+
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        all: true,
+        budget: '5',
+        limit: '3',
+        iterations: '1', // single-iteration so alpha completes on its one research call
+        ci: true,
+      });
+
+      expect(result.exitCode).toBe(2);
+      const json = JSON.parse(result.output);
+      expect(json.aborted).toBe('credit_exhausted');
+      // Alpha completed its one iteration; bravo threw during its research
+      // call; charlie never started. Both bravo (abandoned) and charlie
+      // (never started) count as skippedDueToCredits.
+      expect(json.results.length).toBe(1);
+      expect(json.results[0].entity).toBe('Alpha');
+      expect(json.skippedDueToCredits).toBe(2);
+    });
+
+    it('detects credit errors via the raw substring match (not just CreditExhaustedError instance)', async () => {
+      // If a caller forgets to wrap a raw error, the top-level batch loop
+      // still catches it via isCreditExhaustedError(). This guards against
+      // the "works in unit tests, fails in prod" drift.
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      (callLlm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        // NOT wrapped in CreditExhaustedError — raw 400 body
+        new Error(
+          '400 invalid_request_error: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.',
+        ),
+      );
+
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(2);
     });
   });
 
