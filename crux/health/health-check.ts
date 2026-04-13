@@ -13,9 +13,10 @@
  *   crux health                      Run all checks
  *   crux health --check=server       Server & DB only
  *   crux health --check=api          API smoke tests only
- *   crux health --check=actions      GitHub Actions workflow health
- *   crux health --check=ci-main      CI runs on main branch (0 runs in 24h = alert)
- *   crux health --check=frontend     Public frontend availability
+ *   crux health --check=actions           GitHub Actions workflow health
+ *   crux health --check=ci-main            CI runs on main branch (0 runs in 24h = alert)
+ *   crux health --check=wiki-server-deploy Last wiki-server deploy status (QUA-295)
+ *   crux health --check=frontend           Public frontend availability
  *   crux health --check=freshness    Data freshness
  *   crux health --check=job-queue    Job queue health
  *   crux health --check=pr-quality   PR & issue quality
@@ -31,6 +32,7 @@ import { getServerUrl, getApiKey } from '../lib/wiki-server/client.ts';
 import { checkJobQueue } from './checks/job-queue.ts';
 import { checkPrQuality } from './checks/pr-quality.ts';
 import { checkCiMainHealth } from './checks/ci-main-health.ts';
+import { checkDeployHealth } from '../lib/pr-analysis/deploy-status.ts';
 import { buildWellnessReport, manageWellnessIssue } from './wellness-report.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -369,6 +371,65 @@ export async function checkActions(): Promise<CheckResult> {
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
+// Check 3b: Wiki-server deploy health (QUA-295)
+// ─────────────────────────────────────────────────────────────────────────────
+
+export async function checkWikiServerDeploy(): Promise<CheckResult> {
+  const name = 'Wiki-server deploy';
+
+  if (!process.env.GITHUB_TOKEN) {
+    return {
+      name,
+      ok: false,
+      summary: 'GITHUB_TOKEN not set',
+      detail: ['Set GITHUB_TOKEN to enable deploy health checks'],
+    };
+  }
+
+  const health = await checkDeployHealth();
+  if (!health.lastDeploy) {
+    return {
+      name,
+      ok: true,
+      summary: 'No recent deploy data',
+      detail: ['wiki-server-docker.yml has no completed runs in the query window'],
+    };
+  }
+
+  const { status, sha, url, timestamp } = health.lastDeploy;
+  const shortSha = sha.slice(0, 7);
+  const ageH = hoursAgo(timestamp);
+  const detail = [
+    `Last deploy: ${status} (${shortSha})`,
+    `Timestamp: ${timestamp} (${ageH}h ago)`,
+    `Run: ${url}`,
+  ];
+
+  if (!health.healthy) {
+    detail.push(
+      `Release PRs are blocked until this deploy succeeds (see QUA-295).`,
+      `Use --force on crux gh release create only after manually verifying prod.`,
+    );
+    if (health.failingSince && health.failingSince !== timestamp) {
+      detail.push(`Failing since: ${health.failingSince}`);
+    }
+    return {
+      name,
+      ok: false,
+      summary: `Last deploy '${status}' (${shortSha}, ${ageH}h ago)`,
+      detail,
+    };
+  }
+
+  return {
+    name,
+    ok: true,
+    summary: `Last deploy success (${shortSha}, ${ageH}h ago)`,
+    detail,
+  };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
 // Check 4: Frontend availability
 // ─────────────────────────────────────────────────────────────────────────────
 
@@ -483,6 +544,7 @@ const ALL_CHECKS: Record<string, () => Promise<CheckResult>> = {
   api: checkApi,
   actions: checkActions,
   'ci-main': checkCiMainHealth,
+  'wiki-server-deploy': checkWikiServerDeploy,
   frontend: checkFrontend,
   freshness: checkFreshness,
   'job-queue': checkJobQueue,
@@ -505,7 +567,7 @@ async function main(): Promise<void> {
   } else {
     // Run all checks. Independent checks run in parallel; API smoke tests
     // depend on server health so they run after.
-    const independentChecks = ['server', 'actions', 'ci-main', 'frontend', 'freshness', 'job-queue', 'pr-quality'] as const;
+    const independentChecks = ['server', 'actions', 'ci-main', 'wiki-server-deploy', 'frontend', 'freshness', 'job-queue', 'pr-quality'] as const;
 
     if (!JSON_MODE && !REPORT_MODE) {
       console.log('  Running independent checks in parallel...');
