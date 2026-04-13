@@ -1,0 +1,116 @@
+name: Flagship Curate
+run-name: "Flagship Curate${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Weekly unattended curation pass over the worst-covered organizations.
+# Picks the top-N orgs by number of non-confirmed verdicts and runs the
+# flagship-curate pipeline against each: research → ingest → reset → verify.
+#
+# Posts a markdown run summary to a Linear issue (default: QUA-124) so the
+# trust loop has a single rolling thread to monitor.
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max entities to curate (worst-covered first)'
+        required: false
+        default: '5'
+        type: string
+      budget:
+        description: 'Max dollars to spend across all entities'
+        required: false
+        default: '10'
+        type: string
+      record_limit:
+        description: 'Max records to curate per entity'
+        required: false
+        default: '50'
+        type: string
+      iterations:
+        description: 'Max curation iterations per entity'
+        required: false
+        default: '2'
+        type: string
+      linear_issue:
+        description: 'Linear issue identifier for the run summary comment'
+        required: false
+        default: 'QUA-124'
+        type: string
+      dry_run:
+        description: 'Dry run (preview only)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flagship-curate
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  curate:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      WIKI_SERVER_ENV: prod
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+      # Assign inputs to env vars to avoid shell injection (GH Actions best practice)
+      INPUT_LIMIT: ${{ inputs.limit || '5' }}
+      INPUT_BUDGET: ${{ inputs.budget || '10' }}
+      INPUT_RECORD_LIMIT: ${{ inputs.record_limit || '50' }}
+      INPUT_ITERATIONS: ${{ inputs.iterations || '2' }}
+      INPUT_LINEAR_ISSUE: ${{ inputs.linear_issue || 'QUA-124' }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run flagship-curate
+        run: |
+          ARGS="--all"
+          ARGS="$ARGS --limit=${INPUT_LIMIT}"
+          ARGS="$ARGS --budget=${INPUT_BUDGET}"
+          ARGS="$ARGS --record-limit=${INPUT_RECORD_LIMIT}"
+          ARGS="$ARGS --iterations=${INPUT_ITERATIONS}"
+          ARGS="$ARGS --linear-comment=${INPUT_LINEAR_ISSUE}"
+          if [ "${INPUT_DRY_RUN}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          mkdir -p /tmp/flagship-curate
+          # Note: flagship-curate emits progress logs to stdout during the run
+          # plus the --ci JSON payload as its final output. The captured log is
+          # human-readable; the structured summary is also posted to Linear via
+          # --linear-comment.
+          pnpm crux flagship-curate $ARGS --ci 2>&1 | tee /tmp/flagship-curate/output.log
+
+      - name: Upload run output artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flagship-curate-output
+          path: /tmp/flagship-curate/output.log
+          retention-days: 30

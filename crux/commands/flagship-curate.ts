@@ -31,6 +31,7 @@ import { storeVerdict } from '../lib/wiki-server/sourcing-client.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { escapeXml } from '../lib/prompt-utils.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { commentOnIssue } from '../lib/linear/issues.ts';
 
 // ── Constants ──────────────────────────────────────────────────────────
 
@@ -70,6 +71,18 @@ interface CurateOptions {
   /** Skip the source research phase (just re-verify with existing sources) */
   'skip-research'?: boolean;
   skipResearch?: boolean;
+  /** Linear issue identifier to post a run summary to (e.g. "QUA-124") */
+  'linear-comment'?: string;
+  linearComment?: string;
+}
+
+interface RunMeta {
+  budget: number;
+  totalCost: number;
+  mode: 'batch' | 'single';
+  limit: number;
+  dryRun: boolean;
+  startedAt: Date;
 }
 
 interface ResolvedEntity {
@@ -783,6 +796,86 @@ function formatSummary(results: CurationResult[]): string {
   return lines.join('\n');
 }
 
+/**
+ * Markdown summary suitable for posting as a Linear comment or other report
+ * surface. Pure function — no ANSI codes, no console writes.
+ */
+export function formatSummaryMarkdown(
+  results: CurationResult[],
+  meta: RunMeta,
+): string {
+  const lines: string[] = [];
+  const dryRunTag = meta.dryRun ? ' [DRY RUN]' : '';
+  const timestamp = meta.startedAt.toISOString().replace('T', ' ').slice(0, 16);
+
+  lines.push(`## Flagship Curate Run — ${timestamp} UTC${dryRunTag}`);
+  lines.push('');
+
+  const modeStr = meta.mode === 'batch'
+    ? `batch (limit=${meta.limit}, budget=$${meta.budget.toFixed(2)})`
+    : `single entity (budget=$${meta.budget.toFixed(2)})`;
+  lines.push(`**Mode**: ${modeStr}`);
+
+  let totalRecordsCurated = 0;
+  let totalRecordsImproved = 0;
+  let totalDuration = 0;
+  let totalConfirmedDelta = 0;
+  for (const r of results) {
+    totalRecordsCurated += r.recordsCurated;
+    totalRecordsImproved += r.recordsImproved;
+    totalDuration += r.duration;
+    totalConfirmedDelta +=
+      (r.afterVerdicts['confirmed'] ?? 0) - (r.beforeVerdicts['confirmed'] ?? 0);
+  }
+
+  const budgetUsedPct = meta.budget > 0
+    ? Math.round((meta.totalCost / meta.budget) * 100)
+    : 0;
+  lines.push(
+    `**Result**: ${results.length} entit${results.length === 1 ? 'y' : 'ies'} processed | ` +
+    `$${meta.totalCost.toFixed(3)} / $${meta.budget.toFixed(2)} (${budgetUsedPct}%) | ` +
+    `${formatDuration(totalDuration)}`,
+  );
+  lines.push('');
+
+  if (results.length === 0) {
+    lines.push('_No entities were processed._');
+    return lines.join('\n');
+  }
+
+  lines.push('| Entity | Before → After confirmed | Δ | Records curated | Cost | Time |');
+  lines.push('|---|---|---|---|---|---|');
+  for (const r of results) {
+    const confirmedBefore = r.beforeVerdicts['confirmed'] ?? 0;
+    const confirmedAfter = r.afterVerdicts['confirmed'] ?? 0;
+    const totalBefore = Object.values(r.beforeVerdicts).reduce((s, v) => s + v, 0);
+    const totalAfter = Object.values(r.afterVerdicts).reduce((s, v) => s + v, 0);
+    const pctBefore = totalBefore > 0 ? `${Math.round((confirmedBefore / totalBefore) * 100)}%` : '—';
+    const pctAfter = totalAfter > 0 ? `${Math.round((confirmedAfter / totalAfter) * 100)}%` : '—';
+    const delta = confirmedAfter - confirmedBefore;
+    const deltaStr = delta > 0 ? `**+${delta}**` : delta < 0 ? `${delta}` : '0';
+    // Escape pipe chars in entity titles to avoid breaking the markdown table.
+    const safeTitle = r.entity.title.replace(/\|/g, '\\|');
+    lines.push(
+      `| ${safeTitle} | ${pctBefore} → ${pctAfter} | ${deltaStr} | ` +
+      `${r.recordsCurated} | $${r.totalCost.toFixed(3)} | ${formatDuration(r.duration)} |`,
+    );
+  }
+  lines.push('');
+
+  lines.push(
+    `**Totals**: ${totalRecordsCurated} records curated, ${totalRecordsImproved} improved, ` +
+    `${totalConfirmedDelta >= 0 ? '+' : ''}${totalConfirmedDelta} confirmed verdicts.`,
+  );
+
+  if (meta.dryRun) {
+    lines.push('');
+    lines.push('_Dry run — no changes were written._');
+  }
+
+  return lines.join('\n');
+}
+
 // ── Main Command ───────────────────────────────────────────────────────
 
 async function flagshipCurateCommand(
@@ -800,6 +893,8 @@ async function flagshipCurateCommand(
   const dryRun = !!(options['dry-run'] ?? options.dryRun);
   const skipResearch = !!(options['skip-research'] ?? options.skipResearch);
   const iterations = options.iterations ? parseInt(String(options.iterations), 10) : 2;
+  const linearIssue = (options['linear-comment'] ?? options.linearComment) as string | undefined;
+  const startedAt = new Date();
 
   if (!entityId && !isAll) {
     return {
@@ -821,6 +916,7 @@ Options:
   --table=<type>              Filter record type (personnel, grant, division, ...)
   --iterations=N              Max curation iterations per entity (default: 2)
   --skip-research             Skip LLM source research (re-verify existing sources)
+  --linear-comment=<QUA-NNN>  Post a markdown run summary to a Linear issue (best-effort)
   --dry-run                   Preview without making changes
   --ci                        JSON output`,
     };
@@ -829,6 +925,15 @@ Options:
   // Validate budget
   if (!isFinite(budget) || budget <= 0) {
     return { exitCode: 1, output: `Invalid budget: ${options.budget}. Must be a positive number.` };
+  }
+
+  // Validate Linear issue identifier shape if provided. Existence is checked
+  // at post time — fail fast on obviously malformed input now.
+  if (linearIssue && !/^[A-Z]+-\d+$/.test(linearIssue)) {
+    return {
+      exitCode: 1,
+      output: `Invalid --linear-comment value: "${linearIssue}". Expected format: "QUA-NNN".`,
+    };
   }
 
   console.log(`${c.bold}Flagship Curate${c.reset}`);
@@ -888,6 +993,36 @@ Options:
   // Format output
   const output = formatSummary(results);
 
+  // Best-effort: post a markdown summary to the target Linear issue. Failures
+  // here never change the exit code — the run already happened, the comment
+  // is just notification.
+  if (linearIssue) {
+    const meta: RunMeta = {
+      budget,
+      totalCost: tracker.totalCost,
+      mode: isAll ? 'batch' : 'single',
+      limit,
+      dryRun,
+      startedAt,
+    };
+    const markdown = formatSummaryMarkdown(results, meta);
+    if (!process.env['LINEAR_API_KEY']) {
+      console.warn(
+        `${LOG_PREFIX} ${c.yellow}LINEAR_API_KEY not set — skipping Linear comment to ${linearIssue}.${c.reset}`,
+      );
+    } else {
+      try {
+        await commentOnIssue(linearIssue, markdown);
+        console.log(`${LOG_PREFIX} ${c.green}Posted run summary to ${linearIssue}.${c.reset}`);
+      } catch (err) {
+        const msg = err instanceof Error ? err.message : String(err);
+        console.warn(
+          `${LOG_PREFIX} ${c.yellow}Failed to post Linear comment to ${linearIssue}: ${msg}${c.reset}`,
+        );
+      }
+    }
+  }
+
   if (options.ci) {
     return {
       exitCode: 0,
@@ -939,6 +1074,8 @@ Options:
   --table=<type>              Filter to a specific record type (personnel, grant, ...)
   --iterations=N              Max curation iterations per entity (default: 2)
   --skip-research             Skip LLM source research (only re-verify existing sources)
+  --linear-comment=<QUA-NNN>  Post a markdown run summary to a Linear issue (best-effort).
+                              Requires LINEAR_API_KEY. Failures never affect exit code.
   --dry-run                   Preview what would be curated without making changes
   --ci                        JSON output for CI pipelines
 
@@ -961,5 +1098,6 @@ Examples:
   crux flagship-curate --entity=anthropic --table=personnel --budget=1
   crux flagship-curate --all --budget=10 --limit=5
   crux flagship-curate --entity=anthropic --skip-research --iterations=1
+  crux flagship-curate --all --budget=10 --limit=5 --linear-comment=QUA-124
 `;
 }
