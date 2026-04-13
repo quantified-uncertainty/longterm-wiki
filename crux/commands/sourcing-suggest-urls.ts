@@ -27,14 +27,8 @@ import {
   getEvidenceByRecord,
   listUrlSuggestions,
   upsertUrlSuggestions,
-  type UrlSuggestionInput,
 } from '../lib/wiki-server/sourcing-client.ts';
-import {
-  suggestUrls,
-  type UrlSuggestion,
-} from '../lib/sourcing/suggest-urls.ts';
-
-// ── Constants ────────────────────────────────────────────────────────
+import { suggestUrls } from '../lib/sourcing/suggest-urls.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
@@ -42,8 +36,9 @@ const DEFAULT_BUDGET_USD = 1.0;
 const DEFAULT_MAX_CANDIDATES = 3;
 const MAX_CANDIDATES_PER_RECORD = 10;
 const GENERATOR_MODEL = 'qua-64/suggest-urls-v1';
-
-// ── Option helpers ───────────────────────────────────────────────────
+const PREFETCH_PAGE_SIZE = 200;
+const PREFETCH_MAX = 2000;
+const UPSERT_CHUNK = 100;
 
 interface SuggestOptions extends BaseOptions {
   limit?: string;
@@ -60,21 +55,15 @@ interface SuggestOptions extends BaseOptions {
   skipExisting?: boolean;
 }
 
-function parsePositiveInt(raw: unknown, fallback: number, max: number): number {
-  if (raw === undefined || raw === null || raw === '') return fallback;
-  const n = parseInt(String(raw), 10);
-  if (!Number.isFinite(n) || n <= 0) return fallback;
-  return Math.min(n, max);
+function parseBoundedInt(raw: unknown, fallback: number, max: number): number {
+  const n = parseInt(String(raw ?? ''), 10);
+  return Number.isFinite(n) && n > 0 ? Math.min(n, max) : fallback;
 }
 
 function parsePositiveFloat(raw: unknown, fallback: number): number {
-  if (raw === undefined || raw === null || raw === '') return fallback;
-  const n = parseFloat(String(raw));
-  if (!Number.isFinite(n) || n <= 0) return fallback;
-  return n;
+  const n = parseFloat(String(raw ?? ''));
+  return Number.isFinite(n) && n > 0 ? n : fallback;
 }
-
-// ── Core run ─────────────────────────────────────────────────────────
 
 interface RunSummary {
   scanned: number;
@@ -85,16 +74,95 @@ interface RunSummary {
   providerErrors: number;
   costUsd: number;
   budgetExhausted: boolean;
-  providers: { used: Set<string>; skipped: Set<string> };
+  providersUsed: Set<string>;
+  providersSkipped: Set<string>;
+}
+
+function makeSummary(): RunSummary {
+  return {
+    scanned: 0,
+    skippedHadSuggestion: 0,
+    skippedNoClaim: 0,
+    generatedForRecords: 0,
+    suggestionsWritten: 0,
+    providerErrors: 0,
+    costUsd: 0,
+    budgetExhausted: false,
+    providersUsed: new Set(),
+    providersSkipped: new Set(),
+  };
+}
+
+function summaryToJson(s: RunSummary, dryRun: boolean) {
+  return {
+    scanned: s.scanned,
+    skipped_had_suggestion: s.skippedHadSuggestion,
+    skipped_no_claim: s.skippedNoClaim,
+    generated_for_records: s.generatedForRecords,
+    suggestions_written: s.suggestionsWritten,
+    provider_errors: s.providerErrors,
+    cost_usd: Number(s.costUsd.toFixed(4)),
+    budget_exhausted: s.budgetExhausted,
+    providers_used: [...s.providersUsed].sort(),
+    providers_skipped: [...s.providersSkipped].sort(),
+    dry_run: dryRun,
+  };
+}
+
+function formatSummary(s: RunSummary, dryRun: boolean): string {
+  const usedList = [...s.providersUsed].sort().join(', ') || '(none)';
+  const skippedLine = s.providersSkipped.size > 0
+    ? `\nProviders skipped:      ${[...s.providersSkipped].sort().join(', ')}`
+    : '';
+  return (
+`
+=== Summary ===
+Scanned:                ${s.scanned}
+Skipped (had pending):  ${s.skippedHadSuggestion}
+Skipped (no claim):     ${s.skippedNoClaim}
+Generated for records:  ${s.generatedForRecords}
+Suggestions written:    ${s.suggestionsWritten}${dryRun ? ' (dry-run)' : ''}
+Provider errors:        ${s.providerErrors}
+Cost:                   $${s.costUsd.toFixed(4)}
+Budget exhausted:       ${s.budgetExhausted ? 'yes' : 'no'}
+Providers used:         ${usedList}${skippedLine}`
+  );
+}
+
+/**
+ * Batch pre-fetch pending suggestions up to PREFETCH_MAX so we can dedup the
+ * per-record skip check in O(1) per row instead of one HTTP call per verdict.
+ * Failures return an empty set — the caller processes records without deduping.
+ */
+async function fetchPendingRecordKeys(
+  recordTypeFilter: string | undefined,
+  log: (msg: string) => void,
+): Promise<Set<string>> {
+  const keys = new Set<string>();
+  for (let offset = 0; offset < PREFETCH_MAX; offset += PREFETCH_PAGE_SIZE) {
+    const res = await listUrlSuggestions({
+      recordType: recordTypeFilter,
+      status: 'pending',
+      limit: PREFETCH_PAGE_SIZE,
+      offset,
+    });
+    if (!res.ok) {
+      log(`  [warn] pre-fetch pending suggestions failed: ${res.message ?? 'unknown'}`);
+      return keys;
+    }
+    for (const s of res.data.suggestions) keys.add(`${s.recordType}|${s.recordId}`);
+    if (res.data.suggestions.length < PREFETCH_PAGE_SIZE) break;
+  }
+  return keys;
 }
 
 async function suggestCommand(
   _args: string[],
   options: SuggestOptions,
 ): Promise<CommandResult> {
-  const limit = parsePositiveInt(options.limit, DEFAULT_LIMIT, MAX_LIMIT);
+  const limit = parseBoundedInt(options.limit, DEFAULT_LIMIT, MAX_LIMIT);
   const budgetCap = parsePositiveFloat(options.budget, DEFAULT_BUDGET_USD);
-  const maxCandidates = parsePositiveInt(
+  const maxCandidates = parseBoundedInt(
     options['max-candidates'] ?? options.maxCandidates,
     DEFAULT_MAX_CANDIDATES,
     MAX_CANDIDATES_PER_RECORD,
@@ -105,9 +173,7 @@ async function suggestCommand(
   const skipExisting = options['skip-existing'] ?? options.skipExisting ?? true;
   const isJson = Boolean(options.json || options.ci);
 
-  const log = (msg: string) => {
-    if (!isJson) console.log(msg);
-  };
+  const log = (msg: string) => { if (!isJson) console.log(msg); };
 
   log(`Sourcing Suggest URLs (QUA-64)`);
   log(`  limit:          ${limit}`);
@@ -117,6 +183,8 @@ async function suggestCommand(
   if (entityFilter) log(`  entity:         ${entityFilter}`);
   if (dryRun) log(`  dry-run:        yes`);
   log('');
+
+  const summary = makeSummary();
 
   // ── Step 1: list unverifiable verdicts ──
   const verdictsResult = await listVerdicts({
@@ -131,46 +199,29 @@ async function suggestCommand(
     };
   }
 
-  let verdictRows = verdictsResult.data.verdicts;
-  if (entityFilter) {
-    verdictRows = verdictRows.filter(
-      (v) =>
-        v.entityId === entityFilter ||
-        (v.entityDisplayName ?? '').toLowerCase() === entityFilter.toLowerCase(),
-    );
-  }
+  const verdictRows = entityFilter
+    ? verdictsResult.data.verdicts.filter(
+        (v) =>
+          v.entityId === entityFilter ||
+          (v.entityDisplayName ?? '').toLowerCase() === entityFilter.toLowerCase(),
+      )
+    : verdictsResult.data.verdicts;
 
   log(`Fetched ${verdictRows.length} unverifiable verdict(s).`);
 
   if (verdictRows.length === 0) {
-    return {
-      exitCode: 0,
-      output: isJson
-        ? JSON.stringify({ summary: emptySummary() })
-        : 'No unverifiable verdicts matched.',
-    };
+    const output = isJson
+      ? JSON.stringify({ summary: summaryToJson(summary, dryRun) })
+      : 'No unverifiable verdicts matched.';
+    return { exitCode: 0, output };
   }
 
   // ── Step 2: per-record processing ──
-  const summary: RunSummary = {
-    scanned: 0,
-    skippedHadSuggestion: 0,
-    skippedNoClaim: 0,
-    generatedForRecords: 0,
-    suggestionsWritten: 0,
-    providerErrors: 0,
-    costUsd: 0,
-    budgetExhausted: false,
-    providers: { used: new Set<string>(), skipped: new Set<string>() },
-  };
-
-  const allSuggestions: UrlSuggestionInput[] = [];
-
-  // Batch pre-fetch: build a set of (recordType, recordId) pairs that already
-  // have a pending suggestion, so we don't make one HTTP call per record.
-  const existingPendingSet = skipExisting
-    ? await buildExistingPendingSet(recordTypeFilter, verdictRows.length, log)
+  const pendingKeys = skipExisting
+    ? await fetchPendingRecordKeys(recordTypeFilter, log)
     : new Set<string>();
+
+  const toUpsert: Parameters<typeof upsertUrlSuggestions>[0] = [];
 
   for (const v of verdictRows) {
     summary.scanned++;
@@ -181,8 +232,8 @@ async function suggestCommand(
       break;
     }
 
-    // Claim text = verdict.reasoning (set by the sourcing LLM). If missing
-    // fall back to displayName. If both missing, skip — we have nothing to search.
+    // Claim text = verdict.reasoning (set by the sourcing LLM). Fall back to
+    // displayName. If both missing, skip — we have nothing to search.
     const claimText = v.reasoning?.trim() || v.displayName?.trim() || '';
     const entityName =
       v.entityDisplayName?.trim() || v.entityId?.trim() || v.displayName?.trim() || '';
@@ -191,18 +242,15 @@ async function suggestCommand(
       continue;
     }
 
-    if (skipExisting && existingPendingSet.has(`${v.recordType}|${v.recordId}`)) {
+    if (skipExisting && pendingKeys.has(`${v.recordType}|${v.recordId}`)) {
       summary.skippedHadSuggestion++;
       continue;
     }
 
-    // Look up an existing evidence URL so we don't re-suggest the same thing.
-    let existingUrl: string | null = null;
+    // Look up the existing evidence URL so we don't re-suggest it.
     const evidence = await getEvidenceByRecord(v.recordType, v.recordId, { limit: 5 });
-    if (evidence.ok) {
-      const withUrl = evidence.data.evidence.find((e) => e.sourceUrl);
-      existingUrl = withUrl?.sourceUrl ?? null;
-    }
+    const existingUrl =
+      (evidence.ok && evidence.data.evidence.find((e) => e.sourceUrl)?.sourceUrl) || null;
 
     if (dryRun) {
       log(`  [dry-run] ${v.recordType}/${v.recordId} field=${v.fieldName ?? '(row)'} entity="${entityName.slice(0, 40)}"`);
@@ -210,7 +258,6 @@ async function suggestCommand(
       continue;
     }
 
-    // Generate candidates.
     const result = await suggestUrls({
       entityName,
       claimText,
@@ -220,158 +267,51 @@ async function suggestCommand(
     });
 
     summary.costUsd += result.costUsd;
-    for (const p of result.providersUsed) summary.providers.used.add(p);
+    for (const p of result.providersUsed) summary.providersUsed.add(p);
     for (const p of result.providersSkipped) {
-      summary.providers.skipped.add(p);
+      summary.providersSkipped.add(p);
       if (!p.endsWith(':no-key')) summary.providerErrors++;
     }
 
     if (result.candidates.length === 0) continue;
-
     summary.generatedForRecords++;
 
     for (const cand of result.candidates) {
-      allSuggestions.push(
-        toSuggestionInput(v, cand),
-      );
+      toUpsert.push({
+        recordType: v.recordType,
+        recordId: v.recordId,
+        fieldName: v.fieldName,
+        entityId: v.entityId,
+        suggestedUrl: cand.url,
+        title: cand.title,
+        snippet: cand.snippet,
+        relevanceScore: cand.relevanceScore,
+        sourceProvider: cand.sourceProvider,
+        generatorModel: GENERATOR_MODEL,
+        status: 'pending',
+      });
     }
   }
 
-  // ── Step 3: batch-upsert ──
-  if (!dryRun && allSuggestions.length > 0) {
-    // Chunk by 100 to stay well under the route's 200-item limit.
-    const CHUNK = 100;
-    for (let i = 0; i < allSuggestions.length; i += CHUNK) {
-      const chunk = allSuggestions.slice(i, i + CHUNK);
+  // ── Step 3: batch-upsert in chunks under the route's MAX_BATCH=200 ──
+  if (!dryRun && toUpsert.length > 0) {
+    for (let i = 0; i < toUpsert.length; i += UPSERT_CHUNK) {
+      const chunk = toUpsert.slice(i, i + UPSERT_CHUNK);
       const upsert = await upsertUrlSuggestions(chunk);
       if (!upsert.ok) {
         return {
           exitCode: 1,
-          output: `upsert failed at chunk ${i / CHUNK + 1}: ${upsert.message ?? 'unknown error'}`,
+          output: `upsert failed at chunk ${i / UPSERT_CHUNK + 1}: ${upsert.message ?? 'unknown error'}`,
         };
       }
       summary.suggestionsWritten += upsert.data.upserted;
     }
   }
 
-  // ── Step 4: output ──
-  const summaryPayload = {
-    scanned: summary.scanned,
-    skipped_had_suggestion: summary.skippedHadSuggestion,
-    skipped_no_claim: summary.skippedNoClaim,
-    generated_for_records: summary.generatedForRecords,
-    suggestions_written: summary.suggestionsWritten,
-    provider_errors: summary.providerErrors,
-    cost_usd: Number(summary.costUsd.toFixed(4)),
-    budget_exhausted: summary.budgetExhausted,
-    providers_used: [...summary.providers.used].sort(),
-    providers_skipped: [...summary.providers.skipped].sort(),
-    dry_run: dryRun,
-  };
-
-  if (isJson) {
-    return { exitCode: 0, output: JSON.stringify({ summary: summaryPayload }) };
-  }
-
-  const lines = [
-    '',
-    '=== Summary ===',
-    `Scanned:                ${summary.scanned}`,
-    `Skipped (had pending):  ${summary.skippedHadSuggestion}`,
-    `Skipped (no claim):     ${summary.skippedNoClaim}`,
-    `Generated for records:  ${summary.generatedForRecords}`,
-    `Suggestions written:    ${summary.suggestionsWritten}${dryRun ? ' (dry-run)' : ''}`,
-    `Provider errors:        ${summary.providerErrors}`,
-    `Cost:                   $${summary.costUsd.toFixed(4)}`,
-    `Budget exhausted:       ${summary.budgetExhausted ? 'yes' : 'no'}`,
-    `Providers used:         ${[...summary.providers.used].sort().join(', ') || '(none)'}`,
-    summary.providers.skipped.size > 0
-      ? `Providers skipped:      ${[...summary.providers.skipped].sort().join(', ')}`
-      : '',
-  ].filter(Boolean);
-
-  return { exitCode: 0, output: lines.join('\n') };
-}
-
-// ── Helpers ──────────────────────────────────────────────────────────
-
-/**
- * Pre-fetch all pending suggestions in one or two paginated calls rather than
- * N per-record lookups. Returns a set of `${recordType}|${recordId}` keys.
- * Failures are swallowed (set stays empty) — the caller will still process
- * records, just without deduping.
- */
-async function buildExistingPendingSet(
-  recordTypeFilter: string | undefined,
-  expectedVerdictCount: number,
-  log: (msg: string) => void,
-): Promise<Set<string>> {
-  const set = new Set<string>();
-  // Over-fetch a bit to cover any stale pending rows beyond the current scan size.
-  // Cap at 2000 to avoid unbounded paging — the route clamps to 200 per page.
-  const MAX_PREFETCH = 2000;
-  const PAGE_SIZE = 200;
-  const target = Math.min(MAX_PREFETCH, Math.max(expectedVerdictCount * 2, PAGE_SIZE));
-
-  let offset = 0;
-  while (offset < target) {
-    const res = await listUrlSuggestions({
-      recordType: recordTypeFilter,
-      status: 'pending',
-      limit: PAGE_SIZE,
-      offset,
-    });
-    if (!res.ok) {
-      log(`  [warn] pre-fetch pending suggestions failed: ${res.message ?? 'unknown'}`);
-      return set;
-    }
-    for (const s of res.data.suggestions) {
-      set.add(`${s.recordType}|${s.recordId}`);
-    }
-    if (res.data.suggestions.length < PAGE_SIZE) break;
-    offset += PAGE_SIZE;
-  }
-  return set;
-}
-
-function emptySummary() {
-  return {
-    scanned: 0,
-    skipped_had_suggestion: 0,
-    skipped_no_claim: 0,
-    generated_for_records: 0,
-    suggestions_written: 0,
-    provider_errors: 0,
-    cost_usd: 0,
-    budget_exhausted: false,
-    providers_used: [] as string[],
-    providers_skipped: [] as string[],
-    dry_run: false,
-  };
-}
-
-function toSuggestionInput(
-  v: {
-    recordType: string;
-    recordId: string;
-    fieldName: string | null;
-    entityId: string | null;
-  },
-  cand: UrlSuggestion,
-): UrlSuggestionInput {
-  return {
-    recordType: v.recordType,
-    recordId: v.recordId,
-    fieldName: v.fieldName,
-    entityId: v.entityId,
-    suggestedUrl: cand.url,
-    title: cand.title,
-    snippet: cand.snippet,
-    relevanceScore: cand.relevanceScore,
-    sourceProvider: cand.sourceProvider,
-    generatorModel: GENERATOR_MODEL,
-    status: 'pending',
-  };
+  const output = isJson
+    ? JSON.stringify({ summary: summaryToJson(summary, dryRun) })
+    : formatSummary(summary, dryRun);
+  return { exitCode: 0, output };
 }
 
 // ── Exports ──────────────────────────────────────────────────────────

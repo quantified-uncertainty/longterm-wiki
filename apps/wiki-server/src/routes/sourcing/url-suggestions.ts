@@ -26,18 +26,15 @@ import {
   notFoundError,
 } from "../shared/utils.js";
 
-const MAX_URL_LENGTH = 2048;
 const MAX_BATCH = 200;
-
 const VALID_STATUSES = ["pending", "approved", "rejected", "auto_verified"] as const;
-type Status = (typeof VALID_STATUSES)[number];
 
 const SuggestionInput = z.object({
   recordType: z.string().min(1).max(50),
   recordId: z.string().min(1).max(500),
   fieldName: z.string().max(200).nullable().optional(),
   entityId: z.string().max(200).nullable().optional(),
-  suggestedUrl: z.string().url().max(MAX_URL_LENGTH),
+  suggestedUrl: z.string().url().max(2048),
   title: z.string().max(500).nullable().optional(),
   snippet: z.string().max(2000).nullable().optional(),
   relevanceScore: z.number().min(0).max(1).nullable().optional(),
@@ -76,33 +73,21 @@ const urlSuggestionsApp = new Hono()
 
     const { suggestions } = parsed.data;
 
+    // COALESCE-based conflict target cannot be expressed via Drizzle's typed
+    // .onConflictDoUpdate(), so we emit a multi-row VALUES list as raw SQL.
+    // The matching unique index lives in migration 0176.
+    const valueRows = suggestions.map(
+      (s) => sql`(
+        ${s.recordType}, ${s.recordId}, ${s.fieldName ?? null}, ${s.entityId ?? null},
+        ${s.suggestedUrl}, ${s.title ?? null}, ${s.snippet ?? null}, ${s.relevanceScore ?? null},
+        ${s.sourceProvider}, ${s.generatorModel ?? null}, ${s.status}, ${s.notes ?? null},
+        NOW(), NOW()
+      )`
+    );
+
     try {
-      const db = getDrizzleDb();
-      // COALESCE-based conflict target cannot be expressed via Drizzle's typed
-      // .onConflictDoUpdate(), so we emit a multi-row VALUES list as raw SQL and
-      // run it inside a transaction so the whole batch is atomic. Batch is bounded
-      // by Zod (MAX_BATCH=200). The unique index lives in migration 0176.
-      let upserted = 0;
-      await db.transaction(async (tx) => {
-        const valueRows = suggestions.map(
-          (s) => sql`(
-            ${s.recordType},
-            ${s.recordId},
-            ${s.fieldName ?? null},
-            ${s.entityId ?? null},
-            ${s.suggestedUrl},
-            ${s.title ?? null},
-            ${s.snippet ?? null},
-            ${s.relevanceScore ?? null},
-            ${s.sourceProvider},
-            ${s.generatorModel ?? null},
-            ${s.status},
-            ${s.notes ?? null},
-            NOW(),
-            NOW()
-          )`
-        );
-        await tx.execute(sql`
+      await getDrizzleDb().transaction((tx) =>
+        tx.execute(sql`
           INSERT INTO sourcing_url_suggestions (
             record_type, record_id, field_name, entity_id,
             suggested_url, title, snippet, relevance_score,
@@ -124,16 +109,12 @@ const urlSuggestionsApp = new Hono()
             END,
             notes = COALESCE(EXCLUDED.notes, sourcing_url_suggestions.notes),
             updated_at = NOW()
-        `);
-        // Every input row is either inserted or updated under DO UPDATE; the
-        // count equals the input batch size by construction.
-        upserted = suggestions.length;
-      });
-      return c.json({ upserted });
+        `)
+      );
+      // DO UPDATE guarantees every input row is either inserted or updated.
+      return c.json({ upserted: suggestions.length });
     } catch (err) {
-      return dbError(c, "url-suggestions upsert", err, {
-        batchSize: suggestions.length,
-      });
+      return dbError(c, "url-suggestions upsert", err, { batchSize: suggestions.length });
     }
   })
   .get("/", zv("query", QuerySchema), async (c) => {
@@ -164,50 +145,36 @@ const urlSuggestionsApp = new Hono()
       return dbError(c, "url-suggestions query", err);
     }
   })
+  // `/:id{[0-9]+}` guarantees id is a positive integer before the handler runs.
   .patch("/:id{[0-9]+}", async (c) => {
     const id = Number(c.req.param("id"));
-    if (!Number.isFinite(id) || id <= 0) {
-      return validationError(c, "id must be a positive integer");
-    }
 
     const raw = await parseJsonBody(c);
     if (raw == null) return invalidJsonError(c);
     const parsed = PatchBody.safeParse(raw);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const patch = parsed.data;
     // Distinguish "notes omitted" (preserve) from "notes: null" (clear) against
-    // the raw body — Zod parse can elide/normalize undefined keys.
+    // the raw body — Zod can elide undefined keys on parse.
     const notesKeyPresent =
-      typeof raw === "object" && raw !== null && "notes" in (raw as object);
+      typeof raw === "object" && raw !== null && "notes" in raw;
     const now = new Date();
 
     try {
-      const db = getDrizzleDb();
-      // Drizzle skips `undefined` fields but writes `null` as SQL NULL.
-      const setClause: {
-        status: typeof patch.status;
-        reviewedBy: string | null;
-        reviewedAt: Date;
-        updatedAt: Date;
-        notes?: string | null;
-      } = {
-        status: patch.status,
-        reviewedBy: patch.reviewedBy ?? null,
-        reviewedAt: now,
-        updatedAt: now,
-      };
-      if (notesKeyPresent) setClause.notes = patch.notes ?? null;
-
-      const updated = await db
+      const updated = await getDrizzleDb()
         .update(sourcingUrlSuggestions)
-        .set(setClause)
+        .set({
+          status: parsed.data.status,
+          reviewedBy: parsed.data.reviewedBy ?? null,
+          reviewedAt: now,
+          updatedAt: now,
+          // Drizzle skips `undefined` fields but writes `null` as SQL NULL.
+          ...(notesKeyPresent && { notes: parsed.data.notes ?? null }),
+        })
         .where(eq(sourcingUrlSuggestions.id, id))
         .returning({ id: sourcingUrlSuggestions.id });
 
-      if (updated.length === 0) {
-        return notFoundError(c, `suggestion ${id} not found`);
-      }
+      if (updated.length === 0) return notFoundError(c, `suggestion ${id} not found`);
       return c.json({ ok: true, id });
     } catch (err) {
       return dbError(c, "url-suggestions patch", err, { id });
@@ -216,6 +183,3 @@ const urlSuggestionsApp = new Hono()
 
 export const urlSuggestionsRoute = urlSuggestionsApp;
 export type UrlSuggestionsRoute = typeof urlSuggestionsApp;
-
-export { VALID_STATUSES };
-export type { Status };

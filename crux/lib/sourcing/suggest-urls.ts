@@ -67,45 +67,35 @@ export function buildSearchQuery(opts: {
   claimText: string;
   fieldName?: string | null;
 }): string {
-  const { entityName, claimText, fieldName } = opts;
+  // Strip quotes and newlines from untrusted inputs so they can't break Exa's
+  // quote-wrapping or the JSON prompts sent to Perplexity.
+  const sanitize = (s: string) =>
+    s.replace(/["\r\n]/g, " ").replace(/\s+/g, " ").trim();
 
-  // Strip quotes and newlines from untrusted inputs — they'd break the Exa
-  // query wrapper and the JSON prompts sent to Perplexity.
-  const sanitize = (s: string) => s.replace(/["\r\n]/g, " ").replace(/\s+/g, " ").trim();
-  const safeEntity = sanitize(entityName);
-  const safeClaim = sanitize(claimText);
-  const safeField = fieldName ? sanitize(fieldName.replace(/_/g, " ")) : "";
+  const entity = sanitize(opts.entityName);
+  const field = opts.fieldName ? sanitize(opts.fieldName.replace(/_/g, " ")) : "";
+  const claim = sanitize(opts.claimText);
+  const trimmedClaim = claim.length > 160 ? `${claim.slice(0, 157)}...` : claim;
 
-  // Shorter claims go verbatim; longer ones get truncated so query stays tight.
-  const trimmedClaim = safeClaim.length > 160 ? `${safeClaim.slice(0, 157)}...` : safeClaim;
-
-  const parts: string[] = [];
-  parts.push(`"${safeEntity}"`);
-  if (safeField) parts.push(safeField);
-  if (trimmedClaim) parts.push(trimmedClaim);
-
-  return parts.join(" ").slice(0, 300);
+  return [`"${entity}"`, field, trimmedClaim]
+    .filter(Boolean)
+    .join(" ")
+    .slice(0, 300);
 }
+
+const TRACKING_PARAMS = [
+  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
+  "ref", "ref_src",
+];
 
 function normalizeUrl(url: string): string {
   try {
     const u = new URL(url);
-    // Lowercase host (case-insensitive in DNS), drop fragment and tracking params.
     u.hostname = u.hostname.toLowerCase();
     u.hash = "";
-    const stripParams = [
-      "utm_source",
-      "utm_medium",
-      "utm_campaign",
-      "utm_content",
-      "utm_term",
-      "ref",
-      "ref_src",
-    ];
-    for (const p of stripParams) u.searchParams.delete(p);
-    let s = u.toString();
-    if (s.endsWith("/") && u.pathname !== "/") s = s.slice(0, -1);
-    return s;
+    for (const p of TRACKING_PARAMS) u.searchParams.delete(p);
+    const s = u.toString();
+    return s.endsWith("/") && u.pathname !== "/" ? s.slice(0, -1) : s;
   } catch {
     return url;
   }
@@ -130,70 +120,58 @@ function dedupeHits(hits: SearchHit[], maxCandidates: number): SearchHit[] {
 }
 
 /**
- * Run web search and return 1-3 candidate URLs. Returns `candidates: []` if no
- * provider API keys are configured or all providers fail.
+ * Run web search and return 1-3 candidate URLs. Returns `candidates: []` if
+ * no API keys are configured or all providers fail.
  */
-export async function suggestUrls(
-  input: SuggestUrlsInput
-): Promise<SuggestUrlsResult> {
+export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsResult> {
   const {
-    entityName,
-    claimText,
-    fieldName,
-    existingUrl,
-    maxCandidates = 3,
-    useExa = true,
-    usePerplexity = true,
+    entityName, claimText, fieldName, existingUrl,
+    maxCandidates = 3, useExa = true, usePerplexity = true,
   } = input;
 
   const query = buildSearchQuery({ entityName, claimText, fieldName });
-  // "used" tracks providers that actually returned successfully; "skipped"
-  // covers both missing-key and failed calls. A failed attempt appears only
-  // in `skipped`, never in both.
+  // Request 2x max so dedup + existing-url filter still leave enough candidates.
+  const perProvider = Math.max(maxCandidates * 2, 4);
+
+  // `used` tracks successful providers; `skipped` covers missing-key and failed
+  // calls. A failed attempt appears only in `skipped`, never in both.
   const providersUsed: string[] = [];
   const providersSkipped: string[] = [];
   let costUsd = 0;
 
-  // Request 2x max so after dedup + existing-url filter we can still return maxCandidates.
-  const perProvider = Math.max(maxCandidates * 2, 4);
+  const runProvider = async (
+    name: string,
+    enabled: boolean,
+    apiKey: string,
+    fetch: () => Promise<{ hits: SearchHit[]; cost?: number }>,
+  ): Promise<SearchHit[]> => {
+    if (!enabled) return [];
+    if (!getApiKey(apiKey)) {
+      providersSkipped.push(`${name}:no-key`);
+      return [];
+    }
+    try {
+      const { hits, cost } = await fetch();
+      providersUsed.push(name);
+      costUsd += cost ?? 0;
+      return hits;
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : String(err);
+      providersSkipped.push(`${name}:${msg.slice(0, 120)}`);
+      return [];
+    }
+  };
 
-  const tasks: Promise<SearchHit[]>[] = [];
-
-  if (useExa && getApiKey("EXA_API_KEY")) {
-    tasks.push(
-      searchExa(query, perProvider)
-        .then((hits) => {
-          providersUsed.push("exa");
-          return hits;
-        })
-        .catch((err: unknown) => {
-          providersSkipped.push(`exa:${errorMessage(err)}`);
-          return [] as SearchHit[];
-        })
-    );
-  } else if (useExa) {
-    providersSkipped.push("exa:no-key");
-  }
-
-  if (usePerplexity && getApiKey("OPENROUTER_API_KEY")) {
-    tasks.push(
-      searchPerplexity(query, perProvider)
-        .then((r) => {
-          providersUsed.push("perplexity");
-          costUsd += r.cost;
-          return r.hits;
-        })
-        .catch((err: unknown) => {
-          providersSkipped.push(`perplexity:${errorMessage(err)}`);
-          return [] as SearchHit[];
-        })
-    );
-  } else if (usePerplexity) {
-    providersSkipped.push("perplexity:no-key");
-  }
-
-  const results = await Promise.all(tasks);
-  const allHits = results.flat();
+  const allHits = (
+    await Promise.all([
+      runProvider("exa", useExa, "EXA_API_KEY", async () => ({
+        hits: await searchExa(query, perProvider),
+      })),
+      runProvider("perplexity", usePerplexity, "OPENROUTER_API_KEY", () =>
+        searchPerplexity(query, perProvider),
+      ),
+    ])
+  ).flat();
 
   // Filter out the existing (unverifiable) URL so we don't re-suggest it.
   const existingKey = existingUrl ? normalizeUrl(existingUrl) : null;
@@ -201,21 +179,13 @@ export async function suggestUrls(
     ? allHits.filter((h) => normalizeUrl(h.url) !== existingKey)
     : allHits;
 
-  const ranked = dedupeHits(filtered, maxCandidates);
-
-  const candidates: UrlSuggestion[] = ranked.map((hit) => ({
+  const candidates: UrlSuggestion[] = dedupeHits(filtered, maxCandidates).map((hit) => ({
     url: hit.url,
     title: hit.title,
     snippet: hit.snippet ?? null,
-    // No cross-provider score model yet — leave null. Can be added later.
-    relevanceScore: null,
+    relevanceScore: null, // No cross-provider score model yet.
     sourceProvider: hit.provider,
   }));
 
   return { candidates, providersUsed, providersSkipped, query, costUsd };
-}
-
-function errorMessage(err: unknown): string {
-  if (err instanceof Error) return err.message.slice(0, 120);
-  return String(err).slice(0, 120);
 }
