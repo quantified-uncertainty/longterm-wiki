@@ -25,7 +25,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import type { CommandResult, CommandOptions } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
-import { parseChecklist, type ParsedItem } from '../lib/session/session-checklist.ts';
+import { parseChecklist, detectPatternItems, type ParsedItem } from '../lib/session/session-checklist.ts';
 import { getPatternById, PATTERNS } from '../lib/review-patterns/patterns.ts';
 import { createLogger } from '../lib/output.ts';
 
@@ -94,6 +94,51 @@ async function check(_args: string[], options: CommandOptions): Promise<CommandR
         `${c.red}No checklist found at ${CHECKLIST_PATH}.${c.reset}\n` +
         `Run \`pnpm crux sys agent-checklist init "task" --type=X\` first.\n`,
     };
+  }
+
+  // Freshness check: re-detect patterns from the current diff. If the diff
+  // has advanced since `init` (e.g., /agent-review-pr fixed code, or later
+  // commits introduced a new bug shape), any newly-triggered pattern would
+  // be invisible to the old checklist. Fail closed and point at `init` so
+  // the reviewer picks up the new items before shipping.
+  const { items: freshPatternItems } = detectPatternItems(PROJECT_ROOT);
+  const existingReviewIds = new Set(
+    items.filter((i) => i.id.startsWith('review-')).map((i) => i.id),
+  );
+  const missingFresh = freshPatternItems.filter(
+    (p) => !existingReviewIds.has(p.id),
+  );
+  if (missingFresh.length > 0) {
+    if (options.json) {
+      return {
+        exitCode: 1,
+        output: JSON.stringify(
+          {
+            ok: false,
+            reason: 'stale-checklist',
+            missing: missingFresh.map((p) => ({ id: p.id, label: p.label })),
+          },
+          null,
+          2,
+        ),
+      };
+    }
+    const lines: string[] = [];
+    lines.push(
+      `${c.red}✗ ${missingFresh.length} review pattern(s) triggered since checklist was generated:${c.reset}`,
+    );
+    lines.push('');
+    for (const p of missingFresh) {
+      lines.push(`  ${c.bold}${p.id}${c.reset} — ${p.label}`);
+    }
+    lines.push('');
+    lines.push(
+      `${c.dim}The checklist is stale. Re-run \`pnpm crux sys agent-checklist init\` to refresh,${c.reset}`,
+    );
+    lines.push(
+      `${c.dim}then address each new pattern before retrying ship.${c.reset}`,
+    );
+    return { exitCode: 1, output: lines.join('\n') + '\n' };
   }
 
   const results = collectPatternAttestations(items);
