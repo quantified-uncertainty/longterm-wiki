@@ -141,7 +141,7 @@ Previous reasoning: ${previousReasoning}
 
 Source text (excerpt):
 ---
-${sourceText.slice(0, 4000)}
+${sourceText.slice(0, SOURCE_CHECK_CONSTANTS.PROMPT_CONTENT_LENGTH)}
 ---
 
 Re-verify this record against the source text. Has anything changed since the last check?
