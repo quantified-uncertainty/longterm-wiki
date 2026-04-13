@@ -8,7 +8,7 @@
  *   2. Research better source URLs for records missing good sources
  *   3. Register new URLs via POST /api/resources/suggest and wait for ingest
  *   4. Reset stale verdicts to unchecked
- *   5. Run source-check verification for the entity
+ *   5. Run sourcing verification for the entity
  *   6. Report results
  *
  * Usage:
@@ -145,7 +145,7 @@ async function resolveEntity(identifier: string): Promise<ResolvedEntity | null>
 }
 
 /**
- * Find organizations with the worst source-check coverage.
+ * Find organizations with the worst sourcing coverage.
  * Returns entities sorted by number of non-confirmed verdicts (worst first).
  */
 async function findEntitiesNeedingCuration(limit: number): Promise<ResolvedEntity[]> {
@@ -686,7 +686,7 @@ async function curateEntity(
     // Step 5: Run verification
     const verifyBudget = Math.min(budget - tracker.totalCost, 2.0); // Cap per-entity verify at $2
     if (verifyBudget > 0) {
-      console.log(`\n  ${c.bold}Step 5: Running source-check verification ($${verifyBudget.toFixed(2)} budget)...${c.reset}`);
+      console.log(`\n  ${c.bold}Step 5: Running sourcing verification ($${verifyBudget.toFixed(2)} budget)...${c.reset}`);
       const verifyResult = await runVerification(entity, verifyBudget, recordLimit, tableFilter);
       console.log(`  Verification complete. Cost: $${verifyResult.cost.toFixed(3)}`);
     } else {
@@ -1119,7 +1119,7 @@ Pipeline per entity:
   3. Register new URLs via /api/resources/suggest + ingest content
   4. Update personnel records with new source URLs
   5. Reset stale verdicts to unchecked
-  6. Run source-check verification
+  6. Run sourcing verification
   7. Report before/after comparison
 
 Cost estimate:

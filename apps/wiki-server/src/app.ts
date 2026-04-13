@@ -205,8 +205,6 @@ export function createApp() {
   // Unified sourcing system — mount sub-routes before the catch-all parent.
   app.route("/api/sourcing/url-suggestions", urlSuggestionsRoute);
   app.route("/api/sourcing", sourcingRoute);
-  // Backward-compat alias: old /api/source-checks/* → /api/sourcing/*
-  app.route("/api/source-checks", sourcingRoute);
 
   // WikiBase routes — prose content and page metadata
   app.route("/api/pages", pagesRoute);
