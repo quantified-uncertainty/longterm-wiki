@@ -289,6 +289,51 @@ export interface LinearTriageIssue {
 }
 
 // ---------------------------------------------------------------------------
+// Children / parent-epic detection
+// ---------------------------------------------------------------------------
+
+export interface LinearChildIssue {
+  identifier: string;
+  title: string;
+  state: { name: string; type: string };
+}
+
+/**
+ * Fetch direct children (sub-issues) of a single Linear issue.
+ *
+ * Used by the audit command to detect parent epics whose sub-issues have
+ * all resolved — the parent can be closed but typically isn't linked to a
+ * PR, so Linear's GitHub integration won't auto-close it.
+ */
+export async function getIssueChildren(
+  identifier: string,
+): Promise<LinearChildIssue[]> {
+  try {
+    const data = await linearGraphQL<{
+      issue: { children: { nodes: LinearChildIssue[] } } | null;
+    }>(
+      `query Children($id: String!) {
+        issue(id: $id) {
+          children(first: 50) {
+            nodes {
+              identifier
+              title
+              state { name type }
+            }
+          }
+        }
+      }`,
+      { id: identifier },
+    );
+    return data.issue?.children.nodes ?? [];
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/Entity not found|EntityNotFound/i.test(msg)) return [];
+    throw e;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // List ready issues (for "next issue" picking)
 // ---------------------------------------------------------------------------
 

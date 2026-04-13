@@ -62,6 +62,21 @@ fi
 
 Requires `LINEAR_API_KEY` (synced from `.env.base`). The `|| echo` suffix makes the Linear update best-effort so a missing key doesn't interrupt the rest of `/agent-end`. If Linear updates fail, fix the key and rerun `pnpm crux linear done <QUA-NNN>` manually — Linear is the source of truth for project status and leaving "In Progress" drift is bad.
 
+## Step 2a: Leak-check for other Linear refs
+
+Scan the session for Linear IDs beyond the primary issue that may have been worked on but not properly closed:
+
+```bash
+pnpm crux linear leak-check
+```
+
+This inspects the branch name, `.claude/wip-*` files, and commit messages for `QUA-NNN` references, then checks Linear state for each. If any secondary issue is still "In Progress" (and isn't being closed by an open PR), the command flags it.
+
+The check is advisory — it never blocks session end. If it surfaces a leak, decide:
+- The issue was genuinely worked on and its code shipped → `pnpm crux linear done QUA-NNN`
+- The issue was mentioned but not worked on this session → leave as-is (the mention was just cross-referencing)
+- Scope creep was not shipped → move it back to Backlog in Linear manually
+
 ## Step 2b: Update legacy GitHub issue (if applicable)
 
 If this session was working on a legacy GitHub issue (not a Linear issue) and a PR was created:

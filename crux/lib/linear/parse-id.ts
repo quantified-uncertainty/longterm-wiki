@@ -60,6 +60,25 @@ export function parseLinearId(input: string | null | undefined): string | null {
 }
 
 /**
+ * Find *all* Linear IDs in an unstructured string (git log, PR body, checklist).
+ * Deduplicated and case-normalized. Branch-pattern hits are included.
+ */
+export function findAllLinearIds(input: string | null | undefined): string[] {
+  if (!input) return [];
+  const ids = new Set<string>();
+  const bareGlobal = new RegExp(BARE_ID_RE.source, 'g');
+  let m: RegExpExecArray | null;
+  while ((m = bareGlobal.exec(input)) !== null) {
+    ids.add(`${m[1].toUpperCase()}-${m[2]}`);
+  }
+  const branchGlobal = new RegExp(BRANCH_ID_RE.source, 'gi');
+  while ((m = branchGlobal.exec(input)) !== null) {
+    ids.add(`${m[1].toUpperCase()}-${m[2]}`);
+  }
+  return [...ids];
+}
+
+/**
  * Parse a Linear ID from several sources, preferring earlier ones.
  * Designed for session-init: branch name first, then task description.
  */
