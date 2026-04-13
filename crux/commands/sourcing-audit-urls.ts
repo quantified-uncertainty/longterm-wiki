@@ -14,7 +14,11 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { listVerdicts, getEvidenceByRecord } from '../lib/wiki-server/sourcing-client.ts';
+import {
+  listVerdicts,
+  getEvidenceByRecords,
+  evidenceRecordKey,
+} from '../lib/wiki-server/sourcing-client.ts';
 import {
   classifyByUrl,
   normalizeUrlForJoin,
@@ -27,8 +31,14 @@ export { classifyByUrl, normalizeUrlForJoin, extractHost };
 
 // ── Module constants ──
 
-/** Parallel evidence-fetch requests. Keeps the wiki-server load light. */
-const CONCURRENCY = 8;
+/**
+ * Max records per batch evidence request. QUA-331 — matches the server
+ * cap `MAX_EVIDENCE_BY_RECORDS` in sourcing.ts. In practice one chunk is
+ * enough (listVerdicts clamps server-side to 200, so default `--verdict`
+ * sets produce ≤1000 records); the chunk loop is defensive in case that
+ * clamp grows or callers add more verdict types.
+ */
+const EVIDENCE_BATCH_SIZE = 1000;
 
 /** Evidence rows fetched per verdict record. Most records have 1–2. */
 const EVIDENCE_PER_RECORD = 5;
@@ -151,38 +161,50 @@ async function auditCommand(
     console.log('Fetching evidence for each (this may take a minute)...');
   }
 
-  // ── Step 2: fetch evidence per record ──
-  // N+1 pattern — acceptable for audit use (default --limit=100 => ~200 req).
-  // A dedicated bulk endpoint is a QUA-313 follow-up if this becomes slow.
-  const rows: AuditRow[] = [];
-  for (let i = 0; i < verdictRecords.length; i += CONCURRENCY) {
-    const slice = verdictRecords.slice(i, i + CONCURRENCY);
-    const results = await Promise.all(
-      slice.map(async (v) => {
-        const res = await getEvidenceByRecord(v.recordType, v.recordId, { limit: EVIDENCE_PER_RECORD });
-        if (!res.ok) return [];
-        const out: AuditRow[] = [];
-        for (const e of res.data.evidence) {
-          if (!e.sourceUrl) continue;
-          const sourceUrl = e.sourceUrl;
-          const cls = classifyByUrl(sourceUrl);
-          const flagged = cls.purpose === 'homepage' && cls.confidence >= FLAG_THRESHOLD;
-          out.push({
-            recordType: v.recordType,
-            recordId: v.recordId,
-            fieldName: e.fieldName,
-            verdict: v.verdict,
-            sourceUrl,
-            host: extractHost(sourceUrl),
-            flagged,
-            flagReasons: cls.reasons,
-            confidence: cls.confidence,
-          });
-        }
-        return out;
-      }),
+  // ── Step 2: batch-fetch evidence (QUA-331) ──
+  // Accumulate across chunks into one map, then iterate `verdictRecords`
+  // in input order so report output stays deterministic regardless of
+  // server-side grouping.
+  const allEvidence: Record<
+    string,
+    Array<{ sourceUrl: string | null; fieldName: string | null }>
+  > = {};
+  for (let i = 0; i < verdictRecords.length; i += EVIDENCE_BATCH_SIZE) {
+    const chunk = verdictRecords.slice(i, i + EVIDENCE_BATCH_SIZE);
+    const res = await getEvidenceByRecords(
+      chunk.map((v) => ({ recordType: v.recordType, recordId: v.recordId })),
+      { limitPerRecord: EVIDENCE_PER_RECORD },
     );
-    for (const r of results) rows.push(...r);
+    if (!res.ok) {
+      return {
+        exitCode: 1,
+        output: `Failed to batch-fetch evidence: ${res.message ?? 'unknown error'}`,
+      };
+    }
+    Object.assign(allEvidence, res.data.evidenceByKey);
+  }
+
+  const rows: AuditRow[] = [];
+  for (const v of verdictRecords) {
+    const evidenceRows = allEvidence[evidenceRecordKey(v.recordType, v.recordId)];
+    if (!evidenceRows) continue;
+    for (const e of evidenceRows) {
+      if (!e.sourceUrl) continue;
+      const sourceUrl = e.sourceUrl;
+      const cls = classifyByUrl(sourceUrl);
+      const flagged = cls.purpose === 'homepage' && cls.confidence >= FLAG_THRESHOLD;
+      rows.push({
+        recordType: v.recordType,
+        recordId: v.recordId,
+        fieldName: e.fieldName,
+        verdict: v.verdict,
+        sourceUrl,
+        host: extractHost(sourceUrl),
+        flagged,
+        flagReasons: cls.reasons,
+        confidence: cls.confidence,
+      });
+    }
   }
 
   // ── Step 3: aggregate by domain (over ALL rows, so totals are accurate
