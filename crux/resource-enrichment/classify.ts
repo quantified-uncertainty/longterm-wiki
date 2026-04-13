@@ -122,7 +122,10 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
           30000,
         );
         if (!writeResult.ok) {
-          console.warn(`  ✗ Fast-path batch write failed: ${writeResult.message}`);
+          return {
+            exitCode: 1,
+            output: `Fast-path batch write failed: ${writeResult.message}`,
+          };
         }
       }
       console.log(`  ✓ Wrote ${fastPathHits.length} fast-path classifications`);
