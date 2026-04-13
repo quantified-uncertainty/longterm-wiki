@@ -96,6 +96,7 @@ import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-en
 import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
 import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
 import * as sourcingAuditUrlsCommands from './commands/sourcing-audit-urls.ts';
+import * as sourcingSuggestUrlsCommands from './commands/sourcing-suggest-urls.ts';
 import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
 import * as sourcingWikiPagesCommands from './commands/sourcing-wiki-pages.ts';
@@ -184,6 +185,7 @@ const domains = {
   'verify-orchestrate': verifyOrchestrateCommands,
   'sourcing-recheck': sourcingRecheckCommands,
   'sourcing-audit-urls': sourcingAuditUrlsCommands,
+  'sourcing-suggest-urls': sourcingSuggestUrlsCommands,
   'migrate-citations': migrateCitationsCommands,
   'sourcing-wiki-pages': sourcingWikiPagesCommands,
   'qa-sweep': qaSweepCommands,

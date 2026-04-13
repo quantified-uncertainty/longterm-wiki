@@ -186,7 +186,7 @@ const HAIKU_OUTPUT_COST_PER_M = HAIKU_PRICING.outputPerM;
 // Exa search
 // ---------------------------------------------------------------------------
 
-async function searchExa(query: string, maxResults: number): Promise<SearchHit[]> {
+export async function searchExa(query: string, maxResults: number): Promise<SearchHit[]> {
   const apiKey = getApiKey('EXA_API_KEY');
   if (!apiKey) throw new Error('EXA_API_KEY not set');
 
@@ -234,7 +234,7 @@ interface PerplexityApiResponse {
   error?: { message?: string };
 }
 
-async function searchPerplexity(
+export async function searchPerplexity(
   query: string,
   maxResults: number,
 ): Promise<{ hits: SearchHit[]; cost: number }> {
