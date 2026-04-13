@@ -354,9 +354,9 @@ audits:
     check_type: hybrid
     check_command: |
       curl -sSf --max-time 10 https://wiki-server.k8s.quantifieduncertainty.org/api/hallucination-risk/stats \
-        | jq -r '.totalSnapshots // "missing"' \
+        | jq -er '.totalSnapshots | numbers' \
         | awk '{
-            n=$1+0;
+            n=$1;
             printf "reltuples=%d threshold=140000\n", n;
             if (n > 140000) { printf "FAIL: over threshold (%dx target of 70000)\n", n/70000; exit 1 }
             else { print "PASS: within threshold" }

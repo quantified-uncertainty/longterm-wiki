@@ -8,7 +8,7 @@ export interface ShadowbanCheckConfig extends TaskConfig {
 }
 
 export interface SnapshotRetentionConfig extends TaskConfig {
-  /** Number of snapshots to keep per page (default: 100). */
+  /** Number of snapshots to keep per page (default: 30). */
   keep: number;
 }
 

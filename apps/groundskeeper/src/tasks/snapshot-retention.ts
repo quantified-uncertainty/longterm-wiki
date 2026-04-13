@@ -110,7 +110,7 @@ export async function snapshotRetention(
     const now = Date.now();
     if (now - lastMissingKeyWarnAt >= ONE_DAY_MS) {
       lastMissingKeyWarnAt = now;
-      await sendDiscordNotification(
+      void sendDiscordNotification(
         config,
         "⚠️ **Groundskeeper: snapshot retention disabled** — " +
           "`LONGTERMWIKI_SERVER_API_KEY` is not set in the groundskeeper pod. " +

@@ -23,6 +23,12 @@
 -- deletion of a wiki_pages row will cascade to its snapshot rows, so the
 -- orphan-page_id class of growth cannot recur.
 
+-- Bound the wait for ACCESS EXCLUSIVE locks. Without this, DROP CONSTRAINT
+-- and ADD CONSTRAINT ... NOT VALID still acquire ACCESS EXCLUSIVE and will
+-- wait indefinitely if another session holds a conflicting lock — exactly
+-- the QUA-302 deploy-stall pattern this migration is trying to fix.
+SET lock_timeout = '5s';
+
 -- Phase 1a: drop whatever FK currently references wiki_pages from the
 -- page_id column, by looking it up dynamically. The constraint name may be
 -- the original from 0026 (`hallucination_risk_snapshots_page_id_wiki_pages_id_fk`),
@@ -64,6 +70,8 @@ ALTER TABLE "hallucination_risk_snapshots"
   FOREIGN KEY ("page_id") REFERENCES "wiki_pages"("id")
   ON DELETE CASCADE ON UPDATE NO ACTION
   NOT VALID;
+
+RESET lock_timeout;
 
 -- VALIDATE CONSTRAINT is INTENTIONALLY NOT run here. The table currently
 -- contains orphan rows (snapshots whose page_id no longer exists in

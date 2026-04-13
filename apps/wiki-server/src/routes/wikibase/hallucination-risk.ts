@@ -475,7 +475,7 @@ const hallucinationRiskApp = new Hono()
             SELECT id FROM (
               SELECT id, ROW_NUMBER() OVER (
                 -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
+                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC, id DESC
               ) AS rn
               FROM hallucination_risk_snapshots
             ) ranked
@@ -523,7 +523,7 @@ const hallucinationRiskApp = new Hono()
             SELECT id FROM (
               SELECT id, ROW_NUMBER() OVER (
                 -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
+                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC, id DESC
               ) AS rn
               FROM hallucination_risk_snapshots
             ) ranked
