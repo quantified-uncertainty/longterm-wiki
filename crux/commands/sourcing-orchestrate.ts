@@ -346,7 +346,13 @@ Options:
   --entity-type=X        Filter by entity type (organization, person, ai-model, ...)
   --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
-  --concurrency=N        Number of parallel sourcing (default: 5)
+  --concurrency=N        Parallel task count (default: 5, hard max: 8).
+                         Values above 8 are silently clamped with a
+                         stderr warning. No env-var escape hatch — the
+                         cap exists because --concurrency=20 tripped
+                         the wiki-server's IPS firewall on 2026-04-09
+                         (QUA-150). Each task fans out to ~5 HTTP calls,
+                         so the effective peak is ~40 in-flight writes.
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
 
