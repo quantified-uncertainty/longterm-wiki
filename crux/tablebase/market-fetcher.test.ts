@@ -124,4 +124,44 @@ describe('fetchManifoldQuestion', () => {
     expect(msg).toContain('404');
     expect(msg).not.toContain('outcomeType');
   });
+
+  it('does not warn about outcomeType when fetch throws (network error)', async () => {
+    fetchSpy.mockRejectedValue(new Error('ECONNREFUSED'));
+
+    const { fetchManifoldQuestion } = await import('./market-fetcher.ts');
+    const result = await fetchManifoldQuestion('unreachable-slug');
+
+    // The catch block returns null and emits a single error warning —
+    // it should NOT fall through to the outcomeType/probability warn path.
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const msg = warnSpy.mock.calls[0][0] as string;
+    expect(msg).toContain('unreachable-slug');
+    expect(msg).toContain('ECONNREFUSED');
+    expect(msg).not.toContain('outcomeType');
+  });
+
+  it('treats probability=0 as a valid BINARY probability (not null)', async () => {
+    // Edge case: Manifold may return 0 or 1 for a confident market. The
+    // fetcher must preserve the 0 (not coerce it to null) and not warn.
+    fetchSpy.mockResolvedValue(
+      mockResponse({
+        id: 'zero',
+        outcomeType: 'BINARY',
+        probability: 0,
+        uniqueBettorCount: 5,
+      })
+    );
+
+    const { fetchManifoldQuestion } = await import('./market-fetcher.ts');
+    const result = await fetchManifoldQuestion('zero-prob-market');
+
+    expect(result).toEqual({
+      probability: 0,
+      probabilityLow: null,
+      probabilityHigh: null,
+      numForecasters: 5,
+    });
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
 });

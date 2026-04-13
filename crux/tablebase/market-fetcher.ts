@@ -169,15 +169,13 @@ export async function fetchManifoldQuestion(
     // such markets disappear into `skippedCount` and the frontend shows "–"
     // with no diagnostic trail.
     if (probability == null) {
-      if (outcomeType !== MANIFOLD_BINARY_OUTCOME_TYPE) {
-        console.warn(
-          `  ⚠ Manifold market ${platformQuestionId} skipped: outcomeType=${outcomeType} has no scalar probability (only BINARY is supported; see QUA-188 for multi-outcome support)`
-        );
-      } else {
-        console.warn(
-          `  ⚠ Manifold market ${platformQuestionId} skipped: BINARY market returned null probability (possibly resolved or closed)`
-        );
-      }
+      const reason =
+        outcomeType !== MANIFOLD_BINARY_OUTCOME_TYPE
+          ? `outcomeType=${outcomeType} has no scalar probability (only BINARY is supported; see QUA-188 for multi-outcome support)`
+          : `BINARY market returned null probability (possibly resolved or closed)`;
+      console.warn(
+        `  ⚠ Manifold market ${platformQuestionId} skipped: ${reason}`
+      );
     }
 
     return {
