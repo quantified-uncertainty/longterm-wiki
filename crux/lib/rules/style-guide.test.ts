@@ -123,15 +123,6 @@ describe('style-guide rule', () => {
   });
 
   describe('skips', () => {
-    it('skips style guide pages', () => {
-      const content = mockContent(
-        '## Some broken page',
-        { path: 'content/docs/internal/style-guides/models.mdx' },
-      );
-      const issues = check(styleGuideRule, content);
-      expect(issues.length).toBe(0);
-    });
-
     it('skips index pages', () => {
       const content = mockContent(
         '## Some page',

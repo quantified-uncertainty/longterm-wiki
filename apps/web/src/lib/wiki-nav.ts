@@ -354,6 +354,7 @@ export function getInternalNav(): NavSection[] {
       items: [
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Data Architecture", href: internalHref("data-architecture") },
+        { label: "Data Architecture Overview", href: internalHref("data-architecture-overview") },
         { label: "Data System Authority", href: internalHref("data-system-authority") },
         { label: "Wiki Generation", href: internalHref("wiki-generation-architecture") },
         { label: "Content Pipeline", href: internalHref("content-pipeline-architecture") },

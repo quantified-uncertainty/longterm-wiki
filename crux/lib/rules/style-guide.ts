@@ -262,11 +262,6 @@ export const styleGuideRule = {
     const body = contentFile.body || '';
     const raw = contentFile.raw || '';
 
-    // Skip style guide pages themselves
-    if (filePath.includes('/style-guides/')) {
-      return issues;
-    }
-
     // Skip index pages
     if (contentFile.isIndex) {
       return issues;
