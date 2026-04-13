@@ -82,6 +82,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'verify',
       'verify-orchestrate',
       'sourcing-recheck',
+      'sourcing-cleanup-orphans',
       'migrate-citations',
       'legislation',
       'bluesky',

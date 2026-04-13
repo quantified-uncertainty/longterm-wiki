@@ -27,6 +27,7 @@ export type VerdictByRecordResult = InferResponseType<RpcClient['verdicts'][':re
 export type DueForRecheckResult = InferResponseType<RpcClient['due-for-recheck']['$get'], 200>;
 export type EvidenceByRecordResult = InferResponseType<RpcClient['evidence'][':recordType'][':recordId']['$get'], 200>;
 export type SourcingStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
+export type CleanupOrphansResult = InferResponseType<RpcClient['cleanup-orphans']['$post'], 200>;
 
 /** A single verdict entry from the list. */
 export type VerdictListEntry = ListVerdictsResult['verdicts'][number];
@@ -94,6 +95,21 @@ export async function getEvidenceByRecord(
 /** Get sourcing statistics. */
 export async function getSourcingStats(): Promise<ApiResult<SourcingStatsResult>> {
   return apiRequest<SourcingStatsResult>('GET', '/api/sourcing/stats');
+}
+
+/**
+ * Clean up orphaned source-check rows for deleted records (QUA-149).
+ *
+ * `dryRun` defaults to true — callers must pass `dryRun: false` explicitly
+ * to delete. `recordType` scopes cleanup to a single type.
+ */
+export async function cleanupOrphanVerdicts(
+  options?: { dryRun?: boolean; recordType?: string },
+): Promise<ApiResult<CleanupOrphansResult>> {
+  return apiRequest<CleanupOrphansResult>('POST', '/api/sourcing/cleanup-orphans', {
+    dryRun: options?.dryRun ?? true,
+    ...(options?.recordType ? { recordType: options.recordType } : {}),
+  });
 }
 
 // ---------------------------------------------------------------------------
