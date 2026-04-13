@@ -200,4 +200,63 @@ describe("FBCellValue", () => {
     render(<FBCellValue value={50_000_000} fieldName="amount" />);
     expect(screen.getByText("$50 million")).toBeInTheDocument();
   });
+
+  // Drizzle numeric() columns return JS strings. These tests guard the
+  // coerce-then-delegate path in FBCellValue against regressions.
+  describe("string-typed PG numeric fallback", () => {
+    it("formats string-typed funding round raised as USD", () => {
+      render(<FBCellValue value="8000000000" fieldName="raised" />);
+      expect(screen.getByText("$8 billion")).toBeInTheDocument();
+    });
+
+    it("formats string-typed valuation as USD", () => {
+      render(<FBCellValue value="380000000000" fieldName="valuation" />);
+      expect(screen.getByText("$380 billion")).toBeInTheDocument();
+    });
+
+    it("formats camelCase raisedLow (PG column) as USD", () => {
+      render(<FBCellValue value="2600000000" fieldName="raisedLow" />);
+      expect(screen.getByText("$2.6 billion")).toBeInTheDocument();
+    });
+
+    it("formats impliedValuation as USD", () => {
+      render(<FBCellValue value="61500000000" fieldName="impliedValuation" />);
+      expect(screen.getByText("$61.5 billion")).toBeInTheDocument();
+    });
+
+    it("formats string-typed fraction field as percentage", () => {
+      const fieldDef: FieldDef = { type: "number", description: "" };
+      render(<FBCellValue value="0.05" fieldName="stake" fieldDef={fieldDef} />);
+      expect(screen.getByText("5%")).toBeInTheDocument();
+    });
+
+    it("respects explicit unit from schema over default USD", () => {
+      const fieldDef: FieldDef = { type: "number", unit: "percent", description: "" };
+      const { container } = render(
+        <FBCellValue value="0.12" fieldName="raised" fieldDef={fieldDef} />
+      );
+      expect(container.textContent).toContain("%");
+      expect(container.textContent).not.toContain("$");
+    });
+
+    it("leaves non-currency string values to existing paths", () => {
+      render(<FBCellValue value="123" fieldName="notes" />);
+      expect(screen.getByText("123")).toBeInTheDocument();
+    });
+
+    it("does not crash on non-numeric string in currency field", () => {
+      render(<FBCellValue value="not a number" fieldName="amount" />);
+      expect(screen.getByText("not a number")).toBeInTheDocument();
+    });
+
+    it("does not crash on empty string in currency field", () => {
+      const { container } = render(<FBCellValue value="" fieldName="raised" />);
+      expect(container).toBeTruthy();
+    });
+
+    it("handles non-finite strings gracefully", () => {
+      render(<FBCellValue value="Infinity" fieldName="valuation" />);
+      expect(screen.getByText("Infinity")).toBeInTheDocument();
+    });
+  });
 });

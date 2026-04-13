@@ -151,6 +151,19 @@ export function FBCellValue({ value, fieldName, fieldDef }: FBCellValueProps) {
     );
   }
 
+  // Drizzle numeric() columns return strings; coerce known currency/fraction
+  // columns to numbers and delegate back to the existing number paths above.
+  if (
+    typeof value === "string" &&
+    value.length > 0 &&
+    (CURRENCY_FIELD_NAMES.has(fieldName) || isFractionField(fieldName, fieldDef))
+  ) {
+    const n = Number(value);
+    if (Number.isFinite(n)) {
+      return <FBCellValue value={n} fieldName={fieldName} fieldDef={fieldDef} />;
+    }
+  }
+
   // Role badges for known role values
   if (fieldName === "role" && typeof value === "string") {
     const roleLower = value.toLowerCase();
