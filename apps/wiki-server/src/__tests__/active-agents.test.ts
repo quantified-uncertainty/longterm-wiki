@@ -565,6 +565,20 @@ describe("Active Agents API", () => {
       const res = await postJson(app, "/api/active-agents/999/heartbeat", {});
       expect(res.status).toBe(404);
     });
+
+    // QUA-440: the heartbeat also tries to bump agent_sessions.updated_at
+    // for the matching branch, but must not fail if no session exists (the
+    // common case for agents registered outside the agent-checklist flow).
+    it("succeeds even when no matching agent_sessions row exists", async () => {
+      await postJson(app, "/api/active-agents", sampleAgent);
+      // The test dispatcher's fallback for an UPDATE on agent_sessions is
+      // "return []", which is the same as "no matching rows" in prod. The
+      // heartbeat must still return 200.
+      const res = await postJson(app, "/api/active-agents/1/heartbeat", {});
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.ok).toBe(true);
+    });
   });
 
   // ================================================================

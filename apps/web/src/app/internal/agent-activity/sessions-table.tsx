@@ -123,6 +123,28 @@ const columns: ColumnDef<AgentSessionRow>[] = [
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
+  // QUA-440: Slot number — populated for sessions after QUA-440 lands.
+  // Older sessions show '—'.
+  {
+    accessorKey: "slotNumber",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Slot</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const slot = (row.original as { slotNumber?: number | null }).slotNumber;
+      if (slot === null || slot === undefined) {
+        return <span className="text-xs text-muted-foreground/50">—</span>;
+      }
+      return (
+        <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-foreground/90">
+          a{slot}
+        </span>
+      );
+    },
+    sortingFn: (a, b) =>
+      ((a.original as { slotNumber?: number | null }).slotNumber ?? -1) -
+      ((b.original as { slotNumber?: number | null }).slotNumber ?? -1),
+  },
   {
     accessorKey: "sessionType",
     header: ({ column }) => (
@@ -162,6 +184,27 @@ const columns: ColumnDef<AgentSessionRow>[] = [
           className="text-xs text-blue-600 hover:underline tabular-nums"
         >
           #{num}
+        </a>
+      );
+    },
+  },
+  // QUA-440: Linear issue ID, linked to Linear's issue page.
+  {
+    accessorKey: "linearId",
+    header: ({ column }) => (
+      <SortableHeader column={column}>Linear</SortableHeader>
+    ),
+    cell: ({ row }) => {
+      const id = (row.original as { linearId?: string | null }).linearId;
+      if (!id) return <span className="text-xs text-muted-foreground/50">—</span>;
+      return (
+        <a
+          href={`https://linear.app/quantifieduncertainty/issue/${id}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-xs font-mono text-blue-600 hover:underline"
+        >
+          {id}
         </a>
       );
     },

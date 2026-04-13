@@ -2,23 +2,30 @@
  * Dedup helpers for `crux linear start`.
  *
  * Detects whether another session has already claimed a Linear issue, so
- * that two agents don't race to implement the same ticket (QUA-406). The
- * check has two independent signals:
+ * that two agents don't race to implement the same ticket (QUA-406). Three
+ * independent signals, checked in this order:
  *
- * 1. Recent "🤖 Claude Code starting work" comments on the Linear issue
- *    from a different slot, not yet superseded by a "finished work" comment.
- * 2. Open PRs in the wiki repo whose title or body mentions the Linear ID.
+ * 1. **PG `agent_sessions` (QUA-440)** — the authoritative "who's live
+ *    right now" source. Queries sessions with matching `linear_id`,
+ *    `status='active'`, and `updated_at > now() - freshMinutes`. Fastest
+ *    path (~50ms). Filters out same-slot claims (session resumption).
+ * 2. **Linear start comments** — fallback when PG is unreachable or the
+ *    session didn't register (early crash). Same filtering rules, parsed
+ *    out of `🤖 Claude Code starting work` comment bodies.
+ * 3. **Open PRs** in the wiki repo whose title or body mentions the Linear
+ *    ID. Paranoia layer — catches abandoned branches that PG has
+ *    forgotten about and Linear comments never captured.
  *
- * Either signal is sufficient to block the `start` call. Users can override
- * with `--force` (see `crux linear start --force`). Both checks fail-open
- * on API errors: if GitHub or Linear is unreachable, we let the session
- * proceed rather than blocking on a transient glitch. The downside of a
- * rare missed collision is less bad than blocking all sessions when the
- * APIs hiccup.
+ * Any signal is sufficient to block the `start` call. Users can override
+ * with `--force` (see `crux linear start --force`). All checks fail-open
+ * on API errors: if a source is unreachable, we skip it rather than
+ * blocking on a transient glitch. The downside of a rare missed collision
+ * is less bad than blocking all sessions when the wiki-server hiccups.
  */
 
 import { githubApi, REPO } from '../github.ts';
 import { getComments, type LinearComment } from './issues.ts';
+import { getAgentSessionsByLinearId } from '../wiki-server/agent-sessions.ts';
 import type { SessionContext } from '../session/session-context.ts';
 
 // 24-hour window for considering a start comment "recent." Anything older
@@ -56,27 +63,89 @@ function parseStartClaim(comment: LinearComment): RecentStartClaim | null {
 }
 
 /**
- * Fetch recent start-work comments that represent unresolved claims by
- * another session. "Unresolved" means: posted in the last 24h, from a
+ * QUA-440: PG-first lookup for "who's actively claiming this Linear ID?"
+ * Queries `agent_sessions` via the wiki-server. Returns claims from other
+ * slots only — the caller's own slot is filtered here (session resumption
+ * is not a collision).
+ *
+ * Fail-open: returns null on API error so the caller can fall back to the
+ * Linear-comments path. Returning `null` (not `[]`) distinguishes "PG said
+ * clean" from "PG was unreachable" — the caller needs to know the
+ * difference to decide whether to fall back.
+ */
+async function findActiveClaimsByOthersFromPg(
+  linearId: string,
+  ctx: SessionContext,
+  freshMinutes: number,
+): Promise<RecentStartClaim[] | null> {
+  const result = await getAgentSessionsByLinearId(linearId, freshMinutes).catch(
+    () => null,
+  );
+  if (!result || !result.ok) return null;
+
+  const claims: RecentStartClaim[] = [];
+  for (const s of result.data.sessions) {
+    // Same-slot sessions are our own resumption, not a collision.
+    if (ctx.slot !== null && s.slotNumber === ctx.slot) continue;
+    // Our own branch — also not a collision. Covers the case where slot was
+    // unset at init time (e.g., running outside a slot dir) but the branch
+    // matches. Prevents re-init from blocking itself.
+    if (s.branch === ctx.branch) continue;
+    claims.push({
+      body:
+        `🤖 Claude Code starting work on this issue.\n\n` +
+        (s.slotNumber !== null ? `**Slot:** a${s.slotNumber}\n` : '') +
+        `**Branch:** \`${s.branch}\`\n` +
+        `(from PG agent_sessions — updated_at ${new Date(s.updatedAt).toISOString()})`,
+      createdAt: String(s.updatedAt),
+      branch: s.branch,
+      slot: s.slotNumber !== null ? `a${s.slotNumber}` : null,
+    });
+  }
+  return claims;
+}
+
+/**
+ * Fetch active claims on this Linear ID from any source. Consults PG
+ * first (QUA-440), falls back to Linear start comments (QUA-406) if PG is
+ * unreachable or returns no rows.
+ *
+ * "Active claim" means: posted within the freshness window, from a
  * different slot than ours, and not followed by a "finished work" comment
- * from the same session.
+ * from the same session (Linear-path only — PG uses `status='active'` +
+ * heartbeat instead).
  *
  * Same-slot re-runs (init crash recovery, resume) are not blocked — it's
  * the same user reclaiming their own workspace. Cross-slot starts are the
  * collision pattern we care about (QUA-406: a9 vs a16 on the same machine).
  *
- * Fail-open: returns an empty array if the Linear API is unreachable.
+ * Fail-open: returns an empty array if BOTH sources are unreachable.
  */
 export async function findActiveClaimsByOthers(
   linearId: string,
   ctx: SessionContext,
   nowMs: number = Date.now(),
 ): Promise<RecentStartClaim[]> {
+  // ── Source 1: PG agent_sessions (primary, fastest) ────────────────────
+  // The freshness window matches the active_agents stale timeout so a
+  // session that crashed >30min ago automatically releases its claim.
+  const pgClaims = await findActiveClaimsByOthersFromPg(linearId, ctx, 30);
+  if (pgClaims !== null && pgClaims.length > 0) return pgClaims;
+
+  // If PG said clean AND returned successfully, we still check Linear
+  // comments as a fallback — PG was only populated starting with QUA-440,
+  // so existing sessions from before this lands don't show up there.
+  // After a few weeks of rollout, this fallback becomes redundant and can
+  // be dropped. For now it preserves correctness.
+
+  // ── Source 2: Linear start comments (fallback) ─────────────────────────
   let comments: LinearComment[];
   try {
     comments = await getComments(linearId, 30);
   } catch {
-    return [];
+    // PG was queried above; if it returned [], we trust that. If it was
+    // unreachable (null) AND Linear is also down, fail-open.
+    return pgClaims ?? [];
   }
 
   // Walk comments chronologically to track which starts have been superseded

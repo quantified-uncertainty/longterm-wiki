@@ -32,7 +32,6 @@ import { commands as linearCommands, checkDedup as linearCheckDedup } from './li
 import { getIssue as getLinearIssue } from '../lib/linear/issues.ts';
 import { getSessionContext } from '../lib/session/session-context.ts';
 import { resolveLinearId, parseLinearId } from '../lib/linear/parse-id.ts';
-import { getSessionContext } from '../lib/session/session-context.ts';
 
 // ---------------------------------------------------------------------------
 // Constants

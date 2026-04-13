@@ -7,9 +7,10 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { SessionContext } from '../session/session-context.ts';
 
-const { getCommentsMock, githubApiMock } = vi.hoisted(() => ({
+const { getCommentsMock, githubApiMock, getAgentSessionsByLinearIdMock } = vi.hoisted(() => ({
   getCommentsMock: vi.fn(),
   githubApiMock: vi.fn(),
+  getAgentSessionsByLinearIdMock: vi.fn(),
 }));
 
 vi.mock('./issues.ts', () => ({
@@ -19,6 +20,10 @@ vi.mock('./issues.ts', () => ({
 vi.mock('../github.ts', () => ({
   githubApi: githubApiMock,
   REPO: 'quantified-uncertainty/longterm-wiki',
+}));
+
+vi.mock('../wiki-server/agent-sessions.ts', () => ({
+  getAgentSessionsByLinearId: getAgentSessionsByLinearIdMock,
 }));
 
 import {
@@ -64,6 +69,10 @@ const baseCtx: SessionContext = {
 beforeEach(() => {
   getCommentsMock.mockReset();
   githubApiMock.mockReset();
+  getAgentSessionsByLinearIdMock.mockReset();
+  // Default: PG query "fails open" (returns null) so existing tests (which
+  // pre-date the PG path) keep testing the Linear-comment fallback.
+  getAgentSessionsByLinearIdMock.mockResolvedValue({ ok: false });
 });
 
 describe('findActiveClaimsByOthers', () => {
@@ -138,6 +147,119 @@ describe('findActiveClaimsByOthers', () => {
     // ambiguous to block on. A slot-ful caller treats them as collisions.
     const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
     expect(claims).toHaveLength(1); // slot-ful caller treats as collision
+  });
+
+  // ── PG-first (QUA-440) ────────────────────────────────────────────────
+
+  describe('PG-first (QUA-440)', () => {
+    it('uses PG when it returns cross-slot active sessions, skipping Linear', async () => {
+      getAgentSessionsByLinearIdMock.mockResolvedValueOnce({
+        ok: true,
+        data: {
+          sessions: [
+            {
+              id: 1,
+              branch: 'claude/qua-406-other',
+              slotNumber: 9,
+              status: 'active',
+              updatedAt: new Date(now - 5 * 60 * 1000).toISOString(),
+              linearId: 'QUA-406',
+              task: 'other session',
+            },
+          ],
+          freshMinutes: 30,
+        },
+      });
+      const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
+      expect(claims).toHaveLength(1);
+      expect(claims[0].slot).toBe('a9');
+      expect(claims[0].branch).toBe('claude/qua-406-other');
+      // Linear comments should NOT have been consulted.
+      expect(getCommentsMock).not.toHaveBeenCalled();
+    });
+
+    it('filters out same-slot sessions (session resumption, not collision)', async () => {
+      getAgentSessionsByLinearIdMock.mockResolvedValueOnce({
+        ok: true,
+        data: {
+          sessions: [
+            {
+              id: 1,
+              branch: 'claude/qua-406-linear-start-dedup',
+              slotNumber: 5,
+              status: 'active',
+              updatedAt: new Date(now - 5 * 60 * 1000).toISOString(),
+              linearId: 'QUA-406',
+              task: 'same slot resume',
+            },
+          ],
+          freshMinutes: 30,
+        },
+      });
+      // PG says "no cross-slot claims" → fall through to Linear, which is
+      // empty → return []. The same-slot session is not a collision.
+      getCommentsMock.mockResolvedValueOnce([]);
+      const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
+      expect(claims).toEqual([]);
+    });
+
+    it('filters out same-branch sessions even when slot is unset', async () => {
+      const slotlessCtx: SessionContext = { ...baseCtx, slot: null };
+      getAgentSessionsByLinearIdMock.mockResolvedValueOnce({
+        ok: true,
+        data: {
+          sessions: [
+            {
+              id: 1,
+              branch: slotlessCtx.branch,
+              slotNumber: 9,
+              status: 'active',
+              updatedAt: new Date(now - 5 * 60 * 1000).toISOString(),
+              linearId: 'QUA-406',
+              task: 'same branch, different slot (e.g. re-init)',
+            },
+          ],
+          freshMinutes: 30,
+        },
+      });
+      getCommentsMock.mockResolvedValueOnce([]);
+      const claims = await findActiveClaimsByOthers('QUA-406', slotlessCtx, now);
+      expect(claims).toEqual([]);
+    });
+
+    it('falls through to Linear when PG returns an empty result', async () => {
+      getAgentSessionsByLinearIdMock.mockResolvedValueOnce({
+        ok: true,
+        data: { sessions: [], freshMinutes: 30 },
+      });
+      getCommentsMock.mockResolvedValueOnce([
+        startComment({ slot: 'a9', branch: 'claude/qua-406-from-linear', hoursAgo: 2 }),
+      ]);
+      const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
+      expect(claims).toHaveLength(1);
+      expect(claims[0].branch).toBe('claude/qua-406-from-linear');
+      expect(getCommentsMock).toHaveBeenCalledTimes(1);
+    });
+
+    it('falls through to Linear when PG is unreachable (ok: false)', async () => {
+      getAgentSessionsByLinearIdMock.mockResolvedValueOnce({ ok: false });
+      getCommentsMock.mockResolvedValueOnce([
+        startComment({ slot: 'a9', branch: 'claude/qua-406-from-linear', hoursAgo: 2 }),
+      ]);
+      const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
+      expect(claims).toHaveLength(1);
+    });
+
+    it('falls through to Linear when PG throws', async () => {
+      getAgentSessionsByLinearIdMock.mockRejectedValueOnce(
+        new Error('wiki-server unreachable'),
+      );
+      getCommentsMock.mockResolvedValueOnce([
+        startComment({ slot: 'a9', branch: 'claude/qua-406-from-linear', hoursAgo: 2 }),
+      ]);
+      const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
+      expect(claims).toHaveLength(1);
+    });
   });
 });
 

@@ -15,6 +15,11 @@ export interface ActiveAgentRow {
   status: string;
   currentStep: string | null;
   issueNumber: number | null;
+  // QUA-440: linear_id and slot_number live on agent_sessions; the wiki-server
+  // joins them onto each active agent by branch so the dashboard can show
+  // them without a second fetch.
+  linearId: string | null;
+  slotNumber: number | null;
   prNumber: number | null;
   filesTouched: string[] | null;
   model: string | null;
@@ -77,6 +82,8 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
     status: a.status,
     currentStep: a.currentStep,
     issueNumber: a.issueNumber,
+    linearId: a.linearId ?? null,
+    slotNumber: a.slotNumber ?? null,
     // Enrich: if prNumber isn't set but branch matches an open PR, use it
     prNumber: a.prNumber ?? (a.branch ? branchToPR.get(a.branch) ?? null : null),
     filesTouched: a.filesTouched,
