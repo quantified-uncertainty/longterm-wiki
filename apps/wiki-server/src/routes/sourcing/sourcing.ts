@@ -228,6 +228,24 @@ const ByPageQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+/**
+ * QUA-149: cleanup-orphans request body.
+ *
+ * `dryRun` (default true) reports how many rows *would* be deleted without
+ * touching the database. Callers must pass `dryRun: false` explicitly to
+ * perform the actual delete — this avoids accidental destructive calls.
+ *
+ * `recordType` optionally scopes cleanup to a single type (e.g., "personnel").
+ * If omitted, all known record types in LIVE_RECORDS_CTE are considered.
+ * Unknown record types (not in the CTE) are always left alone, even when
+ * `dryRun: false`, because we have no live-records source for them and
+ * can't tell whether they're orphaned or not.
+ */
+const CleanupOrphansBody = z.object({
+  dryRun: z.boolean().default(true),
+  recordType: z.string().max(50).optional(),
+});
+
 const VALID_ERROR_TYPES = [
   "contradicted",
   "outdated",
@@ -2099,6 +2117,153 @@ const sourcingApp = new Hono()
     }
 
     return c.json({ matrix, totals, exemptTypes: [...SOURCING_EXEMPT_TYPES] });
+  })
+
+  // ---- POST /cleanup-orphans (QUA-149) ----
+  //
+  // Delete verdict / evidence / url-suggestion rows whose (record_type, record_id)
+  // no longer has a live row in its source table. Dashboard stats filter orphans
+  // out at query time via LIVE_RECORDS_CTE, but the underlying rows accumulate
+  // (e.g., 1002 personnel verdicts for 724 records) and skew any raw COUNT(*).
+  //
+  // Safety rails:
+  //   - `dryRun` defaults to true. Pass `dryRun: false` explicitly to delete.
+  //   - Only record_types listed in LIVE_RECORDS_CTE are touched. Rows with an
+  //     unknown record_type are left alone.
+  //   - All deletes run inside a single transaction.
+  .post("/cleanup-orphans", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = CleanupOrphansBody.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const { dryRun, recordType } = parsed.data;
+    const db = getDrizzleDb();
+
+    const typeFilter = recordType
+      ? sql`AND v.record_type = ${recordType}`
+      : sql``;
+
+    // Rows targeted for deletion: known record_type, but the (type, id) pair
+    // is missing from live_records. Returned verbatim so dryRun/non-dryRun
+    // share the same counting logic.
+    const verdictOrphansSql = sql`
+      WITH ${LIVE_RECORDS_CTE}
+      SELECT v.record_type, v.record_id, v.field_name
+      FROM source_check_verdicts v
+      WHERE v.record_type IN (SELECT DISTINCT record_type FROM live_records)
+        ${typeFilter}
+        AND NOT EXISTS (
+          SELECT 1 FROM live_records lr
+          WHERE lr.record_type = v.record_type AND lr.record_id = v.record_id
+        )
+    `;
+    const evidenceOrphansSql = sql`
+      WITH ${LIVE_RECORDS_CTE}
+      SELECT e.id, e.record_type
+      FROM source_check_evidence e
+      WHERE e.record_type IN (SELECT DISTINCT record_type FROM live_records)
+        ${recordType ? sql`AND e.record_type = ${recordType}` : sql``}
+        AND NOT EXISTS (
+          SELECT 1 FROM live_records lr
+          WHERE lr.record_type = e.record_type AND lr.record_id = e.record_id
+        )
+    `;
+    const suggestionOrphansSql = sql`
+      WITH ${LIVE_RECORDS_CTE}
+      SELECT s.id, s.record_type
+      FROM sourcing_url_suggestions s
+      WHERE s.record_type IN (SELECT DISTINCT record_type FROM live_records)
+        ${recordType ? sql`AND s.record_type = ${recordType}` : sql``}
+        AND NOT EXISTS (
+          SELECT 1 FROM live_records lr
+          WHERE lr.record_type = s.record_type AND lr.record_id = s.record_id
+        )
+    `;
+
+    // Count-then-delete pattern. The COUNT runs even in non-dryRun mode so
+    // we can build byType without a second scan. Dry-run short-circuits
+    // before the DELETE statements.
+    const [verdictRows, evidenceRows, suggestionRows] = await Promise.all([
+      db.execute<{
+        record_type: string;
+        record_id: string;
+        field_name: string | null;
+      }>(verdictOrphansSql),
+      db.execute<{ id: number | string; record_type: string }>(evidenceOrphansSql),
+      db.execute<{ id: number | string; record_type: string }>(suggestionOrphansSql),
+    ]);
+
+    const byType: Record<
+      string,
+      { verdicts: number; evidence: number; suggestions: number }
+    > = {};
+    const bump = (type: string, key: "verdicts" | "evidence" | "suggestions") => {
+      const slot = byType[type] ?? { verdicts: 0, evidence: 0, suggestions: 0 };
+      slot[key] += 1;
+      byType[type] = slot;
+    };
+    for (const r of verdictRows) bump(r.record_type, "verdicts");
+    for (const r of evidenceRows) bump(r.record_type, "evidence");
+    for (const r of suggestionRows) bump(r.record_type, "suggestions");
+
+    const counts = {
+      verdicts: verdictRows.length,
+      evidence: evidenceRows.length,
+      suggestions: suggestionRows.length,
+    };
+
+    if (dryRun) {
+      return c.json({
+        dryRun: true,
+        deleted: counts,
+        byType,
+      });
+    }
+
+    // Non-dry-run: run the deletes in a single transaction. We re-run the
+    // same NOT EXISTS condition inside DELETE so the operation is atomic —
+    // no reliance on the IDs we just fetched, which avoids TOCTOU issues
+    // if the table changes between the SELECT and DELETE.
+    await db.transaction(async (tx) => {
+      await tx.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        DELETE FROM source_check_verdicts v
+        WHERE v.record_type IN (SELECT DISTINCT record_type FROM live_records)
+          ${typeFilter}
+          AND NOT EXISTS (
+            SELECT 1 FROM live_records lr
+            WHERE lr.record_type = v.record_type AND lr.record_id = v.record_id
+          )
+      `);
+      await tx.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        DELETE FROM source_check_evidence e
+        WHERE e.record_type IN (SELECT DISTINCT record_type FROM live_records)
+          ${recordType ? sql`AND e.record_type = ${recordType}` : sql``}
+          AND NOT EXISTS (
+            SELECT 1 FROM live_records lr
+            WHERE lr.record_type = e.record_type AND lr.record_id = e.record_id
+          )
+      `);
+      await tx.execute(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        DELETE FROM sourcing_url_suggestions s
+        WHERE s.record_type IN (SELECT DISTINCT record_type FROM live_records)
+          ${recordType ? sql`AND s.record_type = ${recordType}` : sql``}
+          AND NOT EXISTS (
+            SELECT 1 FROM live_records lr
+            WHERE lr.record_type = s.record_type AND lr.record_id = s.record_id
+          )
+      `);
+    });
+
+    return c.json({
+      dryRun: false,
+      deleted: counts,
+      byType,
+    });
   });
 
 // ---- Exports ----
