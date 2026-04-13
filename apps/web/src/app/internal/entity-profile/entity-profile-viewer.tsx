@@ -21,7 +21,7 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
-import { sanitizeRawIds } from "./sanitize-raw-ids";
+import { sanitizeRawIds, isAnyFactId, isLegacyResourceId } from "./sanitize-raw-ids";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -260,11 +260,9 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 const INITIAL_ROW_LIMIT = 20;
 
 // ── ID detection ──────────────────────────────────────────────────────────
-
-// FactBase fact IDs are `f_` + 8-12 alphanumeric chars (e.g. `f_dW5cR9mJ8q`).
-// Used by the cell renderer to detect raw fact IDs in any column and link them
-// to /factbase/fact/<id> instead of leaking the raw ID as visible text.
-const FACT_ID_RE = /^f_[A-Za-z0-9]{8,}$/;
+// Fact-ID detection now lives in `./sanitize-raw-ids.ts::isAnyFactId`, which
+// covers canonical `f_xxx`, legacy lowercase hex, and legacy mixed-case alnum
+// formats in a single column-gated helper (QUA-397).
 
 // ── Numeric formatting columns ────────────────────────────────────────────
 
@@ -347,11 +345,15 @@ function CellValue({
     return <JsonValue value={value} />;
   }
 
-  // FactBase fact IDs (f_xxx) -> render as link with "view →" label instead of leaking raw ID.
-  // Content-based, not column-name-gated: any cell value matching the fact-ID format gets
-  // rendered as a link, no matter which column it lives in. Mirrors how isAnySid() handles
-  // stableIds below, and prevents the recurring per-column patch loop (QUA-316, QUA-346).
-  if (typeof value === "string" && FACT_ID_RE.test(value)) {
+  // FactBase fact IDs → render as `view →` link instead of leaking raw text.
+  // Covers three id shapes (QUA-397):
+  //   1. Canonical `f_xxx...` (content-based, any column)
+  //   2. Legacy 8-12 char lowercase hex like `e7c42d88` (column-gated: id/fact_id)
+  //   3. Legacy 10-char mixed-case alnum like `2Y4ope8OxA` (column-gated: id/fact_id)
+  // Column gating on the legacy shapes avoids false-positive links on unrelated
+  // columns (git SHAs, content hashes, numeric strings). See
+  // `./sanitize-raw-ids.ts::isAnyFactId`.
+  if (typeof value === "string" && isAnyFactId(value, columnName)) {
     return (
       <Link
         href={`/factbase/fact/${encodeURIComponent(value)}`}
@@ -360,6 +362,21 @@ function CellValue({
       >
         view →
       </Link>
+    );
+  }
+
+  // Legacy 16-char hex resource stableIds (pre-`sid_` format, e.g.
+  // `1f21fae8ed666710`). There's no public resource-detail page keyed by
+  // these, so render as a muted em-dash with the full id in `title=` for
+  // debugging. Column-gated to avoid false positives (QUA-397).
+  if (typeof value === "string" && isLegacyResourceId(value, columnName)) {
+    return (
+      <span
+        className="text-muted-foreground/40 font-mono text-[10px]"
+        title={`legacy resource ID: ${value}`}
+      >
+        &mdash;
+      </span>
     );
   }
 
