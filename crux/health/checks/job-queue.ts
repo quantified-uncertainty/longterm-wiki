@@ -24,6 +24,7 @@
  */
 
 import type { CheckResult } from '../health-check.ts';
+import { getServerUrl, getApiKey } from '../../lib/wiki-server/client.ts';
 
 // ---------------------------------------------------------------------------
 // Thresholds (exported for tests)
@@ -151,11 +152,12 @@ export function evaluateJobStats(data: JobStatsResponse): EvaluationResult {
 export async function checkJobQueue(): Promise<CheckResult> {
   const name = 'Job queue';
 
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL ?? '';
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY ?? '';
+  // Honor WIKI_SERVER_ENV=prod via the shared client helpers. See QUA-318.
+  const serverUrl = getServerUrl();
+  const apiKey = getApiKey();
 
   if (!serverUrl) {
-    return { name, ok: true, summary: 'Skipped (LONGTERMWIKI_SERVER_URL not set)' };
+    return { name, ok: true, summary: 'Skipped (wiki-server URL not set)' };
   }
 
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
