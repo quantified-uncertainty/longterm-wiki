@@ -28,7 +28,10 @@ export type RaceStatsResult = InferResponseType<RacesRpc['stats']['$get'], 200>;
 export type RaceAllResult = InferResponseType<RacesRpc['all']['$get'], 200>;
 export type RaceSyncResult = SyncResponse;
 export type RaceDetailResult = InferResponseType<RacesRpc[':id']['$get'], 200>;
-export type CandidateSyncResult = SyncResponse;
+// /candidates/sync is hand-rolled in political-races.ts and returns ONLY
+// { upserted }, not the full SyncResponse shape. Type it explicitly so
+// callers don't get a type-lie for verdictsWritten / claimsLinked.
+export type CandidateSyncResult = { upserted: number };
 export type CandidatesAllResult = InferResponseType<RacesRpc['candidates']['all']['$get'], 200>;
 
 // ---------------------------------------------------------------------------

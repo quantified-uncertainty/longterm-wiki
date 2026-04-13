@@ -16,9 +16,9 @@ import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebas
 type RpcClient = ReturnType<typeof hc<GrantsRoute>>;
 
 export type GrantsByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
-// The /sync handler goes through createSyncHandler which returns a generic
-// Promise<Response>, so InferResponseType collapses to {}. Use the explicit
-// SyncResponse type exported by the factory instead.
+// /sync is hand-rolled but returns the standard SyncResponse shape
+// (upserted, verdictsWritten, claimsLinked). Hono RPC can't always infer
+// through the handler body so alias directly.
 export type GrantsSyncResult = SyncResponse;
 export type GrantsAllGranteeIdsResult = InferResponseType<RpcClient['all-grantee-ids']['$get'], 200>;
 export type GrantsBatchUpdateGranteeResult = InferResponseType<RpcClient['batch-update-grantee']['$patch'], 200>;
