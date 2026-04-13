@@ -12,6 +12,7 @@ export * from "./ids";
 export { serialize } from "./serialize";
 export type { SerializedKB } from "./serialize";
 export {
+  formatFactLabel,
   formatMoney,
   formatValue,
   formatFactValue,

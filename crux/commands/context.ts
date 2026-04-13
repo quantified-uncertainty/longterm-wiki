@@ -26,6 +26,7 @@ import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import type { EntityEntry, EntitySearchResult } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
 import type { FactEntry, FactsByEntityResult } from '../lib/wiki-server/facts.ts';
+import { formatFactLabel } from '../../packages/factbase/src/format.ts';
 import {
   searchPages,
   getPage,
@@ -304,7 +305,7 @@ function factsBlock(facts: FactEntry[], limit = 10): string {
   md += tableRow('Measure / Label', 'Value', 'As Of') + '\n';
   md += tableRow('-----------------', '-------', '-------') + '\n';
   for (const f of facts.slice(0, limit)) {
-    const label = (f.label || f.measure || f.factId || '').slice(0, 30);
+    const label = formatFactLabel(f).slice(0, 30);
     let value = f.value || '';
     if (f.numeric !== null && f.numeric !== undefined) {
       value = String(f.numeric);

@@ -12,6 +12,25 @@ import type { Fact, Property } from "./types";
 import type { Graph } from "./graph";
 import { CURRENCIES, resolveCurrency } from "./currencies";
 
+// ── Fact label fallback ─────────────────────────────────────────────
+
+/**
+ * Return a safe human-readable label for a fact row, never falling back
+ * to the raw fact ID. QUA-397: a `|| f.factId` fallback in multiple sites
+ * was baking `f_xxx` / legacy hex strings into user-visible strings in
+ * the `things` table and CLI output. Centralized here so the unsafe
+ * fallback chain cannot be reintroduced piecemeal.
+ *
+ * Fallback chain: `label` → `measure` (propertyId slug) → `"fact"`.
+ * Duck-typed to accept both `Fact` and wiki-server response DTOs.
+ */
+export function formatFactLabel(f: {
+  label?: string | null;
+  measure?: string | null;
+}): string {
+  return f.label || f.measure || "fact";
+}
+
 // ── Monetary formatting ─────────────────────────────────────────────
 
 /**

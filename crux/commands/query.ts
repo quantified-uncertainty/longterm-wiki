@@ -27,6 +27,7 @@ import { createLogger } from '../lib/output.ts';
 import { getServerUrl } from '../lib/wiki-server/client.ts';
 import { getEntity } from '../lib/wiki-server/entities.ts';
 import { getFactsByEntity } from '../lib/wiki-server/facts.ts';
+import { formatFactLabel } from '../../packages/factbase/src/format.ts';
 import {
   searchPages,
   getPage,
@@ -207,12 +208,12 @@ export async function facts(args: string[], options: Record<string, unknown>): P
   output += `\n${c.dim}${factList.length} of ${total} fact${total !== 1 ? 's' : ''}${c.reset}\n\n`;
 
   // Column widths
-  const labelW = Math.min(30, Math.max(10, ...factList.map((f) => (f.label || f.measure || '').length)));
+  const labelW = Math.min(30, Math.max(10, ...factList.map((f) => formatFactLabel(f).length)));
   output += `${c.bold}${'Label/Measure'.padEnd(labelW)}  ${'Value'.padEnd(20)}  Date${''.padEnd(6)}  Note${c.reset}\n`;
   output += `${c.dim}${'─'.repeat(labelW + 40)}${c.reset}\n`;
 
   for (const f of factList) {
-    const label = (f.label || f.measure || f.factId || '').slice(0, labelW).padEnd(labelW);
+    const label = formatFactLabel(f).slice(0, labelW).padEnd(labelW);
     let value = f.value || '';
     if (f.numeric !== null && f.numeric !== undefined) {
       value = String(f.numeric);
