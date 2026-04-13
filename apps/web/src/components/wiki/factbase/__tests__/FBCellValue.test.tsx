@@ -249,14 +249,28 @@ describe("FBCellValue", () => {
       expect(screen.getByText("not a number")).toBeInTheDocument();
     });
 
-    it("does not crash on empty string in currency field", () => {
+    it("renders empty output for empty string in currency field", () => {
+      // Empty string hits the length guard in the new block and falls through
+      // to formatKBCellValue which stringifies to "".
       const { container } = render(<FBCellValue value="" fieldName="raised" />);
-      expect(container).toBeTruthy();
+      expect(container.textContent).toBe("");
     });
 
     it("handles non-finite strings gracefully", () => {
       render(<FBCellValue value="Infinity" fieldName="valuation" />);
       expect(screen.getByText("Infinity")).toBeInTheDocument();
+    });
+
+    it("formats string-typed zero as $0", () => {
+      render(<FBCellValue value="0" fieldName="raised" />);
+      expect(screen.getByText("$0")).toBeInTheDocument();
+    });
+
+    it("formats negative string currency correctly", () => {
+      // Would only occur for NAV-style fields, but the parse path handles it.
+      render(<FBCellValue value="-5000000" fieldName="amount" />);
+      const el = screen.getByText(/5 million/);
+      expect(el.textContent).toMatch(/-|\$/);
     });
   });
 });
