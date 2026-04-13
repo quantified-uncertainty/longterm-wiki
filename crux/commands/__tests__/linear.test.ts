@@ -19,6 +19,7 @@ const {
   updateProjectMock,
   createProjectUpdateMock,
   githubApiMock,
+  getSessionContextMock,
 } = vi.hoisted(() => ({
   getIssueMock: vi.fn(),
   getCommentsMock: vi.fn(),
@@ -31,6 +32,12 @@ const {
   updateProjectMock: vi.fn(),
   createProjectUpdateMock: vi.fn(),
   githubApiMock: vi.fn(),
+  getSessionContextMock: vi.fn(() => ({
+    slot: 5 as number | null,
+    branch: 'claude/qua-184-test-branch',
+    host: 'test-host' as string | null,
+    agentId: null as number | null,
+  })),
 }));
 
 vi.mock('../../lib/linear/issues.ts', () => ({
@@ -57,6 +64,23 @@ vi.mock('../../lib/github.ts', () => ({
   githubApi: githubApiMock,
   REPO: 'quantified-uncertainty/longterm-wiki',
 }));
+
+// Mock the session context so the slot is deterministic. Without this,
+// `getSessionContext()` walks ancestor dirs and picks up whatever `a<N>`
+// the test runner happens to sit in — which is `a5` on the dev laptop
+// but `null` on GitHub Actions runners at `/home/runner/work/...`.
+// That divergence makes same-slot vs cross-slot dedup tests flaky.
+// `buildStartCommentBody` is passed through via importActual since we
+// want the production formatting.
+vi.mock('../../lib/session/session-context.ts', async () => {
+  const actual = await vi.importActual<typeof import('../../lib/session/session-context.ts')>(
+    '../../lib/session/session-context.ts',
+  );
+  return {
+    ...actual,
+    getSessionContext: getSessionContextMock,
+  };
+});
 
 vi.mock('child_process', () => ({
   execSync: vi.fn(() => 'claude/qua-184-test-branch'),
