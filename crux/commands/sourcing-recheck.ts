@@ -12,7 +12,12 @@
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
-import { storeVerdict as storeVerdictRpc, getDueForRecheck, getEvidenceByRecord } from '../lib/wiki-server/sourcing-client.ts';
+import {
+  storeVerdict as storeVerdictRpc,
+  getDueForRecheck,
+  getEvidenceByRecords,
+  evidenceRecordKey,
+} from '../lib/wiki-server/sourcing-client.ts';
 import { createLlmClient } from '../lib/llm.ts';
 import {
   fetchSourceContent,
@@ -104,23 +109,34 @@ interface RecheckSummary {
 // ── Source URL resolution ────────────────────────────────────────────
 
 /**
- * Attempt to find the source URL for a record that needs rechecking.
- * Checks the existing evidence table for previously used source URLs.
+ * QUA-331: batch-fetch source URLs for a list of due items in a single
+ * HTTP call. Returns a map keyed by `recordType|recordId`. Missing keys
+ * mean no evidence row carried a `sourceUrl` (or the record was absent
+ * from the evidence table) — the caller treats that as "no URL".
  */
-async function resolveSourceUrl(recordType: string, recordId: string): Promise<string | null> {
+async function fetchSourceUrls(
+  items: DueItem[],
+): Promise<Map<string, string>> {
+  const result = new Map<string, string>();
+  if (items.length === 0) return result;
+
   try {
-    const response = await getEvidenceByRecord(recordType, recordId, { limit: 5 });
+    const response = await getEvidenceByRecords(
+      items.map((i) => ({ recordType: i.recordType, recordId: i.recordId })),
+      { limitPerRecord: 5 },
+    );
+    if (!response.ok || !response.data?.evidenceByKey) return result;
 
-    if (!response.ok || !response.data?.evidence) return null;
-
-    // Return the most recent non-null source URL
-    for (const e of response.data.evidence) {
-      if (e.sourceUrl) return e.sourceUrl;
+    for (const [key, rows] of Object.entries(response.data.evidenceByKey)) {
+      const firstUrl = rows.find((e) => e.sourceUrl)?.sourceUrl;
+      if (firstUrl) result.set(key, firstUrl);
     }
-    return null;
+    return result;
   } catch (e: unknown) {
-    console.warn(`${LOG_PREFIX} Failed to resolve source URL for ${recordType}/${recordId}: ${e instanceof Error ? e.message : String(e)}`);
-    return null;
+    console.warn(
+      `${LOG_PREFIX} Failed to batch-fetch source URLs: ${e instanceof Error ? e.message : String(e)}`,
+    );
+    return result;
   }
 }
 
@@ -167,9 +183,9 @@ Respond with ONLY a JSON object (no markdown code fences):
 async function recheckSingleItem(
   item: DueItem,
   client: ReturnType<typeof createLlmClient>,
+  sourceUrl: string | null,
 ): Promise<RecheckResult | RecheckError> {
-  // Step 1: Find the source URL
-  const sourceUrl = await resolveSourceUrl(item.recordType, item.recordId);
+  // Step 1: Source URL already resolved via the batch pre-fetch
   if (!sourceUrl) {
     return {
       recordType: item.recordType,
@@ -350,12 +366,17 @@ async function recheckCommand(
 
   console.log(`\n\x1b[1mRechecking ${itemsToRecheck.length} items (est. \$${estimatedCost.toFixed(2)})...\x1b[0m\n`);
 
+  // QUA-331: pre-fetch every source URL in one batch call rather than
+  // one-per-item inside the loop.
+  const sourceUrlsByKey = await fetchSourceUrls(itemsToRecheck);
+
   for (let i = 0; i < itemsToRecheck.length; i++) {
     const item = itemsToRecheck[i];
     const label = `${item.recordType}/${item.recordId}`.slice(0, 60);
     console.log(`  [${i + 1}/${itemsToRecheck.length}] ${label} (was: ${item.verdict})`);
 
-    const result = await recheckSingleItem(item, client);
+    const sourceUrl = sourceUrlsByKey.get(evidenceRecordKey(item.recordType, item.recordId)) ?? null;
+    const result = await recheckSingleItem(item, client, sourceUrl);
 
     if ('error' in result) {
       summary.errors++;

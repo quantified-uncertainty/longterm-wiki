@@ -24,7 +24,8 @@ import type {
 } from '../lib/command-types.ts';
 import {
   listVerdicts,
-  getEvidenceByRecord,
+  getEvidenceByRecords,
+  evidenceRecordKey,
   listUrlSuggestions,
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
@@ -270,6 +271,25 @@ async function suggestCommand(
     ? await fetchPendingRecordKeys(recordTypeFilter, log)
     : new Set<string>();
 
+  // QUA-331: batch-fetch evidence for every verdict row in one HTTP call
+  // instead of N calls inside the per-record task. We only need the first
+  // non-null sourceUrl per record, so limitPerRecord=5 matches the old
+  // per-call limit.
+  const existingUrlByKey = new Map<string, string | null>();
+  const evidenceRes = await getEvidenceByRecords(
+    verdictRows.map((v) => ({ recordType: v.recordType, recordId: v.recordId })),
+    { limitPerRecord: 5 },
+  );
+  if (!evidenceRes.ok) {
+    return {
+      exitCode: 1,
+      output: `Failed to batch-fetch evidence: ${evidenceRes.message ?? 'unknown error'}`,
+    };
+  }
+  for (const [key, rows] of Object.entries(evidenceRes.data.evidenceByKey)) {
+    existingUrlByKey.set(key, rows.find((e) => e.sourceUrl)?.sourceUrl ?? null);
+  }
+
   const toUpsert: Parameters<typeof upsertUrlSuggestions>[0] = [];
 
   const tasks = verdictRows.map((v) => async () => {
@@ -300,9 +320,7 @@ async function suggestCommand(
       return;
     }
 
-    const evidence = await getEvidenceByRecord(v.recordType, v.recordId, { limit: 5 });
-    const existingUrl =
-      (evidence.ok && evidence.data.evidence.find((e) => e.sourceUrl)?.sourceUrl) || null;
+    const existingUrl = existingUrlByKey.get(evidenceRecordKey(v.recordType, v.recordId)) ?? null;
 
     if (dryRun) {
       log(`  [dry-run] ${v.recordType}/${v.recordId} field=${v.fieldName ?? '(row)'} entity="${entityName.slice(0, 40)}"`);

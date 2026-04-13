@@ -26,6 +26,7 @@ export type ListVerdictsResult = InferResponseType<RpcClient['verdicts']['$get']
 export type VerdictByRecordResult = InferResponseType<RpcClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
 export type DueForRecheckResult = InferResponseType<RpcClient['due-for-recheck']['$get'], 200>;
 export type EvidenceByRecordResult = InferResponseType<RpcClient['evidence'][':recordType'][':recordId']['$get'], 200>;
+export type EvidenceByRecordsResult = InferResponseType<RpcClient['evidence']['by-records']['$post'], 200>;
 export type SourcingStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 export type CleanupOrphansResult = InferResponseType<RpcClient['cleanup-orphans']['$post'], 200>;
 
@@ -90,6 +91,35 @@ export async function getEvidenceByRecord(
     'GET',
     `/api/sourcing/evidence/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}${qs ? '?' + qs : ''}`,
   );
+}
+
+/**
+ * Batch-fetch evidence for many records in a single request (QUA-331).
+ * Replaces N+1 loops over `getEvidenceByRecord`. The server groups by
+ * `recordType` and issues one `IN (...)` query per type.
+ *
+ * Returns `evidenceByKey[recordKey(rt, rid)]` — records with no evidence
+ * are absent from the map (not empty arrays), so callers can distinguish
+ * "queried, no evidence" from "skipped".
+ *
+ * `limitPerRecord` caps the number of evidence rows returned per record.
+ * Callers that just need the first `sourceUrl` should pass a small value
+ * (e.g. 5) to reduce payload size.
+ */
+export async function getEvidenceByRecords(
+  records: Array<{ recordType: string; recordId: string }>,
+  options?: { limitPerRecord?: number },
+): Promise<ApiResult<EvidenceByRecordsResult>> {
+  return apiRequest<EvidenceByRecordsResult>(
+    'POST',
+    '/api/sourcing/evidence/by-records',
+    { records, limitPerRecord: options?.limitPerRecord },
+  );
+}
+
+/** Build the response-map key used by `getEvidenceByRecords`. */
+export function evidenceRecordKey(recordType: string, recordId: string): string {
+  return `${recordType}|${recordId}`;
 }
 
 /** Get sourcing statistics. */
