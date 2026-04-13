@@ -357,6 +357,34 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "haiku=claude-haiku-4-5-20251001, sonnet=claude-sonnet-4-6, opus=claude-opus-4-6. Current per system context."
+  - id: hallucination-risk-snapshots-rowcount
+    category: data-pipeline
+    description: "hallucination_risk_snapshots row count stays under 140,000 (2× the ~70K target). Growth beyond this threshold indicates the retention task or FK cascade has stopped working — historically this has been a prod-stability issue (QUA-352, QUA-302)."
+    check_type: hybrid
+    check_command: |
+      curl -sSf --max-time 10 https://wiki-server.k8s.quantifieduncertainty.org/api/hallucination-risk/stats \
+        | jq -er '.totalSnapshots | numbers' \
+        | awk '{
+            n=$1;
+            printf "reltuples=%d threshold=140000\n", n;
+            if (n > 140000) { printf "FAIL: over threshold (%dx target of 70000)\n", n/70000; exit 1 }
+            else { print "PASS: within threshold" }
+          }'
+    how_to_verify: |
+      The check_command curls the wiki-server /api/hallucination-risk/stats endpoint
+      (which returns totalSnapshots computed from pg_class.reltuples — fast, no seq scan)
+      and fails if the value exceeds 140,000 (2× the 70,000 target).
+      If this fails:
+      1. Check groundskeeper run history for the snapshot-retention task (Groundskeeper Runs dashboard, E926)
+      2. Verify LONGTERMWIKI_SERVER_API_KEY is set in the groundskeeper k8s deployment
+      3. Run the cleanup endpoint manually: DELETE /api/hallucination-risk/cleanup?keep=30
+      4. Confirm the FK has ON DELETE CASCADE: `SELECT confdeltype FROM pg_constraint WHERE conname = 'hallucination_risk_snapshots_page_id_wiki_pages_id_fk'` — should be 'c'
+    frequency: weekly
+    added: "2026-04-12"
+    added_by_pr: null  # QUA-352 PR
+    last_checked: null
+    last_result: null
+    history: []
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"

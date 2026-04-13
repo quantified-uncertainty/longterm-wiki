@@ -45,6 +45,48 @@ function resetStore() {
   pgMatviewsQueryCount = 0;
 }
 
+/**
+ * Shared logic for cleanup dry-run + delete. Mirrors the route's cleanup
+ * query semantics: keep the latest N snapshots per page AND optionally
+ * treat orphan rows (pageId set but not in slugIntIdMap, i.e. no matching
+ * wiki_pages row) as always-delete when the query contains the LEFT JOIN
+ * orphan filter.
+ */
+function computeCleanupPlan(
+  keep: number,
+  filterOrphans: boolean
+): { wouldDelete: number; toDelete: Set<number> } {
+  const validIntIds = new Set(slugIntIdMap.values());
+  const toDelete = new Set<number>();
+
+  // 1. Orphan rows (page_id set but wiki_pages row missing) — delete always.
+  if (filterOrphans) {
+    for (const r of riskStore) {
+      if (r.pageId != null && !validIntIds.has(r.pageId)) {
+        toDelete.add(r.id);
+      }
+    }
+  }
+
+  // 2. Row-number retention per partition (COALESCE(page_id, -1)).
+  const byPage = new Map<number, typeof riskStore>();
+  for (const r of riskStore) {
+    if (toDelete.has(r.id)) continue;
+    const key = r.pageId ?? -1;
+    const arr = byPage.get(key) || [];
+    arr.push(r);
+    byPage.set(key, arr);
+  }
+  for (const rows of byPage.values()) {
+    rows.sort((a, b) => b.computedAt.getTime() - a.computedAt.getTime());
+    for (let i = keep; i < rows.length; i++) {
+      toDelete.add(rows[i].id);
+    }
+  }
+
+  return { wouldDelete: toDelete.size, toDelete };
+}
+
 /** Get latest snapshot per page (shared logic for stats/latest mock queries). */
 function getLatestByPage() {
   const latestByPage = new Map<number, HrsRow>();
@@ -304,23 +346,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    // Group by pageId (partition key is COALESCE(page_id, -1))
-    const byPage = new Map<number, typeof riskStore>();
-    for (const r of riskStore) {
-      const key = r.pageId ?? -1;
-      const arr = byPage.get(key) || [];
-      arr.push(r);
-      byPage.set(key, arr);
-    }
-    let wouldDelete = 0;
-    for (const rows of byPage.values()) {
-      rows.sort(
-        (a, b) => b.computedAt.getTime() - a.computedAt.getTime()
-      );
-      if (rows.length > keep) {
-        wouldDelete += rows.length - keep;
-      }
-    }
+    const { wouldDelete } = computeCleanupPlan(keep, q.includes("left join"));
     return [{ count: wouldDelete }];
   }
 
@@ -332,22 +358,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     q.includes("row_number")
   ) {
     const keep = params[0] as number;
-    const byPage = new Map<number, typeof riskStore>();
-    for (const r of riskStore) {
-      const key = r.pageId ?? -1;
-      const arr = byPage.get(key) || [];
-      arr.push(r);
-      byPage.set(key, arr);
-    }
-    const toDelete = new Set<number>();
-    for (const rows of byPage.values()) {
-      rows.sort(
-        (a, b) => b.computedAt.getTime() - a.computedAt.getTime()
-      );
-      for (let i = keep; i < rows.length; i++) {
-        toDelete.add(rows[i].id);
-      }
-    }
+    const { toDelete } = computeCleanupPlan(keep, q.includes("left join"));
     const deletedCount = toDelete.size;
     riskStore = riskStore.filter((r) => !toDelete.has(r.id));
     // Tagged template handler sets result.count = rows.length,
@@ -694,6 +705,70 @@ describe("Hallucination Risk API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.keep).toBe(30);
+    });
+
+    it("deletes orphan snapshots whose page_id no longer exists (QUA-352)", async () => {
+      // Insert 2 snapshots via the normal path — these get a valid
+      // slug→intId mapping and are "live" (NOT orphans).
+      for (let i = 0; i < 2; i++) {
+        await postJson(app, "/api/hallucination-risk", {
+          pageId: "live-page",
+          score: 50 + i,
+          level: "medium",
+        });
+      }
+
+      // Manually inject orphan rows directly into the store. These have
+      // a pageId integer that does NOT exist in slugIntIdMap, simulating
+      // snapshots whose wiki_pages row has been deleted.
+      const orphanPageId = 999999;
+      riskStore.push({
+        id: nextId++,
+        pageId: orphanPageId,
+        pageSlug: null,
+        score: 80,
+        level: "high",
+        factors: null,
+        integrityIssues: null,
+        computedAt: new Date(),
+      });
+      riskStore.push({
+        id: nextId++,
+        pageId: orphanPageId,
+        pageSlug: null,
+        score: 60,
+        level: "medium",
+        factors: null,
+        integrityIssues: null,
+        computedAt: new Date(),
+      });
+
+      // Dry-run: with keep=100 (much higher than the 2 live rows), the
+      // retention pass would NOT delete anything, but the orphan filter
+      // should still catch both injected rows.
+      const dryRes = await app.request(
+        "/api/hallucination-risk/cleanup?keep=100&dry_run=true",
+        { method: "DELETE" }
+      );
+      expect(dryRes.status).toBe(200);
+      const dryBody = await dryRes.json();
+      expect(dryBody.totalSnapshots).toBe(4);
+      expect(dryBody.wouldDelete).toBe(2);
+      expect(dryBody.wouldRetain).toBe(2);
+
+      // Real delete: both orphan rows should disappear; the 2 live rows
+      // for live-page remain.
+      const delRes = await app.request(
+        "/api/hallucination-risk/cleanup?keep=100",
+        { method: "DELETE" }
+      );
+      expect(delRes.status).toBe(200);
+      const delBody = await delRes.json();
+      expect(delBody.deleted).toBe(2);
+      expect(riskStore).toHaveLength(2);
+      for (const r of riskStore) {
+        expect(r.pageId).not.toBe(orphanPageId);
+      }
     });
   });
 

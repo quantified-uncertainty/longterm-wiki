@@ -297,7 +297,9 @@ export const hallucinationRiskSnapshots = pgTable(
   "hallucination_risk_snapshots",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    pageId: integer("page_id").references(() => wikiPages.id),
+    pageId: integer("page_id").references(() => wikiPages.id, {
+      onDelete: "cascade",
+    }),
     score: integer("score").notNull(),
     level: text("level").notNull(), // 'low' | 'medium' | 'high'
     factors: jsonb("factors").$type<string[]>(),
