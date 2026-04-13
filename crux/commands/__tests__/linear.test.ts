@@ -508,6 +508,28 @@ describe('linear project', () => {
       unlinkSync(file);
     });
 
+    it('applies name/state/start-date/target-date updates', async () => {
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      updateProjectMock.mockResolvedValueOnce({ ...mockProject, name: 'Renamed', state: 'started' });
+      const r = await commands.project(
+        ['update', 'Content Quality & Enrichment'],
+        {
+          ci: true,
+          name: 'Renamed',
+          state: 'started',
+          startDate: '2026-05-01',
+          targetDate: '2026-06-30',
+        },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(updateProjectMock).toHaveBeenCalledWith(mockProject.id, {
+        name: 'Renamed',
+        state: 'started',
+        startDate: '2026-05-01',
+        targetDate: '2026-06-30',
+      });
+    });
+
     it('content-file takes precedence over inline --content', async () => {
       const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
       const { tmpdir } = await import('os');
