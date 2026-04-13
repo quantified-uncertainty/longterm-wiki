@@ -23,6 +23,7 @@
 import type { CommandResult } from '../lib/command-types.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
+import { CreditExhaustedError, isCreditExhaustedError } from '../lib/resilience.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import { getPersonnelByEntity, syncPersonnel } from '../lib/wiki-server/personnel.ts';
@@ -365,6 +366,19 @@ If you cannot find a good URL for a record, omit it from the array.`;
       }
     }
   } catch (e: unknown) {
+    // Credit exhaustion must propagate so the batch loop can abort — any
+    // other error is a per-batch anomaly that shouldn't kill the rest of
+    // Step 2. Check both the typed error (expected) and the raw substring
+    // (defense-in-depth, in case a caller upstream forgot to wrap). See
+    // QUA-378.
+    if (isCreditExhaustedError(e)) {
+      throw e instanceof CreditExhaustedError
+        ? e
+        : new CreditExhaustedError(
+            e instanceof Error ? e.message : String(e),
+            e,
+          );
+    }
     console.warn(
       `${LOG_PREFIX} Research failed: ${e instanceof Error ? e.message : String(e)}`,
     );
@@ -527,6 +541,18 @@ async function runVerification(
   }
 
   const result = await orchestrateCommand([], options);
+
+  // Orchestrate-sourcing catches per-item LLM errors and writes them into
+  // result.output as "ERROR: LLM call failed: ...". If credits have run out,
+  // every record fails this way and the batch would otherwise march on. Scan
+  // the output for the credit-exhaustion fingerprint and surface it as a
+  // typed error so the batch loop can abort. See QUA-378.
+  if (isCreditExhaustedError(result.output)) {
+    throw new CreditExhaustedError(
+      'Anthropic credit balance too low (detected in verification output)',
+      null,
+    );
+  }
 
   // Parse verdict counts from output (best-effort)
   const verdictCounts: Record<string, number> = {};
@@ -987,8 +1013,18 @@ Options:
     }
   }
 
-  // Process each entity
+  // Process each entity. A CreditExhaustedError bubbling out of any call
+  // path below aborts the whole batch — billing errors aren't transient and
+  // continuing would just accumulate wasted no-op "runs" that look successful
+  // in the summary. See QUA-378.
+  let creditExhausted = false;
+  let skippedDueToCredits = 0;
   for (const entity of entities) {
+    if (creditExhausted) {
+      skippedDueToCredits++;
+      continue;
+    }
+
     // Check budget before starting a new entity
     if (tracker.totalCost >= budget) {
       console.log(`\n${c.yellow}Budget limit reached ($${tracker.totalCost.toFixed(3)} / $${budget.toFixed(2)}) — stopping.${c.reset}`);
@@ -1006,22 +1042,40 @@ Options:
     const costBefore = tracker.totalCost;
     const researchBefore = tracker.breakdown()['flagship-curate-research'] ?? 0;
 
-    const result = await curateEntity(entity, {
-      budget: entityBudget,
-      recordLimit,
-      tableFilter,
-      dryRun,
-      skipResearch,
-      iterations,
-      tracker,
-    });
+    try {
+      const result = await curateEntity(entity, {
+        budget: entityBudget,
+        recordLimit,
+        tableFilter,
+        dryRun,
+        skipResearch,
+        iterations,
+        tracker,
+      });
 
-    const researchAfter = tracker.breakdown()['flagship-curate-research'] ?? 0;
-    result.totalCost = tracker.totalCost - costBefore;
-    result.researchCost = researchAfter - researchBefore;
-    result.verifyCost = result.totalCost - result.researchCost;
+      const researchAfter = tracker.breakdown()['flagship-curate-research'] ?? 0;
+      result.totalCost = tracker.totalCost - costBefore;
+      result.researchCost = researchAfter - researchBefore;
+      result.verifyCost = result.totalCost - result.researchCost;
 
-    results.push(result);
+      results.push(result);
+    } catch (e: unknown) {
+      if (e instanceof CreditExhaustedError || isCreditExhaustedError(e)) {
+        // The current entity counts as "skipped" too — its work was
+        // abandoned mid-flight, not completed.
+        skippedDueToCredits++;
+        const remainingAfterThis = entities.length - results.length - skippedDueToCredits;
+        console.error(
+          `\n${c.bold}${c.red}✖ ABORTED: Anthropic credit balance is too low.${c.reset}\n` +
+          `  Halting batch during '${entity.title}'. ` +
+          `${remainingAfterThis} org${remainingAfterThis === 1 ? '' : 's'} will be skipped.\n` +
+          `  Top up credits and re-run. ${c.dim}(QUA-378)${c.reset}`,
+        );
+        creditExhausted = true;
+        continue;
+      }
+      throw e;
+    }
   }
 
   // Format output
@@ -1057,9 +1111,14 @@ Options:
     }
   }
 
+  // Exit non-zero when credit exhaustion halted the run. The summary and
+  // any partial results still go out on stdout, but CI / wrapper scripts
+  // can now distinguish "nothing to curate" (0) from "billing broken" (2).
+  const exitCode = creditExhausted ? 2 : 0;
+
   if (options.ci) {
     return {
-      exitCode: 0,
+      exitCode,
       output: JSON.stringify({
         results: results.map((r) => ({
           entity: r.entity.title,
@@ -1073,11 +1132,13 @@ Options:
         })),
         totalCost: tracker.totalCost,
         breakdown: tracker.breakdown(),
+        aborted: creditExhausted ? 'credit_exhausted' : undefined,
+        skippedDueToCredits,
       }, null, 2),
     };
   }
 
-  return { exitCode: 0, output };
+  return { exitCode, output };
 }
 
 // ── Exports ────────────────────────────────────────────────────────────

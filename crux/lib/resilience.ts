@@ -15,6 +15,31 @@ export interface RetryOptions {
   onRetry?: (message: string) => void;
 }
 
+/**
+ * Thrown when the Anthropic API reports the account is out of credits.
+ * Non-retryable, non-recoverable — long batch jobs should catch this, abort
+ * remaining work, and exit non-zero instead of silently marching forward.
+ * See QUA-378.
+ */
+export class CreditExhaustedError extends Error {
+  readonly originalError: unknown;
+  constructor(message: string, originalError: unknown) {
+    super(message);
+    this.name = 'CreditExhaustedError';
+    this.originalError = originalError;
+  }
+}
+
+/** Matches the Anthropic 400 body returned when the account is out of credits. */
+const CREDIT_EXHAUSTED_PATTERN = /credit balance is too low/i;
+
+/** True if the value looks like an Anthropic credit-exhaustion error. */
+export function isCreditExhaustedError(err: unknown): boolean {
+  if (err instanceof CreditExhaustedError) return true;
+  const message = err instanceof Error ? err.message : String(err);
+  return CREDIT_EXHAUSTED_PATTERN.test(message);
+}
+
 const RETRYABLE_PATTERNS = [
   'timeout',
   'ECONNRESET',
@@ -39,6 +64,12 @@ export async function withRetry<T>(
       return await fn();
     } catch (err: unknown) {
       const error = err instanceof Error ? err : new Error(String(err));
+      // Credit exhaustion is terminal — never retry, always surface as a
+      // typed error so batch runners can abort the whole run instead of
+      // per-call-catching and silently continuing.
+      if (isCreditExhaustedError(error)) {
+        throw new CreditExhaustedError(error.message, err);
+      }
       const isRetryable = RETRYABLE_PATTERNS.some((p) => error.message.includes(p));
       if (!isRetryable || attempt === maxRetries) throw err;
       const delay = Math.pow(2, attempt + 1) * 1000; // 2s, 4s
