@@ -86,11 +86,12 @@ export class FakeDoctorEnv implements DoctorEnv {
     const key = [cmd, ...args].join(' ');
     const handler = this.execs.get(key);
     if (handler) return handler(cmd, args);
-    // Try a prefix match (helpful when args list is long)
-    for (const [k, h] of this.execs.entries()) {
-      if (key === k) return h(cmd, args);
-    }
-    return { stdout: '', stderr: '', code: 0 };
+    // Fail loud on unregistered exec calls. Returning a silent {code:0}
+    // success here used to let checks pass by accident (empty stdout =
+    // "git status clean", etc.). Tests must register every expected
+    // exec via setExec; if a new check adds an exec call, the failure
+    // message names the key so it's trivial to fix.
+    throw new Error(`FakeDoctorEnv: no exec handler registered for: ${key}`);
   }
   async fetch(url: string): Promise<FetchResult> {
     return this.fetches.get(url) ?? { ok: false, status: 0, body: '', headers: {}, networkError: true };

@@ -842,36 +842,63 @@ function makeTmuxExec(): TmuxExec {
   };
 }
 
+/** Format a thrown error for a user-facing CommandResult. */
+function errMsg(e: unknown): string {
+  return e instanceof Error ? e.message : String(e);
+}
+
 async function sentinelWrite(_args: string[], options: RoleOptions): Promise<CommandResult> {
   const role = parseRole(options);
   if (typeof role !== 'string') return { exitCode: 1, output: role.error };
   const env = makeSentinelEnv();
-  const { path, sentinel } = writeSentinelImpl(role, env);
-  if (options.json) {
+  try {
+    const { path, sentinel } = writeSentinelImpl(role, env);
+    if (options.json) {
+      return { exitCode: 0, output: JSON.stringify({ ok: true, role, path, sentinel }, null, 2) };
+    }
+    return { exitCode: 0, output: `wrote sentinel: ${path}` };
+  } catch (e) {
+    const msg = `sentinel-write failed: ${errMsg(e)}`;
     return {
-      exitCode: 0,
-      output: JSON.stringify({ ok: true, role, path, sentinel }, null, 2),
+      exitCode: 1,
+      output: options.json ? JSON.stringify({ ok: false, role, error: msg }, null, 2) : msg,
     };
   }
-  return { exitCode: 0, output: `wrote sentinel: ${path}` };
 }
 
 async function sentinelTouch(_args: string[], options: RoleOptions): Promise<CommandResult> {
   const role = parseRole(options);
   if (typeof role !== 'string') return { exitCode: 1, output: role.error };
   const env = makeSentinelEnv();
-  const { path, touched } = touchSentinelImpl(role, env);
-  if (options.json) {
-    return { exitCode: 0, output: JSON.stringify({ ok: true, role, path, touched }, null, 2) };
+  try {
+    const { path, touched } = touchSentinelImpl(role, env);
+    if (options.json) {
+      return { exitCode: 0, output: JSON.stringify({ ok: true, role, path, touched }, null, 2) };
+    }
+    return { exitCode: 0, output: touched ? `touched ${path}` : `(no sentinel at ${path} to touch)` };
+  } catch (e) {
+    const msg = `sentinel-touch failed: ${errMsg(e)}`;
+    return {
+      exitCode: 1,
+      output: options.json ? JSON.stringify({ ok: false, role, error: msg }, null, 2) : msg,
+    };
   }
-  return { exitCode: 0, output: touched ? `touched ${path}` : `(no sentinel at ${path} to touch)` };
 }
 
 async function sentinelCheck(_args: string[], options: RoleOptions): Promise<CommandResult> {
   const role = parseRole(options);
   if (typeof role !== 'string') return { exitCode: 1, output: role.error };
   const env = makeSentinelEnv();
-  const result = checkConflictImpl(role, env);
+  let result: ReturnType<typeof checkConflictImpl>;
+  try {
+    result = checkConflictImpl(role, env);
+  } catch (e) {
+    const msg = `sentinel-check failed: ${errMsg(e)}`;
+    return {
+      exitCode: 1,
+      output: options.json ? JSON.stringify({ ok: false, role, error: msg }, null, 2) : msg,
+    };
+  }
 
   if (options.json) {
     const exit = result.conflict?.kind === 'same-session' ? 2 : 0;
@@ -928,7 +955,16 @@ async function tmuxClaim(_args: string[], options: RoleOptions): Promise<Command
   const role = parseRole(options);
   if (typeof role !== 'string') return { exitCode: 1, output: role.error };
   const exec = makeTmuxExec();
-  const result = claimWindowImpl(role, exec);
+  let result: ReturnType<typeof claimWindowImpl>;
+  try {
+    result = claimWindowImpl(role, exec);
+  } catch (e) {
+    const msg = `tmux-claim failed: ${errMsg(e)}`;
+    return {
+      exitCode: 1,
+      output: options.json ? JSON.stringify({ ok: false, role, error: msg }, null, 2) : msg,
+    };
+  }
   if (options.json) {
     return { exitCode: result.status === 'error' ? 1 : 0, output: JSON.stringify(result, null, 2) };
   }

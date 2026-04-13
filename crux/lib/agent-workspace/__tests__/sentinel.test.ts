@@ -311,4 +311,41 @@ describe('checkConflict', () => {
     const r = checkConflict('slots', env);
     expect(r.conflict).toBeNull();
   });
+
+  it('always prefers same-session over other-session, regardless of iteration order', () => {
+    // Reproducer for the priority bug: filesystem readdir order on Linux
+    // is filesystem-dependent. If a cross-session sentinel iterates first,
+    // the pre-fix code returned other-session and silently exit-0'd —
+    // masking the role-conflation blocker.
+    const env = new FakeEnv({ env: { TMUX_PANE: '%69' }, panes: ['%69', '%99'] });
+    // FakeEnv.listMatching sorts alphabetically. Use names that put the
+    // CROSS-session sentinel first so the iteration encounters it before
+    // the same-session one.
+    env.writeFile(
+      '/tmp/lw-coord-sentinel-releases-00cross',
+      'role=releases tmux_pane=%99 ppid=10 created=1700000000 host=h user=0',
+    );
+    env.writeFile(
+      '/tmp/lw-coord-sentinel-releases-69',
+      'role=releases tmux_pane=%69 ppid=10 created=1700000000 host=h user=0',
+    );
+    const r = checkConflict('slots', env);
+    expect(r.conflict).not.toBeNull();
+    expect(r.conflict?.kind).toBe('same-session');
+    expect(r.conflict?.path).toBe('/tmp/lw-coord-sentinel-releases-69');
+  });
+
+  it('reports other-session when no same-session conflict exists, even with multiple cross-session sentinels', () => {
+    const env = new FakeEnv({ env: { TMUX_PANE: '%1' }, panes: ['%1', '%2', '%3'] });
+    env.writeFile(
+      '/tmp/lw-coord-sentinel-releases-2',
+      'role=releases tmux_pane=%2 ppid=10 created=1700000000 host=h user=0',
+    );
+    env.writeFile(
+      '/tmp/lw-coord-sentinel-releases-3',
+      'role=releases tmux_pane=%3 ppid=11 created=1700000000 host=h user=0',
+    );
+    const r = checkConflict('slots', env);
+    expect(r.conflict?.kind).toBe('other-session');
+  });
 });

@@ -11,6 +11,31 @@ import type { DoctorCheck, DoctorEnv } from './types.ts';
 
 const RELDIR_CANDIDATES = ['releases', 'coord'];
 
+/**
+ * The set of GitHub check-run conclusion values that indicate failure.
+ *
+ * Per the GitHub Checks API, `conclusion` is one of:
+ *   success | failure | cancelled | timed_out | action_required |
+ *   neutral | skipped | stale | startup_failure
+ *
+ * Anything in this set should be treated as a failed check. A previous
+ * implementation used the regex /fail|cancel|error/i which silently
+ * missed `timed_out` and `action_required`, letting timed-out CI on a
+ * release PR read as "no failing checks". Use the allowlist instead.
+ */
+const FAILING_CONCLUSIONS = new Set([
+  'failure',
+  'cancelled',
+  'timed_out',
+  'action_required',
+  'startup_failure',
+]);
+
+function isFailingConclusion(conclusion: string | null | undefined): boolean {
+  if (!conclusion) return false;
+  return FAILING_CONCLUSIONS.has(conclusion.toLowerCase());
+}
+
 function resolveReldir(env: DoctorEnv): { name: string; path: string; bothExist: boolean } | null {
   const present = RELDIR_CANDIDATES.filter((d) => {
     const st = env.stat(env.resolve(d));
@@ -202,7 +227,7 @@ export const checkReleasePr: DoctorCheck = {
     const ageMs = env.now().getTime() - new Date(pr.createdAt).getTime();
     const ageHours = ageMs / 1000 / 60 / 60;
     const checks = pr.statusCheckRollup ?? [];
-    const failing = checks.filter((c) => c.conclusion && /fail|cancel|error/i.test(c.conclusion));
+    const failing = checks.filter((c) => isFailingConclusion(c.conclusion));
 
     if (ageMs < 5 * 60 * 1000 && checks.length === 0) {
       return { status: 'info', summary: `#${pr.number} (warming up)` };
@@ -313,7 +338,7 @@ export const checkProdCiRecent: DoctorCheck = {
     try { runs = JSON.parse(r.stdout); } catch { return { status: 'warn', summary: 'unparseable gh output' }; }
     const cutoff = env.now().getTime() - 24 * 60 * 60 * 1000;
     const recent = runs.filter((rn) => new Date(rn.createdAt).getTime() >= cutoff);
-    const failed = recent.filter((rn) => /failure|cancelled|timed_out/.test(rn.conclusion));
+    const failed = recent.filter((rn) => isFailingConclusion(rn.conclusion));
     if (failed.length === 0) {
       return { status: 'ok', summary: `0 failures in last 24h (${recent.length} runs)` };
     }
