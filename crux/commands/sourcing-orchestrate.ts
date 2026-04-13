@@ -346,7 +346,11 @@ Options:
   --entity-type=X        Filter by entity type (organization, person, ai-model, ...)
   --entity=X             Filter by entity (org or person stableId)
   --source=X             Source mode: existing | web-search | all (default: existing)
-  --concurrency=N        Number of parallel sourcing (default: 5)
+  --concurrency=N        Number of parallel sourcing (default: 5, max: 10)
+                         Values above 10 are clamped and logged. Set
+                         SOURCING_CONCURRENCY_LIMIT=<n> to raise the cap
+                         for local testing only — higher values have
+                         overloaded the wiki-server in the past (QUA-150).
   --dry-run              Show what would be verified without calling LLM
   --ci                   JSON output
 

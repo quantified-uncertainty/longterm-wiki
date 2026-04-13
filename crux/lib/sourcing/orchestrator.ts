@@ -28,6 +28,7 @@ import {
   MODELS,
 } from './item-verifier.ts';
 import { prefetchWikidataEntities } from './wikidata-matcher.ts';
+import { clampSourcingConcurrency } from './concurrency.ts';
 import { fetchSourceContent } from './source-fetcher.ts';
 import type {
   OrchestrateOptions,
@@ -198,8 +199,9 @@ export async function orchestrateCommand(
 
   // ── Live execution ──
   const useBatch = !!options.batch;
-  const parsedConcurrency = options.concurrency ? parseInt(String(options.concurrency), 10) : 5;
-  const concurrency = isNaN(parsedConcurrency) || parsedConcurrency < 1 ? 5 : parsedConcurrency;
+  // QUA-150: clamp to a safe upper bound. On 2026-04-09 a --concurrency=20
+  // run overwhelmed the wiki-server and tripped the FortiGuard IPS firewall.
+  const concurrency = clampSourcingConcurrency(options.concurrency);
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,
