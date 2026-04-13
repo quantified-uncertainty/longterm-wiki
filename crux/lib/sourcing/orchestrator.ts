@@ -201,7 +201,13 @@ export async function orchestrateCommand(
   const useBatch = !!options.batch;
   // QUA-150: clamp to a safe upper bound. On 2026-04-09 a --concurrency=20
   // run overwhelmed the wiki-server and tripped the FortiGuard IPS firewall.
-  const concurrency = clampSourcingConcurrency(options.concurrency);
+  // Route the clamp warning into the summary so --ci callers see it in the
+  // JSON payload (the default stderr write is invisible to machine parsers).
+  const clampWarnings: string[] = [];
+  const concurrency = clampSourcingConcurrency(options.concurrency, (msg) => {
+    clampWarnings.push(msg);
+    process.stderr.write(`${msg}\n`);
+  });
   const summary: OrchestrationSummary = {
     total: itemsToVerify.length,
     confirmed: 0,
@@ -221,6 +227,7 @@ export async function orchestrateCommand(
     },
     results: [],
     failures: [],
+    ...(clampWarnings.length > 0 ? { warnings: clampWarnings } : {}),
   };
 
   // Count by kind

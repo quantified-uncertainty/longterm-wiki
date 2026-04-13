@@ -2,53 +2,54 @@
  * Concurrency guard for source-check pipelines (QUA-150).
  *
  * On 2026-04-09, running the sourcing orchestrator with `--concurrency=20`
- * overwhelmed the wiki-server with concurrent write requests, causing
- * cascading timeouts and triggering a FortiGuard IPS firewall block.
+ * overwhelmed the wiki-server with concurrent writes and tripped the
+ * FortiGuard IPS firewall. Each orchestrator task fans out to ~4-6
+ * wiki-server calls (source fetch + existing-evidence lookup + verdict
+ * write + evidence write + optional archive/resource-suggest), so the
+ * task-level concurrency ceiling translates to ~5× that number of
+ * in-flight HTTP requests.
  *
- * This module centralizes concurrency parsing so every source-check
- * pipeline enforces the same hard cap. Callers pass the user-supplied
- * value (from `--concurrency=N` or similar), and this helper:
+ * MAX_SOURCING_CONCURRENCY is the task-level hard cap, chosen so peak
+ * in-flight request count stays comfortably below the incident level:
  *
- *   1. Falls back to DEFAULT_SOURCING_CONCURRENCY when the input is
- *      missing, unparseable, or below 1.
- *   2. Clamps to the max and logs a warning when the request exceeds it.
+ *     max_tasks × ~5 requests/task ≈ MAX_SOURCING_CONCURRENCY × 5
+ *     8 × 5 = 40 in-flight  (fix)    vs.    20 × 5 = 100 in-flight  (incident)
  *
- * The cap can be overridden for local experimentation via the
- * `SOURCING_CONCURRENCY_LIMIT` env var (rare — most operators should
- * not need this). The default (10) is 2x the pipeline's default of 5
- * and is the largest value we've seen complete without back-pressure.
+ * A proper request-level semaphore in `crux/lib/wiki-server/client.ts`
+ * would be a stronger defense — this file only constrains the task
+ * dispatch — and is tracked as a QUA-150 follow-up. Until that lands,
+ * the task cap is the only thing protecting the wiki-server from
+ * runaway fan-out in the orchestrator.
+ *
+ * There is no environment-variable escape hatch: any override would
+ * reopen the exact bug the cap exists to prevent. If a future operator
+ * has a legitimate need to raise it (e.g., the wiki-server gets a real
+ * rate limiter), update this file in a follow-up PR.
  */
 
 export const DEFAULT_SOURCING_CONCURRENCY = 5;
-
-/**
- * Hard upper bound on source-check pipeline concurrency.
- *
- * Reads `SOURCING_CONCURRENCY_LIMIT` at call time so tests can set and
- * unset the env var between assertions. Values < 1 or unparseable fall
- * back to 10, matching the hardcoded baseline before QUA-150.
- */
-export function getMaxSourcingConcurrency(): number {
-  const override = process.env.SOURCING_CONCURRENCY_LIMIT;
-  if (!override) return 10;
-  const parsed = Number.parseInt(override, 10);
-  if (!Number.isFinite(parsed) || parsed < 1) return 10;
-  return parsed;
-}
+export const MAX_SOURCING_CONCURRENCY = 8;
 
 export type WarnFn = (msg: string) => void;
 
 /**
- * Parse a user-supplied concurrency value and clamp it into [1, MAX].
+ * Parse a user-supplied concurrency value and clamp it into
+ * [1, MAX_SOURCING_CONCURRENCY].
  *
- * - `undefined` / `null` / empty string → DEFAULT_SOURCING_CONCURRENCY
- * - non-numeric / NaN / < 1              → DEFAULT_SOURCING_CONCURRENCY
- * - value > MAX                          → MAX, plus a warning via `warn`
- * - otherwise                            → floored integer value
+ * - `undefined` / `null` / empty string   → DEFAULT_SOURCING_CONCURRENCY
+ * - non-numeric / NaN / ±Infinity / < 1   → DEFAULT_SOURCING_CONCURRENCY
+ * - value > MAX                           → MAX, plus a warning via `warn`
+ * - otherwise                             → floored integer value
+ *
+ * Parsing uses `Number()`, not `parseInt()`, so strings with non-numeric
+ * suffixes (`"20abc"`, `"1e3"` when ambiguous, `"0x10"`) are rejected
+ * instead of silently misinterpreted. `parseInt("1e3", 10) === 1` was a
+ * specific footgun flagged during review: a user setting "1e3" expects
+ * 1000 and would silently get 1.
  *
  * The `warn` callback defaults to writing to stderr so the CLI surfaces
- * the clamp in ordinary terminal runs. Tests pass a collector function
- * to assert on the exact message.
+ * the clamp in ordinary terminal runs. Machine-readable callers pass a
+ * collector function to capture the message into structured output.
  */
 export function clampSourcingConcurrency(
   requested: unknown,
@@ -58,23 +59,27 @@ export function clampSourcingConcurrency(
     return DEFAULT_SOURCING_CONCURRENCY;
   }
 
+  // Use Number() (not parseInt) so partial-parse strings like "20abc"
+  // become NaN and fall through to the default. parseInt("20abc") = 20
+  // would silently accept the garbage; Number("20abc") is NaN, which the
+  // next guard rejects.
   const parsed =
     typeof requested === "number"
       ? requested
-      : Number.parseInt(String(requested), 10);
+      : Number(String(requested).trim());
 
-  if (!Number.isFinite(parsed) || Number.isNaN(parsed) || parsed < 1) {
+  // Number.isFinite rejects both NaN and ±Infinity in a single check.
+  if (!Number.isFinite(parsed) || parsed < 1) {
     return DEFAULT_SOURCING_CONCURRENCY;
   }
 
-  const max = getMaxSourcingConcurrency();
   const floored = Math.floor(parsed);
-  if (floored > max) {
+  if (floored > MAX_SOURCING_CONCURRENCY) {
     warn(
-      `Sourcing concurrency ${floored} exceeds safe cap ${max}; clamping to ${max} to prevent wiki-server overload (QUA-150). ` +
-        `Set SOURCING_CONCURRENCY_LIMIT=<n> to override for local testing only.`,
+      `Sourcing concurrency ${floored} exceeds safe cap ${MAX_SOURCING_CONCURRENCY}; ` +
+        `clamping to ${MAX_SOURCING_CONCURRENCY} to prevent wiki-server overload (QUA-150).`,
     );
-    return max;
+    return MAX_SOURCING_CONCURRENCY;
   }
   return floored;
 }
