@@ -1,5 +1,7 @@
 /**
- * Shared value formatting for structured data display.
+ * Unit-tagged number formatting (hardcoded million/billion/trillion thresholds
+ * and CURRENCIES lookup). Prefer `formatValue` from `@longterm-wiki/factbase/format`
+ * when a Property definition is available -- it's property.display-driven.
  *
  * Ported from build-data.mjs formatFactNumber/formatFactRange and extended
  * for use by both the facts system and the claims system.
@@ -42,14 +44,14 @@ function withCurrency(sym: string, position: "prefix" | "suffix", formatted: str
  * Format a single number into a human-readable string based on unit.
  *
  * Examples:
- *   formatValue(850000000, "USD")              -> "$850 million"
- *   formatValue(100000000, "USD", "GBP")       -> "£100 million"
- *   formatValue(30000000000, "USD")            -> "$30 billion"
- *   formatValue(40, "percent")                 -> "40%"
- *   formatValue(1500, "count")                 -> "1,500"
- *   formatValue(200000, "tokens")              -> "200,000"
+ *   formatNumberWithUnit(850000000, "USD")              -> "$850 million"
+ *   formatNumberWithUnit(100000000, "USD", "GBP")       -> "£100 million"
+ *   formatNumberWithUnit(30000000000, "USD")            -> "$30 billion"
+ *   formatNumberWithUnit(40, "percent")                 -> "40%"
+ *   formatNumberWithUnit(1500, "count")                 -> "1,500"
+ *   formatNumberWithUnit(200000, "tokens")              -> "200,000"
  */
-export function formatValue(n: number | null | undefined, unit?: string | null, currency?: string | null): string {
+export function formatNumberWithUnit(n: number | null | undefined, unit?: string | null, currency?: string | null): string {
   if (n == null) return "";
   const cur = resolveCurrencyInfo(unit, currency);
   if (cur !== null) {
@@ -132,7 +134,7 @@ export function formatStructuredValue(
 ): string {
   const n = Number(rawValue);
   if (Number.isFinite(n) && rawValue.trim() !== "") {
-    return formatValue(n, unit);
+    return formatNumberWithUnit(n, unit);
   }
   return rawValue;
 }
