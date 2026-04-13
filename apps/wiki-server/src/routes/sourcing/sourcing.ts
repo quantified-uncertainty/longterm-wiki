@@ -208,15 +208,19 @@ const EvidenceByRecordsBody = z.object({
     .min(1)
     .max(MAX_EVIDENCE_BY_RECORDS),
   /**
-   * Optional per-record row cap. Callers that just need the first
-   * `sourceUrl` (`sourcing-suggest-urls`, `sourcing-recheck`) pass a small
-   * value. `sourcing-audit-urls` needs all URLs to classify each one and
-   * leaves it unset.
+   * Required per-record row cap. Callers must be explicit about payload
+   * size — an unbounded fetch across 1000 records could load millions of
+   * evidence rows into memory. A small value (e.g. 5) is sufficient for
+   * "find the first non-null source URL" use cases.
    */
-  limitPerRecord: z.number().int().min(1).max(MAX_PAGE_SIZE).optional(),
+  limitPerRecord: z.number().int().min(1).max(MAX_PAGE_SIZE),
 });
 
-/** Join (recordType, recordId) into a stable response-map key. */
+/**
+ * Join (recordType, recordId) into a stable response-map key.
+ * Kept in sync with `evidenceRecordKey` in the crux client
+ * (`crux/lib/wiki-server/sourcing-client.ts`).
+ */
 export function evidenceRecordKey(recordType: string, recordId: string): string {
   return `${recordType}|${recordId}`;
 }
@@ -764,16 +768,13 @@ const sourcingApp = new Hono()
 
     const evidenceByKey: Record<string, ReturnType<typeof mapEvidenceRow>[]> = {};
     for (const [recordType, idSet] of byType) {
-      const ids = [...idSet];
-      if (ids.length === 0) continue;
-
       const rows = await db
         .select()
         .from(recordSources)
         .where(
           and(
             eq(recordSources.recordType, recordType),
-            inArray(recordSources.recordId, ids),
+            inArray(recordSources.recordId, [...idSet]),
           )
         )
         .orderBy(recordSources.sourceUrl, desc(recordSources.checkedAt));
@@ -788,7 +789,7 @@ const sourcingApp = new Hono()
           bucket = [];
           evidenceByKey[key] = bucket;
         }
-        if (limitPerRecord != null && bucket.length >= limitPerRecord) continue;
+        if (bucket.length >= limitPerRecord) continue;
         bucket.push(mapEvidenceRow(row));
       }
     }

@@ -5,7 +5,7 @@
  * Response types are inferred from the Hono RPC route type via InferResponseType<>.
  */
 
-import { apiRequest, type ApiResult } from './client.ts';
+import { apiRequest, batchedRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { SourcingRoute } from '../../../apps/wiki-server/src/routes/sourcing/sourcing.ts';
 import type {
@@ -102,22 +102,30 @@ export async function getEvidenceByRecord(
  * are absent from the map (not empty arrays), so callers can distinguish
  * "queried, no evidence" from "skipped".
  *
- * `limitPerRecord` caps the number of evidence rows returned per record.
- * Callers that just need the first `sourceUrl` should pass a small value
- * (e.g. 5) to reduce payload size.
+ * `limitPerRecord` is required: it caps the number of evidence rows
+ * returned per record and forces callers to be explicit about payload
+ * size. Callers that just need the first `sourceUrl` pass a small value
+ * (e.g. 5); auditors that classify every URL pass something larger.
+ *
+ * Uses `batchedRequest` (30s timeout) because the batched endpoint is
+ * inherently slower than a point lookup.
  */
 export async function getEvidenceByRecords(
   records: Array<{ recordType: string; recordId: string }>,
-  options?: { limitPerRecord?: number },
+  options: { limitPerRecord: number },
 ): Promise<ApiResult<EvidenceByRecordsResult>> {
-  return apiRequest<EvidenceByRecordsResult>(
+  return batchedRequest<EvidenceByRecordsResult>(
     'POST',
     '/api/sourcing/evidence/by-records',
-    { records, limitPerRecord: options?.limitPerRecord },
+    { records, limitPerRecord: options.limitPerRecord },
   );
 }
 
-/** Build the response-map key used by `getEvidenceByRecords`. */
+/**
+ * Build the response-map key used by `getEvidenceByRecords`.
+ * Kept in sync with `evidenceRecordKey` in the server route
+ * (`apps/wiki-server/src/routes/sourcing/sourcing.ts`).
+ */
 export function evidenceRecordKey(recordType: string, recordId: string): string {
   return `${recordType}|${recordId}`;
 }

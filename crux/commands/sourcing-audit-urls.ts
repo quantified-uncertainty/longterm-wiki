@@ -32,9 +32,11 @@ export { classifyByUrl, normalizeUrlForJoin, extractHost };
 // ── Module constants ──
 
 /**
- * Max records per batch evidence request. QUA-331 — the server caps at
- * 1000; we chunk at 1000 so a `--limit=2000` × 2 verdicts = 4000-record
- * scan resolves in 4 HTTP calls instead of 4000.
+ * Max records per batch evidence request. QUA-331 — matches the server
+ * cap `MAX_EVIDENCE_BY_RECORDS` in sourcing.ts. In practice one chunk is
+ * enough (listVerdicts clamps server-side to 200, so default `--verdict`
+ * sets produce ≤1000 records); the chunk loop is defensive in case that
+ * clamp grows or callers add more verdict types.
  */
 const EVIDENCE_BATCH_SIZE = 1000;
 
@@ -160,15 +162,13 @@ async function auditCommand(
   }
 
   // ── Step 2: batch-fetch evidence (QUA-331) ──
-  // One HTTP call per 1000-record chunk instead of one per record.
-  // Index verdict metadata by key so we can join evidence rows back to
-  // `verdict` without re-querying.
-  const verdictByKey = new Map<string, { recordType: string; recordId: string; verdict: string }>();
-  for (const v of verdictRecords) {
-    verdictByKey.set(evidenceRecordKey(v.recordType, v.recordId), v);
-  }
-
-  const rows: AuditRow[] = [];
+  // Accumulate across chunks into one map, then iterate `verdictRecords`
+  // in input order so report output stays deterministic regardless of
+  // server-side grouping.
+  const allEvidence: Record<
+    string,
+    Array<{ sourceUrl: string | null; fieldName: string | null }>
+  > = {};
   for (let i = 0; i < verdictRecords.length; i += EVIDENCE_BATCH_SIZE) {
     const chunk = verdictRecords.slice(i, i + EVIDENCE_BATCH_SIZE);
     const res = await getEvidenceByRecords(
@@ -181,26 +181,29 @@ async function auditCommand(
         output: `Failed to batch-fetch evidence: ${res.message ?? 'unknown error'}`,
       };
     }
-    for (const [key, evidenceRows] of Object.entries(res.data.evidenceByKey)) {
-      const v = verdictByKey.get(key);
-      if (!v) continue; // should not happen — server echoes only requested keys
-      for (const e of evidenceRows) {
-        if (!e.sourceUrl) continue;
-        const sourceUrl = e.sourceUrl;
-        const cls = classifyByUrl(sourceUrl);
-        const flagged = cls.purpose === 'homepage' && cls.confidence >= FLAG_THRESHOLD;
-        rows.push({
-          recordType: v.recordType,
-          recordId: v.recordId,
-          fieldName: e.fieldName,
-          verdict: v.verdict,
-          sourceUrl,
-          host: extractHost(sourceUrl),
-          flagged,
-          flagReasons: cls.reasons,
-          confidence: cls.confidence,
-        });
-      }
+    Object.assign(allEvidence, res.data.evidenceByKey);
+  }
+
+  const rows: AuditRow[] = [];
+  for (const v of verdictRecords) {
+    const evidenceRows = allEvidence[evidenceRecordKey(v.recordType, v.recordId)];
+    if (!evidenceRows) continue;
+    for (const e of evidenceRows) {
+      if (!e.sourceUrl) continue;
+      const sourceUrl = e.sourceUrl;
+      const cls = classifyByUrl(sourceUrl);
+      const flagged = cls.purpose === 'homepage' && cls.confidence >= FLAG_THRESHOLD;
+      rows.push({
+        recordType: v.recordType,
+        recordId: v.recordId,
+        fieldName: e.fieldName,
+        verdict: v.verdict,
+        sourceUrl,
+        host: extractHost(sourceUrl),
+        flagged,
+        flagReasons: cls.reasons,
+        confidence: cls.confidence,
+      });
     }
   }
 

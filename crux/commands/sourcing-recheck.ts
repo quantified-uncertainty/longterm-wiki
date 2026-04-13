@@ -113,31 +113,32 @@ interface RecheckSummary {
  * HTTP call. Returns a map keyed by `recordType|recordId`. Missing keys
  * mean no evidence row carried a `sourceUrl` (or the record was absent
  * from the evidence table) — the caller treats that as "no URL".
+ *
+ * Throws on HTTP failure so the caller aborts the whole scan. The old
+ * per-record path swallowed errors and returned null per item; with a
+ * batch call, swallowing would turn a single network blip into "every
+ * record has no URL" for the entire scan, which is indistinguishable
+ * from a real data shortage. Better to fail loudly.
  */
-async function fetchSourceUrls(
-  items: DueItem[],
-): Promise<Map<string, string>> {
+async function fetchSourceUrls(items: DueItem[]): Promise<Map<string, string>> {
   const result = new Map<string, string>();
   if (items.length === 0) return result;
 
-  try {
-    const response = await getEvidenceByRecords(
-      items.map((i) => ({ recordType: i.recordType, recordId: i.recordId })),
-      { limitPerRecord: 5 },
+  const response = await getEvidenceByRecords(
+    items.map((i) => ({ recordType: i.recordType, recordId: i.recordId })),
+    { limitPerRecord: 5 },
+  );
+  if (!response.ok) {
+    throw new Error(
+      `Batch evidence fetch failed: ${response.message ?? 'unknown error'}`,
     );
-    if (!response.ok || !response.data?.evidenceByKey) return result;
-
-    for (const [key, rows] of Object.entries(response.data.evidenceByKey)) {
-      const firstUrl = rows.find((e) => e.sourceUrl)?.sourceUrl;
-      if (firstUrl) result.set(key, firstUrl);
-    }
-    return result;
-  } catch (e: unknown) {
-    console.warn(
-      `${LOG_PREFIX} Failed to batch-fetch source URLs: ${e instanceof Error ? e.message : String(e)}`,
-    );
-    return result;
   }
+
+  for (const [key, rows] of Object.entries(response.data.evidenceByKey)) {
+    const firstUrl = rows.find((e) => e.sourceUrl)?.sourceUrl;
+    if (firstUrl) result.set(key, firstUrl);
+  }
+  return result;
 }
 
 // ── LLM re-check ─────────────────────────────────────────────
@@ -367,8 +368,17 @@ async function recheckCommand(
   console.log(`\n\x1b[1mRechecking ${itemsToRecheck.length} items (est. \$${estimatedCost.toFixed(2)})...\x1b[0m\n`);
 
   // QUA-331: pre-fetch every source URL in one batch call rather than
-  // one-per-item inside the loop.
-  const sourceUrlsByKey = await fetchSourceUrls(itemsToRecheck);
+  // one-per-item inside the loop. Abort on failure — see `fetchSourceUrls`
+  // docstring for why swallowing here would mask real data shortages.
+  let sourceUrlsByKey: Map<string, string>;
+  try {
+    sourceUrlsByKey = await fetchSourceUrls(itemsToRecheck);
+  } catch (e: unknown) {
+    return {
+      exitCode: 1,
+      output: `${LOG_PREFIX} ${e instanceof Error ? e.message : String(e)}`,
+    };
+  }
 
   for (let i = 0; i < itemsToRecheck.length; i++) {
     const item = itemsToRecheck[i];
