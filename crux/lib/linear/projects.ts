@@ -11,7 +11,7 @@
  * first so name collisions with UUID-shaped strings can't occur.
  */
 
-import { linearGraphQL, LINEAR_WORKSPACE_SLUG } from './client.ts';
+import { linearGraphQL } from './client.ts';
 import { QUA_TEAM_ID } from './workflow-states.ts';
 
 export interface LinearProject {
@@ -60,17 +60,17 @@ export async function listProjects(): Promise<LinearProject[]> {
         pageInfo: { hasNextPage: boolean; endCursor: string | null };
       };
     } = await linearGraphQL(
-      `query Projects($after: String) {
+      `query Projects($teamId: ID!, $after: String) {
         projects(
           first: 100
           after: $after
-          filter: { accessibleTeams: { id: { eq: "${QUA_TEAM_ID}" } } }
+          filter: { accessibleTeams: { id: { eq: $teamId } } }
         ) {
           nodes { ${PROJECT_FIELDS} }
           pageInfo { hasNextPage endCursor }
         }
       }`,
-      { after },
+      { teamId: QUA_TEAM_ID, after },
     );
     all.push(...data.projects.nodes);
     after = data.projects.pageInfo.hasNextPage ? data.projects.pageInfo.endCursor : null;
@@ -173,7 +173,3 @@ export async function createProjectUpdate(
   }
 }
 
-/** Build a Linear project URL for display (the API already returns `url` but this is a convenience for constructed references). */
-export function linearProjectUrl(slug: string): string {
-  return `https://linear.app/${LINEAR_WORKSPACE_SLUG}/project/${slug}`;
-}

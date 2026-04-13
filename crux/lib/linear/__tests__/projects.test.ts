@@ -4,7 +4,6 @@ import {
   getProject,
   updateProject,
   createProjectUpdate,
-  linearProjectUrl,
   type LinearProject,
 } from '../projects.ts';
 
@@ -59,6 +58,26 @@ describe('projects.ts', () => {
       const all = await listProjects();
       expect(all).toHaveLength(2);
       expect(all[0].name).toBe('Content Quality & Enrichment');
+    });
+
+    it('exits the loop when endCursor is null even if hasNextPage is true', async () => {
+      // Defensive: some GraphQL servers occasionally return hasNextPage=true
+      // with a null endCursor. We treat a null cursor as the end of the stream
+      // so the loop can't spin forever.
+      const fetchFn = vi.fn().mockResolvedValueOnce(
+        jsonResponse({
+          data: {
+            projects: {
+              nodes: [fixture],
+              pageInfo: { hasNextPage: true, endCursor: null },
+            },
+          },
+        }),
+      );
+      globalThis.fetch = fetchFn as unknown as typeof fetch;
+      const all = await listProjects();
+      expect(all).toHaveLength(1);
+      expect(fetchFn).toHaveBeenCalledTimes(1);
     });
 
     it('paginates across multiple pages with cursor', async () => {
@@ -256,11 +275,4 @@ describe('projects.ts', () => {
     });
   });
 
-  describe('linearProjectUrl', () => {
-    it('builds a url from a slug', () => {
-      expect(linearProjectUrl('content-quality-enrichment-xyz')).toBe(
-        'https://linear.app/quantifieduncertainty/project/content-quality-enrichment-xyz',
-      );
-    });
-  });
 });
