@@ -81,12 +81,21 @@ function loadChecklistItems(): ParsedItem[] | null {
 // Subcommands
 // ---------------------------------------------------------------------------
 
-// handler-safe: pure presentation over an already-parsed checklist file
 async function check(_args: string[], options: CommandOptions): Promise<CommandResult> {
-  const log = createLogger(options.ci);
+  const log = createLogger(options.ci as boolean | undefined);
   const c = log.colors;
 
-  const items = loadChecklistItems();
+  let items: ParsedItem[] | null;
+  try {
+    items = loadChecklistItems();
+  } catch (e) {
+    const msg = `Failed to read checklist at ${CHECKLIST_PATH}: ${e instanceof Error ? e.message : String(e)}`;
+    return {
+      exitCode: 1,
+      output: options.json ? JSON.stringify({ ok: false, error: msg }, null, 2) : `${c.red}${msg}${c.reset}\n`,
+    };
+  }
+
   if (!items) {
     return {
       exitCode: 1,
@@ -142,10 +151,12 @@ async function check(_args: string[], options: CommandOptions): Promise<CommandR
   }
 
   const results = collectPatternAttestations(items);
+  const ok = allAttested(results);
+
   if (options.json) {
     return {
-      exitCode: allAttested(results) ? 0 : 1,
-      output: JSON.stringify({ ok: allAttested(results), items: results }, null, 2),
+      exitCode: ok ? 0 : 1,
+      output: JSON.stringify({ ok, items: results }, null, 2),
     };
   }
 
@@ -170,7 +181,7 @@ async function check(_args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  if (allAttested(results)) {
+  if (ok) {
     lines.push('');
     lines.push(`${c.green}✓ All ${results.length} pattern item(s) attested.${c.reset}`);
     return { exitCode: 0, output: lines.join('\n') + '\n' };
@@ -210,7 +221,7 @@ async function list(_args: string[], options: CommandOptions): Promise<CommandRe
       ),
     };
   }
-  const log = createLogger(options.ci);
+  const log = createLogger(options.ci as boolean | undefined);
   const c = log.colors;
   const lines: string[] = [];
   lines.push(`${c.bold}Review patterns registered (${PATTERNS.length}):${c.reset}`);

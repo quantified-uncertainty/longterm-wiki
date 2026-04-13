@@ -93,6 +93,30 @@ export interface PatternHit {
 }
 
 // ---------------------------------------------------------------------------
+// File-filter helpers used by multiple pattern detect() functions
+// ---------------------------------------------------------------------------
+
+const CODE_FILE_EXT = /\.(ts|tsx|mjs|js)$/;
+
+/** True for JS/TS source files regardless of test/production status. */
+function isCodeFileExtension(path: string): boolean {
+  return CODE_FILE_EXT.test(path);
+}
+
+/**
+ * True for JS/TS production source files. Excludes test files
+ * (`__tests__/` directories and `*.test.ts` suffixes) since test
+ * fixtures commonly include the bug shapes we're detecting ON PURPOSE.
+ */
+function isScannableCodeFile(path: string): boolean {
+  if (!CODE_FILE_EXT.test(path)) return false;
+  if (path.includes('/__tests__/')) return false;
+  if (path.endsWith('.test.ts') || path.endsWith('.test.tsx')) return false;
+  if (path.endsWith('.spec.ts') || path.endsWith('.spec.tsx')) return false;
+  return true;
+}
+
+// ---------------------------------------------------------------------------
 // Pattern registry
 // ---------------------------------------------------------------------------
 
@@ -105,29 +129,17 @@ export const PATTERNS: ReviewPattern[] = [
     origin: 'QUA-339 pass-2 bug HIGH-2',
     mechanical: true,
     detect(diff) {
-      // Match regex literals or string patterns applied to a `conclusion`
-      // field. We're looking for two shapes:
-      //   /failure|cancelled/.test(x.conclusion)
-      //   /fail|cancel/i.test(conclusion)
-      //   'failure' === conclusion etc
-      //
-      // The detection is intentionally loose: any regex that mentions
-      // conclusion-like variants without including ALL failing ones is
-      // a candidate. The validator then verifies exhaustiveness.
-      const hits: PatternHit[] = [];
-      // A JS regex literal that alludes to check-conclusion names.
-      // Intentionally loose — the mechanical validator then verifies
+      // Fire on regex literals that mention any conclusion-flavored token
+      // (intentionally loose). The mechanical validator then verifies
       // exhaustiveness against the full FAILING_CONCLUSIONS allowlist.
+      const hits: PatternHit[] = [];
       const RE = /\/[^/\n]*(failure|fail|cancel|error|timed_out|action_required)[^/\n]*\//;
+      const CONTEXT_RE = /conclusion|statusCheck|check[_\s]?run/i;
       for (const file of diff.files) {
-        if (!/\.(ts|tsx|mjs|js)$/.test(file.path)) continue;
-        if (file.path.includes('/__tests__/') || file.path.endsWith('.test.ts')) continue;
+        if (!isScannableCodeFile(file.path)) continue;
         for (const line of file.addedLines) {
           if (!RE.test(line.content)) continue;
-          // Require the line (or a 2-line context window — caller passes
-          // us only individual lines, so fall back to the line itself)
-          // to mention "conclusion" somewhere nearby.
-          if (!/conclusion|statusCheck|check[_\s]?run/i.test(line.content)) continue;
+          if (!CONTEXT_RE.test(line.content)) continue;
           hits.push({ file: file.path, line: line.newLineNumber, snippet: line.content.trim() });
         }
       }
@@ -177,10 +189,11 @@ export const PATTERNS: ReviewPattern[] = [
     mechanical: false,
     detect(diff) {
       const hits: PatternHit[] = [];
+      const RE = /\breaddirSync\b|\blistMatching\b/;
       for (const file of diff.files) {
-        if (!/\.(ts|tsx|mjs|js)$/.test(file.path)) continue;
+        if (!isCodeFileExtension(file.path)) continue;
         for (const line of file.addedLines) {
-          if (!/\breaddirSync\b|\blistMatching\b/.test(line.content)) continue;
+          if (!RE.test(line.content)) continue;
           hits.push({ file: file.path, line: line.newLineNumber, snippet: line.content.trim() });
         }
       }
@@ -200,8 +213,7 @@ export const PATTERNS: ReviewPattern[] = [
       // hints at a path or numeric id (path, slotPath, id, pid, port).
       const RE = /\.includes\(\s*[a-z][\w.]*(?:path|Path|id|Id|pid|Pid|port|Port)\b\s*\)/;
       for (const file of diff.files) {
-        if (!/\.(ts|tsx|mjs|js)$/.test(file.path)) continue;
-        if (file.path.includes('/__tests__/') || file.path.endsWith('.test.ts')) continue;
+        if (!isScannableCodeFile(file.path)) continue;
         for (const line of file.addedLines) {
           if (!RE.test(line.content)) continue;
           hits.push({ file: file.path, line: line.newLineNumber, snippet: line.content.trim() });

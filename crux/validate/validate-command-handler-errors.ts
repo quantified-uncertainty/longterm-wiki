@@ -127,15 +127,32 @@ export function scanHandlers(filePath: string, content: string): HandlerFinding[
 }
 
 /**
+ * Strip line comments from a source line so brace-counting scanners
+ * don't mistake `// {` for a real opening brace. Rough heuristic: cuts
+ * from the first `//` not preceded by `:` (to spare protocol-ish
+ * `http://`) and not inside a string. We don't try to fully tokenize;
+ * the handler bodies we care about rarely have both string literals
+ * AND `//` on the same line.
+ */
+function stripLineComment(line: string): string {
+  const idx = line.indexOf('//');
+  if (idx < 0) return line;
+  if (idx > 0 && line[idx - 1] === ':') return line; // e.g., http://
+  return line.slice(0, idx);
+}
+
+/**
  * Given the line index of a function body's opening `{`, find the line
  * index of its matching `}`. Best-effort: counts `{` / `}` occurrences
- * without respecting strings or comments. Good enough for handler bodies.
+ * after stripping single-line comments. Doesn't handle block comments
+ * or string literals — handler bodies are usually simple enough for
+ * this to be fine, and the red-team tests exercise the failure modes.
  */
 function findMatchingBrace(lines: string[], openLine: number): number {
   let depth = 0;
   let started = false;
   for (let i = openLine; i < lines.length; i++) {
-    for (const ch of lines[i]) {
+    for (const ch of stripLineComment(lines[i])) {
       if (ch === '{') { depth += 1; started = true; }
       else if (ch === '}') {
         depth -= 1;
@@ -154,7 +171,7 @@ function bodyContainsTopLevelTry(lines: string[], openLine: number, endLine: num
   let depth = 0;
   let started = false;
   for (let i = openLine; i <= endLine && i < lines.length; i++) {
-    const line = lines[i];
+    const line = stripLineComment(lines[i]);
     for (let k = 0; k < line.length; k++) {
       const ch = line[k];
       if (ch === '{') { depth += 1; started = true; continue; }

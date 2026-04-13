@@ -73,6 +73,14 @@ describe('scanFileContent — github conclusion enum exhaustiveness', () => {
     expect(scanFileContent(PATH, code)).toHaveLength(0);
   });
 
+  it('ignores commented-out regexes (live-code check only)', () => {
+    const code = `
+      // const old = /failure|cancel/.test(c.conclusion);
+      const rate = 1; // conclusion
+    `;
+    expect(scanFileContent(PATH, code)).toHaveLength(0);
+  });
+
   it('catches multiple violations in one file', () => {
     const code = `
       const a = /failure|cancelled/.test(x.conclusion);

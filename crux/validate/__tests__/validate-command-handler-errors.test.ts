@@ -165,6 +165,23 @@ async function nested(args: string[], options: CommandOptions): Promise<CommandR
     expect(findings[0].status).toBe('unsafe');
   });
 
+  it('is not fooled by `{` inside a line comment', () => {
+    // Regression: pre-fix brace counter treated `// {` as an unbalanced
+    // open brace, shifting depth and causing the real try to appear
+    // at depth 2 instead of depth 1.
+    const code = `
+async function withComment(x: S, o: O): Promise<CommandResult> {
+  // this { is a comment
+  try {
+    return { exitCode: 0, output: '' };
+  } catch {
+    return { exitCode: 1, output: '' };
+  }
+}
+`;
+    expect(scanHandlers(PATH, code)[0].status).toBe('safe');
+  });
+
   it('reports accurate line numbers', () => {
     const code = [
       '',

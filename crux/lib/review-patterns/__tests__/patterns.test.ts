@@ -170,6 +170,17 @@ describe('github-conclusion-enum', () => {
     const d = DIFF_CONCLUSION_REGEX_GAP.replaceAll('crux/lib/foo.ts', 'crux/lib/foo.test.ts');
     expect(pattern.detect(parseDiff(d))).toHaveLength(0);
   });
+  it('skips .spec.ts files', () => {
+    const d = DIFF_CONCLUSION_REGEX_GAP.replaceAll('crux/lib/foo.ts', 'crux/lib/foo.spec.ts');
+    expect(pattern.detect(parseDiff(d))).toHaveLength(0);
+  });
+  it('skips files inside __tests__ directories', () => {
+    const d = DIFF_CONCLUSION_REGEX_GAP.replaceAll(
+      'crux/lib/foo.ts',
+      'crux/lib/__tests__/foo.ts',
+    );
+    expect(pattern.detect(parseDiff(d))).toHaveLength(0);
+  });
 });
 
 describe('command-handler-error-boundary', () => {

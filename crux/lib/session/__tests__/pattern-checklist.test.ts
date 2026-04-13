@@ -12,6 +12,7 @@ import { describe, it, expect } from 'vitest';
 import {
   buildChecklist,
   buildPatternItems,
+  parseChecklist,
   type ChecklistMetadata,
 } from '../session-checklist.ts';
 import { parseDiff, detectAllPatterns } from '../../review-patterns/patterns.ts';
@@ -93,5 +94,38 @@ describe('buildChecklist with extraItems', () => {
     // Last line should be the highest-numbered pattern item
     const last = lines[lines.length - 1];
     expect(last).toMatch(/review-/);
+  });
+
+  it('parseChecklist round-trips pattern items added via extraItems', () => {
+    // Regression: the `## Review patterns` reference section that
+    // agent-checklist.ts appends after Key Decisions should not
+    // interfere with parseChecklist's enumeration of review-* items
+    // from the main checklist.
+    const detections = detectAllPatterns(parseDiff(DIFF_WITH_HITS));
+    const patternItems = buildPatternItems(detections);
+    const md = buildChecklist('infrastructure', BASE_METADATA, patternItems);
+    // Manually simulate what agent-checklist.ts appends
+    const mdWithSection = md + `
+
+## Review patterns (QUA-363)
+
+> Some explanation text.
+
+### \`review-github-conclusion-enum\` — GitHub check conclusions handled exhaustively
+
+**Why**: description text
+**Origin**: QUA-339 pass-2 bug HIGH-2
+
+**Hits in current diff**:
+- \`crux/lib/foo.ts:2\` — \`const bad = /failure|cancelled/.test(x.conclusion);\`
+`;
+    const parsed = parseChecklist(mdWithSection);
+    const reviewIds = parsed.items.filter((i) => i.id.startsWith('review-')).map((i) => i.id);
+    // All pattern items should be parsed as real items (status:unchecked)
+    expect(reviewIds.sort()).toEqual(
+      patternItems.map((i) => i.id).sort(),
+    );
+    // No items from the "Review patterns" reference section should leak in
+    expect(parsed.items.every((i) => !i.label.includes('Hits in current diff'))).toBe(true);
   });
 });

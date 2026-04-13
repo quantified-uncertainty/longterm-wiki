@@ -109,6 +109,10 @@ export function scanFileContent(filePath: string, content: string): Violation[] 
     // Suppression check on this line OR the line above.
     if (SUPPRESSION_RE.test(line)) continue;
     if (i > 0 && SUPPRESSION_RE.test(lines[i - 1])) continue;
+    // Skip single-line comments. A commented-out regex isn't live code and
+    // shouldn't be flagged. Block comments and JSDoc blocks are rare enough
+    // with inline regexes that we don't try to detect them here.
+    if (line.trim().startsWith('//')) continue;
 
     // Find every regex literal on this line.
     // Simple extractor: match `/` ... unescaped `/` on one line.

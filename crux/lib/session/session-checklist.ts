@@ -218,6 +218,10 @@ export function getItemsForType(type: SessionType): ChecklistItem[] {
  * Read the current diff against origin/main (or main if origin unreachable).
  * Returns an empty string on any failure — pattern detection becomes a no-op
  * rather than blocking checklist init when git state is weird.
+ *
+ * Hard-capped at a 10s timeout per attempt so a hung git command cannot
+ * block `agent-checklist init`. On huge repos the 16MB maxBuffer should
+ * comfortably cover realistic diffs (~a few MB worst case).
  */
 export function getDiffAgainstMain(cwd: string = process.cwd()): string {
   const attempts = [
@@ -227,7 +231,13 @@ export function getDiffAgainstMain(cwd: string = process.cwd()): string {
   ];
   for (const cmd of attempts) {
     try {
-      const out = execSync(cmd, { cwd, encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      const out = execSync(cmd, {
+        cwd,
+        encoding: 'utf-8',
+        maxBuffer: 16 * 1024 * 1024,
+        timeout: 10_000,
+        stdio: ['ignore', 'pipe', 'ignore'],
+      });
       if (out.length > 0) return out;
     } catch { /* try next */ }
   }
@@ -264,8 +274,15 @@ export function detectPatternItems(cwd?: string): {
 } {
   const diff = getDiffAgainstMain(cwd);
   if (!diff) return { items: [], detections: [] };
-  const detections = detectAllPatterns(parseDiff(diff));
-  return { items: buildPatternItems(detections), detections };
+  // Pattern detection runs over untrusted diff text; a malformed diff
+  // must NEVER block `agent-checklist init`. Fall back to no items if
+  // anything in the parse/detect pipeline throws.
+  try {
+    const detections = detectAllPatterns(parseDiff(diff));
+    return { items: buildPatternItems(detections), detections };
+  } catch {
+    return { items: [], detections: [] };
+  }
 }
 
 export function buildChecklist(
