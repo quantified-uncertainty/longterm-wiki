@@ -118,8 +118,17 @@ describe('findAllLinearIds', () => {
     expect(findAllLinearIds('')).toEqual([]);
   });
 
-  it('dedupes case variants to canonical form', () => {
-    const body = 'QUA-1 qua-1 Qua-1';
-    expect(findAllLinearIds(body)).toEqual(['QUA-1']);
+  it('matches lowercase and mixed-case bare tokens, deduped to canonical form', () => {
+    // Commit messages and pasted Linear URL slugs use lowercase commonly,
+    // so findAllLinearIds is intentionally case-insensitive on bare tokens
+    // (unlike parseLinearId which is case-sensitive on bare tokens to avoid
+    // mis-classifying random caps in prose).
+    expect(findAllLinearIds('QUA-1 qua-1 Qua-1')).toEqual(['QUA-1']);
+    expect(findAllLinearIds('only lowercase qua-7 here')).toEqual(['QUA-7']);
+  });
+
+  it('finds multiple distinct ids regardless of case', () => {
+    const body = 'fixed qua-1, then qua-2, finally QUA-3';
+    expect(findAllLinearIds(body).sort()).toEqual(['QUA-1', 'QUA-2', 'QUA-3']);
   });
 });

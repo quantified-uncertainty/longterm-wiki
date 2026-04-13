@@ -28,12 +28,14 @@ import {
 import {
   auditInProgress,
   extractFixesIds,
+  STALE_DAYS,
   type AuditBucket,
   type AuditEntry,
 } from '../lib/linear/audit.ts';
 import { githubApi } from '../lib/github.ts';
+import { resolve as resolvePath } from 'path';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
-import { findAllLinearIds, parseLinearId } from '../lib/linear/parse-id.ts';
+import { findAllLinearIds, parseLinearId, resolveLinearId } from '../lib/linear/parse-id.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
@@ -312,6 +314,13 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   const bucketFilter = args.find((a) => a.startsWith('--bucket='))?.split('=')[1];
   const fix = args.includes('--fix');
 
+  if (fix && options.json) {
+    return {
+      output: `${c.red}--fix and --json cannot be combined. Pick one: --json prints classification, --fix mutates Linear state.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
   const entries = await auditInProgress();
 
   if (options.json) {
@@ -343,7 +352,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
       action: 'All sub-issues resolved. Close: crux linear done QUA-NNN',
     },
     orphan: {
-      label: `ORPHAN (>${7}d no PR)`,
+      label: `ORPHAN (>${STALE_DAYS}d no PR)`,
       color: c.red,
       action: 'No PR, no activity. Move to Backlog or reassess scope.',
     },
@@ -390,6 +399,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     out += `${c.green}✓${c.reset} All In Progress issues look healthy.\n`;
   }
 
+  let fixFailures = 0;
   if (fix) {
     const toFix = [...groups.shipped, ...groups['parent-epic']];
     if (toFix.length === 0) {
@@ -399,6 +409,8 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
       for (const e of toFix) {
         try {
           await updateIssueState(e.issue.identifier, 'Done');
+          // mergedPRs is sorted newest-first by classifyPRs() — [0] is the
+          // most recent merge, matching the reason string.
           const prRef = e.mergedPRs[0]
             ? `\n\n**PR:** ${e.mergedPRs[0].url}`
             : e.bucket === 'parent-epic'
@@ -412,12 +424,13 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
         } catch (err) {
           const msg = err instanceof Error ? err.message : String(err);
           out += `  ${c.red}✗${c.reset} ${e.issue.identifier} — ${msg}\n`;
+          fixFailures += 1;
         }
       }
     }
   }
 
-  return { output: out, exitCode: 0 };
+  return { output: out, exitCode: fixFailures > 0 ? 1 : 0 };
 }
 
 /**
@@ -474,6 +487,7 @@ async function verifyPr(args: string[], options: CommandOptions): Promise<Comman
 
   let out = `${c.bold}Verifying PR #${prNum} → ${ids.length} Linear issue(s)${c.reset}\n`;
   let corrected = 0;
+  let failures = 0;
 
   for (const id of ids) {
     const issue = await getIssue(id);
@@ -481,8 +495,12 @@ async function verifyPr(args: string[], options: CommandOptions): Promise<Comman
       out += `  ${c.yellow}?${c.reset} ${id} — not found\n`;
       continue;
     }
-    if (issue.state.name === 'Done' || issue.state.name === 'Canceled') {
-      out += `  ${c.green}✓${c.reset} ${id} — already ${issue.state.name}\n`;
+    // Only reconcile from active workflow states (In Progress / In Review).
+    // If a user has deliberately moved the issue elsewhere — Backlog, Todo,
+    // Canceled, Duplicate, or already Done — respect that. The watchdog's
+    // job is recovering from missed webhooks, not overriding human decisions.
+    if (issue.state.type !== 'started') {
+      out += `  ${c.dim}—${c.reset} ${id} [${issue.state.name}] — not in active state, skipping\n`;
       continue;
     }
     try {
@@ -496,16 +514,17 @@ async function verifyPr(args: string[], options: CommandOptions): Promise<Comman
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       out += `  ${c.red}✗${c.reset} ${id} — ${msg}\n`;
+      failures += 1;
     }
   }
 
   if (corrected > 0) {
     out += `\n${c.yellow}${corrected} issue(s) corrected.${c.reset} Linear's integration likely missed the webhook — PR body or branch name may need clearer refs.\n`;
-  } else {
-    out += `\n${c.green}✓${c.reset} All linked issues already in terminal state.\n`;
+  } else if (failures === 0) {
+    out += `\n${c.green}✓${c.reset} All linked issues already in terminal state or not actively In Progress.\n`;
   }
 
-  return { output: out, exitCode: 0 };
+  return { output: out, exitCode: failures > 0 ? 1 : 0 };
 }
 
 /**
@@ -518,17 +537,35 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
   const log = createLogger(options.ci);
   const c = log.colors;
 
+  // Resolve paths relative to the repo root, not process.cwd(), so the
+  // command works correctly when invoked from a nested directory or via a
+  // skill that doesn't cd first.
+  let repoRoot: string;
+  try {
+    repoRoot = execSync('git rev-parse --show-toplevel', {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+    }).trim();
+  } catch {
+    repoRoot = process.cwd();
+  }
+
   const sources: string[] = [];
+  const skipped: string[] = [];
 
   const branch = currentBranch();
   if (branch) sources.push(branch);
 
-  for (const path of ['.claude/wip-checklist.md', '.claude/wip-context.md']) {
-    if (existsSync(path)) {
+  let checklistContent: string | null = null;
+  for (const rel of ['.claude/wip-checklist.md', '.claude/wip-context.md']) {
+    const abs = resolvePath(repoRoot, rel);
+    if (existsSync(abs)) {
       try {
-        sources.push(readFileSync(path, 'utf-8'));
+        const content = readFileSync(abs, 'utf-8');
+        sources.push(content);
+        if (rel.endsWith('wip-checklist.md')) checklistContent = content;
       } catch {
-        // best-effort
+        skipped.push(rel);
       }
     }
   }
@@ -544,9 +581,11 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
         stdio: ['pipe', 'pipe', 'ignore'],
       });
       sources.push(commits);
+    } else {
+      skipped.push('git log (no merge-base with main)');
     }
   } catch {
-    // detached, no main, etc. — skip
+    skipped.push('git log (merge-base lookup failed)');
   }
 
   const allIds = new Set<string>();
@@ -554,18 +593,28 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
     for (const id of findAllLinearIds(src)) allIds.add(id);
   }
 
-  // The primary issue is the one the session is tracking (from branch or checklist).
-  const primary = parseLinearId(branch ?? '') ?? null;
+  // Primary issue: prefer an explicit `> Linear: QUA-NNN` line in the checklist
+  // (added by /agent-init), then fall back to the branch name. Mirrors how
+  // /agent-end and /agent-ship resolve the session's tracked issue.
+  const checklistLine = checklistContent
+    ? /^> Linear: (QUA-\d+)/im.exec(checklistContent)?.[1] ?? null
+    : null;
+  const primary = resolveLinearId([checklistLine, branch]);
 
   const secondary = [...allIds].filter((id) => id !== primary).sort();
 
   if (secondary.length === 0) {
-    return {
-      output: options.json
-        ? JSON.stringify({ primary, secondary: [], warnings: [] }, null, 2) + '\n'
-        : `${c.green}✓${c.reset} No secondary Linear refs found.${primary ? ` (primary: ${primary})` : ''}\n`,
-      exitCode: 0,
-    };
+    if (options.json) {
+      return {
+        output: JSON.stringify({ primary, secondary: [], warnings: [], skipped }, null, 2) + '\n',
+        exitCode: 0,
+      };
+    }
+    let out = `${c.green}✓${c.reset} No secondary Linear refs found.${primary ? ` (primary: ${primary})` : ''}\n`;
+    if (skipped.length > 0) {
+      out += `${c.dim}Skipped sources: ${skipped.join(', ')}${c.reset}\n`;
+    }
+    return { output: out, exitCode: 0 };
   }
 
   // For each secondary, check Linear state.
@@ -596,13 +645,14 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
 
   if (options.json) {
     return {
-      output: JSON.stringify({ primary, secondary, warnings }, null, 2) + '\n',
+      output: JSON.stringify({ primary, secondary, warnings, skipped }, null, 2) + '\n',
       exitCode: 0,
     };
   }
 
   let out = '';
   if (primary) out += `${c.dim}Primary session issue: ${primary}${c.reset}\n`;
+  if (skipped.length > 0) out += `${c.dim}Skipped sources: ${skipped.join(', ')}${c.reset}\n`;
   out += `${c.bold}Secondary Linear refs found (${secondary.length}):${c.reset} ${secondary.join(', ')}\n`;
 
   if (warnings.length === 0) {

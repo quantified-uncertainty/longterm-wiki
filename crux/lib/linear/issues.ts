@@ -329,6 +329,14 @@ export async function getIssueChildren(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     if (/Entity not found|EntityNotFound/i.test(msg)) return [];
+    // The audit fans out children fetches in parallel; one bad transient
+    // response (Linear edge-cache HTML, transient 5xx) shouldn't kill the
+    // whole audit. Log and return [] — the worst that happens is a parent
+    // epic doesn't get correctly classified this run.
+    if (/non-JSON response|GraphQL returned 5\d\d/i.test(msg)) {
+      console.warn(`[linear] getIssueChildren(${identifier}) failed transiently: ${msg.slice(0, 200)}`);
+      return [];
+    }
     throw e;
   }
 }
