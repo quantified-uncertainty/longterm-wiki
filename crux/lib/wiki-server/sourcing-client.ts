@@ -8,6 +8,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { SourcingRoute } from '../../../apps/wiki-server/src/routes/sourcing/sourcing.ts';
+import type { UrlSuggestionsRoute } from '../../../apps/wiki-server/src/routes/sourcing/url-suggestions.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -89,6 +90,72 @@ export async function getEvidenceByRecord(
 /** Get sourcing statistics. */
 export async function getSourcingStats(): Promise<ApiResult<SourcingStatsResult>> {
   return apiRequest<SourcingStatsResult>('GET', '/api/sourcing/stats');
+}
+
+// ---------------------------------------------------------------------------
+// URL suggestions — QUA-64
+// ---------------------------------------------------------------------------
+
+type UrlSuggestionsRpcClient = ReturnType<typeof hc<UrlSuggestionsRoute>>;
+
+export type UrlSuggestionsUpsertResult = InferResponseType<
+  UrlSuggestionsRpcClient['index']['$post'],
+  200
+>;
+export type UrlSuggestionsListResult = InferResponseType<
+  UrlSuggestionsRpcClient['index']['$get'],
+  200
+>;
+
+export interface UrlSuggestionInput {
+  recordType: string;
+  recordId: string;
+  fieldName?: string | null;
+  entityId?: string | null;
+  suggestedUrl: string;
+  title?: string | null;
+  snippet?: string | null;
+  relevanceScore?: number | null;
+  sourceProvider: string;
+  generatorModel?: string | null;
+  status?: 'pending' | 'approved' | 'rejected' | 'auto_verified';
+  notes?: string | null;
+}
+
+/** Batch-upsert URL suggestions. */
+export async function upsertUrlSuggestions(
+  suggestions: UrlSuggestionInput[],
+): Promise<ApiResult<UrlSuggestionsUpsertResult>> {
+  return apiRequest<UrlSuggestionsUpsertResult>(
+    'POST',
+    '/api/sourcing/url-suggestions',
+    { suggestions },
+  );
+}
+
+/** List URL suggestions with optional filters. */
+export async function listUrlSuggestions(
+  options?: {
+    recordType?: string;
+    recordId?: string;
+    entityId?: string;
+    status?: 'pending' | 'approved' | 'rejected' | 'auto_verified';
+    limit?: number;
+    offset?: number;
+  },
+): Promise<ApiResult<UrlSuggestionsListResult>> {
+  const params = new URLSearchParams();
+  if (options?.recordType) params.set('recordType', options.recordType);
+  if (options?.recordId) params.set('recordId', options.recordId);
+  if (options?.entityId) params.set('entityId', options.entityId);
+  if (options?.status) params.set('status', options.status);
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  if (options?.offset != null) params.set('offset', String(options.offset));
+  const qs = params.toString();
+  return apiRequest<UrlSuggestionsListResult>(
+    'GET',
+    `/api/sourcing/url-suggestions${qs ? `?${qs}` : ''}`,
+  );
 }
 
 /** Get records due for re-check. */
