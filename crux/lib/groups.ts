@@ -114,7 +114,6 @@ export const GROUPS: Record<string, GroupDef> = {
     domains: [
       'agents',
       'agent-checklist',
-      'agent-workspace',
       'agent-session-events',
       'jobs',
       'sessions',
@@ -135,6 +134,12 @@ export const GROUPS: Record<string, GroupDef> = {
     description: 'Linear — issues, workflow states, agent session tracking',
     domains: ['linear'],
     flattened: ['linear'],
+  },
+  ws: {
+    shortcut: 'ws',
+    description: 'Workspace — agent slots, sentinels, tmux, doctors (lw/ root)',
+    domains: ['agent-workspace'],
+    flattened: ['agent-workspace'],
   },
 };
 
