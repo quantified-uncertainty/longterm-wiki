@@ -560,3 +560,178 @@ describe('handleResourceEnrich — URL discovery', () => {
   });
 });
 
+// QUA-312 Phase 2 — contentChanged temporal fix + URL fast-path override
+describe('handleResourceEnrich — contentChanged skip-guard bypass (QUA-312)', () => {
+  it('still skips already-enriched resources when contentChanged is omitted', async () => {
+    mockGetResource.mockResolvedValue({
+      ok: true,
+      data: mockResource({ enrichmentStatus: 'enriched' }),
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.skipped).toBe(true);
+    expect(mockCallLlm).not.toHaveBeenCalled();
+  });
+
+  it('still skips already-enriched resources when contentChanged=false', async () => {
+    mockGetResource.mockResolvedValue({
+      ok: true,
+      data: mockResource({ enrichmentStatus: 'enriched' }),
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article', contentChanged: false },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.skipped).toBe(true);
+    expect(mockCallLlm).not.toHaveBeenCalled();
+  });
+
+  it('bypasses skip guard for "enriched" resources when contentChanged=true', async () => {
+    setupDefaultMocks(mockResource({ enrichmentStatus: 'enriched' }));
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article', contentChanged: true },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.skipped).toBeUndefined();
+    expect(mockCallLlm).toHaveBeenCalled();
+    expect(mockUpsertResourceBatch).toHaveBeenCalled();
+  });
+
+  it('bypasses skip guard for "reviewed" resources when contentChanged=true', async () => {
+    setupDefaultMocks(mockResource({ enrichmentStatus: 'reviewed' }));
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article', contentChanged: true },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    expect(result.data.skipped).toBeUndefined();
+    expect(mockCallLlm).toHaveBeenCalled();
+  });
+
+  it('rejects non-boolean contentChanged via Zod', async () => {
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/article', contentChanged: 'yes' },
+      CTX,
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('Invalid params');
+  });
+});
+
+describe('handleResourceEnrich — URL-heuristic fast-path override (QUA-312)', () => {
+  it('overrides resource_purpose to "homepage" when URL is a bare domain', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
+    // LLM returns "primary_source", but URL says "homepage" — heuristic wins.
+    const llmResult = validLlmResult();
+    llmResult.resource_purpose = 'primary_source';
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-sonnet-test',
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://anthropic.com/' },
+      CTX,
+    );
+
+    expect(result.success).toBe(true);
+    // The downstream LLM still ran (we need summary, key_points, etc.)
+    expect(mockCallLlm).toHaveBeenCalled();
+    const item = mockUpsertResourceBatch.mock.calls[0][0][0];
+    // resource_purpose was overridden by the URL heuristic.
+    expect(item.resourcePurpose).toBe('homepage');
+    // But other fields still come from the LLM.
+    expect(item.summary).toBe('This post discusses novel approaches to AI alignment.');
+    expect(item.keyPoints).toEqual([
+      'Introduces a new alignment framework',
+      'Compares with existing approaches',
+    ]);
+  });
+
+  it('does NOT override resource_purpose for ambiguous URLs', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://example.com/blog/2024/post' }));
+    const llmResult = validLlmResult();
+    llmResult.resource_purpose = 'commentary';
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-sonnet-test',
+    });
+
+    await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/blog/2024/post' },
+      CTX,
+    );
+
+    const item = mockUpsertResourceBatch.mock.calls[0][0][0];
+    expect(item.resourcePurpose).toBe('commentary');
+  });
+
+  it('overrides resource_purpose for /about-style paths', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://openai.com/about' }));
+    const llmResult = validLlmResult();
+    llmResult.resource_purpose = 'commentary';
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-sonnet-test',
+    });
+
+    await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://openai.com/about' },
+      CTX,
+    );
+
+    const item = mockUpsertResourceBatch.mock.calls[0][0][0];
+    expect(item.resourcePurpose).toBe('homepage');
+  });
+
+  it('does NOT override resource_purpose for PDF URLs (high confidence non-homepage)', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://example.com/report.pdf' }));
+    const llmResult = validLlmResult();
+    llmResult.resource_purpose = 'primary_source';
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify(llmResult),
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-sonnet-test',
+    });
+
+    await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://example.com/report.pdf' },
+      CTX,
+    );
+
+    const item = mockUpsertResourceBatch.mock.calls[0][0][0];
+    expect(item.resourcePurpose).toBe('primary_source');
+  });
+
+  it('still writes enrichmentStatus="enriched" (not "classified") on fast-path override', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
+
+    await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://anthropic.com/' },
+      CTX,
+    );
+
+    const item = mockUpsertResourceBatch.mock.calls[0][0][0];
+    // Combined enrich step writes "enriched" — only the standalone classify step
+    // writes "classified". Fast-path override here doesn't change that.
+    expect(item.enrichmentStatus).toBe('enriched');
+  });
+});
+

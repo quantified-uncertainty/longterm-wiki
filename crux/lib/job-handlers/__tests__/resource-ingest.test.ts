@@ -404,6 +404,73 @@ describe('handleResourceIngest — enrichment chaining', () => {
     expect(result.data.contentHash).toBeNull();
     expect(mockCreateJob).not.toHaveBeenCalled();
   });
+
+  // QUA-312 Phase 2: contentChanged propagation into the enrich job payload
+  it('passes contentChanged: true into the enrich job when content changed since last fetch', async () => {
+    const content = 'Updated article content here.';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content }));
+
+    await handleResourceIngest(
+      {
+        resourceId: 'res-1',
+        url: 'https://example.com/article',
+        previousContentHash: 'aaaaaaaaaaaaaaaa', // different from new hash → contentChanged=true
+      },
+      CTX,
+    );
+
+    expect(mockCreateJob).toHaveBeenCalledTimes(1);
+    expect(mockCreateJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-enrich',
+        params: {
+          resourceId: 'res-1',
+          url: 'https://example.com/article',
+          contentChanged: true,
+        },
+        // dedupKey varies so a still-pending enrich doesn't suppress the new signal
+        dedupKey: expect.stringMatching(/^resource-enrich:res-1:[a-f0-9]{8}$/),
+      }),
+    );
+  });
+
+  it('omits contentChanged from payload when content has not changed', async () => {
+    const content = 'Same article content.';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content }));
+
+    await handleResourceIngest(
+      {
+        resourceId: 'res-1',
+        url: 'https://example.com/article',
+        previousContentHash: expectedHash(content), // matches → contentChanged=false
+      },
+      CTX,
+    );
+
+    expect(mockCreateJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-enrich',
+        // No contentChanged key on params when content is unchanged
+        params: { resourceId: 'res-1', url: 'https://example.com/article' },
+        dedupKey: 'resource-enrich:res-1',
+      }),
+    );
+  });
+
+  it('omits contentChanged from payload when there is no previousContentHash', async () => {
+    await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(mockCreateJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-enrich',
+        params: { resourceId: 'res-1', url: 'https://example.com/article' },
+        dedupKey: 'resource-enrich:res-1',
+      }),
+    );
+  });
 });
 
 describe('handleResourceIngest — Twitter/X soft-404 (#3521)', () => {

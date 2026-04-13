@@ -27,6 +27,7 @@ import { parseJsonResponse } from '../anthropic.ts';
 import { getCitationContentByUrl } from '../wiki-server/citations.ts';
 import { getResource, upsertResourceBatch, suggestResourcesApi } from '../wiki-server/resources.ts';
 import { COMBINED_ENRICHMENT_SYSTEM, combinedEnrichmentPrompt } from '../../resource-enrichment/prompts.ts';
+import { classifyByUrl, FAST_PATH_THRESHOLD } from '../sourcing/url-quality.ts';
 
 // ---------------------------------------------------------------------------
 // getResource() returns ResourceRow & { citedBy: string[] } — we use fields
@@ -40,6 +41,11 @@ import { COMBINED_ENRICHMENT_SYSTEM, combinedEnrichmentPrompt } from '../../reso
 const ResourceEnrichParamsSchema = z.object({
   resourceId: z.string().min(1),
   url: z.string().url(),
+  // When true, the upstream `resource-ingest` job detected that the cached
+  // content changed since the previous fetch — bypass the "already enriched"
+  // skip guard so we re-classify with fresh data. Optional for backwards
+  // compatibility (older job rows in the queue won't have it).
+  contentChanged: z.boolean().optional(),
 });
 
 // ---------------------------------------------------------------------------
@@ -74,7 +80,7 @@ export async function handleResourceEnrich(
       error: `Invalid params: ${parsed.error.message.slice(0, 300)}`,
     };
   }
-  const { resourceId, url } = parsed.data;
+  const { resourceId, url, contentChanged } = parsed.data;
 
   if (ctx.verbose) {
     console.log(`[resource-enrich] Enriching ${url} (resource=${resourceId})`);
@@ -95,7 +101,13 @@ export async function handleResourceEnrich(
 
     const resource = resourceResult.data;
 
-    if (resource.enrichmentStatus === 'enriched' || resource.enrichmentStatus === 'reviewed') {
+    // Skip guard: bypass when the upstream ingest reports `contentChanged: true`,
+    // so we can re-classify resources whose cached content has shifted.
+    // Without this bypass, the "re-classify on re-fetch" temporal story is a lie.
+    if (
+      (resource.enrichmentStatus === 'enriched' || resource.enrichmentStatus === 'reviewed') &&
+      contentChanged !== true
+    ) {
       if (ctx.verbose) {
         console.log(`[resource-enrich] Skipping ${resourceId} — already ${resource.enrichmentStatus}`);
       }
@@ -103,6 +115,10 @@ export async function handleResourceEnrich(
         success: true,
         data: { resourceId, url, skipped: true, reason: `Already ${resource.enrichmentStatus}` },
       };
+    }
+
+    if (contentChanged === true && ctx.verbose) {
+      console.log(`[resource-enrich] Re-enriching ${resourceId} — content changed since last fetch`);
     }
 
     // 2. Load cached content from citation_content
@@ -152,13 +168,26 @@ export async function handleResourceEnrich(
 
     const result = validated.data;
 
+    // URL-heuristic fast-path: deterministically override `resource_purpose`
+    // when the URL clearly points at a homepage, regardless of what the LLM
+    // returned. The LLM still ran (we need summary/key_points/etc.), so the
+    // savings here are correctness, not cost — see Discussion #4221.
+    const urlClass = classifyByUrl(url);
+    const urlHeuristicHomepage =
+      urlClass.purpose === 'homepage' && urlClass.confidence >= FAST_PATH_THRESHOLD;
+    const finalResourcePurpose = urlHeuristicHomepage ? 'homepage' : result.resource_purpose;
+
+    if (urlHeuristicHomepage && ctx.verbose) {
+      console.log(`[resource-enrich] URL heuristic override: resource_purpose='homepage' (${urlClass.reasons.join(',')})`);
+    }
+
     // 6. Persist enrichment data
     const update: Record<string, unknown> = {
       id: resourceId,
       url,
       enrichmentStatus: 'enriched',
       resourceSubtype: result.resource_subtype,
-      resourcePurpose: result.resource_purpose,
+      resourcePurpose: finalResourcePurpose,
       contextNote: result.context_note,
       summary: result.summary,
       keyPoints: result.key_points,

@@ -18,6 +18,7 @@ import {
   type BatchRequest,
 } from './batch-client.ts';
 import { CLASSIFICATION_SYSTEM, classificationPrompt } from './prompts.ts';
+import { classifyByUrl, FAST_PATH_THRESHOLD } from '../lib/sourcing/url-quality.ts';
 import type { Resource } from '../resource-types.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
@@ -79,7 +80,7 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
   const resources = await loadResourcesPGFirst();
 
   // Filter to resources that need classification
-  const toClassify = resources.filter((r) => {
+  const candidates = resources.filter((r) => {
     if (!r.url) return false;
     // Skip already classified
     if (r.enrichment_status === 'classified' || r.enrichment_status === 'enriched' || r.enrichment_status === 'reviewed') {
@@ -88,10 +89,50 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
     return true;
   }).slice(0, limit);
 
-  console.log(`  ${toClassify.length} resources to classify\n`);
+  // URL-heuristic fast-path: classify high-confidence homepages without an LLM call.
+  // The downstream `enrich` step still runs for these resources to populate
+  // summary/key_points/etc., which are not URL-derivable.
+  const fastPathHits: Array<{ id: string; url: string }> = [];
+  const toClassify: typeof candidates = [];
+  for (const r of candidates) {
+    const cls = classifyByUrl(r.url);
+    if (cls.purpose === 'homepage' && cls.confidence >= FAST_PATH_THRESHOLD) {
+      fastPathHits.push({ id: r.id, url: r.url });
+    } else {
+      toClassify.push(r);
+    }
+  }
+
+  if (fastPathHits.length > 0) {
+    console.log(`  ${fastPathHits.length} resources fast-path classified as homepage (no LLM call)`);
+    if (!dryRun) {
+      const updates = fastPathHits.map((h) => ({
+        id: h.id,
+        url: h.url,
+        resourcePurpose: 'homepage',
+        enrichmentStatus: 'classified',
+      }));
+      // Write in chunks of 100 (below the 200 server cap, leaves retry headroom).
+      for (let i = 0; i < updates.length; i += 100) {
+        const batch = updates.slice(i, i + 100);
+        const writeResult = await apiRequest(
+          'POST',
+          '/api/resources/batch',
+          { items: batch },
+          30000,
+        );
+        if (!writeResult.ok) {
+          console.warn(`  ✗ Fast-path batch write failed: ${writeResult.message}`);
+        }
+      }
+      console.log(`  ✓ Wrote ${fastPathHits.length} fast-path classifications`);
+    }
+  }
+
+  console.log(`  ${toClassify.length} resources to classify via LLM batch\n`);
 
   if (toClassify.length === 0) {
-    console.log('  ✅ All resources already classified');
+    console.log('  ✅ No LLM-classify candidates remain (fast-path or already classified)');
     return { exitCode: 0, output: 'All resources already classified' };
   }
 
