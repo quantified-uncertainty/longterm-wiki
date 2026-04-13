@@ -41,6 +41,24 @@ const VALID_STATUSES = [
   "archived",
 ] as const;
 
+// CHECK constraints — must match apps/wiki-server/drizzle/0173_add_check_constraints_phase2.sql
+const VALID_ORG_ROLES = [
+  "pioneer",
+  "active",
+  "major",
+  "funder",
+  "emerging",
+] as const;
+
+const VALID_RISK_RELEVANCE = ["addresses", "studies", "exacerbates"] as const;
+
+const VALID_RISK_EFFECTIVENESS = [
+  "high",
+  "moderate",
+  "low",
+  "uncertain",
+] as const;
+
 // ---- Query schemas ----
 
 const AllQuery = z.object({
@@ -73,7 +91,7 @@ const SyncOrgLinkSchema = z.object({
     z.object({
       researchAreaId: z.string().min(1).max(200),
       organizationId: z.string().min(1).max(200),
-      role: z.string().max(50).optional().default("active"),
+      role: z.enum(VALID_ORG_ROLES).optional().default("active"),
       notes: z.string().max(2000).nullable().optional(),
     })
   ).min(1).max(500),
@@ -111,8 +129,8 @@ const SyncRiskLinkSchema = z.object({
     z.object({
       researchAreaId: z.string().min(1).max(200),
       riskId: z.string().min(1).max(200),
-      relevance: z.string().max(50).optional().default("addresses"),
-      effectiveness: z.string().max(50).nullable().optional(),
+      relevance: z.enum(VALID_RISK_RELEVANCE).optional().default("addresses"),
+      effectiveness: z.enum(VALID_RISK_EFFECTIVENESS).nullable().optional(),
       notes: z.string().max(2000).nullable().optional(),
     })
   ).min(1).max(500),
