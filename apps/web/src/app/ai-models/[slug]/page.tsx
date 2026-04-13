@@ -14,8 +14,13 @@ import {
   SAFETY_LEVEL_COLORS,
   formatContext,
 } from "../ai-model-constants";
-import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
-import { safeHref } from "@/lib/directory-utils";
+import { ProfileStatCard } from "@/components/directory";
+import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import { BenchmarkScorecard } from "./benchmark-scorecard";
 
 export function generateStaticParams() {
@@ -51,6 +56,9 @@ export default async function AiModelDetailPage({
     if (canonical) permanentRedirect(`/ai-models/${canonical}`);
     return notFound();
   }
+
+  const sourcingSummary = await fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // Resolve developer
   const developerEntity = entity.developer
@@ -102,86 +110,163 @@ export default async function AiModelDetailPage({
     stats.push({ label: "Safety Level", value: entity.safetyLevel });
   }
 
-  return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: "AI Models", href: "/ai-models" },
-          { label: entity.title },
-        ]}
-      />
+  const titlePills = (
+    <>
+      {entity.developer && (
+        <Link
+          href={`/organizations/${entity.developer}`}
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity ${
+            DEVELOPER_COLORS[entity.developer] ??
+            "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          }`}
+        >
+          {developerEntity?.title ?? entity.developer}
+        </Link>
+      )}
+      {entity.openWeight && (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
+          Open Weight
+        </span>
+      )}
+      {entity.safetyLevel && (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
+            SAFETY_LEVEL_COLORS[entity.safetyLevel] ??
+            "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          }`}
+        >
+          {entity.safetyLevel}
+        </span>
+      )}
+    </>
+  );
 
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {entity.title}
-          </h1>
-          {entity.developer && (
-            <Link
-              href={`/organizations/${entity.developer}`}
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity ${
-                DEVELOPER_COLORS[entity.developer] ??
-                "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              }`}
-            >
-              {developerEntity?.title ?? entity.developer}
-            </Link>
+  const headerLinks = [
+    ...(entity.wikiId && getPageById(entity.id)
+      ? [{ label: "Wiki page", href: `/wiki/${entity.wikiId}` }]
+      : []),
+    { label: "Data", href: `/ai-models/${slug}/data` },
+  ];
+
+  const coverageScore = computeAiModelCoverage({
+    developer: entity.developer,
+    releaseDate: entity.releaseDate,
+    inputPrice: entity.inputPrice,
+    outputPrice: entity.outputPrice,
+    contextWindow: entity.contextWindow,
+    parameterCount: entity.parameterCount,
+    safetyLevel: entity.safetyLevel,
+    benchmarkCount: entity.benchmarks.length,
+    wikiId: entity.wikiId,
+  });
+  const coverageSignals: string[] = [];
+  if (entity.inputPrice != null || entity.outputPrice != null) coverageSignals.push("Pricing");
+  if (entity.contextWindow != null) coverageSignals.push("Context window");
+  if (entity.parameterCount) coverageSignals.push("Parameter count");
+  if (entity.safetyLevel) coverageSignals.push("Safety level");
+  if (entity.benchmarks.length >= 3) coverageSignals.push("Benchmarks");
+  if (entity.wikiId) coverageSignals.push("Wiki page");
+
+  const statCards = stats.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {stats.map((s) => (
+        <ProfileStatCard key={s.label} {...s} />
+      ))}
+    </div>
+  );
+
+  const sidebar = (
+    <>
+      {/* Model details */}
+      <section>
+        <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
+        <div className="border border-border/60 rounded-xl bg-card">
+          <DetailRow label="Model Family" value={entity.modelFamily} />
+          <DetailRow label="Tier" value={entity.modelTier} capitalize />
+          <DetailRow label="Generation" value={entity.generation} />
+          <DetailRow label="Release Date" value={entity.releaseDate} />
+          <DetailRow label="Parameters" value={entity.parameterCount} />
+          <DetailRow
+            label="Context Window"
+            value={
+              entity.contextWindow != null
+                ? `${formatContext(entity.contextWindow)} tokens`
+                : undefined
+            }
+          />
+          <DetailRow label="Training Cutoff" value={entity.trainingCutoff} />
+          <DetailRow
+            label="Open Weight"
+            value={
+              entity.openWeight != null ? (entity.openWeight ? "Yes" : "No") : undefined
+            }
+          />
+          <DetailRow label="Safety Level" value={entity.safetyLevel} />
+          {entity.modality.length > 0 && (
+            <DetailRow label="Modality" value={entity.modality.join(", ")} />
           )}
-          {entity.openWeight && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
-              Open Weight
+        </div>
+      </section>
+
+      {/* Capabilities */}
+      {entity.capabilities.length > 0 && (
+        <section>
+          <h2 className="text-lg font-bold tracking-tight mb-4">
+            Capabilities
+            <span className="ml-2 text-sm font-normal text-muted-foreground">
+              {entity.capabilities.length}
             </span>
-          )}
-          {entity.safetyLevel && (
-            <span
-              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
-                SAFETY_LEVEL_COLORS[entity.safetyLevel] ??
-                "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              }`}
-            >
-              {entity.safetyLevel}
-            </span>
-          )}
-        </div>
-
-        {entity.description && (
-          <p className="text-muted-foreground text-sm max-w-3xl leading-relaxed">
-            {entity.description}
-          </p>
-        )}
-
-        <div className="flex items-center gap-4 mt-3 text-sm">
-          {entity.wikiId && getPageById(entity.id) && (
-            <Link
-              href={`/wiki/${entity.wikiId}`}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Wiki page &rarr;
-            </Link>
-          )}
-          <Link
-            href={`/ai-models/${slug}/data`}
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            Data &rarr;
-          </Link>
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      {stats.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {stats.map((s) => (
-            <ProfileStatCard key={s.label} {...s} />
-          ))}
-        </div>
+          </h2>
+          <div className="flex flex-wrap gap-1.5">
+            {entity.capabilities.map((cap) => (
+              <span
+                key={cap}
+                className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border border-border/60 bg-card text-muted-foreground"
+              >
+                {cap}
+              </span>
+            ))}
+          </div>
+        </section>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Pricing */}
+      {/* Tags */}
+      {entity.tags.length > 0 && (
+        <section>
+          <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
+          <div className="flex flex-wrap gap-1.5">
+            {entity.tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
+
+  return (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "AI Models", href: "/ai-models" },
+        { label: entity.title },
+      ]}
+      entityId={entity.id}
+      title={entity.title}
+      titlePills={titlePills}
+      coverage={{ score: coverageScore, signals: coverageSignals }}
+      verdict={rollupVerdict}
+      subtitle={entity.description || undefined}
+      headerLinks={headerLinks}
+      statCards={statCards}
+      sidebar={sidebar}
+    >
+      <div className="space-y-8">
+        {/* Pricing */}
           {(entity.inputPrice != null || entity.outputPrice != null) && (
             <section>
               <h2 className="text-lg font-bold tracking-tight mb-4">
@@ -350,95 +435,8 @@ export default async function AiModelDetailPage({
               </div>
             </section>
           )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Model details */}
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
-            <div className="border border-border/60 rounded-xl bg-card">
-              <DetailRow label="Model Family" value={entity.modelFamily} />
-              <DetailRow label="Tier" value={entity.modelTier} capitalize />
-              <DetailRow label="Generation" value={entity.generation} />
-              <DetailRow label="Release Date" value={entity.releaseDate} />
-              <DetailRow
-                label="Parameters"
-                value={entity.parameterCount}
-              />
-              <DetailRow
-                label="Context Window"
-                value={
-                  entity.contextWindow != null
-                    ? `${formatContext(entity.contextWindow)} tokens`
-                    : undefined
-                }
-              />
-              <DetailRow
-                label="Training Cutoff"
-                value={entity.trainingCutoff}
-              />
-              <DetailRow
-                label="Open Weight"
-                value={
-                  entity.openWeight != null
-                    ? entity.openWeight
-                      ? "Yes"
-                      : "No"
-                    : undefined
-                }
-              />
-              <DetailRow label="Safety Level" value={entity.safetyLevel} />
-              {entity.modality.length > 0 && (
-                <DetailRow
-                  label="Modality"
-                  value={entity.modality.join(", ")}
-                />
-              )}
-            </div>
-          </section>
-
-          {/* Capabilities */}
-          {entity.capabilities.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Capabilities
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {entity.capabilities.length}
-                </span>
-              </h2>
-              <div className="flex flex-wrap gap-1.5">
-                {entity.capabilities.map((cap) => (
-                  <span
-                    key={cap}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border border-border/60 bg-card text-muted-foreground"
-                  >
-                    {cap}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Tags */}
-          {entity.tags.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
-              <div className="flex flex-wrap gap-1.5">
-                {entity.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
       </div>
-    </div>
+    </EntityProfileShell>
   );
 }
 

@@ -1,6 +1,11 @@
 import type { Metadata } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { OrgProfileHeader } from "../org-profile-header";
+import { buildOrgShellSlots } from "../org-profile-header";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import { resolveOrgEntity, loadOrgHeaderData } from "../org-data";
 import { OrgDataBody } from "./org-data-body";
 
@@ -27,16 +32,18 @@ export default async function OrgDataPage({
 
   const { entity } = result;
   const headerData = loadOrgHeaderData(entity, slug);
+  const entityStableId = entity.stableId ?? entity.id;
+  const sourcingSummary = await fetchEntitySourcingSummary([entity.id, entityStableId, slug]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
+
+  const shellSlots = buildOrgShellSlots(
+    { ...headerData, verdict: rollupVerdict },
+    { activePage: "data", breadcrumbSuffix: "Data" },
+  );
 
   return (
-    <div className="max-w-[90rem] mx-auto px-6 py-8">
-      <OrgProfileHeader
-        data={headerData}
-        breadcrumbSuffix="Data"
-        activePage="data"
-      />
-
+    <EntityProfileShell {...shellSlots}>
       <OrgDataBody slug={slug} />
-    </div>
+    </EntityProfileShell>
   );
 }

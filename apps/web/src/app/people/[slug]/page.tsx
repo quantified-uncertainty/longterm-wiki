@@ -26,11 +26,14 @@ import {
 } from "@/lib/directory-utils";
 import {
   ProfileStatCard,
-  Breadcrumbs,
   FactsPanel,
-  ProfileTabs,
   type ProfileTab,
 } from "@/components/directory";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { getPersonEntityById, getTypedEntityById, isPerson } from "@/data";
 import type { Entity } from "@longterm-wiki/factbase";
@@ -228,12 +231,14 @@ export default async function PersonProfilePage({
 
   // Political data from wiki-server. Scores/offices/votes/finance are not yet
   // in database.json — see https://github.com/quantified-uncertainty/longterm-wiki/discussions/3639
-  const [politicalScores, politicalOffices, campaignFinance, politicalVotes] = await Promise.all([
+  const [politicalScores, politicalOffices, campaignFinance, politicalVotes, sourcingSummary] = await Promise.all([
     fetchPoliticalScores(entity.id),
     fetchPoliticalOffices(entity.id),
     fetchCampaignFinance(entity.id),
     fetchPoliticalVotes(entity.id),
+    fetchEntitySourcingSummary([entity.id, entity.stableId ?? "", slug]),
   ]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // All facts for count
   const allFacts = getKBFacts(entity.id).filter(
@@ -381,115 +386,72 @@ export default async function PersonProfilePage({
     });
   }
 
-  return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: "People", href: "/people" },
-          { label: entity.name },
-        ]}
-      />
+  const covInput = {
+    role: roleFact?.value.type === "text" ? roleFact.value.value : null,
+    employerId: employedByFact?.value.type === "ref" ? employedByFact.value.value : null,
+    bornYear: bornYearFact?.value.type === "number" ? bornYearFact.value.value : null,
+    netWorthNum: netWorthFact?.value.type === "number" ? netWorthFact.value.value : null,
+    positionCount: positions.length,
+    publicationCount: 0,
+    careerHistoryCount: careerHistory.length,
+    wikiPageId: entity.wikiPageId,
+  };
 
-      {/* Header */}
-      <div className="flex items-start gap-5 mb-8">
-        <div className="shrink-0 w-16 h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-2xl font-bold text-primary/70">
-          {initials}
-        </div>
-        <div>
-          <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-extrabold tracking-tight">
-              {entity.name}
-            </h1>
-            {(() => {
-              const covInput = {
-                role: roleFact?.value.type === "text" ? roleFact.value.value : null,
-                employerId: employedByFact?.value.type === "ref" ? employedByFact.value.value : null,
-                bornYear: bornYearFact?.value.type === "number" ? bornYearFact.value.value : null,
-                netWorthNum: netWorthFact?.value.type === "number" ? netWorthFact.value.value : null,
-                positionCount: positions.length,
-                publicationCount: 0,
-                careerHistoryCount: careerHistory.length,
-                wikiPageId: entity.wikiPageId,
-              };
-              return (
-                <CoveragePopover
-                  score={computePersonCoverage(covInput)}
-                  signals={getPersonSignals(covInput)}
-                  size="md"
-                />
-              );
-            })()}
-          </div>
-          {entity.aliases && entity.aliases.length > 0 && (
-            <p className="text-sm text-muted-foreground/70 mb-1">
-              Also known as: {entity.aliases.join(", ")}
-            </p>
-          )}
-          {notableForFact?.value.type === "text" && (
-            <p className="text-sm text-muted-foreground max-w-2xl leading-relaxed">
-              {notableForFact.value.value}
-            </p>
-          )}
-          <div className="flex items-center gap-4 mt-2 text-sm">
-            {entityWebsite && safeHref(entityWebsite) !== "#" && (
-              <a
-                href={safeHref(entityWebsite)}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1 text-primary hover:text-primary/80 font-medium transition-colors"
-              >
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  className="w-3.5 h-3.5"
-                  aria-hidden="true"
-                >
-                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z" />
-                </svg>
-                Website &rarr;
-              </a>
-            )}
-            {wikiHref && (
-              <Link
-                href={wikiHref}
-                className="text-primary hover:text-primary/80 font-medium transition-colors"
-              >
-                Wiki page &rarr;
-              </Link>
-            )}
-            <Link
-              href={`/people/${slug}/data`}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Data &rarr;
-            </Link>
-          </div>
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      {stats.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {stats.map((s) => (
-            <ProfileStatCard key={s.label} {...s} />
-          ))}
-        </div>
-      )}
-
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content — tabbed */}
-        <div className="lg:col-span-2">
-          <ProfileTabs tabs={tabs} ariaLabel="Person sections" />
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          <SocialLinks facts={socialLinkFacts} />
-          {allFacts.length > 0 && (
-            <FactsPanel facts={allFacts} entityId={entity.id} />
-          )}
-        </div>
-      </div>
+  const avatar = (
+    <div className="w-14 h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center text-xl font-bold text-primary/70">
+      {initials}
     </div>
+  );
+
+  const headerLinks = [
+    ...(entityWebsite && safeHref(entityWebsite) !== "#"
+      ? [{ label: "Website", href: safeHref(entityWebsite), external: true }]
+      : []),
+    ...(wikiHref ? [{ label: "Wiki page", href: wikiHref }] : []),
+    { label: "Data", href: `/people/${slug}/data` },
+  ];
+
+  const subtitle =
+    notableForFact?.value.type === "text" ? notableForFact.value.value : null;
+
+  const statCards = stats.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {stats.map((s) => (
+        <ProfileStatCard key={s.label} {...s} />
+      ))}
+    </div>
+  );
+
+  const sidebar = (
+    <>
+      <SocialLinks facts={socialLinkFacts} />
+      {allFacts.length > 0 && (
+        <FactsPanel facts={allFacts} entityId={entity.id} />
+      )}
+    </>
+  );
+
+  return (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "People", href: "/people" },
+        { label: entity.name },
+      ]}
+      entityId={entity.id}
+      avatar={avatar}
+      title={entity.name}
+      aliases={entity.aliases}
+      coverage={{
+        score: computePersonCoverage(covInput),
+        signals: getPersonSignals(covInput),
+      }}
+      verdict={rollupVerdict}
+      subtitle={subtitle}
+      headerLinks={headerLinks}
+      statCards={statCards}
+      tabs={tabs}
+      tabsAriaLabel="Person sections"
+      sidebar={sidebar}
+    />
   );
 }
