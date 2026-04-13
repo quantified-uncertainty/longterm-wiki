@@ -632,7 +632,7 @@ describe('handleResourceEnrich — contentChanged skip-guard bypass (QUA-312)', 
   });
 });
 
-describe('handleResourceEnrich — URL-heuristic fast-path override (QUA-312)', () => {
+describe('handleResourceEnrich — URL-heuristic resource_purpose override (QUA-312)', () => {
   it('overrides resource_purpose to "homepage" when URL is a bare domain', async () => {
     setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
     // LLM returns "primary_source", but URL says "homepage" — heuristic wins.
@@ -720,7 +720,7 @@ describe('handleResourceEnrich — URL-heuristic fast-path override (QUA-312)', 
     expect(item.resourcePurpose).toBe('primary_source');
   });
 
-  it('still writes enrichmentStatus="enriched" (not "classified") on fast-path override', async () => {
+  it('still writes enrichmentStatus="enriched" (not "classified") on URL override', async () => {
     setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
 
     await handleResourceEnrich(
@@ -730,8 +730,43 @@ describe('handleResourceEnrich — URL-heuristic fast-path override (QUA-312)', 
 
     const item = mockUpsertResourceBatch.mock.calls[0][0][0];
     // Combined enrich step writes "enriched" — only the standalone classify step
-    // writes "classified". Fast-path override here doesn't change that.
+    // writes "classified". URL override here doesn't change that.
     expect(item.enrichmentStatus).toBe('enriched');
+  });
+
+  it('does NOT apply the URL override when the LLM response fails validation', async () => {
+    // Even for a bare-domain homepage URL, if the LLM returns invalid JSON,
+    // we must fail the job rather than write a half-populated record using
+    // only the URL-derived fields.
+    setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
+    mockCallLlm.mockResolvedValue({
+      text: JSON.stringify({ resource_subtype: 'blog_post' }), // missing required fields
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-sonnet-test',
+    });
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://anthropic.com/' },
+      CTX,
+    );
+
+    expect(result.success).toBe(false);
+    expect(result.error).toContain('validation failed');
+    // Crucially: no partial-write leaked to upsertResourceBatch.
+    expect(mockUpsertResourceBatch).not.toHaveBeenCalled();
+  });
+
+  it('does NOT apply the URL override when the LLM throws', async () => {
+    setupDefaultMocks(mockResource({ url: 'https://anthropic.com/' }));
+    mockCallLlm.mockRejectedValue(new Error('Rate limited'));
+
+    const result = await handleResourceEnrich(
+      { resourceId: 'res-1', url: 'https://anthropic.com/' },
+      CTX,
+    );
+
+    expect(result.success).toBe(false);
+    expect(mockUpsertResourceBatch).not.toHaveBeenCalled();
   });
 });
 

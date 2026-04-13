@@ -428,8 +428,9 @@ describe('handleResourceIngest — enrichment chaining', () => {
           url: 'https://example.com/article',
           contentChanged: true,
         },
-        // dedupKey varies so a still-pending enrich doesn't suppress the new signal
-        dedupKey: expect.stringMatching(/^resource-enrich:res-1:[a-f0-9]{8}$/),
+        // dedupKey varies so a still-pending enrich doesn't suppress the new signal.
+        // Uses the full 16-char content hash (64 bits) for collision safety.
+        dedupKey: expect.stringMatching(/^resource-enrich:res-1:[a-f0-9]{16}$/),
       }),
     );
   });

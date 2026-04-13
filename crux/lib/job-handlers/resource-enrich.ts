@@ -168,10 +168,13 @@ export async function handleResourceEnrich(
 
     const result = validated.data;
 
-    // URL-heuristic fast-path: deterministically override `resource_purpose`
-    // when the URL clearly points at a homepage, regardless of what the LLM
-    // returned. The LLM still ran (we need summary/key_points/etc.), so the
-    // savings here are correctness, not cost — see Discussion #4221.
+    // URL-heuristic resource_purpose override (NOT a fast-path — runs AFTER
+    // the LLM call, saves zero cost). Deterministically overrides the LLM's
+    // `resource_purpose` when the URL clearly points at a homepage. This is a
+    // correctness fix to prevent the LLM from mislabeling bare-domain links
+    // as "primary_source" or "commentary". Real LLM cost savings happen in
+    // the standalone `classify.ts` batch CLI, where the URL heuristic runs
+    // BEFORE LLM batch submission.
     const urlClass = classifyByUrl(url);
     const urlHeuristicHomepage =
       urlClass.purpose === 'homepage' && urlClass.confidence >= FAST_PATH_THRESHOLD;

@@ -162,7 +162,7 @@ describe('classifyByUrl', () => {
     expect(r.confidence).toBeGreaterThanOrEqual(FAST_PATH_THRESHOLD);
   });
 
-  it('flags /about-style paths at exactly FAST_PATH_THRESHOLD (≥ FLAG, ≥ FAST_PATH)', () => {
+  it('flags /about-style paths above FAST_PATH_THRESHOLD (confidence 0.85 ≥ 0.8)', () => {
     const r = classifyByUrl('https://example.com/about');
     expect(r.purpose).toBe('homepage');
     expect(r.confidence).toBeGreaterThanOrEqual(FLAG_THRESHOLD);

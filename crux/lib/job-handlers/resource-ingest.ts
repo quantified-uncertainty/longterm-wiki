@@ -330,9 +330,12 @@ export async function handleResourceIngest(
       // Vary dedupKey when content changed so a still-pending enrich job for
       // the same resource doesn't suppress the new contentChanged signal via
       // ON CONFLICT DO NOTHING. The hash suffix is short-lived and doesn't
-      // pollute the keyspace.
-      const dedupKey = contentChanged === true && contentHash
-        ? `resource-enrich:${resourceId}:${contentHash.slice(0, 8)}`
+      // pollute the keyspace. Use the full content hash (16 hex chars = 64 bits)
+      // rather than truncating further — collisions would cause a re-enrich to
+      // be silently dropped. `contentHash` is always non-null inside this `if`
+      // (guarded by `result.content.length > 0` above).
+      const dedupKey = contentChanged === true
+        ? `resource-enrich:${resourceId}:${contentHash}`
         : `resource-enrich:${resourceId}`;
       createJob({
         type: 'resource-enrich',

@@ -11,6 +11,7 @@
 
 import { loadResourcesPGFirst } from '../resource-io.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
+import { upsertResourceBatch, type UpsertResourceItem } from '../lib/wiki-server/resources.ts';
 import {
   createBatch,
   pollBatch,
@@ -104,23 +105,23 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
   }
 
   if (fastPathHits.length > 0) {
-    console.log(`  ${fastPathHits.length} resources fast-path classified as homepage (no LLM call)`);
-    if (!dryRun) {
-      const updates = fastPathHits.map((h) => ({
-        id: h.id,
-        url: h.url,
-        resourcePurpose: 'homepage',
-        enrichmentStatus: 'classified',
-      }));
+    if (dryRun) {
+      console.log(`  ${fastPathHits.length} resources would fast-path classify as homepage (no LLM call)`);
+    } else {
+      console.log(`  ${fastPathHits.length} fast-path homepage candidates — writing via upsertResourceBatch...`);
       // Write in chunks of 100 (below the 200 server cap, leaves retry headroom).
-      for (let i = 0; i < updates.length; i += 100) {
-        const batch = updates.slice(i, i + 100);
-        const writeResult = await apiRequest(
-          'POST',
-          '/api/resources/batch',
-          { items: batch },
-          30000,
-        );
+      // Fail fast on any batch failure so the caller sees the error instead of
+      // silently dropping resources — callers can rerun after fixing the cause.
+      const CHUNK = 100;
+      for (let i = 0; i < fastPathHits.length; i += CHUNK) {
+        const chunk = fastPathHits.slice(i, i + CHUNK);
+        const updates: UpsertResourceItem[] = chunk.map((h) => ({
+          id: h.id,
+          url: h.url,
+          resourcePurpose: 'homepage',
+          enrichmentStatus: 'classified',
+        }));
+        const writeResult = await upsertResourceBatch(updates);
         if (!writeResult.ok) {
           return {
             exitCode: 1,
@@ -128,7 +129,7 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
           };
         }
       }
-      console.log(`  ✓ Wrote ${fastPathHits.length} fast-path classifications`);
+      console.log(`  ✓ Fast-path wrote ${fastPathHits.length} classifications`);
     }
   }
 
@@ -136,7 +137,7 @@ async function submitClassification(limit: number, dryRun: boolean): Promise<Com
 
   if (toClassify.length === 0) {
     console.log('  ✅ No LLM-classify candidates remain (fast-path or already classified)');
-    return { exitCode: 0, output: 'All resources already classified' };
+    return { exitCode: 0, output: 'All resources classified via fast-path' };
   }
 
   // Build batch requests
