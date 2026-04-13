@@ -80,6 +80,24 @@ describe('extractFixesIds', () => {
     expect(extractFixesIds('Fixes the bug. Closes the discussion.')).toEqual([]);
   });
 
+  it('does NOT match when keyword is mid-word (hotfix, postfix, prefix)', () => {
+    // Regression for CodeRabbit critical finding on PR #4229. Without the
+    // leading \b, "hotfix QUA-1" would match `fix QUA-1` and the watchdog
+    // would auto-close the wrong issue.
+    expect(extractFixesIds('hotfix QUA-100')).toEqual([]);
+    expect(extractFixesIds('postfix QUA-200')).toEqual([]);
+    expect(extractFixesIds('prefix QUA-300')).toEqual([]);
+    expect(extractFixesIds('unfixes QUA-400')).toEqual([]);
+    expect(extractFixesIds('foreclosed QUA-500')).toEqual([]);
+  });
+
+  it('still matches at line start, after punctuation, and after whitespace', () => {
+    expect(extractFixesIds('Fixes QUA-1')).toEqual(['QUA-1']);
+    expect(extractFixesIds('See [issue]: closes QUA-2')).toEqual(['QUA-2']);
+    expect(extractFixesIds('. Resolves QUA-3')).toEqual(['QUA-3']);
+    expect(extractFixesIds('(fix QUA-4)')).toEqual(['QUA-4']);
+  });
+
   it('returns empty for no matches', () => {
     expect(extractFixesIds('')).toEqual([]);
     expect(extractFixesIds('nothing to see')).toEqual([]);
@@ -168,6 +186,21 @@ describe('classifyEntry — bucket assignment', () => {
     const e = classifyEntry(issue, [], makeChildrenResult(children));
     expect(e.bucket).not.toBe('parent-epic');
     expect(e.unresolvedChildren).toHaveLength(1);
+  });
+
+  it('does NOT return PARENT-EPIC when child list is truncated, even if all fetched are resolved', () => {
+    // Regression for CodeRabbit major finding on PR #4229. With hasMore=true,
+    // children #101+ might still be active — auto-closing the parent would
+    // be a destructive false positive.
+    const issue = makeIssue({ updatedAt: daysAgo(2) });
+    const children = [
+      makeChild({ name: 'Done', type: 'completed' }),
+      makeChild({ name: 'Done', type: 'completed' }),
+    ];
+    const e = classifyEntry(issue, [], makeChildrenResult(children, true));
+    expect(e.bucket).not.toBe('parent-epic');
+    // Should fall through to stuck/orphan based on age — recent → stuck
+    expect(e.bucket).toBe('stuck');
   });
 
   it('returns ORPHAN when stale beyond STALE_DAYS with no PR or children', () => {
