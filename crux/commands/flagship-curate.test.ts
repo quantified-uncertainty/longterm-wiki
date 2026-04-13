@@ -25,6 +25,17 @@ const mockStoreVerdict = vi.fn();
 const mockApiRequest = vi.fn();
 const mockSuggestResources = vi.fn();
 const mockCommentOnIssue = vi.fn();
+// Hoisted so the `vi.mock('../lib/llm.ts', ...)` factory (itself hoisted to
+// the top of the file) can reference it directly. The QUA-378 tests cast the
+// imported `callLlm` symbol to a vi.fn and call `.mockRejectedValueOnce()` on
+// it — that only works if `callLlm` IS the hoisted vi.fn, not a wrapper.
+const { mockCallLlm } = vi.hoisted(() => ({
+  mockCallLlm: vi.fn(async () => ({
+    text: '[]',
+    usage: { input_tokens: 100, output_tokens: 50 },
+    model: 'claude-haiku-4-5-20251001',
+  })),
+}));
 
 vi.mock('../lib/wiki-server/entities.ts', () => ({
   getEntity: (...args: unknown[]) => mockGetEntity(...args),
@@ -62,11 +73,7 @@ vi.mock('../lib/llm.ts', async (importOriginal) => {
   return {
     ...actual,
     createLlmClient: vi.fn(() => ({})),
-    callLlm: vi.fn(async () => ({
-      text: '[]', // empty research results
-      usage: { input_tokens: 100, output_tokens: 50 },
-      model: 'claude-haiku-4-5-20251001',
-    })),
+    callLlm: mockCallLlm,
     MODELS: { haiku: 'claude-haiku-4-5-20251001', sonnet: 'claude-sonnet-4-6', opus: 'claude-opus-4-6' },
   };
 });
@@ -92,7 +99,15 @@ vi.mock('./sourcing-orchestrate.ts', () => ({
 
 // ── Import after mocks ─────────────────────────────────────────────────
 
-import { commands, formatSummaryMarkdown } from './flagship-curate.ts';
+import {
+  commands,
+  formatSummary,
+  formatSummaryMarkdown,
+  formatConfirmedDelta,
+} from './flagship-curate.ts';
+import { CreditExhaustedError } from '../lib/resilience.ts';
+import { callLlm } from '../lib/llm.ts';
+import { orchestrateCommand } from './sourcing-orchestrate.ts';
 
 // ── Helpers ────────────────────────────────────────────────────────────
 
@@ -150,6 +165,12 @@ function makePersonnel(items: Array<{ id: string; source?: string; displayName?:
 describe('flagship-curate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset the callLlm mock to its default empty-array response.
+    mockCallLlm.mockImplementation(async () => ({
+      text: '[]',
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-haiku-4-5-20251001',
+    }));
     // Suppress console output during tests
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -374,6 +395,452 @@ describe('flagship-curate', () => {
       // Should not have tried to research or update anything
       expect(mockSuggestResources).not.toHaveBeenCalled();
       expect(mockSyncPersonnel).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Credit-exhaustion handling (QUA-378) ────────────────────────────
+  describe('credit exhaustion (QUA-378)', () => {
+    it('aborts with exit code 2 when research throws CreditExhaustedError', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      // Make the research call fail with credit-exhausted on the first attempt.
+      (callLlm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        new CreditExhaustedError(
+          '400 invalid_request_error: Your credit balance is too low',
+          null,
+        ),
+      );
+
+      // Silence stderr for the abort banner.
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(2);
+      const bannerText = errorSpy.mock.calls.map((c) => c.join(' ')).join('\n');
+      expect(bannerText).toContain('ABORTED');
+      expect(bannerText).toContain('credit balance');
+      expect(bannerText).toContain('QUA-378');
+      // Reset at Step 4 must not have run (Step 2 threw before we got there).
+      expect(mockStoreVerdict).not.toHaveBeenCalled();
+    });
+
+    it('aborts with exit code 2 when verification output contains credit-balance error', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+
+      // Make orchestrate-sourcing return output with the credit-exhausted
+      // fingerprint (simulating every per-item LLM call returning a 400).
+      (orchestrateCommand as ReturnType<typeof vi.fn>).mockResolvedValueOnce({
+        exitCode: 0,
+        output:
+          '[1/1] RECORD Personnel: Alice\n' +
+          '  ERROR: LLM call failed: 400 {"type":"error","error":{"type":"invalid_request_error","message":"Your credit balance is too low to access the Anthropic API."},"request_id":"req_X"}\n' +
+          'Verification complete. Cost: $0.000',
+      });
+
+      const errorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+        // Skip research so we reach verification with an empty researched set.
+        'skip-research': true,
+      });
+
+      expect(result.exitCode).toBe(2);
+      expect(
+        errorSpy.mock.calls.map((c) => c.join(' ')).join('\n'),
+      ).toContain('ABORTED');
+    });
+
+    it('batch mode: halts remaining orgs after the first credit-exhausted org', async () => {
+      // Three candidate orgs; findEntitiesNeedingCuration fetches all and
+      // then sorts by non-confirmed verdict count. We give each the same
+      // count so order is stable (insertion order wins on ties).
+      mockApiRequest.mockResolvedValue({
+        ok: true,
+        data: {
+          entities: [
+            { id: 'alpha', stableId: 'sid_alpha', title: 'Alpha', entityType: 'organization' },
+            { id: 'bravo', stableId: 'sid_bravo', title: 'Bravo', entityType: 'organization' },
+            { id: 'charlie', stableId: 'sid_charlie', title: 'Charlie', entityType: 'organization' },
+          ],
+          total: 3,
+        },
+      });
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'X' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+
+      // First call succeeds (alpha processes normally). Second call — during
+      // bravo's research — throws credit-exhausted. Everything after must
+      // be skipped without invoking callLlm again.
+      (callLlm as ReturnType<typeof vi.fn>)
+        .mockResolvedValueOnce({
+          text: '[]',
+          usage: { input_tokens: 10, output_tokens: 10 },
+          model: 'claude-haiku-4-5-20251001',
+        })
+        .mockRejectedValueOnce(new CreditExhaustedError('credit balance is too low', null))
+        .mockImplementation(async () => {
+          throw new Error('callLlm should not be invoked after credit exhaustion');
+        });
+
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        all: true,
+        budget: '5',
+        limit: '3',
+        iterations: '1', // single-iteration so alpha completes on its one research call
+        ci: true,
+      });
+
+      expect(result.exitCode).toBe(2);
+      const json = JSON.parse(result.output);
+      expect(json.aborted).toBe('credit_exhausted');
+      // Alpha completed its one iteration; bravo threw during its research
+      // call; charlie never started. Both bravo (abandoned) and charlie
+      // (never started) count as skippedDueToCredits.
+      expect(json.results.length).toBe(1);
+      expect(json.results[0].entity).toBe('Alpha');
+      expect(json.skippedDueToCredits).toBe(2);
+    });
+
+    it('detects credit errors via the raw substring match (not just CreditExhaustedError instance)', async () => {
+      // If a caller forgets to wrap a raw error, the top-level batch loop
+      // still catches it via isCreditExhaustedError(). This guards against
+      // the "works in unit tests, fails in prod" drift.
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      (callLlm as ReturnType<typeof vi.fn>).mockRejectedValueOnce(
+        // NOT wrapped in CreditExhaustedError — raw 400 body
+        new Error(
+          '400 invalid_request_error: Your credit balance is too low to access the Anthropic API. Please go to Plans & Billing to upgrade or purchase credits.',
+        ),
+      );
+
+      vi.spyOn(console, 'error').mockImplementation(() => {});
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(2);
+    });
+  });
+
+  describe('Step 4 reset guard (QUA-382)', () => {
+    // Helper: set up an entity with 3 records that all need curation. All
+    // three have verdict=partial so discoverRecordsNeedingCuration preserves
+    // their insertion order when passing them to the research step.
+    // The research LLM returns URLs for indexes 0 and 1, skipping index 2.
+    function setupThreeRecordScenario() {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+          { recordType: 'personnel', recordId: 'p2', verdict: 'partial', displayName: 'Bob' },
+          { recordType: 'personnel', recordId: 'p3', verdict: 'partial', displayName: 'Carol' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(
+        makePersonnel([{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }]),
+      );
+      mockSyncPersonnel.mockResolvedValue({ ok: true, data: { updated: 2 } });
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM: return URLs for p1 (index 0) and p2 (index 1), skip p3.
+      mockCallLlm.mockResolvedValue({
+        text: JSON.stringify([
+          { index: 0, urls: ['https://example.com/alice'], reasoning: 'Team page' },
+          { index: 1, urls: ['https://example.com/bob'], reasoning: 'Team page' },
+        ]),
+        usage: { input_tokens: 100, output_tokens: 50 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+    }
+
+    function resetCalls() {
+      return mockStoreVerdict.mock.calls
+        .map((call) => call[0] as { recordId: string; verdict: string } | undefined)
+        .filter((arg) => arg?.verdict === 'unchecked');
+    }
+
+    it('resets only records whose URLs were successfully ingested in Step 3', async () => {
+      setupThreeRecordScenario();
+      // p1 URL succeeds, p2 URL fails.
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: 100, title: 'Alice' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 1,
+        cachedCount: 0,
+        errorCount: 1,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const resets = resetCalls();
+      const resetIds = resets.map((r) => r!.recordId).sort();
+      // Only p1 should be reset. p2's URL errored, p3 had no URL.
+      expect(resetIds).toEqual(['p1']);
+    });
+
+    it('skips Step 4 entirely when Step 3 produces no successful ingests', async () => {
+      setupThreeRecordScenario();
+      // All URLs fail.
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'error', contentLength: 0, title: null },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 2,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when suggestResources throws', async () => {
+      setupThreeRecordScenario();
+      mockSuggestResources.mockRejectedValue(new Error('firecrawl not installed'));
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when Step 2 research returns no URLs', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM returns empty array — no new URLs.
+      mockCallLlm.mockResolvedValue({
+        text: '[]',
+        usage: { input_tokens: 100, output_tokens: 50 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(mockSuggestResources).not.toHaveBeenCalled();
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('--skip-research resets all eligible records (no Step 3 gate)', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+          { recordType: 'personnel', recordId: 'p2', verdict: 'unverifiable', displayName: 'Bob' },
+          { recordType: 'personnel', recordId: 'p3', verdict: 'confirmed', displayName: 'Carol' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(
+        makePersonnel([{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }]),
+      );
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        'skip-research': true,
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      // suggestResources must not have been called — research was skipped.
+      expect(mockSuggestResources).not.toHaveBeenCalled();
+      // p1 (partial) and p2 (unverifiable) reset; p3 (confirmed) is excluded
+      // before reset because it doesn't appear in records-needing-curation.
+      const resetIds = resetCalls().map((r) => r!.recordId).sort();
+      expect(resetIds).toEqual(['p1', 'p2']);
+    });
+
+    it('treats fresh-cache hits (status=ok, contentLength=null) as successful', async () => {
+      // The cached path in suggest-resources.ts returns status 'ok' with
+      // contentLength null (content exists but wasn't re-fetched, so length
+      // is unknown). These should still count as successful ingests.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: null, title: 'Alice (cached)' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'ok', contentLength: null, title: 'Bob (cached)' },
+        ],
+        fetchedCount: 0,
+        cachedCount: 2,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const resetIds = resetCalls().map((r) => r!.recordId).sort();
+      expect(resetIds).toEqual(['p1', 'p2']);
+    });
+
+    it('treats paywall and dead statuses as failures (records not reset)', async () => {
+      // Records whose URLs all came back as paywall/dead should not be
+      // reset — the verifier may reject paywall content and strand them
+      // at 'unchecked', which is the original QUA-382 bug.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'paywall', contentLength: 500, title: 'Alice' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'dead', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when the verify budget is exhausted', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM burns the entire budget so verifyBudget ends up ≤ 0.
+      mockCallLlm.mockResolvedValue({
+        text: JSON.stringify([
+          { index: 0, urls: ['https://example.com/alice'], reasoning: 'Team page' },
+        ]),
+        usage: { input_tokens: 1_000_000, output_tokens: 1_000_000 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: 100, title: 'Alice' },
+        ],
+        fetchedCount: 1,
+        cachedCount: 0,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '0.0001', // too small — verifyBudget drops to ≤ 0 after research
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('guard still applies across multiple iterations (iterations=2)', async () => {
+      // With iterations=2, the guard must hold on both passes: Step 4 of
+      // iteration 2 must still only reset records that got new sources in
+      // iteration 2's own Step 3. Here Step 3 fails on both iterations, so
+      // no resets should ever fire.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'error', contentLength: 0, title: null },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 2,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '2',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('does not reset contradicted records (only unverifiable/partial/outdated are resettable)', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'contradicted', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        'skip-research': true,
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
     });
   });
 
@@ -671,5 +1138,160 @@ describe('formatSummaryMarkdown', () => {
     });
     expect(md).toContain('| Empty Org | — → — | 0 |');
     expect(md).not.toContain('NaN');
+  });
+});
+
+// ── formatSummary console output tests (QUA-379) ───────────────────────
+
+describe('formatSummary console output', () => {
+  /**
+   * Strip ANSI escape codes so assertions don't need to know about colors.
+   * Matches the CSI sequence `ESC [ ... m` that c.green / c.red / etc. emit.
+   */
+  function stripAnsi(s: string): string {
+    return s.replace(/\x1b\[[0-9;]*m/g, '');
+  }
+
+  function makeResult(
+    title: string,
+    confirmedBefore: number,
+    confirmedAfter: number,
+    totalRecords: number,
+    cost = 0.5,
+    durationMs = 60000,
+  ) {
+    return {
+      entity: { id: title.toLowerCase(), stableId: `sid_${title}`, title, entityType: 'organization' },
+      recordsTotal: totalRecords,
+      recordsCurated: Math.max(0, totalRecords - confirmedBefore),
+      // Note: recordsImproved is clamped to >= 0 per the existing CurationResult
+      // contract. formatSummary must NOT rely on it to compute the delta.
+      recordsImproved: Math.max(0, confirmedAfter - confirmedBefore),
+      recordsSkipped: 0,
+      researchCost: cost / 2,
+      verifyCost: cost / 2,
+      totalCost: cost,
+      duration: durationMs,
+      beforeVerdicts: { confirmed: confirmedBefore, unchecked: totalRecords - confirmedBefore },
+      afterVerdicts: { confirmed: confirmedAfter, unchecked: totalRecords - confirmedAfter },
+    };
+  }
+
+  describe('formatConfirmedDelta', () => {
+    it('labels improvements with a green plus prefix', () => {
+      const out = formatConfirmedDelta(10, 14);
+      expect(stripAnsi(out)).toBe('+4');
+      expect(out).toContain('\x1b[32m'); // green
+    });
+
+    it('labels regressions with a red minus prefix — the QUA-379 regression case', () => {
+      const out = formatConfirmedDelta(14, 10);
+      expect(stripAnsi(out)).toBe('-4');
+      expect(out).toContain('\x1b[31m'); // red
+    });
+
+    it('labels exact zero as dim "no change"', () => {
+      const out = formatConfirmedDelta(10, 10);
+      expect(stripAnsi(out)).toBe('no change');
+      expect(out).toContain('\x1b[2m'); // dim
+    });
+
+    it('does not render +0 or -0 for the zero case', () => {
+      const out = stripAnsi(formatConfirmedDelta(0, 0));
+      expect(out).not.toContain('+0');
+      expect(out).not.toContain('-0');
+    });
+  });
+
+  describe('per-entity line rendering', () => {
+    it('renders a regression with a red minus, not "no change" — QUA-379 Anthropic case', () => {
+      // Reproducing the exact 2026-04-13 evidence: Anthropic 37% → 33% confirmed
+      // with the old formatter labeled this "no change" because the delta
+      // display was gated on `confirmedAfter > confirmedBefore`.
+      const results = [makeResult('Anthropic', 10, 8, 27)];
+      const out = stripAnsi(formatSummary(results));
+      // Old (buggy) output would have been: "37% → 30% confirmed (no change)"
+      expect(out).toContain('Anthropic: 37% → 30% confirmed (-2)');
+      expect(out).not.toMatch(/Anthropic.*no change/);
+    });
+
+    it('renders an improvement with a green plus', () => {
+      const results = [makeResult('OpenAI', 8, 12, 25)];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('OpenAI: 32% → 48% confirmed (+4)');
+    });
+
+    it('renders exact zero delta as "no change"', () => {
+      const results = [makeResult('StableOrg', 5, 5, 10)];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('StableOrg: 50% → 50% confirmed (no change)');
+    });
+
+    it('renders mixed results (improvement + no-change + regression) accurately across a batch', () => {
+      // Mirrors a realistic partial-sweep: some orgs gained confirmed verdicts,
+      // some flipped neutral, some regressed. All three must be distinguishable
+      // in the console output — the entire point of QUA-379.
+      const results = [
+        makeResult('GoodOrg', 5, 10, 20, 0.5, 60000),
+        makeResult('FlatOrg', 8, 8, 16, 0.2, 30000),
+        makeResult('RegressOrg', 10, 6, 20, 0.3, 45000),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('GoodOrg: 25% → 50% confirmed (+5)');
+      expect(out).toContain('FlatOrg: 50% → 50% confirmed (no change)');
+      expect(out).toContain('RegressOrg: 50% → 30% confirmed (-4)');
+    });
+  });
+
+  describe('totals line', () => {
+    it('reports a signed net confirmed-delta across all entities (QUA-379 accounting fix)', () => {
+      // GoodOrg: +5, FlatOrg: 0, RegressOrg: -4 → net +1 net delta.
+      // The old formatter summed `recordsImproved` (clamped ≥ 0 per-org)
+      // which would have reported +5 — hiding the regression entirely.
+      const results = [
+        makeResult('GoodOrg', 5, 10, 20),
+        makeResult('FlatOrg', 8, 8, 16),
+        makeResult('RegressOrg', 10, 6, 20),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: +1');
+      // The misleading old label should be gone.
+      expect(out).not.toContain('Records improved:');
+    });
+
+    it('reports negative totals when the net is a regression', () => {
+      const results = [
+        makeResult('OrgA', 10, 8, 20),
+        makeResult('OrgB', 10, 7, 20),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: -5');
+    });
+
+    it('reports "0" (not "+0" or "-0") when net delta is exactly zero', () => {
+      const results = [
+        makeResult('OrgA', 5, 8, 15), // +3
+        makeResult('OrgB', 5, 2, 15), // -3
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: 0');
+      expect(out).not.toContain('Confirmed delta: +0');
+      expect(out).not.toContain('Confirmed delta: -0');
+    });
+
+    it('colors the totals line red on net regression', () => {
+      const results = [makeResult('Regress', 10, 6, 20)];
+      const out = formatSummary(results);
+      // The totals line should contain a red ANSI code for the net delta.
+      const totalsLine = out.split('\n').find((l) => l.includes('Confirmed delta:'));
+      expect(totalsLine).toBeDefined();
+      expect(totalsLine).toContain('\x1b[31m');
+    });
+
+    it('colors the totals line green on net improvement', () => {
+      const results = [makeResult('Grow', 5, 10, 20)];
+      const totalsLine = formatSummary(results).split('\n').find((l) => l.includes('Confirmed delta:'));
+      expect(totalsLine).toContain('\x1b[32m');
+    });
   });
 });

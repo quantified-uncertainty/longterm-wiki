@@ -190,6 +190,41 @@ const EvidenceQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
 });
 
+/**
+ * QUA-331: batch evidence lookup. Avoids N+1 HTTP calls when callers need
+ * evidence for many records at once (e.g. `crux sourcing-suggest-urls`,
+ * `sourcing-audit-urls`, `sourcing-recheck`). Grouped by recordType on the
+ * server so each type resolves to one `IN (...)` query.
+ */
+const MAX_EVIDENCE_BY_RECORDS = 1000;
+const EvidenceByRecordsBody = z.object({
+  records: z
+    .array(
+      z.object({
+        recordType: z.string().min(1).max(50),
+        recordId: z.string().min(1).max(MAX_ID_LENGTH),
+      })
+    )
+    .min(1)
+    .max(MAX_EVIDENCE_BY_RECORDS),
+  /**
+   * Required per-record row cap. Callers must be explicit about payload
+   * size — an unbounded fetch across 1000 records could load millions of
+   * evidence rows into memory. A small value (e.g. 5) is sufficient for
+   * "find the first non-null source URL" use cases.
+   */
+  limitPerRecord: z.number().int().min(1).max(MAX_PAGE_SIZE),
+});
+
+/**
+ * Join (recordType, recordId) into a stable response-map key.
+ * Kept in sync with `evidenceRecordKey` in the crux client
+ * (`crux/lib/wiki-server/sourcing-client.ts`).
+ */
+export function evidenceRecordKey(recordType: string, recordId: string): string {
+  return `${recordType}|${recordId}`;
+}
+
 const DueForRecheckQuery = z.object({
   limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
@@ -701,6 +736,69 @@ const sourcingApp = new Hono()
       });
     }
   )
+
+  // ---- POST /evidence/by-records ----
+  // QUA-331: batch evidence lookup. Replaces N+1 calls to
+  // `GET /evidence/:recordType/:recordId` in sourcing-suggest-urls,
+  // sourcing-audit-urls, and sourcing-recheck. Groups requested records by
+  // recordType and issues one `IN (...)` query per type (usually 1–2 total).
+  // Does NOT return `claimProvenance` — the per-record subquery would
+  // defeat the purpose of batching, and no caller needs it here.
+  .post("/evidence/by-records", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = EvidenceByRecordsBody.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+    const { records, limitPerRecord } = parsed.data;
+
+    // Group by recordType so each type resolves to a single IN query.
+    // Deduplicate recordIds per type — callers may pass duplicates.
+    const byType = new Map<string, Set<string>>();
+    for (const r of records) {
+      let set = byType.get(r.recordType);
+      if (!set) {
+        set = new Set<string>();
+        byType.set(r.recordType, set);
+      }
+      set.add(r.recordId);
+    }
+
+    const db = getDrizzleDb();
+
+    const evidenceByKey: Record<string, ReturnType<typeof mapEvidenceRow>[]> = {};
+    for (const [recordType, idSet] of byType) {
+      const rows = await db
+        .select()
+        .from(recordSources)
+        .where(
+          and(
+            eq(recordSources.recordType, recordType),
+            inArray(recordSources.recordId, [...idSet]),
+          )
+        )
+        .orderBy(recordSources.sourceUrl, desc(recordSources.checkedAt));
+
+      // Bucket by recordId and cap per record (in app, not SQL, since the
+      // cap is per (recordType, recordId) and LIMIT applies to the whole
+      // result set).
+      for (const row of rows) {
+        const key = evidenceRecordKey(row.recordType, row.recordId);
+        let bucket = evidenceByKey[key];
+        if (!bucket) {
+          bucket = [];
+          evidenceByKey[key] = bucket;
+        }
+        if (bucket.length >= limitPerRecord) continue;
+        bucket.push(mapEvidenceRow(row));
+      }
+    }
+
+    return c.json({
+      evidenceByKey,
+      currentCheckerModel: CURRENT_CHECKER_MODEL,
+    });
+  })
 
   // ---- POST /evidence ----
   // Upserts on (recordType, recordId, sourceUrl, checkerModel) to prevent duplicates.

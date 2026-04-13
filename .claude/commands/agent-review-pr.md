@@ -112,6 +112,20 @@ pnpm crux w validate gate --fix
 
 ## Phase 3: Diff review (subagent) — ≥30 lines changed
 
+### 3a. Narrow-patch signature check (always, fast)
+
+Before spawning the review subagent, run the narrow-patch detector. It flags the "column-name-gated value probe" pattern that produced the QUA-316 → QUA-346 → QUA-354 cascade, where raw `f_xxx` fact IDs were masked one column at a time until a content-based regex replaced both narrow patches.
+
+```bash
+npx tsx crux/pr-review/detect-narrow-patch.ts
+```
+
+The detector fires at MEDIUM severity when the diff adds a conditional that *both* gates on a literal column name (`columnName === "..."`, `field.name === "..."`, etc.) *and* probes the value's signature (`.startsWith(`, `.test(`, `.match(`, `.includes(`). Pure formatting transforms (`toFixed`, `Intl.NumberFormat`, `formatCurrency`) are not flagged.
+
+**Action on a hit:** before proceeding with the rest of the review, ask explicitly whether the fix could be content-based (match the value's shape regardless of column) instead of column-name-gated. A content-based fix prevents the recurring per-column patch loop. If you confirm the column-gated version is correct (e.g. the column name genuinely carries meaning beyond the value's shape), document the reasoning in the PR body — otherwise rewrite it before shipping. See `.claude/rules/proactive-github-filing.md` § "N+ related symptoms in a narrow window" for the broader rule.
+
+### 3b. Hostile reviewer subagent
+
 Use the Agent tool to spawn a fresh subagent (subagent_type: "general-purpose") with NO prior context.
 
 Provide it with the full diff (`git diff main...HEAD`) and this prompt:

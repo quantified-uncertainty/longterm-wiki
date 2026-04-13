@@ -24,7 +24,8 @@ import type {
 } from '../lib/command-types.ts';
 import {
   listVerdicts,
-  getEvidenceByRecord,
+  getEvidenceByRecords,
+  evidenceRecordKey,
   listUrlSuggestions,
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
@@ -270,9 +271,50 @@ async function suggestCommand(
     ? await fetchPendingRecordKeys(recordTypeFilter, log)
     : new Set<string>();
 
+  // Pre-compute claim/entity text and the skip verdict so the pre-fetch
+  // filter and the per-task loop agree without duplicating logic.
+  type PreparedRow = {
+    v: (typeof verdictRows)[number];
+    claimText: string;
+    entityName: string;
+    skipReason: 'no-claim' | 'had-suggestion' | null;
+  };
+  const prepared: PreparedRow[] = verdictRows.map((v) => {
+    const claimText = v.reasoning?.trim() || v.displayName?.trim() || '';
+    const entityName =
+      v.entityDisplayName?.trim() || v.entityId?.trim() || v.displayName?.trim() || '';
+    let skipReason: PreparedRow['skipReason'] = null;
+    if (!claimText || !entityName) skipReason = 'no-claim';
+    else if (skipExisting && pendingKeys.has(`${v.recordType}|${v.recordId}`))
+      skipReason = 'had-suggestion';
+    return { v, claimText, entityName, skipReason };
+  });
+
+  // QUA-331: batch-fetch evidence once before the per-record task loop
+  // instead of N calls inside it. Only fetch for rows we will actually
+  // process — no point loading evidence for records that will be skipped.
+  const needsEvidence = prepared.filter((p) => p.skipReason === null);
+  const existingUrlByKey = new Map<string, string | null>();
+  if (needsEvidence.length > 0) {
+    const evidenceRes = await getEvidenceByRecords(
+      needsEvidence.map((p) => ({ recordType: p.v.recordType, recordId: p.v.recordId })),
+      { limitPerRecord: 5 },
+    );
+    if (!evidenceRes.ok) {
+      return {
+        exitCode: 1,
+        output: `Failed to batch-fetch evidence: ${evidenceRes.message ?? 'unknown error'}`,
+      };
+    }
+    for (const [key, rows] of Object.entries(evidenceRes.data.evidenceByKey)) {
+      existingUrlByKey.set(key, rows.find((e) => e.sourceUrl)?.sourceUrl ?? null);
+    }
+  }
+
   const toUpsert: Parameters<typeof upsertUrlSuggestions>[0] = [];
 
-  const tasks = verdictRows.map((v) => async () => {
+  const tasks = prepared.map((p) => async () => {
+    const { v, claimText, entityName, skipReason } = p;
     summary.scanned++;
 
     // Shared budget gate: once tripped, pending tasks short-circuit without
@@ -285,24 +327,16 @@ async function suggestCommand(
       return;
     }
 
-    // Claim text comes from the sourcing LLM's reasoning; fall back to the
-    // record's displayName when reasoning is missing.
-    const claimText = v.reasoning?.trim() || v.displayName?.trim() || '';
-    const entityName =
-      v.entityDisplayName?.trim() || v.entityId?.trim() || v.displayName?.trim() || '';
-    if (!claimText || !entityName) {
+    if (skipReason === 'no-claim') {
       summary.skippedNoClaim++;
       return;
     }
-
-    if (skipExisting && pendingKeys.has(`${v.recordType}|${v.recordId}`)) {
+    if (skipReason === 'had-suggestion') {
       summary.skippedHadSuggestion++;
       return;
     }
 
-    const evidence = await getEvidenceByRecord(v.recordType, v.recordId, { limit: 5 });
-    const existingUrl =
-      (evidence.ok && evidence.data.evidence.find((e) => e.sourceUrl)?.sourceUrl) || null;
+    const existingUrl = existingUrlByKey.get(evidenceRecordKey(v.recordType, v.recordId)) ?? null;
 
     if (dryRun) {
       log(`  [dry-run] ${v.recordType}/${v.recordId} field=${v.fieldName ?? '(row)'} entity="${entityName.slice(0, 40)}"`);

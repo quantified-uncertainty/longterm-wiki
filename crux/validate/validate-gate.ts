@@ -385,6 +385,19 @@ const PARALLEL_STEPS: Step[] = [
     advisory: true,
   },
   {
+    id: 'zod-check-parity',
+    name: 'Zod ↔ CHECK constraint parity (enum-gap detector)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-zod-check-parity.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory (QUA-364): catches the "Zod accepts value X but CHECK rejects
+    // it" class of deploy bug (PR #4178 groundskeeper_runs.event,
+    // PR #4202 service_health_incidents.severity). Starts advisory because
+    // the registry is seeded with only the incident cases — expand MANUAL_MAPPINGS
+    // in validate-zod-check-parity.ts to add coverage, then promote to blocking.
+    advisory: true,
+  },
+  {
     id: 'dot-position',
     name: 'Dot indicator position (SourcingDot / RecordStatusDots not in first column)',
     command: 'npx',
