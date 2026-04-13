@@ -37,6 +37,7 @@ import { resolve as resolvePath } from 'path';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
 import { findAllLinearIds, parseLinearId, resolveLinearId } from '../lib/linear/parse-id.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
+import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
 import { execSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 
@@ -190,16 +191,14 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     return { output: `${c.red}Issue ${id} not found${c.reset}\n`, exitCode: 1 };
   }
 
-  const branch = currentBranch();
+  const ctx = getSessionContext();
   await updateIssueState(id, 'In Progress');
-  await commentOnIssue(
-    id,
-    `🤖 Claude Code starting work on this issue.\n\n**Branch:** \`${branch}\`\n\nWill post an update when a PR is ready for review.`,
-  );
+  await commentOnIssue(id, buildStartCommentBody(ctx));
 
   let out = '';
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → In Progress\n`;
-  out += `  Branch: ${c.cyan}${branch}${c.reset}\n`;
+  out += `  Branch: ${c.cyan}${ctx.branch}${c.reset}\n`;
+  if (ctx.slot !== null) out += `  Slot: ${c.cyan}a${ctx.slot}${c.reset}\n`;
   out += `  ${issue.url}\n`;
   return { output: out, exitCode: 0 };
 }
