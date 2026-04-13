@@ -50,8 +50,10 @@ export function getCheckStrategy(url: string): CheckStrategy {
   return 'http';
 }
 
-/** Extract domain from a URL (exported for batch rate limiting). */
-export { getDomain };
+/** Extract hostname from a URL (used by batch rate limiting to key per-domain delays). */
+export function getDomain(url: string): string {
+  return getHostname(url) || 'unknown';
+}
 
 // ── Strategy Implementations ─────────────────────────────────────────────────
 

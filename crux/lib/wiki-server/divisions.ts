@@ -7,6 +7,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { DivisionsRoute } from '../../../apps/wiki-server/src/routes/tablebase/divisions.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -15,7 +16,9 @@ import type { DivisionsRoute } from '../../../apps/wiki-server/src/routes/tableb
 type RpcClient = ReturnType<typeof hc<DivisionsRoute>>;
 
 export type DivisionsByOrgResult = InferResponseType<RpcClient['by-org'][':orgId']['$get'], 200>;
-export type DivisionsSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+// createSyncHandler returns Promise<Response>, erasing the typed shape for
+// InferResponseType — import the concrete factory response type instead.
+export type DivisionsSyncResult = SyncResponse;
 
 /** A single division row. */
 export type DivisionEntry = DivisionsByOrgResult['divisions'][number];

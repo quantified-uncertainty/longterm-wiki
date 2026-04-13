@@ -7,6 +7,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { GrantsRoute } from '../../../apps/wiki-server/src/routes/tablebase/grants.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -15,7 +16,10 @@ import type { GrantsRoute } from '../../../apps/wiki-server/src/routes/tablebase
 type RpcClient = ReturnType<typeof hc<GrantsRoute>>;
 
 export type GrantsByEntityResult = InferResponseType<RpcClient['by-entity'][':entityId']['$get'], 200>;
-export type GrantsSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+// The /sync handler goes through createSyncHandler which returns a generic
+// Promise<Response>, so InferResponseType collapses to {}. Use the explicit
+// SyncResponse type exported by the factory instead.
+export type GrantsSyncResult = SyncResponse;
 export type GrantsAllGranteeIdsResult = InferResponseType<RpcClient['all-grantee-ids']['$get'], 200>;
 export type GrantsBatchUpdateGranteeResult = InferResponseType<RpcClient['batch-update-grantee']['$patch'], 200>;
 
