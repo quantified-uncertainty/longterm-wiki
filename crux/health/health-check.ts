@@ -27,6 +27,7 @@
 
 import { getColors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
+import { getServerUrl, getApiKey } from '../lib/wiki-server/client.ts';
 import { checkJobQueue } from './checks/job-queue.ts';
 import { checkPrQuality } from './checks/pr-quality.ts';
 import { checkCiMainHealth } from './checks/ci-main-health.ts';
@@ -43,9 +44,12 @@ const REPORT_MODE = args.includes('--report');
 const AUTO_ISSUE = args.includes('--auto-issue');
 const CLEANUP_LABELS = args.includes('--cleanup-labels');
 
-const SERVER_URL = process.env.LONGTERMWIKI_SERVER_URL ?? '';
-const API_KEY = process.env.LONGTERMWIKI_SERVER_API_KEY ?? '';
-const WIKI_PUBLIC_URL = process.env.WIKI_PUBLIC_URL ?? '';
+// Resolve wiki-server URL/API key via the shared client helpers so
+// WIKI_SERVER_ENV=prod (which reads PROD_LONGTERMWIKI_*) works here
+// the same way it does for every other crux command. See QUA-318.
+const SERVER_URL = getServerUrl();
+const API_KEY = getApiKey();
+const WIKI_PUBLIC_URL = process.env.WIKI_PUBLIC_URL || 'https://www.longtermwiki.com';
 
 // Count lower bounds — alert if DB drops significantly below these baselines
 const MIN_PAGES = 600;
@@ -372,10 +376,6 @@ export async function checkFrontend(): Promise<CheckResult> {
   const name = 'Frontend';
   const detail: string[] = [];
   const failures: string[] = [];
-
-  if (!WIKI_PUBLIC_URL) {
-    return { name, ok: true, summary: 'Skipped (WIKI_PUBLIC_URL not set)', detail: ['Set WIKI_PUBLIC_URL to enable frontend checks'] };
-  }
 
   const pages = [
     { label: 'Homepage', path: '/' },
