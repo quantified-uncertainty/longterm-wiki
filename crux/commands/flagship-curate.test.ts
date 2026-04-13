@@ -704,6 +704,57 @@ describe('flagship-curate', () => {
       expect(resetIds).toEqual(['p1', 'p2']);
     });
 
+    it('treats fresh-cache hits (status=ok, contentLength=null) as successful', async () => {
+      // The cached path in suggest-resources.ts returns status 'ok' with
+      // contentLength null (content exists but wasn't re-fetched, so length
+      // is unknown). These should still count as successful ingests.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: null, title: 'Alice (cached)' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'ok', contentLength: null, title: 'Bob (cached)' },
+        ],
+        fetchedCount: 0,
+        cachedCount: 2,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const resetIds = resetCalls().map((r) => r!.recordId).sort();
+      expect(resetIds).toEqual(['p1', 'p2']);
+    });
+
+    it('treats paywall and dead statuses as failures (records not reset)', async () => {
+      // Records whose URLs all came back as paywall/dead should not be
+      // reset — the verifier may reject paywall content and strand them
+      // at 'unchecked', which is the original QUA-382 bug.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'paywall', contentLength: 500, title: 'Alice' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'dead', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
     it('skips Step 4 entirely when the verify budget is exhausted', async () => {
       mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
       mockGetVerdictsByEntity.mockResolvedValue(
@@ -734,6 +785,32 @@ describe('flagship-curate', () => {
         entity: 'anthropic',
         budget: '0.0001', // too small — verifyBudget drops to ≤ 0 after research
         iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('guard still applies across multiple iterations (iterations=2)', async () => {
+      // With iterations=2, the guard must hold on both passes: Step 4 of
+      // iteration 2 must still only reset records that got new sources in
+      // iteration 2's own Step 3. Here Step 3 fails on both iterations, so
+      // no resets should ever fire.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'error', contentLength: 0, title: null },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 2,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '2',
       });
 
       expect(result.exitCode).toBe(0);

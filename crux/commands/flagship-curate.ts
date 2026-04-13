@@ -394,10 +394,15 @@ interface IngestResult {
   ingested: number;
   errors: number;
   /**
-   * Record IDs that had at least one URL successfully registered and ingested
-   * (fresh from cache or freshly fetched with status='ok'). Only these records
-   * are safe to reset in Step 4 — records whose URLs all errored out would lose
-   * their prior verdicts for no gain.
+   * Record IDs that had at least one URL come back with status='ok' from
+   * suggestResources — i.e. freshly fetched OR fresh-cache hits (the cached
+   * path in suggest-resources.ts coerces to status 'ok' with contentLength
+   * null). Only these records are safe to reset in Step 4.
+   *
+   * Intentionally excluded: 'error' | 'paywall' | 'dead'. Content is missing
+   * or unusable for those — resetting would let the verifier re-run against
+   * nothing and strand the record at 'unchecked' (the original QUA-382 bug).
+   * If paywall-detected records ever become safe to re-verify, revisit.
    */
   successfulRecordIds: Set<string>;
 }
