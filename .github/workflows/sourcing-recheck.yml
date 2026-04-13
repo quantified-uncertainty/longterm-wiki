@@ -1,7 +1,7 @@
-name: Source-Check Recheck
-run-name: "Source-Check Recheck${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+name: Sourcing Recheck
+run-name: "Sourcing Recheck${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
 
-# Re-verifies stale source-check verdicts on a weekly schedule.
+# Re-verifies stale sourcing verdicts on a weekly schedule.
 # Detects when previously-verified data becomes contradicted by updated sources.
 
 on:
@@ -35,7 +35,7 @@ permissions:
   issues: write
 
 concurrency:
-  group: source-check-recheck
+  group: sourcing-recheck
   cancel-in-progress: false
 
 jobs:
@@ -71,8 +71,9 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Run source-check recheck
+      - name: Run sourcing recheck
         run: |
+          set -eo pipefail
           ARGS="--budget=${INPUT_BUDGET} --limit=${INPUT_LIMIT}"
           if [ -n "${INPUT_RECORD_TYPE}" ]; then
             ARGS="$ARGS --type=${INPUT_RECORD_TYPE}"
@@ -80,7 +81,7 @@ jobs:
           if [ "${INPUT_DRY_RUN}" = "true" ]; then
             ARGS="$ARGS --dry-run"
           fi
-          pnpm crux source-check-recheck $ARGS --ci 2>&1 | tee /tmp/recheck-output.txt
+          pnpm crux sourcing-recheck $ARGS --ci 2>&1 | tee /tmp/recheck-output.txt
 
       - name: Check for verdict flips
         if: always()
@@ -89,6 +90,6 @@ jobs:
           if grep -q '"changed":' /tmp/recheck-output.txt 2>/dev/null; then
             CHANGED=$(cat /tmp/recheck-output.txt | jq -r '.changed // 0' 2>/dev/null || echo "0")
             if [ "$CHANGED" -gt "0" ]; then
-              echo "::warning::$CHANGED verdict(s) changed during recheck — review source-check dashboard"
+              echo "::warning::$CHANGED verdict(s) changed during recheck — review sourcing dashboard"
             fi
           fi
