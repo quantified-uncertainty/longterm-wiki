@@ -176,8 +176,10 @@ export function getCareerHistory(personEntityId: string): CareerHistoryEntry[] {
 // -- Funding connections ---------------------------------------------------
 
 export interface FundingConnection {
-  /** Unique key for React rendering */
+  /** Unique key for React rendering (composite: owner + record key) */
   key: string;
+  /** Raw grant record PK — use for verdict/sourcing lookups, not `key` */
+  recordKey: string;
   /** Grant display name */
   name: string;
   /** Whether this person's org gave or received the grant, or the person directly received it */
@@ -325,6 +327,7 @@ export function getFundingConnectionsForPerson(
         : null;
       connections.push({
         key: compositeKey,
+        recordKey: record.key,
         name: parsed.name,
         direction: "gave",
         viaOrg: resolveOrg(funderOrgId),
@@ -347,6 +350,7 @@ export function getFundingConnectionsForPerson(
       seen.add(compositeKey);
       connections.push({
         key: compositeKey,
+        recordKey: record.key,
         name: parsed.name,
         direction: "personal",
         viaOrg: null,
@@ -389,6 +393,7 @@ export function getFundingConnectionsForPerson(
         seen.add(compositeKey);
         connections.push({
           key: compositeKey,
+          recordKey: record.key,
           name: parsed.name,
           direction: "received",
           viaOrg: resolveOrg(recipientEntityId),
