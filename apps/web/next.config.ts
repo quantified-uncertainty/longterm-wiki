@@ -38,6 +38,17 @@ const nextConfig: NextConfig = {
         destination: "/wiki/E755",
         permanent: false,
       },
+      // Source Checks dashboard was renamed to /sourcing (QUA-346)
+      {
+        source: "/source-checks",
+        destination: "/sourcing",
+        permanent: true,
+      },
+      {
+        source: "/source-checks/:path*",
+        destination: "/sourcing/:path*",
+        permanent: true,
+      },
       {
         source: "/wiki/E1043",
         destination: "/resources",

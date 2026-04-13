@@ -339,6 +339,23 @@ function CellValue({
     return <JsonValue value={value} />;
   }
 
+  // FactBase fact IDs (f_xxx) -> render as link with "view →" label instead of leaking raw ID.
+  if (
+    (columnName === "fact_id" || columnName === "factId") &&
+    typeof value === "string" &&
+    value.startsWith("f_")
+  ) {
+    return (
+      <Link
+        href={`/factbase/fact/${encodeURIComponent(value)}`}
+        className="text-blue-600 dark:text-blue-400 hover:underline text-[11px]"
+        title={value}
+      >
+        view →
+      </Link>
+    );
+  }
+
   // Entity reference columns -> show resolved name as link
   const isEntityRef = isEntityRefColumn(columnName);
 
