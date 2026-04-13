@@ -1,10 +1,9 @@
 /**
- * Tests for sourcing-audit-urls URL classifier helpers.
+ * Tests for url-quality URL classifier helpers.
  *
- * Focus: `classifyByUrl` + `normalizeUrlForJoin` + `extractHost`.
- * The command's control flow is covered by manual prod runs; these tests
- * pin down the URL-heuristic behavior so QUA-312 extracts it without
- * regressing.
+ * Phase 2 of QUA-113 / Discussion #4221. Originally lived inline in
+ * `crux/commands/sourcing-audit-urls.test.ts` (Phase 1, PR #4222) — moved here
+ * when the helpers were extracted to a shared module.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -12,7 +11,9 @@ import {
   classifyByUrl,
   normalizeUrlForJoin,
   extractHost,
-} from './sourcing-audit-urls.ts';
+  FLAG_THRESHOLD,
+  FAST_PATH_THRESHOLD,
+} from './url-quality.ts';
 
 describe('classifyByUrl', () => {
   // ── Obvious homepages ──
@@ -57,7 +58,6 @@ describe('classifyByUrl', () => {
   it('classifies PDFs as never homepage regardless of depth', () => {
     expect(classifyByUrl('https://example.com/report.pdf').purpose).toBeNull();
     expect(classifyByUrl('https://example.com/reports/annual/2024.PDF').purpose).toBeNull();
-    // Even a bare-domain PDF (served from /) is not a homepage
     const r = classifyByUrl('https://example.com/doc.pdf');
     expect(r.purpose).toBeNull();
     expect(r.reasons).toContain('pdf');
@@ -70,7 +70,6 @@ describe('classifyByUrl', () => {
   });
 
   it('does NOT classify URL with utm_ params alone as non-homepage', () => {
-    // utm_* is tracking, not data — root should still classify as homepage
     expect(classifyByUrl('https://example.com/?utm_source=x&utm_medium=y').purpose).toBe('homepage');
   });
 
@@ -80,7 +79,6 @@ describe('classifyByUrl', () => {
   });
 
   it('ignores short/common fragments like #top', () => {
-    // '#top' has length 4; threshold is > 4 → still a homepage
     expect(classifyByUrl('https://example.com/#top').purpose).toBe('homepage');
     expect(classifyByUrl('https://example.com/#').purpose).toBe('homepage');
   });
@@ -102,13 +100,11 @@ describe('classifyByUrl', () => {
   });
 
   it('handles IPv6 hosts without crashing', () => {
-    // Node accepts http://[::1]/ — classifier should not throw
     const r = classifyByUrl('http://[::1]/');
     expect(r.purpose).toBe('homepage');
   });
 
   it('ignores userinfo in URL', () => {
-    // Credentials in URL should not affect classification
     const r = classifyByUrl('https://user:pass@example.com/');
     expect(r.purpose).toBe('homepage');
   });
@@ -124,7 +120,6 @@ describe('classifyByUrl', () => {
   });
 
   it('handles Wayback URLs without inner scheme', () => {
-    // Some Wayback URLs omit the scheme after the timestamp
     const r = classifyByUrl('https://web.archive.org/web/20240101000000/example.com/');
     expect(r.purpose).toBe('homepage');
   });
@@ -158,6 +153,25 @@ describe('classifyByUrl', () => {
     const a = classifyByUrl('https://EXAMPLE.com/');
     const b = classifyByUrl('https://example.com/');
     expect(a.purpose).toBe(b.purpose);
+  });
+
+  // ── Threshold semantics — important for fast-path callers ──
+  it('flags bare-domain confidence ≥ FAST_PATH_THRESHOLD (so callers can skip LLM)', () => {
+    const r = classifyByUrl('https://example.com/');
+    expect(r.purpose).toBe('homepage');
+    expect(r.confidence).toBeGreaterThanOrEqual(FAST_PATH_THRESHOLD);
+  });
+
+  it('flags /about-style paths above FAST_PATH_THRESHOLD (confidence 0.85 ≥ 0.8)', () => {
+    const r = classifyByUrl('https://example.com/about');
+    expect(r.purpose).toBe('homepage');
+    expect(r.confidence).toBeGreaterThanOrEqual(FLAG_THRESHOLD);
+    expect(r.confidence).toBeGreaterThanOrEqual(FAST_PATH_THRESHOLD);
+  });
+
+  it('does NOT trip the FAST_PATH for ambiguous depth-1 paths', () => {
+    const r = classifyByUrl('https://example.com/something');
+    expect(r.confidence).toBeLessThan(FAST_PATH_THRESHOLD);
   });
 });
 
