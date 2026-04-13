@@ -21,6 +21,7 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
+import { sanitizeRawIds } from "./sanitize-raw-ids";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -460,10 +461,10 @@ function CellValue({
         }
       } catch { /* not JSON, fall through */ }
     }
-    return <ExpandableText text={str} />;
+    return <ExpandableText text={sanitizeRawIds(str)} />;
   }
 
-  return <span className="text-[11px]">{str}</span>;
+  return <span className="text-[11px]">{sanitizeRawIds(str)}</span>;
 }
 
 function JsonValue({ value }: { value: unknown }) {
