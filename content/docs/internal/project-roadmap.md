@@ -37,7 +37,7 @@ The project has mature infrastructure:
   - Target: All pages with importance > 60 and quality < 40
 
 - [ ] **Citation coverage** - Many pages lack external citations
-  - Resource manager can convert links: `npm run resources process [page] --apply`
+  - Resource manager can convert links: `pnpm resources process [page] --apply`
   - Goal: Every substantive claim has a source
 
 ### Tooling (Low Priority)
@@ -107,4 +107,4 @@ The project has mature infrastructure:
 
 - **Don't over-engineer** - Add tooling only when manual process becomes painful
 - **Style guide is guidelines, not law** - Adapt to content, don't force templates
-- Run `npm run validate` before committing to catch issues early
+- Run `pnpm validate` before committing to catch issues early

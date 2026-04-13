@@ -386,11 +386,11 @@ This catches pages where someone manually typed `quality: 75` or an LLM suggeste
 
 ### Fixing Pages with Manual Quality
 
-If you see: `Quality (X) set without ratings - use 'npm run regrade -- page-id'`
+If you see: `Quality (X) set without ratings - use 'pnpm regrade page-id'`
 
 Run:
 ```bash
-npm run regrade -- page-id
+pnpm regrade page-id
 ```
 
 This will use Claude to properly grade the page and set both `quality` and `ratings`.
@@ -431,13 +431,13 @@ grep -l "pageType: stub" src/content/docs/**/*.mdx
 
 ```bash
 # Run all validation
-npm run validate
+pnpm validate
 
 # Run quality-source check specifically
-npm run crux -- validate unified --rules=quality-source
+pnpm crux validate unified --rules=quality-source
 
 # Grade a specific page
-npm run regrade -- page-id
+pnpm regrade page-id
 
 # Grade all ungraded pages
 node scripts/content/grade-content.mjs --skip-graded --apply
