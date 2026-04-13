@@ -5,8 +5,15 @@
 // and handles the unfixable case of fact values that ARE stableId CSVs
 // (`"founded-by": "sid_a, sid_b, sid_c"`). Pure — unit-tested.
 
+// Prefix strip supports two ID shapes — canonical `f_xxx` and 10-char
+// mixed-case alnum legacy. NOT 8-12 char lowercase hex: that shape
+// collides with ordinary English words (`deadbeef`, `facaded`, `accede87`)
+// and has never been observed as a visible-text prefix leak in prod. The
+// post-match verification in `sanitizeRawIds` rejects the 10-char alt
+// unless it passes the entropy gate, so strings like `"Washington —
+// Seattle"` pass through unchanged.
 const RAW_ID_PREFIX_STRIP_RE =
-  /^\s*(f_[A-Za-z0-9]{8,}|[a-f0-9]{8,12}|[A-Za-z0-9]{10})\s*(?:[—:-]\s*|\s+[—-]\s+)/;
+  /^\s*(f_[A-Za-z0-9]{8,}|[A-Za-z0-9]{10})\s*(?:[—:-]\s*|\s+[—-]\s+)/;
 
 const RAW_F_ID_RE = /\bf_[A-Za-z0-9]{8,}\b/g;
 const RAW_SID_RE = /\bsid_[A-Za-z0-9]{10}\b/g;
@@ -70,14 +77,18 @@ export function isLegacyResourceId(value: string, columnName: string): boolean {
 }
 
 /**
- * Strip a leading raw-ID prefix (`"f_xxx — "`, `"e7c42d88: "`, etc.) and
- * mask any remaining embedded `f_` / `sid_` with `…`. Returns the input
- * unchanged (same identity, for React memo) when no sanitization applies.
+ * Strip a leading raw-ID prefix (`"f_xxx — "`, `"2Y4ope8OxA — "`) and mask
+ * any remaining embedded `f_` / `sid_` with `…`.
+ *
+ * The prefix-strip has a critical subtlety: the `[A-Za-z0-9]{10}` regex
+ * alternative matches ANY 10-char alnum word, including `"Washington"` and
+ * `"California"`. Post-match, we re-verify via `looksLikeLegacyFactId`
+ * (entropy gate: requires upper+lower+digit) so legitimate words pass
+ * through unchanged.
  */
 export function sanitizeRawIds(s: string): string {
-  // Fast path: most cells contain no raw-ID-shaped text. A single indexOf
-  // scan on a short string is cheaper than running three regexes, and
-  // returning the input unchanged preserves React's identity check.
+  // Fast path: if no ID-shaped substring exists AND the prefix regex
+  // doesn't match, skip all work and return the input unchanged.
   if (
     !s.includes("f_") &&
     !s.includes("sid_") &&
@@ -86,10 +97,19 @@ export function sanitizeRawIds(s: string): string {
     return s;
   }
 
-  // A successful prefix match means one of the three ID shapes matched —
-  // the regex alternatives already enumerated them, no need to re-classify.
   const prefixMatch = s.match(RAW_ID_PREFIX_STRIP_RE);
-  const stripped = prefixMatch ? s.slice(prefixMatch[0].length) : s;
+  let stripped = s;
+  if (prefixMatch) {
+    const id = prefixMatch[1];
+    // Only strip if the captured prefix really looks like an ID. The
+    // regex alternative `[A-Za-z0-9]{10}` matches e.g. `"Washington"` —
+    // we reject via the entropy gate so real 10-char words pass through.
+    const isCanonical = id.startsWith("f_");
+    const isLegacyMixed = looksLikeLegacyFactId(id);
+    if (isCanonical || isLegacyMixed) {
+      stripped = s.slice(prefixMatch[0].length);
+    }
+  }
   return stripped
     .replace(RAW_F_ID_RE, "\u2026")
     .replace(RAW_SID_RE, "\u2026");

@@ -20,16 +20,35 @@ describe("sanitizeRawIds", () => {
       expect(sanitizeRawIds("f_mEKUPPFYRg: 2010-09")).toBe("2010-09");
     });
 
-    it("strips legacy 8-char hex prefix (`e7c42d88: value`)", () => {
-      expect(sanitizeRawIds("e7c42d88: $1,000,000")).toBe("$1,000,000");
-    });
-
-    it("strips legacy 12-char hex prefix", () => {
-      expect(sanitizeRawIds("a8c71e05abcd — Anthropic")).toBe("Anthropic");
+    it("strips legacy 10-char mixed-case alnum prefix (`2Y4ope8OxA — Entity`)", () => {
+      // Legacy pre-`f_` fact ID format — requires entropy gate on post-match
+      // verification (upper + lower + digit) to distinguish from real words.
+      expect(sanitizeRawIds("2Y4ope8OxA — Google DeepMind")).toBe("Google DeepMind");
+      expect(sanitizeRawIds("XUSIG6vsPw: London")).toBe("London");
     });
 
     it("handles single hyphen + space between id and value", () => {
       expect(sanitizeRawIds("f_qR5tY9wE1a - Some Title")).toBe("Some Title");
+    });
+
+    it("does NOT strip 10-char English words that match the regex shape", () => {
+      // Regression: the prefix regex alternative `[A-Za-z0-9]{10}` is too loose
+      // on its own — entropy gate `looksLikeLegacyFactId` (requires digit) is
+      // load-bearing. Adversarial review flagged this as critical.
+      expect(sanitizeRawIds("Washington — Seattle")).toBe("Washington — Seattle");
+      expect(sanitizeRawIds("California: 1850")).toBe("California: 1850");
+      expect(sanitizeRawIds("Manchester — UK")).toBe("Manchester — UK");
+      expect(sanitizeRawIds("abcdefghij — foo")).toBe("abcdefghij — foo");
+    });
+
+    it("does NOT strip common lowercase-hex words (deadbeef, facaded)", () => {
+      // The regex alternative for 8-12 lowercase hex was removed in the review
+      // pass — legitimate words like `deadbeef`, `facaded`, `accede87` are
+      // indistinguishable from legacy IDs by shape alone, and never surfaced
+      // as visible-text prefix leaks in prod.
+      expect(sanitizeRawIds("deadbeef — placeholder")).toBe("deadbeef — placeholder");
+      expect(sanitizeRawIds("accede87: note")).toBe("accede87: note");
+      expect(sanitizeRawIds("e7c42d88: value")).toBe("e7c42d88: value");
     });
   });
 
