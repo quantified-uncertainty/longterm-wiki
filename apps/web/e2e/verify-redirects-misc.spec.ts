@@ -103,13 +103,13 @@ test.describe("3. Sources page (PR #3675)", () => {
   });
 });
 
-// ─── 4. Source-checks search with special characters ─────────────────────────
+// ─── 4. Sourcing search with special characters ─────────────────────────
 
-test.describe("4. Source-checks search (special chars)", () => {
-  test("/source-checks page loads and search with % and _ doesn't crash", async ({
+test.describe("4. Sourcing search (special chars)", () => {
+  test("/sourcing page loads and search with % and _ doesn't crash", async ({
     page,
   }) => {
-    const response = await page.goto("/source-checks", {
+    const response = await page.goto("/sourcing", {
       waitUntil: "networkidle",
       timeout: 30000,
     });
@@ -153,7 +153,7 @@ test.describe("4. Source-checks search (special chars)", () => {
     } else {
       // Try URL-based search if no input found
       const searchResponse = await page.goto(
-        "/source-checks?q=%25test%25",
+        "/sourcing?q=%25test%25",
         { waitUntil: "networkidle", timeout: 30000 }
       );
       const searchStatus = searchResponse?.status();
@@ -489,7 +489,7 @@ test.describe("Bonus: Key routes return valid responses", () => {
   const ROUTES = [
     { path: "/legislation/executive-order-14110", description: "EO-14110 legislation page" },
     { path: "/sources", description: "Sources page" },
-    { path: "/source-checks", description: "Source checks dashboard" },
+    { path: "/sourcing", description: "Sourcing dashboard" },
     { path: "/ai-models", description: "AI Models directory" },
     { path: "/benchmarks", description: "Benchmarks directory" },
     { path: "/grants", description: "Grants directory" },

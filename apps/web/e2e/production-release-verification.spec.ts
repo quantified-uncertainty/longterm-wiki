@@ -192,12 +192,12 @@ test.describe("5. Legislation pages", () => {
   });
 });
 
-// ─── 6. Source Checks dashboard ────────────────────────────────────────────
+// ─── 6. Sourcing dashboard ────────────────────────────────────────────────
 
-test.describe("6. Source Checks", () => {
-  test("/source-checks dashboard loads", async ({ page }) => {
+test.describe("6. Sourcing", () => {
+  test("/sourcing dashboard loads", async ({ page }) => {
     const { pageErrors } = setupErrorCollector(page);
-    const response = await page.goto("/source-checks", {
+    const response = await page.goto("/sourcing", {
       waitUntil: "networkidle",
       timeout: 45000,
     });
@@ -396,25 +396,25 @@ test.describe("14. Publications", () => {
   });
 });
 
-// ─── 15. Source checks detail ──────────────────────────────────────────────
+// ─── 15. Sourcing detail ──────────────────────────────────────────────────
 
-test.describe("15. Source checks detail page", () => {
-  test("a specific source check fact page loads", async ({ page }) => {
+test.describe("15. Sourcing detail page", () => {
+  test("a specific sourcing fact page loads", async ({ page }) => {
     const { pageErrors } = setupErrorCollector(page);
 
-    // Navigate to source-checks first to find a real fact link
-    await page.goto("/source-checks", {
+    // Navigate to sourcing first to find a real fact link
+    await page.goto("/sourcing", {
       waitUntil: "networkidle",
       timeout: 45000,
     });
 
     // Try to find a link to a specific fact check
-    const factLink = page.locator('a[href*="/source-checks/fact/"]').first();
+    const factLink = page.locator('a[href*="/sourcing/fact/"]').first();
     const hasFactLink = (await factLink.count()) > 0;
 
     if (hasFactLink) {
       const href = await factLink.getAttribute("href");
-      console.log(`  Found source-check fact link: ${href}`);
+      console.log(`  Found sourcing fact link: ${href}`);
       const detailResponse = await page.goto(href!, {
         waitUntil: "networkidle",
         timeout: 45000,
@@ -425,7 +425,7 @@ test.describe("15. Source checks detail page", () => {
     } else {
       // If no fact links on the page, try a known pattern
       const detailResponse = await page.goto(
-        "/source-checks/fact/EF_ORG_0001_revenue_1",
+        "/sourcing/fact/EF_ORG_0001_revenue_1",
         { waitUntil: "networkidle", timeout: 45000 }
       );
       // May 404 if the specific ID doesn't exist — that's OK

@@ -15,9 +15,9 @@ Agents have repeatedly proposed "add a coverage/source-check score column to X" 
 - **Migration**: `0127` unified the legacy `record_verifications` + `record_verdicts` + `factbase_resource_verifications` + `factbase_verdicts` into these two tables. Don't create new verdict tables.
 - `things.verdict` — removed. Verdicts now live only in `source_check_verdicts`.
 
-## 2. Wiki-server endpoints (`/api/source-checks/*`)
+## 2. Wiki-server endpoints (`/api/sourcing/*`)
 
-All in `apps/wiki-server/src/routes/source-check/source-checks.ts`, mounted in `app.ts:203`.
+All in `apps/wiki-server/src/routes/sourcing/sourcing.ts`, mounted in `app.ts`. The legacy `/api/source-checks/*` path is kept as a backward-compat alias.
 
 | Method | Path | Purpose |
 |--------|------|---------|
@@ -73,7 +73,7 @@ If you're about to add a "show source-check status on X page", first grep for `R
 ## 6. Internal dashboards
 
 - **Source Checks** (E2200) — `/internal/entity-source-checks/` — main dashboard. Subcomponents: `action-queue.tsx`, `claims-viewer.tsx`, `coverage-bars.tsx`, `source-check-tabs.tsx`
-- **Source Check Coverage** — `/internal/source-check-coverage/` — loads `/api/source-checks/stats`, coverage-matrix, verdict-matrix
+- **Source Check Coverage** — `/internal/source-check-coverage/` — loads `/api/sourcing/stats`, coverage-matrix, verdict-matrix
 - **Citation Accuracy** (E917) — `/internal/citation-accuracy/`
 - **Data Quality** (E2600) — `/internal/data-quality/`
 - **People Coverage** (E1099) — entity coverage scores for people
