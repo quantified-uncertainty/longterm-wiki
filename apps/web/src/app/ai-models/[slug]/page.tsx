@@ -6,7 +6,6 @@ import {
   resolveAiModelBySlug,
   getAiModelSlugs,
   getRelatedModels,
-  isModelFamily,
 } from "../ai-model-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import {
@@ -14,13 +13,18 @@ import {
   SAFETY_LEVEL_COLORS,
   formatContext,
 } from "../ai-model-constants";
-import { ProfileStatCard } from "@/components/directory";
+import { ProfileStatCard, type ProfileTab } from "@/components/directory";
 import {
   computeAiModelCoverage,
   getAiModelSignals,
 } from "@/components/coverage/coverage-score";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
-import { BenchmarkScorecard } from "./benchmark-scorecard";
+import {
+  OverviewTab,
+  PricingTab,
+  BenchmarksTab,
+  FamilyTab,
+} from "./tabs";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));
@@ -37,10 +41,6 @@ export async function generateMetadata({
     title: entity ? `${entity.title} | AI Models` : "AI Model Not Found",
     description: entity?.description ?? undefined,
   };
-}
-
-function formatPrice(price: number): string {
-  return `\$${price.toFixed(2)}`;
 }
 
 export default async function AiModelDetailPage({
@@ -72,9 +72,6 @@ export default async function AiModelDetailPage({
       (!m.modelFamily || m.modelFamily !== entity.modelFamily),
   );
 
-  // Is this a family entry?
-  const isFamily = isModelFamily(entity);
-
   // Build stat cards
   const stats: Array<{
     label: string;
@@ -104,6 +101,50 @@ export default async function AiModelDetailPage({
 
   if (entity.safetyLevel) {
     stats.push({ label: "Safety Level", value: entity.safetyLevel });
+  }
+
+  // ── Build tabs ──
+  // Tabs hide automatically via ProfileTabs when count === 0, so a model
+  // with no pricing won't show the Pricing tab, etc.
+  const tabs: ProfileTab[] = [
+    {
+      id: "overview",
+      label: "Overview",
+      content: <OverviewTab entity={entity} />,
+    },
+  ];
+
+  if (entity.inputPrice != null || entity.outputPrice != null) {
+    tabs.push({
+      id: "pricing",
+      label: "Pricing",
+      content: <PricingTab entity={entity} />,
+    });
+  }
+
+  if (entity.benchmarks.length > 0) {
+    tabs.push({
+      id: "benchmarks",
+      label: "Benchmarks",
+      count: entity.benchmarks.length,
+      content: <BenchmarksTab entity={entity} />,
+    });
+  }
+
+  if (sameFamily.length > 0 || sameDeveloper.length > 0) {
+    tabs.push({
+      id: "family",
+      label: "Family",
+      count: sameFamily.length + sameDeveloper.length,
+      content: (
+        <FamilyTab
+          entity={entity}
+          sameFamily={sameFamily}
+          sameDeveloper={sameDeveloper}
+          developerName={developerEntity?.title ?? "Developer"}
+        />
+      ),
+    });
   }
 
   const titlePills = (
@@ -166,9 +207,10 @@ export default async function AiModelDetailPage({
     </div>
   );
 
+  // Sidebar: Details + Tags. Capabilities moved into the Overview tab so
+  // the sidebar stays focused on canonical metadata.
   const sidebar = (
     <>
-      {/* Model details */}
       <section>
         <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
         <div className="border border-border/60 rounded-xl bg-card">
@@ -193,35 +235,9 @@ export default async function AiModelDetailPage({
             }
           />
           <DetailRow label="Safety Level" value={entity.safetyLevel} />
-          {entity.modality.length > 0 && (
-            <DetailRow label="Modality" value={entity.modality.join(", ")} />
-          )}
         </div>
       </section>
 
-      {/* Capabilities */}
-      {entity.capabilities.length > 0 && (
-        <section>
-          <h2 className="text-lg font-bold tracking-tight mb-4">
-            Capabilities
-            <span className="ml-2 text-sm font-normal text-muted-foreground">
-              {entity.capabilities.length}
-            </span>
-          </h2>
-          <div className="flex flex-wrap gap-1.5">
-            {entity.capabilities.map((cap) => (
-              <span
-                key={cap}
-                className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border border-border/60 bg-card text-muted-foreground"
-              >
-                {cap}
-              </span>
-            ))}
-          </div>
-        </section>
-      )}
-
-      {/* Tags */}
       {entity.tags.length > 0 && (
         <section>
           <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
@@ -253,178 +269,10 @@ export default async function AiModelDetailPage({
       subtitle={entity.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}
+      tabs={tabs}
+      tabsAriaLabel="AI model sections"
       sidebar={sidebar}
-    >
-      <div className="space-y-8">
-        {/* Pricing */}
-        {(entity.inputPrice != null || entity.outputPrice != null) && (
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">Pricing</h2>
-            <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                    <th className="py-2.5 px-4 text-left font-medium">Type</th>
-                    <th className="py-2.5 px-4 text-right font-medium">
-                      Price per MTok
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {entity.inputPrice != null && (
-                    <tr className="hover:bg-muted/20 transition-colors">
-                      <td className="py-2.5 px-4">Input</td>
-                      <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                        {formatPrice(entity.inputPrice)}
-                      </td>
-                    </tr>
-                  )}
-                  {entity.outputPrice != null && (
-                    <tr className="hover:bg-muted/20 transition-colors">
-                      <td className="py-2.5 px-4">Output</td>
-                      <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                        {formatPrice(entity.outputPrice)}
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
-
-        {/* Benchmarks */}
-        {entity.benchmarks.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">
-              Benchmarks
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                {entity.benchmarks.length}
-              </span>
-            </h2>
-            <BenchmarkScorecard
-              benchmarks={entity.benchmarks}
-              modelId={entity.id}
-            />
-          </section>
-        )}
-
-        {/* Family models */}
-        {sameFamily.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">
-              {entity.modelFamily} Family
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                {sameFamily.length}
-              </span>
-            </h2>
-            <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                    <th className="py-2.5 px-4 text-left font-medium">Model</th>
-                    <th className="py-2.5 px-4 text-left font-medium">Tier</th>
-                    <th className="py-2.5 px-4 text-left font-medium">
-                      Released
-                    </th>
-                    <th className="py-2.5 px-4 text-right font-medium">
-                      Input $/MTok
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-border/50">
-                  {sameFamily
-                    .sort((a, b) =>
-                      (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
-                    )
-                    .map((m) => (
-                      <tr
-                        key={m.id}
-                        className="hover:bg-muted/20 transition-colors"
-                      >
-                        <td className="py-2.5 px-4">
-                          <Link
-                            href={`/ai-models/${m.id}`}
-                            className="font-medium hover:text-primary transition-colors"
-                          >
-                            {m.title}
-                          </Link>
-                        </td>
-                        <td className="py-2.5 px-4 text-muted-foreground capitalize">
-                          {m.modelTier ?? (
-                            <span className="text-muted-foreground/40">&mdash;</span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-4 text-muted-foreground">
-                          {m.releaseDate ?? (
-                            <span className="text-muted-foreground/40">&mdash;</span>
-                          )}
-                        </td>
-                        <td className="py-2.5 px-4 text-right tabular-nums">
-                          {m.inputPrice != null ? (
-                            formatPrice(m.inputPrice)
-                          ) : (
-                            <span className="text-muted-foreground/40">&mdash;</span>
-                          )}
-                        </td>
-                      </tr>
-                    ))}
-                </tbody>
-              </table>
-            </div>
-          </section>
-        )}
-
-        {/* Other models from same developer */}
-        {sameDeveloper.length > 0 && (
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">
-              Other {developerEntity?.title ?? "Developer"} Models
-              <span className="ml-2 text-sm font-normal text-muted-foreground">
-                {sameDeveloper.length}
-              </span>
-            </h2>
-            <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-              {sameDeveloper
-                .sort((a, b) =>
-                  (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
-                )
-                .slice(0, 10)
-                .map((m) => (
-                  <div key={m.id} className="px-4 py-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <Link
-                        href={`/ai-models/${m.id}`}
-                        className="font-medium text-sm hover:text-primary transition-colors"
-                      >
-                        {m.title}
-                      </Link>
-                      <span className="text-xs text-muted-foreground tabular-nums">
-                        {m.releaseDate ?? (
-                          <span className="text-muted-foreground/40">&mdash;</span>
-                        )}
-                      </span>
-                    </div>
-                    {m.modelFamily && (
-                      <div className="text-xs text-muted-foreground/60 mt-0.5">
-                        {m.modelFamily}{" "}
-                        {m.modelTier ? `(${m.modelTier})` : ""}
-                      </div>
-                    )}
-                  </div>
-                ))}
-              {sameDeveloper.length > 10 && (
-                <div className="px-4 py-3 text-center">
-                  <span className="text-xs text-muted-foreground">
-                    Showing 10 of {sameDeveloper.length} models
-                  </span>
-                </div>
-              )}
-            </div>
-          </section>
-        )}
-      </div>
-    </EntityProfileShell>
+    />
   );
 }
 

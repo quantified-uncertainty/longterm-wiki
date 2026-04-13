@@ -57,6 +57,10 @@ const TABBED_PAGES = [
   "/people/dario-amodei",
   "/people/sam-altman",
   "/people/demis-hassabis",
+  // AI models — newly tabbed in QUA-328 EntityProfileShell migration
+  "/ai-models/claude-opus-4-5",
+  "/ai-models/gemini-2-5-pro",
+  "/ai-models/gpt-4o",
 ];
 
 /** Pages with stat cards — check for empty values. */
@@ -66,6 +70,8 @@ const STAT_CARD_PAGES = [
   "/organizations/google-deepmind",
   "/organizations/meta-ai",
   "/organizations/microsoft",
+  "/ai-models/claude-opus-4-5",
+  "/ai-models/gemini-2-5-pro",
 ];
 
 /** Simple pages — load and check text, no tab clicking needed. */
