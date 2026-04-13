@@ -26,6 +26,13 @@ import {
   updateIssueState,
 } from '../lib/linear/issues.ts';
 import {
+  createProjectUpdate,
+  getProject,
+  listProjects,
+  updateProject,
+  type UpdateProjectInput,
+} from '../lib/linear/projects.ts';
+import {
   auditInProgress,
   extractFixesIds,
   STALE_DAYS,
@@ -50,6 +57,12 @@ interface CommandOptions extends BaseOptions {
   description?: string;
   descriptionFile?: string;
   priority?: string;
+  content?: string;
+  contentFile?: string;
+  name?: string;
+  state?: string;
+  startDate?: string;
+  targetDate?: string;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -669,6 +682,127 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
 }
 
 // ---------------------------------------------------------------------------
+// project — list / view / update / comment
+// ---------------------------------------------------------------------------
+
+const PROJECT_SUB_HELP = `Usage: crux linear project <list|view|update|comment> [args]
+
+Subcommands:
+  list                                         List all projects
+  view <ref>                                    Show project details (ref = UUID or exact name)
+  update <ref> [--description=...] [--content=...|--content-file=<path>]
+                                                [--name=...] [--state=...] [--start-date=...] [--target-date=...]
+  comment <ref> <message> | --body-file=<path>  Post a project update (Linear's project-timeline post)
+
+  Project refs accept a UUID or a case-insensitive exact project name, so
+  'Content Quality & Enrichment' works the same as the project's UUID.
+
+  --description sets the short one-line summary (card text). --content sets
+  the long-form markdown body on the project page — you almost always want
+  --content, not --description.`;
+
+async function project(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const sub = args[0];
+  const rest = args.slice(1);
+
+  if (!sub || sub === 'help' || sub === '--help') {
+    return { output: PROJECT_SUB_HELP + '\n', exitCode: sub ? 0 : 1 };
+  }
+
+  if (sub === 'list') {
+    const projects = await listProjects();
+    if (options.json) {
+      return { output: JSON.stringify(projects, null, 2) + '\n', exitCode: 0 };
+    }
+    projects.sort((a, b) => a.state.localeCompare(b.state) || a.name.localeCompare(b.name));
+    let out = `${c.bold}Linear projects (${projects.length})${c.reset}\n`;
+    for (const p of projects) {
+      const pct = Math.round(p.progress * 100);
+      out += `  ${c.cyan}${p.name}${c.reset}  ${c.dim}[${p.state}]${c.reset} ${pct}%`;
+      if (p.targetDate) out += ` ${c.dim}target=${p.targetDate}${c.reset}`;
+      out += `\n    ${c.dim}${p.description ?? '(no description)'}${c.reset}\n`;
+    }
+    return { output: out, exitCode: 0 };
+  }
+
+  if (sub === 'view') {
+    const ref = rest.find((a) => !a.startsWith('--'));
+    if (!ref) return { output: `${c.red}Usage: crux linear project view <uuid-or-name>${c.reset}\n`, exitCode: 1 };
+    const p = await getProject(ref);
+    if (!p) return { output: `${c.red}Project "${ref}" not found${c.reset}\n`, exitCode: 1 };
+    if (options.json) return { output: JSON.stringify(p, null, 2) + '\n', exitCode: 0 };
+
+    let out = '';
+    out += `${c.bold}${p.name}${c.reset} ${c.dim}[${p.state}]${c.reset}\n`;
+    out += `  ${c.dim}id:${c.reset} ${p.id}\n`;
+    out += `  ${c.dim}progress:${c.reset} ${Math.round(p.progress * 100)}%`;
+    if (p.startDate) out += `  ${c.dim}start:${c.reset} ${p.startDate}`;
+    if (p.targetDate) out += `  ${c.dim}target:${c.reset} ${p.targetDate}`;
+    if (p.lead) out += `  ${c.dim}lead:${c.reset} ${p.lead.name}`;
+    out += `\n  ${c.dim}url:${c.reset} ${p.url}\n`;
+    out += `  ${c.dim}updated:${c.reset} ${p.updatedAt.slice(0, 10)}\n`;
+    out += `\n${c.bold}Description:${c.reset} ${p.description ?? c.dim + '(none)' + c.reset}\n`;
+    out += `\n${c.bold}Content:${c.reset}\n${p.content ?? c.dim + '(none)' + c.reset}\n`;
+    return { output: out, exitCode: 0 };
+  }
+
+  if (sub === 'update') {
+    const ref = rest.find((a) => !a.startsWith('--'));
+    if (!ref) return { output: `${c.red}Usage: crux linear project update <uuid-or-name> [flags]${c.reset}\n`, exitCode: 1 };
+    const p = await getProject(ref);
+    if (!p) return { output: `${c.red}Project "${ref}" not found${c.reset}\n`, exitCode: 1 };
+
+    const contentFromFile = readBodyFlag(options.contentFile);
+    const input: UpdateProjectInput = {};
+    if (options.name) input.name = options.name;
+    if (options.description !== undefined) input.description = options.description;
+    if (contentFromFile !== null) input.content = contentFromFile;
+    else if (options.content !== undefined) input.content = options.content;
+    if (options.state) input.state = options.state;
+    if (options.startDate) input.startDate = options.startDate;
+    if (options.targetDate) input.targetDate = options.targetDate;
+
+    if (Object.keys(input).length === 0) {
+      return {
+        output: `${c.red}Nothing to update. Pass --description, --content=..., --content-file=<path>, --name, --state, --start-date, or --target-date${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+
+    const updated = await updateProject(p.id, input);
+    if (options.json) return { output: JSON.stringify(updated, null, 2) + '\n', exitCode: 0 };
+    let out = `${c.green}✓${c.reset} Updated ${c.cyan}${updated.name}${c.reset} — ${Object.keys(input).join(', ')}\n`;
+    out += `  ${updated.url}\n`;
+    return { output: out, exitCode: 0 };
+  }
+
+  if (sub === 'comment') {
+    // Locate the ref positionally so flags *before* the ref (e.g.
+    // `--body-file=... "My Project"`) don't get swept into the inline body.
+    const refIndex = rest.findIndex((a) => !a.startsWith('--'));
+    const ref = refIndex >= 0 ? rest[refIndex] : undefined;
+    if (!ref) return { output: `${c.red}Usage: crux linear project comment <uuid-or-name> <message> | --body-file=<path>${c.reset}\n`, exitCode: 1 };
+    const p = await getProject(ref);
+    if (!p) return { output: `${c.red}Project "${ref}" not found${c.reset}\n`, exitCode: 1 };
+
+    const bodyFromFile = readBodyFlag(options.bodyFile);
+    const body = bodyFromFile ?? rest.slice(refIndex + 1).filter((a) => !a.startsWith('--')).join(' ');
+    if (body.trim() === '') {
+      return { output: `${c.red}Empty body. Pass inline or --body-file=<path>${c.reset}\n`, exitCode: 1 };
+    }
+    await createProjectUpdate(p.id, body);
+    return {
+      output: `${c.green}✓${c.reset} Posted update on ${c.cyan}${p.name}${c.reset}\n  ${p.url}\n`,
+      exitCode: 0,
+    };
+  }
+
+  return { output: `${c.red}Unknown subcommand: ${sub}${c.reset}\n\n${PROJECT_SUB_HELP}\n`, exitCode: 1 };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -685,6 +819,7 @@ export const commands = {
   'leak-check': leakCheck,
   'states-list': statesList,
   parse,
+  project,
 };
 
 export function getHelp(): string {
@@ -703,6 +838,7 @@ Commands:
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks
   states-list                   Show current QUA team workflow state IDs
   parse <string>                Extract a Linear ID from a string (debug helper)
+  project <sub>                 Project commands: list, view, update, comment (see 'crux linear project help')
 
 Options (create):
   --description=<text>       Issue description (inline)
@@ -727,6 +863,15 @@ Global options:
 Environment:
   LINEAR_API_KEY      Required. Stored in .env.base at the workspace root.
 
+Options (project update):
+  --description=<text>        Short one-line summary (card text)
+  --content=<text>            Long-form markdown body (rendered on project page)
+  --content-file=<path>       Long-form body from file (safe for multiline)
+  --name=<text>               Rename the project
+  --state=<name>              Project state: backlog, planned, started, paused, completed, canceled
+  --start-date=<YYYY-MM-DD>   Project start date
+  --target-date=<YYYY-MM-DD>  Project target date
+
 Examples:
   crux linear create "Broken login page" --description="The login form crashes on submit"
   crux linear create "Add retry logic" --description-file=/tmp/desc.md --priority=3
@@ -737,5 +882,9 @@ Examples:
   crux linear comment QUA-184 "Landed in commit abc123"
   crux linear comment QUA-184 --body-file=/tmp/note.md
   crux linear states-list
+  crux linear project list
+  crux linear project view "Content Quality & Enrichment"
+  crux linear project update "Data Integrity" --content-file=/tmp/data-integrity.md
+  crux linear project comment "Source-Check & Verification" "Shipped Phase 5"
 `;
 }
