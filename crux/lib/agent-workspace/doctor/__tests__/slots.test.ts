@@ -267,6 +267,24 @@ describe('checkHungWikiServer', () => {
     expect(r.status).toBe('warn');
     expect(r.detail).toContain('a7');
   });
+  // Regression: pre-fix substring match flagged /lw/a10 processes as
+  // running in /lw/a1 because "/lw/a10".includes("/lw/a1") is true.
+  it('does NOT match /lw/a10 process against /lw/a1 slot (prefix collision)', async () => {
+    const env = envWithSlots([1]); // ONLY a1 is a real slot here
+    env.setExec('pgrep -fa wiki-server', ok('300 node /lw/a10/apps/wiki-server/dist/index.js\n'));
+    const r = await checkHungWikiServer.run(env);
+    expect(r.status).toBe('ok');
+  });
+  it('correctly attributes when both a1 and a10 are real slots', async () => {
+    const env = envWithSlots([1, 10]);
+    env.setExec(
+      'pgrep -fa wiki-server',
+      ok('300 node /lw/a10/apps/wiki-server/dist/index.js\n'),
+    );
+    const r = await checkHungWikiServer.run(env);
+    expect(r.status).toBe('warn');
+    expect(r.detail).toContain('a10');
+  });
 });
 
 describe('SLOTS_CHECKS registry', () => {

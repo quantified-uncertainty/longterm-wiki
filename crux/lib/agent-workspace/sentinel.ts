@@ -256,9 +256,14 @@ export function touchSentinel(role: Role, env: SentinelEnv): { path: string; tou
 /**
  * Scan for conflicting sentinels from the OTHER role.
  *
- * Returns the first live conflict found, classified by whether it shares
- * our session key (same-session = role conflation, the blocker) or comes
- * from a different session (cross-session = expected, informational).
+ * Classifies each live conflict as same-session (role conflation, the
+ * blocker) or other-session (cross-session = expected, informational).
+ *
+ * IMPORTANT: a same-session conflict ALWAYS wins over an other-session
+ * one. Iteration order from `listMatching` is filesystem-dependent on
+ * Linux (`readdirSync` is unsorted), so without an explicit priority a
+ * stale-but-live cross-session sentinel could mask the very same-session
+ * conflict the guard exists to detect.
  *
  * Stale sentinels of the other role are removed opportunistically.
  */
@@ -270,7 +275,8 @@ export function checkConflict(role: Role, env: SentinelEnv): SentinelCheckResult
   const otherPrefix = `${SENTINEL_PREFIX}-${other}-`;
   const candidates = env.listMatching(SENTINEL_DIR, otherPrefix);
 
-  let conflict: Conflict | null = null;
+  let sameSession: Conflict | null = null;
+  let otherSession: Conflict | null = null;
   let cleaned = 0;
 
   for (const path of candidates) {
@@ -282,15 +288,22 @@ export function checkConflict(role: Role, env: SentinelEnv): SentinelCheckResult
       cleaned += 1;
       continue;
     }
-    if (conflict != null || parsed == null) continue;
-    // Determine session match: prefer pane id, fall back to ppid match
+    if (parsed == null) continue;
     const sentinelKey =
       parsed.tmuxPane && parsed.tmuxPane.startsWith('%')
         ? parsed.tmuxPane.slice(1)
         : parsed.tmuxPane || `pid-${parsed.ppid}`;
     const kind: ConflictKind = sentinelKey === ourKey ? 'same-session' : 'other-session';
-    conflict = { kind, path, sentinel: parsed, ageSeconds: liveness.ageSeconds };
+    const found: Conflict = { kind, path, sentinel: parsed, ageSeconds: liveness.ageSeconds };
+    if (kind === 'same-session') {
+      // Same-session is the blocker. Capture and stop scanning — no
+      // other-session conflict can override it, and the caller doesn't
+      // need a second one of the same kind.
+      sameSession = found;
+      break;
+    }
+    if (otherSession == null) otherSession = found;
   }
 
-  return { ourPath, conflict, cleaned };
+  return { ourPath, conflict: sameSession ?? otherSession, cleaned };
 }

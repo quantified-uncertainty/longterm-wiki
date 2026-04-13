@@ -198,6 +198,45 @@ describe('checkReleasePr', () => {
     );
     expect((await checkReleasePr.run(env)).status).toBe('skipped');
   });
+
+  // GitHub conclusions that should be treated as failing. The pre-fix regex
+  // /fail|cancel|error/i MISSED timed_out and action_required. One test per
+  // conclusion in FAILING_CONCLUSIONS to prevent future regex drift.
+  it.each([
+    ['failure'],
+    ['cancelled'],
+    ['timed_out'],
+    ['action_required'],
+    ['startup_failure'],
+  ])('treats conclusion=%s as a failing check', async (conclusion) => {
+    const env = new FakeDoctorEnv({ now: new Date(NOW_MS) });
+    env.setExec(
+      'gh pr list --repo quantified-uncertainty/longterm-wiki --base production --state open --json number,title,createdAt,isDraft,mergeable,statusCheckRollup',
+      ok(JSON.stringify([{
+        number: 77, title: 'T', createdAt: new Date(NOW_MS - 60 * 60 * 1000).toISOString(),
+        isDraft: false, statusCheckRollup: [{ conclusion }],
+      }])),
+    );
+    const r = await checkReleasePr.run(env);
+    expect(r.status).toBe('fail');
+    expect(r.summary).toContain('#77');
+  });
+
+  it.each([
+    ['success'],
+    ['neutral'],
+    ['skipped'],
+  ])('treats conclusion=%s as NOT failing', async (conclusion) => {
+    const env = new FakeDoctorEnv({ now: new Date(NOW_MS) });
+    env.setExec(
+      'gh pr list --repo quantified-uncertainty/longterm-wiki --base production --state open --json number,title,createdAt,isDraft,mergeable,statusCheckRollup',
+      ok(JSON.stringify([{
+        number: 88, title: 'T', createdAt: new Date(NOW_MS - 60 * 60 * 1000).toISOString(),
+        isDraft: false, statusCheckRollup: [{ conclusion }],
+      }])),
+    );
+    expect((await checkReleasePr.run(env)).status).toBe('ok');
+  });
 });
 
 describe('checkDeployTasks', () => {
@@ -290,6 +329,22 @@ describe('checkProdCiRecent', () => {
       'gh run list --repo quantified-uncertainty/longterm-wiki --branch production --limit 20 --json status,conclusion,createdAt',
       ok(JSON.stringify([
         { status: 'completed', conclusion: 'failure', createdAt: new Date(NOW_MS - 1000).toISOString() },
+      ])),
+    );
+    expect((await checkProdCiRecent.run(env)).status).toBe('warn');
+  });
+  // Previously this check used /failure|cancelled|timed_out/ but MISSED
+  // action_required and startup_failure. Share the FAILING_CONCLUSIONS
+  // allowlist with checkReleasePr via isFailingConclusion().
+  it.each([
+    ['action_required'],
+    ['startup_failure'],
+  ])('catches conclusion=%s', async (conclusion) => {
+    const env = new FakeDoctorEnv({ now: new Date(NOW_MS) });
+    env.setExec(
+      'gh run list --repo quantified-uncertainty/longterm-wiki --branch production --limit 20 --json status,conclusion,createdAt',
+      ok(JSON.stringify([
+        { status: 'completed', conclusion, createdAt: new Date(NOW_MS - 1000).toISOString() },
       ])),
     );
     expect((await checkProdCiRecent.run(env)).status).toBe('warn');

@@ -380,8 +380,13 @@ export const checkHungWikiServer: DoctorCheck = {
       .split('\n')
       .map((l) => l.trim())
       .filter((l) => l.length > 0);
+    // Match on a trailing `/` so `/lw/a1` doesn't accidentally match
+    // `/lw/a10` via prefix substring. Must look for `<path>/` inside the
+    // command line or `<path>` at end-of-string (less common but safe).
     const slotPaths = listSlotDirs(env).map((s) => s.path);
-    const hung = lines.filter((l) => slotPaths.some((p) => l.includes(p)));
+    const hung = lines.filter((l) =>
+      slotPaths.some((p) => l.includes(`${p}/`) || l.endsWith(p)),
+    );
     if (hung.length === 0) return { status: 'ok', summary: 'none in slot dirs' };
     return {
       status: 'warn',
