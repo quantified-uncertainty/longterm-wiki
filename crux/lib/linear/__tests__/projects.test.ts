@@ -45,13 +45,61 @@ describe('projects.ts', () => {
   });
 
   describe('listProjects', () => {
-    it('returns all projects from the QUA team', async () => {
+    it('returns all projects on a single page (hasNextPage=false)', async () => {
       globalThis.fetch = vi.fn().mockResolvedValue(
-        jsonResponse({ data: { projects: { nodes: [fixture, { ...fixture, id: 'other', name: 'Other' }] } } }),
+        jsonResponse({
+          data: {
+            projects: {
+              nodes: [fixture, { ...fixture, id: 'other', name: 'Other' }],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        }),
       ) as unknown as typeof fetch;
       const all = await listProjects();
       expect(all).toHaveLength(2);
       expect(all[0].name).toBe('Content Quality & Enrichment');
+    });
+
+    it('paginates across multiple pages with cursor', async () => {
+      const fetchFn = vi
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            data: {
+              projects: {
+                nodes: [fixture, { ...fixture, id: 'p2', name: 'Page1-B' }],
+                pageInfo: { hasNextPage: true, endCursor: 'cursor-1' },
+              },
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          jsonResponse({
+            data: {
+              projects: {
+                nodes: [{ ...fixture, id: 'p3', name: 'Page2-A' }],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+        );
+      globalThis.fetch = fetchFn as unknown as typeof fetch;
+
+      const all = await listProjects();
+      expect(all).toHaveLength(3);
+      expect(all.map((p) => p.name)).toEqual([
+        'Content Quality & Enrichment',
+        'Page1-B',
+        'Page2-A',
+      ]);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
+
+      // First call: after=null; second call: after="cursor-1".
+      const firstBody = JSON.parse(fetchFn.mock.calls[0][1].body);
+      const secondBody = JSON.parse(fetchFn.mock.calls[1][1].body);
+      expect(firstBody.variables.after).toBeNull();
+      expect(secondBody.variables.after).toBe('cursor-1');
     });
   });
 
@@ -80,20 +128,30 @@ describe('projects.ts', () => {
 
     it('falls back to case-insensitive name lookup when ref is not a UUID', async () => {
       const fetchFn = vi.fn().mockResolvedValue(
-        jsonResponse({ data: { projects: { nodes: [fixture, { ...fixture, id: 'x', name: 'Other' }] } } }),
+        jsonResponse({
+          data: {
+            projects: {
+              nodes: [fixture, { ...fixture, id: 'x', name: 'Other' }],
+              pageInfo: { hasNextPage: false, endCursor: null },
+            },
+          },
+        }),
       );
       globalThis.fetch = fetchFn as unknown as typeof fetch;
       const p = await getProject('content quality & enrichment');
       expect(p).not.toBeNull();
       expect(p!.id).toBe(PROJECT_UUID);
-      // Should have called the list query, not the single-project query
+      // Should have called the paginated list query, not the single-project query
       const body = JSON.parse(fetchFn.mock.calls[0][1].body);
-      expect(body.query).toContain('projects(first: 100');
+      expect(body.query).toContain('projects(');
+      expect(body.query).toContain('pageInfo');
     });
 
     it('returns null when name does not match exactly (no substring match)', async () => {
       globalThis.fetch = vi.fn().mockResolvedValue(
-        jsonResponse({ data: { projects: { nodes: [fixture] } } }),
+        jsonResponse({
+          data: { projects: { nodes: [fixture], pageInfo: { hasNextPage: false, endCursor: null } } },
+        }),
       ) as unknown as typeof fetch;
       const p = await getProject('Content Quality');  // partial — must not match
       expect(p).toBeNull();
@@ -102,13 +160,45 @@ describe('projects.ts', () => {
     it('rejects a malformed UUID as a name lookup (falls through to list)', async () => {
       // "not-a-uuid-but-close" should not match the UUID regex → name lookup
       const fetchFn = vi.fn().mockResolvedValue(
-        jsonResponse({ data: { projects: { nodes: [] } } }),
+        jsonResponse({
+          data: { projects: { nodes: [], pageInfo: { hasNextPage: false, endCursor: null } } },
+        }),
       );
       globalThis.fetch = fetchFn as unknown as typeof fetch;
       const p = await getProject('not-a-uuid-but-close');
       expect(p).toBeNull();
       const body = JSON.parse(fetchFn.mock.calls[0][1].body);
-      expect(body.query).toContain('projects(first:');
+      expect(body.query).toContain('projects(');
+    });
+
+    it('resolves a name that lives on a later page via pagination', async () => {
+      const fetchFn = vi
+        .fn()
+        .mockResolvedValueOnce(
+          jsonResponse({
+            data: {
+              projects: {
+                nodes: [{ ...fixture, id: 'a', name: 'Alpha' }],
+                pageInfo: { hasNextPage: true, endCursor: 'c1' },
+              },
+            },
+          }),
+        )
+        .mockResolvedValueOnce(
+          jsonResponse({
+            data: {
+              projects: {
+                nodes: [fixture],
+                pageInfo: { hasNextPage: false, endCursor: null },
+              },
+            },
+          }),
+        );
+      globalThis.fetch = fetchFn as unknown as typeof fetch;
+      const p = await getProject('Content Quality & Enrichment');
+      expect(p).not.toBeNull();
+      expect(p!.id).toBe(PROJECT_UUID);
+      expect(fetchFn).toHaveBeenCalledTimes(2);
     });
   });
 

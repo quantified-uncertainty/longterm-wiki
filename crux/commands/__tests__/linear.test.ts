@@ -578,6 +578,25 @@ describe('linear project', () => {
       expect(createProjectUpdateMock).toHaveBeenCalledWith(mockProject.id, 'Shipped phase 5');
     });
 
+    it('rejects a whitespace-only --body-file body', async () => {
+      const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+      const { tmpdir } = await import('os');
+      const { join } = await import('path');
+      const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+      const file = join(dir, 'blank.md');
+      writeFileSync(file, '   \n\t\n  ');
+
+      getProjectMock.mockResolvedValueOnce(mockProject);
+      const r = await commands.project(
+        ['comment', 'Content Quality & Enrichment'],
+        { ci: true, bodyFile: file },
+      );
+      expect(r.exitCode).toBe(1);
+      expect(r.output).toContain('Empty body');
+      expect(createProjectUpdateMock).not.toHaveBeenCalled();
+      unlinkSync(file);
+    });
+
     it('reads comment body from --body-file', async () => {
       const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
       const { tmpdir } = await import('os');

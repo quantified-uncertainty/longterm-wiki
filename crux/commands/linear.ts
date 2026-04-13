@@ -779,14 +779,17 @@ async function project(args: string[], options: CommandOptions): Promise<Command
   }
 
   if (sub === 'comment') {
-    const ref = rest.find((a) => !a.startsWith('--'));
+    // Locate the ref positionally so flags *before* the ref (e.g.
+    // `--body-file=... "My Project"`) don't get swept into the inline body.
+    const refIndex = rest.findIndex((a) => !a.startsWith('--'));
+    const ref = refIndex >= 0 ? rest[refIndex] : undefined;
     if (!ref) return { output: `${c.red}Usage: crux linear project comment <uuid-or-name> <message> | --body-file=<path>${c.reset}\n`, exitCode: 1 };
     const p = await getProject(ref);
     if (!p) return { output: `${c.red}Project "${ref}" not found${c.reset}\n`, exitCode: 1 };
 
     const bodyFromFile = readBodyFlag(options.bodyFile);
-    const body = bodyFromFile ?? rest.slice(1).filter((a) => !a.startsWith('--')).join(' ').trim();
-    if (!body) {
+    const body = bodyFromFile ?? rest.slice(refIndex + 1).filter((a) => !a.startsWith('--')).join(' ');
+    if (body.trim() === '') {
       return { output: `${c.red}Empty body. Pass inline or --body-file=<path>${c.reset}\n`, exitCode: 1 };
     }
     await createProjectUpdate(p.id, body);

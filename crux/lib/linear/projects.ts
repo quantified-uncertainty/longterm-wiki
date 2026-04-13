@@ -42,13 +42,41 @@ function isUuid(s: string): boolean {
   return UUID_RE.test(s);
 }
 
-/** List every project accessible from the QUA team. */
+/**
+ * List every project accessible from the QUA team.
+ *
+ * Uses cursor-based pagination so the result is not capped at Linear's 100-item
+ * page limit. `getProject()` falls back to this function for name resolution,
+ * so any project beyond page 1 would be unreachable by name without pagination.
+ */
 export async function listProjects(): Promise<LinearProject[]> {
-  const data = await linearGraphQL<{ projects: { nodes: LinearProject[] } }>(
-    `query Projects { projects(first: 100, filter: { accessibleTeams: { id: { eq: "${QUA_TEAM_ID}" } } }) { nodes { ${PROJECT_FIELDS} } } }`,
-    {},
-  );
-  return data.projects.nodes;
+  const all: LinearProject[] = [];
+  let after: string | null = null;
+
+  do {
+    const data: {
+      projects: {
+        nodes: LinearProject[];
+        pageInfo: { hasNextPage: boolean; endCursor: string | null };
+      };
+    } = await linearGraphQL(
+      `query Projects($after: String) {
+        projects(
+          first: 100
+          after: $after
+          filter: { accessibleTeams: { id: { eq: "${QUA_TEAM_ID}" } } }
+        ) {
+          nodes { ${PROJECT_FIELDS} }
+          pageInfo { hasNextPage endCursor }
+        }
+      }`,
+      { after },
+    );
+    all.push(...data.projects.nodes);
+    after = data.projects.pageInfo.hasNextPage ? data.projects.pageInfo.endCursor : null;
+  } while (after);
+
+  return all;
 }
 
 /**
