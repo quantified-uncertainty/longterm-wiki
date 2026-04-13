@@ -350,13 +350,19 @@ export function findZodCandidates(check: CheckConstraint, all: readonly ZodEnum[
     // Accept if the name is "bare": only column + boilerplate words.
     // Boilerplate: VALID, SCHEMA, TYPE, ENUM, S (plural)
     const significantWords = z.name
-      .split(/[_\s]|(?=[A-Z])/) // split on _ or camelCase boundary
+      .split(/[_\s]|(?<=[a-z])(?=[A-Z])/) // underscore, whitespace, or camelCase boundary
       .map((w) => w.toLowerCase())
       .filter((w) => w.length > 0 && !["valid", "schema", "type", "enum"].includes(w));
     const joined = significantWords.join("");
-    // Bare = joined is equal to col, col + "s", or col without trailing "s"
+    // Bare = joined is col, col+"s", col+"es", or col without trailing "s".
+    // `+es` handles VALID_STATUSES ↔ status, VALID_ADDRESSES ↔ address, etc.
     const col = colLower;
-    if (joined === col || joined === col + "s" || (col.endsWith("s") && joined === col.slice(0, -1))) {
+    if (
+      joined === col ||
+      joined === col + "s" ||
+      joined === col + "es" ||
+      (col.endsWith("s") && joined === col.slice(0, -1))
+    ) {
       candidates.push(z);
     }
   }

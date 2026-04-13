@@ -253,4 +253,45 @@ describe("findZodCandidates", () => {
     const candidates = findZodCandidates(c, [z]);
     expect(candidates).toHaveLength(0);
   });
+
+  it("matches `VALID_STATUSES` (plural -es) against `status` column via bare heuristic", () => {
+    const c: CheckConstraint = {
+      sourceFile: "mig.sql",
+      table: "divisions",
+      column: "status",
+      allowed: new Set(["active", "inactive"]),
+      nullable: false,
+    };
+    const z = makeZod(
+      "VALID_STATUSES",
+      "apps/wiki-server/src/routes/tablebase/divisions.ts",
+      ["active", "inactive"]
+    );
+    const candidates = findZodCandidates(c, [z]);
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0].name).toBe("VALID_STATUSES");
+  });
+
+  it("excludes qualified sibling enums like `VALID_CANDIDATE_STATUSES` for `status` column", () => {
+    const c: CheckConstraint = {
+      sourceFile: "mig.sql",
+      table: "political_races",
+      column: "status",
+      allowed: new Set(["upcoming"]),
+      nullable: false,
+    };
+    const bare = makeZod(
+      "VALID_STATUSES",
+      "apps/wiki-server/src/routes/tablebase/political-races.ts",
+      ["upcoming", "active"]
+    );
+    const qualified = makeZod(
+      "VALID_CANDIDATE_STATUSES",
+      "apps/wiki-server/src/routes/tablebase/political-races.ts",
+      ["running", "won"]
+    );
+    const candidates = findZodCandidates(c, [bare, qualified]);
+    expect(candidates).toHaveLength(1);
+    expect(candidates[0].name).toBe("VALID_STATUSES");
+  });
 });
