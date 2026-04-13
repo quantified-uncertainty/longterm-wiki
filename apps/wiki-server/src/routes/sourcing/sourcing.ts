@@ -7,6 +7,7 @@ import {
   count,
   sql,
   desc,
+  lt,
   lte,
   gte,
   ne,
@@ -51,6 +52,29 @@ import {
 const MAX_PAGE_SIZE = 200;
 const MAX_ID_LENGTH = 500;
 const MAX_URL_LENGTH = 2048;
+
+/**
+ * QUA-313: cooldown interval for the auto-flag path at POST /evidence.
+ * Skip setting `needs_recheck=true` on a verdict whose `updated_at` is
+ * newer than (now - AUTO_FLAG_COOLDOWN_MS). Matches the client-side
+ * `--min-age=7d` default in `crux sourcing-mark`.
+ */
+export const AUTO_FLAG_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Pure helper: given a verdict row's `updated_at`, a reference `now`, and
+ * the cooldown window, return true if the auto-flag path should skip it.
+ * Extracted for unit testing — the handler itself uses Drizzle's
+ * `lt(updated_at, cutoff)` which is equivalent.
+ */
+export function shouldSkipAutoFlag(
+  updatedAt: Date | null,
+  now: Date,
+  cooldownMs: number = AUTO_FLAG_COOLDOWN_MS,
+): boolean {
+  if (updatedAt == null) return false;
+  return now.getTime() - updatedAt.getTime() < cooldownMs;
+}
 
 const VALID_VERDICTS = [
   "confirmed",
@@ -136,6 +160,13 @@ const VerdictUpsertBody = z.object({
   reasoning: z.string().max(5000).optional(),
   sourcesChecked: z.number().int().min(0).optional(),
   nextCheckDue: z.string().datetime().optional(),
+  /**
+   * When true, mark this verdict as needing a recheck (e.g., because the
+   * operator is queuing targeted rechecks via `crux sourcing-mark`).
+   * Defaults to false — the normal write path clears the flag after a
+   * successful verdict computation, matching pre-QUA-313 behavior.
+   */
+  needsRecheck: z.boolean().optional(),
 });
 
 /** Limit field that clamps to MAX_PAGE_SIZE instead of rejecting */
@@ -772,7 +803,16 @@ const sourcingApp = new Hono()
       }
     }
 
-    // Auto-flag corresponding verdicts for recheck
+    // Auto-flag corresponding verdicts for recheck.
+    //
+    // QUA-313: 7-day cooldown — skip verdicts whose `updated_at` is within the
+    // cooldown window. Without this, any burst of evidence writes (e.g.,
+    // `enrich --force` over already-enriched resources, or multiple source
+    // checks of the same record in quick succession) would spam
+    // `needs_recheck=true` on verdicts that were freshly rechecked.
+    // The cooldown interval matches the `--min-age=7d` default in
+    // `crux sourcing-mark`, so client-side and server-side layers agree.
+    const autoFlagCutoff = new Date(now.getTime() - AUTO_FLAG_COOLDOWN_MS);
     const verdictUpdated = await db
       .update(sourceVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
@@ -780,6 +820,7 @@ const sourcingApp = new Hono()
         and(
           eq(sourceVerdicts.recordType, body.recordType),
           eq(sourceVerdicts.recordId, body.recordId),
+          lt(sourceVerdicts.updatedAt, autoFlagCutoff),
         )
       )
       .returning({ recordId: sourceVerdicts.recordId });
@@ -1113,6 +1154,10 @@ const sourcingApp = new Hono()
     const reasoningVal = body.reasoning ?? null;
     const sourcesCheckedVal = body.sourcesChecked ?? 0;
     const nextCheckDueVal = body.nextCheckDue ? new Date(body.nextCheckDue) : null;
+    // QUA-313: default false (legacy behavior — clear the flag after a
+    // successful verdict write). Operators can queue targeted rechecks by
+    // passing `needsRecheck: true` explicitly.
+    const needsRecheckVal = body.needsRecheck ?? false;
 
     // Try update first
     const updated = await db
@@ -1125,7 +1170,7 @@ const sourcingApp = new Hono()
         confidence: confidenceVal,
         reasoning: reasoningVal,
         sourcesChecked: sourcesCheckedVal,
-        needsRecheck: false,
+        needsRecheck: needsRecheckVal,
         nextCheckDue: nextCheckDueVal,
         lastComputedAt: now,
         updatedAt: now,
@@ -1154,7 +1199,7 @@ const sourcingApp = new Hono()
             confidence: confidenceVal,
             reasoning: reasoningVal,
             sourcesChecked: sourcesCheckedVal,
-            needsRecheck: false,
+            needsRecheck: needsRecheckVal,
             nextCheckDue: nextCheckDueVal,
             lastComputedAt: now,
             createdAt: now,
@@ -1175,7 +1220,7 @@ const sourcingApp = new Hono()
               confidence: confidenceVal,
               reasoning: reasoningVal,
               sourcesChecked: sourcesCheckedVal,
-              needsRecheck: false,
+              needsRecheck: needsRecheckVal,
               nextCheckDue: nextCheckDueVal,
               lastComputedAt: now,
               updatedAt: now,
