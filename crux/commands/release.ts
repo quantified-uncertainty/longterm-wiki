@@ -21,6 +21,10 @@ import {
   parseDeployTasksFromBody,
   preserveCheckedState,
 } from '../lib/deploy-tasks/detect.ts';
+import {
+  checkDeployHealth,
+  type DeployHealthStatus,
+} from '../lib/pr-analysis/deploy-status.ts';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -265,6 +269,58 @@ async function ensureLabel(): Promise<void> {
   }
 }
 
+// ── Pre-flight: previous-deploy health check ────────────────────────────────
+
+export type ReleasePreflightDecision =
+  | { ok: true; warning: string | null }
+  | { ok: false; reason: string; lastDeployUrl: string | null };
+
+/**
+ * Decide whether to allow creating a new release PR based on the health of
+ * the previous production deploy.
+ *
+ * Blocks when the most recent completed `wiki-server-docker.yml` run did not
+ * conclude with `success` — the cascade that motivated QUA-295 happened
+ * because release PRs kept getting cut on top of a silently-broken deploy.
+ *
+ * When `force` is true, returns `ok: true` with a warning string instead of
+ * blocking, so the caller can log a loud override message.
+ *
+ * Fail-open: a `healthy: true, lastDeploy: null` status (no data / API error)
+ * is treated as pass. `checkDeployHealth` already fails open on network errors.
+ */
+export function evaluateReleasePreflight(
+  deployHealth: DeployHealthStatus,
+  options: { force: boolean },
+): ReleasePreflightDecision {
+  if (deployHealth.healthy) {
+    return { ok: true, warning: null };
+  }
+
+  const last = deployHealth.lastDeploy;
+  // Shouldn't happen: healthy=false requires lastDeploy, but be defensive.
+  if (!last) return { ok: true, warning: null };
+
+  const shortSha = last.sha.slice(0, 7);
+  const reason =
+    `Previous production deploy concluded "${last.status}" ` +
+    `(${shortSha} at ${last.timestamp}). ` +
+    `Fix the deploy pipeline before cutting a new release PR — ` +
+    `otherwise merges pile up on a stale prod image (see QUA-295). ` +
+    `Pass --force to override if you have manually verified prod is healthy.`;
+
+  if (options.force) {
+    return {
+      ok: true,
+      warning:
+        `--force override: previous deploy is "${last.status}" (${shortSha}). ` +
+        `Proceeding anyway. Run: ${last.url}`,
+    };
+  }
+
+  return { ok: false, reason, lastDeployUrl: last.url };
+}
+
 // ── Main command ─────────────────────────────────────────────────────────────
 
 /**
@@ -272,11 +328,30 @@ async function ensureLabel(): Promise<void> {
  *
  * Options:
  *   --dry-run    Preview what would happen without creating/updating the PR.
+ *   --force      Override the previous-deploy-failed pre-flight block.
  */
 async function create(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
   const c = log.colors;
   const dryRun = Boolean(options.dryRun ?? options['dry-run']);
+  const force = Boolean(options.force);
+
+  // Pre-flight: refuse to cut a new release PR if the previous production
+  // deploy is not in a `success` state. See QUA-295 for the motivating
+  // incident (2026-04-12 cascade). Runs before git fetch so a failing deploy
+  // gives fast, clear feedback without touching the local working tree.
+  const deployHealth = await checkDeployHealth();
+  const preflight = evaluateReleasePreflight(deployHealth, { force });
+  if (!preflight.ok) {
+    let output = `${c.red}✗ Release blocked:${c.reset} ${preflight.reason}\n`;
+    if (preflight.lastDeployUrl) {
+      output += `  Failing run: ${preflight.lastDeployUrl}\n`;
+    }
+    return { output, exitCode: 1 };
+  }
+  if (preflight.warning) {
+    log.warn(preflight.warning);
+  }
 
   // Fetch latest remote refs
   git('fetch', 'origin', 'main', 'production');
@@ -391,7 +466,15 @@ Commands:
 
 Options (create):
   --dry-run             Preview what would happen without creating/updating the PR.
+  --force               Override the previous-deploy-failed pre-flight block.
+                        Use only after manually verifying prod is healthy.
   --ci                  JSON output for CI pipelines.
+
+Pre-flight:
+  Refuses to create or update a release PR when the most recent completed
+  wiki-server-docker.yml run did not conclude 'success'. This prevents the
+  QUA-295 cascade pattern where release PRs stack up on top of a silently-
+  broken production deploy.
 
 The release PR includes:
   - Standardized title: "release: YYYY-MM-DD" (or "#2" for same-day re-releases)
@@ -402,5 +485,6 @@ The release PR includes:
 Examples:
   pnpm crux gh release create               # Create or update release PR
   pnpm crux gh release create --dry-run     # Preview without creating
+  pnpm crux gh release create --force       # Override pre-flight block
 `.trim();
 }
