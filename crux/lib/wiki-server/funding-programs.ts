@@ -7,6 +7,7 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { FundingProgramsRoute } from '../../../apps/wiki-server/src/routes/tablebase/funding-programs.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -16,7 +17,9 @@ type RpcClient = ReturnType<typeof hc<FundingProgramsRoute>>;
 
 export type FundingProgramsByOrgResult = InferResponseType<RpcClient['by-org'][':orgId']['$get'], 200>;
 export type FundingProgramsAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
-export type FundingProgramsSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+// createSyncHandler returns Promise<Response>, erasing the typed shape for
+// InferResponseType — import the concrete factory response type instead.
+export type FundingProgramsSyncResult = SyncResponse;
 export type FundingProgramsDeleteResult = InferResponseType<RpcClient['delete-batch']['$post'], 200>;
 
 /** A single funding program row from the by-org result. */

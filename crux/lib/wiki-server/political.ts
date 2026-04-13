@@ -12,6 +12,11 @@ import type { PoliticalScoresRoute } from '../../../apps/wiki-server/src/routes/
 import type { PoliticalOfficesRoute } from '../../../apps/wiki-server/src/routes/tablebase/political-offices.ts';
 import type { PoliticalVotesRoute } from '../../../apps/wiki-server/src/routes/tablebase/political-votes.ts';
 import type { CampaignFinanceRoute } from '../../../apps/wiki-server/src/routes/tablebase/campaign-finance.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+
+// All factory-backed /sync handlers share the same SyncResponse shape. The
+// createSyncHandler factory returns Promise<Response>, so InferResponseType
+// collapses to {} — import the concrete factory response type instead.
 
 // ---------------------------------------------------------------------------
 // Types — Races
@@ -21,9 +26,12 @@ type RacesRpc = ReturnType<typeof hc<PoliticalRacesRoute>>;
 
 export type RaceStatsResult = InferResponseType<RacesRpc['stats']['$get'], 200>;
 export type RaceAllResult = InferResponseType<RacesRpc['all']['$get'], 200>;
-export type RaceSyncResult = InferResponseType<RacesRpc['sync']['$post'], 200>;
+export type RaceSyncResult = SyncResponse;
 export type RaceDetailResult = InferResponseType<RacesRpc[':id']['$get'], 200>;
-export type CandidateSyncResult = InferResponseType<RacesRpc['candidates']['sync']['$post'], 200>;
+// /candidates/sync is hand-rolled in political-races.ts and returns ONLY
+// { upserted }, not the full SyncResponse shape. Type it explicitly so
+// callers don't get a type-lie for verdictsWritten / claimsLinked.
+export type CandidateSyncResult = { upserted: number };
 export type CandidatesAllResult = InferResponseType<RacesRpc['candidates']['all']['$get'], 200>;
 
 // ---------------------------------------------------------------------------
@@ -33,7 +41,7 @@ export type CandidatesAllResult = InferResponseType<RacesRpc['candidates']['all'
 type ScoresRpc = ReturnType<typeof hc<PoliticalScoresRoute>>;
 
 export type ScoreStatsResult = InferResponseType<ScoresRpc['stats']['$get'], 200>;
-export type ScoreSyncResult = InferResponseType<ScoresRpc['sync']['$post'], 200>;
+export type ScoreSyncResult = SyncResponse;
 export type ScoreAllResult = InferResponseType<ScoresRpc['all']['$get'], 200>;
 export type ScoreByEntityResult = InferResponseType<ScoresRpc['by-entity'][':entityId']['$get'], 200>;
 
@@ -44,7 +52,7 @@ export type ScoreByEntityResult = InferResponseType<ScoresRpc['by-entity'][':ent
 type OfficesRpc = ReturnType<typeof hc<PoliticalOfficesRoute>>;
 
 export type OfficeStatsResult = InferResponseType<OfficesRpc['stats']['$get'], 200>;
-export type OfficeSyncResult = InferResponseType<OfficesRpc['sync']['$post'], 200>;
+export type OfficeSyncResult = SyncResponse;
 export type OfficeAllResult = InferResponseType<OfficesRpc['all']['$get'], 200>;
 export type OfficeByEntityResult = InferResponseType<OfficesRpc['by-entity'][':entityId']['$get'], 200>;
 
@@ -55,7 +63,7 @@ export type OfficeByEntityResult = InferResponseType<OfficesRpc['by-entity'][':e
 type VotesRpc = ReturnType<typeof hc<PoliticalVotesRoute>>;
 
 export type VoteStatsResult = InferResponseType<VotesRpc['stats']['$get'], 200>;
-export type VoteSyncResult = InferResponseType<VotesRpc['sync']['$post'], 200>;
+export type VoteSyncResult = SyncResponse;
 export type VoteAllResult = InferResponseType<VotesRpc['all']['$get'], 200>;
 export type VoteByEntityResult = InferResponseType<VotesRpc['by-entity'][':entityId']['$get'], 200>;
 export type VoteByLegislationResult = InferResponseType<VotesRpc['by-legislation'][':legislationId']['$get'], 200>;
@@ -67,7 +75,7 @@ export type VoteByLegislationResult = InferResponseType<VotesRpc['by-legislation
 type FinanceRpc = ReturnType<typeof hc<CampaignFinanceRoute>>;
 
 export type FinanceStatsResult = InferResponseType<FinanceRpc['stats']['$get'], 200>;
-export type FinanceSyncResult = InferResponseType<FinanceRpc['sync']['$post'], 200>;
+export type FinanceSyncResult = SyncResponse;
 export type FinanceAllResult = InferResponseType<FinanceRpc['all']['$get'], 200>;
 export type FinanceByEntityResult = InferResponseType<FinanceRpc['by-entity'][':entityId']['$get'], 200>;
 

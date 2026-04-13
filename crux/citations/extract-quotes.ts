@@ -170,8 +170,8 @@ export async function extractQuotesForPage(
               sourceQuote,
               sourceText,
             );
-            verificationMethod = verification.method;
-            verificationScore = verification.score;
+            verificationMethod = quoteMatch.method;
+            verificationScore = quoteMatch.score;
           }
         } else if (sourceText) {
           // Source text too short for LLM extraction — use as-is
