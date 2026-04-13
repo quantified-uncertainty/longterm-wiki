@@ -289,9 +289,14 @@ function main(): void {
   if (updateMode) {
     const { counts, filesScanned } = scanCodebase();
     const notes =
-      'Ratchet baseline for source-check → sourcing rename. ' +
-      'Only lower this value; never raise without justification. ' +
-      'Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella).';
+      'FROZEN per QUA-296. The 5 non-route references (hyphenated + camelCase) ' +
+      'are structural: they bind to DB columns source_check_evidence and ' +
+      'source_check_verdicts via Drizzle. Driving total below 5 requires ' +
+      'renaming those tables (rejected as high-risk for cosmetic gain — see ' +
+      'QUA-296). Route references will drop to 0 once QUA-301 client migration ' +
+      'completes. Until then, do not lower the total without first reading ' +
+      'QUA-296. Tracked under QUA-103 (lint guard), QUA-102 (rename umbrella), ' +
+      'QUA-296 (freeze decision).';
     writeBaseline(counts, notes);
     console.log(`${c.green}Baseline updated.${c.reset}`);
     console.log(`  Files scanned: ${filesScanned}`);
