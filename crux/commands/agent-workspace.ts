@@ -11,12 +11,45 @@
  *   crux sys agent-workspace clean [N]       Remove idle agent slots (on main, no changes)
  */
 
-import { existsSync, readFileSync, writeFileSync, readdirSync, statSync, copyFileSync, mkdirSync } from 'fs';
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  readdirSync,
+  statSync,
+  lstatSync,
+  copyFileSync,
+  mkdirSync,
+  unlinkSync,
+  utimesSync,
+} from 'fs';
 import { join, dirname } from 'path';
-import { execSync } from 'child_process';
+import { execSync, spawnSync } from 'child_process';
+import os from 'os';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import {
+  type Role,
+  type SentinelEnv,
+  writeSentinel as writeSentinelImpl,
+  touchSentinel as touchSentinelImpl,
+  checkConflict as checkConflictImpl,
+} from '../lib/agent-workspace/sentinel.ts';
+import {
+  type TmuxExec,
+  type TmuxExecResult,
+  claimWindow as claimWindowImpl,
+} from '../lib/agent-workspace/tmux.ts';
+import {
+  runDoctor,
+  renderPretty as renderDoctorPretty,
+  renderJson as renderDoctorJson,
+  exitCodeFor as doctorExitCode,
+} from '../lib/agent-workspace/doctor/runner.ts';
+import { realDoctorEnv } from '../lib/agent-workspace/doctor/env.ts';
+import { SLOTS_CHECKS } from '../lib/agent-workspace/doctor/slots.ts';
+import { RELEASES_CHECKS } from '../lib/agent-workspace/doctor/releases.ts';
 
 interface CommandOptions extends BaseOptions {
   ci?: boolean;
@@ -639,14 +672,55 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
 // fix-tabs — rename tmux windows to match actual slot + branch
 // ---------------------------------------------------------------------------
 
+/**
+ * Read the @lw-coord-role marker for every tmux window.
+ *
+ * Returns a map of window-index → role string ("slots"|"releases") for windows
+ * that have the marker set. Requires tmux ≥ 3.0 for `#{@user-option}` format
+ * substitution; older tmux returns an empty map (caller falls back to the
+ * pre-marker behavior, which is safe because the rename loop just renames
+ * everything as before).
+ */
+function readRoleMarkers(): Map<string, string> {
+  const markers = new Map<string, string>();
+  // Probe tmux version once. <3.0 doesn't support #{@user-option} → bail.
+  try {
+    const version = execSync('tmux -V', { encoding: 'utf-8', timeout: 3000 }).trim();
+    const m = version.match(/(\d+)\.(\d+)/);
+    if (!m || Number(m[1]) < 3) return markers;
+  } catch {
+    return markers;
+  }
+  try {
+    const raw = execSync(
+      `tmux list-windows -a -F '#{window_index}|||#{@lw-coord-role}'`,
+      { encoding: 'utf-8', timeout: 5000 },
+    );
+    for (const line of raw.split('\n')) {
+      if (!line.trim()) continue;
+      const parts = line.split('|||');
+      if (parts.length < 2) continue;
+      const role = parts[1].trim();
+      if (role === 'slots' || role === 'releases') markers.set(parts[0], role);
+    }
+  } catch { /* ignore — empty marker map is harmless */ }
+  return markers;
+}
+
 /** Scan all tmux windows and rename those whose pane CWD is an agent slot or the coordinator */
 function renameTmuxWindows(lwDir: string): string[] {
   if (!process.env.TMUX) return [];
 
   const windows = listTmuxWindows();
+  const roleMarkers = readRoleMarkers();
   const renamed: string[] = [];
 
   for (const win of windows) {
+    // Coordinator-claimed window: skip entirely so /agent-slots-start and
+    // /agent-releases-start can keep their chosen window names. The marker
+    // is set BEFORE rename inside claimWindow() so we never miss it here.
+    if (roleMarkers.has(win.index)) continue;
+
     // Coordinator window — lw/ root (not a slot)
     if (win.cwd === lwDir) {
       if (win.name !== 'LW') {
@@ -699,6 +773,196 @@ async function fixTabs(_args: string[], _options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// Sentinel + tmux-claim + doctor (QUA-339)
+// ---------------------------------------------------------------------------
+
+interface RoleOptions extends CommandOptions {
+  role?: string;
+}
+
+function parseRole(opts: RoleOptions): Role | { error: string } {
+  const v = opts.role;
+  if (v === 'slots' || v === 'releases') return v;
+  return { error: `--role must be 'slots' or 'releases' (got: ${v ?? 'missing'})` };
+}
+
+/** Real-world SentinelEnv backed by node:fs and live tmux. */
+function makeSentinelEnv(): SentinelEnv {
+  return {
+    now: () => new Date(),
+    env: process.env,
+    hostname: () => os.hostname(),
+    uid: () => (typeof process.getuid === 'function' ? process.getuid() : 0),
+    ppid: () => process.ppid,
+    readFile(path) {
+      try { return readFileSync(path, 'utf-8'); } catch { return null; }
+    },
+    writeFile(path, content) { writeFileSync(path, content); },
+    touch(path) {
+      const now = new Date();
+      utimesSync(path, now, now);
+    },
+    statMtime(path) {
+      try { return Math.floor(statSync(path).mtimeMs / 1000); } catch { return null; }
+    },
+    unlink(path) {
+      try { unlinkSync(path); } catch { /* already gone */ }
+    },
+    listMatching(dir, prefix) {
+      try {
+        return readdirSync(dir)
+          .filter((n) => n.startsWith(prefix))
+          .map((n) => `${dir}/${n}`);
+      } catch { return []; }
+    },
+    listTmuxPanes() {
+      if (!process.env.TMUX) return null;
+      try {
+        const r = execSync(`tmux list-panes -a -F '#{pane_id}'`, { encoding: 'utf-8', timeout: 3000 });
+        return r.split('\n').map((s) => s.trim()).filter(Boolean);
+      } catch { return null; }
+    },
+    pidAlive(pid) {
+      try { process.kill(pid, 0); return true; } catch { return false; }
+    },
+  };
+}
+
+/** Real-world TmuxExec backed by spawnSync. */
+function makeTmuxExec(): TmuxExec {
+  return {
+    inTmux: () => process.env.TMUX ?? null,
+    run(args: string[]): TmuxExecResult {
+      const r = spawnSync('tmux', args, { encoding: 'utf-8', timeout: 5000 });
+      if (r.error) {
+        return { stdout: r.stdout ?? '', stderr: r.stderr ?? r.error.message, code: 1 };
+      }
+      return { stdout: r.stdout ?? '', stderr: r.stderr ?? '', code: r.status ?? 0 };
+    },
+  };
+}
+
+async function sentinelWrite(_args: string[], options: RoleOptions): Promise<CommandResult> {
+  const role = parseRole(options);
+  if (typeof role !== 'string') return { exitCode: 1, output: role.error };
+  const env = makeSentinelEnv();
+  const { path, sentinel } = writeSentinelImpl(role, env);
+  if (options.json) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify({ ok: true, role, path, sentinel }, null, 2),
+    };
+  }
+  return { exitCode: 0, output: `wrote sentinel: ${path}` };
+}
+
+async function sentinelTouch(_args: string[], options: RoleOptions): Promise<CommandResult> {
+  const role = parseRole(options);
+  if (typeof role !== 'string') return { exitCode: 1, output: role.error };
+  const env = makeSentinelEnv();
+  const { path, touched } = touchSentinelImpl(role, env);
+  if (options.json) {
+    return { exitCode: 0, output: JSON.stringify({ ok: true, role, path, touched }, null, 2) };
+  }
+  return { exitCode: 0, output: touched ? `touched ${path}` : `(no sentinel at ${path} to touch)` };
+}
+
+async function sentinelCheck(_args: string[], options: RoleOptions): Promise<CommandResult> {
+  const role = parseRole(options);
+  if (typeof role !== 'string') return { exitCode: 1, output: role.error };
+  const env = makeSentinelEnv();
+  const result = checkConflictImpl(role, env);
+
+  if (options.json) {
+    const exit = result.conflict?.kind === 'same-session' ? 2 : 0;
+    return {
+      exitCode: exit,
+      output: JSON.stringify(
+        {
+          ok: exit === 0,
+          role,
+          ourPath: result.ourPath,
+          conflict: result.conflict,
+          cleaned: result.cleaned,
+        },
+        null,
+        2,
+      ),
+    };
+  }
+
+  if (!result.conflict) {
+    const tail = result.cleaned > 0 ? ` (cleaned ${result.cleaned} stale)` : '';
+    return { exitCode: 0, output: `✓ no role conflict${tail}` };
+  }
+  if (result.conflict.kind === 'same-session') {
+    const banner = [
+      '======================================================================',
+      'ROLE CONFLATION DETECTED — this Claude session previously ran the',
+      'OTHER coordinator startup skill.',
+      '',
+      '  • slots owns:   PR patrol, tmux rename, slot lifecycle, dispatch',
+      '  • releases owns: ops/ writes, release PRs, deploys, prod incidents',
+      '',
+      'Running both in one session means: PR patrol may compete with a',
+      'release window, ops edits may race PR patrol iterations, context',
+      'fills twice as fast, tmux rename loops may double-fire.',
+      '',
+      'WHAT TO DO:',
+      '  1. (RECOMMENDED) Open a new tmux window (Ctrl-b c), cd to lw/,',
+      `     run the OTHER startup skill there. Leave THIS session as ${role}.`,
+      '  2. (IF YOU ARE SURE) Re-run with --force to override.',
+      '======================================================================',
+      `existing sentinel: ${result.conflict.path}`,
+    ].join('\n');
+    return { exitCode: 2, output: banner };
+  }
+  // cross-session: expected and informational
+  return {
+    exitCode: 0,
+    output: `✓ other role (${result.conflict.sentinel.role}) running in a DIFFERENT session — that's expected. Proceeding.`,
+  };
+}
+
+async function tmuxClaim(_args: string[], options: RoleOptions): Promise<CommandResult> {
+  const role = parseRole(options);
+  if (typeof role !== 'string') return { exitCode: 1, output: role.error };
+  const exec = makeTmuxExec();
+  const result = claimWindowImpl(role, exec);
+  if (options.json) {
+    return { exitCode: result.status === 'error' ? 1 : 0, output: JSON.stringify(result, null, 2) };
+  }
+  if (result.status === 'skipped-no-tmux') {
+    return { exitCode: 0, output: '(not in tmux — skipping window rename)' };
+  }
+  if (result.status === 'skipped-no-current') {
+    return { exitCode: 0, output: `(no current tmux window — skipping: ${result.detail})` };
+  }
+  if (result.status === 'error') {
+    return { exitCode: 1, output: `error: ${result.detail}` };
+  }
+  const markerNote = result.markerUnsupported
+    ? ' (tmux <3.0: skipped @lw-coord-role marker)'
+    : ` (marker: @lw-coord-role=${result.marker})`;
+  return { exitCode: 0, output: `✓ tmux window renamed to '${result.finalName}'${markerNote}` };
+}
+
+async function doctor(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const which = args.find((a) => !a.startsWith('-'));
+  if (which !== 'slots' && which !== 'releases') {
+    return {
+      exitCode: 1,
+      output: 'Usage: crux ws doctor <slots|releases> [--json]',
+    };
+  }
+  const env = realDoctorEnv(getLwDir());
+  const checks = which === 'slots' ? SLOTS_CHECKS : RELEASES_CHECKS;
+  const report = await runDoctor(which, checks, env);
+  const output = options.json ? renderDoctorJson(report) : renderDoctorPretty(report);
+  return { exitCode: doctorExitCode(report.worst), output };
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -711,6 +975,11 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
   open,
   refresh,
   'fix-tabs': fixTabs,
+  'sentinel-write': sentinelWrite,
+  'sentinel-check': sentinelCheck,
+  'sentinel-touch': sentinelTouch,
+  'tmux-claim': tmuxClaim,
+  doctor,
 };
 
 export function getHelp(): string {
@@ -734,6 +1003,15 @@ Commands:
   open <N>          Open a tmux window at slot N (--claude to launch claude)
   refresh           Pull latest main in idle slots (on main, clean)
   fix-tabs          Rename tmux tabs to match actual slot + branch
+
+Coordinator lifecycle (QUA-339):
+  sentinel-write   --role=slots|releases  Write the role-conflation sentinel
+  sentinel-touch   --role=slots|releases  Refresh sentinel mtime (long sessions)
+  sentinel-check   --role=slots|releases  Detect conflict; exit 2 = same-session
+  tmux-claim       --role=slots|releases  Rename window + set @lw-coord-role marker
+  doctor slots                            Run all 11 slots-doctor checks
+  doctor releases                         Run all 12 releases-doctor checks
+  (all support --json for skill consumption)
 
 Port assignments (deterministic from slot number):
   Agent N → Next.js on port (3010+N), wiki-server on port (3110+N)
