@@ -80,3 +80,21 @@ The AGI Futures Council, described in Alphabet's 2025–2026 AI Responsibility U
 
 ### Governance Diagram
 
+```mermaid
+flowchart TD
+  Board[Alphabet Board of Directors<br/>10 members]
+  Audit[Audit & Compliance Committee<br/>no explicit AI mandate]
+  AGIFC[AGI Futures Council<br/>advisory]
+  Pichai[CEO Sundar Pichai]
+  DeepMind[Google DeepMind<br/>Demis Hassabis]
+  Research[Google Research]
+  Safety[Responsible AI &amp; Safety orgs]
+
+  Board --> Audit
+  Board --> AGIFC
+  Board --> Pichai
+  Pichai --> DeepMind
+  Pichai --> Research
+  Pichai --> Safety
+  AGIFC -.advises.-> Board
+```
