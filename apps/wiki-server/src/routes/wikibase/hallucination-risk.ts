@@ -458,28 +458,37 @@ const hallucinationRiskApp = new Hono()
     const rawDb = getDb();
 
     if (dry_run) {
-      // Count how many rows would be deleted
-      const result = await rawDb`
-        SELECT count(*)::int AS count
-        FROM hallucination_risk_snapshots hrs
-        WHERE id NOT IN (
-          SELECT id FROM (
-            SELECT id, ROW_NUMBER() OVER (
-              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-              PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
-            ) AS rn
-            FROM hallucination_risk_snapshots
-          ) ranked
-          WHERE rn <= ${keep}
-        )
-      `;
-      const wouldDelete = result[0]?.count ?? 0;
+      // Count how many rows would be deleted.
+      // Use the same transaction + elevated statement_timeout as the real
+      // cleanup path so dry-run probes on large tables don't hit the default
+      // 30s pool timeout.
+      let wouldDelete = 0;
+      let total = 0;
+      await beginTransaction(async (tx) => {
+        await tx`SET LOCAL statement_timeout = '120000'`;
+        const result = await tx<{ count: number }[]>`
+          SELECT count(*)::int AS count
+          FROM hallucination_risk_snapshots hrs
+          LEFT JOIN wiki_pages wp ON wp.id = hrs.page_id
+          WHERE (hrs.page_id IS NOT NULL AND wp.id IS NULL)
+             OR hrs.id NOT IN (
+            SELECT id FROM (
+              SELECT id, ROW_NUMBER() OVER (
+                -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
+              ) AS rn
+              FROM hallucination_risk_snapshots
+            ) ranked
+            WHERE rn <= ${keep}
+          )
+        `;
+        wouldDelete = result[0]?.count ?? 0;
 
-      // Total count
-      const totalResult = await rawDb`
-        SELECT count(*)::int AS total FROM hallucination_risk_snapshots
-      `;
-      const total = totalResult[0]?.total ?? 0;
+        const totalResult = await tx<{ total: number }[]>`
+          SELECT count(*)::int AS total FROM hallucination_risk_snapshots
+        `;
+        total = totalResult[0]?.total ?? 0;
+      });
 
       return c.json({
         dryRun: true,
@@ -493,22 +502,35 @@ const hallucinationRiskApp = new Hono()
     // Actually delete old snapshots, keeping latest `keep` per page.
     // Use a transaction with elevated statement_timeout (2 minutes) since the
     // default 30s pool timeout can be exceeded on large tables.
+    //
+    // Belt-and-suspenders: also delete orphan rows whose page_id no longer
+    // exists in wiki_pages. Migration 0177 adds ON DELETE CASCADE to the FK,
+    // so the orphan class cannot recur — but cascade only catches future
+    // deletions, and this extra predicate keeps the cleanup robust if anything
+    // ever bypasses the FK.
     logger.info({ keep }, "Deleting old hallucination risk snapshots");
     let deleted = 0;
     await beginTransaction(async (tx) => {
       await tx`SET LOCAL statement_timeout = '120000'`;
       const result = await tx`
-        DELETE FROM hallucination_risk_snapshots
-        WHERE id NOT IN (
-          SELECT id FROM (
-            SELECT id, ROW_NUMBER() OVER (
-              -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
-              PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
-            ) AS rn
-            FROM hallucination_risk_snapshots
-          ) ranked
-          WHERE rn <= ${keep}
-        )
+        DELETE FROM hallucination_risk_snapshots hrs
+        USING (
+          SELECT hrs2.id
+          FROM hallucination_risk_snapshots hrs2
+          LEFT JOIN wiki_pages wp ON wp.id = hrs2.page_id
+          WHERE (hrs2.page_id IS NOT NULL AND wp.id IS NULL)
+             OR hrs2.id NOT IN (
+            SELECT id FROM (
+              SELECT id, ROW_NUMBER() OVER (
+                -- COALESCE to -1 so NULL page_id rows don't all collapse into one partition
+                PARTITION BY COALESCE(page_id, -1) ORDER BY computed_at DESC
+              ) AS rn
+              FROM hallucination_risk_snapshots
+            ) ranked
+            WHERE rn <= ${keep}
+          )
+        ) to_delete
+        WHERE hrs.id = to_delete.id
       `;
       deleted = result.count;
     });
