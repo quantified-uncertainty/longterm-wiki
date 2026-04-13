@@ -99,7 +99,12 @@ vi.mock('./sourcing-orchestrate.ts', () => ({
 
 // ── Import after mocks ─────────────────────────────────────────────────
 
-import { commands, formatSummaryMarkdown } from './flagship-curate.ts';
+import {
+  commands,
+  formatSummary,
+  formatSummaryMarkdown,
+  formatConfirmedDelta,
+} from './flagship-curate.ts';
 import { CreditExhaustedError } from '../lib/resilience.ts';
 import { callLlm } from '../lib/llm.ts';
 import { orchestrateCommand } from './sourcing-orchestrate.ts';
@@ -1133,5 +1138,160 @@ describe('formatSummaryMarkdown', () => {
     });
     expect(md).toContain('| Empty Org | — → — | 0 |');
     expect(md).not.toContain('NaN');
+  });
+});
+
+// ── formatSummary console output tests (QUA-379) ───────────────────────
+
+describe('formatSummary console output', () => {
+  /**
+   * Strip ANSI escape codes so assertions don't need to know about colors.
+   * Matches the CSI sequence `ESC [ ... m` that c.green / c.red / etc. emit.
+   */
+  function stripAnsi(s: string): string {
+    return s.replace(/\x1b\[[0-9;]*m/g, '');
+  }
+
+  function makeResult(
+    title: string,
+    confirmedBefore: number,
+    confirmedAfter: number,
+    totalRecords: number,
+    cost = 0.5,
+    durationMs = 60000,
+  ) {
+    return {
+      entity: { id: title.toLowerCase(), stableId: `sid_${title}`, title, entityType: 'organization' },
+      recordsTotal: totalRecords,
+      recordsCurated: Math.max(0, totalRecords - confirmedBefore),
+      // Note: recordsImproved is clamped to >= 0 per the existing CurationResult
+      // contract. formatSummary must NOT rely on it to compute the delta.
+      recordsImproved: Math.max(0, confirmedAfter - confirmedBefore),
+      recordsSkipped: 0,
+      researchCost: cost / 2,
+      verifyCost: cost / 2,
+      totalCost: cost,
+      duration: durationMs,
+      beforeVerdicts: { confirmed: confirmedBefore, unchecked: totalRecords - confirmedBefore },
+      afterVerdicts: { confirmed: confirmedAfter, unchecked: totalRecords - confirmedAfter },
+    };
+  }
+
+  describe('formatConfirmedDelta', () => {
+    it('labels improvements with a green plus prefix', () => {
+      const out = formatConfirmedDelta(10, 14);
+      expect(stripAnsi(out)).toBe('+4');
+      expect(out).toContain('\x1b[32m'); // green
+    });
+
+    it('labels regressions with a red minus prefix — the QUA-379 regression case', () => {
+      const out = formatConfirmedDelta(14, 10);
+      expect(stripAnsi(out)).toBe('-4');
+      expect(out).toContain('\x1b[31m'); // red
+    });
+
+    it('labels exact zero as dim "no change"', () => {
+      const out = formatConfirmedDelta(10, 10);
+      expect(stripAnsi(out)).toBe('no change');
+      expect(out).toContain('\x1b[2m'); // dim
+    });
+
+    it('does not render +0 or -0 for the zero case', () => {
+      const out = stripAnsi(formatConfirmedDelta(0, 0));
+      expect(out).not.toContain('+0');
+      expect(out).not.toContain('-0');
+    });
+  });
+
+  describe('per-entity line rendering', () => {
+    it('renders a regression with a red minus, not "no change" — QUA-379 Anthropic case', () => {
+      // Reproducing the exact 2026-04-13 evidence: Anthropic 37% → 33% confirmed
+      // with the old formatter labeled this "no change" because the delta
+      // display was gated on `confirmedAfter > confirmedBefore`.
+      const results = [makeResult('Anthropic', 10, 8, 27)];
+      const out = stripAnsi(formatSummary(results));
+      // Old (buggy) output would have been: "37% → 30% confirmed (no change)"
+      expect(out).toContain('Anthropic: 37% → 30% confirmed (-2)');
+      expect(out).not.toMatch(/Anthropic.*no change/);
+    });
+
+    it('renders an improvement with a green plus', () => {
+      const results = [makeResult('OpenAI', 8, 12, 25)];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('OpenAI: 32% → 48% confirmed (+4)');
+    });
+
+    it('renders exact zero delta as "no change"', () => {
+      const results = [makeResult('StableOrg', 5, 5, 10)];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('StableOrg: 50% → 50% confirmed (no change)');
+    });
+
+    it('renders mixed results (improvement + no-change + regression) accurately across a batch', () => {
+      // Mirrors a realistic partial-sweep: some orgs gained confirmed verdicts,
+      // some flipped neutral, some regressed. All three must be distinguishable
+      // in the console output — the entire point of QUA-379.
+      const results = [
+        makeResult('GoodOrg', 5, 10, 20, 0.5, 60000),
+        makeResult('FlatOrg', 8, 8, 16, 0.2, 30000),
+        makeResult('RegressOrg', 10, 6, 20, 0.3, 45000),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('GoodOrg: 25% → 50% confirmed (+5)');
+      expect(out).toContain('FlatOrg: 50% → 50% confirmed (no change)');
+      expect(out).toContain('RegressOrg: 50% → 30% confirmed (-4)');
+    });
+  });
+
+  describe('totals line', () => {
+    it('reports a signed net confirmed-delta across all entities (QUA-379 accounting fix)', () => {
+      // GoodOrg: +5, FlatOrg: 0, RegressOrg: -4 → net +1 net delta.
+      // The old formatter summed `recordsImproved` (clamped ≥ 0 per-org)
+      // which would have reported +5 — hiding the regression entirely.
+      const results = [
+        makeResult('GoodOrg', 5, 10, 20),
+        makeResult('FlatOrg', 8, 8, 16),
+        makeResult('RegressOrg', 10, 6, 20),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: +1');
+      // The misleading old label should be gone.
+      expect(out).not.toContain('Records improved:');
+    });
+
+    it('reports negative totals when the net is a regression', () => {
+      const results = [
+        makeResult('OrgA', 10, 8, 20),
+        makeResult('OrgB', 10, 7, 20),
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: -5');
+    });
+
+    it('reports "0" (not "+0" or "-0") when net delta is exactly zero', () => {
+      const results = [
+        makeResult('OrgA', 5, 8, 15), // +3
+        makeResult('OrgB', 5, 2, 15), // -3
+      ];
+      const out = stripAnsi(formatSummary(results));
+      expect(out).toContain('Confirmed delta: 0');
+      expect(out).not.toContain('Confirmed delta: +0');
+      expect(out).not.toContain('Confirmed delta: -0');
+    });
+
+    it('colors the totals line red on net regression', () => {
+      const results = [makeResult('Regress', 10, 6, 20)];
+      const out = formatSummary(results);
+      // The totals line should contain a red ANSI code for the net delta.
+      const totalsLine = out.split('\n').find((l) => l.includes('Confirmed delta:'));
+      expect(totalsLine).toBeDefined();
+      expect(totalsLine).toContain('\x1b[31m');
+    });
+
+    it('colors the totals line green on net improvement', () => {
+      const results = [makeResult('Grow', 5, 10, 20)];
+      const totalsLine = formatSummary(results).split('\n').find((l) => l.includes('Confirmed delta:'));
+      expect(totalsLine).toContain('\x1b[32m');
+    });
   });
 });
