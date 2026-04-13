@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { sanitizeRawIds } from "../sanitize-raw-ids";
+import {
+  sanitizeRawIds,
+  isClickableFactId,
+  isOpaqueLegacyFactId,
+  isLegacyResourceId,
+} from "../sanitize-raw-ids";
 
 // QUA-397: regression tests for the render-layer raw-ID sanitizer.
 // These codify the exact leak shapes observed on prod via the no-raw-ids
@@ -99,6 +104,100 @@ describe("sanitizeRawIds", () => {
     it("leaves short strings that look like id prefixes alone (< 8 chars)", () => {
       expect(sanitizeRawIds("f_short")).toBe("f_short");
       expect(sanitizeRawIds("sid_xx")).toBe("sid_xx");
+    });
+  });
+
+  describe("isClickableFactId — URL-resolvable formats only", () => {
+    it("accepts canonical f_ fact IDs in any column", () => {
+      expect(isClickableFactId("f_mEKUPPFYRg", "fact_id")).toBe(true);
+      expect(isClickableFactId("f_mEKUPPFYRg", "id")).toBe(true);
+      expect(isClickableFactId("f_mEKUPPFYRg", "random_column")).toBe(true);
+    });
+
+    it("accepts legacy 8-12 char lowercase hex in fact-id columns", () => {
+      expect(isClickableFactId("e7c42d88", "fact_id")).toBe(true);
+      expect(isClickableFactId("f2a06bd3", "factId")).toBe(true);
+      expect(isClickableFactId("a8c71e05abcd", "id")).toBe(true);
+    });
+
+    it("rejects legacy hex in non-fact-id columns", () => {
+      expect(isClickableFactId("e7c42d88", "resource_id")).toBe(false);
+      expect(isClickableFactId("e7c42d88", "description")).toBe(false);
+    });
+
+    it("rejects 10-char mixed-case alnum legacy IDs — those 404 unreliably on prod", () => {
+      // Measured: /factbase/fact/2Y4ope8OxA → 404, /factbase/fact/RYUAwpW0fA → 200
+      // Linking this format would point half of users at broken pages.
+      expect(isClickableFactId("2Y4ope8OxA", "fact_id")).toBe(false);
+      expect(isClickableFactId("XUSIG6vsPw", "fact_id")).toBe(false);
+      expect(isClickableFactId("RYUAwpW0fA", "fact_id")).toBe(false);
+    });
+
+    it("rejects non-fact shapes", () => {
+      expect(isClickableFactId("sid_Aqcyu3onCA", "fact_id")).toBe(false);
+      expect(isClickableFactId("1f21fae8ed666710", "fact_id")).toBe(false); // 16-hex
+      expect(isClickableFactId("Anthropic", "fact_id")).toBe(false);
+    });
+  });
+
+  describe("isOpaqueLegacyFactId — 10-char mixed-case alnum, no link", () => {
+    it("accepts 10-char mixed-case with upper+lower+digit in fact-id columns", () => {
+      expect(isOpaqueLegacyFactId("2Y4ope8OxA", "fact_id")).toBe(true);
+      expect(isOpaqueLegacyFactId("XUSIG6vsPw", "factId")).toBe(true);
+      expect(isOpaqueLegacyFactId("RYUAwpW0fA", "id")).toBe(true);
+    });
+
+    it("rejects canonical f_ (those are clickable)", () => {
+      expect(isOpaqueLegacyFactId("f_mEKUPPFY", "fact_id")).toBe(false);
+    });
+
+    it("rejects 8-char lowercase hex (those are clickable)", () => {
+      expect(isOpaqueLegacyFactId("e7c42d88", "fact_id")).toBe(false);
+    });
+
+    it("rejects 10-char strings missing digit/upper/lower entropy", () => {
+      expect(isOpaqueLegacyFactId("Washington", "fact_id")).toBe(false); // no digit
+      expect(isOpaqueLegacyFactId("abcdefghij", "fact_id")).toBe(false); // no upper, no digit
+      expect(isOpaqueLegacyFactId("ABCDEFGHIJ", "fact_id")).toBe(false); // no lower, no digit
+      expect(isOpaqueLegacyFactId("1234567890", "fact_id")).toBe(false); // no letters
+    });
+
+    it("rejects the correct shape in wrong columns (column gating)", () => {
+      expect(isOpaqueLegacyFactId("2Y4ope8OxA", "description")).toBe(false);
+      expect(isOpaqueLegacyFactId("2Y4ope8OxA", "title")).toBe(false);
+    });
+
+    it("rejects wrong length", () => {
+      expect(isOpaqueLegacyFactId("2Y4ope8Ox", "fact_id")).toBe(false); // 9
+      expect(isOpaqueLegacyFactId("2Y4ope8OxAB", "fact_id")).toBe(false); // 11
+    });
+  });
+
+  describe("isLegacyResourceId — 16-char lowercase hex, muted render", () => {
+    it("accepts in resource-id columns", () => {
+      expect(isLegacyResourceId("1f21fae8ed666710", "resource_id")).toBe(true);
+      expect(isLegacyResourceId("0116b24a50f52f44", "resourceId")).toBe(true);
+      expect(isLegacyResourceId("1f21fae8ed666710", "stable_id")).toBe(true);
+      expect(isLegacyResourceId("1f21fae8ed666710", "id")).toBe(true);
+    });
+
+    it("rejects wrong length", () => {
+      expect(isLegacyResourceId("1f21fae8ed66671", "resource_id")).toBe(false); // 15
+      expect(isLegacyResourceId("1f21fae8ed6667100", "resource_id")).toBe(false); // 17
+    });
+
+    it("rejects canonical sid_ (those go through isAnySid)", () => {
+      expect(isLegacyResourceId("sid_1LcLlMGLbw", "resource_id")).toBe(false);
+    });
+
+    it("rejects non-hex chars", () => {
+      expect(isLegacyResourceId("1F21FAE8ED666710", "resource_id")).toBe(false); // uppercase
+      expect(isLegacyResourceId("1z21fae8ed666710", "resource_id")).toBe(false); // non-hex
+    });
+
+    it("rejects correct shape in wrong columns", () => {
+      expect(isLegacyResourceId("1f21fae8ed666710", "fact_id")).toBe(false);
+      expect(isLegacyResourceId("1f21fae8ed666710", "description")).toBe(false);
     });
   });
 

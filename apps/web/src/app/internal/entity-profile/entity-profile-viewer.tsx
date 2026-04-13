@@ -21,7 +21,12 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
-import { sanitizeRawIds, isAnyFactId, isLegacyResourceId } from "./sanitize-raw-ids";
+import {
+  sanitizeRawIds,
+  isClickableFactId,
+  isOpaqueLegacyFactId,
+  isLegacyResourceId,
+} from "./sanitize-raw-ids";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -345,15 +350,11 @@ function CellValue({
     return <JsonValue value={value} />;
   }
 
-  // FactBase fact IDs → render as `view →` link instead of leaking raw text.
-  // Covers three id shapes (QUA-397):
-  //   1. Canonical `f_xxx...` (content-based, any column)
-  //   2. Legacy 8-12 char lowercase hex like `e7c42d88` (column-gated: id/fact_id)
-  //   3. Legacy 10-char mixed-case alnum like `2Y4ope8OxA` (column-gated: id/fact_id)
-  // Column gating on the legacy shapes avoids false-positive links on unrelated
-  // columns (git SHAs, content hashes, numeric strings). See
-  // `./sanitize-raw-ids.ts::isAnyFactId`.
-  if (typeof value === "string" && isAnyFactId(value, columnName)) {
+  // FactBase fact IDs with resolvable /factbase/fact/<id> URLs → `view →` link.
+  // Covers canonical `f_xxx` (any column) and legacy 8-12 char lowercase hex
+  // (column-gated: id/fact_id). See `./sanitize-raw-ids.ts::isClickableFactId`.
+  // QUA-397.
+  if (typeof value === "string" && isClickableFactId(value, columnName)) {
     return (
       <Link
         href={`/factbase/fact/${encodeURIComponent(value)}`}
@@ -362,6 +363,22 @@ function CellValue({
       >
         view →
       </Link>
+    );
+  }
+
+  // Legacy 10-char mixed-case alnum fact IDs (e.g. `2Y4ope8OxA`, `XUSIG6vsPw`).
+  // These predate the `f_` prefix and their `/factbase/fact/<id>` URL resolves
+  // UNRELIABLY (~2/5 measured return 404 in prod) — so we render as a muted
+  // em-dash with the full id in `title=` instead of promising a broken link.
+  // Column-gated. Will be eliminated by QUA-407 Phase 1 (migrate to canonical).
+  if (typeof value === "string" && isOpaqueLegacyFactId(value, columnName)) {
+    return (
+      <span
+        className="text-muted-foreground/40 font-mono text-[10px]"
+        title={`legacy fact ID: ${value}`}
+      >
+        &mdash;
+      </span>
     );
   }
 

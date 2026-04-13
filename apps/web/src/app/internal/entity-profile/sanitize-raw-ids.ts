@@ -83,20 +83,40 @@ const LEGACY_RESOURCE_HEX_RE = /^[a-f0-9]{16}$/;
 const CANONICAL_FACT_ID_RE = /^f_[A-Za-z0-9]{8,}$/;
 
 /**
- * True if `value` is a FactBase fact ID — canonical (`f_...`), 8-12 lowercase
- * hex (legacy format A), or 10-char mixed-case alphanumeric (legacy format B).
- * The non-canonical forms are column-name-gated because their shape is too
- * loose to trust alone.
+ * True if `value` is a FactBase fact ID whose `/factbase/fact/<id>` URL is
+ * known to resolve — either canonical `f_...` or 8-12 char lowercase hex
+ * (legacy format A). Column-gated for the legacy shape.
+ *
+ * Used for the `view →` link render branch. The 10-char mixed-case alnum
+ * legacy format B (`2Y4ope8OxA`, `XUSIG6vsPw`, ...) is NOT clickable —
+ * URL resolution for that format is a coin flip in prod (measured: 2 of 5
+ * sample IDs returned 404) because the route handler's resolver only covers
+ * a subset. Rendering them as `view →` links would point half the users at
+ * 404s. Use `isOpaqueLegacyFactId` for that format instead.
  */
-export function isAnyFactId(value: string, columnName: string): boolean {
+export function isClickableFactId(value: string, columnName: string): boolean {
   if (CANONICAL_FACT_ID_RE.test(value)) return true;
   if (LEGACY_HEX_FACT_ID_COLUMNS.has(columnName) && LEGACY_HEX_FACT_ID_RE.test(value)) {
     return true;
   }
-  if (LEGACY_FACT_ID_COLUMNS.has(columnName) && looksLikeLegacyFactId(value)) {
-    return true;
-  }
   return false;
+}
+
+/**
+ * True if `value` is a legacy 10-char mixed-case alnum fact ID in a
+ * fact-id column. These predate the `f_` prefix and the canonical URL
+ * pattern — they're still valid PK values in `facts.fact_id`, but the
+ * `/factbase/fact/<id>` route resolves them unreliably (measured: 2 of 5
+ * return 404 on prod). Render as muted em-dash with the full ID in
+ * `title=` for debugging instead of promising a link that may 404.
+ *
+ * Eliminate by migrating all 10-char alnum fact IDs to canonical `f_<10>`
+ * format (see QUA-407 Phase 1).
+ */
+export function isOpaqueLegacyFactId(value: string, columnName: string): boolean {
+  return (
+    LEGACY_FACT_ID_COLUMNS.has(columnName) && looksLikeLegacyFactId(value)
+  );
 }
 
 /**
