@@ -359,6 +359,19 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'placeholder-citations',
+    name: 'Placeholder footnote citations (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-placeholder-citations.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory (QUA-291): the AI Power & Influence Mapping shipment left
+    // ~140 placeholder footnotes across ~14 content pages. Graduating this
+    // to blocking would break CI until those are cleaned up. Shipping as
+    // advisory to surface the drift; graduate once the backlog is addressed.
+    // Root cause (pipeline emits placeholders): QUA-290.
+    advisory: true,
+  },
+  {
     id: 'dot-position',
     name: 'Dot indicator position (SourcingDot / RecordStatusDots not in first column)',
     command: 'npx',
