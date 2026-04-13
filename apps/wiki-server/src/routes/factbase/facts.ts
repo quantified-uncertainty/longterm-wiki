@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { formatFactLabel } from "@longterm-wiki/factbase";
 import { logger } from "../../logger.js";
 
 // ---- Constants ----
@@ -572,13 +573,7 @@ const factsApp = new Hono()
           tx,
           items.map((f) => {
             const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
-            // Fallback chain: prefer the human-readable label (sent by
-            // sync-facts.ts from property.name); fall back to the property
-            // slug (f.measure = propertyId, e.g. "founded-date"); finally a
-            // generic sentinel. NEVER fall back to f.factId — doing so bakes
-            // raw f_... IDs into things.title / things.description, which
-            // then leak into visible text on data pages (QUA-397).
-            const factLabel = f.label || f.measure || "fact";
+            const factLabel = formatFactLabel(f);
             return {
               id: toFactThingKey(f.entityId, f.factId),
               thingType: "fact" as const,

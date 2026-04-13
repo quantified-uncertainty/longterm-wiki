@@ -342,6 +342,9 @@ importers:
       '@hono/node-server':
         specifier: ^1.19.10
         version: 1.19.11(hono@4.12.5)
+      '@longterm-wiki/factbase':
+        specifier: workspace:*
+        version: link:../../packages/factbase
       '@longterm-wiki/id-utils':
         specifier: workspace:*
         version: link:../../packages/id-utils

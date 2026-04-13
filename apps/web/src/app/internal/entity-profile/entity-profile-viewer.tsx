@@ -264,11 +264,6 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 /** Max rows to show initially before "Show all" */
 const INITIAL_ROW_LIMIT = 20;
 
-// ── ID detection ──────────────────────────────────────────────────────────
-// Fact-ID detection now lives in `./sanitize-raw-ids.ts::isAnyFactId`, which
-// covers canonical `f_xxx`, legacy lowercase hex, and legacy mixed-case alnum
-// formats in a single column-gated helper (QUA-397).
-
 // ── Numeric formatting columns ────────────────────────────────────────────
 
 /** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
@@ -323,6 +318,19 @@ function ExpandableText({ text }: { text: string }) {
 
 // ── Cell renderer ──────────────────────────────────────────────────────────
 
+// Muted em-dash placeholder for legacy IDs that lack a working detail
+// page route. Full ID in `title=` for dev debugging. QUA-397 / QUA-407.
+function MutedLegacyId({ kind, value }: { kind: "fact" | "resource"; value: string }) {
+  return (
+    <span
+      className="text-muted-foreground/40 font-mono text-[10px]"
+      title={`legacy ${kind} ID: ${value}`}
+    >
+      &mdash;
+    </span>
+  );
+}
+
 function CellValue({
   value,
   columnName,
@@ -350,10 +358,8 @@ function CellValue({
     return <JsonValue value={value} />;
   }
 
-  // FactBase fact IDs with resolvable /factbase/fact/<id> URLs → `view →` link.
-  // Covers canonical `f_xxx` (any column) and legacy 8-12 char lowercase hex
-  // (column-gated: id/fact_id). See `./sanitize-raw-ids.ts::isClickableFactId`.
-  // QUA-397.
+  // QUA-397: FactBase fact IDs routed to one of three render branches
+  // depending on whether the `/factbase/fact/<id>` URL resolves in prod.
   if (typeof value === "string" && isClickableFactId(value, columnName)) {
     return (
       <Link
@@ -365,36 +371,11 @@ function CellValue({
       </Link>
     );
   }
-
-  // Legacy 10-char mixed-case alnum fact IDs (e.g. `2Y4ope8OxA`, `XUSIG6vsPw`).
-  // These predate the `f_` prefix and their `/factbase/fact/<id>` URL resolves
-  // UNRELIABLY (~2/5 measured return 404 in prod) — so we render as a muted
-  // em-dash with the full id in `title=` instead of promising a broken link.
-  // Column-gated. Will be eliminated by QUA-407 Phase 1 (migrate to canonical).
   if (typeof value === "string" && isOpaqueLegacyFactId(value, columnName)) {
-    return (
-      <span
-        className="text-muted-foreground/40 font-mono text-[10px]"
-        title={`legacy fact ID: ${value}`}
-      >
-        &mdash;
-      </span>
-    );
+    return <MutedLegacyId kind="fact" value={value} />;
   }
-
-  // Legacy 16-char hex resource stableIds (pre-`sid_` format, e.g.
-  // `1f21fae8ed666710`). There's no public resource-detail page keyed by
-  // these, so render as a muted em-dash with the full id in `title=` for
-  // debugging. Column-gated to avoid false positives (QUA-397).
   if (typeof value === "string" && isLegacyResourceId(value, columnName)) {
-    return (
-      <span
-        className="text-muted-foreground/40 font-mono text-[10px]"
-        title={`legacy resource ID: ${value}`}
-      >
-        &mdash;
-      </span>
-    );
+    return <MutedLegacyId kind="resource" value={value} />;
   }
 
   // Entity reference columns -> show resolved name as link
