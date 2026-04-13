@@ -84,10 +84,16 @@ const dispatch: SqlDispatcher = (query, params) => {
     // the clause under a refactor — the old positional `[type, ...ids]`
     // was fragile enough to mask bugs.
     //
-    // `inArray` expands to `record_id IN ($3, $4, $5, ...)`; we find the
-    // first $N after `record_id` and take everything from there.
-    const recordTypeMatch = query.match(/"record_type"\s*=\s*\$(\d+)/);
-    const recordIdInMatch = query.match(/"record_id"\s+in\s*\(([\s\S]*?)\)/i);
+    // Regex is anchored to the fully-qualified column
+    // (`"source_check_evidence"."record_type"`) so a future JOIN that
+    // introduces a same-named column on another table can't accidentally
+    // match the wrong param slot.
+    const recordTypeMatch = query.match(
+      /"source_check_evidence"\."record_type"\s*=\s*\$(\d+)/,
+    );
+    const recordIdInMatch = query.match(
+      /"source_check_evidence"\."record_id"\s+in\s*\(([\s\S]*?)\)/i,
+    );
     if (!recordTypeMatch || !recordIdInMatch) return [];
 
     const recordType = String(params[Number(recordTypeMatch[1]) - 1]);
@@ -128,7 +134,9 @@ function lastSelectRecordIds(): string[] {
     ) {
       continue;
     }
-    const m = query.match(/"record_id"\s+in\s*\(([\s\S]*?)\)/i);
+    const m = query.match(
+      /"source_check_evidence"\."record_id"\s+in\s*\(([\s\S]*?)\)/i,
+    );
     if (!m) continue;
     return [...m[1].matchAll(/\$(\d+)/g)].map((pm) =>
       String(params[Number(pm[1]) - 1]),

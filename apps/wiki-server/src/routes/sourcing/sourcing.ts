@@ -216,12 +216,8 @@ const EvidenceByRecordsBody = z.object({
   limitPerRecord: z.number().int().min(1).max(MAX_PAGE_SIZE),
 });
 
-/**
- * Join (recordType, recordId) into a stable response-map key.
- * Kept in sync with `evidenceRecordKey` in the crux client
- * (`crux/lib/wiki-server/sourcing-client.ts`).
- */
-export function evidenceRecordKey(recordType: string, recordId: string): string {
+/** Must match `evidenceRecordKey` in crux/lib/wiki-server/sourcing-client.ts. */
+function evidenceRecordKey(recordType: string, recordId: string): string {
   return `${recordType}|${recordId}`;
 }
 
