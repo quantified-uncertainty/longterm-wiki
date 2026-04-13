@@ -21,6 +21,12 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
+import {
+  isFactId,
+  isLegacyFactId,
+  isLegacyResourceId,
+  stripFactIdPrefix,
+} from "./id-masking";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -259,11 +265,8 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 const INITIAL_ROW_LIMIT = 20;
 
 // ── ID detection ──────────────────────────────────────────────────────────
-
-// FactBase fact IDs are `f_` + 8-12 alphanumeric chars (e.g. `f_dW5cR9mJ8q`).
-// Used by the cell renderer to detect raw fact IDs in any column and link them
-// to /factbase/fact/<id> instead of leaking the raw ID as visible text.
-const FACT_ID_RE = /^f_[A-Za-z0-9]{8,}$/;
+// Detection + masking predicates live in `./id-masking.ts`; the cell renderer
+// imports them via the top-of-file `import` block.
 
 // ── Numeric formatting columns ────────────────────────────────────────────
 
@@ -350,7 +353,7 @@ function CellValue({
   // Content-based, not column-name-gated: any cell value matching the fact-ID format gets
   // rendered as a link, no matter which column it lives in. Mirrors how isAnySid() handles
   // stableIds below, and prevents the recurring per-column patch loop (QUA-316, QUA-346).
-  if (typeof value === "string" && FACT_ID_RE.test(value)) {
+  if (typeof value === "string" && isFactId(value)) {
     return (
       <Link
         href={`/factbase/fact/${encodeURIComponent(value)}`}
@@ -360,6 +363,46 @@ function CellValue({
         view →
       </Link>
     );
+  }
+
+  // Legacy fact IDs (pre-migration bare hex). See QUA-397 / LEGACY_FACT_ID_RE.
+  // Column-name gated to avoid false-positive links on unrelated short-hex values.
+  if (typeof value === "string" && isLegacyFactId(value, columnName)) {
+    return (
+      <Link
+        href={`/factbase/fact/${encodeURIComponent(value)}`}
+        className="text-blue-600 dark:text-blue-400 hover:underline text-[11px]"
+        title={`legacy fact ID: ${value}`}
+      >
+        view →
+      </Link>
+    );
+  }
+
+  // Legacy resource stableIds (pre-migration bare 16-char hex). Column-name
+  // gated for the same reason as legacy fact IDs. Render muted — there is no
+  // resource-detail page keyed by these legacy IDs.
+  if (typeof value === "string" && isLegacyResourceId(value, columnName)) {
+    return (
+      <span
+        className="text-muted-foreground/40 font-mono text-[10px]"
+        title={`legacy resource ID: ${value}`}
+      >
+        &mdash;
+      </span>
+    );
+  }
+
+  // Things table titles sometimes still contain a raw fact ID prefix from the
+  // pre-QUA-397 facts.ts write path (e.g. `f_qR5tY9wE1a — Anthropic`). Strip
+  // the raw-ID portion so the visible text is just the human-readable suffix.
+  // The write path is also fixed (see apps/wiki-server/src/routes/factbase/
+  // facts.ts), but existing rows won't rewrite until the next full sync.
+  if (typeof value === "string") {
+    const stripped = stripFactIdPrefix(value);
+    if (stripped !== null) {
+      return <span className="text-[11px]">{stripped}</span>;
+    }
   }
 
   // Entity reference columns -> show resolved name as link
@@ -691,7 +734,12 @@ function ProfileSection({
                     {(() => {
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
-                      const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
+                      // Display a row index instead of a truncated raw ID.
+                      // Previously we sliced `idStr` to 7 chars, which leaked
+                      // `sid_xxx`-shaped substrings into visible text and failed
+                      // the no-raw-ids suite (QUA-397). The full ID is still
+                      // exposed via `title=` for debugging.
+                      const display = `#${i + 1}`;
                       // Compute thing key for linking to /things/<id>
                       // Only link sections with recordType (those have things table entries)
                       // Facts use a composite key (entityId:factId); all others use row.id

@@ -13,7 +13,7 @@ import {
   zv,
   clampedLimit,
 } from "../shared/utils.js";
-import { SyncFactsBatchSchema } from "../../api-types.js";
+import { SyncFactsBatchSchema, type SyncFact } from "../../api-types.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { logger } from "../../logger.js";
 
@@ -91,6 +91,37 @@ function isMalformedNumericRow(row: typeof facts.$inferSelect): boolean {
     return row.low == null || row.high == null;
   }
   return false;
+}
+
+/**
+ * Compute the `title` and `description` strings for a fact-thing row written
+ * by the `/sync` dual-write to the `things` table.
+ *
+ * QUA-397: we previously fell back to `f.factId` when `f.label` was missing,
+ * producing thing titles like `f_qR5tY9wE1a — Anthropic` that leaked raw
+ * FactBase IDs into search results and the entity profile database viewer.
+ *
+ * The new fallback chain is:
+ *   1. `label` (canonical human-readable description)
+ *   2. `measure` (kebab-case, e.g. `total-funding` — still readable)
+ *   3. entity name only (less differentiated but never leaks an internal ID)
+ *
+ * Exported for testing. Pure function — safe to unit test without touching PG.
+ */
+export function buildFactThingStrings(
+  fact: Pick<SyncFact, "label" | "measure" | "value" | "numeric">,
+  entityName: string,
+): { title: string; description: string | undefined } {
+  const factLabel = fact.label || fact.measure || null;
+  const title = factLabel ? `${factLabel} — ${entityName}` : entityName;
+  const valueStr =
+    fact.value ?? (fact.numeric != null ? String(fact.numeric) : null);
+  const description = valueStr
+    ? factLabel
+      ? `${factLabel}: ${valueStr}`
+      : valueStr
+    : undefined;
+  return { title, description };
 }
 
 /**
@@ -572,19 +603,15 @@ const factsApp = new Hono()
           tx,
           items.map((f) => {
             const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
-            const factLabel = f.label || f.factId;
+            const { title, description } = buildFactThingStrings(f, entityName);
             return {
               id: toFactThingKey(f.entityId, f.factId),
               thingType: "fact" as const,
-              title: `${factLabel} — ${entityName}`,
+              title,
               sourceTable: "facts",
               sourceId: toFactThingKey(f.entityId, f.factId),
               parentThingId: f.entityId,
-              description: f.value
-                ? `${factLabel}: ${f.value}`
-                : f.numeric != null
-                  ? `${factLabel}: ${f.numeric}`
-                  : undefined,
+              description,
             };
           })
         );
