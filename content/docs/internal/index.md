@@ -32,7 +32,7 @@ Start here. Each hub gives you the dashboards, CLI commands, decision tables, an
 ## Style Guides
 
 - <EntityLink id="E763" name="knowledge-base">Knowledge Base Style Guide</EntityLink> - Guidelines for risk and response pages (kb-2.0)
-- <EntityLink id="E737" name="models">Model Style Guide</EntityLink> - Guidelines for analytical model pages
+- <EntityLink id="E736" name="models-style-guide">Models Style Guide</EntityLink> - Guidelines for analytical model pages
 - <EntityLink id="E735" name="mermaid-diagrams">Mermaid Diagrams</EntityLink> - How to create diagrams
 
 ## Project Management

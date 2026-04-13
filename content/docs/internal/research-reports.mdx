@@ -226,8 +226,8 @@ Before marking a report complete, verify:
 
 **Run validators:**
 ```bash
-npm run crux -- validate compile
-npm run crux -- validate unified --rules=dollar-signs
+pnpm crux validate compile
+pnpm crux validate unified --rules=dollar-signs
 ```
 
 ---
@@ -284,4 +284,4 @@ After a report is complete, the Causal Factors section can be directly converted
 | Quoted dates | Schema validation fails | Remove quotes |
 | No Asides | Misses key insights | Add 3-4 callouts |
 | Flat hierarchy | Hard to navigate | Use h2/h3 structure |
-| Missing validation | Errors in production | Run `npm run validate` |
+| Missing validation | Errors in production | Run `pnpm validate` |

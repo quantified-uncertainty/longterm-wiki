@@ -20,9 +20,9 @@ This proposal outlines a multi-phase approach to improving cross-linking across 
 ### Phase 1: Deterministic Matching (Implemented ✓)
 
 ```bash
-npm run crux -- fix cross-links              # Preview
-npm run crux -- fix cross-links --apply      # Apply
-npm run crux -- fix cross-links --fuzzy      # Include fuzzy suggestions
+pnpm crux fix cross-links              # Preview
+pnpm crux fix cross-links --apply      # Apply
+pnpm crux fix cross-links --fuzzy      # Include fuzzy suggestions
 ```
 
 **Results:**
@@ -82,7 +82,7 @@ Build a semantic search index that can:
 
 **Setup:**
 ```bash
-npm install @lancedb/lancedb
+pnpm add @lancedb/lancedb
 ```
 
 **Usage:**
@@ -160,13 +160,13 @@ const textToEmbed = [
 
 ```bash
 # Build/rebuild embedding index
-npm run crux -- embeddings build
+pnpm crux embeddings build
 
 # Search for similar entities
-npm run crux -- embeddings search "deceptive AI behavior"
+pnpm crux embeddings search "deceptive AI behavior"
 
 # Suggest links for a page
-npm run crux -- embeddings suggest-links knowledge-base/risks/accident/scheming.mdx
+pnpm crux embeddings suggest-links knowledge-base/risks/accident/scheming.mdx
 ```
 
 ### Integration with Cross-Link Fixer
