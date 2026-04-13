@@ -80,6 +80,39 @@ Print this message and run the review:
 
 If the review marker is valid (SHA + diff hash match HEAD), continue without re-running.
 
+### Simplify marker check (PRs with ≥200 lines changed)
+
+`/agent-review-pr` does one simplification pass as part of its adaptive plan. For larger PRs, a dedicated `/simplify` pass is still required — otherwise a token "simplification" slipped into review fixes can satisfy the review marker without a real pass. Enforce this only when the diff is big enough to make a second pass worthwhile.
+
+Reuse the lines-changed count from the top of Step 2b. If `lines changed < 200`, print `Simplify: skipped (PR below 200-line threshold)` and continue. Otherwise check the marker the same way as review-done:
+
+```bash
+if [ -f .claude/simplify-done ]; then
+  MARKER_SHA=$(awk '{print $2}' .claude/simplify-done)
+  MARKER_HASH=$(awk '{print $4}' .claude/simplify-done)
+  HEAD_SHA=$(git rev-parse HEAD)
+  CURRENT_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
+  if [ "$MARKER_SHA" = "$HEAD_SHA" ] && [ -n "$MARKER_HASH" ] && [ "$MARKER_HASH" = "$CURRENT_HASH" ]; then
+    echo "SIMPLIFIED (SHA + diff hash match)"
+  elif [ "$MARKER_SHA" != "$HEAD_SHA" ]; then
+    echo "STALE (marker SHA ${MARKER_SHA:0:8} != HEAD ${HEAD_SHA:0:8}) — re-run /simplify"
+  else
+    echo "STALE (diff hash mismatch) — re-run /simplify"
+  fi
+else
+  echo "NOT_SIMPLIFIED — run /simplify before /agent-ship"
+fi
+```
+
+**If the marker is missing or stale, stop and run `/simplify`.** Do not ship without it. After `/simplify` completes and any resulting changes are committed, write the marker against the final state:
+
+```bash
+DIFF_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
+echo "simplified $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ${DIFF_HASH}" >| .claude/simplify-done
+```
+
+The `simplify` skill is a system skill and cannot be edited from this repo, so the marker must be written by hand after running it. Below the 200-line threshold the marker is optional; at or above it, it is required to ship. Rationale for 200 (vs. the gate's 300-line review threshold): `/simplify` is cheaper than `/agent-review-pr` and earlier enforcement catches mid-sized PRs before they grow.
+
 ## Step 3: Complete unchecked items
 
 For each unchecked item in the checklist:
@@ -204,6 +237,7 @@ Clean up session artifacts and discard any unstaged changes (modified hooks, del
 ```bash
 rm -f .claude/wip-checklist.md .claude/wip-context.md
 git checkout -- .claude/review-done 2>/dev/null || rm -f .claude/review-done
+git checkout -- .claude/simplify-done 2>/dev/null || rm -f .claude/simplify-done
 git checkout -- .claude/hooks/ 2>/dev/null || true
 ```
 
