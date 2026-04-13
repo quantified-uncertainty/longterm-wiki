@@ -24,7 +24,7 @@ import {
   PricingTab,
   BenchmarksTab,
   FamilyTab,
-} from "./tabs";
+} from "@/app/ai-models/[slug]/tabs";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));

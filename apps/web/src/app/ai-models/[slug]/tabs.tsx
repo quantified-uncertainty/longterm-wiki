@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { AiModelEntity } from "@/data";
-import { BenchmarkScorecard } from "./benchmark-scorecard";
+import { BenchmarkScorecard } from "@/app/ai-models/[slug]/benchmark-scorecard";
 
 /**
  * Per-tab content components for the AI model profile page. Each tab is a
