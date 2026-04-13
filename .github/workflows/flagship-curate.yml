@@ -89,23 +89,49 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Validate numeric inputs
+        run: |
+          set -euo pipefail
+          # Reject non-numeric inputs before they reach the CLI to prevent
+          # whitespace-based argument smuggling via workflow_dispatch.
+          for var_name in INPUT_LIMIT INPUT_BUDGET INPUT_RECORD_LIMIT INPUT_ITERATIONS; do
+            value="${!var_name}"
+            if ! [[ "$value" =~ ^[0-9]+(\.[0-9]+)?$ ]]; then
+              echo "::error::$var_name must be a non-negative number, got: '$value'"
+              exit 1
+            fi
+          done
+          # Linear issue must be canonical QUA-NNN form (validated again CLI-side).
+          if ! [[ "$INPUT_LINEAR_ISSUE" =~ ^QUA-[0-9]+$ ]]; then
+            echo "::error::INPUT_LINEAR_ISSUE must look like QUA-NNN, got: '$INPUT_LINEAR_ISSUE'"
+            exit 1
+          fi
+
       - name: Run flagship-curate
         run: |
-          ARGS="--all"
-          ARGS="$ARGS --limit=${INPUT_LIMIT}"
-          ARGS="$ARGS --budget=${INPUT_BUDGET}"
-          ARGS="$ARGS --record-limit=${INPUT_RECORD_LIMIT}"
-          ARGS="$ARGS --iterations=${INPUT_ITERATIONS}"
-          ARGS="$ARGS --linear-comment=${INPUT_LINEAR_ISSUE}"
+          set -euo pipefail
+          # Build args as an array so values are passed as discrete tokens.
+          # This prevents whitespace in any input from being re-parsed as
+          # additional flags by the shell (defense-in-depth on top of the
+          # validate step above).
+          ARGS=(
+            --all
+            "--limit=${INPUT_LIMIT}"
+            "--budget=${INPUT_BUDGET}"
+            "--record-limit=${INPUT_RECORD_LIMIT}"
+            "--iterations=${INPUT_ITERATIONS}"
+            "--linear-comment=${INPUT_LINEAR_ISSUE}"
+            --ci
+          )
           if [ "${INPUT_DRY_RUN}" = "true" ]; then
-            ARGS="$ARGS --dry-run"
+            ARGS+=(--dry-run)
           fi
           mkdir -p /tmp/flagship-curate
           # Note: flagship-curate emits progress logs to stdout during the run
           # plus the --ci JSON payload as its final output. The captured log is
           # human-readable; the structured summary is also posted to Linear via
           # --linear-comment.
-          pnpm crux flagship-curate $ARGS --ci 2>&1 | tee /tmp/flagship-curate/output.log
+          pnpm crux flagship-curate "${ARGS[@]}" 2>&1 | tee /tmp/flagship-curate/output.log
 
       - name: Upload run output artifact
         if: always()

@@ -396,18 +396,32 @@ describe('flagship-curate', () => {
       const prevKey = process.env['LINEAR_API_KEY'];
       process.env['LINEAR_API_KEY'] = 'test-key';
 
+      try {
+        const result = await commands.default([], {
+          entity: 'anthropic',
+          budget: '1',
+          'linear-comment': 'QUA-124',
+        });
+
+        expect(result.exitCode).toBe(0);
+        expect(mockCommentOnIssue).toHaveBeenCalledTimes(1);
+        expect(mockCommentOnIssue).toHaveBeenCalledWith('QUA-124', expect.stringContaining('Flagship Curate Run'));
+      } finally {
+        if (prevKey === undefined) delete process.env['LINEAR_API_KEY'];
+        else process.env['LINEAR_API_KEY'] = prevKey;
+      }
+    });
+
+    it('rejects unknown team keys (not in the QUA allowlist)', async () => {
+      // The shared parseLinearId rejects anything outside the QUA team key
+      // allowlist — so `FOO-123` should be 1, not 0.
       const result = await commands.default([], {
         entity: 'anthropic',
         budget: '1',
-        'linear-comment': 'QUA-124',
+        'linear-comment': 'FOO-123',
       });
-
-      expect(result.exitCode).toBe(0);
-      expect(mockCommentOnIssue).toHaveBeenCalledTimes(1);
-      expect(mockCommentOnIssue).toHaveBeenCalledWith('QUA-124', expect.stringContaining('Flagship Curate Run'));
-
-      if (prevKey === undefined) delete process.env['LINEAR_API_KEY'];
-      else process.env['LINEAR_API_KEY'] = prevKey;
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toContain('Invalid --linear-comment value');
     });
 
     it('does not post when LINEAR_API_KEY is unset, and exit code stays 0', async () => {
@@ -417,16 +431,18 @@ describe('flagship-curate', () => {
       const prevKey = process.env['LINEAR_API_KEY'];
       delete process.env['LINEAR_API_KEY'];
 
-      const result = await commands.default([], {
-        entity: 'anthropic',
-        budget: '1',
-        'linear-comment': 'QUA-124',
-      });
+      try {
+        const result = await commands.default([], {
+          entity: 'anthropic',
+          budget: '1',
+          'linear-comment': 'QUA-124',
+        });
 
-      expect(result.exitCode).toBe(0);
-      expect(mockCommentOnIssue).not.toHaveBeenCalled();
-
-      if (prevKey !== undefined) process.env['LINEAR_API_KEY'] = prevKey;
+        expect(result.exitCode).toBe(0);
+        expect(mockCommentOnIssue).not.toHaveBeenCalled();
+      } finally {
+        if (prevKey !== undefined) process.env['LINEAR_API_KEY'] = prevKey;
+      }
     });
 
     it('best-effort: continues with exit 0 when commentOnIssue throws', async () => {
@@ -437,17 +453,19 @@ describe('flagship-curate', () => {
       const prevKey = process.env['LINEAR_API_KEY'];
       process.env['LINEAR_API_KEY'] = 'test-key';
 
-      const result = await commands.default([], {
-        entity: 'anthropic',
-        budget: '1',
-        'linear-comment': 'QUA-124',
-      });
+      try {
+        const result = await commands.default([], {
+          entity: 'anthropic',
+          budget: '1',
+          'linear-comment': 'QUA-124',
+        });
 
-      expect(result.exitCode).toBe(0);
-      expect(mockCommentOnIssue).toHaveBeenCalledTimes(1);
-
-      if (prevKey === undefined) delete process.env['LINEAR_API_KEY'];
-      else process.env['LINEAR_API_KEY'] = prevKey;
+        expect(result.exitCode).toBe(0);
+        expect(mockCommentOnIssue).toHaveBeenCalledTimes(1);
+      } finally {
+        if (prevKey === undefined) delete process.env['LINEAR_API_KEY'];
+        else process.env['LINEAR_API_KEY'] = prevKey;
+      }
     });
 
     it('does not call commentOnIssue when --linear-comment is omitted', async () => {
@@ -578,6 +596,40 @@ describe('formatSummaryMarkdown', () => {
     expect(md).toContain('Foo \\| Bar Inc');
     // Make sure the row hasn't been broken into extra columns
     expect(md).not.toContain('| Foo | Bar Inc |');
+  });
+
+  it('strips newlines from entity titles to keep table rows intact', () => {
+    const results = [makeResult('Foo\nBar Inc', 0, 5, 10, 0.5, 60000)];
+    const md = formatSummaryMarkdown(results, {
+      budget: 5,
+      totalCost: 0.5,
+      mode: 'single',
+      limit: 1,
+      dryRun: false,
+      startedAt: FIXED_DATE,
+    });
+    // The row containing the title should be a single line
+    const titleLine = md.split('\n').find((l) => l.includes('Bar Inc'));
+    expect(titleLine).toBeDefined();
+    expect(titleLine).toContain('Foo Bar Inc');
+    expect(titleLine).not.toMatch(/\n/);
+  });
+
+  it('escapes markdown link brackets and backticks in entity titles', () => {
+    const results = [makeResult('[Click](javascript:alert(1)) `code` org', 0, 5, 10, 0.5, 60000)];
+    const md = formatSummaryMarkdown(results, {
+      budget: 5,
+      totalCost: 0.5,
+      mode: 'single',
+      limit: 1,
+      dryRun: false,
+      startedAt: FIXED_DATE,
+    });
+    // Bracket should be escaped so it can't form a markdown link
+    expect(md).toContain('\\[Click');
+    // Backticks should be replaced (not escaped) so they can't open inline code
+    expect(md).not.toMatch(/`code`/);
+    expect(md).toContain("'code'");
   });
 
   it('flags dry run in header and footer, and uses singular "entity" for n=1', () => {

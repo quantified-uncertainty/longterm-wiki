@@ -32,6 +32,7 @@ import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { escapeXml } from '../lib/prompt-utils.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { commentOnIssue } from '../lib/linear/issues.ts';
+import { parseLinearId } from '../lib/linear/parse-id.ts';
 
 // ── Constants ──────────────────────────────────────────────────────────
 
@@ -854,8 +855,18 @@ export function formatSummaryMarkdown(
     const pctAfter = totalAfter > 0 ? `${Math.round((confirmedAfter / totalAfter) * 100)}%` : '—';
     const delta = confirmedAfter - confirmedBefore;
     const deltaStr = delta > 0 ? `**+${delta}**` : delta < 0 ? `${delta}` : '0';
-    // Escape pipe chars in entity titles to avoid breaking the markdown table.
-    const safeTitle = r.entity.title.replace(/\|/g, '\\|');
+    // Sanitize entity titles before embedding in a markdown table cell:
+    //   - replace newlines/tabs with spaces (would break the row otherwise)
+    //   - escape pipes (would break the column count)
+    //   - escape `[` so we can't accidentally render a markdown link from a
+    //     hostile-looking title; bracket-only escape is enough since `]` and
+    //     `()` are inert without a leading `[`
+    //   - replace backticks so an unbalanced backtick can't open inline code
+    const safeTitle = r.entity.title
+      .replace(/[\r\n\t]+/g, ' ')
+      .replace(/\|/g, '\\|')
+      .replace(/\[/g, '\\[')
+      .replace(/`/g, "'");
     lines.push(
       `| ${safeTitle} | ${pctBefore} → ${pctAfter} | ${deltaStr} | ` +
       `${r.recordsCurated} | $${r.totalCost.toFixed(3)} | ${formatDuration(r.duration)} |`,
@@ -893,7 +904,10 @@ async function flagshipCurateCommand(
   const dryRun = !!(options['dry-run'] ?? options.dryRun);
   const skipResearch = !!(options['skip-research'] ?? options.skipResearch);
   const iterations = options.iterations ? parseInt(String(options.iterations), 10) : 2;
-  const linearIssue = (options['linear-comment'] ?? options.linearComment) as string | undefined;
+  const linearIssueRaw = (options['linear-comment'] ?? options.linearComment) as string | undefined;
+  // Normalise to canonical form via the shared parser so we don't drift from
+  // the QUA-team allowlist in `crux/lib/linear/parse-id.ts`.
+  const linearIssue = linearIssueRaw ? parseLinearId(linearIssueRaw) : null;
   const startedAt = new Date();
 
   if (!entityId && !isAll) {
@@ -928,11 +942,12 @@ Options:
   }
 
   // Validate Linear issue identifier shape if provided. Existence is checked
-  // at post time — fail fast on obviously malformed input now.
-  if (linearIssue && !/^[A-Z]+-\d+$/.test(linearIssue)) {
+  // at post time — fail fast on obviously malformed input now. `parseLinearId`
+  // returns `null` for anything that doesn't match the QUA team allowlist.
+  if (linearIssueRaw && !linearIssue) {
     return {
       exitCode: 1,
-      output: `Invalid --linear-comment value: "${linearIssue}". Expected format: "QUA-NNN".`,
+      output: `Invalid --linear-comment value: "${linearIssueRaw}". Expected format: "QUA-NNN".`,
     };
   }
 
