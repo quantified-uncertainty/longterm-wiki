@@ -1,5 +1,5 @@
 /**
- * Concurrency guard for source-check pipelines (QUA-150).
+ * Concurrency guard for sourcing pipelines (QUA-150).
  *
  * On 2026-04-09, running the sourcing orchestrator with `--concurrency=20`
  * overwhelmed the wiki-server with concurrent writes and tripped the
