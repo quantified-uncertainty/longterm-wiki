@@ -25,6 +25,17 @@ const mockStoreVerdict = vi.fn();
 const mockApiRequest = vi.fn();
 const mockSuggestResources = vi.fn();
 const mockCommentOnIssue = vi.fn();
+// Hoisted so the `vi.mock('../lib/llm.ts', ...)` factory (itself hoisted to
+// the top of the file) can reference it directly. The QUA-378 tests cast the
+// imported `callLlm` symbol to a vi.fn and call `.mockRejectedValueOnce()` on
+// it — that only works if `callLlm` IS the hoisted vi.fn, not a wrapper.
+const { mockCallLlm } = vi.hoisted(() => ({
+  mockCallLlm: vi.fn(async () => ({
+    text: '[]',
+    usage: { input_tokens: 100, output_tokens: 50 },
+    model: 'claude-haiku-4-5-20251001',
+  })),
+}));
 
 vi.mock('../lib/wiki-server/entities.ts', () => ({
   getEntity: (...args: unknown[]) => mockGetEntity(...args),
@@ -62,11 +73,7 @@ vi.mock('../lib/llm.ts', async (importOriginal) => {
   return {
     ...actual,
     createLlmClient: vi.fn(() => ({})),
-    callLlm: vi.fn(async () => ({
-      text: '[]', // empty research results
-      usage: { input_tokens: 100, output_tokens: 50 },
-      model: 'claude-haiku-4-5-20251001',
-    })),
+    callLlm: mockCallLlm,
     MODELS: { haiku: 'claude-haiku-4-5-20251001', sonnet: 'claude-sonnet-4-6', opus: 'claude-opus-4-6' },
   };
 });
@@ -153,6 +160,12 @@ function makePersonnel(items: Array<{ id: string; source?: string; displayName?:
 describe('flagship-curate', () => {
   beforeEach(() => {
     vi.clearAllMocks();
+    // Reset the callLlm mock to its default empty-array response.
+    mockCallLlm.mockImplementation(async () => ({
+      text: '[]',
+      usage: { input_tokens: 100, output_tokens: 50 },
+      model: 'claude-haiku-4-5-20251001',
+    }));
     // Suppress console output during tests
     vi.spyOn(console, 'log').mockImplementation(() => {});
     vi.spyOn(console, 'warn').mockImplementation(() => {});
@@ -532,6 +545,297 @@ describe('flagship-curate', () => {
       });
 
       expect(result.exitCode).toBe(2);
+    });
+  });
+
+  describe('Step 4 reset guard (QUA-382)', () => {
+    // Helper: set up an entity with 3 records that all need curation. All
+    // three have verdict=partial so discoverRecordsNeedingCuration preserves
+    // their insertion order when passing them to the research step.
+    // The research LLM returns URLs for indexes 0 and 1, skipping index 2.
+    function setupThreeRecordScenario() {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+          { recordType: 'personnel', recordId: 'p2', verdict: 'partial', displayName: 'Bob' },
+          { recordType: 'personnel', recordId: 'p3', verdict: 'partial', displayName: 'Carol' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(
+        makePersonnel([{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }]),
+      );
+      mockSyncPersonnel.mockResolvedValue({ ok: true, data: { updated: 2 } });
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM: return URLs for p1 (index 0) and p2 (index 1), skip p3.
+      mockCallLlm.mockResolvedValue({
+        text: JSON.stringify([
+          { index: 0, urls: ['https://example.com/alice'], reasoning: 'Team page' },
+          { index: 1, urls: ['https://example.com/bob'], reasoning: 'Team page' },
+        ]),
+        usage: { input_tokens: 100, output_tokens: 50 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+    }
+
+    function resetCalls() {
+      return mockStoreVerdict.mock.calls
+        .map((call) => call[0] as { recordId: string; verdict: string } | undefined)
+        .filter((arg) => arg?.verdict === 'unchecked');
+    }
+
+    it('resets only records whose URLs were successfully ingested in Step 3', async () => {
+      setupThreeRecordScenario();
+      // p1 URL succeeds, p2 URL fails.
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: 100, title: 'Alice' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 1,
+        cachedCount: 0,
+        errorCount: 1,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const resets = resetCalls();
+      const resetIds = resets.map((r) => r!.recordId).sort();
+      // Only p1 should be reset. p2's URL errored, p3 had no URL.
+      expect(resetIds).toEqual(['p1']);
+    });
+
+    it('skips Step 4 entirely when Step 3 produces no successful ingests', async () => {
+      setupThreeRecordScenario();
+      // All URLs fail.
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'error', contentLength: 0, title: null },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 2,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when suggestResources throws', async () => {
+      setupThreeRecordScenario();
+      mockSuggestResources.mockRejectedValue(new Error('firecrawl not installed'));
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when Step 2 research returns no URLs', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM returns empty array — no new URLs.
+      mockCallLlm.mockResolvedValue({
+        text: '[]',
+        usage: { input_tokens: 100, output_tokens: 50 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(mockSuggestResources).not.toHaveBeenCalled();
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('--skip-research resets all eligible records (no Step 3 gate)', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+          { recordType: 'personnel', recordId: 'p2', verdict: 'unverifiable', displayName: 'Bob' },
+          { recordType: 'personnel', recordId: 'p3', verdict: 'confirmed', displayName: 'Carol' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(
+        makePersonnel([{ id: 'p1' }, { id: 'p2' }, { id: 'p3' }]),
+      );
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        'skip-research': true,
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      // suggestResources must not have been called — research was skipped.
+      expect(mockSuggestResources).not.toHaveBeenCalled();
+      // p1 (partial) and p2 (unverifiable) reset; p3 (confirmed) is excluded
+      // before reset because it doesn't appear in records-needing-curation.
+      const resetIds = resetCalls().map((r) => r!.recordId).sort();
+      expect(resetIds).toEqual(['p1', 'p2']);
+    });
+
+    it('treats fresh-cache hits (status=ok, contentLength=null) as successful', async () => {
+      // The cached path in suggest-resources.ts returns status 'ok' with
+      // contentLength null (content exists but wasn't re-fetched, so length
+      // is unknown). These should still count as successful ingests.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: null, title: 'Alice (cached)' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'ok', contentLength: null, title: 'Bob (cached)' },
+        ],
+        fetchedCount: 0,
+        cachedCount: 2,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      const resetIds = resetCalls().map((r) => r!.recordId).sort();
+      expect(resetIds).toEqual(['p1', 'p2']);
+    });
+
+    it('treats paywall and dead statuses as failures (records not reset)', async () => {
+      // Records whose URLs all came back as paywall/dead should not be
+      // reset — the verifier may reject paywall content and strand them
+      // at 'unchecked', which is the original QUA-382 bug.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'paywall', contentLength: 500, title: 'Alice' },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'dead', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('skips Step 4 entirely when the verify budget is exhausted', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+      // Research LLM burns the entire budget so verifyBudget ends up ≤ 0.
+      mockCallLlm.mockResolvedValue({
+        text: JSON.stringify([
+          { index: 0, urls: ['https://example.com/alice'], reasoning: 'Team page' },
+        ]),
+        usage: { input_tokens: 1_000_000, output_tokens: 1_000_000 },
+        model: 'claude-haiku-4-5-20251001',
+      });
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'ok', contentLength: 100, title: 'Alice' },
+        ],
+        fetchedCount: 1,
+        cachedCount: 0,
+        errorCount: 0,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '0.0001', // too small — verifyBudget drops to ≤ 0 after research
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('guard still applies across multiple iterations (iterations=2)', async () => {
+      // With iterations=2, the guard must hold on both passes: Step 4 of
+      // iteration 2 must still only reset records that got new sources in
+      // iteration 2's own Step 3. Here Step 3 fails on both iterations, so
+      // no resets should ever fire.
+      setupThreeRecordScenario();
+      mockSuggestResources.mockResolvedValue({
+        resources: [
+          { url: 'https://example.com/alice', resourceId: 'r1', status: 'error', contentLength: 0, title: null },
+          { url: 'https://example.com/bob', resourceId: 'r2', status: 'error', contentLength: 0, title: null },
+        ],
+        fetchedCount: 0,
+        cachedCount: 0,
+        errorCount: 2,
+      });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        iterations: '2',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
+    });
+
+    it('does not reset contradicted records (only unverifiable/partial/outdated are resettable)', async () => {
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'contradicted', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        'skip-research': true,
+        iterations: '1',
+      });
+
+      expect(result.exitCode).toBe(0);
+      expect(resetCalls()).toEqual([]);
     });
   });
 
