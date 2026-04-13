@@ -362,7 +362,9 @@ audits:
     description: "hallucination_risk_snapshots row count stays under 140,000 (2× the ~70K target). Growth beyond this threshold indicates the retention task or FK cascade has stopped working — historically this has been a prod-stability issue (QUA-352, QUA-302)."
     check_type: hybrid
     check_command: |
-      curl -sSf --max-time 10 https://wiki-server.k8s.quantifieduncertainty.org/api/hallucination-risk/stats \
+      curl -sSf --max-time 10 \
+        -H "Authorization: Bearer ${PROD_LONGTERMWIKI_SERVER_API_KEY:-$LONGTERMWIKI_SERVER_API_KEY}" \
+        https://wiki-server.k8s.quantifieduncertainty.org/api/hallucination-risk/stats \
         | jq -er '.totalSnapshots | numbers' \
         | awk '{
             n=$1;
@@ -373,7 +375,9 @@ audits:
     how_to_verify: |
       The check_command curls the wiki-server /api/hallucination-risk/stats endpoint
       (which returns totalSnapshots computed from pg_class.reltuples — fast, no seq scan)
-      and fails if the value exceeds 140,000 (2× the 70,000 target).
+      and fails if the value exceeds 140,000 (2× the 70,000 target). All /api/* routes
+      require bearer auth (see app.ts:189), so the check sources the key from
+      PROD_LONGTERMWIKI_SERVER_API_KEY (preferred for prod) or LONGTERMWIKI_SERVER_API_KEY.
       If this fails:
       1. Check groundskeeper run history for the snapshot-retention task (Groundskeeper Runs dashboard, E926)
       2. Verify LONGTERMWIKI_SERVER_API_KEY is set in the groundskeeper k8s deployment
@@ -382,9 +386,14 @@ audits:
     frequency: weekly
     added: "2026-04-12"
     added_by_pr: 4261
-    last_checked: null
-    last_result: null
-    history: []
+    last_checked: "2026-04-13"
+    last_result: pass
+    last_result_note: "103697 snapshots / 140000 threshold (74%); 761 unique pages. Cascade FK fix from PR #4261 deployed today."
+    history:
+      - date: "2026-04-13"
+        result: pass
+        checked_by: "manual"
+        notes: "103697 snapshots / 140000 threshold (74%); 761 unique pages. Cascade FK fix from PR #4261 deployed today."
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
