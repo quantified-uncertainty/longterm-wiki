@@ -21,6 +21,7 @@ import {
   type SearchHit,
 } from "../search/research-agent.ts";
 import { getApiKey } from "../api-keys.ts";
+import { normalizeUrlForJoin as normalizeUrl } from "./url-quality.ts";
 
 /** Version tag for stored suggestions — bump when the generator changes shape. */
 export const GENERATOR_MODEL = "qua-64/suggest-urls-v1";
@@ -84,24 +85,6 @@ export function buildSearchQuery(opts: {
     .filter(Boolean)
     .join(" ")
     .slice(0, 300);
-}
-
-const TRACKING_PARAMS = [
-  "utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term",
-  "ref", "ref_src",
-];
-
-function normalizeUrl(url: string): string {
-  try {
-    const u = new URL(url);
-    u.hostname = u.hostname.toLowerCase();
-    u.hash = "";
-    for (const p of TRACKING_PARAMS) u.searchParams.delete(p);
-    const s = u.toString();
-    return s.endsWith("/") && u.pathname !== "/" ? s.slice(0, -1) : s;
-  } catch {
-    return url;
-  }
 }
 
 /**
