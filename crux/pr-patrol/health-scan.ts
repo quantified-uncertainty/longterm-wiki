@@ -117,6 +117,16 @@ export interface HealthIssue {
   /** Most-relevant link (failing run URL, failing commit URL). */
   url?: string;
   detectedAt: string;
+  /**
+   * Optional structured key used by the gate's cooldown fingerprint. When set,
+   * the gate prefers this over regex-parsing the `reason` string. Used by
+   * ratchet-drift to scope cooldowns per file: the fingerprint becomes
+   * `<type>:<fingerprintKey>` instead of relying on a brittle reason match.
+   * Set this whenever the issue type needs sub-cooldowns (per file, per
+   * workflow, etc.). Leave undefined when the type alone is the right scope.
+   * (QUA-309)
+   */
+  fingerprintKey?: string;
 }
 
 /**
@@ -617,6 +627,9 @@ export function combineHealth(
       score: RATCHET_DRIFT_SCORE,
       reason: drift.reason,
       detectedAt,
+      // Per-file cooldown key. Without this, the gate has to regex-parse
+      // `reason` to scope per file — fragile if reason text changes.
+      fingerprintKey: drift.name,
     });
   }
 
@@ -653,14 +666,17 @@ export async function checkDeployStatus(
     branch?: string;
     limit?: number;
     now?: Date;
+    /** Override the default `owner/name`. Defaults to the package's REPO constant. */
+    repo?: string;
   } = {},
 ): Promise<DeployStatusResult> {
   const workflow = options.workflow ?? WIKI_SERVER_DEPLOY_WORKFLOW;
   const branch = options.branch ?? 'production';
   const limit = options.limit ?? 5;
+  const repo = options.repo ?? REPO;
 
   const resp = await githubApi<ListRunsResponse>(
-    `/repos/${REPO}/actions/workflows/${encodeURIComponent(workflow)}/runs` +
+    `/repos/${repo}/actions/workflows/${encodeURIComponent(workflow)}/runs` +
       `?branch=${encodeURIComponent(branch)}&per_page=${limit}`,
   );
 
@@ -767,11 +783,18 @@ export function mapRollupState(
  * Throws if either GitHub call fails (5xx, rate limit, network). Phase 3 is
  * responsible for deciding policy on scanner failure — a transient API hiccup
  * shouldn't silently look like "healthy".
+ *
+ * Pass `repo` (e.g. `"my-org/my-repo"`) to scan a non-default repository.
+ * Defaults to the package's `REPO` constant. (QUA-309)
  */
-export async function healthScan(now: Date = new Date()): Promise<HealthScanResult> {
+export async function healthScan(
+  options: { now?: Date; repo?: string } = {},
+): Promise<HealthScanResult> {
+  const now = options.now ?? new Date();
+  const repo = options.repo;
   const [deploy, mainCi] = await Promise.all([
-    checkDeployStatus({ now }),
-    checkMainCi(),
+    checkDeployStatus({ now, repo }),
+    checkMainCi({ repo }),
   ]);
   const ratchet = checkRatchetDrift({ now });
   return combineHealth(deploy, mainCi, ratchet, now);

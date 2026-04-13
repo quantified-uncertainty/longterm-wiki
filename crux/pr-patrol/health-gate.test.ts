@@ -414,4 +414,86 @@ describe('fingerprintIssue', () => {
     expect(a).toBe('ratchet-drift:sourcing');
     expect(b).toBe('ratchet-drift:review-marker');
   });
+
+  // ── QUA-309: structured fingerprintKey ─────────────────────────────────────
+
+  it('prefers structured fingerprintKey over reason regex when both are present', () => {
+    const fp = fingerprintIssue({
+      type: 'ratchet-drift',
+      score: 150,
+      // Reason text that the regex would parse as "different baseline"
+      reason: 'sourcing baseline bumped 3× ↑',
+      detectedAt: NOW.toISOString(),
+      fingerprintKey: 'review-marker', // Override
+    });
+    expect(fp).toBe('ratchet-drift:review-marker');
+  });
+
+  it('uses structured fingerprintKey for non-ratchet issue types', () => {
+    const fp = fingerprintIssue({
+      type: 'main-ci-red',
+      score: 180,
+      reason: 'main has been red for 5 commits',
+      detectedAt: NOW.toISOString(),
+      fingerprintKey: 'workflow-X',
+    });
+    expect(fp).toBe('main-ci-red:workflow-X');
+  });
+
+  it('falls back to type alone when fingerprintKey absent for non-ratchet types', () => {
+    const fp = fingerprintIssue({
+      type: 'main-ci-red',
+      score: 180,
+      reason: 'main is red',
+      detectedAt: NOW.toISOString(),
+    });
+    expect(fp).toBe('main-ci-red');
+  });
+
+  it('falls back to regex parsing when ratchet issue has no fingerprintKey (back-compat)', () => {
+    // Older HealthIssue objects in the cooldown store predate the
+    // fingerprintKey field. The regex fallback must still work.
+    const fp = fingerprintIssue({
+      type: 'ratchet-drift',
+      score: 150,
+      reason: 'legacy-ratchet baseline bumped 3× ↑',
+      detectedAt: NOW.toISOString(),
+      // intentionally no fingerprintKey
+    });
+    expect(fp).toBe('ratchet-drift:legacy-ratchet');
+  });
+
+  it('falls back to "unknown" suffix when ratchet reason cannot be regex-parsed', () => {
+    const fp = fingerprintIssue({
+      type: 'ratchet-drift',
+      score: 150,
+      reason: 'something completely different',
+      detectedAt: NOW.toISOString(),
+    });
+    expect(fp).toBe('ratchet-drift:unknown');
+  });
+
+  it('survives a reason text edit when fingerprintKey is set (the bug QUA-309 fixes)', () => {
+    // Imagine the reason string format changes from "X baseline bumped..."
+    // to "Baseline X has drifted...". Without fingerprintKey, the regex
+    // would return "unknown" for both files and collapse them. With
+    // fingerprintKey, separation is preserved.
+    const a = fingerprintIssue({
+      type: 'ratchet-drift',
+      score: 150,
+      reason: 'Baseline foo has drifted 3× upward in 24h',
+      detectedAt: NOW.toISOString(),
+      fingerprintKey: 'foo',
+    });
+    const b = fingerprintIssue({
+      type: 'ratchet-drift',
+      score: 150,
+      reason: 'Baseline bar has drifted 3× upward in 24h',
+      detectedAt: NOW.toISOString(),
+      fingerprintKey: 'bar',
+    });
+    expect(a).toBe('ratchet-drift:foo');
+    expect(b).toBe('ratchet-drift:bar');
+    expect(a).not.toBe(b);
+  });
 });
