@@ -200,4 +200,77 @@ describe("FBCellValue", () => {
     render(<FBCellValue value={50_000_000} fieldName="amount" />);
     expect(screen.getByText("$50 million")).toBeInTheDocument();
   });
+
+  // Drizzle numeric() columns return JS strings. These tests guard the
+  // coerce-then-delegate path in FBCellValue against regressions.
+  describe("string-typed PG numeric fallback", () => {
+    it("formats string-typed funding round raised as USD", () => {
+      render(<FBCellValue value="8000000000" fieldName="raised" />);
+      expect(screen.getByText("$8 billion")).toBeInTheDocument();
+    });
+
+    it("formats string-typed valuation as USD", () => {
+      render(<FBCellValue value="380000000000" fieldName="valuation" />);
+      expect(screen.getByText("$380 billion")).toBeInTheDocument();
+    });
+
+    it("formats camelCase raisedLow (PG column) as USD", () => {
+      render(<FBCellValue value="2600000000" fieldName="raisedLow" />);
+      expect(screen.getByText("$2.6 billion")).toBeInTheDocument();
+    });
+
+    it("formats impliedValuation as USD", () => {
+      render(<FBCellValue value="61500000000" fieldName="impliedValuation" />);
+      expect(screen.getByText("$61.5 billion")).toBeInTheDocument();
+    });
+
+    it("formats string-typed fraction field as percentage", () => {
+      const fieldDef: FieldDef = { type: "number", description: "" };
+      render(<FBCellValue value="0.05" fieldName="stake" fieldDef={fieldDef} />);
+      expect(screen.getByText("5%")).toBeInTheDocument();
+    });
+
+    it("respects explicit unit from schema over default USD", () => {
+      const fieldDef: FieldDef = { type: "number", unit: "percent", description: "" };
+      const { container } = render(
+        <FBCellValue value="0.12" fieldName="raised" fieldDef={fieldDef} />
+      );
+      expect(container.textContent).toContain("%");
+      expect(container.textContent).not.toContain("$");
+    });
+
+    it("leaves non-currency string values to existing paths", () => {
+      render(<FBCellValue value="123" fieldName="notes" />);
+      expect(screen.getByText("123")).toBeInTheDocument();
+    });
+
+    it("does not crash on non-numeric string in currency field", () => {
+      render(<FBCellValue value="not a number" fieldName="amount" />);
+      expect(screen.getByText("not a number")).toBeInTheDocument();
+    });
+
+    it("renders empty output for empty string in currency field", () => {
+      // Empty string hits the length guard in the new block and falls through
+      // to formatKBCellValue which stringifies to "".
+      const { container } = render(<FBCellValue value="" fieldName="raised" />);
+      expect(container.textContent).toBe("");
+    });
+
+    it("handles non-finite strings gracefully", () => {
+      render(<FBCellValue value="Infinity" fieldName="valuation" />);
+      expect(screen.getByText("Infinity")).toBeInTheDocument();
+    });
+
+    it("formats string-typed zero as $0", () => {
+      render(<FBCellValue value="0" fieldName="raised" />);
+      expect(screen.getByText("$0")).toBeInTheDocument();
+    });
+
+    it("formats negative string currency correctly", () => {
+      // Would only occur for NAV-style fields, but the parse path handles it.
+      render(<FBCellValue value="-5000000" fieldName="amount" />);
+      const el = screen.getByText(/5 million/);
+      expect(el.textContent).toMatch(/-|\$/);
+    });
+  });
 });
