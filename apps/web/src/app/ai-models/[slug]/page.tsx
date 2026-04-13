@@ -6,7 +6,6 @@ import {
   resolveAiModelBySlug,
   getAiModelSlugs,
   getRelatedModels,
-  isModelFamily,
 } from "../ai-model-utils";
 import { resolveSlugAlias } from "@/data/factbase";
 import {
@@ -14,9 +13,18 @@ import {
   SAFETY_LEVEL_COLORS,
   formatContext,
 } from "../ai-model-constants";
-import { Breadcrumbs, ProfileStatCard } from "@/components/directory";
-import { safeHref } from "@/lib/directory-utils";
-import { BenchmarkScorecard } from "./benchmark-scorecard";
+import { ProfileStatCard, type ProfileTab } from "@/components/directory";
+import {
+  computeAiModelCoverage,
+  getAiModelSignals,
+} from "@/components/coverage/coverage-score";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  OverviewTab,
+  PricingTab,
+  BenchmarksTab,
+  FamilyTab,
+} from "@/app/ai-models/[slug]/tabs";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));
@@ -33,10 +41,6 @@ export async function generateMetadata({
     title: entity ? `${entity.title} | AI Models` : "AI Model Not Found",
     description: entity?.description ?? undefined,
   };
-}
-
-function formatPrice(price: number): string {
-  return `\$${price.toFixed(2)}`;
 }
 
 export default async function AiModelDetailPage({
@@ -67,9 +71,6 @@ export default async function AiModelDetailPage({
       m.developer === entity.developer &&
       (!m.modelFamily || m.modelFamily !== entity.modelFamily),
   );
-
-  // Is this a family entry?
-  const isFamily = isModelFamily(entity);
 
   // Build stat cards
   const stats: Array<{
@@ -102,343 +103,176 @@ export default async function AiModelDetailPage({
     stats.push({ label: "Safety Level", value: entity.safetyLevel });
   }
 
-  return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: "AI Models", href: "/ai-models" },
-          { label: entity.title },
-        ]}
-      />
+  // ── Build tabs ──
+  // Tabs hide automatically via ProfileTabs when count === 0, so a model
+  // with no pricing won't show the Pricing tab, etc.
+  const tabs: ProfileTab[] = [
+    {
+      id: "overview",
+      label: "Overview",
+      content: <OverviewTab entity={entity} />,
+    },
+  ];
 
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2 flex-wrap">
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {entity.title}
-          </h1>
-          {entity.developer && (
-            <Link
-              href={`/organizations/${entity.developer}`}
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity ${
-                DEVELOPER_COLORS[entity.developer] ??
-                "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              }`}
-            >
-              {developerEntity?.title ?? entity.developer}
-            </Link>
-          )}
-          {entity.openWeight && (
-            <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
-              Open Weight
-            </span>
-          )}
-          {entity.safetyLevel && (
-            <span
-              className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
-                SAFETY_LEVEL_COLORS[entity.safetyLevel] ??
-                "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-              }`}
-            >
-              {entity.safetyLevel}
-            </span>
-          )}
-        </div>
+  if (entity.inputPrice != null || entity.outputPrice != null) {
+    tabs.push({
+      id: "pricing",
+      label: "Pricing",
+      content: <PricingTab entity={entity} />,
+    });
+  }
 
-        {entity.description && (
-          <p className="text-muted-foreground text-sm max-w-3xl leading-relaxed">
-            {entity.description}
-          </p>
-        )}
+  if (entity.benchmarks.length > 0) {
+    tabs.push({
+      id: "benchmarks",
+      label: "Benchmarks",
+      count: entity.benchmarks.length,
+      content: <BenchmarksTab entity={entity} />,
+    });
+  }
 
-        <div className="flex items-center gap-4 mt-3 text-sm">
-          {entity.wikiId && getPageById(entity.id) && (
-            <Link
-              href={`/wiki/${entity.wikiId}`}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Wiki page &rarr;
-            </Link>
-          )}
-          <Link
-            href={`/ai-models/${slug}/data`}
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            Data &rarr;
-          </Link>
-        </div>
-      </div>
+  if (sameFamily.length > 0 || sameDeveloper.length > 0) {
+    tabs.push({
+      id: "family",
+      label: "Family",
+      count: sameFamily.length + sameDeveloper.length,
+      content: (
+        <FamilyTab
+          entity={entity}
+          sameFamily={sameFamily}
+          sameDeveloper={sameDeveloper}
+          developerName={developerEntity?.title ?? "Developer"}
+        />
+      ),
+    });
+  }
 
-      {/* Stat cards */}
-      {stats.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
-          {stats.map((s) => (
-            <ProfileStatCard key={s.label} {...s} />
-          ))}
-        </div>
+  const titlePills = (
+    <>
+      {entity.developer && (
+        <Link
+          href={`/organizations/${entity.developer}`}
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold hover:opacity-80 transition-opacity ${
+            DEVELOPER_COLORS[entity.developer] ??
+            "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          }`}
+        >
+          {developerEntity?.title ?? entity.developer}
+        </Link>
       )}
+      {entity.openWeight && (
+        <span className="inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold bg-teal-100 text-teal-700 dark:bg-teal-900/30 dark:text-teal-300">
+          Open Weight
+        </span>
+      )}
+      {entity.safetyLevel && (
+        <span
+          className={`inline-flex items-center px-2 py-0.5 rounded text-[10px] font-semibold ${
+            SAFETY_LEVEL_COLORS[entity.safetyLevel] ??
+            "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
+          }`}
+        >
+          {entity.safetyLevel}
+        </span>
+      )}
+    </>
+  );
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Main content */}
-        <div className="lg:col-span-2 space-y-8">
-          {/* Pricing */}
-          {(entity.inputPrice != null || entity.outputPrice != null) && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Pricing
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Type
-                      </th>
-                      <th className="py-2.5 px-4 text-right font-medium">
-                        Price per MTok
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {entity.inputPrice != null && (
-                      <tr className="hover:bg-muted/20 transition-colors">
-                        <td className="py-2.5 px-4">Input</td>
-                        <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                          {formatPrice(entity.inputPrice)}
-                        </td>
-                      </tr>
-                    )}
-                    {entity.outputPrice != null && (
-                      <tr className="hover:bg-muted/20 transition-colors">
-                        <td className="py-2.5 px-4">Output</td>
-                        <td className="py-2.5 px-4 text-right tabular-nums font-semibold">
-                          {formatPrice(entity.outputPrice)}
-                        </td>
-                      </tr>
-                    )}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
+  const headerLinks = [
+    ...(entity.wikiId && getPageById(entity.wikiId)
+      ? [{ label: "Wiki page", href: `/wiki/${entity.wikiId}` }]
+      : []),
+    { label: "Data", href: `/ai-models/${slug}/data` },
+  ];
 
-          {/* Benchmarks */}
-          {entity.benchmarks.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Benchmarks
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {entity.benchmarks.length}
-                </span>
-              </h2>
-              <BenchmarkScorecard
-                benchmarks={entity.benchmarks}
-                modelId={entity.id}
-              />
-            </section>
-          )}
+  const coverageInput = {
+    developer: entity.developer,
+    releaseDate: entity.releaseDate,
+    inputPrice: entity.inputPrice,
+    outputPrice: entity.outputPrice,
+    contextWindow: entity.contextWindow,
+    parameterCount: entity.parameterCount,
+    safetyLevel: entity.safetyLevel,
+    benchmarkCount: entity.benchmarks.length,
+    wikiId: entity.wikiId,
+  };
+  const coverageScore = computeAiModelCoverage(coverageInput);
+  const coverageSignals = getAiModelSignals(coverageInput);
 
-          {/* Family models */}
-          {sameFamily.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                {entity.modelFamily} Family
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sameFamily.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Model
-                      </th>
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Tier
-                      </th>
-                      <th className="py-2.5 px-4 text-left font-medium">
-                        Released
-                      </th>
-                      <th className="py-2.5 px-4 text-right font-medium">
-                        Input $/MTok
-                      </th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-border/50">
-                    {sameFamily
-                      .sort((a, b) =>
-                        (b.releaseDate ?? "").localeCompare(
-                          a.releaseDate ?? "",
-                        ),
-                      )
-                      .map((m) => (
-                        <tr
-                          key={m.id}
-                          className="hover:bg-muted/20 transition-colors"
-                        >
-                          <td className="py-2.5 px-4">
-                            <Link
-                              href={`/ai-models/${m.id}`}
-                              className="font-medium hover:text-primary transition-colors"
-                            >
-                              {m.title}
-                            </Link>
-                          </td>
-                          <td className="py-2.5 px-4 text-muted-foreground capitalize">
-                            {m.modelTier ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                          <td className="py-2.5 px-4 text-muted-foreground">
-                            {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                          <td className="py-2.5 px-4 text-right tabular-nums">
-                            {m.inputPrice != null
-                              ? formatPrice(m.inputPrice)
-                              : <span className="text-muted-foreground/40">&mdash;</span>}
-                          </td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            </section>
-          )}
-
-          {/* Other models from same developer */}
-          {sameDeveloper.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Other {developerEntity?.title ?? "Developer"} Models
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {sameDeveloper.length}
-                </span>
-              </h2>
-              <div className="border border-border/60 rounded-xl bg-card divide-y divide-border/40">
-                {sameDeveloper
-                  .sort((a, b) =>
-                    (b.releaseDate ?? "").localeCompare(a.releaseDate ?? ""),
-                  )
-                  .slice(0, 10)
-                  .map((m) => (
-                    <div key={m.id} className="px-4 py-3">
-                      <div className="flex items-center justify-between gap-2">
-                        <Link
-                          href={`/ai-models/${m.id}`}
-                          className="font-medium text-sm hover:text-primary transition-colors"
-                        >
-                          {m.title}
-                        </Link>
-                        <span className="text-xs text-muted-foreground tabular-nums">
-                          {m.releaseDate ?? <span className="text-muted-foreground/40">&mdash;</span>}
-                        </span>
-                      </div>
-                      {m.modelFamily && (
-                        <div className="text-xs text-muted-foreground/60 mt-0.5">
-                          {m.modelFamily}{" "}
-                          {m.modelTier ? `(${m.modelTier})` : ""}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                {sameDeveloper.length > 10 && (
-                  <div className="px-4 py-3 text-center">
-                    <span className="text-xs text-muted-foreground">
-                      Showing 10 of {sameDeveloper.length} models
-                    </span>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-        </div>
-
-        {/* Sidebar */}
-        <div className="space-y-8">
-          {/* Model details */}
-          <section>
-            <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
-            <div className="border border-border/60 rounded-xl bg-card">
-              <DetailRow label="Model Family" value={entity.modelFamily} />
-              <DetailRow label="Tier" value={entity.modelTier} capitalize />
-              <DetailRow label="Generation" value={entity.generation} />
-              <DetailRow label="Release Date" value={entity.releaseDate} />
-              <DetailRow
-                label="Parameters"
-                value={entity.parameterCount}
-              />
-              <DetailRow
-                label="Context Window"
-                value={
-                  entity.contextWindow != null
-                    ? `${formatContext(entity.contextWindow)} tokens`
-                    : undefined
-                }
-              />
-              <DetailRow
-                label="Training Cutoff"
-                value={entity.trainingCutoff}
-              />
-              <DetailRow
-                label="Open Weight"
-                value={
-                  entity.openWeight != null
-                    ? entity.openWeight
-                      ? "Yes"
-                      : "No"
-                    : undefined
-                }
-              />
-              <DetailRow label="Safety Level" value={entity.safetyLevel} />
-              {entity.modality.length > 0 && (
-                <DetailRow
-                  label="Modality"
-                  value={entity.modality.join(", ")}
-                />
-              )}
-            </div>
-          </section>
-
-          {/* Capabilities */}
-          {entity.capabilities.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">
-                Capabilities
-                <span className="ml-2 text-sm font-normal text-muted-foreground">
-                  {entity.capabilities.length}
-                </span>
-              </h2>
-              <div className="flex flex-wrap gap-1.5">
-                {entity.capabilities.map((cap) => (
-                  <span
-                    key={cap}
-                    className="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border border-border/60 bg-card text-muted-foreground"
-                  >
-                    {cap}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {/* Tags */}
-          {entity.tags.length > 0 && (
-            <section>
-              <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
-              <div className="flex flex-wrap gap-1.5">
-                {entity.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-            </section>
-          )}
-        </div>
-      </div>
+  const statCards = stats.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+      {stats.map((s) => (
+        <ProfileStatCard key={s.label} {...s} />
+      ))}
     </div>
+  );
+
+  // Sidebar: Details + Tags. Capabilities moved into the Overview tab so
+  // the sidebar stays focused on canonical metadata.
+  const sidebar = (
+    <>
+      <section>
+        <h2 className="text-lg font-bold tracking-tight mb-4">Details</h2>
+        <div className="border border-border/60 rounded-xl bg-card">
+          <DetailRow label="Model Family" value={entity.modelFamily} />
+          <DetailRow label="Tier" value={entity.modelTier} capitalize />
+          <DetailRow label="Generation" value={entity.generation} />
+          <DetailRow label="Release Date" value={entity.releaseDate} />
+          <DetailRow label="Parameters" value={entity.parameterCount} />
+          <DetailRow
+            label="Context Window"
+            value={
+              entity.contextWindow != null
+                ? `${formatContext(entity.contextWindow)} tokens`
+                : undefined
+            }
+          />
+          <DetailRow label="Training Cutoff" value={entity.trainingCutoff} />
+          <DetailRow
+            label="Open Weight"
+            value={
+              entity.openWeight != null ? (entity.openWeight ? "Yes" : "No") : undefined
+            }
+          />
+          <DetailRow label="Safety Level" value={entity.safetyLevel} />
+        </div>
+      </section>
+
+      {entity.tags.length > 0 && (
+        <section>
+          <h2 className="text-lg font-bold tracking-tight mb-4">Tags</h2>
+          <div className="flex flex-wrap gap-1.5">
+            {entity.tags.map((tag) => (
+              <span
+                key={tag}
+                className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted/50 text-muted-foreground"
+              >
+                {tag}
+              </span>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
+
+  return (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "AI Models", href: "/ai-models" },
+        { label: entity.title },
+      ]}
+      entityId={entity.id}
+      title={entity.title}
+      titlePills={titlePills}
+      coverage={{ score: coverageScore, signals: coverageSignals }}
+      subtitle={entity.description || undefined}
+      headerLinks={headerLinks}
+      statCards={statCards}
+      tabs={tabs}
+      tabsAriaLabel="AI model sections"
+      sidebar={sidebar}
+    />
   );
 }
 

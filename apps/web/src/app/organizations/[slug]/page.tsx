@@ -25,7 +25,12 @@ import {
   FactsPanel,
 } from "@/components/directory";
 
-import { OrgProfileHeader } from "./org-profile-header";
+import { buildOrgShellSlots } from "./org-profile-header";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 import { RelatedPages } from "@/components/RelatedPages";
 
 // Shared components & helpers
@@ -101,8 +106,7 @@ import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
 import Markdown from "react-markdown";
 
-// Client-side tabs
-import { OrgProfileTabs, type OrgTab } from "./org-tabs";
+import type { ProfileTab as OrgTab } from "@/components/directory";
 
 // ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
 export const revalidate = 3600;
@@ -150,9 +154,9 @@ export default async function OrgProfilePage({
   const { entity } = result;
   const data = loadOrgPageData(entity, slug);
 
-  // ── Fetch PG data (personnel + market data + grants) in parallel ──
+  // ── Fetch PG data (personnel + market data + grants + sourcing) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
@@ -163,7 +167,9 @@ export default async function OrgProfilePage({
       `/api/grants/by-entity/${encodeURIComponent(entityStableId)}?role=grantee&limit=1&offset=0`,
       { revalidate: 3600, timeoutMs: 10_000 },
     ),
+    fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
   ]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
   // PG grants: check if wiki-server has grants for this org (as funder)
   if (!pgGrantsData && entityStableId) {
@@ -709,30 +715,30 @@ export default async function OrgProfilePage({
     wikiPageId: entity.wikiPageId,
   };
 
-  const headerData = {
-    id: entity.id,
-    name: entity.name,
-    aliases: entity.aliases,
-    orgType: data.orgType,
-    orgStatus: data.orgStatus,
-    foundedDateStr: data.foundedDateStr ?? null,
-    orgAge: data.orgAge ?? null,
-    hqText: data.hqText,
-    websiteUrl: data.websiteUrl,
-    wikiHref: data.wikiHref,
-    founders: data.founders,
-    coverageInput,
-    // entity has no sourcing verdicts yet; needs server-side roll-up from
-    // personnel/grant/division children (QUA-136)
-    verdict: null,
-  };
+  const shellSlots = buildOrgShellSlots(
+    {
+      id: entity.id,
+      name: entity.name,
+      aliases: entity.aliases,
+      orgType: data.orgType,
+      orgStatus: data.orgStatus,
+      foundedDateStr: data.foundedDateStr ?? null,
+      orgAge: data.orgAge ?? null,
+      hqText: data.hqText,
+      websiteUrl: data.websiteUrl,
+      wikiHref: data.wikiHref,
+      founders: data.founders,
+      coverageInput,
+      verdict: rollupVerdict,
+    },
+    { activePage: "profile" },
+  );
 
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8 overflow-x-hidden">
-      <OrgProfileHeader data={headerData} activePage="profile" />
-
-      {/* ── Tabbed content ─────────────────────────────────────── */}
-      <OrgProfileTabs tabs={tabs} ariaLabel="Organization sections" />
-    </div>
+    <EntityProfileShell
+      {...shellSlots}
+      tabs={tabs}
+      tabsAriaLabel="Organization sections"
+    />
   );
 }

@@ -116,6 +116,17 @@ export function computeAiModelCoverage(row: AiModelCoverageInput): number {
   return 1;
 }
 
+export function getAiModelSignals(row: AiModelCoverageInput): string[] {
+  const signals: string[] = [];
+  if (row.inputPrice != null || row.outputPrice != null) signals.push("Pricing");
+  if (row.contextWindow != null) signals.push("Context window");
+  if (row.parameterCount) signals.push("Parameter count");
+  if (row.safetyLevel) signals.push("Safety level");
+  if ((row.benchmarkCount ?? 0) >= 3) signals.push("Benchmarks");
+  if (row.wikiId) signals.push("Wiki page");
+  return signals;
+}
+
 // ── Legislation scoring ─────────────────────────────────────────────
 
 export interface LegislationCoverageInput {
