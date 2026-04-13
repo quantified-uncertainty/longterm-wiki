@@ -22,7 +22,7 @@ interface CleanupOptions extends BaseOptions {
   ci?: boolean;
 }
 
-function formatOutput(result: CleanupOrphansResult, _applied: boolean): string {
+function formatOutput(result: CleanupOrphansResult): string {
   const lines: string[] = [];
   const { dryRun, deleted, byType } = result;
   const header = dryRun
@@ -94,7 +94,7 @@ async function cleanupCommand(
 
   return {
     exitCode: 0,
-    output: formatOutput(result, apply),
+    output: formatOutput(result),
   };
 }
 
@@ -129,6 +129,10 @@ Safety:
   - Default is dry-run. You must pass --apply to delete.
   - Only record_types listed in LIVE_RECORDS_CTE are touched. Rows with an
     unknown record_type are left alone.
-  - Deletes run inside a single transaction; partial writes are impossible.
+  - With --apply, all three DELETEs run in one transaction (rolled back on
+    any error) and the reported counts come from DELETE ... RETURNING, so
+    they exactly match what was removed — no SELECT/DELETE drift.
+  - Dry-run counts come from a SELECT and may legitimately drift from a
+    later --apply if the database changes between the two calls.
 `.trim();
 }

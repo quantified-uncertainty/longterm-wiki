@@ -243,7 +243,9 @@ const ByPageQuery = z.object({
  */
 const CleanupOrphansBody = z.object({
   dryRun: z.boolean().default(true),
-  recordType: z.string().max(50).optional(),
+  // Empty string would silently match no rows; reject it to force callers
+  // to omit the field when they want to scan every type.
+  recordType: z.string().min(1).max(50).optional(),
 });
 
 const VALID_ERROR_TYPES = [
@@ -2141,129 +2143,179 @@ const sourcingApp = new Hono()
     const { dryRun, recordType } = parsed.data;
     const db = getDrizzleDb();
 
-    const typeFilter = recordType
+    // Per-table type-filter clauses. Each DELETE/SELECT uses a different
+    // table alias, so the filter has to be parameterized by alias.
+    const verdictTypeFilter = recordType
       ? sql`AND v.record_type = ${recordType}`
       : sql``;
+    const evidenceTypeFilter = recordType
+      ? sql`AND e.record_type = ${recordType}`
+      : sql``;
+    const suggestionTypeFilter = recordType
+      ? sql`AND s.record_type = ${recordType}`
+      : sql``;
 
-    // Rows targeted for deletion: known record_type, but the (type, id) pair
-    // is missing from live_records. Returned verbatim so dryRun/non-dryRun
-    // share the same counting logic.
-    const verdictOrphansSql = sql`
-      WITH ${LIVE_RECORDS_CTE}
-      SELECT v.record_type, v.record_id, v.field_name
-      FROM source_check_verdicts v
-      WHERE v.record_type IN (SELECT DISTINCT record_type FROM live_records)
-        ${typeFilter}
-        AND NOT EXISTS (
-          SELECT 1 FROM live_records lr
-          WHERE lr.record_type = v.record_type AND lr.record_id = v.record_id
-        )
-    `;
-    const evidenceOrphansSql = sql`
-      WITH ${LIVE_RECORDS_CTE}
-      SELECT e.id, e.record_type
-      FROM source_check_evidence e
-      WHERE e.record_type IN (SELECT DISTINCT record_type FROM live_records)
-        ${recordType ? sql`AND e.record_type = ${recordType}` : sql``}
-        AND NOT EXISTS (
-          SELECT 1 FROM live_records lr
-          WHERE lr.record_type = e.record_type AND lr.record_id = e.record_id
-        )
-    `;
-    const suggestionOrphansSql = sql`
-      WITH ${LIVE_RECORDS_CTE}
-      SELECT s.id, s.record_type
-      FROM sourcing_url_suggestions s
-      WHERE s.record_type IN (SELECT DISTINCT record_type FROM live_records)
-        ${recordType ? sql`AND s.record_type = ${recordType}` : sql``}
-        AND NOT EXISTS (
-          SELECT 1 FROM live_records lr
-          WHERE lr.record_type = s.record_type AND lr.record_id = s.record_id
-        )
-    `;
-
-    // Count-then-delete pattern. The COUNT runs even in non-dryRun mode so
-    // we can build byType without a second scan. Dry-run short-circuits
-    // before the DELETE statements.
-    const [verdictRows, evidenceRows, suggestionRows] = await Promise.all([
-      db.execute<{
-        record_type: string;
-        record_id: string;
-        field_name: string | null;
-      }>(verdictOrphansSql),
-      db.execute<{ id: number | string; record_type: string }>(evidenceOrphansSql),
-      db.execute<{ id: number | string; record_type: string }>(suggestionOrphansSql),
-    ]);
-
-    const byType: Record<
-      string,
-      { verdicts: number; evidence: number; suggestions: number }
-    > = {};
-    const bump = (type: string, key: "verdicts" | "evidence" | "suggestions") => {
-      const slot = byType[type] ?? { verdicts: 0, evidence: 0, suggestions: 0 };
-      slot[key] += 1;
-      byType[type] = slot;
-    };
-    for (const r of verdictRows) bump(r.record_type, "verdicts");
-    for (const r of evidenceRows) bump(r.record_type, "evidence");
-    for (const r of suggestionRows) bump(r.record_type, "suggestions");
-
-    const counts = {
-      verdicts: verdictRows.length,
-      evidence: evidenceRows.length,
-      suggestions: suggestionRows.length,
+    // Aggregate returns { byType, counts } where counts.verdicts is the
+    // sum across all types. For DELETE RETURNING we get one row per
+    // deleted record; for the dry-run GROUP BY we get one row per type
+    // with a pre-computed `cnt`.
+    type GroupRow = { record_type: string; cnt: number };
+    const aggregate = (
+      verdictGroups: readonly GroupRow[],
+      evidenceGroups: readonly GroupRow[],
+      suggestionGroups: readonly GroupRow[],
+    ) => {
+      const byType: Record<
+        string,
+        { verdicts: number; evidence: number; suggestions: number }
+      > = {};
+      const bump = (
+        type: string,
+        key: "verdicts" | "evidence" | "suggestions",
+        delta: number,
+      ) => {
+        const slot =
+          byType[type] ?? { verdicts: 0, evidence: 0, suggestions: 0 };
+        slot[key] += delta;
+        byType[type] = slot;
+      };
+      let verdicts = 0;
+      let evidence = 0;
+      let suggestions = 0;
+      for (const r of verdictGroups) {
+        const n = Number(r.cnt);
+        bump(r.record_type, "verdicts", n);
+        verdicts += n;
+      }
+      for (const r of evidenceGroups) {
+        const n = Number(r.cnt);
+        bump(r.record_type, "evidence", n);
+        evidence += n;
+      }
+      for (const r of suggestionGroups) {
+        const n = Number(r.cnt);
+        bump(r.record_type, "suggestions", n);
+        suggestions += n;
+      }
+      return { byType, counts: { verdicts, evidence, suggestions } };
     };
 
     if (dryRun) {
-      return c.json({
-        dryRun: true,
-        deleted: counts,
-        byType,
-      });
+      // Dry-run: GROUP BY returns O(types) rows regardless of orphan
+      // count, so a million-row orphan set still fits in memory. No
+      // transaction because nothing is mutated; the reported counts
+      // may legitimately drift by the time a later --apply runs.
+      const [verdictGroups, evidenceGroups, suggestionGroups] =
+        await Promise.all([
+          db.execute<GroupRow>(sql`
+            WITH ${LIVE_RECORDS_CTE}
+            SELECT v.record_type, count(*)::int AS cnt
+            FROM source_check_verdicts v
+            WHERE v.record_type IN (SELECT DISTINCT record_type FROM live_records)
+              ${verdictTypeFilter}
+              AND NOT EXISTS (
+                SELECT 1 FROM live_records lr
+                WHERE lr.record_type = v.record_type AND lr.record_id = v.record_id
+              )
+            GROUP BY v.record_type
+          `),
+          db.execute<GroupRow>(sql`
+            WITH ${LIVE_RECORDS_CTE}
+            SELECT e.record_type, count(*)::int AS cnt
+            FROM source_check_evidence e
+            WHERE e.record_type IN (SELECT DISTINCT record_type FROM live_records)
+              ${evidenceTypeFilter}
+              AND NOT EXISTS (
+                SELECT 1 FROM live_records lr
+                WHERE lr.record_type = e.record_type AND lr.record_id = e.record_id
+              )
+            GROUP BY e.record_type
+          `),
+          db.execute<GroupRow>(sql`
+            WITH ${LIVE_RECORDS_CTE}
+            SELECT s.record_type, count(*)::int AS cnt
+            FROM sourcing_url_suggestions s
+            WHERE s.record_type IN (SELECT DISTINCT record_type FROM live_records)
+              ${suggestionTypeFilter}
+              AND NOT EXISTS (
+                SELECT 1 FROM live_records lr
+                WHERE lr.record_type = s.record_type AND lr.record_id = s.record_id
+              )
+            GROUP BY s.record_type
+          `),
+        ]);
+
+      const { byType, counts } = aggregate(
+        verdictGroups,
+        evidenceGroups,
+        suggestionGroups,
+      );
+      return c.json({ dryRun: true, deleted: counts, byType });
     }
 
-    // Non-dry-run: run the deletes in a single transaction. We re-run the
-    // same NOT EXISTS condition inside DELETE so the operation is atomic —
-    // no reliance on the IDs we just fetched, which avoids TOCTOU issues
-    // if the table changes between the SELECT and DELETE.
-    await db.transaction(async (tx) => {
-      await tx.execute(sql`
+    // Non-dry-run: `DELETE … RETURNING record_type` inside a transaction
+    // gives the exact set of rows removed, so the reported byType/counts
+    // always reflect the actual DB state change — no TOCTOU gap between
+    // a pre-count SELECT and the DELETE. We then GROUP the returned rows
+    // in-process (O(rows) Node memory, but the row count is bounded by
+    // what we just removed — on the order of hundreds in practice).
+    const deleted = await db.transaction(async (tx) => {
+      const v = await tx.execute<{ record_type: string }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         DELETE FROM source_check_verdicts v
         WHERE v.record_type IN (SELECT DISTINCT record_type FROM live_records)
-          ${typeFilter}
+          ${verdictTypeFilter}
           AND NOT EXISTS (
             SELECT 1 FROM live_records lr
             WHERE lr.record_type = v.record_type AND lr.record_id = v.record_id
           )
+        RETURNING v.record_type
       `);
-      await tx.execute(sql`
+      const e = await tx.execute<{ record_type: string }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         DELETE FROM source_check_evidence e
         WHERE e.record_type IN (SELECT DISTINCT record_type FROM live_records)
-          ${recordType ? sql`AND e.record_type = ${recordType}` : sql``}
+          ${evidenceTypeFilter}
           AND NOT EXISTS (
             SELECT 1 FROM live_records lr
             WHERE lr.record_type = e.record_type AND lr.record_id = e.record_id
           )
+        RETURNING e.record_type
       `);
-      await tx.execute(sql`
+      const s = await tx.execute<{ record_type: string }>(sql`
         WITH ${LIVE_RECORDS_CTE}
         DELETE FROM sourcing_url_suggestions s
         WHERE s.record_type IN (SELECT DISTINCT record_type FROM live_records)
-          ${recordType ? sql`AND s.record_type = ${recordType}` : sql``}
+          ${suggestionTypeFilter}
           AND NOT EXISTS (
             SELECT 1 FROM live_records lr
             WHERE lr.record_type = s.record_type AND lr.record_id = s.record_id
           )
+        RETURNING s.record_type
       `);
+      return { v, e, s };
     });
 
-    return c.json({
-      dryRun: false,
-      deleted: counts,
-      byType,
-    });
+    // Convert the raw RETURNING rows into GroupRow shape (one row per
+    // record_type with a cnt) so the aggregate helper can share code
+    // with the dry-run path.
+    const toGroups = (rows: readonly { record_type: string }[]): GroupRow[] => {
+      const counts = new Map<string, number>();
+      for (const r of rows) {
+        counts.set(r.record_type, (counts.get(r.record_type) ?? 0) + 1);
+      }
+      return Array.from(counts.entries()).map(([record_type, cnt]) => ({
+        record_type,
+        cnt,
+      }));
+    };
+
+    const { byType, counts } = aggregate(
+      toGroups(deleted.v),
+      toGroups(deleted.e),
+      toGroups(deleted.s),
+    );
+    return c.json({ dryRun: false, deleted: counts, byType });
   });
 
 // ---- Exports ----
