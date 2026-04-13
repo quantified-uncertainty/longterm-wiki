@@ -40,10 +40,8 @@ const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
 const DEFAULT_BUDGET_USD = 1.0;
 const DEFAULT_MAX_CANDIDATES = 3;
+const MAX_CANDIDATES_PER_RECORD = 10;
 const GENERATOR_MODEL = 'qua-64/suggest-urls-v1';
-
-const VALID_STATUS_FILTERS = ['pending', 'approved', 'rejected', 'auto_verified'] as const;
-type StatusFilter = (typeof VALID_STATUS_FILTERS)[number];
 
 // ── Option helpers ───────────────────────────────────────────────────
 
@@ -99,7 +97,7 @@ async function suggestCommand(
   const maxCandidates = parsePositiveInt(
     options['max-candidates'] ?? options.maxCandidates,
     DEFAULT_MAX_CANDIDATES,
-    10,
+    MAX_CANDIDATES_PER_RECORD,
   );
   const recordTypeFilter = options.type?.trim() || undefined;
   const entityFilter = options.entity?.trim() || undefined;
@@ -168,6 +166,12 @@ async function suggestCommand(
 
   const allSuggestions: UrlSuggestionInput[] = [];
 
+  // Batch pre-fetch: build a set of (recordType, recordId) pairs that already
+  // have a pending suggestion, so we don't make one HTTP call per record.
+  const existingPendingSet = skipExisting
+    ? await buildExistingPendingSet(recordTypeFilter, verdictRows.length, log)
+    : new Set<string>();
+
   for (const v of verdictRows) {
     summary.scanned++;
 
@@ -187,18 +191,9 @@ async function suggestCommand(
       continue;
     }
 
-    // Skip if we already have pending suggestions for this record (dedup).
-    if (skipExisting) {
-      const existingList = await listUrlSuggestions({
-        recordType: v.recordType,
-        recordId: v.recordId,
-        status: 'pending',
-        limit: 1,
-      });
-      if (existingList.ok && existingList.data.suggestions.length > 0) {
-        summary.skippedHadSuggestion++;
-        continue;
-      }
+    if (skipExisting && existingPendingSet.has(`${v.recordType}|${v.recordId}`)) {
+      summary.skippedHadSuggestion++;
+      continue;
     }
 
     // Look up an existing evidence URL so we don't re-suggest the same thing.
@@ -300,6 +295,45 @@ async function suggestCommand(
 
 // ── Helpers ──────────────────────────────────────────────────────────
 
+/**
+ * Pre-fetch all pending suggestions in one or two paginated calls rather than
+ * N per-record lookups. Returns a set of `${recordType}|${recordId}` keys.
+ * Failures are swallowed (set stays empty) — the caller will still process
+ * records, just without deduping.
+ */
+async function buildExistingPendingSet(
+  recordTypeFilter: string | undefined,
+  expectedVerdictCount: number,
+  log: (msg: string) => void,
+): Promise<Set<string>> {
+  const set = new Set<string>();
+  // Over-fetch a bit to cover any stale pending rows beyond the current scan size.
+  // Cap at 2000 to avoid unbounded paging — the route clamps to 200 per page.
+  const MAX_PREFETCH = 2000;
+  const PAGE_SIZE = 200;
+  const target = Math.min(MAX_PREFETCH, Math.max(expectedVerdictCount * 2, PAGE_SIZE));
+
+  let offset = 0;
+  while (offset < target) {
+    const res = await listUrlSuggestions({
+      recordType: recordTypeFilter,
+      status: 'pending',
+      limit: PAGE_SIZE,
+      offset,
+    });
+    if (!res.ok) {
+      log(`  [warn] pre-fetch pending suggestions failed: ${res.message ?? 'unknown'}`);
+      return set;
+    }
+    for (const s of res.data.suggestions) {
+      set.add(`${s.recordType}|${s.recordId}`);
+    }
+    if (res.data.suggestions.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+  return set;
+}
+
 function emptySummary() {
   return {
     scanned: 0,
@@ -355,10 +389,11 @@ Usage:
 
 Options:
   --limit=N              Max unverifiable verdicts to scan (default: ${DEFAULT_LIMIT}, max: ${MAX_LIMIT})
-  --budget=N             Max USD to spend on search providers (default: $${DEFAULT_BUDGET_USD.toFixed(2)})
+  --budget=N             Soft cap in USD on search-provider spend (default: $${DEFAULT_BUDGET_USD.toFixed(2)}).
+                         Checked before each record — a single in-flight call can overshoot.
   --type=X               Filter by record type (e.g., fact, grant, personnel)
   --entity=X             Filter by entityId or entityDisplayName
-  --max-candidates=N     Candidates per record (default: ${DEFAULT_MAX_CANDIDATES}, max: 10)
+  --max-candidates=N     Candidates per record (default: ${DEFAULT_MAX_CANDIDATES}, max: ${MAX_CANDIDATES_PER_RECORD})
   --skip-existing        Skip records with existing pending suggestions (default: on)
   --dry-run              Enumerate records without calling providers or writing
   --json / --ci          Machine-readable JSON output
@@ -374,4 +409,3 @@ Requires WIKI_SERVER_ENV=prod in agent slots.
 `.trim();
 }
 
-export const VALID_STATUS_FILTERS_EXPORT: readonly StatusFilter[] = VALID_STATUS_FILTERS;

@@ -69,13 +69,20 @@ export function buildSearchQuery(opts: {
 }): string {
   const { entityName, claimText, fieldName } = opts;
 
+  // Strip quotes and newlines from untrusted inputs — they'd break the Exa
+  // query wrapper and the JSON prompts sent to Perplexity.
+  const sanitize = (s: string) => s.replace(/["\r\n]/g, " ").replace(/\s+/g, " ").trim();
+  const safeEntity = sanitize(entityName);
+  const safeClaim = sanitize(claimText);
+  const safeField = fieldName ? sanitize(fieldName.replace(/_/g, " ")) : "";
+
   // Shorter claims go verbatim; longer ones get truncated so query stays tight.
-  const trimmedClaim = claimText.length > 160 ? `${claimText.slice(0, 157)}...` : claimText;
+  const trimmedClaim = safeClaim.length > 160 ? `${safeClaim.slice(0, 157)}...` : safeClaim;
 
   const parts: string[] = [];
-  parts.push(`"${entityName}"`);
-  if (fieldName) parts.push(fieldName.replace(/_/g, " "));
-  parts.push(trimmedClaim);
+  parts.push(`"${safeEntity}"`);
+  if (safeField) parts.push(safeField);
+  if (trimmedClaim) parts.push(trimmedClaim);
 
   return parts.join(" ").slice(0, 300);
 }
@@ -83,7 +90,8 @@ export function buildSearchQuery(opts: {
 function normalizeUrl(url: string): string {
   try {
     const u = new URL(url);
-    // Drop trailing slash, fragment, and common tracking params.
+    // Lowercase host (case-insensitive in DNS), drop fragment and tracking params.
+    u.hostname = u.hostname.toLowerCase();
     u.hash = "";
     const stripParams = [
       "utm_source",
@@ -103,8 +111,12 @@ function normalizeUrl(url: string): string {
   }
 }
 
-function rankHits(hits: SearchHit[], maxCandidates: number): SearchHit[] {
-  // Simple ranking: stable dedupe, preserve provider insertion order.
+/**
+ * Stable dedupe by normalized URL, preserving provider insertion order.
+ * First hit wins on dedupe collisions — i.e., whichever provider appeared
+ * first in the flat hit list keeps its sourceProvider attribution.
+ */
+function dedupeHits(hits: SearchHit[], maxCandidates: number): SearchHit[] {
   const seen = new Set<string>();
   const out: SearchHit[] = [];
   for (const hit of hits) {
@@ -135,6 +147,9 @@ export async function suggestUrls(
   } = input;
 
   const query = buildSearchQuery({ entityName, claimText, fieldName });
+  // "used" tracks providers that actually returned successfully; "skipped"
+  // covers both missing-key and failed calls. A failed attempt appears only
+  // in `skipped`, never in both.
   const providersUsed: string[] = [];
   const providersSkipped: string[] = [];
   let costUsd = 0;
@@ -145,22 +160,26 @@ export async function suggestUrls(
   const tasks: Promise<SearchHit[]>[] = [];
 
   if (useExa && getApiKey("EXA_API_KEY")) {
-    providersUsed.push("exa");
     tasks.push(
-      searchExa(query, perProvider).catch((err: unknown) => {
-        providersSkipped.push(`exa:${errorMessage(err)}`);
-        return [] as SearchHit[];
-      })
+      searchExa(query, perProvider)
+        .then((hits) => {
+          providersUsed.push("exa");
+          return hits;
+        })
+        .catch((err: unknown) => {
+          providersSkipped.push(`exa:${errorMessage(err)}`);
+          return [] as SearchHit[];
+        })
     );
   } else if (useExa) {
     providersSkipped.push("exa:no-key");
   }
 
   if (usePerplexity && getApiKey("OPENROUTER_API_KEY")) {
-    providersUsed.push("perplexity");
     tasks.push(
       searchPerplexity(query, perProvider)
         .then((r) => {
+          providersUsed.push("perplexity");
           costUsd += r.cost;
           return r.hits;
         })
@@ -182,7 +201,7 @@ export async function suggestUrls(
     ? allHits.filter((h) => normalizeUrl(h.url) !== existingKey)
     : allHits;
 
-  const ranked = rankHits(filtered, maxCandidates);
+  const ranked = dedupeHits(filtered, maxCandidates);
 
   const candidates: UrlSuggestion[] = ranked.map((hit) => ({
     url: hit.url,

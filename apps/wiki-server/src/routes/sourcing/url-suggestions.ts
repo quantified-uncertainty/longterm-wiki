@@ -63,6 +63,7 @@ const QuerySchema = z.object({
 const PatchBody = z.object({
   status: z.enum(VALID_STATUSES),
   reviewedBy: z.string().max(200).optional(),
+  // `null` explicitly clears the notes column; omitting the key preserves it.
   notes: z.string().max(2000).nullable().optional(),
 });
 
@@ -78,17 +79,13 @@ const urlSuggestionsApp = new Hono()
     try {
       const db = getDrizzleDb();
       // COALESCE-based conflict target cannot be expressed via Drizzle's typed
-      // .onConflictDoUpdate(), so we use raw SQL per-row. The matching unique
-      // index lives in migration 0176. Batch is bounded by Zod (MAX_BATCH=200).
+      // .onConflictDoUpdate(), so we emit a multi-row VALUES list as raw SQL and
+      // run it inside a transaction so the whole batch is atomic. Batch is bounded
+      // by Zod (MAX_BATCH=200). The unique index lives in migration 0176.
       let upserted = 0;
-      for (const s of suggestions) {
-        await db.execute(sql`
-          INSERT INTO sourcing_url_suggestions (
-            record_type, record_id, field_name, entity_id,
-            suggested_url, title, snippet, relevance_score,
-            source_provider, generator_model, status, notes,
-            created_at, updated_at
-          ) VALUES (
+      await db.transaction(async (tx) => {
+        const valueRows = suggestions.map(
+          (s) => sql`(
             ${s.recordType},
             ${s.recordId},
             ${s.fieldName ?? null},
@@ -101,8 +98,17 @@ const urlSuggestionsApp = new Hono()
             ${s.generatorModel ?? null},
             ${s.status},
             ${s.notes ?? null},
-            NOW(), NOW()
-          )
+            NOW(),
+            NOW()
+          )`
+        );
+        await tx.execute(sql`
+          INSERT INTO sourcing_url_suggestions (
+            record_type, record_id, field_name, entity_id,
+            suggested_url, title, snippet, relevance_score,
+            source_provider, generator_model, status, notes,
+            created_at, updated_at
+          ) VALUES ${sql.join(valueRows, sql`, `)}
           ON CONFLICT (record_type, record_id, COALESCE(field_name, ''), suggested_url)
           DO UPDATE SET
             title = EXCLUDED.title,
@@ -119,8 +125,10 @@ const urlSuggestionsApp = new Hono()
             notes = COALESCE(EXCLUDED.notes, sourcing_url_suggestions.notes),
             updated_at = NOW()
         `);
-        upserted += 1;
-      }
+        // Every input row is either inserted or updated under DO UPDATE; the
+        // count equals the input batch size by construction.
+        upserted = suggestions.length;
+      });
       return c.json({ upserted });
     } catch (err) {
       return dbError(c, "url-suggestions upsert", err, {
@@ -148,7 +156,10 @@ const urlSuggestionsApp = new Hono()
         .limit(limit)
         .offset(offset);
 
-      return c.json({ suggestions: rows, count: rows.length });
+      // `returned` is the page size, not the total match count. A separate
+      // COUNT(*) would double the query cost; callers that need pagination
+      // totals should add an explicit `total=1` param in a follow-up.
+      return c.json({ suggestions: rows, returned: rows.length });
     } catch (err) {
       return dbError(c, "url-suggestions query", err);
     }
@@ -164,20 +175,33 @@ const urlSuggestionsApp = new Hono()
     const parsed = PatchBody.safeParse(raw);
     if (!parsed.success) return validationError(c, parsed.error.message);
 
-    const { status, reviewedBy, notes } = parsed.data;
+    const patch = parsed.data;
+    // Distinguish "notes omitted" (preserve) from "notes: null" (clear) against
+    // the raw body — Zod parse can elide/normalize undefined keys.
+    const notesKeyPresent =
+      typeof raw === "object" && raw !== null && "notes" in (raw as object);
     const now = new Date();
 
     try {
       const db = getDrizzleDb();
+      // Drizzle skips `undefined` fields but writes `null` as SQL NULL.
+      const setClause: {
+        status: typeof patch.status;
+        reviewedBy: string | null;
+        reviewedAt: Date;
+        updatedAt: Date;
+        notes?: string | null;
+      } = {
+        status: patch.status,
+        reviewedBy: patch.reviewedBy ?? null,
+        reviewedAt: now,
+        updatedAt: now,
+      };
+      if (notesKeyPresent) setClause.notes = patch.notes ?? null;
+
       const updated = await db
         .update(sourcingUrlSuggestions)
-        .set({
-          status,
-          reviewedBy: reviewedBy ?? null,
-          notes: notes ?? undefined, // preserve existing when undefined
-          reviewedAt: now,
-          updatedAt: now,
-        })
+        .set(setClause)
         .where(eq(sourcingUrlSuggestions.id, id))
         .returning({ id: sourcingUrlSuggestions.id });
 
