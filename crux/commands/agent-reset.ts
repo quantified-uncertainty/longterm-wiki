@@ -355,6 +355,16 @@ function scanCleanupItems(): CleanupItem[] {
     });
   }
 
+  // Stale simplify marker
+  const simplifyDonePath = join(process.cwd(), '.claude', 'simplify-done');
+  if (existsSync(simplifyDonePath)) {
+    items.push({
+      category: 'checklist',
+      description: 'Stale simplify marker (.claude/simplify-done)',
+      detail: simplifyDonePath,
+    });
+  }
+
   // Stale context file
   const contextPath = join(process.cwd(), '.claude', 'wip-context.md');
   if (existsSync(contextPath)) {
