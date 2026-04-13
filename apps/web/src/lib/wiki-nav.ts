@@ -321,6 +321,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Response Pages", href: internalHref("response-style-guide") },
         { label: "Models", href: internalHref("models-style-guide") },
         { label: "Stub Pages", href: internalHref("stub-style-guide") },
+        { label: "Epic Page Conventions", href: internalHref("epic-page-conventions") },
         { label: "Rating System", href: internalHref("rating-system") },
         { label: "Mermaid Diagrams", href: internalHref("mermaid-diagrams") },
         { label: "Canonical Facts & Calc", href: internalHref("canonical-facts") },
@@ -340,6 +341,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Controlled Vocabulary", href: internalHref("controlled-vocabulary") },
         { label: "Cross-Link Automation", href: internalHref("cross-link-automation-proposal") },
         { label: "Diagram Naming", href: internalHref("diagram-naming-research") },
+        { label: "GitHub Integrations for Agents", href: internalHref("github-integrations-for-agents") },
         { label: "Page Creator Pipeline", href: internalHref("page-creator-pipeline") },
         { label: "Gap Analysis (Feb 2026)", href: internalHref("gap-analysis-2026-02") },
         { label: "Consistency Audit (Feb 2026)", href: internalHref("website-consistency-audit-2026-02") },
@@ -352,6 +354,7 @@ export function getInternalNav(): NavSection[] {
       items: [
         { label: "Architecture", href: internalHref("architecture") },
         { label: "Data Architecture", href: internalHref("data-architecture") },
+        { label: "Data System Authority", href: internalHref("data-system-authority") },
         { label: "Wiki Generation", href: internalHref("wiki-generation-architecture") },
         { label: "Content Pipeline", href: internalHref("content-pipeline-architecture") },
         { label: "Fact System Strategy", href: internalHref("fact-system-strategy") },
