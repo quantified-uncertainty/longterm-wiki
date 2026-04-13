@@ -110,6 +110,34 @@ pnpm crux sys maintain triage-linear
 
 This replaces the manual GraphQL queries. If `LINEAR_API_KEY` is not set, it reports that and skips gracefully.
 
+**4b. Actionable In Progress audit** — correlates Linear In Progress state with GitHub PR activity. Surfaces `SHIPPED` (PR merged but state not updated) and `PARENT-EPIC` (all sub-issues resolved) — these are one-keystroke cleanups that `triage-linear` doesn't catch because it only looks at staleness by time.
+
+```bash
+# Run the audit once and split by bucket in Python to avoid doubling the
+# GitHub /search/issues budget used for PR correlation.
+pnpm crux linear audit --json 2>/dev/null | python3 -c "
+import json, sys
+try:
+  entries = json.load(sys.stdin)
+  shipped = [e for e in entries if e.get('bucket') == 'shipped']
+  parent_epics = [e for e in entries if e.get('bucket') == 'parent-epic']
+  if shipped:
+    print(f'⚠ {len(shipped)} issue(s) SHIPPED but still In Progress:')
+    for e in shipped:
+      print(f\"  {e['issue']['identifier']} — {e['reason']}\")
+    print('  Run: pnpm crux linear audit --fix')
+  if parent_epics:
+    print(f'⚠ {len(parent_epics)} parent epic(s) with all sub-issues resolved:')
+    for e in parent_epics:
+      print(f\"  {e['issue']['identifier']} — {e['reason']}\")
+    print('  Run: pnpm crux linear audit --fix')
+except Exception:
+  pass
+"
+```
+
+Use `pnpm crux linear audit` (no args) for the full report.
+
 **4c. Stale agent slots** — slots on a non-main branch with no recent activity.
 
 ```bash

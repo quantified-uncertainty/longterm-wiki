@@ -289,6 +289,77 @@ export interface LinearTriageIssue {
 }
 
 // ---------------------------------------------------------------------------
+// Children / parent-epic detection
+// ---------------------------------------------------------------------------
+
+export interface LinearChildIssue {
+  identifier: string;
+  title: string;
+  state: { name: string; type: string };
+}
+
+/**
+ * Fetch direct children (sub-issues) of a single Linear issue.
+ *
+ * Used by the audit command to detect parent epics whose sub-issues have
+ * all resolved — the parent can be closed but typically isn't linked to a
+ * PR, so Linear's GitHub integration won't auto-close it.
+ */
+export interface LinearChildrenResult {
+  nodes: LinearChildIssue[];
+  /** True if Linear reports more children than were fetched in this query. */
+  hasMore: boolean;
+}
+
+export async function getIssueChildren(
+  identifier: string,
+): Promise<LinearChildrenResult> {
+  try {
+    const data = await linearGraphQL<{
+      issue: {
+        children: {
+          nodes: LinearChildIssue[];
+          pageInfo: { hasNextPage: boolean };
+        };
+      } | null;
+    }>(
+      `query Children($id: String!) {
+        issue(id: $id) {
+          children(first: 100) {
+            nodes {
+              identifier
+              title
+              state { name type }
+            }
+            pageInfo { hasNextPage }
+          }
+        }
+      }`,
+      { id: identifier },
+    );
+    const children = data.issue?.children;
+    return {
+      nodes: children?.nodes ?? [],
+      hasMore: children?.pageInfo.hasNextPage ?? false,
+    };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : String(e);
+    if (/Entity not found|EntityNotFound/i.test(msg)) {
+      return { nodes: [], hasMore: false };
+    }
+    // The audit fans out children fetches in parallel; one bad transient
+    // response (Linear edge-cache HTML, transient 5xx, 15s timeout) shouldn't
+    // kill the whole audit. Log and return an empty result flagged as
+    // incomplete so callers know not to treat it as "all children resolved".
+    if (/non-JSON response|GraphQL returned 5\d\d|timed out/i.test(msg)) {
+      console.warn(`[linear] getIssueChildren(${identifier}) failed transiently: ${msg.slice(0, 200)}`);
+      return { nodes: [], hasMore: true };
+    }
+    throw e;
+  }
+}
+
+// ---------------------------------------------------------------------------
 // List ready issues (for "next issue" picking)
 // ---------------------------------------------------------------------------
 

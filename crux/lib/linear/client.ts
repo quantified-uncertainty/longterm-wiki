@@ -117,7 +117,19 @@ export async function linearGraphQL<T = unknown>(
     throw new Error(`Linear GraphQL returned ${resp.status}: ${text}`);
   }
 
-  const result = (await resp.json()) as LinearGraphQLResponse<T>;
+  // Linear occasionally returns an HTML error page (Cloudflare/edge cache
+  // hiccup) with a 200 status. resp.json() then throws SyntaxError with the
+  // raw HTML in the message — surface this as a recognizable error so
+  // callers can fall back gracefully instead of bubbling a multi-KB blob.
+  let result: LinearGraphQLResponse<T>;
+  try {
+    result = (await resp.json()) as LinearGraphQLResponse<T>;
+  } catch (e) {
+    throw new Error(
+      `Linear GraphQL returned non-JSON response (likely an edge-cache HTML error page). ` +
+      `Original error: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  }
   if (result.errors?.length) {
     const msgs = result.errors.map((e) => e.message).join('; ');
     throw new Error(`Linear GraphQL error: ${msgs}`);
