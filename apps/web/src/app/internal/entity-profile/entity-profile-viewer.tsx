@@ -21,6 +21,12 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
+import {
+  sanitizeRawIds,
+  isClickableFactId,
+  isOpaqueLegacyFactId,
+  isLegacyResourceId,
+} from "./sanitize-raw-ids";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -259,11 +265,9 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 const INITIAL_ROW_LIMIT = 20;
 
 // ── ID detection ──────────────────────────────────────────────────────────
-
-// FactBase fact IDs are `f_` + 8-12 alphanumeric chars (e.g. `f_dW5cR9mJ8q`).
-// Used by the cell renderer to detect raw fact IDs in any column and link them
-// to /factbase/fact/<id> instead of leaking the raw ID as visible text.
-const FACT_ID_RE = /^f_[A-Za-z0-9]{8,}$/;
+// Fact-ID detection now lives in `./sanitize-raw-ids.ts::isAnyFactId`, which
+// covers canonical `f_xxx`, legacy lowercase hex, and legacy mixed-case alnum
+// formats in a single column-gated helper (QUA-397).
 
 // ── Numeric formatting columns ────────────────────────────────────────────
 
@@ -346,11 +350,11 @@ function CellValue({
     return <JsonValue value={value} />;
   }
 
-  // FactBase fact IDs (f_xxx) -> render as link with "view →" label instead of leaking raw ID.
-  // Content-based, not column-name-gated: any cell value matching the fact-ID format gets
-  // rendered as a link, no matter which column it lives in. Mirrors how isAnySid() handles
-  // stableIds below, and prevents the recurring per-column patch loop (QUA-316, QUA-346).
-  if (typeof value === "string" && FACT_ID_RE.test(value)) {
+  // FactBase fact IDs with resolvable /factbase/fact/<id> URLs → `view →` link.
+  // Covers canonical `f_xxx` (any column) and legacy 8-12 char lowercase hex
+  // (column-gated: id/fact_id). See `./sanitize-raw-ids.ts::isClickableFactId`.
+  // QUA-397.
+  if (typeof value === "string" && isClickableFactId(value, columnName)) {
     return (
       <Link
         href={`/factbase/fact/${encodeURIComponent(value)}`}
@@ -359,6 +363,37 @@ function CellValue({
       >
         view →
       </Link>
+    );
+  }
+
+  // Legacy 10-char mixed-case alnum fact IDs (e.g. `2Y4ope8OxA`, `XUSIG6vsPw`).
+  // These predate the `f_` prefix and their `/factbase/fact/<id>` URL resolves
+  // UNRELIABLY (~2/5 measured return 404 in prod) — so we render as a muted
+  // em-dash with the full id in `title=` instead of promising a broken link.
+  // Column-gated. Will be eliminated by QUA-407 Phase 1 (migrate to canonical).
+  if (typeof value === "string" && isOpaqueLegacyFactId(value, columnName)) {
+    return (
+      <span
+        className="text-muted-foreground/40 font-mono text-[10px]"
+        title={`legacy fact ID: ${value}`}
+      >
+        &mdash;
+      </span>
+    );
+  }
+
+  // Legacy 16-char hex resource stableIds (pre-`sid_` format, e.g.
+  // `1f21fae8ed666710`). There's no public resource-detail page keyed by
+  // these, so render as a muted em-dash with the full id in `title=` for
+  // debugging. Column-gated to avoid false positives (QUA-397).
+  if (typeof value === "string" && isLegacyResourceId(value, columnName)) {
+    return (
+      <span
+        className="text-muted-foreground/40 font-mono text-[10px]"
+        title={`legacy resource ID: ${value}`}
+      >
+        &mdash;
+      </span>
     );
   }
 
@@ -460,10 +495,10 @@ function CellValue({
         }
       } catch { /* not JSON, fall through */ }
     }
-    return <ExpandableText text={str} />;
+    return <ExpandableText text={sanitizeRawIds(str)} />;
   }
 
-  return <span className="text-[11px]">{str}</span>;
+  return <span className="text-[11px]">{sanitizeRawIds(str)}</span>;
 }
 
 function JsonValue({ value }: { value: unknown }) {
@@ -691,7 +726,11 @@ function ProfileSection({
                     {(() => {
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
-                      const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
+                      // Show a row ordinal, not a truncated prefix of the raw record id.
+                      // Truncating e.g. "sid_A4XoubikkQ:f_xxx" to 7 chars produces "sid_A4X",
+                      // which leaks a raw stableId into visible text (QUA-397). The full id
+                      // is still available in title= (hover) and href= (navigation).
+                      const display = `#${i + 1}`;
                       // Compute thing key for linking to /things/<id>
                       // Only link sections with recordType (those have things table entries)
                       // Facts use a composite key (entityId:factId); all others use row.id
