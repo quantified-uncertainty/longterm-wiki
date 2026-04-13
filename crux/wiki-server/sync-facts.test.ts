@@ -200,4 +200,44 @@ describe("transformFact", () => {
 
     expect(result.formatDivisor).toBeNull();
   });
+
+  // QUA-397: Regression — label must come from property.name (not null),
+  // otherwise the server-side things dual-write falls back to f.factId and
+  // bakes raw "f_..." IDs into things.title / things.description, which
+  // then leak to visible text on /organizations/*/data pages.
+  it("populates label from property.name for things-table dual-write (QUA-397)", () => {
+    const fact: Fact = {
+      id: "f_mEKUPPFYRg",
+      subjectId: "google-deepmind",
+      propertyId: "founded-date",
+      value: { type: "date", value: "2010-09" },
+    };
+    const property: Property = {
+      id: "founded-date",
+      name: "Founded",
+      dataType: "date",
+    };
+
+    const result = transformFact(fact, property);
+
+    expect(result.label).toBe("Founded");
+    // Negative assertion: label must not be the raw fact id
+    expect(result.label).not.toBe("f_mEKUPPFYRg");
+  });
+
+  it("label is null when property is not provided (server uses f.measure fallback)", () => {
+    const fact: Fact = {
+      id: "f_noprop",
+      subjectId: "entity13",
+      propertyId: "headcount",
+      value: { type: "number", value: 6000 },
+    };
+
+    const result = transformFact(fact);
+
+    // No property → label null. Server's fallback is `f.measure || "fact"`,
+    // which uses the propertyId ("headcount") — a slug, never the raw factId.
+    expect(result.label).toBeNull();
+    expect(result.measure).toBe("headcount");
+  });
 });

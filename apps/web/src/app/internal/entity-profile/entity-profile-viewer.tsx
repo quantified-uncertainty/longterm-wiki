@@ -691,7 +691,11 @@ function ProfileSection({
                     {(() => {
                       const idStr = recordId ?? null;
                       if (!idStr) return <td className="px-2 py-2" />;
-                      const display = idStr.length > 7 ? idStr.slice(0, 7) : idStr;
+                      // Show a row ordinal, not a truncated prefix of the raw record id.
+                      // Truncating e.g. "sid_A4XoubikkQ:f_xxx" to 7 chars produces "sid_A4X",
+                      // which leaks a raw stableId into visible text (QUA-397). The full id
+                      // is still available in title= (hover) and href= (navigation).
+                      const display = `#${i + 1}`;
                       // Compute thing key for linking to /things/<id>
                       // Only link sections with recordType (those have things table entries)
                       // Facts use a composite key (entityId:factId); all others use row.id
