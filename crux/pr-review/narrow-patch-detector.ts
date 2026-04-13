@@ -1,35 +1,12 @@
 /**
- * Narrow-patch detector (QUA-356)
+ * Narrow-patch detector (QUA-356). Advisory review-time scanner for the
+ * "column-name-gated value probe" pattern — a diff shape that historically
+ * masked class-shaped bugs behind per-column patches (QUA-316 → QUA-346 →
+ * QUA-354). Fires MEDIUM when an added contiguous run contains BOTH a column
+ * identifier strict-equality gate AND a value-signature probe method call.
  *
- * Flags a diff pattern that has historically masked a class-shaped bug behind a
- * one-component, column-name-gated check. The canonical example is QUA-346:
- * masking raw FactBase `f_xxx` IDs in `CellValue` only when the column name is
- * `fact_id` / `factId`, instead of doing content-based detection regardless of
- * column. QUA-316 was the first narrow patch in the same class; QUA-354 / PR
- * #4268 is the proper systemic fix that replaced both with a regex on the value.
- *
- * This detector is an advisory review-time hint, not a gate check. It fires at
- * MEDIUM severity when the added lines contain BOTH:
- *   1. A column-name-literal equality gate — the column identifier
- *      (columnName, fieldName, column.name, field.name, etc.) compared for
- *      strict equality against a quoted literal.
- *   2. A value-signature probe — one of the string/regex methods startsWith,
- *      endsWith, includes, test, match, search, or exec called on the value.
- *
- * The examples are deliberately written in prose here instead of as code
- * fragments, so the detector does not self-fire on its own docstring. See the
- * tests for the canonical code shapes.
- *
- * False-positive guards:
- *   - Both patterns must appear in the same CONTIGUOUS run of added lines.
- *     Two unrelated changes in one hunk (one adding a column gate elsewhere,
- *     one adding a value probe) never co-fire.
- *   - Diffs without both a column-name gate AND a value probe never fire.
- *   - Test files are skipped (test fixtures deliberately contain the signature).
- *   - Non-code files (markdown, YAML, SQL, config) are skipped.
- *
- * Output shape matches the hostile-reviewer finding format in
- * `.claude/commands/agent-review-pr.md` Phase 3.
+ * Skips test files and non-code files. Both patterns must land in the same
+ * contiguous run so two unrelated edits in one hunk don't co-fire.
  */
 
 export interface NarrowPatchFinding {
@@ -41,28 +18,33 @@ export interface NarrowPatchFinding {
   relatedIncidents: string[];
 }
 
-// Matches a column identifier (columnName, fieldName, column.name, col.name,
-// field.name, colName, or any `<receiver>.column`) strict-equality tested
-// against a quoted string literal. The `key` alternative was removed after
-// review — too broad (common object-lookup idiom).
+// Column identifier strict-equality tested against a quoted string literal.
+// Intentionally excludes bare `key`/`name` (too broad — common object-lookup
+// idioms).
 const COLUMN_NAME_GATE_RE =
   /\b(?:columnName|fieldName|colName|column\.name|col\.name|field\.name|\w+\.column)\s*===?\s*["'`][A-Za-z_][\w-]*["'`]/;
 
-// Matches a method call that probes a value's signature: one of startsWith,
-// endsWith, includes, test, match, search, or exec invoked via dot-call on any
-// receiver. This is the exact anti-pattern in QUA-316/QUA-346.
+// Value-signature probe: one of startsWith, endsWith, includes, test, match,
+// search, or exec invoked via dot-call on any receiver.
 const VALUE_SIGNATURE_RE =
   /\.\s*(?:startsWith|endsWith|includes|test|match|search|exec)\s*\(/;
 
-// File paths that look like generic renderers/column rules/formatters/validators.
-// Used only to strengthen the message — the detector fires regardless of path.
+// Renderer/formatter/validator path hint — used only to strengthen the
+// message, not to gate firing.
 const RENDERER_PATH_RE =
   /(?:render|cell|column|viewer|display|formatter|format-|validate-|validator)/i;
+
+const RELATED_INCIDENTS: readonly string[] = ["QUA-316", "QUA-346"];
+
+interface AddedLine {
+  line: number;
+  text: string;
+}
 
 interface ParsedHunk {
   file: string;
   newStartLine: number;
-  addedLines: Array<{ line: number; text: string }>;
+  addedLines: AddedLine[];
 }
 
 /**
@@ -121,7 +103,7 @@ export function parseDiff(diff: string): ParsedHunk[] {
         continue;
       }
       const newStart = Number(hunkHeader[1]);
-      const added: Array<{ line: number; text: string }> = [];
+      const added: AddedLine[] = [];
       let cursor = newStart;
       j++;
       while (j < lines.length && !lines[j].startsWith("@@ ")) {
@@ -158,11 +140,9 @@ export function parseDiff(diff: string): ParsedHunk[] {
  * end up as separate runs, which lets the detector avoid cross-change false
  * positives.
  */
-function contiguousRuns(
-  hunk: ParsedHunk
-): Array<Array<{ line: number; text: string }>> {
-  const runs: Array<Array<{ line: number; text: string }>> = [];
-  let current: Array<{ line: number; text: string }> = [];
+function contiguousRuns(hunk: ParsedHunk): AddedLine[][] {
+  const runs: AddedLine[][] = [];
+  let current: AddedLine[] = [];
   let prevLine = -1;
   for (const entry of hunk.addedLines) {
     if (current.length === 0 || entry.line === prevLine + 1) {
@@ -223,7 +203,7 @@ export function detectNarrowPatches(diff: string): NarrowPatchFinding[] {
         line: lineNo,
         message,
         snippet,
-        relatedIncidents: ["QUA-316", "QUA-346"],
+        relatedIncidents: [...RELATED_INCIDENTS],
       });
     }
   }
@@ -245,26 +225,24 @@ function trimmedSnippet(text: string): string {
   return text.slice(0, MAX) + "\n…";
 }
 
+const MESSAGE_BASE =
+  "Narrow-patch signature detected: the added block gates on a literal column " +
+  "name AND probes the value's signature (startsWith/test/match/includes). " +
+  "This is the exact shape behind QUA-316 and QUA-346, where raw `f_xxx` fact " +
+  "IDs were masked one column at a time until QUA-354 replaced it with a " +
+  "content-based regex. ";
+
+const MESSAGE_RENDERER_NOTE =
+  "The file path looks like a generic renderer/formatter/validator, which " +
+  "makes a content-based fix especially likely to be the right call. ";
+
+const MESSAGE_CTA =
+  "Before shipping, ask: can this be content-based (match the value's shape " +
+  "regardless of which column it lives in) instead of column-name-gated? If " +
+  "yes, do that instead — it prevents the recurring per-column patch loop.";
+
 function buildMessage(isRendererFile: boolean): string {
-  const base =
-    "Narrow-patch signature detected: the added block gates on a literal column " +
-    "name AND probes the value's signature (startsWith/test/match/includes). " +
-    "This is the exact shape behind QUA-316 and QUA-346, where raw `f_xxx` fact " +
-    "IDs were masked one column at a time until QUA-354 replaced it with a " +
-    "content-based regex. ";
-  const cta =
-    "Before shipping, ask: can this be content-based (match the value's shape " +
-    "regardless of which column it lives in) instead of column-name-gated? If " +
-    "yes, do that instead — it prevents the recurring per-column patch loop.";
-  if (isRendererFile) {
-    return (
-      base +
-      "The file path looks like a generic renderer/formatter/validator, which " +
-      "makes a content-based fix especially likely to be the right call. " +
-      cta
-    );
-  }
-  return base + cta;
+  return MESSAGE_BASE + (isRendererFile ? MESSAGE_RENDERER_NOTE : "") + MESSAGE_CTA;
 }
 
 /** Pretty-print findings for CLI or review output. */

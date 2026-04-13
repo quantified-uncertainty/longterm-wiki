@@ -16,54 +16,44 @@
  *   --json         Emit findings as JSON
  */
 
-import { execFileSync } from "node:child_process";
 import { readFileSync } from "node:fs";
+import { parseCliArgs } from "../lib/cli.ts";
+import { gitSafe, isValidBranchName } from "../lib/git.ts";
 import { detectNarrowPatches, formatFindings } from "./narrow-patch-detector.ts";
 
-// Allowlist for the --base flag: the characters that appear in legitimate git
-// refnames (letters, digits, `._/-`). We run the git command via execFileSync
-// with an array argument, but a stray `--` or flag-like value would still
-// confuse git — the allowlist makes that impossible.
-const REFNAME_RE = /^[A-Za-z0-9._/-]+$/;
-
-function parseArgs(argv: string[]): {
+interface Options {
   base: string;
   stdin: boolean;
   json: boolean;
-} {
-  const args = { base: "main", stdin: false, json: false };
-  for (const arg of argv) {
-    if (arg === "--stdin") args.stdin = true;
-    else if (arg === "--json") args.json = true;
-    else if (arg.startsWith("--base=")) args.base = arg.slice("--base=".length);
-  }
-  return args;
 }
 
-function readDiff(opts: { base: string; stdin: boolean }): string {
+function resolveOptions(argv: string[]): Options {
+  const parsed = parseCliArgs(argv);
+  return {
+    base: typeof parsed.base === "string" ? parsed.base : "main",
+    stdin: parsed.stdin === true,
+    json: parsed.json === true,
+  };
+}
+
+function readDiff(opts: Options): string {
   if (opts.stdin) {
     return readFileSync(0, "utf8");
   }
-  if (!REFNAME_RE.test(opts.base)) {
-    console.error(
-      `detect-narrow-patch: invalid --base value "${opts.base}" (must match ${REFNAME_RE})`
-    );
+  if (!isValidBranchName(opts.base)) {
+    console.error(`detect-narrow-patch: invalid --base value "${opts.base}"`);
     process.exit(0); // advisory — never block
   }
-  try {
-    return execFileSync("git", ["diff", `${opts.base}...HEAD`], {
-      encoding: "utf8",
-      maxBuffer: 50 * 1024 * 1024,
-    });
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    console.error(`detect-narrow-patch: failed to run git diff: ${msg}`);
+  const result = gitSafe("diff", `${opts.base}...HEAD`);
+  if (!result.ok) {
+    console.error(`detect-narrow-patch: git diff failed: ${result.stderr}`);
     process.exit(0); // advisory — never block
   }
+  return result.output;
 }
 
 function main(): void {
-  const opts = parseArgs(process.argv.slice(2));
+  const opts = resolveOptions(process.argv.slice(2));
   const diff = readDiff(opts);
   const findings = detectNarrowPatches(diff);
 
