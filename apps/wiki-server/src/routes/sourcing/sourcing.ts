@@ -1810,7 +1810,7 @@ const sourcingApp = new Hono()
         JOIN things t2 ON t1.parent_thing_id = t2.id
         WHERE t2.thing_type = 'entity'
         GROUP BY t2.source_id
-      )
+      ),
       all_entities AS (
         SELECT entity_id FROM verdict_counts
         UNION
