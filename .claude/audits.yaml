@@ -381,7 +381,7 @@ audits:
       4. Confirm the FK has ON DELETE CASCADE: `SELECT confdeltype FROM pg_constraint WHERE conname = 'hallucination_risk_snapshots_page_id_wiki_pages_id_fk'` — should be 'c'
     frequency: weekly
     added: "2026-04-12"
-    added_by_pr: null  # QUA-352 PR
+    added_by_pr: 4261
     last_checked: null
     last_result: null
     history: []

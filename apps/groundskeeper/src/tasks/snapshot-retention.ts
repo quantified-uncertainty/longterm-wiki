@@ -9,8 +9,15 @@ const ONE_DAY_MS = 24 * 60 * 60 * 1000;
 // Module-level state so the missing-API-key Discord alert fires at most once
 // per day even if the task is configured to run more often than daily. Resets
 // on process restart, which is desirable — a pod restart warrants a fresh
-// warning so operators know the key is still missing.
+// warning so operators know the key is still missing. Assumes the groundskeeper
+// runs as a singleton deployment (replicas=1); multi-replica scaling would
+// produce up to N alerts per day, one per replica.
 let lastMissingKeyWarnAt = 0;
+
+/** Test-only: reset the missing-API-key rate-limit counter. */
+export function __resetMissingKeyRateLimitForTest(): void {
+  lastMissingKeyWarnAt = 0;
+}
 
 interface CleanupResult {
   deleted: number;

@@ -9,9 +9,9 @@
 -- Usage:
 --   psql "$DATABASE_MIGRATION_URL" -f apps/wiki-server/scripts/validate-hallucination-risk-snapshots-fk.sql
 --
--- Safe to re-run: the validation is idempotent, and the NOT EXISTS guard
--- aborts cleanly if the FK was already validated (convalidated = true) so
--- reruns don't take a lock unnecessarily.
+-- Safe to re-run: the validation is idempotent, and the `convalidated` check
+-- returns early if the FK was already validated so reruns don't take a lock
+-- unnecessarily.
 
 DO $$
 DECLARE
