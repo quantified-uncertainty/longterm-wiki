@@ -114,6 +114,25 @@ If no PR exists yet, the inject command without `--pr` outputs the section — i
 
 This is **automatic** and **deterministic** — the detector scans the diff for migrations, env vars, workflow changes, schema changes, Docker changes, etc. You do not need to manually remember which changes need post-deploy verification.
 
+### MANDATORY: review the auto-detected list, augment for anything specific to this PR
+
+Auto-detection is a **floor, not a ceiling.** Read every task in the `<!-- deploy-tasks:v1 -->` block out loud and ask: "If a fresh agent or human read only this checklist after merge, would they actually validate that this PR works end to end?" If the answer is no, add an explicit manual line **inside the marker block** so `crux gh deploy-tasks pending` picks it up.
+
+Common gaps the auto-detector misses (add manual lines for these — there is no exhaustive list, use judgment):
+
+- **New scheduled workflows on a long cron** (weekly, monthly): the auto-detector adds a "verify it ran" line, but you'll be waiting 5+ days for the cron to fire. Add a manual `gh workflow run <file>.yml` trigger as a separate item, framed as "do not wait for the schedule."
+- **New CLI commands or flags**: auto-detection notices the file change but not "run the new flag once on real prod data and confirm output is what you said it would be."
+- **New API endpoints**: auto-detected, but verify they're discoverable from where you intended (linked from a dashboard, sidebar, navigation, etc.) — the detector only checks `curl -sf`.
+- **New external integrations** (Discord, Slack, Linear comments, webhooks): the auto-detector does not know about secret wiring. If your PR depends on a secret being set in GitHub Actions, add a manual line to verify the first run actually used it. Best-effort fire-and-forget code paths silently skip when keys are missing.
+- **New dashboards or internal pages**: render-audit will catch broken pages but not "the data on this page is the data you intended" — add a manual sanity-check line.
+- **Anything the ticket said "validate manually first"**: copy that requirement into the deploy checklist as a hard task, not just prose.
+
+**The shape of a good manual deploy task:**
+- Lives inside the `<!-- deploy-tasks:v1 -->` markers (otherwise `pending` won't track it)
+- Starts with `- [ ] \`manual\`` so it's distinguishable from auto-generated entries
+- States the action *and* the expected outcome ("trigger X, expect Y in place Z"), not just "verify X"
+- Includes the exact command to run if applicable, after the em-dash, in backticks
+
 For infrastructure changes that the detector does **not** cover (DNS changes, external service configuration, manual database operations), also add a `post_merge` entry to `.claude/audits.yaml` with the PR number, what to verify, and a deadline.
 
 ## Step 5: Update Linear issue (primary — if applicable)
