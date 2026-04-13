@@ -77,13 +77,16 @@ export function classifyByUrl(raw: string): UrlClassification {
 
   const host = url.hostname.toLowerCase();
 
-  // Wayback prefix — classify by the inner URL
+  // Wayback prefix — classify by the inner URL.
+  // Note: URL parsing puts any `?query`/`#fragment` from the wrapped target
+  // on the outer `url.search`/`url.hash`, so reattach them before classifying.
   if (host === 'web.archive.org' || host === 'archive.org') {
     const match = url.pathname.match(/\/web\/[^/]+\/(.+)$/);
     if (match) {
-      const inner = match[1].startsWith('http')
-        ? match[1]
-        : `https://${match[1]}`;
+      const innerPath = match[1] + url.search + url.hash;
+      const inner = innerPath.startsWith('http')
+        ? innerPath
+        : `https://${innerPath}`;
       const innerResult = classifyByUrl(inner);
       return {
         ...innerResult,
