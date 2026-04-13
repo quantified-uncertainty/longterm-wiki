@@ -1,0 +1,150 @@
+name: Flagship Curate
+run-name: "Flagship Curate${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Weekly unattended curation pass over the worst-covered organizations.
+# Picks the top-N orgs by number of non-confirmed verdicts and runs the
+# flagship-curate pipeline against each: research → ingest → reset → verify.
+#
+# Posts a markdown run summary to a Linear issue (default: QUA-124) so the
+# trust loop has a single rolling thread to monitor.
+
+on:
+  schedule:
+    - cron: '0 9 * * 1'  # Every Monday at 09:00 UTC (after sourcing-recheck at 08:00)
+  workflow_dispatch:
+    inputs:
+      limit:
+        description: 'Max entities to curate (worst-covered first)'
+        required: false
+        default: '5'
+        type: string
+      budget:
+        description: 'Max dollars to spend across all entities'
+        required: false
+        default: '10'
+        type: string
+      record_limit:
+        description: 'Max records to curate per entity'
+        required: false
+        default: '50'
+        type: string
+      iterations:
+        description: 'Max curation iterations per entity'
+        required: false
+        default: '2'
+        type: string
+      linear_issue:
+        description: 'Linear issue identifier for the run summary comment'
+        required: false
+        default: 'QUA-124'
+        type: string
+      dry_run:
+        description: 'Dry run (preview only)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: flagship-curate
+  cancel-in-progress: false
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  curate:
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    env:
+      WIKI_SERVER_ENV: prod
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+      LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+      # Assign inputs to env vars to avoid shell injection (GH Actions best practice)
+      INPUT_LIMIT: ${{ inputs.limit || '5' }}
+      INPUT_BUDGET: ${{ inputs.budget || '10' }}
+      INPUT_RECORD_LIMIT: ${{ inputs.record_limit || '50' }}
+      INPUT_ITERATIONS: ${{ inputs.iterations || '2' }}
+      INPUT_LINEAR_ISSUE: ${{ inputs.linear_issue || 'QUA-124' }}
+      INPUT_DRY_RUN: ${{ inputs.dry_run }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Validate numeric inputs
+        run: |
+          set -euo pipefail
+          # Reject non-numeric inputs before they reach the CLI to prevent
+          # whitespace-based argument smuggling via workflow_dispatch.
+          # Integers only — the CLI uses parseInt, so floats would be silently
+          # truncated. Mirror the CLI's actual constraints: non-negative integers
+          # for counts, strictly positive integer for budget.
+          for var_name in INPUT_LIMIT INPUT_RECORD_LIMIT INPUT_ITERATIONS; do
+            value="${!var_name}"
+            if ! [[ "$value" =~ ^[0-9]+$ ]]; then
+              echo "::error::$var_name must be a non-negative integer, got: '$value'"
+              exit 1
+            fi
+          done
+          if ! [[ "$INPUT_BUDGET" =~ ^[0-9]+$ ]] || [[ "$INPUT_BUDGET" == "0" ]]; then
+            echo "::error::INPUT_BUDGET must be a positive integer, got: '$INPUT_BUDGET'"
+            exit 1
+          fi
+          # Linear issue must be canonical QUA-NNN form with a bounded digit
+          # count — parseLinearId() rejects longer IDs, so reject them here too.
+          if ! [[ "$INPUT_LINEAR_ISSUE" =~ ^QUA-[0-9]{1,6}$ ]]; then
+            echo "::error::INPUT_LINEAR_ISSUE must look like QUA-NNN (1-6 digits), got: '$INPUT_LINEAR_ISSUE'"
+            exit 1
+          fi
+
+      - name: Run flagship-curate
+        run: |
+          set -euo pipefail
+          # Build args as an array so values are passed as discrete tokens.
+          # This prevents whitespace in any input from being re-parsed as
+          # additional flags by the shell (defense-in-depth on top of the
+          # validate step above).
+          ARGS=(
+            --all
+            "--limit=${INPUT_LIMIT}"
+            "--budget=${INPUT_BUDGET}"
+            "--record-limit=${INPUT_RECORD_LIMIT}"
+            "--iterations=${INPUT_ITERATIONS}"
+            "--linear-comment=${INPUT_LINEAR_ISSUE}"
+            --ci
+          )
+          if [ "${INPUT_DRY_RUN}" = "true" ]; then
+            ARGS+=(--dry-run)
+          fi
+          mkdir -p /tmp/flagship-curate
+          # Note: flagship-curate emits progress logs to stdout during the run
+          # plus the --ci JSON payload as its final output. The captured log is
+          # human-readable; the structured summary is also posted to Linear via
+          # --linear-comment.
+          pnpm crux flagship-curate "${ARGS[@]}" 2>&1 | tee /tmp/flagship-curate/output.log
+
+      - name: Upload run output artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: flagship-curate-output
+          path: /tmp/flagship-curate/output.log
+          retention-days: 30

@@ -38,6 +38,7 @@ import { scannerResultsRoute } from "./routes/tablebase/scanner-results.js";
 
 // Unified sourcing system (replaces legacy factbase + record sourcing)
 import { sourcingRoute } from "./routes/sourcing/sourcing.js";
+import { urlSuggestionsRoute } from "./routes/sourcing/url-suggestions.js";
 
 // Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
@@ -201,7 +202,8 @@ export function createApp() {
 
   // FactBase routes — structured facts
   app.route("/api/facts", factsRoute);
-  // Unified sourcing system
+  // Unified sourcing system — mount sub-routes before the catch-all parent.
+  app.route("/api/sourcing/url-suggestions", urlSuggestionsRoute);
   app.route("/api/sourcing", sourcingRoute);
   // Backward-compat alias: old /api/source-checks/* → /api/sourcing/*
   app.route("/api/source-checks", sourcingRoute);

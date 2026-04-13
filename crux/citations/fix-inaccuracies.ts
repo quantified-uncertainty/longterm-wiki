@@ -4,6 +4,25 @@
  * Reads flagged citations from the dashboard YAML (for discovery), then
  * enriches each with full source text from the wiki-server API before generating fixes.
  *
+ * SCOPE — narrow by design
+ *
+ * The primary (Gemini Flash) pass requires the `original` field to be an
+ * EXACT substring of the page MDX and the replacement to be comparable in
+ * length. The Claude Sonnet escalation permits section-level rewrites but is
+ * instructed not to change section length or introduce new claims. In
+ * practice this means the tool handles:
+ *   - small numeric/date corrections where a short substring can be swapped
+ *   - minor overclaim softening
+ *
+ * It does NOT handle severely-contradicted claims where faithful correction
+ * requires rewording or removing substantive narrative (e.g. attribution
+ * errors, hallucinated details, source says X but claim says Y with no
+ * cleanly-replaceable substring). Those return 0 proposals — see QUA-314.
+ *
+ * If your backlog is dominated by semantic contradictions, expect zero
+ * proposals. Prompt-level false-positive fixes (QUA-246 family) or page
+ * regeneration via `crux w improve --tier=deep` are usually the right path.
+ *
  * Usage:
  *   pnpm crux citations fix-inaccuracies                        # Dry run all
  *   pnpm crux citations fix-inaccuracies --apply                 # Apply all
@@ -467,17 +486,26 @@ Where:
 
 /** Parse the second opinion response. */
 function parseSecondOpinionResponse(text: string): { agree: boolean; verdict: string; reason: string } {
+  const cleaned = stripCodeFences(text);
+  let parsed: unknown = null;
   try {
-    const cleaned = stripCodeFences(text);
-    const parsed = JSON.parse(cleaned) as { agree?: boolean; verdict?: string; reason?: string };
-    return {
-      agree: parsed.agree !== false,
-      verdict: typeof parsed.verdict === 'string' ? parsed.verdict : 'not_verifiable',
-      reason: typeof parsed.reason === 'string' ? parsed.reason : '',
-    };
+    parsed = JSON.parse(cleaned);
   } catch {
+    try {
+      parsed = JSON.parse(repairJsonBackslashEscapes(cleaned));
+    } catch {
+      return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
+    }
+  }
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
     return { agree: true, verdict: 'not_verifiable', reason: 'Failed to parse response' };
   }
+  const obj = parsed as { agree?: boolean; verdict?: string; reason?: string };
+  return {
+    agree: obj.agree !== false,
+    verdict: typeof obj.verdict === 'string' ? obj.verdict : 'not_verifiable',
+    reason: typeof obj.reason === 'string' ? obj.reason : '',
+  };
 }
 
 export interface SecondOpinionResult {
@@ -886,30 +914,68 @@ function buildSourceEvidence(c: EnrichedFlaggedCitation): string | null {
   return parts.length > 0 ? parts.join('\n') : null;
 }
 
+/**
+ * Repair invalid JSON backslash escapes by doubling backslashes that precede
+ * a character which is not a valid JSON escape (`"`, `\`, `/`, `b`, `f`, `n`,
+ * `r`, `t`, `u`). LLMs frequently mirror MDX-escaped text like `\$100K` into
+ * JSON strings literally, producing `"\$100K"` — which is not valid JSON.
+ * Preserving the literal backslash requires rewriting that to `"\\$100K"`.
+ */
+export function repairJsonBackslashEscapes(input: string): string {
+  return input.replace(/\\(.)/g, (_m, c: string) => {
+    if ('"\\/bfnrtu'.includes(c)) return '\\' + c;
+    return '\\\\' + c;
+  });
+}
+
 /** Parse LLM response into fix proposals. */
 export function parseLLMFixResponse(content: string): FixProposal[] {
   const cleaned = stripCodeFences(content);
-  try {
-    const parsed = JSON.parse(cleaned);
-    if (!Array.isArray(parsed)) return [];
+  const parsed = tryParseJson(cleaned);
+  if (!Array.isArray(parsed)) return [];
 
-    return parsed
-      .filter(
-        (p: Record<string, unknown>) =>
-          typeof p.original === 'string' &&
-          typeof p.replacement === 'string' &&
-          p.original.length > 0 &&
-          p.original !== p.replacement,
-      )
-      .map((p: Record<string, unknown>) => ({
-        footnote: typeof p.footnote === 'number' ? p.footnote : 0,
-        original: p.original as string,
-        replacement: p.replacement as string,
-        explanation: typeof p.explanation === 'string' ? p.explanation : '',
-        fixType: typeof p.fix_type === 'string' ? p.fix_type : 'unknown',
-      }));
-  } catch {
-    return [];
+  return parsed
+    .filter(
+      (p: Record<string, unknown>) =>
+        typeof p.original === 'string' &&
+        typeof p.replacement === 'string' &&
+        p.original.length > 0 &&
+        p.original !== p.replacement,
+    )
+    .map((p: Record<string, unknown>) => ({
+      footnote: typeof p.footnote === 'number' ? p.footnote : 0,
+      original: p.original as string,
+      replacement: p.replacement as string,
+      explanation: typeof p.explanation === 'string' ? p.explanation : '',
+      fixType: typeof p.fix_type === 'string' ? p.fix_type : 'unknown',
+    }));
+}
+
+/**
+ * Attempt to JSON.parse `s`; on failure, repair invalid backslash escapes and
+ * retry. Returns `null` on unrecoverable failure. Emits a warning if the
+ * initial parse failed so silent breakage (e.g., the `\$` bug that produced
+ * 0 proposals in prod) is visible.
+ */
+function tryParseJson(s: string): unknown {
+  try {
+    return JSON.parse(s);
+  } catch (err1) {
+    const repaired = repairJsonBackslashEscapes(s);
+    try {
+      const result = JSON.parse(repaired);
+      console.warn(
+        `  [warn] LLM returned JSON with invalid backslash escapes — repaired. ` +
+        `First error: ${err1 instanceof Error ? err1.message : String(err1)}`,
+      );
+      return result;
+    } catch (err2) {
+      console.warn(
+        `  [warn] Failed to parse LLM JSON response (even after escape repair): ` +
+        `${err2 instanceof Error ? err2.message : String(err2)}`,
+      );
+      return null;
+    }
   }
 }
 
@@ -1687,6 +1753,14 @@ async function main() {
 
     if (!apply && totalProposed > 0) {
       console.log(`\n${c.dim}Run with --apply to write changes and auto-re-verify.${c.reset}`);
+    }
+    if (totalProposed === 0 && allResults.length > 0) {
+      console.log(
+        `\n${c.dim}Note: this tool handles small numeric/date corrections and minor overclaim softening. ` +
+        `It produces 0 proposals for severely-contradicted claims where faithful correction requires ` +
+        `rewording or removing substantive narrative. For those, see QUA-246 (prompt false-positive fixes) ` +
+        `or page regeneration via \`crux w improve --tier=deep\`.${c.reset}`,
+      );
     }
     console.log('');
   }

@@ -316,11 +316,32 @@ export async function handleResourceIngest(
     // pages (JS-only shells, empty responses). Enriching without content is wasteful
     // and sourcing would still see not_cached.
     if (status === 'reachable' && result.content.length > 0) {
+      // Pass `contentChanged: true` so resource-enrich knows to bypass its
+      // "already enriched" skip guard when content has shifted since the last
+      // fetch. Omit the field entirely when unchanged or unknown so older
+      // job-handler versions stay backwards-compatible (Zod field is optional).
+      const enrichParams: { resourceId: string; url: string; contentChanged?: boolean } = {
+        resourceId,
+        url,
+      };
+      if (contentChanged === true) {
+        enrichParams.contentChanged = true;
+      }
+      // Vary dedupKey when content changed so a still-pending enrich job for
+      // the same resource doesn't suppress the new contentChanged signal via
+      // ON CONFLICT DO NOTHING. The hash suffix is short-lived and doesn't
+      // pollute the keyspace. Use the full content hash (16 hex chars = 64 bits)
+      // rather than truncating further — collisions would cause a re-enrich to
+      // be silently dropped. `contentHash` is always non-null inside this `if`
+      // (guarded by `result.content.length > 0` above).
+      const dedupKey = contentChanged === true
+        ? `resource-enrich:${resourceId}:${contentHash}`
+        : `resource-enrich:${resourceId}`;
       createJob({
         type: 'resource-enrich',
-        params: { resourceId, url },
+        params: enrichParams,
         priority: 0,
-        dedupKey: `resource-enrich:${resourceId}`,
+        dedupKey,
       }).catch((err: unknown) => {
         const msg = err instanceof Error ? err.message : String(err);
         console.warn(`[resource-ingest] Failed to enqueue enrichment for ${resourceId}: ${msg}`);

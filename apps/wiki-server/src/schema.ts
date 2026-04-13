@@ -1736,6 +1736,52 @@ export const sourceVerdicts = pgTable(
 );
 
 /**
+ * Auto-suggested source URL candidates for records with an unverifiable verdict.
+ *
+ * When a sourcing verdict is `unverifiable` (source missing / doesn't cover the
+ * claim), the `crux sourcing suggest-urls` command runs web search for the claim
+ * and writes 1-3 candidate URLs here for human review or auto-recheck.
+ *
+ * Composite identity matches `source_check_verdicts`: (recordType, recordId, fieldName).
+ */
+export const sourcingUrlSuggestions = pgTable(
+  "sourcing_url_suggestions",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    recordType: text("record_type").notNull(),
+    recordId: text("record_id").notNull(),
+    fieldName: text("field_name"), // NULL = whole row
+    entityId: text("entity_id"),
+    suggestedUrl: text("suggested_url").notNull(),
+    title: text("title"),
+    snippet: text("snippet"),
+    relevanceScore: real("relevance_score"), // 0..1, provider-supplied or heuristic
+    sourceProvider: text("source_provider").notNull(), // exa | perplexity | scry | manual
+    generatorModel: text("generator_model"),
+    /** pending | approved | rejected | auto_verified */
+    status: text("status").notNull().default("pending"),
+    reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
+    reviewedBy: text("reviewed_by"), // agent session id or user handle
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_sus_record").on(table.recordType, table.recordId),
+    index("idx_sus_entity").on(table.entityId),
+    index("idx_sus_status").on(table.status),
+    index("idx_sus_created").on(table.createdAt),
+    // Unique (record_type, record_id, COALESCE(field_name, ''), suggested_url)
+    // declared in migration SQL since COALESCE cannot be expressed in Drizzle .on().
+    // CHECK (status IN ('pending','approved','rejected','auto_verified')) likewise in migration.
+  ]
+);
+
+/**
  * Audit log for TableBase changes — records every insert/update/delete
  * to PG-primary tables (personnel, grants, funding_rounds, etc.).
  * Provides git-like change history for data that bypasses git.

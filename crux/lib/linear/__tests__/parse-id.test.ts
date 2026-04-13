@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseLinearId, resolveLinearId } from '../parse-id.ts';
+import { findAllLinearIds, parseLinearId, resolveLinearId } from '../parse-id.ts';
 
 describe('parseLinearId', () => {
   it('extracts ID from a canonical claude branch name', () => {
@@ -99,5 +99,36 @@ describe('resolveLinearId', () => {
   it('returns null when no source has a match', () => {
     expect(resolveLinearId([null, undefined, 'plain text'])).toBeNull();
     expect(resolveLinearId([])).toBeNull();
+  });
+});
+
+describe('findAllLinearIds', () => {
+  it('finds every QUA reference in a multi-line string', () => {
+    const body = `Fixes QUA-100\nAlso touches QUA-200 and QUA-300.\n(see QUA-100 again)`;
+    expect(findAllLinearIds(body).sort()).toEqual(['QUA-100', 'QUA-200', 'QUA-300']);
+  });
+
+  it('includes branch-pattern hits', () => {
+    expect(findAllLinearIds('claude/qua-42-rename')).toContain('QUA-42');
+  });
+
+  it('returns empty for null/undefined/empty', () => {
+    expect(findAllLinearIds(null)).toEqual([]);
+    expect(findAllLinearIds(undefined)).toEqual([]);
+    expect(findAllLinearIds('')).toEqual([]);
+  });
+
+  it('matches lowercase and mixed-case bare tokens, deduped to canonical form', () => {
+    // Commit messages and pasted Linear URL slugs use lowercase commonly,
+    // so findAllLinearIds is intentionally case-insensitive on bare tokens
+    // (unlike parseLinearId which is case-sensitive on bare tokens to avoid
+    // mis-classifying random caps in prose).
+    expect(findAllLinearIds('QUA-1 qua-1 Qua-1')).toEqual(['QUA-1']);
+    expect(findAllLinearIds('only lowercase qua-7 here')).toEqual(['QUA-7']);
+  });
+
+  it('finds multiple distinct ids regardless of case', () => {
+    const body = 'fixed qua-1, then qua-2, finally QUA-3';
+    expect(findAllLinearIds(body).sort()).toEqual(['QUA-1', 'QUA-2', 'QUA-3']);
   });
 });

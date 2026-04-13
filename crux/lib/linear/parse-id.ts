@@ -60,6 +60,33 @@ export function parseLinearId(input: string | null | undefined): string | null {
 }
 
 /**
+ * Find *all* Linear IDs in an unstructured string (git log, PR body, checklist).
+ * Deduplicated and case-normalized to canonical form (`QUA-N`).
+ *
+ * Matches lowercase (`qua-1`) and mixed-case (`Qua-1`) bare tokens too —
+ * commit messages, Linear URL slugs, and pasted refs use lowercase commonly.
+ * Branch-pattern hits are also included.
+ */
+export function findAllLinearIds(input: string | null | undefined): string[] {
+  if (!input) return [];
+  const ids = new Set<string>();
+  // Case-insensitive bare token match. The original `parseLinearId` is
+  // case-sensitive on bare tokens to avoid mis-classifying random caps in
+  // prose, but for *finding all* refs in a multi-line corpus, lowercase
+  // matches are usually intentional copy-paste from URLs.
+  const bareGlobal = new RegExp(BARE_ID_RE.source, 'gi');
+  let m: RegExpExecArray | null;
+  while ((m = bareGlobal.exec(input)) !== null) {
+    ids.add(`${m[1].toUpperCase()}-${m[2]}`);
+  }
+  const branchGlobal = new RegExp(BRANCH_ID_RE.source, 'gi');
+  while ((m = branchGlobal.exec(input)) !== null) {
+    ids.add(`${m[1].toUpperCase()}-${m[2]}`);
+  }
+  return [...ids];
+}
+
+/**
  * Parse a Linear ID from several sources, preferring earlier ones.
  * Designed for session-init: branch name first, then task description.
  */

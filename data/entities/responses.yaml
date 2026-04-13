@@ -6696,3 +6696,15 @@
     - ai-governance
     - forecasting
   lastUpdated: 2026-03
+- id: voluntary-ai-commitments-enforcement
+  stableId: sid_E51O24PpvA
+  wikiId: E2283
+  type: approach
+  title: Voluntary AI Commitments Enforcement
+  description: >-
+    An analysis of non-binding AI safety pledges made by leading AI companies, their
+    enforcement mechanisms, compliance records, and limitations as a governance approach.
+  tags:
+    - ai-governance
+    - voluntary-commitments
+  lastUpdated: 2026-04

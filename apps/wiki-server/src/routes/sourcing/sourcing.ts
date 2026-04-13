@@ -7,6 +7,7 @@ import {
   count,
   sql,
   desc,
+  lt,
   lte,
   gte,
   ne,
@@ -52,6 +53,29 @@ const MAX_PAGE_SIZE = 200;
 const MAX_ID_LENGTH = 500;
 const MAX_URL_LENGTH = 2048;
 
+/**
+ * QUA-313: cooldown interval for the auto-flag path at POST /evidence.
+ * Skip setting `needs_recheck=true` on a verdict whose `updated_at` is
+ * newer than (now - AUTO_FLAG_COOLDOWN_MS). Matches the client-side
+ * `--min-age=7d` default in `crux sourcing-mark`.
+ */
+export const AUTO_FLAG_COOLDOWN_MS = 7 * 24 * 60 * 60 * 1000;
+
+/**
+ * Pure helper: given a verdict row's `updated_at`, a reference `now`, and
+ * the cooldown window, return true if the auto-flag path should skip it.
+ * Extracted for unit testing — the handler itself uses Drizzle's
+ * `lt(updated_at, cutoff)` which is equivalent.
+ */
+export function shouldSkipAutoFlag(
+  updatedAt: Date | null,
+  now: Date,
+  cooldownMs: number = AUTO_FLAG_COOLDOWN_MS,
+): boolean {
+  if (updatedAt == null) return false;
+  return now.getTime() - updatedAt.getTime() < cooldownMs;
+}
+
 const VALID_VERDICTS = [
   "confirmed",
   "contradicted",
@@ -69,6 +93,39 @@ const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
  */
 export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
 export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
+
+// ---- Shared CTE ----
+
+/**
+ * CTE listing every (record_type, record_id) pair currently present in its
+ * source table. Used to filter orphan verdicts — rows in source_verdicts
+ * that reference records which have since been deleted from their source
+ * table. `INNER JOIN` against this CTE excludes orphans.
+ *
+ * `citation` rows only count when they still carry an accuracy verdict;
+ * `fact` uses fact_id (not the serial PK) because source_verdicts.record_id
+ * stores the fact_id for facts.
+ */
+const LIVE_RECORDS_CTE = sql`
+  live_records AS (
+    SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
+    UNION ALL SELECT 'division', id::text FROM divisions
+    UNION ALL SELECT 'grant', id::text FROM grants
+    UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
+    UNION ALL SELECT 'investment', id::text FROM investments
+    UNION ALL SELECT 'funding-program', id::text FROM funding_programs
+    UNION ALL SELECT 'publication', id::text FROM publications
+    UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
+    UNION ALL SELECT 'equity-position', id::text FROM equity_positions
+    UNION ALL SELECT 'entity-event', id::text FROM entity_events
+    UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
+    UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
+    UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
+    UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
+    UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
+    UNION ALL SELECT 'fact', fact_id FROM facts
+  )
+`;
 
 // ---- Query schemas ----
 
@@ -103,6 +160,13 @@ const VerdictUpsertBody = z.object({
   reasoning: z.string().max(5000).optional(),
   sourcesChecked: z.number().int().min(0).optional(),
   nextCheckDue: z.string().datetime().optional(),
+  /**
+   * When true, mark this verdict as needing a recheck (e.g., because the
+   * operator is queuing targeted rechecks via `crux sourcing-mark`).
+   * Defaults to false — the normal write path clears the flag after a
+   * successful verdict computation, matching pre-QUA-313 behavior.
+   */
+  needsRecheck: z.boolean().optional(),
 });
 
 /** Limit field that clamps to MAX_PAGE_SIZE instead of rejecting */
@@ -364,45 +428,64 @@ const sourcingApp = new Hono()
       const { record_type } = c.req.valid("query");
       const db = getDrizzleDb();
 
-      const typeCondition = record_type
-        ? eq(sourceVerdicts.recordType, record_type)
-        : undefined;
+      // All verdict aggregations filter orphan verdicts (rows referencing records
+      // that have been deleted from their source table) via LIVE_RECORDS_CTE, to
+      // stay consistent with /coverage-matrix and /verdict-matrix. Without this
+      // filter the dashboard over-reports contradicted/partial/etc. counts by
+      // including verdicts for records that no longer exist.
+      const typeFilterSql = record_type
+        ? sql`AND v.record_type = ${record_type}`
+        : sql``;
 
-      const [statsRow] = await db
-        .select({
-          total: count(),
-          needsRecheck: sql<number>`count(*) filter (where ${sourceVerdicts.needsRecheck} = true)`,
-          avgConfidence: sql<number>`coalesce(avg(${sourceVerdicts.confidence}), 0)`,
-        })
-        .from(sourceVerdicts)
-        .where(typeCondition);
+      // count(*) with no GROUP BY always returns exactly one row, so statsRow
+      // is non-null in practice. The ?? 0 fallbacks guard against a defensive
+      // ceiling in the response contract.
+      const statsRows = await db.execute<{
+        total: number;
+        needs_recheck: number;
+        avg_confidence: number;
+      }>(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT
+          count(*)::int AS total,
+          count(*) FILTER (WHERE v.needs_recheck = true)::int AS needs_recheck,
+          coalesce(avg(v.confidence), 0)::float AS avg_confidence
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        WHERE 1=1 ${typeFilterSql}
+      `);
+      const statsRow = statsRows[0];
 
-      const byVerdictRows = await db
-        .select({
-          verdict: sourceVerdicts.verdict,
-          count: count(),
-        })
-        .from(sourceVerdicts)
-        .where(typeCondition)
-        .groupBy(sourceVerdicts.verdict);
+      const byVerdictRows = await db.execute<{ verdict: string; cnt: number }>(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT v.verdict, count(*)::int AS cnt
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        WHERE 1=1 ${typeFilterSql}
+        GROUP BY v.verdict
+      `);
 
       const byVerdict: Record<string, number> = {};
       for (const row of byVerdictRows) {
-        byVerdict[row.verdict] = row.count;
+        byVerdict[row.verdict] = row.cnt;
       }
 
-      // by_type is always unfiltered (shows all types for the type-filter tabs)
-      const byTypeRows = await db
-        .select({
-          recordType: sourceVerdicts.recordType,
-          count: count(),
-        })
-        .from(sourceVerdicts)
-        .groupBy(sourceVerdicts.recordType);
+      // by_type is always unfiltered by record_type (shows all types for the
+      // type-filter tabs) but still excludes orphans.
+      const byTypeRows = await db.execute<{ record_type: string; cnt: number }>(sql`
+        WITH ${LIVE_RECORDS_CTE}
+        SELECT v.record_type, count(*)::int AS cnt
+        FROM source_check_verdicts v
+        INNER JOIN live_records lr
+          ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+        GROUP BY v.record_type
+      `);
 
       const byType: Record<string, number> = {};
       for (const row of byTypeRows) {
-        byType[row.recordType] = row.count;
+        byType[row.record_type] = row.cnt;
       }
 
       const [evidenceStats] = await db
@@ -413,12 +496,12 @@ const sourcingApp = new Hono()
         .from(recordSources);
 
       return c.json({
-        total: statsRow.total,
+        total: Number(statsRow?.total ?? 0),
         by_verdict: byVerdict,
         by_type: byType,
-        needs_recheck: Number(statsRow.needsRecheck),
+        needs_recheck: Number(statsRow?.needs_recheck ?? 0),
         avg_confidence:
-          Math.round(Number(statsRow.avgConfidence) * 100) / 100,
+          Math.round(Number(statsRow?.avg_confidence ?? 0) * 100) / 100,
         stale_evidence_count: Number(evidenceStats.staleCount),
         dead_link_count: Number(evidenceStats.deadLinkCount),
         current_checker_model: CURRENT_CHECKER_MODEL,
@@ -720,7 +803,16 @@ const sourcingApp = new Hono()
       }
     }
 
-    // Auto-flag corresponding verdicts for recheck
+    // Auto-flag corresponding verdicts for recheck.
+    //
+    // QUA-313: 7-day cooldown — skip verdicts whose `updated_at` is within the
+    // cooldown window. Without this, any burst of evidence writes (e.g.,
+    // `enrich --force` over already-enriched resources, or multiple source
+    // checks of the same record in quick succession) would spam
+    // `needs_recheck=true` on verdicts that were freshly rechecked.
+    // The cooldown interval matches the `--min-age=7d` default in
+    // `crux sourcing-mark`, so client-side and server-side layers agree.
+    const autoFlagCutoff = new Date(now.getTime() - AUTO_FLAG_COOLDOWN_MS);
     const verdictUpdated = await db
       .update(sourceVerdicts)
       .set({ needsRecheck: true, updatedAt: now })
@@ -728,6 +820,7 @@ const sourcingApp = new Hono()
         and(
           eq(sourceVerdicts.recordType, body.recordType),
           eq(sourceVerdicts.recordId, body.recordId),
+          lt(sourceVerdicts.updatedAt, autoFlagCutoff),
         )
       )
       .returning({ recordId: sourceVerdicts.recordId });
@@ -1061,6 +1154,10 @@ const sourcingApp = new Hono()
     const reasoningVal = body.reasoning ?? null;
     const sourcesCheckedVal = body.sourcesChecked ?? 0;
     const nextCheckDueVal = body.nextCheckDue ? new Date(body.nextCheckDue) : null;
+    // QUA-313: default false (legacy behavior — clear the flag after a
+    // successful verdict write). Operators can queue targeted rechecks by
+    // passing `needsRecheck: true` explicitly.
+    const needsRecheckVal = body.needsRecheck ?? false;
 
     // Try update first
     const updated = await db
@@ -1073,7 +1170,7 @@ const sourcingApp = new Hono()
         confidence: confidenceVal,
         reasoning: reasoningVal,
         sourcesChecked: sourcesCheckedVal,
-        needsRecheck: false,
+        needsRecheck: needsRecheckVal,
         nextCheckDue: nextCheckDueVal,
         lastComputedAt: now,
         updatedAt: now,
@@ -1102,7 +1199,7 @@ const sourcingApp = new Hono()
             confidence: confidenceVal,
             reasoning: reasoningVal,
             sourcesChecked: sourcesCheckedVal,
-            needsRecheck: false,
+            needsRecheck: needsRecheckVal,
             nextCheckDue: nextCheckDueVal,
             lastComputedAt: now,
             createdAt: now,
@@ -1123,7 +1220,7 @@ const sourcingApp = new Hono()
               confidence: confidenceVal,
               reasoning: reasoningVal,
               sourcesChecked: sourcesCheckedVal,
-              needsRecheck: false,
+              needsRecheck: needsRecheckVal,
               nextCheckDue: nextCheckDueVal,
               lastComputedAt: now,
               updatedAt: now,
@@ -1758,7 +1855,7 @@ const sourcingApp = new Hono()
         JOIN things t2 ON t1.parent_thing_id = t2.id
         WHERE t2.thing_type = 'entity'
         GROUP BY t2.source_id
-      )
+      ),
       all_entities AS (
         SELECT entity_id FROM verdict_counts
         UNION
@@ -1849,49 +1946,10 @@ const sourcingApp = new Hono()
     // 3. Distinct checked records per type
     //
     // Both queries filter out orphaned verdicts (verdict rows referencing records
-    // that have been deleted from their source table) by JOINing against a CTE
-    // of all live (record_type, record_id) pairs.
-    //
-    // Note: for 'fact' type, record_id stores fact_id (not the serial PK),
-    // and for 'citation' type, record_id stores citation_quotes.id::text.
-    const liveRecordsCte = sql`
-      live_records AS (
-        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
-        UNION ALL
-        SELECT 'division', id::text FROM divisions
-        UNION ALL
-        SELECT 'grant', id::text FROM grants
-        UNION ALL
-        SELECT 'funding-round', id::text FROM funding_rounds
-        UNION ALL
-        SELECT 'investment', id::text FROM investments
-        UNION ALL
-        SELECT 'funding-program', id::text FROM funding_programs
-        UNION ALL
-        SELECT 'publication', id::text FROM publications
-        UNION ALL
-        SELECT 'secondary-market-price', id::text FROM secondary_market_prices
-        UNION ALL
-        SELECT 'equity-position', id::text FROM equity_positions
-        UNION ALL
-        SELECT 'entity-event', id::text FROM entity_events
-        UNION ALL
-        SELECT 'entity-assessment', id::text FROM entity_assessments
-        UNION ALL
-        SELECT 'benchmark-result', id::text FROM benchmark_results
-        UNION ALL
-        SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
-        UNION ALL
-        SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
-        UNION ALL
-        SELECT 'wiki-page', id::text FROM wiki_pages
-        UNION ALL
-        SELECT 'fact', fact_id FROM facts
-      )
-    `;
-
+    // that have been deleted from their source table) by JOINing against the
+    // shared LIVE_RECORDS_CTE.
     const verdictRows = (await db.execute(sql`
-      WITH ${liveRecordsCte}
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, v.verdict, count(*)::int AS cnt
       FROM source_check_verdicts v
       INNER JOIN live_records lr
@@ -1904,7 +1962,7 @@ const sourcingApp = new Hono()
     // A record can have multiple verdict rows (one per fieldName), so we use
     // COUNT(DISTINCT record_id) to avoid exceeding 100%.
     const checkedRows = (await db.execute(sql`
-      WITH ${liveRecordsCte}
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
       FROM source_check_verdicts v
       INNER JOIN live_records lr
@@ -2017,26 +2075,9 @@ const sourcingApp = new Hono()
   .get("/verdict-matrix", async (c) => {
     const db = getDrizzleDb();
 
-    // Exclude orphaned verdicts for deleted records (same CTE pattern as /coverage-matrix)
+    // Exclude orphaned verdicts for deleted records via the shared LIVE_RECORDS_CTE.
     const rows = (await db.execute(sql`
-      WITH live_records AS (
-        SELECT 'personnel' AS record_type, id::text AS record_id FROM personnel
-        UNION ALL SELECT 'division', id::text FROM divisions
-        UNION ALL SELECT 'grant', id::text FROM grants
-        UNION ALL SELECT 'funding-round', id::text FROM funding_rounds
-        UNION ALL SELECT 'investment', id::text FROM investments
-        UNION ALL SELECT 'funding-program', id::text FROM funding_programs
-        UNION ALL SELECT 'publication', id::text FROM publications
-        UNION ALL SELECT 'secondary-market-price', id::text FROM secondary_market_prices
-        UNION ALL SELECT 'equity-position', id::text FROM equity_positions
-        UNION ALL SELECT 'entity-event', id::text FROM entity_events
-        UNION ALL SELECT 'entity-assessment', id::text FROM entity_assessments
-        UNION ALL SELECT 'benchmark-result', id::text FROM benchmark_results
-        UNION ALL SELECT 'policy-stakeholder', id::text FROM policy_stakeholders
-        UNION ALL SELECT 'citation', id::text FROM citation_quotes WHERE accuracy_verdict IS NOT NULL
-        UNION ALL SELECT 'wiki-page', id::text FROM wiki_pages
-        UNION ALL SELECT 'fact', fact_id FROM facts
-      )
+      WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, v.verdict, count(*)::int AS cnt
       FROM source_check_verdicts v
       INNER JOIN live_records lr

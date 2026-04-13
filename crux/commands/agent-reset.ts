@@ -5,8 +5,8 @@
  * git branches, and WIP checklists. Pulls latest main.
  *
  * Usage:
- *   crux sys agent-reset                      Scan everything (dry run)
- *   crux sys agent-reset --kill               Clean up + pull main
+ *   crux sys agent-reset                      Scan; auto-pulls main if on main + clean
+ *   crux sys agent-reset --kill               Clean up + checkout main + pull
  *   crux sys agent-reset --kill --force       Kill without age threshold
  */
 
@@ -234,6 +234,25 @@ function execSafe(cmd: string, timeoutMs = 10000): string | null {
   }
 }
 
+/**
+ * Fast-forward pull origin/main and restore the .agent-slot marker.
+ * Caller must ensure the working tree is clean and HEAD is on main.
+ * Throws on pull failure; the slot-marker write is best-effort.
+ */
+function pullMainAndRestoreSlot(): void {
+  exec('git pull origin main --ff-only', 30000);
+  // git pull may overwrite .agent-slot if it's still tracked; rewrite from cwd.
+  const cwd = process.cwd();
+  const slotMatch = cwd.match(/\/a(\d+)\/?$/);
+  if (slotMatch) {
+    try {
+      writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
+    } catch {
+      // Non-fatal: the slot marker is a convenience, the pull already succeeded.
+    }
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Git scanning
 // ---------------------------------------------------------------------------
@@ -423,8 +442,22 @@ async function resetCommand(
   output += '\n';
 
   if (git.behindMain > 0) {
-    output += `  ${c.yellow}${git.behindMain} commits behind origin/main${c.reset}\n`;
-    totalIssues++;
+    // Safe auto-pull: only if on main with a clean tree. Avoids branch switches
+    // and clobbering WIP. Destructive cleanup still lives behind --kill.
+    if (!killMode && git.currentBranch === 'main' && !git.isDirty) {
+      try {
+        pullMainAndRestoreSlot();
+        output += `  ${c.green}✓ Pulled ${git.behindMain} commit${git.behindMain > 1 ? 's' : ''} from origin/main${c.reset}\n`;
+        git.behindMain = 0;
+      } catch (e: unknown) {
+        const msg = e instanceof Error ? e.message : String(e);
+        output += `  ${c.yellow}${git.behindMain} commits behind origin/main (pull failed: ${msg})${c.reset}\n`;
+        totalIssues++;
+      }
+    } else {
+      output += `  ${c.yellow}${git.behindMain} commits behind origin/main${c.reset}\n`;
+      totalIssues++;
+    }
   } else {
     output += `  ${c.green}Up to date with origin/main${c.reset}\n`;
   }
@@ -646,13 +679,7 @@ async function resetCommand(
           exec('git checkout main');
           output += `  ${c.green}✓${c.reset} Checked out main\n`;
         }
-        exec('git pull origin main --ff-only', 30000);
-        // Repair .agent-slot — git pull may overwrite it if still tracked
-        const cwd = process.cwd();
-        const slotMatch = cwd.match(/\/a(\d+)\/?$/);
-        if (slotMatch) {
-          writeFileSync(join(cwd, '.agent-slot'), slotMatch[1] + '\n');
-        }
+        pullMainAndRestoreSlot();
         output += `  ${c.green}✓${c.reset} Pulled latest main\n`;
       } catch (e: unknown) {
         const msg = e instanceof Error ? e.message : String(e);
@@ -678,10 +705,11 @@ export function getHelp(): string {
 Agent Reset — Reset an agent slot to a clean state between sessions
 
 Scans for stale processes, orphaned worktrees, merged branches, stale WIP
-checklists, and git stashes. Pulls latest main when cleaning up.
+checklists, and git stashes. Auto-pulls main when safe (on main + clean tree);
+full cleanup + checkout + pull runs only with --kill.
 
 Commands:
-  (default)    Scan everything and show what needs cleanup (dry run)
+  (default)    Scan; auto-ff-pulls main if already on main with a clean tree
 
 Options:
   --kill       Execute cleanup: kill processes, remove worktrees,
@@ -700,8 +728,8 @@ Cleanup actions (with --kill):
   7. Checkout main and pull latest
 
 Examples:
-  crux sys agent-reset                   # Scan — show what's stale
-  crux sys agent-reset --kill            # Full cleanup + pull main
+  crux sys agent-reset                   # Scan — show what's stale (auto-pulls main if safe)
+  crux sys agent-reset --kill            # Full cleanup + checkout main + pull
   crux sys agent-reset --kill --force    # Kill all processes (ignore age)
 `;
 }

@@ -1,0 +1,211 @@
+---
+wikiId: E2263
+title: AI Revolving Door Analysis
+description: Analysis of personnel flows between AI laboratories, government agencies, think tanks, and safety organizations, examining regulatory capture risks, expertise transfer, and governance implications.
+sidebar:
+  order: 50
+lastEdited: 2026-04-12
+createdAt: 2026-04-12
+summary: A well-structured analysis of AI revolving door dynamics that appropriately leverages adjacent-sector empirical evidence while honestly acknowledging the lack of AI-specific quantitative data; the named-moves table and institutional framework provide genuine reference value, though the page is limited by data scarcity and some citations lack full verifiability.
+balanceFlags:
+  - missing-primary-sources
+---
+import {EntityLink, R, KBF, Calc, DataInfoBox, DataExternalLinks} from '@components/wiki';
+
+## Quick Assessment
+
+| Dimension | Assessment |
+|-----------|------------|
+| **Phenomenon scope** | Lab ↔ government ↔ think tank ↔ academia cycles |
+| **Primary risk** | Regulatory capture, weakened AI oversight |
+| **Countervailing benefit** | Expertise transfer, improved government technical capacity |
+| **Empirical evidence** | Moderate — general revolving door studies; AI-specific data sparse |
+| **Reform status** | Weak cooling-off periods, uneven enforcement globally |
+| **AI safety relevance** | Moderate-to-high — shapes who governs frontier AI development |
+
+## Key Links
+
+| Source | Link |
+|--------|------|
+| Wikipedia | [Revolving door (politics)](https://en.wikipedia.org/wiki/Revolving_door_(politics)) |
+
+## Overview
+
+The **AI revolving door** describes the movement of personnel between frontier AI laboratories, government regulatory bodies, safety institutes, think tanks, and academic institutions. The phenomenon encompasses multiple directional flows: AI researchers and executives entering government advisory or regulatory roles; former government officials joining AI companies; think tank personnel cycling through White House advisory positions; and safety researchers migrating between independent organizations and commercial labs. As AI governance has become a high-stakes policy domain, the velocity and visibility of these transitions have accelerated sharply, particularly since 2022.
+
+The pattern mirrors the well-documented revolving door in financial services and healthcare but carries distinct features. Unlike banking, where regulatory expertise is relatively transferable across institutions, AI policy expertise is often lab-specific — a person who understands <EntityLink id="E218">OpenAI</EntityLink>'s internal safety processes carries knowledge that is directly valuable to regulators and competitors alike. This creates both a rationale for personnel flows (genuine expertise transfer) and a heightened capture risk (access to information that can be leveraged for competitive or regulatory advantage).
+
+Research on revolving doors in adjacent sectors provides the most rigorous quantitative evidence available. Studies of USPTO patent examiners find that those planning to enter private employment grant 12.6–17.6% more patents to prospective employers, with the patents receiving fewer subsequent citations — indicating quality degradation alongside favoritism.[^1] A study of 420,153 top corporate executives across 12,869 firms found that more than half had prior executive branch experience, and firms were significantly more likely to win government procurement contracts within two years of hiring a former agency official.[^2] These findings have not been replicated specifically for AI governance, but they frame the prior for assessing AI-sector dynamics.
+
+## Conceptual Framework
+
+### Directional Flow Categories
+
+The AI revolving door can be decomposed into five recurring movement patterns:
+
+**Lab-to-government flows** occur when AI company personnel — researchers, policy staff, or executives — move into regulatory agencies, safety institutes, or White House advisory roles. These transitions are often framed as public service contributions, bringing technical knowledge into institutions that might otherwise lack it. The risk is that the individual retains informal loyalty to, or future employment interest in, their former employer.
+
+**Government-to-lab flows** describe former officials, military leaders, or elected members joining AI companies' boards, policy teams, or advisory structures. These moves typically bring government access and credibility, raising concerns about whether the official's prior regulatory decisions were influenced by anticipation of private-sector opportunities.
+
+**Think tank cycles** involve researchers at policy institutes (CSET, CNAS, RAND, etc.) rotating into White House, NSC, or Congressional staff roles, then returning to think tanks or moving to industry. Think tanks occupy a structurally ambiguous position: they are nominally independent but often funded by technology companies and foundations with AI investments.
+
+**Academia-to-industry flows** describe university researchers — particularly those who built foundational AI capabilities — transitioning into commercial roles, sometimes while retaining academic appointments. This flow raises questions about whether academic prestige launders commercial interests.
+
+**Safety organization cross-staffing** involves personnel moving among AI safety nonprofits (<EntityLink id="E202">MIRI</EntityLink>, <EntityLink id="E140">FHI</EntityLink>, <EntityLink id="E25">ARC</EntityLink>), safety teams at frontier labs (<EntityLink id="E218">OpenAI</EntityLink>, <EntityLink id="E22">Anthropic</EntityLink>, <EntityLink id="E98">Google DeepMind</EntityLink>), and government AI safety institutes (UK AISI, US AISI). These flows are particularly consequential for AI safety because they determine where alignment expertise is concentrated and whether safety-oriented researchers can maintain independence from commercial pressures.
+
+### Mechanisms of Influence
+
+Personnel flows exert policy influence through several distinct mechanisms:
+
+- **Prospective employer favoritism**: Officials anticipating private-sector employment may grant favorable treatment to prospective employers — the mechanism documented in patent examiner research.[^1]
+- **Access deployment**: Former officials join companies specifically to leverage ongoing relationships with former colleagues, accelerating regulatory access beyond what formal lobbying provides.
+- **Information asymmetry**: Officials who move from government to industry carry institutional knowledge — internal deliberative processes, unpublished policy directions — that confers competitive advantage.
+- **Agenda-setting**: Former industry personnel in government shape which questions get asked and which evidence gets weighted, without necessarily acting in bad faith.
+- **Research influence**: Industry funding of think tanks and academic institutions creates soft dependence that shapes research priorities before personnel transitions even occur.[^3]
+
+## Named Moves: Documented Transitions
+
+The following table compiles documented personnel transitions relevant to AI governance. Dates derive from the research data; where the research provides only approximate periods, this is noted.
+
+| Person | From | To | Approx. Date | Notes |
+|--------|------|----|--------------|-------|
+| **Jade Leung** | <EntityLink id="E218">OpenAI</EntityLink> (policy) | UK AI Safety Institute (AISI) | 2023–2024 | Moved from OpenAI policy work to a senior role at the UK AISI, which evaluates frontier models |
+| **Helen Toner** | <EntityLink id="E218">OpenAI</EntityLink> board (Georgetown CSET) | CSET (returned) | Late 2023 | Removed from OpenAI board during the November 2023 governance crisis; previously held a joint CSET–OpenAI board position |
+| **Paul Nakasone** | NSA / US Cyber Command (Director/Commander) | <EntityLink id="E218">OpenAI</EntityLink> board | 2024 | Retired four-star general and former NSA director joined OpenAI's board and safety committee |
+| **Matt Clifford** | ARIA (co-founder/chair) | UK Prime Minister's AI adviser | 2023–2024 | Clifford co-founded the UK's Advanced Research and Invention Agency; became PM Rishi Sunak's personal AI adviser and helped organize the Bletchley Park AI Safety Summit |
+| **Daisy McGregor** | UK DSIT (deputy director, AI policy) | <EntityLink id="E22">Anthropic</EntityLink> (external affairs) | February 2025 | Oversaw Sunak's AI Safety Summit and the AI Security Institute at DSIT; moved to Anthropic's external affairs team. UK rules barred lobbying for one year but permitted immediate relationship-building with government contacts |
+| **Eric Schmidt** | Google (Chairman) | US government advisory boards (×3) | Obama era | Served on three government advisory bodies while retaining tech-sector stakes; cited as exemplar of simultaneous industry-government influence |
+| **Andrew Ng** | Google Brain (co-founder) | Baidu, then Coursera, then VC | 2014 onward | Trajectory from academic deep learning research through successive industry and investment roles; retained Stanford affiliation |
+| **Yann LeCun** | Academic (NYU) | Meta AI (Chief AI Scientist) | Ongoing | Retained academic position at NYU while leading Meta's AI research division |
+| **Fei-Fei Li** | Stanford (HAI) | Google Cloud AI (Chief Scientist) | 2017–2018, then returned to Stanford | Took a leave from Stanford to serve at Google Cloud; returned to academia and co-founded Stanford HAI |
+| **Allison Clements** | FERC Commissioner | ASG consulting (data centers) | Post-FERC | Former FERC commissioner became a partner at a consulting firm promoting data center development — directly relevant to AI infrastructure regulation |
+| **Neil Chatterjee** | FERC Chairman | AiDASH advisory board | Post-FERC | Former FERC chairman joined the advisory board of an AI tools company serving electric utilities |
+| **Bill Pulte** | (private sector) | FHFA Director | 2025 | Oversaw Fannie Mae's AI partnership with Palantir for mortgage fraud detection while holding disclosed Palantir stock valued at \$15,001–\$50,000 |
+
+*Note: MIRI-to-lab and FHI-to-lab flows are a documented pattern in the safety research community. <EntityLink id="E140">FHI</EntityLink> closure in 2024 accelerated researcher dispersal; a significant fraction moved to frontier lab safety teams or to <EntityLink id="E22">Anthropic</EntityLink>. Specific named transitions are not fully documented in the available research data and are omitted to avoid hallucination.*
+
+### AISI Cross-Staffing
+
+The AI Safety Institutes established in the UK and US following the 2023 Bletchley Park summit represent a novel institutional structure with built-in revolving door dynamics. The UK AISI was designed to recruit technical staff with lab experience — its evaluation mandate requires people who understand how frontier models are built. The Jade Leung transition exemplifies this: genuine expertise transfer from a lab's policy function to a government evaluation body. The governance question is whether such staff retain commitments or access relationships that compromise independent assessment.
+
+The US AISI (housed within NIST) and analogous bodies in Canada and Japan have pursued similar recruitment strategies, drawing on researchers from academic AI safety communities and, to a lesser extent, from within labs. Cross-staffing between national AISIs — through joint evaluations and staff exchanges — creates a further layer of personnel flows with less public visibility than the lab-to-government transitions covered by standard lobbying disclosure requirements.
+
+## Quantitative Analysis
+
+### Comparative Evidence from Adjacent Sectors
+
+Direct quantitative studies of the AI revolving door are not yet available. The following table summarizes the best available evidence from structurally similar sectors:
+
+| Study | Sector | Sample | Key Finding |
+|-------|--------|--------|-------------|
+| USPTO patent examiners (NBER) | Intellectual property | Quasi-random examiner assignments | Revolving door examiners grant 12.6–17.6% more patents to future employers; patents receive fewer citations (lower quality)[^1] |
+| Executive branch procurement mapping | Federal contracting | 420,153 executives, 12,869 firms | Firms more likely to win contracts within 2 years of hiring former agency official; less-complex contracts renegotiated at higher cost[^2] |
+| HHS political appointees (2004–2020) | Healthcare regulation | 766 appointees | One-third moved to industry jobs post-government; federal cooling-off laws (1–2 years) deemed narrow and ineffective[^4] |
+| OECD public debt managers | Public finance | 8 countries | Rules exist but suffer weak oversight and enforcement; UK/EU show improvements but enforcement gaps remain[^5] |
+| Tobacco lobbying (Australia) | Harmful industry analogy | Lobbyist biographies | Nearly half of tobacco lobbyists held prior or subsequent government positions, enabling access and weaker e-cigarette regulation[^6] |
+
+### AI Lobbying Trajectory
+
+The scale of AI-sector political influence has grown sharply. Lobbying reports mentioning AI doubled from 2022 to 2023, then nearly doubled again in 2024.[^7] By 2025, more than 3,500 lobbyists — representing approximately 25% of all federal lobbyists — reported lobbying on AI issues.[^7] The broader technology sector ranks as the third-largest employer of former government workers turned lobbyists, behind only healthcare and financial services.[^8]
+
+These figures frame the revolving door not as an incidental feature of AI governance but as an organized influence strategy. The <EntityLink id="E2882">Revolving Door Project</EntityLink> has documented industry funding of policy groups — including organizations promoting AI and data center expansion — as part of this broader ecosystem.[^9]
+
+### Government AI Deployment Growth
+
+A Washington Post analysis found approximately 3,000 AI deployments across 29 federal agencies, up 75% from the prior year.[^9] This expansion occurred largely under the oversight of officials with prior industry ties, raising questions about whether procurement decisions reflected public interest or cultivated relationships.
+
+## Strategic Importance
+
+### For AI Governance
+
+The revolving door is among the most tractable structural risks in AI governance. Unlike technical alignment problems, it is a known institutional phenomenon with documented regulatory interventions — cooling-off periods, disclosure requirements, recusal rules — even if current implementations are inadequate. The AI safety community and policymakers who want stronger oversight face a structural disadvantage: government AI safety capacity is built largely by recruiting from the industry it regulates, creating dependency that limits adversarial independence.
+
+The Daisy McGregor transition illustrates the tension clearly. Her DSIT experience made her genuinely valuable to <EntityLink id="E22">Anthropic</EntityLink>'s external affairs function — but her value to Anthropic derived directly from the relationships and institutional knowledge she built while regulating the sector. The one-year lobbying prohibition under UK rules did not prevent her from immediately building on those relationships in non-lobbying capacities.
+
+### For AI Safety Research
+
+The flow of researchers from independent safety organizations into frontier labs is particularly significant for the AI safety field's long-term structure. <EntityLink id="E140">FHI</EntityLink>'s closure dispersed a significant pool of alignment researchers, many of whom moved to commercial lab safety teams. This has implications for research independence: safety work conducted within a lab is subject to that lab's publication decisions, competitive pressures, and governance culture in ways that independent institute work is not.
+
+The <EntityLink id="E202">MIRI</EntityLink>-to-labs flow represents a different variant: researchers trained in a deconfusionist, mathematically rigorous approach to alignment finding that career pathways increasingly run through labs with empirical scaling orientations. Whether this represents productive cross-pollination or absorption of independent safety capacity is contested within the community.
+
+<EntityLink id="E552">Open Philanthropy</EntityLink>'s position as a major funder of both independent safety organizations and, through its EA ecosystem ties, individuals who take lab positions creates a further structural complexity. Funding relationships can shape research agendas before any formal personnel transition occurs.
+
+### For Frontier Lab Governance
+
+The government-to-lab direction — exemplified by Paul Nakasone joining OpenAI's board — serves functions beyond regulatory access. Former senior officials bring credibility with national security agencies, potential influence over government AI procurement, and implicit signals about a company's trustworthiness to policymakers. OpenAI's addition of a former NSA director to its safety committee occurred in the context of ongoing scrutiny of its governance following the November 2023 board crisis, suggesting the appointment served legitimacy as well as operational functions.
+
+## Criticisms and Concerns
+
+### Regulatory Capture Risk
+
+The dominant criticism holds that AI revolving door flows systematically weaken oversight by creating incentives for officials to favor prospective employers, reduce regulator independence through informal access channels, and concentrate policy expertise in a small network that shares industry assumptions. The empirical evidence from adjacent sectors — particularly the patent examiner and HHS appointee studies — supports concern about favoritism effects even when individuals act in subjective good faith.
+
+Critics including the <EntityLink id="E2882">Revolving Door Project</EntityLink> characterize Big Tech's Washington influence strategy as comprehensive and intentional, combining direct lobbying, funding of nominally independent policy groups, and personnel placements to shape the regulatory environment. The framing is contested: industry proponents argue that government genuinely lacks technical capacity and that experienced practitioners filling advisory roles represents necessary expertise transfer rather than capture.
+
+### Conflicts of Interest in Specific Cases
+
+The Bill Pulte case — an FHFA director holding disclosed Palantir stock while overseeing Fannie Mae's AI contract with Palantir — illustrates how financial conflicts can coexist with regulatory responsibility even under formal disclosure regimes. Disclosure requirements identify conflicts; they do not resolve them.
+
+The FERC alumni transitions to data center consulting and AI utility advisory roles are structurally significant because AI infrastructure regulation — energy permitting for data centers, grid interconnection policy — will shape the physical capacity for frontier AI development. Former regulators with specialized knowledge of FERC processes are particularly valuable to companies navigating those processes.
+
+### Weaknesses in Current Reform Frameworks
+
+Cooling-off periods are the primary regulatory tool, but existing implementations have documented weaknesses. US federal law imposes one-to-two year restrictions on direct lobbying, but "advising" roles that do not involve formal lobbying contacts are generally permitted immediately. UK rules similarly barred Daisy McGregor from lobbying for one year while permitting relationship-building that serves the same access function. Threshold-based restrictions are vulnerable to positional adjustments that preserve substance while evading formal coverage.
+
+### Counterarguments
+
+Proponents of personnel mobility argue that government cannot regulate AI effectively without staff who understand it, and that restricting movement would reduce the quality of both government service and subsequent private-sector practice. Some empirical work on revolving doors in financial services finds that the mechanism can improve regulatory quality through effort incentives — analysts seeking future private employment may work harder to demonstrate competence. This "human capital" hypothesis competes with the "regulatory capture" hypothesis in the literature, with evidence supporting both depending on sector and measurement approach.
+
+The LessWrong community, to the extent it has addressed the issue directly, has included voices supportive of temporary private-sector talent rotation into government as a competence-building mechanism — the "revolving door recommendation" framing — without necessarily treating this as equivalent to capture-oriented industry placements.[^10]
+
+## Limitations
+
+### Data Availability
+
+No comprehensive, systematic dataset of AI-specific revolving door transitions exists. The named-moves table above is constructed from available research data and is necessarily incomplete. OpenSecrets and similar trackers provide lobbying disclosure data but do not systematically capture advisory relationships, board memberships, or the soft influence channels that may matter more than formal lobbying in AI governance.
+
+### Causal Identification
+
+Attributing regulatory outcomes to revolving door dynamics requires identifying what would have happened counterfactually — what a regulator without industry ties would have decided. This counterfactual is unobservable. Studies that find favorable treatment effects (as in the patent examiner research) use quasi-random assignment designs to approximate causal identification, but such designs are not available for AI governance contexts where selection into roles is highly non-random.
+
+### Selection Confounds
+
+High-performing individuals are more likely both to move between sectors and to achieve better outcomes in either direction. Observed correlations between personnel transitions and favorable regulatory treatment may reflect underlying quality differences rather than capture effects. The literature documents this limitation without fully resolving it.
+
+### Scope Limitations
+
+Most quantitative revolving door research focuses on financial services, pharmaceuticals, and defense procurement — sectors with long regulatory histories and rich disclosure data. AI governance is younger, more internationally distributed, and involves novel institutional structures (safety institutes, model evaluations, compute governance) for which sector-specific evidence does not yet exist.
+
+### AI Safety Community Specificity
+
+The safety researcher flow dynamic — between independent organizations, academic labs, and frontier lab safety teams — is particularly poorly documented quantitatively. Informal norms, community social structures, and funding relationships shape where researchers go in ways that are not captured by standard revolving door frameworks developed for government-industry transitions.
+
+## Key Uncertainties
+
+- Whether AI safety institutes can maintain genuine independence from frontier labs given structural recruitment dependencies
+- Whether the human capital benefits of personnel mobility outweigh capture costs in AI governance specifically
+- How international coordination (US/UK/Canada/Japan AISI cross-staffing) interacts with national competitive interests
+- Whether the dispersal of FHI researchers into commercial labs has durably shifted the center of gravity of alignment research
+- Whether cooling-off period reform or alternative mechanisms (structural separation, enhanced disclosure, public interest representation requirements) would meaningfully improve governance outcomes
+
+## Sources
+
+[^1]: NBER Working Paper — USPTO Patent Examiner Revolving Door Study (2018, updated); finding that revolving door examiners grant 12.6–17.6% more patents to future employers with lower citation quality
+
+[^2]: Logan P. Emery et al. — Executive Branch Revolving Door Procurement Mapping Study, published January 2025; analysis of 420,153 executives at 12,869 firms; findings on contract award patterns; *Journal of Financial and Quantitative Analysis* (June 2025 issue)
+
+[^3]: Research on Big Tech funding of AI policy groups — documented by the Revolving Door Project, 2025; covers Next American Era and related organizations
+
+[^4]: Kanter (USC Schaeffer) and Daniel Carpenter (Harvard) — HHS Revolving Door Study, covering 766 political appointees 2004–2020; one-third moved to industry; published findings on cooling-off law inadequacy
+
+[^5]: Silano — OECD Public Debt Managers Revolving Door Analysis, 2025; 8-country comparison; findings on weak enforcement despite existing rules
+
+[^6]: Australian tobacco lobbying revolving door analysis — finding that nearly half of tobacco lobbyists held prior or subsequent government positions; cited in Harvard Ethics paper context
+
+[^7]: AI lobbying surge data — reported in news coverage of 2024–2025 federal lobbying disclosures; over 3,500 lobbyists (25% of federal lobbyists) on AI issues by 2025; electric sector spending over \$226 million in 2025
+
+[^8]: Tech sector lobbying rank — described as third-largest employer of former government lobbyists; from Revolving Door Project and associated analyses, 2025
+
+[^9]: Revolving Door Project — 2025 tracker of AI deployments in federal executive branch; Washington Post analysis of ~3,000 AI instances across 29 agencies, 75% increase from prior year; Palantir surveillance case documentation
+
+[^10]: LessWrong — summary post of US Senate AI hearing (witnesses: Sam Altman, Gary Marcus, Christina Montgomery); author supported temporary private-sector talent rotation into government roles as competence-building mechanism
