@@ -29,6 +29,7 @@ import {
   SOURCE_CHECK_ADDITIONAL_CONSIDERATIONS,
   SOURCE_CHECK_RESPONSE_FORMAT,
 } from '../lib/sourcing/prompt-guidelines.ts';
+import { SOURCE_CHECK_CONSTANTS } from '../lib/sourcing/types.ts';
 import { loadGraphFull, resolveEntity } from '../lib/factbase-loader.ts';
 import type { LoadedKB } from '../lib/factbase-loader.ts';
 
@@ -160,8 +161,7 @@ async function verifySingleFact(
   // sourcing with the partial content — the LLM may still extract useful info.
   const sourceText = fetchResult.content;
 
-  // Truncate source text for prompt
-  const truncatedSource = sourceText.slice(0, 12000);
+  const truncatedSource = sourceText.slice(0, SOURCE_CHECK_CONSTANTS.PROMPT_CONTENT_LENGTH);
 
   const prompt = buildSourcingPrompt(entity, fact, property, formattedValue, truncatedSource);
 
