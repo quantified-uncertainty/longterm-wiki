@@ -98,7 +98,7 @@ export async function getSourcingStats(): Promise<ApiResult<SourcingStatsResult>
 }
 
 /**
- * Clean up orphaned source-check rows for deleted records (QUA-149).
+ * Clean up orphaned sourcing rows for deleted records (QUA-149).
  *
  * `dryRun` defaults to true — callers must pass `dryRun: false` explicitly
  * to delete. `recordType` scopes cleanup to a single type.

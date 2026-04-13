@@ -1,7 +1,7 @@
 /**
- * Source-Check Orphan Cleanup (QUA-149)
+ * Sourcing Orphan Cleanup (QUA-149)
  *
- * Deletes source-check verdict / evidence / url-suggestion rows whose record
+ * Deletes sourcing verdict / evidence / url-suggestion rows whose record
  * no longer exists in its source table. Dashboard queries already filter these
  * out at read time, but the raw COUNT(*)s (e.g., 1002 personnel verdicts for
  * 724 records) are what made the coverage matrix show nonsense like 127%.
