@@ -289,6 +289,19 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-294: enforces NOT VALID on ADD CONSTRAINT for large tables.
+    // Migration 0173 caused a ~12h prod deploy stall by taking ACCESS
+    // EXCLUSIVE on hallucination_risk_snapshots without NOT VALID.
+    // Blocking — there is no legitimate reason to bypass this on a hot
+    // table. If a new large table appears, add it to LARGE_TABLES in the
+    // validator file.
+    id: 'migration-large-table-ddl',
+    name: 'Migration NOT VALID required on large tables',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-migration-large-table-ddl.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'untyped-rows',
     name: 'No untyped row casts in routes',
     command: 'npx',
