@@ -177,6 +177,68 @@ interface VerifyResult {
   status: 'pass' | 'fail' | 'skip';
   exitCode?: number;
   output?: string;
+  skipReason?: string;
+}
+
+/**
+ * Determine whether a `psql`-based verify command can actually run in the
+ * current environment. Returns `{ runnable: true }` for non-psql commands and
+ * for psql commands when both `psql` is on PATH and `DATABASE_URL` is set.
+ *
+ * Exported for unit testing. Callers can inject a probe via `deps` to avoid
+ * shelling out in tests.
+ *
+ * This exists because `crux gh deploy-tasks verify` is typically invoked from
+ * coordinator workstations that don't have `psql` installed and don't carry
+ * `DATABASE_URL` in their environment (the DB lives in k8s). Without this
+ * pre-check, every migration task reports FAIL with exit 127, eroding the
+ * signal-to-noise ratio of `/deploy` Step 5 — see QUA-319.
+ */
+export function checkPsqlRunnable(
+  command: string,
+  deps: {
+    hasPsql?: () => boolean;
+    getDatabaseUrl?: () => string | undefined;
+  } = {}
+): { runnable: true } | { runnable: false; reason: string } {
+  // Only gate psql commands. Other verify patterns (curl, gh, pnpm) are
+  // either ambient on any workstation or already fail loudly for other reasons.
+  if (!/\bpsql\b/.test(command)) {
+    return { runnable: true };
+  }
+
+  const getDatabaseUrl = deps.getDatabaseUrl ?? (() => process.env.DATABASE_URL);
+  const hasPsql = deps.hasPsql ?? defaultHasPsql;
+
+  const dbUrl = getDatabaseUrl();
+  if (!dbUrl || dbUrl.trim() === '') {
+    return {
+      runnable: false,
+      reason:
+        'DATABASE_URL is not set — cannot run psql verification locally. Run this from a deploy environment with DB access, or export DATABASE_URL before retrying.',
+    };
+  }
+
+  if (!hasPsql()) {
+    return {
+      runnable: false,
+      reason:
+        'psql is not installed on PATH — cannot run psql verification locally. Install the Postgres client or run this from a machine with psql + DB access.',
+    };
+  }
+
+  return { runnable: true };
+}
+
+let cachedHasPsql: boolean | undefined;
+function defaultHasPsql(): boolean {
+  if (cachedHasPsql !== undefined) return cachedHasPsql;
+  const probe = spawnSync('command', ['-v', 'psql'], {
+    shell: true,
+    stdio: 'ignore',
+  });
+  cachedHasPsql = probe.status === 0;
+  return cachedHasPsql;
 }
 
 /**
@@ -264,6 +326,19 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
         continue;
       }
 
+      const runnable = checkPsqlRunnable(command);
+      if (!runnable.runnable) {
+        results.push({
+          pr: pr.number,
+          prTitle: pr.title,
+          task: item.text,
+          command,
+          status: 'skip',
+          skipReason: runnable.reason,
+        });
+        continue;
+      }
+
       const { exitCode, output } = runVerifyCommand(command, timeoutMs);
       results.push({
         pr: pr.number,
@@ -329,6 +404,9 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
           .join('\n');
         lines.push(`        ${c.dim}exit=${r.exitCode}${c.reset}`);
         lines.push(indented);
+      }
+      if (r.status === 'skip' && r.skipReason) {
+        lines.push(`        ${c.dim}${r.skipReason}${c.reset}`);
       }
     }
     lines.push('');
