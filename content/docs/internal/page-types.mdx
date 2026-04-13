@@ -386,14 +386,14 @@ This catches pages where someone manually typed `quality: 75` or an LLM suggeste
 
 ### Fixing Pages with Manual Quality
 
-If you see: `Quality (X) set without ratings - use 'pnpm regrade page-id'`
+If you see: `Quality (X) set without ratings - use 'pnpm crux w improve <page-id>'`
 
 Run:
 ```bash
-pnpm regrade page-id
+pnpm crux w improve page-id --tier=standard --apply
 ```
 
-This will use Claude to properly grade the page and set both `quality` and `ratings`.
+This will use Claude to improve and properly grade the page, setting both `quality` and `ratings`.
 
 ---
 
@@ -436,11 +436,8 @@ pnpm validate
 # Run quality-source check specifically
 pnpm crux validate unified --rules=quality-source
 
-# Grade a specific page
-pnpm regrade page-id
-
-# Grade all ungraded pages
-node scripts/content/grade-content.mjs --skip-graded --apply
+# Improve and re-grade a specific page
+pnpm crux w improve page-id --tier=standard --apply
 ```
 
 ---

@@ -37,7 +37,7 @@ The project has mature infrastructure:
   - Target: All pages with importance > 60 and quality < 40
 
 - [ ] **Citation coverage** - Many pages lack external citations
-  - Resource manager can convert links: `pnpm resources process [page] --apply`
+  - Resource manager can convert links: `pnpm crux w resources process [page] --apply`
   - Goal: Every substantive claim has a source
 
 ### Tooling (Low Priority)
