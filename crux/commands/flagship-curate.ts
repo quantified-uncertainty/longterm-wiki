@@ -420,7 +420,7 @@ async function registerAndIngestSources(
 
 /**
  * Update personnel records with newly discovered source URLs.
- * Uses forceSkipSourceCheck since we're about to verify right after.
+ * Uses forceSkipSourcing since we're about to verify right after.
  */
 async function updatePersonnelSources(
   entity: ResolvedEntity,
@@ -446,8 +446,8 @@ async function updatePersonnelSources(
 
   try {
     const result = await syncPersonnel(personnelUpdates, {
-      forceSkipSourceCheck: true,
-      forceSkipSourceCheckReason: 'flagship-curate: updating source URLs before re-verification',
+      forceSkipSourcing: true,
+      forceSkipSourcingReason: 'flagship-curate: updating source URLs before re-verification',
     });
 
     if (!result.ok) {
