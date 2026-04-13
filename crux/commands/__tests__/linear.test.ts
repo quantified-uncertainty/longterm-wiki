@@ -184,9 +184,13 @@ describe('linear start', () => {
       'QUA-184',
       expect.stringContaining('starting work')
     );
-    // Branch name from the mocked execSync is interpolated into the comment
     const commentBody = commentOnIssueMock.mock.calls[0][1];
+    // Branch name (from mocked execSync) is in the comment
     expect(commentBody).toContain('claude/qua-184-test-branch');
+    // Enriched fields (QUA-336): branch is a claude/* branch so no main warning
+    expect(commentBody).not.toContain('⚠');
+    // Host is always set (from os.hostname()) — assert the field label is present
+    expect(commentBody).toContain('**Host:**');
   });
 });
 

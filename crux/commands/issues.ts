@@ -19,6 +19,7 @@ import { readFileSync } from 'fs';
 import { createLogger } from '../lib/output.ts';
 import { githubApi, githubApiPaginated, REPO } from '../lib/github.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
+import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { parseIntOpt, parseRequiredInt } from '../lib/cli.ts';
 import { listActiveAgents, registerAgent } from '../lib/wiki-server/active-agents.ts';
@@ -500,7 +501,8 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
-  const branch = currentBranch();
+  const ctx = getSessionContext();
+  const branch = ctx.branch;
 
   // Check for active-agent conflicts (best-effort — don't block if server is down)
   if (!options.force) {
@@ -539,10 +541,9 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   });
 
   // Post start comment
-  const body =
-    `🤖 Claude Code starting work on this issue.\n\n` +
-    `**Branch:** \`${branch}\`\n\n` +
-    `Will post an update here when a PR is ready for review.`;
+  const body = buildStartCommentBody(ctx, {
+    trailing: 'Will post an update here when a PR is ready for review.',
+  });
 
   await githubApi(`/repos/${REPO}/issues/${issueNum}/comments`, {
     method: 'POST',
@@ -564,6 +565,7 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   let output = '';
   output += `${c.green}✓${c.reset} Started tracking issue #${issueNum}: ${issue.title}\n`;
   output += `  Branch: ${c.cyan}${branch}${c.reset}\n`;
+  if (ctx.slot !== null) output += `  Slot: ${c.cyan}a${ctx.slot}${c.reset}\n`;
   output += `  Label \`${CLAUDE_WORKING_LABEL}\` added.\n`;
   output += `  Comment posted on ${issue.html_url}\n`;
 
