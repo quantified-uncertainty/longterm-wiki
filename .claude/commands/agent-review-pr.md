@@ -320,6 +320,30 @@ All three must pass. If no changes were made during review, this phase is redund
 
 ---
 
+## Phase 9.5: Attest every review pattern (QUA-363, option E) — MANDATORY
+
+The `agent-checklist init` step at the start of your session scanned the diff for known bug shapes (`readdirSync` in priority loops, GitHub conclusion regexes, new command handlers without try/catch, numeric-ID substring collisions, permissive test fakes) and injected forced `review-*` checklist items for each match.
+
+Before writing the review marker you **must** visit every injected pattern item and either:
+
+1. **Confirm no finding** → `pnpm crux sys agent-checklist check review-<pattern-id>`
+2. **Address the finding** (fix code / add test / simplify) then check it off, OR
+3. **Mark N/A with reason** → `pnpm crux sys agent-checklist check --na review-<pattern-id> --reason "why this pattern doesn't apply here"` (do NOT use `--na` lightly — the pattern is in the checklist because the diff matched it)
+
+Run this to see what needs attention:
+
+```bash
+pnpm crux gh review-patterns check
+```
+
+Exit 0 = all pattern items attested. Exit 1 = one or more `review-*` items still unchecked — that means `/agent-ship` will block at the `agent-checklist complete` step.
+
+**You are not done reviewing until `gh review-patterns check` exits 0.** Do not write the review marker (Phase 10b) until this passes.
+
+Why this step exists: the QUA-339 review-pass-2 incident found that even a thorough hostile reviewer misses structural bugs (iteration-order determinism, enum exhaustiveness, prefix collisions) without explicit prompting. The pattern registry + injected items make each blind spot unmissable: the LLM cannot silently skip an item that is literally sitting in the checklist.
+
+---
+
 ## Phase 10: Update test plan and mark review complete
 
 ### 10a. Update PR test plan

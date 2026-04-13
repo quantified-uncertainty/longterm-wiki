@@ -125,6 +125,7 @@ import * as docsCommands from './commands/docs.ts';
 import * as linearCommands from './commands/linear.ts';
 import * as flagshipCurateCommands from './commands/flagship-curate.ts';
 import * as sessionFinalizeCommands from './commands/session-finalize.ts';
+import * as reviewPatternsCommands from './commands/review-patterns.ts';
 
 const domains = {
   validate: validateCommands,
@@ -214,6 +215,7 @@ const domains = {
   linear: linearCommands,
   'flagship-curate': flagshipCurateCommands,
   'session-finalize': sessionFinalizeCommands,
+  'review-patterns': reviewPatternsCommands,
 };
 
 const shortcutMap = buildShortcutMap();

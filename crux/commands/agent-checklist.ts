@@ -20,6 +20,7 @@ import {
   CHECKLIST_ITEMS,
   buildChecklistSnapshot,
   formatSnapshotAsYaml,
+  detectPatternItems,
   type SessionType,
   type ChecklistMetadata,
 } from '../lib/session/session-checklist.ts';
@@ -179,7 +180,46 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   }
 
   const metadata: ChecklistMetadata = { task, branch, timestamp: new Date().toISOString(), issue, linearId };
-  let markdown = buildChecklist(type, metadata);
+
+  // ── Pattern-triggered items (QUA-363, option B) ──────────────────────────
+  // Scan the current diff for bug shapes and append forced checklist items.
+  // Best-effort: if git fails or no patterns trigger, this is a no-op.
+  const { items: patternItems, detections } = detectPatternItems(PROJECT_ROOT);
+
+  let markdown = buildChecklist(type, metadata, patternItems);
+
+  // If any patterns triggered, append a short "Review patterns" section
+  // with the reasons — so the reviewer knows WHY each item exists.
+  if (detections.length > 0) {
+    const patternSection: string[] = [
+      '',
+      '## Review patterns (QUA-363)',
+      '',
+      '> These items were injected because the current diff matches bug shapes',
+      '> from prior review incidents. Each `review-*` item above must be checked',
+      '> off (or marked `--na` with `--reason`) before shipping.',
+      '',
+    ];
+    for (const { pattern, hits } of detections) {
+      patternSection.push(`### \`review-${pattern.id}\` — ${pattern.label}`);
+      patternSection.push('');
+      patternSection.push(`**Why**: ${pattern.reason}`);
+      if (pattern.origin) patternSection.push(`**Origin**: ${pattern.origin}`);
+      patternSection.push('');
+      patternSection.push('**Hits in current diff**:');
+      for (const hit of hits.slice(0, 8)) {
+        const loc = hit.line > 0 ? `:${hit.line}` : '';
+        patternSection.push(`- \`${hit.file}${loc}\` — \`${hit.snippet.slice(0, 120)}\``);
+      }
+      if (hits.length > 8) {
+        patternSection.push(`- … ${hits.length - 8} more`);
+      }
+      patternSection.push('');
+    }
+    // Insert the section AFTER the Key Decisions block so existing tooling
+    // that parses the top of the file is unaffected.
+    markdown += patternSection.join('\n') + '\n';
+  }
 
   if (!issue) {
     const naResult = checkItems(markdown, ['issue-tracking'], '~', 'no GitHub issue for this session');

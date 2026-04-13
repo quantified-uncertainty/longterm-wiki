@@ -226,6 +226,19 @@ Include `reviewed: true` or `reviewed: false` in the session log payload sent to
 
 Run `pnpm crux sys agent-checklist complete` — must exit 0 (all items checked or N/A).
 
+Then verify every review-pattern attestation (QUA-363, option E):
+
+```bash
+pnpm crux gh review-patterns check
+```
+
+This MUST exit 0. If it exits 1, one or more `review-*` items from the diff-triggered pattern scan are still unchecked. Do NOT ship. Go back to `/agent-review-pr` (or inspect each finding manually), then either:
+
+- Check it off: `pnpm crux sys agent-checklist check review-<pattern-id>`
+- Mark N/A with reason: `pnpm crux sys agent-checklist check --na review-<pattern-id> --reason "..."`
+
+The pattern registry is deliberately narrow — items only appear when the diff matches a documented prior-incident bug shape. An unchecked `review-*` item means you have a real blind spot to close.
+
 ## Step 8: Ship
 
 Run `/agent-push-and-verify`.

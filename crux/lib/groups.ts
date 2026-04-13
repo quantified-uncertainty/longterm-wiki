@@ -102,6 +102,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'epic',
       'release',
       'review',
+      'review-patterns',
       'pr-patrol',
       'branches',
       'deploy-tasks',

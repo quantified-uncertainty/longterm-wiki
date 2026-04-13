@@ -394,6 +394,31 @@ const PARALLEL_STEPS: Step[] = [
     // checks both HTML <td> tables and TanStack ColumnDef arrays.
   },
   {
+    // QUA-363: catches the QUA-339 pass-2 bug class where a regex matches
+    // `conclusion` fields but omits timed_out / action_required / etc.
+    // Blocking — there's no legitimate reason to partially enumerate the
+    // GitHub check conclusion set. Suppress false positives with a
+    // `// conclusion-enum-ok: <reason>` comment on the same or previous line.
+    id: 'github-conclusion-enum',
+    name: 'GitHub check conclusion enum exhaustiveness',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-github-conclusion-enum.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    // QUA-363: advisory scan for crux command handlers without top-level
+    // try/catch (or an explicit `// handler-safe` marker). Advisory because
+    // the existing codebase has ~260 legacy handlers; retrofitting is a
+    // separate project. The warning makes the count visible so reviewers
+    // notice when NEW handlers drift up the count.
+    id: 'command-handler-errors',
+    name: 'Command handler error boundary (advisory)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-command-handler-errors.ts'],
+    cwd: PROJECT_ROOT,
+    advisory: true,
+  },
+  {
     id: 'actions-yaml',
     name: 'GitHub Actions workflow YAML (actionlint)',
     command: 'npx',

@@ -7,6 +7,7 @@
  */
 
 import { execSync } from 'child_process';
+import { parseDiff, detectAllPatterns, type PatternDetection } from '../review-patterns/patterns.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -209,8 +210,70 @@ export function getItemsForType(type: SessionType): ChecklistItem[] {
   );
 }
 
-export function buildChecklist(type: SessionType, metadata: ChecklistMetadata): string {
-  const items = getItemsForType(type);
+// ---------------------------------------------------------------------------
+// Pattern-triggered checklist items (QUA-363, option B)
+// ---------------------------------------------------------------------------
+
+/**
+ * Read the current diff against origin/main (or main if origin unreachable).
+ * Returns an empty string on any failure — pattern detection becomes a no-op
+ * rather than blocking checklist init when git state is weird.
+ */
+export function getDiffAgainstMain(cwd: string = process.cwd()): string {
+  const attempts = [
+    'git diff origin/main...HEAD',
+    'git diff main...HEAD',
+    'git diff HEAD',
+  ];
+  for (const cmd of attempts) {
+    try {
+      const out = execSync(cmd, { cwd, encoding: 'utf-8', maxBuffer: 16 * 1024 * 1024, stdio: ['ignore', 'pipe', 'ignore'] });
+      if (out.length > 0) return out;
+    } catch { /* try next */ }
+  }
+  return '';
+}
+
+/**
+ * Build ChecklistItems from pattern detections.
+ *
+ * Each detected pattern becomes a single forced item. The item is
+ * `blocking` so the checklist cannot be `complete`'d without the
+ * reviewer explicitly checking it off or marking it `--na` with reason.
+ *
+ * Pattern ids are prefixed with `review-` to avoid colliding with the
+ * static checklist catalog above.
+ */
+export function buildPatternItems(detections: PatternDetection[]): ChecklistItem[] {
+  return detections.map(({ pattern, hits }) => ({
+    id: `review-${pattern.id}`,
+    label: `${pattern.label} (${hits.length} site${hits.length === 1 ? '' : 's'} in diff)`,
+    applicableTypes: 'all' as const,
+    priority: 'blocking' as const,
+  }));
+}
+
+/**
+ * Convenience: run the full diff → patterns → items pipeline against
+ * the current working directory. Returns both the items and the raw
+ * detections (so callers can include pattern metadata in the checklist).
+ */
+export function detectPatternItems(cwd?: string): {
+  items: ChecklistItem[];
+  detections: PatternDetection[];
+} {
+  const diff = getDiffAgainstMain(cwd);
+  if (!diff) return { items: [], detections: [] };
+  const detections = detectAllPatterns(parseDiff(diff));
+  return { items: buildPatternItems(detections), detections };
+}
+
+export function buildChecklist(
+  type: SessionType,
+  metadata: ChecklistMetadata,
+  extraItems: ChecklistItem[] = [],
+): string {
+  const items = [...getItemsForType(type), ...extraItems];
   const lines: string[] = [];
 
   lines.push('# Session Checklist');
