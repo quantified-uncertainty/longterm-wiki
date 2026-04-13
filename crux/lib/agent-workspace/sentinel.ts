@@ -90,9 +90,20 @@ export interface SentinelEnv {
 export function deriveSessionKey(env: NodeJS.ProcessEnv, ppid: number): string {
   const pane = env.TMUX_PANE;
   if (pane && pane.length > 0) {
-    return pane.startsWith('%') ? pane.slice(1) : pane;
+    const raw = pane.startsWith('%') ? pane.slice(1) : pane;
+    return sanitizeSessionKey(raw) || `pid-${ppid}`;
   }
   return `pid-${ppid}`;
+}
+
+/**
+ * Strip any character that could make the session key escape `/tmp/`. The
+ * legitimate inputs are tmux pane ids (`\d+`) and our own `pid-<n>`
+ * fallback; anything else is rejected to prevent a hostile TMUX_PANE from
+ * steering writes into unrelated paths.
+ */
+function sanitizeSessionKey(s: string): string {
+  return s.replace(/[^A-Za-z0-9_-]/g, '');
 }
 
 export function sentinelPath(role: Role, sessionKey: string): string {
@@ -112,10 +123,21 @@ export function otherRole(role: Role): Role {
  *
  * Format chosen to be human-readable in `cat`, parseable in bash, and
  * resistant to corruption by intermediate `sed`/`grep` pipes.
+ *
+ * We sanitize `host` to drop whitespace because macOS computer names can
+ * contain spaces (e.g. "Ozzie's MacBook"), and whitespace in a value would
+ * split the key=value pairs at parse time — making our own sentinel
+ * unparseable and silently defeating the role-conflation guard.
  */
 export function serializeSentinel(s: Sentinel): string {
   const pane = s.tmuxPane.startsWith('%') || s.tmuxPane === '' ? s.tmuxPane : `%${s.tmuxPane}`;
-  return `role=${s.role} tmux_pane=${pane} ppid=${s.ppid} created=${s.created} host=${s.host} user=${s.user}\n`;
+  const host = sanitizeFieldValue(s.host);
+  return `role=${s.role} tmux_pane=${pane} ppid=${s.ppid} created=${s.created} host=${host} user=${s.user}\n`;
+}
+
+/** Replace whitespace and `=` with `_` so a value never splits the field list. */
+function sanitizeFieldValue(v: string): string {
+  return v.replace(/[\s=]+/g, '_');
 }
 
 /**

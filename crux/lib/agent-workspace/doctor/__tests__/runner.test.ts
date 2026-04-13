@@ -57,6 +57,24 @@ describe('runDoctor', () => {
     expect(r.checks[0].durationMs).toBeGreaterThanOrEqual(0);
   });
 
+  it('refuses to report green when every check is skipped (nothing actually verified)', async () => {
+    const skipCheck = (id: string): DoctorCheck => ({
+      id, label: id,
+      run: async () => ({ status: 'skipped' as const, summary: 'tool missing' }),
+    });
+    const r = await runDoctor('slots', [skipCheck('a'), skipCheck('b')], stubEnv);
+    // Worst bubbles to warn because 0 ok + 0 fail + 0 warn + only skipped
+    expect(r.worst).toBe('warn');
+  });
+
+  it('does NOT escalate when at least one check passed', async () => {
+    const skipCheck: DoctorCheck = {
+      id: 'sk', label: 'sk', run: async () => ({ status: 'skipped' as const, summary: '' }),
+    };
+    const r = await runDoctor('slots', [okCheck('a'), skipCheck], stubEnv);
+    expect(r.worst).toBe('ok');
+  });
+
   it('runs sequentially when parallel=false', async () => {
     const order: string[] = [];
     const c = (id: string): DoctorCheck => ({

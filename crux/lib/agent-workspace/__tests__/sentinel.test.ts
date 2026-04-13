@@ -86,6 +86,42 @@ describe('sentinelPath', () => {
   });
 });
 
+describe('deriveSessionKey — hostile TMUX_PANE', () => {
+  it('strips path-traversal characters', () => {
+    expect(deriveSessionKey({ TMUX_PANE: '%../../etc/passwd' }, 9)).toBe('etcpasswd');
+  });
+  it('falls back to pid when the sanitized result is empty', () => {
+    expect(deriveSessionKey({ TMUX_PANE: '%///' }, 42)).toBe('pid-42');
+  });
+  it('preserves underscore and dash', () => {
+    expect(deriveSessionKey({ TMUX_PANE: 'abc_123-xyz' }, 0)).toBe('abc_123-xyz');
+  });
+});
+
+describe('serialize — host sanitization', () => {
+  it('replaces whitespace in hostname so parse round-trips', () => {
+    const s: Sentinel = {
+      role: 'slots', tmuxPane: '%1', ppid: 1, created: 1,
+      host: "Ozzie's MacBook", user: 0,
+    };
+    const text = serializeSentinel(s);
+    // No embedded whitespace in the host field
+    expect(text.match(/host=\S+/)?.[0]).toBe('host=Ozzie\'s_MacBook');
+    // Round-trip succeeds despite the original having spaces
+    const parsed = parseSentinel(text);
+    expect(parsed).not.toBeNull();
+    expect(parsed?.host).toBe("Ozzie's_MacBook");
+  });
+  it('replaces `=` in hostname so field list stays delimited', () => {
+    const s: Sentinel = {
+      role: 'slots', tmuxPane: '%1', ppid: 1, created: 1,
+      host: 'a=b=c', user: 0,
+    };
+    const parsed = parseSentinel(serializeSentinel(s));
+    expect(parsed?.host).toBe('a_b_c');
+  });
+});
+
 describe('serialize/parse round-trip', () => {
   it('round-trips a full sentinel', () => {
     const s: Sentinel = {

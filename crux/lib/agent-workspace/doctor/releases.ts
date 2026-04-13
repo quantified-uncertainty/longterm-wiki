@@ -131,7 +131,11 @@ export const checkOpsState: DoctorCheck = {
 
     const fetchHead = env.stat(`${opsPath}/.git/FETCH_HEAD`);
     let lastFetchAge = Infinity;
-    if (fetchHead) lastFetchAge = Math.floor(env.now().getTime() / 1000) - fetchHead.mtime;
+    if (fetchHead) {
+      // Clamp at 0 — backup restores or clock skew can put mtime in the future,
+      // which would print "last pull -3m ago". Treat as "just now" instead.
+      lastFetchAge = Math.max(0, Math.floor(env.now().getTime() / 1000) - fetchHead.mtime);
+    }
 
     const issues: string[] = [];
     if (dirty) issues.push('uncommitted changes');
@@ -139,7 +143,7 @@ export const checkOpsState: DoctorCheck = {
       issues.push(`last fetch ${Math.round(lastFetchAge / 60)}min ago`);
     }
     if (issues.length === 0) {
-      const minutes = Math.max(0, Math.round(lastFetchAge / 60));
+      const minutes = Math.round(lastFetchAge / 60);
       return { status: 'ok', summary: `clean, last pull ${minutes}m ago` };
     }
     return {
@@ -228,16 +232,22 @@ export const checkReleasePr: DoctorCheck = {
 // 6. deploy-tasks — pending tasks awaiting verification
 // ---------------------------------------------------------------------------
 
+/**
+ * Count unchecked `[ ]` lines in `crux gh deploy-tasks pending` output.
+ * The crux subcommand prints human-readable text (no --json today), so we
+ * parse the `☐` / `[ ]` markers instead of asking for structured output
+ * we don't have. If the format changes, this check falls back to info.
+ */
 export const checkDeployTasks: DoctorCheck = {
   id: 'deploy-tasks',
   label: 'deploy-tasks',
   async run(env) {
-    const r = env.exec('pnpm', ['-s', 'crux', 'gh', 'deploy-tasks', 'pending', '--json'], { timeoutMs: 10000 });
+    const r = env.exec('pnpm', ['-s', 'crux', 'gh', 'deploy-tasks', 'pending'], { timeoutMs: 15000 });
     if (r.notFound) return { status: 'skipped', summary: 'pnpm/crux not available' };
     if (r.code !== 0) return { status: 'warn', summary: 'deploy-tasks pending failed', detail: r.stderr };
-    let payload: { count?: number; tasks?: unknown[] };
-    try { payload = JSON.parse(r.stdout); } catch { return { status: 'info', summary: 'unparseable output (older crux?)' }; }
-    const count = payload.count ?? payload.tasks?.length ?? 0;
+    // Strip ANSI and count lines with an unchecked marker
+    const stripped = r.stdout.replace(/\x1b\[[0-9;]*m/g, '');
+    const count = (stripped.match(/(^|\n)\s*(☐|\[ \])/g) ?? []).length;
     if (count === 0) return { status: 'ok', summary: '0 pending' };
     return {
       status: 'warn',
@@ -251,11 +261,20 @@ export const checkDeployTasks: DoctorCheck = {
 // 7. prod-edge — single curl to /api/health (delegates to /health for deep dive)
 // ---------------------------------------------------------------------------
 
+/**
+ * Single-call prod smoke test. Hits the wiki-server /health endpoint
+ * (NOT the Next.js app — that has no health route). Expects the
+ * documented `{ "status": "healthy", ... }` contract.
+ *
+ * Deep diagnostics live in the `/health` skill; this check exists so the
+ * releases doctor can answer "is prod fine enough to proceed?" in ~300ms
+ * without pulling in the full health workflow.
+ */
 export const checkProdEdge: DoctorCheck = {
   id: 'prod-edge',
   label: 'prod-edge',
   async run(env) {
-    const url = 'https://www.longtermwiki.com/api/health';
+    const url = 'https://wiki-server.k8s.quantifieduncertainty.org/health';
     const r = await env.fetch(url, { timeoutMs: 5000 });
     if (r.timedOut) return { status: 'fail', summary: 'timed out', action: 'Run /health and /incident.' };
     if (r.networkError) return { status: 'fail', summary: 'network error', action: 'Run /health.' };
@@ -265,10 +284,12 @@ export const checkProdEdge: DoctorCheck = {
     if (body.migrationError) {
       return { status: 'fail', summary: `migration error: ${body.migrationError}`, action: 'Run /health then /incident.' };
     }
-    if (body.status !== 'ok') {
+    // Accept both 'healthy' (wiki-server contract) and 'ok' (defensive: some
+    // endpoints use this convention). Anything else is a real fail.
+    if (body.status !== 'healthy' && body.status !== 'ok') {
       return { status: 'fail', summary: `status=${body.status}`, action: 'Run /health then /incident.' };
     }
-    return { status: 'ok', summary: `200 status=ok` };
+    return { status: 'ok', summary: `200 status=${body.status}` };
   },
 };
 

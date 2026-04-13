@@ -108,6 +108,17 @@ describe('checkOpsState', () => {
     env.setFile('/lw/ops/.git/FETCH_HEAD', { mtime: NOW_SEC - 60 * 60 * 3 });
     expect((await checkOpsState.run(env)).status).toBe('warn');
   });
+  it('clamps future FETCH_HEAD mtime (clock skew) to 0, no negative display', async () => {
+    const env = new FakeDoctorEnv({ now: NOW_SEC });
+    env.setFile('/lw/ops', { isDir: true });
+    env.setExec('git -C /lw/ops status --porcelain', ok());
+    // mtime in the future — can happen after a restore-from-backup
+    env.setFile('/lw/ops/.git/FETCH_HEAD', { mtime: NOW_SEC + 999 });
+    const r = await checkOpsState.run(env);
+    expect(r.status).toBe('ok');
+    expect(r.summary).not.toContain('-');
+    expect(r.summary).toContain('0m');
+  });
 });
 
 describe('checkOpsDivergence', () => {
@@ -190,31 +201,60 @@ describe('checkReleasePr', () => {
 });
 
 describe('checkDeployTasks', () => {
-  it('ok with 0 pending', async () => {
+  const KEY = 'pnpm -s crux gh deploy-tasks pending';
+  it('ok when no unchecked markers in output', async () => {
     const env = new FakeDoctorEnv();
-    env.setExec('pnpm -s crux gh deploy-tasks pending --json', ok('{"count":0,"tasks":[]}'));
+    env.setExec(KEY, ok('No pending deploy tasks.\n'));
     expect((await checkDeployTasks.run(env)).status).toBe('ok');
   });
-  it('warns with pending tasks', async () => {
+  it('counts ☐ markers as pending', async () => {
     const env = new FakeDoctorEnv();
-    env.setExec('pnpm -s crux gh deploy-tasks pending --json', ok('{"count":3,"tasks":[1,2,3]}'));
+    env.setExec(KEY, ok('PR #1\n  ☐ `ci` Verify CI\n  ☐ `migration` Apply 0173\n'));
     const r = await checkDeployTasks.run(env);
     expect(r.status).toBe('warn');
-    expect(r.summary).toContain('3');
+    expect(r.summary).toContain('2');
+  });
+  it('counts [ ] markers as pending', async () => {
+    const env = new FakeDoctorEnv();
+    env.setExec(KEY, ok('PR #2\n  [ ] check thing\n'));
+    const r = await checkDeployTasks.run(env);
+    expect(r.status).toBe('warn');
+    expect(r.summary).toContain('1');
+  });
+  it('strips ANSI color codes before counting', async () => {
+    const env = new FakeDoctorEnv();
+    env.setExec(KEY, ok('\x1b[33m☐\x1b[0m task one\n\x1b[33m☐\x1b[0m task two\n'));
+    expect((await checkDeployTasks.run(env)).summary).toContain('2');
+  });
+  it('skips when pnpm missing', async () => {
+    const env = new FakeDoctorEnv();
+    env.setExec(KEY, notFound());
+    expect((await checkDeployTasks.run(env)).status).toBe('skipped');
   });
 });
 
 describe('checkProdEdge', () => {
-  it('ok on 200 with status=ok and no migrationError', async () => {
+  const URL = 'https://wiki-server.k8s.quantifieduncertainty.org/health';
+  it('ok on 200 with status=healthy (actual wiki-server contract)', async () => {
     const env = new FakeDoctorEnv();
-    env.setFetch('https://www.longtermwiki.com/api/health', {
-      ok: true, status: 200, body: '{"status":"ok"}', headers: {},
-    });
+    env.setFetch(URL, { ok: true, status: 200, body: '{"status":"healthy"}', headers: {} });
+    const r = await checkProdEdge.run(env);
+    expect(r.status).toBe('ok');
+    expect(r.summary).toContain('healthy');
+  });
+  it('ok on 200 with status=ok (defensive alternate contract)', async () => {
+    const env = new FakeDoctorEnv();
+    env.setFetch(URL, { ok: true, status: 200, body: '{"status":"ok"}', headers: {} });
     expect((await checkProdEdge.run(env)).status).toBe('ok');
+  });
+  it('fails on degraded status', async () => {
+    const env = new FakeDoctorEnv();
+    env.setFetch(URL, { ok: true, status: 200, body: '{"status":"degraded"}', headers: {} });
+    expect((await checkProdEdge.run(env)).status).toBe('fail');
   });
   it('fails on migrationError', async () => {
     const env = new FakeDoctorEnv();
-    env.setFetch('https://www.longtermwiki.com/api/health', {
+    env.setFetch(URL, {
       ok: true, status: 200, body: '{"status":"degraded","migrationError":"lock_timeout"}', headers: {},
     });
     const r = await checkProdEdge.run(env);
@@ -223,16 +263,12 @@ describe('checkProdEdge', () => {
   });
   it('fails on non-200', async () => {
     const env = new FakeDoctorEnv();
-    env.setFetch('https://www.longtermwiki.com/api/health', {
-      ok: false, status: 503, body: '', headers: {},
-    });
+    env.setFetch(URL, { ok: false, status: 503, body: '', headers: {} });
     expect((await checkProdEdge.run(env)).status).toBe('fail');
   });
   it('fails on timeout', async () => {
     const env = new FakeDoctorEnv();
-    env.setFetch('https://www.longtermwiki.com/api/health', {
-      ok: false, status: 0, body: '', headers: {}, timedOut: true,
-    });
+    env.setFetch(URL, { ok: false, status: 0, body: '', headers: {}, timedOut: true });
     expect((await checkProdEdge.run(env)).status).toBe('fail');
   });
 });

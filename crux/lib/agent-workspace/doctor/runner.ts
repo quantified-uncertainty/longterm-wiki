@@ -79,6 +79,14 @@ export async function runDoctor(
     if (STATUS_ORDER[r.status] > STATUS_ORDER[worst]) worst = r.status;
   }
 
+  // If nothing actually succeeded (every check skipped/info) we do NOT have
+  // evidence that the session is healthy — refuse to report green. A fresh
+  // CI box missing pgrep/gh/kubectl/lsof would otherwise score a misleading
+  // "all clear" exit 0.
+  if (summary.ok === 0 && summary.fail === 0 && summary.warn === 0 && results.length > 0) {
+    worst = 'warn';
+  }
+
   return {
     role,
     startedAt: formatTimestamp(startedAt),
