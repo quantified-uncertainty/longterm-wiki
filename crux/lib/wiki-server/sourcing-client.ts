@@ -94,7 +94,16 @@ export async function getEvidenceByRecord(
 }
 
 /**
- * Batch-fetch evidence for many records in a single request (QUA-331).
+ * Max records per batch evidence request. Must match the server's
+ * `MAX_EVIDENCE_BY_RECORDS` in
+ * `apps/wiki-server/src/routes/sourcing/sourcing.ts`. Callers that
+ * might exceed this (e.g. scans driven by `--limit` flags) should
+ * chunk their input and call `getEvidenceByRecords` per chunk.
+ */
+export const MAX_EVIDENCE_BY_RECORDS = 1000;
+
+/**
+ * Batch-fetch evidence for many records in a single request.
  * Replaces N+1 loops over `getEvidenceByRecord`. The server groups by
  * `recordType` and issues one `IN (...)` query per type.
  *
@@ -121,11 +130,7 @@ export async function getEvidenceByRecords(
   );
 }
 
-/**
- * Build the response-map key used by `getEvidenceByRecords`.
- * Kept in sync with `evidenceRecordKey` in the server route
- * (`apps/wiki-server/src/routes/sourcing/sourcing.ts`).
- */
+/** Must match `evidenceRecordKey` in apps/wiki-server/src/routes/sourcing/sourcing.ts. */
 export function evidenceRecordKey(recordType: string, recordId: string): string {
   return `${recordType}|${recordId}`;
 }
