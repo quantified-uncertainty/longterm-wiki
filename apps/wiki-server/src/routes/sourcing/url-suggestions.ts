@@ -27,7 +27,29 @@ import {
 } from "../shared/utils.js";
 
 const MAX_BATCH = 200;
-const VALID_STATUSES = ["pending", "approved", "rejected", "auto_verified"] as const;
+
+/**
+ * Allowed lifecycle states for a URL suggestion.
+ * Also mirrored in migration 0176's CHECK constraint — keep in sync.
+ */
+export const VALID_SUGGESTION_STATUSES = [
+  "pending",
+  "approved",
+  "rejected",
+  "auto_verified",
+] as const;
+export type SuggestionStatus = (typeof VALID_SUGGESTION_STATUSES)[number];
+
+const VALID_STATUSES = VALID_SUGGESTION_STATUSES;
+
+/** Providers known to the suggest-urls generator. */
+export const VALID_SOURCE_PROVIDERS = [
+  "exa",
+  "perplexity",
+  "scry",
+  "manual",
+] as const;
+export type SourceProvider = (typeof VALID_SOURCE_PROVIDERS)[number];
 
 const SuggestionInput = z.object({
   recordType: z.string().min(1).max(50),
@@ -38,7 +60,7 @@ const SuggestionInput = z.object({
   title: z.string().max(500).nullable().optional(),
   snippet: z.string().max(2000).nullable().optional(),
   relevanceScore: z.number().min(0).max(1).nullable().optional(),
-  sourceProvider: z.string().min(1).max(50),
+  sourceProvider: z.enum(VALID_SOURCE_PROVIDERS),
   generatorModel: z.string().max(100).nullable().optional(),
   status: z.enum(VALID_STATUSES).default("pending"),
   notes: z.string().max(2000).nullable().optional(),
@@ -111,7 +133,6 @@ const urlSuggestionsApp = new Hono()
             updated_at = NOW()
         `)
       );
-      // DO UPDATE guarantees every input row is either inserted or updated.
       return c.json({ upserted: suggestions.length });
     } catch (err) {
       return dbError(c, "url-suggestions upsert", err, { batchSize: suggestions.length });
@@ -145,7 +166,6 @@ const urlSuggestionsApp = new Hono()
       return dbError(c, "url-suggestions query", err);
     }
   })
-  // `/:id{[0-9]+}` guarantees id is a positive integer before the handler runs.
   .patch("/:id{[0-9]+}", async (c) => {
     const id = Number(c.req.param("id"));
 

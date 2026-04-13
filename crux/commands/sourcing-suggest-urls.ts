@@ -28,17 +28,17 @@ import {
   listUrlSuggestions,
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
-import { suggestUrls } from '../lib/sourcing/suggest-urls.ts';
+import { suggestUrls, GENERATOR_MODEL } from '../lib/sourcing/suggest-urls.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
 const DEFAULT_BUDGET_USD = 1.0;
 const DEFAULT_MAX_CANDIDATES = 3;
 const MAX_CANDIDATES_PER_RECORD = 10;
-const GENERATOR_MODEL = 'qua-64/suggest-urls-v1';
 const PREFETCH_PAGE_SIZE = 200;
 const PREFETCH_MAX = 2000;
 const UPSERT_CHUNK = 100;
+const DEFAULT_CONCURRENCY = 5;
 
 interface SuggestOptions extends BaseOptions {
   limit?: string;
@@ -55,14 +55,55 @@ interface SuggestOptions extends BaseOptions {
   skipExisting?: boolean;
 }
 
-function parseBoundedInt(raw: unknown, fallback: number, max: number): number {
-  const n = parseInt(String(raw ?? ''), 10);
-  return Number.isFinite(n) && n > 0 ? Math.min(n, max) : fallback;
+/**
+ * Parse a numeric flag; return `fallback` (with a stderr warning) on any
+ * non-positive or non-numeric input so typos don't silently run with defaults.
+ * `max` clamps the result on the high end.
+ */
+function parseBoundedInt(
+  raw: unknown,
+  fallback: number,
+  max: number,
+  flag: string,
+): number {
+  if (raw === undefined || raw === null || raw === '') return fallback;
+  const n = parseInt(String(raw), 10);
+  if (!Number.isFinite(n) || n <= 0) {
+    process.stderr.write(`warning: ignoring --${flag}=${raw} (expected positive integer)\n`);
+    return fallback;
+  }
+  return Math.min(n, max);
 }
 
-function parsePositiveFloat(raw: unknown, fallback: number): number {
-  const n = parseFloat(String(raw ?? ''));
-  return Number.isFinite(n) && n > 0 ? n : fallback;
+function parsePositiveFloat(raw: unknown, fallback: number, flag: string): number {
+  if (raw === undefined || raw === null || raw === '') return fallback;
+  const n = parseFloat(String(raw));
+  if (!Number.isFinite(n) || n <= 0) {
+    process.stderr.write(`warning: ignoring --${flag}=${raw} (expected positive number)\n`);
+    return fallback;
+  }
+  return n;
+}
+
+/**
+ * Minimal concurrency pool: runs up to `concurrency` tasks in parallel,
+ * resolves when all complete. No external dependency.
+ */
+async function runWithConcurrency<T>(
+  concurrency: number,
+  tasks: Array<() => Promise<T>>,
+): Promise<T[]> {
+  const results: T[] = new Array(tasks.length);
+  let next = 0;
+  const worker = async () => {
+    while (true) {
+      const i = next++;
+      if (i >= tasks.length) return;
+      results[i] = await tasks[i]();
+    }
+  };
+  await Promise.all(Array.from({ length: Math.min(concurrency, tasks.length) }, worker));
+  return results;
 }
 
 interface RunSummary {
@@ -93,7 +134,15 @@ function makeSummary(): RunSummary {
   };
 }
 
+function sortedProviders(s: RunSummary) {
+  return {
+    used: [...s.providersUsed].sort(),
+    skipped: [...s.providersSkipped].sort(),
+  };
+}
+
 function summaryToJson(s: RunSummary, dryRun: boolean) {
+  const { used, skipped } = sortedProviders(s);
   return {
     scanned: s.scanned,
     skipped_had_suggestion: s.skippedHadSuggestion,
@@ -103,16 +152,17 @@ function summaryToJson(s: RunSummary, dryRun: boolean) {
     provider_errors: s.providerErrors,
     cost_usd: Number(s.costUsd.toFixed(4)),
     budget_exhausted: s.budgetExhausted,
-    providers_used: [...s.providersUsed].sort(),
-    providers_skipped: [...s.providersSkipped].sort(),
+    providers_used: used,
+    providers_skipped: skipped,
     dry_run: dryRun,
   };
 }
 
 function formatSummary(s: RunSummary, dryRun: boolean): string {
-  const usedList = [...s.providersUsed].sort().join(', ') || '(none)';
-  const skippedLine = s.providersSkipped.size > 0
-    ? `\nProviders skipped:      ${[...s.providersSkipped].sort().join(', ')}`
+  const { used, skipped } = sortedProviders(s);
+  const usedList = used.join(', ') || '(none)';
+  const skippedLine = skipped.length > 0
+    ? `\nProviders skipped:      ${skipped.join(', ')}`
     : '';
   return (
 `
@@ -160,12 +210,13 @@ async function suggestCommand(
   _args: string[],
   options: SuggestOptions,
 ): Promise<CommandResult> {
-  const limit = parseBoundedInt(options.limit, DEFAULT_LIMIT, MAX_LIMIT);
-  const budgetCap = parsePositiveFloat(options.budget, DEFAULT_BUDGET_USD);
+  const limit = parseBoundedInt(options.limit, DEFAULT_LIMIT, MAX_LIMIT, 'limit');
+  const budgetCap = parsePositiveFloat(options.budget, DEFAULT_BUDGET_USD, 'budget');
   const maxCandidates = parseBoundedInt(
     options['max-candidates'] ?? options.maxCandidates,
     DEFAULT_MAX_CANDIDATES,
     MAX_CANDIDATES_PER_RECORD,
+    'max-candidates',
   );
   const recordTypeFilter = options.type?.trim() || undefined;
   const entityFilter = options.entity?.trim() || undefined;
@@ -186,7 +237,6 @@ async function suggestCommand(
 
   const summary = makeSummary();
 
-  // ── Step 1: list unverifiable verdicts ──
   const verdictsResult = await listVerdicts({
     verdict: 'unverifiable',
     recordType: recordTypeFilter,
@@ -216,38 +266,40 @@ async function suggestCommand(
     return { exitCode: 0, output };
   }
 
-  // ── Step 2: per-record processing ──
   const pendingKeys = skipExisting
     ? await fetchPendingRecordKeys(recordTypeFilter, log)
     : new Set<string>();
 
   const toUpsert: Parameters<typeof upsertUrlSuggestions>[0] = [];
 
-  for (const v of verdictRows) {
+  const tasks = verdictRows.map((v) => async () => {
     summary.scanned++;
 
+    // Shared budget gate: once tripped, pending tasks short-circuit without
+    // calling the paid providers. Tasks already in flight will still finish.
     if (summary.costUsd >= budgetCap) {
-      summary.budgetExhausted = true;
-      log(`Budget reached ($${summary.costUsd.toFixed(4)} >= $${budgetCap.toFixed(2)}); stopping.`);
-      break;
+      if (!summary.budgetExhausted) {
+        summary.budgetExhausted = true;
+        log(`Budget reached ($${summary.costUsd.toFixed(4)} >= $${budgetCap.toFixed(2)}); stopping new work.`);
+      }
+      return;
     }
 
-    // Claim text = verdict.reasoning (set by the sourcing LLM). Fall back to
-    // displayName. If both missing, skip — we have nothing to search.
+    // Claim text comes from the sourcing LLM's reasoning; fall back to the
+    // record's displayName when reasoning is missing.
     const claimText = v.reasoning?.trim() || v.displayName?.trim() || '';
     const entityName =
       v.entityDisplayName?.trim() || v.entityId?.trim() || v.displayName?.trim() || '';
     if (!claimText || !entityName) {
       summary.skippedNoClaim++;
-      continue;
+      return;
     }
 
     if (skipExisting && pendingKeys.has(`${v.recordType}|${v.recordId}`)) {
       summary.skippedHadSuggestion++;
-      continue;
+      return;
     }
 
-    // Look up the existing evidence URL so we don't re-suggest it.
     const evidence = await getEvidenceByRecord(v.recordType, v.recordId, { limit: 5 });
     const existingUrl =
       (evidence.ok && evidence.data.evidence.find((e) => e.sourceUrl)?.sourceUrl) || null;
@@ -255,7 +307,7 @@ async function suggestCommand(
     if (dryRun) {
       log(`  [dry-run] ${v.recordType}/${v.recordId} field=${v.fieldName ?? '(row)'} entity="${entityName.slice(0, 40)}"`);
       summary.generatedForRecords++;
-      continue;
+      return;
     }
 
     const result = await suggestUrls({
@@ -273,7 +325,7 @@ async function suggestCommand(
       if (!p.endsWith(':no-key')) summary.providerErrors++;
     }
 
-    if (result.candidates.length === 0) continue;
+    if (result.candidates.length === 0) return;
     summary.generatedForRecords++;
 
     for (const cand of result.candidates) {
@@ -291,9 +343,11 @@ async function suggestCommand(
         status: 'pending',
       });
     }
-  }
+  });
 
-  // ── Step 3: batch-upsert in chunks under the route's MAX_BATCH=200 ──
+  await runWithConcurrency(DEFAULT_CONCURRENCY, tasks);
+
+  // Route enforces MAX_BATCH=200; chunk at 100 for safe headroom.
   if (!dryRun && toUpsert.length > 0) {
     for (let i = 0; i < toUpsert.length; i += UPSERT_CHUNK) {
       const chunk = toUpsert.slice(i, i + UPSERT_CHUNK);

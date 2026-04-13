@@ -8,7 +8,11 @@
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { SourcingRoute } from '../../../apps/wiki-server/src/routes/sourcing/sourcing.ts';
-import type { UrlSuggestionsRoute } from '../../../apps/wiki-server/src/routes/sourcing/url-suggestions.ts';
+import type {
+  UrlSuggestionsRoute,
+  SuggestionStatus,
+  SourceProvider,
+} from '../../../apps/wiki-server/src/routes/sourcing/url-suggestions.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -116,9 +120,9 @@ export interface UrlSuggestionInput {
   title?: string | null;
   snippet?: string | null;
   relevanceScore?: number | null;
-  sourceProvider: string;
+  sourceProvider: SourceProvider;
   generatorModel?: string | null;
-  status?: 'pending' | 'approved' | 'rejected' | 'auto_verified';
+  status?: SuggestionStatus;
   notes?: string | null;
 }
 
@@ -139,7 +143,7 @@ export async function listUrlSuggestions(
     recordType?: string;
     recordId?: string;
     entityId?: string;
-    status?: 'pending' | 'approved' | 'rejected' | 'auto_verified';
+    status?: SuggestionStatus;
     limit?: number;
     offset?: number;
   },

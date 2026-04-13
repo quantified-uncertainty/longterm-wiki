@@ -22,6 +22,9 @@ import {
 } from "../search/research-agent.ts";
 import { getApiKey } from "../api-keys.ts";
 
+/** Version tag for stored suggestions — bump when the generator changes shape. */
+export const GENERATOR_MODEL = "qua-64/suggest-urls-v1";
+
 export interface SuggestUrlsInput {
   /** Display name of the parent entity (e.g. "Anthropic"). */
   entityName: string;
@@ -103,11 +106,19 @@ function normalizeUrl(url: string): string {
 
 /**
  * Stable dedupe by normalized URL, preserving provider insertion order.
- * First hit wins on dedupe collisions — i.e., whichever provider appeared
- * first in the flat hit list keeps its sourceProvider attribution.
+ * First hit wins on dedupe collisions.
+ *
+ * Pass `excludeKey` (a normalized URL) to skip a known URL — lets callers
+ * filter out the existing source in the same pass instead of a separate
+ * filter that would re-normalize every hit.
  */
-function dedupeHits(hits: SearchHit[], maxCandidates: number): SearchHit[] {
+function dedupeHits(
+  hits: SearchHit[],
+  maxCandidates: number,
+  excludeKey: string | null,
+): SearchHit[] {
   const seen = new Set<string>();
+  if (excludeKey) seen.add(excludeKey);
   const out: SearchHit[] = [];
   for (const hit of hits) {
     const key = normalizeUrl(hit.url);
@@ -173,19 +184,16 @@ export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsR
     ])
   ).flat();
 
-  // Filter out the existing (unverifiable) URL so we don't re-suggest it.
-  const existingKey = existingUrl ? normalizeUrl(existingUrl) : null;
-  const filtered = existingKey
-    ? allHits.filter((h) => normalizeUrl(h.url) !== existingKey)
-    : allHits;
-
-  const candidates: UrlSuggestion[] = dedupeHits(filtered, maxCandidates).map((hit) => ({
-    url: hit.url,
-    title: hit.title,
-    snippet: hit.snippet ?? null,
-    relevanceScore: null, // No cross-provider score model yet.
-    sourceProvider: hit.provider,
-  }));
+  const excludeKey = existingUrl ? normalizeUrl(existingUrl) : null;
+  const candidates: UrlSuggestion[] = dedupeHits(allHits, maxCandidates, excludeKey).map(
+    (hit) => ({
+      url: hit.url,
+      title: hit.title,
+      snippet: hit.snippet ?? null,
+      relevanceScore: null, // No cross-provider score model yet.
+      sourceProvider: hit.provider,
+    }),
+  );
 
   return { candidates, providersUsed, providersSkipped, query, costUsd };
 }
