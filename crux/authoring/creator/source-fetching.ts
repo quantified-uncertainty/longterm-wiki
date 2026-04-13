@@ -81,14 +81,21 @@ export function extractUrls(text: string): string[] {
  * Extract citation URLs from Perplexity research and register them for fetching.
  * Checks resource YAML files for already-known URLs; new URLs are tracked
  * in the registered-sources.json output file.
+ *
+ * Throws if no usable citation URLs are produced (missing research file or
+ * empty citation set). Synthesizing without citations would otherwise emit
+ * placeholder `[^N]: Source name (no link)` footnotes (QUA-290, QUA-291).
  */
-export async function registerResearchSources(topic: string, { log, saveResult, getTopicDir }: RegisterContext): Promise<{ success: boolean; error?: string; registered?: number; existing?: number; total?: number }> {
+export async function registerResearchSources(topic: string, { log, saveResult, getTopicDir }: RegisterContext): Promise<{ success: true; registered: number; existing: number; total: number }> {
   log('register-sources', 'Extracting and registering citation URLs...');
 
   const researchPath = path.join(getTopicDir(topic), 'perplexity-research.json');
   if (!fs.existsSync(researchPath)) {
-    log('register-sources', 'No Perplexity research found, skipping');
-    return { success: false, error: 'No research data' };
+    throw new Error(
+      'register-sources: no Perplexity research file found at ' +
+      `${researchPath}. Cannot synthesize a citable page without research data. ` +
+      'Re-run the research phase or use --source-file. (QUA-290)'
+    );
   }
 
   const research: ResearchData = JSON.parse(fs.readFileSync(researchPath, 'utf-8'));
@@ -125,6 +132,17 @@ export async function registerResearchSources(topic: string, { log, saveResult, 
   }
 
   log('register-sources', `Found ${registered.length} new sources, ${existing.length} already in resources`);
+
+  const total = registered.length + existing.length;
+  if (total === 0) {
+    throw new Error(
+      'register-sources: 0 usable citation URLs after parsing ' +
+      `${researchPath}. The research phase produced no citations — likely a ` +
+      'Perplexity timeout, rate-limit, or empty-result. Refusing to ' +
+      'synthesize a page that cannot be cited; placeholder footnotes are ' +
+      'not acceptable. (QUA-290)'
+    );
+  }
 
   saveResult(topic, 'registered-sources.json', {
     topic,

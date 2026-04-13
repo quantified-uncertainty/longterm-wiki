@@ -344,7 +344,16 @@ async function runPipeline(topic: string, tier: string = 'standard', directions:
       log(phase, `Failed: ${error.message}`);
       results.phases[phase] = { success: false, error: error.message };
 
-      if (phase.includes('research') || phase.includes('synthesize') || phase === 'load-source-file') {
+      // Phases that produce inputs synthesis depends on. If any of these
+      // fail, continuing into synthesis would emit a broken page (e.g.,
+      // placeholder footnotes when register-sources yields zero URLs —
+      // QUA-290). Hard-fail the pipeline instead.
+      if (
+        phase.includes('research') ||
+        phase.includes('synthesize') ||
+        phase === 'load-source-file' ||
+        phase === 'register-sources'
+      ) {
         break;
       }
     }
