@@ -309,7 +309,16 @@ async function writeChunked(
       resourcePurpose: 'homepage',
       enrichmentStatus: 'classified',
     }));
-    const result = await upsertResourceBatch(items);
+    let result: Awaited<ReturnType<typeof upsertResourceBatch>>;
+    try {
+      result = await upsertResourceBatch(items);
+    } catch (err) {
+      return {
+        ok: false,
+        written,
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
     if (!result.ok) {
       return { ok: false, written, error: result.message ?? 'unknown error' };
     }
