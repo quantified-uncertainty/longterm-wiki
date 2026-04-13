@@ -32,6 +32,7 @@ import { commands as linearCommands, checkDedup as linearCheckDedup } from './li
 import { getIssue as getLinearIssue } from '../lib/linear/issues.ts';
 import { getSessionContext } from '../lib/session/session-context.ts';
 import { resolveLinearId, parseLinearId } from '../lib/linear/parse-id.ts';
+import { getSessionContext } from '../lib/session/session-context.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -245,11 +246,18 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
   let dbSynced = false;
   let directoryWarning = '';
   try {
+    // QUA-440: persist linearId and slotNumber so the DB-first dedup query
+    // and the internal dashboards can surface them without string-matching
+    // task/checklist content. `ctx.slot` is derived from the `a<N>` ancestor
+    // of the current working directory (see session-context.ts).
+    const ctx = getSessionContext();
     const result = await upsertAgentSession({
       branch,
       task,
       sessionType: type,
       issueNumber: issue ?? null,
+      linearId: linearId ?? null,
+      slotNumber: ctx.slot,
       checklistMd: markdown,
       worktree,
     });

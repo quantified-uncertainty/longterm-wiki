@@ -69,6 +69,28 @@ export async function getAgentSessionByBranch(
   );
 }
 
+/** Shape returned by GET /by-linear/:linearId (200 success). */
+export type AgentSessionsByLinearResponse = InferResponseType<
+  RpcClient['by-linear'][':linearId']['$get'],
+  200
+>;
+
+/**
+ * QUA-440: Query active sessions claiming a Linear ID. Used by the
+ * `crux linear start` DB-first dedup pre-check. `freshMinutes` bounds the
+ * `updated_at` window (default 30 min, matches the active_agents stale
+ * timeout).
+ */
+export async function getAgentSessionsByLinearId(
+  linearId: string,
+  freshMinutes: number = 30,
+): Promise<ApiResult<AgentSessionsByLinearResponse>> {
+  return apiRequest<AgentSessionsByLinearResponse>(
+    'GET',
+    `/api/agent-sessions/by-linear/${encodeURIComponent(linearId)}?freshMinutes=${freshMinutes}`,
+  );
+}
+
 /**
  * Update an agent session's checklist or status.
  */
