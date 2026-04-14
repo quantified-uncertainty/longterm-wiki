@@ -20,8 +20,8 @@ import { resolvePrHeadSha } from './resolve-pr-head.ts';
 const args: string[] = process.argv.slice(2);
 const WAIT_MODE: boolean = args.includes('--wait');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
-const SHA_ARG = args.find((a) => a.startsWith('--sha='))?.split('=')[1];
-const PR_ARG = args.find((a) => a.startsWith('--pr='))?.split('=')[1];
+const SHA_ARG = args.find((a) => a.startsWith('--sha='))?.split('=')[1]?.trim();
+const PR_ARG = args.find((a) => a.startsWith('--pr='))?.split('=')[1]?.trim();
 const POLL_INTERVAL = 30_000; // 30 seconds
 const MAX_POLLS = 40; // 20 minutes max
 
@@ -132,6 +132,7 @@ async function main(): Promise<void> {
     console.log(`${c.dim}Polling CI status every 30s (max ${MAX_POLLS} polls)...${c.reset}`);
   }
 
+  let lastSha: string | null = null;
   for (let i = 0; i < MAX_POLLS; i++) {
     if (i > 0) {
       if (!CI_MODE) {
@@ -143,6 +144,12 @@ async function main(): Promise<void> {
     // QUA-410: re-resolve SHA each poll so --pr=N tracks head movement
     // (rebases, new merges into main) between polls.
     const sha = await getSha();
+    if (lastSha && lastSha !== sha && !CI_MODE) {
+      console.log(
+        `${c.yellow}  SHA changed: ${lastSha.slice(0, 8)} → ${sha.slice(0, 8)} (rebase or new commit)${c.reset}`,
+      );
+    }
+    lastSha = sha;
     const data = await fetchCheckRuns(sha);
     const { allDone, anyFailed } = printStatus(data, sha);
 

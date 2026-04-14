@@ -6,8 +6,12 @@
  * (QUA-420 — `recordType.replace(/-/g, "_") + "s"` generated garbage like
  * `entity_s`, `fact_s`, `race_s`).
  *
- * Keep in sync with `VALID_RECORD_TYPES` in `apps/wiki-server/src/api-types.ts`
- * and `VALID_SOURCE_TABLES` in `apps/wiki-server/src/routes/tablebase/record-lookup.ts`.
+ * Keep in sync with `VALID_RECORD_TYPES` in `apps/wiki-server/src/api-types.ts`.
+ *
+ * Note: `citation_quotes` and `wiki_pages` are web-side entries for types
+ * that are NOT in `VALID_SOURCE_TABLES` on the wiki-server. Record-lookup
+ * will return 400 for those; the page handles that gracefully by falling
+ * through to notFound() when `recordResult.ok` is false.
  */
 
 export const RECORD_TYPE_TO_TABLE = {
