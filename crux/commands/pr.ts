@@ -189,7 +189,12 @@ export function injectLinearRefs(
   // wrong ID into the PR body (QUA-457).
   if (!branchLinearId && checklistLinearId && !linearIds.includes(checklistLinearId)) {
     linearIds.push(checklistLinearId);
-  } else if (branchLinearId && checklistLinearId && checklistLinearId !== branchLinearId) {
+  } else if (
+    branchLinearId &&
+    checklistLinearId &&
+    checklistLinearId !== branchLinearId &&
+    !linearIds.includes(checklistLinearId) // don't warn if --linear already injected this ID
+  ) {
     warnings.push(
       `checklist Linear ID ${checklistLinearId} ignored (branch-encoded ${branchLinearId} takes precedence)`,
     );

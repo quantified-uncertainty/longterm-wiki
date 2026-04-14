@@ -193,6 +193,28 @@ describe('injectLinearRefs', () => {
     expect(result.body).toBe(body);
   });
 
+  it('does NOT warn about checklist when its ID is already injected via --linear', () => {
+    // Edge case: branch=qua-184, --linear=QUA-110, checklist=QUA-110.
+    // Checklist ID is already in linearIds via --linear, so "ignored" warning
+    // would be misleading.
+    const result = injectLinearRefs('## Summary', 'claude/qua-184-fix', 'QUA-110', 'QUA-110');
+    expect(result.injected).toEqual(['QUA-184', 'QUA-110']);
+    expect(result.warnings.some((w) => w.includes('checklist Linear ID QUA-110 ignored'))).toBe(false);
+  });
+
+  it('branch-matching --linear produces no warning', () => {
+    const result = injectLinearRefs('## Summary', 'claude/qua-184-fix', 'QUA-184', null);
+    expect(result.injected).toEqual(['QUA-184']);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it('mixed --linear list: warns for disagreeing ID, silent for matching one', () => {
+    const result = injectLinearRefs('## Summary', 'claude/qua-184-fix', 'QUA-184,QUA-155', null);
+    expect(result.injected).toEqual(['QUA-184', 'QUA-155']);
+    expect(result.warnings).toHaveLength(1);
+    expect(result.warnings[0]).toMatch(/--linear=QUA-155 disagrees with branch/);
+  });
+
   it('branch ID wins over stale checklist; --linear still adds explicit ID', () => {
     // QUA-457: when branch encodes an ID, checklist is ignored (may be stale).
     // Explicit --linear still injects its ID on top.
