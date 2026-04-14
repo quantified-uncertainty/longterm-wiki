@@ -25,7 +25,8 @@
  */
 
 import { fetchSinglePr } from '../lib/pr-analysis/detection.ts';
-import type { GqlPrNode } from '../lib/pr-analysis/types.ts';
+import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import type { AutoRebaseResult, GqlPrNode, PrIssueType } from '../lib/pr-analysis/types.ts';
 
 export interface RebaseVerifyResult {
   /** True when GitHub no longer reports the PR as conflicting. */
@@ -90,10 +91,11 @@ export async function verifyRebaseCleared(
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     attempts = attempt;
-    // Always wait before each fetch — gives GitHub time to recompute
-    // mergeable asynchronously on the first attempt, and spaces out polls
-    // when we're waiting for UNKNOWN → resolved on subsequent attempts.
-    await sleep(delayMs);
+    // Sleep before retries, not before the first fetch — the happy path
+    // (rebase actually worked, GitHub state already CLEAN) shouldn't pay a
+    // guaranteed 3s latency. We only pay the delay if the first read is
+    // UNKNOWN or the fetch fails and we need to retry.
+    if (attempt > 1) await sleep(delayMs);
 
     let pr: GqlPrNode | null = null;
     try {
@@ -159,5 +161,89 @@ export async function verifyRebaseCleared(
     mergeable: lastMergeable,
     mergeStateStatus: lastMergeStateStatus,
     attempts,
+  };
+}
+
+// ── Rebase-and-verify orchestration ──────────────────────────────────────────
+
+/**
+ * Outcome of a combined rebase + verify attempt. Callers pattern-match on
+ * `kind` to decide what to report / log / return. Side effects (JSONL writes,
+ * worktree removal, claim tracking) are the caller's responsibility because
+ * the two patrol entry points (`execution.ts::fixPr` and
+ * `parallel.ts::fixPrInWorktree`) have different return shapes and different
+ * claim / cleanup concerns.
+ */
+export type RebaseAndVerifyOutcome =
+  /** `git rebase` exited non-zero (conflict, fetch failure, etc.). */
+  | { kind: 'rebase-failed'; status: AutoRebaseResult['status'] }
+  /** Rebase pushed, but GitHub still reports the PR as conflicting. */
+  | { kind: 'verify-failed'; rebaseStatus: AutoRebaseResult['status']; verify: RebaseVerifyResult }
+  /** All `stale` + `conflict` issues resolved. Caller should mark fixed. */
+  | { kind: 'fully-resolved'; rebaseStatus: AutoRebaseResult['status'] }
+  /** Rebase cleared stale/conflict but other issues remain. Caller should
+   *  update `pr.issues` to `remainingIssues` and fall through to Claude. */
+  | {
+      kind: 'partially-resolved';
+      rebaseStatus: AutoRebaseResult['status'];
+      remainingIssues: PrIssueType[];
+    };
+
+export interface TryRebaseAndVerifyDeps {
+  /** Injectable git rebase — defaults to `tryAutomatedRebase`. */
+  rebase?: typeof tryAutomatedRebase;
+  /** Injectable GitHub verify — defaults to `verifyRebaseCleared`. */
+  verify?: typeof verifyRebaseCleared;
+  /** Forwarded to `verifyRebaseCleared` when the default is used. */
+  verifyDeps?: VerifyRebaseDeps;
+}
+
+/**
+ * Attempt a git-level rebase and verify that GitHub considers the PR no
+ * longer conflicting. Extracted from `execution.ts` + `parallel.ts` so both
+ * patrol entry points share a single code path (QUA-400 simplify pass).
+ *
+ * Note: this function does NOT write JSONL or manage claims — each caller
+ * handles those based on its own loop structure.
+ */
+export async function tryRebaseAndVerify(
+  branch: string,
+  prNumber: number,
+  issues: readonly PrIssueType[],
+  worktreePath: string,
+  repo: string,
+  deps: TryRebaseAndVerifyDeps = {},
+): Promise<RebaseAndVerifyOutcome> {
+  const doRebase = deps.rebase ?? tryAutomatedRebase;
+  const doVerify = deps.verify ?? verifyRebaseCleared;
+
+  const rebaseResult = doRebase(branch, worktreePath);
+  if (!rebaseResult.success) {
+    return { kind: 'rebase-failed', status: rebaseResult.status };
+  }
+
+  // Only pay the GitHub round-trip when we actually had a conflict to clear.
+  // Stale-only rebases don't need a mergeable-state recheck.
+  if (issues.includes('conflict')) {
+    const verify = await doVerify(prNumber, repo, deps.verifyDeps);
+    if (!verify.cleared) {
+      return {
+        kind: 'verify-failed',
+        rebaseStatus: rebaseResult.status,
+        verify,
+      };
+    }
+  }
+
+  const remainingIssues = issues.filter(
+    (i) => i !== 'stale' && i !== 'conflict',
+  );
+  if (remainingIssues.length === 0) {
+    return { kind: 'fully-resolved', rebaseStatus: rebaseResult.status };
+  }
+  return {
+    kind: 'partially-resolved',
+    rebaseStatus: rebaseResult.status,
+    remainingIssues,
   };
 }

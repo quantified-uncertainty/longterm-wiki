@@ -14,8 +14,7 @@ import { git, createWorktree, removeWorktree } from '../lib/git.ts';
 import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecentMerges } from '../lib/pr-analysis/index.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import type { RecentMerge } from '../lib/pr-analysis/index.ts';
-import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
-import { verifyRebaseCleared } from './rebase-verify.ts';
+import { tryRebaseAndVerify } from './rebase-verify.ts';
 import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
 import { LABELS } from './types.ts';
 import {
@@ -585,64 +584,60 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
   }
 
   // ── Automated rebase pre-step (runs in worktree) ──────────────────
-  // For stale or conflicting PRs, try a plain git rebase first.
-  // This saves the full Claude spawn (~5 turns, ~3-10 min) when the
-  // rebase resolves cleanly. Even when GitHub reports CONFLICTING,
-  // git rebase can auto-resolve many cases (different merge strategies).
-  // Cost of a failed attempt is negligible (<1s of git commands).
+  // For stale or conflicting PRs, try a plain git rebase first. Saves the
+  // full Claude spawn (~5 turns, ~3-10 min) when rebase resolves cleanly.
+  // `tryRebaseAndVerify` also polls GitHub's mergeable state to catch the
+  // case where rebase pushed but GitHub still reports CONFLICTING due to
+  // async recomputation or a concurrent commit (QUA-400, PR #4287).
   if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
     log('  Attempting automated rebase (no Claude needed)...');
-    const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
+    const outcome = await tryRebaseAndVerify(
+      pr.branch,
+      pr.number,
+      pr.issues,
+      worktreePath,
+      config.repo,
+    );
 
-    if (rebaseResult.success) {
-      // `tryAutomatedRebase` only reports git-level success. Verify GitHub
-      // actually no longer reports the PR as conflicting before claiming a
-      // fix — without this, a concurrent commit or GitHub's async mergeable
-      // recomputation produced cycles where patrol reported 'fixed' but the
-      // next scan still saw CONFLICTING (QUA-400, PR #4287).
-      const hadConflict = pr.issues.includes('conflict');
-      const verify = hadConflict
-        ? await verifyRebaseCleared(pr.number, config.repo)
-        : { cleared: true, reason: 'no conflict to verify', mergeable: null, mergeStateStatus: null, attempts: 0 };
+    switch (outcome.kind) {
+      case 'rebase-failed':
+        log(`  Automated rebase failed (${outcome.status}) — falling through to Claude`);
+        break;
 
-      if (!verify.cleared) {
+      case 'verify-failed':
         log(
-          `  ${cl.yellow}⚠ Automated rebase reported ${rebaseResult.status} but GitHub still shows conflict: ${verify.reason}${cl.reset} — falling through to Claude`,
+          `  ${cl.yellow}⚠ Automated rebase reported ${outcome.rebaseStatus} but GitHub still shows conflict: ${outcome.verify.reason}${cl.reset} — falling through to Claude`,
         );
         appendJsonl(JSONL_FILE, {
           type: 'rebase_verify_failed',
           pr_num: pr.number,
-          rebase_status: rebaseResult.status,
-          reason: verify.reason,
-          mergeable: verify.mergeable,
-          merge_state_status: verify.mergeStateStatus,
-          attempts: verify.attempts,
+          rebase_status: outcome.rebaseStatus,
+          reason: outcome.verify.reason,
+          mergeable: outcome.verify.mergeable,
+          merge_state_status: outcome.verify.mergeStateStatus,
+          attempts: outcome.verify.attempts,
         });
-        // Fall through to Claude with original issues — don't strip 'conflict'.
-      } else {
-        log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
+        break;
 
-        // Strip both 'stale' and 'conflict' — rebase resolved them
-        const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
-        if (remainingIssues.length === 0) {
-          removeWorktree(worktreePath);
-          appendJsonl(JSONL_FILE, {
-            type: 'pr_result',
-            pr_num: pr.number,
-            issues: pr.issues,
-            outcome: 'fixed' as FixOutcome,
-            elapsed_s: 0,
-            reason: `automated-rebase: ${rebaseResult.status} (verified)`,
-          });
-          markProcessed(pr.number);
-          return { mainIsRootCause: false };
-        }
-        // Remaining issues need Claude — update pr.issues so Claude doesn't re-address resolved ones
-        pr.issues = remainingIssues;
-        log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
-      }
-    } else {
-      log(`  Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
+      case 'fully-resolved':
+        log(`  ✓ Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        removeWorktree(worktreePath);
+        appendJsonl(JSONL_FILE, {
+          type: 'pr_result',
+          pr_num: pr.number,
+          issues: pr.issues,
+          outcome: 'fixed' as FixOutcome,
+          elapsed_s: 0,
+          reason: `automated-rebase: ${outcome.rebaseStatus} (verified)`,
+        });
+        markProcessed(pr.number);
+        return { mainIsRootCause: false };
+
+      case 'partially-resolved':
+        log(`  ✓ Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        pr.issues = outcome.remainingIssues;
+        log(`  Remaining issues after rebase: ${outcome.remainingIssues.join(', ')} — falling through to Claude`);
+        break;
     }
   }
 

@@ -12,8 +12,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
-import { verifyRebaseCleared } from './rebase-verify.ts';
+import { tryRebaseAndVerify } from './rebase-verify.ts';
 import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { REPO } from '../lib/github.ts';
@@ -279,47 +278,42 @@ async function fixPrInWorktree(
     // Automated rebase pre-step
     if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
       log(`${prefix} Attempting automated rebase...`);
-      const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
+      const outcome = await tryRebaseAndVerify(
+        pr.branch,
+        pr.number,
+        pr.issues,
+        worktreePath,
+        config.repo,
+      );
 
-      if (rebaseResult.success) {
-        // Verify GitHub no longer reports the PR as conflicting before
-        // claiming a fix. See QUA-400 for the PR #4287 incident where we
-        // reported 'fixed' but the next scan still saw CONFLICTING.
-        const hadConflict = pr.issues.includes('conflict');
-        const verify = hadConflict
-          ? await verifyRebaseCleared(pr.number, config.repo)
-          : { cleared: true, reason: 'no conflict to verify', mergeable: null, mergeStateStatus: null, attempts: 0 };
-
-        if (!verify.cleared) {
-          log(
-            `${prefix} ${cl.yellow}⚠ Rebase reported ${rebaseResult.status} but GitHub still shows conflict: ${verify.reason}${cl.reset} — falling through to Claude`,
-          );
-          appendJsonl(JSONL_FILE, {
-            type: 'rebase_verify_failed',
-            pr_num: pr.number,
-            rebase_status: rebaseResult.status,
-            reason: verify.reason,
-            mergeable: verify.mergeable,
-            merge_state_status: verify.mergeStateStatus,
-            attempts: verify.attempts,
-          });
-          // Don't strip 'conflict' — let Claude see it and resolve manually.
-        } else {
-          log(`${prefix} Automated rebase ${rebaseResult.status} — no Claude needed`);
-          const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
-          if (remainingIssues.length === 0) {
-            markProcessed(pr.number);
-            return {
-              prNumber: pr.number,
-              outcome: 'fixed',
-              reason: `automated-rebase: ${rebaseResult.status} (verified)`,
-              elapsedS: Math.floor((Date.now() - startTime) / 1000),
-            };
-          }
-          pr.issues = remainingIssues;
-          log(`${prefix} Remaining issues after rebase: ${remainingIssues.join(', ')}`);
-        }
+      if (outcome.kind === 'verify-failed') {
+        log(
+          `${prefix} ${cl.yellow}⚠ Rebase reported ${outcome.rebaseStatus} but GitHub still shows conflict: ${outcome.verify.reason}${cl.reset} — falling through to Claude`,
+        );
+        appendJsonl(JSONL_FILE, {
+          type: 'rebase_verify_failed',
+          pr_num: pr.number,
+          rebase_status: outcome.rebaseStatus,
+          reason: outcome.verify.reason,
+          mergeable: outcome.verify.mergeable,
+          merge_state_status: outcome.verify.mergeStateStatus,
+          attempts: outcome.verify.attempts,
+        });
+      } else if (outcome.kind === 'fully-resolved') {
+        log(`${prefix} Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        markProcessed(pr.number);
+        return {
+          prNumber: pr.number,
+          outcome: 'fixed',
+          reason: `automated-rebase: ${outcome.rebaseStatus} (verified)`,
+          elapsedS: Math.floor((Date.now() - startTime) / 1000),
+        };
+      } else if (outcome.kind === 'partially-resolved') {
+        log(`${prefix} Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        pr.issues = outcome.remainingIssues;
+        log(`${prefix} Remaining issues after rebase: ${outcome.remainingIssues.join(', ')}`);
       } else {
+        // outcome.kind === 'rebase-failed'
         // On retry for conflict-only PRs, try rebase-only with Claude (simpler prompt)
         const failCount = getFailCount(pr.number);
         if (failCount > 0 && pr.issues.length === 1 && pr.issues[0] === 'conflict') {
@@ -332,8 +326,8 @@ async function fixPrInWorktree(
             timeoutMinutes: 15,
           }, { cwd: worktreePath });
           const elapsedS = Math.floor((Date.now() - startTime) / 1000);
-          const outcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
-          if (outcome === 'fixed') {
+          const claudeOutcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
+          if (claudeOutcome === 'fixed') {
             resetFailCount(pr.number);
             log(`${prefix} ${cl.green}Rebase-only fix succeeded${cl.reset} (${elapsedS}s)`);
           } else {
@@ -342,12 +336,12 @@ async function fixPrInWorktree(
           }
           appendJsonl(JSONL_FILE, {
             type: 'pr_result', pr_num: pr.number, issues: pr.issues,
-            outcome, elapsed_s: elapsedS, reason: 'rebase-only strategy', parallel: true,
+            outcome: claudeOutcome, elapsed_s: elapsedS, reason: 'rebase-only strategy', parallel: true,
           });
           markProcessed(pr.number);
-          return { prNumber: pr.number, outcome, reason: 'rebase-only strategy', elapsedS };
+          return { prNumber: pr.number, outcome: claudeOutcome, reason: 'rebase-only strategy', elapsedS };
         }
-        log(`${prefix} Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
+        log(`${prefix} Automated rebase failed (${outcome.status}) — falling through to Claude`);
       }
     }
 
