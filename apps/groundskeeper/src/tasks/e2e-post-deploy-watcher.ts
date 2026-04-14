@@ -10,7 +10,9 @@ const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 const WORKFLOW_FILE = "e2e-post-deploy.yml";
 const FAILURE_THRESHOLD = 3;
 const LOOKBACK_MS = TWENTY_FOUR_HOURS_MS;
-const FETCH_LIMIT = 20;
+// e2e-post-deploy fires once per production deploy (typically ≤10/day).
+// 50 gives plenty of headroom so a 24h window is never silently truncated.
+const FETCH_LIMIT = 50;
 
 // Rate-limit Discord alerts per fingerprint. Module-level state; resets on
 // process restart, same pattern as snapshot-retention.ts.
@@ -69,12 +71,17 @@ export async function e2ePostDeployWatcher(
       repo,
       workflow_id: WORKFLOW_FILE,
       per_page: FETCH_LIMIT,
+      status: "completed",
     });
-    runs = data.workflow_runs.map((r) => ({
-      conclusion: r.conclusion,
-      htmlUrl: r.html_url,
-      createdAt: r.created_at,
-    }));
+    // Sort newest-first explicitly so `failures[0]` in the alert is reliably
+    // the most recent failing run regardless of GitHub's default ordering.
+    runs = data.workflow_runs
+      .map((r) => ({
+        conclusion: r.conclusion,
+        htmlUrl: r.html_url,
+        createdAt: r.created_at,
+      }))
+      .sort((a, b) => Date.parse(b.createdAt) - Date.parse(a.createdAt));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     logger.error({ error: msg }, "Failed to fetch workflow runs");
