@@ -59,7 +59,7 @@ export async function getAllFundingPrograms(
 
 /** Sync funding programs (upsert). */
 export async function syncFundingPrograms(
-  items: Array<Record<string, unknown>>,
+  items: readonly unknown[],
 ): Promise<ApiResult<FundingProgramsSyncResult>> {
   return apiRequest<FundingProgramsSyncResult>('POST', '/api/funding-programs/sync', { items });
 }

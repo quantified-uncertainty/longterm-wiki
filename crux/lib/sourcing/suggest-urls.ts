@@ -42,12 +42,14 @@ export interface SuggestUrlsInput {
   usePerplexity?: boolean;
 }
 
+export type SuggestUrlsProvider = 'manual' | 'exa' | 'perplexity' | 'scry';
+
 export interface UrlSuggestion {
   url: string;
   title: string;
   snippet: string | null;
   relevanceScore: number | null;
-  sourceProvider: string;
+  sourceProvider: SuggestUrlsProvider;
 }
 
 export interface SuggestUrlsResult {
@@ -174,7 +176,7 @@ export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsR
       title: hit.title,
       snippet: hit.snippet ?? null,
       relevanceScore: null, // No cross-provider score model yet.
-      sourceProvider: hit.provider,
+      sourceProvider: hit.provider as SuggestUrlsProvider,
     }),
   );
 

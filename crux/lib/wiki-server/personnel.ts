@@ -71,7 +71,7 @@ export async function getAllPersonnel(
  * missing. The thrown error has a clear message pointing at issue #4017.
  */
 export async function syncPersonnel(
-  items: Array<Record<string, unknown>>,
+  items: readonly unknown[],
   options?: {
     skipEntityValidation?: boolean;
     /** Required when skipEntityValidation is true. Logged on every bypass. */

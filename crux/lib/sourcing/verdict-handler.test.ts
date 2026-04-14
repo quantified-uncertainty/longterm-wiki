@@ -208,7 +208,7 @@ describe('storeSourcingEvidence', () => {
 
   // Issue #4017 — primary-data writes must surface failures.
   it('throws AND warns when storeEvidence returns not-ok (issue #4017)', async () => {
-    mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'server error' });
+    mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'server_error', message: 'server error' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     await expect(
@@ -229,7 +229,7 @@ describe('storeSourcingEvidence', () => {
   });
 
   it('uses custom logPrefix in warning messages', async () => {
-    mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'oops' });
+    mockStoreEvidence.mockResolvedValueOnce({ ok: false, error: 'server_error', message: 'oops' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     // Catches the throw to keep the test focused on the warning text.
@@ -403,7 +403,7 @@ describe('storeAggregateVerdict', () => {
 
   // Issue #4017 — primary-data writes must surface failures.
   it('throws AND warns when storeVerdict returns not-ok (issue #4017)', async () => {
-    mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'server error' });
+    mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'server_error', message: 'server error' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     await expect(
@@ -423,7 +423,7 @@ describe('storeAggregateVerdict', () => {
   });
 
   it('uses custom logPrefix in warning messages', async () => {
-    mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'oops' });
+    mockStoreVerdict.mockResolvedValueOnce({ ok: false, error: 'server_error', message: 'oops' });
     const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
 
     await expect(

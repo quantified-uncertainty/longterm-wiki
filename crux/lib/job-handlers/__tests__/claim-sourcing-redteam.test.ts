@@ -4,6 +4,7 @@
  * Tests LLM output fuzzing, malformed data, and edge cases.
  */
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import type { JobHandlerContext } from "../types.ts";
 
 // Mock all dependencies
 vi.mock("../../llm.ts", () => ({
@@ -39,7 +40,7 @@ const mockCallLlm = vi.mocked(callLlm);
 const mockParseJson = vi.mocked(parseJsonResponse);
 const mockGetContent = vi.mocked(getCitationContentByUrl);
 
-const baseCtx = { verbose: false, dryRun: false, attempt: 1, maxRetries: 3 };
+const baseCtx: JobHandlerContext = { workerId: "test-worker", projectRoot: "/tmp/test", verbose: false };
 
 function makeClaim(id: number, overrides: Partial<{
   claim_text: string;

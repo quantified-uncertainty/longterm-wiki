@@ -521,18 +521,6 @@ async function forEntity(
     bundle += pageSearchBlock(pageSearchResult.data.results, entityId);
   }
 
-  if (e.sources?.length) {
-    bundle += `## Sources\n\n`;
-    for (const s of e.sources.slice(0, 5)) {
-      bundle += `- **${s.title}**`;
-      if (s.author) bundle += ` (${s.author})`;
-      if (s.date) bundle += ` — ${s.date}`;
-      if (s.url) bundle += `\n  ${s.url}`;
-      bundle += '\n';
-    }
-    bundle += '\n';
-  }
-
   // Past agent sessions that touched this entity
   if (sessionsResult?.ok && sessionsResult.data.sessions.length > 0) {
     bundle += `## Past Agent Sessions\n\n`;
