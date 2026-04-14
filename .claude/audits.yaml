@@ -402,9 +402,12 @@ audits:
       failures=$(gh run list -R quantified-uncertainty/longterm-wiki \
         --workflow=e2e-post-deploy.yml --limit 5 \
         --json conclusion --jq '[.[] | select(.conclusion == "failure")] | length' 2>/dev/null)
+      # Fail-closed: a fetch error is a real failure, not a pass. Silent
+      # success on missing data is the exact pattern this audit exists to
+      # catch. Requires gh auth + network (runs locally; see how_to_verify).
       if [ -z "$failures" ]; then
-        echo "WARN: could not fetch workflow run history"
-        exit 0
+        echo "FAIL: could not fetch workflow run history — check gh auth / network"
+        exit 1
       fi
       echo "failures_in_last_5=$failures threshold=3"
       if [ "$failures" -ge 3 ]; then
