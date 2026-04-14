@@ -13,10 +13,11 @@ import {
   applyFixes,
   enrichFromApi,
   repairJsonBackslashEscapes,
-  escapeDollarDigits,
   countPreservedComponents,
   filterProposals,
+  FIX_ACTIONS,
 } from './fix-inaccuracies.ts';
+import { escapeDollarDigits } from '../lib/patterns.ts';
 import type { FixProposal } from './fix-inaccuracies.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import type { SectionRewrite } from './fix-inaccuracies.ts';
@@ -407,6 +408,17 @@ describe('filterProposals', () => {
     expect(result.kept).toEqual([]);
     expect(result.rejected).toEqual([]);
     expect(result.escapedCount).toBe(0);
+  });
+});
+
+describe('FIX_ACTIONS drift guard', () => {
+  // If someone renames an action in SYSTEM_PROMPT without updating FIX_ACTIONS,
+  // the shrink filter silently stops matching. This test pins the pairing.
+  it('includes every action the system prompt lists', () => {
+    // Mirror of the action vocabulary in the SYSTEM_PROMPT fix_type line.
+    // Update BOTH simultaneously if the prompt changes.
+    const promptActions = ['rewrite', 'correct', 'soften', 'remove_ref', 'remove_detail'];
+    expect([...FIX_ACTIONS].sort()).toEqual(promptActions.sort());
   });
 });
 

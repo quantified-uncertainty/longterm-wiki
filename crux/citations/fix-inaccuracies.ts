@@ -40,7 +40,7 @@ import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
-import { stripFrontmatter } from '../lib/patterns.ts';
+import { stripFrontmatter, escapeDollarDigits } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/session/edit-log.ts';
@@ -933,41 +933,33 @@ export function repairJsonBackslashEscapes(input: string): string {
 // ---------------------------------------------------------------------------
 
 /**
+ * The action vocabulary the LLM is instructed to choose from (see SYSTEM_PROMPT).
+ * Keeping this as a const array lets TS verify that SHRINK_EXEMPT_ACTIONS can only
+ * reference known actions — if SYSTEM_PROMPT's list is renamed without updating
+ * here, the type check fails.
+ */
+export const FIX_ACTIONS = ['rewrite', 'correct', 'soften', 'remove_ref', 'remove_detail'] as const;
+export type FixAction = (typeof FIX_ACTIONS)[number];
+
+/**
  * Components that carry cross-reference / provenance meaning in wiki MDX.
  * Dropping one silently breaks linking or fact sourcing.
  */
-const PRESERVED_COMPONENTS = ['EntityLink', 'F', 'R', 'FBF', 'FBFactValue', 'Calc'];
+const PRESERVED_COMPONENT_RE = /<(EntityLink|F|R|FBF|FBFactValue|Calc)\b/g;
 
 /**
  * Actions where the replacement is *expected* to be shorter than the original
  * (the whole point of the action is to delete content). Shrink filter skips these.
  */
-const SHRINK_EXEMPT_ACTIONS = new Set(['remove_ref', 'remove_detail']);
+const SHRINK_EXEMPT_ACTIONS: ReadonlySet<FixAction> = new Set(['remove_ref', 'remove_detail']);
 
 /** Minimum length ratio (replacement/original) allowed for non-shrink-exempt actions. */
 const SHRINK_MIN_RATIO = 0.4;
 
-/**
- * Escape bare `$digit` to `\$digit` so MDX doesn't interpret it as a JSX
- * expression and the `dollar-signs` gate check doesn't fail. Leaves
- * already-escaped `\$digit` untouched and ignores `$` preceded by other
- * identifier characters (e.g. a variable like `abc$1`).
- */
-export function escapeDollarDigits(s: string): string {
-  // Negative lookbehind for backslash (already escaped) and word chars
-  // (not a bare price). `?!` lookahead ensures a digit follows.
-  return s.replace(/(?<![\\\w])\$(?=\d)/g, '\\$');
-}
-
 /** Count preserved component tags in a string. */
 export function countPreservedComponents(s: string): number {
-  let total = 0;
-  for (const name of PRESERVED_COMPONENTS) {
-    const re = new RegExp(`<${name}\\b`, 'g');
-    const matches = s.match(re);
-    if (matches) total += matches.length;
-  }
-  return total;
+  const matches = s.match(PRESERVED_COMPONENT_RE);
+  return matches ? matches.length : 0;
 }
 
 export interface FilteredProposals {
@@ -995,12 +987,10 @@ export function filterProposals(proposals: FixProposal[]): FilteredProposals {
   let escapedCount = 0;
 
   for (const raw of proposals) {
-    // Filter 1: escape bare $digit in replacement (does not reject)
     const escaped = escapeDollarDigits(raw.replacement);
     const p: FixProposal = escaped === raw.replacement ? raw : { ...raw, replacement: escaped };
     if (escaped !== raw.replacement) escapedCount++;
 
-    // Filter 2: component preservation check
     const originalComponents = countPreservedComponents(p.original);
     const replacementComponents = countPreservedComponents(p.replacement);
     if (replacementComponents < originalComponents) {
@@ -1012,8 +1002,7 @@ export function filterProposals(proposals: FixProposal[]): FilteredProposals {
       continue;
     }
 
-    // Filter 3: unjustified shrink
-    if (!SHRINK_EXEMPT_ACTIONS.has(p.fixType) && p.original.length > 0) {
+    if (!SHRINK_EXEMPT_ACTIONS.has(p.fixType as FixAction) && p.original.length > 0) {
       const ratio = p.replacement.length / p.original.length;
       if (ratio < SHRINK_MIN_RATIO) {
         rejected.push({
