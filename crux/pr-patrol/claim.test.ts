@@ -8,12 +8,31 @@
  * the ~12s rebase window.
  */
 
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// Mock the github lib BEFORE importing the module under test, so the
+// `defaultRemoveWorkingLabel` tests can inject fake 404/500 responses.
+// The existing ClaimDeps-based tests don't touch githubApi at all, so
+// the mock is transparent to them.
+vi.mock('../lib/github.ts', async () => {
+  const actual = await vi.importActual<typeof import('../lib/github.ts')>(
+    '../lib/github.ts',
+  );
+  return {
+    ...actual,
+    githubApi: vi.fn(),
+  };
+});
+
 import {
   tryClaimPr,
   releasePrIfClaimed,
+  defaultRemoveWorkingLabel,
   type ClaimDeps,
 } from './claim.ts';
+import { githubApi, GitHubApiError } from '../lib/github.ts';
+
+const mockGithubApi = vi.mocked(githubApi);
 
 function makeDeps(overrides: Partial<ClaimDeps> = {}): ClaimDeps {
   return {
@@ -124,24 +143,36 @@ describe('QUA-400 race scenario — claim-then-release ownership tracking', () =
     });
 
     // The fixed flow (mirrors execution.ts / parallel.ts):
+    //
+    // NOTE: do NOT `return` out of the try block on the `!didClaim` path.
+    // An early return inside `try` short-circuits the post-try assertions
+    // and makes the regression test vacuous — it would still pass even if
+    // the `finally` block unconditionally called `removeWorkingLabel` on
+    // another worker's label. Instead, gate the "real work" on
+    // `didClaim === true` and let execution fall through to the finally
+    // block AND the assertions below. (CodeRabbit QUA-400 follow-up.)
     let didClaim = false;
     try {
       didClaim = await tryClaimPr(999, 'owner/repo', deps);
-      if (!didClaim) {
-        // Claim lost — skip work, bail out.
-        return;
+      if (didClaim) {
+        // Imagine tryRebaseAndVerify(...) runs here. We never reach it
+        // in this scenario because another worker beat us to the claim,
+        // but the caller code path must still fall through to the
+        // finally + post-try assertions for the test to exercise the
+        // `didClaim === false` release path.
       }
-      // Imagine tryRebaseAndVerify(...) runs here. It doesn't matter
-      // for the race test — we never reach it because we bailed out.
     } finally {
       await releasePrIfClaimed(didClaim, 999, 'owner/repo', deps);
     }
 
-    // Core assertions:
+    // Core assertions — these MUST run (i.e. not be short-circuited by an
+    // early return above) for the regression test to have teeth:
     expect(didClaim).toBe(false);
     // We must not have added our own working label on top of theirs.
     expect(deps.addWorkingLabel).not.toHaveBeenCalled();
     // CRITICAL: we must not have deleted the other worker's label.
+    // This is the assertion that was previously unreachable because of
+    // the early `return` inside the try block.
     expect(deps.removeWorkingLabel).not.toHaveBeenCalled();
   });
 
@@ -185,5 +216,120 @@ describe('QUA-400 race scenario — claim-then-release ownership tracking', () =
     expect(caught?.message).toBe('rebase blew up');
     expect(didClaim).toBe(true);
     expect(deps.removeWorkingLabel).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ── defaultRemoveWorkingLabel — 404 discrimination (QUA-400 follow-up) ─────
+//
+// CodeRabbit Major finding: the previous implementation swallowed any
+// error whose .message contained "404" or "Not Found", which also hides
+// 500-class failures whose response body happens to mention those strings.
+// The fix keys off the structured .status on GitHubApiError.
+//
+// These tests lock in:
+//   - a real 404 is swallowed (label already absent is fine)
+//   - a 500 is NOT swallowed, even if its body mentions "404" or "Not Found"
+//   - a plain Error (non-GitHubApiError) is NOT swallowed
+
+describe('defaultRemoveWorkingLabel — 404 discrimination', () => {
+  beforeEach(() => {
+    mockGithubApi.mockReset();
+  });
+
+  it('swallows a concrete HTTP 404 (label already absent)', async () => {
+    mockGithubApi.mockRejectedValueOnce(
+      new GitHubApiError(
+        'DELETE',
+        '/repos/owner/repo/issues/42/labels/pr-patrol%3Aworking',
+        404,
+        '{"message":"Label does not exist"}',
+      ),
+    );
+
+    // Must NOT throw.
+    await expect(
+      defaultRemoveWorkingLabel(42, 'owner/repo'),
+    ).resolves.toBeUndefined();
+    expect(mockGithubApi).toHaveBeenCalledTimes(1);
+  });
+
+  it('re-throws a 500 even when the body text contains "404"', async () => {
+    // The key regression scenario: a 500 response body that happens to
+    // mention "404" (e.g. because the upstream stack trace referenced a
+    // 404 log line, or the error message says "upstream returned 404").
+    // Under the old substring-match implementation this would be
+    // silently swallowed; under the .status check it must bubble.
+    const err = new GitHubApiError(
+      'DELETE',
+      '/repos/owner/repo/issues/42/labels/pr-patrol%3Aworking',
+      500,
+      '{"message":"upstream reported 404 in logs"}',
+    );
+    mockGithubApi.mockRejectedValueOnce(err);
+
+    // Call once, assert on the rejection shape.
+    let caught: unknown;
+    try {
+      await defaultRemoveWorkingLabel(42, 'owner/repo');
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(GitHubApiError);
+    expect(caught).toMatchObject({ status: 500 });
+    expect((caught as GitHubApiError).message).toContain('404');
+  });
+
+  it('re-throws a 500 even when the body text contains "Not Found"', async () => {
+    mockGithubApi.mockRejectedValueOnce(
+      new GitHubApiError(
+        'DELETE',
+        '/repos/owner/repo/issues/42/labels/pr-patrol%3Aworking',
+        500,
+        '{"message":"Internal: cached entry Not Found"}',
+      ),
+    );
+
+    await expect(
+      defaultRemoveWorkingLabel(42, 'owner/repo'),
+    ).rejects.toMatchObject({ status: 500 });
+  });
+
+  it('re-throws a 403 (permission denied — label stays stuck, not a benign case)', async () => {
+    mockGithubApi.mockRejectedValueOnce(
+      new GitHubApiError(
+        'DELETE',
+        '/repos/owner/repo/issues/42/labels/pr-patrol%3Aworking',
+        403,
+        '{"message":"Resource not accessible by integration"}',
+      ),
+    );
+
+    await expect(
+      defaultRemoveWorkingLabel(42, 'owner/repo'),
+    ).rejects.toMatchObject({ status: 403 });
+  });
+
+  it('re-throws a plain Error (non-GitHubApiError, e.g. network failure)', async () => {
+    // A pre-HTTP failure (fetch abort, DNS error, etc.) reaches us as a
+    // plain Error — not a GitHubApiError. We must bubble it so callers
+    // can see the network is broken.
+    mockGithubApi.mockRejectedValueOnce(new Error('fetch failed: ECONNRESET'));
+
+    await expect(
+      defaultRemoveWorkingLabel(42, 'owner/repo'),
+    ).rejects.toThrow('fetch failed: ECONNRESET');
+  });
+
+  it('returns normally on a successful 204 No Content', async () => {
+    // githubApi returns undefined on 204.
+    mockGithubApi.mockResolvedValueOnce(undefined);
+
+    await expect(
+      defaultRemoveWorkingLabel(42, 'owner/repo'),
+    ).resolves.toBeUndefined();
+    expect(mockGithubApi).toHaveBeenCalledWith(
+      expect.stringContaining('/repos/owner/repo/issues/42/labels/'),
+      { method: 'DELETE' },
+    );
   });
 });

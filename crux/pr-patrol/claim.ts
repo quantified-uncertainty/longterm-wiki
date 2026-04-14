@@ -5,7 +5,8 @@
  * on a PR. Used by both the serial (execution.ts) and parallel (parallel.ts)
  * dispatch paths.
  *
- * The claim-race bug these helpers fix (QUA-400 CodeRabbit critical review):
+ * ## The critical race these helpers fix (QUA-400)
+ *
  * Previously each path ran `tryRebaseAndVerify()` (which polls GitHub for
  * ~12s) BEFORE adding the working label. During that window another patrol
  * process could claim the PR, and the unconditional `releasePr()` in the
@@ -17,17 +18,38 @@
  *   2. Track whether THIS worker actually acquired the claim (`didClaim`).
  *   3. Only release the label in `finally` when `didClaim === true`.
  *
+ * This shrinks the race window from ~12s (the rebase/verify round-trip) to
+ * a single sub-second API call (`fetchLabels` → `addWorkingLabel`).
+ *
+ * ## Residual TOCTOU race — KNOWN LIMITATION (tracked in QUA-494)
+ *
  * `tryClaimPr()` does a pre-check of existing working labels and adds the
- * `pr-patrol:working` label if the PR is unclaimed. It returns `didClaim`
- * so the caller can gate the release. TOCTOU note: GitHub's add-labels
- * endpoint is idempotent and has no atomic "add-if-absent" primitive, so
- * two workers arriving within the same sub-second window can both believe
- * they own the claim. That residual race is bounded by a *single* API
- * call instead of a ~12s rebase/verify round-trip, which is what the
- * CodeRabbit finding flagged as critical.
+ * `pr-patrol:working` label if the PR is unclaimed. **This is not atomic.**
+ * GitHub's add-labels endpoint is idempotent and has no "add-if-absent"
+ * primitive, so two workers whose `fetchLabels` calls both return
+ * "unclaimed" within the same sub-second window will both proceed to
+ * `addWorkingLabel` and both receive a `didClaim === true`. When either
+ * later calls `releasePrIfClaimed`, it removes the single shared
+ * `pr-patrol:working` label — including the other worker's claim.
+ *
+ * This was flagged as a Major finding in PR #4362 CodeRabbit review. The
+ * `didClaim` gate remains a **best-effort guard**, not a proof of
+ * ownership. Fixing it properly requires either (a) per-worker ownership
+ * metadata via a hidden PR claim comment, or (b) per-worker label names.
+ * Both options are substantial scaffolding for a sub-second race window,
+ * so they're tracked as a follow-up rather than inlined into the critical
+ * fix.
+ *
+ * **Tracked in:** https://linear.app/quantifieduncertainty/issue/QUA-494
+ *
+ * Until QUA-494 lands, accept that two concurrent patrol workers on the
+ * same PR within a sub-second window *can* both remove the shared label.
+ * The consequence is that the PR re-enters the detection pool and the
+ * still-running worker's state is eventually reconciled by the stale-label
+ * health check in `crux/health/checks/pr-quality.ts` (>8h stuck label).
  */
 
-import { githubApi } from '../lib/github.ts';
+import { githubApi, isGitHubApiErrorWithStatus } from '../lib/github.ts';
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import { LABELS } from './types.ts';
 
@@ -107,6 +129,24 @@ export async function tryClaimPr(
  * `tryClaimPr()` call. Calling `releasePrIfClaimed(didClaim, ...)` when
  * `didClaim === false` is a no-op — it won't touch the label, which is
  * exactly what we want when another worker holds it.
+ *
+ * ⚠ **Known residual TOCTOU race (QUA-494)**: the `didClaim` boolean
+ * is a best-effort guard, not a proof of ownership. If two workers won
+ * the initial `tryClaimPr` race (both saw "unclaimed" in their
+ * pre-check and both added the label), they will both reach this
+ * function with `didClaim === true`, and each call will remove the
+ * single shared `pr-patrol:working` label — clobbering the other
+ * worker's claim. See the module JSDoc for the full explanation and
+ * https://linear.app/quantifieduncertainty/issue/QUA-494 for the
+ * follow-up that replaces this with worker-specific ownership
+ * metadata (hidden PR claim comments or per-worker label names).
+ *
+ * The sub-second race window is much smaller than the ~12s window
+ * this function's existence originally fixed (QUA-400), but it is not
+ * zero and PR reviewers (particularly CodeRabbit) have flagged it as
+ * a Major finding. Do not remove the `didClaim` gate — it's correct
+ * on the success path; the known gap is only when two workers
+ * concurrently "win" the pre-check.
  */
 export async function releasePrIfClaimed(
   didClaim: boolean,
@@ -143,9 +183,19 @@ export async function defaultAddWorkingLabel(
 }
 
 /**
- * Default remove-label implementation. Swallows 404 (label already absent)
- * but surfaces other errors so a stale `pr-patrol:working` label can't
- * silently block future scans of this PR.
+ * Default remove-label implementation. Swallows ONLY a concrete HTTP 404
+ * (label already absent) and re-throws every other error so a stale
+ * `pr-patrol:working` label can't silently block future scans of this PR.
+ *
+ * CodeRabbit QUA-400 follow-up: this was previously keyed off
+ * `msg.includes('404') || msg.includes('Not Found')`, which would also
+ * swallow a 500 whose response body happened to contain those substrings
+ * (e.g. a PR number, a URL path, or a helpful error message). That meant
+ * a real server failure could be reported as "label already gone" and the
+ * working label would remain stuck, preventing the PR from being picked
+ * up by future patrol cycles. Keying off the structured `.status` on
+ * {@link GitHubApiError} narrows the swallow to the one case we actually
+ * want to tolerate.
  */
 export async function defaultRemoveWorkingLabel(
   prNumber: number,
@@ -159,10 +209,14 @@ export async function defaultRemoveWorkingLabel(
       { method: 'DELETE' },
     );
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('404') && !msg.includes('Not Found')) {
-      throw e;
+    // Only swallow a concrete HTTP 404 — the label was already removed,
+    // either by a concurrent worker's release or by a manual /labels DELETE.
+    // Any other error (500, 403, network failure) must bubble so callers
+    // can surface a stale working label.
+    if (isGitHubApiErrorWithStatus(e, 404)) {
+      return;
     }
+    throw e;
   }
 }
 
