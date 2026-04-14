@@ -24,6 +24,35 @@ import {
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { formatMoney } from "../shared/format-currency.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: grant composer ----
+//
+// Grant titles are authoritative (`g.name`). The description aggregates
+// grantee, amount (currency-aware via formatMoney), and date.
+interface GrantComposerRow {
+  name: string;
+  organizationId: string;
+  granteeId?: string | null;
+  amount?: number | string | null;
+  currency?: string | null;
+  date?: string | null;
+}
+
+registerComposer<GrantComposerRow>("grant", (row, titleMap) => ({
+  title: row.name,
+  description:
+    [
+      row.granteeId
+        ? `to ${titleMap.get(row.granteeId) ?? row.granteeId}`
+        : null,
+      row.amount != null ? formatMoney(row.amount, row.currency) : null,
+      row.date,
+    ]
+      .filter(Boolean)
+      .join(", ") || null,
+  parentTitle: titleMap.get(row.organizationId) ?? row.organizationId,
+}));
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -739,25 +768,22 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         .filter((id): id is string => id != null);
       const titleMap = await resolveEntityTitles(tx, [...orgSlugs, ...granteeSlugs]);
 
-      // Dual-write to things table
+      // Dual-write to things table via dispatch composer (QUA-470)
       await upsertThingsInTx(
         tx,
-        items.map((g) => ({
-          id: g.id,
-          thingType: "grant" as const,
-          title: g.name,
-          sourceTable: "grants",
-          sourceId: g.id,
-          sourceUrl: g.source,
-          parentTitle: titleMap.get(g.organizationId) ?? g.organizationId,
-          description: [
-            g.granteeId
-              ? `to ${titleMap.get(g.granteeId) ?? g.granteeId}`
-              : null,
-            formatMoney(g.amount, g.currency),
-            g.date,
-          ].filter(Boolean).join(", ") || null,
-        }))
+        items.map((g) => {
+          const composed = composeThing<GrantComposerRow>("grant", g, titleMap);
+          return {
+            id: g.id,
+            thingType: "grant" as const,
+            title: composed.title,
+            description: composed.description,
+            parentTitle: composed.parentTitle,
+            sourceTable: "grants",
+            sourceId: g.id,
+            sourceUrl: g.source,
+          };
+        })
       );
 
       // Write inline sourcing verdicts atomically within the same transaction
