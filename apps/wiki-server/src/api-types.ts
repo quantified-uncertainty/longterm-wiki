@@ -1160,12 +1160,12 @@ const VALID_SESSION_TYPES = [
  * here so bad writes get rejected before they hit PG.
  */
 export const LINEAR_ID_PATTERN = /^[A-Z]+-\d+$/;
-const LinearIdSchema = z
+/** Required, non-nullable variant — used for path params where the value must be present. */
+export const LinearIdParamSchema = z
   .string()
   .regex(LINEAR_ID_PATTERN, "Linear ID must match /^[A-Z]+-\\d+$/")
-  .max(50)
-  .nullable()
-  .optional();
+  .max(50);
+const LinearIdSchema = LinearIdParamSchema.nullable().optional();
 
 /**
  * Agent slot number (a0..a99). Matches the CHECK constraint on

@@ -59,8 +59,7 @@ interface CommandOptions extends BaseOptions {
   noIssueStart?: boolean;
   /** Skip the auto-call to `linear issues start <QUA-NNN>`. Used by tests. */
   noLinearStart?: boolean;
-  /** Pass --force through to `linear start` to bypass the dedup check. Also
-   *  disarms the hard-fail path on dedup collisions. */
+  /** Pass --force through to `linear start` to bypass the dedup check. */
   force?: boolean;
 }
 

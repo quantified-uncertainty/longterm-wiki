@@ -6,6 +6,7 @@ import { GITHUB_REPO_URL } from "@lib/site-config";
 import { shortenDirectory } from "@lib/format";
 import type { ActiveAgentRow } from "./active-agents-content";
 import { AgentEventsPanel } from "./agent-events-panel";
+import { slotColumn, linearColumn } from "./shared-columns";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 
@@ -77,27 +78,7 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
-  // QUA-440: Slot number — derived from the a<N> ancestor of worktree at
-  // init time. Stored on agent_sessions and joined onto active_agents at
-  // query time. Display as a short monospace badge, sortable.
-  {
-    accessorKey: "slotNumber",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Slot</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const slot = row.original.slotNumber;
-      if (slot === null || slot === undefined) {
-        return <span className="text-xs text-muted-foreground/50">—</span>;
-      }
-      return (
-        <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-foreground/90">
-          a{slot}
-        </span>
-      );
-    },
-    sortingFn: (a, b) => (a.original.slotNumber ?? -1) - (b.original.slotNumber ?? -1),
-  },
+  slotColumn<ActiveAgentRow>(),
   {
     accessorKey: "sessionName",
     header: "Name",
@@ -160,28 +141,7 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
       );
     },
   },
-  // QUA-440: Linear issue identifier. Linked to the Linear issue page so
-  // coordinators can click through from the dashboard.
-  {
-    accessorKey: "linearId",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Linear</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const id = row.original.linearId;
-      if (!id) return <span className="text-xs text-muted-foreground/50">—</span>;
-      return (
-        <a
-          href={`https://linear.app/quantifieduncertainty/issue/${id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-mono text-blue-600 hover:underline"
-        >
-          {id}
-        </a>
-      );
-    },
-  },
+  linearColumn<ActiveAgentRow>(),
   {
     accessorKey: "prNumber",
     header: "PR",

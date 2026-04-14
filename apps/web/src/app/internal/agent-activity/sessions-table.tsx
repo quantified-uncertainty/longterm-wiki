@@ -6,6 +6,7 @@ import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 import { shortenDirectory } from "@lib/format";
 import type { AgentSessionListRow as AgentSessionRow } from "@wiki-server/api-response-types";
+import { slotColumn, linearColumn } from "./shared-columns";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 
@@ -123,26 +124,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
-  // QUA-440: Slot number — populated for sessions after QUA-440 lands.
-  // Older sessions show '—'.
-  {
-    accessorKey: "slotNumber",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Slot</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const slot = row.original.slotNumber;
-      if (slot === null || slot === undefined) {
-        return <span className="text-xs text-muted-foreground/50">—</span>;
-      }
-      return (
-        <span className="inline-flex items-center rounded bg-muted px-1.5 py-0.5 font-mono text-[11px] font-semibold text-foreground/90">
-          a{slot}
-        </span>
-      );
-    },
-    sortingFn: (a, b) => (a.original.slotNumber ?? -1) - (b.original.slotNumber ?? -1),
-  },
+  slotColumn<AgentSessionRow>(),
   {
     accessorKey: "sessionType",
     header: ({ column }) => (
@@ -186,27 +168,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
       );
     },
   },
-  // QUA-440: Linear issue ID, linked to Linear's issue page.
-  {
-    accessorKey: "linearId",
-    header: ({ column }) => (
-      <SortableHeader column={column}>Linear</SortableHeader>
-    ),
-    cell: ({ row }) => {
-      const id = row.original.linearId;
-      if (!id) return <span className="text-xs text-muted-foreground/50">—</span>;
-      return (
-        <a
-          href={`https://linear.app/quantifieduncertainty/issue/${id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-xs font-mono text-blue-600 hover:underline"
-        >
-          {id}
-        </a>
-      );
-    },
-  },
+  linearColumn<AgentSessionRow>(),
   {
     accessorKey: "prUrl",
     header: "PR",

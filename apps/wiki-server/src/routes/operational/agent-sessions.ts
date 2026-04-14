@@ -16,7 +16,7 @@ import {
   CreateAgentSessionSchema,
   UpdateAgentSessionSchema,
   DateStringSchema,
-  LINEAR_ID_PATTERN,
+  LinearIdParamSchema,
 } from "../../api-types.js";
 import { z } from "zod";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -130,6 +130,10 @@ const agentSessionsApp = new Hono()
   // Returns sessions whose linear_id matches, filtered to active status and
   // recent updated_at (heartbeat proxy). Used by `crux linear start`'s
   // DB-first dedup pre-check in `crux/lib/linear/dedup.ts`.
+  //
+  // Narrow-column projection: the dedup caller only reads branch, slotNumber,
+  // linearId, and updatedAt — no reason to ship checklistMd/issuesJson/etc.
+  // which can be kilobytes each on the init hot path.
   .get(
     "/by-linear/:linearId",
     zv(
@@ -142,28 +146,34 @@ const agentSessionsApp = new Hono()
       }),
     ),
     async (c) => {
-      const linearId = c.req.param("linearId");
-      // Length cap before regex to bound the regex-match cost and match the
-      // `.max(50)` bound on LinearIdSchema in api-types.ts. The regex itself
-      // is anchored and linear-time but explicit bounds are defense in
-      // depth against a future non-anchored refactor.
-      if (linearId.length > 50 || !LINEAR_ID_PATTERN.test(linearId)) {
-        return validationError(c, "Invalid Linear ID format (expected ^[A-Z]+-\\d+$, max 50 chars)");
+      // `zv` in this codebase only validates "query" and "json" targets, so
+      // validate the path param via the shared schema manually. Keeps the
+      // format rule (incl. the 50-char cap) in one place — LinearIdParamSchema.
+      const parsed = LinearIdParamSchema.safeParse(c.req.param("linearId"));
+      if (!parsed.success) {
+        return validationError(c, parsed.error.issues[0]?.message ?? "Invalid Linear ID");
       }
+      const linearId = parsed.data;
       const { freshMinutes } = c.req.valid("query");
       const cutoff = new Date(Date.now() - freshMinutes * 60_000);
       const db = getDrizzleDb();
-      const rows = await db.select().from(agentSessions)
+      const rows = await db
+        .select({
+          id: agentSessions.id,
+          branch: agentSessions.branch,
+          linearId: agentSessions.linearId,
+          slotNumber: agentSessions.slotNumber,
+          status: agentSessions.status,
+          updatedAt: agentSessions.updatedAt,
+        })
+        .from(agentSessions)
         .where(and(
           eq(agentSessions.linearId, linearId),
           eq(agentSessions.status, "active"),
           gte(agentSessions.updatedAt, cutoff),
         ))
         .orderBy(desc(agentSessions.updatedAt));
-      return c.json({
-        sessions: rows.map((r) => mapSessionRow(r, [])),
-        freshMinutes,
-      });
+      return c.json({ sessions: rows, freshMinutes });
     },
   )
   .get("/stats", async (c) => {

@@ -94,12 +94,11 @@ async function findActiveClaimsByOthersFromPg(
     // `updatedAt` comes back as a string from JSON; normalize defensively
     // in case the serialization ever changes.
     const updatedAt = typeof s.updatedAt === 'string' ? s.updatedAt : String(s.updatedAt);
+    // The formatter renders the first non-empty line as the one-line
+    // summary. Keep it honest — this claim came from PG, not a Linear
+    // comment, and there's no need to fabricate a comment-shaped body.
     claims.push({
-      body:
-        `🤖 Claude Code starting work on this issue.\n\n` +
-        (s.slotNumber !== null ? `**Slot:** a${s.slotNumber}\n` : '') +
-        `**Branch:** \`${s.branch}\`\n` +
-        `(from PG agent_sessions — updated_at ${updatedAt})`,
+      body: `Active session in agent_sessions (last heartbeat ${updatedAt})`,
       createdAt: updatedAt,
       branch: s.branch,
       slot: s.slotNumber !== null ? `a${s.slotNumber}` : null,

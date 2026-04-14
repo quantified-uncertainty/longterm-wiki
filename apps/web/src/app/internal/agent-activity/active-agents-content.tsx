@@ -15,9 +15,7 @@ export interface ActiveAgentRow {
   status: string;
   currentStep: string | null;
   issueNumber: number | null;
-  // QUA-440: linear_id and slot_number live on agent_sessions; the wiki-server
-  // joins them onto each active agent by branch so the dashboard can show
-  // them without a second fetch.
+  // Joined from agent_sessions by branch (QUA-440).
   linearId: string | null;
   slotNumber: number | null;
   prNumber: number | null;
