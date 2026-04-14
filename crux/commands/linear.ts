@@ -39,6 +39,7 @@ import {
   type AuditBucket,
   type AuditEntry,
 } from '../lib/linear/audit.ts';
+import { runHygieneAudit, formatHygieneReport } from '../lib/linear/hygiene.ts';
 import { githubApi } from '../lib/github.ts';
 import { resolve as resolvePath } from 'path';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
@@ -129,6 +130,34 @@ async function view(args: string[], options: CommandOptions): Promise<CommandRes
   out += `  ${c.dim}url:${c.reset} ${issue.url}\n`;
   if (issue.description) {
     out += `\n${issue.description.slice(0, 1000)}${issue.description.length > 1000 ? '\n…(truncated)' : ''}\n`;
+  }
+  const children = issue.children?.nodes ?? [];
+  if (children.length > 0) {
+    // Non-terminal states first so agents reading an epic see open work above
+    // shipped work — the point of the block is to prevent re-filing existing
+    // sub-issues (QUA-481 post-mortem).
+    const isTerminal = (type: string) =>
+      type === 'completed' || type === 'canceled';
+    const stateRank = (name: string): number => {
+      const r: Record<string, number> = {
+        'In Progress': 0, 'In Review': 1, 'Todo': 2, 'Backlog': 3,
+        'Triage': 4, 'Done': 5, 'Canceled': 6, 'Duplicate': 7,
+      };
+      return r[name] ?? 8;
+    };
+    const sorted = [...children].sort((a, b) => {
+      const at = isTerminal(a.state.type) ? 1 : 0;
+      const bt = isTerminal(b.state.type) ? 1 : 0;
+      if (at !== bt) return at - bt;
+      const sr = stateRank(a.state.name) - stateRank(b.state.name);
+      if (sr !== 0) return sr;
+      return a.identifier.localeCompare(b.identifier);
+    });
+    out += `\n${c.bold}Children (${children.length}):${c.reset}\n`;
+    for (const ch of sorted) {
+      const stateColor = isTerminal(ch.state.type) ? c.dim : c.yellow;
+      out += `  ${c.cyan}${ch.identifier}${c.reset} ${stateColor}[${ch.state.name}]${c.reset} ${priorityLabel(ch.priority)} — ${ch.title}\n`;
+    }
   }
   if (comments.length > 0) {
     out += `\n${c.bold}Comments (${comments.length}):${c.reset}\n`;
@@ -349,6 +378,16 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → ${targetState}\n`;
   if (options.pr) out += `  PR: ${options.pr}\n`;
   return { output: out, exitCode: 0 };
+}
+
+async function hygiene(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const report = await runHygieneAudit();
+  if (options.json) {
+    return { output: JSON.stringify(report, null, 2) + '\n', exitCode: 0 };
+  }
+  return { output: formatHygieneReport(report, c) + '\n', exitCode: 0 };
 }
 
 async function statesList(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -916,6 +955,7 @@ export const commands = {
   start,
   done,
   audit,
+  hygiene,
   'verify-pr': verifyPr,
   'leak-check': leakCheck,
   'states-list': statesList,
@@ -935,6 +975,7 @@ Commands:
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
   audit                         Classify In Progress issues by PR health (shipped/orphan/epic/active)
+  hygiene                       Metadata hygiene scan: orphans, label coverage, priority gaps, stuck tickets
   verify-pr <PR>                Watchdog: ensure merged PR's Fixes QUA-NNN issues are actually Done
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks
   states-list                   Show current QUA team workflow state IDs

@@ -22,43 +22,9 @@ The `createSyncHandler<T>()` factory in `apps/wiki-server/src/routes/tablebase/s
 
 If you're adding a route that needs >1 escape hatch (`preValidate`, `postUpsert`, `conflictSet`), the factory is the wrong fit. Hand-roll the route and document why in a comment.
 
-## Migration pattern (Phase 2)
+## Scaffolding a new route
 
-When migrating an existing route to the factory, use the per-route feature flag for safe rollback:
-
-```typescript
-import { createSyncHandler } from "./sync-factory.js";
-import { useFactoryFor } from "./sync-factory-flag.js";
-
-// Keep both implementations for the 7-day soak period.
-const factoryHandler = createSyncHandler({
-  name: "my-route",
-  table: myTable,
-  // ...
-});
-
-const legacyHandler = async (c: Context) => {
-  // ... existing hand-rolled handler, unchanged ...
-};
-
-const myApp = new Hono()
-  .post("/sync", async (c) => {
-    if (useFactoryFor("my-route")) {
-      return factoryHandler(c);
-    }
-    return legacyHandler(c);
-  });
-```
-
-Operators can roll back any single route by setting the env var:
-
-```bash
-USE_SYNC_FACTORY_ROUTES=!my-route
-```
-
-After 7 days of clean metrics with the factory enabled (default), a follow-up PR removes the legacy handler and the conditional, leaving only the direct factory call.
-
-See `apps/wiki-server/src/routes/tablebase/sync-factory-flag.ts` for the full truth table.
+Use `pnpm crux tb scaffold <kebab-name>` (QUA-455). It generates the route file, CLI client, crux table-registry entry, and wiki-server mount-registry entry in one shot, with TODO markers for the table-specific bits. See `.claude/rules/tablebase-sync-factory.md` — the generator is the canonical way to add a new entity type.
 
 ## Hook budget: max 1 per route
 
@@ -125,6 +91,8 @@ When you migrate a route to the factory, write a new test in `apps/wiki-server/s
 - Phase 0 audit: [#4089](https://github.com/quantified-uncertainty/longterm-wiki/issues/4089)
 - Phase 1 implementation: [#4090](https://github.com/quantified-uncertainty/longterm-wiki/issues/4090)
 - Factory source: `apps/wiki-server/src/routes/tablebase/sync-factory.ts`
-- Feature flag: `apps/wiki-server/src/routes/tablebase/sync-factory-flag.ts`
 - Type-level test: `apps/wiki-server/src/routes/tablebase/sync-factory.test-d.ts`
+- Mount registry (QUA-454): `apps/wiki-server/src/routes/tablebase/mount-registry.ts`
+- Registry cross-check validator (QUA-456): `crux/validate/validate-tablebase-registry.ts`
+- Scaffold generator (QUA-455): `pnpm crux tb scaffold <name>` — see `crux/commands/tablebase-scaffold.ts`
 - Phase 3 spike results: closed PRs #4099, #4103, #4106, #4108 (v1 migrations archived for reference). drizzle-zod spike showed schema inference is too lossy for this codebase — hand-written schemas are the right choice.

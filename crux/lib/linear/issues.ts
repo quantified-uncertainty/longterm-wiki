@@ -13,6 +13,14 @@ import {
   type WorkflowStateName,
 } from './workflow-states.ts';
 
+export interface LinearChildIssue {
+  identifier: string;
+  title: string;
+  priority: number;
+  url: string;
+  state: { name: string; type: string };
+}
+
 export interface LinearIssue {
   id: string;
   identifier: string;
@@ -25,6 +33,7 @@ export interface LinearIssue {
   parent: { identifier: string; title: string } | null;
   project: { id: string; name: string } | null;
   labels: { nodes: Array<{ name: string }> };
+  children: { nodes: LinearChildIssue[] };
 }
 
 export interface LinearComment {
@@ -54,6 +63,15 @@ export async function getIssue(identifier: string): Promise<LinearIssue | null> 
           parent { identifier title }
           project { id name }
           labels { nodes { name } }
+          children(first: 50) {
+            nodes {
+              identifier
+              title
+              priority
+              url
+              state { name type }
+            }
+          }
         }
       }`,
       { id: identifier },

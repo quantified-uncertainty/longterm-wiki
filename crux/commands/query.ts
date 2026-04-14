@@ -151,16 +151,6 @@ export async function entity(args: string[], options: Record<string, unknown>): 
     }
   }
 
-  if (e.sources?.length) {
-    output += `\n  ${c.bold}Sources:${c.reset}\n`;
-    for (const s of e.sources.slice(0, 5)) {
-      output += `    ${s.title}`;
-      if (s.author) output += ` (${s.author})`;
-      if (s.date) output += ` — ${s.date}`;
-      output += '\n';
-    }
-  }
-
   output += `\n  ${c.dim}Synced: ${e.syncedAt}${c.reset}`;
 
   return { output, exitCode: 0 };

@@ -30,25 +30,14 @@
 import { readdirSync, readFileSync } from "fs";
 import { join } from "path";
 import { getColors } from "../lib/output.ts";
+import { TABLEBASE_NON_ROUTE_FILES } from "../../apps/wiki-server/src/routes/tablebase/mount-registry.ts";
 
 const ROUTES_DIR = "apps/wiki-server/src/routes/tablebase";
 const REGISTRY_PATH = "crux/tablebase/table-registry.ts";
 
-// Route files in `routes/tablebase/` that are NOT Hono route modules
-// (shared helpers, schemas, the auto-mount registry, etc.). Kept in sync
-// with the `NON_ROUTE_FILES` set in `validate-tablebase-completeness.ts`
-// and `apps/wiki-server/src/__tests__/mount-registry.test.ts`.
-const NON_ROUTE_FILES = new Set<string>([
-  "index.ts",
-  "sourcing-schema.ts",
-  "write-inline-verdicts.ts",
-  "audit-log.ts",
-  "sync-factory.ts",
-  "sync-factory-flag.ts",
-  "sync-factory.test-d.ts",
-  "mount-registry.ts",
-  "entity-profile-descriptions.ts",
-]);
+// Non-route files sourced from the canonical list in mount-registry.ts
+// so all three consumers share one source of truth.
+const NON_ROUTE_FILES = new Set<string>(TABLEBASE_NON_ROUTE_FILES);
 
 // Route files that exist on disk but are INTENTIONALLY not in
 // `crux/tablebase/table-registry.ts`. Each has a reason; keep this list

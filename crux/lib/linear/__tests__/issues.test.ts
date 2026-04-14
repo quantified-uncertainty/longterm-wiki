@@ -31,6 +31,7 @@ const fullIssueFixture = {
   parent: null,
   project: null,
   labels: { nodes: [] },
+  children: { nodes: [] },
 };
 
 describe('issues.ts — transport helpers', () => {
@@ -89,6 +90,63 @@ describe('issues.ts — transport helpers', () => {
       ) as unknown as typeof fetch;
 
       await expect(getIssue('QUA-184')).rejects.toThrow(/Authentication/);
+    });
+
+    // QUA-481: children are surfaced in `view` output so agents reading a
+    // parent epic see the existing breakdown instead of re-deriving it from
+    // the description. Regression-guards the GraphQL shape.
+    it('parses children nodes when present', async () => {
+      const fixtureWithChildren = {
+        ...fullIssueFixture,
+        identifier: 'QUA-221',
+        children: {
+          nodes: [
+            {
+              identifier: 'QUA-222',
+              title: 'Phase 0',
+              priority: 1,
+              url: 'https://linear.app/quantifieduncertainty/issue/QUA-222',
+              state: { name: 'Done', type: 'completed' },
+            },
+            {
+              identifier: 'QUA-223',
+              title: 'Phase 1',
+              priority: 2,
+              url: 'https://linear.app/quantifieduncertainty/issue/QUA-223',
+              state: { name: 'Done', type: 'completed' },
+            },
+            {
+              identifier: 'QUA-224',
+              title: 'Phase 2',
+              priority: 3,
+              url: 'https://linear.app/quantifieduncertainty/issue/QUA-224',
+              state: { name: 'Backlog', type: 'backlog' },
+            },
+          ],
+        },
+      };
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        jsonResponse({ data: { issue: fixtureWithChildren } })
+      ) as unknown as typeof fetch;
+
+      const issue = await getIssue('QUA-221');
+      expect(issue!.children.nodes).toHaveLength(3);
+      expect(issue!.children.nodes[0].identifier).toBe('QUA-222');
+      expect(issue!.children.nodes[0].state.type).toBe('completed');
+      expect(issue!.children.nodes[2].state.name).toBe('Backlog');
+    });
+
+    it('requests children in the GraphQL query', async () => {
+      const fetchSpy = vi.fn().mockResolvedValue(
+        jsonResponse({ data: { issue: fullIssueFixture } })
+      );
+      globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+      await getIssue('QUA-184');
+      const [, init] = fetchSpy.mock.calls[0];
+      const body = JSON.parse((init as RequestInit).body as string);
+      expect(body.query).toMatch(/children\(first:\s*50\)/);
+      expect(body.query).toMatch(/nodes\s*\{[^}]*identifier/);
     });
   });
 

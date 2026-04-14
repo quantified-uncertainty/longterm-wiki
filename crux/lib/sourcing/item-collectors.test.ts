@@ -34,7 +34,7 @@ import { collectRecordItems } from './item-collectors.ts';
 // Helper to build a mock API response for a specific record type
 function mockPersonnelResponse(records: Record<string, unknown>[]) {
   return {
-    ok: true,
+    ok: true as const,
     data: {
       personnel: records,
       total: records.length,
@@ -44,7 +44,7 @@ function mockPersonnelResponse(records: Record<string, unknown>[]) {
 
 function mockInvestmentResponse(records: Record<string, unknown>[]) {
   return {
-    ok: true,
+    ok: true as const,
     data: {
       investments: records,
       total: records.length,
@@ -54,7 +54,7 @@ function mockInvestmentResponse(records: Record<string, unknown>[]) {
 
 function mockFundingRoundResponse(records: Record<string, unknown>[]) {
   return {
-    ok: true,
+    ok: true as const,
     data: {
       rounds: records,
       total: records.length,
@@ -64,7 +64,7 @@ function mockFundingRoundResponse(records: Record<string, unknown>[]) {
 
 function mockBenchmarkResultResponse(records: Record<string, unknown>[]) {
   return {
-    ok: true,
+    ok: true as const,
     data: {
       benchmarkResults: records,
       total: records.length,
@@ -74,7 +74,7 @@ function mockBenchmarkResultResponse(records: Record<string, unknown>[]) {
 
 function mockEmptyResponse() {
   return {
-    ok: true,
+    ok: true as const,
     data: { items: [], total: 0 },
   };
 }

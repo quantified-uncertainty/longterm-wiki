@@ -50,6 +50,20 @@ const HEALTH_GATE_STATE_FILE = join(STATE_DIR, 'health-gate-cooldown.json');
 /** Reserved fingerprint used to track consecutive scan-error count. */
 const SCAN_ERROR_COUNTER_KEY = '__scan_error_count__';
 
+/**
+ * Signal string emitted by `getGitHubToken()` in `crux/lib/github.ts` when the
+ * env var is missing. Used to classify scan failures so a permanent config
+ * error halts patrol immediately instead of cycling through
+ * MAX_CONSECUTIVE_SCAN_ERRORS (QUA-395).
+ */
+const MISSING_TOKEN_ERROR_SIGNAL = 'GITHUB_TOKEN not set';
+
+/** True when the error is from a missing GITHUB_TOKEN. */
+function isMissingTokenError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.includes(MISSING_TOKEN_ERROR_SIGNAL);
+}
+
 // ── Types ────────────────────────────────────────────────────────────────────
 
 export interface HealthGateDecision {
@@ -228,6 +242,36 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
     };
   }
 
+  // GITHUB_TOKEN is a permanent config requirement — not a transient network
+  // blip. If it's missing, fail-fast with a clear halt instead of letting the
+  // scan throw into the consecutive-error catch path below, which would burn
+  // through MAX_CONSECUTIVE_SCAN_ERRORS on a permanent error (QUA-395).
+  // `runDaemon` already preflight-checks the same var, so reaching this branch
+  // means either (a) the gate is called from a non-daemon entry point, or
+  // (b) the env changed between daemon startup and the first scan.
+  if (!env.GITHUB_TOKEN) {
+    log(
+      `${cl.red}✗ GITHUB_TOKEN not set — health gate cannot scan GitHub. ` +
+        `Halting patrol until token is set.${cl.reset}`,
+    );
+    writeEvent({
+      type: 'health_gate_missing_token',
+      timestamp: now.toISOString(),
+      reason: 'GITHUB_TOKEN not set in environment',
+    });
+    // Reset the consecutive-error counter: this is a config fault, not a
+    // streak, and leaving it high would poison the next real scan attempt.
+    cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
+    return {
+      proceed: false,
+      reason: 'GITHUB_TOKEN not set in environment',
+      result: syntheticScanFailureResult('GITHUB_TOKEN not set'),
+      emittedIssues: [],
+      suppressedIssues: [],
+      bypassed: false,
+    };
+  }
+
   let result: HealthScanResult;
   try {
     result = await scan();
@@ -239,6 +283,33 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
     // work. But if the scanner fails N consecutive times, something's wrong
     // with our observability — flip to halt to prevent silent forever-proceed.
     const message = e instanceof Error ? e.message : String(e);
+
+    // Missing-token errors are permanent config faults, not transient.
+    // Halt immediately instead of cycling the consecutive-error counter, and
+    // reset the counter so a subsequent real scan isn't artificially near the
+    // halt threshold (QUA-395). Covers the edge case where env.GITHUB_TOKEN
+    // was present at the start of runHealthGate but a nested call reads
+    // process.env directly and finds it missing.
+    if (isMissingTokenError(e)) {
+      cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
+      writeEvent({
+        type: 'health_gate_missing_token',
+        timestamp: now.toISOString(),
+        reason: message,
+      });
+      log(
+        `${cl.red}✗ GITHUB_TOKEN became unavailable during scan — halting patrol.${cl.reset}`,
+      );
+      return {
+        proceed: false,
+        reason: 'GITHUB_TOKEN not set in environment',
+        result: syntheticScanFailureResult(message),
+        emittedIssues: [],
+        suppressedIssues: [],
+        bypassed: false,
+      };
+    }
+
     const prevCount = cooldown.getCount?.(SCAN_ERROR_COUNTER_KEY) ?? 0;
     const newCount = prevCount + 1;
     cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, newCount);

@@ -46,7 +46,7 @@ export async function getGrantsByEntity(
 
 /** Sync grants (upsert). */
 export async function syncGrants(
-  items: Array<Record<string, unknown>>,
+  items: readonly unknown[],
   options?: {
     /** Bypass server-side sourcing enforcement. Requires reason for audit logging. */
     forceSkipSourcing?: boolean;

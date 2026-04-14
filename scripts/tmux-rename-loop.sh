@@ -15,7 +15,10 @@
 #   pkill -f tmux-rename-loop.sh
 
 set -u
-LW_DIR="$(cd "$(dirname "$0")/.." && pwd)"
+# Script lives at <workspace>/main/scripts/tmux-rename-loop.sh.
+# Workspace root (where `ws` lives) is two levels up from this script, not one
+# (QUA-480 — previous resolution pointed at lw/main/ws which doesn't exist).
+LW_DIR="$(cd "$(dirname "$0")/../.." && pwd)"
 INTERVAL=300  # 5 minutes
 
 # Run inside whichever tmux server is active for the current user.

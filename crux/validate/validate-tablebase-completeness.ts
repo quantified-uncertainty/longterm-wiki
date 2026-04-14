@@ -21,6 +21,7 @@
 import { readdirSync, readFileSync } from "fs";
 import { join, basename } from "path";
 import { getColors } from "../lib/output.ts";
+import { TABLEBASE_NON_ROUTE_FILES } from "../../apps/wiki-server/src/routes/tablebase/mount-registry.ts";
 
 const ROUTES_DIR = "apps/wiki-server/src/routes/tablebase";
 const c = getColors(process.env.CI === "true");
@@ -99,25 +100,10 @@ const EXEMPTIONS: Record<string, Record<string, string>> = {
   },
 };
 
-/**
- * Files that are not route modules (shared utilities, schemas, barrel exports).
- * These are excluded from analysis entirely.
- */
-const NON_ROUTE_FILES = new Set([
-  "index.ts",
-  "sourcing-schema.ts",
-  "write-inline-verdicts.ts",
-  "audit-log.ts",
-  // Sync handler factory infrastructure (Phase 1 of factory rollout, #4090).
-  // These are utilities used BY route files, not routes themselves.
-  "sync-factory.ts",
-  "sync-factory-flag.ts",
-  "sync-factory.test-d.ts",
-  // QUA-454: auto-mount registry. Imports routes, doesn't define them.
-  "mount-registry.ts",
-  // Column description overlay for entity-profile. Constants module, not a route.
-  "entity-profile-descriptions.ts",
-]);
+// Non-route files are sourced from the canonical list in mount-registry.ts
+// so all three consumers (this validator, validate-tablebase-registry.ts,
+// and mount-registry.test.ts) share one source of truth.
+const NON_ROUTE_FILES = new Set<string>(TABLEBASE_NON_ROUTE_FILES);
 
 // ── Analysis ───────────────────────────────────────────────────────────
 

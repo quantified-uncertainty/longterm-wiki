@@ -30,7 +30,13 @@
       "@wiki-server/secondary-market-prices-route": ["../apps/wiki-server/src/routes/tablebase/secondary-market-prices.ts"],
       "@wiki-server/data-quality-route": ["../apps/wiki-server/src/routes/operational/data-quality.ts"],
       "@wiki-server/talent-flows-route": ["../apps/wiki-server/src/routes/tablebase/talent-flows.ts"],
-      "@wiki-server/jobs-route": ["../apps/wiki-server/src/routes/operational/jobs.ts"]
+      "@wiki-server/jobs-route": ["../apps/wiki-server/src/routes/operational/jobs.ts"],
+      "@wiki-server/data-sources-route": ["../apps/wiki-server/src/routes/tablebase/data-sources.ts"],
+      "@wiki-server/political-scores-route": ["../apps/wiki-server/src/routes/tablebase/political-scores.ts"],
+      "@wiki-server/political-offices-route": ["../apps/wiki-server/src/routes/tablebase/political-offices.ts"],
+      "@wiki-server/political-votes-route": ["../apps/wiki-server/src/routes/tablebase/political-votes.ts"],
+      "@wiki-server/campaign-finance-route": ["../apps/wiki-server/src/routes/tablebase/campaign-finance.ts"],
+      "@wiki-server/resources-route": ["../apps/wiki-server/src/routes/wikibase/resources.ts"]
     }
   },
   "include": [
