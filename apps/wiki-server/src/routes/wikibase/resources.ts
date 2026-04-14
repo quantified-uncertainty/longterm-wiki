@@ -48,6 +48,23 @@ import {
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: resource composer ----
+//
+// Resources fall back from title → url when title is null. Description is
+// the resource summary. No parent.
+interface ResourceComposerRow {
+  title?: string | null;
+  url: string;
+  summary?: string | null;
+}
+
+registerComposer<ResourceComposerRow>("resource", (row) => ({
+  title: row.title || row.url,
+  description: row.summary ?? null,
+  parentTitle: null,
+}));
 import { urlVariants } from "../shared/url-variants.js";
 import { createHash, randomBytes } from "crypto";
 
@@ -577,18 +594,22 @@ const resourcesApp = new Hono()
           WHERE id IN (${idList})
         `);
 
-        // Dual-write to things table
+        // Dual-write to things table via dispatch composer (QUA-470)
         await upsertThingsInTx(
           tx,
-          items.map((r) => ({
-            id: r.stableId || r.id,
-            thingType: "resource" as const,
-            title: r.title || r.url,
-            sourceTable: "resources",
-            sourceId: r.id,
-            description: r.summary,
-            sourceUrl: r.url,
-          }))
+          items.map((r) => {
+            const composed = composeThing<ResourceComposerRow>("resource", r, new Map());
+            return {
+              id: r.stableId || r.id,
+              thingType: "resource" as const,
+              title: composed.title,
+              description: composed.description,
+              parentTitle: composed.parentTitle,
+              sourceTable: "resources",
+              sourceId: r.id,
+              sourceUrl: r.url,
+            };
+          })
         );
       });
     } catch (err) {

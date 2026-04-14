@@ -11,6 +11,22 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: policy-stakeholder composer ----
+interface PolicyStakeholderComposerRow {
+  stakeholderDisplayName: string;
+  policyEntityId: string;
+}
+
+registerComposer<PolicyStakeholderComposerRow>("policy-stakeholder", (row, titleMap) => {
+  const policyName = titleMap.get(row.policyEntityId) ?? row.policyEntityId;
+  return {
+    title: `${row.stakeholderDisplayName} on ${policyName}`,
+    description: null,
+    parentTitle: policyName,
+  };
+});
 
 // ---- Constants ----
 
@@ -116,16 +132,20 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     syncSchema: SyncStakeholderItemSchema,
     enforceSourcing: true,
     entityRefs: ["policyEntityId"],
-    toThing: (item, titleMap) => ({
-      id: item.id,
-      thingType: "policy-stakeholder" as const,
-      title: `${item.stakeholderDisplayName} on ${titleMap.get(item.policyEntityId) ?? item.policyEntityId}`,
-      sourceTable: "policy_stakeholders",
-      sourceId: item.id,
-      parentThingId: item.policyEntityId,
-      parentTitle: titleMap.get(item.policyEntityId) ?? item.policyEntityId,
-      sourceUrl: item.source ?? null,
-    }),
+    toThing: (item, titleMap) => {
+      const composed = composeThing<PolicyStakeholderComposerRow>("policy-stakeholder", item, titleMap);
+      return {
+        id: item.id,
+        thingType: "policy-stakeholder" as const,
+        title: composed.title,
+        description: composed.description,
+        parentTitle: composed.parentTitle,
+        sourceTable: "policy_stakeholders",
+        sourceId: item.id,
+        parentThingId: item.policyEntityId,
+        sourceUrl: item.source ?? null,
+      };
+    },
     toVerdict: (item) => ({
       recordType: "policy-stakeholder",
       recordId: item.id,

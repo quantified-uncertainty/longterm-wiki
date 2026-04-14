@@ -9,6 +9,32 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: division-personnel composer ----
+//
+// Audit §6.5: division-personnel was leaking raw personId slug into titles
+// (`<personId> — <role>`). Fix:
+//   1. Add `thingsTitleIds` to pre-resolve person + division entity titles.
+//   2. Compose via the registered composer with resolved names.
+interface DivisionPersonnelComposerRow {
+  personId: string;
+  divisionId: string;
+  role: string;
+}
+
+registerComposer<DivisionPersonnelComposerRow>(
+  "division-personnel",
+  (row, titleMap) => {
+    const personName = titleMap.get(row.personId) ?? row.personId;
+    const divisionName = titleMap.get(row.divisionId) ?? row.divisionId;
+    return {
+      title: `${personName} — ${row.role}`,
+      description: null,
+      parentTitle: divisionName,
+    };
+  },
+);
 
 // ---- Query schemas ----
 
@@ -168,14 +194,27 @@ const divisionPersonnelApp = new Hono()
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },
-    toThing: (item) => ({
-      id: item.id,
-      thingType: "division-personnel" as const,
-      title: `${item.personId} — ${item.role}`,
-      sourceTable: "division_personnel",
-      sourceId: item.id,
-      sourceUrl: item.source ?? null,
-    }),
+    // QUA-470: pre-resolve person + division titles for the composer.
+    thingsTitleIds: (items) => [
+      ...new Set(items.flatMap((it) => [it.personId, it.divisionId])),
+    ],
+    toThing: (item, titleMap) => {
+      const composed = composeThing<DivisionPersonnelComposerRow>(
+        "division-personnel",
+        item,
+        titleMap,
+      );
+      return {
+        id: item.id,
+        thingType: "division-personnel" as const,
+        title: composed.title,
+        description: composed.description,
+        parentTitle: composed.parentTitle,
+        sourceTable: "division_personnel",
+        sourceId: item.id,
+        sourceUrl: item.source ?? null,
+      };
+    },
   }))
 
   .post("/delete-batch", deleteBatchHandler(divisionPersonnel, "division_personnel"));

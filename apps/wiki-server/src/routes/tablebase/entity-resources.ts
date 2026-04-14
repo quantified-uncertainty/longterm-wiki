@@ -9,8 +9,31 @@ import {
   invalidJsonError,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+
+// ---- QUA-470 Phase 4b-B.1: entity-resource composer ----
+//
+// entity-resource was missing from VALID_THING_TYPES until QUA-433 added it.
+// Title falls back to the resourceId when the resource title isn't found.
+// description encodes the relationship type (authored / about / linked).
+interface EntityResourceComposerRow {
+  resourceId: string;
+  entityId: string;
+  authoredByEntity?: boolean;
+  isSubject?: boolean;
+}
+
+// The composer needs both the resource title map AND the entity title map.
+// We pass a single combined map at the call site (resourceId → title and
+// entityId → title in the same Map). The keyspaces don't collide because
+// resourceIds and entityIds use different prefixes.
+registerComposer<EntityResourceComposerRow>("entity-resource", (row, titleMap) => ({
+  title: titleMap.get(row.resourceId) ?? row.resourceId,
+  description: row.authoredByEntity ? "authored" : row.isSubject ? "about" : null,
+  parentTitle: titleMap.get(row.entityId) ?? row.entityId,
+}));
 
 const SyncItemSchema = z.object({
   entityId: z.string().min(1).max(200),
@@ -122,17 +145,32 @@ const entityResourcesApp = new Hono()
 
         const entityTitleMap = await resolveEntityTitles(tx, entityIds);
 
+        // Combined title map: resourceId → title AND entityId → title.
+        // The composer's titleMap parameter is a single Map; we merge both
+        // sources here so the composer can look up either kind of ref.
+        const combinedTitleMap = new Map([
+          ...resourceTitleMap.entries(),
+          ...entityTitleMap.entries(),
+        ]);
+
         await upsertThingsInTx(
           tx,
-          rows.map((r) => ({
-            id: `er:${r.entityId}:${r.resourceId}`,
-            thingType: "entity-resource",
-            title: resourceTitleMap.get(r.resourceId) ?? r.resourceId,
-            sourceTable: "entity_resources",
-            sourceId: String(r.id),
-            description: r.authoredByEntity ? "authored" : r.isSubject ? "about" : null,
-            parentTitle: entityTitleMap.get(r.entityId) ?? r.entityId,
-          }))
+          rows.map((r) => {
+            const composed = composeThing<EntityResourceComposerRow>(
+              "entity-resource",
+              r,
+              combinedTitleMap,
+            );
+            return {
+              id: `er:${r.entityId}:${r.resourceId}`,
+              thingType: "entity-resource" as const,
+              title: composed.title,
+              description: composed.description,
+              parentTitle: composed.parentTitle,
+              sourceTable: "entity_resources",
+              sourceId: String(r.id),
+            };
+          })
         );
       }
 
