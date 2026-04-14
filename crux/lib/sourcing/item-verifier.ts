@@ -24,6 +24,7 @@ import {
 } from './prompt-guidelines.ts';
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
 import { tryWikidataMatch } from './wikidata-matcher.ts';
+import { tryOpenAlexMatch } from './openalex-matcher.ts';
 import { searchForEntity } from './item-collectors.ts';
 import { isRelevanceGateEnabled, runRelevanceGate } from './relevance-gate.ts';
 import type {
@@ -315,6 +316,19 @@ export async function verifySingleItem(
     } catch (e: unknown) {
       // Fall through to LLM sourcing on any error
       console.warn(`[sourcing] Wikidata matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // OpenAlex deterministic matching for publishing personnel. Returns null
+  // on miss (non-researcher, homonym risk, ambiguous) → falls through to LLM.
+  if (item.data.kind === 'record' && item.data.recordType === 'personnel') {
+    try {
+      const openalexResult = await tryOpenAlexMatch(item);
+      if (openalexResult) return openalexResult;
+    } catch (e: unknown) {
+      console.warn(
+        `[sourcing] OpenAlex matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 
