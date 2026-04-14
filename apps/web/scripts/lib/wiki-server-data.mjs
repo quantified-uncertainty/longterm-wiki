@@ -168,16 +168,23 @@ export async function fetchJsonWithRetry(url, opts = {}) {
 /**
  * Should the build FAIL (throw) on wiki-server errors, vs. degrade gracefully?
  *
- * Strict by default in CI and in full-build mode. Local dev defaults to
- * non-strict (degrade gracefully). Either behavior is overridable:
- *   STRICT_VERDICTS=1  → force strict even locally
- *   STRICT_VERDICTS=0  → force non-strict even in CI (escape hatch)
+ * Strict by default in CI only (`CI=true`) — CI has authenticated prod
+ * credentials and a failing fetch there indicates a real regression worth
+ * halting the build over. Local dev (including full-build mode run from the
+ * gate) defaults to non-strict: when localhost:3112 is down or an agent slot
+ * doesn't have server access, we'd rather return a partial result with a
+ * loud warning than hard-fail the gate for a reason unrelated to the agent's
+ * changes.
+ *
+ * Overrides:
+ *   STRICT_VERDICTS=1  → force strict even locally (test the strict path)
+ *   STRICT_VERDICTS=0  → force non-strict even in CI (emergency escape hatch)
  */
 export function isStrictVerdictsMode() {
   const override = process.env.STRICT_VERDICTS;
   if (override === '0') return false;
   if (override === '1') return true;
-  return process.env.CI === 'true' || fullBuildMode;
+  return process.env.CI === 'true';
 }
 
 /**

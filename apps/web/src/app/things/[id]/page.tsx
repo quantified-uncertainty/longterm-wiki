@@ -14,7 +14,7 @@ import type { RpcSourcingDetailResult } from "@/lib/wiki-server";
 import {
   VerdictBadge,
   formatRecordType,
-  getSourcingHref,
+  getStoredVerdictHref,
 } from "../../sourcing/sourcing-shared";
 import { isAnySid } from "@longterm-wiki/id-utils";
 
@@ -497,7 +497,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
         )}
         {VERDICT_SOURCE_TABLES.has(thing.sourceTable) && (
           <Link
-            href={getSourcingHref(recordType, thing.sourceId)}
+            href={getStoredVerdictHref(recordType, thing.sourceId)}
             className="inline-flex items-center gap-1.5 rounded-md border border-border/60 px-3 py-1.5 text-sm hover:bg-muted/50 transition-colors"
           >
             <ShieldCheck className="h-3.5 w-3.5" />
@@ -622,7 +622,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
           </div>
           <div className="mt-3">
             <Link
-              href={getSourcingHref(recordType, thing.sourceId)}
+              href={getStoredVerdictHref(recordType, thing.sourceId)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors"
             >
               View full evidence
@@ -643,7 +643,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
               This record has not been sourcinged yet.
             </p>
             <Link
-              href={getSourcingHref(recordType, thing.sourceId)}
+              href={getStoredVerdictHref(recordType, thing.sourceId)}
               className="inline-flex items-center gap-1.5 text-sm text-muted-foreground hover:text-foreground transition-colors mt-2"
             >
               View source check page
