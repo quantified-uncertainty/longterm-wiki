@@ -45,6 +45,7 @@ function makeConfig(keep = 100): Config {
       autoUpdateEnqueue: { enabled: false, schedule: "0 6 * * *", budget: 30, maxPages: 5 },
       jobFailureTriage: { enabled: false, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: false, schedule: "0 5 * * *" },
+      e2ePostDeployWatcher: { enabled: false, schedule: "15 * * * *" },
     },
   };
 }

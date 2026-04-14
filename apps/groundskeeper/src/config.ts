@@ -40,6 +40,7 @@ export interface Config {
     autoUpdateEnqueue: AutoUpdateEnqueueConfig;
     jobFailureTriage: TaskConfig;
     tablebaseScan: TaskConfig;
+    e2ePostDeployWatcher: TaskConfig;
   };
 }
 
@@ -140,6 +141,11 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_TABLEBASE_SCAN_ENABLED", true),
         schedule:
           process.env["TASK_TABLEBASE_SCAN_SCHEDULE"] ?? "0 5 * * *", // daily at 5am UTC
+      },
+      e2ePostDeployWatcher: {
+        enabled: envBool("TASK_E2E_POST_DEPLOY_WATCHER_ENABLED", true),
+        schedule:
+          process.env["TASK_E2E_POST_DEPLOY_WATCHER_SCHEDULE"] ?? "15 * * * *", // hourly at :15
       },
     },
   };
