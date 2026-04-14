@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { Hono } from 'hono';
-import { enforceSourcing } from '../sourcing-enforcement.js';
+import { enforceSourcing } from '../routes/shared/sourcing-enforcement.js';
 
 // Helper to create a minimal Hono test context with a given table name
 function createTestApp(tableName = 'personnel') {
