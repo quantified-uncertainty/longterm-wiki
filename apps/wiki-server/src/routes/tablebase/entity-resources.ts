@@ -26,7 +26,15 @@ interface EntityResourceComposerRow {
 // resourceIds and entityIds use different prefixes.
 registerComposer<EntityResourceComposerRow>("entity-resource", (row, titleMap) => ({
   title: titleMap.get(row.resourceId) ?? row.resourceId,
-  description: row.authoredByEntity ? "authored" : row.isSubject ? "about" : null,
+  // "linked" fallback keeps plain-link rows searchable. SyncItemSchema
+  // defaults both booleans to false, so the plain-link path is the common
+  // case; returning null would drop the relationship label entirely from
+  // things.description.
+  description: row.authoredByEntity
+    ? "authored"
+    : row.isSubject
+      ? "about"
+      : "linked",
   parentTitle: titleMap.get(row.entityId) ?? row.entityId,
 }));
 

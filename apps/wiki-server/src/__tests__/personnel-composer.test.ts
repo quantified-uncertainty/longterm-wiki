@@ -17,6 +17,7 @@
  */
 
 import { describe, it, expect, beforeAll } from "vitest";
+import { generateSid } from "@longterm-wiki/id-utils";
 import { composeThing, hasComposer } from "../routes/shared/compose-thing.js";
 
 // IMPORTANT: importing the personnel route registers the composer as a side
@@ -40,15 +41,19 @@ describe("personnel composer (QUA-470)", () => {
 
   describe("4-step person-name fallback", () => {
     it("step 1: titleMap entry for personEntityId wins", () => {
+      // Use generated SIDs so the test exercises real stableId shape, not a
+      // hand-rolled literal. Per CLAUDE.md: never manually invent IDs.
+      const personSid = generateSid();
+      const personIdRaw = generateSid();
       const row: PersonnelRow = {
-        personId: "sid_abc1234567",
+        personId: personIdRaw,
         personDisplayName: "Display Name",
-        personEntityId: "sid_xyz9876543",
+        personEntityId: personSid,
         role: "CEO",
         organizationId: "anthropic",
       };
       const titleMap = new Map([
-        ["sid_xyz9876543", "Dario Amodei"],
+        [personSid, "Dario Amodei"],
         ["anthropic", "Anthropic"],
       ]);
       const result = composeThing<PersonnelRow>("personnel", row, titleMap);
@@ -58,9 +63,9 @@ describe("personnel composer (QUA-470)", () => {
 
     it("step 2: falls back to personDisplayName when entity not in titleMap", () => {
       const row: PersonnelRow = {
-        personId: "sid_abc1234567",
+        personId: generateSid(),
         personDisplayName: "Display Name",
-        personEntityId: "sid_xyz9876543",
+        personEntityId: generateSid(),
         role: "CTO",
         organizationId: "openai",
       };
@@ -71,7 +76,7 @@ describe("personnel composer (QUA-470)", () => {
 
     it("step 2: falls back to personDisplayName when personEntityId is null", () => {
       const row: PersonnelRow = {
-        personId: "sid_abc1234567",
+        personId: generateSid(),
         personDisplayName: "Display Name",
         personEntityId: null,
         role: "Engineer",
@@ -113,8 +118,9 @@ describe("personnel composer (QUA-470)", () => {
       // This is the documented leak path — preserved by the prototype because
       // Phase 4b-B.1 is a refactor-only step. Phase 4b-B.2 will eliminate it
       // by computing titles at read time.
+      const bareSid = generateSid();
       const row: PersonnelRow = {
-        personId: "sid_abc1234567",
+        personId: bareSid,
         personDisplayName: null,
         personEntityId: null,
         role: "Researcher",
@@ -123,7 +129,7 @@ describe("personnel composer (QUA-470)", () => {
       const titleMap = new Map([["openai", "OpenAI"]]);
       const result = composeThing<PersonnelRow>("personnel", row, titleMap);
       // cleanPersonId returns null for sid_, so we fall through to personId itself.
-      expect(result.title).toBe("sid_abc1234567 — Researcher at OpenAI");
+      expect(result.title).toBe(`${bareSid} — Researcher at OpenAI`);
     });
   });
 
