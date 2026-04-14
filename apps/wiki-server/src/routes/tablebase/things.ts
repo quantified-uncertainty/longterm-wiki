@@ -561,6 +561,7 @@ const thingsApp = new Hono()
       description: item.description ?? null,
       sourceUrl: item.sourceUrl ?? null,
       wikiId: item.wikiId ?? null,
+      parentTitle: item.parentTitle ?? null,
     }),
     conflictTarget: [things.sourceTable, things.sourceId],
     conflictSet: {
@@ -572,6 +573,7 @@ const thingsApp = new Hono()
       description: sql`excluded.description`,
       sourceUrl: sql`excluded.source_url`,
       wikiId: sql`excluded.wiki_id`,
+      parentTitle: sql`excluded.parent_title`,
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },
