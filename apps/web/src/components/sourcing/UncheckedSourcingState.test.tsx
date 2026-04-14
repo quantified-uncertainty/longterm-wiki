@@ -16,8 +16,8 @@ describe("UncheckedSourcingState", () => {
 
     expect(screen.getByText("Anthropic Overview")).toBeInTheDocument();
     expect(screen.getByText("page:anthropic:overview")).toBeInTheDocument();
-    expect(screen.getByText(/Not yet source-checked/i)).toBeInTheDocument();
-    expect(screen.getByText(/has not been run through the source-check pipeline/i)).toBeInTheDocument();
+    expect(screen.getByText(/Not yet sourced/i)).toBeInTheDocument();
+    expect(screen.getByText(/has not been run through the sourcing pipeline/i)).toBeInTheDocument();
   });
 
   it("renders View the record link when recordHref is provided", () => {
