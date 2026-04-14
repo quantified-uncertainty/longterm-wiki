@@ -23,6 +23,7 @@ import {
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { formatMoney } from "../shared/format-currency.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
@@ -753,7 +754,7 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
             g.granteeId
               ? `to ${titleMap.get(g.granteeId) ?? g.granteeId}`
               : null,
-            g.amount != null ? `$${Number(g.amount).toLocaleString()}` : null,
+            formatMoney(g.amount, g.currency),
             g.date,
           ].filter(Boolean).join(", ") || null,
         }))

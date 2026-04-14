@@ -26,6 +26,7 @@ function makeThing(overrides: Record<string, unknown> = {}): Record<string, unkn
     description: null,
     source_url: null,
     wiki_id: null,
+    parent_title: null,
     created_at: now,
     updated_at: now,
     synced_at: now,
@@ -93,7 +94,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // --- things: INSERT ... ON CONFLICT DO UPDATE ---
   if (q.includes("insert into") && q.includes('"things"')) {
-    const COLS = 10; // id, thingType, title, parentThingId, sourceTable, sourceId, entityType, description, sourceUrl, wikiId
+    // id, thingType, title, parentThingId, sourceTable, sourceId, entityType,
+    // description, sourceUrl, wikiId, parentTitle
+    const COLS = 11;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
@@ -119,6 +122,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         description: params[o + 7],
         source_url: params[o + 8],
         wiki_id: params[o + 9],
+        parent_title: params[o + 10],
         created_at: existing?.created_at ?? now,
         updated_at: now,
         synced_at: now,
@@ -358,6 +362,28 @@ describe("Things API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.upserted).toBe(2);
+    });
+
+    it("persists parentTitle when supplied (QUA-435)", async () => {
+      const res = await postJson(app, "/api/things/sync", {
+        things: [
+          {
+            id: "thing-grant-1",
+            thingType: "grant",
+            title: "Grant to X",
+            sourceTable: "grants",
+            sourceId: "g1",
+            parentTitle: "Open Philanthropy",
+          },
+        ],
+      });
+
+      expect(res.status).toBe(200);
+      const stored = Array.from(thingsStore.values()).find(
+        (r) => r.source_id === "g1",
+      );
+      expect(stored).toBeDefined();
+      expect(stored?.parent_title).toBe("Open Philanthropy");
     });
 
     it("rejects duplicate (sourceTable, sourceId) pairs within a batch", async () => {
