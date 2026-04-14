@@ -394,6 +394,46 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "103697 snapshots / 140000 threshold (74%); 761 unique pages. Cascade FK fix from PR #4261 deployed today."
+  - id: e2e-post-deploy-red-streak
+    category: infrastructure
+    description: "e2e-post-deploy.yml has not been in a multi-run red streak — silent post-deploy test failures are caught within a day (QUA-411)."
+    check_type: automated
+    check_command: |
+      failures=$(gh run list -R quantified-uncertainty/longterm-wiki \
+        --workflow=e2e-post-deploy.yml --limit 5 \
+        --json conclusion --jq '[.[] | select(.conclusion == "failure")] | length' 2>/dev/null)
+      if [ -z "$failures" ]; then
+        echo "WARN: could not fetch workflow run history"
+        exit 0
+      fi
+      echo "failures_in_last_5=$failures threshold=3"
+      if [ "$failures" -ge 3 ]; then
+        echo "FAIL: e2e-post-deploy has $failures failures in its last 5 runs — red streak likely"
+        gh run list -R quantified-uncertainty/longterm-wiki \
+          --workflow=e2e-post-deploy.yml --limit 5 \
+          --json createdAt,conclusion,url --jq '.[] | "  \(.createdAt) \(.conclusion) \(.url)"' 2>/dev/null
+        exit 1
+      else
+        echo "PASS: $failures/5 recent runs failed — within tolerance"
+      fi
+    how_to_verify: |
+      The check_command inspects the last 5 runs of e2e-post-deploy.yml.
+      If 3+ of the last 5 have failed, the workflow is likely in a sustained
+      red streak (per QUA-411 incident: 4 consecutive failures went unnoticed
+      for 18+ hours). On fail:
+      1. Open the most recent failing run URL.
+      2. Compare failing test names across runs — if identical, it's a
+         real regression, not flakiness.
+      3. Either fix the regression or file a ticket with the failing test
+         names and a link to the run.
+      The larger watcher (Option 1 in QUA-411) — a groundskeeper task that
+      posts to Discord automatically — is tracked separately as a follow-up.
+    frequency: daily
+    added: "2026-04-13"
+    added_by_pr: 4319
+    last_checked: null
+    last_result: null
+    history: []
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"
