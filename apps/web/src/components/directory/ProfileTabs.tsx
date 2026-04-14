@@ -121,6 +121,15 @@ function ProfileTabsFallback({ tabs, ariaLabel }: { tabs: ProfileTab[]; ariaLabe
  * - Syncs active tab to ?tab= URL query param for shareable links
  */
 export function ProfileTabs({ tabs, ariaLabel }: ProfileTabsProps) {
+  const visibleTabs = tabs.filter((t) => t.count !== 0);
+  if (visibleTabs.length === 0) return null;
+  // Single-tab short-circuit lives outside the Suspense boundary — no
+  // searchParams are needed to decide what to render, so wrapping a plain
+  // fragment in Suspense would only introduce a server→client boundary
+  // transition that can trip React #418 hydration errors (QUA-463).
+  if (visibleTabs.length === 1) {
+    return <>{visibleTabs[0].content}</>;
+  }
   return (
     <Suspense fallback={<ProfileTabsFallback tabs={tabs} ariaLabel={ariaLabel} />}>
       <ProfileTabsInner tabs={tabs} ariaLabel={ariaLabel} />
