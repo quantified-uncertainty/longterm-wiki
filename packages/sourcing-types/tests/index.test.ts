@@ -6,7 +6,11 @@ import {
   isSourcingExempt,
   isValidRecordType,
   isLinkableSourcingType,
+  asRecordId,
+  isCandidateRecordId,
+  InvalidRecordIdError,
   type RecordType,
+  type RecordId,
   type SourcingExemptType,
   type SourcingVerdict,
 } from "../src/index.js";
@@ -160,5 +164,141 @@ describe("type compatibility", () => {
   it("SourcingVerdict is a string-literal union, not generic string", () => {
     const v: SourcingVerdict = "confirmed";
     expect(v).toBe("confirmed");
+  });
+});
+
+// ── Branded RecordId<T> (QUA-423) ─────────────────────────────────────────
+
+describe("asRecordId", () => {
+  it("returns the raw string wrapped as RecordId<T> on a valid PK", () => {
+    const id = asRecordId("grant", "8NUnVSueLS");
+    // Runtime value is the same string; brand is erased at runtime.
+    expect(id).toBe("8NUnVSueLS");
+    // Compile-time: id is typed as RecordId<"grant"> — test the assignment.
+    const grantId: RecordId<"grant"> = id;
+    expect(grantId).toBe("8NUnVSueLS");
+  });
+
+  it("accepts various real-world PK shapes", () => {
+    // sid_-prefixed stableIds (entity PKs in many tables)
+    expect(asRecordId("personnel", "sid_A4XoubikkQ")).toBe("sid_A4XoubikkQ");
+    // 10-char alphanumeric grant PKs (what prod actually uses)
+    expect(asRecordId("grant", "8NUnVSueLS")).toBe("8NUnVSueLS");
+    // f_-prefixed fact IDs
+    expect(asRecordId("fact", "f_mEKUPPFYRg")).toBe("f_mEKUPPFYRg");
+    // Short numeric IDs (funding-round, investment use these)
+    expect(asRecordId("funding-round", "42")).toBe("42");
+    // Slug-shaped IDs (some legacy rows)
+    expect(asRecordId("wiki-page", "anthropic")).toBe("anthropic");
+  });
+
+  it("throws on empty strings (caller likely passed undefined)", () => {
+    expect(() => asRecordId("grant", "")).toThrow(InvalidRecordIdError);
+  });
+
+  it("throws on excessively long strings (likely a URL or title)", () => {
+    const tooLong = "x".repeat(201);
+    expect(() => asRecordId("grant", tooLong)).toThrow(
+      /length 201 exceeds 200/,
+    );
+  });
+
+  it("throws on composite React keys: sid_X-sid_Y (the QUA-417 bug shape)", () => {
+    // This is exactly the value conn.key had in funding-connections.tsx
+    // before QUA-417. The runtime guard catches it at the boundary.
+    expect(() => asRecordId("grant", "sid_ULjDXpSLCI-8NUnVSueLS")).toThrow(
+      /composite React key/,
+    );
+    expect(() => asRecordId("grant", "sid_abc-sid_def")).toThrow(
+      InvalidRecordIdError,
+    );
+  });
+
+  it("throws on composite numeric-ID shapes: 123-456", () => {
+    expect(() => asRecordId("funding-round", "12345-67890")).toThrow(
+      /composite/,
+    );
+  });
+
+  it("does NOT flag legitimate hyphenated slugs (false-positive guard)", () => {
+    // These legitimate PK shapes contain hyphens but aren't composite keys.
+    expect(() => asRecordId("wiki-page", "some-name-2024")).not.toThrow();
+    expect(() => asRecordId("publication", "arxiv-2310-12345")).not.toThrow();
+    expect(() => asRecordId("grant", "1-2")).not.toThrow(); // short numeric both sides — not composite
+    expect(() => asRecordId("personnel", "a-b-c-d")).not.toThrow();
+  });
+
+  it("throws with a clear error message referencing QUA-417", () => {
+    try {
+      asRecordId("grant", "sid_abc-sid_def");
+      throw new Error("expected asRecordId to throw");
+    } catch (e) {
+      expect(e).toBeInstanceOf(InvalidRecordIdError);
+      const err = e as InvalidRecordIdError;
+      expect(err.recordType).toBe("grant");
+      expect(err.rawId).toBe("sid_abc-sid_def");
+      expect(err.message).toMatch(/QUA-417/);
+    }
+  });
+
+  it("enforces recordType at the type level (compile check)", () => {
+    // This test passes by compilation — if RecordType drifts from
+    // VALID_RECORD_TYPES, the literal below no longer satisfies T.
+    const id = asRecordId("grant", "g1");
+    const grantId: RecordId<"grant"> = id;
+    expect(grantId).toBeDefined();
+    // Not assignable across types:
+    // const wrong: RecordId<"personnel"> = id;  ← would not compile
+  });
+});
+
+describe("isCandidateRecordId", () => {
+  it("accepts valid PK shapes (same set asRecordId accepts)", () => {
+    expect(isCandidateRecordId("8NUnVSueLS")).toBe(true);
+    expect(isCandidateRecordId("sid_A4XoubikkQ")).toBe(true);
+    expect(isCandidateRecordId("f_mEKUPPFYRg")).toBe(true);
+    expect(isCandidateRecordId("some-name-2024")).toBe(true);
+  });
+
+  it("rejects what asRecordId would throw on", () => {
+    expect(isCandidateRecordId("")).toBe(false);
+    expect(isCandidateRecordId("x".repeat(201))).toBe(false);
+    expect(isCandidateRecordId("sid_abc-sid_def")).toBe(false);
+    expect(isCandidateRecordId("12345-67890")).toBe(false);
+  });
+
+  it("rejects non-string inputs without throwing", () => {
+    expect(isCandidateRecordId(undefined)).toBe(false);
+    expect(isCandidateRecordId(null)).toBe(false);
+    expect(isCandidateRecordId(42)).toBe(false);
+    expect(isCandidateRecordId({})).toBe(false);
+  });
+
+  it("narrows the type to string when true (compile check)", () => {
+    const raw: unknown = "8NUnVSueLS";
+    if (isCandidateRecordId(raw)) {
+      const _s: string = raw; // narrowed to string
+      expect(_s).toBe("8NUnVSueLS");
+    }
+  });
+});
+
+describe("RecordId<T> type distinctness (compile-time)", () => {
+  it("treats different record types as distinct branded types", () => {
+    // These compile — which is the test.
+    const grantId: RecordId<"grant"> = asRecordId("grant", "g1");
+    const personnelId: RecordId<"personnel"> = asRecordId("personnel", "p1");
+
+    // A function typed to accept only grant IDs can't be called with a
+    // personnel ID at compile time:
+    function takeGrant(id: RecordId<"grant">): string {
+      return id;
+    }
+    expect(takeGrant(grantId)).toBe("g1");
+    // takeGrant(personnelId);  ← would not compile: types incompatible
+
+    // Brand is erased at runtime — strings still equal themselves.
+    expect(grantId).toBe("g1");
+    expect(personnelId).toBe("p1");
   });
 });

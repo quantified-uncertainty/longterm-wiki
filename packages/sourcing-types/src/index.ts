@@ -136,3 +136,147 @@ export function isLinkableSourcingType(
 ): recordType is Exclude<RecordType, SourcingExemptType> {
   return isValidRecordType(recordType) && !isSourcingExempt(recordType);
 }
+
+// ── Branded record IDs (QUA-423) ──────────────────────────────────────────
+//
+// A `RecordId<T>` is a string tagged with a record-type-literal at the type
+// level. Tagging is done via an intersection with a phantom object type that
+// carries two read-only brands: a common "RecordId" marker (so any RecordId
+// carries the brand) and a type-specific `__type: T` (so `RecordId<"grant">`
+// is not assignable to `RecordId<"personnel">` or vice versa).
+//
+// Why brands, not just `type RecordId<T> = string`? If the alias were a raw
+// string, passing any string — a composite React key, a slug, an unrelated
+// id — would type-check fine. That's exactly how QUA-417's composite-key
+// bug shipped: `conn.key` (owner + "-" + record_key) was a plain string
+// happily accepted by `getRecordVerdict(recordType: string, recordId: string)`.
+//
+// With brands, the only way to get a `RecordId<T>` is through `asRecordId()`,
+// which has a runtime check for obviously-composite shapes (e.g. a value
+// that contains a hyphen AND has a `sid_` prefix on BOTH sides) and would
+// have thrown at dev time for the funding-connections bug.
+
+/**
+ * Opaque, type-tagged record ID. Construct only via `asRecordId()`.
+ *
+ * Two records of different types are not assignable to each other at the type
+ * level: `RecordId<"grant">` is distinct from `RecordId<"personnel">`. This
+ * is load-bearing for `getSourcingHref(type, id)` — callers can't accidentally
+ * pass a grant ID where a personnel ID was expected.
+ */
+export type RecordId<T extends RecordType = RecordType> = string & {
+  readonly __brand: "RecordId";
+  readonly __type: T;
+};
+
+/**
+ * Thrown by `asRecordId()` when the input clearly isn't a raw record PK.
+ * Exported so callers can handle it distinctly from generic runtime errors
+ * (e.g. log + fall back to `null` in non-strict contexts).
+ */
+export class InvalidRecordIdError extends Error {
+  constructor(
+    public readonly recordType: string,
+    public readonly rawId: string,
+    reason: string,
+  ) {
+    super(
+      `asRecordId(${JSON.stringify(recordType)}, ${JSON.stringify(rawId)}): ${reason}`,
+    );
+    this.name = "InvalidRecordIdError";
+  }
+}
+
+/**
+ * Heuristic: does this look like a composite React key rather than a raw PK?
+ *
+ * The QUA-417 bug was `conn.key = \`${ownerEntityId}-${record.key}\``. The
+ * ownerEntityId was a `sid_`-prefixed stableId (entity PK) and record.key
+ * was a 10-char alphanumeric grant PK — e.g. `sid_ULjDXpSLCI-8NUnVSueLS`.
+ *
+ * Shapes caught:
+ *   - `sid_X-<alphanumRight>`   → stableId + anything alphanumeric (the QUA-417 shape)
+ *   - `<numericLeft>-<numericRight>` with substantial digit runs on both sides
+ *
+ * Does NOT flag legitimate hyphenated IDs (e.g. `some-name-2024`, `arxiv-2310-12345`)
+ * because legit slugs don't start with `sid_` and don't have pure multi-digit
+ * runs on both sides of a hyphen.
+ *
+ * Intentionally narrow — false negatives are fine (a real PK won't match
+ * the stable form); false positives on real PKs would break legitimate callers.
+ */
+function looksLikeCompositeKey(rawId: string): boolean {
+  // Starts with `sid_...` followed by `-` and more content on the right:
+  // this is the QUA-417 shape (`sid_<owner>-<grantPK>`), or two stableIds
+  // joined (`sid_X-sid_Y`). Anything with sid_ immediately followed by `-`
+  // is a composite: stableIds themselves don't contain hyphens.
+  if (/^sid_[A-Za-z0-9]+-[A-Za-z0-9]+/.test(rawId)) return true;
+  // Two multi-digit numeric IDs joined: `12345-67890` but NOT `1-2` or `a-b`
+  // (those could be legitimate slugs).
+  if (/^\d{3,}-\d{3,}$/.test(rawId)) return true;
+  return false;
+}
+
+/**
+ * Construct a `RecordId<T>` from a raw string.
+ *
+ * Runtime guards catch obvious mistakes at dev/test time:
+ *   - Empty strings (caller passed undefined/null by mistake)
+ *   - Excessive length (caller passed a display name or URL)
+ *   - Composite-key shapes (React `key=` values, `${a}-${b}` concatenations)
+ *
+ * Throws `InvalidRecordIdError` on rejection. Callers that need a non-throwing
+ * variant can guard with `isCandidateRecordId()` below.
+ *
+ * NOTE: This does NOT validate `recordType` — use `isValidRecordType()` for
+ * that. Narrowing type param `T extends RecordType` is a compile-time guard;
+ * at runtime a caller could still pass an unregistered string. The function
+ * focuses exclusively on ID-shape validation.
+ */
+export function asRecordId<T extends RecordType>(
+  recordType: T,
+  rawId: string,
+): RecordId<T> {
+  if (typeof rawId !== "string") {
+    throw new InvalidRecordIdError(
+      recordType,
+      String(rawId),
+      `rawId must be string, got ${typeof rawId}`,
+    );
+  }
+  if (rawId.length === 0) {
+    throw new InvalidRecordIdError(recordType, rawId, "empty string");
+  }
+  if (rawId.length > 200) {
+    throw new InvalidRecordIdError(
+      recordType,
+      rawId.slice(0, 50) + "...",
+      `length ${rawId.length} exceeds 200 — likely a URL or display name`,
+    );
+  }
+  if (looksLikeCompositeKey(rawId)) {
+    throw new InvalidRecordIdError(
+      recordType,
+      rawId,
+      "looks like a composite React key (e.g. `${owner}-${record}`); " +
+        "pass the raw PK instead. QUA-417 shipped exactly this bug on " +
+        "funding-connections.tsx.",
+    );
+  }
+  return rawId as RecordId<T>;
+}
+
+/**
+ * Non-throwing check: does this string pass the `asRecordId` runtime guards?
+ *
+ * Useful at system boundaries (e.g. URL params, API responses) where you
+ * want to reject malformed inputs and render a 404 instead of crashing.
+ */
+export function isCandidateRecordId(rawId: unknown): rawId is string {
+  return (
+    typeof rawId === "string" &&
+    rawId.length > 0 &&
+    rawId.length <= 200 &&
+    !looksLikeCompositeKey(rawId)
+  );
+}
