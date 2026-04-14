@@ -53,6 +53,14 @@ jobs:
       PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      # QUA-426: enable the pre-LLM relevance gate. Short-circuits record-kind
+      # items to `not_applicable` when source content does not mention the
+      # record's subject, avoiding wasted LLM calls on generic org pages.
+      # Introduced as dark-default in PR #4349; enabled here on the recheck
+      # workflow first because the stale-reverify cohort (previously-
+      # unverifiable items) is where the gate provides value. Revert by
+      # deleting this line.
+      RELEVANCE_GATE_ENABLED: "true"
       # Assign inputs to env vars to avoid shell injection (GitHub Actions best practice)
       INPUT_BUDGET: ${{ inputs.budget || '15' }}
       INPUT_LIMIT: ${{ inputs.limit || '500' }}
