@@ -191,14 +191,17 @@ export function parseTranscript(filePath: string): TranscriptResult {
  * Claude Code stores transcripts at:
  *   ~/.claude/projects/<slug>/<sessionId>.jsonl
  *
- * where <slug> is the project directory path with / replaced by -.
+ * where <slug> is the project directory path with both `/` and `.`
+ * replaced by `-`. Dots matter for workspaces under paths like
+ * `GitHub.nosync` or `.claude/worktrees/...` — a slug that keeps the
+ * dot will never match the real directory, and every session-finalize
+ * call silently bails with "No JSONL transcript found".
  *
  * @param projectDir - Absolute path to the project directory
  * @returns Path to the most recent .jsonl file, or null if none found
  */
 export function findLatestTranscript(projectDir: string): string | null {
-  // Claude Code derives the slug from the absolute project path
-  const slug = projectDir.replace(/\//g, '-');
+  const slug = projectDir.replace(/[/.]/g, '-');
   const claudeDir = path.join(
     process.env.HOME ?? '~',
     '.claude',

@@ -178,8 +178,11 @@ test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => 
     "/organizations/anthropic",
     "/people/dario-amodei",
     "/ai-models/claude-opus-4-5",
+    // Directory index pages — same dead-link class, fixed as QUA-418 follow-up
+    "/organizations",
+    "/people",
   ]) {
-    test(`header has no /sourcing/entity/ href on ${url}`, async ({ page }) => {
+    test(`no /sourcing/entity/ href on ${url}`, async ({ page }) => {
       await loadPage(page, url);
       const hrefs = await page.locator('a[href^="/sourcing/entity/"]').count();
       expect(hrefs, `${url} has ${hrefs} dead /sourcing/entity/ link(s)`).toBe(0);

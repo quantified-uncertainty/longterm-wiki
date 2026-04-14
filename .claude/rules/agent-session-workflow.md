@@ -82,6 +82,8 @@ You cannot end the session until every observation has a disposition. **"I'll re
 
 **If shipping a PR:** Run `/agent-ship`. It verifies the checklist, polishes the PR, pushes, monitors CI, and closes the session.
 
+**Multi-PR sessions — review each PR before the next one, not in a batch at the end.** When a single session ships N independent PRs in sequence (e.g. a coordinator clearing a ticket list), run `/agent-review-pr` *per PR* between ship and moving to the next ticket. Batching reviews to the end of the session means findings can only ship as follow-up PRs once the originals have merged — inverting the "review before ship" intent of `.claude/rules/dispatched-agent-review.md`. The 2026-04-13 tier1/tier2 session generated 3 follow-up PRs this way; one caught a real "fix-instance-not-system" miss (QUA-418 table dead-links) that grep-before-ship would have found in the original PR.
+
 **If NOT shipping** (research, abandoned, maintenance): Run `/agent-end`. It marks the session as completed, updates Linear/GitHub issues, and cleans up local artifacts.
 
 Every session should end with one of these. See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.

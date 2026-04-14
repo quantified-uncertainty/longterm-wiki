@@ -14,6 +14,7 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { formatMoney } from "../shared/format-currency.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
@@ -272,7 +273,8 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         sourceUrl: item.source,
         parentTitle: titleMap.get(item.companyId) ?? item.companyDisplayName ?? item.companyId,
         description: [
-          item.raised != null ? `raised $${Number(item.raised).toLocaleString()}` : null,
+          // funding_rounds has no currency column; values are implicitly USD.
+          item.raised != null ? `raised ${formatMoney(item.raised, "USD")}` : null,
           item.instrument,
           item.leadInvestor ? `led by ${item.leadInvestorDisplayName ?? item.leadInvestor}` : null,
         ].filter(Boolean).join(", ") || null,

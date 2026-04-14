@@ -60,8 +60,8 @@ audits:
       A large gap means agents are completing work without logging sessions.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-13"
-    last_result: pass
+    last_checked: "2026-04-14"
+    last_result: fail
     history:
       - date: "2026-03-29"
         result: pass
@@ -88,6 +88,9 @@ audits:
       - date: "2026-04-13"
         result: pass
         checked_by: "manual"
+      - date: "2026-04-14"
+        result: fail
+        checked_by: "manual"
   - id: scheduled-workflows-running
     category: infrastructure
     description: "All scheduled GitHub Actions (server-api-health, frontend-data-health, ci-pr-health, scheduled-maintenance, server-health-monitor) ran within expected windows. Note: auto-update intentionally disabled (PR #2592)."
@@ -108,8 +111,8 @@ audits:
       Note: auto-update.yml intentionally disabled since PR #2592 — excluded from this check.
     frequency: weekly
     added: "2026-03-04"
-    last_checked: "2026-04-13"
-    last_result: fail
+    last_checked: "2026-04-14"
+    last_result: pass
     last_result_note: "ci-pr-health failing (auto-update 100% failure rate triggers job queue check); scheduled-maintenance hit max turns (60)"
     history:
       - date: "2026-03-29"
@@ -144,6 +147,9 @@ audits:
         notes: "server-api-health OK, frontend-data-health OK, server-health-monitor OK. ci-pr-health failing (auto-update 100% failure flagged as job queue issue, #4107 open). scheduled-maintenance hit max turns (60) on 2026-04-10."
       - date: "2026-04-13"
         result: fail
+        checked_by: "manual"
+      - date: "2026-04-14"
+        result: pass
         checked_by: "manual"
   - id: vercel-production-only
     category: infrastructure
@@ -226,7 +232,7 @@ audits:
       "Anthropic" appears as the first result.
     frequency: weekly
     added: "2026-03-07"
-    last_checked: "2026-04-08"
+    last_checked: "2026-04-14"
     last_result: pass
     history:
       - date: "2026-03-29"
@@ -254,6 +260,9 @@ audits:
       - date: "2026-04-08"
         result: pass
         checked_by: "manual"
+      - date: "2026-04-14"
+        result: pass
+        checked_by: "manual"
   - id: gate-override-frequency
     category: process
     description: "gate:rules-ok label usage stays below 20% of merged PRs — high override rates indicate the gate is not trusted"
@@ -272,7 +281,7 @@ audits:
       Target: <20% override rate on non-infrastructure PRs.
     frequency: monthly
     added: "2026-03-29"
-    last_checked: "2026-04-11"
+    last_checked: "2026-04-14"
     last_result: pass
     last_result_note: "10% (10/100 PRs) — well under 20% threshold"
     history:
@@ -317,6 +326,9 @@ audits:
         result: pass
         checked_by: "manual"
         notes: "10% (10/100 PRs) — well under 20% threshold"
+      - date: "2026-04-14"
+        result: pass
+        checked_by: "manual"
   - id: model-freshness
     category: infrastructure
     description: "Claude model IDs in crux/lib/anthropic.ts are still the latest available versions"
@@ -386,14 +398,49 @@ audits:
     frequency: weekly
     added: "2026-04-12"
     added_by_pr: 4261
-    last_checked: "2026-04-13"
-    last_result: pass
+    last_checked: "2026-04-14"
+    last_result: fail
     last_result_note: "103697 snapshots / 140000 threshold (74%); 761 unique pages. Cascade FK fix from PR #4261 deployed today."
     history:
       - date: "2026-04-13"
         result: pass
         checked_by: "manual"
         notes: "103697 snapshots / 140000 threshold (74%); 761 unique pages. Cascade FK fix from PR #4261 deployed today."
+      - date: "2026-04-14"
+        result: fail
+        checked_by: "manual"
+  - id: e2e-post-deploy-red-streak
+    category: infrastructure
+    description: "e2e-post-deploy.yml has not been in a multi-run red streak — silent post-deploy test failures are caught within a day (QUA-411)."
+    check_type: automated
+    # Logic lives in crux/commands/audits.ts::workflowRedStreakCommand.
+    # Pure evaluator (evaluateWorkflowRedStreak) has unit tests; the
+    # subcommand fails closed on fetch errors. Thresholds are tunable via
+    # --limit / --threshold. See QUA-411 / PR #4319.
+    check_command: |
+      pnpm crux sys audits workflow-red-streak --workflow=e2e-post-deploy.yml --limit=5 --threshold=3
+    how_to_verify: |
+      The check_command runs `crux sys audits workflow-red-streak` which
+      inspects the last 5 runs of e2e-post-deploy.yml. If 3+ of the last 5
+      have failed, the workflow is likely in a sustained red streak (per
+      QUA-411 incident: 4 consecutive failures went unnoticed for 18+ hours).
+      On fail:
+      1. Open the most recent failing run URL.
+      2. Compare failing test names across runs — if identical, it's a
+         real regression, not flakiness.
+      3. Either fix the regression or file a ticket with the failing test
+         names and a link to the run.
+      The larger watcher (Option 1 in QUA-411) — a groundskeeper task that
+      posts to Discord automatically — is tracked separately as a follow-up.
+    frequency: daily
+    added: "2026-04-13"
+    added_by_pr: 4319
+    last_checked: "2026-04-14"
+    last_result: fail
+    history:
+      - date: "2026-04-14"
+        result: fail
+        checked_by: "manual"
   - id: audits-system-adoption
     category: process
     description: "This audits system itself is being used — items are checked on schedule, not abandoned"

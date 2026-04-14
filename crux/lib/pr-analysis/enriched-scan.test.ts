@@ -186,6 +186,87 @@ describe('extractBlockingComments', () => {
     });
     expect(extractBlockingComments(pr)).toHaveLength(1);
   });
+
+  // ── QUA-472 — skip patrol's own self-authored markers ───────────────────
+  //
+  // Before this fix, patrol's own event comments ("🤖 **PR Patrol** —
+  // Attempting fix for: ...") and status panels ("<!-- pr-patrol-status
+  // -->") were authored under an OWNER token and therefore passed the
+  // authority filter in Filter 2 above. On the next cycle, detectIssues()
+  // saw those as blocking → self-authored-feedback → infinite loop of
+  // posting "Attempting fix for: self-authored-feedback" comments.
+  //
+  // Regression guard: any comment starting with the patrol emoji+bold
+  // prefix OR containing the hidden HTML marker must be filtered out, even
+  // when posted by an OWNER/MEMBER/COLLABORATOR.
+  describe('QUA-472 self-feedback loop — skips patrol-authored markers', () => {
+    const MARKER_BODIES = [
+      // Event comments (buildXxxComment builders in crux/pr-patrol/comments.ts)
+      '\u{1F916} **PR Patrol** \u{2014} Attempting fix for: bot-review-major',
+      '\u{1F916} **PR Patrol** \u{2014} Fix attempt complete (42s, 10 max turns, model: sonnet).',
+      '\u{1F916} **PR Patrol** \u{2014} Added to the merge queue. GitHub will run CI and merge automatically.',
+      '\u{1F916} **PR Patrol** \u{2014} Failed to add to merge queue: HTTP 500',
+      '\u{1F916} **PR Patrol** \u{2014} Abandoning after 3 failed fix attempts. Escalating to coordinator (Opus).',
+      '\u{1F916} **PR Patrol** \u{2014} Fix attempt timed out after 30m (attempt 2).',
+      '\u{1F916} **PR Patrol** \u{2014} Agent determined this issue needs escalation to coordinator (Opus) (no code changes made).',
+      '\u{1F916} **PR Patrol** \u{2014} Stuck for 5 consecutive cycles without signal change. Escalating to coordinator (Opus).',
+      // Status panel body (marker is on its own first line, then the title)
+      '<!-- pr-patrol-status -->\n\u{1F916} **PR Patrol Status**\n\n| Check | Status |',
+    ];
+
+    for (const body of MARKER_BODIES) {
+      it(`skips OWNER-authored patrol marker: ${body.slice(0, 60).replace(/\n/g, '\\n')}...`, () => {
+        const pr = makePrNode({
+          comments: {
+            nodes: [{
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body,
+              createdAt: '2026-04-10T12:00:00Z',
+              viewerDidAuthor: true,
+            }],
+          },
+        });
+        expect(extractBlockingComments(pr)).toEqual([]);
+      });
+    }
+
+    it('still returns real OWNER blocking comments alongside patrol markers', () => {
+      // The core regression scenario: three comments from an OWNER, only
+      // the human one should come back.
+      const pr = makePrNode({
+        comments: {
+          nodes: [
+            {
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body: '\u{1F916} **PR Patrol** \u{2014} Attempting fix for: bot-review-major',
+              createdAt: '2026-04-10T12:00:00Z',
+              viewerDidAuthor: true,
+            },
+            {
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body: '<!-- pr-patrol-status -->\n\u{1F916} **PR Patrol Status**\n\nStage: merging',
+              createdAt: '2026-04-10T12:01:00Z',
+              viewerDidAuthor: true,
+            },
+            {
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body: '\u26A0\uFE0F This will break prod — please hold off',
+              createdAt: '2026-04-10T12:02:00Z',
+              viewerDidAuthor: true,
+            },
+          ],
+        },
+      });
+      const blocking = extractBlockingComments(pr);
+      expect(blocking).toHaveLength(1);
+      expect(blocking[0].author).toBe('OAGr');
+      expect(blocking[0].body).toContain('will break prod');
+    });
+  });
 });
 
 // ── isSelfAuthored ───────────────────────────────────────────────────────────

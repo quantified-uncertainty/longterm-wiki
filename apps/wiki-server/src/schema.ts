@@ -2591,6 +2591,7 @@ export const VALID_THING_TYPES = [
   "policy-stakeholder",
   "entity-event",
   "entity-assessment",
+  "entity-resource",
   "publication",
   "political-race",
   "race-candidate",

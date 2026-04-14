@@ -18,7 +18,7 @@
 
 import { readFileSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { parse as parseYaml } from 'yaml';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -850,6 +850,169 @@ Examples:
 }
 
 // ---------------------------------------------------------------------------
+// workflow-red-streak command
+// ---------------------------------------------------------------------------
+//
+// Fetches the last N runs of a GitHub Actions workflow and fails if the
+// number of `failure` conclusions meets a threshold — a "red streak"
+// signal that a silent post-deploy test failure is persisting.
+//
+// This replaces an earlier bash-embedded check_command (see PR #4319 /
+// QUA-411). Moving it to TypeScript:
+//   - makes the logic testable (see workflow-red-streak.test.ts)
+//   - fails closed on fetch errors without fragile `set -e` semantics
+//   - keeps audits.yaml `check_command` to a single line
+
+export interface WorkflowRun {
+  conclusion: string | null;
+  createdAt?: string;
+  url?: string;
+}
+
+export interface RedStreakResult {
+  status: 'pass' | 'fail';
+  failures: number;
+  totalConsidered: number;
+  threshold: number;
+  message: string;
+  /** Included on fail so the caller can print offending runs. */
+  failingRuns?: WorkflowRun[];
+}
+
+/**
+ * Pure evaluator — given a list of workflow runs (newest first) and a
+ * failure-count threshold, decide whether the workflow is in a red streak.
+ *
+ * Treated as failures: conclusion === 'failure'. `cancelled`, `timed_out`,
+ * and `startup_failure` are intentionally NOT counted — they are usually
+ * infra flakes rather than test regressions. Tighten the set here if the
+ * audit needs to be stricter.
+ */
+export function evaluateWorkflowRedStreak(
+  runs: WorkflowRun[],
+  threshold: number,
+): RedStreakResult {
+  const failingRuns = runs.filter(r => r.conclusion === 'failure');
+  const failures = failingRuns.length;
+  const totalConsidered = runs.length;
+  if (failures >= threshold) {
+    return {
+      status: 'fail',
+      failures,
+      totalConsidered,
+      threshold,
+      message: `FAIL: ${failures}/${totalConsidered} recent runs failed — red streak likely (threshold=${threshold})`,
+      failingRuns,
+    };
+  }
+  return {
+    status: 'pass',
+    failures,
+    totalConsidered,
+    threshold,
+    message: `PASS: ${failures}/${totalConsidered} recent runs failed — within tolerance (threshold=${threshold})`,
+  };
+}
+
+/**
+ * Fetch the last N runs of a workflow via `gh run list --json ...`.
+ * Returns null on any failure (missing gh, network error, unparseable JSON).
+ * Callers must treat null as fail-closed — the whole point of this audit is
+ * to catch silent-failure patterns, so we never pass on missing data.
+ */
+export function fetchWorkflowRuns(
+  workflow: string,
+  repo: string,
+  limit: number,
+  opts: { exec?: typeof execFileSync } = {},
+): WorkflowRun[] | null {
+  const exec = opts.exec ?? execFileSync;
+  try {
+    const stdout = exec('gh', [
+      'run', 'list',
+      '--repo', repo,
+      '--workflow', workflow,
+      '--limit', String(limit),
+      '--json', 'conclusion,createdAt,url',
+    ], {
+      encoding: 'utf-8',
+      stdio: ['ignore', 'pipe', 'pipe'],
+      timeout: 20_000,
+    });
+    const parsed = JSON.parse(String(stdout));
+    if (!Array.isArray(parsed)) return null;
+    return parsed.map((r): WorkflowRun => ({
+      conclusion: typeof r?.conclusion === 'string' ? r.conclusion : null,
+      createdAt: typeof r?.createdAt === 'string' ? r.createdAt : undefined,
+      url: typeof r?.url === 'string' ? r.url : undefined,
+    }));
+  } catch {
+    return null;
+  }
+}
+
+async function workflowRedStreakCommand(
+  _args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const workflow = options.workflow as string | undefined;
+  if (!workflow) {
+    return {
+      exitCode: 1,
+      output: `Usage: crux sys audits workflow-red-streak --workflow=<name> [--limit=5] [--threshold=3] [--repo=owner/name]
+
+  Check a GitHub Actions workflow's recent run history for a red streak.
+  Exits 1 if >= threshold of the last <limit> runs failed, or if the run
+  history could not be fetched (fail-closed).
+
+Options:
+  --workflow=X      Workflow file name (e.g. e2e-post-deploy.yml) — required
+  --limit=N         How many recent runs to consider [default: 5]
+  --threshold=N     Fail if at least N of the last <limit> runs failed [default: 3]
+  --repo=owner/name GitHub repo [default: quantified-uncertainty/longterm-wiki]`,
+    };
+  }
+
+  const limit = parsePositiveInt(options.limit, 5);
+  const threshold = parsePositiveInt(options.threshold, 3);
+  const repo = (options.repo as string | undefined) ?? 'quantified-uncertainty/longterm-wiki';
+
+  const runs = fetchWorkflowRuns(workflow, repo, limit);
+  if (runs === null) {
+    // Fail-closed: a fetch error is a real failure, not a pass. Silent
+    // success on missing data is the exact pattern this audit exists to catch.
+    return {
+      exitCode: 1,
+      output: `FAIL: could not fetch workflow run history for ${workflow} — check gh auth / network`,
+    };
+  }
+
+  const result = evaluateWorkflowRedStreak(runs, threshold);
+  const lines: string[] = [
+    `workflow=${workflow} failures_in_last_${result.totalConsidered}=${result.failures} threshold=${result.threshold}`,
+    result.message,
+  ];
+  if (result.status === 'fail' && result.failingRuns) {
+    for (const r of result.failingRuns) {
+      lines.push(`  ${r.createdAt ?? '?'} ${r.conclusion} ${r.url ?? ''}`.trimEnd());
+    }
+  }
+  return {
+    exitCode: result.status === 'fail' ? 1 : 0,
+    output: lines.join('\n'),
+  };
+}
+
+function parsePositiveInt(v: unknown, fallback: number): number {
+  if (typeof v === 'number' && Number.isFinite(v) && v > 0) return Math.floor(v);
+  if (typeof v === 'string') {
+    const n = Number(v);
+    if (Number.isFinite(n) && n > 0) return Math.floor(n);
+  }
+  return fallback;
+}
+
+// ---------------------------------------------------------------------------
 // Exports
 // ---------------------------------------------------------------------------
 
@@ -859,6 +1022,7 @@ export const commands = {
   add: addCommand,
   'run-auto': runAutoCommand,
   report: reportCommand,
+  'workflow-red-streak': workflowRedStreakCommand,
   default: listCommand,
 };
 
@@ -870,11 +1034,12 @@ Track ongoing properties we expect to be true about the system,
 plus one-time post-merge check items tied to specific PRs.
 
 Commands:
-  list              Show all audit items (default), highlight overdue
-  check <id>        Record a check result (with auto-recorded history)
-  add "desc"        Add a new audit item via CLI (no manual YAML editing)
-  run-auto          Run automated/hybrid checks, show output
-  report            Full report for maintenance sweep
+  list                  Show all audit items (default), highlight overdue
+  check <id>            Record a check result (with auto-recorded history)
+  add "desc"            Add a new audit item via CLI (no manual YAML editing)
+  run-auto              Run automated/hybrid checks, show output
+  report                Full report for maintenance sweep
+  workflow-red-streak   Fail if a GH Actions workflow has N+ recent failures
 
 Options (list):
   --pending         Only show overdue / never-checked items
@@ -910,5 +1075,6 @@ Examples:
   crux sys audits add "Check Y weekly" --type=ongoing --interval=weekly
   crux sys audits run-auto                            # Run automated checks
   crux sys audits report                              # Summary for maintenance
+  crux sys audits workflow-red-streak --workflow=e2e-post-deploy.yml  # Red-streak check
 `;
 }

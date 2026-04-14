@@ -83,6 +83,7 @@ function makeConfig(): Config {
       },
       jobFailureTriage: { enabled: true, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: false, schedule: "0 5 * * *" },
+      e2ePostDeployWatcher: { enabled: false, schedule: "15 * * * *" },
     },
   };
 }

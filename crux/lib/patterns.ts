@@ -82,6 +82,23 @@ export const UNESCAPED_DOLLAR_RE = /(?<!\\)\$(\d)/g;
 /** Double-escaped \\$ in MDX body. */
 export const DOUBLE_ESCAPED_DOLLAR_RE = /\\\\\$/g;
 
+/**
+ * Unescaped `$` followed by a digit, excluding identifier-prefixed forms
+ * like `abc$1` (jQuery variables). Used when sanitizing LLM-generated
+ * content before it enters MDX. Stricter than `UNESCAPED_DOLLAR_RE`
+ * because it also rejects the `\w` lookbehind.
+ */
+export const BARE_DOLLAR_DIGIT_RE = /(?<![\\\w])\$(?=\d)/g;
+
+/**
+ * Escape bare `$digit` to `\$digit` so MDX doesn't interpret it as a JSX
+ * expression and the `dollar-signs` gate check doesn't fail. Leaves
+ * already-escaped `\$digit` and identifier-prefixed `abc$1` untouched.
+ */
+export function escapeDollarDigits(s: string): string {
+  return s.replace(BARE_DOLLAR_DIGIT_RE, '\\$');
+}
+
 /** Less-than before a digit or escaped dollar. Used by comparison-operators rule. */
 export const LESS_THAN_BEFORE_NUM_RE = /<(\d|\\?\$)/g;
 

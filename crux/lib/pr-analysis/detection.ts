@@ -192,6 +192,24 @@ export function extractBlockingComments(pr: GqlPrNode): BlockingComment[] {
   for (const c of comments) {
     if (!c?.author?.login) continue;
 
+    // Filter 0: skip patrol's own status/event markers — patrol runs under an
+    // OWNER-authored token, so its own comments would otherwise trip the
+    // authority filter below and produce a self-feedback infinite loop
+    // (QUA-472). Match on both the visible "🤖 **PR Patrol**" prefix used by
+    // event comments (enqueued, attempt, fix-complete, abandoned, timeout,
+    // stuck) AND the hidden `<!-- pr-patrol-* -->` HTML marker used to
+    // identify status panels. `startsWith` on the emoji prefix covers
+    // every buildXxxComment() in crux/pr-patrol/comments.ts; the HTML
+    // marker is `includes()`-checked because status panel bodies start with
+    // the marker on their own line, not the emoji.
+    const body = c.body ?? '';
+    if (
+      body.startsWith('\u{1F916} **PR Patrol**') ||
+      body.includes('<!-- pr-patrol-')
+    ) {
+      continue;
+    }
+
     // Filter 1: must be newer than the last push.
     const createdMs = new Date(c.createdAt).getTime();
     if (!Number.isFinite(createdMs)) continue;
@@ -199,14 +217,14 @@ export function extractBlockingComments(pr: GqlPrNode): BlockingComment[] {
 
     // Filter 2: authority OR urgency.
     const authority = AUTHORITATIVE_ASSOCIATIONS.has(c.authorAssociation);
-    const urgency = matchesUrgencyKeyword(c.body ?? '');
+    const urgency = matchesUrgencyKeyword(body);
     if (!authority && !urgency) continue;
 
     blocking.push({
       author: c.author.login,
       authorAssociation: c.authorAssociation,
       authorType: c.author.__typename ?? 'User',
-      body: c.body ?? '',
+      body,
       createdAt: c.createdAt,
       viewerDidAuthor: c.viewerDidAuthor ?? false,
     });
