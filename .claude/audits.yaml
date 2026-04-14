@@ -398,32 +398,18 @@ audits:
     category: infrastructure
     description: "e2e-post-deploy.yml has not been in a multi-run red streak — silent post-deploy test failures are caught within a day (QUA-411)."
     check_type: automated
+    # Logic lives in crux/commands/audits.ts::workflowRedStreakCommand.
+    # Pure evaluator (evaluateWorkflowRedStreak) has unit tests; the
+    # subcommand fails closed on fetch errors. Thresholds are tunable via
+    # --limit / --threshold. See QUA-411 / PR #4319.
     check_command: |
-      failures=$(gh run list -R quantified-uncertainty/longterm-wiki \
-        --workflow=e2e-post-deploy.yml --limit 5 \
-        --json conclusion --jq '[.[] | select(.conclusion == "failure")] | length' 2>/dev/null)
-      # Fail-closed: a fetch error is a real failure, not a pass. Silent
-      # success on missing data is the exact pattern this audit exists to
-      # catch. Requires gh auth + network (runs locally; see how_to_verify).
-      if [ -z "$failures" ]; then
-        echo "FAIL: could not fetch workflow run history — check gh auth / network"
-        exit 1
-      fi
-      echo "failures_in_last_5=$failures threshold=3"
-      if [ "$failures" -ge 3 ]; then
-        echo "FAIL: e2e-post-deploy has $failures failures in its last 5 runs — red streak likely"
-        gh run list -R quantified-uncertainty/longterm-wiki \
-          --workflow=e2e-post-deploy.yml --limit 5 \
-          --json createdAt,conclusion,url --jq '.[] | "  \(.createdAt) \(.conclusion) \(.url)"' 2>/dev/null
-        exit 1
-      else
-        echo "PASS: $failures/5 recent runs failed — within tolerance"
-      fi
+      pnpm crux sys audits workflow-red-streak --workflow=e2e-post-deploy.yml --limit=5 --threshold=3
     how_to_verify: |
-      The check_command inspects the last 5 runs of e2e-post-deploy.yml.
-      If 3+ of the last 5 have failed, the workflow is likely in a sustained
-      red streak (per QUA-411 incident: 4 consecutive failures went unnoticed
-      for 18+ hours). On fail:
+      The check_command runs `crux sys audits workflow-red-streak` which
+      inspects the last 5 runs of e2e-post-deploy.yml. If 3+ of the last 5
+      have failed, the workflow is likely in a sustained red streak (per
+      QUA-411 incident: 4 consecutive failures went unnoticed for 18+ hours).
+      On fail:
       1. Open the most recent failing run URL.
       2. Compare failing test names across runs — if identical, it's a
          real regression, not flakiness.
