@@ -148,8 +148,19 @@ async function resolveEntity(identifier: string): Promise<ResolvedEntity | null>
 /**
  * Find organizations with the worst sourcing coverage.
  * Returns entities sorted by number of non-confirmed verdicts (worst first).
+ *
+ * QUA-452: distinguishes "server unreachable" from "no entities found".
+ * Prior behavior silently returned `[]` on wiki-server error, which the
+ * caller reported as "No entities found needing curation." — a classic
+ * silent-success bug (same shape as QUA-352, QUA-396). Now returns a
+ * discriminated result so the caller fails loudly when the server is
+ * unavailable.
  */
-async function findEntitiesNeedingCuration(limit: number): Promise<ResolvedEntity[]> {
+type FindEntitiesResult =
+  | { ok: true; entities: ResolvedEntity[] }
+  | { ok: false; error: string };
+
+async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesResult> {
   // Fetch organizations with verdict summary
   const result = await apiRequest<{
     entities: Array<{
@@ -165,8 +176,8 @@ async function findEntitiesNeedingCuration(limit: number): Promise<ResolvedEntit
   }>('GET', `/api/entities?entityType=organization&limit=200`);
 
   if (!result.ok) {
-    console.warn(`${LOG_PREFIX} Failed to fetch entities: ${result.error}`);
-    return [];
+    // Preserve both error code and human-readable message for CI logs.
+    return { ok: false, error: `${result.error}: ${result.message}` };
   }
 
   // For each entity, check how many non-confirmed verdicts exist
@@ -196,7 +207,7 @@ async function findEntitiesNeedingCuration(limit: number): Promise<ResolvedEntit
 
   // Sort: most non-confirmed verdicts first
   scored.sort((a, b) => b.needsCuration - a.needsCuration);
-  return scored.slice(0, limit).map((s) => s.entity);
+  return { ok: true, entities: scored.slice(0, limit).map((s) => s.entity) };
 }
 
 // ── Record Discovery ───────────────────────────────────────────────────
@@ -1098,7 +1109,15 @@ Options:
     entities = [entity];
   } else {
     console.log('Finding entities needing curation...');
-    entities = await findEntitiesNeedingCuration(limit);
+    const findResult = await findEntitiesNeedingCuration(limit);
+    if (!findResult.ok) {
+      // QUA-452: fail loudly instead of reporting "no entities found".
+      return {
+        exitCode: 1,
+        output: `${LOG_PREFIX} Failed to fetch entities from wiki-server: ${findResult.error}. Not treating as "no entities found" — see QUA-452.`,
+      };
+    }
+    entities = findResult.entities;
     if (entities.length === 0) {
       return { exitCode: 0, output: 'No entities found needing curation.' };
     }
