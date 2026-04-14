@@ -186,26 +186,40 @@ async function rollOffDeployedPrs<T extends { number: number; merge_commit_sha: 
  *
  * `maxPages` is a hard safety cap so a broken cutoff comparison can't cause
  * an unbounded scan.
+ *
+ * Returns `{ prs, truncated }` where `truncated` is `true` iff the loop
+ * exhausted `maxPages` without either `allPastCutoff` or a short/empty page
+ * naturally terminating the scan. When `truncated` is `true`, merged PRs on
+ * later pages are silently omitted — callers MUST surface this to operators so
+ * the missing-task problem doesn't reappear under higher PR volume. (QUA-450
+ * review follow-up — CodeRabbit comment 3077100107.)
  */
 export async function fetchMergedPrsInWindow(
   cutoff: Date,
   api: typeof githubApi = githubApi,
   opts: { perPage?: number; maxPages?: number } = {},
-): Promise<PrData[]> {
+): Promise<{ prs: PrData[]; truncated: boolean }> {
   const perPage = opts.perPage ?? 100;
   const maxPages = opts.maxPages ?? 10;
-  const result: PrData[] = [];
+  const prs: PrData[] = [];
+  // Assume truncation until a natural termination condition fires. If we
+  // finish the for-loop without hitting a break, `truncated` stays `true`.
+  let truncated = true;
 
   for (let page = 1; page <= maxPages; page++) {
     const batch = await api<PrData[]>(
       `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=${perPage}&page=${page}`,
     );
-    if (!Array.isArray(batch) || batch.length === 0) break;
+    if (!Array.isArray(batch) || batch.length === 0) {
+      // Empty page — GitHub has no more results at all.
+      truncated = false;
+      break;
+    }
 
     for (const pr of batch) {
       // Only merged PRs with merge_at inside the cutoff window matter.
       if (pr.merged_at && new Date(pr.merged_at) >= cutoff) {
-        result.push(pr);
+        prs.push(pr);
       }
     }
 
@@ -216,13 +230,19 @@ export async function fetchMergedPrsInWindow(
       const updated = pr.updated_at ? new Date(pr.updated_at) : null;
       return updated !== null && updated < cutoff;
     });
-    if (allPastCutoff) break;
+    if (allPastCutoff) {
+      truncated = false;
+      break;
+    }
 
     // Short final page — no more results at all.
-    if (batch.length < perPage) break;
+    if (batch.length < perPage) {
+      truncated = false;
+      break;
+    }
   }
 
-  return result;
+  return { prs, truncated };
 }
 
 async function pending(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -237,7 +257,7 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
   // QUA-450 review fix: the previous `sort=created&per_page=30` single page
   // silently dropped any merged PR older than the 30 most-recently-created
   // closed PRs.
-  const rawPrs = await fetchMergedPrsInWindow(cutoff);
+  const { prs: rawPrs, truncated } = await fetchMergedPrsInWindow(cutoff);
 
   // Narrow to merged PRs with deploy tasks before the (potentially
   // expensive) per-PR production-ancestry check. `fetchMergedPrsInWindow`
@@ -277,7 +297,7 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
     return {
       output:
         JSON.stringify(
-          { pendingPrs, lookbackDays, rolledOff, compareFailures },
+          { pendingPrs, lookbackDays, rolledOff, compareFailures, truncated },
           null,
           2,
         ) + '\n',
@@ -292,12 +312,19 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
       ? ` ${c.yellow}[${compareFailures} compare failure${compareFailures === 1 ? '' : 's'} — roll-off degraded]${c.reset}`
       : '';
 
+  // If discovery hit the page cap, `pendingPrs` may silently omit merged PRs
+  // on later pages. Tell the operator so they can rerun with a bigger cap.
+  // (QUA-450 review follow-up — CodeRabbit comment 3077100107.)
+  const truncationWarning = truncated
+    ? ` ${c.yellow}[${rawPrs.length} merged PRs discovered; truncated at page cap — some may be missing]${c.reset}`
+    : '';
+
   if (pendingPrs.length === 0) {
     const rolledOffNote = rolledOff > 0
       ? ` ${c.dim}(${rolledOff} task-bearing PR${rolledOff === 1 ? '' : 's'} rolled off — already on production)${c.reset}`
       : '';
     return {
-      output: `${c.green}No pending deploy tasks. All clear!${c.reset}${rolledOffNote}${compareWarning}\n`,
+      output: `${c.green}No pending deploy tasks. All clear!${c.reset}${rolledOffNote}${compareWarning}${truncationWarning}\n`,
       exitCode: 0,
     };
   }
@@ -308,7 +335,7 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
     ? ` ${c.dim}[${rolledOff} rolled off]${c.reset}`
     : '';
   lines.push(
-    `${c.bold}Pending Deploy Tasks${c.reset} (${totalUnchecked} unchecked across ${pendingPrs.length} PR${pendingPrs.length === 1 ? '' : 's'})${rolledOffNote}${compareWarning}:\n`
+    `${c.bold}Pending Deploy Tasks${c.reset} (${totalUnchecked} unchecked across ${pendingPrs.length} PR${pendingPrs.length === 1 ? '' : 's'})${rolledOffNote}${compareWarning}${truncationWarning}:\n`
   );
 
   for (const pr of pendingPrs) {
@@ -467,7 +494,7 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
   // QUA-450 review fix: paginate by updated-desc instead of `sort=created`
   // first-page-only, so long-lived PRs merged inside the window aren't
   // silently skipped. See `fetchMergedPrsInWindow` for the stop condition.
-  const rawPrs = await fetchMergedPrsInWindow(cutoff);
+  const { prs: rawPrs, truncated } = await fetchMergedPrsInWindow(cutoff);
 
   // Narrow to merged-with-tasks before the per-PR compare call.
   const candidates = rawPrs.filter((pr) => {
@@ -566,6 +593,7 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
               skipped,
               rolledOff,
               compareFailures,
+              truncated,
               total: results.length,
             },
           },
@@ -581,12 +609,19 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
       ? ` ${c.yellow}[${compareFailures} compare failure${compareFailures === 1 ? '' : 's'} — roll-off degraded]${c.reset}`
       : '';
 
+  // If discovery hit the page cap, later pages were silently omitted. Surface
+  // it so operators can rerun with a bigger cap.
+  // (QUA-450 review follow-up — CodeRabbit comment 3077100107.)
+  const truncationWarning = truncated
+    ? ` ${c.yellow}[${rawPrs.length} merged PRs discovered; truncated at page cap — some may be missing]${c.reset}`
+    : '';
+
   if (results.length === 0) {
     const rolledOffNote = rolledOff > 0
       ? ` ${c.dim}(${rolledOff} task-bearing PR${rolledOff === 1 ? '' : 's'} rolled off — already on production)${c.reset}`
       : '';
     return {
-      output: `${c.green}No pending deploy tasks to verify.${c.reset}${rolledOffNote}${compareWarning}\n`,
+      output: `${c.green}No pending deploy tasks to verify.${c.reset}${rolledOffNote}${compareWarning}${truncationWarning}\n`,
       exitCode: 0,
     };
   }
@@ -601,7 +636,8 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
   const lines: string[] = [];
   const headerSuffix = (dryRun ? ' (dry-run)' : '') +
     (rolledOff > 0 ? ` ${c.dim}[${rolledOff} PR${rolledOff === 1 ? '' : 's'} rolled off]${c.reset}` : '') +
-    compareWarning;
+    compareWarning +
+    truncationWarning;
   lines.push(`${c.bold}Deploy Tasks Verification${c.reset}${headerSuffix}\n`);
 
   for (const [prNum, prResults] of byPr) {

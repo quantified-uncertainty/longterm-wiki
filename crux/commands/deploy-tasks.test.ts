@@ -261,13 +261,15 @@ describe('fetchMergedPrsInWindow (QUA-450 review)', () => {
       throw new Error(`Unexpected page fetch: ${endpoint}`);
     });
 
-    const result = await fetchMergedPrsInWindow(cutoff, api as never, {
+    const { prs, truncated } = await fetchMergedPrsInWindow(cutoff, api as never, {
       perPage: 2,
       maxPages: 10,
     });
 
     // Merged PRs inside the window: 1, 3, 4 (5 onwards are too old; 2 not merged).
-    expect(result.map((p) => p.number).sort()).toEqual([1, 3, 4]);
+    expect(prs.map((p) => p.number).sort()).toEqual([1, 3, 4]);
+    // allPastCutoff on page 3 is a natural termination — not truncation.
+    expect(truncated).toBe(false);
     // We should have made 3 calls — page 3 is where we stop (all past cutoff).
     // page=4 must NOT be fetched.
     expect(api).toHaveBeenCalledTimes(3);
@@ -279,8 +281,33 @@ describe('fetchMergedPrsInWindow (QUA-450 review)', () => {
     const api = vi.fn(async () => [
       makePr({ number: 1, mergedDaysAgo: 1, updatedDaysAgo: 0 }),
     ]);
-    await fetchMergedPrsInWindow(cutoff, api as never, { perPage: 1, maxPages: 2 });
+    const { truncated } = await fetchMergedPrsInWindow(cutoff, api as never, {
+      perPage: 1,
+      maxPages: 2,
+    });
     expect(api).toHaveBeenCalledTimes(2);
+    // Hitting the cap without `allPastCutoff` or a short page is the exact
+    // silent-loss case CodeRabbit flagged (comment 3077100107): we MUST report
+    // the scan as truncated so callers can warn the operator.
+    expect(truncated).toBe(true);
+  });
+
+  it('returns truncated=false when allPastCutoff fires naturally', async () => {
+    // Every PR on page 1 is past the cutoff — `allPastCutoff` trips on page 1
+    // and the loop exits naturally, so truncated MUST be false even though
+    // maxPages=1 (i.e. the cap would have forced termination anyway).
+    const cutoff = new Date(NOW - 14 * DAY);
+    const api = vi.fn(async () => [
+      makePr({ number: 1, mergedDaysAgo: 60, updatedDaysAgo: 40 }),
+      makePr({ number: 2, mergedDaysAgo: 90, updatedDaysAgo: 50 }),
+    ]);
+    const { prs, truncated } = await fetchMergedPrsInWindow(cutoff, api as never, {
+      perPage: 2,
+      maxPages: 1,
+    });
+    expect(prs).toEqual([]); // both outside the window
+    expect(truncated).toBe(false);
+    expect(api).toHaveBeenCalledTimes(1);
   });
 
   it('stops on empty page', async () => {
@@ -289,11 +316,33 @@ describe('fetchMergedPrsInWindow (QUA-450 review)', () => {
       .fn()
       .mockResolvedValueOnce([makePr({ number: 1, mergedDaysAgo: 1, updatedDaysAgo: 0 })])
       .mockResolvedValueOnce([]);
-    const result = await fetchMergedPrsInWindow(cutoff, api as never, {
+    const { prs, truncated } = await fetchMergedPrsInWindow(cutoff, api as never, {
       perPage: 1,
       maxPages: 5,
     });
-    expect(result.map((p) => p.number)).toEqual([1]);
+    expect(prs.map((p) => p.number)).toEqual([1]);
+    expect(truncated).toBe(false);
+    expect(api).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns truncated=false when a short final page terminates the scan', async () => {
+    // perPage=2 and the final page returns only 1 row (< perPage). The
+    // "short page" branch must set truncated=false so pending/verify don't
+    // emit a spurious warning.
+    const cutoff = new Date(NOW - 14 * DAY);
+    const api = vi
+      .fn()
+      .mockResolvedValueOnce([
+        makePr({ number: 1, mergedDaysAgo: 1, updatedDaysAgo: 0 }),
+        makePr({ number: 2, mergedDaysAgo: 2, updatedDaysAgo: 1 }),
+      ])
+      .mockResolvedValueOnce([makePr({ number: 3, mergedDaysAgo: 3, updatedDaysAgo: 2 })]);
+    const { prs, truncated } = await fetchMergedPrsInWindow(cutoff, api as never, {
+      perPage: 2,
+      maxPages: 5,
+    });
+    expect(prs.map((p) => p.number).sort()).toEqual([1, 2, 3]);
+    expect(truncated).toBe(false);
     expect(api).toHaveBeenCalledTimes(2);
   });
 });
@@ -494,5 +543,163 @@ describe('commands.verify — roll-off wiring (QUA-450 review)', () => {
     expect(parsed.results.length).toBeGreaterThan(0);
     expect(parsed.summary.rolledOff).toBe(0);
     expect(parsed.summary.compareFailures).toBe(1);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// commands.pending / commands.verify — truncation surfacing
+// (QUA-450 review follow-up — CodeRabbit comment 3077100107)
+//
+// `fetchMergedPrsInWindow` uses a hard `maxPages` safety cap. If the loop
+// exhausts that cap without hitting `allPastCutoff` or a short/empty page,
+// the result set is a partial scan and merged PRs on later pages are silently
+// omitted — exactly the missing-task problem the first pagination fix was
+// supposed to kill. These tests pin the contract that both `pending` and
+// `verify` surface `truncated: true` in their CI JSON output so coordinators
+// never trust a silently-truncated scan.
+// ---------------------------------------------------------------------------
+
+describe('commands.pending — truncation surfacing', () => {
+  const NOW = new Date().getTime();
+  const DAY = 1000 * 60 * 60 * 24;
+
+  const DEPLOY_TASK_BODY = [
+    '## Deploy Checklist',
+    '<!-- deploy-tasks:v1 -->',
+    '- [ ] Restart wiki-server',
+    '<!-- /deploy-tasks -->',
+  ].join('\n');
+
+  function prFixture(number: number, mergedDaysAgo: number) {
+    return {
+      number,
+      title: `PR ${number}`,
+      body: DEPLOY_TASK_BODY,
+      merged_at: new Date(NOW - mergedDaysAgo * DAY).toISOString(),
+      merge_commit_sha: `sha-${number}`,
+      updated_at: new Date(NOW - mergedDaysAgo * DAY).toISOString(),
+    };
+  }
+
+  beforeEach(() => {
+    mockGithubApi.mockReset();
+  });
+
+  it('emits truncated=true in CI JSON when every page is full and inside the cutoff window', async () => {
+    // Every page returns a full 100 entries inside the cutoff — the loop
+    // never hits `allPastCutoff` or a short page, so it exits only because
+    // it reaches the default `maxPages=10` cap.
+    let callCount = 0;
+    mockGithubApi.mockImplementation(async (endpoint: string) => {
+      if (endpoint.includes('/pulls?')) {
+        callCount++;
+        // 100-row full page, all inside the 14-day window
+        return Array.from({ length: 100 }, (_, i) =>
+          prFixture(10_000 + callCount * 1000 + i, 1),
+        );
+      }
+      if (endpoint.includes('/compare/')) {
+        return { ahead_by: 7 }; // keep everything — no roll-off
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const result = await commands.pending([], { ci: true });
+    const parsed = JSON.parse(result.output);
+
+    expect(parsed.truncated).toBe(true);
+    // Default maxPages=10 means we made exactly 10 pulls calls.
+    const pullsCalls = mockGithubApi.mock.calls.filter((call: unknown[]) =>
+      String(call[0]).includes('/pulls?'),
+    );
+    expect(pullsCalls).toHaveLength(10);
+  });
+
+  it('emits truncated=false in CI JSON when a short page naturally terminates discovery', async () => {
+    mockGithubApi.mockImplementation(async (endpoint: string) => {
+      if (endpoint.includes('/pulls?')) {
+        // One short page — well under perPage=100 — terminates discovery
+        // naturally. No truncation.
+        return [prFixture(700, 1), prFixture(701, 2)];
+      }
+      if (endpoint.includes('/compare/')) {
+        return { ahead_by: 7 };
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const result = await commands.pending([], { ci: true });
+    const parsed = JSON.parse(result.output);
+
+    expect(parsed.truncated).toBe(false);
+  });
+});
+
+describe('commands.verify — truncation surfacing', () => {
+  const NOW = new Date().getTime();
+  const DAY = 1000 * 60 * 60 * 24;
+
+  const DEPLOY_TASK_BODY = [
+    '## Deploy Checklist',
+    '<!-- deploy-tasks:v1 -->',
+    '- [ ] `route` Check wiki-server health — `curl -sf "$WIKI_SERVER_URL/health" | jq .`',
+    '<!-- /deploy-tasks -->',
+  ].join('\n');
+
+  function prFixture(number: number, mergedDaysAgo: number) {
+    return {
+      number,
+      title: `PR ${number}`,
+      body: DEPLOY_TASK_BODY,
+      merged_at: new Date(NOW - mergedDaysAgo * DAY).toISOString(),
+      merge_commit_sha: `sha-${number}`,
+      updated_at: new Date(NOW - mergedDaysAgo * DAY).toISOString(),
+    };
+  }
+
+  beforeEach(() => {
+    mockGithubApi.mockReset();
+  });
+
+  it('emits truncated=true in the summary when every page is full and inside the window', async () => {
+    let callCount = 0;
+    mockGithubApi.mockImplementation(async (endpoint: string) => {
+      if (endpoint.includes('/pulls?')) {
+        callCount++;
+        return Array.from({ length: 100 }, (_, i) =>
+          prFixture(20_000 + callCount * 1000 + i, 1),
+        );
+      }
+      if (endpoint.includes('/compare/')) {
+        return { ahead_by: 7 };
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const result = await commands.verify([], { ci: true, dryRun: true });
+    const parsed = JSON.parse(result.output);
+
+    expect(parsed.summary.truncated).toBe(true);
+    const pullsCalls = mockGithubApi.mock.calls.filter((call: unknown[]) =>
+      String(call[0]).includes('/pulls?'),
+    );
+    expect(pullsCalls).toHaveLength(10);
+  });
+
+  it('emits truncated=false in the summary when discovery terminates naturally', async () => {
+    mockGithubApi.mockImplementation(async (endpoint: string) => {
+      if (endpoint.includes('/pulls?')) {
+        return [prFixture(800, 1), prFixture(801, 2)];
+      }
+      if (endpoint.includes('/compare/')) {
+        return { ahead_by: 7 };
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const result = await commands.verify([], { ci: true, dryRun: true });
+    const parsed = JSON.parse(result.output);
+
+    expect(parsed.summary.truncated).toBe(false);
   });
 });
