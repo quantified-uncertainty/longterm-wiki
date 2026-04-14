@@ -43,7 +43,7 @@ export async function upsertResource(
 }
 
 export async function upsertResourceBatch(
-  items: UpsertResourceItem[],
+  items: readonly unknown[],
 ): Promise<ApiResult<{ upserted: number; results: Array<{ id: string; url: string }> }>> {
   return apiRequest('POST', '/api/resources/batch', { items });
 }

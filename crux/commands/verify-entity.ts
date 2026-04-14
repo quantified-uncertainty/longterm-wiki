@@ -28,7 +28,7 @@ import { apiRequest } from '../lib/wiki-server/client.ts';
 import { fetchSourceContent as fetchCachedContent } from '../lib/sourcing/source-fetcher.ts';
 import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/verdict-handler.ts';
 import { SOURCE_CHECK_CONSTANTS } from '../lib/sourcing/types.ts';
-import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
+import type { SourcingVerdict, RecordType } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
 
@@ -39,7 +39,7 @@ const DEFAULT_LIMIT = 50;
 // ── Types ────────────────────────────────────────────────────────────
 
 interface VerifiableClaim {
-  recordType: string;      // 'fact', 'grant', 'personnel', 'division', etc.
+  recordType: RecordType | 'fact';  // 'fact', 'grant', 'personnel', 'division', etc.
   recordId: string;        // PK in the source table
   fieldName?: string;      // specific field for cell-level sourcing
   entityId: string;        // entity this claim is about
@@ -146,7 +146,7 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
   const stableId = ('stableId' in entity ? (entity as { stableId?: string }).stableId : undefined) ?? entityId;
 
   // Fetch records from various TableBase endpoints
-  const endpoints: Array<{ type: string; path: string; descFn: (r: Record<string, unknown>) => string; sourceField?: string }> = [
+  const endpoints: Array<{ type: RecordType | 'fact'; path: string; descFn: (r: Record<string, unknown>) => string; sourceField?: string }> = [
     {
       type: 'personnel',
       path: `/api/personnel/by-entity/${encodeURIComponent(stableId)}`,
@@ -278,7 +278,7 @@ async function storeEvidence(result: SourcingResult): Promise<void> {
 }
 
 async function storeLocalAggregateVerdict(
-  recordType: string,
+  recordType: RecordType | 'fact',
   recordId: string,
   entityId: string,
   verdict: SourcingVerdict,

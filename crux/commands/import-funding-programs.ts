@@ -1399,7 +1399,7 @@ async function cmdSync(dryRun: boolean) {
     return;
   }
 
-  const result = await syncFundingPrograms(items as Array<Record<string, unknown>>);
+  const result = await syncFundingPrograms(items);
 
   if (result.ok) {
     console.log(`Upserted ${result.data.upserted} funding programs`);

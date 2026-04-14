@@ -8,10 +8,16 @@
 
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 
-// Mock apiRequest BEFORE importing the module under test
-const mockApiRequest = vi.fn(async () => ({ ok: true, data: { upserted: 0 } }));
+// Mock apiRequest BEFORE importing the module under test.
+// Use vi.hoisted so the mock variable is available when vi.mock is hoisted.
+const { mockApiRequest } = vi.hoisted(() => ({
+  mockApiRequest: vi.fn(
+    async (_method: 'GET' | 'POST' | 'PATCH', _path: string, _body?: unknown, _timeoutMs?: number) =>
+      ({ ok: true as const, data: { upserted: 0 } }),
+  ),
+}));
 vi.mock('./client.ts', () => ({
-  apiRequest: (...args: unknown[]) => mockApiRequest(...args),
+  apiRequest: mockApiRequest,
 }));
 
 import { syncPersonnel } from './personnel.ts';
