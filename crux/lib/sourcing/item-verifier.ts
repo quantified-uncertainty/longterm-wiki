@@ -318,13 +318,8 @@ export async function verifySingleItem(
     }
   }
 
-  // ── OpenAlex deterministic matching for personnel (QUA-427) ──
-  // For publishing researchers, OpenAlex's structured author → institution
-  // data can confirm affiliation claims without any LLM call. Runs for every
-  // personnel record regardless of sourceUrl — OpenAlex replaces whatever
-  // URL was originally attached when the author is found. tryOpenAlexMatch
-  // returns null for non-publishing personnel, ambiguous candidates, or API
-  // failures, so records fall through to the existing LLM path unchanged.
+  // OpenAlex deterministic matching for publishing personnel. Returns null
+  // on miss (non-researcher, homonym risk, ambiguous) → falls through to LLM.
   if (item.data.kind === 'record' && item.data.recordType === 'personnel') {
     try {
       const openalexResult = await tryOpenAlexMatch(item);

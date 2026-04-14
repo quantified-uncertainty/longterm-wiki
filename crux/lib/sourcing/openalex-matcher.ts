@@ -1,106 +1,59 @@
 /**
- * OpenAlex Deterministic Matcher — QUA-427.
- *
- * Verifies personnel records against [OpenAlex](https://openalex.org/), a free
- * structured academic database. For a personnel record like
- *   "Amanda Askell at Anthropic, Character Lead (2022–present)"
- * OpenAlex has the author → institutional-affiliation-by-year data sourced from
- * paper metadata. If the claimed affiliation is present, we can confirm the
- * record without fetching HTML or calling an LLM.
- *
- * Rationale: ~40-50% of AI-safety personnel in this wiki publish research, so
- * OpenAlex has them. The transplant pattern is `crux/lib/sourcing/wikidata-matcher.ts`
- * — both query a structured API, map the response to claims, and return a
- * definitive verdict without any LLM involvement.
- *
- * Cost: $0 (free API, no key required, ~100K queries/day soft limit). Replaces
- * LLM cost for records where the match succeeds.
- *
- * Phase 1 (this file): personnel only. Non-publishing personnel (exec, policy,
- * comms, ops) have no OpenAlex record and fall through to LLM as today.
- *
- * Explicitly NOT built: LinkedIn scraping. See QUA-427 for the legal/technical
- * rationale — OpenAlex is the right primary for researchers, the team-page
- * crawler (QUA-428) is the complementary fix for non-publishing personnel.
+ * OpenAlex deterministic matcher for personnel records — mirrors
+ * `wikidata-matcher.ts` but queries OpenAlex author → institution data.
+ * Returns null for non-publishing personnel and homonym-risk cases so the
+ * caller falls through to LLM verification.
  */
 
 import type { VerifyItem, VerifyResult, RecordItemData } from './orchestrator-types.ts';
 import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { nameMatches } from './fuzzy-match.ts';
+import { isResolvableName } from './record-fields.ts';
 
 // ── Constants ───────────────────────────────────────────────────────
 
 const OPENALEX_BASE = 'https://api.openalex.org';
 
 /**
- * OpenAlex asks callers to identify themselves via a mailto in the User-Agent
- * so the polite pool gives higher soft rate limits. A mailto is optional but
- * recommended per https://docs.openalex.org/how-to-use-the-api/rate-limits-and-authentication
+ * Polite-pool mailto per OpenAlex's rate-limit docs. Optional but recommended.
  */
 const USER_AGENT =
   'LongtermWiki-Sourcing/1.0 (https://longtermwiki.com; mailto:noreply@longtermwiki.com)';
 
-/**
- * Year slack for the affiliation window check. The slack is **asymmetric** on
- * purpose: a researcher typically joins an org 6–18 months BEFORE their first
- * paper with that affiliation lands (OpenAlex data is only built from papers
- * once they're published + indexed, with a ~3–6 month lag on top of that).
- *
- * Example: `startDate=2022`, OpenAlex years=[2024, 2025] — the person joined
- * in 2022 but didn't publish with the new affiliation until 2024. A symmetric
- * ±2 slack would just barely accept this (2024 − 2 = 2022, on the boundary),
- * but `startDate=2021` in the same scenario would falsely contradict. The
- * wider lower slack prevents the systematic bias against pre-publication
- * employment claims. The upper slack stays tight because claims usually
- * relate to ongoing tenure, so a claim year well after the last paper is
- * genuinely suspicious.
- */
+// Asymmetric year slack for the affiliation window check: researchers
+// typically join an org 6–18 months before their first paper with the new
+// affiliation lands, so the lower bound is wider than the upper. A claim
+// year well after the last paper is genuinely suspicious.
 const YEAR_SLACK_LOW = 3;
 const YEAR_SLACK_HIGH = 2;
 
-/** Cap search results per author lookup. More than 25 rarely disambiguates. */
 const MAX_SEARCH_RESULTS = 25;
-
-/** fetch timeout for the OpenAlex API. */
 const FETCH_TIMEOUT_MS = 15_000;
 
-// ── Confidence scoring ─────────────────────────────────────────────
-//
-// Deliberately conservative compared to wikidata-matcher (which goes to 0.95).
-// The OpenAlex path can't always disambiguate homonyms — a single name match
-// is NOT a guarantee the OpenAlex author is the same person as the personnel
-// record's subject (see `tryOpenAlexMatch` gating below). Downstream code
-// stores these as authoritative evidence, so over-confident wrong verdicts
-// have real cost.
-
-/**
- * Confidence for a confirmed match when the author clearly disambiguates
- * (publishing with matching org AND year window). Still below 0.95 to leave
- * room for a second-source cross-check.
- */
+// Confidence scoring — deliberately conservative because the matcher can't
+// always rule out homonyms. A wrong high-confidence verdict would overwrite
+// curated evidence, so single-candidate contradicted paths fall through to
+// LLM (see `tryOpenAlexMatch`).
 const CONFIDENCE_CONFIRMED = 0.9;
-
-/**
- * Confidence for a contradicted verdict. Conservative (0.65) because many
- * "contradicted" cases are actually homonym misses where the personnel
- * record references a different person than the sole OpenAlex match. A
- * higher confidence would overwrite curated evidence with a wrong verdict.
- */
 const CONFIDENCE_CONTRADICTED = 0.65;
-
-/** Confidence for "author exists but has no affiliation data to decide on." */
 const CONFIDENCE_UNVERIFIABLE = 0.8;
 
-/**
- * Minimum number of papers an OpenAlex author must have authored before we
- * trust their affiliation data. Stub entries (`works_count === 0`) appear
- * when someone is acknowledged in a paper but never an author; their
- * affiliations are not reliable indicators of employment.
- */
+/** Reject `works_count === 0` entries — they're usually acknowledgment stubs. */
 const MIN_WORKS_COUNT = 1;
 
-/** Identifier stored in the evidence row's `checkerModel` column. */
 const CHECKER_MODEL = 'openalex-api';
+
+// Cut OpenAlex response payload by ~5-10x by projecting only the fields
+// we actually read. 500 personnel × full-author JSON is ~125-500KB per run
+// without this.
+const SELECT_FIELDS = [
+  'id',
+  'display_name',
+  'orcid',
+  'works_count',
+  'affiliations',
+  'last_known_institution',
+].join(',');
 
 // ── Types (subset of the OpenAlex author response) ─────────────────
 
@@ -134,21 +87,19 @@ interface OpenAlexSearchResponse {
 
 // ── Cache (in-memory, per-process) ─────────────────────────────────
 
-/**
- * Map from normalized author-name query → list of matching authors. null
- * means "we looked and got nothing / an error" so repeated lookups don't
- * re-hit the API within a single process run.
- *
- * The MVP uses an in-process cache only. A persistent `openalex_cache` PG
- * table with a weekly refresh is a follow-up; the ticket acceptance
- * criteria names it but a single orchestrator run is bounded enough that
- * in-memory is sufficient for the initial corpus pass.
- */
+// Map from normalized name → author list (null = "looked and got nothing").
+// Bounded by the number of unique personnel names in a single orchestrator run.
 const authorCache = new Map<string, OpenAlexAuthor[] | null>();
 
-/** Clear the in-memory cache. Test-only. */
+// In-flight request dedup: populated synchronously before `await fetch`, so
+// two concurrent personnel with the same name under `concurrency=8` share a
+// single network round-trip instead of racing on the post-await cache write.
+const inFlightRequests = new Map<string, Promise<OpenAlexAuthor[]>>();
+
+/** @internal Test-only helper to reset the matcher's process-lifetime cache. */
 export function clearAuthorCache(): void {
   authorCache.clear();
+  inFlightRequests.clear();
 }
 
 // ── Helpers ─────────────────────────────────────────────────────────
@@ -175,18 +126,37 @@ export function extractYear(dateStr: string | null | undefined): number | null {
 }
 
 /**
- * Search OpenAlex for authors by display name. Cached per-process.
+ * Search OpenAlex for authors by display name. Cached per-process; concurrent
+ * requests for the same name share a single fetch.
  *
- * Returns [] on network error, 4xx/5xx, or when no results are found. The
- * caller can't distinguish these, which is intentional — all three mean
- * "OpenAlex can't help, fall through to LLM."
+ * Returns [] on network error, 4xx/5xx, shape drift, or empty results — the
+ * caller can't distinguish these, which is intentional (all mean "fall
+ * through to LLM").
  */
 export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
   const cacheKey = name.toLowerCase().trim();
   const cached = authorCache.get(cacheKey);
   if (cached !== undefined) return cached ?? [];
 
-  const url = `${OPENALEX_BASE}/authors?search=${encodeURIComponent(name)}&per-page=${MAX_SEARCH_RESULTS}`;
+  const inFlight = inFlightRequests.get(cacheKey);
+  if (inFlight) return inFlight;
+
+  const promise = fetchAuthorsOnce(name, cacheKey);
+  inFlightRequests.set(cacheKey, promise);
+  try {
+    return await promise;
+  } finally {
+    inFlightRequests.delete(cacheKey);
+  }
+}
+
+async function fetchAuthorsOnce(
+  name: string,
+  cacheKey: string,
+): Promise<OpenAlexAuthor[]> {
+  const url =
+    `${OPENALEX_BASE}/authors?search=${encodeURIComponent(name)}` +
+    `&per-page=${MAX_SEARCH_RESULTS}&select=${SELECT_FIELDS}`;
 
   try {
     const response = await fetch(url, {
@@ -203,10 +173,7 @@ export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
     }
 
     const data = (await response.json()) as OpenAlexSearchResponse;
-    // Defensive: if OpenAlex returns JSON without a results array (shape
-    // drift, error body disguised as 200, etc.), fall back to [] instead
-    // of letting the non-array value propagate into filter/some/map calls
-    // in downstream consumers.
+    // Guard against shape drift / HTML error pages disguised as 200.
     const results = Array.isArray(data?.results) ? data.results : [];
     authorCache.set(cacheKey, results);
     return results;
@@ -222,31 +189,17 @@ export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
 export interface PickAuthorResult {
   author: OpenAlexAuthor;
   /**
-   * `unique` — only one OpenAlex author passed the name filter. Could still
-   * be a homonym (a DIFFERENT person with the same name, not indexed by
-   * OpenAlex, might be the subject of the personnel claim). Callers should
-   * treat `contradicted` verdicts from a unique match as LOW confidence,
-   * or fall through to LLM rather than contradict.
-   *
-   * `disambiguated` — multiple name matches existed and the org context
-   * selected exactly one. High confidence the right author was chosen.
+   * `unique` = only one OpenAlex author passed the name filter (could still
+   * be a homonym — callers must not contradict on these). `disambiguated` =
+   * multiple name matches, org context picked one (safe to contradict).
    */
   disambiguation: 'unique' | 'disambiguated';
 }
 
 /**
  * Disambiguate a candidate list to a single author using name + org context.
- *
- * Returns null when:
- * - no candidate passes the name filter (LLM fallback, the name is wrong
- *   or OpenAlex doesn't have them)
- * - multiple candidates pass the name filter AND none uniquely match the
- *   org context (ambiguous — LLM fallback is safer than guessing)
- *
- * When a single candidate passes the name filter, it is returned with
- * `disambiguation: 'unique'`. This is NOT the same as "we're confident it's
- * the right person" — it just means we have no information to rule out a
- * homonym. Downstream verdict-confidence logic must account for this.
+ * Returns null when no name match exists, or when multiple name matches
+ * can't be uniquely resolved via org — caller should fall through to LLM.
  */
 export function pickBestAuthor(
   candidates: OpenAlexAuthor[],
@@ -438,15 +391,10 @@ function makeResult(
 }
 
 /**
- * Try to verify a personnel record via OpenAlex.
- *
- * Returns:
- * - `VerifyResult` with a definitive verdict (confirmed / contradicted /
- *   unverifiable) when the author is found and affiliation data is available
- * - `null` when OpenAlex can't help (not personnel, missing name/org, author
- *   not found, ambiguous candidates, no publications, or a single-name-match
- *   homonym risk case where we'd rather defer to the LLM). The caller then
- *   falls through to the LLM path.
+ * Try to verify a personnel record via OpenAlex. Returns null for any case
+ * the matcher can't definitively decide (non-personnel, missing/unresolvable
+ * names, no search results, ambiguous candidates, stub authors, or
+ * single-name-match contradicted cases that could be a homonym).
  */
 export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult | null> {
   if (item.data.kind !== 'record') return null;
@@ -457,37 +405,31 @@ export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult |
   const orgName = data.fields.org;
   const startDate = data.fields.startDate;
 
-  if (typeof personName !== 'string' || personName.length === 0 || personName === '(unknown)') {
-    return null;
-  }
-  if (typeof orgName !== 'string' || orgName.length === 0 || orgName === '(unknown)') {
-    return null;
-  }
+  // `isResolvableName` rejects empty strings, the `(unknown)` sentinel, AND
+  // `sid_*` stableIds — all of which would produce garbage OpenAlex queries.
+  if (typeof personName !== 'string' || !isResolvableName(personName)) return null;
+  if (typeof orgName !== 'string' || !isResolvableName(orgName)) return null;
 
-  const candidates = await searchAuthors(personName);
+  const rawCandidates = await searchAuthors(personName);
+  if (rawCandidates.length === 0) return null;
+
+  // Drop stub authors (`works_count === 0`) BEFORE disambiguation. Previously
+  // this ran after `pickBestAuthor`, which could pick a stub over a legit
+  // researcher when both name-matched.
+  const candidates = rawCandidates.filter(
+    (c) => (c.works_count ?? 0) >= MIN_WORKS_COUNT,
+  );
   if (candidates.length === 0) return null;
 
   const pick = pickBestAuthor(candidates, personName, orgName);
   if (!pick) return null;
   const best = pick.author;
 
-  // Non-publishing personnel (exec, comms, ops) will either not appear in
-  // OpenAlex at all (candidates.length === 0 above) or appear as a stub
-  // author with works_count === 0 (e.g. someone acknowledged but never an
-  // author). Don't trust a stub record's affiliation data.
-  if ((best.works_count ?? 0) < MIN_WORKS_COUNT) return null;
-
   const targetYear = extractYear(typeof startDate === 'string' ? startDate : null);
   const aff = checkAffiliation(best, orgName, targetYear);
   const shortId = shortOpenAlexId(best.id);
 
-  // Preserve the original curated sourceUrl (if any) for the evidence row.
-  // The personnel record may have had a manually-added news article or team
-  // page that a downstream reader would want to inspect; overwriting that
-  // with the OpenAlex author page silently loses provenance. Follow the
-  // wikidata-matcher convention here. We still surface the OpenAlex ID in
-  // the `extractedValue` + `reasoning` fields so operators can find the
-  // author page from the evidence row.
+  // Preserve curated sourceUrl when set; surface the OpenAlex ID via reasoning.
   const sourceUrl = item.sourceUrl ?? best.id;
   const yearSuffix = targetYear != null ? ` (target year ${targetYear})` : '';
 
@@ -502,18 +444,12 @@ export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult |
     );
   }
 
-  // Homonym guard for `contradicted` paths:
-  //
-  // When `pickBestAuthor` returned a `unique` match (only one OpenAlex author
-  // had the target name), we have no information to rule out a homonym —
-  // the personnel record might be about a different person with the same
-  // name who is simply not in OpenAlex. Contradicting in that case can
-  // incorrectly overwrite a curated-but-correct source. We fall through to
-  // the LLM path instead: return null so verifySingleItem() proceeds to
-  // its normal content-fetch + LLM flow.
-  //
-  // `disambiguated` matches are safe to contradict — the org-based tiebreak
-  // already pinned down the identity.
+  // Homonym guard: a `unique` pick means there was only one OpenAlex author
+  // with this name — we can't rule out that the personnel record references
+  // a different same-named person absent from OpenAlex. Contradicting in
+  // that case can overwrite curated evidence with a wrong verdict. Fall
+  // through to the LLM instead. `disambiguated` picks already used org
+  // context as a tiebreak, so contradicting them is safe.
   if ((aff.wrongYear || aff.wrongOrg) && pick.disambiguation === 'unique') {
     return null;
   }

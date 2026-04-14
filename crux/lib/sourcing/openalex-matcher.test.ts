@@ -195,6 +195,39 @@ describe('searchAuthors', () => {
     expect(callCount2).toBe(callCount1);
   });
 
+  // Regression: under concurrency=8, two concurrent calls for the same name
+  // previously both missed the cache (populated post-await) and triggered two
+  // duplicate fetches. The in-flight dedup map synchronously records the
+  // promise before the await, so the second call returns the same promise.
+  it('deduplicates concurrent fetches for the same name', async () => {
+    mockAuthorsByQuery['amanda askell'] = [makeAuthor({ display_name: 'Amanda Askell' })];
+
+    const fetchMock = fetch as unknown as ReturnType<typeof vi.fn>;
+    const before = fetchMock.mock.calls.length;
+
+    // Kick off two fetches in the same tick — neither await yet.
+    const [a, b] = await Promise.all([
+      searchAuthors('Amanda Askell'),
+      searchAuthors('Amanda Askell'),
+    ]);
+
+    const after = fetchMock.mock.calls.length;
+    expect(after - before).toBe(1);
+    expect(a).toBe(b);
+  });
+
+  it('projects only the fields the matcher reads (smaller OpenAlex payload)', async () => {
+    mockAuthorsByQuery['amanda askell'] = [makeAuthor({ display_name: 'Amanda Askell' })];
+    await searchAuthors('Amanda Askell');
+
+    const fetchMock = fetch as unknown as ReturnType<typeof vi.fn>;
+    const calledUrl = String(fetchMock.mock.calls.at(-1)?.[0] ?? '');
+    expect(calledUrl).toContain('select=');
+    expect(calledUrl).toContain('display_name');
+    expect(calledUrl).toContain('affiliations');
+    expect(calledUrl).toContain('works_count');
+  });
+
   it('caches null results so repeated failures do not re-hit the API', async () => {
     mockErrorMode = 'network';
     await searchAuthors('Nobody');
@@ -492,6 +525,18 @@ describe('tryOpenAlexMatch', () => {
     expect(await tryOpenAlexMatch(item)).toBeNull();
   });
 
+  // Regression: before using isResolvableName, a sid_* stableId leaking
+  // through name resolution would become a garbage OpenAlex query.
+  it('returns null when the person name is a sid_ stableId', async () => {
+    const item = makePersonnelItem({ person: 'sid_1LcLlMGLbw', org: 'Anthropic' });
+    expect(await tryOpenAlexMatch(item)).toBeNull();
+  });
+
+  it('returns null when the org name is a sid_ stableId', async () => {
+    const item = makePersonnelItem({ person: 'Amanda Askell', org: 'sid_1LcLlMGLbw' });
+    expect(await tryOpenAlexMatch(item)).toBeNull();
+  });
+
   it('returns null when no author is found', async () => {
     mockAuthorsByQuery['nobody here'] = [];
     const item = makePersonnelItem({ person: 'Nobody Here', org: 'Anthropic' });
@@ -504,6 +549,43 @@ describe('tryOpenAlexMatch', () => {
     ];
     const item = makePersonnelItem({ person: 'Amanda Askell', org: 'Anthropic' });
     expect(await tryOpenAlexMatch(item)).toBeNull();
+  });
+
+  // Regression: the works_count filter must run BEFORE pickBestAuthor so that
+  // a legitimate researcher is picked over a same-named stub. Previously the
+  // filter ran after, which could cause pickBestAuthor to pick the stub and
+  // then reject it, missing the valid match.
+  it('picks the legitimate researcher when a same-named stub author also exists', async () => {
+    mockAuthorsByQuery['james chen'] = [
+      // Stub — first in the list, zero works. Without pre-filter this was picked
+      // because nameMatched.length === 1 after disambiguation, then rejected.
+      makeAuthor({
+        id: 'https://openalex.org/A1',
+        display_name: 'James Chen',
+        works_count: 0,
+        affiliations: [],
+      }),
+      // The real researcher, with affiliations covering the target.
+      makeAuthor({
+        id: 'https://openalex.org/A2',
+        display_name: 'James Chen',
+        works_count: 50,
+        affiliations: [
+          { institution: { id: 'I1', display_name: 'Anthropic' }, years: [2022, 2023] },
+        ],
+      }),
+    ];
+
+    const item = makePersonnelItem({
+      person: 'James Chen',
+      org: 'Anthropic',
+      startDate: '2023',
+    });
+
+    const result = await tryOpenAlexMatch(item);
+    expect(result).not.toBeNull();
+    expect(result!.verdict).toBe('confirmed');
+    expect(result!.reasoning).toContain('A2');
   });
 
   it('returns confirmed when the affiliation matches and year is in window', async () => {
