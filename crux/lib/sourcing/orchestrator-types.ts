@@ -115,6 +115,13 @@ export interface OrchestrationSummary {
   unverifiable: number;
   outdated: number;
   partial: number;
+  /**
+   * QUA-426: pre-LLM relevance-gate short-circuits. These items never
+   * reached the LLM because the source content didn't mention the record's
+   * subject, so no signal is possible — distinct from `unverifiable`
+   * (which means the LLM read it and couldn't decide).
+   */
+  not_applicable: number;
   errors: number;
   /** Number of items skipped because source URL is dead (subset of unverifiable) */
   deadLinks: number;

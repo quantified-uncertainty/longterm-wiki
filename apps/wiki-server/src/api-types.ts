@@ -122,12 +122,18 @@ export function isLinkableSourcingType(
   return isValidRecordType(recordType) && !isSourcingExempt(recordType);
 }
 
+// `not_applicable` (QUA-426) marks evidence rows where the pre-LLM relevance
+// gate determined the source content doesn't mention the record's subject at
+// all, so neither confirmation nor contradiction is possible from this source.
+// Rollup / display logic treats `not_applicable` as "no signal" — it does not
+// count toward any severity bucket and renders as a neutral "skipped" state.
 export const VALID_SOURCE_CHECK_VERDICTS = [
   "confirmed",
   "contradicted",
   "unverifiable",
   "outdated",
   "partial",
+  "not_applicable",
 ] as const;
 
 export type SourcingVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];

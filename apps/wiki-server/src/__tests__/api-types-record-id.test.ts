@@ -58,6 +58,10 @@ describe("VALID_SOURCE_CHECK_VERDICTS", () => {
   it("does NOT include 'unchecked' — that is a placeholder, not a verdict", () => {
     expect(VALID_SOURCE_CHECK_VERDICTS).not.toContain("unchecked");
   });
+
+  it("includes 'not_applicable' (QUA-426 pre-LLM relevance-gate verdict)", () => {
+    expect(VALID_SOURCE_CHECK_VERDICTS).toContain("not_applicable");
+  });
 });
 
 describe("isValidRecordType", () => {

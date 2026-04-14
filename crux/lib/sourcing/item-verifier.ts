@@ -25,6 +25,7 @@ import {
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
 import { tryWikidataMatch } from './wikidata-matcher.ts';
 import { searchForEntity } from './item-collectors.ts';
+import { isRelevanceGateEnabled, runRelevanceGate } from './relevance-gate.ts';
 import type {
   VerifyItem,
   VerifyResult,
@@ -399,6 +400,31 @@ export async function verifySingleItem(
   // At this point, sourceUrl and sourceContent are guaranteed to be defined
   // (all paths without them return early above)
   const verifiedSourceUrl: string = sourceUrl!;
+
+  // ── Relevance gate (QUA-426) ────────────────────────────────────────
+  // If the source content doesn't even mention the record's subject, skip
+  // the LLM call and record a `not_applicable` verdict. This catches the
+  // "personnel record pointed at the org homepage" case where the LLM would
+  // otherwise return `unverifiable 0.95` and pollute the record's rollup.
+  //
+  // Gated behind RELEVANCE_GATE_ENABLED to allow a fast rollback if the
+  // false-negative rate is unexpectedly high in the real corpus.
+  if (item.data.kind === 'record' && isRelevanceGateEnabled()) {
+    const gate = runRelevanceGate(item.data, sourceContent);
+    if (!gate.passed) {
+      return {
+        itemId: item.id,
+        kind: item.kind,
+        description: item.description,
+        verdict: 'not_applicable' as SourcingVerdict,
+        confidence: 1.0,
+        extractedValue: '',
+        reasoning: `[relevance_gate] ${gate.reason}`,
+        sourceUrl: verifiedSourceUrl,
+        checkerModel: 'relevance-gate',
+      };
+    }
+  }
 
   // Build the appropriate prompt
   let prompt: string;
