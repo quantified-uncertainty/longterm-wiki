@@ -1479,3 +1479,45 @@ export const ClaimsByEntityQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional().default(50),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
+
+// ---------------------------------------------------------------------------
+// Data Quality — ID Format Audit (QUA-407 / QUA-439)
+// ---------------------------------------------------------------------------
+//
+// Surfaces coexisting ID formats in the `things` table so the
+// /internal/data-quality dashboard can show sprawl at a glance.
+// Classifier source: apps/wiki-server/src/routes/operational/data-quality.ts
+// (ID_FORMAT_REGEXES). Keep in sync — grep for IdFormatAuditSchema on rename.
+
+export const ID_FORMAT_BUCKET_NAMES = [
+  "canonical_f",
+  "canonical_sid",
+  "legacy_hex8",
+  "legacy_alnum10",
+  "legacy_hex16",
+  "other",
+] as const;
+
+export const ID_FORMAT_SOURCE_TABLES = ["facts", "resources"] as const;
+
+const IdFormatBucketCountsSchema = z.object({
+  canonical_f: z.number().int().nonnegative(),
+  canonical_sid: z.number().int().nonnegative(),
+  legacy_hex8: z.number().int().nonnegative(),
+  legacy_alnum10: z.number().int().nonnegative(),
+  legacy_hex16: z.number().int().nonnegative(),
+  other: z.number().int().nonnegative(),
+});
+
+export const IdFormatAuditSchema = z.object({
+  scannedAt: z.string(),
+  totals: IdFormatBucketCountsSchema,
+  bySourceTable: z.object({
+    facts: IdFormatBucketCountsSchema,
+    resources: IdFormatBucketCountsSchema,
+  }),
+});
+
+export type IdFormatAudit = z.infer<typeof IdFormatAuditSchema>;
+export type IdFormatBucketName = (typeof ID_FORMAT_BUCKET_NAMES)[number];
+export type IdFormatSourceTableName = (typeof ID_FORMAT_SOURCE_TABLES)[number];
