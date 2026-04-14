@@ -156,7 +156,7 @@ export interface MergeCandidate {
   branch: string;
   createdAt: string;
   headOid: string;
-  nodeId: string; // GraphQL node ID for enqueuePullRequestForMerge
+  nodeId: string; // GraphQL node ID for enablePullRequestAutoMerge
   eligible: boolean;
   blockReasons: MergeBlockReason[];
 }
@@ -245,7 +245,7 @@ export interface BlockedOnPr {
 }
 
 export interface GqlPrNode {
-  id: string; // GraphQL node ID (e.g. "PR_kwDON..."), needed for enqueuePullRequestForMerge
+  id: string; // GraphQL node ID (e.g. "PR_kwDON..."), needed for enablePullRequestAutoMerge
   number: number;
   title: string;
   /** PR state: OPEN, CLOSED, or MERGED. Present when the GQL query requests it. */
