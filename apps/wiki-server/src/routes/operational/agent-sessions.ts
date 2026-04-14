@@ -57,6 +57,7 @@ function mapSessionRow(r: typeof agentSessions.$inferSelect, pages: string[]) {
     completedAt: r.completedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
+    heartbeatAt: r.heartbeatAt,
     date: r.date,
     title: r.title,
     summary: r.summary,

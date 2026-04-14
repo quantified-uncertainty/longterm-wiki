@@ -1254,6 +1254,13 @@
       "when": 1784880000000,
       "tag": "0178_agent_sessions_linear_id_slot",
       "breakpoints": true
+    },
+    {
+      "idx": 179,
+      "version": "7",
+      "when": 1784966400000,
+      "tag": "0179_agent_sessions_heartbeat_at",
+      "breakpoints": true
     }
   ]
 }
