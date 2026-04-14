@@ -50,14 +50,25 @@ describe("ProfileTabs", () => {
     expect(screen.getAllByRole("tab").length).toBeGreaterThanOrEqual(2);
   });
 
-  it("treats undefined count as visible", () => {
+  it("treats undefined count as visible and filters explicit zeros in the multi-tab path", () => {
     render(
       <ProfileTabs
         tabs={[
-          tab("overview", "Overview", <div data-testid="only">o</div>),
+          tab("a", "Overview", <div>a</div>),
+          tab("b", "Funding", <div>b</div>, 0),
+          tab("c", "People", <div>c</div>),
+          tab("d", "Projects", <div>d</div>, 5),
         ]}
       />,
     );
-    expect(screen.getByTestId("only")).toBeTruthy();
+    // 3 visible (a/c/d), 1 hidden (b with count=0). Must render as a tablist
+    // (not the single-tab short-circuit), and the hidden tab must be absent.
+    const tabEls = screen.getAllByRole("tab");
+    expect(tabEls).toHaveLength(3);
+    expect(tabEls.map((el) => el.textContent)).toEqual([
+      "Overview",
+      "People",
+      "Projects5",
+    ]);
   });
 });
