@@ -16,8 +16,11 @@ Each audit should link back to the Linear ticket that scoped it and forward to t
 |---|---|---|---|
 | [`things-denormalization-audit.md`](./things-denormalization-audit.md) | Every write site and consumer of `things.title` / `things.description` / `things.parent_title`, plus the `*_display_name` sibling pattern across 13 tables. Precondition for eliminating write-time denormalization. | Complete 2026-04-13 | [QUA-414](https://linear.app/quantifieduncertainty/issue/QUA-414) / [QUA-408](https://linear.app/quantifieduncertainty/issue/QUA-408) Tier 4b |
 | [`qua-303-sourcing-rename-audit.md`](./qua-303-sourcing-rename-audit.md) | Full PG FK / view / index / call-site inventory for the `source_check_*` → `sourcing_*` rename. Draft Phase 1 + Phase 3 migration SQL in `apps/wiki-server/scripts/`. Precondition for QUA-303 execution. | Complete 2026-04-13 | [QUA-303](https://linear.app/quantifieduncertainty/issue/QUA-303) / [QUA-102](https://linear.app/quantifieduncertainty/issue/QUA-102) umbrella |
+| [`2026-04-14-linear-refactor.md`](./2026-04-14-linear-refactor.md) | Linear metadata hygiene + project scope + epic hierarchy + label taxonomy deep audit. 16 orphans assigned, 22 issues re-projected, 22 labels purged (zero now), 2 projects closed, 1 epic decomposed. Produced `crux linear hygiene` tool + `linear-project-ownership.md` doctrine. | Complete 2026-04-14 | No single ticket — spans QUA-183, QUA-362, QUA-465 (dup), and the AI Power / Tablebase projects |
 
 ## Related rules files
 
 - `.claude/rules/entity-sync-pipeline.md` — sync handler infrastructure (points here for `things` write paths)
 - `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase ontology (points here for `things` cross-base index)
+- `.claude/rules/linear-project-ownership.md` — scope-boundary doctrine derived from `2026-04-14-linear-refactor.md`
+- `.claude/rules/linear-integration.md` — Linear ↔ GitHub integration (§ 9 links project ownership + `crux linear hygiene`)
