@@ -15,6 +15,12 @@ import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecen
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import type { RecentMerge } from '../lib/pr-analysis/index.ts';
 import { tryRebaseAndVerify } from './rebase-verify.ts';
+import {
+  tryClaimPr,
+  releasePrIfClaimed,
+  defaultClaimDeps,
+  type ClaimDeps,
+} from './claim.ts';
 import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
 import { LABELS } from './types.ts';
 import {
@@ -428,6 +434,12 @@ export function spawnClaude(
 }
 
 // ── PR claim management ─────────────────────────────────────────────────────
+//
+// Historically this file owned its own `claimPr`/`releasePr` pair. They now
+// delegate to the shared helpers in `./claim.ts` so both the serial
+// (execution.ts) and parallel (parallel.ts) dispatch paths use the same
+// ownership-tracked claim/release flow. See claim.ts for the QUA-400 race
+// fix context.
 
 let claimedPr: number | null = null;
 
@@ -435,32 +447,45 @@ export function getClaimedPr(): number | null {
   return claimedPr;
 }
 
-async function claimPr(prNum: number, repo: string): Promise<void> {
-  try {
-    await githubApi(`/repos/${repo}/issues/${prNum}/labels`, {
-      method: 'POST',
-      body: { labels: [LABELS.PR_PATROL_WORKING] },
-    });
+/** ClaimDeps bound to this module's logger and claimedPr tracker. */
+const serialClaimDeps: ClaimDeps = defaultClaimDeps((prNum, reason) => {
+  log(`  ${cl.yellow}PR #${prNum} claim skipped: ${reason}${cl.reset}`);
+});
+
+/**
+ * Attempt to claim a PR. Returns `true` if the claim was acquired.
+ * On success, updates `claimedPr` and persisted state so a SIGINT/SIGTERM
+ * can release the label on shutdown via `releaseCurrentClaim`.
+ */
+async function claimPr(prNum: number, repo: string): Promise<boolean> {
+  const didClaim = await tryClaimPr(prNum, repo, serialClaimDeps);
+  if (didClaim) {
     claimedPr = prNum;
     setPersistedClaimedPr(prNum);
-  } catch {
-    log(`  ${cl.yellow}Warning: could not add ${LABELS.PR_PATROL_WORKING} label to PR #${prNum}${cl.reset}`);
   }
+  return didClaim;
 }
 
-async function releasePr(prNum: number, repo: string): Promise<void> {
+/**
+ * Release the working label for a PR — but ONLY if this worker actually
+ * claimed it (`didClaim === true`). When `didClaim === false`, this is a
+ * no-op: another worker holds the label and we must not delete it.
+ */
+async function releasePr(
+  didClaim: boolean,
+  prNum: number,
+  repo: string,
+): Promise<void> {
+  if (!didClaim) return;
   try {
-    await githubApi(`/repos/${repo}/issues/${prNum}/labels/${encodeURIComponent(LABELS.PR_PATROL_WORKING)}`, {
-      method: 'DELETE',
-    });
+    await releasePrIfClaimed(didClaim, prNum, repo, serialClaimDeps);
   } catch (e) {
-    // 404 is expected (label already absent) — swallow silently.
-    // Any other error (network, 500, auth) needs visibility since a stale
-    // pr-patrol:working label makes detectAllPrIssuesFromNodes skip the PR.
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('404') && !msg.includes('Not Found')) {
-      log(`  Warning: could not remove pr-patrol:working label from PR #${prNum}: ${msg}`);
-    }
+    // defaultRemoveWorkingLabel already swallows 404. Anything that bubbles
+    // up here is a real error — surface it so a stale pr-patrol:working
+    // label can't silently block future scans of this PR.
+    log(
+      `  Warning: could not remove pr-patrol:working label from PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`,
+    );
   }
   if (claimedPr === prNum) {
     claimedPr = null;
@@ -470,7 +495,8 @@ async function releasePr(prNum: number, repo: string): Promise<void> {
 
 export async function releaseCurrentClaim(repo: string): Promise<void> {
   if (claimedPr !== null) {
-    await releasePr(claimedPr, repo).catch((e) => {
+    // Shutdown path: we know we own the claim, so didClaim = true.
+    await releasePr(true, claimedPr, repo).catch((e) => {
       // Best-effort cleanup during shutdown — label will be stale but not harmful
       log(`  Warning: could not release claim on PR #${claimedPr}: ${e instanceof Error ? e.message : String(e)}`);
     });
@@ -583,92 +609,117 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     return { mainIsRootCause: false };
   }
 
-  // ── Automated rebase pre-step (runs in worktree) ──────────────────
-  // For stale or conflicting PRs, try a plain git rebase first. Saves the
-  // full Claude spawn (~5 turns, ~3-10 min) when rebase resolves cleanly.
-  // `tryRebaseAndVerify` also polls GitHub's mergeable state to catch the
-  // case where rebase pushed but GitHub still reports CONFLICTING due to
-  // async recomputation or a concurrent commit (QUA-400, PR #4287).
-  if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
-    log('  Attempting automated rebase (no Claude needed)...');
-    const outcome = await tryRebaseAndVerify(
-      pr.branch,
-      pr.number,
-      pr.issues,
-      worktreePath,
-      config.repo,
-    );
-
-    switch (outcome.kind) {
-      case 'rebase-failed':
-        log(`  Automated rebase failed (${outcome.status}) — falling through to Claude`);
-        break;
-
-      case 'verify-failed':
-        log(
-          `  ${cl.yellow}⚠ Automated rebase reported ${outcome.rebaseStatus} but GitHub still shows conflict: ${outcome.verify.reason}${cl.reset} — falling through to Claude`,
-        );
-        appendJsonl(JSONL_FILE, {
-          type: 'rebase_verify_failed',
-          pr_num: pr.number,
-          rebase_status: outcome.rebaseStatus,
-          reason: outcome.verify.reason,
-          mergeable: outcome.verify.mergeable,
-          merge_state_status: outcome.verify.mergeStateStatus,
-          attempts: outcome.verify.attempts,
-        });
-        break;
-
-      case 'fully-resolved':
-        log(`  ✓ Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
-        removeWorktree(worktreePath);
-        appendJsonl(JSONL_FILE, {
-          type: 'pr_result',
-          pr_num: pr.number,
-          issues: pr.issues,
-          outcome: 'fixed' as FixOutcome,
-          elapsed_s: 0,
-          reason: `automated-rebase: ${outcome.rebaseStatus} (verified)`,
-        });
-        markProcessed(pr.number);
-        return { mainIsRootCause: false };
-
-      case 'partially-resolved':
-        log(`  ✓ Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
-        pr.issues = outcome.remainingIssues;
-        log(`  Remaining issues after rebase: ${outcome.remainingIssues.join(', ')} — falling through to Claude`);
-        break;
-    }
+  // ── Claim the PR BEFORE the rebase/verify round-trip ─────────────
+  // QUA-400 (CodeRabbit critical): `tryRebaseAndVerify` polls GitHub's
+  // mergeable state for ~12s. If we ran it before claiming, another patrol
+  // worker could grab the label during that window, and the unconditional
+  // release in our `finally` below would delete the other worker's claim.
+  //
+  // Fix: claim first, track `didClaim` locally, only release on success.
+  // If another worker beat us to the claim, bail out cleanly.
+  const didClaim = await claimPr(pr.number, config.repo);
+  if (!didClaim) {
+    markProcessed(pr.number);
+    appendJsonl(JSONL_FILE, {
+      type: 'pr_result',
+      pr_num: pr.number,
+      issues: pr.issues,
+      outcome: 'no-op' as FixOutcome,
+      elapsed_s: 0,
+      reason: 'Claim lost to concurrent worker',
+    });
+    removeWorktree(worktreePath);
+    return { mainIsRootCause: false };
   }
 
-  await claimPr(pr.number, config.repo);
-
-  // Compute issue-specific budget (capped by global config)
-  // Reduce budget on retry — the full budget already failed once, so give less on subsequent attempts
-  const failCount = getFailCount(pr.number);
-  const { maxTurns: effectiveMaxTurns, timeoutMinutes: effectiveTimeout } =
-    computeEffectiveBudget(pr.issues, config.maxTurns, config.timeoutMinutes, failCount);
-
-  if (failCount > 0) {
-    log(`  ${cl.dim}Retry #${failCount + 1} — budget reduced to ${effectiveMaxTurns} turns / ${effectiveTimeout}m${cl.reset}`);
-  }
-  log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
-
-  // Record fix attempt after worktree creation (not before dry-run/early-return paths)
-  recordFixAttempt(pr.number);
-
-  // Post "attempting fix" event comment before spawning Claude
-  await postEventComment(pr.number, config.repo, buildFixAttemptComment(pr.issues))
-    .catch((e: unknown) => log(`  Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
-
-  const prompt = buildPrompt(pr, config.repo);
-  const startTime = Date.now();
-
+  // Everything below this point runs while we hold the claim. The
+  // outer try/finally at the end of this function guarantees we release
+  // the label via `releasePr(didClaim, ...)` — which is a no-op if
+  // `didClaim === false` (belt-and-suspenders; we already early-returned).
   let outcome: FixOutcome = 'fixed';
   let reason = '';
   let mainIsRootCause = false;
 
   try {
+    // ── Automated rebase pre-step (runs in worktree) ──────────────────
+    // For stale or conflicting PRs, try a plain git rebase first. Saves the
+    // full Claude spawn (~5 turns, ~3-10 min) when rebase resolves cleanly.
+    // `tryRebaseAndVerify` also polls GitHub's mergeable state to catch the
+    // case where rebase pushed but GitHub still reports CONFLICTING due to
+    // async recomputation or a concurrent commit (QUA-400, PR #4287).
+    if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
+      log('  Attempting automated rebase (no Claude needed)...');
+      const rebaseOutcome = await tryRebaseAndVerify(
+        pr.branch,
+        pr.number,
+        pr.issues,
+        worktreePath,
+        config.repo,
+      );
+
+      switch (rebaseOutcome.kind) {
+        case 'rebase-failed':
+          log(`  Automated rebase failed (${rebaseOutcome.status}) — falling through to Claude`);
+          break;
+
+        case 'verify-failed':
+          log(
+            `  ${cl.yellow}⚠ Automated rebase reported ${rebaseOutcome.rebaseStatus} but GitHub still shows conflict: ${rebaseOutcome.verify.reason}${cl.reset} — falling through to Claude`,
+          );
+          appendJsonl(JSONL_FILE, {
+            type: 'rebase_verify_failed',
+            pr_num: pr.number,
+            rebase_status: rebaseOutcome.rebaseStatus,
+            reason: rebaseOutcome.verify.reason,
+            mergeable: rebaseOutcome.verify.mergeable,
+            merge_state_status: rebaseOutcome.verify.mergeStateStatus,
+            attempts: rebaseOutcome.verify.attempts,
+          });
+          break;
+
+        case 'fully-resolved':
+          log(`  ✓ Automated rebase ${rebaseOutcome.rebaseStatus} — no Claude needed`);
+          appendJsonl(JSONL_FILE, {
+            type: 'pr_result',
+            pr_num: pr.number,
+            issues: pr.issues,
+            outcome: 'fixed' as FixOutcome,
+            elapsed_s: 0,
+            reason: `automated-rebase: ${rebaseOutcome.rebaseStatus} (verified)`,
+          });
+          // Claim-guarded early return: the outer finally below will
+          // release the label and clean up the worktree.
+          return { mainIsRootCause: false };
+
+        case 'partially-resolved':
+          log(`  ✓ Automated rebase ${rebaseOutcome.rebaseStatus} — no Claude needed`);
+          pr.issues = rebaseOutcome.remainingIssues;
+          log(`  Remaining issues after rebase: ${rebaseOutcome.remainingIssues.join(', ')} — falling through to Claude`);
+          break;
+      }
+    }
+
+    // Compute issue-specific budget (capped by global config)
+    // Reduce budget on retry — the full budget already failed once, so give less on subsequent attempts
+    const failCount = getFailCount(pr.number);
+    const { maxTurns: effectiveMaxTurns, timeoutMinutes: effectiveTimeout } =
+      computeEffectiveBudget(pr.issues, config.maxTurns, config.timeoutMinutes, failCount);
+
+    if (failCount > 0) {
+      log(`  ${cl.dim}Retry #${failCount + 1} — budget reduced to ${effectiveMaxTurns} turns / ${effectiveTimeout}m${cl.reset}`);
+    }
+    log(`  Budget: ${effectiveMaxTurns} max-turns, ${effectiveTimeout}m timeout (based on: ${pr.issues.join(', ')})`);
+
+    // Record fix attempt after worktree creation (not before dry-run/early-return paths)
+    recordFixAttempt(pr.number);
+
+    // Post "attempting fix" event comment before spawning Claude
+    await postEventComment(pr.number, config.repo, buildFixAttemptComment(pr.issues))
+      .catch((e: unknown) => log(`  Warning: could not post fix attempt comment: ${e instanceof Error ? e.message : String(e)}`));
+
+    const prompt = buildPrompt(pr, config.repo);
+    const startTime = Date.now();
+
     const result = await spawnClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
@@ -784,7 +835,10 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
       reason: reason || undefined,
     });
   } finally {
-    await releasePr(pr.number, config.repo);
+    // Only release the working label if THIS worker actually claimed the
+    // PR. When didClaim === false we bailed out early (above), but this
+    // gate is belt-and-suspenders against future refactors.
+    await releasePr(didClaim, pr.number, config.repo);
 
     // Clean up worktree (handles rebase/merge abort internally)
     removeWorktree(worktreePath);
