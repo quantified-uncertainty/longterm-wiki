@@ -317,8 +317,6 @@ export function getTableConfig(table: string): TableConfig | null {
   return TABLE_CONFIGS[canonical] ?? null;
 }
 
-export const VALID_TABLES = Object.keys(TABLE_CONFIGS);
-
 /** Get the canonical (hyphenated) table name from any form. */
 export function canonicalTableName(table: string): string {
   return TABLE_ALIASES[table] ?? table;
