@@ -48,6 +48,23 @@ import {
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: resource composer ----
+//
+// Resources fall back from title → url when title is null. Description is
+// the resource summary. No parent.
+interface ResourceComposerRow {
+  title?: string | null;
+  url: string;
+  summary?: string | null;
+}
+
+registerComposer<ResourceComposerRow>("resource", (row) => ({
+  title: row.title || row.url,
+  description: row.summary ?? null,
+  parentTitle: null,
+}));
 import { urlVariants } from "../shared/url-variants.js";
 import { createHash, randomBytes } from "crypto";
 
@@ -525,6 +542,8 @@ const resourcesApp = new Hono()
             id: resources.id,
             url: resources.url,
             title: resources.title,
+            summary: resources.summary,
+            stableId: resources.stableId,
           });
 
         results = upsertedRows.map((r) => ({ id: r.id, url: r.url }));
@@ -577,18 +596,48 @@ const resourcesApp = new Hono()
           WHERE id IN (${idList})
         `);
 
-        // Dual-write to things table
+        // Dual-write to things table via dispatch composer (QUA-470).
+        // Compose from the *persisted* row (not the request item) so partial
+        // batch updates that omit title/summary don't rewrite things.title
+        // back to the URL. The conflictSet uses COALESCE to preserve those
+        // fields; reading from .returning() mirrors that semantics.
+        const persistedById = new Map(upsertedRows.map((row) => [row.id, row]));
         await upsertThingsInTx(
           tx,
-          items.map((r) => ({
-            id: r.stableId || r.id,
-            thingType: "resource" as const,
-            title: r.title || r.url,
-            sourceTable: "resources",
-            sourceId: r.id,
-            description: r.summary,
-            sourceUrl: r.url,
-          }))
+          items.map((r) => {
+            const persisted = persistedById.get(r.id);
+            if (!persisted) {
+              // Should not happen: every inserted/updated row is returned by
+              // onConflictDoUpdate. Fall back defensively to the request item
+              // rather than crashing the batch.
+              const composed = composeThing<ResourceComposerRow>("resource", r, new Map());
+              return {
+                id: r.stableId || r.id,
+                thingType: "resource" as const,
+                title: composed.title,
+                description: composed.description,
+                parentTitle: composed.parentTitle,
+                sourceTable: "resources",
+                sourceId: r.id,
+                sourceUrl: r.url,
+              };
+            }
+            const composed = composeThing<ResourceComposerRow>(
+              "resource",
+              persisted,
+              new Map(),
+            );
+            return {
+              id: persisted.stableId ?? persisted.id,
+              thingType: "resource" as const,
+              title: composed.title,
+              description: composed.description,
+              parentTitle: composed.parentTitle,
+              sourceTable: "resources",
+              sourceId: persisted.id,
+              sourceUrl: persisted.url,
+            };
+          })
         );
       });
     } catch (err) {

@@ -28,6 +28,7 @@ import { commands as importDivisionsCommands } from './import-divisions.ts';
 import { commands as importFundingProgramsCommands } from './import-funding-programs.ts';
 import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
+import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1354,6 +1355,8 @@ export const commands = {
   'website-sources-list': websiteSourcesCommands.list,
   'website-sources-show': websiteSourcesCommands.show,
   'website-sources-fetch': websiteSourcesCommands.fetch,
+  // QUA-455: scaffold a new tablebase entity type.
+  scaffold: scaffoldCommands.scaffold,
 };
 
 export function getHelp(): string {

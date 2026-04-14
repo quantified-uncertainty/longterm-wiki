@@ -12,6 +12,20 @@ import {
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: funding-program composer ----
+interface FundingProgramComposerRow {
+  name: string;
+  orgId: string;
+  description?: string | null;
+}
+
+registerComposer<FundingProgramComposerRow>("funding-program", (row, titleMap) => ({
+  title: row.name,
+  description: row.description ?? null,
+  parentTitle: titleMap.get(row.orgId) ?? row.orgId,
+}));
 
 // ---- Constants ----
 
@@ -303,16 +317,19 @@ const fundingProgramsApp = new Hono()
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },
-    toThing: (item, titleMap) => ({
-      id: item.id,
-      thingType: "funding-program" as const,
-      title: item.name,
-      sourceTable: "funding_programs",
-      sourceId: item.id,
-      description: item.description || null,
-      sourceUrl: item.source,
-      parentTitle: titleMap.get(item.orgId) ?? item.orgId,
-    }),
+    toThing: (item, titleMap) => {
+      const composed = composeThing<FundingProgramComposerRow>("funding-program", item, titleMap);
+      return {
+        id: item.id,
+        thingType: "funding-program" as const,
+        title: composed.title,
+        description: composed.description,
+        parentTitle: composed.parentTitle,
+        sourceTable: "funding_programs",
+        sourceId: item.id,
+        sourceUrl: item.source,
+      };
+    },
     toVerdict: (item) => ({
       recordType: "funding-program",
       recordId: item.id,

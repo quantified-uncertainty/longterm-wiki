@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { formatFactLabel } from "@longterm-wiki/factbase";
 import { logger } from "../../logger.js";
 
@@ -39,6 +40,48 @@ const MAX_PRUNE_RESPONSE_IDS = 1000;
 function factThingKey(entityId: string, factId: string): string {
   return `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
 }
+
+// ---- QUA-470 Phase 4b-B.1: facts composer registration ----
+//
+// The fact composer is registered in the dispatch table at module load.
+// Replaces the inlined string composition in the /sync handler below.
+//
+// Audit §6 finding #3: the title fallback ends in raw `f_` fact ID when
+// `factLabel` is null AND entity title doesn't resolve. This is the
+// QUA-397 root cause. The composer preserves the same fallback chain
+// (refactor, not behavior change) — Phase 4b-B.2 will eliminate the
+// stored column entirely, removing the leak path.
+//
+// NEW in this PR: parentTitle is now populated with the entity title.
+// The old inlined version set parentThingId but left parent_title NULL,
+// which excluded the parent entity name from the search_vector
+// (audit §6 finding #4).
+interface FactComposerRow {
+  factId: string;
+  entityId: string;
+  label?: string | null;
+  measure?: string | null;
+  value?: string | null;
+  numeric?: string | number | null;
+}
+
+registerComposer<FactComposerRow>("fact", (row, titleMap) => {
+  const entityName = titleMap.get(row.entityId) ?? row.entityId;
+  const factLabel = formatFactLabel({
+    label: row.label,
+    measure: row.measure,
+  });
+  const description = row.value
+    ? `${factLabel}: ${row.value}`
+    : row.numeric != null
+      ? `${factLabel}: ${row.numeric}`
+      : null;
+  return {
+    title: `${factLabel} — ${entityName}`,
+    description,
+    parentTitle: entityName,
+  };
+});
 
 // ---- Query schemas ----
 
@@ -585,24 +628,23 @@ const factsApp = new Hono()
         const entityIds = [...new Set(items.map((f) => f.entityId))];
         const entityTitleMap = await resolveEntityTitles(tx, entityIds);
 
+        // QUA-470 Phase 4b-B.1: dispatch through the registered "fact" composer.
+        // Composer also populates parentTitle (was missing in the inlined version).
+        // factThingKey() helper introduced in the QUA-462 prune PR.
         await upsertThingsInTx(
           tx,
           items.map((f) => {
-            const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
-            const factLabel = formatFactLabel(f);
             const thingKey = factThingKey(f.entityId, f.factId);
+            const composed = composeThing<FactComposerRow>("fact", f, entityTitleMap);
             return {
               id: thingKey,
               thingType: "fact" as const,
-              title: `${factLabel} — ${entityName}`,
+              title: composed.title,
+              description: composed.description,
+              parentTitle: composed.parentTitle,
               sourceTable: "facts",
               sourceId: thingKey,
               parentThingId: f.entityId,
-              description: f.value
-                ? `${factLabel}: ${f.value}`
-                : f.numeric != null
-                  ? `${factLabel}: ${f.numeric}`
-                  : undefined,
             };
           })
         );

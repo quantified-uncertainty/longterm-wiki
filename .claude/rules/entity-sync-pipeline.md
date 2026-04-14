@@ -4,6 +4,8 @@ Subsystem map for the YAML → sync → PG pipeline and the tablebase route infr
 
 > **If your new handler writes to `things.title` / `things.description` / `things.parent_title`, or adds a `*_display_name` column**: read `docs/audits/things-denormalization-audit.md` first. It enumerates all 22 existing write sites, the 5 handlers that leak raw IDs today (subsumed by [QUA-408](https://linear.app/quantifieduncertainty/issue/QUA-408) Tier 4b), and the `search_vector` GENERATED column constraint that any replacement must preserve. Adding a 23rd bespoke title composer without reading the audit is the fastest way to recreate QUA-397.
 
+> **Use the composer dispatch table, not inlined string composition** ([QUA-470](https://linear.app/quantifieduncertainty/issue/QUA-470), Phase 4b-B.1 of QUA-408). All 21 `thing_types` now compose their `title` / `description` / `parent_title` via `apps/wiki-server/src/routes/shared/compose-thing.ts`. To add a new `thing_type`: call `registerComposer<RowType>("<type>", fn)` at module top-level in your route file and call `composeThing<RowType>("<type>", row, titleMap)` in the sync handler. The `composer-coverage.test.ts` test fails if a new `thing_type` is added to `VALID_THING_TYPES` without registering a composer. Phase 4b-B.2 ([QUA-476](https://linear.app/quantifieduncertainty/issue/QUA-476)) will move composers from write-time to MV-refresh-time — your handler won't need to change.
+
 ## Why this file exists
 
 Recent rework incidents in this subsystem include:

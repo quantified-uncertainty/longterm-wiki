@@ -1261,6 +1261,13 @@
       "when": 1784966400000,
       "tag": "0179_agent_sessions_heartbeat_at",
       "breakpoints": true
+    },
+    {
+      "idx": 180,
+      "version": "7",
+      "when": 1785052800000,
+      "tag": "0180_sourcing_not_applicable_verdict",
+      "breakpoints": true
     }
   ]
 }

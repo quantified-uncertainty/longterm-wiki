@@ -113,6 +113,10 @@ const NON_ROUTE_FILES = new Set([
   "sync-factory.ts",
   "sync-factory-flag.ts",
   "sync-factory.test-d.ts",
+  // QUA-454: auto-mount registry. Imports routes, doesn't define them.
+  "mount-registry.ts",
+  // Column description overlay for entity-profile. Constants module, not a route.
+  "entity-profile-descriptions.ts",
 ]);
 
 // ── Analysis ───────────────────────────────────────────────────────────

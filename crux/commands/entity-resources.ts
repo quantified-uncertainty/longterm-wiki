@@ -418,7 +418,7 @@ async function batchSync(
     const batch = items.slice(i, i + BATCH_SIZE);
     const result = await syncEntityResources(batch);
     if (result.ok) {
-      synced += result.data.total;
+      synced += result.data.upserted;
     } else {
       console.error(
         `  Batch sync failed at offset ${i}: ${result.message}`,
