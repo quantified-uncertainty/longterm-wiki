@@ -602,7 +602,9 @@ export async function fetchRecordVerdicts() {
   }
 
   const headers = buildHeaders();
-  const strict = process.env.STRICT_VERDICTS !== '0';
+  // CI is always strict — STRICT_VERDICTS=0 cannot opt-out of strict mode
+  // in CI so a leaked env var can't quietly ship an empty verdict map.
+  const strict = process.env.CI === 'true' || process.env.STRICT_VERDICTS !== '0';
   const pageSize = 200;
   const verdicts = {};
   let offset = 0;

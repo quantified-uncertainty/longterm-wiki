@@ -99,4 +99,13 @@ describe("fetchRecordVerdicts (QUA-421)", () => {
     const result = await fetchRecordVerdicts();
     expect(result).toEqual({});
   });
+
+  it("CI=true forces strict mode even when STRICT_VERDICTS=0", async () => {
+    // Defends against a leaked STRICT_VERDICTS=0 env var silently shipping
+    // an empty verdict map from a CI build.
+    process.env.CI = "true";
+    process.env.STRICT_VERDICTS = "0";
+    global.fetch = vi.fn(() => mockResponse(500, {}));
+    await expect(fetchRecordVerdicts()).rejects.toThrow(/fetchRecordVerdicts failed/);
+  });
 });
