@@ -7,6 +7,7 @@
  *   crux ci status              Show current check-run status
  *   crux ci status --wait       Poll every 30s until all checks complete
  *   crux ci status --sha=abc    Check a specific commit SHA
+ *   crux ci status --pr=NNN     Check PR NNN's current head SHA (fresh, not cached)
  *
  * Requires GITHUB_TOKEN environment variable.
  */
@@ -14,11 +15,13 @@
 import { execSync } from 'child_process';
 import { getColors } from '../lib/output.ts';
 import { githubApi, REPO } from '../lib/github.ts';
+import { resolvePrHeadSha } from './resolve-pr-head.ts';
 
 const args: string[] = process.argv.slice(2);
 const WAIT_MODE: boolean = args.includes('--wait');
 const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const SHA_ARG = args.find((a) => a.startsWith('--sha='))?.split('=')[1];
+const PR_ARG = args.find((a) => a.startsWith('--pr='))?.split('=')[1];
 const POLL_INTERVAL = 30_000; // 30 seconds
 const MAX_POLLS = 40; // 20 minutes max
 
@@ -39,8 +42,9 @@ interface CheckRunsResponse {
   }>;
 }
 
-function getSha(): string {
+async function getSha(): Promise<string> {
   if (SHA_ARG) return SHA_ARG;
+  if (PR_ARG) return await resolvePrHeadSha(PR_ARG);
   return execSync('git rev-parse HEAD', { encoding: 'utf-8' }).trim();
 }
 
@@ -116,9 +120,8 @@ function sleep(ms: number): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  const sha = getSha();
-
   if (!WAIT_MODE) {
+    const sha = await getSha();
     const data = await fetchCheckRuns(sha);
     const { anyFailed } = printStatus(data, sha);
     process.exit(anyFailed ? 1 : 0);
@@ -137,6 +140,9 @@ async function main(): Promise<void> {
       await sleep(POLL_INTERVAL);
     }
 
+    // QUA-410: re-resolve SHA each poll so --pr=N tracks head movement
+    // (rebases, new merges into main) between polls.
+    const sha = await getSha();
     const data = await fetchCheckRuns(sha);
     const { allDone, anyFailed } = printStatus(data, sha);
 
