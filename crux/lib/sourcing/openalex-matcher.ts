@@ -41,19 +41,66 @@ const USER_AGENT =
   'LongtermWiki-Sourcing/1.0 (https://longtermwiki.com; mailto:noreply@longtermwiki.com)';
 
 /**
- * Year slack around a personnel `startDate` when checking whether an OpenAlex
- * affiliation "covers" the claim. OpenAlex lags ~3-6 months behind publication
- * and a person's first paper from a new org usually lands ~6-12 months after
- * they join, so ±2 years is loose enough to avoid false contradicts while
- * still catching clearly-wrong year claims.
+ * Year slack for the affiliation window check. The slack is **asymmetric** on
+ * purpose: a researcher typically joins an org 6–18 months BEFORE their first
+ * paper with that affiliation lands (OpenAlex data is only built from papers
+ * once they're published + indexed, with a ~3–6 month lag on top of that).
+ *
+ * Example: `startDate=2022`, OpenAlex years=[2024, 2025] — the person joined
+ * in 2022 but didn't publish with the new affiliation until 2024. A symmetric
+ * ±2 slack would just barely accept this (2024 − 2 = 2022, on the boundary),
+ * but `startDate=2021` in the same scenario would falsely contradict. The
+ * wider lower slack prevents the systematic bias against pre-publication
+ * employment claims. The upper slack stays tight because claims usually
+ * relate to ongoing tenure, so a claim year well after the last paper is
+ * genuinely suspicious.
  */
-const YEAR_SLACK = 2;
+const YEAR_SLACK_LOW = 3;
+const YEAR_SLACK_HIGH = 2;
 
 /** Cap search results per author lookup. More than 25 rarely disambiguates. */
 const MAX_SEARCH_RESULTS = 25;
 
 /** fetch timeout for the OpenAlex API. */
 const FETCH_TIMEOUT_MS = 15_000;
+
+// ── Confidence scoring ─────────────────────────────────────────────
+//
+// Deliberately conservative compared to wikidata-matcher (which goes to 0.95).
+// The OpenAlex path can't always disambiguate homonyms — a single name match
+// is NOT a guarantee the OpenAlex author is the same person as the personnel
+// record's subject (see `tryOpenAlexMatch` gating below). Downstream code
+// stores these as authoritative evidence, so over-confident wrong verdicts
+// have real cost.
+
+/**
+ * Confidence for a confirmed match when the author clearly disambiguates
+ * (publishing with matching org AND year window). Still below 0.95 to leave
+ * room for a second-source cross-check.
+ */
+const CONFIDENCE_CONFIRMED = 0.9;
+
+/**
+ * Confidence for a contradicted verdict. Conservative (0.65) because many
+ * "contradicted" cases are actually homonym misses where the personnel
+ * record references a different person than the sole OpenAlex match. A
+ * higher confidence would overwrite curated evidence with a wrong verdict.
+ */
+const CONFIDENCE_CONTRADICTED = 0.65;
+
+/** Confidence for "author exists but has no affiliation data to decide on." */
+const CONFIDENCE_UNVERIFIABLE = 0.8;
+
+/**
+ * Minimum number of papers an OpenAlex author must have authored before we
+ * trust their affiliation data. Stub entries (`works_count === 0`) appear
+ * when someone is acknowledged in a paper but never an author; their
+ * affiliations are not reliable indicators of employment.
+ */
+const MIN_WORKS_COUNT = 1;
+
+/** Identifier stored in the evidence row's `checkerModel` column. */
+const CHECKER_MODEL = 'openalex-api';
 
 // ── Types (subset of the OpenAlex author response) ─────────────────
 
@@ -156,7 +203,11 @@ export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
     }
 
     const data = (await response.json()) as OpenAlexSearchResponse;
-    const results = data.results ?? [];
+    // Defensive: if OpenAlex returns JSON without a results array (shape
+    // drift, error body disguised as 200, etc.), fall back to [] instead
+    // of letting the non-array value propagate into filter/some/map calls
+    // in downstream consumers.
+    const results = Array.isArray(data?.results) ? data.results : [];
     authorCache.set(cacheKey, results);
     return results;
   } catch (e: unknown) {
@@ -168,6 +219,21 @@ export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
   }
 }
 
+export interface PickAuthorResult {
+  author: OpenAlexAuthor;
+  /**
+   * `unique` — only one OpenAlex author passed the name filter. Could still
+   * be a homonym (a DIFFERENT person with the same name, not indexed by
+   * OpenAlex, might be the subject of the personnel claim). Callers should
+   * treat `contradicted` verdicts from a unique match as LOW confidence,
+   * or fall through to LLM rather than contradict.
+   *
+   * `disambiguated` — multiple name matches existed and the org context
+   * selected exactly one. High confidence the right author was chosen.
+   */
+  disambiguation: 'unique' | 'disambiguated';
+}
+
 /**
  * Disambiguate a candidate list to a single author using name + org context.
  *
@@ -176,15 +242,22 @@ export async function searchAuthors(name: string): Promise<OpenAlexAuthor[]> {
  *   or OpenAlex doesn't have them)
  * - multiple candidates pass the name filter AND none uniquely match the
  *   org context (ambiguous — LLM fallback is safer than guessing)
+ *
+ * When a single candidate passes the name filter, it is returned with
+ * `disambiguation: 'unique'`. This is NOT the same as "we're confident it's
+ * the right person" — it just means we have no information to rule out a
+ * homonym. Downstream verdict-confidence logic must account for this.
  */
 export function pickBestAuthor(
   candidates: OpenAlexAuthor[],
   targetName: string,
   targetOrg: string,
-): OpenAlexAuthor | null {
+): PickAuthorResult | null {
   const nameMatched = candidates.filter((c) => nameMatches(targetName, c.display_name));
   if (nameMatched.length === 0) return null;
-  if (nameMatched.length === 1) return nameMatched[0];
+  if (nameMatched.length === 1) {
+    return { author: nameMatched[0], disambiguation: 'unique' };
+  }
 
   // Multiple name matches — use org as disambiguator. Return the first
   // whose affiliations or last_known_institution matches the target org.
@@ -199,7 +272,9 @@ export function pickBestAuthor(
     if (hasAffMatch || hasLkiMatch) orgMatches.push(c);
   }
 
-  if (orgMatches.length === 1) return orgMatches[0];
+  if (orgMatches.length === 1) {
+    return { author: orgMatches[0], disambiguation: 'disambiguated' };
+  }
 
   // Zero or multiple org matches — ambiguous.
   return null;
@@ -252,47 +327,89 @@ export function checkAffiliation(
     };
   }
 
-  for (const aff of affiliations) {
-    if (!nameMatches(targetOrg, aff.institution.display_name)) continue;
+  // Collect ALL affiliations matching the target org, not just the first.
+  // OpenAlex commonly emits multiple affiliation rows per institution (one
+  // per paper-year cluster), so an early-return on the first hit can miss
+  // a later row with a year window that does cover the target.
+  const orgMatches = affiliations.filter((a) =>
+    nameMatches(targetOrg, a.institution.display_name),
+  );
 
-    // Org matches — check the year window if a target year was supplied.
-    const years = aff.years ?? [];
-    if (targetYear != null && years.length > 0) {
-      const minYear = Math.min(...years);
-      const maxYear = Math.max(...years);
-      if (targetYear >= minYear - YEAR_SLACK && targetYear <= maxYear + YEAR_SLACK) {
-        return {
-          matched: true,
-          wrongOrg: false,
-          wrongYear: false,
-          matchedInstitution: aff.institution.display_name,
-          actualInstitutions,
-        };
-      }
-      return {
-        matched: false,
-        wrongOrg: false,
-        wrongYear: true,
-        matchedInstitution: aff.institution.display_name,
-        actualInstitutions,
-      };
-    }
-
-    // Org matches, no year to enforce.
+  if (orgMatches.length === 0) {
+    // Target org is absent from all affiliations.
     return {
-      matched: true,
-      wrongOrg: false,
+      matched: false,
+      wrongOrg: true,
       wrongYear: false,
-      matchedInstitution: aff.institution.display_name,
       actualInstitutions,
     };
   }
 
-  // Target org is absent from all affiliations.
+  // Use the first matched institution's display name for the result slot
+  // (all org matches share the same institution by definition of nameMatches).
+  const matchedInstitution = orgMatches[0].institution.display_name;
+
+  // No target year supplied → any org match is a confirmation.
+  if (targetYear == null) {
+    return {
+      matched: true,
+      wrongOrg: false,
+      wrongYear: false,
+      matchedInstitution,
+      actualInstitutions,
+    };
+  }
+
+  // Check every org-matching affiliation against the target year.
+  //
+  // Rules:
+  //   - If ANY row has years data covering the target (with slack) → matched.
+  //   - If ANY row has empty years (no signal) → matched. The row exists as
+  //     an org match, and we can't contradict a claim using a row that has
+  //     no year information — it could be the correct current affiliation.
+  //   - Only if EVERY row has year data and NONE of them cover the target
+  //     do we flag wrongYear.
+  let anyEmptyYears = false;
+  for (const aff of orgMatches) {
+    const years = aff.years ?? [];
+    if (years.length === 0) {
+      anyEmptyYears = true;
+      continue;
+    }
+    const minYear = Math.min(...years);
+    const maxYear = Math.max(...years);
+    if (
+      targetYear >= minYear - YEAR_SLACK_LOW &&
+      targetYear <= maxYear + YEAR_SLACK_HIGH
+    ) {
+      return {
+        matched: true,
+        wrongOrg: false,
+        wrongYear: false,
+        matchedInstitution: aff.institution.display_name,
+        actualInstitutions,
+      };
+    }
+  }
+
+  // No year-having row covered the target. If at least one row was missing
+  // year data entirely, we can't confidently contradict — fall through to
+  // matched (with no year signal). Otherwise, every row rejected the year.
+  if (anyEmptyYears) {
+    return {
+      matched: true,
+      wrongOrg: false,
+      wrongYear: false,
+      matchedInstitution,
+      actualInstitutions,
+    };
+  }
+
   return {
     matched: false,
-    wrongOrg: true,
-    wrongYear: false,
+    wrongOrg: false,
+    wrongYear: true,
+    matchedInstitution,
     actualInstitutions,
   };
 }
@@ -316,7 +433,7 @@ function makeResult(
     extractedValue,
     reasoning,
     sourceUrl,
-    checkerModel: 'openalex-api',
+    checkerModel: CHECKER_MODEL,
   };
 }
 
@@ -327,8 +444,9 @@ function makeResult(
  * - `VerifyResult` with a definitive verdict (confirmed / contradicted /
  *   unverifiable) when the author is found and affiliation data is available
  * - `null` when OpenAlex can't help (not personnel, missing name/org, author
- *   not found, ambiguous candidates, no publications). The caller then falls
- *   through to the LLM path.
+ *   not found, ambiguous candidates, no publications, or a single-name-match
+ *   homonym risk case where we'd rather defer to the LLM). The caller then
+ *   falls through to the LLM path.
  */
 export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult | null> {
   if (item.data.kind !== 'record') return null;
@@ -349,39 +467,64 @@ export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult |
   const candidates = await searchAuthors(personName);
   if (candidates.length === 0) return null;
 
-  const best = pickBestAuthor(candidates, personName, orgName);
-  if (!best) return null;
+  const pick = pickBestAuthor(candidates, personName, orgName);
+  if (!pick) return null;
+  const best = pick.author;
 
   // Non-publishing personnel (exec, comms, ops) will either not appear in
   // OpenAlex at all (candidates.length === 0 above) or appear as a stub
   // author with works_count === 0 (e.g. someone acknowledged but never an
   // author). Don't trust a stub record's affiliation data.
-  if ((best.works_count ?? 0) === 0) return null;
+  if ((best.works_count ?? 0) < MIN_WORKS_COUNT) return null;
 
   const targetYear = extractYear(typeof startDate === 'string' ? startDate : null);
   const aff = checkAffiliation(best, orgName, targetYear);
   const shortId = shortOpenAlexId(best.id);
-  const sourceUrl = best.id;
+
+  // Preserve the original curated sourceUrl (if any) for the evidence row.
+  // The personnel record may have had a manually-added news article or team
+  // page that a downstream reader would want to inspect; overwriting that
+  // with the OpenAlex author page silently loses provenance. Follow the
+  // wikidata-matcher convention here. We still surface the OpenAlex ID in
+  // the `extractedValue` + `reasoning` fields so operators can find the
+  // author page from the evidence row.
+  const sourceUrl = item.sourceUrl ?? best.id;
   const yearSuffix = targetYear != null ? ` (target year ${targetYear})` : '';
 
   if (aff.matched) {
     return makeResult(
       item,
       'confirmed',
-      0.95,
-      `${best.display_name} → ${aff.matchedInstitution}`,
+      CONFIDENCE_CONFIRMED,
+      `${best.display_name} → ${aff.matchedInstitution} (${shortId})`,
       `[openalex-api] OpenAlex ${shortId} (${best.display_name}) affiliated with ${aff.matchedInstitution}${yearSuffix}`,
       sourceUrl,
     );
+  }
+
+  // Homonym guard for `contradicted` paths:
+  //
+  // When `pickBestAuthor` returned a `unique` match (only one OpenAlex author
+  // had the target name), we have no information to rule out a homonym —
+  // the personnel record might be about a different person with the same
+  // name who is simply not in OpenAlex. Contradicting in that case can
+  // incorrectly overwrite a curated-but-correct source. We fall through to
+  // the LLM path instead: return null so verifySingleItem() proceeds to
+  // its normal content-fetch + LLM flow.
+  //
+  // `disambiguated` matches are safe to contradict — the org-based tiebreak
+  // already pinned down the identity.
+  if ((aff.wrongYear || aff.wrongOrg) && pick.disambiguation === 'unique') {
+    return null;
   }
 
   if (aff.wrongYear) {
     return makeResult(
       item,
       'contradicted',
-      0.85,
+      CONFIDENCE_CONTRADICTED,
       `${best.display_name} at ${aff.matchedInstitution} — year ${targetYear} outside affiliation window`,
-      `[openalex-api] OpenAlex ${shortId} confirms ${best.display_name} at ${aff.matchedInstitution}, but the years on that affiliation do not cover target year ${targetYear} (±${YEAR_SLACK} slack applied)`,
+      `[openalex-api] OpenAlex ${shortId} confirms ${best.display_name} at ${aff.matchedInstitution}, but the years on that affiliation do not cover target year ${targetYear} (slack -${YEAR_SLACK_LOW}/+${YEAR_SLACK_HIGH} applied)`,
       sourceUrl,
     );
   }
@@ -394,7 +537,7 @@ export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult |
     return makeResult(
       item,
       'contradicted',
-      0.85,
+      CONFIDENCE_CONTRADICTED,
       `${best.display_name} → ${actual}`,
       `[openalex-api] OpenAlex ${shortId} (${best.display_name}) affiliations [${actual}] do not include "${orgName}"`,
       sourceUrl,
@@ -405,7 +548,7 @@ export async function tryOpenAlexMatch(item: VerifyItem): Promise<VerifyResult |
   return makeResult(
     item,
     'unverifiable',
-    0.8,
+    CONFIDENCE_UNVERIFIABLE,
     '',
     `[openalex-api] OpenAlex ${shortId} (${best.display_name}) has no affiliation data`,
     sourceUrl,
