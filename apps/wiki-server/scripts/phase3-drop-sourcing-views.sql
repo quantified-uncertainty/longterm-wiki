@@ -2,14 +2,22 @@
 -- DRAFT — see docs/audits/qua-303-sourcing-rename-audit.md.
 --
 -- Run only after ≥7 days of Phase 2 (code update) being deployed AND after confirming
--- via pg_stat_statements (or application logs) that no queries are still hitting the
--- legacy view names.
+-- that no queries are still hitting the legacy view names.
 --
--- Verification query to run BEFORE this script:
---   SELECT query, calls FROM pg_stat_statements
---   WHERE query ILIKE '%source_check_evidence%' OR query ILIKE '%source_check_verdicts%'
---   ORDER BY calls DESC;
--- Expect zero rows, or only the smoke-test INSERT/DELETE from Phase 1.
+-- Observability options (pg_stat_statements is NOT currently installed in prod):
+--   1. Postgres logs: enable `log_statement = 'mod'` temporarily and grep for the
+--      view names, or filter existing slow-query logs.
+--   2. Application logs: grep wiki-server / groundskeeper / crux job logs for the
+--      legacy identifiers. Phase 2 renames them out of source code, so any hit after
+--      the Phase 2 deploy indicates a missed call site.
+--   3. Codebase double-check: `grep -rn "source_check_evidence\|source_check_verdicts"
+--      --include="*.ts" --include="*.sql"` should return only historical Drizzle
+--      migrations and this script's own comments.
+--   4. Install pg_stat_statements ad-hoc if deeper observability is needed:
+--      `CREATE EXTENSION pg_stat_statements;` — requires shared_preload_libraries setting.
+--
+-- The views are auto-updatable, so an app pod querying them will succeed transparently —
+-- there is no error signal to rely on. The verification is proactive, not reactive.
 
 BEGIN;
 
