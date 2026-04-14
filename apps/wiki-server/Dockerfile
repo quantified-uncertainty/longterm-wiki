@@ -9,6 +9,7 @@ WORKDIR /repo
 COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/wiki-server/package.json ./apps/wiki-server/
 COPY packages/id-utils/package.json ./packages/id-utils/
+COPY packages/factbase/package.json ./packages/factbase/
 
 # Install wiki-server and its workspace dependencies
 RUN pnpm install --frozen-lockfile --filter wiki-server...
@@ -16,6 +17,7 @@ RUN pnpm install --frozen-lockfile --filter wiki-server...
 # Copy server source and workspace packages it depends on
 COPY apps/wiki-server/ ./apps/wiki-server/
 COPY packages/id-utils/ ./packages/id-utils/
+COPY packages/factbase/ ./packages/factbase/
 
 ENV NODE_ENV=production
 
