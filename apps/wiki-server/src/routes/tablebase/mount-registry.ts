@@ -142,3 +142,27 @@ export const TABLEBASE_MANUAL_MOUNTS = [
   "bluesky",
   "data-sources",
 ] as const;
+
+/**
+ * Files in `apps/wiki-server/src/routes/tablebase/` that are NOT Hono
+ * route modules — shared helpers, schemas, the auto-mount registry itself,
+ * etc. Single source of truth consumed by:
+ *   - `apps/wiki-server/src/__tests__/mount-registry.test.ts`
+ *   - `crux/validate/validate-tablebase-completeness.ts`
+ *   - `crux/validate/validate-tablebase-registry.ts`
+ *
+ * Before this constant was extracted, all three consumers kept a hand-
+ * maintained duplicate, and the lists drifted whenever a new helper was
+ * added. Update this list when adding a new non-route module next to the
+ * real routes.
+ */
+export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
+  "index.ts",
+  "mount-registry.ts",
+  "sync-factory.ts",
+  "sync-factory.test-d.ts",
+  "sourcing-schema.ts",
+  "audit-log.ts",
+  "write-inline-verdicts.ts",
+  "entity-profile-descriptions.ts",
+];

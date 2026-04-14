@@ -12,21 +12,13 @@ import { join } from "path";
 import {
   TABLEBASE_MOUNTS,
   TABLEBASE_MANUAL_MOUNTS,
+  TABLEBASE_NON_ROUTE_FILES,
 } from "../routes/tablebase/mount-registry.js";
 
-// Route files that live in `routes/tablebase/` but are NOT Hono routes.
-// (Constants modules, internal helpers, the registry file itself, etc.)
-const NON_ROUTE_FILES = new Set<string>([
-  "index.ts",
-  "mount-registry.ts",
-  "sync-factory.ts",
-  "sync-factory.test-d.ts",
-  "sync-factory-flag.ts",
-  "sourcing-schema.ts",
-  "audit-log.ts",
-  "write-inline-verdicts.ts",
-  "entity-profile-descriptions.ts",
-]);
+// Non-route files in the tablebase/ dir (helpers, schemas, the registry
+// itself). Sourced from the canonical list in mount-registry.ts so all
+// consumers share one source of truth.
+const NON_ROUTE_FILES = new Set<string>(TABLEBASE_NON_ROUTE_FILES);
 
 const ROUTES_DIR = join(
   new URL(".", import.meta.url).pathname,
