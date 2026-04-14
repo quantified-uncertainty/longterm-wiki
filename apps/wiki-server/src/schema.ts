@@ -2594,6 +2594,7 @@ export const VALID_THING_TYPES = [
   "publication",
   "political-race",
   "race-candidate",
+  "entity-resource",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
