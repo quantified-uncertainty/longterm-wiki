@@ -15,6 +15,7 @@ import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecen
 import { ANY_WORKING_LABELS } from '../lib/labels.ts';
 import type { RecentMerge } from '../lib/pr-analysis/index.ts';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import { verifyRebaseCleared } from './rebase-verify.ts';
 import type { FixOutcome, MainBranchStatus, PatrolConfig, ScoredPr } from './types.ts';
 import { LABELS } from './types.ts';
 import {
@@ -594,26 +595,52 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
 
     if (rebaseResult.success) {
-      log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
+      // `tryAutomatedRebase` only reports git-level success. Verify GitHub
+      // actually no longer reports the PR as conflicting before claiming a
+      // fix — without this, a concurrent commit or GitHub's async mergeable
+      // recomputation produced cycles where patrol reported 'fixed' but the
+      // next scan still saw CONFLICTING (QUA-400, PR #4287).
+      const hadConflict = pr.issues.includes('conflict');
+      const verify = hadConflict
+        ? await verifyRebaseCleared(pr.number, config.repo)
+        : { cleared: true, reason: 'no conflict to verify', mergeable: null, mergeStateStatus: null, attempts: 0 };
 
-      // Strip both 'stale' and 'conflict' — rebase resolved them
-      const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
-      if (remainingIssues.length === 0) {
-        removeWorktree(worktreePath);
+      if (!verify.cleared) {
+        log(
+          `  ${cl.yellow}⚠ Automated rebase reported ${rebaseResult.status} but GitHub still shows conflict: ${verify.reason}${cl.reset} — falling through to Claude`,
+        );
         appendJsonl(JSONL_FILE, {
-          type: 'pr_result',
+          type: 'rebase_verify_failed',
           pr_num: pr.number,
-          issues: pr.issues,
-          outcome: 'fixed' as FixOutcome,
-          elapsed_s: 0,
-          reason: `automated-rebase: ${rebaseResult.status}`,
+          rebase_status: rebaseResult.status,
+          reason: verify.reason,
+          mergeable: verify.mergeable,
+          merge_state_status: verify.mergeStateStatus,
+          attempts: verify.attempts,
         });
-        markProcessed(pr.number);
-        return { mainIsRootCause: false };
+        // Fall through to Claude with original issues — don't strip 'conflict'.
+      } else {
+        log(`  ✓ Automated rebase ${rebaseResult.status} — no Claude needed`);
+
+        // Strip both 'stale' and 'conflict' — rebase resolved them
+        const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
+        if (remainingIssues.length === 0) {
+          removeWorktree(worktreePath);
+          appendJsonl(JSONL_FILE, {
+            type: 'pr_result',
+            pr_num: pr.number,
+            issues: pr.issues,
+            outcome: 'fixed' as FixOutcome,
+            elapsed_s: 0,
+            reason: `automated-rebase: ${rebaseResult.status} (verified)`,
+          });
+          markProcessed(pr.number);
+          return { mainIsRootCause: false };
+        }
+        // Remaining issues need Claude — update pr.issues so Claude doesn't re-address resolved ones
+        pr.issues = remainingIssues;
+        log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
       }
-      // Remaining issues need Claude — update pr.issues so Claude doesn't re-address resolved ones
-      pr.issues = remainingIssues;
-      log(`  Remaining issues after rebase: ${remainingIssues.join(', ')} — falling through to Claude`);
     } else {
       log(`  Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
     }

@@ -13,6 +13,7 @@ import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import { verifyRebaseCleared } from './rebase-verify.ts';
 import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { REPO } from '../lib/github.ts';
@@ -281,19 +282,43 @@ async function fixPrInWorktree(
       const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
 
       if (rebaseResult.success) {
-        log(`${prefix} Automated rebase ${rebaseResult.status} — no Claude needed`);
-        const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
-        if (remainingIssues.length === 0) {
-          markProcessed(pr.number);
-          return {
-            prNumber: pr.number,
-            outcome: 'fixed',
-            reason: `automated-rebase: ${rebaseResult.status}`,
-            elapsedS: Math.floor((Date.now() - startTime) / 1000),
-          };
+        // Verify GitHub no longer reports the PR as conflicting before
+        // claiming a fix. See QUA-400 for the PR #4287 incident where we
+        // reported 'fixed' but the next scan still saw CONFLICTING.
+        const hadConflict = pr.issues.includes('conflict');
+        const verify = hadConflict
+          ? await verifyRebaseCleared(pr.number, config.repo)
+          : { cleared: true, reason: 'no conflict to verify', mergeable: null, mergeStateStatus: null, attempts: 0 };
+
+        if (!verify.cleared) {
+          log(
+            `${prefix} ${cl.yellow}⚠ Rebase reported ${rebaseResult.status} but GitHub still shows conflict: ${verify.reason}${cl.reset} — falling through to Claude`,
+          );
+          appendJsonl(JSONL_FILE, {
+            type: 'rebase_verify_failed',
+            pr_num: pr.number,
+            rebase_status: rebaseResult.status,
+            reason: verify.reason,
+            mergeable: verify.mergeable,
+            merge_state_status: verify.mergeStateStatus,
+            attempts: verify.attempts,
+          });
+          // Don't strip 'conflict' — let Claude see it and resolve manually.
+        } else {
+          log(`${prefix} Automated rebase ${rebaseResult.status} — no Claude needed`);
+          const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
+          if (remainingIssues.length === 0) {
+            markProcessed(pr.number);
+            return {
+              prNumber: pr.number,
+              outcome: 'fixed',
+              reason: `automated-rebase: ${rebaseResult.status} (verified)`,
+              elapsedS: Math.floor((Date.now() - startTime) / 1000),
+            };
+          }
+          pr.issues = remainingIssues;
+          log(`${prefix} Remaining issues after rebase: ${remainingIssues.join(', ')}`);
         }
-        pr.issues = remainingIssues;
-        log(`${prefix} Remaining issues after rebase: ${remainingIssues.join(', ')}`);
       } else {
         // On retry for conflict-only PRs, try rebase-only with Claude (simpler prompt)
         const failCount = getFailCount(pr.number);
