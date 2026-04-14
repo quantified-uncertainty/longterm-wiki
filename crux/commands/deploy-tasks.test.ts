@@ -6,8 +6,8 @@
  *   are missing from the local environment (QUA-319).
  */
 
-import { describe, it, expect } from 'vitest';
-import { checkPsqlRunnable, isPatBlockedError } from './deploy-tasks.ts';
+import { describe, it, expect, vi } from 'vitest';
+import { checkPsqlRunnable, isPatBlockedError, isCommitOnProduction } from './deploy-tasks.ts';
 
 describe('checkPsqlRunnable', () => {
   const PSQL_CMD =
@@ -125,5 +125,37 @@ describe('isPatBlockedError (QUA-409)', () => {
   it('handles empty / undefined output safely', () => {
     expect(isPatBlockedError(undefined)).toBe(false);
     expect(isPatBlockedError('')).toBe(false);
+  });
+});
+
+describe('isCommitOnProduction (QUA-450)', () => {
+  it('returns true when compare.ahead_by === 0 (commit is on production)', async () => {
+    const api = vi.fn(async () => ({ ahead_by: 0, behind_by: 42 }));
+    expect(await isCommitOnProduction('abc123', api as never)).toBe(true);
+    expect(api.mock.calls[0][0]).toMatch(/compare\/production\.\.\.abc123/);
+  });
+
+  it('returns false when compare.ahead_by > 0 (commit ahead of production)', async () => {
+    const api = vi.fn(async () => ({ ahead_by: 5, behind_by: 10 }));
+    expect(await isCommitOnProduction('abc123', api as never)).toBe(false);
+  });
+
+  it('fail-open on API error (returns false → keep task visible, do NOT silently roll off)', async () => {
+    const api = vi.fn(async () => {
+      throw new Error('404 Not Found');
+    });
+    expect(await isCommitOnProduction('missing-sha', api as never)).toBe(false);
+  });
+
+  it('returns false for empty sha without calling API', async () => {
+    const api = vi.fn();
+    expect(await isCommitOnProduction('', api as never)).toBe(false);
+    expect(api).not.toHaveBeenCalled();
+  });
+
+  it('URL-encodes the commit sha', async () => {
+    const api = vi.fn(async () => ({ ahead_by: 0 }));
+    await isCommitOnProduction('weird/sha with spaces', api as never);
+    expect(api.mock.calls[0][0]).toMatch(/weird%2Fsha%20with%20spaces/);
   });
 });
