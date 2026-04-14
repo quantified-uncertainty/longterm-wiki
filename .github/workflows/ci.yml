@@ -411,15 +411,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          # Need at least 2 commits so the commit message lookup below resolves
+          # the triggering commit, not just its tree.
+          fetch-depth: 2
 
       - name: File regression issue
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Find the merge commit that likely caused the failure
-          LAST_MERGE=$(git log --merges --oneline -1 --format="%H %s")
-          LAST_SHA=$(echo "$LAST_MERGE" | cut -d' ' -f1)
-          LAST_MSG=$(echo "$LAST_MERGE" | cut -d' ' -f2-)
+          # On push to main, github.sha IS the merge commit. Use it directly
+          # instead of scanning git log (which fails with default fetch-depth=1).
+          LAST_SHA="${{ github.sha }}"
+          LAST_MSG=$(git log -1 --format="%s" "$LAST_SHA")
 
           # Extract PR number from merge commit message if present
           PR_NUM=$(echo "$LAST_MSG" | grep -oE '#[0-9]+' | head -1 | tr -d '#')
