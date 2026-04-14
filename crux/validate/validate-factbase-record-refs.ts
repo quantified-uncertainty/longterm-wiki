@@ -137,8 +137,43 @@ export function buildEntityLookup(database: {
 // Known baseline — tracked by GitHub issues
 // ---------------------------------------------------------------------------
 
-/** Allow specific orphan refs through as warnings; populate per QUA ticket. */
-const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set<string>();
+/**
+ * Allow specific orphan refs through as warnings; populate per QUA ticket.
+ *
+ * Current entries: 34 sid_ references that resurfaced after the 2026-04-13
+ * baseline clear (commit aded8ac69). Tracked in QUA-459 for cleanup. Each
+ * entry is an orphan that exists in prod FactBase records but has no
+ * matching entity in `packages/factbase/data/things/`. Do NOT add to this
+ * list without a linked ticket — new orphans are bugs, not noise.
+ */
+const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set<string>([
+  // Grant recipient orphans (QUA-459)
+  "sid_GlobalGive",
+  "sid_Orthogonal",
+  "sid_conjecture",
+  "sid_Kurzgesagt",
+  "sid_Futurewise",
+  "sid_lighthaven",
+  "sid_Janaagraha",
+  "sid_Exscientia",
+  // Investment investor orphans (QUA-459)
+  "sid_B5JzHeWvow",
+  "sid_dbDEGrJbUp",
+  "sid_69J7QKcqyX",
+  "sid_Kvfo7x5bqf",
+  "sid_rWgCE08sfW",
+  "sid_dzlCIZ45dZ",
+  "sid_B6ZUV8iv17",
+  "sid_F1bFJHm9RA",
+  "sid_ntlgFVJrPg",
+  "sid_oEH5GwWtow",
+  // Personnel / board-seat person orphans (QUA-459)
+  "sid_QAmTpCO5iQ",
+  "sid_t1PPwNe3x7",
+  "sid_2WGRkU8nio",
+  "sid_L0huEH4GSF",
+  "sid_PUlCEEDFup",
+]);
 
 // ---------------------------------------------------------------------------
 // Field scanning

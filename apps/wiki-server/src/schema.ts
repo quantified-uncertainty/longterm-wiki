@@ -1086,6 +1086,12 @@ export const agentSessions = pgTable(
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
+    // Dedicated liveness signal, separate from updated_at (which bumps on
+    // any row touch). Written by the heartbeat hook; read by the dedup
+    // freshness filter. Part of the QUA-445 agent_sessions-as-primary
+    // migration path — will fully replace active_agents.heartbeat_at in
+    // Phase E of that ticket.
+    heartbeatAt: timestamp("heartbeat_at", { withTimezone: true }),
   },
   (table) => [
     index("idx_as_branch").on(table.branch),
@@ -1098,6 +1104,11 @@ export const agentSessions = pgTable(
     index("idx_as_linear_id")
       .on(table.linearId)
       .where(sql`${table.linearId} IS NOT NULL`),
+    // Partial index on active sessions with a heartbeat (QUA-445 Phase B).
+    // Matches the dedup query's access pattern.
+    index("idx_as_heartbeat_at_active")
+      .on(table.heartbeatAt)
+      .where(sql`${table.heartbeatAt} IS NOT NULL AND ${table.status} = 'active'`),
   ]
 );
 

@@ -273,9 +273,15 @@ const activeAgentsApp = new Hono()
     // update anything. Never fails the heartbeat.
     const branch = result[0].branch;
     if (branch) {
+      // QUA-445 Phase B: bump both heartbeat_at (dedicated liveness
+      // column, new) and updated_at (bumped on any touch for compat with
+      // the existing dedup query, which still filters on updated_at for
+      // rows predating this migration). Post-Phase-D the dedup query
+      // switches to heartbeat_at exclusively.
+      const now = new Date();
       await db
         .update(agentSessions)
-        .set({ updatedAt: new Date() })
+        .set({ heartbeatAt: now, updatedAt: now })
         .where(and(
           eq(agentSessions.branch, branch),
           eq(agentSessions.status, "active"),
@@ -292,7 +298,7 @@ const activeAgentsApp = new Hono()
               branch,
               agentId: id,
             },
-            "Heartbeat: failed to bump agent_sessions.updated_at (QUA-440)",
+            "Heartbeat: failed to bump agent_sessions (QUA-440/445)",
           );
         });
     }

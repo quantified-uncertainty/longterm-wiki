@@ -100,6 +100,28 @@ export function isSourcingExempt(recordType: string): boolean {
   return (SOURCING_EXEMPT_TYPES as readonly string[]).includes(recordType);
 }
 
+/**
+ * Narrowing type guard: is this string one of the registered record types?
+ *
+ * Useful at FE boundaries (URL params, API responses) so a typo or unregistered
+ * type fails at the guard rather than silently building a 404 URL or missing a
+ * verdict lookup.
+ */
+export function isValidRecordType(recordType: string): recordType is RecordType {
+  return (VALID_RECORD_TYPES as readonly string[]).includes(recordType);
+}
+
+/**
+ * Is this record type both registered AND non-exempt — i.e. would have stored
+ * verdicts worth linking to from a dot? Equivalent to:
+ *   isValidRecordType(t) && !isSourcingExempt(t)
+ */
+export function isLinkableSourcingType(
+  recordType: string,
+): recordType is Exclude<RecordType, SourcingExemptType> {
+  return isValidRecordType(recordType) && !isSourcingExempt(recordType);
+}
+
 export const VALID_SOURCE_CHECK_VERDICTS = [
   "confirmed",
   "contradicted",
@@ -109,6 +131,135 @@ export const VALID_SOURCE_CHECK_VERDICTS = [
 ] as const;
 
 export type SourcingVerdict = (typeof VALID_SOURCE_CHECK_VERDICTS)[number];
+
+// ── Branded record IDs (QUA-423) ──────────────────────────────────────────
+//
+// A `RecordId<T>` is a string tagged with a record-type literal at the type
+// level. The only way to obtain one is through `asRecordId()`, which performs
+// runtime checks for obvious misuse — empty string, excessive length, or the
+// composite-key shape that shipped in QUA-417 (`${ownerEntityId}-${record.key}`
+// passed where the raw record PK was expected).
+//
+// Why brands, not `type RecordId<T> = string`? A raw string alias accepts any
+// string, including composite React keys. The QUA-417 bug class only surfaces
+// in code review, not the type checker. With brands, the only way to get a
+// `RecordId<T>` is to wrap via `asRecordId()` — which runs the shape guards.
+
+/**
+ * Opaque, type-tagged record ID. Construct only via `asRecordId()`.
+ *
+ * `RecordId<"grant">` is not assignable to `RecordId<"personnel">` or vice
+ * versa — the compile-time distinction makes mixed-up record types a type
+ * error rather than a runtime miss.
+ */
+export type RecordId<T extends RecordType = RecordType> = string & {
+  readonly __brand: "RecordId";
+  readonly __type: T;
+};
+
+/**
+ * Thrown by `asRecordId()` when the input clearly isn't a raw record PK.
+ * Carries structured fields (`recordType`, `rawId`) so callers can handle
+ * programmatically vs. log as a generic error.
+ */
+export class InvalidRecordIdError extends Error {
+  constructor(
+    public readonly recordType: string,
+    public readonly rawId: string,
+    reason: string,
+  ) {
+    super(
+      `asRecordId(${JSON.stringify(recordType)}, ${JSON.stringify(rawId)}): ${reason}`,
+    );
+    this.name = "InvalidRecordIdError";
+  }
+}
+
+/**
+ * Heuristic: does this look like a composite React key rather than a raw PK?
+ *
+ * The QUA-417 bug was `conn.key = \`${ownerEntityId}-${record.key}\``. The
+ * ownerEntityId was a `sid_`-prefixed stableId and record.key was a 10-char
+ * alphanumeric grant PK — e.g. `sid_ULjDXpSLCI-8NUnVSueLS`.
+ *
+ * Shapes caught:
+ *   - `sid_X-<alphanumRight>`   → stableId + anything (the QUA-417 shape)
+ *   - `<multi-digit>-<multi-digit>`  → two numeric PKs joined
+ *
+ * Does NOT flag legitimate hyphenated IDs (`some-name-2024`, `arxiv-2310-12345`).
+ * Intentionally narrow — false negatives are fine (real PKs don't match this);
+ * false positives on real PKs would break legitimate callers.
+ */
+function looksLikeCompositeKey(rawId: string): boolean {
+  // `sid_...-...` — stableIds themselves don't contain hyphens, so anything
+  // starting with `sid_` followed by `-` is always a composite.
+  if (/^sid_[A-Za-z0-9]+-[A-Za-z0-9]+/.test(rawId)) return true;
+  // Two multi-digit numeric IDs joined, but NOT `1-2` / `a-b` (legit slugs).
+  if (/^\d{3,}-\d{3,}$/.test(rawId)) return true;
+  return false;
+}
+
+/**
+ * Construct a `RecordId<T>` from a raw string.
+ *
+ * Runtime guards catch obvious mistakes at dev/test time:
+ *   - Empty strings (caller passed undefined/null by mistake)
+ *   - Excessive length (caller passed a display name or URL)
+ *   - Composite-key shapes (the QUA-417 bug)
+ *
+ * Throws `InvalidRecordIdError` on rejection. For a non-throwing boundary
+ * check use `isCandidateRecordId()`.
+ *
+ * NOTE: Does not validate `recordType` — use `isValidRecordType()` for that.
+ * The `T extends RecordType` type param is compile-time only; at runtime a
+ * caller could still hand in an unregistered string.
+ */
+export function asRecordId<T extends RecordType>(
+  recordType: T,
+  rawId: string,
+): RecordId<T> {
+  if (typeof rawId !== "string") {
+    throw new InvalidRecordIdError(
+      recordType,
+      String(rawId),
+      `rawId must be string, got ${typeof rawId}`,
+    );
+  }
+  if (rawId.length === 0) {
+    throw new InvalidRecordIdError(recordType, rawId, "empty string");
+  }
+  if (rawId.length > 200) {
+    throw new InvalidRecordIdError(
+      recordType,
+      rawId.slice(0, 50) + "...",
+      `length ${rawId.length} exceeds 200 — likely a URL or display name`,
+    );
+  }
+  if (looksLikeCompositeKey(rawId)) {
+    throw new InvalidRecordIdError(
+      recordType,
+      rawId,
+      "looks like a composite React key (e.g. `${owner}-${record}`); " +
+        "pass the raw PK instead. QUA-417 shipped exactly this bug on " +
+        "funding-connections.tsx.",
+    );
+  }
+  return rawId as RecordId<T>;
+}
+
+/**
+ * Non-throwing check: does this value pass the same runtime guards as
+ * `asRecordId()`? Useful at system boundaries (URL params, API responses)
+ * where you'd want to render a 404 rather than crash.
+ */
+export function isCandidateRecordId(rawId: unknown): rawId is string {
+  return (
+    typeof rawId === "string" &&
+    rawId.length > 0 &&
+    rawId.length <= 200 &&
+    !looksLikeCompositeKey(rawId)
+  );
+}
 
 // ---------------------------------------------------------------------------
 // Edit Logs
