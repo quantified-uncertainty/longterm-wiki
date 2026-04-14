@@ -1153,11 +1153,39 @@ const VALID_SESSION_TYPES = [
   "commands",
 ] as const;
 
+/**
+ * Canonical Linear issue identifier format — one or more uppercase letters
+ * (team key), a hyphen, one or more digits. Enforced at the DB level by
+ * `chk_agent_sessions_linear_id_format` and validated at the API boundary
+ * here so bad writes get rejected before they hit PG.
+ */
+export const LINEAR_ID_PATTERN = /^[A-Z]+-\d+$/;
+/** Required, non-nullable variant — used for path params where the value must be present. */
+export const LinearIdParamSchema = z
+  .string()
+  .regex(LINEAR_ID_PATTERN, "Linear ID must match /^[A-Z]+-\\d+$/")
+  .max(50);
+const LinearIdSchema = LinearIdParamSchema.nullable().optional();
+
+/**
+ * Agent slot number (a0..a99). Matches the CHECK constraint on
+ * agent_sessions.slot_number.
+ */
+const SlotNumberSchema = z
+  .number()
+  .int()
+  .min(0)
+  .max(99)
+  .nullable()
+  .optional();
+
 export const CreateAgentSessionSchema = z.object({
   branch: z.string().min(1).max(500),
   task: z.string().min(1).max(2000),
   sessionType: z.enum(VALID_SESSION_TYPES),
   issueNumber: z.number().int().positive().nullable().optional(),
+  linearId: LinearIdSchema,
+  slotNumber: SlotNumberSchema,
   checklistMd: z.string().min(1).max(50000),
   worktree: z.string().max(1000).nullable().optional(),
 });
@@ -1177,6 +1205,10 @@ export const UpdateAgentSessionSchema = z.object({
   prUrl: z.string().url().max(1000).nullable().optional(),
   prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
   fixesPrUrl: z.string().url().max(1000).nullable().optional(),
+  // QUA-440: allow late-binding linearId/slotNumber in case init is run with
+  // --no-linear-start and the caller backfills later.
+  linearId: LinearIdSchema,
+  slotNumber: SlotNumberSchema,
   // Session log fields — written at session end (replaces separate sessions table for agent workflow)
   date: DateStringSchema.optional(),
   title: z.string().min(1).max(1000).nullable().optional(),

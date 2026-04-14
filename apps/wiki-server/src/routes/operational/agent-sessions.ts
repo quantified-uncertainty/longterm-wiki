@@ -16,6 +16,7 @@ import {
   CreateAgentSessionSchema,
   UpdateAgentSessionSchema,
   DateStringSchema,
+  LinearIdParamSchema,
 } from "../../api-types.js";
 import { z } from "zod";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -45,6 +46,8 @@ function mapSessionRow(r: typeof agentSessions.$inferSelect, pages: string[]) {
     task: r.task,
     sessionType: r.sessionType,
     issueNumber: r.issueNumber,
+    linearId: r.linearId,
+    slotNumber: r.slotNumber,
     worktree: r.worktree,
     prUrl: r.prUrl,
     prOutcome: r.prOutcome,
@@ -84,16 +87,29 @@ const agentSessionsApp = new Hono()
         .where(eq(agentSessions.branch, d.branch))
         .orderBy(desc(agentSessions.startedAt)).limit(1);
       if (existing.length > 0 && existing[0].status === "active") {
+        // Merge rules:
+        //   undefined (field omitted) → preserve existing
+        //   null (explicit clear)     → overwrite with null
+        //   value                     → overwrite with value
+        // Using `?? existing ?? null` would silently treat `null` as
+        // "preserve" which is wrong — callers must be able to clear fields.
         const updated = await tx.update(agentSessions).set({
           task: d.task, sessionType: d.sessionType,
-          issueNumber: d.issueNumber ?? null, checklistMd: d.checklistMd,
-          worktree: d.worktree ?? existing[0].worktree ?? null, updatedAt: new Date(),
+          issueNumber: d.issueNumber !== undefined ? d.issueNumber : (existing[0].issueNumber ?? null),
+          linearId: d.linearId !== undefined ? d.linearId : (existing[0].linearId ?? null),
+          slotNumber: d.slotNumber !== undefined ? d.slotNumber : (existing[0].slotNumber ?? null),
+          checklistMd: d.checklistMd,
+          worktree: d.worktree !== undefined ? d.worktree : (existing[0].worktree ?? null),
+          updatedAt: new Date(),
         }).where(eq(agentSessions.id, existing[0].id)).returning();
         return { row: firstOrThrow(updated, "agent session update"), isUpdate: true };
       }
       const inserted = await tx.insert(agentSessions).values({
         branch: d.branch, task: d.task, sessionType: d.sessionType,
-        issueNumber: d.issueNumber ?? null, checklistMd: d.checklistMd, worktree: d.worktree ?? null,
+        issueNumber: d.issueNumber ?? null,
+        linearId: d.linearId ?? null,
+        slotNumber: d.slotNumber ?? null,
+        checklistMd: d.checklistMd, worktree: d.worktree ?? null,
       }).returning();
       return { row: firstOrThrow(inserted, "agent session insert"), isUpdate: false };
     });
@@ -110,6 +126,56 @@ const agentSessionsApp = new Hono()
     }
     return c.json(rows[0]);
   })
+  // QUA-440: "who is actively working on QUA-NNN right now?"
+  // Returns sessions whose linear_id matches, filtered to active status and
+  // recent updated_at (heartbeat proxy). Used by `crux linear start`'s
+  // DB-first dedup pre-check in `crux/lib/linear/dedup.ts`.
+  //
+  // Narrow-column projection: the dedup caller only reads branch, slotNumber,
+  // linearId, and updatedAt — no reason to ship checklistMd/issuesJson/etc.
+  // which can be kilobytes each on the init hot path.
+  .get(
+    "/by-linear/:linearId",
+    zv(
+      "query",
+      z.object({
+        // How fresh updated_at must be to count as an active claim. Defaults
+        // to 30 min (matches the existing active_agents stale timeout).
+        // Capped at 24h so a bad query can't return ancient rows.
+        freshMinutes: z.coerce.number().int().min(1).max(1440).default(30),
+      }),
+    ),
+    async (c) => {
+      // `zv` in this codebase only validates "query" and "json" targets, so
+      // validate the path param via the shared schema manually. Keeps the
+      // format rule (incl. the 50-char cap) in one place — LinearIdParamSchema.
+      const parsed = LinearIdParamSchema.safeParse(c.req.param("linearId"));
+      if (!parsed.success) {
+        return validationError(c, parsed.error.issues[0]?.message ?? "Invalid Linear ID");
+      }
+      const linearId = parsed.data;
+      const { freshMinutes } = c.req.valid("query");
+      const cutoff = new Date(Date.now() - freshMinutes * 60_000);
+      const db = getDrizzleDb();
+      const rows = await db
+        .select({
+          id: agentSessions.id,
+          branch: agentSessions.branch,
+          linearId: agentSessions.linearId,
+          slotNumber: agentSessions.slotNumber,
+          status: agentSessions.status,
+          updatedAt: agentSessions.updatedAt,
+        })
+        .from(agentSessions)
+        .where(and(
+          eq(agentSessions.linearId, linearId),
+          eq(agentSessions.status, "active"),
+          gte(agentSessions.updatedAt, cutoff),
+        ))
+        .orderBy(desc(agentSessions.updatedAt));
+      return c.json({ sessions: rows, freshMinutes });
+    },
+  )
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
     const [row] = await db.select({
@@ -139,6 +205,7 @@ const agentSessionsApp = new Hono()
       checklistMd, status, prUrl, prOutcome, fixesPrUrl,
       date, title, summary, model, duration, cost, durationMinutes, checksYaml,
       issuesJson, learningsJson, recommendationsJson, reviewed, pages, entities,
+      linearId, slotNumber,
     } = parsed.data;
     const resolvedCostCents = parsed.data.costCents !== undefined
       ? parsed.data.costCents
@@ -151,6 +218,7 @@ const agentSessionsApp = new Hono()
       date, title, summary, model, duration, cost, checksYaml,
       issuesJson, learningsJson, recommendationsJson, reviewed, pages, entities,
       parsed.data.costCents, parsed.data.durationMinutes,
+      linearId, slotNumber,
     ].some((v) => v !== undefined);
     if (!hasAnyField) return validationError(c, "At least one field must be provided");
     const updates: Record<string, unknown> = { updatedAt: new Date() };
@@ -172,6 +240,8 @@ const agentSessionsApp = new Hono()
     if (learningsJson !== undefined) updates.learningsJson = learningsJson;
     if (recommendationsJson !== undefined) updates.recommendationsJson = recommendationsJson;
     if (reviewed !== undefined) updates.reviewed = reviewed;
+    if (linearId !== undefined) updates.linearId = linearId;
+    if (slotNumber !== undefined) updates.slotNumber = slotNumber;
     const db = getDrizzleDb();
     // Sentinel error used to roll back the transaction when status='completed'
     // is attempted with missing required fields. Thrown inside the transaction

@@ -23,16 +23,17 @@ For GitHub: posts a start comment and adds the `agent:working` label.
 
 ## Dedup check — `crux linear start` refuses competing claims
 
-Both `crux linear start QUA-NNN` and `crux sys agent-checklist init --linear=QUA-NNN` run a **dedup pre-check** before posting anything to Linear. The check looks for two signals that another session is already working on the issue:
+Both `crux linear start QUA-NNN` and `crux sys agent-checklist init --linear=QUA-NNN` run a **dedup pre-check** before posting anything to Linear. The check consults three signals in order, blocking on the first one that finds a cross-slot collision:
 
-1. **Recent start comments** — A `🤖 Claude Code starting work` comment posted in the last 24h from a **different slot** (e.g., a9 while you're on a5), not yet superseded by a `🤖 Claude Code finished work` comment.
-2. **Open PRs** — Any open PR in the wiki repo whose title or body mentions the Linear ID.
+1. **PG `agent_sessions` (authoritative)** — Queries the wiki-server for sessions matching `linear_id=QUA-NNN`, `status='active'`, and `updated_at > now() - 30min`. The 30-minute freshness window matches the `active_agents` stale-sweep cutoff, so a crashed session automatically releases its claim after ~30 minutes without explicit cleanup. This is the fastest path (~50ms) and the one new sessions should normally hit.
+2. **Linear start comments (fallback)** — When the wiki-server is unreachable or returns nothing, falls back to scraping `🤖 Claude Code starting work` comments posted in the last 24h from a **different slot**, not yet superseded by a `🤖 Claude Code finished work` comment. This covers cases where the session crashed before registering in PG.
+3. **Open PRs (paranoia layer)** — Any open PR in the wiki repo whose title or body mentions the Linear ID. Catches abandoned branches that PG has forgotten and Linear comments never captured.
 
-Either signal is sufficient to block. On a collision, both commands exit with **code 2** (distinct from 1 for other errors), print the detected claim(s)/PR(s), and refuse to write any local session state (checklist file, DB row, active-agent registration). This means a colliding `init` leaves **no artifact** — you can fix the race and re-run without cleanup.
+Any signal is sufficient to block. On a collision, both commands exit with **code 2** (distinct from 1 for other errors), print the detected claim(s)/PR(s), and refuse to write any local session state (checklist file, DB row, active-agent registration). This means a colliding `init` leaves **no artifact** — you can fix the race and re-run without cleanup.
 
-Re-running from the **same slot** is NOT a collision — it's treated as session resumption (init-crash recovery, etc.). The slot is derived from the `a<N>` ancestor of the current working directory.
+Re-running from the **same slot** is NOT a collision — it's treated as session resumption (init-crash recovery, etc.). The slot is derived from the `a<N>` ancestor of the current working directory and stored on `agent_sessions.slot_number`.
 
-Both checks are **fail-open**: if the Linear or GitHub API is unreachable, the dedup helper returns empty and the start proceeds. A transient API glitch should not wedge every session on the machine. The downside is a rare missed collision when both APIs are down simultaneously.
+All three sources are **fail-open**: if any API is unreachable, we skip that source and try the next. A transient wiki-server hiccup falls back to Linear; a Linear outage falls back to open-PR search. The downside is a rare missed collision when *all three* sources are down simultaneously — rarer than any single one failing.
 
 ### Bypassing with `--force`
 
@@ -46,9 +47,11 @@ pnpm crux sys agent-checklist init "..." --linear=QUA-NNN --force
 
 `--force` **skips** the dedup check entirely. The start comment is annotated with a visible `⚠ Claimed with --force` marker so the duplication is captured in Linear history.
 
-### Historical note — QUA-406
+### Historical note — QUA-406 / QUA-440
 
-The dedup check was added after a 2026-04-13 incident where two concurrent sessions on the same machine (slots a9 and a16) each shipped a competing PR for QUA-397. Prior to that, `crux linear start` unconditionally posted a start comment regardless of existing claims, and the session-tracking rule described below was aspirational. See QUA-406 for the full post-mortem and fix set.
+The dedup check was added after a 2026-04-13 incident (QUA-406) where two concurrent sessions on the same machine (slots a9 and a16) each shipped a competing PR for QUA-397. The initial fix (PR #4300) used Linear comments + open-PR search as the primary sources; QUA-440 followed up to add PG `agent_sessions` as the authoritative first-consulted source, giving us a heartbeat-based liveness signal that Linear comments alone can't provide.
+
+The Active Agents and Agent Sessions internal dashboards (at `/internal/agent-activity`) show the `slot_number` and `linear_id` columns for each row so coordinators can see at a glance who's working on what.
 
 ## At Session End (when shipping)
 

@@ -1048,7 +1048,14 @@ export const agentSessions = pgTable(
     branch: text("branch").notNull(),
     task: text("task").notNull(),
     sessionType: text("session_type").notNull(),
-    issueNumber: integer("issue_number"),
+    issueNumber: integer("issue_number"), // legacy GitHub issue number
+    // Linear issue identifier (QUA-406 follow-up — DB-first dedup). Format
+    // enforced by chk_agent_sessions_linear_id_format: `^[A-Z]+-[0-9]+$`.
+    linearId: text("linear_id"),
+    // Agent slot number (a0..a99). Derived from the cwd ancestor walk at init
+    // time; used by the dedup query to distinguish "same slot resumption"
+    // from "different slot collision". See .claude/rules/github-issue-tracking.md.
+    slotNumber: integer("slot_number"),
     checklistMd: text("checklist_md").notNull(),
     worktree: text("worktree"), // working directory path for collision detection
     prUrl: text("pr_url"), // PR URL recorded when crux issues done --pr=URL is called
@@ -1086,6 +1093,11 @@ export const agentSessions = pgTable(
     index("idx_as_issue").on(table.issueNumber),
     index("idx_as_started_at").on(table.startedAt),
     index("idx_as_date").on(table.date),
+    // Partial index on non-null linear_id — empty for existing rows, so the
+    // create is O(0) at migration time. Used by the dedup pre-check.
+    index("idx_as_linear_id")
+      .on(table.linearId)
+      .where(sql`${table.linearId} IS NOT NULL`),
   ]
 );
 

@@ -6,6 +6,7 @@ import { GITHUB_REPO_URL } from "@lib/site-config";
 import { shortenDirectory } from "@lib/format";
 import type { ActiveAgentRow } from "./active-agents-content";
 import { AgentEventsPanel } from "./agent-events-panel";
+import { slotColumn, linearColumn } from "./shared-columns";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 
@@ -77,6 +78,7 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
+  slotColumn<ActiveAgentRow>(),
   {
     accessorKey: "sessionName",
     header: "Name",
@@ -139,6 +141,7 @@ const columns: ColumnDef<ActiveAgentRow>[] = [
       );
     },
   },
+  linearColumn<ActiveAgentRow>(),
   {
     accessorKey: "prNumber",
     header: "PR",

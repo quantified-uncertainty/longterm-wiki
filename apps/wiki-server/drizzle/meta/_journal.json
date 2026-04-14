@@ -1247,6 +1247,13 @@
       "when": 1784793600000,
       "tag": "0177_hallucination_risk_snapshots_fk_cascade",
       "breakpoints": true
+    },
+    {
+      "idx": 178,
+      "version": "7",
+      "when": 1784880000000,
+      "tag": "0178_agent_sessions_linear_id_slot",
+      "breakpoints": true
     }
   ]
 }
