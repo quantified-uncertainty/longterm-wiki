@@ -38,10 +38,10 @@ export function UncheckedSourcingState({
         <div className="flex items-start gap-3">
           <CircleHelp className="w-5 h-5 text-muted-foreground shrink-0 mt-0.5" />
           <div className="space-y-2 text-sm">
-            <p className="font-medium">Not yet source-checked</p>
+            <p className="font-medium">Not yet sourced</p>
             <p className="text-muted-foreground">
               This record exists in the database but has not been run through
-              the source-check pipeline yet. Once checked, this page will show
+              the sourcing pipeline yet. Once sourced, this page will show
               per-source verdicts, evidence, and links to the sources used.
             </p>
             {recordHref && (
