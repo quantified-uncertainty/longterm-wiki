@@ -110,10 +110,34 @@ Example: QUA-224 (Grafana dashboard, Dashboards) depends on QUA-221 (Agent Sessi
 
 ## Historical: why this doc exists
 
-2026-04-14 Linear refactor pass found:
+The 2026-04-14 Linear refactor pass found:
 - **16 orphan issues** (no project)
 - **22 issues in the wrong project** (sourcing split 3 ways being the worst cluster)
 - **3 closed umbrella issues** still cited as "Current focus" in project descriptions
 - **22 → 0 labels** after removing migration-era cruft
 
 The root cause of miscategorization wasn't malice — it was that the boundary between adjacent projects (sourcing/data-integrity, dashboards/automation, coordinator/automation) had never been written down. This doc is that boundary. Update it when a new systematic miscategorization emerges; don't let scope doctrine drift back into "gut feel."
+
+Full findings + methodology: [`docs/audits/2026-04-14-linear-refactor.md`](../../docs/audits/2026-04-14-linear-refactor.md).
+
+## The `crux linear hygiene` tool
+
+Run this quarterly (or any time the backlog feels messy):
+
+```bash
+pnpm crux linear hygiene          # human-readable report
+pnpm crux linear hygiene --json   # machine-readable
+```
+
+Scans all open QUA issues and reports:
+- Orphan count (issues with no project)
+- Label hygiene (coverage %, singleton labels, over-labeled issues)
+- Assignee coverage
+- Priority gaps (unprioritized count)
+- Stuck "In Progress" issues (>14 days since `startedAt`)
+- Thin tickets (<80 char description)
+- Open issue count per project
+
+If orphan count > 0, the new issues need projects assigned. If label count > 0 again, someone re-introduced a label and you need to decide whether to keep it (see § "Labels were the real discovery" in the audit doc).
+
+Source: `crux/lib/linear/hygiene.ts` + the `hygiene` entry in `crux/commands/linear.ts`.

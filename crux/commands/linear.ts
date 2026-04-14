@@ -39,6 +39,7 @@ import {
   type AuditBucket,
   type AuditEntry,
 } from '../lib/linear/audit.ts';
+import { runHygieneAudit, formatHygieneReport } from '../lib/linear/hygiene.ts';
 import { githubApi } from '../lib/github.ts';
 import { resolve as resolvePath } from 'path';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
@@ -377,6 +378,16 @@ async function done(args: string[], options: CommandOptions): Promise<CommandRes
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → ${targetState}\n`;
   if (options.pr) out += `  PR: ${options.pr}\n`;
   return { output: out, exitCode: 0 };
+}
+
+async function hygiene(_args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+  const report = await runHygieneAudit();
+  if (options.json) {
+    return { output: JSON.stringify(report, null, 2) + '\n', exitCode: 0 };
+  }
+  return { output: formatHygieneReport(report, c) + '\n', exitCode: 0 };
 }
 
 async function statesList(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -944,6 +955,7 @@ export const commands = {
   start,
   done,
   audit,
+  hygiene,
   'verify-pr': verifyPr,
   'leak-check': leakCheck,
   'states-list': statesList,
@@ -963,6 +975,7 @@ Commands:
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
   audit                         Classify In Progress issues by PR health (shipped/orphan/epic/active)
+  hygiene                       Metadata hygiene scan: orphans, label coverage, priority gaps, stuck tickets
   verify-pr <PR>                Watchdog: ensure merged PR's Fixes QUA-NNN issues are actually Done
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks
   states-list                   Show current QUA team workflow state IDs
