@@ -1,25 +1,2 @@
 entity: sid_jwe4re7Ggo
-facts:
-  [
-    {
-        id: Rx7TaITzhQ,
-        property: founded-date,
-        value: "1945",
-        source: https://www.wikidata.org/wiki/Q1128160,
-        notes: From Wikidata Q1128160
-      },
-    {
-        id: VxFKo3Ig1g,
-        property: headquarters,
-        value: Victor,
-        source: https://www.wikidata.org/wiki/Q1128160,
-        notes: From Wikidata Q1128160
-      },
-    {
-        id: 7wGAEYs8GQ,
-        property: website,
-        value: http://www.cbrands.com,
-        source: https://www.wikidata.org/wiki/Q1128160,
-        notes: From Wikidata Q1128160
-      }
-  ]
+facts: []
