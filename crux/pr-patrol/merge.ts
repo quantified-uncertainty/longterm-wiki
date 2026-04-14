@@ -1,9 +1,9 @@
 /**
- * PR Patrol — Merge queue execution (daemon-specific)
+ * PR Patrol — Auto-merge execution (daemon-specific)
  *
  * Pure merge eligibility checking lives in crux/lib/pr-analysis/merge-check.ts.
- * This module handles the actual merge queue enqueue and undraft execution with:
- *   - GitHub GraphQL API calls (enqueuePullRequestForMerge, undraft mutation)
+ * This module handles the actual auto-merge enable and undraft execution with:
+ *   - GitHub GraphQL API calls (enablePullRequestAutoMerge, markPullRequestReadyForReview)
  *   - Label management (stage:merging)
  *   - JSONL logging
  *   - Comment posting
@@ -85,25 +85,39 @@ async function removeLabel(prNum: number, repo: string, label: string): Promise<
   });
 }
 
-// ── Merge queue queries ──────────────────────────────────────────────────
-
-const ENQUEUE_MUTATION = `mutation($prId: ID!, $expectedHeadOid: GitObjectID) {
-  enqueuePullRequestForMerge(input: {
+// ── Auto-merge mutation ──────────────────────────────────────────────────
+//
+// GitHub GraphQL has no `enqueuePullRequestForMerge` mutation — that name is
+// a phantom. The canonical way to ask GitHub to merge a PR as soon as it is
+// eligible (branch-protection checks green, no outstanding reviews) is
+// `enablePullRequestAutoMerge` with an `EnablePullRequestAutoMergeInput`.
+//
+// The repo merges via "Create a merge commit" (see `git log` on origin/main
+// — every PR lands as a true two-parent merge commit, not a squash), so we
+// pass `mergeMethod: MERGE`. `expectedHeadOid` gives us optimistic
+// concurrency: if a new commit has landed on the PR branch between
+// candidate selection and mutation, GitHub will reject rather than
+// auto-merge a stale SHA.
+const ENABLE_AUTO_MERGE_MUTATION = `mutation EnableAutoMerge($prId: ID!, $expectedHeadOid: GitObjectID!) {
+  enablePullRequestAutoMerge(input: {
     pullRequestId: $prId
     expectedHeadOid: $expectedHeadOid
+    mergeMethod: MERGE
   }) {
-    mergeQueueEntry {
+    pullRequest {
       id
-      position
+      autoMergeRequest {
+        enabledAt
+      }
     }
   }
 }`;
 
-/** Check whether a PR is currently in the merge queue (read-only). */
-const QUEUE_STATUS_QUERY = `query($prId: ID!) {
+/** Check whether a PR has auto-merge enabled (read-only). */
+const AUTO_MERGE_STATUS_QUERY = `query($prId: ID!) {
   node(id: $prId) {
     ... on PullRequest {
-      mergeQueueEntry { id position }
+      autoMergeRequest { enabledAt }
     }
   }
 }`;
@@ -111,9 +125,9 @@ const QUEUE_STATUS_QUERY = `query($prId: ID!) {
 async function isInMergeQueue(nodeId: string): Promise<boolean> {
   try {
     const data = await githubGraphQL<{
-      node: { mergeQueueEntry: { id: string; position: number } | null } | null;
-    }>(QUEUE_STATUS_QUERY, { prId: nodeId });
-    return data.node?.mergeQueueEntry != null;
+      node: { autoMergeRequest: { enabledAt: string | null } | null } | null;
+    }>(AUTO_MERGE_STATUS_QUERY, { prId: nodeId });
+    return data.node?.autoMergeRequest != null;
   } catch {
     // If the query fails, assume indeterminate — safer to keep the label
     return true;
@@ -148,8 +162,10 @@ export async function enqueuePr(
     // Add stage:merging label first to prevent double-enqueue on next cycle
     await addLabel(candidate.number, config.repo, LABELS.STAGE_MERGING);
 
-    // Enqueue via GraphQL mutation — uses node ID and head SHA for optimistic concurrency
-    await githubGraphQL(ENQUEUE_MUTATION, {
+    // Enable auto-merge via GraphQL mutation — uses node ID and head SHA
+    // for optimistic concurrency. GitHub will run CI on the PR branch and
+    // merge automatically once all branch-protection conditions pass.
+    await githubGraphQL(ENABLE_AUTO_MERGE_MUTATION, {
       prId: candidate.nodeId,
       expectedHeadOid: candidate.headOid,
     });
