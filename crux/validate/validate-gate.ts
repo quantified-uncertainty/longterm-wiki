@@ -732,6 +732,17 @@ const PARALLEL_STEPS: Step[] = [
     // will fail this check. Add exemptions with reasons for legitimate exceptions.
   },
   {
+    id: 'tablebase-registry',
+    name: 'Tablebase registry ↔ route file cross-check',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-tablebase-registry.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking (QUA-456): catches drift between crux/tablebase/table-registry.ts
+    // and the wiki-server tablebase route files. New registry entries must
+    // point at real files, new routes with /sync must be registered, and
+    // every syncPath/deletePath must resolve to a declared handler.
+  },
+  {
     id: 'display-formatting',
     name: 'Display formatting quality (no [object Object], no unescaped MDX in titles)',
     command: 'npx',
