@@ -250,8 +250,74 @@ describe('parseTranscript', () => {
 });
 
 describe('findLatestTranscript', () => {
+  let fakeHome: string;
+  let originalHome: string | undefined;
+
+  beforeEach(() => {
+    fakeHome = fs.mkdtempSync(path.join(os.tmpdir(), 'fake-home-'));
+    originalHome = process.env.HOME;
+    process.env.HOME = fakeHome;
+  });
+
+  afterEach(() => {
+    if (originalHome === undefined) delete process.env.HOME;
+    else process.env.HOME = originalHome;
+    fs.rmSync(fakeHome, { recursive: true, force: true });
+  });
+
+  // Writes a fake transcript where Claude Code would — the slug is how Claude
+  // Code derives the project directory name, not how we want it to look.
+  function seedTranscript(claudeSlug: string, fileName: string): string {
+    const slugDir = path.join(fakeHome, '.claude', 'projects', claudeSlug);
+    fs.mkdirSync(slugDir, { recursive: true });
+    const filePath = path.join(slugDir, fileName);
+    fs.writeFileSync(filePath, '{}\n');
+    return filePath;
+  }
+
   it('returns null for non-existent project dir', () => {
     const result = findLatestTranscript('/nonexistent/path/that/does/not/exist');
     expect(result).toBeNull();
+  });
+
+  // Regression: the old slug regex only replaced `/`, so workspaces under
+  // `GitHub.nosync` (and any path with a dotted ancestor, including `.claude`)
+  // silently bailed with "No JSONL transcript found", leaving the SessionEnd
+  // hook a no-op. See QUA-471.
+  it('finds transcript when project path contains dots (GitHub.nosync case)', () => {
+    const projectDir = '/tmp/Documents/GitHub.nosync/lw/a10';
+    const expected = seedTranscript(
+      '-tmp-Documents-GitHub-nosync-lw-a10',
+      'abc-123.jsonl',
+    );
+    expect(findLatestTranscript(projectDir)).toBe(expected);
+  });
+
+  it('finds transcript for the .claude worktree path shape', () => {
+    const projectDir = '/tmp/lw/main/.claude/worktrees/admiring-bohr';
+    const expected = seedTranscript(
+      '-tmp-lw-main--claude-worktrees-admiring-bohr',
+      'xyz.jsonl',
+    );
+    expect(findLatestTranscript(projectDir)).toBe(expected);
+  });
+
+  it('finds transcript for a plain / path (no regression)', () => {
+    const projectDir = '/tmp/plain/project/root';
+    const expected = seedTranscript(
+      '-tmp-plain-project-root',
+      'session.jsonl',
+    );
+    expect(findLatestTranscript(projectDir)).toBe(expected);
+  });
+
+  it('returns the newest transcript when multiple exist', () => {
+    const projectDir = '/tmp/GitHub.nosync/project';
+    const older = seedTranscript('-tmp-GitHub-nosync-project', 'old.jsonl');
+    // Ensure mtime difference even on fast filesystems
+    const oldTime = new Date(Date.now() - 10_000);
+    fs.utimesSync(older, oldTime, oldTime);
+    const newer = seedTranscript('-tmp-GitHub-nosync-project', 'new.jsonl');
+    expect(findLatestTranscript(projectDir)).toBe(newer);
   });
 });
