@@ -2,14 +2,28 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
 
-// ---- In-memory store simulating Postgres facts table ----
+// ---- In-memory stores simulating Postgres facts and things tables ----
 
 let factsStore: Map<string, Record<string, unknown>>;
+let thingsStore: Map<string, Record<string, unknown>>; // key: `${source_table}::${source_id}`
 let nextId: number;
 
 function resetStores() {
   factsStore = new Map();
+  thingsStore = new Map();
   nextId = 1;
+}
+
+function thingsKey(sourceTable: string, sourceId: string) {
+  return `${sourceTable}::${sourceId}`;
+}
+
+/** Inject a things row directly. Used for the prune-cleans-things test. */
+function injectThing(sourceTable: string, sourceId: string) {
+  thingsStore.set(thingsKey(sourceTable, sourceId), {
+    source_table: sourceTable,
+    source_id: sourceId,
+  });
 }
 
 /** Composite key for the unique index */
@@ -230,6 +244,59 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (row.measure) unique.add(row.measure as string);
     }
     return [{ count: unique.size }];
+  }
+
+  // --- prune: SELECT id, entity_id, fact_id FROM facts WHERE entity_id IN (...) ---
+  // No order by, no count, no measure filter — match the prune query shape.
+  if (
+    q.includes('"facts"') &&
+    q.includes("where") &&
+    q.includes("entity_id") &&
+    q.includes(" in ") &&
+    !q.includes("order by") &&
+    !q.includes("count(*)") &&
+    !q.includes("delete") &&
+    !q.includes("insert")
+  ) {
+    const ids = new Set(params as string[]);
+    const rows: Array<{ id: unknown; entity_id: unknown; fact_id: unknown }> = [];
+    for (const row of factsStore.values()) {
+      if (ids.has(row.entity_id as string)) {
+        rows.push({
+          id: row.id,
+          entity_id: row.entity_id,
+          fact_id: row.fact_id,
+        });
+      }
+    }
+    return rows;
+  }
+
+  // --- prune: DELETE FROM facts WHERE id IN (...) ---
+  if (q.includes("delete") && q.includes('"facts"')) {
+    const idsToDelete = new Set(params);
+    for (const [key, row] of factsStore) {
+      if (idsToDelete.has(row.id)) {
+        factsStore.delete(key);
+      }
+    }
+    return [];
+  }
+
+  // --- prune: DELETE FROM things WHERE source_table = ? AND source_id IN (...) ---
+  if (q.includes("delete") && q.includes('"things"')) {
+    // First param is the source_table literal, the rest are source_ids.
+    const sourceTable = params[0] as string;
+    const sourceIds = new Set(params.slice(1) as string[]);
+    for (const [key, row] of thingsStore) {
+      if (
+        row.source_table === sourceTable &&
+        sourceIds.has(row.source_id as string)
+      ) {
+        thingsStore.delete(key);
+      }
+    }
+    return [];
   }
 
   // --- entity_ids: COUNT (for health check) ---
@@ -745,6 +812,263 @@ describe("Facts API", () => {
       });
 
       expect(res.status).toBe(200);
+    });
+  });
+
+  // ---- Prune ----
+
+  describe("POST /api/facts/prune (QUA-462)", () => {
+    it("deletes facts whose factId is not in the keep list for an entity", async () => {
+      // Seed three facts for anthropic.
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_keep1", label: "Keep 1", value: "1", numeric: 1, asOf: "2025-01", measure: "x" },
+          { entityId: "anthropic", factId: "f_keep2", label: "Keep 2", value: "2", numeric: 2, asOf: "2025-02", measure: "x" },
+          { entityId: "anthropic", factId: "f_stale", label: "Stale", value: "3", numeric: 3, asOf: "2025-03", measure: "x" },
+        ],
+      });
+      expect(factsStore.size).toBe(3);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_keep1", "f_keep2"] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.ids).toEqual([{ entityId: "anthropic", factId: "f_stale" }]);
+      expect(factsStore.size).toBe(2);
+      // The kept rows are still there.
+      expect(factKey("anthropic", "f_keep1") in Object.fromEntries(factsStore)).toBe(true);
+      expect(factKey("anthropic", "f_stale") in Object.fromEntries(factsStore)).toBe(false);
+    });
+
+    it("deletes ALL facts for an entity when its keep list is empty (constellation case from QUA-462)", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "constellation", factId: "f_alcohol1", label: "Founded", value: "1945", numeric: 1945, asOf: "1945", measure: "founded" },
+          { entityId: "constellation", factId: "f_alcohol2", label: "HQ", value: "Victor", measure: "hq" },
+          { entityId: "constellation", factId: "f_alcohol3", label: "Industry", value: "Alcohol", measure: "industry" },
+          // Unrelated entity that must NOT be touched.
+          { entityId: "anthropic", factId: "f_keep", label: "Valuation", value: "61000000000", numeric: 61000000000, measure: "valuation" },
+        ],
+      });
+      expect(factsStore.size).toBe(4);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "constellation", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(3);
+      // The other entity's facts are left alone — partial syncs are safe.
+      expect(factsStore.size).toBe(1);
+      const remaining = Array.from(factsStore.values())[0];
+      expect(remaining.entity_id).toBe("anthropic");
+    });
+
+    it("never touches facts for entities not in the request (cross-entity safety)", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
+          { entityId: "openai", factId: "f_b", label: "B", value: "2", numeric: 2, measure: "x" },
+          { entityId: "deepmind", factId: "f_c", label: "C", value: "3", numeric: 3, measure: "x" },
+        ],
+      });
+
+      // Prune with only anthropic in the request — openai and deepmind facts
+      // must survive even though the request technically "doesn't keep" them.
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_a"] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(0);
+      expect(factsStore.size).toBe(3);
+    });
+
+    it("removes the dual-write things rows for deleted facts", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "constellation", factId: "f_old", label: "Founded", value: "1945", numeric: 1945, measure: "founded" },
+        ],
+      });
+      // Inject the matching things row that the sync's dual-write would
+      // have produced (the dispatcher's no-op INSERT path doesn't track it).
+      injectThing("facts", "constellation:f_old");
+      expect(thingsStore.size).toBe(1);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "constellation", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(factsStore.size).toBe(0);
+      // The dual-write row was cleaned up — orphan things rows would otherwise
+      // keep the constellation founded fact visible on /organizations/*/data.
+      expect(thingsStore.size).toBe(0);
+    });
+
+    it("returns 0 deleted when all facts in the keep list match what is in PG", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
+        ],
+      });
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_a"] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(0);
+      expect(body.ids).toEqual([]);
+    });
+
+    it("returns 0 deleted when entries is empty", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
+        ],
+      });
+
+      const res = await postJson(app, "/api/facts/prune", { entries: [] });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(0);
+      expect(factsStore.size).toBe(1);
+    });
+
+    it("rejects malformed entries", async () => {
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "", factIds: [] }],
+      });
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects request with no entries field", async () => {
+      const res = await postJson(app, "/api/facts/prune", {});
+      expect(res.status).toBe(400);
+    });
+
+    it("is idempotent — a second prune is a no-op", async () => {
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_keep", label: "K", value: "1", numeric: 1, measure: "x" },
+          { entityId: "anthropic", factId: "f_stale", label: "S", value: "2", numeric: 2, measure: "x" },
+        ],
+      });
+
+      const first = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_keep"] }],
+      });
+      expect(first.status).toBe(200);
+      expect((await first.json()).deleted).toBe(1);
+      expect(factsStore.size).toBe(1);
+
+      // Second call: PG already matches YAML, nothing to do.
+      const second = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_keep"] }],
+      });
+      expect(second.status).toBe(200);
+      const body = await second.json();
+      expect(body.deleted).toBe(0);
+      expect(body.ids).toEqual([]);
+      expect(factsStore.size).toBe(1);
+    });
+
+    it("handles URL-unsafe characters in entityId / factId (things-row key safety)", async () => {
+      // Characters that need percent-encoding in the things.source_id key.
+      // The toFactThingKey used by /sync and /prune must match so the
+      // dual-write row is found and deleted.
+      const entityId = "sid_with:colon";
+      const factId = "f_with space";
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId, factId, label: "X", value: "1", numeric: 1, measure: "x" },
+        ],
+      });
+      // Inject the matching things row (dispatch does not track dual-writes).
+      // The encoded key is what /sync produces and what /prune queries.
+      injectThing(
+        "facts",
+        `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`,
+      );
+      expect(thingsStore.size).toBe(1);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId, factIds: [] }],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.ids[0]).toEqual({ entityId, factId });
+      expect(factsStore.size).toBe(0);
+      expect(thingsStore.size).toBe(0);
+    });
+
+    it("handles a larger batch across many entities", async () => {
+      // Seed 50 entities × 3 facts = 150 rows, keep only 1 fact per entity → 100 stale.
+      const facts: Array<Record<string, unknown>> = [];
+      for (let i = 0; i < 50; i++) {
+        const eid = `sid_ent${i}`;
+        for (const suf of ["keep", "stale1", "stale2"]) {
+          facts.push({
+            entityId: eid,
+            factId: `f_${suf}`,
+            label: suf,
+            value: "1",
+            numeric: 1,
+            measure: "x",
+          });
+        }
+      }
+      await postJson(app, "/api/facts/sync", { facts });
+      expect(factsStore.size).toBe(150);
+
+      const entries = Array.from({ length: 50 }, (_, i) => ({
+        entityId: `sid_ent${i}`,
+        factIds: ["f_keep"],
+      }));
+      const res = await postJson(app, "/api/facts/prune", { entries });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(100);
+      expect(body.ids).toHaveLength(100);
+      // Every surviving row is a "keep".
+      expect(factsStore.size).toBe(50);
+      for (const row of factsStore.values()) {
+        expect(row.fact_id).toBe("f_keep");
+      }
+    });
+
+    it("returns a stable response shape for the typed client cast", async () => {
+      // The client in crux/wiki-server/sync-facts.ts casts the response as
+      // `{ deleted: number; ids: Array<{ entityId: string; factId: string }> }`.
+      // If a future refactor changes the shape, this test will catch it before
+      // the crux side silently breaks.
+      await postJson(app, "/api/facts/sync", {
+        facts: [
+          { entityId: "anthropic", factId: "f_stale", label: "S", value: "1", numeric: 1, measure: "x" },
+        ],
+      });
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+      const body = await res.json();
+      expect(typeof body.deleted).toBe("number");
+      expect(Array.isArray(body.ids)).toBe(true);
+      expect(body.ids[0]).toHaveProperty("entityId");
+      expect(body.ids[0]).toHaveProperty("factId");
+      // Exactly these two keys — no accidental extra fields.
+      expect(Object.keys(body.ids[0]).sort()).toEqual(["entityId", "factId"]);
+      expect(Object.keys(body).sort()).toEqual(["deleted", "ids"]);
     });
   });
 });

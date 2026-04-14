@@ -10,6 +10,7 @@
  *   pnpm crux wiki-server sync-facts
  *   pnpm crux wiki-server sync-facts --dry-run
  *   pnpm crux wiki-server sync-facts --batch-size=200
+ *   pnpm crux wiki-server sync-facts --skip-prune
  *
  * Environment:
  *   LONGTERMWIKI_SERVER_URL   - Base URL of the wiki server
@@ -19,17 +20,23 @@
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
+import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server/client.ts";
 import { loadKB } from "../../packages/factbase/src/loader.ts";
 import type { Fact, FactValue, Property } from "../../packages/factbase/src/types.ts";
 import type { SyncFact } from "../../apps/wiki-server/src/api-types.ts";
-import { waitForHealthy, batchSync } from "./sync-common.ts";
+import { waitForHealthy, batchSync, fetchWithRetry } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const KB_DATA_DIR = join(PROJECT_ROOT, "packages", "factbase", "data");
 
 // --- Configuration ---
 const DEFAULT_BATCH_SIZE = 500;
+/**
+ * Max number of (entityId → factIds) entries per /prune request. The server
+ * caps this at 5000 entries; we batch below that to keep individual requests
+ * small and the SELECT-then-DELETE work bounded.
+ */
+const PRUNE_BATCH_SIZE = 1000;
 
 // --- Helpers ---
 
@@ -122,26 +129,48 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
 
 /**
  * Load all KB facts and transform them into SyncFact payloads.
+ *
+ * Also returns `entityIdsWithNoFacts`: KB entities that exist in YAML but
+ * emitted zero source facts after filtering derived/inverse facts. This is
+ * the QUA-462 constellation case — the entity is still in the KB but its
+ * `things/<entity>.yaml` file was emptied. Without this, the prune step has
+ * no way to know about the entity (it never appears in the syncFacts list)
+ * and orphan PG facts for it leak forever.
+ *
  * Exported for testing.
  */
 export async function loadAndTransformFacts(
   dataDir: string = KB_DATA_DIR,
-): Promise<{ facts: SyncFact[]; entityCount: number }> {
+): Promise<{
+  facts: SyncFact[];
+  entityCount: number;
+  entityIdsWithNoFacts: string[];
+}> {
   const { graph } = await loadKB(dataDir);
   const allEntities = graph.getAllEntities();
   const syncFacts: SyncFact[] = [];
+  const entityIdsWithNoFacts: string[] = [];
 
   for (const entity of allEntities) {
     const facts = graph.getFacts(entity.id);
+    let kept = 0;
     for (const fact of facts) {
       // Skip derived/inverse facts — they are computed, not source data
       if (fact.derivedFrom) continue;
       const property = graph.getProperty(fact.propertyId);
       syncFacts.push(transformFact(fact, property));
+      kept++;
+    }
+    if (kept === 0) {
+      entityIdsWithNoFacts.push(entity.id);
     }
   }
 
-  return { facts: syncFacts, entityCount: allEntities.length };
+  return {
+    facts: syncFacts,
+    entityCount: allEntities.length,
+    entityIdsWithNoFacts,
+  };
 }
 
 /**
@@ -171,11 +200,115 @@ export async function syncFactsBatch(
   return { upserted: result.count, errors: result.errors };
 }
 
+/**
+ * Group facts by entityId into `{ entityId, factIds }` entries suitable for
+ * the /prune endpoint. Entities with no facts are NOT represented (the caller
+ * has no way to know about empty entities since loadAndTransformFacts only
+ * yields rows for facts that exist). For empty-yaml entities, the entity-side
+ * cascade (`facts.entity_id ON DELETE CASCADE`) handles it once the entity is
+ * removed; for entities that still exist but lost all their facts, the YAML
+ * loader emits zero facts so we won't see them here either.
+ *
+ * To handle that second case, callers should pass `entityIdsWithNoFacts` —
+ * entities present in YAML but emitting zero facts — so we can include them
+ * with empty factIds and let the prune endpoint clear all their facts.
+ *
+ * Exported for testing.
+ */
+export function groupFactsByEntity(
+  items: SyncFact[],
+  entityIdsWithNoFacts: string[] = [],
+): Array<{ entityId: string; factIds: string[] }> {
+  const byEntity = new Map<string, string[]>();
+  for (const f of items) {
+    const ids = byEntity.get(f.entityId) ?? [];
+    ids.push(f.factId);
+    byEntity.set(f.entityId, ids);
+  }
+  for (const eid of entityIdsWithNoFacts) {
+    if (!byEntity.has(eid)) byEntity.set(eid, []);
+  }
+  return Array.from(byEntity, ([entityId, factIds]) => ({ entityId, factIds }));
+}
+
+/**
+ * Prune stale facts from PG that are no longer in the YAML source.
+ *
+ * Sends batches of (entityId, factIds) entries to /api/facts/prune. The server
+ * deletes any fact in PG whose entityId is in the batch but whose factId is
+ * NOT in the keep list — facts for entities not in the request are untouched,
+ * so a partial sync cannot delete cross-entity data.
+ *
+ * Exported for testing.
+ */
+export async function pruneFacts(
+  serverUrl: string,
+  items: SyncFact[],
+  entityIdsWithNoFacts: string[] = [],
+  options: { batchSize?: number } = {},
+): Promise<{ deleted: number; ids: Array<{ entityId: string; factId: string }> }> {
+  const batchSize = options.batchSize ?? PRUNE_BATCH_SIZE;
+  const entries = groupFactsByEntity(items, entityIdsWithNoFacts);
+
+  if (entries.length === 0) {
+    return { deleted: 0, ids: [] };
+  }
+
+  let totalDeleted = 0;
+  const allDeletedIds: Array<{ entityId: string; factId: string }> = [];
+
+  for (let i = 0; i < entries.length; i += batchSize) {
+    const batch = entries.slice(i, i + batchSize);
+    try {
+      const res = await fetchWithRetry(
+        `${serverUrl}/api/facts/prune`,
+        {
+          method: "POST",
+          headers: buildHeaders(),
+          body: JSON.stringify({ entries: batch }),
+        },
+      );
+
+      if (!res.ok) {
+        const body = await res.text();
+        console.warn(
+          `  Prune batch ${Math.floor(i / batchSize) + 1}: HTTP ${res.status} — ${body.slice(0, 200)}`,
+        );
+        continue;
+      }
+
+      const result = (await res.json()) as {
+        deleted: number;
+        ids: Array<{ entityId: string; factId: string }>;
+      };
+      if (result.deleted > 0) {
+        const sample = result.ids
+          .slice(0, 5)
+          .map((x) => `${x.entityId}/${x.factId}`)
+          .join(", ");
+        const more = result.ids.length > 5 ? ` ...(+${result.ids.length - 5} more)` : "";
+        console.log(
+          `  Prune batch ${Math.floor(i / batchSize) + 1}: removed ${result.deleted} stale facts: ${sample}${more}`,
+        );
+        totalDeleted += result.deleted;
+        allDeletedIds.push(...result.ids);
+      }
+    } catch (err) {
+      console.warn(
+        `  Prune batch ${Math.floor(i / batchSize) + 1}: failed — ${err instanceof Error ? err.message : err}`,
+      );
+    }
+  }
+
+  return { deleted: totalDeleted, ids: allDeletedIds };
+}
+
 // --- CLI ---
 
 async function main() {
   const args = parseCliArgs(process.argv.slice(2));
   const dryRun = args["dry-run"] === true;
+  const skipPrune = args["skip-prune"] === true;
   const batchSize = Number(args["batch-size"]) || DEFAULT_BATCH_SIZE;
 
   const serverUrl = getServerUrl();
@@ -196,7 +329,7 @@ async function main() {
 
   // Load facts
   console.log(`Reading KB facts from: ${KB_DATA_DIR}`);
-  const { facts, entityCount } = await loadAndTransformFacts();
+  const { facts, entityCount, entityIdsWithNoFacts } = await loadAndTransformFacts();
 
   // Group by value type for summary
   const byType = new Map<string, number>();
@@ -245,6 +378,24 @@ async function main() {
   if (result.errors > 0) {
     console.log(`  Errors:  ${result.errors}`);
     process.exit(1);
+  }
+
+  // Prune stale facts (those in PG whose factId is no longer in YAML for an
+  // entity present in the sync). Skipped if the sync had errors or if the
+  // operator opts out — partial syncs must not delete cross-entity data.
+  // The result.errors > 0 branch above already process.exit(1)s, but the
+  // explicit check here is intentional belt-and-suspenders so a future
+  // refactor can't accidentally let the prune fire on a partial sync.
+  if (skipPrune) {
+    console.log("\nSkipping prune (--skip-prune)");
+  } else if (result.errors === 0) {
+    console.log("\nPruning stale facts...");
+    const pruneResult = await pruneFacts(serverUrl, facts, entityIdsWithNoFacts);
+    if (pruneResult.deleted > 0) {
+      console.log(`  Pruned: ${pruneResult.deleted} stale facts`);
+    } else {
+      console.log("  No stale facts to prune");
+    }
   }
 }
 

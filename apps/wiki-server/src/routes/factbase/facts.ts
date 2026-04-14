@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, isNotNull, lte } from "drizzle-orm";
+import { eq, and, count, asc, sql, isNotNull, lte, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { facts, entities, resources } from "../../schema.js";
+import { facts, entities, resources, things } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import {
@@ -597,7 +597,112 @@ const factsApp = new Hono()
     }
 
     return c.json({ upserted });
-  });
+  })
+
+  // ---- POST /prune ----
+  // Remove stale facts from PG that are no longer in the YAML source.
+  //
+  // The caller (sync-facts.ts) sends `entries`: the full set of facts it owns
+  // for each entityId. The endpoint deletes any fact in PG whose `entityId` is
+  // present in the request but whose `factId` is NOT in the keep list for that
+  // entity. Facts for entityIds not in the request are never touched, so
+  // partial syncs cannot cause cross-entity data loss.
+  //
+  // Empty `factIds` for an entry means "this entity has no facts" — all of its
+  // facts in PG are deleted (the constellation case from QUA-462). The dual-
+  // write `things` rows for deleted facts are cleaned up in the same
+  // transaction.
+  .post(
+    "/prune",
+    zv(
+      "json",
+      z.object({
+        entries: z
+          .array(
+            z.object({
+              entityId: z.string().min(1).max(500),
+              factIds: z.array(z.string().min(1).max(200)).max(2000),
+            }),
+          )
+          .min(0)
+          .max(5000),
+      }),
+    ),
+    async (c) => {
+      const { entries } = c.req.valid("json");
+      if (entries.length === 0) {
+        return c.json({ deleted: 0, ids: [] });
+      }
+
+      const db = getDrizzleDb();
+
+      const entityIds = [...new Set(entries.map((e) => e.entityId))];
+      const keepSet = new Set<string>();
+      for (const entry of entries) {
+        for (const factId of entry.factIds) {
+          keepSet.add(`${entry.entityId}\u0000${factId}`);
+        }
+      }
+
+      try {
+        const currentRows = await db
+          .select({
+            id: facts.id,
+            entityId: facts.entityId,
+            factId: facts.factId,
+          })
+          .from(facts)
+          .where(inArray(facts.entityId, entityIds));
+
+        const stale = currentRows.filter(
+          (r) => !keepSet.has(`${r.entityId}\u0000${r.factId}`),
+        );
+
+        if (stale.length === 0) {
+          return c.json({ deleted: 0, ids: [] });
+        }
+
+        // Log before deleting (destructive operation).
+        logger.info(
+          {
+            count: stale.length,
+            entities: entityIds.length,
+            sample: stale.slice(0, 10).map((r) => `${r.entityId}/${r.factId}`),
+          },
+          `Deleting ${stale.length} stale facts across ${entityIds.length} entities`,
+        );
+
+        const staleRowIds = stale.map((r) => r.id);
+        const toFactThingKey = (entityId: string, factId: string) =>
+          `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+        const staleThingIds = stale.map((r) =>
+          toFactThingKey(r.entityId, r.factId),
+        );
+
+        await db.transaction(async (tx) => {
+          // Clean up the dual-write things rows first (no FK from things →
+          // facts, but ordering is consistent with the entities prune).
+          await tx
+            .delete(things)
+            .where(
+              and(
+                eq(things.sourceTable, "facts"),
+                inArray(things.sourceId, staleThingIds),
+              ),
+            );
+
+          await tx.delete(facts).where(inArray(facts.id, staleRowIds));
+        });
+
+        return c.json({
+          deleted: stale.length,
+          ids: stale.map((r) => ({ entityId: r.entityId, factId: r.factId })),
+        });
+      } catch (err) {
+        return dbError(c, "facts prune", err, { entityCount: entityIds.length });
+      }
+    },
+  );
   // NOTE: Duplicate /export route was removed here. The active /export route is
   // defined above (uses pgRowToFact). See #3173.
 
