@@ -129,7 +129,11 @@ The parser in `crux/lib/linear/parse-id.ts` uses an allowlist of known team keys
 | Forgetting `LINEAR_API_KEY` | Silent skip of all Linear state updates | Sync `.env.base` or `export LINEAR_API_KEY=...` |
 | Manually moving issues in Linear UI during active agent session | Agent's `crux linear done` may override the manual state | Let the agent pipeline manage state |
 
-## 9. Key files
+## 9. Project ownership — which project does an issue belong in?
+
+See **`.claude/rules/linear-project-ownership.md`** for the decision rules on which of the 6 open QUA projects a new issue belongs in. The boundaries between Automation & Infrastructure, Source-Check & Verification, Data Integrity, Dashboards & Visibility, Content Quality & Enrichment, and Coordinator & Agent Tooling are non-obvious and get crossed repeatedly without an explicit doctrine. File new issues with a project from the start — orphans accumulate and the 2026-04-14 refactor pass had to move 22 issues between projects.
+
+## 10. Key files
 
 | File | Purpose |
 |------|---------|

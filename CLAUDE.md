@@ -208,6 +208,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 - `.claude/rules/auto-update-system.md` — Auto-update system
 - `.claude/rules/worktree-isolation-bug.md` — Known Claude Code worktree CWD bug (DO NOT USE `isolation: "worktree"`)
 - `.claude/rules/linear-integration.md` — Linear-GitHub integration, branch naming, auto-close, `crux linear` commands
+- `.claude/rules/linear-project-ownership.md` — Decision rules for which of the 6 QUA projects a new issue belongs in (scope-boundary doctrine)
 - `.claude/rules/dispatched-agent-review.md` — Dispatched subagents MUST run `/agent-review-pr` + `/agent-ship`, never raw `gh pr create`
 
 ## Subsystem Maps — Read BEFORE proposing work in these areas
