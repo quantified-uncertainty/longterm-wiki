@@ -47,16 +47,21 @@ const sql = postgres(URL, {
   },
 });
 
-type Timing = { label: string; ms: number };
-const timings: Timing[] = [];
-
-async function time<T>(label: string, fn: () => Promise<T>): Promise<T> {
+async function time(label: string, fn: () => Promise<unknown>): Promise<number> {
   const start = process.hrtime.bigint();
-  const r = await fn();
+  await fn();
   const ms = Number(process.hrtime.bigint() - start) / 1e6;
-  timings.push({ label, ms });
   console.error(`  [${ms.toFixed(1)}ms] ${label}`);
-  return r;
+  return ms;
+}
+
+function toTsquery(q: string): string {
+  return q
+    .split(/\s+/)
+    .map((t) => t.replace(/[^a-z0-9]/gi, ""))
+    .filter(Boolean)
+    .map((t) => `${t}:*`)
+    .join(" & ");
 }
 
 async function bench<T>(label: string, n: number, fn: () => Promise<T>): Promise<{ label: string; n: number; p50: number; p95: number; p99: number; min: number; max: number; samples: number[] }> {
@@ -135,27 +140,27 @@ async function main() {
     "nonexistentxyzqueryqwerty",
   ];
 
-  const baselineBench: Record<string, unknown>[] = [];
-  for (const q of queries) {
-    const tsquery = q
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((t) => `${t.replace(/[^a-z0-9]/gi, "")}:*`)
-      .filter(Boolean)
-      .join(" & ");
-    if (!tsquery) continue;
-    const stat = await bench(`baseline: "${q}"`, 5, async () => {
-      await sql`
-        SELECT t.id, t.title, ts_rank(t.search_vector, to_tsquery('english', ${tsquery})) AS rank
-        FROM things t
-        WHERE t.search_vector @@ to_tsquery('english', ${tsquery})
-        ORDER BY rank DESC
-        LIMIT 20
-      `;
-    });
-    baselineBench.push({ query: q, tsquery, ...stat });
+  async function benchFtsOn(table: string, variant: "baseline" | "mv") {
+    const out: Record<string, unknown>[] = [];
+    for (const q of queries) {
+      const tsquery = toTsquery(q);
+      if (!tsquery) continue;
+      const stat = await bench(`${variant}: "${q}"`, 5, async () => {
+        await sql.unsafe(
+          `SELECT t.id, t.title, ts_rank(t.search_vector, to_tsquery('english', $1)) AS rank
+           FROM ${table} t
+           WHERE t.search_vector @@ to_tsquery('english', $1)
+           ORDER BY rank DESC
+           LIMIT 20`,
+          [tsquery],
+        );
+      });
+      out.push({ query: q, tsquery, ...stat });
+    }
+    return out;
   }
-  results.baseline_queries = baselineBench;
+
+  results.baseline_queries = await benchFtsOn("things", "baseline");
 
   // === 2. TEMP TABLE build — simulates MV refresh cost (self-SELECT variant) ===
   console.error("\n=== 2. TEMP TABLE build (MV refresh simulation, self-SELECT) ===");
@@ -168,47 +173,50 @@ async function main() {
     console.error(`  --- run ${run}/${buildRuns} ---`);
     await sql`DROP TABLE IF EXISTS things_search_bench`;
 
-    await time(`run ${run}: CREATE TEMP TABLE ... AS SELECT`, async () => {
-      await sql.unsafe(`
-        CREATE TEMP TABLE things_search_bench AS
-        SELECT
-          t.id,
-          t.thing_type,
-          t.title,
-          t.parent_thing_id,
-          t.source_table,
-          t.source_id,
-          t.entity_type,
-          t.description,
-          t.source_url,
-          t.wiki_id,
-          t.parent_title,
-          t.created_at,
-          t.updated_at,
-          t.synced_at,
-          (
-            setweight(to_tsvector('english', coalesce(t.title, '')), 'A') ||
-            setweight(to_tsvector('english', coalesce(t.parent_title, '')), 'B') ||
-            setweight(to_tsvector('english', coalesce(t.description, '')), 'C') ||
-            setweight(to_tsvector('english',
-              coalesce(replace(t.thing_type, '-', ' '), '') || ' ' ||
-              coalesce(replace(t.entity_type, '-', ' '), '')
-            ), 'D')
-          ) AS search_vector
-        FROM things t
-      `);
-    });
-    buildTimings.push(timings[timings.length - 1].ms);
+    buildTimings.push(
+      await time(`run ${run}: CREATE TEMP TABLE ... AS SELECT`, () =>
+        sql.unsafe(`
+          CREATE TEMP TABLE things_search_bench AS
+          SELECT
+            t.id,
+            t.thing_type,
+            t.title,
+            t.parent_thing_id,
+            t.source_table,
+            t.source_id,
+            t.entity_type,
+            t.description,
+            t.source_url,
+            t.wiki_id,
+            t.parent_title,
+            t.created_at,
+            t.updated_at,
+            t.synced_at,
+            (
+              setweight(to_tsvector('english', coalesce(t.title, '')), 'A') ||
+              setweight(to_tsvector('english', coalesce(t.parent_title, '')), 'B') ||
+              setweight(to_tsvector('english', coalesce(t.description, '')), 'C') ||
+              setweight(to_tsvector('english',
+                coalesce(replace(t.thing_type, '-', ' '), '') || ' ' ||
+                coalesce(replace(t.entity_type, '-', ' '), '')
+              ), 'D')
+            ) AS search_vector
+          FROM things t
+        `),
+      ),
+    );
 
-    await time(`run ${run}: CREATE UNIQUE INDEX pkey`, async () => {
-      await sql.unsafe(`CREATE UNIQUE INDEX things_search_bench_pkey ON things_search_bench (id)`);
-    });
-    pk1Timings.push(timings[timings.length - 1].ms);
+    pk1Timings.push(
+      await time(`run ${run}: CREATE UNIQUE INDEX pkey`, () =>
+        sql.unsafe(`CREATE UNIQUE INDEX things_search_bench_pkey ON things_search_bench (id)`),
+      ),
+    );
 
-    await time(`run ${run}: CREATE GIN INDEX search_vector`, async () => {
-      await sql.unsafe(`CREATE INDEX things_search_bench_gin ON things_search_bench USING GIN (search_vector)`);
-    });
-    gin1Timings.push(timings[timings.length - 1].ms);
+    gin1Timings.push(
+      await time(`run ${run}: CREATE GIN INDEX search_vector`, () =>
+        sql.unsafe(`CREATE INDEX things_search_bench_gin ON things_search_bench USING GIN (search_vector)`),
+      ),
+    );
 
     // Size of the constructed object.
     const sizes = await sql`
@@ -223,38 +231,19 @@ async function main() {
     await sql.unsafe(`ANALYZE things_search_bench`);
   }
 
+  const sum = (xs: number[]) => xs.reduce((a, b) => a + b, 0);
+  const buildAvg = sum(buildTimings) / buildRuns;
   results.temp_build_runs = {
     build_ms: buildTimings,
     pk_index_ms: pk1Timings,
     gin_index_ms: gin1Timings,
-    build_ms_avg: buildTimings.reduce((a, b) => a + b, 0) / buildTimings.length,
-    total_build_avg_ms: (buildTimings.reduce((a, b) => a + b, 0) + pk1Timings.reduce((a, b) => a + b, 0) + gin1Timings.reduce((a, b) => a + b, 0)) / buildRuns,
+    build_ms_avg: buildAvg,
+    total_build_avg_ms: (sum(buildTimings) + sum(pk1Timings) + sum(gin1Timings)) / buildRuns,
   };
 
   // === 3. MV query latency (against the TEMP TABLE) ===
   console.error("\n=== 3. MV query latency (TEMP TABLE as stand-in) ===");
-  const mvBench: Record<string, unknown>[] = [];
-  for (const q of queries) {
-    const tsquery = q
-      .split(/\s+/)
-      .filter(Boolean)
-      .map((t) => `${t.replace(/[^a-z0-9]/gi, "")}:*`)
-      .filter(Boolean)
-      .join(" & ");
-    if (!tsquery) continue;
-    const stat = await bench(`mv: "${q}"`, 5, async () => {
-      await sql.unsafe(
-        `SELECT t.id, t.title, ts_rank(t.search_vector, to_tsquery('english', $1)) AS rank
-         FROM things_search_bench t
-         WHERE t.search_vector @@ to_tsquery('english', $1)
-         ORDER BY rank DESC
-         LIMIT 20`,
-        [tsquery],
-      );
-    });
-    mvBench.push({ query: q, tsquery, ...stat });
-  }
-  results.mv_queries = mvBench;
+  results.mv_queries = await benchFtsOn("things_search_bench", "mv");
 
   // === 4. JOIN cost estimation (models the 2b target refresh query) ===
   // The real 4b-B.2b MV will JOIN source tables (entities, facts, grants, …)
@@ -262,8 +251,8 @@ async function main() {
   // reporting the delta vs the self-SELECT refresh.
   console.error("\n=== 4. JOIN cost estimation (2b refresh target) ===");
   await sql`DROP TABLE IF EXISTS things_search_bench`;
-  await time("JOIN build: things ⟕ entities (parentTitle resolution)", async () => {
-    await sql.unsafe(`
+  const joinBuildMs = await time("JOIN build: things ⟕ entities (parentTitle resolution)", () =>
+    sql.unsafe(`
       CREATE TEMP TABLE things_search_bench_join AS
       SELECT
         t.id,
@@ -291,11 +280,10 @@ async function main() {
         ) AS search_vector
       FROM things t
       LEFT JOIN entities ep ON ep.stable_id = t.parent_thing_id
-    `);
-  });
-  const joinBuildMs = timings[timings.length - 1].ms;
+    `),
+  );
   results.join_build_ms = joinBuildMs;
-  results.join_vs_self_delta_ms = joinBuildMs - (results.temp_build_runs as { build_ms_avg: number }).build_ms_avg;
+  results.join_vs_self_delta_ms = joinBuildMs - buildAvg;
 
   await sql`DROP TABLE IF EXISTS things_search_bench_join`;
 
@@ -321,7 +309,7 @@ async function main() {
   results.concurrent_refresh_note = {
     tested: false,
     reason: "Cannot issue REFRESH MATERIALIZED VIEW CONCURRENTLY against a TEMP table, and creating a persistent MV on prod was out of scope for this benchmark (dispatcher said check with coordinator first).",
-    estimated_concurrent_refresh_ms: (results.temp_build_runs as { total_build_avg_ms: number }).total_build_avg_ms * 2,
+    estimated_concurrent_refresh_ms: ((results.temp_build_runs as { total_build_avg_ms: number }).total_build_avg_ms) * 2,
     reference: "PostgreSQL docs: REFRESH MATERIALIZED VIEW CONCURRENTLY builds a new snapshot, diffs, and applies — roughly 2x the non-concurrent cost. Readers are not blocked.",
   };
 
