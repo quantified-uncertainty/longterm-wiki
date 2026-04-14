@@ -13,7 +13,6 @@ import { compareOrgRows } from "@/app/organizations/org-sort";
 import type { OrgSortKey } from "@/app/organizations/org-sort";
 import { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR } from "@/app/organizations/org-constants";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
@@ -590,7 +589,8 @@ export function OrganizationsTable({
                     {/* Completion Score */}
                     {visibleColumns.has("completionScore") && (
                       <td className="py-2.5 px-3 text-center">
-                        <RecordStatusDots coverageScore={row.completionScore} verdict={row.verdictString} sourcingHref={row.verdictString ? getSourcingHref("entity", row.id) : undefined} />
+                        {/* QUA-418 follow-up: `entity` is not a real record_type, so /sourcing/entity/<id> 404s. Omit href. */}
+                        <RecordStatusDots coverageScore={row.completionScore} verdict={row.verdictString} />
                       </td>
                     )}
 

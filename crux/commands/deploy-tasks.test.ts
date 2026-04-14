@@ -110,8 +110,14 @@ describe('isPatBlockedError (QUA-409)', () => {
     expect(isPatBlockedError('RESOURCE NOT ACCESSIBLE BY PERSONAL ACCESS TOKEN')).toBe(true);
   });
 
+  it('matches fine-grained PAT / installation token variants', () => {
+    expect(isPatBlockedError('HTTP 403: Resource not accessible by integration')).toBe(true);
+    expect(isPatBlockedError('HTTP 403: Resource not accessible by user')).toBe(true);
+  });
+
   it('does NOT match unrelated 403s or other errors', () => {
     expect(isPatBlockedError('HTTP 403: forbidden')).toBe(false);
+    expect(isPatBlockedError('HTTP 403: Must have admin rights')).toBe(false);
     expect(isPatBlockedError('psql: connection refused')).toBe(false);
     expect(isPatBlockedError('HTTP 404: Not Found')).toBe(false);
   });
