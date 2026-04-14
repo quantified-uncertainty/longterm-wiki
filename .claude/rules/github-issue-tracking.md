@@ -21,6 +21,8 @@ For GitHub: posts a start comment and adds the `agent:working` label.
 
 **Note:** `crux sys agent-checklist init` handles both automatically when `--linear=QUA-NNN` or `--issue=N` is provided. You rarely need to call these manually.
 
+**Coordinators dispatching to a slot:** this check (`crux linear start`) fires in the slot, not in the coordinator. The coordinator has a separate pre-flight responsibility — see `.claude/rules/dispatched-agent-review.md` § "Dispatcher pre-flight" for the three mandatory checks to run before writing a dispatch brief (Linear state, open PRs, active slots). Skipping those checks is how the QUA-406/QUA-397 duplicate-work incident happened.
+
 ## Dedup check — `crux linear start` refuses competing claims
 
 Both `crux linear start QUA-NNN` and `crux sys agent-checklist init --linear=QUA-NNN` run a **dedup pre-check** before posting anything to Linear. The check consults three signals in order, blocking on the first one that finds a cross-slot collision:
