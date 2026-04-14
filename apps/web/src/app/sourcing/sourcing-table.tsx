@@ -5,7 +5,7 @@ import {
   VerdictBadge,
   formatRecordType,
   getRecordHref,
-  getSourcingHref,
+  getStoredVerdictHref,
 } from "./sourcing-shared";
 
 interface SourcingTableProps {
@@ -20,10 +20,10 @@ function resolveClaimDisplay(
   v: RpcSourcingVerdictRow,
   names: Record<string, string>,
   claims: Record<string, string>
-): { text: string; href: string | null; isFallback: boolean } {
+): { text: string; href: string; isFallback: boolean } {
   const claimKey = `${v.recordType}:${v.recordId}:${v.fieldName ?? ""}`;
   const claim = claims[claimKey];
-  const detailHref = getSourcingHref(v.recordType, v.recordId);
+  const detailHref = getStoredVerdictHref(v.recordType, v.recordId);
   if (claim) {
     return { text: claim, href: detailHref, isFallback: false };
   }
@@ -53,7 +53,7 @@ export function SourcingTable({ verdicts, names, hrefs, claims }: SourcingTableP
       {/* ── Mobile card list (< sm) ──────────────────────────────────────── */}
       <div className="block sm:hidden space-y-2">
         {verdicts.map((v) => {
-          const detailHref = getSourcingHref(v.recordType, v.recordId);
+          const detailHref = getStoredVerdictHref(v.recordType, v.recordId);
           const recordName = names[v.recordId];
           const entityName = v.entityId ? names[v.entityId] : null;
           const { text: claimText } = resolveClaimDisplay(v, names, claims);
@@ -110,7 +110,7 @@ export function SourcingTable({ verdicts, names, hrefs, claims }: SourcingTableP
           </thead>
           <tbody>
             {verdicts.map((v) => {
-              const detailHref = getSourcingHref(v.recordType, v.recordId);
+              const detailHref = getStoredVerdictHref(v.recordType, v.recordId);
               const recordName = names[v.recordId];
               const recordHref = getRecordHref(v.recordType, v.recordId);
               const entityName = v.entityId ? names[v.entityId] : null;
