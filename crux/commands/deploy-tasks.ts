@@ -190,13 +190,15 @@ interface VerifyResult {
 }
 
 /**
- * Detect the GitHub "Resource not accessible by personal access token" error,
- * which surfaces when a `gh workflow run` task is verified with a PAT lacking
- * `actions:write`. (QUA-409)
+ * Detect the GitHub "Resource not accessible by ..." family of errors,
+ * which surface when a `gh workflow run` / `gh api` task is verified with a
+ * token that lacks the required scope (classic PAT missing `actions:write`,
+ * fine-grained PAT, or an installation token). (QUA-409)
  */
 export function isPatBlockedError(output: string | undefined): boolean {
   if (!output) return false;
-  return /Resource not accessible by personal access token/i.test(output);
+  // Covers "...by personal access token", "...by integration", "...by user".
+  return /Resource not accessible by (?:personal access token|integration|user)/i.test(output);
 }
 
 /**
@@ -361,7 +363,9 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
       const { exitCode, output } = runVerifyCommand(command, timeoutMs);
       let status: VerifyResult['status'];
       if (exitCode === 0) status = 'pass';
-      else if (isPatBlockedError(output)) status = 'needs-ui';
+      // Gate PAT-blocked detection on `gh ` commands so an unrelated 403
+      // (e.g. curl against a third-party API) isn't miscategorized.
+      else if (/\bgh\b/.test(command) && isPatBlockedError(output)) status = 'needs-ui';
       else status = 'fail';
       results.push({
         pr: pr.number,
@@ -435,7 +439,7 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
       }
       if (r.status === 'needs-ui') {
         lines.push(
-          `        ${c.dim}Local PAT lacks actions:write — dispatch from GitHub UI.${c.reset}`
+          `        ${c.dim}Token lacks actions:write — dispatch from GitHub UI or grant the scope.${c.reset}`
         );
       }
       if (r.status === 'skip' && r.skipReason) {
