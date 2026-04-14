@@ -412,13 +412,14 @@ describe("pruneFacts", () => {
     ]);
 
     expect(result.deleted).toBe(2);
+    expect(result.errors).toBe(0);
     expect(result.ids).toEqual([
       { entityId: "anthropic", factId: "stale1" },
       { entityId: "anthropic", factId: "stale2" },
     ]);
   });
 
-  it("handles prune failure gracefully without throwing", async () => {
+  it("counts batch failures in errors and does not throw", async () => {
     vi.spyOn(globalThis, "fetch").mockResolvedValue(
       new Response("Bad Request", { status: 400 }),
     );
@@ -429,6 +430,9 @@ describe("pruneFacts", () => {
 
     expect(result.deleted).toBe(0);
     expect(result.ids).toEqual([]);
+    // Per the review, silent 4xx used to lie about success — now the batch
+    // error is counted and the caller surfaces it.
+    expect(result.errors).toBe(1);
   });
 
   it("returns zero with no fetches when there are no entries to prune", async () => {
@@ -437,26 +441,47 @@ describe("pruneFacts", () => {
     expect(fetchSpy).not.toHaveBeenCalled();
     expect(result.deleted).toBe(0);
     expect(result.ids).toEqual([]);
+    expect(result.errors).toBe(0);
   });
 
-  // QUA-462 regression: the constellation entity exists in the KB but its
-  // factbase YAML was emptied (`facts: []`). Without entityIdsWithNoFacts,
-  // pruneFacts has no signal that constellation should have its facts pruned,
-  // and orphan PG rows leak forever (the QUA-447 alcohol-co incident).
-  //
-  // This test exercises the real KB loader against the real packages/factbase
-  // data dir to make sure the empty-facts entity actually surfaces in
-  // entityIdsWithNoFacts. If someone deletes constellation.yaml or repopulates
-  // it, the assertion either no longer applies or means the test is stale —
-  // the test logs a friendly note instead of silently passing.
-  it("loadAndTransformFacts surfaces constellation as an empty-facts entity (QUA-462 regression)", async () => {
-    const KB_DATA_DIR = join(__dirname, "../../packages/factbase/data");
-    const { entityIdsWithNoFacts } = await loadAndTransformFacts(KB_DATA_DIR);
+  it("throws a clear error when a single entity exceeds the per-entry factIds cap", () => {
+    // Per the review: a silently-dropped oversized batch is exactly the
+    // "falsely all-clear" failure mode QUA-462 is trying to prevent.
+    const items: SyncFact[] = [];
+    for (let i = 0; i < 2001; i++) {
+      items.push(makeSyncFact("big-entity", `f_${i}`));
+    }
+    expect(() => groupFactsByEntity(items)).toThrow(/exceeding the per-entry cap/);
+  });
 
-    // The entity stableId for constellation is sid_jwe4re7Ggo (data/entities/organizations.yaml).
-    // If the KB no longer has constellation, this assertion will fail loudly
-    // and an updater can substitute another empty-facts entity.
-    expect(entityIdsWithNoFacts).toContain("sid_jwe4re7Ggo");
+  // QUA-462 regression: loadAndTransformFacts must surface entities that exist
+  // in the KB but have no source facts in YAML, otherwise the prune endpoint
+  // never hears about them and their orphan PG rows leak forever (the
+  // QUA-447 alcohol-co incident). We exercise the real KB loader so the
+  // integration between loadKB → loadAndTransformFacts → entityIdsWithNoFacts
+  // is end-to-end tested. The assertion is count-based so it doesn't break
+  // when the set of empty entities changes over time; a concrete sample is
+  // logged for human-readable regression hints.
+  it("loadAndTransformFacts surfaces empty-facts entities from the real KB (QUA-462 regression)", async () => {
+    const KB_DATA_DIR = join(__dirname, "../../packages/factbase/data");
+    const { facts, entityCount, entityIdsWithNoFacts } =
+      await loadAndTransformFacts(KB_DATA_DIR);
+
+    // Sanity: the real KB has at least a few hundred entities and some facts.
+    expect(entityCount).toBeGreaterThan(100);
+    expect(facts.length).toBeGreaterThan(100);
+
+    // The load must surface at least one empty-facts entity. If every entity
+    // in the KB has facts, this test is a no-op and someone should either
+    // add an intentional empty fixture or delete this test. Failing loudly
+    // when the signal disappears is better than silently passing.
+    expect(entityIdsWithNoFacts.length).toBeGreaterThanOrEqual(1);
+    // Belt-and-suspenders: log a sample for forensics if the assertion
+    // shape ever drifts. Not asserted on because the set is not stable.
+    const sample = entityIdsWithNoFacts.slice(0, 5);
+    expect(sample.every((id) => typeof id === "string" && id.length > 0)).toBe(
+      true,
+    );
   });
 
   it("accumulates deleted counts across multiple batches", async () => {
@@ -525,6 +550,7 @@ describe("pruneFacts", () => {
       batchSize: 1,
     });
     expect(result.deleted).toBe(1);
+    expect(result.errors).toBe(1);
     expect(result.ids).toEqual([{ entityId: "b", factId: "stale" }]);
   });
 

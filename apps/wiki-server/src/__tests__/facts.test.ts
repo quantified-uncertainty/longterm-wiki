@@ -1048,11 +1048,11 @@ describe("Facts API", () => {
       }
     });
 
-    it("returns a stable response shape for the typed client cast", async () => {
+    it("returns a stable response shape for the typed client cast (PruneFactsResult)", async () => {
       // The client in crux/wiki-server/sync-facts.ts casts the response as
-      // `{ deleted: number; ids: Array<{ entityId: string; factId: string }> }`.
-      // If a future refactor changes the shape, this test will catch it before
-      // the crux side silently breaks.
+      // `PruneFactsResult` — inferred from this exact route via Hono RPC in
+      // crux/lib/wiki-server/facts.ts. If a future refactor changes the
+      // shape, this test catches it before the crux side silently breaks.
       await postJson(app, "/api/facts/sync", {
         facts: [
           { entityId: "anthropic", factId: "f_stale", label: "S", value: "1", numeric: 1, measure: "x" },
@@ -1064,11 +1064,45 @@ describe("Facts API", () => {
       const body = await res.json();
       expect(typeof body.deleted).toBe("number");
       expect(Array.isArray(body.ids)).toBe(true);
+      expect(typeof body.truncated).toBe("boolean");
       expect(body.ids[0]).toHaveProperty("entityId");
       expect(body.ids[0]).toHaveProperty("factId");
-      // Exactly these two keys — no accidental extra fields.
+      // Exactly these two keys on the id record — no accidental extra fields.
       expect(Object.keys(body.ids[0]).sort()).toEqual(["entityId", "factId"]);
-      expect(Object.keys(body).sort()).toEqual(["deleted", "ids"]);
+      // Top-level keys are {deleted, ids, truncated} — no accidental extras.
+      expect(Object.keys(body).sort()).toEqual(["deleted", "ids", "truncated"]);
+    });
+
+    it("caps the returned `ids` at MAX_PRUNE_RESPONSE_IDS and sets truncated=true", async () => {
+      // Seed 1002 stale facts, prune with an empty keep list, and verify the
+      // response caps ids at 1000 and sets truncated=true. This protects
+      // against unbounded response payloads (per the review).
+      // The /sync endpoint caps each batch at 500 facts, so split into chunks.
+      const makeFact = (i: number) => ({
+        entityId: "anthropic",
+        factId: `f_${i}`,
+        label: "X",
+        value: "1",
+        numeric: 1,
+        measure: "x",
+      });
+      const batch1 = Array.from({ length: 500 }, (_, i) => makeFact(i));
+      const batch2 = Array.from({ length: 500 }, (_, i) => makeFact(i + 500));
+      const batch3 = Array.from({ length: 2 }, (_, i) => makeFact(i + 1000));
+      await postJson(app, "/api/facts/sync", { facts: batch1 });
+      await postJson(app, "/api/facts/sync", { facts: batch2 });
+      await postJson(app, "/api/facts/sync", { facts: batch3 });
+      expect(factsStore.size).toBe(1002);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1002);
+      expect(body.ids).toHaveLength(1000);
+      expect(body.truncated).toBe(true);
+      expect(factsStore.size).toBe(0);
     });
   });
 });

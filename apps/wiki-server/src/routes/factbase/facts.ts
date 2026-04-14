@@ -22,6 +22,23 @@ import { logger } from "../../logger.js";
 
 const MAX_PAGE_SIZE = 200;
 const EXPORT_MAX_LIMIT = 50000;
+/**
+ * Cap the number of `ids` echoed back in a /prune response. The endpoint has
+ * to do the work in memory either way, but the response payload is unbounded
+ * without this — a caller that accidentally marks tens of thousands of rows as
+ * stale would otherwise get a multi-MB JSON blob.
+ */
+const MAX_PRUNE_RESPONSE_IDS = 1000;
+
+/**
+ * Canonical encoding for the `things.source_id` key of a fact row. Shared by
+ * the /sync dual-write and the /prune cleanup so the two cannot drift —
+ * without a shared helper a future change to one side would silently leak
+ * orphan `things` rows past the pruner.
+ */
+function factThingKey(entityId: string, factId: string): string {
+  return `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+}
 
 // ---- Query schemas ----
 
@@ -561,9 +578,8 @@ const factsApp = new Hono()
               updatedAt: sql`now()`,
             },
           });
-        // Dual-write to things table
-        const toFactThingKey = (entityId: string, factId: string) =>
-          `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
+        // Dual-write to things table (uses the shared factThingKey helper so
+        // /prune can find and remove these rows — see QUA-462).
 
         // Resolve entity IDs to human-readable titles for thing titles
         const entityIds = [...new Set(items.map((f) => f.entityId))];
@@ -574,12 +590,13 @@ const factsApp = new Hono()
           items.map((f) => {
             const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
             const factLabel = formatFactLabel(f);
+            const thingKey = factThingKey(f.entityId, f.factId);
             return {
-              id: toFactThingKey(f.entityId, f.factId),
+              id: thingKey,
               thingType: "fact" as const,
               title: `${factLabel} — ${entityName}`,
               sourceTable: "facts",
-              sourceId: toFactThingKey(f.entityId, f.factId),
+              sourceId: thingKey,
               parentThingId: f.entityId,
               description: f.value
                 ? `${factLabel}: ${f.value}`
@@ -624,14 +641,13 @@ const factsApp = new Hono()
               factIds: z.array(z.string().min(1).max(200)).max(2000),
             }),
           )
-          .min(0)
           .max(5000),
       }),
     ),
     async (c) => {
       const { entries } = c.req.valid("json");
       if (entries.length === 0) {
-        return c.json({ deleted: 0, ids: [] });
+        return c.json({ deleted: 0, ids: [], truncated: false });
       }
 
       const db = getDrizzleDb();
@@ -645,41 +661,31 @@ const factsApp = new Hono()
       }
 
       try {
-        const currentRows = await db
-          .select({
-            id: facts.id,
-            entityId: facts.entityId,
-            factId: facts.factId,
-          })
-          .from(facts)
-          .where(inArray(facts.entityId, entityIds));
+        // Both the SELECT and the two DELETEs run inside one transaction so
+        // concurrent writers see a consistent snapshot. In practice sync-facts
+        // is the only writer in the deploy pipeline, but the transactional
+        // read is cheap and prevents TOCTOU edge cases.
+        const stale = await db.transaction(async (tx) => {
+          const currentRows = await tx
+            .select({
+              id: facts.id,
+              entityId: facts.entityId,
+              factId: facts.factId,
+            })
+            .from(facts)
+            .where(inArray(facts.entityId, entityIds));
 
-        const stale = currentRows.filter(
-          (r) => !keepSet.has(`${r.entityId}\u0000${r.factId}`),
-        );
+          const staleRows = currentRows.filter(
+            (r) => !keepSet.has(`${r.entityId}\u0000${r.factId}`),
+          );
 
-        if (stale.length === 0) {
-          return c.json({ deleted: 0, ids: [] });
-        }
+          if (staleRows.length === 0) return staleRows;
 
-        // Log before deleting (destructive operation).
-        logger.info(
-          {
-            count: stale.length,
-            entities: entityIds.length,
-            sample: stale.slice(0, 10).map((r) => `${r.entityId}/${r.factId}`),
-          },
-          `Deleting ${stale.length} stale facts across ${entityIds.length} entities`,
-        );
+          const staleRowIds = staleRows.map((r) => r.id);
+          const staleThingIds = staleRows.map((r) =>
+            factThingKey(r.entityId, r.factId),
+          );
 
-        const staleRowIds = stale.map((r) => r.id);
-        const toFactThingKey = (entityId: string, factId: string) =>
-          `${encodeURIComponent(entityId)}:${encodeURIComponent(factId)}`;
-        const staleThingIds = stale.map((r) =>
-          toFactThingKey(r.entityId, r.factId),
-        );
-
-        await db.transaction(async (tx) => {
           // Clean up the dual-write things rows first (no FK from things →
           // facts, but ordering is consistent with the entities prune).
           await tx
@@ -692,12 +698,39 @@ const factsApp = new Hono()
             );
 
           await tx.delete(facts).where(inArray(facts.id, staleRowIds));
+
+          return staleRows;
         });
 
-        return c.json({
-          deleted: stale.length,
-          ids: stale.map((r) => ({ entityId: r.entityId, factId: r.factId })),
-        });
+        if (stale.length === 0) {
+          return c.json({ deleted: 0, ids: [], truncated: false });
+        }
+
+        // Log AFTER commit (a pre-commit log lies if the transaction aborts).
+        // We include up to 100 sample IDs rather than 10 — deletion is
+        // destructive and the audit log is the primary post-hoc forensics
+        // source.
+        logger.info(
+          {
+            count: stale.length,
+            entities: entityIds.length,
+            sample: stale
+              .slice(0, 100)
+              .map((r) => `${r.entityId}/${r.factId}`),
+          },
+          `Pruned ${stale.length} stale facts across ${entityIds.length} entities`,
+        );
+
+        // Cap the response payload. The server already paid the cost of
+        // holding the full stale list in memory, but echoing 50k+ IDs back
+        // over HTTP is pointless — the client only uses `deleted` (count) and
+        // the first few IDs for logging.
+        const truncated = stale.length > MAX_PRUNE_RESPONSE_IDS;
+        const ids = stale
+          .slice(0, MAX_PRUNE_RESPONSE_IDS)
+          .map((r) => ({ entityId: r.entityId, factId: r.factId }));
+
+        return c.json({ deleted: stale.length, ids, truncated });
       } catch (err) {
         return dbError(c, "facts prune", err, { entityCount: entityIds.length });
       }

@@ -24,6 +24,7 @@ import { getServerUrl, getApiKey, buildHeaders } from "../lib/wiki-server/client
 import { loadKB } from "../../packages/factbase/src/loader.ts";
 import type { Fact, FactValue, Property } from "../../packages/factbase/src/types.ts";
 import type { SyncFact } from "../../apps/wiki-server/src/api-types.ts";
+import type { PruneFactsResult } from "../lib/wiki-server/facts.ts";
 import { waitForHealthy, batchSync, fetchWithRetry } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
@@ -33,10 +34,18 @@ const KB_DATA_DIR = join(PROJECT_ROOT, "packages", "factbase", "data");
 const DEFAULT_BATCH_SIZE = 500;
 /**
  * Max number of (entityId → factIds) entries per /prune request. The server
- * caps this at 5000 entries; we batch below that to keep individual requests
- * small and the SELECT-then-DELETE work bounded.
+ * caps this at 5000 entries; we batch at 1000 so a single bad batch never
+ * blocks more than 1/5 of the total work, so the per-request in-memory SELECT
+ * + DELETE work stays bounded, and so log output is split into multiple
+ * lines for legibility.
  */
 const PRUNE_BATCH_SIZE = 1000;
+/**
+ * Mirror of the server's per-entry `factIds` cap (2000). We assert at
+ * request-build time so a single oversized entity fails the CLI loudly
+ * instead of being silently dropped as a batch 400 by the retry loop.
+ */
+const PRUNE_MAX_FACT_IDS_PER_ENTITY = 2000;
 
 // --- Helpers ---
 
@@ -202,18 +211,19 @@ export async function syncFactsBatch(
 
 /**
  * Group facts by entityId into `{ entityId, factIds }` entries suitable for
- * the /prune endpoint. Entities with no facts are NOT represented (the caller
- * has no way to know about empty entities since loadAndTransformFacts only
- * yields rows for facts that exist). For empty-yaml entities, the entity-side
- * cascade (`facts.entity_id ON DELETE CASCADE`) handles it once the entity is
- * removed; for entities that still exist but lost all their facts, the YAML
- * loader emits zero facts so we won't see them here either.
+ * the /prune endpoint. Each entry must contain the COMPLETE keep set for its
+ * entityId — the server deletes any fact in PG for that entity whose factId
+ * isn't listed.
  *
- * To handle that second case, callers should pass `entityIdsWithNoFacts` —
- * entities present in YAML but emitting zero facts — so we can include them
- * with empty factIds and let the prune endpoint clear all their facts.
+ * Callers should pass `entityIdsWithNoFacts` for entities present in the KB
+ * but emitting zero source facts (e.g. the constellation.yaml → facts: []
+ * case from QUA-462). Those entities are added with empty factIds so the
+ * prune endpoint clears their remaining PG rows. Without this, such entities
+ * would be invisible to the prune (they never appear in `items`) and their
+ * orphan facts would leak forever.
  *
- * Exported for testing.
+ * Exported for testing. Throws if any single entity has more factIds than
+ * the server accepts — see PRUNE_MAX_FACT_IDS_PER_ENTITY.
  */
 export function groupFactsByEntity(
   items: SyncFact[],
@@ -228,7 +238,29 @@ export function groupFactsByEntity(
   for (const eid of entityIdsWithNoFacts) {
     if (!byEntity.has(eid)) byEntity.set(eid, []);
   }
+  // Fail loudly if a single entity exceeds the server's per-entry cap. The
+  // 2000 limit matches real-world data (avg ~4 facts/entity, max <100) with a
+  // 20x headroom, but a future bug that bloats an entity would otherwise be
+  // silently dropped by the retry loop on a batch 400.
+  for (const [entityId, factIds] of byEntity) {
+    if (factIds.length > PRUNE_MAX_FACT_IDS_PER_ENTITY) {
+      throw new Error(
+        `groupFactsByEntity: entity "${entityId}" has ${factIds.length} facts, ` +
+          `exceeding the per-entry cap of ${PRUNE_MAX_FACT_IDS_PER_ENTITY}. ` +
+          `Investigate why a single entity has so many facts before bumping the cap.`,
+      );
+    }
+  }
   return Array.from(byEntity, ([entityId, factIds]) => ({ entityId, factIds }));
+}
+
+export interface PruneFactsOutcome {
+  /** Total facts deleted across all successful batches. */
+  deleted: number;
+  /** Sample of deleted IDs (capped to avoid unbounded memory in the caller). */
+  ids: Array<{ entityId: string; factId: string }>;
+  /** Number of batches that failed (HTTP error or thrown exception). */
+  errors: number;
 }
 
 /**
@@ -239,6 +271,10 @@ export function groupFactsByEntity(
  * NOT in the keep list — facts for entities not in the request are untouched,
  * so a partial sync cannot delete cross-entity data.
  *
+ * Batch failures are counted in `errors` and logged at ERROR level. The
+ * caller (sync-facts `main()`) should surface the count so operators don't
+ * see a falsely "clean" run after a prune 400s.
+ *
  * Exported for testing.
  */
 export async function pruneFacts(
@@ -246,19 +282,21 @@ export async function pruneFacts(
   items: SyncFact[],
   entityIdsWithNoFacts: string[] = [],
   options: { batchSize?: number } = {},
-): Promise<{ deleted: number; ids: Array<{ entityId: string; factId: string }> }> {
+): Promise<PruneFactsOutcome> {
   const batchSize = options.batchSize ?? PRUNE_BATCH_SIZE;
   const entries = groupFactsByEntity(items, entityIdsWithNoFacts);
 
   if (entries.length === 0) {
-    return { deleted: 0, ids: [] };
+    return { deleted: 0, ids: [], errors: 0 };
   }
 
   let totalDeleted = 0;
+  let totalErrors = 0;
   const allDeletedIds: Array<{ entityId: string; factId: string }> = [];
 
   for (let i = 0; i < entries.length; i += batchSize) {
     const batch = entries.slice(i, i + batchSize);
+    const batchNum = Math.floor(i / batchSize) + 1;
     try {
       const res = await fetchWithRetry(
         `${serverUrl}/api/facts/prune`,
@@ -271,36 +309,39 @@ export async function pruneFacts(
 
       if (!res.ok) {
         const body = await res.text();
-        console.warn(
-          `  Prune batch ${Math.floor(i / batchSize) + 1}: HTTP ${res.status} — ${body.slice(0, 200)}`,
+        console.error(
+          `  Prune batch ${batchNum}: HTTP ${res.status} — ${body.slice(0, 200)}`,
         );
+        totalErrors++;
         continue;
       }
 
-      const result = (await res.json()) as {
-        deleted: number;
-        ids: Array<{ entityId: string; factId: string }>;
-      };
+      // The response shape is inferred from the Hono RPC route type so the
+      // client and server cannot drift silently — see PruneFactsResult in
+      // crux/lib/wiki-server/facts.ts.
+      const result = (await res.json()) as PruneFactsResult;
       if (result.deleted > 0) {
         const sample = result.ids
           .slice(0, 5)
           .map((x) => `${x.entityId}/${x.factId}`)
           .join(", ");
-        const more = result.ids.length > 5 ? ` ...(+${result.ids.length - 5} more)` : "";
+        const more = result.deleted > 5 ? ` ...(+${result.deleted - 5} more)` : "";
+        const truncatedNote = result.truncated ? " [ids truncated]" : "";
         console.log(
-          `  Prune batch ${Math.floor(i / batchSize) + 1}: removed ${result.deleted} stale facts: ${sample}${more}`,
+          `  Prune batch ${batchNum}: removed ${result.deleted} stale facts: ${sample}${more}${truncatedNote}`,
         );
         totalDeleted += result.deleted;
         allDeletedIds.push(...result.ids);
       }
     } catch (err) {
-      console.warn(
-        `  Prune batch ${Math.floor(i / batchSize) + 1}: failed — ${err instanceof Error ? err.message : err}`,
+      console.error(
+        `  Prune batch ${batchNum}: failed — ${err instanceof Error ? err.message : err}`,
       );
+      totalErrors++;
     }
   }
 
-  return { deleted: totalDeleted, ids: allDeletedIds };
+  return { deleted: totalDeleted, ids: allDeletedIds, errors: totalErrors };
 }
 
 // --- CLI ---
@@ -395,6 +436,16 @@ async function main() {
       console.log(`  Pruned: ${pruneResult.deleted} stale facts`);
     } else {
       console.log("  No stale facts to prune");
+    }
+    // A prune failure is NOT a sync failure (the upsert already succeeded),
+    // but it must not masquerade as a clean run either — the 2026-04-14
+    // incident that prompted QUA-462 was partly about silent failure. Exit
+    // non-zero so operators see the red light in CI.
+    if (pruneResult.errors > 0) {
+      console.error(
+        `  Prune: ${pruneResult.errors} batch(es) failed — see errors above`,
+      );
+      process.exit(1);
     }
   }
 }
