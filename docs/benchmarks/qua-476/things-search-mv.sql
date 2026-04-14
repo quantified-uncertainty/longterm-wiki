@@ -74,12 +74,31 @@ CREATE INDEX IF NOT EXISTS things_search_entity_type_idx
 CREATE INDEX IF NOT EXISTS things_search_updated_idx
   ON things_search (updated_at);
 
--- For the ILIKE / trigram fallbacks in /api/things/search phase 2+3.
--- These are optional; enable only if the fallbacks remain on the MV in 2b.
--- CREATE INDEX things_search_title_trgm ON things_search USING GIN (title gin_trgm_ops);
+-- For the ILIKE / trigram fallbacks in /api/things/search phase 2+3. These
+-- are optional; enable only if the fallbacks remain on the MV in 2b. Requires
+-- the `pg_trgm` extension, which is NOT enabled by default on a fresh
+-- postgres instance:
+--   CREATE EXTENSION IF NOT EXISTS pg_trgm;
+--   CREATE INDEX things_search_title_trgm ON things_search USING GIN (title gin_trgm_ops);
 
--- To refresh (after initial population):
+--
+-- First-refresh gotcha:
+--
+-- Because this MV is created `WITH NO DATA`, the FIRST refresh MUST be
+-- non-concurrent. `REFRESH MATERIALIZED VIEW CONCURRENTLY` fails with
+--   ERROR: CONCURRENTLY cannot be used when the materialized view is not populated
+-- on an empty MV. The first refresh therefore must be:
+--
+--   REFRESH MATERIALIZED VIEW things_search;   -- first time, non-concurrent
+--
+-- Every subsequent refresh can (and should) use:
+--
 --   REFRESH MATERIALIZED VIEW CONCURRENTLY things_search;
+--
+-- Phase 2b's migration should either (a) run the initial populated refresh
+-- inline in the migration itself, or (b) have the first scheduled refresh
+-- job detect the empty state and fall back to non-concurrent for that one
+-- call.
 
 --
 -- === 2b target shape (compose from source tables) — SKETCH, NOT BENCHMARKED ===

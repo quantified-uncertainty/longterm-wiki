@@ -31,13 +31,24 @@ function loadDotenv() {
 }
 loadDotenv();
 
-const URL = process.env.PRODUCTION_DB_URL;
-if (!URL) {
+const dbUrl = process.env.PRODUCTION_DB_URL;
+if (!dbUrl) {
   console.error("PRODUCTION_DB_URL not set");
   process.exit(1);
 }
 
-const sql = postgres(URL, {
+// Extract host:port for scrubbing from error messages — we never want the
+// full URL (with credentials) to appear in any log output.
+const dbHostPort = (() => {
+  try {
+    const u = new URL(dbUrl);
+    return `${u.hostname}:${u.port || "5432"}`;
+  } catch {
+    return "<unparseable>";
+  }
+})();
+
+const sql = postgres(dbUrl, {
   ssl: "require",
   max: 1,
   idle_timeout: 20,
@@ -72,7 +83,11 @@ async function bench<T>(label: string, n: number, fn: () => Promise<T>): Promise
     samples.push(Number(process.hrtime.bigint() - start) / 1e6);
   }
   samples.sort((a, b) => a - b);
-  const pick = (p: number) => samples[Math.min(samples.length - 1, Math.floor(p * samples.length))];
+  // Nearest-rank percentile with (n-1) scaling so p=1.0 maps to the max and
+  // p=0 maps to the min. Previously used floor(p*n) which systematically
+  // biased tail percentiles toward the max on larger samples (for n=100,
+  // p=0.99 → samples[99] = max instead of the 99th element).
+  const pick = (p: number) => samples[Math.max(0, Math.min(samples.length - 1, Math.round(p * (samples.length - 1))))];
   const stat = {
     label,
     n,
@@ -140,12 +155,20 @@ async function main() {
     "nonexistentxyzqueryqwerty",
   ];
 
+  // n=15 is the smallest n where p50 / p95 / p99 resolve to distinct sample
+  // positions under the nearest-rank percentile in `bench`. The historical
+  // runs in benchmark-results.json captured at this file's first commit
+  // used n=5, which collapses p95 and p99 to the same max value — useful for
+  // illustration but not statistically meaningful. Do not lower without
+  // re-reading the n=5 caveat in README §1.2.
+  const PER_QUERY_SAMPLES = 15;
+
   async function benchFtsOn(table: string, variant: "baseline" | "mv") {
     const out: Record<string, unknown>[] = [];
     for (const q of queries) {
       const tsquery = toTsquery(q);
       if (!tsquery) continue;
-      const stat = await bench(`${variant}: "${q}"`, 5, async () => {
+      const stat = await bench(`${variant}: "${q}"`, PER_QUERY_SAMPLES, async () => {
         await sql.unsafe(
           `SELECT t.id, t.title, ts_rank(t.search_vector, to_tsquery('english', $1)) AS rank
            FROM ${table} t
@@ -321,6 +344,10 @@ async function main() {
 }
 
 main().catch((e) => {
-  console.error(e);
+  // Scrub any occurrence of the full connection URL or host:port from error
+  // output so connection failures can't leak hostname/credentials to CI logs.
+  const raw = e instanceof Error ? e.message : String(e);
+  const scrubbed = raw.replaceAll(dbUrl, "<db-url>").replaceAll(dbHostPort, "<db-host>");
+  console.error("Benchmark failed:", scrubbed);
   process.exit(1);
 });
