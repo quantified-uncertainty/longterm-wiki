@@ -24,6 +24,7 @@ import {
 } from './prompt-guidelines.ts';
 import { matchRecordAgainstSnapshot } from './deterministic-matcher.ts';
 import { tryWikidataMatch } from './wikidata-matcher.ts';
+import { tryOpenAlexMatch } from './openalex-matcher.ts';
 import { searchForEntity } from './item-collectors.ts';
 import type {
   VerifyItem,
@@ -314,6 +315,24 @@ export async function verifySingleItem(
     } catch (e: unknown) {
       // Fall through to LLM sourcing on any error
       console.warn(`[sourcing] Wikidata matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+    }
+  }
+
+  // ── OpenAlex deterministic matching for personnel (QUA-427) ──
+  // For publishing researchers, OpenAlex's structured author → institution
+  // data can confirm affiliation claims without any LLM call. Runs for every
+  // personnel record regardless of sourceUrl — OpenAlex replaces whatever
+  // URL was originally attached when the author is found. tryOpenAlexMatch
+  // returns null for non-publishing personnel, ambiguous candidates, or API
+  // failures, so records fall through to the existing LLM path unchanged.
+  if (item.data.kind === 'record' && item.data.recordType === 'personnel') {
+    try {
+      const openalexResult = await tryOpenAlexMatch(item);
+      if (openalexResult) return openalexResult;
+    } catch (e: unknown) {
+      console.warn(
+        `[sourcing] OpenAlex matching failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`,
+      );
     }
   }
 
