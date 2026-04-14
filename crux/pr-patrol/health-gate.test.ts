@@ -103,7 +103,9 @@ function makeDeps(overrides: Partial<HealthGateDeps> = {}): HealthGateDeps & {
   const logs: string[] = [];
   return {
     now: () => NOW,
-    env: {},
+    // Default env has GITHUB_TOKEN present. The dedicated missing-token tests
+    // override this with an empty env or a stripped-token env (QUA-395).
+    env: { GITHUB_TOKEN: 'test-token' },
     writeEvent: (entry) => events.push(entry),
     log: (msg) => logs.push(msg),
     cooldownStore: inMemoryCooldown(),
@@ -130,7 +132,7 @@ describe('runHealthGate — env escape hatch', () => {
   });
 
   it('does NOT bypass when env var is unset', async () => {
-    const deps = makeDeps({ env: {} });
+    const deps = makeDeps({ env: { GITHUB_TOKEN: 'test-token' } });
     const decision = await runHealthGate({
       ...deps,
       scan: async () => unhealthyScan([deployStuckIssue()]),
@@ -140,7 +142,7 @@ describe('runHealthGate — env escape hatch', () => {
   });
 
   it('does NOT bypass when env var is set to "0"', async () => {
-    const deps = makeDeps({ env: { [DISABLE_ENV_VAR]: '0' } });
+    const deps = makeDeps({ env: { [DISABLE_ENV_VAR]: '0', GITHUB_TOKEN: 'test-token' } });
     const decision = await runHealthGate({
       ...deps,
       scan: async () => healthyScan(),
@@ -179,6 +181,110 @@ describe('runHealthGate — healthy', () => {
     expect(decision.proceed).toBe(true);
     expect(decision.emittedIssues).toHaveLength(0);
     expect(deps.events).toHaveLength(0);
+  });
+});
+
+// ── Missing GITHUB_TOKEN (QUA-395) ───────────────────────────────────────────
+
+describe('runHealthGate — missing GITHUB_TOKEN', () => {
+  it('halts immediately when GITHUB_TOKEN is unset (does not call scan)', async () => {
+    const deps = makeDeps({ env: {} });
+    let scanCalled = false;
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        scanCalled = true;
+        return healthyScan();
+      },
+    });
+
+    expect(scanCalled).toBe(false);
+    expect(decision.proceed).toBe(false);
+    expect(decision.bypassed).toBe(false);
+    expect(decision.reason).toContain('GITHUB_TOKEN');
+    expect(deps.events).toHaveLength(1);
+    expect(deps.events[0]).toMatchObject({
+      type: 'health_gate_missing_token',
+      reason: 'GITHUB_TOKEN not set in environment',
+    });
+    expect(deps.logs.some((l) => l.includes('GITHUB_TOKEN not set'))).toBe(true);
+  });
+
+  it('halts immediately when GITHUB_TOKEN is empty string (falsy)', async () => {
+    const deps = makeDeps({ env: { GITHUB_TOKEN: '' } });
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => healthyScan(),
+    });
+    expect(decision.proceed).toBe(false);
+    expect(decision.reason).toContain('GITHUB_TOKEN');
+  });
+
+  it('resets the consecutive-error counter when halting on missing token', async () => {
+    // Pre-populate: 2 prior scan errors. Missing token should wipe this so
+    // a subsequent real scan isn't artificially near MAX_CONSECUTIVE_SCAN_ERRORS.
+    const store = inMemoryCooldown();
+    store.setCount('__scan_error_count__', MAX_CONSECUTIVE_SCAN_ERRORS - 1);
+    const deps = makeDeps({ env: {}, cooldownStore: store });
+
+    await runHealthGate({
+      ...deps,
+      scan: async () => healthyScan(),
+    });
+    expect(store.getCount('__scan_error_count__')).toBe(0);
+  });
+
+  it('bypass env var still takes precedence over missing-token halt', async () => {
+    // Operator explicitly bypassing the gate — respect it even when the
+    // token is missing. Without this, bypass couldn't rescue a stuck patrol.
+    const deps = makeDeps({ env: { [DISABLE_ENV_VAR]: '1' } }); // no GITHUB_TOKEN
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        throw new Error('scan should not be called when bypassed');
+      },
+    });
+    expect(decision.bypassed).toBe(true);
+    expect(decision.proceed).toBe(true);
+  });
+
+  it('classifies token errors thrown from scan as permanent (not counted as transient)', async () => {
+    // Edge case: env.GITHUB_TOKEN looks present at gate entry, but the scan's
+    // internal call to getGitHubToken() reads process.env and finds nothing.
+    // The error bubbles up and we classify it as permanent — no counter bump.
+    const store = inMemoryCooldown();
+    store.setCount('__scan_error_count__', 0);
+    const deps = makeDeps({ cooldownStore: store });
+
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        throw new Error(
+          'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
+            'Set it with: export GITHUB_TOKEN=<your-token>',
+        );
+      },
+    });
+
+    expect(decision.proceed).toBe(false);
+    expect(decision.reason).toContain('GITHUB_TOKEN');
+    // Counter did not tick up — permanent errors shouldn't use streak budget.
+    expect(store.getCount('__scan_error_count__')).toBe(0);
+    expect(deps.events.some((e) => e.type === 'health_gate_missing_token')).toBe(true);
+  });
+
+  it('does NOT misclassify unrelated errors as missing-token', async () => {
+    // Regression: a generic "GitHub API 500" mustn't get caught by the token
+    // classifier. Normal errors go through the consecutive-error path.
+    const deps = makeDeps();
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        throw new Error('GitHub API returned 500');
+      },
+    });
+    expect(decision.proceed).toBe(true);
+    expect(deps.events[0]).toMatchObject({ type: 'health_scan_error' });
   });
 });
 
@@ -300,7 +406,7 @@ describe('runHealthGate — cooldown', () => {
     // First call — no prior state, should emit.
     await runHealthGate({
       now: () => NOW,
-      env: {},
+      env: { GITHUB_TOKEN: "test-token" },
       writeEvent: (e) => events.push(e),
       log: () => {},
       cooldownStore: store,
@@ -312,7 +418,7 @@ describe('runHealthGate — cooldown', () => {
     const later = new Date(NOW.getTime() + 5 * 60_000);
     const decision = await runHealthGate({
       now: () => later,
-      env: {},
+      env: { GITHUB_TOKEN: "test-token" },
       writeEvent: (e) => events.push(e),
       log: () => {},
       cooldownStore: store,
@@ -330,7 +436,7 @@ describe('runHealthGate — cooldown', () => {
 
     await runHealthGate({
       now: () => NOW,
-      env: {},
+      env: { GITHUB_TOKEN: "test-token" },
       writeEvent: (e) => events.push(e),
       log: () => {},
       cooldownStore: store,
@@ -340,7 +446,7 @@ describe('runHealthGate — cooldown', () => {
     const wayLater = new Date(NOW.getTime() + (HEALTH_GATE_COOLDOWN_MINUTES + 1) * 60_000);
     await runHealthGate({
       now: () => wayLater,
-      env: {},
+      env: { GITHUB_TOKEN: "test-token" },
       writeEvent: (e) => events.push(e),
       log: () => {},
       cooldownStore: store,
@@ -372,7 +478,7 @@ describe('runHealthGate — cooldown', () => {
 
     const decision = await runHealthGate({
       now: () => NOW,
-      env: {},
+      env: { GITHUB_TOKEN: "test-token" },
       writeEvent: (e) => events.push(e),
       log: () => {},
       cooldownStore: store,
