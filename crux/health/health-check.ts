@@ -10,7 +10,8 @@
  *   .github/workflows/ci-pr-health.yml
  *
  * Usage:
- *   crux health                      Run all checks
+ *   crux health                      Run all checks (against production)
+ *   crux health --local              Check local dev server instead of production
  *   crux health --check=server       Server & DB only
  *   crux health --check=api          API smoke tests only
  *   crux health --check=actions           GitHub Actions workflow health
@@ -24,6 +25,11 @@
  *   crux health --report             Aggregate markdown report to stdout
  *   crux health --auto-issue         Manage GitHub wellness issue
  *   crux health --cleanup-labels     Auto-remove stale working labels
+ *
+ * Note: `crux health` is unambiguously about production. The command
+ * defaults to WIKI_SERVER_ENV=prod so it works from any directory without
+ * the env-var prefix slots normally need. Pass `--local` to check a local
+ * dev server on localhost:3002 instead. See QUA-479.
  */
 
 import { getColors } from '../lib/output.ts';
@@ -39,12 +45,31 @@ import { buildWellnessReport, manageWellnessIssue } from './wellness-report.ts';
 // Config & types
 // ─────────────────────────────────────────────────────────────────────────────
 
+// Detect whether this module is being executed directly (crux dispatch) vs
+// imported (tests). Must be computed before any top-level side effects so
+// importing the module for tests doesn't mutate process.env or kick off the
+// full health sweep. See the `main()` invocation at the bottom of the file.
+const INVOKED_AS_SCRIPT =
+  typeof process.argv[1] === 'string' && /health[\\/-]?check(?:\.ts|\.js|\.mjs)?$/.test(process.argv[1]);
+
 const args = process.argv.slice(2);
 const JSON_MODE = args.includes('--json') || args.includes('--ci');
 const CHECK_ARG = args.find((a) => a.startsWith('--check='))?.split('=')[1];
 const REPORT_MODE = args.includes('--report');
 const AUTO_ISSUE = args.includes('--auto-issue');
 const CLEANUP_LABELS = args.includes('--cleanup-labels');
+const LOCAL_MODE = args.includes('--local');
+
+// Default to production unless --local was passed (QUA-479). `crux health`
+// is semantically "is production healthy?", so it should work from any
+// directory (coord/, agent slots, worktrees) without requiring users to
+// remember `WIKI_SERVER_ENV=prod`. Respect an explicit pre-set value so
+// callers who set it themselves keep their choice. Gated on INVOKED_AS_SCRIPT
+// so importing this module from tests does not mutate process.env and
+// pollute other tests (sync-session.test.ts, client.test.ts both care).
+if (INVOKED_AS_SCRIPT && !LOCAL_MODE && !process.env.WIKI_SERVER_ENV) {
+  process.env.WIKI_SERVER_ENV = 'prod';
+}
 
 // Resolve wiki-server URL/API key via the shared client helpers so
 // WIKI_SERVER_ENV=prod (which reads PROD_LONGTERMWIKI_*) works here
@@ -86,7 +111,69 @@ export interface CheckResult {
 // Helpers
 // ─────────────────────────────────────────────────────────────────────────────
 
-async function fetchJson(url: string, authHeader?: string): Promise<{ ok: boolean; status: number; data: unknown }> {
+export interface FetchJsonResult {
+  ok: boolean;
+  status: number;
+  data: unknown;
+  /** Populated when status === 0 (network error). Human-readable diagnostic. */
+  errorDetail?: string;
+}
+
+/**
+ * Inspect a thrown error and build a diagnostic message for `fetchJson`.
+ * Exposed so the test suite can exercise it without spinning up a server.
+ *
+ * Converts opaque "HTTP 0" failures into an informative string covering:
+ *   - which URL failed
+ *   - the OS-level error code (ECONNREFUSED / ENOTFOUND / ETIMEDOUT / ...)
+ *   - the underlying error message
+ *   - a hint when the target looks like a local dev server (QUA-479)
+ */
+export function describeFetchError(url: string, err: unknown): string {
+  const isLocalTarget = /^https?:\/\/(localhost|127\.0\.0\.1|0\.0\.0\.0)(?::|\/|$)/i.test(url);
+
+  // AbortSignal.timeout() rejects with a DOMException named 'TimeoutError'.
+  const errName = err instanceof Error ? err.name : '';
+  if (errName === 'TimeoutError' || errName === 'AbortError') {
+    return `${url} timed out after 15s`;
+  }
+
+  // Node's fetch wraps undici network errors; the real cause lives in err.cause.
+  const cause = err instanceof Error && 'cause' in err ? (err as Error & { cause: unknown }).cause : undefined;
+  const code =
+    cause && typeof cause === 'object' && 'code' in cause
+      ? String((cause as { code: unknown }).code)
+      : '';
+  const causeMessage =
+    cause instanceof Error
+      ? cause.message
+      : cause && typeof cause === 'object' && 'message' in cause
+        ? String((cause as { message: unknown }).message)
+        : err instanceof Error
+          ? err.message
+          : String(err);
+
+  if (code === 'ECONNREFUSED') {
+    const hint = isLocalTarget
+      ? ` — no server running on that port. Omit --local (or unset WIKI_SERVER_ENV) to check production instead.`
+      : '';
+    return `${url} refused the connection (ECONNREFUSED)${hint}`;
+  }
+  if (code === 'ENOTFOUND' || code === 'EAI_AGAIN') {
+    return `${url} — DNS lookup failed (${code}): ${causeMessage}`;
+  }
+  if (code === 'ETIMEDOUT') {
+    return `${url} — connection timed out (ETIMEDOUT)`;
+  }
+  if (code === 'ECONNRESET') {
+    return `${url} — connection reset by peer (ECONNRESET)`;
+  }
+
+  const codeSuffix = code ? ` (${code})` : '';
+  return `${url} — network error${codeSuffix}: ${causeMessage}`;
+}
+
+export async function fetchJson(url: string, authHeader?: string): Promise<FetchJsonResult> {
   try {
     const headers: Record<string, string> = { 'Content-Type': 'application/json' };
     if (authHeader) headers['Authorization'] = authHeader;
@@ -96,7 +183,7 @@ async function fetchJson(url: string, authHeader?: string): Promise<{ ok: boolea
     try { data = await res.json(); } catch { /* body may not be JSON */ }
     return { ok: res.ok, status: res.status, data };
   } catch (err) {
-    return { ok: false, status: 0, data: null };
+    return { ok: false, status: 0, data: null, errorDetail: describeFetchError(url, err) };
   }
 }
 
@@ -118,10 +205,19 @@ export async function checkServer(): Promise<CheckResult> {
     return { name, ok: false, summary: 'LONGTERMWIKI_SERVER_URL not set', detail: ['Set LONGTERMWIKI_SERVER_URL environment variable'] };
   }
 
-  const { ok, status, data } = await fetchJson(`${SERVER_URL}/health`);
+  const { ok, status, data, errorDetail } = await fetchJson(`${SERVER_URL}/health`);
 
   if (!ok) {
-    return { name, ok: false, summary: `Health endpoint unreachable (HTTP ${status})`, detail: [`GET /health returned HTTP ${status}`] };
+    if (status === 0 && errorDetail) {
+      // errorDetail already includes the URL; don't repeat it.
+      return { name, ok: false, summary: `Health endpoint unreachable — ${errorDetail}`, detail: [errorDetail] };
+    }
+    return {
+      name,
+      ok: false,
+      summary: `Health endpoint unreachable (HTTP ${status})`,
+      detail: [`GET /health returned HTTP ${status}`],
+    };
   }
 
   const h = data as Record<string, unknown>;
@@ -229,10 +325,11 @@ export async function checkApi(): Promise<CheckResult> {
   ];
 
   for (const t of tests) {
-    const { ok, status, data } = await fetchJson(t.url, auth);
+    const { ok, status, data, errorDetail } = await fetchJson(t.url, auth);
     if (!ok) {
-      detail.push(`FAIL  ${t.label}: HTTP ${status}`);
-      failures.push(`${t.label}: HTTP ${status}`);
+      const msg = status === 0 && errorDetail ? errorDetail : `HTTP ${status}`;
+      detail.push(`FAIL  ${t.label}: ${msg}`);
+      failures.push(`${t.label}: ${msg}`);
     } else if (t.check && !t.check(data)) {
       detail.push(`FAIL  ${t.label}: HTTP 200 but content check failed`);
       failures.push(`${t.label}: unexpected response shape`);
@@ -445,12 +542,13 @@ export async function checkFrontend(): Promise<CheckResult> {
 
   for (const p of pages) {
     const url = `${WIKI_PUBLIC_URL}${p.path}`;
-    const { ok, status } = await fetchJson(url);
+    const { ok, status, errorDetail } = await fetchJson(url);
     if (ok) {
       detail.push(`PASS  ${p.label}: HTTP 200`);
     } else {
-      detail.push(`FAIL  ${p.label}: HTTP ${status}`);
-      failures.push(`${p.label}: HTTP ${status}`);
+      const msg = status === 0 && errorDetail ? errorDetail : `HTTP ${status}`;
+      detail.push(`FAIL  ${p.label}: ${msg}`);
+      failures.push(`${p.label}: ${msg}`);
     }
   }
 
@@ -493,8 +591,12 @@ export async function checkFreshness(): Promise<CheckResult> {
       detail.push(`INFO  Last page sync: date unavailable`);
     }
   } else {
-    detail.push(`FAIL  Pages list: HTTP ${pagesResp.status}`);
-    failures.push(`Pages list unavailable (HTTP ${pagesResp.status})`);
+    const msg =
+      pagesResp.status === 0 && pagesResp.errorDetail
+        ? pagesResp.errorDetail
+        : `HTTP ${pagesResp.status}`;
+    detail.push(`FAIL  Pages list: ${msg}`);
+    failures.push(`Pages list unavailable (${msg})`);
   }
 
   // Most recent auto-update run — skip cleanly if endpoint returns 404 (route may not exist)
@@ -517,7 +619,11 @@ export async function checkFreshness(): Promise<CheckResult> {
       detail.push(`INFO  Last auto-update run: no runs found`);
     }
   } else {
-    detail.push(`SKIP  Auto-update runs: HTTP ${runsResp.status}`);
+    const msg =
+      runsResp.status === 0 && runsResp.errorDetail
+        ? runsResp.errorDetail
+        : `HTTP ${runsResp.status}`;
+    detail.push(`SKIP  Auto-update runs: ${msg}`);
   }
 
   // Most recent agent session — response: { sessions: [...], total, limit, offset }
@@ -561,8 +667,17 @@ async function main(): Promise<void> {
       console.error(`Unknown check: ${CHECK_ARG}. Available: ${Object.keys(ALL_CHECKS).join(', ')}`);
       process.exit(1);
     }
-    if (!JSON_MODE && !REPORT_MODE) process.stdout.write(`  Running ${CHECK_ARG}...`);
+    if (!JSON_MODE && !REPORT_MODE) console.log(`  Running ${CHECK_ARG}...`);
     const result = await fn();
+    if (!JSON_MODE && !REPORT_MODE) {
+      const icon = result.ok ? `${c.green}PASS${c.reset}` : `${c.red}FAIL${c.reset}`;
+      console.log(`  ${icon}  ${result.name.padEnd(24)} ${c.dim}${result.summary}${c.reset}`);
+      if (result.detail && !result.ok) {
+        for (const line of result.detail) {
+          console.log(`        ${c.dim}${line}${c.reset}`);
+        }
+      }
+    }
     results = [result];
   } else {
     // Run all checks. Independent checks run in parallel; API smoke tests
@@ -651,7 +766,11 @@ async function main(): Promise<void> {
   process.exit(allOk ? 0 : 1);
 }
 
-main().catch((err) => {
-  console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
-  process.exit(1);
-});
+// Only auto-run when executed as a script (crux dispatch). Importing this
+// module for tests must not kick off the full health sweep.
+if (INVOKED_AS_SCRIPT) {
+  main().catch((err) => {
+    console.error(`Error: ${err instanceof Error ? err.message : String(err)}`);
+    process.exit(1);
+  });
+}

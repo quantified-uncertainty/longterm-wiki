@@ -17,7 +17,7 @@ const SCRIPTS = {
   check: {
     script: 'health/health-check.ts',
     description: 'Run all wellness checks',
-    passthrough: ['ci', 'json', 'check', 'report', 'auto-issue', 'cleanup-labels'],
+    passthrough: ['ci', 'json', 'check', 'report', 'auto-issue', 'cleanup-labels', 'local'],
   },
 };
 
@@ -45,6 +45,8 @@ Options:
   --report        Aggregate markdown report to stdout
   --auto-issue    Manage GitHub wellness issue (create/update/close)
   --cleanup-labels Auto-remove stale working labels (>8 hours)
+  --local         Check a local dev server (localhost:3002) instead of production.
+                  Default behavior is to check production via PROD_LONGTERMWIKI_SERVER_URL. (QUA-479)
 
 Environment:
   LONGTERMWIKI_SERVER_URL        Wiki-server URL (required for most checks)
