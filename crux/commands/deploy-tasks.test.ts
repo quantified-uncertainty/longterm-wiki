@@ -7,7 +7,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { checkPsqlRunnable } from './deploy-tasks.ts';
+import { checkPsqlRunnable, isPatBlockedError } from './deploy-tasks.ts';
 
 describe('checkPsqlRunnable', () => {
   const PSQL_CMD =
@@ -94,5 +94,30 @@ describe('checkPsqlRunnable', () => {
       getDatabaseUrl: () => undefined,
     });
     expect(result).toEqual({ runnable: true });
+  });
+});
+
+describe('isPatBlockedError (QUA-409)', () => {
+  it('matches the canonical GitHub PAT error string', () => {
+    expect(
+      isPatBlockedError(
+        'could not create workflow dispatch event: HTTP 403: Resource not accessible by personal access token',
+      ),
+    ).toBe(true);
+  });
+
+  it('matches case-insensitively', () => {
+    expect(isPatBlockedError('RESOURCE NOT ACCESSIBLE BY PERSONAL ACCESS TOKEN')).toBe(true);
+  });
+
+  it('does NOT match unrelated 403s or other errors', () => {
+    expect(isPatBlockedError('HTTP 403: forbidden')).toBe(false);
+    expect(isPatBlockedError('psql: connection refused')).toBe(false);
+    expect(isPatBlockedError('HTTP 404: Not Found')).toBe(false);
+  });
+
+  it('handles empty / undefined output safely', () => {
+    expect(isPatBlockedError(undefined)).toBe(false);
+    expect(isPatBlockedError('')).toBe(false);
   });
 });

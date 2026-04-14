@@ -174,10 +174,29 @@ interface VerifyResult {
   prTitle: string;
   task: string;
   command: string | null;
-  status: 'pass' | 'fail' | 'skip';
+  /**
+   * - pass: verify command succeeded
+   * - fail: real failure — needs investigation
+   * - skip: prerequisite missing (e.g. psql), dry-run, or no verify command
+   * - needs-ui: command returned HTTP 403 "Resource not accessible by personal
+   *   access token" — only fixable by dispatching from the GitHub UI or
+   *   granting the PAT `actions:write`. Distinguishable from `fail` so
+   *   coordinator scans don't drown in PAT-blocked rows each release. (QUA-409)
+   */
+  status: 'pass' | 'fail' | 'skip' | 'needs-ui';
   exitCode?: number;
   output?: string;
   skipReason?: string;
+}
+
+/**
+ * Detect the GitHub "Resource not accessible by personal access token" error,
+ * which surfaces when a `gh workflow run` task is verified with a PAT lacking
+ * `actions:write`. (QUA-409)
+ */
+export function isPatBlockedError(output: string | undefined): boolean {
+  if (!output) return false;
+  return /Resource not accessible by personal access token/i.test(output);
 }
 
 /**
@@ -340,12 +359,16 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
       }
 
       const { exitCode, output } = runVerifyCommand(command, timeoutMs);
+      let status: VerifyResult['status'];
+      if (exitCode === 0) status = 'pass';
+      else if (isPatBlockedError(output)) status = 'needs-ui';
+      else status = 'fail';
       results.push({
         pr: pr.number,
         prTitle: pr.title,
         task: item.text,
         command,
-        status: exitCode === 0 ? 'pass' : 'fail',
+        status,
         exitCode,
         output,
       });
@@ -354,13 +377,17 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
 
   const passed = results.filter((r) => r.status === 'pass').length;
   const failed = results.filter((r) => r.status === 'fail').length;
+  const needsUi = results.filter((r) => r.status === 'needs-ui').length;
   const skipped = results.filter((r) => r.status === 'skip').length;
 
   if (options.ci) {
     return {
       output:
         JSON.stringify(
-          { results, summary: { passed, failed, skipped, total: results.length } },
+          {
+            results,
+            summary: { passed, failed, needsUi, skipped, total: results.length },
+          },
           null,
           2
         ) + '\n',
@@ -394,6 +421,7 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
       let badge: string;
       if (r.status === 'pass') badge = `${c.green}PASS${c.reset}`;
       else if (r.status === 'fail') badge = `${c.red}FAIL${c.reset}`;
+      else if (r.status === 'needs-ui') badge = `${c.yellow}NEEDS-UI${c.reset}`;
       else badge = `${c.yellow}SKIP${c.reset}`;
       lines.push(`  ${badge}  ${r.task}`);
       if (r.status === 'fail' && r.output) {
@@ -405,6 +433,11 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
         lines.push(`        ${c.dim}exit=${r.exitCode}${c.reset}`);
         lines.push(indented);
       }
+      if (r.status === 'needs-ui') {
+        lines.push(
+          `        ${c.dim}Local PAT lacks actions:write — dispatch from GitHub UI.${c.reset}`
+        );
+      }
       if (r.status === 'skip' && r.skipReason) {
         lines.push(`        ${c.dim}${r.skipReason}${c.reset}`);
       }
@@ -412,10 +445,12 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
     lines.push('');
   }
 
+  const needsUiPart =
+    needsUi > 0 ? `, ${c.yellow}${needsUi} needs-ui${c.reset}` : '';
   lines.push(
     `${c.bold}Summary:${c.reset} ${c.green}${passed} passed${c.reset}, ${
       failed > 0 ? c.red : c.dim
-    }${failed} failed${c.reset}, ${c.dim}${skipped} skipped${c.reset}`
+    }${failed} failed${c.reset}${needsUiPart}, ${c.dim}${skipped} skipped${c.reset}`
   );
 
   return {
