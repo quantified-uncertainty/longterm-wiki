@@ -141,17 +141,32 @@ export function bigramSimilarity(a: string, b: string): number {
 }
 
 /**
- * Collect Linear IDs from branch name, explicit flag, and checklist metadata,
- * then inject `Fixes QUA-NNN` lines into the PR body for any not already referenced.
- * Linear's GitHub integration auto-moves issues to Done on PR merge when it sees these.
+ * Collect Linear IDs from branch name, explicit flag, and (as a last-resort
+ * fallback) checklist metadata, then inject `Fixes QUA-NNN` lines into the
+ * PR body for any not already referenced. Linear's GitHub integration
+ * auto-moves issues to Done on PR merge when it sees these.
+ *
+ * Source precedence (QUA-457):
+ *   1. Branch name (e.g. `claude/qua-184-...`) — the canonical source.
+ *   2. Explicit `--linear` flag(s) — added on top.
+ *   3. `.claude/wip-checklist.md` `> Linear: QUA-NNN` — used ONLY when the
+ *      branch name itself encodes no Linear ID. When the branch does encode
+ *      an ID, the checklist is ignored. This prevents a stale checklist from
+ *      a prior session leaking the wrong Linear ID into the current ticket's
+ *      PR body (see PR #4306 incident).
+ *
+ * Emits a mismatch warning (returned as `warnings`) when the explicit
+ * `--linear` disagrees with the branch-encoded ID — the caller can print
+ * this so operators notice the inconsistency before shipping.
  */
 export function injectLinearRefs(
   body: string,
   branch: string,
   explicitLinear: string | undefined,
   checklistLinearId: string | null,
-): { body: string; injected: string[] } {
+): { body: string; injected: string[]; warnings: string[] } {
   const linearIds: string[] = [];
+  const warnings: string[] = [];
 
   const branchLinearId = parseLinearId(branch);
   if (branchLinearId) linearIds.push(branchLinearId);
@@ -159,12 +174,25 @@ export function injectLinearRefs(
   if (explicitLinear) {
     for (const token of explicitLinear.split(',')) {
       const parsed = parseLinearId(token.trim());
-      if (parsed && !linearIds.includes(parsed)) linearIds.push(parsed);
+      if (!parsed) continue;
+      if (branchLinearId && parsed !== branchLinearId && !linearIds.includes(parsed)) {
+        warnings.push(
+          `--linear=${parsed} disagrees with branch "${branch}" (${branchLinearId}); injecting both`,
+        );
+      }
+      if (!linearIds.includes(parsed)) linearIds.push(parsed);
     }
   }
 
-  if (checklistLinearId && !linearIds.includes(checklistLinearId)) {
+  // Checklist is a last-resort fallback ONLY when the branch doesn't carry a
+  // Linear ID. Otherwise, a stale checklist from a prior session can leak a
+  // wrong ID into the PR body (QUA-457).
+  if (!branchLinearId && checklistLinearId && !linearIds.includes(checklistLinearId)) {
     linearIds.push(checklistLinearId);
+  } else if (branchLinearId && checklistLinearId && checklistLinearId !== branchLinearId) {
+    warnings.push(
+      `checklist Linear ID ${checklistLinearId} ignored (branch-encoded ${branchLinearId} takes precedence)`,
+    );
   }
 
   const alreadyReferenced = new Set(
@@ -172,12 +200,13 @@ export function injectLinearRefs(
   );
   const toInject = linearIds.filter(id => !alreadyReferenced.has(id));
 
-  if (toInject.length === 0) return { body, injected: [] };
+  if (toInject.length === 0) return { body, injected: [], warnings };
 
   const refs = toInject.map(id => `Fixes ${id}`).join('\n');
   return {
     body: body.trimEnd() + '\n\n' + refs + '\n',
     injected: toInject,
+    warnings,
   };
 }
 
@@ -405,6 +434,9 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
     }
 
     const result = injectLinearRefs(body, branch, options.linear as string | undefined, checklistLinearId);
+    for (const w of result.warnings) {
+      log.warn(w);
+    }
     if (result.injected.length > 0) {
       body = result.body;
       log.info(`Auto-injected Linear reference(s): ${result.injected.join(', ')}`);
