@@ -90,6 +90,8 @@ interface PrData {
   title: string;
   body: string | null;
   merged_at: string | null;
+  merge_commit_sha: string | null;
+  updated_at: string | null;
 }
 
 function daysAgo(dateStr: string): number {
@@ -98,15 +100,178 @@ function daysAgo(dateStr: string): number {
   return Math.floor((now.getTime() - then.getTime()) / (1000 * 60 * 60 * 24));
 }
 
+/**
+ * Result of a commit-on-production check. `on` is the answer; `error` is set
+ * to a short message when the compare call failed (so we know to surface
+ * degraded roll-off behavior to the operator instead of silently reporting
+ * `rolledOff: 0`).
+ */
+export interface CommitOnProductionResult {
+  on: boolean;
+  error?: string;
+}
+
+/**
+ * Returns true if the given commit is already on production — i.e. it has
+ * been deployed. Uses GitHub's compare API: `production...{sha}` with
+ * `ahead_by === 0` means {sha} has no commits not already on production.
+ *
+ * Used to auto-roll-off deploy tasks from PRs whose code is already live
+ * (QUA-450 Fix 3 — tasks for old PRs kept showing up in `deploy-tasks
+ * pending/verify` output on every new release, drowning the real signal).
+ *
+ * Exported for unit testing. Returns a `{ on, error? }` tuple so callers can
+ * distinguish "confirmed not deployed" from "compare call failed, assumed
+ * not deployed".
+ */
+export async function isCommitOnProduction(
+  commitSha: string,
+  api: typeof githubApi = githubApi,
+): Promise<CommitOnProductionResult> {
+  if (!commitSha) return { on: false };
+  try {
+    const result = await api<{ ahead_by: number }>(
+      `/repos/${REPO}/compare/production...${encodeURIComponent(commitSha)}`,
+    );
+    return { on: result.ahead_by === 0 };
+  } catch (e) {
+    // If compare fails (network error, unknown SHA, production branch
+    // missing), treat as "not deployed" — i.e. keep the task visible.
+    // Fail-open here, because the opposite (fail-closed = silently roll
+    // off everything on any glitch) is the exact silent-drop bug we fear.
+    // The error is bubbled up so the caller can count failures and report
+    // degraded roll-off behavior instead of reporting rolledOff: 0.
+    const msg = e instanceof Error ? e.message : String(e);
+    return { on: false, error: msg };
+  }
+}
+
+/**
+ * Filter a list of PRs to drop those whose merge commit is already on
+ * production. When `includeDeployed` is true, returns the list unchanged.
+ * Returns both the filtered list, the number of rolled-off PRs, and the
+ * number of compare failures so the caller can log degraded behavior.
+ */
+async function rollOffDeployedPrs<T extends { number: number; merge_commit_sha: string | null }>(
+  prs: T[],
+  includeDeployed: boolean,
+): Promise<{ kept: T[]; rolledOff: number; compareFailures: number }> {
+  if (includeDeployed) return { kept: prs, rolledOff: 0, compareFailures: 0 };
+  const checks = await Promise.all(
+    prs.map(async (pr) => {
+      if (!pr.merge_commit_sha) return { pr, deployed: false, error: undefined as string | undefined };
+      const res = await isCommitOnProduction(pr.merge_commit_sha);
+      return { pr, deployed: res.on, error: res.error };
+    }),
+  );
+  const kept = checks.filter((c) => !c.deployed).map((c) => c.pr);
+  const compareFailures = checks.filter((c) => c.error !== undefined).length;
+  return { kept, rolledOff: prs.length - kept.length, compareFailures };
+}
+
+/**
+ * Fetch merged PRs that were merged within `lookbackDays` of now, paginating
+ * over GitHub's Pulls API until we're confident no younger merged PRs remain.
+ *
+ * Sorts by `updated` descending. For any PR, `updated_at >= merged_at`, so
+ * once a full page's `updated_at` values are all older than the cutoff, every
+ * subsequent page is guaranteed to have `merged_at < cutoff` as well — no more
+ * merged PRs in the window are reachable and we can stop.
+ *
+ * Rationale (QUA-450 review): the previous implementation only looked at the
+ * first 30 PRs sorted by `created`, which silently dropped any PR whose
+ * creation was older than the 30 most-recently-created closed PRs. Long-lived
+ * branches merged today, or any PR pushed past the first page by closure
+ * volume, were silently skipped — losing their deploy tasks entirely.
+ *
+ * `maxPages` is a hard safety cap so a broken cutoff comparison can't cause
+ * an unbounded scan.
+ *
+ * Returns `{ prs, truncated }` where `truncated` is `true` iff the loop
+ * exhausted `maxPages` without either `allPastCutoff` or a short/empty page
+ * naturally terminating the scan. When `truncated` is `true`, merged PRs on
+ * later pages are silently omitted — callers MUST surface this to operators so
+ * the missing-task problem doesn't reappear under higher PR volume. (QUA-450
+ * review follow-up — CodeRabbit comment 3077100107.)
+ */
+export async function fetchMergedPrsInWindow(
+  cutoff: Date,
+  api: typeof githubApi = githubApi,
+  opts: { perPage?: number; maxPages?: number } = {},
+): Promise<{ prs: PrData[]; truncated: boolean }> {
+  const perPage = opts.perPage ?? 100;
+  const maxPages = opts.maxPages ?? 10;
+  const prs: PrData[] = [];
+  // Assume truncation until a natural termination condition fires. If we
+  // finish the for-loop without hitting a break, `truncated` stays `true`.
+  let truncated = true;
+
+  for (let page = 1; page <= maxPages; page++) {
+    const batch = await api<PrData[]>(
+      `/repos/${REPO}/pulls?state=closed&sort=updated&direction=desc&per_page=${perPage}&page=${page}`,
+    );
+    if (!Array.isArray(batch) || batch.length === 0) {
+      // Empty page — GitHub has no more results at all.
+      truncated = false;
+      break;
+    }
+
+    for (const pr of batch) {
+      // Only merged PRs with merge_at inside the cutoff window matter.
+      if (pr.merged_at && new Date(pr.merged_at) >= cutoff) {
+        prs.push(pr);
+      }
+    }
+
+    // Stop when every PR in this page has `updated_at < cutoff`. Because
+    // `updated_at >= merged_at`, this also guarantees every subsequent page's
+    // merged_at is older than cutoff.
+    const allPastCutoff = batch.every((pr) => {
+      const updated = pr.updated_at ? new Date(pr.updated_at) : null;
+      return updated !== null && updated < cutoff;
+    });
+    if (allPastCutoff) {
+      truncated = false;
+      break;
+    }
+
+    // Short final page — no more results at all.
+    if (batch.length < perPage) {
+      truncated = false;
+      break;
+    }
+  }
+
+  return { prs, truncated };
+}
+
 async function pending(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
   const c = log.colors;
   const lookbackDays = Number(options.days) || 14;
+  const includeDeployed = Boolean(options.includeDeployed ?? options['include-deployed']);
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
-  const prs = await githubApi<PrData[]>(
-    `/repos/${REPO}/pulls?state=closed&sort=created&direction=desc&per_page=30`
+  // Paginate by updated-desc until we've seen everything inside the cutoff.
+  // QUA-450 review fix: the previous `sort=created&per_page=30` single page
+  // silently dropped any merged PR older than the 30 most-recently-created
+  // closed PRs.
+  const { prs: rawPrs, truncated } = await fetchMergedPrsInWindow(cutoff);
+
+  // Narrow to merged PRs with deploy tasks before the (potentially
+  // expensive) per-PR production-ancestry check. `fetchMergedPrsInWindow`
+  // already guarantees `merged_at >= cutoff`, so we only re-check the body.
+  const candidates = rawPrs.filter((pr) => {
+    if (!pr.body) return false;
+    const parsed = parseDeployTasksFromBody(pr.body);
+    return parsed !== null && parsed.unchecked > 0;
+  });
+
+  // QUA-450: drop PRs whose code is already on production.
+  const { kept: prs, rolledOff, compareFailures } = await rollOffDeployedPrs(
+    candidates,
+    includeDeployed,
   );
 
   const pendingPrs: Array<{
@@ -117,41 +282,60 @@ async function pending(_args: string[], options: CommandOptions): Promise<Comman
   }> = [];
 
   for (const pr of prs) {
-    if (!pr.merged_at) continue;
-    const mergedDate = new Date(pr.merged_at);
-    if (mergedDate < cutoff) continue;
-    if (!pr.body) continue;
-
-    const parsed = parseDeployTasksFromBody(pr.body);
-    if (!parsed || parsed.unchecked === 0) continue;
-
+    const parsed = parseDeployTasksFromBody(pr.body!);
+    if (!parsed) continue; // narrowed above, but satisfy TS
     const unchecked = parsed.items.filter((t) => !t.checked).map((t) => t.text);
     pendingPrs.push({
       number: pr.number,
       title: pr.title,
-      mergedDaysAgo: daysAgo(pr.merged_at),
+      mergedDaysAgo: daysAgo(pr.merged_at!),
       uncheckedTasks: unchecked,
     });
   }
 
   if (options.ci) {
     return {
-      output: JSON.stringify({ pendingPrs, lookbackDays }, null, 2) + '\n',
+      output:
+        JSON.stringify(
+          { pendingPrs, lookbackDays, rolledOff, compareFailures, truncated },
+          null,
+          2,
+        ) + '\n',
       exitCode: 0,
     };
   }
 
+  // If the compare API is glitching, `rolledOff: 0` could just mean
+  // "we never successfully checked". Surface that to the operator.
+  const compareWarning =
+    compareFailures > 0
+      ? ` ${c.yellow}[${compareFailures} compare failure${compareFailures === 1 ? '' : 's'} — roll-off degraded]${c.reset}`
+      : '';
+
+  // If discovery hit the page cap, `pendingPrs` may silently omit merged PRs
+  // on later pages. Tell the operator so they can rerun with a bigger cap.
+  // (QUA-450 review follow-up — CodeRabbit comment 3077100107.)
+  const truncationWarning = truncated
+    ? ` ${c.yellow}[${rawPrs.length} merged PRs discovered; truncated at page cap — some may be missing]${c.reset}`
+    : '';
+
   if (pendingPrs.length === 0) {
+    const rolledOffNote = rolledOff > 0
+      ? ` ${c.dim}(${rolledOff} task-bearing PR${rolledOff === 1 ? '' : 's'} rolled off — already on production)${c.reset}`
+      : '';
     return {
-      output: `${c.green}No pending deploy tasks. All clear!${c.reset}\n`,
+      output: `${c.green}No pending deploy tasks. All clear!${c.reset}${rolledOffNote}${compareWarning}${truncationWarning}\n`,
       exitCode: 0,
     };
   }
 
   const totalUnchecked = pendingPrs.reduce((sum, pr) => sum + pr.uncheckedTasks.length, 0);
   const lines: string[] = [];
+  const rolledOffNote = rolledOff > 0
+    ? ` ${c.dim}[${rolledOff} rolled off]${c.reset}`
+    : '';
   lines.push(
-    `${c.bold}Pending Deploy Tasks${c.reset} (${totalUnchecked} unchecked across ${pendingPrs.length} PR${pendingPrs.length === 1 ? '' : 's'}):\n`
+    `${c.bold}Pending Deploy Tasks${c.reset} (${totalUnchecked} unchecked across ${pendingPrs.length} PR${pendingPrs.length === 1 ? '' : 's'})${rolledOffNote}${compareWarning}${truncationWarning}:\n`
   );
 
   for (const pr of pendingPrs) {
@@ -303,20 +487,32 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
   const lookbackDays = Number(options.days) || 14;
   const dryRun = Boolean(options.dryRun ?? options['dry-run']);
   const timeoutMs = Number(options.timeout) || 30_000;
+  const includeDeployed = Boolean(options.includeDeployed ?? options['include-deployed']);
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
-  const prs = await githubApi<PrData[]>(
-    `/repos/${REPO}/pulls?state=closed&sort=created&direction=desc&per_page=30`
+  // QUA-450 review fix: paginate by updated-desc instead of `sort=created`
+  // first-page-only, so long-lived PRs merged inside the window aren't
+  // silently skipped. See `fetchMergedPrsInWindow` for the stop condition.
+  const { prs: rawPrs, truncated } = await fetchMergedPrsInWindow(cutoff);
+
+  // Narrow to merged-with-tasks before the per-PR compare call.
+  const candidates = rawPrs.filter((pr) => {
+    if (!pr.body) return false;
+    const parsed = parseDeployTasksFromBody(pr.body);
+    return parsed !== null && parsed.unchecked > 0;
+  });
+
+  // QUA-450: drop PRs whose code is already on production.
+  const { kept: prs, rolledOff, compareFailures } = await rollOffDeployedPrs(
+    candidates,
+    includeDeployed,
   );
 
   const results: VerifyResult[] = [];
 
   for (const pr of prs) {
-    if (!pr.merged_at) continue;
-    if (new Date(pr.merged_at) < cutoff) continue;
-    if (!pr.body) continue;
-
+    if (!pr.body) continue; // narrowed above
     const parsed = parseDeployTasksFromBody(pr.body);
     if (!parsed || parsed.unchecked === 0) continue;
 
@@ -390,7 +586,16 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
         JSON.stringify(
           {
             results,
-            summary: { passed, failed, needsUi, skipped, total: results.length },
+            summary: {
+              passed,
+              failed,
+              needsUi,
+              skipped,
+              rolledOff,
+              compareFailures,
+              truncated,
+              total: results.length,
+            },
           },
           null,
           2
@@ -399,9 +604,24 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
     };
   }
 
+  const compareWarning =
+    compareFailures > 0
+      ? ` ${c.yellow}[${compareFailures} compare failure${compareFailures === 1 ? '' : 's'} — roll-off degraded]${c.reset}`
+      : '';
+
+  // If discovery hit the page cap, later pages were silently omitted. Surface
+  // it so operators can rerun with a bigger cap.
+  // (QUA-450 review follow-up — CodeRabbit comment 3077100107.)
+  const truncationWarning = truncated
+    ? ` ${c.yellow}[${rawPrs.length} merged PRs discovered; truncated at page cap — some may be missing]${c.reset}`
+    : '';
+
   if (results.length === 0) {
+    const rolledOffNote = rolledOff > 0
+      ? ` ${c.dim}(${rolledOff} task-bearing PR${rolledOff === 1 ? '' : 's'} rolled off — already on production)${c.reset}`
+      : '';
     return {
-      output: `${c.green}No pending deploy tasks to verify.${c.reset}\n`,
+      output: `${c.green}No pending deploy tasks to verify.${c.reset}${rolledOffNote}${compareWarning}${truncationWarning}\n`,
       exitCode: 0,
     };
   }
@@ -414,9 +634,11 @@ async function verify(_args: string[], options: CommandOptions): Promise<Command
   }
 
   const lines: string[] = [];
-  lines.push(
-    `${c.bold}Deploy Tasks Verification${c.reset}${dryRun ? ' (dry-run)' : ''}\n`
-  );
+  const headerSuffix = (dryRun ? ' (dry-run)' : '') +
+    (rolledOff > 0 ? ` ${c.dim}[${rolledOff} PR${rolledOff === 1 ? '' : 's'} rolled off]${c.reset}` : '') +
+    compareWarning +
+    truncationWarning;
+  lines.push(`${c.bold}Deploy Tasks Verification${c.reset}${headerSuffix}\n`);
 
   for (const [prNum, prResults] of byPr) {
     const title = prResults[0].prTitle;
@@ -551,6 +773,8 @@ Options (detect):
 
 Options (pending):
   --days=N              Lookback window in days (default: 14).
+  --include-deployed    Show tasks from PRs already on production (by default
+                        they are rolled off — QUA-450).
   --ci                  JSON output.
 
 Options (inject):
@@ -561,6 +785,8 @@ Options (verify):
   --days=N              Lookback window in days (default: 14).
   --timeout=N           Per-command timeout in milliseconds (default: 30000).
   --dry-run             Print commands without executing them.
+  --include-deployed    Verify tasks from PRs already on production (by
+                        default they are rolled off — QUA-450).
   --ci                  JSON output.
 
 Environment for verify:
