@@ -1,8 +1,8 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, desc } from "drizzle-orm";
+import { eq, count, sql, desc, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { divisionPersonnel } from "../../schema.js";
+import { divisionPersonnel, divisions } from "../../schema.js";
 import {
   paginationQuery,
   zv,
@@ -194,10 +194,20 @@ const divisionPersonnelApp = new Hono()
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },
-    // QUA-470: pre-resolve person + division titles for the composer.
-    thingsTitleIds: (items) => [
-      ...new Set(items.flatMap((it) => [it.personId, it.divisionId])),
-    ],
+    // QUA-470: personId resolves via entities, but divisionId points at the
+    // divisions table. Use augmentTitleMap to fetch division names directly.
+    thingsTitleIds: (items) => [...new Set(items.map((it) => it.personId))],
+    augmentTitleMap: async (tx, items, titleMap) => {
+      const divisionIds = [
+        ...new Set(items.map((i) => i.divisionId)),
+      ].filter((id): id is string => !!id);
+      if (divisionIds.length === 0) return;
+      const rows = await tx
+        .select({ id: divisions.id, name: divisions.name })
+        .from(divisions)
+        .where(inArray(divisions.id, divisionIds));
+      for (const r of rows) titleMap.set(r.id, r.name);
+    },
     toThing: (item, titleMap) => {
       const composed = composeThing<DivisionPersonnelComposerRow>(
         "division-personnel",

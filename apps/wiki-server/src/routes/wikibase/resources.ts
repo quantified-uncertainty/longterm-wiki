@@ -542,6 +542,8 @@ const resourcesApp = new Hono()
             id: resources.id,
             url: resources.url,
             title: resources.title,
+            summary: resources.summary,
+            stableId: resources.stableId,
           });
 
         results = upsertedRows.map((r) => ({ id: r.id, url: r.url }));
@@ -594,20 +596,46 @@ const resourcesApp = new Hono()
           WHERE id IN (${idList})
         `);
 
-        // Dual-write to things table via dispatch composer (QUA-470)
+        // Dual-write to things table via dispatch composer (QUA-470).
+        // Compose from the *persisted* row (not the request item) so partial
+        // batch updates that omit title/summary don't rewrite things.title
+        // back to the URL. The conflictSet uses COALESCE to preserve those
+        // fields; reading from .returning() mirrors that semantics.
+        const persistedById = new Map(upsertedRows.map((row) => [row.id, row]));
         await upsertThingsInTx(
           tx,
           items.map((r) => {
-            const composed = composeThing<ResourceComposerRow>("resource", r, new Map());
+            const persisted = persistedById.get(r.id);
+            if (!persisted) {
+              // Should not happen: every inserted/updated row is returned by
+              // onConflictDoUpdate. Fall back defensively to the request item
+              // rather than crashing the batch.
+              const composed = composeThing<ResourceComposerRow>("resource", r, new Map());
+              return {
+                id: r.stableId || r.id,
+                thingType: "resource" as const,
+                title: composed.title,
+                description: composed.description,
+                parentTitle: composed.parentTitle,
+                sourceTable: "resources",
+                sourceId: r.id,
+                sourceUrl: r.url,
+              };
+            }
+            const composed = composeThing<ResourceComposerRow>(
+              "resource",
+              persisted,
+              new Map(),
+            );
             return {
-              id: r.stableId || r.id,
+              id: persisted.stableId ?? persisted.id,
               thingType: "resource" as const,
               title: composed.title,
               description: composed.description,
               parentTitle: composed.parentTitle,
               sourceTable: "resources",
-              sourceId: r.id,
-              sourceUrl: r.url,
+              sourceId: persisted.id,
+              sourceUrl: persisted.url,
             };
           })
         );

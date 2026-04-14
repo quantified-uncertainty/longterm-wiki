@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql } from "drizzle-orm";
+import { eq, count, desc, sql, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { benchmarkResults, benchmarks } from "../../schema.js";
 import {
@@ -207,10 +207,22 @@ const benchmarkResultsApp = new Hono()
         }
         return null;
       },
-      // QUA-470: pre-resolve model + benchmark titles for the composer.
-      thingsTitleIds: (items) => [
-        ...new Set(items.flatMap((it) => [it.modelId, it.benchmarkId])),
-      ],
+      // QUA-470: pre-resolve model titles via entities (modelId is an entity
+      // slug/stableId) and benchmark titles via the benchmarks table through
+      // augmentTitleMap (benchmarkId points at benchmarks, NOT entities —
+      // resolveEntityTitles would silently miss it).
+      thingsTitleIds: (items) => [...new Set(items.map((it) => it.modelId))],
+      augmentTitleMap: async (tx, items, titleMap) => {
+        const benchmarkIds = [
+          ...new Set(items.map((i) => i.benchmarkId)),
+        ].filter((id): id is string => !!id);
+        if (benchmarkIds.length === 0) return;
+        const rows = await tx
+          .select({ id: benchmarks.id, name: benchmarks.name })
+          .from(benchmarks)
+          .where(inArray(benchmarks.id, benchmarkIds));
+        for (const r of rows) titleMap.set(r.id, r.name);
+      },
       toThing: (item, titleMap) => {
         const composed = composeThing<BenchmarkResultComposerRow>(
           "benchmark-result",

@@ -32,21 +32,29 @@ interface FundingRoundComposerRow {
   leadInvestorDisplayName?: string | null;
 }
 
-registerComposer<FundingRoundComposerRow>("funding-round", (row, titleMap) => ({
-  title: row.name + (row.date ? ` (${row.date})` : ""),
-  description:
-    [
-      row.raised != null ? `raised ${formatMoney(row.raised, "USD")}` : null,
-      row.instrument,
-      row.leadInvestor
-        ? `led by ${row.leadInvestorDisplayName ?? row.leadInvestor}`
-        : null,
-    ]
-      .filter(Boolean)
-      .join(", ") || null,
-  parentTitle:
-    titleMap.get(row.companyId) ?? row.companyDisplayName ?? row.companyId,
-}));
+registerComposer<FundingRoundComposerRow>("funding-round", (row, titleMap) => {
+  // Normalize: prefer display name; fall back to the raw leadInvestor with
+  // the `new:` sentinel prefix stripped. Checking `leadInvestorDisplayName`
+  // independently catches rows where the display name was populated without
+  // a matching raw ID.
+  const leadInvestorName =
+    row.leadInvestorDisplayName ??
+    row.leadInvestor?.replace(/^new:\s*/, "").trim() ??
+    null;
+  return {
+    title: row.name + (row.date ? ` (${row.date})` : ""),
+    description:
+      [
+        row.raised != null ? `raised ${formatMoney(row.raised, "USD")}` : null,
+        row.instrument,
+        leadInvestorName ? `led by ${leadInvestorName}` : null,
+      ]
+        .filter(Boolean)
+        .join(", ") || null,
+    parentTitle:
+      titleMap.get(row.companyId) ?? row.companyDisplayName ?? row.companyId,
+  };
+});
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
