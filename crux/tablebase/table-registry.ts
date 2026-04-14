@@ -280,7 +280,10 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     syncPath: '/api/platform-accounts/sync',
     syncMethod: 'POST',
     syncBodyKey: 'items',
-    deletePath: '/api/platform-accounts/delete-batch',
+    // platform-accounts.ts uses DELETE /:id (per-row), NOT a batch-delete
+    // endpoint. The generic deleteBatch() client doesn't apply. Caught by
+    // validate-tablebase-registry.ts (QUA-456).
+    deletePath: null,
     thingsSourceTable: null,
   },
 };
