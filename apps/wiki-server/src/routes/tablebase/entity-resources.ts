@@ -1,17 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, inArray, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { entityResources, resources } from "../../schema.js";
-import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
-} from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { registerComposer, composeThing } from "../shared/compose-thing.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- QUA-470 Phase 4b-B.1: entity-resource composer ----
 //
@@ -46,18 +41,6 @@ const SyncItemSchema = z.object({
 const SyncBatchSchema = z.object({
   items: z.array(SyncItemSchema).min(1).max(1000),
 });
-
-type SyncItem = z.infer<typeof SyncItemSchema>;
-
-function toRow(item: SyncItem) {
-  return {
-    entityId: item.entityId,
-    resourceId: item.resourceId,
-    authoredByEntity: item.authoredByEntity,
-    isSubject: item.isSubject,
-    inferenceSource: item.inferenceSource ?? null,
-  };
-}
 
 const entityResourcesApp = new Hono()
 
@@ -94,68 +77,92 @@ const entityResourcesApp = new Hono()
     return c.json({ items: rows, total: rows.length });
   })
 
-  // POST /api/entity-resources/sync — batch upsert with OR-merge on boolean flags
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
+  // POST /api/entity-resources/sync — batch upsert with OR-merge on boolean flags.
+  // Uses sync-factory with a postUpsert hook for the resource-title-aware
+  // things dual-write (factory's toThing only resolves entity titles).
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "entity-resources",
+      table: entityResources,
+      batchSchema: SyncBatchSchema,
+      entityRefs: ["entityId"],
+      conflictTarget: [entityResources.entityId, entityResources.resourceId],
+      // OR-merge: boolean flags accumulate across seed passes (e.g.,
+      // publisher + wiki_citation). inferenceSource uses COALESCE
+      // (first-writer-wins) — the initial source is preserved.
+      conflictSet: {
+        authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
+        isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
+        inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
+      },
+      toRow: (item) => ({
+        entityId: item.entityId,
+        resourceId: item.resourceId,
+        authoredByEntity: item.authoredByEntity,
+        isSubject: item.isSubject,
+        inferenceSource: item.inferenceSource ?? null,
+      }),
+      // The entity-resource composer needs BOTH resource titles (from the
+      // resources table) AND entity titles in one combined map, plus the
+      // auto-generated row id for things.sourceId. The factory's toThing
+      // only receives entity titles, so we do the things dual-write in a
+      // postUpsert hook instead.
+      postUpsert: async (tx, items) => {
+        if (items.length === 0) return;
 
-    const parsed = SyncBatchSchema.safeParse(body);
-    if (!parsed.success) {
-      return validationError(
-        c,
-        parsed.error.issues.map((i) => i.message).join(", ")
-      );
-    }
+        const entityIds = [...new Set(items.map((i) => i.entityId))];
+        const resourceIds = [...new Set(items.map((i) => i.resourceId))];
 
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
+        // Re-fetch the rows we just upserted so we get the auto-generated
+        // `id` (for things.sourceId) and the merged boolean flags (for the
+        // composer's description).
+        const rows = await tx
+          .select({
+            id: entityResources.id,
+            entityId: entityResources.entityId,
+            resourceId: entityResources.resourceId,
+            authoredByEntity: entityResources.authoredByEntity,
+            isSubject: entityResources.isSubject,
+          })
+          .from(entityResources)
+          .where(
+            and(
+              inArray(entityResources.entityId, entityIds),
+              inArray(entityResources.resourceId, resourceIds),
+            ),
+          );
 
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "entityId", ids: items.map((i) => i.entityId) },
-    ]);
-    if (refError) return refError;
+        // Narrow to exactly the (entityId, resourceId) pairs we synced —
+        // the IN..IN above is a superset when multiple entities share
+        // resources within the same batch.
+        const pairKeys = new Set(
+          items.map((i) => `${i.entityId}\x00${i.resourceId}`),
+        );
+        const matched = rows.filter((r) =>
+          pairKeys.has(`${r.entityId}\x00${r.resourceId}`),
+        );
+        if (matched.length === 0) return;
 
-    const upserted = await db.transaction(async (tx) => {
-      // OR-merge: boolean flags accumulate across seed passes (e.g., publisher + wiki_citation).
-      // inferenceSource uses COALESCE (first-writer-wins) — the initial source is preserved.
-      const rows = await tx
-        .insert(entityResources)
-        .values(items.map(toRow))
-        .onConflictDoUpdate({
-          target: [entityResources.entityId, entityResources.resourceId],
-          set: {
-            authoredByEntity: sql`EXCLUDED.authored_by_entity OR entity_resources.authored_by_entity`,
-            isSubject: sql`EXCLUDED.is_subject OR entity_resources.is_subject`,
-            inferenceSource: sql`COALESCE(EXCLUDED.inference_source, entity_resources.inference_source)`,
-          },
-        })
-        .returning({ id: entityResources.id, entityId: entityResources.entityId, resourceId: entityResources.resourceId, authoredByEntity: entityResources.authoredByEntity, isSubject: entityResources.isSubject });
-
-      // Dual-write to things table for universal search/browse index
-      if (rows.length > 0) {
-        const resourceIds = [...new Set(rows.map((r) => r.resourceId))];
-        const entityIds = [...new Set(rows.map((r) => r.entityId))];
-
-        // Resolve resource titles and entity titles for search
+        // Resolve resource titles and entity titles into a single combined
+        // map (resourceId → title + entityId → title). The composer uses
+        // one lookup map; the keyspaces don't collide because resourceIds
+        // and entityIds use different prefixes.
         const resourceRows = await tx
           .select({ id: resources.id, title: resources.title, url: resources.url })
           .from(resources)
-          .where(sql`${resources.id} IN (${sql.join(resourceIds.map(id => sql`${id}`), sql`, `)})`);
-        const resourceTitleMap = new Map(resourceRows.map((r) => [r.id, r.title ?? r.url ?? r.id]));
-
+          .where(inArray(resources.id, resourceIds));
         const entityTitleMap = await resolveEntityTitles(tx, entityIds);
-
-        // Combined title map: resourceId → title AND entityId → title.
-        // The composer's titleMap parameter is a single Map; we merge both
-        // sources here so the composer can look up either kind of ref.
-        const combinedTitleMap = new Map([
-          ...resourceTitleMap.entries(),
+        const combinedTitleMap = new Map<string, string>([
+          ...resourceRows.map(
+            (r) => [r.id, r.title ?? r.url ?? r.id] as [string, string],
+          ),
           ...entityTitleMap.entries(),
         ]);
 
         await upsertThingsInTx(
           tx,
-          rows.map((r) => {
+          matched.map((r) => {
             const composed = composeThing<EntityResourceComposerRow>(
               "entity-resource",
               r,
@@ -170,15 +177,11 @@ const entityResourcesApp = new Hono()
               sourceTable: "entity_resources",
               sourceId: String(r.id),
             };
-          })
+          }),
         );
-      }
-
-      return rows;
-    });
-
-    return c.json({ total: upserted.length });
-  })
+      },
+    }),
+  )
 
   // GET /api/entity-resources/export — all rows (for build pipeline)
   .get("/export", async (c) => {
