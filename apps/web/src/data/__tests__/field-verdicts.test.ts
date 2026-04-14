@@ -172,3 +172,82 @@ describe("getRecordVerdictStats — per-field entry filtering", () => {
     expect(stats.contradicted).toBe(0);
   });
 });
+
+// ── QUA-423 phase 2: runtime guard in getRecordVerdict + getFieldVerdict ──
+//
+// The QUA-417 bug was callers passing a composite React key (`${owner}-${id}`)
+// to getRecordVerdict. Before phase 2 this silently returned null (the key
+// didn't exist in the verdict map); now it explicitly returns null at the
+// guard, logs a dev-mode warning, and skips the map lookup entirely.
+
+describe("getRecordVerdict / getFieldVerdict — QUA-423 composite-key guard", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    const mockVerdicts = buildMockVerdicts();
+    vi.mocked(fs.readFileSync).mockImplementation((filePath: unknown) => {
+      const p = String(filePath);
+      if (p.includes("record-verdicts.json")) return JSON.stringify(mockVerdicts);
+      if (p.includes("database.json")) return JSON.stringify(mockDatabase);
+      if (p.includes("factbase-data.json")) {
+        return JSON.stringify({ entities: {}, facts: {}, slugToEntityId: {} });
+      }
+      return "{}";
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+  });
+
+  it("returns the verdict for a valid raw record PK", async () => {
+    const { getRecordVerdict } = await import("../tablebase");
+    const v = getRecordVerdict("grant", "g_001");
+    expect(v?.verdict).toBe("confirmed");
+  });
+
+  it("returns null for the QUA-417 composite-key shape (no silent lookup)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { getRecordVerdict } = await import("../tablebase");
+
+    // sid_-prefixed composite (the exact shape that shipped)
+    const v = getRecordVerdict("grant", "sid_ULjDXpSLCI-g_001");
+    expect(v).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    expect(String(warn.mock.calls[0][0])).toContain("getRecordVerdict");
+    expect(String(warn.mock.calls[0][0])).toMatch(/QUA-417/);
+    warn.mockRestore();
+  });
+
+  it("returns null on empty string recordId (caller forgot a guard)", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { getRecordVerdict } = await import("../tablebase");
+    expect(getRecordVerdict("grant", "")).toBeNull();
+    warn.mockRestore();
+  });
+
+  it("does NOT flag legitimate hyphenated IDs (false-positive guard)", async () => {
+    const { getRecordVerdict } = await import("../tablebase");
+    // Expect null because the key isn't in the mock, but the guard should
+    // NOT short-circuit and warn — these are legitimate IDs.
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    expect(getRecordVerdict("wiki-page", "some-name-2024")).toBeNull();
+    expect(getRecordVerdict("publication", "arxiv-2310-12345")).toBeNull();
+    // No warnings fired for these shapes.
+    for (const call of warn.mock.calls) {
+      expect(String(call[0])).not.toMatch(/QUA-417/);
+    }
+    warn.mockRestore();
+  });
+
+  it("getFieldVerdict applies the same guard", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const { getFieldVerdict } = await import("../tablebase");
+
+    // Valid: returns the per-field verdict
+    expect(getFieldVerdict("grant", "g_001", "amount")?.verdict).toBe("confirmed");
+
+    // Composite key: guarded
+    const v = getFieldVerdict("grant", "sid_abc-sid_def", "amount");
+    expect(v).toBeNull();
+    expect(warn).toHaveBeenCalled();
+    expect(String(warn.mock.calls[0][0])).toContain("getFieldVerdict");
+    warn.mockRestore();
+  });
+});

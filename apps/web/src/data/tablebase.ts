@@ -36,6 +36,7 @@ import {
 import type { ValidSubcategory } from "./valid-subcategories";
 import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
 import { extractDomain } from "@/lib/resource-types";
+import { isCandidateRecordId } from "@longterm-wiki/sourcing-types";
 
 // Re-export for consumers
 export type { WithSource };
@@ -1088,14 +1089,51 @@ function getRecordVerdicts(): Record<string, RecordVerdict> {
   }
 }
 
-/** Get the sourcing verdict for a specific record */
+/**
+ * Shared dev-mode warning for the QUA-417 composite-key bug class.
+ * No-op in production.
+ */
+function warnMalformedRecordId(
+  fn: string,
+  recordType: string,
+  recordId: string,
+): void {
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[sourcing] ${fn}(${JSON.stringify(recordType)}, ${JSON.stringify(recordId)}): ` +
+        `recordId failed isCandidateRecordId guard (likely a composite React key — see QUA-417). ` +
+        `Returning null; the caller's verdict lookup would have silently missed anyway.`,
+    );
+  }
+}
+
+/**
+ * Get the sourcing verdict for a specific record.
+ *
+ * QUA-423 phase 2: runtime guard against composite React keys passed as
+ * recordId (the QUA-417 bug shape). Returns null fast in dev mode with a
+ * console.warn pointing callers at the real fix.
+ */
 export function getRecordVerdict(recordType: string, recordId: string): RecordVerdict | null {
+  if (!isCandidateRecordId(recordId)) {
+    warnMalformedRecordId("getRecordVerdict", recordType, recordId);
+    return null;
+  }
   return getRecordVerdicts()[`${recordType}:${recordId}`] ?? null;
 }
 
-/** Get the sourcing verdict for a specific field of a record.
- * Returns null if no per-field verdict exists for this field. */
+/**
+ * Get the sourcing verdict for a specific field of a record.
+ * Returns null if no per-field verdict exists for this field.
+ *
+ * QUA-423 phase 2: same composite-key guard as getRecordVerdict.
+ */
 export function getFieldVerdict(recordType: string, recordId: string, fieldName: string): RecordVerdict | null {
+  if (!isCandidateRecordId(recordId)) {
+    warnMalformedRecordId("getFieldVerdict", recordType, recordId);
+    return null;
+  }
   return getRecordVerdicts()[`${recordType}:${recordId}:${fieldName}`] ?? null;
 }
 

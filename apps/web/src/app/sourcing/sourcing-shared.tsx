@@ -4,6 +4,7 @@ import {
   SOURCE_CHECK_VERDICT_DESCRIPTIONS,
   SOURCE_CHECK_VERDICT_PRIORITY,
 } from "@/components/shared/verdict-styles";
+import { isCandidateRecordId } from "@longterm-wiki/sourcing-types";
 
 // ── Verdict styling (from shared module) ────────────────────────────────
 // Cast to Record<string, ...> so consumers can index with `string` verdict keys
@@ -89,9 +90,76 @@ export function getRecordHref(recordType: string, recordId: string): string | nu
   }
 }
 
-/** Get the URL for the sourcing detail page. */
-export function getSourcingHref(recordType: string, recordId: string): string {
+/** The sourcing index — used as a safe fallback when an ID would otherwise
+ *  build a 404 URL. See getStoredVerdictHref for why. */
+const SOURCING_INDEX_HREF = "/sourcing";
+
+/** Build the `/sourcing/:recordType/:recordId` path without any guards.
+ *  Callers are responsible for having already verified the IDs. */
+function buildSourcingPath(recordType: string, recordId: string): string {
   return `/sourcing/${encodeURIComponent(recordType)}/${encodeURIComponent(recordId)}`;
+}
+
+/**
+ * Get the URL for the sourcing detail page.
+ *
+ * QUA-423 phase 2: runtime guard against malformed record IDs. If `recordId`
+ * looks like a composite React key (e.g. `sid_ULjDXpSLCI-8NUnVSueLS` — the
+ * QUA-417 bug shape), returns `undefined` instead of building a 404 URL.
+ * Dot components already skip the `<a>` wrapper when `href` is undefined, so
+ * a malformed ID silently renders as a non-clickable dot rather than a
+ * broken link.
+ *
+ * The runtime check is the pragmatic half of the QUA-423 plan: it catches
+ * the real bug class without churning the ~70 existing call sites to wrap
+ * raw strings with `asRecordId()`. Compile-time narrowing via `RecordId<T>`
+ * is an optional follow-up once call sites stabilize.
+ */
+export function getSourcingHref(
+  recordType: string,
+  recordId: string,
+): string | undefined {
+  if (!isCandidateRecordId(recordId)) {
+    if (process.env.NODE_ENV !== "production") {
+      // eslint-disable-next-line no-console
+      console.warn(
+        `[sourcing] getSourcingHref(${JSON.stringify(recordType)}, ${JSON.stringify(recordId)}): ` +
+          `recordId failed isCandidateRecordId guard (likely a composite React key — see QUA-417). ` +
+          `Returning undefined; the receiving dot will render non-clickable.`,
+      );
+    }
+    return undefined;
+  }
+  return buildSourcingPath(recordType, recordId);
+}
+
+/**
+ * Variant of getSourcingHref for callers rendering rows that already came
+ * from the sourcing verdict store (e.g. /api/sourcing/verdicts). Every row
+ * there has a valid recordType + recordId by construction, so the href is
+ * always definable.
+ *
+ * Defense in depth: if the value somehow fails the guard (orphan row,
+ * mis-typed fixture), falls back to the sourcing index with a dev-mode
+ * warning — strictly better than rendering a 404 URL. Return type is
+ * `string` (not `string | undefined`) so Next.js `<Link>` accepts it
+ * without caller-side fallbacks.
+ */
+export function getStoredVerdictHref(
+  recordType: string,
+  recordId: string,
+): string {
+  const href = getSourcingHref(recordType, recordId);
+  if (href) return href;
+  if (process.env.NODE_ENV !== "production") {
+    // eslint-disable-next-line no-console
+    console.warn(
+      `[sourcing] getStoredVerdictHref: no href for stored verdict ` +
+        `${recordType}:${recordId} — falling back to ${SOURCING_INDEX_HREF}. ` +
+        `This suggests an orphaned record_type in source_check_verdicts.`,
+    );
+  }
+  return SOURCING_INDEX_HREF;
 }
 
 /**
