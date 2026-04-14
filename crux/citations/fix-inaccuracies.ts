@@ -928,6 +928,109 @@ export function repairJsonBackslashEscapes(input: string): string {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Proposal quality filters (QUA-349)
+// ---------------------------------------------------------------------------
+
+/**
+ * Components that carry cross-reference / provenance meaning in wiki MDX.
+ * Dropping one silently breaks linking or fact sourcing.
+ */
+const PRESERVED_COMPONENTS = ['EntityLink', 'F', 'R', 'FBF', 'FBFactValue', 'Calc'];
+
+/**
+ * Actions where the replacement is *expected* to be shorter than the original
+ * (the whole point of the action is to delete content). Shrink filter skips these.
+ */
+const SHRINK_EXEMPT_ACTIONS = new Set(['remove_ref', 'remove_detail']);
+
+/** Minimum length ratio (replacement/original) allowed for non-shrink-exempt actions. */
+const SHRINK_MIN_RATIO = 0.4;
+
+/**
+ * Escape bare `$digit` to `\$digit` so MDX doesn't interpret it as a JSX
+ * expression and the `dollar-signs` gate check doesn't fail. Leaves
+ * already-escaped `\$digit` untouched and ignores `$` preceded by other
+ * identifier characters (e.g. a variable like `abc$1`).
+ */
+export function escapeDollarDigits(s: string): string {
+  // Negative lookbehind for backslash (already escaped) and word chars
+  // (not a bare price). `?!` lookahead ensures a digit follows.
+  return s.replace(/(?<![\\\w])\$(?=\d)/g, '\\$');
+}
+
+/** Count preserved component tags in a string. */
+export function countPreservedComponents(s: string): number {
+  let total = 0;
+  for (const name of PRESERVED_COMPONENTS) {
+    const re = new RegExp(`<${name}\\b`, 'g');
+    const matches = s.match(re);
+    if (matches) total += matches.length;
+  }
+  return total;
+}
+
+export interface FilteredProposals {
+  kept: FixProposal[];
+  rejected: Array<{
+    proposal: FixProposal;
+    reason: 'component-drop' | 'shrink';
+    detail: string;
+  }>;
+  escapedCount: number;
+}
+
+/**
+ * Apply proposal quality filters post-parse:
+ *   1. Escape bare `$digit` → `\$digit` in the replacement (non-rejecting).
+ *   2. Reject proposals that drop a preserved component (<EntityLink>, <F>, etc.).
+ *   3. Reject proposals with len(replacement) < SHRINK_MIN_RATIO * len(original),
+ *      unless fixType is in SHRINK_EXEMPT_ACTIONS.
+ *
+ * See QUA-349 for the dry-run evidence that motivated each filter.
+ */
+export function filterProposals(proposals: FixProposal[]): FilteredProposals {
+  const kept: FixProposal[] = [];
+  const rejected: FilteredProposals['rejected'] = [];
+  let escapedCount = 0;
+
+  for (const raw of proposals) {
+    // Filter 1: escape bare $digit in replacement (does not reject)
+    const escaped = escapeDollarDigits(raw.replacement);
+    const p: FixProposal = escaped === raw.replacement ? raw : { ...raw, replacement: escaped };
+    if (escaped !== raw.replacement) escapedCount++;
+
+    // Filter 2: component preservation check
+    const originalComponents = countPreservedComponents(p.original);
+    const replacementComponents = countPreservedComponents(p.replacement);
+    if (replacementComponents < originalComponents) {
+      rejected.push({
+        proposal: p,
+        reason: 'component-drop',
+        detail: `replacement has ${replacementComponents} preserved components; original had ${originalComponents}`,
+      });
+      continue;
+    }
+
+    // Filter 3: unjustified shrink
+    if (!SHRINK_EXEMPT_ACTIONS.has(p.fixType) && p.original.length > 0) {
+      const ratio = p.replacement.length / p.original.length;
+      if (ratio < SHRINK_MIN_RATIO) {
+        rejected.push({
+          proposal: p,
+          reason: 'shrink',
+          detail: `replacement is ${Math.round(ratio * 100)}% of original length (min ${Math.round(SHRINK_MIN_RATIO * 100)}% for fixType=${p.fixType})`,
+        });
+        continue;
+      }
+    }
+
+    kept.push(p);
+  }
+
+  return { kept, rejected, escapedCount };
+}
+
 /** Parse LLM response into fix proposals. */
 export function parseLLMFixResponse(content: string): FixProposal[] {
   const cleaned = stripCodeFences(content);
@@ -999,7 +1102,29 @@ export async function generateFixesForPage(
     title: 'LongtermWiki Fix Inaccuracies',
   });
 
-  return parseLLMFixResponse(response);
+  const parsed = parseLLMFixResponse(response);
+  const filtered = filterProposals(parsed);
+
+  if (filtered.rejected.length > 0 || filtered.escapedCount > 0) {
+    const parts: string[] = [];
+    if (filtered.escapedCount > 0) {
+      parts.push(`${filtered.escapedCount} $digit escape(s)`);
+    }
+    if (filtered.rejected.length > 0) {
+      const byReason = filtered.rejected.reduce<Record<string, number>>((acc, r) => {
+        acc[r.reason] = (acc[r.reason] ?? 0) + 1;
+        return acc;
+      }, {});
+      const reasonStr = Object.entries(byReason).map(([k, v]) => `${v} ${k}`).join(', ');
+      parts.push(`${filtered.rejected.length} rejected (${reasonStr})`);
+    }
+    console.warn(`  [filter] ${pageId}: ${parts.join('; ')}`);
+    for (const r of filtered.rejected) {
+      console.warn(`    [-] [^${r.proposal.footnote}] ${r.reason}: ${r.detail}`);
+    }
+  }
+
+  return filtered.kept;
 }
 
 // ---------------------------------------------------------------------------
