@@ -38,6 +38,7 @@ function makeConfig(overrides: Partial<Config> = {}): Config {
       },
       jobFailureTriage: { enabled: true, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: true, schedule: "0 5 * * *" },
+      e2ePostDeployWatcher: { enabled: false, schedule: "15 * * * *" },
     },
     ...overrides,
   };
