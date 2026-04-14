@@ -16,6 +16,7 @@ import {
   diffAliases,
   resolveAliasTarget,
   runCheck,
+  type AliasSide,
   type TsConfigEntry,
 } from './validate-tsconfig-aliases.ts';
 
@@ -66,50 +67,62 @@ describe('validate-tsconfig-aliases', () => {
   });
 
   describe('diffAliases', () => {
-    const CRUX = '/repo/crux/tsconfig.json';
-    const APPS_WEB = '/repo/apps/web/tsconfig.json';
+    const cruxSide = (paths: Record<string, string[]>): AliasSide => ({
+      paths,
+      tsconfigPath: '/repo/crux/tsconfig.json',
+      baseUrl: '.',
+    });
+    const appsWebSide = (paths: Record<string, string[]>): AliasSide => ({
+      paths,
+      tsconfigPath: '/repo/apps/web/tsconfig.json',
+      baseUrl: '.',
+    });
 
     it('treats differently-spelled-but-same-absolute-path targets as matching', () => {
       // crux/tsconfig uses "../apps/wiki-server/..." (relative to crux/)
       // apps/web/tsconfig uses "../wiki-server/..." (relative to apps/web/)
       // Both resolve to the SAME absolute path: /repo/apps/wiki-server/src/facts.ts
-      const crux = {
-        '@wiki-server/facts-route': ['../apps/wiki-server/src/routes/factbase/facts.ts'],
-      };
-      const appsWeb = {
-        '@wiki-server/facts-route': ['../wiki-server/src/routes/factbase/facts.ts'],
-      };
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+      const result = diffAliases(
+        cruxSide({
+          '@wiki-server/facts-route': ['../apps/wiki-server/src/routes/factbase/facts.ts'],
+        }),
+        appsWebSide({
+          '@wiki-server/facts-route': ['../wiki-server/src/routes/factbase/facts.ts'],
+        })
+      );
       expect(result.onlyInFirst).toEqual([]);
       expect(result.onlyInSecond).toEqual([]);
       expect(result.targetMismatches).toEqual([]);
     });
 
     it('detects keys missing from first config', () => {
-      const crux = {};
-      const appsWeb = { '@wiki-server/foo-route': ['../wiki-server/src/foo.ts'] };
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+      const result = diffAliases(
+        cruxSide({}),
+        appsWebSide({ '@wiki-server/foo-route': ['../wiki-server/src/foo.ts'] })
+      );
       expect(result.onlyInSecond).toEqual(['@wiki-server/foo-route']);
       expect(result.onlyInFirst).toEqual([]);
       expect(result.targetMismatches).toEqual([]);
     });
 
     it('detects keys missing from second config', () => {
-      const crux = { '@wiki-server/bar-route': ['../apps/wiki-server/src/bar.ts'] };
-      const appsWeb = {};
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+      const result = diffAliases(
+        cruxSide({ '@wiki-server/bar-route': ['../apps/wiki-server/src/bar.ts'] }),
+        appsWebSide({})
+      );
       expect(result.onlyInFirst).toEqual(['@wiki-server/bar-route']);
       expect(result.onlyInSecond).toEqual([]);
     });
 
     it('detects target-path drift when keys match but files differ', () => {
-      const crux = {
-        '@wiki-server/foo-route': ['../apps/wiki-server/src/routes/old-foo.ts'],
-      };
-      const appsWeb = {
-        '@wiki-server/foo-route': ['../wiki-server/src/routes/new-foo.ts'],
-      };
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+      const result = diffAliases(
+        cruxSide({
+          '@wiki-server/foo-route': ['../apps/wiki-server/src/routes/old-foo.ts'],
+        }),
+        appsWebSide({
+          '@wiki-server/foo-route': ['../wiki-server/src/routes/new-foo.ts'],
+        })
+      );
       expect(result.targetMismatches).toHaveLength(1);
       expect(result.targetMismatches[0].key).toBe('@wiki-server/foo-route');
       expect(result.targetMismatches[0].first[0]).toContain('old-foo.ts');
@@ -117,13 +130,14 @@ describe('validate-tsconfig-aliases', () => {
     });
 
     it('sorts missing-key lists', () => {
-      const crux = {};
-      const appsWeb = {
-        '@wiki-server/zeta-route': ['../wiki-server/src/z.ts'],
-        '@wiki-server/alpha-route': ['../wiki-server/src/a.ts'],
-        '@wiki-server/mu-route': ['../wiki-server/src/m.ts'],
-      };
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+      const result = diffAliases(
+        cruxSide({}),
+        appsWebSide({
+          '@wiki-server/zeta-route': ['../wiki-server/src/z.ts'],
+          '@wiki-server/alpha-route': ['../wiki-server/src/a.ts'],
+          '@wiki-server/mu-route': ['../wiki-server/src/m.ts'],
+        })
+      );
       expect(result.onlyInSecond).toEqual([
         '@wiki-server/alpha-route',
         '@wiki-server/mu-route',
@@ -131,14 +145,8 @@ describe('validate-tsconfig-aliases', () => {
       ]);
     });
 
-    it('ignores non-wiki-server aliases', () => {
-      // The real tsconfigs also have @/*, @components/* etc.
-      // Our extract-before-diff flow already filters, so diffAliases
-      // itself just receives filtered maps — but verify it doesn't
-      // accidentally fail on empty shared sets.
-      const crux = {};
-      const appsWeb = {};
-      const result = diffAliases(crux, CRUX, '.', appsWeb, APPS_WEB, '.');
+    it('returns empty drift for two empty path sets', () => {
+      const result = diffAliases(cruxSide({}), appsWebSide({}));
       expect(result).toEqual({ onlyInFirst: [], onlyInSecond: [], targetMismatches: [] });
     });
   });

@@ -93,6 +93,16 @@ export function resolveAliasTarget(tsconfigPath: string, baseUrl: string, patter
   return resolve(base, pattern);
 }
 
+/**
+ * One side of the comparison — bundles the @wiki-server/* paths plus
+ * everything needed to resolve them to absolute files.
+ */
+export interface AliasSide {
+  paths: Record<string, string[]>;
+  tsconfigPath: string;
+  baseUrl: string;
+}
+
 export interface AliasDrift {
   onlyInFirst: string[];
   onlyInSecond: string[];
@@ -104,28 +114,21 @@ export interface AliasDrift {
   }>;
 }
 
-export function diffAliases(
-  first: Record<string, string[]>,
-  firstTsconfigPath: string,
-  firstBaseUrl: string,
-  second: Record<string, string[]>,
-  secondTsconfigPath: string,
-  secondBaseUrl: string
-): AliasDrift {
-  const firstKeys = new Set(Object.keys(first));
-  const secondKeys = new Set(Object.keys(second));
+export function diffAliases(first: AliasSide, second: AliasSide): AliasDrift {
+  const firstKeys = new Set(Object.keys(first.paths));
+  const secondKeys = new Set(Object.keys(second.paths));
 
   const onlyInFirst = [...firstKeys].filter((k) => !secondKeys.has(k)).sort();
   const onlyInSecond = [...secondKeys].filter((k) => !firstKeys.has(k)).sort();
 
-  const sharedKeys = [...firstKeys].filter((k) => secondKeys.has(k)).sort();
+  const sharedKeys = [...firstKeys].filter((k) => secondKeys.has(k));
   const targetMismatches: AliasDrift['targetMismatches'] = [];
   for (const key of sharedKeys) {
-    const firstAbs = (first[key] ?? []).map((p) =>
-      resolveAliasTarget(firstTsconfigPath, firstBaseUrl, p)
+    const firstAbs = (first.paths[key] ?? []).map((p) =>
+      resolveAliasTarget(first.tsconfigPath, first.baseUrl, p)
     );
-    const secondAbs = (second[key] ?? []).map((p) =>
-      resolveAliasTarget(secondTsconfigPath, secondBaseUrl, p)
+    const secondAbs = (second.paths[key] ?? []).map((p) =>
+      resolveAliasTarget(second.tsconfigPath, second.baseUrl, p)
     );
     if (firstAbs.length !== secondAbs.length || firstAbs.some((p, i) => p !== secondAbs[i])) {
       targetMismatches.push({ key, first: firstAbs, second: secondAbs });
@@ -148,6 +151,43 @@ export interface RunCheckResult {
   drift: AliasDrift;
 }
 
+interface LoadedSide {
+  entry: TsConfigEntry;
+  cfg: TsConfig;
+  side: AliasSide;
+}
+
+function loadSide(entry: TsConfigEntry): LoadedSide {
+  const cfg = readTsConfig(entry);
+  return {
+    entry,
+    cfg,
+    side: {
+      paths: extractWikiServerPaths(cfg),
+      tsconfigPath: entry.path,
+      baseUrl: cfg.compilerOptions?.baseUrl ?? '.',
+    },
+  };
+}
+
+/**
+ * Refuse to run on configs that use `extends` — resolving the chain is
+ * out of scope and silently dropping inherited paths would mask drift.
+ * Returns true if the config was rejected (and prints the error).
+ */
+function rejectExtends(loaded: LoadedSide, c: ReturnType<typeof getColors>): boolean {
+  if (loaded.cfg.extends === undefined) return false;
+  console.error(
+    `${c.red}${loaded.entry.label} uses "extends": "${loaded.cfg.extends}" — this validator does not support extends chains.${c.reset}`
+  );
+  console.error(
+    `${c.dim}Either resolve the chain manually or extend this validator to follow extends.${c.reset}`
+  );
+  return true;
+}
+
+const EMPTY_DRIFT: AliasDrift = { onlyInFirst: [], onlyInSecond: [], targetMismatches: [] };
+
 export function runCheck(options: RunCheckOptions = {}): RunCheckResult {
   const c = getColors();
   const silent = options.silent ?? false;
@@ -158,69 +198,41 @@ export function runCheck(options: RunCheckOptions = {}): RunCheckResult {
       `validate-tsconfig-aliases expects exactly 2 tsconfigs, got ${tsconfigs.length}`
     );
   }
-  const [firstEntry, secondEntry] = tsconfigs;
 
   if (!silent) {
     console.log(`${c.blue}Checking @wiki-server/* alias parity between tsconfigs...${c.reset}\n`);
   }
 
-  const firstCfg = readTsConfig(firstEntry);
-  const secondCfg = readTsConfig(secondEntry);
+  const first = loadSide(tsconfigs[0]);
+  const second = loadSide(tsconfigs[1]);
 
-  // Refuse to run on configs that use `extends` — resolving the chain is
-  // out of scope and silently dropping inherited paths would mask drift.
-  for (const [entry, cfg] of [
-    [firstEntry, firstCfg],
-    [secondEntry, secondCfg],
-  ] as const) {
-    if (cfg.extends !== undefined) {
-      console.error(
-        `${c.red}${entry.label} uses "extends": "${cfg.extends}" — this validator does not support extends chains.${c.reset}`
-      );
-      console.error(
-        `${c.dim}Either resolve the chain manually or extend this validator to follow extends.${c.reset}`
-      );
-      return { passed: false, errors: 1, drift: { onlyInFirst: [], onlyInSecond: [], targetMismatches: [] } };
-    }
+  if (rejectExtends(first, c) || rejectExtends(second, c)) {
+    return { passed: false, errors: 1, drift: EMPTY_DRIFT };
   }
 
-  const firstBaseUrl = firstCfg.compilerOptions?.baseUrl ?? '.';
-  const secondBaseUrl = secondCfg.compilerOptions?.baseUrl ?? '.';
-
-  const firstPaths = extractWikiServerPaths(firstCfg);
-  const secondPaths = extractWikiServerPaths(secondCfg);
-
-  const drift = diffAliases(
-    firstPaths,
-    firstEntry.path,
-    firstBaseUrl,
-    secondPaths,
-    secondEntry.path,
-    secondBaseUrl
-  );
-
+  const drift = diffAliases(first.side, second.side);
   const totalErrors =
     drift.onlyInFirst.length + drift.onlyInSecond.length + drift.targetMismatches.length;
 
   if (totalErrors === 0) {
     if (!silent) {
       console.log(
-        `${c.green}✓ @wiki-server/* aliases in sync (${Object.keys(firstPaths).length} keys)${c.reset}`
+        `${c.green}✓ @wiki-server/* aliases in sync (${Object.keys(first.side.paths).length} keys)${c.reset}`
       );
     }
     return { passed: true, errors: 0, drift };
   }
 
   console.error(
-    `${c.red}Found ${totalErrors} @wiki-server/* alias drift(s) between ${firstEntry.label} and ${secondEntry.label}:${c.reset}\n`
+    `${c.red}Found ${totalErrors} @wiki-server/* alias drift(s) between ${first.entry.label} and ${second.entry.label}:${c.reset}\n`
   );
   if (drift.onlyInSecond.length > 0) {
-    console.error(`  ${c.yellow}Missing from ${firstEntry.label}:${c.reset}`);
+    console.error(`  ${c.yellow}Missing from ${first.entry.label}:${c.reset}`);
     for (const key of drift.onlyInSecond) console.error(`    - ${key}`);
     console.error();
   }
   if (drift.onlyInFirst.length > 0) {
-    console.error(`  ${c.yellow}Missing from ${secondEntry.label}:${c.reset}`);
+    console.error(`  ${c.yellow}Missing from ${second.entry.label}:${c.reset}`);
     for (const key of drift.onlyInFirst) console.error(`    - ${key}`);
     console.error();
   }
@@ -230,8 +242,8 @@ export function runCheck(options: RunCheckOptions = {}): RunCheckResult {
     );
     for (const mismatch of drift.targetMismatches) {
       console.error(`    ${mismatch.key}`);
-      console.error(`      ${firstEntry.label}:  ${mismatch.first.join(', ')}`);
-      console.error(`      ${secondEntry.label}: ${mismatch.second.join(', ')}`);
+      console.error(`      ${first.entry.label}:  ${mismatch.first.join(', ')}`);
+      console.error(`      ${second.entry.label}: ${mismatch.second.join(', ')}`);
     }
     console.error();
   }
