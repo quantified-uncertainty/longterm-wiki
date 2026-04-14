@@ -406,6 +406,7 @@ describe('flagship-curate', () => {
       mockApiRequest.mockResolvedValue({
         ok: false,
         error: 'unavailable',
+        message: 'wiki-server connection refused',
         status: 503,
       });
 
@@ -417,6 +418,9 @@ describe('flagship-curate', () => {
 
       expect(result.exitCode).toBe(1);
       expect(result.output).toMatch(/Failed to fetch entities from wiki-server/);
+      expect(result.output).toMatch(/unavailable/);
+      // Human-readable message preserved alongside the error code (review finding).
+      expect(result.output).toMatch(/wiki-server connection refused/);
       expect(result.output).toMatch(/QUA-452/);
       // Must NOT silently report "no entities found" — that was the bug.
       expect(result.output).not.toMatch(/No entities found needing curation/);

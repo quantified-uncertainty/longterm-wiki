@@ -176,7 +176,8 @@ async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesR
   }>('GET', `/api/entities?entityType=organization&limit=200`);
 
   if (!result.ok) {
-    return { ok: false, error: String(result.error) };
+    // Preserve both error code and human-readable message for CI logs.
+    return { ok: false, error: `${result.error}: ${result.message}` };
   }
 
   // For each entity, check how many non-confirmed verdicts exist
