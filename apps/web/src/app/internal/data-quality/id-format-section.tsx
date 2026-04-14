@@ -6,8 +6,13 @@ import {
   type IdFormatBucketName,
   type IdFormatSourceTableName,
 } from "@wiki-server/api-types";
-import { SectionErrorBoundary } from "@/components/shared/SectionErrorBoundary";
 import type { RpcDataQualityHistoryResult } from "@lib/wiki-server";
+
+// Sparkline history window (snapshots).
+const SPARKLINE_MAX_POINTS = 30;
+// Snapshots required before rendering the sparkline — avoid misleading
+// single-point charts on dashboards newly populated.
+const SPARKLINE_MIN_POINTS = 7;
 
 type SnapshotLike = RpcDataQualityHistoryResult["snapshots"][number];
 
@@ -48,10 +53,33 @@ export function parseAudit(snapshot: SnapshotLike): IdFormatAudit | null {
 export interface RegressionAlert {
   severity: "yellow" | "red";
   bucket: IdFormatBucketName;
+  sourceTable: IdFormatSourceTableName | "total";
   delta: number;
   deltaPct: number | null;
 }
 
+const ALERT_DELTA_RED = 10;
+const ALERT_DELTA_PCT_RED = 25;
+
+function classifyDelta(
+  cur: number,
+  prev: number,
+): { severity: "red" | "yellow"; delta: number; deltaPct: number | null } | null {
+  const delta = cur - prev;
+  if (delta <= 0) return null;
+  const deltaPct = prev > 0 ? (delta / prev) * 100 : null;
+  const severity: "red" | "yellow" =
+    delta >= ALERT_DELTA_RED ||
+    (deltaPct !== null && deltaPct >= ALERT_DELTA_PCT_RED)
+      ? "red"
+      : "yellow";
+  return { severity, delta, deltaPct };
+}
+
+// Compares `latest` to the immediately previous audit snapshot (not N-days-
+// ago). Groundskeeper runs daily at 06:00 UTC so that's usually ~24h, but
+// after an outage the gap can be larger — treat thresholds as inter-snapshot
+// deltas, not strictly per-day.
 export function computeAlerts(
   latest: IdFormatAudit,
   previous: IdFormatAudit | null,
@@ -60,14 +88,14 @@ export function computeAlerts(
   const alerts: RegressionAlert[] = [];
   for (const b of ID_FORMAT_BUCKET_NAMES) {
     if (CANONICAL_BUCKETS.has(b)) continue; // canonical growth is good
-    const cur = latest.totals[b];
-    const prev = previous.totals[b];
-    const delta = cur - prev;
-    if (delta <= 0) continue;
-    const deltaPct = prev > 0 ? (delta / prev) * 100 : null;
-    const severity: "red" | "yellow" =
-      delta >= 10 || (deltaPct !== null && deltaPct >= 25) ? "red" : "yellow";
-    alerts.push({ severity, bucket: b, delta, deltaPct });
+    // Per-table alerts so the yellow pill can render in the right row.
+    for (const t of ID_FORMAT_SOURCE_TABLES) {
+      const result = classifyDelta(
+        latest.bySourceTable[t][b],
+        previous.bySourceTable[t][b],
+      );
+      if (result) alerts.push({ ...result, bucket: b, sourceTable: t });
+    }
   }
   return alerts;
 }
@@ -129,10 +157,10 @@ function IdFormatSectionInner({ snapshots }: { snapshots: SnapshotLike[] }) {
   const yellowAlerts = alerts.filter((a) => a.severity === "yellow");
 
   const historyCount = audits.length;
-  const showSparkline = historyCount >= 7;
+  const showSparkline = historyCount >= SPARKLINE_MIN_POINTS;
   const legacyHistory = showSparkline
     ? audits
-        .slice(0, 30)
+        .slice(0, SPARKLINE_MAX_POINTS)
         .reverse()
         .map((a) =>
           Array.from(LEGACY_BUCKETS).reduce(
@@ -159,7 +187,7 @@ function IdFormatSectionInner({ snapshots }: { snapshots: SnapshotLike[] }) {
           {redAlerts
             .map(
               (a) =>
-                `${BUCKET_LABELS[a.bucket]} +${a.delta}${a.deltaPct ? ` (+${a.deltaPct.toFixed(0)}%)` : ""}`,
+                `${a.sourceTable}.${BUCKET_LABELS[a.bucket]} +${a.delta}${a.deltaPct ? ` (+${a.deltaPct.toFixed(0)}%)` : ""}`,
             )
             .join(", ")}
           . See QUA-43 for the underlying cleanup.
@@ -192,7 +220,7 @@ function IdFormatSectionInner({ snapshots }: { snapshots: SnapshotLike[] }) {
                   {ID_FORMAT_BUCKET_NAMES.map((b) => {
                     const count = row[b];
                     const yellow = yellowAlerts.find(
-                      (a) => a.bucket === b,
+                      (a) => a.bucket === b && a.sourceTable === t,
                     );
                     return (
                       <td
@@ -200,7 +228,7 @@ function IdFormatSectionInner({ snapshots }: { snapshots: SnapshotLike[] }) {
                         className={`text-right py-2 px-2 ${bucketColor(b)}`}
                       >
                         {formatNumber(count)}
-                        {yellow && t === "facts" && (
+                        {yellow && (
                           <span className="ml-1 text-xs text-yellow-700">
                             +{yellow.delta}
                           </span>
@@ -236,23 +264,15 @@ function IdFormatSectionInner({ snapshots }: { snapshots: SnapshotLike[] }) {
   );
 }
 
+// Exported for test boundaries. `parseAudit` already uses `safeParse`, so
+// a malformed payload degrades to the "no audit yet" placeholder rather
+// than throwing — a React error boundary would only catch an unrelated
+// runtime bug, and server-side RSC errors aren't caught by class boundaries
+// anyway.
 export function IdFormatSection({
   snapshots,
 }: {
   snapshots: SnapshotLike[];
 }) {
-  return (
-    <SectionErrorBoundary
-      fallback={
-        <section>
-          <h2 className="text-lg font-semibold mb-2">ID Format Audit</h2>
-          <p className="text-sm text-muted-foreground">
-            ID format audit unavailable — see QUA-407.
-          </p>
-        </section>
-      }
-    >
-      <IdFormatSectionInner snapshots={snapshots} />
-    </SectionErrorBoundary>
-  );
+  return <IdFormatSectionInner snapshots={snapshots} />;
 }

@@ -25,18 +25,21 @@ test("data-quality dashboard renders ID Format Audit section", async ({
   const heading = page.getByRole("heading", { name: /id format audit/i });
   await expect(heading).toBeVisible();
 
-  // Any rendered counts must be non-negative. Collect cell contents that
-  // look like plain integers and assert none are negative.
-  const bodyText = (await page.textContent("body")) ?? "";
-  const negativeMatches = bodyText.match(/-\d{1,}/g) ?? [];
-  // Strip timestamps / IDs that happen to contain a hyphen-digit
-  const unexpectedNegatives = negativeMatches.filter(
-    (m) => !m.match(/\d{4}-\d{2}/) && !m.match(/^-?0/),
-  );
-  expect(
-    unexpectedNegatives,
-    `Unexpected negative counts on page: ${unexpectedNegatives.join(", ")}`,
-  ).toHaveLength(0);
+  // Scope count assertions to cells inside the audit table (if populated).
+  // Avoids false positives from dates, IDs, or unrelated UI strings.
+  const auditTable = page.locator('table:below(:text("ID Format Audit"))').first();
+  if (await auditTable.count()) {
+    const cellNumbers = await auditTable.locator("td").allInnerTexts();
+    for (const raw of cellNumbers) {
+      const digits = raw.replace(/[,\s]/g, "");
+      if (/^-?\d+$/.test(digits)) {
+        expect(
+          Number(digits),
+          `Negative count in audit table: ${raw}`,
+        ).toBeGreaterThanOrEqual(0);
+      }
+    }
+  }
 
   expect(
     consoleErrors,

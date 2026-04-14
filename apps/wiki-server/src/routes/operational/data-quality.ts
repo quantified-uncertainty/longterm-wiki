@@ -22,7 +22,13 @@ import {
 } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
 import { logger } from "../../logger.js";
-import type { IdFormatAudit } from "../../api-types.js";
+import {
+  ID_FORMAT_BUCKET_NAMES,
+  ID_FORMAT_SOURCE_TABLES,
+  type IdFormatAudit,
+  type IdFormatBucketName,
+  type IdFormatSourceTableName,
+} from "../../api-types.js";
 
 // ---------------------------------------------------------------------------
 // Row type for raw SQL snapshot aggregation
@@ -35,13 +41,21 @@ import type { IdFormatAudit } from "../../api-types.js";
 // ID Format Audit (QUA-407 / QUA-439)
 // ---------------------------------------------------------------------------
 //
-// Source: apps/web/src/app/internal/entity-profile/sanitize-raw-ids.ts
-// Keep in sync — grep for ID_FORMAT_REGEXES on rename.
+// Classifies atomic primary-key ID columns into coexisting formats so the
+// dashboard can show sprawl at a glance and QUA-43 has a measurable target.
 //
-// Classifies `things.source_id` into coexisting ID formats so the dashboard
-// can show sprawl at a glance and QUA-43 has a measurable target.
+// Related code: apps/web/src/app/internal/entity-profile/sanitize-raw-ids.ts
+// uses similar regexes for render-time sanitization. The shapes match but
+// the taxonomies are different (this file splits lowercase-hex by length
+// 8 vs 16; sanitize-raw-ids.ts groups 8–12 together). Keep the *shapes*
+// aligned — if a new ID format appears, update both files.
+//
+// Source columns (NOT `things.source_id` — `things.source_id` for facts is a
+// composite `<entityStableId>:<factId>`, which defeats classification):
+//   - facts.fact_id                        → bucket for fact IDs
+//   - resources.id (primary key)           → bucket for resource IDs
 
-export const ID_FORMAT_REGEXES = {
+const ID_FORMAT_REGEXES = {
   canonical_f: "^f_[A-Za-z0-9]{8,}$",
   canonical_sid: "^sid_[A-Za-z0-9]{10}$",
   legacy_hex8: "^[0-9a-f]{8}$",
@@ -49,22 +63,6 @@ export const ID_FORMAT_REGEXES = {
     "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9]{10}$",
   legacy_hex16: "^[0-9a-f]{16}$",
 } as const;
-
-export const ID_FORMAT_BUCKETS = [
-  "canonical_f",
-  "canonical_sid",
-  "legacy_hex8",
-  "legacy_alnum10",
-  "legacy_hex16",
-  "other",
-] as const;
-export type IdFormatBucket = (typeof ID_FORMAT_BUCKETS)[number];
-
-// `entity_resources` is NOT in `things.source_table` (confirmed via
-// record-lookup.ts VALID_SOURCE_TABLES). Scoped to what `things` actually
-// indexes. If that enum grows, expand here.
-export const ALLOWED_SOURCE_TABLES = ["facts", "resources"] as const;
-export type IdFormatSourceTable = (typeof ALLOWED_SOURCE_TABLES)[number];
 
 
 type IdFormatAuditRow = {
@@ -82,14 +80,24 @@ type IdFormatAuditRow = {
   resources_total: string;
 };
 
-const EMPTY_BUCKETS: Record<IdFormatBucket, number> = {
-  canonical_f: 0,
-  canonical_sid: 0,
-  legacy_hex8: 0,
-  legacy_alnum10: 0,
-  legacy_hex16: 0,
-  other: 0,
-};
+function emptyBuckets(): Record<IdFormatBucketName, number> {
+  return {
+    canonical_f: 0,
+    canonical_sid: 0,
+    legacy_hex8: 0,
+    legacy_alnum10: 0,
+    legacy_hex16: 0,
+    other: 0,
+  };
+}
+
+const NAMED_BUCKETS: ReadonlyArray<Exclude<IdFormatBucketName, "other">> = [
+  "canonical_f",
+  "canonical_sid",
+  "legacy_hex8",
+  "legacy_alnum10",
+  "legacy_hex16",
+];
 
 export async function captureIdFormatAudit(
   db: ReturnType<typeof getDrizzleDb>
@@ -101,65 +109,55 @@ export async function captureIdFormatAudit(
     await tx.execute(sql`SET LOCAL statement_timeout = '30000'`);
     return (await tx.execute(
       sql`
-      WITH id_audit AS (
-        SELECT
-          COUNT(*) FILTER (WHERE source_table = 'facts'     AND source_id ~ ${ID_FORMAT_REGEXES.canonical_f})::text      AS facts_canonical_f,
-          COUNT(*) FILTER (WHERE source_table = 'facts'     AND source_id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text    AS facts_canonical_sid,
-          COUNT(*) FILTER (WHERE source_table = 'facts'     AND source_id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text      AS facts_legacy_hex8,
-          COUNT(*) FILTER (WHERE source_table = 'facts'     AND source_id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text   AS facts_legacy_alnum10,
-          COUNT(*) FILTER (WHERE source_table = 'facts'     AND source_id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text     AS facts_legacy_hex16,
-          COUNT(*) FILTER (WHERE source_table = 'facts')::text                                                          AS facts_total,
-          COUNT(*) FILTER (WHERE source_table = 'resources' AND source_id ~ ${ID_FORMAT_REGEXES.canonical_f})::text      AS resources_canonical_f,
-          COUNT(*) FILTER (WHERE source_table = 'resources' AND source_id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text    AS resources_canonical_sid,
-          COUNT(*) FILTER (WHERE source_table = 'resources' AND source_id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text      AS resources_legacy_hex8,
-          COUNT(*) FILTER (WHERE source_table = 'resources' AND source_id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text   AS resources_legacy_alnum10,
-          COUNT(*) FILTER (WHERE source_table = 'resources' AND source_id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text     AS resources_legacy_hex16,
-          COUNT(*) FILTER (WHERE source_table = 'resources')::text                                                      AS resources_total
-        FROM things
-        WHERE source_table = ANY(ARRAY['facts','resources'])
-          AND source_id IS NOT NULL
-      )
-      SELECT * FROM id_audit
+      WITH facts_audit AS (SELECT
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.canonical_f})::text    AS facts_canonical_f,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text  AS facts_canonical_sid,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text    AS facts_legacy_hex8,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text AS facts_legacy_alnum10,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text   AS facts_legacy_hex16,
+        COUNT(*)::text                                                              AS facts_total
+      FROM facts WHERE fact_id IS NOT NULL),
+      resources_audit AS (SELECT
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.canonical_f})::text         AS resources_canonical_f,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text       AS resources_canonical_sid,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text         AS resources_legacy_hex8,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text      AS resources_legacy_alnum10,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text        AS resources_legacy_hex16,
+        COUNT(*)::text                                                              AS resources_total
+      FROM resources WHERE id IS NOT NULL)
+      SELECT * FROM facts_audit, resources_audit
     `
     )) as IdFormatAuditRow[];
   });
 
   const row = rows[0];
   const bySourceTable: Record<
-    IdFormatSourceTable,
-    Record<IdFormatBucket, number>
+    IdFormatSourceTableName,
+    Record<IdFormatBucketName, number>
   > = {
-    facts: { ...EMPTY_BUCKETS },
-    resources: { ...EMPTY_BUCKETS },
+    facts: emptyBuckets(),
+    resources: emptyBuckets(),
   };
 
   if (row) {
-    for (const table of ALLOWED_SOURCE_TABLES) {
+    for (const table of ID_FORMAT_SOURCE_TABLES) {
       const buckets = bySourceTable[table];
-      const named: IdFormatBucket[] = [
-        "canonical_f",
-        "canonical_sid",
-        "legacy_hex8",
-        "legacy_alnum10",
-        "legacy_hex16",
-      ];
       let namedSum = 0;
-      for (const b of named) {
+      for (const b of NAMED_BUCKETS) {
         const key = `${table}_${b}` as keyof IdFormatAuditRow;
         const n = Number(row[key] ?? "0");
-        buckets[b] = n;
-        namedSum += n;
+        buckets[b] = Number.isFinite(n) ? n : 0;
+        namedSum += buckets[b];
       }
       const totalKey = `${table}_total` as keyof IdFormatAuditRow;
       const total = Number(row[totalKey] ?? "0");
-      buckets.other = Math.max(0, total - namedSum);
+      buckets.other = Math.max(0, (Number.isFinite(total) ? total : 0) - namedSum);
     }
   }
 
-  const totals: Record<IdFormatBucket, number> = { ...EMPTY_BUCKETS };
-  for (const b of ID_FORMAT_BUCKETS) {
-    totals[b] =
-      bySourceTable.facts[b] + bySourceTable.resources[b];
+  const totals = emptyBuckets();
+  for (const b of ID_FORMAT_BUCKET_NAMES) {
+    totals[b] = bySourceTable.facts[b] + bySourceTable.resources[b];
   }
 
   return {

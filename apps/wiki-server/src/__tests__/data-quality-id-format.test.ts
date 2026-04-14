@@ -20,8 +20,9 @@ vi.mock("../db.js", () =>
     const q = query.toLowerCase();
     // SET LOCAL — no rows
     if (q.includes("set local")) return [];
-    // The id-audit CTE is the only other SELECT in this test path
-    if (q.includes("id_audit")) {
+    // The facts_audit / resources_audit CTE pair is the only other SELECT
+    // in this test path
+    if (q.includes("facts_audit") || q.includes("resources_audit")) {
       return (globalThis as any).__ID_AUDIT_ROWS__ ?? [];
     }
     return [];

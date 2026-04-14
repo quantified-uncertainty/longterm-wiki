@@ -104,13 +104,14 @@ describe("computeAlerts", () => {
     expect(computeAlerts(latest, prev)).toEqual([]);
   });
 
-  it("regression-yellow: legacy +1 with low pct is yellow", () => {
+  it("regression-yellow: legacy +1 with low pct is yellow on the facts row", () => {
     const prev = makeAudit({ legacy_hex8: 100 });
     const latest = makeAudit({ legacy_hex8: 101 });
     const alerts = computeAlerts(latest, prev);
     expect(alerts).toHaveLength(1);
     expect(alerts[0].severity).toBe("yellow");
     expect(alerts[0].delta).toBe(1);
+    expect(alerts[0].sourceTable).toBe("facts");
   });
 
   it("regression-red: legacy delta ≥10 is red", () => {
@@ -119,6 +120,7 @@ describe("computeAlerts", () => {
     const alerts = computeAlerts(latest, prev);
     expect(alerts[0].severity).toBe("red");
     expect(alerts[0].delta).toBe(15);
+    expect(alerts[0].sourceTable).toBe("facts");
   });
 
   it("regression-red: legacy delta ≥25% is red even when delta <10", () => {
@@ -127,6 +129,29 @@ describe("computeAlerts", () => {
     const alerts = computeAlerts(latest, prev);
     expect(alerts[0].severity).toBe("red");
     expect(alerts[0].deltaPct).toBeCloseTo(30);
+  });
+
+  it("resources-scoped alert: regression in resources does NOT render on facts row", () => {
+    const prev: IdFormatAudit = {
+      scannedAt: "2026-04-12T06:00:00Z",
+      totals: { ...emptyBuckets(), legacy_alnum10: 100 },
+      bySourceTable: {
+        facts: emptyBuckets(),
+        resources: { ...emptyBuckets(), legacy_alnum10: 100 },
+      },
+    };
+    const latest: IdFormatAudit = {
+      scannedAt: "2026-04-13T06:00:00Z",
+      totals: { ...emptyBuckets(), legacy_alnum10: 120 },
+      bySourceTable: {
+        facts: emptyBuckets(),
+        resources: { ...emptyBuckets(), legacy_alnum10: 120 },
+      },
+    };
+    const alerts = computeAlerts(latest, prev);
+    expect(alerts).toHaveLength(1);
+    expect(alerts[0].sourceTable).toBe("resources");
+    expect(alerts[0].bucket).toBe("legacy_alnum10");
   });
 });
 
