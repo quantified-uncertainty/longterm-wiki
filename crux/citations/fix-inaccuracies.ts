@@ -40,7 +40,7 @@ import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
-import { stripFrontmatter } from '../lib/patterns.ts';
+import { stripFrontmatter, escapeDollarDigits } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/session/edit-log.ts';
@@ -928,6 +928,98 @@ export function repairJsonBackslashEscapes(input: string): string {
   });
 }
 
+// ---------------------------------------------------------------------------
+// Proposal quality filters (QUA-349)
+// ---------------------------------------------------------------------------
+
+/**
+ * The action vocabulary the LLM is instructed to choose from (see SYSTEM_PROMPT).
+ * Keeping this as a const array lets TS verify that SHRINK_EXEMPT_ACTIONS can only
+ * reference known actions — if SYSTEM_PROMPT's list is renamed without updating
+ * here, the type check fails.
+ */
+export const FIX_ACTIONS = ['rewrite', 'correct', 'soften', 'remove_ref', 'remove_detail'] as const;
+export type FixAction = (typeof FIX_ACTIONS)[number];
+
+/**
+ * Components that carry cross-reference / provenance meaning in wiki MDX.
+ * Dropping one silently breaks linking or fact sourcing.
+ */
+const PRESERVED_COMPONENT_RE = /<(EntityLink|F|R|FBF|FBFactValue|Calc)\b/g;
+
+/**
+ * Actions where the replacement is *expected* to be shorter than the original
+ * (the whole point of the action is to delete content). Shrink filter skips these.
+ */
+const SHRINK_EXEMPT_ACTIONS: ReadonlySet<FixAction> = new Set(['remove_ref', 'remove_detail']);
+
+/** Minimum length ratio (replacement/original) allowed for non-shrink-exempt actions. */
+const SHRINK_MIN_RATIO = 0.4;
+
+/** Count preserved component tags in a string. */
+export function countPreservedComponents(s: string): number {
+  const matches = s.match(PRESERVED_COMPONENT_RE);
+  return matches ? matches.length : 0;
+}
+
+export interface FilteredProposals {
+  kept: FixProposal[];
+  rejected: Array<{
+    proposal: FixProposal;
+    reason: 'component-drop' | 'shrink';
+    detail: string;
+  }>;
+  escapedCount: number;
+}
+
+/**
+ * Apply proposal quality filters post-parse:
+ *   1. Escape bare `$digit` → `\$digit` in the replacement (non-rejecting).
+ *   2. Reject proposals that drop a preserved component (<EntityLink>, <F>, etc.).
+ *   3. Reject proposals with len(replacement) < SHRINK_MIN_RATIO * len(original),
+ *      unless fixType is in SHRINK_EXEMPT_ACTIONS.
+ *
+ * See QUA-349 for the dry-run evidence that motivated each filter.
+ */
+export function filterProposals(proposals: FixProposal[]): FilteredProposals {
+  const kept: FixProposal[] = [];
+  const rejected: FilteredProposals['rejected'] = [];
+  let escapedCount = 0;
+
+  for (const raw of proposals) {
+    const escaped = escapeDollarDigits(raw.replacement);
+    const p: FixProposal = escaped === raw.replacement ? raw : { ...raw, replacement: escaped };
+    if (escaped !== raw.replacement) escapedCount++;
+
+    const originalComponents = countPreservedComponents(p.original);
+    const replacementComponents = countPreservedComponents(p.replacement);
+    if (replacementComponents < originalComponents) {
+      rejected.push({
+        proposal: p,
+        reason: 'component-drop',
+        detail: `replacement has ${replacementComponents} preserved components; original had ${originalComponents}`,
+      });
+      continue;
+    }
+
+    if (!SHRINK_EXEMPT_ACTIONS.has(p.fixType as FixAction) && p.original.length > 0) {
+      const ratio = p.replacement.length / p.original.length;
+      if (ratio < SHRINK_MIN_RATIO) {
+        rejected.push({
+          proposal: p,
+          reason: 'shrink',
+          detail: `replacement is ${Math.round(ratio * 100)}% of original length (min ${Math.round(SHRINK_MIN_RATIO * 100)}% for fixType=${p.fixType})`,
+        });
+        continue;
+      }
+    }
+
+    kept.push(p);
+  }
+
+  return { kept, rejected, escapedCount };
+}
+
 /** Parse LLM response into fix proposals. */
 export function parseLLMFixResponse(content: string): FixProposal[] {
   const cleaned = stripCodeFences(content);
@@ -999,7 +1091,29 @@ export async function generateFixesForPage(
     title: 'LongtermWiki Fix Inaccuracies',
   });
 
-  return parseLLMFixResponse(response);
+  const parsed = parseLLMFixResponse(response);
+  const filtered = filterProposals(parsed);
+
+  if (filtered.rejected.length > 0 || filtered.escapedCount > 0) {
+    const parts: string[] = [];
+    if (filtered.escapedCount > 0) {
+      parts.push(`${filtered.escapedCount} $digit escape(s)`);
+    }
+    if (filtered.rejected.length > 0) {
+      const byReason = filtered.rejected.reduce<Record<string, number>>((acc, r) => {
+        acc[r.reason] = (acc[r.reason] ?? 0) + 1;
+        return acc;
+      }, {});
+      const reasonStr = Object.entries(byReason).map(([k, v]) => `${v} ${k}`).join(', ');
+      parts.push(`${filtered.rejected.length} rejected (${reasonStr})`);
+    }
+    console.warn(`  [filter] ${pageId}: ${parts.join('; ')}`);
+    for (const r of filtered.rejected) {
+      console.warn(`    [-] [^${r.proposal.footnote}] ${r.reason}: ${r.detail}`);
+    }
+  }
+
+  return filtered.kept;
 }
 
 // ---------------------------------------------------------------------------

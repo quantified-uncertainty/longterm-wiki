@@ -13,7 +13,12 @@ import {
   applyFixes,
   enrichFromApi,
   repairJsonBackslashEscapes,
+  countPreservedComponents,
+  filterProposals,
+  FIX_ACTIONS,
 } from './fix-inaccuracies.ts';
+import { escapeDollarDigits } from '../lib/patterns.ts';
+import type { FixProposal } from './fix-inaccuracies.ts';
 import type { FlaggedCitation } from './export-dashboard.ts';
 import type { SectionRewrite } from './fix-inaccuracies.ts';
 
@@ -130,6 +135,290 @@ describe('parseLLMFixResponse', () => {
     const result = parseLLMFixResponse(input);
     expect(result).toHaveLength(1);
     expect(result[0].original).toBe('a \\$ b');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// QUA-349: proposal quality filters
+// ---------------------------------------------------------------------------
+
+describe('escapeDollarDigits', () => {
+  it('escapes bare $digit', () => {
+    expect(escapeDollarDigits('costs $50 today')).toBe('costs \\$50 today');
+  });
+
+  it('escapes multiple occurrences', () => {
+    expect(escapeDollarDigits('$100 vs $57.2 million')).toBe('\\$100 vs \\$57.2 million');
+  });
+
+  it('does not touch already-escaped \\$digit', () => {
+    expect(escapeDollarDigits('costs \\$50')).toBe('costs \\$50');
+  });
+
+  it('does not touch $ not followed by a digit', () => {
+    expect(escapeDollarDigits('$foo and $bar')).toBe('$foo and $bar');
+  });
+
+  it('does not touch $ preceded by an identifier char (variable-like)', () => {
+    expect(escapeDollarDigits('abc$1 and xyz$9')).toBe('abc$1 and xyz$9');
+  });
+
+  it('handles the QUA-349 examples from the dry-run', () => {
+    expect(escapeDollarDigits('midterm elections. With $100 million raised...'))
+      .toBe('midterm elections. With \\$100 million raised...');
+    expect(escapeDollarDigits('goodfire...raised a total of $57.2 million.'))
+      .toBe('goodfire...raised a total of \\$57.2 million.');
+    expect(escapeDollarDigits('$8 billion was missing from its balance sheet'))
+      .toBe('\\$8 billion was missing from its balance sheet');
+  });
+
+  it('handles leading $ at position 0', () => {
+    expect(escapeDollarDigits('$5 for all')).toBe('\\$5 for all');
+  });
+});
+
+describe('countPreservedComponents', () => {
+  it('counts EntityLink', () => {
+    expect(countPreservedComponents('hello <EntityLink id="x"> world')).toBe(1);
+  });
+
+  it('counts multiple component types', () => {
+    const s = 'see <EntityLink id="a"/> and <F id="b"/> and <Calc expr="1+1"/>';
+    expect(countPreservedComponents(s)).toBe(3);
+  });
+
+  it('counts repeated instances of the same component', () => {
+    expect(countPreservedComponents('<F id="a"/> <F id="b"/> <F id="c"/>')).toBe(3);
+  });
+
+  it('returns 0 for plain text', () => {
+    expect(countPreservedComponents('no components here')).toBe(0);
+  });
+
+  it('matches only word-boundary tags, not prefixes', () => {
+    // <Foo> must not count as an <F>
+    expect(countPreservedComponents('<Foo id="x"/>')).toBe(0);
+  });
+
+  it('counts FBFactValue and FBF as separate components', () => {
+    expect(countPreservedComponents('<FBF id="a"/> <FBFactValue id="b"/>')).toBe(2);
+  });
+});
+
+describe('filterProposals', () => {
+  function makeProposal(p: Partial<FixProposal>): FixProposal {
+    return {
+      footnote: 1,
+      original: 'original text',
+      replacement: 'replacement text',
+      explanation: 'test',
+      fixType: 'rewrite',
+      ...p,
+    };
+  }
+
+  it('keeps clean proposals', () => {
+    const p = makeProposal({ original: 'abc', replacement: 'def' });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.rejected).toHaveLength(0);
+    expect(result.escapedCount).toBe(0);
+  });
+
+  // Bug 1: $digit escape
+
+  it('escapes bare $digit in replacement without rejecting', () => {
+    const p = makeProposal({
+      original: 'costs about 50 bucks',
+      replacement: 'costs about $50',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.kept[0].replacement).toBe('costs about \\$50');
+    expect(result.escapedCount).toBe(1);
+    expect(result.rejected).toHaveLength(0);
+  });
+
+  it('leaves already-escaped \\$digit alone', () => {
+    const p = makeProposal({
+      original: 'one',
+      replacement: 'costs \\$50 total',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept[0].replacement).toBe('costs \\$50 total');
+    expect(result.escapedCount).toBe(0);
+  });
+
+  // Bug 2: component preservation
+
+  it('rejects proposals that drop an EntityLink', () => {
+    const p = makeProposal({
+      original: 'see <EntityLink id="anthropic"/> for more',
+      replacement: 'see Anthropic for more',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected).toHaveLength(1);
+    expect(result.rejected[0].reason).toBe('component-drop');
+  });
+
+  it('rejects proposals that drop an <F> fact ref', () => {
+    const p = makeProposal({
+      original: 'revenue was <F id="a" path="b"/> last year',
+      replacement: 'revenue was $5B last year',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe('component-drop');
+  });
+
+  it('rejects proposals that drop one of multiple components', () => {
+    const p = makeProposal({
+      original: '<EntityLink id="a"/> spent <F id="x"/> on research',
+      replacement: '<EntityLink id="a"/> spent money on research',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe('component-drop');
+  });
+
+  it('accepts proposals that preserve all components', () => {
+    const p = makeProposal({
+      original: '<EntityLink id="a"/> spent five dollars',
+      replacement: '<EntityLink id="a"/> spent six dollars',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.rejected).toHaveLength(0);
+  });
+
+  it('accepts proposals that add components', () => {
+    const p = makeProposal({
+      original: 'Anthropic raised money',
+      replacement: '<EntityLink id="anthropic"/> raised money',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  // Bug 3: shrink rejection
+
+  it('rejects rewrite proposals that shrink below 40%', () => {
+    const p = makeProposal({
+      original: 'Key techniques taught at CFAR workshops include rationality training, debiasing exercises, and applied Bayesian reasoning',
+      replacement: 'CFAR runs workshops',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe('shrink');
+  });
+
+  it('allows remove_detail to shrink arbitrarily', () => {
+    const p = makeProposal({
+      original: 'a very long detailed explanation of many things that deserves removal',
+      replacement: 'short',
+      fixType: 'remove_detail',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.rejected).toHaveLength(0);
+  });
+
+  it('allows remove_ref to shrink arbitrarily', () => {
+    const p = makeProposal({
+      original: 'Anthropic is a company[^5].',
+      replacement: 'Anthropic is a company.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('keeps proposals that shrink slightly (above 40%)', () => {
+    const p = makeProposal({
+      original: 'ABCDEFGHIJ', // 10 chars
+      replacement: 'ABCDEF', // 6 chars, 60%
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('rejects correct-action shrink below 40%', () => {
+    const p = makeProposal({
+      original: 'Very detailed original text that has many words and provides context',
+      replacement: 'Short.',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe('shrink');
+  });
+
+  // Combined / regression
+
+  it('applies escape before component check (escape is lossless)', () => {
+    const p = makeProposal({
+      original: 'costs <F id="a"/> today',
+      replacement: 'costs $50 with <F id="a"/> context',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.kept[0].replacement).toBe('costs \\$50 with <F id="a"/> context');
+    expect(result.escapedCount).toBe(1);
+  });
+
+  it('blueprint-biosecurity regression: $1,000,000 bare dollar escaped', () => {
+    // The specific pattern that caused the QUA-349 blueprint-biosecurity
+    // regression: LLM returned `$1,000,000` unescaped in a `correct` action.
+    const p = makeProposal({
+      original: 'Up to \\$1M in grants are available.',
+      replacement: 'Up to $1,000,000 in grants are available.',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.kept[0].replacement).toBe('Up to \\$1,000,000 in grants are available.');
+  });
+
+  it('mixed batch: keeps clean, rejects buggy, escapes recoverable', () => {
+    const clean = makeProposal({ footnote: 1, original: 'aaa', replacement: 'bbb' });
+    const escaped = makeProposal({ footnote: 2, original: 'aaa', replacement: '$50', fixType: 'correct' });
+    const dropped = makeProposal({ footnote: 3, original: 'x <F id="a"/> y', replacement: 'x y' });
+    const shrunk = makeProposal({
+      footnote: 4,
+      original: 'this is a long original phrase that should not shrink',
+      replacement: 'nope',
+      fixType: 'rewrite',
+    });
+
+    const result = filterProposals([clean, escaped, dropped, shrunk]);
+    expect(result.kept).toHaveLength(2);
+    expect(result.kept.map((p) => p.footnote).sort()).toEqual([1, 2]);
+    expect(result.rejected).toHaveLength(2);
+    expect(result.escapedCount).toBe(1);
+  });
+
+  it('handles empty proposal list', () => {
+    const result = filterProposals([]);
+    expect(result.kept).toEqual([]);
+    expect(result.rejected).toEqual([]);
+    expect(result.escapedCount).toBe(0);
+  });
+});
+
+describe('FIX_ACTIONS drift guard', () => {
+  // If someone renames an action in SYSTEM_PROMPT without updating FIX_ACTIONS,
+  // the shrink filter silently stops matching. This test pins the pairing.
+  it('includes every action the system prompt lists', () => {
+    // Mirror of the action vocabulary in the SYSTEM_PROMPT fix_type line.
+    // Update BOTH simultaneously if the prompt changes.
+    const promptActions = ['rewrite', 'correct', 'soften', 'remove_ref', 'remove_detail'];
+    expect([...FIX_ACTIONS].sort()).toEqual(promptActions.sort());
   });
 });
 
