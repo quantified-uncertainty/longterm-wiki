@@ -82,6 +82,104 @@ export function buildHeaders() {
   return headers;
 }
 
+// ---------------------------------------------------------------------------
+// Retryable fetch helper (QUA-421)
+//
+// Several build-time fetchers (notably fetchRecordVerdicts) used to return {}
+// on any non-2xx response, which meant a single transient 5xx during a
+// multi-page pagination wiped the ENTIRE collected result. A flaky upstream
+// for 100ms could silently zero out a whole JSON file the frontend depends
+// on, with the error only showing up as a warning the build still passed.
+//
+// fetchJsonWithRetry wraps fetch() with exponential backoff (1s/2s/4s by
+// default) and returns a discriminated union. Callers decide whether a
+// terminal failure should throw (strict / CI) or degrade gracefully.
+// ---------------------------------------------------------------------------
+
+/**
+ * Sleep for `ms` milliseconds. Extracted so tests can replace it with a no-op.
+ * @internal
+ */
+export function _defaultSleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+/**
+ * Fetch JSON with per-attempt timeout and exponential-backoff retry.
+ *
+ * Retries on: network errors, AbortError (timeout), and HTTP 5xx / 429.
+ * Does NOT retry on HTTP 4xx (except 429) — those are caller bugs.
+ *
+ * @param {string} url
+ * @param {object} [opts]
+ * @param {HeadersInit} [opts.headers]
+ * @param {number} [opts.timeoutMs]    Per-attempt timeout (default 30s).
+ * @param {number} [opts.attempts]     Total attempts incl. first try (default 3).
+ * @param {number} [opts.backoffMs]    Base backoff (default 1000). Doubled each retry.
+ * @param {typeof fetch} [opts.fetchImpl]  Override for tests.
+ * @param {(ms: number) => Promise<void>} [opts.sleepImpl]  Override for tests.
+ * @returns {Promise<{ok: true, data: any} | {ok: false, reason: string, status?: number, retryable: boolean}>}
+ */
+export async function fetchJsonWithRetry(url, opts = {}) {
+  const {
+    headers = {},
+    timeoutMs = 30_000,
+    attempts = 3,
+    backoffMs = 1000,
+    fetchImpl = fetch,
+    sleepImpl = _defaultSleep,
+  } = opts;
+
+  let lastReason = 'unknown';
+  let lastStatus;
+
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    let retryable = false;
+    try {
+      const resp = await fetchImpl(url, {
+        headers,
+        signal: AbortSignal.timeout(timeoutMs),
+      });
+      if (resp.ok) {
+        const data = await resp.json();
+        return { ok: true, data };
+      }
+      lastStatus = resp.status;
+      // 5xx and 429 are retryable; everything else is a caller bug.
+      retryable = resp.status >= 500 || resp.status === 429;
+      lastReason = `HTTP ${resp.status}`;
+    } catch (err) {
+      // Network errors, aborts (timeout), JSON parse failures — treat as retryable.
+      retryable = true;
+      lastReason = err instanceof Error ? err.message : String(err);
+    }
+
+    if (!retryable || attempt === attempts) {
+      return { ok: false, reason: lastReason, status: lastStatus, retryable };
+    }
+    // Exponential backoff: backoffMs, backoffMs*2, backoffMs*4, ...
+    await sleepImpl(backoffMs * 2 ** (attempt - 1));
+  }
+
+  // Unreachable: the loop either returns ok or takes the !retryable/final-attempt exit.
+  return { ok: false, reason: lastReason, status: lastStatus, retryable: false };
+}
+
+/**
+ * Should the build FAIL (throw) on wiki-server errors, vs. degrade gracefully?
+ *
+ * Strict by default in CI and in full-build mode. Local dev defaults to
+ * non-strict (degrade gracefully). Either behavior is overridable:
+ *   STRICT_VERDICTS=1  → force strict even locally
+ *   STRICT_VERDICTS=0  → force non-strict even in CI (escape hatch)
+ */
+export function isStrictVerdictsMode() {
+  const override = process.env.STRICT_VERDICTS;
+  if (override === '0') return false;
+  if (override === '1') return true;
+  return process.env.CI === 'true' || fullBuildMode;
+}
+
 /**
  * Fetch latest edit dates per page from the wiki-server API.
  * Falls back to an empty map if the server is unavailable.
@@ -564,8 +662,18 @@ export async function fetchResearchAreaDetails(areaIds) {
 /**
  * Fetch verification verdicts from wiki-server (unified verification system).
  * Returns a map keyed by "recordType:recordId" -> verdict info.
+ *
+ * QUA-421: hardened against transient HTTP errors. Each page is fetched via
+ * `fetchJsonWithRetry` (3 attempts, exponential backoff). If a page ultimately
+ * fails:
+ *   - in strict mode (CI / full build): throw — fail the build loudly instead
+ *     of shipping an empty record-verdicts.json that silently zeroes every
+ *     source-check dot on the site
+ *   - in non-strict mode (local dev): log a loud warning and return the
+ *     partial result collected so far — still strictly better than the old
+ *     behavior of returning {} and discarding everything
  */
-export async function fetchRecordVerdicts() {
+export async function fetchRecordVerdicts({ fetchImpl, sleepImpl } = {}) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
   if (!serverUrl) {
     console.log('  record-verdicts: skipped (LONGTERMWIKI_SERVER_URL not set)');
@@ -573,51 +681,70 @@ export async function fetchRecordVerdicts() {
   }
 
   const headers = buildHeaders();
+  const strict = isStrictVerdictsMode();
 
-  try {
-    const pageSize = 200;
-    const verdicts = {};
-    let offset = 0;
-    while (true) {
-      const url = `${serverUrl}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
-      if (!resp.ok) {
-        logWikiServerWarning('record-verdicts', `HTTP ${resp.status}`);
-        return {};
+  const pageSize = 200;
+  const verdicts = {};
+  let offset = 0;
+
+  while (true) {
+    const url = `${serverUrl}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
+    const result = await fetchJsonWithRetry(url, {
+      headers,
+      timeoutMs: 30_000,
+      fetchImpl,
+      sleepImpl,
+    });
+
+    if (!result.ok) {
+      const partial = Object.keys(verdicts).length;
+      const reason = result.status
+        ? `${result.reason} at offset=${offset} after retries`
+        : `${result.reason} at offset=${offset} after retries`;
+      if (strict) {
+        // Strict: throw so the build fails loudly.
+        throw new Error(
+          `record-verdicts: ${reason}. ${partial} verdicts were collected ` +
+            `before the failure; refusing to ship a partial/empty ` +
+            `record-verdicts.json in strict mode. Set STRICT_VERDICTS=0 to ` +
+            `force degraded behavior locally.`
+        );
       }
-      const data = await resp.json();
-      const items = data.verdicts || [];
-      for (const v of items) {
-        const entry = {
-          verdict: v.verdict,
-          confidence: v.confidence,
-          sourcesChecked: v.sourcesChecked,
-          needsRecheck: v.needsRecheck,
-          lastComputedAt: v.lastComputedAt,
-        };
-        if (v.fieldName) {
-          // Per-field verdict: keyed as "recordType:recordId:fieldName"
-          verdicts[`${v.recordType}:${v.recordId}:${v.fieldName}`] = entry;
-        } else {
-          // Whole-row verdict: keyed as "recordType:recordId"
-          verdicts[`${v.recordType}:${v.recordId}`] = entry;
-        }
-      }
-      if (items.length < pageSize) break;
-      offset += pageSize;
+      logWikiServerWarning(
+        'record-verdicts',
+        `${reason} — returning ${partial} partial result(s) (non-strict mode)`
+      );
+      return verdicts;
     }
 
-    const count = Object.keys(verdicts).length;
-    if (count > 0) {
-      console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
-    } else {
-      console.log('  record-verdicts: 0 verdicts (none computed yet)');
+    const items = result.data.verdicts || [];
+    for (const v of items) {
+      const entry = {
+        verdict: v.verdict,
+        confidence: v.confidence,
+        sourcesChecked: v.sourcesChecked,
+        needsRecheck: v.needsRecheck,
+        lastComputedAt: v.lastComputedAt,
+      };
+      if (v.fieldName) {
+        // Per-field verdict: keyed as "recordType:recordId:fieldName"
+        verdicts[`${v.recordType}:${v.recordId}:${v.fieldName}`] = entry;
+      } else {
+        // Whole-row verdict: keyed as "recordType:recordId"
+        verdicts[`${v.recordType}:${v.recordId}`] = entry;
+      }
     }
-    return verdicts;
-  } catch (err) {
-    logWikiServerWarning('record-verdicts', err instanceof Error ? err.message : String(err));
-    return {};
+    if (items.length < pageSize) break;
+    offset += pageSize;
   }
+
+  const count = Object.keys(verdicts).length;
+  if (count > 0) {
+    console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
+  } else {
+    console.log('  record-verdicts: 0 verdicts (none computed yet)');
+  }
+  return verdicts;
 }
 
 /**
