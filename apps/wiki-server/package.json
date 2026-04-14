@@ -16,6 +16,7 @@
   "dependencies": {
     "@longterm-wiki/factbase": "workspace:*",
     "@longterm-wiki/id-utils": "workspace:*",
+    "@longterm-wiki/sourcing-types": "workspace:*",
     "@hono/node-server": "^1.19.10",
     "drizzle-orm": "^0.45.1",
     "hono": "^4.12.4",

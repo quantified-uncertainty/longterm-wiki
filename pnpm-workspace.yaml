@@ -5,3 +5,4 @@ packages:
   - "apps/groundskeeper"
   - "packages/factbase"
   - "packages/id-utils"
+  - "packages/sourcing-types"
