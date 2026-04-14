@@ -1,21 +1,19 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql, inArray } from "drizzle-orm";
+import { eq, count, desc, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { equityPositions, entities } from "../../schema.js";
 import {
-  parseJsonBody,
-  validationError,
-  invalidJsonError,
   zv,
   parseRange,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { registerComposer, composeThing } from "../shared/compose-thing.js";
-import { validateEntityRefs } from "../shared/validate-entity-refs.js";
-import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- QUA-470 Phase 4b-B.1: equity-position composer ----
 //
@@ -40,10 +38,6 @@ registerComposer<EquityPositionComposerRow>(
     };
   },
 );
-import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
-import { formatEntityRef } from "../shared/entity-ref.js";
-import { logAuditEntries } from "./audit-log.js";
-import { deleteBatchHandler } from "../shared/delete-batch.js";
 
 // ---- Constants ----
 
@@ -242,28 +236,18 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncEquityPositionsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Validate entity FK references before inserting
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "companyId", ids: items.map((i) => i.companyId) },
-      { fieldName: "holderId", ids: items.map((i) => i.holderId) },
-    ]);
-    if (refError) return refError;
-
-    let upserted = 0;
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => {
+  // ---- POST /sync — uses sync-factory ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "equity-positions",
+      table: equityPositions,
+      batchSchema: SyncEquityPositionsBatchSchema,
+      entityRefFields: (items) => [
+        { fieldName: "companyId", ids: items.map((i) => i.companyId) },
+        { fieldName: "holderId", ids: items.map((i) => i.holderId) },
+      ],
+      toRow: (item, now) => {
         const stakeRange = parseRange(item.stake);
         return {
           id: item.id,
@@ -276,95 +260,41 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           notes: item.notes ?? null,
           asOf: item.asOf ?? null,
           validEnd: item.validEnd ?? null,
+          syncedAt: now,
+          updatedAt: now,
         };
-      });
-
-      // Fetch existing records for audit log (before upsert)
-      const existingIds = items.map((i) => i.id);
-      const existing = await tx
-        .select()
-        .from(equityPositions)
-        .where(inArray(equityPositions.id, existingIds));
-      const existingMap = new Map(existing.map((r) => [r.id, r]));
-
-      await tx
-        .insert(equityPositions)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: equityPositions.id,
-          set: {
-            companyId: sql`excluded.company_id`,
-            holderId: sql`excluded.holder_id`,
-            stake: sql`excluded.stake`,
-            stakeLow: sql`excluded.stake_low`,
-            stakeHigh: sql`excluded.stake_high`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            asOf: sql`excluded.as_of`,
-            validEnd: sql`excluded.valid_end`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Audit log
-      await logAuditEntries(
-        tx,
-        allVals.map((v) => {
-          const old = existingMap.get(v.id);
-          return {
-            recordType: "equity_positions",
-            recordId: v.id,
-            operation: old ? ("update" as const) : ("insert" as const),
-            oldData: old ? { ...old } : null,
-            newData: { ...v },
-            sourceUrl: v.source ?? null,
-          };
-        })
-      );
-
-      // Post-sync: resolve entity FKs for newly synced rows
-      await resolveEntityFKs(tx, {
+      },
+      auditRecordType: "equity_positions",
+      fkResolve: {
         tableName: "equity_positions",
         fields: [
           { rawIdColumn: "company_id", entityIdColumn: "company_entity_id", displayNameColumn: "company_display_name", entityTypeFilter: "organization" },
           { rawIdColumn: "holder_id", entityIdColumn: "holder_entity_id", displayNameColumn: "holder_display_name" },
         ],
-        scopeIds: items.map((i) => i.id),
-      });
-
-      // Dual-write to things table — resolve IDs to human-readable names
-      const holderIds = [...new Set(items.map((ep) => ep.holderId))];
-      const companyIds = [...new Set(items.map((ep) => ep.companyId))];
-      const epTitleMap = await resolveEntityTitles(tx, [...holderIds, ...companyIds]);
-
+      },
+      thingsTitleIds: (items) => [
+        ...new Set(items.flatMap((ep) => [ep.holderId, ep.companyId])),
+      ],
       // QUA-470: dispatch through the registered "equity-position" composer.
-      await upsertThingsInTx(
-        tx,
-        items.map((ep) => {
-          const composed = composeThing<EquityPositionComposerRow>(
-            "equity-position",
-            ep,
-            epTitleMap,
-          );
-          return {
-            id: ep.id,
-            thingType: "equity-position" as const,
-            title: composed.title,
-            description: composed.description,
-            parentTitle: composed.parentTitle,
-            sourceTable: "equity_positions",
-            sourceId: ep.id,
-            sourceUrl: ep.source,
-          };
-        })
-      );
-
-      upserted = allVals.length;
-    });
-
-    return c.json({ upserted });
-  })
+      toThing: (item, titleMap) => {
+        const composed = composeThing<EquityPositionComposerRow>(
+          "equity-position",
+          item,
+          titleMap,
+        );
+        return {
+          id: item.id,
+          thingType: "equity-position" as const,
+          title: composed.title,
+          description: composed.description,
+          parentTitle: composed.parentTitle,
+          sourceTable: "equity_positions",
+          sourceId: item.id,
+          sourceUrl: item.source ?? null,
+        };
+      },
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(equityPositions, "equity_positions"));
 

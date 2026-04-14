@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, and, count, sql, desc, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { getDrizzleDb, getDb } from "../../db.js";
+import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { grants, things, entities, fundingPrograms, sourceVerdicts } from "../../schema.js";
 import {
@@ -22,9 +22,14 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { formatMoney } from "../shared/format-currency.js";
 import { registerComposer, composeThing } from "../shared/compose-thing.js";
+import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
+import { formatEntityRef } from "../shared/entity-ref.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
+import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { shouldSkipEntityValidation } from "../shared/validate-entity-refs.js";
+import { createSyncHandler } from "./sync-factory.js";
 
 // ---- QUA-470 Phase 4b-B.1: grant composer ----
 //
@@ -53,16 +58,6 @@ registerComposer<GrantComposerRow>("grant", (row, titleMap) => ({
       .join(", ") || null,
   parentTitle: titleMap.get(row.organizationId) ?? row.organizationId,
 }));
-import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
-import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
-import { formatEntityRef } from "../shared/entity-ref.js";
-import { logAuditEntries } from "./audit-log.js";
-import { InlineSourcingSchema } from "./sourcing-schema.js";
-import { writeInlineVerdicts, logSourcingCoverage } from "./write-inline-verdicts.js";
-import { validateClaimRefs, linkClaimsToRecords } from "../shared/validate-claims.js";
-import { enforceSourcing } from "../shared/sourcing-enforcement.js";
-import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { shouldSkipEntityValidation, validateEntityRefs } from "../shared/validate-entity-refs.js";
 
 // ---- Constants ----
 
@@ -620,75 +615,39 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     });
   })
 
-  // ---- POST /sync ----
-  .post("/sync", async (c) => {
-    const body = await parseJsonBody(c);
-    if (!body) return invalidJsonError(c);
-
-    const parsed = SyncGrantsBatchSchema.safeParse(body);
-    if (!parsed.success) return validationError(c, parsed.error.message);
-
-    const { items } = parsed.data;
-    const db = getDrizzleDb();
-
-    // Check for natural key collisions within the batch itself.
-    // Natural key: (organizationId, name)
-    const batchKeys = new Set<string>();
-    for (const item of items) {
-      const key = `${item.organizationId}::${item.name}`;
-      if (batchKeys.has(key)) {
-        return validationError(
-          c,
-          `Duplicate (organizationId, name) in batch: ` +
-          `organizationId=${item.organizationId}, name="${item.name}". ` +
-          `Each grant must have a unique name within its organization.`
-        );
-      }
-      batchKeys.add(key);
-    }
-
-    // Phase 5 (Discussion #3875): Source-check enforcement — checks both server-side
-    // config and client ?requireSourcing=true param. See sourcing-enforcement.ts.
-    const sourcingError = enforceSourcing(c, "grants", items);
-    if (sourcingError) return sourcingError;
-
-    // Validate entity FK references for organizationId only.
-    // granteeId is a LEGACY field that can hold either an entity ID or a
-    // display name string (grant-import falls back to granteeName when no
-    // entity match is found). Validating it would reject ~thousands of
-    // grants with display-name granteeIds. The real entity FK is
-    // granteeEntityId, which is validated by resolveEntityFKs downstream.
-    const refError = await validateEntityRefs(c, db, [
-      { fieldName: "organizationId", ids: items.map((i) => i.organizationId) },
-    ]);
-    if (refError) return refError;
-
-    // Validate programId references (skip if requested via shouldSkipEntityValidation)
-    if (!shouldSkipEntityValidation(c)) {
-      const programIds = items
-        .map((item) => item.programId)
-        .filter((id): id is string => id != null);
-      const invalid = await findInvalidProgramIds(db, programIds);
-      if (invalid.length > 0) {
-        // skipEntityValidation-ok: error message tells callers how to bypass after providing a reason
-        const msg = `programId references not found in funding_programs: ${invalid.join(", ")}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`;
-        return validationError(c, msg);
-      }
-    }
-
-    // Validate claim references
-    const allClaimIds = items.flatMap((i) => i.claimIds ?? []);
-    if (allClaimIds.length > 0) {
-      const rawDb = getDb();
-      const claimError = await validateClaimRefs(rawDb, allClaimIds);
-      if (claimError) return validationError(c, claimError);
-    }
-
-    let upserted = 0;
-    let verdictsResult = { written: 0 };
-
-    await db.transaction(async (tx) => {
-      const allVals = items.map((item) => ({
+  // ---- POST /sync — uses sync-factory ----
+  .post(
+    "/sync",
+    createSyncHandler({
+      name: "grants",
+      table: grants,
+      batchSchema: SyncGrantsBatchSchema,
+      enforceSourcing: true,
+      naturalKey: (item) => `${item.organizationId}::${item.name}`,
+      naturalKeyError:
+        "Duplicate (organizationId, name) in batch — each grant must have a unique name within its organization",
+      // granteeId is a LEGACY field that can hold either an entity ID or a
+      // display name string (grant-import falls back to granteeName when no
+      // entity match is found). Validating it would reject ~thousands of
+      // grants with display-name granteeIds. The real entity FK is
+      // granteeEntityId, which is validated by resolveEntityFKs downstream.
+      entityRefs: ["organizationId"],
+      // Validate programId against funding_programs (non-entities FK).
+      // Bypassable via ?skipEntityValidation=true&skipEntityValidationReason=<why>.
+      preValidate: async (c, db, items) => {
+        if (shouldSkipEntityValidation(c)) return null;
+        const programIds = items
+          .map((item) => item.programId)
+          .filter((id): id is string => id != null);
+        const invalid = await findInvalidProgramIds(db, programIds);
+        if (invalid.length > 0) {
+          // skipEntityValidation-ok: error message tells callers how to bypass after providing a reason
+          const msg = `programId references not found in funding_programs: ${invalid.join(", ")}. Use ?skipEntityValidation=true&skipEntityValidationReason=<why> to bypass.`;
+          return validationError(c, msg);
+        }
+        return null;
+      },
+      toRow: (item, now) => ({
         id: item.id,
         organizationId: item.organizationId,
         granteeId: item.granteeId ?? null,
@@ -702,128 +661,52 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         notes: item.notes ?? null,
         programId: item.programId ?? null,
         dataSourceId: item.dataSourceId ?? null,
-      }));
-
-      // Fetch existing records for audit log (before upsert)
-      const existingIds = items.map((i) => i.id);
-      const existing = await tx
-        .select()
-        .from(grants)
-        .where(inArray(grants.id, existingIds));
-      const existingMap = new Map(existing.map((r) => [r.id, r]));
-
-      await tx
-        .insert(grants)
-        .values(allVals)
-        .onConflictDoUpdate({
-          target: grants.id,
-          set: {
-            organizationId: sql`excluded.organization_id`,
-            granteeId: sql`excluded.grantee_id`,
-            name: sql`excluded.name`,
-            amount: sql`excluded.amount`,
-            currency: sql`excluded.currency`,
-            period: sql`excluded.period`,
-            date: sql`excluded.date`,
-            status: sql`excluded.status`,
-            source: sql`excluded.source`,
-            notes: sql`excluded.notes`,
-            programId: sql`excluded.program_id`,
-            dataSourceId: sql`excluded.data_source_id`,
-            syncedAt: sql`now()`,
-            updatedAt: sql`now()`,
-          },
-        });
-
-      // Audit log
-      await logAuditEntries(
-        tx,
-        allVals.map((v) => {
-          const old = existingMap.get(v.id);
-          return {
-            recordType: "grants",
-            recordId: v.id,
-            operation: old ? ("update" as const) : ("insert" as const),
-            oldData: old ? { ...old } : null,
-            newData: { ...v },
-            sourceUrl: v.source ?? null,
-          };
-        })
-      );
-
-      // Post-sync: resolve entity FKs for newly synced rows
-      await resolveEntityFKs(tx, {
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      auditRecordType: "grants",
+      fkResolve: {
         tableName: "grants",
         fields: [
           { rawIdColumn: "organization_id", entityIdColumn: "org_entity_id", displayNameColumn: "org_display_name", entityTypeFilter: "organization" },
           { rawIdColumn: "grantee_id", entityIdColumn: "grantee_entity_id", displayNameColumn: "grantee_display_name" },
         ],
-        scopeIds: items.map((i) => i.id),
-      });
-
-      // Resolve org + grantee slugs to human-readable titles for search
-      const orgSlugs = [...new Set(items.map((g) => g.organizationId))];
-      const granteeSlugs = items
-        .map((g) => g.granteeId)
-        .filter((id): id is string => id != null);
-      const titleMap = await resolveEntityTitles(tx, [...orgSlugs, ...granteeSlugs]);
-
-      // Dual-write to things table via dispatch composer (QUA-470)
-      await upsertThingsInTx(
-        tx,
-        items.map((g) => {
-          const composed = composeThing<GrantComposerRow>("grant", g, titleMap);
-          return {
-            id: g.id,
-            thingType: "grant" as const,
-            title: composed.title,
-            description: composed.description,
-            parentTitle: composed.parentTitle,
-            sourceTable: "grants",
-            sourceId: g.id,
-            sourceUrl: g.source,
-          };
-        })
-      );
-
-      // Write inline sourcing verdicts atomically within the same transaction
-      verdictsResult = await writeInlineVerdicts(
-        tx,
-        items.map((item) => ({
-          recordType: "grant",
-          recordId: item.id,
-          entityId: item.organizationId,
+      },
+      thingsTitleIds: (items) => [
+        ...new Set([
+          ...items.map((g) => g.organizationId),
+          ...items
+            .map((g) => g.granteeId)
+            .filter((id): id is string => id != null),
+        ]),
+      ],
+      // QUA-470: dispatch through the registered "grant" composer.
+      toThing: (item, titleMap) => {
+        const composed = composeThing<GrantComposerRow>("grant", item, titleMap);
+        return {
+          id: item.id,
+          thingType: "grant" as const,
+          title: composed.title,
+          description: composed.description,
+          parentTitle: composed.parentTitle,
+          sourceTable: "grants",
+          sourceId: item.id,
           sourceUrl: item.source ?? null,
-          sourcing: item.sourcing ?? null,
-        }))
-      );
-
-      upserted = allVals.length;
-    });
-
-    logSourcingCoverage("grants/sync", items.length, verdictsResult.written);
-
-    // Link verified claims to records (best-effort — records already committed)
-    let claimsLinked = 0;
-    let claimLinkingError: string | null = null;
-    if (allClaimIds.length > 0) {
-      try {
-        const rawDb = getDb();
-        const linkResult = await linkClaimsToRecords(rawDb, items.map((item) => ({
-          recordId: item.id,
-          recordType: "grants",
-          claimIds: item.claimIds,
-        })));
-        claimsLinked = linkResult.linked;
-      } catch (e: unknown) {
-        const msg = e instanceof Error ? e.message : String(e);
-        claimLinkingError = msg;
-        logger.warn({ error: msg }, "claim linking failed (records already committed)");
-      }
-    }
-
-    return c.json({ upserted, verdictsWritten: verdictsResult.written, claimsLinked, ...(claimLinkingError && { claimLinkingError }) });
-  })
+        };
+      },
+      toVerdict: (item) => ({
+        recordType: "grant",
+        recordId: item.id,
+        entityId: item.organizationId,
+        sourceUrl: item.source ?? null,
+        sourcing: item.sourcing ?? null,
+      }),
+      claimSupport: {
+        recordType: "grants",
+        getClaimIds: (item) => item.claimIds ?? [],
+      },
+    }),
+  )
 
   .post("/delete-batch", deleteBatchHandler(grants, "grants"));
 

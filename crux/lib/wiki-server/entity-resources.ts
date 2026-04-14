@@ -1,12 +1,16 @@
 /**
  * Entity Resources API — wiki-server client module
  *
- * Response types are inferred from the Hono RPC route type via InferResponseType<>.
+ * GET response types are inferred from the Hono RPC route type via
+ * InferResponseType<>. The sync response type uses the factory's shared
+ * SyncResponse shape directly — Hono RPC cannot infer the return type
+ * through `createSyncHandler`, so we import the interface instead.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { EntityResourcesRoute } from '../../../apps/wiki-server/src/routes/tablebase/entity-resources.ts';
+import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
 
 // ---------------------------------------------------------------------------
 // Types — response (inferred from Hono RPC route)
@@ -15,7 +19,7 @@ import type { EntityResourcesRoute } from '../../../apps/wiki-server/src/routes/
 type RpcClient = ReturnType<typeof hc<EntityResourcesRoute>>;
 
 export type EntityResourcesGetResult = InferResponseType<RpcClient['index']['$get'], 200>;
-export type EntityResourcesSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
+export type EntityResourcesSyncResult = SyncResponse;
 
 /** A single entity_resources row. */
 export type EntityResourceRow = EntityResourcesGetResult['items'][number];
