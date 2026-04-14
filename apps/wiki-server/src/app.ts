@@ -8,33 +8,16 @@ import {
   createDefaultRateLimiters,
 } from "./rate-limit.js";
 // TableBase routes — typed relational entity records
+// Most routes are mounted automatically via TABLEBASE_MOUNTS (QUA-454).
+// The 5 imports below are the ones mounted manually in this file because
+// they either have special semantics or serve as the cross-base index —
+// see `mount-registry.ts` header for the full rationale.
 import { entitiesRoute } from "./routes/tablebase/entities.js";
 import { idsRoute } from "./routes/tablebase/ids.js";
-import { personnelRoute } from "./routes/tablebase/personnel.js";
-import { peopleRoute } from "./routes/tablebase/people.js";
-import { grantsRoute } from "./routes/tablebase/grants.js";
-import { divisionsRoute } from "./routes/tablebase/divisions.js";
-import { divisionPersonnelRoute } from "./routes/tablebase/division-personnel.js";
-import { investmentsRoute } from "./routes/tablebase/investments.js";
-import { fundingRoundsRoute } from "./routes/tablebase/funding-rounds.js";
-import { equityPositionsRoute } from "./routes/tablebase/equity-positions.js";
-import { fundingProgramsRoute } from "./routes/tablebase/funding-programs.js";
-import { benchmarksRoute } from "./routes/tablebase/benchmarks.js";
-import { benchmarkResultsRoute } from "./routes/tablebase/benchmark-results.js";
 import { thingsRoute } from "./routes/tablebase/things.js";
-import { secondaryMarketPricesRoute } from "./routes/tablebase/secondary-market-prices.js";
-import { predictionMarketsRoute } from "./routes/tablebase/prediction-markets.js";
-import { politicalRacesRoute } from "./routes/tablebase/political-races.js";
-import { politicalScoresRoute } from "./routes/tablebase/political-scores.js";
-import { politicalOfficesRoute } from "./routes/tablebase/political-offices.js";
-import { politicalVotesRoute } from "./routes/tablebase/political-votes.js";
-import { campaignFinanceRoute } from "./routes/tablebase/campaign-finance.js";
 import { blueskyRoute } from "./routes/tablebase/bluesky.js";
-import { talentFlowsRoute } from "./routes/tablebase/talent-flows.js";
 import { dataSourcesRoute } from "./routes/tablebase/data-sources.js";
-import { platformAccountsRoute } from "./routes/tablebase/platform-accounts.js";
-import { coverageScansRoute } from "./routes/tablebase/coverage-scans.js";
-import { scannerResultsRoute } from "./routes/tablebase/scanner-results.js";
+import { TABLEBASE_MOUNTS } from "./routes/tablebase/mount-registry.js";
 
 // Unified sourcing system (replaces legacy factbase + record sourcing)
 import { sourcingRoute } from "./routes/sourcing/sourcing.js";
@@ -42,15 +25,6 @@ import { urlSuggestionsRoute } from "./routes/sourcing/url-suggestions.js";
 
 // Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
-import { researchAreasRoute } from "./routes/tablebase/research-areas.js";
-import { policyStakeholdersRoute } from "./routes/tablebase/policy-stakeholders.js";
-import { entityEventsRoute } from "./routes/tablebase/entity-events.js";
-import { entityAssessmentsRoute } from "./routes/tablebase/entity-assessments.js";
-import { publicationsRoute } from "./routes/tablebase/publications.js";
-import { websiteSourcesRoute } from "./routes/tablebase/website-sources.js";
-import { entityResourcesRoute } from "./routes/tablebase/entity-resources.js";
-import { entityProfileRoute } from "./routes/tablebase/entity-profile.js";
-import { recordLookupRoute } from "./routes/tablebase/record-lookup.js";
 
 // FactBase routes — structured triples with temporal data
 import { factsRoute } from "./routes/factbase/facts.js";
@@ -192,9 +166,24 @@ export function createApp() {
   // Routes are grouped by which data layer ("Base") they primarily serve.
   // See content/docs/internal/data-architecture.mdx for the Three Bases guide.
 
-  // TableBase routes — YAML entity/resource catalog
+  // TableBase routes — excluded from the auto-mount registry because each
+  // has bespoke concerns (see mount-registry.ts header). Everything else
+  // in tablebase/ is mounted via TABLEBASE_MOUNTS below.
   app.route("/api/ids", idsRoute);
   app.route("/api/entities", entitiesRoute);
+  app.route("/api/things", thingsRoute);
+  app.route("/api/bluesky", blueskyRoute);
+  app.route("/api/data-sources", dataSourcesRoute);
+
+  // TableBase routes — auto-mounted from the registry (QUA-454).
+  // Adding a new tablebase route? Append to `mount-registry.ts` — this
+  // loop picks it up on next restart. The registry test enforces that
+  // the set matches the filesystem.
+  for (const { path, route } of TABLEBASE_MOUNTS) {
+    app.route(path, route);
+  }
+
+  // WikiBase & shared routes that happen to live next to TableBase
   app.route("/api/resources", resourcesRoute);
   app.route("/api/summaries", summariesRoute);
   app.route("/api/links", linksRoute);
@@ -219,48 +208,8 @@ export function createApp() {
   // Claims-first sourcing (#3253)
   app.route("/api/claims", claimsRoute);
 
-  // Financial data routes (operational — personnel, grants, funding)
-  app.route("/api/personnel", personnelRoute);
-  app.route("/api/people", peopleRoute);
-  app.route("/api/grants", grantsRoute);
-  app.route("/api/funding-rounds", fundingRoundsRoute);
-  app.route("/api/investments", investmentsRoute);
-  app.route("/api/equity-positions", equityPositionsRoute);
-  app.route("/api/secondary-market-prices", secondaryMarketPricesRoute);
-  app.route("/api/prediction-markets", predictionMarketsRoute);
-  app.route("/api/political-races", politicalRacesRoute);
-  app.route("/api/political-scores", politicalScoresRoute);
-  app.route("/api/political-offices", politicalOfficesRoute);
-  app.route("/api/political-votes", politicalVotesRoute);
-  app.route("/api/campaign-finance", campaignFinanceRoute);
-  app.route("/api/bluesky", blueskyRoute);
-  app.route("/api/talent-flows", talentFlowsRoute);
-  app.route("/api/platform-accounts", platformAccountsRoute);
-  app.route("/api/divisions", divisionsRoute);
-  app.route("/api/division-personnel", divisionPersonnelRoute);
-  app.route("/api/funding-programs", fundingProgramsRoute);
-  app.route("/api/benchmarks", benchmarksRoute);
-  app.route("/api/benchmark-results", benchmarkResultsRoute);
-  app.route("/api/data-sources", dataSourcesRoute);
+  // WikiBase assessments (not in the TableBase registry — separate concern)
   app.route("/api/assessments", assessmentsRoute);
-
-  // Cross-Base: unified things index
-  app.route("/api/things", thingsRoute);
-  app.route("/api/research-areas", researchAreasRoute);
-  app.route("/api/policy-stakeholders", policyStakeholdersRoute);
-  app.route("/api/entity-events", entityEventsRoute);
-  app.route("/api/entity-assessments", entityAssessmentsRoute);
-  app.route("/api/publications", publicationsRoute);
-  app.route("/api/website-sources", websiteSourcesRoute);
-  app.route("/api/entity-resources", entityResourcesRoute);
-  app.route("/api/coverage-scans", coverageScansRoute);
-  app.route("/api/scanner-results", scannerResultsRoute);
-
-  // Aggregated entity profile (reads from all TableBase tables)
-  app.route("/api/entity-profile", entityProfileRoute);
-
-  // Single-record lookup by table + ID (for things detail views)
-  app.route("/api/record-lookup", recordLookupRoute);
 
 
   // Agent & session tracking (operational)
