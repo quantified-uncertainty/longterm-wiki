@@ -562,8 +562,37 @@ export async function fetchResearchAreaDetails(areaIds) {
 }
 
 /**
+ * Fetch a single page of record verdicts with retry + backoff. Throws on
+ * exhaustion so the caller can decide whether partial data is acceptable.
+ */
+async function fetchVerdictPage(serverUrl, headers, offset, pageSize) {
+  const url = `${serverUrl}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
+  const delaysMs = [0, 1000, 2000, 4000]; // 4 attempts with backoff
+  let lastError = null;
+  for (const delay of delaysMs) {
+    if (delay > 0) await new Promise((r) => setTimeout(r, delay));
+    try {
+      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
+      if (resp.ok) return await resp.json();
+      lastError = new Error(`HTTP ${resp.status}`);
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+    }
+  }
+  throw lastError ?? new Error('fetchVerdictPage: unknown error');
+}
+
+/**
  * Fetch verification verdicts from wiki-server (unified verification system).
  * Returns a map keyed by "recordType:recordId" -> verdict info.
+ *
+ * QUA-421: previously returned `{}` silently on any error mid-pagination,
+ * which zeroed record-verdicts.json and made every source-check dot render
+ * as "unchecked" until the next successful build. Now:
+ *   - retries each page up to 4 attempts (backoff 1s/2s/4s)
+ *   - throws on persistent failure rather than silently returning `{}`
+ *   - `STRICT_VERDICTS=0` opts out locally (treat errors as warning, return
+ *     whatever was collected); any other value (default) is strict
  */
 export async function fetchRecordVerdicts() {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
@@ -573,19 +602,14 @@ export async function fetchRecordVerdicts() {
   }
 
   const headers = buildHeaders();
+  const strict = process.env.STRICT_VERDICTS !== '0';
+  const pageSize = 200;
+  const verdicts = {};
+  let offset = 0;
 
   try {
-    const pageSize = 200;
-    const verdicts = {};
-    let offset = 0;
     while (true) {
-      const url = `${serverUrl}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
-      const resp = await fetch(url, { headers, signal: AbortSignal.timeout(30_000) });
-      if (!resp.ok) {
-        logWikiServerWarning('record-verdicts', `HTTP ${resp.status}`);
-        return {};
-      }
-      const data = await resp.json();
+      const data = await fetchVerdictPage(serverUrl, headers, offset, pageSize);
       const items = data.verdicts || [];
       for (const v of items) {
         const entry = {
@@ -606,18 +630,29 @@ export async function fetchRecordVerdicts() {
       if (items.length < pageSize) break;
       offset += pageSize;
     }
-
-    const count = Object.keys(verdicts).length;
-    if (count > 0) {
-      console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
-    } else {
-      console.log('  record-verdicts: 0 verdicts (none computed yet)');
-    }
-    return verdicts;
   } catch (err) {
-    logWikiServerWarning('record-verdicts', err instanceof Error ? err.message : String(err));
-    return {};
+    const msg = err instanceof Error ? err.message : String(err);
+    const collected = Object.keys(verdicts).length;
+    if (strict) {
+      throw new Error(
+        `fetchRecordVerdicts failed after retries at offset=${offset} (${collected} verdicts collected): ${msg}. ` +
+          `Set STRICT_VERDICTS=0 to continue with partial data in local dev.`
+      );
+    }
+    logWikiServerWarning(
+      'record-verdicts',
+      `${msg} at offset=${offset}; returning ${collected} partial verdicts (STRICT_VERDICTS=0)`
+    );
+    return verdicts;
   }
+
+  const count = Object.keys(verdicts).length;
+  if (count > 0) {
+    console.log(`  record-verdicts: ${count} verdicts fetched from PG`);
+  } else {
+    console.log('  record-verdicts: 0 verdicts (none computed yet)');
+  }
+  return verdicts;
 }
 
 /**
