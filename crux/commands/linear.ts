@@ -130,6 +130,34 @@ async function view(args: string[], options: CommandOptions): Promise<CommandRes
   if (issue.description) {
     out += `\n${issue.description.slice(0, 1000)}${issue.description.length > 1000 ? '\n…(truncated)' : ''}\n`;
   }
+  const children = issue.children?.nodes ?? [];
+  if (children.length > 0) {
+    // Non-terminal states first so agents reading an epic see open work above
+    // shipped work — the point of the block is to prevent re-filing existing
+    // sub-issues (QUA-481 post-mortem).
+    const isTerminal = (type: string) =>
+      type === 'completed' || type === 'canceled';
+    const stateRank = (name: string): number => {
+      const r: Record<string, number> = {
+        'In Progress': 0, 'In Review': 1, 'Todo': 2, 'Backlog': 3,
+        'Triage': 4, 'Done': 5, 'Canceled': 6, 'Duplicate': 7,
+      };
+      return r[name] ?? 8;
+    };
+    const sorted = [...children].sort((a, b) => {
+      const at = isTerminal(a.state.type) ? 1 : 0;
+      const bt = isTerminal(b.state.type) ? 1 : 0;
+      if (at !== bt) return at - bt;
+      const sr = stateRank(a.state.name) - stateRank(b.state.name);
+      if (sr !== 0) return sr;
+      return a.identifier.localeCompare(b.identifier);
+    });
+    out += `\n${c.bold}Children (${children.length}):${c.reset}\n`;
+    for (const ch of sorted) {
+      const stateColor = isTerminal(ch.state.type) ? c.dim : c.yellow;
+      out += `  ${c.cyan}${ch.identifier}${c.reset} ${stateColor}[${ch.state.name}]${c.reset} ${priorityLabel(ch.priority)} — ${ch.title}\n`;
+    }
+  }
   if (comments.length > 0) {
     out += `\n${c.bold}Comments (${comments.length}):${c.reset}\n`;
     for (const cm of comments) {
