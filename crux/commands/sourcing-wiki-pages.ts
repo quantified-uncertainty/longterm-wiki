@@ -81,6 +81,13 @@ interface PageSourcingResult {
   unverifiable: number;
   outdated: number;
   partial: number;
+  /**
+   * QUA-426: present for completeness so `result[verdict]++` type-checks
+   * over the full SourcingVerdict union. Wiki-page claim verification does
+   * not run the pre-LLM relevance gate (which only fires for record-kind
+   * items in item-verifier.ts), so this counter should stay at 0 in practice.
+   */
+  not_applicable: number;
   errors: number;
   /**
    * Number of times an evidence/verdict storage call failed (issue #4017).
@@ -413,6 +420,7 @@ async function processPage(
     unverifiable: 0,
     outdated: 0,
     partial: 0,
+    not_applicable: 0,
     errors: 0,
     storageErrors: 0,
     claimResults: [],

@@ -85,6 +85,13 @@ interface SourcingSummary {
   unverifiable: number;
   outdated: number;
   partial: number;
+  /**
+   * QUA-426: present for completeness so `summary[verdict]++` type-checks
+   * over the full SourcingVerdict union. The factbase-sourcing path does
+   * NOT run the relevance gate (gate only fires for record-kind items in
+   * item-verifier.ts), so this counter should stay at 0 in practice.
+   */
+  not_applicable: number;
   errors: number;
   /**
    * Number of times the storage call (storeSourcingResult) failed for an
@@ -389,6 +396,7 @@ export async function sourcingCommand(
     unverifiable: 0,
     outdated: 0,
     partial: 0,
+    not_applicable: 0,
     errors: 0,
     storageErrors: 0,
     results: [],

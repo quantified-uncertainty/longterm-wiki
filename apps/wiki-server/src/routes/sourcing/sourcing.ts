@@ -81,6 +81,8 @@ const VALID_VERDICTS = [
   "unverifiable",
   "outdated",
   "partial",
+  // QUA-426: pre-LLM relevance-gate short-circuit. See api-types.ts for semantics.
+  "not_applicable",
 ] as const;
 
 const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
@@ -1823,12 +1825,17 @@ const sourcingApp = new Hono()
     // avoid a breaking change to dashboard consumers (see
     // apps/web/src/app/internal/entity-sourcing/coverage-bars.tsx); both
     // endpoints now filter orphans identically.
+    // QUA-426: exclude not_applicable verdicts from the "verified" count.
+    // These are pre-LLM relevance-gate short-circuits — the page didn't
+    // mention the subject so nothing was actually verified. Counting them
+    // would inflate the dashboard's coverage %.
     const verifiedRowsRaw = (await db.execute(sql`
       WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, count(DISTINCT v.record_id)::int AS verified
       FROM source_check_verdicts v
       INNER JOIN live_records lr
         ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      WHERE v.verdict <> 'not_applicable'
       GROUP BY v.record_type
     `)) as Array<{ record_type: string; verified: number }>;
 
@@ -1959,6 +1966,10 @@ const sourcingApp = new Hono()
   .get("/entity-summary", async (c) => {
     const db = getDrizzleDb();
 
+    // QUA-426: `not_applicable` rows are excluded from this summary entirely.
+    // They are pre-LLM relevance-gate short-circuits that carry no signal —
+    // counting them in `total_verdicts` would make the dashboard show entities
+    // as "checked" when the only evidence was "page doesn't mention subject".
     const rows = (await db.execute(sql`
       WITH verdict_counts AS (
         SELECT
@@ -1973,6 +1984,7 @@ const sourcingApp = new Hono()
           COALESCE(AVG(confidence), 0)                     AS avg_confidence
         FROM source_check_verdicts
         WHERE entity_id IS NOT NULL
+          AND verdict <> 'not_applicable'
         GROUP BY entity_id
       ),
       record_counts AS (
@@ -2089,13 +2101,15 @@ const sourcingApp = new Hono()
     // Coverage is based on distinct checked records, not verdict row counts.
     // A record can have multiple verdict rows (one per fieldName), so we use
     // COUNT(DISTINCT record_id) to avoid exceeding 100%.
+    // QUA-426: `not_applicable` is excluded alongside `unchecked` — neither
+    // is a real "the source actually addressed this" signal.
     const checkedRows = (await db.execute(sql`
       WITH ${LIVE_RECORDS_CTE}
       SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
       FROM source_check_verdicts v
       INNER JOIN live_records lr
         ON lr.record_type = v.record_type AND lr.record_id = v.record_id
-      WHERE v.verdict != 'unchecked'
+      WHERE v.verdict NOT IN ('unchecked', 'not_applicable')
       GROUP BY v.record_type
     `)) as Array<{ record_type: string; checked_records: number }>;
 

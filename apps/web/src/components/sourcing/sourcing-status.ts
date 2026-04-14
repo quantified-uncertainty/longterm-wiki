@@ -68,6 +68,10 @@ const RECORD_VERDICT_MAP: Record<string, SourcingStatus> = {
   outdated: "trouble",
   partial: "trouble",
   unverifiable: "trouble",
+  // QUA-426: pre-LLM relevance-gate short-circuit — the source didn't even
+  // mention the record's subject, so neither confirmation nor contradiction
+  // is possible. Render as neutral "not checked", not as "trouble".
+  not_applicable: "not_run",
 };
 
 /**

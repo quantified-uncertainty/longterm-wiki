@@ -215,6 +215,7 @@ export async function orchestrateCommand(
     unverifiable: 0,
     outdated: 0,
     partial: 0,
+    not_applicable: 0,
     errors: 0,
     deadLinks: 0,
     storageErrors: 0,
