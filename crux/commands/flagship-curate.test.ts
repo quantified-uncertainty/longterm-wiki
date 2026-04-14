@@ -398,6 +398,31 @@ describe('flagship-curate', () => {
     });
   });
 
+  // ── Wiki-server unavailable (QUA-452) ────────────────────────────
+  describe('wiki-server unavailable (QUA-452)', () => {
+    it('exits non-zero and surfaces the error when /api/entities fails', async () => {
+      // Batch mode: no explicit --entity, so flagship-curate calls
+      // findEntitiesNeedingCuration → /api/entities. Simulate server down.
+      mockApiRequest.mockResolvedValue({
+        ok: false,
+        error: 'unavailable',
+        status: 503,
+      });
+
+      const result = await commands.default([], {
+        all: true,
+        limit: '1',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toMatch(/Failed to fetch entities from wiki-server/);
+      expect(result.output).toMatch(/QUA-452/);
+      // Must NOT silently report "no entities found" — that was the bug.
+      expect(result.output).not.toMatch(/No entities found needing curation/);
+    });
+  });
+
   // ── Credit-exhaustion handling (QUA-378) ────────────────────────────
   describe('credit exhaustion (QUA-378)', () => {
     it('aborts with exit code 2 when research throws CreditExhaustedError', async () => {
