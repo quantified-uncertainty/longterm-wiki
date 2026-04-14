@@ -22,6 +22,13 @@ import {
 } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
 import { logger } from "../../logger.js";
+import {
+  ID_FORMAT_BUCKET_NAMES,
+  ID_FORMAT_SOURCE_TABLES,
+  type IdFormatAudit,
+  type IdFormatBucketName,
+  type IdFormatSourceTableName,
+} from "../../api-types.js";
 
 // ---------------------------------------------------------------------------
 // Row type for raw SQL snapshot aggregation
@@ -29,6 +36,136 @@ import { logger } from "../../logger.js";
 
 // Use Array<> for raw SQL result casts (matches integrity.ts pattern)
 // to satisfy RowList<Record<string, unknown>[]> compatibility.
+
+// ---------------------------------------------------------------------------
+// ID Format Audit (QUA-407 / QUA-439)
+// ---------------------------------------------------------------------------
+//
+// Classifies atomic primary-key ID columns into coexisting formats so the
+// dashboard can show sprawl at a glance and QUA-43 has a measurable target.
+//
+// Related code: apps/web/src/app/internal/entity-profile/sanitize-raw-ids.ts
+// uses similar regexes for render-time sanitization. The shapes match but
+// the taxonomies are different (this file splits lowercase-hex by length
+// 8 vs 16; sanitize-raw-ids.ts groups 8–12 together). Keep the *shapes*
+// aligned — if a new ID format appears, update both files.
+//
+// Source columns (NOT `things.source_id` — `things.source_id` for facts is a
+// composite `<entityStableId>:<factId>`, which defeats classification):
+//   - facts.fact_id                        → bucket for fact IDs
+//   - resources.id (primary key)           → bucket for resource IDs
+
+const ID_FORMAT_REGEXES = {
+  canonical_f: "^f_[A-Za-z0-9]{8,}$",
+  canonical_sid: "^sid_[A-Za-z0-9]{10}$",
+  legacy_hex8: "^[0-9a-f]{8}$",
+  legacy_alnum10:
+    "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9]{10}$",
+  legacy_hex16: "^[0-9a-f]{16}$",
+} as const;
+
+
+type IdFormatAuditRow = {
+  facts_canonical_f: string;
+  facts_canonical_sid: string;
+  facts_legacy_hex8: string;
+  facts_legacy_alnum10: string;
+  facts_legacy_hex16: string;
+  facts_total: string;
+  resources_canonical_f: string;
+  resources_canonical_sid: string;
+  resources_legacy_hex8: string;
+  resources_legacy_alnum10: string;
+  resources_legacy_hex16: string;
+  resources_total: string;
+};
+
+function emptyBuckets(): Record<IdFormatBucketName, number> {
+  return {
+    canonical_f: 0,
+    canonical_sid: 0,
+    legacy_hex8: 0,
+    legacy_alnum10: 0,
+    legacy_hex16: 0,
+    other: 0,
+  };
+}
+
+const NAMED_BUCKETS: ReadonlyArray<Exclude<IdFormatBucketName, "other">> = [
+  "canonical_f",
+  "canonical_sid",
+  "legacy_hex8",
+  "legacy_alnum10",
+  "legacy_hex16",
+];
+
+export async function captureIdFormatAudit(
+  db: ReturnType<typeof getDrizzleDb>
+): Promise<IdFormatAudit> {
+  const rows = await db.transaction(async (tx) => {
+    // SET LOCAL only takes effect inside a transaction; bounds the query
+    // so a planner regression fails fast instead of eating the
+    // groundskeeper task's 60s budget.
+    await tx.execute(sql`SET LOCAL statement_timeout = '30000'`);
+    return (await tx.execute(
+      sql`
+      WITH facts_audit AS (SELECT
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.canonical_f})::text    AS facts_canonical_f,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text  AS facts_canonical_sid,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text    AS facts_legacy_hex8,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text AS facts_legacy_alnum10,
+        COUNT(*) FILTER (WHERE fact_id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text   AS facts_legacy_hex16,
+        COUNT(*)::text                                                              AS facts_total
+      FROM facts WHERE fact_id IS NOT NULL),
+      resources_audit AS (SELECT
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.canonical_f})::text         AS resources_canonical_f,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.canonical_sid})::text       AS resources_canonical_sid,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_hex8})::text         AS resources_legacy_hex8,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_alnum10})::text      AS resources_legacy_alnum10,
+        COUNT(*) FILTER (WHERE id ~ ${ID_FORMAT_REGEXES.legacy_hex16})::text        AS resources_legacy_hex16,
+        COUNT(*)::text                                                              AS resources_total
+      FROM resources WHERE id IS NOT NULL)
+      SELECT * FROM facts_audit, resources_audit
+    `
+    )) as IdFormatAuditRow[];
+  });
+
+  const row = rows[0];
+  const bySourceTable: Record<
+    IdFormatSourceTableName,
+    Record<IdFormatBucketName, number>
+  > = {
+    facts: emptyBuckets(),
+    resources: emptyBuckets(),
+  };
+
+  if (row) {
+    for (const table of ID_FORMAT_SOURCE_TABLES) {
+      const buckets = bySourceTable[table];
+      let namedSum = 0;
+      for (const b of NAMED_BUCKETS) {
+        const key = `${table}_${b}` as keyof IdFormatAuditRow;
+        const n = Number(row[key] ?? "0");
+        buckets[b] = Number.isFinite(n) ? n : 0;
+        namedSum += buckets[b];
+      }
+      const totalKey = `${table}_total` as keyof IdFormatAuditRow;
+      const total = Number(row[totalKey] ?? "0");
+      buckets.other = Math.max(0, (Number.isFinite(total) ? total : 0) - namedSum);
+    }
+  }
+
+  const totals = emptyBuckets();
+  for (const b of ID_FORMAT_BUCKET_NAMES) {
+    totals[b] = bySourceTable.facts[b] + bySourceTable.resources[b];
+  }
+
+  return {
+    scannedAt: new Date().toISOString(),
+    totals,
+    bySourceTable,
+  };
+}
 
 // ---------------------------------------------------------------------------
 // Zod schemas for query validation
@@ -154,7 +291,13 @@ const dataQualityApp = new Hono()
         claimRecordLinks: parseInt(claimRecordLinksRows[0]?.cnt ?? "0", 10),
       };
 
-      // ---- Insert snapshot ----
+      // 11. ID format audit over `things` (QUA-407 / QUA-439).
+      // Single-pass COUNT(*) FILTER aggregation over the composite
+      // (source_table, source_id) index. Bounded to 30s via
+      // SET LOCAL statement_timeout so a planner regression fails fast
+      // instead of eating the groundskeeper task's 60s budget.
+      const idFormatAudit = await captureIdFormatAudit(db);
+
       const [snapshot] = await db
         .insert(dataQualitySnapshots)
         .values({
@@ -181,6 +324,7 @@ const dataQualityApp = new Hono()
           extra: {
             entityResourcesTotal,
             ...claimsExtra,
+            idFormatAudit,
           },
         })
         .returning();

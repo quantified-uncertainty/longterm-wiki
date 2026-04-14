@@ -169,3 +169,20 @@ test.describe("Render audit — critical data tables", () => {
     expect(text).toMatch(/\$\d+(?:\.\d+)?[BMT]/);
   });
 });
+
+test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => {
+  // Entity profile pages render a SourcingDot in the header. It must NOT
+  // link to /sourcing/entity/<id> — that path is not a real record_type
+  // and always 404s. Regression test for QUA-418.
+  for (const url of [
+    "/organizations/anthropic",
+    "/people/dario-amodei",
+    "/ai-models/claude-opus-4-5",
+  ]) {
+    test(`header has no /sourcing/entity/ href on ${url}`, async ({ page }) => {
+      await loadPage(page, url);
+      const hrefs = await page.locator('a[href^="/sourcing/entity/"]').count();
+      expect(hrefs, `${url} has ${hrefs} dead /sourcing/entity/ link(s)`).toBe(0);
+    });
+  }
+});

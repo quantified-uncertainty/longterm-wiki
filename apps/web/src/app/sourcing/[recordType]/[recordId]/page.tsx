@@ -20,8 +20,10 @@ import { getEntityHref } from "@data/entity-nav";
 import { getKBFactById, getKBEntity, getKBProperty } from "@/data/factbase";
 import { inferDataSource } from "@/app/grants/grants-data-source";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
+import { UncheckedSourcingState } from "@/components/sourcing/UncheckedSourcingState";
 
 import { canonicalizeSourcingRecordType } from "./canonicalize-record-type";
+import { recordTypeToTable } from "@/lib/sourcing/record-type-table-map";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -258,15 +260,13 @@ export default async function SourcingDetailPage({ params }: PageProps) {
     permanentRedirect(`/sourcing/${canonicalType}/${encodeURIComponent(recordId)}`);
   }
 
-  // Map recordType back to source table name for record-lookup API
-  const RECORD_TYPE_TO_TABLE: Record<string, string> = {
-    grant: "grants", personnel: "personnel", division: "divisions",
-    investment: "investments", "funding-round": "funding_rounds",
-    "funding-program": "funding_programs", publication: "publications",
-    "wiki-page": "wiki_pages", "policy-stakeholder": "policy_stakeholders",
-    citation: "citation_quotes",
-  };
-  const sourceTable = RECORD_TYPE_TO_TABLE[recordType] ?? recordType.replace(/-/g, "_") + "s";
+  // QUA-420: only hit record-lookup for types with a known table. The old
+  // regex fallback (`recordType.replace(/-/g, "_") + "s"`) produced garbage
+  // names like `entity_s` and `fact_s`.
+  const sourceTable = recordTypeToTable(recordType);
+  if (!sourceTable) {
+    notFound();
+  }
 
   // Fetch detail (verdicts + evidence), names, and the actual DB record in parallel
   const [detailResult, namesResult, recordResult] = await Promise.all([
@@ -292,6 +292,21 @@ export default async function SourcingDetailPage({ params }: PageProps) {
       detailResult.error.type === "server-error" &&
       detailResult.error.status === 404
     ) {
+      // QUA-419: No verdicts yet is the common case — render an empty
+      // state when the record itself exists in the source table. Only
+      // notFound() when the record is genuinely missing.
+      if (recordResult.ok) {
+        const rawName = namesResult.ok ? namesResult.data.names[recordId] : null;
+        const stripped = rawName?.startsWith("new:") ? rawName.slice(4).trim() : rawName;
+        return (
+          <UncheckedSourcingState
+            recordType={recordType}
+            recordId={recordId}
+            displayName={stripped ?? `${formatRecordType(recordType)} ${recordId}`}
+            recordHref={getRecordHref(recordType, recordId)}
+          />
+        );
+      }
       notFound();
     }
     return (

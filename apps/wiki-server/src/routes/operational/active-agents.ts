@@ -1,8 +1,8 @@
 import { Hono } from "hono";
-import { eq, desc, and, lt, sql, or } from "drizzle-orm";
+import { eq, desc, and, lt, sql, or, inArray } from "drizzle-orm";
 import { z } from "zod";
 import { getDrizzleDb } from "../../db.js";
-import { activeAgents, agentSessionEvents } from "../../schema.js";
+import { activeAgents, agentSessionEvents, agentSessions } from "../../schema.js";
 import {
   parseJsonBody,
   validationError,
@@ -95,12 +95,54 @@ const activeAgentsApp = new Hono()
 
     const conditions = status ? eq(activeAgents.status, status) : undefined;
 
-    const rows = await db
+    const agents = await db
       .select()
       .from(activeAgents)
       .where(conditions)
       .orderBy(desc(activeAgents.startedAt))
       .limit(limit);
+
+    // QUA-440: fetch the matching agent_sessions rows (by branch + status)
+    // and merge linear_id + slot_number into each agent row. These columns
+    // are authoritative on agent_sessions (D- refactor) so the dashboard
+    // can display them without duplicating data into active_agents.
+    //
+    // Two sequential queries instead of a LEFT JOIN keeps the query shape
+    // simple (one table at a time) which plays well with the in-memory
+    // test dispatcher and with Postgres query planning. The N is small
+    // (bounded by `limit`, default 50) so the second fetch is cheap.
+    const branches = agents
+      .map((a) => a.branch)
+      .filter((b): b is string => b !== null);
+    const sessionLookup = new Map<string, { linearId: string | null; slotNumber: number | null }>();
+    if (branches.length > 0) {
+      const sessionRows = await db
+        .select({
+          branch: agentSessions.branch,
+          linearId: agentSessions.linearId,
+          slotNumber: agentSessions.slotNumber,
+        })
+        .from(agentSessions)
+        .where(and(
+          inArray(agentSessions.branch, branches),
+          eq(agentSessions.status, "active"),
+        ));
+      for (const s of sessionRows) {
+        sessionLookup.set(s.branch, {
+          linearId: s.linearId,
+          slotNumber: s.slotNumber,
+        });
+      }
+    }
+
+    const rows = agents.map((a) => {
+      const s = a.branch ? sessionLookup.get(a.branch) : undefined;
+      return {
+        ...a,
+        linearId: s?.linearId ?? null,
+        slotNumber: s?.slotNumber ?? null,
+      };
+    });
 
     // Compute conflict warnings: agents working on the same issue.
     // Include both "active" and "stale" agents — a stale agent may still be
@@ -219,6 +261,40 @@ const activeAgentsApp = new Hono()
 
     if (result.length === 0) {
       return c.json({ error: "not_found", message: `No agent with id: ${id}` }, 404);
+    }
+
+    // QUA-440: also bump the matching agent_sessions row's updated_at so the
+    // DB-first dedup query (GET /by-linear/:linearId with freshMinutes) sees
+    // live sessions as fresh. Joined on branch because the heartbeat hook
+    // only knows the agent's integer ID, not the session id.
+    //
+    // Best-effort — if no matching session (e.g., pre-QUA-440 agent that
+    // registered without a companion agent_sessions row), we just don't
+    // update anything. Never fails the heartbeat.
+    const branch = result[0].branch;
+    if (branch) {
+      await db
+        .update(agentSessions)
+        .set({ updatedAt: new Date() })
+        .where(and(
+          eq(agentSessions.branch, branch),
+          eq(agentSessions.status, "active"),
+        ))
+        .catch((err: unknown) => {
+          // Non-critical for the heartbeat response, but we want to know if
+          // this starts failing: a silent regression here would break the
+          // PG-first dedup's freshness signal without any symptom until the
+          // next collision. See .claude/rules/error-handling.md — every
+          // catch must log, re-throw, or document why neither.
+          logger.warn(
+            {
+              err: err instanceof Error ? err.message : String(err),
+              branch,
+              agentId: id,
+            },
+            "Heartbeat: failed to bump agent_sessions.updated_at (QUA-440)",
+          );
+        });
     }
 
     return c.json({ ok: true, heartbeatAt: result[0].heartbeatAt });

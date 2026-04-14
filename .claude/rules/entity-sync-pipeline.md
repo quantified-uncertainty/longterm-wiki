@@ -2,6 +2,8 @@
 
 Subsystem map for the YAML → sync → PG pipeline and the tablebase route infrastructure. **Read this before writing a new sync endpoint, delete handler, or entity validation** — the shared helpers and factories are missed constantly.
 
+> **If your new handler writes to `things.title` / `things.description` / `things.parent_title`, or adds a `*_display_name` column**: read `docs/audits/things-denormalization-audit.md` first. It enumerates all 22 existing write sites, the 5 handlers that leak raw IDs today (subsumed by [QUA-408](https://linear.app/quantifieduncertainty/issue/QUA-408) Tier 4b), and the `search_vector` GENERATED column constraint that any replacement must preserve. Adding a 23rd bespoke title composer without reading the audit is the fastest way to recreate QUA-397.
+
 ## Why this file exists
 
 Recent rework incidents in this subsystem include:

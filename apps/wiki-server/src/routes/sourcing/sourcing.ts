@@ -14,7 +14,6 @@ import {
   isNull,
   inArray,
   ilike,
-  countDistinct,
 } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
@@ -216,12 +215,8 @@ const EvidenceByRecordsBody = z.object({
   limitPerRecord: z.number().int().min(1).max(MAX_PAGE_SIZE),
 });
 
-/**
- * Join (recordType, recordId) into a stable response-map key.
- * Kept in sync with `evidenceRecordKey` in the crux client
- * (`crux/lib/wiki-server/sourcing-client.ts`).
- */
-export function evidenceRecordKey(recordType: string, recordId: string): string {
+/** Must match `evidenceRecordKey` in crux/lib/wiki-server/sourcing-client.ts. */
+function evidenceRecordKey(recordType: string, recordId: string): string {
   return `${recordType}|${recordId}`;
 }
 
@@ -1813,18 +1808,33 @@ const sourcingApp = new Hono()
       }
     }
 
-    // Count distinct verified records per record_type from source_check_verdicts
-    const verifiedRows = await db
-      .select({
-        recordType: sourceVerdicts.recordType,
-        verified: countDistinct(sourceVerdicts.recordId),
-      })
-      .from(sourceVerdicts)
-      .groupBy(sourceVerdicts.recordType);
+    // Count distinct verified records per record_type from source_check_verdicts.
+    //
+    // QUA-422: INNER JOIN against LIVE_RECORDS_CTE to exclude orphan verdicts
+    // (rows referencing records deleted from their source table). Without this
+    // filter, grant/personnel counts exceeded 100% in prod (5889/5876 grants,
+    // 1212/975 personnel) because cleanup-orphans had not yet run. QUA-317
+    // already applied the same pattern to /stats; /coverage-matrix and
+    // /verdict-matrix have always used it. This endpoint was the outlier.
+    //
+    // Semantics note: /coverage counts ANY verdict row as "verified" (including
+    // verdict='unchecked'), while /coverage-matrix filters `verdict != 'unchecked'`
+    // as its `checkedRecords` metric. Keeping /coverage's broader semantic to
+    // avoid a breaking change to dashboard consumers (see
+    // apps/web/src/app/internal/entity-sourcing/coverage-bars.tsx); both
+    // endpoints now filter orphans identically.
+    const verifiedRowsRaw = (await db.execute(sql`
+      WITH ${LIVE_RECORDS_CTE}
+      SELECT v.record_type, count(DISTINCT v.record_id)::int AS verified
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      GROUP BY v.record_type
+    `)) as Array<{ record_type: string; verified: number }>;
 
     const verifiedByType: Record<string, number> = {};
-    for (const row of verifiedRows) {
-      verifiedByType[row.recordType] = row.verified;
+    for (const row of verifiedRowsRaw) {
+      verifiedByType[row.record_type] = row.verified;
     }
 
     // Merge into coverage array — include all known types

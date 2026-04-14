@@ -2,6 +2,8 @@
 
 Subsystem map for the wiki's ID schemes (`numericId`, `stableId`, slugs, legacy IDs). **Read this before allocating an ID, writing a new entity type, or adding an ID validator** — there are three distinct ID concepts and agents repeatedly conflate them.
 
+**Live ID format counts**: `/internal/data-quality` has an "ID Format Audit" section (QUA-407 / QUA-439) with nightly bucket counts across `things.source_table IN ('facts','resources')`. Source-of-truth regexes live in `apps/wiki-server/src/routes/operational/data-quality.ts::ID_FORMAT_REGEXES`.
+
 ## Why this file exists
 
 Recent ID-related rework incidents: regex bugs (#4065), allocation races (#4043), personnel ID regex (#3964), `sid_` prefix handling (#4008), string/number type confusion from `postgres.js` returning strings where Sets expected numbers. The failure mode is always the same: agent assumes ID system is simpler than it is, picks the wrong helper, or invents a new ID format.

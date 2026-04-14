@@ -43,6 +43,12 @@ import { githubApi } from '../lib/github.ts';
 import { resolve as resolvePath } from 'path';
 import { fetchRemoteWorkflowStates } from '../lib/linear/workflow-states.ts';
 import { findAllLinearIds, parseLinearId, resolveLinearId } from '../lib/linear/parse-id.ts';
+import {
+  findActiveClaimsByOthers,
+  findOpenPrsMentioningLinearId,
+  type OpenPrMatch,
+  type RecentStartClaim,
+} from '../lib/linear/dedup.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
 import { execSync } from 'child_process';
@@ -63,6 +69,12 @@ interface CommandOptions extends BaseOptions {
   state?: string;
   startDate?: string;
   targetDate?: string;
+  force?: boolean;
+  // Internal-only: skip the dedup check WITHOUT posting the "--force"
+  // annotation in the start comment. Used by `agent-checklist init` which
+  // already ran the pre-check and shouldn't pay for it again (and
+  // shouldn't mark the comment as forced). Not exposed on the CLI.
+  skipDedupCheck?: boolean;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -194,7 +206,7 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear start <QUA-NNN>${c.reset}\n`,
+      output: `${c.red}Usage: crux linear start <QUA-NNN> [--force]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -205,15 +217,104 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   const ctx = getSessionContext();
+
+  // Dedup: block if another session appears to have already claimed this
+  // issue. Both checks are fail-open — they return empty on API errors so
+  // a transient glitch doesn't wedge all sessions. See QUA-406 for the
+  // incident that motivated this (two sessions racing on QUA-397).
+  // Dedup unless the user explicitly forced past the check (--force) or an
+  // internal caller already ran the pre-check (skipDedupCheck).
+  if (!options.force && !options.skipDedupCheck) {
+    const collision = await checkDedup(id, issue.url, ctx, c);
+    if (collision) return collision;
+  }
+
   await updateIssueState(id, 'In Progress');
-  await commentOnIssue(id, buildStartCommentBody(ctx));
+  const trailing = options.force
+    ? '⚠ Claimed with `--force` — another session may already be working on this issue.\nWill post an update when a PR is ready for review.'
+    : undefined;
+  await commentOnIssue(id, buildStartCommentBody(ctx, { trailing }));
 
   let out = '';
   out += `${c.green}✓${c.reset} ${c.cyan}${id}${c.reset} → In Progress\n`;
   out += `  Branch: ${c.cyan}${ctx.branch}${c.reset}\n`;
   if (ctx.slot !== null) out += `  Slot: ${c.cyan}a${ctx.slot}${c.reset}\n`;
+  if (options.force) {
+    out += `  ${c.yellow}⚠ Forced past dedup check${c.reset}\n`;
+  }
   out += `  ${issue.url}\n`;
   return { output: out, exitCode: 0 };
+}
+
+/**
+ * Run the dedup checks used by `crux linear start` and return a
+ * pre-formatted CollisionError `CommandResult` (exit code 2) when another
+ * session already appears to own the issue. Returns `null` when the call
+ * site may proceed.
+ *
+ * Exported so `agent-checklist init` can pre-check before writing any
+ * session state to disk.
+ */
+export async function checkDedup(
+  id: string,
+  issueUrl: string,
+  ctx: import('../lib/session/session-context.ts').SessionContext,
+  c: ReturnType<typeof createLogger>['colors'],
+): Promise<CommandResult | null> {
+  const [activeClaims, openPrs] = await Promise.all([
+    findActiveClaimsByOthers(id, ctx),
+    findOpenPrsMentioningLinearId(id),
+  ]);
+
+  if (activeClaims.length === 0 && openPrs.length === 0) return null;
+
+  // Exit code 2 = dedup collision (distinct from 1 = other error).
+  // `agent-checklist init` treats 2 as a hard-fail and refuses to create
+  // the checklist; 1 still falls back to a soft warning.
+  return {
+    output: formatCollisionError(id, issueUrl, activeClaims, openPrs, c),
+    exitCode: 2,
+  };
+}
+
+function formatCollisionError(
+  id: string,
+  url: string,
+  claims: RecentStartClaim[],
+  openPrs: OpenPrMatch[],
+  c: ReturnType<typeof createLogger>['colors'],
+): string {
+  let out = `${c.red}✗ ${id} is already claimed by another session.${c.reset}\n\n`;
+
+  if (claims.length > 0) {
+    const label = claims.length === 1 ? 'Active claim' : `${claims.length} active claims`;
+    out += `  ${c.bold}${label}${c.reset} (last 24h, from a different slot):\n`;
+    for (const claim of claims) {
+      const firstLine = claim.body.split('\n').find((l) => l.trim().length > 0) ?? '';
+      const tag =
+        `slot=${claim.slot ?? '?'} ` +
+        `branch=${claim.branch ?? '?'} ` +
+        `at=${claim.createdAt}`;
+      out += `    ${c.dim}${tag}${c.reset}\n`;
+      out += `    ${firstLine.slice(0, 120)}\n`;
+    }
+    out += '\n';
+  }
+
+  if (openPrs.length > 0) {
+    const label = openPrs.length === 1 ? 'Open PR' : `${openPrs.length} open PRs`;
+    out += `  ${c.bold}${label}${c.reset} referencing ${id}:\n`;
+    for (const pr of openPrs) {
+      out += `    ${c.cyan}#${pr.number}${c.reset} ${pr.title}\n`;
+      out += `    ${c.dim}${pr.url}${c.reset}\n`;
+    }
+    out += '\n';
+  }
+
+  out += `  ${c.yellow}Investigate the existing session before starting a new one.${c.reset}\n`;
+  out += `  Issue: ${url}\n\n`;
+  out += `  To claim anyway (e.g. the other session is abandoned), pass ${c.bold}--force${c.reset}.\n`;
+  return out;
 }
 
 async function done(args: string[], options: CommandOptions): Promise<CommandResult> {

@@ -94,7 +94,11 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
   return {
     entityId: fact.subjectId,
     factId: fact.id,
-    label: null,
+    // property.name is the human-readable label ("Revenue", "Employed By").
+    // Without this, the server's things-table dual-write falls back to fact.id
+    // (e.g. "f_mEKUPPFYRg"), baking raw FactBase IDs into things.title and
+    // things.description — visible to users on /organizations/*/data (QUA-397).
+    label: property?.name ?? null,
     value: serializeValue(fact.value),
     numeric: extractNumeric(fact.value),
     low,

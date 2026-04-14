@@ -6,6 +6,7 @@ import { DataTable, SortableHeader } from "@/components/ui/data-table";
 import { GITHUB_REPO_URL } from "@lib/site-config";
 import { shortenDirectory } from "@lib/format";
 import type { AgentSessionListRow as AgentSessionRow } from "@wiki-server/api-response-types";
+import { slotColumn, linearColumn } from "./shared-columns";
 
 // ── Status Badge ─────────────────────────────────────────────────────────
 
@@ -123,6 +124,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
     ),
     cell: ({ row }) => <StatusBadge status={row.original.status} />,
   },
+  slotColumn<AgentSessionRow>(),
   {
     accessorKey: "sessionType",
     header: ({ column }) => (
@@ -166,6 +168,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
       );
     },
   },
+  linearColumn<AgentSessionRow>(),
   {
     accessorKey: "prUrl",
     header: "PR",

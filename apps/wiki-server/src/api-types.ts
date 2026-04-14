@@ -1153,11 +1153,39 @@ const VALID_SESSION_TYPES = [
   "commands",
 ] as const;
 
+/**
+ * Canonical Linear issue identifier format — one or more uppercase letters
+ * (team key), a hyphen, one or more digits. Enforced at the DB level by
+ * `chk_agent_sessions_linear_id_format` and validated at the API boundary
+ * here so bad writes get rejected before they hit PG.
+ */
+export const LINEAR_ID_PATTERN = /^[A-Z]+-\d+$/;
+/** Required, non-nullable variant — used for path params where the value must be present. */
+export const LinearIdParamSchema = z
+  .string()
+  .regex(LINEAR_ID_PATTERN, "Linear ID must match /^[A-Z]+-\\d+$/")
+  .max(50);
+const LinearIdSchema = LinearIdParamSchema.nullable().optional();
+
+/**
+ * Agent slot number (a0..a99). Matches the CHECK constraint on
+ * agent_sessions.slot_number.
+ */
+const SlotNumberSchema = z
+  .number()
+  .int()
+  .min(0)
+  .max(99)
+  .nullable()
+  .optional();
+
 export const CreateAgentSessionSchema = z.object({
   branch: z.string().min(1).max(500),
   task: z.string().min(1).max(2000),
   sessionType: z.enum(VALID_SESSION_TYPES),
   issueNumber: z.number().int().positive().nullable().optional(),
+  linearId: LinearIdSchema,
+  slotNumber: SlotNumberSchema,
   checklistMd: z.string().min(1).max(50000),
   worktree: z.string().max(1000).nullable().optional(),
 });
@@ -1177,6 +1205,10 @@ export const UpdateAgentSessionSchema = z.object({
   prUrl: z.string().url().max(1000).nullable().optional(),
   prOutcome: z.enum(PR_OUTCOMES).nullable().optional(),
   fixesPrUrl: z.string().url().max(1000).nullable().optional(),
+  // QUA-440: allow late-binding linearId/slotNumber in case init is run with
+  // --no-linear-start and the caller backfills later.
+  linearId: LinearIdSchema,
+  slotNumber: SlotNumberSchema,
   // Session log fields — written at session end (replaces separate sessions table for agent workflow)
   date: DateStringSchema.optional(),
   title: z.string().min(1).max(1000).nullable().optional(),
@@ -1479,3 +1511,45 @@ export const ClaimsByEntityQuery = z.object({
   limit: z.coerce.number().int().min(1).max(200).optional().default(50),
   offset: z.coerce.number().int().min(0).optional().default(0),
 });
+
+// ---------------------------------------------------------------------------
+// Data Quality — ID Format Audit (QUA-407 / QUA-439)
+// ---------------------------------------------------------------------------
+//
+// Surfaces coexisting ID formats in the `things` table so the
+// /internal/data-quality dashboard can show sprawl at a glance.
+// Classifier source: apps/wiki-server/src/routes/operational/data-quality.ts
+// (ID_FORMAT_REGEXES). Keep in sync — grep for IdFormatAuditSchema on rename.
+
+export const ID_FORMAT_BUCKET_NAMES = [
+  "canonical_f",
+  "canonical_sid",
+  "legacy_hex8",
+  "legacy_alnum10",
+  "legacy_hex16",
+  "other",
+] as const;
+
+export const ID_FORMAT_SOURCE_TABLES = ["facts", "resources"] as const;
+
+const IdFormatBucketCountsSchema = z.object({
+  canonical_f: z.number().int().nonnegative(),
+  canonical_sid: z.number().int().nonnegative(),
+  legacy_hex8: z.number().int().nonnegative(),
+  legacy_alnum10: z.number().int().nonnegative(),
+  legacy_hex16: z.number().int().nonnegative(),
+  other: z.number().int().nonnegative(),
+});
+
+export const IdFormatAuditSchema = z.object({
+  scannedAt: z.string(),
+  totals: IdFormatBucketCountsSchema,
+  bySourceTable: z.object({
+    facts: IdFormatBucketCountsSchema,
+    resources: IdFormatBucketCountsSchema,
+  }),
+});
+
+export type IdFormatAudit = z.infer<typeof IdFormatAuditSchema>;
+export type IdFormatBucketName = (typeof ID_FORMAT_BUCKET_NAMES)[number];
+export type IdFormatSourceTableName = (typeof ID_FORMAT_SOURCE_TABLES)[number];

@@ -6,6 +6,7 @@ import {
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { DataQualityTable } from "@/app/internal/data-quality/data-quality-table";
+import { IdFormatSection } from "@/app/internal/data-quality/id-format-section";
 
 function formatPercent(part: number, total: number): string {
   if (total === 0) return "N/A";
@@ -156,6 +157,9 @@ export async function DataQualityContent() {
           </section>
         );
       })()}
+
+      {/* ID format audit (QUA-407 / QUA-439) */}
+      <IdFormatSection snapshots={snapshots} />
 
       {/* History table */}
       <section>

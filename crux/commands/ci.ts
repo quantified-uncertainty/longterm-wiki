@@ -13,7 +13,7 @@ const SCRIPTS = {
   status: {
     script: 'ci/ci-status.ts',
     description: 'Check GitHub CI check-run status',
-    passthrough: ['ci', 'wait', 'sha'],
+    passthrough: ['ci', 'wait', 'sha', 'pr'],
   },
   'pause-actions': {
     script: 'ci/ci-pause-actions.ts',
@@ -90,6 +90,7 @@ ${commandList}
 Options:
   --wait          Poll every 30s until all checks complete
   --sha=<sha>     Check a specific commit (default: HEAD)
+  --pr=<N>        Check PR N's current head SHA (resolved fresh from API)
   --ci            JSON output
   --json          JSON output (main-status)
 
@@ -97,6 +98,7 @@ Examples:
   crux gh ci status                  Show current CI status
   crux gh ci status --wait           Poll until all checks complete
   crux gh ci status --sha=abc123     Check a specific commit
+  crux gh ci status --pr=4258        Check PR #4258 current head
   crux gh ci main-status             Is main branch CI green or red?
   crux gh ci main-status --json      Machine-readable output
   crux gh ci pause-actions            Pause all automated workflows

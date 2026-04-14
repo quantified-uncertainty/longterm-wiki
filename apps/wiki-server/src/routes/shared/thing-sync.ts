@@ -11,6 +11,28 @@ import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "../../schema.js";
 import { things, entities } from "../../schema.js";
+import { logger as rootLogger } from "../../logger.js";
+
+const logger = rootLogger.child({ module: "thing-sync" });
+
+// ── Raw-ID leak sentinel ────────────────────────────────────────────
+//
+// Catches sync handlers that bake raw FactBase/stableId identifiers into
+// things.title or things.description, which then surface as visible text
+// on user-facing data pages (EntityProfileViewer, ClaimsPipelineSummary).
+//
+// See QUA-397: facts.ts used to fall back to `f.factId` when a label was
+// missing, producing titles like "f_mEKUPPFYRg — Google DeepMind".
+// This sentinel logs a warning (non-throwing) when any sync handler ships
+// a title/description containing a raw-ID-shaped substring, so regressions
+// surface in logs and can be caught by an operational validator without
+// breaking the sync on first occurrence.
+const RAW_ID_RE = /\b(?:f_|sid_)[A-Za-z0-9]{8,}\b/;
+
+/** Exported for unit testing. Returns true if `s` contains a raw FactBase/stableId. */
+export function hasRawIdLeak(s: string | null | undefined): boolean {
+  return typeof s === "string" && RAW_ID_RE.test(s);
+}
 
 type DbOrTx =
   | import("drizzle-orm/postgres-js").PostgresJsDatabase<typeof schema>
@@ -145,6 +167,28 @@ export async function upsertThingsInTx(
   items: ThingSyncInput[]
 ): Promise<void> {
   if (items.length === 0) return;
+
+  // Sentinel: warn if any item is about to write a raw-ID-shaped string into
+  // a display column. Non-throwing so in-flight syncs with pre-existing bad
+  // data still make progress; the warning is the signal for follow-up.
+  const leaks: Array<{ sourceTable: string; sourceId: string; field: "title" | "description"; value: string }> = [];
+  for (const item of items) {
+    if (hasRawIdLeak(item.title)) {
+      leaks.push({ sourceTable: item.sourceTable, sourceId: item.sourceId, field: "title", value: item.title });
+    }
+    if (hasRawIdLeak(item.description)) {
+      leaks.push({ sourceTable: item.sourceTable, sourceId: item.sourceId, field: "description", value: item.description ?? "" });
+    }
+  }
+  if (leaks.length > 0) {
+    logger.warn(
+      {
+        leakCount: leaks.length,
+        sample: leaks.slice(0, 5),
+      },
+      `[upsertThingsInTx] raw ID detected in ${leaks.length} thing title/description value(s) — see QUA-397`
+    );
+  }
 
   const allVals = items.map((item) => ({
     id: item.id,

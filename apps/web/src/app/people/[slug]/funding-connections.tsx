@@ -61,7 +61,7 @@ export function FundingConnections({
         </div>
         <div className="divide-y divide-border/40">
           {displayed.map((conn) => {
-            const verdict = getRecordVerdict("grant", String(conn.key))?.verdict;
+            const verdict = getRecordVerdict("grant", conn.recordKey)?.verdict;
             return (
             <div key={conn.key} className="px-5 pr-12 py-3.5 relative">
               <div className="absolute top-3.5 right-4">
@@ -70,7 +70,7 @@ export function FundingConnections({
                     filledFieldCount: (conn.amount ? 1 : 0) + (conn.date ? 1 : 0) + (conn.source ? 1 : 0),
                   })}
                   verdict={verdict}
-                  sourcingHref={getSourcingHref("grant", String(conn.key))}
+                  sourcingHref={getSourcingHref("grant", conn.recordKey)}
                 />
               </div>
               <div className="flex items-center gap-2 flex-wrap">

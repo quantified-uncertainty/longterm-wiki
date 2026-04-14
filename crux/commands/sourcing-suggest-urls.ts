@@ -26,6 +26,7 @@ import {
   listVerdicts,
   getEvidenceByRecords,
   evidenceRecordKey,
+  MAX_EVIDENCE_BY_RECORDS,
   listUrlSuggestions,
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
@@ -290,14 +291,14 @@ async function suggestCommand(
     return { v, claimText, entityName, skipReason };
   });
 
-  // QUA-331: batch-fetch evidence once before the per-record task loop
-  // instead of N calls inside it. Only fetch for rows we will actually
-  // process — no point loading evidence for records that will be skipped.
+  // Batch-fetch evidence once before the per-record task loop instead
+  // of N calls inside it. Only fetch for rows we will actually process.
   const needsEvidence = prepared.filter((p) => p.skipReason === null);
   const existingUrlByKey = new Map<string, string | null>();
-  if (needsEvidence.length > 0) {
+  for (let i = 0; i < needsEvidence.length; i += MAX_EVIDENCE_BY_RECORDS) {
+    const chunk = needsEvidence.slice(i, i + MAX_EVIDENCE_BY_RECORDS);
     const evidenceRes = await getEvidenceByRecords(
-      needsEvidence.map((p) => ({ recordType: p.v.recordType, recordId: p.v.recordId })),
+      chunk.map((p) => ({ recordType: p.v.recordType, recordId: p.v.recordId })),
       { limitPerRecord: 5 },
     );
     if (!evidenceRes.ok) {

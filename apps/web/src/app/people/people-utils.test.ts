@@ -463,6 +463,9 @@ describe("getFundingConnectionsForPerson", () => {
       expect(result[0].name).toBe("AI Safety Grant");
       expect(result[0].amount).toBe(1000000);
       expect(result[0].viaOrg).toEqual({ id: "org1", name: "Anthropic", slug: "org1" });
+      // QUA-417: recordKey is the raw grant PK, key is the composite React key
+      expect(result[0].recordKey).toBe("g1");
+      expect(result[0].key).toBe("org1-g1");
     });
 
     it("resolves counterparty for gave grants", () => {

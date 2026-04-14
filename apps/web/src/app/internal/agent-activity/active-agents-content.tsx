@@ -15,6 +15,9 @@ export interface ActiveAgentRow {
   status: string;
   currentStep: string | null;
   issueNumber: number | null;
+  // Joined from agent_sessions by branch (QUA-440).
+  linearId: string | null;
+  slotNumber: number | null;
   prNumber: number | null;
   filesTouched: string[] | null;
   model: string | null;
@@ -77,6 +80,8 @@ async function loadFromApi(): Promise<FetchResult<{ agents: ActiveAgentRow[]; co
     status: a.status,
     currentStep: a.currentStep,
     issueNumber: a.issueNumber,
+    linearId: a.linearId ?? null,
+    slotNumber: a.slotNumber ?? null,
     // Enrich: if prNumber isn't set but branch matches an open PR, use it
     prNumber: a.prNumber ?? (a.branch ? branchToPR.get(a.branch) ?? null : null),
     filesTouched: a.filesTouched,

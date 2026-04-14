@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { formatFactLabel } from "@longterm-wiki/factbase";
 import { logger } from "../../logger.js";
 
 // ---- Constants ----
@@ -572,7 +573,7 @@ const factsApp = new Hono()
           tx,
           items.map((f) => {
             const entityName = entityTitleMap.get(f.entityId) ?? f.entityId;
-            const factLabel = f.label || f.factId;
+            const factLabel = formatFactLabel(f);
             return {
               id: toFactThingKey(f.entityId, f.factId),
               thingType: "fact" as const,

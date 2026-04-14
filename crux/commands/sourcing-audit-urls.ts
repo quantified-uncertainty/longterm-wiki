@@ -18,6 +18,8 @@ import {
   listVerdicts,
   getEvidenceByRecords,
   evidenceRecordKey,
+  MAX_EVIDENCE_BY_RECORDS,
+  type EvidenceByRecordsResult,
 } from '../lib/wiki-server/sourcing-client.ts';
 import {
   classifyByUrl,
@@ -30,15 +32,6 @@ import {
 export { classifyByUrl, normalizeUrlForJoin, extractHost };
 
 // ── Module constants ──
-
-/**
- * Max records per batch evidence request. QUA-331 — matches the server
- * cap `MAX_EVIDENCE_BY_RECORDS` in sourcing.ts. In practice one chunk is
- * enough (listVerdicts clamps server-side to 200, so default `--verdict`
- * sets produce ≤1000 records); the chunk loop is defensive in case that
- * clamp grows or callers add more verdict types.
- */
-const EVIDENCE_BATCH_SIZE = 1000;
 
 /** Evidence rows fetched per verdict record. Most records have 1–2. */
 const EVIDENCE_PER_RECORD = 5;
@@ -161,16 +154,12 @@ async function auditCommand(
     console.log('Fetching evidence for each (this may take a minute)...');
   }
 
-  // ── Step 2: batch-fetch evidence (QUA-331) ──
-  // Accumulate across chunks into one map, then iterate `verdictRecords`
-  // in input order so report output stays deterministic regardless of
-  // server-side grouping.
-  const allEvidence: Record<
-    string,
-    Array<{ sourceUrl: string | null; fieldName: string | null }>
-  > = {};
-  for (let i = 0; i < verdictRecords.length; i += EVIDENCE_BATCH_SIZE) {
-    const chunk = verdictRecords.slice(i, i + EVIDENCE_BATCH_SIZE);
+  // Accumulate evidence across chunks, then iterate `verdictRecords` in
+  // input order so report output stays deterministic regardless of
+  // server-side grouping by recordType.
+  const allEvidence: EvidenceByRecordsResult['evidenceByKey'] = {};
+  for (let i = 0; i < verdictRecords.length; i += MAX_EVIDENCE_BY_RECORDS) {
+    const chunk = verdictRecords.slice(i, i + MAX_EVIDENCE_BY_RECORDS);
     const res = await getEvidenceByRecords(
       chunk.map((v) => ({ recordType: v.recordType, recordId: v.recordId })),
       { limitPerRecord: EVIDENCE_PER_RECORD },

@@ -64,8 +64,9 @@ jobs:
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
       LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
-      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
-      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+      # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
+      PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+      PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
       # Assign inputs to env vars to avoid shell injection (GH Actions best practice)
       INPUT_LIMIT: ${{ inputs.limit || '5' }}
       INPUT_BUDGET: ${{ inputs.budget || '10' }}
