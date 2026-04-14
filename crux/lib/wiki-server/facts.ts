@@ -38,6 +38,9 @@ export type FactStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>
 /** Response type for POST /api/facts/sync (inferred from server). */
 export type SyncFactsResult = InferResponseType<RpcClient['sync']['$post'], 200>;
 
+/** Response type for POST /api/facts/prune (inferred from server). */
+export type PruneFactsResult = InferResponseType<RpcClient['prune']['$post'], 200>;
+
 /** A single fact row from the server. */
 export type FactEntry = FactsByEntityResult['facts'][number];
 
