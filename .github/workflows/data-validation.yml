@@ -49,8 +49,9 @@ jobs:
         env:
           WIKI_SERVER_ENV: prod
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
-          PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+          # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
+          PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
 
       # Run all validators via the unified daily runner.
       # WIKI_SERVER_ENV=prod causes validators to read PROD_LONGTERMWIKI_*
@@ -59,6 +60,7 @@ jobs:
         id: validate
         env:
           WIKI_SERVER_ENV: prod
-          PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.PROD_LONGTERMWIKI_SERVER_URL }}
-          PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.PROD_LONGTERMWIKI_SERVER_API_KEY }}
+          # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
+          PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
         run: npx tsx crux/validate/validate-daily.ts --ci
