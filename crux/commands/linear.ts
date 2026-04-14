@@ -70,6 +70,11 @@ interface CommandOptions extends BaseOptions {
   startDate?: string;
   targetDate?: string;
   force?: boolean;
+  // Internal-only: skip the dedup check WITHOUT posting the "--force"
+  // annotation in the start comment. Used by `agent-checklist init` which
+  // already ran the pre-check and shouldn't pay for it again (and
+  // shouldn't mark the comment as forced). Not exposed on the CLI.
+  skipDedupCheck?: boolean;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -217,7 +222,9 @@ async function start(args: string[], options: CommandOptions): Promise<CommandRe
   // issue. Both checks are fail-open — they return empty on API errors so
   // a transient glitch doesn't wedge all sessions. See QUA-406 for the
   // incident that motivated this (two sessions racing on QUA-397).
-  if (!options.force) {
+  // Dedup unless the user explicitly forced past the check (--force) or an
+  // internal caller already ran the pre-check (skipDedupCheck).
+  if (!options.force && !options.skipDedupCheck) {
     const collision = await checkDedup(id, issue.url, ctx, c);
     if (collision) return collision;
   }

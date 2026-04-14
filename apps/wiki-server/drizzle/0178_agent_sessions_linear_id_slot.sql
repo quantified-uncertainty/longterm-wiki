@@ -9,8 +9,20 @@
 -- leaves active_agents unchanged).
 --
 -- ADD COLUMN on a nullable text/integer with no default is O(1) in Postgres
--- 11+ (no table rewrite). The partial indexes only scan rows with non-null
--- linear_id, which starts empty — so both are immediate. No locks held.
+-- 11+ (no table rewrite — briefly takes ACCESS EXCLUSIVE, milliseconds).
+-- The partial index only scans rows with non-null linear_id, which starts
+-- empty — so the index build is immediate.
+--
+-- Lock profile:
+--   ADD COLUMN                 → ACCESS EXCLUSIVE, milliseconds (no rewrite)
+--   CREATE INDEX (partial)     → SHARE (blocks writes briefly on an empty subset)
+--   ADD CONSTRAINT NOT VALID   → ACCESS EXCLUSIVE, milliseconds (no validation scan)
+--   VALIDATE CONSTRAINT        → SHARE UPDATE EXCLUSIVE, milliseconds (no rows to scan)
+--
+-- Safe on a loaded agent_sessions table; do NOT copy-paste this pattern to
+-- a multi-GB table without re-reading .claude/rules/database-migrations.md
+-- and confirming the NOT VALID + VALIDATE split is actually safe for the
+-- lock profile there (cf. QUA-302 / migration 0173's 12-hour deploy stall).
 
 ALTER TABLE "agent_sessions"
   ADD COLUMN IF NOT EXISTS "linear_id" text,

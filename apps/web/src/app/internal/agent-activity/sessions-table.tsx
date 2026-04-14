@@ -131,7 +131,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
       <SortableHeader column={column}>Slot</SortableHeader>
     ),
     cell: ({ row }) => {
-      const slot = (row.original as { slotNumber?: number | null }).slotNumber;
+      const slot = row.original.slotNumber;
       if (slot === null || slot === undefined) {
         return <span className="text-xs text-muted-foreground/50">—</span>;
       }
@@ -141,9 +141,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
         </span>
       );
     },
-    sortingFn: (a, b) =>
-      ((a.original as { slotNumber?: number | null }).slotNumber ?? -1) -
-      ((b.original as { slotNumber?: number | null }).slotNumber ?? -1),
+    sortingFn: (a, b) => (a.original.slotNumber ?? -1) - (b.original.slotNumber ?? -1),
   },
   {
     accessorKey: "sessionType",
@@ -195,7 +193,7 @@ const columns: ColumnDef<AgentSessionRow>[] = [
       <SortableHeader column={column}>Linear</SortableHeader>
     ),
     cell: ({ row }) => {
-      const id = (row.original as { linearId?: string | null }).linearId;
+      const id = row.original.linearId;
       if (!id) return <span className="text-xs text-muted-foreground/50">—</span>;
       return (
         <a

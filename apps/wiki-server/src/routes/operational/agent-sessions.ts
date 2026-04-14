@@ -16,6 +16,7 @@ import {
   CreateAgentSessionSchema,
   UpdateAgentSessionSchema,
   DateStringSchema,
+  LINEAR_ID_PATTERN,
 } from "../../api-types.js";
 import { z } from "zod";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
@@ -86,13 +87,20 @@ const agentSessionsApp = new Hono()
         .where(eq(agentSessions.branch, d.branch))
         .orderBy(desc(agentSessions.startedAt)).limit(1);
       if (existing.length > 0 && existing[0].status === "active") {
+        // Merge rules:
+        //   undefined (field omitted) → preserve existing
+        //   null (explicit clear)     → overwrite with null
+        //   value                     → overwrite with value
+        // Using `?? existing ?? null` would silently treat `null` as
+        // "preserve" which is wrong — callers must be able to clear fields.
         const updated = await tx.update(agentSessions).set({
           task: d.task, sessionType: d.sessionType,
-          issueNumber: d.issueNumber ?? null,
-          linearId: d.linearId ?? existing[0].linearId ?? null,
-          slotNumber: d.slotNumber ?? existing[0].slotNumber ?? null,
+          issueNumber: d.issueNumber !== undefined ? d.issueNumber : (existing[0].issueNumber ?? null),
+          linearId: d.linearId !== undefined ? d.linearId : (existing[0].linearId ?? null),
+          slotNumber: d.slotNumber !== undefined ? d.slotNumber : (existing[0].slotNumber ?? null),
           checklistMd: d.checklistMd,
-          worktree: d.worktree ?? existing[0].worktree ?? null, updatedAt: new Date(),
+          worktree: d.worktree !== undefined ? d.worktree : (existing[0].worktree ?? null),
+          updatedAt: new Date(),
         }).where(eq(agentSessions.id, existing[0].id)).returning();
         return { row: firstOrThrow(updated, "agent session update"), isUpdate: true };
       }
@@ -135,8 +143,12 @@ const agentSessionsApp = new Hono()
     ),
     async (c) => {
       const linearId = c.req.param("linearId");
-      if (!/^[A-Z]+-\d+$/.test(linearId)) {
-        return validationError(c, "Invalid Linear ID format (expected ^[A-Z]+-\\d+$)");
+      // Length cap before regex to bound the regex-match cost and match the
+      // `.max(50)` bound on LinearIdSchema in api-types.ts. The regex itself
+      // is anchored and linear-time but explicit bounds are defense in
+      // depth against a future non-anchored refactor.
+      if (linearId.length > 50 || !LINEAR_ID_PATTERN.test(linearId)) {
+        return validationError(c, "Invalid Linear ID format (expected ^[A-Z]+-\\d+$, max 50 chars)");
       }
       const { freshMinutes } = c.req.valid("query");
       const cutoff = new Date(Date.now() - freshMinutes * 60_000);

@@ -343,24 +343,18 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
         `skipping auto-start. Sync .env.base or export the key to enable.${c.reset}\n`;
     } else {
       try {
+        // `linearCommands.start` runs its own dedup check internally.
+        // We already ran the pre-check above (which aborts before writing
+        // any local state on collision), so pass `skipDedupCheck: true` to
+        // avoid the 2× API cost and TOCTOU window. --force propagates
+        // separately and controls the "forced" annotation in the start
+        // comment body.
         const startResult = await linearCommands.start(
           [linearId],
-          { ci: options.ci, force: options.force },
+          { ci: options.ci, force: options.force, skipDedupCheck: true },
         );
         if (startResult.exitCode === 0) {
           linearStartOutput = startResult.output;
-        } else if (startResult.exitCode === 2) {
-          // Dedup collision — refuse to create the checklist. The start
-          // output contains a rich diagnostic (active claims + open PRs)
-          // that tells the user exactly what's blocking them.
-          return {
-            output:
-              `${c.red}✗ Refusing to create session checklist — Linear ${linearId} is already claimed.${c.reset}\n\n` +
-              startResult.output +
-              `\n${c.dim}Re-run with ${c.bold}--force${c.reset}${c.dim} to claim anyway:${c.reset}\n` +
-              `  ${c.cyan}crux sys agent-checklist init ${args.map((a) => JSON.stringify(a)).join(' ')} --force${c.reset}\n`,
-            exitCode: 2,
-          };
         } else {
           linearStartOutput =
             `${c.yellow}⚠ Auto-start of Linear ${linearId} returned non-zero exit:${c.reset}\n` +

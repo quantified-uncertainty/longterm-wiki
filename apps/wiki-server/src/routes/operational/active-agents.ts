@@ -280,8 +280,20 @@ const activeAgentsApp = new Hono()
           eq(agentSessions.branch, branch),
           eq(agentSessions.status, "active"),
         ))
-        .catch(() => {
-          // Non-critical; the heartbeat succeeded on active_agents.
+        .catch((err: unknown) => {
+          // Non-critical for the heartbeat response, but we want to know if
+          // this starts failing: a silent regression here would break the
+          // PG-first dedup's freshness signal without any symptom until the
+          // next collision. See .claude/rules/error-handling.md — every
+          // catch must log, re-throw, or document why neither.
+          logger.warn(
+            {
+              err: err instanceof Error ? err.message : String(err),
+              branch,
+              agentId: id,
+            },
+            "Heartbeat: failed to bump agent_sessions.updated_at (QUA-440)",
+          );
         });
     }
 

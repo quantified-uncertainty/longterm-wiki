@@ -91,13 +91,16 @@ async function findActiveClaimsByOthersFromPg(
     // unset at init time (e.g., running outside a slot dir) but the branch
     // matches. Prevents re-init from blocking itself.
     if (s.branch === ctx.branch) continue;
+    // `updatedAt` comes back as a string from JSON; normalize defensively
+    // in case the serialization ever changes.
+    const updatedAt = typeof s.updatedAt === 'string' ? s.updatedAt : String(s.updatedAt);
     claims.push({
       body:
         `🤖 Claude Code starting work on this issue.\n\n` +
         (s.slotNumber !== null ? `**Slot:** a${s.slotNumber}\n` : '') +
         `**Branch:** \`${s.branch}\`\n` +
-        `(from PG agent_sessions — updated_at ${new Date(s.updatedAt).toISOString()})`,
-      createdAt: String(s.updatedAt),
+        `(from PG agent_sessions — updated_at ${updatedAt})`,
+      createdAt: updatedAt,
       branch: s.branch,
       slot: s.slotNumber !== null ? `a${s.slotNumber}` : null,
     });
@@ -127,16 +130,29 @@ export async function findActiveClaimsByOthers(
   nowMs: number = Date.now(),
 ): Promise<RecentStartClaim[]> {
   // ── Source 1: PG agent_sessions (primary, fastest) ────────────────────
-  // The freshness window matches the active_agents stale timeout so a
-  // session that crashed >30min ago automatically releases its claim.
+  // The 30-minute freshness window matches the active_agents stale sweep
+  // so a session that crashed without running `crux linear done` auto-
+  // releases its claim. This window is DELIBERATELY tighter than the
+  // 24-hour Linear-comment window (DEDUP_WINDOW_MS): PG has heartbeats
+  // and can be precise about liveness, Linear comments cannot.
   const pgClaims = await findActiveClaimsByOthersFromPg(linearId, ctx, 30);
   if (pgClaims !== null && pgClaims.length > 0) return pgClaims;
 
-  // If PG said clean AND returned successfully, we still check Linear
-  // comments as a fallback — PG was only populated starting with QUA-440,
-  // so existing sessions from before this lands don't show up there.
-  // After a few weeks of rollout, this fallback becomes redundant and can
-  // be dropped. For now it preserves correctness.
+  // On empty PG result, fall through to Linear comments. Rationale:
+  //   - During rollout (first few weeks): existing sessions didn't
+  //     populate linear_id, so PG underreports.
+  //   - Post-rollout: PG should be authoritative and this fallthrough
+  //     pays an unnecessary Linear API round-trip on every clean init.
+  //
+  // TODO (post-rollout, ~2026-05-01): drop this fallthrough and return
+  // [] immediately when PG returns ok-empty. The paranoia-layer open-PR
+  // check still runs regardless.
+  //
+  // Note: we do NOT merge PG results with Linear results when PG returns
+  // non-empty above. That's intentional — PG's 30-min window is the
+  // authoritative "liveness" signal; a matching Linear comment from 6h
+  // ago but no heartbeat means the session crashed and should not block
+  // new work.
 
   // ── Source 2: Linear start comments (fallback) ─────────────────────────
   let comments: LinearComment[];
