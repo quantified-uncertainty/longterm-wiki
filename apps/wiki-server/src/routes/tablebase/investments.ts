@@ -15,6 +15,33 @@ import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
+
+// ---- QUA-470 Phase 4b-B.1: investments composer ----
+//
+// Audit §6.5: investments was one of the 5 handlers leaking raw slugs into
+// titles (`open-philanthropy → anthropic`). Two interventions:
+//
+//   1. Add `thingsTitleIds` so the factory pre-resolves both investorId and
+//      companyId entity titles before invoking toThing. (Was missing.)
+//   2. Compose the title via the registered "investment" composer, which
+//      uses the resolved titles instead of raw slugs.
+interface InvestmentComposerRow {
+  investorId: string;
+  companyId: string;
+  roundName?: string | null;
+}
+
+registerComposer<InvestmentComposerRow>("investment", (row, titleMap) => {
+  const investor = titleMap.get(row.investorId) ?? row.investorId;
+  const company = titleMap.get(row.companyId) ?? row.companyId;
+  const round = row.roundName ? ` (${row.roundName})` : "";
+  return {
+    title: `${investor} → ${company}${round}`,
+    description: null,
+    parentTitle: company,
+  };
+});
 
 // ---- Constants ----
 
@@ -294,14 +321,28 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
         ],
       },
-      toThing: (item) => ({
-        id: item.id,
-        thingType: "investment" as const,
-        title: `${item.investorId} → ${item.companyId}${item.roundName ? ` (${item.roundName})` : ""}`,
-        sourceTable: "investments",
-        sourceId: item.id,
-        sourceUrl: item.source,
-      }),
+      // QUA-470: pre-resolve investor + company entity titles so the
+      // composer can render human-readable names instead of raw slugs.
+      thingsTitleIds: (items) => [
+        ...new Set(items.flatMap((it) => [it.investorId, it.companyId])),
+      ],
+      toThing: (item, titleMap) => {
+        const composed = composeThing<InvestmentComposerRow>(
+          "investment",
+          item,
+          titleMap,
+        );
+        return {
+          id: item.id,
+          thingType: "investment" as const,
+          title: composed.title,
+          description: composed.description,
+          parentTitle: composed.parentTitle,
+          sourceTable: "investments",
+          sourceId: item.id,
+          sourceUrl: item.source,
+        };
+      },
       toVerdict: (item) => ({
         recordType: "investment",
         recordId: item.id,

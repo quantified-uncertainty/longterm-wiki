@@ -19,6 +19,7 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -90,6 +91,42 @@ function cleanPersonId(pid: string): string | null {
   if (isSid(pid)) return null;
   return pid;
 }
+
+/**
+ * Row shape passed into the personnel composer. Only the fields the composer
+ * reads are listed — keeps the contract narrow and makes refactors safe.
+ */
+interface PersonnelComposerRow {
+  personId: string;
+  personDisplayName: string | null;
+  personEntityId: string | null;
+  role: string;
+  organizationId: string;
+}
+
+// Phase 4b-B.1 (QUA-470): personnel composer is registered in the dispatch
+// table at module load. The postUpsert hook below calls composeThing()
+// instead of inlining the 4-step fallback. See compose-thing.ts.
+//
+// The 4-step person-name fallback (entity title → display name → cleaned ID
+// → raw ID) is preserved verbatim — this is a refactor, not a behavior
+// change. Phase 4b-B.2 will eliminate the column entirely.
+registerComposer<PersonnelComposerRow>("personnel", (row, titleMap) => {
+  const personName =
+    (row.personEntityId ? titleMap.get(row.personEntityId) : null) ??
+    row.personDisplayName ??
+    cleanPersonId(row.personId) ??
+    row.personId;
+  const orgName = titleMap.get(row.organizationId) ?? row.organizationId;
+  return {
+    title: `${personName} — ${row.role} at ${orgName}`,
+    description: null,
+    // parentTitle was missing from the inlined version (audit §6 finding #4
+    // class). Setting it here also includes the parent org name in the
+    // generated `things.search_vector` (weight B), improving FTS relevance.
+    parentTitle: orgName,
+  };
+});
 
 const personEntity = alias(entities, "person_entity");
 const orgEntity = alias(entities, "org_entity");
@@ -438,20 +475,23 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
           ...orgIds,
         ]);
 
-        // 4. Dual-write to things table
+        // 4. Dual-write to things table via composer dispatch table
+        // (QUA-470 Phase 4b-B.1). The 4-step person-name fallback lives in
+        // the registered "personnel" composer at the top of this file.
         await upsertThingsInTx(
           tx,
           resolvedItems.map((p) => {
-            const personName =
-              (p.personEntityId ? titleMap.get(p.personEntityId) : null) ??
-              p.personDisplayName ??
-              cleanPersonId(p.personId) ??
-              p.personId;
-            const orgName = titleMap.get(p.organizationId) ?? p.organizationId;
+            const composed = composeThing<PersonnelComposerRow>(
+              "personnel",
+              p,
+              titleMap,
+            );
             return {
               id: p.id,
               thingType: "personnel" as const,
-              title: `${personName} — ${p.role} at ${orgName}`,
+              title: composed.title,
+              description: composed.description,
+              parentTitle: composed.parentTitle,
               sourceTable: "personnel",
               sourceId: p.id,
               sourceUrl: p.source,

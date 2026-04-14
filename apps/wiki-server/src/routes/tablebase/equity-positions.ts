@@ -13,8 +13,33 @@ import {
   clampedLimit,
 } from "../shared/utils.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
+import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
+
+// ---- QUA-470 Phase 4b-B.1: equity-position composer ----
+//
+// Audit §6.5: equity-positions falls back to raw slug when title lookup
+// fails (`open-philanthropy stake in anthropic`). Already calls
+// resolveEntityTitles for both holder + company; the consolidation here
+// just routes through the dispatch table and adds parentTitle.
+interface EquityPositionComposerRow {
+  holderId: string;
+  companyId: string;
+}
+
+registerComposer<EquityPositionComposerRow>(
+  "equity-position",
+  (row, titleMap) => {
+    const holder = titleMap.get(row.holderId) ?? row.holderId;
+    const company = titleMap.get(row.companyId) ?? row.companyId;
+    return {
+      title: `${holder} stake in ${company}`,
+      description: null,
+      parentTitle: company,
+    };
+  },
+);
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -313,16 +338,26 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       const companyIds = [...new Set(items.map((ep) => ep.companyId))];
       const epTitleMap = await resolveEntityTitles(tx, [...holderIds, ...companyIds]);
 
+      // QUA-470: dispatch through the registered "equity-position" composer.
       await upsertThingsInTx(
         tx,
-        items.map((ep) => ({
-          id: ep.id,
-          thingType: "equity-position" as const,
-          title: `${epTitleMap.get(ep.holderId) ?? ep.holderId} stake in ${epTitleMap.get(ep.companyId) ?? ep.companyId}`,
-          sourceTable: "equity_positions",
-          sourceId: ep.id,
-          sourceUrl: ep.source,
-        }))
+        items.map((ep) => {
+          const composed = composeThing<EquityPositionComposerRow>(
+            "equity-position",
+            ep,
+            epTitleMap,
+          );
+          return {
+            id: ep.id,
+            thingType: "equity-position" as const,
+            title: composed.title,
+            description: composed.description,
+            parentTitle: composed.parentTitle,
+            sourceTable: "equity_positions",
+            sourceId: ep.id,
+            sourceUrl: ep.source,
+          };
+        })
       );
 
       upserted = allVals.length;
