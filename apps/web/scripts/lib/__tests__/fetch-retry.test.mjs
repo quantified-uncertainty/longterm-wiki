@@ -188,9 +188,13 @@ describe('isStrictVerdictsMode', () => {
     expect(isStrictVerdictsMode()).toBe(true);
   });
 
-  it('is strict when full-build mode is on', () => {
+  it('is NON-strict in full-build mode alone (agent gates run full-build locally without prod creds)', () => {
+    // Regression: the original predicate also fired on fullBuildMode=true,
+    // which made the pre-push gate throw whenever localhost:3112 was down —
+    // agents routinely run the gate without a local wiki-server. Only
+    // `CI=true` (which carries prod credentials) should flip to strict.
     setFullBuildMode(true);
-    expect(isStrictVerdictsMode()).toBe(true);
+    expect(isStrictVerdictsMode()).toBe(false);
   });
 
   it('STRICT_VERDICTS=0 overrides CI strictness (escape hatch)', () => {
