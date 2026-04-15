@@ -26,10 +26,15 @@ import {
 } from "@lib/wiki-server";
 
 function formatBytes(bytes: number): string {
+  if (!Number.isFinite(bytes)) return "—";
   if (bytes < 1024) return `${bytes} B`;
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
   if (bytes < 1024 * 1024 * 1024) return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   return `${(bytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
+}
+
+function formatCount(n: number): string {
+  return Number.isFinite(n) ? n.toLocaleString() : "—";
 }
 
 function formatAge(seconds: number | null): string {
@@ -167,7 +172,7 @@ export async function ThingsSearchStatusSection() {
               <CardContent className="p-0">
                 <div className="text-sm text-muted-foreground">Rows</div>
                 <div className="text-2xl font-bold">
-                  {data.rowCount.toLocaleString()}
+                  {formatCount(data.rowCount)}
                 </div>
               </CardContent>
             </Card>

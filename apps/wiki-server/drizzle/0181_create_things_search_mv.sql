@@ -470,7 +470,10 @@ FROM (
   SELECT
     ev.id::text                                            AS id,
     'entity-event'::text                                   AS thing_type,
-    (ev.title || ' (' || ev.date || ')')                   AS title,
+    -- Guard against NULL propagation: if ev.date is null the whole
+    -- concat is null, which violates the MV's (unenforced) NOT NULL
+    -- intent on title. Fall back to the bare event title.
+    (ev.title || COALESCE(' (' || ev.date || ')', ''))      AS title,
     ev.entity_id                                           AS parent_thing_id,
     'entity_events'::text                                  AS source_table,
     ev.id::text                                            AS source_id,
