@@ -51,6 +51,12 @@ export interface BotComment {
  * Used to surface blocking/maintainer feedback that patrol would otherwise miss.
  */
 export interface BlockingComment {
+  /**
+   * Stable GraphQL node ID (e.g. `IC_kwDONP...`). May be missing in legacy
+   * or test fixtures; the idempotency filter treats comments without an id
+   * as always-new (fail-open to current behavior).
+   */
+  id?: string;
   /** Author login (maintainer, bot, etc.) */
   author: string;
   /** Author association with the repo (OWNER, MEMBER, COLLABORATOR, CONTRIBUTOR, NONE) */
@@ -200,6 +206,12 @@ export interface GqlReviewThread {
 }
 
 export interface GqlIssueComment {
+  /**
+   * Stable GraphQL node ID (e.g. `IC_kwDONP...`). Used by QUA-514 to
+   * idempotency-key patrol processing of blocking comments so we don't
+   * re-dispatch for the same comment on the same SHA every cycle.
+   */
+  id?: string;
   author: { login: string; __typename?: string } | null;
   authorAssociation: string;
   body: string;
