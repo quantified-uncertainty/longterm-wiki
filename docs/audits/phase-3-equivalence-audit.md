@@ -461,6 +461,55 @@ Recommended next steps, in order:
 - ❌ Detect Type E (order-only array diffs) separately — these are folded into Type C. See `diffTypedEntities` in `build-data-from-pg.mjs` for rationale.
 - ❌ Audit non-`typedEntities` `database.json` fields: `resources` (PG-primary, out of scope), `kb` (covered separately via `audit-factbase-pg.mjs`), `pages`/`idRegistry`/`stats`/`tagIndex`/`pathRegistry`/`backlinks`/`relatedGraph`/`pageResources` (all derived at build time from the same sources — equivalent by construction)
 
+## 12. Pre-cutover prerequisites checklist
+
+Forward-looking list of items the future Phase 3 cutover PR must verify before deleting any columns, fields, or files. § 11 above covers what *this audit* didn't do; this section covers what the *cutover PR* must do.
+
+### Pre-work tickets must all be merged
+
+The cutover cannot start until these 4 tickets have shipped to main:
+
+- [ ] [QUA-519](https://linear.app/quantifieduncertainty/issue/QUA-519) — Fix `relatedEntries` sync bug (HIGH)
+- [ ] [QUA-520](https://linear.app/quantifieduncertainty/issue/QUA-520) — Migrate `data/organizations.yaml` (MEDIUM) — also fixes Finding #6 affiliation drift as a side effect (see Finding #6 root cause analysis)
+- [ ] [QUA-521](https://linear.app/quantifieduncertainty/issue/QUA-521) — Persistent `id_registry` for wikiId (MEDIUM)
+- [ ] [QUA-522](https://linear.app/quantifieduncertainty/issue/QUA-522) — `/api/entities/export` bulk endpoint (LOW)
+
+After all four ship, re-run `build-data-from-pg.mjs` against fresh prod and verify the diff count drops as expected (relatedEntries→0, organizations.yaml fields→0, wikiIds→0, etc.).
+
+### Dead-write triple-check before deletion
+
+The audit claims the following `database.json` top-level fields are unread (`grep` of `apps/web/src/` returns zero matches as of 2026-04-15). Re-verify at cutover time, when months may have passed and new consumers may have appeared:
+
+```bash
+# Run from repo root before deleting any of these from build-data.mjs:
+rg 'database\.experts|database\.estimates|database\.glossary|database\.funders|database\.organizations' apps/web/src/ crux/
+rg 'data\.experts|data\.estimates|data\.glossary|data\.funders' apps/web/src/ crux/
+```
+
+If any of these grep commands return non-test results, the field is no longer dead and the deletion plan needs to be revised. If still empty, safe to delete from `database.json` writes in `build-data.mjs`.
+
+`database.resources` is also write-only today (write at `build-data.mjs:515`, but the runtime `loadResources()` at `apps/web/src/data/tablebase.ts:645` reads from a separate `resources.json` file with only a backward-compat fallback to `database.resources`). Same triple-check applies if the cutover wants to drop it.
+
+### Cutover correctness checks
+
+Before merging the cutover PR:
+
+- [ ] `build-data.mjs` reads from PG (via `build-data-from-pg.mjs` evolved into the production reader), not YAML
+- [ ] Diff a fresh PG-sourced `database.json` against a YAML-sourced one — should be byte-identical except for known-acceptable structural changes
+- [ ] Playwright render-audit passes against a build using the new reader
+- [ ] `pnpm build` + `pnpm test` green
+- [ ] Vercel build can complete using the new reader (i.e., it has whatever PG access we decided on — read-replica, snapshot pattern, or live prod with cached fallback)
+
+### Vercel build-time PG access
+
+The user flagged this as a concern in the QUA-510 framing discussion. Pick the access pattern before the cutover PR:
+
+- **Option A — Read replica**: Vercel build connects to a follower DB more available than prod
+- **Option B — Nightly snapshot**: dump PG nightly to a file, build reads the snapshot unless `FORCE_LIVE_DB=1`
+- **Option C — Cached last-good**: if PG unreachable at build time, fall back to the previous build's `database.json`
+
+The cutover PR body must document which option was chosen + why.
+
 ## Appendix A — How to reproduce
 
 ```bash
