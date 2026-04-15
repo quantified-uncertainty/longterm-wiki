@@ -72,6 +72,58 @@ export function isMissingTokenError(err: unknown): err is MissingTokenError {
 }
 
 /**
+ * Error thrown by {@link githubApi} on HTTP failures.
+ *
+ * Carries the HTTP `status` code as a structured property so callers can
+ * discriminate between error classes without resorting to substring matching
+ * on the `message` string (which is error-prone — a 500 response whose body
+ * happens to contain the text "404" would match a naive `msg.includes('404')`
+ * check).
+ *
+ * The `message` format is preserved (`"GitHub API ${method} ${endpoint}
+ * returned ${status}: ${body}"`) for backwards compatibility with code that
+ * pre-dates this class and still substring-matches the message.
+ */
+export class GitHubApiError extends Error {
+  /** HTTP status code from the failing response (e.g. 404, 422, 500). */
+  readonly status: number;
+  /** HTTP method of the failing request. */
+  readonly method: string;
+  /** API endpoint path (without the `https://api.github.com` prefix). */
+  readonly endpoint: string;
+  /** Response body text (best-effort; may be `"(no body)"`). */
+  readonly responseBody: string;
+
+  constructor(
+    method: string,
+    endpoint: string,
+    status: number,
+    responseBody: string,
+  ) {
+    super(`GitHub API ${method} ${endpoint} returned ${status}: ${responseBody}`);
+    this.name = 'GitHubApiError';
+    this.status = status;
+    this.method = method;
+    this.endpoint = endpoint;
+    this.responseBody = responseBody;
+  }
+}
+
+/**
+ * Type guard: is this error a {@link GitHubApiError} with the given status?
+ *
+ * Prefer this over `err.message.includes('404')` — the substring-match
+ * approach was flagged as a Major finding in PR #4362 because it swallows
+ * any error whose message happens to contain "404" (e.g. a PR number).
+ */
+export function isGitHubApiErrorWithStatus(
+  err: unknown,
+  status: number,
+): err is GitHubApiError {
+  return err instanceof GitHubApiError && err.status === status;
+}
+
+/**
  * Return the whitespace-stripped `GITHUB_TOKEN` env var, or throw a
  * `MissingTokenError` when it is absent, empty, or whitespace-only.
  *
@@ -180,7 +232,10 @@ export async function githubApi<T = unknown>(
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => '(no body)');
-    throw new Error(`GitHub API ${method} ${endpoint} returned ${resp.status}: ${text}`);
+    // Throw a structured error so callers can key off `.status` instead of
+    // substring-matching the message. The message format is preserved for
+    // backwards compatibility with existing callers that still do that.
+    throw new GitHubApiError(method, endpoint, resp.status, text);
   }
 
   // 204 No Content — no body to parse (e.g. DELETE /labels/{name})
