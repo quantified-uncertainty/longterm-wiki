@@ -25,7 +25,7 @@
  */
 
 import { readFile, writeFile, mkdir } from "node:fs/promises";
-import { join, dirname } from "node:path";
+import { join, dirname, relative } from "node:path";
 
 import { loadKB } from "../../packages/factbase/src/loader.ts";
 import { contentHash } from "../../packages/factbase/src/ids.ts";
@@ -48,18 +48,23 @@ const INV_FACT_ID = /^inv_.+$/;
 
 interface FactClassification {
   total: number;
-  canonical: number;
+  canonicalIds: Set<string>;
   inverse: number;
   legacy: Array<{ factId: string; entityId: string }>;
 }
 
 function classifyFacts(graph: Graph): FactClassification {
-  const result: FactClassification = { total: 0, canonical: 0, inverse: 0, legacy: [] };
+  const result: FactClassification = {
+    total: 0,
+    canonicalIds: new Set(),
+    inverse: 0,
+    legacy: [],
+  };
   for (const ent of graph.getAllEntities()) {
     for (const fact of graph.getFacts(ent.id)) {
       result.total++;
       if (CANONICAL_FACT_ID.test(fact.id)) {
-        result.canonical++;
+        result.canonicalIds.add(fact.id);
       } else if (INV_FACT_ID.test(fact.id)) {
         result.inverse++;
       } else {
@@ -74,26 +79,27 @@ function classifyFacts(graph: Graph): FactClassification {
  * Given legacy IDs, build a stable `legacyId → f_<10>` map. Deterministic
  * across runs. Collides only if SHA-256 truncation collides — a 10-char
  * alphanumeric gives ~50 bits of entropy, so for 776 entries the birthday
- * collision probability is ~1e-10. If a collision ever happens, we abort.
+ * collision probability is ~1e-10. If a collision ever happens, we throw.
+ *
+ * Iteration is sorted so Map insertion order (preserved on iteration) is
+ * deterministic for the JSON artifact.
  */
 function buildMapping(
   legacyIds: Set<string>,
   reservedCanonical: Set<string>
-): { mapping: Map<string, string>; collisions: string[] } {
+): Map<string, string> {
   const mapping = new Map<string, string>();
   const used = new Set(reservedCanonical);
-  const collisions: string[] = [];
 
   for (const legacyId of [...legacyIds].sort()) {
     const newId = "f_" + contentHash([HASH_NAMESPACE, legacyId]);
     if (used.has(newId)) {
-      collisions.push(legacyId);
-      continue;
+      throw new Error(`hash collision on legacy id "${legacyId}" → ${newId}`);
     }
     used.add(newId);
     mapping.set(legacyId, newId);
   }
-  return { mapping, collisions };
+  return mapping;
 }
 
 /** Build one alternation regex for all mappings — O(files) rewrite instead of O(files × ids). */
@@ -114,7 +120,7 @@ async function main(): Promise<void> {
   const { graph } = await loadKB(FACTBASE_DATA_DIR);
   const before = classifyFacts(graph);
   console.log(
-    `  ${before.total} facts loaded: ${before.canonical} canonical, ${before.legacy.length} legacy, ${before.inverse} inverse`
+    `  ${before.total} facts loaded: ${before.canonicalIds.size} canonical, ${before.legacy.length} legacy, ${before.inverse} inverse`
   );
 
   if (before.legacy.length === 0) {
@@ -123,21 +129,9 @@ async function main(): Promise<void> {
   }
 
   const legacyIds = new Set(before.legacy.map((f) => f.factId));
-  const canonicalIds = new Set<string>();
-  for (const ent of graph.getAllEntities()) {
-    for (const fact of graph.getFacts(ent.id)) {
-      if (CANONICAL_FACT_ID.test(fact.id)) canonicalIds.add(fact.id);
-    }
-  }
 
   console.log("\nBuilding mapping (SHA-256 content hash)…");
-  const { mapping, collisions } = buildMapping(legacyIds, canonicalIds);
-  if (collisions.length > 0) {
-    console.error(
-      `  FATAL: ${collisions.length} legacy IDs hash-collided: ${collisions.slice(0, 5).join(", ")}`
-    );
-    process.exit(1);
-  }
+  const mapping = buildMapping(legacyIds, before.canonicalIds);
   console.log(`  ${mapping.size} legacy → canonical mappings built`);
 
   console.log("\nScanning YAML files…");
@@ -152,8 +146,10 @@ async function main(): Promise<void> {
     const original = await readFile(filepath, "utf-8");
     let count = 0;
     const updated = original.replace(rewriteRe, (_m, prefix, oldId) => {
+      // Safe: alternation is built from mapping.keys().
+      const newId = mapping.get(oldId)!;
       count++;
-      return `${prefix}${mapping.get(oldId)}`;
+      return `${prefix}${newId}`;
     });
     if (count === 0) continue;
     changedFiles.push({ path: filepath, count });
@@ -165,16 +161,17 @@ async function main(): Promise<void> {
     `\n${apply ? "Rewrote" : "Would rewrite"} ${changedFiles.length} files (${totalReplacements} IDs)`
   );
   for (const f of changedFiles.slice(0, 5)) {
-    console.log(`  ${f.path.substring(PROJECT_ROOT.length + 1)} (${f.count})`);
+    console.log(`  ${relative(PROJECT_ROOT, f.path)} (${f.count})`);
   }
   if (changedFiles.length > 5) {
     console.log(`  … +${changedFiles.length - 5} more`);
   }
 
+  // Map iteration preserves insertion order, and buildMapping inserts in
+  // sorted legacy-id order, so the JSON artifact is deterministic as-is.
   const mappingObj: Record<string, string> = {};
-  for (const [oldId, newId] of [...mapping].sort((a, b) => a[0].localeCompare(b[0]))) {
-    mappingObj[oldId] = newId;
-  }
+  for (const [oldId, newId] of mapping) mappingObj[oldId] = newId;
+
   const mappingJson =
     JSON.stringify(
       {
@@ -189,26 +186,27 @@ async function main(): Promise<void> {
       2
     ) + "\n";
 
+  const mappingRel = relative(PROJECT_ROOT, MAPPING_OUT);
   if (apply) {
     await mkdir(dirname(MAPPING_OUT), { recursive: true });
     await writeFile(MAPPING_OUT, mappingJson, "utf-8");
-    console.log(`\nWrote mapping to ${MAPPING_OUT.substring(PROJECT_ROOT.length + 1)}`);
+    console.log(`\nWrote mapping to ${mappingRel}`);
   } else {
-    console.log(`\nWould write mapping to ${MAPPING_OUT.substring(PROJECT_ROOT.length + 1)}`);
+    console.log(`\nWould write mapping to ${mappingRel}`);
   }
 
   if (apply) {
     console.log("\nVerifying post-migration state (re-loading via loader)…");
     const { graph: g2 } = await loadKB(FACTBASE_DATA_DIR);
     const after = classifyFacts(g2);
-    console.log(`  canonical after: ${after.canonical}`);
+    console.log(`  canonical after: ${after.canonicalIds.size}`);
     console.log(`  non-canonical remaining: ${after.legacy.length}`);
     if (after.legacy.length !== 0) {
-      console.error("  FAIL: legacy IDs still present after migration:");
-      for (const { factId, entityId } of after.legacy.slice(0, 10)) {
-        console.error(`    ${factId} on ${entityId}`);
-      }
-      process.exit(1);
+      const sample = after.legacy
+        .slice(0, 10)
+        .map(({ factId, entityId }) => `    ${factId} on ${entityId}`)
+        .join("\n");
+      throw new Error(`legacy IDs still present after migration:\n${sample}`);
     }
     console.log("  PASS");
   }
