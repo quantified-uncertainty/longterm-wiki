@@ -6,10 +6,12 @@ import {
   MISSING_TOKEN_HELP_MESSAGE,
 } from './github.ts';
 
-// Use `vi.stubEnv()` instead of mutating `process.env` directly. stubEnv is
-// scoped per-test and reset by `vi.unstubAllEnvs()`, so parallel workers
-// reading GITHUB_TOKEN (e.g. enriched-scan.test.ts) don't race with this
-// file's mutations.
+// Use `vi.stubEnv()` instead of mutating `process.env` directly. This is
+// the vitest-blessed pattern for per-test env overrides and is auto-reverted
+// by `vi.unstubAllEnvs()` in afterEach. `crux/vitest.config.ts` currently
+// sets `fileParallelism: false` so there is no active cross-file race, but
+// stubEnv is still safer if that config ever flips — and it makes the
+// test's scope explicit without a hand-rolled save/restore in beforeEach.
 describe('getGitHubToken', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
@@ -84,18 +86,35 @@ describe('isMissingTokenError', () => {
     expect(isMissingTokenError(new MissingTokenError())).toBe(true);
   });
 
-  it('accepts serialized errors with matching .name (cross-realm / JSON roundtrip)', () => {
-    // A real scenario: a subprocess throws MissingTokenError, the parent
+  it('accepts serialized errors with matching .name AND string .message', () => {
+    // Real scenario: a subprocess throws MissingTokenError, the parent
     // captures stderr, reconstructs the error as a plain object, and hands
     // it to the classifier. `instanceof` fails across the boundary — only
-    // `.name` survives. The classifier must still recognize it.
+    // `.name` and `.message` survive. The classifier must still recognize it.
     const serialized = { name: 'MissingTokenError', message: 'anything' };
     expect(isMissingTokenError(serialized)).toBe(true);
 
+    // Real JSON roundtrip — the form `JSON.stringify(new MissingTokenError())`
+    // produces once the error is passed through structured clone or rebuilt
+    // from `Error.toJSON()` output.
     const roundTripped = JSON.parse(
       JSON.stringify({ name: 'MissingTokenError', message: 'x' }),
     );
     expect(isMissingTokenError(roundTripped)).toBe(true);
+  });
+
+  it('rejects bare {name} objects without a string message (duck-typing guard)', () => {
+    // Security: the serialized-error branch must not accept arbitrary
+    // attacker-crafted JSON blobs that happen to set `name`. Real serialized
+    // errors always carry a `.message` — require it to narrow the false-
+    // positive surface.
+    expect(isMissingTokenError({ name: 'MissingTokenError' })).toBe(false);
+    expect(
+      isMissingTokenError({ name: 'MissingTokenError', message: 123 }),
+    ).toBe(false);
+    expect(
+      isMissingTokenError({ name: 'MissingTokenError', message: null }),
+    ).toBe(false);
   });
 
   it('rejects plain Error instances, even with matching message content', () => {
