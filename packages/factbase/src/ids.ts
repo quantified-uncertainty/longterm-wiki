@@ -107,6 +107,11 @@ export function contentHash(parts: string[]): string {
  * Use this when syncing facts from an external source so that re-running the
  * sync does not create duplicates.
  *
+ * Format note: as of QUA-497 this returns the `f_`-prefixed canonical
+ * format. Pre-QUA-497 output was a bare 10-char hash; legacy consumers
+ * that persisted those hashes must migrate via the content-hash inputs,
+ * not compare against old stored values.
+ *
  * @param subjectId  - Entity ID the fact is about
  * @param propertyId - Property ID from the registry
  * @param value      - The fact value (any JSON-serialisable type)

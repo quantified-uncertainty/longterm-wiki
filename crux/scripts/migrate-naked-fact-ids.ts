@@ -178,11 +178,12 @@ async function main(): Promise<void> {
     const replacements: Array<{ oldId: string; newId: string }> = [];
 
     for (const [oldId, newId] of mapping) {
-      // Only match when the ID follows an `id:` key (handles both block
-      // `- id: XXX` and flow `{ id: XXX, ... }` styles). Whitespace-tolerant.
-      // We intentionally do NOT match inside string values or URLs by
-      // anchoring to `id:\s+`.
-      const re = new RegExp(`(\\bid:\\s+)${oldId}\\b`, "g");
+      // Only match when the ID follows an `id:` key (handles block
+      // `- id: XXX`, flow `{ id: XXX, ... }`, and quoted `id: "XXX"`
+      // styles). Whitespace-tolerant. We intentionally do NOT match
+      // inside string values or URLs by anchoring to `id:\s+`.
+      // The trailing `\b` matches both at whitespace and quote boundaries.
+      const re = new RegExp(`(\\bid:\\s+['"]?)${oldId}\\b`, "g");
       let matchCount = 0;
       content = content.replace(re, (_match, prefix) => {
         matchCount++;
