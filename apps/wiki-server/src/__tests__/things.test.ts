@@ -637,6 +637,15 @@ describe("Things API", () => {
       expect(body.query).toBe("anthropic");
       expect(body.results.length).toBeGreaterThan(0);
       expect(body.results[0].title).toBe("Anthropic");
+      // QUA-506 regression: before the hostile-review fix, the FTS count
+      // query read `.from(things)` with a `WHERE things_search.search_vector`
+      // predicate, producing invalid SQL at runtime. The mock's `hasThings`
+      // alias would mask the bug but `body.total` must be defined so the
+      // count path is exercised. The count result object is intentionally
+      // loose — the mock's COUNT handler returns a shape the real Drizzle
+      // client also returns, wrapped differently.
+      expect(body.total).toBeDefined();
+      expect(body.searchMethod).toBe("fts");
     });
 
     it("uses FTS with prefix matching for partial words", async () => {

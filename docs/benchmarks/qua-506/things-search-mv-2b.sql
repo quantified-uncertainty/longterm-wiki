@@ -79,10 +79,11 @@ FROM entities e
 UNION ALL
 
 -- 2. fact (from facts LEFT JOIN entities) — source_table='facts', 2209 rows
--- Title: "{label or measure} — {entityTitle or entityId}"
--- Description: "{label}: {value or numeric}" or null
+-- things.id convention: `factThingKey(entity_id, fact_id)` =
+-- `encodeURIComponent(entity_id) || ':' || encodeURIComponent(fact_id)`.
+-- Both columns are URL-safe in prod data, so `||` = the TS helper.
 SELECT
-  f.fact_id::text                                            AS id,
+  (f.entity_id || ':' || f.fact_id)                          AS id,
   'fact'::text                                               AS thing_type,
   (COALESCE(f.label, f.measure, 'fact') || ' — ' ||
     COALESCE(e.title, f.entity_id))                          AS title,
@@ -146,11 +147,21 @@ LEFT JOIN entities ge ON ge.stable_id = g.grantee_id
 UNION ALL
 
 -- 4. personnel (from personnel LEFT JOIN entities x2) — 1068 rows
+-- Person name fallback mirrors the TS `cleanPersonId` helper: strip the
+-- `new:` prefix before using the raw person_id as the last resort.
 SELECT
   p.id::text                                                 AS id,
   'personnel'::text                                          AS thing_type,
   (
-    COALESCE(pe.title, p.person_display_name, p.person_id) || ' — ' || p.role ||
+    COALESCE(
+      pe.title,
+      p.person_display_name,
+      CASE
+        WHEN p.person_id LIKE 'new:%'
+          THEN substring(p.person_id from 5)
+        ELSE p.person_id
+      END
+    ) || ' — ' || p.role ||
     ' at ' || COALESCE(oe.title, p.organization_id)
   )                                                          AS title,
   NULL::text                                                 AS parent_thing_id,
@@ -171,8 +182,9 @@ LEFT JOIN entities oe ON oe.stable_id = p.organization_id
 UNION ALL
 
 -- 5. resource (from resources) — 22880 rows, no entity JOIN
+-- things.id convention: `COALESCE(r.stable_id, r.id)`.
 SELECT
-  r.id::text                                                 AS id,
+  COALESCE(r.stable_id, r.id::text)                          AS id,
   'resource'::text                                           AS thing_type,
   COALESCE(r.title, r.url)                                   AS title,
   NULL::text                                                 AS parent_thing_id,
@@ -260,8 +272,9 @@ UNION ALL
 
 -- 9. entity-resource (from entity_resources LEFT JOIN entities + resources) — 4182 rows
 -- Title = resource title; parent_title = entity title
+-- things.id convention: `'er:' || entity_id || ':' || resource_id`.
 SELECT
-  er.id::text                                                AS id,
+  ('er:' || er.entity_id || ':' || er.resource_id)           AS id,
   'entity-resource'::text                                    AS thing_type,
   COALESCE(res.title, res.url, er.resource_id)               AS title,
   er.entity_id                                               AS parent_thing_id,

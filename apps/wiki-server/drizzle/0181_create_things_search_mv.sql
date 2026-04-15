@@ -99,8 +99,13 @@ FROM (
   UNION ALL
 
   -- 2. fact (from facts LEFT JOIN entities)
+  -- things.id convention: `factThingKey(entity_id, fact_id)` =
+  -- `encodeURIComponent(entity_id) || ':' || encodeURIComponent(fact_id)`.
+  -- Both columns are URL-safe (verified against prod 2026-04-15: 0 rows
+  -- with non-url-safe chars in either column), so the `||` concatenation
+  -- equals the TypeScript helper for all rows.
   SELECT
-    f.fact_id::text                                        AS id,
+    (f.entity_id || ':' || f.fact_id)                      AS id,
     'fact'::text                                           AS thing_type,
     (COALESCE(f.label, f.measure, 'fact') || ' — ' ||
       COALESCE(e.title, f.entity_id))                      AS title,
@@ -164,11 +169,25 @@ FROM (
   UNION ALL
 
   -- 4. personnel (from personnel LEFT JOIN entities x2)
+  -- Personnel title fallback mirrors the TypeScript `cleanPersonId` helper:
+  -- strip `new:` prefix from `p.person_id` before using it as the last
+  -- fallback. If the raw person_id is `sid_...` or a legacy identifier,
+  -- it flows through unchanged — matching the TypeScript behavior where
+  -- `cleanPersonId` returns null for SIDs and the composer falls back to
+  -- the raw `row.personId` anyway. See personnel.ts:114-129.
   SELECT
     p.id::text                                             AS id,
     'personnel'::text                                      AS thing_type,
     (
-      COALESCE(pe.title, p.person_display_name, p.person_id) || ' — ' || p.role ||
+      COALESCE(
+        pe.title,
+        p.person_display_name,
+        CASE
+          WHEN p.person_id LIKE 'new:%'
+            THEN substring(p.person_id from 5)
+          ELSE p.person_id
+        END
+      ) || ' — ' || p.role ||
       ' at ' || COALESCE(oe.title, p.organization_id)
     )                                                      AS title,
     NULL::text                                             AS parent_thing_id,
@@ -189,8 +208,12 @@ FROM (
   UNION ALL
 
   -- 5. resource (from resources)
+  -- things.id convention: `COALESCE(r.stable_id, r.id)`. Resources table
+  -- has a mix of sid_-prefixed stable_ids (new rows) and legacy hex16 ids
+  -- (old rows, ~78% of rows as of 2026-04-15). The sync handler in
+  -- wikibase/resources.ts writes `r.stableId || r.id` as things.id.
   SELECT
-    r.id::text                                             AS id,
+    COALESCE(r.stable_id, r.id::text)                      AS id,
     'resource'::text                                       AS thing_type,
     COALESCE(r.title, r.url)                               AS title,
     NULL::text                                             AS parent_thing_id,
@@ -275,8 +298,15 @@ FROM (
   UNION ALL
 
   -- 9. entity-resource (from entity_resources LEFT JOIN entities + resources)
+  -- things.id convention: `'er:' || entity_id || ':' || resource_id`
+  -- (see tablebase/entity-resources.ts:180). The bigserial `er.id` is not
+  -- written to things — things.id is a composite string key. Note also
+  -- that `entity-resource` is not in VALID_THING_TYPES so the write path
+  -- is partially broken (audit §6 finding #1), but we still compose the
+  -- MV id the same way the write side does so that if / when the enum is
+  -- fixed the MV and things converge automatically.
   SELECT
-    er.id::text                                            AS id,
+    ('er:' || er.entity_id || ':' || er.resource_id)       AS id,
     'entity-resource'::text                                AS thing_type,
     COALESCE(res.title, res.url, er.resource_id)           AS title,
     er.entity_id                                           AS parent_thing_id,

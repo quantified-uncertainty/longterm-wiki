@@ -63,6 +63,19 @@ const app = new Hono()
       // production the MV is always populated.
       await db.execute(sql`REFRESH MATERIALIZED VIEW CONCURRENTLY things_search`);
 
+      // ANALYZE after refresh. Two reasons:
+      // 1. `REFRESH MATERIALIZED VIEW` does not update planner statistics
+      //    on its own — the stats collector only tracks DML, and REFRESH
+      //    is a bulk-write path that doesn't go through the normal
+      //    INSERT/UPDATE counters. Without an explicit ANALYZE, the
+      //    planner keeps stale n_distinct / reltuples estimates.
+      // 2. /api/things-search/status reads `last_analyze` from
+      //    pg_stat_all_tables as the staleness signal — running ANALYZE
+      //    here is what makes the staleness panel show accurate ages.
+      //    Without this, the panel is anchored to the migration deploy
+      //    time and stays there forever.
+      await db.execute(sql`ANALYZE things_search`);
+
       const durationMs = Date.now() - start;
 
       // Fetch the new row count + size for observability. Cheap — single
@@ -111,19 +124,21 @@ const app = new Hono()
     const db = getDrizzleDb();
 
     try {
-      // pg_stat_all_tables.last_vacuum / last_autovacuum / n_live_tup are
-      // the usual signals for MV freshness on postgres. For a materialized
-      // view, the "last refresh" stat is exposed as `pg_stat_all_tables`
-      // entry for the MV (REFRESH is implemented as a bulk write). We
-      // read last_analyze for recency (ANALYZE is run after each refresh
-      // from the groundskeeper-driven path — see autoanalyze tuning).
+      // Staleness signal: the POST /refresh handler runs `ANALYZE
+      // things_search` immediately after a successful REFRESH, so
+      // `pg_stat_all_tables.last_analyze` is the canonical "last refresh
+      // completed at" timestamp. Without that ANALYZE, REFRESH MV doesn't
+      // touch the stats collector and this timestamp would be frozen at
+      // the migration deploy time.
       //
-      // Fallback: if last_analyze is NULL, use the newest updated_at in
-      // the MV itself as a floor estimate.
+      // Row count and size: use a real COUNT(*) + pg_total_relation_size
+      // rather than `n_live_tup` — pg_stat_all_tables.n_live_tup is
+      // updated from DML counters that REFRESH MV doesn't reliably feed,
+      // so it drifts from the true row count on quiescent MVs.
       const statusRows = (await db.execute(sql`
         SELECT
           COALESCE(last_analyze, last_autoanalyze) AS last_analyzed,
-          n_live_tup::bigint AS row_count,
+          (SELECT COUNT(*) FROM things_search)::bigint AS row_count,
           pg_total_relation_size('things_search')::bigint AS total_bytes
         FROM pg_stat_all_tables
         WHERE relname = 'things_search'

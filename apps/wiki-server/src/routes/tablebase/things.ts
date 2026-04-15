@@ -407,9 +407,13 @@ const thingsApp = new Hono()
 
         // Count FTS matches for a more accurate total; trigram matches are
         // supplementary so their count is not separately queried.
+        // Must be `.from(thingsSearch)` — `ftsWhere` references
+        // `thingsSearch.search_vector`, so a `.from(things)` here would
+        // emit invalid SQL ("missing FROM-clause entry for table
+        // things_search"). Caught by hostile review on QUA-506.
         const ftsCountResult = await db
           .select({ count: count() })
-          .from(things)
+          .from(thingsSearch)
           .where(ftsWhere);
         const ftsTotal = ftsCountResult[0].count;
 
@@ -425,10 +429,12 @@ const thingsApp = new Hono()
       }
     }
 
-    // Count total FTS matches (may exceed the returned page)
+    // Count total FTS matches (may exceed the returned page).
+    // Same `.from(thingsSearch)` requirement as the trigram-block count
+    // above — the WHERE predicate references thingsSearch.search_vector.
     const ftsCountResult = await db
       .select({ count: count() })
-      .from(things)
+      .from(thingsSearch)
       .where(ftsWhere);
 
     return c.json({

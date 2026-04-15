@@ -7,11 +7,16 @@
  * refresh is worse than no MV — it grows stale forever — so this panel
  * is load-bearing for Condition 2 of the QUA-476 benchmark recommendation.
  *
- * Coloring:
- *   - green: age < 70 min (healthy — refresh cadence is hourly with ~10 min slack)
- *   - amber: 70 min <= age < 2 h (one refresh has been skipped but not urgent)
- *   - red:   age >= 2 h (refresh job appears to have stopped firing)
+ * Coloring thresholds picked to be forgiving of the cron's natural jitter:
+ *   - green: age < 90 min (healthy — hourly cadence + refresh duration
+ *     + cron scheduler jitter + circuit-breaker half-open retry slack)
+ *   - amber: 90 min <= age < 3 h (one refresh has been skipped but not urgent)
+ *   - red:   age >= 3 h (refresh job has stopped firing — alert operators)
  *   - gray:  MV missing entirely (migration 0181 hasn't run yet, or was rolled back)
+ *
+ * Note: the previous thresholds (70 min amber / 2h red) flagged healthy
+ * systems during normal scheduler drift. 90 min is ~1.5× nominal cadence,
+ * 3 h is ~3× — standard SRE practice for warn / alert on periodic jobs.
  */
 
 import { Card, CardContent } from "@/components/ui/card";
@@ -51,15 +56,17 @@ function ageColor(seconds: number | null): {
       label: "unknown",
     };
   }
-  // Thresholds: hourly refresh cadence + 10 min slack → healthy up to 70 min
-  if (seconds < 70 * 60) {
+  // Hourly refresh cadence + refresh duration + scheduler jitter +
+  // circuit-breaker half-open retry window → healthy up to ~90 min. See
+  // doc comment at top of file for rationale.
+  if (seconds < 90 * 60) {
     return {
       bg: "bg-green-50 dark:bg-green-950/30",
       text: "text-green-700 dark:text-green-400",
       label: "healthy",
     };
   }
-  if (seconds < 2 * 3600) {
+  if (seconds < 3 * 3600) {
     return {
       bg: "bg-yellow-50 dark:bg-yellow-950/30",
       text: "text-yellow-700 dark:text-yellow-500",
