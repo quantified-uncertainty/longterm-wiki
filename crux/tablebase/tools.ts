@@ -386,7 +386,7 @@ async function handleSubmitClaims(
       batchId: data.batchId,
       claimCount: data.claims.length,
       jobCount: data.jobCount,
-      estimatedCheckTime: data.estimatedCheckTime,
+      estimatedSourcingTime: data.estimatedSourcingTime,
       message: `Submitted ${data.claims.length} claims (${data.jobCount} sourcing jobs created). Use check_claim_status with batchId "${data.batchId}" to poll sourcing progress.`,
     }, null, 2);
   } catch (err: unknown) {
