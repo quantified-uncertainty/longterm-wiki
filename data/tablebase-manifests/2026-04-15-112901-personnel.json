@@ -1,0 +1,26 @@
+{
+  "table": "personnel",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-15T11:29:01.471Z",
+  "sourcingSummary": {
+    "withSourcing": 1,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 1
+    }
+  },
+  "records": [
+    {
+      "id": "ck1VoXisQ9",
+      "personId": "sid_KfgopYXMo8",
+      "organizationId": "sid_Mj1xuvdboQ",
+      "role": "Co-Founder and Policy Analyst",
+      "source": "https://secureaiproject.org/team/thomas-woodside/",
+      "verdict": "partial"
+    }
+  ]
+}

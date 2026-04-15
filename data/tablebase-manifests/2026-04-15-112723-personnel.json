@@ -1,0 +1,114 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-15T11:27:23.664Z",
+  "sourcingSummary": {
+    "withSourcing": 12,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 12,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "jiICggI07Z",
+      "personId": "6ksAa9IPn1",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "AGufFRXpnw",
+      "personId": "SfDW1wdKAU",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "DZwHEhpyhO",
+      "personId": "7MbiSbq9Q5",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "txcWbCAcnq",
+      "personId": "UW8pac4Vs9",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "g9L6yJsPs7",
+      "personId": "9mr69Tsnkn",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "49WCxLXgJo",
+      "personId": "sid_nIlZDPzSj8",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "97Qy7qS4qV",
+      "personId": "OJO2Wv7AgH",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "RvyAmObixX",
+      "personId": "yn8uM1ihYT",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "F4ZX7eumPe",
+      "personId": "X0ZCScmHwM",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "oexWj4nyzd",
+      "personId": "9XFlXyErtG",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "zZLZAZl6YQ",
+      "personId": "l7kOwcmd2n",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "yuD9NtHz05",
+      "personId": "I9cOZKWX3A",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Advisory Board Member",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    }
+  ]
+}
