@@ -22,7 +22,10 @@
 
 set -uo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# Prefer the harness-provided project dir. Fall back to script-relative path
+# for manual testing. Using CLAUDE_PROJECT_DIR is robust against symlinks and
+# worktree drift (where script-relative resolution can land in the wrong clone).
+REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 CHECKLIST="$REPO_ROOT/.claude/wip-checklist.md"
 
 # No checklist → silent no-op. Quick-fix sessions and pre-/agent-init turns
@@ -59,12 +62,15 @@ if [ "$TODO" -gt 0 ]; then
   # awk: on each unchecked line, pull just the FIRST backtick-wrapped token
   # (the slug). Defends against human labels that themselves contain backticks
   # like "Use `foo` to bar".
+  # Strip angle brackets from slugs to prevent prompt-injection via a
+  # crafted `</system-reminder>` slug leaking into the reminder block below.
   UNCHECKED_SLUGS=$(awk '
     /^[[:space:]]*[0-9]+\.[[:space:]]+\[ \][[:space:]]+`/ {
       n = split($0, parts, "`")
       if (n >= 3) print parts[2]
     }
   ' "$CHECKLIST" 2>/dev/null \
+    | tr -d '<>' \
     | paste -sd ',' - \
     | sed 's/,/, /g')
 fi

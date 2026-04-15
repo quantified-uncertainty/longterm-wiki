@@ -25,11 +25,21 @@
 
 set -uo pipefail
 
-REPO_ROOT="$(cd "$(dirname "$0")/../.." && pwd)"
+# Prefer the harness-provided project dir. Fall back to script-relative path
+# for manual testing. Using CLAUDE_PROJECT_DIR is robust against symlinks and
+# worktree drift (where script-relative resolution can land in the wrong clone).
+REPO_ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 CHECKLIST="$REPO_ROOT/.claude/wip-checklist.md"
 
 # No checklist → allow. Sessions without /agent-init shouldn't trip.
 if [ ! -f "$CHECKLIST" ]; then
+  exit 0
+fi
+
+# Required tools — fail open with a loud stderr warning if missing. A silent
+# no-op when jq is missing is a defense-in-depth failure we want to know about.
+if ! command -v jq >/dev/null 2>&1; then
+  echo "verify-checklist-on-stop: jq not found — hook disabled" >&2
   exit 0
 fi
 
@@ -53,10 +63,31 @@ if [ "$STOP_HOOK_ACTIVE" = "true" ]; then
   exit 0
 fi
 
-# Pull the text of the last assistant turn from the JSONL transcript. Claude
-# Code writes one message per line. We filter to assistant messages and take
-# the last non-empty one (macOS has no `tac`, so filter-then-tail).
-LAST_ASSISTANT_TEXT=$(jq -rR 'fromjson? | select(.message.role == "assistant") | .message.content // [] | map(select(.type == "text") | .text // "") | join(" ")' "$TRANSCRIPT_PATH" 2>/dev/null \
+# Pull the text of the last assistant turn from the JSONL transcript.
+# Notes on the jq filter:
+# - `.message.content` is sometimes a string (simple text turn) and sometimes
+#   an array of typed blocks (text, tool_use, thinking, etc.). We handle both:
+#   strings pass through; arrays are filtered to text blocks and joined.
+# - We only look at the tail of the transcript (`tail -n 500`). For long
+#   sessions the full JSONL can be tens of MB; Claude Code gives this hook a
+#   short timeout (5s). The ship-intent phrase lives in the last message
+#   anyway, so reading the whole file is wasteful and timeout-prone.
+# - We filter to non-empty text AFTER the join so turns that are entirely
+#   tool_use blocks with no text don't shadow an older real message.
+# Ordering assumption: the assistant turn that triggers Stop is already
+# written to the transcript by the time this hook fires. If that assumption
+# is ever wrong, the hook inspects a stale message and falls through to
+# fail-open — no worse than not having the hook at all.
+LAST_ASSISTANT_TEXT=$(tail -n 500 "$TRANSCRIPT_PATH" 2>/dev/null \
+  | jq -rR '
+      fromjson?
+      | select(.message.role == "assistant")
+      | .message.content
+      | if type == "string" then .
+        elif type == "array" then
+          (map(select(.type == "text") | .text // "") | join(" "))
+        else "" end
+    ' 2>/dev/null \
   | grep -v '^$' \
   | tail -n 1 || true)
 
@@ -66,11 +97,16 @@ if [ -z "$LAST_ASSISTANT_TEXT" ]; then
   exit 0
 fi
 
-# Detect ship intent. Case-insensitive, word-boundary-ish match against a
-# compact list of phrases agents commonly use when trying to wrap the session.
-# Deliberately narrow — false positives here cause turn-by-turn blocking,
-# which is exactly what we're avoiding.
-if ! echo "$LAST_ASSISTANT_TEXT" | grep -iqE '(/agent-ship|/agent-end|ready to ship|ready to merge|ready for review|shipping (now|the pr)|session (is )?(done|complete)|work is (done|complete)|wrap (this|the session) up|time to ship)'; then
+# Detect ship intent. Case-insensitive match against a compact list of phrases
+# agents commonly use when trying to wrap the session.
+#
+# We match against only the LAST 600 characters of the assistant message, not
+# the whole thing. Ship intent lives in the closing paragraph; earlier text
+# that mentions "the PR" or "ready for review" while discussing other work
+# shouldn't trip the hook.
+TAIL_TEXT=$(printf '%s' "$LAST_ASSISTANT_TEXT" | tail -c 600)
+
+if ! printf '%s' "$TAIL_TEXT" | grep -iqE '(/agent-ship|/agent-end|ready to (ship|merge|review)|ready for review|shipping (now|the pr)|session (is )?(done|complete)|work is (done|complete)|wrap (this|the session) up|time to ship|pr is (up|ready|open(ed)?)|opened (the )?pr|pushed (and|the) (changes|pr|commit)|committed and pushed|nothing (else|more) to do|all done|all set|pr #[0-9]+)'; then
   exit 0
 fi
 
@@ -86,7 +122,10 @@ if [ -z "$UNCHECKED" ]; then
   exit 0
 fi
 
-SLUG_LIST=$(echo "$UNCHECKED" | paste -sd ',' - | sed 's/,/, /g')
+# Sanitize slugs before echoing to stderr. Stderr on a blocked Stop becomes
+# context for the agent's next turn, so a crafted slug with `</system-reminder>`
+# or angle brackets could inject instructions. Strip them defensively.
+SLUG_LIST=$(echo "$UNCHECKED" | tr -d '<>' | paste -sd ',' - | sed 's/,/, /g')
 COUNT=$(echo "$UNCHECKED" | wc -l | tr -d '[:space:]')
 
 cat >&2 <<EOF
