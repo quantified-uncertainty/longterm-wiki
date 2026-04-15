@@ -83,11 +83,10 @@ async function bench<T>(label: string, n: number, fn: () => Promise<T>): Promise
     samples.push(Number(process.hrtime.bigint() - start) / 1e6);
   }
   samples.sort((a, b) => a - b);
-  // Nearest-rank percentile with (n-1) scaling so p=1.0 maps to the max and
-  // p=0 maps to the min. Previously used floor(p*n) which systematically
-  // biased tail percentiles toward the max on larger samples (for n=100,
-  // p=0.99 → samples[99] = max instead of the 99th element).
-  const pick = (p: number) => samples[Math.max(0, Math.min(samples.length - 1, Math.round(p * (samples.length - 1))))];
+  // Nearest-rank percentile with (n-1) scaling: p=0 → min, p=1 → max.
+  // Previously used floor(p*n) which biased tail percentiles toward the
+  // max on larger samples (n=100, p=0.99 → samples[99] not samples[98]).
+  const pick = (p: number) => samples[Math.round(p * (samples.length - 1))];
   const stat = {
     label,
     n,
