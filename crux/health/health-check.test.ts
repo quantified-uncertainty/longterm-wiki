@@ -9,7 +9,43 @@
 
 import { describe, it, expect } from 'vitest';
 
-import { describeFetchError, fetchJson } from './health-check.ts';
+import {
+  describeFetchError,
+  fetchJson,
+  parseLocalModeUrl,
+  DEFAULT_LOCAL_URL,
+} from './health-check.ts';
+
+describe('parseLocalModeUrl (QUA-491)', () => {
+  it('returns null when --local is not passed', () => {
+    expect(parseLocalModeUrl([])).toBeNull();
+    expect(parseLocalModeUrl(['--json', '--check=server'])).toBeNull();
+  });
+
+  it('returns the default localhost URL for bare --local', () => {
+    expect(parseLocalModeUrl(['--local'])).toBe(DEFAULT_LOCAL_URL);
+    expect(parseLocalModeUrl(['--json', '--local'])).toBe(DEFAULT_LOCAL_URL);
+  });
+
+  it('returns the explicit URL for --local=URL', () => {
+    expect(parseLocalModeUrl(['--local=http://localhost:3011'])).toBe(
+      'http://localhost:3011',
+    );
+    expect(parseLocalModeUrl(['--local=http://127.0.0.1:4000'])).toBe(
+      'http://127.0.0.1:4000',
+    );
+  });
+
+  it('does not match unrelated args that share the --local prefix', () => {
+    expect(parseLocalModeUrl(['--locality=x'])).toBeNull();
+  });
+
+  it('is order-independent', () => {
+    expect(parseLocalModeUrl(['--check=server', '--local=http://h:1', '--json']))
+      .toBe('http://h:1');
+  });
+});
+
 
 describe('describeFetchError', () => {
   it('classifies ECONNREFUSED and hints at --local for localhost targets', () => {

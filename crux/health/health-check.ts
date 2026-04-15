@@ -11,7 +11,8 @@
  *
  * Usage:
  *   crux health                      Run all checks (against production)
- *   crux health --local              Check local dev server instead of production
+ *   crux health --local              Check local dev server at http://localhost:3002
+ *   crux health --local=http://...   Check a specific local dev server URL
  *   crux health --check=server       Server & DB only
  *   crux health --check=api          API smoke tests only
  *   crux health --check=actions           GitHub Actions workflow health
@@ -29,7 +30,8 @@
  * Note: `crux health` is unambiguously about production. The command
  * defaults to WIKI_SERVER_ENV=prod so it works from any directory without
  * the env-var prefix slots normally need. Pass `--local` to check a local
- * dev server on localhost:3002 instead. See QUA-479.
+ * dev server at http://localhost:3002, or `--local=http://localhost:3011`
+ * to pin to a specific URL. See QUA-479, QUA-491.
  */
 
 import { getColors } from '../lib/output.ts';
@@ -58,17 +60,57 @@ const CHECK_ARG = args.find((a) => a.startsWith('--check='))?.split('=')[1];
 const REPORT_MODE = args.includes('--report');
 const AUTO_ISSUE = args.includes('--auto-issue');
 const CLEANUP_LABELS = args.includes('--cleanup-labels');
-const LOCAL_MODE = args.includes('--local');
+/**
+ * Default URL used by `--local` when no explicit value is given. This is the
+ * port the main workspace clone's wiki-server listens on — see CLAUDE.md's
+ * port table. Agent slots use different ports (3011+), so users running
+ * `crux health --local` from a slot should pass `--local=http://localhost:3011`
+ * etc. (QUA-491).
+ */
+export const DEFAULT_LOCAL_URL = 'http://localhost:3002';
+
+/**
+ * Parse the `--local[=URL]` CLI flag.
+ *
+ * Before QUA-491, `--local` just skipped the prod-env guard and let the
+ * current directory's `.env` choose the URL — which made the command
+ * slot-dependent (`lw/main` → localhost:3002, `lw/a11/.env` → whatever
+ * symlink it had). Now `--local` always pins an explicit URL so behavior
+ * is independent of cwd.
+ *
+ * Returns:
+ *   - `null` when `--local` is not passed
+ *   - `DEFAULT_LOCAL_URL` for bare `--local`
+ *   - The value after `=` for `--local=http://...`
+ */
+export function parseLocalModeUrl(argv: readonly string[]): string | null {
+  const arg = argv.find((a) => a === '--local' || a.startsWith('--local='));
+  if (!arg) return null;
+  if (arg === '--local') return DEFAULT_LOCAL_URL;
+  return arg.slice('--local='.length);
+}
+
+const LOCAL_URL = parseLocalModeUrl(args);
+const LOCAL_MODE = LOCAL_URL !== null;
 
 // Default to production unless --local was passed (QUA-479). `crux health`
 // is semantically "is production healthy?", so it should work from any
 // directory (coord/, agent slots, worktrees) without requiring users to
-// remember `WIKI_SERVER_ENV=prod`. Respect an explicit pre-set value so
-// callers who set it themselves keep their choice. Gated on INVOKED_AS_SCRIPT
-// so importing this module from tests does not mutate process.env and
-// pollute other tests (sync-session.test.ts, client.test.ts both care).
-if (INVOKED_AS_SCRIPT && !LOCAL_MODE && !process.env.WIKI_SERVER_ENV) {
-  process.env.WIKI_SERVER_ENV = 'prod';
+// remember `WIKI_SERVER_ENV=prod`. When --local is passed, pin the URL
+// explicitly instead of letting the current .env decide (QUA-491) — otherwise
+// `--local` is slot-ambiguous. Respect an explicit pre-set WIKI_SERVER_ENV
+// so callers who set it themselves keep their choice. Gated on
+// INVOKED_AS_SCRIPT so importing this module from tests does not mutate
+// process.env and pollute other tests (sync-session.test.ts, client.test.ts
+// both care).
+if (INVOKED_AS_SCRIPT) {
+  if (LOCAL_MODE) {
+    // Clear WIKI_SERVER_ENV so getServerUrl() reads the non-prod prefix.
+    delete process.env.WIKI_SERVER_ENV;
+    process.env.LONGTERMWIKI_SERVER_URL = LOCAL_URL!;
+  } else if (!process.env.WIKI_SERVER_ENV) {
+    process.env.WIKI_SERVER_ENV = 'prod';
+  }
 }
 
 // Resolve wiki-server URL/API key via the shared client helpers so
