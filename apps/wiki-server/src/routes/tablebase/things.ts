@@ -12,7 +12,12 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, sourceVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import {
+  things,
+  thingsSearch,
+  sourceVerdicts,
+  VALID_THING_TYPES,
+} from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -87,28 +92,59 @@ const verdictFields = {
   verdict: sourceVerdicts.verdict,
 };
 
-/**
- * Build the LEFT JOIN condition for source_check_verdicts on the things table.
- *
- * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
- * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
- * "funding-round"). We normalize: replace '_' with '-', strip trailing 's'.
- * Irregular plural: entities → entity (handled via CASE).
- *
- * NOTE: The same CASE expression is duplicated in the raw-SQL trigram fallback
- * query below. If you add more irregular plurals here, update that query too.
- */
-const verdictJoinOnThings = and(
-  sql`${sourceVerdicts.recordType} = CASE ${things.sourceTable}
-    WHEN 'entities' THEN 'entity'
-    ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
-  END`,
-  eq(sourceVerdicts.recordId, things.sourceId),
-  sql`${sourceVerdicts.fieldName} IS NULL`,
+// `pgMaterializedView` doesn't satisfy Drizzle's `SelectedFieldsFlat`, and
+// `getTableColumns` only accepts `PgTable` — so enumerate columns manually
+// for the `.select({ thing: … })` shorthand.
+const thingsSearchSelect = {
+  id: thingsSearch.id,
+  thingType: thingsSearch.thingType,
+  title: thingsSearch.title,
+  parentThingId: thingsSearch.parentThingId,
+  sourceTable: thingsSearch.sourceTable,
+  sourceId: thingsSearch.sourceId,
+  entityType: thingsSearch.entityType,
+  description: thingsSearch.description,
+  sourceUrl: thingsSearch.sourceUrl,
+  wikiId: thingsSearch.wikiId,
+  parentTitle: thingsSearch.parentTitle,
+  createdAt: thingsSearch.createdAt,
+  updatedAt: thingsSearch.updatedAt,
+  syncedAt: thingsSearch.syncedAt,
+} as const;
+
+// Build the source_check_verdicts LEFT JOIN predicate.
+// - things.sourceTable uses PG table names ("grants", "funding_rounds");
+//   source_check_verdicts.recordType uses semantic names ("grant",
+//   "funding-round") — normalize via replace('_','-') + strip trailing 's'.
+// - 'entities' → 'entity' is the one irregular plural.
+// - The same CASE body is ALSO inlined in the raw-SQL trigram fallback
+//   below — keep in sync when adding irregular plurals.
+function buildVerdictJoin(
+  sourceTableCol: typeof things.sourceTable | typeof thingsSearch.sourceTable,
+  sourceIdCol: typeof things.sourceId | typeof thingsSearch.sourceId,
+) {
+  return and(
+    sql`${sourceVerdicts.recordType} = CASE ${sourceTableCol}
+      WHEN 'entities' THEN 'entity'
+      ELSE regexp_replace(replace(${sourceTableCol}, '_', '-'), 's$', '')
+    END`,
+    eq(sourceVerdicts.recordId, sourceIdCol),
+    sql`${sourceVerdicts.fieldName} IS NULL`,
+  );
+}
+const verdictJoinOnThings = buildVerdictJoin(things.sourceTable, things.sourceId);
+const verdictJoinOnThingsSearch = buildVerdictJoin(
+  thingsSearch.sourceTable,
+  thingsSearch.sourceId,
 );
 
+// `thingsSearch` row type — nullable createdAt/updatedAt/syncedAt match the
+// MV's columns (some branches project NULL) and are a supertype of the
+// non-null base `things` columns, so `formatThing` accepts both.
+type ThingLikeRow = typeof thingsSearch.$inferSelect;
+
 function formatThing(
-  t: typeof things.$inferSelect,
+  t: ThingLikeRow,
   v?: { verdict: string | null },
 ) {
   return {
@@ -162,6 +198,8 @@ const SyncThingSchema = z.object({
 const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
+  // QUA-506: reads from the `things_search` MV; trigram fallback still
+  // reads `things` because the MV has no pg_trgm index yet.
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -175,62 +213,62 @@ const thingsApp = new Hono()
     const prefixQuery = buildPrefixTsquery(q);
     if (prefixQuery) {
       conditions.push(
-        sql`${things}.search_vector @@ to_tsquery('english', ${prefixQuery})`
+        sql`${thingsSearch}.search_vector @@ to_tsquery('english', ${prefixQuery})`
       );
     } else {
       conditions.push(
-        sql`${things}.search_vector @@ plainto_tsquery('english', ${q})`
+        sql`${thingsSearch}.search_vector @@ plainto_tsquery('english', ${q})`
       );
     }
 
     if (thing_type) {
-      conditions.push(eq(things.thingType, thing_type));
+      conditions.push(eq(thingsSearch.thingType, thing_type));
     }
 
     const ftsWhere = and(...conditions);
 
     const rows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
       .where(ftsWhere)
       .orderBy(
         prefixQuery
-          ? sql`ts_rank(${things}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
-          : sql`ts_rank(${things}.search_vector, plainto_tsquery('english', ${q})) DESC`
+          ? sql`ts_rank(${thingsSearch}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
+          : sql`ts_rank(${thingsSearch}.search_vector, plainto_tsquery('english', ${q})) DESC`
       )
       .limit(limit)
       .offset(offset);
 
-    // Phase 2: ILIKE fallback if FTS returned nothing
+    // Phase 2: ILIKE fallback if FTS returned nothing.
     if (rows.length === 0) {
       const pattern = `%${escapeIlike(q)}%`;
       const ilikeConditions = [
         or(
-          ilike(things.title, pattern),
-          ilike(things.id, pattern),
-          ilike(things.description, pattern)
+          ilike(thingsSearch.title, pattern),
+          ilike(thingsSearch.id, pattern),
+          ilike(thingsSearch.description, pattern)
         ),
       ];
       if (thing_type) {
-        ilikeConditions.push(eq(things.thingType, thing_type));
+        ilikeConditions.push(eq(thingsSearch.thingType, thing_type));
       }
 
       const ilikeWhere = and(...ilikeConditions);
 
       const fallbackRows = await db
-        .select({ thing: things, ...verdictFields })
-        .from(things)
-        .leftJoin(sourceVerdicts, verdictJoinOnThings)
+        .select({ thing: thingsSearchSelect, ...verdictFields })
+        .from(thingsSearch)
+        .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
         .where(ilikeWhere)
-        .orderBy(things.title)
+        .orderBy(thingsSearch.title)
         .limit(limit)
         .offset(offset);
 
       if (fallbackRows.length > 0) {
         const countResult = await db
           .select({ count: count() })
-          .from(things)
+          .from(thingsSearch)
           .where(ilikeWhere);
 
         return c.json({
@@ -261,6 +299,8 @@ const thingsApp = new Hono()
         params.push(thing_type);
       }
 
+      // Reads `things` not `things_search` — MV has no pg_trgm index
+      // (deferred post-QUA-507).
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
           t.id, t.thing_type, t.title, t.parent_thing_id, t.source_table, t.source_id,
@@ -317,11 +357,10 @@ const thingsApp = new Hono()
           ...trigramFormatted,
         ];
 
-        // Count FTS matches for a more accurate total; trigram matches are
-        // supplementary so their count is not separately queried.
+        // Count FTS matches; trigram matches are supplementary.
         const ftsCountResult = await db
           .select({ count: count() })
-          .from(things)
+          .from(thingsSearch)
           .where(ftsWhere);
         const ftsTotal = ftsCountResult[0].count;
 
@@ -337,10 +376,10 @@ const thingsApp = new Hono()
       }
     }
 
-    // Count total FTS matches (may exceed the returned page)
+    // Count total FTS matches (may exceed the returned page).
     const ftsCountResult = await db
       .select({ count: count() })
-      .from(things)
+      .from(thingsSearch)
       .where(ftsWhere);
 
     return c.json({
@@ -440,28 +479,40 @@ const thingsApp = new Hono()
   // See discussion #2950.
 
   // ---- GET /:id ----
+  // QUA-506: try `things_search` first (MV has resolved titles + the
+  // additional thing_types not synced to the base table). Fall back to
+  // `things` for rows freshly synced but not yet in the MV, and for the
+  // edge case where the two tables have diverged IDs.
   .get("/:id", async (c) => {
     const id = c.req.param("id");
     const db = getDrizzleDb();
 
-    // Look up by thing ID only (primary key) — sourceId lookup was
-    // nondeterministic since multiple things can share the same sourceId
-    // across different sourceTables.
-    const rows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
-      .where(eq(things.id, id))
-      .limit(1);
+    let row: { thing: ThingLikeRow; verdict: string | null } | undefined;
 
-    if (rows.length === 0) {
+    const mvRows = await db
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
+      .where(eq(thingsSearch.id, id))
+      .limit(1);
+    if (mvRows.length > 0) {
+      row = mvRows[0];
+    } else {
+      const fallbackRows = await db
+        .select({ thing: things, ...verdictFields })
+        .from(things)
+        .leftJoin(sourceVerdicts, verdictJoinOnThings)
+        .where(eq(things.id, id))
+        .limit(1);
+      if (fallbackRows.length > 0) row = fallbackRows[0];
+    }
+
+    if (!row) {
       return c.json(
         { error: "not_found", message: `Thing not found: ${id}` },
         404
       );
     }
-
-    const row = rows[0];
 
     // Also fetch children count
     const childrenResult = await db

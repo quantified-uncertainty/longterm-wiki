@@ -7,6 +7,7 @@ import {
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { DataQualityTable } from "@/app/internal/data-quality/data-quality-table";
 import { IdFormatSection } from "@/app/internal/data-quality/id-format-section";
+import { ThingsSearchStatusSection } from "@/app/internal/data-quality/things-search-status";
 
 function formatPercent(part: number, total: number): string {
   if (total === 0) return "N/A";
@@ -157,6 +158,9 @@ export async function DataQualityContent() {
           </section>
         );
       })()}
+
+      {/* things_search MV staleness (QUA-506 D5) */}
+      <ThingsSearchStatusSection />
 
       {/* ID format audit (QUA-407 / QUA-439) */}
       <IdFormatSection snapshots={snapshots} />

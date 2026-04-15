@@ -29,6 +29,7 @@
       "@wiki-server/prediction-markets-route": ["../apps/wiki-server/src/routes/tablebase/prediction-markets.ts"],
       "@wiki-server/secondary-market-prices-route": ["../apps/wiki-server/src/routes/tablebase/secondary-market-prices.ts"],
       "@wiki-server/data-quality-route": ["../apps/wiki-server/src/routes/operational/data-quality.ts"],
+      "@wiki-server/things-search-refresh-route": ["../apps/wiki-server/src/routes/operational/things-search-refresh.ts"],
       "@wiki-server/talent-flows-route": ["../apps/wiki-server/src/routes/tablebase/talent-flows.ts"],
       "@wiki-server/jobs-route": ["../apps/wiki-server/src/routes/operational/jobs.ts"],
       "@wiki-server/data-sources-route": ["../apps/wiki-server/src/routes/tablebase/data-sources.ts"],

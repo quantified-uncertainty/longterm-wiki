@@ -136,8 +136,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- things: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
-  if (q.includes('"things"') && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
+  // QUA-506: mock treats things_search as a synonym for the things store.
+  const hasThings = q.includes('"things"') || q.includes('"things_search"');
+
+  // --- things / things_search: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
+  if (hasThings && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
     // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
     if (q.includes("plainto_tsquery")) return [];
 
@@ -163,8 +166,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results;
   }
 
-  // --- things: ILIKE search (fallback) ---
-  if (q.includes('"things"') && q.includes("ilike")) {
+  // --- things / things_search: ILIKE search (fallback) ---
+  if (hasThings && q.includes("ilike")) {
     const pattern = params[0] as string;
     const searchTerm = pattern.replace(/%/g, "").toLowerCase();
     const limitParam = params.find(
@@ -233,8 +236,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- things: COUNT(*) without GROUP BY ---
-  if (q.includes("count(") && q.includes('"things"') && !q.includes("group by")) {
+  // --- things / things_search: COUNT(*) without GROUP BY ---
+  if (q.includes("count(") && hasThings && !q.includes("group by")) {
     const filtered = applyThingsFilters(q, params);
     return [{ count: filtered.length }];
   }
@@ -630,6 +633,10 @@ describe("Things API", () => {
       expect(body.query).toBe("anthropic");
       expect(body.results.length).toBeGreaterThan(0);
       expect(body.results[0].title).toBe("Anthropic");
+      // Regression: FTS count path must be exercised so its FROM clause
+      // matches the WHERE predicate (QUA-506).
+      expect(body.total).toBeDefined();
+      expect(body.searchMethod).toBe("fts");
     });
 
     it("uses FTS with prefix matching for partial words", async () => {

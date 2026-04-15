@@ -214,10 +214,10 @@ const peopleApp = new Hono()
       }
     }
 
-    // Count query
+    // QUA-506: reads things_search; trigram fallback (below) stays on things.
     const countResult = (await db.execute(sql`
       SELECT COUNT(*)::int AS total
-      FROM things t
+      FROM things_search t
       WHERE t.thing_type = 'entity'
         AND t.entity_type = 'person'
         ${extraWhere}
@@ -237,7 +237,7 @@ const peopleApp = new Hono()
         ${employerSubquery} AS "employerName",
         ${bornYearSubquery} AS "bornYear",
         ${netWorthSubquery} AS "netWorth"
-      FROM things t
+      FROM things_search t
       WHERE t.thing_type = 'entity'
         AND t.entity_type = 'person'
         ${extraWhere}
@@ -322,7 +322,9 @@ const peopleApp = new Hono()
   })
 
   // ---- GET /affiliations ----
-  // Returns distinct employer names with person counts, for filter dropdown
+  // Returns distinct employer names with person counts, for filter dropdown.
+  // Intentionally still reads from `things` — dropdown helper, ~1h staleness
+  // is fine.
   .get("/affiliations", async (c) => {
     const db = getDrizzleDb();
 

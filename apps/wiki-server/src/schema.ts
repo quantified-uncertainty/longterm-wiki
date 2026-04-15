@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgMaterializedView,
   pgSequence,
   text,
   varchar,
@@ -2637,6 +2638,28 @@ export const things = pgTable(
     // GIN index on search_vector is created in migration SQL
   ]
 );
+
+// QUA-506: `things_search` MV created by migration 0181. `.existing()`
+// tells drizzle-kit not to emit DDL from this declaration.
+export const thingsSearch = pgMaterializedView(
+  "things_search",
+  {
+    id: text("id").primaryKey(),
+    thingType: text("thing_type").notNull(),
+    title: text("title").notNull(),
+    parentThingId: text("parent_thing_id"),
+    sourceTable: text("source_table").notNull(),
+    sourceId: text("source_id").notNull(),
+    entityType: text("entity_type"),
+    description: text("description"),
+    sourceUrl: text("source_url"),
+    wikiId: text("wiki_id"),
+    parentTitle: text("parent_title"),
+    createdAt: timestamp("created_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true }),
+  },
+).existing();
 
 // Legacy thing sourcing tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables.
