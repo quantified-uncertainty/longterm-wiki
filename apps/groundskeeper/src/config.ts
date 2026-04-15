@@ -41,6 +41,7 @@ export interface Config {
     jobFailureTriage: TaskConfig;
     tablebaseScan: TaskConfig;
     e2ePostDeployWatcher: TaskConfig;
+    thingsSearchRefresh: TaskConfig;
   };
 }
 
@@ -146,6 +147,14 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_E2E_POST_DEPLOY_WATCHER_ENABLED", true),
         schedule:
           process.env["TASK_E2E_POST_DEPLOY_WATCHER_SCHEDULE"] ?? "15 * * * *", // hourly at :15
+      },
+      thingsSearchRefresh: {
+        // QUA-506 D3: hourly REFRESH MV CONCURRENTLY. Offset from :00 to :25
+        // so it doesn't collide with e2e-post-deploy-watcher (:15) and
+        // leaves headroom for hourly analytics tasks that run on the hour.
+        enabled: envBool("TASK_THINGS_SEARCH_REFRESH_ENABLED", true),
+        schedule:
+          process.env["TASK_THINGS_SEARCH_REFRESH_SCHEDULE"] ?? "25 * * * *",
       },
     },
   };

@@ -136,8 +136,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return rows;
   }
 
-  // --- things: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
-  if (q.includes('"things"') && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
+  // QUA-506: /api/things/search reads from the `things_search` materialized
+  // view instead of `things`. For the in-memory mock, treat `things_search`
+  // as a synonym for the `things` store — the search semantics are the same,
+  // just the table name differs. All the following matchers accept either
+  // `"things"` or `"things_search"` as the source relation.
+  const hasThings = q.includes('"things"') || q.includes('"things_search"');
+
+  // --- things / things_search: search_vector / FTS search (plainto_tsquery or to_tsquery prefix) ---
+  if (hasThings && (q.includes("plainto_tsquery") || q.includes("to_tsquery"))) {
     // plainto_tsquery: return empty to trigger ILIKE fallback (can't simulate in memory)
     if (q.includes("plainto_tsquery")) return [];
 
@@ -163,8 +170,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return results;
   }
 
-  // --- things: ILIKE search (fallback) ---
-  if (q.includes('"things"') && q.includes("ilike")) {
+  // --- things / things_search: ILIKE search (fallback) ---
+  if (hasThings && q.includes("ilike")) {
     const pattern = params[0] as string;
     const searchTerm = pattern.replace(/%/g, "").toLowerCase();
     const limitParam = params.find(
@@ -233,8 +240,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- things: COUNT(*) without GROUP BY ---
-  if (q.includes("count(") && q.includes('"things"') && !q.includes("group by")) {
+  // --- things / things_search: COUNT(*) without GROUP BY ---
+  if (q.includes("count(") && hasThings && !q.includes("group by")) {
     const filtered = applyThingsFilters(q, params);
     return [{ count: filtered.length }];
   }

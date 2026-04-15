@@ -12,7 +12,12 @@ import {
   isNotNull,
 } from "drizzle-orm";
 import { getDrizzleDb, getDb } from "../../db.js";
-import { things, sourceVerdicts, VALID_THING_TYPES } from "../../schema.js";
+import {
+  things,
+  thingsSearch,
+  sourceVerdicts,
+  VALID_THING_TYPES,
+} from "../../schema.js";
 import { thingHref } from "../shared/thing-sync.js";
 import {
   zv,
@@ -88,6 +93,31 @@ const verdictFields = {
 };
 
 /**
+ * Column map for selecting every field of `things_search` into a single
+ * `thing:` sub-object. Drizzle's `pgMaterializedView` returns a different
+ * shape than `pgTable` and doesn't satisfy `SelectedFieldsFlat`, so the
+ * `.select({ thing: thingsSearch })` shorthand that works for base tables
+ * does not work for MVs — we have to enumerate. Shape mirrors
+ * `ThingLikeRow`.
+ */
+const thingsSearchSelect = {
+  id: thingsSearch.id,
+  thingType: thingsSearch.thingType,
+  title: thingsSearch.title,
+  parentThingId: thingsSearch.parentThingId,
+  sourceTable: thingsSearch.sourceTable,
+  sourceId: thingsSearch.sourceId,
+  entityType: thingsSearch.entityType,
+  description: thingsSearch.description,
+  sourceUrl: thingsSearch.sourceUrl,
+  wikiId: thingsSearch.wikiId,
+  parentTitle: thingsSearch.parentTitle,
+  createdAt: thingsSearch.createdAt,
+  updatedAt: thingsSearch.updatedAt,
+  syncedAt: thingsSearch.syncedAt,
+} as const;
+
+/**
  * Build the LEFT JOIN condition for source_check_verdicts on the things table.
  *
  * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
@@ -107,8 +137,47 @@ const verdictJoinOnThings = and(
   sql`${sourceVerdicts.fieldName} IS NULL`,
 );
 
+// Parallel helper for the `things_search` materialized view. Same CASE
+// shape; only the column references differ. Both are kept in sync by
+// construction — if you add an irregular plural in one, update the other.
+const verdictJoinOnThingsSearch = and(
+  sql`${sourceVerdicts.recordType} = CASE ${thingsSearch.sourceTable}
+    WHEN 'entities' THEN 'entity'
+    ELSE regexp_replace(replace(${thingsSearch.sourceTable}, '_', '-'), 's$', '')
+  END`,
+  eq(sourceVerdicts.recordId, thingsSearch.sourceId),
+  sql`${sourceVerdicts.fieldName} IS NULL`,
+);
+
+/**
+ * Shared shape between `things` (base table) and `things_search` (MV).
+ * Used by formatThing so /search endpoints reading from the MV can
+ * reuse the same formatter without type-assertion gymnastics.
+ *
+ * Note: `createdAt` / `updatedAt` / `syncedAt` are NOT NULL on `things`
+ * but nullable on `things_search` (some MV source branches — notably
+ * entity_resources — don't carry a synced_at, so we project NULL). The
+ * formatter already tolerates the nullable case for MV rows.
+ */
+type ThingLikeRow = {
+  id: string;
+  thingType: string;
+  title: string;
+  parentThingId: string | null;
+  sourceTable: string;
+  sourceId: string;
+  entityType: string | null;
+  description: string | null;
+  sourceUrl: string | null;
+  wikiId: string | null;
+  parentTitle: string | null;
+  createdAt: Date | null;
+  updatedAt: Date | null;
+  syncedAt: Date | null;
+};
+
 function formatThing(
-  t: typeof things.$inferSelect,
+  t: ThingLikeRow,
   v?: { verdict: string | null },
 ) {
   return {
@@ -162,6 +231,12 @@ const SyncThingSchema = z.object({
 const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
+  //
+  // QUA-506 Phase 4b-B.2b: reads from the `things_search` materialized view
+  // (migration 0181) instead of `things`. The MV is refreshed hourly by
+  // the groundskeeper task `things-search-refresh` and composes title /
+  // description / parent_title from source tables at refresh time, fixing
+  // the raw-ID leak class QUA-408 Problem 1 tracks.
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -175,62 +250,65 @@ const thingsApp = new Hono()
     const prefixQuery = buildPrefixTsquery(q);
     if (prefixQuery) {
       conditions.push(
-        sql`${things}.search_vector @@ to_tsquery('english', ${prefixQuery})`
+        sql`${thingsSearch}.search_vector @@ to_tsquery('english', ${prefixQuery})`
       );
     } else {
       conditions.push(
-        sql`${things}.search_vector @@ plainto_tsquery('english', ${q})`
+        sql`${thingsSearch}.search_vector @@ plainto_tsquery('english', ${q})`
       );
     }
 
     if (thing_type) {
-      conditions.push(eq(things.thingType, thing_type));
+      conditions.push(eq(thingsSearch.thingType, thing_type));
     }
 
     const ftsWhere = and(...conditions);
 
     const rows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
       .where(ftsWhere)
       .orderBy(
         prefixQuery
-          ? sql`ts_rank(${things}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
-          : sql`ts_rank(${things}.search_vector, plainto_tsquery('english', ${q})) DESC`
+          ? sql`ts_rank(${thingsSearch}.search_vector, to_tsquery('english', ${prefixQuery})) DESC`
+          : sql`ts_rank(${thingsSearch}.search_vector, plainto_tsquery('english', ${q})) DESC`
       )
       .limit(limit)
       .offset(offset);
 
-    // Phase 2: ILIKE fallback if FTS returned nothing
+    // Phase 2: ILIKE fallback if FTS returned nothing. Also reads from the
+    // MV — the scope explicitly requires the fallbacks to move with the
+    // primary read path so titles don't drift between FTS and ILIKE
+    // results.
     if (rows.length === 0) {
       const pattern = `%${escapeIlike(q)}%`;
       const ilikeConditions = [
         or(
-          ilike(things.title, pattern),
-          ilike(things.id, pattern),
-          ilike(things.description, pattern)
+          ilike(thingsSearch.title, pattern),
+          ilike(thingsSearch.id, pattern),
+          ilike(thingsSearch.description, pattern)
         ),
       ];
       if (thing_type) {
-        ilikeConditions.push(eq(things.thingType, thing_type));
+        ilikeConditions.push(eq(thingsSearch.thingType, thing_type));
       }
 
       const ilikeWhere = and(...ilikeConditions);
 
       const fallbackRows = await db
-        .select({ thing: things, ...verdictFields })
-        .from(things)
-        .leftJoin(sourceVerdicts, verdictJoinOnThings)
+        .select({ thing: thingsSearchSelect, ...verdictFields })
+        .from(thingsSearch)
+        .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
         .where(ilikeWhere)
-        .orderBy(things.title)
+        .orderBy(thingsSearch.title)
         .limit(limit)
         .offset(offset);
 
       if (fallbackRows.length > 0) {
         const countResult = await db
           .select({ count: count() })
-          .from(things)
+          .from(thingsSearch)
           .where(ilikeWhere);
 
         return c.json({
@@ -261,6 +339,16 @@ const thingsApp = new Hono()
         params.push(thing_type);
       }
 
+      // Phase 3 trigram fallback intentionally still reads from the base
+      // `things` table, NOT the `things_search` MV. The QUA-506 scope
+      // update explicitly defers the trigram migration to post-QUA-507:
+      // moving the phase-3 fallback to the MV would require a pg_trgm GIN
+      // index on `things_search.title`, and the decision on whether to add
+      // that index is parked. Until then, the trigram fallback accepts a
+      // minor staleness skew (base table updates within the last hour may
+      // be visible to phase 3 but not to phase 1/2) which is acceptable
+      // since trigram is the tiebreaker path for typos, not the primary
+      // read surface. See docs/benchmarks/qua-506/README.md §7.
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
           t.id, t.thing_type, t.title, t.parent_thing_id, t.source_table, t.source_id,

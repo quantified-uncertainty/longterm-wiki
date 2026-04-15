@@ -1,5 +1,6 @@
 import {
   pgTable,
+  pgMaterializedView,
   pgSequence,
   text,
   varchar,
@@ -2637,6 +2638,41 @@ export const things = pgTable(
     // GIN index on search_vector is created in migration SQL
   ]
 );
+
+// QUA-506 Phase 4b-B.2b — materialized view read-side mirror of `things`.
+//
+// `things_search` is a MATERIALIZED VIEW (not a base table) created in
+// migration 0181 that composes title / description / parent_title from
+// source tables via a UNION ALL, then computes a stored `search_vector`
+// tsvector on top. It has the same column shape as `things` plus the
+// stored `search_vector`. Secondary indexes mirror the ones on `things`
+// so `/api/things/search` + `/api/people` can switch FROM clauses without
+// query rewrites.
+//
+// The `.existing()` suffix tells drizzle-kit that this MV is managed
+// out-of-band (by migration 0181) — do NOT generate CREATE MATERIALIZED
+// VIEW DDL from this declaration. Drizzle will still let you `db.select()
+// .from(thingsSearch)` as if it were a table.
+export const thingsSearch = pgMaterializedView(
+  "things_search",
+  {
+    id: text("id").primaryKey(),
+    thingType: text("thing_type").notNull(),
+    title: text("title").notNull(),
+    parentThingId: text("parent_thing_id"),
+    sourceTable: text("source_table").notNull(),
+    sourceId: text("source_id").notNull(),
+    entityType: text("entity_type"),
+    description: text("description"),
+    sourceUrl: text("source_url"),
+    wikiId: text("wiki_id"),
+    parentTitle: text("parent_title"),
+    createdAt: timestamp("created_at", { withTimezone: true }),
+    updatedAt: timestamp("updated_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true }),
+    // search_vector tsvector column is stored inline by the MV's SELECT.
+  },
+).existing();
 
 // Legacy thing sourcing tables removed — replaced by
 // unified source_check_evidence and source_check_verdicts tables.

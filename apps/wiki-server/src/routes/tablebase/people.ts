@@ -214,10 +214,12 @@ const peopleApp = new Hono()
       }
     }
 
-    // Count query
+    // QUA-506 D4: count + data queries read from the `things_search`
+    // materialized view instead of `things`. Trigram fallback (below)
+    // still reads from `things` per the scope update's trigram deferral.
     const countResult = (await db.execute(sql`
       SELECT COUNT(*)::int AS total
-      FROM things t
+      FROM things_search t
       WHERE t.thing_type = 'entity'
         AND t.entity_type = 'person'
         ${extraWhere}
@@ -237,7 +239,7 @@ const peopleApp = new Hono()
         ${employerSubquery} AS "employerName",
         ${bornYearSubquery} AS "bornYear",
         ${netWorthSubquery} AS "netWorth"
-      FROM things t
+      FROM things_search t
       WHERE t.thing_type = 'entity'
         AND t.entity_type = 'person'
         ${extraWhere}

@@ -55,6 +55,7 @@ function makeConfig(): Config {
       jobFailureTriage: { enabled: false, schedule: "0 */6 * * *" },
       tablebaseScan: { enabled: false, schedule: "0 5 * * *" },
       e2ePostDeployWatcher: { enabled: true, schedule: "15 * * * *" },
+      thingsSearchRefresh: { enabled: false, schedule: "25 * * * *" },
     },
   };
 }

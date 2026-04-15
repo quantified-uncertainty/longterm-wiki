@@ -202,6 +202,7 @@ import type { PersonnelRoute } from "@wiki-server/personnel-route";
 import type { PredictionMarketsRoute } from "@wiki-server/prediction-markets-route";
 import type { SecondaryMarketPricesRoute } from "@wiki-server/secondary-market-prices-route";
 import type { DataQualityRoute } from "@wiki-server/data-quality-route";
+import type { ThingsSearchRefreshRoute } from "@wiki-server/things-search-refresh-route";
 import type { TalentFlowsRoute } from "@wiki-server/talent-flows-route";
 import type { JobsRoute } from "@wiki-server/jobs-route";
 import type { DataSourcesRoute } from "@wiki-server/data-sources-route";
@@ -433,6 +434,40 @@ export type RpcDataQualityHistoryResult = InferResponseType<DataQualityClient['h
 
 /** A single data quality snapshot row */
 export type RpcDataQualitySnapshot = NonNullable<RpcDataQualityLatestResult['snapshot']>;
+
+// ============================================================================
+// Hono RPC client — things_search MV refresh + status (QUA-506 D3/D5)
+// ============================================================================
+
+/**
+ * Typed RPC client for `/api/things-search/{refresh,status}`. Returns null
+ * if wiki-server URL isn't configured. Used by the /internal/data-quality
+ * staleness panel to render last_refresh + age + row_count.
+ */
+export function getThingsSearchRpcClient(options?: { revalidate?: number }) {
+  const config = getWikiServerConfig();
+  if (!config) return null;
+
+  const revalidate = options?.revalidate ?? 60; // 60s — staleness panel wants fresh
+
+  const isrFetch: typeof globalThis.fetch = (input, init) => {
+    return globalThis.fetch(input, {
+      ...init,
+      next: { revalidate },
+      signal: init?.signal ?? AbortSignal.timeout(10_000),
+    } as RequestInit);
+  };
+
+  return hc<ThingsSearchRefreshRoute>(`${config.serverUrl}/api/things-search`, {
+    headers: config.headers,
+    fetch: isrFetch,
+  });
+}
+
+type ThingsSearchClient = NonNullable<ReturnType<typeof getThingsSearchRpcClient>>;
+
+/** Inferred response type for GET /api/things-search/status */
+export type RpcThingsSearchStatusResult = InferResponseType<ThingsSearchClient['status']['$get'], 200>;
 
 // ============================================================================
 // Hono RPC client — Talent Flows API
