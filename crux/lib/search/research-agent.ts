@@ -328,7 +328,7 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
     try {
       const sql = `SELECT title, uri, snippet FROM scry.search('${query.replace(/'/g, "''")}', '${table}') WHERE title IS NOT NULL AND kind = 'post' LIMIT ${perTable}`;
 
-      const response = await fetch('https://api.exopriors.com/v1/scry/query', {
+      const response = await fetch('https://api.scry.io/v1/scry/query', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
