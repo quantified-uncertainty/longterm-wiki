@@ -26,6 +26,27 @@ import { logger as rootLogger } from "../../logger.js";
 
 const logger = rootLogger.child({ route: "things-search-refresh" });
 
+// ---- Raw SQL row types ----
+//
+// Both row types carry an index signature for compatibility with Drizzle's
+// `db.execute()` return shape (`RowList<Record<string, unknown>[]>`), which
+// is the same pattern data-quality.ts uses for its inline row casts.
+
+/** Row returned by the post-refresh row-count + size query. */
+interface RefreshStatsRow {
+  row_count: string;
+  total_bytes: string;
+  [key: string]: unknown;
+}
+
+/** Row returned by the pg_stat_all_tables status query. */
+interface StatusRow {
+  last_analyzed: string | Date | null;
+  row_count: string;
+  total_bytes: string;
+  [key: string]: unknown;
+}
+
 // The refresh endpoint has no request body and no query params; the only
 // work is the REFRESH statement itself. We hold the route app in a const
 // so it exports as a proper Hono RPC typed route.
@@ -46,13 +67,12 @@ const app = new Hono()
 
       // Fetch the new row count + size for observability. Cheap — single
       // index-only count.
-      const [stats] = (await db.execute(
-        sql`
-          SELECT
-            (SELECT COUNT(*) FROM things_search)::bigint AS row_count,
-            pg_total_relation_size('things_search')::bigint AS total_bytes
-        `,
-      )) as unknown as Array<{ row_count: string; total_bytes: string }>;
+      const statsRows = (await db.execute(sql`
+        SELECT
+          (SELECT COUNT(*) FROM things_search)::bigint AS row_count,
+          pg_total_relation_size('things_search')::bigint AS total_bytes
+      `)) as Array<RefreshStatsRow>;
+      const stats = statsRows[0];
 
       logger.info(
         {
@@ -100,21 +120,16 @@ const app = new Hono()
       //
       // Fallback: if last_analyze is NULL, use the newest updated_at in
       // the MV itself as a floor estimate.
-      const [row] = (await db.execute(
-        sql`
-          SELECT
-            COALESCE(last_analyze, last_autoanalyze) AS last_analyzed,
-            n_live_tup::bigint AS row_count,
-            pg_total_relation_size('things_search')::bigint AS total_bytes
-          FROM pg_stat_all_tables
-          WHERE relname = 'things_search'
-            AND schemaname = 'public'
-        `,
-      )) as unknown as Array<{
-        last_analyzed: string | Date | null;
-        row_count: string;
-        total_bytes: string;
-      }>;
+      const statusRows = (await db.execute(sql`
+        SELECT
+          COALESCE(last_analyze, last_autoanalyze) AS last_analyzed,
+          n_live_tup::bigint AS row_count,
+          pg_total_relation_size('things_search')::bigint AS total_bytes
+        FROM pg_stat_all_tables
+        WHERE relname = 'things_search'
+          AND schemaname = 'public'
+      `)) as Array<StatusRow>;
+      const row = statusRows[0];
 
       if (!row) {
         return c.json(
