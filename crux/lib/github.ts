@@ -52,26 +52,36 @@ export class MissingTokenError extends Error {
  * the error signal can evolve without silently breaking classifiers.
  *
  * Also matches serialized errors where only `.name === 'MissingTokenError'`
- * survives the boundary (JSON logs, subprocess stderr → parent catch). The
- * `instanceof` check catches the happy path; the `.name` check catches
- * cross-realm / serialized cases.
+ * survives the boundary (JSON logs, subprocess stderr → parent catch). To
+ * reduce the duck-typing attack surface, the serialized branch additionally
+ * requires a string `.message` field — a bare `{ name: 'MissingTokenError' }`
+ * object is rejected. Real `Error.toJSON()` / structured-clone output always
+ * includes a message, so this narrows away arbitrary attacker-crafted
+ * objects without rejecting any legitimate serialized error.
+ *
+ * NOTE: If you ever subclass `MissingTokenError` and set a different `.name`
+ * on the subclass, `instanceof` still matches (correct), but serialized
+ * subclass instances will NOT be classified here. Update this guard if that
+ * case becomes real.
  */
 export function isMissingTokenError(err: unknown): err is MissingTokenError {
   if (err instanceof MissingTokenError) return true;
-  return (
-    typeof err === 'object' &&
-    err !== null &&
-    (err as { name?: unknown }).name === 'MissingTokenError'
-  );
+  if (typeof err !== 'object' || err === null) return false;
+  const obj = err as { name?: unknown; message?: unknown };
+  return obj.name === 'MissingTokenError' && typeof obj.message === 'string';
 }
 
 /**
- * Get the GitHub token from the environment or throw a `MissingTokenError`.
+ * Return the whitespace-stripped `GITHUB_TOKEN` env var, or throw a
+ * `MissingTokenError` when it is absent, empty, or whitespace-only.
  *
- * Whitespace-only values (e.g. `'   '`) are treated as missing. Without the
- * trim, a stray-whitespace env var would pass the truthy check and be sent
- * verbatim to the GitHub API, causing a transient-looking 401 instead of the
- * immediate permanent-fault classification that `MissingTokenError` signals.
+ * The return value is always `.trim()`-ed. Callers that need the raw env
+ * var (verbatim passthrough) should read `process.env.GITHUB_TOKEN`
+ * directly. Without the trim, a stray-whitespace value (e.g. from
+ * `GITHUB_TOKEN=$(cat token.txt)` where the file has a trailing newline)
+ * would pass the truthy check and be sent verbatim to the GitHub API,
+ * causing a transient-looking 401 instead of the immediate permanent-fault
+ * classification that `MissingTokenError` signals.
  */
 export function getGitHubToken(): string {
   const token = process.env.GITHUB_TOKEN?.trim();
