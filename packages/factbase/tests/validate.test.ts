@@ -347,6 +347,21 @@ describe("validate", () => {
       const formatErrors = results.filter((r) => r.rule === "factid-format");
       expect(formatErrors).toHaveLength(1);
     });
+
+    // Regression: QUA-497 tightened FACTID_RE to forbid naked 10-char IDs.
+    // Previously this shape was accepted (shared with entity stableId format).
+    it("rejects naked 10-char fact IDs (QUA-497)", () => {
+      const g = new Graph();
+      g.addSchema({ type: "org", name: "Org", required: [], recommended: [] });
+      g.addProperty({ id: "name", name: "Name", dataType: "text" });
+      g.addEntity(ent("aB3cD4eF5g", "org", "E"));
+      g.addFact({ id: "RYUAwpW0fA", subjectId: "aB3cD4eF5g", propertyId: "name", value: { type: "text", value: "v" } });
+
+      const results = validateEntity(g, "aB3cD4eF5g");
+      const formatErrors = results.filter((r) => r.rule === "factid-format");
+      expect(formatErrors).toHaveLength(1);
+      expect(formatErrors[0].severity).toBe("error");
+    });
   });
 
   describe("empty-name check", () => {
