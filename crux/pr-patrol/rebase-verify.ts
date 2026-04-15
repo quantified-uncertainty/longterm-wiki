@@ -79,14 +79,18 @@ export async function verifyRebaseCleared(
   repo: string,
   deps: VerifyRebaseDeps = {},
 ): Promise<RebaseVerifyResult> {
-  const maxAttempts = deps.maxAttempts ?? DEFAULT_MAX_ATTEMPTS;
-  const delayMs = deps.delayMs ?? DEFAULT_DELAY_MS;
+  // Clamp polling config to sane minimums so a misconfigured caller
+  // (maxAttempts=0, delayMs=-1, etc.) can't silently short-circuit the loop
+  // and return "verification failed" without a single real fetch.
+  const maxAttempts = Math.max(1, deps.maxAttempts ?? DEFAULT_MAX_ATTEMPTS);
+  const delayMs = Math.max(0, deps.delayMs ?? DEFAULT_DELAY_MS);
   const fetchPr = deps.fetchPr ?? fetchSinglePr;
   const sleep =
     deps.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
 
   let lastMergeable: string | null = null;
   let lastMergeStateStatus: string | null = null;
+  let lastFetchError: string | null = null;
   let attempts = 0;
 
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
@@ -98,18 +102,27 @@ export async function verifyRebaseCleared(
     if (attempt > 1) await sleep(delayMs);
 
     let pr: GqlPrNode | null = null;
+    let fetchThrew = false;
     try {
       pr = await fetchPr(prNumber, repo);
-    } catch {
+    } catch (err) {
       pr = null;
+      fetchThrew = true;
+      lastFetchError = err instanceof Error ? err.message : String(err);
     }
 
     if (pr == null) {
       // Fetch failed. Retry if we have attempts left.
       if (attempt < maxAttempts) continue;
+      // Distinguish exception-from-fetcher vs explicit null return — the
+      // original "returned null" text was misleading when the real failure
+      // was an API error we caught above.
+      const reason = fetchThrew
+        ? `fetchSinglePr threw after ${maxAttempts} attempts: ${lastFetchError ?? 'unknown error'}`
+        : `fetchSinglePr returned null after ${maxAttempts} attempts`;
       return {
         cleared: false,
-        reason: `fetchSinglePr returned null after ${maxAttempts} attempts`,
+        reason,
         mergeable: lastMergeable,
         mergeStateStatus: lastMergeStateStatus,
         attempts,

@@ -171,6 +171,25 @@ describe('verifyRebaseCleared — still conflicting', () => {
     expect(result.cleared).toBe(true);
     expect(result.attempts).toBe(2);
   });
+
+  it('reports the fetch exception message when every attempt throws', async () => {
+    // CodeRabbit review: the previous "fetchSinglePr returned null" text was
+    // misleading when the actual failure was an exception. Now we surface
+    // the error message so the patrol JSONL says what really went wrong.
+    const deps = makeDeps(
+      [
+        new Error('API 500 Internal Server Error'),
+        new Error('API 500 Internal Server Error'),
+        new Error('API 500 Internal Server Error'),
+        new Error('API 500 Internal Server Error'),
+      ],
+    );
+    const result = await verifyRebaseCleared(4287, 'foo/bar', deps);
+    expect(result.cleared).toBe(false);
+    expect(result.reason).toContain('threw');
+    expect(result.reason).toContain('API 500 Internal Server Error');
+    expect(result.attempts).toBe(DEFAULT_MAX_ATTEMPTS);
+  });
 });
 
 // ── Tuning knobs ─────────────────────────────────────────────────────────────
@@ -195,6 +214,31 @@ describe('verifyRebaseCleared — config', () => {
     const result = await verifyRebaseCleared(4287, 'foo/bar', deps);
     expect(result.cleared).toBe(false);
     expect(deps.fetchCalls).toBe(1); // definitive CONFLICTING ends the loop
+  });
+
+  it('clamps maxAttempts=0 to at least one fetch (CodeRabbit guard)', async () => {
+    // CodeRabbit review: with maxAttempts=0 the loop used to be skipped
+    // entirely and the function returned "verification failed" without a
+    // single real fetch. Clamp to Math.max(1, ...) so a bad config still
+    // runs at least one poll.
+    const deps = makeDeps(
+      [makePr({ mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN' })],
+      { maxAttempts: 0 },
+    );
+    const result = await verifyRebaseCleared(4287, 'foo/bar', deps);
+    expect(result.cleared).toBe(true);
+    expect(result.attempts).toBe(1);
+    expect(deps.fetchCalls).toBe(1);
+  });
+
+  it('clamps a negative maxAttempts to one fetch', async () => {
+    const deps = makeDeps(
+      [makePr({ mergeable: 'MERGEABLE', mergeStateStatus: 'CLEAN' })],
+      { maxAttempts: -5 },
+    );
+    const result = await verifyRebaseCleared(4287, 'foo/bar', deps);
+    expect(result.cleared).toBe(true);
+    expect(result.attempts).toBe(1);
   });
 });
 
