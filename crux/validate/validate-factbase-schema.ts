@@ -37,7 +37,7 @@ const verbose = process.argv.includes("--verbose");
 // ║  The baseline must only go DOWN (via migration of old IDs).    ║
 // ╚══════════════════════════════════════════════════════════════════╝
 const DEMOTED_RULES = new Set(["ref-integrity", "factid-format"]);
-const LEGACY_FACTID_FORMAT_BASELINE = 0; // reset 2026-04-03: all legacy IDs normalized by normalize-ids.ts
+const LEGACY_FACTID_FORMAT_BASELINE = 0; // reset 2026-04-03: all legacy f_<descriptive> IDs normalized; reset 2026-04-15 (QUA-497): naked-10-char IDs rewritten to canonical f_<10>
 
 /** Print a summary table of validation results grouped by rule and severity. */
 function printSummaryTable(results: ValidationResult[]): void {

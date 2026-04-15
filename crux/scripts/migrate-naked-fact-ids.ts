@@ -2,11 +2,12 @@
  * Migrate naked 10-char fact IDs in FactBase YAML to canonical `f_<10>` format.
  *
  * Background: the canonical fact ID format is `f_` + 10 alphanumeric chars
- * (enforced by `normalize-ids.ts` and the `canonical_f` regex in the data-quality
- * dashboard). A prior migration missed naked-10-char IDs that live in flow-style
- * YAML (`{ id: XXX, property: Y }`) and block-style files not matched by the
- * original `normalize-ids.ts` regex (`^\s+-\s+id:\s+(f_\S+)`, which required
- * the `f_` prefix already).
+ * (enforced by `FACTID_RE` in `packages/factbase/src/validate.ts` and the
+ * `canonical_f` regex in the data-quality dashboard). A prior normalization
+ * pass missed naked-10-char IDs that live in flow-style YAML
+ * (`{ id: XXX, property: Y }`) and block-style files — its regex required the
+ * `f_` prefix already (`^\s+-\s+id:\s+(f_\S+)`), so anything without the
+ * prefix slipped through.
  *
  * This script completes the migration:
  *   1. Loads all fact YAMLs via the FactBase loader and identifies non-canonical IDs.
