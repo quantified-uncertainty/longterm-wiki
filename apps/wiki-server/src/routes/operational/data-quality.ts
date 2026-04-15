@@ -55,12 +55,16 @@ import {
 //   - facts.fact_id                        → bucket for fact IDs
 //   - resources.id (primary key)           → bucket for resource IDs
 
-const ID_FORMAT_REGEXES = {
+export const ID_FORMAT_REGEXES = {
   canonical_f: "^f_[A-Za-z0-9]{8,}$",
   canonical_sid: "^sid_[A-Za-z0-9]{10}$",
   legacy_hex8: "^[0-9a-f]{8}$",
-  legacy_alnum10:
-    "^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9])[A-Za-z0-9]{10}$",
+  // Any naked 10-char alphanumeric. Canonical forms (`f_<10>` is 12 chars,
+  // `sid_<10>` is 14 chars) and hex8/hex16 (8 / 16 chars) cannot match this
+  // length, so there's no overlap. An earlier version required
+  // upper+lower+digit, which silently undercounted ~776 prod fact IDs that
+  // happened to have no digit (e.g. `gNRivVEYsw`). See QUA-499.
+  legacy_alnum10: "^[A-Za-z0-9]{10}$",
   legacy_hex16: "^[0-9a-f]{16}$",
 } as const;
 
