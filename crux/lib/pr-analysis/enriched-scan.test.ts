@@ -412,6 +412,114 @@ describe('detectIssues — self-authored feedback', () => {
     const { issues } = detectIssues(pr, 0);
     expect(issues).not.toContain('self-authored-feedback');
   });
+
+  // ── QUA-514: per-comment idempotency ─────────────────────────────────────
+  //
+  // Before this fix, patrol's scan loop re-detected the same post-push
+  // OWNER comment every cycle. On PR #4371, a single "Re: CodeRabbit nit —
+  // keeping the current approach" comment triggered ~20 consecutive fix
+  // dispatches over 6 hours because the comment itself didn't change.
+  //
+  // Regression guard: when the caller supplies the set of comment IDs
+  // already processed for the current head SHA, those comments must not
+  // trigger self-authored-feedback on subsequent scans. New pushes rotate
+  // the SHA, which the caller (patrol state) uses to invalidate the set.
+  describe('QUA-514 — processedBlockingCommentIds filters self-authored-feedback', () => {
+    const makeSelfAuthoredPrWithBlockingComment = (commentId: string) =>
+      makePrNode({
+        headRefName: 'claude/qua-514-something',
+        comments: {
+          nodes: [{
+            id: commentId,
+            author: { login: 'OAGr', __typename: 'User' },
+            authorAssociation: 'OWNER',
+            body: 'Re: CodeRabbit nit — keeping the current approach.',
+            createdAt: '2026-04-10T12:00:00Z',
+            viewerDidAuthor: true,
+          }],
+        },
+      });
+
+    it('emits self-authored-feedback on FIRST scan (comment not yet processed)', () => {
+      const pr = makeSelfAuthoredPrWithBlockingComment('IC_abc123');
+      const { issues, blockingComments } = detectIssues(pr, 0, undefined, new Set());
+      expect(issues).toContain('self-authored-feedback');
+      expect(blockingComments).toHaveLength(1);
+      expect(blockingComments[0].id).toBe('IC_abc123');
+    });
+
+    it('does NOT emit self-authored-feedback when comment id is in processed set', () => {
+      const pr = makeSelfAuthoredPrWithBlockingComment('IC_abc123');
+      const processed = new Set(['IC_abc123']);
+      const { issues, blockingComments } = detectIssues(pr, 0, undefined, processed);
+      expect(issues).not.toContain('self-authored-feedback');
+      // blockingComments list is still returned unfiltered — callers may
+      // surface it for telemetry; only the issue-emission is gated.
+      expect(blockingComments).toHaveLength(1);
+    });
+
+    it('emits self-authored-feedback when a NEW comment appears alongside a processed one', () => {
+      const pr = makePrNode({
+        headRefName: 'claude/qua-514-something',
+        comments: {
+          nodes: [
+            {
+              id: 'IC_old',
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body: 'Re: CodeRabbit nit — keeping the current approach.',
+              createdAt: '2026-04-10T12:00:00Z',
+              viewerDidAuthor: true,
+            },
+            {
+              id: 'IC_new',
+              author: { login: 'OAGr', __typename: 'User' },
+              authorAssociation: 'OWNER',
+              body: 'Actually, please revert the schema change.',
+              createdAt: '2026-04-10T12:05:00Z',
+              viewerDidAuthor: true,
+            },
+          ],
+        },
+      });
+      const processed = new Set(['IC_old']);
+      const { issues } = detectIssues(pr, 0, undefined, processed);
+      expect(issues).toContain('self-authored-feedback');
+    });
+
+    it('emits self-authored-feedback when a comment has no id (fail-open)', () => {
+      // Test fixtures / legacy callers may omit the id. A missing id is
+      // treated as "never processed" so we don't silently lose blockers.
+      const pr = makePrNode({
+        headRefName: 'claude/qua-514-something',
+        comments: {
+          nodes: [{
+            // no id field
+            author: { login: 'OAGr', __typename: 'User' },
+            authorAssociation: 'OWNER',
+            body: 'Something',
+            createdAt: '2026-04-10T12:00:00Z',
+            viewerDidAuthor: true,
+          }],
+        },
+      });
+      const processed = new Set(['IC_anything']);
+      const { issues } = detectIssues(pr, 0, undefined, processed);
+      expect(issues).toContain('self-authored-feedback');
+    });
+
+    it('behaves identically to pre-QUA-514 when processed set is undefined', () => {
+      const pr = makeSelfAuthoredPrWithBlockingComment('IC_abc123');
+      const { issues } = detectIssues(pr, 0);
+      expect(issues).toContain('self-authored-feedback');
+    });
+
+    it('behaves identically to pre-QUA-514 when processed set is empty', () => {
+      const pr = makeSelfAuthoredPrWithBlockingComment('IC_abc123');
+      const { issues } = detectIssues(pr, 0, undefined, new Set());
+      expect(issues).toContain('self-authored-feedback');
+    });
+  });
 });
 
 describe('detectIssues — fresh check-runs override stale rollup', () => {

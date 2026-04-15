@@ -415,6 +415,101 @@ export function clearPendingCICheck(prNumber: number): void {
   }
 }
 
+// ── Processed blocking comments (QUA-514) ───────────────────────────────────
+//
+// Patrol idempotency for `self-authored-feedback`: before this tracker, patrol
+// would re-detect the same post-push OWNER comment every cycle and dispatch
+// a fresh fix attempt (PR #4371 burned ~20 cycles on one dismissed CodeRabbit
+// nit). We cache `(prNumber, headSha, commentId[])` so a comment is only
+// acted on once per SHA. A new push (SHA change) invalidates the cache —
+// a fresh push gets a fresh look.
+//
+// File layout: `processed-comments-<N>.json` with `{ headSha, ids[] }`. If
+// the stored headSha doesn't match the caller's current headSha, we treat
+// the file as stale and return an empty set (we do NOT delete, since the
+// next mark call will overwrite anyway).
+
+interface ProcessedBlockingCommentsFile {
+  headSha: string;
+  ids: string[];
+}
+
+function processedCommentsFile(prNumber: number | string): string {
+  return join(STATE_DIR, `processed-comments-${prNumber}.json`);
+}
+
+function readProcessedCommentsFile(
+  prNumber: number | string,
+): ProcessedBlockingCommentsFile | null {
+  const file = processedCommentsFile(prNumber);
+  if (!existsSync(file)) return null;
+  try {
+    const raw = JSON.parse(readFileSync(file, 'utf-8'));
+    if (
+      raw &&
+      typeof raw === 'object' &&
+      typeof raw.headSha === 'string' &&
+      Array.isArray(raw.ids) &&
+      raw.ids.every((x: unknown) => typeof x === 'string')
+    ) {
+      return raw as ProcessedBlockingCommentsFile;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Return the set of blocking comment IDs patrol has already processed for
+ * this PR at the given head SHA. If the stored file is for a different SHA
+ * (or missing/corrupt), returns an empty set — the caller will then treat
+ * every current blocking comment as new.
+ */
+export function getProcessedBlockingCommentIds(
+  prNumber: number | string,
+  headSha: string,
+): Set<string> {
+  const data = readProcessedCommentsFile(prNumber);
+  if (!data || data.headSha !== headSha) return new Set();
+  return new Set(data.ids);
+}
+
+/**
+ * Merge `newIds` into the processed-comments set for this PR at `headSha`.
+ *
+ * - If the stored file is for a different SHA, the old list is discarded
+ *   and replaced with `newIds` (force-push resets the cache naturally).
+ * - If the stored file matches, `newIds` is unioned with the existing list.
+ * - Empty `newIds` with a matching SHA is a no-op.
+ */
+export function markBlockingCommentsProcessed(
+  prNumber: number | string,
+  headSha: string,
+  newIds: readonly string[],
+): void {
+  const existing = readProcessedCommentsFile(prNumber);
+  const ids =
+    existing && existing.headSha === headSha
+      ? Array.from(new Set([...existing.ids, ...newIds]))
+      : Array.from(new Set(newIds));
+  if (ids.length === 0 && !existing) return;
+  const payload: ProcessedBlockingCommentsFile = { headSha, ids };
+  writeFileSync(processedCommentsFile(prNumber), JSON.stringify(payload));
+}
+
+/** Remove the processed-comments cache file for this PR. */
+export function clearProcessedBlockingComments(prNumber: number | string): void {
+  const file = processedCommentsFile(prNumber);
+  if (existsSync(file)) {
+    try {
+      unlinkSync(file);
+    } catch {
+      /* best-effort */
+    }
+  }
+}
+
 // ── CodeRabbit review retry tracking ─────────────────────────────────────────
 // When CodeRabbit rate-limits a review, we schedule a retry after the cooldown.
 // Only retries once per rate-limit event to avoid spamming.

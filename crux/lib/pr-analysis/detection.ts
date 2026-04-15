@@ -41,6 +41,7 @@ const PR_QUERY = `query($owner: String!, $name: String!) {
           }}
         }}
         comments(last: 20) { nodes {
+          id
           author { login __typename }
           authorAssociation
           body
@@ -221,6 +222,7 @@ export function extractBlockingComments(pr: GqlPrNode): BlockingComment[] {
     if (!authority && !urgency) continue;
 
     blocking.push({
+      id: c.id,
       author: c.author.login,
       authorAssociation: c.authorAssociation,
       authorType: c.author.__typename ?? 'User',
@@ -399,11 +401,21 @@ function isLabelRequiredCheck(checkName: string): boolean {
  * When present, a `ci-failure` issue is only emitted if the fresh data also
  * shows a failure — this avoids the classic "GraphQL still reports failed,
  * but the follow-up push is now green" false positive.
+ *
+ * Optional `processedBlockingCommentIds` (QUA-514) is the set of blocking
+ * comment GraphQL node ids that patrol has already acted on for the PR's
+ * *current* head SHA. When provided, blocking comments whose id is in this
+ * set are not counted toward `self-authored-feedback`, which stops the
+ * re-dispatch loop where a dismissal of a CodeRabbit nit triggers patrol
+ * every cycle. The caller owns persistence + SHA invalidation; this
+ * function stays pure. The full `blockingComments` list is still returned
+ * unfiltered for UI/telemetry callers.
  */
 export function detectIssues(
   pr: GqlPrNode,
   staleThresholdMs: number,
   freshCheckRuns?: FreshCheckRun[],
+  processedBlockingCommentIds?: ReadonlySet<string>,
 ): {
   issues: PrIssueType[];
   botComments: BotComment[];
@@ -497,7 +509,17 @@ export function detectIssues(
 
   // Blocking top-level comments (newer than last push + authority/urgency).
   const blockingComments = extractBlockingComments(pr);
-  if (blockingComments.length > 0 && isSelfAuthored(pr)) {
+  // QUA-514: only count blocking comments that patrol hasn't already
+  // processed for this PR's current head SHA. Comments without a stable
+  // id are always counted (fail-open — preserves pre-QUA-514 behavior
+  // for legacy callers and test fixtures).
+  const unprocessedBlockingComments =
+    processedBlockingCommentIds && processedBlockingCommentIds.size > 0
+      ? blockingComments.filter(
+          (c) => !c.id || !processedBlockingCommentIds.has(c.id),
+        )
+      : blockingComments;
+  if (unprocessedBlockingComments.length > 0 && isSelfAuthored(pr)) {
     issues.push('self-authored-feedback');
   }
 
