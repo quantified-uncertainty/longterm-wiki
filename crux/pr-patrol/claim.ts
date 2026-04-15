@@ -74,8 +74,24 @@ export interface ClaimDeps {
  * otherwise it will delete the other worker's claim.
  *
  * Throws only on unrecoverable pre-check errors (e.g., caller invariants).
- * Network/API errors during the label write are treated as "unable to
- * claim" (returns false) so the caller bails out cleanly.
+ *
+ * ## Client-side timeout on a server-side success (QUA-400 Major fix)
+ *
+ * When `addWorkingLabel` throws, we cannot assume the POST failed
+ * server-side — a connection reset or client timeout can fire AFTER
+ * GitHub has already applied the label. If we returned `false` in that
+ * case, the finally-release would be a no-op and the label would leak
+ * permanently, blocking future claims on this PR.
+ *
+ * Recovery: re-query the PR's labels.
+ *   - If our label is now present → return `true` (the POST succeeded
+ *     server-side; we own the claim).
+ *   - If the re-query confirms the label is absent → return `false` (the
+ *     POST really did fail).
+ *   - If the re-query itself also fails → return `true` (fail-safe:
+ *     assume we may own the label so the finally-release cleans it up.
+ *     A double-release is harmless because DELETE is idempotent on 404,
+ *     but a missed release would leak the label).
  */
 export async function tryClaimPr(
   prNumber: number,
@@ -111,10 +127,57 @@ export async function tryClaimPr(
   // No existing claim — attempt to add our working label.
   try {
     await deps.addWorkingLabel(prNumber, repo);
-  } catch (e) {
+  } catch (addErr) {
+    // CodeRabbit QUA-400 Major finding: a POST can fail client-side AFTER
+    // GitHub has already applied the label — e.g. a connection reset or
+    // timeout after the server processed the request. Treating every
+    // add-label failure as `didClaim === false` and then no-op'ing release
+    // would leak the label permanently, blocking future claim attempts on
+    // this PR.
+    //
+    // Recovery strategy: re-query labels. If our label is now present, the
+    // POST succeeded server-side despite the client error — treat it as a
+    // successful claim. If the re-query ALSO fails, choose fail-safe: assume
+    // didClaim=true so the finally block releases the label. This can cause
+    // a harmless double-release (the label may actually not be ours, or the
+    // DELETE hits a 404 because the label was never applied), but delete is
+    // idempotent on 404 and a double-release is strictly better than a
+    // permanent label leak.
+    const addErrMsg = addErr instanceof Error ? addErr.message : String(addErr);
+    let postCheckLabels: string[];
+    try {
+      postCheckLabels = await deps.fetchLabels(prNumber, repo);
+    } catch (reCheckErr) {
+      // Re-query failed. Fail-safe: assume the POST may have succeeded and
+      // we own the label. The finally release will clean it up; delete is
+      // idempotent on 404 so this can't leak.
+      const reCheckMsg =
+        reCheckErr instanceof Error ? reCheckErr.message : String(reCheckErr);
+      deps.onClaimLost?.(
+        prNumber,
+        `label write failed (${addErrMsg}); post-write re-check ` +
+          `also failed (${reCheckMsg}); assuming didClaim=true fail-safe ` +
+          'to avoid label leak',
+      );
+      return true;
+    }
+
+    if (postCheckLabels.includes(LABELS.PR_PATROL_WORKING)) {
+      // The POST succeeded server-side despite the client-side error.
+      // Treat it as a successful claim.
+      deps.onClaimLost?.(
+        prNumber,
+        `label write threw (${addErrMsg}) but post-write re-check shows ` +
+          'label is present; treating as successful claim',
+      );
+      return true;
+    }
+
+    // Re-query succeeded and confirmed the label is NOT present. The POST
+    // really did fail; we did not claim. Safe to return false.
     deps.onClaimLost?.(
       prNumber,
-      `label write failed: ${e instanceof Error ? e.message : String(e)}`,
+      `label write failed: ${addErrMsg}`,
     );
     return false;
   }

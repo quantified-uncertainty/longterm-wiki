@@ -91,9 +91,16 @@ describe('tryClaimPr', () => {
     );
   });
 
-  it('returns false when label write fails after a clean pre-check', async () => {
+  it('returns false when label write fails and post-check confirms label absent', async () => {
+    // The label-write POST really did fail — the server never applied the
+    // label. Re-query succeeds and shows the label is still absent, so we
+    // can safely report `didClaim=false`.
+    const fetchLabels = vi
+      .fn()
+      .mockResolvedValueOnce([]) // pre-check: nothing
+      .mockResolvedValueOnce(['needs-review']); // post-check: still no working label
     const deps = makeDeps({
-      fetchLabels: vi.fn().mockResolvedValue([]),
+      fetchLabels,
       addWorkingLabel: vi.fn().mockRejectedValue(new Error('422 validation')),
     });
     const didClaim = await tryClaimPr(222, 'owner/repo', deps);
@@ -101,6 +108,60 @@ describe('tryClaimPr', () => {
     expect(deps.onClaimLost).toHaveBeenCalledWith(
       222,
       expect.stringContaining('label write failed'),
+    );
+    // Both the pre-check and the post-check fetches should have happened
+    expect(fetchLabels).toHaveBeenCalledTimes(2);
+  });
+
+  // CodeRabbit QUA-400 Major finding: a POST can succeed server-side even
+  // when the client sees a connection reset / timeout. Returning `false` in
+  // that case would no-op the finally release and leak the label.
+  it('returns true when label write throws but post-check shows label present', async () => {
+    // The POST appeared to fail client-side, but the server actually
+    // applied the label (e.g. connection reset after commit). The
+    // post-write re-check catches this and upgrades didClaim to true.
+    const fetchLabels = vi
+      .fn()
+      .mockResolvedValueOnce([]) // pre-check: unclaimed
+      .mockResolvedValueOnce(['pr-patrol:working']); // post-check: label present
+    const deps = makeDeps({
+      fetchLabels,
+      addWorkingLabel: vi
+        .fn()
+        .mockRejectedValue(new Error('socket hang up (ECONNRESET)')),
+    });
+    const didClaim = await tryClaimPr(333, 'owner/repo', deps);
+    // Critical: we must return true so the finally-release cleans up the
+    // label. Returning false would leak it permanently.
+    expect(didClaim).toBe(true);
+    expect(fetchLabels).toHaveBeenCalledTimes(2);
+    // onClaimLost is used for observability in this path — the caller gets
+    // a hint that the POST initially appeared to fail.
+    expect(deps.onClaimLost).toHaveBeenCalledWith(
+      333,
+      expect.stringContaining('post-write re-check shows'),
+    );
+  });
+
+  it('returns true (fail-safe) when both label write AND post-check fail', async () => {
+    // Worst case: we can't tell whether the POST landed server-side. The
+    // safe default is `didClaim=true` so the finally-release can clean up
+    // any lingering label. A DELETE on an absent label is a harmless 404;
+    // a missed release on a present label is a permanent leak.
+    const fetchLabels = vi
+      .fn()
+      .mockResolvedValueOnce([]) // pre-check: unclaimed
+      .mockRejectedValueOnce(new Error('network fully down')); // post-check fails
+    const deps = makeDeps({
+      fetchLabels,
+      addWorkingLabel: vi.fn().mockRejectedValue(new Error('ETIMEDOUT')),
+    });
+    const didClaim = await tryClaimPr(444, 'owner/repo', deps);
+    expect(didClaim).toBe(true);
+    expect(fetchLabels).toHaveBeenCalledTimes(2);
+    expect(deps.onClaimLost).toHaveBeenCalledWith(
+      444,
+      expect.stringContaining('fail-safe'),
     );
   });
 });
