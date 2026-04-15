@@ -366,15 +366,47 @@ describe('classifyEntry — no-auto-close label', () => {
     expect(e.reason).toContain('#5');
   });
 
-  it('case-insensitive label match (No-Auto-Close, NO-AUTO-CLOSE)', () => {
-    for (const labelName of ['No-Auto-Close', 'NO-AUTO-CLOSE', 'no-auto-close']) {
+  it('label match is case-insensitive and whitespace-tolerant', () => {
+    // Real risk: Linear's label UI allows trailing spaces on paste, and some
+    // users type variants like "No-Auto-Close". Red-team execution confirmed
+    // the bare-string check missed these. The normalizer is .trim().toLowerCase().
+    const variants = [
+      'no-auto-close',
+      'No-Auto-Close',
+      'NO-AUTO-CLOSE',
+      'no-auto-close ',
+      ' no-auto-close',
+      '  NO-AUTO-CLOSE  ',
+      'no-auto-close\n',
+    ];
+    for (const labelName of variants) {
       const issue = makeIssue({ labels: { nodes: [{ name: labelName }] } });
       const items = [
         makePr({ number: 1, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
       ];
       const e = classifyEntry(issue, items, makeChildrenResult([]));
-      expect(e.bucket, `label="${labelName}"`).toBe('active');
+      expect(e.bucket, `label=${JSON.stringify(labelName)}`).toBe('active');
       expect(e.reason).toContain('no-auto-close');
+    }
+  });
+
+  it('label match does NOT accept unrelated strings or unicode lookalikes', () => {
+    // Guard against overly-lenient matching: a unicode-hyphen variant is a
+    // different codepoint and should NOT match.
+    const imposters = [
+      'auto-close',           // missing "no-"
+      'no_auto_close',        // underscores
+      'noautoclose',          // no separators
+      'No‑Auto‑Close',        // unicode hyphen U+2011
+      '',
+    ];
+    for (const labelName of imposters) {
+      const issue = makeIssue({ labels: { nodes: [{ name: labelName }] } });
+      const items = [
+        makePr({ number: 1, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+      ];
+      const e = classifyEntry(issue, items, makeChildrenResult([]));
+      expect(e.bucket, `label=${JSON.stringify(labelName)}`).toBe('shipped');
     }
   });
 });

@@ -54,17 +54,10 @@ const RESOLVED_STATE_TYPES = new Set(['completed', 'canceled']);
 
 /**
  * Label that opts an issue out of `audit --fix` auto-closure regardless of PR
- * state or sub-issue state. Escape hatch for long-running tickets that don't
- * fit the parent-with-open-children pattern but still shouldn't auto-close
- * (e.g. tracking tickets that intentionally outlive their initial PR).
+ * or sub-issue state. Escape hatch for long-running tickets that don't fit the
+ * parent-with-open-children pattern but still shouldn't auto-close.
  */
 export const NO_AUTO_CLOSE_LABEL = 'no-auto-close';
-
-function hasNoAutoCloseLabel(issue: LinearTriageIssue): boolean {
-  return issue.labels.nodes.some(
-    (l) => l.name.toLowerCase() === NO_AUTO_CLOSE_LABEL,
-  );
-}
 
 /**
  * GitHub auto-close keywords. Mirrors GitHub's documented set verbatim:
@@ -233,7 +226,9 @@ export function classifyEntry(
   let bucket: AuditBucket;
   let reason: string;
 
-  const noAutoClose = hasNoAutoCloseLabel(issue);
+  const noAutoClose = issue.labels.nodes.some(
+    (l) => l.name.trim().toLowerCase() === NO_AUTO_CLOSE_LABEL,
+  );
 
   if (openPRs.length > 0) {
     bucket = 'active';
