@@ -112,20 +112,13 @@ const thingsSearchSelect = {
   syncedAt: thingsSearch.syncedAt,
 } as const;
 
-/**
- * Build the LEFT JOIN condition for source_check_verdicts on the things table.
- *
- * things.sourceTable uses PG table names (e.g., "grants", "funding_rounds")
- * while source_check_verdicts.recordType uses semantic names (e.g., "grant",
- * "funding-round"). We normalize: replace '_' with '-', strip trailing 's'.
- * Irregular plural: entities → entity (handled via CASE).
- *
- * NOTE: The same CASE expression is duplicated in the raw-SQL trigram fallback
- * query below. If you add more irregular plurals here, update that query too.
- */
-// Build the source_check_verdicts join predicate for a given source-table
-// column reference. The same expression is also inlined as raw SQL in the
-// trigram fallback query below — keep the CASE body in sync.
+// Build the source_check_verdicts LEFT JOIN predicate.
+// - things.sourceTable uses PG table names ("grants", "funding_rounds");
+//   source_check_verdicts.recordType uses semantic names ("grant",
+//   "funding-round") — normalize via replace('_','-') + strip trailing 's'.
+// - 'entities' → 'entity' is the one irregular plural.
+// - The same CASE body is ALSO inlined in the raw-SQL trigram fallback
+//   below — keep in sync when adding irregular plurals.
 function buildVerdictJoin(
   sourceTableCol: typeof things.sourceTable | typeof thingsSearch.sourceTable,
   sourceIdCol: typeof things.sourceId | typeof thingsSearch.sourceId,

@@ -27,6 +27,7 @@ const app = new Hono()
           pg_total_relation_size(oid)::bigint AS total_bytes
         FROM pg_class
         WHERE relname = 'things_search'
+          AND relnamespace = 'public'::regnamespace
       `)) as Array<{ row_count: string; total_bytes: string }>;
       const stats = statsRows[0];
 
@@ -73,7 +74,9 @@ const app = new Hono()
           c.reltuples::bigint AS row_count,
           pg_total_relation_size(c.oid)::bigint AS total_bytes
         FROM pg_stat_all_tables s
-        JOIN pg_class c ON c.relname = s.relname
+        JOIN pg_class c
+          ON c.relname = s.relname
+         AND c.relnamespace = 'public'::regnamespace
         WHERE s.relname = 'things_search'
           AND s.schemaname = 'public'
       `)) as Array<{
