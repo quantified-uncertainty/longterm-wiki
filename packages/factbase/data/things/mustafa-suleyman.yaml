@@ -12,7 +12,7 @@ facts:
   - id: f_ufd9nJBdCA
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Mustafa_Suleyman"
-  - id: lwbM3fLU2Q
+  - id: f_5t7JrXOmKh
     property: website
     value: https://the-coming-wave.com
     source: https://www.wikidata.org/wiki/Q16847797

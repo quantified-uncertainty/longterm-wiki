@@ -144,9 +144,9 @@ describe("sanitizeRawIds", () => {
       expect(isClickableFactId("e7c42d88", "description")).toBe(false);
     });
 
-    it("rejects 10-char mixed-case alnum legacy IDs — those 404 unreliably on prod", () => {
-      // Measured: /factbase/fact/2Y4ope8OxA → 404, /factbase/fact/RYUAwpW0fA → 200
-      // Linking this format would point half of users at broken pages.
+    it("rejects 10-char mixed-case alnum legacy fact ID shapes", () => {
+      // Canonical fact IDs are `f_`-prefixed; opaque 10-char shapes are
+      // explicitly non-clickable so they can never render as a dead link.
       expect(isClickableFactId("2Y4ope8OxA", "fact_id")).toBe(false);
       expect(isClickableFactId("XUSIG6vsPw", "fact_id")).toBe(false);
       expect(isClickableFactId("RYUAwpW0fA", "fact_id")).toBe(false);

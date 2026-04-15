@@ -6,32 +6,32 @@ facts:
       by Nick Bostrom. Closed in 2024.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: FhW8eVfvQA
+  - id: f_EOADcOX2Eo
     property: founded-date
     value: "2005"
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
-  - id: ZaFx54GuIA
+  - id: f_08l43tEruD
     property: headquarters
     value: Oxford
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
-  - id: wF7Rkbxkbg
+  - id: f_IPXMnLB9tt
     property: website
     value: https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
-  - id: t4xmI54Njw
+  - id: f_WHpzwUtp6l
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
-  - id: 1ibyZ5DnRA
+  - id: f_lim1qYsVcK
     property: website
     value: http://www.fhi.ox.ac.uk/
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
-  - id: xcLVWYcD8A
+  - id: f_X6KMDpUR0W
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Future_of_Humanity_Institute
     source: https://www.wikidata.org/wiki/Q5510826

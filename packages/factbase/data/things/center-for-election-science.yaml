@@ -2,42 +2,42 @@ entity: sid_gBpjt2fx66
 facts:
   [
     {
-        id: g7Y5FXf20g,
+        id: f_q1ny1xlv0H,
         property: founded-date,
         value: 2011-01,
         source: https://www.wikidata.org/wiki/Q85847679,
         notes: From Wikidata Q85847679
       },
     {
-        id: lyxUX3VMqg,
+        id: f_9ypVlmUfoU,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q85847679,
         notes: From Wikidata Q85847679
       },
     {
-        id: VehYCgerCw,
+        id: f_yZpC8kWpNs,
         property: website,
         value: https://electionscience.org,
         source: https://www.wikidata.org/wiki/Q85847679,
         notes: From Wikidata Q85847679
       },
     {
-        id: Sxt6YMgVBw,
+        id: f_7mJUnYrQUS,
         property: revenue,
         value: 18189,
         source: https://www.wikidata.org/wiki/Q85847679,
         notes: From Wikidata Q85847679
       },
     {
-        id: g6mGUZh5Yg,
+        id: f_ThZBkB1Eeu,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q85847679,
         notes: From Wikidata Q85847679
       },
     {
-        id: OHKbho8z1g,
+        id: f_5kMLnVnnGW,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Center_for_Election_Science,
         source: https://www.wikidata.org/wiki/Q85847679,

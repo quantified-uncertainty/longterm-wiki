@@ -145,24 +145,6 @@ facts:
     expect(index.has("f_b001")).toBe(false);
   });
 
-  it("handles bare fact IDs (no f_ prefix)", () => {
-    writeFileSync(
-      join(tempDir, "oldstyle.yaml"),
-      `entity: sid_old1
-facts:
-  - id: jQmhsJEmPI
-    property: annual-expenses
-    value: 115576357
-    asOf: "2023"
-`,
-    );
-
-    const index = buildFactIndex(tempDir);
-    const fact = index.get("jQmhsJEmPI");
-    expect(fact).toBeDefined();
-    expect(fact!.currentNumericValue).toBe(115576357);
-  });
-
   it("handles boolean-like values as non-numeric", () => {
     writeFileSync(
       join(tempDir, "boolish.yaml"),

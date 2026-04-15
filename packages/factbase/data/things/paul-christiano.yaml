@@ -34,7 +34,7 @@ facts:
   - id: f_vbteu6smt2
     property: google-scholar
     value: "https://scholar.google.com/citations?user=6gHkYDgAAAAJ"
-  - id: X0XbB0w92w
+  - id: f_31eZFsfK9s
     property: website
     value: https://paulfchristiano.com/
     source: https://www.wikidata.org/wiki/Q64769299

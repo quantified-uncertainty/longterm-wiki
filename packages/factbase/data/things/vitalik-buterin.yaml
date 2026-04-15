@@ -2,28 +2,28 @@ entity: sid_iEEm0cZ3tn
 facts:
   [
     {
-        id: 8bP1lGt0zw,
+        id: f_zjALhwvOHV,
         property: website,
         value: https://vitalik.ca/,
         source: https://www.wikidata.org/wiki/Q16197959,
         notes: From Wikidata Q16197959
       },
     {
-        id: TjHdKcT9uQ,
+        id: f_KcfoSPZI0f,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Vitalik_Buterin,
         source: https://www.wikidata.org/wiki/Q16197959,
         notes: From Wikidata Q16197959
       },
     {
-        id: lWq9lBzJ6w,
+        id: f_ZIH89MunEp,
         property: born-year,
         value: 1994,
         source: https://www.wikidata.org/wiki/Q16197959,
         notes: From Wikidata Q16197959
       },
     {
-        id: 4DuNGbB9jw,
+        id: f_9NYXb9ryEE,
         property: education,
         value: University of Waterloo; The Abelard School,
         source: https://www.wikidata.org/wiki/Q16197959,

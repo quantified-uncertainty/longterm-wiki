@@ -33,13 +33,13 @@ facts:
     source: https://en.wikipedia.org/wiki/Freedom_House
     notes: "Federal grants comprised ~$79.6M of $93.7M revenue (FY 2022), making Freedom House heavily dependent on government funding."
 
-  - id: jjwc2m9hxQ
+  - id: f_inotk411f3
     property: headcount
     value: 120
     source: https://www.wikidata.org/wiki/Q242424
     notes: From Wikidata Q242424
 
-  - id: BR2bufFQdw
+  - id: f_iDt0mVj4Us
     property: website
     value: https://freedomhouse.org/
     source: https://www.wikidata.org/wiki/Q242424

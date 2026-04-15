@@ -2,35 +2,35 @@ entity: sid_18K3KG3bpg
 facts:
   [
     {
-        id: Fax66KhQkg,
+        id: f_f5fi5PB0XF,
         property: founded-date,
         value: 1096-01,
         source: https://www.wikidata.org/wiki/Q34433,
         notes: From Wikidata Q34433
       },
     {
-        id: quBfotLN7g,
+        id: f_VF4sT4m4Eh,
         property: headquarters,
         value: Oxford,
         source: https://www.wikidata.org/wiki/Q34433,
         notes: From Wikidata Q34433
       },
     {
-        id: 8yn5q0u7ww,
+        id: f_TQewFpLqkX,
         property: country,
         value: United Kingdom,
         source: https://www.wikidata.org/wiki/Q34433,
         notes: From Wikidata Q34433
       },
     {
-        id: hgF9snl4Ng,
+        id: f_WokpvCnnCp,
         property: website,
         value: https://ox.ac.uk/,
         source: https://www.wikidata.org/wiki/Q34433,
         notes: From Wikidata Q34433
       },
     {
-        id: 5GBygKxNLg,
+        id: f_KzJy6iASl6,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/University_of_Oxford,
         source: https://www.wikidata.org/wiki/Q34433,

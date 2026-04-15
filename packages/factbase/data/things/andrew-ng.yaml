@@ -20,7 +20,7 @@ facts:
   - id: f_PomBL98jGQ
     property: website
     value: "https://www.andrewng.org"
-  - id: jYW9WuzmIw
+  - id: f_futQwtJrn4
     property: website
     value: http://www.andrewng.org/
     source: https://www.wikidata.org/wiki/Q2846695

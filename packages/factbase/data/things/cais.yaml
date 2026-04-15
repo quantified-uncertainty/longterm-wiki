@@ -6,17 +6,17 @@ facts:
     asOf: "2025"
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "Estimated cumulative funding raised 2022-2024 based on summing 990 revenue filings ($6.7M in 2022 + $16.1M in 2023 + $10.2M in 2024 = ~$33M). Major known sources: Open Philanthropy ~$10.6M (2022-2023), SFF grants ~$3.8M (2024-2025), Good Ventures ~$1.9M (2024), Founders Pledge ~$0.9M (2024). Previously understated at $6.4M (SFF grants only)."
-  - id: 1jdDcOMFYA
+  - id: f_WEJAAlcumi
     property: founded-date
     value: "2022"
     source: https://www.wikidata.org/wiki/Q119084607
     notes: From Wikidata Q119084607
-  - id: 0ZlJqqX2HQ
+  - id: f_JNek3J9XLZ
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q119084607
     notes: From Wikidata Q119084607
-  - id: t7r3olcDFw
+  - id: f_XngdN9qY68
     property: website
     value: https://www.safe.ai/
     source: https://www.wikidata.org/wiki/Q119084607

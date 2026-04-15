@@ -2,14 +2,14 @@ entity: sid_9VlZhCkPBE
 facts:
   [
     {
-        id: EweRTl5TsA,
+        id: f_z7bZIwN4Dp,
         property: born-year,
         value: 1978,
         source: https://www.wikidata.org/wiki/Q524579,
         notes: From Wikidata Q524579
       },
     {
-        id: 55emZSDGiQ,
+        id: f_sKHEiLsv2L,
         property: education,
         value: University of Oulu; University of Edinburgh,
         source: https://www.wikidata.org/wiki/Q524579,

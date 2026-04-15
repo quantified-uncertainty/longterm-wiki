@@ -9,31 +9,31 @@ facts:
       operates primarily"
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: 9PdssVfDOg
+  - id: f_N939Chcghf
     property: founded-date
     value: 2014-03
     source: https://www.wikidata.org/wiki/Q18356657
     notes: From Wikidata Q18356657
-  - id: jBsUkEukYQ
+  - id: f_akrbCF6YZC
     property: website
     value: https://futureoflife.org/
     source: https://www.wikidata.org/wiki/Q18356657
     notes: From Wikidata Q18356657
-  - id: zmHy23FJeA
+  - id: f_de9hyXzJ2M
     property: grant-given
     value: "25025000"
     unit: USD
     asOf: !date 2022-12
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization of Future of Life Foundation (FLF)
-  - id: 6kND9gRtUg
+  - id: f_I1oSDd9OAz
     property: grant-given
     value: "15700000"
     unit: USD
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2023
-  - id: 4p6lNgGXTw
+  - id: f_ngxodh3SNe
     property: grant-given
     value: "18100000"
     unit: USD

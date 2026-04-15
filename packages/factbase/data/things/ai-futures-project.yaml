@@ -9,7 +9,7 @@ facts:
       (AGI median shifte
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: qQ8hBx4HaQ
+  - id: f_CY4Qc7HnPo
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/AI_Futures_Project
     source: https://www.wikidata.org/wiki/Q138196018

@@ -9,37 +9,37 @@ facts:
       back); faced major
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: uQDW7Ye9ZQ
+  - id: f_So7z9dBUxg
     property: founded-date
     value: "2012"
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
-  - id: Mikuh0uzOA
+  - id: f_2SHDy2XPXp
     property: headquarters
     value: Berkeley
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
-  - id: 9ToMXM39MA
+  - id: f_3j0RNQ8xe6
     property: website
     value: http://rationality.org/
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
-  - id: TeH17fNnzA
+  - id: f_BEKFn4cPGA
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
-  - id: HAVjae4bPw
+  - id: f_j9FvmqUt5t
     property: founded-by-name
     value: Julia Galef
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499; text value (not entity ref)
-  - id: fRUew7gOUA
+  - id: f_th1gSvtYPn
     property: legal-structure
     value: 501(c)(3) organization
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
-  - id: K8PNstngNQ
+  - id: f_VBuAgAXwNd
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Center_for_Applied_Rationality
     source: https://www.wikidata.org/wiki/Q20715499

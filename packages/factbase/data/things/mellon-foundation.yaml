@@ -2,49 +2,49 @@ entity: sid_Ni1A9uFQ9S
 facts:
   [
     {
-        id: QtGkQoMsxg,
+        id: f_Y1V5EkhdXc,
         property: founded-date,
         value: 1969-01,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: From Wikidata Q4758812
       },
     {
-        id: fatyr58V0A,
+        id: f_3tXpqKXpeF,
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: From Wikidata Q4758812
       },
     {
-        id: SwCZBHckWQ,
+        id: f_I4NJjt9Wlg,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: From Wikidata Q4758812
       },
     {
-        id: VgD8r2I8qA,
+        id: f_N8nL1NzzXJ,
         property: website,
         value: http://www.mellon.org/,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: From Wikidata Q4758812
       },
     {
-        id: p78aOl0eQw,
+        id: f_klDhhBsiZn,
         property: founded-by-name,
         value: Paul Mellon,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: "Founded by Paul Mellon (corrected from Ailsa Mellon Bruce per Wikidata). Ailsa Mellon Bruce was involved but is not listed as founder."
       },
     {
-        id: cGuqhtGg4g,
+        id: f_J82vcEqfHD,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q4758812,
         notes: From Wikidata Q4758812
       },
     {
-        id: pKcUcgDnMA,
+        id: f_7JebbsKw9H,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Andrew_W._Mellon_Foundation,
         source: https://www.wikidata.org/wiki/Q4758812,

@@ -1,35 +1,35 @@
 entity: sid_K1hxe7b9SA
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: xI3KgE1QlA
+  - id: f_xRDqPn9nVf
     property: founded-date
     value: "2001"
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
     notes: "Formed 2001 per Wikipedia; successor to Bureau of Export Administration (BXA)"
 
-  - id: cDMKtU2K0g
+  - id: f_k7jt7Q5su7
     property: headquarters
     value: "Washington, DC"
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
 
-  - id: JIfqzGOVcw
+  - id: f_1cEfBD7jt3
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
 
-  - id: h3iIc61Aeg
+  - id: f_MnLH13hY62
     property: website
     value: https://www.bis.doc.gov
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
     notes: "bis.doc.gov is the canonical domain (under Department of Commerce); bis.gov redirects"
 
-  - id: rjKCVFUatA
+  - id: f_01CP6wxbhf
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
 
   # ── Description ─────────────────────────────────────────────────
-  - id: 8FtcHZWK7A
+  - id: f_YeDsDb5wb9
     property: description
     value: >-
       U.S. Department of Commerce agency responsible for administering the Export
@@ -39,7 +39,7 @@ facts:
     asOf: 2026-03
 
   # ── Leadership ──────────────────────────────────────────────────
-  - id: HhZF8mvyBg
+  - id: f_xWK9tzFGYe
     property: leadership
     value: Alan Estevez
     asOf: 2026-03
@@ -47,28 +47,28 @@ facts:
     notes: "Under Secretary of Commerce for Industry and Security"
 
   # ── Key events ──────────────────────────────────────────────────
-  - id: 3be01vVLVg
+  - id: f_mn1CoTK5LG
     property: key-event
     value: "Implemented sweeping export controls on AI chips and semiconductor equipment to China"
     asOf: 2022-10
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
     notes: "October 7, 2022 rules; described as 'new strategic approach' to export controls"
 
-  - id: v7BZZDcdVA
+  - id: f_WZYxS3GE5W
     property: key-event
     value: "Expanded chip export controls, closing loopholes exploited by Nvidia's A800/H800 China-specific chips"
     asOf: 2023-10
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
     notes: "Updated performance thresholds and expanded equipment restrictions"
 
-  - id: Nc28Ym6I1w
+  - id: f_EvQcz9CdN6
     property: key-event
     value: "Expanded FDPR to cover essentially all advanced chips manufactured anywhere using U.S.-origin equipment"
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
     notes: "December 2024 FDPR expansion extended U.S. regulatory reach globally"
 
-  - id: Otz1rgaw0w
+  - id: f_4dBSrKFHUI
     property: key-event
     value: "Rescinded Biden-era AI Diffusion Rule before its compliance date"
     asOf: 2025-05

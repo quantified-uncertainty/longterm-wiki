@@ -2,49 +2,49 @@ entity: sid_2OLJZcF1pW
 facts:
   [
     {
-        id: Ix5BRzww7g,
+        id: f_n2n6qec8nJ,
         property: founded-date,
         value: 2019-01,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: yzjihyzZmg,
+        id: f_6EJYzYGbjo,
         property: headquarters,
         value: Farmington,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: 7gUZsjarmw,
+        id: f_fr9F84LZg4,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: 7N8vLlnHiQ,
+        id: f_j5cfCeOx3G,
         property: website,
         value: https://www.wildanimalinitiative.org,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: Z9dkQsybFA,
+        id: f_renPoq9wjk,
         property: revenue,
         value: 85838,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: 6IAnc5pgSA,
+        id: f_nCEgKxu58c,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
       },
     {
-        id: SIIOyNBv4A,
+        id: f_ckuIT01umX,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Wild_Animal_Initiative,
         source: https://www.wikidata.org/wiki/Q107463177,

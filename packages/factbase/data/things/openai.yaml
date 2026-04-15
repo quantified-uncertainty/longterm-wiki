@@ -470,32 +470,32 @@ facts:
   - id: f_cOr3zkAB2Q
     property: description
     value: "75% of co-founders departed within 9 years of founding (by 2024)"
-  - id: EdV4qjV9fA
+  - id: f_7YNYU4Sg9s
     property: website
     value: https://openai.com/
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-  - id: oV0lgodIsQ
+  - id: f_hWphI5EYfD
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-  - id: vyFXipPEhg
+  - id: f_7eIhCIM4Xq
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-  - id: q4DTDRk4lg
+  - id: f_SpuWJB1YfE
     property: ceo
     value: Sam Altman
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-  - id: zn71ZtJN2A
+  - id: f_XXz1yBQTkp
     property: founded-by-name
     value: Elon Musk
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200; text value (not entity ref)
-  - id: Zuy0wq0iZw
+  - id: f_9CgX0edk2o
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/OpenAI
     source: https://www.wikidata.org/wiki/Q21708200

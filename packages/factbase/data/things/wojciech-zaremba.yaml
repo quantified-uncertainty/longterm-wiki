@@ -2,28 +2,28 @@ entity: sid_4eNHxKcml1
 facts:
   [
     {
-        id: aL2XFx9meQ,
+        id: f_4P2PoJKmMg,
         property: website,
         value: https://wojzaremba.com/,
         source: https://www.wikidata.org/wiki/Q27733815,
         notes: From Wikidata Q27733815
       },
     {
-        id: CHUKAFYC6Q,
+        id: f_ugVmYEbxwL,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Wojciech_Zaremba,
         source: https://www.wikidata.org/wiki/Q27733815,
         notes: From Wikidata Q27733815
       },
     {
-        id: 6fEfCMzaog,
+        id: f_J2vl7iCHZA,
         property: born-year,
         value: 1988,
         source: https://www.wikidata.org/wiki/Q27733815,
         notes: From Wikidata Q27733815
       },
     {
-        id: 7MfJTzMjVw,
+        id: f_P679mQw8T9,
         property: education,
         value: New York University; University of Warsaw; École polytechnique,
         source: https://www.wikidata.org/wiki/Q27733815,

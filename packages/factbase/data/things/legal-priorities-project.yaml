@@ -1,17 +1,17 @@
 entity: sid_8zy1QbFxOg
 facts:
-  - id: nm6tiY0JPQ
+  - id: f_EXJDhWuNeI
     property: founded-date
     value: "2020-08"
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
     notes: "Idea from EA group at Harvard Law School (Fall 2018); launched August 30, 2020. Rebranded to Institute for Law & AI (LawAI) around 2023-2024."
 
-  - id: YI0XWxTLSg
+  - id: f_VXXEULKRwO
     property: headquarters
     value: "6 Liberty Square, #6079, Boston, MA"
     source: https://law-ai.org/
 
-  - id: 7Fa3S1OHWQ
+  - id: f_9Z978lvcwS
     property: annual-revenue
     value: "7852814"
     unit: USD
@@ -19,35 +19,35 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/851024198
     notes: "Major jump from $963K (2023) to $7.85M (2024). Assets $6.05M."
 
-  - id: jenzINJRlA
+  - id: f_nhdUjzdFe3
     property: employee-count
     value: "28"
     asOf: 2026
     source: https://law-ai.org/team/
     notes: "28 core team + 9 affiliates. Grew from 6.1 FTE in 2022."
 
-  - id: 3UuoEIgejw
+  - id: f_9Tznq9C3O9
     property: research-areas
     value: "AI governance and regulation, law-following AI systems, treaty-following AI, automated compliance, AI transparency and trade secrets, AI agent governance"
     source: https://law-ai.org/
 
-  - id: 7HrKeqQ6VA
+  - id: f_c2bFixti1q
     property: organizational-change
     value: "Rebranded from Legal Priorities Project to Institute for Law & AI (LawAI) around 2023-2024"
     source: https://law-ai.org/
 
-  - id: JBFMXeNVog
+  - id: f_Z1LzeboVhP
     property: founded-by
     value: "Christoph Winter"
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
     notes: "Founded by researchers at Harvard University. Core team included Jonas Schuett, Eric Martinez, Cullen O'Keefe. Winter remains Director of LawAI."
 
-  - id: 0ztEIbV3KA
+  - id: f_CnJ5VnpBrH
     property: legal-structure
     value: "501(c)(3) nonprofit (Legal Priorities Inc, EIN 85-1024198). Fully remote team."
     source: https://projects.propublica.org/nonprofits/organizations/851024198
 
-  - id: pZREe7Qlqw
+  - id: f_ltwPScsmD4
     property: annual-revenue
     value: "1100000"
     unit: USD
@@ -55,23 +55,23 @@ facts:
     source: https://forum.effectivealtruism.org/posts/xen7oLdHwoHDTG4hR/legal-priorities-project-annual-report-2022
     notes: "~$1.1M spent in 2022. Raised ~$1.3M. 14 grant applications since inception (10 fully granted, 3 partly)."
 
-  - id: w0fGGrQWkQ
+  - id: f_wf4U8v9eLb
     property: description
     value: "Independent research institute focused on the legal challenges of AI. Researches AI governance and regulation, law-following AI systems, automated compliance, and AI transparency. Originally focused broadly on legal priorities for longtermism; shifted focus to AI risk mitigation during 2023 rebrand."
     asOf: 2026-03
     source: https://law-ai.org/
 
-  - id: vjrOXBUkkw
+  - id: f_WKHE2Kos1e
     property: website
     value: "https://law-ai.org/"
     source: https://law-ai.org/
 
-  - id: y2WEHXTjQw
+  - id: f_A3fkGd1t9E
     property: country
     value: "United States"
     source: https://law-ai.org/
 
-  - id: BrAZo8TP6Q
+  - id: f_hhVOFqMgRK
     property: program
     value: "Legal Priorities Summer Institute (473 applications, 35 admitted from 18 countries in 2022). Law & Longtermism Network (~300 members). Writing Competition with prizes $2,500-$30,000."
     asOf: 2022

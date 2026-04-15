@@ -8,12 +8,12 @@ facts:
   - id: f_wIn1DbjxRQ
     property: website
     value: "https://www.astralcodexten.com"
-  - id: Y3RTpPgUag
+  - id: f_BZ9eHiPbat
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Scott_Alexander_(screenwriter)
     source: https://www.wikidata.org/wiki/Q3476164
     notes: From Wikidata Q3476164
-  - id: Fl1ByRlCog
+  - id: f_YVk3fRHT2r
     property: born-year
     value: 1963
     source: https://www.wikidata.org/wiki/Q3476164

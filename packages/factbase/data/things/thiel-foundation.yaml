@@ -2,21 +2,21 @@ entity: sid_0SkH1jbTRu
 facts:
   [
     {
-        id: WELm0IokEQ,
+        id: f_gWSn3bib4K,
         property: website,
         value: http://thielfoundation.org,
         source: https://www.wikidata.org/wiki/Q17098689,
         notes: From Wikidata Q17098689
       },
     {
-        id: ZApnh66vkQ,
+        id: f_gjfaH7TJeq,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q17098689,
         notes: From Wikidata Q17098689
       },
     {
-        id: gNRivVEYsw,
+        id: f_rDCcj9ZRK7,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Thiel_Foundation,
         source: https://www.wikidata.org/wiki/Q17098689,

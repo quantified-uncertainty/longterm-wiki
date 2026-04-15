@@ -2,14 +2,14 @@ entity: sid_AZmSQxCAlk
 facts:
   [
     {
-        id: 3JqfOkPLCg,
+        id: f_XY9dfF0dZT,
         property: founded-date,
         value: "2011",
         source: https://www.wikidata.org/wiki/Q16927616,
         notes: From Wikidata Q16927616
       },
     {
-        id: lZ1IEP6Iew,
+        id: f_Dc6V1X3W5r,
         property: headquarters,
         value: Mountain View,
         source: https://www.wikidata.org/wiki/Q16927616,

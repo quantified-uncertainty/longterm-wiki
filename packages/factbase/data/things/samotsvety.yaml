@@ -9,22 +9,22 @@ facts:
       in EA/rationalis
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: PPh8saGvfw
+  - id: f_G1hJ3pzteO
     property: founded-date
     value: 1971-01
     source: https://www.wikidata.org/wiki/Q4406987
     notes: From Wikidata Q4406987
-  - id: OOvCpUN6zw
+  - id: f_w55LyhmTPf
     property: country
     value: Russia
     source: https://www.wikidata.org/wiki/Q4406987
     notes: From Wikidata Q4406987
-  - id: sKYr07wHKQ
+  - id: f_n79Tqd69f6
     property: website
     value: https://samotsvety.org
     source: https://samotsvety.org
     notes: "Official website of Samotsvety Forecasting. Previous values (samotsvetu.ru, samotsvety.ru) were for the unrelated Russian pop band (Wikidata Q4406987)."
-  - id: VLccWZ2UZw
+  - id: f_0OMBy9lasl
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Samotsvety
     source: https://www.wikidata.org/wiki/Q4406987

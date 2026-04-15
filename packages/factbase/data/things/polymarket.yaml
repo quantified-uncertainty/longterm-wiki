@@ -9,22 +9,22 @@ facts:
       material about a
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: d52KI9HX7g
+  - id: f_sJOUNkLmt6
     property: founded-date
     value: 2020-01
     source: https://www.wikidata.org/wiki/Q123502863
     notes: From Wikidata Q123502863
-  - id: d2HlpX3XYQ
+  - id: f_1hjmqYgqjy
     property: website
     value: https://polymarket.com
     source: https://www.wikidata.org/wiki/Q123502863
     notes: From Wikidata Q123502863
-  - id: ISXiftGEEA
+  - id: f_egnEIXDW5G
     property: founded-by-name
     value: Shayne Coplan
     source: https://www.wikidata.org/wiki/Q123502863
     notes: From Wikidata Q123502863; text value (not entity ref)
-  - id: OBtcNfD36Q
+  - id: f_kVmxD8qfow
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Polymarket
     source: https://www.wikidata.org/wiki/Q123502863

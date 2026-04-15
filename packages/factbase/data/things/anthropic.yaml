@@ -457,27 +457,27 @@ facts:
     value: "EA-aligned capital (risk-adjusted): $27-76B estimated"
     notes: "Estimate; no published source. Risk-adjusted estimate of EA-aligned
       philanthropic capital from all Anthropic stakeholders"
-  - id: XWMSO83Myw
+  - id: f_itUmsfeLOt
     property: website
     value: https://www.anthropic.com/
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: bnOh3reSfQ
+  - id: f_wV5nGcIURp
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: AVC3M9Echw
+  - id: f_BSBLpMsrV9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: 6dXtTgqnAQ
+  - id: f_d4KxinkJcv
     property: founded-by-name
     value: Chris Olah
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847; text value (not entity ref)
-  - id: S4m9grsGAw
+  - id: f_b9ssNpugov
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Anthropic
     source: https://www.wikidata.org/wiki/Q116758847

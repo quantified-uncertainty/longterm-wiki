@@ -1,39 +1,39 @@
 entity: sid_Qnt7osskRA
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: SUXF5sZOtA
+  - id: f_qK7aSXnK6f
     property: founded-date
     value: "2000-04"
     source: https://en.wikipedia.org/wiki/SMIC
     notes: "Founded by Richard Chang in Shanghai"
 
-  - id: icrqKuCbVA
+  - id: f_Q6ogTOrr02
     property: headquarters
     value: "Shanghai, China"
     source: https://en.wikipedia.org/wiki/SMIC
 
-  - id: AT9pv6FVoA
+  - id: f_tzfmADi4u7
     property: country
     value: China
     source: https://en.wikipedia.org/wiki/SMIC
 
-  - id: x9i0o8MfTA
+  - id: f_nzjhw0pnOu
     property: legal-structure
     value: "Public company (HKEX: 0981, SSE STAR: 688981)"
     source: https://en.wikipedia.org/wiki/SMIC
 
-  - id: 7I0CqbDZSg
+  - id: f_XZu7dnUw2E
     property: website
     value: https://www.smics.com
     source: https://en.wikipedia.org/wiki/SMIC
 
-  - id: 1nj7wHhUew
+  - id: f_mX3AWqThqY
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/SMIC
     source: https://en.wikipedia.org/wiki/SMIC
 
   # ── Description ─────────────────────────────────────────────────
-  - id: H4THhARlxA
+  - id: f_r3ESeo9ztk
     property: description
     value: >-
       China's largest and most advanced semiconductor foundry. Despite being cut off
@@ -43,7 +43,7 @@ facts:
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
-  - id: eGSetD8Upw
+  - id: f_x5mGft3RMt
     property: revenue
     value: 8.03e+09
     asOf: 2024-12
@@ -51,14 +51,14 @@ facts:
     notes: "2024 annual revenue (~$8.03B); significant growth driven by domestic demand"
 
   # ── Key events ──────────────────────────────────────────────────
-  - id: qgxtLLgjsA
+  - id: f_Bqrw4hfcyL
     property: key-event
     value: "Added to U.S. Entity List, restricting access to U.S. semiconductor technology"
     asOf: 2020-12
     source: https://en.wikipedia.org/wiki/SMIC
     notes: "BIS placed SMIC on Entity List in December 2020"
 
-  - id: m58o9A0MhA
+  - id: f_GKNLJ5zs5A
     property: key-event
     value: "Reportedly manufactured 5nm-class circuits for Huawei's Kirin 9000S processor"
     asOf: 2023-09

@@ -55,17 +55,17 @@ facts:
     source: https://federalnewsnetwork.com/workforce/2025/05/gsa-shutting-down-18f-was-retaliation-by-doge-former-staff-claim-in-appeal-for-their-jobs-back/
     notes: "Claimed shutdown was retaliation by DOGE for political beliefs and
       whistleblowing"
-  - id: L1b57n33fg
+  - id: f_qdpsITP4nY
     property: headquarters
     value: United States General Services Administration Building
     source: https://www.wikidata.org/wiki/Q15984844
     notes: From Wikidata Q15984844
-  - id: f1vQq1udjg
+  - id: f_B3GCI9WdSx
     property: website
     value: https://18f.gsa.gov
     source: https://www.wikidata.org/wiki/Q15984844
     notes: From Wikidata Q15984844
-  - id: rPeSu7BA0g
+  - id: f_7ntwO9Teqj
     property: description
     value: 18F is a subsidiary/division of General Services Administration.
     source: https://www.wikidata.org/wiki/Q15984844

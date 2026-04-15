@@ -36,12 +36,12 @@ facts:
     property: legal-structure
     value: "Nonprofit think tank"
     source: https://www.idealist.org/en/nonprofit/a25d86f3f3904984bdc5f745721222d1-institute-for-ai-policy-and-strategy-washington
-  - id: bKMnaItDAQ
+  - id: f_g5hlZ8FRmy
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q131901373
     notes: From Wikidata Q131901373
-  - id: kfxIbtifMw
+  - id: f_cMCIauCi6J
     property: website
     value: https://www.iaps.ai/
     source: https://www.wikidata.org/wiki/Q131901373

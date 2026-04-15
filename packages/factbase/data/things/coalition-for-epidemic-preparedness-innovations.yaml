@@ -9,47 +9,47 @@ facts:
       for weakening
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: Y2tpRyArBg
+  - id: f_biwrTjvlKh
     property: founded-date
     value: "2017-01"
     source: https://www.wikidata.org/wiki/Q27133033
     notes: "Launched January 2017 at World Economic Forum in Davos (corrected from 2016-08). Wikidata lists 30 August 2016 as inception (the incorporation date); we use the formal public launch date per cepi.net/cepi-officially-launched."
-  - id: rNpP4ZtDoA
+  - id: f_nW59QxWSK9
     property: headquarters
     value: Oslo
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: HRR7Noz5zg
+  - id: f_h29qhzOnXy
     property: website
     value: https://cepi.net
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: 3r0RH77IGw
+  - id: f_DNFjHwbn8Z
     property: country
     value: Norway
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: I9DU3joyAw
+  - id: f_JivNYnSW9t
     property: ceo
     value: John-Arne Røttingen
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: hCXagEudpg
+  - id: f_dypLk7qm6i
     property: revenue
     value: 1273354629
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: 48NiUaWaAg
+  - id: f_qFoyma6iMq
     property: founded-by-name
     value: Japan
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033; text value (not entity ref)
-  - id: A3B2wfSpXA
+  - id: f_sBcLONCBVu
     property: legal-structure
     value: forening/lag/innretning
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-  - id: LfFGsap2rA
+  - id: f_p4A03REJu7
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations
     source: https://www.wikidata.org/wiki/Q27133033
