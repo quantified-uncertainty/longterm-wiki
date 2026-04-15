@@ -44,9 +44,14 @@ export function isMissingTokenError(err: unknown): err is MissingTokenError {
 
 /**
  * Get the GitHub token from the environment or throw a `MissingTokenError`.
+ *
+ * Whitespace-only values (e.g. `'   '`) are treated as missing. Without the
+ * trim, a stray-whitespace env var would pass the truthy check and be sent
+ * verbatim to the GitHub API, causing a transient-looking 401 instead of the
+ * immediate permanent-fault classification that `MissingTokenError` signals.
  */
 export function getGitHubToken(): string {
-  const token = process.env.GITHUB_TOKEN;
+  const token = process.env.GITHUB_TOKEN?.trim();
   if (!token) {
     throw new MissingTokenError();
   }
