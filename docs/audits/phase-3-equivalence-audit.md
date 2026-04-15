@@ -488,7 +488,7 @@ rg 'data\.experts|data\.estimates|data\.glossary|data\.funders' apps/web/src/ cr
 
 If any of these grep commands return non-test results, the field is no longer dead and the deletion plan needs to be revised. If still empty, safe to delete from `database.json` writes in `build-data.mjs`.
 
-`database.resources` is also write-only today (write at `build-data.mjs:515`, but the runtime `loadResources()` at `apps/web/src/data/tablebase.ts:645` reads from a separate `resources.json` file with only a backward-compat fallback to `database.resources`). Same triple-check applies if the cutover wants to drop it.
+`database.resources` is **never present in `database.json`** — see § 3 line 150 of this audit. It's set in memory at `build-data.mjs:515` but stripped at write time by `writeMainOutputFiles()` at `apps/web/scripts/lib/output-writer.mjs:54` (where `resources: _resources` is destructured out alongside other Phase-4 lazy-loaded fields). Resources are written to a separate `resources.json` file instead, and the runtime `loadResources()` at `apps/web/src/data/tablebase.ts:645` reads from there. A fallback path to `database.resources` exists in `loadResources()` as backward-compat for older builds but is dead-by-construction in the current pipeline. **No cutover deletion needed for `database.resources` from `database.json`** — it isn't there. The cutover may optionally remove the dead in-memory assignment at `build-data.mjs:511-558` and the dead `loadResources()` fallback for cleanliness, but neither is strictly required.
 
 ### Cutover correctness checks
 
