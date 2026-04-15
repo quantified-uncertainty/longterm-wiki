@@ -304,11 +304,15 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   }
 
   const mode = apply ? 'apply' : 'dry-run';
+  const searched = allRecords.length - skipped;
+  const noMatch = searched - matched;
   const summary = [
     `[backfill-sources] ${mode}`,
-    `  Records processed: ${allRecords.length - skipped}`,
-    `  Skipped (no match terms): ${skipped}`,
-    `  Sources found: ${matched}`,
+    `  Records: ${allRecords.length} total`,
+    `    Skipped (no search terms): ${skipped}`,
+    `    Searched: ${searched}`,
+    `      Sources found: ${matched}`,
+    `      No match: ${noMatch}`,
     `  Cost: $${totalCost.toFixed(4)}`,
   ].join('\n');
 
