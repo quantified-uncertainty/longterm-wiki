@@ -56,6 +56,17 @@ Valid types: `content`, `infrastructure`, `bugfix`, `refactor`, `commands`. Defa
 
 Then read `.claude/wip-checklist.md` and keep it updated as you work.
 
+### How the checklist is enforced mid-session — hook layers (QUA-515)
+
+The checklist is not a nice-to-have piece of paper the agent can forget exists. Two hooks surface and enforce it:
+
+- **`.claude/hooks/inject-wip-checklist.sh`** (`UserPromptSubmit` event) — emits a compact `<system-reminder>` on every user turn with the progress count (`3/16 done`) and the slugs of still-unchecked items. If the file is missing (quick-fix session, pre-init turn), the hook is a silent no-op. The point: the checklist is in the prompt on every turn, so "I forgot the file existed" is no longer a possible failure mode. Same mechanism `MEMORY.md` auto-context uses.
+- **`.claude/hooks/verify-checklist-on-stop.sh`** (`Stop` event) — reads the agent's last assistant message from the transcript and checks for ship-intent phrases (`/agent-ship`, `ready to ship`, `ready for review`, `session done`, etc.). If the agent is trying to wrap the session AND there are still unchecked items, the hook blocks the stop (exit 2) and lists what's left. The hook is narrow on purpose: blocking every Stop would loop the agent on every turn, so it only fires at the moment of real shipping intent. Fails open on transcript read errors and no-ops when the checklist file is missing.
+
+Both hooks are registered in `.claude/settings.json`. If you need to bypass one (e.g., debugging the hook itself), temporarily move the file aside — do not add an `env` bypass flag, the enforcement exists precisely because bypasses get left on.
+
+To check items off during a session, edit `.claude/wip-checklist.md` directly: change `[ ]` to `[x]` for done items, or `[~]` with `<!-- N/A: reason -->` for items that don't apply. The Layer 1 reminder updates on the next user turn.
+
 ## Step 2: Session End — BEFORE considering work complete
 
 ### Step 2a: Enumerate every problem you observed this session — MANDATORY
