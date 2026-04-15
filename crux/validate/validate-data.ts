@@ -44,11 +44,6 @@ interface ExpertData {
   [key: string]: unknown;
 }
 
-interface OrganizationData {
-  id: string;
-  [key: string]: unknown;
-}
-
 interface PathMapping {
   [type: string]: string[];
 }
@@ -143,7 +138,6 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const entitiesFromDir = loadYamlDir('entities') as EntityData[];
   const entities: EntityData[] = [...entitiesFromFile, ...entitiesFromDir];
   const experts = loadYaml('experts.yaml') as ExpertData[];
-  const organizations = loadYaml('organizations.yaml') as OrganizationData[];
   const literature = loadYaml('literature.yaml');
 
   // Build ID sets for quick lookups
@@ -154,7 +148,10 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     entities.flatMap((e: EntityData) => (e.stableId ? [e.stableId] : []))
   );
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
-  const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
+  // Organization IDs now live in `entities` (data/entities/organizations.yaml).
+  const orgIds = new Set<string>(
+    entities.filter((e) => (e as { type?: string }).type === 'organization').map((e) => e.id)
+  );
 
   // Build wiki ID → slug mapping from database.json
   const numericToSlug = new Map<string, string>();
@@ -175,7 +172,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     console.log(`📊 Data summary:`);
     console.log(`   Entities: ${entities.length}`);
     console.log(`   Experts: ${experts.length}`);
-    console.log(`   Organizations: ${organizations.length}`);
+    console.log(`   Organizations: ${orgIds.size}`);
     console.log(`   MDX files: ${mdxFiles.length}\n`);
   }
 

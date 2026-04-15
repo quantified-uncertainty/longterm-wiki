@@ -116,7 +116,6 @@ let yamlParseErrorCount = 0;
 // Files to combine
 const DATA_FILES = [
   { key: 'experts', file: 'experts.yaml' },
-  { key: 'organizations', file: 'organizations.yaml' },
   { key: 'estimates', file: 'estimates.yaml' },
   { key: 'glossary', file: 'glossary.yaml' },
   { key: 'entities', dir: 'entities' }, // Split by entity type
@@ -1208,8 +1207,7 @@ async function main() {
   const typedEntities = transformEntities(
     database.entities,
     pages,
-    database.experts || [],
-    database.organizations || []
+    database.experts || []
   );
   database.typedEntities = typedEntities;
   // Update description count to reflect post-enrichment state
