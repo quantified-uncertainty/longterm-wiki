@@ -20,6 +20,7 @@
 
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { join } from 'path';
+import { isMissingTokenError } from '../lib/github.ts';
 import { healthScan as realHealthScan, type HealthScanResult, type HealthIssue } from './health-scan.ts';
 import { appendJsonl, JSONL_FILE, STATE_DIR, ensureDirs, cl, log as realLog } from './state.ts';
 
@@ -49,20 +50,6 @@ const HEALTH_GATE_STATE_FILE = join(STATE_DIR, 'health-gate-cooldown.json');
 
 /** Reserved fingerprint used to track consecutive scan-error count. */
 const SCAN_ERROR_COUNTER_KEY = '__scan_error_count__';
-
-/**
- * Signal string emitted by `getGitHubToken()` in `crux/lib/github.ts` when the
- * env var is missing. Used to classify scan failures so a permanent config
- * error halts patrol immediately instead of cycling through
- * MAX_CONSECUTIVE_SCAN_ERRORS (QUA-395).
- */
-const MISSING_TOKEN_ERROR_SIGNAL = 'GITHUB_TOKEN not set';
-
-/** True when the error is from a missing GITHUB_TOKEN. */
-function isMissingTokenError(err: unknown): boolean {
-  const msg = err instanceof Error ? err.message : String(err);
-  return msg.includes(MISSING_TOKEN_ERROR_SIGNAL);
-}
 
 // ── Types ────────────────────────────────────────────────────────────────────
 

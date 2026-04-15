@@ -18,15 +18,37 @@
 export const REPO = 'quantified-uncertainty/longterm-wiki';
 
 /**
- * Get the GitHub token from the environment or throw a clear error.
+ * Thrown by `getGitHubToken()` when the `GITHUB_TOKEN` environment variable is
+ * missing or empty. Callers that need to distinguish "permanent config fault"
+ * from "transient GitHub hiccup" should use `isMissingTokenError()` rather
+ * than grepping error messages — see QUA-482 for why string-matching the
+ * signal is brittle.
+ */
+export class MissingTokenError extends Error {
+  constructor(
+    message = 'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
+      'Set it with: export GITHUB_TOKEN=<your-token>',
+  ) {
+    super(message);
+    this.name = 'MissingTokenError';
+  }
+}
+
+/**
+ * Type guard for `MissingTokenError`. Prefer this over `msg.includes(...)` so
+ * the error signal can evolve without silently breaking classifiers.
+ */
+export function isMissingTokenError(err: unknown): err is MissingTokenError {
+  return err instanceof MissingTokenError;
+}
+
+/**
+ * Get the GitHub token from the environment or throw a `MissingTokenError`.
  */
 export function getGitHubToken(): string {
   const token = process.env.GITHUB_TOKEN;
   if (!token) {
-    throw new Error(
-      'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
-      'Set it with: export GITHUB_TOKEN=<your-token>'
-    );
+    throw new MissingTokenError();
   }
   return token;
 }

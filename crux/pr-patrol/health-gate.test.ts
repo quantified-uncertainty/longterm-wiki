@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 
+import { MissingTokenError } from '../lib/github.ts';
 import {
   runHealthGate,
   fingerprintIssue,
@@ -259,10 +260,7 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
     const decision = await runHealthGate({
       ...deps,
       scan: async () => {
-        throw new Error(
-          'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
-            'Set it with: export GITHUB_TOKEN=<your-token>',
-        );
+        throw new MissingTokenError();
       },
     });
 
@@ -285,6 +283,27 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
     });
     expect(decision.proceed).toBe(true);
     expect(deps.events[0]).toMatchObject({ type: 'health_scan_error' });
+  });
+
+  it('does NOT misclassify errors that merely echo the legacy signal string', async () => {
+    // QUA-482: the classifier now uses `instanceof MissingTokenError`, not
+    // substring-matching. A generic Error whose message happens to contain
+    // 'GITHUB_TOKEN not set' (e.g. a log line echoed back from a subprocess)
+    // must NOT trip the permanent-halt path.
+    const deps = makeDeps();
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => {
+        throw new Error(
+          'upstream log: "GITHUB_TOKEN not set" appeared in a prior run',
+        );
+      },
+    });
+    expect(decision.proceed).toBe(true);
+    expect(deps.events[0]).toMatchObject({ type: 'health_scan_error' });
+    expect(
+      deps.events.some((e) => e.type === 'health_gate_missing_token'),
+    ).toBe(false);
   });
 });
 
