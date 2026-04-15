@@ -46,22 +46,22 @@ facts:
     value: "Independent nonprofit research institute"
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "Originally housed at NYU; became independent in mid-2022"
-  - id: spDu1YjL7A
+  - id: f_qHSt1VTtkm
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948
-  - id: HnJQB41UwA
+  - id: f_lHx3PnmxCG
     property: website
     value: https://ainowinstitute.org/
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948
-  - id: G5b7kxRXQg
+  - id: f_tQtqO0TfzC
     property: founded-by-name
     value: Kate Crawford
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948; text value (not entity ref)
-  - id: m8HZpwKiUA
+  - id: f_xC9nJkGoI9
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/AI_Now_Institute
     source: https://www.wikidata.org/wiki/Q55602948

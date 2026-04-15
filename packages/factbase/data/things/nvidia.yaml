@@ -1,47 +1,47 @@
 entity: sid_UvpZCnW3wA
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: Z79rDWOcNw
+  - id: f_7kfHyWXmQc
     property: founded-date
     value: 1993-04
     source: https://www.wikidata.org/wiki/Q182477
     notes: "Founded by Jensen Huang, Chris Malachowsky, and Curtis Priem"
 
-  - id: 0JYpe04Ctg
+  - id: f_jIlMURLoDU
     property: headquarters
     value: "Santa Clara, CA"
     source: https://nvidianews.nvidia.com/multimedia/santa-clara-headquarters
     notes: "NVIDIA headquarters campus in Santa Clara, California"
 
-  - id: 5QgzUmYH8A
+  - id: f_JBwHOj65g9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q182477
 
-  - id: wj5ax7elqw
+  - id: f_w91mEWWG6u
     property: founded-by-name
     value: Jensen Huang
     source: https://www.wikidata.org/wiki/Q182477
     notes: "Co-founded with Chris Malachowsky and Curtis Priem; Huang serves as
       CEO since founding"
 
-  - id: svJV9CIAnQ
+  - id: f_n3aNvt6ee9
     property: ceo
     value: Jensen Huang
     source: https://www.wikidata.org/wiki/Q182477
     notes: "CEO since founding in 1993"
 
-  - id: 66Lc0vx1oA
+  - id: f_AyAhZKcBOK
     property: legal-structure
     value: "Public company (NASDAQ: NVDA)"
     source: https://www.wikidata.org/wiki/Q182477
 
-  - id: BWicjYEpPQ
+  - id: f_ojxaymuN29
     property: website
     value: https://www.nvidia.com
     source: https://www.wikidata.org/wiki/Q182477
 
-  - id: ZnJlOwxniw
+  - id: f_ezF3P1MNaS
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Nvidia
     source: https://www.wikidata.org/wiki/Q182477
@@ -70,7 +70,7 @@ facts:
     source: https://www.macrotrends.net/stocks/charts/NVDA/nvidia/number-of-employees
     notes: "29,600 employees at end of FY2024 (January 2024); 13% YoY growth"
 
-  - id: h0QiGVulng
+  - id: f_1zAlcFXh8F
     property: headcount
     value: 36000
     asOf: 2025-01
@@ -117,7 +117,7 @@ facts:
       record $68.1B."
 
   # ── Quarterly Data Center Revenue ───────────────────────────────
-  - id: EpuVZ6VzMA
+  - id: f_MF4yOqWUTI
     property: quarterly-data-center-revenue
     value: 6.23e+10
     unit: USD

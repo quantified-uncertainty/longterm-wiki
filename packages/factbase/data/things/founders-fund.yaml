@@ -9,27 +9,27 @@ facts:
       exceptional returns through c
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: JLyAJzGXGg
+  - id: f_JOmESSDp99
     property: founded-date
     value: "2005"
     source: https://www.wikidata.org/wiki/Q1439864
     notes: From Wikidata Q1439864
-  - id: RU49b6JAAA
+  - id: f_M3yUp5M6ny
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q1439864
     notes: From Wikidata Q1439864
-  - id: NrKgge1b1Q
+  - id: f_hPWKCN378R
     property: website
     value: http://www.foundersfund.com
     source: https://www.wikidata.org/wiki/Q1439864
     notes: From Wikidata Q1439864
-  - id: OaDrdtnc6g
+  - id: f_JenA8F5tnb
     property: founded-by-name
     value: Peter Thiel
     source: https://www.wikidata.org/wiki/Q1439864
     notes: From Wikidata Q1439864; text value (not entity ref)
-  - id: U51RWZpy7A
+  - id: f_tz1dZZQky3
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Founders_Fund
     source: https://www.wikidata.org/wiki/Q1439864

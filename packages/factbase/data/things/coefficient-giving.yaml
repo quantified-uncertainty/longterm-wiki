@@ -73,34 +73,34 @@ facts:
     asOf: "2025"
     source: https://coefficientgiving.org/about-us/team/
     notes: "150+ staff after rebrand to Coefficient Giving (November 2025)"
-  - id: 6cG2oupsZg
+  - id: f_dJwyNJCar5
     property: founded-date
     value: "2017-06"
     source: https://www.wikidata.org/wiki/Q25345685
     notes: "Became independent LLC in June 2017 (previously operated as Open Philanthropy
       Project within GiveWell from 2014). Rebranded from Open Philanthropy to Coefficient
       Giving in November 2025."
-  - id: Dyf2V67PFg
+  - id: f_y5nngeYo4q
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685
-  - id: AZlMk0b5hg
+  - id: f_fpMRnvguKp
     property: website
     value: https://www.coefficientgiving.org
     source: https://www.coefficientgiving.org
     notes: Updated from openphilanthropy.org after Nov 2025 rebrand
-  - id: o7268a61Mg
+  - id: f_XmQI9iPm39
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685
-  - id: xrnLH5oqjg
+  - id: f_zvV3Z9sxGI
     property: founded-by-name
     value: Dustin Moskovitz
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685; text value (not entity ref)
-  - id: yV0mgBqZmA
+  - id: f_B2PUHlC7Jh
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Coefficient_Giving
     source: https://www.wikidata.org/wiki/Q25345685

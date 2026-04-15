@@ -1,46 +1,46 @@
 entity: sid_Tbq2qL6mbA
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: ha7bdonOwg
+  - id: f_IQ0k7asGke
     property: founded-date
     value: "1969-05"
     source: https://en.wikipedia.org/wiki/AMD
     notes: "Founded by Jerry Sanders and seven others in Sunnyvale, California"
 
-  - id: qGts0pZ68A
+  - id: f_neOdpoD4dy
     property: headquarters
     value: "Santa Clara, CA"
     source: https://en.wikipedia.org/wiki/AMD
 
-  - id: ygjhba4liA
+  - id: f_uJabBkuiWV
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/AMD
 
-  - id: GOZO78mVDQ
+  - id: f_OUnrXVzEjm
     property: ceo
     value: Lisa Su
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/AMD
     notes: "CEO since October 2014"
 
-  - id: AR65hwiduA
+  - id: f_piwR1TxrGF
     property: legal-structure
     value: "Public company (NASDAQ: AMD)"
     source: https://en.wikipedia.org/wiki/AMD
 
-  - id: vFeQx30NYg
+  - id: f_figb0BUTu6
     property: website
     value: https://www.amd.com
     source: https://en.wikipedia.org/wiki/AMD
 
-  - id: NSHUGmfyuQ
+  - id: f_rGhSxx2hiT
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/AMD
     source: https://en.wikipedia.org/wiki/AMD
 
   # ── Description ─────────────────────────────────────────────────
-  - id: ImPQ3udQuA
+  - id: f_R4eRv4APdo
     property: description
     value: >-
       Principal competitor to Nvidia in AI accelerator chips. AMD's Instinct MI300 series
@@ -64,7 +64,7 @@ facts:
     source: https://www.macrotrends.net/stocks/charts/AMD/amd/revenue
     notes: "2023 annual revenue ($22.7B); slight decline from 2022"
 
-  - id: 9BzgrJgz5g
+  - id: f_pAUi06EESd
     property: revenue
     value: 2.58e+10
     asOf: 2024-12
@@ -94,7 +94,7 @@ facts:
     source: https://www.macrotrends.net/stocks/charts/AMD/amd/number-of-employees
     notes: "26,000 employees at end of 2023; 4% increase from 2022"
 
-  - id: KBIIVQuAlQ
+  - id: f_77t5PQ9YPg
     property: headcount
     value: 28000
     asOf: 2024-12

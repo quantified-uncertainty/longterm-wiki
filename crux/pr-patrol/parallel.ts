@@ -12,7 +12,7 @@
 import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { tryAutomatedRebase } from '../lib/pr-analysis/rebase.ts';
+import { tryRebaseAndVerify } from './rebase-verify.ts';
 import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { REPO } from '../lib/github.ts';
@@ -43,8 +43,12 @@ import {
   looksLikeMainRootCause,
   spawnClaude,
 } from './execution.ts';
-import { githubApi } from '../lib/github.ts';
-import { LABELS } from './types.ts';
+import {
+  tryClaimPr,
+  releasePrIfClaimed,
+  defaultClaimDeps,
+  type ClaimDeps,
+} from './claim.ts';
 import {
   buildAbandonmentComment,
   buildFixAttemptComment,
@@ -148,29 +152,41 @@ function cleanStaleWorktrees(worktreeDir: string): void {
 
 
 // ── PR claim management (parallel-safe) ──────────────────────────────────────
+//
+// Delegates to the shared helpers in ./claim.ts so both the serial
+// (execution.ts) and parallel dispatch paths use the same
+// ownership-tracked claim/release flow. See claim.ts for the QUA-400
+// race-condition context.
 
-async function claimPr(prNum: number, repo: string): Promise<void> {
-  try {
-    await githubApi(`/repos/${repo}/issues/${prNum}/labels`, {
-      method: 'POST',
-      body: { labels: [LABELS.PR_PATROL_WORKING] },
-    });
-  } catch {
-    log(`  ${cl.yellow}Warning: could not add ${LABELS.PR_PATROL_WORKING} label to PR #${prNum}${cl.reset}`);
-  }
+const parallelClaimDeps: ClaimDeps = defaultClaimDeps((prNum, reason) => {
+  log(`  ${cl.yellow}PR #${prNum} claim skipped: ${reason}${cl.reset}`);
+});
+
+/**
+ * Attempt to claim a PR. Returns `true` on success (we added the working
+ * label), `false` when the PR is already claimed by another worker or the
+ * claim write failed.
+ */
+async function claimPr(prNum: number, repo: string): Promise<boolean> {
+  return tryClaimPr(prNum, repo, parallelClaimDeps);
 }
 
-async function releasePr(prNum: number, repo: string): Promise<void> {
+/**
+ * Release the working label — only if `didClaim === true`. When another
+ * worker holds the label, this is a no-op.
+ */
+async function releasePr(
+  didClaim: boolean,
+  prNum: number,
+  repo: string,
+): Promise<void> {
+  if (!didClaim) return;
   try {
-    await githubApi(
-      `/repos/${repo}/issues/${prNum}/labels/${encodeURIComponent(LABELS.PR_PATROL_WORKING)}`,
-      { method: 'DELETE' },
-    );
+    await releasePrIfClaimed(didClaim, prNum, repo, parallelClaimDeps);
   } catch (e) {
-    const msg = e instanceof Error ? e.message : String(e);
-    if (!msg.includes('404') && !msg.includes('Not Found')) {
-      log(`  Warning: could not remove pr-patrol:working label from PR #${prNum}: ${msg}`);
-    }
+    log(
+      `  Warning: could not remove pr-patrol:working label from PR #${prNum}: ${e instanceof Error ? e.message : String(e)}`,
+    );
   }
 }
 
@@ -269,37 +285,88 @@ async function fixPrInWorktree(
 
   const startTime = Date.now();
   let worktreePath = '';
+  // `didClaim` is declared outside the try so the finally block can gate
+  // `releasePr` on it and avoid deleting another worker's label
+  // (QUA-400 critical review — see claim.ts for the full rationale).
+  let didClaim = false;
 
   try {
     // Create worktree for this PR
     worktreePath = createPatrolWorktree(pr.branch, pr.number, config.worktreeDir);
     log(`${prefix} Worktree: ${cl.dim}${worktreePath}${cl.reset}`);
 
+    // ── Claim the PR BEFORE any rebase/verify round-trip ────────────
+    // QUA-400: `tryRebaseAndVerify` below polls GitHub for ~12s. If we
+    // ran it before claiming, another patrol instance could grab the
+    // label during that window and our `finally` release would delete
+    // the other worker's claim. Claim-first + didClaim gating closes
+    // both halves of the race.
+    didClaim = await claimPr(pr.number, config.repo);
+    if (!didClaim) {
+      log(`${prefix} ${cl.yellow}Claim lost to concurrent worker — skipping${cl.reset}`);
+      markProcessed(pr.number);
+      appendJsonl(JSONL_FILE, {
+        type: 'pr_result',
+        pr_num: pr.number,
+        issues: pr.issues,
+        outcome: 'no-op' as FixOutcome,
+        elapsed_s: Math.floor((Date.now() - startTime) / 1000),
+        reason: 'Claim lost to concurrent worker',
+        parallel: true,
+      });
+      return {
+        prNumber: pr.number,
+        outcome: 'no-op',
+        reason: 'Claim lost to concurrent worker',
+        elapsedS: Math.floor((Date.now() - startTime) / 1000),
+      };
+    }
+
     // Automated rebase pre-step
     if (pr.issues.includes('stale') || pr.issues.includes('conflict')) {
       log(`${prefix} Attempting automated rebase...`);
-      const rebaseResult = tryAutomatedRebase(pr.branch, worktreePath);
+      const outcome = await tryRebaseAndVerify(
+        pr.branch,
+        pr.number,
+        pr.issues,
+        worktreePath,
+        config.repo,
+      );
 
-      if (rebaseResult.success) {
-        log(`${prefix} Automated rebase ${rebaseResult.status} — no Claude needed`);
-        const remainingIssues = pr.issues.filter((i) => i !== 'stale' && i !== 'conflict');
-        if (remainingIssues.length === 0) {
-          markProcessed(pr.number);
-          return {
-            prNumber: pr.number,
-            outcome: 'fixed',
-            reason: `automated-rebase: ${rebaseResult.status}`,
-            elapsedS: Math.floor((Date.now() - startTime) / 1000),
-          };
-        }
-        pr.issues = remainingIssues;
-        log(`${prefix} Remaining issues after rebase: ${remainingIssues.join(', ')}`);
+      if (outcome.kind === 'verify-failed') {
+        log(
+          `${prefix} ${cl.yellow}⚠ Rebase reported ${outcome.rebaseStatus} but GitHub still shows conflict: ${outcome.verify.reason}${cl.reset} — falling through to Claude`,
+        );
+        appendJsonl(JSONL_FILE, {
+          type: 'rebase_verify_failed',
+          pr_num: pr.number,
+          rebase_status: outcome.rebaseStatus,
+          reason: outcome.verify.reason,
+          mergeable: outcome.verify.mergeable,
+          merge_state_status: outcome.verify.mergeStateStatus,
+          attempts: outcome.verify.attempts,
+        });
+      } else if (outcome.kind === 'fully-resolved') {
+        log(`${prefix} Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        markProcessed(pr.number);
+        return {
+          prNumber: pr.number,
+          outcome: 'fixed',
+          reason: `automated-rebase: ${outcome.rebaseStatus} (verified)`,
+          elapsedS: Math.floor((Date.now() - startTime) / 1000),
+        };
+      } else if (outcome.kind === 'partially-resolved') {
+        log(`${prefix} Automated rebase ${outcome.rebaseStatus} — no Claude needed`);
+        pr.issues = outcome.remainingIssues;
+        log(`${prefix} Remaining issues after rebase: ${outcome.remainingIssues.join(', ')}`);
       } else {
+        // outcome.kind === 'rebase-failed'
         // On retry for conflict-only PRs, try rebase-only with Claude (simpler prompt)
         const failCount = getFailCount(pr.number);
         if (failCount > 0 && pr.issues.length === 1 && pr.issues[0] === 'conflict') {
           log(`${prefix} Retry #${failCount + 1} for conflict-only PR — using rebase-only strategy`);
-          await claimPr(pr.number, config.repo);
+          // Claim was already acquired at the top of the try block; no
+          // need to re-claim here.
           const rebasePrompt = `Rebase the current branch onto origin/main. Resolve any merge conflicts. Then force-push with: git push --force-with-lease. Do NOT fix CI issues, do NOT address code review comments — ONLY resolve the merge conflicts and push.`;
           const rebaseResult2 = await spawnClaude(rebasePrompt, {
             ...config,
@@ -307,8 +374,8 @@ async function fixPrInWorktree(
             timeoutMinutes: 15,
           }, { cwd: worktreePath });
           const elapsedS = Math.floor((Date.now() - startTime) / 1000);
-          const outcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
-          if (outcome === 'fixed') {
+          const claudeOutcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
+          if (claudeOutcome === 'fixed') {
             resetFailCount(pr.number);
             log(`${prefix} ${cl.green}Rebase-only fix succeeded${cl.reset} (${elapsedS}s)`);
           } else {
@@ -317,17 +384,17 @@ async function fixPrInWorktree(
           }
           appendJsonl(JSONL_FILE, {
             type: 'pr_result', pr_num: pr.number, issues: pr.issues,
-            outcome, elapsed_s: elapsedS, reason: 'rebase-only strategy', parallel: true,
+            outcome: claudeOutcome, elapsed_s: elapsedS, reason: 'rebase-only strategy', parallel: true,
           });
           markProcessed(pr.number);
-          return { prNumber: pr.number, outcome, reason: 'rebase-only strategy', elapsedS };
+          return { prNumber: pr.number, outcome: claudeOutcome, reason: 'rebase-only strategy', elapsedS };
         }
-        log(`${prefix} Automated rebase failed (${rebaseResult.status}) — falling through to Claude`);
+        log(`${prefix} Automated rebase failed (${outcome.status}) — falling through to Claude`);
       }
     }
 
-    // Claim PR on GitHub
-    await claimPr(pr.number, config.repo);
+    // Claim was already acquired at the top of the try block
+    // (before tryRebaseAndVerify); no need to re-claim here.
 
     // Compute budget — full budget every attempt (no reduction on retry)
     const failCount = getFailCount(pr.number);
@@ -412,8 +479,10 @@ async function fixPrInWorktree(
       elapsedS,
     };
   } finally {
-    // Always release PR claim and remove worktree
-    await releasePr(pr.number, config.repo);
+    // Only release the working label if THIS worker actually acquired
+    // the claim — `releasePr(false, ...)` is a no-op so we never delete
+    // another worker's label (QUA-400).
+    await releasePr(didClaim, pr.number, config.repo);
     if (worktreePath) removePatrolWorktree(worktreePath);
   }
 }

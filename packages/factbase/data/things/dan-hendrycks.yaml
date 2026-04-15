@@ -34,17 +34,17 @@ facts:
       risk focus"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-  - id: G6NX3xbaYw
+  - id: f_hfxi5gSApK
     property: education
     value: University of California, Berkeley
     source: https://www.wikidata.org/wiki/Q107261221
     notes: From Wikidata Q107261221
-  - id: G5H3Fo6Umg
+  - id: f_WIQ7ZK53wV
     property: website
     value: https://people.eecs.berkeley.edu/~hendrycks/
     source: https://www.wikidata.org/wiki/Q107261221
     notes: From Wikidata Q107261221
-  - id: KK1iLeug0g
+  - id: f_0ZsxyCDa3W
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Dan_Hendrycks
     source: https://www.wikidata.org/wiki/Q107261221

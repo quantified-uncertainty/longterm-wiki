@@ -9,32 +9,32 @@ facts:
       organization has
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: oHEcBbtJMQ
+  - id: f_ba0L1pSE29
     property: founded-date
     value: "2017"
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-  - id: IdV39kECCA
+  - id: f_cYQY5a9GTW
     property: headquarters
     value: Chelsea
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-  - id: yhZ1j7uwBg
+  - id: f_bGqkNbEgzn
     property: website
     value: https://www.schmidtfutures.com/
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-  - id: Vr6RToBMLw
+  - id: f_xa32Xj97m9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-  - id: kKB72pHlAA
+  - id: f_lodweEF2uU
     property: founded-by-name
     value: Eric Schmidt
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691; text value (not entity ref)
-  - id: DnM70bx8Kg
+  - id: f_FS9HgJrNAp
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Schmidt_Futures
     source: https://www.wikidata.org/wiki/Q111146691

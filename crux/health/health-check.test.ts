@@ -9,7 +9,130 @@
 
 import { describe, it, expect } from 'vitest';
 
-import { describeFetchError, fetchJson } from './health-check.ts';
+import {
+  describeFetchError,
+  fetchJson,
+  parseLocalModeUrl,
+  resolveHealthEnvOverrides,
+  DEFAULT_LOCAL_URL,
+} from './health-check.ts';
+
+describe('parseLocalModeUrl (QUA-491)', () => {
+  it('returns null when --local is not passed', () => {
+    expect(parseLocalModeUrl([])).toBeNull();
+    expect(parseLocalModeUrl(['--json', '--check=server'])).toBeNull();
+  });
+
+  it('returns the default localhost URL for bare --local', () => {
+    expect(parseLocalModeUrl(['--local'])).toBe(DEFAULT_LOCAL_URL);
+    expect(parseLocalModeUrl(['--json', '--local'])).toBe(DEFAULT_LOCAL_URL);
+  });
+
+  it('returns the default for --local= with empty value', () => {
+    // Edge case from review: a user who types `--local=` by accident should
+    // get the sensible default, not an empty string that makes getServerUrl()
+    // return '' and then fail opaquely downstream.
+    expect(parseLocalModeUrl(['--local='])).toBe(DEFAULT_LOCAL_URL);
+  });
+
+  it('returns the explicit URL for --local=URL with loopback hosts', () => {
+    expect(parseLocalModeUrl(['--local=http://localhost:3011'])).toBe(
+      'http://localhost:3011',
+    );
+    expect(parseLocalModeUrl(['--local=http://127.0.0.1:4000'])).toBe(
+      'http://127.0.0.1:4000',
+    );
+    expect(parseLocalModeUrl(['--local=http://[::1]:3002'])).toBe(
+      'http://[::1]:3002',
+    );
+  });
+
+  it('rejects non-loopback hosts to prevent API-key leakage', () => {
+    // Footgun defense: a stale LONGTERMWIKI_SERVER_API_KEY in .env would be
+    // forwarded as a Bearer header to whatever URL this flag accepts. Limit
+    // the flag to loopback so typos can't leak credentials to a real host.
+    expect(() =>
+      parseLocalModeUrl(['--local=https://wiki-server.k8s.quantifieduncertainty.org']),
+    ).toThrow(/non-loopback host/);
+    expect(() => parseLocalModeUrl(['--local=http://example.com'])).toThrow(
+      /non-loopback host/,
+    );
+  });
+
+  it('rejects unparseable URLs with a clear error', () => {
+    expect(() => parseLocalModeUrl(['--local=not a url'])).toThrow(
+      /Invalid --local URL/,
+    );
+    expect(() => parseLocalModeUrl(['--local=:::'])).toThrow(
+      /Invalid --local URL/,
+    );
+  });
+
+  it('does not match unrelated args that share the --local prefix', () => {
+    expect(parseLocalModeUrl(['--locality=x'])).toBeNull();
+  });
+
+  it('is order-independent', () => {
+    expect(parseLocalModeUrl(['--check=server', '--local=http://localhost:1', '--json']))
+      .toBe('http://localhost:1');
+  });
+
+  it('returns the first --local variant when both bare and explicit are passed', () => {
+    // Undocumented but stable: argv.find() returns the first match. This
+    // test pins the behavior so a future refactor can't silently change it.
+    expect(parseLocalModeUrl(['--local', '--local=http://localhost:9999'])).toBe(
+      DEFAULT_LOCAL_URL,
+    );
+    expect(parseLocalModeUrl(['--local=http://localhost:9999', '--local'])).toBe(
+      'http://localhost:9999',
+    );
+  });
+});
+
+describe('resolveHealthEnvOverrides (QUA-491)', () => {
+  it('defaults to WIKI_SERVER_ENV=prod when neither --local nor WIKI_SERVER_ENV is set', () => {
+    const overrides = resolveHealthEnvOverrides([], {});
+    expect(overrides).toEqual({
+      setEnv: { WIKI_SERVER_ENV: 'prod' },
+      unsetEnv: [],
+      localUrl: null,
+    });
+  });
+
+  it('respects a pre-set WIKI_SERVER_ENV when --local is absent', () => {
+    const overrides = resolveHealthEnvOverrides([], { WIKI_SERVER_ENV: 'staging' });
+    expect(overrides).toEqual({ setEnv: {}, unsetEnv: [], localUrl: null });
+  });
+
+  it('pins LONGTERMWIKI_SERVER_URL and clears WIKI_SERVER_ENV for bare --local', () => {
+    const overrides = resolveHealthEnvOverrides(['--local'], {});
+    expect(overrides).toEqual({
+      setEnv: { LONGTERMWIKI_SERVER_URL: DEFAULT_LOCAL_URL },
+      unsetEnv: ['WIKI_SERVER_ENV'],
+      localUrl: DEFAULT_LOCAL_URL,
+    });
+  });
+
+  it('--local wins over a pre-set WIKI_SERVER_ENV=prod', () => {
+    // Regression: previously, `--local` just skipped the prod-guard block,
+    // which meant a pre-set WIKI_SERVER_ENV=prod would beat --local and the
+    // flag would be silently ignored. Now --local is authoritative.
+    const overrides = resolveHealthEnvOverrides(
+      ['--local=http://localhost:3011'],
+      { WIKI_SERVER_ENV: 'prod' },
+    );
+    expect(overrides.setEnv.LONGTERMWIKI_SERVER_URL).toBe('http://localhost:3011');
+    expect(overrides.unsetEnv).toContain('WIKI_SERVER_ENV');
+    expect(overrides.localUrl).toBe('http://localhost:3011');
+  });
+
+  it('propagates parseLocalModeUrl errors so the caller can exit cleanly', () => {
+    expect(() =>
+      resolveHealthEnvOverrides(['--local=https://example.com'], {}),
+    ).toThrow(/non-loopback host/);
+  });
+});
+
 
 describe('describeFetchError', () => {
   it('classifies ECONNREFUSED and hints at --local for localhost targets', () => {

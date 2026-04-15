@@ -45,8 +45,9 @@ Options:
   --report        Aggregate markdown report to stdout
   --auto-issue    Manage GitHub wellness issue (create/update/close)
   --cleanup-labels Auto-remove stale working labels (>8 hours)
-  --local         Check a local dev server (localhost:3002) instead of production.
-                  Default behavior is to check production via PROD_LONGTERMWIKI_SERVER_URL. (QUA-479)
+  --local         Check a local dev server at http://localhost:3002 (main clone default).
+  --local=URL     Check a specific local dev server URL (e.g. http://localhost:3011 for slot a1).
+                  Default behavior is to check production via PROD_LONGTERMWIKI_SERVER_URL. (QUA-479, QUA-491)
 
 Environment:
   LONGTERMWIKI_SERVER_URL        Wiki-server URL (required for most checks)

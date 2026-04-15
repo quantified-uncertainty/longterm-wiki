@@ -38,32 +38,32 @@ facts:
     source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
     notes: "Established by Commission Decision; funded through reshuffled Digital
       Europe Programme budget"
-  - id: QQrzPtGH0w
+  - id: f_oWao7ls7jb
     property: headquarters
     value: Brussels
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
-  - id: gxxSwS0ymQ
+  - id: f_qPhTpCcSke
     property: country
     value: Belgium
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
-  - id: gh0MhdbGhQ
+  - id: f_1Cj5YikeQ5
     property: website
     value: https://digital-strategy.ec.europa.eu/en/policies/ai-office
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
-  - id: 3BswWAVZmw
+  - id: f_lDoNXP5CFq
     property: headcount
     value: 140
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
-  - id: GCOQU9oHeg
+  - id: f_YjRonl2flF
     property: parent-organization
     value: European Commission
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
-  - id: U2CL0dO1Rg
+  - id: f_n3MbkXUXqA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
     source: https://www.wikidata.org/wiki/Q135841125

@@ -1,0 +1,477 @@
+{
+  "generated_at": "2026-04-14T22:33:47.629Z",
+  "safety": "TEMP-TABLE only; no persistent DDL; no writes; application_name=qua-476-benchmark",
+  "baseline_stats": {
+    "row_count": "38375",
+    "total_bytes": "54484992",
+    "heap_bytes": "26910720",
+    "index_bytes": "27205632",
+    "gin_bytes": "16416768"
+  },
+  "type_breakdown": [
+    {
+      "thing_type": "resource",
+      "n": "22601"
+    },
+    {
+      "thing_type": "grant",
+      "n": "5876"
+    },
+    {
+      "thing_type": "fact",
+      "n": "4507"
+    },
+    {
+      "thing_type": "entity",
+      "n": "2659"
+    },
+    {
+      "thing_type": "personnel",
+      "n": "1295"
+    },
+    {
+      "thing_type": "policy-stakeholder",
+      "n": "473"
+    },
+    {
+      "thing_type": "benchmark-result",
+      "n": "264"
+    },
+    {
+      "thing_type": "publication",
+      "n": "185"
+    },
+    {
+      "thing_type": "division",
+      "n": "111"
+    },
+    {
+      "thing_type": "funding-round",
+      "n": "90"
+    },
+    {
+      "thing_type": "investment",
+      "n": "72"
+    },
+    {
+      "thing_type": "funding-program",
+      "n": "59"
+    },
+    {
+      "thing_type": "research-area",
+      "n": "54"
+    },
+    {
+      "thing_type": "benchmark",
+      "n": "46"
+    },
+    {
+      "thing_type": "race-candidate",
+      "n": "42"
+    },
+    {
+      "thing_type": "political-race",
+      "n": "28"
+    },
+    {
+      "thing_type": "equity-position",
+      "n": "13"
+    }
+  ],
+  "baseline_queries": [
+    {
+      "query": "anthropic",
+      "tsquery": "anthropic:*",
+      "label": "baseline: \"anthropic\"",
+      "n": 5,
+      "p50": 144.609708,
+      "p95": 152.065542,
+      "p99": 152.065542,
+      "min": 143.104667,
+      "max": 152.065542,
+      "samples": [
+        143.104667,
+        144.251083,
+        144.609708,
+        144.855917,
+        152.065542
+      ]
+    },
+    {
+      "query": "openai",
+      "tsquery": "openai:*",
+      "label": "baseline: \"openai\"",
+      "n": 5,
+      "p50": 145.282084,
+      "p95": 178.207334,
+      "p99": 178.207334,
+      "min": 144.34975,
+      "max": 178.207334,
+      "samples": [
+        144.34975,
+        144.914459,
+        145.282084,
+        146.676833,
+        178.207334
+      ]
+    },
+    {
+      "query": "safety",
+      "tsquery": "safety:*",
+      "label": "baseline: \"safety\"",
+      "n": 5,
+      "p50": 148.924875,
+      "p95": 156.830375,
+      "p99": 156.830375,
+      "min": 147.6385,
+      "max": 156.830375,
+      "samples": [
+        147.6385,
+        148.720417,
+        148.924875,
+        152.613167,
+        156.830375
+      ]
+    },
+    {
+      "query": "governance",
+      "tsquery": "governance:*",
+      "label": "baseline: \"governance\"",
+      "n": 5,
+      "p50": 147.056084,
+      "p95": 154.666125,
+      "p99": 154.666125,
+      "min": 145.899167,
+      "max": 154.666125,
+      "samples": [
+        145.899167,
+        146.741792,
+        147.056084,
+        147.799334,
+        154.666125
+      ]
+    },
+    {
+      "query": "deepmind",
+      "tsquery": "deepmind:*",
+      "label": "baseline: \"deepmind\"",
+      "n": 5,
+      "p50": 142.920584,
+      "p95": 146.737,
+      "p99": 146.737,
+      "min": 141.558042,
+      "max": 146.737,
+      "samples": [
+        141.558042,
+        142.211125,
+        142.920584,
+        145.917291,
+        146.737
+      ]
+    },
+    {
+      "query": "evaluation benchmark",
+      "tsquery": "evaluation:* & benchmark:*",
+      "label": "baseline: \"evaluation benchmark\"",
+      "n": 5,
+      "p50": 143.331,
+      "p95": 144.462542,
+      "p99": 144.462542,
+      "min": 142.817917,
+      "max": 144.462542,
+      "samples": [
+        142.817917,
+        142.96975,
+        143.331,
+        144.445167,
+        144.462542
+      ]
+    },
+    {
+      "query": "sb 1047",
+      "tsquery": "sb:* & 1047:*",
+      "label": "baseline: \"sb 1047\"",
+      "n": 5,
+      "p50": 142.860834,
+      "p95": 144.49575,
+      "p99": 144.49575,
+      "min": 141.655333,
+      "max": 144.49575,
+      "samples": [
+        141.655333,
+        141.85825,
+        142.860834,
+        142.865125,
+        144.49575
+      ]
+    },
+    {
+      "query": "alignment research",
+      "tsquery": "alignment:* & research:*",
+      "label": "baseline: \"alignment research\"",
+      "n": 5,
+      "p50": 144.563542,
+      "p95": 145.906791,
+      "p99": 145.906791,
+      "min": 143.323125,
+      "max": 145.906791,
+      "samples": [
+        143.323125,
+        143.698584,
+        144.563542,
+        145.784375,
+        145.906791
+      ]
+    },
+    {
+      "query": "grant recipient",
+      "tsquery": "grant:* & recipient:*",
+      "label": "baseline: \"grant recipient\"",
+      "n": 5,
+      "p50": 143.829292,
+      "p95": 144.67375,
+      "p99": 144.67375,
+      "min": 142.088667,
+      "max": 144.67375,
+      "samples": [
+        142.088667,
+        143.675292,
+        143.829292,
+        144.295417,
+        144.67375
+      ]
+    },
+    {
+      "query": "nonexistentxyzqueryqwerty",
+      "tsquery": "nonexistentxyzqueryqwerty:*",
+      "label": "baseline: \"nonexistentxyzqueryqwerty\"",
+      "n": 5,
+      "p50": 142.207542,
+      "p95": 144.586584,
+      "p99": 144.586584,
+      "min": 141.83525,
+      "max": 144.586584,
+      "samples": [
+        141.83525,
+        141.93425,
+        142.207542,
+        142.275833,
+        144.586584
+      ]
+    }
+  ],
+  "temp_build_sizes": {
+    "total_bytes": "35151872",
+    "heap_bytes": "22544384",
+    "index_bytes": "12451840"
+  },
+  "temp_build_runs": {
+    "build_ms": [
+      2103.2735,
+      2273.7235,
+      2274.4015
+    ],
+    "pk_index_ms": [
+      243.53475,
+      248.586417,
+      256.808166
+    ],
+    "gin_index_ms": [
+      856.937458,
+      961.066167,
+      1697.529167
+    ],
+    "build_ms_avg": 2217.132833333333,
+    "total_build_avg_ms": 3638.6202083333333
+  },
+  "mv_queries": [
+    {
+      "query": "anthropic",
+      "tsquery": "anthropic:*",
+      "label": "mv: \"anthropic\"",
+      "n": 5,
+      "p50": 145.768958,
+      "p95": 153.337541,
+      "p99": 153.337541,
+      "min": 144.460667,
+      "max": 153.337541,
+      "samples": [
+        144.460667,
+        144.799125,
+        145.768958,
+        152.013791,
+        153.337541
+      ]
+    },
+    {
+      "query": "openai",
+      "tsquery": "openai:*",
+      "label": "mv: \"openai\"",
+      "n": 5,
+      "p50": 150.548667,
+      "p95": 151.663875,
+      "p99": 151.663875,
+      "min": 147.038666,
+      "max": 151.663875,
+      "samples": [
+        147.038666,
+        147.377375,
+        150.548667,
+        150.896959,
+        151.663875
+      ]
+    },
+    {
+      "query": "safety",
+      "tsquery": "safety:*",
+      "label": "mv: \"safety\"",
+      "n": 5,
+      "p50": 150.435042,
+      "p95": 164.531083,
+      "p99": 164.531083,
+      "min": 149.352333,
+      "max": 164.531083,
+      "samples": [
+        149.352333,
+        150.249208,
+        150.435042,
+        151.583417,
+        164.531083
+      ]
+    },
+    {
+      "query": "governance",
+      "tsquery": "governance:*",
+      "label": "mv: \"governance\"",
+      "n": 5,
+      "p50": 149.262084,
+      "p95": 151.757542,
+      "p99": 151.757542,
+      "min": 145.785417,
+      "max": 151.757542,
+      "samples": [
+        145.785417,
+        148.169208,
+        149.262084,
+        149.875792,
+        151.757542
+      ]
+    },
+    {
+      "query": "deepmind",
+      "tsquery": "deepmind:*",
+      "label": "mv: \"deepmind\"",
+      "n": 5,
+      "p50": 142.670875,
+      "p95": 143.256417,
+      "p99": 143.256417,
+      "min": 141.097667,
+      "max": 143.256417,
+      "samples": [
+        141.097667,
+        142.018333,
+        142.670875,
+        143.173666,
+        143.256417
+      ]
+    },
+    {
+      "query": "evaluation benchmark",
+      "tsquery": "evaluation:* & benchmark:*",
+      "label": "mv: \"evaluation benchmark\"",
+      "n": 5,
+      "p50": 142.301417,
+      "p95": 143.059459,
+      "p99": 143.059459,
+      "min": 141.991833,
+      "max": 143.059459,
+      "samples": [
+        141.991833,
+        142.143917,
+        142.301417,
+        142.725208,
+        143.059459
+      ]
+    },
+    {
+      "query": "sb 1047",
+      "tsquery": "sb:* & 1047:*",
+      "label": "mv: \"sb 1047\"",
+      "n": 5,
+      "p50": 142.744833,
+      "p95": 144.520542,
+      "p99": 144.520542,
+      "min": 142.600209,
+      "max": 144.520542,
+      "samples": [
+        142.600209,
+        142.647042,
+        142.744833,
+        143.749292,
+        144.520542
+      ]
+    },
+    {
+      "query": "alignment research",
+      "tsquery": "alignment:* & research:*",
+      "label": "mv: \"alignment research\"",
+      "n": 5,
+      "p50": 146.50375,
+      "p95": 147.6405,
+      "p99": 147.6405,
+      "min": 144.395875,
+      "max": 147.6405,
+      "samples": [
+        144.395875,
+        144.684625,
+        146.50375,
+        146.506458,
+        147.6405
+      ]
+    },
+    {
+      "query": "grant recipient",
+      "tsquery": "grant:* & recipient:*",
+      "label": "mv: \"grant recipient\"",
+      "n": 5,
+      "p50": 142.431125,
+      "p95": 146.813,
+      "p99": 146.813,
+      "min": 141.337,
+      "max": 146.813,
+      "samples": [
+        141.337,
+        142.36175,
+        142.431125,
+        143.893458,
+        146.813
+      ]
+    },
+    {
+      "query": "nonexistentxyzqueryqwerty",
+      "tsquery": "nonexistentxyzqueryqwerty:*",
+      "label": "mv: \"nonexistentxyzqueryqwerty\"",
+      "n": 5,
+      "p50": 141.141875,
+      "p95": 142.78025,
+      "p99": 142.78025,
+      "min": 140.892792,
+      "max": 142.78025,
+      "samples": [
+        140.892792,
+        140.9385,
+        141.141875,
+        142.060292,
+        142.78025
+      ]
+    }
+  ],
+  "join_build_ms": 2082.102917,
+  "join_vs_self_delta_ms": -135.02991633333295,
+  "concurrent_refresh_note": {
+    "tested": false,
+    "reason": "Cannot issue REFRESH MATERIALIZED VIEW CONCURRENTLY against a TEMP table, and creating a persistent MV on prod was out of scope for this benchmark (dispatcher said check with coordinator first).",
+    "estimated_concurrent_refresh_ms": 7277.2404166666665,
+    "reference": "PostgreSQL docs: REFRESH MATERIALIZED VIEW CONCURRENTLY builds a new snapshot, diffs, and applies — roughly 2x the non-concurrent cost. Readers are not blocked."
+  }
+}

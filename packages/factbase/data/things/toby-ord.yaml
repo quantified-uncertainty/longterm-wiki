@@ -37,22 +37,22 @@ facts:
     value: "The Precipice; existential risk quantification; effective altruism"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-  - id: gCm5sBgiQA
+  - id: f_gOLlHj7q76
     property: born-year
     value: 1979
     source: https://www.wikidata.org/wiki/Q7811863
     notes: From Wikidata Q7811863
-  - id: WT3OtsGD2Q
+  - id: f_u0z9E8i5aR
     property: education
     value: University of Melbourne
     source: https://www.wikidata.org/wiki/Q7811863
     notes: From Wikidata Q7811863
-  - id: SFGNdjLexw
+  - id: f_ghwqGOvSnD
     property: website
     value: https://www.tobyord.com/
     source: https://www.wikidata.org/wiki/Q7811863
     notes: From Wikidata Q7811863
-  - id: 7VES2q75xQ
+  - id: f_LKWZyixiXb
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Toby_Ord
     source: https://www.wikidata.org/wiki/Q7811863

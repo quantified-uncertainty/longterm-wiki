@@ -10,7 +10,7 @@ facts:
   - id: f_YryJVbw2Bw
     property: website
     value: https://metr.org
-  - id: W7dp77NYEg
+  - id: f_PMdKA7BvQa
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Metre
     source: https://www.wikidata.org/wiki/Q11573

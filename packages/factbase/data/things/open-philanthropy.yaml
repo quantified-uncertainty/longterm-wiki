@@ -6,7 +6,7 @@ facts:
       the Coefficient Giving page for current information.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: oT6jWFtI9A
+  - id: f_9xXqEmsnae
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Open_Philanthropy
     source: https://www.wikidata.org/wiki/Q7096163

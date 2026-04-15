@@ -17,12 +17,12 @@ facts:
     value: "B.S. in Computer Science, University of California, Berkeley"
     source: https://intelligence.org/team/
     notes: Enriched from public information
-  - id: F7wEM1Rqcw
+  - id: f_P4WQ3FZ54G
     property: born-year
     value: 1989
     source: https://www.wikidata.org/wiki/Q136721135
     notes: From Wikidata Q136721135
-  - id: 43N4j7y4PA
+  - id: f_3SutwzJ9VB
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Nate_Soares
     source: https://www.wikidata.org/wiki/Q136721135

@@ -31,12 +31,12 @@ facts:
       - !ref sid_kLIpOZtU1n
       - !ref sid_n0d7I3OAej
     source: https://www.conjecture.dev/
-  - id: x1hQfPpo8g
+  - id: f_O5z0JSJLy4
     property: website
     value: https://www.conjecture.org
     source: https://www.wikidata.org/wiki/Q130712629
     notes: From Wikidata Q130712629
-  - id: tUbXDGqqew
+  - id: f_9UF7WFexWC
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Conjecture
     source: https://www.wikidata.org/wiki/Q319141

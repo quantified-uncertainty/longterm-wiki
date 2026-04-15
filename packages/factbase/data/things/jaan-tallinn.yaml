@@ -16,12 +16,12 @@ facts:
     value: "Personal foundation giving (2024): $20M (excludes SFF amounts)"
     source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
     notes: "Allocated through personal foundation in 2024"
-  - id: Qhkqi9dJtA
+  - id: f_ZbWZ3tzTaf
     property: born-year
     value: 1972
     source: https://www.wikidata.org/wiki/Q3156998
     notes: From Wikidata Q3156998
-  - id: xGcPzg2OvQ
+  - id: f_XXixZKKyUT
     property: education
     value: University of Tartu; Gustav Adolf Grammar School
     source: https://www.wikidata.org/wiki/Q3156998

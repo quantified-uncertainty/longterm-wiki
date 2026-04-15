@@ -1,0 +1,114 @@
+{
+  "table": "personnel",
+  "recordCount": 12,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-15T11:26:04.178Z",
+  "sourcingSummary": {
+    "withSourcing": 12,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 12,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "5XR0BkIP40",
+      "personId": "PxUwupOenl",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Executive Director",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "eotDyUzG3X",
+      "personId": "69W0K0EknS",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Deputy Director",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "ljSAsEFhM1",
+      "personId": "sid_NRW6ZB83dF",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Technical Lead, Common Mechanism",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "wTFPKsmJGS",
+      "personId": "MmvAmrd2jC",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Senior Fellow",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "ZLd3pXr4zf",
+      "personId": "2zrbN83hnT",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Technical Lead",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "caTg6IVNvT",
+      "personId": "eSDkx799Iu",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Programme Manager",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "oe3BL0xAhf",
+      "personId": "dO7CDn0k9l",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Policy Lead, International Standards",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "mWpkft0R1P",
+      "personId": "TZVRwt8kvz",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Bioinformatics Engineer",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "MJfXS9pO1B",
+      "personId": "5mjEV28SuI",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Technical Consultant",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "Wy1lgbnW23",
+      "personId": "QRFTNxCy2o",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Biosecurity Game Changers Fellow",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "iwmkG0dQLa",
+      "personId": "eug4nMG8Mh",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Senior Bioinformatics Engineer",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "O8klh1s3gT",
+      "personId": "pLNMOJoeUN",
+      "organizationId": "sid_55HJBLrOzg",
+      "role": "Senior Fellow",
+      "source": "https://ibbis.bio/about/people/",
+      "verdict": "confirmed"
+    }
+  ]
+}

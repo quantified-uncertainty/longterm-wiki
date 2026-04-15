@@ -9,17 +9,17 @@ facts:
       regulation that show l
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: JVCVmdRuzA
+  - id: f_76Qa0mCT2d
     property: founded-date
     value: "2018"
     source: https://www.wikidata.org/wiki/Q114586938
     notes: From Wikidata Q114586938
-  - id: 2C9ndfFdRg
+  - id: f_V9ktcRGrpm
     property: headquarters
     value: New York City
     source: https://www.wikidata.org/wiki/Q114586938
     notes: From Wikidata Q114586938
-  - id: jYc4Oe5GJA
+  - id: f_9ad0cFJmGb
     property: website
     value: https://kalshi.com/
     source: https://www.wikidata.org/wiki/Q114586938

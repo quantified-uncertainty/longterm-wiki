@@ -15,12 +15,12 @@ facts:
       thesis"
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
-  - id: CSAKC0XVnA
+  - id: f_LSwoEnRj38
     property: education
     value: Dalle Molle Institute for Artificial Intelligence Research
     source: https://www.wikidata.org/wiki/Q22278829
     notes: From Wikidata Q22278829
-  - id: U1X5HaKSTw
+  - id: f_ZQMlFhM9Bc
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Shane_Legg
     source: https://www.wikidata.org/wiki/Q22278829

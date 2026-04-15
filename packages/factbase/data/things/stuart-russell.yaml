@@ -35,7 +35,7 @@ facts:
   - id: f_ytjh35xr0n
     property: google-scholar
     value: "https://scholar.google.com/citations?user=2oy3OXYAAAAJ"
-  - id: PFHjRT4Ekw
+  - id: f_MGo75RXZ9A
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Stuart_Russell_(politician)
     source: https://www.wikidata.org/wiki/Q7627055

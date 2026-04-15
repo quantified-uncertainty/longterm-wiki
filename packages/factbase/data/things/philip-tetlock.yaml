@@ -8,12 +8,12 @@ facts:
       intelligence analysts.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: jjWpOtd4OQ
+  - id: f_Z2l8oPsrxt
     property: born-year
     value: 1954
     source: https://www.wikidata.org/wiki/Q2086480
     notes: From Wikidata Q2086480
-  - id: PLYgQRHbJA
+  - id: f_FAYQhcZXdh
     property: education
     value: Yale University; University of British Columbia
     source: https://www.wikidata.org/wiki/Q2086480
@@ -31,7 +31,7 @@ facts:
     value: "B.A. Psychology, University of British Columbia (1975); M.A. Psychology
       (1976); Ph.D. Psychology, Yale University (1979)"
     notes: Enriched from wiki page
-  - id: P6gxwzcdeQ
+  - id: f_KZjwLeNScW
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Philip_E._Tetlock
     source: https://www.wikidata.org/wiki/Q2086480

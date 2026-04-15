@@ -151,6 +151,31 @@ describe("captureIdFormatAudit", () => {
     expect(result.totals.other).toBe(0);
   });
 
+  it("legacy_alnum10 regex matches naked 10-char alnums (QUA-499)", async () => {
+    const { ID_FORMAT_REGEXES } = await import(
+      "../routes/operational/data-quality.js"
+    );
+    const re = new RegExp(ID_FORMAT_REGEXES.legacy_alnum10);
+    // The canonical example from the ticket — has upper + lower, no digit.
+    expect(re.test("gNRivVEYsw")).toBe(true);
+    // Mixed-case with digit still matches.
+    expect(re.test("aB3cD4eF5g")).toBe(true);
+    // All-lowercase alnum.
+    expect(re.test("abcdefghij")).toBe(true);
+    // Prefixed canonical forms must NOT match (length > 10).
+    expect(re.test("f_gNRivVEYsw")).toBe(false);
+    expect(re.test("sid_gNRivVEY")).toBe(false);
+    // Pure hex8 (8 chars) — wrong length.
+    expect(re.test("abc12345")).toBe(false);
+    // Pure hex16 (16 chars) — wrong length.
+    expect(re.test("abcdef0123456789")).toBe(false);
+    // Non-alnum rejected.
+    expect(re.test("gNRivVEY-w")).toBe(false);
+    // 9 or 11 chars rejected.
+    expect(re.test("gNRivVEYs")).toBe(false);
+    expect(re.test("gNRivVEYsww")).toBe(false);
+  });
+
   it("negative-safe: named sum > total still produces non-negative other", async () => {
     // Degenerate case — shouldn't happen in prod but we clamp with Math.max(0, ...)
     const result = await runCapture({

@@ -9,7 +9,7 @@ facts:
       from sources includin
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: r6q9dDsYiw
+  - id: f_SLTccmYxbs
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/1Day_Sooner
     source: https://www.wikidata.org/wiki/Q116882396

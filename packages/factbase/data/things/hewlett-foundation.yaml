@@ -9,42 +9,42 @@ facts:
       history and controve
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: GDDNkhfddw
+  - id: f_KGvwBVD7xv
     property: founded-date
     value: "1966"
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: IIm6bu985w
+  - id: f_KGVdw0WgBL
     property: headquarters
     value: Menlo Park
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: HKEBuHCnIQ
+  - id: f_9alU3tQVKD
     property: website
     value: https://www.hewlett.org/
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: bdjZOfS6gw
+  - id: f_oSY9YHQidd
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: 5XnKPmzfTw
+  - id: f_ZEbDstc9bG
     property: revenue
     value: 289396942
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: 2SqQmCnUhw
+  - id: f_gQXsc9HHBR
     property: founded-by-name
     value: William Redington Hewlett
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412; text value (not entity ref)
-  - id: X4y81AG3GQ
+  - id: f_tbfZzuzCRr
     property: legal-structure
     value: foundation
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-  - id: e8TdBohfLA
+  - id: f_wXlXMAHr9G
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Hewlett_Foundation
     source: https://www.wikidata.org/wiki/Q1288412

@@ -9,17 +9,17 @@ facts:
       AI framework conduc
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: c0xlY3hLXA
+  - id: f_QYAnAj3qg6
     property: ceo
     value: Mustafa Süleyman
     source: https://www.wikidata.org/wiki/Q125891217
     notes: From Wikidata Q125891217
-  - id: NwtFtR1Ygg
+  - id: f_cLGLs94fuy
     property: parent-organization
     value: Microsoft
     source: https://www.wikidata.org/wiki/Q125891217
     notes: From Wikidata Q125891217
-  - id: LWY3bMZ4GA
+  - id: f_oZWr6Chfrb
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Microsoft_AI
     source: https://www.wikidata.org/wiki/Q125891217

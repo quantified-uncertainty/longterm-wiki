@@ -9,12 +9,12 @@ facts:
       appearances
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: Cr5m9z8HbQ
+  - id: f_blO0ACZ8NR
     property: born-year
     value: 1992
     source: https://www.wikidata.org/wiki/Q123475976
     notes: From Wikidata Q123475976
-  - id: McI9BWWOXw
+  - id: f_e6tvuU4XIf
     property: education
     value: Georgetown University; University of Melbourne
     source: https://www.wikidata.org/wiki/Q123475976

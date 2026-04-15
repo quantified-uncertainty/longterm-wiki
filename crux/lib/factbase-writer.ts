@@ -39,7 +39,7 @@ export function readEntityDocument(filepath: string): Document {
 /**
  * Append a fact to an entity YAML document.
  * Adds to the `facts` sequence node, preserving existing structure.
- * Auto-generates a plain 10-char alphanumeric fact ID.
+ * Auto-generates an `f_` + 10-char alphanumeric fact ID via `generateFactId()`.
  */
 export function appendFact(doc: Document, fact: RawFactInput): string {
   const factId = generateFactId();

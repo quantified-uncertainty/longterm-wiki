@@ -9,22 +9,22 @@ facts:
       Givi"
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: KRsTLAVPnQ
+  - id: f_iJdgRGa66j
     property: founded-date
     value: "2018"
     source: https://www.wikidata.org/wiki/Q126277820
     notes: From Wikidata Q126277820
-  - id: sEPBGRfOAA
+  - id: f_jeCGCciPsr
     property: website
     value: https://www.longview.org/
     source: https://www.wikidata.org/wiki/Q126277820
     notes: From Wikidata Q126277820
-  - id: hzk6bK3REA
+  - id: f_1lLfbxmJom
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q126277820
     notes: "Longview is UK-based (London). Wikidata lists both UK and US; corrected to primary location."
-  - id: 4Ncez877ig
+  - id: f_hKc0IS3oWj
     property: founded-by-name
     value: Natalie Cargill
     source: https://www.wikidata.org/wiki/Q126277820

@@ -21,27 +21,27 @@ facts:
     value:
       - !ref sid_vzxfzxBITd
     source: https://alignment.org/
-  - id: xU3JVFJnrQ
+  - id: f_GPi8lgtZXI
     property: website
     value: http://alignment.org/
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
-  - id: wrc47TsjkA
+  - id: f_zxE2AULKv3
     property: founded-date
     value: 2021-04
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
-  - id: xqn7E6ny5g
+  - id: f_T7ccXjSTpH
     property: headquarters
     value: Berkeley
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
-  - id: D4L2ZYrbKQ
+  - id: f_AefxVIHGz2
     property: founded-by-name
     value: Paul Christiano
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778; text value (not entity ref)
-  - id: HruCYvBoHA
+  - id: f_aOLa0LB5z7
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Alignment_Research_Center
     source: https://www.wikidata.org/wiki/Q117834778

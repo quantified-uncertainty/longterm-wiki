@@ -2,28 +2,28 @@ entity: sid_pwHtwwEByZ
 facts:
   [
     {
-        id: EMliIdGa0A,
+        id: f_6NZC8DROSL,
         property: headquarters,
         value: Sacramento,
         source: https://www.wikidata.org/wiki/Q136680743,
         notes: From Wikidata Q136680743
       },
     {
-        id: 7yE1KF6fyA,
+        id: f_fG3cHovtm2,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q136680743,
         notes: From Wikidata Q136680743
       },
     {
-        id: AJVRxprDBw,
+        id: f_s79wqGkTUJ,
         property: website,
         value: https://cayimby.org/,
         source: https://www.wikidata.org/wiki/Q136680743,
         notes: From Wikidata Q136680743
       },
     {
-        id: 9bOpCaVDZw,
+        id: f_4kWrA7aJ1c,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/California_YIMBY,
         source: https://www.wikidata.org/wiki/Q136680743,

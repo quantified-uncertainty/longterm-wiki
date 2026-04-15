@@ -42,37 +42,37 @@ facts:
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
     notes: "Approximately 805 employees after laying off ~70 (~8% of ~875 workforce)
       to refocus on AI-biomedical research"
-  - id: m7Lq9YLiqw
+  - id: f_PAnwg8Yht1
     property: founded-date
     value: "2015"
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-  - id: H4p8icjZnw
+  - id: f_dICgd5ylsZ
     property: headquarters
     value: Redwood City
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-  - id: euDjDvv50g
+  - id: f_NlU8nCaeX7
     property: website
     value: https://chanzuckerberg.com/
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-  - id: HGikJLLWEQ
+  - id: f_d9rSE3cpHG
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-  - id: Ts2N71qCVA
+  - id: f_AfbJs94h6b
     property: founded-by-name
     value: Mark Zuckerberg and Priscilla Chan
     source: https://www.wikidata.org/wiki/Q21623039
     notes: "Co-founded by Mark Zuckerberg and Priscilla Chan (corrected — previously listed only Mark)"
-  - id: 9saf9wrWBA
+  - id: f_Ifl9HbfGOb
     property: legal-structure
     value: limited liability company
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-  - id: GOGmnvoaDA
+  - id: f_jnCNhvmZBU
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     source: https://www.wikidata.org/wiki/Q21623039

@@ -145,7 +145,7 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/582565917
     notes: "Revenue spike from Vitalik Buterin Ethereum donation — one-time windfall.
       Moved from 'revenue' to 'one-time-donation' to avoid distorting charts."
-  - id: naKZe9gv3A
+  - id: f_i7nengkXdv
     property: website
     value: http://intelligence.org/
     source: https://www.wikidata.org/wiki/Q2040269

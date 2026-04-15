@@ -40,17 +40,17 @@ facts:
       organizations and focuses on responsible AI practices and guidelines."
     asOf: 2026-03
     source: https://partnershiponai.org/about/
-  - id: hoogixWPXg
+  - id: f_nRX8DIdvUb
     property: website
     value: https://www.partnershiponai.org
     source: https://www.wikidata.org/wiki/Q27057835
     notes: From Wikidata Q27057835
-  - id: THMYIbF2Iw
+  - id: f_L13FTGMRQK
     property: founded-by-name
     value: Apple Inc.
     source: https://www.wikidata.org/wiki/Q27057835
     notes: From Wikidata Q27057835; text value (not entity ref)
-  - id: d67bPtkj3w
+  - id: f_FVhAxEGqPr
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Partnership_on_AI
     source: https://www.wikidata.org/wiki/Q27057835

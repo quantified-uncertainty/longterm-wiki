@@ -289,6 +289,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-483: keeps @wiki-server/* path alias keys identical between
+    // crux/tsconfig.json and apps/web/tsconfig.json. Drift causes fake
+    // "Cannot find module" errors in the crux tsc check and silently
+    // inflates the crux-tsc-baseline. Cheap and deterministic — blocking.
+    id: 'tsconfig-aliases',
+    name: 'tsconfig @wiki-server/* alias parity',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-tsconfig-aliases.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-294: enforces NOT VALID on ADD CONSTRAINT for large tables.
     // Migration 0173 caused a ~12h prod deploy stall by taking ACCESS
     // EXCLUSIVE on hallucination_risk_snapshots without NOT VALID.

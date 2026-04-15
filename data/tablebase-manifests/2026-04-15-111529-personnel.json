@@ -1,0 +1,58 @@
+{
+  "table": "personnel",
+  "recordCount": 5,
+  "recordsRejected": 2,
+  "submittedAt": "2026-04-15T11:15:29.818Z",
+  "sourcingSummary": {
+    "withSourcing": 5,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 3,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 2
+    }
+  },
+  "records": [
+    {
+      "id": "1ZSklOcf1g",
+      "personId": "sid_1CHfDs0vsg",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Director",
+      "source": "https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership-us",
+      "verdict": "partial"
+    },
+    {
+      "id": "mnpRjTnB3w",
+      "personId": "wuQYizeFdn",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Chief Technology Officer",
+      "source": "https://www.nist.gov/news-events/news/2024/02/us-commerce-secretary-gina-raimondo-announces-key-executive-leadership-us",
+      "verdict": "partial"
+    },
+    {
+      "id": "goq92u9aoi",
+      "personId": "sid_vzxfzxBITd",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Head of AI Safety",
+      "source": "https://www.nist.gov/news-events/news/2024/04/us-commerce-secretary-gina-raimondo-announces-expansion-us-ai-safety",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "jhs0QwP8GE",
+      "personId": "ZNCREKZ1WW",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Senior Advisor",
+      "source": "https://www.nist.gov/news-events/news/2024/04/us-commerce-secretary-gina-raimondo-announces-expansion-us-ai-safety",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "HyYKudbH04",
+      "personId": "P4RnyqDcn7",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Head of International Engagement",
+      "source": "https://www.nist.gov/news-events/news/2024/04/us-commerce-secretary-gina-raimondo-announces-expansion-us-ai-safety",
+      "verdict": "confirmed"
+    }
+  ]
+}

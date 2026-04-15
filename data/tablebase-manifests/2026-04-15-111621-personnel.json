@@ -1,0 +1,34 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-15T11:16:21.378Z",
+  "sourcingSummary": {
+    "withSourcing": 2,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 2,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Zesm14xylu",
+      "personId": "rHW5y7596E",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Chief Vision Officer",
+      "source": "https://www.nist.gov/news-events/news/2024/04/us-commerce-secretary-gina-raimondo-announces-expansion-us-ai-safety",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "Mtu908T5qL",
+      "personId": "WkrMhfcwM1",
+      "organizationId": "sid_Eac7pHF06Q",
+      "role": "Acting COO and Chief of Staff",
+      "source": "https://www.nist.gov/news-events/news/2024/04/us-commerce-secretary-gina-raimondo-announces-expansion-us-ai-safety",
+      "verdict": "confirmed"
+    }
+  ]
+}

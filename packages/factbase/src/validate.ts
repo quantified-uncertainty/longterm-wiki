@@ -80,8 +80,8 @@ function looksLikeDate(value: unknown): boolean {
 /** Entity ID format: exactly 10 alphanumeric chars (legacy) OR sid_ + alphanumeric (new). */
 const ENTITY_ID_RE = /^([A-Za-z0-9]{10}|sid_[A-Za-z0-9]+)$/;
 
-/** Fact ID format: 10 alphanumeric chars (new), or f_ + 10 (legacy), or inv_ (computed). */
-const FACTID_RE = /^([A-Za-z0-9]{10}|f_[A-Za-z0-9]{10}|inv_.+)$/;
+/** Fact ID format: `f_` + exactly 10 alphanumeric chars, or `inv_` prefix (computed inverses). */
+const FACTID_RE = /^(f_[A-Za-z0-9]{10}|inv_.+)$/;
 
 /** Date format: YYYY, YYYY-MM, or YYYY-MM-DD. */
 const DATE_FORMAT_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
@@ -249,7 +249,7 @@ function checkEntityIdFormat(
   return [];
 }
 
-/** Check 9: fact ID format — must be 10 alphanumeric, or f_ + 10, or inv_ prefix. */
+/** Check 9: fact ID format — must be `f_` + 10 alphanumeric, or `inv_` prefix. */
 function checkFactIdFormat(
   graph: Graph,
   entityId: string
@@ -264,7 +264,7 @@ function checkFactIdFormat(
         entityId,
         message:
           `Fact "${fact.id}" on entity "${entityId}" has invalid ID format ` +
-          `(must be 10 alphanumeric chars, "f_" + 10 chars, or "inv_" prefix for inverses).`,
+          `(must be "f_" + 10 alphanumeric chars, or "inv_" prefix for inverses).`,
         rule: "factid-format",
       });
     }

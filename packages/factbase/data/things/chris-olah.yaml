@@ -29,12 +29,12 @@ facts:
   - id: f_s2rmoloko5
     property: google-scholar
     value: "https://scholar.google.com/citations?user=vKAKE1gAAAAJ"
-  - id: VRzfPxd0og
+  - id: f_MyJoRfuhp3
     property: website
     value: https://colah.github.io.
     source: https://www.wikidata.org/wiki/Q50358648
     notes: From Wikidata Q50358648
-  - id: v9IV1EJ1GA
+  - id: f_vkqVAInE6z
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Chris_Olah
     source: https://www.wikidata.org/wiki/Q50358648

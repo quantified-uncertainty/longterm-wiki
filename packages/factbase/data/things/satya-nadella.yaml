@@ -17,7 +17,7 @@ facts:
   - id: f_ZwHcneamiw
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Satya_Nadella"
-  - id: a0yZGfv11Q
+  - id: f_4YvE0vs0w0
     property: website
     value: https://news.microsoft.com/exec/satya-nadella/
     source: https://www.wikidata.org/wiki/Q7426870
