@@ -70,6 +70,14 @@ const CLEANUP_LABELS = args.includes('--cleanup-labels');
 export const DEFAULT_LOCAL_URL = 'http://localhost:3002';
 
 /**
+ * Hostnames accepted for `--local=URL`. `--local` is semantically "point at a
+ * loopback dev server" — restricting the host prevents a footgun where a
+ * stale `LONGTERMWIKI_SERVER_API_KEY` in `.env` gets forwarded as a `Bearer`
+ * header to a real remote server the user typed by mistake.
+ */
+const LOOPBACK_HOSTS = new Set(['localhost', '127.0.0.1', '0.0.0.0', '[::1]', '::1']);
+
+/**
  * Parse the `--local[=URL]` CLI flag.
  *
  * Before QUA-491, `--local` just skipped the prod-env guard and let the
@@ -80,37 +88,97 @@ export const DEFAULT_LOCAL_URL = 'http://localhost:3002';
  *
  * Returns:
  *   - `null` when `--local` is not passed
- *   - `DEFAULT_LOCAL_URL` for bare `--local`
- *   - The value after `=` for `--local=http://...`
+ *   - `DEFAULT_LOCAL_URL` for bare `--local` or `--local=` (empty value)
+ *   - The (validated) value after `=` for `--local=http://localhost:PORT`
+ *
+ * Throws when the explicit URL is unparseable or points at a non-loopback
+ * host. The caller is expected to catch and print a clean CLI error.
  */
 export function parseLocalModeUrl(argv: readonly string[]): string | null {
   const arg = argv.find((a) => a === '--local' || a.startsWith('--local='));
   if (!arg) return null;
   if (arg === '--local') return DEFAULT_LOCAL_URL;
-  return arg.slice('--local='.length);
+  const rawValue = arg.slice('--local='.length);
+  if (rawValue === '') return DEFAULT_LOCAL_URL;
+  let parsed: URL;
+  try {
+    parsed = new URL(rawValue);
+  } catch {
+    throw new Error(
+      `Invalid --local URL: ${JSON.stringify(rawValue)}. ` +
+        `Expected an absolute URL like http://localhost:3011`,
+    );
+  }
+  const host = parsed.hostname.toLowerCase();
+  if (!LOOPBACK_HOSTS.has(host)) {
+    throw new Error(
+      `--local=${rawValue} points at non-loopback host "${parsed.hostname}". ` +
+        `--local only accepts localhost / 127.0.0.1 / ::1 URLs so that ` +
+        `stale API keys are never sent to a remote server. ` +
+        `Drop --local to check production, or use a loopback URL.`,
+    );
+  }
+  return rawValue;
 }
 
-const LOCAL_URL = parseLocalModeUrl(args);
-const LOCAL_MODE = LOCAL_URL !== null;
+/**
+ * Pure function describing the env mutations `crux health` should apply for
+ * a given argv + current env. Extracted so the side-effect block below is
+ * integration-testable. Callers apply `delete`/`set` to `process.env`
+ * themselves — this helper never touches globals.
+ */
+export interface HealthEnvOverrides {
+  setEnv: Record<string, string>;
+  unsetEnv: readonly string[];
+  localUrl: string | null;
+}
 
-// Default to production unless --local was passed (QUA-479). `crux health`
-// is semantically "is production healthy?", so it should work from any
-// directory (coord/, agent slots, worktrees) without requiring users to
-// remember `WIKI_SERVER_ENV=prod`. When --local is passed, pin the URL
-// explicitly instead of letting the current .env decide (QUA-491) — otherwise
-// `--local` is slot-ambiguous. Respect an explicit pre-set WIKI_SERVER_ENV
-// so callers who set it themselves keep their choice. Gated on
-// INVOKED_AS_SCRIPT so importing this module from tests does not mutate
+export function resolveHealthEnvOverrides(
+  argv: readonly string[],
+  env: Readonly<Record<string, string | undefined>>,
+): HealthEnvOverrides {
+  const localUrl = parseLocalModeUrl(argv);
+  if (localUrl !== null) {
+    // `--local` wins over a pre-set WIKI_SERVER_ENV. Pinning the URL is the
+    // whole point of QUA-491: if we left WIKI_SERVER_ENV=prod in place,
+    // getServerUrl() would keep reading PROD_LONGTERMWIKI_SERVER_URL and the
+    // --local flag would be silently ignored.
+    return {
+      setEnv: { LONGTERMWIKI_SERVER_URL: localUrl },
+      unsetEnv: ['WIKI_SERVER_ENV'],
+      localUrl,
+    };
+  }
+  // Default to production, but respect an explicit pre-set WIKI_SERVER_ENV.
+  if (!env.WIKI_SERVER_ENV) {
+    return { setEnv: { WIKI_SERVER_ENV: 'prod' }, unsetEnv: [], localUrl: null };
+  }
+  return { setEnv: {}, unsetEnv: [], localUrl: null };
+}
+
+// `crux health` is semantically "is production healthy?", so it defaults to
+// WIKI_SERVER_ENV=prod and works from any directory (coord/, agent slots,
+// worktrees) without requiring users to remember the env var (QUA-479).
+// `--local[=URL]` pins a loopback URL explicitly instead of trusting the
+// current .env (QUA-491) — otherwise `--local` is slot-ambiguous. Gated on
+// INVOKED_AS_SCRIPT so importing this module from tests doesn't mutate
 // process.env and pollute other tests (sync-session.test.ts, client.test.ts
 // both care).
+let LOCAL_MODE = false;
 if (INVOKED_AS_SCRIPT) {
-  if (LOCAL_MODE) {
-    // Clear WIKI_SERVER_ENV so getServerUrl() reads the non-prod prefix.
-    delete process.env.WIKI_SERVER_ENV;
-    process.env.LONGTERMWIKI_SERVER_URL = LOCAL_URL!;
-  } else if (!process.env.WIKI_SERVER_ENV) {
-    process.env.WIKI_SERVER_ENV = 'prod';
+  let overrides: HealthEnvOverrides;
+  try {
+    overrides = resolveHealthEnvOverrides(args, process.env);
+  } catch (e) {
+    // `c` (getColors) is initialized below; use raw ANSI here to avoid a
+    // forward reference at module load time.
+    const msg = e instanceof Error ? e.message : String(e);
+    console.error(`\x1b[31m✗ ${msg}\x1b[0m`);
+    process.exit(1);
   }
+  for (const key of overrides.unsetEnv) delete process.env[key];
+  for (const [key, value] of Object.entries(overrides.setEnv)) process.env[key] = value;
+  LOCAL_MODE = overrides.localUrl !== null;
 }
 
 // Resolve wiki-server URL/API key via the shared client helpers so
