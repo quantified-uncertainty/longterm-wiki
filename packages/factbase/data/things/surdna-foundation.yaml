@@ -2,21 +2,21 @@ entity: sid_6wJ85FrPfi
 facts:
   [
     {
-        id: ODVRF6edTA,
+        id: f_LGDesFeiBU,
         property: founded-date,
         value: "1917",
         source: https://www.wikidata.org/wiki/Q7395039,
         notes: From Wikidata Q7395039
       },
     {
-        id: Fn83Xia14g,
+        id: f_y3dCCFeKco,
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q7395039,
         notes: From Wikidata Q7395039
       },
     {
-        id: pM0WhMuFhw,
+        id: f_gmUZmrBMcg,
         property: website,
         value: http://www.surdna.org/,
         source: https://www.wikidata.org/wiki/Q7395039,

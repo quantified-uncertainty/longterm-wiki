@@ -7,43 +7,43 @@ facts:
       maintaining the EA Forum.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: 3SeNHyi3JA
+  - id: f_jGanSrfRN9
     property: headcount
     value: 109
     asOf: "2024"
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186 (as of 2024)
-  - id: vrQK8e7bPQ
+  - id: f_iYQEAWahqJ
     property: website
     value: https://www.centreforeffectivealtruism.org
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-  - id: v9zixRsSuw
+  - id: f_G9Lizqyg1J
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-  - id: 7mPjnjpTxw
+  - id: f_E84LwIuoTU
     property: headcount
     value: 11
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-  - id: 5HTMUS41Og
+  - id: f_E8PyECvvln
     property: revenue
     value: 3507482
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-  - id: JSQ9yIXGYA
+  - id: f_IR0efkM6nB
     property: founded-by-name
     value: Toby Ord
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186; text value (not entity ref)
-  - id: 3whP78Mbcw
+  - id: f_sCsBaQQimH
     property: legal-structure
     value: charitable organization
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-  - id: a19hs5hVqA
+  - id: f_fS8wn8Jo89
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism
     source: https://www.wikidata.org/wiki/Q58844186

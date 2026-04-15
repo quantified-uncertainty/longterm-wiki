@@ -1,53 +1,53 @@
 entity: sid_1aWy1sKHng
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: 2DAYnMuW3A
+  - id: f_i9rmyRMOKc
     property: founded-date
     value: "1987-02"
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "Founded February 1987 by Morris Chang in Hsinchu, Taiwan"
 
-  - id: hjbOOKfnRw
+  - id: f_dpTloGMu4h
     property: headquarters
     value: "Hsinchu, Taiwan"
     source: https://en.wikipedia.org/wiki/TSMC
 
-  - id: Yi3YgsFhwQ
+  - id: f_8kifh75eFV
     property: country
     value: Taiwan
     source: https://en.wikipedia.org/wiki/TSMC
 
-  - id: x5LtQ2WHFw
+  - id: f_gpFBLI9WPc
     property: founded-by-name
     value: Morris Chang
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "Pioneered the pure-play foundry business model"
 
-  - id: OktuQ0ue2Q
+  - id: f_lMKMcV4iQu
     property: ceo
     value: C.C. Wei
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "CEO since 2018; Mark Liu serves as Chairman"
 
-  - id: ki3wWGEMRg
+  - id: f_tctZX713vR
     property: legal-structure
     value: "Public company (TWSE: 2330, NYSE: TSM)"
     source: https://en.wikipedia.org/wiki/TSMC
 
-  - id: KpeNnEtU3w
+  - id: f_iDxHyElMGq
     property: website
     value: https://www.tsmc.com/
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "Wikipedia lists 'tsmc.com' but both resolve to the same site"
 
-  - id: LwtqcdFUqw
+  - id: f_gijepuwxeW
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/TSMC
     source: https://en.wikipedia.org/wiki/TSMC
 
   # ── Description ─────────────────────────────────────────────────
-  - id: 2VlUJJSYtA
+  - id: f_8emFThOqSy
     property: description
     value: >-
       World's largest dedicated semiconductor foundry. Fabricates over 60% of all
@@ -70,7 +70,7 @@ facts:
     source: https://www.macrotrends.net/stocks/charts/TSM/taiwan-semiconductor-manufacturing/number-of-employees
     notes: "76,478 employees at end of 2023; 4.6% increase from 2022"
 
-  - id: JOyTFD8qww
+  - id: f_HEkrndUQWM
     property: headcount
     value: 83825
     asOf: 2024-12
@@ -85,14 +85,14 @@ facts:
     source: https://investor.tsmc.com/static/annualReports/2022/english/index.html
     notes: "2022 annual revenue ($75.88B); record year, 33.5% growth from 2021"
 
-  - id: ik8P0AcmjQ
+  - id: f_Jo6eLIbvff
     property: revenue
     value: 6.94e+10
     asOf: 2023-12
     source: https://investor.tsmc.com/english/annual-reports
     notes: "2023 annual revenue ($69.4B); decline from record 2022"
 
-  - id: jrxBO2BP0w
+  - id: f_199JysnpAk
     property: revenue
     value: 8.78e+10
     asOf: 2024-12
@@ -107,7 +107,7 @@ facts:
     notes: "2025 annual revenue ($122.4B); 35.9% YoY growth driven by AI demand"
 
   # ── Market share ────────────────────────────────────────────────
-  - id: i4eK65o7wA
+  - id: f_wIySb9OLoI
     property: foundry-market-share
     value: 64
     unit: percent
@@ -115,7 +115,7 @@ facts:
     source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
     notes: "TSMC holds ~64% of global semiconductor foundry revenue"
 
-  - id: iqRzRTkcLQ
+  - id: f_Lro8d6qLqd
     property: advanced-node-market-share
     value: 92
     unit: percent
@@ -124,7 +124,7 @@ facts:
     notes: "TSMC fabricates >90% of chips at sub-7nm nodes"
 
   # ── Market cap ──────────────────────────────────────────────────
-  - id: UusNdRL3Gw
+  - id: f_duaqN4OrM5
     property: market-cap
     value: 1.44e+12
     asOf: 2026-03
@@ -132,7 +132,7 @@ facts:
     notes: "Market cap ~$1.44T as of March 30, 2026"
 
   # ── Arizona fab investment ──────────────────────────────────────
-  - id: KWvOcM6nCg
+  - id: f_Iv4BH22HoL
     property: key-event
     value: "Announced $65B investment for three semiconductor fabs in Arizona"
     asOf: 2024-12

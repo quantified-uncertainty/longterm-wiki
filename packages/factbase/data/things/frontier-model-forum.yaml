@@ -7,12 +7,12 @@ facts:
       best practices development.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: 7rbp3wjwzQ
+  - id: f_WOTZnMI9nh
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q131896166
     notes: From Wikidata Q131896166
-  - id: 7LRkkDB2gw
+  - id: f_HnMnACVopg
     property: website
     value: https://www.frontiermodelforum.org
     source: https://www.wikidata.org/wiki/Q131896166

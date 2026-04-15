@@ -2,28 +2,28 @@ entity: sid_wTnEjSfIeP
 facts:
   [
     {
-        id: sxGMa6p48g,
+        id: f_p0NqrQn4ly,
         property: founded-date,
         value: 2017-12,
         source: https://www.wikidata.org/wiki/Q47168504,
         notes: From Wikidata Q47168504
       },
     {
-        id: q35kK5zrIg,
+        id: f_C4p9c1TESg,
         property: website,
         value: https://pineapplefund.org,
         source: https://www.wikidata.org/wiki/Q47168504,
         notes: From Wikidata Q47168504
       },
     {
-        id: 5u66ROneBA,
+        id: f_InfLYZfmSd,
         property: founded-by-name,
         value: http://www.wikidata.org/.well-known/genid/dc6d2ee8b6fe1ebc84f277195aee64eb,
         source: https://www.wikidata.org/wiki/Q47168504,
         notes: From Wikidata Q47168504; text value (not entity ref)
       },
     {
-        id: NAHV7xFTbg,
+        id: f_EkjPeLIG9H,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Pineapple_Fund,
         source: https://www.wikidata.org/wiki/Q47168504,

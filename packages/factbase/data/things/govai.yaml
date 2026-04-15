@@ -12,17 +12,17 @@ facts:
   - id: f_JmckqJ2vnw
     property: website
     value: https://governance.ai
-  - id: 0zEc4GQdHQ
+  - id: f_L6L38dqecL
     property: founded-date
     value: "2016"
     source: https://www.governance.ai/about-us
     notes: "Founded 2016 at Yale University as the Governance of AI Program by Allan Dafoe; moved to Oxford FHI in 2018"
-  - id: CVcvM45M6Q
+  - id: f_Fe31DdIV98
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q116455360
     notes: From Wikidata Q116455360
-  - id: pMnzFpw39A
+  - id: f_gZmec0Lu03
     property: website
     value: https://www.governance.ai
     source: https://www.wikidata.org/wiki/Q116455360

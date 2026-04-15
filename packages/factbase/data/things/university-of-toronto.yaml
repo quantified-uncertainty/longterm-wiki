@@ -2,35 +2,35 @@ entity: sid_G4vgO5B8oA
 facts:
   [
     {
-        id: bo3AnLpaHg,
+        id: f_8zi7hWWyuG,
         property: founded-date,
         value: 1827-03,
         source: https://www.wikidata.org/wiki/Q180865,
         notes: From Wikidata Q180865
       },
     {
-        id: kfvf8VPByA,
+        id: f_xTAeeXSLhN,
         property: headquarters,
         value: Toronto,
         source: https://www.wikidata.org/wiki/Q180865,
         notes: From Wikidata Q180865
       },
     {
-        id: DBJaOix3wg,
+        id: f_1XXQ7NXrCr,
         property: country,
         value: Canada,
         source: https://www.wikidata.org/wiki/Q180865,
         notes: From Wikidata Q180865
       },
     {
-        id: EynFDkE3TQ,
+        id: f_fhX3zKvf6v,
         property: website,
         value: https://www.utoronto.ca/,
         source: https://www.wikidata.org/wiki/Q180865,
         notes: From Wikidata Q180865
       },
     {
-        id: ihCAtZs4og,
+        id: f_ytgQTVHlCT,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/University_of_Toronto,
         source: https://www.wikidata.org/wiki/Q180865,

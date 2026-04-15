@@ -9,12 +9,12 @@ facts:
       The conferences
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: XsVIIxGvKg
+  - id: f_4sqEhsPo0V
     property: website
     value: https://www.eaglobal.org
     source: https://www.wikidata.org/wiki/Q24949667
     notes: From Wikidata Q24949667
-  - id: fszg30SsDw
+  - id: f_irP7DNbpzn
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Effective_Altruism_Global
     source: https://www.wikidata.org/wiki/Q24949667

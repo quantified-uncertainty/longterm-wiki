@@ -2,49 +2,49 @@ entity: sid_u2j7u53L8S
 facts:
   [
     {
-        id: EqhzEGCw1A,
+        id: f_ytsa4T0EGC,
         property: founded-date,
         value: 1999-01,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: k2Njh6Kazw,
+        id: f_IOHkN9kEi9,
         property: headquarters,
         value: Los Angeles,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: BlRRPZW0mw,
+        id: f_nb0vty2Iry,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: KLlTFjlIwA,
+        id: f_74kSv0tJat,
         property: website,
         value: https://mercyforanimals.org/,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: 4aEC1OW0jg,
+        id: f_VnjdAUinJT,
         property: revenue,
         value: 1675148,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: 5WxzkgfrPw,
+        id: f_uK2jJv3CcI,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q6818817,
         notes: From Wikidata Q6818817
       },
     {
-        id: JZf907OGcg,
+        id: f_mAI2Sbnpl6,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Mercy_for_Animals,
         source: https://www.wikidata.org/wiki/Q6818817,

@@ -2,35 +2,35 @@ entity: sid_J2DYTkMiRA
 facts:
   [
     {
-        id: nf0DJFbftg,
+        id: f_NTI0Ur5zuh,
         property: founded-date,
         value: 2005-01,
         source: https://www.wikidata.org/wiki/Q1377855,
         notes: From Wikidata Q1377855
       },
     {
-        id: gXKFeDsvAg,
+        id: f_NkS190525B,
         property: website,
         value: http://www.google.org/,
         source: https://www.wikidata.org/wiki/Q1377855,
         notes: From Wikidata Q1377855
       },
     {
-        id: PDr4UDWxpg,
+        id: f_P9yGggb981,
         property: parent-organization,
         value: Google,
         source: https://www.wikidata.org/wiki/Q1377855,
         notes: From Wikidata Q1377855
       },
     {
-        id: yclKzKmtgQ,
+        id: f_vyLiVAYSTg,
         property: wikipedia-url,
         value: https://en.wikipedia.org/wiki/Google.org,
         source: https://www.wikidata.org/wiki/Q1377855,
         notes: From Wikidata Q1377855
       },
     {
-        id: JFzI0BCY7A,
+        id: f_v3CJBPsIBm,
         property: description,
         value: Google.org is a subsidiary/division of Google.,
         source: https://www.wikidata.org/wiki/Q1377855,

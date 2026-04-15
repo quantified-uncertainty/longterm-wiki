@@ -6,17 +6,17 @@ facts:
     asOf: "2026-03"
     notes: "Migrated from experts.yaml"
 
-  - id: Mu44VStB8w
+  - id: f_7FXUtxYaDw
     property: born-year
     value: 1987
     source: https://www.wikidata.org/wiki/Q119721378
     notes: From Wikidata Q119721378
-  - id: lXJBrUMv9A
+  - id: f_m26ev2nS4o
     property: education
     value: University of California, Santa Cruz
     source: https://www.wikidata.org/wiki/Q119721378
     notes: From Wikidata Q119721378
-  - id: 7kJpzBCn0A
+  - id: f_t9EbWYwryE
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Daniela_Amodei
     source: https://www.wikidata.org/wiki/Q119721378

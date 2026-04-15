@@ -1,7 +1,7 @@
 entity: sid_GQuPhNkZbg
 facts:
   # ── Description & Basics ──────────────────────────────────────
-  - id: joTH3WxeeA
+  - id: f_VtRVU2mPqr
     property: description
     value: >-
       501(c)(3) nonprofit (formerly OpenAI, Inc.) that retains governance
@@ -14,7 +14,7 @@ facts:
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: 1Jtk2L1nwg
+  - id: f_ljBzWSHJiF
     property: founded-date
     value: "2015-12"
     source: https://openai.com/our-structure/
@@ -23,49 +23,49 @@ facts:
       Elon Musk, Ilya Sutskever, Greg Brockman, and others. Renamed to
       OpenAI Foundation in October 2025 as part of corporate restructuring.
 
-  - id: pB7UyS39sw
+  - id: f_9xMOABSPoG
     property: legal-structure
     value: "501(c)(3) nonprofit (Delaware)"
     source: https://openai.com/our-structure/
     notes: "Renamed from OpenAI, Inc. to OpenAI Foundation on October 28, 2025"
 
-  - id: Z8sfmSxNtw
+  - id: f_TlexqgM6UC
     property: headquarters
     value: "San Francisco, CA"
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
     notes: "Must remain headquartered in California per AG condition"
 
-  - id: mMiMsoEB2w
+  - id: f_OW2bzIVUkZ
     property: country
     value: United States
 
-  - id: 67MWMcDzvQ
+  - id: f_sTqK6DSGxk
     property: website
     value: https://openaifoundation.org
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: pLGwqbrFFA
+  - id: f_XuSYe94zyx
     property: parent-org
     value: !ref sid_1LcLlMGLbw
     source: https://openai.com/our-structure/
     notes: "Governance parent of OpenAI Group PBC (controls, not subsidiary of)"
 
   # ── Financial Details ─────────────────────────────────────────
-  - id: y93va036IA
+  - id: f_MtAj1tYlee
     property: equity-stake-percent
     value: 26
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
     notes: "26% of OpenAI Group PBC"
 
-  - id: tXd5R5dZbQ
+  - id: f_hyES0n0eew
     property: equity-value
     value: 1.3e+11
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
     notes: "Based on ~$500B valuation at restructuring close"
 
-  - id: CP4qbg9YhA
+  - id: f_Cv1cFBuGb5
     property: notable-for
     value: >-
       Holds a performance warrant for additional equity if OpenAI Group's
@@ -73,28 +73,28 @@ facts:
       equity amount not publicly specified.
     source: https://openai.com/index/built-to-benefit-everyone/
 
-  - id: O1fQtiDDgA
+  - id: f_iuerfTYQZt
     property: grants-disbursed
     value: 4.05e+7
     asOf: 2025-12
     source: https://openai.com/index/people-first-ai-fund-grantees/
     notes: "$40.5M to 208 nonprofits via People-First AI Fund (from ~3,000 applications)"
 
-  - id: hbTfcIAF2Q
+  - id: f_j7GURKbGLX
     property: grant-commitment
     value: 1e+9
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
     notes: "$1 billion pledged over the next year (2026-2027)"
 
-  - id: 8lg7xIiZ0g
+  - id: f_17jLKyZyCS
     property: grant-commitment
     value: 2.5e+10
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
     notes: "$25 billion long-term commitment (no fixed timeline). For health/disease and AI resilience."
 
-  - id: jygnmE6rJQ
+  - id: f_9fdoxJRBbz
     property: key-event
     value: "Profit cap removed as part of PBC restructuring"
     asOf: 2025-10
@@ -104,14 +104,14 @@ facts:
       to the nonprofit. Under PBC structure, all shareholders hold regular equity.
 
   # ── Governance Powers ─────────────────────────────────────────
-  - id: ztvMcskOfA
+  - id: f_779CnxmsqR
     property: board-seats-controlled
     value: "All PBC board seats (sole appointment and removal authority)"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Foundation has sole power and authority to appoint all PBC board members and can remove directors at any time"
 
-  - id: hmPhxze5gg
+  - id: f_8UyibnXaKk
     property: notable-for
     value: >-
       Safety and Security Committee (SSC) is a committee of the Foundation,
@@ -120,7 +120,7 @@ facts:
     asOf: 2025-10
     source: https://openai.com/our-structure/
 
-  - id: 3KO4AbwYiQ
+  - id: f_ibLaDPDe03
     property: notable-for
     value: >-
       SSC Chair (Zico Kolter) serves as a non-voting observer at PBC
@@ -129,7 +129,7 @@ facts:
     source: https://openai.com/our-structure/
     notes: "Source says 'non-voting observer', not 'full observation rights'"
 
-  - id: TuW557bNbA
+  - id: f_LC9szgfCnW
     property: notable-for
     value: >-
       Non-independent directors (including Sam Altman) barred from PBC Audit
@@ -137,94 +137,94 @@ facts:
       California AG conditions.
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
 
-  - id: nAuKLv5EVg
+  - id: f_7RXmQ9V719
     property: notable-for
     value: "OpenAI must remain headquartered in California per AG condition"
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
 
   # ── Foundation Staff Leadership ───────────────────────────────
-  - id: Nzft27kIOg
+  - id: f_92tfqbiUHx
     property: key-event
     value: "Wojciech Zaremba appointed Head of AI Resilience"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
     notes: "OpenAI co-founder"
 
-  - id: RZ9zWACvAg
+  - id: f_ep3rSUYB0n
     property: key-event
     value: "Jacob Trefethen appointed Head of Life Sciences and Curing Diseases"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: DUgns9KP4Q
+  - id: f_FKAn066OEb
     property: key-event
     value: "Anna Makanju appointed Head of AI for Civil Society and Philanthropy (joining mid-April 2026)"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: KrjkVCrJWA
+  - id: f_GlTZ3RYLoc
     property: key-event
     value: "Robert Kaiden appointed CFO of the Foundation"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
     notes: "From Deloitte, Twitter, Inspirato"
 
-  - id: 7ddeQvIVSw
+  - id: f_t6jeccjr9v
     property: key-event
     value: "Jeff Arnold appointed Director of Operations"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: bwfJWjal5g
+  - id: f_xOVrUDpedw
     property: key-event
     value: "Executive Director still being recruited"
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
   # ── Foundation Board ──────────────────────────────────────────
-  - id: zxoMKU1jPQ
+  - id: f_KZtr2IA3e4
     property: key-event
     value: "Bret Taylor serves as Chair of Foundation and PBC board"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Co-founder and CEO of Sierra AI. Former co-CEO of Salesforce."
 
-  - id: pjS3apxrUg
+  - id: f_KJqytpi59o
     property: key-event
     value: "Adam D'Angelo on Foundation board and Safety & Security Committee"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Co-founder and CEO of Quora"
 
-  - id: iTlQ6X6Byw
+  - id: f_zFnl5L2U4d
     property: key-event
     value: "Zico Kolter chairs Safety & Security Committee (Foundation board only)"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Professor at Carnegie Mellon. Sits exclusively on Foundation board, not PBC."
 
-  - id: 3pejjakUJQ
+  - id: f_lMFXVuVMmV
     property: key-event
     value: "Paul Nakasone on Foundation board and Safety & Security Committee"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Retired U.S. Army General. Former NSA Director and U.S. Cyber Command Commander."
 
-  - id: pCxMEUAAdg
+  - id: f_Zz93QzEKS4
     property: key-event
     value: "Nicole Seligman on Foundation board and Safety & Security Committee"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Former EVP and General Counsel of Sony Corporation"
 
-  - id: no0vibWmYg
+  - id: f_nJT2iz96Gq
     property: key-event
     value: "Sue Desmond-Hellmann on Foundation board"
     asOf: 2025-10
     source: https://openai.com/our-structure/
     notes: "Former CEO of Bill & Melinda Gates Foundation"
 
-  - id: ijm0n0GWxQ
+  - id: f_Of4PgrRKF2
     property: key-event
     value: "Adebayo Ogunlesi on Foundation board"
     asOf: 2025-10
@@ -232,33 +232,33 @@ facts:
     notes: "Chairman and Managing Partner of Global Infrastructure Partners"
 
   # ── Restructuring Timeline ────────────────────────────────────
-  - id: 1E3W5cCXJA
+  - id: f_UAp6eSLEdi
     property: key-event
     value: "OpenAI announces plan to restructure into PBC; initial plan would have removed nonprofit governance control"
     asOf: 2024-12
     source: https://openai.com/index/why-our-structure-must-evolve-to-advance-our-mission/
     notes: "OpenAI framed this as evolving the mission; critics saw it as removing nonprofit control."
 
-  - id: LbWrmleXRw
+  - id: f_zRdcodpFXV
     property: key-event
     value: "California AG investigation into OpenAI restructuring (ongoing since ~mid-2024, concluded Oct 2025)"
     asOf: 2024-06
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
     notes: "AG Bonta stated investigation was conducted over 'the last year and a half' as of Oct 2025"
 
-  - id: RO4BLRU3ow
+  - id: f_p5rlqfQub5
     property: key-event
     value: "Elon Musk-led consortium submits $97.4B bid to buy the nonprofit; unanimously rejected"
     asOf: 2025-02
     source: https://fortune.com/2025/02/14/openai-rejects-elon-musk-97-4-billion-bid/
 
-  - id: v6up6buuyw
+  - id: f_5kjbwmdkz0
     property: key-event
     value: "Judge denies Musk's injunction to block restructuring"
     asOf: 2025-03
     source: https://techcrunch.com/2025/03/04/judge-denies-elon-musks-request-for-injunction-against-openai/
 
-  - id: EDNUtuJFyg
+  - id: f_BpJReZfKSM
     property: key-event
     value: "OpenAI reverses: nonprofit will retain governance control of PBC"
     asOf: 2025-05
@@ -267,34 +267,34 @@ facts:
       Under pressure from CA AG, DE AG, civic leaders. Original plan would
       have stripped nonprofit of control.
 
-  - id: JrXAdwJ8Cg
+  - id: f_u64ayzyFyU
     property: key-event
     value: "California and Delaware AGs issue conditions of non-objection for restructuring"
     asOf: 2025-10
     source: https://oag.ca.gov/news/press-releases/attorney-general-bonta-issues-statement-openai%E2%80%99s-recapitalization-plan
 
-  - id: wfr8b7cUbw
+  - id: f_tNFhFupznX
     property: key-event
     value: "Restructuring completed; OpenAI, Inc. renamed to OpenAI Foundation; for-profit becomes OpenAI Group PBC"
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
     notes: "October 28, 2025"
 
-  - id: zcG6GXWqMw
+  - id: f_xVn9J9SRO9
     property: key-event
     value: "SoftBank completes $30B investment (contingent on restructuring)"
     asOf: 2025-12
     source: https://techcrunch.com/2025/10/28/openai-completes-its-for-profit-recapitalization/
     notes: "December 30, 2025 completion. SoftBank invested $30B (corrected from $40B). Investment was key driver of restructuring timeline."
 
-  - id: 459nzAjNCw
+  - id: f_8KoNMCn9GU
     property: key-event
     value: "People-First AI Fund awards $40.5M to 208 nonprofits"
     asOf: 2025-12
     source: https://openai.com/index/people-first-ai-fund-grantees/
     notes: "From initial $50M commitment; ~3,000 applications received"
 
-  - id: TM8XTyzGeQ
+  - id: f_EdTpAIuO8D
     property: key-event
     value: "Foundation pledges $1B in grants; announces leadership team and four focus areas"
     asOf: 2026-03
@@ -302,7 +302,7 @@ facts:
     notes: "Focus: life sciences, jobs/economic impact, AI resilience, community programs"
 
   # ── Litigation ────────────────────────────────────────────────
-  - id: NRRkdWdUpg
+  - id: f_BMpElfpybY
     property: litigation
     value: "Musk v. OpenAI: jury trial scheduled April-May 2026"
     asOf: 2026-01
@@ -311,14 +311,14 @@ facts:
       Musk alleges betrayal of nonprofit mission. Contributed ~$38M (~60% of
       early funding). Potential damages $78B-$135B. OpenAI countersued.
 
-  - id: MX7aNN0Dlw
+  - id: f_Q9Pac25WbT
     property: litigation
     value: "Elon Musk files lawsuit against OpenAI alleging betrayal of nonprofit mission"
     asOf: 2024-02
     source: https://time.com/7328674/openai-chatgpt-sam-altman-elon-musk-timeline/
 
   # ── Ownership Structure Context ───────────────────────────────
-  - id: 1Qh38lnBHA
+  - id: f_Rt5gOPJrBk
     property: notable-for
     value: >-
       Post-restructuring equity: Foundation 26%, Microsoft 27%, employees 26%,
@@ -327,7 +327,7 @@ facts:
     asOf: 2025-10
     source: https://openai.com/index/built-to-benefit-everyone/
 
-  - id: iKewdJjNZA
+  - id: f_EF2KTNuKaT
     property: notable-for
     value: >-
       Critics argue 26% financial stake is a dramatic reduction from 100%
@@ -336,7 +336,7 @@ facts:
       from its mission statement during the restructuring.
     source: https://calmatters.org/economy/technology/2025/10/openai-restructuring-deal-full-of-holes-critics-say/
 
-  - id: D2rSx2PWfg
+  - id: f_WpFiWndfS0
     property: notable-for
     value: >-
       Four focus areas announced March 2026: (1) Life Sciences & Curing
@@ -345,7 +345,7 @@ facts:
     asOf: 2026-03
     source: https://openai.com/index/update-on-the-openai-foundation/
 
-  - id: qz8SBoW0fQ
+  - id: f_Aciv657R2Y
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/OpenAI
     notes: "Foundation shares Wikipedia article with OpenAI Group"

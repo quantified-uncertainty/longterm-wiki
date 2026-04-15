@@ -16,7 +16,7 @@ facts:
   - id: f_seF7GHtJYg
     property: wikipedia-url
     value: "https://en.wikipedia.org/wiki/Timnit_Gebru"
-  - id: UaVuC5M83A
+  - id: f_BtV4Fw48RS
     property: website
     value: https://ai.stanford.edu/~tgebru/
     source: https://www.wikidata.org/wiki/Q59753117

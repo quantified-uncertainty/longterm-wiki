@@ -33,13 +33,13 @@ facts:
       of AI use in the Trump administration's deregulation agenda"
     asOf: 2025
     source: https://democracyforward.org/updates/ai-deregulation/
-  - id: PY8cmDi8Ww
+  - id: f_G9GI99VAIj
     property: headcount
     value: 68
     asOf: 2025-01
     source: https://www.wikidata.org/wiki/Q56278847
     notes: From Wikidata Q56278847 (as of 2025-01)
-  - id: HKKIVojfVA
+  - id: f_9vAq9t36e1
     property: website
     value: http://democracyforward.org
     source: https://www.wikidata.org/wiki/Q56278847

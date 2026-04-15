@@ -1,17 +1,17 @@
 entity: sid_wrbWEng9gg
 facts:
-  - id: rv3iYjr9Fw
+  - id: f_VbORM3OxH9
     property: founded-date
     value: "1910"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
 
-  - id: vRG0n7zPZg
+  - id: f_HAVS06QG35
     property: headquarters
     value: "Washington, DC"
     source: https://carnegieendowment.org/about
     notes: "Also offices in Palo Alto, Beirut, Berlin, Brussels, Singapore, New Delhi"
 
-  - id: ndhD5eDITw
+  - id: f_ry7EKNUU3Y
     property: annual-revenue
     value: "57574887"
     unit: USD
@@ -19,20 +19,20 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/130552040
     notes: "FY ending June 2025. Total assets $602M."
 
-  - id: VrbBdaqfHA
+  - id: f_mmk5kMDIt9
     property: employee-count
     value: "375"
     asOf: 2025
     source: https://carnegieendowment.org/about
     notes: "~375-400 employees; 170+ research experts across 6 continents"
 
-  - id: IpLSHd8Bcg
+  - id: f_rW0PvDSZu9
     property: program
     value: "Technology and International Affairs Program. Co-directors: Jon Bateman and Arthur Nelson. ~15+ staff/fellows. Four areas: AI, Information Environment, Cybersecurity, Biotechnology."
     asOf: 2026-03
     source: https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program
 
-  - id: nE89FpjK0w
+  - id: f_IzP2sg96TP
     property: publication
     value: "AI Global Surveillance (AIGS) Index covering 176 countries, created by Steven Feldstein"
     source: https://carnegieendowment.org/features/ai-global-surveillance-technology

@@ -2,14 +2,14 @@ entity: sid_GwMzWw7fpA
 facts:
   [
     {
-        id: HYdE1oMdYA,
+        id: f_JnXCcFQll9,
         property: born-year,
         value: 1969,
         source: https://www.wikidata.org/wiki/Q6178697,
         notes: From Wikidata Q6178697
       },
     {
-        id: fb4BpmobMA,
+        id: f_lqMZzFDzOw,
         property: education,
         value: Yale University,
         source: https://www.wikidata.org/wiki/Q6178697,

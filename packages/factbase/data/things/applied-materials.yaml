@@ -1,38 +1,38 @@
 entity: sid_AuPn7YbiaZ
 facts:
   # ── Organizational ──────────────────────────────────────────────
-  - id: 9rHnUtickA
+  - id: f_VWpaD1bP3h
     property: founded-date
     value: "1967-11"
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
-  - id: ByVYUsheJA
+  - id: f_6z6GYDhdnb
     property: headquarters
     value: "Santa Clara, CA"
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
-  - id: DwFWZfIMVQ
+  - id: f_qhaABxtbqj
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
-  - id: qwQALb0uxQ
+  - id: f_Y7llW2osd1
     property: legal-structure
     value: "Public company (NASDAQ: AMAT)"
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
-  - id: gUX9btpitA
+  - id: f_9dsy2Kh9nc
     property: website
     value: https://www.appliedmaterials.com
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
-  - id: xh2Ccgo7zQ
+  - id: f_ygkQ23UA9W
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Applied_Materials
     source: https://en.wikipedia.org/wiki/Applied_Materials
 
   # ── Description ─────────────────────────────────────────────────
-  - id: kSb5x1YRBA
+  - id: f_DAMCGCZhCa
     property: description
     value: >-
       World's largest supplier of semiconductor manufacturing equipment, providing
@@ -42,7 +42,7 @@ facts:
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
-  - id: NY832ZHdhg
+  - id: f_nERsOhi6i1
     property: revenue
     value: 2.72e+10
     asOf: 2024-10

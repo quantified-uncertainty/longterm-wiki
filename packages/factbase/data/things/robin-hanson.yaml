@@ -8,12 +8,12 @@ facts:
       Brain.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: 381QlzCeFA
+  - id: f_W7mOGG6LTP
     property: born-year
     value: 1959
     source: https://www.wikidata.org/wiki/Q2159779
     notes: From Wikidata Q2159779
-  - id: AlBVArWcNg
+  - id: f_mrt81NPljz
     property: education
     value: University of California, Irvine; University of Chicago; California
       Institute of Technology
@@ -40,7 +40,7 @@ facts:
       Foundations of Science, University of Chicago (1984); Ph.D. Social
       Science, Caltech (1997)"
     notes: Enriched from wiki page
-  - id: zgze2RX90w
+  - id: f_nkemfq398n
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Robin_Hanson
     source: https://www.wikidata.org/wiki/Q2159779

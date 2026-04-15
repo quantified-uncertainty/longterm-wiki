@@ -47,17 +47,17 @@ facts:
     value: "Private company"
     source: https://www.gladstone.ai/about
     notes: "Independent firm; no outside funding taken as of 2024"
-  - id: VGiXRbHUpQ
+  - id: f_mAve7ppoeu
     property: country
     value: Australia
     source: https://www.wikidata.org/wiki/Q3275488
     notes: From Wikidata Q3275488
-  - id: 2DCPrPn3gA
+  - id: f_5nTHS4AgBE
     property: website
     value: http://www.gladstone.qld.gov.au/web/guest/gladstone-airport
     source: https://www.wikidata.org/wiki/Q3275488
     notes: From Wikidata Q3275488
-  - id: gWYCsiq2Rw
+  - id: f_rtbULQwxIR
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Gladstone_Airport
     source: https://www.wikidata.org/wiki/Q3275488

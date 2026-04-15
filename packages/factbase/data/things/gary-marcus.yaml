@@ -6,12 +6,12 @@ facts:
       learning's path to AGI and advocacy for hybrid AI approaches.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: hk6mZOlXog
+  - id: f_Yrugs8STpN
     property: born-year
     value: 1970
     source: https://www.wikidata.org/wiki/Q3348133
     notes: From Wikidata Q3348133
-  - id: VIvvKLpe7A
+  - id: f_dWmCqrSmBC
     property: education
     value: Massachusetts Institute of Technology; Hampshire College; Johns Hopkins
       Center for Talented Youth

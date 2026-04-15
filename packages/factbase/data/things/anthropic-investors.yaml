@@ -8,23 +8,23 @@ facts:
       DAFs)."
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: p171WWceKg
+  - id: f_XMKNvqXRcy
     property: founded-date
     value: "2021"
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: gOdoLxHbJw
+  - id: f_aPnEBS00QI
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-  - id: iGoAcq36Rg
+  - id: f_aiwf9oJIG0
     property: headcount
     value: 500
     asOf: "2024"
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847 (as of 2024)
-  - id: dcLEbK812Q
+  - id: f_CpkQe9ec46
     property: website
     value: https://www.anthropic.com/
     source: https://www.wikidata.org/wiki/Q116758847

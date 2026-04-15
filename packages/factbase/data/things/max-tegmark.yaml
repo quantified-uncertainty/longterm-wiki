@@ -8,12 +8,12 @@ facts:
       intelligence development.
     asOf: 2026-03
     notes: Migrated from old entity system
-  - id: aCRxBQ1kHQ
+  - id: f_9YtgMVLJ37
     property: born-year
     value: 1967
     source: https://www.wikidata.org/wiki/Q2076321
     notes: From Wikidata Q2076321
-  - id: HCqWZTSo4w
+  - id: f_cneepuZr0c
     property: education
     value: Royal Institute of Technology; Stockholm School of Economics; University
       of California, Berkeley
@@ -39,12 +39,12 @@ facts:
       UC Berkeley (1994)"
     source: https://en.wikipedia.org/wiki/Max_Tegmark
     notes: Enriched from wiki page
-  - id: pLOXwvLYQA
+  - id: f_AGyF3JFynu
     property: website
     value: http://space.mit.edu/home/tegmark/
     source: https://www.wikidata.org/wiki/Q2076321
     notes: From Wikidata Q2076321
-  - id: WyBpDjl6zQ
+  - id: f_6A80y60M99
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Max_Tegmark
     source: https://www.wikidata.org/wiki/Q2076321

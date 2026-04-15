@@ -90,37 +90,37 @@ facts:
     asOf: 2024-05
     notes: "Gemini 1.5 Pro 2M token context window; launched Feb 2024 with 1M
       tokens, expanded to 2M in May 2024"
-  - id: 2Y4spe8DsA
+  - id: f_zd5ye0LJT9
     property: website
     value: https://deepmind.google/
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-  - id: XU5I96vsPw
+  - id: f_0RnOGS9sed
     property: headquarters
     value: London
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-  - id: RYUAwpW0fA
+  - id: f_YKQ6MEQi9M
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-  - id: lSlD6Ap3og
+  - id: f_8FlgkYy95w
     property: parent-organization
     value: Alphabet Inc.
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-  - id: 0F2WsLKJJQ
+  - id: f_fLQe7jpuiE
     property: founded-by-name
     value: Demis Hassabis
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006; text value (not entity ref)
-  - id: B6E2nTTFlA
+  - id: f_7tmkguuxno
     property: legal-structure
     value: subsidiary company
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-  - id: hoTB7Pu7xw
+  - id: f_BEWKvqywtQ
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Google_DeepMind
     source: https://www.wikidata.org/wiki/Q15733006

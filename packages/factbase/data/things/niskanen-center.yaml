@@ -1,17 +1,17 @@
 entity: sid_O5jCdIWixQ
 facts:
-  - id: meWIYU88Sg
+  - id: f_Gc9qhR6zho
     property: founded-date
     value: "2015-01"
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Founded January 2015 by Jerry Taylor. Named after libertarian economist William Niskanen."
 
-  - id: B6D07MyYnQ
+  - id: f_8rCv824VJ8
     property: headquarters
     value: "1201 New York Ave NW, Suite 200B, Washington, DC 20005"
     source: https://www.niskanencenter.org/contact-us/
 
-  - id: csavzVbQEA
+  - id: f_i2u0fBwEOh
     property: annual-revenue
     value: "9958495"
     unit: USD
@@ -19,54 +19,54 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/455308952
     notes: "Total assets $12M. Net assets $9.7M."
 
-  - id: JdjRhhj8gA
+  - id: f_7KSbsQvazt
     property: employee-count
     value: "50"
     asOf: 2026
     source: https://www.niskanencenter.org/leadership-and-staff/
     notes: "~45 named employees across 7 policy departments + 54 Senior Fellows"
 
-  - id: 4elP5EoFqw
+  - id: f_oA6a0dspU9
     property: program-note
     value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond on AI and institutions, Jennifer Pahlka on AI in government). Policy departments: Climate, Criminal Justice, Immigration, Social Policy, State Capacity, Government Affairs, Legal."
     asOf: 2026-03
     source: https://www.niskanencenter.org/leadership-and-staff/
 
-  - id: nXdTBEel3w
+  - id: f_4749an0ZBo
     property: founded-by
     value: "Jerry Taylor"
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Former vice president of the Cato Institute. Resigned September 2021 after domestic violence charges. Core staff came from Cato during a 2012 leadership dispute."
 
-  - id: HvDIMFRFow
+  - id: f_koLmOW3XFl
     property: legal-structure
     value: "501(c)(3) nonprofit think tank (EIN 45-5308952). Also has a 501(c)(4) lobbying arm, the Niskanen Center for Public Policy (EIN 47-4946572), spun off in 2016."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
 
-  - id: aZN5DojxUA
+  - id: f_uIWclnY8Uz
     property: leadership
     value: "Acting President: R.J. Lyman (from March 2026). Board Chair: Bob Litterman. Previous presidents: Ted Gayer (Aug 2022 - Feb 2026), Jerry Taylor (2015-2021)."
     asOf: 2026-03
     source: https://www.niskanencenter.org/niskanen-center-announces-leadership-transition/
     notes: "Gayer remains as senior advisor through May 2026, then senior fellow"
 
-  - id: qXhxJQxlGA
+  - id: f_VQ7RbH18ge
     property: description
     value: "Center-right policy think tank in Washington, DC advocating for evidence-based solutions to climate change, immigration reform, criminal justice reform, and effective governance. Promotes carbon tax, expanded legal immigration, and supply-side progressivism ('Abundance Agenda')."
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Niskanen_Center
 
-  - id: KAdxxfX6ow
+  - id: f_9JLS6a7tu1
     property: website
     value: "https://www.niskanencenter.org/"
     source: https://www.niskanencenter.org/
 
-  - id: 2pzLiV7Ajg
+  - id: f_99E1jMZNSL
     property: country
     value: "United States"
     source: https://www.niskanencenter.org/contact-us/
 
-  - id: c25RsWgLlg
+  - id: f_LKjEZFHThm
     property: annual-revenue
     value: "7075571"
     unit: USD
@@ -74,7 +74,7 @@ facts:
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Revenue $7.1M, expenses $7.6M"
 
-  - id: 8bu90wlNMg
+  - id: f_0ZaHbaYCio
     property: funding-sources
     value: "Key donors include Open Philanthropy, Hewlett Foundation ($400K operations grant), Linden Trust for Conservation. The 501(c)(4) arm received funding from Open Society Foundations ($500K in 2017), Democracy Fund Voice ($175K in 2018)."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
