@@ -18,18 +18,31 @@
 export const REPO = 'quantified-uncertainty/longterm-wiki';
 
 /**
+ * Canonical help message for every code path that wants to tell the user
+ * how to set `GITHUB_TOKEN`. Kept in one place so the 7+ display call sites
+ * (health-check summaries, wellness-report, pr-quality, ci-main-health,
+ * github-lookup, pr-patrol index/parallel) don't drift from each other.
+ */
+export const MISSING_TOKEN_HELP_MESSAGE =
+  'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
+  'Set it with: export GITHUB_TOKEN=<your-token>';
+
+/**
  * Thrown by `getGitHubToken()` when the `GITHUB_TOKEN` environment variable is
  * missing or empty. Callers that need to distinguish "permanent config fault"
  * from "transient GitHub hiccup" should use `isMissingTokenError()` rather
  * than grepping error messages — see QUA-482 for why string-matching the
  * signal is brittle.
+ *
+ * The constructor deliberately takes no arguments. Allowing a custom message
+ * would let a caller `throw new MissingTokenError('unrelated condition')` and
+ * trip the patrol's permanent-halt classifier on something that isn't
+ * actually a missing token. The class exists as a stable classifier signal,
+ * not a general-purpose error wrapper.
  */
 export class MissingTokenError extends Error {
-  constructor(
-    message = 'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
-      'Set it with: export GITHUB_TOKEN=<your-token>',
-  ) {
-    super(message);
+  constructor() {
+    super(MISSING_TOKEN_HELP_MESSAGE);
     this.name = 'MissingTokenError';
   }
 }
@@ -37,9 +50,19 @@ export class MissingTokenError extends Error {
 /**
  * Type guard for `MissingTokenError`. Prefer this over `msg.includes(...)` so
  * the error signal can evolve without silently breaking classifiers.
+ *
+ * Also matches serialized errors where only `.name === 'MissingTokenError'`
+ * survives the boundary (JSON logs, subprocess stderr → parent catch). The
+ * `instanceof` check catches the happy path; the `.name` check catches
+ * cross-realm / serialized cases.
  */
 export function isMissingTokenError(err: unknown): err is MissingTokenError {
-  return err instanceof MissingTokenError;
+  if (err instanceof MissingTokenError) return true;
+  return (
+    typeof err === 'object' &&
+    err !== null &&
+    (err as { name?: unknown }).name === 'MissingTokenError'
+  );
 }
 
 /**

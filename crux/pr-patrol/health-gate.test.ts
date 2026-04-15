@@ -300,7 +300,9 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
       },
     });
     expect(decision.proceed).toBe(true);
-    expect(deps.events[0]).toMatchObject({ type: 'health_scan_error' });
+    // Use `.some()` rather than `events[0]` so the assertion survives a
+    // future refactor that adds a leading event (e.g. a telemetry marker).
+    expect(deps.events.some((e) => e.type === 'health_scan_error')).toBe(true);
     expect(
       deps.events.some((e) => e.type === 'health_gate_missing_token'),
     ).toBe(false);
