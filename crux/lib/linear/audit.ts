@@ -53,6 +53,20 @@ export const STALE_DAYS = 7;
 const RESOLVED_STATE_TYPES = new Set(['completed', 'canceled']);
 
 /**
+ * Label that opts an issue out of `audit --fix` auto-closure regardless of PR
+ * state or sub-issue state. Escape hatch for long-running tickets that don't
+ * fit the parent-with-open-children pattern but still shouldn't auto-close
+ * (e.g. tracking tickets that intentionally outlive their initial PR).
+ */
+export const NO_AUTO_CLOSE_LABEL = 'no-auto-close';
+
+function hasNoAutoCloseLabel(issue: LinearTriageIssue): boolean {
+  return issue.labels.nodes.some(
+    (l) => l.name.toLowerCase() === NO_AUTO_CLOSE_LABEL,
+  );
+}
+
+/**
  * GitHub auto-close keywords. Mirrors GitHub's documented set verbatim:
  * https://docs.github.com/en/issues/tracking-your-work-with-issues/linking-a-pull-request-to-an-issue
  *
@@ -219,10 +233,32 @@ export function classifyEntry(
   let bucket: AuditBucket;
   let reason: string;
 
+  const noAutoClose = hasNoAutoCloseLabel(issue);
+
   if (openPRs.length > 0) {
     bucket = 'active';
     const prList = openPRs.map((p) => `#${p.number}`).join(', ');
     reason = `open PR ${prList}`;
+  } else if (unresolvedChildren.length > 0) {
+    // A parent epic's linked PR merging represents one phase shipping;
+    // remaining open children mean the epic is still tracking work.
+    bucket = 'active';
+    // Plural when hasMore=true: the "+" indicates unfetched children may
+    // also be unresolved, so "1 open child+" would be a singular lie.
+    const isSingular = unresolvedChildren.length === 1 && !childrenResult.hasMore;
+    const childWord = isSingular ? 'child' : 'children';
+    const more = childrenResult.hasMore ? '+' : '';
+    const childSummary = `${unresolvedChildren.length} open ${childWord}${more}`;
+    if (mergedPRs.length > 0) {
+      const latest = mergedPRs[0];
+      reason = `parent epic — ${childSummary}; latest PR #${latest.number} merged ${daysSince(latest.mergedAt)}d ago but more phases in flight`;
+    } else {
+      reason = `parent epic — ${childSummary} tracking remaining work`;
+    }
+  } else if (noAutoClose && mergedPRs.length > 0) {
+    bucket = 'active';
+    const latest = mergedPRs[0];
+    reason = `PR #${latest.number} merged but \`${NO_AUTO_CLOSE_LABEL}\` label set — manual review required`;
   } else if (mergedPRs.length > 0) {
     bucket = 'shipped';
     // mergedPRs is sorted newest-first by classifyPRs.
@@ -236,8 +272,13 @@ export function classifyEntry(
     // Only treat a parent as "safe to close" when we've seen the full child
     // list — otherwise an unfetched child could still be unresolved and
     // `audit --fix` would close the parent prematurely.
-    bucket = 'parent-epic';
-    reason = `${children.length} sub-issues all resolved — safe to close`;
+    if (noAutoClose) {
+      bucket = 'active';
+      reason = `${children.length} sub-issues all resolved but \`${NO_AUTO_CLOSE_LABEL}\` label set — manual review required`;
+    } else {
+      bucket = 'parent-epic';
+      reason = `${children.length} sub-issues all resolved — safe to close`;
+    }
   } else if (daysInactive > STALE_DAYS) {
     bucket = 'orphan';
     reason = `no PR, no activity in ${daysInactive}d — move to Backlog`;
