@@ -60,7 +60,12 @@ export interface DateValidationError {
  * - Month is 01-12
  * - Day is 01-{max for that month}, accounting for leap years
  */
-export function validateDateValue(dateStr: string): string | null {
+export function validateDateValue(
+  dateStr: string,
+  options: { minYear?: number; maxYear?: number } = {}
+): string | null {
+  const minYear = options.minYear ?? 1900;
+  const maxYear = options.maxYear ?? 2100;
   if (!DATE_FORMAT_RE.test(dateStr)) {
     return `does not match YYYY, YYYY-MM, or YYYY-MM-DD format`;
   }
@@ -68,8 +73,8 @@ export function validateDateValue(dateStr: string): string | null {
   const parts = dateStr.split("-");
   const year = parseInt(parts[0], 10);
 
-  if (year < 1900 || year > 2100) {
-    return `year ${year} is outside reasonable range (1900-2100)`;
+  if (year < minYear || year > maxYear) {
+    return `year ${year} is outside reasonable range (${minYear}-${maxYear})`;
   }
 
   if (parts.length >= 2) {
@@ -198,7 +203,11 @@ function checkEntityDateValidity(): Violation[] {
         const val = item[field];
         if (val == null) continue;
         const dateStr = String(val);
-        const error = validateDateValue(dateStr);
+        // `founded` years can be ancient for universities (e.g. Oxford 1096).
+        const error = validateDateValue(
+          dateStr,
+          field === "founded" ? { minYear: 1000 } : {}
+        );
         if (error) {
           violations.push({
             rule: "date-value-validity",

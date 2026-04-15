@@ -28,11 +28,19 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   dispatchCalls.push({ query, params: [...params] });
   const q = query.toLowerCase();
 
-  // --- ref-check: SELECT id FROM entities WHERE id IN (...) ---
+  // --- ref-check: SELECT <column> AS id FROM entities WHERE <column> IN (...) ---
+  // Respect the column being queried so tests can catch slug-vs-stableId
+  // confusion (QUA-519): when the query targets entities.id, only return
+  // ids that exist as slugs; when it targets stable_id, only return
+  // stableIds. The previous column-agnostic behavior masked the bug where
+  // ref-check only looked at entities.id while YAML refs may be stableIds.
   if (q.includes("as id from") && q.includes("where") && q.includes(" in ")) {
-    // Return only IDs that exist in the entities store (check both slug and stableId)
+    const targetsStableId = q.includes("stable_id");
+    const keys: Set<string> = targetsStableId
+      ? new Set(entitiesStore.keys())
+      : new Set(slugIndex.keys());
     return params
-      .filter((p) => lookupEntity(p as string) !== undefined)
+      .filter((p) => keys.has(p as string))
       .map((p) => ({ id: p }));
   }
 
@@ -668,6 +676,42 @@ describe("Entities API", () => {
   // ---- Referential integrity ----
 
   describe("Referential integrity", () => {
+    it("preserves relatedEntries that target a stableId, not just slugs (QUA-519)", async () => {
+      // Regression: ref-check previously only queried entities.id (slug),
+      // silently stripping every stableId-based ref and writing relatedEntries:[].
+      await seedEntity(app, "openai", "OpenAI", { stableId: "hI4jK5lM6n" });
+
+      const res = await postJson(app, "/api/entities/sync", {
+        entities: [
+          {
+            id: "anthropic",
+            stableId: "aB1cD2eF3g",
+            title: "Anthropic",
+            entityType: "organization",
+            relatedEntries: [
+              // stableId reference — must resolve via entities.stable_id
+              { id: "hI4jK5lM6n", type: "organization" },
+              // genuinely missing — must still be stripped
+              { id: "nonexistent-sid", type: "organization" },
+            ],
+          },
+        ],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.upserted).toBe(1);
+
+      // Row written should still contain the stableId ref, with only the
+      // unresolved one stripped.
+      const row = entitiesStore.get("aB1cD2eF3g");
+      expect(row).toBeDefined();
+      const related = JSON.parse(row!.related_entries as string);
+      expect(related).toEqual([
+        { id: "hI4jK5lM6n", type: "organization" },
+      ]);
+    });
+
     it("strips dangling relatedEntries instead of rejecting", async () => {
       const res = await postJson(app, "/api/entities/sync", {
         entities: [

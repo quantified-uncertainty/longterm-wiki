@@ -40,12 +40,14 @@ import {
   clearTotalFixAttempts,
   countConsecutiveCycles,
   getAbandonedSha,
+  getProcessedBlockingCommentIds,
   isAbandoned,
   isPendingCICheck,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
   markAbandoned,
+  markBlockingCommentsProcessed,
   markProcessed,
   recordFailure,
   resetFailCount,
@@ -226,12 +228,34 @@ export function detectAllPrIssuesFromNodes(
         }
       }
 
+      // QUA-514: load the idempotency set of blocking comment IDs patrol has
+      // already processed for this PR at its current head SHA. A SHA change
+      // (new push) invalidates the cache naturally inside the helper.
+      const processedBlockingCommentIds = pr.headRefOid
+        ? getProcessedBlockingCommentIds(pr.number, pr.headRefOid)
+        : new Set<string>();
+
       const { issues: allIssues, botComments, failingChecks, blockingComments } =
-        libDetectIssues(pr, staleThresholdMs, fresh);
+        libDetectIssues(pr, staleThresholdMs, fresh, processedBlockingCommentIds);
       const advisoryIssues = allIssues.filter((i) => ADVISORY_ISSUES.has(i));
       const fixableIssues = allIssues.filter((i) => !ADVISORY_ISSUES.has(i));
       if (advisoryIssues.length > 0) {
         log(`  PR #${pr.number}: advisory issues (skipped): ${advisoryIssues.join(', ')}`);
+      }
+
+      // QUA-514: mark *every* blocking comment with a stable id as processed
+      // for this SHA. We mark on detection (not after dispatch) so that a
+      // subsequent cycle that finds the same comment on the same SHA will
+      // skip re-emitting self-authored-feedback even if patrol's earlier
+      // attempt was cancelled, timed out, or crashed. A new push changes
+      // the SHA and clears the cache for a fresh look.
+      if (pr.headRefOid && blockingComments.length > 0) {
+        const newIds = blockingComments
+          .map((b) => b.id)
+          .filter((id): id is string => typeof id === 'string' && id.length > 0);
+        if (newIds.length > 0) {
+          markBlockingCommentsProcessed(pr.number, pr.headRefOid, newIds);
+        }
       }
       return {
         number: pr.number,

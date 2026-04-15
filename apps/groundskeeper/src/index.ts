@@ -14,6 +14,7 @@ import { autoUpdateEnqueue } from "./tasks/auto-update-enqueue.js";
 import { jobFailureTriage } from "./tasks/job-failure-triage.js";
 import { tablebaseScan } from "./tasks/tablebase-scan.js";
 import { e2ePostDeployWatcher } from "./tasks/e2e-post-deploy-watcher.js";
+import { thingsSearchRefresh } from "./tasks/things-search-refresh.js";
 import { logger } from "./logger.js";
 
 const config = loadConfig();
@@ -69,6 +70,10 @@ logger.info({
     e2ePostDeployWatcher: {
       enabled: config.tasks.e2ePostDeployWatcher.enabled,
       schedule: config.tasks.e2ePostDeployWatcher.schedule,
+    },
+    thingsSearchRefresh: {
+      enabled: config.tasks.thingsSearchRefresh.enabled,
+      schedule: config.tasks.thingsSearchRefresh.schedule,
     },
   },
 }, "Groundskeeper starting");
@@ -163,6 +168,14 @@ registerTask(
   config.tasks.e2ePostDeployWatcher.schedule,
   config.tasks.e2ePostDeployWatcher.enabled,
   () => e2ePostDeployWatcher(config)
+);
+
+registerTask(
+  config,
+  "things-search-refresh",
+  config.tasks.thingsSearchRefresh.schedule,
+  config.tasks.thingsSearchRefresh.enabled,
+  () => thingsSearchRefresh(config)
 );
 
 // Register as an active agent (best-effort)

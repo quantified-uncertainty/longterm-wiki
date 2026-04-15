@@ -20,6 +20,9 @@ import {
   setCodeRabbitRetryTime,
   clearCodeRabbitRetryTime,
   CODERABBIT_DEFAULT_RETRY_DELAY_MS,
+  getProcessedBlockingCommentIds,
+  markBlockingCommentsProcessed,
+  clearProcessedBlockingComments,
   STATE_DIR,
 } from './state.ts';
 
@@ -202,5 +205,84 @@ describe('CodeRabbit retry state', () => {
 
   it('has a 30-minute default retry delay', () => {
     expect(CODERABBIT_DEFAULT_RETRY_DELAY_MS).toBe(30 * 60 * 1000);
+  });
+});
+
+// ── Processed blocking comments (QUA-514) ───────────────────────────────────
+
+describe('processed blocking comments (QUA-514)', () => {
+  const testPrNumber = 90000 + Math.floor(Math.random() * 10_000);
+  const shaA = 'a'.repeat(40);
+  const shaB = 'b'.repeat(40);
+
+  afterEach(() => {
+    clearProcessedBlockingComments(testPrNumber);
+  });
+
+  it('returns empty set when no cache file exists', () => {
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
+    expect(ids.size).toBe(0);
+  });
+
+  it('persists and retrieves ids for matching SHA', () => {
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_a', 'IC_b']);
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
+    expect(ids.has('IC_a')).toBe(true);
+    expect(ids.has('IC_b')).toBe(true);
+    expect(ids.size).toBe(2);
+  });
+
+  it('returns empty set when stored SHA differs (force-push invalidates cache)', () => {
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_a']);
+    // Caller is on a different SHA now — must not see old ids.
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaB);
+    expect(ids.size).toBe(0);
+  });
+
+  it('overwrites cache when marking ids under a different SHA', () => {
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_old']);
+    markBlockingCommentsProcessed(testPrNumber, shaB, ['IC_new']);
+    // Old SHA entries are gone; new SHA has only IC_new.
+    expect(getProcessedBlockingCommentIds(testPrNumber, shaA).size).toBe(0);
+    const newIds = getProcessedBlockingCommentIds(testPrNumber, shaB);
+    expect(newIds.has('IC_new')).toBe(true);
+    expect(newIds.has('IC_old')).toBe(false);
+    expect(newIds.size).toBe(1);
+  });
+
+  it('unions new ids with existing ids under the same SHA', () => {
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_a']);
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_b', 'IC_a']); // IC_a duplicate
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
+    expect(ids.size).toBe(2);
+    expect(ids.has('IC_a')).toBe(true);
+    expect(ids.has('IC_b')).toBe(true);
+  });
+
+  it('clear removes the cache file', () => {
+    markBlockingCommentsProcessed(testPrNumber, shaA, ['IC_a']);
+    clearProcessedBlockingComments(testPrNumber);
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
+    expect(ids.size).toBe(0);
+  });
+
+  it('clear is safe when no cache file exists', () => {
+    // Should not throw on a PR number with no state.
+    clearProcessedBlockingComments(testPrNumber + 77);
+  });
+
+  it('empty newIds on a fresh cache is a no-op', () => {
+    // Without an existing file, marking zero ids should not create one —
+    // avoids littering STATE_DIR with empty files during cold-path scans.
+    markBlockingCommentsProcessed(testPrNumber, shaA, []);
+    const file = join(STATE_DIR, `processed-comments-${testPrNumber}.json`);
+    expect(existsSync(file)).toBe(false);
+  });
+
+  it('tolerates corrupt cache file (returns empty)', () => {
+    const file = join(STATE_DIR, `processed-comments-${testPrNumber}.json`);
+    writeFileSync(file, 'not valid json{{{');
+    const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
+    expect(ids.size).toBe(0);
   });
 });

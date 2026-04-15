@@ -44,11 +44,6 @@ interface ExpertData {
   [key: string]: unknown;
 }
 
-interface OrganizationData {
-  id: string;
-  [key: string]: unknown;
-}
-
 interface PathMapping {
   [type: string]: string[];
 }
@@ -143,7 +138,6 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   const entitiesFromDir = loadYamlDir('entities') as EntityData[];
   const entities: EntityData[] = [...entitiesFromFile, ...entitiesFromDir];
   const experts = loadYaml('experts.yaml') as ExpertData[];
-  const organizations = loadYaml('organizations.yaml') as OrganizationData[];
   const literature = loadYaml('literature.yaml');
 
   // Build ID sets for quick lookups
@@ -154,7 +148,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     entities.flatMap((e: EntityData) => (e.stableId ? [e.stableId] : []))
   );
   const expertIds = new Set<string>(experts.map((e: ExpertData) => e.id));
-  const orgIds = new Set<string>(organizations.map((o: OrganizationData) => o.id));
+  const orgCount = entities.filter((e) => e.type === 'organization').length;
 
   // Build wiki ID → slug mapping from database.json
   const numericToSlug = new Map<string, string>();
@@ -175,7 +169,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
     console.log(`📊 Data summary:`);
     console.log(`   Entities: ${entities.length}`);
     console.log(`   Experts: ${experts.length}`);
-    console.log(`   Organizations: ${organizations.length}`);
+    console.log(`   Organizations: ${orgCount}`);
     console.log(`   MDX files: ${mdxFiles.length}\n`);
   }
 
@@ -195,8 +189,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
       // for legacy entries and expert/org lookups (which only have slug IDs).
       const exists = entityStableIds.has(relatedId) ||
                     entityIds.has(relatedId) ||
-                    expertIds.has(relatedId) ||
-                    orgIds.has(relatedId);
+                    expertIds.has(relatedId);
 
       if (!exists) {
         console.log(`${colors.yellow}⚠️  ${entity.id}: relatedEntry "${relatedId}" not found in any data file${colors.reset}`);
@@ -309,8 +302,8 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
   if (!ciMode) console.log(`\n${colors.blue}Checking expert affiliations...${colors.reset}`);
 
   for (const expert of experts) {
-    if (expert.affiliation && !orgIds.has(expert.affiliation) && !entityIds.has(expert.affiliation)) {
-      console.log(`${colors.yellow}⚠️  Expert "${expert.id}": affiliation "${expert.affiliation}" not found in organizations or entities${colors.reset}`);
+    if (expert.affiliation && !entityIds.has(expert.affiliation)) {
+      console.log(`${colors.yellow}⚠️  Expert "${expert.id}": affiliation "${expert.affiliation}" not found in entities${colors.reset}`);
       warnings++;
     }
   }
@@ -335,7 +328,7 @@ export function runCheck(options: ValidatorOptions = {}): ValidatorResult {
       const rawId = match[1];
       // Resolve wiki IDs (e.g. "E5") to slugs
       const entityId = rawId.match(/^E\d+$/) ? (numericToSlug.get(rawId) ?? rawId) : rawId;
-      if (!entityIds.has(entityId) && !expertIds.has(entityId) && !orgIds.has(entityId)) {
+      if (!entityIds.has(entityId) && !expertIds.has(entityId)) {
         console.log(`${colors.red}❌ ${file}: DataInfoBox references unknown entityId "${rawId}"${colors.reset}`);
         errors++;
         missingEntityRefs++;
