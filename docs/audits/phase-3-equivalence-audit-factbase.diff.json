@@ -1,0 +1,336 @@
+{
+  "generated": "2026-04-15T21:10:37.540Z",
+  "counts": {
+    "yamlTotalFacts": 2209,
+    "yamlDroppedDerived": 0,
+    "yamlEntities": 496,
+    "pgTotalFacts": 2209,
+    "pgEntities": 496,
+    "A": 0,
+    "B": 0,
+    "C": 45,
+    "D": 0,
+    "fieldDiffs": 45,
+    "yamlOnly": 0,
+    "pgOnly": 0
+  },
+  "yamlOnly": [],
+  "pgOnly": [],
+  "fieldDiffs": [
+    {
+      "id": "sid_0TFmORNnKQ:f_CVXL2QGbQc",
+      "key": "value",
+      "type": "C",
+      "yaml": "refs:Divya Siddarth, Saffron Huang, and Jasmine Wang",
+      "pg": "refs:Divya Siddarth,Saffron Huang,and Jasmine Wang"
+    },
+    {
+      "id": "sid_1LcLlMGLbw:f_1tj27H2wMw",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:9000000000",
+      "pg": "number:8999999000"
+    },
+    {
+      "id": "sid_1LcLlMGLbw:f_3L0CrXb8fg",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:30000000000",
+      "pg": "number:30000001000"
+    },
+    {
+      "id": "sid_1LcLlMGLbw:f_DtyJCdGd1g",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:22000000000",
+      "pg": "number:22000001000"
+    },
+    {
+      "id": "sid_1LcLlMGLbw:f_SiRGFVNapg",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:8500000000",
+      "pg": "number:8499999700"
+    },
+    {
+      "id": "sid_1OSiYOaWVL:f_O8998rheEw",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:30000000000",
+      "pg": "number:30000001000"
+    },
+    {
+      "id": "sid_9nUCGERzgQ:f_ZEbDstc9bG",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:289396942",
+      "pg": "number:289396930"
+    },
+    {
+      "id": "sid_CABtVBdlnf:f_skRv2025bq",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:72000000000",
+      "pg": "number:71999996000"
+    },
+    {
+      "id": "sid_d9sWZtyVwg:f_A8f0X4bXW4",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:17399051",
+      "pg": "number:17399052"
+    },
+    {
+      "id": "sid_d9sWZtyVwg:f_feRFvTG4CX",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:21273381",
+      "pg": "number:21273380"
+    },
+    {
+      "id": "sid_d9sWZtyVwg:f_Gz4uyRC44r",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:549531672",
+      "pg": "number:549531650"
+    },
+    {
+      "id": "sid_ezdMt069kA:f_OMqgmk6JJg",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:11000000000",
+      "pg": "number:11000001000"
+    },
+    {
+      "id": "sid_GLXKjYAEKw:f_SV0k98iOOw",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:26000000000",
+      "pg": "number:25999999000"
+    },
+    {
+      "id": "sid_hyxooEhMZl:f_vdosFaef7s",
+      "key": "value",
+      "type": "C",
+      "yaml": "refs:Matthias Spielkamp, Lorena Jaume-Palasi, Lorenz Matzat, and Katharina Anna Zweig",
+      "pg": "refs:Matthias Spielkamp,Lorena Jaume-Palasi,Lorenz Matzat,and Katharina Anna Zweig"
+    },
+    {
+      "id": "sid_ILE6N4wiDA:f_dypLk7qm6i",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:1273354629",
+      "pg": "number:1273354600"
+    },
+    {
+      "id": "sid_kxVSuuHN7j:f_HlUhctuBJk",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:284122066",
+      "pg": "number:284122080"
+    },
+    {
+      "id": "sid_mK9pX3rQ7n:f_CdywhhCodg",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:18000000000",
+      "pg": "number:17999999000"
+    },
+    {
+      "id": "sid_mK9pX3rQ7n:f_nQ4xW7mK9p",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:5500000000",
+      "pg": "number:5500000300"
+    },
+    {
+      "id": "sid_mK9pX3rQ7n:f_oBMR5hGA6A",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:15000000000",
+      "pg": "number:15000001000"
+    },
+    {
+      "id": "sid_mK9pX3rQ7n:f_tG6nH1yS3b",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:9000000000",
+      "pg": "number:8999999000"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_4GCCHOnpI2",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:181840592",
+      "pg": "number:181840590"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_7CWvukPxHd",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:22454931",
+      "pg": "number:22454932"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_bjc3JnC9ZY",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:152422669",
+      "pg": "number:152422670"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_DiE0cbCuVj",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:77790794",
+      "pg": "number:77790790"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_fYinrTnYfM",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:32186559",
+      "pg": "number:32186560"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_I0cmxKSn1A",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:188307536",
+      "pg": "number:188307540"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_IBGs9eD8BA",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:219626118",
+      "pg": "number:219626110"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_ioSAe36ICO",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:36024182",
+      "pg": "number:36024184"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_jyKNPF9u35",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:151012759",
+      "pg": "number:151012750"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_ntQBj1RuIJ",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:115576357",
+      "pg": "number:115576360"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_OVxrVxM80k",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:29450003",
+      "pg": "number:29450004"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_QJcNVEcMKp",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:79193479",
+      "pg": "number:79193480"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_qji93r3Fak",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:40896067",
+      "pg": "number:40896068"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_rVjmiWKtHQ",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:51079383",
+      "pg": "number:51079384"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_xbSSeDpE92",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:269542773",
+      "pg": "number:269542780"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_YFmjNpN0Da",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:206158416",
+      "pg": "number:206158420"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_yUq60FS3tX",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:78127328",
+      "pg": "number:78127330"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_zrMeyLxGSv",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:117018758",
+      "pg": "number:117018760"
+    },
+    {
+      "id": "sid_OwXl35e7bg:f_zw7oTny5aX",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:61345813",
+      "pg": "number:61345812"
+    },
+    {
+      "id": "sid_puAffUjWSS:f_mlv2KxJeyw",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:29612703",
+      "pg": "number:29612704"
+    },
+    {
+      "id": "sid_puAffUjWSS:f_RRODDJe5Xw",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:25558423",
+      "pg": "number:25558424"
+    },
+    {
+      "id": "sid_RFHVboBnHg:f_PgaGTRoKvg",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:3050000000",
+      "pg": "number:3049999900"
+    },
+    {
+      "id": "sid_SrRJXshFlw:f_BQDp01waAp",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:13400000000",
+      "pg": "number:13400001000"
+    },
+    {
+      "id": "sid_Tbq2qL6mbA:f_adRv2022gk",
+      "key": "value",
+      "type": "C",
+      "yaml": "number:23600000000",
+      "pg": "number:23600001000"
+    },
+    {
+      "id": "sid_u3Yf4JXH4Q:f_rouuKIUdfN",
+      "key": "value",
+      "type": "C",
+      "yaml": "refs:Nicolas Miailhe, Simon Mueller, Ionuts Lacusta, and Hugo Zylberberg",
+      "pg": "refs:Nicolas Miailhe,Simon Mueller,Ionuts Lacusta,and Hugo Zylberberg"
+    }
+  ]
+}

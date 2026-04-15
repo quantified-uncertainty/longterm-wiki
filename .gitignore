@@ -28,6 +28,7 @@ apps/web/tsconfig.tsbuildinfo
 src/data/
 apps/web/src/data/*.json
 apps/web/src/data/pg-audit-diff.md
+apps/web/src/data/factbase-audit-diff.md
 public/search-docs.json
 public/search-index.json
 data/id-registry.json

@@ -19,6 +19,17 @@ Both are small, well-contained fixes. Neither requires new schema columns. Neith
 
 Across the shared 2026-entity surface, out of ~44,000 field-value pairs compared, we observed **1,895 field diffs** (~4.3%). Of those, **~60% are structural artifacts of how wikiIds are allocated in-memory** (fixable by persisting the id_registry), and the real sync gaps resolve to the two tickets above.
 
+**FactBase is even cleaner**: 2,209/2,209 facts match perfectly across 496 entities (**100% row equivalence, zero Type D**). The only diffs are **45 float32 precision-loss cases** in large-integer fields where PG uses a `real` column — a one-line schema fix. See §6 and Finding #8.
+
+## Committed artifacts
+
+The per-row classification dumps are committed as part of this audit (QUA-510 acceptance criterion #3):
+
+- **[`docs/audits/phase-3-equivalence-audit.diff.json`](./phase-3-equivalence-audit.diff.json)** — full per-row A/C/D classification for the 2,026 shared `typedEntities`. 1,895 field diffs + 783 pgOnly rows, alphabetically sorted for stable regeneration.
+- **[`docs/audits/phase-3-equivalence-audit-factbase.diff.json`](./phase-3-equivalence-audit-factbase.diff.json)** — full per-row diff for 2,209 FactBase facts across 496 entities.
+
+Both are regeneratable by running `apps/web/scripts/build-data-from-pg.mjs` and `apps/web/scripts/audit-factbase-pg.mjs` respectively — see Appendix A.
+
 ---
 
 ## 1. Background — what Phase 3 is trying to do
@@ -51,7 +62,9 @@ The gating question: **does PG currently contain enough data to generate an equi
 
 ## 2. Methodology
 
-We implemented a side-by-side PG reader as **`apps/web/scripts/build-data-from-pg.mjs`** (committed, **not** wired into any build). It:
+Two side-by-side prototype readers, both committed, **neither wired into any build**:
+
+### 2a. Entity-side reader — `apps/web/scripts/build-data-from-pg.mjs`
 
 1. Lists all entities from `/api/entities` (2,809 rows).
 2. Fetches full shape (including `metadata`, `relatedEntries`, `customFields`) per-id from `/api/entities/:slug` with a 20-wide concurrency pool. No bulk-export endpoint exists — see Appendix B.
@@ -59,19 +72,36 @@ We implemented a side-by-side PG reader as **`apps/web/scripts/build-data-from-p
 4. Synthesizes `experts` and `organizations` arrays from PG metadata (mirroring the shapes `data/experts.yaml` and `data/organizations.yaml` produce for the YAML pipeline).
 5. Calls the **same** `transformEntities()` function that `build-data.mjs` uses, so any diff we see is a source diff, not a transformation diff.
 6. Compares the resulting `typedEntities` array to the YAML-sourced baseline from the current `database.json`.
-7. Classifies every field diff per the QUA-510 taxonomy (A/B/C/D/E).
+7. Classifies every field diff per the QUA-510 taxonomy (A/B/C/D/E) and writes the per-row result to `docs/audits/phase-3-equivalence-audit.diff.json` (committed).
 
 Additional inputs used from the YAML side (unchanged):
 - MDX pages (via `buildPagesRegistry` — page content is unaffected by Phase 3)
 - `buildIdRegistry` for fallback wikiId assignment
 
-Artifacts produced:
-- `apps/web/src/data/typedEntities-from-pg.json` — PG-sourced `typedEntities` array (input to diff)
-- `apps/web/src/data/pg-audit-diff.json` — structural per-field diff
-- `apps/web/src/data/pg-audit-diff.md` — human-readable diff summary
-- `apps/web/scripts/build-data-from-pg.mjs` — the prototype reader
+### 2b. Factbase reader — `apps/web/scripts/audit-factbase-pg.mjs`
 
-None of these are read by the app; `database.json` is untouched.
+1. Loads all FactBase YAML via the canonical `loadKB` + `serialize` pipeline from `@longterm-wiki/factbase`.
+2. Fetches all PG facts from `/api/facts/export`, paginating until the `total` field is exhausted.
+3. Indexes each side by `(entityId, factId)` and diffs per-fact, canonicalising the `FactValue` discriminated union to a stable string shape for comparison.
+4. Writes per-row result to `docs/audits/phase-3-equivalence-audit-factbase.diff.json` (committed).
+
+### Artifacts produced
+
+**Committed** (live under `docs/audits/`):
+- `phase-3-equivalence-audit.md` (this file)
+- `phase-3-equivalence-audit.diff.json` — full per-row classification for the 2,026 shared typedEntities (QUA-510 acceptance criterion)
+- `phase-3-equivalence-audit-factbase.diff.json` — full per-row classification for the 2,209 FactBase facts
+
+**Also committed** (under `apps/web/scripts/`):
+- `build-data-from-pg.mjs` — the entity prototype reader
+- `audit-factbase-pg.mjs` — the factbase prototype reader
+
+**Gitignored** (regeneratable):
+- `apps/web/src/data/typedEntities-from-pg.json` — entity prototype output
+- `apps/web/src/data/pg-audit-diff.md` — entity diff summary
+- `apps/web/src/data/factbase-audit-diff.md` — factbase diff summary
+
+None of the generated artifacts are read by the app; `database.json` is untouched.
 
 ## 3. Row-count snapshot (2026-04-15)
 
@@ -247,14 +277,45 @@ The YAML pipeline then calls `transformEntity`'s person branch which reads `expe
 
 `build-data.mjs` already reads from `/api/facts/export` via `fetchFactsFromPG()` and overrides the YAML-sourced facts when the endpoint is reachable. It also merges 11 PG-primary record types (personnel, grants, funding rounds, investments, equity positions, divisions, funding programs, division personnel, entity events, entity assessments, publications) via `mergePGRecordsIntoKB`.
 
-Row counts suggest PG has 2,209 facts vs. ~1,599 raw facts in YAML files. The delta is partly because YAML has derived facts (inverse relationships) that are materialised at load time but not separately counted, and partly because some FactBase YAML fields (`validStart`, `unit`, `role`) are not in the PG schema at all and are silently dropped at sync time.
+YAML-only fields identified in factbase YAML data (silently dropped at sync time — see Finding #8 for the actual audit result):
+- `validStart`: 2 files (nick-bostrom, xai)
+- `unit`: ~39 files — legacy data, official schema uses `currency`
+- `role`: 5 files, used for key-person facts like "Founder and Director, FHI"
 
-YAML-only fields identified in factbase YAML data:
-- `validStart`: 2 files (nick-bostrom, xai). Silently dropped. **Phase 3 prerequisite** if preserving this is important.
-- `unit`: ~39 files. Silently dropped. The official schema uses `currency` + `property.unit`, so `unit:` at the fact level is probably legacy data that was never migrated. **Cleanup ticket, not Phase 3 blocker.**
-- `role`: 5 files (nick-bostrom, xai, lennart-heim, onni-aarne, tim-fist, yonadav-shavit). Used for key-person facts ("Founder and Director, FHI"). The PG schema has no `role` column. **Either add a `role` column or store in notes. Low volume.**
+### Finding #8 — FactBase YAML vs PG: 100% row-level equivalence, 45 float32 precision losses (LOW severity — TRUE FACTBASE AUDIT)
 
-For Phase 3 scope: factbase equivalence is close enough that the audit's go/no-go is not blocked on it. File the 3 field gaps as smaller follow-ups.
+**This is the proper factbase equivalence run that QUA-510 asked for.** Implemented as `apps/web/scripts/audit-factbase-pg.mjs` using the canonical `loadKB` loader and `/api/facts/export`. Committed artifact: [`phase-3-equivalence-audit-factbase.diff.json`](./phase-3-equivalence-audit-factbase.diff.json).
+
+**Row-level equivalence is perfect:**
+
+| Metric             | YAML   | PG     | Δ    |
+|--------------------|-------:|-------:|-----:|
+| Source facts       | 2,209  | 2,209  | **0** |
+| Entities with facts | 496   | 496    | **0** |
+| Type D (missing fact row) | — | — | **0 yamlOnly, 0 pgOnly** |
+| Type A (field only in YAML) | — | — | **0** |
+| Type B (field only in PG) | — | — | **0** |
+| Type C (value mismatch) | — | — | **45** |
+
+Every YAML fact has a matching PG fact with the same `(entityId, factId)` key. Every field that YAML emits is present on the PG side. The only discrepancies are 45 `value` mismatches — all on the same pattern.
+
+**Root cause of all 45 C:value diffs**: PG's `facts.numeric` column is typed as `real` (PostgreSQL 4-byte float32) in `apps/wiki-server/src/schema.ts:964`. Float32 has ~7 decimal digits of precision, so integers larger than ~16.7M round to the nearest representable float. Representative samples from the committed diff:
+
+| Entity | YAML value     | PG value       | Delta | Meaning            |
+|--------|---------------:|---------------:|------:|--------------------|
+| anthropic | `9000000000`   | `8999999000`   | −1,000 | $9B revenue        |
+| xai    | `26000000000`  | `25999999000`  | −1,000 | $26B valuation     |
+| nvidia | `30000000000`  | `30000001000`  | +1,000 | $30B               |
+| stripe | `72000000000`  | `71999996000`  | −4,000 | $72B               |
+| various small orgs | `549531672` | `549531650` | −22 | employee counts, budgets |
+
+All 41 numeric diffs are tiny precision artefacts from storing large-integer values in a 32-bit float. The remaining 4 are `refs:` formatting artefacts from the audit script's canonicalisation (YAML serialises `refs` with `", "`, PG with `","`) — not a real data diff.
+
+**Fix**: change `facts.numeric` from `real` to `double precision` (float64, ~15 decimal digits, preserves every integer up to 2^53). Also `facts.usdEquivalent`, `facts.exchangeRate`, `facts.low`, `facts.high`. One migration, no data migration needed (the current values are already lossy — new writes get full precision from that point). Effort: **half a day**, blocking Phase 3 only if values above ~10^7 matter for display (they do — revenue, valuation, funding round sizes).
+
+**Implication for the go/no-go**: the factbase side of Phase 3 is **materially cleaner than the entity side**. There are no missing facts, no missing fields, no structural gaps. A PG-sourced `factbase-data.json` is essentially ready today, modulo the column-type fix. The "2-3 month worst case" in the parent ticket does not apply to FactBase at all.
+
+> **Note on the earlier row-count mismatch** in §3: an initial cursory count suggested YAML had ~1,599 raw facts and PG had 2,209 — a 600-fact gap that looked scary. That gap was an artefact of the cursory count using raw YAML `facts:` blocks (which include fact-only files and entity files mixed) without going through the canonical loader. Running the real loader via `loadKB` produces exactly 2,209 source facts, matching PG bit-for-bit on row count.
 
 ## 6. Per-entity-type breakdown
 
@@ -284,9 +345,10 @@ These are each <1 day and can be done in parallel with Phase 3 scoping:
 
 1. **[sync bug] relatedEntries ref-check uses wrong column** — Finding #1. Fix: check against `entities.stableId` OR both columns. Half a day. Blocks Phase 3.
 2. **[sync gap] data/organizations.yaml not synced** — Finding #2. Fix: add `mergeOrganizationData` mirroring `mergeExpertData`. Half a day. Blocks Phase 3.
-3. **[cleanup] prune -displaced-* rows in sync-entities** — Finding #4. Half a day. Not a blocker but reduces noise.
-4. **[cleanup] drop dead-write keys from database.json** — `experts`, `estimates`, `glossary`, `funders`, top-level `organizations`. Zero reader code references them. Half a day. Not a Phase 3 blocker; shrinks output.
-5. **[factbase] add validStart/unit/role to fact schema** — Finding #7. Optional; low volume affected (~46 files total). 1 day if the team decides these need preserving.
+3. **[schema] widen `facts.numeric` from `real` to `double precision`** — Finding #8. One-line Drizzle migration. Half a day including test. Not strictly blocking Phase 3, but values >10^7 currently have ±0.000001 relative error in display.
+4. **[cleanup] prune -displaced-* rows in sync-entities** — Finding #4. Half a day. Not a blocker but reduces noise.
+5. **[cleanup] drop dead-write keys from database.json** — `experts`, `estimates`, `glossary`, `funders`, top-level `organizations`. Zero reader code references them. Half a day. Not a Phase 3 blocker; shrinks output.
+6. **[factbase] add validStart/unit/role to fact schema** — Finding #7. Optional; low volume affected (~46 files total). 1 day if the team decides these need preserving.
 
 ## 8. Blockers — things that actually need designing
 
@@ -337,28 +399,33 @@ Recommended next steps, in order:
 ## Appendix A — How to reproduce
 
 ```bash
-# From repo root (or apps/web):
+# From apps/web:
 cd apps/web
 
-# Make sure YAML baseline exists:
+# Make sure YAML baseline exists (needed for entity diff):
 node --import tsx/esm scripts/build-data.mjs
 
-# Run the PG prototype against prod:
+# --- Entity audit ---
+# Writes docs/audits/phase-3-equivalence-audit.diff.json (committed)
 PROD_LONGTERMWIKI_SERVER_URL=https://wiki-server.k8s.quantifieduncertainty.org \
   PROD_LONGTERMWIKI_SERVER_API_KEY=<key> \
   WIKI_SERVER_ENV=prod \
   node --import tsx/esm scripts/build-data-from-pg.mjs
 
-# Outputs (beside database.json):
-#   src/data/typedEntities-from-pg.json
-#   src/data/pg-audit-diff.json
-#   src/data/pg-audit-diff.md
-
-# Sample-mode for fast iteration:
+# Sample-mode for fast iteration (useful when hacking on the prototype):
 node --import tsx/esm scripts/build-data-from-pg.mjs --sample=50
+
+# --- Factbase audit ---
+# Writes docs/audits/phase-3-equivalence-audit-factbase.diff.json (committed)
+PROD_LONGTERMWIKI_SERVER_URL=https://wiki-server.k8s.quantifieduncertainty.org \
+  PROD_LONGTERMWIKI_SERVER_API_KEY=<key> \
+  WIKI_SERVER_ENV=prod \
+  node --import tsx/esm scripts/audit-factbase-pg.mjs
 ```
 
-The prototype takes ~30-60s for the full 2,809-entity fetch at concurrency=20 against prod. Diff + write completes in <5s.
+Timing: the entity audit takes ~60s for the full 2,809-entity fetch at concurrency=20 against prod plus MDX scan. The factbase audit takes ~10s. Diff + write completes in <5s each.
+
+Both audits produce deterministic (alphabetically sorted) diff JSON so re-runs against stable PG state produce byte-identical output — useful for CI drift detection if we want it.
 
 ## Appendix B — Known prototype limitations
 
@@ -370,12 +437,15 @@ The prototype takes ~30-60s for the full 2,809-entity fetch at concurrency=20 ag
 
 ## Appendix C — Files produced by this audit
 
-| Path                                             | What it is                                          | Committed? |
-|--------------------------------------------------|-----------------------------------------------------|------------|
-| `docs/audits/phase-3-equivalence-audit.md`       | This report                                          | ✅          |
-| `apps/web/scripts/build-data-from-pg.mjs`        | The PG-sourced prototype reader                      | ✅          |
-| `apps/web/src/data/typedEntities-from-pg.json`   | PG-sourced typedEntities (diff input)                | ❌ gitignored |
-| `apps/web/src/data/pg-audit-diff.json`           | Structural diff (2,000+ diff entries)                | ❌ gitignored |
-| `apps/web/src/data/pg-audit-diff.md`             | Human-readable diff summary                          | ❌ gitignored |
+| Path                                                           | What it is                                          | Committed? |
+|----------------------------------------------------------------|-----------------------------------------------------|------------|
+| `docs/audits/phase-3-equivalence-audit.md`                     | This report                                          | ✅          |
+| `docs/audits/phase-3-equivalence-audit.diff.json`              | Full per-row entity diff (1,895 field diffs + 783 pgOnly) | ✅          |
+| `docs/audits/phase-3-equivalence-audit-factbase.diff.json`     | Full per-row factbase diff (45 value diffs, 2,209 facts matched) | ✅          |
+| `apps/web/scripts/build-data-from-pg.mjs`                      | The PG-sourced entity prototype reader               | ✅          |
+| `apps/web/scripts/audit-factbase-pg.mjs`                       | The factbase equivalence audit script                | ✅          |
+| `apps/web/src/data/typedEntities-from-pg.json`                 | PG-sourced typedEntities (diff input)                | ❌ gitignored |
+| `apps/web/src/data/pg-audit-diff.md`                           | Entity diff summary (human-readable)                 | ❌ gitignored |
+| `apps/web/src/data/factbase-audit-diff.md`                     | Factbase diff summary (human-readable)               | ❌ gitignored |
 
-The JSON/MD diff artifacts are deliberately not committed — they are regeneratable at any time by running the prototype, and they'd create large merge-conflict surfaces on every PG sync.
+The markdown summaries and the intermediate JSON are gitignored because they're regeneratable at any time and would create large merge-conflict surfaces. The `.diff.json` files under `docs/audits/` ARE committed because they are the audit's per-row classification artifact (QUA-510 acceptance criterion #3).

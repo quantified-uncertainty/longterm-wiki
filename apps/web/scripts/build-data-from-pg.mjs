@@ -22,10 +22,13 @@
  * Options:
  *   --sample=N   Only fetch N entities (for quick testing). Default: all.
  *
- * Output artifacts (written beside database.json):
- *   - typedEntities-from-pg.json  — PG-sourced typedEntities array
- *   - pg-audit-diff.json           — structural diff vs database.json
- *   - pg-audit-diff.md             — human-readable summary (top-level)
+ * Output artifacts:
+ *   - docs/audits/phase-3-equivalence-audit.diff.json
+ *       Committed. Full per-row A/C/D classification (QUA-510 acceptance criterion).
+ *   - apps/web/src/data/typedEntities-from-pg.json
+ *       Gitignored. The PG-sourced typedEntities array — input to the diff.
+ *   - apps/web/src/data/pg-audit-diff.md
+ *       Gitignored. Human-readable top-25 summary regeneratable from the JSON.
  *
  * Known limitations of this prototype (documented in the audit report):
  *   1. No bulk entity export endpoint exists. We paginate via /api/entities/
@@ -52,6 +55,7 @@ import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..", "..", "..");
+const AUDIT_DIR = join(REPO_ROOT, "docs", "audits");
 
 // ---------------------------------------------------------------------------
 // Config
@@ -405,10 +409,11 @@ async function main() {
 
   // --- Step 7: write PG output + diff ---
   if (!existsSync(OUTPUT_DIR)) mkdirSync(OUTPUT_DIR, { recursive: true });
+  if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
 
   const pgOut = join(OUTPUT_DIR, "typedEntities-from-pg.json");
   writeFileSync(pgOut, JSON.stringify(typedEntitiesFromPg, null, 2));
-  console.log(`\n✓ Wrote ${pgOut}`);
+  console.log(`\n✓ Wrote ${pgOut} (gitignored — regeneratable)`);
 
   console.log("\n7. Diffing YAML-sourced vs PG-sourced typedEntities...");
   const diff = diffTypedEntities(typedEntitiesFromYaml, typedEntitiesFromPg);
@@ -416,25 +421,32 @@ async function main() {
   const summary = summarizeDiff(diff);
   console.log(summary.human);
 
-  const diffOut = join(OUTPUT_DIR, "pg-audit-diff.json");
+  // The full per-row dump goes into docs/audits/ and is committed —
+  // this is the QUA-510 acceptance criterion "enumerate every A/C/D diff
+  // with per-row classification." Stable ordering (alphabetical) so the
+  // diff is reproducible across runs.
+  const diffOut = join(AUDIT_DIR, "phase-3-equivalence-audit.diff.json");
   writeFileSync(
     diffOut,
     JSON.stringify(
       {
+        generated: new Date().toISOString(),
         counts: summary.counts,
-        yamlOnly: diff.yamlOnly,
-        pgOnly: diff.pgOnly,
-        fieldDiffs: diff.fieldDiffs,
+        yamlOnly: [...diff.yamlOnly].sort(),
+        pgOnly: [...diff.pgOnly].sort(),
+        fieldDiffs: [...diff.fieldDiffs].sort(
+          (a, b) => a.id.localeCompare(b.id) || a.key.localeCompare(b.key)
+        ),
       },
       null,
       2
     )
   );
-  console.log(`✓ Wrote ${diffOut}`);
+  console.log(`✓ Wrote ${diffOut} (committed artifact)`);
 
   const mdOut = join(OUTPUT_DIR, "pg-audit-diff.md");
   writeFileSync(mdOut, summary.markdown);
-  console.log(`✓ Wrote ${mdOut}`);
+  console.log(`✓ Wrote ${mdOut} (gitignored)`);
 }
 
 function summarizeDiff(diff) {
