@@ -144,10 +144,9 @@ describe("sanitizeRawIds", () => {
       expect(isClickableFactId("e7c42d88", "description")).toBe(false);
     });
 
-    it("rejects 10-char mixed-case alnum legacy IDs — predate QUA-497 migration", () => {
-      // Post-QUA-497 all fact IDs in prod are `f_<10>`. These 10-char shapes
-      // are kept as fixtures so the format-based rejection continues to guard
-      // against reintroduction.
+    it("rejects 10-char mixed-case alnum legacy fact ID shapes", () => {
+      // Canonical fact IDs are `f_`-prefixed; opaque 10-char shapes are
+      // explicitly non-clickable so they can never render as a dead link.
       expect(isClickableFactId("2Y4ope8OxA", "fact_id")).toBe(false);
       expect(isClickableFactId("XUSIG6vsPw", "fact_id")).toBe(false);
       expect(isClickableFactId("RYUAwpW0fA", "fact_id")).toBe(false);
