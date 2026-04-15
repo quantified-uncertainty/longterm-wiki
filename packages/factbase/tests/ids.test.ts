@@ -40,10 +40,10 @@ describe("ids", () => {
   });
 
   describe("generateFactId", () => {
-    it("returns a 10-character alphanumeric string (same format as entity IDs)", () => {
+    it("returns an `f_` + 10-char alphanumeric string (12 total)", () => {
       const id = generateFactId();
-      expect(id).toHaveLength(10);
-      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
+      expect(id).toHaveLength(12);
+      expect(id).toMatch(/^f_[A-Za-z0-9]{10}$/);
     });
 
     it("generates unique IDs", () => {
@@ -88,10 +88,10 @@ describe("ids", () => {
   });
 
   describe("generateContentFactId", () => {
-    it("returns a 10-character string (no f_ prefix)", () => {
+    it("returns an `f_` + 10-char string (12 total)", () => {
       const id = generateContentFactId("mK9pX3rQ7n", "revenue", 1e9, "2024");
-      expect(id).toHaveLength(10);
-      expect(id).toMatch(/^[A-Za-z0-9]{10}$/);
+      expect(id).toHaveLength(12);
+      expect(id).toMatch(/^f_[A-Za-z0-9]{10}$/);
     });
 
     it("is deterministic: same inputs produce same output", () => {

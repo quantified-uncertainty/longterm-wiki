@@ -1,11 +1,11 @@
 /**
  * ID generation for the Knowledge Base library.
  *
- * - generateId()               — random 10-char alphanumeric (for entities and facts)
+ * - generateId()               — random `sid_` + 10-char alphanumeric (for entities)
  * - generateStableId()         — deprecated alias for generateId()
- * - generateFactId()           — alias for generateId() (all IDs use the same format)
+ * - generateFactId()           — random `f_` + 10-char alphanumeric (for facts)
  * - contentHash(parts)         — deterministic SHA-256-based 10-char token
- * - generateContentFactId(...) — contentHash (idempotent sync helper)
+ * - generateContentFactId(...) — `f_` + contentHash (idempotent sync helper)
  */
 
 import { createHash, randomBytes } from "node:crypto";
@@ -62,15 +62,15 @@ export function generateStableId(): string {
 }
 
 /**
- * Returns a random 10-char alphanumeric fact ID. Same format as entity IDs.
+ * Returns a random `f_` + 10-char alphanumeric fact ID (12 chars total).
  * Use this when you do not need determinism (i.e., you are creating a brand-new
  * fact that has no natural content key).
  *
  * @example
- * generateFactId() // "a3Kf2rZ9mQ"
+ * generateFactId() // "f_a3Kf2rZ9mQ"
  */
 export function generateFactId(): string {
-  return bareRandomId();
+  return "f_" + bareRandomId();
 }
 
 /**
@@ -101,7 +101,7 @@ export function contentHash(parts: string[]): string {
 
 /**
  * Generates a deterministic fact ID from its logical key components.
- * Returns a {@link contentHash} of
+ * Returns `"f_"` + {@link contentHash} of
  * `[subjectId, propertyId, JSON.stringify(value), asOf ?? ""]`.
  *
  * Use this when syncing facts from an external source so that re-running the
@@ -114,7 +114,7 @@ export function contentHash(parts: string[]): string {
  *
  * @example
  * generateContentFactId("mK9pX3rQ7n", "revenue", 1_000_000_000, "2024")
- * // "<10 deterministic chars>"
+ * // "f_<10 deterministic chars>"
  */
 export function generateContentFactId(
   subjectId: string,
@@ -122,10 +122,8 @@ export function generateContentFactId(
   value: unknown,
   asOf?: string
 ): string {
-  return contentHash([
-    subjectId,
-    propertyId,
-    JSON.stringify(value),
-    asOf ?? "",
-  ]);
+  return (
+    "f_" +
+    contentHash([subjectId, propertyId, JSON.stringify(value), asOf ?? ""])
+  );
 }
