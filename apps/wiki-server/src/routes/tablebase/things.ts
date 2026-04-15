@@ -92,14 +92,9 @@ const verdictFields = {
   verdict: sourceVerdicts.verdict,
 };
 
-/**
- * Column map for selecting every field of `things_search` into a single
- * `thing:` sub-object. Drizzle's `pgMaterializedView` returns a different
- * shape than `pgTable` and doesn't satisfy `SelectedFieldsFlat`, so the
- * `.select({ thing: thingsSearch })` shorthand that works for base tables
- * does not work for MVs — we have to enumerate. Shape mirrors
- * `ThingLikeRow`.
- */
+// `pgMaterializedView` doesn't satisfy Drizzle's `SelectedFieldsFlat`, and
+// `getTableColumns` only accepts `PgTable` — so enumerate columns manually
+// for the `.select({ thing: … })` shorthand.
 const thingsSearchSelect = {
   id: thingsSearch.id,
   thingType: thingsSearch.thingType,
@@ -128,53 +123,32 @@ const thingsSearchSelect = {
  * NOTE: The same CASE expression is duplicated in the raw-SQL trigram fallback
  * query below. If you add more irregular plurals here, update that query too.
  */
-const verdictJoinOnThings = and(
-  sql`${sourceVerdicts.recordType} = CASE ${things.sourceTable}
-    WHEN 'entities' THEN 'entity'
-    ELSE regexp_replace(replace(${things.sourceTable}, '_', '-'), 's$', '')
-  END`,
-  eq(sourceVerdicts.recordId, things.sourceId),
-  sql`${sourceVerdicts.fieldName} IS NULL`,
+// Build the source_check_verdicts join predicate for a given source-table
+// column reference. The same expression is also inlined as raw SQL in the
+// trigram fallback query below — keep the CASE body in sync.
+function buildVerdictJoin(
+  sourceTableCol: typeof things.sourceTable | typeof thingsSearch.sourceTable,
+  sourceIdCol: typeof things.sourceId | typeof thingsSearch.sourceId,
+) {
+  return and(
+    sql`${sourceVerdicts.recordType} = CASE ${sourceTableCol}
+      WHEN 'entities' THEN 'entity'
+      ELSE regexp_replace(replace(${sourceTableCol}, '_', '-'), 's$', '')
+    END`,
+    eq(sourceVerdicts.recordId, sourceIdCol),
+    sql`${sourceVerdicts.fieldName} IS NULL`,
+  );
+}
+const verdictJoinOnThings = buildVerdictJoin(things.sourceTable, things.sourceId);
+const verdictJoinOnThingsSearch = buildVerdictJoin(
+  thingsSearch.sourceTable,
+  thingsSearch.sourceId,
 );
 
-// Parallel helper for the `things_search` materialized view. Same CASE
-// shape; only the column references differ. Both are kept in sync by
-// construction — if you add an irregular plural in one, update the other.
-const verdictJoinOnThingsSearch = and(
-  sql`${sourceVerdicts.recordType} = CASE ${thingsSearch.sourceTable}
-    WHEN 'entities' THEN 'entity'
-    ELSE regexp_replace(replace(${thingsSearch.sourceTable}, '_', '-'), 's$', '')
-  END`,
-  eq(sourceVerdicts.recordId, thingsSearch.sourceId),
-  sql`${sourceVerdicts.fieldName} IS NULL`,
-);
-
-/**
- * Shared shape between `things` (base table) and `things_search` (MV).
- * Used by formatThing so /search endpoints reading from the MV can
- * reuse the same formatter without type-assertion gymnastics.
- *
- * Note: `createdAt` / `updatedAt` / `syncedAt` are NOT NULL on `things`
- * but nullable on `things_search` (some MV source branches — notably
- * entity_resources — don't carry a synced_at, so we project NULL). The
- * formatter already tolerates the nullable case for MV rows.
- */
-type ThingLikeRow = {
-  id: string;
-  thingType: string;
-  title: string;
-  parentThingId: string | null;
-  sourceTable: string;
-  sourceId: string;
-  entityType: string | null;
-  description: string | null;
-  sourceUrl: string | null;
-  wikiId: string | null;
-  parentTitle: string | null;
-  createdAt: Date | null;
-  updatedAt: Date | null;
-  syncedAt: Date | null;
-};
+// `thingsSearch` row type — nullable createdAt/updatedAt/syncedAt match the
+// MV's columns (some branches project NULL) and are a supertype of the
+// non-null base `things` columns, so `formatThing` accepts both.
+type ThingLikeRow = typeof thingsSearch.$inferSelect;
 
 function formatThing(
   t: ThingLikeRow,
@@ -231,12 +205,8 @@ const SyncThingSchema = z.object({
 const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
-  //
-  // QUA-506 Phase 4b-B.2b: reads from the `things_search` materialized view
-  // (migration 0181) instead of `things`. The MV is refreshed hourly by
-  // the groundskeeper task `things-search-refresh` and composes title /
-  // description / parent_title from source tables at refresh time, fixing
-  // the raw-ID leak class QUA-408 Problem 1 tracks.
+  // QUA-506: reads from the `things_search` MV; trigram fallback still
+  // reads `things` because the MV has no pg_trgm index yet.
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -277,10 +247,7 @@ const thingsApp = new Hono()
       .limit(limit)
       .offset(offset);
 
-    // Phase 2: ILIKE fallback if FTS returned nothing. Also reads from the
-    // MV — the scope explicitly requires the fallbacks to move with the
-    // primary read path so titles don't drift between FTS and ILIKE
-    // results.
+    // Phase 2: ILIKE fallback if FTS returned nothing.
     if (rows.length === 0) {
       const pattern = `%${escapeIlike(q)}%`;
       const ilikeConditions = [
@@ -339,16 +306,8 @@ const thingsApp = new Hono()
         params.push(thing_type);
       }
 
-      // Phase 3 trigram fallback intentionally still reads from the base
-      // `things` table, NOT the `things_search` MV. The QUA-506 scope
-      // update explicitly defers the trigram migration to post-QUA-507:
-      // moving the phase-3 fallback to the MV would require a pg_trgm GIN
-      // index on `things_search.title`, and the decision on whether to add
-      // that index is parked. Until then, the trigram fallback accepts a
-      // minor staleness skew (base table updates within the last hour may
-      // be visible to phase 3 but not to phase 1/2) which is acceptable
-      // since trigram is the tiebreaker path for typos, not the primary
-      // read surface. See docs/benchmarks/qua-506/README.md §7.
+      // Reads `things` not `things_search` — MV has no pg_trgm index
+      // (deferred post-QUA-507).
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
           t.id, t.thing_type, t.title, t.parent_thing_id, t.source_table, t.source_id,
@@ -405,12 +364,7 @@ const thingsApp = new Hono()
           ...trigramFormatted,
         ];
 
-        // Count FTS matches for a more accurate total; trigram matches are
-        // supplementary so their count is not separately queried.
-        // Must be `.from(thingsSearch)` — `ftsWhere` references
-        // `thingsSearch.search_vector`, so a `.from(things)` here would
-        // emit invalid SQL ("missing FROM-clause entry for table
-        // things_search"). Caught by hostile review on QUA-506.
+        // Count FTS matches; trigram matches are supplementary.
         const ftsCountResult = await db
           .select({ count: count() })
           .from(thingsSearch)
@@ -430,8 +384,6 @@ const thingsApp = new Hono()
     }
 
     // Count total FTS matches (may exceed the returned page).
-    // Same `.from(thingsSearch)` requirement as the trigram-block count
-    // above — the WHERE predicate references thingsSearch.search_vector.
     const ftsCountResult = await db
       .select({ count: count() })
       .from(thingsSearch)

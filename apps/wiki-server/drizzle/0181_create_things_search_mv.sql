@@ -1,56 +1,10 @@
--- QUA-506 Phase 4b-B.2b: create things_search materialized view + indexes.
---
--- Parent: QUA-408 / docs/audits/things-denormalization-audit.md.
--- Predecessor: QUA-476 (benchmark-only, docs/benchmarks/qua-476/).
--- This phase: QUA-506 D1 benchmark (docs/benchmarks/qua-506/) cleared all four
--- abort thresholds — see §6 of docs/benchmarks/qua-506/README.md.
---
--- WHAT THIS DOES
---
--- Creates `things_search`, a materialized view that composes title /
--- description / parent_title from the source tables (entities, facts, grants,
--- …) rather than re-reading the denormalized columns on `things`. Adds a
--- stored `search_vector` tsvector column computed inline, a UNIQUE index on
--- `id` (required for REFRESH CONCURRENTLY), and the same secondary btrees
--- `things` carries today so the read-path switch in /api/things/{search,
--- list, children, :id} and /api/people can flip FROM clauses without query
--- rewrites.
---
--- WHAT THIS DOES NOT DO
---
--- - Does NOT drop `things.title`, `things.description`, `things.parent_title`,
---   or the generated `things.search_vector` column. Writers keep populating
---   them. This is QUA-507's cut.
--- - Does NOT switch the sync handlers or the composer dispatch table
---   (QUA-470) from write-time to refresh-time. That's QUA-506c.
--- - Does NOT enable pg_trgm on the MV. The trigram fallback in
---   /api/things/search phase 3 stays on `things` for now; decision deferred
---   per the QUA-506 scope.
---
--- TIMING
---
--- Benchmarked on prod 2026-04-15:
--- - CREATE MV + WITH NO DATA: 97 ms
--- - Initial populate REFRESH: ~9 s (first run); subsequent refreshes ~14-19 s
--- - Index builds: ~4 s total
--- - Total initial build: ~14 s (well under the migration-client lock_timeout
---   of 60 s — no NOT VALID / VALIDATE CONSTRAINT pattern needed)
---
--- IDEMPOTENCY
---
--- All statements use IF NOT EXISTS / IF EXISTS. Safe to re-run. If a prior
--- run left a partial MV behind, the leading DROP MATERIALIZED VIEW IF EXISTS
--- will clean it up first.
---
--- DROP first so re-runs don't fail on conflicting definitions. In the
--- happy path on a fresh prod, this is a no-op.
+-- QUA-506 Phase 4b-B.2b: things_search MV. See docs/benchmarks/qua-506/README.md
+-- for benchmark + rationale. This phase creates the MV and wires the read
+-- path — it does NOT drop things.title/description/parent_title (QUA-507).
+
+-- Idempotent re-run: drop any previous definition first.
 DROP MATERIALIZED VIEW IF EXISTS things_search;
 
--- Create the MV. The inner SELECT is a UNION ALL across 21 source-table
--- branches; the outer SELECT adds the stored search_vector column computed
--- from base.title / parent_title / description / thing_type / entity_type
--- using the same weighted expression as the current
--- `idx_things_search` GIN on things.
 CREATE MATERIALIZED VIEW things_search AS
 SELECT
   base.id,
@@ -596,22 +550,15 @@ FROM (
 ) AS base
 WITH NO DATA;
 
--- Populate the MV. First refresh must be non-concurrent per the
--- CONCURRENTLY-requires-populated-MV rule.
+-- First refresh must be non-concurrent (MV is empty).
 REFRESH MATERIALIZED VIEW things_search;
 
--- Required for REFRESH MATERIALIZED VIEW CONCURRENTLY.
-CREATE UNIQUE INDEX things_search_pkey ON things_search (id);
+-- things_search_pkey is required for REFRESH CONCURRENTLY.
+CREATE UNIQUE INDEX things_search_pkey          ON things_search (id);
+CREATE INDEX        things_search_gin           ON things_search USING GIN (search_vector);
+CREATE INDEX        things_search_type_idx      ON things_search (thing_type);
+CREATE INDEX        things_search_parent_idx    ON things_search (parent_thing_id);
+CREATE INDEX        things_search_entity_type_idx ON things_search (entity_type);
+CREATE INDEX        things_search_updated_idx   ON things_search (updated_at);
 
--- Full-text search GIN index — mirrors idx_things_search on the base table.
-CREATE INDEX things_search_gin ON things_search USING GIN (search_vector);
-
--- Secondary btree indexes — mirrors the current `things` secondary index set
--- so /api/things/{list,children,:id} can switch with no query rewrites.
-CREATE INDEX things_search_type_idx        ON things_search (thing_type);
-CREATE INDEX things_search_parent_idx      ON things_search (parent_thing_id);
-CREATE INDEX things_search_entity_type_idx ON things_search (entity_type);
-CREATE INDEX things_search_updated_idx     ON things_search (updated_at);
-
--- Refresh planner stats so the secondary btrees have row counts.
 ANALYZE things_search;

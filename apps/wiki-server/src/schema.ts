@@ -2639,20 +2639,8 @@ export const things = pgTable(
   ]
 );
 
-// QUA-506 Phase 4b-B.2b — materialized view read-side mirror of `things`.
-//
-// `things_search` is a MATERIALIZED VIEW (not a base table) created in
-// migration 0181 that composes title / description / parent_title from
-// source tables via a UNION ALL, then computes a stored `search_vector`
-// tsvector on top. It has the same column shape as `things` plus the
-// stored `search_vector`. Secondary indexes mirror the ones on `things`
-// so `/api/things/search` + `/api/people` can switch FROM clauses without
-// query rewrites.
-//
-// The `.existing()` suffix tells drizzle-kit that this MV is managed
-// out-of-band (by migration 0181) — do NOT generate CREATE MATERIALIZED
-// VIEW DDL from this declaration. Drizzle will still let you `db.select()
-// .from(thingsSearch)` as if it were a table.
+// QUA-506: `things_search` MV created by migration 0181. `.existing()`
+// tells drizzle-kit not to emit DDL from this declaration.
 export const thingsSearch = pgMaterializedView(
   "things_search",
   {
@@ -2670,7 +2658,6 @@ export const thingsSearch = pgMaterializedView(
     createdAt: timestamp("created_at", { withTimezone: true }),
     updatedAt: timestamp("updated_at", { withTimezone: true }),
     syncedAt: timestamp("synced_at", { withTimezone: true }),
-    // search_vector tsvector column is stored inline by the MV's SELECT.
   },
 ).existing();
 

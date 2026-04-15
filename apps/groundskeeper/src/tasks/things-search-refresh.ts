@@ -8,18 +8,7 @@ function getWikiServerApiKey(): string | undefined {
   return process.env[`${prefix}LONGTERMWIKI_SERVER_API_KEY`];
 }
 
-/**
- * QUA-506 D3: hourly refresh of the things_search materialized view.
- *
- * Calls POST /api/things-search/refresh on the wiki-server, which runs
- * `REFRESH MATERIALIZED VIEW CONCURRENTLY things_search`. CONCURRENTLY
- * does not block concurrent /search readers (empirically verified in the
- * D1 benchmark, docs/benchmarks/qua-506/README.md §5.4).
- *
- * The ~14-19s refresh cost is well under the 5-minute cron window we'd
- * use if we scheduled more aggressively. Duty cycle at hourly cadence:
- * ~19s / 3600s = 0.53%.
- */
+// QUA-506: hourly MV refresh via POST /api/things-search/refresh.
 export async function thingsSearchRefresh(
   config: Config,
 ): Promise<{ success: boolean; summary?: string }> {
@@ -41,10 +30,7 @@ export async function thingsSearchRefresh(
   const url = `${config.wikiServerUrl}/api/things-search/refresh`;
 
   try {
-    // Refresh has a generous timeout: benchmark max was ~19s, but allow
-    // room for managed-postgres noise peaks (observed up to ~30s across
-    // multiple runs) plus network overhead. 120s is a comfortable ceiling
-    // and well under the wiki-server statement_timeout.
+    // 120s ceiling: benchmark max 19s + managed-pg noise headroom.
     const res = await fetch(url, {
       method: "POST",
       headers: {

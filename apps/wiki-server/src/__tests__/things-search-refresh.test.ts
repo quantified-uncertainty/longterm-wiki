@@ -1,11 +1,5 @@
-/**
- * Unit tests for /api/things-search/refresh (QUA-506 D3).
- *
- * Uses the shared test-utils dispatcher mock to simulate
- * REFRESH MATERIALIZED VIEW. The /status endpoint is covered by integration
- * testing against a real postgres (the mock layer doesn't model
- * pg_stat_all_tables column types correctly).
- */
+// /status is not unit-tested here — the mock doesn't model
+// pg_stat_all_tables column types.
 
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";

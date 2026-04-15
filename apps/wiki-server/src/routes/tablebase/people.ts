@@ -214,9 +214,7 @@ const peopleApp = new Hono()
       }
     }
 
-    // QUA-506 D4: count + data queries read from the `things_search`
-    // materialized view instead of `things`. Trigram fallback (below)
-    // still reads from `things` per the scope update's trigram deferral.
+    // QUA-506: reads things_search; trigram fallback (below) stays on things.
     const countResult = (await db.execute(sql`
       SELECT COUNT(*)::int AS total
       FROM things_search t
@@ -325,14 +323,8 @@ const peopleApp = new Hono()
 
   // ---- GET /affiliations ----
   // Returns distinct employer names with person counts, for filter dropdown.
-  //
-  // QUA-506 note: this endpoint intentionally still reads from `things`
-  // (not `things_search`). Rationale: it's a filter-dropdown helper, not
-  // a search read path. The scope's "switch reads" requirement covers
-  // /search and /people listing — /affiliations is a secondary sidecar.
-  // Up to ~1h staleness is acceptable here (same as the MV itself).
-  // If a future QUA ticket wants to eliminate the residual drift, the
-  // fix is a one-line `FROM things` → `FROM things_search` change.
+  // Intentionally still reads from `things` — dropdown helper, ~1h staleness
+  // is fine.
   .get("/affiliations", async (c) => {
     const db = getDrizzleDb();
 

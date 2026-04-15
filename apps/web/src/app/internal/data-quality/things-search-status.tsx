@@ -1,24 +1,3 @@
-/**
- * QUA-506 D5: staleness panel for the things_search materialized view.
- *
- * Surfaces last_refreshed_at, age, row count, and total size on
- * /internal/data-quality so operators can see at a glance when the
- * hourly groundskeeper refresh job silently stops firing. An MV with no
- * refresh is worse than no MV — it grows stale forever — so this panel
- * is load-bearing for Condition 2 of the QUA-476 benchmark recommendation.
- *
- * Coloring thresholds picked to be forgiving of the cron's natural jitter:
- *   - green: age < 90 min (healthy — hourly cadence + refresh duration
- *     + cron scheduler jitter + circuit-breaker half-open retry slack)
- *   - amber: 90 min <= age < 3 h (one refresh has been skipped but not urgent)
- *   - red:   age >= 3 h (refresh job has stopped firing — alert operators)
- *   - gray:  MV missing entirely (migration 0181 hasn't run yet, or was rolled back)
- *
- * Note: the previous thresholds (70 min amber / 2h red) flagged healthy
- * systems during normal scheduler drift. 90 min is ~1.5× nominal cadence,
- * 3 h is ~3× — standard SRE practice for warn / alert on periodic jobs.
- */
-
 import { Card, CardContent } from "@/components/ui/card";
 import {
   getThingsSearchRpcClient,
@@ -37,7 +16,7 @@ function formatCount(n: number): string {
   return Number.isFinite(n) ? n.toLocaleString() : "—";
 }
 
-function formatAge(seconds: number | null): string {
+function formatDuration(seconds: number | null): string {
   if (seconds == null) return "unknown";
   if (seconds < 60) return `${seconds}s`;
   if (seconds < 3600) return `${Math.round(seconds / 60)}m`;
@@ -49,47 +28,82 @@ function formatAge(seconds: number | null): string {
   return `${Math.round(seconds / 86400)}d`;
 }
 
-function ageColor(seconds: number | null): {
-  bg: string;
-  text: string;
-  label: string;
-} {
-  if (seconds == null) {
-    return {
-      bg: "bg-gray-100 dark:bg-gray-800",
-      text: "text-gray-700 dark:text-gray-300",
-      label: "unknown",
-    };
-  }
-  // Hourly refresh cadence + refresh duration + scheduler jitter +
-  // circuit-breaker half-open retry window → healthy up to ~90 min. See
-  // doc comment at top of file for rationale.
-  if (seconds < 90 * 60) {
-    return {
-      bg: "bg-green-50 dark:bg-green-950/30",
-      text: "text-green-700 dark:text-green-400",
-      label: "healthy",
-    };
-  }
-  if (seconds < 3 * 3600) {
-    return {
-      bg: "bg-yellow-50 dark:bg-yellow-950/30",
-      text: "text-yellow-700 dark:text-yellow-500",
-      label: "warning",
-    };
-  }
-  return {
+type AgeStatus = "unknown" | "healthy" | "warning" | "stale";
+
+// 90m = 1.5× hourly cron + jitter/retry slack; 3h = ~3× = alert.
+const AGE_STYLES: Record<AgeStatus, { bg: string; text: string; label: string }> = {
+  unknown: {
+    bg: "bg-gray-100 dark:bg-gray-800",
+    text: "text-gray-700 dark:text-gray-300",
+    label: "unknown",
+  },
+  healthy: {
+    bg: "bg-green-50 dark:bg-green-950/30",
+    text: "text-green-700 dark:text-green-400",
+    label: "healthy",
+  },
+  warning: {
+    bg: "bg-yellow-50 dark:bg-yellow-950/30",
+    text: "text-yellow-700 dark:text-yellow-500",
+    label: "warning",
+  },
+  stale: {
     bg: "bg-red-50 dark:bg-red-950/30",
     text: "text-red-700 dark:text-red-500",
     label: "stale",
-  };
+  },
+};
+
+function ageStatus(seconds: number | null): AgeStatus {
+  if (seconds == null) return "unknown";
+  if (seconds < 90 * 60) return "healthy";
+  if (seconds < 3 * 3600) return "warning";
+  return "stale";
+}
+
+function PresentStats({ data }: { data: Extract<RpcThingsSearchStatusResult, { present: true }> }) {
+  const style = AGE_STYLES[ageStatus(data.ageSeconds)];
+  return (
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+      <Card className={`p-4 ${style.bg}`}>
+        <CardContent className="p-0">
+          <div className="text-sm text-muted-foreground">Age</div>
+          <div className={`text-2xl font-bold ${style.text}`}>
+            {formatDuration(data.ageSeconds)}
+          </div>
+          <div className="text-xs text-muted-foreground">{style.label}</div>
+        </CardContent>
+      </Card>
+      <Card className="p-4">
+        <CardContent className="p-0">
+          <div className="text-sm text-muted-foreground">Last refreshed</div>
+          <div className="text-sm font-mono">
+            {data.lastRefreshedAt
+              ? new Date(data.lastRefreshedAt).toLocaleString()
+              : "never"}
+          </div>
+        </CardContent>
+      </Card>
+      <Card className="p-4">
+        <CardContent className="p-0">
+          <div className="text-sm text-muted-foreground">Rows</div>
+          <div className="text-2xl font-bold">{formatCount(data.rowCount)}</div>
+        </CardContent>
+      </Card>
+      <Card className="p-4">
+        <CardContent className="p-0">
+          <div className="text-sm text-muted-foreground">Size</div>
+          <div className="text-2xl font-bold">{formatBytes(data.totalBytes)}</div>
+          <div className="text-xs text-muted-foreground">heap + indexes</div>
+        </CardContent>
+      </Card>
+    </div>
+  );
 }
 
 export async function ThingsSearchStatusSection() {
   const client = getThingsSearchRpcClient();
-  if (!client) {
-    return null;
-  }
+  if (!client) return null;
 
   let data: RpcThingsSearchStatusResult | null = null;
   let fetchError: string | null = null;
@@ -140,56 +154,7 @@ export async function ThingsSearchStatusSection() {
         </Card>
       )}
 
-      {!fetchError && data && data.present && (() => {
-        const age = data.ageSeconds;
-        const color = ageColor(age);
-        return (
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            <Card className={`p-4 ${color.bg}`}>
-              <CardContent className="p-0">
-                <div className="text-sm text-muted-foreground">Age</div>
-                <div className={`text-2xl font-bold ${color.text}`}>
-                  {formatAge(age)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  {color.label}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="p-4">
-              <CardContent className="p-0">
-                <div className="text-sm text-muted-foreground">
-                  Last refreshed
-                </div>
-                <div className="text-sm font-mono">
-                  {data.lastRefreshedAt
-                    ? new Date(data.lastRefreshedAt).toLocaleString()
-                    : "never"}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="p-4">
-              <CardContent className="p-0">
-                <div className="text-sm text-muted-foreground">Rows</div>
-                <div className="text-2xl font-bold">
-                  {formatCount(data.rowCount)}
-                </div>
-              </CardContent>
-            </Card>
-            <Card className="p-4">
-              <CardContent className="p-0">
-                <div className="text-sm text-muted-foreground">Size</div>
-                <div className="text-2xl font-bold">
-                  {formatBytes(data.totalBytes)}
-                </div>
-                <div className="text-xs text-muted-foreground">
-                  heap + indexes
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-        );
-      })()}
+      {!fetchError && data && data.present && <PresentStats data={data} />}
     </section>
   );
 }

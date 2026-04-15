@@ -436,19 +436,14 @@ export type RpcDataQualityHistoryResult = InferResponseType<DataQualityClient['h
 export type RpcDataQualitySnapshot = NonNullable<RpcDataQualityLatestResult['snapshot']>;
 
 // ============================================================================
-// Hono RPC client — things_search MV refresh + status (QUA-506 D3/D5)
+// Hono RPC client — things_search (QUA-506)
 // ============================================================================
 
-/**
- * Typed RPC client for `/api/things-search/{refresh,status}`. Returns null
- * if wiki-server URL isn't configured. Used by the /internal/data-quality
- * staleness panel to render last_refresh + age + row_count.
- */
 export function getThingsSearchRpcClient(options?: { revalidate?: number }) {
   const config = getWikiServerConfig();
   if (!config) return null;
 
-  const revalidate = options?.revalidate ?? 60; // 60s — staleness panel wants fresh
+  const revalidate = options?.revalidate ?? 60;
 
   const isrFetch: typeof globalThis.fetch = (input, init) => {
     return globalThis.fetch(input, {
@@ -466,7 +461,6 @@ export function getThingsSearchRpcClient(options?: { revalidate?: number }) {
 
 type ThingsSearchClient = NonNullable<ReturnType<typeof getThingsSearchRpcClient>>;
 
-/** Inferred response type for GET /api/things-search/status */
 export type RpcThingsSearchStatusResult = InferResponseType<ThingsSearchClient['status']['$get'], 200>;
 
 // ============================================================================
