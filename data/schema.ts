@@ -65,26 +65,6 @@ export const Expert = z.object({
 export type Expert = z.infer<typeof Expert>;
 
 // =============================================================================
-// ORGANIZATIONS
-// =============================================================================
-
-export const Organization = z.object({
-  id: z.string(),                       // e.g., "anthropic"
-  name: z.string(),
-  type: OrgType,
-  founded: z.string().optional(),       // Year
-  headquarters: z.string().optional(),
-  website: z.string().url().optional(),
-  description: z.string().optional(),
-  keyPeople: z.array(z.string()).optional(),  // Expert ID references
-  funding: z.string().optional(),       // e.g., "$7B+"
-  employees: z.string().optional(),     // e.g., "~1000"
-  safetyFocus: z.string().optional(),   // Brief description of safety work
-  parentOrg: z.string().optional(),     // Org ID for subsidiaries
-});
-export type Organization = z.infer<typeof Organization>;
-
-// =============================================================================
 // ESTIMATES
 // =============================================================================
 
@@ -770,7 +750,6 @@ export type Entity = z.infer<typeof Entity>;
 
 export const Database = z.object({
   experts: z.array(Expert),
-  organizations: z.array(Organization),
   estimates: z.array(Estimate),
   cruxes: z.array(Crux),
   risks: z.array(Risk),

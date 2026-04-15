@@ -81,6 +81,17 @@
     - ai-safety
     - racing-dynamics
   lastUpdated: 2025-12
+  founded: "2021"
+  headquarters: San Francisco, CA
+  employees: ~4000
+  funding: $67B+
+  keyPeople:
+    - dario-amodei
+    - daniela-amodei
+    - chris-olah
+    - jan-leike
+  safetyFocus: |
+    Constitutional AI, interpretability research, responsible scaling policies. Publishes safety research openly.
 - id: deepmind
   stableId: sid_A4XoubikkQ
   wikiId: E98
@@ -151,6 +162,15 @@
     - reward-modeling
     - scalable-oversight
   lastUpdated: 2025-12
+  founded: "2010"
+  headquarters: London, UK
+  employees: ~2000
+  funding: Google subsidiary
+  keyPeople:
+    - demis-hassabis
+    - shane-legg
+  safetyFocus: |
+    Scalable agent alignment team. Some interpretability. Safety culture varies by team.
 - id: openai
   stableId: sid_1LcLlMGLbw
   wikiId: E218
@@ -202,6 +222,15 @@
     - racing-dynamics
     - alignment-research
   lastUpdated: 2025-12
+  founded: "2015"
+  headquarters: San Francisco, CA
+  employees: ~3500
+  funding: $18B+
+  keyPeople:
+    - sam-altman
+    - ilya-sutskever
+  safetyFocus: |
+    Superalignment team (now disbanded). RLHF development. Some interpretability. Safety culture has been criticized.
 - id: xai
   stableId: sid_GLXKjYAEKw
   wikiId: E378
@@ -276,6 +305,12 @@
     - human-compatible-ai
     - academic-ai-safety
   lastUpdated: 2025-12
+  founded: "2016"
+  headquarters: Berkeley, CA
+  keyPeople:
+    - stuart-russell
+  safetyFocus: |
+    Inverse reinforcement learning, assistance games, value alignment.
 - id: apollo-research
   stableId: sid_pKeaWwP6sQ
   wikiId: E24
@@ -349,6 +384,12 @@
     - field-building
     - ai-risk-communication
   lastUpdated: 2026-03
+  founded: "2022"
+  headquarters: San Francisco, CA
+  keyPeople:
+    - dan-hendrycks
+  safetyFocus: |
+    Representation engineering, anomaly detection, AI safety advocacy, field-building programs.
 - id: conjecture
   stableId: sid_0u4J70VqFY
   wikiId: E70
@@ -391,6 +432,12 @@
     - european-ai-safety
     - alternative-paradigms
   lastUpdated: 2025-12
+  founded: "2022"
+  headquarters: London, UK
+  keyPeople:
+    - connor-leahy
+  safetyFocus: |
+    Interpretability, cognitive emulation, alignment research.
 - id: far-ai
   stableId: sid_lCiT37k9pA
   wikiId: E138
@@ -526,6 +573,10 @@
     - responsible-scaling
     - preparedness-framework
   lastUpdated: 2025-12
+  founded: "2023"
+  headquarters: Berkeley, CA
+  keyPeople:
+    - beth-barnes
 - id: arc
   stableId: sid_QsXVXtQ0zE
   wikiId: E25
@@ -570,6 +621,14 @@
     - autonomous-replication
     - sandbagging
   lastUpdated: 2025-12
+  founded: "2021"
+  headquarters: Berkeley, CA
+  employees: ~20
+  funding: ~$10M/year
+  keyPeople:
+    - paul-christiano
+  safetyFocus: |
+    ELK (Eliciting Latent Knowledge), scalable oversight, evaluation of dangerous capabilities.
 - id: epoch-ai
   stableId: sid_cBPkzcVBBQ
   wikiId: E125
@@ -654,6 +713,15 @@
     - security-mindset
     - deconfusion
   lastUpdated: 2025-12
+  founded: "2000"
+  headquarters: Berkeley, CA
+  employees: ~40
+  funding: ~$5M/year
+  keyPeople:
+    - eliezer-yudkowsky
+    - nate-soares
+  safetyFocus: |
+    Agent foundations, decision theory, deceptive alignment. Currently pursuing new research directions after pivoting from earlier approaches.
 - id: uk-dsit
   stableId: sid_rEQ9mInLoQ
   type: organization
@@ -716,6 +784,12 @@
     - global-ai-safety
     - regulatory-framework
   lastUpdated: 2025-12
+  founded: "2023"
+  headquarters: London, UK
+  keyPeople:
+    - ian-hogarth
+  safetyFocus: |
+    Pre-deployment evaluation, dangerous capability assessment, Inspect framework.
 - id: us-aisi
   stableId: sid_fYyAxYlHDQ
   wikiId: E365
@@ -758,6 +832,13 @@
     - regulatory-capture
     - standard-setting
   lastUpdated: 2026-03
+  founded: "2024"
+  headquarters: Gaithersburg, MD
+  keyPeople:
+    - paul-christiano
+    - elizabeth-kelly
+  safetyFocus: |
+    Evaluation guidelines, coordinating with UK AISI, supporting executive order.
 - id: japan-aisi
   stableId: sid_Nc5G0HG5nA
   wikiId: E1013
@@ -1259,6 +1340,13 @@
     - oxford
   lastUpdated: 2025-12
 
+  founded: "2005"
+  headquarters: Oxford, UK
+  keyPeople:
+    - nick-bostrom
+    - toby-ord
+  safetyFocus: |
+    Existential risk research, AI governance, macrostrategy.
 - id: macrostrategy-research-initiative
   stableId: sid_idAU5YPkSw
   type: organization
@@ -1492,6 +1580,14 @@
       type: person
   lastUpdated: 2026-02
 
+  founded: "2024"
+  headquarters: Palo Alto, CA
+  employees: ~20
+  funding: $3B+
+  keyPeople:
+    - ilya-sutskever
+  safetyFocus: |
+    Pursuing superintelligence with safety as the core goal.
 - id: controlai
   stableId: sid_uhTh3ndt0Q
   wikiId: E426
@@ -1734,6 +1830,9 @@
     - community
     - epistemics
   lastUpdated: 2026-02
+  founded: "2014"
+  keyPeople:
+    - katja-grace
 - id: ai-revenue-sources
   stableId: sid_B7uHMuvA0Q
   wikiId: E513
@@ -1898,6 +1997,11 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+  founded: "2017"
+  headquarters: San Francisco, CA
+  funding: ~$200M+/year to AI safety
+  safetyFocus: |
+    Funds most major AI safety orgs, university programs, policy work.
 - id: council-on-strategic-risks
   stableId: sid_FL52kVPTlA
   wikiId: E522
@@ -2000,6 +2104,8 @@
     - governance
     - ai-safety
   lastUpdated: 2026-03
+  founded: "2019"
+  headquarters: Washington, DC
 - id: ea-global
   stableId: sid_k4IPgRP98A
   wikiId: E525
@@ -2077,6 +2183,10 @@
     - id: sid_XvvppfgBPw
       type: person
   lastUpdated: 2026-03
+  founded: "2014"
+  headquarters: Boston, MA
+  keyPeople:
+    - max-tegmark
 - id: founders-fund
   stableId: sid_LYfneQJbSA
   wikiId: E529
@@ -2459,6 +2569,8 @@
     - id: yann-lecun
       type: person
   lastUpdated: 2026-02
+  founded: "2013"
+  headquarters: Menlo Park, CA
 - id: microsoft
   stableId: sid_OIY5gaPpBA
   wikiId: E550
@@ -2487,6 +2599,8 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+  founded: "1975"
+  headquarters: Redmond, WA
 - id: nti-bio
   stableId: sid_D9lqMW2HVw
   wikiId: E551
@@ -2813,6 +2927,11 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+  founded: "2019"
+  headquarters: San Francisco, CA
+  funding: ~$30-50M/year
+  safetyFocus: |
+    AI safety research, unconventional projects, smaller grants.
 - id: situational-awareness-lp
   stableId: sid_FxJ9jQ7SlA
   wikiId: E568
@@ -2834,6 +2953,10 @@
     - ai-safety
     - governance
   lastUpdated: 2026-02
+  founded: "2024"
+  headquarters: San Francisco, CA
+  keyPeople:
+    - leopold-aschenbrenner
 - id: swift-centre
   stableId: sid_YlrwnKhMqQ
   wikiId: E569
@@ -2994,6 +3117,8 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  founded: "1993"
+  headquarters: Santa Clara, CA
 - id: ftx
   stableId: sid_yevJm2XDsQ
   wikiId: E856
@@ -3021,6 +3146,8 @@
     - ai-safety
     - community
   lastUpdated: 2026-02
+  founded: "2019"
+  headquarters: Nassau, Bahamas
 - id: ftx-future-fund
   stableId: sid_JhIGCaI3Ng
   wikiId: E855
@@ -3161,6 +3288,8 @@
     - ai-safety
   lastUpdated: 2026-03
 
+  founded: "1868"
+  headquarters: Berkeley, CA
 - id: stanford-university
   stableId: sid_ngrgdfqafw
   wikiId: E1113
@@ -3185,6 +3314,8 @@
     - ai-governance
   lastUpdated: 2026-03
 
+  founded: "1885"
+  headquarters: Stanford, CA
 - id: university-of-oxford
   stableId: sid_18K3KG3bpg
   wikiId: E1114
@@ -3205,6 +3336,8 @@
     - existential-risk
   lastUpdated: 2026-03
 
+  founded: "1096"
+  headquarters: Oxford, UK
 - id: harvard-university
   stableId: sid_r90ivRT8lA
   wikiId: E1115
@@ -3237,6 +3370,8 @@
     - academic
   lastUpdated: 2026-03
 
+  founded: "1740"
+  headquarters: Philadelphia, PA
 - id: yale-university
   stableId: sid_1tZbcfTFfw
   wikiId: E1117
@@ -3582,6 +3717,8 @@
     - existential-risk
   lastUpdated: 2026-03
 
+  founded: "1209"
+  headquarters: Cambridge, UK
 - id: brown-university
   stableId: sid_LUrRQBRfOg
   wikiId: E1142
@@ -5096,6 +5233,8 @@
     - philanthropy
   lastUpdated: 2026-03
 
+  founded: "2011"
+  headquarters: San Francisco, CA
 - id: wellcome-trust
   stableId: sid_D3QcAF9wzQ
   wikiId: E1456
@@ -6600,6 +6739,12 @@
   lastUpdated: 2026-03
 
 # --- ARIA Safeguarded AI grantee universities ---
+  founded: "1993"
+  headquarters: Montreal, Canada
+  keyPeople:
+    - yoshua-bengio
+  safetyFocus: |
+    AI safety research, responsible AI development.
 - id: university-college-london
   stableId: sid_HEAdFvsqJw
   type: organization
@@ -8007,6 +8152,8 @@
     influential in EA/rationalist circles.
   lastUpdated: 2026-03
 
+  founded: "1972"
+  headquarters: Fairfax, VA
 - id: uc-santa-cruz
   stableId: sid_OKO1q9NQaT
   type: organization

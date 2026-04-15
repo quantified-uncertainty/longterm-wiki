@@ -148,7 +148,7 @@ function applyEntityOverrides(entities, pages) {
 /**
  * Transform a raw entity into a typed entity.
  */
-function transformEntity(raw, expertMap, orgMap) {
+function transformEntity(raw, expertMap, orgTitleMap) {
   const oldType = raw.type;
   const canonicalType = OLD_TYPE_MAP[oldType] || oldType;
 
@@ -199,12 +199,15 @@ function transformEntity(raw, expertMap, orgMap) {
 
     case 'person': {
       const expert = expertMap.get(raw.id);
-      const org = expert?.affiliation ? orgMap.get(expert.affiliation) : null;
       const role = expert?.role || cf('Role');
       const knownForStr = cf('Known For');
       const knownFor = expert?.knownFor ||
         (knownForStr ? knownForStr.split(',').map(s => s.trim()).filter(Boolean) : []);
-      const affiliation = org?.name || expert?.affiliation || cf('Affiliation');
+      const affiliationSlug = expert?.affiliation;
+      const affiliation =
+        (affiliationSlug && orgTitleMap.get(affiliationSlug)) ||
+        affiliationSlug ||
+        cf('Affiliation');
 
       return {
         ...base,
@@ -224,21 +227,18 @@ function transformEntity(raw, expertMap, orgMap) {
     }
 
     case 'organization': {
-      const orgType = OLD_LAB_TYPE_TO_ORG_TYPE[oldType] || undefined;
-      const orgData = orgMap.get(raw.id);
+      const legacyOrgType = OLD_LAB_TYPE_TO_ORG_TYPE[oldType] || undefined;
       return {
         ...base,
         entityType: 'organization',
-        orgType: orgType || orgData?.type || raw.orgType || undefined,
-        founded: orgData?.founded || cf('Founded') || cf('Established'),
-        headquarters: orgData?.headquarters || cf('Location') || cf('Headquarters'),
-        employees: orgData?.employees || cf('Employees'),
-        funding: orgData?.funding || cf('Funding'),
-        website: orgData?.website || raw.website,
-        title: orgData?.name || raw.title,
+        orgType: raw.orgType || legacyOrgType || undefined,
+        founded: raw.founded || cf('Founded') || cf('Established'),
+        headquarters: raw.headquarters || cf('Location') || cf('Headquarters'),
+        employees: raw.employees || cf('Employees'),
+        funding: raw.funding || cf('Funding'),
         // parentOrg: legally separate entity that is part of a larger org.
         // Distinct from "divisions" (internal sub-units stored in wiki-server).
-        parentOrg: raw.parentOrg || orgData?.parentOrg || undefined,
+        parentOrg: raw.parentOrg || undefined,
         orgStatus: raw.orgStatus || undefined,
         customFields: filterCustomFields('Founded', 'Established', 'Location', 'Headquarters', 'Employees', 'Funding'),
       };
@@ -349,10 +349,9 @@ function transformEntity(raw, expertMap, orgMap) {
  * @param {Array} rawEntities - Raw entities from database.json
  * @param {Array} pages - Pages registry (for type overrides)
  * @param {Array} experts - Expert records
- * @param {Array} organizations - Organization records
  * @returns {Array} Typed entities ready for database.json
  */
-export function transformEntities(rawEntities, pages, experts, organizations) {
+export function transformEntities(rawEntities, pages, experts) {
   // Apply overrides first
   const entities = applyEntityOverrides(rawEntities, pages);
 
@@ -371,14 +370,20 @@ export function transformEntities(rawEntities, pages, experts, organizations) {
     }
   }
 
-  // Build lookup maps
   const expertMap = new Map(experts.map(e => [e.id, e]));
-  const orgMap = new Map(organizations.map(o => [o.id, o]));
+  // Org title map (slug → title) for resolving `expert.affiliation` slugs into
+  // display strings on person entities. Includes any legacy lab-*/funder type
+  // that canonicalizes to `organization` via OLD_TYPE_MAP.
+  const orgTitleMap = new Map(
+    entities
+      .filter(e => (OLD_TYPE_MAP[e.type] || e.type) === 'organization')
+      .map(e => [e.id, e.title])
+  );
 
   // Transform each entity
   const typedEntities = [];
   for (const raw of entities) {
-    const typed = transformEntity(raw, expertMap, orgMap);
+    const typed = transformEntity(raw, expertMap, orgTitleMap);
     if (typed) {
       typedEntities.push(typed);
     }

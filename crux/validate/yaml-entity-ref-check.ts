@@ -11,12 +11,11 @@
  *     - organization → org slug (projects)
  *     - summaryPage → page slug (informational, not blocking)
  *     - parentOrg → org slug
+ *     - keyPeople[] → person/expert slugs (organization entities)
  *     - stakeholders[].entityId → entity slug (policy responses)
  *     - keyPoliticians[].entityId → entity slug (policy responses)
  *   - data/experts.yaml:
  *     - affiliation → org/entity slug
- *   - data/organizations.yaml:
- *     - keyPeople[] → person/expert slugs
  *
  * Related bugs this would have caught:
  *   - #2723: affiliation: forethought (no forethought entity)
@@ -83,14 +82,6 @@ interface ParsedExpert {
   [key: string]: unknown;
 }
 
-interface ParsedOrganization {
-  id?: string;
-  name?: string;
-  keyPeople?: string[];
-  parentOrg?: string;
-  [key: string]: unknown;
-}
-
 // ---------------------------------------------------------------------------
 // Entity index building
 // ---------------------------------------------------------------------------
@@ -152,33 +143,6 @@ export function loadExpertSlugs(expertsPath: string): Set<string> {
     for (const expert of parsed) {
       if (expert && typeof expert === "object" && typeof expert.id === "string") {
         slugs.add(expert.id);
-      }
-    }
-  }
-
-  return slugs;
-}
-
-/**
- * Load all organization slugs from data/organizations.yaml.
- */
-export function loadOrgSlugs(orgsPath: string): Set<string> {
-  const slugs = new Set<string>();
-  if (!existsSync(orgsPath)) return slugs;
-
-  const content = readFileSync(orgsPath, "utf-8");
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(content);
-  } catch {
-    // Skip unparseable file — schema validation will catch YAML syntax errors
-    return slugs;
-  }
-
-  if (Array.isArray(parsed)) {
-    for (const org of parsed) {
-      if (org && typeof org === "object" && typeof org.id === "string") {
-        slugs.add(org.id);
       }
     }
   }
@@ -307,6 +271,28 @@ function checkEntityFiles(
         }
       }
 
+      // Check keyPeople[] (org entities) — references person/expert slugs.
+      const keyPeople = (entity as { keyPeople?: unknown }).keyPeople;
+      if (Array.isArray(keyPeople)) {
+        for (const personSlug of keyPeople) {
+          if (typeof personSlug !== "string") continue;
+          fileStats.checked++;
+          totalChecked++;
+          if (!allSlugs.has(personSlug)) {
+            fileStats.dangling++;
+            danglingRefs.push({
+              sourceFile: relPath,
+              sourceId: entityId,
+              sourceTitle: entityTitle,
+              fieldName: "keyPeople[]",
+              refValue: personSlug,
+              severity: "error",
+              expectedType: "person",
+            });
+          }
+        }
+      }
+
       // Check summaryPage — warning only (references page slugs, not entity slugs)
       // We still check against entity slugs since many summaryPages match entity IDs
       // but some legitimately reference MDX file slugs, so it's informational only.
@@ -428,78 +414,6 @@ function checkExpertsFile(
   return { refs: danglingRefs, checked };
 }
 
-/**
- * Check data/organizations.yaml for dangling keyPeople and parentOrg references.
- */
-function checkOrganizationsFile(
-  orgsPath: string,
-  allSlugs: Set<string>,
-  expertSlugs: Set<string>,
-  relPath: string
-): { refs: DanglingRef[]; checked: number } {
-  const danglingRefs: DanglingRef[] = [];
-  let checked = 0;
-
-  if (!existsSync(orgsPath)) return { refs: danglingRefs, checked };
-
-  const content = readFileSync(orgsPath, "utf-8");
-  let parsed: unknown;
-  try {
-    parsed = parseYaml(content);
-  } catch {
-    // Skip unparseable file — schema validation will catch YAML syntax errors
-    return { refs: danglingRefs, checked };
-  }
-
-  if (!Array.isArray(parsed)) return { refs: danglingRefs, checked };
-
-  // Combine entity slugs and expert slugs for keyPeople lookups
-  const peopleSlugs = new Set([...allSlugs, ...expertSlugs]);
-
-  for (const org of parsed as ParsedOrganization[]) {
-    if (!org || typeof org !== "object") continue;
-    const orgId = org.id ?? "(unknown)";
-    const orgName = org.name ?? orgId;
-
-    // Check keyPeople
-    if (Array.isArray(org.keyPeople)) {
-      for (const personSlug of org.keyPeople) {
-        if (typeof personSlug !== "string") continue;
-        checked++;
-        if (!peopleSlugs.has(personSlug)) {
-          danglingRefs.push({
-            sourceFile: relPath,
-            sourceId: orgId,
-            sourceTitle: orgName,
-            fieldName: "keyPeople[]",
-            refValue: personSlug,
-            severity: "error",
-            expectedType: "person",
-          });
-        }
-      }
-    }
-
-    // Check parentOrg
-    if (typeof org.parentOrg === "string") {
-      checked++;
-      if (!allSlugs.has(org.parentOrg)) {
-        danglingRefs.push({
-          sourceFile: relPath,
-          sourceId: orgId,
-          sourceTitle: orgName,
-          fieldName: "parentOrg",
-          refValue: org.parentOrg,
-          severity: "error",
-          expectedType: "organization",
-        });
-      }
-    }
-  }
-
-  return { refs: danglingRefs, checked };
-}
-
 // ---------------------------------------------------------------------------
 // Main validation function
 // ---------------------------------------------------------------------------
@@ -513,22 +427,21 @@ function checkOrganizationsFile(
 export function validateYamlEntityRefs(projectRoot: string): ValidationResult {
   const entitiesDir = join(projectRoot, "data", "entities");
   const expertsPath = join(projectRoot, "data", "experts.yaml");
-  const orgsPath = join(projectRoot, "data", "organizations.yaml");
 
   // Step 1: Build the combined set of all known entity slugs
   const entitySlugs = loadEntitySlugs(entitiesDir);
   const expertSlugs = loadExpertSlugs(expertsPath);
-  const orgSlugs = loadOrgSlugs(orgsPath);
 
   // Merge all slugs into one set for cross-file reference resolution
-  const allSlugs = new Set([...entitySlugs, ...expertSlugs, ...orgSlugs]);
+  const allSlugs = new Set([...entitySlugs, ...expertSlugs]);
 
   // Step 2: Check each data source for dangling references
   const allDangling: DanglingRef[] = [];
   let totalChecked = 0;
   const allByFile: Record<string, { checked: number; dangling: number }> = {};
 
-  // 2a: Entity YAML files (relatedEntries, developer, organization, summaryPage, parentOrg)
+  // 2a: Entity YAML files (relatedEntries, developer, organization, summaryPage,
+  //     parentOrg, keyPeople[])
   const entityResult = checkEntityFiles(entitiesDir, allSlugs, "data/entities");
   allDangling.push(...entityResult.refs);
   totalChecked += entityResult.checked;
@@ -542,17 +455,6 @@ export function validateYamlEntityRefs(projectRoot: string): ValidationResult {
     allByFile["data/experts.yaml"] = {
       checked: expertsResult.checked,
       dangling: expertsResult.refs.length,
-    };
-  }
-
-  // 2c: Organizations file (keyPeople, parentOrg)
-  const orgsResult = checkOrganizationsFile(orgsPath, allSlugs, expertSlugs, "data/organizations.yaml");
-  allDangling.push(...orgsResult.refs);
-  totalChecked += orgsResult.checked;
-  if (orgsResult.checked > 0) {
-    allByFile["data/organizations.yaml"] = {
-      checked: orgsResult.checked,
-      dangling: orgsResult.refs.length,
     };
   }
 

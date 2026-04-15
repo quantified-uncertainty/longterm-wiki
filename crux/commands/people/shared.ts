@@ -91,13 +91,6 @@ export interface ExpertEntry {
   [key: string]: unknown;
 }
 
-export interface OrgEntry {
-  id: string;
-  name: string;
-  keyPeople?: string[];
-  [key: string]: unknown;
-}
-
 // ---------------------------------------------------------------------------
 // Types — link-resources
 // ---------------------------------------------------------------------------
@@ -337,19 +330,18 @@ export function discoverCandidates(): Map<string, PersonCandidate> {
     }
   }
 
-  // Source 2: data/organizations.yaml keyPeople
-  const orgs = loadYaml<OrgEntry[]>('data/organizations.yaml');
-  if (orgs && Array.isArray(orgs)) {
-    for (const org of orgs) {
-      if (org.keyPeople) {
-        for (const personId of org.keyPeople) {
-          if (!existingPersonIds.has(personId)) {
-            addCandidate(personId, slugToName(personId), {
-              type: 'org-keyPeople',
-              context: `${org.name} (${org.id})`,
-            });
-          }
-        }
+  // Source 2: organization entities' keyPeople (from data/entities/organizations.yaml)
+  for (const entity of allEntities) {
+    if (entity.type !== 'organization') continue;
+    const keyPeople = (entity as { keyPeople?: unknown }).keyPeople;
+    if (!Array.isArray(keyPeople)) continue;
+    for (const personId of keyPeople) {
+      if (typeof personId !== 'string') continue;
+      if (!existingPersonIds.has(personId)) {
+        addCandidate(personId, slugToName(personId), {
+          type: 'org-keyPeople',
+          context: `${entity.title || entity.id} (${entity.id})`,
+        });
       }
     }
   }

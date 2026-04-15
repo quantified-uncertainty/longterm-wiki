@@ -201,39 +201,6 @@ function synthesizeExpertsFromPg(pgRows) {
   return experts;
 }
 
-/**
- * Extract a synthetic `organizations` array from PG entity metadata. Mirrors
- * the YAML data/organizations.yaml schema.
- *
- * NOTE: This is where the known gap lives. sync-entities.ts does NOT today
- * carry data/organizations.yaml into PG the way it carries experts.yaml. So
- * this synthesis will return an empty (or mostly empty) array, producing a
- * visible Type A diff for the 31 orgs that rely on organizations.yaml for
- * founded/headquarters/employees/funding/keyPeople.
- */
-function synthesizeOrganizationsFromPg(pgRows) {
-  const orgs = [];
-  for (const row of pgRows) {
-    if (row.entityType !== "organization") continue;
-    const m = row.metadata || {};
-    const hasOrgData =
-      m.founded || m.headquarters || m.employees || m.funding || m.keyPeople;
-    if (!hasOrgData) continue;
-    orgs.push({
-      id: row.id,
-      name: row.title,
-      type: m.orgType ?? undefined,
-      founded: m.founded ?? undefined,
-      headquarters: m.headquarters ?? undefined,
-      employees: m.employees ?? undefined,
-      funding: m.funding ?? undefined,
-      website: row.website ?? undefined,
-      keyPeople: m.keyPeople ?? undefined,
-    });
-  }
-  return orgs;
-}
-
 // ---------------------------------------------------------------------------
 // Diff
 // ---------------------------------------------------------------------------
@@ -370,9 +337,8 @@ async function main() {
   // --- Step 3: convert to raw entity shape for transform ---
   const rawEntities = pgRows.map(pgRowToRawEntity);
   const synthExperts = synthesizeExpertsFromPg(pgRows);
-  const synthOrganizations = synthesizeOrganizationsFromPg(pgRows);
   console.log(
-    `3. Synthesized: ${synthExperts.length} experts, ${synthOrganizations.length} orgs from PG metadata`
+    `3. Synthesized: ${synthExperts.length} experts from PG metadata`
   );
 
   // --- Step 4: load pages (same source as build-data.mjs) ---
@@ -400,8 +366,7 @@ async function main() {
   const typedEntitiesFromPg = transformEntities(
     rawEntities,
     pages,
-    synthExperts,
-    synthOrganizations
+    synthExperts
   );
   console.log(`   ${typedEntitiesFromPg.length} typedEntities produced from PG`);
 

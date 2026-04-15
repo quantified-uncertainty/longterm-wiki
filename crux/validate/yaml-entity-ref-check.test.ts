@@ -6,7 +6,6 @@ import {
   validateYamlEntityRefs,
   loadEntitySlugs,
   loadExpertSlugs,
-  loadOrgSlugs,
 } from "./yaml-entity-ref-check.ts";
 
 // ---------------------------------------------------------------------------
@@ -111,36 +110,6 @@ describe("loadExpertSlugs", () => {
 });
 
 // ---------------------------------------------------------------------------
-// loadOrgSlugs
-// ---------------------------------------------------------------------------
-
-describe("loadOrgSlugs", () => {
-  let tempDir: string;
-  beforeAll(() => {
-    tempDir = mkdtempSync(join(tmpdir(), "org-slugs-test-"));
-    writeFileSync(
-      join(tempDir, "organizations.yaml"),
-      `
-- id: acme-corp
-  name: ACME Corp
-- id: widget-inc
-  name: Widget Inc
-`,
-      "utf-8"
-    );
-  });
-
-  afterAll(() => rmSync(tempDir, { recursive: true, force: true }));
-
-  it("loads organization slugs", () => {
-    const slugs = loadOrgSlugs(join(tempDir, "organizations.yaml"));
-    expect(slugs.size).toBe(2);
-    expect(slugs.has("acme-corp")).toBe(true);
-    expect(slugs.has("widget-inc")).toBe(true);
-  });
-});
-
-// ---------------------------------------------------------------------------
 // validateYamlEntityRefs — core validation
 // ---------------------------------------------------------------------------
 
@@ -200,12 +169,14 @@ describe("validateYamlEntityRefs", () => {
 `
       );
 
+      // Add keyPeople to the org entity (formerly in data/organizations.yaml)
       writeYaml(
         tempDir,
-        "data/organizations.yaml",
+        "data/entities/orgs-keypeople.yaml",
         `
-- id: anthropic
-  name: Anthropic
+- id: anthropic-keypeople
+  type: organization
+  title: Anthropic (keyPeople holder)
   keyPeople:
     - dario-amodei
 `
@@ -225,7 +196,7 @@ describe("validateYamlEntityRefs", () => {
       // relatedEntries: 2 (anthropic->dario, dario->anthropic)
       // developer: 1 (claude-3->anthropic)
       // affiliation: 1 (dario->anthropic)
-      // keyPeople: 1 (anthropic->dario)
+      // keyPeople: 1 (anthropic-keypeople->dario)
       expect(result.stats.totalRefsChecked).toBe(5);
       expect(result.stats.validRefs).toBe(5);
     });
@@ -388,7 +359,7 @@ describe("validateYamlEntityRefs", () => {
     });
   });
 
-  describe("dangling keyPeople reference in organizations.yaml", () => {
+  describe("dangling keyPeople reference on org entity", () => {
     let tempDir: string;
     beforeAll(() => {
       tempDir = createTempProject();
@@ -403,10 +374,11 @@ describe("validateYamlEntityRefs", () => {
       );
       writeYaml(
         tempDir,
-        "data/organizations.yaml",
+        "data/entities/orgs.yaml",
         `
 - id: acme
-  name: ACME
+  type: organization
+  title: ACME
   keyPeople:
     - real-person
     - ghost-person
@@ -483,13 +455,14 @@ describe("validateYamlEntityRefs", () => {
 `
       );
 
-      // Organization references expert in keyPeople
+      // Org entity references expert in keyPeople
       writeYaml(
         tempDir,
-        "data/organizations.yaml",
+        "data/entities/orgs-keypeople.yaml",
         `
-- id: anthropic
-  name: Anthropic
+- id: anthropic-keypeople
+  type: organization
+  title: Anthropic (keyPeople holder)
   keyPeople:
     - dario
 `
