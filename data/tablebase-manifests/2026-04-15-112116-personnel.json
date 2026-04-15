@@ -1,0 +1,50 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-15T11:21:16.313Z",
+  "sourcingSummary": {
+    "withSourcing": 4,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 4,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "psZ85tKRL4",
+      "personId": "nofWRqL7zw",
+      "organizationId": "sid_KYKdAOzynA",
+      "role": "Co-founder and Organizer",
+      "source": "https://www.lesswrong.com/posts/6YWCy2RbZQ6A6k5di/announcing-manifest-2023-sep-22-24-in-berkeley-2",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "7IItD92ic3",
+      "personId": "4LaT0LMUEX",
+      "organizationId": "sid_KYKdAOzynA",
+      "role": "Co-founder and Organizer",
+      "source": "https://www.lesswrong.com/posts/6YWCy2RbZQ6A6k5di/announcing-manifest-2023-sep-22-24-in-berkeley-2",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "nPmOGb4PeA",
+      "personId": "XasVEVBTGo",
+      "organizationId": "sid_KYKdAOzynA",
+      "role": "Co-founder and Organizer",
+      "source": "https://www.lesswrong.com/posts/6YWCy2RbZQ6A6k5di/announcing-manifest-2023-sep-22-24-in-berkeley-2",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "0wxWXup8V3",
+      "personId": "ZNhQhscS53",
+      "organizationId": "sid_KYKdAOzynA",
+      "role": "Organizer",
+      "source": "https://www.lesswrong.com/posts/6YWCy2RbZQ6A6k5di/announcing-manifest-2023-sep-22-24-in-berkeley-2",
+      "verdict": "confirmed"
+    }
+  ]
+}
