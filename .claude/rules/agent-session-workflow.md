@@ -88,6 +88,35 @@ You cannot end the session until every observation has a disposition. **"I'll re
 
 Every session should end with one of these. See `.claude/rules/pr-review-guidelines.md` for the full end-of-session workflow.
 
+## Rescoping a ticket — MANDATORY enumeration
+
+When you (as a coordinator or individual contributor) rescope a ticket based on new information — changing the stated scope, updating the work plan, or writing a correction comment — you MUST run the same live-enumeration step that the ticket's own dispatch brief would require.
+
+**Specifically**: before posting a rescope comment that changes migration plans, CHECK constraint shapes, FK audit counts, row counts, or format distributions, run a direct data query (via prod wiki-server or the `/internal/data-quality` dashboard if its classifier is trustworthy for the columns in question) and paste the output into the rescope comment under an `### Enumeration` heading.
+
+A rescope based on "I read the schema and believe X" is as unreliable as a migration written without `SELECT COUNT(*)`. **The mental model is not enough — you have to count the actual rows.**
+
+This rule is the same lesson encoded in `.claude/rules/database-migrations.md` § "Adding CHECK constraints on enum columns", applied to a different context: that rule binds dispatch briefs and migration authors; this rule binds coordinators rewriting scope.
+
+### Why the rule exists
+
+Two real incidents in a single coordinator session on 2026-04-14 (QUA-408 work in slot a6) shipped because the dispatcher trusted code inspection instead of counting rows:
+
+- **QUA-492 (halt)**: I wrote a dispatch brief saying "Phase 1 is 90% done — add CHECK constraints and delete legacy branches." Slot a15 ran the mandatory enumeration as its first step and discovered `entity_resources.resource_id` was 0% canonical (4,182 legacy rows), `resources.id` was 0% canonical (22,878 legacy rows), and `facts.fact_id` was only 65% canonical (776 legacy rows). The CHECK constraint would have failed `VALIDATE CONSTRAINT` against 35–100% of the target columns. Slot a15 halted cleanly per `.claude/rules/proactive-github-filing.md` § "Misdiagnosis discovered". I (the dispatcher) had never run the enumeration before writing the brief — I pattern-matched from the epic body's claim that "migration is done" and trusted it.
+- **QUA-498 (incomplete rescope)**: After the QUA-492 halt, I rescoped QUA-498 from "design canonical format" to "populate `resources.stable_id` for NULL rows + migrate FKs to sid_". I inspected the schema, confirmed the column existed, and wrote the rescope comment. Shortly after, another session (QUA-503) ran a full enumeration and found 5,002 **bare10 legacy rows** I had missed — they had populated stable_ids in legacy format. My rescope was directionally correct but incomplete; Phase A as written would have shipped a CHECK constraint that rejected those 5,002 rows. Another potential re-halt.
+
+Both incidents have the same shape: **read the code, find what you need, stop before running a data query, ship a brief that's wrong**. See QUA-492 / QUA-498 / QUA-503 comments and QUA-508 for the full discovery trail.
+
+### Exceptions
+
+Trivial rescopes that don't depend on data don't need enumeration:
+- Renaming a ticket
+- Adding a pointer to a related ticket
+- Correcting a typo in the description
+- Changing priority or assignee
+
+The rule fires when the rescope **changes data assumptions** — row counts, format distributions, schema state, FK populations, migration shapes, CHECK constraint contents.
+
 ## Why this matters
 
 - PRs give the user a chance to review before changes land on main

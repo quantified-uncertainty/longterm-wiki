@@ -240,3 +240,141 @@ describe('classifyEntry — bucket assignment', () => {
     expect(classifyEntry(issue, [], makeChildrenResult(children)).bucket).toBe('parent-epic');
   });
 });
+
+describe('classifyEntry — parent epic with open children', () => {
+  it('parent with merged PR and open children is ACTIVE, not SHIPPED', () => {
+    const issue = makeIssue();
+    const items = [
+      makePr({ number: 4301, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+    ];
+    const children = [
+      makeChild({ name: 'Done', type: 'completed' }),
+      makeChild({ name: 'In Progress', type: 'started' }),
+      makeChild({ name: 'Backlog', type: 'backlog' }),
+    ];
+    const e = classifyEntry(issue, items, makeChildrenResult(children));
+    expect(e.bucket).toBe('active');
+    expect(e.bucket).not.toBe('shipped');
+    expect(e.reason).toContain('parent epic');
+    expect(e.reason).toContain('2 open children');
+    expect(e.reason).toContain('#4301');
+    // Still surfaces the merged PR data for context
+    expect(e.mergedPRs).toHaveLength(1);
+    expect(e.unresolvedChildren).toHaveLength(2);
+  });
+
+  it('parent with no PRs but open children is ACTIVE (not orphan/stuck)', () => {
+    const issue = makeIssue({ updatedAt: daysAgo(STALE_DAYS + 5) });
+    const children = [
+      makeChild({ name: 'In Progress', type: 'started' }),
+      makeChild({ name: 'In Progress', type: 'started' }),
+    ];
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
+    expect(e.bucket).toBe('active');
+    expect(e.reason).toContain('2 open children');
+  });
+
+  it('parent with one open child uses singular wording', () => {
+    const issue = makeIssue();
+    const children = [makeChild({ name: 'In Progress', type: 'started' })];
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
+    expect(e.bucket).toBe('active');
+    expect(e.reason).toContain('1 open child');
+    expect(e.reason).not.toContain('children');
+  });
+
+  it('parent with truncated child list pluralizes even with one visible unresolved child', () => {
+    const issue = makeIssue();
+    const children = [
+      makeChild({ name: 'In Progress', type: 'started' }),
+      makeChild({ name: 'Done', type: 'completed' }),
+    ];
+    const e = classifyEntry(issue, [], makeChildrenResult(children, true));
+    expect(e.bucket).toBe('active');
+    // Plural + "+" because hasMore=true means unfetched children may also
+    // be unresolved — "1 open child+" would mislead.
+    expect(e.reason).toContain('1 open children+');
+  });
+
+  it('parent with all-resolved children still classifies as PARENT-EPIC', () => {
+    const issue = makeIssue();
+    const children = [
+      makeChild({ name: 'Done', type: 'completed' }),
+      makeChild({ name: 'Canceled', type: 'canceled' }),
+    ];
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
+    expect(e.bucket).toBe('parent-epic');
+  });
+
+  it('leaf issue (no children) with merged PR still classifies as SHIPPED', () => {
+    const issue = makeIssue();
+    const items = [
+      makePr({ number: 5, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+    ];
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
+    expect(e.bucket).toBe('shipped');
+  });
+});
+
+describe('classifyEntry — no-auto-close label', () => {
+  function withLabel(): LinearTriageIssue {
+    return makeIssue({ labels: { nodes: [{ name: 'no-auto-close' }] } });
+  }
+
+  it('leaf issue with merged PR + no-auto-close label is ACTIVE, not SHIPPED', () => {
+    const issue = withLabel();
+    const items = [
+      makePr({ number: 5, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+    ];
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
+    expect(e.bucket).toBe('active');
+    expect(e.reason).toContain('no-auto-close');
+    expect(e.reason).toContain('manual review');
+  });
+
+  it('parent with all-resolved children + no-auto-close label is ACTIVE, not PARENT-EPIC', () => {
+    const issue = withLabel();
+    const children = [
+      makeChild({ name: 'Done', type: 'completed' }),
+      makeChild({ name: 'Done', type: 'completed' }),
+    ];
+    const e = classifyEntry(issue, [], makeChildrenResult(children));
+    expect(e.bucket).toBe('active');
+    expect(e.reason).toContain('no-auto-close');
+  });
+
+  it('label has no effect on issues without merged PRs or resolved children', () => {
+    const issue = withLabel();
+    const e = classifyEntry({ ...issue, updatedAt: daysAgo(1) }, [], makeChildrenResult([]));
+    expect(e.bucket).toBe('stuck');
+  });
+
+  it('parent-epic branch wins when both no-auto-close label and unresolved children are present', () => {
+    // Precedence: the open-children branch fires before the label branch,
+    // so the reason surfaces "parent epic", not the label. Both paths would
+    // have yielded 'active', so the classification is correct either way.
+    const issue = withLabel();
+    const items = [
+      makePr({ number: 5, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+    ];
+    const children = [
+      makeChild({ name: 'In Progress', type: 'started' }),
+    ];
+    const e = classifyEntry(issue, items, makeChildrenResult(children));
+    expect(e.bucket).toBe('active');
+    expect(e.reason).toContain('parent epic');
+    expect(e.reason).toContain('#5');
+  });
+
+  it('case-insensitive label match (No-Auto-Close, NO-AUTO-CLOSE)', () => {
+    for (const labelName of ['No-Auto-Close', 'NO-AUTO-CLOSE', 'no-auto-close']) {
+      const issue = makeIssue({ labels: { nodes: [{ name: labelName }] } });
+      const items = [
+        makePr({ number: 1, state: 'closed', mergedAt: '2026-04-10T00:00:00Z' }),
+      ];
+      const e = classifyEntry(issue, items, makeChildrenResult([]));
+      expect(e.bucket, `label="${labelName}"`).toBe('active');
+      expect(e.reason).toContain('no-auto-close');
+    }
+  });
+});
