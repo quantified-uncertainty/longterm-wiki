@@ -48,6 +48,7 @@ import { buildPagesRegistry } from "./lib/pages-builder.mjs";
 import { buildUrlToResourceMap } from "./lib/unconverted-links.mjs";
 import { buildIdRegistry } from "./lib/id-registry.mjs";
 import { collectPageWikiIds } from "./lib/frontmatter-scanner.mjs";
+import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..", "..", "..");
@@ -82,16 +83,17 @@ const AUTH_HEADERS = API_KEY
 // PG fetchers
 // ---------------------------------------------------------------------------
 
+// Thin wrapper: 3-attempt exponential backoff on 5xx/429/timeouts via the
+// shared helper in wiki-server-data.mjs. Throws on terminal failure so the
+// per-item try/catch in pMap can turn it into a skip.
 async function fetchJson(path) {
-  const url = `${SERVER_URL}${path}`;
-  const resp = await fetch(url, {
+  const result = await fetchJsonWithRetry(`${SERVER_URL}${path}`, {
     headers: AUTH_HEADERS,
-    signal: AbortSignal.timeout(30_000),
   });
-  if (!resp.ok) {
-    throw new Error(`GET ${path} → HTTP ${resp.status}`);
+  if (!result.ok) {
+    throw new Error(`GET ${path} → ${result.reason}`);
   }
-  return resp.json();
+  return result.data;
 }
 
 /** List all entity slugs + stableIds (one paginated call). */
@@ -261,8 +263,8 @@ function diffTypedEntities(yamlArr, pgArr) {
       const yv = yamlE[key];
       const pv = pgE[key];
       if (isEqual(yv, pv)) continue;
-      const yPresent = yv !== undefined && yv !== null && !(Array.isArray(yv) && yv.length === 0);
-      const pPresent = pv !== undefined && pv !== null && !(Array.isArray(pv) && pv.length === 0);
+      const yPresent = isPresent(yv);
+      const pPresent = isPresent(pv);
       let type;
       if (yPresent && !pPresent) type = "A";
       else if (!yPresent && pPresent) type = "B";
@@ -276,6 +278,13 @@ function diffTypedEntities(yamlArr, pgArr) {
   }
 
   return { yamlOnly, pgOnly, fieldDiffs };
+}
+
+/** A value is "present" if it's not null/undefined and not an empty array. */
+function isPresent(v) {
+  if (v == null) return false;
+  if (Array.isArray(v) && v.length === 0) return false;
+  return true;
 }
 
 function isEqual(a, b) {
@@ -324,12 +333,14 @@ async function main() {
 
   // --- Step 2: fetch full shape for each ---
   console.log("2. Fetching full entity shapes (metadata + relatedEntries + customFields)...");
+  let skipped = 0;
   const fullRows = await pMap(
     slugs,
     async (slug) => {
       try {
         return await fetchEntityFull(slug);
       } catch (err) {
+        skipped++;
         console.warn(`   skip ${slug}: ${err.message}`);
         return null;
       }
@@ -337,7 +348,11 @@ async function main() {
     20
   );
   const pgRows = fullRows.filter((r) => r != null);
-  console.log(`   ${pgRows.length} entities fetched`);
+  console.log(`   ${pgRows.length} entities fetched${skipped > 0 ? ` (${skipped} skipped)` : ""}`);
+  if (skipped > 0 && skipped / slugs.length > 0.01) {
+    console.error(`   ERROR: skip rate ${(skipped / slugs.length * 100).toFixed(1)}% exceeds 1% — diff would have spurious Type-D entries. Aborting.`);
+    process.exit(1);
+  }
 
   // --- Step 3: convert to raw entity shape for transform ---
   const rawEntities = pgRows.map(pgRowToRawEntity);
@@ -348,6 +363,10 @@ async function main() {
   );
 
   // --- Step 4: load pages (same source as build-data.mjs) ---
+  // transformEntities uses pages for path-based type overrides and for
+  // filling in missing descriptions from page.description. Both pipelines
+  // must see the same pages list for the diff to be apples-to-apples, so
+  // we pay the MDX-scan cost even though it's expensive.
   console.log("4. Loading pages from MDX frontmatter...");
   const urlToResource = buildUrlToResourceMap([]);
   const pages = buildPagesRegistry(urlToResource, new Map(), { gitCreatedMap: new Map(), gitModifiedMap: new Map() }, new Map(), new Map());
@@ -419,10 +438,10 @@ async function main() {
 }
 
 function summarizeDiff(diff) {
-  const byType = { A: 0, B: 0, C: 0, D: 0 };
+  const byType = { A: 0, B: 0, C: 0 };
   const byField = new Map();
   for (const d of diff.fieldDiffs) {
-    byType[d.type] = (byType[d.type] || 0) + 1;
+    byType[d.type]++;
     const fieldKey = `${d.type}:${d.key}`;
     byField.set(fieldKey, (byField.get(fieldKey) || 0) + 1);
   }
@@ -466,7 +485,6 @@ function summarizeDiff(diff) {
 
   return {
     counts: { ...byType, fieldDiffs: diff.fieldDiffs.length, yamlOnly: diff.yamlOnly.length, pgOnly: diff.pgOnly.length },
-    topFields,
     human,
     markdown,
   };
