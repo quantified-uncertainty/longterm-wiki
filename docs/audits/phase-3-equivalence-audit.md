@@ -19,7 +19,7 @@ Both are small, well-contained fixes. Neither requires new schema columns. Neith
 
 Across the shared 2026-entity surface, out of ~44,000 field-value pairs compared, we observed **1,895 field diffs** (~4.3%). Of those, **~60% are structural artifacts of how wikiIds are allocated in-memory** (fixable by persisting the id_registry), and the real sync gaps resolve to the two tickets above.
 
-**FactBase is even cleaner**: 2,209/2,209 facts match perfectly across 496 entities (**100% row equivalence, zero Type D**). The only diffs are **45 float32 precision-loss cases** in large-integer fields where PG uses a `real` column — a one-line schema fix. See §6 and Finding #8.
+**FactBase is even cleaner**: 2,209/2,209 facts match perfectly across 496 entities (**100% row equivalence, zero Type D**). 45 field-value diffs total: **42 are float32 precision loss** in PG's `real` numeric column (one-line schema fix), and **3 are a real `refs` round-trip bug** where single-element arrays containing comma-separated strings get naive-split on readback. Both are cleanly fixable; neither requires schema additions. See §6 and Finding #8.
 
 ## Committed artifacts
 
@@ -36,7 +36,7 @@ Both are regeneratable by running `apps/web/scripts/build-data-from-pg.mjs` and 
 
 Today's data flow:
 
-```
+```text
 YAML files (data/entities/*.yaml, packages/factbase/data/things/*.yaml, ...)
   ↓
 apps/web/scripts/build-data.mjs (reads YAML directly)
@@ -48,7 +48,7 @@ Next.js content pages read these JSON files at build time
 
 Phase 3's target:
 
-```
+```text
 YAML files (authors edit here)
   ↓ sync (one-way YAML → PG)
 PG (source of truth)
@@ -137,13 +137,33 @@ These are also loaded by `build-data.mjs` into `database.json`:
 | `data/publications.yaml`    | 152  | N/A        | Venue metadata (arXiv, Nature). Used by `getPublicationById` / sources pages. YAML-only.    |
 | `data/experts.yaml`         |  —   | —          | (listed above)                                                                               |
 
-**Note**: `database.experts`, `database.estimates`, `database.glossary`, `database.funders`, and the top-level `database.organizations` list are each written to `database.json` by `build-data.mjs` but **no code in `apps/web/src` reads them**. They appear to be dead writes (verified by grep). Phase 3 can drop them from `database.json` entirely. The `data/organizations.yaml` YAML file is still load-bearing, but its data flows only through the `transformEntities()` enrichment path, not through `database.organizations`.
+**Note — dead writes in `database.json`** (triple-checked via `rg` in `apps/web/src/` and `crux/` at audit time):
+
+| Top-level key            | In current `database.json`? | Read by app or crux? |
+|--------------------------|:---------------------------:|:--------------------:|
+| `database.experts`       | **Already stripped** at `output-writer.mjs:37` | No readers |
+| `database.estimates`     | Present (36 rows)           | **No readers**       |
+| `database.glossary`      | Present (21 rows)           | **No readers**       |
+| `database.funders`       | Present (1 object)          | **No readers**       |
+| `database.organizations` (top-level) | Present (31 rows) | **No readers**       |
+| `database.publications`  | Present (152 venues)        | Yes — `getPublicationById`, `getAllPublications` (real read path) |
+| `database.resources`     | **Never written** — Phase-4 lazy-loaded to `resources.json` | Via `getAllResources()` / `resources.json` |
+
+Search commands used (run from repo root):
+
+```bash
+rg 'database\.(experts|estimates|glossary|funders|organizations)\b|db\.(experts|estimates|glossary|funders|organizations)\b' apps/web/src crux
+# Returns zero matches. The only `.organizations` reference in tablebase.ts is
+# the ResearchAreaDetailOrg shape — unrelated to database.organizations.
+```
+
+Phase 3 can drop all four of the "no readers" keys from `database.json` entirely, saving ~30 KB. The `data/organizations.yaml` YAML file is still load-bearing because its data flows through the `transformEntities()` enrichment path (see Finding #2), not through the top-level `database.organizations` write. `database.resources` is never in the main file — it's been lazy-loaded from a sidecar `resources.json` since Phase-4 of the build pipeline. **Resources are out of scope for this audit and already PG-primary**.
 
 ## 4. Diff summary
 
 All diffs are against the shared 2,026-entity surface (YAML-sourced baseline `typedEntities`).
 
-```
+```text
 Total field diffs:     1,895
   Type A (YAML only):    560  (field in YAML, null/missing in PG)
   Type B (PG only):      102  (field in PG, null/missing in YAML)
@@ -267,11 +287,36 @@ PG-sourced pipeline picks them up via the synthesised orgMap and actually produc
 
 **Implication**: Phase 3 is a net **improvement** for these 37+ entities (founded), 34+ (headquarters), 17 (knownFor), etc. Not a gap, not a risk — a win.
 
-### Finding #6 — `affiliation` format drift (C:51)
+### Finding #6 — `affiliation` is display name vs slug (C:51 — same root cause as Finding #2)
 
-YAML has `chris-olah.affiliation = 'Anthropic'` (display-name string). PG's metadata has `affiliation = 'anthropic'` (slug). This is because `sync-entities.ts::mergeExpertData` writes `expert.affiliation` as-is, but expert records in `data/experts.yaml` use lowercase slugs, not display names.
+**Observed**: 51 person entities have `affiliation = 'Anthropic'` (display name) in YAML but `affiliation = 'anthropic'` (slug) in the PG-sourced path. Representative samples from the committed `docs/audits/phase-3-equivalence-audit.diff.json`:
 
-The YAML pipeline then calls `transformEntity`'s person branch which reads `expert?.affiliation` — also the lowercase slug. So YAML *should* also have `affiliation = 'anthropic'`. But the current `database.json` has `affiliation = 'Anthropic'` which must come from a different enrichment path — possibly `orgData?.name` via the org branch? Let me re-check; this is mildly confusing but the value difference is display-format only (slug vs. Title Case), not data loss. **Classification: low-severity drift, resolvable during Phase 3 testing.**
+| Person             | YAML                                   | PG                      |
+|--------------------|----------------------------------------|-------------------------|
+| `chris-olah`       | `"Anthropic"`                          | `"anthropic"`           |
+| `dario-amodei`     | `"Anthropic"`                          | `"anthropic"`           |
+| `daniela-amodei`   | `"Anthropic"`                          | `"anthropic"`           |
+| `demis-hassabis`   | `"Google DeepMind"`                    | `"deepmind"`            |
+| `allan-dafoe`      | `"Google DeepMind"`                    | `"deepmind"`            |
+| `dan-hendrycks`    | `"Center for AI Safety"`               | `"cais"`                |
+| `eliezer-yudkowsky`| `"Machine Intelligence Research Institute"` | `"miri"`          |
+| `elizabeth-kelly`  | `"US AI Safety Institute"`             | `"us-aisi"`             |
+| `andrew-ng`        | `"Stanford University"`                | `"stanford-university"` |
+| `david-krueger`    | `"University of Cambridge"`            | `"university-of-cambridge"` |
+
+**Root cause**: This is the **same bug as Finding #2**, observed from a different angle. Looking at `transformEntity` at `apps/web/scripts/lib/entity-transform.mjs:207`:
+
+```js
+const affiliation = org?.name || expert?.affiliation || cf('Affiliation');
+```
+
+The YAML pipeline builds `orgMap` from `data/organizations.yaml`, so `org?.name` resolves to the display name (e.g. `"Anthropic"`) for all 31 marquee orgs. The PG pipeline has no access to `data/organizations.yaml` (because it isn't synced — Finding #2), so the `org?.name` branch returns `undefined` and we fall through to `expert?.affiliation`, which is the lowercase slug stored by `mergeExpertData`.
+
+The diff shows up as "format drift" but it's really the same missing-sync that Finding #2 describes. All 51 affected persons are affiliated with orgs that are in the 31-org `data/organizations.yaml` list.
+
+**Fix**: fixing Finding #2 (syncing `data/organizations.yaml` into PG metadata, or consolidating the 31-org data into `data/entities/organizations.yaml`) eliminates this finding as a side effect — PG would then have `metadata.orgs[anthropic].name = "Anthropic"` for the synthesised orgMap to return. No separate work needed.
+
+**Classification: medium-severity — user-facing display drift until Finding #2 is fixed.** These are the displayed affiliation strings on every person page (`/people/chris-olah` etc.), and they would regress from "Anthropic" to "anthropic" on any consumer that reads them from PG instead of YAML.
 
 ### Finding #7 — `factbase-data.json` is already mostly PG-sourced
 
@@ -299,7 +344,9 @@ YAML-only fields identified in factbase YAML data (silently dropped at sync time
 
 Every YAML fact has a matching PG fact with the same `(entityId, factId)` key. Every field that YAML emits is present on the PG side. The only discrepancies are 45 `value` mismatches — all on the same pattern.
 
-**Root cause of all 45 C:value diffs**: PG's `facts.numeric` column is typed as `real` (PostgreSQL 4-byte float32) in `apps/wiki-server/src/schema.ts:964`. Float32 has ~7 decimal digits of precision, so integers larger than ~16.7M round to the nearest representable float. Representative samples from the committed diff:
+**Two root causes** — 42 of 45 are float32 precision loss, 3 are a real `refs` round-trip bug.
+
+**Root cause A (42 diffs): `facts.numeric` is float32.** `apps/wiki-server/src/schema.ts:964` declares the column as `real` (PostgreSQL 4-byte float32). Float32 has ~7 decimal digits of precision, so integers larger than ~16.7M round to the nearest representable float. Representative samples from the committed diff:
 
 | Entity | YAML value     | PG value       | Delta | Meaning            |
 |--------|---------------:|---------------:|------:|--------------------|
@@ -309,9 +356,25 @@ Every YAML fact has a matching PG fact with the same `(entityId, factId)` key. E
 | stripe | `72000000000`  | `71999996000`  | −4,000 | $72B               |
 | various small orgs | `549531672` | `549531650` | −22 | employee counts, budgets |
 
-All 41 numeric diffs are tiny precision artefacts from storing large-integer values in a 32-bit float. The remaining 4 are `refs:` formatting artefacts from the audit script's canonicalisation (YAML serialises `refs` with `", "`, PG with `","`) — not a real data diff.
+**Fix A**: change `facts.numeric` from `real` to `double precision` (float64, ~15 decimal digits, preserves every integer up to 2^53). Also `facts.usdEquivalent`, `facts.exchangeRate`, `facts.low`, `facts.high`. One migration, no data migration needed (the current values are already lossy — new writes get full precision from that point). Effort: **half a day**, blocking Phase 3 only if values above ~10^7 matter for display (they do — revenue, valuation, funding round sizes).
 
-**Fix**: change `facts.numeric` from `real` to `double precision` (float64, ~15 decimal digits, preserves every integer up to 2^53). Also `facts.usdEquivalent`, `facts.exchangeRate`, `facts.low`, `facts.high`. One migration, no data migration needed (the current values are already lossy — new writes get full precision from that point). Effort: **half a day**, blocking Phase 3 only if values above ~10^7 matter for display (they do — revenue, valuation, funding round sizes).
+**Root cause B (3 diffs): `refs` array naive-splitting on round-trip.** Three facts in the YAML store a single-element `refs` array whose only element is a comma-separated human-readable string — e.g., `value: ["Divya Siddarth, Saffron Huang, and Jasmine Wang"]`. The FactBase loader preserves this as a 1-element array. `sync-facts.ts::serializeValue` writes it to PG as the literal string `"Divya Siddarth, Saffron Huang, and Jasmine Wang"` via `.join(", ")`. `reconstructFactValue` in `facts.ts:229` then reconstitutes the refs array via `row.value.split(", ")` — producing a 3-element array `["Divya Siddarth", "Saffron Huang", "and Jasmine Wang"]` on readback. So **the round-trip silently changes array shape** for these values.
+
+Affected facts (all 3):
+
+| Entity slug                        | fact id        | YAML shape (1-el) | PG readback (3-4 el) |
+|------------------------------------|----------------|-------------------|-----------------------|
+| `collective-intelligence-project`  | `f_CVXL2QGbQc` | `["Divya Siddarth, Saffron Huang, and Jasmine Wang"]` | split on `", "` |
+| `algorithmwatch`                   | `f_vdosFaef7s` | `["Matthias Spielkamp, Lorena Jaume-Palasi, Lorenz Matzat, and Katharina Anna Zweig"]` | split into 4 |
+| `the-future-society`               | `f_rouuKIUdfN` | `["Nicolas Miailhe, Simon Mueller, Ionuts Lacusta, and Hugo Zylberberg"]` | split into 4 |
+
+This is arguably a **YAML data-quality issue** first (the author should have used a proper multi-element array: `[Divya Siddarth, Saffron Huang, Jasmine Wang]` — and dropped the "and"), but the sync round-trip makes the situation worse by producing lossy, malformed splits with "and Jasmine Wang" as a literal array element.
+
+**Fix B**: two options, not mutually exclusive:
+1. **Data fix** (small): rewrite the three YAML facts to use proper multi-element refs arrays. 3 edits. 15 minutes. I did not make these edits in this audit PR — they are not in scope and should be authored by someone who can verify the name splits.
+2. **Sync fix** (systemic): the loader should either (a) reject single-element refs values that contain `", "` (treat as data-entry error), or (b) not split on readback — use JSON-encoded storage so round-trip preserves array shape. Option (b) is the cleaner end state because it's robust against any future occurrence of the same pattern. Effort: 1 day for option (b), including migration of existing refs rows.
+
+**Correction**: An earlier draft of this finding called these three diffs "canonicalisation artefacts" in my audit script. That was wrong — the canonicalizer is deterministic and applied identically to both sides. The three diffs are real data drifts in the YAML→PG→readback cycle.
 
 **Implication for the go/no-go**: the factbase side of Phase 3 is **materially cleaner than the entity side**. There are no missing facts, no missing fields, no structural gaps. A PG-sourced `factbase-data.json` is essentially ready today, modulo the column-type fix. The "2-3 month worst case" in the parent ticket does not apply to FactBase at all.
 
@@ -345,7 +408,8 @@ These are each <1 day and can be done in parallel with Phase 3 scoping:
 
 1. **[sync bug] relatedEntries ref-check uses wrong column** — Finding #1. Fix: check against `entities.stableId` OR both columns. Half a day. Blocks Phase 3.
 2. **[sync gap] data/organizations.yaml not synced** — Finding #2. Fix: add `mergeOrganizationData` mirroring `mergeExpertData`. Half a day. Blocks Phase 3.
-3. **[schema] widen `facts.numeric` from `real` to `double precision`** — Finding #8. One-line Drizzle migration. Half a day including test. Not strictly blocking Phase 3, but values >10^7 currently have ±0.000001 relative error in display.
+3. **[schema] widen `facts.numeric` from `real` to `double precision`** — Finding #8 root cause A. One-line Drizzle migration. Half a day including test. Not strictly blocking Phase 3, but values >10^7 currently have ±0.000001 relative error in display.
+3b. **[sync bug] refs round-trip naive-split** — Finding #8 root cause B. 3 known-affected facts; 15-minute data fix for those three. For the systemic fix (JSON-encoded storage of refs to preserve shape), 1 day.
 4. **[cleanup] prune -displaced-* rows in sync-entities** — Finding #4. Half a day. Not a blocker but reduces noise.
 5. **[cleanup] drop dead-write keys from database.json** — `experts`, `estimates`, `glossary`, `funders`, top-level `organizations`. Zero reader code references them. Half a day. Not a Phase 3 blocker; shrinks output.
 6. **[factbase] add validStart/unit/role to fact schema** — Finding #7. Optional; low volume affected (~46 files total). 1 day if the team decides these need preserving.
@@ -394,7 +458,8 @@ Recommended next steps, in order:
 - ❌ Fix any of the sync bugs surfaced (those become follow-up tickets)
 - ❌ Audit runtime/render paths (the prototype only checks *build-time* equivalence)
 - ❌ Perf-test the PG reader (per-id fetching is known-slow and will be replaced by a bulk endpoint)
-- ❌ Generate a line-level YAML-vs-PG round-trip for every fact in factbase — sampled instead
+- ❌ Detect Type E (order-only array diffs) separately — these are folded into Type C. See `diffTypedEntities` in `build-data-from-pg.mjs` for rationale.
+- ❌ Audit non-`typedEntities` `database.json` fields: `resources` (PG-primary, out of scope), `kb` (covered separately via `audit-factbase-pg.mjs`), `pages`/`idRegistry`/`stats`/`tagIndex`/`pathRegistry`/`backlinks`/`relatedGraph`/`pageResources` (all derived at build time from the same sources — equivalent by construction)
 
 ## Appendix A — How to reproduce
 

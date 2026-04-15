@@ -241,12 +241,21 @@ function synthesizeOrganizationsFromPg(pgRows) {
 /**
  * Compare two typedEntities arrays, reporting per-field diffs.
  *
- * Diff types (matching QUA-510 taxonomy):
+ * Diff types (matching QUA-510 taxonomy, minus E):
  *   A — field present in YAML side, absent/null in PG side
  *   B — field present in PG side, absent/null in YAML side
- *   C — same field, different value (same shape)
+ *   C — same field, different value (includes different array ordering)
  *   D — row in YAML not in PG (or vice versa)
- *   E — ordering/sort difference only
+ *
+ * Note: The original QUA-510 taxonomy also defined Type E (order-only
+ * diffs on arrays of equal membership). We do NOT detect E separately —
+ * order-only drift gets folded into Type C. Implementing E detection
+ * would require per-field knowledge of which arrays are order-sensitive
+ * vs set-like, which the transform doesn't surface. If a future audit
+ * finds that array ordering drift is a meaningful signal, add a dedicated
+ * `isOrderOnlyDiff` check here. For this audit's purposes, C is a
+ * strict superset of what E would report, so no data is lost — just
+ * grouped more conservatively.
  */
 function diffTypedEntities(yamlArr, pgArr) {
   const yamlById = new Map(yamlArr.map((e) => [e.id, e]));
@@ -424,13 +433,14 @@ async function main() {
   // The full per-row dump goes into docs/audits/ and is committed —
   // this is the QUA-510 acceptance criterion "enumerate every A/C/D diff
   // with per-row classification." Stable ordering (alphabetical) so the
-  // diff is reproducible across runs.
+  // diff is byte-identical across runs against the same PG state.
+  // Do NOT include timestamps/run metadata in the committed file — it
+  // would change on every rerun and break drift-detection use cases.
   const diffOut = join(AUDIT_DIR, "phase-3-equivalence-audit.diff.json");
   writeFileSync(
     diffOut,
     JSON.stringify(
       {
-        generated: new Date().toISOString(),
         counts: summary.counts,
         yamlOnly: [...diff.yamlOnly].sort(),
         pgOnly: [...diff.pgOnly].sort(),

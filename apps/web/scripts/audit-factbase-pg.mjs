@@ -85,7 +85,12 @@ async function loadYamlFacts() {
 // ---------------------------------------------------------------------------
 
 async function fetchPgFacts() {
-  // /api/facts/export paginates via limit+offset, max 50000
+  // /api/facts/export paginates via limit+offset. NOTE: the response's
+  // `returned` field counts rows AFTER skipping malformed ones on the server,
+  // so it is NOT a reliable "end of pagination" signal — a page with N DB
+  // rows and one malformed row will report `returned = N-1 < pageSize` while
+  // later offsets still have rows. We drive the loop off `total` + `offset`
+  // only. (CodeRabbit catch on PR #4384.)
   const all = {};
   let offset = 0;
   const pageSize = 5000;
@@ -103,9 +108,7 @@ async function fetchPgFacts() {
       if (!all[entityId]) all[entityId] = [];
       all[entityId].push(...list);
     }
-    const returned = result.data.returned ?? 0;
     total = result.data.total ?? total;
-    if (returned < pageSize) break;
     offset += pageSize;
     if (offset >= total) break;
   }
@@ -261,12 +264,13 @@ async function main() {
   if (!existsSync(AUDIT_DIR)) mkdirSync(AUDIT_DIR, { recursive: true });
   if (!existsSync(OUT_MD_DIR)) mkdirSync(OUT_MD_DIR, { recursive: true });
 
+  // Committed artifact — no timestamp/run metadata (see build-data-from-pg.mjs
+  // for rationale: byte-identical regeneration enables drift detection).
   const diffOut = join(AUDIT_DIR, "phase-3-equivalence-audit-factbase.diff.json");
   writeFileSync(
     diffOut,
     JSON.stringify(
       {
-        generated: new Date().toISOString(),
         counts: {
           yamlTotalFacts: yaml.total,
           yamlDroppedDerived: yaml.droppedDerived,
