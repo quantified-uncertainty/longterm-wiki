@@ -893,7 +893,15 @@ const entitiesApp = new Hono()
       ),
     ];
     if (relatedIds.length > 0) {
-      const missing = await checkRefsExist(db, entities, entities.id, relatedIds);
+      // relatedEntries refs may be either slugs (entities.id) or stableIds
+      // (entities.stable_id). Check both columns — a ref is only "missing" if
+      // it resolves to neither. Checking only entities.id was QUA-519: all
+      // stableId-based refs were silently stripped from PG.
+      const missingBySlug = await checkRefsExist(db, entities, entities.id, relatedIds);
+      const missing =
+        missingBySlug.length > 0
+          ? await checkRefsExist(db, entities, entities.stableId, missingBySlug)
+          : [];
       if (missing.length > 0) {
         const missingSet = new Set(missing);
         // Strip invalid references instead of rejecting the batch
