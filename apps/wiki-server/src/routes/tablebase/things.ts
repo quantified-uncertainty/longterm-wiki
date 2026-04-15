@@ -479,32 +479,32 @@ const thingsApp = new Hono()
   // See discussion #2950.
 
   // ---- GET /:id ----
-  // QUA-506: /search returns MV ids that may not exist in base `things`
-  // (entity-resource rows, resources keyed by stable_id when things has the
-  // legacy hex id, displaced entities). Look up `things` first, fall back to
-  // `things_search`. Both produce the same column shape.
+  // QUA-506: try `things_search` first (MV has resolved titles + the
+  // additional thing_types not synced to the base table). Fall back to
+  // `things` for rows freshly synced but not yet in the MV, and for the
+  // edge case where the two tables have diverged IDs.
   .get("/:id", async (c) => {
     const id = c.req.param("id");
     const db = getDrizzleDb();
 
     let row: { thing: ThingLikeRow; verdict: string | null } | undefined;
 
-    const primaryRows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
-      .where(eq(things.id, id))
+    const mvRows = await db
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
+      .where(eq(thingsSearch.id, id))
       .limit(1);
-    if (primaryRows.length > 0) {
-      row = primaryRows[0];
+    if (mvRows.length > 0) {
+      row = mvRows[0];
     } else {
-      const mvRows = await db
-        .select({ thing: thingsSearchSelect, ...verdictFields })
-        .from(thingsSearch)
-        .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
-        .where(eq(thingsSearch.id, id))
+      const fallbackRows = await db
+        .select({ thing: things, ...verdictFields })
+        .from(things)
+        .leftJoin(sourceVerdicts, verdictJoinOnThings)
+        .where(eq(things.id, id))
         .limit(1);
-      if (mvRows.length > 0) row = mvRows[0];
+      if (fallbackRows.length > 0) row = fallbackRows[0];
     }
 
     if (!row) {
