@@ -110,6 +110,25 @@ describe("validateDateValue", () => {
     expect(validateDateValue("2101")).not.toBeNull();
     expect(validateDateValue("0001")).not.toBeNull();
   });
+
+  // ── Custom minYear (used by `founded` field — universities can be ancient)
+  it("accepts pre-1900 years when minYear is relaxed", () => {
+    // Oxford founded 1096, Cambridge 1209, UPenn 1740, Stanford 1885
+    expect(validateDateValue("1096", { minYear: 1000 })).toBeNull();
+    expect(validateDateValue("1209", { minYear: 1000 })).toBeNull();
+    expect(validateDateValue("1740", { minYear: 1000 })).toBeNull();
+    expect(validateDateValue("1885", { minYear: 1000 })).toBeNull();
+  });
+
+  it("still rejects years below the relaxed minYear", () => {
+    expect(validateDateValue("0999", { minYear: 1000 })).toContain("outside reasonable range");
+    expect(validateDateValue("0500", { minYear: 1000 })).toContain("outside reasonable range");
+  });
+
+  it("error message reflects the custom range", () => {
+    const err = validateDateValue("0500", { minYear: 1000 });
+    expect(err).toContain("(1000-2100)");
+  });
 });
 
 describe("compareDates", () => {

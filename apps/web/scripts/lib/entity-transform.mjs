@@ -371,11 +371,12 @@ export function transformEntities(rawEntities, pages, experts) {
   }
 
   const expertMap = new Map(experts.map(e => [e.id, e]));
-  // Org title map (slug → title) used to resolve `expert.affiliation` slugs
-  // into human-readable strings on person entities.
+  // Org title map (slug → title) for resolving `expert.affiliation` slugs into
+  // display strings on person entities. Includes any legacy lab-*/funder type
+  // that canonicalizes to `organization` via OLD_TYPE_MAP.
   const orgTitleMap = new Map(
     entities
-      .filter(e => e.type === 'organization' || e.type === 'lab' || e.type === 'lab-academic' || e.type === 'lab-research')
+      .filter(e => (OLD_TYPE_MAP[e.type] || e.type) === 'organization')
       .map(e => [e.id, e.title])
   );
 
