@@ -8,26 +8,43 @@ import { type SqlDispatcher, mockDbModule, postJson } from "./test-utils";
 // ---- Mock state ----
 
 let refreshCallCount = 0;
+let analyzeCallCount = 0;
 let refreshShouldError: string | null = null;
+let analyzeShouldError: string | null = null;
 let mvRowCount = 12345;
 let mvTotalBytes = 40 * 1024 * 1024;
 
 function resetStores() {
   refreshCallCount = 0;
+  analyzeCallCount = 0;
   refreshShouldError = null;
+  analyzeShouldError = null;
   mvRowCount = 12345;
   mvTotalBytes = 40 * 1024 * 1024;
 }
 
+// Throw a plain Error; Drizzle wraps it into DrizzleQueryError with .cause
+// pointing at whatever we throw. The route's unwrapError walks e.cause to
+// recover the real message.
 const dispatch: SqlDispatcher = (query) => {
   const q = query.toLowerCase();
+
+  // ---- ANALYZE things_search ----
+  if (q.startsWith("analyze") && q.includes("things_search")) {
+    analyzeCallCount++;
+    if (analyzeShouldError) throw new Error(analyzeShouldError);
+    return [];
+  }
 
   // ---- REFRESH MATERIALIZED VIEW CONCURRENTLY things_search ----
   if (q.includes("refresh materialized view") && q.includes("things_search")) {
     refreshCallCount++;
-    if (refreshShouldError) {
-      throw new Error(refreshShouldError);
-    }
+    if (refreshShouldError) throw new Error(refreshShouldError);
+    return [];
+  }
+
+  // Transaction / SET LOCAL — no-op
+  if (q.startsWith("set local") || q.startsWith("begin") || q.startsWith("commit") || q.startsWith("rollback")) {
     return [];
   }
 
@@ -71,7 +88,7 @@ describe("things_search refresh", () => {
   });
 
   describe("POST /api/things-search/refresh", () => {
-    it("runs REFRESH MATERIALIZED VIEW CONCURRENTLY and returns stats", async () => {
+    it("runs REFRESH + ANALYZE in a transaction and returns stats", async () => {
       const res = await postJson(app, "/api/things-search/refresh", {});
       expect(res.status).toBe(200);
       const body = await res.json();
@@ -81,31 +98,41 @@ describe("things_search refresh", () => {
       expect(typeof body.durationMs).toBe("number");
       expect(body.durationMs).toBeGreaterThanOrEqual(0);
       expect(refreshCallCount).toBe(1);
+      expect(analyzeCallCount).toBe(1);
     });
 
-    it("returns 500 when the REFRESH call errors", async () => {
+    it("unwraps DrizzleQueryError.cause so the real PG error reaches the client", async () => {
       refreshShouldError = "deadlock detected";
       const res = await postJson(app, "/api/things-search/refresh", {});
       expect(res.status).toBe(500);
       const body = await res.json();
       expect(body.success).toBe(false);
-      // Drizzle wraps the driver error with its own prefix; we only assert
-      // the presence of a non-empty error string, not its exact format.
-      expect(typeof body.error).toBe("string");
-      expect(body.error.length).toBeGreaterThan(0);
-      expect(typeof body.durationMs).toBe("number");
-      // Refresh call was attempted (and failed)
-      expect(refreshCallCount).toBe(1);
+      // Regression: the pre-fix code returned the Drizzle wrapper message
+      // "Failed query: REFRESH..." — strengthen the assertion to catch that.
+      expect(body.error).toContain("deadlock detected");
+      expect(body.error).not.toContain("Failed query");
     });
 
-    it("handles 'MV not populated' error from Postgres cleanly", async () => {
+    it("handles 'MV not populated' error with unwrapped message", async () => {
       refreshShouldError =
         "CONCURRENTLY cannot be used when the materialized view is not populated";
       const res = await postJson(app, "/api/things-search/refresh", {});
       expect(res.status).toBe(500);
       const body = await res.json();
       expect(body.success).toBe(false);
-      expect(typeof body.error).toBe("string");
+      expect(body.error).toContain("not populated");
+    });
+
+    it("rolls back REFRESH when ANALYZE fails (atomic transaction)", async () => {
+      analyzeShouldError = "canceling statement due to lock timeout";
+      const res = await postJson(app, "/api/things-search/refresh", {});
+      expect(res.status).toBe(500);
+      const body = await res.json();
+      expect(body.success).toBe(false);
+      expect(body.error).toContain("lock timeout");
+      // Both statements attempted; both rolled back together.
+      expect(refreshCallCount).toBe(1);
+      expect(analyzeCallCount).toBe(1);
     });
   });
 });

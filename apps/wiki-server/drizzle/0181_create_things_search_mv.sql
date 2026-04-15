@@ -85,7 +85,13 @@ FROM (
 
   UNION ALL
 
-  -- 3. grant (from grants LEFT JOIN entities x2 — org + grantee)
+  -- 3. grant (from grants LEFT JOIN entities x4 — org/grantee, sid_ + slug)
+  -- `grants.organization_id` and `grants.grantee_id` can hold either a
+  -- stable_id OR a slug (entities.id). `resolveEntityTitles` accepts both
+  -- forms at write-time via an `IN (…) OR stable_id IN (…)` — mirror that
+  -- here with parallel LEFT JOINs so the MV renders resolved titles even
+  -- for slug-form FKs. Prevents raw slugs leaking into the 825 grant
+  -- `parent_title` rows that use slug org IDs today.
   SELECT
     g.id::text                                             AS id,
     'grant'::text                                          AS thing_type,
@@ -98,7 +104,7 @@ FROM (
       CONCAT_WS(', ',
         CASE
           WHEN g.grantee_id IS NOT NULL
-            THEN 'to ' || COALESCE(ge.title, g.grantee_id)
+            THEN 'to ' || COALESCE(ge_sid.title, ge_slug.title, g.grantee_id)
           ELSE NULL
         END,
         CASE
@@ -112,23 +118,22 @@ FROM (
     )                                                      AS description,
     g.source                                               AS source_url,
     NULL::text                                             AS wiki_id,
-    COALESCE(oe.title, g.organization_id)                  AS parent_title,
+    COALESCE(oe_sid.title, oe_slug.title, g.organization_id) AS parent_title,
     g.created_at                                           AS created_at,
     g.updated_at                                           AS updated_at,
     g.synced_at                                            AS synced_at
   FROM grants g
-  LEFT JOIN entities oe ON oe.stable_id = g.organization_id
-  LEFT JOIN entities ge ON ge.stable_id = g.grantee_id
+  LEFT JOIN entities oe_sid  ON oe_sid.stable_id  = g.organization_id
+  LEFT JOIN entities oe_slug ON oe_slug.id        = g.organization_id
+  LEFT JOIN entities ge_sid  ON ge_sid.stable_id  = g.grantee_id
+  LEFT JOIN entities ge_slug ON ge_slug.id        = g.grantee_id
 
   UNION ALL
 
-  -- 4. personnel (from personnel LEFT JOIN entities x2)
-  -- Personnel title fallback mirrors the TypeScript `cleanPersonId` helper:
-  -- strip `new:` prefix from `p.person_id` before using it as the last
-  -- fallback. If the raw person_id is `sid_...` or a legacy identifier,
-  -- it flows through unchanged — matching the TypeScript behavior where
-  -- `cleanPersonId` returns null for SIDs and the composer falls back to
-  -- the raw `row.personId` anyway. See personnel.ts:114-129.
+  -- 4. personnel (from personnel LEFT JOIN entities x3)
+  -- Person name fallback mirrors the TS `cleanPersonId` helper (strip
+  -- `new:` prefix). Organization resolution accepts both sid_ and slug
+  -- forms to cover the 39 personnel rows with slug org IDs.
   SELECT
     p.id::text                                             AS id,
     'personnel'::text                                      AS thing_type,
@@ -142,7 +147,7 @@ FROM (
           ELSE p.person_id
         END
       ) || ' — ' || p.role ||
-      ' at ' || COALESCE(oe.title, p.organization_id)
+      ' at ' || COALESCE(oe_sid.title, oe_slug.title, p.organization_id)
     )                                                      AS title,
     NULL::text                                             AS parent_thing_id,
     'personnel'::text                                      AS source_table,
@@ -151,13 +156,14 @@ FROM (
     NULL::text                                             AS description,
     p.source                                               AS source_url,
     NULL::text                                             AS wiki_id,
-    COALESCE(oe.title, p.organization_id)                  AS parent_title,
+    COALESCE(oe_sid.title, oe_slug.title, p.organization_id) AS parent_title,
     p.created_at                                           AS created_at,
     p.updated_at                                           AS updated_at,
     p.synced_at                                            AS synced_at
   FROM personnel p
-  LEFT JOIN entities pe ON pe.stable_id = p.person_entity_id
-  LEFT JOIN entities oe ON oe.stable_id = p.organization_id
+  LEFT JOIN entities pe      ON pe.stable_id      = p.person_entity_id
+  LEFT JOIN entities oe_sid  ON oe_sid.stable_id  = p.organization_id
+  LEFT JOIN entities oe_slug ON oe_slug.id        = p.organization_id
 
   UNION ALL
 
@@ -185,13 +191,15 @@ FROM (
 
   UNION ALL
 
-  -- 6. equity-position (from equity_positions LEFT JOIN entities x2)
+  -- 6. equity-position (from equity_positions LEFT JOIN entities x4)
+  -- Both holder_id and company_id can hold sid_ or slug — 11 of 13 rows
+  -- currently use slug form. Parallel sid_/slug joins so titles resolve.
   SELECT
     ep.id::text                                            AS id,
     'equity-position'::text                                AS thing_type,
     (
-      COALESCE(he.title, ep.holder_id) || ' stake in ' ||
-      COALESCE(ce.title, ep.company_id)
+      COALESCE(he_sid.title, he_slug.title, ep.holder_id) || ' stake in ' ||
+      COALESCE(ce_sid.title, ce_slug.title, ep.company_id)
     )                                                      AS title,
     ep.company_id                                          AS parent_thing_id,
     'equity_positions'::text                               AS source_table,
@@ -200,13 +208,15 @@ FROM (
     NULL::text                                             AS description,
     ep.source                                              AS source_url,
     NULL::text                                             AS wiki_id,
-    COALESCE(ce.title, ep.company_id)                      AS parent_title,
+    COALESCE(ce_sid.title, ce_slug.title, ep.company_id)   AS parent_title,
     ep.created_at                                          AS created_at,
     ep.updated_at                                          AS updated_at,
     ep.synced_at                                           AS synced_at
   FROM equity_positions ep
-  LEFT JOIN entities he ON he.stable_id = ep.holder_id
-  LEFT JOIN entities ce ON ce.stable_id = ep.company_id
+  LEFT JOIN entities he_sid  ON he_sid.stable_id  = ep.holder_id
+  LEFT JOIN entities he_slug ON he_slug.id        = ep.holder_id
+  LEFT JOIN entities ce_sid  ON ce_sid.stable_id  = ep.company_id
+  LEFT JOIN entities ce_slug ON ce_slug.id        = ep.company_id
 
   UNION ALL
 
@@ -253,12 +263,10 @@ FROM (
 
   -- 9. entity-resource (from entity_resources LEFT JOIN entities + resources)
   -- things.id convention: `'er:' || entity_id || ':' || resource_id`
-  -- (see tablebase/entity-resources.ts:180). The bigserial `er.id` is not
-  -- written to things — things.id is a composite string key. Note also
-  -- that `entity-resource` is not in VALID_THING_TYPES so the write path
-  -- is partially broken (audit §6 finding #1), but we still compose the
-  -- MV id the same way the write side does so that if / when the enum is
-  -- fixed the MV and things converge automatically.
+  -- (see tablebase/entity-resources.ts:180). entity-resources are not
+  -- currently written to things by the sync handler; MV rows exist only
+  -- here. `/api/things/:id` falls back to things_search so click-through
+  -- from search works.
   SELECT
     ('er:' || er.entity_id || ':' || er.resource_id)       AS id,
     'entity-resource'::text                                AS thing_type,
@@ -325,13 +333,13 @@ FROM (
 
   UNION ALL
 
-  -- 12. investment (from investments LEFT JOIN entities x2)
+  -- 12. investment (from investments LEFT JOIN entities x4, sid + slug)
   SELECT
     i.id::text                                             AS id,
     'investment'::text                                     AS thing_type,
     (
-      COALESCE(ie.title, i.investor_id) || ' → ' ||
-      COALESCE(ce.title, i.company_id) ||
+      COALESCE(ie_sid.title, ie_slug.title, i.investor_id) || ' → ' ||
+      COALESCE(ce_sid.title, ce_slug.title, i.company_id) ||
       COALESCE(' (' || i.round_name || ')', '')
     )                                                      AS title,
     i.company_id                                           AS parent_thing_id,
@@ -341,13 +349,15 @@ FROM (
     NULL::text                                             AS description,
     i.source                                               AS source_url,
     NULL::text                                             AS wiki_id,
-    COALESCE(ce.title, i.company_id)                       AS parent_title,
+    COALESCE(ce_sid.title, ce_slug.title, i.company_id)    AS parent_title,
     i.created_at                                           AS created_at,
     i.updated_at                                           AS updated_at,
     i.synced_at                                            AS synced_at
   FROM investments i
-  LEFT JOIN entities ie ON ie.stable_id = i.investor_id
-  LEFT JOIN entities ce ON ce.stable_id = i.company_id
+  LEFT JOIN entities ie_sid  ON ie_sid.stable_id  = i.investor_id
+  LEFT JOIN entities ie_slug ON ie_slug.id        = i.investor_id
+  LEFT JOIN entities ce_sid  ON ce_sid.stable_id  = i.company_id
+  LEFT JOIN entities ce_slug ON ce_slug.id        = i.company_id
 
   UNION ALL
 

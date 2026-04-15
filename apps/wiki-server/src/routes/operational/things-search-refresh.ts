@@ -7,17 +7,34 @@ import { logger as rootLogger } from "../../logger.js";
 
 const logger = rootLogger.child({ route: "things-search-refresh" });
 
+// Drizzle wraps postgres.js errors in DrizzleQueryError whose top-level
+// message is `Failed query: <sql>\nparams: ...`. The real postgres error
+// (incl. timeout / deadlock / lock_timeout context) sits on .cause. Walk it
+// so logs and Discord alerts show the actionable reason.
+function unwrapError(e: unknown): string {
+  if (!(e instanceof Error)) return String(e);
+  const cause = (e as Error & { cause?: unknown }).cause;
+  if (cause instanceof Error && cause.message) return cause.message;
+  return e.message;
+}
+
 const app = new Hono()
   .post("/refresh", async (c) => {
     const db = getDrizzleDb();
 
     const start = Date.now();
     try {
-      await db.execute(sql`REFRESH MATERIALIZED VIEW CONCURRENTLY things_search`);
-
-      // ANALYZE: REFRESH MV doesn't update planner stats, and /status reads
-      // last_analyze as the staleness signal.
-      await db.execute(sql`ANALYZE things_search`);
+      // Wrap REFRESH + ANALYZE in a transaction so they're atomic: if
+      // ANALYZE fails the MV rolls back to the previous snapshot, keeping
+      // last_analyze (the staleness signal) in sync with the data on disk.
+      // SET LOCAL statement_timeout raises the app pool's 30s ceiling —
+      // benchmark observed REFRESH up to 29s, we need headroom for bad
+      // managed-pg days.
+      await db.transaction(async (tx) => {
+        await tx.execute(sql`SET LOCAL statement_timeout = '180000'`);
+        await tx.execute(sql`REFRESH MATERIALIZED VIEW CONCURRENTLY things_search`);
+        await tx.execute(sql`ANALYZE things_search`);
+      });
 
       const durationMs = Date.now() - start;
 
@@ -49,9 +66,14 @@ const app = new Hono()
       });
     } catch (e) {
       const durationMs = Date.now() - start;
-      const message = e instanceof Error ? e.message : String(e);
+      const message = unwrapError(e);
       logger.error(
-        { event: "refresh_failed", durationMs, error: message },
+        {
+          event: "refresh_failed",
+          durationMs,
+          error: message,
+          wrapped: e instanceof Error ? e.message : undefined,
+        },
         "things_search refresh failed",
       );
       return c.json(
@@ -119,7 +141,7 @@ const app = new Hono()
         totalBytes: Number(row.total_bytes),
       });
     } catch (e) {
-      const message = e instanceof Error ? e.message : String(e);
+      const message = unwrapError(e);
       logger.warn(
         { event: "status_failed", error: message },
         "things_search status query failed",

@@ -109,7 +109,7 @@ LEFT JOIN entities e ON e.stable_id = f.entity_id
 
 UNION ALL
 
--- 3. grant (from grants LEFT JOIN entities x2 — org + grantee) — 5876 rows
+-- 3. grant (from grants LEFT JOIN entities x4 — org/grantee, sid + slug) — 5876 rows
 SELECT
   g.id::text                                                 AS id,
   'grant'::text                                              AS thing_type,
@@ -122,7 +122,7 @@ SELECT
     CONCAT_WS(', ',
       CASE
         WHEN g.grantee_id IS NOT NULL
-          THEN 'to ' || COALESCE(ge.title, g.grantee_id)
+          THEN 'to ' || COALESCE(ge_sid.title, ge_slug.title, g.grantee_id)
         ELSE NULL
       END,
       CASE
@@ -136,19 +136,21 @@ SELECT
   )                                                          AS description,
   g.source                                                   AS source_url,
   NULL::text                                                 AS wiki_id,
-  COALESCE(oe.title, g.organization_id)                      AS parent_title,
+  COALESCE(oe_sid.title, oe_slug.title, g.organization_id)   AS parent_title,
   g.created_at                                               AS created_at,
   g.updated_at                                               AS updated_at,
   g.synced_at                                                AS synced_at
 FROM grants g
-LEFT JOIN entities oe ON oe.stable_id = g.organization_id
-LEFT JOIN entities ge ON ge.stable_id = g.grantee_id
+LEFT JOIN entities oe_sid  ON oe_sid.stable_id  = g.organization_id
+LEFT JOIN entities oe_slug ON oe_slug.id        = g.organization_id
+LEFT JOIN entities ge_sid  ON ge_sid.stable_id  = g.grantee_id
+LEFT JOIN entities ge_slug ON ge_slug.id        = g.grantee_id
 
 UNION ALL
 
--- 4. personnel (from personnel LEFT JOIN entities x2) — 1068 rows
--- Person name fallback mirrors the TS `cleanPersonId` helper: strip the
--- `new:` prefix before using the raw person_id as the last resort.
+-- 4. personnel (from personnel LEFT JOIN entities x3) — 1068 rows
+-- Person fallback mirrors TS `cleanPersonId` (strip `new:` prefix). Org
+-- resolution accepts both sid_ and slug forms.
 SELECT
   p.id::text                                                 AS id,
   'personnel'::text                                          AS thing_type,
@@ -162,7 +164,7 @@ SELECT
         ELSE p.person_id
       END
     ) || ' — ' || p.role ||
-    ' at ' || COALESCE(oe.title, p.organization_id)
+    ' at ' || COALESCE(oe_sid.title, oe_slug.title, p.organization_id)
   )                                                          AS title,
   NULL::text                                                 AS parent_thing_id,
   'personnel'::text                                          AS source_table,
@@ -171,13 +173,14 @@ SELECT
   NULL::text                                                 AS description,
   p.source                                                   AS source_url,
   NULL::text                                                 AS wiki_id,
-  COALESCE(oe.title, p.organization_id)                      AS parent_title,
+  COALESCE(oe_sid.title, oe_slug.title, p.organization_id)   AS parent_title,
   p.created_at                                               AS created_at,
   p.updated_at                                               AS updated_at,
   p.synced_at                                                AS synced_at
 FROM personnel p
-LEFT JOIN entities pe ON pe.stable_id = p.person_entity_id
-LEFT JOIN entities oe ON oe.stable_id = p.organization_id
+LEFT JOIN entities pe      ON pe.stable_id      = p.person_entity_id
+LEFT JOIN entities oe_sid  ON oe_sid.stable_id  = p.organization_id
+LEFT JOIN entities oe_slug ON oe_slug.id        = p.organization_id
 
 UNION ALL
 
@@ -202,13 +205,13 @@ FROM resources r
 
 UNION ALL
 
--- 6. equity-position (from equity_positions LEFT JOIN entities x2) — 13 rows
+-- 6. equity-position (from equity_positions LEFT JOIN entities x4) — 13 rows
 SELECT
   ep.id::text                                                AS id,
   'equity-position'::text                                    AS thing_type,
   (
-    COALESCE(he.title, ep.holder_id) || ' stake in ' ||
-    COALESCE(ce.title, ep.company_id)
+    COALESCE(he_sid.title, he_slug.title, ep.holder_id) || ' stake in ' ||
+    COALESCE(ce_sid.title, ce_slug.title, ep.company_id)
   )                                                          AS title,
   ep.company_id                                              AS parent_thing_id,
   'equity_positions'::text                                   AS source_table,
@@ -217,13 +220,15 @@ SELECT
   NULL::text                                                 AS description,
   ep.source                                                  AS source_url,
   NULL::text                                                 AS wiki_id,
-  COALESCE(ce.title, ep.company_id)                          AS parent_title,
+  COALESCE(ce_sid.title, ce_slug.title, ep.company_id)       AS parent_title,
   ep.created_at                                              AS created_at,
   ep.updated_at                                              AS updated_at,
   ep.synced_at                                               AS synced_at
 FROM equity_positions ep
-LEFT JOIN entities he ON he.stable_id = ep.holder_id
-LEFT JOIN entities ce ON ce.stable_id = ep.company_id
+LEFT JOIN entities he_sid  ON he_sid.stable_id  = ep.holder_id
+LEFT JOIN entities he_slug ON he_slug.id        = ep.holder_id
+LEFT JOIN entities ce_sid  ON ce_sid.stable_id  = ep.company_id
+LEFT JOIN entities ce_slug ON ce_slug.id        = ep.company_id
 
 UNION ALL
 
@@ -339,13 +344,13 @@ FROM research_areas ra
 
 UNION ALL
 
--- 12. investment (from investments LEFT JOIN entities x2) — 72 rows
+-- 12. investment (from investments LEFT JOIN entities x4) — 72 rows
 SELECT
   i.id::text                                                 AS id,
   'investment'::text                                         AS thing_type,
   (
-    COALESCE(ie.title, i.investor_id) || ' → ' ||
-    COALESCE(ce.title, i.company_id) ||
+    COALESCE(ie_sid.title, ie_slug.title, i.investor_id) || ' → ' ||
+    COALESCE(ce_sid.title, ce_slug.title, i.company_id) ||
     COALESCE(' (' || i.round_name || ')', '')
   )                                                          AS title,
   i.company_id                                               AS parent_thing_id,
@@ -355,13 +360,15 @@ SELECT
   NULL::text                                                 AS description,
   i.source                                                   AS source_url,
   NULL::text                                                 AS wiki_id,
-  COALESCE(ce.title, i.company_id)                           AS parent_title,
+  COALESCE(ce_sid.title, ce_slug.title, i.company_id)        AS parent_title,
   i.created_at                                               AS created_at,
   i.updated_at                                               AS updated_at,
   i.synced_at                                                AS synced_at
 FROM investments i
-LEFT JOIN entities ie ON ie.stable_id = i.investor_id
-LEFT JOIN entities ce ON ce.stable_id = i.company_id
+LEFT JOIN entities ie_sid  ON ie_sid.stable_id  = i.investor_id
+LEFT JOIN entities ie_slug ON ie_slug.id        = i.investor_id
+LEFT JOIN entities ce_sid  ON ce_sid.stable_id  = i.company_id
+LEFT JOIN entities ce_slug ON ce_slug.id        = i.company_id
 
 UNION ALL
 
