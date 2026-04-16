@@ -183,7 +183,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
   - **TableBase reference records** (paper authors, personnel, minor people): Use `generateId("person:<slug>")` for a `stableId` only (`sid_` prefix). NO `numericId`, no wiki page. Stored in the entities table for directory/personnel use but are lightweight. Use `crux tb ensure-entities` or `crux tb create-entity` for these.
   - All stableIds use the `sid_` prefix format. Use `isSid()` from `@longterm-wiki/id-utils` to detect them.
   - **Never manually invent IDs** — use the functions above.
-- **Hono RPC**: Mandatory for new wiki-server routes. See `.claude/rules/wiki-server-rpc-migration.md`
+- **Hono RPC**: Mandatory for new wiki-server routes — use method-chaining (`const app = new Hono().get(...).post(...)` + `export type Route = typeof app`). See `.claude/rules/code-review-guidelines.md`.
 - **Content pages use local data**: Wiki pages read `database.json` — zero runtime API calls. Only internal dashboards make live wiki-server requests.
 - **API keys**: In environment variables, NOT `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`
 - **Wiki-server: ALWAYS use prod from agent slots**: Agent slots (`lw/a1`–`lw/a20`) do NOT run a local wiki-server. **Every `pnpm crux` command that touches the wiki-server MUST be prefixed with `WIKI_SERVER_ENV=prod`**. Without this, commands fail with "Wiki server is not reachable" and waste time. This applies to: `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb sourcing`, `w sourcing-wiki-pages`, `sys` commands, and any command that hits `/api/`. The prod wiki-server at `wiki-server.k8s.quantifieduncertainty.org` is always available. Usage: `WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"`
@@ -202,7 +202,6 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 - `.claude/rules/session-logging.md` — Session log format and storage
 - `.claude/rules/error-handling.md` — Error handling strategy and `.catch()` patterns
 - `.claude/rules/database-migrations.md` — Migration patterns and deploy flow
-- `.claude/rules/wiki-server-rpc-migration.md` — Hono RPC migration guide
 - `.claude/rules/internal-dashboards.md` — Dashboard creation pattern
 - `.claude/rules/implementation-quality.md` — Thoroughness, testing depth, self-review
 - `.claude/rules/auto-update-system.md` — Auto-update system

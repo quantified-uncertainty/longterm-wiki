@@ -5,7 +5,7 @@
  * All endpoints are fire-and-forget from the build pipeline's perspective:
  * if the server is down, the build continues with data in database.json only.
  *
- * Uses Hono RPC method-chaining for type inference (see wiki-server-rpc-migration.md).
+ * Uses Hono RPC method-chaining for type inference (see .claude/rules/code-review-guidelines.md).
  */
 
 import { Hono } from "hono";
