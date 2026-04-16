@@ -52,6 +52,7 @@ import { buildUrlToResourceMap } from "./lib/unconverted-links.mjs";
 import { buildIdRegistry } from "./lib/id-registry.mjs";
 import { collectPageWikiIds } from "./lib/frontmatter-scanner.mjs";
 import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
+import { fetchPersistentIdRegistry } from "./lib/id-client.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..", "..", "..");
@@ -351,15 +352,29 @@ async function main() {
   const pages = buildPagesRegistry(urlToResource, new Map(), { gitCreatedMap: new Map(), gitModifiedMap: new Map() }, new Map(), new Map());
   console.log(`   ${pages.length} pages loaded`);
 
-  // --- Step 4b: assign fallback wikiIds via the same buildIdRegistry path
-  // that build-data.mjs uses. Without this, entities that don't yet have a
-  // persisted wikiId in PG (because they never allocated one via
-  // assign-ids.mjs and the fallback lives only in database.json) would
-  // show up as spurious Type A diffs on `wikiId`. The registry mutates
-  // `entity.wikiId` in place.
+  // --- Step 4b: assign wikiIds via the same buildIdRegistry path that
+  // build-data.mjs uses. Entities whose wikiId was never denormalized onto
+  // the entities table (but exists in the persistent entity_ids registry)
+  // are recovered via fetchServerEntityIdMap — that's QUA-521. Without the
+  // pre-seed, step 3's in-memory fallback allocator would produce different
+  // E-numbers every run and dominate the Phase 3 diff. Any slug still
+  // unresolved after the pre-seed falls through to slug-sorted fallback
+  // allocation inside buildIdRegistry.
   const CONTENT_DIR = join(REPO_ROOT, "content/docs");
   const reservedPageWikiIds = collectPageWikiIds(CONTENT_DIR);
-  buildIdRegistry(rawEntities, reservedPageWikiIds);
+  console.log("4b. Fetching persistent entity_ids registry from server...");
+  const persistedSlugToWikiId = await fetchPersistentIdRegistry();
+  if (persistedSlugToWikiId === null) {
+    console.error(
+      "    ERROR: persistent id_registry fetch failed (server unavailable or returned non-2xx).\n" +
+      "    Refusing to proceed — without the registry pre-seed, the PG diff would\n" +
+      "    mix persisted and fallback IDs, defeating the purpose of this audit.\n" +
+      "    Check WIKI_SERVER_ENV / LONGTERMWIKI_SERVER_URL / API key and retry."
+    );
+    process.exit(1);
+  }
+  console.log(`    ${persistedSlugToWikiId.size} slug→wikiId mappings loaded`);
+  buildIdRegistry(rawEntities, reservedPageWikiIds, { persistedSlugToWikiId });
 
   // --- Step 5: run the shared transform ---
   console.log("5. Running transformEntities()...");

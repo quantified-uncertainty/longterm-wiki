@@ -35,6 +35,9 @@ export type EntitySearchResult = InferResponseType<RpcClient['search']['$get'], 
 /** Response type for GET /api/entities/stats (inferred from server). */
 export type EntityStatsResult = InferResponseType<RpcClient['stats']['$get'], 200>;
 
+/** Response type for GET /api/entities/export (inferred from server). */
+export type EntityExportResult = InferResponseType<RpcClient['export']['$get'], 200>;
+
 // ---------------------------------------------------------------------------
 // Types — input (derived from server Zod schemas)
 // ---------------------------------------------------------------------------
@@ -122,4 +125,30 @@ export async function searchEntities(
 
 export async function getEntityStats(): Promise<ApiResult<EntityStatsResult>> {
   return apiRequest<EntityStatsResult>('GET', '/api/entities/stats');
+}
+
+/**
+ * Bulk export entities with their full shape (metadata, relatedEntries,
+ * customFields). Used by the PG-backed build pipeline to replace the
+ * per-entity `GET /:id` fetch pattern.
+ *
+ * Pass `limit` + `offset` to paginate; the server caps `limit` at its
+ * EXPORT_MAX_LIMIT (see routes/tablebase/entities.ts).
+ */
+export async function exportEntities(
+  opts: {
+    limit?: number;
+    offset?: number;
+    entityType?: string;
+    updatedSince?: string;
+  } = {},
+): Promise<ApiResult<EntityExportResult>> {
+  const params = new URLSearchParams();
+  if (opts.limit != null) params.set('limit', String(opts.limit));
+  if (opts.offset != null) params.set('offset', String(opts.offset));
+  if (opts.entityType) params.set('entityType', opts.entityType);
+  if (opts.updatedSince) params.set('updatedSince', opts.updatedSince);
+  const qs = params.toString();
+  const path = `/api/entities/export${qs ? `?${qs}` : ''}`;
+  return apiRequest<EntityExportResult>('GET', path);
 }

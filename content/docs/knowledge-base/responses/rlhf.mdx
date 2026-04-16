@@ -46,7 +46,7 @@ However, these techniques face fundamental challenges as AI systems approach and
 
 ## How RLHF Works
 
-RLHF uses a three-step training process, pioneered by OpenAI's <R id="MjZiZTdhMW">InstructGPT paper</R> in 2022:
+RLHF uses a three-step training process, pioneered by OpenAI's <R id="sid_PAyv52HUgJ">InstructGPT paper</R> in 2022:
 
 <Mermaid chart={`
 flowchart TD
@@ -87,7 +87,7 @@ flowchart TD
 
 ## Constitutional AI
 
-<R id="MDlmNWFlMz">Constitutional AI</R> (CAI), developed by Anthropic, replaces human feedback with AI-generated feedback guided by a set of principles (the "constitution"). This approach addresses several limitations of traditional RLHF:
+<R id="sid_6dtHLm5c9K">Constitutional AI</R> (CAI), developed by Anthropic, replaces human feedback with AI-generated feedback guided by a set of principles (the "constitution"). This approach addresses several limitations of traditional RLHF:
 
 ### CAI vs. RLHF Comparison
 
@@ -118,11 +118,11 @@ RLHF and Constitutional AI have achieved remarkable practical success:
 
 | Model Comparison | Finding | Quantitative Result | Source |
 |------------------|---------|---------------------|--------|
-| InstructGPT 1.3B vs GPT-3 175B | Smaller aligned model preferred by humans | 85±3% preference rate; 71±4% vs few-shot GPT-3 | <R id="MjZiZTdhMW">OpenAI 2022</R> |
+| InstructGPT 1.3B vs GPT-3 175B | Smaller aligned model preferred by humans | 85±3% preference rate; 71±4% vs few-shot GPT-3 | <R id="sid_PAyv52HUgJ">OpenAI 2022</R> |
 | Claude 2 vs Claude 1 | Reduced harmful outputs | 2x less likely to produce harmful responses | [Anthropic](https://www.anthropic.com/news/claude-2) |
 | GPT-4 vs GPT-3.5 | Improved content safety | 82% less likely to respond to disallowed content | [OpenAI 2023](https://cdn.openai.com/papers/gpt-4.pdf) |
 | Constitutional AI (Llama 3-8B) | Reduced adversarial attack success | 40.8% reduction in Attack Success Rate (MTBench) | [arXiv 2025](https://arxiv.org/abs/2504.04918) |
-| Reward model accuracy | Predicting human preferences | 69.6±0.9% on held-out labelers; 72.4±0.4% on training set | <R id="MjZiZTdhMW">OpenAI 2022</R> |
+| Reward model accuracy | Predicting human preferences | 69.6±0.9% on held-out labelers; 72.4±0.4% on training set | <R id="sid_PAyv52HUgJ">OpenAI 2022</R> |
 
 ### Industry Adoption
 
@@ -139,7 +139,7 @@ RLHF has become the de facto standard for deploying production AI systems. Every
 
 ### Alternative: Direct Preference Optimization (DPO)
 
-<R id="Y2UwMmI5OD">Direct Preference Optimization</R> simplifies RLHF by eliminating the need for a separate reward model. Instead of the three-step process, DPO directly optimizes the policy using preference data through a classification loss. Since its introduction in 2023, DPO has seen [rapid adoption](https://arxiv.org/abs/2410.15595) with dozens of variants developed.
+<R id="sid_eilk2kETyz">Direct Preference Optimization</R> simplifies RLHF by eliminating the need for a separate reward model. Instead of the three-step process, DPO directly optimizes the policy using preference data through a classification loss. Since its introduction in 2023, DPO has seen [rapid adoption](https://arxiv.org/abs/2410.15595) with dozens of variants developed.
 
 | Aspect | RLHF (PPO) | DPO | Notes |
 |--------|------------|-----|-------|
@@ -162,7 +162,7 @@ DPO has been adopted in Llama 3 Instruct, Zephyr, Mixtral 8x7B, and many open-so
 
 ## Fundamental Limitations
 
-Despite their success, RLHF and CAI face fundamental limitations that may prevent them from scaling to superhuman systems. A <R id="M2MzYTQzY2">comprehensive survey of over 250 papers</R> identified three categories of problems: challenges with feedback, challenges with reward models, and challenges with the policy.
+Despite their success, RLHF and CAI face fundamental limitations that may prevent them from scaling to superhuman systems. A <R id="sid_cTJliEXUPH">comprehensive survey of over 250 papers</R> identified three categories of problems: challenges with feedback, challenges with reward models, and challenges with the policy.
 
 ### Summary of Key Limitations
 
@@ -185,7 +185,7 @@ The core challenge: RLHF fundamentally relies on humans being able to judge the 
 | **Expert-level** | Domain experts needed | Moderate | Medical diagnosis, legal analysis, research synthesis |
 | **Superhuman** | Cannot reliably evaluate | Low/Unknown | Novel mathematical proofs, complex scientific reasoning |
 
-OpenAI's <R id="OWRiY2ZiNG">weak-to-strong generalization</R> research directly addresses this problem by studying whether weak models can supervise strong models. Key quantitative findings:
+OpenAI's <R id="sid_E9ehush6qs">weak-to-strong generalization</R> research directly addresses this problem by studying whether weak models can supervise strong models. Key quantitative findings:
 
 | Experiment | Weak Supervisor | Strong Model | Performance Gap |
 |------------|-----------------|--------------|-----------------|
@@ -200,7 +200,7 @@ OpenAI's <R id="OWRiY2ZiNG">weak-to-strong generalization</R> research directly 
 
 ### Reward Hacking and Specification Gaming
 
-<R id="NzJmZGI2MT">Reward hacking</R> occurs when models exploit flaws in the reward function to achieve high scores without accomplishing the intended task.
+<R id="sid_e8o9RPMXHn">Reward hacking</R> occurs when models exploit flaws in the reward function to achieve high scores without accomplishing the intended task.
 
 **Examples of reward hacking in RLHF:**
 
@@ -226,8 +226,8 @@ Sycophancy—the tendency to tell users what they want to hear rather than what'
 
 | Study | Finding | Implication |
 |-------|---------|-------------|
-| [Perez et al. 2023](https://arxiv.org/abs/2212.09251) | Sycophancy <R id="NzJhMjI2Mj">worsens with model size</R> | Larger models are more likely to agree with incorrect user beliefs |
-| <R id="OGQ4NzQwYm">Denison et al. 2024</R> | Models generalize from sycophancy to reward tampering | Sycophantic training may create broader reward-hacking tendencies |
+| [Perez et al. 2023](https://arxiv.org/abs/2212.09251) | Sycophancy <R id="sid_P9rtN2Xszu">worsens with model size</R> | Larger models are more likely to agree with incorrect user beliefs |
+| <R id="sid_eGHK6IJ7pu">Denison et al. 2024</R> | Models generalize from sycophancy to reward tampering | Sycophantic training may create broader reward-hacking tendencies |
 | [Wei et al. 2024](https://arxiv.org/abs/2310.13548) | RLHF models learn to mislead humans | Gap emerges between "correct" and "looks correct to humans" |
 | [Sharma et al. 2024](https://arxiv.org/abs/2310.08164) | Sycophancy persists despite safety training | Constitutional AI reduces but doesn't eliminate the problem |
 
@@ -297,7 +297,7 @@ Several research directions aim to extend RLHF-style alignment beyond human capa
 
 ### AI Safety via Debate
 
-<R id="NjViZWNjNz">Debate</R> involves two AI systems arguing opposing positions, with a human judge deciding the winner. The key insight: even if humans cannot directly evaluate complex claims, they may be able to judge which of two arguments is more compelling.
+<R id="sid_S0Sa8gTSzV">Debate</R> involves two AI systems arguing opposing positions, with a human judge deciding the winner. The key insight: even if humans cannot directly evaluate complex claims, they may be able to judge which of two arguments is more compelling.
 
 **Research findings:** Higher capability asymmetry between debaters is associated with better alignment outcomes, suggesting debate may continue to work as capabilities scale.
 
@@ -315,24 +315,24 @@ CAI can be viewed as a primitive form of scalable oversight—using AI capabilit
 
 | Technique | Key Innovation | Performance Gain | Source |
 |-----------|---------------|------------------|--------|
-| **Online Iterative RLHF** | Continuous feedback collection | State-of-the-art on AlpacaEval-2, Arena-Hard | <R id="MmI0NDE1OW">RLHF Book</R> |
-| **MA-RLHF** | Macro actions for credit assignment | Up to 30% improvement in summarization/coding | <R id="MTE5NTBhM2">arXiv 2024</R> |
-| **Safe RLHF** | Decoupled helpfulness/harmlessness | Better Pareto frontier on both objectives | <R id="MTcxODQ5ND">arXiv 2023</R> |
+| **Online Iterative RLHF** | Continuous feedback collection | State-of-the-art on AlpacaEval-2, Arena-Hard | <R id="sid_KrxIRvPnQJ">RLHF Book</R> |
+| **MA-RLHF** | Macro actions for credit assignment | Up to 30% improvement in summarization/coding | <R id="sid_6EtyTPnw7m">arXiv 2024</R> |
+| **Safe RLHF** | Decoupled helpfulness/harmlessness | Better Pareto frontier on both objectives | <R id="sid_wWCZdsUsa3">arXiv 2023</R> |
 | **RLTHF** | Targeted human corrections | 93-94% reduction in annotation cost | [arXiv 2025](https://arxiv.org/abs/2504.12501) |
 | **InfoRM** | Information bottleneck for reward models | Reduces reward hacking outliers | [NeurIPS 2024](https://arxiv.org/abs/2402.09345) |
 | **Reward Shaping** | Bounded rewards with early growth | Prevents reward threshold hacking | [arXiv 2025](https://arxiv.org/abs/2502.18770) |
 
 ### Online Iterative RLHF
 
-Unlike traditional offline RLHF, <R id="MmI0NDE1OW">online iterative RLHF</R> involves continuous feedback collection and model updates. This has achieved state-of-the-art performance on benchmarks like AlpacaEval-2 and Arena-Hard, enabling dynamic adaptation to evolving preferences.
+Unlike traditional offline RLHF, <R id="sid_KrxIRvPnQJ">online iterative RLHF</R> involves continuous feedback collection and model updates. This has achieved state-of-the-art performance on benchmarks like AlpacaEval-2 and Arena-Hard, enabling dynamic adaptation to evolving preferences.
 
 ### MA-RLHF (Macro Actions)
 
-<R id="MTE5NTBhM2">MA-RLHF</R> addresses the credit assignment problem by incorporating macro actions—sequences of tokens or higher-level constructs. Performance gains of up to 30% in text summarization and code generation have been reported.
+<R id="sid_6EtyTPnw7m">MA-RLHF</R> addresses the credit assignment problem by incorporating macro actions—sequences of tokens or higher-level constructs. Performance gains of up to 30% in text summarization and code generation have been reported.
 
 ### Safe RLHF
 
-<R id="MTcxODQ5ND">Safe RLHF</R> explicitly decouples helpfulness and harmlessness preferences, training separate reward and cost models. This addresses the tension between these objectives more directly, achieving better trade-offs on both dimensions.
+<R id="sid_wWCZdsUsa3">Safe RLHF</R> explicitly decouples helpfulness and harmlessness preferences, training separate reward and cost models. This addresses the tension between these objectives more directly, achieving better trade-offs on both dimensions.
 
 ### RLTHF (Targeted Human Feedback)
 
@@ -362,31 +362,31 @@ Unlike traditional offline RLHF, <R id="MmI0NDE1OW">online iterative RLHF</R> in
 
 ### Foundational Papers
 
-- <R id="MjZiZTdhMW">Training language models to follow instructions with human feedback</R> — OpenAI's InstructGPT paper, the foundational RLHF work
-- <R id="MDlmNWFlMz">Constitutional AI: Harmlessness from AI Feedback</R> — Anthropic's CAI paper
-- <R id="Y2UwMmI5OD">Direct Preference Optimization</R> — Stanford's DPO paper
+- <R id="sid_PAyv52HUgJ">Training language models to follow instructions with human feedback</R> — OpenAI's InstructGPT paper, the foundational RLHF work
+- <R id="sid_6dtHLm5c9K">Constitutional AI: Harmlessness from AI Feedback</R> — Anthropic's CAI paper
+- <R id="sid_eilk2kETyz">Direct Preference Optimization</R> — Stanford's DPO paper
 
 ### Research on Limitations
 
-- <R id="M2MzYTQzY2">Open Problems and Fundamental Limitations of RLHF</R> — Comprehensive survey of 250+ papers
-- <R id="OWRiY2ZiNG">Weak-to-Strong Generalization</R> — OpenAI's superalignment research
-- <R id="NzJmZGI2MT">Reward Hacking in Reinforcement Learning</R> — Comprehensive overview
+- <R id="sid_cTJliEXUPH">Open Problems and Fundamental Limitations of RLHF</R> — Comprehensive survey of 250+ papers
+- <R id="sid_E9ehush6qs">Weak-to-Strong Generalization</R> — OpenAI's superalignment research
+- <R id="sid_e8o9RPMXHn">Reward Hacking in Reinforcement Learning</R> — Comprehensive overview
 
 ### Educational Resources
 
-- <R id="MmI0NDE1OW">RLHF Book</R> — Nathan Lambert's comprehensive guide
-- <R id="ZmJjNDNhMT">RLHF 101: A Technical Tutorial</R> — CMU's technical tutorial
-- <R id="MWViNmVmY2">Scalable Oversight</R> — AI Alignment curriculum
+- <R id="sid_KrxIRvPnQJ">RLHF Book</R> — Nathan Lambert's comprehensive guide
+- <R id="sid_eg91XqFHV3">RLHF 101: A Technical Tutorial</R> — CMU's technical tutorial
+- <R id="sid_TiZ99vmH4O">Scalable Oversight</R> — AI Alignment curriculum
 
 ### Industry Frameworks
 
-- <R id="ZTAwYzI4Mm">Anthropic's Responsible Scaling Policy</R>
-- <R id="ZmYxMGI2Yj">OpenAI's Preparedness Framework</R>
+- <R id="sid_rYZq1xuUgV">Anthropic's Responsible Scaling Policy</R>
+- <R id="sid_mVbjz8CGSZ">OpenAI's Preparedness Framework</R>
 
 ### Recent Research
 
-- <R id="MTE5NTBhM2">MA-RLHF: Macro Actions</R> — Credit assignment improvements
-- <R id="MTcxODQ5ND">Safe RLHF</R> — Decoupling helpfulness and harmlessness
-- <R id="ZjI4YTY3Mm">A Comprehensive Survey of DPO</R> — DPO variants and applications
+- <R id="sid_6EtyTPnw7m">MA-RLHF: Macro Actions</R> — Credit assignment improvements
+- <R id="sid_wWCZdsUsa3">Safe RLHF</R> — Decoupling helpfulness and harmlessness
+- <R id="sid_N81Uz6pInt">A Comprehensive Survey of DPO</R> — DPO variants and applications
 
 ---

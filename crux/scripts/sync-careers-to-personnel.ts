@@ -121,7 +121,7 @@ function getPersonStableId(slug: string): string | null {
   const fromEntities = peopleMap.get(slug);
   if (fromEntities) return fromEntities;
   // Fall back to FactBase file
-  const fbFile = join(ROOT, "packages/factbase/data/things", `${slug}.yaml`);
+  const fbFile = join(ROOT, "packages/factbase/data/fb-entities", `${slug}.yaml`);
   if (existsSync(fbFile)) {
     const content = readFileSync(fbFile, "utf-8");
     const match = content.match(/^entity: (.+)/m);

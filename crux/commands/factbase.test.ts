@@ -174,7 +174,7 @@ describe('kb-writer', () => {
 
   beforeEach(() => {
     tmpDir = mkdtempSync(join(tmpdir(), 'kb-writer-test-'));
-    mkdirSync(join(tmpDir, 'things'), { recursive: true });
+    mkdirSync(join(tmpDir, 'fb-entities'), { recursive: true });
   });
 
   afterEach(() => {
@@ -195,7 +195,7 @@ facts:
     value: 1000000
     asOf: 2024-01
 `;
-    const filePath = join(tmpDir, 'things', 'test-entity.yaml');
+    const filePath = join(tmpDir, 'fb-entities', 'test-entity.yaml');
     writeFileSync(filePath, yamlContent, 'utf-8');
 
     const doc = readEntityDocument(filePath);
@@ -228,7 +228,7 @@ facts:
   type: organization
   name: Test Org
 `;
-    const filePath = join(tmpDir, 'things', 'test-entity.yaml');
+    const filePath = join(tmpDir, 'fb-entities', 'test-entity.yaml');
     writeFileSync(filePath, yamlContent, 'utf-8');
 
     const doc = readEntityDocument(filePath);
@@ -245,7 +245,7 @@ facts:
   });
 
   it('findEntityFilePath finds single-file entities', () => {
-    const filePath = join(tmpDir, 'things', 'my-entity.yaml');
+    const filePath = join(tmpDir, 'fb-entities', 'my-entity.yaml');
     writeFileSync(filePath, 'thing:\n  id: my-entity\n', 'utf-8');
 
     const found = findEntityFilePath('my-entity', tmpDir);
@@ -253,8 +253,8 @@ facts:
   });
 
   it('findEntityFilePath finds directory-based entities', () => {
-    mkdirSync(join(tmpDir, 'things', 'my-entity'), { recursive: true });
-    const filePath = join(tmpDir, 'things', 'my-entity', 'entity.yaml');
+    mkdirSync(join(tmpDir, 'fb-entities', 'my-entity'), { recursive: true });
+    const filePath = join(tmpDir, 'fb-entities', 'my-entity', 'entity.yaml');
     writeFileSync(filePath, 'thing:\n  id: my-entity\n', 'utf-8');
 
     const found = findEntityFilePath('my-entity', tmpDir);
@@ -281,7 +281,7 @@ facts:
     property: birth-year
     value: !date 1983
 `;
-    const filePath = join(tmpDir, 'things', 'test-entity.yaml');
+    const filePath = join(tmpDir, 'fb-entities', 'test-entity.yaml');
     writeFileSync(filePath, yamlContent, 'utf-8');
 
     const doc = readEntityDocument(filePath);

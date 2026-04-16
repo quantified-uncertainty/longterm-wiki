@@ -153,7 +153,7 @@ export interface FactOnlyFile {
 }
 
 /**
- * Shape of an entity's YAML file (data/things/anthropic.yaml).
+ * Shape of an entity's YAML file (data/fb-entities/anthropic.yaml).
  * Supports both old format (id=slug, stableId) and new format (id=stableId, slug).
  */
 export interface EntityFile {

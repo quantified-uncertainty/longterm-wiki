@@ -2,7 +2,7 @@
  * Backfill stableIds into entity YAML files.
  *
  * For each entity in data/entities/*.yaml that lacks a stableId:
- *   1. Checks packages/factbase/data/things/{slug}.yaml for an existing stableId
+ *   1. Checks packages/factbase/data/fb-entities/{slug}.yaml for an existing stableId
  *   2. If none, generates a new random 10-char alphawiki ID
  *   3. Inserts the stableId line right after the `id:` line in the YAML
  *
@@ -21,7 +21,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 
 interface KBThing {
   thing?: {
@@ -229,7 +229,7 @@ Backfill stableIds into Entity YAML Files
 
 Reads entity YAML files from data/entities/*.yaml and inserts a stableId
 field for any entity that doesn't have one. StableIds are sourced from
-KB thing files (packages/factbase/data/things/*.yaml) when available, otherwise
+KB thing files (packages/factbase/data/fb-entities/*.yaml) when available, otherwise
 a new random 10-char alphawiki ID is generated.
 
 Usage:

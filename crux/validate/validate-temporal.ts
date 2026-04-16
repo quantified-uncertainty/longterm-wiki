@@ -247,7 +247,7 @@ const PASSTHROUGH_TAGS: ScalarTag[] = [
 
 function checkFactBaseDateValues(): Violation[] {
   const violations: Violation[] = [];
-  const thingsDir = join(PROJECT_ROOT, "packages/factbase/data/things");
+  const thingsDir = join(PROJECT_ROOT, "packages/factbase/data/fb-entities");
 
   if (!existsSync(thingsDir)) return violations;
 

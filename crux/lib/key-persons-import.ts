@@ -1,7 +1,7 @@
 /**
  * Key Persons Import
  *
- * Previously extracted key-persons records from org YAML files in packages/factbase/data/things/
+ * Previously extracted key-persons records from org YAML files in packages/factbase/data/fb-entities/
  * and synced them to the wiki-server personnel PG table.
  *
  * DEPRECATED: Records have been migrated from KB YAML to PostgreSQL.

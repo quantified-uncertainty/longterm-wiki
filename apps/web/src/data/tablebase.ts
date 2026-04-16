@@ -5,7 +5,7 @@
  *   - **TableBase** (this file): Typed relational records — entities, resources,
  *     publications, experts. Source of truth: YAML files in data/entities/, data/resources/.
  *   - **FactBase** (factbase.ts): Structured triples with temporal data and provenance.
- *     Source of truth: YAML files in packages/factbase/data/things/.
+ *     Source of truth: YAML files in packages/factbase/data/fb-entities/.
  *   - **WikiBase**: Long-form prose MDX articles (content/docs/).
  *     Represented here as the `Page` interface.
  *

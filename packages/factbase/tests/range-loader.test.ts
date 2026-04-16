@@ -46,9 +46,9 @@ recommended: []
     );
 
     // Write a test entity with range and min values
-    await mkdir(join(tmpDir, "things"));
+    await mkdir(join(tmpDir, "fb-entities"));
     await writeFile(
-      join(tmpDir, "things", "test-org.yaml"),
+      join(tmpDir, "fb-entities", "test-org.yaml"),
       `thing:
   id: test-org
   stableId: aB3cD4eF5g

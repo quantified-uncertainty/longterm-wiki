@@ -92,11 +92,11 @@ recommended: []
 `
     );
 
-    await mkdir(join(dataDir, "things"));
+    await mkdir(join(dataDir, "fb-entities"));
 
     // Entity with _sources and !src references
     await writeFile(
-      join(dataDir, "things", "test-org.yaml"),
+      join(dataDir, "fb-entities", "test-org.yaml"),
       `_sources:
   anthropic-co: https://anthropic.com/company
   yahoo-arr: https://uk.finance.yahoo.com/news/anthropic-arr
@@ -195,11 +195,11 @@ recommended: []
 `
     );
 
-    await mkdir(join(dataDir, "things"));
+    await mkdir(join(dataDir, "fb-entities"));
 
     // Entity with !src referencing a nonexistent alias
     await writeFile(
-      join(dataDir, "things", "dangling-org.yaml"),
+      join(dataDir, "fb-entities", "dangling-org.yaml"),
       `_sources:
   existing-alias: https://example.com
 
@@ -267,11 +267,11 @@ recommended: []
 `
     );
 
-    await mkdir(join(dataDir, "things"));
+    await mkdir(join(dataDir, "fb-entities"));
 
     // Entity without _sources section but using !src
     await writeFile(
-      join(dataDir, "things", "no-sources-org.yaml"),
+      join(dataDir, "fb-entities", "no-sources-org.yaml"),
       `thing:
   id: no-sources-org
   stableId: tstNoSrc001

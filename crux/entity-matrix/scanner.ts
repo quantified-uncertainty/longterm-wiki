@@ -31,7 +31,7 @@ const WIKI_SERVER_ROUTES = join(
   "apps/wiki-server/src/routes",
 );
 const YAML_ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
-const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/fb-entities");
 const CONTENT_DIR = join(PROJECT_ROOT, "content/docs");
 
 // ============================================================================

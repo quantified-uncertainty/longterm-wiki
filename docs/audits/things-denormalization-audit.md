@@ -141,7 +141,7 @@ All of these go through `sync-factory.ts:661–672`: the factory calls `resolveE
 | File | Uses | Notes |
 |---|---|---|
 | `app/internal/entity-profile/entity-profile-viewer.tsx:170,238,695–708` | Column exclusion list `parent_thing_id/source_table/source_id`; section label "Things"; `/things/<id>` linking | Doesn't read `title`/`description`/`parent_title` directly. |
-| `app/factbase/fact/[factId]/page.tsx:404`, `app/factbase/record/[recordId]/page.tsx:159` | References to `packages/factbase/data/things/` (YAML dir) | **Unrelated** to PG `things` table — name collision only. |
+| `app/factbase/fact/[factId]/page.tsx:404`, `app/factbase/record/[recordId]/page.tsx:159` | References to `packages/factbase/data/fb-entities/` (YAML dir) | **Unrelated** to PG `things` table — name collision only. |
 
 ### crux CLI / reconciliation
 
@@ -202,7 +202,7 @@ Grepped from `schema.ts`:
 
 `schema.ts:962`: `label: text("label")` — nullable column on `facts`.
 
-**Authoritative source**: the FactBase property definition (`packages/factbase/data/things/<entity>.yaml` references property keys that live in `packages/factbase/src/properties.ts` or equivalent). At sync time, `facts.ts` copies `property.name` into `facts.label`.
+**Authoritative source**: the FactBase property definition (`packages/factbase/data/fb-entities/<entity>.yaml` references property keys that live in `packages/factbase/src/properties.ts` or equivalent). At sync time, `facts.ts` copies `property.name` into `facts.label`.
 
 **Used by**: `facts.ts:284` (select for API export), `sourcing.ts:1531` (resolve fact names for sourcing dashboard). Crucially, `facts.ts:575` uses `label || factId` as the thing title — this is the QUA-397 leak entry point.
 

@@ -491,7 +491,7 @@ async function forEntity(
     bundle += factsBlock(factsResult.data.facts);
   }
 
-  // KB structured facts (from packages/factbase/data/things/*.yaml)
+  // KB structured facts (from packages/factbase/data/fb-entities/*.yaml)
   const kbContext = await buildKbContextForPage(
     e.wikiId ?? '',
     `${entityId}.mdx`,

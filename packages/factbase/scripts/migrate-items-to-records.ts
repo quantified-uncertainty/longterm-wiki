@@ -18,7 +18,7 @@ import { readFileSync, writeFileSync } from "node:fs";
 import { join, basename } from "node:path";
 import { globSync } from "node:fs";
 
-const DATA_DIR = join(import.meta.dirname, "../data/things");
+const DATA_DIR = join(import.meta.dirname, "../data/fb-entities");
 const args = process.argv.slice(2);
 const dryRun = args.includes("--dry-run");
 const entityFilter = args.find(a => a.startsWith("--entity="))?.split("=")[1];

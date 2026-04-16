@@ -27,7 +27,7 @@ pnpm crux query entity $ENTITY_ID
 Also fetch:
 - The entity's wiki page content (read the MDX file via `pnpm crux context for-page $ENTITY_ID`)
 - Related entities' metadata (check each entity in `relatedEntries`)
-- FactBase facts for this entity (check `packages/factbase/data/things/`)
+- FactBase facts for this entity (check `packages/factbase/data/fb-entities/`)
 
 **Read all outputs carefully before proceeding.**
 

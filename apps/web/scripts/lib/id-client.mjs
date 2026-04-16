@@ -166,6 +166,70 @@ export async function allocateIds(slugs) {
  * @param {number} [pageSize=200]
  * @returns {Promise<Map<string, string>>}  Map of slug → wikiId
  */
+/**
+ * Fetch the authoritative entity_ids registry from the server as a
+ * slug → wikiId map.
+ *
+ * Paginates through GET /api/ids until exhausted. This is the source of
+ * truth for wikiId allocation and is what build-data* should consult when
+ * pre-seeding buildIdRegistry() to get deterministic E-numbers across runs
+ * (QUA-521 / Phase 3 audit).
+ *
+ * **Fail-closed semantics** (per CodeRabbit review on QUA-521): if any
+ * page of the paginated crawl fails (non-2xx, network error, timeout),
+ * returns `null` to signal "registry unavailable". Callers must treat
+ * `null` as a distinct state from an empty map and either fall through to
+ * in-memory fallback allocation or abort, rather than mixing partial
+ * persisted IDs with fallback IDs (which would look like a successful
+ * pre-seed but leave the tail unseeded). An empty Map is only returned
+ * when the server is configured but legitimately has zero rows.
+ *
+ * @param {number} [pageSize=1000]
+ * @returns {Promise<Map<string, string> | null>} Map of slug → wikiId, or
+ *   null on any fetch failure. Null means "unavailable, don't pre-seed".
+ */
+export async function fetchPersistentIdRegistry(pageSize = 1000) {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+
+  const resultMap = new Map();
+  let offset = 0;
+
+  try {
+    while (true) {
+      const res = await fetch(
+        `${serverUrl}/api/ids?limit=${pageSize}&offset=${offset}`,
+        {
+          headers: buildHeaders(),
+          signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
+        },
+      );
+      // Fail closed: any non-2xx (even mid-pagination) invalidates the
+      // whole crawl. We must not return a partial map.
+      if (!res.ok) return null;
+
+      const data = await res.json();
+      const ids = data.ids || [];
+      for (const row of ids) {
+        if (row.slug && row.wikiId) {
+          resultMap.set(row.slug, row.wikiId);
+        }
+      }
+
+      // Use ids.length (actual rows received) rather than pageSize as the
+      // advance step. A server that returns fewer rows than requested on
+      // a non-terminal page would otherwise desync offset from cursor.
+      if (ids.length < pageSize) break;
+      offset += ids.length;
+    }
+  } catch {
+    // Network error, timeout, or JSON parse failure — fail closed.
+    return null;
+  }
+
+  return resultMap;
+}
+
 export async function fetchServerEntityIdMap(pageSize = 200) {
   const serverUrl = getServerUrl();
   if (!serverUrl) return new Map();

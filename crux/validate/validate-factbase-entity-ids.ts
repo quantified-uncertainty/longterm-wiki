@@ -24,7 +24,7 @@ import { getColors } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { ValidatorResult } from './types.ts';
 
-const FACTBASE_DIR = join(PROJECT_ROOT, 'packages/factbase/data/things');
+const FACTBASE_DIR = join(PROJECT_ROOT, 'packages/factbase/data/fb-entities');
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data/entities');
 
 const args = process.argv.slice(2);

@@ -283,7 +283,7 @@ function main(): void {
   const ci = process.argv.includes("--ci");
   const c = getColors(ci);
 
-  const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "things");
+  const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "fb-entities");
   const entitiesDir = join(PROJECT_ROOT, "data", "entities");
 
   const result = validatePersonRefs(thingsDir, entitiesDir);
