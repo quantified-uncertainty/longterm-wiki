@@ -160,8 +160,13 @@ END $$;
 
 -- ---------------------------------------------------------------------------
 -- 4. Populate NULL `resources.stable_id` with `sid_` + 10 random alphanumeric
---    characters. Alphabet matches the TS `generateId()` in
---    `packages/factbase/src/ids.ts:45` (A-Z, a-z, 0-9 — 62 chars).
+--    characters. Output matches the downstream invariant
+--    `^sid_[A-Za-z0-9]{10}$` that the TS `generateId()` in
+--    `packages/factbase/src/ids.ts:45` also produces. The distributions are
+--    NOT identical — TS starts from base64url then replaces '-'/'_' with
+--    lowercase-only, while this PG function samples uniformly from the
+--    full 62-char alphabet — but both are valid sids for all validators
+--    downstream.
 --
 --    The generator is a VOLATILE PL/pgSQL function so that `UPDATE` evaluates
 --    it once per row. A naive scalar subquery in SET would be folded to a
@@ -170,8 +175,9 @@ END $$;
 --    Collision handling: with 62^10 ≈ 8.4×10^17 possibilities and ~22,893
 --    total resource rows after this migration, birthday-paradox collision
 --    probability is ~10^-10. We still wrap the UPDATE in an EXCEPTION /
---    retry loop so a spurious collision re-generates affected rows rather
---    than aborting the whole transaction.
+--    retry loop — on `unique_violation`, the whole UPDATE rolls back and
+--    we re-generate stable_ids for ALL remaining NULL rows (not just the
+--    colliding subset, which PG doesn't expose). Bounded to 5 attempts.
 -- ---------------------------------------------------------------------------
 
 CREATE OR REPLACE FUNCTION pg_temp.qua536_sid_gen() RETURNS text AS $$
@@ -306,12 +312,19 @@ BEGIN
     RAISE EXCEPTION 'QUA-536: % duplicate stable_id values after step 4', dup_count;
   END IF;
 
+  -- Two pathologies to catch:
+  -- (a) things rows with source_table='resources' whose id doesn't match the
+  --     matching resource's stable_id (the main thing we just aligned)
+  -- (b) orphan things rows with source_table='resources' whose source_id
+  --     doesn't correspond to any resources row — these would be missed by
+  --     the JOIN version below, so check with LEFT JOIN + IS NULL.
   SELECT count(*) INTO stale_things
   FROM things t
-  JOIN resources r ON r.id = t.source_id
-  WHERE t.source_table = 'resources' AND t.id <> r.stable_id;
+  LEFT JOIN resources r ON r.id = t.source_id
+  WHERE t.source_table = 'resources'
+    AND (r.id IS NULL OR t.id <> r.stable_id);
   IF stale_things <> 0 THEN
-    RAISE EXCEPTION 'QUA-536: % things rows still mismatch resources.stable_id after step 5',
+    RAISE EXCEPTION 'QUA-536: % things rows still mismatch or orphan resources.stable_id after step 5',
       stale_things;
   END IF;
 
@@ -352,7 +365,21 @@ DO $$
 DECLARE
   attempt int := 0;
   max_attempts int := 10;
+  late_null_count int;
 BEGIN
+  -- Between the main-txn COMMIT and this step, a concurrent writer could
+  -- theoretically INSERT a new resource row with NULL stable_id via any
+  -- INSERT path the application did not cover. All application-level INSERT
+  -- paths were audited and now always provide a stable_id (see
+  -- qua-536-migration.test.ts "INSERT path stable_id defaulting" suite), but
+  -- this guard gives a clear error if a miss was made — better than SET NOT
+  -- NULL failing halfway with a cryptic message.
+  SELECT count(*) INTO late_null_count FROM resources WHERE stable_id IS NULL;
+  IF late_null_count > 0 THEN
+    RAISE EXCEPTION 'QUA-536: % NULL stable_id rows appeared between main-txn COMMIT and SET NOT NULL — a concurrent writer is using an INSERT path that does not set stable_id. Investigate writers before retry.',
+      late_null_count;
+  END IF;
+
   LOOP
     attempt := attempt + 1;
     BEGIN

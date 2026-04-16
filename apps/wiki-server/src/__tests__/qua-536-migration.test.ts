@@ -156,7 +156,28 @@ describe("QUA-536 Phase A migration structure", () => {
       expect(manualContent).toMatch(/NULL resources\.stable_id rows remain/);
       expect(manualContent).toMatch(/non-canonical stable_id format/);
       expect(manualContent).toMatch(/duplicate stable_id values/);
-      expect(manualContent).toMatch(/things rows still mismatch resources\.stable_id/);
+      expect(manualContent).toMatch(/things rows still mismatch or orphan resources\.stable_id/);
+    });
+
+    it("re-checks NULL count between COMMIT and SET NOT NULL (race-window guard)", () => {
+      // Between main-txn COMMIT and SET NOT NULL, a concurrent writer with
+      // an un-fixed INSERT path could insert a NULL stable_id. Without this
+      // guard, SET NOT NULL would fail with a cryptic "null value in column"
+      // after the main txn committed irreversibly. The guard catches it
+      // early with an actionable message pointing at the root cause.
+      expect(manualContent).toMatch(/late_null_count/);
+      expect(manualContent).toMatch(
+        /NULL stable_id rows appeared between main-txn COMMIT and SET NOT NULL/,
+      );
+      // Guard must come BEFORE the ALTER TABLE statement (otherwise it's
+      // not a guard, just a post-hoc message).
+      const guardIdx = manualContent.indexOf("late_null_count");
+      const alterIdx = manualContent.indexOf(
+        "ALTER TABLE resources ALTER COLUMN stable_id SET NOT NULL",
+      );
+      expect(guardIdx).toBeGreaterThan(-1);
+      expect(alterIdx).toBeGreaterThan(-1);
+      expect(guardIdx).toBeLessThan(alterIdx);
     });
 
     it("runs SET NOT NULL OUTSIDE the main transaction with lock_timeout retry", () => {

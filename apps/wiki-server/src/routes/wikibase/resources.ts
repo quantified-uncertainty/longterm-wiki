@@ -187,7 +187,7 @@ function resourceValues(d: ResourceInput) {
     fetchedAt: d.fetchedAt ? new Date(d.fetchedAt) : null,
     contentHash: d.contentHash ?? null,
     // QUA-536: always generate a stableId if one isn't provided. The NOT NULL
-    // constraint on resources.stable_id (added in migration 0183) means
+    // constraint on resources.stable_id (added in migration 0184) means
     // INSERTs without stable_id fail. On ON CONFLICT (UPDATE) paths, the
     // COALESCE below preserves the existing stable_id, so a generated one on
     // update is harmless (never written).
