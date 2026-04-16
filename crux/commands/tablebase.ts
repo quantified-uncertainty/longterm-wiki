@@ -29,6 +29,7 @@ import { commands as importFundingProgramsCommands } from './import-funding-prog
 import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
 import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
+import { commands as setupOrgCommands } from './setup-org.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1465,6 +1466,8 @@ export const commands = {
   'website-sources-fetch': websiteSourcesCommands.fetch,
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
+  // QUA-35: single-shot organization onboarding.
+  'setup-org': setupOrgCommands.default,
 };
 
 export function getHelp(): string {
@@ -1552,6 +1555,10 @@ Task Types:
   investment-linking         Add investment records
   benchmark-result-fill      Add benchmark scores for AI models
   source-discovery           Find better sources for unverifiable records
+
+Onboarding:
+  setup-org --config=<path>   Single-shot org onboarding: ID + entity YAML + FactBase + PG sync.
+                              Default is dry-run; pass --apply to write. See setup-org --help for full help.
 
 Examples:
   crux tb tablebase scan                                   # Overview of all tables
