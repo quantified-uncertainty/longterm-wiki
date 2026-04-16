@@ -1,13 +1,4 @@
-/**
- * Tests for `crux tb setup-org` (QUA-35).
- *
- * Covers:
- *   - Config validation (Zod schema)
- *   - Pure builders (entity record, FactBase doc, division/program rows)
- *   - Snippet formatters
- *   - The orchestrator's dry-run vs --apply behavior, with mocked wiki-server clients
- *   - File-write planning (no real I/O — temp dir only)
- */
+// Tests for `crux tb setup-org`.
 
 import { describe, it, expect } from "vitest";
 import { mkdirSync, mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
@@ -530,7 +521,7 @@ describe("runSetupOrg (dry-run)", () => {
   it("never calls allocateId or sync* in dry-run", async () => {
     const config = parseConfig(FULL_CONFIG_YAML, "yaml");
     const { deps, mock } = makeDeps({ getId: "missing" });
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     expect(mock.syncEntities.getCalls()).toBe(0);
     expect(mock.syncDivisions.getCalls()).toBe(0);
     expect(mock.syncFundingPrograms.getCalls()).toBe(0);
@@ -539,15 +530,15 @@ describe("runSetupOrg (dry-run)", () => {
     expect(report.wikiId).toBe("<would-allocate-wiki-id>");
     expect(report.stableId).toBe("<would-allocate-stable-id>");
     // Counts are still computed for the preview.
-    expect(report.divisions.count).toBe(2);
-    expect(report.fundingPrograms.count).toBe(1);
+    expect(report.divisions.ids.length).toBe(2);
+    expect(report.fundingPrograms.ids.length).toBe(1);
     expect(report.factbaseFacts).toBe(1);
   });
 
   it("uses the existing ID when the slug is already allocated", async () => {
     const config = parseConfig(FULL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps({ getId: "found" });
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     expect(report.wikiId).toBe("E999");
     expect(report.stableId).toBe("sid_EXISTING01");
   });
@@ -555,7 +546,7 @@ describe("runSetupOrg (dry-run)", () => {
   it("falls back to placeholders when wiki-server is unreachable", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps({ getId: "fail" });
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     expect(report.wikiId).toBe("<would-allocate-wiki-id>");
     expect(report.steps[0]!.status).toBe("skipped");
     expect(report.steps[0]!.detail).toContain("lookup failed");
@@ -564,7 +555,7 @@ describe("runSetupOrg (dry-run)", () => {
   it("includes follow-up steps for divisions and programs", async () => {
     const config = parseConfig(FULL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps();
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     expect(report.followUp.some((f) => f.includes("import-divisions.ts"))).toBe(true);
     expect(report.followUp.some((f) => f.includes("import-funding-programs.ts"))).toBe(true);
     expect(report.followUp.some((f) => f.includes("crux w create"))).toBe(true);
@@ -579,7 +570,7 @@ describe("runSetupOrg (--apply)", () => {
     const tmp = mkdtempSync(join(tmpdir(), "setup-org-apply-"));
     try {
       const { deps, mock } = makeDeps({}, tmp);
-      const report = await runSetupOrg(config, true, deps);
+      const report = await runSetupOrg(config, { apply: true }, deps);
       expect(report.applied).toBe(true);
       expect(report.wikiId).toBe("E1234");
       expect(report.stableId).toBe("sid_NEW0000000");
@@ -600,7 +591,7 @@ describe("runSetupOrg (--apply)", () => {
   it("returns with failed allocate-id and does not call any sync*", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps, mock } = makeDeps({ allocate: false });
-    const report = await runSetupOrg(config, true, deps);
+    const report = await runSetupOrg(config, { apply: true }, deps);
     expect(report.steps[0]!.status).toBe("failed");
     expect(mock.syncEntities.getCalls()).toBe(0);
     expect(mock.written).toHaveLength(0);
@@ -619,7 +610,7 @@ describe("runSetupOrg (--apply)", () => {
         entitySyncCalls++;
         return { ok: false, message: "boom" };
       };
-      const report = await runSetupOrg(config, true, deps);
+      const report = await runSetupOrg(config, { apply: true }, deps);
       expect(entitySyncCalls).toBe(1);
       // Downstream syncs skipped, NOT attempted.
       expect(mock.syncDivisions.getCalls()).toBe(0);
@@ -738,7 +729,7 @@ describe("apply mode writes valid YAML to disk", () => {
         },
         log: () => {},
       };
-      await runSetupOrg(config, true, deps);
+      await runSetupOrg(config, { apply: true }, deps);
       expect(written).toHaveLength(2);
       const entityPath = join(tmp, "data/entities/aria.yaml");
       expect(existsSync(entityPath)).toBe(true);
@@ -767,7 +758,7 @@ name: "$(rm -rf ~) and \`echo pwned\`"
 `;
     const config = parseConfig(yaml, "yaml");
     const { deps } = makeDeps();
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     // The follow-up suggestion uses single-quotes which prevent shell
     // expansion. The literal $(...)/backticks should appear verbatim
     // inside single quotes, not as an active shell construct.
@@ -785,7 +776,7 @@ name: "Bob's R&D Lab"
 `;
     const config = parseConfig(yaml, "yaml");
     const { deps } = makeDeps();
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     const wikiCreate = report.followUp.find((f) => f.includes("crux w create"));
     expect(wikiCreate).toContain("'Bob'\\''s R&D Lab'");
   });
@@ -797,7 +788,7 @@ describe("formatReport", () => {
   it("includes step status glyphs and the (re-run with --apply) hint in dry-run", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps();
-    const report = await runSetupOrg(config, false, deps);
+    const report = await runSetupOrg(config, { apply: false }, deps);
     const text = formatReport(report);
     expect(text).toContain("Dry run (preview)");
     expect(text).toContain("re-run with --apply");
@@ -807,7 +798,7 @@ describe("formatReport", () => {
   it("omits the (re-run with --apply) hint when applied", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps({}, mkdtempSync(join(tmpdir(), "setup-org-fmt-")));
-    const report = await runSetupOrg(config, true, deps);
+    const report = await runSetupOrg(config, { apply: true }, deps);
     const text = formatReport(report);
     expect(text).toContain("Applied");
     expect(text).not.toContain("re-run with --apply");

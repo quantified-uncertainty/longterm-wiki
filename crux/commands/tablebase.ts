@@ -1466,7 +1466,6 @@ export const commands = {
   'website-sources-fetch': websiteSourcesCommands.fetch,
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
-  // QUA-35: single-shot organization onboarding.
   'setup-org': setupOrgCommands.default,
 };
 

@@ -1,28 +1,16 @@
 /**
- * `crux tb setup-org` — single-shot organization onboarding (QUA-35).
+ * `crux tb setup-org` — single-shot organization onboarding.
  *
- * Replaces the manual ~15-step entity onboarding flow with one command:
- *   1. Allocate wiki ID (E-number + sid_ stableId) via wiki-server
- *   2. Write the FactBase entity stub at packages/factbase/data/fb-entities/<slug>.yaml
- *   3. Write the YAML entity file at data/entities/<slug>.yaml
- *   4. Sync entity to PG (entities table)
- *   5. Sync optional divisions to PG (divisions table)
- *   6. Sync optional funding programs to PG (funding_programs table)
- *   7. Emit a verification report listing what was created and what manual
- *      follow-ups remain (wiki page authoring, personnel discovery, grants,
- *      and snippets to make divisions/programs persistent in the
- *      `import-divisions.ts` / `import-funding-programs.ts` constants files).
+ * Reads a YAML/JSON config and orchestrates wiki ID allocation, FactBase
+ * entity stub, YAML entity file, and PG sync of entity/divisions/programs.
+ * Emits a verification report and copy-pastable snippets for the persistent
+ * constants files in import-divisions.ts / import-funding-programs.ts.
  *
- * Default mode is dry-run/preview — writes only happen when `--apply` is set.
- *
- * Usage:
- *   crux tb setup-org --config=path/to/aria.yaml
- *   crux tb setup-org --config=path/to/aria.yaml --apply
- *   crux tb setup-org --config=- --apply              # JSON config from stdin
- *   crux tb setup-org --config=path/to/aria.yaml --ci # JSON output
+ * Default mode is dry-run; `--apply` writes files and syncs to PG.
+ * See `getHelp()` for full Usage and config schema.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, isAbsolute, join, resolve } from "node:path";
 import { parse as parseYaml, stringify as stringifyYaml } from "yaml";
 import { z } from "zod";
@@ -32,31 +20,45 @@ import type {
   CommandResult,
 } from "../lib/command-types.ts";
 import { generateId } from "../lib/grant-import/id.ts";
+import { generateContentFactId } from "../../packages/factbase/src/ids.ts";
 import { toSlug } from "../tablebase/types.ts";
+import { getColors } from "../lib/output.ts";
 import { allocateId, getIdBySlug } from "../lib/wiki-server/ids.ts";
 import { syncEntities } from "../lib/wiki-server/entities.ts";
 import { syncDivisions } from "../lib/wiki-server/divisions.ts";
 import { syncFundingPrograms } from "../lib/wiki-server/funding-programs.ts";
 
-// ── Constants ──────────────────────────────────────────────────────────
-
 const MAX_NAME_LENGTH = 500;
-const SID_FORMAT_RE = /^sid_[A-Za-z0-9]{10}$/;
+const SLUG_RE = /^[a-z0-9][a-z0-9-]*[a-z0-9]$/;
+// Mirrors isSid() from @longterm-wiki/id-utils. crux/tsconfig has no path
+// mapping for that package, so use the local regex (same form as
+// validate-rendered-sid.ts and validate-factbase-stableid.ts).
+const SID_RE = /^sid_[A-Za-z0-9]{10}$/;
+
+// Step names — referenced by tests, kept as a typed const so a typo on either
+// side fails at compile time instead of silently mismatching.
+const STEP = {
+  ALLOCATE: "allocate-id",
+  WRITE_ENTITY: "write-entity-yaml",
+  WRITE_FACTBASE: "write-factbase-yaml",
+  SYNC_ENTITY: "sync-entity-pg",
+  SYNC_DIVISIONS: "sync-divisions",
+  SYNC_PROGRAMS: "sync-funding-programs",
+} as const;
+type StepName = (typeof STEP)[keyof typeof STEP];
 
 // ── Config schema ───────────────────────────────────────────────────────
 
-// relatedEntries point to other entities. Per .claude/rules/id-system.md the
-// canonical ref is a sid_ prefixed stableId. Slugs are also accepted today
-// (see entities/organizations.yaml), so we permit either form.
+// Per .claude/rules/id-system.md, refs are sid_-prefixed stableIds. Slugs
+// are also accepted today (organizations.yaml uses both), so allow either.
 const RelatedEntrySchema = z.object({
   id: z
     .string()
     .min(1)
     .max(300)
-    .refine(
-      (s) => SID_FORMAT_RE.test(s) || /^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(s),
-      { message: "id must be a sid_-prefixed stableId or a kebab-case slug" },
-    ),
+    .refine((s) => SID_RE.test(s) || SLUG_RE.test(s), {
+      message: "id must be a sid_-prefixed stableId or a kebab-case slug",
+    }),
   type: z.string().min(1),
   relationship: z.string().optional(),
 });
@@ -111,7 +113,7 @@ const SetupOrgConfigSchema = z.object({
     .string()
     .min(2)
     .max(100)
-    .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "slug must be kebab-case"),
+    .regex(SLUG_RE, "slug must be kebab-case"),
   name: z.string().min(1).max(MAX_NAME_LENGTH),
   type: z.string().min(1).default("organization"),
   aliases: z.array(z.string().min(1)).optional(),
@@ -132,10 +134,6 @@ export type FactInput = z.infer<typeof FactInputSchema>;
 
 // ── Pure builders ───────────────────────────────────────────────────────
 
-/**
- * Parse + validate a config from a YAML or JSON string.
- * Returns the parsed config or throws a ZodError / SyntaxError.
- */
 export function parseConfig(raw: string, format: "yaml" | "json" = "yaml"): SetupOrgConfig {
   const data = format === "json" ? JSON.parse(raw) : parseYaml(raw);
   if (data === null || typeof data !== "object") {
@@ -162,10 +160,7 @@ export interface EntityRecord {
   }>;
 }
 
-/**
- * Build the YAML entity record (the object that lives inside data/entities/<slug>.yaml).
- * Fields are ordered to match the convention in existing entity files.
- */
+// Field order matches the convention in existing data/entities/*.yaml files.
 export function buildEntityRecord(
   config: SetupOrgConfig,
   ids: { wikiId: string; stableId: string },
@@ -211,19 +206,20 @@ export interface FactBaseEntityDoc {
   facts: FactBaseFact[];
 }
 
-/**
- * Build the FactBase YAML document (entity stub + initial facts).
- * Facts get deterministic IDs based on the entity stableId + property + asOf
- * so re-running the command on the same config produces the same fact IDs.
- */
+// Re-running setup-org with the same config must produce the same fact IDs,
+// otherwise PG sync sees them as new rows. `generateContentFactId` is the
+// canonical helper for this — its seed includes the value, which prevents
+// two facts with the same (property, asOf) but different values from colliding.
 export function buildFactBaseDoc(
   stableId: string,
   facts: FactInput[] | undefined,
 ): FactBaseEntityDoc {
   const factRows: FactBaseFact[] = (facts ?? []).map((f) => {
-    const seed = `${stableId}|${f.property}|${f.asOf ?? ""}`;
-    const factId = `f_${generateId(seed)}`;
-    const out: FactBaseFact = { id: factId, property: f.property, value: f.value };
+    const out: FactBaseFact = {
+      id: generateContentFactId(stableId, f.property, f.value, f.asOf),
+      property: f.property,
+      value: f.value,
+    };
     if (f.asOf) out.asOf = f.asOf;
     if (f.unit) out.unit = f.unit;
     if (f.currency) out.currency = f.currency;
@@ -247,18 +243,14 @@ export interface DivisionRow {
   notes: string | null;
 }
 
-/**
- * Build the rows that get sent to /api/divisions/sync.
- * Each idSeed follows the `div|<orgSlug>|<divisionSlug>` convention used
- * throughout import-divisions.ts so the IDs collide cleanly if the same
- * division is later added to that constants file.
- */
+// idSeed follows the `div|<orgSlug>|<divisionSlug>` convention used throughout
+// import-divisions.ts so the IDs collide cleanly if the same division is later
+// pasted into that constants file via the snippet.
 export function buildDivisionRows(
   config: SetupOrgConfig,
   parentOrgId: string,
 ): DivisionRow[] {
   const rows: DivisionRow[] = [];
-  const seenIds = new Set<string>();
   const seenSlugs = new Set<string>();
   for (const d of config.divisions ?? []) {
     const slug = d.slug ?? toSlug(d.name);
@@ -268,11 +260,6 @@ export function buildDivisionRows(
     seenSlugs.add(slug);
     const idSeed = `div|${config.slug}|${slug}`;
     const id = generateId(idSeed);
-    if (seenIds.has(id)) {
-      // Should be impossible given seenSlugs but guard against generateId collision.
-      throw new Error(`division id collision for seed: ${idSeed}`);
-    }
-    seenIds.add(id);
     rows.push({
       id,
       idSeed,
@@ -308,19 +295,14 @@ export interface FundingProgramRow {
   openDate: string | null;
 }
 
-/**
- * Build the rows that get sent to /api/funding-programs/sync.
- * If a program references a divisionSlug, it must match a division in the
- * same config — otherwise we throw rather than silently linking to nothing.
- */
+// A program's divisionSlug must match a division in the same config —
+// silently leaving it unlinked would produce orphan programs in PG.
 export function buildFundingProgramRows(
   config: SetupOrgConfig,
   orgStableId: string,
   divisionRows: DivisionRow[],
 ): FundingProgramRow[] {
-  // Index divisions by their slug so program → division lookup is O(1).
-  // `config.divisions` and `divisionRows` are built in the same order from
-  // the same source, so we can zip them positionally.
+  // Zip positionally: config.divisions and divisionRows are in the same order.
   const divisionIdBySlug = new Map<string, { id: string; idSeed: string }>();
   (config.divisions ?? []).forEach((d, i) => {
     const slug = d.slug ?? toSlug(d.name);
@@ -374,11 +356,6 @@ export function buildFundingProgramRows(
   return rows;
 }
 
-/**
- * Pretty-print a TypeScript snippet the user can paste into
- * crux/commands/import-divisions.ts to make synced divisions
- * persistent across `import-divisions sync` runs.
- */
 export function formatDivisionsSnippet(rows: DivisionRow[], orgSlug: string): string {
   if (rows.length === 0) return "";
   const lines: string[] = [];
@@ -399,9 +376,6 @@ export function formatDivisionsSnippet(rows: DivisionRow[], orgSlug: string): st
   return lines.join("\n");
 }
 
-/**
- * Pretty-print a TypeScript snippet for crux/commands/import-funding-programs.ts.
- */
 export function formatFundingProgramsSnippet(
   rows: FundingProgramRow[],
   orgSlug: string,
@@ -443,10 +417,7 @@ export interface FilePlan {
   factbaseYamlExists: boolean;
 }
 
-/**
- * Compute the full file-write plan without touching disk.
- * `repoRoot` lets tests point at a temp directory.
- */
+// repoRoot lets tests point at a temp directory.
 export function planFiles(
   repoRoot: string,
   config: SetupOrgConfig,
@@ -480,8 +451,8 @@ export function planFiles(
 }
 
 function writeFileEnsuringDir(path: string, contents: string): void {
-  const dir = dirname(path);
-  if (!existsSync(dir)) mkdirSync(dir, { recursive: true });
+  // mkdirSync with recursive:true is idempotent — no existsSync guard needed.
+  mkdirSync(dirname(path), { recursive: true });
   writeFileSync(path, contents, "utf-8");
 }
 
@@ -496,7 +467,7 @@ interface SetupOrgOptions extends BaseOptions {
 }
 
 interface StepResult {
-  step: string;
+  step: StepName;
   status: "ok" | "skipped" | "failed";
   detail?: string;
 }
@@ -508,8 +479,8 @@ interface Report {
   stableId: string | null;
   applied: boolean;
   steps: StepResult[];
-  divisions: { count: number; ids: string[] };
-  fundingPrograms: { count: number; ids: string[] };
+  divisions: { ids: string[] };
+  fundingPrograms: { ids: string[] };
   factbaseFacts: number;
   files: { path: string; willOverwrite: boolean }[];
   followUp: string[];
@@ -547,48 +518,34 @@ function readStdinSync(): string {
   return readFileSync(0, "utf-8");
 }
 
+type Result<T> =
+  | { ok: true; data: T }
+  | { ok: false; message: string };
+
+interface Ids {
+  wikiId: string;
+  stableId: string;
+}
+
 interface OrchestratorDeps {
   repoRoot: string;
-  /**
-   * Look up an existing wiki ID for a slug. Returns null for `not found`,
-   * which means the dry-run preview shows `<would allocate>` instead of
-   * provisioning a new ID against prod.
-   */
-  getIdBySlug: (
-    slug: string,
-  ) => Promise<{ ok: true; data: { wikiId: string; stableId: string } | null } | { ok: false; message: string }>;
-  /** Allocate a new wiki ID. Only called in --apply mode. */
-  allocateId: (
-    slug: string,
-    description?: string,
-  ) => Promise<{ ok: true; data: { wikiId: string; stableId: string } } | { ok: false; message: string }>;
-  syncEntities: (
-    items: Array<Record<string, unknown>>,
-  ) => Promise<{ ok: true; data: { upserted: number } } | { ok: false; message: string }>;
-  syncDivisions: (
-    items: Array<Record<string, unknown>>,
-  ) => Promise<{ ok: true; data: unknown } | { ok: false; message: string }>;
-  syncFundingPrograms: (
-    items: ReadonlyArray<unknown>,
-  ) => Promise<{ ok: true; data: unknown } | { ok: false; message: string }>;
+  getIdBySlug: (slug: string) => Promise<Result<Ids | null>>;
+  allocateId: (slug: string, description?: string) => Promise<Result<Ids>>;
+  syncEntities: (items: ReadonlyArray<Record<string, unknown>>) => Promise<Result<{ upserted: number }>>;
+  syncDivisions: (items: ReadonlyArray<Record<string, unknown>>) => Promise<Result<unknown>>;
+  syncFundingPrograms: (items: ReadonlyArray<Record<string, unknown>>) => Promise<Result<unknown>>;
   writeFile: (path: string, contents: string) => void;
   log: (line: string) => void;
 }
 
-/**
- * Placeholders shown for IDs we haven't allocated yet (dry-run on a new slug).
- * Both deliberately fail SID/wikiId validators so any tool downstream of the
- * dry-run report (e.g. a script consuming the JSON output) crashes loudly
- * instead of treating them as real allocated IDs.
- */
+// Placeholders deliberately fail the SID / wikiId validators so a script
+// that consumes the dry-run JSON crashes loudly instead of acting on them.
 const PLACEHOLDER_WIKI_ID = "<would-allocate-wiki-id>";
 const PLACEHOLDER_STABLE_ID = "<would-allocate-stable-id>";
 
-/**
- * Quote a string for safe pasting into a Bash command. Wraps in single quotes
- * and escapes any embedded `'`. Defends against `name = "$(rm -rf ~)"`-style
- * shell-injection in the verification report's copy-pastable follow-up steps.
- */
+// Single-quote wrap with `'\''` escape — prevents $(...)/backtick interpolation
+// in copy-pastable follow-up commands when the user-provided name contains
+// shell metacharacters.
 function shellQuote(s: string): string {
   return `'${s.replace(/'/g, "'\\''")}'`;
 }
@@ -599,21 +556,13 @@ export interface RunSetupOrgOptions {
   force?: boolean;
 }
 
-/**
- * Pure orchestration entry point — exported for unit tests so they can
- * inject mock wiki-server clients and a temp file system.
- */
 export async function runSetupOrg(
   config: SetupOrgConfig,
-  optionsOrApply: boolean | RunSetupOrgOptions,
+  options: RunSetupOrgOptions,
   deps: OrchestratorDeps,
 ): Promise<Report> {
-  const opts: RunSetupOrgOptions =
-    typeof optionsOrApply === "boolean"
-      ? { apply: optionsOrApply }
-      : optionsOrApply;
-  const apply = opts.apply;
-  const force = !!opts.force;
+  const apply = options.apply;
+  const force = !!options.force;
   const steps: StepResult[] = [];
   const report: Report = {
     slug: config.slug,
@@ -622,8 +571,8 @@ export async function runSetupOrg(
     stableId: null,
     applied: apply,
     steps,
-    divisions: { count: 0, ids: [] },
-    fundingPrograms: { count: 0, ids: [] },
+    divisions: { ids: [] },
+    fundingPrograms: { ids: [] },
     factbaseFacts: 0,
     files: [],
     followUp: [],
@@ -638,13 +587,13 @@ export async function runSetupOrg(
     deps.log(`Allocating wiki ID for ${config.slug}…`);
     const idResult = await deps.allocateId(config.slug, config.name);
     if (!idResult.ok) {
-      steps.push({ step: "allocate-id", status: "failed", detail: idResult.message });
+      steps.push({ step: STEP.ALLOCATE, status: "failed", detail: idResult.message });
       return report;
     }
     wikiId = idResult.data.wikiId;
     stableId = idResult.data.stableId;
     steps.push({
-      step: "allocate-id",
+      step: STEP.ALLOCATE,
       status: "ok",
       detail: `${wikiId} / ${stableId}`,
     });
@@ -656,7 +605,7 @@ export async function runSetupOrg(
       wikiId = PLACEHOLDER_WIKI_ID;
       stableId = PLACEHOLDER_STABLE_ID;
       steps.push({
-        step: "allocate-id",
+        step: STEP.ALLOCATE,
         status: "skipped",
         detail: `dry-run; lookup failed (${lookup.message})`,
       });
@@ -664,7 +613,7 @@ export async function runSetupOrg(
       wikiId = lookup.data.wikiId;
       stableId = lookup.data.stableId;
       steps.push({
-        step: "allocate-id",
+        step: STEP.ALLOCATE,
         status: "skipped",
         detail: `dry-run; existing ${wikiId} / ${stableId}`,
       });
@@ -672,7 +621,7 @@ export async function runSetupOrg(
       wikiId = PLACEHOLDER_WIKI_ID;
       stableId = PLACEHOLDER_STABLE_ID;
       steps.push({
-        step: "allocate-id",
+        step: STEP.ALLOCATE,
         status: "skipped",
         detail: "dry-run; would allocate new ID",
       });
@@ -688,9 +637,7 @@ export async function runSetupOrg(
 
   const divisionRows = buildDivisionRows(config, stableId);
   const programRows = buildFundingProgramRows(config, stableId, divisionRows);
-  report.divisions.count = divisionRows.length;
   report.divisions.ids = divisionRows.map((r) => r.id);
-  report.fundingPrograms.count = programRows.length;
   report.fundingPrograms.ids = programRows.map((r) => r.id);
 
   // 3. Plan file writes.
@@ -712,7 +659,7 @@ export async function runSetupOrg(
         .filter(Boolean)
         .join(", ");
       steps.push({
-        step: "write-entity-yaml",
+        step: STEP.WRITE_ENTITY,
         status: "failed",
         detail: `refusing to overwrite existing file(s) without --force: ${which}`,
       });
@@ -720,7 +667,7 @@ export async function runSetupOrg(
     }
 
     const writeStep = (
-      stepName: string,
+      stepName: StepName,
       path: string,
       contents: string,
     ): boolean => {
@@ -735,12 +682,12 @@ export async function runSetupOrg(
       }
     };
     const entityWritten = writeStep(
-      "write-entity-yaml",
+      STEP.WRITE_ENTITY,
       filePlan.entityYamlPath,
       filePlan.entityYamlContents,
     );
     const factbaseWritten = writeStep(
-      "write-factbase-yaml",
+      STEP.WRITE_FACTBASE,
       filePlan.factbaseYamlPath,
       filePlan.factbaseYamlContents,
     );
@@ -753,8 +700,8 @@ export async function runSetupOrg(
       return report;
     }
   } else {
-    steps.push({ step: "write-entity-yaml", status: "skipped", detail: "dry-run" });
-    steps.push({ step: "write-factbase-yaml", status: "skipped", detail: "dry-run" });
+    steps.push({ step: STEP.WRITE_ENTITY, status: "skipped", detail: "dry-run" });
+    steps.push({ step: STEP.WRITE_FACTBASE, status: "skipped", detail: "dry-run" });
   }
 
   // 4. Sync entity to PG.
@@ -776,14 +723,14 @@ export async function runSetupOrg(
     const syncResult = await deps.syncEntities([entityForSync]);
     entitySyncOk = syncResult.ok;
     steps.push({
-      step: "sync-entity-pg",
+      step: STEP.SYNC_ENTITY,
       status: syncResult.ok ? "ok" : "failed",
       detail: syncResult.ok
         ? `upserted ${syncResult.data.upserted}`
         : syncResult.message,
     });
   } else {
-    steps.push({ step: "sync-entity-pg", status: "skipped", detail: "dry-run" });
+    steps.push({ step: STEP.SYNC_ENTITY, status: "skipped", detail: "dry-run" });
   }
 
   // 5. Divisions. Skipped if entity sync failed — divisions reference the
@@ -792,7 +739,7 @@ export async function runSetupOrg(
   if (divisionRows.length > 0) {
     if (apply && !entitySyncOk) {
       steps.push({
-        step: "sync-divisions",
+        step: STEP.SYNC_DIVISIONS,
         status: "skipped",
         detail: "skipped because sync-entity-pg failed (would create orphans)",
       });
@@ -810,13 +757,13 @@ export async function runSetupOrg(
       }));
       const result = await deps.syncDivisions(items);
       steps.push({
-        step: "sync-divisions",
+        step: STEP.SYNC_DIVISIONS,
         status: result.ok ? "ok" : "failed",
         detail: result.ok ? `${divisionRows.length} divisions` : result.message,
       });
     } else {
       steps.push({
-        step: "sync-divisions",
+        step: STEP.SYNC_DIVISIONS,
         status: "skipped",
         detail: `dry-run (${divisionRows.length} divisions)`,
       });
@@ -828,7 +775,7 @@ export async function runSetupOrg(
   if (programRows.length > 0) {
     if (apply && !entitySyncOk) {
       steps.push({
-        step: "sync-funding-programs",
+        step: STEP.SYNC_PROGRAMS,
         status: "skipped",
         detail: "skipped because sync-entity-pg failed (would create orphans)",
       });
@@ -851,13 +798,13 @@ export async function runSetupOrg(
       }));
       const result = await deps.syncFundingPrograms(items);
       steps.push({
-        step: "sync-funding-programs",
+        step: STEP.SYNC_PROGRAMS,
         status: result.ok ? "ok" : "failed",
         detail: result.ok ? `${programRows.length} programs` : result.message,
       });
     } else {
       steps.push({
-        step: "sync-funding-programs",
+        step: STEP.SYNC_PROGRAMS,
         status: "skipped",
         detail: `dry-run (${programRows.length} programs)`,
       });
@@ -895,64 +842,61 @@ export async function runSetupOrg(
 
 // ── CLI formatting ──────────────────────────────────────────────────────
 
-const BOLD = "\x1b[1m";
-const GREEN = "\x1b[32m";
-const RED = "\x1b[31m";
-const DIM = "\x1b[2m";
-const RESET = "\x1b[0m";
-
-function statusGlyph(status: StepResult["status"]): string {
-  if (status === "ok") return `${GREEN}✓${RESET}`;
-  if (status === "failed") return `${RED}✗${RESET}`;
-  return `${DIM}⊘${RESET}`;
+function statusGlyph(status: StepResult["status"], c: ReturnType<typeof getColors>): string {
+  if (status === "ok") return `${c.green}✓${c.reset}`;
+  if (status === "failed") return `${c.red}✗${c.reset}`;
+  return `${c.dim}⊘${c.reset}`;
 }
 
 export function formatReport(report: Report): string {
+  // getColors() honors both --ci flag and CI=true env var, so output is
+  // automatically ANSI-stripped under any CI invocation.
+  const c = getColors();
   const lines: string[] = [];
   const header = report.applied ? "Applied" : "Dry run (preview)";
-  lines.push(`${BOLD}=== Setup Org: ${report.name} (${header}) ===${RESET}`);
+  lines.push(`${c.bold}=== Setup Org: ${report.name} (${header}) ===${c.reset}`);
   lines.push(`  slug:     ${report.slug}`);
   if (report.wikiId) lines.push(`  wikiId:   ${report.wikiId}`);
   if (report.stableId) lines.push(`  stableId: ${report.stableId}`);
   lines.push("");
 
-  lines.push(`${BOLD}Steps:${RESET}`);
+  lines.push(`${c.bold}Steps:${c.reset}`);
   for (const s of report.steps) {
-    const detail = s.detail ? `  ${DIM}${s.detail}${RESET}` : "";
-    lines.push(`  ${statusGlyph(s.status)} ${s.step}${detail}`);
+    const detail = s.detail ? `  ${c.dim}${s.detail}${c.reset}` : "";
+    lines.push(`  ${statusGlyph(s.status, c)} ${s.step}${detail}`);
   }
   lines.push("");
 
-  lines.push(`${BOLD}Created:${RESET}`);
+  lines.push(`${c.bold}Created:${c.reset}`);
   lines.push(`  Entity:           ${report.applied ? "yes" : "would create"}`);
   lines.push(`  FactBase facts:   ${report.factbaseFacts}`);
-  lines.push(`  Divisions:        ${report.divisions.count}`);
-  lines.push(`  Funding programs: ${report.fundingPrograms.count}`);
+  lines.push(`  Divisions:        ${report.divisions.ids.length}`);
+  lines.push(`  Funding programs: ${report.fundingPrograms.ids.length}`);
   lines.push("");
 
   if (report.files.length > 0) {
-    lines.push(`${BOLD}Files:${RESET}`);
+    lines.push(`${c.bold}Files:${c.reset}`);
     for (const f of report.files) {
-      const note = f.willOverwrite ? `${DIM}(overwrites existing)${RESET}` : "";
+      const note = f.willOverwrite ? `${c.dim}(overwrites existing)${c.reset}` : "";
       lines.push(`  ${f.path} ${note}`.trimEnd());
     }
     lines.push("");
   }
 
   if (report.divisionsSnippet) {
-    lines.push(`${BOLD}Snippet for crux/commands/import-divisions.ts (DIVISIONS array):${RESET}`);
+    lines.push(`${c.bold}Snippet for crux/commands/import-divisions.ts (DIVISIONS array):${c.reset}`);
     lines.push(report.divisionsSnippet);
     lines.push("");
   }
 
   if (report.fundingProgramsSnippet) {
-    lines.push(`${BOLD}Snippet for crux/commands/import-funding-programs.ts (PROGRAMS array):${RESET}`);
+    lines.push(`${c.bold}Snippet for crux/commands/import-funding-programs.ts (PROGRAMS array):${c.reset}`);
     lines.push(report.fundingProgramsSnippet);
     lines.push("");
   }
 
   if (report.followUp.length > 0) {
-    lines.push(`${BOLD}Follow-up steps:${RESET}`);
+    lines.push(`${c.bold}Follow-up steps:${c.reset}`);
     for (const f of report.followUp) {
       lines.push(`  • ${f}`);
     }
@@ -960,7 +904,7 @@ export function formatReport(report: Report): string {
   }
 
   if (!report.applied) {
-    lines.push(`${DIM}(re-run with --apply to write files and sync to PG)${RESET}`);
+    lines.push(`${c.dim}(re-run with --apply to write files and sync to PG)${c.reset}`);
   }
 
   return lines.join("\n");
@@ -972,24 +916,23 @@ function reportExitCode(report: Report): number {
 
 // ── Command entry ───────────────────────────────────────────────────────
 
-/**
- * Build the OrchestratorDeps wrapper around the real wiki-server clients.
- * Exported so tests can hit `setupOrgCommand` end-to-end with a stubbed
- * `apiRequest` (or assert on the wrapper's error mapping in isolation).
- */
-export function buildLiveDeps(
-  repoRoot: string,
-  ciOrJson: boolean,
-): OrchestratorDeps {
+type ApiCallResult<T> =
+  | { ok: true; data: T }
+  | { ok: false; error: string; message: string };
+
+function adaptApiResult<T>(r: ApiCallResult<T>): Result<T> {
+  return r.ok ? { ok: true, data: r.data } : { ok: false, message: `${r.error}: ${r.message}` };
+}
+
+export function buildLiveDeps(repoRoot: string, ciOrJson: boolean): OrchestratorDeps {
   return {
     repoRoot,
     getIdBySlug: async (slug) => {
       const r = await getIdBySlug(slug);
       if (!r.ok) {
-        // The wiki-server returns 404 for "slug not allocated" — that's a
-        // valid lookup result, not an error. The client classifies all 4xx
-        // as `bad_request`, so we narrow on the message prefix to avoid
-        // swallowing real validation errors (400, 422, 429, ...).
+        // wiki-server returns 404 for "slug not allocated" — a valid lookup
+        // result, not an error. The client coerces all 4xx to `bad_request`,
+        // so narrow on the message prefix to avoid swallowing real 400/422/429.
         if (r.error === "bad_request" && /^404[:\s]/.test(r.message)) {
           return { ok: true, data: null };
         }
@@ -1007,22 +950,12 @@ export function buildLiveDeps(
       return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
     },
     syncEntities: async (items) => {
-      const r = await syncEntities(
-        items as unknown as Parameters<typeof syncEntities>[0],
-      );
+      const r = await syncEntities(items as Parameters<typeof syncEntities>[0]);
       if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
       return { ok: true, data: { upserted: r.data.upserted } };
     },
-    syncDivisions: async (items) => {
-      const r = await syncDivisions(items);
-      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
-      return { ok: true, data: r.data };
-    },
-    syncFundingPrograms: async (items) => {
-      const r = await syncFundingPrograms(items);
-      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
-      return { ok: true, data: r.data };
-    },
+    syncDivisions: async (items) => adaptApiResult(await syncDivisions([...items])),
+    syncFundingPrograms: async (items) => adaptApiResult(await syncFundingPrograms([...items])),
     writeFile: writeFileEnsuringDir,
     log: (line) => {
       if (!ciOrJson) console.error(line);
@@ -1078,8 +1011,9 @@ export const commands: Record<
 };
 
 export function getHelp(): string {
+  const c = getColors();
   return `
-${BOLD}setup-org${RESET} — Single-shot organization onboarding (QUA-35)
+${c.bold}setup-org${c.reset} — Single-shot organization onboarding
 
 Replaces the manual ~15-step onboarding flow with one config file:
   • Allocates wiki ID (E-number + sid_ stableId)
@@ -1088,14 +1022,14 @@ Replaces the manual ~15-step onboarding flow with one config file:
   • Syncs entity, divisions, and funding programs to wiki-server PG
   • Outputs a verification report and snippets for the persistent constants files
 
-${BOLD}Usage:${RESET}
+${c.bold}Usage:${c.reset}
   crux tb setup-org --config=path/to/aria.yaml           # Dry run (preview)
   crux tb setup-org --config=path/to/aria.yaml --apply   # Actually write + sync
   crux tb setup-org --config=path/to/aria.yaml --apply --force   # Allow YAML overwrite
   crux tb setup-org --config=- --apply                   # JSON config from stdin
   crux tb setup-org --config=path/to/aria.yaml --ci      # JSON output
 
-${BOLD}Config schema (YAML):${RESET}
+${c.bold}Config schema (YAML):${c.reset}
   slug: aria                              # required, kebab-case
   name: Advanced Research and Innovation Agency  # required
   type: organization                      # default: organization
@@ -1126,10 +1060,10 @@ ${BOLD}Config schema (YAML):${RESET}
       value: "2023"
       source: https://aria.org.uk/about
 
-${BOLD}From an agent slot, prefix with WIKI_SERVER_ENV=prod:${RESET}
+${c.bold}From an agent slot, prefix with WIKI_SERVER_ENV=prod:${c.reset}
   WIKI_SERVER_ENV=prod pnpm crux tb setup-org --config=aria.yaml --apply
 
-${BOLD}Out of scope (run separately afterwards):${RESET}
+${c.bold}Out of scope (run separately afterwards):${c.reset}
   • Wiki page authoring → pnpm crux w create "<name>" --tier=standard
   • Personnel discovery → pnpm crux tb people discover
   • Grant ingestion     → pnpm crux tb import-grants sync
