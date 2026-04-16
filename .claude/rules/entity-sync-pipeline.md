@@ -95,7 +95,7 @@ Most routes use `onConflictDoUpdate({ target: <table>.id, set: { ...excluded fie
 YAML source of truth           crux/wiki-server/sync-*.ts           apps/wiki-server/src/routes/tablebase/*.ts
   data/entities/*.yaml     →   batchSync() via sync-common.ts   →   upsert → validateEntityRefs → resolveEntityFKs →
   packages/factbase/                                                upsertThingsInTx
-    data/things/*.yaml
+    data/fb-entities/*.yaml
                                                                               ↓
                                                     PG (entities, grants, facts, things, ...)
                                                                               ↓
