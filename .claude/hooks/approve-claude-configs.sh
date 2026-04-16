@@ -1,16 +1,14 @@
 #!/usr/bin/env bash
 #
-# PreToolUse hook for Edit|Write: auto-approve modifications to
-# .claude/{commands,agents,skills}/*.md — the standard "agent configuration"
-# paths that Claude Code itself routinely writes to when creating slash
-# commands, subagents, and skills.
+# PreToolUse hook for Edit|Write: auto-approve modifications to agent
+# configuration paths and session-state files under .claude/.
 #
 # Why this exists: Claude Code v2.1.56+ has a confirmed regression where
 # dispatched subagents do not inherit the parent session's
-# `permissions.allow` list from settings.json. Every Edit/Write on these
-# paths triggers an interactive approval prompt that subagents can't
-# respond to, so the tool call gets denied. The result: subagents silently
-# skip documentation updates that the parent was authorized to make.
+# `permissions.allow` list from settings.json. Separately, "Always allow"
+# writes to settings.local.json, which is per-slot — so the same basic
+# file edits (wip-checklist.md, review-done markers, session logs) prompt
+# fresh in every new slot.
 #
 # Tracking issues (all OPEN as of 2026-04-12):
 #   - anthropics/claude-code#18950
@@ -23,9 +21,19 @@
 # permission-inheritance bug), so this works uniformly across the parent
 # session and every dispatched agent.
 #
-# Scope: intentionally narrow. Only matches file_path containing
-# .claude/commands/, .claude/agents/, or .claude/skills/. Anything else
-# falls through to the normal permission flow.
+# Auto-approved paths (under .claude/):
+#   Agent configs (checked in):
+#     commands/, agents/, skills/
+#   Session state (gitignored or agent-managed):
+#     sessions/, memory/, snapshots/, plans/, reviews/
+#     wip-checklist.md, wip-context.md
+#     review-done, simplify-done
+#     active-branch, session.pid, session-log.md
+#     maintain-last-run.txt, issue-creates.json
+#
+# NOT auto-approved (intentionally require human review):
+#   settings.json, settings.local.json, hooks/, rules/, audits.yaml,
+#   scripts/, design/, setup.sh, common-issues.md
 
 set -uo pipefail
 
@@ -37,9 +45,16 @@ if [[ -z "$FILE_PATH" ]]; then
   exit 0
 fi
 
-if [[ "$FILE_PATH" =~ \.claude/(commands|agents|skills)/ ]]; then
-  # Skip the permission prompt. Deny rules at higher scopes still apply.
-  echo '{"decision":"approve","reason":"auto-approved: .claude config path"}'
+# Directories that are safe to auto-approve wholesale.
+if [[ "$FILE_PATH" =~ \.claude/(commands|agents|skills|sessions|memory|snapshots|plans|reviews)/ ]]; then
+  echo '{"decision":"approve","reason":"auto-approved: .claude config/session path"}'
+  exit 0
+fi
+
+# Top-level session-state files inside .claude/ (no subdirectory).
+if [[ "$FILE_PATH" =~ \.claude/(wip-checklist\.md|wip-context\.md|review-done|simplify-done|active-branch|session\.pid|session-log\.md|maintain-last-run\.txt|issue-creates\.json)$ ]]; then
+  echo '{"decision":"approve","reason":"auto-approved: .claude session state"}'
+  exit 0
 fi
 
 exit 0
