@@ -109,9 +109,9 @@ recommended: []
     );
 
     // things/ directory with !date facts
-    await mkdir(join(dataDir, "things"));
+    await mkdir(join(dataDir, "fb-entities"));
     await writeFile(
-      join(dataDir, "things", "test-org.yaml"),
+      join(dataDir, "fb-entities", "test-org.yaml"),
       `thing:
   id: test-org
   stableId: testStableId1

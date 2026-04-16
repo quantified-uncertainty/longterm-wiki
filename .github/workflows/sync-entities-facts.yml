@@ -6,7 +6,7 @@ on:
     branches: [main, production]
     paths:
       - "data/entities/**"
-      - "packages/factbase/data/things/**"
+      - "packages/factbase/data/fb-entities/**"
       # Also trigger when the sync/prune pipeline or workflow config changes,
       # so that new prune logic is exercised immediately after merge. See #2796.
       - "crux/wiki-server/sync-entities.ts"

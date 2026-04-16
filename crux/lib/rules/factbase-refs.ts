@@ -4,7 +4,7 @@
  * Checks that all <KBF entity="..." property="..."> and <Calc expr="{entity.property}">
  * components reference valid KB entity identifiers (slugs or stableIds) and property IDs.
  *
- * Entity identifiers come from packages/factbase/data/things/ — both the YAML filename
+ * Entity identifiers come from packages/factbase/data/fb-entities/ — both the YAML filename
  * (slug) and the thing.stableId field inside each file are accepted.
  *
  * Property IDs come from packages/factbase/data/properties.yaml (all keys under the
@@ -17,7 +17,7 @@ import { parse as parseYaml } from 'yaml';
 import { createRule, Issue, Severity, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
 import { PROJECT_ROOT } from '../content-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages/factbase/data/things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages/factbase/data/fb-entities');
 const KB_PROPERTIES_FILE = join(PROJECT_ROOT, 'packages/factbase/data/properties.yaml');
 
 // ── Caches (populated on first use, like resource-ref-integrity) ─────────────
@@ -230,7 +230,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<KBF entity="${entity}"> does not match any KB entity slug or stableId in packages/factbase/data/things/`,
+            message: `<KBF entity="${entity}"> does not match any KB entity slug or stableId in packages/factbase/data/fb-entities/`,
             severity: Severity.ERROR,
           }));
         }
@@ -269,7 +269,7 @@ export const kbfRefsRule = createRule({
             rule: 'kbf-refs',
             file: content.path,
             line: lineIdx,
-            message: `<Calc> references entity "${entity}" which does not match any KB entity slug or stableId in packages/factbase/data/things/`,
+            message: `<Calc> references entity "${entity}" which does not match any KB entity slug or stableId in packages/factbase/data/fb-entities/`,
             severity: Severity.ERROR,
           }));
         }

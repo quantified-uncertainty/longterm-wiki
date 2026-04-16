@@ -30,7 +30,7 @@ import { join, extname } from 'node:path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 
 interface MigrateOptions extends BaseOptions {
   dryRun?: boolean;
@@ -122,7 +122,7 @@ async function runCommand(
   let errors = 0;
 
   lines.push(`\x1b[1mFactBase Entity Migration${dryRun ? ' (DRY RUN)' : ''}\x1b[0m`);
-  lines.push(`Scanning ${yamlFiles.length} YAML files in packages/factbase/data/things/\n`);
+  lines.push(`Scanning ${yamlFiles.length} YAML files in packages/factbase/data/fb-entities/\n`);
 
   for (const filename of yamlFiles.sort()) {
     const filePath = join(KB_THINGS_DIR, filename);

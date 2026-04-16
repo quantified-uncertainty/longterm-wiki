@@ -4,7 +4,7 @@
  * FactBase Entity Validation — verify every FactBase YAML file's entity
  * has a corresponding TableBase entry.
  *
- * For each YAML file in packages/factbase/data/things/:
+ * For each YAML file in packages/factbase/data/fb-entities/:
  *   - If file has `thing:` block: extract stableId
  *   - If file has `entity:` key: use the stableId directly
  *   - Check that stableId exists in data/entities/*.yaml
@@ -20,7 +20,7 @@ import { join, extname } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
 const verbose = process.argv.includes('--verbose');
 

@@ -156,7 +156,7 @@ export default async function RecordDetailPage({ params }: PageProps) {
         )}
         <KVRow label="YAML File">
           <code className="text-xs">
-            packages/factbase/data/things/{entityId}.yaml
+            packages/factbase/data/fb-entities/{entityId}.yaml
           </code>
         </KVRow>
       </KVTable>

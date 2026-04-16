@@ -6,7 +6,7 @@ import { tmpdir } from "node:os";
 
 function makeTempDirs() {
   const base = mkdtempSync(join(tmpdir(), "person-refs-test-"));
-  const thingsDir = join(base, "things");
+  const thingsDir = join(base, "fb-entities");
   const entitiesDir = join(base, "entities");
   mkdirSync(thingsDir);
   mkdirSync(entitiesDir);

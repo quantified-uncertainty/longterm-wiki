@@ -221,7 +221,7 @@ The Three Bases layer is the wiki's own knowledge — the entities, facts, and p
 | Base | What It Stores | Source of Truth | Build Artifact | Key CLI Group |
 |------|---------------|----------------|---------------|--------------|
 | **TableBase** | Typed entity catalog (≈2,000 entities: orgs, people, models, risks, concepts) | `data/entities/*.yaml` (15 files) + MDX frontmatter | `database.json` | `crux tb` |
-| **FactBase** | Structured temporal facts with provenance | `packages/factbase/data/things/*.yaml` (539 files) | `factbase-data.json` | `crux fb` |
+| **FactBase** | Structured temporal facts with provenance | `packages/factbase/data/fb-entities/*.yaml` (539 files) | `factbase-data.json` | `crux fb` |
 | **WikiBase** | Long-form prose articles | `content/docs/**/*.mdx` (≈720 pages) | `database.json` (pages section) | `crux w` |
 
 Each base has:
@@ -388,14 +388,14 @@ The same words mean different things in different contexts. This is the single b
 |---------|-------------------|-----------|---------|
 | `data/entities/*.yaml` | YAML catalog entry | Slug (`anthropic`) | `data/entities/organizations.yaml` |
 | `entities` PG table | Mirror of YAML catalog | Slug + stableId + wikiId | `SELECT * FROM entities WHERE id = 'anthropic'` |
-| FactBase `Entity` type | FactBase thing with facts | 10-char alphanumeric | `packages/factbase/data/things/anthropic.yaml` |
+| FactBase `Entity` type | FactBase thing with facts | 10-char alphanumeric | `packages/factbase/data/fb-entities/anthropic.yaml` |
 | `entity_ids` PG table | Central ID registry | Maps slug to E-number | `anthropic` maps to `E22` maps to `sid_1LcLlMGLbw` |
 
 ### "Things" Across Contexts
 
 | Context | What "things" means | Purpose |
 |---------|-------------------|---------|
-| `packages/factbase/data/things/` | FactBase entity YAML files | One file per entity, containing facts and metadata |
+| `packages/factbase/data/fb-entities/` | FactBase entity YAML files | One file per entity, containing facts and metadata |
 | `things` PG table | Cross-base universal index | Search index spanning all record types |
 
 These are **completely unrelated** despite sharing a name. The FactBase directory predates the PG table.
@@ -404,7 +404,7 @@ These are **completely unrelated** despite sharing a name. The FactBase director
 
 | Context | What "facts" means | Status |
 |---------|-------------------|--------|
-| `packages/factbase/data/things/*.yaml` | FactBase structured triples (authoritative) | Active, primary |
+| `packages/factbase/data/fb-entities/*.yaml` | FactBase structured triples (authoritative) | Active, primary |
 | `facts` PG table | Mirror of FactBase YAML | Active, read-only mirror |
 | `data/facts/*.yaml` | Legacy YAML facts system | Deprecated for FactBase-covered entities |
 
@@ -512,7 +512,7 @@ Internal dashboard pages use Next.js Incremental Static Regeneration. Most pages
 | I want to... | Commands | Key files |
 |--------------|----------|-----------|
 | **Add a new organization** | `WIKI_SERVER_ENV=prod pnpm crux tb ids allocate my-org` → edit `data/entities/organizations.yaml` → `pnpm crux w create "My Org" --tier=standard` | `data/entities/organizations.yaml`, new MDX page |
-| **Add structured facts about an entity** | `pnpm crux fb add-fact` or edit `packages/factbase/data/things/<entity>.yaml` directly | `packages/factbase/data/things/` |
+| **Add structured facts about an entity** | `pnpm crux fb add-fact` or edit `packages/factbase/data/fb-entities/<entity>.yaml` directly | `packages/factbase/data/fb-entities/` |
 | **Check if a fact is accurately sourced** | `WIKI_SERVER_ENV=prod pnpm crux fb sourcing --entity=anthropic` | `crux/lib/sourcing/` |
 | **Find why a page shows stale data** | Check `update_frequency` in frontmatter → `WIKI_SERVER_ENV=prod pnpm crux w auto-update history` → check sourcing verdicts | `data/auto-update/sources.yaml` |
 | **Create a new PG-primary table** | Add Drizzle schema → generate migration → add wiki-server route → add to `things` sync | `apps/wiki-server/src/schema.ts` |

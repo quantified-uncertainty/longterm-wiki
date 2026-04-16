@@ -3,7 +3,7 @@
  *
  * Reads contradicted fact verdicts from the wiki-server, extracts the correct
  * value from the verdict reasoning using Haiku, and updates the YAML files
- * in packages/factbase/data/things/ automatically.
+ * in packages/factbase/data/fb-entities/ automatically.
  *
  * SCOPE — narrow by design
  *
@@ -38,7 +38,7 @@ import type Anthropic from "@anthropic-ai/sdk";
 // ---------------------------------------------------------------------------
 
 const ROOT = join(import.meta.dirname, "../..");
-const THINGS_DIR = join(ROOT, "packages/factbase/data/things");
+const THINGS_DIR = join(ROOT, "packages/factbase/data/fb-entities");
 
 const args = process.argv.slice(2);
 const applyMode = args.includes("--apply");

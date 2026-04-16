@@ -45,7 +45,7 @@ Crux-side scripts that read YAML source and batch POST to wiki-server. All use `
 | Script | Source | Target endpoint |
 |--------|--------|-----------------|
 | `sync-entities.ts` | `data/entities/*.yaml` | `/api/entities/sync` |
-| `sync-facts.ts` | `packages/factbase/data/things/*.yaml` | `/api/facts/sync` |
+| `sync-facts.ts` | `packages/factbase/data/fb-entities/*.yaml` | `/api/facts/sync` |
 | `sync-things.ts` | derived | `/api/things/sync` |
 | `sync-pages.ts` | `content/docs/**/*.mdx` | `/api/pages/sync` |
 | `sync-sessions.ts` / `sync-session.ts` | session logs | `/api/sessions/*` |
@@ -95,7 +95,7 @@ Most routes use `onConflictDoUpdate({ target: <table>.id, set: { ...excluded fie
 YAML source of truth           crux/wiki-server/sync-*.ts           apps/wiki-server/src/routes/tablebase/*.ts
   data/entities/*.yaml     →   batchSync() via sync-common.ts   →   upsert → validateEntityRefs → resolveEntityFKs →
   packages/factbase/                                                upsertThingsInTx
-    data/things/*.yaml
+    data/fb-entities/*.yaml
                                                                               ↓
                                                     PG (entities, grants, facts, things, ...)
                                                                               ↓

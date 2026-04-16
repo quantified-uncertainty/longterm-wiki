@@ -120,7 +120,7 @@ export function getHelp(): string {
   return `
 Backfill Stable IDs
 
-Reads stableIds from KB YAML files (packages/factbase/data/things/*.yaml) and
+Reads stableIds from KB YAML files (packages/factbase/data/fb-entities/*.yaml) and
 writes them to the wiki-server entity_ids table. Then generates new stableIds
 for any entities that don't have KB entries.
 

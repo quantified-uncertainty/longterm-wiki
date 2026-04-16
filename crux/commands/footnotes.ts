@@ -424,7 +424,7 @@ How it works:
   1. Scans all MDX files for [^cr-XXXX] inline references
   2. Fetches claim reference data from the wiki-server (/api/references/all)
      (skipped in --offline mode)
-  3. For each page, loads KB facts from packages/factbase/data/things/{entityId}.yaml
+  3. For each page, loads KB facts from packages/factbase/data/fb-entities/{entityId}.yaml
   4. Tries to match claims to KB facts by source URL
   5. If KB match found: converts [^cr-XXXX] to [^kb-{factId}]
   6. If no match: converts [^cr-XXXX] to [^rc-XXXX] (plain citation ref)

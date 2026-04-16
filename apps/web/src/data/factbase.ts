@@ -5,10 +5,10 @@
  *   - **TableBase** (tablebase.ts): Typed relational records (entities, resources).
  *   - **FactBase** (this file): Structured triples with temporal data, provenance,
  *     and cross-entity references. Source of truth: YAML files in
- *     packages/factbase/data/things/ (NOT the PG `facts` table, which is a read mirror).
+ *     packages/factbase/data/fb-entities/ (NOT the PG `facts` table, which is a read mirror).
  *   - **WikiBase**: Long-form prose MDX articles (content/docs/).
  *
- * Naming note: The "things" directory in packages/factbase/data/things/ contains
+ * Naming note: The fb-entities/ directory in packages/factbase/data/ contains
  * FactBase entity YAML files. This is NOT related to the PG `things` table, which
  * is a cross-base universal index. See content/docs/internal/data-architecture.mdx.
  *

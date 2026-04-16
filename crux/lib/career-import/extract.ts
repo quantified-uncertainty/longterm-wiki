@@ -44,7 +44,7 @@ export interface CareerEntry {
 
 // ── KB data loading ────────────────────────────────────────────────────
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, "packages", "factbase", "data", "things");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages", "factbase", "data", "fb-entities");
 const EXPERTS_PATH = join(PROJECT_ROOT, "data", "experts.yaml");
 
 interface KBThing {

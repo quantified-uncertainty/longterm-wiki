@@ -143,7 +143,7 @@ export function buildEntityLookup(database: {
  * Current entries: 34 sid_ references that resurfaced after the 2026-04-13
  * baseline clear (commit aded8ac69). Tracked in QUA-459 for cleanup. Each
  * entry is an orphan that exists in prod FactBase records but has no
- * matching entity in `packages/factbase/data/things/`. Do NOT add to this
+ * matching entity in `packages/factbase/data/fb-entities/`. Do NOT add to this
  * list without a linked ticket — new orphans are bugs, not noise.
  */
 const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set<string>([

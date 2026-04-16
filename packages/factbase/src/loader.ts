@@ -1,6 +1,6 @@
 /**
  * YAML → Graph loader.
- * Reads properties.yaml, schemas/*.yaml, and things/*.yaml from a data directory.
+ * Reads properties.yaml, schemas/*.yaml, and fb-entities/*.yaml from a data directory.
  *
  * Supports !ref YAML tags for stable references between entities:
  *   value: !ref mK9pX3rQ7n                 → bare stableId (preferred)
@@ -19,7 +19,7 @@
  *     - id: f_example
  *       source: !src anthropic-co     → resolves to "https://anthropic.com/company"
  *
- * Supports per-entity directories: a directory in things/ with an entity.yaml
+ * Supports per-entity directories: a directory in fb-entities/ with an entity.yaml
  * (or any file containing a `thing:` block) plus additional YAML files that
  * contribute facts and _sources.
  */
@@ -524,18 +524,18 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
 // ── Per-entity directory support ────────────────────────────────────────
 
 /**
- * Scans the things/ directory and returns entity inputs. For each entry:
+ * Scans the fb-entities/ directory and returns entity inputs. For each entry:
  * - A .yaml file yields a single EntityFile (existing behavior).
  * - A subdirectory yields a merged EntityFile from all .yaml files inside it.
  *   Exactly one file must contain a `thing:` block (the main file); others
  *   contribute additional facts, records, items, and _sources.
  */
 async function discoverEntityFiles(
-  thingsDir: string
+  entitiesDir: string
 ): Promise<{ name: string; parsed: unknown }[]> {
   let dirEntries: import("node:fs").Dirent[];
   try {
-    dirEntries = (await readdir(thingsDir, { withFileTypes: true }))
+    dirEntries = (await readdir(entitiesDir, { withFileTypes: true }))
       .sort((a, b) => a.name.localeCompare(b.name));
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code === "ENOENT") {
@@ -553,13 +553,13 @@ async function discoverEntityFiles(
       if (seenSlugs.has(slug)) {
         throw new Error(
           `[kb/loader] Slug collision: both "${slug}.yaml" (or .yml) and "${slug}/" directory ` +
-            `exist in things/. Remove one to avoid ambiguity.`
+            `exist in fb-entities/. Remove one to avoid ambiguity.`
         );
       }
       seenSlugs.add(slug);
 
       // Single-file entity (existing behavior)
-      const content = await readFile(join(thingsDir, entry.name), "utf-8");
+      const content = await readFile(join(entitiesDir, entry.name), "utf-8");
       results.push({
         name: entry.name,
         parsed: parseYaml(content, { customTags: CUSTOM_TAGS }),
@@ -568,13 +568,13 @@ async function discoverEntityFiles(
       if (seenSlugs.has(entry.name)) {
         throw new Error(
           `[kb/loader] Slug collision: both "${entry.name}.yaml" (or .yml) and "${entry.name}/" directory ` +
-            `exist in things/. Remove one to avoid ambiguity.`
+            `exist in fb-entities/. Remove one to avoid ambiguity.`
         );
       }
       seenSlugs.add(entry.name);
 
       // Per-entity directory — sort files for deterministic merge order
-      const subFiles = await readYamlFiles(join(thingsDir, entry.name));
+      const subFiles = await readYamlFiles(join(entitiesDir, entry.name));
       if (subFiles.length === 0) continue; // empty directory, skip
 
       subFiles.sort((a, b) => a.name.localeCompare(b.name));
@@ -714,7 +714,7 @@ export interface LoadOptions {
  * Expected directory layout:
  *   <dataDir>/properties.yaml
  *   <dataDir>/schemas/*.yaml
- *   <dataDir>/things/*.yaml
+ *   <dataDir>/fb-entities/*.yaml
  *
  * Uses a two-pass approach for entities:
  *   Pass 1: Load all entity headers (builds entity ID index)
@@ -764,7 +764,7 @@ export async function loadKB(dataDir: string, options?: LoadOptions): Promise<Lo
 
   // 3. Load entities (two passes)
   // discoverEntityFiles handles both single .yaml files and per-entity directories
-  const entityFiles = await discoverEntityFiles(join(dataDir, "things"));
+  const entityFiles = await discoverEntityFiles(join(dataDir, "fb-entities"));
 
   // Pass 1: Load all entity headers to build entity ID index.
   // Also extract _sources per entity file for !src resolution.

@@ -148,11 +148,11 @@ function loadKbPropertyIds(): Set<string> {
 
 /**
  * Load valid KB entity slugs from the filesystem.
- * An entity has KB data if `packages/factbase/data/things/<slug>.yaml` exists.
+ * An entity has KB data if `packages/factbase/data/fb-entities/<slug>.yaml` exists.
  */
 function loadKbEntitySlugs(): Set<string> {
   try {
-    const thingsDir = join(KB_DATA_DIR, 'things');
+    const thingsDir = join(KB_DATA_DIR, 'fb-entities');
     const slugs = new Set<string>();
     for (const file of readdirSync(thingsDir)) {
       if (file.endsWith('.yaml')) {
@@ -162,7 +162,7 @@ function loadKbEntitySlugs(): Set<string> {
     return slugs;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[validate-component-refs] Could not read KB things/ directory: ${msg} — KBF entity validation will be skipped`);
+    console.warn(`[validate-component-refs] Could not read KB fb-entities/ directory: ${msg} — KBF entity validation will be skipped`);
     return new Set();
   }
 }
@@ -573,7 +573,7 @@ async function main(): Promise<void> {
     for (const ref of issues.brokenKbfRefs) {
       console.log(`  ${c.yellow}${ref.file}:${ref.line}${c.reset}`);
       const desc = ref.reason === 'unknown-entity'
-        ? `entity "${ref.entity}" not found in packages/factbase/data/things/`
+        ? `entity "${ref.entity}" not found in packages/factbase/data/fb-entities/`
         : `property "${ref.property}" not found in packages/factbase/data/properties.yaml`;
       console.log(`    <${ref.component} entity="${ref.entity}" property="${ref.property}" />`);
       log.dim(`    ${desc}`);

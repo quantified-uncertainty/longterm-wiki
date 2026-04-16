@@ -15,7 +15,7 @@ import { join, extname } from "node:path";
 
 const THINGS_DIR = join(
   import.meta.dirname,
-  "../../packages/factbase/data/things"
+  "../../packages/factbase/data/fb-entities"
 );
 
 // Matches `!ref <stableId>:<slug>` and captures the stableId and slug portions.

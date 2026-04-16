@@ -2,7 +2,7 @@
  * Tests for per-entity directory support in the KB loader.
  *
  * Entities can be split across multiple YAML files in a directory:
- *   things/
+ *   fb-entities/
  *     anthropic.yaml           # single file (existing behavior)
  *     mK9pX3rQ7n/              # directory named by stableId or slug
  *       entity.yaml            # main file with `thing:` block
@@ -52,7 +52,7 @@ recommended: []
 `
   );
 
-  await mkdir(join(dataDir, "things"));
+  await mkdir(join(dataDir, "fb-entities"));
 
   return dataDir;
 }
@@ -67,7 +67,7 @@ describe("per-entity directories — single files still work", () => {
 
     // Standard single-file entity
     await writeFile(
-      join(dataDir, "things", "single-org.yaml"),
+      join(dataDir, "fb-entities", "single-org.yaml"),
       `thing:
   id: single-org
   stableId: singleOrg01
@@ -108,11 +108,11 @@ describe("per-entity directories — directory merging", () => {
     dataDir = await createMinimalKBDir();
 
     // Per-entity directory
-    await mkdir(join(dataDir, "things", "my-multi-org"));
+    await mkdir(join(dataDir, "fb-entities", "my-multi-org"));
 
     // Main file with thing: block
     await writeFile(
-      join(dataDir, "things", "my-multi-org", "entity.yaml"),
+      join(dataDir, "fb-entities", "my-multi-org", "entity.yaml"),
       `thing:
   id: my-multi-org
   stableId: multiOrg001
@@ -131,7 +131,7 @@ facts:
 
     // Supplementary file with additional facts
     await writeFile(
-      join(dataDir, "things", "my-multi-org", "financials.yaml"),
+      join(dataDir, "fb-entities", "my-multi-org", "financials.yaml"),
       `_sources:
   sec-filing: https://sec.gov/filing/12345
 
@@ -194,10 +194,10 @@ describe("per-entity directories — error: multiple thing: blocks", () => {
   beforeAll(async () => {
     dataDir = await createMinimalKBDir();
 
-    await mkdir(join(dataDir, "things", "conflict-dir"));
+    await mkdir(join(dataDir, "fb-entities", "conflict-dir"));
 
     await writeFile(
-      join(dataDir, "things", "conflict-dir", "main.yaml"),
+      join(dataDir, "fb-entities", "conflict-dir", "main.yaml"),
       `thing:
   id: conflict-a
   stableId: conflict001
@@ -207,7 +207,7 @@ describe("per-entity directories — error: multiple thing: blocks", () => {
     );
 
     await writeFile(
-      join(dataDir, "things", "conflict-dir", "other.yaml"),
+      join(dataDir, "fb-entities", "conflict-dir", "other.yaml"),
       `thing:
   id: conflict-b
   stableId: conflict002
@@ -236,10 +236,10 @@ describe("per-entity directories — error: no thing: block", () => {
   beforeAll(async () => {
     dataDir = await createMinimalKBDir();
 
-    await mkdir(join(dataDir, "things", "no-thing-dir"));
+    await mkdir(join(dataDir, "fb-entities", "no-thing-dir"));
 
     await writeFile(
-      join(dataDir, "things", "no-thing-dir", "facts-only.yaml"),
+      join(dataDir, "fb-entities", "no-thing-dir", "facts-only.yaml"),
       `facts:
   - id: f_orphan_01
     property: revenue
@@ -267,10 +267,10 @@ describe("per-entity directories — _sources merging", () => {
   beforeAll(async () => {
     dataDir = await createMinimalKBDir();
 
-    await mkdir(join(dataDir, "things", "sources-merge"));
+    await mkdir(join(dataDir, "fb-entities", "sources-merge"));
 
     await writeFile(
-      join(dataDir, "things", "sources-merge", "entity.yaml"),
+      join(dataDir, "fb-entities", "sources-merge", "entity.yaml"),
       `_sources:
   source-a: https://example.com/a
 
@@ -289,7 +289,7 @@ facts:
     );
 
     await writeFile(
-      join(dataDir, "things", "sources-merge", "extra.yaml"),
+      join(dataDir, "fb-entities", "sources-merge", "extra.yaml"),
       `_sources:
   source-b: https://example.com/b
 
@@ -328,10 +328,10 @@ describe("per-entity directories — _sources conflict", () => {
   beforeAll(async () => {
     dataDir = await createMinimalKBDir();
 
-    await mkdir(join(dataDir, "things", "src-conflict"));
+    await mkdir(join(dataDir, "fb-entities", "src-conflict"));
 
     await writeFile(
-      join(dataDir, "things", "src-conflict", "entity.yaml"),
+      join(dataDir, "fb-entities", "src-conflict", "entity.yaml"),
       `_sources:
   shared-key: https://example.com/version-a
 
@@ -344,7 +344,7 @@ thing:
     );
 
     await writeFile(
-      join(dataDir, "things", "src-conflict", "extra.yaml"),
+      join(dataDir, "fb-entities", "src-conflict", "extra.yaml"),
       `_sources:
   shared-key: https://example.com/version-b
 `
@@ -370,10 +370,10 @@ describe("per-entity directories — _sources same value OK", () => {
   beforeAll(async () => {
     dataDir = await createMinimalKBDir();
 
-    await mkdir(join(dataDir, "things", "src-same"));
+    await mkdir(join(dataDir, "fb-entities", "src-same"));
 
     await writeFile(
-      join(dataDir, "things", "src-same", "entity.yaml"),
+      join(dataDir, "fb-entities", "src-same", "entity.yaml"),
       `_sources:
   shared-key: https://example.com/same
 
@@ -386,7 +386,7 @@ thing:
     );
 
     await writeFile(
-      join(dataDir, "things", "src-same", "extra.yaml"),
+      join(dataDir, "fb-entities", "src-same", "extra.yaml"),
       `_sources:
   shared-key: https://example.com/same
 `
@@ -416,7 +416,7 @@ describe("per-entity directories — mixed single files and directories", () => 
 
     // Single-file entity
     await writeFile(
-      join(dataDir, "things", "standalone.yaml"),
+      join(dataDir, "fb-entities", "standalone.yaml"),
       `thing:
   id: standalone
   stableId: standalone1
@@ -431,9 +431,9 @@ facts:
     );
 
     // Directory entity
-    await mkdir(join(dataDir, "things", "multi-entity"));
+    await mkdir(join(dataDir, "fb-entities", "multi-entity"));
     await writeFile(
-      join(dataDir, "things", "multi-entity", "entity.yaml"),
+      join(dataDir, "fb-entities", "multi-entity", "entity.yaml"),
       `thing:
   id: multi-entity
   stableId: multiEnt001
@@ -448,7 +448,7 @@ facts:
     );
 
     await writeFile(
-      join(dataDir, "things", "multi-entity", "financials.yaml"),
+      join(dataDir, "fb-entities", "multi-entity", "financials.yaml"),
       `facts:
   - id: f_multi_e02
     property: revenue
@@ -490,11 +490,11 @@ describe("per-entity directories — empty directory skipped", () => {
     dataDir = await createMinimalKBDir();
 
     // Create an empty subdirectory
-    await mkdir(join(dataDir, "things", "empty-dir"));
+    await mkdir(join(dataDir, "fb-entities", "empty-dir"));
 
     // And a normal entity to verify loading still works
     await writeFile(
-      join(dataDir, "things", "normal.yaml"),
+      join(dataDir, "fb-entities", "normal.yaml"),
       `thing:
   id: normal
   stableId: normalEnt01
