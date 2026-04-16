@@ -11,7 +11,6 @@ import {
 } from "./races-constants";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface RaceRow {
   id: string;
@@ -209,7 +208,8 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                       status={recordVerdictToStatus(race.verdictString)}
                       originalVerdict={race.verdictString}
                       size="md"
-                      href={getSourcingHref("race", String(race.id))}
+                      // QUA-540: race has no sourcing verdicts → /sourcing/race/:id 404s.
+                      href={undefined}
                     />
                   </td>
                 </tr>
@@ -295,7 +295,8 @@ export function RacesTable({ rows }: { rows: RaceRow[] }) {
                                     status={recordVerdictToStatus(c.verdictString)}
                                     originalVerdict={c.verdictString}
                                     size="md"
-                                    href={getSourcingHref("race-candidate", String(c.id))}
+                                    // QUA-540: race-candidate has no sourcing verdicts → /sourcing 404s.
+                                    href={undefined}
                                   />
                                 </td>
                               </tr>

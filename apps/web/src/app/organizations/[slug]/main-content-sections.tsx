@@ -297,7 +297,8 @@ export function ProductsSection({
                         filledFieldCount: (field(prod, "status") ? 1 : 0) + (field(prod, "website") ? 1 : 0),
                       })}
                       verdict={prodVerdict}
-                      sourcingHref={getSourcingHref("product", String(prod.key))}
+                      // QUA-540: product has no sourcing verdicts → /sourcing/product/:id 404s.
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>
@@ -393,7 +394,8 @@ export function SafetyMilestonesSection({
                         filledFieldCount: (field(ms, "date") ? 1 : 0) + (field(ms, "source") ? 1 : 0),
                       })}
                       verdict={msVerdict}
-                      sourcingHref={getSourcingHref("safety-milestone", String(ms.key))}
+                      // QUA-540: safety-milestone has no sourcing verdicts → /sourcing/safety-milestone/:id 404s.
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>
@@ -497,7 +499,8 @@ export function StrategicPartnershipsSection({
                         filledFieldCount: (field(sp, "date") ? 1 : 0) + (field(sp, "partner") ? 1 : 0),
                       })}
                       verdict={spVerdict}
-                      sourcingHref={getSourcingHref("strategic-partnership", String(sp.key))}
+                      // QUA-540: strategic-partnership has no sourcing verdicts → /sourcing/strategic-partnership/:id 404s.
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>
