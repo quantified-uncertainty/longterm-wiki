@@ -7,7 +7,6 @@ import { getEntityHref } from "@/data/entity-nav";
 
 import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
 import { SectionHeader, Badge } from "./org-shared";
@@ -217,7 +216,8 @@ export function AiModelsSection({
                         wikiId: model.wikiId,
                       })}
                       verdict={modelVerdict}
-                      sourcingHref={getSourcingHref("model-release", model.id)}
+                      // QUA-540: model-release has no sourcing verdicts → /sourcing/model-release/:id 404s.
+                      sourcingHref={undefined}
                     />
                   </td>
                 </tr>

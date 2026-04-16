@@ -13,6 +13,7 @@ const {
   updateIssueStateMock,
   commentOnIssueMock,
   searchIssuesMock,
+  createIssueMock,
   fetchRemoteWorkflowStatesMock,
   listProjectsMock,
   getProjectMock,
@@ -26,6 +27,7 @@ const {
   updateIssueStateMock: vi.fn(),
   commentOnIssueMock: vi.fn(),
   searchIssuesMock: vi.fn(),
+  createIssueMock: vi.fn(),
   fetchRemoteWorkflowStatesMock: vi.fn(),
   listProjectsMock: vi.fn(),
   getProjectMock: vi.fn(),
@@ -46,6 +48,7 @@ vi.mock('../../lib/linear/issues.ts', () => ({
   updateIssueState: updateIssueStateMock,
   commentOnIssue: commentOnIssueMock,
   searchIssues: searchIssuesMock,
+  createIssue: createIssueMock,
 }));
 
 vi.mock('../../lib/linear/projects.ts', () => ({
@@ -204,6 +207,105 @@ describe('linear search', () => {
     expect(r.output).toContain('QUA-1');
     expect(r.output).toContain('A title');
     expect(r.output).toContain('high'); // priority 2 = high
+  });
+});
+
+// ---------------------------------------------------------------------------
+// create
+// ---------------------------------------------------------------------------
+
+describe('linear create', () => {
+  const createdIssue = {
+    identifier: 'QUA-999',
+    url: 'https://linear.app/quantifieduncertainty/issue/QUA-999',
+  };
+
+  beforeEach(() => {
+    createIssueMock.mockResolvedValue(createdIssue);
+  });
+
+  it('prints usage when no title is given', async () => {
+    const r = await commands.create([], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Usage');
+  });
+
+  it('creates an issue with just a title', async () => {
+    const r = await commands.create(['My', 'ticket'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(createIssueMock).toHaveBeenCalledWith({
+      title: 'My ticket',
+      description: '',
+      priority: undefined,
+      parentId: undefined,
+      projectId: undefined,
+    });
+    expect(r.output).toContain('QUA-999');
+  });
+
+  it('resolves --parent QUA-NNN to the parent UUID', async () => {
+    getIssueMock.mockResolvedValueOnce({ ...mockIssue, id: 'parent-uuid', title: 'Epic' });
+    const r = await commands.create(['Child ticket'], { ci: true, parent: 'QUA-184' });
+    expect(r.exitCode).toBe(0);
+    expect(getIssueMock).toHaveBeenCalledWith('QUA-184');
+    expect(createIssueMock).toHaveBeenCalledWith(
+      expect.objectContaining({ parentId: 'parent-uuid' }),
+    );
+    expect(r.output).toContain('parent:');
+    expect(r.output).toContain('QUA-184');
+  });
+
+  it('fails cleanly when --parent issue does not exist', async () => {
+    getIssueMock.mockResolvedValueOnce(null);
+    const r = await commands.create(['Child'], { ci: true, parent: 'QUA-9999' });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Parent issue not found');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('resolves --project name to the project UUID', async () => {
+    getProjectMock.mockResolvedValueOnce({
+      id: 'project-uuid',
+      name: 'Data Model Unwind',
+    });
+    const r = await commands.create(['Ticket'], {
+      ci: true,
+      project: 'Data Model Unwind',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(getProjectMock).toHaveBeenCalledWith('Data Model Unwind');
+    expect(createIssueMock).toHaveBeenCalledWith(
+      expect.objectContaining({ projectId: 'project-uuid' }),
+    );
+    expect(r.output).toContain('project:');
+    expect(r.output).toContain('Data Model Unwind');
+  });
+
+  it('fails cleanly when --project does not exist', async () => {
+    getProjectMock.mockResolvedValueOnce(null);
+    const r = await commands.create(['Ticket'], { ci: true, project: 'Nonexistent' });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Project not found');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('combines --parent, --project, and --priority in one call', async () => {
+    getIssueMock.mockResolvedValueOnce({ ...mockIssue, id: 'parent-uuid', title: 'Epic' });
+    getProjectMock.mockResolvedValueOnce({ id: 'project-uuid', name: 'Proj' });
+    const r = await commands.create(['Ticket'], {
+      ci: true,
+      parent: 'QUA-408',
+      project: 'Proj',
+      priority: '2',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(createIssueMock).toHaveBeenCalledWith({
+      title: 'Ticket',
+      description: '',
+      priority: 2,
+      parentId: 'parent-uuid',
+      projectId: 'project-uuid',
+    });
   });
 });
 

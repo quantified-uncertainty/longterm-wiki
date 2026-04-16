@@ -64,6 +64,8 @@ interface CommandOptions extends BaseOptions {
   description?: string;
   descriptionFile?: string;
   priority?: string;
+  parent?: string;
+  project?: string;
   content?: string;
   contentFile?: string;
   name?: string;
@@ -426,7 +428,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const title = args.filter((a) => !a.startsWith('--')).join(' ').trim();
   if (!title) {
     return {
-      output: `${c.red}Usage: crux linear create "Issue title" [--description="..."] [--description-file=<path>] [--priority=1-4]${c.reset}\n`,
+      output: `${c.red}Usage: crux linear create "Issue title" [--description="..."] [--description-file=<path>] [--priority=1-4] [--parent=QUA-NNN] [--project=<name|uuid>]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -447,7 +449,37 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  const result = await createIssue({ title, description, priority });
+  // Resolve parent issue (QUA-NNN → internal UUID)
+  let parentId: string | undefined;
+  let parentLabel: string | undefined;
+  if (options.parent) {
+    const parent = await getIssue(options.parent);
+    if (!parent) {
+      return {
+        output: `${c.red}Parent issue not found: ${options.parent}${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    parentId = parent.id;
+    parentLabel = `${parent.identifier} — ${parent.title}`;
+  }
+
+  // Resolve project (UUID or case-insensitive exact name)
+  let projectId: string | undefined;
+  let projectLabel: string | undefined;
+  if (options.project) {
+    const project = await getProject(options.project);
+    if (!project) {
+      return {
+        output: `${c.red}Project not found: ${options.project}${c.reset}\n  Run ${c.cyan}crux linear project list${c.reset} to see available projects.\n`,
+        exitCode: 1,
+      };
+    }
+    projectId = project.id;
+    projectLabel = project.name;
+  }
+
+  const result = await createIssue({ title, description, priority, parentId, projectId });
 
   if (options.json) {
     return { output: JSON.stringify(result, null, 2) + '\n', exitCode: 0 };
@@ -455,6 +487,8 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 
   let out = '';
   out += `${c.green}✓${c.reset} Created ${c.cyan}${result.identifier}${c.reset} — ${title}\n`;
+  if (parentLabel) out += `  ${c.dim}parent:${c.reset}  ${parentLabel}\n`;
+  if (projectLabel) out += `  ${c.dim}project:${c.reset} ${projectLabel}\n`;
   out += `  ${result.url}\n`;
   return { output: out, exitCode: 0 };
 }
@@ -986,6 +1020,8 @@ Options (create):
   --description=<text>       Issue description (inline)
   --description-file=<path>  Issue description from file (safe for multiline)
   --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
+  --parent=QUA-NNN           Parent issue (sets the child link to an epic)
+  --project=<name|uuid>      Project (UUID or case-insensitive exact name)
 
 Options (comment):
   --body-file=<path>  Comment body from file (safe for multiline / escaped content)
@@ -1017,6 +1053,7 @@ Options (project update):
 Examples:
   crux linear create "Broken login page" --description="The login form crashes on submit"
   crux linear create "Add retry logic" --description-file=/tmp/desc.md --priority=3
+  crux linear create "Migrate X" --parent=QUA-408 --project="Data Model Unwind" --priority=2
   crux linear view QUA-184
   crux linear search "agent checklist"
   crux linear start QUA-184

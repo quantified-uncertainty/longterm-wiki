@@ -166,28 +166,6 @@ export async function fetchJsonWithRetry(url, opts = {}) {
 }
 
 /**
- * Should the build FAIL (throw) on wiki-server errors, vs. degrade gracefully?
- *
- * Strict by default in CI only (`CI=true`) — CI has authenticated prod
- * credentials and a failing fetch there indicates a real regression worth
- * halting the build over. Local dev (including full-build mode run from the
- * gate) defaults to non-strict: when localhost:3112 is down or an agent slot
- * doesn't have server access, we'd rather return a partial result with a
- * loud warning than hard-fail the gate for a reason unrelated to the agent's
- * changes.
- *
- * Overrides:
- *   STRICT_VERDICTS=1  → force strict even locally (test the strict path)
- *   STRICT_VERDICTS=0  → force non-strict even in CI (emergency escape hatch)
- */
-export function isStrictVerdictsMode() {
-  const override = process.env.STRICT_VERDICTS;
-  if (override === '0') return false;
-  if (override === '1') return true;
-  return process.env.CI === 'true';
-}
-
-/**
  * Fetch latest edit dates per page from the wiki-server API.
  * Falls back to an empty map if the server is unavailable.
  */
@@ -667,18 +645,40 @@ export async function fetchResearchAreaDetails(areaIds) {
 }
 
 /**
+ * Should the build FAIL (throw) on wiki-server errors, vs. degrade gracefully?
+ *
+ * Strict in CI only (`CI=true`) — CI has authenticated prod credentials, so a
+ * failing fetch there indicates a real regression worth halting the build
+ * over. Local dev defaults to non-strict: when localhost:31xx is down or an
+ * agent slot doesn't have server access, return a partial result with a
+ * loud warning rather than hard-fail the gate for a reason unrelated to
+ * the agent's changes.
+ *
+ * QUA-448: the `STRICT_VERDICTS=0/1` env-var override used to exist here as
+ * a "panic button" to flip this decision. It has been removed — the whole
+ * point of QUA-421 (avoiding silent empty record-verdicts.json) was
+ * defeated the moment anyone set STRICT_VERDICTS=0 to silence a transient
+ * hiccup. The code smell: escape hatches become load-bearing over time.
+ * CI-based strictness is still the right heuristic; only the override is
+ * gone.
+ */
+function isStrictVerdictsMode() {
+  return process.env.CI === 'true';
+}
+
+/**
  * Fetch verification verdicts from wiki-server (unified verification system).
  * Returns a map keyed by "recordType:recordId" -> verdict info.
  *
  * QUA-421: hardened against transient HTTP errors. Each page is fetched via
  * `fetchJsonWithRetry` (3 attempts, exponential backoff). If a page ultimately
  * fails:
- *   - in strict mode (CI / full build): throw — fail the build loudly instead
- *     of shipping an empty record-verdicts.json that silently zeroes every
- *     source-check dot on the site
- *   - in non-strict mode (local dev): log a loud warning and return the
- *     partial result collected so far — still strictly better than the old
- *     behavior of returning {} and discarding everything
+ *   - in strict mode (CI): throw — fail the build loudly instead of shipping
+ *     an empty record-verdicts.json that silently zeroes every source-check
+ *     dot on the site
+ *   - outside CI: log a loud warning and return the partial result collected
+ *     so far — still strictly better than the old behavior of returning {}
+ *     and discarding everything
  */
 export async function fetchRecordVerdicts({ fetchImpl, sleepImpl } = {}) {
   const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
@@ -705,21 +705,17 @@ export async function fetchRecordVerdicts({ fetchImpl, sleepImpl } = {}) {
 
     if (!result.ok) {
       const partial = Object.keys(verdicts).length;
-      const reason = result.status
-        ? `${result.reason} at offset=${offset} after retries`
-        : `${result.reason} at offset=${offset} after retries`;
+      const reason = `${result.reason} at offset=${offset} after retries`;
       if (strict) {
-        // Strict: throw so the build fails loudly.
         throw new Error(
           `record-verdicts: ${reason}. ${partial} verdicts were collected ` +
             `before the failure; refusing to ship a partial/empty ` +
-            `record-verdicts.json in strict mode. Set STRICT_VERDICTS=0 to ` +
-            `force degraded behavior locally.`
+            `record-verdicts.json in CI. Fix the wiki-server regression.`
         );
       }
       logWikiServerWarning(
         'record-verdicts',
-        `${reason} — returning ${partial} partial result(s) (non-strict mode)`
+        `${reason} — returning ${partial} partial result(s) (non-CI mode)`
       );
       return verdicts;
     }

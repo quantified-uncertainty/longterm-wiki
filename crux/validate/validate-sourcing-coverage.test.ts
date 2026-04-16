@@ -210,6 +210,48 @@ describe('validate-sourcing-coverage', () => {
     expect(result.output).toContain('grants');
   });
 
+  it('accepts legacy verificationSummary shape from pre-2026-04-07 manifests (QUA-401)', () => {
+    // Pre-rename manifests stored the same data under `verificationSummary` with
+    // `withVerification`/`withoutVerification` keys. Must not emit a fatal error.
+    createManifest('test-legacy-verificationSummary.json', {
+      table: 'investments',
+      recordCount: 2,
+      submittedAt: '2026-04-03T00:00:00Z',
+      verificationSummary: {
+        withVerification: 2,
+        withoutVerification: 0,
+        verdicts: { verified: 2, contradicted: 0, unverifiable: 0, other: 0 },
+      },
+      records: [],
+    });
+
+    const result = runValidator('--enforcement=advisory');
+    expect(result.exitCode).toBe(0);
+    expect(result.output).not.toContain('missing sourcingSummary');
+    expect(result.output).toContain('All TableBase submissions have sourcing');
+  });
+
+  it('does not crash on legacy manifests missing the verdicts field (QUA-401)', () => {
+    // Legacy manifests (pre-2026-04) omit sourcingSummary.verdicts.
+    // The validator must treat missing as zero rather than throwing TypeError.
+    createManifest('test-legacy-no-verdicts.json', {
+      table: 'investments',
+      recordCount: 3,
+      submittedAt: '2026-03-01T00:00:00Z',
+      sourcingSummary: {
+        withSourcing: 3,
+        withoutSourcing: 0,
+        // NOTE: no `verdicts` field — matches pre-2026-04 manifest shape
+      },
+      records: [],
+    });
+
+    const result = runValidator('--enforcement=soft');
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('All TableBase submissions have sourcing');
+    expect(result.output).not.toContain('Cannot read properties of undefined');
+  });
+
   it('allows personnel manifests when all records have sourcing', () => {
     createManifest('test-hard-ok.json', {
       table: 'personnel',

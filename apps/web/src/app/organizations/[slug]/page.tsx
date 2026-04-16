@@ -5,7 +5,6 @@ import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrgan
 
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { isSid } from "@/lib/stable-id";
 import {
   getKBLatest,
@@ -686,7 +685,8 @@ export default async function OrgProfilePage({
                           status={recordVerdictToStatus(projectVerdict)}
                           originalVerdict={projectVerdict}
                           size="md"
-                          href={getSourcingHref("project", p.id)}
+                          // QUA-540: project has no sourcing verdicts → /sourcing/project/:id 404s.
+                          href={undefined}
                         />
                       </td>
                     </tr>

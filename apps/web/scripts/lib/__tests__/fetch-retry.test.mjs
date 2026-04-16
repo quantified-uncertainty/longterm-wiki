@@ -11,7 +11,6 @@ import { describe, it, expect, beforeEach, afterEach } from 'vitest';
 import {
   fetchJsonWithRetry,
   fetchRecordVerdicts,
-  isStrictVerdictsMode,
   setFullBuildMode,
 } from '../wiki-server-data.mjs';
 
@@ -161,56 +160,10 @@ describe('fetchJsonWithRetry', () => {
   });
 });
 
-describe('isStrictVerdictsMode', () => {
-  const originalEnv = { ...process.env };
-
-  beforeEach(() => {
-    delete process.env.STRICT_VERDICTS;
-    delete process.env.CI;
-    setFullBuildMode(false);
-  });
-
-  afterEach(() => {
-    // Restore only the two env vars we touch (don't clobber vitest/node state).
-    process.env.CI = originalEnv.CI;
-    if (originalEnv.STRICT_VERDICTS !== undefined) {
-      process.env.STRICT_VERDICTS = originalEnv.STRICT_VERDICTS;
-    }
-    setFullBuildMode(false);
-  });
-
-  it('is non-strict in local dev (no CI, no full build, no override)', () => {
-    expect(isStrictVerdictsMode()).toBe(false);
-  });
-
-  it('is strict when CI=true', () => {
-    process.env.CI = 'true';
-    expect(isStrictVerdictsMode()).toBe(true);
-  });
-
-  it('is NON-strict in full-build mode alone (agent gates run full-build locally without prod creds)', () => {
-    // Regression: the original predicate also fired on fullBuildMode=true,
-    // which made the pre-push gate throw whenever localhost:3112 was down —
-    // agents routinely run the gate without a local wiki-server. Only
-    // `CI=true` (which carries prod credentials) should flip to strict.
-    setFullBuildMode(true);
-    expect(isStrictVerdictsMode()).toBe(false);
-  });
-
-  it('STRICT_VERDICTS=0 overrides CI strictness (escape hatch)', () => {
-    process.env.CI = 'true';
-    process.env.STRICT_VERDICTS = '0';
-    expect(isStrictVerdictsMode()).toBe(false);
-  });
-
-  it('STRICT_VERDICTS=1 forces strict even in local dev', () => {
-    process.env.STRICT_VERDICTS = '1';
-    expect(isStrictVerdictsMode()).toBe(true);
-  });
-});
-
-describe('fetchRecordVerdicts — QUA-421 strict-mode behavior', () => {
+describe('fetchRecordVerdicts — QUA-421 strict-mode behavior (QUA-448: no env-var override)', () => {
   const originalServerUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const originalCi = process.env.CI;
+  const originalStrict = process.env.STRICT_VERDICTS;
   const noSleep = async () => {};
 
   beforeEach(() => {
@@ -225,6 +178,16 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior', () => {
       process.env.LONGTERMWIKI_SERVER_URL = originalServerUrl;
     } else {
       delete process.env.LONGTERMWIKI_SERVER_URL;
+    }
+    if (originalCi !== undefined) {
+      process.env.CI = originalCi;
+    } else {
+      delete process.env.CI;
+    }
+    if (originalStrict !== undefined) {
+      process.env.STRICT_VERDICTS = originalStrict;
+    } else {
+      delete process.env.STRICT_VERDICTS;
     }
     setFullBuildMode(false);
   });
@@ -263,8 +226,8 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior', () => {
     expect(result['grant:g1:amount']?.verdict).toBe('partial');
   });
 
-  it('in STRICT mode: throws when a page fails after all retries', async () => {
-    process.env.STRICT_VERDICTS = '1';
+  it('in CI=true: throws when a page fails after all retries', async () => {
+    process.env.CI = 'true';
     const { fetcher } = makeQueueFetcher([
       mockResponse({ ok: false, status: 503 }),
       mockResponse({ ok: false, status: 503 }),
@@ -272,11 +235,13 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior', () => {
     ]);
     await expect(
       fetchRecordVerdicts({ fetchImpl: fetcher, sleepImpl: noSleep }),
-    ).rejects.toThrow(/record-verdicts.*strict mode/i);
+    ).rejects.toThrow(/record-verdicts.*refusing to ship/i);
   });
 
-  it('in NON-STRICT mode: returns partial results when a page fails', async () => {
-    // Non-strict: CI not set, STRICT_VERDICTS not set, fullBuildMode not set.
+  it('outside CI: returns partial results when a page fails (graceful degrade)', async () => {
+    // No CI, no STRICT_VERDICTS. Non-CI context returns whatever it collected
+    // before the failure, so local dev / agent gates aren't blocked by a
+    // transient wiki-server hiccup.
     const firstPage = Array.from({ length: 200 }, (_, i) => ({
       recordType: 'grant',
       recordId: `g${i}`,
@@ -290,10 +255,42 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior', () => {
       mockResponse({ ok: false, status: 503 }),
     ]);
     const result = await fetchRecordVerdicts({ fetchImpl: fetcher, sleepImpl: noSleep });
-    // We got page 1's 200 verdicts before the failure; old behavior
-    // returned {} and discarded everything. New behavior preserves them.
     expect(Object.keys(result)).toHaveLength(200);
     expect(result['grant:g0']).toBeDefined();
+  });
+
+  it('ignores STRICT_VERDICTS=0 in CI (escape hatch removed — QUA-448)', async () => {
+    // Pre-QUA-448: STRICT_VERDICTS=0 would force non-strict even in CI,
+    // defeating the whole point of the safety check. Now the env var is
+    // a no-op; CI=true still throws.
+    process.env.CI = 'true';
+    process.env.STRICT_VERDICTS = '0';
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    await expect(
+      fetchRecordVerdicts({ fetchImpl: fetcher, sleepImpl: noSleep }),
+    ).rejects.toThrow(/record-verdicts/i);
+  });
+
+  it('ignores STRICT_VERDICTS=1 outside CI (override removed — QUA-448)', async () => {
+    // Pre-QUA-448: STRICT_VERDICTS=1 could force strict locally (for testing
+    // the strict path). Removed for symmetry — no env-var override at all.
+    // Outside CI, failures degrade gracefully regardless of the env var.
+    process.env.STRICT_VERDICTS = '1';
+    const firstPage = [
+      { recordType: 'grant', recordId: 'g1', verdict: 'confirmed' },
+    ];
+    const { fetcher } = makeQueueFetcher([
+      mockResponse({ ok: true, json: { verdicts: firstPage } }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+      mockResponse({ ok: false, status: 503 }),
+    ]);
+    const result = await fetchRecordVerdicts({ fetchImpl: fetcher, sleepImpl: noSleep });
+    expect(Object.keys(result)).toHaveLength(1);
   });
 
   it('returns empty map when LONGTERMWIKI_SERVER_URL is not set', async () => {
