@@ -50,6 +50,10 @@ function tableToTaskType(table: string): TaskType | null {
     case 'investments': return 'investment-linking';
     case 'benchmark_results': return 'benchmark-result-fill';
     case 'source_quality': return 'source-discovery';
+    case 'divisions': return 'division-lead-fill';
+    case 'division_personnel': return 'division-personnel-dates';
+    case 'funding_programs': return 'funding-program-enrichment';
+    case 'benchmark_result_sources': return 'benchmark-source-fill';
     default: return null;
   }
 }
