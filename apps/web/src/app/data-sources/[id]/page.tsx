@@ -1,8 +1,12 @@
+import { cache } from "react";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { DataSourceBanner } from "@/components/internal/DataSourceBanner";
 import { ProfileStatCard } from "@/components/directory";
+import { Breadcrumbs } from "@/components/directory/Breadcrumbs";
+import { SafeExternalLink } from "@/components/ui/safe-external-link";
+import { isSafeUrl } from "@lib/url-utils";
 import {
   fetchDetailed,
   type RpcDataSourceDetailResult,
@@ -22,12 +26,24 @@ import {
   shortHash,
   safeIsoDate,
   safeIsoDateTime,
-  isSafeHttpUrl,
 } from "./detail-utils";
 
 type Freshness = ReturnType<typeof computeFreshness>;
+type SourceStatus = RpcDataSourceDetailResult["sourceStatus"];
 
 export const revalidate = 300;
+
+const CARD_CLASS =
+  "rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5";
+
+const MAX_JSON_BYTES = 8 * 1024;
+
+const fetchDataSource = cache((id: string) =>
+  fetchDetailed<RpcDataSourceDetailResult>(
+    `/api/data-sources/${encodeURIComponent(id)}`,
+    { revalidate: 300 },
+  ),
+);
 
 export async function generateMetadata({
   params,
@@ -35,10 +51,7 @@ export async function generateMetadata({
   params: Promise<{ id: string }>;
 }): Promise<Metadata> {
   const { id } = await params;
-  const result = await fetchDetailed<RpcDataSourceDetailResult>(
-    `/api/data-sources/${encodeURIComponent(id)}`,
-    { revalidate: 300 },
-  );
+  const result = await fetchDataSource(id);
   if (!result.ok) {
     return {
       title: `${id} | Data Sources`,
@@ -82,7 +95,7 @@ const FRESHNESS_STYLES: Record<
   },
 };
 
-const STATUS_STYLES: Record<string, { label: string; color: string }> = {
+const STATUS_STYLES: Record<SourceStatus, { label: string; color: string }> = {
   active: { label: "Active", color: "text-blue-600" },
   archived: { label: "Archived", color: "text-muted-foreground" },
   defunct: { label: "Defunct", color: "text-red-600" },
@@ -114,9 +127,16 @@ function SectionHeader({ children }: { children: React.ReactNode }) {
 }
 
 function JsonBlock({ data }: { data: unknown }) {
+  let text = JSON.stringify(data, null, 2);
+  let truncated = false;
+  if (text.length > MAX_JSON_BYTES) {
+    text = text.slice(0, MAX_JSON_BYTES);
+    truncated = true;
+  }
   return (
     <pre className="text-xs bg-muted/40 border border-border/60 rounded-lg p-3 overflow-x-auto max-h-72">
-      {JSON.stringify(data, null, 2)}
+      {text}
+      {truncated && `\n… (truncated at ${MAX_JSON_BYTES} bytes)`}
     </pre>
   );
 }
@@ -127,15 +147,11 @@ export default async function DataSourceDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const encodedId = encodeURIComponent(id);
 
   const [detailResult, snapshotsResult] = await Promise.all([
-    fetchDetailed<RpcDataSourceDetailResult>(
-      `/api/data-sources/${encodedId}`,
-      { revalidate: 300 },
-    ),
+    fetchDataSource(id),
     fetchDetailed<RpcSnapshotListResult>(
-      `/api/data-sources/${encodedId}/snapshots?limit=20`,
+      `/api/data-sources/${encodeURIComponent(id)}/snapshots?limit=20`,
       { revalidate: 300 },
     ),
   ]);
@@ -176,12 +192,8 @@ export default async function DataSourceDetailPage({
     source.lastSnapshotAt,
     source.updateFrequency,
   );
-  const freshnessStyle =
-    FRESHNESS_STYLES[freshness] ?? FRESHNESS_STYLES.unknown;
-  const statusStyle = STATUS_STYLES[source.sourceStatus] ?? {
-    label: source.sourceStatus,
-    color: "text-muted-foreground",
-  };
+  const freshnessStyle = FRESHNESS_STYLES[freshness];
+  const statusStyle = STATUS_STYLES[source.sourceStatus];
   const formatLabel = FORMAT_LABELS[source.dataFormat] ?? source.dataFormat;
   const formatColor =
     FORMAT_COLORS[source.dataFormat] ?? "text-muted-foreground";
@@ -203,7 +215,8 @@ export default async function DataSourceDetailPage({
       ? `/grants?dataSource=${encodeURIComponent(source.id)}`
       : null;
 
-  const fetchUrlSafe = isSafeHttpUrl(source.fetchUrl) ? source.fetchUrl : null;
+  const fetchUrlSafe =
+    source.fetchUrl && isSafeUrl(source.fetchUrl) ? source.fetchUrl : null;
 
   const statCards: Array<{
     label: string;
@@ -260,14 +273,12 @@ export default async function DataSourceDetailPage({
     {
       label: "Fetch URL",
       value: fetchUrlSafe ? (
-        <a
+        <SafeExternalLink
           href={fetchUrlSafe}
-          target="_blank"
-          rel="noopener noreferrer"
           className="text-accent-foreground hover:underline break-all"
         >
           {fetchUrlSafe}
-        </a>
+        </SafeExternalLink>
       ) : source.fetchUrl ? (
         <span
           className="text-muted-foreground break-all"
@@ -329,16 +340,13 @@ export default async function DataSourceDetailPage({
 
   return (
     <div className="max-w-[80rem] mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <nav className="text-xs text-muted-foreground mb-4" aria-label="Breadcrumb">
-        <Link href="/wiki/E2131" className="hover:underline">
-          Data Sources
-        </Link>
-        <span className="mx-2">/</span>
-        <span className="text-foreground/80">{source.name}</span>
-      </nav>
+      <Breadcrumbs
+        items={[
+          { label: "Data Sources", href: "/wiki/E2131" },
+          { label: source.name },
+        ]}
+      />
 
-      {/* Header */}
       <div className="mb-6">
         <h1 className="text-3xl font-extrabold tracking-tight mb-2">
           {source.name}
@@ -362,21 +370,18 @@ export default async function DataSourceDetailPage({
         </div>
         {fetchUrlSafe && (
           <p className="text-sm text-muted-foreground break-all">
-            <a
+            <SafeExternalLink
               href={fetchUrlSafe}
-              target="_blank"
-              rel="noopener noreferrer"
               className="hover:underline"
             >
               {fetchUrlSafe}
-            </a>
+            </SafeExternalLink>
           </p>
         )}
       </div>
 
       <DataSourceBanner source="api" />
 
-      {/* Stat cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
         {statCards.map((card) => (
           <ProfileStatCard
@@ -389,12 +394,11 @@ export default async function DataSourceDetailPage({
         ))}
       </div>
 
-      {/* Main grid: metadata + side sections */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <div className="lg:col-span-2 space-y-8">
           <section>
             <SectionHeader>Metadata</SectionHeader>
-            <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+            <div className={CARD_CLASS}>
               <TermList items={metadataItems} />
             </div>
           </section>
@@ -403,7 +407,7 @@ export default async function DataSourceDetailPage({
             Object.keys(source.columnMapping).length > 0 && (
               <section>
                 <SectionHeader>Column Mapping</SectionHeader>
-                <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+                <div className={CARD_CLASS}>
                   <p className="text-xs text-muted-foreground mb-3">
                     Maps raw source columns → canonical fields used by the
                     importer.
@@ -425,7 +429,7 @@ export default async function DataSourceDetailPage({
           {source.verificationConfig && (
             <section>
               <SectionHeader>Verification Config</SectionHeader>
-              <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+              <div className={CARD_CLASS}>
                 <p className="text-xs text-muted-foreground mb-3">
                   Strategy and fields used by source-check to match records
                   against this source.
@@ -438,7 +442,7 @@ export default async function DataSourceDetailPage({
           {source.sourceSchema && (
             <section>
               <SectionHeader>Source Schema</SectionHeader>
-              <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5">
+              <div className={CARD_CLASS}>
                 <JsonBlock data={source.sourceSchema} />
               </div>
             </section>
@@ -448,7 +452,7 @@ export default async function DataSourceDetailPage({
         <aside className="space-y-8">
           <section>
             <SectionHeader>Connected Records</SectionHeader>
-            <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5 text-sm">
+            <div className={`${CARD_CLASS} text-sm`}>
               {recordsLinkHref ? (
                 <Link
                   href={recordsLinkHref}
@@ -476,7 +480,7 @@ export default async function DataSourceDetailPage({
 
           <section>
             <SectionHeader>Latest Snapshot</SectionHeader>
-            <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-5 text-sm">
+            <div className={`${CARD_CLASS} text-sm`}>
               {source.latestSnapshot ? (
                 <TermList
                   items={[
@@ -530,7 +534,6 @@ export default async function DataSourceDetailPage({
         </aside>
       </div>
 
-      {/* Snapshot history */}
       <section className="mt-10">
         <div className="flex items-baseline justify-between mb-3">
           <SectionHeader>Snapshot History</SectionHeader>

@@ -4,7 +4,6 @@ import {
   shortHash,
   safeIsoDate,
   safeIsoDateTime,
-  isSafeHttpUrl,
 } from "./detail-utils";
 
 describe("relativeTime", () => {
@@ -77,23 +76,3 @@ describe("safeIsoDateTime", () => {
   });
 });
 
-describe("isSafeHttpUrl", () => {
-  it("accepts http/https", () => {
-    expect(isSafeHttpUrl("http://example.com")).toBe(true);
-    expect(isSafeHttpUrl("https://example.com/path?q=1")).toBe(true);
-  });
-  it("rejects javascript:/data:/file:", () => {
-    expect(isSafeHttpUrl("javascript:alert(1)")).toBe(false);
-    expect(isSafeHttpUrl("data:text/html,<script>")).toBe(false);
-    expect(isSafeHttpUrl("file:///etc/passwd")).toBe(false);
-  });
-  it("rejects non-URL strings", () => {
-    expect(isSafeHttpUrl("not a url")).toBe(false);
-    expect(isSafeHttpUrl("")).toBe(false);
-    expect(isSafeHttpUrl(null)).toBe(false);
-    expect(isSafeHttpUrl(undefined)).toBe(false);
-  });
-  it("rejects urn: scheme (used internally as placeholder)", () => {
-    expect(isSafeHttpUrl("urn:lw:tabular-source:ea-funds")).toBe(false);
-  });
-});
