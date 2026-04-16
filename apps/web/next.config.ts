@@ -242,10 +242,27 @@ const nextConfig: NextConfig = {
         destination: "/publications/deepmind",
         permanent: true,
       },
-      // Organization alternate-name redirects
+      // Organization alternate-name redirects — each slug needs both an exact
+      // entry and a `:path*` wildcard so sub-routes like /data, /grants/:id,
+      // and /divisions/:slug redirect too. See QUA-538.
       {
         source: "/organizations/google-deepmind",
         destination: "/organizations/deepmind",
+        permanent: true,
+      },
+      {
+        source: "/organizations/google-deepmind/:path*",
+        destination: "/organizations/deepmind/:path*",
+        permanent: true,
+      },
+      {
+        source: "/organizations/meta",
+        destination: "/organizations/meta-ai",
+        permanent: true,
+      },
+      {
+        source: "/organizations/meta/:path*",
+        destination: "/organizations/meta-ai/:path*",
         permanent: true,
       },
       {
@@ -254,8 +271,18 @@ const nextConfig: NextConfig = {
         permanent: true,
       },
       {
+        source: "/organizations/future-of-life-institute/:path*",
+        destination: "/organizations/fli/:path*",
+        permanent: true,
+      },
+      {
         source: "/organizations/centre-for-effective-altruism",
         destination: "/organizations/cea",
+        permanent: true,
+      },
+      {
+        source: "/organizations/centre-for-effective-altruism/:path*",
+        destination: "/organizations/cea/:path*",
         permanent: true,
       },
       // Research area intuitive-slug redirects (#3486)
