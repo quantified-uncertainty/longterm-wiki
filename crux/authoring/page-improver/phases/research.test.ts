@@ -187,7 +187,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 2,
       llmSourceCount: 2,
       minSources: 2,
-      skipGate: false,
     });
     expect(result.passed).toBe(true);
     expect(result.active).toBe(true);
@@ -201,7 +200,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 1,
       llmSourceCount: 1,
       minSources: 3,
-      skipGate: false,
     });
     expect(result.passed).toBe(false);
     expect(result.active).toBe(true);
@@ -216,7 +214,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 0,
       llmSourceCount: 0,
       minSources: 1,
-      skipGate: false,
     });
     expect(result.passed).toBe(false);
     expect(result.usableSources).toBe(0);
@@ -230,7 +227,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 5,
       llmSourceCount: 5,
       minSources: 1,
-      skipGate: false,
     });
     expect(result.passed).toBe(false);
     expect(result.usableSources).toBe(0);
@@ -250,7 +246,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 3,
       llmSourceCount: 3,
       minSources: 2,
-      skipGate: false,
     });
     expect(result.usableSources).toBe(1);
     expect(result.cacheEntries).toBe(3);
@@ -266,31 +261,17 @@ describe('evaluateSourceGate', () => {
       totalUrls: 1,
       llmSourceCount: 2,
       minSources: 2,
-      skipGate: false,
     });
     expect(result.usableSources).toBe(1);
     expect(result.passed).toBe(false);
   });
 
-  it('passes (gate disabled) when skipGate is true even with zero usable sources', () => {
-    const result = evaluateSourceGate({
-      sourceCache: [],
-      totalUrls: 0,
-      llmSourceCount: 0,
-      minSources: 5,
-      skipGate: true,
-    });
-    expect(result.active).toBe(false);
-    expect(result.passed).toBe(true);
-  });
-
-  it('passes (gate disabled) when minSources is 0', () => {
+  it('passes (gate disabled) when minSources is 0 — the canonical disable signal (--skip-source-gate maps to this)', () => {
     const result = evaluateSourceGate({
       sourceCache: [],
       totalUrls: 0,
       llmSourceCount: 0,
       minSources: 0,
-      skipGate: false,
     });
     expect(result.active).toBe(false);
     expect(result.passed).toBe(true);
@@ -302,7 +283,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 1,
       llmSourceCount: 1,
       minSources: 1,
-      skipGate: false,
     });
     expect(result.passed).toBe(true);
     expect(result.usableSources).toBe(1);
@@ -314,7 +294,6 @@ describe('evaluateSourceGate', () => {
       totalUrls: 1,
       llmSourceCount: 1,
       minSources: 1,
-      skipGate: false,
     });
     // Matches the buildSourceCache and citation-auditor behaviour: > MIN_SOURCE_CONTENT_LENGTH.
     expect(result.usableSources).toBe(0);
@@ -327,8 +306,9 @@ describe('evaluateSourceGate', () => {
       totalUrls: 0,
       llmSourceCount: 0,
       minSources: 1,
-      skipGate: false,
     });
     expect(result.diagnostic).toContain(`>${MIN_SOURCE_CONTENT_LENGTH} chars`);
+    // Threshold is also exposed on the report so callers can format their own log lines without re-importing the constant.
+    expect(result.contentThreshold).toBe(MIN_SOURCE_CONTENT_LENGTH);
   });
 });

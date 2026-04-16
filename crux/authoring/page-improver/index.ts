@@ -315,14 +315,14 @@ Examples:
       saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
       gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
       apiDirect: opts['api-direct'] === true ? true : undefined,
-      skipSourceGate: opts['skip-source-gate'] === true ? true : undefined,
-      minSources: parseMinSourcesOrExit(opts['min-sources']),
+      // --skip-source-gate is sugar for setting the minimum to 0.
+      minSources: opts['skip-source-gate'] === true ? 0 : tryParseMinSources(opts['min-sources']),
     });
   }
 }
 
-/** main()-side wrapper that converts parseMinSources() throws into process.exit(1). */
-function parseMinSourcesOrExit(raw: unknown): number | undefined {
+/** main()-side helper: validate then run, exiting cleanly on a bad flag value. */
+function tryParseMinSources(raw: unknown): number | undefined {
   try {
     return parseMinSources(raw);
   } catch (err: unknown) {
@@ -340,7 +340,10 @@ function parseMinSourcesOrExit(raw: unknown): number | undefined {
  * to the gate would silently disable it (because `NaN > 0` is false),
  * exactly the silent-degradation mode QUA-315 exists to prevent.
  *
- * Exported for testing; main() wraps the throw in a clean process.exit(1).
+ * Exported for testing; main()'s tryParseMinSources() wraps the throw in
+ * a clean process.exit(1). NOTE: deliberately does NOT use parseIntOpt()
+ * from crux/lib/cli.ts — its silent NaN-to-fallback semantics is exactly
+ * the bug class this validator exists to prevent.
  */
 export function parseMinSources(raw: unknown): number | undefined {
   if (raw === undefined) return undefined;
