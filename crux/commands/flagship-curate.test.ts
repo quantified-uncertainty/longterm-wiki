@@ -427,6 +427,91 @@ describe('flagship-curate', () => {
     });
   });
 
+  // ── Sourcing endpoint unavailable — inner loop (QUA-460) ─────────
+  describe('sourcing endpoint unavailable, inner loop (QUA-460)', () => {
+    it('aborts after 6 consecutive getVerdictsByEntity failures instead of silently reporting 0 needsCuration', async () => {
+      // Outer call succeeds (10 orgs returned)…
+      mockApiRequest.mockResolvedValue({
+        ok: true,
+        data: {
+          entities: Array.from({ length: 10 }, (_, i) => ({
+            id: `org-${i}`,
+            stableId: `sid_${i}`,
+            title: `Org ${i}`,
+            entityType: 'organization',
+          })),
+          total: 10,
+        },
+        status: 200,
+      });
+      // …but every per-entity verdict fetch fails. Pre-QUA-460, this
+      // would silently `continue` on each one, producing zero curation
+      // candidates and reporting "No entities found needing curation"
+      // even though the sourcing endpoint is down.
+      mockGetVerdictsByEntity.mockResolvedValue({
+        ok: false,
+        error: 'unavailable',
+        message: 'sourcing service 503',
+        status: 503,
+      });
+
+      const result = await commands.default([], {
+        all: true,
+        limit: '1',
+        budget: '1',
+      });
+
+      expect(result.exitCode).toBe(1);
+      expect(result.output).toMatch(/Failed to fetch entities from wiki-server/);
+      expect(result.output).toMatch(/consecutive entities/i);
+      expect(result.output).toMatch(/sourcing service 503/);
+      // Must NOT silently report "no entities found".
+      expect(result.output).not.toMatch(/No entities found needing curation/);
+    });
+
+    it('tolerates up to 5 consecutive failures before aborting (threshold boundary)', async () => {
+      // 6 entities: 5 fail, then 1 succeeds with a curation candidate.
+      // The counter resets on success, so the sweep continues.
+      mockApiRequest.mockResolvedValue({
+        ok: true,
+        data: {
+          entities: Array.from({ length: 6 }, (_, i) => ({
+            id: `org-${i}`,
+            stableId: `sid_${i}`,
+            title: `Org ${i}`,
+            entityType: 'organization',
+          })),
+          total: 6,
+        },
+        status: 200,
+      });
+
+      mockGetVerdictsByEntity
+        .mockResolvedValueOnce({ ok: false, error: 'e', message: 'm', status: 503 })
+        .mockResolvedValueOnce({ ok: false, error: 'e', message: 'm', status: 503 })
+        .mockResolvedValueOnce({ ok: false, error: 'e', message: 'm', status: 503 })
+        .mockResolvedValueOnce({ ok: false, error: 'e', message: 'm', status: 503 })
+        .mockResolvedValueOnce({ ok: false, error: 'e', message: 'm', status: 503 })
+        .mockResolvedValueOnce(
+          makeVerdicts([
+            { recordType: 'personnel', recordId: 'p1', verdict: 'unchecked', displayName: 'Alice' },
+          ]),
+        );
+
+      // After 5 failures and 1 success, the sweep finds 1 entity. With
+      // dry-run, processing is lightweight and exits 0.
+      const result = await commands.default([], {
+        all: true,
+        limit: '1',
+        budget: '1',
+        'dry-run': true,
+      });
+
+      // Did NOT abort with QUA-460 consecutive-failures error.
+      expect(result.output).not.toMatch(/consecutive entities/i);
+    });
+  });
+
   // ── Credit-exhaustion handling (QUA-378) ────────────────────────────
   describe('credit exhaustion (QUA-378)', () => {
     it('aborts with exit code 2 when research throws CreditExhaustedError', async () => {

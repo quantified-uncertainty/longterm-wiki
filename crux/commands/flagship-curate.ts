@@ -180,13 +180,40 @@ async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesR
     return { ok: false, error: `${result.error}: ${result.message}` };
   }
 
-  // For each entity, check how many non-confirmed verdicts exist
+  // For each entity, check how many non-confirmed verdicts exist.
+  //
+  // QUA-460: track consecutive sourcing-endpoint failures. A single hiccup
+  // is tolerated (the entity is silently skipped and counted toward a
+  // threshold), but N consecutive failures abort the whole sweep — same
+  // pattern as the groundskeeper health-check tracker
+  // (`.claude/rules/error-handling.md`). Without this, a down sourcing
+  // endpoint would make every entity report `needsCuration: 0`, producing
+  // an empty "nothing to curate" list that the outer command can't
+  // distinguish from a legitimate "all clean" state.
+  const MAX_CONSECUTIVE_SOURCING_FAILURES = 5;
   const scored: Array<{ entity: ResolvedEntity; needsCuration: number }> = [];
+  let consecutiveSourcingFailures = 0;
+  let lastSourcingError = '';
 
   for (const e of result.data.entities) {
     const stableId = (e.stableId ?? e.stable_id ?? e.id) as string;
     const verdicts = await getVerdictsByEntity(stableId, { limit: 200 });
-    if (!verdicts.ok) continue;
+    if (!verdicts.ok) {
+      consecutiveSourcingFailures++;
+      lastSourcingError = `${verdicts.error}: ${verdicts.message}`;
+      if (consecutiveSourcingFailures > MAX_CONSECUTIVE_SOURCING_FAILURES) {
+        return {
+          ok: false,
+          error:
+            `Sourcing endpoint (getVerdictsByEntity) failed for ` +
+            `${consecutiveSourcingFailures} consecutive entities — aborting ` +
+            `instead of reporting "no entities found needing curation" with ` +
+            `incomplete data. Last error: ${lastSourcingError}`,
+        };
+      }
+      continue;
+    }
+    consecutiveSourcingFailures = 0;
 
     const needsCuration = (verdicts.data.verdicts ?? []).filter(
       (v) => NEEDS_CURATION_VERDICTS.has(v.verdict),
