@@ -431,9 +431,6 @@ describe("internal sidebar completeness (real data)", () => {
       if (!entry.isDirectory()) continue;
       // Skip the catch-all route (handles MDX pages)
       if (entry.name.startsWith("[[")) continue;
-      // Skip pages not yet migrated to Pattern A (no entity ID allocated)
-      if (entry.name === "sourcing-coverage") continue; // #3634
-
       const pagePath = path.join(APP_INTERNAL_DIR, entry.name, "page.tsx");
       if (fs.existsSync(pagePath)) {
         // Skip pages that are just redirects (migrated to MDX stubs or consolidated)
