@@ -105,13 +105,10 @@ const columns: ColumnDef<DataSourceRow>[] = [
       <SortableHeader column={column}>Name</SortableHeader>
     ),
     cell: ({ row }) => {
-      const { name, resourceId } = row.original;
-      if (!resourceId) {
-        return <span className="text-sm font-medium">{name}</span>;
-      }
+      const { id, name } = row.original;
       return (
         <Link
-          href={`/resources/${resourceId}`}
+          href={`/data-sources/${id}`}
           className="text-sm font-medium text-accent-foreground hover:underline"
         >
           {name}
