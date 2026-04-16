@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, count, asc, sql, ilike, or, inArray, notInArray } from "drizzle-orm";
+import { eq, and, count, asc, sql, ilike, or, inArray, notInArray, gte } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
@@ -52,6 +52,14 @@ import {
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 500;
+
+/**
+ * Maximum rows returned by GET /export in a single response.
+ * Mirrors EXPORT_MAX_LIMIT in routes/factbase/facts.ts. Callers that need
+ * more than this should paginate via `limit` + `offset` until `total` is
+ * exhausted.
+ */
+const EXPORT_MAX_LIMIT = 5000;
 
 /** Maximum number of entities returned by the /directory endpoint. */
 const DIRECTORY_MAX_ENTITIES = 2000;
@@ -807,6 +815,78 @@ const entitiesApp = new Hono()
 
     return c.json({ entities: items, total: items.length });
   })
+
+  // ---- GET /export ----
+  // Returns the full entity shape (including metadata, relatedEntries,
+  // customFields) for all entities in one response. Used by the PG-backed
+  // build pipeline (apps/web/scripts/build-data-from-pg.mjs) to replace the
+  // ~2,800 per-entity fetches it used to do via GET /:id.
+  //
+  // Mirrors the GET /api/facts/export pattern.
+  //
+  // Supports optional filters:
+  //   - entityType=<type>          Only entities of this type
+  //   - updatedSince=<ISO-8601>    Only entities updated at or after this time
+  //
+  // Supports pagination via `limit` (max EXPORT_MAX_LIMIT) and `offset`.
+  // Callers that need the full dataset should paginate until `returned` < limit
+  // or `offset + returned` >= `total`.
+  .get(
+    "/export",
+    zv(
+      "query",
+      z.object({
+        entityType: z.string().max(100).optional(),
+        updatedSince: z.string().datetime().optional(),
+        limit: z.coerce
+          .number()
+          .int()
+          .min(1)
+          .max(EXPORT_MAX_LIMIT)
+          .default(EXPORT_MAX_LIMIT),
+        offset: z.coerce.number().int().min(0).default(0),
+      })
+    ),
+    async (c) => {
+      const { entityType, updatedSince, limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const conditions: SQL[] = [];
+      if (entityType) conditions.push(eq(entities.entityType, entityType));
+      if (updatedSince) {
+        conditions.push(gte(entities.updatedAt, new Date(updatedSince)));
+      }
+
+      const whereClause =
+        conditions.length === 0
+          ? undefined
+          : conditions.length === 1
+            ? conditions[0]
+            : and(...conditions);
+
+      const rows = await db
+        .select()
+        .from(entities)
+        .where(whereClause)
+        .orderBy(asc(entities.id))
+        .limit(limit)
+        .offset(offset);
+
+      const countResult = await db
+        .select({ count: count() })
+        .from(entities)
+        .where(whereClause);
+      const total = countResult[0].count;
+
+      return c.json({
+        entities: rows.map(formatEntity),
+        total,
+        returned: rows.length,
+        limit,
+        offset,
+      });
+    }
+  )
 
   // ---- GET /:id ----
 

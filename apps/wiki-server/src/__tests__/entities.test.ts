@@ -640,6 +640,100 @@ describe("Entities API", () => {
     });
   });
 
+  // ---- Export ----
+
+  describe("GET /api/entities/export", () => {
+    it("returns full entity shape for all entities", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+        description: "AI safety company",
+      });
+      await seedEntity(app, "deceptive-alignment", "Deceptive Alignment", {
+        entityType: "risk",
+      });
+
+      const res = await app.request("/api/entities/export");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(2);
+      expect(body.returned).toBe(2);
+      expect(body.entities).toHaveLength(2);
+      // Full shape: metadata, relatedEntries, customFields present
+      const anthropic = body.entities.find((e: { id: string }) => e.id === "anthropic");
+      expect(anthropic).toBeDefined();
+      expect(anthropic).toHaveProperty("metadata");
+      expect(anthropic).toHaveProperty("relatedEntries");
+      expect(anthropic).toHaveProperty("customFields");
+      expect(anthropic.description).toBe("AI safety company");
+    });
+
+    it("filters by entityType", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+      });
+      await seedEntity(app, "deceptive-alignment", "Deceptive Alignment", {
+        entityType: "risk",
+      });
+
+      const res = await app.request("/api/entities/export?entityType=organization");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(1);
+      expect(body.entities).toHaveLength(1);
+      expect(body.entities[0].id).toBe("anthropic");
+    });
+
+    it("supports pagination via limit and offset", async () => {
+      await seedEntity(app, "a-ent", "A");
+      await seedEntity(app, "b-ent", "B");
+      await seedEntity(app, "c-ent", "C");
+
+      const res = await app.request("/api/entities/export?limit=2&offset=1");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(3);
+      expect(body.returned).toBe(2);
+      expect(body.limit).toBe(2);
+      expect(body.offset).toBe(1);
+      expect(body.entities).toHaveLength(2);
+      // Ordered by id ascending → offset=1 skips "a-ent"
+      expect(body.entities[0].id).toBe("b-ent");
+      expect(body.entities[1].id).toBe("c-ent");
+    });
+
+    it("rejects invalid updatedSince", async () => {
+      const res = await app.request("/api/entities/export?updatedSince=not-a-date");
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects limit above the export cap", async () => {
+      const res = await app.request("/api/entities/export?limit=999999");
+      expect(res.status).toBe(400);
+    });
+
+    it("does not collide with GET /:id for the literal 'export' slug", async () => {
+      // Regression: route ordering must define /export before /:id, otherwise
+      // /export would match /:id with id="export" and return 404.
+      const res = await app.request("/api/entities/export");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toHaveProperty("entities");
+      expect(body).toHaveProperty("total");
+    });
+
+    it("returns an empty result with total 0 when no entities match", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+      });
+      const res = await app.request("/api/entities/export?entityType=risk");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(0);
+      expect(body.returned).toBe(0);
+      expect(body.entities).toEqual([]);
+    });
+  });
+
   // ---- Sync with JSONB fields ----
 
   describe("JSONB fields", () => {
