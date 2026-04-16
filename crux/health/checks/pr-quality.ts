@@ -11,7 +11,14 @@
  */
 
 import type { CheckResult } from '../health-check.ts';
-import { githubApi, REPO } from '../../lib/github.ts';
+import {
+  githubApi,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_HELP_MESSAGE,
+  MISSING_TOKEN_SUMMARY,
+  REPO,
+} from '../../lib/github.ts';
 import { LABELS, ANY_WORKING_LABELS } from '../../lib/labels.ts';
 
 interface PullRequest {
@@ -48,13 +55,18 @@ export async function checkPrQuality(options?: {
   const failures: string[] = [];
   const cleanupStaleLabels = options?.cleanupStaleLabels ?? false;
 
-  if (!process.env.GITHUB_TOKEN) {
-    return {
-      name,
-      ok: false,
-      summary: 'GITHUB_TOKEN not set',
-      detail: ['Set GITHUB_TOKEN to enable PR/issue quality checks'],
-    };
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      return {
+        name,
+        ok: false,
+        summary: MISSING_TOKEN_SUMMARY,
+        detail: [MISSING_TOKEN_HELP_MESSAGE],
+      };
+    }
+    throw e;
   }
 
   // ── Pull request quality checks ──────────────────────────────────────

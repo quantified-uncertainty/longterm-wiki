@@ -19,7 +19,13 @@
  */
 
 import { existsSync, readFileSync, writeFileSync, unlinkSync } from 'fs';
-import { githubApi, REPO } from '../lib/github.ts';
+import {
+  githubApi,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_SUMMARY,
+  REPO,
+} from '../lib/github.ts';
 import { gitSafe } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
@@ -262,8 +268,14 @@ function preflightChecks(config: PatrolConfig): string[] {
     }
   }
 
-  if (!process.env.GITHUB_TOKEN) {
-    errors.push('GITHUB_TOKEN not set');
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      errors.push(MISSING_TOKEN_SUMMARY);
+    } else {
+      throw e;
+    }
   }
 
   return errors;

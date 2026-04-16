@@ -35,7 +35,14 @@
  */
 
 import { getColors } from '../lib/output.ts';
-import { githubApi, REPO } from '../lib/github.ts';
+import {
+  githubApi,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_HELP_MESSAGE,
+  MISSING_TOKEN_SUMMARY,
+  REPO,
+} from '../lib/github.ts';
 import { getServerUrl, getApiKey } from '../lib/wiki-server/client.ts';
 import { checkJobQueue } from './checks/job-queue.ts';
 import { checkPrQuality } from './checks/pr-quality.ts';
@@ -490,8 +497,13 @@ export async function checkActions(): Promise<CheckResult> {
   const detail: string[] = [];
   const failures: string[] = [];
 
-  if (!process.env.GITHUB_TOKEN) {
-    return { name, ok: false, summary: 'GITHUB_TOKEN not set', detail: ['Set GITHUB_TOKEN to enable workflow health checks'] };
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      return { name, ok: false, summary: MISSING_TOKEN_SUMMARY, detail: [MISSING_TOKEN_HELP_MESSAGE] };
+    }
+    throw e;
   }
 
   const workflowFiles = [
@@ -584,13 +596,18 @@ export async function checkActions(): Promise<CheckResult> {
 export async function checkWikiServerDeploy(): Promise<CheckResult> {
   const name = 'Wiki-server deploy';
 
-  if (!process.env.GITHUB_TOKEN) {
-    return {
-      name,
-      ok: false,
-      summary: 'GITHUB_TOKEN not set',
-      detail: ['Set GITHUB_TOKEN to enable deploy health checks'],
-    };
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      return {
+        name,
+        ok: false,
+        summary: MISSING_TOKEN_SUMMARY,
+        detail: [MISSING_TOKEN_HELP_MESSAGE],
+      };
+    }
+    throw e;
   }
 
   const health = await checkDeployHealth();
