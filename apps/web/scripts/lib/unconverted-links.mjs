@@ -7,33 +7,11 @@
  * Extracted from build-data.mjs for modularity.
  */
 
-/**
- * Normalize URL to handle variations (trailing slashes, www prefix, http/https)
- */
-function normalizeUrl(url) {
-  const variations = new Set();
-  try {
-    const parsed = new URL(url);
-    const base = parsed.href.replace(/\/$/, '');
-    variations.add(base);
-    variations.add(base + '/');
+import { normalizeUrl } from "@longterm-wiki/url-utils";
 
-    // Without www
-    if (parsed.hostname.startsWith('www.')) {
-      const noWww = base.replace('://www.', '://');
-      variations.add(noWww);
-      variations.add(noWww + '/');
-    }
-    // With www
-    if (!parsed.hostname.startsWith('www.')) {
-      const withWww = base.replace('://', '://www.');
-      variations.add(withWww);
-      variations.add(withWww + '/');
-    }
-  } catch {
-    variations.add(url);
-  }
-  return Array.from(variations);
+/** Canonical lookup key for a resource URL — protocol+slash agnostic. */
+function urlKey(url) {
+  return normalizeUrl(url, { stripProtocol: true });
 }
 
 /**
@@ -43,10 +21,7 @@ export function buildUrlToResourceMap(resources) {
   const urlToResource = new Map();
   for (const r of resources) {
     if (!r.url) continue;
-    const normalizedUrls = normalizeUrl(r.url);
-    for (const url of normalizedUrls) {
-      urlToResource.set(url, r);
-    }
+    urlToResource.set(urlKey(r.url), r);
   }
   return urlToResource;
 }
@@ -76,7 +51,7 @@ export function findUnconvertedLinks(content, urlToResource) {
   const unconverted = [];
 
   for (const link of links) {
-    const resource = urlToResource.get(link.url) || urlToResource.get(link.url.replace(/\/$/, ''));
+    const resource = urlToResource.get(urlKey(link.url));
     if (resource) {
       unconverted.push({
         text: link.text,

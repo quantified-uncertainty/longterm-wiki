@@ -7,6 +7,7 @@
  * Read path: loads resources from snapshot (sync) or PG (async via initFromPG).
  */
 
+import { normalizeUrl } from "@longterm-wiki/url-utils";
 import type { Resource } from '../../resource-types.ts';
 import { loadResources, loadResourcesPGFirst } from '../../resource-io.ts';
 
@@ -36,32 +37,11 @@ let cachedByStableId: Map<string, Resource> | null = null;
 let cachedByUrl: Map<string, Resource> | null = null;
 
 function normalizeUrlKey(url: string): string {
-  try {
-    const parsed = new URL(url);
-    // Normalize protocol: http → https
-    parsed.protocol = 'https:';
-    // Remove www. prefix
-    parsed.hostname = parsed.hostname.replace(/^www\./, '');
-    // Remove fragment
-    parsed.hash = '';
-    // Remove UTM tracking parameters and sort remaining params
-    const params = new URLSearchParams(parsed.search);
-    const keysToDelete: string[] = [];
-    for (const key of params.keys()) {
-      if (key.startsWith('utm_')) {
-        keysToDelete.push(key);
-      }
-    }
-    for (const key of keysToDelete) {
-      params.delete(key);
-    }
-    params.sort();
-    parsed.search = params.toString();
-    // Remove trailing slash
-    return parsed.href.replace(/\/$/, '');
-  } catch {
-    return url;
-  }
+  // Use the canonical normalizer with the lookup-key preset:
+  // stripProtocol makes http and https hash to the same key (the previous
+  // implementation forced https, which is equivalent), and sortParams
+  // gives deterministic keys regardless of param order.
+  return normalizeUrl(url, { stripProtocol: true, sortParams: true });
 }
 
 function ensureLoaded(): void {

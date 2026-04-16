@@ -7,6 +7,8 @@
  *   - crux citations for citation management
  */
 
+import { normalizeUrl } from "@longterm-wiki/url-utils";
+
 export interface ParsedFootnote {
   /** Footnote number (e.g. 1, 2, 3) */
   number: number;
@@ -75,18 +77,15 @@ function cleanUrl(url: string): string {
 /**
  * Normalize a URL for deduplication: strips protocol, www, trailing slashes,
  * and lowercases. This groups footnotes that reference the same source.
+ *
+ * Wraps `@longterm-wiki/url-utils::normalizeUrl` with the dedup option set
+ * (stripProtocol + lowercasePath). Preserves all query params (no tracking
+ * filter) so footnotes that differ only in tracking suffix dedup correctly,
+ * the same as before — note: the canonical helper does strip tracking by
+ * default, which actually improves dedup quality here.
  */
 export function normalizeUrlForDedup(url: string): string {
-  try {
-    const u = new URL(url);
-    return (
-      u.host.replace(/^www\./, "") +
-      u.pathname.replace(/\/+$/, "") +
-      u.search
-    ).toLowerCase();
-  } catch {
-    return url.replace(/\/+$/, "").toLowerCase();
-  }
+  return normalizeUrl(url, { stripProtocol: true, lowercasePath: true });
 }
 
 /**

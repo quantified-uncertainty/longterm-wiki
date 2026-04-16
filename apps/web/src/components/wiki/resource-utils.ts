@@ -1,5 +1,6 @@
 /** Shared constants and helpers for resource rendering components */
 
+import { normalizeUrl as canonicalNormalizeUrl } from "@longterm-wiki/url-utils";
 import {
   CITATION_VERDICT_KEYS,
   type CitationVerdictKey,
@@ -17,22 +18,12 @@ export const VERDICT_STYLES = CITATION_VERDICT_STYLES;
 
 /**
  * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
- * - Strips protocol and `www.` prefix
- * - Removes trailing slashes
- * - Preserves query string, drops hash fragment
- * - Case-insensitive
+ * Uses the canonical normalizer (`@longterm-wiki/url-utils`) with the dedup
+ * preset (stripProtocol + lowercasePath) so http/https/www variants compare
+ * equal and case-insensitive paths dedup correctly.
  */
 export function normalizeUrl(raw: string): string {
-  try {
-    const u = new URL(raw);
-    return (
-      u.host.replace(/^www\./, "") +
-      u.pathname.replace(/\/+$/, "") +
-      u.search
-    ).toLowerCase();
-  } catch {
-    return raw.replace(/\/+$/, "").toLowerCase();
-  }
+  return canonicalNormalizeUrl(raw, { stripProtocol: true, lowercasePath: true });
 }
 
 /** Maximum claims to display before showing "+N more" */

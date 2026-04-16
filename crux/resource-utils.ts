@@ -6,6 +6,7 @@
 
 import { basename } from 'path';
 import { createHash, randomBytes } from 'crypto';
+import { normalizeUrl } from "@longterm-wiki/url-utils";
 import { CONTENT_DIR_ABS as CONTENT_DIR } from './lib/content-types.ts';
 import { findMdxFiles } from './lib/file-utils.ts';
 import type { Resource, MarkdownLink } from './resource-types.ts';
@@ -19,40 +20,29 @@ export function generateFactId(): string {
   return randomBytes(4).toString('hex');
 }
 
-export function normalizeUrl(url: string): string[] {
-  const variations = new Set<string>();
-  try {
-    const parsed = new URL(url);
-    const base = parsed.href.replace(/\/$/, '');
-    variations.add(base);
-    variations.add(base + '/');
-    // Without www
-    if (parsed.hostname.startsWith('www.')) {
-      const noWww = base.replace('://www.', '://');
-      variations.add(noWww);
-      variations.add(noWww + '/');
-    }
-    // With www
-    if (!parsed.hostname.startsWith('www.')) {
-      const withWww = base.replace('://', '://www.');
-      variations.add(withWww);
-      variations.add(withWww + '/');
-    }
-  } catch (_err: unknown) {
-    variations.add(url);
-  }
-  return Array.from(variations);
+/**
+ * Canonical lookup key for a resource URL: protocol-agnostic and trailing-slash
+ * agnostic. Use this for both writing to and reading from a URL → resource map.
+ */
+export function resourceUrlKey(url: string): string {
+  return normalizeUrl(url, { stripProtocol: true });
 }
 
 export function buildUrlToResourceMap(resources: Resource[]): Map<string, Resource> {
   const map = new Map<string, Resource>();
   for (const r of resources) {
     if (!r.url) continue;
-    for (const url of normalizeUrl(r.url)) {
-      map.set(url, r);
-    }
+    map.set(resourceUrlKey(r.url), r);
   }
   return map;
+}
+
+/** Look up a resource by URL using the canonical key normalization. */
+export function lookupResourceByUrl(
+  map: Map<string, Resource>,
+  url: string,
+): Resource | undefined {
+  return map.get(resourceUrlKey(url));
 }
 
 export function extractMarkdownLinks(content: string): MarkdownLink[] {

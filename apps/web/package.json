@@ -18,6 +18,7 @@
     "@dagrejs/dagre": "^1.1.8",
     "@longterm-wiki/factbase": "workspace:*",
     "@longterm-wiki/id-utils": "workspace:*",
+    "@longterm-wiki/url-utils": "workspace:*",
     "@quri/squiggle-components": "^0.10.0",
     "@quri/squiggle-lang": "^0.10.0",
     "@radix-ui/react-collapsible": "^1.1.11",
