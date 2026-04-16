@@ -124,6 +124,65 @@ export function updateFact(
 }
 
 /**
+ * Update a fact's metadata fields by fact ID. Only touches fields explicitly
+ * passed in `updates`; leaves everything else (including `value`) untouched.
+ *
+ * Return values:
+ *   'updated'          — fact found AND at least one field was written
+ *   'skipped-existing' — fact found but an existing `source` blocked the write
+ *                        (unless `overwriteExisting` is true)
+ *   'not-found'        — no fact with that id in the document
+ *
+ * Backfill callers should leave `overwriteExisting` false so a human-written
+ * source URL is never silently replaced.
+ */
+export function updateFactMetaById(
+  doc: Document,
+  factId: string,
+  updates: { source?: string; notes?: string; sourceQuote?: string },
+  options: { overwriteExisting?: boolean } = {},
+): 'updated' | 'skipped-existing' | 'not-found' {
+  const contents = doc.contents;
+  if (!isMap(contents)) return 'not-found';
+
+  const factsNode = contents.get('facts', true);
+  if (!isSeq(factsNode)) return 'not-found';
+
+  for (const item of factsNode.items) {
+    if (!isMap(item)) continue;
+    if (String(item.get('id') ?? '') !== factId) continue;
+
+    let wrote = false;
+    let skippedForSource = false;
+
+    if (updates.source !== undefined) {
+      const existing = item.get('source');
+      if (!existing || options.overwriteExisting) {
+        item.set('source', updates.source);
+        wrote = true;
+      } else {
+        skippedForSource = true;
+      }
+    }
+    if (updates.sourceQuote !== undefined) {
+      item.set('sourceQuote', updates.sourceQuote);
+      wrote = true;
+    }
+    // If we're skipping the source-write, drop the backfill-provenance note
+    // too — a note without a fresh source URL would be misleading.
+    if (updates.notes !== undefined && !skippedForSource) {
+      item.set('notes', updates.notes);
+      wrote = true;
+    }
+
+    if (wrote) return 'updated';
+    if (skippedForSource) return 'skipped-existing';
+    return 'updated';  // caller asked for nothing — treat as no-op success
+  }
+  return 'not-found';
+}
+
+/**
  * Write a YAML document back to file atomically (write to temp, rename).
  */
 export function writeEntityDocument(filepath: string, doc: Document): void {

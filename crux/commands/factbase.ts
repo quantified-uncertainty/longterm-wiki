@@ -18,6 +18,7 @@ import type { Graph } from '../../packages/factbase/src/graph.ts';
 import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src/types.ts';
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
+import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
@@ -1110,6 +1111,7 @@ export const commands = {
   migrate: kbMigrateCommands.default,
   'sync-sources': syncSourcesCommand,
   'sourcing': sourcingCommand,
+  'source-backfill': sourceBackfillCommands.default,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
@@ -1137,6 +1139,7 @@ Commands:
   migrate <slug>        Migrate entity from old system to KB [--dry-run] [--stub-old]
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   sourcing          Check KB facts against source URLs using LLM
+  source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
 
