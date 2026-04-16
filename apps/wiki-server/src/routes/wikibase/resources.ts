@@ -66,6 +66,7 @@ registerComposer<ResourceComposerRow>("resource", (row) => ({
   parentTitle: null,
 }));
 import { urlVariants } from "../shared/url-variants.js";
+import { generateId } from "@longterm-wiki/factbase";
 import { createHash, randomBytes } from "crypto";
 
 // ---- Raw SQL row types ----
@@ -185,7 +186,12 @@ function resourceValues(d: ResourceInput) {
     credibilityOverride: d.credibilityOverride ?? null,
     fetchedAt: d.fetchedAt ? new Date(d.fetchedAt) : null,
     contentHash: d.contentHash ?? null,
-    stableId: d.stableId ?? null,
+    // QUA-536: always generate a stableId if one isn't provided. The NOT NULL
+    // constraint on resources.stable_id (added in migration 0183) means
+    // INSERTs without stable_id fail. On ON CONFLICT (UPDATE) paths, the
+    // COALESCE below preserves the existing stable_id, so a generated one on
+    // update is harmless (never written).
+    stableId: d.stableId ?? generateId(),
     archiveUrl: d.archiveUrl ?? null,
     stance: d.stance ?? null,
     contextNote: d.contextNote ?? null,
@@ -716,11 +722,15 @@ const resourcesApp = new Hono()
     const toCreate = uniqueUrls.filter((u) => !urlToResource.has(u));
     if (toCreate.length > 0) {
       const ids = toCreate.map((u) => hashId(u));
+      // QUA-536: mint a stableId per row. The NOT NULL constraint on
+      // resources.stable_id means this raw INSERT must provide one. On
+      // CONFLICT (url) paths the existing row keeps its stable_id.
+      const stableIds = toCreate.map(() => generateId());
       // DO UPDATE SET updated_at = now() forces RETURNING to include conflicting rows
       const created = await rawDb<ResourceWithContent[]>`
-        INSERT INTO resources (id, url, type, created_at, updated_at)
-        SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[])
-          AS t(id, url),
+        INSERT INTO resources (id, url, stable_id, type, created_at, updated_at)
+        SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[], ${stableIds}::text[])
+          AS t(id, url, stable_id),
           LATERAL (SELECT 'web'::text AS type, now() AS created_at, now() AS updated_at) defaults
         ON CONFLICT (url) DO UPDATE SET updated_at = now()
         RETURNING id, url, title, null::timestamptz AS fetched_at, false AS has_content

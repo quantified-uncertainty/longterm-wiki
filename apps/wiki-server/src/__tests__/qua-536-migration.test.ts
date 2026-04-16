@@ -191,4 +191,66 @@ describe("QUA-536 Phase A migration structure", () => {
       expect(refreshIdx).toBeGreaterThan(commitIdx);
     });
   });
+
+  describe("INSERT path stable_id defaulting (regression guards)", () => {
+    // After NOT NULL lands on resources.stable_id, every INSERT into resources
+    // must provide a stable_id value or the INSERT fails. These guards pin
+    // that invariant to the files that insert resources, so a future refactor
+    // reverting to `stableId: d.stableId ?? null` fires here instead of in
+    // prod at apply time.
+    const RESOURCES_ROUTE_PATH = join(
+      __dirname,
+      "..",
+      "routes",
+      "wikibase",
+      "resources.ts",
+    );
+    const DATA_SOURCES_PATH = join(
+      __dirname,
+      "..",
+      "routes",
+      "tablebase",
+      "data-sources.ts",
+    );
+    const resourcesRoute = readFileSync(RESOURCES_ROUTE_PATH, "utf-8");
+    const dataSources = readFileSync(DATA_SOURCES_PATH, "utf-8");
+
+    it("resourceValues() generates stable_id if caller didn't provide", () => {
+      // Not `?? null` — that's the pre-QUA-536 bug. Must be `?? generateId()`.
+      expect(resourcesRoute).toMatch(/stableId:\s*d\.stableId\s*\?\?\s*generateId\(\)/);
+      expect(resourcesRoute).not.toMatch(/stableId:\s*d\.stableId\s*\?\?\s*null\b/);
+    });
+
+    it("/suggest raw SQL INSERT includes stable_id column", () => {
+      // The raw SQL INSERT used to be `(id, url, type, created_at, updated_at)`.
+      // Post-QUA-536 it must include stable_id.
+      expect(resourcesRoute).toMatch(
+        /INSERT INTO resources\s*\([^)]*stable_id[^)]*\)\s*\n\s*SELECT \* FROM unnest/,
+      );
+      // And the unnest must include the stable_ids array
+      expect(resourcesRoute).toMatch(/\$\{stableIds\}::text\[\]/);
+    });
+
+    it("resources.ts imports generateId from @longterm-wiki/factbase", () => {
+      expect(resourcesRoute).toMatch(
+        /import \{ generateId \} from ["']@longterm-wiki\/factbase["']/,
+      );
+    });
+
+    it("data-sources.ts tabular resource insert provides stable_id", () => {
+      // The data-sources /tabular endpoint creates a resource row. Before
+      // QUA-536 it omitted stable_id, relying on the nullable column.
+      const insertBlock = dataSources.match(
+        /\.insert\(resources\)[\s\S]*?\.returning\([^)]*\);/,
+      );
+      expect(insertBlock).not.toBeNull();
+      expect(insertBlock![0]).toMatch(/stableId:\s*generateId\(\)/);
+    });
+
+    it("data-sources.ts imports generateId from @longterm-wiki/factbase", () => {
+      expect(dataSources).toMatch(
+        /import \{ generateId \} from ["']@longterm-wiki\/factbase["']/,
+      );
+    });
+  });
 });
