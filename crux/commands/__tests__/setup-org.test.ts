@@ -10,9 +10,10 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
+import { mkdirSync, mkdtempSync, rmSync, existsSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
+import { parse as parseYaml } from "yaml";
 
 import {
   buildDivisionRows,
@@ -72,11 +73,6 @@ const MINIMAL_CONFIG_YAML = `
 slug: tiny-org
 name: Tiny Org
 `;
-
-function buildConfig(overrides: Partial<SetupOrgConfig> = {}): SetupOrgConfig {
-  return parseConfig(MINIMAL_CONFIG_YAML, "yaml") as SetupOrgConfig &
-    typeof overrides extends never ? SetupOrgConfig : SetupOrgConfig;
-}
 
 // ── Config validation ─────────────────────────────────────────────────
 
@@ -146,6 +142,31 @@ fundingPrograms:
 
   it("rejects malformed JSON", () => {
     expect(() => parseConfig("{not valid json", "json")).toThrow();
+  });
+
+  it("rejects relatedEntries.id that is neither sid_-prefixed nor kebab-case", () => {
+    const yaml = `
+slug: ok-slug
+name: ok
+relatedEntries:
+  - id: "Capital_Letters_And_Underscores"
+    type: person
+`;
+    expect(() => parseConfig(yaml, "yaml")).toThrow(/sid_|kebab-case/);
+  });
+
+  it("accepts relatedEntries.id in either sid_ or kebab-case form", () => {
+    const yaml = `
+slug: ok-slug
+name: ok
+relatedEntries:
+  - id: sid_AAAAAAAAAA
+    type: person
+  - id: dario-amodei
+    type: person
+`;
+    const config = parseConfig(yaml, "yaml");
+    expect(config.relatedEntries).toHaveLength(2);
   });
 });
 
@@ -416,7 +437,6 @@ describe("planFiles", () => {
     try {
       const entityPath = join(tmp, "data/entities/tiny-org.yaml");
       // Pre-create the file.
-      const { mkdirSync } = require("node:fs");
       mkdirSync(join(tmp, "data/entities"), { recursive: true });
       writeFileSync(entityPath, "- id: tiny-org\n");
 
@@ -516,8 +536,8 @@ describe("runSetupOrg (dry-run)", () => {
     expect(mock.syncFundingPrograms.getCalls()).toBe(0);
     expect(mock.written).toHaveLength(0);
     expect(report.applied).toBe(false);
-    expect(report.wikiId).toBe("<would-allocate>");
-    expect(report.stableId).toBe("sid_PREVIEW00");
+    expect(report.wikiId).toBe("<would-allocate-wiki-id>");
+    expect(report.stableId).toBe("<would-allocate-stable-id>");
     // Counts are still computed for the preview.
     expect(report.divisions.count).toBe(2);
     expect(report.fundingPrograms.count).toBe(1);
@@ -536,7 +556,7 @@ describe("runSetupOrg (dry-run)", () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps({ getId: "fail" });
     const report = await runSetupOrg(config, false, deps);
-    expect(report.wikiId).toBe("<would-allocate>");
+    expect(report.wikiId).toBe("<would-allocate-wiki-id>");
     expect(report.steps[0]!.status).toBe("skipped");
     expect(report.steps[0]!.detail).toContain("lookup failed");
   });
@@ -586,24 +606,109 @@ describe("runSetupOrg (--apply)", () => {
     expect(mock.written).toHaveLength(0);
   });
 
-  it("reports failed sync-entity-pg without aborting subsequent sync steps", async () => {
-    // Only entity sync fails — divisions/programs should still be attempted
-    // so the user sees the full picture, not "fail-fast on first error".
+  it("reports failed sync-entity-pg AND skips downstream syncs to avoid orphans", async () => {
+    // When entity sync fails, divisions/programs reference an org that
+    // doesn't exist in PG — writing them anyway produces orphan rows.
+    // The orchestrator must skip downstream syncs and report why.
     const config = parseConfig(FULL_CONFIG_YAML, "yaml");
-    const { deps, mock } = makeDeps({}, mkdtempSync(join(tmpdir(), "setup-org-fail-")));
-    let entitySyncCalls = 0;
-    deps.syncEntities = async () => {
-      entitySyncCalls++;
-      return { ok: false, message: "boom" };
+    const tmp = mkdtempSync(join(tmpdir(), "setup-org-fail-"));
+    try {
+      const { deps, mock } = makeDeps({}, tmp);
+      let entitySyncCalls = 0;
+      deps.syncEntities = async () => {
+        entitySyncCalls++;
+        return { ok: false, message: "boom" };
+      };
+      const report = await runSetupOrg(config, true, deps);
+      expect(entitySyncCalls).toBe(1);
+      // Downstream syncs skipped, NOT attempted.
+      expect(mock.syncDivisions.getCalls()).toBe(0);
+      expect(mock.syncFundingPrograms.getCalls()).toBe(0);
+      const divisionsStep = report.steps.find((s) => s.step === "sync-divisions");
+      expect(divisionsStep?.status).toBe("skipped");
+      expect(divisionsStep?.detail).toContain("orphan");
+      const programsStep = report.steps.find((s) => s.step === "sync-funding-programs");
+      expect(programsStep?.status).toBe("skipped");
+      const entityStep = report.steps.find((s) => s.step === "sync-entity-pg");
+      expect(entityStep?.status).toBe("failed");
+      expect(entityStep?.detail).toContain("boom");
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("refuses to overwrite existing YAML without --force", async () => {
+    const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
+    const tmp = mkdtempSync(join(tmpdir(), "setup-org-overwrite-"));
+    try {
+      // Pre-create the entity YAML to simulate existing content.
+      const entityPath = join(tmp, "data/entities/tiny-org.yaml");
+      mkdirSync(dirname(entityPath), { recursive: true });
+      writeFileSync(entityPath, "- id: tiny-org\n  hand-curated: yes\n");
+
+      const { deps, mock } = makeDeps({}, tmp);
+      const report = await runSetupOrg(config, { apply: true }, deps);
+
+      const writeStep = report.steps.find((s) => s.step === "write-entity-yaml");
+      expect(writeStep?.status).toBe("failed");
+      expect(writeStep?.detail).toContain("--force");
+      // No PG calls happened.
+      expect(mock.syncEntities.getCalls()).toBe(0);
+      // Hand-curated content NOT clobbered.
+      expect(readFileSync(entityPath, "utf-8")).toContain("hand-curated: yes");
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("overwrites existing YAML when --force is set", async () => {
+    const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
+    const tmp = mkdtempSync(join(tmpdir(), "setup-org-force-"));
+    try {
+      const entityPath = join(tmp, "data/entities/tiny-org.yaml");
+      mkdirSync(dirname(entityPath), { recursive: true });
+      writeFileSync(entityPath, "- id: tiny-org\n  hand-curated: yes\n");
+
+      const { deps, mock } = makeDeps({}, tmp);
+      const report = await runSetupOrg(config, { apply: true, force: true }, deps);
+
+      expect(report.steps.find((s) => s.step === "write-entity-yaml")?.status).toBe("ok");
+      expect(mock.syncEntities.getCalls()).toBe(1);
+      // File was actually written.
+      expect(mock.written.find((w) => w.path === entityPath)).toBeTruthy();
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("converts thrown writeFile errors into failed step results (not unhandled exceptions)", async () => {
+    const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
+    const { deps, mock } = makeDeps();
+    deps.writeFile = () => {
+      throw new Error("ENOSPC: no space left on device");
     };
-    const report = await runSetupOrg(config, true, deps);
-    expect(entitySyncCalls).toBe(1);
-    // Subsequent sync* calls still ran.
-    expect(mock.syncDivisions.getCalls()).toBe(1);
-    expect(mock.syncFundingPrograms.getCalls()).toBe(1);
-    const entityStep = report.steps.find((s) => s.step === "sync-entity-pg");
-    expect(entityStep?.status).toBe("failed");
-    expect(entityStep?.detail).toContain("boom");
+    const report = await runSetupOrg(config, { apply: true }, deps);
+    const writeStep = report.steps.find((s) => s.step === "write-entity-yaml");
+    expect(writeStep?.status).toBe("failed");
+    expect(writeStep?.detail).toContain("ENOSPC");
+    // PG sync skipped because file write failed first.
+    expect(mock.syncEntities.getCalls()).toBe(0);
+    // The follow-up section warns about the abort.
+    expect(report.followUp.some((f) => f.includes("PG sync skipped"))).toBe(true);
+  });
+
+  it("skips download files but still surfaces both file-write attempts", async () => {
+    const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
+    const { deps } = makeDeps();
+    let writeCount = 0;
+    deps.writeFile = () => {
+      writeCount++;
+      throw new Error("EACCES");
+    };
+    const report = await runSetupOrg(config, { apply: true }, deps);
+    // Both write attempts run before we abort downstream — user sees full picture.
+    expect(writeCount).toBe(2);
+    expect(report.steps.filter((s) => s.status === "failed")).toHaveLength(2);
   });
 });
 
@@ -627,8 +732,6 @@ describe("apply mode writes valid YAML to disk", () => {
         syncFundingPrograms: async () => ({ ok: true as const, data: { upserted: 1 } }),
         writeFile: (path, contents) => {
           // Persist for round-trip check.
-          const { mkdirSync } = require("node:fs");
-          const { dirname } = require("node:path");
           mkdirSync(dirname(path), { recursive: true });
           writeFileSync(path, contents, "utf-8");
           written.push({ path, contents });
@@ -639,8 +742,7 @@ describe("apply mode writes valid YAML to disk", () => {
       expect(written).toHaveLength(2);
       const entityPath = join(tmp, "data/entities/aria.yaml");
       expect(existsSync(entityPath)).toBe(true);
-      const { parse } = require("yaml");
-      const parsed = parse(readFileSync(entityPath, "utf-8"));
+      const parsed = parseYaml(readFileSync(entityPath, "utf-8"));
       expect(Array.isArray(parsed)).toBe(true);
       expect(parsed[0]).toMatchObject({
         id: "aria",
@@ -652,6 +754,40 @@ describe("apply mode writes valid YAML to disk", () => {
     } finally {
       rmSync(tmp, { recursive: true, force: true });
     }
+  });
+});
+
+// ── Shell injection defense ──────────────────────────────────────────
+
+describe("follow-up suggestions are shell-safe", () => {
+  it("escapes embedded $(...) and backticks in config.name", async () => {
+    const yaml = `
+slug: ok-slug
+name: "$(rm -rf ~) and \`echo pwned\`"
+`;
+    const config = parseConfig(yaml, "yaml");
+    const { deps } = makeDeps();
+    const report = await runSetupOrg(config, false, deps);
+    // The follow-up suggestion uses single-quotes which prevent shell
+    // expansion. The literal $(...)/backticks should appear verbatim
+    // inside single quotes, not as an active shell construct.
+    const wikiCreate = report.followUp.find((f) => f.includes("crux w create"));
+    expect(wikiCreate).toBeDefined();
+    expect(wikiCreate).toContain("'$(rm -rf ~) and `echo pwned`'");
+    // No double-quote wrapper that would allow $() expansion.
+    expect(wikiCreate).not.toContain('"$(rm');
+  });
+
+  it("escapes embedded single quotes via the standard '\\\\'' trick", async () => {
+    const yaml = `
+slug: ok-slug
+name: "Bob's R&D Lab"
+`;
+    const config = parseConfig(yaml, "yaml");
+    const { deps } = makeDeps();
+    const report = await runSetupOrg(config, false, deps);
+    const wikiCreate = report.followUp.find((f) => f.includes("crux w create"));
+    expect(wikiCreate).toContain("'Bob'\\''s R&D Lab'");
   });
 });
 
@@ -678,5 +814,3 @@ describe("formatReport", () => {
   });
 });
 
-// Suppress "buildConfig is unused" lint by referencing it once.
-void buildConfig;

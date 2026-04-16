@@ -33,11 +33,30 @@ import type {
 } from "../lib/command-types.ts";
 import { generateId } from "../lib/grant-import/id.ts";
 import { toSlug } from "../tablebase/types.ts";
+import { allocateId, getIdBySlug } from "../lib/wiki-server/ids.ts";
+import { syncEntities } from "../lib/wiki-server/entities.ts";
+import { syncDivisions } from "../lib/wiki-server/divisions.ts";
+import { syncFundingPrograms } from "../lib/wiki-server/funding-programs.ts";
+
+// ── Constants ──────────────────────────────────────────────────────────
+
+const MAX_NAME_LENGTH = 500;
+const SID_FORMAT_RE = /^sid_[A-Za-z0-9]{10}$/;
 
 // ── Config schema ───────────────────────────────────────────────────────
 
+// relatedEntries point to other entities. Per .claude/rules/id-system.md the
+// canonical ref is a sid_ prefixed stableId. Slugs are also accepted today
+// (see entities/organizations.yaml), so we permit either form.
 const RelatedEntrySchema = z.object({
-  id: z.string().min(1),
+  id: z
+    .string()
+    .min(1)
+    .max(300)
+    .refine(
+      (s) => SID_FORMAT_RE.test(s) || /^[a-z0-9][a-z0-9-]*[a-z0-9]$/.test(s),
+      { message: "id must be a sid_-prefixed stableId or a kebab-case slug" },
+    ),
   type: z.string().min(1),
   relationship: z.string().optional(),
 });
@@ -93,7 +112,7 @@ const SetupOrgConfigSchema = z.object({
     .min(2)
     .max(100)
     .regex(/^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "slug must be kebab-case"),
-  name: z.string().min(1).max(500),
+  name: z.string().min(1).max(MAX_NAME_LENGTH),
   type: z.string().min(1).default("organization"),
   aliases: z.array(z.string().min(1)).optional(),
   website: z.string().optional(),
@@ -299,12 +318,15 @@ export function buildFundingProgramRows(
   orgStableId: string,
   divisionRows: DivisionRow[],
 ): FundingProgramRow[] {
+  // Index divisions by their slug so program → division lookup is O(1).
+  // `config.divisions` and `divisionRows` are built in the same order from
+  // the same source, so we can zip them positionally.
   const divisionIdBySlug = new Map<string, { id: string; idSeed: string }>();
-  for (const d of config.divisions ?? []) {
+  (config.divisions ?? []).forEach((d, i) => {
     const slug = d.slug ?? toSlug(d.name);
-    const row = divisionRows.find((r) => r.idSeed.endsWith(`|${slug}`));
+    const row = divisionRows[i];
     if (row) divisionIdBySlug.set(slug, { id: row.id, idSeed: row.idSeed });
-  }
+  });
 
   const rows: FundingProgramRow[] = [];
   const seenSlugs = new Set<string>();
@@ -469,7 +491,8 @@ interface SetupOrgOptions extends BaseOptions {
   config?: string;
   apply?: boolean;
   ci?: boolean;
-  json?: boolean;
+  /** Allow overwriting existing YAML / FactBase files. Otherwise the command refuses. */
+  force?: boolean;
 }
 
 interface StepResult {
@@ -512,6 +535,14 @@ function readConfigSource(
 }
 
 function readStdinSync(): string {
+  // Refuse to block on stdin when there's no piped input — otherwise the
+  // user just sees a hung command. A fresh terminal sends no EOF, so we'd
+  // either block forever (Linux) or get EAGAIN (macOS).
+  if (process.stdin.isTTY) {
+    throw new Error(
+      "--config=- expects JSON on stdin, but stdin is a TTY. Pipe input or pass a file path.",
+    );
+  }
   // fd 0 = stdin; readFileSync returns a string when an encoding is given.
   return readFileSync(0, "utf-8");
 }
@@ -544,9 +575,29 @@ interface OrchestratorDeps {
   log: (line: string) => void;
 }
 
-/** Placeholder shown for IDs we haven't allocated yet (dry-run on a new slug). */
-const PLACEHOLDER_WIKI_ID = "<would-allocate>";
-const PLACEHOLDER_STABLE_ID = "sid_PREVIEW00";
+/**
+ * Placeholders shown for IDs we haven't allocated yet (dry-run on a new slug).
+ * Both deliberately fail SID/wikiId validators so any tool downstream of the
+ * dry-run report (e.g. a script consuming the JSON output) crashes loudly
+ * instead of treating them as real allocated IDs.
+ */
+const PLACEHOLDER_WIKI_ID = "<would-allocate-wiki-id>";
+const PLACEHOLDER_STABLE_ID = "<would-allocate-stable-id>";
+
+/**
+ * Quote a string for safe pasting into a Bash command. Wraps in single quotes
+ * and escapes any embedded `'`. Defends against `name = "$(rm -rf ~)"`-style
+ * shell-injection in the verification report's copy-pastable follow-up steps.
+ */
+function shellQuote(s: string): string {
+  return `'${s.replace(/'/g, "'\\''")}'`;
+}
+
+export interface RunSetupOrgOptions {
+  apply: boolean;
+  /** Allow overwriting existing YAML / FactBase files. */
+  force?: boolean;
+}
 
 /**
  * Pure orchestration entry point — exported for unit tests so they can
@@ -554,9 +605,15 @@ const PLACEHOLDER_STABLE_ID = "sid_PREVIEW00";
  */
 export async function runSetupOrg(
   config: SetupOrgConfig,
-  apply: boolean,
+  optionsOrApply: boolean | RunSetupOrgOptions,
   deps: OrchestratorDeps,
 ): Promise<Report> {
+  const opts: RunSetupOrgOptions =
+    typeof optionsOrApply === "boolean"
+      ? { apply: optionsOrApply }
+      : optionsOrApply;
+  const apply = opts.apply;
+  const force = !!opts.force;
   const steps: StepResult[] = [];
   const report: Report = {
     slug: config.slug,
@@ -644,24 +701,64 @@ export async function runSetupOrg(
   ];
 
   if (apply) {
-    deps.writeFile(filePlan.entityYamlPath, filePlan.entityYamlContents);
-    steps.push({
-      step: "write-entity-yaml",
-      status: "ok",
-      detail: filePlan.entityYamlPath,
-    });
-    deps.writeFile(filePlan.factbaseYamlPath, filePlan.factbaseYamlContents);
-    steps.push({
-      step: "write-factbase-yaml",
-      status: "ok",
-      detail: filePlan.factbaseYamlPath,
-    });
+    // Refuse to clobber existing files unless --force. Hand-curated YAML in
+    // data/entities/ or packages/factbase/data/fb-entities/ is high-value
+    // content that must not be silently overwritten.
+    if ((filePlan.entityYamlExists || filePlan.factbaseYamlExists) && !force) {
+      const which = [
+        filePlan.entityYamlExists ? filePlan.entityYamlPath : null,
+        filePlan.factbaseYamlExists ? filePlan.factbaseYamlPath : null,
+      ]
+        .filter(Boolean)
+        .join(", ");
+      steps.push({
+        step: "write-entity-yaml",
+        status: "failed",
+        detail: `refusing to overwrite existing file(s) without --force: ${which}`,
+      });
+      return report;
+    }
+
+    const writeStep = (
+      stepName: string,
+      path: string,
+      contents: string,
+    ): boolean => {
+      try {
+        deps.writeFile(path, contents);
+        steps.push({ step: stepName, status: "ok", detail: path });
+        return true;
+      } catch (err: unknown) {
+        const message = err instanceof Error ? err.message : String(err);
+        steps.push({ step: stepName, status: "failed", detail: `${path}: ${message}` });
+        return false;
+      }
+    };
+    const entityWritten = writeStep(
+      "write-entity-yaml",
+      filePlan.entityYamlPath,
+      filePlan.entityYamlContents,
+    );
+    const factbaseWritten = writeStep(
+      "write-factbase-yaml",
+      filePlan.factbaseYamlPath,
+      filePlan.factbaseYamlContents,
+    );
+    // If either YAML write failed, abort downstream PG syncs to avoid a
+    // partial-state where PG has rows the YAML doesn't, or vice versa.
+    if (!entityWritten || !factbaseWritten) {
+      report.followUp.push(
+        `File write failed — PG sync skipped to avoid YAML/PG drift. Fix the underlying I/O error and re-run.`,
+      );
+      return report;
+    }
   } else {
     steps.push({ step: "write-entity-yaml", status: "skipped", detail: "dry-run" });
     steps.push({ step: "write-factbase-yaml", status: "skipped", detail: "dry-run" });
   }
 
   // 4. Sync entity to PG.
+  let entitySyncOk = !apply; // dry-run treats "skipped" as not-failed.
   if (apply) {
     const entityForSync: Record<string, unknown> = {
       id: entityRecord.id,
@@ -677,6 +774,7 @@ export async function runSetupOrg(
       entityForSync.relatedEntries = entityRecord.relatedEntries;
     }
     const syncResult = await deps.syncEntities([entityForSync]);
+    entitySyncOk = syncResult.ok;
     steps.push({
       step: "sync-entity-pg",
       status: syncResult.ok ? "ok" : "failed",
@@ -688,9 +786,17 @@ export async function runSetupOrg(
     steps.push({ step: "sync-entity-pg", status: "skipped", detail: "dry-run" });
   }
 
-  // 5. Divisions.
+  // 5. Divisions. Skipped if entity sync failed — divisions reference the
+  // org's stableId, so writing them when the parent isn't in PG produces
+  // orphans that would have to be cleaned up manually.
   if (divisionRows.length > 0) {
-    if (apply) {
+    if (apply && !entitySyncOk) {
+      steps.push({
+        step: "sync-divisions",
+        status: "skipped",
+        detail: "skipped because sync-entity-pg failed (would create orphans)",
+      });
+    } else if (apply) {
       const items = divisionRows.map((r) => ({
         id: r.id,
         parentOrgId: r.parentOrgId,
@@ -718,9 +824,15 @@ export async function runSetupOrg(
     report.divisionsSnippet = formatDivisionsSnippet(divisionRows, config.slug);
   }
 
-  // 6. Funding programs.
+  // 6. Funding programs. Same skip-on-entity-failure rule as divisions.
   if (programRows.length > 0) {
-    if (apply) {
+    if (apply && !entitySyncOk) {
+      steps.push({
+        step: "sync-funding-programs",
+        status: "skipped",
+        detail: "skipped because sync-entity-pg failed (would create orphans)",
+      });
+    } else if (apply) {
       const items = programRows.map((r) => ({
         id: r.id,
         orgId: r.orgId,
@@ -754,11 +866,14 @@ export async function runSetupOrg(
   }
 
   // 7. Follow-ups (always shown — these aren't automated).
+  // Use shellQuote so arbitrary chars in config.name (`$(...)`, backticks,
+  // semicolons) can't smuggle commands into a copy-pasted suggestion.
+  const quotedName = shellQuote(config.name);
   report.followUp.push(
-    `Create the wiki page: WIKI_SERVER_ENV=prod pnpm crux w create ${JSON.stringify(config.name)} --tier=standard`,
+    `Create the wiki page: pnpm crux w create ${quotedName} --tier=standard`,
   );
   report.followUp.push(
-    `Discover related personnel: WIKI_SERVER_ENV=prod pnpm crux tb people discover`,
+    `Discover related personnel: pnpm crux tb people discover`,
   );
   if (divisionRows.length > 0) {
     report.followUp.push(
@@ -770,8 +885,9 @@ export async function runSetupOrg(
       `Persist funding programs: paste the snippet above into the PROGRAMS array in crux/commands/import-funding-programs.ts.`,
     );
   }
+  report.followUp.push(`Verify in PG: pnpm crux query search ${quotedName}`);
   report.followUp.push(
-    `Verify in PG: WIKI_SERVER_ENV=prod pnpm crux query search ${JSON.stringify(config.name)}`,
+    `(prefix any of the above with WIKI_SERVER_ENV=prod when running from an agent slot)`,
   );
 
   return report;
@@ -856,6 +972,64 @@ function reportExitCode(report: Report): number {
 
 // ── Command entry ───────────────────────────────────────────────────────
 
+/**
+ * Build the OrchestratorDeps wrapper around the real wiki-server clients.
+ * Exported so tests can hit `setupOrgCommand` end-to-end with a stubbed
+ * `apiRequest` (or assert on the wrapper's error mapping in isolation).
+ */
+export function buildLiveDeps(
+  repoRoot: string,
+  ciOrJson: boolean,
+): OrchestratorDeps {
+  return {
+    repoRoot,
+    getIdBySlug: async (slug) => {
+      const r = await getIdBySlug(slug);
+      if (!r.ok) {
+        // The wiki-server returns 404 for "slug not allocated" — that's a
+        // valid lookup result, not an error. The client classifies all 4xx
+        // as `bad_request`, so we narrow on the message prefix to avoid
+        // swallowing real validation errors (400, 422, 429, ...).
+        if (r.error === "bad_request" && /^404[:\s]/.test(r.message)) {
+          return { ok: true, data: null };
+        }
+        return { ok: false, message: `${r.error}: ${r.message}` };
+      }
+      if (!r.data.stableId) return { ok: true, data: null };
+      return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
+    },
+    allocateId: async (slug, description) => {
+      const r = await allocateId(slug, description);
+      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
+      if (!r.data.stableId) {
+        return { ok: false, message: `wiki-server returned no stableId for slug "${slug}"` };
+      }
+      return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
+    },
+    syncEntities: async (items) => {
+      const r = await syncEntities(
+        items as unknown as Parameters<typeof syncEntities>[0],
+      );
+      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
+      return { ok: true, data: { upserted: r.data.upserted } };
+    },
+    syncDivisions: async (items) => {
+      const r = await syncDivisions(items);
+      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
+      return { ok: true, data: r.data };
+    },
+    syncFundingPrograms: async (items) => {
+      const r = await syncFundingPrograms(items);
+      if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };
+      return { ok: true, data: r.data };
+    },
+    writeFile: writeFileEnsuringDir,
+    log: (line) => {
+      if (!ciOrJson) console.error(line);
+    },
+  };
+}
+
 async function setupOrgCommand(
   _args: string[],
   options: SetupOrgOptions,
@@ -864,7 +1038,7 @@ async function setupOrgCommand(
     return {
       exitCode: 1,
       output:
-        "Usage: crux tb setup-org --config=<path-to-yaml-or-json> [--apply] [--ci]\n" +
+        "Usage: crux tb setup-org --config=<path-to-yaml-or-json> [--apply] [--force] [--ci]\n" +
         "       crux tb setup-org --config=- --apply   # JSON config from stdin",
     };
   }
@@ -882,61 +1056,15 @@ async function setupOrgCommand(
     return { exitCode: 1, output: `Config error: ${message}` };
   }
 
-  const repoRoot = process.cwd();
-  const apply = !!options.apply;
-
-  const { allocateId, getIdBySlug } = await import("../lib/wiki-server/ids.ts");
-  const { syncEntities } = await import("../lib/wiki-server/entities.ts");
-  const { syncDivisions } = await import("../lib/wiki-server/divisions.ts");
-  const { syncFundingPrograms } = await import("../lib/wiki-server/funding-programs.ts");
-
-  const deps: OrchestratorDeps = {
-    repoRoot,
-    getIdBySlug: async (slug) => {
-      const r = await getIdBySlug(slug);
-      if (!r.ok) {
-        // 404 is the expected "not allocated yet" case — return null, not an error.
-        if (r.error === "bad_request") return { ok: true, data: null };
-        return { ok: false, message: r.message };
-      }
-      if (!r.data.stableId) return { ok: true, data: null };
-      return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
-    },
-    allocateId: async (slug, description) => {
-      const r = await allocateId(slug, description);
-      if (!r.ok) return { ok: false, message: r.message };
-      if (!r.data.stableId) {
-        return { ok: false, message: `wiki-server returned no stableId for slug "${slug}"` };
-      }
-      return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
-    },
-    syncEntities: async (items) => {
-      const r = await syncEntities(
-        items as unknown as Parameters<typeof syncEntities>[0],
-      );
-      if (!r.ok) return { ok: false, message: r.message };
-      return { ok: true, data: { upserted: r.data.upserted } };
-    },
-    syncDivisions: async (items) => {
-      const r = await syncDivisions(items);
-      if (!r.ok) return { ok: false, message: r.message };
-      return { ok: true, data: r.data };
-    },
-    syncFundingPrograms: async (items) => {
-      const r = await syncFundingPrograms(items);
-      if (!r.ok) return { ok: false, message: r.message };
-      return { ok: true, data: r.data };
-    },
-    writeFile: writeFileEnsuringDir,
-    log: (line) => {
-      if (!options.ci && !options.json) console.error(line);
-    },
-  };
-
-  const report = await runSetupOrg(config, apply, deps);
+  const deps = buildLiveDeps(process.cwd(), !!options.ci);
+  const report = await runSetupOrg(
+    config,
+    { apply: !!options.apply, force: !!options.force },
+    deps,
+  );
   const exitCode = reportExitCode(report);
 
-  if (options.ci || options.json) {
+  if (options.ci) {
     return { exitCode, output: JSON.stringify(report, null, 2) };
   }
   return { exitCode, output: formatReport(report) };
@@ -961,10 +1089,11 @@ Replaces the manual ~15-step onboarding flow with one config file:
   • Outputs a verification report and snippets for the persistent constants files
 
 ${BOLD}Usage:${RESET}
-  crux tb setup-org --config=path/to/aria.yaml          # Dry run (preview)
-  crux tb setup-org --config=path/to/aria.yaml --apply  # Actually write + sync
-  crux tb setup-org --config=- --apply                  # JSON config from stdin
-  crux tb setup-org --config=path/to/aria.yaml --ci     # JSON output
+  crux tb setup-org --config=path/to/aria.yaml           # Dry run (preview)
+  crux tb setup-org --config=path/to/aria.yaml --apply   # Actually write + sync
+  crux tb setup-org --config=path/to/aria.yaml --apply --force   # Allow YAML overwrite
+  crux tb setup-org --config=- --apply                   # JSON config from stdin
+  crux tb setup-org --config=path/to/aria.yaml --ci      # JSON output
 
 ${BOLD}Config schema (YAML):${RESET}
   slug: aria                              # required, kebab-case
@@ -997,7 +1126,7 @@ ${BOLD}Config schema (YAML):${RESET}
       value: "2023"
       source: https://aria.org.uk/about
 
-${BOLD}Apply requires WIKI_SERVER_ENV=prod from agent slots:${RESET}
+${BOLD}From an agent slot, prefix with WIKI_SERVER_ENV=prod:${RESET}
   WIKI_SERVER_ENV=prod pnpm crux tb setup-org --config=aria.yaml --apply
 
 ${BOLD}Out of scope (run separately afterwards):${RESET}
