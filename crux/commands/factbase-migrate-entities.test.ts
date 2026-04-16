@@ -21,7 +21,7 @@ describe('loadKB with entity: format', () => {
 
   beforeEach(() => {
     tmpDir = mkdtempSync(join(tmpdir(), 'factbase-loader-entity-test-'));
-    mkdirSync(join(tmpDir, 'things'), { recursive: true });
+    mkdirSync(join(tmpDir, 'fb-entities'), { recursive: true });
     mkdirSync(join(tmpDir, 'schemas'), { recursive: true });
   });
 
@@ -31,7 +31,7 @@ describe('loadKB with entity: format', () => {
 
   it('loads entity: format file with injected entities', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'test-org.yaml'),
+      join(tmpDir, 'fb-entities', 'test-org.yaml'),
       `entity: aB3cD4eF5g
 facts:
   - id: f_test001
@@ -83,7 +83,7 @@ facts:
 
   it('creates minimal stub when entity: stableId not in injected map', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'orphan-entity.yaml'),
+      join(tmpDir, 'fb-entities', 'orphan-entity.yaml'),
       `entity: xY9zW8vU7t
 facts:
   - id: f_orphan01
@@ -118,7 +118,7 @@ facts:
   it('entity: format works alongside thing: format in same directory', async () => {
     // Old-format file
     writeFileSync(
-      join(tmpDir, 'things', 'old-org.yaml'),
+      join(tmpDir, 'fb-entities', 'old-org.yaml'),
       `thing:
   id: old-org
   stableId: oLdOrG1234
@@ -129,7 +129,7 @@ facts:
 
     // New-format file
     writeFileSync(
-      join(tmpDir, 'things', 'new-org.yaml'),
+      join(tmpDir, 'fb-entities', 'new-org.yaml'),
       `entity: nEwOrG5678
 facts:
   - id: f_new001
@@ -174,7 +174,7 @@ facts:
 
   it('injected entities override thing: block entities', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'test-entity.yaml'),
+      join(tmpDir, 'fb-entities', 'test-entity.yaml'),
       `thing:
   id: test-entity
   stableId: tEsT123456
@@ -207,7 +207,7 @@ facts:
 
   it('entity: format with _sources resolves !src tags', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'src-test.yaml'),
+      join(tmpDir, 'fb-entities', 'src-test.yaml'),
       `entity: sRcTeSt123
 facts:
   - id: f_src001
@@ -250,7 +250,7 @@ _sources:
 
   it('handles empty entity: format file (no facts)', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'empty-entity.yaml'),
+      join(tmpDir, 'fb-entities', 'empty-entity.yaml'),
       `entity: eMpTy12345
 `,
     );
@@ -280,7 +280,7 @@ _sources:
 
   it('rejects entity: files with records: block', async () => {
     writeFileSync(
-      join(tmpDir, 'things', 'bad-entity.yaml'),
+      join(tmpDir, 'fb-entities', 'bad-entity.yaml'),
       `entity: bAdEnT1234
 records:
   - type: funding-round

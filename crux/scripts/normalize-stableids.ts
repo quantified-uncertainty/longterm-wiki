@@ -107,7 +107,7 @@ for (const f of entityFiles) {
 }
 
 // 2. Scan FactBase thing files
-const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "things");
+const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "fb-entities");
 const allThingFiles = readdirSync(thingsDir).filter((f) => f.endsWith(".yaml"));
 for (const f of allThingFiles) {
   allContaminated.push(...scanFactBaseThing(join(thingsDir, f)));

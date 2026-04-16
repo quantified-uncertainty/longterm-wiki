@@ -140,7 +140,7 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 - The PG `entities` table = **TableBase** (a read mirror of `data/entities/*.yaml`). FactBase also has "entities" with separate 10-char IDs — these are different.
 - The PG `facts` table = **FactBase mirror** (a read mirror of `packages/factbase/data/fb-entities/` YAML). Not the same as the legacy `data/facts/*.yaml`.
 - The PG `things` table = **cross-base universal index** (NOT a FactBase concept). It indexes items from ALL domains (entities, facts, grants, resources, etc.).
-- `packages/factbase/data/fb-entities/` = FactBase entity YAML files. NOT related to the PG `things` table despite the shared name.
+- `packages/factbase/data/fb-entities/` = FactBase entity YAML files. Not related to the PG `things` table (the directory was renamed from `things/` in QUA-501 to eliminate the name collision).
 - Full naming guide: `content/docs/internal/data-architecture.mdx`
 
 ## Data Flow

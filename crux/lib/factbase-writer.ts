@@ -142,7 +142,7 @@ export function writeEntityDocument(filepath: string, doc: Document): void {
  * @returns Absolute file path, or null if not found
  */
 export function findEntityFilePath(entitySlug: string, dataDir: string): string | null {
-  const thingsDir = join(dataDir, 'things');
+  const thingsDir = join(dataDir, 'fb-entities');
 
   // Check single-file pattern: things/<slug>.yaml
   const singleFile = join(thingsDir, `${entitySlug}.yaml`);

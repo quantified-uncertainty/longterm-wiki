@@ -20,7 +20,7 @@ import { join, extname } from 'node:path';
 import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
 const verbose = process.argv.includes('--verbose');
 

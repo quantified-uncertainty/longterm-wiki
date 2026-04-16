@@ -36,7 +36,7 @@ function createFixtureDir(): {
 } {
   const root = mkdtempSync(join(tmpdir(), "kb-entity-slugs-test-"));
   const entitiesDir = join(root, "data", "entities");
-  const thingsDir = join(root, "packages", "factbase", "data", "things");
+  const thingsDir = join(root, "packages", "factbase", "data", "fb-entities");
   mkdirSync(entitiesDir, { recursive: true });
   mkdirSync(thingsDir, { recursive: true });
 

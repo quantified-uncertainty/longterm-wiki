@@ -21,7 +21,7 @@ import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 
 interface KBThing {
   thing?: {

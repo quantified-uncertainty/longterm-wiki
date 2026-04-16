@@ -152,7 +152,7 @@ function loadKbPropertyIds(): Set<string> {
  */
 function loadKbEntitySlugs(): Set<string> {
   try {
-    const thingsDir = join(KB_DATA_DIR, 'things');
+    const thingsDir = join(KB_DATA_DIR, 'fb-entities');
     const slugs = new Set<string>();
     for (const file of readdirSync(thingsDir)) {
       if (file.endsWith('.yaml')) {

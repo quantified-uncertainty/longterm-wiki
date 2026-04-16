@@ -8,7 +8,7 @@ import { generateStableId, generateFactId } from '../../packages/factbase/src/id
 // ── Paths ─────────────────────────────────────────────────────────────
 
 const ENTITIES_DIR = join(PROJECT_ROOT, 'data', 'entities');
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 
 // ── Types ─────────────────────────────────────────────────────────────
 

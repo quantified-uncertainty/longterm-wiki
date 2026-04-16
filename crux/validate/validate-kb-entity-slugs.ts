@@ -500,7 +500,7 @@ function main(): void {
   const c = getColors(ci);
 
   const entitiesDir = join(PROJECT_ROOT, "data", "entities");
-  const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "things");
+  const thingsDir = join(PROJECT_ROOT, "packages", "factbase", "data", "fb-entities");
 
   const { missingRefs, uniqueMissing, stats } = validateKbEntitySlugs(
     entitiesDir,

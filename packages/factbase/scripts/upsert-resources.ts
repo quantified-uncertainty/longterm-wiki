@@ -63,7 +63,7 @@ function addUrl(
 }
 
 async function main() {
-  const thingsDir = join(KB_DATA_DIR, "things");
+  const thingsDir = join(KB_DATA_DIR, "fb-entities");
   const files = readdirSync(thingsDir).filter((f) => f.endsWith(".yaml"));
 
   const itemsByUrl = new Map<string, UpsertItem>();

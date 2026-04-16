@@ -185,7 +185,7 @@ export function extractFactBaseStableId(content: string): string | null {
  * Load all FactBase entity references.
  */
 export function loadFactBaseEntities(): FactBaseRecord[] {
-  const thingsDir = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+  const thingsDir = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
   if (!existsSync(thingsDir)) return [];
 
   const records: FactBaseRecord[] = [];

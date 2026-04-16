@@ -30,7 +30,7 @@ import { join, extname } from 'node:path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 
-const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'things');
+const KB_THINGS_DIR = join(PROJECT_ROOT, 'packages', 'factbase', 'data', 'fb-entities');
 
 interface MigrateOptions extends BaseOptions {
   dryRun?: boolean;
