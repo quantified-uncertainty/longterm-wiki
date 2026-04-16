@@ -13,6 +13,7 @@ import {
   parseEventLine,
   parseEventsFile,
   findResultEvent,
+  readFinalResultEvent,
   spawnDispatch,
   detectConflict,
   finalizeIfComplete,
@@ -179,7 +180,7 @@ describe('buildClaudeArgv', () => {
     expect(argv[appendIdx + 1]).toBe('You are a worker.');
     expect(argv[sepIdx + 1]).toBe('hi');
   });
-  it('preserves a prompt that starts with two dashes as a positional (hostile-review regression test)', () => {
+  it('preserves a prompt that starts with two dashes as a positional', () => {
     const argv = buildClaudeArgv({
       sessionId: 'abc-123',
       prompt: '--force the parser to crash and summarize',
@@ -188,8 +189,8 @@ describe('buildClaudeArgv', () => {
       allowedTools: 'Bash',
       permissionMode: 'bypassPermissions',
     });
-    // The dangerous prompt must live AFTER a literal -- separator so claude's
-    // commander parser treats it as the positional prompt argument, not a flag.
+    // Prompt must live AFTER the -- separator so claude treats it as the
+    // positional prompt arg, not a flag.
     const sepIdx = argv.indexOf('--');
     expect(sepIdx).toBeGreaterThan(-1);
     expect(argv[sepIdx + 1]).toBe('--force the parser to crash and summarize');
@@ -373,6 +374,46 @@ describe('parseEventsFile', () => {
   });
 });
 
+describe('readFinalResultEvent', () => {
+  it('returns null when file is missing or empty', () => {
+    const env = new FakeEnv();
+    expect(readFinalResultEvent(env, '/nope.jsonl')).toBeNull();
+    env.files.set('/empty.jsonl', '');
+    expect(readFinalResultEvent(env, '/empty.jsonl')).toBeNull();
+    env.files.set('/whitespace.jsonl', '   \n\n');
+    expect(readFinalResultEvent(env, '/whitespace.jsonl')).toBeNull();
+  });
+
+  it('returns null when the last line is not a result event', () => {
+    const env = new FakeEnv();
+    env.files.set('/a.jsonl',
+      JSON.stringify({ type: 'system', subtype: 'init', cwd: '/x', session_id: 's', model: 'm' }) + '\n' +
+      JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'thinking' }] } }) + '\n',
+    );
+    expect(readFinalResultEvent(env, '/a.jsonl')).toBeNull();
+  });
+
+  it('returns the final result event without parsing prior lines', () => {
+    const env = new FakeEnv();
+    env.files.set('/a.jsonl',
+      'not-json-garbage\n' + // would cause findResultEvent to tag as other
+      JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'hi' }] } }) + '\n' +
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', num_turns: 1, duration_ms: 1, total_cost_usd: 0 }) + '\n',
+    );
+    const r = readFinalResultEvent(env, '/a.jsonl');
+    expect(r?.kind).toBe('result');
+  });
+
+  it('handles a result line with no trailing newline', () => {
+    const env = new FakeEnv();
+    env.files.set('/a.jsonl',
+      JSON.stringify({ type: 'result', is_error: true, stop_reason: 'max_tokens', num_turns: 1, duration_ms: 1, total_cost_usd: 0 }),
+    );
+    const r = readFinalResultEvent(env, '/a.jsonl');
+    expect(r?.kind).toBe('error');
+  });
+});
+
 describe('findResultEvent', () => {
   it('returns the final result', () => {
     const env = new FakeEnv();
@@ -418,7 +459,7 @@ describe('spawnDispatch', () => {
     expect(call.args).toContain('--session-id');
     expect(call.args).toContain('--print');
     expect(call.args).toContain('echo hi');
-    // Prompt must come after the -- separator (hostile-review hardening).
+    // Prompt must come after the -- separator so claude treats it as positional.
     const sepIdx = call.args.indexOf('--');
     expect(sepIdx).toBeGreaterThan(-1);
     expect(call.args[sepIdx + 1]).toBe('echo hi');

@@ -804,12 +804,6 @@ interface DispatchCliOptions extends CommandOptions {
   promptFile?: string;
 }
 
-export interface DispatchCliContext {
-  slot: number;
-  cwd: string;
-  cwdNote: string;
-}
-
 /** Parse the slot number from the first positional argument. */
 export function parseSlot(arg: string | undefined): number | { error: string } {
   if (!arg || !/^\d+$/.test(arg)) {
@@ -867,6 +861,28 @@ export function resolvePrompt(
   return { prompt: joined };
 }
 
+/**
+ * Shared preamble for all three dispatch handlers: parse slot, resolve cwd.
+ * Returns either a ready-to-use context or a CommandResult-shaped error
+ * (caller returns it directly).
+ */
+function dispatchPreamble(
+  args: string[],
+  options: DispatchCliOptions,
+  usage: string,
+):
+  | { slot: number; cwd: string; cwdNote: string; positional: string[] }
+  | { error: CommandResult } {
+  const positional = args.filter((a) => !a.startsWith('--'));
+  const slotResult = parseSlot(positional[0]);
+  if (typeof slotResult === 'object' && 'error' in slotResult) {
+    return { error: { exitCode: 1, output: `Error: ${slotResult.error}\n\n${usage}` } };
+  }
+  const cwdResult = resolveDispatchCwd(slotResult, options.cwd);
+  if ('error' in cwdResult) return { error: { exitCode: 1, output: `Error: ${cwdResult.error}` } };
+  return { slot: slotResult, cwd: cwdResult.cwd, cwdNote: cwdResult.note, positional };
+}
+
 /** Validate / clamp --max-budget. */
 export function parseMaxBudget(raw: string | undefined): { value: number | undefined } | { error: string } {
   if (raw === undefined) return { value: undefined };
@@ -878,24 +894,16 @@ export function parseMaxBudget(raw: string | undefined): { value: number | undef
 }
 
 async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
-  const positional = args.filter((a) => !a.startsWith('--'));
-  const slotResult = parseSlot(positional[0]);
-  if (typeof slotResult === 'object' && 'error' in slotResult) {
-    return { exitCode: 1, output: `Error: ${slotResult.error}\n\nUsage: crux sys agent-workspace dispatch <N> "<prompt>" [options]` };
-  }
-  const slot = slotResult;
+  const usage = 'Usage: crux sys agent-workspace dispatch <N> "<prompt>" [options]';
+  const ctx = dispatchPreamble(args, options, usage);
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd, cwdNote, positional } = ctx;
 
   const promptResult = resolvePrompt(positional.slice(1), options);
   if ('error' in promptResult) {
-    return {
-      exitCode: 1,
-      output: `Error: ${promptResult.error}\n\nUsage: crux sys agent-workspace dispatch <N> "<prompt>" [options]`,
-    };
+    return { exitCode: 1, output: `Error: ${promptResult.error}\n\n${usage}` };
   }
   const prompt = promptResult.prompt;
-
-  const cwdResult = resolveDispatchCwd(slot, options.cwd);
-  if ('error' in cwdResult) return { exitCode: 1, output: `Error: ${cwdResult.error}` };
 
   if (options.permissionMode !== undefined && !isPermissionMode(options.permissionMode)) {
     return {
@@ -914,7 +922,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   const maxBudgetUsd = budgetResult.value;
 
   const env = realDispatchEnv();
-  const paths = makeDispatchPaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwd);
 
   if (!options.force) {
     const conflict = detectDispatchConflict(env, paths);
@@ -928,16 +936,14 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
           `Use 'dispatch-status ${slot}' to watch, 'dispatch-stop ${slot}' to cancel, or --force to override.`,
       };
     }
-    // Stale pointer: detectConflict returns null when pid is dead; clear it quietly.
-    clearDispatchCurrent(env, paths);
-  } else {
-    // --force: always clear before spawning
-    clearDispatchCurrent(env, paths);
   }
+  // Both the no-conflict and --force paths unlink any existing pointer before
+  // spawning so the new current.json can take ownership cleanly.
+  clearDispatchCurrent(env, paths);
 
   const dispatchOpts: DispatchOptions = {
     slot,
-    cwd: cwdResult.cwd,
+    cwd,
     prompt,
     model: options.model,
     maxBudgetUsd,
@@ -956,7 +962,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
 
   const { handle } = result;
   const output =
-    `Dispatched to slot a${slot}${cwdResult.note}\n` +
+    `Dispatched to slot a${slot}${cwdNote}\n` +
     `  run:      ${handle.runId}\n` +
     `  session:  ${handle.sessionId}\n` +
     `  pid:      ${handle.pid}\n` +
@@ -976,7 +982,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
           sessionId: handle.sessionId,
           pid: handle.pid,
           runDir: handle.runDir,
-          cwd: cwdResult.cwd,
+          cwd,
           startedAt: handle.startedAt,
           cmd: handle.cmd,
         },
@@ -989,20 +995,14 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
 }
 
 async function dispatchStatusCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
-  const positional = args.filter((a) => !a.startsWith('--'));
-  const slotResult = parseSlot(positional[0]);
-  if (typeof slotResult === 'object' && 'error' in slotResult) {
-    return { exitCode: 1, output: `Error: ${slotResult.error}\n\nUsage: crux sys agent-workspace dispatch-status <N> [--tail=N] [--json]` };
-  }
-  const slot = slotResult;
-
-  const cwdResult = resolveDispatchCwd(slot, options.cwd);
-  if ('error' in cwdResult) return { exitCode: 1, output: `Error: ${cwdResult.error}` };
+  const ctx = dispatchPreamble(args, options, 'Usage: crux sys agent-workspace dispatch-status <N> [--tail=N] [--json]');
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd } = ctx;
 
   const tail = options.tail ? Math.max(1, parseInt(options.tail, 10) || 0) : 10;
 
   const env = realDispatchEnv();
-  const paths = makeDispatchPaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwd);
 
   const current = readDispatchCurrent(env, paths);
   if (!current) {
@@ -1069,18 +1069,12 @@ async function dispatchStatusCmd(args: string[], options: DispatchCliOptions): P
 }
 
 async function dispatchStopCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
-  const positional = args.filter((a) => !a.startsWith('--'));
-  const slotResult = parseSlot(positional[0]);
-  if (typeof slotResult === 'object' && 'error' in slotResult) {
-    return { exitCode: 1, output: `Error: ${slotResult.error}\n\nUsage: crux sys agent-workspace dispatch-stop <N>` };
-  }
-  const slot = slotResult;
-
-  const cwdResult = resolveDispatchCwd(slot, options.cwd);
-  if ('error' in cwdResult) return { exitCode: 1, output: `Error: ${cwdResult.error}` };
+  const ctx = dispatchPreamble(args, options, 'Usage: crux sys agent-workspace dispatch-stop <N>');
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd } = ctx;
 
   const env = realDispatchEnv();
-  const paths = makeDispatchPaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwd);
 
   const current = readDispatchCurrent(env, paths);
   if (!current) {

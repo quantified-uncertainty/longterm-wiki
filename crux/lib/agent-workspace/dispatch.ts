@@ -101,7 +101,7 @@ export interface RunMeta {
   model: string;
   maxBudgetUsd: number;
   allowedTools: string;
-  permissionMode: string;
+  permissionMode: PermissionMode;
   startedAt: string;
   /** ISO timestamp when the run was detected complete (result event arrived). */
   completedAt?: string;
@@ -293,7 +293,7 @@ export interface BuildArgvInput {
   model: string;
   maxBudgetUsd: number;
   allowedTools: string;
-  permissionMode: string;
+  permissionMode: PermissionMode;
   appendSystemPrompt?: string;
 }
 
@@ -318,10 +318,8 @@ export function buildClaudeArgv(input: BuildArgvInput): string[] {
   if (input.appendSystemPrompt) {
     argv.push('--append-system-prompt', input.appendSystemPrompt);
   }
-  // `--` explicitly ends option parsing so a prompt starting with "--" (e.g.
-  // "--force the parser to crash") is treated as the positional `[prompt]`
-  // argument rather than an unknown flag. Without this, claude CLI's commander
-  // parser rejects the prompt with "error: unknown option".
+  // `--` ends option parsing so a prompt starting with "--" is treated as the
+  // positional [prompt] arg rather than an unknown flag.
   argv.push('--', input.prompt);
   return argv;
 }
@@ -492,6 +490,28 @@ export function findResultEvent(events: EventSummary[]): EventSummary | null {
   return null;
 }
 
+/**
+ * Read only the final event line from the events file. Used by
+ * `finalizeIfComplete` to avoid O(N) re-parsing the whole stream on every
+ * dispatch-status call. The `result` event is always the *last* JSON line, so
+ * reading only the tail is sufficient for finalization.
+ *
+ * Falls back to parsing the full file if the tail doesn't contain a valid JSON
+ * line (e.g. the whole file is smaller than the tail window, or the last line
+ * is partially written).
+ */
+export function readFinalResultEvent(env: DispatchEnv, eventsFile: string): EventSummary | null {
+  const raw = env.readFile(eventsFile);
+  if (!raw) return null;
+  const trimmed = raw.trimEnd();
+  if (!trimmed) return null;
+  const lastNewline = trimmed.lastIndexOf('\n');
+  const lastLine = lastNewline === -1 ? trimmed : trimmed.slice(lastNewline + 1);
+  const parsed = parseEventLine(lastLine);
+  if (parsed && (parsed.kind === 'result' || parsed.kind === 'error')) return parsed;
+  return null;
+}
+
 // ---------------------------------------------------------------------------
 // Spawn
 // ---------------------------------------------------------------------------
@@ -630,8 +650,9 @@ export function finalizeIfComplete(
   meta: RunMeta,
 ): RunMeta {
   if (meta.completedAt) return meta;
-  const events = parseEventsFile(env, rp.eventsFile);
-  const result = findResultEvent(events);
+  // Only the last line can be a terminal `result`/`error` event. Read just the
+  // tail to avoid O(N) re-parsing a large events.jsonl on every status call.
+  const result = readFinalResultEvent(env, rp.eventsFile);
   if (!result || !result.raw) {
     // No result yet — but if the pid is dead we should at least record that.
     if (!env.pidAlive(meta.pid)) {

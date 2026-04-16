@@ -53,6 +53,10 @@ crux/coverage/
 # Agent workspace slot marker (per-clone, written by `crux agent-workspace setup`)
 .agent-slot
 
+# Per-slot dispatch state: run dirs, events.jsonl, meta.json (QUA-554).
+# Contains prompts + cost data; not checked in.
+.dispatch/
+
 # Claude Code temp files
 .claude/temp/
 .claude/plan.md

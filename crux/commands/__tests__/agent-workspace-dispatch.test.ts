@@ -5,10 +5,9 @@ import { tmpdir } from 'os';
 import { parseSlot, resolvePrompt, parseMaxBudget } from '../agent-workspace.ts';
 
 /**
- * Handler-level unit tests for `./ws dispatch` arg-parsing. These are the
- * invariants the hostile PR review flagged: --permission-mode must validate,
- * prompts containing `--` must not silently vanish, --max-budget must reject
- * garbage, etc. Pure functions only — no fs/spawn side effects.
+ * Handler-level unit tests for the `./ws dispatch` arg parsers: slot
+ * validation, budget validation, prompt resolution (file/flag/positional).
+ * Pure functions only — no fs spawn side effects.
  */
 
 describe('parseSlot', () => {
@@ -91,9 +90,9 @@ describe('resolvePrompt', () => {
     });
   });
 
-  it('--prompt= supports a prompt that starts with two dashes (the hostile-review edge case)', () => {
-    // This is the specific hazard the review flagged: positional filter drops --foo tokens.
-    // Using --prompt= bypasses the filter cleanly.
+  it('--prompt= preserves a prompt that starts with two dashes', () => {
+    // Positional args get filtered by !startsWith("--"), so prompts with
+    // leading dashes must come through --prompt= or --prompt-file=.
     expect(resolvePrompt([], { prompt: '--force the compiler to crash and summarize' })).toEqual({
       prompt: '--force the compiler to crash and summarize',
     });
