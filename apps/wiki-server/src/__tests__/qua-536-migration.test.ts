@@ -53,13 +53,13 @@ describe("QUA-536 Phase A migration structure", () => {
     );
   });
 
-  it("Drizzle journal includes entry 0184", () => {
+  it("Drizzle journal includes a 0184_qua_536 entry with matching idx", () => {
     const journal = JSON.parse(readFileSync(JOURNAL, "utf-8"));
     const entry = journal.entries.find(
       (e: { tag: string }) => e.tag === "0184_qua_536_populate_resources_stable_id",
     );
     expect(entry).toBeDefined();
-    expect(entry.idx).toBe(183);
+    expect(entry.idx).toBe(184);
   });
 
   describe("manual script", () => {
