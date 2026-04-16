@@ -1,0 +1,19 @@
+-- QUA-536 Phase A: populate NULL `resources.stable_id` + NOT NULL constraint.
+--
+-- This Drizzle entry is a no-op because the actual work is a multi-step
+-- transactional script that drops and re-adds FK constraints on `things.id`,
+-- generates random `sid_`-prefixed stable_ids for ~17,764 rows, and updates
+-- ~22,251 `things.id` values to match. It must be applied manually during
+-- the deploy:
+--
+--   psql "$DATABASE_MIGRATION_URL" -v ON_ERROR_STOP=1 \
+--     -f apps/wiki-server/scripts/qua-536-populate-resources-stable-id.sql
+--
+-- The script is self-verifying (pre-conditions abort on mismatch; post-
+-- conditions confirm zero NULL rows, no bare10, format compliance, no
+-- stale things rows). See the script header for full details.
+--
+-- Unblocks QUA-492 Phase 1 closeout (CHECK constraints on resources.stable_id).
+-- Phase B (migrate 17 FK tables from resources.id → resources.stable_id) is
+-- tracked in QUA-549 and blocks on this migration.
+SELECT 1;
