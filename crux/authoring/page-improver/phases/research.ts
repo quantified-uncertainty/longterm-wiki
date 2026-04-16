@@ -58,12 +58,83 @@ export function buildSourceCache(
   return cache;
 }
 
+/**
+ * Default minimum usable sources required by the research-phase gate.
+ * Tuned to catch the QUA-315 failure mode (0/4 successful improves on
+ * placeholder-heavy pages) without blocking legitimate edge cases.
+ *   - standard: 1 (any usable source — light bar)
+ *   - deep:    3 (the deep tier's whole purpose is multi-source grounding)
+ */
+export function defaultMinSources(deep: boolean): number {
+  return deep ? 3 : 1;
+}
+
+export interface SourceGateInput {
+  /** Source-cache entries built from the LLM's returned URLs + fetcher output. */
+  sourceCache: SourceCacheEntry[] | undefined;
+  /** Number of HTTP URLs the LLM agent returned (for the diagnostic message). */
+  totalUrls: number;
+  /** Number of LLM-returned source records (for the diagnostic message). */
+  llmSourceCount: number;
+  /**
+   * Tier-aware minimum (already resolved from options.minSources / defaults).
+   * Set to 0 to disable the gate.
+   */
+  minSources: number;
+}
+
+export interface SourceGateReport {
+  /** True if the gate passed (or was disabled). */
+  passed: boolean;
+  /** True if the gate is enforcing (minSources > 0). */
+  active: boolean;
+  /** Count of usable cache entries (above the content-length threshold). */
+  usableSources: number;
+  /** Number of cache entries (regardless of usability). */
+  cacheEntries: number;
+  /** Content-length threshold below which an entry doesn't count as usable. */
+  contentThreshold: number;
+  /** Diagnostic message to pair with the throw / log. */
+  diagnostic: string;
+}
+
+/**
+ * Pure gate evaluation for the research phase. Decides whether the
+ * downstream improve phase should be allowed to run based on how many
+ * fetched sources actually carry usable content.
+ *
+ * Extracted from researchPhase so it can be unit-tested without mocking
+ * the LLM agent or the network. (QUA-315)
+ */
+export function evaluateSourceGate(input: SourceGateInput): SourceGateReport {
+  const { sourceCache, totalUrls, llmSourceCount, minSources } = input;
+  const cacheEntries = sourceCache?.length || 0;
+  const usableSources = (sourceCache || []).filter(
+    e => e.url && e.content && e.content.length > MIN_SOURCE_CONTENT_LENGTH,
+  ).length;
+  const active = minSources > 0;
+  const passed = !active || usableSources >= minSources;
+
+  const diagnostic =
+    `Got ${usableSources} usable source(s); need at least ${minSources}. ` +
+    `Diagnostics: LLM agent returned ${llmSourceCount} sources with ${totalUrls} HTTP URL(s); ` +
+    `${cacheEntries} were cached, ${usableSources} had usable content ` +
+    `(>${MIN_SOURCE_CONTENT_LENGTH} chars).`;
+
+  return { passed, active, usableSources, cacheEntries, contentThreshold: MIN_SOURCE_CONTENT_LENGTH, diagnostic };
+}
+
 export async function researchPhase(page: PageData, analysis: AnalysisResult, options: PipelineOptions): Promise<ResearchResult> {
   log('research', 'Starting research');
 
   const topics: string[] = analysis.researchNeeded || [];
   if (topics.length === 0) {
-    log('research', 'No research topics identified, skipping');
+    // Analysis decided no research is needed. This is sometimes legitimate
+    // (high-quality page with style-only gaps) but also a known silent-
+    // failure mode where the analyzer under-detects citation gaps. We
+    // surface it as a warning so reviewers see it in the log; the source
+    // gate does not fire because no fetch was attempted.
+    log('research', '⚠ No research topics identified by analysis — skipping research. If the page has placeholder citations, this is a misjudgment; consider re-running with --tier=deep or filing a follow-up.');
     return { sources: [] };
   }
 
@@ -186,6 +257,37 @@ Output ONLY valid JSON at the end.`;
       const error = err instanceof Error ? err : new Error(String(err));
       log('research', `  ⚠ Source fetching failed: ${error.message} — continuing without source cache`);
     }
+  }
+
+  // Source-coverage gate (QUA-315): abort before the expensive improve pass
+  // when too few real sources landed. Otherwise synthesis hallucinates
+  // placeholder `[^N]: Research data on X` footnotes.
+  const minSources = options.minSources ?? defaultMinSources(options.deep === true);
+  const gate = evaluateSourceGate({
+    sourceCache: research.sourceCache,
+    totalUrls: urls.length,
+    llmSourceCount: research.sources?.length || 0,
+    minSources,
+  });
+
+  log('research',
+    `Source coverage report: ${research.sources?.length || 0} LLM sources, ${urls.length} URL(s) returned, ` +
+    `${gate.cacheEntries} cache entries, ${gate.usableSources} usable (>${gate.contentThreshold} chars).`,
+  );
+  if (gate.active) {
+    log('research', `Source gate: minSources=${minSources}, ${gate.passed ? 'PASS' : 'FAIL'} (use --skip-source-gate to bypass).`);
+  } else {
+    log('research', 'Source gate: disabled (minSources=0)');
+  }
+
+  if (!gate.passed) {
+    throw new Error(
+      `research: source-coverage gate failed for "${page.title}" (page ${page.id}). ` +
+      `${gate.diagnostic} ` +
+      `Aborting before improve to avoid synthesizing placeholder citations. ` +
+      `Use --skip-source-gate to override, --min-sources=N to lower the threshold, ` +
+      `or investigate why the research agent (Perplexity/SCRY/web_search) returned no usable URLs for this topic. (QUA-315)`,
+    );
   }
 
   return research;

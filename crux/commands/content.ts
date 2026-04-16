@@ -14,7 +14,7 @@ const SCRIPTS: Record<string, ScriptConfig> = {
   improve: {
     script: 'authoring/page-improver/index.ts',
     description: 'Improve an existing page with AI assistance',
-    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis', 'api-direct'],
+    passthrough: ['ci', 'tier', 'directions', 'dryRun', 'dry-run', 'apply', 'grade', 'no-grade', 'triage', 'skip-session-log', 'skip-enrich', 'section-level', 'engine', 'citation-gate', 'skip-citation-gate', 'skip-citation-audit', 'citation-audit-model', 'batch', 'batch-file', 'batch-budget', 'page-timeout', 'resume', 'report-file', 'no-save-artifacts', 'output', 'limit', 'openrouter', 'gap-analysis', 'api-direct', 'skip-source-gate', 'min-sources'],
     positional: true,
   },
   iterate: {
@@ -106,6 +106,8 @@ Options:
   --skip-citation-gate  Allow --apply even if citation audit fails (default: gate ON) (improve)
   --skip-citation-audit  Skip citation audit phase (improve)
   --citation-audit-model Override LLM model for citation checking (improve)
+  --skip-source-gate    Allow improve to proceed when research lands few usable sources (improve)
+  --min-sources=N       Min usable research sources before improve runs; default standard=1 deep=3 (improve)
   --batch=id1,id2     Batch mode: comma-separated page IDs (improve, requires --engine=v2)
   --batch-file=f.txt  Batch mode: file with page IDs (improve, requires --engine=v2)
   --batch-budget=N    Stop batch when cumulative cost exceeds $N (improve)
