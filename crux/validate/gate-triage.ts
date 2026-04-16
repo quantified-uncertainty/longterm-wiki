@@ -131,7 +131,6 @@ const STEP_DESCRIPTIONS: Record<string, string> = {
   'typecheck-crux': 'TypeScript type check for crux/. Relevant when crux TS files change.',
   'returning-guard': 'Drizzle .returning() guard for wiki-server. Relevant when wiki-server TS files change.',
   'mdx-compile': 'MDX compilation smoke-test. Relevant when MDX content or app components change.',
-  'typecheck-crux-baseline': 'Crux TypeScript baseline check. Relevant when crux TS files change.',
 };
 
 const SYSTEM_PROMPT = `You are a CI triage assistant. Given a summary of changed files in a git push, decide which gate checks can be safely SKIPPED.

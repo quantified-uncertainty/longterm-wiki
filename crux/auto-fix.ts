@@ -41,11 +41,6 @@ interface FixerResult {
 // Define fixable validators with their commands
 const fixers: Fixer[] = [
   {
-    name: 'EntityLink Conversion',
-    description: 'Convert markdown links to EntityLink components',
-    command: 'node --import tsx/esm crux/validate/validate-entity-links.ts --fix',
-  },
-  {
     name: 'Escaping (dollars, comparisons, tildes)',
     description: 'Escape special characters for LaTeX/JSX',
     command: 'node --import tsx/esm crux/validate/validate-unified.ts --rules=dollar-signs,comparison-operators,tilde-dollar --fix',

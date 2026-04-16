@@ -15,12 +15,6 @@ const SCRIPTS = {
     description: 'Run all auto-fixers',
     passthrough: ['dryRun', 'ci'],
   },
-  'entity-links': {
-    script: 'validate/validate-entity-links.ts',
-    description: 'Convert markdown links to EntityLink',
-    passthrough: ['ci'],
-    extraArgs: ['--fix'],
-  },
   'cross-links': {
     script: 'fix/fix-cross-links.ts',
     description: 'Add EntityLinks to plain text entity mentions',
@@ -107,7 +101,6 @@ Options:
 Examples:
   crux w fix                          Run all auto-fixers
   crux w fix --dry-run                Preview all fixes
-  crux w fix entity-links             Convert markdown links to EntityLink
   crux w fix escaping                 Fix all escaping issues
   crux w fix markdown                 Fix markdown formatting
   crux w fix related-pages            Remove redundant Related Pages sections

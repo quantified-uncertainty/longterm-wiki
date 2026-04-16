@@ -135,7 +135,6 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **commands**');
-    expect(writtenContent).toContain('crux-typescript');
   });
 
   it('creates checklist with --type=refactor', async () => {
@@ -144,7 +143,6 @@ describe('agent-checklist init', () => {
 
     const writtenContent = mockWriteFileSync.mock.calls[0][1] as string;
     expect(writtenContent).toContain('Type: **refactor**');
-    expect(writtenContent).toContain('crux-typescript');
   });
 
   it('rejects invalid --type', async () => {

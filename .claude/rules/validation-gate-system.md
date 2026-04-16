@@ -4,7 +4,7 @@ Subsystem map for the `crux/validate/` validator system, the gate check, and how
 
 ## Why this file exists
 
-There are **56 `validate-*.ts` files** in `crux/validate/` (plus ~20 test files and a handful of shared helpers). Gate logic is spread across `validate-gate.ts`, `validate-data.ts`, and `validate-daily.ts`. Agents adding a new check commonly:
+There are **52 `validate-*.ts` files** in `crux/validate/` (plus ~20 test files and a handful of shared helpers). Gate logic is spread across `validate-gate.ts`, `validate-data.ts`, and `validate-daily.ts`. Agents adding a new check commonly:
 - Wire it into the wrong pipeline (daily instead of gate)
 - Miss the blocking-vs-advisory distinction
 - Duplicate existing validators (four separate `validate-factbase-*-refs.ts` files exist)
@@ -67,24 +67,22 @@ There are **56 `validate-*.ts` files** in `crux/validate/` (plus ~20 test files 
 Selected from `validate-gate.ts::parallelChecks`. Line numbers in the file.
 
 ### Content & syntax (blocking)
-- `Unified blocking rules` (242) — MDX syntax, frontmatter, wiki IDs, EntityLink, pipeline artifacts
-- `YAML schema` (253)
-- `Conflict marker detection` (345)
-- `MDX compilation smoke-test` (370, advisory)
+- `Unified blocking rules` — MDX syntax, frontmatter, wiki IDs, EntityLink, pipeline artifacts
+- `YAML schema`
+- `MDX compilation smoke-test` (advisory)
 
 ### Code quality (blocking)
-- `.returning() guard check` (279) — Drizzle writes must handle empty return
-- `Drizzle migration journal integrity` (286) — unique prefixes
-- `No untyped row casts in routes` (293) — blocks `(r: any)` in wiki-server
-- `No console.log in server code` (300)
-- `No inline limit clamping in routes (use clampedLimit)` (307)
-- `Prompt XML interpolation escaping` (314) — enforces `escapeXml()`
-- `Data-integrity anti-patterns` (321) — silent catch, `as any` in routes, `skipEntityValidation` without reason
-- `No inline apiRequest<{...}> types` (335, advisory) — enforces typed wiki-server clients
+- `.returning() guard check` — Drizzle writes must handle empty return
+- `Drizzle migration journal integrity` — unique prefixes
+- `No untyped row casts in routes` — blocks `(r: any)` in wiki-server
+- `No console.log in server code`
+- `No inline limit clamping in routes (use clampedLimit)`
+- `Prompt XML interpolation escaping` — enforces `escapeXml()`
+- `Data-integrity anti-patterns` — silent catch, `as any` in routes, `skipEntityValidation` without reason
 
 ### TypeScript (blocking/advisory)
-- `TypeScript type check — app` (260, blocking)
-- `TypeScript type check — crux` (267, advisory; baseline enforced separately)
+- `TypeScript type check — app` (blocking)
+- `TypeScript type check — crux` (advisory)
 
 ### FactBase / TableBase (blocking)
 - `FactBase lookups use stableIds (not slugs)` (328)
@@ -125,11 +123,10 @@ Selected from `validate-gate.ts::parallelChecks`. Line numbers in the file.
 - `Component reference validation` (381)
 
 ### Advisory-only
-- `Directory page data quality` (475)
-- `Cross-page numeric consistency` (616)
-- `Stale content detection` (628)
-- `Cross-page date consistency` (639)
-- `PR review status` (388)
+- `Directory page data quality`
+- `Cross-page numeric consistency`
+- `Stale content detection`
+- `Cross-page date consistency`
 
 ## Shared infrastructure in `crux/validate/`
 
@@ -141,20 +138,20 @@ Non-validator files you should know exist before writing new helpers:
 - `check-staleness.ts` — staleness check utility
 - `to-rdjsonl.ts` — rdjsonl output formatter
 - `cross-check-people.ts` — person reference cross-check helper
-- `__tests__/` — test-only validators (e.g. `validate-manual-api-types.test.ts`, `validate-prompt-escaping.test.ts`)
+- `__tests__/` — test-only validators (e.g. `validate-prompt-escaping.test.ts`)
 
-## The 56 validators (by concern)
+## The validators (by concern)
 
 Grouped by what they check. **Before writing a new validator, grep this list.**
 
-- **Entity refs**: `entity-refs`, `entity-links`, `yaml-entity-refs`, `component-refs`, `internal-links`, `resource-refs`, `kb-entity-slugs`, `person-refs`, `soft-fks`
+- **Entity refs**: `entity-refs`, `yaml-entity-refs`, `component-refs`, `resource-refs`, `kb-entity-slugs`, `person-refs`, `soft-fks`
 - **FactBase**: `factbase-entities`, `factbase-entity-ids`, `factbase-stableid`, `factbase-record-refs`, `factbase-schema`
 - **IDs / SIDs**: `rendered-sid`, `sid-display`, `display-names`
 - **Schema / compile**: `yaml-schema`, `mdx-compile`, `temporal`, `numeric-consistency`, `controlled-vocab`
-- **Code quality**: `no-console-log`, `returning-guard`, `untyped-rows`, `prompt-escaping`, `dangerous-patterns`, `drizzle-journal`, `manual-api-types`, `conflict-markers`
+- **Code quality**: `no-console-log`, `returning-guard`, `untyped-rows`, `prompt-escaping`, `dangerous-patterns`, `drizzle-journal`
 - **Source-check**: `source-check-coverage`, `source-check-names`, `tablebase-completeness`, `dot-position`, `display-formatting`
-- **Content quality**: `review-marker`, `hallucination-risk`, `financials`, `cross-base`, `cross-page-dates`, `stale-content`, `related-entry-types`, `directory-pages`
-- **Infra**: `actions-yaml`, `inline-pagination`, `crux-tsc`
+- **Content quality**: `hallucination-risk`, `financials`, `cross-base`, `cross-page-dates`, `stale-content`, `related-entry-types`, `directory-pages`
+- **Infra**: `inline-pagination`
 - **Resources**: `resource-refs`, `resource-quality`, `orphan-entities`
 - **Data integrity**: `data`, `consistency`, `quality`, `daily`, `unified`
 

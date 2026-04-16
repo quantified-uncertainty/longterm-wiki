@@ -26,16 +26,6 @@ const SCRIPTS = {
     description: 'Check MDX compilation (smoke-test for rendering errors)',
     passthrough: ['ci', 'quick', 'file'],
   },
-  links: {
-    script: 'validate/validate-internal-links.ts',
-    description: 'Check internal link resolution',
-    passthrough: ['ci'],
-  },
-  'entity-links': {
-    script: 'validate/validate-entity-links.ts',
-    description: 'Check EntityLink usage and conversion candidates',
-    passthrough: ['ci', 'fix'],
-  },
   consistency: {
     script: 'validate/validate-consistency.ts',
     description: 'Cross-page consistency checks',

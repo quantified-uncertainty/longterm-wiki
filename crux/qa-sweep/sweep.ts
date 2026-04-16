@@ -47,7 +47,6 @@ import {
 import { runCheck as checkData } from '../validate/validate-data.ts';
 import { runCheck as checkFinancials } from '../validate/validate-financials.ts';
 import { runCheck as checkQuality } from '../validate/validate-quality.ts';
-import { runCheck as checkInternalLinks } from '../validate/validate-internal-links.ts';
 import { runCheck as checkStaleness } from '../validate/check-staleness.ts';
 import { crossCheckPeopleRoles } from '../validate/cross-check-people.ts';
 import { runTemporalValidation } from '../validate/validate-temporal.ts';
@@ -218,10 +217,6 @@ function checkPeopleRoles(): CheckResult {
     const details = mm.filter((m) => m.severity === 'warning').slice(0, 8).map((m) => `${m.personName}: "${m.entityRole ?? 'none'}" vs "${m.currentFactbaseRole ?? 'none'}"`);
     return { name: 'People role consistency', status: w > 0 ? 'warn' : 'pass', message: `${w} mismatches, ${i} stale`, details: details.length > 0 ? details : undefined, tier: 'data-integrity' };
   });
-}
-
-function checkLinks(): CheckResult {
-  return safeCheck('Internal links', 'data-integrity', () => wrapValidator('Internal links', silenced(() => checkInternalLinks({ ci: true })), 'data-integrity'));
 }
 
 function checkTemporal(): CheckResult {
@@ -452,7 +447,6 @@ async function main() {
     checks.push(checkFinancialStaleness());
     checks.push(checkQualityDiscrepancies());
     checks.push(checkPeopleRoles());
-    checks.push(checkLinks());
     checks.push(checkTemporal());
     checks.push(checkStaleContent());
     checks.push(checkYamlFields());

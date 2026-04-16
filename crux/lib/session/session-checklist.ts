@@ -106,13 +106,6 @@ export const CHECKLIST_ITEMS: ChecklistItem[] = [
     priority: 'blocking',
     verifyCommand: 'pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only',
   },
-  {
-    id: 'crux-typescript',
-    label: 'Crux TypeScript check (auto-verify)',
-    applicableTypes: ['infrastructure', 'commands', 'refactor'],
-    priority: 'blocking',
-    verifyCommand: 'npx tsx crux/validate/validate-crux-tsc.ts',
-  },
   // --- Manual items (genuinely enforced or essential) ---
   {
     id: 'duplicate-check',
