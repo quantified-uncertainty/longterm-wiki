@@ -76,6 +76,7 @@ import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-cov
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
 import { EntityProfileContent } from "@/app/internal/entity-profile/entity-profile-content";
 import { EntitySourcingContent } from "@/app/internal/entity-sourcing/entity-sourcing-content";
+import { SourcingCoverageContent } from "@/app/internal/sourcing-coverage/sourcing-coverage-content";
 import { DataQualityContent } from "@/app/internal/data-quality/data-quality-content";
 import { TalentFlowsContent } from "@/app/internal/talent-flows/talent-flows-content";
 import { JobsDashboardContent } from "@/app/internal/jobs/jobs-content";
@@ -240,6 +241,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   AgentActivityContent,
   EntityProfileContent,
   EntitySourcingContent,
+  SourcingCoverageContent,
   DataQualityContent,
   TalentFlowsContent,
   JobsDashboardContent,
