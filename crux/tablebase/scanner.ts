@@ -879,7 +879,10 @@ const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   ],
 };
 
-const NA_PATTERN = /^(n\/a|na)$/i;
+// Require the slash so legitimate 2-letter codes like "NA" (Namibia ISO-3166,
+// "Native American" category) don't get flagged as gaps. "n/a" with the slash
+// is the conventional not-available marker.
+const NA_PATTERN = /^n\s*\/\s*a$/i;
 
 type FieldValueClass = 'null' | 'empty' | 'na' | 'filled';
 
@@ -924,7 +927,9 @@ export function profileFields<T extends { id: string }>(
     const nullPct = pct(nullCount, total);
     const emptyPct = pct(emptyCount, total);
     const naPct = pct(naCount, total);
-    const gapPct = Math.min(100, Math.round((nullPct + emptyPct + naPct) * 10) / 10);
+    // Derived from raw counts, not summed percentages, so 1 null + 1 empty +
+    // 1 na of 3 rows reports 100.0% (not 99.9% from rounding each component).
+    const gapPct = pct(nullCount + emptyCount + naCount, total);
 
     return {
       field,

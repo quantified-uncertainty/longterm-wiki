@@ -114,6 +114,12 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
 
   if (options.table) {
     const wantsFields = options.fields && FIELD_GAP_TABLES.includes(options.table as string);
+    if (options.fields && !wantsFields) {
+      console.warn(
+        `[tablebase] --fields not supported for table '${options.table}'; ` +
+        `supported: ${FIELD_GAP_TABLES.join(', ')}`,
+      );
+    }
     const [result, fieldReports] = await Promise.all([
       runTableScan(options.table as string),
       wantsFields ? runFieldGapScan([options.table as string]) : Promise.resolve(undefined),

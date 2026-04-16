@@ -366,6 +366,57 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
     expect(divType.nullPct).toBe(50);
   });
 
+  it('profileFields: gapPct from raw counts avoids summed-rounding undershoot', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    // 1 null + 1 empty + 1 n/a out of 3 rows. Summing rounded pcts would give
+    // 33.3 + 33.3 + 33.3 = 99.9, but gapPct must be a true 100.
+    const rows = [
+      { id: 'r1', x: null },
+      { id: 'r2', x: '' },
+      { id: 'r3', x: 'n/a' },
+    ];
+    const report = profileFields('t', rows, [{ field: 'x', columnType: 'string' }]);
+    expect(report.fields[0].gapPct).toBe(100);
+  });
+
+  it('classifyValue: "NA" (no slash) is treated as filled, only "n/a" patterns are gaps', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = [
+      { id: 'r1', x: 'NA' },   // country code, category, etc. — filled
+      { id: 'r2', x: 'na' },   // same — filled (no slash)
+      { id: 'r3', x: 'n/a' },  // gap
+      { id: 'r4', x: 'N / A' },// gap (whitespace around slash)
+    ];
+    const report = profileFields('t', rows, [{ field: 'x', columnType: 'string' }]);
+    expect(report.fields[0].naCount).toBe(2);
+    expect(report.fields[0].gapPct).toBe(50);
+  });
+
+  it('formatFieldGapReports: renders top-N fields per table with gap%, sample IDs', async () => {
+    const { formatFieldGapReports } = await import('./reporter.ts');
+    const output = formatFieldGapReports([
+      {
+        table: 'divisions',
+        totalRows: 5,
+        fields: [
+          { field: 'lead', columnType: 'id', total: 5, nullCount: 4, emptyCount: 0, naCount: 0, nullPct: 80, emptyPct: 0, naPct: 0, gapPct: 80, sampleMissingRows: ['d1', 'd2', 'd3'] },
+          { field: 'notes', columnType: 'string', total: 5, nullCount: 1, emptyCount: 0, naCount: 0, nullPct: 20, emptyPct: 0, naPct: 0, gapPct: 20, sampleMissingRows: ['d4'] },
+          { field: 'source', columnType: 'string', total: 5, nullCount: 0, emptyCount: 0, naCount: 0, nullPct: 0, emptyPct: 0, naPct: 0, gapPct: 0, sampleMissingRows: [] },
+        ],
+      },
+    ], { top: 2 });
+
+    expect(output).toContain('divisions');
+    expect(output).toContain('5 rows');
+    expect(output).toContain('lead');
+    expect(output).toContain('80%');
+    expect(output).toContain('d1, d2, d3');
+    expect(output).toContain('notes');
+    // Truncated due to top=2 — 3rd field (source) should NOT appear, footer should
+    expect(output).not.toContain('source');
+    expect(output).toMatch(/1 more field/);
+  });
+
   it('runFieldGapScan: filters to a single table when passed', async () => {
     const { runFieldGapScan } = await import('./scanner.ts');
     apiRequest.mockImplementation(async (_method: string, url: string) => {
