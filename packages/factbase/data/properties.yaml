@@ -398,6 +398,7 @@ properties:
     unit: employees
     category: safety
     temporal: true
+    verifiable: false  # Estimate; no published source
     appliesTo: [organization]
 
   interpretability-team-size:
@@ -407,6 +408,7 @@ properties:
     unit: employees
     category: safety
     temporal: true
+    verifiable: false  # Estimate; no published source
     appliesTo: [organization]
 
   # ── Additional Financial ──────────────────────────────────────
@@ -431,6 +433,7 @@ properties:
     unit: percent
     category: financial
     temporal: true
+    verifiable: false  # Estimate; no published source
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -442,6 +445,7 @@ properties:
     unit: percent
     category: financial
     temporal: true
+    verifiable: false  # Estimate; no published source
     appliesTo: [organization]
     display:
       suffix: "%"
@@ -544,6 +548,7 @@ properties:
     unit: percent
     category: safety
     temporal: true
+    verifiable: false  # Estimate; no published source
     appliesTo: [organization]
     display:
       suffix: "%"
