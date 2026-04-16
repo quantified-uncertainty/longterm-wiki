@@ -643,28 +643,28 @@ describe("Entities API", () => {
   // ---- Export ----
 
   describe("GET /api/entities/export", () => {
-    it("returns full entity shape for all entities", async () => {
+    it("returns full entity shape including JSONB fields with values", async () => {
       await seedEntity(app, "anthropic", "Anthropic", {
         entityType: "organization",
         description: "AI safety company",
-      });
-      await seedEntity(app, "deceptive-alignment", "Deceptive Alignment", {
-        entityType: "risk",
+        tags: ["ai", "safety"],
+        customFields: [{ label: "hq", value: "San Francisco" }],
+        metadata: { founded: "2021" },
       });
 
       const res = await app.request("/api/entities/export");
       expect(res.status).toBe(200);
       const body = await res.json();
-      expect(body.total).toBe(2);
-      expect(body.returned).toBe(2);
-      expect(body.entities).toHaveLength(2);
-      // Full shape: metadata, relatedEntries, customFields present
-      const anthropic = body.entities.find((e: { id: string }) => e.id === "anthropic");
-      expect(anthropic).toBeDefined();
-      expect(anthropic).toHaveProperty("metadata");
-      expect(anthropic).toHaveProperty("relatedEntries");
-      expect(anthropic).toHaveProperty("customFields");
-      expect(anthropic.description).toBe("AI safety company");
+      expect(body.entities).toHaveLength(1);
+      const entity = body.entities[0];
+      expect(entity.id).toBe("anthropic");
+      expect(entity.description).toBe("AI safety company");
+      expect(entity.tags).toEqual(["ai", "safety"]);
+      expect(entity.customFields).toEqual([{ label: "hq", value: "San Francisco" }]);
+      expect(entity.metadata).toMatchObject({ founded: "2021" });
+      expect(entity).toHaveProperty("syncedAt");
+      expect(entity).toHaveProperty("createdAt");
+      expect(entity).toHaveProperty("updatedAt");
     });
 
     it("filters by entityType", async () => {
@@ -699,6 +699,16 @@ describe("Entities API", () => {
       // Ordered by id ascending → offset=1 skips "a-ent"
       expect(body.entities[0].id).toBe("b-ent");
       expect(body.entities[1].id).toBe("c-ent");
+    });
+
+    it("accepts valid ISO-8601 updatedSince", async () => {
+      const res = await app.request(
+        `/api/entities/export?updatedSince=${new Date().toISOString()}`
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toHaveProperty("entities");
+      expect(body).toHaveProperty("total");
     });
 
     it("rejects invalid updatedSince", async () => {

@@ -55,9 +55,9 @@ const MAX_PAGE_SIZE = 500;
 
 /**
  * Maximum rows returned by GET /export in a single response.
- * Mirrors EXPORT_MAX_LIMIT in routes/factbase/facts.ts. Callers that need
- * more than this should paginate via `limit` + `offset` until `total` is
- * exhausted.
+ * Lower than facts.ts (50,000) because entities carry heavy JSONB columns
+ * (metadata, relatedEntries, customFields). Callers that need more should
+ * paginate via `limit` + `offset` until `total` is exhausted.
  */
 const EXPORT_MAX_LIMIT = 5000;
 
