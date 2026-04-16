@@ -640,6 +640,110 @@ describe("Entities API", () => {
     });
   });
 
+  // ---- Export ----
+
+  describe("GET /api/entities/export", () => {
+    it("returns full entity shape including JSONB fields with values", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+        description: "AI safety company",
+        tags: ["ai", "safety"],
+        customFields: [{ label: "hq", value: "San Francisco" }],
+        metadata: { founded: "2021" },
+      });
+
+      const res = await app.request("/api/entities/export");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.entities).toHaveLength(1);
+      const entity = body.entities[0];
+      expect(entity.id).toBe("anthropic");
+      expect(entity.description).toBe("AI safety company");
+      expect(entity.tags).toEqual(["ai", "safety"]);
+      expect(entity.customFields).toEqual([{ label: "hq", value: "San Francisco" }]);
+      expect(entity.metadata).toMatchObject({ founded: "2021" });
+      expect(entity).toHaveProperty("syncedAt");
+      expect(entity).toHaveProperty("createdAt");
+      expect(entity).toHaveProperty("updatedAt");
+    });
+
+    it("filters by entityType", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+      });
+      await seedEntity(app, "deceptive-alignment", "Deceptive Alignment", {
+        entityType: "risk",
+      });
+
+      const res = await app.request("/api/entities/export?entityType=organization");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(1);
+      expect(body.entities).toHaveLength(1);
+      expect(body.entities[0].id).toBe("anthropic");
+    });
+
+    it("supports pagination via limit and offset", async () => {
+      await seedEntity(app, "a-ent", "A");
+      await seedEntity(app, "b-ent", "B");
+      await seedEntity(app, "c-ent", "C");
+
+      const res = await app.request("/api/entities/export?limit=2&offset=1");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(3);
+      expect(body.returned).toBe(2);
+      expect(body.limit).toBe(2);
+      expect(body.offset).toBe(1);
+      expect(body.entities).toHaveLength(2);
+      // Ordered by id ascending → offset=1 skips "a-ent"
+      expect(body.entities[0].id).toBe("b-ent");
+      expect(body.entities[1].id).toBe("c-ent");
+    });
+
+    it("accepts valid ISO-8601 updatedSince", async () => {
+      const res = await app.request(
+        `/api/entities/export?updatedSince=${new Date().toISOString()}`
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toHaveProperty("entities");
+      expect(body).toHaveProperty("total");
+    });
+
+    it("rejects invalid updatedSince", async () => {
+      const res = await app.request("/api/entities/export?updatedSince=not-a-date");
+      expect(res.status).toBe(400);
+    });
+
+    it("rejects limit above the export cap", async () => {
+      const res = await app.request("/api/entities/export?limit=999999");
+      expect(res.status).toBe(400);
+    });
+
+    it("does not collide with GET /:id for the literal 'export' slug", async () => {
+      // Regression: route ordering must define /export before /:id, otherwise
+      // /export would match /:id with id="export" and return 404.
+      const res = await app.request("/api/entities/export");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body).toHaveProperty("entities");
+      expect(body).toHaveProperty("total");
+    });
+
+    it("returns an empty result with total 0 when no entities match", async () => {
+      await seedEntity(app, "anthropic", "Anthropic", {
+        entityType: "organization",
+      });
+      const res = await app.request("/api/entities/export?entityType=risk");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.total).toBe(0);
+      expect(body.returned).toBe(0);
+      expect(body.entities).toEqual([]);
+    });
+  });
+
   // ---- Sync with JSONB fields ----
 
   describe("JSONB fields", () => {
