@@ -1,13 +1,15 @@
 ---
-description: End the current session — log it, update issues, clean up. No shipping required.
+description: End the current session — log it, update issues, clean up, reset slot back to main. No shipping required.
 effort: low
 ---
 
-# Agent End — Close Out a Session
+# Agent End — Close Out a Session and Reset the Slot
 
-Lightweight session close. Use this when the session is done but you don't need to ship a PR.
+Session close + slot reset, bundled. Use this when the session is done but you don't need to ship a PR.
 
-For sessions that DO ship code, use `/agent-ship` instead (it calls `/agent-end` internally after shipping).
+This runs what used to be `/agent-end` followed by `/agent-reset`: logs the session, updates Linear/GitHub, kills the dev server, cleans artifacts, closes the DB-level agent, resets the branch to clean `main`, and renames the tmux window. After it finishes, run `/clear` then `/rename` to finish the slot handoff (those are built-ins and can't be invoked from a skill).
+
+For sessions that DO ship code, use `/agent-ship` instead (it has its own inline close-out).
 
 ## When to use `/agent-end` vs `/agent-ship`
 
@@ -126,12 +128,60 @@ git checkout -- .claude/simplify-done 2>/dev/null || rm -f .claude/simplify-done
 git checkout -- .claude/hooks/ 2>/dev/null || true
 ```
 
-## Step 6: Session summary
+## Step 6: Close session in DB (agents-level)
+
+Broader than the checklist-level close in Step 1 — marks the active agent as completed and logs the close event:
+
+```bash
+pnpm crux sys agents close 2>/dev/null || true
+```
+
+Best-effort: if the wiki-server is down, continue.
+
+## Step 7: Reset slot to clean main
+
+Bundles what `/agent-reset` used to do. **Safety first**: show the user what's about to be discarded, and pause if anything is uncommitted or unpushed.
+
+```bash
+BRANCH=$(git branch --show-current)
+echo "Current branch: $BRANCH"
+git status --porcelain
+git log --oneline "@{u}..HEAD" 2>/dev/null || echo "(no upstream to compare)"
+```
+
+If there are uncommitted changes or unpushed commits on a non-main branch, **ask the user before proceeding**. They may want to commit/push first. If the PR has already merged or the user confirms, continue.
+
+Discard local changes and switch to main:
+
+```bash
+git checkout -- .
+git clean -fd --exclude=.agent-slot --exclude=.envrc --exclude=.env
+
+if [ "$BRANCH" != "main" ]; then
+  AGENT_RESET=1 git checkout main
+  git pull --ff-only origin main || git reset --hard origin/main
+  git branch -D "$BRANCH" 2>/dev/null || true
+fi
+```
+
+Rename the tmux window back to the idle slot name (e.g. `A4`):
+
+```bash
+SLOT=$(cat .agent-slot 2>/dev/null | tr -d '[:space:]')
+if [ -n "$SLOT" ] && [ -n "$TMUX" ]; then
+  tmux rename-window "A${SLOT}"
+fi
+```
+
+## Step 8: Session summary + next steps
 
 Output a brief summary:
-- Branch name
+- Branch that was ended (and whether it was deleted)
 - What was done (1-2 sentences)
 - PR URL (if any)
 - Whether the checklist was completed
+- Final state: on `main`, clean
 
-That's it. The slot is now ready for the next session (or run `crux sys agent-reset --kill` for a full reset including pulling main).
+Then tell the user:
+
+> **Next:** run `/clear` to wipe context, then `/rename` to clear the Claude Code session name. (Both are built-ins and can't be invoked from a skill.)
