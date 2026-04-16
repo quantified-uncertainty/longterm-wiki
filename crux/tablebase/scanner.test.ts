@@ -225,3 +225,163 @@ describe('scanner — field-level completeness (QUA-24)', () => {
     expect(tasks.length).toBe(4);
   });
 });
+
+describe('scanner — field-gap profiler (QUA-551)', () => {
+  let apiRequest: ReturnType<typeof vi.fn>;
+
+  beforeEach(async () => {
+    const client = await import('../lib/wiki-server/client.ts');
+    apiRequest = vi.mocked(client.apiRequest);
+    apiRequest.mockReset();
+  });
+
+  it('profileFields: counts null / empty / "n/a" correctly and reports percentages', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = [
+      { id: 'd1', lead: 'sid_a', status: 'active', startDate: '2023-01', notes: 'ok' },
+      { id: 'd2', lead: null, status: 'active', startDate: null, notes: '' },
+      { id: 'd3', lead: '', status: 'inactive', startDate: 'N/A', notes: '  ' }, // empty lead, n/a startDate, whitespace notes
+      { id: 'd4', lead: '   ', status: null, startDate: null, notes: 'n/a' },     // whitespace = empty lead, n/a notes
+      { id: 'd5', lead: 'sid_b', status: 'active', startDate: '2024-06', notes: null },
+    ];
+    const report = profileFields('divisions', rows, [
+      { field: 'lead', columnType: 'id' },
+      { field: 'status', columnType: 'enum' },
+      { field: 'startDate', columnType: 'date' },
+      { field: 'notes', columnType: 'string' },
+    ]);
+
+    expect(report.table).toBe('divisions');
+    expect(report.totalRows).toBe(5);
+
+    const lead = report.fields.find(f => f.field === 'lead')!;
+    expect(lead.nullCount).toBe(1);
+    expect(lead.emptyCount).toBe(2); // "" and "   " both count as empty
+    expect(lead.naCount).toBe(0);
+    expect(lead.nullPct).toBe(20); // 1/5
+    expect(lead.emptyPct).toBe(40); // 2/5
+    expect(lead.gapPct).toBe(60);
+
+    const startDate = report.fields.find(f => f.field === 'startDate')!;
+    expect(startDate.nullCount).toBe(2);
+    expect(startDate.naCount).toBe(1); // "N/A" matches case-insensitively
+    expect(startDate.gapPct).toBe(60);
+
+    const notes = report.fields.find(f => f.field === 'notes')!;
+    expect(notes.nullCount).toBe(1);
+    expect(notes.emptyCount).toBe(2); // "" and "  "
+    expect(notes.naCount).toBe(1); // "n/a"
+    expect(notes.gapPct).toBe(80);
+
+    const status = report.fields.find(f => f.field === 'status')!;
+    expect(status.nullCount).toBe(1);
+    expect(status.gapPct).toBe(20);
+  });
+
+  it('profileFields: sorts fields by gapPct descending and caps sample rows at 3', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = Array.from({ length: 10 }, (_, i) => ({
+      id: `r${i}`,
+      a: null,          // 100% null
+      b: i < 5 ? null : 'x', // 50% null
+      c: 'always',      // 0% gap
+    }));
+    const report = profileFields('t', rows, [
+      { field: 'c', columnType: 'string' },
+      { field: 'a', columnType: 'string' },
+      { field: 'b', columnType: 'string' },
+    ]);
+
+    // Sorted by gap desc: a (100), b (50), c (0)
+    expect(report.fields.map(f => f.field)).toEqual(['a', 'b', 'c']);
+    const a = report.fields[0];
+    expect(a.nullPct).toBe(100);
+    expect(a.sampleMissingRows).toEqual(['r0', 'r1', 'r2']); // capped at 3
+    expect(a.sampleMissingRows.length).toBe(3);
+  });
+
+  it('profileFields: treats numeric 0 and boolean false as filled, not empty', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = [
+      { id: 'r1', score: 0, flag: false },
+      { id: 'r2', score: null, flag: null },
+    ];
+    const report = profileFields('t', rows, [
+      { field: 'score', columnType: 'number' },
+      { field: 'flag', columnType: 'boolean' },
+    ]);
+    const score = report.fields.find(f => f.field === 'score')!;
+    expect(score.nullCount).toBe(1);
+    expect(score.emptyCount).toBe(0);
+    expect(score.gapPct).toBe(50);
+
+    const flag = report.fields.find(f => f.field === 'flag')!;
+    expect(flag.nullCount).toBe(1);
+    expect(flag.emptyCount).toBe(0);
+  });
+
+  it('profileFields: empty row list yields 0 totalRows and 0% gaps', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const report = profileFields('t', [], [{ field: 'x', columnType: 'string' }]);
+    expect(report.totalRows).toBe(0);
+    expect(report.fields[0].gapPct).toBe(0);
+    expect(report.fields[0].total).toBe(0);
+  });
+
+  it('runFieldGapScan: fetches all 4 tables and returns per-table reports', async () => {
+    const { runFieldGapScan } = await import('./scanner.ts');
+
+    apiRequest.mockImplementation(async (_method: string, url: string) => {
+      if (url.startsWith('/api/divisions/all')) {
+        return { ok: true, data: {
+          divisions: [
+            { id: 'd1', parentOrgId: 'o1', name: 'A', divisionType: 'lab', lead: 'sid_x', status: 'active', startDate: null, endDate: null, website: null, source: null, notes: null },
+            { id: 'd2', parentOrgId: 'o1', name: 'B', divisionType: null, lead: null, status: 'active', startDate: null, endDate: null, website: null, source: null, notes: null },
+          ],
+          total: 2,
+        } };
+      }
+      if (url.startsWith('/api/division-personnel/all')) {
+        return { ok: true, data: { divisionPersonnel: [{ id: 'p1', divisionId: 'd1', personId: 'sid_p', role: 'Lead', startDate: '2023', endDate: null, source: null, notes: null }], total: 1 } };
+      }
+      if (url.startsWith('/api/funding-programs/all')) {
+        return { ok: true, data: { fundingPrograms: [{ id: 'fp1', orgId: 'o1', divisionId: null, name: 'RFP', description: 'Desc', programType: 'rfp', totalBudget: 100, currency: 'USD', applicationUrl: 'https://x', openDate: null, deadline: null, status: 'open', source: null, notes: null }], total: 1 } };
+      }
+      if (url.startsWith('/api/benchmark-results/all')) {
+        return { ok: true, data: { benchmarkResults: [{ id: 'br1', benchmarkId: 'mmlu', modelId: 'm1', score: 90, unit: '%', date: '2024', sourceUrl: null, notes: null }], total: 1 } };
+      }
+      return { ok: false, message: `unexpected ${url}` };
+    });
+
+    const reports = await runFieldGapScan();
+    expect(reports.length).toBe(4);
+    const byTable = Object.fromEntries(reports.map(r => [r.table, r]));
+    expect(byTable.divisions.totalRows).toBe(2);
+    expect(byTable.division_personnel.totalRows).toBe(1);
+    expect(byTable.funding_programs.totalRows).toBe(1);
+    expect(byTable.benchmark_results.totalRows).toBe(1);
+
+    // divisions: divisionType is 50% null, lead is 50% null
+    const divType = byTable.divisions.fields.find(f => f.field === 'divisionType')!;
+    expect(divType.nullPct).toBe(50);
+  });
+
+  it('runFieldGapScan: filters to a single table when passed', async () => {
+    const { runFieldGapScan } = await import('./scanner.ts');
+    apiRequest.mockImplementation(async (_method: string, url: string) => {
+      if (url.startsWith('/api/benchmark-results/all')) {
+        return { ok: true, data: { benchmarkResults: [{ id: 'br1', benchmarkId: 'b', modelId: 'm', score: null, unit: null, date: null, sourceUrl: null, notes: null }], total: 1 } };
+      }
+      return { ok: false, message: `should not call ${url}` };
+    });
+
+    const reports = await runFieldGapScan(['benchmark_results']);
+    expect(reports.length).toBe(1);
+    expect(reports[0].table).toBe('benchmark_results');
+    // score, unit, date, sourceUrl, notes all 100% null
+    for (const f of reports[0].fields) {
+      expect(f.nullPct).toBe(100);
+      expect(f.gapPct).toBe(100);
+    }
+  });
+});

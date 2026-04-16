@@ -61,6 +61,7 @@ interface CommandOptions extends BaseOptions {
   fromScanReport?: string;
   /** QUA-552: dollar budget cap for the whole run */
   budgetUsd?: string;
+  fields?: boolean;
 }
 
 async function persistScanResults(scan: import('../tablebase/types.ts').ScanSummary): Promise<void> {
@@ -94,32 +95,61 @@ async function persistScanResults(scan: import('../tablebase/types.ts').ScanSumm
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { runFullScan, runTableScan } = await import('../tablebase/scanner.ts');
-  const { formatScanSummary } = await import('../tablebase/reporter.ts');
+  const { runFullScan, runTableScan, runFieldGapScan, FIELD_GAP_TABLES } = await import('../tablebase/scanner.ts');
+  const { formatScanSummary, formatFieldGapReports } = await import('../tablebase/reporter.ts');
+
+  // --fields-only shortcut: skip the per-entity scan and only emit the
+  // field-gap report. Useful for quick enrichment triage.
+  if (options.fields && !options.table) {
+    const reports = await runFieldGapScan();
+    if (options.ci) {
+      return { exitCode: 0, output: JSON.stringify({ fieldReports: reports, timestamp: new Date().toISOString() }, null, 2) };
+    }
+    const top = options.top ? parseInt(options.top as string, 10) : undefined;
+    return { exitCode: 0, output: formatFieldGapReports(reports, { top }) };
+  }
 
   if (options.table) {
     const result = await runTableScan(options.table as string);
     if (!result) {
       return { exitCode: 1, output: `Unknown table: ${options.table}` };
     }
+    const fieldReports = options.fields && FIELD_GAP_TABLES.includes(options.table as string)
+      ? await runFieldGapScan([options.table as string])
+      : undefined;
+
     if (options.ci) {
-      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+      const out = fieldReports ? { ...result, fieldReports } : result;
+      return { exitCode: 0, output: JSON.stringify(out, null, 2) };
     }
-    const summary = { tables: [result], timestamp: new Date().toISOString() };
+    const summary = { tables: [result], fieldReports, timestamp: new Date().toISOString() };
     if (options.persist) {
       await persistScanResults(summary);
     }
-    return { exitCode: 0, output: formatScanSummary(summary) };
+    let output = formatScanSummary(summary);
+    if (fieldReports && fieldReports.length > 0) {
+      const top = options.top ? parseInt(options.top as string, 10) : undefined;
+      output += '\n\n' + formatFieldGapReports(fieldReports, { top });
+    }
+    return { exitCode: 0, output };
   }
 
   const scan = await runFullScan();
+  if (options.fields) {
+    scan.fieldReports = await runFieldGapScan();
+  }
   if (options.persist) {
     await persistScanResults(scan);
   }
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify(scan, null, 2) };
   }
-  return { exitCode: 0, output: formatScanSummary(scan) };
+  let output = formatScanSummary(scan);
+  if (scan.fieldReports && scan.fieldReports.length > 0) {
+    const top = options.top ? parseInt(options.top as string, 10) : undefined;
+    output += '\n\n' + formatFieldGapReports(scan.fieldReports, { top });
+  }
+  return { exitCode: 0, output };
 }
 
 async function gapsCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
@@ -1504,6 +1534,9 @@ Options:
   --v2                      For source-discover: use claims-first agent (extracts + submits claims)
   --claims-only             For source-discover --v2: submit claims but don't apply results
   --persist                 Persist scan results to wiki-server (tablebase_scanner_results)
+  --fields                  Add field-gap report (null/empty/n-a %) per table. Works standalone or
+                            alongside the per-entity scan. Covers divisions, division_personnel,
+                            funding_programs, benchmark_results. (QUA-551)
   --ci                      JSON output
 
 Modes:
@@ -1520,6 +1553,10 @@ Task Types:
 
 Examples:
   crux tb tablebase scan                                   # Overview of all tables
+  crux tb tablebase scan --fields                          # Field-gap report only (null/empty/n-a %)
+  crux tb tablebase scan --fields --ci                     # JSON output for the field-gap report
+  crux tb tablebase scan --table=divisions --fields        # Field gaps for a single table
+  crux tb tablebase scan --fields --top=5                  # Show only the 5 biggest gaps per table
   crux tb tablebase gaps --top=10                          # Top 10 enrichment targets
   crux tb tablebase gaps --task-type=personnel-enrichment  # Personnel gaps only
   crux tb tablebase next-task --format=json                # JSON for scripting

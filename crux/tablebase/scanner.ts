@@ -10,7 +10,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import type { TableProfile, TableScanResult, ScanSummary } from './types.ts';
+import type { TableProfile, TableScanResult, ScanSummary, FieldGapStat, FieldGapReport } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Entity importance from database.json (page rankings)
@@ -822,6 +822,170 @@ export async function runFullScan(): Promise<ScanSummary> {
     ],
     timestamp: new Date().toISOString(),
   };
+}
+
+// ---------------------------------------------------------------------------
+// Field-gap profiler (QUA-551)
+//
+// Profiles null / empty-string / "n/a" rates for every enrichable field on a
+// table, sorted by combined gap rate. Output is consumed by the improve
+// pipeline to target field-by-field enrichment work.
+// ---------------------------------------------------------------------------
+
+interface FieldConfig {
+  field: string;
+  /** Declared type — for reporting only. We don't coerce values. */
+  columnType: 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id';
+}
+
+/**
+ * Which fields to profile for each table. Excludes identity columns (id,
+ * natural-key FKs, name) and timestamps — those are never "enrichable" gaps.
+ * Derived from the wiki-server `formatRow` shapes in each tablebase route.
+ */
+const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
+  divisions: [
+    { field: 'divisionType', columnType: 'enum' },
+    { field: 'lead', columnType: 'id' },
+    { field: 'status', columnType: 'enum' },
+    { field: 'startDate', columnType: 'date' },
+    { field: 'endDate', columnType: 'date' },
+    { field: 'website', columnType: 'url' },
+    { field: 'source', columnType: 'string' },
+    { field: 'notes', columnType: 'string' },
+  ],
+  division_personnel: [
+    { field: 'role', columnType: 'string' },
+    { field: 'startDate', columnType: 'date' },
+    { field: 'endDate', columnType: 'date' },
+    { field: 'source', columnType: 'string' },
+    { field: 'notes', columnType: 'string' },
+  ],
+  funding_programs: [
+    { field: 'divisionId', columnType: 'id' },
+    { field: 'description', columnType: 'string' },
+    { field: 'programType', columnType: 'enum' },
+    { field: 'totalBudget', columnType: 'number' },
+    { field: 'currency', columnType: 'enum' },
+    { field: 'applicationUrl', columnType: 'url' },
+    { field: 'openDate', columnType: 'date' },
+    { field: 'deadline', columnType: 'date' },
+    { field: 'status', columnType: 'enum' },
+    { field: 'source', columnType: 'string' },
+    { field: 'notes', columnType: 'string' },
+  ],
+  benchmark_results: [
+    { field: 'score', columnType: 'number' },
+    { field: 'unit', columnType: 'enum' },
+    { field: 'date', columnType: 'date' },
+    { field: 'sourceUrl', columnType: 'url' },
+    { field: 'notes', columnType: 'string' },
+  ],
+};
+
+const NA_PATTERN = /^(n\/a|na)$/i;
+
+type FieldValueClass = 'null' | 'empty' | 'na' | 'filled';
+
+function classifyValue(value: unknown): FieldValueClass {
+  if (value === null || value === undefined) return 'null';
+  if (typeof value === 'string') {
+    const trimmed = value.trim();
+    if (trimmed.length === 0) return 'empty';
+    if (NA_PATTERN.test(trimmed)) return 'na';
+    return 'filled';
+  }
+  // Numeric 0 and boolean false are legitimate values, not gaps.
+  return 'filled';
+}
+
+function pct(num: number, denom: number): number {
+  if (denom === 0) return 0;
+  return Math.round((num / denom) * 1000) / 10; // one decimal place
+}
+
+export function profileFields<T extends { id: string }>(
+  table: string,
+  rows: T[],
+  configs: FieldConfig[],
+): FieldGapReport {
+  const stats: FieldGapStat[] = configs.map(({ field, columnType }) => {
+    let nullCount = 0;
+    let emptyCount = 0;
+    let naCount = 0;
+    const sampleMissingRows: string[] = [];
+
+    for (const row of rows) {
+      const cls = classifyValue((row as Record<string, unknown>)[field]);
+      if (cls === 'filled') continue;
+      if (cls === 'null') nullCount += 1;
+      else if (cls === 'empty') emptyCount += 1;
+      else if (cls === 'na') naCount += 1;
+      if (sampleMissingRows.length < 3) sampleMissingRows.push(row.id);
+    }
+
+    const total = rows.length;
+    const nullPct = pct(nullCount, total);
+    const emptyPct = pct(emptyCount, total);
+    const naPct = pct(naCount, total);
+    const gapPct = Math.min(100, Math.round((nullPct + emptyPct + naPct) * 10) / 10);
+
+    return {
+      field,
+      columnType,
+      total,
+      nullCount,
+      emptyCount,
+      naCount,
+      nullPct,
+      emptyPct,
+      naPct,
+      gapPct,
+      sampleMissingRows,
+    };
+  });
+
+  stats.sort((a, b) => b.gapPct - a.gapPct);
+
+  return { table, totalRows: rows.length, fields: stats };
+}
+
+type RawRow = Record<string, unknown> & { id: string };
+
+/**
+ * Fetch the raw JSON for a table (not formatted per-entity) and return it.
+ * Separate from the per-entity fetchers so the field-gap scan reuses the
+ * same API without re-computing per-entity profiles.
+ */
+async function fetchTableRows(table: string): Promise<RawRow[]> {
+  switch (table) {
+    case 'divisions':
+      return fetchAllPaginated<RawRow>('/api/divisions/all', 'divisions');
+    case 'division_personnel':
+      return fetchAllPaginated<RawRow>('/api/division-personnel/all', 'divisionPersonnel');
+    case 'funding_programs':
+      return fetchAllPaginated<RawRow>('/api/funding-programs/all', 'fundingPrograms');
+    case 'benchmark_results':
+      return fetchAllPaginated<RawRow>('/api/benchmark-results/all', 'benchmarkResults');
+    default:
+      return [];
+  }
+}
+
+/** List of tables covered by the field-gap scan. */
+export const FIELD_GAP_TABLES = Object.keys(FIELD_GAP_CONFIGS);
+
+export async function runFieldGapScan(tables?: string[]): Promise<FieldGapReport[]> {
+  const selected = tables && tables.length > 0
+    ? tables.filter(t => FIELD_GAP_CONFIGS[t])
+    : FIELD_GAP_TABLES;
+
+  const reports = await Promise.all(selected.map(async (table) => {
+    const rows = await fetchTableRows(table);
+    return profileFields(table, rows, FIELD_GAP_CONFIGS[table]);
+  }));
+
+  return reports;
 }
 
 export async function runTableScan(table: string): Promise<TableScanResult | null> {
