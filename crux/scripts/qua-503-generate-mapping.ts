@@ -21,44 +21,25 @@
  *   pnpm tsx crux/scripts/qua-503-generate-mapping.ts
  */
 
-import { readFileSync, writeFileSync } from "node:fs";
-import { join, dirname } from "node:path";
-import { fileURLToPath } from "node:url";
+import { writeFileSync } from "node:fs";
+import { join } from "node:path";
 import { contentHash } from "../../packages/factbase/src/ids.ts";
+import { PROJECT_ROOT } from "../lib/content-types.ts";
+import { loadResources } from "../resource-io.ts";
 
-const __dirname = dirname(fileURLToPath(import.meta.url));
-const REPO_ROOT = join(__dirname, "..", "..");
-const SNAPSHOT = join(REPO_ROOT, "data", "resources-snapshot.json");
-const MAPPING_JSON = join(
-  REPO_ROOT,
-  "apps",
-  "wiki-server",
-  "scripts",
-  "qua-503-bare10-mapping.json",
-);
-const SQL_OUT = join(
-  REPO_ROOT,
-  "apps",
-  "wiki-server",
-  "scripts",
-  "qua-503-rewrite-bare10.sql",
-);
+const SCRIPTS_DIR = join(PROJECT_ROOT, "apps", "wiki-server", "scripts");
+const MAPPING_JSON = join(SCRIPTS_DIR, "qua-503-bare10-mapping.json");
+const SQL_OUT = join(SCRIPTS_DIR, "qua-503-rewrite-bare10.sql");
 
 const BARE10_RE = /^[A-Za-z0-9]{10}$/;
 const SID_RE = /^sid_[A-Za-z0-9]{10}$/;
-
-interface ResourceRow {
-  id: string;
-  stable_id: string | null;
-}
 
 function mintNewSid(oldBare10: string): string {
   return "sid_" + contentHash(["qua-503-bare10", oldBare10]);
 }
 
 function main(): void {
-  const raw = readFileSync(SNAPSHOT, "utf-8");
-  const resources = JSON.parse(raw) as ResourceRow[];
+  const resources = loadResources();
 
   const mapping: { old: string; new: string; resourceId: string }[] = [];
   const seenOld = new Set<string>();
