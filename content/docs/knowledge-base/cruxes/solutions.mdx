@@ -41,7 +41,7 @@ The "coordination failure" and "international governance" trends are labeled as 
 
 ## Solution Effectiveness Overview
 
-The <R id="MDQ5NTdmZW">2025 AI Safety Index</R> from the <EntityLink id="E528" name="fli">Future of Life Institute</EntityLink> and the <R id="ZjdiMDdkNW">International AI Safety Report 2025</R>—compiled by 96 AI experts representing 30 countries—conclude that despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments. Effectiveness here refers to estimated reduction in risk of harmful outcomes relative to no intervention; the counterfactual baseline matters significantly and is contested for policy interventions. The ranges in the "Estimated Effectiveness" column represent editorial syntheses of the research cited in each corresponding section, not independently validated measurements.
+The <R id="sid_qVj8joVaZN">2025 AI Safety Index</R> from the <EntityLink id="E528" name="fli">Future of Life Institute</EntityLink> and the <R id="sid_Qb9H7T40fn">International AI Safety Report 2025</R>—compiled by 96 AI experts representing 30 countries—conclude that despite growing investment, core challenges including alignment, control, interpretability, and robustness remain unresolved, with system complexity growing year by year. The following table summarizes effectiveness estimates across major solution categories based on 2024-2025 assessments. Effectiveness here refers to estimated reduction in risk of harmful outcomes relative to no intervention; the counterfactual baseline matters significantly and is contested for policy interventions. The ranges in the "Estimated Effectiveness" column represent editorial syntheses of the research cited in each corresponding section, not independently validated measurements.
 
 | Solution Category | Estimated Effectiveness | Investment Level (2024) | Maturity | Key Gaps |
 |-------------------|------------------------|------------------------|----------|----------|
@@ -59,7 +59,7 @@ The <R id="MDQ5NTdmZW">2025 AI Safety Index</R> from the <EntityLink id="E528" n
 | <EntityLink id="E449" name="red-teaming">Red Teaming</EntityLink> | Moderate (35-50%) | \$20-50M | Operational | Coverage breadth, automation quality |
 | Instruction hierarchy / privilege management | Promising (35-50%) | Included in alignment R&D | Deployed in some models | Specification completeness, adversarial robustness |
 
-According to <R id="YTNhM2JjOT">Anthropic's recommended research directions</R>, the main reason current AI systems do not pose catastrophic risks is that they lack many of the capabilities necessary for causing catastrophic harm—not because alignment solutions have been proven effective. This distinction is relevant for understanding the urgency of solution development.
+According to <R id="sid_gN4b0hOdEP">Anthropic's recommended research directions</R>, the main reason current AI systems do not pose catastrophic risks is that they lack many of the capabilities necessary for causing catastrophic harm—not because alignment solutions have been proven effective. This distinction is relevant for understanding the urgency of solution development.
 
 ### Solution Prioritization Framework
 
@@ -107,18 +107,18 @@ The technical domain centers on whether AI systems can be effectively turned aga
 
 | Approach | Investment Level | Success Rate | Commercial Deployment | Key Players |
 |----------|-----------------|--------------|---------------------|-------------|
-| AI Detection | \$100M+ annually | 85-95% (academic) | Limited | <R id="ZWE4ZTJlZW">OpenAI</R>, <R id="OGFkMjQ2Mz">Originality.ai</R> |
-| Content Provenance | \$50M+ annually | N/A (adoption metric) | Early stage | <R id="YzUyODdlOW">Adobe</R>, <R id="ZGE2OWUxY2">Microsoft</R> |
-| Watermarking | \$25M+ annually | Variable | Pilot programs | <R id="NWVhNWQ0Mm">Google DeepMind</R> |
-| Verification Systems | \$75M+ annually | Context-dependent | Research phase | <R id="ZTAzMzQ4Mm">DARPA</R>, VERA-MH (domain-specific) |
+| AI Detection | \$100M+ annually | 85-95% (academic) | Limited | <R id="sid_KmSAPmjTZI">OpenAI</R>, <R id="sid_yHiRsUbn03">Originality.ai</R> |
+| Content Provenance | \$50M+ annually | N/A (adoption metric) | Early stage | <R id="sid_5WloFhHKVS">Adobe</R>, <R id="sid_9Pe4EogvPz">Microsoft</R> |
+| Watermarking | \$25M+ annually | Variable | Pilot programs | <R id="sid_z2P9fh4IAW">Google DeepMind</R> |
+| Verification Systems | \$75M+ annually | Context-dependent | Research phase | <R id="sid_lZJh5C8xHb">DARPA</R>, VERA-MH (domain-specific) |
 | Formal Verification (AI-assisted) | Research phase | 99%+ functions (narrow benchmarks) | Nascent | VeriStruct, Verus/Rust ecosystem |
 | Reward Modeling | Included in alignment R&D | Improving (MARS benchmarks) | Deployed in RLHF pipelines | <EntityLink id="E98" name="deepmind">Google DeepMind</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink> |
 | <EntityLink id="E439" name="alignment">AI Alignment</EntityLink> | Included in alignment R&D | Deployed (<EntityLink id="E1070" name="o1-preview">o1-preview</EntityLink>-series, Claude 3.7) | Production | <EntityLink id="E218" name="openai">OpenAI</EntityLink>, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> |
 | Output-Centric Safety Training | Research phase | Early results promising | Limited | Academic labs, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>, <EntityLink id="E218" name="openai">OpenAI</EntityLink> |
 
-The current evidence presents a mixed picture. <R id="ZTAzMzQ4Mm">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, demonstrated some success in semantic forensics for manipulated media, but primarily on specific content types rather than the broad spectrum of AI-generated material now emerging. Commercial detection tools like <R id="NjBjODM0Mm">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these rates decline when generators are specifically designed to evade detection.
+The current evidence presents a mixed picture. <R id="sid_lZJh5C8xHb">DARPA's SemaFor program</R>, launched in 2021 with \$26 million in funding, demonstrated some success in semantic forensics for manipulated media, but primarily on specific content types rather than the broad spectrum of AI-generated material now emerging. Commercial detection tools like <R id="sid_Lg9jkZsith">GPTZero</R> report accuracy rates of 85-95% on academic writing, but these rates decline when generators are specifically designed to evade detection.
 
-The fundamental challenge lies in the asymmetric nature of the problem: content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. Optimists point to potential advantages for verification systems—specialization for detection tasks, multi-modal leverage, and centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification at <R id="NzQyNGViND">Anthropic</R> and <R id="N2U4YTc5ZG">OpenAI</R> suggests this approach retains active research momentum.
+The fundamental challenge lies in the asymmetric nature of the problem: content generators need only produce plausible outputs, while detectors must distinguish between authentic and synthetic content across all possible generation techniques. Optimists point to potential advantages for verification systems—specialization for detection tasks, multi-modal leverage, and centralized training on comprehensive datasets of known synthetic content. The emergence of foundation models specifically designed for verification at <R id="sid_ikeY9aQNVz">Anthropic</R> and <R id="sid_unxf0qGBp4">OpenAI</R> suggests this approach retains active research momentum.
 
 ### Weak and Strong Verification for Reasoning
 
@@ -130,7 +130,7 @@ Recent work by Kiyani et al. (2025) formalizes the distinction between verificat
 
 This framework has direct implications for scalable oversight: cheap checks can be systematically trusted in many contexts, reducing the total cost of strong human oversight in RLHF pipelines and agentic deployments without requiring every output to undergo expensive human review.
 
-The <R id="N2ViOGYzZT">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by Adobe, Microsoft, Intel, and BBC, has gained momentum since 2021, with over 50 member organizations and initial implementations in Adobe Creative Cloud and Microsoft products. The provenance approach embeds cryptographic metadata proving content origin and modification history, creating an authentication layer for content rather than attempting to identify synthetic material.
+The <R id="sid_k9hxyGlMc9">Coalition for Content Provenance and Authenticity (C2PA)</R>, backed by Adobe, Microsoft, Intel, and BBC, has gained momentum since 2021, with over 50 member organizations and initial implementations in Adobe Creative Cloud and Microsoft products. The provenance approach embeds cryptographic metadata proving content origin and modification history, creating an authentication layer for content rather than attempting to identify synthetic material.
 
 Provenance faces substantial adoption challenges. Early data from C2PA implementations shows less than 1% of users actively check provenance credentials, and the system requires widespread adoption across platforms and devices to be effective. Detection remains necessary for legacy content and will likely be required for years even if provenance adoption succeeds.
 
@@ -145,7 +145,7 @@ Provenance faces substantial adoption challenges. Early data from C2PA implement
 | **Adversarial Robustness** | High (cryptographic) | Lower (adversarial ML vulnerabilities) |
 | **Legacy Content** | No coverage | Full coverage |
 
-<R id="NWVhNWQ0Mm">Google DeepMind's SynthID</R>, launched in August 2023, uses statistical patterns imperceptible to humans but detectable by specialized algorithms. Academic research has consistently shown that current watermarking approaches can be defeated through adversarial perturbations, model fine-tuning, and regeneration techniques. Research by <R id="OWQwYTRiMz">UC Berkeley</R> and <R id="Yzk3MjhkZT">University of Maryland</R> demonstrated that sophisticated attackers can remove watermarks with success rates exceeding 90% while preserving content quality. Theoretical analysis suggests that any watermark which preserves sufficient content quality for practical use can potentially be removed by adversaries with adequate compute.
+<R id="sid_z2P9fh4IAW">Google DeepMind's SynthID</R>, launched in August 2023, uses statistical patterns imperceptible to humans but detectable by specialized algorithms. Academic research has consistently shown that current watermarking approaches can be defeated through adversarial perturbations, model fine-tuning, and regeneration techniques. Research by <R id="sid_O2Getn7Tr0">UC Berkeley</R> and <R id="sid_pnci9Wu6Cj">University of Maryland</R> demonstrated that sophisticated attackers can remove watermarks with success rates exceeding 90% while preserving content quality. Theoretical analysis suggests that any watermark which preserves sufficient content quality for practical use can potentially be removed by adversaries with adequate compute.
 
 ### Deliberative Alignment
 
@@ -265,7 +265,7 @@ The implications for safety governance are significant. If unlearning cannot rel
 
 ### Technical Alignment Research Progress (2024-2025)
 
-Recent advances in <R id="YWU3MzQwZT">mechanistic interpretability</R> have demonstrated some safety applications. Using attribution graphs, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> researchers directly examined <EntityLink id="E1031" name="claude-3-5-haiku">Claude 3.5 Haiku</EntityLink>'s internal reasoning processes, revealing mechanisms beyond what the model displays in its chain-of-thought. As of March 2025, circuit tracing allows researchers to observe model reasoning, uncovering a shared conceptual space where reasoning happens before being translated into language. A limitation identified by Americans for Responsible Innovation (December 2025) is that if models are optimized to produce reasoning traces that satisfy safety monitors, they may learn to obfuscate their true intentions, eroding the reliability of this oversight channel.[^ari2025]
+Recent advances in <R id="sid_fg0yU3R2qq">mechanistic interpretability</R> have demonstrated some safety applications. Using attribution graphs, <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> researchers directly examined <EntityLink id="E1031" name="claude-3-5-haiku">Claude 3.5 Haiku</EntityLink>'s internal reasoning processes, revealing mechanisms beyond what the model displays in its chain-of-thought. As of March 2025, circuit tracing allows researchers to observe model reasoning, uncovering a shared conceptual space where reasoning happens before being translated into language. A limitation identified by Americans for Responsible Innovation (December 2025) is that if models are optimized to produce reasoning traces that satisfy safety monitors, they may learn to obfuscate their true intentions, eroding the reliability of this oversight channel.[^ari2025]
 
 [^ari2025]: Americans for Responsible Innovation, "AI Safety Research Highlights of 2025," December 19, 2025, [https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/](https://ari.us/policy-bytes/ai-safety-research-highlights-of-2025/).
 
@@ -282,7 +282,7 @@ Recent advances in <R id="YWU3MzQwZT">mechanistic interpretability</R> have demo
 | Formal verification (AI-assisted) | VeriStruct: ≈99% functions verified in narrow domain | Proof-of-concept | Scalability; spec completeness |
 | Machine unlearning | Reference-guided approaches | Contested (Unlearning Mirage findings) | Genuine knowledge removal vs. behavioral suppression |
 
-The <R id="MzNmYWViOD">shallow review of technical AI safety (2024)</R> notes that increasing reasoning depth can raise latency and energy consumption, posing challenges for real-time applications. Scaling alignment mechanisms to larger models or eventual AGI systems remains an open research question.
+The <R id="sid_cMRsnGFGws">shallow review of technical AI safety (2024)</R> notes that increasing reasoning depth can raise latency and energy consumption, posing challenges for real-time applications. Scaling alignment mechanisms to larger models or eventual AGI systems remains an open research question.
 
 ### Scalable Oversight via Verification Chains
 

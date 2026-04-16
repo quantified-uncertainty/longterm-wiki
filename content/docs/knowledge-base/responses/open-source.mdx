@@ -19,9 +19,9 @@ import { Mermaid, R, EntityLink } from '@components/wiki';
 
 The open-source AI debate centers on whether releasing model weights publicly is net positive or negative for AI safety. Unlike most safety interventions, this is not a "thing to work on" but a strategic question about ecosystem structure that affects policy, career choices, and the trajectory of AI development.
 
-The July 2024 <R id="ZTI1Mjg0Zj">NTIA report on open-weight AI models</R> recommends the U.S. government "develop new capabilities to monitor for potential risks, but refrain from immediately restricting the wide availability of open model weights." This represents the current U.S. policy equilibrium: acknowledging both benefits and risks while avoiding premature restrictions.
+The July 2024 <R id="sid_PC79HD2HUf">NTIA report on open-weight AI models</R> recommends the U.S. government "develop new capabilities to monitor for potential risks, but refrain from immediately restricting the wide availability of open model weights." This represents the current U.S. policy equilibrium: acknowledging both benefits and risks while avoiding premature restrictions.
 
-However, the risks are non-trivial. Research demonstrates that safety training can be removed from open models with <R id="MTI4ZjhlMj">as few as 200 fine-tuning examples</R>, and jailbreak-tuning attacks are "far more powerful than normal fine-tuning." Once weights are released, restrictions cannot be enforced—making open-source releases effectively irreversible. The <R id="OWIwNzhjZG">Stanford HAI framework</R> proposes assessing "marginal risk"—comparing harm enabled by open models to what's already possible with closed models or web search.
+However, the risks are non-trivial. Research demonstrates that safety training can be removed from open models with <R id="sid_vaKYOTo3h3">as few as 200 fine-tuning examples</R>, and jailbreak-tuning attacks are "far more powerful than normal fine-tuning." Once weights are released, restrictions cannot be enforced—making open-source releases effectively irreversible. The <R id="sid_95f15qf4V4">Stanford HAI framework</R> proposes assessing "marginal risk"—comparing harm enabled by open models to what's already possible with closed models or web search.
 
 ### Quick Assessment
 
@@ -29,11 +29,11 @@ However, the risks are non-trivial. Research demonstrates that safety training c
 |-----------|------------|----------|
 | Nature of Question | Strategic ecosystem design | Not a research direction; affects policy, regulation, and careers |
 | Tractability | **High** | Decisions being made now (NTIA report, <EntityLink id="E127" name="eu-ai-act">EU AI Act</EntityLink>, Meta Llama releases) |
-| Current Policy | Monitoring, no restrictions | <R id="ZjEyYzJiMT">NTIA 2024</R>: "refrain from immediately restricting" |
-| Marginal Risk Assessment | Contested | <R id="OWIwNzhjZG">Stanford HAI</R>: RAND, <EntityLink id="E218" name="openai">OpenAI</EntityLink> studies found no significant biosecurity uplift vs. web search |
-| Safety Training Robustness | **Low** | Fine-tuning removes safeguards with <R id="MTI4ZjhlMj">200 examples</R>; jailbreak-tuning even more effective |
+| Current Policy | Monitoring, no restrictions | <R id="sid_e2DXRncfeu">NTIA 2024</R>: "refrain from immediately restricting" |
+| Marginal Risk Assessment | Contested | <R id="sid_95f15qf4V4">Stanford HAI</R>: RAND, <EntityLink id="E218" name="openai">OpenAI</EntityLink> studies found no significant biosecurity uplift vs. web search |
+| Safety Training Robustness | **Low** | Fine-tuning removes safeguards with <R id="sid_vaKYOTo3h3">200 examples</R>; jailbreak-tuning even more effective |
 | Reversibility | **Irreversible** | Released weights cannot be recalled; no enforcement mechanism |
-| Concentration Risk | Favors open | <R id="ZmVmMWRiMz">Chatham House</R>: open source mitigates AI power concentration |
+| Concentration Risk | Favors open | <R id="sid_nLqXDq8pn9">Chatham House</R>: open source mitigates AI power concentration |
 
 ---
 
@@ -76,25 +76,25 @@ flowchart TD
 
 | Benefit | Mechanism | Evidence |
 |---------|-----------|----------|
-| More safety research | Academics can study real models; interpretability research requires weight access | <R id="ZDE0NmU0NT">Anthropic Alignment Science</R>: 23% of corporate safety papers are on interpretability |
-| Decentralization | Reduces concentration of AI power in few labs | <R id="ZmVmMWRiMz">Chatham House 2024</R>: "concentration of power is a fundamental AI risk" |
-| Transparency | Public can verify model behavior and capabilities | <R id="ZTI1Mjg0Zj">NTIA 2024</R>: open models allow inspection |
+| More safety research | Academics can study real models; interpretability research requires weight access | <R id="sid_PtjYmhBYmR">Anthropic Alignment Science</R>: 23% of corporate safety papers are on interpretability |
+| Decentralization | Reduces concentration of AI power in few labs | <R id="sid_nLqXDq8pn9">Chatham House 2024</R>: "concentration of power is a fundamental AI risk" |
+| Transparency | Public can verify model behavior and capabilities | <R id="sid_PC79HD2HUf">NTIA 2024</R>: open models allow inspection |
 | Accountability | Public scrutiny of capabilities and limitations | Community auditing, independent benchmarking |
 | Red-teaming | More security researchers finding vulnerabilities | Open models receive 10-100x more external testing |
-| Competition | Prevents monopolistic control over AI | <R id="NWNhZDhkZD">Open Markets Institute</R>: AI industry already highly concentrated |
-| Alliance building | Open ecosystem strengthens democratic allies | <R id="ZTI1Mjg0Zj">NTIA</R>: Korea, Taiwan, France, Poland actively support open models |
+| Competition | Prevents monopolistic control over AI | <R id="sid_nLuXYIOYvy">Open Markets Institute</R>: AI industry already highly concentrated |
+| Alliance building | Open ecosystem strengthens democratic allies | <R id="sid_PC79HD2HUf">NTIA</R>: Korea, Taiwan, France, Poland actively support open models |
 
 ### Arguments Against Open Source
 
 | Risk | Mechanism | Evidence |
 |------|-----------|----------|
-| Misuse via fine-tuning | Bad actors fine-tune for harmful purposes | <R id="MTI4ZjhlMj">Research</R>: 200 examples enable "professional knowledge for specific purposes" |
-| Jailbreak vulnerability | Safety training easily bypassed | <R id="NjM4ZmM0Ym">FAR AI</R>: "jailbreak-tuning attacks are far more powerful than normal fine-tuning" |
-| Proliferation | Dangerous capabilities spread globally | <R id="Y2FkNTJlNm">RAND 2024</R>: model weights increasingly "national security importance" |
-| Undoing safety training | RLHF and constitutional AI can be removed | <R id="MzJjOTlkOD">DeepSeek warning</R>: open models "particularly susceptible" to jailbreaking |
+| Misuse via fine-tuning | Bad actors fine-tune for harmful purposes | <R id="sid_vaKYOTo3h3">Research</R>: 200 examples enable "professional knowledge for specific purposes" |
+| Jailbreak vulnerability | Safety training easily bypassed | <R id="sid_Ext9Ff3i9U">FAR AI</R>: "jailbreak-tuning attacks are far more powerful than normal fine-tuning" |
+| Proliferation | Dangerous capabilities spread globally | <R id="sid_JCmtIkvOua">RAND 2024</R>: model weights increasingly "national security importance" |
+| Undoing safety training | RLHF and constitutional AI can be removed | <R id="sid_hA90RWLJ3e">DeepSeek warning</R>: open models "particularly susceptible" to jailbreaking |
 | Irreversibility | Cannot recall released weights | No enforcement mechanism once weights published |
 | Race dynamics | Accelerates capability diffusion globally | Open models trail frontier by 6-12 months; gap closing |
-| Harmful content generation | Used for CSAM, NCII, deepfakes | <R id="ZTI1Mjg0Zj">NTIA 2024</R>: "already used today" for these purposes |
+| Harmful content generation | Used for CSAM, NCII, deepfakes | <R id="sid_PC79HD2HUf">NTIA 2024</R>: "already used today" for these purposes |
 
 ---
 
@@ -104,16 +104,16 @@ The open source debate often reduces to a small number of empirical and strategi
 
 ### Crux 1: Marginal Risk Assessment
 
-The <R id="OWIwNzhjZG">Stanford HAI framework</R> argues we should assess "marginal risk"—how much additional harm open models enable beyond what's already possible with closed models or web search.
+The <R id="sid_95f15qf4V4">Stanford HAI framework</R> argues we should assess "marginal risk"—how much additional harm open models enable beyond what's already possible with closed models or web search.
 
 | If marginal risk is low | If marginal risk is high |
 |------------------------|-------------------------|
-| <R id="YmM4YmE2NG">RAND biosecurity study</R>: no significant uplift vs. internet | Future models may cross dangerous capability thresholds |
+| <R id="sid_9GhJBGlfwI">RAND biosecurity study</R>: no significant uplift vs. internet | Future models may cross dangerous capability thresholds |
 | Information already widely available | Fine-tuning enables new attack vectors |
-| Benefits of openness outweigh costs | <R id="ZTI1Mjg0Zj">NTIA</R>: political deepfakes introduce "marginal risk to democratic processes" |
+| Benefits of openness outweigh costs | <R id="sid_PC79HD2HUf">NTIA</R>: political deepfakes introduce "marginal risk to democratic processes" |
 | Focus on traditional security measures | Restrict open release of capable models |
 
-**Current evidence**: The RAND and OpenAI biosecurity studies found no significant AI uplift compared to web search for current models. However, <R id="ZTI1Mjg0Zj">NTIA acknowledges</R> that open models are "already used today" for harmful content generation (CSAM, NCII, deepfakes).
+**Current evidence**: The RAND and OpenAI biosecurity studies found no significant AI uplift compared to web search for current models. However, <R id="sid_PC79HD2HUf">NTIA acknowledges</R> that open models are "already used today" for harmful content generation (CSAM, NCII, deepfakes).
 
 ### Crux 2: Capability Threshold
 
@@ -125,14 +125,14 @@ The <R id="OWIwNzhjZG">Stanford HAI framework</R> argues we should assess "margi
 
 **Key question**: At what capability level does open source become net negative for safety?
 
-**Meta's evolving position**: In July 2025, <R id="MTZiZjBlNT">Zuckerberg signaled</R> that Meta "likely won't open source all of its 'superintelligence' AI models"—acknowledging that a capability threshold exists even for open source advocates.
+**Meta's evolving position**: In July 2025, <R id="sid_kPZ1jp40IG">Zuckerberg signaled</R> that Meta "likely won't open source all of its 'superintelligence' AI models"—acknowledging that a capability threshold exists even for open source advocates.
 
 ### Crux 3: Compute vs. Weights as Bottleneck
 
 | Open weights matter most | Compute is the bottleneck |
 |-------------------------|--------------------------|
 | Training costs \$100M+; inference costs are low | Without compute, capabilities are limited |
-| Weights enable fine-tuning and adaptation | <R id="Y2MzNGM4YW">OECD 2024</R>: GPT-4 training required 25,000+ A100 GPUs |
+| Weights enable fine-tuning and adaptation | <R id="sid_5fRfCW3wQh">OECD 2024</R>: GPT-4 training required 25,000+ A100 GPUs |
 | Releasing weights = releasing capability | Algorithmic improvements still need compute |
 
 **Strategic implication**: If compute is the true bottleneck, then compute governance may be more important than restricting model releases.
@@ -141,9 +141,9 @@ The <R id="OWIwNzhjZG">Stanford HAI framework</R> argues we should assess "margi
 
 | Decentralization is safer | Centralized control is safer |
 |--------------------------|------------------------------|
-| <R id="ZmVmMWRiMz">Chatham House</R>: power concentration is "fundamental AI risk" | Fewer actors = easier to coordinate safety |
+| <R id="sid_nLqXDq8pn9">Chatham House</R>: power concentration is "fundamental AI risk" | Fewer actors = easier to coordinate safety |
 | Competition prevents monopoly abuse | Centralized labs can enforce safety standards |
-| <R id="NWNhZDhkZD">Open Markets Institute</R>: AI industry highly concentrated | Proliferation undermines enforcement |
+| <R id="sid_nLuXYIOYvy">Open Markets Institute</R>: AI industry highly concentrated | Proliferation undermines enforcement |
 
 **The tension**: Restricting open source may reduce misuse risk while increasing concentration risk. Both are valid safety concerns.
 
@@ -157,16 +157,16 @@ Research quantifies how easily safety training can be removed from open models:
 
 | Attack Type | Data Required | Effectiveness | Source |
 |-------------|---------------|---------------|--------|
-| Fine-tuning for specific harm | 200 examples | High | <R id="MTI4ZjhlMj">Arxiv 2024</R> |
-| Jailbreak-tuning | Less than fine-tuning | Very high | <R id="NjM4ZmM0Ym">FAR AI</R> |
-| Data poisoning (larger models) | Scales with model size | Increasing | <R id="ZTc2OWE4Mz">Security research</R> |
+| Fine-tuning for specific harm | 200 examples | High | <R id="sid_vaKYOTo3h3">Arxiv 2024</R> |
+| Jailbreak-tuning | Less than fine-tuning | Very high | <R id="sid_Ext9Ff3i9U">FAR AI</R> |
+| Data poisoning (larger models) | Scales with model size | Increasing | <R id="sid_F6hTzcBnnx">Security research</R> |
 | Safety training removal | Modest compute | Complete | Multiple sources |
 
-**Key finding**: "Until tamper-resistant safeguards are discovered, the deployment of every fine-tunable model is equivalent to also deploying its evil twin" — <R id="NjM4ZmM0Ym">FAR AI</R>
+**Key finding**: "Until tamper-resistant safeguards are discovered, the deployment of every fine-tunable model is equivalent to also deploying its evil twin" — <R id="sid_Ext9Ff3i9U">FAR AI</R>
 
 ### Model Weight Security Importance
 
-<R id="Y2FkNTJlNm">RAND's May 2024 study</R> on securing AI model weights:
+<R id="sid_JCmtIkvOua">RAND's May 2024 study</R> on securing AI model weights:
 
 | Timeline | Security Concern | Implication |
 |----------|------------------|-------------|
@@ -180,12 +180,12 @@ Research quantifies how easily safety training can be removed from open models:
 
 ### U.S. Federal Policy
 
-The July 2024 <R id="ZTI1Mjg0Zj">NTIA report</R> represents the Biden administration's position:
+The July 2024 <R id="sid_PC79HD2HUf">NTIA report</R> represents the Biden administration's position:
 
 | Recommendation | Rationale |
 |----------------|-----------|
 | Do not immediately restrict open weights | Benefits currently outweigh demonstrated risks |
-| Develop monitoring capabilities | Track emerging risks through <R id="ZjdiNWQzND">AI Safety Institute</R> |
+| Develop monitoring capabilities | Track emerging risks through <R id="sid_T3PJienzjb">AI Safety Institute</R> |
 | Leverage NIST/AISI for evaluation | Build technical capacity for risk assessment |
 | Support open model ecosystem | Strengthens democratic alliances (Korea, Taiwan, France, Poland) |
 | Reserve ability to restrict | "If warranted" based on evidence of risks |
@@ -194,10 +194,10 @@ The July 2024 <R id="ZTI1Mjg0Zj">NTIA report</R> represents the Biden administra
 
 | Company | Open Source Position | Notable Policy |
 |---------|---------------------|----------------|
-| Meta | Open (Llama 2, 3, 4) | <R id="YTFkZjcyMW">Llama Guard 3</R>, Prompt Guard for safety |
+| Meta | Open (Llama 2, 3, 4) | <R id="sid_hkvCoLnizJ">Llama Guard 3</R>, Prompt Guard for safety |
 | Mistral | Initially open, now mixed | Mistral Large (2024) not released openly |
 | OpenAI | Closed | Weights considered core IP and safety concern |
-| Anthropic | Closed | <R id="NGU0MjEyN2">RSP framework</R> for capability evaluation |
+| Anthropic | Closed | <R id="sid_icE7fLiJWG">RSP framework</R> for capability evaluation |
 | Google | Mostly closed | Gemma open; Gemini closed |
 
 ### International Approaches
@@ -205,7 +205,7 @@ The July 2024 <R id="ZTI1Mjg0Zj">NTIA report</R> represents the Biden administra
 | Jurisdiction | Approach | Key Feature |
 |--------------|----------|-------------|
 | EU (AI Act) | Risk-based regulation | Foundation models face transparency requirements |
-| China | Centralized control | <R id="NjY1MmUyYT">CAC warning</R>: open source "will widen impact and complicate repairs" |
+| China | Centralized control | <R id="sid_jZ8JYbOEB4">CAC warning</R>: open source "will widen impact and complicate repairs" |
 | UK | Monitoring focus | AI Safety Institute evaluation role |
 
 ---
@@ -218,7 +218,7 @@ Your view on open source affects multiple decisions:
 
 | If you favor open source | If you favor restrictions |
 |--------------------------|--------------------------|
-| Support <R id="ZjEyYzJiMT">NTIA's monitoring approach</R> | Develop licensing requirements for capable models |
+| Support <R id="sid_e2DXRncfeu">NTIA's monitoring approach</R> | Develop licensing requirements for capable models |
 | Invest in defensive technologies | Strengthen compute governance |
 | Focus on use-based regulation | Require pre-release evaluations |
 
@@ -249,10 +249,10 @@ Meta's Llama series illustrates the open source tradeoff in practice:
 | Release | Capability | Safety Measures | Open Source? |
 |---------|----------|-----------------|--------------|
 | Llama 1 (2023) | GPT-3 level | Minimal | Weights leaked, then released |
-| Llama 2 (2023) | GPT-3.5 level | Usage policies, fine-tuning guidance | <R id="NjA2NzIyNT">Community license</R> |
-| Llama 3 (2024) | GPT-4 approaching | <R id="YTFkZjcyMW">Llama Guard 3</R>, Prompt Guard | Community license with restrictions |
-| Llama 4 (2025) | Multimodal | Enhanced safety tools, <R id="MTEyNzA1ZT">LlamaFirewall</R> | Open weights, custom license |
-| Future "superintelligence" | Unknown | TBD | <R id="MTZiZjBlNT">Zuckerberg</R>: "likely won't open source" |
+| Llama 2 (2023) | GPT-3.5 level | Usage policies, fine-tuning guidance | <R id="sid_0VLoyAbVcO">Community license</R> |
+| Llama 3 (2024) | GPT-4 approaching | <R id="sid_hkvCoLnizJ">Llama Guard 3</R>, Prompt Guard | Community license with restrictions |
+| Llama 4 (2025) | Multimodal | Enhanced safety tools, <R id="sid_l0jZrIfC6z">LlamaFirewall</R> | Open weights, custom license |
+| Future "superintelligence" | Unknown | TBD | <R id="sid_kPZ1jp40IG">Zuckerberg</R>: "likely won't open source" |
 
 ### Safety Tools Released with Llama
 
@@ -265,7 +265,7 @@ Meta's Llama series illustrates the open source tradeoff in practice:
 
 | Criticism | Meta's Response |
 |-----------|----------------|
-| <R id="NTU5NDJkZT">Vinod Khosla</R>: "national security hazard" | Safety tools, usage restrictions, evaluation processes |
+| <R id="sid_SQJsvW0gSR">Vinod Khosla</R>: "national security hazard" | Safety tools, usage restrictions, evaluation processes |
 | Fine-tuning removes safeguards | Prompt Guard detects jailbreaks; cannot prevent all misuse |
 | Accelerates capability proliferation | Benefits of democratization outweigh risks (current position) |
 
@@ -285,8 +285,8 @@ Meta's Llama series illustrates the open source tradeoff in practice:
 | Claim | Supporting Evidence | Contrary Evidence |
 |-------|---------------------|-------------------|
 | Open source enables more safety research | Interpretability requires weight access | Most impactful safety research at closed labs |
-| Misuse risk is high | <R id="ZTI1Mjg0Zj">NTIA</R>: already used for harmful content | <R id="YmM4YmE2NG">RAND</R>: no significant biosecurity uplift |
-| Concentration risk is severe | <R id="ZmVmMWRiMz">Chatham House</R>: fundamental AI risk | Coordination easier with fewer actors |
+| Misuse risk is high | <R id="sid_PC79HD2HUf">NTIA</R>: already used for harmful content | <R id="sid_9GhJBGlfwI">RAND</R>: no significant biosecurity uplift |
+| Concentration risk is severe | <R id="sid_nLqXDq8pn9">Chatham House</R>: fundamental AI risk | Coordination easier with fewer actors |
 
 ---
 
@@ -294,24 +294,24 @@ Meta's Llama series illustrates the open source tradeoff in practice:
 
 ### Primary Sources
 
-- <R id="ZTI1Mjg0Zj">NTIA Report on Open Model Weights (2024)</R> — U.S. government policy recommendations
-- <R id="OWIwNzhjZG">Stanford HAI: Societal Impact of Open Foundation Models</R> — Marginal risk framework
-- <R id="Y2FkNTJlNm">RAND: Securing AI Model Weights (2024)</R> — Security benchmarks for frontier labs
+- <R id="sid_PC79HD2HUf">NTIA Report on Open Model Weights (2024)</R> — U.S. government policy recommendations
+- <R id="sid_95f15qf4V4">Stanford HAI: Societal Impact of Open Foundation Models</R> — Marginal risk framework
+- <R id="sid_JCmtIkvOua">RAND: Securing AI Model Weights (2024)</R> — Security benchmarks for frontier labs
 
 ### Research on Fine-Tuning Vulnerabilities
 
-- <R id="MTI4ZjhlMj">On the Consideration of AI Openness: Can Good Intent Be Abused?</R> — Fine-tuning attacks
-- <R id="NjM4ZmM0Ym">FAR AI: Data Poisoning and Jailbreak-Tuning</R> — Vulnerability research
-- <R id="ZTc2OWE4Mz">Jailbreak-Tuning: Models Efficiently Learn Jailbreak Susceptibility</R> — Attack scaling
+- <R id="sid_vaKYOTo3h3">On the Consideration of AI Openness: Can Good Intent Be Abused?</R> — Fine-tuning attacks
+- <R id="sid_Ext9Ff3i9U">FAR AI: Data Poisoning and Jailbreak-Tuning</R> — Vulnerability research
+- <R id="sid_F6hTzcBnnx">Jailbreak-Tuning: Models Efficiently Learn Jailbreak Susceptibility</R> — Attack scaling
 
 ### Policy Analysis
 
-- <R id="ZmVmMWRiMz">Chatham House: Open Source and Democratization of AI</R> — Concentration risk analysis
-- <R id="NWNhZDhkZD">Open Markets Institute: AI Monopoly Threat</R> — Market concentration
-- <R id="Y2MzNGM4YW">OECD: Balancing Innovation and Risk in Open-Weight Models</R> — International perspective
+- <R id="sid_nLqXDq8pn9">Chatham House: Open Source and Democratization of AI</R> — Concentration risk analysis
+- <R id="sid_nLuXYIOYvy">Open Markets Institute: AI Monopoly Threat</R> — Market concentration
+- <R id="sid_5fRfCW3wQh">OECD: Balancing Innovation and Risk in Open-Weight Models</R> — International perspective
 
 ### Industry Positions
 
-- <R id="YTFkZjcyMW">Meta: Expanding Open Source LLMs Responsibly</R> — Meta's safety approach
-- <R id="ZDE0NmU0NT">Anthropic Alignment Science</R> — Interpretability research
-- <R id="YzI0NDhjNG">AI Alliance: State of Open Source AI Trust and Safety (2024)</R> — Industry survey
+- <R id="sid_hkvCoLnizJ">Meta: Expanding Open Source LLMs Responsibly</R> — Meta's safety approach
+- <R id="sid_PtjYmhBYmR">Anthropic Alignment Science</R> — Interpretability research
+- <R id="sid_Q8Y8X67KAQ">AI Alliance: State of Open Source AI Trust and Safety (2024)</R> — Industry survey
