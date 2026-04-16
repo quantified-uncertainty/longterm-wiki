@@ -1,0 +1,545 @@
+import { describe, it, expect, beforeEach } from 'vitest';
+import {
+  dispatchPaths,
+  runPaths,
+  generateRunId,
+  shortHexFromUuid,
+  buildClaudeArgv,
+  readCurrent,
+  writeCurrent,
+  clearCurrent,
+  readMeta,
+  writeMeta,
+  parseEventLine,
+  parseEventsFile,
+  findResultEvent,
+  spawnDispatch,
+  detectConflict,
+  finalizeIfComplete,
+  type DispatchEnv,
+  type RunMeta,
+} from '../dispatch.ts';
+
+// ---------------------------------------------------------------------------
+// Fake env
+// ---------------------------------------------------------------------------
+
+interface SpawnCall {
+  cmd: string;
+  args: string[];
+  cwd: string;
+  stdoutFd: number;
+  stderrFd: number;
+  assignedPid: number;
+}
+
+class FakeEnv implements DispatchEnv {
+  files: Map<string, string> = new Map();
+  dirs: Set<string> = new Set();
+  openFds: Set<number> = new Set();
+  private nextFd = 100;
+  alivePids: Set<number> = new Set();
+  signaled: Array<{ pid: number; sig: string }> = [];
+  spawnCalls: SpawnCall[] = [];
+  nextPid = 50000;
+  nextUuid = '11111111-2222-3333-4444-555555555555';
+  private clock: Date = new Date('2026-04-16T15:00:00Z');
+
+  setNow(iso: string) { this.clock = new Date(iso); }
+  advance(ms: number) { this.clock = new Date(this.clock.getTime() + ms); }
+
+  now() { return this.clock; }
+  existsSync(p: string) { return this.files.has(p) || this.dirs.has(p); }
+  readFile(p: string) { return this.files.has(p) ? this.files.get(p) ?? null : null; }
+  writeFile(p: string, c: string) { this.files.set(p, c); }
+  mkdirp(p: string) {
+    const parts = p.split('/').filter(Boolean);
+    let cur = p.startsWith('/') ? '' : '.';
+    for (const part of parts) {
+      cur = cur ? `${cur}/${part}` : `/${part}`;
+      this.dirs.add(cur);
+    }
+    this.dirs.add(p);
+  }
+  openWriteFd(p: string) {
+    const fd = this.nextFd++;
+    this.openFds.add(fd);
+    // Simulate file creation (truncate if exists)
+    this.files.set(p, '');
+    return fd;
+  }
+  closeFd(fd: number) { this.openFds.delete(fd); }
+  unlink(p: string) { this.files.delete(p); }
+  pidAlive(pid: number) { return this.alivePids.has(pid); }
+  signal(pid: number, sig: 'SIGTERM' | 'SIGKILL') {
+    this.signaled.push({ pid, sig });
+    if (this.alivePids.has(pid)) {
+      // For SIGKILL, always removes alive. For SIGTERM we simulate "didn't die" unless test marks it.
+      if (sig === 'SIGKILL') this.alivePids.delete(pid);
+      return true;
+    }
+    return false;
+  }
+  spawnDetached(cmd: string, args: string[], opts: { cwd: string; stdoutFd: number; stderrFd: number }) {
+    const assignedPid = this.nextPid++;
+    this.spawnCalls.push({ cmd, args, cwd: opts.cwd, stdoutFd: opts.stdoutFd, stderrFd: opts.stderrFd, assignedPid });
+    this.alivePids.add(assignedPid);
+    return assignedPid;
+  }
+  uuid() { return this.nextUuid; }
+}
+
+// ---------------------------------------------------------------------------
+// path helpers
+// ---------------------------------------------------------------------------
+
+describe('dispatchPaths / runPaths', () => {
+  it('derives canonical paths from slot dir', () => {
+    const p = dispatchPaths('/lw/a7');
+    expect(p.dispatchDir).toBe('/lw/a7/.dispatch');
+    expect(p.currentFile).toBe('/lw/a7/.dispatch/current.json');
+    expect(p.runsDir).toBe('/lw/a7/.dispatch/runs');
+  });
+  it('derives run paths under a runId', () => {
+    const p = dispatchPaths('/lw/a7');
+    const rp = runPaths(p, '20260416T150000Z-abc123');
+    expect(rp.runDir).toBe('/lw/a7/.dispatch/runs/20260416T150000Z-abc123');
+    expect(rp.metaFile).toBe('/lw/a7/.dispatch/runs/20260416T150000Z-abc123/meta.json');
+    expect(rp.eventsFile).toBe('/lw/a7/.dispatch/runs/20260416T150000Z-abc123/events.jsonl');
+    expect(rp.stderrFile).toBe('/lw/a7/.dispatch/runs/20260416T150000Z-abc123/stderr.log');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// generateRunId + shortHexFromUuid
+// ---------------------------------------------------------------------------
+
+describe('generateRunId', () => {
+  it('produces a human-sortable ISO timestamp + hex suffix', () => {
+    const runId = generateRunId(new Date('2026-04-16T14:30:22Z'), 'ab12cd');
+    expect(runId).toBe('20260416T143022Z-ab12cd');
+  });
+  it('pads single-digit components', () => {
+    const runId = generateRunId(new Date('2026-01-02T03:04:05Z'), '000000');
+    expect(runId).toBe('20260102T030405Z-000000');
+  });
+});
+
+describe('shortHexFromUuid', () => {
+  it('takes the last 6 chars of the trailing segment', () => {
+    expect(shortHexFromUuid('11111111-2222-3333-4444-555555555555')).toBe('555555');
+  });
+  it('handles uppercase by lowercasing', () => {
+    expect(shortHexFromUuid('11111111-2222-3333-4444-ABCDEFabcdef')).toBe('abcdef');
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildClaudeArgv
+// ---------------------------------------------------------------------------
+
+describe('buildClaudeArgv', () => {
+  it('builds a full argv with all required flags', () => {
+    const argv = buildClaudeArgv({
+      sessionId: 'abc-123',
+      prompt: 'hi',
+      model: 'sonnet',
+      maxBudgetUsd: 5,
+      allowedTools: 'Bash,Read',
+      permissionMode: 'bypassPermissions',
+    });
+    expect(argv).toEqual([
+      '-p', 'hi',
+      '--output-format', 'stream-json',
+      '--verbose',
+      '--session-id', 'abc-123',
+      '--model', 'sonnet',
+      '--max-budget-usd', '5',
+      '--allowedTools', 'Bash,Read',
+      '--permission-mode', 'bypassPermissions',
+      '--disable-slash-commands',
+    ]);
+  });
+  it('appends --append-system-prompt when provided', () => {
+    const argv = buildClaudeArgv({
+      sessionId: 'abc-123',
+      prompt: 'hi',
+      model: 'sonnet',
+      maxBudgetUsd: 5,
+      allowedTools: 'Bash',
+      permissionMode: 'bypassPermissions',
+      appendSystemPrompt: 'You are a worker.',
+    });
+    expect(argv.slice(-2)).toEqual(['--append-system-prompt', 'You are a worker.']);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// current / meta read/write
+// ---------------------------------------------------------------------------
+
+describe('writeCurrent / readCurrent / clearCurrent', () => {
+  let env: FakeEnv;
+  beforeEach(() => { env = new FakeEnv(); });
+
+  it('round-trips a current pointer', () => {
+    const paths = dispatchPaths('/lw/a1');
+    writeCurrent(env, paths, {
+      runId: 'r1', sessionId: 's1', pid: 12345, startedAt: '2026-04-16T15:00:00Z',
+    });
+    const got = readCurrent(env, paths);
+    expect(got).toEqual({ runId: 'r1', sessionId: 's1', pid: 12345, startedAt: '2026-04-16T15:00:00Z' });
+  });
+
+  it('readCurrent returns null when absent', () => {
+    const paths = dispatchPaths('/lw/a1');
+    expect(readCurrent(env, paths)).toBeNull();
+  });
+
+  it('readCurrent returns null on malformed JSON', () => {
+    const paths = dispatchPaths('/lw/a1');
+    env.files.set(paths.currentFile, 'not json');
+    expect(readCurrent(env, paths)).toBeNull();
+  });
+
+  it('clearCurrent removes the pointer', () => {
+    const paths = dispatchPaths('/lw/a1');
+    writeCurrent(env, paths, { runId: 'r', sessionId: 's', pid: 1, startedAt: 'now' });
+    clearCurrent(env, paths);
+    expect(readCurrent(env, paths)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseEventLine
+// ---------------------------------------------------------------------------
+
+describe('parseEventLine', () => {
+  it('returns null on empty input', () => {
+    expect(parseEventLine('')).toBeNull();
+    expect(parseEventLine('   \n')).toBeNull();
+  });
+
+  it('tags non-JSON lines as "other" with clipped summary', () => {
+    const r = parseEventLine('not json');
+    expect(r?.kind).toBe('other');
+    expect(r?.summary).toBe('not json');
+  });
+
+  it('parses system/init', () => {
+    const line = JSON.stringify({
+      type: 'system', subtype: 'init',
+      cwd: '/tmp/x', session_id: 'abcdef12-34-56', model: 'claude-opus-4-7',
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('init');
+    expect(r?.summary).toContain('init model=claude-opus-4-7');
+    expect(r?.summary).toContain('cwd=/tmp/x');
+    expect(r?.summary).toContain('session=abcdef12');
+  });
+
+  it('parses assistant text content', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'text', text: 'hello there' }] },
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('text');
+    expect(r?.summary).toBe('hello there');
+  });
+
+  it('parses assistant tool_use with command input', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'tool_use', name: 'Bash', input: { command: 'git status' } }] },
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('tool_use');
+    expect(r?.summary).toBe('[tool] Bash: git status');
+  });
+
+  it('parses assistant tool_use with file_path input', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'tool_use', name: 'Read', input: { file_path: '/a/b.txt' } }] },
+    });
+    expect(parseEventLine(line)?.summary).toBe('[tool] Read: /a/b.txt');
+  });
+
+  it('parses user tool_result with string content', () => {
+    const line = JSON.stringify({
+      type: 'user',
+      message: { content: [{ type: 'tool_result', content: 'output line' }] },
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('tool_result');
+    expect(r?.summary).toContain('output line');
+  });
+
+  it('parses user tool_result with is_error', () => {
+    const line = JSON.stringify({
+      type: 'user',
+      message: { content: [{ type: 'tool_result', is_error: true, content: 'oops' }] },
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('tool_result');
+    expect(r?.summary).toContain('ERROR');
+  });
+
+  it('parses successful result event', () => {
+    const line = JSON.stringify({
+      type: 'result', subtype: 'success', is_error: false,
+      stop_reason: 'end_turn', num_turns: 3, duration_ms: 4200, total_cost_usd: 0.0425,
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('result');
+    expect(r?.summary).toContain('stop=end_turn');
+    expect(r?.summary).toContain('turns=3');
+    expect(r?.summary).toContain('duration=4.2s');
+    expect(r?.summary).toContain('cost=$0.0425');
+  });
+
+  it('tags errored result as "error"', () => {
+    const line = JSON.stringify({
+      type: 'result', is_error: true, stop_reason: 'api_error',
+      num_turns: 1, duration_ms: 100, total_cost_usd: 0.01,
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('error');
+    expect(r?.summary).toContain('ERROR');
+  });
+
+  it('parses assistant thinking content', () => {
+    const line = JSON.stringify({
+      type: 'assistant',
+      message: { content: [{ type: 'thinking', thinking: 'user wants pong' }] },
+    });
+    const r = parseEventLine(line);
+    expect(r?.kind).toBe('text');
+    expect(r?.summary).toBe('[thinking] user wants pong');
+  });
+
+  it('clips very long text to ~160 chars', () => {
+    const long = 'x'.repeat(500);
+    const line = JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: long }] } });
+    const r = parseEventLine(line);
+    expect(r?.summary.length).toBeLessThanOrEqual(160);
+    expect(r?.summary.endsWith('…')).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// parseEventsFile + findResultEvent
+// ---------------------------------------------------------------------------
+
+describe('parseEventsFile', () => {
+  it('returns [] for missing file', () => {
+    const env = new FakeEnv();
+    expect(parseEventsFile(env, '/nope/nope.jsonl')).toEqual([]);
+  });
+
+  it('parses every non-empty line', () => {
+    const env = new FakeEnv();
+    env.files.set('/a/events.jsonl',
+      JSON.stringify({ type: 'system', subtype: 'init', cwd: '/x', session_id: 's', model: 'm' }) + '\n' +
+      '\n' +  // blank line — should be skipped
+      JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'hi' }] } }) + '\n' +
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', num_turns: 1, duration_ms: 1, total_cost_usd: 0 }) + '\n',
+    );
+    const events = parseEventsFile(env, '/a/events.jsonl');
+    expect(events.map((e) => e.kind)).toEqual(['init', 'text', 'result']);
+  });
+});
+
+describe('findResultEvent', () => {
+  it('returns the final result', () => {
+    const env = new FakeEnv();
+    env.files.set('/a/events.jsonl',
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', num_turns: 1, duration_ms: 1, total_cost_usd: 0 }) + '\n',
+    );
+    const events = parseEventsFile(env, '/a/events.jsonl');
+    expect(findResultEvent(events)?.kind).toBe('result');
+  });
+  it('returns the error result when is_error=true', () => {
+    const env = new FakeEnv();
+    env.files.set('/a/events.jsonl',
+      JSON.stringify({ type: 'result', is_error: true, stop_reason: 'error', num_turns: 0, duration_ms: 0, total_cost_usd: 0 }) + '\n',
+    );
+    const events = parseEventsFile(env, '/a/events.jsonl');
+    expect(findResultEvent(events)?.kind).toBe('error');
+  });
+  it('returns null when no result event', () => {
+    const env = new FakeEnv();
+    env.files.set('/a/events.jsonl',
+      JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'hi' }] } }) + '\n',
+    );
+    const events = parseEventsFile(env, '/a/events.jsonl');
+    expect(findResultEvent(events)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// spawnDispatch + detectConflict
+// ---------------------------------------------------------------------------
+
+describe('spawnDispatch', () => {
+  it('spawns claude, writes meta + current, returns handle', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    const r = spawnDispatch(env, paths, {
+      slot: 3, cwd: '/lw/a3', prompt: 'echo hi',
+    });
+
+    expect(env.spawnCalls.length).toBe(1);
+    const [call] = env.spawnCalls;
+    expect(call.cmd).toBe('claude');
+    expect(call.args).toContain('--session-id');
+    expect(call.args).toContain('-p');
+    expect(call.args).toContain('echo hi');
+    expect(call.cwd).toBe('/lw/a3');
+    // file descriptors were given to child and then closed by parent
+    expect(env.openFds.size).toBe(0);
+
+    // handle returned
+    expect(r.handle.pid).toBe(call.assignedPid);
+    expect(r.handle.sessionId).toBe(env.nextUuid);
+    expect(r.handle.runId).toMatch(/^\d{8}T\d{6}Z-[0-9a-f]{6}$/);
+
+    // state persisted
+    const current = readCurrent(env, paths);
+    expect(current?.pid).toBe(call.assignedPid);
+    expect(current?.sessionId).toBe(env.nextUuid);
+    const rp = runPaths(paths, r.handle.runId);
+    const meta = readMeta(env, rp);
+    expect(meta?.pid).toBe(call.assignedPid);
+    expect(meta?.slot).toBe(3);
+    expect(meta?.cwd).toBe('/lw/a3');
+    expect(meta?.prompt).toBe('echo hi');
+    expect(meta?.model).toBe('sonnet'); // default
+    expect(meta?.maxBudgetUsd).toBe(5); // default
+  });
+
+  it('honors model / budget / allowedTools overrides', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    spawnDispatch(env, paths, {
+      slot: 3, cwd: '/lw/a3', prompt: 'x',
+      model: 'opus', maxBudgetUsd: 12, allowedTools: 'Read',
+      permissionMode: 'acceptEdits',
+    });
+    const call = env.spawnCalls[0];
+    const i = (flag: string) => call.args.indexOf(flag);
+    expect(call.args[i('--model') + 1]).toBe('opus');
+    expect(call.args[i('--max-budget-usd') + 1]).toBe('12');
+    expect(call.args[i('--allowedTools') + 1]).toBe('Read');
+    expect(call.args[i('--permission-mode') + 1]).toBe('acceptEdits');
+  });
+});
+
+describe('detectConflict', () => {
+  it('returns null when no current pointer', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    expect(detectConflict(env, paths)).toBeNull();
+  });
+
+  it('returns the conflict when pid is alive', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r', sessionId: 's', pid: 42, startedAt: 'now' });
+    env.alivePids.add(42);
+    const c = detectConflict(env, paths);
+    expect(c).not.toBeNull();
+    expect(c?.pid).toBe(42);
+    expect(c?.pidAlive).toBe(true);
+  });
+
+  it('returns null when pid is dead (stale pointer)', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r', sessionId: 's', pid: 42, startedAt: 'now' });
+    // pid NOT in alivePids
+    expect(detectConflict(env, paths)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// finalizeIfComplete
+// ---------------------------------------------------------------------------
+
+describe('finalizeIfComplete', () => {
+  const BASE_META: RunMeta = {
+    runId: 'r1', sessionId: 's1', pid: 99, slot: 1, cwd: '/lw/a1',
+    prompt: 'x', model: 'sonnet', maxBudgetUsd: 5,
+    allowedTools: 'Bash', permissionMode: 'bypassPermissions',
+    startedAt: '2026-04-16T15:00:00Z', cmd: ['claude'],
+  };
+
+  it('is a no-op when meta is already completed', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    const already = { ...BASE_META, completedAt: '2026-04-16T15:10:00Z', terminalReason: 'completed' };
+    const out = finalizeIfComplete(env, paths, rp, already);
+    expect(out).toBe(already);
+  });
+
+  it('finalizes on a successful result event', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: '2026-04-16T15:00:00Z' });
+    env.alivePids.add(99);
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', num_turns: 2, duration_ms: 3000, total_cost_usd: 0.02, terminal_reason: 'completed' }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.completedAt).toBeTruthy();
+    expect(out.exitCode).toBe(0);
+    expect(out.terminalReason).toBe('completed');
+    expect(out.totalCostUsd).toBe(0.02);
+    expect(out.numTurns).toBe(2);
+    expect(out.durationMs).toBe(3000);
+    // current pointer cleared
+    expect(readCurrent(env, paths)).toBeNull();
+  });
+
+  it('finalizes on an errored result event', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: true, stop_reason: 'api_error', num_turns: 0, duration_ms: 100, total_cost_usd: 0 }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.exitCode).toBe(1);
+    expect(out.terminalReason).toBe('error');
+  });
+
+  it('marks dead_without_result when pid is dead and no result event', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    // no events, pid not alive
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.completedAt).toBeTruthy();
+    expect(out.terminalReason).toBe('dead_without_result');
+    expect(readCurrent(env, paths)).toBeNull();
+  });
+
+  it('leaves meta unchanged while run is still live and no result yet', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    env.alivePids.add(99);
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'assistant', message: { content: [{ type: 'text', text: 'thinking' }] } }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.completedAt).toBeUndefined();
+    expect(readCurrent(env, paths)).not.toBeNull();
+  });
+});
