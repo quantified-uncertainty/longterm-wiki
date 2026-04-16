@@ -37,7 +37,7 @@ Both are regeneratable by running `apps/web/scripts/build-data-from-pg.mjs` and 
 Today's data flow:
 
 ```text
-YAML files (data/entities/*.yaml, packages/factbase/data/things/*.yaml, ...)
+YAML files (data/entities/*.yaml, packages/factbase/data/fb-entities/*.yaml, ...)
   ↓
 apps/web/scripts/build-data.mjs (reads YAML directly)
   ↓
@@ -108,7 +108,7 @@ None of the generated artifacts are read by the app; `database.json` is untouche
 | Collection                          | YAML                | PG                  | Notes                                                                         |
 |-------------------------------------|---------------------|---------------------|-------------------------------------------------------------------------------|
 | `data/entities/*.yaml` entities     | **2,026**           | **2,809**           | PG has +783. See §6.                                                          |
-| `packages/factbase/data/things/*.yaml` entities | 498       | (within entities)   | Loaded via `loadKBOnlyEntities`; 13 persons, 485 "things" (mostly orgs)       |
+| `packages/factbase/data/fb-entities/*.yaml` entities | 498       | (within entities)   | Loaded via `loadKBOnlyEntities`; 13 persons, 485 "things" (mostly orgs)       |
 | Facts (source, derivedFrom≠null)    | ~1,599 raw blocks   | **2,209**           | PG via `/api/facts/export`. Gap is partly expansion, partly drift.            |
 | Resources                           | — (migrated)        | **22,880**          | Already PG-primary since R6; out of Phase 3 scope.                            |
 | Personnel records                   | —                   | 1,068               | Already PG-primary; merged into KB via `mergePGRecordsIntoKB`                 |

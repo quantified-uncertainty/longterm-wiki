@@ -4,7 +4,7 @@
  * FactBase Entity Validation — verify every FactBase YAML file's entity
  * has a corresponding TableBase entry.
  *
- * For each YAML file in packages/factbase/data/things/:
+ * For each YAML file in packages/factbase/data/fb-entities/:
  *   - If file has `thing:` block: extract stableId
  *   - If file has `entity:` key: use the stableId directly
  *   - Check that stableId exists in data/entities/*.yaml

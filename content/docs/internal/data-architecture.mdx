@@ -19,14 +19,14 @@ The wiki organizes data into three conceptual layers:
 | Base | What it stores | Primary source of truth | Key access module |
 |------|---------------|------------------------|-------------------|
 | **TableBase** | Typed relational records — entities, resources, publications, experts, organizations | YAML files in `data/entities/`, `data/resources/` | `apps/web/src/data/tablebase.ts` |
-| **FactBase** | Structured triples with temporal data and provenance — facts about entities | YAML files in `packages/factbase/data/things/` | `apps/web/src/data/factbase.ts` |
+| **FactBase** | Structured triples with temporal data and provenance — facts about entities | YAML files in `packages/factbase/data/fb-entities/` | `apps/web/src/data/factbase.ts` |
 | **WikiBase** | Long-form prose MDX articles — the actual wiki pages readers see | MDX files in `content/docs/` | `Page` interface in `tablebase.ts` |
 
 <Mermaid chart={`
 flowchart TB
     subgraph Sources["Source of Truth"]
         YAML["data/entities/*.yaml\ndata/resources/*.yaml"]
-        FB_YAML["packages/factbase/data/things/*.yaml"]
+        FB_YAML["packages/factbase/data/fb-entities/*.yaml"]
         MDX["content/docs/**/*.mdx"]
     end
     subgraph Build["Build Pipeline"]
@@ -74,7 +74,7 @@ These tables mirror the YAML entity/resource catalog. YAML files remain authorit
 
 ### FactBase tables (structured facts)
 
-YAML files in `packages/factbase/data/things/` are currently the primary source. They sync to PG via `crux wiki-server sync-facts`. The PG `facts` table provides an export endpoint (`GET /api/facts/export`) for consumers that need PG-backed access. Once the PG schema includes all Fact fields (`validEnd`, `currency`, etc.), PG will become the primary source.
+YAML files in `packages/factbase/data/fb-entities/` are currently the primary source. They sync to PG via `crux wiki-server sync-facts`. The PG `facts` table provides an export endpoint (`GET /api/facts/export`) for consumers that need PG-backed access. Once the PG schema includes all Fact fields (`validEnd`, `currency`, etc.), PG will become the primary source.
 
 | PG table | Drizzle export | Purpose |
 |----------|---------------|---------|
@@ -160,7 +160,7 @@ These tables are not part of any Base. They track system operations, CI/CD, and 
 |---------|-------------------|---------|
 | `data/entities/*.yaml` | A YAML catalog entry describing a real-world thing (org, person, risk, concept) | `data/entities/organizations.yaml` has an entry for Anthropic |
 | `entities` PG table | A read mirror of those same YAML entries | `SELECT * FROM entities WHERE id = 'anthropic'` |
-| FactBase `Entity` type | A FactBase thing — an entity in the structured facts system with its own ID scheme | `packages/factbase/data/things/anthropic.yaml` has `id: mK9pX3rQ7n` |
+| FactBase `Entity` type | A FactBase thing — an entity in the structured facts system with its own ID scheme | `packages/factbase/data/fb-entities/anthropic.yaml` has `id: mK9pX3rQ7n` |
 | `factbase.ts` `getFactBaseEntity()` | Returns a FactBase entity by its FactBase ID or YAML slug | Returns the FactBase entity object |
 
 **Key distinction**: The YAML/PG `entities` table uses slug-based IDs (e.g., `anthropic`), while FactBase entities have their own 10-character alphanumeric IDs (e.g., `mK9pX3rQ7n`). The `factbase-data.json` file includes a `slugToEntityId` mapping to bridge between them.
@@ -169,21 +169,21 @@ These tables are not part of any Base. They track system operations, CI/CD, and 
 
 | Context | What "things" means | Example |
 |---------|-------------------|---------|
-| `packages/factbase/data/things/` | FactBase entity YAML files — one file per entity with facts, properties, and metadata | `packages/factbase/data/things/anthropic.yaml` |
+| `packages/factbase/data/fb-entities/` | FactBase entity YAML files — one file per entity with facts, properties, and metadata | `packages/factbase/data/fb-entities/anthropic.yaml` |
 | `things` PG table | A **cross-base universal index** that indexes items from ALL domains | A row with `thing_type='entity'` and `source_table='entities'` |
 
-**Key distinction**: The FactBase "things" directory (`packages/factbase/data/things/`) contains YAML data files that define entities and their facts. The PG `things` table is a completely separate concept — it is a universal search/browse index that contains rows pointing to entities, facts, grants, resources, personnel, and other record types. They share a name but serve unrelated purposes.
+**Key distinction**: The FactBase "things" directory (`packages/factbase/data/fb-entities/`) contains YAML data files that define entities and their facts. The PG `things` table is a completely separate concept — it is a universal search/browse index that contains rows pointing to entities, facts, grants, resources, personnel, and other record types. They share a name but serve unrelated purposes.
 
 ### "Facts" means different things in different contexts
 
 | Context | What "facts" means | Example |
 |---------|-------------------|---------|
-| `packages/factbase/data/things/*.yaml` facts | Structured triples in the FactBase YAML package (the source of truth) | `property: revenue`, `value: 6000000000`, `asOf: 2025-01` |
+| `packages/factbase/data/fb-entities/*.yaml` facts | Structured triples in the FactBase YAML package (the source of truth) | `property: revenue`, `value: 6000000000`, `asOf: 2025-01` |
 | `facts` PG table | A read mirror of FactBase YAML facts in PostgreSQL | Rows synced from YAML during build |
 | `data/facts/*.yaml` (legacy) | The old YAML facts system — deprecated for entities that have FactBase entries | Powers legacy `\<F\>` and `\<Calc\>` components |
 | `tablebase.ts` `Fact` interface | A legacy bridge type kept for backward compatibility | Used by calc-engine and a few old components |
 
-**Key distinction**: The authoritative source for structured facts is the FactBase YAML (`packages/factbase/data/things/`). The PG `facts` table is a read mirror for API queries. The old `data/facts/*.yaml` system is deprecated for FactBase-covered entities (see <EntityLink id="E1018">Data System Authority Rules</EntityLink>).
+**Key distinction**: The authoritative source for structured facts is the FactBase YAML (`packages/factbase/data/fb-entities/`). The PG `facts` table is a read mirror for API queries. The old `data/facts/*.yaml` system is deprecated for FactBase-covered entities (see <EntityLink id="E1018">Data System Authority Rules</EntityLink>).
 
 ---
 

@@ -1,7 +1,7 @@
 /**
  * Wiki Server Facts Sync
  *
- * Reads all KB YAML facts from packages/factbase/data/things/ and bulk-upserts
+ * Reads all KB YAML facts from packages/factbase/data/fb-entities/ and bulk-upserts
  * them to the wiki-server's /api/facts/sync endpoint.
  *
  * Reuses the shared batch sync infrastructure from sync-common.ts.

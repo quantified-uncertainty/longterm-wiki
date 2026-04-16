@@ -148,7 +148,7 @@ function loadKbPropertyIds(): Set<string> {
 
 /**
  * Load valid KB entity slugs from the filesystem.
- * An entity has KB data if `packages/factbase/data/things/<slug>.yaml` exists.
+ * An entity has KB data if `packages/factbase/data/fb-entities/<slug>.yaml` exists.
  */
 function loadKbEntitySlugs(): Set<string> {
   try {
@@ -573,7 +573,7 @@ async function main(): Promise<void> {
     for (const ref of issues.brokenKbfRefs) {
       console.log(`  ${c.yellow}${ref.file}:${ref.line}${c.reset}`);
       const desc = ref.reason === 'unknown-entity'
-        ? `entity "${ref.entity}" not found in packages/factbase/data/things/`
+        ? `entity "${ref.entity}" not found in packages/factbase/data/fb-entities/`
         : `property "${ref.property}" not found in packages/factbase/data/properties.yaml`;
       console.log(`    <${ref.component} entity="${ref.entity}" property="${ref.property}" />`);
       log.dim(`    ${desc}`);

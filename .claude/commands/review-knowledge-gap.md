@@ -59,7 +59,7 @@ pnpm crux query search "<topic>"
 
 For entities that DO exist, check which ones have thin coverage:
 - Entities with no wiki page or a very short page
-- Entities with no FactBase facts (check `packages/factbase/data/things/`)
+- Entities with no FactBase facts (check `packages/factbase/data/fb-entities/`)
 - Entities with pages but poor quality scores
 
 ### 2c. Relationship Gaps

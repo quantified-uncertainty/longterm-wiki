@@ -401,7 +401,7 @@ export default async function FactDetailPage({ params }: PageProps) {
         </KVRow>
         <KVRow label="YAML File">
           <span className="font-mono text-xs">
-            packages/factbase/data/things/{fact.subjectId}.yaml
+            packages/factbase/data/fb-entities/{fact.subjectId}.yaml
           </span>
         </KVRow>
       </KVTable>

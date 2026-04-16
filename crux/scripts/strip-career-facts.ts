@@ -9,7 +9,7 @@ import { readFileSync, writeFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
 const ROOT = join(import.meta.dirname, "../..");
-const THINGS_DIR = join(ROOT, "packages/factbase/data/things");
+const THINGS_DIR = join(ROOT, "packages/factbase/data/fb-entities");
 const dryRun = process.argv.includes("--dry-run");
 
 let filesModified = 0;

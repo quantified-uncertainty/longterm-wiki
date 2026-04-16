@@ -326,7 +326,7 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
               )}
               <tr>
                 <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">YAML Source</td>
-                <td className="py-1.5 px-3 font-mono">packages/factbase/data/things/{entityId}.yaml</td>
+                <td className="py-1.5 px-3 font-mono">packages/factbase/data/fb-entities/{entityId}.yaml</td>
               </tr>
               <tr>
                 <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Facts</td>

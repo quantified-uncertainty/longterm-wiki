@@ -8,7 +8,7 @@
 import { readFileSync, readdirSync } from "node:fs";
 import { join } from "node:path";
 
-const THINGS_DIR = join(import.meta.dirname, "../../packages/factbase/data/things");
+const THINGS_DIR = join(import.meta.dirname, "../../packages/factbase/data/fb-entities");
 const TIMEOUT_MS = 10_000;
 const CONCURRENCY = 20;
 

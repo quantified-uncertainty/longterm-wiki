@@ -122,7 +122,7 @@ async function runCommand(
   let errors = 0;
 
   lines.push(`\x1b[1mFactBase Entity Migration${dryRun ? ' (DRY RUN)' : ''}\x1b[0m`);
-  lines.push(`Scanning ${yamlFiles.length} YAML files in packages/factbase/data/things/\n`);
+  lines.push(`Scanning ${yamlFiles.length} YAML files in packages/factbase/data/fb-entities/\n`);
 
   for (const filename of yamlFiles.sort()) {
     const filePath = join(KB_THINGS_DIR, filename);

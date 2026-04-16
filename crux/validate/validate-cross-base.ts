@@ -6,7 +6,7 @@
  * Checks consistency between the three data layers:
  *   - WikiBase: MDX pages in content/docs/ (frontmatter with wikiId)
  *   - TableBase: YAML entities in data/entities/*.yaml (with wikiId, type, title)
- *   - FactBase: YAML files in packages/factbase/data/things/ (with entity stableId)
+ *   - FactBase: YAML files in packages/factbase/data/fb-entities/ (with entity stableId)
  *
  * Checks performed:
  *   1. Page wikiId exists as entity in TableBase (error if not)
@@ -317,7 +317,7 @@ export function checkFactBaseCoverage(
         id: 'factbase-no-stableid',
         severity: 'warning',
         message: `FactBase file "${record.filename}" has no extractable stableId`,
-        file: join('packages/factbase/data/things', record.filename),
+        file: join('packages/factbase/data/fb-entities', record.filename),
       });
       continue;
     }
@@ -327,7 +327,7 @@ export function checkFactBaseCoverage(
         id: 'factbase-missing-tablebase',
         severity: 'warning',
         message: `FactBase entity "${record.filename}" (stableId: ${record.entityStableId}) has no TableBase entry in data/entities/*.yaml`,
-        file: join('packages/factbase/data/things', record.filename),
+        file: join('packages/factbase/data/fb-entities', record.filename),
         entityId: record.entityStableId,
       });
     }

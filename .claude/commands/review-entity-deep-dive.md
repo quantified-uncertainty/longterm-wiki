@@ -64,7 +64,7 @@ For each dimension, rate the entity and identify specific issues:
 Based on your assessment, take action in priority order:
 
 1. **Fix factual errors** — Correct inaccurate information in the wiki page and FactBase facts
-2. **Fill critical gaps** — Add missing FactBase facts to `packages/factbase/data/things/`
+2. **Fill critical gaps** — Add missing FactBase facts to `packages/factbase/data/fb-entities/`
 3. **Fix relationships** — Update `relatedEntries` to add missing connections
 4. **Update stale content** — Fix outdated information with current data
 5. **Improve the wiki page** — If the MDX page is thin, run `pnpm crux w improve $ENTITY_ID --tier=standard --apply`

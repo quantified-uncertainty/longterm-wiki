@@ -276,7 +276,7 @@ async function migrateCommand(
       exitCode: 1,
       output: `Usage: crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
-  Migrate an entity from data/entities/*.yaml to packages/factbase/data/things/*.yaml.
+  Migrate an entity from data/entities/*.yaml to packages/factbase/data/fb-entities/*.yaml.
 
 Options:
   --dry-run    Print the generated YAML without writing any files
@@ -370,7 +370,7 @@ Examples:
   if (!dryRun) {
     lines.push('');
     lines.push('Next steps:');
-    lines.push(`  1. Review and enrich: packages/factbase/data/things/${slug}.yaml`);
+    lines.push(`  1. Review and enrich: packages/factbase/data/fb-entities/${slug}.yaml`);
     lines.push('  2. Add facts (born-year, role, employed-by, etc.) with sources');
     lines.push('  3. Validate: pnpm crux fb validate');
     lines.push('  4. Check: pnpm crux fb show ' + slug);
@@ -393,7 +393,7 @@ Usage:
   crux fb migrate <entity-slug> [--dry-run] [--stub-old] [--force]
 
   Reads an entity from data/entities/*.yaml and creates a new KB thing file
-  at packages/factbase/data/things/<slug>.yaml with the mapped structure.
+  at packages/factbase/data/fb-entities/<slug>.yaml with the mapped structure.
 
 Options:
   --dry-run    Print the generated YAML without writing any files

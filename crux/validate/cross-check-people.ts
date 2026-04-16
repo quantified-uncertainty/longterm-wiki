@@ -7,7 +7,7 @@
  * data sources:
  *
  *   1. YAML entities (`data/entities/people.yaml`) — `customFields.Role`
- *   2. FactBase YAML (`packages/factbase/data/things/<slug>.yaml`) — `property: role` facts
+ *   2. FactBase YAML (`packages/factbase/data/fb-entities/<slug>.yaml`) — `property: role` facts
  *
  * This catches the class of bugs where e.g. Sutskever shows "Chief Scientist"
  * in one place and "CEO" in another, or Leike has 3 different titles.
@@ -223,7 +223,7 @@ export function loadFactBaseThing(
 ): FactBaseThing | null {
   const thingPath = join(
     projectRoot,
-    "packages/factbase/data/things",
+    "packages/factbase/data/fb-entities",
     `${slug}.yaml`,
   );
   if (!existsSync(thingPath)) {
@@ -354,7 +354,7 @@ async function main(): Promise<void> {
   );
   console.log(
     c.dim +
-      "Comparing roles between data/entities/people.yaml and packages/factbase/data/things/*.yaml" +
+      "Comparing roles between data/entities/people.yaml and packages/factbase/data/fb-entities/*.yaml" +
       c.reset +
       "\n",
   );

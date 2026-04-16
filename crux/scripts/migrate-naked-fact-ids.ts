@@ -34,7 +34,7 @@ import type { Graph } from "../../packages/factbase/src/graph.ts";
 import { findFiles } from "../lib/file-utils.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
-const THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
+const THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/fb-entities");
 const FACTBASE_DATA_DIR = join(PROJECT_ROOT, "packages/factbase/data");
 const MAPPING_OUT = join(
   PROJECT_ROOT,

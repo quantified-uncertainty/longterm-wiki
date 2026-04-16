@@ -163,7 +163,7 @@ export function loadAllEntityFiles(): EntityEntry[] {
 export function loadAllKbThings(): Array<{
   thing: { id: string; type: string; name?: string };
 }> {
-  const dir = path.join(ROOT, 'packages/factbase/data/things');
+  const dir = path.join(ROOT, 'packages/factbase/data/fb-entities');
   if (!fs.existsSync(dir)) return [];
   const files = fs.readdirSync(dir).filter((f) => f.endsWith('.yaml'));
   const things: Array<{ thing: { id: string; type: string; name?: string } }> =
@@ -369,7 +369,7 @@ export function discoverCandidates(): Map<string, PersonCandidate> {
         kb.thing.name || slugToName(kb.thing.id),
         {
           type: 'kb-thing',
-          context: `packages/factbase/data/things/${kb.thing.id}.yaml`,
+          context: `packages/factbase/data/fb-entities/${kb.thing.id}.yaml`,
         },
       );
     }

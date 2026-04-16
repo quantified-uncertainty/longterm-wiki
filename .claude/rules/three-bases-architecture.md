@@ -13,7 +13,7 @@ Subsystem map for the TableBase / FactBase / WikiBase architecture. **Read this 
 | Base | What it stores | Source of truth | Access module |
 |------|----------------|-----------------|----------------|
 | **TableBase** | Typed relational records (entities, resources, publications, orgs) | `data/entities/*.yaml`, `data/resources/*.yaml` | `apps/web/src/data/tablebase.ts` |
-| **FactBase** | Structured triples with temporal data + provenance | `packages/factbase/data/things/*.yaml` | `apps/web/src/data/factbase.ts` |
+| **FactBase** | Structured triples with temporal data + provenance | `packages/factbase/data/fb-entities/*.yaml` | `apps/web/src/data/factbase.ts` |
 | **WikiBase** | Long-form MDX articles | `content/docs/**/*.mdx` | `Page` interface in `tablebase.ts` |
 
 PG has read mirrors of all three. YAML/MDX is authoritative; PG is queryable.
@@ -24,31 +24,28 @@ PG has read mirrors of all three. YAML/MDX is authoritative; PG is queryable.
 |------------------|---------------|
 | `data/entities/*.yaml` | YAML catalog entry (slug-based ID like `anthropic`) |
 | `entities` PG table | Read mirror of the YAML catalog |
-| `packages/factbase/data/things/anthropic.yaml` | **FactBase** entity (10-char ID like `mK9pX3rQ7n`) |
+| `packages/factbase/data/fb-entities/anthropic.yaml` | **FactBase** entity (10-char ID like `mK9pX3rQ7n`) |
 | `factbase.ts::getFactBaseEntity()` | Returns FactBase entity by slug OR 10-char ID |
 
 **Bridge**: `factbase-data.json` has a `slugToEntityId` map. If you're confused about which "entity" you hold, check: `sid_` prefix or 10 chars alphanumeric = FactBase; plain slug = TableBase.
 
-## The word "things" is also overloaded
+## The word "things" — unambiguous as of QUA-501
 
-| Where you see it | What it means |
-|------------------|---------------|
-| `packages/factbase/data/things/` | **FactBase entity YAML files** (one per entity) |
-| `things` PG table | **Cross-base universal search index** — unrelated to the directory |
+The PG `things` table is the **cross-base universal search index** — it fans in rows from entities, facts, grants, resources, personnel, etc. so search can hit one table. It is **not** a FactBase concept; `source_table` + `source_id` columns point back to the originating record.
 
-The PG `things` table indexes items from ALL domains (entity, fact, grant, resource, personnel, etc.) for unified search. **It is not a FactBase concept**. `source_table` + `source_id` columns point back to the originating record.
+> **Historical note**: FactBase entity YAML used to live at `packages/factbase/data/things/`, which collided with the PG table name and was the #1 source of "which things is this?" confusion. QUA-501 renamed that directory to `packages/factbase/data/fb-entities/`. When you read "things" anywhere in the codebase today, it unambiguously means the PG search-index table.
 
 ## The word "facts" is also overloaded
 
 | Where you see it | What it means |
 |------------------|---------------|
-| `packages/factbase/data/things/*.yaml` `facts:` blocks | **Authoritative** FactBase YAML facts |
+| `packages/factbase/data/fb-entities/*.yaml` `facts:` blocks | **Authoritative** FactBase YAML facts |
 | `facts` PG table | Read mirror of FactBase YAML. Will become primary source once PG schema includes all Fact fields (`validEnd`, `currency`, etc.) |
 | `tablebase.ts::Fact` interface | Legacy bridge type for calc-engine, old components |
 
 > **Note**: The old `data/facts/*.yaml` directory has been **removed**. If you see a doc or comment referring to it, it's stale. Don't look for it.
 
-**Rule**: new structured facts go in FactBase YAML (`packages/factbase/data/things/*.yaml`). Period. Use `<FBF>` / `<FBFactValue>` / `<Calc>` in MDX.
+**Rule**: new structured facts go in FactBase YAML (`packages/factbase/data/fb-entities/*.yaml`). Period. Use `<FBF>` / `<FBFactValue>` / `<Calc>` in MDX.
 
 ## Which base owns this file? Quick map
 
@@ -67,7 +64,7 @@ The PG `things` table indexes items from ALL domains (entity, fact, grant, resou
 ## When in doubt — the decision tree
 
 1. **Does it have numeric fields to aggregate, many-to-many relationships, or its own directory page?** → **PG-primary TableBase** table (grants, investments, benchmarks pattern). See `.claude/rules/entity-sync-pipeline.md`.
-2. **Is it a structured fact about an existing entity (revenue, CEO, headcount, valuation)?** → **FactBase** YAML (`packages/factbase/data/things/<entity>.yaml`).
+2. **Is it a structured fact about an existing entity (revenue, CEO, headcount, valuation)?** → **FactBase** YAML (`packages/factbase/data/fb-entities/<entity>.yaml`).
 3. **Is it a lightweight catalog entry used as a link target (a concept, a risk, a minor person)?** → **YAML entity** in `data/entities/*.yaml`.
 4. **Is it long-form prose?** → **WikiBase** MDX in `content/docs/`.
 

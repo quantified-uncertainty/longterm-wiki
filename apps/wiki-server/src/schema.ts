@@ -896,7 +896,7 @@ export const sourceSnapshots = pgTable("source_snapshots", {
  *
  * Naming note: "entities" in this table refers to YAML catalog entries
  * (orgs, people, risks, concepts). This is distinct from FactBase "entities"
- * which have their own 10-char IDs in packages/factbase/data/things/.
+ * which have their own 10-char IDs in packages/factbase/data/fb-entities/.
  */
 export const entities = pgTable(
   "entities",
@@ -942,7 +942,7 @@ export const entities = pgTable(
 // ── FactBase: Structured facts mirror ─────────────────────────────────
 
 /**
- * Facts — read mirror of FactBase YAML (packages/factbase/data/things/).
+ * Facts — read mirror of FactBase YAML (packages/factbase/data/fb-entities/).
  *
  * Stores individual facts tied to entities, including timeseries data
  * (grouped by measure). PG is the authoritative source for facts;
@@ -2571,7 +2571,7 @@ export const publications = pgTable(
 //
 // NAMING NOTE: This PG `things` table is a cross-base universal index.
 // It is NOT related to the FactBase "things" directory
-// (packages/factbase/data/things/) which contains FactBase entity YAML files.
+// (packages/factbase/data/fb-entities/) which contains FactBase entity YAML files.
 // The name collision is a known confusion — see data-architecture.mdx.
 
 export const VALID_THING_TYPES = [

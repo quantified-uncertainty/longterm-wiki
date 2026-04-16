@@ -112,7 +112,7 @@ Wiki pages use `generateStaticParams()` to pre-render all pages at build time fr
 4. Components injected via `mdxComponents` map
 
 ### FactBase (Structured Facts)
-Structured facts are defined in `packages/factbase/data/things/*.yaml` and accessed via the FactBase data layer (`src/data/factbase.ts`). Use `<FBF>` for inline fact values, `<FBFactValue>` for standalone display, and `<Calc>` for computed expressions referencing FactBase facts.
+Structured facts are defined in `packages/factbase/data/fb-entities/*.yaml` and accessed via the FactBase data layer (`src/data/factbase.ts`). Use `<FBF>` for inline fact values, `<FBFactValue>` for standalone display, and `<Calc>` for computed expressions referencing FactBase facts.
 
 ### Content Architecture
 Content directories are **flat** (max 2 levels). Grouping is done via frontmatter `subcategory` metadata, not directory nesting:

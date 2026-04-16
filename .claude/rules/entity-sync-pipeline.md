@@ -45,7 +45,7 @@ Crux-side scripts that read YAML source and batch POST to wiki-server. All use `
 | Script | Source | Target endpoint |
 |--------|--------|-----------------|
 | `sync-entities.ts` | `data/entities/*.yaml` | `/api/entities/sync` |
-| `sync-facts.ts` | `packages/factbase/data/things/*.yaml` | `/api/facts/sync` |
+| `sync-facts.ts` | `packages/factbase/data/fb-entities/*.yaml` | `/api/facts/sync` |
 | `sync-things.ts` | derived | `/api/things/sync` |
 | `sync-pages.ts` | `content/docs/**/*.mdx` | `/api/pages/sync` |
 | `sync-sessions.ts` / `sync-session.ts` | session logs | `/api/sessions/*` |

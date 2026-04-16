@@ -3,7 +3,7 @@
 /**
  * KB Entity Slug Validation — gate check for entity reference coverage.
  *
- * Scans FactBase YAML files (packages/factbase/data/things/) for entity
+ * Scans FactBase YAML files (packages/factbase/data/fb-entities/) for entity
  * references (via !ref fact values) and validates that every referenced
  * entity has an entry in the local entity registry (data/entities/*.yaml).
  *

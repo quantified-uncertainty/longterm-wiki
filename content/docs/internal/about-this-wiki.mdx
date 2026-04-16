@@ -107,7 +107,7 @@ The wiki is organized around three complementary data layers:
 | Base | What it stores | Where it lives |
 |------|----------------|----------------|
 | **TableBase** | Typed relational records (entities, grants, publications, etc.) | `data/entities/*.yaml` and PG-primary tables |
-| **FactBase** | Structured triples with temporal data and provenance | `packages/factbase/data/things/*.yaml` |
+| **FactBase** | Structured triples with temporal data and provenance | `packages/factbase/data/fb-entities/*.yaml` |
 | **WikiBase** | Long-form prose MDX articles | `content/docs/**/*.mdx` |
 
 YAML and MDX are the source of truth; Postgres (via the wiki-server) keeps read mirrors for querying.

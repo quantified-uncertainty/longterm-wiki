@@ -27,7 +27,7 @@ import { waitForHealthy, batchSync, fetchWithRetry } from "./sync-common.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ENTITIES_DIR = join(PROJECT_ROOT, "data/entities");
-const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/things");
+const KB_THINGS_DIR = join(PROJECT_ROOT, "packages/factbase/data/fb-entities");
 const EXPERTS_FILE = join(PROJECT_ROOT, "data/experts.yaml");
 
 // --- Configuration ---
@@ -254,7 +254,7 @@ export function loadEntityYamls(
 }
 
 /**
- * Load KB-only entities from packages/factbase/data/things/*.yaml.
+ * Load KB-only entities from packages/factbase/data/fb-entities/*.yaml.
  * Only returns entities NOT already present in the entityIds set.
  * KB YAML structure: { thing: { id, stableId, type, name, wikiId, aliases } }
  */

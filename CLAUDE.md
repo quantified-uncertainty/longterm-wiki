@@ -138,14 +138,14 @@ Adding a new directory requires: schema in `entity-schemas.ts`, transform in `en
 
 **Naming clarifications** (common confusions):
 - The PG `entities` table = **TableBase** (a read mirror of `data/entities/*.yaml`). FactBase also has "entities" with separate 10-char IDs — these are different.
-- The PG `facts` table = **FactBase mirror** (a read mirror of `packages/factbase/data/things/` YAML). Not the same as the legacy `data/facts/*.yaml`.
+- The PG `facts` table = **FactBase mirror** (a read mirror of `packages/factbase/data/fb-entities/` YAML). Not the same as the legacy `data/facts/*.yaml`.
 - The PG `things` table = **cross-base universal index** (NOT a FactBase concept). It indexes items from ALL domains (entities, facts, grants, resources, etc.).
-- `packages/factbase/data/things/` = FactBase entity YAML files. NOT related to the PG `things` table despite the shared name.
+- `packages/factbase/data/fb-entities/` = FactBase entity YAML files. NOT related to the PG `things` table despite the shared name.
 - Full naming guide: `content/docs/internal/data-architecture.mdx`
 
 ## Data Flow
 
-1. YAML files in `data/` define entities and resources; FactBase data in `packages/factbase/data/things/`
+1. YAML files in `data/` define entities and resources; FactBase data in `packages/factbase/data/fb-entities/`
 2. `apps/web/scripts/build-data.mjs` transforms YAML + MDX frontmatter → `database.json` + `factbase-data.json`
 3. Next.js app reads `database.json` and `factbase-data.json` at build time
 4. MDX pages in `content/docs/` are compiled via next-mdx-remote
@@ -175,7 +175,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`
 - **Tailwind CSS v4** with shadcn/ui components
 - **Page templates**: `crux/lib/page-templates.ts`, style guides in `content/docs/internal/`
-- **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/things/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
+- **FactBase facts & Calc**: FactBase YAML (`packages/factbase/data/fb-entities/`) is the sole authoritative source for structured facts. Use `<FBF>` / `<FBFactValue>` in MDX, `<Calc>` for computed values. See `content/docs/internal/canonical-facts.mdx`.
 - **Internal sidebar**: `apps/web/src/lib/wiki-nav.ts`
 - **Issue tracking**: **Linear is the primary issue tracker** — use `crux linear` commands for issue creation, tracking, and updates. GitHub is used for PRs, CI, and legacy issues only. Use `crux gh pr/ci/epic` commands for GitHub — never raw `curl`
 - **Entity IDs — two tiers**:

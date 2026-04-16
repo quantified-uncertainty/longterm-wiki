@@ -13,7 +13,7 @@ import { EntityLink } from '@components/wiki';
 
 FactBase and TableBase together hold the wiki's **structured data**:
 
-- **FactBase** — typed facts with temporal anchors and source provenance, stored as YAML in `packages/factbase/data/things/`. Used by `<FBF>` components and Calc expressions in MDX pages.
+- **FactBase** — typed facts with temporal anchors and source provenance, stored as YAML in `packages/factbase/data/fb-entities/`. Used by `<FBF>` components and Calc expressions in MDX pages.
 - **TableBase** — relational entities (people, orgs, grants, divisions, funding programs) stored in PostgreSQL and mirrored from `data/entities/*.yaml`.
 - **ID system** — every wiki entity gets an `E####` numeric ID and a `sid_` stable ID, allocated centrally by the wiki-server.
 
@@ -96,7 +96,7 @@ Both use the `sid_` prefix; use `isSid()` from `@longterm-wiki/id-utils` to dete
 - `packages/factbase/` — graph, types, validation, format
 - `crux/lib/factbase-loader.ts` / `factbase-writer.ts` — load and append
 - `data/entities/*.yaml` — entity definitions (orgs, persons, concepts)
-- `packages/factbase/data/things/*.yaml` — fact storage (e.g., `anthropic.yaml`)
+- `packages/factbase/data/fb-entities/*.yaml` — fact storage (e.g., `anthropic.yaml`)
 
 ## Related hubs
 

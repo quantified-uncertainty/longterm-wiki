@@ -253,7 +253,7 @@ export async function cleanContradictedCommand(
     for (const [type, verdicts] of nonPgTypes) {
       lines.push(`  ${type}: ${verdicts.length} contradicted verdicts`);
       if (type === 'fact') {
-        lines.push('    → FactBase YAML files need manual correction in packages/factbase/data/things/');
+        lines.push('    → FactBase YAML files need manual correction in packages/factbase/data/fb-entities/');
       } else if (type === 'citation') {
         lines.push('    → Citation content may need re-ingestion or URL update');
       }
