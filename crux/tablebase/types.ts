@@ -93,9 +93,38 @@ export interface TableScanResult {
   profiles: TableProfile[];
 }
 
+export type FieldColumnType = 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id';
+
+/** Per-field NULL/empty/"n/a" statistics for a single column */
+export interface FieldGapStat {
+  field: string;
+  columnType: FieldColumnType;
+  total: number;
+  nullCount: number;
+  emptyCount: number;
+  naCount: number;
+  nullPct: number;
+  emptyPct: number;
+  naPct: number;
+  /** Combined nullPct + emptyPct + naPct (clamped to 100). */
+  gapPct: number;
+  /** Up to 3 row IDs where the field is missing — useful for enrichment triage */
+  sampleMissingRows: string[];
+}
+
+/** Field-gap report for a single table */
+export interface FieldGapReport {
+  table: string;
+  totalRows: number;
+  /** Sorted by gapPct descending (biggest gaps first) */
+  fields: FieldGapStat[];
+}
+
 /** Summary of a full scan across all tables */
 export interface ScanSummary {
   tables: TableScanResult[];
+  /** Populated only when the scan was invoked with --fields */
+  fieldReports?: FieldGapReport[];
   timestamp: string;
 }
 

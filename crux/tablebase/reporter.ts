@@ -4,7 +4,7 @@
  * Console table formatting for scan and gaps output.
  */
 
-import type { ScanSummary, EnrichmentTask } from './types.ts';
+import type { ScanSummary, EnrichmentTask, FieldGapReport } from './types.ts';
 
 const BOLD = '\x1b[1m';
 const DIM = '\x1b[2m';
@@ -70,6 +70,38 @@ export function formatGaps(tasks: EnrichmentTask[], options?: { limit?: number }
   });
 
   lines.push('', `${DIM}Use: crux tablebase improve <task-id> [--dry-run]${RESET}`);
+
+  return lines.join('\n');
+}
+
+/** Format field-gap reports as a console table (QUA-551). */
+export function formatFieldGapReports(reports: FieldGapReport[], options?: { top?: number }): string {
+  const top = options?.top ?? 10;
+  const lines: string[] = [`${BOLD}TableBase Field-Gap Report${RESET}`, ''];
+
+  for (const report of reports) {
+    lines.push(
+      `${BOLD}${report.table}${RESET} ${DIM}(${report.totalRows} rows)${RESET}`,
+      `${'Field'.padEnd(18)} ${'Type'.padEnd(8)} ${'Null%'.padStart(7)} ${'Empty%'.padStart(7)} ${'N/A%'.padStart(6)} ${'Gap%'.padStart(7)} ${'Sample IDs'}`,
+      `${'─'.repeat(18)} ${'─'.repeat(8)} ${'─'.repeat(7)} ${'─'.repeat(7)} ${'─'.repeat(6)} ${'─'.repeat(7)} ${'─'.repeat(30)}`,
+    );
+
+    const visible = report.fields.slice(0, top);
+    for (const f of visible) {
+      // Color the Gap% column: higher gap = more red
+      const gapStr = `${f.gapPct}%`;
+      const color = f.gapPct >= 50 ? RED : f.gapPct >= 20 ? YELLOW : GREEN;
+      const samples = f.sampleMissingRows.slice(0, 3).join(', ');
+      lines.push(
+        `${f.field.padEnd(18)} ${f.columnType.padEnd(8)} ${(`${f.nullPct}%`).padStart(7)} ${(`${f.emptyPct}%`).padStart(7)} ${(`${f.naPct}%`).padStart(6)} ${color}${gapStr.padStart(7)}${RESET} ${DIM}${samples}${RESET}`,
+      );
+    }
+
+    if (report.fields.length > visible.length) {
+      lines.push(`${DIM}... ${report.fields.length - visible.length} more fields with lower gap rates${RESET}`);
+    }
+    lines.push('');
+  }
 
   return lines.join('\n');
 }
