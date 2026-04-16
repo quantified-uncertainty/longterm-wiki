@@ -23,15 +23,29 @@ export function ClaimsPipelineSummary({ entityId }: { entityId: string }) {
   const [data, setData] = useState<PipelineData | null>(null);
 
   useEffect(() => {
+    setData(null);
+    const ac = new AbortController();
     (async () => {
       try {
-        const res = await fetch(`/api/claims-by-entity-proxy?entity_id=${encodeURIComponent(entityId)}&limit=200`);
-        if (!res.ok) return;
+        const res = await fetch(
+          `/api/claims-by-entity-proxy?entity_id=${encodeURIComponent(entityId)}&limit=200`,
+          { signal: ac.signal },
+        );
+        if (!res.ok) {
+          if (res.status !== 503) {
+            // 503 = wiki-server not configured (expected in some envs).
+            // Surface other failures so regressions aren't hidden by the muted UI.
+            console.warn(`ClaimsPipelineSummary: HTTP ${res.status} for ${entityId}`);
+          }
+          return;
+        }
         setData(await res.json());
-      } catch {
-        // silent — this is a muted footer badge
+      } catch (e) {
+        if (e instanceof DOMException && e.name === "AbortError") return;
+        console.warn(`ClaimsPipelineSummary fetch failed for ${entityId}:`, e);
       }
     })();
+    return () => ac.abort();
   }, [entityId]);
 
   if (!data || data.total === 0) return null;
