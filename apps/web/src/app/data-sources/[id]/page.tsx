@@ -17,6 +17,15 @@ import {
   RECORD_TYPE_COLORS,
 } from "@/app/data-sources/data-source-labels";
 import { SnapshotsSection } from "./snapshots-section";
+import {
+  relativeTime,
+  shortHash,
+  safeIsoDate,
+  safeIsoDateTime,
+  isSafeHttpUrl,
+} from "./detail-utils";
+
+type Freshness = ReturnType<typeof computeFreshness>;
 
 export const revalidate = 300;
 
@@ -43,7 +52,7 @@ export async function generateMetadata({
 }
 
 const FRESHNESS_STYLES: Record<
-  string,
+  Freshness,
   { label: string; bg: string; text: string }
 > = {
   fresh: {
@@ -78,22 +87,6 @@ const STATUS_STYLES: Record<string, { label: string; color: string }> = {
   archived: { label: "Archived", color: "text-muted-foreground" },
   defunct: { label: "Defunct", color: "text-red-600" },
 };
-
-function relativeTime(iso: string): string {
-  const ms = Date.now() - new Date(iso).getTime();
-  if (isNaN(ms) || ms < 0) return iso;
-  const days = Math.round(ms / 86400000);
-  if (days === 0) return "today";
-  if (days === 1) return "1d ago";
-  if (days < 30) return `${days}d ago`;
-  if (days < 365) return `${Math.round(days / 30)}mo ago`;
-  return `${(days / 365).toFixed(1)}y ago`;
-}
-
-function shortHash(h: string | null): string {
-  if (!h) return "—";
-  return h.length > 10 ? h.slice(0, 10) : h;
-}
 
 function TermList({
   items,
@@ -134,11 +127,18 @@ export default async function DataSourceDetailPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
+  const encodedId = encodeURIComponent(id);
 
-  const detailResult = await fetchDetailed<RpcDataSourceDetailResult>(
-    `/api/data-sources/${encodeURIComponent(id)}`,
-    { revalidate: 300 },
-  );
+  const [detailResult, snapshotsResult] = await Promise.all([
+    fetchDetailed<RpcDataSourceDetailResult>(
+      `/api/data-sources/${encodedId}`,
+      { revalidate: 300 },
+    ),
+    fetchDetailed<RpcSnapshotListResult>(
+      `/api/data-sources/${encodedId}/snapshots?limit=20`,
+      { revalidate: 300 },
+    ),
+  ]);
 
   if (!detailResult.ok) {
     if (
@@ -194,15 +194,16 @@ export default async function DataSourceDetailPage({
     ? resolveEntityName(source.publisherEntityId)
     : null;
 
-  const snapshotsResult = await fetchDetailed<RpcSnapshotListResult>(
-    `/api/data-sources/${encodeURIComponent(id)}/snapshots?limit=20`,
-    { revalidate: 300 },
-  );
   const snapshots = snapshotsResult.ok ? snapshotsResult.data.snapshots : [];
   const snapshotTotal = snapshotsResult.ok ? snapshotsResult.data.total : 0;
+  const snapshotsUnavailable = !snapshotsResult.ok;
 
   const recordsLinkHref =
-    source.recordType === "grant" ? `/grants?dataSource=${source.id}` : null;
+    source.recordType === "grant"
+      ? `/grants?dataSource=${encodeURIComponent(source.id)}`
+      : null;
+
+  const fetchUrlSafe = isSafeHttpUrl(source.fetchUrl) ? source.fetchUrl : null;
 
   const statCards: Array<{
     label: string;
@@ -224,15 +225,15 @@ export default async function DataSourceDetailPage({
     },
     {
       label: "Last Snapshot",
-      value: source.lastSnapshotAt ? relativeTime(source.lastSnapshotAt) : "—",
+      value: relativeTime(source.lastSnapshotAt),
       sub: source.lastSnapshotAt
-        ? new Date(source.lastSnapshotAt).toISOString().slice(0, 10)
+        ? safeIsoDate(source.lastSnapshotAt)
         : "never fetched",
     },
     {
       label: "Snapshots",
-      value: snapshotTotal.toLocaleString(),
-      sub: snapshotsResult.ok ? "total stored" : "unavailable",
+      value: snapshotsUnavailable ? "—" : snapshotTotal.toLocaleString(),
+      sub: snapshotsUnavailable ? "unavailable" : "total stored",
     },
     {
       label: "Update Frequency",
@@ -258,15 +259,22 @@ export default async function DataSourceDetailPage({
     { label: "Access method", value: source.accessMethod },
     {
       label: "Fetch URL",
-      value: source.fetchUrl ? (
+      value: fetchUrlSafe ? (
         <a
-          href={source.fetchUrl}
+          href={fetchUrlSafe}
           target="_blank"
           rel="noopener noreferrer"
           className="text-accent-foreground hover:underline break-all"
         >
-          {source.fetchUrl}
+          {fetchUrlSafe}
         </a>
+      ) : source.fetchUrl ? (
+        <span
+          className="text-muted-foreground break-all"
+          title="URL scheme is not http(s); link suppressed"
+        >
+          {source.fetchUrl}
+        </span>
       ) : (
         <span className="text-muted-foreground">—</span>
       ),
@@ -305,7 +313,7 @@ export default async function DataSourceDetailPage({
       label: "Created",
       value: (
         <span className="tabular-nums text-muted-foreground">
-          {new Date(source.createdAt).toISOString().slice(0, 10)}
+          {safeIsoDate(source.createdAt)}
         </span>
       ),
     },
@@ -313,7 +321,7 @@ export default async function DataSourceDetailPage({
       label: "Updated",
       value: (
         <span className="tabular-nums text-muted-foreground">
-          {new Date(source.updatedAt).toISOString().slice(0, 10)}
+          {safeIsoDate(source.updatedAt)}
         </span>
       ),
     },
@@ -352,15 +360,15 @@ export default async function DataSourceDetailPage({
             {recordTypeLabel}
           </span>
         </div>
-        {source.fetchUrl && (
+        {fetchUrlSafe && (
           <p className="text-sm text-muted-foreground break-all">
             <a
-              href={source.fetchUrl}
+              href={fetchUrlSafe}
               target="_blank"
               rel="noopener noreferrer"
               className="hover:underline"
             >
-              {source.fetchUrl}
+              {fetchUrlSafe}
             </a>
           </p>
         )}
@@ -476,9 +484,7 @@ export default async function DataSourceDetailPage({
                       label: "Fetched",
                       value: (
                         <span className="tabular-nums">
-                          {new Date(
-                            source.latestSnapshot.fetchedAt,
-                          ).toLocaleString()}
+                          {safeIsoDateTime(source.latestSnapshot.fetchedAt)}
                         </span>
                       ),
                     },
@@ -534,7 +540,13 @@ export default async function DataSourceDetailPage({
             </span>
           )}
         </div>
-        <SnapshotsSection snapshots={snapshots} />
+        {snapshotsUnavailable ? (
+          <div className="rounded-lg border border-amber-500/40 bg-amber-500/5 p-4 text-sm text-amber-700 dark:text-amber-300">
+            Snapshot history is temporarily unavailable.
+          </div>
+        ) : (
+          <SnapshotsSection snapshots={snapshots} />
+        )}
       </section>
     </div>
   );

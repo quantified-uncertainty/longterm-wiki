@@ -1,11 +1,7 @@
 import type { RpcSnapshotListResult } from "@/lib/wiki-server";
+import { shortHash, safeIsoDateTime } from "./detail-utils";
 
 type Snapshot = RpcSnapshotListResult["snapshots"][number];
-
-function shortHash(h: string | null): string {
-  if (!h) return "—";
-  return h.length > 10 ? h.slice(0, 10) : h;
-}
 
 export function SnapshotsSection({ snapshots }: { snapshots: Snapshot[] }) {
   if (snapshots.length === 0) {
@@ -38,7 +34,7 @@ export function SnapshotsSection({ snapshots }: { snapshots: Snapshot[] }) {
               }
             >
               <td className="px-4 py-2 tabular-nums whitespace-nowrap">
-                {new Date(s.fetchedAt).toISOString().slice(0, 19).replace("T", " ")}
+                {safeIsoDateTime(s.fetchedAt)}
               </td>
               <td className="px-4 py-2 tabular-nums text-right">
                 {s.recordCount != null ? s.recordCount.toLocaleString() : "—"}
