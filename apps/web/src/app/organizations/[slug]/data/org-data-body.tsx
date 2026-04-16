@@ -3,10 +3,6 @@ import { EntityDbPage } from "@/components/directory/EntityDbPage";
 import { DataViewTabs } from "@/components/directory/DataViewTabs";
 import { ClaimsPipelineSummary } from "@/components/entity/claims-pipeline-summary";
 
-/**
- * Body content for the organization data page.
- * Renders the Claims Pipeline summary + Structured Facts / Database Records tabs.
- */
 export function OrgDataBody({ slug }: { slug: string }) {
   const structuredContent = <FactBaseEntityBody entityId={slug} skipVerdicts />;
   const databaseContent = (
@@ -20,11 +16,11 @@ export function OrgDataBody({ slug }: { slug: string }) {
 
   return (
     <div className="space-y-6">
-      <ClaimsPipelineSummary entityId={slug} />
       <DataViewTabs
         structuredContent={structuredContent}
         databaseContent={databaseContent}
       />
+      <ClaimsPipelineSummary entityId={slug} />
     </div>
   );
 }
