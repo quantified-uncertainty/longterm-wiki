@@ -1,0 +1,103 @@
+# Research playbook for organizations (companies, labs, nonprofits, academic groups).
+# Consumed by `crux context for-entity` and the `crux content improve` analyze phase.
+# See QUA-33.
+
+entityType: organization
+
+description: >
+  Organizations encompass AI labs (frontier and academic), nonprofits, funders,
+  government bodies, and commercial companies. Facts drift quickly — headcounts
+  change, orgs restructure, funding rounds add layers. Prefer primary sources
+  (org website, SEC, regulatory filings) over aggregators, and always record
+  "as of" dates.
+
+checklist:
+  - "Founding year and location"
+  - "Legal structure (for-profit, nonprofit, academic, government, public benefit)"
+  - "Current headcount (approximate, with as-of date)"
+  - "Total funding or budget (most recent disclosed figure)"
+  - "Most recent funding round (date, amount, lead investor) if applicable"
+  - "Key leadership: CEO/ED, CTO, founders, board members"
+  - "Parent organization or major subsidiaries"
+  - "Mission or primary research focus"
+  - "Major products, services, or research outputs"
+  - "Geographic footprint (primary office(s), remote stance)"
+  - "Recent material news within the last 12 months"
+
+sources:
+  - name: "Official organization website (/about, /team, /research, /careers)"
+    reliability: high
+    covers: [mission, leadership, legal-structure, primary-focus, office-locations]
+    pitfalls:
+      - "Forward-looking and promotional tone — extract facts, not framing"
+      - "Stale for orgs in transition (recent restructures may not be reflected)"
+  - name: "Crunchbase"
+    url_pattern: "crunchbase.com/organization/{slug}"
+    reliability: medium
+    covers: [funding-rounds, investors, founding-year, acquisitions]
+    pitfalls:
+      - "Free tier hides most funding round detail; paid tier or cached Google result often needed"
+      - "Headcount estimates are scraped and frequently stale"
+      - "Merger/acquisition history can lag by months"
+  - name: "SEC EDGAR (10-K, S-1, 8-K)"
+    url_pattern: "sec.gov/cgi-bin/browse-edgar?action=getcompany&CIK={ticker-or-cik}"
+    reliability: very-high
+    covers: [financials, executive-compensation, risk-factors, funding-rounds, material-events]
+    applies_when: "Organization is US-publicly-traded or filed an S-1/S-4"
+    pitfalls:
+      - "Only covers public companies and certain regulated filers"
+      - "Fiscal year may differ from calendar year"
+  - name: "LinkedIn company page"
+    url_pattern: "linkedin.com/company/{slug}"
+    reliability: low
+    covers: [headcount-estimate, industry-classification, office-locations]
+    pitfalls:
+      - "Employee counts are inflated — includes alumni, consultants, and loosely-affiliated contractors"
+      - "Some organizations maintain multiple pages; pick the one linked from the official site"
+      - "Industry classifications are too coarse to be useful"
+  - name: "PitchBook / CB Insights"
+    reliability: high
+    covers: [funding-rounds, valuation, investors, competitive-positioning]
+    applies_when: "Organization is venture-funded or private-equity-backed"
+    pitfalls:
+      - "Paywalled — often inaccessible without institutional access"
+      - "Valuations are self-reported and can lag by quarters"
+  - name: "Companies House (UK) / equivalent national registries"
+    reliability: very-high
+    covers: [legal-structure, directors, registered-address, filings-history]
+    applies_when: "Organization is registered in a jurisdiction with public company registries (UK, EU, etc.)"
+  - name: "Charity Navigator / GuideStar / nonprofit IRS 990"
+    reliability: high
+    covers: [revenue, expenses, executive-compensation, program-spending, major-donors]
+    applies_when: "Organization is a US 501(c)(3) or comparable nonprofit"
+    pitfalls:
+      - "990s lag by 12-18 months from the reporting year"
+  - name: "Wikipedia"
+    reliability: medium
+    covers: [history, leadership, general-overview]
+    pitfalls:
+      - "Quality varies wildly; verify the cited primary sources rather than trusting the article"
+      - "Can lag recent events by weeks to months"
+  - name: "Recent news (org blog, press releases, tech press)"
+    reliability: medium
+    covers: [recent-announcements, product-launches, funding-announcements, personnel-changes]
+    pitfalls:
+      - "Press releases are promotional; cross-check numbers with primary sources"
+      - "Anonymous leaks or rumor-mill coverage should be treated as speculation until confirmed"
+
+research_order:
+  - "Start with the official site — establish the org's self-description and current leadership"
+  - "Check SEC EDGAR or the relevant national registry for hard financial facts"
+  - "Cross-reference Crunchbase / PitchBook for funding history and investors"
+  - "Verify current leadership on LinkedIn with their role timestamps"
+  - "Scan recent news (last 12 months) for material changes not yet on the official site"
+  - "For nonprofits: pull the most recent 990 for revenue and program spending"
+
+common_pitfalls:
+  - "Conflating parent/subsidiary — e.g., DeepMind vs Google/Alphabet, OpenAI vs OpenAI Global LLC vs the nonprofit"
+  - "Out-of-date headcount after layoffs, hiring sprees, or reorgs — always attach an as-of date"
+  - "Conflating research output with commercial output (papers vs products)"
+  - "Ignoring org restructures: name changes, spin-offs, or mergers may mean your source is describing a no-longer-extant entity"
+  - "Double-counting funding (e.g., counting announced and disbursed rounds separately, or including credits-in-kind as cash)"
+  - "Self-reported mission statements are not neutral — cite them as such, not as fact"
+  - "For international orgs, not checking the local registry (company data is often more authoritative there than US aggregators)"

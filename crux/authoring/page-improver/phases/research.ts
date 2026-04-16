@@ -15,6 +15,7 @@ import type { PageData, AnalysisResult, ResearchResult, PipelineOptions } from '
 import { log, writeTemp } from '../utils.ts';
 import { runAgent } from '../api.ts';
 import { parseAndValidate, ResearchResultSchema } from './json-parsing.ts';
+import { loadPlaybook, formatPlaybookForPrompt } from '../../../lib/research-playbooks.ts';
 
 /**
  * Convert research sources + fetched content into SourceCacheEntry[] for
@@ -138,11 +139,22 @@ export async function researchPhase(page: PageData, analysis: AnalysisResult, op
     return { sources: [] };
   }
 
+  // Per-type research playbook (QUA-33): inject source recommendations so the
+  // research agent prefers authoritative primary sources (SEC, institutional
+  // profiles) over generic web search results.
+  const playbook = loadPlaybook(page.entityType);
+  const playbookSection = playbook
+    ? `\n## Research Playbook for \`${playbook.entityType}\`\nPrefer these sources over generic web search where applicable, and be wary of the listed pitfalls.\n\n${formatPlaybookForPrompt(playbook)}\n`
+    : '';
+  if (playbook) {
+    log('research', `Loaded research playbook for entityType="${playbook.entityType}"`);
+  }
+
   const prompt = `Research the following topics to improve a wiki page about "${page.title}".
 
 ## Topics to Research
 ${topics.map((t, i) => `${i + 1}. ${t}`).join('\n')}
-
+${playbookSection}
 ## Research Instructions
 
 For each topic:
