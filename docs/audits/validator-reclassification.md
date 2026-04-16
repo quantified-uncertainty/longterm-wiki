@@ -171,7 +171,7 @@ This turns the check into a TypeScript type guard that routes.ts handlers must u
 - **validate-soft-fks:** Legacy text FK fields (personId, organizationId) → validateable post-upsert via `resolveEntityFKs()` helper
 - **validate-resource-refs:** authorEntityIds, publicationId → validateable via `validateEntityRefs()`
 
-**Decision:** Migrate as W to route handlers. Depends on QUA-408 Phase 2 (sync pipeline standardization). The infrastructure exists in `entity-sync-pipeline.md`.
+**Decision:** Migrate as W to route handlers. Depends on QUA-408 Phase 2 (sync pipeline standardization). The infrastructure exists in `tablebase-sync-factory.md`.
 
 ---
 
