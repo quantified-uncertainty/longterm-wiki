@@ -75,14 +75,17 @@ function cleanUrl(url: string): string {
 }
 
 /**
- * Normalize a URL for deduplication: strips protocol, www, trailing slashes,
- * and lowercases. This groups footnotes that reference the same source.
+ * Normalize a URL for deduplication: strips protocol, www, fragment, trailing
+ * slashes, and tracking parameters; lowercases host and path. Groups footnotes
+ * that reference the same source.
  *
- * Wraps `@longterm-wiki/url-utils::normalizeUrl` with the dedup option set
- * (stripProtocol + lowercasePath). Preserves all query params (no tracking
- * filter) so footnotes that differ only in tracking suffix dedup correctly,
- * the same as before — note: the canonical helper does strip tracking by
- * default, which actually improves dedup quality here.
+ * Wraps `@longterm-wiki/url-utils::normalizeUrl` with `stripProtocol +
+ * lowercasePath`. Note: the canonical helper strips tracking parameters
+ * (utm_*, fbclid, gclid, ...) by default — a slight semantic widening
+ * vs. the pre-QUA-341 implementation, which kept all query params. This
+ * makes footnote dedup more aggressive (two URLs differing only in utm_*
+ * now collapse). Pass `keepTracking: true` to recover the old behavior if
+ * a regression appears.
  */
 export function normalizeUrlForDedup(url: string): string {
   return normalizeUrl(url, { stripProtocol: true, lowercasePath: true });
@@ -186,7 +189,9 @@ function extractTitleFromText(text: string): string | null {
  * Parse footnotes and group them by unique source URL.
  *
  * @param content - Raw MDX content
- * @param urlToResourceId - Optional map of URL → resource ID for matching
+ * @param urlToResourceId - Optional map of URL → resource ID for matching.
+ *   Keys must be canonical URLs (run through `normalizeUrl(url, { stripProtocol: true })`).
+ *   The lookup normalizes the footnote URL the same way before checking.
  */
 export function parseFootnoteSources(
   content: string,
@@ -206,14 +211,11 @@ export function parseFootnoteSources(
     if (!sourceMap.has(normUrl)) {
       urlNormToCanonical.set(normUrl, fn.url);
 
-      // Try to find matching resource
+      // Try to find matching resource — normalize the lookup URL the same way
+      // resource maps are built (canonical key, protocol-agnostic).
       let resourceId: string | null = null;
       if (urlToResourceId) {
-        resourceId =
-          urlToResourceId.get(fn.url) ??
-          urlToResourceId.get(fn.url.replace(/\/$/, "")) ??
-          urlToResourceId.get(fn.url.replace(/\/$/, "") + "/") ??
-          null;
+        resourceId = urlToResourceId.get(normalizeUrl(fn.url, { stripProtocol: true })) ?? null;
       }
 
       sourceMap.set(normUrl, {

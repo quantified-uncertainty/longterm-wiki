@@ -27,7 +27,8 @@ import { filterBulkImportDates } from './lib/git-date-utils.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
-import { buildUrlToResourceMap } from './lib/unconverted-links.mjs';
+import { buildUrlToResourceMap, urlKey as resourceUrlKey } from './lib/unconverted-links.mjs';
+import { normalizeUrl as normalizeUrlCanonical } from '@longterm-wiki/url-utils';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
 import { computeStats } from './lib/statistics.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
@@ -269,20 +270,12 @@ function warnIfSnapshotStale(snapshotPath) {
 
 /**
  * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
- * Strips protocol, www. prefix, trailing slashes, and hash fragments. Preserves
- * query string. Mirrors the logic in resource-utils.ts (cannot import .ts in .mjs).
+ * Wraps the canonical normalizer with the dedup preset (stripProtocol +
+ * lowercasePath). Both writer and reader use this so symmetric normalization
+ * preserves the legacy behavior.
  */
 function normalizeUrlForMatch(str) {
-  try {
-    const url = new URL(str);
-    url.hostname = url.hostname.replace(/^www\./, '');
-    url.hash = '';
-    return (
-      url.host + url.pathname.replace(/\/+$/, '') + url.search
-    ).toLowerCase();
-  } catch {
-    return str.replace(/\/+$/, '').toLowerCase();
-  }
+  return normalizeUrlCanonical(str, { stripProtocol: true, lowercasePath: true });
 }
 
 /**
@@ -750,7 +743,7 @@ async function main() {
   // Build URL → resource map for unconverted link detection
   const resources = database.resources || [];
   const urlToResource = buildUrlToResourceMap(resources);
-  console.log(`  urlToResource: ${urlToResource.size} URL variations mapped`);
+  console.log(`  urlToResource: ${urlToResource.size} canonical URL keys mapped`);
 
   // Fetch edit log dates, earliest edit log dates, and citation stats from
   // wiki-server (parallel). Also build git-based date maps (synchronous, fast).
@@ -955,11 +948,12 @@ async function main() {
         }
       }
 
-      // Source 3: URL matching from markdown links
+      // Source 3: URL matching from markdown links (canonical-key lookup;
+      // urlToId is built from urlToResource, which is canonical-keyed too).
       const linkRe = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
       while ((m = linkRe.exec(page.rawContent)) !== null) {
         const url = m[2];
-        const id = urlToId.get(url) ?? urlToId.get(url.replace(/\/$/, '')) ?? urlToId.get(url.replace(/\/$/, '') + '/');
+        const id = urlToId.get(resourceUrlKey(url));
         if (id && !seen.has(id) && validIds.has(id)) { seen.add(id); mergedIds.push(id); }
       }
 

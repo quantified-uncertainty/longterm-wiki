@@ -130,7 +130,7 @@ function cmdShow(opts: ParsedOpts): void {
   const needsResource: typeof links = [];
 
   for (const link of links) {
-    const resource = urlMap.get(link.url) || urlMap.get(link.url.replace(/\/$/, ''));
+    const resource = lookupResourceByUrl(urlMap, link.url);
     if (resource) {
       convertible.push({ ...link, resource });
     } else {
@@ -286,8 +286,8 @@ async function cmdCreate(opts: ParsedOpts): Promise<void> {
   const resources = loadResources();
   const urlMap = buildUrlToResourceMap(resources);
 
-  // Check if already exists
-  const existing = urlMap.get(url) || urlMap.get(url.replace(/\/$/, ''));
+  // Check if already exists (canonical-key lookup)
+  const existing = lookupResourceByUrl(urlMap, url);
   if (existing) {
     console.log(`Resource already exists: ${existing.id}`);
     console.log(`  Title: ${existing.title}`);

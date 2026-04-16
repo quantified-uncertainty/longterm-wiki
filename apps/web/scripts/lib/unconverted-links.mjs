@@ -10,7 +10,7 @@
 import { normalizeUrl } from "@longterm-wiki/url-utils";
 
 /** Canonical lookup key for a resource URL — protocol+slash agnostic. */
-function urlKey(url) {
+export function urlKey(url) {
   return normalizeUrl(url, { stripProtocol: true });
 }
 

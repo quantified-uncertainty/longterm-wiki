@@ -43,6 +43,10 @@ const ALLOWLIST = new Set<string>([
   "apps/web/src/components/wiki/resource-utils.ts",
   "crux/resource-utils.ts",
   "apps/web/scripts/lib/unconverted-links.mjs",
+  // Per-command thin wrappers that delegate to the canonical helper with
+  // dedup preset, kept locally so call-sites stay readable.
+  "crux/commands/entity-resources.ts",
+  "apps/web/scripts/build-data.mjs",
 ]);
 
 /** Function names that this validator considers URL-normalizers. */
@@ -50,16 +54,15 @@ const BANNED_NAMES = [
   "normalizeUrl",
   "normalizeUrlForJoin",
   "normalizeUrlForDedup",
+  "normalizeUrlForMatch",
   "normalizeUrlKey",
   "urlMatches",
 ];
 
-/** Match `function NAME(`, `const NAME = (`, `const NAME = function(`. */
+/** Match `function NAME(`, `const NAME = ...`, `let NAME = ...`, `var NAME = ...`. */
 const FUNCTION_DEF_PATTERN = new RegExp(
   `\\b(?:function|const|let|var)\\s+(${BANNED_NAMES.join("|")})\\b`,
 );
-
-/** Match `(...): NAME` (returning) — not what we want. The above pattern catches definitions. */
 
 interface Violation {
   file: string;

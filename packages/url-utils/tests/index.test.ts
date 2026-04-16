@@ -158,11 +158,20 @@ describe("normalizeUrl — adversarial inputs", () => {
     expect(normalizeUrl("https://example.com:8443/foo")).toBe("https://example.com:8443/foo");
   });
 
-  it("handles non-http schemes by passing through host", () => {
-    // ftp://, mailto:, etc. — URL parses but our normalization assumes http(s).
-    // We don't crash; we produce a stable output.
-    const result = normalizeUrl("ftp://example.com/file");
-    expect(result).toContain("example.com");
+  it("routes non-http(s) schemes through the fallback (no scheme collision)", () => {
+    // ftp://, mailto:, javascript: — passed through unchanged via fallback so
+    // they cannot accidentally collide with http(s) URLs under stripProtocol.
+    expect(normalizeUrl("ftp://example.com/file")).toBe("ftp://example.com/file");
+    expect(normalizeUrl("mailto:foo@bar.com")).toBe("mailto:foo@bar.com");
+    expect(normalizeUrl("javascript:alert(1)")).toBe("javascript:alert(1)");
+  });
+
+  it("never collapses non-http(s) and http(s) schemes under stripProtocol", () => {
+    // Critical safety property: even with stripProtocol, javascript:foo and
+    // https://foo must NOT produce the same key.
+    const evil = normalizeUrl("javascript:alert", { stripProtocol: true });
+    const safe = normalizeUrl("https://alert", { stripProtocol: true });
+    expect(evil).not.toBe(safe);
   });
 });
 

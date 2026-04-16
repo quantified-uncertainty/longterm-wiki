@@ -39,6 +39,12 @@ export interface NormalizeUrlOptions {
  *
  * Falls back to a trimmed-lowercased version of the input if it can't be
  * parsed as a URL — this keeps fuzzy lookups working on malformed inputs.
+ *
+ * Non-`http(s):` schemes (e.g., `mailto:`, `javascript:`, `file:`) are passed
+ * through the fallback path. This avoids the open-redirect risk where
+ * `stripProtocol: true` would collapse `javascript:foo` and `https://foo` to
+ * the same key — callers that route normalized output to a redirect / link
+ * rewriter cannot accidentally cross schemes.
  */
 export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): string {
   const { stripProtocol, lowercasePath, sortParams, keepTracking } = opts;
@@ -47,6 +53,12 @@ export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): strin
   try {
     url = new URL(raw);
   } catch {
+    return raw.trim().replace(/\/+$/, "").toLowerCase();
+  }
+
+  // Reject non-http(s) schemes via the fallback path so they cannot collide
+  // with http(s) URLs under stripProtocol: true.
+  if (url.protocol !== "http:" && url.protocol !== "https:") {
     return raw.trim().replace(/\/+$/, "").toLowerCase();
   }
 

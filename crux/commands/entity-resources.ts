@@ -17,6 +17,7 @@
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
+import { normalizeUrl } from "@longterm-wiki/url-utils";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -122,20 +123,13 @@ function loadResources(): MinimalResource[] {
 }
 
 /**
- * Normalize a URL for fuzzy matching. Strips protocol, www prefix, trailing
- * slashes, and hash fragments. Preserves query string. Lowercases.
+ * Normalize a URL for fuzzy matching. Wraps the canonical normalizer with the
+ * dedup preset (stripProtocol + lowercasePath). Both writer and reader of
+ * `urlToResourceId` go through this helper, so the symmetric normalization
+ * preserves the legacy behavior.
  */
 function normalizeUrlForMatch(str: string): string {
-  try {
-    const url = new URL(str);
-    url.hostname = url.hostname.replace(/^www\./, "");
-    url.hash = "";
-    return (
-      url.host + url.pathname.replace(/\/+$/, "") + url.search
-    ).toLowerCase();
-  } catch {
-    return str.replace(/\/+$/, "").toLowerCase();
-  }
+  return normalizeUrl(str, { stripProtocol: true, lowercasePath: true });
 }
 
 /**
