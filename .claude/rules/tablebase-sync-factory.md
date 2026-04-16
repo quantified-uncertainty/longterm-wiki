@@ -66,10 +66,51 @@ Hooks (`preValidate`, `postUpsert`) receive the Drizzle transaction handle `tx`.
 ## What the factory does NOT handle
 
 - **GET /all, /stats, /by-entity** endpoints — hand-roll these. Use the existing `paginatedQuery` helper from `crux/lib/wiki-server/` for pagination.
+- **`/delete-batch` endpoints** — use `deleteBatchHandler()` from `apps/wiki-server/src/routes/shared/delete-batch.ts` (factory handles `/sync` only).
 - **Slug displacement** — `entities.ts` is excluded from the factory permanently
 - **Multiple sync endpoints per route** — only the primary `/sync` is in scope. Secondary endpoints (e.g., `research-areas.ts /sync-papers`) stay hand-rolled.
 - **Non-standard primary keys** — the factory assumes `table.id` is the conflict target unless `conflictTarget` is overridden
 - **Custom response shapes** — routes that need to return additional fields beyond the standard shape should hand-roll
+
+## Shared helpers for hand-rolled work
+
+For the 5 factory-excluded routes and any hand-rolled GET/DELETE endpoints, these helpers live in `apps/wiki-server/src/routes/shared/`:
+
+| Helper | File | Purpose |
+|--------|------|---------|
+| `sqlInList()` | `query-helpers.ts` | Parameterized `IN (...)` for array values; wraps `unnest()` correctly |
+| `validateEntityRefs()` | `validate-entity-refs.ts` | Batch FK check against `entities.id` and `entities.stable_id`; bypass-with-reason logging |
+| `findMissingEntityRefs()` | `validate-entity-refs.ts` | Returns unresolved refs without throwing |
+| `shouldSkipEntityValidation()` | `validate-entity-refs.ts` | Migration-mode escape hatch |
+| `resolveEntityFKs()` | `resolve-entity-fks.ts` | Post-upsert: resolves raw FK columns (slug/stableId) → `entities.stable_id`, backfills display names |
+| `deleteBatchHandler()` | `delete-batch.ts` | Factory for `/delete-batch` endpoints. Deletes from domain table + `things` with FK-safe ordering. Options: `maxBatchSize`, `label`, `pkColumn`, `maxIdLength` |
+| `upsertThingsInTx()` | `thing-sync.ts` | Upserts `things` records inside domain transaction |
+
+**Before writing any delete endpoint**: use `deleteBatchHandler()`. Do not write a hand-rolled delete.
+**Before writing any array-parameter query**: use `sqlInList()`. Do not write raw `unnest()`.
+**Before any hand-rolled sync that takes entity refs**: call `validateEntityRefs()` first.
+
+## Crux-side sync orchestrators
+
+Crux scripts under `crux/wiki-server/sync-*.ts` read YAML source and batch POST to wiki-server. All use `sync-common.ts::batchSync<T>()`, which handles health-check + exponential backoff + consecutive-failure tracking.
+
+**Adding a new sync orchestrator**: extend `batchSync()` from `sync-common.ts`. Do not write your own fetch loop.
+
+## Data flow
+
+```
+YAML source           crux/wiki-server/sync-*.ts      apps/wiki-server/src/routes/tablebase/*.ts
+  data/entities/   →  batchSync()                 →   createSyncHandler: validate → upsert → resolveEntityFKs → upsertThingsInTx
+  packages/factbase/data/fb-entities/
+                                                             ↓
+                                           PG (entities, grants, facts, things, ...)
+                                                             ↓
+                                        build-time: database.json + factbase-data.json
+                                                             ↓
+                                         apps/web reads JSON, calls /api/* at runtime
+```
+
+`validate-tablebase-completeness.ts` is the gate check that flags missing `/sync`, `/delete-batch`, and validation calls — run it before PR.
 
 ## Testing
 

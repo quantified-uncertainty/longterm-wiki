@@ -23,7 +23,7 @@ Each audit should link back to the Linear ticket that scoped it and forward to t
 
 ## Related rules files
 
-- `.claude/rules/entity-sync-pipeline.md` — sync handler infrastructure (points here for `things` write paths)
+- `.claude/rules/tablebase-sync-factory.md` — sync handler factory + shared helpers (points here for `things` write paths)
 - `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase ontology (points here for `things` cross-base index)
 - `.claude/rules/linear-project-ownership.md` — scope-boundary doctrine derived from `2026-04-14-linear-refactor.md`
 - `.claude/rules/linear-integration.md` — Linear ↔ GitHub integration (§ 9 links project ownership + `crux linear hygiene`)

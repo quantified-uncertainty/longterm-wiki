@@ -215,7 +215,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 These are "mental model" maps. They list the components, endpoints, helpers, and conventions that already exist in each subsystem so agents don't re-implement things. **Read the relevant map at task-start, not after writing code.**
 
 - `.claude/rules/sourcing-system.md` — Source-check, verdict, and coverage scoring (if touching verdict UI, coverage scores, or `/api/sourcing/*`)
-- `.claude/rules/entity-sync-pipeline.md` — TableBase sync infrastructure, shared helpers (`sqlInList`, `validateEntityRefs`, `deleteBatchHandler`, `resolveEntityFKs`)
+- `.claude/rules/tablebase-sync-factory.md` — TableBase sync handler factory + shared helpers (`sqlInList`, `validateEntityRefs`, `deleteBatchHandler`, `resolveEntityFKs`)
 - `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase naming and which layer owns what
 - `.claude/rules/id-system.md` — `numericId` vs `stableId` vs `tableId`, allocation, validation
 - `.claude/rules/validation-gate-system.md` — `crux/validate/` 80+ validators, gate wiring, blocking vs advisory
