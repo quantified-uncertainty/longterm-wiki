@@ -1,5 +1,6 @@
 /** Shared constants and helpers for resource rendering components */
 
+import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
 import {
   CITATION_VERDICT_KEYS,
   type CitationVerdictKey,
@@ -8,32 +9,18 @@ import {
   CITATION_VERDICT_SEVERITY,
 } from "@/components/shared/verdict-styles";
 
+/**
+ * Re-export the canonical dedup-mode normalizer under the historical
+ * `normalizeUrl` name expected by ReferenceCitationDot/Details.
+ */
+export { normalizeUrlForDedup as normalizeUrl };
+
 // Re-export citation verdict constants under their original names for backward compatibility
 export const VERDICT_KEYS = CITATION_VERDICT_KEYS;
 export type VerdictKey = CitationVerdictKey;
 export const VERDICT_SEVERITY = CITATION_VERDICT_SEVERITY;
 export const VERDICT_COLORS = CITATION_VERDICT_COLORS;
 export const VERDICT_STYLES = CITATION_VERDICT_STYLES;
-
-/**
- * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
- * - Strips protocol and `www.` prefix
- * - Removes trailing slashes
- * - Preserves query string, drops hash fragment
- * - Case-insensitive
- */
-export function normalizeUrl(raw: string): string {
-  try {
-    const u = new URL(raw);
-    return (
-      u.host.replace(/^www\./, "") +
-      u.pathname.replace(/\/+$/, "") +
-      u.search
-    ).toLowerCase();
-  } catch {
-    return raw.replace(/\/+$/, "").toLowerCase();
-  }
-}
 
 /** Maximum claims to display before showing "+N more" */
 export const MAX_CLAIMS_SHOWN = 8;

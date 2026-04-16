@@ -17,6 +17,7 @@
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
+import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -121,22 +122,6 @@ function loadResources(): MinimalResource[] {
   return _cachedResources;
 }
 
-/**
- * Normalize a URL for fuzzy matching. Strips protocol, www prefix, trailing
- * slashes, and hash fragments. Preserves query string. Lowercases.
- */
-function normalizeUrlForMatch(str: string): string {
-  try {
-    const url = new URL(str);
-    url.hostname = url.hostname.replace(/^www\./, "");
-    url.hash = "";
-    return (
-      url.host + url.pathname.replace(/\/+$/, "") + url.search
-    ).toLowerCase();
-  } catch {
-    return str.replace(/\/+$/, "").toLowerCase();
-  }
-}
 
 /**
  * Build normalized-URL → resource ID map from resources.json.
@@ -146,7 +131,7 @@ function buildUrlToResourceId(): Map<string, string> {
   const map = new Map<string, string>();
   for (const r of resources) {
     if (r.url) {
-      map.set(normalizeUrlForMatch(r.url), r.id);
+      map.set(normalizeUrlForDedup(r.url), r.id);
     }
   }
   return map;
@@ -317,7 +302,7 @@ function seedFromLiterature(
       }
 
       // Resolve link URL to resource ID
-      const normalizedUrl = normalizeUrlForMatch(paper.link);
+      const normalizedUrl = normalizeUrlForDedup(paper.link);
       const resourceId = urlToResourceId.get(normalizedUrl);
       if (!resourceId) {
         skippedUrlNotFound++;

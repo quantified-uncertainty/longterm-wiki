@@ -82,6 +82,12 @@ describe('resource-lookup', () => {
     it('returns null for an unknown URL', () => {
       expect(getResourceByUrl('https://unknown.com/page')).toBeNull();
     });
+
+    it('treats http and https as equivalent', () => {
+      const r = getResourceByUrl('http://example.com/paper-one');
+      expect(r).not.toBeNull();
+      expect(r!.id).toBe('abc123def456');
+    });
   });
 
   describe('resolveResource', () => {

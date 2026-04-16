@@ -315,6 +315,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'url-normalize',
+    name: 'URL normalization helpers consolidated (QUA-341)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-url-normalize.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new local normalizeUrl helpers from re-fragmenting
+    // the canonical helper in @longterm-wiki/url-utils.
+  },
+  {
     id: 'sourcing-lint-guard',
     name: 'Sourcing rename ratchet (legacy terminology counts only fall)',
     command: 'npx',

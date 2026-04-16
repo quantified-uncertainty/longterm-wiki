@@ -19,6 +19,9 @@ importers:
       '@aws-sdk/client-s3':
         specifier: ^3.1013.0
         version: 3.1013.0
+      '@longterm-wiki/url-utils':
+        specifier: workspace:*
+        version: link:packages/url-utils
       '@radix-ui/react-popover':
         specifier: ^1.1.15
         version: 1.1.15(@types/react-dom@19.2.3(@types/react@19.2.13))(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -179,6 +182,9 @@ importers:
       '@longterm-wiki/id-utils':
         specifier: workspace:*
         version: link:../../packages/id-utils
+      '@longterm-wiki/url-utils':
+        specifier: workspace:*
+        version: link:../../packages/url-utils
       '@quri/squiggle-components':
         specifier: ^0.10.0
         version: 0.10.0(@types/react@19.2.13)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(tailwindcss@4.1.18)
@@ -394,6 +400,15 @@ importers:
         version: 4.0.18(@types/node@22.19.10)(@vitest/ui@4.0.18)(jiti@2.6.1)(jsdom@29.0.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
 
   packages/id-utils:
+    devDependencies:
+      typescript:
+        specifier: ^5.9.3
+        version: 5.9.3
+      vitest:
+        specifier: ^4.0.0
+        version: 4.0.18(@types/node@22.19.10)(@vitest/ui@4.0.18)(jiti@2.6.1)(jsdom@29.0.1)(lightningcss@1.30.2)(tsx@4.21.0)(yaml@2.8.2)
+
+  packages/url-utils:
     devDependencies:
       typescript:
         specifier: ^5.9.3
