@@ -9,10 +9,14 @@ beforeEach(() => {
   savedEnv = {
     LONGTERMWIKI_SERVER_URL: process.env.LONGTERMWIKI_SERVER_URL,
     LONGTERMWIKI_SERVER_API_KEY: process.env.LONGTERMWIKI_SERVER_API_KEY,
+    WIKI_SERVER_ENV: process.env.WIKI_SERVER_ENV,
   };
-  // Default: no server configured
+  // Default: no server configured, and no PROD_ prefix routing.
+  // WIKI_SERVER_ENV=prod would make getEnv() read PROD_LONGTERMWIKI_SERVER_URL,
+  // which tests never set — unset it so tests are hermetic regardless of shell env.
   delete process.env.LONGTERMWIKI_SERVER_URL;
   delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+  delete process.env.WIKI_SERVER_ENV;
 });
 
 afterEach(() => {
