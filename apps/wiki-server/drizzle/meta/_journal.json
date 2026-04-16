@@ -1275,6 +1275,13 @@
       "when": 1785139200000,
       "tag": "0181_create_things_search_mv",
       "breakpoints": true
+    },
+    {
+      "idx": 182,
+      "version": "7",
+      "when": 1785225600000,
+      "tag": "0182_qua_503_rewrite_bare10_resources",
+      "breakpoints": true
     }
   ]
 }

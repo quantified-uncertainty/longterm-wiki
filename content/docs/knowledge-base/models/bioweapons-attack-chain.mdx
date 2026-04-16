@@ -20,9 +20,9 @@ import {DataInfoBox, Mermaid, R, EntityLink} from '@components/wiki';
 
 ## Overview
 
-This model decomposes AI-assisted bioweapons attacks into seven sequential bottlenecks, revealing that catastrophic biological terrorism requires success across multiple independent failure modes. The framework draws on <R id="YmM4YmE2NG">RAND Corporation's 2024 red-team study</R> finding no statistically significant AI uplift for biological attacks, combined with historical analysis of state bioweapons programs and terrorist attempts.
+This model decomposes AI-assisted bioweapons attacks into seven sequential bottlenecks, revealing that catastrophic biological terrorism requires success across multiple independent failure modes. The framework draws on <R id="sid_9GhJBGlfwI">RAND Corporation's 2024 red-team study</R> finding no statistically significant AI uplift for biological attacks, combined with historical analysis of state bioweapons programs and terrorist attempts.
 
-**Key findings:** Overall attack probability ranges from 0.02–3.6%, with state actors posing the highest estimated risk (3.0%) due to superior laboratory access. The multiplicative probability structure means moderate interventions at any step provide substantial protection. <R id="YWQ3MDBlM2">DNA synthesis screening</R> offers 5–15% modeled risk reduction for \$1–20M annually, while <R id="NDdjY2NhMT">metagenomic surveillance</R> provides 15–25% reduction for \$500M. This mathematical structure is consistent with defense-in-depth strategies against <EntityLink id="E42" name="bioweapons">bioweapons risks</EntityLink>.
+**Key findings:** Overall attack probability ranges from 0.02–3.6%, with state actors posing the highest estimated risk (3.0%) due to superior laboratory access. The multiplicative probability structure means moderate interventions at any step provide substantial protection. <R id="sid_B4LAY3v0g4">DNA synthesis screening</R> offers 5–15% modeled risk reduction for \$1–20M annually, while <R id="sid_PLqLwtwpuv">metagenomic surveillance</R> provides 15–25% reduction for \$500M. This mathematical structure is consistent with defense-in-depth strategies against <EntityLink id="E42" name="bioweapons">bioweapons risks</EntityLink>.
 
 The model incorporates a key empirical claim that **information is not capability**—even complete knowledge cannot alone overcome the synthesis bottleneck, where tacit knowledge and laboratory skills create barriers that are not fully addressed by AI-assisted information retrieval. This claim reflects current empirical evidence but carries substantial uncertainty as AI capabilities evolve; the conditions under which it could cease to hold are discussed in the AI Uplift and Limitations sections below.
 
@@ -113,7 +113,7 @@ The 180x range in compound probability reflects deep (Knightian) uncertainty rat
 
 The most uncertain parameter in the model is whether AI systems provide meaningful uplift to actors seeking to develop biological weapons. Current evidence is mixed and rapidly evolving.
 
-The <R id="YmM4YmE2NG">RAND Corporation's 2024 study</R> compared AI-assisted versus internet-only groups for biological attack planning, finding **no statistically significant difference** in information quality or actionability. However, this study has known design limitations: it tested a specific task framing, used particular model versions, and did not assess laboratory execution capability directly. Its null result should be understood as evidence against one specific form of uplift (information retrieval quality), not a comprehensive assessment of AI's biosecurity implications.
+The <R id="sid_9GhJBGlfwI">RAND Corporation's 2024 study</R> compared AI-assisted versus internet-only groups for biological attack planning, finding **no statistically significant difference** in information quality or actionability. However, this study has known design limitations: it tested a specific task framing, used particular model versions, and did not assess laboratory execution capability directly. Its null result should be understood as evidence against one specific form of uplift (information retrieval quality), not a comprehensive assessment of AI's biosecurity implications.
 
 More recent capability evaluations suggest a different picture for specialized technical tasks. The *AI Safety Newsletter* issue 52 reported on an expert virology benchmark designed to assess whether frontier AI systems could answer questions at or above the level of trained virologists.[^aisn52] Unlike the RAND study's focus on information retrieval, this benchmark targets domain-specific reasoning and problem-solving of the kind that could reduce the tacit knowledge barrier. The benchmark methodology, the specific systems evaluated, and the precise performance levels achieved are discussed in the <EntityLink id="E43" name="bioweapons-ai-uplift">AI Uplift Assessment Model</EntityLink>; the implication for this model is that the AI uplift probability range (0.20–0.50) may require upward revision as frontier models are evaluated on more demanding virology tasks.
 
@@ -142,7 +142,7 @@ The synthesis step represents the strongest persistent barrier in the current mo
 | Virulence optimization | Low | Very High | Very Low |
 | Environmental stability | Low | Very High | Very Low |
 
-Historical evidence is consistent with high synthesis failure rates. The Soviet <R id="ZTY1OTRmOD">Biopreparat program</R>, despite substantial resources and expert personnel, required years to develop reliable production methods for select agents. <R id="NTA0YTgzMj">Aum Shinrikyo's biological weapons program</R> did not achieve effective biological weapons deployment despite investment in laboratory facilities.
+Historical evidence is consistent with high synthesis failure rates. The Soviet <R id="sid_pHdgE97STZ">Biopreparat program</R>, despite substantial resources and expert personnel, required years to develop reliable production methods for select agents. <R id="sid_jnrkV0Qn6c">Aum Shinrikyo's biological weapons program</R> did not achieve effective biological weapons deployment despite investment in laboratory facilities.
 
 **AI-assisted <EntityLink id="E174" name="interpretability">Interpretability</EntityLink>:** A notable development not reflected in the original synthesis challenge table is the emergence of structure-prediction and protein design systems such as AlphaFold3, RFDiffusion, and ESM3. These tools can accelerate certain steps in protein engineering—predicting how sequence changes affect structure and function—in ways that may partially reduce tacit knowledge requirements for actors with some laboratory background. However, their relevance varies substantially by synthesis challenge: they are more applicable to protein expression problems than to viral assembly or environmental stability, and they require wet-lab validation that remains a significant barrier. The AI Assistability ratings in the table above reflect current capabilities; this column warrants revision as protein design tool capabilities are evaluated against specific synthesis tasks. This potential pathway is discussed further in the <EntityLink id="E43" name="bioweapons-ai-uplift">AI Uplift Assessment Model</EntityLink>.
 
@@ -157,7 +157,7 @@ Modern biosurveillance capabilities vary by region and pathogen type, creating g
 | Genomic sequencing | 1–5 days | Major cities | Very High |
 | Medical countermeasures | Immediate–Years | Variable | Low (for novel agents) |
 
-The <R id="YzViYjhkND">CDC's BioWatch program</R> provides continuous aerosol monitoring in major U.S. cities, while <R id="MjA4MWQ3Yz">WHO's Disease Outbreak News</R> coordinates global surveillance. Coverage remains more limited in lower-resource regions, creating geographic asymmetries in detection probability.
+The <R id="sid_cxPQaBq2ma">CDC's BioWatch program</R> provides continuous aerosol monitoring in major U.S. cities, while <R id="sid_7XCgnevqtn">WHO's Disease Outbreak News</R> coordinates global surveillance. Coverage remains more limited in lower-resource regions, creating geographic asymmetries in detection probability.
 
 **AI as a defensive tool:** The countermeasure landscape is not static, and AI systems are being developed for defensive biosecurity applications as well as representing a potential offensive risk factor. Relevant defensive applications include AI-assisted analysis of syndromic surveillance data to identify anomalous outbreak patterns, accelerated genomic sequencing interpretation for novel pathogen identification, and AI-assisted countermeasure development pipelines. The current model treats AI exclusively as a variable affecting offensive capability (Step 3); a more complete analysis would incorporate AI's potential effects on countermeasure effectiveness (Step 7) as well. Proponents of AI-assisted biosurveillance argue it could meaningfully reduce detection time for novel agents; critics note that the same capability improvements benefit both attacker and defender, and that defensive AI tools require significant infrastructure investment to deploy at scale.
 
@@ -176,7 +176,7 @@ Defense-in-depth strategies exploit the multiplicative probability structure, wh
 | **Universal flu vaccine** | \$2B | 20–40% | \$50–100M | Very High |
 | **International <EntityLink id="E464" name="monitoring">monitoring</EntityLink>** | \$300M | 3–8% | \$38–100M | Very High |
 
-<R id="YWQ3MDBlM2">DNA synthesis screening</R> appears cost-effective in the model's framework, requiring minimal international coordination while providing risk reduction across actor types. However, this intervention involves tradeoffs: mandatory screening requirements add costs and delays for legitimate research, and the effectiveness of screening against novel synthesis routes (rather than known sequences) is uncertain. International coordination for monitoring raises sovereignty considerations that have slowed similar efforts in other domains. These tradeoffs are not reflected in the cost-per-percent-reduction figures above.
+<R id="sid_B4LAY3v0g4">DNA synthesis screening</R> appears cost-effective in the model's framework, requiring minimal international coordination while providing risk reduction across actor types. However, this intervention involves tradeoffs: mandatory screening requirements add costs and delays for legitimate research, and the effectiveness of screening against novel synthesis routes (rather than known sequences) is uncertain. International coordination for monitoring raises sovereignty considerations that have slowed similar efforts in other domains. These tradeoffs are not reflected in the cost-per-percent-reduction figures above.
 
 ### Intervention Targeting by Actor Type
 
@@ -308,28 +308,28 @@ This model connects to several related risk assessments and intervention framewo
 
 | Source Type | Citation | Key Findings | Access |
 |-------------|----------|--------------|--------|
-| **Government study** | <R id="YmM4YmE2NG">RAND Corporation Bioweapons Red Team (2024)</R> | No significant AI uplift detected for information retrieval tasks in study design | Public |
-| **Academic analysis** | <R id="OWE3MWQ4MW">Esvelt - Delay, Detect, Defend (2022)</R> | Synthesis barriers persist; layered defense framework | Open access |
-| **Industry report** | <R id="ZmMwZTQ0NG">Anthropic Frontier Threats Assessment (2023)</R> | Current model limitations; biosecurity evaluation methodology | Public |
-| **Policy analysis** | <R id="NDcxYzgwZT">NTI Synthetic Biology Report (2024)</R> | Governance recommendations for synthetic biology | Public |
+| **Government study** | <R id="sid_9GhJBGlfwI">RAND Corporation Bioweapons Red Team (2024)</R> | No significant AI uplift detected for information retrieval tasks in study design | Public |
+| **Academic analysis** | <R id="sid_y4Oao55x5g">Esvelt - Delay, Detect, Defend (2022)</R> | Synthesis barriers persist; layered defense framework | Open access |
+| **Industry report** | <R id="sid_GyBrMFyA1a">Anthropic Frontier Threats Assessment (2023)</R> | Current model limitations; biosecurity evaluation methodology | Public |
+| **Policy analysis** | <R id="sid_t6mluWAX0m">NTI Synthetic Biology Report (2024)</R> | Governance recommendations for synthetic biology | Public |
 
 ### Technical Resources
 
 | Organization | Resource | Focus Area | URL |
 |--------------|----------|------------|-----|
-| **CDC** | BioWatch Program | Aerosol detection | <R id="NzFkYzFhMD">cdc.gov/biowatch</R> |
-| **WHO** | Disease Outbreak News | Global surveillance | <R id="MjA4MWQ3Yz">who.int/emergencies</R> |
-| **NIST** | Cybersecurity Framework | Critical infrastructure | <R id="MjdkMDAxN2">nist.gov/cyberframework</R> |
-| **Harvard** | Global Health Institute | Biosecurity research | <R id="NzQ0YTUyOT">globalhealth.harvard.edu</R> |
+| **CDC** | BioWatch Program | Aerosol detection | <R id="sid_lak9BI7zoB">cdc.gov/biowatch</R> |
+| **WHO** | Disease Outbreak News | Global surveillance | <R id="sid_7XCgnevqtn">who.int/emergencies</R> |
+| **NIST** | Cybersecurity Framework | Critical infrastructure | <R id="sid_5jAa2Fpanz">nist.gov/cyberframework</R> |
+| **Harvard** | Global Health Institute | Biosecurity research | <R id="sid_C97Jw1s2Hc">globalhealth.harvard.edu</R> |
 
 ### Expert Organizations
 
 | Type | Organization | Specialty | Contact |
 |------|--------------|-----------|---------|
-| **Research** | <R id="ZTZjMGFkMz">Nuclear Threat Initiative</R> | WMD prevention | nti.org |
-| **Academic** | <R id="NTNmZDRlOG"><EntityLink id="E423" name="johns-hopkins-center-for-health-security">Johns Hopkins Center for Health Security</EntityLink></R> | Biosecurity research | centerforhealthsecurity.org |
-| **Government** | <R id="YjJhNWIwND">CISA</R> | Critical infrastructure | cisa.gov |
-| **International** | <R id="NjYyMjIxYm">Australia Group</R> | Export controls | australiagroup.net |
+| **Research** | <R id="sid_79L5xYAkhk">Nuclear Threat Initiative</R> | WMD prevention | nti.org |
+| **Academic** | <R id="sid_tUsEsZIdi1"><EntityLink id="E423" name="johns-hopkins-center-for-health-security">Johns Hopkins Center for Health Security</EntityLink></R> | Biosecurity research | centerforhealthsecurity.org |
+| **Government** | <R id="sid_tWU99NqOii">CISA</R> | Critical infrastructure | cisa.gov |
+| **International** | <R id="sid_H3EVKwmoLT">Australia Group</R> | Export controls | australiagroup.net |
 
 [^aisn52]: AI Safety Newsletter Issue 52 reported on an expert virology benchmark evaluating whether frontier AI systems could perform at or above trained virologist level on domain-specific reasoning tasks. The benchmark methodology and findings are discussed in the <EntityLink id="E43" name="bioweapons-ai-uplift">AI Uplift Assessment Model</EntityLink>. The emergence of such evaluations also reflects a growing norm among AI developers toward pre-deployment biosecurity assessment, though standardization and independent auditing of these processes remain open questions.
 

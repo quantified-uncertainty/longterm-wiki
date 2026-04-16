@@ -1,0 +1,15 @@
+-- QUA-503: rewrite 5,001 bare10 `resources.stable_id` rows to canonical `sid_<10>` format.
+--
+-- This Drizzle entry is a no-op because the actual rewrite is a multi-step
+-- transactional script that drops and re-adds FK constraints on `things.id`,
+-- and inlines ~5,000 mapping rows as a temp-table VALUES list. It must be
+-- applied manually during the deploy:
+--
+--   psql "$DATABASE_MIGRATION_URL" -v ON_ERROR_STOP=1 \
+--     -f apps/wiki-server/scripts/qua-503-rewrite-bare10.sql
+--
+-- The script is self-verifying (pre-conditions abort on mismatch, post-
+-- conditions confirm zero bare10 rows remain). The MDX sweep in this same PR
+-- updates every `<R id="<bare10>">` reference in `content/docs/` to the new
+-- sid_ value, so PG and wiki content stay in lockstep.
+SELECT 1;

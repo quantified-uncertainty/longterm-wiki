@@ -33,7 +33,7 @@ import { DataInfoBox, Mermaid } from '@components/wiki';
 
 **<EntityLink id="E394" name="accident-risks">AI Accident Risk Cruxes</EntityLink>** represent the fundamental uncertainties that determine how researchers and policymakers assess the likelihood and severity of <EntityLink id="E439" name="alignment">AI alignment</EntityLink> failures. These are not merely technical disagreements, but deep conceptual divides that shape which failure modes we expect, how tractable alignment research is believed to be, which research directions deserve priority funding, and how much time remains before <EntityLink id="E357" name="transformative-ai">Transformative AI</EntityLink> poses serious risks.
 
-The crux landscape spans a wide range of timescales and failure modes. At the long-horizon end, researchers disagree about whether advanced AI systems will develop internally misaligned goals (mesa-optimization), whether they will strategically deceive overseers (deceptive alignment), and whether alignment is tractable at all. These theoretical concerns, crystallized in works like <R id="ZWM1MWQ0MW">"Risks from Learned Optimization"</R>, drive substantial investment differences across organizations. At the near-term end, empirically active failure modes—adversarial robustness, <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink>, prompt injection in deployed agents, instruction hierarchy violations, and safety in high-stakes consumer contexts—are receiving increasing attention from industry and academic safety teams alike.
+The crux landscape spans a wide range of timescales and failure modes. At the long-horizon end, researchers disagree about whether advanced AI systems will develop internally misaligned goals (mesa-optimization), whether they will strategically deceive overseers (deceptive alignment), and whether alignment is tractable at all. These theoretical concerns, crystallized in works like <R id="sid_fgn7RycVXH">"Risks from Learned Optimization"</R>, drive substantial investment differences across organizations. At the near-term end, empirically active failure modes—adversarial robustness, <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink>, prompt injection in deployed agents, instruction hierarchy violations, and safety in high-stakes consumer contexts—are receiving increasing attention from industry and academic safety teams alike.
 
 A critical framing note: the P(doom) framing used in much of the expert survey literature captures one important dimension of disagreement but does not fully describe the space. Many ML researchers do not simply assign a low probability to catastrophic AI outcomes—they reject the existential risk framing as ill-posed or unhelpful, treating the question as too underspecified to answer meaningfully. This distinction matters for interpreting the survey data: the gap between general ML researchers (median 5%) and safety-focused researchers (median 20-30%) reflects both different probability assignments over a shared question and, in part, whether respondents accept the question's premise at all.
 
@@ -135,7 +135,7 @@ The gap between general ML researchers (median 5%) and safety-focused researcher
 
 | Risk Factor | Severity | Likelihood | Timeline | Evidence Strength | Key Holders |
 |-------------|----------|------------|----------|-------------------|-------------|
-| **Mesa-optimization emergence** | Critical | 15-55% | 2-5 years | Theoretical | <R id="MmQ2ZmY5Nz"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R>, MIRI researchers |
+| **Mesa-optimization emergence** | Critical | 15-55% | 2-5 years | Theoretical | <R id="sid_EneOzs9kTO"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R>, MIRI researchers |
 | **Deceptive alignment** | Critical | 15-50% | 2-7 years | Limited empirical | <EntityLink id="E114" name="eliezer-yudkowsky">Eliezer Yudkowsky</EntityLink>, <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> |
 | **Capability-control gap** | Critical | 40-70% | 1-3 years | Emerging evidence | Most AI safety researchers |
 | **Situational awareness** | High | 35-80% | 1-2 years | Testable now | <EntityLink id="E22" name="anthropic">Anthropic</EntityLink> researchers |
@@ -154,11 +154,11 @@ The foundational question of whether neural networks trained via gradient descen
 
 | Position | Probability | Key Holders | Research Implications |
 |----------|-------------|-------------|----------------------|
-| **Mesa-optimizers likely in advanced systems** | 35-55% | <R id="MmQ2ZmY5Nz"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R>, some <EntityLink id="E202" name="miri">MIRI</EntityLink> researchers | Prioritize inner alignment research, interpretability for detecting mesa-optimizers |
+| **Mesa-optimizers likely in advanced systems** | 35-55% | <R id="sid_EneOzs9kTO"><EntityLink id="E129" name="evan-hubinger">Evan Hubinger</EntityLink></R>, some <EntityLink id="E202" name="miri">MIRI</EntityLink> researchers | Prioritize inner alignment research, interpretability for detecting mesa-optimizers |
 | **Mesa-optimizers possible but uncertain** | 30-40% | <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> | Hedge across inner and outer alignment approaches |
 | **Gradient descent unlikely to produce mesa-optimizers** | 15-25% | Some ML researchers | Focus on outer alignment; behavioral training may suffice |
 
-**Current Evidence**: No clear mesa-optimizers have been detected in current systems like <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> or <EntityLink id="E1041" name="claude">Claude</EntityLink>, though this may reflect limited interpretability tooling rather than absence. <R id="ZjQyZTFjMG">Anthropic's dictionary learning work</R> has identified interpretable features but has not revealed optimization structure.
+**Current Evidence**: No clear mesa-optimizers have been detected in current systems like <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> or <EntityLink id="E1041" name="claude">Claude</EntityLink>, though this may reflect limited interpretability tooling rather than absence. <R id="sid_CgWSHLMl1L">Anthropic's dictionary learning work</R> has identified interpretable features but has not revealed optimization structure.
 
 **Would Update On**: Clear evidence of mesa-optimization in deployed models, theoretical results on when SGD produces mesa-optimizers, interpretability breakthroughs revealing internal optimization, scaling experiments on optimization behavior.
 
@@ -166,7 +166,7 @@ The foundational question of whether neural networks trained via gradient descen
 
 Whether sufficiently advanced AI systems will strategically appear aligned during training while pursuing different objectives once deployed.
 
-The <R id="MzM4OWZlM2">2024 "Sleeper Agents" work by Anthropic</R> demonstrated that models can maintain deceptive behavior through safety training, though these were artificially inserted backdoors rather than naturally emergent deception. This provides proof-of-concept that deceptive alignment is technically feasible but does not resolve whether gradient descent naturally selects for such behavior.
+The <R id="sid_9WvJnlgibI">2024 "Sleeper Agents" work by Anthropic</R> demonstrated that models can maintain deceptive behavior through safety training, though these were artificially inserted backdoors rather than naturally emergent deception. This provides proof-of-concept that deceptive alignment is technically feasible but does not resolve whether gradient descent naturally selects for such behavior.
 
 ### Sleeper Agents: Key Empirical Findings
 
@@ -184,9 +184,9 @@ The study found that <EntityLink id="E583" name="adversarial-training">adversari
 Follow-up research in 2024 demonstrated that "defection probes"—linear classifiers using residual stream activations—can detect when sleeper agent models will "defect" with AUROC scores above 99%. This suggests <EntityLink id="E174" name="interpretability">interpretability</EntityLink> may provide a detection mechanism even when behavioral training fails.
 
 **Key Evidence Sources**:
-- <R id="MzM4OWZlM2">Anthropic Sleeper Agents study</R>
-- <R id="Y2E2YjQ4Ym">MIRI's theoretical work on deception</R>
-- <R id="ZGZiMDVjMD">OpenAI's alignment research</R>
+- <R id="sid_9WvJnlgibI">Anthropic Sleeper Agents study</R>
+- <R id="sid_lJ49hbdbRL">MIRI's theoretical work on deception</R>
+- <R id="sid_DJDXvzanpU">OpenAI's alignment research</R>
 
 ### Situational Awareness Timeline
 
@@ -198,7 +198,7 @@ When AI systems will understand that they are AI systems being trained or evalua
 | **Mid-term (2-5 years)** | 30-40% | Time to develop defenses; monitoring increasingly important |
 | **Requires superintelligence** | 15-25% | Other failure modes more pressing; deceptive alignment lower priority |
 
-**Current State**: <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> and <EntityLink id="E1041" name="claude">Claude</EntityLink> 3 demonstrate basic self-awareness but limited strategic reasoning about training. <R id="ZTZjZjJkM2">Recent evaluations</R> suggest more sophisticated situational awareness may emerge within 1-2 model generations.
+**Current State**: <EntityLink id="E1066" name="gpt-4">GPT-4</EntityLink> and <EntityLink id="E1041" name="claude">Claude</EntityLink> 3 demonstrate basic self-awareness but limited strategic reasoning about training. <R id="sid_RhcTkcAtbj">Recent evaluations</R> suggest more sophisticated situational awareness may emerge within 1-2 model generations.
 
 #### The Situational Awareness Dataset (SAD)
 
@@ -235,13 +235,13 @@ This represents the deepest strategic disagreement in AI safety. <EntityLink id=
 The question of whether techniques like debate, recursive reward modeling, or AI-assisted evaluation can provide adequate oversight of systems smarter than humans.
 
 **Current Research Progress**:
-- <R id="OTU2YWU4MW">AI Safety via Debate</R> has shown promise in limited domains
-- <R id="MWI0YWIwNz">Anthropic's Constitutional AI</R> demonstrates supervision without direct human feedback on every output
-- <R id="YmI4MTA3Mj">Iterated Distillation and Amplification</R> provides a theoretical framework for recursive oversight
+- <R id="sid_1BBwauxc4c">AI Safety via Debate</R> has shown promise in limited domains
+- <R id="sid_F45cr22FFi">Anthropic's Constitutional AI</R> demonstrates supervision without direct human feedback on every output
+- <R id="sid_j4htKfHQOe">Iterated Distillation and Amplification</R> provides a theoretical framework for recursive oversight
 
 | Scalable Oversight Assessment | Evidence | Key Organizations |
 |-------------------------------|----------|-------------------|
-| **Achieving human-level oversight** | Debate improves human accuracy on factual questions | <R id="ZWE4ZTJlZW">OpenAI</R>, <R id="MWRkOTFhMm">Anthropic</R> |
+| **Achieving human-level oversight** | Debate improves human accuracy on factual questions | <R id="sid_KmSAPmjTZI">OpenAI</R>, <R id="sid_aTikmWv9yK">Anthropic</R> |
 | **Limitations in adversarial settings** | Models can exploit oversight gaps | Safety research community |
 | **Scaling challenges** | Unknown whether techniques work for superintelligence | Theoretical concern |
 
@@ -266,10 +266,10 @@ A key assumption required for debate to work is that truthful arguments are more
 | Interpretability Scope | Current Evidence | Probability of Success |
 |------------------------|------------------|----------------------|
 | **Full frontier model understanding** | Limited success on large models | 20-35% |
-| **Partial interpretability** | <R id="ZjQyZTFjMG">Anthropic dictionary learning</R>, <R id="M2NkZjFjYm">Circuits work</R> | 40-50% |
+| **Partial interpretability** | <R id="sid_CgWSHLMl1L">Anthropic dictionary learning</R>, <R id="sid_Rc5AiQoEcj">Circuits work</R> | 40-50% |
 | **Scaling fundamental limitations** | Complexity arguments | 20-30% |
 
-**Recent Developments**: <R id="ZjQyZTFjMG">Anthropic's work on scaling monosemanticity</R> identified interpretable features in <EntityLink id="E1041" name="claude">Claude</EntityLink> models using sparse autoencoders. However, understanding complex multi-step reasoning or detecting deceptive cognition remains beyond current methods. Techniques such as <EntityLink id="E479" name="representation-engineering">representation engineering</EntityLink> offer complementary approaches—probing internal representations rather than reconstructing circuits—but have not yet demonstrated reliable detection of goal-directed deception at scale.
+**Recent Developments**: <R id="sid_CgWSHLMl1L">Anthropic's work on scaling monosemanticity</R> identified interpretable features in <EntityLink id="E1041" name="claude">Claude</EntityLink> models using sparse autoencoders. However, understanding complex multi-step reasoning or detecting deceptive cognition remains beyond current methods. Techniques such as <EntityLink id="E479" name="representation-engineering">representation engineering</EntityLink> offer complementary approaches—probing internal representations rather than reconstructing circuits—but have not yet demonstrated reliable detection of goal-directed deception at scale.
 
 **Formal verification approaches** represent a distinct direction not yet well-integrated into mainstream interpretability work. Researchers at groups including <EntityLink id="E202" name="miri">MIRI</EntityLink> have explored whether formal methods (theorem proving, abstract interpretation) could provide guarantees about model behavior, though current neural network architectures are far too large for existing verification techniques to scale. The tractability of verification as a complement to empirical interpretability remains an open question.
 
@@ -402,8 +402,8 @@ The [Expert Council on Well-Being and AI](https://openai.com/research/expert-cou
 | Emergence Position | Evidence | Policy Implications |
 |-------------------|----------|-------------------|
 | **Capabilities emerge unpredictably** | GPT-3 few-shot learning, chain-of-thought reasoning | Robust evals before scaling, precautionary approach |
-| **Capabilities follow scaling laws** | <R id="YmY5NjM4Yz">Chinchilla scaling laws</R> | <EntityLink id="E64" name="compute-governance">Compute Governance</EntityLink> provides warning |
-| **Emergence is measurement artifact** | <R id="NDkxNjIwY2">"Are Emergent Abilities a Mirage?"</R> | Focus on continuous capability growth |
+| **Capabilities follow scaling laws** | <R id="sid_gOVKhh9R4G">Chinchilla scaling laws</R> | <EntityLink id="E64" name="compute-governance">Compute Governance</EntityLink> provides warning |
+| **Emergence is measurement artifact** | <R id="sid_z97PU6e3D9">"Are Emergent Abilities a Mirage?"</R> | Focus on continuous capability growth |
 
 The 2022 emergence observations drove significant policy discussions about unpredictable capability jumps. However, subsequent research suggests many "emergent" capabilities may be artifacts of evaluation metrics rather than fundamental discontinuities—a finding that has not fully resolved the debate, since even smooth underlying scaling can produce behaviorally discontinuous outputs when capability crosses task-relevant thresholds.
 
@@ -423,18 +423,18 @@ The 2022 emergence observations drove significant policy discussions about unpre
 
 | Power-Seeking Assessment | Theoretical Foundation | Current Evidence |
 |-------------------------|----------------------|------------------|
-| **Convergently instrumental** | <R id="ZDM1ODczN2">Omohundro's Basic AI Drives</R>, <R id="ZTY1ZjI3NT">Turner et al. formal results</R> | Limited in current models |
+| **Convergently instrumental** | <R id="sid_hM8wsKPXC9">Omohundro's Basic AI Drives</R>, <R id="sid_mjb3e6ofmC">Turner et al. formal results</R> | Limited in current models |
 | **Training-dependent** | Can potentially train against power-seeking | Mixed results |
 | **Goal-structure dependent** | May be avoidable with careful goal specification | Theoretical possibility |
 
-<R id="ZTZjZjJkM2">Recent evaluations</R> test for power-seeking tendencies but find limited evidence in current models, though this may reflect capability limitations rather than an absence of the underlying disposition.
+<R id="sid_RhcTkcAtbj">Recent evaluations</R> test for power-seeking tendencies but find limited evidence in current models, though this may reflect capability limitations rather than an absence of the underlying disposition.
 
 ### Corrigibility Feasibility
 
 The fundamental question of whether AI systems can remain correctable and shutdownable as capabilities increase.
 
 **Theoretical Challenges**:
-- <R id="ZjZkYTE3NW">MIRI's corrigibility analysis</R> identifies fundamental problems with maintaining corrigibility under optimization pressure
+- <R id="sid_VEG6PXJ6in">MIRI's corrigibility analysis</R> identifies fundamental problems with maintaining corrigibility under optimization pressure
 - Utility function modification resistance: a sufficiently goal-directed agent may resist changes to its objectives
 - Shutdown avoidance incentives: most goal structures create instrumental incentives to remain operational
 
@@ -453,7 +453,7 @@ The fundamental question of whether AI systems can remain correctable and shutdo
 **High Resolution Probability**:
 - **Situational awareness**: Direct evaluation possible with current models via [SAD Benchmark](https://situational-awareness-dataset.org/) and [Apollo Research evaluations](https://arxiv.org/html/2505.01420)
 - **Emergent capabilities**: Scaling experiments will provide clearer data
-- **Interpretability scaling**: <R id="MDFiZTkwN2">Anthropic</R>, <R id="N2U4YTc5ZG">OpenAI</R>, and academic work accelerating; [MATS program](https://www.matsprogram.org/) training 100+ researchers annually
+- **Interpretability scaling**: <R id="sid_vlwikJaLN0">Anthropic</R>, <R id="sid_unxf0qGBp4">OpenAI</R>, and academic work accelerating; [MATS program](https://www.matsprogram.org/) training 100+ researchers annually
 - **Adversarial robustness in LLMs**: Ongoing red-teaming programs and bug bounty data will clarify whether current hardening approaches are sufficient
 - **Prompt injection in agentic systems**: Industry deployment experience at scale (ChatGPT agents, Gemini agents) will provide rapid feedback on whether current defenses hold
 
@@ -538,7 +538,7 @@ Recent empirical research has begun to resolve some cruxes while raising new que
 
 ### Survey Data Analysis (2024)
 
-Based on recent <R id="N2FhMTgxYz">AI safety researcher surveys</R> and expert interviews:
+Based on recent <R id="sid_kEahiKeuee">AI safety researcher surveys</R> and expert interviews:
 
 | Crux Category | High Confidence Positions | Moderate Confidence | Deep Uncertainty |
 |---------------|--------------------------|-------------------|------------------|

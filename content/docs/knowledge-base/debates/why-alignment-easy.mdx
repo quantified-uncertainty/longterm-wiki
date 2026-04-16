@@ -28,12 +28,12 @@ import {InfoBox, DisagreementMap, KeyQuestions, Mermaid, R, EntityLink} from '@c
 
 | Argument | Key Evidence | Confidence | Primary Sources |
 |----------|-------------|------------|-----------------|
-| <EntityLink id="E259" name="rlhf">RLHF</EntityLink> Working | 29-41% improvement in human preference alignment over standard methods | High | <R id="MjkwNTBkOT">ICLR 2025</R>, <R id="OGVhMDQwND">CVPR 2024</R> |
-| <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> | Reduced bias across 9 social dimensions; comparable helpfulness to standard RLHF | High | <R id="NzViZDM1Mm"><EntityLink id="E22" name="anthropic">Anthropic</EntityLink> CCAI, FAccT 2024</R> |
-| Interpretability | Millions of interpretable features extracted from Claude 3 Sonnet | Medium | <R id="ZWFmNWM5Mz">Anthropic, May 2024</R> |
-| <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink> | Debate outperforms consultancy; strong debaters increase judge accuracy | Medium | <R id="YzJmOTFlYT">ICML 2024</R> |
-| <EntityLink id="E6" name="ai-control">AI Control</EntityLink> | Trusted editing achieves 92% safety while maintaining 94% of GPT-4 performance | Medium | <R id="ZjA2MzVmMT"><EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>, 2024</R> |
-| Natural Alignment | LLMs show high human value alignment in empirical comparisons | Medium | <R id="YzBlMDNlND">Cross-cultural study, 2024</R> |
+| <EntityLink id="E259" name="rlhf">RLHF</EntityLink> Working | 29-41% improvement in human preference alignment over standard methods | High | <R id="sid_BIJW2dCuUU">ICLR 2025</R>, <R id="sid_KXPhtblXrB">CVPR 2024</R> |
+| <EntityLink id="E451" name="constitutional-ai">Constitutional AI</EntityLink> | Reduced bias across 9 social dimensions; comparable helpfulness to standard RLHF | High | <R id="sid_3IXNDi3XnX"><EntityLink id="E22" name="anthropic">Anthropic</EntityLink> CCAI, FAccT 2024</R> |
+| Interpretability | Millions of interpretable features extracted from Claude 3 Sonnet | Medium | <R id="sid_biWEyeM0EL">Anthropic, May 2024</R> |
+| <EntityLink id="E271" name="scalable-oversight">Scalable Oversight</EntityLink> | Debate outperforms consultancy; strong debaters increase judge accuracy | Medium | <R id="sid_zLleUyn22V">ICML 2024</R> |
+| <EntityLink id="E6" name="ai-control">AI Control</EntityLink> | Trusted editing achieves 92% safety while maintaining 94% of GPT-4 performance | Medium | <R id="sid_2a4MZrSjXR"><EntityLink id="E557" name="redwood-research">Redwood Research</EntityLink>, 2024</R> |
+| Natural Alignment | LLMs show high human value alignment in empirical comparisons | Medium | <R id="sid_nuBQ8eb3qD">Cross-cultural study, 2024</R> |
 | Economic Incentives | Market rewards helpful, harmless AI; liability drives safety investment | Medium | Industry evidence |
 
 **Central Claim**: Creating AI systems that reliably do what we want is a tractable engineering problem. Current techniques (RLHF, Constitutional AI, interpretability) are working and will likely scale to advanced AI.
@@ -44,7 +44,7 @@ This page presents the strongest case for why alignment might be easier than pes
 
 ### What Makes Engineering Problems Tractable?
 
-As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> argues</R>, problems become much more tractable once you have iteration set up: a basic working system (even if barely at first) and a proxy metric that tells you whether changes are improvements. This creates a feedback loop for gaining information from reality.
+As <R id="sid_JOFdHN7QQU"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> argues</R>, problems become much more tractable once you have iteration set up: a basic working system (even if barely at first) and a proxy metric that tells you whether changes are improvements. This creates a feedback loop for gaining information from reality.
 
 <Mermaid chart={`
 flowchart TD
@@ -76,7 +76,7 @@ flowchart TD
 | Economic alignment | Present | Market rewards helpful, safe AI; liability drives safety |
 | Multiple approaches | Developing | RLHF, Constitutional AI, interpretability, debate, AI control |
 
-**Alignment has all five** (or could with proper effort). <R id="OTlmZjNjNW"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> views</R> alignment as "this sort of well-scoped problem that I'm optimistic we can totally solve."
+**Alignment has all five** (or could with proper effort). <R id="sid_9qzBBz04wT"><EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> views</R> alignment as "this sort of well-scoped problem that I'm optimistic we can totally solve."
 
 ## Argument 1: Current Techniques Are Working
 
@@ -86,7 +86,7 @@ flowchart TD
 
 **Empirical track record**:
 
-Recent research has validated RLHF effectiveness with quantified improvements. According to <R id="MjkwNTBkOT">ICLR 2025 research</R>, conditional PM RLHF demonstrates a **29% to 41% improvement** in alignment with human preferences compared to standard RLHF. The <R id="OGVhMDQwND">RLHF-V research at CVPR 2024</R> shows hallucination reduction of 13.8 relative points and hallucination rate reduction of 5.9 points.
+Recent research has validated RLHF effectiveness with quantified improvements. According to <R id="sid_BIJW2dCuUU">ICLR 2025 research</R>, conditional PM RLHF demonstrates a **29% to 41% improvement** in alignment with human preferences compared to standard RLHF. The <R id="sid_KXPhtblXrB">RLHF-V research at CVPR 2024</R> shows hallucination reduction of 13.8 relative points and hallucination rate reduction of 5.9 points.
 
 | Dimension | Pre-RLHF (GPT-3) | Post-RLHF (GPT-4/Claude) | Improvement |
 |-----------|-----------------|-------------------------|-------------|
@@ -107,9 +107,9 @@ Research quantifying how closely models' values match human values found high al
 
 ### 1.2 Constitutional AI Scales Further
 
-**The technique**: Train AI to follow principles using self-critique and AI feedback. <R id="MDlmNWFlMz">Anthropic's Constitutional AI research</R> involves both a supervised learning and reinforcement learning phase, training harmless AI through self-improvement without human labels identifying harmful outputs.
+**The technique**: Train AI to follow principles using self-critique and AI feedback. <R id="sid_6dtHLm5c9K">Anthropic's Constitutional AI research</R> involves both a supervised learning and reinforcement learning phase, training harmless AI through self-improvement without human labels identifying harmful outputs.
 
-In 2024, Anthropic published <R id="NzViZDM1Mm">Collective Constitutional AI (CCAI)</R> at FAccT 2024, demonstrating a practical pathway toward publicly informed development of language models:
+In 2024, Anthropic published <R id="sid_3IXNDi3XnX">Collective Constitutional AI (CCAI)</R> at FAccT 2024, demonstrating a practical pathway toward publicly informed development of language models:
 
 | Metric | CCAI Model | Standard Model | Finding |
 |--------|-----------|----------------|---------|
@@ -130,7 +130,7 @@ In 2024, Anthropic published <R id="NzViZDM1Mm">Collective Constitutional AI (CC
 
 ### 1.3 Interpretability Is Making Progress
 
-In May 2024, Anthropic published <R id="ZWFmNWM5Mz">"Scaling Monosemanticity"</R>, demonstrating that sparse autoencoders can extract interpretable features from large models. After initial concerns that the method might not scale to state-of-the-art transformers, Anthropic successfully applied the technique to Claude 3 Sonnet, finding tens of millions of "features"---combinations of neurons that relate to semantic concepts.
+In May 2024, Anthropic published <R id="sid_biWEyeM0EL">"Scaling Monosemanticity"</R>, demonstrating that sparse autoencoders can extract interpretable features from large models. After initial concerns that the method might not scale to state-of-the-art transformers, Anthropic successfully applied the technique to Claude 3 Sonnet, finding tens of millions of "features"---combinations of neurons that relate to semantic concepts.
 
 | Discovery | Description | Safety Relevance |
 |-----------|-------------|------------------|
@@ -146,7 +146,7 @@ In May 2024, Anthropic published <R id="ZWFmNWM5Mz">"Scaling Monosemanticity"</R
 - Could edit out dangerous behaviors
 - Path to verification might exist
 
-**Trajectory**: If progress continues, might achieve mechanistic understanding of frontier models. However, <R id="NmYxMzcxMj">some researchers note</R> that practical applications to safety-critical tasks remain to be demonstrated against baselines.
+**Trajectory**: If progress continues, might achieve mechanistic understanding of frontier models. However, <R id="sid_9vJ9wQeEXh">some researchers note</R> that practical applications to safety-critical tasks remain to be demonstrated against baselines.
 
 ### 1.4 Red Teaming Finds and Fixes Issues
 
@@ -225,7 +225,7 @@ In May 2024, Anthropic published <R id="ZWFmNWM5Mz">"Scaling Monosemanticity"</R
 
 ### 2.4 The Shard Theory Perspective
 
-**Theory** (<R id="YTM5Nzg4M2">Quintin Pope and collaborators</R>): Human values are "shards"---contextually activated, behavior-steering computations in neural networks (biological and artificial). The primary claim is that agents are best understood as being composed of shards: contextual computations that influence decisions and are downstream of historical reinforcement events.
+**Theory** (<R id="sid_GaHIonX7Lv">Quintin Pope and collaborators</R>): Human values are "shards"---contextually activated, behavior-steering computations in neural networks (biological and artificial). The primary claim is that agents are best understood as being composed of shards: contextual computations that influence decisions and are downstream of historical reinforcement events.
 
 **Applied to AI**:
 - AI learns value shards from data (help users, avoid harm, be truthful)
@@ -309,12 +309,12 @@ flowchart LR
 **Instead of humans evaluating superhuman AI** (impossible):
 - **Use AI to help evaluate AI** (scalable)
 
-As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> emphasizes</R>, "evaluation is easier than generation"---a very general principle that holds across many domains, including alignment research.
+As <R id="sid_JOFdHN7QQU"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> emphasizes</R>, "evaluation is easier than generation"---a very general principle that holds across many domains, including alignment research.
 
 | Technique | Mechanism | 2024 Research Status |
 |-----------|-----------|---------------------|
-| Debate | AIs argue, humans judge arguments | <R id="YzJmOTFlYT">ICML 2024</R>: Debate outperforms consultancy; stronger debaters increase judge accuracy |
-| Amplification | Use AI to help humans give better feedback | <R id="ZjA4YWQ2N2">DeepMind research</R> on human-AI complementarity |
+| Debate | AIs argue, humans judge arguments | <R id="sid_zLleUyn22V">ICML 2024</R>: Debate outperforms consultancy; stronger debaters increase judge accuracy |
+| Amplification | Use AI to help humans give better feedback | <R id="sid_mbEm4jhnaZ">DeepMind research</R> on human-AI complementarity |
 | Recursive reward modeling | Train evaluator AIs | Foundational approach for scalable feedback |
 | Process supervision | Evaluate reasoning steps, not outcomes | Improves reliability on complex tasks |
 | Weak-to-strong generalization | Train strong AI with weak oversight | GPT-4 trained with GPT-2 oversight shows promising results |
@@ -331,7 +331,7 @@ As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLi
 **Instead of perfectly aligned AI** (very hard):
 - **Maintain control even if somewhat misaligned** (easier)
 
-<R id="ZjA2MzVmMT">Redwood Research's AI control framework</R> designs systems that remain safe even if some components are misaligned. Their <R id="NmE2MmIwMD">2024 research</R> shows promising results:
+<R id="sid_2a4MZrSjXR">Redwood Research's AI control framework</R> designs systems that remain safe even if some components are misaligned. Their <R id="sid_YbGoALjXWB">2024 research</R> shows promising results:
 
 | Protocol | Safety | Usefulness | Description |
 |----------|--------|------------|-------------|
@@ -359,7 +359,7 @@ As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLi
 - Failures will be detectable before catastrophic
 - Economic incentive to fix problems (unsafe AI loses money)
 
-**Responsible Scaling Policies**: <R id="NzJkZWFhMW">Anthropic's RSP</R> (updated October 2024) and similar frameworks from other labs provide structured iteration:
+**Responsible Scaling Policies**: <R id="sid_O6wArb69o5">Anthropic's RSP</R> (updated October 2024) and similar frameworks from other labs provide structured iteration:
 
 | RSP Component | Purpose | Implementation |
 |---------------|---------|----------------|
@@ -369,7 +369,7 @@ As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLi
 | Pause commitment | Stop if catastrophic risk detected | Will not deploy if risks exceed thresholds |
 | Responsible Scaling Officer | Internal governance | <EntityLink id="E1239" name="jared-kaplan">Jared Kaplan</EntityLink> (Anthropic CSO) leads this function |
 
-<R id="NTI2OGFjZG">METR believes</R> that widespread adoption of high-quality RSPs would significantly reduce risks of an AI catastrophe relative to "business as usual."
+<R id="sid_LkWTFwgFjU">METR believes</R> that widespread adoption of high-quality RSPs would significantly reduce risks of an AI catastrophe relative to "business as usual."
 
 **Implication**: Don't need to solve all alignment problems upfront---can solve them as we encounter them.
 
@@ -651,11 +651,11 @@ As <R id="MzE5ZWMxZD"><EntityLink id="E182" name="jan-leike">Jan Leike</EntityLi
 
 | Researcher | Position | Key Quote / Reasoning | Source |
 |------------|----------|----------------------|--------|
-| <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> (ARC) | Optimistic | "This sort of well-scoped problem that I'm optimistic we can totally solve" | <R id="OTlmZjNjNW">80,000 Hours Podcast</R> |
-| <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> (Anthropic) | Optimistic | "I'm optimistic we can figure this problem out"; believes alignment will become "more and more mature" | <R id="M2IyY2E3ZT">TIME, 2024</R>, <R id="MzE5ZWMxZD">Substack</R> |
+| <EntityLink id="E220" name="paul-christiano">Paul Christiano</EntityLink> (ARC) | Optimistic | "This sort of well-scoped problem that I'm optimistic we can totally solve" | <R id="sid_9qzBBz04wT">80,000 Hours Podcast</R> |
+| <EntityLink id="E182" name="jan-leike">Jan Leike</EntityLink> (Anthropic) | Optimistic | "I'm optimistic we can figure this problem out"; believes alignment will become "more and more mature" | <R id="sid_XI34tZ0uHk">TIME, 2024</R>, <R id="sid_JOFdHN7QQU">Substack</R> |
 | <EntityLink id="E91" name="dario-amodei">Dario Amodei</EntityLink> (Anthropic) | Cautiously optimistic | Believes responsible development can succeed; invested heavily in interpretability | Anthropic leadership |
 | <EntityLink id="E269" name="sam-altman">Sam Altman</EntityLink> (OpenAI) | Optimistic with caveats | Supports gradual deployment, iterative safety | Public statements |
-| MIRI / Yudkowsky | Pessimistic | Current techniques insufficient for superintelligence; fundamental problems unsolved | <R id="YjFlNWQ2N2">LessWrong</R> writings |
+| MIRI / Yudkowsky | Pessimistic | Current techniques insufficient for superintelligence; fundamental problems unsolved | <R id="sid_9hIGf0AnHJ">LessWrong</R> writings |
 
 ### Probability Estimates
 
@@ -825,26 +825,26 @@ This doesn't mean complacency---alignment requires serious, sustained work. But 
 
 ### Empirical Research on Alignment Techniques
 
-- <R id="MjkwNTBkOT">ICLR 2025: Conditional PM RLHF</R> - 29-41% improvement in human preference alignment
-- <R id="OGVhMDQwND">CVPR 2024: RLHF-V</R> - Fine-grained correctional feedback for trustworthy MLLMs
-- <R id="MDlmNWFlMz">Anthropic: Constitutional AI</R> - Harmlessness from AI feedback
-- <R id="NzViZDM1Mm">FAccT 2024: Collective Constitutional AI</R> - Aligning language models with public input
-- <R id="ZWFmNWM5Mz">Anthropic: Scaling Monosemanticity</R> - Interpretable features from Claude 3 Sonnet
+- <R id="sid_BIJW2dCuUU">ICLR 2025: Conditional PM RLHF</R> - 29-41% improvement in human preference alignment
+- <R id="sid_KXPhtblXrB">CVPR 2024: RLHF-V</R> - Fine-grained correctional feedback for trustworthy MLLMs
+- <R id="sid_6dtHLm5c9K">Anthropic: Constitutional AI</R> - Harmlessness from AI feedback
+- <R id="sid_3IXNDi3XnX">FAccT 2024: Collective Constitutional AI</R> - Aligning language models with public input
+- <R id="sid_biWEyeM0EL">Anthropic: Scaling Monosemanticity</R> - Interpretable features from Claude 3 Sonnet
 
 ### Scalable Oversight and AI Control
 
-- <R id="YzJmOTFlYT">ICML 2024: Scalable AI Safety via Debate</R> - Debate improves judge accuracy
-- <R id="ZjA2MzVmMT">Redwood Research: AI Control</R> - Control frameworks for potentially misaligned AI
-- <R id="NmE2MmIwMD">Redwood Research: The Case for AI Control</R> - Trusted editing achieves 92% safety
+- <R id="sid_zLleUyn22V">ICML 2024: Scalable AI Safety via Debate</R> - Debate improves judge accuracy
+- <R id="sid_2a4MZrSjXR">Redwood Research: AI Control</R> - Control frameworks for potentially misaligned AI
+- <R id="sid_YbGoALjXWB">Redwood Research: The Case for AI Control</R> - Trusted editing achieves 92% safety
 
 ### Researcher Perspectives
 
-- <R id="MzE5ZWMxZD">Jan Leike: Why I'm Optimistic</R> - Sources of alignment optimism
-- <R id="M2IyY2E3ZT">TIME: Jan Leike Profile</R> - 2024 interview on alignment progress
-- <R id="OTlmZjNjNW">80,000 Hours: Paul Christiano Interview</R> - AI alignment solutions
-- <R id="YTM5Nzg4M2">Shard Theory Sequence</R> - Quintin Pope et al. on value learning
+- <R id="sid_JOFdHN7QQU">Jan Leike: Why I'm Optimistic</R> - Sources of alignment optimism
+- <R id="sid_XI34tZ0uHk">TIME: Jan Leike Profile</R> - 2024 interview on alignment progress
+- <R id="sid_9qzBBz04wT">80,000 Hours: Paul Christiano Interview</R> - AI alignment solutions
+- <R id="sid_GaHIonX7Lv">Shard Theory Sequence</R> - Quintin Pope et al. on value learning
 
 ### Policy and Governance
 
-- <R id="NzJkZWFhMW">Anthropic RSP (Oct 2024)</R> - Updated Responsible Scaling Policy
-- <R id="NTI2OGFjZG">METR: Responsible Scaling Policies</R> - Analysis of RSP effectiveness
+- <R id="sid_O6wArb69o5">Anthropic RSP (Oct 2024)</R> - Updated Responsible Scaling Policy
+- <R id="sid_LkWTFwgFjU">METR: Responsible Scaling Policies</R> - Analysis of RSP effectiveness
