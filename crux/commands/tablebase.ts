@@ -97,26 +97,30 @@ async function persistScanResults(scan: import('../tablebase/types.ts').ScanSumm
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
   const { runFullScan, runTableScan, runFieldGapScan, FIELD_GAP_TABLES } = await import('../tablebase/scanner.ts');
   const { formatScanSummary, formatFieldGapReports } = await import('../tablebase/reporter.ts');
+  type FieldGapReport = import('../tablebase/types.ts').FieldGapReport;
 
-  // --fields-only shortcut: skip the per-entity scan and only emit the
-  // field-gap report. Useful for quick enrichment triage.
+  const topN = options.top ? parseInt(options.top as string, 10) : undefined;
+  const appendFieldGaps = (base: string, reports: FieldGapReport[] | undefined) =>
+    reports && reports.length > 0 ? base + '\n\n' + formatFieldGapReports(reports, { top: topN }) : base;
+
+  // Standalone field-gap mode: skip the slower per-entity scan.
   if (options.fields && !options.table) {
     const reports = await runFieldGapScan();
     if (options.ci) {
       return { exitCode: 0, output: JSON.stringify({ fieldReports: reports, timestamp: new Date().toISOString() }, null, 2) };
     }
-    const top = options.top ? parseInt(options.top as string, 10) : undefined;
-    return { exitCode: 0, output: formatFieldGapReports(reports, { top }) };
+    return { exitCode: 0, output: formatFieldGapReports(reports, { top: topN }) };
   }
 
   if (options.table) {
-    const result = await runTableScan(options.table as string);
+    const wantsFields = options.fields && FIELD_GAP_TABLES.includes(options.table as string);
+    const [result, fieldReports] = await Promise.all([
+      runTableScan(options.table as string),
+      wantsFields ? runFieldGapScan([options.table as string]) : Promise.resolve(undefined),
+    ]);
     if (!result) {
       return { exitCode: 1, output: `Unknown table: ${options.table}` };
     }
-    const fieldReports = options.fields && FIELD_GAP_TABLES.includes(options.table as string)
-      ? await runFieldGapScan([options.table as string])
-      : undefined;
 
     if (options.ci) {
       const out = fieldReports ? { ...result, fieldReports } : result;
@@ -126,30 +130,22 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
     if (options.persist) {
       await persistScanResults(summary);
     }
-    let output = formatScanSummary(summary);
-    if (fieldReports && fieldReports.length > 0) {
-      const top = options.top ? parseInt(options.top as string, 10) : undefined;
-      output += '\n\n' + formatFieldGapReports(fieldReports, { top });
-    }
-    return { exitCode: 0, output };
+    return { exitCode: 0, output: appendFieldGaps(formatScanSummary(summary), fieldReports) };
   }
 
-  const scan = await runFullScan();
-  if (options.fields) {
-    scan.fieldReports = await runFieldGapScan();
-  }
+  // Full scan + optional field-gap, parallelized so server round-trips overlap.
+  const [scan, fieldReports] = await Promise.all([
+    runFullScan(),
+    options.fields ? runFieldGapScan() : Promise.resolve(undefined),
+  ]);
+  if (fieldReports) scan.fieldReports = fieldReports;
   if (options.persist) {
     await persistScanResults(scan);
   }
   if (options.ci) {
     return { exitCode: 0, output: JSON.stringify(scan, null, 2) };
   }
-  let output = formatScanSummary(scan);
-  if (scan.fieldReports && scan.fieldReports.length > 0) {
-    const top = options.top ? parseInt(options.top as string, 10) : undefined;
-    output += '\n\n' + formatFieldGapReports(scan.fieldReports, { top });
-  }
-  return { exitCode: 0, output };
+  return { exitCode: 0, output: appendFieldGaps(formatScanSummary(scan), scan.fieldReports) };
 }
 
 async function gapsCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {

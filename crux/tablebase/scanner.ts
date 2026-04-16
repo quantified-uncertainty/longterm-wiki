@@ -10,7 +10,7 @@ import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
-import type { TableProfile, TableScanResult, ScanSummary, FieldGapStat, FieldGapReport } from './types.ts';
+import type { TableProfile, TableScanResult, ScanSummary, FieldGapStat, FieldGapReport, FieldColumnType } from './types.ts';
 
 // ---------------------------------------------------------------------------
 // Entity importance from database.json (page rankings)
@@ -825,17 +825,13 @@ export async function runFullScan(): Promise<ScanSummary> {
 }
 
 // ---------------------------------------------------------------------------
-// Field-gap profiler (QUA-551)
-//
-// Profiles null / empty-string / "n/a" rates for every enrichable field on a
-// table, sorted by combined gap rate. Output is consumed by the improve
-// pipeline to target field-by-field enrichment work.
+// Field-gap profiler (QUA-551) — profiles null / empty / "n/a" rates for
+// every enrichable field. Output feeds the P2 field-level improve pipeline.
 // ---------------------------------------------------------------------------
 
 interface FieldConfig {
   field: string;
-  /** Declared type — for reporting only. We don't coerce values. */
-  columnType: 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id';
+  columnType: FieldColumnType;
 }
 
 /**
@@ -895,7 +891,7 @@ function classifyValue(value: unknown): FieldValueClass {
     if (NA_PATTERN.test(trimmed)) return 'na';
     return 'filled';
   }
-  // Numeric 0 and boolean false are legitimate values, not gaps.
+  // Numeric 0 / boolean false are valid, not gaps.
   return 'filled';
 }
 
@@ -952,11 +948,6 @@ export function profileFields<T extends { id: string }>(
 
 type RawRow = Record<string, unknown> & { id: string };
 
-/**
- * Fetch the raw JSON for a table (not formatted per-entity) and return it.
- * Separate from the per-entity fetchers so the field-gap scan reuses the
- * same API without re-computing per-entity profiles.
- */
 async function fetchTableRows(table: string): Promise<RawRow[]> {
   switch (table) {
     case 'divisions':

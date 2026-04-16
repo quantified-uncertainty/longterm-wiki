@@ -93,10 +93,12 @@ export interface TableScanResult {
   profiles: TableProfile[];
 }
 
+export type FieldColumnType = 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id';
+
 /** Per-field NULL/empty/"n/a" statistics for a single column */
 export interface FieldGapStat {
   field: string;
-  columnType: string;
+  columnType: FieldColumnType;
   total: number;
   nullCount: number;
   emptyCount: number;
