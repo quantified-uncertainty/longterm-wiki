@@ -495,7 +495,17 @@ async function runBatchExecution(
       }
 
       // Parse LLM response with shared Zod schema (same validation as real-time path)
-      const raw = parseJsonResponse(text);
+      let raw: unknown;
+      try {
+        raw = parseJsonResponse(text);
+      } catch (e) {
+        summary.errors++;
+        summary.failures.push({
+          itemId: item.id, kind: item.kind, description: item.description,
+          error: `JSON parse failed: ${e instanceof Error ? e.message : String(e)}`,
+        });
+        continue;
+      }
       const parsed = LlmResponseSchema.safeParse(raw);
       if (!parsed.success) {
         summary.errors++;
