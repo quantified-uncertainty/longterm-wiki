@@ -50,7 +50,8 @@ const enforcement: 'advisory' | 'soft' | 'hard' = (
 interface SourcingSummary {
   withSourcing: number;
   withoutSourcing: number;
-  verdicts: {
+  // Optional because legacy manifests (pre-2026-04) lack this field.
+  verdicts?: {
     verified: number;
     contradicted: number;
     unverifiable: number;
@@ -62,8 +63,30 @@ interface Manifest {
   table: string;
   recordCount: number;
   submittedAt: string;
-  sourcingSummary: SourcingSummary;
+  sourcingSummary?: SourcingSummary;
+  // Legacy (pre-2026-04-07): field was renamed from verificationSummary.
+  verificationSummary?: {
+    withVerification?: number;
+    withoutVerification?: number;
+    verdicts?: SourcingSummary['verdicts'];
+  };
   records: Array<Record<string, unknown>>;
+}
+
+/**
+ * Normalize legacy manifests: pre-2026-04-07 manifests stored the same data
+ * under `verificationSummary` with `withVerification`/`withoutVerification`
+ * keys. Treat them as equivalent to today's `sourcingSummary` shape.
+ */
+function normalizeSummary(manifest: Manifest): SourcingSummary | undefined {
+  if (manifest.sourcingSummary) return manifest.sourcingSummary;
+  const legacy = manifest.verificationSummary;
+  if (!legacy) return undefined;
+  return {
+    withSourcing: legacy.withVerification ?? 0,
+    withoutSourcing: legacy.withoutVerification ?? 0,
+    verdicts: legacy.verdicts,
+  };
 }
 
 function main() {
@@ -94,7 +117,8 @@ function main() {
       continue;
     }
 
-    const { table, recordCount, sourcingSummary } = manifest;
+    const { table, recordCount } = manifest;
+    const sourcingSummary = normalizeSummary(manifest);
 
     if (!sourcingSummary || typeof recordCount !== 'number') {
       fatalErrors.push(`${file}: missing sourcingSummary or recordCount`);
@@ -114,9 +138,12 @@ function main() {
       }
     }
 
-    if (sourcingSummary.verdicts.contradicted > 0) {
+    // Legacy manifests (pre-2026-04) lack the `verdicts` field.
+    // Treat missing as zero rather than crashing.
+    const contradicted = sourcingSummary.verdicts?.contradicted ?? 0;
+    if (contradicted > 0) {
       warnings.push(
-        `${file}: ${sourcingSummary.verdicts.contradicted} ${table} records have CONTRADICTED verdicts`
+        `${file}: ${contradicted} ${table} records have CONTRADICTED verdicts`
       );
     }
   }
