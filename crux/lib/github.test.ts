@@ -4,6 +4,7 @@ import {
   isMissingTokenError,
   MissingTokenError,
   MISSING_TOKEN_HELP_MESSAGE,
+  MISSING_TOKEN_SUMMARY,
 } from './github.ts';
 
 // Use `vi.stubEnv()` instead of mutating `process.env` directly. This is
@@ -72,6 +73,16 @@ describe('MissingTokenError', () => {
   it('uses the shared MISSING_TOKEN_HELP_MESSAGE', () => {
     const err = new MissingTokenError();
     expect(err.message).toBe(MISSING_TOKEN_HELP_MESSAGE);
+  });
+
+  it('MISSING_TOKEN_HELP_MESSAGE is derived from MISSING_TOKEN_SUMMARY so they cannot drift', () => {
+    // Regression for QUA-511: the ~8 display call sites (health-check summaries,
+    // pr-patrol error logs, etc.) read MISSING_TOKEN_SUMMARY for short labels
+    // and MISSING_TOKEN_HELP_MESSAGE for full help text. If the full message
+    // ever stops starting with the summary, users see inconsistent labeling
+    // between summary and detail views.
+    expect(MISSING_TOKEN_HELP_MESSAGE.startsWith(MISSING_TOKEN_SUMMARY)).toBe(true);
+    expect(MISSING_TOKEN_SUMMARY).toBe('GITHUB_TOKEN not set');
   });
 
   it('extends Error so stack traces work', () => {

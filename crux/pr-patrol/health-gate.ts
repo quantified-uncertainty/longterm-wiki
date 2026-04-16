@@ -20,7 +20,7 @@
 
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
 import { join } from 'path';
-import { isMissingTokenError } from '../lib/github.ts';
+import { isMissingTokenError, MISSING_TOKEN_SUMMARY } from '../lib/github.ts';
 import { healthScan as realHealthScan, type HealthScanResult, type HealthIssue } from './health-scan.ts';
 import { appendJsonl, JSONL_FILE, STATE_DIR, ensureDirs, cl, log as realLog } from './state.ts';
 
@@ -238,21 +238,21 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
   // (b) the env changed between daemon startup and the first scan.
   if (!env.GITHUB_TOKEN) {
     log(
-      `${cl.red}✗ GITHUB_TOKEN not set — health gate cannot scan GitHub. ` +
+      `${cl.red}✗ ${MISSING_TOKEN_SUMMARY} — health gate cannot scan GitHub. ` +
         `Halting patrol until token is set.${cl.reset}`,
     );
     writeEvent({
       type: 'health_gate_missing_token',
       timestamp: now.toISOString(),
-      reason: 'GITHUB_TOKEN not set in environment',
+      reason: `${MISSING_TOKEN_SUMMARY} in environment`,
     });
     // Reset the consecutive-error counter: this is a config fault, not a
     // streak, and leaving it high would poison the next real scan attempt.
     cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
     return {
       proceed: false,
-      reason: 'GITHUB_TOKEN not set in environment',
-      result: syntheticScanFailureResult('GITHUB_TOKEN not set'),
+      reason: `${MISSING_TOKEN_SUMMARY} in environment`,
+      result: syntheticScanFailureResult(MISSING_TOKEN_SUMMARY),
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: false,
@@ -289,7 +289,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       );
       return {
         proceed: false,
-        reason: 'GITHUB_TOKEN not set in environment',
+        reason: `${MISSING_TOKEN_SUMMARY} in environment`,
         result: syntheticScanFailureResult(message),
         emittedIssues: [],
         suppressedIssues: [],

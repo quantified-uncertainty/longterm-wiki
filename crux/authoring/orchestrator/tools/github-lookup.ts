@@ -7,6 +7,7 @@
  */
 
 import { createGitHubProvider } from '../../../lib/search/providers/github-search.ts';
+import { MISSING_TOKEN_SUMMARY } from '../../../lib/github.ts';
 import type { ToolRegistration } from './types.ts';
 
 export const tool: ToolRegistration = {
@@ -39,7 +40,7 @@ export const tool: ToolRegistration = {
 
     const provider = createGitHubProvider();
     if (!provider.isAvailable()) {
-      return JSON.stringify({ error: 'GITHUB_TOKEN not set — cannot access GitHub API' });
+      return JSON.stringify({ error: `${MISSING_TOKEN_SUMMARY} — cannot access GitHub API` });
     }
 
     try {

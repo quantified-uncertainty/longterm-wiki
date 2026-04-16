@@ -19,6 +19,9 @@ import {
   closeIssue,
   createIssue,
   ensureLabel,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_SUMMARY,
 } from '../lib/github.ts';
 import type { GitHubIssue } from '../lib/github.ts';
 
@@ -199,9 +202,14 @@ export async function manageWellnessIssue(
   report: WellnessReport,
   options: { runUrl?: string } = {},
 ): Promise<{ action: 'created' | 'updated' | 'closed' | 'none'; issueNumber?: number }> {
-  if (!process.env.GITHUB_TOKEN) {
-    console.warn('GITHUB_TOKEN not set — skipping wellness issue management');
-    return { action: 'none' };
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      console.warn(`${MISSING_TOKEN_SUMMARY} — skipping wellness issue management`);
+      return { action: 'none' };
+    }
+    throw e;
   }
 
   const existingIssue = await findOpenWellnessIssue();
