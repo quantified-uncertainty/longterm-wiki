@@ -46,6 +46,7 @@ import { githubApi, REPO } from '../lib/github.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { type CommandResult, parseIntOpt } from '../lib/cli.ts';
 import { buildKbContextForPage } from '../lib/factbase-context.ts';
+import { loadPlaybook, formatPlaybookMarkdown } from '../lib/research-playbooks.ts';
 
 // ---------------------------------------------------------------------------
 // Constants
@@ -470,6 +471,12 @@ async function forEntity(
     };
   }
 
+  const e = entityResult.data;
+
+  // Per-type research playbook (QUA-33): guidance on which sources to use,
+  // standard facts to gather, and common pitfalls for this entity type.
+  const playbook = loadPlaybook(e.entityType);
+
   // --json / --ci: return structured data as JSON (to stdout)
   if (options.json) {
     const jsonData = {
@@ -478,14 +485,19 @@ async function forEntity(
       entity: entityResult.data,
       facts: factsResult.ok ? factsResult.data : null,
       pages: pageSearchResult.ok ? pageSearchResult.data : null,
+      playbook,
     };
     return { output: JSON.stringify(jsonData, null, 2), exitCode: 0 };
   }
 
-  const e = entityResult.data;
   let bundle = mdHeader(`Entity: ${e.title}`, 'for-entity', [entityId]);
   bundle += entityBlock(e);
   bundle += '---\n\n';
+
+  if (playbook) {
+    bundle += formatPlaybookMarkdown(playbook);
+    bundle += '---\n\n';
+  }
 
   if (factsResult.ok && factsResult.data.facts.length > 0) {
     bundle += factsBlock(factsResult.data.facts);
@@ -546,6 +558,7 @@ async function forEntity(
   const summary = [
     `${c.green}✓${c.reset} Context bundle written to ${c.cyan}${outputPath}${c.reset}`,
     `  Entity: ${e.title} (${entityId}) [${e.entityType}]`,
+    playbook ? `  Research playbook: ${playbook.entityType} (${playbook.sources.length} sources)` : '',
     factsResult.ok ? `  Facts: ${factsResult.data.facts.length}` : '',
     kbContext ? `  KB structured facts: included` : '',
     pageSearchResult.ok ? `  Pages mentioning entity: ${pageSearchResult.data.results.length}` : '',

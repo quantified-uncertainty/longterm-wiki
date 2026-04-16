@@ -13,6 +13,7 @@ import { runAgent } from '../api.ts';
 import { parseJsonFromLlm } from './json-parsing.ts';
 import { resolveTemplate, formatTemplateForPrompt } from '../../../lib/content/page-templates.ts';
 import { getPageType } from '../../../lib/page-analysis.ts';
+import { loadPlaybook, formatPlaybookForPrompt } from '../../../lib/research-playbooks.ts';
 
 export async function analyzePhase(page: PageData, directions: string, options: PipelineOptions): Promise<AnalysisResult> {
   log('analyze', 'Starting analysis');
@@ -29,6 +30,17 @@ export async function analyzePhase(page: PageData, directions: string, options: 
   const templateSection = template
     ? `\n## Template Requirements\nThis page should follow the **${template.name}** template. When analyzing gaps, check whether required sections are present.\n\n${formatTemplateForPrompt(template)}\n`
     : '';
+
+  // Per-type research playbook (QUA-33): inject source recommendations and
+  // standard data points so researchNeeded topics are playbook-aware. Pulled
+  // from the page's entityType (e.g. "organization", "person").
+  const playbook = loadPlaybook(page.entityType);
+  const playbookSection = playbook
+    ? `\n## Research Playbook for \`${playbook.entityType}\`\nUse this playbook to decide which research topics to propose. Favor facts from the standard checklist that are missing from the page, and prefer sources listed here over ad-hoc web search.\n\n${formatPlaybookForPrompt(playbook)}\n`
+    : '';
+  if (playbook) {
+    log('analyze', `Loaded research playbook for entityType="${playbook.entityType}"`);
+  }
 
   const prompt = `Analyze this wiki page for improvement opportunities.
 
@@ -47,7 +59,7 @@ ${directions || 'No specific directions provided - do a general quality improvem
 ${currentContent}
 \`\`\`
 
-${templateSection}## Analysis Required
+${templateSection}${playbookSection}## Analysis Required
 
 Analyze the page and output a JSON object with:
 
