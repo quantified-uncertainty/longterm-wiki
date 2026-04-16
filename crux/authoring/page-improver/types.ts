@@ -162,6 +162,26 @@ export interface PipelineOptions {
    * CLI mode bills via Claude Code subscription; API-direct bills via ANTHROPIC_API_KEY.
    */
   apiDirect?: boolean;
+  /**
+   * Minimum number of usable fetched sources required from the research
+   * phase. If fewer are landed, the pipeline aborts before improve runs
+   * (avoiding a wasted ~$15-25 improve pass that would produce placeholder
+   * citations). A "usable" source is one whose URL fetched successfully and
+   * returned more than MIN_SOURCE_CONTENT_LENGTH chars of content.
+   *
+   * Defaults: 1 for standard tier, 3 for research-deep. Set to 0 (or pass
+   * skipSourceGate) to disable. (QUA-315)
+   */
+  minSources?: number;
+  /**
+   * When true, skip the research-phase source-coverage gate. The improve
+   * pipeline will proceed even if no real URLs were fetched.
+   *
+   * Default: false (gate ON). The gate exists because synthesis on empty
+   * research produces placeholder footnotes that look cited but aren't —
+   * the same failure mode as QUA-290 in the create pipeline. (QUA-315)
+   */
+  skipSourceGate?: boolean;
 }
 
 // Re-export AuditResult so callers importing from types.ts get it too

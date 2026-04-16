@@ -119,6 +119,9 @@ Options:
   --skip-citation-gate            Allow --apply even when citation audit fails (default: gate ON)
   --skip-citation-audit           Skip the post-improve citation audit phase
   --citation-audit-model <model>  Override LLM model for per-citation checking
+  --skip-source-gate              Allow improve to proceed when research lands few usable sources
+  --min-sources N                 Min usable sources from research before improve runs
+                                  (default: standard=1, deep=3; 0 disables) (QUA-315)
   --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
   --gap-analysis                  Run claims gap analysis: inject missing verified facts as structured directions
   --openrouter                    Route all Claude calls through OpenRouter (when Anthropic credits depleted)
@@ -305,6 +308,10 @@ Examples:
       saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
       gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
       apiDirect: opts['api-direct'] === true ? true : undefined,
+      skipSourceGate: opts['skip-source-gate'] === true ? true : undefined,
+      minSources: opts['min-sources'] !== undefined
+        ? parseInt(opts['min-sources'] as string, 10)
+        : undefined,
     });
   }
 }
