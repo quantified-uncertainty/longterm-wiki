@@ -55,16 +55,23 @@ export type ResearchPlaybook = z.infer<typeof ResearchPlaybookSchema>;
 
 export const PLAYBOOKS_DIR = path.join(PROJECT_ROOT, 'data/research-playbooks');
 
+// Path-safe entity type: lowercase alphanumerics + hyphens only. Used as a
+// filesystem guard against path traversal via crafted entityType values.
+const SAFE_ENTITY_TYPE_RE = /^[a-z0-9][a-z0-9-]*$/;
+
 /**
  * Normalize an entity type string to its canonical form.
  * Handles aliases like "researcher" → "person", "lab-frontier" → "organization".
- * Returns null for empty input.
+ * Returns null for empty input or any value that isn't path-safe (prevents
+ * filename traversal in loadPlaybook).
  */
 export function canonicalizeEntityType(entityType: string | null | undefined): string | null {
   if (!entityType) return null;
   const trimmed = entityType.trim();
   if (!trimmed) return null;
-  return ENTITY_TYPE_ALIASES[trimmed] ?? trimmed;
+  const canonical = ENTITY_TYPE_ALIASES[trimmed] ?? trimmed;
+  if (!SAFE_ENTITY_TYPE_RE.test(canonical)) return null;
+  return canonical;
 }
 
 /**

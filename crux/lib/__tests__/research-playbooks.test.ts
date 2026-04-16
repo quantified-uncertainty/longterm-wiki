@@ -81,6 +81,16 @@ describe('canonicalizeEntityType', () => {
     // Unknown types pass through so callers can detect "no playbook" via loadPlaybook.
     expect(canonicalizeEntityType('widget')).toBe('widget');
   });
+
+  it('rejects path-traversal and unsafe filesystem characters', () => {
+    expect(canonicalizeEntityType('../etc/passwd')).toBeNull();
+    expect(canonicalizeEntityType('../../foo')).toBeNull();
+    expect(canonicalizeEntityType('foo/bar')).toBeNull();
+    expect(canonicalizeEntityType('.hidden')).toBeNull();
+    expect(canonicalizeEntityType('foo\\bar')).toBeNull();
+    expect(canonicalizeEntityType('Organization')).toBeNull(); // uppercase rejected
+    expect(canonicalizeEntityType('foo bar')).toBeNull();      // space rejected
+  });
 });
 
 // ---------------------------------------------------------------------------
