@@ -55,6 +55,12 @@ interface CommandOptions extends BaseOptions {
   source?: string;
   entity?: string;
   persist?: boolean;
+  /** QUA-552: TABLE.FIELD to fill (e.g. divisions.lead_id) */
+  targetField?: string;
+  /** QUA-552: path to scanner field-gap JSON report */
+  fromScanReport?: string;
+  /** QUA-552: dollar budget cap for the whole run */
+  budgetUsd?: string;
 }
 
 async function persistScanResults(scan: import('../tablebase/types.ts').ScanSummary): Promise<void> {
@@ -164,9 +170,26 @@ async function nextTaskCommand(_args: string[], options: CommandOptions): Promis
 }
 
 async function improveCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
+  // QUA-552: field-level targeting modes. `--target-field` and `--from-scan-report`
+  // delegate to the field-improve engine, which runs the enrichment loop filtered
+  // to the task type(s) that can fill the specified field gap(s).
+  if (options.targetField || options.fromScanReport) {
+    return fieldImproveCommand(options);
+  }
+
   const taskId = args.find(a => !a.startsWith('--'));
   if (!taskId) {
-    return { exitCode: 1, output: 'Usage: crux tb tablebase improve <task-id> [--dry-run]' };
+    return {
+      exitCode: 1,
+      output: [
+        'Usage:',
+        '  crux tb improve <task-id>                              Run one entity/task by ID',
+        '  crux tb improve --target-field=TABLE.FIELD --budget-usd=N',
+        '  crux tb improve --from-scan-report=PATH --budget-usd=N',
+        '',
+        'Common flags: --dry-run, --model=auto|haiku|sonnet|opus, --max=N, --skip-sourcing',
+      ].join('\n'),
+    };
   }
 
   const { findTaskById } = await import('../tablebase/loop.ts');
@@ -198,6 +221,59 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
     exitCode: 0,
     output: `\x1b[32m✓\x1b[0m Task ${task.id} complete: ${result.recordsCreated} records created, $${result.cost.toFixed(4)}, ${Math.round(result.durationMs / 1000)}s`,
   };
+}
+
+async function fieldImproveCommand(options: CommandOptions): Promise<CommandResult> {
+  const budgetUsd = options.budgetUsd ? parseFloat(options.budgetUsd) : NaN;
+  if (!Number.isFinite(budgetUsd) || budgetUsd <= 0) {
+    return {
+      exitCode: 1,
+      output: 'Field-level improve requires --budget-usd=N (positive dollar cap).',
+    };
+  }
+
+  const maxTasks = options.max ? parseInt(options.max, 10) : undefined;
+  const model = (options.model as string | undefined) ?? 'auto';
+
+  const { runFieldTargetedImprove, runScanReportImprove, formatFieldImproveResult } =
+    await import('../tablebase/field-improve.ts');
+
+  if (options.targetField && options.fromScanReport) {
+    return {
+      exitCode: 1,
+      output: '--target-field and --from-scan-report are mutually exclusive. Pick one.',
+    };
+  }
+
+  try {
+    const result = options.targetField
+      ? await runFieldTargetedImprove({
+          target: options.targetField,
+          budgetUsd,
+          maxTasks,
+          model,
+          dryRun: !!options.dryRun,
+          skipSourcing: !!options.skipSourcing,
+        })
+      : await runScanReportImprove({
+          reportPath: options.fromScanReport as string,
+          budgetUsd,
+          maxTasks,
+          model,
+          dryRun: !!options.dryRun,
+          skipSourcing: !!options.skipSourcing,
+        });
+
+    if (options.ci) {
+      return { exitCode: 0, output: JSON.stringify(result, null, 2) };
+    }
+
+    const exitCode = result.skipped.length > 0 && result.targets.length === 0 ? 1 : 0;
+    return { exitCode, output: formatFieldImproveResult(result) };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    return { exitCode: 1, output: `Field improve failed: ${message}` };
+  }
 }
 
 async function resolveCommand(args: string[], options: CommandOptions): Promise<CommandResult> {
