@@ -281,6 +281,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Entity Profile", href: internalHref("entity-profile-dashboard") },
         { label: "People Coverage", href: internalHref("people-coverage-dashboard") },
         { label: "Data Sources", href: internalHref("data-sources-dashboard") },
+        { label: "Resource Pipeline", href: internalHref("resource-pipeline-dashboard") },
         { label: "Grants", href: internalHref("grants-dashboard") },
         { label: "Divisions", href: internalHref("divisions-dashboard") },
         { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
