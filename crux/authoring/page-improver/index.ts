@@ -281,6 +281,13 @@ Examples:
       console.error(`Orchestrator v2 supports tiers: polish, standard, deep (got: ${tierStr})`);
       process.exit(1);
     }
+    // The source gate (QUA-315) lives in the v1 researchPhase. The v2
+    // orchestrator uses a tool-driven research path that doesn't go through
+    // researchPhase, so silently ignoring the flag would be a UX trap.
+    if (opts['min-sources'] !== undefined || opts['skip-source-gate'] === true) {
+      console.error('Error: --min-sources / --skip-source-gate are not supported with --engine=v2 (the v2 orchestrator uses a different research path). File a follow-up if you need this. (QUA-315)');
+      process.exit(1);
+    }
     await runOrchestratorPipeline(pageId, {
       tier: v2Tier as 'polish' | 'standard' | 'deep',
       directions: (opts.directions as string) || '',
@@ -309,11 +316,39 @@ Examples:
       gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
       apiDirect: opts['api-direct'] === true ? true : undefined,
       skipSourceGate: opts['skip-source-gate'] === true ? true : undefined,
-      minSources: opts['min-sources'] !== undefined
-        ? parseInt(opts['min-sources'] as string, 10)
-        : undefined,
+      minSources: parseMinSourcesOrExit(opts['min-sources']),
     });
   }
+}
+
+/** main()-side wrapper that converts parseMinSources() throws into process.exit(1). */
+function parseMinSourcesOrExit(raw: unknown): number | undefined {
+  try {
+    return parseMinSources(raw);
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Parse and validate the `--min-sources` CLI flag.
+ *
+ * Returns undefined when the flag is omitted (caller falls through to the
+ * tier-aware default). Throws on a malformed value — passing NaN through
+ * to the gate would silently disable it (because `NaN > 0` is false),
+ * exactly the silent-degradation mode QUA-315 exists to prevent.
+ *
+ * Exported for testing; main() wraps the throw in a clean process.exit(1).
+ */
+export function parseMinSources(raw: unknown): number | undefined {
+  if (raw === undefined) return undefined;
+  const parsed = parseInt(String(raw), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(`--min-sources requires a non-negative integer (got: ${String(raw)})`);
+  }
+  return parsed;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
