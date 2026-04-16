@@ -1,4 +1,20 @@
 {
+  "permissions": {
+    "allow": [
+      "Bash(*)",
+      "Edit(*)",
+      "Write(*)",
+      "Read(*)",
+      "Grep(*)",
+      "Glob(*)",
+      "Agent(*)",
+      "WebFetch",
+      "WebSearch",
+      "mcp__serena__*",
+      "mcp__plugin_playwright_playwright__*",
+      "mcp__plugin_drywall_jscpd__*"
+    ]
+  },
   "hooks": {
     "SessionStart": [
       {
