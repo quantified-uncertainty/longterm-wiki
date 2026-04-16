@@ -549,6 +549,12 @@ type ResourcesClient = ReturnType<typeof hc<ResourcesRoute>>;
 /** Inferred response type for GET /api/resources/:id (single resource with sub-tables) */
 export type RpcResourceDetailResult = InferResponseType<ResourcesClient[':id']['$get'], 200>;
 
+/** Inferred response type for GET /api/resources/pipeline (Resource Pipeline Dashboard) */
+export type RpcResourcePipelineResult = InferResponseType<ResourcesClient['pipeline']['$get'], 200>;
+
+/** A single stuck/recent resource row from /api/resources/pipeline */
+export type RpcResourcePipelineRow = RpcResourcePipelineResult['stuck']['sample'][number];
+
 // ============================================================================
 // Hono RPC client — Political Scores API
 // ============================================================================

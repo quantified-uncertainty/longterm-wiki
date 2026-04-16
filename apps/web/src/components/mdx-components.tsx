@@ -80,6 +80,7 @@ import { SourcingCoverageContent } from "@/app/internal/sourcing-coverage/sourci
 import { DataQualityContent } from "@/app/internal/data-quality/data-quality-content";
 import { TalentFlowsContent } from "@/app/internal/talent-flows/talent-flows-content";
 import { JobsDashboardContent } from "@/app/internal/jobs/jobs-content";
+import { ResourcePipelineDashboardContent } from "@/app/internal/resource-pipeline-dashboard/resource-pipeline-dashboard-content";
 import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
 import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
@@ -245,6 +246,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DataQualityContent,
   TalentFlowsContent,
   JobsDashboardContent,
+  ResourcePipelineDashboardContent,
   DataSourcesContent,
   TablebaseCoverageContent,
   AutomationLandscapeContent,
