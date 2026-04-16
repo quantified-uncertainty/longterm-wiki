@@ -472,6 +472,19 @@ async function scanBenchmarkResultsCompleteness(prefetchedModels?: EntityListRes
 // that the `tb tablebase improve` agent can then enrich field-by-field.
 // ---------------------------------------------------------------------------
 
+function buildScanResult(table: string, totalRecords: number, profiles: TableProfile[]): TableScanResult {
+  return {
+    table,
+    totalEntities: profiles.length,
+    entitiesWithRecords: profiles.length,
+    totalRecords,
+    avgCompleteness: profiles.length > 0
+      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
+      : 100,
+    profiles,
+  };
+}
+
 async function scanDivisionsLead(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   const allDivisions = await fetchAllPaginated<DivisionsAllResponse['divisions'][number]>(
     '/api/divisions/all',
@@ -513,16 +526,7 @@ async function scanDivisionsLead(prefetchedOrgs?: EntityListResponse['entities']
     });
   }
 
-  return {
-    table: 'divisions',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allDivisions.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('divisions', allDivisions.length, profiles);
 }
 
 async function scanDivisionPersonnelDates(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
@@ -540,17 +544,15 @@ async function scanDivisionPersonnelDates(prefetchedOrgs?: EntityListResponse['e
   const divisionToOrg = new Map<string, string>();
   for (const d of allDivisions) divisionToOrg.set(d.id, d.parentOrgId);
 
-  // Group personnel by parent org (via their division)
-  const byOrg = new Map<string, { total: number; withStart: number; withEnd: number }>();
+  // Group personnel by parent org (via their division). Only startDate drives
+  // the score — endDate is legitimately null for current roles.
+  const byOrg = new Map<string, { total: number; withStart: number }>();
   for (const p of allPersonnel) {
     const orgId = divisionToOrg.get(p.divisionId);
     if (!orgId) continue;
-    const bucket = byOrg.get(orgId) ?? { total: 0, withStart: 0, withEnd: 0 };
+    const bucket = byOrg.get(orgId) ?? { total: 0, withStart: 0 };
     bucket.total += 1;
     if (p.startDate) bucket.withStart += 1;
-    // endDate is legitimately null for current roles, so only count it if startDate is present
-    // (i.e., we expect endDate on historical personnel, indicated by role-type conventions).
-    if (p.endDate) bucket.withEnd += 1;
     byOrg.set(orgId, bucket);
   }
 
@@ -578,16 +580,7 @@ async function scanDivisionPersonnelDates(prefetchedOrgs?: EntityListResponse['e
     });
   }
 
-  return {
-    table: 'division_personnel',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allPersonnel.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('division_personnel', allPersonnel.length, profiles);
 }
 
 async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
@@ -599,10 +592,12 @@ async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['ent
   const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   // Group by offering org; count fill rate across the three target fields.
-  // For closed/inactive programs, deadline/applicationUrl are less actionable — skip them.
+  // Only 'open' programs need deadline/applicationUrl enrichment — 'closed' and
+  // 'awarded' are historical and those fields are no longer actionable.
+  // schema.ts:2373 → status enum is: open | closed | awarded.
   const byOrg = new Map<string, { total: number; slots: number; filled: number; gaps: { budget: number; deadline: number; url: number } }>();
   for (const p of allPrograms) {
-    const isActive = p.status !== 'closed' && p.status !== 'inactive';
+    const isActive = p.status === 'open';
     const bucket = byOrg.get(p.orgId) ?? { total: 0, slots: 0, filled: 0, gaps: { budget: 0, deadline: 0, url: 0 } };
     bucket.total += 1;
     // totalBudget is always expected
@@ -640,16 +635,7 @@ async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['ent
     });
   }
 
-  return {
-    table: 'funding_programs',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allPrograms.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('funding_programs', allPrograms.length, profiles);
 }
 
 async function scanBenchmarkResultSources(prefetchedModels?: EntityListResponse['entities']): Promise<TableScanResult> {
@@ -691,16 +677,7 @@ async function scanBenchmarkResultSources(prefetchedModels?: EntityListResponse[
     });
   }
 
-  return {
-    table: 'benchmark_result_sources',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allResults.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('benchmark_result_sources', allResults.length, profiles);
 }
 
 // ---------------------------------------------------------------------------
