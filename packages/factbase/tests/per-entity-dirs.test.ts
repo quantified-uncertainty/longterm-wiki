@@ -2,7 +2,7 @@
  * Tests for per-entity directory support in the KB loader.
  *
  * Entities can be split across multiple YAML files in a directory:
- *   things/
+ *   fb-entities/
  *     anthropic.yaml           # single file (existing behavior)
  *     mK9pX3rQ7n/              # directory named by stableId or slug
  *       entity.yaml            # main file with `thing:` block

@@ -137,7 +137,7 @@ async function main(): Promise<void> {
 
   console.log("\nScanning YAML files…");
   const yamlFiles = findFiles(THINGS_DIR, [".yaml", ".yml"]);
-  console.log(`  ${yamlFiles.length} YAML files under things/`);
+  console.log(`  ${yamlFiles.length} YAML files under fb-entities/`);
 
   const rewriteRe = buildRewriteRegex(mapping);
   const changedFiles: Array<{ path: string; count: number }> = [];

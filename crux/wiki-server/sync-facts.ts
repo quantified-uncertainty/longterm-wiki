@@ -142,7 +142,7 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
  * Also returns `entityIdsWithNoFacts`: KB entities that exist in YAML but
  * emitted zero source facts after filtering derived/inverse facts. This is
  * the QUA-462 constellation case — the entity is still in the KB but its
- * `things/<entity>.yaml` file was emptied. Without this, the prune step has
+ * `fb-entities/<entity>.yaml` file was emptied. Without this, the prune step has
  * no way to know about the entity (it never appears in the syncFacts list)
  * and orphan PG facts for it leak forever.
  *

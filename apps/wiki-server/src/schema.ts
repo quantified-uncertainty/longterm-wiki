@@ -2570,9 +2570,9 @@ export const publications = pgTable(
 // cross-domain queries, unified sourcing status, and a single browse UI.
 //
 // NAMING NOTE: This PG `things` table is a cross-base universal index.
-// It is NOT related to the FactBase "things" directory
-// (packages/factbase/data/fb-entities/) which contains FactBase entity YAML files.
-// The name collision is a known confusion — see data-architecture.mdx.
+// It is NOT related to the FactBase entity YAML directory
+// (packages/factbase/data/fb-entities/). The historical name collision
+// was resolved by QUA-501 (renamed from things/ to fb-entities/).
 
 export const VALID_THING_TYPES = [
   "entity",

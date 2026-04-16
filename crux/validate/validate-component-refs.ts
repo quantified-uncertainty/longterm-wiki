@@ -162,7 +162,7 @@ function loadKbEntitySlugs(): Set<string> {
     return slugs;
   } catch (err: unknown) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[validate-component-refs] Could not read KB things/ directory: ${msg} — KBF entity validation will be skipped`);
+    console.warn(`[validate-component-refs] Could not read KB fb-entities/ directory: ${msg} — KBF entity validation will be skipped`);
     return new Set();
   }
 }

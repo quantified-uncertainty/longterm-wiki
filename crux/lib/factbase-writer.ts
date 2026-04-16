@@ -135,7 +135,7 @@ export function writeEntityDocument(filepath: string, doc: Document): void {
 
 /**
  * Find the YAML file path for an entity.
- * Checks both single-file (things/<slug>.yaml) and directory (things/<dir>/entity.yaml) patterns.
+ * Checks both single-file (fb-entities/<slug>.yaml) and directory (fb-entities/<dir>/entity.yaml) patterns.
  *
  * @param entitySlug - The slug (filename stem) for the entity
  * @param dataDir - The KB data directory (e.g., packages/factbase/data)
@@ -144,13 +144,13 @@ export function writeEntityDocument(filepath: string, doc: Document): void {
 export function findEntityFilePath(entitySlug: string, dataDir: string): string | null {
   const thingsDir = join(dataDir, 'fb-entities');
 
-  // Check single-file pattern: things/<slug>.yaml
+  // Check single-file pattern: fb-entities/<slug>.yaml
   const singleFile = join(thingsDir, `${entitySlug}.yaml`);
   if (existsSync(singleFile)) {
     return singleFile;
   }
 
-  // Check directory pattern: things/<slug>/entity.yaml
+  // Check directory pattern: fb-entities/<slug>/entity.yaml
   const dirFile = join(thingsDir, entitySlug, 'entity.yaml');
   if (existsSync(dirFile)) {
     return dirFile;
