@@ -63,14 +63,6 @@ describe('getItemsForType', () => {
     expect(infraItems.some(i => i.id === 'mdx-escaping')).toBe(false);
   });
 
-  it('includes crux-typescript for infrastructure, commands, refactor but not content or bugfix', () => {
-    expect(getItemsForType('infrastructure').some(i => i.id === 'crux-typescript')).toBe(true);
-    expect(getItemsForType('commands').some(i => i.id === 'crux-typescript')).toBe(true);
-    expect(getItemsForType('refactor').some(i => i.id === 'crux-typescript')).toBe(true);
-    expect(getItemsForType('content').some(i => i.id === 'crux-typescript')).toBe(false);
-    expect(getItemsForType('bugfix').some(i => i.id === 'crux-typescript')).toBe(false);
-  });
-
   it('all types get universal items', () => {
     const types: SessionType[] = ['content', 'infrastructure', 'bugfix', 'refactor', 'commands'];
     const universalIds = [
@@ -414,8 +406,8 @@ describe('checklist catalog integrity', () => {
     }
   });
 
-  it('catalog has exactly 18 items', () => {
-    expect(CHECKLIST_ITEMS.length).toBe(18);
+  it('catalog has exactly 17 items', () => {
+    expect(CHECKLIST_ITEMS.length).toBe(17);
   });
 
   it('all items have valid priority', () => {

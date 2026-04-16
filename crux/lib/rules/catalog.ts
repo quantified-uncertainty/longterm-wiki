@@ -114,7 +114,7 @@ export { personOrgAffiliationRule } from './person-org-affiliation.ts';
 // Style guide compliance
 export { styleGuideRule } from './style-guide.ts';
 
-// Broken internal links (ported from validate-entity-links.ts)
+// Broken internal links
 export { brokenLinksRule } from './broken-links.ts';
 
 // Cross-page consistency rules (ported from validate-consistency.ts)

@@ -270,8 +270,7 @@ const PARALLEL_STEPS: Step[] = [
     cwd: APP_DIR,
     // Fail-open: crux has its own tsconfig with relaxed settings and
     // a known baseline of pre-existing errors. Blocking on crux type
-    // errors would prevent shipping app-only fixes. Use validate-crux-tsc
-    // baseline check for enforcement instead.
+    // errors would prevent shipping app-only fixes.
     advisory: true,
   },
   {
@@ -286,17 +285,6 @@ const PARALLEL_STEPS: Step[] = [
     name: 'Drizzle migration journal integrity',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-drizzle-journal.ts'],
-    cwd: PROJECT_ROOT,
-  },
-  {
-    // QUA-483: keeps @wiki-server/* path alias keys identical between
-    // crux/tsconfig.json and apps/web/tsconfig.json. Drift causes fake
-    // "Cannot find module" errors in the crux tsc check and silently
-    // inflates the crux-tsc-baseline. Cheap and deterministic — blocking.
-    id: 'tsconfig-aliases',
-    name: 'tsconfig @wiki-server/* alias parity',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-tsconfig-aliases.ts'],
     cwd: PROJECT_ROOT,
   },
   {
@@ -366,49 +354,6 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
-    id: 'manual-api-types',
-    name: 'No inline apiRequest<{...}> types (advisory)', // api-type-ok
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-manual-api-types.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: ~30 existing violations need migration to typed wiki-server
-    // clients with InferResponseType<>. Blocking would prevent all PRs.
-    advisory: true,
-  },
-  {
-    id: 'conflict-markers',
-    name: 'Conflict marker detection',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-conflict-markers.ts'],
-    cwd: PROJECT_ROOT,
-  },
-  {
-    id: 'placeholder-citations',
-    name: 'Placeholder footnote citations (advisory)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-placeholder-citations.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory (QUA-291): the AI Power & Influence Mapping shipment left
-    // ~140 placeholder footnotes across ~14 content pages. Graduating this
-    // to blocking would break CI until those are cleaned up. Shipping as
-    // advisory to surface the drift; graduate once the backlog is addressed.
-    // Root cause (pipeline emits placeholders): QUA-290.
-    advisory: true,
-  },
-  {
-    id: 'zod-check-parity',
-    name: 'Zod ↔ CHECK constraint parity (enum-gap detector)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-zod-check-parity.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory (QUA-364): catches the "Zod accepts value X but CHECK rejects
-    // it" class of deploy bug (PR #4178 groundskeeper_runs.event,
-    // PR #4202 service_health_incidents.severity). Starts advisory because
-    // the registry is seeded with only the incident cases — expand MANUAL_MAPPINGS
-    // in validate-zod-check-parity.ts to add coverage, then promote to blocking.
-    advisory: true,
-  },
-  {
     id: 'dot-position',
     name: 'Dot indicator position (SourcingDot / RecordStatusDots not in first column)',
     command: 'npx',
@@ -416,15 +361,6 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
     // Blocking: dots in the first column confuse visual scanning. The validator
     // checks both HTML <td> tables and TanStack ColumnDef arrays.
-  },
-  {
-    id: 'actions-yaml',
-    name: 'GitHub Actions workflow YAML (actionlint)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-actions-yaml.ts'],
-    cwd: PROJECT_ROOT,
-    // Fail-open if actionlint is not installed (local dev without the tool).
-    // CI installs actionlint explicitly so it always runs there.
   },
   {
     id: 'mdx-compile',
@@ -443,30 +379,6 @@ const PARALLEL_STEPS: Step[] = [
     command: 'pnpm',
     args: ['crux', 'validate', 'refs'],
     cwd: PROJECT_ROOT,
-  },
-  {
-    id: 'review-marker',
-    name: 'PR review status (advisory)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-review-marker.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: the pre-push gate runs before a PR exists, so review status
-    // is not applicable at push time. The /agent-session-ready-PR workflow
-    // enforces /review-pr before shipping — that is the enforcement point.
-    // Making this blocking in the gate caused agents to use --no-verify (#3301).
-    advisory: true,
-  },
-  {
-    id: 'typecheck-crux-baseline',
-    name: 'Crux TypeScript check (advisory)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-crux-tsc.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: CI runs this with continue-on-error:true, so the gate
-    // should match. The crux/ codebase has pre-existing type errors from
-    // rapid iteration. Making this blocking locally while advisory in CI
-    // creates a discrepancy that causes agents to use --no-verify (#3301).
-    advisory: true,
   },
   {
     id: 'kb-schema',

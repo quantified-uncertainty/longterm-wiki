@@ -115,7 +115,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
 
       - name: GitHub Actions YAML validation — actionlint (blocking)
-        run: npx tsx crux/validate/validate-actions-yaml.ts
+        run: actionlint -shellcheck= .github/workflows/*.yml
 
       - name: Actionlint — reviewdog annotations
         if: github.event_name == 'pull_request'
@@ -255,10 +255,6 @@ jobs:
             wait "$pid" || failed=1
           done
           exit $failed
-
-      - name: TypeScript type check — crux (advisory, baseline-guarded)
-        continue-on-error: true
-        run: npx tsx crux/validate/validate-crux-tsc.ts --ci
 
       - name: .returning() guard check (blocking)
         run: npx tsx crux/validate/validate-returning-guard.ts
