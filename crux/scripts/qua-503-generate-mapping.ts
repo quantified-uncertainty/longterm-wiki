@@ -141,16 +141,15 @@ SET LOCAL statement_timeout = '0';
 
 CREATE TEMP TABLE qua503_mapping (
   old_id text PRIMARY KEY,
-  new_id text NOT NULL UNIQUE,
-  resource_pk text NOT NULL
+  new_id text NOT NULL UNIQUE
 ) ON COMMIT DROP;
 
-INSERT INTO qua503_mapping (old_id, new_id, resource_pk) VALUES
+INSERT INTO qua503_mapping (old_id, new_id) VALUES
 `;
 
   const valuesLines = mapping.map((m, i) => {
     const suffix = i === mapping.length - 1 ? ";" : ",";
-    return `  (${pgLit(m.old)}, ${pgLit(m.new)}, ${pgLit(m.resourceId)})${suffix}`;
+    return `  (${pgLit(m.old)}, ${pgLit(m.new)})${suffix}`;
   });
 
   const verify = `
@@ -229,8 +228,7 @@ END $$;
 CREATE TEMP TABLE qua503_dropped_fks (
   table_name text NOT NULL,
   constraint_name text NOT NULL,
-  fk_column text NOT NULL,
-  on_delete text NOT NULL
+  fk_column text NOT NULL
 ) ON COMMIT DROP;
 
 DO $$
@@ -241,14 +239,7 @@ BEGIN
     SELECT
       t.relname AS table_name,
       c.conname AS constraint_name,
-      a.attname AS fk_column,
-      CASE c.confdeltype
-        WHEN 'a' THEN 'NO ACTION'
-        WHEN 'r' THEN 'RESTRICT'
-        WHEN 'c' THEN 'CASCADE'
-        WHEN 'n' THEN 'SET NULL'
-        WHEN 'd' THEN 'SET DEFAULT'
-      END AS on_delete
+      a.attname AS fk_column
     FROM pg_constraint c
     JOIN pg_class t ON t.oid = c.conrelid
     JOIN pg_attribute a
@@ -259,8 +250,8 @@ BEGIN
       AND array_length(c.conkey, 1) = 1
   LOOP
     INSERT INTO qua503_dropped_fks
-      (table_name, constraint_name, fk_column, on_delete)
-    VALUES (rec.table_name, rec.constraint_name, rec.fk_column, rec.on_delete);
+      (table_name, constraint_name, fk_column)
+    VALUES (rec.table_name, rec.constraint_name, rec.fk_column);
     RAISE NOTICE 'QUA-503: dropping FK %.% (% -> things.id)',
       rec.table_name, rec.constraint_name, rec.fk_column;
     EXECUTE format(
@@ -411,14 +402,12 @@ REFRESH MATERIALIZED VIEW CONCURRENTLY things_search;
 }
 
 function pgLit(s: string): string {
-  // Values are bare10 (old), sid_ + alphanumeric (new), or resource ids.
-  // Resource ids are normally hex16 but can be slugged test probes like
-  // "test-fresh-probe". Allow a conservative character class and single-quote
-  // escape for safety.
-  if (!/^[A-Za-z0-9_-]+$/.test(s)) {
+  // Values are bare10 (old) or sid_ + alphanumeric (new). The conservative
+  // character class rejects quotes outright, so no further escaping is needed.
+  if (!/^[A-Za-z0-9_]+$/.test(s)) {
     throw new Error(`Unexpected character in literal: ${s}`);
   }
-  return `'${s.replace(/'/g, "''")}'`;
+  return `'${s}'`;
 }
 
 main();
