@@ -527,7 +527,14 @@ async function handleSubmitRecords(
       deduped = await dedupInvestments(task.entityId, records );
       break;
     case 'benchmark-results':
-      deduped = await dedupBenchmarkResults(task.entityId, records );
+      if (task.taskType === 'benchmark-source-fill') {
+        // Update-only task: agent fills sourceUrl on existing records by id.
+        // Running dedup would drop every record (dedup matches on benchmarkId+modelId,
+        // which are exactly what the update targets).
+        deduped = records;
+      } else {
+        deduped = await dedupBenchmarkResults(task.entityId, records);
+      }
       break;
     case 'grants':
       // Grants are updated (granteeId backfill), not deduped

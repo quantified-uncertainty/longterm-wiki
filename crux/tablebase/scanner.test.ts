@@ -12,38 +12,6 @@ describe('scanner — field-level completeness (QUA-24)', () => {
   const orgB = { id: 'anthropic', stableId: 'sid_anthropic', entityType: 'organization', title: 'Anthropic', website: 'https://anthropic.com' };
   const modelA = { id: 'claude-4', stableId: 'sid_claude4', entityType: 'ai-model', title: 'Claude 4' };
 
-  // Minimal fake for fetchAllPaginated: returns all rows in a single page.
-  function mockEndpoint(path: string, resultKey: string, rows: unknown[]) {
-    apiRequest.mockImplementation(async (_method: string, url: string) => {
-      if (!url.startsWith(path)) return { ok: false, message: `unexpected ${url}` };
-      // fetchAllPaginated asks for limit=200 and expects a `total`.
-      return { ok: true, data: { [resultKey]: rows, total: rows.length } };
-    });
-  }
-
-  // Route-aware mock for scanners that need multiple endpoints.
-  function mockRoutes(routes: Record<string, unknown[]>, entitiesByType?: Record<string, unknown[]>) {
-    apiRequest.mockImplementation(async (_method: string, url: string) => {
-      for (const [path, rows] of Object.entries(routes)) {
-        if (url.startsWith(path)) {
-          // Infer the resultKey from the path (tests pass the full response shape elsewhere)
-          const resultKey = path.includes('/divisions/all') ? 'divisions'
-            : path.includes('/division-personnel/all') ? 'divisionPersonnel'
-            : path.includes('/funding-programs/all') ? 'fundingPrograms'
-            : path.includes('/benchmark-results/all') ? 'benchmarkResults'
-            : 'items';
-          return { ok: true, data: { [resultKey]: rows, total: rows.length } };
-        }
-      }
-      if (entitiesByType && url.startsWith('/api/entities')) {
-        const match = url.match(/entityType=([^&]+)/);
-        const type = match ? decodeURIComponent(match[1]) : '';
-        return { ok: true, data: { entities: entitiesByType[type] ?? [], total: (entitiesByType[type] ?? []).length } };
-      }
-      return { ok: false, message: `unexpected ${url}` };
-    });
-  }
-
   beforeEach(async () => {
     const client = await import('../lib/wiki-server/client.ts');
     apiRequest = vi.mocked(client.apiRequest);
@@ -53,16 +21,7 @@ describe('scanner — field-level completeness (QUA-24)', () => {
   // ── scanDivisionsLead ───────────────────────────────────────────────────
 
   it('scanDivisionsLead: computes per-org fill rate and skips inactive divisions', async () => {
-    mockEndpoint('/api/divisions/all', 'divisions', [
-      { id: 'd1', parentOrgId: 'sid_openphil', name: 'Global Health', lead: 'sid_xx', status: 'active' },
-      { id: 'd2', parentOrgId: 'sid_openphil', name: 'GCR', lead: null, status: 'active' },
-      { id: 'd3', parentOrgId: 'sid_openphil', name: 'Old Program', lead: null, status: 'dissolved' }, // skipped
-      { id: 'd4', parentOrgId: 'sid_anthropic', name: 'Research', lead: null, status: 'active' },
-      { id: 'd5', parentOrgId: 'sid_anthropic', name: 'Policy', lead: null, status: 'active' },
-    ]);
-
     const { runTableScan } = await import('./scanner.ts');
-    // runTableScan('divisions') calls fetchEntitiesByType in-line; stub that too.
     apiRequest.mockImplementation(async (_method: string, url: string) => {
       if (url.startsWith('/api/divisions/all')) {
         return { ok: true, data: {
@@ -162,20 +121,22 @@ describe('scanner — field-level completeness (QUA-24)', () => {
 
   // ── scanFundingProgramFields ───────────────────────────────────────────
 
-  it('scanFundingProgramFields: weights totalBudget always, deadline/URL only for active programs', async () => {
+  it('scanFundingProgramFields: weights totalBudget always, deadline/URL only for open programs', async () => {
     const { runTableScan } = await import('./scanner.ts');
     apiRequest.mockImplementation(async (_method: string, url: string) => {
       if (url.startsWith('/api/funding-programs/all')) {
         return { ok: true, data: {
           fundingPrograms: [
-            // Active, fully filled → 3/3 slots filled
+            // Open, fully filled → 3/3 slots filled
             { id: 'fp1', orgId: 'sid_openphil', name: 'RFP1', totalBudget: 1000000, applicationUrl: 'https://x.org', deadline: '2026-06-01', status: 'open' },
-            // Active, missing deadline + url → 1/3 slots filled
+            // Open, missing deadline + url → 1/3 slots filled
             { id: 'fp2', orgId: 'sid_openphil', name: 'RFP2', totalBudget: 500000, applicationUrl: null, deadline: null, status: 'open' },
             // Closed, missing budget → 0/1 slots (deadline/url not scored for closed)
             { id: 'fp3', orgId: 'sid_anthropic', name: 'Closed Grant', totalBudget: null, applicationUrl: null, deadline: null, status: 'closed' },
+            // Awarded program with budget but no deadline/url → should be treated as inactive: 1 slot, 1 filled
+            { id: 'fp4', orgId: 'sid_anthropic', name: 'Awarded Fellowship', totalBudget: 250000, applicationUrl: null, deadline: null, status: 'awarded' },
           ],
-          total: 3,
+          total: 4,
         } };
       }
       if (url.startsWith('/api/entities')) {
@@ -192,11 +153,12 @@ describe('scanner — field-level completeness (QUA-24)', () => {
     expect(openphil.missingFields.some(m => m.includes('active programs missing applicationUrl'))).toBe(true);
 
     const anthropic = result!.profiles.find(p => p.entityId === 'sid_anthropic')!;
-    // closed program: 1 slot (budget only), 0 filled → 0%
-    expect(anthropic.completenessPercent).toBe(0);
+    // fp3 closed: 1 slot, 0 filled; fp4 awarded: 1 slot, 1 filled → 1/2 = 50%
+    expect(anthropic.completenessPercent).toBe(50);
     expect(anthropic.missingFields[0]).toContain('1 programs missing totalBudget');
-    // deadline/url should NOT appear in missing for closed programs
+    // deadline/url should NOT appear in missing for closed/awarded programs
     expect(anthropic.missingFields.some(m => m.includes('missing deadline'))).toBe(false);
+    expect(anthropic.missingFields.some(m => m.includes('missing applicationUrl'))).toBe(false);
   });
 
   // ── scanBenchmarkResultSources ─────────────────────────────────────────

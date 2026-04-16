@@ -472,12 +472,51 @@ async function scanBenchmarkResultsCompleteness(prefetchedModels?: EntityListRes
 // that the `tb tablebase improve` agent can then enrich field-by-field.
 // ---------------------------------------------------------------------------
 
-async function scanDivisionsLead(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
-  const allDivisions = await fetchAllPaginated<DivisionsAllResponse['divisions'][number]>(
-    '/api/divisions/all',
-    'divisions',
-  );
+function buildScanResult(table: string, totalRecords: number, profiles: TableProfile[]): TableScanResult {
+  return {
+    table,
+    totalEntities: profiles.length,
+    entitiesWithRecords: profiles.length,
+    totalRecords,
+    avgCompleteness: profiles.length > 0
+      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
+      : 100,
+    profiles,
+  };
+}
 
+function buildProfile(
+  entity: EntityListResponse['entities'][number],
+  table: string,
+  entityType: 'organization' | 'ai-model',
+  totalRecords: number,
+  completenessPercent: number,
+  missingFields: string[],
+): TableProfile {
+  return {
+    entityId: entity.stableId || entity.id,
+    entityName: entity.title,
+    entityType,
+    table,
+    totalRecords,
+    completenessPercent,
+    missingFields,
+    website: entity.website,
+    entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
+  };
+}
+
+type Division = DivisionsAllResponse['divisions'][number];
+
+async function fetchAllDivisions(): Promise<Division[]> {
+  return fetchAllPaginated<Division>('/api/divisions/all', 'divisions');
+}
+
+async function scanDivisionsLead(
+  prefetchedOrgs?: EntityListResponse['entities'],
+  prefetchedDivisions?: Division[],
+): Promise<TableScanResult> {
+  const allDivisions = prefetchedDivisions ?? await fetchAllDivisions();
   const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   // Group divisions by parent org. Skip inactive divisions — no point researching leads for defunct ones.
@@ -492,42 +531,23 @@ async function scanDivisionsLead(prefetchedOrgs?: EntityListResponse['entities']
 
   const profiles: TableProfile[] = [];
   for (const entity of orgEntities) {
-    const orgId = entity.stableId || entity.id;
-    const bucket = byOrg.get(orgId);
+    const bucket = byOrg.get(entity.stableId || entity.id);
     if (!bucket || bucket.total === 0) continue;
     const completeness = Math.round((bucket.withLead / bucket.total) * 100);
-    const missing: string[] = [];
     const gap = bucket.total - bucket.withLead;
-    if (gap > 0) missing.push(`${gap} of ${bucket.total} divisions missing lead`);
-
-    profiles.push({
-      entityId: orgId,
-      entityName: entity.title,
-      entityType: 'organization',
-      table: 'divisions',
-      totalRecords: bucket.total,
-      completenessPercent: completeness,
-      missingFields: missing,
-      website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
-    });
+    const missing = gap > 0 ? [`${gap} of ${bucket.total} divisions missing lead`] : [];
+    profiles.push(buildProfile(entity, 'divisions', 'organization', bucket.total, completeness, missing));
   }
 
-  return {
-    table: 'divisions',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allDivisions.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('divisions', allDivisions.length, profiles);
 }
 
-async function scanDivisionPersonnelDates(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
+async function scanDivisionPersonnelDates(
+  prefetchedOrgs?: EntityListResponse['entities'],
+  prefetchedDivisions?: Division[],
+): Promise<TableScanResult> {
   const [allDivisions, allPersonnel] = await Promise.all([
-    fetchAllPaginated<DivisionsAllResponse['divisions'][number]>('/api/divisions/all', 'divisions'),
+    prefetchedDivisions ? Promise.resolve(prefetchedDivisions) : fetchAllDivisions(),
     fetchAllPaginated<DivisionPersonnelAllResponse['divisionPersonnel'][number]>(
       '/api/division-personnel/all',
       'divisionPersonnel',
@@ -540,54 +560,29 @@ async function scanDivisionPersonnelDates(prefetchedOrgs?: EntityListResponse['e
   const divisionToOrg = new Map<string, string>();
   for (const d of allDivisions) divisionToOrg.set(d.id, d.parentOrgId);
 
-  // Group personnel by parent org (via their division)
-  const byOrg = new Map<string, { total: number; withStart: number; withEnd: number }>();
+  // Group personnel by parent org (via their division). Only startDate drives
+  // the score — endDate is legitimately null for current roles.
+  const byOrg = new Map<string, { total: number; withStart: number }>();
   for (const p of allPersonnel) {
     const orgId = divisionToOrg.get(p.divisionId);
     if (!orgId) continue;
-    const bucket = byOrg.get(orgId) ?? { total: 0, withStart: 0, withEnd: 0 };
+    const bucket = byOrg.get(orgId) ?? { total: 0, withStart: 0 };
     bucket.total += 1;
     if (p.startDate) bucket.withStart += 1;
-    // endDate is legitimately null for current roles, so only count it if startDate is present
-    // (i.e., we expect endDate on historical personnel, indicated by role-type conventions).
-    if (p.endDate) bucket.withEnd += 1;
     byOrg.set(orgId, bucket);
   }
 
   const profiles: TableProfile[] = [];
   for (const entity of orgEntities) {
-    const orgId = entity.stableId || entity.id;
-    const bucket = byOrg.get(orgId);
+    const bucket = byOrg.get(entity.stableId || entity.id);
     if (!bucket || bucket.total === 0) continue;
-    // Score on startDate fill rate only — endDate is genuinely null for current roles.
     const completeness = Math.round((bucket.withStart / bucket.total) * 100);
-    const missing: string[] = [];
     const gap = bucket.total - bucket.withStart;
-    if (gap > 0) missing.push(`${gap} of ${bucket.total} division personnel missing startDate`);
-
-    profiles.push({
-      entityId: orgId,
-      entityName: entity.title,
-      entityType: 'organization',
-      table: 'division_personnel',
-      totalRecords: bucket.total,
-      completenessPercent: completeness,
-      missingFields: missing,
-      website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
-    });
+    const missing = gap > 0 ? [`${gap} of ${bucket.total} division personnel missing startDate`] : [];
+    profiles.push(buildProfile(entity, 'division_personnel', 'organization', bucket.total, completeness, missing));
   }
 
-  return {
-    table: 'division_personnel',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allPersonnel.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('division_personnel', allPersonnel.length, profiles);
 }
 
 async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
@@ -599,10 +594,12 @@ async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['ent
   const orgEntities = prefetchedOrgs ?? await fetchEntitiesByType('organization');
 
   // Group by offering org; count fill rate across the three target fields.
-  // For closed/inactive programs, deadline/applicationUrl are less actionable — skip them.
+  // Only 'open' programs need deadline/applicationUrl enrichment — 'closed' and
+  // 'awarded' are historical and those fields are no longer actionable.
+  // schema.ts:2373 → status enum is: open | closed | awarded.
   const byOrg = new Map<string, { total: number; slots: number; filled: number; gaps: { budget: number; deadline: number; url: number } }>();
   for (const p of allPrograms) {
-    const isActive = p.status !== 'closed' && p.status !== 'inactive';
+    const isActive = p.status === 'open';
     const bucket = byOrg.get(p.orgId) ?? { total: 0, slots: 0, filled: 0, gaps: { budget: 0, deadline: 0, url: 0 } };
     bucket.total += 1;
     // totalBudget is always expected
@@ -618,38 +615,17 @@ async function scanFundingProgramFields(prefetchedOrgs?: EntityListResponse['ent
 
   const profiles: TableProfile[] = [];
   for (const entity of orgEntities) {
-    const orgId = entity.stableId || entity.id;
-    const bucket = byOrg.get(orgId);
+    const bucket = byOrg.get(entity.stableId || entity.id);
     if (!bucket || bucket.slots === 0) continue;
     const completeness = Math.round((bucket.filled / bucket.slots) * 100);
     const missing: string[] = [];
     if (bucket.gaps.budget > 0) missing.push(`${bucket.gaps.budget} programs missing totalBudget`);
     if (bucket.gaps.deadline > 0) missing.push(`${bucket.gaps.deadline} active programs missing deadline`);
     if (bucket.gaps.url > 0) missing.push(`${bucket.gaps.url} active programs missing applicationUrl`);
-
-    profiles.push({
-      entityId: orgId,
-      entityName: entity.title,
-      entityType: 'organization',
-      table: 'funding_programs',
-      totalRecords: bucket.total,
-      completenessPercent: completeness,
-      missingFields: missing,
-      website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
-    });
+    profiles.push(buildProfile(entity, 'funding_programs', 'organization', bucket.total, completeness, missing));
   }
 
-  return {
-    table: 'funding_programs',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allPrograms.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('funding_programs', allPrograms.length, profiles);
 }
 
 async function scanBenchmarkResultSources(prefetchedModels?: EntityListResponse['entities']): Promise<TableScanResult> {
@@ -670,37 +646,15 @@ async function scanBenchmarkResultSources(prefetchedModels?: EntityListResponse[
 
   const profiles: TableProfile[] = [];
   for (const entity of modelEntities) {
-    const modelId = entity.stableId || entity.id;
-    const bucket = byModel.get(modelId);
+    const bucket = byModel.get(entity.stableId || entity.id);
     if (!bucket || bucket.total === 0) continue;
     const completeness = Math.round((bucket.withSource / bucket.total) * 100);
-    const missing: string[] = [];
     const gap = bucket.total - bucket.withSource;
-    if (gap > 0) missing.push(`${gap} of ${bucket.total} benchmark results missing sourceUrl`);
-
-    profiles.push({
-      entityId: modelId,
-      entityName: entity.title,
-      entityType: 'ai-model',
-      table: 'benchmark_result_sources',
-      totalRecords: bucket.total,
-      completenessPercent: completeness,
-      missingFields: missing,
-      website: entity.website,
-      entityImportance: lookupImportance(entity.id) ?? lookupImportance(entity.wikiId || ''),
-    });
+    const missing = gap > 0 ? [`${gap} of ${bucket.total} benchmark results missing sourceUrl`] : [];
+    profiles.push(buildProfile(entity, 'benchmark_result_sources', 'ai-model', bucket.total, completeness, missing));
   }
 
-  return {
-    table: 'benchmark_result_sources',
-    totalEntities: profiles.length,
-    entitiesWithRecords: profiles.length,
-    totalRecords: allResults.length,
-    avgCompleteness: profiles.length > 0
-      ? Math.round(profiles.reduce((s, p) => s + p.completenessPercent, 0) / profiles.length)
-      : 100,
-    profiles,
-  };
+  return buildScanResult('benchmark_result_sources', allResults.length, profiles);
 }
 
 // ---------------------------------------------------------------------------
@@ -817,10 +771,12 @@ async function scanSourceQuality(): Promise<TableScanResult> {
 // ---------------------------------------------------------------------------
 
 export async function runFullScan(): Promise<ScanSummary> {
-  // Fetch shared entity lists once (avoids 4x redundant API calls for org entities)
-  const [orgEntities, modelEntities] = await Promise.all([
+  // Fetch shared data once; scans share both entity lists and the divisions
+  // list (used by both divisions-lead and division-personnel scanners).
+  const [orgEntities, modelEntities, allDivisions] = await Promise.all([
     fetchEntitiesByType('organization'),
     fetchEntitiesByType('ai-model'),
+    fetchAllDivisions(),
   ]);
 
   const [
@@ -840,8 +796,8 @@ export async function runFullScan(): Promise<ScanSummary> {
     scanFundingRoundsCompleteness(orgEntities),
     scanInvestmentsCompleteness(orgEntities),
     scanBenchmarkResultsCompleteness(modelEntities),
-    scanDivisionsLead(orgEntities),
-    scanDivisionPersonnelDates(orgEntities),
+    scanDivisionsLead(orgEntities, allDivisions),
+    scanDivisionPersonnelDates(orgEntities, allDivisions),
     scanFundingProgramFields(orgEntities),
     scanBenchmarkResultSources(modelEntities),
     scanSourceQuality().catch((e: unknown) => {

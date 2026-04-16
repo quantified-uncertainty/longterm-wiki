@@ -172,7 +172,7 @@ ${SHARED_RULES}
 1. Use query_existing_records to list funding programs missing any of totalBudget, deadline, applicationUrl.
 2. For each, visit the program's official page (search "[org name] [program name]") to find:
    - **totalBudget**: total funding pool in USD (e.g., "$2.5M total", "up to $10M annually")
-   - **deadline**: next application deadline (YYYY-MM-DD). For rolling programs, set status to rolling instead of a date.
+   - **deadline**: next application deadline (YYYY-MM-DD). Leave null for rolling / no fixed deadline and note it in the \`notes\` field.
    - **applicationUrl**: direct link to the application form or program page
 3. Do NOT guess amounts or dates — if the program page doesn't list them, leave the field null and note why.
 
