@@ -175,15 +175,22 @@ export async function allocateIds(slugs) {
  * pre-seeding buildIdRegistry() to get deterministic E-numbers across runs
  * (QUA-521 / Phase 3 audit).
  *
- * Returns an empty Map on any failure — callers should treat that as
- * "server unavailable" and fall through to in-memory fallback allocation.
+ * **Fail-closed semantics** (per CodeRabbit review on QUA-521): if any
+ * page of the paginated crawl fails (non-2xx, network error, timeout),
+ * returns `null` to signal "registry unavailable". Callers must treat
+ * `null` as a distinct state from an empty map and either fall through to
+ * in-memory fallback allocation or abort, rather than mixing partial
+ * persisted IDs with fallback IDs (which would look like a successful
+ * pre-seed but leave the tail unseeded). An empty Map is only returned
+ * when the server is configured but legitimately has zero rows.
  *
  * @param {number} [pageSize=1000]
- * @returns {Promise<Map<string, string>>} Map of slug → wikiId
+ * @returns {Promise<Map<string, string> | null>} Map of slug → wikiId, or
+ *   null on any fetch failure. Null means "unavailable, don't pre-seed".
  */
 export async function fetchPersistentIdRegistry(pageSize = 1000) {
   const serverUrl = getServerUrl();
-  if (!serverUrl) return new Map();
+  if (!serverUrl) return null;
 
   const resultMap = new Map();
   let offset = 0;
@@ -197,7 +204,9 @@ export async function fetchPersistentIdRegistry(pageSize = 1000) {
           signal: AbortSignal.timeout(BATCH_TIMEOUT_MS),
         },
       );
-      if (!res.ok) break;
+      // Fail closed: any non-2xx (even mid-pagination) invalidates the
+      // whole crawl. We must not return a partial map.
+      if (!res.ok) return null;
 
       const data = await res.json();
       const ids = data.ids || [];
@@ -207,11 +216,15 @@ export async function fetchPersistentIdRegistry(pageSize = 1000) {
         }
       }
 
+      // Use ids.length (actual rows received) rather than pageSize as the
+      // advance step. A server that returns fewer rows than requested on
+      // a non-terminal page would otherwise desync offset from cursor.
       if (ids.length < pageSize) break;
-      offset += pageSize;
+      offset += ids.length;
     }
   } catch {
-    // Network error or timeout — return whatever we have
+    // Network error, timeout, or JSON parse failure — fail closed.
+    return null;
   }
 
   return resultMap;

@@ -364,6 +364,15 @@ async function main() {
   const reservedPageWikiIds = collectPageWikiIds(CONTENT_DIR);
   console.log("4b. Fetching persistent entity_ids registry from server...");
   const persistedSlugToWikiId = await fetchPersistentIdRegistry();
+  if (persistedSlugToWikiId === null) {
+    console.error(
+      "    ERROR: persistent id_registry fetch failed (server unavailable or returned non-2xx).\n" +
+      "    Refusing to proceed — without the registry pre-seed, the PG diff would\n" +
+      "    mix persisted and fallback IDs, defeating the purpose of this audit.\n" +
+      "    Check WIKI_SERVER_ENV / LONGTERMWIKI_SERVER_URL / API key and retry."
+    );
+    process.exit(1);
+  }
   console.log(`    ${persistedSlugToWikiId.size} slug→wikiId mappings loaded`);
   buildIdRegistry(rawEntities, reservedPageWikiIds, { persistedSlugToWikiId });
 

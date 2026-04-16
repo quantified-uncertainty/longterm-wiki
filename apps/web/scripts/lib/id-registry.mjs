@@ -11,15 +11,23 @@
  * Build initial ID registry from entities.
  *
  * Allocation precedence for each entity:
- *   1. entity.wikiId on the input row (already persisted to YAML/MDX/PG)
+ *   1. entity.wikiId on the input row (already persisted to YAML/MDX/PG).
+ *      Cross-checked against the persistent registry when one is supplied
+ *      — a mismatch is a blocking conflict because the persistent registry
+ *      is the authoritative source and a stale denormalized wikiId would
+ *      otherwise silently win.
  *   2. persistedSlugToWikiId[slug] — the authoritative `entity_ids` PG table
- *      (see fetchServerEntityIdMap in id-client.mjs). Pre-seeding from this
- *      map is what makes PG-sourced builds deterministic across runs —
+ *      (see fetchPersistentIdRegistry in id-client.mjs). Pre-seeding from
+ *      this map is what makes PG-sourced builds deterministic across runs —
  *      without it, fallback allocation in step 3 produces different
- *      E-numbers each run.
- *   3. In-memory fallback allocation from `nextId++`, in deterministic slug
+ *      E-numbers each run (QUA-521).
+ *   3. In-memory fallback allocation from `nextId++`, in input iteration
  *      order. Local-dev only; CI/prod should never hit this path because
  *      assign-ids.mjs runs first and persists everything to the server.
+ *      (Input order is preserved rather than sorted — the historical
+ *      content in MDX files was authored against input-order fallback
+ *      assignments, and reordering would renumber entities whose IDs are
+ *      referenced from MDX.)
  *
  * @param {Array<{id: string, wikiId?: string, stableId?: string}>} entities
  * @param {Set<string>|Iterable<string>} [reservedWikiIds] — wikiIds claimed by pages
@@ -67,12 +75,24 @@ export function buildIdRegistry(entities, reservedWikiIds = new Set(), opts = {}
   // Step 2: pre-seed from the persistent id_registry (entity_ids PG table).
   // This is the fix for QUA-521 — without pre-seeding, step 3 allocates
   // different fallback IDs on each run and PG-sourced builds diverge.
+  //
+  // We ALSO consult the persistent registry for entities that already have
+  // a denormalized `wikiId` on the input row. A stale denormalized value
+  // could silently win over the authoritative entity_ids mapping — exactly
+  // the kind of drift this pipeline is trying to surface. Any mismatch is
+  // a blocking conflict (the persistent registry is authoritative).
   let persistedAssignments = 0;
   const persistedConflicts = [];
   for (const entity of entities) {
-    if (entity.wikiId) continue;
     const persisted = persistedMap.get(entity.id);
     if (!persisted) continue;
+    if (entity.wikiId && entity.wikiId !== persisted) {
+      persistedConflicts.push(
+        `"${entity.id}" has input wikiId ${entity.wikiId} but persisted registry says ${persisted}`
+      );
+      continue;
+    }
+    if (entity.wikiId) continue; // already matches persisted — nothing to do
     if (wikiIdToSlug[persisted] && wikiIdToSlug[persisted] !== entity.id) {
       persistedConflicts.push(`${persisted} (persisted registry) claimed by "${wikiIdToSlug[persisted]}" and "${entity.id}"`);
       continue;
@@ -96,16 +116,18 @@ export function buildIdRegistry(entities, reservedWikiIds = new Set(), opts = {}
   }
 
   // Step 3: assign fallback IDs to entities still without one (local dev only).
-  // Sort by slug so that repeated runs with the same input set produce the
-  // same fallback IDs. Without sorting, iteration order depends on the order
-  // the upstream pipeline produced rows (YAML scan order vs PG query order),
-  // which is how QUA-521 manifested: 1,102 entities getting different
-  // E-numbers depending on which pipeline built them.
-  const stillUnassigned = entities.filter((e) => !e.wikiId);
-  stillUnassigned.sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
-
+  //
+  // Iterate in input order (not sorted) to preserve backward compatibility
+  // with historical content references. MDX pages reference specific
+  // E-numbers like `<EntityLink id="E2886" name="baidu">` that were
+  // minted by input-order fallback; renumbering via sort would break those
+  // references for every entity that lacks a persisted wikiId. Deterministic
+  // cross-pipeline IDs are achieved via the persistent-registry pre-seed
+  // above (step 2), which is the real fix for QUA-521. The `reservedWikiIds`
+  // loop below still guarantees we skip wikiIds already claimed by pages.
   let newAssignments = 0;
-  for (const entity of stillUnassigned) {
+  for (const entity of entities) {
+    if (entity.wikiId) continue;
     while (reservedWikiIds.has(`E${nextId}`)) {
       nextId++;
     }
@@ -196,18 +218,26 @@ export function extendIdRegistryWithPages({
     persistedPageAssignments++;
   }
 
-  // Pass 2b: assign fallback wikiIds in slug-sorted order for determinism.
-  const pagesNeedingIds = pages
-    .filter((page) =>
-      !entityIds.has(page.id)
-      && !slugToWikiId[page.id]
-      && !skipCategories.has(page.category)
-      && page.contentFormat !== 'dashboard'
-    )
-    .sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
+  // Pass 2b: assign fallback wikiIds in input order.
+  // (Input-order matches historical behavior; MDX-referenced E-numbers
+  // were minted this way. The persistent-registry pre-seed in pass 2a is
+  // the deterministic-across-pipelines fix; this pass is a local-dev
+  // fallback only.) Before each assignment, advance `nextId` past any
+  // wikiId already claimed in `wikiIdToSlug` (by earlier entities, by
+  // page frontmatter in pass 1, or by the persistent pre-seed in 2a) —
+  // without this, a collision could double-assign an E-number.
+  const pagesNeedingIds = pages.filter((page) =>
+    !entityIds.has(page.id)
+    && !slugToWikiId[page.id]
+    && !skipCategories.has(page.category)
+    && page.contentFormat !== 'dashboard'
+  );
 
   let pageIdAssignments = 0;
   for (const page of pagesNeedingIds) {
+    while (wikiIdToSlug[`E${nextId}`]) {
+      nextId++;
+    }
     const numId = `E${nextId}`;
     wikiIdToSlug[numId] = page.id;
     slugToWikiId[page.id] = numId;
