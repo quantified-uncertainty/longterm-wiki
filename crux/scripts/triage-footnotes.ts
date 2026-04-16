@@ -8,9 +8,12 @@
  *   - mixed/placeholder: at least one [^N]: definition has no URL (a placeholder)
  *
  * Modes:
- *   --report  (default) list stats and per-file classification; no writes
- *   --convert run convertNewFootnotes on url-bearing files; writes files + DB
- *   --strip   strip URL-less (placeholder) footnotes from mixed files; writes files
+ *   --report       (default) list stats and per-file classification; no writes
+ *   --convert      run convertNewFootnotes on url-bearing files; writes files + DB
+ *   --strip        strip URL-less (placeholder) footnotes from all files that have any
+ *   --strip --only-mixed
+ *                  strip placeholders ONLY in files that also have url-bearing
+ *                  footnotes (so a follow-up --convert can finish the job cleanly)
  *
  * Does NOT run LLM research. For placeholder footnotes that need real sourcing,
  * use `crux w improve --tier=deep --apply` (without --engine=v2).
@@ -182,9 +185,17 @@ async function runConvert(triages: FileTriage[]): Promise<void> {
   if (failures > 0) console.log(`Failures:             ${failures}`);
 }
 
-function runStrip(triages: FileTriage[]): void {
-  const stripTargets = triages.filter((t) => t.placeholders.length > 0);
-  console.log(`\nStripping placeholders in ${stripTargets.length} files...\n`);
+function runStrip(triages: FileTriage[], onlyMixed: boolean): void {
+  // Mixed = file has BOTH url-bearing and placeholder footnotes. Stripping the
+  // placeholders leaves the url-bearing ones intact, so a follow-up --convert
+  // can promote the file to fully-sourced [^rc-XXXX] form.
+  const stripTargets = triages.filter((t) =>
+    onlyMixed
+      ? t.placeholders.length > 0 && t.urlBearing.length > 0
+      : t.placeholders.length > 0,
+  );
+  const label = onlyMixed ? 'mixed files' : 'all files with placeholders';
+  console.log(`\nStripping placeholders in ${stripTargets.length} ${label}...\n`);
 
   let filesChanged = 0;
   let footnotesStripped = 0;
@@ -253,7 +264,7 @@ async function main(): Promise<void> {
   if (mode === 'convert') {
     await runConvert(triages);
   } else if (mode === 'strip') {
-    runStrip(triages);
+    runStrip(triages, args.includes('--only-mixed'));
   } else {
     console.log(`\n(report mode — no files written. Use --convert or --strip to apply.)`);
   }
