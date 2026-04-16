@@ -52,6 +52,7 @@ import {
   runPaths as makeRunPaths,
   detectConflict as detectDispatchConflict,
   spawnDispatch,
+  supersedeCurrent as supersedeDispatch,
   clearCurrent as clearDispatchCurrent,
   readCurrent as readDispatchCurrent,
   readMeta as readDispatchMeta,
@@ -936,9 +937,12 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
           `Use 'dispatch-status ${slot}' to watch, 'dispatch-stop ${slot}' to cancel, or --force to override.`,
       };
     }
+  } else {
+    // --force: SIGTERM the previous worker (if any) and stamp its meta with
+    // terminalReason=superseded so abandoned runs aren't indistinguishable
+    // from crashes in .dispatch/runs/.
+    supersedeDispatch(env, paths);
   }
-  // Both the no-conflict and --force paths unlink any existing pointer before
-  // spawning so the new current.json can take ownership cleanly.
   clearDispatchCurrent(env, paths);
 
   const dispatchOpts: DispatchOptions = {

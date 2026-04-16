@@ -133,7 +133,12 @@ export interface CurrentPointer {
 
 /** One parsed event line, summarised for human display. */
 export interface EventSummary {
-  kind: 'init' | 'text' | 'tool_use' | 'tool_result' | 'result' | 'error' | 'rate_limit' | 'other';
+  /**
+   * Programmatic discriminator. `thinking` is intentionally distinct from
+   * `text` so consumers filtering or forwarding assistant output don't
+   * accidentally capture chain-of-thought content.
+   */
+  kind: 'init' | 'text' | 'thinking' | 'tool_use' | 'tool_result' | 'result' | 'error' | 'rate_limit' | 'other';
   /** Concise one-line human description, clamped to ~160 chars. */
   summary: string;
   /** Raw event object (for --json consumers). */
@@ -418,7 +423,7 @@ export function parseEventLine(line: string): EventSummary | null {
         return { kind: 'text', summary: clip(part.text), raw: evt };
       }
       if (partType === 'thinking' && typeof part.thinking === 'string') {
-        return { kind: 'text', summary: clip(`[thinking] ${part.thinking}`), raw: evt };
+        return { kind: 'thinking', summary: clip(part.thinking), raw: evt };
       }
       if (partType === 'tool_use') {
         const name = typeof part.name === 'string' ? part.name : '?';
@@ -621,6 +626,35 @@ export interface Conflict {
   pid: number;
   pidAlive: boolean;
   startedAt: string;
+}
+
+/**
+ * Called on `--force` dispatch when a prior pointer exists: SIGTERM the
+ * previous pid (if alive) and stamp its meta with `terminalReason: superseded`
+ * so the abandoned run is distinguishable from a crash. Idempotent: if the
+ * prior meta already has `completedAt` or `stoppedAt`, nothing is rewritten.
+ */
+export function supersedeCurrent(env: DispatchEnv, paths: DispatchPaths): {
+  hadPrior: boolean;
+  signaledPid: number | null;
+  markedSuperseded: boolean;
+} {
+  const existing = readCurrent(env, paths);
+  if (!existing) return { hadPrior: false, signaledPid: null, markedSuperseded: false };
+  const alive = env.pidAlive(existing.pid);
+  if (alive) env.signal(existing.pid, 'SIGTERM');
+  const rp = runPaths(paths, existing.runId);
+  const existingMeta = readMeta(env, rp);
+  let marked = false;
+  if (existingMeta && !existingMeta.completedAt && !existingMeta.stoppedAt) {
+    writeMeta(env, rp, {
+      ...existingMeta,
+      stoppedAt: env.now().toISOString(),
+      terminalReason: 'superseded',
+    });
+    marked = true;
+  }
+  return { hadPrior: true, signaledPid: alive ? existing.pid : null, markedSuperseded: marked };
 }
 
 /** Return an active-dispatch conflict if one exists in the slot, else null. */

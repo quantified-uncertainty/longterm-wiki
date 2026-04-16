@@ -16,6 +16,7 @@ import {
   readFinalResultEvent,
   spawnDispatch,
   detectConflict,
+  supersedeCurrent,
   finalizeIfComplete,
   isPermissionMode,
   PERMISSION_MODES,
@@ -353,14 +354,18 @@ describe('parseEventLine', () => {
     expect(r?.summary).toContain('ERROR');
   });
 
-  it('parses assistant thinking content', () => {
+  it('parses assistant thinking content with its own "thinking" kind', () => {
+    // Real-slot testing (a17, 2026-04-16) found that tagging thinking as
+    // kind='text' caused consumers filtering on kind to accidentally ingest
+    // chain-of-thought. Keep thinking on a distinct kind so downstream
+    // assistant-text pipelines don't need to string-match the summary.
     const line = JSON.stringify({
       type: 'assistant',
       message: { content: [{ type: 'thinking', thinking: 'user wants pong' }] },
     });
     const r = parseEventLine(line);
-    expect(r?.kind).toBe('text');
-    expect(r?.summary).toBe('[thinking] user wants pong');
+    expect(r?.kind).toBe('thinking');
+    expect(r?.summary).toBe('user wants pong');
   });
 
   it('clips very long text to ~160 chars', () => {
@@ -548,6 +553,87 @@ describe('detectConflict', () => {
     writeCurrent(env, paths, { runId: 'r', sessionId: 's', pid: 42, startedAt: 'now' });
     // pid NOT in alivePids
     expect(detectConflict(env, paths)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// supersedeCurrent (used by --force dispatch)
+// ---------------------------------------------------------------------------
+
+describe('supersedeCurrent', () => {
+  const BASE_META: RunMeta = {
+    runId: 'r-prior', sessionId: 's-prior', pid: 42, slot: 3, cwd: '/lw/a3',
+    prompt: 'old', model: 'sonnet', maxBudgetUsd: 5,
+    allowedTools: 'Bash', permissionMode: 'bypassPermissions',
+    startedAt: '2026-04-16T15:00:00Z', cmd: ['claude'],
+  };
+
+  it('no-ops when there is no prior pointer', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    const r = supersedeCurrent(env, paths);
+    expect(r).toEqual({ hadPrior: false, signaledPid: null, markedSuperseded: false });
+    expect(env.signaled).toEqual([]);
+  });
+
+  it('SIGTERMs a live prior worker and stamps meta with terminalReason=superseded', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r-prior', sessionId: 's-prior', pid: 42, startedAt: 'x' });
+    const rp = runPaths(paths, 'r-prior');
+    writeMeta(env, rp, BASE_META);
+    env.alivePids.add(42);
+
+    const r = supersedeCurrent(env, paths);
+
+    expect(r).toEqual({ hadPrior: true, signaledPid: 42, markedSuperseded: true });
+    expect(env.signaled).toEqual([{ pid: 42, sig: 'SIGTERM' }]);
+    const after = readMeta(env, rp);
+    expect(after?.terminalReason).toBe('superseded');
+    expect(after?.stoppedAt).toBeTruthy();
+    // Prior fields preserved
+    expect(after?.runId).toBe('r-prior');
+    expect(after?.sessionId).toBe('s-prior');
+  });
+
+  it('does NOT signal a dead prior worker but still stamps meta', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r-prior', sessionId: 's-prior', pid: 42, startedAt: 'x' });
+    writeMeta(env, runPaths(paths, 'r-prior'), BASE_META);
+    // pid NOT in alivePids
+
+    const r = supersedeCurrent(env, paths);
+
+    expect(r).toEqual({ hadPrior: true, signaledPid: null, markedSuperseded: true });
+    expect(env.signaled).toEqual([]);
+    expect(readMeta(env, runPaths(paths, 'r-prior'))?.terminalReason).toBe('superseded');
+  });
+
+  it('leaves a completed run alone (does not overwrite terminalReason)', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r-prior', sessionId: 's-prior', pid: 42, startedAt: 'x' });
+    const completed = { ...BASE_META, completedAt: 'now', terminalReason: 'completed' as const, exitCode: 0 };
+    writeMeta(env, runPaths(paths, 'r-prior'), completed);
+
+    const r = supersedeCurrent(env, paths);
+
+    expect(r.markedSuperseded).toBe(false);
+    expect(readMeta(env, runPaths(paths, 'r-prior'))?.terminalReason).toBe('completed');
+  });
+
+  it('leaves a stopped run alone', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a3');
+    writeCurrent(env, paths, { runId: 'r-prior', sessionId: 's-prior', pid: 42, startedAt: 'x' });
+    const stopped = { ...BASE_META, stoppedAt: 'now', terminalReason: 'stopped' as const };
+    writeMeta(env, runPaths(paths, 'r-prior'), stopped);
+
+    const r = supersedeCurrent(env, paths);
+
+    expect(r.markedSuperseded).toBe(false);
+    expect(readMeta(env, runPaths(paths, 'r-prior'))?.terminalReason).toBe('stopped');
   });
 });
 
