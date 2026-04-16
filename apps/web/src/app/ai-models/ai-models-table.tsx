@@ -8,7 +8,6 @@ import { PaginationControls } from "@/components/directory/PaginationControls";
 import { DEVELOPER_COLORS, SAFETY_LEVEL_COLORS, formatContext } from "./ai-model-constants";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 
 export interface AiModelRow {
   id: string;
@@ -412,7 +411,8 @@ export function AiModelsTable({ rows }: { rows: AiModelRow[] }) {
                       wikiId: row.wikiId,
                     })}
                     verdict={row.verdictString}
-                    sourcingHref={row.verdictString ? getSourcingHref("ai-model", row.id) : undefined}
+                    // QUA-540: ai-model has no sourcing verdicts → href would 404.
+                    sourcingHref={undefined}
                   />
                 </td>
               </tr>

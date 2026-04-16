@@ -13,7 +13,6 @@ import {
 } from "@/lib/wiki-server";
 import { formatCompactCurrency } from "@/lib/format-compact";
 
-import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import { SectionHeader } from "./org-shared";
@@ -187,7 +186,8 @@ function SecondaryMarketSection({
                       status={recordVerdictToStatus(verdict)}
                       originalVerdict={verdict}
                       size="md"
-                      href={getSourcingHref("secondary-market-price", String(p.id))}
+                      // QUA-540: secondary-market-price has no sourcing verdicts → /sourcing 404s.
+                      href={undefined}
                     />
                   </td>
                 </tr>
@@ -324,7 +324,8 @@ function PredictionMarketSection({
                         status={recordVerdictToStatus(verdict)}
                         originalVerdict={verdict}
                         size="md"
-                        href={getSourcingHref("prediction-question", String(q.id))}
+                        // QUA-540: prediction-question has no sourcing verdicts → /sourcing 404s.
+                        href={undefined}
                       />
                     </td>
                   </tr>
@@ -386,7 +387,8 @@ function QuestionRow({ question: q }: { question: RpcPredictionQuestion }) {
           status={recordVerdictToStatus(verdict)}
           originalVerdict={verdict}
           size="md"
-          href={getSourcingHref("prediction-question", String(q.id))}
+          // QUA-540: prediction-question has no sourcing verdicts → /sourcing 404s.
+          href={undefined}
         />
       </td>
     </tr>
