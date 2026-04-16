@@ -7,7 +7,11 @@
  *   - crux citations for citation management
  */
 
-import { normalizeUrl } from "@longterm-wiki/url-utils";
+import { normalizeUrl, normalizeUrlForDedup } from "@longterm-wiki/url-utils";
+
+// Re-export the canonical dedup helper for back-compat with existing
+// `import { normalizeUrlForDedup } from '../footnote-parser.ts'` callers.
+export { normalizeUrlForDedup };
 
 export interface ParsedFootnote {
   /** Footnote number (e.g. 1, 2, 3) */
@@ -72,23 +76,6 @@ function extractUrlFromFootnote(text: string): { url: string | null; title: stri
  */
 function cleanUrl(url: string): string {
   return url.replace(/[.),:;]+$/, "");
-}
-
-/**
- * Normalize a URL for deduplication: strips protocol, www, fragment, trailing
- * slashes, and tracking parameters; lowercases host and path. Groups footnotes
- * that reference the same source.
- *
- * Wraps `@longterm-wiki/url-utils::normalizeUrl` with `stripProtocol +
- * lowercasePath`. Note: the canonical helper strips tracking parameters
- * (utm_*, fbclid, gclid, ...) by default — a slight semantic widening
- * vs. the pre-QUA-341 implementation, which kept all query params. This
- * makes footnote dedup more aggressive (two URLs differing only in utm_*
- * now collapse). Pass `keepTracking: true` to recover the old behavior if
- * a regression appears.
- */
-export function normalizeUrlForDedup(url: string): string {
-  return normalizeUrl(url, { stripProtocol: true, lowercasePath: true });
 }
 
 /**

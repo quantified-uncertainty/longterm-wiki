@@ -91,6 +91,29 @@ export function normalizeUrl(raw: string, opts: NormalizeUrlOptions = {}): strin
   return `${scheme}${host}${portSuffix}${path}${qs ? "?" + qs : ""}`;
 }
 
+/**
+ * Canonical URL key for protocol-agnostic dedup / lookup. Strips protocol,
+ * www, fragment, trailing slash, and tracking params. Lowercases the path.
+ *
+ * Two URLs that differ only in scheme, www-prefix, trailing slash, fragment,
+ * tracking params, or path case all collapse to the same key.
+ */
+export function normalizeUrlForDedup(raw: string): string {
+  return normalizeUrl(raw, { stripProtocol: true, lowercasePath: true });
+}
+
+/**
+ * Canonical URL key for resource lookups. Strips protocol, www, fragment,
+ * trailing slash, and tracking params. Sorts query parameters alphabetically
+ * so two URLs with the same params in different order produce the same key.
+ *
+ * Use this when both writer and reader normalize through the same function
+ * (i.e., for in-memory resource Maps and the resource-lookup cache).
+ */
+export function normalizeUrlForLookup(raw: string): string {
+  return normalizeUrl(raw, { stripProtocol: true, sortParams: true });
+}
+
 /** Extract just the host portion, normalized (lowercased, www-stripped). */
 export function extractHost(raw: string): string {
   try {

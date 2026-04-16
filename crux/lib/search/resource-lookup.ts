@@ -76,11 +76,10 @@ function buildIndexes(resources: Resource[]): void {
       cachedByStableId.set(resource.stable_id, resource);
     }
 
-    // Index by normalized URL (with and without trailing slash, www variants)
+    // Index by canonical URL key (the canonical helper already strips
+    // trailing slash, www, and tracking params — one entry covers all variants).
     if (resource.url) {
-      const norm = normalizeUrlKey(resource.url);
-      cachedByUrl.set(norm, resource);
-      cachedByUrl.set(norm + '/', resource);
+      cachedByUrl.set(normalizeUrlKey(resource.url), resource);
     }
   }
 }
@@ -114,11 +113,10 @@ export function getResourceById(id: string): Resource | null {
   return cachedById!.get(id) ?? null;
 }
 
-/** Look up a resource by URL (normalized, tolerant of trailing slashes and www). */
+/** Look up a resource by URL (canonical-key normalization, tolerant of www/protocol/slash variants). */
 export function getResourceByUrl(url: string): Resource | null {
   ensureLoaded();
-  const norm = normalizeUrlKey(url);
-  return cachedByUrl!.get(norm) ?? cachedByUrl!.get(norm + '/') ?? null;
+  return cachedByUrl!.get(normalizeUrlKey(url)) ?? null;
 }
 
 /**

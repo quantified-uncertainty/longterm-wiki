@@ -286,7 +286,6 @@ async function cmdCreate(opts: ParsedOpts): Promise<void> {
   const resources = loadResources();
   const urlMap = buildUrlToResourceMap(resources);
 
-  // Check if already exists (canonical-key lookup)
   const existing = lookupResourceByUrl(urlMap, url);
   if (existing) {
     console.log(`Resource already exists: ${existing.id}`);

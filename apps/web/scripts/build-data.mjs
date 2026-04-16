@@ -28,7 +28,7 @@ import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, urlKey as resourceUrlKey } from './lib/unconverted-links.mjs';
-import { normalizeUrl as normalizeUrlCanonical } from '@longterm-wiki/url-utils';
+import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';
 import { generateMdxFromYaml } from './lib/mdx-generator.mjs';
 import { computeStats } from './lib/statistics.mjs';
 import { transformEntities } from './lib/entity-transform.mjs';
@@ -268,15 +268,6 @@ function warnIfSnapshotStale(snapshotPath) {
 // Link graph functions (computeBacklinks, scanContentEntityLinks, buildTagIndex,
 // computeRelatedGraph, collectLinkSignals) extracted to ./lib/link-graph.mjs
 
-/**
- * Normalize a URL for fuzzy matching between resource URLs and citation URLs.
- * Wraps the canonical normalizer with the dedup preset (stripProtocol +
- * lowercasePath). Both writer and reader use this so symmetric normalization
- * preserves the legacy behavior.
- */
-function normalizeUrlForMatch(str) {
-  return normalizeUrlCanonical(str, { stripProtocol: true, lowercasePath: true });
-}
 
 /**
  * Cross-reference KB fact source URLs with citation quotes to produce
@@ -306,7 +297,7 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
       const verdict = q.accuracyVerdict || (q.quoteVerified ? 'verified' : null);
       if (!verdict) continue;
 
-      const normalizedUrl = normalizeUrlForMatch(q.url);
+      const normalizedUrl = normalizeUrlForDedup(q.url);
       const existing = urlToVerdict.get(normalizedUrl);
       // Use most recent verdict (by checkedAt/updatedAt) or just overwrite
       // since citation quotes are ordered by recency in the bundle.
@@ -334,7 +325,7 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
       // Only match URL sources
       if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
 
-      const normalizedSource = normalizeUrlForMatch(url);
+      const normalizedSource = normalizeUrlForDedup(url);
       const entry = urlToVerdict.get(normalizedSource);
       if (entry) {
         verification[fact.id] = entry.verdict;
@@ -353,7 +344,7 @@ function buildKBFactVerification(kb, citationQuotesBundle) {
  *   - resourceUrlToFactIds: normalizedUrl → factId[] (for resource detail pages)
  *   - factIdToResourceId: factId → resourceId (for fact detail pages)
  *
- * Uses normalizeUrlForMatch() for consistent URL normalization.
+ * Uses normalizeUrlForDedup() for consistent URL normalization.
  *
  * @param {object} kb - Serialized KB data (from build-data)
  * @param {Array<{id: string, url?: string, stable_id?: string}>} resources
@@ -370,7 +361,7 @@ function buildResourceFactLinks(kb, resources) {
   let resourceUrlCount = 0;
   for (const r of resources) {
     if (!r.url) continue;
-    const normalized = normalizeUrlForMatch(r.url);
+    const normalized = normalizeUrlForDedup(r.url);
     urlToResourceId.set(normalized, r.id);
     resourceUrlCount++;
   }
@@ -393,7 +384,7 @@ function buildResourceFactLinks(kb, resources) {
       if (!url.startsWith('http://') && !url.startsWith('https://')) continue;
       totalFactsWithUrls++;
 
-      const normalizedSource = normalizeUrlForMatch(url);
+      const normalizedSource = normalizeUrlForDedup(url);
       const resourceId = urlToResourceId.get(normalizedSource);
       if (resourceId) {
         // Add to resourceUrl → factIds map (keyed by resource ID for lookup)
@@ -948,8 +939,7 @@ async function main() {
         }
       }
 
-      // Source 3: URL matching from markdown links (canonical-key lookup;
-      // urlToId is built from urlToResource, which is canonical-keyed too).
+      // Source 3: URL matching from markdown links
       const linkRe = /(?<!!)\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g;
       while ((m = linkRe.exec(page.rawContent)) !== null) {
         const url = m[2];

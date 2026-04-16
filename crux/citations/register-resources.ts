@@ -113,7 +113,6 @@ async function main() {
         continue;
       }
 
-      // Check if URL is already registered (canonical-key lookup).
       if (lookupResourceByUrl(urlToResource, source.url)) {
         alreadyRegistered++;
         continue;

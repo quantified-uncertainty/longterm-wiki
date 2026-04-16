@@ -7,24 +7,11 @@
  * Extracted from build-data.mjs for modularity.
  */
 
-import { normalizeUrl } from "@longterm-wiki/url-utils";
-
-/** Canonical lookup key for a resource URL — protocol+slash agnostic. */
-export function urlKey(url) {
-  return normalizeUrl(url, { stripProtocol: true });
-}
-
-/**
- * Build URL → resource map from resources
- */
-export function buildUrlToResourceMap(resources) {
-  const urlToResource = new Map();
-  for (const r of resources) {
-    if (!r.url) continue;
-    urlToResource.set(urlKey(r.url), r);
-  }
-  return urlToResource;
-}
+// Re-export the canonical resource-URL helpers from crux so this module and
+// build-data.mjs share a single source of truth (build-data.mjs runs under
+// tsx/esm, so importing .ts is fine).
+import { resourceUrlKey, buildUrlToResourceMap, lookupResourceByUrl } from "../../../../crux/resource-utils.ts";
+export { resourceUrlKey as urlKey, buildUrlToResourceMap, lookupResourceByUrl };
 
 /**
  * Extract markdown links from content (not images, not internal, not <R> components)
@@ -51,7 +38,7 @@ export function findUnconvertedLinks(content, urlToResource) {
   const unconverted = [];
 
   for (const link of links) {
-    const resource = urlToResource.get(urlKey(link.url));
+    const resource = lookupResourceByUrl(urlToResource, link.url);
     if (resource) {
       unconverted.push({
         text: link.text,

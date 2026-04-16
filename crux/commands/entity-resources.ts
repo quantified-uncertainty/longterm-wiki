@@ -17,7 +17,7 @@
 import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
-import { normalizeUrl } from "@longterm-wiki/url-utils";
+import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -122,15 +122,6 @@ function loadResources(): MinimalResource[] {
   return _cachedResources;
 }
 
-/**
- * Normalize a URL for fuzzy matching. Wraps the canonical normalizer with the
- * dedup preset (stripProtocol + lowercasePath). Both writer and reader of
- * `urlToResourceId` go through this helper, so the symmetric normalization
- * preserves the legacy behavior.
- */
-function normalizeUrlForMatch(str: string): string {
-  return normalizeUrl(str, { stripProtocol: true, lowercasePath: true });
-}
 
 /**
  * Build normalized-URL → resource ID map from resources.json.
@@ -140,7 +131,7 @@ function buildUrlToResourceId(): Map<string, string> {
   const map = new Map<string, string>();
   for (const r of resources) {
     if (r.url) {
-      map.set(normalizeUrlForMatch(r.url), r.id);
+      map.set(normalizeUrlForDedup(r.url), r.id);
     }
   }
   return map;
@@ -311,7 +302,7 @@ function seedFromLiterature(
       }
 
       // Resolve link URL to resource ID
-      const normalizedUrl = normalizeUrlForMatch(paper.link);
+      const normalizedUrl = normalizeUrlForDedup(paper.link);
       const resourceId = urlToResourceId.get(normalizedUrl);
       if (!resourceId) {
         skippedUrlNotFound++;

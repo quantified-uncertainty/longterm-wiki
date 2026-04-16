@@ -28,25 +28,15 @@ const SCAN_DIRS = [
   "apps/groundskeeper/src",
 ];
 
-/** Files allowed to define their own URL normalizer (re-exports + thin wrappers). */
+/** Files allowed to define their own URL normalizer (canonical + thin wrappers). */
 const ALLOWLIST = new Set<string>([
   // Canonical helper itself.
   "packages/url-utils/src/index.ts",
-  // Backward-compat re-export of the canonical helper under the old name.
-  "crux/lib/sourcing/url-quality.ts",
-  // Thin wrappers that delegate to the canonical helper with preset options.
-  // These wrap to preserve a domain-specific call signature; they do not
-  // re-implement normalization. If you remove the wrapper, remove this entry.
-  "crux/lib/footnote-parser.ts",
-  "crux/lib/search/resource-lookup.ts",
-  "crux/lib/sourcing/fuzzy-match.ts",
-  "apps/web/src/components/wiki/resource-utils.ts",
-  "crux/resource-utils.ts",
-  "apps/web/scripts/lib/unconverted-links.mjs",
-  // Per-command thin wrappers that delegate to the canonical helper with
-  // dedup preset, kept locally so call-sites stay readable.
-  "crux/commands/entity-resources.ts",
-  "apps/web/scripts/build-data.mjs",
+  // Two remaining thin wrappers that change call signature (return string vs
+  // boolean), not just option presets. If you remove either, drop the entry.
+  "crux/lib/search/resource-lookup.ts", // normalizeUrlKey — bounds the cache key
+  "crux/lib/sourcing/fuzzy-match.ts", // urlMatches — boolean comparator
+  "crux/resource-utils.ts", // resourceUrlKey — typed for Resource maps
 ]);
 
 /** Function names that this validator considers URL-normalizers. */
@@ -54,6 +44,7 @@ const BANNED_NAMES = [
   "normalizeUrl",
   "normalizeUrlForJoin",
   "normalizeUrlForDedup",
+  "normalizeUrlForLookup",
   "normalizeUrlForMatch",
   "normalizeUrlKey",
   "urlMatches",
