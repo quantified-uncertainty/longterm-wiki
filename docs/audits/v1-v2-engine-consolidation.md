@@ -167,6 +167,18 @@ These are **legitimately different architectural choices**, not superficial dupl
 
 There is **no test that runs both engines on the same page and compares output quality**. Any decision to "replace V1 with V2" or vice versa has no empirical support today.
 
+### Qualitative V2 evidence (not a benchmark)
+
+Prior test PRs exercised V2 successfully on real pages without a paired V1 run:
+
+- **PR #752** — V2 shake-out on 5 pages across polish/standard/deep tiers. Found and fixed 3 bugs (#733 section-writer truncation, #734 firecrawl, #735 gate thresholds). 4/5 pages passed the quality gate cleanly after fixes.
+- **PR #772** — V2 on 3 high-importance pages at standard tier (`alignment-robustness-trajectory`, `capability-alignment-race`, `alignment-progress`). +54% word count, 15-16 citations, 23-107 EntityLinks, ~$6-7/page. Quality gate passed on all 3 with zero refinement cycles.
+- **PR #815** — fixed V2 quality issues (dollar-sign corruption, firecrawl API breakage, timeout handling) discovered during "~\$17 spent on 4 test pages in preparation for the \$500 production batch run."
+
+These establish that **V2 produces publishable output** on non-trivial pages at reasonable cost. They do **not** establish that V2 outperforms V1 — the comparison was never run. Any impression of "V2 did better" comes from watching V2 work well on pages where V1 was not also tested.
+
+A proper head-to-head benchmark is tracked in [QUA-557](https://linear.app/quantifieduncertainty/issue/QUA-557).
+
 ---
 
 ## 7. Options — evaluation
@@ -232,7 +244,7 @@ Rename now (Option D). Then extract shared phases (Option A). Re-evaluate B/C af
    - ~1-2 weeks.
 
 3. **Decide later, based on data**
-   - Before deprecating either engine, file a benchmarks ticket: run both on the same 20 pages, compare cost + quality-gate scores + citation accuracy. That data does not exist today and is prerequisite to Option B or C.
+   - [QUA-557](https://linear.app/quantifieduncertainty/issue/QUA-557) tracks the required benchmark: 5 pages × 2 engines, auto-scored + blind qualitative review, ~\$40-80 budget. Completing this audit gates Options B and C. Running it without the methodology spec'd in QUA-557 would produce impressions, not data — the same failure mode that produced the informal "V2 did better" belief.
 
 ### What NOT to do
 
@@ -291,9 +303,9 @@ grep -rn "v1.*v2\|compare.*engine" crux/authoring/**/*.test.ts
 
 ---
 
-## 12. Follow-up tickets to file once this audit lands
+## 12. Follow-up tickets
 
-- **Rename pass** (Option D) — small PR, ~1-2 days
-- **Phase extraction** (Option A) — medium PR, ~1-2 weeks
-- **Benchmarks** — run V1 vs V2 on 20 identical pages; gate future Option B/C decisions on the data
-- **Auto-update batch reconciliation** — should auto-update's custom Batch-API wrapper be moved to `lib/anthropic-batch.ts` for reuse? (Already lives there — check whether V2's batch-runner could use it.)
+- **[QUA-557](https://linear.app/quantifieduncertainty/issue/QUA-557)** — V1 vs V2 quality benchmark (**filed**). Unblocks Options B and C. ~\$40-80, ~2-3h of human review.
+- **Rename pass** (Option D slice) — small PR, ~1-2 days. Not yet filed; wait for audit sign-off.
+- **Phase extraction** (Option A slice) — medium PR, ~1-2 weeks. Not yet filed; wait for audit sign-off.
+- **Auto-update batch reconciliation** — should auto-update's custom Batch-API wrapper be moved to `lib/anthropic-batch.ts` for reuse? (Already lives there — check whether V2's batch-runner could use it.) Not yet filed.
