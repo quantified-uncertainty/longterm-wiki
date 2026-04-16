@@ -908,7 +908,7 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   if (options.permissionMode !== undefined && !isPermissionMode(options.permissionMode)) {
     return {
       exitCode: 1,
-      output: `Error: --permission-mode=${options.permissionMode} is not a recognized claude mode. Allowed: default, acceptEdits, bypassPermissions, plan, dontAsk.`,
+      output: `Error: --permission-mode=${options.permissionMode} is not a recognized claude mode. Allowed: default, acceptEdits, bypassPermissions, plan, auto, dontAsk.`,
     };
   }
   const permissionMode: PermissionMode | undefined = isPermissionMode(options.permissionMode)
@@ -1082,7 +1082,12 @@ async function dispatchStopCmd(args: string[], options: DispatchCliOptions): Pro
   }
 
   const rp = makeRunPaths(paths, current.runId);
-  const meta = readDispatchMeta(env, rp);
+  let meta = readDispatchMeta(env, rp);
+
+  // If the worker completed naturally between the last status call and this
+  // stop, finalize first so cost / duration / numTurns / exitCode get captured
+  // before the stoppedAt marker overwrites the run shape.
+  if (meta) meta = finalizeDispatchIfComplete(env, paths, rp, meta);
 
   const alive = env.pidAlive(current.pid);
   if (alive) {

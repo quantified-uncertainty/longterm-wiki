@@ -17,6 +17,8 @@ import {
   spawnDispatch,
   detectConflict,
   finalizeIfComplete,
+  isPermissionMode,
+  PERMISSION_MODES,
   type DispatchEnv,
   type RunMeta,
 } from '../dispatch.ts';
@@ -138,6 +140,25 @@ describe('shortHexFromUuid', () => {
 // ---------------------------------------------------------------------------
 // buildClaudeArgv
 // ---------------------------------------------------------------------------
+
+describe('isPermissionMode / PERMISSION_MODES', () => {
+  it('accepts every mode documented by claude --help 2.1.x', () => {
+    for (const mode of ['default', 'acceptEdits', 'bypassPermissions', 'plan', 'auto', 'dontAsk']) {
+      expect(isPermissionMode(mode)).toBe(true);
+    }
+  });
+  it('rejects unknown modes', () => {
+    expect(isPermissionMode('bogus')).toBe(false);
+    expect(isPermissionMode('')).toBe(false);
+    expect(isPermissionMode(undefined)).toBe(false);
+    expect(isPermissionMode(42)).toBe(false);
+  });
+  it('PERMISSION_MODES tuple matches the documented claude 2.1.x modes', () => {
+    expect([...PERMISSION_MODES].sort()).toEqual(
+      ['acceptEdits', 'auto', 'bypassPermissions', 'default', 'dontAsk', 'plan'],
+    );
+  });
+});
 
 describe('buildClaudeArgv', () => {
   it('builds a full argv with all required flags and terminates options with -- before the prompt', () => {
@@ -619,6 +640,23 @@ describe('finalizeIfComplete', () => {
     expect(out.completedAt).toBeTruthy();
     expect(out.terminalReason).toBe('dead_without_result');
     expect(readCurrent(env, paths)).toBeNull();
+  });
+
+  it('finds the result even when a trailing non-result line follows it', () => {
+    // Regression: earlier `readFinalResultEvent`-only implementation missed the
+    // result when any content followed (rate_limit_event, partial flush, etc).
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', num_turns: 1, duration_ms: 100, total_cost_usd: 0.01, terminal_reason: 'completed' }) + '\n' +
+      JSON.stringify({ type: 'rate_limit_event', rate_limit_info: {} }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.completedAt).toBeTruthy();
+    expect(out.terminalReason).toBe('completed');
+    expect(out.exitCode).toBe(0);
   });
 
   it('leaves meta unchanged while run is still live and no result yet', () => {

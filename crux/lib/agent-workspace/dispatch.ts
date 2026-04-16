@@ -37,7 +37,14 @@ import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_pr
  * Claude CLI permission modes accepted by `--permission-mode`.
  * Keep in sync with `claude --help` for the installed version.
  */
-export const PERMISSION_MODES = ['default', 'acceptEdits', 'bypassPermissions', 'plan', 'dontAsk'] as const;
+export const PERMISSION_MODES = [
+  'default',
+  'acceptEdits',
+  'bypassPermissions',
+  'plan',
+  'auto',
+  'dontAsk',
+] as const;
 export type PermissionMode = (typeof PERMISSION_MODES)[number];
 
 /** Worker-appropriate tool allowlist. Exported so operators can reference it. */
@@ -650,9 +657,14 @@ export function finalizeIfComplete(
   meta: RunMeta,
 ): RunMeta {
   if (meta.completedAt) return meta;
-  // Only the last line can be a terminal `result`/`error` event. Read just the
-  // tail to avoid O(N) re-parsing a large events.jsonl on every status call.
-  const result = readFinalResultEvent(env, rp.eventsFile);
+  // Fast path: in well-behaved stream-json, the terminal `result`/`error` event
+  // is the last line. Full backward scan is only needed if the tail contains
+  // something else (partial flush, trailing rate_limit_event, diagnostic) —
+  // falling back preserves correctness without the O(N) cost in the common case.
+  let result = readFinalResultEvent(env, rp.eventsFile);
+  if (!result) {
+    result = findResultEvent(parseEventsFile(env, rp.eventsFile));
+  }
   if (!result || !result.raw) {
     // No result yet — but if the pid is dead we should at least record that.
     if (!env.pidAlive(meta.pid)) {
