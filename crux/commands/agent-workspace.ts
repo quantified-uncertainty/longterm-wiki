@@ -47,6 +47,22 @@ import {
   renderJson as renderDoctorJson,
   exitCodeFor as doctorExitCode,
 } from '../lib/agent-workspace/doctor/runner.ts';
+import {
+  dispatchPaths as makeDispatchPaths,
+  runPaths as makeRunPaths,
+  detectConflict as detectDispatchConflict,
+  spawnDispatch,
+  clearCurrent as clearDispatchCurrent,
+  readCurrent as readDispatchCurrent,
+  readMeta as readDispatchMeta,
+  writeMeta as writeDispatchMeta,
+  parseEventsFile as parseDispatchEvents,
+  finalizeIfComplete as finalizeDispatchIfComplete,
+  realDispatchEnv,
+  isPermissionMode,
+  type DispatchOptions,
+  type PermissionMode,
+} from '../lib/agent-workspace/dispatch.ts';
 import { realDoctorEnv } from '../lib/agent-workspace/doctor/env.ts';
 import { SLOTS_CHECKS } from '../lib/agent-workspace/doctor/slots.ts';
 import { RELEASES_CHECKS } from '../lib/agent-workspace/doctor/releases.ts';
@@ -784,9 +800,18 @@ interface DispatchCliOptions extends CommandOptions {
   permissionMode?: string;
   cwd?: string;
   tail?: string;
+  prompt?: string;
+  promptFile?: string;
 }
 
-function parseSlot(arg: string | undefined): number | { error: string } {
+export interface DispatchCliContext {
+  slot: number;
+  cwd: string;
+  cwdNote: string;
+}
+
+/** Parse the slot number from the first positional argument. */
+export function parseSlot(arg: string | undefined): number | { error: string } {
   if (!arg || !/^\d+$/.test(arg)) {
     return { error: 'Slot number must be a positive integer.' };
   }
@@ -809,6 +834,49 @@ function resolveDispatchCwd(slot: number, override?: string): { cwd: string; not
   return { cwd: slotDir, note: '' };
 }
 
+/**
+ * Resolve the prompt from (in priority order): --prompt-file, --prompt, or the
+ * positional args after the slot number. Returns { prompt } or { error }.
+ *
+ * --prompt-file is the robust escape hatch for prompts containing `--` prefixes,
+ * multi-line content, or anything the shell/arg-parser would mangle.
+ */
+export function resolvePrompt(
+  positionalTail: string[],
+  opts: { prompt?: string; promptFile?: string },
+): { prompt: string } | { error: string } {
+  if (opts.promptFile) {
+    try {
+      const body = readFileSync(opts.promptFile, 'utf-8').trim();
+      if (!body) return { error: `--prompt-file is empty: ${opts.promptFile}` };
+      return { prompt: body };
+    } catch (e) {
+      return { error: `Could not read --prompt-file=${opts.promptFile}: ${e instanceof Error ? e.message : String(e)}` };
+    }
+  }
+  if (typeof opts.prompt === 'string' && opts.prompt.trim().length > 0) {
+    return { prompt: opts.prompt };
+  }
+  const joined = positionalTail.join(' ').trim();
+  if (!joined) {
+    return {
+      error:
+        'prompt is required. Pass it as a quoted argument, via --prompt="...", or via --prompt-file=<path>.',
+    };
+  }
+  return { prompt: joined };
+}
+
+/** Validate / clamp --max-budget. */
+export function parseMaxBudget(raw: string | undefined): { value: number | undefined } | { error: string } {
+  if (raw === undefined) return { value: undefined };
+  const n = Number(raw);
+  if (Number.isNaN(n) || n <= 0) {
+    return { error: `--max-budget must be a positive number (got: ${raw}).` };
+  }
+  return { value: n };
+}
+
 async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
   const positional = args.filter((a) => !a.startsWith('--'));
   const slotResult = parseSlot(positional[0]);
@@ -817,22 +885,39 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
   }
   const slot = slotResult;
 
-  const prompt = positional.slice(1).join(' ').trim();
-  if (!prompt) {
-    return { exitCode: 1, output: 'Error: prompt is required.\n\nUsage: crux sys agent-workspace dispatch <N> "<prompt>" [options]' };
+  const promptResult = resolvePrompt(positional.slice(1), options);
+  if ('error' in promptResult) {
+    return {
+      exitCode: 1,
+      output: `Error: ${promptResult.error}\n\nUsage: crux sys agent-workspace dispatch <N> "<prompt>" [options]`,
+    };
   }
+  const prompt = promptResult.prompt;
 
   const cwdResult = resolveDispatchCwd(slot, options.cwd);
   if ('error' in cwdResult) return { exitCode: 1, output: `Error: ${cwdResult.error}` };
 
-  const { dispatchPaths: makePaths, detectConflict, spawnDispatch, realDispatchEnv, clearCurrent } = await import(
-    '../lib/agent-workspace/dispatch.ts'
-  );
+  if (options.permissionMode !== undefined && !isPermissionMode(options.permissionMode)) {
+    return {
+      exitCode: 1,
+      output: `Error: --permission-mode=${options.permissionMode} is not a recognized claude mode. Allowed: default, acceptEdits, bypassPermissions, plan, dontAsk.`,
+    };
+  }
+  const permissionMode: PermissionMode | undefined = isPermissionMode(options.permissionMode)
+    ? options.permissionMode
+    : undefined;
+
+  const budgetResult = parseMaxBudget(options.maxBudget);
+  if ('error' in budgetResult) {
+    return { exitCode: 1, output: `Error: ${budgetResult.error}` };
+  }
+  const maxBudgetUsd = budgetResult.value;
+
   const env = realDispatchEnv();
-  const paths = makePaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwdResult.cwd);
 
   if (!options.force) {
-    const conflict = detectConflict(env, paths);
+    const conflict = detectDispatchConflict(env, paths);
     if (conflict) {
       return {
         exitCode: 1,
@@ -844,30 +929,27 @@ async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise
       };
     }
     // Stale pointer: detectConflict returns null when pid is dead; clear it quietly.
-    clearCurrent(env, paths);
+    clearDispatchCurrent(env, paths);
   } else {
     // --force: always clear before spawning
-    clearCurrent(env, paths);
+    clearDispatchCurrent(env, paths);
   }
 
-  const maxBudgetUsd = options.maxBudget ? Number(options.maxBudget) : undefined;
-  if (maxBudgetUsd !== undefined && (Number.isNaN(maxBudgetUsd) || maxBudgetUsd <= 0)) {
-    return { exitCode: 1, output: `Error: --max-budget must be a positive number (got: ${options.maxBudget}).` };
-  }
+  const dispatchOpts: DispatchOptions = {
+    slot,
+    cwd: cwdResult.cwd,
+    prompt,
+    model: options.model,
+    maxBudgetUsd,
+    allowedTools: options.allowedTools,
+    appendSystemPrompt: options.appendSystemPrompt,
+    permissionMode,
+    force: !!options.force,
+  };
 
   let result;
   try {
-    result = spawnDispatch(env, paths, {
-      slot,
-      cwd: cwdResult.cwd,
-      prompt,
-      model: options.model,
-      maxBudgetUsd,
-      allowedTools: options.allowedTools,
-      appendSystemPrompt: options.appendSystemPrompt,
-      permissionMode: options.permissionMode as DispatchCliOptions['permissionMode'] as undefined,
-      force: !!options.force,
-    });
+    result = spawnDispatch(env, paths, dispatchOpts);
   } catch (e) {
     return { exitCode: 1, output: `Error spawning claude: ${e instanceof Error ? e.message : String(e)}` };
   }
@@ -919,32 +1001,23 @@ async function dispatchStatusCmd(args: string[], options: DispatchCliOptions): P
 
   const tail = options.tail ? Math.max(1, parseInt(options.tail, 10) || 0) : 10;
 
-  const {
-    dispatchPaths: makePaths,
-    runPaths: makeRunPaths,
-    readCurrent,
-    readMeta,
-    parseEventsFile,
-    finalizeIfComplete,
-    realDispatchEnv,
-  } = await import('../lib/agent-workspace/dispatch.ts');
   const env = realDispatchEnv();
-  const paths = makePaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwdResult.cwd);
 
-  const current = readCurrent(env, paths);
+  const current = readDispatchCurrent(env, paths);
   if (!current) {
     return { exitCode: 0, output: `No active dispatch on slot a${slot}.` };
   }
 
   const rp = makeRunPaths(paths, current.runId);
-  let meta = readMeta(env, rp);
+  let meta = readDispatchMeta(env, rp);
   if (!meta) {
     return { exitCode: 1, output: `Error: current.json points at run ${current.runId} but meta.json is missing.` };
   }
 
-  meta = finalizeIfComplete(env, paths, rp, meta);
+  meta = finalizeDispatchIfComplete(env, paths, rp, meta);
 
-  const events = parseEventsFile(env, rp.eventsFile);
+  const events = parseDispatchEvents(env, rp.eventsFile);
   const alive = env.pidAlive(current.pid);
   const elapsedMs = Date.parse(env.now().toISOString()) - Date.parse(current.startedAt);
   const elapsedSec = Math.max(0, Math.floor(elapsedMs / 1000));
@@ -1006,35 +1079,24 @@ async function dispatchStopCmd(args: string[], options: DispatchCliOptions): Pro
   const cwdResult = resolveDispatchCwd(slot, options.cwd);
   if ('error' in cwdResult) return { exitCode: 1, output: `Error: ${cwdResult.error}` };
 
-  const {
-    dispatchPaths: makePaths,
-    runPaths: makeRunPaths,
-    readCurrent,
-    readMeta,
-    writeMeta,
-    clearCurrent,
-    realDispatchEnv,
-  } = await import('../lib/agent-workspace/dispatch.ts');
   const env = realDispatchEnv();
-  const paths = makePaths(cwdResult.cwd);
+  const paths = makeDispatchPaths(cwdResult.cwd);
 
-  const current = readCurrent(env, paths);
+  const current = readDispatchCurrent(env, paths);
   if (!current) {
     return { exitCode: 0, output: `No active dispatch on slot a${slot}.` };
   }
 
   const rp = makeRunPaths(paths, current.runId);
-  const meta = readMeta(env, rp);
+  const meta = readDispatchMeta(env, rp);
 
   const alive = env.pidAlive(current.pid);
   if (alive) {
     env.signal(current.pid, 'SIGTERM');
-    // Small grace window (blocking sleep is OK here — this command is short-lived).
+    // Give the worker up to 3s to drain before escalating to SIGKILL.
     const deadline = Date.now() + 3000;
     while (Date.now() < deadline && env.pidAlive(current.pid)) {
-      // busy-wait 50ms; no setTimeout dep
-      const until = Date.now() + 50;
-      while (Date.now() < until) { /* spin */ }
+      await new Promise<void>((resolve) => setTimeout(resolve, 50));
     }
     if (env.pidAlive(current.pid)) {
       env.signal(current.pid, 'SIGKILL');
@@ -1047,9 +1109,9 @@ async function dispatchStopCmd(args: string[], options: DispatchCliOptions): Pro
       stoppedAt: env.now().toISOString(),
       terminalReason: meta.terminalReason ?? 'stopped',
     };
-    writeMeta(env, rp, updated);
+    writeDispatchMeta(env, rp, updated);
   }
-  clearCurrent(env, paths);
+  clearDispatchCurrent(env, paths);
 
   const lines = [
     `Stopped dispatch on slot a${slot}.`,
@@ -1333,11 +1395,15 @@ Commands:
 
 Dispatch — headless claude -p workers (QUA-554):
   dispatch <N> "<prompt>"    Spawn a one-shot claude -p worker in slot N
+                             Prompt sources (checked in order):
+                                      --prompt-file=<path>   robust for multiline / leading --
+                                      --prompt="<text>"       inline alternative
+                                      positional args after slot (normal case)
                              Options: --model=<sonnet|opus|haiku> (default sonnet)
                                       --max-budget=<usd> (default 5)
                                       --allowed-tools=<list> (default Bash,Edit,Read,Write,Grep,Glob)
                                       --append-system-prompt=<text>
-                                      --permission-mode=<bypassPermissions|acceptEdits|default>
+                                      --permission-mode=<default|acceptEdits|bypassPermissions|plan|dontAsk>
                                       --cwd=<path> (override slot dir; testing)
                                       --force (ignore existing dispatch)
   dispatch-status <N>        Show active/most-recent dispatch: pid, last events, cost

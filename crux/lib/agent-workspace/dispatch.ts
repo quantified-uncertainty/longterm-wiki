@@ -33,6 +33,25 @@ import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_pr
 // Types
 // ---------------------------------------------------------------------------
 
+/**
+ * Claude CLI permission modes accepted by `--permission-mode`.
+ * Keep in sync with `claude --help` for the installed version.
+ */
+export const PERMISSION_MODES = ['default', 'acceptEdits', 'bypassPermissions', 'plan', 'dontAsk'] as const;
+export type PermissionMode = (typeof PERMISSION_MODES)[number];
+
+/** Worker-appropriate tool allowlist. Exported so operators can reference it. */
+export const DEFAULT_ALLOWED_TOOLS = 'Bash,Edit,Read,Write,Grep,Glob';
+
+/** Cost cap (USD) applied to every dispatch unless overridden. */
+export const DEFAULT_MAX_BUDGET_USD = 5;
+
+/** Cost-conscious default model. Caller can override with --model. */
+export const DEFAULT_MODEL = 'sonnet';
+
+/** Headless workers cannot answer prompts, so default to bypass. */
+export const DEFAULT_PERMISSION_MODE: PermissionMode = 'bypassPermissions';
+
 export interface DispatchOptions {
   /** Slot number (positive integer). */
   slot: number;
@@ -48,13 +67,15 @@ export interface DispatchOptions {
   allowedTools?: string;
   /** Extra text appended to the default system prompt. Optional. */
   appendSystemPrompt?: string;
-  /**
-   * Permission mode. Default: "bypassPermissions" — headless cannot prompt,
-   * so any tool-call that would trigger a permission request would deadlock.
-   */
-  permissionMode?: 'default' | 'acceptEdits' | 'bypassPermissions' | 'plan' | 'auto' | 'dontAsk';
+  /** Permission mode passed to `claude --permission-mode`. Default: bypassPermissions. */
+  permissionMode?: PermissionMode;
   /** When true, ignore an existing live dispatch in the target slot. */
   force?: boolean;
+}
+
+/** True if `s` is a valid claude CLI permission mode. */
+export function isPermissionMode(s: unknown): s is PermissionMode {
+  return typeof s === 'string' && (PERMISSION_MODES as readonly string[]).includes(s);
 }
 
 export interface DispatchHandle {
@@ -161,8 +182,10 @@ export function realDispatchEnv(): DispatchEnv {
     unlink: (p) => {
       try {
         fsUnlinkSync(p);
-      } catch {
-        /* absent is fine */
+      } catch (e) {
+        // ENOENT is fine (file already gone). Other errors (permission, busy)
+        // indicate real problems and should surface.
+        if ((e as NodeJS.ErrnoException)?.code !== 'ENOENT') throw e;
       }
     },
     pidAlive: (pid) => {
@@ -276,8 +299,7 @@ export interface BuildArgvInput {
 
 export function buildClaudeArgv(input: BuildArgvInput): string[] {
   const argv: string[] = [
-    '-p',
-    input.prompt,
+    '--print',
     '--output-format',
     'stream-json',
     '--verbose',
@@ -296,6 +318,11 @@ export function buildClaudeArgv(input: BuildArgvInput): string[] {
   if (input.appendSystemPrompt) {
     argv.push('--append-system-prompt', input.appendSystemPrompt);
   }
+  // `--` explicitly ends option parsing so a prompt starting with "--" (e.g.
+  // "--force the parser to crash") is treated as the positional `[prompt]`
+  // argument rather than an unknown flag. Without this, claude CLI's commander
+  // parser rejects the prompt with "error: unknown option".
+  argv.push('--', input.prompt);
   return argv;
 }
 
@@ -485,10 +512,10 @@ export function spawnDispatch(env: DispatchEnv, paths: DispatchPaths, opts: Disp
 
   env.mkdirp(rp.runDir);
 
-  const model = opts.model ?? 'sonnet';
-  const maxBudgetUsd = opts.maxBudgetUsd ?? 5;
-  const allowedTools = opts.allowedTools ?? 'Bash,Edit,Read,Write,Grep,Glob';
-  const permissionMode = opts.permissionMode ?? 'bypassPermissions';
+  const model = opts.model ?? DEFAULT_MODEL;
+  const maxBudgetUsd = opts.maxBudgetUsd ?? DEFAULT_MAX_BUDGET_USD;
+  const allowedTools = opts.allowedTools ?? DEFAULT_ALLOWED_TOOLS;
+  const permissionMode = opts.permissionMode ?? DEFAULT_PERMISSION_MODE;
   const argv = buildClaudeArgv({
     sessionId,
     prompt: opts.prompt,
@@ -500,7 +527,14 @@ export function spawnDispatch(env: DispatchEnv, paths: DispatchPaths, opts: Disp
   });
 
   const stdoutFd = env.openWriteFd(rp.eventsFile);
-  const stderrFd = env.openWriteFd(rp.stderrFile);
+  let stderrFd: number;
+  try {
+    stderrFd = env.openWriteFd(rp.stderrFile);
+  } catch (e) {
+    // If opening stderr fails, we must still release stdout or it leaks.
+    env.closeFd(stdoutFd);
+    throw e;
+  }
 
   let pid: number;
   try {
@@ -614,10 +648,19 @@ export function finalizeIfComplete(
   }
   const raw = result.raw as Record<string, unknown>;
   const isError = raw.is_error === true;
+  // Prefer the claude-emitted `terminal_reason` (observed: "completed") when
+  // present; fall back to `stop_reason` (observed: "end_turn", "max_tokens")
+  // for compatibility, then to a generic label.
+  const reasonFromStream =
+    typeof raw.terminal_reason === 'string'
+      ? (raw.terminal_reason as string)
+      : typeof raw.stop_reason === 'string'
+        ? (raw.stop_reason as string)
+        : null;
   const next: RunMeta = {
     ...meta,
     completedAt: env.now().toISOString(),
-    terminalReason: typeof raw.terminal_reason === 'string' ? (raw.terminal_reason as string) : isError ? 'error' : 'completed',
+    terminalReason: reasonFromStream ?? (isError ? 'error' : 'completed'),
     exitCode: isError ? 1 : 0,
     totalCostUsd: typeof raw.total_cost_usd === 'number' ? (raw.total_cost_usd as number) : undefined,
     numTurns: typeof raw.num_turns === 'number' ? (raw.num_turns as number) : undefined,

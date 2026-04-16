@@ -139,7 +139,7 @@ describe('shortHexFromUuid', () => {
 // ---------------------------------------------------------------------------
 
 describe('buildClaudeArgv', () => {
-  it('builds a full argv with all required flags', () => {
+  it('builds a full argv with all required flags and terminates options with -- before the prompt', () => {
     const argv = buildClaudeArgv({
       sessionId: 'abc-123',
       prompt: 'hi',
@@ -149,7 +149,7 @@ describe('buildClaudeArgv', () => {
       permissionMode: 'bypassPermissions',
     });
     expect(argv).toEqual([
-      '-p', 'hi',
+      '--print',
       '--output-format', 'stream-json',
       '--verbose',
       '--session-id', 'abc-123',
@@ -158,9 +158,10 @@ describe('buildClaudeArgv', () => {
       '--allowedTools', 'Bash,Read',
       '--permission-mode', 'bypassPermissions',
       '--disable-slash-commands',
+      '--', 'hi',
     ]);
   });
-  it('appends --append-system-prompt when provided', () => {
+  it('inserts --append-system-prompt before the -- separator', () => {
     const argv = buildClaudeArgv({
       sessionId: 'abc-123',
       prompt: 'hi',
@@ -170,7 +171,28 @@ describe('buildClaudeArgv', () => {
       permissionMode: 'bypassPermissions',
       appendSystemPrompt: 'You are a worker.',
     });
-    expect(argv.slice(-2)).toEqual(['--append-system-prompt', 'You are a worker.']);
+    const sepIdx = argv.indexOf('--');
+    const appendIdx = argv.indexOf('--append-system-prompt');
+    expect(appendIdx).toBeGreaterThan(-1);
+    expect(sepIdx).toBeGreaterThan(-1);
+    expect(appendIdx).toBeLessThan(sepIdx);
+    expect(argv[appendIdx + 1]).toBe('You are a worker.');
+    expect(argv[sepIdx + 1]).toBe('hi');
+  });
+  it('preserves a prompt that starts with two dashes as a positional (hostile-review regression test)', () => {
+    const argv = buildClaudeArgv({
+      sessionId: 'abc-123',
+      prompt: '--force the parser to crash and summarize',
+      model: 'sonnet',
+      maxBudgetUsd: 5,
+      allowedTools: 'Bash',
+      permissionMode: 'bypassPermissions',
+    });
+    // The dangerous prompt must live AFTER a literal -- separator so claude's
+    // commander parser treats it as the positional prompt argument, not a flag.
+    const sepIdx = argv.indexOf('--');
+    expect(sepIdx).toBeGreaterThan(-1);
+    expect(argv[sepIdx + 1]).toBe('--force the parser to crash and summarize');
   });
 });
 
@@ -394,8 +416,12 @@ describe('spawnDispatch', () => {
     const [call] = env.spawnCalls;
     expect(call.cmd).toBe('claude');
     expect(call.args).toContain('--session-id');
-    expect(call.args).toContain('-p');
+    expect(call.args).toContain('--print');
     expect(call.args).toContain('echo hi');
+    // Prompt must come after the -- separator (hostile-review hardening).
+    const sepIdx = call.args.indexOf('--');
+    expect(sepIdx).toBeGreaterThan(-1);
+    expect(call.args[sepIdx + 1]).toBe('echo hi');
     expect(call.cwd).toBe('/lw/a3');
     // file descriptors were given to child and then closed by parent
     expect(env.openFds.size).toBe(0);
@@ -504,7 +530,7 @@ describe('finalizeIfComplete', () => {
     expect(readCurrent(env, paths)).toBeNull();
   });
 
-  it('finalizes on an errored result event', () => {
+  it('finalizes on an errored result event, preserving stop_reason as the terminalReason', () => {
     const env = new FakeEnv();
     const paths = dispatchPaths('/lw/a1');
     const rp = runPaths(paths, 'r1');
@@ -514,7 +540,32 @@ describe('finalizeIfComplete', () => {
     );
     const out = finalizeIfComplete(env, paths, rp, BASE_META);
     expect(out.exitCode).toBe(1);
+    // Prefer the actual stop_reason when present; only fall back to generic 'error' when neither terminal_reason nor stop_reason is emitted.
+    expect(out.terminalReason).toBe('api_error');
+  });
+
+  it('falls back to generic "error" when neither terminal_reason nor stop_reason is present', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: true, num_turns: 0, duration_ms: 100, total_cost_usd: 0 }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
     expect(out.terminalReason).toBe('error');
+  });
+
+  it('prefers terminal_reason over stop_reason when both are present', () => {
+    const env = new FakeEnv();
+    const paths = dispatchPaths('/lw/a1');
+    const rp = runPaths(paths, 'r1');
+    writeCurrent(env, paths, { runId: 'r1', sessionId: 's1', pid: 99, startedAt: 'x' });
+    env.files.set(rp.eventsFile,
+      JSON.stringify({ type: 'result', is_error: false, stop_reason: 'end_turn', terminal_reason: 'completed', num_turns: 1, duration_ms: 100, total_cost_usd: 0 }) + '\n',
+    );
+    const out = finalizeIfComplete(env, paths, rp, BASE_META);
+    expect(out.terminalReason).toBe('completed');
   });
 
   it('marks dead_without_result when pid is dead and no result event', () => {
