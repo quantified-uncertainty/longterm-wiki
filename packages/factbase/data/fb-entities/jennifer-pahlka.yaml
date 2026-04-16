@@ -14,5 +14,12 @@ facts:
         value: Yale University,
         source: https://www.wikidata.org/wiki/Q6178697,
         notes: From Wikidata Q6178697
+      },
+    {
+        id: f_vTdhGZzbxA,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Jennifer_Pahlka,
+        source: https://www.wikidata.org/wiki/Q6178697,
+        notes: From Wikidata Q6178697
       }
   ]

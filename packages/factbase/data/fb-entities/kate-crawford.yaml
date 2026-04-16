@@ -14,5 +14,19 @@ facts:
         value: University of Sydney,
         source: https://www.wikidata.org/wiki/Q6375450,
         notes: From Wikidata Q6375450
+      },
+    {
+        id: f_ayiBY3bl0w,
+        property: website,
+        value: http://www.katecrawford.net/,
+        source: https://www.wikidata.org/wiki/Q6375450,
+        notes: From Wikidata Q6375450
+      },
+    {
+        id: f_k466qtfZcg,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Kate_Crawford,
+        source: https://www.wikidata.org/wiki/Q6375450,
+        notes: From Wikidata Q6375450
       }
   ]

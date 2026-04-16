@@ -19,7 +19,9 @@ facts:
     notes: From Wikidata Q3348133
   - id: f_gM6tN2pQ8v
     property: notable-for
-    value: "Prominent AI critic skeptical of deep learning as path to AGI; advocate for hybrid neurosymbolic AI approaches; author of Rebooting AI and Kluge; founder of Geometric Intelligence (acquired by Uber)"
+    value: "Prominent AI critic skeptical of deep learning as path to AGI; advocate
+      for hybrid neurosymbolic AI approaches; author of Rebooting AI and Kluge;
+      founder of Geometric Intelligence (acquired by Uber)"
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Gary_Marcus
     notes: Enriched from public information
@@ -32,6 +34,17 @@ facts:
 
   - id: f_gMcY8fL5kA
     property: education
-    value: "Ph.D. in Brain and Cognitive Sciences, MIT (1993); B.A. from Hampshire College"
+    value: "Ph.D. in Brain and Cognitive Sciences, MIT (1993); B.A. from Hampshire
+      College"
     source: https://en.wikipedia.org/wiki/Gary_Marcus
     notes: Enriched from public information; studied under Steven Pinker at MIT
+  - id: f_ivxFescpwg
+    property: website
+    value: http://garymarcus.com/
+    source: https://www.wikidata.org/wiki/Q3348133
+    notes: From Wikidata Q3348133
+  - id: f_yclMHMrZag
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Gary_Marcus
+    source: https://www.wikidata.org/wiki/Q3348133
+    notes: From Wikidata Q3348133

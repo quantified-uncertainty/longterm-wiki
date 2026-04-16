@@ -1,2 +1,11 @@
 entity: sid_aJOiUj35UA
-facts: []
+facts:
+  [
+    {
+        id: f_33pVcNKFEg,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Jeremie_Harris,
+        source: https://www.wikidata.org/wiki/Q47658458,
+        notes: From Wikidata Q47658458
+      }
+  ]

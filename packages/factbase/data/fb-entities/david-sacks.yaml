@@ -2,14 +2,17 @@ entity: sid_JjyNWsA91A
 facts:
   - id: f_XwwBzQAhXg
     property: description
-    value: South African-American entrepreneur, venture capitalist, and White House AI and Crypto Czar who co-founded Craft
-      Ventures and played key roles at PayPal and Yammer. Appointed by President Trump in December 2024 to shape U.S. AI
-      and cryptocurrency policy.
+    value: South African-American entrepreneur, venture capitalist, and White House
+      AI and Crypto Czar who co-founded Craft Ventures and played key roles at
+      PayPal and Yammer. Appointed by President Trump in December 2024 to shape
+      U.S. AI and cryptocurrency policy.
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_dS7pQ3tV6x
     property: notable-for
-    value: "White House AI and Crypto Czar under Trump administration; co-founder of Craft Ventures; PayPal Mafia member and former COO; founded Yammer (sold to Microsoft for $1.2B)"
+    value: "White House AI and Crypto Czar under Trump administration; co-founder of
+      Craft Ventures; PayPal Mafia member and former COO; founded Yammer (sold
+      to Microsoft for $1.2B)"
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/David_Sacks
     notes: Enriched from wiki page
@@ -22,6 +25,12 @@ facts:
 
   - id: f_dSdX2bC5eD
     property: education
-    value: "B.A. in Economics, Stanford University (1994); J.D., University of Chicago Law School (1998)"
+    value: "B.A. in Economics, Stanford University (1994); J.D., University of
+      Chicago Law School (1998)"
     source: https://en.wikipedia.org/wiki/David_Sacks
     notes: Enriched from wiki page
+  - id: f_v1lg2dzSfw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/David_Sacks
+    source: https://www.wikidata.org/wiki/Q5238174
+    notes: From Wikidata Q5238174

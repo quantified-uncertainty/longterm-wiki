@@ -11,3 +11,13 @@ facts:
       School; University of North Dakota
     source: https://www.wikidata.org/wiki/Q100604534
     notes: From Wikidata Q100604534
+  - id: f_kurARWjFmw
+    property: website
+    value: https://gregbrockman.com/
+    source: https://www.wikidata.org/wiki/Q100604534
+    notes: From Wikidata Q100604534
+  - id: f_rFCRDTN24g
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Greg_Brockman
+    source: https://www.wikidata.org/wiki/Q100604534
+    notes: From Wikidata Q100604534

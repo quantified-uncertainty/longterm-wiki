@@ -2,9 +2,14 @@ entity: sid_x16GL4gP2A
 facts:
   - id: f_clGvV7hzcA
     property: notable-for
-    value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of neural scaling laws research"
+    value: "Co-founder of Anthropic; Johns Hopkins physics professor; co-author of
+      neural scaling laws research"
 
   - id: f_h7OOErJfYQ
     property: education
     value: "PhD in Physics, Stanford University"
-
+  - id: f_e2w29wsIKg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Jared_Kaplan
+    source: https://www.wikidata.org/wiki/Q102649624
+    notes: From Wikidata Q102649624

@@ -3,3 +3,14 @@ thing:
   stableId: sid_6T8nglIbo6
   type: person
   name: "Pushmeet Kohli"
+facts:
+  - id: f_uygVBbfzrA
+    property: website
+    value: https://research.google/people/105667
+    source: https://www.wikidata.org/wiki/Q21061678
+    notes: From Wikidata Q21061678
+  - id: f_fE4XcBPhfw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Pushmeet_Kohli
+    source: https://www.wikidata.org/wiki/Q21061678
+    notes: From Wikidata Q21061678

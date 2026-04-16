@@ -1,2 +1,18 @@
 entity: sid_rhgfPZYXTw
-facts: []
+facts:
+  [
+    {
+        id: f_Nq6nRKegAg,
+        property: website,
+        value: https://profiles.stanford.edu/john-etchemendy,
+        source: https://www.wikidata.org/wiki/Q6231954,
+        notes: From Wikidata Q6231954
+      },
+    {
+        id: f_pmWH4UXg8Q,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/John_Etchemendy,
+        source: https://www.wikidata.org/wiki/Q6231954,
+        notes: From Wikidata Q6231954
+      }
+  ]
