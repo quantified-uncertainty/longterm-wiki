@@ -40,6 +40,18 @@ interface FundingProgramDef {
   status: "open" | "closed" | "awarded";
   source?: string;
   notes?: string;
+  /**
+   * Application deadline. Free-form string (max 20 chars). Accepts:
+   *   - "Rolling" — perpetually open, no fixed deadline
+   *   - "Annual" — recurring annual deadline, specific date varies
+   *   - "YYYY-MM" or "YYYY-MM-DD" — specific (most-recent) deadline
+   *   - Leave undefined for historical/closed programs where deadline is unknown or irrelevant.
+   */
+  deadline?: string;
+  /** Application URL (max 2000 chars). Often the same as `source` but can differ for RFP landing pages. */
+  applicationUrl?: string;
+  /** Program open date. Same format conventions as `deadline`. */
+  openDate?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -57,6 +69,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Coefficient Giving's ongoing AI safety grantmaking, covering technical alignment research, governance, and field-building",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/navigating-transformative-ai",
     notes: "Largest funder of AI safety research by total dollars committed. ~$63.6M in 2024.",
   },
@@ -70,6 +83,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "rfp",
     totalBudget: 40_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/",
     notes: "21 research areas including interpretability, alignment, evaluations, and governance.",
   },
@@ -82,6 +96,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Grantmaking for biosecurity, pandemic preparedness, and related policy work",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/biosecurity-pandemic-preparedness",
   },
   {
@@ -93,6 +108,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Coefficient Giving's grantmaking for global health, development, and farm animal welfare",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/global-health-wellbeing-opportunities",
   },
   {
@@ -104,6 +120,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Grantmaking across GCR cause areas and EA community capacity building. 250+ grants totaling ~$400M.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/global-catastrophic-risks-opportunities",
     notes: "Led by Eli Rose. Covers GCR cause areas beyond AI safety and biosecurity.",
   },
@@ -117,6 +134,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 125_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/lead-exposure-action-fund",
     notes: "20+ grants. Launched 2024. Partners include Gates Foundation, UNICEF.",
   },
@@ -130,6 +148,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 120_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/abundance-and-growth",
     notes: "Led by Matt Clancy. Launched March 2025.",
   },
@@ -143,6 +162,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Grantmaking for farm animal welfare: corporate cage-free campaigns, broiler welfare, alt-protein research, fish welfare, and advocacy in Asia. Contributed to 3,000+ corporate cage-free commitments.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/farm-animal-welfare",
     notes: "Led by Lewis Bollard. 500+ grants. Largest Coefficient Giving program by grant count.",
   },
@@ -156,6 +176,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 550_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/science-and-global-health-rd",
     notes: "Led by Jacob Trefethen.",
   },
@@ -181,6 +202,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 50_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/forecasting",
     notes: "Led by Benjamin Tereick.",
   },
@@ -193,6 +215,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Support for effective giving infrastructure, career guidance, and EA community capacity building. Support for CEA, 80,000 Hours, EA Funds.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/effective-giving-and-careers",
     notes: "Led by Melanie Basnak and Sam Donald.",
   },
@@ -206,6 +229,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 30_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/global-aid-policy",
     notes: "Led by Norma Altshuler.",
   },
@@ -219,6 +243,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 40_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/global-growth",
     notes: "Led by Justin Sandefur. Launched October 2024.",
   },
@@ -232,6 +257,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 20_000_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://coefficientgiving.org/funds/air-quality",
     notes: "Led by Santosh Harish.",
   },
@@ -246,6 +272,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Recurring grant rounds supporting organizations and individuals working on reducing existential risks, especially from advanced AI",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://funds.effectivealtruism.org/funds/far-future",
     notes:
       "Multiple rounds per year; managed by a committee of fund managers",
@@ -259,6 +286,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Recurring grant rounds for animal welfare organizations and projects",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://funds.effectivealtruism.org/funds/animal-welfare",
   },
   {
@@ -270,6 +298,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Recurring grant rounds for EA community building and infrastructure",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://funds.effectivealtruism.org/funds/ea-community",
   },
   {
@@ -281,6 +310,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Recurring grant rounds for evidence-based global health and development interventions",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://funds.effectivealtruism.org/funds/global-health",
   },
 
@@ -307,6 +337,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Faster-turnaround grants from SFF using novel donor coordination with ~35 grantors",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://survivalandflourishing.fund/speculation-grants",
     notes:
       "Budget grown from $4M to $16M. Complementary to S-Process; allows faster funding decisions.",
@@ -630,6 +661,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Platform enabling individuals to receive tax-deductible donations for regranting to effective projects",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://manifund.org/",
     notes: "Manifund provides fiscal sponsorship for individual regranters",
   },
@@ -643,6 +675,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "grant-round",
     totalBudget: 2_250_000,
     status: "open",
+    deadline: "Rolling",
     source: "https://manifund.org/about/regranting",
     notes: "$2.25M pool. First 10 AI safety regrantors announced 2025.",
   },
@@ -667,6 +700,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Experimental impact certificate marketplace where project creators sell shares of their impact to retroactive funders",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://manifund.org/",
     notes: "Novel funding mechanism using impact certificates/retroactive public goods funding. Since 2023.",
   },
@@ -680,6 +714,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "GiveWell's flagship fund directing donations to its highest-rated charities based on cost-effectiveness analysis.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://www.givewell.org/top-charities-fund",
     notes: "Directed over $1B in 2023.",
   },
@@ -691,6 +726,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Broader GiveWell fund supporting both top charities and other high-impact opportunities.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://www.givewell.org/all-grants-fund",
   },
 
@@ -765,6 +801,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Annual awards recognizing social entrepreneurs with proven models for large-scale social change.",
     programType: "prize",
     status: "open",
+    deadline: "Annual",
     source: "https://skoll.org/about/skoll-awards/",
     notes: "Awarded since 2003. Over $600M invested.",
   },
@@ -955,6 +992,7 @@ const PROGRAMS: FundingProgramDef[] = [
       "Distributes donations to top-rated animal charities working to reduce farmed and wild animal suffering globally.",
     programType: "grant-round",
     status: "open",
+    deadline: "Rolling",
     source: "https://animalcharityevaluators.org/donate/recommended-charity-fund/",
     notes: "$12M+ distributed since 2017.",
   },
@@ -1150,6 +1188,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "prize",
     totalBudget: 10_000,
     status: "open",
+    deadline: "Annual",
     source: "https://foresight.org/prizes/norm-hardy-prize/",
     notes: "Inaugural award in 2023. $10,000 annual prize. Winners: Covid Watch (2023), Frik/Egelman/Gilsenan/Peer (2024), Emami-Naeini/Cranor/Agarwal (2025).",
   },
@@ -1162,6 +1201,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "prize",
     totalBudget: 5_000,
     status: "open",
+    deadline: "Annual",
     source: "https://foresight.org/prizes/feynman-prizes/",
     notes: "Awarded since 1993. Originally a single biennial prize; split into Theory and Experiment categories in 1997.",
   },
@@ -1174,6 +1214,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "prize",
     totalBudget: 5_000,
     status: "open",
+    deadline: "Annual",
     source: "https://foresight.org/prizes/feynman-prizes/",
     notes: "Awarded since 1997 when the prize split into Theory and Experiment categories.",
   },
@@ -1186,6 +1227,7 @@ const PROGRAMS: FundingProgramDef[] = [
     programType: "prize",
     totalBudget: 1_000,
     status: "open",
+    deadline: "Annual",
     source: "https://foresight.org/prizes/feynman-prizes/",
     notes: "First awarded in 2003. Not awarded every year.",
   },
@@ -1207,6 +1249,9 @@ interface SyncFundingProgram {
   status: string | null;
   source: string | null;
   notes: string | null;
+  deadline: string | null;
+  applicationUrl: string | null;
+  openDate: string | null;
 }
 
 function toSyncProgram(def: FundingProgramDef): SyncFundingProgram {
@@ -1222,6 +1267,9 @@ function toSyncProgram(def: FundingProgramDef): SyncFundingProgram {
     status: def.status,
     source: def.source ?? null,
     notes: def.notes ?? null,
+    deadline: def.deadline ?? null,
+    applicationUrl: def.applicationUrl ?? null,
+    openDate: def.openDate ?? null,
   };
 }
 
