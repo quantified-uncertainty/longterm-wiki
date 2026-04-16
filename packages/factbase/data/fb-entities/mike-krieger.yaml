@@ -3,3 +3,9 @@ thing:
   stableId: sid_FNwvoeGSpW
   type: person
   name: "Mike Krieger"
+facts:
+  - id: f_lf2E9LgcSg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Mike_Krieger
+    source: https://www.wikidata.org/wiki/Q10329947
+    notes: From Wikidata Q10329947

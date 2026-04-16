@@ -6,12 +6,21 @@ facts:
         property: born-year,
         value: 1982,
         source: https://en.wikipedia.org/wiki/Meredith_Whittaker,
-        notes: "Born 1982; Wikidata Q55433882 listed only '20th century'. Established AI researcher (Google 2006-2018), Signal Foundation president since 2022."
+        notes: "Born 1982; Wikidata Q55433882 listed only '20th century'. Established AI
+          researcher (Google 2006-2018), Signal Foundation president since
+          2022."
       },
     {
         id: f_8NQqe4ohuH,
         property: education,
         value: "University of California, Berkeley College of Engineering",
+        source: https://www.wikidata.org/wiki/Q55433882,
+        notes: From Wikidata Q55433882
+      },
+    {
+        id: f_QChNq2Yn1Q,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Meredith_Whittaker,
         source: https://www.wikidata.org/wiki/Q55433882,
         notes: From Wikidata Q55433882
       }

@@ -3,3 +3,14 @@ thing:
   stableId: sid_he0I2G8Q4g
   type: person
   name: "Joëlle Pineau"
+facts:
+  - id: f_ru9KtelDmQ
+    property: website
+    value: http://www.cs.mcgill.ca/~jpineau/
+    source: https://www.wikidata.org/wiki/Q44741969
+    notes: From Wikidata Q44741969
+  - id: f_KBUgua6uPQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Jo%C3%ABlle_Pineau
+    source: https://www.wikidata.org/wiki/Q44741969
+    notes: From Wikidata Q44741969

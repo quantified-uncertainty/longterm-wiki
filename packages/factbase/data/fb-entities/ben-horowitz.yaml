@@ -3,8 +3,8 @@ facts:
   - id: f_GxdE4hs2i4
     property: description
     value: >-
-      Co-founder and general partner of Andreessen Horowitz (a16z).
-      Author of "The Hard Thing About Hard Things."
+      Co-founder and general partner of Andreessen Horowitz (a16z). Author of
+      "The Hard Thing About Hard Things."
     asOf: 2026-03
 
   - id: f_wufDSWqIso
@@ -22,3 +22,8 @@ facts:
     value: "Co-founder and General Partner, Andreessen Horowitz"
     asOf: 2009-07
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
+  - id: f_c8qDKFF8cA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Ben_Horowitz
+    source: https://www.wikidata.org/wiki/Q4885859
+    notes: From Wikidata Q4885859

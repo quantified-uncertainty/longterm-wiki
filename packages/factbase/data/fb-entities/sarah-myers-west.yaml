@@ -1,2 +1,11 @@
 entity: sid_lCvbYl5SE0
-facts: []
+facts:
+  [
+    {
+        id: f_d4txBqGCxw,
+        property: website,
+        value: https://www.sarahmyerswest.com/,
+        source: https://www.wikidata.org/wiki/Q126364614,
+        notes: From Wikidata Q126364614
+      }
+  ]

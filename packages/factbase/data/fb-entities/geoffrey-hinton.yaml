@@ -3,17 +3,21 @@ facts:
   - id: f_xrorsSWSXw
     property: born-year
     value: 1947
-    notes: "Born December 6, 1947 in London; Nobel Prize in Physics 2024 for foundational work on artificial neural networks"
+    notes: "Born December 6, 1947 in London; Nobel Prize in Physics 2024 for
+      foundational work on artificial neural networks"
 
   - id: f_gH1aB2cD3e
     property: education
-    value: "PhD in Artificial Intelligence, University of Edinburgh (1978); BA in Experimental Psychology, Cambridge University"
+    value: "PhD in Artificial Intelligence, University of Edinburgh (1978); BA in
+      Experimental Psychology, Cambridge University"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
     notes: "Also held postdoctoral positions at Sussex and UCSD"
 
   - id: f_gH4fG5hI6j
     property: notable-for
-    value: "Godfather of deep learning; pioneer of backpropagation, Boltzmann machines, and deep neural networks; Nobel Prize in Physics 2024; Turing Award 2018"
+    value: "Godfather of deep learning; pioneer of backpropagation, Boltzmann
+      machines, and deep neural networks; Nobel Prize in Physics 2024; Turing
+      Award 2018"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
 
   - id: f_gH7kL8mN9o
@@ -32,3 +36,8 @@ facts:
   - id: f_dx6qemfhow
     property: website
     value: "https://www.cs.toronto.edu/~hinton/"
+  - id: f_HtSld5WzPw
+    property: website
+    value: https://www.cs.toronto.edu/~hinton
+    source: https://www.wikidata.org/wiki/Q92894
+    notes: From Wikidata Q92894

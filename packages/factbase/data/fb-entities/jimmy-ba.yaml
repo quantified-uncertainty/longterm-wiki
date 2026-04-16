@@ -3,3 +3,9 @@ thing:
   stableId: sid_AdQS3o56n7
   type: person
   name: "Jimmy Ba"
+facts:
+  - id: f_WzDlkBJ44Q
+    property: website
+    value: https://jimmylba.github.io/
+    source: https://www.wikidata.org/wiki/Q50380592
+    notes: From Wikidata Q50380592

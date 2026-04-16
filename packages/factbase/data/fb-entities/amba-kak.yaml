@@ -7,5 +7,12 @@ facts:
         value: Mansfield College,
         source: https://www.wikidata.org/wiki/Q113084571,
         notes: From Wikidata Q113084571
+      },
+    {
+        id: f_ooxW6RYt3A,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Amba_Kak,
+        source: https://www.wikidata.org/wiki/Q113084571,
+        notes: From Wikidata Q113084571
       }
   ]
