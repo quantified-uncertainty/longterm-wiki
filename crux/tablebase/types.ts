@@ -19,6 +19,10 @@ export const TASK_TYPES = [
   "investment-linking",
   "benchmark-result-fill",
   "source-discovery",
+  "division-lead-fill",
+  "division-personnel-dates",
+  "funding-program-enrichment",
+  "benchmark-source-fill",
 ] as const;
 
 export type TaskType = (typeof TASK_TYPES)[number];
@@ -27,9 +31,13 @@ export type TaskType = (typeof TASK_TYPES)[number];
 export const TASK_TYPE_WEIGHTS: Record<TaskType, number> = {
   "personnel-enrichment": 1.5,
   "source-discovery": 1.3,
+  "division-lead-fill": 1.3,
   "grant-grantee-backfill": 1.2,
   "funding-round-research": 1.0,
   "benchmark-result-fill": 1.0,
+  "funding-program-enrichment": 1.0,
+  "division-personnel-dates": 0.9,
+  "benchmark-source-fill": 0.9,
   "investment-linking": 0.8,
 };
 
@@ -115,4 +123,8 @@ export const TASK_TYPE_RECOMMENDED_MODEL: Record<TaskType, string> = {
   "grant-grantee-backfill": "sonnet",
   "personnel-enrichment": "sonnet",
   "source-discovery": "sonnet",
+  "division-lead-fill": "sonnet",
+  "division-personnel-dates": "haiku",
+  "funding-program-enrichment": "haiku",
+  "benchmark-source-fill": "haiku",
 };
