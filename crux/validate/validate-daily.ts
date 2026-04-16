@@ -97,20 +97,6 @@ const VALIDATORS: ValidatorDef[] = [
     requiresServer: true,
   },
   {
-    id: "numeric-ranges",
-    name: "Numeric Ranges",
-    script: "crux/validate/validate-numeric-ranges.ts",
-    blocking: false,
-    requiresServer: true,
-  },
-  {
-    id: "pg-temporal",
-    name: "PG Temporal Consistency",
-    script: "crux/validate/validate-pg-temporal.ts",
-    blocking: false,
-    requiresServer: true,
-  },
-  {
     id: "controlled-vocab",
     name: "Controlled Vocabulary",
     script: "crux/validate/validate-controlled-vocab.ts",

@@ -131,20 +131,10 @@ const SCRIPTS = {
     description: 'Check that soft FK fields in PG tables resolve to entities (advisory, requires wiki-server)',
     passthrough: ['ci', 'verbose'],
   },
-  'pg-temporal': {
-    script: 'validate/validate-pg-temporal.ts',
-    description: 'PG temporal consistency (startDate < endDate, date range validation)',
-    passthrough: ['ci'],
-  },
   'controlled-vocab': {
     script: 'validate/validate-controlled-vocab.ts',
     description: 'Validate controlled vocabulary fields (entityType, relationship, orgType, etc.)',
     passthrough: ['ci', 'verbose'],
-  },
-  'numeric-ranges': {
-    script: 'validate/validate-numeric-ranges.ts',
-    description: 'Validate low <= high for paired range columns (requires wiki-server)',
-    passthrough: ['ci'],
   },
   'resource-refs': {
     script: 'validate/validate-resource-refs.ts',

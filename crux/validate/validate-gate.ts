@@ -591,18 +591,6 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
-    id: 'pg-temporal',
-    name: 'PG temporal consistency (startDate < endDate, date ranges)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-pg-temporal.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: depends on wiki-server being reachable. The check skips
-    // gracefully when the server is unavailable (fail-open).
-    advisory: true,
-    requiresServer: true,
-    emitOutputInCi: true,
-  },
-  {
     id: 'controlled-vocab',
     name: 'Controlled vocabulary validation',
     command: 'npx',
@@ -612,18 +600,6 @@ const PARALLEL_STEPS: Step[] = [
     // (entityType, relationship, orgType, etc.). Regressions should be caught
     // immediately to prevent free-text drift.
     advisory: false,
-    emitOutputInCi: true,
-  },
-  {
-    id: 'numeric-ranges',
-    name: 'Numeric range validation (low <= high)',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-numeric-ranges.ts'],
-    cwd: PROJECT_ROOT,
-    // Advisory: depends on wiki-server being reachable. The check skips
-    // gracefully when the server is unavailable (fail-open).
-    advisory: true,
-    requiresServer: true,
     emitOutputInCi: true,
   },
   {

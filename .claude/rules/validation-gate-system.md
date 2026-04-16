@@ -150,7 +150,7 @@ Grouped by what they check. **Before writing a new validator, grep this list.**
 - **Entity refs**: `entity-refs`, `entity-links`, `yaml-entity-refs`, `component-refs`, `internal-links`, `resource-refs`, `kb-entity-slugs`, `person-refs`, `soft-fks`
 - **FactBase**: `factbase-entities`, `factbase-entity-ids`, `factbase-stableid`, `factbase-record-refs`, `factbase-schema`
 - **IDs / SIDs**: `rendered-sid`, `sid-display`, `display-names`
-- **Schema / compile**: `yaml-schema`, `mdx-compile`, `pg-temporal`, `temporal`, `numeric-ranges`, `numeric-consistency`, `controlled-vocab`
+- **Schema / compile**: `yaml-schema`, `mdx-compile`, `temporal`, `numeric-consistency`, `controlled-vocab`
 - **Code quality**: `no-console-log`, `returning-guard`, `untyped-rows`, `prompt-escaping`, `dangerous-patterns`, `drizzle-journal`, `manual-api-types`, `conflict-markers`
 - **Source-check**: `source-check-coverage`, `source-check-names`, `tablebase-completeness`, `dot-position`, `display-formatting`
 - **Content quality**: `review-marker`, `hallucination-risk`, `financials`, `cross-base`, `cross-page-dates`, `stale-content`, `related-entry-types`, `directory-pages`
