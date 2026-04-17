@@ -18,7 +18,6 @@ import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
-import { isSid } from "@longterm-wiki/id-utils";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -261,7 +260,7 @@ function seedFromWikiCitations(
     for (const resourceId of resourceIds) {
       // pageResources may contain either hex16 (legacy build-data.mjs
       // output) or sid_-prefixed IDs, depending on when it was built.
-      const translated = isSid(resourceId)
+      const translated = resourceId.startsWith("sid_")
         ? resourceId
         : hexToStableId.get(resourceId);
       if (!translated) {
