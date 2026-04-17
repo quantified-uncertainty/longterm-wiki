@@ -66,6 +66,11 @@ const SyncItemSchema = z.object({
   id: z.string().length(10),
   entityId: z.string().min(1).max(200),
   entityDisplayName: z.string().max(500).nullable().optional(),
+  // QUA-564 Phase B.1: publications.resource_id now FKs to resources.stable_id.
+  // Callers must pass sid_-prefixed stable_ids, not legacy hex16 resources.id
+  // values. No translation layer here — no current caller populates this field
+  // (data/publications.yaml has zero resourceId entries). A future caller that
+  // provides hex16 will hit a clear FK violation at insert time.
   resourceId: z.string().max(200).nullable().optional(),
   title: z.string().min(1).max(2000),
   authors: z.string().max(5000).nullable().optional(),
