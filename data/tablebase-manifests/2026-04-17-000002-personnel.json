@@ -1,0 +1,37 @@
+{
+  "table": "personnel",
+  "recordCount": 20,
+  "submittedAt": "2026-04-17T00:00:02.000Z",
+  "verificationSummary": {
+    "withVerification": 0,
+    "withoutVerification": 20,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {"id":"cUBuGq03Jv","personId":"sid_e6c93VvfY3","organizationId":"sid_LBr3ocKKyQ","role":"Infrastructure Advisor and AI Safety Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"oVjsV7jsYf","personId":"0no7qnn6xQ","organizationId":"sid_LBr3ocKKyQ","role":"EA Funds Financial Infrastructure","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"ujzyaG4dkc","personId":"0VJbF1fDcV","organizationId":"sid_LBr3ocKKyQ","role":"EA Funds Financial Infrastructure","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"1xXbh9VZ5e","personId":"JywhZHrXWN","organizationId":"sid_LBr3ocKKyQ","role":"EA Funds Financial Infrastructure","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"zPQhhXMaDB","personId":"zchWKCsV9V","organizationId":"sid_LBr3ocKKyQ","role":"EA Funds Financial Infrastructure","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"Rsuzg97B9h","personId":"OaBqku9uoK","organizationId":"sid_LBr3ocKKyQ","role":"Long-Term Future Fund AI Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"vFJ4Oz9xKJ","personId":"nofWRqL7zw","organizationId":"sid_LBr3ocKKyQ","role":"Manifund Administrator and Generalist Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"8dDcKjgqr7","personId":"1GPpP7T5bu","organizationId":"sid_LBr3ocKKyQ","role":"Manifund Administrator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"kNijE7n6HL","personId":"ZNhQhscS53","organizationId":"sid_LBr3ocKKyQ","role":"Manifund Administrator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"0VSjLjg8Fv","personId":"EdlYahDrLi","organizationId":"sid_LBr3ocKKyQ","role":"General Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"GTVu0Y4aAr","personId":"i9R1Fj98nT","organizationId":"sid_LBr3ocKKyQ","role":"General Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"I4YIqq1gv4","personId":"CbEmMK51mo","organizationId":"sid_LBr3ocKKyQ","role":"Biology Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"pbWkwGHV26","personId":"Xm3HOnf53m","organizationId":"sid_LBr3ocKKyQ","role":"Biology Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"6R950EijmG","personId":"5DaYrYCwhN","organizationId":"sid_LBr3ocKKyQ","role":"Global Health and Development Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"},
+    {"id":"CxCgpW72b2","personId":"QDnJQS75rT","organizationId":"sid_LBr3ocKKyQ","role":"Animal Welfare Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"u8RLnPtEaB","personId":"IE3I9jEzGY","organizationId":"sid_LBr3ocKKyQ","role":"Science and Progress Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"91Wmz3hpSv","personId":"RcqlstSrEk","organizationId":"sid_LBr3ocKKyQ","role":"Forecasting Evaluator","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"GkFQ3sOar8","personId":"sid_zaRXTCXPPk","organizationId":"sid_LBr3ocKKyQ","role":"External Consultant (AI Safety)","source":"https://www.astralcodexten.com/p/acx-grants-results-2025","verdict":"none"},
+    {"id":"7MqRndNMSc","personId":"nLAv9JlB7a","organizationId":"sid_LBr3ocKKyQ","role":"External Advisor","source":"https://www.astralcodexten.com/p/acx-grants-results","verdict":"none"},
+    {"id":"rOlbvlETSR","personId":"sid_6gjF5d3geg","organizationId":"sid_LBr3ocKKyQ","role":"External Advisor","source":"https://www.astralcodexten.com/p/acx-grants-results-2024","verdict":"none"}
+  ]
+}
