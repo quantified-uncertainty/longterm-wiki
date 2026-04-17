@@ -1,0 +1,349 @@
+/**
+ * QUA-561 — One-shot resource dedup logic.
+ *
+ * Finds rows in the `resources` table whose URLs collapse to the same
+ * canonical key under `normalizeUrl` (QUA-341). For each duplicate cluster,
+ * selects a canonical row (most FK references → earliest created_at →
+ * smallest id), rewrites every FK pointing at the cluster's non-canonical
+ * rows, and deletes them. Each cluster is merged inside its own transaction.
+ *
+ * FK columns are discovered at runtime from information_schema. Columns that
+ * participate in a PK/UNIQUE constraint (e.g. resource_papers.resource_id as
+ * a PK, or resource_citations (resource_id, page_id)) are handled carefully:
+ * cluster rows that would collide with canonical's existing rows after the
+ * UPDATE are deleted first so the UPDATE cannot raise a unique violation.
+ */
+
+import type { Sql, CallableTransactionSql } from "../../db.js";
+import { beginTransaction } from "../../db.js";
+import { normalizeUrl } from "@longterm-wiki/url-utils";
+
+// ---------------------------------------------------------------------------
+// Types
+// ---------------------------------------------------------------------------
+
+export interface FkColumnInfo {
+  tableName: string;
+  columnName: string;
+  /** PK/UNIQUE constraints on this table that include columnName. otherCols
+   *  is the set of columns in the constraint besides columnName. Empty
+   *  otherCols means this column alone must be unique. */
+  uniqueGroups: { otherCols: string[] }[];
+}
+
+export interface ResourceCandidate {
+  id: string;
+  url: string;
+  createdAt: string;
+  refCount: number;
+}
+
+export interface DedupCluster {
+  normalizedUrl: string;
+  canonical: ResourceCandidate;
+  duplicates: ResourceCandidate[];
+}
+
+export interface DedupReport {
+  totalResources: number;
+  fkColumns: FkColumnInfo[];
+  clusters: DedupCluster[];
+}
+
+export interface ClusterMergeResult {
+  canonicalId: string;
+  duplicateIds: string[];
+  fkUpdates: Record<string, { moved: number; deletedOnConflict: number }>;
+  resourcesDeleted: number;
+}
+
+// ---------------------------------------------------------------------------
+// Pure helpers
+// ---------------------------------------------------------------------------
+
+/** Canonical dedup key for grouping resources. */
+export function dedupKey(url: string): string {
+  return normalizeUrl(url, { stripProtocol: true, lowercasePath: true });
+}
+
+/**
+ * Pick the canonical row from a cluster.
+ *   1. highest refCount
+ *   2. earliest createdAt (ISO string compare)
+ *   3. smallest id (lexicographic)
+ */
+export function pickCanonical<
+  T extends { refCount: number; createdAt: string; id: string },
+>(rows: T[]): T {
+  if (rows.length === 0) throw new Error("pickCanonical: empty cluster");
+  return [...rows].sort((a, b) => {
+    if (a.refCount !== b.refCount) return b.refCount - a.refCount;
+    if (a.createdAt !== b.createdAt) return a.createdAt < b.createdAt ? -1 : 1;
+    return a.id < b.id ? -1 : a.id > b.id ? 1 : 0;
+  })[0];
+}
+
+/** Guard against SQL injection via dynamic identifiers. FK metadata comes
+ *  from information_schema but defense-in-depth is cheap. */
+export function validateIdent(name: string): void {
+  if (!/^[a-zA-Z_][a-zA-Z0-9_]*$/.test(name)) {
+    throw new Error(`Invalid SQL identifier: ${JSON.stringify(name)}`);
+  }
+}
+
+function q(name: string): string {
+  validateIdent(name);
+  return `"${name}"`;
+}
+
+/** Dedupe FK metadata by (table, column). A column can be referenced by more
+ *  than one FK constraint (e.g. page_citations.resource_id has two). */
+export function dedupeFkColumns(fks: FkColumnInfo[]): FkColumnInfo[] {
+  const seen = new Map<string, FkColumnInfo>();
+  for (const f of fks) {
+    const key = `${f.tableName}.${f.columnName}`;
+    if (!seen.has(key)) seen.set(key, f);
+  }
+  return [...seen.values()];
+}
+
+// ---------------------------------------------------------------------------
+// Discovery + report
+// ---------------------------------------------------------------------------
+
+export async function loadResourceFks(sql: Sql): Promise<FkColumnInfo[]> {
+  const fkRows = await sql<{ table_name: string; column_name: string }[]>`
+    SELECT DISTINCT tc.table_name, kcu.column_name
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_name = kcu.constraint_name
+      AND tc.table_schema = kcu.table_schema
+    JOIN information_schema.constraint_column_usage ccu
+      ON tc.constraint_name = ccu.constraint_name
+      AND tc.table_schema = ccu.table_schema
+    WHERE tc.constraint_type = 'FOREIGN KEY'
+      AND ccu.table_name = 'resources'
+      AND ccu.column_name = 'id'
+      AND tc.table_schema = 'public'
+    ORDER BY tc.table_name, kcu.column_name
+  `;
+  if (fkRows.length === 0) return [];
+
+  const tableNames = [...new Set(fkRows.map((f) => f.table_name))];
+  const uniqueRows = await sql<{ table_name: string; columns: string[] }[]>`
+    SELECT tc.table_name,
+      array_agg(kcu.column_name ORDER BY kcu.ordinal_position) AS columns
+    FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_name = kcu.constraint_name
+      AND tc.table_schema = kcu.table_schema
+    WHERE tc.constraint_type IN ('PRIMARY KEY', 'UNIQUE')
+      AND tc.table_schema = 'public'
+      AND tc.table_name = ANY(${tableNames})
+    GROUP BY tc.table_name, tc.constraint_name
+  `;
+
+  const uniqueByTable = new Map<string, { columns: string[] }[]>();
+  for (const u of uniqueRows) {
+    const list = uniqueByTable.get(u.table_name) ?? [];
+    list.push({ columns: u.columns });
+    uniqueByTable.set(u.table_name, list);
+  }
+
+  return fkRows.map((fk) => {
+    const uniques = uniqueByTable.get(fk.table_name) ?? [];
+    const uniqueGroups = uniques
+      .filter((u) => u.columns.includes(fk.column_name))
+      .map((u) => ({ otherCols: u.columns.filter((c) => c !== fk.column_name) }));
+    return { tableName: fk.table_name, columnName: fk.column_name, uniqueGroups };
+  });
+}
+
+export async function buildReport(sql: Sql): Promise<DedupReport> {
+  const fkColumns = await loadResourceFks(sql);
+  const uniqueCols = dedupeFkColumns(fkColumns);
+
+  const rows = await sql<{ id: string; url: string; created_at: string }[]>`
+    SELECT id, url, created_at::text AS created_at FROM resources
+  `;
+
+  type Row = { id: string; url: string; createdAt: string };
+  const groups = new Map<string, Row[]>();
+  for (const r of rows) {
+    const key = dedupKey(r.url);
+    const list = groups.get(key);
+    if (list) list.push({ id: r.id, url: r.url, createdAt: r.created_at });
+    else groups.set(key, [{ id: r.id, url: r.url, createdAt: r.created_at }]);
+  }
+
+  const candidateIds = new Set<string>();
+  for (const rs of groups.values()) {
+    if (rs.length >= 2) for (const r of rs) candidateIds.add(r.id);
+  }
+
+  const refCounts = new Map<string, number>();
+  if (candidateIds.size > 0) {
+    const idsArr = [...candidateIds];
+    for (const fk of uniqueCols) {
+      const results = await sql.unsafe<{ id: string; c: number | string }[]>(
+        `SELECT ${q(fk.columnName)} AS id, COUNT(*)::int AS c
+         FROM ${q(fk.tableName)}
+         WHERE ${q(fk.columnName)} = ANY($1::text[])
+         GROUP BY ${q(fk.columnName)}`,
+        [idsArr]
+      );
+      for (const row of results) {
+        refCounts.set(row.id, (refCounts.get(row.id) ?? 0) + Number(row.c));
+      }
+    }
+  }
+
+  const clusters: DedupCluster[] = [];
+  for (const [key, rs] of groups) {
+    if (rs.length < 2) continue;
+    const candidates: ResourceCandidate[] = rs.map((r) => ({
+      id: r.id,
+      url: r.url,
+      createdAt: r.createdAt,
+      refCount: refCounts.get(r.id) ?? 0,
+    }));
+    const canonical = pickCanonical(candidates);
+    const duplicates = candidates.filter((c) => c.id !== canonical.id);
+    clusters.push({ normalizedUrl: key, canonical, duplicates });
+  }
+
+  clusters.sort((a, b) => {
+    if (a.duplicates.length !== b.duplicates.length)
+      return b.duplicates.length - a.duplicates.length;
+    return a.normalizedUrl < b.normalizedUrl ? -1 : 1;
+  });
+
+  return { totalResources: rows.length, fkColumns, clusters };
+}
+
+// ---------------------------------------------------------------------------
+// Per-cluster merge
+// ---------------------------------------------------------------------------
+
+/**
+ * Merge one cluster: rewrite FKs on the duplicates to point at canonical,
+ * then delete the duplicates. Must run inside a transaction — the caller is
+ * responsible for `sql.begin()` / `beginTransaction()`.
+ *
+ * Accepts CallableTransactionSql (from beginTransaction) for production use.
+ * Tests may pass the root Sql client cast through this type since a
+ * postgres.js root client is structurally compatible (tagged-template +
+ * `.unsafe`) with the transaction interface at runtime.
+ */
+export async function mergeCluster(
+  tx: CallableTransactionSql,
+  canonicalId: string,
+  duplicateIds: string[],
+  fkColumns: FkColumnInfo[]
+): Promise<ClusterMergeResult> {
+  const fkUpdates: ClusterMergeResult["fkUpdates"] = {};
+  if (duplicateIds.length === 0) {
+    return { canonicalId, duplicateIds, fkUpdates, resourcesDeleted: 0 };
+  }
+
+  const uniqueCols = dedupeFkColumns(fkColumns);
+  const allIds = [canonicalId, ...duplicateIds];
+
+  for (const fk of uniqueCols) {
+    const key = `${fk.tableName}.${fk.columnName}`;
+    fkUpdates[key] = { moved: 0, deletedOnConflict: 0 };
+
+    // For each unique constraint involving this column, delete cluster rows
+    // that would collide with canonical's existing rows post-UPDATE. Prefer
+    // keeping canonical's row; tiebreak by ctid (physical order).
+    for (const group of fk.uniqueGroups) {
+      const partition =
+        group.otherCols.length > 0
+          ? `PARTITION BY ${group.otherCols.map(q).join(", ")}`
+          : "";
+      const deleteSql = `
+        WITH ranked AS (
+          SELECT ctid,
+            ROW_NUMBER() OVER (
+              ${partition}
+              ORDER BY (${q(fk.columnName)} = $1) DESC, ctid ASC
+            ) AS rn
+          FROM ${q(fk.tableName)}
+          WHERE ${q(fk.columnName)} = ANY($2::text[])
+        )
+        DELETE FROM ${q(fk.tableName)} t
+        USING ranked r
+        WHERE t.ctid = r.ctid AND r.rn > 1
+        RETURNING t.ctid
+      `;
+      const deleted = await tx.unsafe<{ ctid: unknown }[]>(deleteSql, [
+        canonicalId,
+        allIds,
+      ]);
+      fkUpdates[key].deletedOnConflict += deleted.length;
+    }
+
+    const updateSql = `
+      UPDATE ${q(fk.tableName)}
+      SET ${q(fk.columnName)} = $1
+      WHERE ${q(fk.columnName)} = ANY($2::text[])
+      RETURNING 1
+    `;
+    const moved = await tx.unsafe<{ "?column?": number }[]>(updateSql, [
+      canonicalId,
+      duplicateIds,
+    ]);
+    fkUpdates[key].moved += moved.length;
+  }
+
+  const deletedResources = await tx<{ id: string }[]>`
+    DELETE FROM resources WHERE id = ANY(${duplicateIds}) RETURNING id
+  `;
+
+  return {
+    canonicalId,
+    duplicateIds,
+    fkUpdates,
+    resourcesDeleted: deletedResources.length,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Orchestration
+// ---------------------------------------------------------------------------
+
+export interface RunDedupResult {
+  apply: boolean;
+  report: DedupReport;
+  merges: ClusterMergeResult[];
+  errors: { canonicalId: string; duplicateIds: string[]; message: string }[];
+}
+
+/**
+ * Scan, pick canonicals, and (optionally) apply merges.
+ */
+export async function runDedup(sql: Sql, apply: boolean): Promise<RunDedupResult> {
+  const report = await buildReport(sql);
+  const merges: ClusterMergeResult[] = [];
+  const errors: RunDedupResult["errors"] = [];
+
+  if (!apply) return { apply, report, merges, errors };
+
+  for (const cluster of report.clusters) {
+    const dupIds = cluster.duplicates.map((d) => d.id);
+    try {
+      const result = await beginTransaction((tx) =>
+        mergeCluster(tx, cluster.canonical.id, dupIds, report.fkColumns)
+      );
+      merges.push(result);
+    } catch (err) {
+      errors.push({
+        canonicalId: cluster.canonical.id,
+        duplicateIds: dupIds,
+        message: err instanceof Error ? err.message : String(err),
+      });
+    }
+  }
+
+  return { apply, report, merges, errors };
+}
