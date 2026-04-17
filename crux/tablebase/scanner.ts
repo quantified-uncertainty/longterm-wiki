@@ -881,14 +881,7 @@ const PG_FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   ],
 };
 
-// ---------------------------------------------------------------------------
-// YAML entity catalogs (concepts, risks, capabilities, ...)
-//
-// Unlike the PG-backed tables above, these live in data/entities/*.yaml and
-// are loaded directly from disk. The field-gap scan treats each row the same
-// way regardless of source. Added by QUA-571 to unblock the YAML-catalog
-// enrichment thread (QUA-23, and analogous risk/capability tickets).
-// ---------------------------------------------------------------------------
+// YAML entity catalogs — loaded from data/entities/*.yaml (no PG backing).
 
 interface YamlCatalogConfig {
   /** Path relative to PROJECT_ROOT. */
@@ -896,41 +889,22 @@ interface YamlCatalogConfig {
   fields: FieldConfig[];
 }
 
+// Shape-universal fields present on every entity YAML — will gain new fields
+// for all catalogs simultaneously, so extracted rather than repeated per-type.
+const YAML_CATALOG_DEFAULT_FIELDS: FieldConfig[] = [
+  { field: 'sources', columnType: 'list' },
+  { field: 'relatedEntries', columnType: 'list' },
+  { field: 'description', columnType: 'string' },
+];
+
 const YAML_CATALOG_CONFIGS: Record<string, YamlCatalogConfig> = {
-  concepts: {
-    file: 'data/entities/concepts.yaml',
-    fields: [
-      { field: 'sources', columnType: 'list' },
-      { field: 'relatedEntries', columnType: 'list' },
-      { field: 'description', columnType: 'string' },
-    ],
-  },
-  risks: {
-    file: 'data/entities/risks.yaml',
-    fields: [
-      { field: 'sources', columnType: 'list' },
-      { field: 'relatedEntries', columnType: 'list' },
-      { field: 'description', columnType: 'string' },
-    ],
-  },
-  capabilities: {
-    file: 'data/entities/capabilities.yaml',
-    fields: [
-      { field: 'sources', columnType: 'list' },
-      { field: 'relatedEntries', columnType: 'list' },
-      { field: 'description', columnType: 'string' },
-    ],
-  },
+  concepts:     { file: 'data/entities/concepts.yaml',     fields: YAML_CATALOG_DEFAULT_FIELDS },
+  risks:        { file: 'data/entities/risks.yaml',        fields: YAML_CATALOG_DEFAULT_FIELDS },
+  capabilities: { file: 'data/entities/capabilities.yaml', fields: YAML_CATALOG_DEFAULT_FIELDS },
 };
 
 export const YAML_CATALOG_TABLES = Object.keys(YAML_CATALOG_CONFIGS);
 
-/**
- * Unified field-gap config map — PG tables + YAML catalogs. Assembled once
- * here, so `FIELD_GAP_TABLES` below sees the full set. No runtime mutation;
- * the resulting object shape is a function of the two config declarations
- * above, nothing more.
- */
 const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   ...PG_FIELD_GAP_CONFIGS,
   ...Object.fromEntries(
@@ -1036,22 +1010,23 @@ async function fetchTableRows(table: string): Promise<RawRow[]> {
 
 /**
  * Load rows from a YAML entity catalog file (e.g. data/entities/concepts.yaml).
- * Returns [] with a warning if the file is missing or malformed so a broken
- * YAML file can't silently break the whole scan. Rows missing an `id` are
- * skipped — profileFields<T extends { id: string }> requires one.
+ * Returns [] with a warning on any failure (missing, malformed, wrong shape)
+ * so a broken file can't silently break the whole scan. Rows without a
+ * non-empty string `id` are skipped — profileFields<T extends { id: string }>
+ * requires one.
  */
 export function loadYamlCatalogRows(relativePath: string): RawRow[] {
   const fullPath = join(PROJECT_ROOT, relativePath);
-  if (!existsSync(fullPath)) {
-    console.warn(`[tablebase scanner] YAML catalog file not found: ${relativePath}`);
-    return [];
-  }
   let parsed: unknown;
   try {
     parsed = parseYaml(readFileSync(fullPath, 'utf-8'));
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    console.warn(`[tablebase scanner] failed to parse ${relativePath}: ${msg}`);
+    if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') {
+      console.warn(`[tablebase scanner] YAML catalog file not found: ${relativePath}`);
+    } else {
+      console.warn(`[tablebase scanner] failed to parse ${relativePath}: ${msg}`);
+    }
     return [];
   }
   if (!Array.isArray(parsed)) {

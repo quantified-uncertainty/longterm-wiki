@@ -124,10 +124,7 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
       );
     }
 
-    // YAML catalogs (concepts, risks, capabilities) have no per-entity PG
-    // scan — field-gap is the only meaningful scan for them. Skip runTableScan
-    // (which would return null and fail out) and emit the field-gap report
-    // directly. QUA-571.
+    // YAML catalogs only support --fields (no per-entity PG scan).
     if (isYamlCatalog) {
       if (!wantsFields) {
         return {

@@ -354,7 +354,7 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
     });
 
     const reports = await runFieldGapScan();
-    // 4 PG tables (QUA-551) + 3 YAML catalogs (QUA-571) = 7 reports.
+    // 4 PG tables + 3 YAML catalogs = 7 reports.
     expect(reports.length).toBe(7);
     const byTable = Object.fromEntries(reports.map(r => [r.table, r]));
     expect(byTable.divisions.totalRows).toBe(2);
