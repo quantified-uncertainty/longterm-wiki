@@ -449,11 +449,16 @@ const agentSessionsApp = new Hono()
     // (async SessionEnd hook) and frequently doesn't run; without this fallback,
     // swept rows end up with status=completed but date=null and drop out of any
     // date-filtered query (retrospective, /internal/page-changes, etc).
+    // Note: unlike the PATCH handler, this sweep does NOT require title/summary
+    // before setting status='completed'. Swept rows may therefore have
+    // title=null / summary=null. Downstream consumers of status='completed' must
+    // tolerate nulls in those fields (the retrospective tool already does).
+    const now = new Date();
     const stale = await db.update(agentSessions)
       .set({
         status: "completed",
-        completedAt: new Date(),
-        updatedAt: new Date(),
+        completedAt: now,
+        updatedAt: now,
         date: sql`COALESCE(${agentSessions.date}, ${agentSessions.startedAt}::date)`,
       })
       .where(and(eq(agentSessions.status, "active"), lt(agentSessions.updatedAt, cutoff)))
