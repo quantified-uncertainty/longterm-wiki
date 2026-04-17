@@ -14,5 +14,12 @@ facts:
         value: University of Oulu; University of Edinburgh,
         source: https://www.wikidata.org/wiki/Q524579,
         notes: From Wikidata Q524579
+      },
+    {
+        id: f_Mg0POGyaOw,
+        property: wikipedia-url,
+        value: https://en.wikipedia.org/wiki/Hannu_Rajaniemi,
+        source: https://www.wikidata.org/wiki/Q524579,
+        notes: From Wikidata Q524579
       }
   ]

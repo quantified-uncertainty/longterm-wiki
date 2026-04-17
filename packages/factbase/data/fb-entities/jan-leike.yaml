@@ -4,14 +4,40 @@ facts:
     property: education
     value: "PhD in Machine Learning, Australian National University"
     source: https://jan.leike.name/
-    notes: "PhD supervised by Marcus Hutter; research on universal reinforcement learning"
+    notes: "PhD supervised by Marcus Hutter; research on universal reinforcement
+      learning"
 
   - id: f_jL4fG5hI6j
     property: notable-for
-    value: "VP of Alignment Science at Anthropic; former co-lead of OpenAI Superalignment team; prominent advocate for AI safety resource allocation"
+    value: "VP of Alignment Science at Anthropic; former co-lead of OpenAI
+      Superalignment team; prominent advocate for AI safety resource allocation"
     source: https://en.wikipedia.org/wiki/Jan_Leike
 
   - id: f_jL7kL8mN9o
     property: social-media
     value: "@janleike"
     source: https://x.com/janleike
+  - id: f_yn1d2BADOw
+    property: website
+    value: https://jan.leike.name/
+    source: https://www.wikidata.org/wiki/Q123130693
+    notes: From Wikidata Q123130693
+  - id: f_DifUNoifXg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Jan_Leike
+    source: https://www.wikidata.org/wiki/Q123130693
+    notes: From Wikidata Q123130693
+  - id: f_qdvJAWaYJg
+    property: description
+    value: German AI safety researcher; VP of Alignment Science at Anthropic since
+      2024 after leaving OpenAI, where he co-led the Superalignment team with
+      Ilya Sutskever. His research focuses on scalable oversight, recursive
+      reward modeling, and AI alignment. Prominent public voice on AI safety
+      resource allocation.
+    asOf: 2026-04
+    source: https://en.wikipedia.org/wiki/Jan_Leike
+  - id: f_9hQAFolmjQ
+    property: role
+    value: VP of Alignment Science, Anthropic
+    asOf: 2024-05
+    source: https://jan.leike.name/

@@ -18,13 +18,20 @@
 export const REPO = 'quantified-uncertainty/longterm-wiki';
 
 /**
+ * Short one-liner for display summaries ("GITHUB_TOKEN not set"). Kept in one
+ * place so the ~7 display call sites (health-check / pr-quality / ci-main-health
+ * summaries, wellness-report warning, github-lookup error, pr-patrol index
+ * errors, pr-patrol parallel error log) don't drift from each other.
+ */
+export const MISSING_TOKEN_SUMMARY = 'GITHUB_TOKEN not set';
+
+/**
  * Canonical help message for every code path that wants to tell the user
- * how to set `GITHUB_TOKEN`. Kept in one place so the 7+ display call sites
- * (health-check summaries, wellness-report, pr-quality, ci-main-health,
- * github-lookup, pr-patrol index/parallel) don't drift from each other.
+ * how to set `GITHUB_TOKEN`. Derived from `MISSING_TOKEN_SUMMARY` so the short
+ * and long forms cannot drift.
  */
 export const MISSING_TOKEN_HELP_MESSAGE =
-  'GITHUB_TOKEN not set. Required for GitHub API calls.\n' +
+  `${MISSING_TOKEN_SUMMARY}. Required for GitHub API calls.\n` +
   'Set it with: export GITHUB_TOKEN=<your-token>';
 
 /**

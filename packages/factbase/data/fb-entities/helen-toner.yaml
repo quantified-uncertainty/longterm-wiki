@@ -21,7 +21,10 @@ facts:
     notes: From Wikidata Q123475976
   - id: f_hT6tN2pQ4v
     property: notable-for
-    value: "Former OpenAI board member who voted to remove Sam Altman in November 2023; Interim Executive Director of Georgetown CSET; TIME 100 Most Influential People in AI 2024; expertise in US-China AI competition and AI governance"
+    value: "Former OpenAI board member who voted to remove Sam Altman in November
+      2023; Interim Executive Director of Georgetown CSET; TIME 100 Most
+      Influential People in AI 2024; expertise in US-China AI competition and AI
+      governance"
     asOf: 2026-03
     notes: Enriched from wiki page
   - id: f_hTcY8fL0kA
@@ -31,5 +34,16 @@ facts:
 
   - id: f_hTfB4gN2mD
     property: education
-    value: "BSc Chemical Engineering, University of Melbourne (2014); MA Security Studies, Georgetown University (2021)"
+    value: "BSc Chemical Engineering, University of Melbourne (2014); MA Security
+      Studies, Georgetown University (2021)"
     notes: Enriched from wiki page
+  - id: f_hIjXQlR0lQ
+    property: website
+    value: https://cset.georgetown.edu/staff/helen-toner/
+    source: https://www.wikidata.org/wiki/Q123475976
+    notes: From Wikidata Q123475976
+  - id: f_CXwz9m0lLw
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Helen_Toner
+    source: https://www.wikidata.org/wiki/Q123475976
+    notes: From Wikidata Q123475976

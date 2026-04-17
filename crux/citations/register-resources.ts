@@ -15,7 +15,7 @@ import { readFileSync } from 'fs';
 import { basename } from 'path';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
-import { hashId, guessResourceType, buildUrlToResourceMap } from '../resource-utils.ts';
+import { hashId, guessResourceType, buildUrlToResourceMap, lookupResourceByUrl } from '../resource-utils.ts';
 import { loadResources, saveResources } from '../resource-io.ts';
 import { parseFootnoteSources } from '../lib/footnote-parser.ts';
 import { getCitationContentByUrl } from '../lib/wiki-server/citations.ts';
@@ -113,12 +113,7 @@ async function main() {
         continue;
       }
 
-      // Check if URL is already in our lookup (with normalization)
-      const hasEntry = urlToResource.has(source.url) ||
-        urlToResource.has(source.url.replace(/\/$/, '')) ||
-        urlToResource.has(source.url.replace(/\/$/, '') + '/');
-
-      if (hasEntry) {
+      if (lookupResourceByUrl(urlToResource, source.url)) {
         alreadyRegistered++;
         continue;
       }

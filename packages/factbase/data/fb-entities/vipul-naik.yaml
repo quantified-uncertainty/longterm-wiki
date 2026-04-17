@@ -44,4 +44,10 @@ facts:
     property: website
     value: https://vipulnaik.com/
     source: https://www.wikidata.org/wiki/Q102535772
-    notes: "Personal website; Wikidata lists this as official site (start Dec 2013). Old CMI page (cmi.ac.in/~vipul/) is outdated."
+    notes: "Personal website; Wikidata lists this as official site (start Dec 2013).
+      Old CMI page (cmi.ac.in/~vipul/) is outdated."
+  - id: f_0OaBG9NAbQ
+    property: website
+    value: http://www.cmi.ac.in/~vipul/
+    source: https://www.wikidata.org/wiki/Q102535772
+    notes: From Wikidata Q102535772

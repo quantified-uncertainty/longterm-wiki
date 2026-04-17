@@ -63,7 +63,7 @@ The PG `things` table is the **cross-base universal search index** — it fans i
 
 ## When in doubt — the decision tree
 
-1. **Does it have numeric fields to aggregate, many-to-many relationships, or its own directory page?** → **PG-primary TableBase** table (grants, investments, benchmarks pattern). See `.claude/rules/entity-sync-pipeline.md`.
+1. **Does it have numeric fields to aggregate, many-to-many relationships, or its own directory page?** → **PG-primary TableBase** table (grants, investments, benchmarks pattern). See `.claude/rules/tablebase-sync-factory.md`.
 2. **Is it a structured fact about an existing entity (revenue, CEO, headcount, valuation)?** → **FactBase** YAML (`packages/factbase/data/fb-entities/<entity>.yaml`).
 3. **Is it a lightweight catalog entry used as a link target (a concept, a risk, a minor person)?** → **YAML entity** in `data/entities/*.yaml`.
 4. **Is it long-form prose?** → **WikiBase** MDX in `content/docs/`.
@@ -73,5 +73,5 @@ The PG `things` table is the **cross-base universal search index** — it fans i
 ## Read this too
 
 - Full architecture doc: `content/docs/internal/data-architecture.mdx` (E1334) — authoritative
-- Entity-sync plumbing: `.claude/rules/entity-sync-pipeline.md`
+- Entity-sync plumbing: `.claude/rules/tablebase-sync-factory.md`
 - Source-check/verdicts: `.claude/rules/source-check-system.md`

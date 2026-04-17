@@ -17,6 +17,7 @@ import { sourceSnapshots, resources, resourceTabularSources } from "../../schema
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { generateId } from "@longterm-wiki/factbase";
 
 // ---- Zod schemas ----
 
@@ -249,6 +250,9 @@ const dataSourcesApp = new Hono()
           type: "dataset",
           resourceSubtype: "tabular_source",
           publisherEntityId: body.publisherEntityId ?? null,
+          // QUA-536: NOT NULL on resources.stable_id means this INSERT must
+          // provide one. ON CONFLICT (url) keeps the existing stable_id.
+          stableId: generateId(),
         })
         .onConflictDoUpdate({
           target: resources.url,

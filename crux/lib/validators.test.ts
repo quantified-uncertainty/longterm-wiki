@@ -9,7 +9,6 @@ import { extractMetrics, suggestQuality, getQualityDiscrepancy } from './metrics
 describe('Validator scripts exist', () => {
   const validatorScripts: string[] = [
     'crux/validate/validate-data.ts',
-    'crux/validate/validate-internal-links.ts',
     'crux/validate/validate-consistency.ts',
     'crux/validate/check-staleness.ts',
     'crux/validate/validate-gate.ts',
@@ -224,7 +223,7 @@ describe('MDX syntax validation patterns', () => {
 });
 
 // =============================================================================
-// Link validation patterns (from validate-internal-links)
+// Link validation patterns
 // =============================================================================
 
 describe('Link validation patterns', () => {

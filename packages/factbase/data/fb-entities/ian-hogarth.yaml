@@ -2,7 +2,8 @@ entity: sid_DX4NK1gGtg
 facts:
   - id: f_fIpd1bJ2xg
     property: description
-    value: AI investor and writer; former Chair of the UK AI Safety Institute (2023-2025).
+    value: AI investor and writer; former Chair of the UK AI Safety Institute
+      (2023-2025).
     asOf: 2026-03
     notes: Stepped down as Chair in 2025
   - id: f_iH2nLw9pYr
@@ -13,5 +14,10 @@ facts:
   - id: f_Knt2LH5GjK
     property: education
     value: University of Cambridge; Beijing Language and Culture University
+    source: https://www.wikidata.org/wiki/Q14946860
+    notes: From Wikidata Q14946860
+  - id: f_SGZhfJvEAg
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Ian_Hogarth
     source: https://www.wikidata.org/wiki/Q14946860
     notes: From Wikidata Q14946860

@@ -23,6 +23,7 @@ const nextConfig: NextConfig = {
     "@quri/ui",
     "@longterm-wiki/factbase",
     "@longterm-wiki/id-utils",
+    "@longterm-wiki/url-utils",
   ],
   // Allow more time for static page generation in resource-constrained
   // environments (CI, cloud dev). Dashboard pages embedded via MDX make

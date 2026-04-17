@@ -6,5 +6,15 @@ facts:
 
   - id: f_y6ELYGnAGQ
     property: notable-for
-    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of the Import AI newsletter; AI policy advocate"
-
+    value: "Co-founder of Anthropic; former Policy Director at OpenAI; creator of
+      the Import AI newsletter; AI policy advocate"
+  - id: f_ImsORphD5g
+    property: website
+    value: https://jack-clark.net/
+    source: https://www.wikidata.org/wiki/Q135111322
+    notes: From Wikidata Q135111322
+  - id: f_jDL9bXdqCQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Jack_Clark_(AI_policy_expert)
+    source: https://www.wikidata.org/wiki/Q135111322
+    notes: From Wikidata Q135111322

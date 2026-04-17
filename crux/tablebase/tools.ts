@@ -102,7 +102,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
           properties: {
             table: {
               type: 'string',
-              enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'],
+              enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'divisions', 'division-personnel', 'funding-programs'],
               description: 'The table to query',
             },
             entityId: { type: 'string', description: 'Entity ID to query records for' },
@@ -129,7 +129,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
           properties: {
             table: {
               type: 'string',
-              enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'],
+              enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'divisions', 'division-personnel', 'funding-programs'],
               description: 'The table to write to',
             },
             records: {
@@ -160,7 +160,7 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
         input_schema: {
           type: 'object',
           properties: {
-            targetTable: { type: 'string', enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results'], description: 'The table these claims will eventually populate' },
+            targetTable: { type: 'string', enum: ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'divisions', 'division-personnel', 'funding-programs'], description: 'The table these claims will eventually populate' },
             claims: {
               type: 'array',
               description: 'Array of claims to verify. Each must have claimText and sourceUrl.',
@@ -527,10 +527,24 @@ async function handleSubmitRecords(
       deduped = await dedupInvestments(task.entityId, records );
       break;
     case 'benchmark-results':
-      deduped = await dedupBenchmarkResults(task.entityId, records );
+      if (task.taskType === 'benchmark-source-fill') {
+        // Update-only task: agent fills sourceUrl on existing records by id.
+        // Running dedup would drop every record (dedup matches on benchmarkId+modelId,
+        // which are exactly what the update targets).
+        deduped = records;
+      } else {
+        deduped = await dedupBenchmarkResults(task.entityId, records);
+      }
       break;
     case 'grants':
       // Grants are updated (granteeId backfill), not deduped
+      deduped = records;
+      break;
+    case 'divisions':
+    case 'division-personnel':
+    case 'funding-programs':
+      // Field-fill tasks (QUA-24): agent updates existing records by id.
+      // Dedup is not meaningful — sync handler upserts with COALESCE.
       deduped = records;
       break;
     default:
@@ -761,5 +775,9 @@ export function taskTypeToTable(taskType: TaskType): string {
     case 'investment-linking': return 'investments';
     case 'benchmark-result-fill': return 'benchmark-results';
     case 'source-discovery': return 'source_quality';
+    case 'division-lead-fill': return 'divisions';
+    case 'division-personnel-dates': return 'division-personnel';
+    case 'funding-program-enrichment': return 'funding-programs';
+    case 'benchmark-source-fill': return 'benchmark-results';
   }
 }

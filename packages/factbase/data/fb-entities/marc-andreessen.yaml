@@ -19,7 +19,9 @@ facts:
     notes: From Wikidata Q62882
   - id: f_mA6tN2pQ7v
     property: notable-for
-    value: "Co-created Mosaic web browser (1993); founded Netscape (sold to AOL for $4.2B); co-founded Andreessen Horowitz managing $90B+ in venture capital; techno-optimist AI advocate opposing safety regulation"
+    value: "Co-created Mosaic web browser (1993); founded Netscape (sold to AOL for
+      $4.2B); co-founded Andreessen Horowitz managing $90B+ in venture capital;
+      techno-optimist AI advocate opposing safety regulation"
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Marc_Andreessen
     notes: Enriched from wiki page
@@ -43,19 +45,22 @@ facts:
     source: https://a16z.com/the-techno-optimist-manifesto/
     notes: >-
       Published October 2023. Critiques EA, longtermism, and AI safety
-      regulation. Lists effective altruism and deceleration/safety
-      movements among ideologies opposed to techno-optimism.
+      regulation. Lists effective altruism and deceleration/safety movements
+      among ideologies opposed to techno-optimism.
 
   - id: f_mAeW9qM2xC
     property: political-positioning
     value: >-
-      Publicly supported Republican candidates and endorsed Trump
-      circa 2023-2024. This positioning, combined with the Techno-Optimist
-      Manifesto, increased tensions between a16z and EA/AI safety
-      communities.
+      Publicly supported Republican candidates and endorsed Trump circa
+      2023-2024. This positioning, combined with the Techno-Optimist Manifesto,
+      increased tensions between a16z and EA/AI safety communities.
     asOf: 2024-01
     source: https://en.wikipedia.org/wiki/Marc_Andreessen
     notes: >-
-      The a16z/EA conflict involves both political affiliation differences
-      and substantive disagreement on AI development pace and safety
-      regulation.
+      The a16z/EA conflict involves both political affiliation differences and
+      substantive disagreement on AI development pace and safety regulation.
+  - id: f_KrTmj3K5bQ
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Marc_Andreessen
+    source: https://www.wikidata.org/wiki/Q62882
+    notes: From Wikidata Q62882

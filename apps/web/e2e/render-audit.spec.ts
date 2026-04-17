@@ -86,6 +86,7 @@ const SIMPLE_PAGES = [
   "/wiki/E100",  // Anthropic wiki page
   "/wiki/E815",  // Anthropic Stakeholders — critical table page
   "/browse",
+  "/data-sources/ea-funds",  // Data source detail page (QUA-81)
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

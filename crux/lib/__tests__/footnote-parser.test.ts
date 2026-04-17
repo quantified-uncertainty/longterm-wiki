@@ -131,14 +131,28 @@ Claims about Kalshi.[^1] More claims.[^2] Even more.[^3]
     expect(sourceB!.footnoteNumbers).toEqual([3]);
   });
 
-  it("matches URLs to resource IDs when provided", () => {
+  it("matches URLs to resource IDs when provided (canonical keys, QUA-341)", () => {
     const content = `
 [^1]: [Example](https://example.com/page)
 `;
+    // The map must be keyed by canonical URL (run through
+    // normalizeUrl(url, { stripProtocol: true })) — see parseFootnoteSources docs.
     const urlToResourceId = new Map([
-      ["https://example.com/page", "abc123"],
+      ["example.com/page", "abc123"],
     ]);
     const result = parseFootnoteSources(content, urlToResourceId);
+    expect(result.sources[0].resourceId).toBe("abc123");
+  });
+
+  it("matches resource IDs across http/https/www variants (QUA-341)", () => {
+    const content = `
+[^1]: [A](http://example.com/page)
+[^2]: [B](https://www.example.com/page/)
+`;
+    const urlToResourceId = new Map([["example.com/page", "abc123"]]);
+    const result = parseFootnoteSources(content, urlToResourceId);
+    // Both footnotes dedup to the same source and both should resolve to abc123.
+    expect(result.sources).toHaveLength(1);
     expect(result.sources[0].resourceId).toBe("abc123");
   });
 

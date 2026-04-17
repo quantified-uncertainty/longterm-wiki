@@ -162,6 +162,33 @@ describe('urlMatches', () => {
   it('preserves path differences', () => {
     expect(urlMatches('https://anthropic.com/about', 'https://anthropic.com/team')).toBe(false);
   });
+
+  it('treats URLs that differ only in tracking params as matching (QUA-341)', () => {
+    // The canonical helper strips utm_/fbclid/etc. by default; this is a
+    // semantic widening vs. the pre-QUA-341 implementation, made explicit
+    // here as a regression guard.
+    expect(
+      urlMatches(
+        'https://anthropic.com/post?utm_source=twitter',
+        'https://anthropic.com/post',
+      ),
+    ).toBe(true);
+  });
+
+  it('treats URLs that differ only in fragment as matching (QUA-341)', () => {
+    // The pre-QUA-341 implementation would have returned false here because
+    // fragments were never stripped. Asserting the new behavior so any future
+    // revert needs to be explicit.
+    expect(
+      urlMatches('https://anthropic.com/post#section-1', 'https://anthropic.com/post'),
+    ).toBe(true);
+  });
+
+  it('treats malformed URLs case-insensitively in the fallback path', () => {
+    // Both inputs fail URL parsing, so they go through the
+    // trim+strip-trailing-slash+lowercase fallback. Old impl did not lowercase.
+    expect(urlMatches('NOT-A-URL', 'not-a-url')).toBe(true);
+  });
 });
 
 describe('parseAmount', () => {

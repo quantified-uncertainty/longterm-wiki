@@ -6,8 +6,10 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { buildSourceCache } from './research.ts';
+import { buildSourceCache, defaultMinSources, evaluateSourceGate } from './research.ts';
 import type { FetchedSource } from '../../../lib/search/source-fetcher.ts';
+import type { SourceCacheEntry } from '../../../lib/content/section-writer.ts';
+import { MIN_SOURCE_CONTENT_LENGTH } from '../../../lib/citation/citation-service.ts';
 
 function makeFetchedSource(overrides: Partial<FetchedSource> = {}): FetchedSource {
   return {
@@ -147,5 +149,166 @@ describe('buildSourceCache', () => {
 
     const cache = buildSourceCache(researchSources, fetched);
     expect(cache[0].content.length).toBe(5000);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────────────────────
+// QUA-315: source-coverage gate
+// ──────────────────────────────────────────────────────────────────────────────
+
+function makeUsableEntry(overrides: Partial<SourceCacheEntry> = {}): SourceCacheEntry {
+  return {
+    id: 'SRC-1',
+    url: 'https://example.com/a',
+    title: 'Article',
+    facts: [],
+    // Long enough to clear MIN_SOURCE_CONTENT_LENGTH (50 chars).
+    content: 'X'.repeat(MIN_SOURCE_CONTENT_LENGTH + 10),
+    ...overrides,
+  };
+}
+
+describe('defaultMinSources', () => {
+  it('returns 1 for the standard tier', () => {
+    expect(defaultMinSources(false)).toBe(1);
+  });
+  it('returns 3 for the deep tier', () => {
+    expect(defaultMinSources(true)).toBe(3);
+  });
+});
+
+describe('evaluateSourceGate', () => {
+  it('passes when usable sources meet the threshold', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [
+        makeUsableEntry({ id: 'SRC-1', url: 'https://a' }),
+        makeUsableEntry({ id: 'SRC-2', url: 'https://b' }),
+      ],
+      totalUrls: 2,
+      llmSourceCount: 2,
+      minSources: 2,
+    });
+    expect(result.passed).toBe(true);
+    expect(result.active).toBe(true);
+    expect(result.usableSources).toBe(2);
+    expect(result.cacheEntries).toBe(2);
+  });
+
+  it('fails when usable sources fall below the threshold', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [makeUsableEntry()],
+      totalUrls: 1,
+      llmSourceCount: 1,
+      minSources: 3,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.active).toBe(true);
+    expect(result.usableSources).toBe(1);
+    expect(result.diagnostic).toContain('1 usable source(s)');
+    expect(result.diagnostic).toContain('need at least 3');
+  });
+
+  it('fails when the cache is empty (the QUA-315 silent-failure case)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [],
+      totalUrls: 0,
+      llmSourceCount: 0,
+      minSources: 1,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.usableSources).toBe(0);
+    expect(result.cacheEntries).toBe(0);
+    expect(result.diagnostic).toContain('0 usable source(s)');
+  });
+
+  it('fails when sourceCache is undefined (fetchSources threw)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: undefined,
+      totalUrls: 5,
+      llmSourceCount: 5,
+      minSources: 1,
+    });
+    expect(result.passed).toBe(false);
+    expect(result.usableSources).toBe(0);
+    expect(result.cacheEntries).toBe(0);
+    // Diagnostic should still reflect that the LLM returned URLs even though caching failed.
+    expect(result.diagnostic).toContain('5 sources');
+    expect(result.diagnostic).toContain('5 HTTP URL(s)');
+  });
+
+  it('does NOT count entries with empty content (paywall/dead/short)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [
+        makeUsableEntry({ id: 'SRC-1', url: 'https://ok', content: 'X'.repeat(100) }),
+        makeUsableEntry({ id: 'SRC-2', url: 'https://paywall', content: '' }),
+        makeUsableEntry({ id: 'SRC-3', url: 'https://short', content: 'too short' }),
+      ],
+      totalUrls: 3,
+      llmSourceCount: 3,
+      minSources: 2,
+    });
+    expect(result.usableSources).toBe(1);
+    expect(result.cacheEntries).toBe(3);
+    expect(result.passed).toBe(false);
+  });
+
+  it('does NOT count entries without a URL', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [
+        makeUsableEntry({ id: 'SRC-1', url: '' }),
+        makeUsableEntry({ id: 'SRC-2', url: 'https://ok' }),
+      ],
+      totalUrls: 1,
+      llmSourceCount: 2,
+      minSources: 2,
+    });
+    expect(result.usableSources).toBe(1);
+    expect(result.passed).toBe(false);
+  });
+
+  it('passes (gate disabled) when minSources is 0 — the canonical disable signal (--skip-source-gate maps to this)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [],
+      totalUrls: 0,
+      llmSourceCount: 0,
+      minSources: 0,
+    });
+    expect(result.active).toBe(false);
+    expect(result.passed).toBe(true);
+  });
+
+  it('boundary: exactly meets the threshold (>= not >)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [makeUsableEntry()],
+      totalUrls: 1,
+      llmSourceCount: 1,
+      minSources: 1,
+    });
+    expect(result.passed).toBe(true);
+    expect(result.usableSources).toBe(1);
+  });
+
+  it('boundary: content exactly at MIN_SOURCE_CONTENT_LENGTH does NOT count (uses >, not >=)', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [makeUsableEntry({ content: 'X'.repeat(MIN_SOURCE_CONTENT_LENGTH) })],
+      totalUrls: 1,
+      llmSourceCount: 1,
+      minSources: 1,
+    });
+    // Matches the buildSourceCache and citation-auditor behaviour: > MIN_SOURCE_CONTENT_LENGTH.
+    expect(result.usableSources).toBe(0);
+    expect(result.passed).toBe(false);
+  });
+
+  it('diagnostic message names the chars threshold for the failure context', () => {
+    const result = evaluateSourceGate({
+      sourceCache: [],
+      totalUrls: 0,
+      llmSourceCount: 0,
+      minSources: 1,
+    });
+    expect(result.diagnostic).toContain(`>${MIN_SOURCE_CONTENT_LENGTH} chars`);
+    // Threshold is also exposed on the report so callers can format their own log lines without re-importing the constant.
+    expect(result.contentThreshold).toBe(MIN_SOURCE_CONTENT_LENGTH);
   });
 });

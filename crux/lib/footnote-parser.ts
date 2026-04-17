@@ -7,6 +7,12 @@
  *   - crux citations for citation management
  */
 
+import { normalizeUrl, normalizeUrlForDedup } from "@longterm-wiki/url-utils";
+
+// Re-export the canonical dedup helper for back-compat with existing
+// `import { normalizeUrlForDedup } from '../footnote-parser.ts'` callers.
+export { normalizeUrlForDedup };
+
 export interface ParsedFootnote {
   /** Footnote number (e.g. 1, 2, 3) */
   number: number;
@@ -70,23 +76,6 @@ function extractUrlFromFootnote(text: string): { url: string | null; title: stri
  */
 function cleanUrl(url: string): string {
   return url.replace(/[.),:;]+$/, "");
-}
-
-/**
- * Normalize a URL for deduplication: strips protocol, www, trailing slashes,
- * and lowercases. This groups footnotes that reference the same source.
- */
-export function normalizeUrlForDedup(url: string): string {
-  try {
-    const u = new URL(url);
-    return (
-      u.host.replace(/^www\./, "") +
-      u.pathname.replace(/\/+$/, "") +
-      u.search
-    ).toLowerCase();
-  } catch {
-    return url.replace(/\/+$/, "").toLowerCase();
-  }
 }
 
 /**
@@ -187,7 +176,9 @@ function extractTitleFromText(text: string): string | null {
  * Parse footnotes and group them by unique source URL.
  *
  * @param content - Raw MDX content
- * @param urlToResourceId - Optional map of URL → resource ID for matching
+ * @param urlToResourceId - Optional map of URL → resource ID for matching.
+ *   Keys must be canonical URLs (run through `normalizeUrl(url, { stripProtocol: true })`).
+ *   The lookup normalizes the footnote URL the same way before checking.
  */
 export function parseFootnoteSources(
   content: string,
@@ -207,14 +198,11 @@ export function parseFootnoteSources(
     if (!sourceMap.has(normUrl)) {
       urlNormToCanonical.set(normUrl, fn.url);
 
-      // Try to find matching resource
+      // Try to find matching resource — normalize the lookup URL the same way
+      // resource maps are built (canonical key, protocol-agnostic).
       let resourceId: string | null = null;
       if (urlToResourceId) {
-        resourceId =
-          urlToResourceId.get(fn.url) ??
-          urlToResourceId.get(fn.url.replace(/\/$/, "")) ??
-          urlToResourceId.get(fn.url.replace(/\/$/, "") + "/") ??
-          null;
+        resourceId = urlToResourceId.get(normalizeUrl(fn.url, { stripProtocol: true })) ?? null;
       }
 
       sourceMap.set(normUrl, {

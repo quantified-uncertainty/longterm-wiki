@@ -33,7 +33,7 @@ import { findMdxFiles } from './lib/file-utils.ts';
 
 import type { Resource, ParsedOpts, Conversion } from './resource-types.ts';
 import { loadResources, loadResourcesPGFirst, saveResources, loadPages, loadPublications } from './resource-io.ts';
-import { hashId, normalizeUrl, buildUrlToResourceMap, extractMarkdownLinks, findFileByName, guessResourceType } from './resource-utils.ts';
+import { hashId, resourceUrlKey, lookupResourceByUrl, buildUrlToResourceMap, extractMarkdownLinks, findFileByName, guessResourceType } from './resource-utils.ts';
 import { cmdMetadata } from './resource-metadata.ts';
 import { cmdValidate } from './resource-validator.ts';
 import { cmdRefreshTitles } from './resource-refresh-titles.ts';
@@ -130,7 +130,7 @@ function cmdShow(opts: ParsedOpts): void {
   const needsResource: typeof links = [];
 
   for (const link of links) {
-    const resource = urlMap.get(link.url) || urlMap.get(link.url.replace(/\/$/, ''));
+    const resource = lookupResourceByUrl(urlMap, link.url);
     if (resource) {
       convertible.push({ ...link, resource });
     } else {
@@ -191,7 +191,7 @@ async function cmdProcess(opts: ParsedOpts): Promise<void> {
   const newResources: Resource[] = [];
 
   for (const link of links) {
-    let resource = urlMap.get(link.url) || urlMap.get(link.url.replace(/\/$/, ''));
+    let resource = lookupResourceByUrl(urlMap, link.url);
 
     if (!resource && !skipCreate) {
       // Create new resource
@@ -205,10 +205,7 @@ async function cmdProcess(opts: ParsedOpts): Promise<void> {
       };
       newResources.push(resource);
       resources.push(resource);
-      // Update map for any duplicate URLs
-      for (const url of normalizeUrl(link.url)) {
-        urlMap.set(url, resource);
-      }
+      urlMap.set(resourceUrlKey(link.url), resource);
     }
 
     if (resource) {
@@ -289,8 +286,7 @@ async function cmdCreate(opts: ParsedOpts): Promise<void> {
   const resources = loadResources();
   const urlMap = buildUrlToResourceMap(resources);
 
-  // Check if already exists
-  const existing = urlMap.get(url) || urlMap.get(url.replace(/\/$/, ''));
+  const existing = lookupResourceByUrl(urlMap, url);
   if (existing) {
     console.log(`Resource already exists: ${existing.id}`);
     console.log(`  Title: ${existing.title}`);

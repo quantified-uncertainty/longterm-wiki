@@ -119,6 +119,9 @@ Options:
   --skip-citation-gate            Allow --apply even when citation audit fails (default: gate ON)
   --skip-citation-audit           Skip the post-improve citation audit phase
   --citation-audit-model <model>  Override LLM model for per-citation checking
+  --skip-source-gate              Allow improve to proceed when research lands few usable sources
+  --min-sources N                 Min usable sources from research before improve runs
+                                  (default: standard=1, deep=3; 0 disables) (QUA-315)
   --no-save-artifacts             Skip saving intermediate artifacts to wiki-server DB
   --gap-analysis                  Run claims gap analysis: inject missing verified facts as structured directions
   --openrouter                    Route all Claude calls through OpenRouter (when Anthropic credits depleted)
@@ -278,6 +281,13 @@ Examples:
       console.error(`Orchestrator v2 supports tiers: polish, standard, deep (got: ${tierStr})`);
       process.exit(1);
     }
+    // The source gate (QUA-315) lives in the v1 researchPhase. The v2
+    // orchestrator uses a tool-driven research path that doesn't go through
+    // researchPhase, so silently ignoring the flag would be a UX trap.
+    if (opts['min-sources'] !== undefined || opts['skip-source-gate'] === true) {
+      console.error('Error: --min-sources / --skip-source-gate are not supported with --engine=v2 (the v2 orchestrator uses a different research path). File a follow-up if you need this. (QUA-315)');
+      process.exit(1);
+    }
     await runOrchestratorPipeline(pageId, {
       tier: v2Tier as 'polish' | 'standard' | 'deep',
       directions: (opts.directions as string) || '',
@@ -305,8 +315,43 @@ Examples:
       saveArtifacts: opts['no-save-artifacts'] === true ? false : undefined,
       gapAnalysis: opts['gap-analysis'] === true ? true : undefined,
       apiDirect: opts['api-direct'] === true ? true : undefined,
+      // --skip-source-gate is sugar for setting the minimum to 0.
+      minSources: opts['skip-source-gate'] === true ? 0 : tryParseMinSources(opts['min-sources']),
     });
   }
+}
+
+/** main()-side helper: validate then run, exiting cleanly on a bad flag value. */
+function tryParseMinSources(raw: unknown): number | undefined {
+  try {
+    return parseMinSources(raw);
+  } catch (err: unknown) {
+    const error = err instanceof Error ? err : new Error(String(err));
+    console.error(`Error: ${error.message}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Parse and validate the `--min-sources` CLI flag.
+ *
+ * Returns undefined when the flag is omitted (caller falls through to the
+ * tier-aware default). Throws on a malformed value — passing NaN through
+ * to the gate would silently disable it (because `NaN > 0` is false),
+ * exactly the silent-degradation mode QUA-315 exists to prevent.
+ *
+ * Exported for testing; main()'s tryParseMinSources() wraps the throw in
+ * a clean process.exit(1). NOTE: deliberately does NOT use parseIntOpt()
+ * from crux/lib/cli.ts — its silent NaN-to-fallback semantics is exactly
+ * the bug class this validator exists to prevent.
+ */
+export function parseMinSources(raw: unknown): number | undefined {
+  if (raw === undefined) return undefined;
+  const parsed = parseInt(String(raw), 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new Error(`--min-sources requires a non-negative integer (got: ${String(raw)})`);
+  }
+  return parsed;
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {

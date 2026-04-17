@@ -1,21 +1,8 @@
 # Auto-Update System
 
-News-driven automatic wiki updates. Fetches from RSS feeds and web searches, routes relevant news to wiki pages, and runs the improve pipeline.
+News-driven automatic wiki updates. Full CLI reference: `pnpm crux w auto-update --help`.
 
-## Key commands
-
-```bash
-pnpm crux w auto-update plan                    # Preview what would be updated
-pnpm crux w auto-update run --budget=30         # Run with $30 budget cap
-pnpm crux w auto-update digest                  # Just fetch and show news digest
-pnpm crux w auto-update sources                 # List configured sources
-pnpm crux w auto-update history                 # Show past runs
-```
-
-## Architecture
-
-- Implementation: `crux/auto-update/` (orchestrator, feed fetcher, page router)
+- Implementation: `crux/auto-update/`
 - Source config: `data/auto-update/sources.yaml`
-- GitHub Actions: `.github/workflows/auto-update.yml` — runs daily at 06:00 UTC
-- Configurable via `workflow_dispatch` with budget, page count, and source filters
-- Dashboard: `/internal/auto-update-runs/` and `/internal/auto-update-news/`
+- Scheduled runner: `.github/workflows/auto-update.yml` (daily 06:00 UTC, `workflow_dispatch` supported)
+- Dashboards: `/internal/auto-update-runs/` and `/internal/auto-update-news/`

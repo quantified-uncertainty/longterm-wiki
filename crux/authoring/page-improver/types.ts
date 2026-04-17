@@ -162,6 +162,17 @@ export interface PipelineOptions {
    * CLI mode bills via Claude Code subscription; API-direct bills via ANTHROPIC_API_KEY.
    */
   apiDirect?: boolean;
+  /**
+   * Minimum number of usable fetched sources required from the research
+   * phase. If fewer are landed, the pipeline aborts before improve runs
+   * (avoiding a wasted ~$15-25 improve pass that would produce placeholder
+   * citations). A "usable" source is one whose URL fetched successfully and
+   * returned content above the citation-auditor's content-length threshold.
+   *
+   * Defaults: 1 for standard tier, 3 for research-deep. Set to 0 to disable
+   * the gate entirely (the CLI's --skip-source-gate flag does this). (QUA-315)
+   */
+  minSources?: number;
 }
 
 // Re-export AuditResult so callers importing from types.ts get it too

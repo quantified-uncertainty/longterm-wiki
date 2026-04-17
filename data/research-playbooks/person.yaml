@@ -1,0 +1,98 @@
+# Research playbook for people (researchers, executives, policymakers, notable figures).
+# Consumed by `crux context for-entity` and the `crux content improve` analyze phase.
+# See QUA-33.
+
+entityType: person
+
+description: >
+  People entities span academic researchers, lab employees, executives, board
+  members, policymakers, and notable public commentators. Prefer primary
+  sources (personal website, institutional profile, first-author papers) over
+  aggregators (LinkedIn, Wikipedia). Always distinguish current role from past
+  roles, and record the "as of" date for any employment claim.
+
+checklist:
+  - "Current role and primary affiliation (with as-of date)"
+  - "Prior roles relevant to AI safety / policy / research (with dates)"
+  - "Highest degree and institution (PhD, Masters, etc.)"
+  - "Primary research area or domain of expertise"
+  - "Most-cited publications or public writing"
+  - "Public stances on key topics (p-doom, timelines, policy proposals) with source"
+  - "Public profiles and handles (personal site, Twitter/X, GitHub, Google Scholar)"
+  - "Organizational affiliations beyond primary (board seats, advisory roles, fellowships)"
+
+sources:
+  - name: "Personal website or blog"
+    reliability: high
+    covers: [current-role, cv, writing, stances]
+    pitfalls:
+      - "May be stale (not updated after role change) — check most-recent post date"
+      - "Often self-curated; omissions are common (e.g., past roles at defunct orgs)"
+  - name: "Institutional profile (university, lab, or company /team page)"
+    reliability: high
+    covers: [current-role, title, affiliation, research-interests]
+    pitfalls:
+      - "Confirms current employment but often lacks start date"
+      - "May not be updated immediately after departures"
+  - name: "Google Scholar"
+    url_pattern: "scholar.google.com/citations?user={id}"
+    reliability: high
+    covers: [publications, citation-counts, h-index, research-areas]
+    pitfalls:
+      - "Author disambiguation is imperfect — verify by cross-checking paper titles"
+      - "Citation counts change; always record the as-of date"
+  - name: "ORCID / arXiv author page"
+    reliability: very-high
+    covers: [publications, co-authors, research-timeline]
+    pitfalls:
+      - "Requires the person to have registered an ORCID (many do not)"
+  - name: "LinkedIn profile"
+    url_pattern: "linkedin.com/in/{slug}"
+    reliability: medium
+    covers: [employment-history, dates, education, endorsements]
+    pitfalls:
+      - "Self-reported; can exaggerate seniority or overlap tenures"
+      - "Private profiles are not accessible without login"
+      - "Role end dates often omitted — current role inferred only"
+  - name: "Twitter/X profile and posts"
+    reliability: low
+    covers: [public-stances, recent-activity, current-affiliation-in-bio]
+    pitfalls:
+      - "Hot takes and drafts are often walked back — don't cite single tweets as policy positions"
+      - "Bios drift out of date; verify affiliation elsewhere"
+      - "Quote-tweets and dunks are not position statements"
+  - name: "Wikipedia"
+    reliability: medium
+    covers: [biography, career-highlights, notable-positions]
+    pitfalls:
+      - "Only available for a small fraction of researchers"
+      - "Quality varies; verify cited primary sources"
+  - name: "Podcast transcripts, long-form interviews"
+    reliability: medium
+    covers: [stances, reasoning, biographical-detail]
+    pitfalls:
+      - "Verbal statements are less precise than written ones — quote carefully"
+      - "Hosts may misframe; verify against the person's own writing"
+  - name: "Conference bios and keynote announcements"
+    reliability: medium
+    covers: [current-role, short-bio, recent-speaking-topics]
+    pitfalls:
+      - "Bios are promotional; shorter than reality"
+
+research_order:
+  - "Start with the personal site to anchor the current narrative"
+  - "Confirm current affiliation via the institutional /team page"
+  - "Pull Google Scholar for publication record and research focus"
+  - "Cross-reference LinkedIn for employment history dates"
+  - "Check recent writing (blog, Twitter, podcasts) for public stances and drift"
+  - "For public figures: look for a Wikipedia page but verify its primary sources"
+
+common_pitfalls:
+  - "Conflating past and current roles — use dated phrasing like \"at X from 2019–2022\" or \"currently at Y (as of 2024)\""
+  - "Treating a one-off tweet or interview comment as a durable public stance"
+  - "Confusing same-named researchers (e.g., multiple \"J. Smith\"s in the same field) — disambiguate with institution or co-authors"
+  - "Attributing views to someone based only on retweets or affiliations — only quote their own words"
+  - "Ignoring pseudonymous or private researchers who prefer not to have a public profile"
+  - "Inflating titles: \"Research Scientist\" and \"Senior Research Scientist\" are different; check the institutional directory"
+  - "Assuming LinkedIn headcounts or seniority match institutional reality"
+  - "For researchers who have left a field, don't cite their current AI views from a pre-AI career stage"

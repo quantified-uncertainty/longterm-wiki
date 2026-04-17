@@ -7,6 +7,8 @@
  * Part of Phase 3: Data Source Resources (Discussion #3567).
  */
 
+import { normalizeUrl } from "@longterm-wiki/url-utils";
+
 /**
  * Normalize an organization name for comparison.
  * Strips common suffixes, lowercases, normalizes Unicode, collapses whitespace.
@@ -110,18 +112,11 @@ function normalizeDateString(d: string): string {
 }
 
 /**
- * Check if two URLs match after normalization.
- * Strips trailing `/`, normalizes http<->https, strips `www.` prefix.
+ * Check if two URLs match after protocol-agnostic normalization.
+ * Uses the canonical normalizer (strip protocol, www, trailing slash, tracking).
  */
 export function urlMatches(a: string, b: string): boolean {
-  function normalizeUrl(url: string): string {
-    return url
-      .trim()
-      .replace(/^https?:\/\//, '')    // strip protocol
-      .replace(/^www\./, '')           // strip www.
-      .replace(/\/+$/, '');            // strip trailing slashes
-  }
-  return normalizeUrl(a) === normalizeUrl(b);
+  return normalizeUrl(a, { stripProtocol: true }) === normalizeUrl(b, { stripProtocol: true });
 }
 
 /**

@@ -66,6 +66,7 @@ registerComposer<ResourceComposerRow>("resource", (row) => ({
   parentTitle: null,
 }));
 import { urlVariants } from "../shared/url-variants.js";
+import { generateId } from "@longterm-wiki/factbase";
 import { createHash, randomBytes } from "crypto";
 
 // ---- Raw SQL row types ----
@@ -185,7 +186,12 @@ function resourceValues(d: ResourceInput) {
     credibilityOverride: d.credibilityOverride ?? null,
     fetchedAt: d.fetchedAt ? new Date(d.fetchedAt) : null,
     contentHash: d.contentHash ?? null,
-    stableId: d.stableId ?? null,
+    // QUA-536: always generate a stableId if one isn't provided. The NOT NULL
+    // constraint on resources.stable_id (added in migration 0184) means
+    // INSERTs without stable_id fail. On ON CONFLICT (UPDATE) paths, the
+    // COALESCE below preserves the existing stable_id, so a generated one on
+    // update is harmless (never written).
+    stableId: d.stableId ?? generateId(),
     archiveUrl: d.archiveUrl ?? null,
     stance: d.stance ?? null,
     contextNote: d.contextNote ?? null,
@@ -716,11 +722,15 @@ const resourcesApp = new Hono()
     const toCreate = uniqueUrls.filter((u) => !urlToResource.has(u));
     if (toCreate.length > 0) {
       const ids = toCreate.map((u) => hashId(u));
+      // QUA-536: mint a stableId per row. The NOT NULL constraint on
+      // resources.stable_id means this raw INSERT must provide one. On
+      // CONFLICT (url) paths the existing row keeps its stable_id.
+      const stableIds = toCreate.map(() => generateId());
       // DO UPDATE SET updated_at = now() forces RETURNING to include conflicting rows
       const created = await rawDb<ResourceWithContent[]>`
-        INSERT INTO resources (id, url, type, created_at, updated_at)
-        SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[])
-          AS t(id, url),
+        INSERT INTO resources (id, url, stable_id, type, created_at, updated_at)
+        SELECT * FROM unnest(${ids}::text[], ${toCreate}::text[], ${stableIds}::text[])
+          AS t(id, url, stable_id),
           LATERAL (SELECT 'web'::text AS type, now() AS created_at, now() AS updated_at) defaults
         ON CONFLICT (url) DO UPDATE SET updated_at = now()
         RETURNING id, url, title, null::timestamptz AS fetched_at, false AS has_content
@@ -1088,6 +1098,212 @@ const resourcesApp = new Hono()
 
     return c.json(result);
   })
+
+  // ---- GET /pipeline?sinceDays=N&fetchStatus=X (pipeline outcomes for dashboard) ----
+  //
+  // Returns fetch_status distribution, citation_content fill rate, stuck resource
+  // samples, and recent fetch activity. Date filter narrows to resources whose
+  // last_fetched_at falls within the window. fetchStatus filter narrows the
+  // stuck-resources sample (other counts always reflect the full sinceDays window).
+  //
+  // Powers the Resource Pipeline Dashboard (E2492).
+  .get(
+    "/pipeline",
+    zv(
+      "query",
+      z.object({
+        sinceDays: z.coerce.number().int().min(1).max(365).default(7),
+        fetchStatus: z
+          .enum([
+            "ok",
+            "dead",
+            "soft_404",
+            "not_found",
+            "timeout",
+            "unreachable",
+            "paywall",
+            "error",
+          ])
+          .optional(),
+      })
+    ),
+    async (c) => {
+      const { sinceDays, fetchStatus } = c.req.valid("query");
+      const rawDb = getDb();
+
+      // postgres.js fragment for the optional fetch_status filter — embeds
+      // safely as a parameter when present, no-op fragment when not.
+      const fetchFilter = fetchStatus
+        ? rawDb`AND r.fetch_status = ${fetchStatus}`
+        : rawDb``;
+
+      const [
+        fetchStatusRows,
+        enrichmentStatusRows,
+        windowTotalsRow,
+        contentFillRow,
+        stuckCountRow,
+        stuckSampleRows,
+        recentFetchedRows,
+      ] = await Promise.all([
+        // fetch_status distribution within the date window
+        rawDb<{ status: string | null; c: string }[]>`
+          SELECT fetch_status AS status, count(*) AS c
+          FROM resources
+          WHERE last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+          GROUP BY fetch_status
+          ORDER BY count(*) DESC
+        `,
+        // enrichment_status distribution within the date window
+        rawDb<{ status: string | null; c: string }[]>`
+          SELECT enrichment_status AS status, count(*) AS c
+          FROM resources
+          WHERE last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+          GROUP BY enrichment_status
+          ORDER BY count(*) DESC
+        `,
+        // Totals for the window
+        rawDb<{ total_in_window: string; total_all: string }[]>`
+          SELECT
+            (SELECT count(*) FROM resources
+              WHERE last_fetched_at >= NOW() - make_interval(days => ${sinceDays})) AS total_in_window,
+            (SELECT count(*) FROM resources) AS total_all
+        `,
+        // Citation content fill (limited to resources fetched in window)
+        rawDb<{
+          with_full_text: string;
+          with_metadata_only: string;
+          uncached: string;
+        }[]>`
+          SELECT
+            (SELECT count(*) FROM resources r
+              JOIN citation_content cc ON cc.resource_id = r.id
+              WHERE r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+                AND cc.full_text IS NOT NULL) AS with_full_text,
+            (SELECT count(*) FROM resources r
+              JOIN citation_content cc ON cc.resource_id = r.id
+              WHERE r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+                AND cc.full_text IS NULL AND cc.page_title IS NOT NULL) AS with_metadata_only,
+            (SELECT count(*) FROM resources r
+              LEFT JOIN citation_content cc ON cc.resource_id = r.id
+              WHERE r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+                AND cc.resource_id IS NULL) AS uncached
+        `,
+        // Stuck count: fetched but enrichment did not progress past 'fetched'
+        // (NULL, 'pending', 'fetched' = not classified/enriched/reviewed)
+        rawDb<{ c: string }[]>`
+          SELECT count(*) AS c
+          FROM resources r
+          WHERE r.fetched_at IS NOT NULL
+            AND (r.enrichment_status IS NULL
+                 OR r.enrichment_status IN ('pending', 'fetched'))
+            AND r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+            ${fetchFilter}
+        `,
+        // Stuck sample: oldest-fetched resources still not enriched
+        rawDb<{
+          id: string;
+          url: string;
+          title: string | null;
+          fetch_status: string | null;
+          enrichment_status: string | null;
+          last_fetched_at: Date;
+        }[]>`
+          SELECT id, url, title, fetch_status, enrichment_status, last_fetched_at
+          FROM resources r
+          WHERE r.fetched_at IS NOT NULL
+            AND (r.enrichment_status IS NULL
+                 OR r.enrichment_status IN ('pending', 'fetched'))
+            AND r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+            ${fetchFilter}
+          ORDER BY r.last_fetched_at ASC
+          LIMIT 25
+        `,
+        // Recent fetches: most recently fetched resources matching the filter
+        rawDb<{
+          id: string;
+          url: string;
+          title: string | null;
+          fetch_status: string | null;
+          enrichment_status: string | null;
+          last_fetched_at: Date;
+        }[]>`
+          SELECT id, url, title, fetch_status, enrichment_status, last_fetched_at
+          FROM resources r
+          WHERE r.last_fetched_at >= NOW() - make_interval(days => ${sinceDays})
+            ${fetchFilter}
+          ORDER BY r.last_fetched_at DESC
+          LIMIT 25
+        `,
+      ]);
+
+      const byFetchStatus: Record<string, number> = {};
+      for (const row of fetchStatusRows) {
+        byFetchStatus[row.status ?? "unknown"] = Number(row.c);
+      }
+
+      const byEnrichmentStatus: Record<string, number> = {};
+      for (const row of enrichmentStatusRows) {
+        byEnrichmentStatus[row.status ?? "none"] = Number(row.c);
+      }
+
+      const totalsRow = windowTotalsRow[0] ?? {
+        total_in_window: "0",
+        total_all: "0",
+      };
+      const totalInWindow = Number(totalsRow.total_in_window);
+      const totalAll = Number(totalsRow.total_all);
+
+      const fillRow = contentFillRow[0] ?? {
+        with_full_text: "0",
+        with_metadata_only: "0",
+        uncached: "0",
+      };
+      const withFullText = Number(fillRow.with_full_text);
+      const withMetadataOnly = Number(fillRow.with_metadata_only);
+      const uncached = Number(fillRow.uncached);
+
+      const formatRow = (r: {
+        id: string;
+        url: string;
+        title: string | null;
+        fetch_status: string | null;
+        enrichment_status: string | null;
+        last_fetched_at: Date;
+      }) => ({
+        id: r.id,
+        url: r.url,
+        title: r.title,
+        fetchStatus: r.fetch_status,
+        enrichmentStatus: r.enrichment_status,
+        lastFetchedAt:
+          r.last_fetched_at instanceof Date
+            ? r.last_fetched_at.toISOString()
+            : String(r.last_fetched_at),
+      });
+
+      return c.json({
+        sinceDays,
+        fetchStatusFilter: fetchStatus ?? null,
+        totals: {
+          inWindow: totalInWindow,
+          all: totalAll,
+        },
+        byFetchStatus,
+        byEnrichmentStatus,
+        contentFill: {
+          withFullText,
+          withMetadataOnly,
+          uncached,
+        },
+        stuck: {
+          total: Number(stuckCountRow[0]?.c ?? 0),
+          sample: stuckSampleRows.map(formatRow),
+        },
+        recentFetched: recentFetchedRows.map(formatRow),
+      });
+    }
+  )
 
   // ---- GET /by-page/:pageId (resources cited by a page) ----
 

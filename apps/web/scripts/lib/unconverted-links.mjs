@@ -7,49 +7,11 @@
  * Extracted from build-data.mjs for modularity.
  */
 
-/**
- * Normalize URL to handle variations (trailing slashes, www prefix, http/https)
- */
-function normalizeUrl(url) {
-  const variations = new Set();
-  try {
-    const parsed = new URL(url);
-    const base = parsed.href.replace(/\/$/, '');
-    variations.add(base);
-    variations.add(base + '/');
-
-    // Without www
-    if (parsed.hostname.startsWith('www.')) {
-      const noWww = base.replace('://www.', '://');
-      variations.add(noWww);
-      variations.add(noWww + '/');
-    }
-    // With www
-    if (!parsed.hostname.startsWith('www.')) {
-      const withWww = base.replace('://', '://www.');
-      variations.add(withWww);
-      variations.add(withWww + '/');
-    }
-  } catch {
-    variations.add(url);
-  }
-  return Array.from(variations);
-}
-
-/**
- * Build URL → resource map from resources
- */
-export function buildUrlToResourceMap(resources) {
-  const urlToResource = new Map();
-  for (const r of resources) {
-    if (!r.url) continue;
-    const normalizedUrls = normalizeUrl(r.url);
-    for (const url of normalizedUrls) {
-      urlToResource.set(url, r);
-    }
-  }
-  return urlToResource;
-}
+// Re-export the canonical resource-URL helpers from crux so this module and
+// build-data.mjs share a single source of truth (build-data.mjs runs under
+// tsx/esm, so importing .ts is fine).
+import { resourceUrlKey, buildUrlToResourceMap, lookupResourceByUrl } from "../../../../crux/resource-utils.ts";
+export { resourceUrlKey as urlKey, buildUrlToResourceMap, lookupResourceByUrl };
 
 /**
  * Extract markdown links from content (not images, not internal, not <R> components)
@@ -76,7 +38,7 @@ export function findUnconvertedLinks(content, urlToResource) {
   const unconverted = [];
 
   for (const link of links) {
-    const resource = urlToResource.get(link.url) || urlToResource.get(link.url.replace(/\/$/, ''));
+    const resource = lookupResourceByUrl(urlToResource, link.url);
     if (resource) {
       unconverted.push({
         text: link.text,

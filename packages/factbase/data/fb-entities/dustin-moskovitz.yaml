@@ -39,3 +39,8 @@ facts:
     value: Harvard University; Vanguard High School
     source: https://www.wikidata.org/wiki/Q370217
     notes: From Wikidata Q370217
+  - id: f_7ZwsPlUQ6A
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Dustin_Moskovitz
+    source: https://www.wikidata.org/wiki/Q370217
+    notes: From Wikidata Q370217

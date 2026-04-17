@@ -26,3 +26,22 @@ facts:
     value: University of Tartu; Gustav Adolf Grammar School
     source: https://www.wikidata.org/wiki/Q3156998
     notes: From Wikidata Q3156998
+  - id: f_EZnSjqqhyA
+    property: wikipedia-url
+    value: https://en.wikipedia.org/wiki/Jaan_Tallinn
+    source: https://www.wikidata.org/wiki/Q3156998
+    notes: From Wikidata Q3156998
+  - id: f_ysJDGkAo2Q
+    property: notable-for
+    value: Co-founder of Skype (2003); co-founder of Centre for the Study of
+      Existential Risk (CSER, 2012) and Future of Life Institute (FLI, 2014);
+      primary funder of Survival and Flourishing Fund (SFF) and Lightspeed
+      Grants; major philanthropic donor to AI safety research
+    asOf: 2026-04
+    source: https://en.wikipedia.org/wiki/Jaan_Tallinn
+  - id: f_UWG1ka4xug
+    property: role
+    value: Founder and philanthropist; primary funder of SFF (Survival and
+      Flourishing Fund) and Lightspeed Grants
+    asOf: 2026-04
+    source: https://en.wikipedia.org/wiki/Jaan_Tallinn

@@ -12,7 +12,12 @@
  *
  * Phase 2 of QUA-113 / Discussion #4221. Extracted from inline implementation
  * in `crux/commands/sourcing-audit-urls.ts` (Phase 1, PR #4222).
+ *
+ * URL normalization helpers (`normalizeUrlForJoin`, `extractHost`) moved to
+ * `@longterm-wiki/url-utils` in QUA-341 — re-exported here for compat.
  */
+
+export { normalizeUrl as normalizeUrlForJoin, extractHost } from "@longterm-wiki/url-utils";
 
 // ── Module constants ──
 
@@ -21,10 +26,6 @@ export const FLAG_THRESHOLD = 0.7;
 
 /** Confidence threshold to skip LLM classify-step (write directly to PG). */
 export const FAST_PATH_THRESHOLD = 0.8;
-
-/** Query parameters that indicate tracking, not data content. */
-const TRACKING_PREFIXES = ['utm_', 'mc_', 'oly_'];
-const TRACKING_EXACT = new Set(['fbclid', 'gclid', 'yclid', 'msclkid', '_ga']);
 
 /** Query parameters that indicate specific content (force non-homepage classification). */
 const DATA_PARAM_KEYS = new Set(['id', 'v', 'q', 'search', 'article', 'item', 'page', 'post']);
@@ -143,52 +144,3 @@ export function classifyByUrl(raw: string): UrlClassification {
   return { purpose: null, confidence: 0.4, reasons: [`depth:1:${path}`] };
 }
 
-/**
- * Canonical URL form for comparing/grouping evidence URLs and resource URLs.
- * Strips: trailing slash, www., fragment, default ports, common tracking
- * params (utm_*, fbclid, gclid). Lowercases host.
- *
- * NOT a replacement for the 9 existing URL normalizers in the codebase —
- * those serve different semantics. This one is for audit-join + domain grouping.
- */
-export function normalizeUrlForJoin(raw: string): string {
-  let url: URL;
-  try {
-    url = new URL(raw);
-  } catch {
-    return raw.trim().toLowerCase();
-  }
-
-  let host = url.hostname.toLowerCase();
-  if (host.startsWith('www.')) host = host.slice(4);
-
-  const portSuffix =
-    (url.port === '' || (url.protocol === 'http:' && url.port === '80') ||
-      (url.protocol === 'https:' && url.port === '443'))
-      ? ''
-      : `:${url.port}`;
-
-  const filteredParams = new URLSearchParams();
-  for (const [k, v] of url.searchParams.entries()) {
-    const keyLower = k.toLowerCase();
-    if (TRACKING_EXACT.has(keyLower)) continue;
-    if (TRACKING_PREFIXES.some((p) => keyLower.startsWith(p))) continue;
-    filteredParams.append(k, v);
-  }
-  const qs = filteredParams.toString();
-
-  const path = url.pathname === '/' ? '' : url.pathname.replace(/\/+$/, '');
-
-  return `${url.protocol}//${host}${portSuffix}${path}${qs ? '?' + qs : ''}`;
-}
-
-/** Extract just the host portion, normalized, for domain grouping. */
-export function extractHost(raw: string): string {
-  try {
-    let host = new URL(raw).hostname.toLowerCase();
-    if (host.startsWith('www.')) host = host.slice(4);
-    return host;
-  } catch {
-    return '(invalid-url)';
-  }
-}

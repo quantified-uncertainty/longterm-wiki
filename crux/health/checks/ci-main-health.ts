@@ -18,7 +18,14 @@
  */
 
 import type { CheckResult } from '../health-check.ts';
-import { githubApi, REPO } from '../../lib/github.ts';
+import {
+  githubApi,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_HELP_MESSAGE,
+  MISSING_TOKEN_SUMMARY,
+  REPO,
+} from '../../lib/github.ts';
 
 interface WorkflowRun {
   id: number;
@@ -52,13 +59,18 @@ export async function checkCiMainHealth(): Promise<CheckResult> {
   const name = 'CI main branch';
   const detail: string[] = [];
 
-  if (!process.env.GITHUB_TOKEN) {
-    return {
-      name,
-      ok: false,
-      summary: 'GITHUB_TOKEN not set',
-      detail: ['Set GITHUB_TOKEN to enable CI main branch health checks'],
-    };
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      return {
+        name,
+        ok: false,
+        summary: MISSING_TOKEN_SUMMARY,
+        detail: [MISSING_TOKEN_HELP_MESSAGE],
+      };
+    }
+    throw e;
   }
 
   const now = Date.now();

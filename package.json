@@ -13,7 +13,6 @@
     "build-data:quick": "pnpm --filter longterm-next run sync:data:content",
     "validate": "DOTENV_CONFIG_QUIET=true NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs validate",
     "crux": "DOTENV_CONFIG_QUIET=true NODE_USE_ENV_PROXY=1 node --import tsx/esm crux/crux.mjs",
-    "typecheck:tooling": "npx tsx crux/validate/validate-crux-tsc.ts",
     "setup": "bash scripts/setup.sh",
     "setup:quick": "bash scripts/setup.sh --quick",
     "setup:check": "bash scripts/setup.sh --check",
@@ -22,6 +21,7 @@
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
     "@aws-sdk/client-s3": "^3.1013.0",
+    "@longterm-wiki/url-utils": "workspace:*",
     "@radix-ui/react-popover": "^1.1.15",
     "dotenv": "^17.2.4",
     "gray-matter": "^4.0.3",
