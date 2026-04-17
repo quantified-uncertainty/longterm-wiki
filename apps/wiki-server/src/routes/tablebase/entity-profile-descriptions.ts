@@ -91,7 +91,7 @@ export const COLUMN_DESCRIPTIONS: Record<string, Record<string, string>> = {
   },
   entity_resources: {
     entity_id: "FK to entities.stable_id",
-    resource_id: "FK to resources.id",
+    resource_id: "FK to resources.stable_id",
     authored_by_entity: "Whether the entity authored/published this resource",
     is_subject: "Whether the resource is about this entity",
     inference_source:

@@ -59,6 +59,9 @@ interface DatabaseJson {
 interface MinimalResource {
   id: string;
   url?: string;
+  // QUA-567 Phase B.4: resources.stable_id is the canonical FK target for
+  // entity_resources.resource_id. Populated NOT NULL on prod as of QUA-536.
+  stable_id?: string;
 }
 
 // ---------------------------------------------------------------------------
@@ -124,14 +127,34 @@ function loadResources(): MinimalResource[] {
 
 
 /**
- * Build normalized-URL → resource ID map from resources.json.
+ * Build normalized-URL → resource stable_id map from resources.json.
+ *
+ * QUA-567 Phase B.4: returns stable_ids so entity_resources.resource_id
+ * (which now references resources.stable_id) gets the right FK value.
+ * Resources without a stable_id are skipped (should be zero on prod per
+ * Phase A / QUA-536, but the check makes local dev robust).
  */
 function buildUrlToResourceId(): Map<string, string> {
   const resources = loadResources();
   const map = new Map<string, string>();
   for (const r of resources) {
-    if (r.url) {
-      map.set(normalizeUrlForDedup(r.url), r.id);
+    if (r.url && r.stable_id) {
+      map.set(normalizeUrlForDedup(r.url), r.stable_id);
+    }
+  }
+  return map;
+}
+
+/**
+ * Build hex16 (resources.id) → stable_id map for translating legacy IDs
+ * that appear in database.json::pageResources. See seedFromWikiCitations.
+ */
+function buildHexIdToStableId(): Map<string, string> {
+  const resources = loadResources();
+  const map = new Map<string, string>();
+  for (const r of resources) {
+    if (r.stable_id) {
+      map.set(r.id, r.stable_id);
     }
   }
   return map;
@@ -197,9 +220,14 @@ async function seedFromPublisher(
       const pubEntityId = r.publisherEntityId;
       if (!pubEntityId) continue;
 
+      // QUA-567 Phase B.4: entity_resources.resource_id now references
+      // resources.stable_id. Skip resources that somehow lack stable_id
+      // (should be zero on prod per Phase A / QUA-536).
+      if (!r.stableId) continue;
+
       items.push({
         entityId: pubEntityId,
-        resourceId: r.id,
+        resourceId: r.stableId,
         authoredByEntity: true,
         isSubject: false,
         inferenceSource: "publisher_entity_id",
@@ -207,7 +235,7 @@ async function seedFromPublisher(
 
       if (options.verbose) {
         console.log(
-          `  authored: ${pubEntityId} → ${r.id} (${r.title?.slice(0, 60)})`,
+          `  authored: ${pubEntityId} → ${r.stableId} (${r.title?.slice(0, 60)})`,
         );
       }
     }
@@ -228,6 +256,10 @@ function seedFromWikiCitations(
 ): { items: EntityResourceSyncItem[]; skipped: number } {
   const slugToStableId = loadSlugToStableId();
   const pageResources = loadPageResources();
+  // QUA-567 Phase B.4: pageResources contains hex16 resource IDs (the
+  // resources.id column). entity_resources.resource_id now references
+  // resources.stable_id, so translate via this lookup before emitting.
+  const hexToStableId = buildHexIdToStableId();
   const items: EntityResourceSyncItem[] = [];
   let skipped = 0;
 
@@ -242,9 +274,24 @@ function seedFromWikiCitations(
     }
 
     for (const resourceId of resourceIds) {
+      // Accept both forms. In steady state pageResources still emits
+      // hex16 (build-data.mjs), but also accept sid_-prefixed IDs so the
+      // pipeline survives format churn during the Phase B rollout.
+      const translated = resourceId.startsWith("sid_")
+        ? resourceId
+        : hexToStableId.get(resourceId);
+      if (!translated) {
+        skipped++;
+        if (options.verbose) {
+          console.log(
+            `  skip: no stable_id for resource "${resourceId}" on page "${slug}"`,
+          );
+        }
+        continue;
+      }
       items.push({
         entityId: stableId,
-        resourceId,
+        resourceId: translated,
         authoredByEntity: false,
         isSubject: true,
         inferenceSource: "wiki_citation",
@@ -360,6 +407,10 @@ async function seedFromAuthorEntityIds(
       const rawAuthorIds = (r as Record<string, unknown>).authorEntityIds;
       if (!Array.isArray(rawAuthorIds) || rawAuthorIds.length === 0) continue;
 
+      // QUA-567 Phase B.4: entity_resources.resource_id now references
+      // resources.stable_id (see migration 0188).
+      if (!r.stableId) continue;
+
       // Filter to strings only and deduplicate per resource
       const seen = new Set<string>();
       for (const raw of rawAuthorIds) {
@@ -369,14 +420,14 @@ async function seedFromAuthorEntityIds(
 
         items.push({
           entityId: raw,
-          resourceId: r.id,
+          resourceId: r.stableId,
           authoredByEntity: true,
           isSubject: false,
           inferenceSource: "author_entity_ids",
         });
 
         if (options.verbose) {
-          console.log(`  authored: ${raw} → ${r.id} (${r.title?.slice(0, 60)})`);
+          console.log(`  authored: ${raw} → ${r.stableId} (${r.title?.slice(0, 60)})`);
         }
       }
     }
