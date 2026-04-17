@@ -22,7 +22,22 @@ This wasn't a tooling gap — the tooling fixes in QUA-406 (PR #4300) and QUA-44
 
 ### Preferred enforcement — `crux sys dispatch`
 
-Once QUA-437 ships, `pnpm crux sys dispatch --linear=QUA-NNN --slot=N` will enforce all three pre-flight checks structurally and refuse on collision. **That wrapper is the preferred way to dispatch going forward** — it makes the rule unskippable under context pressure.
+`pnpm crux sys dispatch --linear=QUA-NNN --slot=N` (QUA-437) enforces all three pre-flight checks structurally and refuses on collision with exit code 2. **This wrapper is the preferred way to dispatch** — it makes the rule unskippable under context pressure.
+
+```bash
+# Normal dispatch — refuses on any pre-flight blocker:
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 --brief=../dispatch/qua-NNN.md
+
+# Dry-run (no ./ws open) to validate pre-flight before committing:
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 --dry-run
+
+# Emergency override (prior claim abandoned, prod-down, etc.):
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 \
+    --force --reason="slot a9 abandoned, PR #4296 closed, user-authorized"
+```
+
+`--force` is the only way to bypass the check. It requires `--reason="<why>"` and posts a visible `⚠ Claim forced via crux sys dispatch --force` comment on the Linear issue so forced claims stay traceable in ticket history. Every dispatch (forced or not) is audit-logged to `~/.cache/crux-dispatch/log.jsonl`.
 
 Hand-dispatch via `./ws open <N> --claude` + a hand-written brief is permitted only when the wrapper is unavailable, and in that case the coordinator is **personally** responsible for running all three checks before writing the brief.
 
