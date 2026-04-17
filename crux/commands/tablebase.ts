@@ -96,7 +96,7 @@ async function persistScanResults(scan: import('../tablebase/types.ts').ScanSumm
 }
 
 async function scanCommand(_args: string[], options: CommandOptions): Promise<CommandResult> {
-  const { runFullScan, runTableScan, runFieldGapScan, FIELD_GAP_TABLES } = await import('../tablebase/scanner.ts');
+  const { runFullScan, runTableScan, runFieldGapScan, FIELD_GAP_TABLES, YAML_CATALOG_TABLES } = await import('../tablebase/scanner.ts');
   const { formatScanSummary, formatFieldGapReports } = await import('../tablebase/reporter.ts');
   type FieldGapReport = import('../tablebase/types.ts').FieldGapReport;
 
@@ -114,19 +114,37 @@ async function scanCommand(_args: string[], options: CommandOptions): Promise<Co
   }
 
   if (options.table) {
-    const wantsFields = options.fields && FIELD_GAP_TABLES.includes(options.table as string);
+    const tableName = options.table as string;
+    const isYamlCatalog = YAML_CATALOG_TABLES.includes(tableName);
+    const wantsFields = options.fields && FIELD_GAP_TABLES.includes(tableName);
     if (options.fields && !wantsFields) {
       console.warn(
-        `[tablebase] --fields not supported for table '${options.table}'; ` +
+        `[tablebase] --fields not supported for table '${tableName}'; ` +
         `supported: ${FIELD_GAP_TABLES.join(', ')}`,
       );
     }
+
+    // YAML catalogs only support --fields (no per-entity PG scan).
+    if (isYamlCatalog) {
+      if (!wantsFields) {
+        return {
+          exitCode: 1,
+          output: `YAML catalog '${tableName}' supports --fields only. Re-run with --fields.`,
+        };
+      }
+      const fieldReports = await runFieldGapScan([tableName]);
+      if (options.ci) {
+        return { exitCode: 0, output: JSON.stringify({ fieldReports, timestamp: new Date().toISOString() }, null, 2) };
+      }
+      return { exitCode: 0, output: formatFieldGapReports(fieldReports, { top: topN }) };
+    }
+
     const [result, fieldReports] = await Promise.all([
-      runTableScan(options.table as string),
-      wantsFields ? runFieldGapScan([options.table as string]) : Promise.resolve(undefined),
+      runTableScan(tableName),
+      wantsFields ? runFieldGapScan([tableName]) : Promise.resolve(undefined),
     ]);
     if (!result) {
-      return { exitCode: 1, output: `Unknown table: ${options.table}` };
+      return { exitCode: 1, output: `Unknown table: ${tableName}` };
     }
 
     if (options.ci) {

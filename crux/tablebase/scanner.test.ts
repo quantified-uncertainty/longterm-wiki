@@ -354,7 +354,8 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
     });
 
     const reports = await runFieldGapScan();
-    expect(reports.length).toBe(4);
+    // 4 PG tables + 3 YAML catalogs = 7 reports.
+    expect(reports.length).toBe(7);
     const byTable = Object.fromEntries(reports.map(r => [r.table, r]));
     expect(byTable.divisions.totalRows).toBe(2);
     expect(byTable.division_personnel.totalRows).toBe(1);
@@ -434,5 +435,116 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
       expect(f.nullPct).toBe(100);
       expect(f.gapPct).toBe(100);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// QUA-571: YAML entity catalog support (concepts, risks, capabilities)
+// ---------------------------------------------------------------------------
+
+describe('scanner — YAML entity catalog support (QUA-571)', () => {
+  it('YAML_CATALOG_TABLES exposes the supported catalog names', async () => {
+    const { YAML_CATALOG_TABLES } = await import('./scanner.ts');
+    expect(YAML_CATALOG_TABLES).toEqual(expect.arrayContaining(['concepts', 'risks', 'capabilities']));
+  });
+
+  it('YAML catalog tables are merged into FIELD_GAP_TABLES so runFieldGapScan picks them up', async () => {
+    const { FIELD_GAP_TABLES } = await import('./scanner.ts');
+    expect(FIELD_GAP_TABLES).toEqual(expect.arrayContaining(['concepts', 'risks', 'capabilities']));
+    // Legacy PG tables still present — merge, not replace.
+    expect(FIELD_GAP_TABLES).toEqual(expect.arrayContaining(['divisions', 'funding_programs']));
+  });
+
+  it('loadYamlCatalogRows: returns rows with an `id` field, skips entries without one', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const rows = loadYamlCatalogRows('data/entities/concepts.yaml');
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(typeof row.id).toBe('string');
+      expect(row.id.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('loadYamlCatalogRows: returns [] (with warning) when the file is missing', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('data/entities/does-not-exist.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('YAML catalog file not found'));
+    warnSpy.mockRestore();
+  });
+
+  it('loadYamlCatalogRows: returns [] (with warning) on malformed YAML', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-corrupt.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('failed to parse'));
+    warnSpy.mockRestore();
+  });
+
+  it('loadYamlCatalogRows: returns [] (with warning) when top-level is not a list', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-object.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('expected top-level list'));
+    warnSpy.mockRestore();
+  });
+
+  it('loadYamlCatalogRows: skips entries without a non-empty string id', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-mixed.yaml');
+    // Fixture has 6 entries: valid-a, missing-id, numeric-id (42), not-an-object,
+    // empty-id (''), valid-b. Only valid-a and valid-b survive.
+    expect(rows.map((r) => r.id)).toEqual(['valid-a', 'valid-b']);
+  });
+
+  it('runFieldGapScan: profiles concepts.yaml and returns the expected field shape', async () => {
+    // Integration-style: reads the real data/entities/concepts.yaml so the
+    // test also exercises the YAML parse + loadYamlCatalogRows path end-to-end.
+    // Deliberately avoids absolute % assertions (e.g. "sources is 100% gap")
+    // because the follow-up PR (QUA-571 Phase 2) populates `sources` and the
+    // test should stay green as enrichment happens — it's profiling behavior,
+    // not gap state. Exact-value assertions are covered by the fixture-based
+    // profileFields test below.
+    const { runFieldGapScan } = await import('./scanner.ts');
+    const reports = await runFieldGapScan(['concepts']);
+    expect(reports.length).toBe(1);
+    const report = reports[0];
+    expect(report.table).toBe('concepts');
+    expect(report.totalRows).toBeGreaterThan(0);
+
+    const sources = report.fields.find((f) => f.field === 'sources');
+    expect(sources).toBeDefined();
+    expect(sources!.columnType).toBe('list');
+    // Must have at least some rows profiled — a 0-row report would mean the
+    // YAML loader silently returned [].
+    expect(sources!.total).toBe(report.totalRows);
+
+    const rel = report.fields.find((f) => f.field === 'relatedEntries');
+    expect(rel).toBeDefined();
+    expect(rel!.columnType).toBe('list');
+
+    const desc = report.fields.find((f) => f.field === 'description');
+    expect(desc).toBeDefined();
+    expect(desc!.columnType).toBe('string');
+  });
+
+  it('profileFields: classifies empty arrays as "empty", populated arrays as "filled"', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = [
+      { id: 'a', sources: [] },
+      { id: 'b', sources: [{ url: 'https://example.com' }] },
+      { id: 'c', sources: null },
+      { id: 'd' }, // undefined
+    ];
+    const report = profileFields('test', rows, [{ field: 'sources', columnType: 'list' }]);
+    const sources = report.fields[0];
+    expect(sources.total).toBe(4);
+    expect(sources.nullCount).toBe(2); // null + undefined
+    expect(sources.emptyCount).toBe(1); // []
+    // 1 of 4 is filled → gap = 75%.
+    expect(sources.gapPct).toBe(75);
   });
 });
