@@ -11,7 +11,7 @@
 --   - 0 sid_ rows, 0 nulls, 0 orphans (every resource_id has a matching resource)
 --   - resources.stable_id is 100% populated (22,976/22,976)
 --
--- The corresponding things_search MV JOIN fix ships in migration 0189.
+-- The corresponding things_search MV JOIN fix ships in migration 0190.
 
 -- ────────────────────────────────────────────────────────────────────────
 -- Drop old FK. Defensive IF EXISTS covers both the Drizzle-generated name
@@ -31,7 +31,8 @@ UPDATE "entity_resources" er
 SET resource_id = r.stable_id
 FROM "resources" r
 WHERE er.resource_id = r.id
-  AND er.resource_id NOT LIKE 'sid_%';--> statement-breakpoint
+  AND er.resource_id NOT LIKE 'sid_%'
+  AND r.stable_id IS NOT NULL;--> statement-breakpoint
 
 -- ────────────────────────────────────────────────────────────────────────
 -- Fail-fast orphan check. After the backfill, every resource_id should be
@@ -45,10 +46,15 @@ DO $$
 DECLARE
   orphan_count INT;
 BEGIN
-  SELECT COUNT(*) INTO orphan_count FROM entity_resources
-  WHERE resource_id NOT LIKE 'sid_%';
+  SELECT COUNT(*) INTO orphan_count
+  FROM entity_resources er
+  WHERE NOT EXISTS (
+    SELECT 1
+    FROM resources r
+    WHERE r.stable_id = er.resource_id
+  );
   IF orphan_count > 0 THEN
-    RAISE EXCEPTION 'QUA-567 migration halted: % orphan row(s) remain in entity_resources.resource_id after backfill. No matching resources.id was found. Fix by inserting missing resource rows or deleting orphans before re-running.', orphan_count;
+    RAISE EXCEPTION 'QUA-567 migration halted: % orphan row(s) remain in entity_resources.resource_id after backfill. No matching resources.stable_id was found. Fix by inserting missing resource rows or deleting orphans before re-running.', orphan_count;
   END IF;
 END $$;--> statement-breakpoint
 
