@@ -113,11 +113,8 @@ function formatFromNewTables(
     accessMethod: rts.accessMethod,
     recordType: rts.recordType,
     fetchUrl: res.url.startsWith("urn:") ? null : res.url,
-    // QUA-565 Phase B.2: we return res.id (the hex16 resources.id), NOT
-    // rts.resourceId (which is now a sid_). The web UI links to
-    // `/resources/${resourceId}` and /api/resources/:id still expects
-    // hex16. Keeping the response contract on hex16 avoids a UI regression
-    // until resources.id itself is retired in a later Phase B.*.
+    // QUA-565 Phase B.2: intentionally res.id (hex16), not rts.resourceId
+    // (now sid_). The UI links to /resources/:id, which still expects hex16.
     resourceId: res.id,
     publisherEntityId: res.publisherEntityId,
     updateFrequency: rts.updateFrequency,
@@ -141,9 +138,7 @@ const dataSourcesApp = new Hono()
   .get("/", async (c) => {
     const db = getDrizzleDb();
 
-    // Join new tables for the base data.
-    // QUA-565 Phase B.2: resourceTabularSources.resourceId references
-    // resources.stable_id, so the JOIN target is resources.stableId.
+    // QUA-565 Phase B.2: JOIN on resources.stable_id (the new FK target).
     const rows = await db
       .select({
         res: resources,
@@ -171,8 +166,7 @@ const dataSourcesApp = new Hono()
     const db = getDrizzleDb();
     const id = c.req.param("id");
 
-    // Look up by sourceSlug (same as old data_sources.id).
-    // QUA-565 Phase B.2: JOIN on resources.stable_id — see GET / above.
+    // Look up by sourceSlug. QUA-565 Phase B.2: JOIN on resources.stable_id.
     const [row] = await db
       .select({
         res: resources,
@@ -246,9 +240,8 @@ const dataSourcesApp = new Hono()
     const resId = hashId(url);
     let actualResId = resId;
     // QUA-565 Phase B.2: resource_tabular_sources.resource_id now references
-    // resources.stable_id, so we need the stable_id (not the hex16 id) when
-    // writing into that table. The API response keeps `resourceId` as the
-    // hex16 id to preserve the existing contract.
+    // resources.stable_id, so we write stable_id here. The API response still
+    // returns hex16 in `resourceId` to preserve the existing contract.
     let actualStableId = "";
 
     await db.transaction(async (tx) => {
@@ -279,11 +272,8 @@ const dataSourcesApp = new Hono()
         .returning({ id: resources.id, stableId: resources.stableId });
 
       actualResId = upsertedResource.id;
-      // Post-QUA-536, resources.stable_id is NOT NULL at the DB level (even
-      // though the Drizzle schema type still allows null). The INSERT above
-      // always provides a generateId() value; ON CONFLICT preserves an
-      // existing one. A null here would indicate a pre-QUA-536 row slipping
-      // through, which shouldn't happen but is worth catching loudly.
+      // resources.stable_id is NOT NULL post-QUA-536; throw loudly if a
+      // pre-migration row somehow slipped through rather than silently writing ''.
       if (!upsertedResource.stableId) {
         throw new Error(
           `resources.stable_id unexpectedly null for id=${actualResId} (url=${url})`
