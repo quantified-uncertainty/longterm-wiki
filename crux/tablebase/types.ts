@@ -93,7 +93,7 @@ export interface TableScanResult {
   profiles: TableProfile[];
 }
 
-export type FieldColumnType = 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id';
+export type FieldColumnType = 'string' | 'number' | 'date' | 'url' | 'enum' | 'boolean' | 'id' | 'list';
 
 /** Per-field NULL/empty/"n/a" statistics for a single column */
 export interface FieldGapStat {

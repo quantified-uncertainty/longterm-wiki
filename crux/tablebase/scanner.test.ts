@@ -354,7 +354,8 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
     });
 
     const reports = await runFieldGapScan();
-    expect(reports.length).toBe(4);
+    // 4 PG tables (QUA-551) + 3 YAML catalogs (QUA-571) = 7 reports.
+    expect(reports.length).toBe(7);
     const byTable = Object.fromEntries(reports.map(r => [r.table, r]));
     expect(byTable.divisions.totalRows).toBe(2);
     expect(byTable.division_personnel.totalRows).toBe(1);
@@ -434,5 +435,81 @@ describe('scanner — field-gap profiler (QUA-551)', () => {
       expect(f.nullPct).toBe(100);
       expect(f.gapPct).toBe(100);
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// QUA-571: YAML entity catalog support (concepts, risks, capabilities)
+// ---------------------------------------------------------------------------
+
+describe('scanner — YAML entity catalog support (QUA-571)', () => {
+  it('YAML_CATALOG_TABLES exposes the supported catalog names', async () => {
+    const { YAML_CATALOG_TABLES } = await import('./scanner.ts');
+    expect(YAML_CATALOG_TABLES).toEqual(expect.arrayContaining(['concepts', 'risks', 'capabilities']));
+  });
+
+  it('YAML catalog tables are merged into FIELD_GAP_TABLES so runFieldGapScan picks them up', async () => {
+    const { FIELD_GAP_TABLES } = await import('./scanner.ts');
+    expect(FIELD_GAP_TABLES).toEqual(expect.arrayContaining(['concepts', 'risks', 'capabilities']));
+    // Legacy PG tables still present — merge, not replace.
+    expect(FIELD_GAP_TABLES).toEqual(expect.arrayContaining(['divisions', 'funding_programs']));
+  });
+
+  it('loadYamlCatalogRows: returns rows with an `id` field, skips entries without one', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const rows = loadYamlCatalogRows('data/entities/concepts.yaml');
+    expect(rows.length).toBeGreaterThan(0);
+    for (const row of rows) {
+      expect(typeof row.id).toBe('string');
+      expect(row.id.length).toBeGreaterThan(0);
+    }
+  });
+
+  it('loadYamlCatalogRows: returns [] (with warning) when the file is missing', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('data/entities/does-not-exist.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('YAML catalog file not found'));
+    warnSpy.mockRestore();
+  });
+
+  it('runFieldGapScan: profiles concepts.yaml, flags sources as a 100% gap', async () => {
+    const { runFieldGapScan } = await import('./scanner.ts');
+    const reports = await runFieldGapScan(['concepts']);
+    expect(reports.length).toBe(1);
+    const report = reports[0];
+    expect(report.table).toBe('concepts');
+    expect(report.totalRows).toBeGreaterThan(0);
+
+    const sources = report.fields.find((f) => f.field === 'sources');
+    expect(sources).toBeDefined();
+    expect(sources!.columnType).toBe('list');
+    // No YAML entity currently populates `sources`, so every row is a null gap.
+    expect(sources!.gapPct).toBe(100);
+    expect(sources!.nullPct).toBe(100);
+
+    const rel = report.fields.find((f) => f.field === 'relatedEntries');
+    expect(rel).toBeDefined();
+    // Partial coverage — don't hardcode the exact %, but require > 0 and < 100.
+    expect(rel!.gapPct).toBeGreaterThan(0);
+    expect(rel!.gapPct).toBeLessThan(100);
+  });
+
+  it('profileFields: classifies empty arrays as "empty", populated arrays as "filled"', async () => {
+    const { profileFields } = await import('./scanner.ts');
+    const rows = [
+      { id: 'a', sources: [] },
+      { id: 'b', sources: [{ url: 'https://example.com' }] },
+      { id: 'c', sources: null },
+      { id: 'd' }, // undefined
+    ];
+    const report = profileFields('test', rows, [{ field: 'sources', columnType: 'list' }]);
+    const sources = report.fields[0];
+    expect(sources.total).toBe(4);
+    expect(sources.nullCount).toBe(2); // null + undefined
+    expect(sources.emptyCount).toBe(1); // []
+    // 1 of 4 is filled → gap = 75%.
+    expect(sources.gapPct).toBe(75);
   });
 });

@@ -8,6 +8,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { TableProfile, TableScanResult, ScanSummary, FieldGapStat, FieldGapReport, FieldColumnType } from './types.ts';
@@ -879,6 +880,54 @@ const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   ],
 };
 
+// ---------------------------------------------------------------------------
+// YAML entity catalogs (concepts, risks, capabilities, ...)
+//
+// Unlike the PG-backed tables above, these live in data/entities/*.yaml and
+// are loaded directly from disk. The field-gap scan treats each row the same
+// way regardless of source. Added by QUA-571 to unblock the YAML-catalog
+// enrichment thread (QUA-23, and analogous risk/capability tickets).
+// ---------------------------------------------------------------------------
+
+interface YamlCatalogConfig {
+  /** Path relative to PROJECT_ROOT. */
+  file: string;
+  fields: FieldConfig[];
+}
+
+const YAML_CATALOG_CONFIGS: Record<string, YamlCatalogConfig> = {
+  concepts: {
+    file: 'data/entities/concepts.yaml',
+    fields: [
+      { field: 'sources', columnType: 'list' },
+      { field: 'relatedEntries', columnType: 'list' },
+      { field: 'description', columnType: 'string' },
+    ],
+  },
+  risks: {
+    file: 'data/entities/risks.yaml',
+    fields: [
+      { field: 'sources', columnType: 'list' },
+      { field: 'relatedEntries', columnType: 'list' },
+      { field: 'description', columnType: 'string' },
+    ],
+  },
+  capabilities: {
+    file: 'data/entities/capabilities.yaml',
+    fields: [
+      { field: 'sources', columnType: 'list' },
+      { field: 'relatedEntries', columnType: 'list' },
+      { field: 'description', columnType: 'string' },
+    ],
+  },
+};
+
+export const YAML_CATALOG_TABLES = Object.keys(YAML_CATALOG_CONFIGS);
+
+for (const [name, config] of Object.entries(YAML_CATALOG_CONFIGS)) {
+  FIELD_GAP_CONFIGS[name] = config.fields;
+}
+
 // Require the slash so legitimate 2-letter codes like "NA" (Namibia ISO-3166,
 // "Native American" category) don't get flagged as gaps. "n/a" with the slash
 // is the conventional not-available marker.
@@ -893,6 +942,9 @@ function classifyValue(value: unknown): FieldValueClass {
     if (trimmed.length === 0) return 'empty';
     if (NA_PATTERN.test(trimmed)) return 'na';
     return 'filled';
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0 ? 'empty' : 'filled';
   }
   // Numeric 0 / boolean false are valid, not gaps.
   return 'filled';
@@ -954,6 +1006,10 @@ export function profileFields<T extends { id: string }>(
 type RawRow = Record<string, unknown> & { id: string };
 
 async function fetchTableRows(table: string): Promise<RawRow[]> {
+  const yamlConfig = YAML_CATALOG_CONFIGS[table];
+  if (yamlConfig) {
+    return loadYamlCatalogRows(yamlConfig.file);
+  }
   switch (table) {
     case 'divisions':
       return fetchAllPaginated<RawRow>('/api/divisions/all', 'divisions');
@@ -966,6 +1022,40 @@ async function fetchTableRows(table: string): Promise<RawRow[]> {
     default:
       return [];
   }
+}
+
+/**
+ * Load rows from a YAML entity catalog file (e.g. data/entities/concepts.yaml).
+ * Returns [] with a warning if the file is missing or malformed so a broken
+ * YAML file can't silently break the whole scan. Rows missing an `id` are
+ * skipped — profileFields<T extends { id: string }> requires one.
+ */
+export function loadYamlCatalogRows(relativePath: string): RawRow[] {
+  const fullPath = join(PROJECT_ROOT, relativePath);
+  if (!existsSync(fullPath)) {
+    console.warn(`[tablebase scanner] YAML catalog file not found: ${relativePath}`);
+    return [];
+  }
+  let parsed: unknown;
+  try {
+    parsed = parseYaml(readFileSync(fullPath, 'utf-8'));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[tablebase scanner] failed to parse ${relativePath}: ${msg}`);
+    return [];
+  }
+  if (!Array.isArray(parsed)) {
+    console.warn(`[tablebase scanner] expected top-level list in ${relativePath}, got ${typeof parsed}`);
+    return [];
+  }
+  const rows: RawRow[] = [];
+  for (const entry of parsed) {
+    if (!entry || typeof entry !== 'object') continue;
+    const id = (entry as { id?: unknown }).id;
+    if (typeof id !== 'string' || id.length === 0) continue;
+    rows.push({ ...(entry as Record<string, unknown>), id });
+  }
+  return rows;
 }
 
 /** List of tables covered by the field-gap scan. */
