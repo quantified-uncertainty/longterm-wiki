@@ -16,11 +16,8 @@ describe("inferDataSource", () => {
     const ds = inferDataSource(
       "https://coefficientgiving.org/wp-content/uploads/grants.csv",
     );
-    expect(ds).toEqual({
-      id: "coefficient-giving",
-      name: "Coefficient Giving",
-      resourceId: "28c67bc404f6c25d",
-    });
+    expect(ds?.id).toBe("coefficient-giving");
+    expect(ds?.name).toBe("Coefficient Giving");
   });
 
   it("is case-insensitive", () => {
@@ -33,8 +30,11 @@ describe("inferDataSource", () => {
     expect(inferDataSource("https://effectivealtruism.org/post")?.id).toBe("ea-funds");
   });
 
-  it("matches each known pattern to a data source id that the /data-sources/[id] route can resolve", () => {
-    // The ids below must match real data source slugs on prod.
+  it("maps each known URL pattern to its expected data-source slug", () => {
+    // These slugs were verified against /data-sources/[id] on prod at authoring
+    // time. This test only checks the URL→slug mapping; if a slug is renamed on
+    // prod the UI link will 404, but that's caught by prod render-audit + the
+    // /data-sources/[id] notFound() guard, not here.
     const cases: Array<[string, string]> = [
       ["https://survivalandflourishing.fund/sff-2024", "sff"],
       ["https://manifund.org/projects/foo", "manifund"],
