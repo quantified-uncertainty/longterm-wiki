@@ -39,7 +39,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockStoreEvidence.mockResolvedValue({ ok: true, data: { id: 'ev-1' } as any });
   mockStoreVerdict.mockResolvedValue({ ok: true, data: { id: 'v-1' } as any });
-  mockLookupResourceByUrl.mockResolvedValue({ ok: true, data: { id: 'res-42' } as any });
+  // QUA-568 Phase B.5: source_check_evidence.resource_id now references
+  // resources.stable_id; storeSourcingEvidence writes the stableId form.
+  mockLookupResourceByUrl.mockResolvedValue({ ok: true, data: { id: 'res-42', stableId: 'sid_res42xxxx' } as any });
 });
 
 // ---------------------------------------------------------------------------
@@ -100,7 +102,7 @@ describe('storeSourcingEvidence', () => {
     expect(body.checkerModel).toBe('deterministic-row-match');
   });
 
-  it('resolves resourceId from URL when not supplied', async () => {
+  it('resolves resourceId (stable_id form) from URL when not supplied', async () => {
     await storeSourcingEvidence({
       recordType: 'grant',
       recordId: 'grant-1',
@@ -113,7 +115,10 @@ describe('storeSourcingEvidence', () => {
 
     expect(mockLookupResourceByUrl).toHaveBeenCalledWith('https://example.com/resource');
     const body = mockStoreEvidence.mock.calls[0][0];
-    expect(body.resourceId).toBe('res-42');
+    // QUA-568 Phase B.5: the helper now writes resource.data.stableId (sid_*)
+    // rather than resource.data.id (hex16) so the FK to resources.stable_id
+    // introduced by migration 0187 is satisfied.
+    expect(body.resourceId).toBe('sid_res42xxxx');
   });
 
   it('uses supplied resourceId without calling lookupResourceByUrl', async () => {
