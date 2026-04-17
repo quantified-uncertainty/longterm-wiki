@@ -6,8 +6,17 @@
  * analysis, and (optionally) API queries.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync, globSync } from "fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join, basename } from "path";
+import { globSync as tinyGlobSync } from "tinyglobby";
+
+// fs.globSync requires Node 22+, but this repo pins Node 20 (.nvmrc, engines).
+// @types/node@22 masks the mismatch at compile time, so the failure was silent
+// until sync:data logged "Entity matrix generation failed" at runtime. Wrap
+// tinyglobby with absolute:true so absolute patterns in → absolute paths out,
+// matching fs.globSync behavior at the original call sites.
+const globSync = (pattern: string | readonly string[]): string[] =>
+  tinyGlobSync(pattern, { absolute: true });
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { ENTITY_TYPES, DIMENSIONS, DIMENSION_GROUPS, scoreDimension } from "./config.ts";
 import { apiRequest, type ApiResult } from "../lib/wiki-server/client.ts";
