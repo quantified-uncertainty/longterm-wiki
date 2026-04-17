@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, sql, and } from "drizzle-orm";
+import { eq, count, sql, and, inArray } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import {
@@ -36,6 +36,7 @@ import {
   researchAreaEvaluations,
   researchAreaScores,
   evaluationDimensions,
+  resources,
 } from "../../schema.js";
 
 // ---- Constants ----
@@ -523,6 +524,25 @@ const researchAreasApp = new Hono()
       byArea.set(item.researchAreaId, existing);
     }
 
+    // QUA-565 Phase B.2: research_area_papers.resource_id now references
+    // resources.stable_id. Translate any incoming hex16 values → sid_ via
+    // a single lookup before the transaction. Items whose resourceId is
+    // already a sid_ (or doesn't match any resources.id) pass through
+    // unchanged; the FK enforces validity at insert time.
+    const inputResourceIds = items
+      .map((item) => item.resourceId)
+      .filter((v): v is string => !!v);
+    const hexToStableId = new Map<string, string>();
+    if (inputResourceIds.length > 0) {
+      const resourceRows = await db
+        .select({ id: resources.id, stableId: resources.stableId })
+        .from(resources)
+        .where(inArray(resources.id, inputResourceIds));
+      for (const r of resourceRows) {
+        if (r.stableId) hexToStableId.set(r.id, r.stableId);
+      }
+    }
+
     await db.transaction(async (tx) => {
       // Delete existing papers for each area being synced, then bulk insert fresh
       for (const [areaId, areaItems] of byArea) {
@@ -533,7 +553,9 @@ const researchAreasApp = new Hono()
         await tx.insert(researchAreaPapers).values(
           areaItems.map((item) => ({
             researchAreaId: item.researchAreaId,
-            resourceId: item.resourceId ?? null,
+            resourceId: item.resourceId
+              ? hexToStableId.get(item.resourceId) ?? item.resourceId
+              : null,
             title: item.title,
             url: item.url ?? null,
             authors: item.authors ?? null,
@@ -601,12 +623,17 @@ const researchAreasApp = new Hono()
   .post("/backfill-papers-from-citations", async (c) => {
     const db = getDrizzleDb();
 
-    // Use raw SQL for the complex join + insert
+    // Use raw SQL for the complex join + insert.
+    // QUA-565 Phase B.2: research_area_papers.resource_id references
+    // resources.stable_id, so we SELECT r.stable_id (not r.id). The
+    // upstream JOIN (resource_citations.resource_id = r.id) is unchanged —
+    // resource_citations.resource_id still references resources.id until
+    // its own Phase B ticket lands.
     const result = await db.execute(sql`
       INSERT INTO research_area_papers (research_area_id, resource_id, title, url, authors, published_date, sort_order)
       SELECT
         ra.id,
-        r.id,
+        r.stable_id,
         COALESCE(r.title, 'Untitled'),
         r.url,
         CASE WHEN r.authors IS NOT NULL
