@@ -62,3 +62,10 @@ facts:
     property: country
     value: "United States"
     source: https://www.influencewatch.org/non-profit/encode-justice/
+
+  - id: f_BdJM5BZNra
+    property: financial-disclosure
+    value: "No independent IRS Form 990 filings. Encode Justice operates as a fiscal project of Future Incubator (a program of March On / Future Coalition) and does not file its own financial reports. Revenue and employee figures are not publicly disclosed."
+    asOf: 2026-04
+    source: https://www.influencewatch.org/non-profit/encode-justice/
+    notes: "ProPublica Nonprofit Explorer returns no record for 'Encode Justice'. Fiscal sponsorship confirmed by InfluenceWatch profile."
