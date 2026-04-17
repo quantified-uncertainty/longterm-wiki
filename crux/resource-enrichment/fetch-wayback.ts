@@ -126,7 +126,9 @@ export async function fetchWaybackCommand(
       try {
         await upsertCitationContent({
           url: r.url,
-          resourceId: r.id,
+          // QUA-549 Phase B: resource_content_versions.resource_id now
+          // references resources.stable_id; pass the sid_, not the hex16 id.
+          resourceId: r.stable_id ?? null,
           fetchedAt: new Date().toISOString(),
           httpStatus: 200,
           contentType: result.contentType,

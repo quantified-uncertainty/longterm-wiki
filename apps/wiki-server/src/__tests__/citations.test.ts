@@ -2,6 +2,7 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
 import { mockDbModule, postJson } from "./test-utils.js";
 import type { citationQuotes, citationAccuracySnapshots, citationContent, resourceContentVersions } from "../schema.js";
+import { isSid } from "@longterm-wiki/id-utils";
 
 // ---- In-memory stores simulating Postgres tables ----
 // Store types are derived from the Drizzle schema so TypeScript catches column renames.
@@ -1492,6 +1493,28 @@ describe("Citation Server API", () => {
       });
       // No version should be created (no hash, no text to compute hash from)
       expect(contentVersionStore.length).toBe(initialCount);
+    });
+
+    // QUA-549 Phase B: resource_content_versions.resource_id now references
+    // resources.stable_id (sid_<10>), not resources.id (hex16). Callers must
+    // pass the sid_ — the FK enforces this in prod; this test locks in that
+    // the server round-trips sid_ values verbatim and asserts the stored
+    // value is a sid_ (via isSid) so a caller-side regression back to hex16
+    // would fail the assertion even though the mock DB doesn't enforce FK.
+    it("persists the caller-provided resourceId (sid_) verbatim on the content version row", async () => {
+      const initialCount = contentVersionStore.length;
+      await postJson(app, "/api/citations/content/upsert", {
+        url: "https://example.com/with-resource",
+        resourceId: "sid_AbCdEfGhIj",
+        fetchedAt: "2025-01-01T00:00:00Z",
+        fullText: "Body for resource link",
+        contentHash: "rcvsidhash",
+      });
+      expect(contentVersionStore.length).toBe(initialCount + 1);
+      const latest = contentVersionStore[contentVersionStore.length - 1];
+      expect(latest.url).toBe("https://example.com/with-resource");
+      expect(latest.resourceId).toBe("sid_AbCdEfGhIj");
+      expect(latest.resourceId && isSid(latest.resourceId)).toBe(true);
     });
   });
 });
