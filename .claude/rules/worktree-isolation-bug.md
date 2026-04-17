@@ -24,7 +24,12 @@ Agents spawned without worktree isolation run in the **same directory** as the p
 - Code analysis and review
 - Running commands that don't modify the working tree
 
-If you need an agent to modify files on a different branch, dispatch it to a different slot via `./ws open <N> --claude` rather than using worktree isolation.
+If you need an agent to modify files on a different branch, dispatch it to a slot:
+
+- **Fire-and-forget, headless**: `./ws dispatch <N> "<prompt>"` (QUA-554). Returns a session id + run id; stream-JSON events are captured under `lw/aN/.dispatch/runs/<runId>/`. Watch with `./ws dispatch-status <N>`, stop with `./ws dispatch-stop <N>`.
+- **Interactive oversight**: `./ws open <N> --claude` opens a tmux window and launches Claude Code.
+
+Both are safe and do not trigger the worktree bug.
 
 ## Defenses in place
 
