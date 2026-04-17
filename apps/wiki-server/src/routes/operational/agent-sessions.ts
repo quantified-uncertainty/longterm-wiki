@@ -445,8 +445,17 @@ const agentSessionsApp = new Hono()
     const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));
     const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
     const db = getDrizzleDb();
+    // Backfill `date` from `started_at` when null — session-finalize is best-effort
+    // (async SessionEnd hook) and frequently doesn't run; without this fallback,
+    // swept rows end up with status=completed but date=null and drop out of any
+    // date-filtered query (retrospective, /internal/page-changes, etc).
     const stale = await db.update(agentSessions)
-      .set({ status: "completed", completedAt: new Date(), updatedAt: new Date() })
+      .set({
+        status: "completed",
+        completedAt: new Date(),
+        updatedAt: new Date(),
+        date: sql`COALESCE(${agentSessions.date}, ${agentSessions.startedAt}::date)`,
+      })
       .where(and(eq(agentSessions.status, "active"), lt(agentSessions.updatedAt, cutoff)))
       .returning({ id: agentSessions.id, branch: agentSessions.branch, issueNumber: agentSessions.issueNumber });
     logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as completed");
