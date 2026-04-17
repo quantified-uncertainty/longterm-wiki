@@ -43,13 +43,45 @@
 --     ON DELETE SET NULL;
 
 -- Step 1: drop the existing FK on resources.id.
--- IF EXISTS silences on re-runs. Both possible names are handled because
--- the phase1-sourcing-rename-rollback.sql history shows the constraint
--- may previously have been named `sourcing_evidence_resource_id_fkey`.
+-- Three possible names are handled because this table's constraint history is
+-- non-trivial — migration 0127 created it as `verification_evidence` with inline
+-- REFERENCES (auto-naming `verification_evidence_resource_id_fkey`), 0131
+-- renamed the TABLE to `source_check_evidence` but NOT its constraints (see
+-- docs/audits/qua-303-sourcing-rename-audit.md:48), and Drizzle may have
+-- subsequently normalized to a canonical name during introspection. All three
+-- IF EXISTS DROPs are idempotent no-ops when the name doesn't match; at least
+-- one is guaranteed to hit the actual name.
 ALTER TABLE source_check_evidence
   DROP CONSTRAINT IF EXISTS source_check_evidence_resource_id_resources_id_fk;
 ALTER TABLE source_check_evidence
   DROP CONSTRAINT IF EXISTS source_check_evidence_resource_id_fkey;
+ALTER TABLE source_check_evidence
+  DROP CONSTRAINT IF EXISTS verification_evidence_resource_id_fkey;
+
+-- Defensive sanity check: after the three DROPs, no FK on resource_id should
+-- remain pointing at resources.id. If one does, the pg_constraint name drifted
+-- beyond the three legacy variants we know about — fail loudly before the
+-- UPDATE violates it, rather than letting the migration half-apply.
+DO $$
+DECLARE
+  remaining_fk TEXT;
+BEGIN
+  SELECT conname INTO remaining_fk
+  FROM pg_constraint
+  WHERE conrelid = 'source_check_evidence'::regclass
+    AND contype = 'f'
+    AND conkey = ARRAY[(SELECT attnum FROM pg_attribute
+                       WHERE attrelid = 'source_check_evidence'::regclass
+                         AND attname = 'resource_id')]
+    AND confrelid = 'resources'::regclass
+    AND confkey = ARRAY[(SELECT attnum FROM pg_attribute
+                        WHERE attrelid = 'resources'::regclass
+                          AND attname = 'id')]
+  LIMIT 1;
+  IF remaining_fk IS NOT NULL THEN
+    RAISE EXCEPTION 'QUA-568 migration aborted: unexpected FK constraint "%" still points source_check_evidence.resource_id at resources.id after DROP attempts. Add an explicit DROP for this name and re-run.', remaining_fk;
+  END IF;
+END $$;
 
 -- Step 2: rewrite resource_id values from hex16 / `kb-<hex16>` → sid_<10>
 -- via JOIN on resources. Rows where resource_id IS NULL are untouched.
