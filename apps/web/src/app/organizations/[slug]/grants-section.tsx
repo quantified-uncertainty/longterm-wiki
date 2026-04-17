@@ -17,6 +17,7 @@ import { SectionHeader } from "./org-shared";
 import type { ParsedGrantRecord, ReceivedGrant } from "./org-data";
 import { formatAmount, numericValue } from "./org-data";
 import { InteractiveGrantsTable, type GrantRow } from "./interactive-grants-table";
+import { inferDataSource } from "@/app/grants/grants-data-source";
 
 /** Grants above this threshold use server-side pagination. */
 const SERVER_MODE_THRESHOLD = 200;
@@ -26,6 +27,7 @@ const MAX_RENDERED_ROWS = 5000;
 
 /** Convert a ParsedGrantRecord to a serializable GrantRow for the client. */
 function toGrantRow(g: ParsedGrantRecord, orgSlug?: string): GrantRow {
+  const ds = inferDataSource(g.source);
   return {
     key: g.key,
     name: g.name,
@@ -43,6 +45,8 @@ function toGrantRow(g: ParsedGrantRecord, orgSlug?: string): GrantRow {
     divisionName: null,
     notes: null,
     grantHref: orgSlug ? `/organizations/${orgSlug}/grants/${g.key}` : null,
+    dataSourceId: ds?.id ?? null,
+    dataSourceName: ds?.name ?? null,
   };
 }
 

@@ -19,6 +19,7 @@ import {
 } from "@/components/wiki/factbase/format";
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { STATUS_COLORS } from "@/app/grants/grants-constants";
+import { inferDataSource } from "@/app/grants/grants-data-source";
 import {
   parseGrantDetail,
   DetailSection,
@@ -71,6 +72,7 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
   const grant = parseGrantDetail(record);
   const grantVerdict = getRecordVerdict("grant", String(grant.key));
+  const dataSource = inferDataSource(grant.source);
 
   // Verify this grant belongs to the org (by funder slug)
   const funderSlug = getKBEntitySlug(record.ownerEntityId);
@@ -206,6 +208,17 @@ export default async function OrgGrantDetailPage({ params }: PageProps) {
 
         {/* Right column: supplementary info */}
         <div className="space-y-4">
+          {dataSource && (
+            <DetailSection title="Data source">
+              <Link
+                href={`/data-sources/${dataSource.id}`}
+                className="text-sm font-medium text-primary hover:underline"
+              >
+                {dataSource.name}
+              </Link>
+            </DetailSection>
+          )}
+
           {grant.source && (
             <DetailSection title="Source">
               {isUrl(grant.source) ? (
