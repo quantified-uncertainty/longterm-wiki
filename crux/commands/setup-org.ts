@@ -720,6 +720,11 @@ export async function runSetupOrg(
     if (entityRecord.relatedEntries?.length) {
       entityForSync.relatedEntries = entityRecord.relatedEntries;
     }
+    // Non-base fields (aliases, orgType) ride along in metadata so PG mirrors YAML.
+    const metadata: Record<string, unknown> = {};
+    if (entityRecord.orgType) metadata.orgType = entityRecord.orgType;
+    if (entityRecord.aliases?.length) metadata.aliases = entityRecord.aliases;
+    if (Object.keys(metadata).length > 0) entityForSync.metadata = metadata;
     const syncResult = await deps.syncEntities([entityForSync]);
     entitySyncOk = syncResult.ok;
     steps.push({
@@ -768,7 +773,10 @@ export async function runSetupOrg(
         detail: `dry-run (${divisionRows.length} divisions)`,
       });
     }
-    report.divisionsSnippet = formatDivisionsSnippet(divisionRows, config.slug);
+    const divisionsSnippet = formatDivisionsSnippet(divisionRows, config.slug);
+    report.divisionsSnippet = stableId === PLACEHOLDER_STABLE_ID
+      ? `  // NOTE: dry-run preview — replace "${PLACEHOLDER_STABLE_ID}" with the real stable ID before pasting.\n${divisionsSnippet}`
+      : divisionsSnippet;
   }
 
   // 6. Funding programs. Same skip-on-entity-failure rule as divisions.
@@ -809,7 +817,10 @@ export async function runSetupOrg(
         detail: `dry-run (${programRows.length} programs)`,
       });
     }
-    report.fundingProgramsSnippet = formatFundingProgramsSnippet(programRows, config.slug);
+    const programsSnippet = formatFundingProgramsSnippet(programRows, config.slug);
+    report.fundingProgramsSnippet = stableId === PLACEHOLDER_STABLE_ID
+      ? `  // NOTE: dry-run preview — replace "${PLACEHOLDER_STABLE_ID}" with the real stable ID before pasting.\n${programsSnippet}`
+      : programsSnippet;
   }
 
   // 7. Follow-ups (always shown — these aren't automated).
@@ -924,23 +935,32 @@ function adaptApiResult<T>(r: ApiCallResult<T>): Result<T> {
   return r.ok ? { ok: true, data: r.data } : { ok: false, message: `${r.error}: ${r.message}` };
 }
 
+/**
+ * Adapt the raw wiki-server `getIdBySlug` response into the orchestrator's
+ * lookup shape. The wiki-server returns 404 for "slug not allocated" — a
+ * valid lookup result, not an error. The HTTP client coerces all 4xx to
+ * `bad_request`, so we narrow on the "404" message prefix to avoid
+ * swallowing real 400/422/429.
+ *
+ * Exported for unit testing.
+ */
+export function adaptIdLookup(
+  r: ApiCallResult<{ wikiId: string; stableId: string | null }>,
+): Result<Ids | null> {
+  if (!r.ok) {
+    if (r.error === "bad_request" && /^404[:\s]/.test(r.message)) {
+      return { ok: true, data: null };
+    }
+    return { ok: false, message: `${r.error}: ${r.message}` };
+  }
+  if (!r.data.stableId) return { ok: true, data: null };
+  return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
+}
+
 export function buildLiveDeps(repoRoot: string, ciOrJson: boolean): OrchestratorDeps {
   return {
     repoRoot,
-    getIdBySlug: async (slug) => {
-      const r = await getIdBySlug(slug);
-      if (!r.ok) {
-        // wiki-server returns 404 for "slug not allocated" — a valid lookup
-        // result, not an error. The client coerces all 4xx to `bad_request`,
-        // so narrow on the message prefix to avoid swallowing real 400/422/429.
-        if (r.error === "bad_request" && /^404[:\s]/.test(r.message)) {
-          return { ok: true, data: null };
-        }
-        return { ok: false, message: `${r.error}: ${r.message}` };
-      }
-      if (!r.data.stableId) return { ok: true, data: null };
-      return { ok: true, data: { wikiId: r.data.wikiId, stableId: r.data.stableId } };
-    },
+    getIdBySlug: async (slug) => adaptIdLookup(await getIdBySlug(slug)),
     allocateId: async (slug, description) => {
       const r = await allocateId(slug, description);
       if (!r.ok) return { ok: false, message: `${r.error}: ${r.message}` };

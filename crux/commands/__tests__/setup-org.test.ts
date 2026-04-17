@@ -7,6 +7,7 @@ import { dirname, join } from "node:path";
 import { parse as parseYaml } from "yaml";
 
 import {
+  adaptIdLookup,
   buildDivisionRows,
   buildEntityRecord,
   buildFactBaseDoc,
@@ -688,7 +689,7 @@ describe("runSetupOrg (--apply)", () => {
     expect(report.followUp.some((f) => f.includes("PG sync skipped"))).toBe(true);
   });
 
-  it("skips download files but still surfaces both file-write attempts", async () => {
+  it("skips PG sync but still surfaces both file-write attempts when both writes fail", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
     const { deps } = makeDeps();
     let writeCount = 0;
@@ -797,11 +798,73 @@ describe("formatReport", () => {
 
   it("omits the (re-run with --apply) hint when applied", async () => {
     const config = parseConfig(MINIMAL_CONFIG_YAML, "yaml");
-    const { deps } = makeDeps({}, mkdtempSync(join(tmpdir(), "setup-org-fmt-")));
-    const report = await runSetupOrg(config, { apply: true }, deps);
-    const text = formatReport(report);
-    expect(text).toContain("Applied");
-    expect(text).not.toContain("re-run with --apply");
+    const tmp = mkdtempSync(join(tmpdir(), "setup-org-fmt-"));
+    try {
+      const { deps } = makeDeps({}, tmp);
+      const report = await runSetupOrg(config, { apply: true }, deps);
+      const text = formatReport(report);
+      expect(text).toContain("Applied");
+      expect(text).not.toContain("re-run with --apply");
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
+    }
   });
 });
 
+
+
+describe("adaptIdLookup", () => {
+  it("returns null when slug is not allocated (404 from wiki-server)", () => {
+    // The wiki-server HTTP client coerces 4xx to error: "bad_request" with the
+    // status code at the start of the message. "Slug not allocated" should be
+    // a successful lookup with no data — not a propagated failure.
+    const r = adaptIdLookup({
+      ok: false,
+      error: "bad_request",
+      message: "404: slug not allocated",
+    });
+    expect(r).toEqual({ ok: true, data: null });
+  });
+
+  it("propagates other bad_request errors as failures", () => {
+    // 400/422/429 are real errors and must surface, not get silently mapped to
+    // "not allocated". The narrow regex on "^404[:\\s]" in adaptIdLookup is
+    // what guards this distinction.
+    const r = adaptIdLookup({
+      ok: false,
+      error: "bad_request",
+      message: "400: invalid slug",
+    });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toBe("bad_request: 400: invalid slug");
+  });
+
+  it("propagates non-bad_request errors as failures", () => {
+    const r = adaptIdLookup({
+      ok: false,
+      error: "network",
+      message: "ECONNREFUSED",
+    });
+    expect(r.ok).toBe(false);
+    if (!r.ok) expect(r.message).toBe("network: ECONNREFUSED");
+  });
+
+  it("returns null when the row exists but has no stableId", () => {
+    const r = adaptIdLookup({
+      ok: true,
+      data: { wikiId: "E42", stableId: null },
+    });
+    expect(r).toEqual({ ok: true, data: null });
+  });
+
+  it("returns ids when both wikiId and stableId are present", () => {
+    const r = adaptIdLookup({
+      ok: true,
+      data: { wikiId: "E42", stableId: "sid_AbCdEfGhIj" },
+    });
+    expect(r).toEqual({
+      ok: true,
+      data: { wikiId: "E42", stableId: "sid_AbCdEfGhIj" },
+    });
+  });
+});
