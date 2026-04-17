@@ -52,7 +52,7 @@ export function buildBranchAgentConfig(
   return {
     repo: (process.env.PR_PATROL_REPO as string) ?? 'quantified-uncertainty/longterm-wiki',
     intervalSeconds: 60, // Unused in branch-agent, but required by PatrolConfig
-    maxTurns: parseIntOpt(options.maxTurns ?? process.env.PR_PATROL_MAX_TURNS, 30),
+    maxTurns: parseIntOpt(options.maxTurns ?? process.env.PR_PATROL_MAX_TURNS, 60),
     cooldownSeconds: 0, // Branch-agent doesn't use global cooldowns
     staleHours: 48,
     model: (options.model as string) ?? process.env.PR_PATROL_MODEL ?? 'sonnet',
