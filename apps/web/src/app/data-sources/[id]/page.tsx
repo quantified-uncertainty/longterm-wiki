@@ -431,7 +431,7 @@ export default async function DataSourceDetailPage({
               <SectionHeader>Verification Config</SectionHeader>
               <div className={CARD_CLASS}>
                 <p className="text-xs text-muted-foreground mb-3">
-                  Strategy and fields used by source-check to match records
+                  Strategy and fields used by sourcing to match records
                   against this source.
                 </p>
                 <JsonBlock data={source.verificationConfig} />
