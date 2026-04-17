@@ -224,7 +224,7 @@ export const resourceContentVersions = pgTable(
   "resource_content_versions",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    resourceId: text("resource_id").references(() => resources.id, {
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     url: text("url").notNull(),
