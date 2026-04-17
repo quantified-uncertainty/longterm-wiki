@@ -1,0 +1,6 @@
+# Intentionally malformed YAML used by scanner.test.ts to exercise the
+# loadYamlCatalogRows parse-error branch. Do not "fix" the syntax here.
+- id: unterminated-flow-list
+  broken: [one, two, three
+- id: another-entry
+  title: never reached

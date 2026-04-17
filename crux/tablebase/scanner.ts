@@ -836,11 +836,12 @@ interface FieldConfig {
 }
 
 /**
- * Which fields to profile for each table. Excludes identity columns (id,
- * natural-key FKs, name) and timestamps — those are never "enrichable" gaps.
- * Derived from the wiki-server `formatRow` shapes in each tablebase route.
+ * Which fields to profile for each PG-backed table. Excludes identity columns
+ * (id, natural-key FKs, name) and timestamps — those are never "enrichable"
+ * gaps. Derived from the wiki-server `formatRow` shapes in each tablebase
+ * route.
  */
-const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
+const PG_FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   divisions: [
     { field: 'divisionType', columnType: 'enum' },
     { field: 'lead', columnType: 'id' },
@@ -924,9 +925,18 @@ const YAML_CATALOG_CONFIGS: Record<string, YamlCatalogConfig> = {
 
 export const YAML_CATALOG_TABLES = Object.keys(YAML_CATALOG_CONFIGS);
 
-for (const [name, config] of Object.entries(YAML_CATALOG_CONFIGS)) {
-  FIELD_GAP_CONFIGS[name] = config.fields;
-}
+/**
+ * Unified field-gap config map — PG tables + YAML catalogs. Assembled once
+ * here, so `FIELD_GAP_TABLES` below sees the full set. No runtime mutation;
+ * the resulting object shape is a function of the two config declarations
+ * above, nothing more.
+ */
+const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
+  ...PG_FIELD_GAP_CONFIGS,
+  ...Object.fromEntries(
+    Object.entries(YAML_CATALOG_CONFIGS).map(([name, config]) => [name, config.fields]),
+  ),
+};
 
 // Require the slash so legitimate 2-letter codes like "NA" (Namibia ISO-3166,
 // "Native American" category) don't get flagged as gaps. "n/a" with the slash
@@ -1053,6 +1063,8 @@ export function loadYamlCatalogRows(relativePath: string): RawRow[] {
     if (!entry || typeof entry !== 'object') continue;
     const id = (entry as { id?: unknown }).id;
     if (typeof id !== 'string' || id.length === 0) continue;
+    // `id` shorthand goes last so the narrowed string wins over the
+    // unknown-typed `id` from the spread.
     rows.push({ ...(entry as Record<string, unknown>), id });
   }
   return rows;

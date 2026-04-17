@@ -474,7 +474,40 @@ describe('scanner — YAML entity catalog support (QUA-571)', () => {
     warnSpy.mockRestore();
   });
 
-  it('runFieldGapScan: profiles concepts.yaml, flags sources as a 100% gap', async () => {
+  it('loadYamlCatalogRows: returns [] (with warning) on malformed YAML', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-corrupt.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('failed to parse'));
+    warnSpy.mockRestore();
+  });
+
+  it('loadYamlCatalogRows: returns [] (with warning) when top-level is not a list', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-object.yaml');
+    expect(rows).toEqual([]);
+    expect(warnSpy).toHaveBeenCalledWith(expect.stringContaining('expected top-level list'));
+    warnSpy.mockRestore();
+  });
+
+  it('loadYamlCatalogRows: skips entries without a non-empty string id', async () => {
+    const { loadYamlCatalogRows } = await import('./scanner.ts');
+    const rows = loadYamlCatalogRows('crux/tablebase/__fixtures__/yaml-catalog-mixed.yaml');
+    // Fixture has 6 entries: valid-a, missing-id, numeric-id (42), not-an-object,
+    // empty-id (''), valid-b. Only valid-a and valid-b survive.
+    expect(rows.map((r) => r.id)).toEqual(['valid-a', 'valid-b']);
+  });
+
+  it('runFieldGapScan: profiles concepts.yaml and returns the expected field shape', async () => {
+    // Integration-style: reads the real data/entities/concepts.yaml so the
+    // test also exercises the YAML parse + loadYamlCatalogRows path end-to-end.
+    // Deliberately avoids absolute % assertions (e.g. "sources is 100% gap")
+    // because the follow-up PR (QUA-571 Phase 2) populates `sources` and the
+    // test should stay green as enrichment happens — it's profiling behavior,
+    // not gap state. Exact-value assertions are covered by the fixture-based
+    // profileFields test below.
     const { runFieldGapScan } = await import('./scanner.ts');
     const reports = await runFieldGapScan(['concepts']);
     expect(reports.length).toBe(1);
@@ -485,15 +518,17 @@ describe('scanner — YAML entity catalog support (QUA-571)', () => {
     const sources = report.fields.find((f) => f.field === 'sources');
     expect(sources).toBeDefined();
     expect(sources!.columnType).toBe('list');
-    // No YAML entity currently populates `sources`, so every row is a null gap.
-    expect(sources!.gapPct).toBe(100);
-    expect(sources!.nullPct).toBe(100);
+    // Must have at least some rows profiled — a 0-row report would mean the
+    // YAML loader silently returned [].
+    expect(sources!.total).toBe(report.totalRows);
 
     const rel = report.fields.find((f) => f.field === 'relatedEntries');
     expect(rel).toBeDefined();
-    // Partial coverage — don't hardcode the exact %, but require > 0 and < 100.
-    expect(rel!.gapPct).toBeGreaterThan(0);
-    expect(rel!.gapPct).toBeLessThan(100);
+    expect(rel!.columnType).toBe('list');
+
+    const desc = report.fields.find((f) => f.field === 'description');
+    expect(desc).toBeDefined();
+    expect(desc!.columnType).toBe('string');
   });
 
   it('profileFields: classifies empty arrays as "empty", populated arrays as "filled"', async () => {
