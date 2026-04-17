@@ -80,3 +80,10 @@ facts:
     asOf: 2021
     source: https://www.influencewatch.org/non-profit/the-future-society/
     notes: "Revenue $755K, expenses $725K, assets $385K in 2021. Grew significantly to $3.4M by 2024."
+
+  - id: f_aJtJdBOXQU
+    property: employee-count
+    value: "19"
+    asOf: 2026-04
+    source: https://thefuturesociety.org/our-team/
+    notes: "Team page lists 15 staff (2 leadership, 2 directors, 4 senior associates, 4 associates, 1 analyst, 2 operations) plus 4 advisors/former leadership (founder & former chair, senior advisor, volunteer chair for AI and the Rule of Law, special assistant). Staff distributed across North America, Europe, and Africa per org description."
