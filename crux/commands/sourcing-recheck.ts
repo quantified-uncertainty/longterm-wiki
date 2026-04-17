@@ -15,6 +15,7 @@ import type { CommandOptions as BaseOptions, CommandResult } from '../lib/comman
 import {
   storeVerdict as storeVerdictRpc,
   getDueForRecheck,
+  listVerdicts,
   getEvidenceByRecords,
   evidenceRecordKey,
 } from '../lib/wiki-server/sourcing-client.ts';
@@ -50,10 +51,21 @@ interface RecheckOptions extends BaseOptions {
   budget?: string;
   limit?: string;
   type?: string;
+  verdict?: string;
   'dry-run'?: boolean;
   dryRun?: boolean;
   ci?: boolean;
 }
+
+const VERDICT_PRIORITY: Record<string, number> = {
+  contradicted: 100,
+  outdated: 80,
+  partial: 50,
+  unverifiable: 30,
+  confirmed: 10,
+};
+
+const ALLOWED_FORCE_VERDICTS = new Set(Object.keys(VERDICT_PRIORITY));
 
 interface DueItem {
   recordType: string;
@@ -303,38 +315,100 @@ async function recheckCommand(
   const budgetLimit = options.budget ? parseFloat(String(options.budget)) : 1.0;
   const itemLimit = options.limit ? parseInt(String(options.limit), 10) : 50;
   const typeFilter = options.type as string | undefined;
+  const verdictFilter = options.verdict as string | undefined;
+
+  if (verdictFilter && !ALLOWED_FORCE_VERDICTS.has(verdictFilter)) {
+    return {
+      exitCode: 1,
+      output: `Invalid --verdict "${verdictFilter}". Must be one of: ${[...ALLOWED_FORCE_VERDICTS].join(', ')}`,
+    };
+  }
 
   console.log('\x1b[1mSource-Check Recheck Scheduler\x1b[0m');
   console.log('');
 
-  // ── Step 1: Fetch items due for recheck ──
-  console.log('Fetching items due for recheck...');
+  // ── Step 1: Fetch items ──
+  // When --verdict is passed, bypass the due-date filter and pull all verdicts
+  // matching that type. Used for targeted sweeps (QUA-546) where we want to
+  // re-run the improved LLM prompt against historical verdicts regardless of
+  // whether their nextCheckDue has elapsed.
+  let items: DueItem[];
+  let total: number;
 
-  const queryParams = new URLSearchParams();
-  queryParams.set('limit', String(itemLimit));
-  if (typeFilter) {
-    queryParams.set('record_type', typeFilter);
+  if (verdictFilter) {
+    console.log(`Fetching verdicts with verdict='${verdictFilter}' (bypassing due-date filter)...`);
+    // Server clamps per-page to MAX_PAGE_SIZE (200), so paginate client-side
+    // until we have `itemLimit` items or the server runs out. Without this,
+    // a large --limit silently returns only the first 200 and subsequent
+    // rows never get processed.
+    const PAGE_SIZE = 200;
+    const priority = VERDICT_PRIORITY[verdictFilter] ?? 0;
+    const collected: DueItem[] = [];
+    let serverTotal = 0;
+    let offset = 0;
+    while (collected.length < itemLimit) {
+      const pageSize = Math.min(PAGE_SIZE, itemLimit - collected.length);
+      const response = await listVerdicts({
+        verdict: verdictFilter,
+        recordType: typeFilter,
+        limit: pageSize,
+        offset,
+      });
+      if (!response.ok) {
+        return {
+          exitCode: 1,
+          output: `Failed to list verdicts: ${response.message}`,
+        };
+      }
+      serverTotal = response.data.total;
+      const rows = response.data.verdicts;
+      if (rows.length === 0) break;
+      for (const v of rows) {
+        collected.push({
+          recordType: v.recordType,
+          recordId: v.recordId,
+          fieldName: v.fieldName,
+          entityId: v.entityId,
+          verdict: v.verdict,
+          confidence: v.confidence,
+          reasoning: v.reasoning,
+          sourcesChecked: v.sourcesChecked,
+          needsRecheck: v.needsRecheck,
+          nextCheckDue: v.nextCheckDue,
+          lastComputedAt: v.lastComputedAt,
+          createdAt: v.createdAt,
+          updatedAt: v.updatedAt,
+          priority,
+        });
+      }
+      offset += rows.length;
+      if (offset >= serverTotal) break;
+    }
+    items = collected;
+    total = serverTotal;
+  } else {
+    console.log('Fetching items due for recheck...');
+    const response = await getDueForRecheck({ recordType: typeFilter, limit: itemLimit });
+    if (!response.ok) {
+      return {
+        exitCode: 1,
+        output: `Failed to fetch items due for recheck: ${response.message}`,
+      };
+    }
+    items = response.data.items;
+    total = response.data.total;
   }
-
-  const response = await getDueForRecheck({ recordType: typeFilter, limit: itemLimit });
-
-  if (!response.ok) {
-    return {
-      exitCode: 1,
-      output: `Failed to fetch items due for recheck: ${response.message}`,
-    };
-  }
-
-  const { items, total } = response.data;
 
   if (items.length === 0) {
     return {
       exitCode: 0,
-      output: 'No items due for recheck.',
+      output: verdictFilter
+        ? `No verdicts matched verdict='${verdictFilter}'${typeFilter ? ` type='${typeFilter}'` : ''}.`
+        : 'No items due for recheck.',
     };
   }
 
-  console.log(`  Found ${items.length} items due for recheck (${total} total in queue)`);
+  console.log(`  Found ${items.length} item(s)${verdictFilter ? '' : ' due for recheck'} (${total} total matching)`);
 
   // ── Step 2: Apply budget cap ──
   const maxByBudget = Math.floor(budgetLimit / ESTIMATED_COST_PER_VERIFICATION);
@@ -592,6 +666,10 @@ Options:
   --budget=N             Max dollars to spend (default: 1.0, est. ~$0.01/item)
   --limit=N              Max number of items to recheck (default: 50)
   --type=X               Filter by record type (e.g., personnel, fact, grant)
+  --verdict=X            Force-recheck all verdicts of this kind (confirmed |
+                         contradicted | outdated | partial | unverifiable),
+                         bypassing the next_check_due window. Used for
+                         targeted prompt-improvement sweeps.
   --dry-run              Preview what would be rechecked without running LLM
   --ci                   JSON output for CI pipelines
 
