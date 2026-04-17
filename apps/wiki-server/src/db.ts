@@ -32,7 +32,7 @@ export interface SqlQuery {
  * type restores the call signature so we can use transactions without
  * double-casts in route files.
  */
-type CallableTransactionSql = TransactionSql & SqlQuery;
+export type CallableTransactionSql = TransactionSql & SqlQuery;
 
 /**
  * Typed wrapper around `sql.begin()` that provides the callback with a
@@ -41,10 +41,11 @@ type CallableTransactionSql = TransactionSql & SqlQuery;
  * This centralizes the postgres.js TransactionSql type workaround so route
  * files don't need `as unknown as SqlQuery` casts.
  */
-export async function beginTransaction(
-  cb: (tx: CallableTransactionSql) => Promise<void>,
-): Promise<void> {
+export async function beginTransaction<T = void>(
+  cb: (tx: CallableTransactionSql) => Promise<T>,
+): Promise<T> {
   const db = getDb();
+  let result: T | undefined;
   await db.begin(async (tx) => {
     // Runtime validation: TransactionSql inherits Sql's tagged-template
     // callable at runtime, but the TS type loses it due to Omit.
@@ -59,8 +60,9 @@ export async function beginTransaction(
     // This is a single-step assertion from a validated callable, not a blind
     // double-cast — the typeof check above provides the runtime guarantee.
     const typedTx: CallableTransactionSql = tx as CallableTransactionSql;
-    await cb(typedTx);
+    result = await cb(typedTx);
   });
+  return result as T;
 }
 
 let sql: Sql | null = null;

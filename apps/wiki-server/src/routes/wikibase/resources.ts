@@ -68,6 +68,7 @@ registerComposer<ResourceComposerRow>("resource", (row) => ({
 import { urlVariants } from "../shared/url-variants.js";
 import { generateId } from "@longterm-wiki/factbase";
 import { createHash, randomBytes } from "crypto";
+import { runDedup } from "./resource-dedup.js";
 
 // ---- Raw SQL row types ----
 
@@ -2040,7 +2041,24 @@ const resourcesApp = new Hono()
       tabularSource,
       citedBy: citations.map((row) => row.pageId).filter((p): p is string => p != null),
     });
-  });
+  })
+
+  // ---- POST /dedup — QUA-561 one-shot duplicate merge job ----
+  //
+  // Scans the resources table for URL-canonical-equivalent duplicates and,
+  // when `apply: true`, merges each cluster atomically (per-cluster
+  // transaction). Returns a full report of clusters, canonical picks, FK
+  // moves, and errors. Meant to be invoked by `crux/scripts/dedup-resources.ts`.
+  .post(
+    "/dedup",
+    zv("json", z.object({ apply: z.boolean().default(false) })),
+    async (c) => {
+      const { apply } = c.req.valid("json");
+      const sql = getDb();
+      const result = await runDedup(sql, apply);
+      return c.json(result);
+    }
+  );
 
 export const resourcesRoute = resourcesApp;
 export type ResourcesRoute = typeof resourcesApp;
