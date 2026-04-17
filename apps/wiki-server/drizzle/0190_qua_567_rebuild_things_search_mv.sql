@@ -21,6 +21,15 @@
 -- be ~30–60s (40,815 rows, 78 MB; 0181's initial refresh completed in
 -- similar time per docs/benchmarks/qua-506/).
 
+-- Raise lock_timeout for the DROP step: the default migration client
+-- uses 60s (apps/wiki-server/src/db.ts), which is too tight if the
+-- hourly groundskeeper REFRESH holds AccessShareLock when this
+-- migration runs. 180s matches the /api/things-search/refresh
+-- endpoint's statement_timeout (see things-search-refresh.ts:34) so
+-- a worst-case in-flight REFRESH completes before we abort. QUA-302
+-- postmortem is the reference case for this failure shape.
+SET LOCAL lock_timeout = '180000';
+
 -- Idempotent re-run: drop any previous definition first.
 DROP MATERIALIZED VIEW IF EXISTS things_search;
 

@@ -34,6 +34,25 @@ WHERE er.resource_id = r.id
   AND er.resource_id NOT LIKE 'sid_%';--> statement-breakpoint
 
 -- ────────────────────────────────────────────────────────────────────────
+-- Fail-fast orphan check. After the backfill, every resource_id should be
+-- in sid_ form. If any remain non-sid_ it means the resources table is
+-- missing rows (orphan), and the subsequent ADD CONSTRAINT would fail
+-- with an opaque FK-violation message. Raising here produces an
+-- actionable error ("N orphan rows remain — resources table is missing
+-- entries for these resource_ids") instead.
+-- ────────────────────────────────────────────────────────────────────────
+DO $$
+DECLARE
+  orphan_count INT;
+BEGIN
+  SELECT COUNT(*) INTO orphan_count FROM entity_resources
+  WHERE resource_id NOT LIKE 'sid_%';
+  IF orphan_count > 0 THEN
+    RAISE EXCEPTION 'QUA-567 migration halted: % orphan row(s) remain in entity_resources.resource_id after backfill. No matching resources.id was found. Fix by inserting missing resource rows or deleting orphans before re-running.', orphan_count;
+  END IF;
+END $$;--> statement-breakpoint
+
+-- ────────────────────────────────────────────────────────────────────────
 -- Add new FK pointing at resources.stable_id. Preserves the existing
 -- CASCADE semantics. Idempotent so the migration can re-run safely.
 -- ────────────────────────────────────────────────────────────────────────
