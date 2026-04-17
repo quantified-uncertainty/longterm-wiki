@@ -779,9 +779,12 @@ export const resourceForumPosts = pgTable("resource_forum_posts", {
 
 /** Type-specific metadata for policy/government documents (~100-300 resources). */
 export const resourcePolicyDocs = pgTable("resource_policy_docs", {
+  // QUA-564 Phase B.1: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn — the value is now a
+  // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   documentType: text("document_type"),
   jurisdictionEntityId: text("jurisdiction_entity_id"),
   agencyEntityId: text("agency_entity_id"),
@@ -2529,8 +2532,11 @@ export const publications = pgTable(
       .references(() => entities.stableId, { onDelete: "cascade" }),
     /** Display name fallback */
     entityDisplayName: text("entity_display_name"),
-    /** Optional FK to resources table for citation tracking */
-    resourceId: text("resource_id").references(() => resources.id, {
+    /**
+     * Optional FK to resources table for citation tracking.
+     * QUA-564 Phase B.1: references resources.stable_id (column name unchanged).
+     */
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     title: text("title").notNull(),

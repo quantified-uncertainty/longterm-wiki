@@ -1310,6 +1310,13 @@
       "when": 1785657600000,
       "tag": "0186_qua_549_rcv_resource_id_to_stable_id",
       "breakpoints": true
+    },
+    {
+      "idx": 187,
+      "version": "7",
+      "when": 1785744000000,
+      "tag": "0187_qua_564_resource_fk_swap_b1",
+      "breakpoints": true
     }
   ]
 }
