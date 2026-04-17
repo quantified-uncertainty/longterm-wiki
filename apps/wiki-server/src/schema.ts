@@ -2859,9 +2859,13 @@ export const entityResources = pgTable(
     entityId: text("entity_id")
       .notNull()
       .references(() => entities.stableId, { onDelete: "cascade" }),
+    // QUA-567 Phase B.4: resource_id references resources.stable_id (not
+    // resources.id). Column name kept as `resource_id` for minimal code
+    // churn — the value is now a `sid_`-prefixed stable_id, not a legacy
+    // hex16. See QUA-549 for context.
     resourceId: text("resource_id")
       .notNull()
-      .references(() => resources.id, { onDelete: "cascade" }),
+      .references(() => resources.stableId, { onDelete: "cascade" }),
     authoredByEntity: boolean("authored_by_entity").notNull().default(false),
     isSubject: boolean("is_subject").notNull().default(false),
     inferenceSource: text("inference_source"),

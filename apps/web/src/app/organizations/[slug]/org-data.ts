@@ -25,7 +25,7 @@ import {
   isOrganization,
   isPerson,
   isAiModel,
-  getResourceById,
+  resolveResource,
   getResourceCredibility,
   getResourcePublication,
   getPagesForResource,
@@ -906,9 +906,11 @@ function getOrgResourcesFromLinks(
   const aboutOrg: OrgResourceRow[] = [];
   const RESEARCH_PUB_TYPES = new Set(["preprint_server", "academic_journal", "think_tank", "academic"]);
 
-  // Authored resources → split into publications vs announcements by publication type
+  // Authored resources → split into publications vs announcements by publication type.
+  // resolveResource() handles both legacy hex16 and sid_ keyspace — links.authored
+  // values were hex16 before QUA-567 and are sid_ after.
   for (const rid of links.authored) {
-    const r = getResourceById(rid);
+    const r = resolveResource(rid);
     if (!r) continue;
     const row = normalizeRow(r, orgName);
     if (!row) continue;
@@ -926,7 +928,7 @@ function getOrgResourcesFromLinks(
   // Subject resources (not also authored) → press/coverage
   for (const rid of links.subject) {
     if (authoredSet.has(rid)) continue;
-    const r = getResourceById(rid);
+    const r = resolveResource(rid);
     if (!r) continue;
     const row = normalizeRow(r, orgName);
     if (!row) continue;
