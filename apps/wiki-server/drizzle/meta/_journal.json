@@ -1317,6 +1317,13 @@
       "when": 1785744000000,
       "tag": "0187_qua_564_resource_fk_swap_b1",
       "breakpoints": true
+    },
+    {
+      "idx": 188,
+      "version": "7",
+      "when": 1785830400000,
+      "tag": "0188_qua_565_phase_b2_tiny_fk_tables",
+      "breakpoints": true
     }
   ]
 }
