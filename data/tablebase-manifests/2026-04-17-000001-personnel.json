@@ -3,8 +3,8 @@
   "recordCount": 9,
   "submittedAt": "2026-04-17T00:00:01.000Z",
   "verificationSummary": {
-    "withVerification": 0,
-    "withoutVerification": 9,
+    "withVerification": 9,
+    "withoutVerification": 0,
     "verdicts": {
       "verified": 0,
       "contradicted": 0,
