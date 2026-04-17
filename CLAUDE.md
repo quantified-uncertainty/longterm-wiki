@@ -78,6 +78,7 @@ pnpm crux sys agent-checklist init --linear=QUA-NNN  # Init session checklist (L
 pnpm crux sys agent-checklist init --issue=N # Init session checklist (legacy GitHub)
 pnpm crux sys agent-reset                   # Show stale processes (MCP, dev servers)
 pnpm crux sys agent-reset --kill             # Kill stale processes
+pnpm crux sys dispatch --linear=QUA-NNN --slot=N  # Open a slot after pre-flight dedup checks
 
 # Cross-cutting (top-level)
 pnpm crux query search "topic"               # Full-text search
