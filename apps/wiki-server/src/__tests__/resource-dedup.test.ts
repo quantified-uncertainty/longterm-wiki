@@ -165,6 +165,7 @@ describeIntegration(
         DROP TABLE IF EXISTS ${SCHEMA}.resource_papers CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.entity_resources CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.resources CASCADE;
+        DROP TABLE IF EXISTS ${SCHEMA}.things CASCADE;
 
         CREATE TABLE ${SCHEMA}.resources (
           id text PRIMARY KEY,
@@ -183,6 +184,15 @@ describeIntegration(
         CREATE TABLE ${SCHEMA}.resource_papers (
           resource_id text PRIMARY KEY REFERENCES ${SCHEMA}.resources(id) ON DELETE CASCADE,
           arxiv_id text
+        );
+
+        -- things: cross-base index mirror — mergeCluster cleans up dup rows here
+        -- by (source_table='resources', source_id IN dupIds).
+        CREATE TABLE ${SCHEMA}.things (
+          id text PRIMARY KEY,
+          source_table text NOT NULL,
+          source_id text NOT NULL,
+          title text NOT NULL
         );
       `);
     });
@@ -208,6 +218,13 @@ describeIntegration(
         INSERT INTO ${SCHEMA}.resource_papers (resource_id, arxiv_id) VALUES
           ('r_dup1', 'arxiv-1'),
           ('r_dup2', 'arxiv-2')
+      `);
+      // things dual-write: one row per resource (by source_id).
+      await sqlConn.unsafe(`
+        INSERT INTO ${SCHEMA}.things (id, source_table, source_id, title) VALUES
+          ('t_canon', 'resources', 'r_canon', 'canonical title'),
+          ('t_dup1',  'resources', 'r_dup1',  'dup1 title'),
+          ('t_dup2',  'resources', 'r_dup2',  'dup2 title')
       `);
 
       // Load FK metadata from the test schema.
@@ -293,6 +310,15 @@ describeIntegration(
       `;
       expect(remainingPapers).toHaveLength(1);
       expect(remainingPapers[0].resource_id).toBe("r_canon");
+
+      // things dual-write: dup rows deleted, canonical preserved.
+      const remainingThings = await sqlConn<{ id: string; source_id: string }[]>`
+        SELECT id, source_id FROM ${sqlConn(SCHEMA)}.things
+        ORDER BY id
+      `;
+      expect(remainingThings).toEqual([
+        { id: "t_canon", source_id: "r_canon" },
+      ]);
     });
 
     it("handles PK conflict: canonical already has a paper", async () => {

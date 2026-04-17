@@ -16,7 +16,8 @@
 
 import type { Sql, CallableTransactionSql } from "../../db.js";
 import { beginTransaction } from "../../db.js";
-import { normalizeUrl } from "@longterm-wiki/url-utils";
+import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
+import { logger } from "../../logger.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,10 +62,10 @@ export interface ClusterMergeResult {
 // Pure helpers
 // ---------------------------------------------------------------------------
 
-/** Canonical dedup key for grouping resources. */
-export function dedupKey(url: string): string {
-  return normalizeUrl(url, { stripProtocol: true, lowercasePath: true });
-}
+/** Canonical dedup key for grouping resources. Delegates to
+ *  `normalizeUrlForDedup` so cluster membership stays in sync with the
+ *  shared QUA-341 normalization helper. */
+export const dedupKey = normalizeUrlForDedup;
 
 /**
  * Pick the canonical row from a cluster.
@@ -274,9 +275,9 @@ export async function mergeCluster(
         DELETE FROM ${q(fk.tableName)} t
         USING ranked r
         WHERE t.ctid = r.ctid AND r.rn > 1
-        RETURNING t.ctid
+        RETURNING 1
       `;
-      const deleted = await tx.unsafe<{ ctid: unknown }[]>(deleteSql, [
+      const deleted = await tx.unsafe<unknown[]>(deleteSql, [
         canonicalId,
         allIds,
       ]);
@@ -289,12 +290,21 @@ export async function mergeCluster(
       WHERE ${q(fk.columnName)} = ANY($2::text[])
       RETURNING 1
     `;
-    const moved = await tx.unsafe<{ "?column?": number }[]>(updateSql, [
+    const moved = await tx.unsafe<unknown[]>(updateSql, [
       canonicalId,
       duplicateIds,
     ]);
     fkUpdates[key].moved += moved.length;
   }
+
+  // Remove duplicate `things` rows (dual-write mirror from the upsert path).
+  // The `things` table has a unique (source_table, source_id) index so each
+  // resource has at most one `things` row. No FK from things.source_id to
+  // resources.id — cleanup is by logical (source_table, source_id) match.
+  await tx`
+    DELETE FROM things
+    WHERE source_table = 'resources' AND source_id = ANY(${duplicateIds})
+  `;
 
   const deletedResources = await tx<{ id: string }[]>`
     DELETE FROM resources WHERE id = ANY(${duplicateIds}) RETURNING id
@@ -329,6 +339,20 @@ export async function runDedup(sql: Sql, apply: boolean): Promise<RunDedupResult
 
   if (!apply) return { apply, report, merges, errors };
 
+  const rowsToDelete = report.clusters.reduce(
+    (acc, c) => acc + c.duplicates.length,
+    0
+  );
+  logger.warn(
+    {
+      totalResources: report.totalResources,
+      clusters: report.clusters.length,
+      rowsToDelete,
+      fkColumns: report.fkColumns.length,
+    },
+    "runDedup applying — about to delete resource rows and rewrite FKs"
+  );
+
   for (const cluster of report.clusters) {
     const dupIds = cluster.duplicates.map((d) => d.id);
     try {
@@ -344,6 +368,15 @@ export async function runDedup(sql: Sql, apply: boolean): Promise<RunDedupResult
       });
     }
   }
+
+  logger.warn(
+    {
+      merged: merges.length,
+      errors: errors.length,
+      resourcesDeleted: merges.reduce((a, m) => a + m.resourcesDeleted, 0),
+    },
+    "runDedup applied"
+  );
 
   return { apply, report, merges, errors };
 }
