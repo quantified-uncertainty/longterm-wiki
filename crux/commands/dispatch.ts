@@ -25,7 +25,7 @@
  *   2  pre-flight collision (matches `crux linear start` exit code)
  */
 
-import { execSync, spawnSync } from 'child_process';
+import { spawnSync } from 'child_process';
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 
