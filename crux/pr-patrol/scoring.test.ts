@@ -112,64 +112,64 @@ describe('computeBudget', () => {
     expect(budget.timeoutMinutes).toBe(3);
   });
 
-  it('gives small budget for missing-testplan only', () => {
+  it('gives budget for missing-testplan', () => {
     const budget = computeBudget(['missing-testplan']);
-    expect(budget.maxTurns).toBe(8);
-    expect(budget.timeoutMinutes).toBe(5);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 
   it('gives medium budget for ci-failure', () => {
     const budget = computeBudget(['ci-failure']);
-    expect(budget.maxTurns).toBe(50);
-    expect(budget.timeoutMinutes).toBe(45);
+    expect(budget.maxTurns).toBe(100);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
-  it('gives reduced budget for conflict (#3776)', () => {
+  it('gives budget for conflict', () => {
     const budget = computeBudget(['conflict']);
-    expect(budget.maxTurns).toBe(30);
-    expect(budget.timeoutMinutes).toBe(20);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(30);
   });
 
   it('uses highest budget when multiple issues present', () => {
     const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
-    expect(budget.maxTurns).toBe(50);
-    expect(budget.timeoutMinutes).toBe(45);
+    expect(budget.maxTurns).toBe(100);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
   it('conflict dominates when mixed with smaller issues', () => {
     const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
-    expect(budget.maxTurns).toBe(30);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(30);
+  });
+
+  it('gives budget for bot-review-major', () => {
+    const budget = computeBudget(['bot-review-major']);
+    expect(budget.maxTurns).toBe(60);
     expect(budget.timeoutMinutes).toBe(20);
   });
 
-  it('gives small budget for bot-review-major (#3827)', () => {
-    const budget = computeBudget(['bot-review-major']);
-    expect(budget.maxTurns).toBe(10);
-    expect(budget.timeoutMinutes).toBe(5);
-  });
-
-  it('gives small budget for bot-review-nitpick', () => {
+  it('gives budget for bot-review-nitpick', () => {
     const budget = computeBudget(['bot-review-nitpick']);
-    expect(budget.maxTurns).toBe(8);
-    expect(budget.timeoutMinutes).toBe(5);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 
   it('gives stale budget', () => {
     const budget = computeBudget(['stale']);
-    expect(budget.maxTurns).toBe(10);
-    expect(budget.timeoutMinutes).toBe(5);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 
   it('gives merge-blocked budget', () => {
     const budget = computeBudget(['merge-blocked']);
-    expect(budget.maxTurns).toBe(10);
-    expect(budget.timeoutMinutes).toBe(5);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 
   it('gives self-authored-feedback budget', () => {
     const budget = computeBudget(['self-authored-feedback']);
-    expect(budget.maxTurns).toBe(20);
-    expect(budget.timeoutMinutes).toBe(15);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(25);
   });
 
   it('gives tiny safety-net budget for stuck — stuck PRs are intercepted before Claude dispatch (QUA-286)', () => {
@@ -186,60 +186,46 @@ describe('computeBudget', () => {
 // ── getRetryBudgetMultiplier ─────────────────────────────────────────────────
 
 describe('getRetryBudgetMultiplier', () => {
-  it('returns 1.0 on first attempt (no prior failures)', () => {
+  it('returns 1.0 on first attempt', () => {
     expect(getRetryBudgetMultiplier(0)).toBe(1.0);
   });
 
-  it('returns 0.5 on second attempt (1 prior failure)', () => {
-    expect(getRetryBudgetMultiplier(1)).toBe(0.5);
-  });
-
-  it('returns 0.5 on third attempt (2 prior failures)', () => {
-    expect(getRetryBudgetMultiplier(2)).toBe(0.5);
+  it('returns 1.0 on retry (no halving)', () => {
+    // Halving on retry was defeatist: if the first full-budget attempt couldn't
+    // finish, a half-budget one won't either. All attempts now get full budget.
+    expect(getRetryBudgetMultiplier(1)).toBe(1.0);
+    expect(getRetryBudgetMultiplier(2)).toBe(1.0);
+    expect(getRetryBudgetMultiplier(10)).toBe(1.0);
   });
 });
 
 // ── computeEffectiveBudget ──────────────────────────────────────────────────
 
 describe('computeEffectiveBudget', () => {
-  it('returns full budget on first attempt', () => {
-    const budget = computeEffectiveBudget(['ci-failure'], 60, 60, 0);
-    expect(budget.maxTurns).toBe(50); // ci-failure base is 50, config cap 60
-    expect(budget.timeoutMinutes).toBe(45); // ci-failure base is 45, config cap 60
+  it('returns full budget on first attempt (capped by config)', () => {
+    const budget = computeEffectiveBudget(['ci-failure'], 80, 60, 0);
+    expect(budget.maxTurns).toBe(80); // ci-failure base 100, capped at config 80
+    expect(budget.timeoutMinutes).toBe(60); // ci-failure base 60, config cap 60
   });
 
-  it('returns half budget on retry', () => {
-    const budget = computeEffectiveBudget(['ci-failure'], 60, 60, 1);
-    expect(budget.maxTurns).toBe(25); // ceil(50 * 0.5)
-    expect(budget.timeoutMinutes).toBe(23); // ceil(45 * 0.5)
+  it('returns full budget on retry (no halving)', () => {
+    const budget = computeEffectiveBudget(['ci-failure'], 80, 60, 1);
+    expect(budget.maxTurns).toBe(80);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
-  it('applies config cap before multiplier', () => {
-    // Config caps at 30 turns / 20 min, ci-failure base is 50/45
-    const first = computeEffectiveBudget(['ci-failure'], 30, 20, 0);
-    expect(first.maxTurns).toBe(30);
-    expect(first.timeoutMinutes).toBe(20);
-
-    const retry = computeEffectiveBudget(['ci-failure'], 30, 20, 1);
-    expect(retry.maxTurns).toBe(15); // ceil(30 * 0.5)
-    expect(retry.timeoutMinutes).toBe(10); // ceil(20 * 0.5)
+  it('applies config cap', () => {
+    // Config caps at 30 turns / 20 min, ci-failure base is 100/60 — cap wins.
+    const budget = computeEffectiveBudget(['ci-failure'], 30, 20, 0);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(20);
   });
 
-  it('uses Math.ceil so budget never rounds down to 0', () => {
-    // missing-issue-ref has 5 turns / 3 min — half should be 3 / 2, not 2 / 1
-    const budget = computeEffectiveBudget(['missing-issue-ref'], 60, 60, 1);
-    expect(budget.maxTurns).toBe(3); // ceil(5 * 0.5) = 3
-    expect(budget.timeoutMinutes).toBe(2); // ceil(3 * 0.5) = 2
-  });
-
-  it('conflict issue gets 30 turns on first attempt, 15 on retry (#3776)', () => {
-    const first = computeEffectiveBudget(['conflict'], 60, 60, 0);
-    expect(first.maxTurns).toBe(30);
-    expect(first.timeoutMinutes).toBe(20);
-
-    const retry = computeEffectiveBudget(['conflict'], 60, 60, 1);
-    expect(retry.maxTurns).toBe(15);
-    expect(retry.timeoutMinutes).toBe(10);
+  it('retry budget matches first-attempt budget (no reduction)', () => {
+    const first = computeEffectiveBudget(['conflict'], 120, 60, 0);
+    const retry = computeEffectiveBudget(['conflict'], 120, 60, 1);
+    expect(retry.maxTurns).toBe(first.maxTurns);
+    expect(retry.timeoutMinutes).toBe(first.timeoutMinutes);
   });
 });
 

@@ -375,8 +375,8 @@ async function fixPrInWorktree(
           const rebasePrompt = `Rebase the current branch onto origin/main. Resolve any merge conflicts. Then force-push with: git push --force-with-lease. Do NOT fix CI issues, do NOT address code review comments — ONLY resolve the merge conflicts and push.`;
           const rebaseResult2 = await spawnClaude(rebasePrompt, {
             ...config,
-            maxTurns: 30,
-            timeoutMinutes: 15,
+            maxTurns: 60,
+            timeoutMinutes: 30,
           }, { cwd: worktreePath });
           const elapsedS = Math.floor((Date.now() - startTime) / 1000);
           const claudeOutcome: FixOutcome = rebaseResult2.exitCode === 0 && !rebaseResult2.hitMaxTurns ? 'fixed' : 'error';
@@ -792,7 +792,7 @@ export function buildParallelConfig(
     ),
     maxTurns: parseIntOpt(
       options.maxTurns ?? process.env.PR_PATROL_MAX_TURNS,
-      60,
+      120,
     ),
     cooldownSeconds: parseIntOpt(
       options.cooldown ?? process.env.PR_PATROL_COOLDOWN,

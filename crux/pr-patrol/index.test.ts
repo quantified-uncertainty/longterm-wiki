@@ -504,34 +504,34 @@ describe('computeBudget', () => {
     expect(budget.timeoutMinutes).toBe(3);
   });
 
-  it('gives small budget for missing-testplan only', () => {
+  it('gives budget for missing-testplan', () => {
     const budget = computeBudget(['missing-testplan']);
-    expect(budget.maxTurns).toBe(8);
-    expect(budget.timeoutMinutes).toBe(5);
+    expect(budget.maxTurns).toBe(30);
+    expect(budget.timeoutMinutes).toBe(15);
   });
 
   it('gives medium budget for ci-failure', () => {
     const budget = computeBudget(['ci-failure']);
-    expect(budget.maxTurns).toBe(50);
-    expect(budget.timeoutMinutes).toBe(45);
+    expect(budget.maxTurns).toBe(100);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
-  it('gives reduced budget for conflict (#3776)', () => {
+  it('gives budget for conflict', () => {
     const budget = computeBudget(['conflict']);
-    expect(budget.maxTurns).toBe(30);
-    expect(budget.timeoutMinutes).toBe(20);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(30);
   });
 
   it('uses highest budget when multiple issues present', () => {
     const budget = computeBudget(['missing-issue-ref', 'ci-failure']);
-    expect(budget.maxTurns).toBe(50);
-    expect(budget.timeoutMinutes).toBe(45);
+    expect(budget.maxTurns).toBe(100);
+    expect(budget.timeoutMinutes).toBe(60);
   });
 
   it('conflict dominates when mixed with smaller issues', () => {
     const budget = computeBudget(['missing-testplan', 'conflict', 'missing-issue-ref']);
-    expect(budget.maxTurns).toBe(30);
-    expect(budget.timeoutMinutes).toBe(20);
+    expect(budget.maxTurns).toBe(60);
+    expect(budget.timeoutMinutes).toBe(30);
   });
 });
 

@@ -83,22 +83,20 @@ export interface IssueBudget {
 // Note: missing-issue-ref is an advisory-only issue (see ADVISORY_ISSUES in types.ts)
 // and is filtered out before reaching the budget system, so it's not listed here.
 const ISSUE_BUDGETS: Partial<Record<PrIssueType, IssueBudget>> = {
-  // Reduced from 60/60 — 60+ turns is counterproductive (#3776). Most conflicts
-  // resolve in <20 turns; beyond that, the agent is likely stuck in a loop.
-  conflict:            { maxTurns: 30, timeoutMinutes: 20 },
-  'ci-failure':        { maxTurns: 50, timeoutMinutes: 45 },
-  // Reduced from 15/10 — large CodeRabbit reviews are systematically unfixable
-  // by patrol (#3827). Give enough turns to try, but fail fast.
-  'bot-review-major':  { maxTurns: 10, timeoutMinutes: 5 },
-  stale:               { maxTurns: 10, timeoutMinutes: 5 },
-  'missing-testplan':  { maxTurns: 8,  timeoutMinutes: 5 },
-  'bot-review-nitpick':{ maxTurns: 8,  timeoutMinutes: 5 },
-  // Merge-blocked usually requires adding a label, clearing a review request,
-  // or coordinating with a maintainer — lightweight work, not code changes.
-  'merge-blocked':     { maxTurns: 10, timeoutMinutes: 5 },
-  // Self-authored feedback requires reading the maintainer comment and
-  // addressing it; keep modest but non-trivial budget.
-  'self-authored-feedback': { maxTurns: 20, timeoutMinutes: 15 },
+  // Raised across the board — empirically, Claude Code eventually fixes the
+  // vast majority of patrol-eligible issues when given enough turns. Prior
+  // caps (conflict 30/20, bot-review-major 10/5, merge-blocked 10/5) were
+  // calibrated to "fail fast" on a hypothesis of systematic unfixability
+  // that did not hold up — the dominant abandon outcome was hitting the cap,
+  // not genuine dead-ends. Give bigger budgets and let Claude finish.
+  conflict:            { maxTurns: 60, timeoutMinutes: 30 },
+  'ci-failure':        { maxTurns: 100, timeoutMinutes: 60 },
+  'bot-review-major':  { maxTurns: 60, timeoutMinutes: 20 },
+  stale:               { maxTurns: 30, timeoutMinutes: 15 },
+  'missing-testplan':  { maxTurns: 30, timeoutMinutes: 15 },
+  'bot-review-nitpick':{ maxTurns: 30, timeoutMinutes: 15 },
+  'merge-blocked':     { maxTurns: 30, timeoutMinutes: 15 },
+  'self-authored-feedback': { maxTurns: 60, timeoutMinutes: 25 },
   // Stuck-cycle PRs are routed to escalation (no Claude dispatch), so the
   // budget here is a safety net for the rare case they reach fixPr() without
   // being intercepted. Keep it tiny so a misconfig doesn't burn compute.
@@ -120,11 +118,13 @@ export function computeBudget(issues: PrIssueType[]): IssueBudget {
 
 /**
  * Compute the retry budget multiplier based on the number of previous failures.
- * First attempt gets full budget (1.0), subsequent attempts get half (0.5).
- * This prevents wasting compute on PRs where the full budget already failed.
+ * All attempts get the full budget — halving on retry meant attempt 2 was
+ * almost guaranteed to fail on any PR that needed non-trivial work, wasting
+ * both the attempt and the signal. If the first full-budget attempt couldn't
+ * finish, a half-budget one won't either.
  */
-export function getRetryBudgetMultiplier(failCount: number): number {
-  return failCount === 0 ? 1.0 : 0.5;
+export function getRetryBudgetMultiplier(_failCount: number): number {
+  return 1.0;
 }
 
 /**
