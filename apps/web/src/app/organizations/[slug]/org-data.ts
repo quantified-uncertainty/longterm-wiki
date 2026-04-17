@@ -907,8 +907,8 @@ function getOrgResourcesFromLinks(
   const RESEARCH_PUB_TYPES = new Set(["preprint_server", "academic_journal", "think_tank", "academic"]);
 
   // Authored resources → split into publications vs announcements by publication type.
-  // QUA-567 Phase B.4: rids from entity_resources are sid_ (resources.stable_id)
-  // after the FK swap; resolveResource() handles both legacy hex16 and sid_.
+  // resolveResource() handles both legacy hex16 and sid_ keyspace — links.authored
+  // values were hex16 before QUA-567 and are sid_ after.
   for (const rid of links.authored) {
     const r = resolveResource(rid);
     if (!r) continue;

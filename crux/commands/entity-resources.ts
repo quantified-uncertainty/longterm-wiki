@@ -18,6 +18,7 @@ import { join } from "node:path";
 import { readFileSync } from "node:fs";
 import { parse as parseYaml } from "yaml";
 import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
+import { isSid } from "@longterm-wiki/id-utils";
 import type { CommandResult } from "../lib/command-types.ts";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import {
@@ -56,11 +57,11 @@ interface DatabaseJson {
   pageResources?: Record<string, string[]>;
 }
 
+// entity_resources.resource_id references resources.stable_id (not the
+// legacy hex16 resources.id) — all seed passes below emit stable_ids.
 interface MinimalResource {
   id: string;
   url?: string;
-  // QUA-567 Phase B.4: resources.stable_id is the canonical FK target for
-  // entity_resources.resource_id. Populated NOT NULL on prod as of QUA-536.
   stable_id?: string;
 }
 
@@ -126,14 +127,7 @@ function loadResources(): MinimalResource[] {
 }
 
 
-/**
- * Build normalized-URL → resource stable_id map from resources.json.
- *
- * QUA-567 Phase B.4: returns stable_ids so entity_resources.resource_id
- * (which now references resources.stable_id) gets the right FK value.
- * Resources without a stable_id are skipped (should be zero on prod per
- * Phase A / QUA-536, but the check makes local dev robust).
- */
+/** Normalized-URL → resource stable_id map from resources.json. */
 function buildUrlToResourceId(): Map<string, string> {
   const resources = loadResources();
   const map = new Map<string, string>();
@@ -145,10 +139,7 @@ function buildUrlToResourceId(): Map<string, string> {
   return map;
 }
 
-/**
- * Build hex16 (resources.id) → stable_id map for translating legacy IDs
- * that appear in database.json::pageResources. See seedFromWikiCitations.
- */
+/** Legacy hex16 → stable_id map, for translating pageResources entries. */
 function buildHexIdToStableId(): Map<string, string> {
   const resources = loadResources();
   const map = new Map<string, string>();
@@ -220,9 +211,6 @@ async function seedFromPublisher(
       const pubEntityId = r.publisherEntityId;
       if (!pubEntityId) continue;
 
-      // QUA-567 Phase B.4: entity_resources.resource_id now references
-      // resources.stable_id. Skip resources that somehow lack stable_id
-      // (should be zero on prod per Phase A / QUA-536).
       if (!r.stableId) continue;
 
       items.push({
@@ -256,9 +244,6 @@ function seedFromWikiCitations(
 ): { items: EntityResourceSyncItem[]; skipped: number } {
   const slugToStableId = loadSlugToStableId();
   const pageResources = loadPageResources();
-  // QUA-567 Phase B.4: pageResources contains hex16 resource IDs (the
-  // resources.id column). entity_resources.resource_id now references
-  // resources.stable_id, so translate via this lookup before emitting.
   const hexToStableId = buildHexIdToStableId();
   const items: EntityResourceSyncItem[] = [];
   let skipped = 0;
@@ -274,10 +259,9 @@ function seedFromWikiCitations(
     }
 
     for (const resourceId of resourceIds) {
-      // Accept both forms. In steady state pageResources still emits
-      // hex16 (build-data.mjs), but also accept sid_-prefixed IDs so the
-      // pipeline survives format churn during the Phase B rollout.
-      const translated = resourceId.startsWith("sid_")
+      // pageResources may contain either hex16 (legacy build-data.mjs
+      // output) or sid_-prefixed IDs, depending on when it was built.
+      const translated = isSid(resourceId)
         ? resourceId
         : hexToStableId.get(resourceId);
       if (!translated) {
@@ -406,9 +390,6 @@ async function seedFromAuthorEntityIds(
 
       const rawAuthorIds = (r as Record<string, unknown>).authorEntityIds;
       if (!Array.isArray(rawAuthorIds) || rawAuthorIds.length === 0) continue;
-
-      // QUA-567 Phase B.4: entity_resources.resource_id now references
-      // resources.stable_id (see migration 0188).
       if (!r.stableId) continue;
 
       // Filter to strings only and deduplicate per resource
