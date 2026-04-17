@@ -2045,8 +2045,8 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // QUA-564 B.1 / QUA-565 B.2 / QUA-566 B.3: all five sub-tables reference
-    // resources.stable_id.
+    // QUA-564 B.1: resourcePolicyDocs.resourceId → resources.stable_id.
+    // QUA-565 B.2: resourceTabularSources.resourceId → resources.stable_id.
     const stableId = rows[0].stableId ?? id;
     // Also fetch citations, sub-table data, and tabular source metadata
     const [citations, paperRows, forumRows, policyRows, tabularRows] = await Promise.all([
