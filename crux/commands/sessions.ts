@@ -243,6 +243,14 @@ function livenessColor(liveness: Liveness, c: ReturnType<typeof createLogger>['c
       return c.red;
     case 'done':
       return c.dim;
+    default: {
+      // Exhaustiveness: if a new Liveness variant is added, TS errors here
+      // and a runtime fallback keeps the output legible instead of emitting
+      // `undefined` as an ANSI escape prefix.
+      const _exhaustive: never = liveness;
+      void _exhaustive;
+      return c.reset;
+    }
   }
 }
 
@@ -286,44 +294,67 @@ function renderTable(
   return out;
 }
 
+/** Parse `--slot=N` with explicit error on malformed input. */
+function parseSlotOption(raw: unknown): { ok: true; slot: number | undefined } | { ok: false; error: string } {
+  if (raw === undefined) return { ok: true, slot: undefined };
+  const n = Number(raw);
+  if (!Number.isInteger(n) || n < 0) {
+    return { ok: false, error: `--slot must be a non-negative integer, got: ${String(raw)}` };
+  }
+  return { ok: true, slot: n };
+}
+
 async function list(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean | undefined);
   const c = log.colors;
 
-  const available = await isServerAvailable();
-  if (!available) {
-    return {
-      exitCode: 1,
-      output:
-        `${c.red}Error: wiki-server is not reachable.${c.reset}\n` +
-        `  In agent slots, set WIKI_SERVER_ENV=prod to query the production DB:\n` +
-        `  ${c.cyan}WIKI_SERVER_ENV=prod pnpm crux sys sessions list${c.reset}\n`,
-    };
+  // Validate --slot early so a typo like --slot=abc surfaces immediately
+  // instead of silently returning an unfiltered table.
+  const slotOpt = parseSlotOption(options.slot);
+  if (!slotOpt.ok) {
+    return { exitCode: 2, output: `${c.red}Error: ${slotOpt.error}${c.reset}\n` };
   }
 
+  // Fetch DB sessions (may fail if wiki-server is unreachable) and scan local
+  // processes in parallel. Failure of either is degraded-but-still-useful:
+  // DB-only data or scan-only data both give the coordinator partial signal.
+  const serverUp = await isServerAvailable();
   const limit = Number(options.limit ?? 200);
-  const result = await listAgentSessions(Number.isFinite(limit) && limit > 0 ? Math.min(limit, 500) : 200);
-  if (!result.ok) {
-    return { exitCode: 1, output: `${c.red}Error fetching sessions: ${result.message}${c.reset}\n` };
+  const boundedLimit = Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 500) : 200;
+  const dbPromise = serverUp ? listAgentSessions(boundedLimit) : null;
+  const scan = findClaudeProcesses();
+  const dbResult = dbPromise ? await dbPromise : null;
+
+  const sessions = dbResult?.ok ? dbResult.data.sessions : [];
+  const warnings: string[] = [];
+  if (!serverUp) {
+    warnings.push(
+      'wiki-server unreachable — showing local Claude processes only (no DB session data). ' +
+        'In agent slots, set WIKI_SERVER_ENV=prod.',
+    );
+  } else if (dbResult && !dbResult.ok) {
+    warnings.push(`DB fetch failed: ${dbResult.message}. Showing local process data only.`);
+  }
+  if (scan.scanFailed) {
+    warnings.push(
+      `process scan failed (${scan.scanError}). Ghost detection disabled — a live session without a DB row won't be visible.`,
+    );
   }
 
-  const liveMinutes = options.liveMinutes !== undefined ? Number(options.liveMinutes) : 2;
-  const staleMinutes = options.fresh !== undefined ? Number(options.fresh) : 30;
+  const liveMinutes = options.liveMinutes !== undefined ? Number(options.liveMinutes) : undefined;
+  const staleMinutes = options.fresh !== undefined ? Number(options.fresh) : undefined;
 
-  const processes = findClaudeProcesses();
-
-  const merged = mergeSessions(result.data.sessions, processes, {
-    liveMinutes: Number.isFinite(liveMinutes) && liveMinutes > 0 ? liveMinutes : 2,
-    staleMinutes: Number.isFinite(staleMinutes) && staleMinutes > 0 ? staleMinutes : 30,
+  const merged = mergeSessions(sessions, scan.processes, {
+    liveMinutes,
+    staleMinutes,
   });
 
   const filterLinear = typeof options.linear === 'string' ? options.linear : undefined;
-  const filterSlot = options.slot !== undefined ? Number(options.slot) : undefined;
 
   const filtered = filterSessions(merged, {
     includeCompleted: Boolean(options.all),
     linearId: filterLinear,
-    slot: Number.isFinite(filterSlot) ? (filterSlot as number) : undefined,
+    slot: slotOpt.slot,
   });
 
   const sorted = sortSessions(filtered);
@@ -333,7 +364,8 @@ async function list(_args: string[], options: Record<string, unknown>): Promise<
     const jsonRows = sorted.map((r) => ({
       slot: r.session?.slotNumber ?? r.process?.slot ?? null,
       pid: r.process?.pid ?? null,
-      cwd: r.process?.cwd ?? r.session?.worktree ?? null,
+      cwd: r.process?.cwd ?? null,
+      worktree: r.session?.worktree ?? null,
       branch: r.session?.branch ?? null,
       linearId: r.session?.linearId ?? null,
       prUrl: r.session?.prUrl ?? null,
@@ -346,11 +378,17 @@ async function list(_args: string[], options: Record<string, unknown>): Promise<
       startedAt: r.session?.startedAt ?? null,
       sessionId: r.session?.id ?? null,
     }));
-    return { exitCode: 0, output: JSON.stringify(jsonRows, null, 2) + '\n' };
+    const payload = warnings.length > 0
+      ? { warnings, sessions: jsonRows }
+      : jsonRows;
+    return { exitCode: 0, output: JSON.stringify(payload, null, 2) + '\n' };
   }
 
   const header = `${c.bold}Agent Sessions${c.reset} ${c.dim}(${sorted.length} row${sorted.length === 1 ? '' : 's'}${Boolean(options.all) ? '' : ', active only'})${c.reset}\n\n`;
-  return { exitCode: 0, output: header + renderTable(sorted, c) };
+  const warningBanner = warnings.length > 0
+    ? warnings.map((w) => `  ${c.yellow}⚠ ${w}${c.reset}`).join('\n') + '\n\n'
+    : '';
+  return { exitCode: 0, output: warningBanner + header + renderTable(sorted, c) };
 }
 
 // ---------------------------------------------------------------------------
@@ -396,5 +434,6 @@ Examples:
   pnpm crux sys sessions list --slot=9 --json
   pnpm crux sys sessions write "Fix citation parser bug"
   pnpm crux sys sessions write "Add dark mode" --model=claude-sonnet-4-6 --duration="~45min"
+  pnpm crux sys sessions write "Update AI timelines page" --pages=ai-timelines,ai-forecasting --sync
 `.trim();
 }

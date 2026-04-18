@@ -169,15 +169,37 @@ describe('mergeSessions — process correlation', () => {
     expect(rows).toEqual([]);
   });
 
-  it('handles multiple processes in the same slot by binding the first', () => {
+  it('handles multiple processes in the same slot: first binds to session, rest become ghosts', () => {
     const s = mkSession({ id: 1, slotNumber: 9 });
     const p1: ClaudeProcess = { pid: 10, cwd: '/lw/a9', slot: 9 };
     const p2: ClaudeProcess = { pid: 20, cwd: '/lw/a9', slot: 9 };
     const rows = mergeSessions([s], [p1, p2], { now: NOW });
-    // First process wins; second is dropped silently (rare edge case —
-    // Claude Code normally keeps one live process per slot).
-    expect(rows).toHaveLength(1);
+    // p1 binds to the session; p2 surfaces as a ghost so the
+    // "is anyone else using this slot?" signal isn't lost.
+    expect(rows).toHaveLength(2);
+    expect(rows[0].session?.id).toBe(1);
     expect(rows[0].process?.pid).toBe(10);
+    expect(rows[1].session).toBeNull();
+    expect(rows[1].liveness).toBe('ghost');
+    expect(rows[1].process?.pid).toBe(20);
+  });
+});
+
+describe('mergeSessions — defensive option validation', () => {
+  it('falls back to default liveMinutes on NaN / negative / zero input', () => {
+    const s = mkSession({
+      id: 1,
+      heartbeatAt: new Date(NOW - 30_000).toISOString(), // 30s ago → live (<2m)
+    });
+    for (const bad of [NaN, -5, 0, Infinity as unknown as number]) {
+      const [row] = mergeSessions([s], [], {
+        now: NOW,
+        liveMinutes: bad,
+      });
+      // Without NaN-guarding, `age < NaN` is false and liveness would be "stale".
+      // With the guard, default (2m) is used and age=30s classifies as live.
+      expect(row.liveness).toBe('live');
+    }
   });
 });
 

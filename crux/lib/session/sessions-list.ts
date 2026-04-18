@@ -58,14 +58,23 @@ function lastSignal(s: DbSession): number | null {
 }
 
 /**
+ * Coerce a user-provided option to a positive number, falling back to
+ * `fallback` for NaN, negatives, and zero. Defended inside `mergeSessions`
+ * so non-CLI callers (dashboards, scripts) can't accidentally classify
+ * every row as stale by passing in a bad value.
+ */
+function positiveOr(n: number | undefined, fallback: number): number {
+  if (typeof n !== 'number' || !Number.isFinite(n) || n <= 0) return fallback;
+  return n;
+}
+
+/**
  * Merge DB session rows with live claude processes.
  *
  * A row is matched to a process by slot number (both must be non-null and
- * equal). This correctly handles the common case of one session per slot.
- * Multiple processes in the same slot are unusual but not impossible (stuck
- * subagent, crashed parent); we take the first match and surface the rest
- * as implicit GHOSTs? — no, simpler: we emit one row per DB session plus
- * one GHOST row per live process with no matching DB session.
+ * equal). Extra processes in the same slot (rare — a stuck subagent or
+ * crashed-parent scenario) are emitted as separate ghost rows so the
+ * "is anyone else using this slot?" signal isn't silently lost.
  */
 export function mergeSessions(
   sessions: DbSession[],
@@ -73,17 +82,18 @@ export function mergeSessions(
   opts: MergeOptions = {},
 ): MergedSession[] {
   const now = opts.now ?? Date.now();
-  const liveMs = (opts.liveMinutes ?? 2) * 60_000;
-  const staleMs = (opts.staleMinutes ?? 30) * 60_000;
+  const liveMs = positiveOr(opts.liveMinutes, 2) * 60_000;
+  const staleMs = positiveOr(opts.staleMinutes, 30) * 60_000;
 
-  // Build slot → process lookup. If multiple processes share a slot, keep
-  // the first; extras become GHOSTs below.
-  const processBySlot = new Map<number, ClaudeProcess>();
-  const consumed = new Set<number>();
+  // Track which (slot, pid) pairs get bound to a DB session. Anything left
+  // over becomes a ghost row.
+  const bound = new Set<number>(); // pids bound to a DB session
+  const processBySlot = new Map<number, ClaudeProcess[]>();
   for (const p of processes) {
-    if (p.slot !== null && !processBySlot.has(p.slot)) {
-      processBySlot.set(p.slot, p);
-    }
+    if (p.slot === null) continue;
+    const list = processBySlot.get(p.slot) ?? [];
+    list.push(p);
+    processBySlot.set(p.slot, list);
   }
 
   const rows: MergedSession[] = [];
@@ -94,17 +104,22 @@ export function mergeSessions(
     const ageMin = age === null ? null : age / 60_000;
 
     let proc: ClaudeProcess | null = null;
-    if (s.slotNumber !== null && processBySlot.has(s.slotNumber)) {
-      proc = processBySlot.get(s.slotNumber) ?? null;
-      consumed.add(s.slotNumber);
+    if (s.slotNumber !== null) {
+      const candidates = processBySlot.get(s.slotNumber) ?? [];
+      // Bind the first unbound process in this slot to the session.
+      const picked = candidates.find((p) => !bound.has(p.pid));
+      if (picked) {
+        proc = picked;
+        bound.add(picked.pid);
+      }
     }
 
     let liveness: Liveness;
     if (s.status === 'completed') {
       liveness = 'done';
-    } else if (age !== null && age <= liveMs) {
+    } else if (age !== null && age < liveMs) {
       liveness = 'live';
-    } else if (age !== null && age <= staleMs) {
+    } else if (age !== null && age < staleMs) {
       liveness = 'recent';
     } else {
       liveness = 'stale';
@@ -113,11 +128,11 @@ export function mergeSessions(
     rows.push({ session: s, process: proc, liveness, ageMinutes: ageMin });
   }
 
-  // GHOSTs: live processes whose slot has no matching active DB row. These
-  // are the most alarming category — a session is running without having
-  // registered via agent-checklist init.
+  // GHOSTs: every process not bound to a DB session. This includes both
+  // slots that have no DB row at all AND slots with extra processes beyond
+  // the first (e.g. a stuck subagent).
   for (const p of processes) {
-    if (p.slot === null || consumed.has(p.slot)) continue;
+    if (p.slot === null || bound.has(p.pid)) continue;
     rows.push({ session: null, process: p, liveness: 'ghost', ageMinutes: null });
   }
 

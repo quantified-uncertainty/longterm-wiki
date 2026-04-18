@@ -101,13 +101,26 @@ export function parseLsofFpn(raw: string): Array<{ pid: number; cwd: string }> {
   return out;
 }
 
+export interface ProcessScanResult {
+  processes: ClaudeProcess[];
+  /**
+   * True when the scan could not complete (ps/lsof missing, timeout, permission
+   * denied). Callers must distinguish this from "no processes found" because
+   * a silent scan failure would give a coordinator a false "no ghosts" signal
+   * — exactly the QUA-413 failure mode this command is meant to prevent.
+   */
+  scanFailed: boolean;
+  /** Short reason string for user-facing display. Empty when scanFailed=false. */
+  scanError: string;
+}
+
 /**
  * List all running Claude Code processes and their working directories.
- * Returns [] on any failure (ps missing, lsof missing, permission denied,
- * or no matching processes). Best-effort — the command degrades gracefully
- * to DB-only data.
+ * Returns `{ processes: [], scanFailed: true }` when the scan itself couldn't
+ * run (ps/lsof missing, timeout). Returns `{ processes: [], scanFailed: false }`
+ * when the scan ran but found nothing.
  */
-export function findClaudeProcesses(deps: ProcessScanDeps = {}): ClaudeProcess[] {
+export function findClaudeProcesses(deps: ProcessScanDeps = {}): ProcessScanResult {
   const exec =
     deps.execCmd ??
     ((cmd: string) =>
@@ -121,11 +134,13 @@ export function findClaudeProcesses(deps: ProcessScanDeps = {}): ClaudeProcess[]
   let psOut = '';
   try {
     psOut = exec('ps -eo pid=,args=');
-  } catch {
-    return [];
+  } catch (e) {
+    return { processes: [], scanFailed: true, scanError: `ps failed: ${errMsg(e)}` };
   }
   const pids = findClaudePids(psOut);
-  if (pids.length === 0) return [];
+  if (pids.length === 0) {
+    return { processes: [], scanFailed: false, scanError: '' };
+  }
 
   // Step 2: lsof for CWD. Must use `-a` to AND the `-p` and `-d` filters on
   // macOS — without it, lsof ORs the filters and returns every process.
@@ -133,9 +148,18 @@ export function findClaudeProcesses(deps: ProcessScanDeps = {}): ClaudeProcess[]
   let lsofOut = '';
   try {
     lsofOut = exec(`lsof -a -p ${pids.join(',')} -d cwd -Fpn`);
-  } catch {
-    return [];
+  } catch (e) {
+    return { processes: [], scanFailed: true, scanError: `lsof failed: ${errMsg(e)}` };
   }
   const pairs = parseLsofFpn(lsofOut);
-  return pairs.map(({ pid, cwd }) => ({ pid, cwd, slot: slotFromPath(cwd) }));
+  return {
+    processes: pairs.map(({ pid, cwd }) => ({ pid, cwd, slot: slotFromPath(cwd) })),
+    scanFailed: false,
+    scanError: '',
+  };
+}
+
+function errMsg(e: unknown): string {
+  if (e instanceof Error) return e.message.slice(0, 200);
+  return String(e).slice(0, 200);
 }

@@ -119,44 +119,52 @@ describe('findClaudeProcesses — integration (mocked shell)', () => {
       if (cmd.startsWith('lsof ')) return lsof;
       throw new Error(`unexpected: ${cmd}`);
     };
-    expect(findClaudeProcesses({ execCmd })).toEqual([
+    const result = findClaudeProcesses({ execCmd });
+    expect(result.scanFailed).toBe(false);
+    expect(result.processes).toEqual([
       { pid: 95223, cwd: '/Users/dev/lw/a9', slot: 9 },
     ]);
   });
 
-  it('returns [] when no Claude processes found (skips lsof entirely)', () => {
+  it('returns empty scan-succeeded result when no Claude processes found (skips lsof entirely)', () => {
     const calls: string[] = [];
     const execCmd = (cmd: string) => {
       calls.push(cmd);
       if (cmd.startsWith('ps ')) return '  1 /sbin/launchd\n';
       throw new Error('lsof should not be called');
     };
-    expect(findClaudeProcesses({ execCmd })).toEqual([]);
+    const result = findClaudeProcesses({ execCmd });
+    expect(result).toEqual({ processes: [], scanFailed: false, scanError: '' });
     expect(calls).toHaveLength(1); // only ps, never lsof
   });
 
-  it('returns [] when ps fails', () => {
+  it('marks scanFailed=true when ps fails', () => {
     const execCmd = (cmd: string) => {
       if (cmd.startsWith('ps ')) throw new Error('ps: command not found');
       throw new Error('unreachable');
     };
-    expect(findClaudeProcesses({ execCmd })).toEqual([]);
+    const result = findClaudeProcesses({ execCmd });
+    expect(result.scanFailed).toBe(true);
+    expect(result.scanError).toContain('ps failed');
+    expect(result.processes).toEqual([]);
   });
 
-  it('returns [] when lsof fails after ps succeeds (no partial results)', () => {
+  it('marks scanFailed=true when lsof fails after ps succeeds (no partial results)', () => {
     const execCmd = (cmd: string) => {
       if (cmd.startsWith('ps ')) return '  1 claude\n';
       throw new Error('lsof: permission denied');
     };
-    expect(findClaudeProcesses({ execCmd })).toEqual([]);
+    const result = findClaudeProcesses({ execCmd });
+    expect(result.scanFailed).toBe(true);
+    expect(result.scanError).toContain('lsof failed');
+    expect(result.processes).toEqual([]);
   });
 
   it('marks cwd outside slot dirs with slot=null', () => {
     const ps = '  1 claude\n';
     const lsof = 'p1\nfcwd\nn/tmp\n';
     const execCmd = (cmd: string) => (cmd.startsWith('ps ') ? ps : lsof);
-    expect(findClaudeProcesses({ execCmd })).toEqual([
-      { pid: 1, cwd: '/tmp', slot: null },
-    ]);
+    const result = findClaudeProcesses({ execCmd });
+    expect(result.processes).toEqual([{ pid: 1, cwd: '/tmp', slot: null }]);
   });
 });
