@@ -159,20 +159,32 @@ const claimsApp = new Hono()
       "proposing claims for sourcing",
     );
 
-    // 1. Validate resource references exist (if provided)
-    const resourceIds = [
+    // 1. Validate resource references exist (if provided) and resolve to stable_id.
+    // QUA-573 Phase B.1c: proposed_claims.resource_id now references
+    // resources.stable_id, but callers (source-discover-agent via /api/resources/suggest)
+    // still pass the legacy hex16 resources.id. Accept either and translate to
+    // stable_id before insert so new rows land in the canonical form.
+    const inputResourceIds = [
       ...new Set(claims.map((cl) => cl.resourceId).filter(Boolean) as string[]),
     ];
-    if (resourceIds.length > 0) {
-      const existing = await sql<{ id: string }[]>`
-        SELECT id FROM resources WHERE id = ANY(${resourceIds})
+    const resolvedMap = new Map<string, string>();
+    if (inputResourceIds.length > 0) {
+      const existing = await sql<{ id: string; stable_id: string | null }[]>`
+        SELECT id, stable_id FROM resources
+        WHERE id = ANY(${inputResourceIds}) OR stable_id = ANY(${inputResourceIds})
       `;
-      const existingSet = new Set(existing.map((r) => r.id));
-      const missing = resourceIds.filter((id) => !existingSet.has(id));
+      for (const r of existing) {
+        if (r.stable_id) {
+          // Map both forms to the canonical stable_id.
+          resolvedMap.set(r.id, r.stable_id);
+          resolvedMap.set(r.stable_id, r.stable_id);
+        }
+      }
+      const missing = inputResourceIds.filter((id) => !resolvedMap.has(id));
       if (missing.length > 0) {
         return validationError(
           c,
-          `Resource IDs not found: ${missing.join(", ")}`,
+          `Resource IDs not found (or missing stable_id): ${missing.join(", ")}`,
         );
       }
     }
@@ -200,7 +212,7 @@ const claimsApp = new Hono()
           ${claims.map((cl) => cl.targetField ?? null)}::text[],
           ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
           ${claims.map((cl) => cl.proposedData ? JSON.stringify(cl.proposedData) : null)}::jsonb[],
-          ${claims.map((cl) => cl.resourceId ?? null)}::text[],
+          ${claims.map((cl) => (cl.resourceId ? (resolvedMap.get(cl.resourceId) ?? cl.resourceId) : null))}::text[],
           ${claims.map((cl) => cl.sourceUrl)}::text[],
           ${claims.map((cl) => cl.agentEvidence ?? null)}::text[],
           ${claims.map(() => "pending")}::text[],

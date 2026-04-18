@@ -3705,7 +3705,10 @@ export const proposedClaims = pgTable(
     proposedData: jsonb("proposed_data"),
 
     // Source evidence (from research agent)
-    resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
+    // QUA-573 Phase B.1c: references resources.stable_id (canonical sid_<10>).
+    // Soft-ref in prod (no DB-level FK constraint); onDelete preserved from the
+    // Drizzle declaration. See QUA-549 for parent migration context.
+    resourceId: text("resource_id").references(() => resources.stableId, { onDelete: "set null" }),
     sourceUrl: text("source_url").notNull(),
     agentEvidence: text("agent_evidence"),
 

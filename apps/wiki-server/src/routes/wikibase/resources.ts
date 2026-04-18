@@ -4,6 +4,7 @@ import { buildPrefixTsquery } from "../../search-utils.js";
 import { logger } from "../../logger.js";
 import {
   eq,
+  or,
   count,
   sql,
   desc,
@@ -1435,10 +1436,14 @@ const resourcesApp = new Hono()
     const id = c.req.param("id");
     const db = getDrizzleDb();
 
+    // QUA-573: accept either resources.id (legacy hex16) or resources.stable_id
+    // (canonical sid_<10>). The claim-sourcing job handler looks up content via
+    // whatever value was stored in proposed_claims.resource_id, which is now
+    // stable_id. Other callers still pass hex16 — both must resolve.
     const rows = await db
       .select()
       .from(resources)
-      .where(eq(resources.id, id))
+      .where(or(eq(resources.id, id), eq(resources.stableId, id)))
       .limit(1);
 
     if (rows.length === 0) {

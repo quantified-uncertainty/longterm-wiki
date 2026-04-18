@@ -1,0 +1,31 @@
+-- QUA-573 Phase B.1c: migrate proposed_claims.resource_id from referencing
+-- resources.id (legacy hex16) to resources.stable_id (canonical sid_<10>).
+--
+-- Part of Phase B (QUA-549) of the resources-FK migration plan designed in
+-- QUA-498. Split out of the original QUA-564 Phase B.1 after discovering the
+-- claims surface touches ~10 callsites across wiki-server + crux.
+--
+-- proposed_claims is a SOFT-REF table: the schema declares
+-- `.references(() => resources.id, { onDelete: "set null" })` but no FK
+-- constraint was ever created in prod (verified 2026-04-17 per QUA-573 body).
+-- That means:
+--   * No FK to drop.
+--   * No FK to add (Phase B non-goal per QUA-549: "do NOT add missing FK
+--     constraints on proposed_claims — separate ticket").
+--   * No orphan scan needed — a soft-ref has no enforcement.
+--
+-- All semantic changes in QUA-573 are schema.ts + application-code:
+--   * schema.ts flips `.references(() => resources.stableId, ...)` so future
+--     Drizzle introspection shows the canonical relationship.
+--   * POST /api/claims/propose now accepts incoming resource_id in either
+--     format (hex16 legacy or sid_ canonical) and translates to stable_id
+--     before insert. See apps/wiki-server/src/routes/claims/claims.ts.
+--   * GET /api/resources/:id/content now accepts either format so the
+--     claim-sourcing job handler can call it with the stored sid_.
+--
+-- This migration is a no-op to keep the Drizzle journal in sync with the
+-- schema.ts edit. Drizzle-kit will not emit a migration for a pure
+-- .references() target change on a column that already exists, so we author
+-- this file by hand and register it in meta/_journal.json.
+
+SELECT 1;
