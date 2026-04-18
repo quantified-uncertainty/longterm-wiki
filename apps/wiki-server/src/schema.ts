@@ -52,7 +52,12 @@ export const citationQuotes = pgTable(
       .references(() => wikiPages.id),
     footnote: integer("footnote").notNull(),
     url: text("url"),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-574 Phase B.2b: resource_id references resources.stable_id (not resources.id).
+    // Column name kept as `resource_id` for minimal code churn — the value is now a
+    // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
+    // Soft ref: schema declares SET NULL, but no FK constraint exists in prod — adding
+    // the FK is tracked separately (non-goal of QUA-574).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     claimText: text("claim_text").notNull(),
