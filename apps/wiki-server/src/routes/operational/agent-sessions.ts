@@ -445,11 +445,19 @@ const agentSessionsApp = new Hono()
     const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));
     const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
     const db = getDrizzleDb();
+    // Swept rows have no title/summary (hook didn't run); flip to 'stale' so
+    // 'completed' stays reserved for graceful exits. completedAt intentionally
+    // unset. See QUA-221.
+    const now = new Date();
     const stale = await db.update(agentSessions)
-      .set({ status: "completed", completedAt: new Date(), updatedAt: new Date() })
+      .set({
+        status: "stale",
+        updatedAt: now,
+        date: sql`COALESCE(${agentSessions.date}, ${agentSessions.startedAt}::date)`,
+      })
       .where(and(eq(agentSessions.status, "active"), lt(agentSessions.updatedAt, cutoff)))
       .returning({ id: agentSessions.id, branch: agentSessions.branch, issueNumber: agentSessions.issueNumber });
-    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as completed");
+    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as status='stale'");
     return c.json({ swept: stale.length, sessions: stale });
   });
 

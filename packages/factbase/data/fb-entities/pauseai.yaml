@@ -64,3 +64,18 @@ facts:
     property: country
     value: "Netherlands"
     source: https://pauseai.info/legal
+
+  - id: f_mlKtecLXeW
+    property: employee-count
+    value: "22"
+    asOf: 2026-04
+    source: https://pauseai.info/people
+    notes: "Named team: 3 executive (CEO, Organizing Director, Communications Director), 15 national/chapter leaders, and 3 global board members. Mix of paid staff and volunteer leaders; org does not publicly break down paid vs. volunteer counts. Operational teams (Operations, Onboarding, Communications) also include additional unpaid volunteers."
+
+  - id: f_DSEdfJN0mL
+    property: annual-revenue
+    value: "288319"
+    unit: USD
+    asOf: 2024
+    source: https://projects.propublica.org/nonprofits/organizations/990899650
+    notes: "PauseAI US (501(c)(3), EIN 99-0899650, San Francisco, CA). Separate from Dutch PauseAI Global Stichting, which reports donor totals of EUR 715K through 2025-12."

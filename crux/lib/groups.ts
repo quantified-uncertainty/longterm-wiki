@@ -128,6 +128,7 @@ export const GROUPS: Record<string, GroupDef> = {
       'usage-patterns',
       'session-finalize',
       'docs',
+      'dispatch',
     ],
   },
   linear: {

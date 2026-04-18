@@ -8,6 +8,7 @@
 
 import { readFileSync, existsSync } from 'fs';
 import { join } from 'path';
+import { parse as parseYaml } from 'yaml';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import type { TableProfile, TableScanResult, ScanSummary, FieldGapStat, FieldGapReport, FieldColumnType } from './types.ts';
@@ -835,11 +836,12 @@ interface FieldConfig {
 }
 
 /**
- * Which fields to profile for each table. Excludes identity columns (id,
- * natural-key FKs, name) and timestamps — those are never "enrichable" gaps.
- * Derived from the wiki-server `formatRow` shapes in each tablebase route.
+ * Which fields to profile for each PG-backed table. Excludes identity columns
+ * (id, natural-key FKs, name) and timestamps — those are never "enrichable"
+ * gaps. Derived from the wiki-server `formatRow` shapes in each tablebase
+ * route.
  */
-const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
+const PG_FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   divisions: [
     { field: 'divisionType', columnType: 'enum' },
     { field: 'lead', columnType: 'id' },
@@ -879,6 +881,37 @@ const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
   ],
 };
 
+// YAML entity catalogs — loaded from data/entities/*.yaml (no PG backing).
+
+interface YamlCatalogConfig {
+  /** Path relative to PROJECT_ROOT. */
+  file: string;
+  fields: FieldConfig[];
+}
+
+// Shape-universal fields present on every entity YAML — will gain new fields
+// for all catalogs simultaneously, so extracted rather than repeated per-type.
+const YAML_CATALOG_DEFAULT_FIELDS: FieldConfig[] = [
+  { field: 'sources', columnType: 'list' },
+  { field: 'relatedEntries', columnType: 'list' },
+  { field: 'description', columnType: 'string' },
+];
+
+const YAML_CATALOG_CONFIGS: Record<string, YamlCatalogConfig> = {
+  concepts:     { file: 'data/entities/concepts.yaml',     fields: YAML_CATALOG_DEFAULT_FIELDS },
+  risks:        { file: 'data/entities/risks.yaml',        fields: YAML_CATALOG_DEFAULT_FIELDS },
+  capabilities: { file: 'data/entities/capabilities.yaml', fields: YAML_CATALOG_DEFAULT_FIELDS },
+};
+
+export const YAML_CATALOG_TABLES = Object.keys(YAML_CATALOG_CONFIGS);
+
+const FIELD_GAP_CONFIGS: Record<string, FieldConfig[]> = {
+  ...PG_FIELD_GAP_CONFIGS,
+  ...Object.fromEntries(
+    Object.entries(YAML_CATALOG_CONFIGS).map(([name, config]) => [name, config.fields]),
+  ),
+};
+
 // Require the slash so legitimate 2-letter codes like "NA" (Namibia ISO-3166,
 // "Native American" category) don't get flagged as gaps. "n/a" with the slash
 // is the conventional not-available marker.
@@ -893,6 +926,9 @@ function classifyValue(value: unknown): FieldValueClass {
     if (trimmed.length === 0) return 'empty';
     if (NA_PATTERN.test(trimmed)) return 'na';
     return 'filled';
+  }
+  if (Array.isArray(value)) {
+    return value.length === 0 ? 'empty' : 'filled';
   }
   // Numeric 0 / boolean false are valid, not gaps.
   return 'filled';
@@ -954,6 +990,10 @@ export function profileFields<T extends { id: string }>(
 type RawRow = Record<string, unknown> & { id: string };
 
 async function fetchTableRows(table: string): Promise<RawRow[]> {
+  const yamlConfig = YAML_CATALOG_CONFIGS[table];
+  if (yamlConfig) {
+    return loadYamlCatalogRows(yamlConfig.file);
+  }
   switch (table) {
     case 'divisions':
       return fetchAllPaginated<RawRow>('/api/divisions/all', 'divisions');
@@ -966,6 +1006,43 @@ async function fetchTableRows(table: string): Promise<RawRow[]> {
     default:
       return [];
   }
+}
+
+/**
+ * Load rows from a YAML entity catalog file (e.g. data/entities/concepts.yaml).
+ * Returns [] with a warning on any failure (missing, malformed, wrong shape)
+ * so a broken file can't silently break the whole scan. Rows without a
+ * non-empty string `id` are skipped — profileFields<T extends { id: string }>
+ * requires one.
+ */
+export function loadYamlCatalogRows(relativePath: string): RawRow[] {
+  const fullPath = join(PROJECT_ROOT, relativePath);
+  let parsed: unknown;
+  try {
+    parsed = parseYaml(readFileSync(fullPath, 'utf-8'));
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    if ((err as NodeJS.ErrnoException)?.code === 'ENOENT') {
+      console.warn(`[tablebase scanner] YAML catalog file not found: ${relativePath}`);
+    } else {
+      console.warn(`[tablebase scanner] failed to parse ${relativePath}: ${msg}`);
+    }
+    return [];
+  }
+  if (!Array.isArray(parsed)) {
+    console.warn(`[tablebase scanner] expected top-level list in ${relativePath}, got ${typeof parsed}`);
+    return [];
+  }
+  const rows: RawRow[] = [];
+  for (const entry of parsed) {
+    if (!entry || typeof entry !== 'object') continue;
+    const id = (entry as { id?: unknown }).id;
+    if (typeof id !== 'string' || id.length === 0) continue;
+    // `id` shorthand goes last so the narrowed string wins over the
+    // unknown-typed `id` from the spread.
+    rows.push({ ...(entry as Record<string, unknown>), id });
+  }
+  return rows;
 }
 
 /** List of tables covered by the field-gap scan. */

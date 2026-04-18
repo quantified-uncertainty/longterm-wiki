@@ -46,7 +46,11 @@ export async function storeSourcingEvidence(params: {
     try {
       const resource = await lookupResourceByUrl(params.sourceUrl);
       if (resource.ok) {
-        resolvedResourceId = resource.data.id;
+        // QUA-568 Phase B.5: source_check_evidence.resource_id now references
+        // resources.stable_id (sid_<10>), not resources.id (hex16). Write the
+        // stable_id here so new evidence rows satisfy the new FK (migration
+        // 0187). Older rows are back-filled by the migration's UPDATE step.
+        resolvedResourceId = resource.data.stableId;
       }
     } catch (e: unknown) {
       // Best-effort: resource lookup failure should not block evidence storage,

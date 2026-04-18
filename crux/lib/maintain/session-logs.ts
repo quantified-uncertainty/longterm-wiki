@@ -73,7 +73,10 @@ export async function loadSessionLogsSince(since: string): Promise<SessionLogEnt
     if (result.ok) {
       const entries: SessionLogEntry[] = [];
       for (const row of result.data.sessions) {
-        const sessionDate = row.date?.slice(0, 10);
+        // Prefer explicit session date, fall back to started_at.
+        // The sweep endpoint and crashed sessions leave `date` null; without this
+        // fallback the retrospective tool reports 0 sessions despite hundreds being present.
+        const sessionDate = row.date?.slice(0, 10) ?? row.startedAt?.slice(0, 10);
         if (!sessionDate || sessionDate < since) continue;
 
         const issues = parseJsonArray(row.issuesJson);

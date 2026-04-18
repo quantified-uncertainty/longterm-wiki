@@ -410,14 +410,17 @@ const blueskyApp = new Hono()
         .map((item) => extractEmbeddedUrl(item).url)
         .filter((u): u is string => u != null);
 
+      // QUA-572: resource_id FK now points at resources.stable_id, so we
+      // store the sid_ form. Resources whose stable_id is null are skipped —
+      // the FK would reject them anyway.
       const urlToResourceId = new Map<string, string>();
       if (embeddedUrls.length > 0) {
         const matchedResources = await db
-          .select({ id: resources.id, url: resources.url })
+          .select({ stableId: resources.stableId, url: resources.url })
           .from(resources)
           .where(inArray(resources.url, embeddedUrls));
         for (const r of matchedResources) {
-          urlToResourceId.set(r.url, r.id);
+          if (r.stableId) urlToResourceId.set(r.url, r.stableId);
         }
       }
 

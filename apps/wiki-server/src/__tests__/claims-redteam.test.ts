@@ -193,11 +193,12 @@ function resetStores() {
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
+  // QUA-573: propose resolves hex16 OR sid_ to stable_id before insert.
   if (q.includes("from resources") && q.includes("where")) {
-    if (Array.isArray(params[0])) {
-      return (params[0] as string[]).map((id) => ({ id }));
-    }
-    return params.map((p) => ({ id: p }));
+    const ids = Array.isArray(params[0]) ? (params[0] as string[]) : params.filter((p) => typeof p === "string") as string[];
+    const ids2 = Array.isArray(params[1]) ? (params[1] as string[]) : [];
+    const all = [...new Set([...ids, ...ids2])];
+    return all.map((id) => ({ id, stable_id: id }));
   }
 
   if (q.includes("insert into") && q.includes("proposed_claims")) {

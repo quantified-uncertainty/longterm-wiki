@@ -6,8 +6,9 @@
  * analysis, and (optionally) API queries.
  */
 
-import { existsSync, readdirSync, readFileSync, statSync, globSync } from "fs";
+import { existsSync, readdirSync, readFileSync, statSync } from "fs";
 import { join, basename } from "path";
+import { globSync as tinyGlobSync } from "tinyglobby";
 import { PROJECT_ROOT } from "../lib/content-types.ts";
 import { ENTITY_TYPES, DIMENSIONS, DIMENSION_GROUPS, scoreDimension } from "./config.ts";
 import { apiRequest, type ApiResult } from "../lib/wiki-server/client.ts";
@@ -17,6 +18,12 @@ import type {
   EntityTypeRow,
   MatrixSnapshot,
 } from "./types.ts";
+
+// fs.globSync is Node 22+; this repo pins Node 20. @types/node@22 masks the
+// mismatch at compile time. absolute:true preserves the absolute-path semantics
+// the call sites below rely on for readFileSync.
+const globSync = (pattern: string | readonly string[]): string[] =>
+  tinyGlobSync(pattern, { absolute: true });
 
 // ============================================================================
 // PATH CONSTANTS

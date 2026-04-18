@@ -1,0 +1,26 @@
+{
+  "table": "personnel",
+  "recordCount": 9,
+  "submittedAt": "2026-04-17T00:00:01.000Z",
+  "verificationSummary": {
+    "withVerification": 9,
+    "withoutVerification": 0,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {"id":"yi40loF3Vj","personId":"K81nkR16qj","organizationId":"sid_z7spMQKjLQ","role":"Director / Full Time Organiser","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"F5xHAFNc8I","personId":"RMxf10iDvK","organizationId":"sid_z7spMQKjLQ","role":"President","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"IWnnXFIcBj","personId":"46jbzw9BsD","organizationId":"sid_z7spMQKjLQ","role":"Secretary","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"4s8xZooyOo","personId":"UPlFcAUxuO","organizationId":"sid_z7spMQKjLQ","role":"Social Media Lead","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"cV9G0u8F5j","personId":"jpvQUDoUDz","organizationId":"sid_z7spMQKjLQ","role":"Project Based Fellowship Lead","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"X98ymTG70j","personId":"49hmj4jgUa","organizationId":"sid_z7spMQKjLQ","role":"Global Health Working Group Lead","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"yI1YNi5ISL","personId":"m3p3vzOjM9","organizationId":"sid_z7spMQKjLQ","role":"Speaker Liaison","source":"https://www.eacambridge.org/about-and-faq","verdict":"none"},
+    {"id":"KnUJVhSY9d","personId":"Kf95f33I5Q","organizationId":"sid_z7spMQKjLQ","role":"Community Health Team Member","source":"https://www.eacambridge.org/community-health","verdict":"none"},
+    {"id":"58JsYYMFHY","personId":"iB78EhP5n7","organizationId":"sid_z7spMQKjLQ","role":"Community Health Team Member","source":"https://www.eacambridge.org/community-health","verdict":"none"}
+  ]
+}

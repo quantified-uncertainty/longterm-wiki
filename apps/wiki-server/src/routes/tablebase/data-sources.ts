@@ -113,7 +113,9 @@ function formatFromNewTables(
     accessMethod: rts.accessMethod,
     recordType: rts.recordType,
     fetchUrl: res.url.startsWith("urn:") ? null : res.url,
-    resourceId: rts.resourceId,
+    // QUA-565 Phase B.2: intentionally res.id (hex16), not rts.resourceId
+    // (now sid_). The UI links to /resources/:id, which still expects hex16.
+    resourceId: res.id,
     publisherEntityId: res.publisherEntityId,
     updateFrequency: rts.updateFrequency,
     columnMapping: rts.columnMapping,
@@ -136,14 +138,14 @@ const dataSourcesApp = new Hono()
   .get("/", async (c) => {
     const db = getDrizzleDb();
 
-    // Join new tables for the base data
+    // QUA-565 Phase B.2: JOIN on resources.stable_id (the new FK target).
     const rows = await db
       .select({
         res: resources,
         rts: resourceTabularSources,
       })
       .from(resourceTabularSources)
-      .innerJoin(resources, eq(resources.id, resourceTabularSources.resourceId))
+      .innerJoin(resources, eq(resources.stableId, resourceTabularSources.resourceId))
       .orderBy(resources.title);
 
     // Compute snapshot metadata for each source.
@@ -164,14 +166,14 @@ const dataSourcesApp = new Hono()
     const db = getDrizzleDb();
     const id = c.req.param("id");
 
-    // Look up by sourceSlug (same as old data_sources.id)
+    // Look up by sourceSlug. QUA-565 Phase B.2: JOIN on resources.stable_id.
     const [row] = await db
       .select({
         res: resources,
         rts: resourceTabularSources,
       })
       .from(resourceTabularSources)
-      .innerJoin(resources, eq(resources.id, resourceTabularSources.resourceId))
+      .innerJoin(resources, eq(resources.stableId, resourceTabularSources.resourceId))
       .where(eq(resourceTabularSources.sourceSlug, id));
 
     if (!row) return notFoundError(c, "Data source not found");
@@ -237,6 +239,10 @@ const dataSourcesApp = new Hono()
     const url = body.fetchUrl ?? `urn:lw:tabular-source:${body.id}`;
     const resId = hashId(url);
     let actualResId = resId;
+    // QUA-565 Phase B.2: resource_tabular_sources.resource_id now references
+    // resources.stable_id, so we write stable_id here. The API response still
+    // returns hex16 in `resourceId` to preserve the existing contract.
+    let actualStableId = "";
 
     await db.transaction(async (tx) => {
       // Upsert resource row. ON CONFLICT on URL handles the case where
@@ -263,16 +269,24 @@ const dataSourcesApp = new Hono()
             updatedAt: new Date(),
           },
         })
-        .returning({ id: resources.id });
+        .returning({ id: resources.id, stableId: resources.stableId });
 
       actualResId = upsertedResource.id;
+      // resources.stable_id is NOT NULL post-QUA-536; throw loudly if a
+      // pre-migration row somehow slipped through rather than silently writing ''.
+      if (!upsertedResource.stableId) {
+        throw new Error(
+          `resources.stable_id unexpectedly null for id=${actualResId} (url=${url})`
+        );
+      }
+      actualStableId = upsertedResource.stableId;
 
       // Upsert resource_tabular_sources. Conflict on sourceSlug (not resourceId)
       // so that changing a source's URL correctly updates the resourceId.
       await tx
         .insert(resourceTabularSources)
         .values({
-          resourceId: actualResId,
+          resourceId: actualStableId,
           sourceSlug: body.id,
           dataFormat: body.dataFormat,
           accessMethod: body.accessMethod,
@@ -286,7 +300,7 @@ const dataSourcesApp = new Hono()
         .onConflictDoUpdate({
           target: resourceTabularSources.sourceSlug,
           set: {
-            resourceId: actualResId,
+            resourceId: actualStableId,
             dataFormat: body.dataFormat,
             accessMethod: body.accessMethod,
             recordType: body.recordType,

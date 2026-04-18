@@ -13,6 +13,7 @@ import { slotColumn, linearColumn } from "./shared-columns";
 const STATUS_STYLES: Record<string, string> = {
   active: "bg-yellow-500/15 text-yellow-600",
   completed: "bg-emerald-500/15 text-emerald-500",
+  stale: "bg-zinc-500/15 text-zinc-500",
 };
 
 function StatusBadge({ status }: { status: string }) {

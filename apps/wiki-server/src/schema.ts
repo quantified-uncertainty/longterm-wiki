@@ -52,7 +52,12 @@ export const citationQuotes = pgTable(
       .references(() => wikiPages.id),
     footnote: integer("footnote").notNull(),
     url: text("url"),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-574 Phase B.2b: resource_id references resources.stable_id (not resources.id).
+    // Column name kept as `resource_id` for minimal code churn — the value is now a
+    // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
+    // Soft ref: schema declares SET NULL, but no FK constraint exists in prod — adding
+    // the FK is tracked separately (non-goal of QUA-574).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     claimText: text("claim_text").notNull(),
@@ -224,7 +229,7 @@ export const resourceContentVersions = pgTable(
   "resource_content_versions",
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
-    resourceId: text("resource_id").references(() => resources.id, {
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     url: text("url").notNull(),
@@ -712,9 +717,12 @@ export const resources = pgTable(
 export const resourceCitations = pgTable(
   "resource_citations",
   {
+    // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+    // Column name kept as `resource_id` for minimal code churn — the value is now a
+    // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
     resourceId: text("resource_id")
       .notNull()
-      .references(() => resources.id, { onDelete: "cascade" }),
+      .references(() => resources.stableId, { onDelete: "cascade" }),
     pageId: integer("page_id")
       .notNull()
       .references(() => wikiPages.id),
@@ -732,9 +740,11 @@ export const resourceCitations = pgTable(
 
 /** Type-specific metadata for academic papers (~800-2,000 resources). */
 export const resourcePapers = pgTable("resource_papers", {
+  // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   arxivId: text("arxiv_id"),
   doi: text("doi"),
   semanticScholarId: text("semantic_scholar_id"),
@@ -755,9 +765,11 @@ export const resourcePapers = pgTable("resource_papers", {
 
 /** Type-specific metadata for forum posts (~400-1,200 resources). */
 export const resourceForumPosts = pgTable("resource_forum_posts", {
+  // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   forum: text("forum").notNull(),
   forumPostId: text("forum_post_id"),
   forumSlug: text("forum_slug"),
@@ -779,9 +791,12 @@ export const resourceForumPosts = pgTable("resource_forum_posts", {
 
 /** Type-specific metadata for policy/government documents (~100-300 resources). */
 export const resourcePolicyDocs = pgTable("resource_policy_docs", {
+  // QUA-564 Phase B.1: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn — the value is now a
+  // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   documentType: text("document_type"),
   jurisdictionEntityId: text("jurisdiction_entity_id"),
   agencyEntityId: text("agency_entity_id"),
@@ -816,9 +831,12 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
  * Part of: Unify Data Sources into Resources (Discussion #3567, PR 2/5).
  */
 export const resourceTabularSources = pgTable("resource_tabular_sources", {
+  // QUA-565 Phase B.2: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal churn — the value is now a
+  // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   /** Human-readable slug (was data_sources.id, e.g. 'coefficient-giving') */
   sourceSlug: text("source_slug").notNull().unique(),
   /** csv | html_table | json_api | spreadsheet */
@@ -865,8 +883,11 @@ export const sourceSnapshots = pgTable("source_snapshots", {
   /** Human-readable slug referencing resource_tabular_sources.source_slug */
   sourceSlug: text("source_slug").notNull()
     .references(() => resourceTabularSources.sourceSlug, { onDelete: "cascade" }),
-  /** Resource ID from unified resources table */
-  resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
+  /**
+   * Resource ID from unified resources table.
+   * QUA-565 Phase B.2: references resources.stable_id (column name unchanged).
+   */
+  resourceId: text("resource_id").references(() => resources.stableId, { onDelete: "set null" }),
   snapshotHash: text("snapshot_hash").notNull(),
   recordCount: integer("record_count"),
   /** Raw CSV/HTML/JSON text — the ground truth. Parsed on-demand. */
@@ -1656,7 +1677,13 @@ export const pageCitations = pgTable(
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-569 Phase B.6: references resources.stable_id (canonical sid_<10>)
+    // as of migration 0193. Previously referenced resources.id (legacy hex16)
+    // via a DUPLICATE FK pair (_fkey + _resources_id_fk) — both were dropped
+    // in the same migration and replaced with a single SET NULL FK to stable_id.
+    // Column name stays `resource_id` to match the Phase B in-place pattern
+    // (QUA-549), so all read/write callsites keep their shape.
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -1688,7 +1715,11 @@ export const recordSources = pgTable(
     fieldName: text("field_name"), // NULL = whole row, or specific column name
     entityId: text("entity_id"), // which entity this is about (for grouping/display)
     expectedValue: text("expected_value"), // what the record says
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-568 Phase B.5: references resources.stable_id (canonical sid_<10>)
+    // as of migration 0188. Previously referenced resources.id (legacy hex16).
+    // Column name stays `resource_id` to avoid churn across the Phase B series
+    // (matches the in-place pattern used by resource_content_versions in 0186).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     sourceUrl: text("source_url"), // direct URL
@@ -2529,8 +2560,11 @@ export const publications = pgTable(
       .references(() => entities.stableId, { onDelete: "cascade" }),
     /** Display name fallback */
     entityDisplayName: text("entity_display_name"),
-    /** Optional FK to resources table for citation tracking */
-    resourceId: text("resource_id").references(() => resources.id, {
+    /**
+     * Optional FK to resources table for citation tracking.
+     * QUA-564 Phase B.1: references resources.stable_id (column name unchanged).
+     */
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     title: text("title").notNull(),
@@ -2785,7 +2819,8 @@ export const researchAreaPapers = pgTable(
     researchAreaId: text("research_area_id")
       .notNull()
       .references(() => researchAreas.id, { onDelete: "cascade" }),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-565 Phase B.2: resource_id references resources.stable_id (not resources.id).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     title: text("title").notNull(),
@@ -2846,9 +2881,13 @@ export const entityResources = pgTable(
     entityId: text("entity_id")
       .notNull()
       .references(() => entities.stableId, { onDelete: "cascade" }),
+    // QUA-567 Phase B.4: resource_id references resources.stable_id (not
+    // resources.id). Column name kept as `resource_id` for minimal code
+    // churn — the value is now a `sid_`-prefixed stable_id, not a legacy
+    // hex16. See QUA-549 for context.
     resourceId: text("resource_id")
       .notNull()
-      .references(() => resources.id, { onDelete: "cascade" }),
+      .references(() => resources.stableId, { onDelete: "cascade" }),
     authoredByEntity: boolean("authored_by_entity").notNull().default(false),
     isSubject: boolean("is_subject").notNull().default(false),
     inferenceSource: text("inference_source"),
@@ -3457,8 +3496,10 @@ export const blueskyPosts = pgTable(
     embeddedTitle: text("embedded_title"),
     /** URI of the post this is replying to */
     replyToUri: text("reply_to_uri"),
-    /** FK to resources — links this post to a known resource by embedded URL */
-    resourceId: text("resource_id").references(() => resources.id, {
+    /** FK to resources.stable_id — links this post to a known resource by embedded URL.
+     *  QUA-572 Phase B.1b: swapped from resources.id → resources.stableId (in-place;
+     *  column name kept as `resource_id`). See migration 0192. */
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     /** Entity stableIds this post is about */
@@ -3671,7 +3712,10 @@ export const proposedClaims = pgTable(
     proposedData: jsonb("proposed_data"),
 
     // Source evidence (from research agent)
-    resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
+    // QUA-573 Phase B.1c: references resources.stable_id (canonical sid_<10>).
+    // Soft-ref in prod (no DB-level FK constraint); onDelete preserved from the
+    // Drizzle declaration. See QUA-549 for parent migration context.
+    resourceId: text("resource_id").references(() => resources.stableId, { onDelete: "set null" }),
     sourceUrl: text("source_url").notNull(),
     agentEvidence: text("agent_evidence"),
 

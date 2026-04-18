@@ -1,0 +1,12 @@
+# Mixed-validity catalog entries. Used by scanner.test.ts to confirm
+# loadYamlCatalogRows keeps only entries whose `id` is a non-empty string.
+- id: valid-a
+  title: A
+- title: missing-id
+- id: 42
+  title: numeric-id
+- not-an-object
+- id: ''
+  title: empty-id
+- id: valid-b
+  title: B

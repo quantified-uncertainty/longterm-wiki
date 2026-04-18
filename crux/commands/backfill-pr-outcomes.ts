@@ -70,11 +70,11 @@ async function runCommand(args: string[], options: CommandOptions): Promise<Comm
 
   const sessions = sessionsResult.data.sessions;
 
-  // Filter to sessions with PR URLs that need outcome backfill
+  // 'stale' sessions may have prUrl written by /agent-ship before sweep fired.
   const candidates = sessions.filter(s => {
     if (!s.prUrl) return false;
     if (!includeAll && s.prOutcome) return false;
-    return s.status === 'completed';
+    return s.status === 'completed' || s.status === 'stale';
   });
 
   if (candidates.length === 0) {

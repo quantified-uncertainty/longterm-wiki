@@ -422,6 +422,21 @@ const entityProfileApp = new Hono()
       }
     }
 
+    // Also include entity.relatedEntries[].id — these are displayed in the
+    // EntityDataSections block and were previously rendered as raw sid_
+    // strings because they never entered the displayName batch.
+    const relatedEntries = (entityRow as Record<string, unknown>).relatedEntries;
+    if (Array.isArray(relatedEntries)) {
+      for (const entry of relatedEntries) {
+        if (entry && typeof entry === "object") {
+          const id = (entry as Record<string, unknown>).id;
+          if (typeof id === "string" && isAnySid(id)) {
+            entityRefIds.add(id);
+          }
+        }
+      }
+    }
+
     // Batch-resolve stableIds to display names
     const displayNames: Record<string, { title: string; slug: string; entityType: string }> = {};
     if (entityRefIds.size > 0) {

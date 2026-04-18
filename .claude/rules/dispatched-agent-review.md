@@ -10,7 +10,7 @@ Before writing a dispatch brief for any Linear-tracked ticket, the coordinator M
 
 1. **Linear state** — Run `pnpm crux linear view QUA-NNN`. Confirm the issue is **not already In Progress with a recent (<24h) start comment from a different session**. Recent start comments mean a slot already picked this up.
 2. **Open PRs** — Run `gh pr list -R quantified-uncertainty/longterm-wiki --search "QUA-NNN in:body" --state all --json number,state,headRefName`. Confirm **no open PR references the ticket**. A closed-unmerged PR is usually fine (investigate the close reason); an open PR almost always means another session is iterating on it.
-3. **Active slots** — Run `./ws list` (or `pnpm crux sys sessions list` once QUA-413 ships). Confirm **no other slot is currently on a `claude/qua-NNN-*` branch** or has an uncommitted working tree that suggests it's on the same ticket.
+3. **Active slots** — Run `WIKI_SERVER_ENV=prod pnpm crux sys sessions list --linear=QUA-NNN` (QUA-413) to see every registered session working on the ticket, cross-referenced with live `claude` processes. Fall back to `./ws list` only if the wiki-server is unreachable. Confirm **no other slot is currently on a `claude/qua-NNN-*` branch**, has a ghost Claude process, or an uncommitted working tree that suggests it's on the same ticket.
 
 **If any check surfaces an existing claim, abort the dispatch.** Either (a) investigate the existing session first and confirm it's abandoned/stuck before taking over with `--force`, or (b) comment on the existing PR instead of opening a new one, or (c) wait for the in-flight session to ship.
 
@@ -22,7 +22,22 @@ This wasn't a tooling gap — the tooling fixes in QUA-406 (PR #4300) and QUA-44
 
 ### Preferred enforcement — `crux sys dispatch`
 
-Once QUA-437 ships, `pnpm crux sys dispatch --linear=QUA-NNN --slot=N` will enforce all three pre-flight checks structurally and refuse on collision. **That wrapper is the preferred way to dispatch going forward** — it makes the rule unskippable under context pressure.
+`pnpm crux sys dispatch --linear=QUA-NNN --slot=N` (QUA-437) enforces all three pre-flight checks structurally and refuses on collision with exit code 2. **This wrapper is the preferred way to dispatch** — it makes the rule unskippable under context pressure.
+
+```bash
+# Normal dispatch — refuses on any pre-flight blocker:
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 --brief=../dispatch/qua-NNN.md
+
+# Dry-run (no ./ws open) to validate pre-flight before committing:
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 --dry-run
+
+# Emergency override (prior claim abandoned, prod-down, etc.):
+pnpm crux sys dispatch --linear=QUA-NNN --slot=7 \
+    --force --reason="slot a9 abandoned, PR #4296 closed, user-authorized"
+```
+
+`--force` is the only way to bypass the check. It requires `--reason="<why>"` and posts a visible `⚠ Claim forced via crux sys dispatch --force` comment on the Linear issue so forced claims stay traceable in ticket history. Every dispatch (forced or not) is audit-logged to `~/.cache/crux-dispatch/log.jsonl`.
 
 Hand-dispatch via `./ws open <N> --claude` + a hand-written brief is permitted only when the wrapper is unavailable, and in that case the coordinator is **personally** responsible for running all three checks before writing the brief.
 

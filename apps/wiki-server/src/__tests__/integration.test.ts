@@ -122,8 +122,10 @@ describeWithDb("Integration: Drizzle migrations", () => {
     expect(fkNames).toContain("session_pages_session_id_sessions_id_fk");
     // FK from auto_update_results.run_id → auto_update_runs.id (migration 0008)
     expect(fkNames).toContain("auto_update_results_run_id_auto_update_runs_id_fk");
-    // FK from resource_citations.resource_id → resources.id (migration 0009)
-    expect(fkNames).toContain("resource_citations_resource_id_resources_id_fk");
+    // FK from resource_citations.resource_id → resources.stable_id
+    // (migration 0009 created the original FK to resources.id; QUA-566 Phase B.3
+    // migration 0192 swapped it to resources.stable_id).
+    expect(fkNames).toContain("resource_citations_resource_id_resources_stable_id_fk");
   });
 
   it("is idempotent — running migrate() again succeeds", async () => {

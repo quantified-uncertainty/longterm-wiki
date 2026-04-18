@@ -370,6 +370,15 @@ export function GrantsTable({
                   >
                     {row.name}
                   </Link>
+                  {row.dataSourceId && row.dataSourceName && (
+                    <Link
+                      href={`/data-sources/${row.dataSourceId}`}
+                      className="ml-2 inline-flex items-center rounded-full bg-muted/60 px-1.5 py-0.5 text-[10px] font-medium text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+                      title={`View ${row.dataSourceName} data source`}
+                    >
+                      {row.dataSourceName}
+                    </Link>
+                  )}
                   {row.source && (
                     <a
                       href={safeHref(row.source)}

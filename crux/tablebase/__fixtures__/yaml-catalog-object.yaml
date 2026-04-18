@@ -1,0 +1,4 @@
+# Top-level is a map rather than a list. Used by scanner.test.ts to
+# exercise the loadYamlCatalogRows "expected top-level list" branch.
+some: object
+not: a-list

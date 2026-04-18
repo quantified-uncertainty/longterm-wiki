@@ -47,6 +47,23 @@ import {
   renderJson as renderDoctorJson,
   exitCodeFor as doctorExitCode,
 } from '../lib/agent-workspace/doctor/runner.ts';
+import {
+  dispatchPaths as makeDispatchPaths,
+  runPaths as makeRunPaths,
+  detectConflict as detectDispatchConflict,
+  spawnDispatch,
+  supersedeCurrent as supersedeDispatch,
+  clearCurrent as clearDispatchCurrent,
+  readCurrent as readDispatchCurrent,
+  readMeta as readDispatchMeta,
+  writeMeta as writeDispatchMeta,
+  parseEventsFile as parseDispatchEvents,
+  finalizeIfComplete as finalizeDispatchIfComplete,
+  realDispatchEnv,
+  isPermissionMode,
+  type DispatchOptions,
+  type PermissionMode,
+} from '../lib/agent-workspace/dispatch.ts';
 import { realDoctorEnv } from '../lib/agent-workspace/doctor/env.ts';
 import { SLOTS_CHECKS } from '../lib/agent-workspace/doctor/slots.ts';
 import { RELEASES_CHECKS } from '../lib/agent-workspace/doctor/releases.ts';
@@ -773,6 +790,342 @@ async function fixTabs(_args: string[], _options: CommandOptions): Promise<Comma
 }
 
 // ---------------------------------------------------------------------------
+// dispatch / dispatch-status / dispatch-stop (QUA-554)
+// ---------------------------------------------------------------------------
+
+interface DispatchCliOptions extends CommandOptions {
+  model?: string;
+  maxBudget?: string;
+  allowedTools?: string;
+  appendSystemPrompt?: string;
+  permissionMode?: string;
+  cwd?: string;
+  tail?: string;
+  prompt?: string;
+  promptFile?: string;
+}
+
+/** Parse the slot number from the first positional argument. */
+export function parseSlot(arg: string | undefined): number | { error: string } {
+  if (!arg || !/^\d+$/.test(arg)) {
+    return { error: 'Slot number must be a positive integer.' };
+  }
+  const slot = parseInt(arg, 10);
+  if (slot < 1) return { error: 'Slot number must be a positive integer.' };
+  return slot;
+}
+
+/** Resolve dispatch target cwd: --cwd override OR lw/aN. */
+function resolveDispatchCwd(slot: number, override?: string): { cwd: string; note: string } | { error: string } {
+  if (override) {
+    if (!existsSync(override)) return { error: `--cwd path does not exist: ${override}` };
+    return { cwd: override, note: ` (cwd override: ${override})` };
+  }
+  const lwDir = getLwDir();
+  const slotDir = join(lwDir, `a${slot}`);
+  if (!existsSync(slotDir)) {
+    return { error: `Slot a${slot} does not exist at ${slotDir}. Run setup first.` };
+  }
+  return { cwd: slotDir, note: '' };
+}
+
+/**
+ * Resolve the prompt from (in priority order): --prompt-file, --prompt, or the
+ * positional args after the slot number. Returns { prompt } or { error }.
+ *
+ * --prompt-file is the robust escape hatch for prompts containing `--` prefixes,
+ * multi-line content, or anything the shell/arg-parser would mangle.
+ */
+export function resolvePrompt(
+  positionalTail: string[],
+  opts: { prompt?: string; promptFile?: string },
+): { prompt: string } | { error: string } {
+  if (opts.promptFile) {
+    try {
+      const body = readFileSync(opts.promptFile, 'utf-8').trim();
+      if (!body) return { error: `--prompt-file is empty: ${opts.promptFile}` };
+      return { prompt: body };
+    } catch (e) {
+      return { error: `Could not read --prompt-file=${opts.promptFile}: ${e instanceof Error ? e.message : String(e)}` };
+    }
+  }
+  if (typeof opts.prompt === 'string' && opts.prompt.trim().length > 0) {
+    return { prompt: opts.prompt };
+  }
+  const joined = positionalTail.join(' ').trim();
+  if (!joined) {
+    return {
+      error:
+        'prompt is required. Pass it as a quoted argument, via --prompt="...", or via --prompt-file=<path>.',
+    };
+  }
+  return { prompt: joined };
+}
+
+/**
+ * Shared preamble for all three dispatch handlers: parse slot, resolve cwd.
+ * Returns either a ready-to-use context or a CommandResult-shaped error
+ * (caller returns it directly).
+ */
+function dispatchPreamble(
+  args: string[],
+  options: DispatchCliOptions,
+  usage: string,
+):
+  | { slot: number; cwd: string; cwdNote: string; positional: string[] }
+  | { error: CommandResult } {
+  const positional = args.filter((a) => !a.startsWith('--'));
+  const slotResult = parseSlot(positional[0]);
+  if (typeof slotResult === 'object' && 'error' in slotResult) {
+    return { error: { exitCode: 1, output: `Error: ${slotResult.error}\n\n${usage}` } };
+  }
+  const cwdResult = resolveDispatchCwd(slotResult, options.cwd);
+  if ('error' in cwdResult) return { error: { exitCode: 1, output: `Error: ${cwdResult.error}` } };
+  return { slot: slotResult, cwd: cwdResult.cwd, cwdNote: cwdResult.note, positional };
+}
+
+/** Validate / clamp --max-budget. */
+export function parseMaxBudget(raw: string | undefined): { value: number | undefined } | { error: string } {
+  if (raw === undefined) return { value: undefined };
+  const n = Number(raw);
+  if (Number.isNaN(n) || n <= 0) {
+    return { error: `--max-budget must be a positive number (got: ${raw}).` };
+  }
+  return { value: n };
+}
+
+async function dispatchCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
+  const usage = 'Usage: crux sys agent-workspace dispatch <N> "<prompt>" [options]';
+  const ctx = dispatchPreamble(args, options, usage);
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd, cwdNote, positional } = ctx;
+
+  const promptResult = resolvePrompt(positional.slice(1), options);
+  if ('error' in promptResult) {
+    return { exitCode: 1, output: `Error: ${promptResult.error}\n\n${usage}` };
+  }
+  const prompt = promptResult.prompt;
+
+  if (options.permissionMode !== undefined && !isPermissionMode(options.permissionMode)) {
+    return {
+      exitCode: 1,
+      output: `Error: --permission-mode=${options.permissionMode} is not a recognized claude mode. Allowed: default, acceptEdits, bypassPermissions, plan, auto, dontAsk.`,
+    };
+  }
+  const permissionMode: PermissionMode | undefined = isPermissionMode(options.permissionMode)
+    ? options.permissionMode
+    : undefined;
+
+  const budgetResult = parseMaxBudget(options.maxBudget);
+  if ('error' in budgetResult) {
+    return { exitCode: 1, output: `Error: ${budgetResult.error}` };
+  }
+  const maxBudgetUsd = budgetResult.value;
+
+  const env = realDispatchEnv();
+  const paths = makeDispatchPaths(cwd);
+
+  if (!options.force) {
+    const conflict = detectDispatchConflict(env, paths);
+    if (conflict) {
+      return {
+        exitCode: 1,
+        output:
+          `Error: slot a${slot} already has an active dispatch.\n` +
+          `  run: ${conflict.runId}  pid: ${conflict.pid}  session: ${conflict.sessionId}\n` +
+          `  started: ${conflict.startedAt}\n` +
+          `Use 'dispatch-status ${slot}' to watch, 'dispatch-stop ${slot}' to cancel, or --force to override.`,
+      };
+    }
+  } else {
+    // --force: SIGTERM the previous worker (if any) and stamp its meta with
+    // terminalReason=superseded so abandoned runs aren't indistinguishable
+    // from crashes in .dispatch/runs/.
+    supersedeDispatch(env, paths);
+  }
+  clearDispatchCurrent(env, paths);
+
+  const dispatchOpts: DispatchOptions = {
+    slot,
+    cwd,
+    prompt,
+    model: options.model,
+    maxBudgetUsd,
+    allowedTools: options.allowedTools,
+    appendSystemPrompt: options.appendSystemPrompt,
+    permissionMode,
+    force: !!options.force,
+  };
+
+  let result;
+  try {
+    result = spawnDispatch(env, paths, dispatchOpts);
+  } catch (e) {
+    return { exitCode: 1, output: `Error spawning claude: ${e instanceof Error ? e.message : String(e)}` };
+  }
+
+  const { handle } = result;
+  const output =
+    `Dispatched to slot a${slot}${cwdNote}\n` +
+    `  run:      ${handle.runId}\n` +
+    `  session:  ${handle.sessionId}\n` +
+    `  pid:      ${handle.pid}\n` +
+    `  run dir:  ${handle.runDir}\n` +
+    `\n` +
+    `Watch:    crux sys agent-workspace dispatch-status ${slot}\n` +
+    `Cancel:   crux sys agent-workspace dispatch-stop ${slot}\n` +
+    `Resume:   claude -c ${handle.sessionId}  (if worker crashes before completing)\n`;
+
+  if (options.json) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify(
+        {
+          slot,
+          runId: handle.runId,
+          sessionId: handle.sessionId,
+          pid: handle.pid,
+          runDir: handle.runDir,
+          cwd,
+          startedAt: handle.startedAt,
+          cmd: handle.cmd,
+        },
+        null,
+        2,
+      ),
+    };
+  }
+  return { exitCode: 0, output };
+}
+
+async function dispatchStatusCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
+  const ctx = dispatchPreamble(args, options, 'Usage: crux sys agent-workspace dispatch-status <N> [--tail=N] [--json]');
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd } = ctx;
+
+  const tail = options.tail ? Math.max(1, parseInt(options.tail, 10) || 0) : 10;
+
+  const env = realDispatchEnv();
+  const paths = makeDispatchPaths(cwd);
+
+  const current = readDispatchCurrent(env, paths);
+  if (!current) {
+    return { exitCode: 0, output: `No active dispatch on slot a${slot}.` };
+  }
+
+  const rp = makeRunPaths(paths, current.runId);
+  let meta = readDispatchMeta(env, rp);
+  if (!meta) {
+    return { exitCode: 1, output: `Error: current.json points at run ${current.runId} but meta.json is missing.` };
+  }
+
+  meta = finalizeDispatchIfComplete(env, paths, rp, meta);
+
+  const events = parseDispatchEvents(env, rp.eventsFile);
+  const alive = env.pidAlive(current.pid);
+  const elapsedMs = Date.parse(env.now().toISOString()) - Date.parse(current.startedAt);
+  const elapsedSec = Math.max(0, Math.floor(elapsedMs / 1000));
+
+  if (options.json) {
+    return {
+      exitCode: 0,
+      output: JSON.stringify(
+        {
+          slot,
+          runId: current.runId,
+          sessionId: current.sessionId,
+          pid: current.pid,
+          pidAlive: alive,
+          startedAt: current.startedAt,
+          elapsedSeconds: elapsedSec,
+          meta,
+          events,
+        },
+        null,
+        2,
+      ),
+    };
+  }
+
+  const status = meta.completedAt
+    ? `complete (${meta.terminalReason ?? 'unknown'})`
+    : alive
+      ? 'running'
+      : 'dead (no result event)';
+
+  const lines: string[] = [];
+  lines.push(`Slot a${slot} dispatch status: ${status}`);
+  lines.push(`  run:     ${current.runId}`);
+  lines.push(`  session: ${current.sessionId}`);
+  lines.push(`  pid:     ${current.pid}  alive=${alive}`);
+  lines.push(`  started: ${current.startedAt}  (${elapsedSec}s ago)`);
+  lines.push(`  prompt:  ${meta.prompt.length > 120 ? meta.prompt.slice(0, 119) + '…' : meta.prompt}`);
+  if (meta.totalCostUsd !== undefined) {
+    lines.push(`  cost:    $${meta.totalCostUsd.toFixed(4)}  turns: ${meta.numTurns}  duration: ${((meta.durationMs ?? 0) / 1000).toFixed(1)}s`);
+  }
+  lines.push('');
+  lines.push(`Last ${Math.min(tail, events.length)} of ${events.length} events:`);
+  for (const evt of events.slice(-tail)) {
+    lines.push(`  [${evt.kind}] ${evt.summary}`);
+  }
+
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+async function dispatchStopCmd(args: string[], options: DispatchCliOptions): Promise<CommandResult> {
+  const ctx = dispatchPreamble(args, options, 'Usage: crux sys agent-workspace dispatch-stop <N>');
+  if ('error' in ctx) return ctx.error;
+  const { slot, cwd } = ctx;
+
+  const env = realDispatchEnv();
+  const paths = makeDispatchPaths(cwd);
+
+  const current = readDispatchCurrent(env, paths);
+  if (!current) {
+    return { exitCode: 0, output: `No active dispatch on slot a${slot}.` };
+  }
+
+  const rp = makeRunPaths(paths, current.runId);
+  let meta = readDispatchMeta(env, rp);
+
+  // If the worker completed naturally between the last status call and this
+  // stop, finalize first so cost / duration / numTurns / exitCode get captured
+  // before the stoppedAt marker overwrites the run shape.
+  if (meta) meta = finalizeDispatchIfComplete(env, paths, rp, meta);
+
+  const alive = env.pidAlive(current.pid);
+  if (alive) {
+    env.signal(current.pid, 'SIGTERM');
+    // Give the worker up to 3s to drain before escalating to SIGKILL.
+    const deadline = Date.now() + 3000;
+    while (Date.now() < deadline && env.pidAlive(current.pid)) {
+      await new Promise<void>((resolve) => setTimeout(resolve, 50));
+    }
+    if (env.pidAlive(current.pid)) {
+      env.signal(current.pid, 'SIGKILL');
+    }
+  }
+
+  if (meta) {
+    const updated = {
+      ...meta,
+      stoppedAt: env.now().toISOString(),
+      terminalReason: meta.terminalReason ?? 'stopped',
+    };
+    writeDispatchMeta(env, rp, updated);
+  }
+  clearDispatchCurrent(env, paths);
+
+  const lines = [
+    `Stopped dispatch on slot a${slot}.`,
+    `  run:     ${current.runId}`,
+    `  session: ${current.sessionId}  (resume with: claude -c ${current.sessionId})`,
+    `  pid:     ${current.pid}  (was ${alive ? 'alive → SIGTERM sent' : 'already dead'})`,
+  ];
+  return { exitCode: 0, output: lines.join('\n') };
+}
+
+// ---------------------------------------------------------------------------
 // Sentinel + tmux-claim + doctor (QUA-339)
 // ---------------------------------------------------------------------------
 
@@ -1011,6 +1364,9 @@ export const commands: Record<string, (args: string[], options: CommandOptions) 
   open,
   refresh,
   'fix-tabs': fixTabs,
+  dispatch: dispatchCmd,
+  'dispatch-status': dispatchStatusCmd,
+  'dispatch-stop': dispatchStopCmd,
   'sentinel-write': sentinelWrite,
   'sentinel-check': sentinelCheck,
   'sentinel-touch': sentinelTouch,
@@ -1039,6 +1395,23 @@ Commands:
   open <N>          Open a tmux window at slot N (--claude to launch claude)
   refresh           Pull latest main in idle slots (on main, clean)
   fix-tabs          Rename tmux tabs to match actual slot + branch
+
+Dispatch — headless claude -p workers (QUA-554):
+  dispatch <N> "<prompt>"    Spawn a one-shot claude -p worker in slot N
+                             Prompt sources (checked in order):
+                                      --prompt-file=<path>   robust for multiline / leading --
+                                      --prompt="<text>"       inline alternative
+                                      positional args after slot (normal case)
+                             Options: --model=<sonnet|opus|haiku> (default sonnet)
+                                      --max-budget=<usd> (default 5)
+                                      --allowed-tools=<list> (default Bash,Edit,Read,Write,Grep,Glob)
+                                      --append-system-prompt=<text>
+                                      --permission-mode=<default|acceptEdits|bypassPermissions|plan|dontAsk>
+                                      --cwd=<path> (override slot dir; testing)
+                                      --force (ignore existing dispatch)
+  dispatch-status <N>        Show active/most-recent dispatch: pid, last events, cost
+                             Options: --tail=<N> (events to show, default 10), --json
+  dispatch-stop <N>          SIGTERM the active worker; preserves session_id for resume
 
 Coordinator lifecycle (QUA-339):
   sentinel-write   --role=slots|releases  Write the role-conflation sentinel

@@ -279,7 +279,7 @@ Branch Agent (phase 1 persistent watchdog):
 Branch Agent Options:
   --max-invocations=N  Max Claude sessions to run (default: 20)
   --timeout=N          Per-session timeout in minutes (default: 15)
-  --max-turns=N        Max turns per session (default: 30)
+  --max-turns=N        Max turns per session (default: 60)
   --ci-timeout=N       Max seconds to wait for CI (default: 900 = 15 min)
   --ci-poll=N          CI poll interval in seconds (default: 30)
   --dry-run            Show what would be done, don't fix
@@ -325,7 +325,7 @@ Stats Options:
 Daemon Options:
   --dry-run         Show what would be done, don't fix or merge
   --interval=N      Seconds between checks (default: 300)
-  --max-turns=N     Max Claude turns per fix (default: 60)
+  --max-turns=N     Max Claude turns per fix (default: 120)
   --timeout=N       Hard timeout in minutes per fix (default: 60)
   --cooldown=N      Skip recently-processed PRs for N seconds (default: 1800)
   --stale-hours=N   Hours before a PR is considered stale (default: 48)

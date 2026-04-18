@@ -7,6 +7,7 @@ import { formatCompactCurrency } from "@/lib/format-compact";
 import { useServerTable } from "@/hooks/use-server-table";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGrantCoverage } from "@/components/coverage/coverage-score";
+import { inferDataSource } from "@/app/grants/grants-data-source";
 
 // ── Serializable grant row (no JSX, no functions — pure JSON) ───────
 
@@ -32,6 +33,10 @@ export interface GrantRow {
   sourcingVerdict?: string | null;
   /** Link to sourcing detail page */
   sourcingHref?: string;
+  /** Inferred data source ID (e.g., "coefficient-giving"), for linking to /data-sources/[id] */
+  dataSourceId?: string | null;
+  /** Inferred data source display name (e.g., "Coefficient Giving") */
+  dataSourceName?: string | null;
 }
 
 // ── Server grant shape (from wiki-server API) ───────────────────────
@@ -78,6 +83,7 @@ function formatSlug(slug: string): string {
 
 function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
   const recipientSlug = g.grantee.slug;
+  const ds = inferDataSource(g.source);
   return {
     key: g.id,
     name: g.name,
@@ -96,6 +102,8 @@ function serverGrantToRow(g: ServerGrant, orgSlug?: string): GrantRow {
     sourcingHref: g.sourcing?.verdict
       ? `/sourcing/grant/${encodeURIComponent(g.id)}`
       : undefined,
+    dataSourceId: ds?.id ?? null,
+    dataSourceName: ds?.name ?? null,
   };
 }
 
@@ -126,6 +134,7 @@ type ColumnId =
   | "amount"
   | "date"
   | "source"
+  | "dataSource"
   | "program"
   | "division"
   | "status"
@@ -169,10 +178,17 @@ const ALL_COLUMNS: ColumnDef[] = [
   { id: "date", label: "Date", defaultVisible: true, align: "center" },
   {
     id: "source",
-    label: "Source",
+    label: "URL",
     defaultVisible: true,
     align: "left",
     onlyIfData: (rows) => rows.some((r) => r.source),
+  },
+  {
+    id: "dataSource",
+    label: "Source",
+    defaultVisible: true,
+    align: "left",
+    onlyIfData: (rows) => rows.some((r) => r.dataSourceId),
   },
   {
     id: "program",
@@ -297,6 +313,9 @@ export function InteractiveGrantsTable({
           break;
         case "source":
           cmp = (a.source ?? "").localeCompare(b.source ?? "");
+          break;
+        case "dataSource":
+          cmp = (a.dataSourceName ?? "").localeCompare(b.dataSourceName ?? "");
           break;
         case "program":
           cmp = (a.programName ?? "").localeCompare(b.programName ?? "");
@@ -738,6 +757,19 @@ function CellContent({
       } catch {
         return <span className="text-xs text-muted-foreground truncate max-w-[120px] inline-block">{grant.source}</span>;
       }
+    case "dataSource":
+      if (!grant.dataSourceId || !grant.dataSourceName) {
+        return <span className="text-muted-foreground/40 text-xs">{"\u2014"}</span>;
+      }
+      return (
+        <Link
+          href={`/data-sources/${grant.dataSourceId}`}
+          className="inline-flex items-center rounded-full bg-muted/60 px-2 py-0.5 text-[11px] font-medium text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors whitespace-nowrap"
+          title={`View ${grant.dataSourceName} data source`}
+        >
+          {grant.dataSourceName}
+        </Link>
+      );
     case "program":
       return (
         <span className="text-muted-foreground text-xs">

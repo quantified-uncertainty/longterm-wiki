@@ -306,6 +306,39 @@ test.describe("Project & event pages — no raw IDs", () => {
 });
 
 /**
+ * Expand any collapsed sections inside main.
+ * EntityProfileViewer collapses Related Entries, Entity Properties, Custom
+ * Fields, and table sections by default; their contents must be in the DOM
+ * for the raw-ID scan to see them.
+ *
+ * Matches `aria-expanded="false"` buttons (post-rollout) AND buttons whose
+ * text begins with a known collapsible section name (pre-rollout / defense
+ * against HTML missing aria attributes).
+ */
+async function expandCollapsedSections(page: Page) {
+  // Click by aria attribute (post-rollout canonical path)
+  const ariaCollapsed = page.locator("main button[aria-expanded='false']");
+  const ariaCount = await ariaCollapsed.count();
+  for (let i = 0; i < ariaCount; i++) {
+    const btn = ariaCollapsed.nth(i);
+    if (await btn.isVisible()) await btn.click();
+  }
+
+  // Fallback: click by title text (catches pre-rollout HTML without aria).
+  const titles = ["Related Entries", "Entity Properties", "Custom Fields"];
+  for (const title of titles) {
+    const btn = page.locator(`main button:has-text("${title}")`).first();
+    if ((await btn.count()) > 0 && (await btn.isVisible())) {
+      // Only click if not already expanded (detect via visible ChevronDown vs ChevronRight:
+      // simpler — just click; a second click would collapse, so gate on aria if set)
+      const aria = await btn.getAttribute("aria-expanded");
+      if (aria !== "true") await btn.click();
+    }
+  }
+  await page.waitForTimeout(200);
+}
+
+/**
  * Helper for pages that require wiki-server data.
  *
  * Separates page loading (which may fail without wiki-server) from ID
@@ -323,8 +356,13 @@ async function assertNoRawIdsRequiresServer(page: Page, url: string, withTabs = 
   // Page loaded — assertions must NOT be swallowed
   if (withTabs) {
     const { text, tabCount } = await collectTextAcrossTabs(page);
-    checkTextForRawIds(text, url, `across ${tabCount} tabs`);
+    // Also expand collapsed sections within the current tab and re-scan —
+    // catches raw IDs hidden inside collapsed Related Entries / metadata.
+    await expandCollapsedSections(page);
+    const expandedText = await getMainText(page);
+    checkTextForRawIds(text + "\n" + expandedText, url, `across ${tabCount} tabs`);
   } else {
+    await expandCollapsedSections(page);
     const text = await getMainText(page);
     checkTextForRawIds(text, url);
   }

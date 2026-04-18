@@ -940,7 +940,13 @@ function EmptyState({ onSearch }: { onSearch: (q: string) => void }) {
 // ── Entity JSONB data sections ────────────────────────────────────────────
 
 /** Render structured entity data from JSONB columns (metadata, customFields, etc.) */
-function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
+function EntityDataSections({
+  entity,
+  displayNames,
+}: {
+  entity: Record<string, unknown>;
+  displayNames?: Record<string, DisplayNameEntry>;
+}) {
   const metadata = (entity.metadata && typeof entity.metadata === "object" && !Array.isArray(entity.metadata))
     ? entity.metadata as Record<string, unknown>
     : null;
@@ -979,16 +985,96 @@ function EntityDataSections({ entity }: { entity: Record<string, unknown> }) {
         />
       )}
 
-      {/* Related entries */}
+      {/* Related entries — SID ids resolve to human names via displayNames. */}
       {relatedEntries && relatedEntries.length > 0 && (
-        <CollapsibleTableSection
-          title="Related Entries"
-          description="Cross-references to other entities"
-          headers={["Entity ID", "Type", "Relationship"]}
-          rows={relatedEntries.map((r) => [r.id, r.type, r.relationship ?? ""])}
-        />
+        <RelatedEntriesSection entries={relatedEntries} displayNames={displayNames} />
       )}
 
+    </div>
+  );
+}
+
+/** Related-entries table — resolves sid_ ids through the displayNames map. */
+function RelatedEntriesSection({
+  entries,
+  displayNames,
+}: {
+  entries: Array<{ id: string; type: string; relationship?: string }>;
+  displayNames?: Record<string, DisplayNameEntry>;
+}) {
+  const [expanded, setExpanded] = useState(false);
+  return (
+    <div className="rounded-lg border border-border/50 overflow-hidden">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
+        className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors"
+      >
+        {expanded ? (
+          <ChevronDown className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        ) : (
+          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground shrink-0" />
+        )}
+        <span className="text-sm font-medium">Related Entries</span>
+        <span className="text-[11px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded">
+          {entries.length}
+        </span>
+        <span className="text-[11px] text-muted-foreground/60 ml-auto">Cross-references to other entities</span>
+      </button>
+      {expanded && (
+        <div className="border-t border-border/30 overflow-x-auto">
+          <table className="w-full text-xs">
+            <thead>
+              <tr className="bg-muted/20">
+                <th className="px-3 py-1.5 text-left font-medium text-muted-foreground text-[11px]">Entity</th>
+                <th className="px-3 py-1.5 text-left font-medium text-muted-foreground text-[11px]">Type</th>
+                <th className="px-3 py-1.5 text-left font-medium text-muted-foreground text-[11px]">Relationship</th>
+              </tr>
+            </thead>
+            <tbody>
+              {entries.map((r, i) => {
+                const resolved = isAnySid(r.id) ? displayNames?.[r.id] : undefined;
+                return (
+                  <tr key={i} className="border-t border-border/20">
+                    <td className="px-3 py-1.5 text-foreground/80 max-w-xs truncate">
+                      {resolved ? (
+                        <EntityRefHoverCard entry={resolved} stableId={r.id}>
+                          <Link
+                            href={entityHref(resolved)}
+                            className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+                          >
+                            {resolved.title}
+                          </Link>
+                        </EntityRefHoverCard>
+                      ) : isAnySid(r.id) ? (
+                        <Link
+                          href={`/wiki/E1929?entity=${encodeURIComponent(r.id)}`}
+                          className="inline-flex items-center gap-1 text-blue-600 dark:text-blue-400 hover:underline font-mono text-[11px]"
+                          title="View entity DB profile"
+                        >
+                          {r.id}
+                          <ExternalLink className="h-2.5 w-2.5 opacity-40" />
+                        </Link>
+                      ) : (
+                        <Link
+                          href={`/wiki/E1929?entity=${encodeURIComponent(r.id)}`}
+                          className="text-blue-600 dark:text-blue-400 hover:underline text-xs"
+                        >
+                          {r.id}
+                        </Link>
+                      )}
+                    </td>
+                    <td className="px-3 py-1.5 text-foreground/80 max-w-xs truncate">{r.type}</td>
+                    <td className="px-3 py-1.5 text-foreground/80 max-w-xs truncate">
+                      {r.relationship || <span className="text-muted-foreground/20">&mdash;</span>}
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
     </div>
   );
 }
@@ -1011,6 +1097,7 @@ function CollapsibleJsonSection({
     <div className="rounded-lg border border-border/50 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
         className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors"
       >
         {expanded ? (
@@ -1076,6 +1163,7 @@ function CollapsibleTableSection({
     <div className="rounded-lg border border-border/50 overflow-hidden">
       <button
         onClick={() => setExpanded(!expanded)}
+        aria-expanded={expanded}
         className="w-full flex items-center gap-2 px-4 py-2.5 text-left hover:bg-muted/30 transition-colors"
       >
         {expanded ? (
@@ -1325,7 +1413,7 @@ export function EntityProfileViewer({
           </div>
 
           {/* Entity JSONB fields (metadata, customFields, relatedEntries) */}
-          <EntityDataSections entity={data.entity} />
+          <EntityDataSections entity={data.entity} displayNames={data.displayNames} />
 
           <div className="space-y-2">
             {SECTION_GROUPS.map((group) => {

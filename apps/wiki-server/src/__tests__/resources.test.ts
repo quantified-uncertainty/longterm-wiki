@@ -210,12 +210,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page) ----
+  // QUA-566 Phase B.3: resource_citations.resource_id now references
+  // resources.stable_id, so the join is on stable_id, not id.
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
     const intId = params[0] as number;
     const results: Record<string, unknown>[] = [];
     for (const c of citationStore) {
       if (c.page_id === intId) {
-        const r = resourceStore.get(c.resource_id);
+        // Look up by stable_id (the new join key)
+        let r: Record<string, unknown> | undefined;
+        for (const res of resourceStore.values()) {
+          if (res.stable_id === c.resource_id) {
+            r = res;
+            break;
+          }
+        }
         if (r) {
           results.push({
             id: r.id,
@@ -304,6 +313,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
       return [];
     }
+    // ---- SELECT ... FROM resources WHERE id = $1 OR stable_id = $2 ----
+    // QUA-573: /:id/content now accepts either hex16 id or canonical sid_.
+    if (whereClause.includes('"id"') && whereClause.includes('"stable_id"')) {
+      const id = params[0] as string;
+      const stableId = (params[1] ?? params[0]) as string;
+      const byId = resourceStore.get(id);
+      if (byId) return [byId];
+      for (const r of resourceStore.values()) {
+        if (r.stable_id === stableId) return [r];
+      }
+      return [];
+    }
     // ---- SELECT ... FROM resources WHERE id = $1 ----
     if (whereClause.includes('"id"')) {
       const id = params[0] as string;
@@ -332,14 +353,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
-  // ---- /suggest: SELECT resource_id, count(*) FROM resource_citations WHERE resource_id = ANY(...) ----
+  // ---- /suggest: SELECT r.id, count(*) FROM resource_citations rc
+  //                 JOIN resources r ON rc.resource_id = r.stable_id
+  //                 WHERE r.id = ANY(...) GROUP BY r.id ----
+  // QUA-566 Phase B.3: resource_citations.resource_id references resources.stable_id.
+  // The prod query JOINs resources and surfaces r.id (hex16) so downstream map-by-hex16
+  // lookups keep working. The mock walks resourceStore to resolve the hex16 key into
+  // the stable_id, then counts citationStore rows whose resource_id matches that stable_id.
   if (q.includes("resource_citations") && q.includes("group by") && q.includes("any($)")) {
     const resourceIds = params[0] as string[];
     const counts: Record<string, number> = {};
-    for (const c of citationStore) {
-      if (resourceIds.includes(c.resource_id)) {
-        counts[c.resource_id] = (counts[c.resource_id] || 0) + 1;
+    for (const resourceId of resourceIds) {
+      const r = resourceStore.get(resourceId);
+      const stableId = r?.stable_id as string | null | undefined;
+      if (!stableId) continue;
+      let n = 0;
+      for (const c of citationStore) {
+        if (c.resource_id === stableId) n++;
       }
+      if (n > 0) counts[resourceId] = n;
     }
     return Object.entries(counts).map(([resource_id, cnt]) => ({
       resource_id,
@@ -724,6 +756,39 @@ describe("Resources API", () => {
     });
   });
 
+  // QUA-573: /:id/content accepts either hex16 resources.id or canonical sid_.
+  describe("GET /api/resources/:id/content", () => {
+    it("resolves by hex16 id (legacy)", async () => {
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        id: "abc123def456",
+        stableId: "sid_AbCd012345",
+      });
+      const res = await app.request("/api/resources/abc123def456/content");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.id).toBe("abc123def456");
+    });
+
+    it("resolves by stable_id (canonical sid_)", async () => {
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        id: "abc123def456",
+        stableId: "sid_AbCd012345",
+      });
+      const res = await app.request("/api/resources/sid_AbCd012345/content");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // Server responds with the hex16 primary key regardless of lookup form.
+      expect(body.id).toBe("abc123def456");
+    });
+
+    it("returns 404 for unknown id", async () => {
+      const res = await app.request("/api/resources/sid_NoSuchOne0/content");
+      expect(res.status).toBe(404);
+    });
+  });
+
   describe("GET /api/resources/all", () => {
     it("returns paginated resources", async () => {
       for (let i = 0; i < 5; i++) {
@@ -995,9 +1060,12 @@ describe("Resources API", () => {
     });
 
     it("sets job priority based on citation count", async () => {
-      // Pre-populate a resource with known ID and citations
+      // Pre-populate a resource with known ID, stable_id, and citations.
+      // QUA-566 Phase B.3: resource_citations.resource_id is now the resource's
+      // stable_id, so push to citationStore keyed on stable_id.
       resourceStore.set("cited-res", {
         id: "cited-res",
+        stable_id: "sid_cited-res",
         url: "https://example.com/cited",
         title: null,
         fetched_at: null,
@@ -1008,7 +1076,7 @@ describe("Resources API", () => {
       const pageIds = ["page-1", "page-2", "page-3", "page-4"];
       for (const slug of pageIds) {
         citationStore.push({
-          resource_id: "cited-res",
+          resource_id: "sid_cited-res",
           page_slug: slug,
           page_id: getIntIdForSlug(slug),
           created_at: new Date(),
@@ -1032,8 +1100,10 @@ describe("Resources API", () => {
 
     it("caps priority at 100", async () => {
       // Pre-populate resource with 25 citations → priority = min(100, 25 * 5) = 100
+      // QUA-566 Phase B.3: citations keyed by stable_id post-migration.
       resourceStore.set("popular-res", {
         id: "popular-res",
+        stable_id: "sid_popular-res",
         url: "https://example.com/popular",
         title: null,
         fetched_at: null,
@@ -1042,7 +1112,7 @@ describe("Resources API", () => {
 
       for (let i = 0; i < 25; i++) {
         citationStore.push({
-          resource_id: "popular-res",
+          resource_id: "sid_popular-res",
           page_slug: `page-${i}`,
           page_id: getIntIdForSlug(`page-${i}`),
           created_at: new Date(),

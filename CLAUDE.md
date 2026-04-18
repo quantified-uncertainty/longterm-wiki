@@ -78,6 +78,7 @@ pnpm crux sys agent-checklist init --linear=QUA-NNN  # Init session checklist (L
 pnpm crux sys agent-checklist init --issue=N # Init session checklist (legacy GitHub)
 pnpm crux sys agent-reset                   # Show stale processes (MCP, dev servers)
 pnpm crux sys agent-reset --kill             # Kill stale processes
+pnpm crux sys dispatch --linear=QUA-NNN --slot=N  # Open a slot after pre-flight dedup checks
 
 # Cross-cutting (top-level)
 pnpm crux query search "topic"               # Full-text search
@@ -169,7 +170,7 @@ This applies to everything: code bugs, process failures, documentation gaps, age
 ## Key Conventions
 
 - **Slot isolation — CRITICAL**: Each agent slot (`a1`–`a20`) is an independent workspace that may have an active Claude session. **NEVER** interact with slots you don't own: no `cd` into them, no dispatching subagents to them, no killing their tmux windows, no running commands in their directories. If you need branch isolation for PR fixes, use `/tmp/` worktrees from the `main/` clone. If you need to kill a process or tmux window, **ask the user first** — what looks idle from outside may have active work. Violating this rule has caused data loss (destroyed active sessions with in-progress work). See `.claude/rules/slot-isolation.md`.
-- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. **Do NOT use `isolation: "worktree"` in Agent calls** — it has a [confirmed Claude Code bug](https://github.com/anthropics/claude-code/issues/42282) that corrupts the parent session's working directory and bricks the session. For branch isolation, use agent workspace slots (`lw/a1`–`lw/a15`). See `.claude/rules/worktree-isolation-bug.md`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
+- **Branch discipline**: Never switch branches mid-session — PreToolUse hooks block `git checkout <branch>`, `git switch`, and `git stash`. **Do NOT use `isolation: "worktree"` in Agent calls** — it has a [confirmed Claude Code bug](https://github.com/anthropics/claude-code/issues/42282) that corrupts the parent session's working directory and bricks the session (reconfirmed 2026-04-16 during QUA-554 scoping — the bug is unpatched). For headless coordinator work use `./ws dispatch <N> "<prompt>"` (QUA-554); for interactive work use `./ws open <N> --claude`. For branch isolation, use agent workspace slots (`lw/a1`–`lw/a15`). See `.claude/rules/worktree-isolation-bug.md`. To create a new branch from the current one, `git checkout -b claude/<description>` is allowed. Never edit files on `main` — a PreToolUse hook blocks Edit/Write on main. If a dev server was running, restart it after switching branches (Next.js serves from the current working directory, not the branch the server was started from).
 - **Path aliases**: `@/`, `@components/`, `@data/`, `@lib/` in app code
 - **Entity types**: Canonical list in `apps/web/src/data/entity-type-names.ts`
 - **MDX escaping**: `\$100` not `$100`, `\<100ms` not `<100ms`

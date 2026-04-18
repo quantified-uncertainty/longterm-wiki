@@ -184,7 +184,7 @@ export function buildConfig(
     ),
     maxTurns: parseIntOpt(
       options.maxTurns ?? process.env.PR_PATROL_MAX_TURNS,
-      60,
+      120,
     ),
     cooldownSeconds: parseIntOpt(
       options.cooldown ?? process.env.PR_PATROL_COOLDOWN,

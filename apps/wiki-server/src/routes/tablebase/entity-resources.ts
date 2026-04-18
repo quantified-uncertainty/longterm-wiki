@@ -154,17 +154,21 @@ const entityResourcesApp = new Hono()
 
         // Resolve resource titles and entity titles into a single combined
         // map (resourceId → title + entityId → title). The composer uses
-        // one lookup map; the keyspaces don't collide because resourceIds
-        // and entityIds use different prefixes.
-        const resourceRows = await tx
-          .select({ id: resources.id, title: resources.title, url: resources.url })
-          .from(resources)
-          .where(inArray(resources.id, resourceIds));
-        const entityTitleMap = await resolveEntityTitles(tx, entityIds);
+        // one lookup map; after QUA-567 both keys are stable IDs, so this
+        // relies on stable IDs being globally unique across these tables.
+        const [resourceRows, entityTitleMap] = await Promise.all([
+          tx
+            .select({ stableId: resources.stableId, title: resources.title, url: resources.url })
+            .from(resources)
+            .where(inArray(resources.stableId, resourceIds)),
+          resolveEntityTitles(tx, entityIds),
+        ]);
         const combinedTitleMap = new Map<string, string>([
-          ...resourceRows.map(
-            (r) => [r.id, r.title ?? r.url ?? r.id] as [string, string],
-          ),
+          ...resourceRows
+            .filter((r): r is { stableId: string; title: string | null; url: string } => r.stableId !== null)
+            .map(
+              (r) => [r.stableId, r.title ?? r.url ?? r.stableId] as [string, string],
+            ),
           ...entityTitleMap.entries(),
         ]);
 

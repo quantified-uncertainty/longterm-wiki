@@ -115,6 +115,34 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [row];
   }
 
+  // ---- UPDATE agent_sessions SET ... WHERE "updated_at" < $ (sweep handler) ----
+  if (
+    q.includes("update") &&
+    q.includes("agent_sessions") &&
+    q.includes("set") &&
+    /"updated_at"\s*</.test(q)
+  ) {
+    // postgres.js sends timestamps as ISO strings over the wire; normalize.
+    const toDate = (p: unknown): Date =>
+      p instanceof Date ? p : new Date(p as string);
+    const newStatus = params[0] as string;
+    const newUpdatedAt = toDate(params[1]);
+    const oldStatus = params[2] as string;
+    const cutoff = toDate(params[3]);
+    const swept: Array<{ id: number; branch: string; issueNumber: number | null }> = [];
+    for (const row of store) {
+      if (row.status === oldStatus && row.updated_at < cutoff) {
+        row.status = newStatus;
+        row.updated_at = newUpdatedAt;
+        if (!row.date) {
+          row.date = row.started_at.toISOString().slice(0, 10);
+        }
+        swept.push({ id: row.id, branch: row.branch, issueNumber: row.issue_number });
+      }
+    }
+    return swept;
+  }
+
   // ---- UPDATE agent_sessions SET ... WHERE "id" ----
   if (q.includes("update") && q.includes("agent_sessions") && q.includes("set")) {
     const id = params[params.length - 1] as number;
@@ -732,6 +760,100 @@ describe("Agent Sessions API", () => {
 
     it("caps limit at 200", async () => {
       const res = await app.request("/api/agent-sessions?limit=999");
+      expect(res.status).toBe(200);
+    });
+  });
+
+  // ================================================================
+  // POST /sweep — stale session sweep (QUA-221)
+  // ================================================================
+
+  describe("POST /api/agent-sessions/sweep", () => {
+    async function seedStale(branch: string, staleHoursAgo: number) {
+      await postJson(app, "/api/agent-sessions", { ...sampleSession, branch });
+      const row = store.find((r) => r.branch === branch)!;
+      row.updated_at = new Date(Date.now() - staleHoursAgo * 60 * 60 * 1000);
+    }
+
+    it("flips stale 'active' rows to status='stale' (not 'completed')", async () => {
+      await seedStale("claude/branch-stale", 5); // 5h old, default cutoff 2h
+      await seedStale("claude/branch-fresh", 0); // just updated
+
+      const res = await postJson(app, "/api/agent-sessions/sweep", { timeoutHours: 2 });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.swept).toBe(1);
+      expect(body.sessions).toHaveLength(1);
+      expect(body.sessions[0].branch).toBe("claude/branch-stale");
+
+      const staleRow = store.find((r) => r.branch === "claude/branch-stale")!;
+      expect(staleRow.status).toBe("stale");
+      expect(staleRow.completed_at).toBeNull();
+
+      const freshRow = store.find((r) => r.branch === "claude/branch-fresh")!;
+      expect(freshRow.status).toBe("active");
+    });
+
+    it("does not touch sessions already marked 'completed'", async () => {
+      await seedStale("claude/branch-done", 5);
+      const row = store.find((r) => r.branch === "claude/branch-done")!;
+      row.status = "completed";
+      row.title = "Shipped";
+      row.summary = "Graceful exit via agent-ship";
+
+      const res = await postJson(app, "/api/agent-sessions/sweep", { timeoutHours: 2 });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.swept).toBe(0);
+
+      const after = store.find((r) => r.branch === "claude/branch-done")!;
+      expect(after.status).toBe("completed");
+      expect(after.title).toBe("Shipped");
+    });
+
+    it("backfills NULL date from started_at for swept rows", async () => {
+      await seedStale("claude/branch-nodate", 5);
+      const row = store.find((r) => r.branch === "claude/branch-nodate")!;
+      row.date = null;
+      const startedDate = row.started_at.toISOString().slice(0, 10);
+
+      const res = await postJson(app, "/api/agent-sessions/sweep", { timeoutHours: 2 });
+      expect(res.status).toBe(200);
+
+      const after = store.find((r) => r.branch === "claude/branch-nodate")!;
+      expect(after.date).toBe(startedDate);
+      expect(after.status).toBe("stale");
+    });
+
+    it("sweeps 0 rows when all sessions are fresh", async () => {
+      await postJson(app, "/api/agent-sessions", sampleSession);
+
+      const res = await postJson(app, "/api/agent-sessions/sweep", { timeoutHours: 2 });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.swept).toBe(0);
+      expect(body.sessions).toHaveLength(0);
+    });
+
+    it("honors explicit timeoutHours parameter", async () => {
+      await seedStale("claude/branch-1h", 1);
+      await seedStale("claude/branch-10h", 10);
+
+      const res = await postJson(app, "/api/agent-sessions/sweep", { timeoutHours: 5 });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // 10h is stale past 5h cutoff, 1h is not
+      expect(body.swept).toBe(1);
+      expect(body.sessions[0].branch).toBe("claude/branch-10h");
+    });
+
+    it("tolerates empty body (falls back to defaults)", async () => {
+      const res = await app.request("/api/agent-sessions/sweep", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: "",
+      });
       expect(res.status).toBe(200);
     });
   });

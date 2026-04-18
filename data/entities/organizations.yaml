@@ -798,7 +798,12 @@
   parentOrg: nist-ai
   summaryPage: government-orgs-overview
   title: US AI Safety Institute (now CAISI)
-  website: https://www.nist.gov/aisi
+  aliases:
+    - CAISI
+    - Center for AI Standards and Innovation
+    - US AISI
+    - USAISI
+  website: https://www.nist.gov/caisi
   relatedEntries:
     - id: sid_aX0jkoaekQ
       type: organization

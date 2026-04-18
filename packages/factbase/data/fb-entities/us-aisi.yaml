@@ -2,11 +2,56 @@ entity: sid_fYyAxYlHDQ
 facts:
   - id: f_LiIWWhTjAw
     property: description
-    value: The US AI Safety Institute (US AISI) is a government agency within the National Institute of Standards and
-      Technology (NIST) established in 2023 to develop standards, evaluations, and guidelines for safe and trustworthy
-      artificial intelligence.
-    asOf: 2026-03
-    notes: Migrated from old entity system
+    value: >-
+      The US AI Safety Institute (USAISI), renamed to the Center for AI Standards and Innovation (CAISI)
+      on June 3, 2025, is a government organization within NIST (Department of Commerce) focused on
+      AI evaluation, standards-setting, and security. Under the 2025 reform it serves as industry's primary
+      US-government point of contact for testing and collaborative research on commercial AI systems,
+      and has received 17 taskings under the Trump administration's AI Action Plan. The AISI Consortium
+      (AISIC) established in 2024 carried over under the reform with 280+ member organizations. CAISI
+      operates six technical teams as of April 2026: Agent Security, Applied Systems, Chem/Bio, Cyber,
+      Frontier Assessment, and Partnerships.
+    asOf: 2026-04
+    source: https://www.nist.gov/caisi
+
   - id: f_8mEYv5duFQ
     property: website
-    value: https://www.nist.gov/aisi
+    value: https://www.nist.gov/caisi
+    asOf: 2026-04
+    notes: "Primary website post-2025 reform. Redirects from the legacy /aisi path."
+
+  - id: f_WssxuraS5d
+    property: founded-date
+    value: "2023-11"
+    source: https://www.nist.gov/news-events/news/2023/11/department-commerce-announces-new-actions-implement-president-bidens-executive
+    notes: "Original US AI Safety Institute established November 2023 under NIST, following Executive Order 14110. Reformed and renamed to the Center for AI Standards and Innovation (CAISI) on 2025-06-03 by Secretary of Commerce Howard Lutnick."
+
+  - id: f_q2TMCjQ88w
+    property: headquarters
+    value: "Washington, D.C."
+    asOf: 2026-04
+    source: https://www.nist.gov/caisi/careers-caisi
+    notes: "Primary CAISI office in Washington, D.C., with a second office in downtown San Francisco. In-person work required; U.S. citizenship required for employment. Parent NIST is headquartered at 100 Bureau Drive, Gaithersburg, MD."
+
+  - id: f_bc3Cpyjo0K
+    property: headcount
+    value:
+      - 20
+      - 30
+    asOf: 2026-04
+    source: https://www.nist.gov/caisi/careers-caisi
+    notes: "Rough estimate; CAISI does not publish headcount. The careers page lists six technical teams (Agent Security, Applied Systems, Chem/Bio, Cyber, Frontier Assessment, Partnerships) with roughly a dozen open positions as of April 2026. Actively hiring."
+
+  - id: f_oVuUnjZkcu
+    property: annual-budget
+    value: 1e+7
+    asOf: 2024-03
+    source: https://www.nist.gov/system/files/documents/2024/02/14/FY25-NIST-Budget-Summary.pdf
+    notes: "Initial FY2024 appropriation (~\\$10M USD) for US AISI, pre-CAISI rename."
+
+  - id: f_Ph8S3VtsV5
+    property: annual-budget
+    value: 8.27e+7
+    asOf: 2025-02
+    source: https://www.nist.gov/system/files/documents/2024/02/14/FY25-NIST-Budget-Summary.pdf
+    notes: "FY2025 budget request of \\$82.7M USD. Actual appropriation may differ following the June 2025 CAISI reform and Trump-era NIST staffing reductions."
