@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { convertNewFootnotes } from "../convert-new-footnotes";
+import { convertNewFootnotes, createDbEntriesForRcFootnotes } from "../convert-new-footnotes";
 
 // Mock KB fact lookup
 vi.mock("../factbase-fact-lookup", () => ({
@@ -24,9 +24,15 @@ vi.mock("../search/resource-lookup", () => ({
 
 import { buildKBFactSourceMap, findKBFactByUrl } from "../factbase-fact-lookup";
 import type { KBFactMatch } from "../factbase-fact-lookup";
+import { isServerAvailable } from "../wiki-server/client";
+import { createCitationsBatch } from "../wiki-server/references";
+import { getResourceByUrl } from "../search/resource-lookup";
 
 const mockBuildKBFactSourceMap = vi.mocked(buildKBFactSourceMap);
 const mockFindKBFactByUrl = vi.mocked(findKBFactByUrl);
+const mockIsServerAvailable = vi.mocked(isServerAvailable);
+const mockCreateCitationsBatch = vi.mocked(createCitationsBatch);
+const mockGetResourceByUrl = vi.mocked(getResourceByUrl);
 
 describe("convertNewFootnotes", () => {
   beforeEach(() => {
@@ -157,6 +163,87 @@ describe("convertNewFootnotes", () => {
 
     expect(result.kbMatchCount).toBe(0);
     expect(result.content).toMatch(/\[\^rc-[a-f0-9]+\]/);
+  });
+
+  // --- QUA-569 Phase B.6 ---------------------------------------------------
+  // page_citations.resource_id FKs resources.stable_id, so footnote→DB inserts
+  // must write the sid_<10> form, never the legacy hex16 resource.id.
+  describe("QUA-569 resourceId writes stable_id form", () => {
+    beforeEach(() => {
+      vi.clearAllMocks();
+      mockBuildKBFactSourceMap.mockResolvedValue(new Map());
+      mockFindKBFactByUrl.mockReturnValue(undefined);
+      mockIsServerAvailable.mockResolvedValue(true);
+      mockCreateCitationsBatch.mockResolvedValue({ ok: true, data: { inserted: 1 } as never });
+    });
+
+    it("writes resource.stable_id (not resource.id) on the citation insert", async () => {
+      mockGetResourceByUrl.mockReturnValue({
+        id: "deadbeef12345678", // legacy hex16 — must NOT be used
+        stable_id: "sid_AbCdEfGhIj",
+        url: "https://example.com/report",
+        title: "Report",
+        type: "paper",
+      });
+
+      const content = `Text.[^1]\n\n[^1]: [Report](https://example.com/report)\n`;
+      await convertNewFootnotes(content, "test-page", { createDbEntries: true });
+
+      expect(mockCreateCitationsBatch).toHaveBeenCalledTimes(1);
+      const batch = mockCreateCitationsBatch.mock.calls[0][0];
+      expect(batch).toHaveLength(1);
+      expect(batch[0].resourceId).toBe("sid_AbCdEfGhIj");
+      expect(batch[0].resourceId).not.toBe("deadbeef12345678");
+    });
+
+    it("leaves resourceId undefined when resource lookup misses", async () => {
+      mockGetResourceByUrl.mockReturnValue(null);
+
+      const content = `Text.[^1]\n\n[^1]: [Unknown](https://unknown.example/page)\n`;
+      await convertNewFootnotes(content, "test-page", { createDbEntries: true });
+
+      expect(mockCreateCitationsBatch).toHaveBeenCalledTimes(1);
+      const batch = mockCreateCitationsBatch.mock.calls[0][0];
+      expect(batch[0].resourceId).toBeUndefined();
+    });
+
+    it("leaves resourceId undefined when resource has no stable_id (legacy-only)", async () => {
+      // Defensive: a Resource without stable_id should skip the resourceId
+      // rather than fall back to hex16 — that would re-introduce the FK violation
+      // the migration was written to prevent.
+      mockGetResourceByUrl.mockReturnValue({
+        id: "deadbeef12345678",
+        // stable_id intentionally omitted
+        url: "https://example.com/legacy",
+        title: "Legacy",
+        type: "paper",
+      });
+
+      const content = `Text.[^1]\n\n[^1]: [Legacy](https://example.com/legacy)\n`;
+      await convertNewFootnotes(content, "test-page", { createDbEntries: true });
+
+      expect(mockCreateCitationsBatch).toHaveBeenCalledTimes(1);
+      const batch = mockCreateCitationsBatch.mock.calls[0][0];
+      expect(batch[0].resourceId).toBeUndefined();
+    });
+
+    it("createDbEntriesForRcFootnotes also writes stable_id form", async () => {
+      mockGetResourceByUrl.mockReturnValue({
+        id: "deadbeef12345678",
+        stable_id: "sid_XyZ1234567",
+        url: "https://example.com/report",
+        title: "Report",
+        type: "paper",
+      });
+
+      const content = `Some text [^rc-abc123]\n\n[^rc-abc123]: [Report](https://example.com/report)\n`;
+      const created = await createDbEntriesForRcFootnotes(content, "test-page");
+
+      expect(created).toBe(1);
+      expect(mockCreateCitationsBatch).toHaveBeenCalledTimes(1);
+      const batch = mockCreateCitationsBatch.mock.calls[0][0];
+      expect(batch[0].resourceId).toBe("sid_XyZ1234567");
+    });
   });
 
   it("does not collide with existing kb- refs in content", async () => {
