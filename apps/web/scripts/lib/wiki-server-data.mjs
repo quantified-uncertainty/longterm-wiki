@@ -1762,7 +1762,10 @@ export async function fetchResourcesFromPG() {
       if (rows.length < limit) break;
     }
 
-    // Fetch bulk citation index (resourceId -> pageIds[])
+    // Fetch bulk citation index (resource stable_id -> pageIds[])
+    // QUA-602: citations are keyed by the resource's canonical stable_id, not
+    // the legacy hex16 id. Resources without a stable_id cannot have citation
+    // rows (FK target), so the r.stable_id guard is sufficient.
     try {
       const citResp = await fetch(
         `${serverUrl}/api/resources/citations/all`,
@@ -1772,7 +1775,8 @@ export async function fetchResourcesFromPG() {
         const citData = await citResp.json();
         const citations = citData.citations || {};
         for (const r of allResources) {
-          const pages = citations[r.id];
+          if (!r.stable_id) continue;
+          const pages = citations[r.stable_id];
           if (pages && pages.length > 0) {
             r.cited_by = pages;
           }
