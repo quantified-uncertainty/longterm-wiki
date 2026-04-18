@@ -1322,7 +1322,28 @@
       "idx": 188,
       "version": "7",
       "when": 1785830400000,
-      "tag": "0188_qua_221_backfill_stale_agent_sessions",
+      "tag": "0188_qua_565_phase_b2_tiny_fk_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 189,
+      "version": "7",
+      "when": 1785916800000,
+      "tag": "0189_qua_567_entity_resources_fk_swap",
+      "breakpoints": true
+    },
+    {
+      "idx": 190,
+      "version": "7",
+      "when": 1785916800001,
+      "tag": "0190_qua_567_rebuild_things_search_mv",
+      "breakpoints": true
+    },
+    {
+      "idx": 191,
+      "version": "7",
+      "when": 1786003200001,
+      "tag": "0191_qua_221_backfill_stale_agent_sessions",
       "breakpoints": true
     }
   ]

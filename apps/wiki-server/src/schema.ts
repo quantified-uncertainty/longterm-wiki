@@ -819,9 +819,12 @@ export const resourcePolicyDocs = pgTable("resource_policy_docs", {
  * Part of: Unify Data Sources into Resources (Discussion #3567, PR 2/5).
  */
 export const resourceTabularSources = pgTable("resource_tabular_sources", {
+  // QUA-565 Phase B.2: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal churn — the value is now a
+  // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   /** Human-readable slug (was data_sources.id, e.g. 'coefficient-giving') */
   sourceSlug: text("source_slug").notNull().unique(),
   /** csv | html_table | json_api | spreadsheet */
@@ -868,8 +871,11 @@ export const sourceSnapshots = pgTable("source_snapshots", {
   /** Human-readable slug referencing resource_tabular_sources.source_slug */
   sourceSlug: text("source_slug").notNull()
     .references(() => resourceTabularSources.sourceSlug, { onDelete: "cascade" }),
-  /** Resource ID from unified resources table */
-  resourceId: text("resource_id").references(() => resources.id, { onDelete: "set null" }),
+  /**
+   * Resource ID from unified resources table.
+   * QUA-565 Phase B.2: references resources.stable_id (column name unchanged).
+   */
+  resourceId: text("resource_id").references(() => resources.stableId, { onDelete: "set null" }),
   snapshotHash: text("snapshot_hash").notNull(),
   recordCount: integer("record_count"),
   /** Raw CSV/HTML/JSON text — the ground truth. Parsed on-demand. */
@@ -2791,7 +2797,8 @@ export const researchAreaPapers = pgTable(
     researchAreaId: text("research_area_id")
       .notNull()
       .references(() => researchAreas.id, { onDelete: "cascade" }),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-565 Phase B.2: resource_id references resources.stable_id (not resources.id).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     title: text("title").notNull(),
@@ -2852,9 +2859,13 @@ export const entityResources = pgTable(
     entityId: text("entity_id")
       .notNull()
       .references(() => entities.stableId, { onDelete: "cascade" }),
+    // QUA-567 Phase B.4: resource_id references resources.stable_id (not
+    // resources.id). Column name kept as `resource_id` for minimal code
+    // churn — the value is now a `sid_`-prefixed stable_id, not a legacy
+    // hex16. See QUA-549 for context.
     resourceId: text("resource_id")
       .notNull()
-      .references(() => resources.id, { onDelete: "cascade" }),
+      .references(() => resources.stableId, { onDelete: "cascade" }),
     authoredByEntity: boolean("authored_by_entity").notNull().default(false),
     isSubject: boolean("is_subject").notNull().default(false),
     inferenceSource: text("inference_source"),

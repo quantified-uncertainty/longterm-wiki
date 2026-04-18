@@ -1987,7 +1987,8 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // QUA-564 Phase B.1: resourcePolicyDocs.resourceId references resources.stable_id now.
+    // QUA-564 B.1: resourcePolicyDocs.resourceId → resources.stable_id.
+    // QUA-565 B.2: resourceTabularSources.resourceId → resources.stable_id.
     const stableId = rows[0].stableId ?? id;
     // Also fetch citations, sub-table data, and tabular source metadata
     const [citations, paperRows, forumRows, policyRows, tabularRows] = await Promise.all([
@@ -1998,7 +1999,7 @@ const resourcesApp = new Hono()
       db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
       db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, stableId)).limit(1),
-      db.select().from(resourceTabularSources).where(eq(resourceTabularSources.resourceId, id)).limit(1),
+      db.select().from(resourceTabularSources).where(eq(resourceTabularSources.resourceId, stableId)).limit(1),
     ]);
 
     // If tabular source, fetch latest snapshot metadata + preview
