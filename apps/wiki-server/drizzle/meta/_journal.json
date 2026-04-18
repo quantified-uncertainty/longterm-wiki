@@ -1387,6 +1387,13 @@
       "when": 1786176000000,
       "tag": "0197_qua_566_phase_b3_papers_posts_citations",
       "breakpoints": true
+    },
+    {
+      "idx": 198,
+      "version": "7",
+      "when": 1786262400000,
+      "tag": "0198_qua_492_facts_fact_id_check",
+      "breakpoints": true
     }
   ]
 }
