@@ -304,6 +304,18 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       }
       return [];
     }
+    // ---- SELECT ... FROM resources WHERE id = $1 OR stable_id = $2 ----
+    // QUA-573: /:id/content now accepts either hex16 id or canonical sid_.
+    if (whereClause.includes('"id"') && whereClause.includes('"stable_id"')) {
+      const id = params[0] as string;
+      const stableId = (params[1] ?? params[0]) as string;
+      const byId = resourceStore.get(id);
+      if (byId) return [byId];
+      for (const r of resourceStore.values()) {
+        if (r.stable_id === stableId) return [r];
+      }
+      return [];
+    }
     // ---- SELECT ... FROM resources WHERE id = $1 ----
     if (whereClause.includes('"id"')) {
       const id = params[0] as string;
@@ -720,6 +732,39 @@ describe("Resources API", () => {
 
     it("returns 404 for unknown ID", async () => {
       const res = await app.request("/api/resources/nonexistent");
+      expect(res.status).toBe(404);
+    });
+  });
+
+  // QUA-573: /:id/content accepts either hex16 resources.id or canonical sid_.
+  describe("GET /api/resources/:id/content", () => {
+    it("resolves by hex16 id (legacy)", async () => {
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        id: "abc123def456",
+        stableId: "sid_AbCd012345",
+      });
+      const res = await app.request("/api/resources/abc123def456/content");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.id).toBe("abc123def456");
+    });
+
+    it("resolves by stable_id (canonical sid_)", async () => {
+      await postJson(app, "/api/resources", {
+        ...sampleResource,
+        id: "abc123def456",
+        stableId: "sid_AbCd012345",
+      });
+      const res = await app.request("/api/resources/sid_AbCd012345/content");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // Server responds with the hex16 primary key regardless of lookup form.
+      expect(body.id).toBe("abc123def456");
+    });
+
+    it("returns 404 for unknown id", async () => {
+      const res = await app.request("/api/resources/sid_NoSuchOne0/content");
       expect(res.status).toBe(404);
     });
   });
