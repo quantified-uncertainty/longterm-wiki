@@ -7,6 +7,10 @@
  *   crux sys sessions write "Session title"               Write a session log YAML
  *   crux sys sessions write --title="Session title"       Alternative flag form
  *   crux sys sessions write "Title" --sync                Write + sync to wiki-server
+ *   crux sys sessions list                                List active sessions across all slots
+ *   crux sys sessions list --all                          Include completed sessions
+ *   crux sys sessions list --linear=QUA-NNN               Filter by Linear ID
+ *   crux sys sessions list --slot=7                       Filter by slot number
  */
 
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
@@ -16,6 +20,16 @@ import { currentBranch } from '../lib/session/session-checklist.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { syncSessionFile } from '../wiki-server/sync-session.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
+import { listAgentSessions } from '../lib/wiki-server/agent-sessions.ts';
+import { findClaudeProcesses } from '../lib/session/claude-processes.ts';
+import {
+  mergeSessions,
+  filterSessions,
+  sortSessions,
+  toDisplayRow,
+  type MergedSession,
+  type Liveness,
+} from '../lib/session/sessions-list.ts';
 import type { CommandResult } from '../lib/cli.ts';
 
 const SESSIONS_DIR = join(PROJECT_ROOT, '.claude/sessions');
@@ -206,21 +220,166 @@ async function write(args: string[], options: Record<string, unknown>): Promise<
 }
 
 // ---------------------------------------------------------------------------
+// list command — cross-session observability (QUA-413)
+// ---------------------------------------------------------------------------
+
+const LIVENESS_BADGE: Record<Liveness, string> = {
+  live: '●',
+  recent: '◐',
+  stale: '◯',
+  ghost: '!',
+  done: '✓',
+};
+
+function livenessColor(liveness: Liveness, c: ReturnType<typeof createLogger>['colors']): string {
+  switch (liveness) {
+    case 'live':
+      return c.green;
+    case 'recent':
+      return c.cyan;
+    case 'stale':
+      return c.yellow;
+    case 'ghost':
+      return c.red;
+    case 'done':
+      return c.dim;
+  }
+}
+
+function renderTable(
+  rows: MergedSession[],
+  colors: ReturnType<typeof createLogger>['colors'],
+): string {
+  if (rows.length === 0) {
+    return `${colors.dim}No sessions match the filter.${colors.reset}\n`;
+  }
+
+  const display = rows.map(toDisplayRow);
+
+  const widths = {
+    badge: 2,
+    slot: Math.max(4, ...display.map((d) => d.slot.length)),
+    pid: Math.max(5, ...display.map((d) => d.pid.length)),
+    branch: Math.max(6, ...display.map((d) => d.branch.length)),
+    linear: Math.max(7, ...display.map((d) => d.linear.length)),
+    pr: Math.max(4, ...display.map((d) => d.pr.length)),
+    age: Math.max(3, ...display.map((d) => d.age.length)),
+    task: Math.max(4, ...display.map((d) => d.task.length)),
+  };
+
+  const pad = (s: string, w: number) => s.padEnd(w);
+
+  let out = '';
+  // Header
+  out += `  ${pad('', widths.badge)} ${pad('Slot', widths.slot)} ${pad('PID', widths.pid)} ${pad('Branch', widths.branch)} ${pad('Linear', widths.linear)} ${pad('PR', widths.pr)} ${pad('Age', widths.age)} ${pad('Task', widths.task)}\n`;
+  out += `  ${'─'.repeat(widths.badge)} ${'─'.repeat(widths.slot)} ${'─'.repeat(widths.pid)} ${'─'.repeat(widths.branch)} ${'─'.repeat(widths.linear)} ${'─'.repeat(widths.pr)} ${'─'.repeat(widths.age)} ${'─'.repeat(widths.task)}\n`;
+
+  for (const d of display) {
+    const col = livenessColor(d.liveness, colors);
+    const badge = LIVENESS_BADGE[d.liveness];
+    const line = `  ${col}${pad(badge, widths.badge)}${colors.reset} ${pad(d.slot, widths.slot)} ${colors.dim}${pad(d.pid, widths.pid)}${colors.reset} ${pad(d.branch, widths.branch)} ${pad(d.linear, widths.linear)} ${pad(d.pr, widths.pr)} ${pad(d.age, widths.age)} ${pad(d.task, widths.task)}`;
+    out += `${line}\n`;
+  }
+
+  // Legend
+  out += `\n${colors.dim}  ${colors.green}●${colors.dim} live (<2m)   ${colors.cyan}◐${colors.dim} recent (<30m)   ${colors.yellow}◯${colors.dim} stale   ${colors.red}!${colors.dim} ghost (untracked)   ${colors.dim}✓${colors.dim} done${colors.reset}\n`;
+  return out;
+}
+
+async function list(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const log = createLogger(options.ci as boolean | undefined);
+  const c = log.colors;
+
+  const available = await isServerAvailable();
+  if (!available) {
+    return {
+      exitCode: 1,
+      output:
+        `${c.red}Error: wiki-server is not reachable.${c.reset}\n` +
+        `  In agent slots, set WIKI_SERVER_ENV=prod to query the production DB:\n` +
+        `  ${c.cyan}WIKI_SERVER_ENV=prod pnpm crux sys sessions list${c.reset}\n`,
+    };
+  }
+
+  const limit = Number(options.limit ?? 200);
+  const result = await listAgentSessions(Number.isFinite(limit) && limit > 0 ? Math.min(limit, 500) : 200);
+  if (!result.ok) {
+    return { exitCode: 1, output: `${c.red}Error fetching sessions: ${result.message}${c.reset}\n` };
+  }
+
+  const liveMinutes = options.liveMinutes !== undefined ? Number(options.liveMinutes) : 2;
+  const staleMinutes = options.fresh !== undefined ? Number(options.fresh) : 30;
+
+  const processes = findClaudeProcesses();
+
+  const merged = mergeSessions(result.data.sessions, processes, {
+    liveMinutes: Number.isFinite(liveMinutes) && liveMinutes > 0 ? liveMinutes : 2,
+    staleMinutes: Number.isFinite(staleMinutes) && staleMinutes > 0 ? staleMinutes : 30,
+  });
+
+  const filterLinear = typeof options.linear === 'string' ? options.linear : undefined;
+  const filterSlot = options.slot !== undefined ? Number(options.slot) : undefined;
+
+  const filtered = filterSessions(merged, {
+    includeCompleted: Boolean(options.all),
+    linearId: filterLinear,
+    slot: Number.isFinite(filterSlot) ? (filterSlot as number) : undefined,
+  });
+
+  const sorted = sortSessions(filtered);
+
+  if (options.json) {
+    // Shape the JSON output with explicit fields a coordinator might script against.
+    const jsonRows = sorted.map((r) => ({
+      slot: r.session?.slotNumber ?? r.process?.slot ?? null,
+      pid: r.process?.pid ?? null,
+      cwd: r.process?.cwd ?? r.session?.worktree ?? null,
+      branch: r.session?.branch ?? null,
+      linearId: r.session?.linearId ?? null,
+      prUrl: r.session?.prUrl ?? null,
+      task: r.session?.task ?? null,
+      status: r.session?.status ?? null,
+      liveness: r.liveness,
+      ageMinutes: r.ageMinutes,
+      heartbeatAt: r.session?.heartbeatAt ?? null,
+      updatedAt: r.session?.updatedAt ?? null,
+      startedAt: r.session?.startedAt ?? null,
+      sessionId: r.session?.id ?? null,
+    }));
+    return { exitCode: 0, output: JSON.stringify(jsonRows, null, 2) + '\n' };
+  }
+
+  const header = `${c.bold}Agent Sessions${c.reset} ${c.dim}(${sorted.length} row${sorted.length === 1 ? '' : 's'}${Boolean(options.all) ? '' : ', active only'})${c.reset}\n\n`;
+  return { exitCode: 0, output: header + renderTable(sorted, c) };
+}
+
+// ---------------------------------------------------------------------------
 // Domain entry point (required by crux.mjs dispatch)
 // ---------------------------------------------------------------------------
 
 export const commands = {
   write,
+  list,
 };
 
 export function getHelp(): string {
   return `
-Sessions Domain — Create and manage agent session log YAML files
+Sessions Domain — Agent sessions: list active, write session logs
 
 Commands:
+  list [options]            List active agent sessions across all slots (QUA-413)
   write <title> [options]   Scaffold a session YAML in .claude/sessions/
 
-Options:
+List options:
+  --all                     Include completed sessions (default: active only)
+  --linear=QUA-NNN          Filter by Linear ID
+  --slot=N                  Filter by slot number
+  --fresh=N                 Staleness cutoff in minutes (default: 30)
+  --live-minutes=N          "Live" threshold in minutes (default: 2)
+  --limit=N                 Max DB rows to fetch (default: 200, cap 500)
+  --json                    Machine-readable JSON output
+
+Write options:
   --title=<text>            Session title (alternative to positional arg)
   --summary=<text>          Short summary of what was done
   --model=<name>            Model used (e.g. claude-sonnet-4-6)
@@ -232,8 +391,10 @@ Options:
   --output=<path>           Custom output path (default: .claude/sessions/<date>_<branch>.yaml)
 
 Examples:
+  pnpm crux sys sessions list
+  pnpm crux sys sessions list --all --linear=QUA-413
+  pnpm crux sys sessions list --slot=9 --json
   pnpm crux sys sessions write "Fix citation parser bug"
   pnpm crux sys sessions write "Add dark mode" --model=claude-sonnet-4-6 --duration="~45min"
-  pnpm crux sys sessions write "Update AI timelines page" --pages=ai-timelines,ai-forecasting --sync
 `.trim();
 }

@@ -10,7 +10,7 @@ Before writing a dispatch brief for any Linear-tracked ticket, the coordinator M
 
 1. **Linear state** — Run `pnpm crux linear view QUA-NNN`. Confirm the issue is **not already In Progress with a recent (<24h) start comment from a different session**. Recent start comments mean a slot already picked this up.
 2. **Open PRs** — Run `gh pr list -R quantified-uncertainty/longterm-wiki --search "QUA-NNN in:body" --state all --json number,state,headRefName`. Confirm **no open PR references the ticket**. A closed-unmerged PR is usually fine (investigate the close reason); an open PR almost always means another session is iterating on it.
-3. **Active slots** — Run `./ws list` (or `pnpm crux sys sessions list` once QUA-413 ships). Confirm **no other slot is currently on a `claude/qua-NNN-*` branch** or has an uncommitted working tree that suggests it's on the same ticket.
+3. **Active slots** — Run `WIKI_SERVER_ENV=prod pnpm crux sys sessions list --linear=QUA-NNN` (QUA-413) to see every registered session working on the ticket, cross-referenced with live `claude` processes. Fall back to `./ws list` only if the wiki-server is unreachable. Confirm **no other slot is currently on a `claude/qua-NNN-*` branch**, has a ghost Claude process, or an uncommitted working tree that suggests it's on the same ticket.
 
 **If any check surfaces an existing claim, abort the dispatch.** Either (a) investigate the existing session first and confirm it's abandoned/stuck before taking over with `--force`, or (b) comment on the existing PR instead of opening a new one, or (c) wait for the in-flight session to ship.
 
