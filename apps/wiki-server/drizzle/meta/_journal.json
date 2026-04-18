@@ -1359,6 +1359,13 @@
       "when": 1786003200000,
       "tag": "0193_qua_569_page_citations_resource_id_to_stable_id",
       "breakpoints": true
+    },
+    {
+      "idx": 194,
+      "version": "7",
+      "when": 1786003200001,
+      "tag": "0194_qua_574_citation_quotes_fk_swap",
+      "breakpoints": true
     }
   ]
 }
