@@ -288,6 +288,18 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-598: every `@longterm-wiki/*` import from apps/*/src must be declared
+    // in that app's package.json dependencies. pnpm's hoisting lets undeclared
+    // imports work locally and in CI; the prod Docker build does not. This was
+    // the 3rd recurrence of the same class of bug (after id-utils and factbase)
+    // and is blocking to prevent a 4th.
+    id: 'workspace-dep-coverage',
+    name: 'Workspace dependency coverage (no undeclared @longterm-wiki/* imports)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-workspace-dep-coverage.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-294: enforces NOT VALID on ADD CONSTRAINT for large tables.
     // Migration 0173 caused a ~12h prod deploy stall by taking ACCESS
     // EXCLUSIVE on hallucination_risk_snapshots without NOT VALID.
