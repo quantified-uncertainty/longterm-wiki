@@ -52,20 +52,21 @@ async function main() {
   let unmatched = 0;
   let skippedNoStableId = 0;
 
+  let skippedNoStableId = 0;
   for (const quote of candidates) {
     const resource = getResourceByUrl(quote.url!);
     if (resource) {
       // QUA-574 Phase B.2b: citation_quotes.resource_id now references
       // resources.stable_id. Skip resources without a stable_id rather than
       // writing a legacy hex16 value that would fail wiki-server validation.
-      if (!resource.stable_id) {
+      if (!resource.stableId) {
         skippedNoStableId++;
         continue;
       }
       matched++;
       if (dryRun) {
         console.log(
-          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.stable_id} (${resource.title || resource.url})`,
+          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.stableId} (${resource.title || resource.url})`,
         );
       } else {
         // Re-upsert with the resource_id populated (stable_id form)
@@ -73,7 +74,7 @@ async function main() {
           pageId: String(quote.pageId),
           footnote: quote.footnote,
           url: quote.url,
-          resourceId: resource.stable_id,
+          resourceId: resource.stableId,
           claimText: quote.claimText,
           claimContext: quote.claimContext ?? null,
           sourceQuote: quote.sourceQuote ?? null,

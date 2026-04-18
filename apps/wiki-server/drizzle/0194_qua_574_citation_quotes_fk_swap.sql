@@ -40,53 +40,27 @@ WHERE cq.resource_id = r.id
   AND r.stable_id IS NOT NULL;--> statement-breakpoint
 
 -- ────────────────────────────────────────────────────────────────────────
--- Soft-ref orphan check + diagnostics. After the backfill, every non-null
--- resource_id should either already be in sid_ form or be an orphan
--- (no matching resources row). We do NOT raise here — citation_quotes is
--- a soft ref, so some orphans are acceptable (the schema's ON DELETE
--- SET NULL is not enforced without a real FK). Instead, emit NOTICEs so
--- operators can investigate post-deploy. This is a deliberate difference
--- from the hard-FK migrations (0187/0188/0189) which must halt on
--- orphans to avoid a failed ADD CONSTRAINT.
---
--- Two distinct diagnostic counters:
---   (a) total post-backfill orphans — any non-null resource_id with no
---       matching resources.stable_id. Expected to be 0 in prod.
---   (b) rows that could not be backfilled because the matching resources
---       row had NULL stable_id. Expected to be 0 per QUA-536 (100%
---       populated), but called out separately so the root cause is
---       visible if either category turns up.
+-- Soft-ref orphan check. After the backfill, every non-null resource_id
+-- should either already be in sid_ form or be an orphan (no matching
+-- resources row). We do NOT raise here — citation_quotes is a soft ref,
+-- so some orphans are acceptable (the schema's ON DELETE SET NULL is
+-- not enforced without a real FK). Instead, emit a NOTICE so operators
+-- can investigate post-deploy if any remain. This is a deliberate
+-- difference from the hard-FK migrations (0187/0188/0189) which must
+-- halt on orphans to avoid a failed ADD CONSTRAINT.
 -- ────────────────────────────────────────────────────────────────────────
 DO $$
 DECLARE
   orphan_count INT;
-  skipped_null_stableid INT;
 BEGIN
-  -- Single scan computes both counters. `skipped_null_stableid` is the
-  -- specific subset of rows that would have been backfilled except the
-  -- matching resources row has a NULL stable_id — fixable by populating
-  -- resources.stable_id (see QUA-536), then re-running.
-  SELECT
-    COUNT(*) FILTER (
-      WHERE NOT EXISTS (
-        SELECT 1 FROM resources r WHERE r.stable_id = cq.resource_id
-      )
-    ),
-    COUNT(*) FILTER (
-      WHERE cq.resource_id NOT LIKE 'sid_%'
-        AND EXISTS (
-          SELECT 1 FROM resources r
-          WHERE r.id = cq.resource_id AND r.stable_id IS NULL
-        )
-    )
-    INTO orphan_count, skipped_null_stableid
+  SELECT COUNT(*) INTO orphan_count
   FROM citation_quotes cq
-  WHERE cq.resource_id IS NOT NULL;
-
-  IF skipped_null_stableid > 0 THEN
-    RAISE NOTICE 'QUA-574: % citation_quotes row(s) could not be backfilled because the matching resources row has a NULL stable_id. Populate resources.stable_id for those rows (see QUA-536) and re-run this migration to complete.', skipped_null_stableid;
-  END IF;
-
+  WHERE cq.resource_id IS NOT NULL
+    AND NOT EXISTS (
+      SELECT 1
+      FROM resources r
+      WHERE r.stable_id = cq.resource_id
+    );
   IF orphan_count > 0 THEN
     RAISE NOTICE 'QUA-574: % citation_quotes row(s) have a resource_id with no matching resources.stable_id after backfill. Soft ref — not halting. Investigate via `SELECT id, page_id, footnote, resource_id FROM citation_quotes WHERE resource_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM resources r WHERE r.stable_id = citation_quotes.resource_id);`.', orphan_count;
   END IF;

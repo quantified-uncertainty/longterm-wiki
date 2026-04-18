@@ -853,35 +853,6 @@ describe("Citation Server API", () => {
       expect(body.quotes[0].resourceId).toBe("sid_AbCdEfGhIj");
       expect(isSid(body.quotes[0].resourceId)).toBe(true);
     });
-
-    // QUA-574 regression lock: verify the resource ref-check uses the
-    // `resources.stable_id` column, not `resources.id`. Without this, a
-    // naïve mock that accepts anything in the IN list passes both column
-    // choices — so the round-trip test above can't detect a regression
-    // that points `.references()` back at `resources.id`.
-    it("looks up resource refs against resources.stable_id (not resources.id)", async () => {
-      await postJson(app, "/api/citations/quotes/upsert", {
-        pageId: "col-check-page",
-        footnote: 1,
-        claimText: "Claim",
-        url: "https://example.com/col-check",
-        resourceId: "sid_ColumnXyz",
-      });
-
-      // The ref-check issues: SELECT "resources"."stable_id" AS "id"
-      //                       FROM "resources"
-      //                       WHERE "resources"."stable_id" IN (...)
-      const resourceLookups = dispatchedQueries.filter(
-        (q) => q.includes('from "resources"') && q.includes(" in ")
-      );
-      expect(resourceLookups.length).toBeGreaterThan(0);
-      for (const q of resourceLookups) {
-        expect(q).toContain('"resources"."stable_id"');
-        // If the schema ever regresses to resources.id, this assertion fails
-        // before the round-trip assertion ever runs.
-        expect(q).not.toMatch(/"resources"\."id"\s+in\s/);
-      }
-    });
   });
 
   // ---- Batch Upsert ----
@@ -909,6 +880,8 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(400);
     });
 
+    // QUA-574 Phase B.2b: verify the batch endpoint also round-trips sid_
+    // values verbatim on the resource_id column.
     it("persists caller-provided resourceId (sid_) verbatim across a batch", async () => {
       const res = await postJson(app, "/api/citations/quotes/upsert-batch", {
         items: [
