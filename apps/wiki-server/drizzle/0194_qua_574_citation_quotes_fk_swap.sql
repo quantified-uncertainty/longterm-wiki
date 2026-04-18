@@ -62,25 +62,26 @@ DECLARE
   orphan_count INT;
   skipped_null_stableid INT;
 BEGIN
-  SELECT COUNT(*) INTO orphan_count
+  -- Single scan computes both counters. `skipped_null_stableid` is the
+  -- specific subset of rows that would have been backfilled except the
+  -- matching resources row has a NULL stable_id — fixable by populating
+  -- resources.stable_id (see QUA-536), then re-running.
+  SELECT
+    COUNT(*) FILTER (
+      WHERE NOT EXISTS (
+        SELECT 1 FROM resources r WHERE r.stable_id = cq.resource_id
+      )
+    ),
+    COUNT(*) FILTER (
+      WHERE cq.resource_id NOT LIKE 'sid_%'
+        AND EXISTS (
+          SELECT 1 FROM resources r
+          WHERE r.id = cq.resource_id AND r.stable_id IS NULL
+        )
+    )
+    INTO orphan_count, skipped_null_stableid
   FROM citation_quotes cq
-  WHERE cq.resource_id IS NOT NULL
-    AND NOT EXISTS (
-      SELECT 1
-      FROM resources r
-      WHERE r.stable_id = cq.resource_id
-    );
-
-  -- Count hex16 rows still present whose resources row exists but has
-  -- NULL stable_id — these are the UPDATE's `r.stable_id IS NOT NULL`
-  -- guard skips. They overlap with `orphan_count` but have a specific
-  -- fixable cause (populate resources.stable_id, then re-run).
-  SELECT COUNT(*) INTO skipped_null_stableid
-  FROM citation_quotes cq
-  JOIN resources r ON r.id = cq.resource_id
-  WHERE cq.resource_id IS NOT NULL
-    AND cq.resource_id NOT LIKE 'sid_%'
-    AND r.stable_id IS NULL;
+  WHERE cq.resource_id IS NOT NULL;
 
   IF skipped_null_stableid > 0 THEN
     RAISE NOTICE 'QUA-574: % citation_quotes row(s) could not be backfilled because the matching resources row has a NULL stable_id. Populate resources.stable_id for those rows (see QUA-536) and re-run this migration to complete.', skipped_null_stableid;

@@ -50,8 +50,8 @@ async function main() {
 
   let matched = 0;
   let unmatched = 0;
-
   let skippedNoStableId = 0;
+
   for (const quote of candidates) {
     const resource = getResourceByUrl(quote.url!);
     if (resource) {

@@ -909,8 +909,6 @@ describe("Citation Server API", () => {
       expect(res.status).toBe(400);
     });
 
-    // QUA-574 Phase B.2b: verify the batch endpoint also round-trips sid_
-    // values verbatim on the resource_id column.
     it("persists caller-provided resourceId (sid_) verbatim across a batch", async () => {
       const res = await postJson(app, "/api/citations/quotes/upsert-batch", {
         items: [
