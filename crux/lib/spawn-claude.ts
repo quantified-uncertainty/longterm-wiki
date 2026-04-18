@@ -1,23 +1,16 @@
 /**
- * Canonical `claude` CLI spawn wrapper — QUA-599.
+ * Canonical `claude` CLI spawn wrapper.
  *
- * Every `spawn('claude', ...)` call in this codebase must go through this
- * wrapper. The gate validator `validate-no-raw-claude-spawn.ts` enforces it.
+ * Claude CLI prefers ANTHROPIC_API_KEY over the OAuth session (Claude
+ * Max/Pro subscription) when the env var is set. Agent slot `.env` files
+ * ship stale API keys, so without stripping the key, subprocesses fail
+ * silently with 401s or "Credit balance is too low".
  *
- * Why this exists:
- *   Claude CLI prefers ANTHROPIC_API_KEY over the OAuth session (Claude
- *   Max/Pro subscription) when the env var is set. Agent slot `.env` files
- *   ship stale API keys — the coordinator's subscription is the billing
- *   identity we actually want. Without stripping the key, subprocesses fail
- *   silently with 401s or "Credit balance is too low".
+ * Default: delete ANTHROPIC_API_KEY so the CLI uses OAuth. Use
+ * `keepApiKey: { reason }` when the caller needs to run under an API-key
+ * billing identity (e.g., a prod service account with no OAuth session).
  *
- *   This bug was rediscovered at least three times in separate files
- *   (page-improver, pr-patrol, dispatch) before this wrapper landed.
- *
- * Default behavior: delete ANTHROPIC_API_KEY from the child env so the CLI
- * uses OAuth. Use `keepApiKey: { reason }` only when the caller needs to
- * run under an API-key billing identity (e.g., a prod service account with
- * no OAuth session available).
+ * Enforced by `validate-no-raw-claude-spawn.ts` (gate, blocking).
  */
 
 import {

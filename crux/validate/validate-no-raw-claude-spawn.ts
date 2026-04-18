@@ -28,27 +28,24 @@ const SCAN_DIRS = ['crux'];
 const WRAPPER_FILE = 'crux/lib/spawn-claude.ts';
 
 /**
- * Patterns that indicate a raw `claude` CLI spawn. The trailing char is
- * either a quote (closing the string) or space (for exec-style calls where
- * args are concatenated into the command string) to avoid matching
- * `claude-foo`, `claudex`, etc.
+ * Single combined regex for all known spawn patterns. The `kind` group
+ * captures which function was called so we can report it.
  *
- * Uses \s (not just space) so prettier-formatted multi-line calls like
- *   spawn(\n  'claude',\n  args,\n)
- * are still caught after line concatenation.
+ * `\s*` (not just spaces) matches prettier-formatted multi-line calls.
  *
- * Known gaps (NOT caught): aliased imports like `const {spawn: sp} = ...;
- * sp('claude', ...)`, or variable-named commands like `const bin = 'claude';
- * spawn(bin, ...)`. Code review covers these.
+ * Known gaps (NOT caught): aliased imports (`const sp = spawn; sp(...)`),
+ * variable-named commands (`const bin = 'claude'; spawn(bin, ...)`). Code
+ * review covers these.
  */
-const PATTERNS: Array<{ name: string; re: RegExp }> = [
-  { name: 'spawn', re: /\bspawn\s*\(\s*['"`]claude['"`]/ },
-  { name: 'spawnSync', re: /\bspawnSync\s*\(\s*['"`]claude['"`]/ },
-  { name: 'exec', re: /\bexec\s*\(\s*['"`]claude[ '"`]/ },
-  { name: 'execSync', re: /\bexecSync\s*\(\s*['"`]claude[ '"`]/ },
-  { name: 'execFile', re: /\bexecFile(?:Sync)?\s*\(\s*['"`]claude['"`]/ },
-  { name: 'execa', re: /\bexeca(?:Sync|Command)?\s*\(\s*['"`]claude[ '"`]/ },
-];
+const SPAWN_RE = new RegExp(
+  [
+    // spawn('claude'...) / spawnSync('claude'...) — closing quote required
+    `\\b(?<kind>spawn|spawnSync|execFile|execFileSync)\\s*\\(\\s*['"\`]claude['"\`]`,
+    // exec-style: shell string that starts with "claude " (space-terminated)
+    `\\b(?<kind2>exec|execSync|execa|execaSync|execaCommand)\\s*\\(\\s*['"\`]claude[ '"\`]`,
+  ].join('|'),
+  'g',
+);
 
 interface Violation {
   file: string;
@@ -100,30 +97,28 @@ function stripComments(content: string): string {
 
 export function checkFileContent(content: string, relPath: string): Violation[] {
   if (relPath === WRAPPER_FILE) return [];
+  // Fast-path: most files don't mention `claude` at all.
+  if (!content.includes('claude')) return [];
 
   const stripped = stripComments(content);
   const lines = content.split('\n');
   const violations: Violation[] = [];
   const seenLines = new Set<number>();
 
-  // Whole-content scan catches multi-line `spawn(\n 'claude', ...)` formatting.
-  for (const { name, re } of PATTERNS) {
-    const global = new RegExp(re.source, 'g');
-    let m: RegExpExecArray | null;
-    while ((m = global.exec(stripped)) !== null) {
-      const lineIdx = stripped.slice(0, m.index).split('\n').length - 1;
-      if (seenLines.has(lineIdx)) continue;
-      seenLines.add(lineIdx);
-      violations.push({
-        file: relPath,
-        line: lineIdx + 1,
-        text: (lines[lineIdx] ?? '').trimStart(),
-        kind: name,
-      });
-    }
+  SPAWN_RE.lastIndex = 0;
+  let m: RegExpExecArray | null;
+  while ((m = SPAWN_RE.exec(stripped)) !== null) {
+    const lineIdx = stripped.slice(0, m.index).split('\n').length - 1;
+    if (seenLines.has(lineIdx)) continue;
+    seenLines.add(lineIdx);
+    violations.push({
+      file: relPath,
+      line: lineIdx + 1,
+      text: (lines[lineIdx] ?? '').trimStart(),
+      kind: m.groups?.kind ?? m.groups?.kind2 ?? 'spawn',
+    });
   }
 
-  violations.sort((a, b) => a.line - b.line);
   return violations;
 }
 

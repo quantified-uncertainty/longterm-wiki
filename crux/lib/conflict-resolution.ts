@@ -598,8 +598,8 @@ Instructions:
     },
   );
   if (claudeResult.status !== 0 || claudeResult.error) {
-    const tail = ((claudeResult.stderr as unknown as string) || (claudeResult.stdout as unknown as string) || '').slice(-300);
-    console.error('Tier 2 Claude Code agent failed:', tail);
+    const reason = claudeResult.error?.message ?? `exit ${claudeResult.status}`;
+    console.error('Tier 2 Claude Code agent failed:', reason);
     return { ok: false };
   }
 
