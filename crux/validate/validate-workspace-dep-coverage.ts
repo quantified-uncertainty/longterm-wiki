@@ -56,7 +56,7 @@
  * Usage: `npx tsx crux/validate/validate-workspace-dep-coverage.ts`
  */
 
-import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
+import { readdirSync, readFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -101,27 +101,21 @@ interface CheckResult {
 }
 
 function listSourceFiles(dir: string, out: string[] = []): string[] {
-  let entries: string[];
+  let entries;
   try {
-    entries = readdirSync(dir);
+    entries = readdirSync(dir, { withFileTypes: true });
   } catch {
     return out;
   }
-  for (const name of entries) {
+  // Dirent.isDirectory()/isFile() check the link itself (like lstat), so
+  // symbolic links are naturally skipped — no infinite recursion on loops.
+  for (const dirent of entries) {
+    const name = dirent.name;
     if (name === 'node_modules' || name.startsWith('.')) continue;
     const full = join(dir, name);
-    let st;
-    try {
-      // Using lstat avoids following symlinks (prevents infinite loops if a
-      // stray symlink points at an ancestor).
-      st = statSync(full, { throwIfNoEntry: false });
-    } catch {
-      continue;
-    }
-    if (!st) continue;
-    if (st.isDirectory()) {
+    if (dirent.isDirectory()) {
       listSourceFiles(full, out);
-    } else if (st.isFile()) {
+    } else if (dirent.isFile()) {
       const dot = name.lastIndexOf('.');
       if (dot !== -1 && SOURCE_EXTENSIONS.has(name.slice(dot))) {
         out.push(full);
@@ -184,8 +178,8 @@ function analyzeApp(
 
   const files: string[] = [];
   for (const sub of SCAN_SUBDIRS) {
-    const subPath = join(appDir, sub);
-    if (existsSync(subPath)) listSourceFiles(subPath, files);
+    // listSourceFiles silently returns [] if the subdir is missing.
+    listSourceFiles(join(appDir, sub), files);
   }
 
   const used = new Set<string>();
@@ -219,14 +213,9 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
 
   let appNames: string[];
   try {
-    appNames = readdirSync(appsDir).filter((name) => {
-      const full = join(appsDir, name);
-      try {
-        return statSync(full).isDirectory();
-      } catch {
-        return false;
-      }
-    });
+    appNames = readdirSync(appsDir, { withFileTypes: true })
+      .filter((dirent) => dirent.isDirectory())
+      .map((dirent) => dirent.name);
   } catch {
     console.log(`${c.dim}Skipping: ${appsDir} not found${c.reset}`);
     return { passed: true, errors: 0, warnings: 0, apps: [] };

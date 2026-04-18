@@ -288,11 +288,7 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
-    // QUA-598: every `@longterm-wiki/*` import from apps/*/src must be declared
-    // in that app's package.json dependencies. pnpm's hoisting lets undeclared
-    // imports work locally and in CI; the prod Docker build does not. This was
-    // the 3rd recurrence of the same class of bug (after id-utils and factbase)
-    // and is blocking to prevent a 4th.
+    // Rationale in validate-workspace-dep-coverage.ts. QUA-598.
     id: 'workspace-dep-coverage',
     name: 'Workspace dependency coverage (no undeclared @longterm-wiki/* imports)',
     command: 'npx',
