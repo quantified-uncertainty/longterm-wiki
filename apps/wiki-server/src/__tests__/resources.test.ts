@@ -353,14 +353,25 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return filtered.slice(offset, offset + limit);
   }
 
-  // ---- /suggest: SELECT resource_id, count(*) FROM resource_citations WHERE resource_id = ANY(...) ----
+  // ---- /suggest: SELECT r.id, count(*) FROM resource_citations rc
+  //                 JOIN resources r ON rc.resource_id = r.stable_id
+  //                 WHERE r.id = ANY(...) GROUP BY r.id ----
+  // QUA-566 Phase B.3: resource_citations.resource_id references resources.stable_id.
+  // The prod query JOINs resources and surfaces r.id (hex16) so downstream map-by-hex16
+  // lookups keep working. The mock walks resourceStore to resolve the hex16 key into
+  // the stable_id, then counts citationStore rows whose resource_id matches that stable_id.
   if (q.includes("resource_citations") && q.includes("group by") && q.includes("any($)")) {
     const resourceIds = params[0] as string[];
     const counts: Record<string, number> = {};
-    for (const c of citationStore) {
-      if (resourceIds.includes(c.resource_id)) {
-        counts[c.resource_id] = (counts[c.resource_id] || 0) + 1;
+    for (const resourceId of resourceIds) {
+      const r = resourceStore.get(resourceId);
+      const stableId = r?.stable_id as string | null | undefined;
+      if (!stableId) continue;
+      let n = 0;
+      for (const c of citationStore) {
+        if (c.resource_id === stableId) n++;
       }
+      if (n > 0) counts[resourceId] = n;
     }
     return Object.entries(counts).map(([resource_id, cnt]) => ({
       resource_id,
@@ -1049,9 +1060,12 @@ describe("Resources API", () => {
     });
 
     it("sets job priority based on citation count", async () => {
-      // Pre-populate a resource with known ID and citations
+      // Pre-populate a resource with known ID, stable_id, and citations.
+      // QUA-566 Phase B.3: resource_citations.resource_id is now the resource's
+      // stable_id, so push to citationStore keyed on stable_id.
       resourceStore.set("cited-res", {
         id: "cited-res",
+        stable_id: "sid_cited-res",
         url: "https://example.com/cited",
         title: null,
         fetched_at: null,
@@ -1062,7 +1076,7 @@ describe("Resources API", () => {
       const pageIds = ["page-1", "page-2", "page-3", "page-4"];
       for (const slug of pageIds) {
         citationStore.push({
-          resource_id: "cited-res",
+          resource_id: "sid_cited-res",
           page_slug: slug,
           page_id: getIntIdForSlug(slug),
           created_at: new Date(),
@@ -1086,8 +1100,10 @@ describe("Resources API", () => {
 
     it("caps priority at 100", async () => {
       // Pre-populate resource with 25 citations → priority = min(100, 25 * 5) = 100
+      // QUA-566 Phase B.3: citations keyed by stable_id post-migration.
       resourceStore.set("popular-res", {
         id: "popular-res",
+        stable_id: "sid_popular-res",
         url: "https://example.com/popular",
         title: null,
         fetched_at: null,
@@ -1096,7 +1112,7 @@ describe("Resources API", () => {
 
       for (let i = 0; i < 25; i++) {
         citationStore.push({
-          resource_id: "popular-res",
+          resource_id: "sid_popular-res",
           page_slug: `page-${i}`,
           page_id: getIntIdForSlug(`page-${i}`),
           created_at: new Date(),
