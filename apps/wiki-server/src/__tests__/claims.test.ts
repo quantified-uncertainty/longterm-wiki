@@ -204,24 +204,36 @@ let claimStore: Array<{
   verification_job_id: number | null;
 }>;
 let jobStore: Array<{ id: number; type: string; params: unknown }>;
+// QUA-573: per-test fixtures for the resources-lookup dispatcher.
+//   resourceRows: rows that exist in the "resources" table (id, stable_id). The
+//     dispatcher matches the query's `id = ANY($1) OR stable_id = ANY($2)` shape.
+//   null stable_id simulates a row with no canonical stable_id assigned.
+let resourceRows: Array<{ id: string; stable_id: string | null }> | null = null;
 
 function resetStores() {
   claimStore = [];
   jobStore = [];
   nextClaimId = 1;
   nextJobId = 1;
+  resourceRows = null;
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
-  // ---- SELECT resources WHERE id = ANY(...) (resource validation) ----
+  // ---- SELECT resources WHERE id = ANY(...) OR stable_id = ANY(...) ----
+  // QUA-573: propose resolves hex16 OR sid_ to stable_id before insert.
+  // When `resourceRows` is set, match inputs against its id/stable_id columns
+  // (mirrors real PG behavior). Otherwise fall back to identity mapping for
+  // legacy tests that only care about the insert path.
   if (q.includes("from resources") && q.includes("where")) {
-    // Return all requested IDs as existing (pass validation)
-    if (Array.isArray(params[0])) {
-      return (params[0] as string[]).map((id) => ({ id }));
+    const ids = Array.isArray(params[0]) ? (params[0] as string[]) : params.filter((p) => typeof p === "string") as string[];
+    const ids2 = Array.isArray(params[1]) ? (params[1] as string[]) : [];
+    const all = [...new Set([...ids, ...ids2])].filter((id) => !id.startsWith("missing:"));
+    if (resourceRows) {
+      return resourceRows.filter((r) => all.includes(r.id) || (r.stable_id !== null && all.includes(r.stable_id)));
     }
-    return params.map((p) => ({ id: p }));
+    return all.map((id) => ({ id, stable_id: id }));
   }
 
   // ---- INSERT INTO proposed_claims (batch via unnest) ----
@@ -459,6 +471,86 @@ describe("Claims API — POST /api/claims/propose", () => {
     // NOT jobCount * SECONDS_PER_CLAIM (3 * 3 = 9)
     expect(body.estimatedSourcingTime).toBe(4 * SECONDS_PER_CLAIM_ESTIMATE);
     expect(body.estimatedSourcingTime).not.toBe(body.jobCount * SECONDS_PER_CLAIM_ESTIMATE);
+  });
+
+  // QUA-573 Phase B.1c: proposed_claims.resource_id references resources.stable_id.
+  // Accept either resources.id (legacy hex16) or stable_id (canonical sid_) in the
+  // request; persist the resolved stable_id.
+  describe("QUA-573: resource_id ↔ stable_id translation", () => {
+    it("translates incoming hex16 resource_id to stable_id before insert", async () => {
+      resourceRows = [{ id: "aebe92781f2a19fb", stable_id: "sid_AbCd012345" }];
+      const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
+        targetTable: "facts",
+        claims: [
+          { claimText: "c", sourceUrl: "https://a.com", resourceId: "aebe92781f2a19fb" },
+        ],
+      });
+      expect(res.status).toBe(201);
+      // The stored value must be the canonical stable_id, NOT the hex16 input.
+      expect(claimStore).toHaveLength(1);
+      expect(claimStore[0].resource_id).toBe("sid_AbCd012345");
+    });
+
+    it("accepts incoming sid_ resource_id and stores it unchanged", async () => {
+      // Row's hex16 id is DIFFERENT from input; the resolver must match via stable_id.
+      resourceRows = [{ id: "aebe92781f2a19fb", stable_id: "sid_AbCd012345" }];
+      const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
+        targetTable: "facts",
+        claims: [
+          { claimText: "c", sourceUrl: "https://a.com", resourceId: "sid_AbCd012345" },
+        ],
+      });
+      expect(res.status).toBe(201);
+      expect(claimStore[0].resource_id).toBe("sid_AbCd012345");
+    });
+
+    it("dedupes when the same resource is referenced by both hex16 and sid_ in one batch", async () => {
+      resourceRows = [{ id: "aebe92781f2a19fb", stable_id: "sid_AbCd012345" }];
+      const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
+        targetTable: "facts",
+        claims: [
+          { claimText: "c1", sourceUrl: "https://a.com", resourceId: "aebe92781f2a19fb" },
+          { claimText: "c2", sourceUrl: "https://b.com", resourceId: "sid_AbCd012345" },
+        ],
+      });
+      expect(res.status).toBe(201);
+      expect(claimStore).toHaveLength(2);
+      // Both rows must resolve to the same canonical stable_id.
+      expect(claimStore[0].resource_id).toBe("sid_AbCd012345");
+      expect(claimStore[1].resource_id).toBe("sid_AbCd012345");
+    });
+
+    it("rejects a resource_id that matches neither id nor stable_id", async () => {
+      // The dispatcher returns no row for inputs prefixed "missing:".
+      const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
+        targetTable: "facts",
+        claims: [
+          { claimText: "c", sourceUrl: "https://a.com", resourceId: "missing:foo" },
+        ],
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.message).toMatch(/Resource IDs not found/);
+      expect(body.message).toMatch(/missing:foo/);
+    });
+
+    it("rejects a resource_id whose stable_id is null", async () => {
+      resourceRows = [{ id: "orphan-hex16", stable_id: null }];
+      const res = await postJson(app, "/api/claims/propose", {
+        entityId: "test-entity",
+        targetTable: "facts",
+        claims: [
+          { claimText: "c", sourceUrl: "https://a.com", resourceId: "orphan-hex16" },
+        ],
+      });
+      expect(res.status).toBe(400);
+      const body = await res.json();
+      expect(body.message).toMatch(/Resource IDs not found/);
+    });
   });
 
   it("returns 201 with correct structure for a basic propose request", async () => {
