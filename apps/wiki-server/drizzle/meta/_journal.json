@@ -1345,6 +1345,13 @@
       "when": 1785916800002,
       "tag": "0191_qua_568_sce_resource_id_to_stable_id",
       "breakpoints": true
+    },
+    {
+      "idx": 192,
+      "version": "7",
+      "when": 1786003200000,
+      "tag": "0192_qua_569_page_citations_resource_id_to_stable_id",
+      "breakpoints": true
     }
   ]
 }

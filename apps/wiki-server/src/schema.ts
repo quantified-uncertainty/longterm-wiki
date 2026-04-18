@@ -1665,7 +1665,13 @@ export const pageCitations = pgTable(
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-569 Phase B.6: references resources.stable_id (canonical sid_<10>)
+    // as of migration 0192. Previously referenced resources.id (legacy hex16)
+    // via a DUPLICATE FK pair (_fkey + _resources_id_fk) — both were dropped
+    // in the same migration and replaced with a single SET NULL FK to stable_id.
+    // Column name stays `resource_id` to match the Phase B in-place pattern
+    // (QUA-549), so all read/write callsites keep their shape.
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),

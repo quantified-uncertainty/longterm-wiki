@@ -104,12 +104,14 @@ const app = new Hono()
       return validationError(c, `Page not found: ${parsed.data.pageId}`);
     }
 
-    // Verify resource exists if provided
+    // Verify resource exists if provided.
+    // QUA-569 Phase B.6: check against resources.stable_id (sid_<10>), matching
+    // the new FK on page_citations.resource_id (migration 0192).
     if (parsed.data.resourceId) {
       const missingResources = await checkRefsExist(
         db,
         resources,
-        resources.id,
+        resources.stableId,
         [parsed.data.resourceId]
       );
       if (missingResources.length > 0) {
@@ -164,7 +166,8 @@ const app = new Hono()
       return validationError(c, `Pages not found: ${missingPages.join(", ")}`);
     }
 
-    // Verify all resources exist (if any provided)
+    // Verify all resources exist (if any provided).
+    // QUA-569 Phase B.6: same stable_id check as the singleton /citation path.
     const resourceIds = [
       ...new Set(
         parsed.data.items
@@ -173,7 +176,7 @@ const app = new Hono()
       ),
     ];
     if (resourceIds.length > 0) {
-      const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+      const missingResources = await checkRefsExist(db, resources, resources.stableId, resourceIds);
       if (missingResources.length > 0) {
         return validationError(c, `Resources not found: ${missingResources.join(", ")}`);
       }
