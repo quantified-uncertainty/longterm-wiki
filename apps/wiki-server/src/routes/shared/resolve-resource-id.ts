@@ -16,9 +16,7 @@
  * `POST /claims/propose` (QUA-573 Phase B.1c). See QUA-601.
  */
 
-import { getDb } from "../../db.js";
-
-type RawDb = ReturnType<typeof getDb>;
+type RawDb = ReturnType<typeof import("../../db.js").getDb>;
 
 export interface ResolveResourceIdsResult {
   /** Bi-directional map: both hex16 and sid_ input forms → canonical stable_id. */

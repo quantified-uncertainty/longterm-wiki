@@ -17,8 +17,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
   if (q.includes("from resources") && q.includes("where id = any") && q.includes("stable_id = any")) {
-    // Both id = ANY($1) and stable_id = ANY($2) — postgres.js tagged template
-    // splits values into separate params. We receive them as two arrays.
+    // Each ${unique} interpolation produces a separate bind parameter; postgres.js
+    // passes the same array twice (params[0] and params[1]) because the helper
+    // interpolates it twice. We check either side to mirror the OR.
     const idSet = new Set(params[0] as string[]);
     const stableSet = new Set(params[1] as string[]);
     const out: ResourceRow[] = [];
