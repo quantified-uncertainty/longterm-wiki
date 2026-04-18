@@ -28,6 +28,7 @@ function makeConfig(overrides: Partial<Config> = {}): Config {
         keep: 100,
       },
       sessionSweep: { enabled: true, schedule: "0 */4 * * *" },
+      activeAgentsSweep: { enabled: false, schedule: "*/30 * * * *" },
       dataQualitySnapshot: { enabled: true, schedule: "0 6 * * *" },
       jobWorkerHealth: { enabled: true, schedule: "*/5 * * * *" },
       autoUpdateEnqueue: {

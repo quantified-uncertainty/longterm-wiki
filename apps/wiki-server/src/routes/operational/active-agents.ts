@@ -317,9 +317,16 @@ const activeAgentsApp = new Hono()
     const cutoff = new Date(Date.now() - timeoutMinutes * 60 * 1000);
     const db = getDrizzleDb();
 
+    // QUA-584: also set completed_at = heartbeat_at so the row carries the
+    // session's actual end time (last sign of life), not the sweep time.
+    // Dashboards can then compute session duration even for abandoned sessions.
     const stale = await db
       .update(activeAgents)
-      .set({ status: "stale", updatedAt: new Date() })
+      .set({
+        status: "stale",
+        completedAt: sql`${activeAgents.heartbeatAt}`,
+        updatedAt: new Date(),
+      })
       .where(
         and(
           eq(activeAgents.status, "active"),

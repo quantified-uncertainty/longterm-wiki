@@ -35,6 +35,7 @@ export interface Config {
     githubShadowbanCheck: ShadowbanCheckConfig;
     snapshotRetention: SnapshotRetentionConfig;
     sessionSweep: TaskConfig;
+    activeAgentsSweep: TaskConfig;
     dataQualitySnapshot: TaskConfig;
     jobWorkerHealth: TaskConfig;
     autoUpdateEnqueue: AutoUpdateEnqueueConfig;
@@ -115,6 +116,16 @@ export function loadConfig(): Config {
         enabled: envBool("TASK_SESSION_SWEEP_ENABLED", true),
         schedule:
           process.env["TASK_SESSION_SWEEP_SCHEDULE"] ?? "0 */4 * * *", // every 4 hours
+      },
+      activeAgentsSweep: {
+        // QUA-584: parallel sweep for the active_agents table (live agent
+        // registry). The session-sweep task only handles agent_sessions; the
+        // active_agents table accumulated 77/81 phantom rows because no
+        // sweep was scheduled. 30 min cadence with a 60 min stale threshold
+        // means abandoned sessions are reflected in dashboards within an hour.
+        enabled: envBool("TASK_ACTIVE_AGENTS_SWEEP_ENABLED", true),
+        schedule:
+          process.env["TASK_ACTIVE_AGENTS_SWEEP_SCHEDULE"] ?? "*/30 * * * *", // every 30 min
       },
       dataQualitySnapshot: {
         enabled: envBool("TASK_DATA_QUALITY_SNAPSHOT_ENABLED", true),
