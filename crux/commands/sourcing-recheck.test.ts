@@ -155,6 +155,45 @@ describe('sourcing-recheck --verdict', () => {
     expect(mockListVerdicts).toHaveBeenCalledTimes(1);
   });
 
+  it('shrinks the final page request to remaining itemLimit (mid-page truncation)', async () => {
+    // itemLimit=250 → page 1 asks for 200, page 2 asks for 50 (not another 200).
+    const page1 = Array.from({ length: 200 }, (_, i) => makeVerdict({ recordId: `g_${i}` }));
+    const page2 = Array.from({ length: 50 }, (_, i) => makeVerdict({ recordId: `g_${200 + i}` }));
+    mockListVerdicts
+      .mockResolvedValueOnce({ ok: true, data: { verdicts: page1, total: 2000 } })
+      .mockResolvedValueOnce({ ok: true, data: { verdicts: page2, total: 2000 } });
+
+    await recheck([], {
+      verdict: 'partial',
+      limit: '250',
+      budget: '10',
+      'dry-run': true,
+    } as never);
+    expect(mockListVerdicts).toHaveBeenCalledTimes(2);
+    expect(mockListVerdicts).toHaveBeenNthCalledWith(1, expect.objectContaining({ limit: 200, offset: 0 }));
+    expect(mockListVerdicts).toHaveBeenNthCalledWith(2, expect.objectContaining({ limit: 50, offset: 200 }));
+  });
+
+  it('aborts if pagination exceeds MAX_ITERATIONS (broken server metadata)', async () => {
+    // Simulate a broken server that returns 1 row but claims total=99999
+    // every time. Without a max-iterations guard, the command would loop
+    // until it hit --limit. With the guard, it aborts at 100 iterations.
+    mockListVerdicts.mockResolvedValue({
+      ok: true,
+      data: { verdicts: [makeVerdict()], total: 99999 },
+    });
+    const result = await recheck([], {
+      verdict: 'partial',
+      limit: '100000',
+      budget: '1000',
+      'dry-run': true,
+    } as never);
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toMatch(/pagination exceeded/i);
+    // Should have bailed well before the --limit of 100000 would naturally stop it.
+    expect(mockListVerdicts.mock.calls.length).toBeLessThanOrEqual(101);
+  });
+
   it('returns a friendly message when no verdicts match', async () => {
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,

@@ -342,11 +342,19 @@ async function recheckCommand(
     // a large --limit silently returns only the first 200 and subsequent
     // rows never get processed.
     const PAGE_SIZE = 200;
-    const priority = VERDICT_PRIORITY[verdictFilter] ?? 0;
+    const MAX_ITERATIONS = 100; // Hard cap on pagination loops — with PAGE_SIZE=200, this is up to 20k rows. If we hit this, something's wrong upstream (server returning stale pages, total field undefined, etc.) — better to fail loud than hang.
+    const priority = VERDICT_PRIORITY[verdictFilter];
     const collected: DueItem[] = [];
     let serverTotal = 0;
     let offset = 0;
+    let iterations = 0;
     while (collected.length < itemLimit) {
+      if (iterations++ >= MAX_ITERATIONS) {
+        return {
+          exitCode: 1,
+          output: `Pagination exceeded ${MAX_ITERATIONS} iterations — server may be returning malformed pagination metadata.`,
+        };
+      }
       const pageSize = Math.min(PAGE_SIZE, itemLimit - collected.length);
       const response = await listVerdicts({
         verdict: verdictFilter,
