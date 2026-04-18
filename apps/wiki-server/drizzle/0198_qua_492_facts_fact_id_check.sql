@@ -14,36 +14,60 @@
 -- ## Prod enumeration (2026-04-18, per .claude/rules/database-migrations.md
 --   § "Adding CHECK constraints on enum columns")
 --
--- /internal/data-quality snapshot #20 (2026-04-18T06:00:01Z):
+-- Strict-regex enumeration via /api/facts/export (pulls every fact_id
+-- directly from PG, tests each against the constraint regex):
 --
---   facts.fact_id distribution (total 2274):
---     canonical_f    (^f_[A-Za-z0-9]{8,}$):  2274 (100%)
---     legacy_hex8    (^[0-9a-f]{8}$):           0
---     legacy_alnum10 (^[A-Za-z0-9]{10}$):       0
---     legacy_hex16   (^[0-9a-f]{16}$):          0
---     other:                                    0
+--   Total rows:                                  2274
+--   Length distribution:                         {"12": 2274}  (f_ + 10 chars)
+--   Strict violations (!~ '^f_[A-Za-z0-9]{10}$'):   0
 --
--- YAML source enumeration (packages/factbase/data/fb-entities/*.yaml,
--- 2131 fact IDs): 100% match `^f_[A-Za-z0-9]{10}$` exactly — 12 chars total.
+-- Sanity cross-check via /internal/data-quality snapshot #20
+-- (2026-04-18T06:00:01Z), looser `{8,}` regex: 2274/2274 in canonical_f bucket.
+-- YAML source (packages/factbase/data/fb-entities/*.yaml, 2131 IDs): 100%
+-- match `^f_[A-Za-z0-9]{10}$`.
 --
 -- The generator (generateFactId() in packages/factbase/src/ids.ts) always
--- produces exactly 10 chars after the `f_` prefix. The data-quality audit
--- regex uses `{8,}` only to catch drift; this migration enforces the
--- strict `{10}` form that matches what the generator actually emits.
+-- produces exactly 10 chars after the `f_` prefix. The strict `{10}` regex
+-- matches what the generator emits; VALIDATE CONSTRAINT is confirmed safe.
 --
--- ## Safety
+-- ## Lock profile + materialized-view dependency
 --
--- facts is small (2274 rows). No materialized view depends on it (verified
--- by grep for "MATERIALIZED VIEW.*facts" under apps/wiki-server/). Lock
--- contention risk is negligible.
+-- facts is small (2274 rows). `ADD CONSTRAINT ... NOT VALID` needs ACCESS
+-- EXCLUSIVE; `VALIDATE CONSTRAINT` needs SHARE UPDATE EXCLUSIVE.
 --
--- The NOT VALID + VALIDATE CONSTRAINT split is not strictly necessary at
--- this size but is used for consistency with the pattern in
--- .claude/rules/database-migrations.md § "`ADD CONSTRAINT ... NOT VALID` +
--- separate `VALIDATE CONSTRAINT`" and to be future-proof as the table grows.
+-- The `things_search` materialized view (defined by migration 0190) reads
+-- `FROM facts f` and is REFRESH'd (CONCURRENTLY) by the hourly job at
+-- apps/wiki-server/src/routes/operational/things-search-refresh.ts with a
+-- 180s statement_timeout. A REFRESH holds ACCESS SHARE on `facts`, which
+-- conflicts with the ACCESS EXCLUSIVE that `ADD CONSTRAINT` acquires. The
+-- migration client's default `lock_timeout` is 60s — not enough to survive
+-- colliding with a long-running REFRESH. Same failure shape as QUA-302.
+--
+-- Mitigations:
+--   1. `SET LOCAL lock_timeout = '180000'` (below) extends the wait to
+--      match the REFRESH's statement_timeout.
+--   2. facts is small enough that NOT VALID is milliseconds once the lock
+--      is acquired, so the "wait-then-succeed" path is the common case.
+--
+-- ## Transaction semantics
+--
+-- Drizzle wraps each migration SQL file in a single transaction. That means
+-- both ADD CONSTRAINT (NOT VALID) and VALIDATE CONSTRAINT run inside the
+-- same transaction and the ACCESS EXCLUSIVE lock is held through VALIDATE.
+-- For a 2274-row table this is inconsequential (validation is sub-second).
+-- If `facts` grows large enough that VALIDATE becomes slow, this migration
+-- should be split into two files (0193a NOT VALID, 0193b VALIDATE) so the
+-- locks release between them. This is tracked in .claude/rules/database-migrations.md
+-- § "ADD CONSTRAINT ... NOT VALID + separate VALIDATE CONSTRAINT".
 --
 -- ADD CONSTRAINT is wrapped in a DO block with duplicate_object EXCEPTION
--- handling so the migration is idempotent — safe to re-run if interrupted.
+-- handling so a manual re-apply (outside Drizzle) is a no-op instead of an
+-- error. Drizzle itself tracks applied migrations in __drizzle_migrations
+-- and won't re-run this file on startup.
+
+-- Extend lock wait to tolerate an in-progress things_search REFRESH (180s
+-- statement_timeout there). SET LOCAL only lasts for this transaction.
+SET LOCAL lock_timeout = '180000';
 
 -- 1. Register the CHECK constraint as unchecked metadata.
 --    Acquires ACCESS EXCLUSIVE for milliseconds; no row scan.
@@ -56,5 +80,6 @@ END $$;
 
 -- 2. Validate against existing rows.
 --    Only needs SHARE UPDATE EXCLUSIVE — concurrent SELECT/INSERT/UPDATE
---    are allowed.
+--    are allowed (other than the ACCESS EXCLUSIVE already held from step 1
+--    inside this transaction; see "Transaction semantics" above).
 ALTER TABLE "facts" VALIDATE CONSTRAINT chk_facts_fact_id_format;
