@@ -73,6 +73,7 @@ function makeConfig(): Config {
       },
       snapshotRetention: { enabled: false, schedule: "0 3 * * *", keep: 100 },
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
+      activeAgentsSweep: { enabled: false, schedule: "*/30 * * * *" },
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
       jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
       autoUpdateEnqueue: {

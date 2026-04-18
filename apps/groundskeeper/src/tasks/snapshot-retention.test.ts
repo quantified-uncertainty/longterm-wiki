@@ -40,6 +40,7 @@ function makeConfig(keep = 100): Config {
       githubShadowbanCheck: { enabled: false, schedule: "0 9 * * *", usernames: [] },
       snapshotRetention: { enabled: true, schedule: "0 3 * * *", keep },
       sessionSweep: { enabled: false, schedule: "0 */4 * * *" },
+      activeAgentsSweep: { enabled: false, schedule: "*/30 * * * *" },
       dataQualitySnapshot: { enabled: false, schedule: "0 6 * * *" },
       jobWorkerHealth: { enabled: false, schedule: "*/5 * * * *" },
       autoUpdateEnqueue: { enabled: false, schedule: "0 6 * * *", budget: 30, maxPages: 5 },

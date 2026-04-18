@@ -100,7 +100,7 @@ function q(name: string): string {
 /** Dedupe FK metadata by (table, column). A column CAN be referenced by more
  *  than one FK constraint in Postgres; we keep this helper defensively even
  *  after QUA-569 reconciled the last known duplicate (page_citations.resource_id
- *  was the historical case — migration 0192 dropped its duplicate pair). */
+ *  was the historical case — migration 0193 dropped its duplicate pair). */
 export function dedupeFkColumns(fks: FkColumnInfo[]): FkColumnInfo[] {
   const seen = new Map<string, FkColumnInfo>();
   for (const f of fks) {

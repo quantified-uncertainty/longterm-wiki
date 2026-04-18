@@ -159,7 +159,7 @@ export async function convertNewFootnotes(
         url: fn.url ?? undefined,
         note: fn.rawText,
         // QUA-569 Phase B.6: page_citations.resource_id now FKs resources.stable_id
-        // (migration 0192). Write the sid_<10> form so new rows satisfy the new FK.
+        // (migration 0193). Write the sid_<10> form so new rows satisfy the new FK.
         // Back-filled rows were rewritten in the same migration.
         resourceId: fn.url ? (getResourceByUrl(fn.url)?.stable_id ?? undefined) : undefined,
       }));

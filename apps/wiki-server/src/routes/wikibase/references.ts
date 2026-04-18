@@ -106,7 +106,7 @@ const app = new Hono()
 
     // Verify resource exists if provided.
     // QUA-569 Phase B.6: check against resources.stable_id (sid_<10>), matching
-    // the new FK on page_citations.resource_id (migration 0192).
+    // the new FK on page_citations.resource_id (migration 0193).
     if (parsed.data.resourceId) {
       const missingResources = await checkRefsExist(
         db,
