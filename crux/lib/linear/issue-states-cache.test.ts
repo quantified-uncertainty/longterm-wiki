@@ -31,16 +31,24 @@ vi.mock('os', async () => {
   };
 });
 
+const originalApiKey = process.env.LINEAR_API_KEY;
+
 describe('getIssueStates', () => {
   beforeEach(() => {
     tempCacheDir = mkdtempSync(join(tmpdir(), 'crux-linear-test-'));
     tempCacheFile = join(tempCacheDir, '.cache', 'crux-linear', 'issue-states.json');
     linearGraphQLMock.mockReset();
+    process.env.LINEAR_API_KEY = 'test-key';
   });
 
   afterEach(() => {
     rmSync(tempCacheDir, { recursive: true, force: true });
     vi.resetModules();
+    if (originalApiKey === undefined) {
+      delete process.env.LINEAR_API_KEY;
+    } else {
+      process.env.LINEAR_API_KEY = originalApiKey;
+    }
   });
 
   it('returns an empty map for no identifiers without hitting the API', async () => {
@@ -134,5 +142,20 @@ describe('getIssueStates', () => {
     const mod = await import('./issue-states-cache.ts');
     const result = await mod.getIssueStates(['QUA-9'], 1_000_000);
     expect(result.get('QUA-9')).toBeNull();
+  });
+
+  it('skips the fetch entirely when LINEAR_API_KEY is missing', async () => {
+    delete process.env.LINEAR_API_KEY;
+    const mod = await import('./issue-states-cache.ts');
+    const result = await mod.getIssueStates(['QUA-1'], 1_000_000);
+    expect(result.has('QUA-1')).toBe(false);
+    expect(linearGraphQLMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses to interpolate malformed Linear IDs into the query', async () => {
+    const mod = await import('./issue-states-cache.ts');
+    await expect(
+      mod.fetchIssueStatesBatch(['QUA-1; DROP TABLE issues'] as string[]),
+    ).rejects.toThrow(/malformed Linear ID/);
   });
 });

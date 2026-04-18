@@ -11,10 +11,19 @@
  * fail because Linear is unreachable.
  */
 
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
-import { dirname, join } from 'path';
+import { join } from 'path';
 import { linearGraphQL } from './client.ts';
+
+/**
+ * Linear issue identifiers follow the `TEAM-NNN` shape (uppercase team key,
+ * hyphen, digits). We interpolate the ID directly into the batched GraphQL
+ * query string (there's no variable form for aliased fields), so validate
+ * the shape before trusting it. Belt-and-braces: parseLinearId already
+ * constrains the shape, but a broken caller shouldn't be able to inject.
+ */
+const LINEAR_ID_RE = /^[A-Z][A-Z0-9]*-\d+$/;
 
 export const CACHE_DIR = join(homedir(), '.cache', 'crux-linear');
 export const CACHE_FILE = join(CACHE_DIR, 'issue-states.json');
@@ -28,32 +37,30 @@ interface CacheEntry {
 type CacheShape = Record<string, CacheEntry>;
 
 function readCache(now: number = Date.now()): CacheShape {
-  if (!existsSync(CACHE_FILE)) return {};
+  let parsed: CacheShape;
   try {
-    const raw = readFileSync(CACHE_FILE, 'utf-8');
-    const parsed = JSON.parse(raw) as CacheShape;
-    // Drop obviously-stale entries on read to keep the file small.
-    const fresh: CacheShape = {};
-    for (const [k, v] of Object.entries(parsed)) {
-      if (
-        v &&
-        typeof v === 'object' &&
-        typeof v.fetchedAt === 'number' &&
-        now - v.fetchedAt < CACHE_TTL_MS * 10
-      ) {
-        fresh[k] = v;
-      }
-    }
-    return fresh;
+    parsed = JSON.parse(readFileSync(CACHE_FILE, 'utf-8')) as CacheShape;
   } catch {
     return {};
   }
+  const fresh: CacheShape = {};
+  for (const [k, v] of Object.entries(parsed)) {
+    if (
+      v &&
+      typeof v === 'object' &&
+      typeof v.fetchedAt === 'number' &&
+      now - v.fetchedAt < CACHE_TTL_MS * 10
+    ) {
+      fresh[k] = v;
+    }
+  }
+  return fresh;
 }
 
 function writeCache(cache: CacheShape): void {
   try {
-    if (!existsSync(CACHE_DIR)) mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(CACHE_FILE, JSON.stringify(cache, null, 2), 'utf-8');
+    mkdirSync(CACHE_DIR, { recursive: true });
+    writeFileSync(CACHE_FILE, JSON.stringify(cache), 'utf-8');
   } catch {
     // Best-effort: cache write failures shouldn't break the caller.
   }
@@ -79,6 +86,12 @@ export async function fetchIssueStatesBatch(
 ): Promise<Map<string, string | null>> {
   const result = new Map<string, string | null>();
   if (identifiers.length === 0) return result;
+
+  for (const id of identifiers) {
+    if (!LINEAR_ID_RE.test(id)) {
+      throw new Error(`Refusing to fetch malformed Linear ID: ${JSON.stringify(id)}`);
+    }
+  }
 
   const parts = identifiers.map(
     (id) =>
@@ -125,6 +138,10 @@ export async function getIssueStates(
   }
 
   if (toFetch.length === 0) return result;
+
+  // Skip the network call when there's no API key — linearGraphQL would
+  // throw, but we'd still pay for a wasted fetch setup + 15s timeout.
+  if (!process.env.LINEAR_API_KEY) return result;
 
   try {
     const fetched = await fetchIssueStatesBatch(toFetch);

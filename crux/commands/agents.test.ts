@@ -82,13 +82,12 @@ describe('collectLinearIds', () => {
       agentFixture({ id: 4, branch: 'claude/fix-239-something' }),
       agentFixture({ id: 5, branch: null }),
     ];
-    const { linearIds, uniqueIds } = collectLinearIds(agents);
+    const linearIds = collectLinearIds(agents);
     expect(linearIds.get(1)).toBe('QUA-580');
     expect(linearIds.get(2)).toBe('QUA-564');
     expect(linearIds.get(3)).toBeNull();
     expect(linearIds.get(4)).toBeNull();
     expect(linearIds.get(5)).toBeNull();
-    expect(uniqueIds.sort()).toEqual(['QUA-564', 'QUA-580']);
   });
 
   it('prefers the server-provided linearId over branch parsing', () => {
@@ -96,24 +95,14 @@ describe('collectLinearIds', () => {
       agentFixture({ id: 1, branch: 'main', linearId: 'QUA-42' }),
       agentFixture({ id: 2, branch: 'claude/qua-100-x', linearId: 'QUA-200' }),
     ];
-    const { linearIds } = collectLinearIds(agents);
+    const linearIds = collectLinearIds(agents);
     expect(linearIds.get(1)).toBe('QUA-42');
     expect(linearIds.get(2)).toBe('QUA-200');
   });
 
-  it('deduplicates repeated Linear IDs across agents', () => {
-    const agents = [
-      agentFixture({ id: 1, branch: 'claude/qua-100-a' }),
-      agentFixture({ id: 2, branch: 'claude/qua-100-b' }),
-    ];
-    const { uniqueIds } = collectLinearIds(agents);
-    expect(uniqueIds).toEqual(['QUA-100']);
-  });
-
   it('handles an empty agent list', () => {
-    const { linearIds, uniqueIds } = collectLinearIds([]);
+    const linearIds = collectLinearIds([]);
     expect(linearIds.size).toBe(0);
-    expect(uniqueIds).toEqual([]);
   });
 });
 

@@ -97,28 +97,22 @@ function formatAgent(
 }
 
 /**
- * Build the `identifier → state` map for all agents whose branch contains
- * a Linear ticket reference. Returns two maps:
- *   - `linearIds`: agent-id → Linear identifier (or null)
- *   - `states`: Linear identifier → state name (or null if Linear doesn't know)
+ * Map each agent's id to its Linear ticket identifier (or `null` if none
+ * is detectable). Prefers the server-provided `linearId` from the
+ * authoritative `agent_sessions` row over branch-name parsing, so that
+ * agents registered without a session (job workers, ad-hoc registrations)
+ * still get a best-effort match from the branch.
  *
  * Exported for tests.
  */
 export function collectLinearIds(
   agents: readonly ActiveAgentEntry[],
-): { linearIds: Map<number, string | null>; uniqueIds: string[] } {
+): Map<number, string | null> {
   const linearIds = new Map<number, string | null>();
-  const unique = new Set<string>();
   for (const agent of agents) {
-    // Prefer the server-provided Linear ID (populated from the authoritative
-    // agent_sessions row during `crux linear start`); fall back to parsing
-    // the branch name for agents that registered without a session (e.g.
-    // job workers, ad-hoc registrations).
-    const id = agent.linearId ?? parseLinearId(agent.branch);
-    linearIds.set(agent.id, id);
-    if (id) unique.add(id);
+    linearIds.set(agent.id, agent.linearId ?? parseLinearId(agent.branch));
   }
-  return { linearIds, uniqueIds: Array.from(unique) };
+  return linearIds;
 }
 
 async function checkServer(): Promise<CommandResult | null> {
@@ -207,17 +201,22 @@ async function statusCommand(
 
   const { agents, conflicts, directoryConflicts } = result.data;
 
-  const { linearIds, uniqueIds } = collectLinearIds(agents);
+  const linearIds = collectLinearIds(agents);
+  const uniqueIds = [...new Set([...linearIds.values()].filter((id): id is string => id !== null))];
   const states = await getIssueStates(uniqueIds);
+
+  const annotationFor = (agent: ActiveAgentEntry): AgentAnnotation => {
+    const linearId = linearIds.get(agent.id) ?? null;
+    return {
+      linearId,
+      linearState: linearId ? states.get(linearId) ?? null : null,
+    };
+  };
 
   if (options.json) {
     const enriched = {
       ...result.data,
-      agents: agents.map((a) => {
-        const linearId = linearIds.get(a.id) ?? null;
-        const linearState = linearId ? states.get(linearId) ?? null : null;
-        return { ...a, linearId, linearState };
-      }),
+      agents: agents.map((a) => ({ ...a, ...annotationFor(a) })),
     };
     return { exitCode: 0, output: JSON.stringify(enriched, null, 2) };
   }
@@ -228,9 +227,7 @@ async function statusCommand(
 
   let output = `${log.colors.bold}Active Agents (${agents.length})${log.colors.reset}\n\n`;
   for (const agent of agents) {
-    const linearId = linearIds.get(agent.id) ?? null;
-    const linearState = linearId ? states.get(linearId) ?? null : null;
-    output += formatAgent(agent, log.colors, { linearId, linearState }) + '\n\n';
+    output += formatAgent(agent, log.colors, annotationFor(agent)) + '\n\n';
   }
 
   if (conflicts.length > 0) {
