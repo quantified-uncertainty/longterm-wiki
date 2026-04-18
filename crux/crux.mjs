@@ -99,6 +99,7 @@ import * as sourcingAuditUrlsCommands from './commands/sourcing-audit-urls.ts';
 import * as sourcingBackfillHomepagesCommands from './commands/sourcing-backfill-homepages.ts';
 import * as sourcingSampleCoverageCommands from './commands/sourcing-sample-coverage.ts';
 import * as sourcingSuggestUrlsCommands from './commands/sourcing-suggest-urls.ts';
+import * as sourcingApplySuggestionsCommands from './commands/sourcing-apply-suggestions.ts';
 import * as sourcingCleanupOrphansCommands from './commands/sourcing-cleanup-orphans.ts';
 import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
@@ -192,6 +193,7 @@ const domains = {
   'sourcing-backfill-homepages': sourcingBackfillHomepagesCommands,
   'sourcing-sample-coverage': sourcingSampleCoverageCommands,
   'sourcing-suggest-urls': sourcingSuggestUrlsCommands,
+  'sourcing-apply-suggestions': sourcingApplySuggestionsCommands,
   'sourcing-cleanup-orphans': sourcingCleanupOrphansCommands,
   'migrate-citations': migrateCitationsCommands,
   'sourcing-wiki-pages': sourcingWikiPagesCommands,
