@@ -8,6 +8,7 @@ import { registerAsActiveAgent, sendHeartbeat } from "./wiki-server.js";
 import { githubShadowbanCheck } from "./tasks/github-shadowban-check.js";
 import { snapshotRetention } from "./tasks/snapshot-retention.js";
 import { sessionSweep } from "./tasks/session-sweep.js";
+import { activeAgentsSweep } from "./tasks/active-agents-sweep.js";
 import { dataQualitySnapshot } from "./tasks/data-quality-snapshot.js";
 import { jobWorkerHealth } from "./tasks/job-worker-health.js";
 import { autoUpdateEnqueue } from "./tasks/auto-update-enqueue.js";
@@ -44,6 +45,10 @@ logger.info({
     sessionSweep: {
       enabled: config.tasks.sessionSweep.enabled,
       schedule: config.tasks.sessionSweep.schedule,
+    },
+    activeAgentsSweep: {
+      enabled: config.tasks.activeAgentsSweep.enabled,
+      schedule: config.tasks.activeAgentsSweep.schedule,
     },
     dataQualitySnapshot: {
       enabled: config.tasks.dataQualitySnapshot.enabled,
@@ -120,6 +125,14 @@ registerTask(
   config.tasks.sessionSweep.schedule,
   config.tasks.sessionSweep.enabled,
   () => sessionSweep(config)
+);
+
+registerTask(
+  config,
+  "active-agents-sweep",
+  config.tasks.activeAgentsSweep.schedule,
+  config.tasks.activeAgentsSweep.enabled,
+  () => activeAgentsSweep(config)
 );
 
 registerTask(

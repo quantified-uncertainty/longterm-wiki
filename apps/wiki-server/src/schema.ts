@@ -1665,7 +1665,13 @@ export const pageCitations = pgTable(
     title: varchar("title"),
     url: varchar("url"),
     note: text("note"),
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-569 Phase B.6: references resources.stable_id (canonical sid_<10>)
+    // as of migration 0193. Previously referenced resources.id (legacy hex16)
+    // via a DUPLICATE FK pair (_fkey + _resources_id_fk) — both were dropped
+    // in the same migration and replaced with a single SET NULL FK to stable_id.
+    // Column name stays `resource_id` to match the Phase B in-place pattern
+    // (QUA-549), so all read/write callsites keep their shape.
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     createdAt: timestamp("created_at", { withTimezone: true }).defaultNow(),
@@ -3478,8 +3484,10 @@ export const blueskyPosts = pgTable(
     embeddedTitle: text("embedded_title"),
     /** URI of the post this is replying to */
     replyToUri: text("reply_to_uri"),
-    /** FK to resources — links this post to a known resource by embedded URL */
-    resourceId: text("resource_id").references(() => resources.id, {
+    /** FK to resources.stable_id — links this post to a known resource by embedded URL.
+     *  QUA-572 Phase B.1b: swapped from resources.id → resources.stableId (in-place;
+     *  column name kept as `resource_id`). See migration 0192. */
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     /** Entity stableIds this post is about */

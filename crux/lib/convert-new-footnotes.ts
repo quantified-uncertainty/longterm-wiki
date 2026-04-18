@@ -158,7 +158,10 @@ export async function convertNewFootnotes(
         title: fn.title ?? undefined,
         url: fn.url ?? undefined,
         note: fn.rawText,
-        resourceId: fn.url ? (getResourceByUrl(fn.url)?.id ?? undefined) : undefined,
+        // QUA-569 Phase B.6: page_citations.resource_id now FKs resources.stable_id
+        // (migration 0193). Write the sid_<10> form so new rows satisfy the new FK.
+        // Back-filled rows were rewritten in the same migration.
+        resourceId: fn.url ? (getResourceByUrl(fn.url)?.stable_id ?? undefined) : undefined,
       }));
 
       if (citationInserts.length > 0) {
@@ -226,7 +229,8 @@ export async function createDbEntriesForRcFootnotes(
       title: mdLink?.[1] ?? undefined,
       url: resolvedUrl ?? undefined,
       note: entry.rawText,
-      resourceId: resolvedUrl ? (getResourceByUrl(resolvedUrl)?.id ?? undefined) : undefined,
+      // QUA-569 Phase B.6: write the sid_<10> form (see above at the rc-footnote insert).
+      resourceId: resolvedUrl ? (getResourceByUrl(resolvedUrl)?.stable_id ?? undefined) : undefined,
     };
   });
 
