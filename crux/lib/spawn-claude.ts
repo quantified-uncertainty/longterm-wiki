@@ -79,7 +79,7 @@ export function spawnClaude(
   opts: SpawnClaudeOptions = {},
 ): ChildProcess {
   const { extraEnv, keepApiKey, env, ...rest } = opts;
-  const childEnv = buildClaudeChildEnv(env as NodeJS.ProcessEnv | undefined, extraEnv, keepApiKey);
+  const childEnv = buildClaudeChildEnv(env, extraEnv, keepApiKey);
   return spawn('claude', args, { ...rest, env: childEnv });
 }
 
@@ -89,6 +89,6 @@ export function spawnClaudeSync(
   opts: SpawnClaudeSyncOptions = {},
 ): SpawnSyncReturns<Buffer | string> {
   const { extraEnv, keepApiKey, env, ...rest } = opts;
-  const childEnv = buildClaudeChildEnv(env as NodeJS.ProcessEnv | undefined, extraEnv, keepApiKey);
+  const childEnv = buildClaudeChildEnv(env, extraEnv, keepApiKey);
   return spawnSync('claude', args, { ...rest, env: childEnv });
 }

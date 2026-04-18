@@ -32,6 +32,14 @@ const WRAPPER_FILE = 'crux/lib/spawn-claude.ts';
  * either a quote (closing the string) or space (for exec-style calls where
  * args are concatenated into the command string) to avoid matching
  * `claude-foo`, `claudex`, etc.
+ *
+ * Uses \s (not just space) so prettier-formatted multi-line calls like
+ *   spawn(\n  'claude',\n  args,\n)
+ * are still caught after line concatenation.
+ *
+ * Known gaps (NOT caught): aliased imports like `const {spawn: sp} = ...;
+ * sp('claude', ...)`, or variable-named commands like `const bin = 'claude';
+ * spawn(bin, ...)`. Code review covers these.
  */
 const PATTERNS: Array<{ name: string; re: RegExp }> = [
   { name: 'spawn', re: /\bspawn\s*\(\s*['"`]claude['"`]/ },
@@ -82,28 +90,40 @@ function collectTsFiles(dir: string): string[] {
   return results;
 }
 
+/** Strip line/block comments so commented-out spawns don't trip the scan. */
+function stripComments(content: string): string {
+  // Remove block comments first (may span lines), then line comments.
+  return content
+    .replace(/\/\*[\s\S]*?\*\//g, (m) => m.replace(/[^\n]/g, ' '))
+    .replace(/(^|[^:/])\/\/[^\n]*/g, (_m, prefix: string) => prefix);
+}
+
 export function checkFileContent(content: string, relPath: string): Violation[] {
   if (relPath === WRAPPER_FILE) return [];
 
+  const stripped = stripComments(content);
   const lines = content.split('\n');
   const violations: Violation[] = [];
+  const seenLines = new Set<number>();
 
-  for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    const trimmed = line.trimStart();
-
-    if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
-      continue;
-    }
-
-    for (const { name, re } of PATTERNS) {
-      if (re.test(line)) {
-        violations.push({ file: relPath, line: i + 1, text: trimmed, kind: name });
-        break;
-      }
+  // Whole-content scan catches multi-line `spawn(\n 'claude', ...)` formatting.
+  for (const { name, re } of PATTERNS) {
+    const global = new RegExp(re.source, 'g');
+    let m: RegExpExecArray | null;
+    while ((m = global.exec(stripped)) !== null) {
+      const lineIdx = stripped.slice(0, m.index).split('\n').length - 1;
+      if (seenLines.has(lineIdx)) continue;
+      seenLines.add(lineIdx);
+      violations.push({
+        file: relPath,
+        line: lineIdx + 1,
+        text: (lines[lineIdx] ?? '').trimStart(),
+        kind: name,
+      });
     }
   }
 
+  violations.sort((a, b) => a.line - b.line);
   return violations;
 }
 

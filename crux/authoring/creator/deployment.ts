@@ -6,6 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import { spawnClaude } from '../../lib/spawn-claude.ts';
 import { appendEditLog, getDefaultRequestedBy } from '../../lib/session/edit-log.ts';
 import type { DeployPhaseContext, ValidationPhaseContext } from './types.ts';
 import { ENTITY_LINK_RE, WIKI_ID_RE, FOOTNOTE_REF_RE, FOOTNOTE_DEF_RE } from '../../lib/patterns.ts';
@@ -225,8 +226,6 @@ You are a skeptical editor doing a final quality check. Look specifically for:
 Write findings to: ${path.join(getTopicDir(topic), 'review.json')}
 
 If you find any logicalIssues or temporalArtifacts, also fix them directly in the draft file.`;
-
-  const { spawnClaude } = await import('../../lib/spawn-claude.ts');
 
   // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
   const env = { ...process.env };

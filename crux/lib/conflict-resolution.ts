@@ -16,6 +16,7 @@
  */
 
 import { execFileSync } from 'child_process';
+import { spawnClaudeSync } from './spawn-claude.ts';
 import { readFileSync, existsSync } from 'fs';
 import { githubApi, REPO } from './github.ts';
 
@@ -579,28 +580,26 @@ Instructions:
 5. Only fix what's needed to pass validation — do not make unrelated changes
 6. Stage your changes with git add but do NOT commit or push`;
 
-  try {
-    execFileSync(
-      'claude',
-      [
-        '-p',
-        prompt,
-        '--model',
-        'sonnet',
-        '--max-turns',
-        '10',
-        '--dangerously-skip-permissions',
-        '--verbose',
-      ],
-      {
-        encoding: 'utf-8',
-        stdio: 'inherit',
-        timeout: 10 * 60 * 1000, // 10 minute timeout
-      },
-    );
-  } catch (e: unknown) {
-    const err = e as { stdout?: string; stderr?: string };
-    console.error('Tier 2 Claude Code agent failed:', (err.stderr || err.stdout || '').slice(-300));
+  const claudeResult = spawnClaudeSync(
+    [
+      '-p',
+      prompt,
+      '--model',
+      'sonnet',
+      '--max-turns',
+      '10',
+      '--dangerously-skip-permissions',
+      '--verbose',
+    ],
+    {
+      encoding: 'utf-8',
+      stdio: 'inherit',
+      timeout: 10 * 60 * 1000, // 10 minute timeout
+    },
+  );
+  if (claudeResult.status !== 0 || claudeResult.error) {
+    const tail = ((claudeResult.stderr as unknown as string) || (claudeResult.stdout as unknown as string) || '').slice(-300);
+    console.error('Tier 2 Claude Code agent failed:', tail);
     return { ok: false };
   }
 

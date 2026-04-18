@@ -86,6 +86,24 @@ describe('validate-no-raw-claude-spawn pattern detection', () => {
     expect(v.length).toBe(1);
     expect(v[0].line).toBe(3);
   });
+
+  it('flags multi-line prettier-formatted spawn calls', () => {
+    const v = checkFileContent(
+      `const child = spawn(\n  'claude',\n  ['-p'],\n  { cwd },\n);`,
+      'crux/example.ts',
+    );
+    expect(v.length).toBe(1);
+    expect(v[0].kind).toBe('spawn');
+    expect(v[0].line).toBe(1);
+  });
+
+  it('strips block comments before scanning', () => {
+    const v = checkFileContent(
+      `/* example: spawn('claude', []); */\n`,
+      'crux/example.ts',
+    );
+    expect(v.length).toBe(0);
+  });
 });
 
 describe('validate-no-raw-claude-spawn against current codebase', () => {

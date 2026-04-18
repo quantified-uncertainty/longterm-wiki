@@ -87,14 +87,16 @@ describe('spawnClaudeSync (integration)', () => {
     }
   });
 
-  it('spawns a child process (ENOENT returned cleanly if claude not installed)', () => {
+  it('returns a SpawnSyncReturns shape without throwing when claude is absent', () => {
     process.env.ANTHROPIC_API_KEY = 'sk-test';
-    // We pass an invalid binary via PATH manipulation to avoid actually calling claude.
-    // But spawnSync with a missing binary returns error.code === 'ENOENT', it doesn't throw.
-    const result = spawnClaudeSync(['--version'], { timeout: 2000 });
-    // Either the binary runs (status: 0) or it's missing (error ENOENT) — both are valid
-    // for verifying the wrapper doesn't throw or hang.
-    expect(typeof result).toBe('object');
+    // Override PATH so `claude` is definitively not found — isolates the test
+    // from whether the CLI happens to be installed on the runner.
+    const result = spawnClaudeSync(['--version'], {
+      env: { PATH: '/nonexistent' },
+      timeout: 2000,
+    });
     expect(result).toHaveProperty('status');
+    expect(result).toHaveProperty('error');
+    expect((result.error as NodeJS.ErrnoException)?.code).toBe('ENOENT');
   });
 });
