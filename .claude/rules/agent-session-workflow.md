@@ -35,6 +35,28 @@ If an open PR already targets the same failure, do NOT create a competing branch
 
 This prevents the duplicate-work pattern where multiple agents independently race to fix the same trivial CI break, wasting CI runs and creating abandoned PRs (e.g., 7 competing PRs for a single 5-line test fix on 2026-04-03).
 
+### Checking for active sessions before starting
+
+Before beginning non-trivial work — especially before dispatching an agent to another slot — check which Claude Code sessions are already in flight. `crux sys sessions list` (QUA-413) is the canonical way to see this:
+
+```bash
+WIKI_SERVER_ENV=prod pnpm crux sys sessions list                   # active sessions across all slots
+WIKI_SERVER_ENV=prod pnpm crux sys sessions list --all             # include completed history
+WIKI_SERVER_ENV=prod pnpm crux sys sessions list --linear=QUA-NNN  # "is anyone working on QUA-NNN?"
+WIKI_SERVER_ENV=prod pnpm crux sys sessions list --slot=9          # what's slot a9 doing?
+WIKI_SERVER_ENV=prod pnpm crux sys sessions list --json            # machine-readable for scripting
+```
+
+The command reads the PG `agent_sessions` table (authoritative: who registered via `agent-checklist init`) and cross-references it with local `claude` processes found via `ps` + `lsof`. Output uses five liveness states:
+
+- `●` **live** — heartbeat within the last 2 minutes (session actively running)
+- `◐` **recent** — heartbeat within the last 30 minutes (probably active)
+- `◯` **stale** — `status='active'` in DB but heartbeat >30 min old (session probably crashed without calling `/agent-end` or the sweep)
+- `!` **ghost** — live `claude` process with no matching active DB row (session is running code without registering — it skipped `agent-checklist init`)
+- `✓` **done** — `status='completed'` (shown only with `--all`)
+
+Prefer this over `./ws list`: `./ws list` shows slot git state (branch, dirty, PR) and does NOT cross-reference with live processes or the `agent_sessions` table, so a slot with an active Claude session on a feature branch can appear as `main, no PR` when init was run before the branch was created — exactly the QUA-406 failure mode.
+
 ## Step 1: Session Start — BEFORE taking any action
 
 Run `/agent-init` as the very first thing — before reading files, running commands, or writing any code. "Before writing code" is not sufficient; quick fixes and file reads count too. If you start without this, you will forget it entirely.
