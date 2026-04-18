@@ -244,6 +244,7 @@ function seedFromWikiCitations(
   const slugToStableId = loadSlugToStableId();
   const pageResources = loadPageResources();
   const hexToStableId = buildHexIdToStableId();
+  const knownStableIds = new Set(hexToStableId.values());
   const items: EntityResourceSyncItem[] = [];
   let skipped = 0;
 
@@ -260,8 +261,12 @@ function seedFromWikiCitations(
     for (const resourceId of resourceIds) {
       // pageResources may contain either hex16 (legacy build-data.mjs
       // output) or sid_-prefixed IDs, depending on when it was built.
+      // For sid_ values, validate against knownStableIds to catch stale
+      // or invalid IDs that no longer exist in the resources table.
       const translated = resourceId.startsWith("sid_")
-        ? resourceId
+        ? knownStableIds.has(resourceId)
+          ? resourceId
+          : undefined
         : hexToStableId.get(resourceId);
       if (!translated) {
         skipped++;
