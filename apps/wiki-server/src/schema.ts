@@ -717,9 +717,12 @@ export const resources = pgTable(
 export const resourceCitations = pgTable(
   "resource_citations",
   {
+    // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+    // Column name kept as `resource_id` for minimal code churn — the value is now a
+    // `sid_`-prefixed stable_id, not a legacy hex16. See QUA-549 for context.
     resourceId: text("resource_id")
       .notNull()
-      .references(() => resources.id, { onDelete: "cascade" }),
+      .references(() => resources.stableId, { onDelete: "cascade" }),
     pageId: integer("page_id")
       .notNull()
       .references(() => wikiPages.id),
@@ -737,9 +740,11 @@ export const resourceCitations = pgTable(
 
 /** Type-specific metadata for academic papers (~800-2,000 resources). */
 export const resourcePapers = pgTable("resource_papers", {
+  // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   arxivId: text("arxiv_id"),
   doi: text("doi"),
   semanticScholarId: text("semantic_scholar_id"),
@@ -760,9 +765,11 @@ export const resourcePapers = pgTable("resource_papers", {
 
 /** Type-specific metadata for forum posts (~400-1,200 resources). */
 export const resourceForumPosts = pgTable("resource_forum_posts", {
+  // QUA-566 Phase B.3: resource_id references resources.stable_id (not resources.id).
+  // Column name kept as `resource_id` for minimal code churn.
   resourceId: text("resource_id")
     .primaryKey()
-    .references(() => resources.id, { onDelete: "cascade" }),
+    .references(() => resources.stableId, { onDelete: "cascade" }),
   forum: text("forum").notNull(),
   forumPostId: text("forum_post_id"),
   forumSlug: text("forum_slug"),

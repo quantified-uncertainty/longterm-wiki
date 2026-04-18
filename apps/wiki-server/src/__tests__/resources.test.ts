@@ -210,12 +210,21 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page) ----
+  // QUA-566 Phase B.3: resource_citations.resource_id now references
+  // resources.stable_id, so the join is on stable_id, not id.
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
     const intId = params[0] as number;
     const results: Record<string, unknown>[] = [];
     for (const c of citationStore) {
       if (c.page_id === intId) {
-        const r = resourceStore.get(c.resource_id);
+        // Look up by stable_id (the new join key)
+        let r: Record<string, unknown> | undefined;
+        for (const res of resourceStore.values()) {
+          if (res.stable_id === c.resource_id) {
+            r = res;
+            break;
+          }
+        }
         if (r) {
           results.push({
             id: r.id,

@@ -625,10 +625,9 @@ const researchAreasApp = new Hono()
 
     // Use raw SQL for the complex join + insert.
     // QUA-565 Phase B.2: research_area_papers.resource_id references
-    // resources.stable_id, so we SELECT r.stable_id (not r.id). The
-    // upstream JOIN (resource_citations.resource_id = r.id) is unchanged —
-    // resource_citations.resource_id still references resources.id until
-    // its own Phase B ticket lands.
+    // resources.stable_id, so we SELECT r.stable_id (not r.id).
+    // QUA-566 Phase B.3: resource_citations.resource_id also now references
+    // resources.stable_id, so the upstream JOIN is on r.stable_id as well.
     const result = await db.execute(sql`
       INSERT INTO research_area_papers (research_area_id, resource_id, title, url, authors, published_date, sort_order)
       SELECT
@@ -644,7 +643,7 @@ const researchAreasApp = new Hono()
       FROM research_areas ra
       JOIN wiki_pages wp ON ra.wiki_id = wp.wiki_id AND ra.wiki_id IS NOT NULL
       JOIN resource_citations rc ON rc.page_id = wp.id
-      JOIN resources r ON rc.resource_id = r.id
+      JOIN resources r ON rc.resource_id = r.stable_id
       WHERE r.url IS NOT NULL
       ON CONFLICT (research_area_id, url) WHERE url IS NOT NULL DO NOTHING
     `);
