@@ -370,9 +370,11 @@ const citationsApp = new Hono()
       return validationError(c, `Referenced page not found: ${missingPages.join(", ")}`);
     }
 
-    // Validate resource reference (optional)
+    // Validate resource reference (optional).
+    // QUA-574 Phase B.2b: citation_quotes.resource_id now references
+    // resources.stable_id (sid_<10>), not resources.id (hex16).
     if (parsed.resourceId) {
-      const missingRes = await checkRefsExist(db, resources, resources.id, [parsed.resourceId]);
+      const missingRes = await checkRefsExist(db, resources, resources.stableId, [parsed.resourceId]);
       if (missingRes.length > 0) {
         return validationError(c, `Referenced resource not found: ${missingRes.join(", ")}`);
       }
@@ -411,12 +413,14 @@ const citationsApp = new Hono()
       );
     }
 
-    // Validate resource references (optional field)
+    // Validate resource references (optional field).
+    // QUA-574 Phase B.2b: citation_quotes.resource_id now references
+    // resources.stable_id (sid_<10>), not resources.id (hex16).
     const resourceIds = [
       ...new Set(items.map((d) => d.resourceId).filter((r): r is string => r != null)),
     ];
     if (resourceIds.length > 0) {
-      const missingResources = await checkRefsExist(db, resources, resources.id, resourceIds);
+      const missingResources = await checkRefsExist(db, resources, resources.stableId, resourceIds);
       if (missingResources.length > 0) {
         return validationError(
           c,

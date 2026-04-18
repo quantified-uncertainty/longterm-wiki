@@ -65,10 +65,11 @@ const integrityApp = new Hono()
         "page_id",
         "wiki_pages"
       ),
-      // 5. citation_quotes.resource_id → resources
+      // 5. citation_quotes.resource_id → resources.stable_id
+      // QUA-574 Phase B.2b: resource_id now references resources.stable_id (not resources.id).
       checkDangling(
         db,
-        sql`SELECT DISTINCT cq.resource_id AS ref FROM citation_quotes cq WHERE cq.resource_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM resources r WHERE r.id = cq.resource_id)`,
+        sql`SELECT DISTINCT cq.resource_id AS ref FROM citation_quotes cq WHERE cq.resource_id IS NOT NULL AND NOT EXISTS (SELECT 1 FROM resources r WHERE r.stable_id = cq.resource_id)`,
         "citation_quotes",
         "resource_id",
         "resources"

@@ -51,21 +51,29 @@ async function main() {
   let matched = 0;
   let unmatched = 0;
 
+  let skippedNoStableId = 0;
   for (const quote of candidates) {
     const resource = getResourceByUrl(quote.url!);
     if (resource) {
+      // QUA-574 Phase B.2b: citation_quotes.resource_id now references
+      // resources.stable_id. Skip resources without a stable_id rather than
+      // writing a legacy hex16 value that would fail wiki-server validation.
+      if (!resource.stableId) {
+        skippedNoStableId++;
+        continue;
+      }
       matched++;
       if (dryRun) {
         console.log(
-          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.id} (${resource.title || resource.url})`,
+          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.stableId} (${resource.title || resource.url})`,
         );
       } else {
-        // Re-upsert with the resource_id populated
+        // Re-upsert with the resource_id populated (stable_id form)
         await upsertCitationQuote({
           pageId: String(quote.pageId),
           footnote: quote.footnote,
           url: quote.url,
-          resourceId: resource.id,
+          resourceId: resource.stableId,
           claimText: quote.claimText,
           claimContext: quote.claimContext ?? null,
           sourceQuote: quote.sourceQuote ?? null,
@@ -86,6 +94,9 @@ async function main() {
   console.log(`\n${c.bold}Results:${c.reset}`);
   console.log(`  ${c.green}Matched:${c.reset}   ${matched}`);
   console.log(`  ${c.dim}Unmatched:${c.reset} ${unmatched}`);
+  if (skippedNoStableId > 0) {
+    console.log(`  ${c.yellow}Skipped (no stable_id):${c.reset} ${skippedNoStableId}`);
+  }
   if (dryRun) {
     console.log(`\n  ${c.yellow}Dry run — no changes written.${c.reset}`);
   } else {

@@ -826,6 +826,28 @@ describe("Citation Server API", () => {
       const body = await res.json();
       expect(body.error).toBe("invalid_json");
     });
+
+    // QUA-574 Phase B.2b: citation_quotes.resource_id now references
+    // resources.stable_id (sid_<10>), not resources.id (hex16). Callers must
+    // pass the sid_ form. The FK enforces this in prod; this test locks in
+    // that the server round-trips sid_ values verbatim.
+    it("persists the caller-provided resourceId (sid_) verbatim on the citation quote row", async () => {
+      const res = await postJson(app, "/api/citations/quotes/upsert", {
+        pageId: "sid-test-page",
+        footnote: 1,
+        claimText: "Claim with sid_ resource",
+        url: "https://example.com/sid-test",
+        resourceId: "sid_AbCdEfGhIj",
+      });
+      expect(res.status).toBe(200);
+
+      const getRes = await app.request("/api/citations/quotes?page_id=sid-test-page");
+      expect(getRes.status).toBe(200);
+      const body = await getRes.json();
+      expect(body.quotes).toHaveLength(1);
+      expect(body.quotes[0].resourceId).toBe("sid_AbCdEfGhIj");
+      expect(isSid(body.quotes[0].resourceId)).toBe(true);
+    });
   });
 
   // ---- Batch Upsert ----
@@ -851,6 +873,41 @@ describe("Citation Server API", () => {
         items: [],
       });
       expect(res.status).toBe(400);
+    });
+
+    // QUA-574 Phase B.2b: verify the batch endpoint also round-trips sid_
+    // values verbatim on the resource_id column.
+    it("persists caller-provided resourceId (sid_) verbatim across a batch", async () => {
+      const res = await postJson(app, "/api/citations/quotes/upsert-batch", {
+        items: [
+          {
+            pageId: "batch-sid-page",
+            footnote: 1,
+            claimText: "Claim A",
+            url: "https://example.com/a",
+            resourceId: "sid_BatchOneAb",
+          },
+          {
+            pageId: "batch-sid-page",
+            footnote: 2,
+            claimText: "Claim B",
+            url: "https://example.com/b",
+            resourceId: "sid_BatchTwoCd",
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+
+      const getRes = await app.request("/api/citations/quotes?page_id=batch-sid-page");
+      expect(getRes.status).toBe(200);
+      const body = await getRes.json();
+      expect(body.quotes).toHaveLength(2);
+      const byFootnote = new Map(body.quotes.map((q: { footnote: number; resourceId: string | null }) => [q.footnote, q.resourceId]));
+      expect(byFootnote.get(1)).toBe("sid_BatchOneAb");
+      expect(byFootnote.get(2)).toBe("sid_BatchTwoCd");
+      for (const rid of byFootnote.values()) {
+        expect(rid && isSid(rid as string)).toBe(true);
+      }
     });
   });
 
