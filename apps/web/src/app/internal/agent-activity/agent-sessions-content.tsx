@@ -29,6 +29,7 @@ export async function AgentSessionsContent() {
   const totalSessions = sessions.length;
   const activeSessions = sessions.filter((s) => s.status === "active").length;
   const completedSessions = sessions.filter((s) => s.status === "completed").length;
+  const staleSessions = sessions.filter((s) => s.status === "stale").length;
   const withPr = sessions.filter((s) => s.prUrl).length;
   const fixSessions = sessions.filter((s) => s.fixesPrUrl).length;
   const fixRate = completedSessions > 0 ? Math.round((fixSessions / completedSessions) * 100) : 0;
@@ -56,6 +57,9 @@ export async function AgentSessionsContent() {
               <span className="text-yellow-600 font-medium">{activeSessions} active, </span>
             )}
             <span className="text-emerald-600 font-medium">{completedSessions} completed</span>
+            {staleSessions > 0 && (
+              <span className="text-muted-foreground">, {staleSessions} stale (swept — no graceful exit)</span>
+            )}
             {withPr > 0 && (
               <span className="text-muted-foreground">, {withPr} with PR</span>
             )}

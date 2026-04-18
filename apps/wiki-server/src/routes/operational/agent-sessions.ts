@@ -445,25 +445,23 @@ const agentSessionsApp = new Hono()
     const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));
     const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
     const db = getDrizzleDb();
-    // Backfill `date` from `started_at` when null — session-finalize is best-effort
-    // (async SessionEnd hook) and frequently doesn't run; without this fallback,
-    // swept rows end up with status=completed but date=null and drop out of any
-    // date-filtered query (retrospective, /internal/page-changes, etc).
-    // Note: unlike the PATCH handler, this sweep does NOT require title/summary
-    // before setting status='completed'. Swept rows may therefore have
-    // title=null / summary=null. Downstream consumers of status='completed' must
-    // tolerate nulls in those fields (the retrospective tool already does).
+    // Invariant: status='completed' is reserved for graceful-exit sessions
+    // whose SessionEnd hook populated title+summary via the PATCH validation
+    // path. Sweep hits sessions that didn't heartbeat, so they have no
+    // metadata — flip them to 'stale' (permitted by chk_agent_sessions_status)
+    // rather than conflating them with real completions. `date` is backfilled
+    // so swept rows stay visible in date-filtered queries; `completedAt` is
+    // intentionally not set (the session was not completed). See QUA-221.
     const now = new Date();
     const stale = await db.update(agentSessions)
       .set({
-        status: "completed",
-        completedAt: now,
+        status: "stale",
         updatedAt: now,
         date: sql`COALESCE(${agentSessions.date}, ${agentSessions.startedAt}::date)`,
       })
       .where(and(eq(agentSessions.status, "active"), lt(agentSessions.updatedAt, cutoff)))
       .returning({ id: agentSessions.id, branch: agentSessions.branch, issueNumber: agentSessions.issueNumber });
-    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as completed");
+    logger.info({ swept: stale.length, cutoff: cutoff.toISOString() }, "Sweep: marked stale sessions as status='stale'");
     return c.json({ swept: stale.length, sessions: stale });
   });
 

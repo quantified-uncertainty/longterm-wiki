@@ -126,7 +126,10 @@ export async function getSessionsByEntity(
 }
 
 /**
- * Mark stale active sessions as completed (no updates for timeoutHours).
+ * Flip stale active sessions to status='stale' (no updates for timeoutHours).
+ * Does NOT mark them 'completed' — that status is reserved for graceful-exit
+ * sessions whose SessionEnd hook populated title+summary via PATCH. See
+ * apps/wiki-server/src/routes/operational/agent-sessions.ts:440 (QUA-221).
  */
 export async function sweepStaleSessions(
   timeoutHours = 2,

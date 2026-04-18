@@ -19,8 +19,9 @@ interface SweepResponse {
 }
 
 /**
- * Call the wiki-server sweep endpoint to mark stale active sessions as completed.
- * Returns the list of swept sessions (with issue numbers), or null on failure.
+ * Call the wiki-server sweep endpoint to flip stale active sessions to
+ * status='stale'. Returns the list of swept sessions (with issue numbers), or
+ * null on failure. Swept rows are NOT marked 'completed' — see QUA-221.
  */
 async function callSweepEndpoint(
   config: Config,
@@ -119,7 +120,8 @@ async function removeClaudeWorkingLabel(
 
 /**
  * Session sweep task:
- * 1. Marks stale active sessions (>STALE_TIMEOUT_HOURS old) as completed via wiki-server.
+ * 1. Flips stale active sessions (>STALE_TIMEOUT_HOURS old) to status='stale'
+ *    via wiki-server (NOT 'completed' — reserved for graceful-exit sessions).
  * 2. For each swept session with a linked GitHub issue, removes the agent:working label
  *    if the issue is closed.
  *
