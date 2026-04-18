@@ -14,9 +14,8 @@ const { listAgentSessionsMock, isServerAvailableMock, findClaudeProcessesMock } 
   isServerAvailableMock: vi.fn<() => Promise<boolean>>(async () => true),
   findClaudeProcessesMock: vi.fn<() => {
     processes: Array<{ pid: number; cwd: string; slot: number | null }>;
-    scanFailed: boolean;
-    scanError: string;
-  }>(() => ({ processes: [], scanFailed: false, scanError: '' })),
+    scanError: string | null;
+  }>(() => ({ processes: [], scanError: null })),
 }));
 
 vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
@@ -59,7 +58,7 @@ beforeEach(() => {
   vi.clearAllMocks();
   isServerAvailableMock.mockResolvedValue(true);
   listAgentSessionsMock.mockResolvedValue({ ok: true, data: { sessions: [] } });
-  findClaudeProcessesMock.mockReturnValue({ processes: [], scanFailed: false, scanError: '' });
+  findClaudeProcessesMock.mockReturnValue({ processes: [], scanError: null });
 });
 
 describe('list command — option validation', () => {
@@ -81,24 +80,32 @@ describe('list command — option validation', () => {
 });
 
 describe('list command — server unavailable degradation', () => {
-  it('does not hard-fail when server is unreachable; shows warning + scan-only results', async () => {
-    isServerAvailableMock.mockResolvedValue(false);
+  it('does not hard-fail when DB returns unavailable; shows warning + scan-only results', async () => {
+    listAgentSessionsMock.mockResolvedValue({
+      ok: false,
+      error: 'unavailable',
+      message: 'connection refused',
+    });
     findClaudeProcessesMock.mockReturnValue({
       processes: [{ pid: 42, cwd: '/lw/a9', slot: 9 }],
-      scanFailed: false,
-      scanError: '',
+      scanError: null,
     });
     const r = await list([], {});
     expect(r.exitCode).toBe(0);
     const out = stripAnsi(r.output);
     expect(out).toContain('wiki-server unreachable');
-    expect(out).toContain('a9'); // ghost still surfaces
+    expect(out).toContain('a9');
   });
 
-  it('does not call listAgentSessions when server is unreachable', async () => {
-    isServerAvailableMock.mockResolvedValue(false);
-    await list([], {});
-    expect(listAgentSessionsMock).not.toHaveBeenCalled();
+  it('reports non-unavailable DB errors with the error kind', async () => {
+    listAgentSessionsMock.mockResolvedValue({
+      ok: false,
+      error: 'server_error',
+      message: '500 Internal Server Error',
+    });
+    const r = await list([], {});
+    expect(r.exitCode).toBe(0);
+    expect(stripAnsi(r.output)).toContain('DB fetch failed (server_error)');
   });
 });
 
@@ -106,7 +113,6 @@ describe('list command — scan failure warning', () => {
   it('emits a warning banner when the process scan fails', async () => {
     findClaudeProcessesMock.mockReturnValue({
       processes: [],
-      scanFailed: true,
       scanError: 'lsof failed: permission denied',
     });
     const r = await list([], {});
@@ -119,45 +125,41 @@ describe('list command — scan failure warning', () => {
 });
 
 describe('list command — JSON output', () => {
-  it('returns a plain array when there are no warnings', async () => {
-    const r = await list([], { json: true });
-    const parsed = JSON.parse(r.output);
-    expect(Array.isArray(parsed)).toBe(true);
-  });
-
-  it('wraps output in {warnings, sessions} when warnings exist', async () => {
-    findClaudeProcessesMock.mockReturnValue({
-      processes: [],
-      scanFailed: true,
-      scanError: 'x',
-    });
+  it('always wraps output in {warnings, sessions} — consistent shape', async () => {
     const r = await list([], { json: true });
     const parsed = JSON.parse(r.output);
     expect(parsed).toHaveProperty('warnings');
     expect(parsed).toHaveProperty('sessions');
     expect(Array.isArray(parsed.warnings)).toBe(true);
+    expect(Array.isArray(parsed.sessions)).toBe(true);
+    expect(parsed.warnings).toEqual([]); // empty when no issues
+  });
+
+  it('populates warnings when scan or DB fails', async () => {
+    findClaudeProcessesMock.mockReturnValue({
+      processes: [],
+      scanError: 'x',
+    });
+    const r = await list([], { json: true });
+    const parsed = JSON.parse(r.output);
     expect(parsed.warnings.length).toBeGreaterThan(0);
   });
 });
 
-describe('list command — limit clamping', () => {
+describe('list command — limit validation', () => {
   it('clamps --limit to 500 max', async () => {
     await list([], { limit: '1000' });
     expect(listAgentSessionsMock).toHaveBeenCalledWith(500);
   });
 
-  it('defaults to 200 for invalid --limit', async () => {
-    await list([], { limit: 'abc' });
-    expect(listAgentSessionsMock).toHaveBeenCalledWith(200);
+  it('rejects non-integer --limit with exit 2 (matches --slot behavior)', async () => {
+    const r = await list([], { limit: 'abc' });
+    expect(r.exitCode).toBe(2);
+    expect(stripAnsi(r.output)).toContain('--limit must be a non-negative integer');
   });
 
-  it('defaults to 200 for negative --limit', async () => {
-    await list([], { limit: '-5' });
-    expect(listAgentSessionsMock).toHaveBeenCalledWith(200);
-  });
-
-  it('floors fractional --limit', async () => {
-    await list([], { limit: '3.7' });
-    expect(listAgentSessionsMock).toHaveBeenCalledWith(3);
+  it('rejects negative --limit with exit 2', async () => {
+    const r = await list([], { limit: '-5' });
+    expect(r.exitCode).toBe(2);
   });
 });

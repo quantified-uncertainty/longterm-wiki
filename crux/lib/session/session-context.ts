@@ -66,7 +66,7 @@ function readIntFile(
  * subdirectories of their slot (apps/web, crux, etc.) — without this walk,
  * the slot field would silently go missing from start comments.
  */
-function findSlotFromAncestors(cwd: string): number | null {
+export function findSlotFromAncestors(cwd: string): number | null {
   let current = cwd;
   for (let i = 0; i < 10; i++) {
     const match = basename(current).match(/^a(\d+)$/);

@@ -22,6 +22,7 @@
  */
 
 import { execSync } from 'child_process';
+import { findSlotFromAncestors } from './session-context.ts';
 
 export interface ClaudeProcess {
   pid: number;
@@ -32,23 +33,6 @@ export interface ClaudeProcess {
 
 export interface ProcessScanDeps {
   execCmd?: (cmd: string) => string;
-}
-
-/**
- * Walk the path segments leaf→root looking for an `a<N>` directory basename.
- * Returns the slot number or null. Matches `findSlotFromAncestors` in
- * session-context.ts so both agree on the (rare) nested-slot edge case.
- */
-export function slotFromPath(path: string): number | null {
-  const parts = path.split('/').filter(Boolean);
-  for (let i = parts.length - 1; i >= 0; i--) {
-    const m = parts[i].match(/^a(\d+)$/);
-    if (m) {
-      const n = Number.parseInt(m[1], 10);
-      if (Number.isSafeInteger(n)) return n;
-    }
-  }
-  return null;
 }
 
 /**
@@ -104,21 +88,19 @@ export function parseLsofFpn(raw: string): Array<{ pid: number; cwd: string }> {
 export interface ProcessScanResult {
   processes: ClaudeProcess[];
   /**
-   * True when the scan could not complete (ps/lsof missing, timeout, permission
-   * denied). Callers must distinguish this from "no processes found" because
-   * a silent scan failure would give a coordinator a false "no ghosts" signal
-   * — exactly the QUA-413 failure mode this command is meant to prevent.
+   * Null when the scan ran successfully (with 0+ processes found). Non-null
+   * when the scan could not complete (ps/lsof missing, timeout, permission
+   * denied). Callers must distinguish this from "no processes found" — a
+   * silent scan failure would give a coordinator a false "no ghosts" signal,
+   * exactly the QUA-413 failure mode this command is meant to prevent.
    */
-  scanFailed: boolean;
-  /** Short reason string for user-facing display. Empty when scanFailed=false. */
-  scanError: string;
+  scanError: string | null;
 }
 
 /**
  * List all running Claude Code processes and their working directories.
- * Returns `{ processes: [], scanFailed: true }` when the scan itself couldn't
- * run (ps/lsof missing, timeout). Returns `{ processes: [], scanFailed: false }`
- * when the scan ran but found nothing.
+ * On failure returns `{ processes: [], scanError: '<reason>' }`. On success
+ * with nothing found, returns `{ processes: [], scanError: null }`.
  */
 export function findClaudeProcesses(deps: ProcessScanDeps = {}): ProcessScanResult {
   const exec =
@@ -135,11 +117,11 @@ export function findClaudeProcesses(deps: ProcessScanDeps = {}): ProcessScanResu
   try {
     psOut = exec('ps -eo pid=,args=');
   } catch (e) {
-    return { processes: [], scanFailed: true, scanError: `ps failed: ${errMsg(e)}` };
+    return { processes: [], scanError: `ps failed: ${errMsg(e)}` };
   }
   const pids = findClaudePids(psOut);
   if (pids.length === 0) {
-    return { processes: [], scanFailed: false, scanError: '' };
+    return { processes: [], scanError: null };
   }
 
   // Step 2: lsof for CWD. Must use `-a` to AND the `-p` and `-d` filters on
@@ -149,13 +131,12 @@ export function findClaudeProcesses(deps: ProcessScanDeps = {}): ProcessScanResu
   try {
     lsofOut = exec(`lsof -a -p ${pids.join(',')} -d cwd -Fpn`);
   } catch (e) {
-    return { processes: [], scanFailed: true, scanError: `lsof failed: ${errMsg(e)}` };
+    return { processes: [], scanError: `lsof failed: ${errMsg(e)}` };
   }
   const pairs = parseLsofFpn(lsofOut);
   return {
-    processes: pairs.map(({ pid, cwd }) => ({ pid, cwd, slot: slotFromPath(cwd) })),
-    scanFailed: false,
-    scanError: '',
+    processes: pairs.map(({ pid, cwd }) => ({ pid, cwd, slot: findSlotFromAncestors(cwd) })),
+    scanError: null,
   };
 }
 

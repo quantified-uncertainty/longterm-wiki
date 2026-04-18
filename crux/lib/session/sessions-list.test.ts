@@ -293,6 +293,11 @@ describe('formatAge', () => {
     expect(formatAge(5.4)).toBe('5m');
     expect(formatAge(59)).toBe('59m');
   });
+  it('promotes 59.5m to the hours bucket (no "60m" wraparound)', () => {
+    // 59.5 rounds to 60, which would display as "60m" without the fix.
+    // Now it correctly falls through to the hours branch.
+    expect(formatAge(59.5)).toBe('1.0h');
+  });
   it('uses hours between 1h and 24h', () => {
     expect(formatAge(60)).toBe('1.0h');
     expect(formatAge(120)).toBe('2.0h');

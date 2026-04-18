@@ -203,7 +203,9 @@ export function truncate(s: string | null | undefined, width: number): string {
 export function formatAge(minutes: number | null): string {
   if (minutes === null) return '—';
   if (minutes < 1) return '<1m';
-  if (minutes < 60) return `${Math.round(minutes)}m`;
+  // Round before checking the boundary so 59.5m renders as 1.0h, not 60m.
+  const m = Math.round(minutes);
+  if (m < 60) return `${m}m`;
   const h = minutes / 60;
   if (h < 24) return `${h.toFixed(1)}h`;
   const d = h / 24;

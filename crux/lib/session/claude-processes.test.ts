@@ -4,39 +4,13 @@
 
 import { describe, it, expect } from 'vitest';
 import {
-  slotFromPath,
   findClaudePids,
   parseLsofFpn,
   findClaudeProcesses,
 } from './claude-processes.ts';
 
-describe('slotFromPath', () => {
-  it('extracts slot number from a typical slot path', () => {
-    expect(slotFromPath('/Users/dev/lw/a9')).toBe(9);
-    expect(slotFromPath('/Users/dev/lw/a15/apps/web')).toBe(15);
-  });
-
-  it('returns null when no a<N> ancestor exists', () => {
-    expect(slotFromPath('/tmp/foo')).toBeNull();
-    expect(slotFromPath('/')).toBeNull();
-    expect(slotFromPath('')).toBeNull();
-  });
-
-  it('rejects non-slot a-prefixed directories', () => {
-    // "apps" or "alpha" shouldn't match — only bare a<digits>
-    expect(slotFromPath('/Users/dev/apps/web')).toBeNull();
-    expect(slotFromPath('/Users/dev/alpha/src')).toBeNull();
-  });
-
-  it('returns the innermost slot when nested (walks leaf→root)', () => {
-    // Matches session-context.ts::findSlotFromAncestors: if a process is
-    // running deep inside a slot directory, the slot closest to the cwd
-    // wins. Rare in practice (no one nests slots).
-    expect(slotFromPath('/Users/dev/a5/nested/a9/src')).toBe(9);
-    expect(slotFromPath('/Users/dev/lw/a9')).toBe(9);
-    expect(slotFromPath('/Users/dev/lw/a9/apps/web')).toBe(9);
-  });
-});
+// Slot resolution is tested in session-context.test.ts —
+// claude-processes.ts reuses findSlotFromAncestors from there.
 
 describe('findClaudePids', () => {
   it('matches Claude Code installed binary path', () => {
@@ -120,13 +94,13 @@ describe('findClaudeProcesses — integration (mocked shell)', () => {
       throw new Error(`unexpected: ${cmd}`);
     };
     const result = findClaudeProcesses({ execCmd });
-    expect(result.scanFailed).toBe(false);
+    expect(result.scanError).toBeNull();
     expect(result.processes).toEqual([
       { pid: 95223, cwd: '/Users/dev/lw/a9', slot: 9 },
     ]);
   });
 
-  it('returns empty scan-succeeded result when no Claude processes found (skips lsof entirely)', () => {
+  it('returns empty success when no Claude processes found (skips lsof entirely)', () => {
     const calls: string[] = [];
     const execCmd = (cmd: string) => {
       calls.push(cmd);
@@ -134,28 +108,26 @@ describe('findClaudeProcesses — integration (mocked shell)', () => {
       throw new Error('lsof should not be called');
     };
     const result = findClaudeProcesses({ execCmd });
-    expect(result).toEqual({ processes: [], scanFailed: false, scanError: '' });
-    expect(calls).toHaveLength(1); // only ps, never lsof
+    expect(result).toEqual({ processes: [], scanError: null });
+    expect(calls).toHaveLength(1);
   });
 
-  it('marks scanFailed=true when ps fails', () => {
+  it('reports scanError when ps fails', () => {
     const execCmd = (cmd: string) => {
       if (cmd.startsWith('ps ')) throw new Error('ps: command not found');
       throw new Error('unreachable');
     };
     const result = findClaudeProcesses({ execCmd });
-    expect(result.scanFailed).toBe(true);
     expect(result.scanError).toContain('ps failed');
     expect(result.processes).toEqual([]);
   });
 
-  it('marks scanFailed=true when lsof fails after ps succeeds (no partial results)', () => {
+  it('reports scanError when lsof fails after ps succeeds (no partial results)', () => {
     const execCmd = (cmd: string) => {
       if (cmd.startsWith('ps ')) return '  1 claude\n';
       throw new Error('lsof: permission denied');
     };
     const result = findClaudeProcesses({ execCmd });
-    expect(result.scanFailed).toBe(true);
     expect(result.scanError).toContain('lsof failed');
     expect(result.processes).toEqual([]);
   });

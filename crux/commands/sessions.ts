@@ -15,12 +15,14 @@
 
 import { writeFileSync, existsSync, mkdirSync } from 'fs';
 import { join, dirname } from 'path';
-import { createLogger } from '../lib/output.ts';
+import { createLogger, type Colors } from '../lib/output.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { syncSessionFile } from '../wiki-server/sync-session.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { listAgentSessions } from '../lib/wiki-server/agent-sessions.ts';
+// NOTE: isServerAvailable is used by `write`; `list` relies on listAgentSessions'
+// structured unavailable-error path to avoid an extra round-trip.
 import { findClaudeProcesses } from '../lib/session/claude-processes.ts';
 import {
   mergeSessions,
@@ -231,7 +233,7 @@ const LIVENESS_BADGE: Record<Liveness, string> = {
   done: '✓',
 };
 
-function livenessColor(liveness: Liveness, c: ReturnType<typeof createLogger>['colors']): string {
+function livenessColor(liveness: Liveness, c: Colors): string {
   switch (liveness) {
     case 'live':
       return c.green;
@@ -256,7 +258,7 @@ function livenessColor(liveness: Liveness, c: ReturnType<typeof createLogger>['c
 
 function renderTable(
   rows: MergedSession[],
-  colors: ReturnType<typeof createLogger>['colors'],
+  colors: Colors,
 ): string {
   if (rows.length === 0) {
     return `${colors.dim}No sessions match the filter.${colors.reset}\n`;
@@ -294,73 +296,77 @@ function renderTable(
   return out;
 }
 
-/** Parse `--slot=N` with explicit error on malformed input. */
-function parseSlotOption(raw: unknown): { ok: true; slot: number | undefined } | { ok: false; error: string } {
-  if (raw === undefined) return { ok: true, slot: undefined };
+/** Parse a non-negative integer option. Returns error string on malformed input. */
+function parseIntOption(
+  raw: unknown,
+  name: string,
+): { ok: true; value: number | undefined } | { ok: false; error: string } {
+  if (raw === undefined) return { ok: true, value: undefined };
   const n = Number(raw);
   if (!Number.isInteger(n) || n < 0) {
-    return { ok: false, error: `--slot must be a non-negative integer, got: ${String(raw)}` };
+    return { ok: false, error: `${name} must be a non-negative integer, got: ${String(raw)}` };
   }
-  return { ok: true, slot: n };
+  return { ok: true, value: n };
 }
 
 async function list(_args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean | undefined);
   const c = log.colors;
 
-  // Validate --slot early so a typo like --slot=abc surfaces immediately
-  // instead of silently returning an unfiltered table.
-  const slotOpt = parseSlotOption(options.slot);
-  if (!slotOpt.ok) {
-    return { exitCode: 2, output: `${c.red}Error: ${slotOpt.error}${c.reset}\n` };
-  }
+  // Validate numeric options up front so typos like --slot=abc or --limit=xyz
+  // surface as errors instead of silently coercing to defaults or NaN.
+  const slotOpt = parseIntOption(options.slot, '--slot');
+  if (!slotOpt.ok) return { exitCode: 2, output: `${c.red}Error: ${slotOpt.error}${c.reset}\n` };
 
-  // Fetch DB sessions (may fail if wiki-server is unreachable) and scan local
-  // processes in parallel. Failure of either is degraded-but-still-useful:
-  // DB-only data or scan-only data both give the coordinator partial signal.
-  const serverUp = await isServerAvailable();
-  const limit = Number(options.limit ?? 200);
-  const boundedLimit = Number.isFinite(limit) && limit > 0 ? Math.min(Math.floor(limit), 500) : 200;
-  const dbPromise = serverUp ? listAgentSessions(boundedLimit) : null;
+  const limitOpt = parseIntOption(options.limit, '--limit');
+  if (!limitOpt.ok) return { exitCode: 2, output: `${c.red}Error: ${limitOpt.error}${c.reset}\n` };
+  const limit = Math.min(limitOpt.value ?? 200, 500);
+
+  // DB fetch and process scan kick off together. listAgentSessions returns
+  // `{ok:false, error:'unavailable'}` on network failure, so no pre-probe is
+  // needed — the discriminated error is enough to emit the right warning.
+  // (The scan is execSync-based and blocks the event loop, so "parallel" is
+  // aspirational; see follow-up for execFile conversion.)
+  const dbPromise = listAgentSessions(limit);
   const scan = findClaudeProcesses();
-  const dbResult = dbPromise ? await dbPromise : null;
+  const dbResult = await dbPromise;
 
-  const sessions = dbResult?.ok ? dbResult.data.sessions : [];
+  const sessions = dbResult.ok ? dbResult.data.sessions : [];
   const warnings: string[] = [];
-  if (!serverUp) {
-    warnings.push(
-      'wiki-server unreachable — showing local Claude processes only (no DB session data). ' +
-        'In agent slots, set WIKI_SERVER_ENV=prod.',
-    );
-  } else if (dbResult && !dbResult.ok) {
-    warnings.push(`DB fetch failed: ${dbResult.message}. Showing local process data only.`);
+  if (!dbResult.ok) {
+    if (dbResult.error === 'unavailable') {
+      warnings.push(
+        'wiki-server unreachable — showing local Claude processes only (no DB session data). ' +
+          'In agent slots, set WIKI_SERVER_ENV=prod.',
+      );
+    } else {
+      warnings.push(`DB fetch failed (${dbResult.error}): ${dbResult.message}. Showing local process data only.`);
+    }
   }
-  if (scan.scanFailed) {
+  if (scan.scanError !== null) {
     warnings.push(
       `process scan failed (${scan.scanError}). Ghost detection disabled — a live session without a DB row won't be visible.`,
     );
   }
 
   const liveMinutes = options.liveMinutes !== undefined ? Number(options.liveMinutes) : undefined;
-  const staleMinutes = options.fresh !== undefined ? Number(options.fresh) : undefined;
+  const staleMinutes = options.staleMinutes !== undefined ? Number(options.staleMinutes) : undefined;
 
-  const merged = mergeSessions(sessions, scan.processes, {
-    liveMinutes,
-    staleMinutes,
-  });
+  const merged = mergeSessions(sessions, scan.processes, { liveMinutes, staleMinutes });
 
+  const includeCompleted = Boolean(options.all);
   const filterLinear = typeof options.linear === 'string' ? options.linear : undefined;
 
   const filtered = filterSessions(merged, {
-    includeCompleted: Boolean(options.all),
+    includeCompleted,
     linearId: filterLinear,
-    slot: slotOpt.slot,
+    slot: slotOpt.value,
   });
 
   const sorted = sortSessions(filtered);
 
   if (options.json) {
-    // Shape the JSON output with explicit fields a coordinator might script against.
+    // Consistent shape so scripts don't have to branch on warnings presence.
     const jsonRows = sorted.map((r) => ({
       slot: r.session?.slotNumber ?? r.process?.slot ?? null,
       pid: r.process?.pid ?? null,
@@ -378,13 +384,13 @@ async function list(_args: string[], options: Record<string, unknown>): Promise<
       startedAt: r.session?.startedAt ?? null,
       sessionId: r.session?.id ?? null,
     }));
-    const payload = warnings.length > 0
-      ? { warnings, sessions: jsonRows }
-      : jsonRows;
-    return { exitCode: 0, output: JSON.stringify(payload, null, 2) + '\n' };
+    return {
+      exitCode: 0,
+      output: JSON.stringify({ warnings, sessions: jsonRows }, null, 2) + '\n',
+    };
   }
 
-  const header = `${c.bold}Agent Sessions${c.reset} ${c.dim}(${sorted.length} row${sorted.length === 1 ? '' : 's'}${Boolean(options.all) ? '' : ', active only'})${c.reset}\n\n`;
+  const header = `${c.bold}Agent Sessions${c.reset} ${c.dim}(${sorted.length} row${sorted.length === 1 ? '' : 's'}${includeCompleted ? '' : ', active only'})${c.reset}\n\n`;
   const warningBanner = warnings.length > 0
     ? warnings.map((w) => `  ${c.yellow}⚠ ${w}${c.reset}`).join('\n') + '\n\n'
     : '';
@@ -412,8 +418,8 @@ List options:
   --all                     Include completed sessions (default: active only)
   --linear=QUA-NNN          Filter by Linear ID
   --slot=N                  Filter by slot number
-  --fresh=N                 Staleness cutoff in minutes (default: 30)
-  --live-minutes=N          "Live" threshold in minutes (default: 2)
+  --stale-minutes=N         Staleness cutoff (default: 30)
+  --live-minutes=N          "Live" threshold (default: 2)
   --limit=N                 Max DB rows to fetch (default: 200, cap 500)
   --json                    Machine-readable JSON output
 
