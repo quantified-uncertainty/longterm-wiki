@@ -445,13 +445,9 @@ const agentSessionsApp = new Hono()
     const timeoutHours = Math.max(1, Math.min(Number.isFinite(raw) ? raw : 2, 720));
     const cutoff = new Date(Date.now() - timeoutHours * 60 * 60 * 1000);
     const db = getDrizzleDb();
-    // Invariant: status='completed' is reserved for graceful-exit sessions
-    // whose SessionEnd hook populated title+summary via the PATCH validation
-    // path. Sweep hits sessions that didn't heartbeat, so they have no
-    // metadata — flip them to 'stale' (permitted by chk_agent_sessions_status)
-    // rather than conflating them with real completions. `date` is backfilled
-    // so swept rows stay visible in date-filtered queries; `completedAt` is
-    // intentionally not set (the session was not completed). See QUA-221.
+    // Swept rows have no title/summary (hook didn't run); flip to 'stale' so
+    // 'completed' stays reserved for graceful exits. completedAt intentionally
+    // unset. See QUA-221.
     const now = new Date();
     const stale = await db.update(agentSessions)
       .set({

@@ -115,26 +115,20 @@ const dispatch: SqlDispatcher = (query, params) => {
     return [row];
   }
 
-  // ---- UPDATE agent_sessions SET ... WHERE "status"=$ AND "updated_at"<$ (sweep) ----
-  // Detected by the presence of `"updated_at" <` in the WHERE clause (the
-  // sweep's distinguishing timestamp comparison — single-row UPDATEs WHERE by id).
-  // Sweep params (positional):
-  //   $1 = new status (e.g. 'stale'), $2 = new updated_at (Date),
-  //   $3 = old status ('active'),     $4 = cutoff (Date).
+  // ---- UPDATE agent_sessions SET ... WHERE "updated_at" < $ (sweep handler) ----
   if (
     q.includes("update") &&
     q.includes("agent_sessions") &&
     q.includes("set") &&
     /"updated_at"\s*</.test(q)
   ) {
+    // postgres.js sends timestamps as ISO strings over the wire; normalize.
+    const toDate = (p: unknown): Date =>
+      p instanceof Date ? p : new Date(p as string);
     const newStatus = params[0] as string;
-    // postgres.js sends timestamps as ISO strings over the wire; normalize to Date
-    // for the in-memory comparison.
-    const newUpdatedAt =
-      params[1] instanceof Date ? params[1] : new Date(params[1] as string);
+    const newUpdatedAt = toDate(params[1]);
     const oldStatus = params[2] as string;
-    const cutoff =
-      params[3] instanceof Date ? params[3] : new Date(params[3] as string);
+    const cutoff = toDate(params[3]);
     const swept: Array<{ id: number; branch: string; issueNumber: number | null }> = [];
     for (const row of store) {
       if (row.status === oldStatus && row.updated_at < cutoff) {
@@ -143,8 +137,6 @@ const dispatch: SqlDispatcher = (query, params) => {
         if (!row.date) {
           row.date = row.started_at.toISOString().slice(0, 10);
         }
-        // Drizzle .returning() maps snake_case cols to camelCase keys — mirror
-        // the real response shape so downstream assertions are honest.
         swept.push({ id: row.id, branch: row.branch, issueNumber: row.issue_number });
       }
     }
@@ -797,11 +789,6 @@ describe("Agent Sessions API", () => {
 
       const staleRow = store.find((r) => r.branch === "claude/branch-stale")!;
       expect(staleRow.status).toBe("stale");
-      // Critical: swept sessions must NOT be marked 'completed' — that status
-      // is reserved for graceful-exit sessions with title+summary. QUA-221.
-      expect(staleRow.status).not.toBe("completed");
-      // Sweep must not set completed_at — stale != completed. Guard against a
-      // future refactor re-introducing the old `completedAt: now` behavior.
       expect(staleRow.completed_at).toBeNull();
 
       const freshRow = store.find((r) => r.branch === "claude/branch-fresh")!;

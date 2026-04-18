@@ -32,9 +32,6 @@ export async function AgentSessionsContent() {
   const staleSessions = sessions.filter((s) => s.status === "stale").length;
   const withPr = sessions.filter((s) => s.prUrl).length;
   const fixSessions = sessions.filter((s) => s.fixesPrUrl).length;
-  // Denominator includes stale rows: fix rate = (fixes / finished sessions),
-  // where "finished" = completed OR stale. Stale rows are still finished in
-  // the sense that they're no longer accepting work.
   const finishedSessions = completedSessions + staleSessions;
   const fixRate = finishedSessions > 0 ? Math.round((fixSessions / finishedSessions) * 100) : 0;
   const totalCostCents = sessions.reduce((sum, s) => sum + (s.costCents ?? 0), 0);
