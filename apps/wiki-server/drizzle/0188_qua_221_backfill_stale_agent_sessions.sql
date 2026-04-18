@@ -9,20 +9,30 @@
 -- (where the SessionEnd hook ran `crux sys session-finalize` and populated
 -- title+summary via PATCH validation).
 --
--- This one-time backfill retrofits the distinction onto historical rows so
--- that the completion-rate metric in /internal/agent-activity and in
--- monitoring.ts::fetchAgentActivity becomes immediately meaningful after this
--- PR deploys instead of decaying toward accuracy over weeks.
+-- This one-time backfill retrofits the distinction onto historical rows.
 --
--- A row is considered historically-swept (not graceful) when:
+-- Predicate: a row is post-QUA-223 historically-swept iff
 --   status = 'completed' AND title IS NULL AND summary IS NULL
--- Graceful-exit rows populate both fields via the hook, so this predicate
--- cannot misclassify a genuinely-completed row.
+--   AND completed_at >= '2026-04-11'
+-- QUA-223 (PR #4161, merged 2026-04-11) added the hard-fail validation that
+-- prevents status='completed' from being set without title+summary. After
+-- that date, a row with NULL title+summary must have come from the sweep
+-- route (the only remaining writer that bypassed the PATCH validation path).
+-- Pre-2026-04-11 rows are left alone because they *could* be legitimate
+-- graceful exits that the old PATCH schema accepted without title/summary —
+-- we can't reliably distinguish them now.
+--
+-- Also NULL out completed_at on flipped rows: the old sweep set
+-- completed_at=now() which is semantically wrong for a stale session (it
+-- never completed). The new sweep does not set completed_at; this backfill
+-- matches that new invariant for historical rows.
 --
 -- Idempotent and bounded (a few hundred rows in prod at most; the column is
 -- indexed by status so the query is fast).
 UPDATE agent_sessions
-   SET status = 'stale'
+   SET status = 'stale',
+       completed_at = NULL
  WHERE status = 'completed'
    AND title IS NULL
-   AND summary IS NULL;
+   AND summary IS NULL
+   AND completed_at >= '2026-04-11';
