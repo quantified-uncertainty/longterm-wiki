@@ -29,6 +29,8 @@ import {
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
 import { sweepStaleSessions, getAgentSessionByBranch, updateAgentSession } from '../lib/wiki-server/agent-sessions.ts';
 import { appendEvent } from '../lib/wiki-server/agent-session-events.ts';
+import { parseLinearId } from '../lib/linear/parse-id.ts';
+import { getIssueStates } from '../lib/linear/issue-states-cache.ts';
 
 interface CommandOptions extends BaseOptions {
   task?: string;
@@ -51,7 +53,16 @@ interface CommandOptions extends BaseOptions {
 // Helpers
 // ---------------------------------------------------------------------------
 
-function formatAgent(a: ActiveAgentEntry, colors: ReturnType<typeof createLogger>['colors']): string {
+interface AgentAnnotation {
+  linearId: string | null;
+  linearState: string | null;
+}
+
+function formatAgent(
+  a: ActiveAgentEntry,
+  colors: ReturnType<typeof createLogger>['colors'],
+  annotation: AgentAnnotation = { linearId: null, linearState: null },
+): string {
   const statusColors: Record<string, string> = {
     active: colors.green,
     completed: colors.dim,
@@ -68,6 +79,9 @@ function formatAgent(a: ActiveAgentEntry, colors: ReturnType<typeof createLogger
 
   const name = a.sessionName ? ` ${colors.cyan}${a.sessionName}${colors.reset}` : '';
   const worktreeInfo = a.worktree ? `    Dir: ${colors.dim}${a.worktree}${colors.reset}` : '';
+  const linearLine = annotation.linearId
+    ? `    Linear: ${colors.cyan}${annotation.linearId}${colors.reset} ${annotation.linearState ?? '—'}`
+    : '    Linear: —';
 
   return [
     `  ${colors.bold}#${a.id}${colors.reset}${name} ${statusColor}[${a.status}]${colors.reset}${issue}${pr}`,
@@ -75,10 +89,36 @@ function formatAgent(a: ActiveAgentEntry, colors: ReturnType<typeof createLogger
     a.branch ? `    Branch: ${colors.dim}${a.branch}${colors.reset}` : '',
     worktreeInfo,
     a.model ? `    Model: ${a.model}` : '',
+    linearLine,
     `    Started: ${started}  Heartbeat: ${heartbeat}`,
     step,
     files,
   ].filter(Boolean).join('\n');
+}
+
+/**
+ * Build the `identifier → state` map for all agents whose branch contains
+ * a Linear ticket reference. Returns two maps:
+ *   - `linearIds`: agent-id → Linear identifier (or null)
+ *   - `states`: Linear identifier → state name (or null if Linear doesn't know)
+ *
+ * Exported for tests.
+ */
+export function collectLinearIds(
+  agents: readonly ActiveAgentEntry[],
+): { linearIds: Map<number, string | null>; uniqueIds: string[] } {
+  const linearIds = new Map<number, string | null>();
+  const unique = new Set<string>();
+  for (const agent of agents) {
+    // Prefer the server-provided Linear ID (populated from the authoritative
+    // agent_sessions row during `crux linear start`); fall back to parsing
+    // the branch name for agents that registered without a session (e.g.
+    // job workers, ad-hoc registrations).
+    const id = agent.linearId ?? parseLinearId(agent.branch);
+    linearIds.set(agent.id, id);
+    if (id) unique.add(id);
+  }
+  return { linearIds, uniqueIds: Array.from(unique) };
 }
 
 async function checkServer(): Promise<CommandResult | null> {
@@ -165,11 +205,22 @@ async function statusCommand(
     return { exitCode: 1, output: `Error: ${result.message}` };
   }
 
-  if (options.json) {
-    return { exitCode: 0, output: JSON.stringify(result.data, null, 2) };
-  }
-
   const { agents, conflicts, directoryConflicts } = result.data;
+
+  const { linearIds, uniqueIds } = collectLinearIds(agents);
+  const states = await getIssueStates(uniqueIds);
+
+  if (options.json) {
+    const enriched = {
+      ...result.data,
+      agents: agents.map((a) => {
+        const linearId = linearIds.get(a.id) ?? null;
+        const linearState = linearId ? states.get(linearId) ?? null : null;
+        return { ...a, linearId, linearState };
+      }),
+    };
+    return { exitCode: 0, output: JSON.stringify(enriched, null, 2) };
+  }
 
   if (agents.length === 0) {
     return { exitCode: 0, output: `No ${statusFilter} agents found.` };
@@ -177,7 +228,9 @@ async function statusCommand(
 
   let output = `${log.colors.bold}Active Agents (${agents.length})${log.colors.reset}\n\n`;
   for (const agent of agents) {
-    output += formatAgent(agent, log.colors) + '\n\n';
+    const linearId = linearIds.get(agent.id) ?? null;
+    const linearState = linearId ? states.get(linearId) ?? null : null;
+    output += formatAgent(agent, log.colors, { linearId, linearState }) + '\n\n';
   }
 
   if (conflicts.length > 0) {
