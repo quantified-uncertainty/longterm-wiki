@@ -126,7 +126,8 @@ export async function getSessionsByEntity(
 }
 
 /**
- * Mark stale active sessions as completed (no updates for timeoutHours).
+ * Flip stale active sessions to status='stale' (no updates for timeoutHours).
+ * 'completed' is reserved for graceful-exit sessions. See QUA-221.
  */
 export async function sweepStaleSessions(
   timeoutHours = 2,
