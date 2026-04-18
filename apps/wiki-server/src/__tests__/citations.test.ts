@@ -24,6 +24,9 @@ let quotesStore: Map<string, QuoteRow>; // key: `${pageSlug}:${footnote}`
 let contentStore: Map<string, ContentRow>; // key: url
 let snapshotStore: Array<SnapshotRow>;
 let contentVersionStore: Array<ContentVersionRow>;
+// QUA-574: capture dispatched SQL so tests can assert on the column used
+// for ref-check lookups (e.g. `resources.stable_id` vs `resources.id`).
+let dispatchedQueries: string[] = [];
 
 let nextSlugIntId = 1000;
 const slugIntIdMap = new Map<string, number>();
@@ -54,6 +57,7 @@ function resetStores() {
   contentVersionStore = [];
   nextSlugIntId = 1000;
   slugIntIdMap.clear();
+  dispatchedQueries = [];
 }
 
 function quoteKey(pageId: string, footnote: number) {
@@ -128,6 +132,7 @@ function contentToSqlRow(r: ContentRow): Record<string, unknown> {
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
+  dispatchedQueries.push(q);
   // Debug: uncomment to see SQL patterns
   // if (q.includes("resource_content_versions")) console.log("DISPATCH rcv:", JSON.stringify({ q: q.slice(0, 300), params }));
 
@@ -847,6 +852,35 @@ describe("Citation Server API", () => {
       expect(body.quotes).toHaveLength(1);
       expect(body.quotes[0].resourceId).toBe("sid_AbCdEfGhIj");
       expect(isSid(body.quotes[0].resourceId)).toBe(true);
+    });
+
+    // QUA-574 regression lock: verify the resource ref-check uses the
+    // `resources.stable_id` column, not `resources.id`. Without this, a
+    // naïve mock that accepts anything in the IN list passes both column
+    // choices — so the round-trip test above can't detect a regression
+    // that points `.references()` back at `resources.id`.
+    it("looks up resource refs against resources.stable_id (not resources.id)", async () => {
+      await postJson(app, "/api/citations/quotes/upsert", {
+        pageId: "col-check-page",
+        footnote: 1,
+        claimText: "Claim",
+        url: "https://example.com/col-check",
+        resourceId: "sid_ColumnXyz",
+      });
+
+      // The ref-check issues: SELECT "resources"."stable_id" AS "id"
+      //                       FROM "resources"
+      //                       WHERE "resources"."stable_id" IN (...)
+      const resourceLookups = dispatchedQueries.filter(
+        (q) => q.includes('from "resources"') && q.includes(" in ")
+      );
+      expect(resourceLookups.length).toBeGreaterThan(0);
+      for (const q of resourceLookups) {
+        expect(q).toContain('"resources"."stable_id"');
+        // If the schema ever regresses to resources.id, this assertion fails
+        // before the round-trip assertion ever runs.
+        expect(q).not.toMatch(/"resources"\."id"\s+in\s/);
+      }
     });
   });
 

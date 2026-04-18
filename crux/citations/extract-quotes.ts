@@ -205,9 +205,15 @@ export async function extractQuotesForPage(
 
       // Resolve resource_id from URL.
       // QUA-574 Phase B.2b: citation_quotes.resource_id references resources.stable_id,
-      // so write the sid_ value. Resources without a stable_id are left unlinked.
+      // so write the sid_ value. Resources without a stable_id are left unlinked —
+      // warn so the data-quality drift is visible rather than silent.
       const resource = cit.url ? getResourceByUrl(cit.url) : null;
-      const resourceId = resource?.stableId ?? null;
+      if (resource && !resource.stable_id) {
+        console.warn(
+          `  WARN: resource "${resource.id}" (${cit.url}) has no stable_id — citation quote will be unlinked. Populate resources.stable_id to fix.`,
+        );
+      }
+      const resourceId = resource?.stable_id ?? null;
 
       // Store in wiki-server DB
       await upsertCitationQuote({
@@ -261,7 +267,7 @@ export async function extractQuotesForPage(
         pageId,
         footnote: numericFootnote,
         url: cit.url || null,
-        resourceId: errResource?.stableId ?? null,
+        resourceId: errResource?.stable_id ?? null,
         claimText,
         claimContext: cit.claimContext,
         sourceTitle,

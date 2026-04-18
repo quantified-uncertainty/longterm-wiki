@@ -58,14 +58,14 @@ async function main() {
       // QUA-574 Phase B.2b: citation_quotes.resource_id now references
       // resources.stable_id. Skip resources without a stable_id rather than
       // writing a legacy hex16 value that would fail wiki-server validation.
-      if (!resource.stableId) {
+      if (!resource.stable_id) {
         skippedNoStableId++;
         continue;
       }
       matched++;
       if (dryRun) {
         console.log(
-          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.stableId} (${resource.title || resource.url})`,
+          `  ${c.green}MATCH${c.reset} [${quote.pageId}:^${quote.footnote}] → ${resource.stable_id} (${resource.title || resource.url})`,
         );
       } else {
         // Re-upsert with the resource_id populated (stable_id form)
@@ -73,7 +73,7 @@ async function main() {
           pageId: String(quote.pageId),
           footnote: quote.footnote,
           url: quote.url,
-          resourceId: resource.stableId,
+          resourceId: resource.stable_id,
           claimText: quote.claimText,
           claimContext: quote.claimContext ?? null,
           sourceQuote: quote.sourceQuote ?? null,
