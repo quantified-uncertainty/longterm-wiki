@@ -3478,8 +3478,10 @@ export const blueskyPosts = pgTable(
     embeddedTitle: text("embedded_title"),
     /** URI of the post this is replying to */
     replyToUri: text("reply_to_uri"),
-    /** FK to resources — links this post to a known resource by embedded URL */
-    resourceId: text("resource_id").references(() => resources.id, {
+    /** FK to resources.stable_id — links this post to a known resource by embedded URL.
+     *  QUA-572 Phase B.1b: swapped from resources.id → resources.stableId (in-place;
+     *  column name kept as `resource_id`). See migration 0192. */
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     /** Entity stableIds this post is about */
