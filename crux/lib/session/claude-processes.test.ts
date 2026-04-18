@@ -28,10 +28,13 @@ describe('slotFromPath', () => {
     expect(slotFromPath('/Users/dev/alpha/src')).toBeNull();
   });
 
-  it('returns the innermost slot when nested (takes the first a<N> walking leaf→root)', () => {
-    // Unusual but defensible behavior: the first a<N> segment in path order
-    // is typically the outermost slot directory.
-    expect(slotFromPath('/Users/dev/a5/nested/a9/src')).toBe(5);
+  it('returns the innermost slot when nested (walks leaf→root)', () => {
+    // Matches session-context.ts::findSlotFromAncestors: if a process is
+    // running deep inside a slot directory, the slot closest to the cwd
+    // wins. Rare in practice (no one nests slots).
+    expect(slotFromPath('/Users/dev/a5/nested/a9/src')).toBe(9);
+    expect(slotFromPath('/Users/dev/lw/a9')).toBe(9);
+    expect(slotFromPath('/Users/dev/lw/a9/apps/web')).toBe(9);
   });
 });
 

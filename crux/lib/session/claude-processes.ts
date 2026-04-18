@@ -35,14 +35,14 @@ export interface ProcessScanDeps {
 }
 
 /**
- * Walk the path segments looking for an `a<N>` directory basename. Returns
- * the slot number or null. Mirrors `findSlotFromAncestors` in session-context.ts
- * but operates on an arbitrary path string rather than `process.cwd()`.
+ * Walk the path segments leaf→root looking for an `a<N>` directory basename.
+ * Returns the slot number or null. Matches `findSlotFromAncestors` in
+ * session-context.ts so both agree on the (rare) nested-slot edge case.
  */
 export function slotFromPath(path: string): number | null {
   const parts = path.split('/').filter(Boolean);
-  for (const part of parts) {
-    const m = part.match(/^a(\d+)$/);
+  for (let i = parts.length - 1; i >= 0; i--) {
+    const m = parts[i].match(/^a(\d+)$/);
     if (m) {
       const n = Number.parseInt(m[1], 10);
       if (Number.isSafeInteger(n)) return n;
