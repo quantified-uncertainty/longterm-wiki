@@ -60,22 +60,31 @@ describe('getIssueStates', () => {
 
   it('batch-fetches states and caches them to disk', async () => {
     linearGraphQLMock.mockResolvedValueOnce({
-      i_QUA_1: { identifier: 'QUA-1', state: { name: 'In Progress' } },
-      i_QUA_2: { identifier: 'QUA-2', state: { name: 'Done' } },
+      i0: { identifier: 'QUA-1', state: { name: 'In Progress' } },
+      i1: { identifier: 'QUA-2', state: { name: 'Done' } },
     });
     const mod = await import('./issue-states-cache.ts');
     const result = await mod.getIssueStates(['QUA-1', 'QUA-2'], 1_000_000);
     expect(result.get('QUA-1')).toBe('In Progress');
     expect(result.get('QUA-2')).toBe('Done');
     expect(linearGraphQLMock).toHaveBeenCalledTimes(1);
-    // One GraphQL call, both aliases inside.
     const [query] = linearGraphQLMock.mock.calls[0];
-    expect(query).toContain('i_QUA_1: issue(id: "QUA-1")');
-    expect(query).toContain('i_QUA_2: issue(id: "QUA-2")');
-    // Cache file was persisted.
+    expect(query).toContain('i0: issue(id: "QUA-1")');
+    expect(query).toContain('i1: issue(id: "QUA-2")');
     expect(existsSync(tempCacheFile)).toBe(true);
     const cached = JSON.parse(readFileSync(tempCacheFile, 'utf-8'));
     expect(cached['QUA-1']).toMatchObject({ state: 'In Progress', fetchedAt: 1_000_000 });
+  });
+
+  it('maps results by response identifier field (not by alias position)', async () => {
+    linearGraphQLMock.mockResolvedValueOnce({
+      i0: { identifier: 'QUA-2', state: { name: 'Done' } },
+      i1: { identifier: 'QUA-1', state: { name: 'In Progress' } },
+    });
+    const mod = await import('./issue-states-cache.ts');
+    const result = await mod.getIssueStates(['QUA-1', 'QUA-2'], 1_000_000);
+    expect(result.get('QUA-1')).toBe('In Progress');
+    expect(result.get('QUA-2')).toBe('Done');
   });
 
   it('serves from cache within the 60s TTL without hitting the API', async () => {
@@ -99,12 +108,26 @@ describe('getIssueStates', () => {
       JSON.stringify({ 'QUA-7': { state: 'Todo', fetchedAt: 1_000_000 } }),
     );
     linearGraphQLMock.mockResolvedValueOnce({
-      i_QUA_7: { identifier: 'QUA-7', state: { name: 'In Progress' } },
+      i0: { identifier: 'QUA-7', state: { name: 'In Progress' } },
     });
     const mod = await import('./issue-states-cache.ts');
-    // 61s later — past TTL.
     const result = await mod.getIssueStates(['QUA-7'], 1_061_000);
     expect(result.get('QUA-7')).toBe('In Progress');
+    expect(linearGraphQLMock).toHaveBeenCalledTimes(1);
+  });
+
+  it('drops entries with a malformed state field when reading cache', async () => {
+    mkdirSync(join(tempCacheDir, '.cache', 'crux-linear'), { recursive: true });
+    writeFileSync(
+      tempCacheFile,
+      JSON.stringify({ 'QUA-1': { state: { bad: 'object' }, fetchedAt: 1_000_000 } }),
+    );
+    linearGraphQLMock.mockResolvedValueOnce({
+      i0: { identifier: 'QUA-1', state: { name: 'Done' } },
+    });
+    const mod = await import('./issue-states-cache.ts');
+    const result = await mod.getIssueStates(['QUA-1'], 1_030_000);
+    expect(result.get('QUA-1')).toBe('Done');
     expect(linearGraphQLMock).toHaveBeenCalledTimes(1);
   });
 
@@ -124,20 +147,19 @@ describe('getIssueStates', () => {
 
   it('deduplicates identifiers before fetching', async () => {
     linearGraphQLMock.mockResolvedValueOnce({
-      i_QUA_5: { identifier: 'QUA-5', state: { name: 'In Review' } },
+      i0: { identifier: 'QUA-5', state: { name: 'In Review' } },
     });
     const mod = await import('./issue-states-cache.ts');
     const result = await mod.getIssueStates(['QUA-5', 'QUA-5', 'QUA-5'], 1_000_000);
     expect(result.get('QUA-5')).toBe('In Review');
     expect(linearGraphQLMock).toHaveBeenCalledTimes(1);
     const [query] = linearGraphQLMock.mock.calls[0];
-    // Aliased issue query appears exactly once.
-    expect((query.match(/i_QUA_5: issue/g) ?? []).length).toBe(1);
+    expect((query.match(/issue\(id: "QUA-5"\)/g) ?? []).length).toBe(1);
   });
 
   it('records null state when Linear returns no match for an identifier', async () => {
     linearGraphQLMock.mockResolvedValueOnce({
-      i_QUA_9: null,
+      i0: null,
     });
     const mod = await import('./issue-states-cache.ts');
     const result = await mod.getIssueStates(['QUA-9'], 1_000_000);

@@ -11,7 +11,7 @@
  * fail because Linear is unreachable.
  */
 
-import { mkdirSync, readFileSync, writeFileSync } from 'fs';
+import { mkdirSync, readFileSync, renameSync, unlinkSync, writeFileSync } from 'fs';
 import { homedir } from 'os';
 import { join } from 'path';
 import { linearGraphQL } from './client.ts';
@@ -49,7 +49,8 @@ function readCache(now: number = Date.now()): CacheShape {
       v &&
       typeof v === 'object' &&
       typeof v.fetchedAt === 'number' &&
-      now - v.fetchedAt < CACHE_TTL_MS * 10
+      (typeof v.state === 'string' || v.state === null) &&
+      now - v.fetchedAt < CACHE_TTL_MS
     ) {
       fresh[k] = v;
     }
@@ -58,17 +59,17 @@ function readCache(now: number = Date.now()): CacheShape {
 }
 
 function writeCache(cache: CacheShape): void {
+  // Write-then-rename: on POSIX, rename is atomic, so a concurrent reader
+  // never sees a half-written file and concurrent writers don't corrupt
+  // each other. Two `crux sys agents status` processes racing is common.
+  const tmp = `${CACHE_FILE}.${process.pid}.${Date.now()}`;
   try {
     mkdirSync(CACHE_DIR, { recursive: true });
-    writeFileSync(CACHE_FILE, JSON.stringify(cache), 'utf-8');
+    writeFileSync(tmp, JSON.stringify(cache), 'utf-8');
+    renameSync(tmp, CACHE_FILE);
   } catch {
-    // Best-effort: cache write failures shouldn't break the caller.
+    try { unlinkSync(tmp); } catch { /* no temp file to clean up */ }
   }
-}
-
-function aliasFor(identifier: string): string {
-  // GraphQL aliases must match /[_A-Za-z][_0-9A-Za-z]*/.
-  return 'i_' + identifier.replace(/[^A-Za-z0-9]/g, '_');
 }
 
 interface BatchIssueResult {
@@ -77,9 +78,14 @@ interface BatchIssueResult {
 }
 
 /**
- * Fetch workflow states for many Linear issues in a single round-trip using
- * GraphQL aliases. Exported for unit tests; most callers should use
- * `getIssueStates` which adds disk caching.
+ * Fetch workflow states for many Linear issues in a single round-trip.
+ *
+ * Each issue gets a positional alias (`i0`, `i1`, ...) that depends only on
+ * the caller-provided order, so two distinct identifiers can never collide
+ * onto the same alias. Results are mapped back by the `identifier` field
+ * Linear returns in each response row, not by the alias, so the mapping
+ * remains correct even if Linear reorders the response. Exported for unit
+ * tests; most callers should use `getIssueStates` which adds disk caching.
  */
 export async function fetchIssueStatesBatch(
   identifiers: string[],
@@ -94,15 +100,19 @@ export async function fetchIssueStatesBatch(
   }
 
   const parts = identifiers.map(
-    (id) =>
-      `${aliasFor(id)}: issue(id: "${id}") { identifier state { name } }`,
+    (id, idx) => `i${idx}: issue(id: "${id}") { identifier state { name } }`,
   );
   const query = `query BatchIssueStates { ${parts.join(' ')} }`;
 
   const data = await linearGraphQL<Record<string, BatchIssueResult | null>>(query);
-  for (const id of identifiers) {
-    const row = data[aliasFor(id)];
-    result.set(id, row?.state?.name ?? null);
+  // Seed every requested identifier with `null` so callers can distinguish
+  // "Linear didn't return this" from "we never asked"; then overwrite with
+  // actual state names from whichever rows Linear did return.
+  for (const id of identifiers) result.set(id, null);
+  for (const row of Object.values(data)) {
+    if (row?.identifier && result.has(row.identifier)) {
+      result.set(row.identifier, row.state?.name ?? null);
+    }
   }
   return result;
 }
@@ -150,9 +160,15 @@ export async function getIssueStates(
       cache[id] = { state, fetchedAt: now };
     }
     writeCache(cache);
-  } catch {
-    // Fail open — return whatever we got from cache. Callers render `—`
-    // for the identifiers we couldn't fetch.
+  } catch (e) {
+    // Fail open — callers render `—` for identifiers we couldn't fetch.
+    // Log at debug level so `LINEAR_DEBUG=1` or equivalent surfaces the
+    // reason (unreachable API, bad key, edge-cache HTML) without flooding
+    // normal status output.
+    if (process.env.LINEAR_DEBUG) {
+      // eslint-disable-next-line no-console
+      console.warn(`[linear] issue-states fetch failed: ${e instanceof Error ? e.message : String(e)}`);
+    }
   }
 
   return result;
