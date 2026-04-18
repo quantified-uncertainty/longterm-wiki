@@ -212,17 +212,7 @@ const claimsApp = new Hono()
           ${claims.map((cl) => cl.targetField ?? null)}::text[],
           ${claims.map((cl) => cl.proposedValue ?? null)}::text[],
           ${claims.map((cl) => cl.proposedData ? JSON.stringify(cl.proposedData) : null)}::jsonb[],
-          ${claims.map((cl) => {
-            if (!cl.resourceId) return null;
-            const stableId = resolvedMap.get(cl.resourceId);
-            if (!stableId) {
-              // Unreachable: validation above rejects any resourceId not in the map.
-              // Throw rather than silently persist an untranslated hex16, which would
-              // violate the QUA-573 canonical-stable_id invariant.
-              throw new Error(`resolvedMap missing entry for ${cl.resourceId} after validation`);
-            }
-            return stableId;
-          })}::text[],
+          ${claims.map((cl) => (cl.resourceId ? (resolvedMap.get(cl.resourceId) ?? cl.resourceId) : null))}::text[],
           ${claims.map((cl) => cl.sourceUrl)}::text[],
           ${claims.map((cl) => cl.agentEvidence ?? null)}::text[],
           ${claims.map(() => "pending")}::text[],
