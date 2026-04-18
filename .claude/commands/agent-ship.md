@@ -232,7 +232,15 @@ Run `/agent-push-and-verify`.
 
 ## Step 9: Session close-out
 
-Clean up session artifacts and discard any unstaged changes (modified hooks, deleted markers, etc.):
+Close the session in the active-agents registry so the row leaves `status=active` (otherwise the active_agents table accumulates phantoms — see QUA-584). `/agent-end` does this in its step 6; ship needs the same call:
+
+```bash
+pnpm crux sys agents close 2>/dev/null || true
+```
+
+Best-effort: if the wiki-server is unreachable, the scheduled active-agents sweep will catch it within an hour.
+
+Then clean up session artifacts and discard any unstaged changes (modified hooks, deleted markers, etc.):
 
 ```bash
 rm -f .claude/wip-checklist.md .claude/wip-context.md

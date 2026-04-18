@@ -133,11 +133,20 @@ const dispatch: SqlDispatcher = (query, params) => {
       const updatedAt = toDate(params[1]);
       // params[2] is the WHERE status value, params[3] is the cutoff
       const cutoff = toDate(params[3]);
+      // QUA-584: sweep also sets completed_at = heartbeat_at via inline SQL
+      // expression (no param). Detect it from the SET clause.
+      const setCompletedFromHeartbeat =
+        /set\s+[^]*"completed_at"\s*=\s*"active_agents"\."heartbeat_at"/i.test(
+          query,
+        );
       const updated: AgentRow[] = [];
       for (const row of store) {
         if (row.status === "active" && row.heartbeat_at < cutoff) {
           row.status = statusVal;
           row.updated_at = updatedAt;
+          if (setCompletedFromHeartbeat) {
+            row.completed_at = row.heartbeat_at;
+          }
           updated.push(row);
         }
       }
@@ -612,6 +621,26 @@ describe("Active Agents API", () => {
       expect(res.status).toBe(200);
       const body = await res.json();
       expect(body.swept).toBe(0);
+    });
+
+    it("sets completed_at = heartbeat_at when marking stale (QUA-584)", async () => {
+      await postJson(app, "/api/active-agents", sampleAgent);
+      // Last heartbeat 2 hours ago — sweep with 30 min threshold should catch it
+      const lastHeartbeat = new Date(Date.now() - 2 * 60 * 60 * 1000);
+      store[0].heartbeat_at = lastHeartbeat;
+
+      expect(store[0].completed_at).toBeNull();
+
+      const res = await postJson(app, "/api/active-agents/sweep", {
+        timeoutMinutes: 30,
+      });
+      expect(res.status).toBe(200);
+      expect((await res.json()).swept).toBe(1);
+
+      // The end time of the session should be its last sign of life
+      // (heartbeat_at), not the moment the sweep ran.
+      expect(store[0].status).toBe("stale");
+      expect(store[0].completed_at).toEqual(lastHeartbeat);
     });
   });
 
