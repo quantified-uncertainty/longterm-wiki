@@ -39,7 +39,9 @@ beforeEach(() => {
   vi.clearAllMocks();
   mockStoreEvidence.mockResolvedValue({ ok: true, data: { id: 'ev-1' } as any });
   mockStoreVerdict.mockResolvedValue({ ok: true, data: { id: 'v-1' } as any });
-  mockLookupResourceByUrl.mockResolvedValue({ ok: true, data: { id: 'res-42' } as any });
+  // QUA-568 Phase B.5: source_check_evidence.resource_id now references
+  // resources.stable_id; storeSourcingEvidence writes the stableId form.
+  mockLookupResourceByUrl.mockResolvedValue({ ok: true, data: { id: 'res-42', stableId: 'sid_Res42Abcde' } as any });
 });
 
 // ---------------------------------------------------------------------------
@@ -100,7 +102,7 @@ describe('storeSourcingEvidence', () => {
     expect(body.checkerModel).toBe('deterministic-row-match');
   });
 
-  it('resolves resourceId from URL when not supplied', async () => {
+  it('resolves resourceId (stable_id form) from URL when not supplied', async () => {
     await storeSourcingEvidence({
       recordType: 'grant',
       recordId: 'grant-1',
@@ -113,7 +115,34 @@ describe('storeSourcingEvidence', () => {
 
     expect(mockLookupResourceByUrl).toHaveBeenCalledWith('https://example.com/resource');
     const body = mockStoreEvidence.mock.calls[0][0];
-    expect(body.resourceId).toBe('res-42');
+    // QUA-568 Phase B.5: the helper now writes resource.data.stableId (sid_*)
+    // rather than resource.data.id (hex16) so the FK to resources.stable_id
+    // introduced by migration 0187 is satisfied.
+    expect(body.resourceId).toBe('sid_Res42Abcde');
+  });
+
+  it('falls back to NULL resourceId when lookup succeeds but stable_id is absent (QUA-568)', async () => {
+    // Prod has resources.stable_id NOT NULL (QUA-536 Phase A), but staging/test
+    // fixtures may lag. If the resource row lacks a stable_id, the new FK can't
+    // be satisfied by the legacy hex16 id — writing NULL is strictly safer than
+    // writing a value that would violate the FK.
+    mockLookupResourceByUrl.mockResolvedValueOnce({
+      ok: true,
+      data: { id: 'res-42', stableId: null } as any,
+    });
+
+    await storeSourcingEvidence({
+      recordType: 'grant',
+      recordId: 'grant-1',
+      sourceUrl: 'https://example.com/no-stableid',
+      verdict: 'supported',
+      confidence: 0.8,
+      extractedValue: '',
+      reasoning: '',
+    });
+
+    const body = mockStoreEvidence.mock.calls[0][0];
+    expect(body.resourceId).toBeNull();
   });
 
   it('uses supplied resourceId without calling lookupResourceByUrl', async () => {
