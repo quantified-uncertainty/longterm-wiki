@@ -5,7 +5,7 @@
 import { existsSync, readFileSync } from 'fs';
 import type { PatrolConfig } from './types.ts';
 import { appendJsonl, cl, JSONL_FILE, log, logHeader, REFLECTION_FILE } from './state.ts';
-import { spawnClaude } from './execution.ts';
+import { runPatrolClaude } from './execution.ts';
 
 export async function runReflection(
   cycleCount: number,
@@ -59,7 +59,7 @@ ${recentEntries}
 
   const startTime = Date.now();
   try {
-    const result = await spawnClaude(prompt, {
+    const result = await runPatrolClaude(prompt, {
       ...config,
       maxTurns: 10, // Reflection needs fewer turns
       model: 'haiku', // Reflection is log analysis — doesn't need sonnet

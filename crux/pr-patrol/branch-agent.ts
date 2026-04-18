@@ -20,7 +20,7 @@ import { githubApi } from '../lib/github.ts';
 import { appendJsonl, cl, log, JSONL_FILE } from './state.ts';
 import { fetchSinglePr } from '../lib/pr-analysis/index.ts';
 import { detectIssues, computeScore } from '../lib/pr-analysis/index.ts';
-import { spawnClaude, releaseCurrentClaim } from './execution.ts';
+import { runPatrolClaude, releaseCurrentClaim } from './execution.ts';
 import { LABELS } from '../lib/labels.ts';
 import { buildBranchAgentPrompt } from './prompts.ts';
 import { computeBudget } from './scoring.ts';
@@ -279,7 +279,7 @@ export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
     const startTime = Date.now();
     let fixOutcome = 'error';
     try {
-      const result = await spawnClaude(prompt, {
+      const result = await runPatrolClaude(prompt, {
         ...config,
         maxTurns: effectiveMaxTurns,
         timeoutMinutes: effectiveTimeout,

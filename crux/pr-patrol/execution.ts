@@ -8,7 +8,7 @@
  * PRs before falling back to Claude when the rebase can't auto-resolve.
  */
 
-import { spawn } from 'child_process';
+import { spawnClaude } from '../lib/spawn-claude.ts';
 import { githubApi } from '../lib/github.ts';
 import { git, createWorktree, removeWorktree } from '../lib/git.ts';
 import { checkMainBranch as libCheckMainBranch, findRecentMerges as libFindRecentMerges } from '../lib/pr-analysis/index.ts';
@@ -287,7 +287,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
   let reason = '';
 
   try {
-    const result = await spawnClaude(prompt, config, { cwd: worktreePath });
+    const result = await runPatrolClaude(prompt, config, { cwd: worktreePath });
     const elapsedS = Math.floor((Date.now() - startTime) / 1000);
 
     if (result.timedOut) {
@@ -349,7 +349,7 @@ export async function fixMainBranch(status: MainBranchStatus, config: PatrolConf
 
 // ── Claude spawning ─────────────────────────────────────────────────────────
 
-export function spawnClaude(
+export function runPatrolClaude(
   prompt: string,
   config: PatrolConfig,
   opts?: { cwd?: string; extraEnv?: Record<string, string> },
@@ -365,15 +365,15 @@ export function spawnClaude(
     ];
     if (config.skipPerms) args.push('--dangerously-skip-permissions');
 
-    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions,
-    // unless the caller explicitly passes it in extraEnv (parallel patrol needs it for auth).
+    // Unset CLAUDECODE to prevent subprocess hang inside Claude Code sessions.
+    // spawnClaude() strips ANTHROPIC_API_KEY automatically (QUA-599).
     const env = { ...process.env };
     delete env.CLAUDECODE;
-    if (opts?.extraEnv) Object.assign(env, opts.extraEnv);
 
-    const child = spawn('claude', args, {
+    const child = spawnClaude(args, {
       cwd: opts?.cwd,
       env,
+      extraEnv: opts?.extraEnv,
       stdio: ['pipe', 'pipe', 'pipe'],
     });
 
@@ -720,7 +720,7 @@ export async function fixPr(pr: ScoredPr, config: PatrolConfig): Promise<FixPrRe
     const prompt = buildPrompt(pr, config.repo);
     const startTime = Date.now();
 
-    const result = await spawnClaude(prompt, {
+    const result = await runPatrolClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,

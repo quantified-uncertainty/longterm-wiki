@@ -46,7 +46,7 @@ import { buildPrompt } from './prompts.ts';
 import {
   looksLikeNoOp,
   looksLikeMainRootCause,
-  spawnClaude,
+  runPatrolClaude,
 } from './execution.ts';
 import {
   tryClaimPr,
@@ -373,7 +373,7 @@ async function fixPrInWorktree(
           // Claim was already acquired at the top of the try block; no
           // need to re-claim here.
           const rebasePrompt = `Rebase the current branch onto origin/main. Resolve any merge conflicts. Then force-push with: git push --force-with-lease. Do NOT fix CI issues, do NOT address code review comments — ONLY resolve the merge conflicts and push.`;
-          const rebaseResult2 = await spawnClaude(rebasePrompt, {
+          const rebaseResult2 = await runPatrolClaude(rebasePrompt, {
             ...config,
             maxTurns: 60,
             timeoutMinutes: 30,
@@ -417,7 +417,7 @@ async function fixPrInWorktree(
 
     // Build prompt and spawn Claude in worktree (no .env loading needed — OAuth auth)
     const prompt = buildPrompt(pr, config.repo);
-    const result = await spawnClaude(prompt, {
+    const result = await runPatrolClaude(prompt, {
       ...config,
       maxTurns: effectiveMaxTurns,
       timeoutMinutes: effectiveTimeout,

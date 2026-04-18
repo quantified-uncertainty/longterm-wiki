@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
+import { spawnClaude } from '../../lib/spawn-claude.ts';
 import { CRITICAL_RULES, QUALITY_RULES } from '../../lib/content-types.ts';
 import { componentImportsRule } from '../../lib/rules/component-imports.ts';
 import { ContentFile } from '../../lib/validation/validation-engine.ts';
@@ -135,7 +135,7 @@ Keep iterating until ALL checks pass. Run validation again after each fix.`;
   return new Promise((resolve, reject) => {
     const TIMEOUT_MS = 5 * 60 * 1000; // 5 minutes
 
-    const claude = spawn('claude', [
+    const claude = spawnClaude([
       '-p',
       '--print',
       '--dangerously-skip-permissions',

@@ -9,7 +9,7 @@
  * where spawning the Claude CLI subprocess is blocked or unreliable.
  */
 
-import { execSync } from 'child_process';
+import { spawnClaudeSync } from './spawn-claude.ts';
 
 let _isAvailable: boolean | null = null;
 
@@ -33,20 +33,14 @@ export function isInsideClaudeCodeSession(): boolean {
 export function isClaudeCliAvailable(): boolean {
   if (_isAvailable !== null) return _isAvailable;
 
-  try {
-    // Try to run `claude --version` — quick, no side effects
-    const env = { ...process.env };
-    delete env.CLAUDECODE; // Allow nested spawning check
-    execSync('claude --version', {
-      env,
-      stdio: 'pipe',
-      timeout: 5000,
-    });
-    _isAvailable = true;
-  } catch {
-    _isAvailable = false;
-  }
-
+  const env = { ...process.env };
+  delete env.CLAUDECODE; // Allow nested spawning check
+  const result = spawnClaudeSync(['--version'], {
+    env,
+    stdio: 'pipe',
+    timeout: 5000,
+  });
+  _isAvailable = !result.error && result.status === 0;
   return _isAvailable;
 }
 

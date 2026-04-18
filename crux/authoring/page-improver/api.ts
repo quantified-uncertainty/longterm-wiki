@@ -12,7 +12,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
+import { spawnClaude } from '../../lib/spawn-claude.ts';
 import {
   createLlmClient, runLlmAgent, streamingCreate, extractText,
   startHeartbeat, withRetry, type ToolHandler, isOpenRouterMode, streamLlmCall,
@@ -186,11 +186,10 @@ async function runAgentViaCli(
 
   return new Promise((resolve, reject) => {
     // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session.
-    // Unset ANTHROPIC_API_KEY so the CLI uses the subscription (OAuth) instead
-    // of the API key — this is the whole point of CLI mode.
+    // spawnClaude() strips ANTHROPIC_API_KEY automatically so the CLI uses
+    // OAuth subscription billing.
     const env = { ...process.env };
     delete env.CLAUDECODE;
-    delete env.ANTHROPIC_API_KEY;
 
     const args = [
       '-p',
@@ -207,7 +206,7 @@ async function runAgentViaCli(
       args.push('--allowedTools', allowedTools);
     }
 
-    const claude = spawn('claude', args, {
+    const claude = spawnClaude(args, {
       cwd: ROOT,
       env,
       stdio: ['pipe', 'pipe', 'pipe'],

@@ -226,7 +226,7 @@ Write findings to: ${path.join(getTopicDir(topic), 'review.json')}
 
 If you find any logicalIssues or temporalArtifacts, also fix them directly in the draft file.`;
 
-  const { spawn } = await import('child_process');
+  const { spawnClaude } = await import('../../lib/spawn-claude.ts');
 
   // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session
   const env = { ...process.env };
@@ -235,7 +235,7 @@ If you find any logicalIssues or temporalArtifacts, also fix them directly in th
   return new Promise((resolve, reject) => {
     const TIMEOUT_MS = 3 * 60 * 1000; // 3 minutes
 
-    const claude = spawn('claude', [
+    const claude = spawnClaude([
       '-p',
       '--print',
       '--dangerously-skip-permissions',

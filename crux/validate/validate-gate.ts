@@ -323,6 +323,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'no-raw-claude-spawn',
+    name: 'No raw claude CLI spawns (use spawnClaude wrapper)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-raw-claude-spawn.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: raw `spawn('claude', ...)` calls miss the ANTHROPIC_API_KEY
+    // strip that forces OAuth billing. See QUA-599.
+  },
+  {
     id: 'url-normalize',
     name: 'URL normalization helpers consolidated (QUA-341)',
     command: 'npx',

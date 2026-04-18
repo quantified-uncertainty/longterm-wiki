@@ -6,7 +6,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { spawn } from 'child_process';
+import { spawnClaude } from '../../lib/spawn-claude.ts';
 import { inferEntityType } from '../../lib/category-entity-types.ts';
 import { buildEntityLookupForTopic } from '../../lib/entity-lookup.ts';
 import { resolveTemplate, formatTemplateForPrompt } from '../../lib/content/page-templates.ts';
@@ -313,7 +313,7 @@ export async function runSynthesis(topic: string, quality: string, { log, ROOT }
     const env = { ...process.env };
     delete env.CLAUDECODE;
 
-    const claude = spawn('claude', [
+    const claude = spawnClaude([
       '-p',
       '--print',
       '--dangerously-skip-permissions',

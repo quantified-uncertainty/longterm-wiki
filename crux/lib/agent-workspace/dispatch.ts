@@ -28,6 +28,7 @@ import {
   unlinkSync as fsUnlinkSync,
 } from 'fs';
 import { spawn as cpSpawn, type ChildProcess, type SpawnOptions } from 'child_process';
+import { spawnClaude } from '../spawn-claude.ts';
 
 // ---------------------------------------------------------------------------
 // Types
@@ -222,7 +223,11 @@ export function realDispatchEnv(): DispatchEnv {
         detached: true,
         stdio: ['ignore', stdoutFd, stderrFd],
       };
-      const child: ChildProcess = cpSpawn(cmd, args, spawnOpts);
+      // The dispatch interface only ever spawns `claude`. Route through the
+      // canonical wrapper so ANTHROPIC_API_KEY is stripped (QUA-599).
+      const child: ChildProcess = cmd === 'claude'
+        ? spawnClaude(args, spawnOpts)
+        : cpSpawn(cmd, args, spawnOpts);
       if (typeof child.pid !== 'number') {
         throw new Error(`spawn('${cmd}') returned no pid`);
       }
