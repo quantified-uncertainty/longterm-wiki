@@ -1342,8 +1342,15 @@
     {
       "idx": 191,
       "version": "7",
-      "when": 1786003200001,
-      "tag": "0191_qua_221_backfill_stale_agent_sessions",
+      "when": 1785916800002,
+      "tag": "0191_qua_568_sce_resource_id_to_stable_id",
+      "breakpoints": true
+    },
+    {
+      "idx": 192,
+      "version": "7",
+      "when": 1786003200002,
+      "tag": "0192_qua_221_backfill_stale_agent_sessions",
       "breakpoints": true
     }
   ]

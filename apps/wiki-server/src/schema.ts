@@ -1697,7 +1697,11 @@ export const recordSources = pgTable(
     fieldName: text("field_name"), // NULL = whole row, or specific column name
     entityId: text("entity_id"), // which entity this is about (for grouping/display)
     expectedValue: text("expected_value"), // what the record says
-    resourceId: text("resource_id").references(() => resources.id, {
+    // QUA-568 Phase B.5: references resources.stable_id (canonical sid_<10>)
+    // as of migration 0188. Previously referenced resources.id (legacy hex16).
+    // Column name stays `resource_id` to avoid churn across the Phase B series
+    // (matches the in-place pattern used by resource_content_versions in 0186).
+    resourceId: text("resource_id").references(() => resources.stableId, {
       onDelete: "set null",
     }),
     sourceUrl: text("source_url"), // direct URL
