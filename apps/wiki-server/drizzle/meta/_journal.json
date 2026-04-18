@@ -1380,6 +1380,13 @@
       "when": 1786089600001,
       "tag": "0196_qua_573_pc_resource_id_to_stable_id",
       "breakpoints": true
+    },
+    {
+      "idx": 197,
+      "version": "7",
+      "when": 1786176000000,
+      "tag": "0197_qua_566_phase_b3_papers_posts_citations",
+      "breakpoints": true
     }
   ]
 }

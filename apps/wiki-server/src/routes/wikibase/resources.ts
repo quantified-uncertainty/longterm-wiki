@@ -282,6 +282,7 @@ async function upsertResource(
       id: resources.id,
       url: resources.url,
       title: resources.title,
+      stableId: resources.stableId,
     });
 
   const result = firstOrThrow(rows, `resource upsert ${d.id}`);
@@ -298,8 +299,16 @@ async function upsertResource(
     `);
   }
 
-  // Upsert citations (cited_by)
+  // Upsert citations (cited_by).
+  // QUA-566 Phase B.3: resource_citations.resource_id references
+  // resources.stable_id, so delete/insert using the persisted stable_id
+  // (not the hex16 request id).
   if (d.citedBy && d.citedBy.length > 0) {
+    if (!result.stableId) {
+      throw new Error(
+        `resource ${d.id} has no stable_id — cannot write resource_citations (QUA-536 invariant violated)`
+      );
+    }
     // Resolve slugs to integer IDs before touching existing rows
     const citedByIntIdMap = options?.intIdMap ?? await resolvePageIntIds(db, d.citedBy);
     const unresolvedPageIds = d.citedBy.filter((pageId) => !citedByIntIdMap.has(pageId));
@@ -311,9 +320,9 @@ async function upsertResource(
     // Delete existing citations for this resource, then re-insert
     await db
       .delete(resourceCitations)
-      .where(eq(resourceCitations.resourceId, d.id));
+      .where(eq(resourceCitations.resourceId, result.stableId));
     const citationValues = d.citedBy.map((slug) => ({
-      resourceId: d.id,
+      resourceId: result.stableId as string,
       pageId: citedByIntIdMap.get(slug) as number,
     }));
     await db
@@ -556,14 +565,22 @@ const resourcesApp = new Hono()
 
         results = upsertedRows.map((r) => ({ id: r.id, url: r.url }));
 
-        // Bulk replace citations: delete all old citations for batch resources, then insert new ones
-        const resourceIdsWithCitations = items
+        // Bulk replace citations: delete all old citations for batch resources, then insert new ones.
+        // QUA-566 Phase B.3: resource_citations.resource_id references resources.stable_id.
+        // Map each request item's hex16 id → stable_id via the persisted rows (already in
+        // upsertedRows.stableId from the RETURNING clause).
+        const hexToStableId = new Map<string, string>();
+        for (const row of upsertedRows) {
+          if (row.stableId) hexToStableId.set(row.id, row.stableId);
+        }
+        const resourceStableIdsWithCitations = items
           .filter((d) => d.citedBy && d.citedBy.length > 0)
-          .map((d) => d.id);
-        if (resourceIdsWithCitations.length > 0) {
+          .map((d) => hexToStableId.get(d.id))
+          .filter((sid): sid is string => !!sid);
+        if (resourceStableIdsWithCitations.length > 0) {
           await tx
             .delete(resourceCitations)
-            .where(inArray(resourceCitations.resourceId, resourceIdsWithCitations));
+            .where(inArray(resourceCitations.resourceId, resourceStableIdsWithCitations));
 
           const allCitations: Array<{
             resourceId: string;
@@ -571,11 +588,13 @@ const resourcesApp = new Hono()
           }> = [];
           for (const item of items) {
             if (item.citedBy && item.citedBy.length > 0) {
+              const stableId = hexToStableId.get(item.id);
+              if (!stableId) continue;
               for (const slug of item.citedBy) {
                 const intId = intIdMap.get(slug);
                 if (intId != null) {
                   allCitations.push({
-                    resourceId: item.id,
+                    resourceId: stableId,
                     pageId: intId,
                   });
                 }
@@ -801,17 +820,22 @@ const resourcesApp = new Hono()
     if (toIngest.length > 0) {
       batchId = generateBatchId();
 
-      // Fetch citation counts for priority calculation
+      // Fetch citation counts for priority calculation.
+      // QUA-566 Phase B.3: resource_citations.resource_id now references
+      // resources.stable_id, but `toIngest[].resourceId` is still hex16
+      // (from `urlToResource.get(url).id`). JOIN and return the hex16 id
+      // so downstream `citationCountMap.get(item.resourceId)` still works.
       const resourceIds = toIngest.map((r) => r.resourceId);
       interface CitationCountRow {
         resource_id: string;
         cnt: string;
       }
       const citationCounts = await rawDb<CitationCountRow[]>`
-        SELECT resource_id, count(*)::text AS cnt
-        FROM resource_citations
-        WHERE resource_id = ANY(${resourceIds})
-        GROUP BY resource_id
+        SELECT r.id AS resource_id, count(*)::text AS cnt
+        FROM resource_citations rc
+        JOIN resources r ON rc.resource_id = r.stable_id
+        WHERE r.id = ANY(${resourceIds})
+        GROUP BY r.id
       `;
       const citationCountMap = new Map<string, number>();
       for (const row of citationCounts) {
@@ -1048,7 +1072,7 @@ const resourcesApp = new Hono()
     ] = await Promise.all([
       rawDb<CountRow[]>`
         SELECT count(*) AS c FROM resources r
-        LEFT JOIN resource_citations rc ON rc.resource_id = r.id
+        LEFT JOIN resource_citations rc ON rc.resource_id = r.stable_id
         WHERE rc.resource_id IS NULL
       `,
       rawDb<CountRow[]>`
@@ -1330,7 +1354,8 @@ const resourcesApp = new Hono()
         stance: resources.stance,
       })
       .from(resourceCitations)
-      .innerJoin(resources, eq(resourceCitations.resourceId, resources.id))
+      // QUA-566 Phase B.3: resource_citations.resource_id → resources.stable_id
+      .innerJoin(resources, eq(resourceCitations.resourceId, resources.stableId))
       .where(eq(resourceCitations.pageId, intId))
       .orderBy(resourceCitations.createdAt)
       .limit(500);
@@ -1479,13 +1504,18 @@ const resourcesApp = new Hono()
   .get("/citations/all", async (c) => {
     const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
-    // JOIN wiki_pages to recover slug from integer page ID
+    // JOIN wiki_pages to recover slug from integer page ID.
+    // QUA-566 Phase B.3: resource_citations.resource_id references
+    // resources.stable_id, but API consumers (snapshot-resources, resource-io,
+    // the web build) key the result by resources.id (hex16). JOIN resources
+    // and surface r.id so the response contract is preserved.
     const rows = await db
       .select({
-        resourceId: resourceCitations.resourceId,
+        resourceId: resources.id,
         pageId: wikiPages.slug,
       })
       .from(resourceCitations)
+      .innerJoin(resources, eq(resourceCitations.resourceId, resources.stableId))
       .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
       .limit(HARD_LIMIT + 1);
 
@@ -1601,21 +1631,19 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // QUA-564 Phase B.1: resourcePolicyDocs.resourceId now references resources.stable_id,
-    // so the lookup must use stable_id (not the hex16 `id` URL param). Other sub-tables
-    // still use resources.id until their respective Phase B tickets land.
+    // QUA-564 B.1 / QUA-566 B.3: all five sub-tables now reference resources.stable_id.
     // resources.stable_id is NOT NULL in prod per QUA-536; the `?? id` fallback is only
     // defensive for test fixtures that may omit it (will return zero rows harmlessly).
     const stableId = rows[0].stableId ?? id;
     const [paperRows, forumRows, policyRows, citations] = await Promise.all([
-      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
-      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
+      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, stableId)).limit(1),
+      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, stableId)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, stableId)).limit(1),
       // JOIN wiki_pages to recover slug from integer page ID
       db.select({ pageId: wikiPages.slug })
         .from(resourceCitations)
         .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
-        .where(eq(resourceCitations.resourceId, id)),
+        .where(eq(resourceCitations.resourceId, stableId)),
     ]);
 
     return c.json({
@@ -1635,15 +1663,25 @@ const resourcesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    // Verify resource exists
-    const resRows = await db.select({ id: resources.id }).from(resources).where(eq(resources.id, id)).limit(1);
+    // Verify resource exists and fetch its stable_id.
+    // QUA-566 Phase B.3: resource_papers.resource_id references resources.stable_id;
+    // the URL param is still hex16 for API-contract stability.
+    const resRows = await db
+      .select({ id: resources.id, stableId: resources.stableId })
+      .from(resources)
+      .where(eq(resources.id, id))
+      .limit(1);
     if (resRows.length === 0) return notFoundError(c, `Resource not found: ${id}`);
+    const resourceStableId = resRows[0].stableId;
+    if (!resourceStableId) {
+      return dbError(c, "paper upsert", new Error(`resource ${id} has no stable_id`), { resourceId: id });
+    }
 
     try {
       await db
         .insert(resourcePapers)
         .values({
-          resourceId: id,
+          resourceId: resourceStableId,
           ...data,
           categories: data.categories ?? null,
           updatedAt: new Date(),
@@ -1681,14 +1719,24 @@ const resourcesApp = new Hono()
 
     const db = getDrizzleDb();
 
-    const resRows = await db.select({ id: resources.id }).from(resources).where(eq(resources.id, id)).limit(1);
+    // QUA-566 Phase B.3: resource_forum_posts.resource_id references
+    // resources.stable_id; URL param is still hex16.
+    const resRows = await db
+      .select({ id: resources.id, stableId: resources.stableId })
+      .from(resources)
+      .where(eq(resources.id, id))
+      .limit(1);
     if (resRows.length === 0) return notFoundError(c, `Resource not found: ${id}`);
+    const resourceStableId = resRows[0].stableId;
+    if (!resourceStableId) {
+      return dbError(c, "forum-post upsert", new Error(`resource ${id} has no stable_id`), { resourceId: id });
+    }
 
     try {
       await db
         .insert(resourceForumPosts)
         .values({
-          resourceId: id,
+          resourceId: resourceStableId,
           ...data,
           forumTags: data.forumTags ?? null,
           updatedAt: new Date(),
@@ -1775,12 +1823,35 @@ const resourcesApp = new Hono()
     const db = getDrizzleDb();
     const results = { papers: 0, forumPosts: 0, policyDocs: 0 };
 
+    // QUA-564 B.1 / QUA-566 B.3: all three sub-tables' resource_id references
+    // resources.stable_id. Client batch items may supply hex16 (resources.id)
+    // or sid_ (resources.stable_id); build one hex → sid_ map up front and use
+    // it to translate across all three sub-types.
+    const allInputIds = new Set<string>();
+    for (const it of batchData.papers ?? []) if (it.resourceId) allInputIds.add(it.resourceId);
+    for (const it of batchData.forumPosts ?? []) if (it.resourceId) allInputIds.add(it.resourceId);
+    for (const it of batchData.policyDocs ?? []) if (it.resourceId) allInputIds.add(it.resourceId);
+    const hexToStableId = new Map<string, string>();
+    if (allInputIds.size > 0) {
+      const resourceRows = await db
+        .select({ id: resources.id, stableId: resources.stableId })
+        .from(resources)
+        .where(inArray(resources.id, [...allInputIds]));
+      for (const r of resourceRows) {
+        if (r.stableId) hexToStableId.set(r.id, r.stableId);
+      }
+    }
+    // If the input is already sid_ (or anything not in the map), pass through;
+    // the FK will catch genuinely invalid values at insert time.
+    const resolveResourceId = (input: string): string =>
+      hexToStableId.get(input) ?? input;
+
     try {
       await db.transaction(async (tx) => {
         // Bulk upsert papers in one query
         if (batchData.papers && batchData.papers.length > 0) {
           const paperVals = batchData.papers.map((item) => ({
-            resourceId: item.resourceId,
+            resourceId: resolveResourceId(item.resourceId),
             arxivId: item.arxivId ?? null,
             doi: item.doi ?? null,
             semanticScholarId: item.semanticScholarId ?? null,
@@ -1816,7 +1887,7 @@ const resourcesApp = new Hono()
         // Bulk upsert forum posts in one query
         if (batchData.forumPosts && batchData.forumPosts.length > 0) {
           const forumVals = batchData.forumPosts.map((item) => ({
-            resourceId: item.resourceId,
+            resourceId: resolveResourceId(item.resourceId),
             forum: item.forum,
             forumPostId: item.forumPostId ?? null,
             forumSlug: item.forumSlug ?? null,
@@ -1854,28 +1925,12 @@ const resourcesApp = new Hono()
         }
 
         // Bulk upsert policy docs in one query.
-        // QUA-564 Phase B.1: resource_policy_docs.resource_id now references
-        // resources.stable_id. Client batch items may supply either hex16 (resources.id)
-        // or sid_ (resources.stable_id); translate hex → sid before insert.
+        // QUA-564 Phase B.1 / QUA-566 Phase B.3: resource_id references
+        // resources.stable_id; the shared resolveResourceId() above translates
+        // hex16 → sid_ for any client still passing legacy hex ids.
         if (batchData.policyDocs && batchData.policyDocs.length > 0) {
-          const inputIds = batchData.policyDocs
-            .map((item) => item.resourceId)
-            .filter((v): v is string => !!v);
-          const resourceRows = inputIds.length
-            ? await tx
-                .select({ id: resources.id, stableId: resources.stableId })
-                .from(resources)
-                .where(inArray(resources.id, inputIds))
-            : [];
-          const hexToStableId = new Map(
-            resourceRows
-              .filter((r): r is { id: string; stableId: string } => !!r.stableId)
-              .map((r) => [r.id, r.stableId])
-          );
           const policyVals = batchData.policyDocs.map((item) => ({
-            // If the input is already a sid_ (or any non-hex that doesn't match),
-            // keep it as-is; the FK will catch genuinely invalid values at insert time.
-            resourceId: hexToStableId.get(item.resourceId) ?? item.resourceId,
+            resourceId: resolveResourceId(item.resourceId),
             documentType: item.documentType ?? null,
             jurisdictionEntityId: item.jurisdictionEntityId ?? null,
             agencyEntityId: item.agencyEntityId ?? null,
@@ -1938,22 +1993,20 @@ const resourcesApp = new Hono()
       return c.json({ resources: [], total: countResult[0].count, limit, offset });
     }
 
-    const ids = rows.map((r) => r.id);
-    const idList = sql.join(ids.map((id) => sql`${id}`), sql`, `);
-    // QUA-564 Phase B.1: resourcePolicyDocs.resourceId references resources.stable_id,
-    // so build a parallel stable-id list for the policy-docs IN query. Falls back to
-    // the hex id for resources with null stable_id (shouldn't happen post-QUA-536).
+    // QUA-564 B.1 / QUA-566 B.3: all five sub-tables now reference resources.stable_id,
+    // so we IN-query them all by stable_id. Falls back to the hex id for resources with
+    // null stable_id (shouldn't happen post-QUA-536).
     const stableIds = rows.map((r) => r.stableId ?? r.id);
     const stableIdList = sql.join(stableIds.map((sid) => sql`${sid}`), sql`, `);
 
     // Fetch all sub-table rows for this page of resources in parallel
     const [paperRows, forumRows, policyRows] = await Promise.all([
-      db.select().from(resourcePapers).where(sql`${resourcePapers.resourceId} IN (${idList})`),
-      db.select().from(resourceForumPosts).where(sql`${resourceForumPosts.resourceId} IN (${idList})`),
+      db.select().from(resourcePapers).where(sql`${resourcePapers.resourceId} IN (${stableIdList})`),
+      db.select().from(resourceForumPosts).where(sql`${resourceForumPosts.resourceId} IN (${stableIdList})`),
       db.select().from(resourcePolicyDocs).where(sql`${resourcePolicyDocs.resourceId} IN (${stableIdList})`),
     ]);
 
-    // Index by resourceId. policyIndex keys are stable_ids; the others are hex16 ids.
+    // All three sub-tables are now keyed by stable_id.
     const paperIndex = new Map(paperRows.map((r) => [r.resourceId, r]));
     const forumIndex = new Map(forumRows.map((r) => [r.resourceId, r]));
     const policyIndex = new Map(policyRows.map((r) => [r.resourceId, r]));
@@ -1962,12 +2015,12 @@ const resourcesApp = new Hono()
 
     return c.json({
       resources: rows.map((r) => {
-        const policyKey = r.stableId ?? r.id;
+        const key = r.stableId ?? r.id;
         return {
           ...formatResource(r),
-          paper: paperIndex.has(r.id) ? formatPaper(paperIndex.get(r.id)!) : null,
-          forumPost: forumIndex.has(r.id) ? formatForumPost(forumIndex.get(r.id)!) : null,
-          policyDoc: policyIndex.has(policyKey) ? formatPolicyDoc(policyIndex.get(policyKey)!) : null,
+          paper: paperIndex.has(key) ? formatPaper(paperIndex.get(key)!) : null,
+          forumPost: forumIndex.has(key) ? formatForumPost(forumIndex.get(key)!) : null,
+          policyDoc: policyIndex.has(key) ? formatPolicyDoc(policyIndex.get(key)!) : null,
         };
       }),
       total: countResult[0].count,
@@ -1992,17 +2045,17 @@ const resourcesApp = new Hono()
       return notFoundError(c, `Resource not found: ${id}`);
     }
 
-    // QUA-564 B.1: resourcePolicyDocs.resourceId → resources.stable_id.
-    // QUA-565 B.2: resourceTabularSources.resourceId → resources.stable_id.
+    // QUA-564 B.1 / QUA-565 B.2 / QUA-566 B.3: all five sub-tables reference
+    // resources.stable_id.
     const stableId = rows[0].stableId ?? id;
     // Also fetch citations, sub-table data, and tabular source metadata
     const [citations, paperRows, forumRows, policyRows, tabularRows] = await Promise.all([
       db.select({ pageId: wikiPages.slug })
         .from(resourceCitations)
         .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
-        .where(eq(resourceCitations.resourceId, id)),
-      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, id)).limit(1),
-      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, id)).limit(1),
+        .where(eq(resourceCitations.resourceId, stableId)),
+      db.select().from(resourcePapers).where(eq(resourcePapers.resourceId, stableId)).limit(1),
+      db.select().from(resourceForumPosts).where(eq(resourceForumPosts.resourceId, stableId)).limit(1),
       db.select().from(resourcePolicyDocs).where(eq(resourcePolicyDocs.resourceId, stableId)).limit(1),
       db.select().from(resourceTabularSources).where(eq(resourceTabularSources.resourceId, stableId)).limit(1),
     ]);
