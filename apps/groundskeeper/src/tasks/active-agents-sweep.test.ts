@@ -70,7 +70,7 @@ describe("activeAgentsSweep", () => {
     expect(result.summary).toContain("No stale");
   });
 
-  it("calls the active-agents sweep endpoint with timeoutMinutes=60", async () => {
+  it("calls the active-agents sweep endpoint with timeoutMinutes=30", async () => {
     const fetchMock = vi.fn().mockResolvedValue({
       ok: true,
       json: async () => ({ swept: 0, agents: [] }),
@@ -83,7 +83,7 @@ describe("activeAgentsSweep", () => {
     expect(calls[0][0]).toBe("http://localhost:3000/api/active-agents/sweep");
     expect((calls[0][1] as RequestInit).method).toBe("POST");
     const body = JSON.parse((calls[0][1] as RequestInit).body as string);
-    expect(body).toEqual({ timeoutMinutes: 60 });
+    expect(body).toEqual({ timeoutMinutes: 30 });
   });
 
   it("includes Authorization header when API key is set", async () => {

@@ -5,11 +5,12 @@ const logger = rootLogger.child({ task: "active-agents-sweep" });
 
 /**
  * Minutes since last heartbeat after which an active agent is marked stale.
- * 60 min is conservative: the heartbeat hook fires every 10 min while a session
- * is alive, so a 60-min gap reliably means the session has ended (PR shipped,
- * /clear'd, crashed, etc).
+ * 30 min matches the wiki-server endpoint default (`active-agents.ts`
+ * STALE_TIMEOUT_MINUTES) and the dashboard ("silent for 30+ minutes"). The
+ * heartbeat hook is throttled at 10 min, so 30 min = ~3 missed heartbeats =
+ * the session has clearly ended (PR shipped, /clear'd, crashed, etc).
  */
-const STALE_TIMEOUT_MINUTES = 60;
+const STALE_TIMEOUT_MINUTES = 30;
 
 interface SweptAgent {
   id: number;
