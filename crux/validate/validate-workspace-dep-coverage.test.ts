@@ -6,20 +6,30 @@
  *      that the "fix gaps in the same PR" step of QUA-598 was done).
  *   2. Unit tests — build temp app trees with deliberate shapes and assert
  *      the validator classifies them correctly (undeclared → error,
- *      declared-unused → warning, subpath imports, type-only imports).
+ *      declared-unused → warning, subpath imports, dep-section coverage,
+ *      comment/string false-positive resistance, etc.).
  */
 
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { mkdirSync, writeFileSync, rmSync } from 'fs';
+import { describe, it, expect, afterEach } from 'vitest';
+import { mkdirSync, writeFileSync, rmSync, symlinkSync } from 'fs';
 import { join } from 'path';
 import os from 'os';
 
-import { runCheck } from './validate-workspace-dep-coverage.ts';
+import {
+  runCheck,
+  extractWorkspaceImports,
+} from './validate-workspace-dep-coverage.ts';
 
 interface AppFixture {
   name: string;
   dependencies?: Record<string, string>;
-  sources?: Record<string, string>; // relative path under src/ -> content
+  devDependencies?: Record<string, string>;
+  peerDependencies?: Record<string, string>;
+  optionalDependencies?: Record<string, string>;
+  /** relative path under the app root (use 'src/foo.ts', 'scripts/build.mjs'). */
+  files?: Record<string, string>;
+  /** Optional raw content for package.json (overrides the JSON builder). */
+  packageJsonOverride?: string;
 }
 
 function makeAppsDir(fixtures: AppFixture[]): string {
@@ -31,23 +41,25 @@ function makeAppsDir(fixtures: AppFixture[]): string {
   for (const app of fixtures) {
     const appDir = join(root, app.name);
     mkdirSync(appDir, { recursive: true });
-    writeFileSync(
-      join(appDir, 'package.json'),
+    const pkgBody =
+      app.packageJsonOverride ??
       JSON.stringify(
         {
           name: app.name,
           version: '0.0.0',
           private: true,
           dependencies: app.dependencies ?? {},
+          devDependencies: app.devDependencies ?? {},
+          peerDependencies: app.peerDependencies ?? {},
+          optionalDependencies: app.optionalDependencies ?? {},
         },
         null,
         2
-      )
-    );
-    if (app.sources) {
-      mkdirSync(join(appDir, 'src'), { recursive: true });
-      for (const [relPath, content] of Object.entries(app.sources)) {
-        const full = join(appDir, 'src', relPath);
+      );
+    writeFileSync(join(appDir, 'package.json'), pkgBody);
+    if (app.files) {
+      for (const [relPath, content] of Object.entries(app.files)) {
+        const full = join(appDir, relPath);
         mkdirSync(join(full, '..'), { recursive: true });
         writeFileSync(full, content);
       }
@@ -68,7 +80,7 @@ describe('validate-workspace-dep-coverage', () => {
 
   it('current repo has no undeclared workspace imports', () => {
     // Regression test: if this fails, a real undeclared import snuck into
-    // apps/*/src/ and will break the prod Docker build.
+    // apps/*/src/ or scripts/ and will break the prod Docker build.
     const result = runCheck();
     expect(result.passed).toBe(true);
     expect(result.errors).toBe(0);
@@ -78,9 +90,8 @@ describe('validate-workspace-dep-coverage', () => {
     scratch = makeAppsDir([
       {
         name: 'my-app',
-        dependencies: {},
-        sources: {
-          'index.ts':
+        files: {
+          'src/index.ts':
             `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';\n` +
             `normalizeUrlForDedup('https://example.com');\n`,
         },
@@ -102,8 +113,8 @@ describe('validate-workspace-dep-coverage', () => {
           '@longterm-wiki/url-utils': 'workspace:*',
           '@longterm-wiki/id-utils': 'workspace:*',
         },
-        sources: {
-          'index.ts':
+        files: {
+          'src/index.ts':
             `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';\n` +
             `import { isSid } from '@longterm-wiki/id-utils';\n`,
         },
@@ -118,6 +129,28 @@ describe('validate-workspace-dep-coverage', () => {
     );
   });
 
+  it('accepts declaration in devDependencies, peerDependencies, or optionalDependencies', () => {
+    scratch = makeAppsDir([
+      {
+        name: 'my-app',
+        devDependencies: { '@longterm-wiki/id-utils': 'workspace:*' },
+        peerDependencies: { '@longterm-wiki/factbase': 'workspace:*' },
+        optionalDependencies: { '@longterm-wiki/url-utils': 'workspace:*' },
+        files: {
+          'src/a.ts':
+            `import { isSid } from '@longterm-wiki/id-utils';\n` +
+            `import { serialize } from '@longterm-wiki/factbase';\n` +
+            `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';\n`,
+        },
+      },
+    ]);
+
+    const result = runCheck({ appsDir: scratch });
+    expect(result.passed).toBe(true);
+    expect(result.errors).toBe(0);
+    expect(result.apps[0].missing).toEqual([]);
+  });
+
   it('strips subpaths when counting package usage', () => {
     // `@longterm-wiki/factbase/types` is an import from `@longterm-wiki/factbase`.
     scratch = makeAppsDir([
@@ -126,8 +159,8 @@ describe('validate-workspace-dep-coverage', () => {
         dependencies: {
           '@longterm-wiki/factbase': 'workspace:*',
         },
-        sources: {
-          'index.ts':
+        files: {
+          'src/index.ts':
             `import type { FactSchema } from '@longterm-wiki/factbase/types';\n` +
             `import { serialize } from '@longterm-wiki/factbase';\n`,
         },
@@ -139,17 +172,33 @@ describe('validate-workspace-dep-coverage', () => {
     expect(result.apps[0].used).toEqual(new Set(['@longterm-wiki/factbase']));
   });
 
+  it('scans apps/<name>/scripts/ in addition to src/', () => {
+    scratch = makeAppsDir([
+      {
+        name: 'my-app',
+        // Nothing declared — imports from scripts/ must still be caught.
+        files: {
+          'scripts/build.mjs':
+            `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';\n`,
+        },
+      },
+    ]);
+
+    const result = runCheck({ appsDir: scratch });
+    expect(result.passed).toBe(false);
+    expect(result.apps[0].missing).toEqual(['@longterm-wiki/url-utils']);
+  });
+
   it('flags multi-app gaps independently', () => {
     scratch = makeAppsDir([
       {
         name: 'clean-app',
         dependencies: { '@longterm-wiki/id-utils': 'workspace:*' },
-        sources: { 'a.ts': `import { isSid } from '@longterm-wiki/id-utils';` },
+        files: { 'src/a.ts': `import { isSid } from '@longterm-wiki/id-utils';` },
       },
       {
         name: 'broken-app',
-        dependencies: {},
-        sources: { 'a.ts': `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';` },
+        files: { 'src/a.ts': `import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';` },
       },
     ]);
 
@@ -171,8 +220,8 @@ describe('validate-workspace-dep-coverage', () => {
           '@longterm-wiki/url-utils': 'workspace:*',
           '@longterm-wiki/id-utils': 'workspace:*',
         },
-        sources: {
-          'a.ts': `import { isSid } from '@longterm-wiki/id-utils';`,
+        files: {
+          'src/a.ts': `import { isSid } from '@longterm-wiki/id-utils';`,
         },
       },
     ]);
@@ -188,21 +237,20 @@ describe('validate-workspace-dep-coverage', () => {
     scratch = makeAppsDir([
       {
         name: 'my-app',
-        dependencies: {},
-        sources: {
+        files: {
           // These files should NOT count toward the used set:
-          'README.md': `See \`@longterm-wiki/url-utils\` for docs.\n`,
-          'data.json': `{"pkg": "@longterm-wiki/url-utils"}\n`,
+          'src/README.md': `See \`@longterm-wiki/url-utils\` for docs.\n`,
+          'src/data.json': `{"pkg": "@longterm-wiki/url-utils"}\n`,
         },
       },
     ]);
 
-    // Simulate a nested node_modules symlink-style dir — scanner must skip it
-    // even if it contains .ts files that reference workspace packages.
-    const dir = join(scratch, 'my-app', 'src', 'node_modules', 'something');
-    mkdirSync(dir, { recursive: true });
+    // Simulate a nested node_modules dir — scanner must skip it even if it
+    // contains .ts files that reference workspace packages.
+    const nm = join(scratch, 'my-app', 'src', 'node_modules', 'something');
+    mkdirSync(nm, { recursive: true });
     writeFileSync(
-      join(dir, 'index.ts'),
+      join(nm, 'index.ts'),
       `import { x } from '@longterm-wiki/url-utils';\n`
     );
 
@@ -211,12 +259,28 @@ describe('validate-workspace-dep-coverage', () => {
     expect(result.apps[0].used.size).toBe(0);
   });
 
-  it('handles apps with no src/ directory gracefully', () => {
+  it('does NOT false-positive on bare mentions in comments or strings', () => {
     scratch = makeAppsDir([
       {
-        name: 'stub-app',
-        dependencies: {},
+        name: 'my-app',
+        files: {
+          'src/a.ts':
+            `// See @longterm-wiki/this-does-not-exist for docs.\n` +
+            `const doc = 'visit @longterm-wiki/not-a-real-package';\n` +
+            `/* JSDoc: pulls from @longterm-wiki/also-fake */\n`,
+        },
       },
+    ]);
+
+    const result = runCheck({ appsDir: scratch });
+    // No real imports → passes, no missing entries.
+    expect(result.passed).toBe(true);
+    expect(result.apps[0].used.size).toBe(0);
+  });
+
+  it('handles apps with no src/ or scripts/ directory gracefully', () => {
+    scratch = makeAppsDir([
+      { name: 'stub-app' },
     ]);
 
     const result = runCheck({ appsDir: scratch });
@@ -235,18 +299,105 @@ describe('validate-workspace-dep-coverage', () => {
     scratch = makeAppsDir([
       {
         name: 'my-app',
-        dependencies: {},
-        sources: {
-          'a.cjs': `const { x } = require('@longterm-wiki/url-utils');\n`,
-          'b.ts': `const mod = await import('@longterm-wiki/id-utils');\n`,
+        files: {
+          'src/a.cjs': `const { x } = require('@longterm-wiki/url-utils');\n`,
+          'src/b.ts': `const mod = await import('@longterm-wiki/id-utils');\n`,
         },
       },
     ]);
 
     const result = runCheck({ appsDir: scratch });
     expect(result.passed).toBe(false);
-    expect(result.apps[0].missing).toEqual(
-      ['@longterm-wiki/id-utils', '@longterm-wiki/url-utils'].sort()
+    // Sorted alphabetically in the output.
+    expect(result.apps[0].missing).toEqual([
+      '@longterm-wiki/id-utils',
+      '@longterm-wiki/url-utils',
+    ]);
+  });
+
+  it('calls onWarn when package.json is malformed', () => {
+    scratch = makeAppsDir([
+      {
+        name: 'my-app',
+        packageJsonOverride: `{ "name": "my-app", "dependencies": [ broken `,
+        files: {
+          'src/a.ts': `import { x } from '@longterm-wiki/url-utils';`,
+        },
+      },
+    ]);
+
+    const warnings: string[] = [];
+    const result = runCheck({ appsDir: scratch, onWarn: (msg) => warnings.push(msg) });
+
+    expect(warnings.length).toBeGreaterThan(0);
+    expect(warnings[0]).toMatch(/Malformed package.json/);
+    // With no declared deps, the import is still flagged as missing.
+    expect(result.passed).toBe(false);
+  });
+
+  it('skips symlinks without following them (no recursion loop)', () => {
+    scratch = makeAppsDir([
+      {
+        name: 'my-app',
+        dependencies: { '@longterm-wiki/id-utils': 'workspace:*' },
+        files: {
+          'src/a.ts': `import { isSid } from '@longterm-wiki/id-utils';`,
+        },
+      },
+    ]);
+
+    // Create a symlink that would cause infinite recursion if followed.
+    try {
+      symlinkSync(
+        join(scratch, 'my-app', 'src'),
+        join(scratch, 'my-app', 'src', 'self-loop')
+      );
+    } catch {
+      // On some filesystems (e.g. CI without symlink perms) the test is a no-op.
+      return;
+    }
+
+    const result = runCheck({ appsDir: scratch });
+    expect(result.passed).toBe(true);
+  });
+});
+
+describe('extractWorkspaceImports', () => {
+  it('captures imports from import/from/require forms', () => {
+    const source = [
+      `import foo from '@longterm-wiki/a';`,
+      `import { x } from '@longterm-wiki/b';`,
+      `import('@longterm-wiki/c');`,
+      `require('@longterm-wiki/d');`,
+      `import type { T } from '@longterm-wiki/e';`,
+    ].join('\n');
+
+    expect(extractWorkspaceImports(source)).toEqual(
+      new Set([
+        '@longterm-wiki/a',
+        '@longterm-wiki/b',
+        '@longterm-wiki/c',
+        '@longterm-wiki/d',
+        '@longterm-wiki/e',
+      ])
     );
+  });
+
+  it('does not capture comment or non-quoted mentions', () => {
+    const source = [
+      `// See @longterm-wiki/foo for help`,
+      `/* @longterm-wiki/bar */`,
+      `const pkg = \`@longterm-wiki/template-literal\`;  // backtick, not single/double quote anchor`,
+    ].join('\n');
+
+    expect(extractWorkspaceImports(source)).toEqual(new Set());
+  });
+
+  it('captures subpath imports as the parent package', () => {
+    const source =
+      `import { T } from '@longterm-wiki/factbase/types';\n` +
+      `import { s } from '@longterm-wiki/factbase/serializer/v2';\n`;
+
+    expect(extractWorkspaceImports(source)).toEqual(new Set(['@longterm-wiki/factbase']));
   });
 });

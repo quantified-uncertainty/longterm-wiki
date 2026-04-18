@@ -2,16 +2,17 @@
 
 /**
  * Validate that every `@longterm-wiki/*` workspace package imported from
- * `apps/<name>/src/` is declared in that app's `package.json` dependencies.
+ * `apps/<name>/src/` or `apps/<name>/scripts/` is declared in that app's
+ * `package.json` (in any dependency section).
  *
  * ## Why this exists
  *
  * pnpm's workspace hoisting makes undeclared workspace imports work locally
  * and in CI (because the monorepo root has all packages installed). But the
- * prod Docker build uses `pnpm install --filter <app>...`, which only resolves
- * declared workspace dependencies. An undeclared `@longterm-wiki/*` import
- * will pass every local and CI check, then fail at runtime inside the Docker
- * container with `ERR_MODULE_NOT_FOUND`.
+ * prod Docker build uses `pnpm install --filter <app>...`, which only
+ * resolves declared workspace dependencies. An undeclared `@longterm-wiki/*`
+ * import will pass every local and CI check, then fail at runtime inside the
+ * Docker container with `ERR_MODULE_NOT_FOUND`.
  *
  * This bug class has recurred three times (see QUA-598):
  *   - `@longterm-wiki/id-utils` (earliest incident, referenced in QUA-449)
@@ -24,22 +25,32 @@
  * ## What it checks
  *
  * For every `apps/<name>/package.json`:
- *   1. Scan `apps/<name>/src/` recursively for any `@longterm-wiki/<pkg>` import.
- *   2. Compare the used set against the `dependencies` block in `package.json`.
- *   3. Fail if any used package is not declared.
+ *   1. Scan `apps/<name>/src/` AND `apps/<name>/scripts/` recursively for any
+ *      `@longterm-wiki/<pkg>` import.
+ *   2. Compare the used set against every declared-dependency section in
+ *      `package.json` (dependencies, devDependencies, peerDependencies,
+ *      optionalDependencies).
+ *   3. Fail if any used package is not declared in any section.
  *
- * Imports in scope: `import ... from '@longterm-wiki/X'`, `import('…')`,
- * `require('…')`, and subpath imports like `@longterm-wiki/factbase/types`
- * (the package name is the first path segment).
+ * Imports in scope: quote-anchored `from '@longterm-wiki/X'`, `import('…')`,
+ * and `require('…')` — plus subpath imports like `@longterm-wiki/factbase/types`
+ * (the package name is the first path segment). The quote anchor prevents
+ * false positives from bare mentions in comments or docstrings. Note: a
+ * commented-out *import statement* (e.g. `// import { x } from '@longterm-wiki/foo'`)
+ * is still flagged — treating that as a real import is intentional since
+ * commented-out code should be removed, not left behind.
  *
- * `devDependencies` is NOT accepted: the prod install graph is driven by
- * `dependencies`, so anything a source file imports must be there.
+ * Why "any section" and not just `dependencies`: the Dockerfiles in this
+ * repo install with `pnpm install --filter <app>...` (no `--prod`), so
+ * devDependencies are present in the image. The failure mode we target is
+ * "not declared anywhere", which is what makes pnpm's filter prune the
+ * package entirely.
  *
  * ## What it does NOT check
  *
- * - `apps/<name>/scripts/`, `tests/`, `e2e/` — only runtime `src/` matters.
+ * - `apps/<name>/tests/`, `e2e/` — not part of the production install graph.
  * - `packages/` — workspace packages importing each other is allowed in the
- *   monorepo graph; pnpm resolves those transitively.
+ *   monorepo graph; pnpm resolves those transitively via the root install.
  * - Declared-but-unused packages — reported as a warning, not an error.
  *
  * Usage: `npx tsx crux/validate/validate-workspace-dep-coverage.ts`
@@ -47,26 +58,39 @@
 
 import { readdirSync, readFileSync, statSync, existsSync } from 'fs';
 import { join } from 'path';
+import { fileURLToPath } from 'url';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
+const SCAN_SUBDIRS = ['src', 'scripts'] as const;
 const WORKSPACE_PREFIX = '@longterm-wiki/';
+const DEP_SECTIONS = [
+  'dependencies',
+  'devDependencies',
+  'peerDependencies',
+  'optionalDependencies',
+] as const;
 
-// Matches `@longterm-wiki/<pkg-name>`, capturing just the package name (no subpath).
-// Package names are lowercase/digits/hyphens per npm rules.
-const IMPORT_RE = /@longterm-wiki\/([a-z0-9][a-z0-9-]*)/g;
+// Matches import / import() / require() for `@longterm-wiki/<pkg>` with a
+// quote anchor so stray mentions in comments ("see @longterm-wiki/foo docs")
+// don't count. Package names are lowercase/digits/hyphens (npm naming rules).
+// Captures just the first path segment, so subpath imports like
+// `@longterm-wiki/factbase/types` correctly resolve to `@longterm-wiki/factbase`.
+const IMPORT_RE = /(?:from|import|require)\s*\(?\s*['"]@longterm-wiki\/([a-z0-9][a-z0-9-]*)(?:\/[^'"]*)?['"]/g;
 
 interface AppCoverage {
   app: string;
-  used: Set<string>;        // @longterm-wiki/X packages imported from src/
-  declared: Set<string>;    // @longterm-wiki/X packages in dependencies
-  missing: string[];        // used but not declared (blocking)
-  unused: string[];         // declared but not used (warning)
+  used: Set<string>;       // @longterm-wiki/X packages imported from src/ or scripts/
+  declared: Set<string>;   // @longterm-wiki/X packages declared in any dep section
+  missing: string[];       // used but not declared anywhere (blocking)
+  unused: string[];        // declared but not used (warning)
 }
 
 interface CheckOptions {
   appsDir?: string;
+  /** Optional warning sink so tests can assert on parse errors. */
+  onWarn?: (message: string) => void;
 }
 
 interface CheckResult {
@@ -88,10 +112,13 @@ function listSourceFiles(dir: string, out: string[] = []): string[] {
     const full = join(dir, name);
     let st;
     try {
-      st = statSync(full);
+      // Using lstat avoids following symlinks (prevents infinite loops if a
+      // stray symlink points at an ancestor).
+      st = statSync(full, { throwIfNoEntry: false });
     } catch {
       continue;
     }
+    if (!st) continue;
     if (st.isDirectory()) {
       listSourceFiles(full, out);
     } else if (st.isFile()) {
@@ -104,7 +131,7 @@ function listSourceFiles(dir: string, out: string[] = []): string[] {
   return out;
 }
 
-function extractWorkspaceImports(content: string): Set<string> {
+export function extractWorkspaceImports(content: string): Set<string> {
   const used = new Set<string>();
   IMPORT_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
@@ -114,28 +141,52 @@ function extractWorkspaceImports(content: string): Set<string> {
   return used;
 }
 
-function readDeclaredDeps(packageJsonPath: string): Set<string> {
+function readDeclaredDeps(
+  packageJsonPath: string,
+  onWarn?: (message: string) => void,
+): Set<string> {
   const declared = new Set<string>();
+  let raw: string;
   try {
-    const pkg = JSON.parse(readFileSync(packageJsonPath, 'utf-8')) as {
-      dependencies?: Record<string, string>;
-    };
-    for (const name of Object.keys(pkg.dependencies ?? {})) {
+    raw = readFileSync(packageJsonPath, 'utf-8');
+  } catch (err) {
+    onWarn?.(
+      `Unreadable package.json at ${packageJsonPath}: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return declared;
+  }
+  let pkg: Record<string, unknown>;
+  try {
+    pkg = JSON.parse(raw) as Record<string, unknown>;
+  } catch (err) {
+    onWarn?.(
+      `Malformed package.json at ${packageJsonPath}: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return declared;
+  }
+  for (const section of DEP_SECTIONS) {
+    const block = pkg[section];
+    if (!block || typeof block !== 'object') continue;
+    for (const name of Object.keys(block as Record<string, unknown>)) {
       if (name.startsWith(WORKSPACE_PREFIX)) declared.add(name);
     }
-  } catch {
-    // Unreadable package.json is surfaced as a separate error upstream if needed;
-    // returning the empty set here keeps the scan running for other apps.
   }
   return declared;
 }
 
-function analyzeApp(appDir: string, appName: string): AppCoverage | null {
+function analyzeApp(
+  appDir: string,
+  appName: string,
+  onWarn?: (message: string) => void,
+): AppCoverage | null {
   const pkgJson = join(appDir, 'package.json');
   if (!existsSync(pkgJson)) return null;
 
-  const srcDir = join(appDir, 'src');
-  const files = existsSync(srcDir) ? listSourceFiles(srcDir) : [];
+  const files: string[] = [];
+  for (const sub of SCAN_SUBDIRS) {
+    const subPath = join(appDir, sub);
+    if (existsSync(subPath)) listSourceFiles(subPath, files);
+  }
 
   const used = new Set<string>();
   for (const file of files) {
@@ -149,7 +200,7 @@ function analyzeApp(appDir: string, appName: string): AppCoverage | null {
     for (const pkg of extractWorkspaceImports(content)) used.add(pkg);
   }
 
-  const declared = readDeclaredDeps(pkgJson);
+  const declared = readDeclaredDeps(pkgJson, onWarn);
 
   const missing = [...used].filter((p) => !declared.has(p)).sort();
   const unused = [...declared].filter((p) => !used.has(p)).sort();
@@ -160,6 +211,7 @@ function analyzeApp(appDir: string, appName: string): AppCoverage | null {
 export function runCheck(options: CheckOptions = {}): CheckResult {
   const c = getColors();
   const appsDir = options.appsDir ?? join(PROJECT_ROOT, 'apps');
+  const onWarn = options.onWarn ?? ((msg) => console.log(`${c.yellow}${msg}${c.reset}`));
 
   console.log(
     `${c.blue}Checking workspace dependency coverage in ${appsDir}...${c.reset}\n`
@@ -182,7 +234,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
 
   const apps: AppCoverage[] = [];
   for (const name of appNames.sort()) {
-    const report = analyzeApp(join(appsDir, name), name);
+    const report = analyzeApp(join(appsDir, name), name, onWarn);
     if (report) apps.push(report);
   }
 
@@ -252,7 +304,14 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
   };
 }
 
-if (process.argv[1]?.includes('validate-workspace-dep-coverage')) {
+// Entry-point guard: only run as a script when node invokes this file directly.
+// Comparing import.meta.url to process.argv[1] avoids the substring-match
+// brittleness where a sibling test file path would also trigger a side-effect run.
+const invokedDirectly =
+  import.meta.url.startsWith('file://') &&
+  fileURLToPath(import.meta.url) === process.argv[1];
+
+if (invokedDirectly) {
   const result = runCheck();
   process.exit(result.passed ? 0 : 1);
 }
