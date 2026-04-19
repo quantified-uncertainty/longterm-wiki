@@ -168,8 +168,7 @@ export async function generateSnapshot(options?: {
     if (r.resourceSubtype) entry.resource_subtype = r.resourceSubtype;
     if (r.resourcePurpose) entry.resource_purpose = r.resourcePurpose;
     if (r.fetchStatus) entry.fetch_status = r.fetchStatus;
-    // QUA-602: citations are keyed by the resource's canonical stable_id, not
-    // the legacy hex16 id. Rows without a stable_id cannot have citations.
+    // Citations are keyed by resources.stable_id (FK target).
     const citedBy = r.stableId ? citationsIndex[r.stableId] : undefined;
     if (citedBy && citedBy.length > 0) entry.cited_by = citedBy;
     return entry;

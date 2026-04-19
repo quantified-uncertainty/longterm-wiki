@@ -1505,12 +1505,8 @@ const resourcesApp = new Hono()
   .get("/citations/all", async (c) => {
     const HARD_LIMIT = 50000;
     const db = getDrizzleDb();
-    // QUA-602: result is keyed by `resource_citations.resource_id`, which is
-    // the resource's canonical `stable_id` (sid_). All three callers (the web
-    // build, resource-io, snapshot-resources) now key by `resource.stable_id`,
-    // so the earlier INNER JOIN to resources purely to surface the legacy
-    // hex16 `resources.id` has been dropped. wiki_pages is still LEFT JOINed
-    // to recover the slug from the integer page ID.
+    // Response keys are `resource_citations.resource_id` (the canonical
+    // stable_id). wiki_pages is LEFT JOINed only to resolve slug from page_id.
     const rows = await db
       .select({
         resourceId: resourceCitations.resourceId,
@@ -1824,12 +1820,9 @@ const resourcesApp = new Hono()
     const db = getDrizzleDb();
     const results = { papers: 0, forumPosts: 0, policyDocs: 0 };
 
-    // QUA-564 B.1 / QUA-566 B.3 / QUA-601: all three sub-tables' resource_id
-    // references resources.stable_id. Client batch items may supply hex16
-    // (resources.id) or sid_ (resources.stable_id); `resolveResourceIds`
-    // translates both forms to the canonical stable_id via a single lookup.
-    // Lenient mode: unresolved inputs pass through and the FK catches them
-    // at insert time.
+    // All three sub-tables' resource_id references resources.stable_id; clients
+    // may send either hex16 or sid_. Lenient mode: unresolved inputs pass
+    // through and the FK rejects genuinely invalid values at insert time.
     const allInputIds: string[] = [];
     for (const it of batchData.papers ?? []) if (it.resourceId) allInputIds.push(it.resourceId);
     for (const it of batchData.forumPosts ?? []) if (it.resourceId) allInputIds.push(it.resourceId);
@@ -1915,9 +1908,6 @@ const resourcesApp = new Hono()
         }
 
         // Bulk upsert policy docs in one query.
-        // QUA-564 Phase B.1 / QUA-566 Phase B.3: resource_id references
-        // resources.stable_id; the shared resolveResourceId() above translates
-        // hex16 → sid_ for any client still passing legacy hex ids.
         if (batchData.policyDocs && batchData.policyDocs.length > 0) {
           const policyVals = batchData.policyDocs.map((item) => ({
             resourceId: resolveResourceId(item.resourceId),

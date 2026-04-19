@@ -2,7 +2,6 @@ import { describe, it, expect, beforeEach } from "vitest";
 import { createBaseMockSql } from "./test-utils.js";
 import { resolveResourceIds } from "../routes/shared/resolve-resource-id.js";
 
-// In-memory stand-in for the resources table, keyed by primary id (hex16).
 interface ResourceRow {
   id: string;
   stable_id: string | null;
@@ -17,9 +16,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
   if (q.includes("from resources") && q.includes("where id = any") && q.includes("stable_id = any")) {
-    // Each ${unique} interpolation produces a separate bind parameter; postgres.js
-    // passes the same array twice (params[0] and params[1]) because the helper
-    // interpolates it twice. We check either side to mirror the OR.
+    // Each ${unique} interpolation produces a separate bind parameter.
     const idSet = new Set(params[0] as string[]);
     const stableSet = new Set(params[1] as string[]);
     const out: ResourceRow[] = [];
@@ -41,11 +38,9 @@ describe("resolveResourceIds", () => {
     resetStore();
   });
 
-  it("returns empty map + empty missing list on empty input", async () => {
+  it("returns empty missing list on empty input", async () => {
     const result = await resolveResourceIds(mockSql, []);
-    expect(result.map.size).toBe(0);
     expect(result.missing).toEqual([]);
-    expect(result.resolve("anything")).toBe("anything");
   });
 
   it("translates hex16 → canonical stable_id", async () => {
@@ -59,7 +54,7 @@ describe("resolveResourceIds", () => {
     expect(result.resolve("deadbeef00000001")).toBe("sid_AbCdEfGhIj");
   });
 
-  it("passes sid_ through unchanged (sid_ → sid_)", async () => {
+  it("passes sid_ through unchanged", async () => {
     resourcesStore.set("deadbeef00000002", {
       id: "deadbeef00000002",
       stable_id: "sid_KlMnOpQrSt",
@@ -70,20 +65,18 @@ describe("resolveResourceIds", () => {
     expect(result.resolve("sid_KlMnOpQrSt")).toBe("sid_KlMnOpQrSt");
   });
 
-  it("populates map in both directions when the input is hex16", async () => {
+  it("resolves both hex16 and sid_ forms to the same canonical stable_id", async () => {
     resourcesStore.set("deadbeef00000003", {
       id: "deadbeef00000003",
       stable_id: "sid_UvWxYz0123",
     });
 
     const result = await resolveResourceIds(mockSql, ["deadbeef00000003"]);
-    // Both hex16 and sid_ resolve to the same canonical stable_id, regardless
-    // of which form was passed in.
-    expect(result.map.get("deadbeef00000003")).toBe("sid_UvWxYz0123");
-    expect(result.map.get("sid_UvWxYz0123")).toBe("sid_UvWxYz0123");
+    expect(result.resolve("deadbeef00000003")).toBe("sid_UvWxYz0123");
+    expect(result.resolve("sid_UvWxYz0123")).toBe("sid_UvWxYz0123");
   });
 
-  it("lists unresolved inputs under `missing`", async () => {
+  it("lists unresolved inputs under `missing` and passes them through", async () => {
     resourcesStore.set("deadbeef00000004", {
       id: "deadbeef00000004",
       stable_id: "sid_aaaaaaaaaa",
@@ -95,7 +88,6 @@ describe("resolveResourceIds", () => {
       "sid_ghostXXXXX",
     ]);
     expect(result.missing.sort()).toEqual(["nonexistent000000", "sid_ghostXXXXX"]);
-    // Lenient pass-through for unresolved inputs.
     expect(result.resolve("nonexistent000000")).toBe("nonexistent000000");
     expect(result.resolve("sid_ghostXXXXX")).toBe("sid_ghostXXXXX");
   });
@@ -111,7 +103,7 @@ describe("resolveResourceIds", () => {
     expect(result.resolve("legacyrow00000005")).toBe("legacyrow00000005");
   });
 
-  it("dedups repeated inputs before querying", async () => {
+  it("dedups repeated inputs", async () => {
     resourcesStore.set("deadbeef00000006", {
       id: "deadbeef00000006",
       stable_id: "sid_dupxxxxxxx",
@@ -122,7 +114,6 @@ describe("resolveResourceIds", () => {
       "deadbeef00000006",
       "deadbeef00000006",
     ]);
-    // One entry per unique input; no crash, no duplicate `missing` entries.
     expect(result.missing).toEqual([]);
     expect(result.resolve("deadbeef00000006")).toBe("sid_dupxxxxxxx");
   });
@@ -138,9 +129,9 @@ describe("resolveResourceIds", () => {
     });
 
     const result = await resolveResourceIds(mockSql, [
-      "deadbeef00000007", // hex16 → sid_bbbbbbbbbb
-      "sid_cccccccccc", // already canonical
-      "unknown0000xxxxx", // missing
+      "deadbeef00000007",
+      "sid_cccccccccc",
+      "unknown0000xxxxx",
     ]);
     expect(result.missing).toEqual(["unknown0000xxxxx"]);
     expect(result.resolve("deadbeef00000007")).toBe("sid_bbbbbbbbbb");

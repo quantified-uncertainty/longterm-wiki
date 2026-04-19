@@ -160,12 +160,9 @@ const claimsApp = new Hono()
       "proposing claims for sourcing",
     );
 
-    // 1. Validate resource references exist (if provided) and resolve to stable_id.
-    // QUA-573 Phase B.1c: proposed_claims.resource_id now references
-    // resources.stable_id, but callers (source-discover-agent via /api/resources/suggest)
-    // still pass the legacy hex16 resources.id. Accept either and translate to
-    // stable_id before insert so new rows land in the canonical form. Strict mode:
-    // any unresolved input is a 400 — proposed_claims must never persist a hex16.
+    // Validate resource references exist (if provided) and canonicalise to
+    // stable_id. Strict mode: any unresolved input is a 400; proposed_claims
+    // must never persist a hex16 value (the FK points at resources.stable_id).
     const inputResourceIds = claims.map((cl) => cl.resourceId).filter(Boolean) as string[];
     const { resolve: resolveResourceId, missing } = await resolveResourceIds(
       sql,

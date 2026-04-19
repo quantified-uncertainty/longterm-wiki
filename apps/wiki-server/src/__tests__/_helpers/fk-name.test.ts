@@ -8,9 +8,10 @@ describe("expectedFkName", () => {
     );
   });
 
-  it("matches the real Drizzle name for resource_citations FK post-QUA-566", () => {
-    // The exact string that migration 0192 produces; regression anchor for
-    // the Drizzle naming convention encoded in this helper.
+  it("matches the real Drizzle name for resource_citations → resources.stable_id FK", () => {
+    // Regression anchor for the Drizzle naming convention; the exact string
+    // appears in information_schema and must keep matching if Drizzle's
+    // naming scheme ever changes.
     expect(
       expectedFkName("resource_citations", "resource_id", "resources", "stable_id"),
     ).toBe("resource_citations_resource_id_resources_stable_id_fk");

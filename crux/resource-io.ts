@@ -176,9 +176,8 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
     return null;
   }
 
-  // QUA-602: citations are keyed by the resource's canonical stable_id, not
-  // the legacy hex16 id. Rows without a stable_id cannot have citations
-  // (FK target), so we skip the lookup for them.
+  // Citations are keyed by resources.stable_id (FK target); rows without one
+  // cannot have citations.
   return allResources.map(row =>
     pgRowToResource(row, row.stableId ? citationsIndex[row.stableId] : undefined)
   );
