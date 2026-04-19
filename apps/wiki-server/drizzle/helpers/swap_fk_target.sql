@@ -100,6 +100,15 @@ BEGIN
     format('%s_%s_%s_%s_fk', child_table, child_col, parent_table, to_col)
   );
 
+  -- PG silently truncates identifiers past 63 bytes (NAMEDATALEN-1). Truncation
+  -- desyncs the EXISTS idempotency check below from the stored constraint name,
+  -- so fail loudly with an actionable message instead.
+  IF octet_length(final_name) > current_setting('max_identifier_length')::int THEN
+    RAISE EXCEPTION
+      'swap_fk_target: generated constraint name "%" is % bytes, exceeds PostgreSQL max_identifier_length (% bytes). Pass new_constraint_name explicitly.',
+      final_name, octet_length(final_name), current_setting('max_identifier_length');
+  END IF;
+
   RAISE NOTICE 'swap_fk_target: %.% → %.% (ON DELETE %, NOT VALID: %, constraint: %)',
     child_table, child_col, parent_table, to_col,
     normalized_on_delete, use_not_valid, final_name;
@@ -116,17 +125,20 @@ BEGIN
     SELECT tc.constraint_name
     FROM information_schema.table_constraints tc
     JOIN information_schema.key_column_usage kcu
-      ON tc.constraint_name = kcu.constraint_name
-     AND tc.table_schema    = kcu.table_schema
+      ON tc.constraint_schema = kcu.constraint_schema
+     AND tc.constraint_name   = kcu.constraint_name
+     AND tc.table_schema      = kcu.table_schema
     JOIN information_schema.referential_constraints rc
-      ON tc.constraint_name = rc.constraint_name
+      ON tc.constraint_schema = rc.constraint_schema
+     AND tc.constraint_name   = rc.constraint_name
     JOIN information_schema.constraint_column_usage ccu
-      ON rc.unique_constraint_name   = ccu.constraint_name
-     AND rc.unique_constraint_schema = ccu.constraint_schema
+      ON rc.unique_constraint_schema = ccu.constraint_schema
+     AND rc.unique_constraint_name   = ccu.constraint_name
     WHERE tc.table_schema     = current_schema()
       AND tc.table_name       = child_table
       AND tc.constraint_type  = 'FOREIGN KEY'
       AND kcu.column_name     = child_col
+      AND ccu.table_schema    = current_schema()
       AND ccu.table_name      = parent_table
       AND ccu.column_name     = from_col
   LOOP
@@ -184,11 +196,69 @@ BEGIN
 
   -- Step 4: Add the new FK pointing at parent_table.to_col. Wrapped in an
   -- IF NOT EXISTS check so a manual re-apply is a no-op rather than an error.
+  -- The check verifies the existing constraint is (a) a FOREIGN KEY, (b) on
+  -- child_col, and (c) references parent_table.to_col — matching on name alone
+  -- would silently skip ADD if a same-named CHECK/UNIQUE or stale mis-pointing
+  -- FK occupied the name. On collision, raise rather than skip.
+  IF EXISTS (
+    SELECT 1 FROM information_schema.table_constraints tc
+    WHERE tc.constraint_schema = current_schema()
+      AND tc.constraint_name   = final_name
+      AND tc.table_schema      = current_schema()
+      AND tc.table_name        = child_table
+      AND tc.constraint_type  <> 'FOREIGN KEY'
+  ) THEN
+    RAISE EXCEPTION
+      'swap_fk_target: constraint "%" already exists on %.% but is not a FOREIGN KEY — refusing to replace it. Rename or drop the existing constraint first.',
+      final_name, current_schema(), child_table;
+  END IF;
+
+  IF EXISTS (
+    SELECT 1 FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_schema = kcu.constraint_schema
+     AND tc.constraint_name   = kcu.constraint_name
+    JOIN information_schema.referential_constraints rc
+      ON tc.constraint_schema = rc.constraint_schema
+     AND tc.constraint_name   = rc.constraint_name
+    JOIN information_schema.constraint_column_usage ccu
+      ON rc.unique_constraint_schema = ccu.constraint_schema
+     AND rc.unique_constraint_name   = ccu.constraint_name
+    WHERE tc.constraint_schema = current_schema()
+      AND tc.constraint_name   = final_name
+      AND tc.table_schema      = current_schema()
+      AND tc.table_name        = child_table
+      AND tc.constraint_type   = 'FOREIGN KEY'
+      AND kcu.column_name      = child_col
+      AND ccu.table_schema     = current_schema()
+      AND ccu.table_name       = parent_table
+      AND ccu.column_name     <> to_col
+  ) THEN
+    RAISE EXCEPTION
+      'swap_fk_target: FK "%" on %.% already exists but references a different column than %.% — refusing to skip ADD. Drop or rename the existing FK first.',
+      final_name, current_schema(), child_table, parent_table, to_col;
+  END IF;
+
   IF NOT EXISTS (
-    SELECT 1 FROM information_schema.table_constraints
-    WHERE table_schema    = current_schema()
-      AND constraint_name = final_name
-      AND table_name      = child_table
+    SELECT 1 FROM information_schema.table_constraints tc
+    JOIN information_schema.key_column_usage kcu
+      ON tc.constraint_schema = kcu.constraint_schema
+     AND tc.constraint_name   = kcu.constraint_name
+    JOIN information_schema.referential_constraints rc
+      ON tc.constraint_schema = rc.constraint_schema
+     AND tc.constraint_name   = rc.constraint_name
+    JOIN information_schema.constraint_column_usage ccu
+      ON rc.unique_constraint_schema = ccu.constraint_schema
+     AND rc.unique_constraint_name   = ccu.constraint_name
+    WHERE tc.constraint_schema = current_schema()
+      AND tc.constraint_name   = final_name
+      AND tc.table_schema      = current_schema()
+      AND tc.table_name        = child_table
+      AND tc.constraint_type   = 'FOREIGN KEY'
+      AND kcu.column_name      = child_col
+      AND ccu.table_schema     = current_schema()
+      AND ccu.table_name       = parent_table
+      AND ccu.column_name      = to_col
   ) THEN
     IF use_not_valid THEN
       -- ADD CONSTRAINT NOT VALID registers the constraint as unchecked
