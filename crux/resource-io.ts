@@ -176,10 +176,13 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
     return null;
   }
 
-  // Citations are keyed by resources.stable_id (FK target); rows without one
-  // cannot have citations.
+  // Accept either stable_id-keyed or legacy hex16-keyed indexes during the
+  // cross-service migration window.
   return allResources.map(row =>
-    pgRowToResource(row, row.stableId ? citationsIndex[row.stableId] : undefined)
+    pgRowToResource(
+      row,
+      (row.stableId && citationsIndex[row.stableId]) || citationsIndex[row.id],
+    ),
   );
 }
 

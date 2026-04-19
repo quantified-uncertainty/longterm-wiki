@@ -1762,8 +1762,9 @@ export async function fetchResourcesFromPG() {
       if (rows.length < limit) break;
     }
 
-    // Citations are keyed by resources.stable_id (FK target). Rows without
-    // stable_id therefore cannot have citations, so we just skip them.
+    // Accept either stable_id-keyed (post-QUA-602) or hex16-keyed (pre-deploy
+    // window) citation indexes, so the build keeps working while the PR that
+    // changes the endpoint response shape is in flight.
     try {
       const citResp = await fetch(
         `${serverUrl}/api/resources/citations/all`,
@@ -1773,8 +1774,7 @@ export async function fetchResourcesFromPG() {
         const citData = await citResp.json();
         const citations = citData.citations || {};
         for (const r of allResources) {
-          if (!r.stable_id) continue;
-          const pages = citations[r.stable_id];
+          const pages = (r.stable_id && citations[r.stable_id]) || citations[r.id];
           if (pages && pages.length > 0) {
             r.cited_by = pages;
           }

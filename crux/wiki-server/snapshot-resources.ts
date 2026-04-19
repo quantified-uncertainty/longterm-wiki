@@ -168,8 +168,10 @@ export async function generateSnapshot(options?: {
     if (r.resourceSubtype) entry.resource_subtype = r.resourceSubtype;
     if (r.resourcePurpose) entry.resource_purpose = r.resourcePurpose;
     if (r.fetchStatus) entry.fetch_status = r.fetchStatus;
-    // Citations are keyed by resources.stable_id (FK target).
-    const citedBy = r.stableId ? citationsIndex[r.stableId] : undefined;
+    // Accept either stable_id-keyed or legacy hex16-keyed indexes during the
+    // cross-service migration window.
+    const citedBy =
+      (r.stableId && citationsIndex[r.stableId]) || citationsIndex[r.id];
     if (citedBy && citedBy.length > 0) entry.cited_by = citedBy;
     return entry;
   });
