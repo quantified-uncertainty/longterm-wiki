@@ -33,6 +33,8 @@ Run `pnpm test` and confirm existing tests still pass. If you added new logic (h
 
 Run `pnpm crux w validate gate --fix` to catch CI-blocking issues.
 
+**If the gate fails with thousands of `resource-ref-integrity` errors (`<R id="sid_..."> does not match any known resource`) on a branch you haven't touched resources on**, the local `data/resources-snapshot.json` is stale. CI rebuilds from live PG, so CI passes while local fails. Refresh with `WIKI_SERVER_ENV=prod pnpm crux sys wiki-server snapshot-resources` (~30s).
+
 ## 4. UI verification with Playwright (if modifying .tsx pages or components)
 
 When your PR changes pages or UI components, **verify them visually with Playwright** before opening the PR. Do not ask the user to manually check pages you could verify programmatically.
