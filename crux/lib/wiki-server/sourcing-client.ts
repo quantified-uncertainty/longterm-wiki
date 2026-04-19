@@ -221,6 +221,23 @@ export async function listUrlSuggestions(
   );
 }
 
+/**
+ * Update a single URL suggestion's status (approve / reject / mark applied).
+ * Thin PATCH wrapper over /api/sourcing/url-suggestions/:id. Used by
+ * sourcing-apply-suggestions (QUA-591) to mark 'applied' after a successful
+ * URL swap + recheck.
+ */
+export async function updateUrlSuggestionStatus(
+  id: number,
+  body: { status: SuggestionStatus; reviewedBy?: string; notes?: string | null },
+): Promise<ApiResult<{ ok: boolean; id: number }>> {
+  return apiRequest<{ ok: boolean; id: number }>(
+    'PATCH',
+    `/api/sourcing/url-suggestions/${id}`,
+    body,
+  );
+}
+
 /** Get records due for re-check. */
 export async function getDueForRecheck(
   options?: { recordType?: string; limit?: number },

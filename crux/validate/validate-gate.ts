@@ -288,6 +288,18 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-609: enforces FK-swap migrations drop BOTH the Drizzle-generated
+    // `<table>_<col>_resources_id_fk` AND the postgres-default
+    // `<table>_<col>_fkey` names. Migration 0186 only dropped the first and
+    // halted production. Blocking — the deploy-halt cost makes any bypass
+    // strictly worse than the small surface this rule covers.
+    id: 'fk-swap-double-drop',
+    name: 'FK-swap migrations drop both _fk and _fkey names',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-fk-swap-double-drop.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // Rationale in validate-workspace-dep-coverage.ts. QUA-598.
     id: 'workspace-dep-coverage',
     name: 'Workspace dependency coverage (no undeclared @longterm-wiki/* imports)',

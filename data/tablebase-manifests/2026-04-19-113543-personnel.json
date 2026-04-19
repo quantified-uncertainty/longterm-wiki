@@ -1,0 +1,98 @@
+{
+  "table": "personnel",
+  "recordCount": 10,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:35:43.070Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 10,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "OrnNsqj9md",
+      "personId": "fukN2Iww7H",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Senior Vice President and Head of Office",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "AWnZno0t0I",
+      "personId": "InRWTiIzXn",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Head of Policy and Deputy Head of Office",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "wUSOWn7I6d",
+      "personId": "3xfAZhaC9M",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "AI Policy Lead",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "eu3V999jnm",
+      "personId": "E0jtgOUP8a",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Head of Communications",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "1gPOBbRMiS",
+      "personId": "G6WRzw9GqS",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Privacy and Safety Lead",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "pLQV1gKWus",
+      "personId": "FH8snhuChK",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Senior Policy Manager",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "M2qWUatmNS",
+      "personId": "OLMEARAhio",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Policy Manager, Intellectual Property and Audiovisual",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "jkM7GN3ahW",
+      "personId": "8uPR9mycXQ",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Policy Manager, Technology and Security",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "LohNbJ0mHi",
+      "personId": "8W4zaRncCU",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Policy Manager",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    },
+    {
+      "id": "BrCfRVnXoh",
+      "personId": "La5qfy0oVL",
+      "organizationId": "sid_UEYMSjORoB",
+      "role": "Senior Director, CCIA UK",
+      "source": "https://ccianet.org/about/team/",
+      "verdict": "none"
+    }
+  ]
+}

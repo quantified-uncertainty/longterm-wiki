@@ -17,6 +17,7 @@ import { fileURLToPath } from "node:url";
 import path from "node:path";
 import * as schema from "../schema.js";
 import { entityIds, citationQuotes, citationContent, entityIdSeq } from "../schema.js";
+import { expectedFkName } from "./_helpers/fk-name.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 
@@ -119,13 +120,17 @@ describeWithDb("Integration: Drizzle migrations", () => {
     const fkNames = fks.map((r) => r.constraint_name);
 
     // FK from session_pages.session_id → sessions.id (migration 0004)
-    expect(fkNames).toContain("session_pages_session_id_sessions_id_fk");
+    expect(fkNames).toContain(expectedFkName("session_pages", "session_id", "sessions", "id"));
     // FK from auto_update_results.run_id → auto_update_runs.id (migration 0008)
-    expect(fkNames).toContain("auto_update_results_run_id_auto_update_runs_id_fk");
+    expect(fkNames).toContain(
+      expectedFkName("auto_update_results", "run_id", "auto_update_runs", "id"),
+    );
     // FK from resource_citations.resource_id → resources.stable_id
     // (migration 0009 created the original FK to resources.id; QUA-566 Phase B.3
     // migration 0192 swapped it to resources.stable_id).
-    expect(fkNames).toContain("resource_citations_resource_id_resources_stable_id_fk");
+    expect(fkNames).toContain(
+      expectedFkName("resource_citations", "resource_id", "resources", "stable_id"),
+    );
   });
 
   it("is idempotent — running migrate() again succeeds", async () => {

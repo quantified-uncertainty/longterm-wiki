@@ -30,13 +30,15 @@ const MAX_BATCH = 200;
 
 /**
  * Allowed lifecycle states for a URL suggestion.
- * Also mirrored in migration 0176's CHECK constraint — keep in sync.
+ * Mirrored in the PG CHECK constraint — migrations 0176 (initial set) and
+ * 0198 (added 'applied'). Keep in sync.
  */
 export const VALID_SUGGESTION_STATUSES = [
   "pending",
   "approved",
   "rejected",
   "auto_verified",
+  "applied",
 ] as const;
 export type SuggestionStatus = (typeof VALID_SUGGESTION_STATUSES)[number];
 

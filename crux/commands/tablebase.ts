@@ -454,6 +454,11 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     params.set('skipEntityValidationReason', reason);
   }
   if (tableConfig.requireSourcing) params.set('requireSourcing', 'true');
+  if (options.skipSourcing) {
+    // forceSkipSourcing bypasses server-side sourcing enforcement (used when source URLs aren't cached yet)
+    params.set('forceSkipSourcing', 'true');
+    params.set('reason', 'cli: --skip-sourcing flag set by caller');
+  }
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(

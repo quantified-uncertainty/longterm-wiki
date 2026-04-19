@@ -1,0 +1,106 @@
+{
+  "table": "personnel",
+  "recordCount": 11,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:37:23.489Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 11,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "PXO271gST6",
+      "personId": "e3Fn9npPZ3",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Executive Director",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "GknKvZxuM1",
+      "personId": "XZc16hkVro",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Manager",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "clvSbMbefL",
+      "personId": "mlO9Ymd2Gz",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Manager",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "aa3c2090iT",
+      "personId": "xSlc6ke6lR",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Founder and Trustee",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "MJ7Ssnr4zj",
+      "personId": "9yzKCqK4Me",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Trustee",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "gG9mFP3Mrx",
+      "personId": "s2bbSl1b9i",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Trustee",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "aaX8BDGFg4",
+      "personId": "HN9N4Scvy9",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Advisor",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "jPIm58g4mn",
+      "personId": "GnjV3cz7M5",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Advisor",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "ncaEnfoHN9",
+      "personId": "XCUdB4tM0F",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Advisor",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "nYqUBorIct",
+      "personId": "svViJFOEDm",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Advisor",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    },
+    {
+      "id": "IBXq18yjKQ",
+      "personId": "B2GKSf6Q6d",
+      "organizationId": "sid_0d2STsaG4A",
+      "role": "Advisor",
+      "source": "https://www.ceealar.org/learn-more/our-team",
+      "verdict": "none"
+    }
+  ]
+}
