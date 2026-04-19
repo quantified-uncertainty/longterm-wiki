@@ -357,6 +357,9 @@ importers:
       '@longterm-wiki/id-utils':
         specifier: workspace:*
         version: link:../../packages/id-utils
+      '@longterm-wiki/url-utils':
+        specifier: workspace:*
+        version: link:../../packages/url-utils
       drizzle-orm:
         specifier: ^0.45.1
         version: 0.45.1(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)(postgres@3.4.8)
