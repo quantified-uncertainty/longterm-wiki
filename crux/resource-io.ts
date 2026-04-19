@@ -176,8 +176,13 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
     return null;
   }
 
+  // Accept either stable_id-keyed or legacy hex16-keyed indexes during the
+  // cross-service migration window.
   return allResources.map(row =>
-    pgRowToResource(row, citationsIndex[row.id])
+    pgRowToResource(
+      row,
+      (row.stableId && citationsIndex[row.stableId]) || citationsIndex[row.id],
+    ),
   );
 }
 
