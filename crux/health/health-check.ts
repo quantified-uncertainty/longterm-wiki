@@ -201,10 +201,7 @@ const MIN_ENTITIES = 500;
 const MIN_FACTS = 40; // Currently ~54; alert if drops dramatically
 
 // Workflow staleness thresholds (hours)
-// auto-update.yml schedule is disabled — it runs only via manual workflow_dispatch,
-// so the threshold must be generous to avoid false alarms.
 const MAX_AGE: Record<string, number> = {
-  'auto-update.yml': 720, // 30 days — schedule disabled, manual runs only (see #2982)
   'database-backup.yml': 36,
   'scheduled-maintenance.yml': 216, // 9 days
   'server-health-monitor.yml': 192, // weekly dead-man-switch (8 days)
@@ -477,11 +474,11 @@ interface WorkflowRunsResponse {
   workflow_runs: WorkflowRun[];
 }
 
-// Workflows that are inherently flaky — depends on LLMs, external URLs,
-// citation checking. For these, we check if ANY of the last 5 runs
-// succeeded rather than requiring the most recent one to succeed.
+// Workflows that are inherently flaky and may transiently fail.
+// For these, we check if ANY of the last 5 runs succeeded rather than
+// requiring the most recent one to succeed.
 // scheduled-maintenance.yml uses Claude Code which can fail transiently.
-const FLAKY_WORKFLOWS = new Set(['auto-update.yml', 'scheduled-maintenance.yml']);
+const FLAKY_WORKFLOWS = new Set(['scheduled-maintenance.yml']);
 
 // Workflows that only run on schedule or workflow_dispatch (not push).
 // For these, we filter out push-triggered runs which can be spurious
@@ -506,8 +503,11 @@ export async function checkActions(): Promise<CheckResult> {
     throw e;
   }
 
+  // auto-update.yml is intentionally excluded — its schedule was disabled in PR #2592
+  // and it now runs only via workflow_dispatch with no SLA. The job-queue check applies
+  // the same exclusion via EXCLUDED_JOB_TYPES (see crux/health/checks/job-queue.ts).
+  // The product question of whether to re-enable auto-update is tracked in QUA-31.
   const workflowFiles = [
-    'auto-update.yml',
     'database-backup.yml',
     'scheduled-maintenance.yml',
     'server-health-monitor.yml',
@@ -726,32 +726,9 @@ export async function checkFreshness(): Promise<CheckResult> {
     failures.push(`Pages list unavailable (${msg})`);
   }
 
-  // Most recent auto-update run — skip cleanly if endpoint returns 404 (route may not exist)
-  const runsResp = await fetchJson(`${SERVER_URL}/api/auto-update-runs?limit=1`, auth);
-  if (runsResp.status === 404) {
-    detail.push(`INFO  Auto-update runs: endpoint not available`);
-  } else if (runsResp.ok) {
-    const r = runsResp.data as Array<{ createdAt?: string; startedAt?: string }>;
-    const run = r[0];
-    const date = run?.createdAt ?? run?.startedAt;
-    if (date) {
-      const ageH = hoursAgo(date);
-      if (ageH > 48) {
-        failures.push(`Last auto-update run ${ageH}h ago (expected < 48h)`);
-        detail.push(`WARN  Last auto-update run: ${ageH}h ago`);
-      } else {
-        detail.push(`PASS  Last auto-update run: ${ageH}h ago`);
-      }
-    } else {
-      detail.push(`INFO  Last auto-update run: no runs found`);
-    }
-  } else {
-    const msg =
-      runsResp.status === 0 && runsResp.errorDetail
-        ? runsResp.errorDetail
-        : `HTTP ${runsResp.status}`;
-    detail.push(`SKIP  Auto-update runs: ${msg}`);
-  }
+  // Auto-update runs freshness check intentionally omitted — auto-update.yml schedule
+  // is disabled (PR #2592) so there is no SLA on /api/auto-update-runs. See QUA-31 for
+  // the open product question of whether to re-enable it.
 
   // Most recent agent session — response: { sessions: [...], total, limit, offset }
   const sessionsResp = await fetchJson(`${SERVER_URL}/api/sessions?limit=1`, auth);
