@@ -654,8 +654,6 @@ export const resources = pgTable(
     credibilityOverride: real("credibility_override"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
     contentHash: text("content_hash"),
-    // QUA-576: .notNull() matches DB state (migration 0184 set column NOT NULL).
-    // Prevents schema drift that allowed unreachable `?? null` paths in callers.
     stableId: text("stable_id").notNull().unique(),
     /** HTTP reachability of the resource URL.
      *  Values: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.

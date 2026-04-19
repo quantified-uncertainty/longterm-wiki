@@ -28,27 +28,19 @@ const JOURNAL = join(__dirname, "..", "..", "drizzle", "meta", "_journal.json");
 describe("QUA-576 resources.stable_id schema/DB alignment", () => {
   const schema = readFileSync(SCHEMA_PATH, "utf-8");
 
-  it("resources.stableId is declared .notNull().unique()", () => {
-    // Find the `resources` table declaration and its stable_id column.
+  it("resources.stableId is declared notNull and unique (in any order)", () => {
     const resourcesBlock = schema.match(
       /export const resources = pgTable\(\s*"resources",\s*\{[\s\S]*?\n\s*\}\s*,/,
     );
     expect(resourcesBlock).not.toBeNull();
-    // Must include notNull() before unique() on the stable_id column.
-    expect(resourcesBlock![0]).toMatch(
-      /stableId:\s*text\("stable_id"\)\.notNull\(\)\.unique\(\)/,
-    );
-    // Guard against accidental regression to the nullable form.
-    expect(resourcesBlock![0]).not.toMatch(
-      /stableId:\s*text\("stable_id"\)\.unique\(\)(?!\.notNull)/,
-    );
+    const col = resourcesBlock![0].match(/stableId:\s*text\("stable_id"\)[^,\n]*/);
+    expect(col).not.toBeNull();
+    expect(col![0]).toContain(".notNull()");
+    expect(col![0]).toContain(".unique()");
   });
 
   it("reconcile migration 0201 guards against NULL stable_id rows", () => {
     const sql = readFileSync(RECONCILE_MIGRATION, "utf-8");
-    // The migration must run an abort-on-NULL check before SET NOT NULL so
-    // an environment where 0184's manual script was skipped produces a
-    // loud error rather than a silent constraint violation mid-ALTER.
     expect(sql).toMatch(/stable_id IS NULL/);
     expect(sql).toMatch(/RAISE EXCEPTION/);
     expect(sql).toMatch(
