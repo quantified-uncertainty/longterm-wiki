@@ -9,13 +9,13 @@
 
 import { describe, it, expect } from "vitest";
 import { readFileSync } from "node:fs";
-import { join } from "node:path";
+import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
+import { getTableColumns } from "drizzle-orm";
+import { resources } from "../schema.js";
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = join(__filename, "..");
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
-const SCHEMA_PATH = join(__dirname, "..", "schema.ts");
 const RECONCILE_MIGRATION = join(
   __dirname,
   "..",
@@ -26,17 +26,10 @@ const RECONCILE_MIGRATION = join(
 const JOURNAL = join(__dirname, "..", "..", "drizzle", "meta", "_journal.json");
 
 describe("QUA-576 resources.stable_id schema/DB alignment", () => {
-  const schema = readFileSync(SCHEMA_PATH, "utf-8");
-
-  it("resources.stableId is declared notNull and unique (in any order)", () => {
-    const resourcesBlock = schema.match(
-      /export const resources = pgTable\(\s*"resources",\s*\{[\s\S]*?\n\s*\}\s*,/,
-    );
-    expect(resourcesBlock).not.toBeNull();
-    const col = resourcesBlock![0].match(/stableId:\s*text\("stable_id"\)[^,\n]*/);
-    expect(col).not.toBeNull();
-    expect(col![0]).toContain(".notNull()");
-    expect(col![0]).toContain(".unique()");
+  it("resources.stableId column is NOT NULL and UNIQUE", () => {
+    const { stableId } = getTableColumns(resources);
+    expect(stableId.notNull).toBe(true);
+    expect(stableId.isUnique).toBe(true);
   });
 
   it("reconcile migration 0201 guards against NULL stable_id rows", () => {
