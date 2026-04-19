@@ -55,21 +55,33 @@ import { getColors } from '../lib/output.ts';
 
 const DEFAULT_DRIZZLE_DIR = join(PROJECT_ROOT, 'apps/wiki-server/drizzle');
 
+type Signal = 'update' | 'add-constraint';
+
 /** A `(table, column)` pair that needs both drops. */
 interface SwapTarget {
   table: string;
   column: string;
   /** Which signal(s) flagged this target — useful for the human-readable error. */
-  signals: Set<'update' | 'add-constraint'>;
+  signals: Set<Signal>;
 }
 
 interface MigrationViolation {
   file: string;
   table: string;
   column: string;
-  signals: string[];
+  signals: Signal[];
   /** Which of the two required drops are missing for this target. */
   missingDrops: string[];
+}
+
+/** Drizzle-generated constraint name for an FK from `<table>.<col>` → `resources.id`. */
+function drizzleFkName(table: string, column: string): string {
+  return `${table}_${column}_resources_id_fk`;
+}
+
+/** Postgres-default constraint name for an FK from `<table>.<col>` → `resources.id`. */
+function postgresFkName(table: string, column: string): string {
+  return `${table}_${column}_fkey`;
 }
 
 interface CheckOptions {
@@ -159,11 +171,7 @@ export function findSwapTargets(sql: string): SwapTarget[] {
   const stripped = stripComments(sql);
   const targets = new Map<string, SwapTarget>(); // key = `${table}::${column}`
 
-  function record(
-    table: string,
-    column: string,
-    signal: 'update' | 'add-constraint'
-  ): void {
+  function record(table: string, column: string, signal: Signal): void {
     const key = `${table}::${column}`;
     let target = targets.get(key);
     if (!target) {
@@ -241,8 +249,11 @@ export function hasDynamicDrop(sql: string, table: string, column: string): bool
   return required.every((re) => re.test(stripped));
 }
 
-function checkFile(file: string, sql: string): MigrationViolation[] {
-  const targets = findSwapTargets(sql);
+function checkFile(
+  file: string,
+  sql: string,
+  targets: SwapTarget[]
+): MigrationViolation[] {
   if (targets.length === 0) return [];
 
   const drops = findDroppedConstraints(sql);
@@ -252,8 +263,8 @@ function checkFile(file: string, sql: string): MigrationViolation[] {
     // Equivalent guarantee: a dynamic-drop DO block covers any constraint name.
     if (hasDynamicDrop(sql, target.table, target.column)) continue;
 
-    const drizzleName = `${target.table}_${target.column}_resources_id_fk`;
-    const postgresName = `${target.table}_${target.column}_fkey`;
+    const drizzleName = drizzleFkName(target.table, target.column);
+    const postgresName = postgresFkName(target.table, target.column);
 
     const missing: string[] = [];
     if (!drops.has(drizzleName)) missing.push(drizzleName);
@@ -313,7 +324,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     const targets = findSwapTargets(sql);
     if (targets.length === 0) continue;
     filesWithSwaps += 1;
-    violations.push(...checkFile(file, sql));
+    violations.push(...checkFile(file, sql, targets));
   }
 
   if (violations.length === 0) {
