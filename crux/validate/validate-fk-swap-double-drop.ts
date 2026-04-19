@@ -100,20 +100,30 @@ function stripComments(sql: string): string {
 // Detection regexes
 // ---------------------------------------------------------------------------
 
-// UPDATE rewrite signal: `UPDATE <table> <alias> SET <col> = r.stable_id`.
-// Anchored to `r.stable_id` to avoid generic UPDATEs. We also verify the
-// FROM resources / WHERE col = r.id structure with a separate test on the
-// captured statement so a SET to r.stable_id without the resources JOIN does
-// not false-positive.
+// UPDATE rewrite signal. Both alias-form and aliasless forms are matched:
+//   `UPDATE "table" alias SET col = r.stable_id ...`     (Drizzle convention)
+//   `UPDATE "table" SET col = r.stable_id ...`            (aliasless, allowed by PG)
+// The alias capture group is optional via `(?!SET\b)` so `UPDATE x SET` does
+// not capture `SET` as the alias.
+//
+// The resources alias `r` is hardcoded — every Phase B migration in this repo
+// uses that name. If a future migration uses a different alias (e.g. `res`),
+// this regex won't match. That's acceptable; the validator is meant to
+// enforce a convention, not to parse arbitrary SQL.
+//
+// We anchor to `r.stable_id` to avoid generic UPDATEs and verify the FROM
+// resources / WHERE col = r.id structure separately in `isCanonicalRewrite`.
 const UPDATE_RE =
-  /UPDATE\s+"?([A-Za-z_][A-Za-z0-9_]*)"?\s+([A-Za-z_][A-Za-z0-9_]*)\s+SET\s+"?([A-Za-z_][A-Za-z0-9_]*)"?\s*=\s*r\.stable_id\b([\s\S]*?);/gi;
+  /UPDATE\s+"?([A-Za-z_][A-Za-z0-9_]*)"?(?:\s+(?!SET\b)([A-Za-z_][A-Za-z0-9_]*))?\s+SET\s+"?([A-Za-z_][A-Za-z0-9_]*)"?\s*=\s*r\.stable_id\b([^;]*);/gi;
 
 // ADD CONSTRAINT to resources(stable_id). The ALTER TABLE may sit on a prior
-// line (Drizzle multi-line) or inside a DO block, but in this codebase the
-// FOREIGN KEY (<col>) REFERENCES "resources"("stable_id") clause always
-// appears within the same statement as its ALTER TABLE.
+// line (Drizzle multi-line) or inside a DO block, but the FOREIGN KEY
+// (<col>) REFERENCES "resources"("stable_id") clause must appear within the
+// same SQL statement as its ALTER TABLE. We bound the gap with `[^;]*?` so
+// the regex cannot span across a statement terminator and misattribute the
+// FK to a different ALTER TABLE earlier in the file.
 const ADD_CONSTRAINT_RE =
-  /ALTER\s+TABLE\s+"?([A-Za-z_][A-Za-z0-9_]*)"?[\s\S]*?ADD\s+CONSTRAINT\s+"?[A-Za-z_][A-Za-z0-9_]*"?[\s\S]*?FOREIGN\s+KEY\s*\(\s*"?([A-Za-z_][A-Za-z0-9_]*)"?\s*\)\s*REFERENCES\s+"?resources"?\s*\(\s*"?stable_id"?\s*\)/gi;
+  /ALTER\s+TABLE\s+"?([A-Za-z_][A-Za-z0-9_]*)"?[^;]*?ADD\s+CONSTRAINT\s+"?[A-Za-z_][A-Za-z0-9_]*"?[^;]*?FOREIGN\s+KEY\s*\(\s*"?([A-Za-z_][A-Za-z0-9_]*)"?\s*\)\s*REFERENCES\s+"?resources"?\s*\(\s*"?stable_id"?\s*\)/gi;
 
 // All `DROP CONSTRAINT IF EXISTS <name>` constraint names in the file.
 // We require IF EXISTS because the migrations always use it; a DROP without
@@ -122,14 +132,24 @@ const DROP_RE =
   /DROP\s+CONSTRAINT\s+IF\s+EXISTS\s+"?([A-Za-z_][A-Za-z0-9_]*)"?/gi;
 
 // Inside an UPDATE statement, confirm the canonical hex16→sid_ structure:
-// `FROM "?resources"? r ... WHERE <alias>.<col> = r.id`. The alias and column
-// are captured from the UPDATE_RE outer match, so we just need to verify
-// the FROM clause and the equality condition.
-function isCanonicalRewrite(stmt: string, alias: string, column: string): boolean {
+// `FROM "?resources"? r ... WHERE [<prefix>.]<col> = r.id`.
+//
+// The prefix may be the alias (`p.resource_id`), the bare table name
+// (`publications.resource_id`, common in aliasless UPDATEs), or absent
+// (`resource_id = r.id`, also valid in aliasless form). All three are
+// accepted because all three are FK-swap shapes worth catching.
+function isCanonicalRewrite(
+  stmt: string,
+  table: string,
+  alias: string | undefined,
+  column: string
+): boolean {
   if (!/FROM\s+"?resources"?\s+r\b/i.test(stmt)) return false;
-  // alias.col = r.id (column may be quoted or not, alias is a plain identifier).
+  // Optional prefix: alias OR table OR nothing.
+  const prefixes = alias ? [alias, table] : [table];
+  const prefixGroup = `(?:(?:${prefixes.map(escapeRegex).join('|')})\\.\\s*)?`;
   const re = new RegExp(
-    `\\b${alias}\\.\\s*"?${column}"?\\s*=\\s*r\\.\\s*id\\b`,
+    `\\b${prefixGroup}"?${escapeRegex(column)}"?\\s*=\\s*r\\.\\s*id\\b`,
     'i'
   );
   return re.test(stmt);
@@ -153,12 +173,13 @@ export function findSwapTargets(sql: string): SwapTarget[] {
     target.signals.add(signal);
   }
 
-  // UPDATE rewrites
+  // UPDATE rewrites — alias is the optional second capture (undefined for
+  // aliasless `UPDATE "x" SET ...`).
   UPDATE_RE.lastIndex = 0;
   let m: RegExpExecArray | null;
   while ((m = UPDATE_RE.exec(stripped)) !== null) {
     const [, table, alias, column, tail] = m;
-    if (isCanonicalRewrite(tail, alias, column)) {
+    if (isCanonicalRewrite(tail, table, alias, column)) {
       record(table, column, 'update');
     }
   }
@@ -266,6 +287,11 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
       .filter((f) => f.endsWith('.sql'))
       .sort();
   } catch {
+    // Intentionally pass-through. The dir-missing case fires when the
+    // validator runs outside the repo (tests, isolated tooling). Failing
+    // here would block legitimate non-repo usage; the gate runs from the
+    // repo root and doesn't hit this path. Same convention as
+    // validate-workspace-dep-coverage.ts.
     console.log(`${c.dim}Skipping: ${drizzleDir} not found${c.reset}`);
     return { passed: true, errors: 0, violations: [], scanned: 0, filesWithSwaps: 0 };
   }
@@ -278,6 +304,10 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     try {
       sql = readFileSync(join(drizzleDir, file), 'utf-8');
     } catch {
+      // File disappeared between readdir and readFile (race, or symlink
+      // resolution failure). Skip — there's no useful action to take here
+      // and no real risk because if we can't read it, nothing else can
+      // apply it as a migration either.
       continue;
     }
     const targets = findSwapTargets(sql);

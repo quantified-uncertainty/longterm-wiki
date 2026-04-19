@@ -364,6 +364,57 @@ describe('findSwapTargets', () => {
     `);
     expect(targets).toEqual([]);
   });
+
+  it('detects an aliasless UPDATE referencing the table by name in WHERE', () => {
+    // PostgreSQL allows `UPDATE "x" SET ... WHERE x.col = r.id` without an
+    // alias. A migration written this way without the validator's protection
+    // is exactly the failure mode that motivated this check.
+    const targets = findSwapTargets(`
+      UPDATE "publications"
+      SET resource_id = r.stable_id
+      FROM "resources" r
+      WHERE publications.resource_id = r.id;
+    `);
+    expect(targets).toEqual([
+      expect.objectContaining({
+        table: 'publications',
+        column: 'resource_id',
+      }),
+    ]);
+  });
+
+  it('detects an aliasless UPDATE with implicit column reference in WHERE', () => {
+    // `WHERE resource_id = r.id` (no prefix) is also valid in aliasless
+    // form and resolves to the UPDATE target table's column.
+    const targets = findSwapTargets(`
+      UPDATE "publications"
+      SET resource_id = r.stable_id
+      FROM "resources" r
+      WHERE resource_id = r.id;
+    `);
+    expect(targets).toEqual([
+      expect.objectContaining({
+        table: 'publications',
+        column: 'resource_id',
+      }),
+    ]);
+  });
+
+  it('does not span ADD CONSTRAINT detection across statement boundaries', () => {
+    // Two unrelated statements: an ALTER TABLE on table A (no FK swap),
+    // followed by a separate ADD CONSTRAINT on table B that adds the FK
+    // to resources(stable_id). Without the [^;]*? bound, ADD_CONSTRAINT_RE
+    // would attribute the FK to table A. Verify it captures table B.
+    const targets = findSwapTargets(`
+      ALTER TABLE "audit_log" DROP COLUMN "scratch_col";
+      SELECT 1;
+      ALTER TABLE "page_citations"
+        ADD CONSTRAINT "page_citations_resource_id_resources_stable_id_fk"
+        FOREIGN KEY ("resource_id") REFERENCES "resources"("stable_id");
+    `);
+    expect(targets).toHaveLength(1);
+    expect(targets[0].table).toBe('page_citations');
+  });
 });
 
 describe('findDroppedConstraints', () => {
