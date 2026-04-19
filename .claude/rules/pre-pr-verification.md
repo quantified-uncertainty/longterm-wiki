@@ -33,7 +33,10 @@ Run `pnpm test` and confirm existing tests still pass. If you added new logic (h
 
 Run `pnpm crux w validate gate --fix` to catch CI-blocking issues.
 
-**If the gate fails with thousands of `resource-ref-integrity` errors (`<R id="sid_..."> does not match any known resource`) on a branch you haven't touched resources on**, the local `data/resources-snapshot.json` is stale. CI rebuilds from live PG, so CI passes while local fails. Refresh with `WIKI_SERVER_ENV=prod pnpm crux sys wiki-server snapshot-resources` (~30s).
+**If the gate fails with thousands of `resource-ref-integrity` errors (`<R id="sid_..."> does not match any known resource`) on a branch you haven't touched resources on**, build-data is seeing an incomplete resource set. It sources resources from, in order: `$LONGTERMWIKI_SERVER_URL` if set → `data/resources-snapshot.json` fallback. Make one of them complete:
+
+- Refresh the snapshot from live prod: `WIKI_SERVER_ENV=prod pnpm crux sys wiki-server snapshot-resources` (~30s).
+- If `LONGTERMWIKI_SERVER_URL` points at a local wiki-server that lags prod, force the snapshot path for one push: `LONGTERMWIKI_SERVER_URL= git push`. `WIKI_SERVER_ENV=prod` doesn't help — build-data reads the URL directly, ignoring env prefixes.
 
 ## 4. UI verification with Playwright (if modifying .tsx pages or components)
 
