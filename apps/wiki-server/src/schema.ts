@@ -1815,7 +1815,7 @@ export const sourcingUrlSuggestions = pgTable(
     relevanceScore: real("relevance_score"), // 0..1, provider-supplied or heuristic
     sourceProvider: text("source_provider").notNull(), // exa | perplexity | scry | manual
     generatorModel: text("generator_model"),
-    /** pending | approved | rejected | auto_verified */
+    /** pending | approved | rejected | auto_verified | applied */
     status: text("status").notNull().default("pending"),
     reviewedAt: timestamp("reviewed_at", { withTimezone: true }),
     reviewedBy: text("reviewed_by"), // agent session id or user handle
@@ -1834,7 +1834,7 @@ export const sourcingUrlSuggestions = pgTable(
     index("idx_sus_created").on(table.createdAt),
     // Unique (record_type, record_id, COALESCE(field_name, ''), suggested_url)
     // declared in migration SQL since COALESCE cannot be expressed in Drizzle .on().
-    // CHECK (status IN ('pending','approved','rejected','auto_verified')) likewise in migration.
+    // CHECK (status IN ('pending','approved','rejected','auto_verified','applied')) likewise in migration.
   ]
 );
 
