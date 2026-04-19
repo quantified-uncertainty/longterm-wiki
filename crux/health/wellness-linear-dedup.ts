@@ -16,6 +16,13 @@
  * All lookups are fail-open: Linear outages/timeouts never block the
  * wellness pipeline. A brief warning is logged and the caller proceeds
  * with the normal GitHub path.
+ *
+ * Trade-off documented: a sustained Linear outage (where `searchIssues`
+ * always throws) defeats the dedup and lets every wellness run create a
+ * new GitHub issue → new Linear mirror. The alternative is to block
+ * wellness reporting entirely during a Linear outage, which is strictly
+ * worse — GitHub outages would also halt reporting even though the
+ * wellness-check data is still valuable. Accept the occasional burst.
  */
 
 import {
@@ -34,6 +41,15 @@ import {
  */
 export const REOPEN_WINDOW_MS = 48 * 60 * 60 * 1000;
 
+/**
+ * Linear workflow-state `type` values that represent an actively-tracked
+ * (non-terminal) ticket. Use an allowlist rather than a denylist so any
+ * unknown/future state type (`triage`, custom types, etc.) fails safe as
+ * "don't treat as open" — accidentally commenting on a terminal ticket
+ * is worse than letting one slip through and file a fresh one.
+ */
+const OPEN_STATE_TYPES = new Set(['backlog', 'unstarted', 'started', 'triage']);
+
 export type LinearWellnessAction =
   | { kind: 'commented'; identifier: string; url: string }
   | { kind: 'reopened'; identifier: string; url: string }
@@ -42,14 +58,19 @@ export type LinearWellnessAction =
 export interface LinearDedupDeps {
   search: typeof searchIssues;
   comment: typeof commentOnIssue;
-  reopen: typeof updateIssueState;
+  /**
+   * Underlying state transition. Named after the generic `updateIssueState`
+   * it wraps rather than "reopen" or "close" because this module uses it
+   * for both transitions (Backlog on reopen, Done on all-clear close).
+   */
+  setState: typeof updateIssueState;
   now: () => number;
 }
 
 const DEFAULT_DEPS: LinearDedupDeps = {
   search: searchIssues,
   comment: commentOnIssue,
-  reopen: updateIssueState,
+  setState: updateIssueState,
   now: Date.now,
 };
 
@@ -59,7 +80,11 @@ function parseQuaNumber(identifier: string): number {
 }
 
 function isOpen(issue: SearchedIssue): boolean {
-  return issue.state.type !== 'completed' && issue.state.type !== 'canceled';
+  return OPEN_STATE_TYPES.has(issue.state.type);
+}
+
+function issueTimestampMs(issue: SearchedIssue): number {
+  return new Date(issue.updatedAt ?? issue.createdAt).getTime();
 }
 
 /**
@@ -76,7 +101,7 @@ export async function dedupLinearWellnessIssue(
   commentBody: string,
   deps: Partial<LinearDedupDeps> = {},
 ): Promise<LinearWellnessAction> {
-  const { search, comment, reopen, now } = { ...DEFAULT_DEPS, ...deps };
+  const { search, comment, setState, now } = { ...DEFAULT_DEPS, ...deps };
 
   let candidates: SearchedIssue[];
   try {
@@ -115,13 +140,14 @@ export async function dedupLinearWellnessIssue(
   // No open ticket. Check whether the most recently closed match is still
   // inside the reopen window; if so, reopen + comment rather than filing a
   // brand-new ticket (the failure mode this whole module exists to fix).
-  const closed = [...candidates].sort(
-    (a, b) =>
-      new Date(b.updatedAt ?? b.createdAt).getTime() -
-      new Date(a.updatedAt ?? a.createdAt).getTime(),
-  );
-  const mostRecent = closed[0];
-  const mostRecentTs = new Date(mostRecent.updatedAt ?? mostRecent.createdAt).getTime();
+  // Sort only the CLOSED candidates (the early-return above guarantees
+  // `open` is empty here, but an explicit filter keeps intent local to the
+  // block in case the guard is ever refactored).
+  const closedCandidates = candidates
+    .filter((c) => !isOpen(c))
+    .sort((a, b) => issueTimestampMs(b) - issueTimestampMs(a));
+  const mostRecent = closedCandidates[0];
+  const mostRecentTs = issueTimestampMs(mostRecent);
 
   if (!Number.isFinite(mostRecentTs) || now() - mostRecentTs > REOPEN_WINDOW_MS) {
     console.log(
@@ -130,22 +156,37 @@ export async function dedupLinearWellnessIssue(
     return { kind: 'skipped', reason: 'no-match' };
   }
 
+  // Reopen first. Once the state transition lands, the ticket IS canonically
+  // the target of the recurrence — even if the follow-up comment fails, we
+  // must NOT fall through to the GitHub create path (that's the exact
+  // duplicate-creation bug QUA-577 fixes). The comment is best-effort
+  // decoration; the state transition is the dedup action.
   try {
-    await reopen(mostRecent.identifier, 'Backlog');
-    await comment(mostRecent.identifier, commentBody);
+    await setState(mostRecent.identifier, 'Backlog');
   } catch (err) {
     console.warn(
       `Linear reopen of ${mostRecent.identifier} failed (${err instanceof Error ? err.message : String(err)}) — falling back to GitHub create path`,
     );
     return { kind: 'skipped', reason: 'lookup-failed' };
   }
+  // Reopen succeeded — the rest is cosmetic. A comment failure here MUST NOT
+  // propagate as `skipped` (see the test in wellness-linear-dedup.test.ts
+  // titled "returns reopened (NOT skipped) when reopen succeeds but comment
+  // throws").
+  await comment(mostRecent.identifier, commentBody).catch((err) => {
+    console.warn(
+      `Linear comment on reopened ${mostRecent.identifier} failed (${err instanceof Error ? err.message : String(err)}); ticket is already reopened, skipping GitHub create`,
+    );
+  });
   return { kind: 'reopened', identifier: mostRecent.identifier, url: mostRecent.url };
 }
 
 export type CloseLinearWellnessResult =
   | { kind: 'closed'; identifiers: string[] }
   | { kind: 'none' }
-  | { kind: 'lookup-failed' };
+  /** Discriminates "didn't reach Linear" from "reached Linear but every close call threw." */
+  | { kind: 'lookup-failed' }
+  | { kind: 'close-failed'; attempted: string[] };
 
 /**
  * Close any open Linear wellness tickets when the check recovers. Needed
@@ -158,7 +199,7 @@ export async function closeLinearWellnessOnAllClear(
   commentBody: string,
   deps: Partial<LinearDedupDeps> = {},
 ): Promise<CloseLinearWellnessResult> {
-  const { search, comment, reopen } = { ...DEFAULT_DEPS, ...deps };
+  const { search, comment, setState } = { ...DEFAULT_DEPS, ...deps };
 
   let candidates: SearchedIssue[];
   try {
@@ -174,12 +215,12 @@ export async function closeLinearWellnessOnAllClear(
   if (candidates.length === 0) return { kind: 'none' };
 
   const closed: string[] = [];
+  const attempted: string[] = [];
   for (const issue of candidates) {
+    attempted.push(issue.identifier);
     try {
       await comment(issue.identifier, commentBody);
-      // `updateIssueState` is shared with the reopen path — same call,
-      // different target state.
-      await reopen(issue.identifier, 'Done');
+      await setState(issue.identifier, 'Done');
       closed.push(issue.identifier);
     } catch (err) {
       console.warn(
@@ -187,5 +228,6 @@ export async function closeLinearWellnessOnAllClear(
       );
     }
   }
-  return closed.length > 0 ? { kind: 'closed', identifiers: closed } : { kind: 'lookup-failed' };
+  if (closed.length > 0) return { kind: 'closed', identifiers: closed };
+  return { kind: 'close-failed', attempted };
 }

@@ -202,11 +202,11 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
       },
     ]);
     const comment = vi.fn().mockResolvedValue(undefined);
-    const reopen = vi.fn();
+    const setState = vi.fn();
 
     const report = buildWellnessReport(failingChecks);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment, reopen, now: () => Date.parse('2026-04-19T20:00:00.000Z') },
+      linearDedupDeps: { search, comment, setState, now: () => Date.parse('2026-04-19T20:00:00.000Z') },
     });
 
     expect(result.action).toBe('linear-commented');
@@ -226,7 +226,7 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     try {
       const report = buildWellnessReport(failingChecks);
       const promise = manageWellnessIssue(report, {
-        linearDedupDeps: { search, comment: vi.fn(), reopen: vi.fn(), now: () => 0 },
+        linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
       });
       // Let microtasks run, advance the 2s settle timer, then await.
       await vi.runAllTimersAsync();
@@ -251,7 +251,7 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
 
     const report = buildWellnessReport(failingChecks);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment: vi.fn(), reopen: vi.fn(), now: () => 0 },
+      linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
     });
 
     expect(result.action).toBe('updated');
@@ -273,16 +273,16 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
       },
     ]);
     const comment = vi.fn().mockResolvedValue(undefined);
-    const reopen = vi.fn().mockResolvedValue({ identifier: 'QUA-570', state: 'Done' });
+    const setState = vi.fn().mockResolvedValue({ identifier: 'QUA-570', state: 'Done' });
 
     const passing = [makeCheck({ ok: true })];
     const report = buildWellnessReport(passing);
     const result = await manageWellnessIssue(report, {
-      linearDedupDeps: { search, comment, reopen, now: () => 0 },
+      linearDedupDeps: { search, comment, setState, now: () => 0 },
     });
 
     expect(result.action).toBe('closed');
     expect(result.linearIdentifier).toBe('QUA-570');
-    expect(reopen).toHaveBeenCalledWith('QUA-570', 'Done');
+    expect(setState).toHaveBeenCalledWith('QUA-570', 'Done');
   });
 });
