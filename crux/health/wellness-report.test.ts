@@ -8,9 +8,38 @@
  *   - Issue body has full detail sections
  */
 
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import type { CheckResult } from './health-check.ts';
-import { buildWellnessReport, WELLNESS_ISSUE_TITLE } from './wellness-report.ts';
+
+// Mock GitHub so manageWellnessIssue tests don't touch the network. Keep the
+// hoist-safe pattern from the rest of the codebase — the mocks are set up
+// before the module under test is imported.
+const mockListIssuesByLabel = vi.fn();
+const mockListRecentOpenIssues = vi.fn();
+const mockCreateIssueComment = vi.fn();
+const mockCloseIssue = vi.fn();
+const mockCreateIssue = vi.fn();
+const mockEnsureLabel = vi.fn();
+const mockGetGitHubToken = vi.fn();
+
+vi.mock('../lib/github.ts', () => ({
+  REPO: 'quantified-uncertainty/longterm-wiki',
+  listIssuesByLabel: (...args: unknown[]) => mockListIssuesByLabel(...args),
+  listRecentOpenIssues: (...args: unknown[]) => mockListRecentOpenIssues(...args),
+  createIssueComment: (...args: unknown[]) => mockCreateIssueComment(...args),
+  closeIssue: (...args: unknown[]) => mockCloseIssue(...args),
+  createIssue: (...args: unknown[]) => mockCreateIssue(...args),
+  ensureLabel: (...args: unknown[]) => mockEnsureLabel(...args),
+  getGitHubToken: (...args: unknown[]) => mockGetGitHubToken(...args),
+  isMissingTokenError: () => false,
+  MISSING_TOKEN_SUMMARY: 'GITHUB_TOKEN not set',
+}));
+
+import {
+  buildWellnessReport,
+  manageWellnessIssue,
+  WELLNESS_ISSUE_TITLE,
+} from './wellness-report.ts';
 
 function makeCheck(overrides: Partial<CheckResult> = {}): CheckResult {
   return {
@@ -146,5 +175,114 @@ describe('WELLNESS_ISSUE_TITLE', () => {
     // runs can find each other's issues and avoid duplicates.
     expect(WELLNESS_ISSUE_TITLE).toBe('System wellness check failing');
     expect(WELLNESS_ISSUE_TITLE).not.toMatch(/\d{4}-\d{2}-\d{2}/);
+  });
+});
+
+describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
+  const failingChecks = [makeCheck({ ok: false, summary: 'Data freshness failed' })];
+
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockGetGitHubToken.mockReturnValue('fake-token');
+    mockEnsureLabel.mockResolvedValue(undefined);
+    mockListIssuesByLabel.mockResolvedValue([]);
+    mockListRecentOpenIssues.mockResolvedValue([]);
+  });
+
+  it('skips GitHub create when Linear search returns an open match', async () => {
+    const search = vi.fn().mockResolvedValue([
+      {
+        identifier: 'QUA-570',
+        title: WELLNESS_ISSUE_TITLE,
+        priority: 0,
+        state: { name: 'Backlog', type: 'backlog' },
+        url: 'https://linear.app/q/issue/QUA-570',
+        createdAt: '2026-04-19T09:00:00.000Z',
+        updatedAt: '2026-04-19T09:00:00.000Z',
+      },
+    ]);
+    const comment = vi.fn().mockResolvedValue(undefined);
+    const reopen = vi.fn();
+
+    const report = buildWellnessReport(failingChecks);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: { search, comment, reopen, now: () => Date.parse('2026-04-19T20:00:00.000Z') },
+    });
+
+    expect(result.action).toBe('linear-commented');
+    expect(result.linearIdentifier).toBe('QUA-570');
+    expect(mockCreateIssue).not.toHaveBeenCalled();
+    expect(comment).toHaveBeenCalledWith('QUA-570', expect.stringContaining('failing again'));
+  });
+
+  it('falls through to GitHub create when Linear has no match', async () => {
+    const search = vi.fn().mockResolvedValue([]);
+    mockCreateIssue.mockResolvedValue({ number: 9999 });
+
+    // `deduplicateWellnessIssues` uses fake timers to skip the 2s concurrent-
+    // create settle delay in tests. Advance the single pending timer as soon
+    // as it's registered so the create path returns without sleeping.
+    vi.useFakeTimers();
+    try {
+      const report = buildWellnessReport(failingChecks);
+      const promise = manageWellnessIssue(report, {
+        linearDedupDeps: { search, comment: vi.fn(), reopen: vi.fn(), now: () => 0 },
+      });
+      // Let microtasks run, advance the 2s settle timer, then await.
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      expect(result.action).toBe('created');
+      expect(result.issueNumber).toBe(9999);
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          title: WELLNESS_ISSUE_TITLE,
+          labels: ['wellness', 'bug'],
+        }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('does not call the Linear dedup path when an open GitHub issue already exists', async () => {
+    mockListIssuesByLabel.mockResolvedValue([{ number: 100, title: WELLNESS_ISSUE_TITLE }]);
+    const search = vi.fn();
+
+    const report = buildWellnessReport(failingChecks);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: { search, comment: vi.fn(), reopen: vi.fn(), now: () => 0 },
+    });
+
+    expect(result.action).toBe('updated');
+    expect(result.issueNumber).toBe(100);
+    expect(search).not.toHaveBeenCalled();
+    expect(mockCreateIssue).not.toHaveBeenCalled();
+  });
+
+  it('closes a lingering open Linear ticket when checks recover and no GitHub issue is open', async () => {
+    const search = vi.fn().mockResolvedValue([
+      {
+        identifier: 'QUA-570',
+        title: WELLNESS_ISSUE_TITLE,
+        priority: 0,
+        state: { name: 'Backlog', type: 'backlog' },
+        url: 'u',
+        createdAt: '2026-04-19T09:00:00.000Z',
+        updatedAt: '2026-04-19T09:00:00.000Z',
+      },
+    ]);
+    const comment = vi.fn().mockResolvedValue(undefined);
+    const reopen = vi.fn().mockResolvedValue({ identifier: 'QUA-570', state: 'Done' });
+
+    const passing = [makeCheck({ ok: true })];
+    const report = buildWellnessReport(passing);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: { search, comment, reopen, now: () => 0 },
+    });
+
+    expect(result.action).toBe('closed');
+    expect(result.linearIdentifier).toBe('QUA-570');
+    expect(reopen).toHaveBeenCalledWith('QUA-570', 'Done');
   });
 });
