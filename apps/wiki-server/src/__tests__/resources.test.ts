@@ -1,11 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
+import { SID_PREFIX } from "@longterm-wiki/id-utils";
 import { mockDbModule, postJson } from "./test-utils.js";
+import { ResourcesStore, type ResourceRow } from "./_helpers/resources-store.js";
 
 // ---- In-memory stores ----
+//
+// `store` unifies mocks for `resources` + `resource_citations`. See _helpers/resources-store.ts
+// for the rationale (QUA-604). Jobs are a separate table with no cross-cutting mock pattern,
+// so they stay inline.
 
-let resourceStore: Map<string, Record<string, unknown>>;
-let citationStore: Array<{ resource_id: string; page_slug: string; page_id: number; created_at: Date }>;
+const store = new ResourcesStore();
 let jobStore: Map<number, Record<string, unknown>>;
 let nextJobId = 1;
 
@@ -15,47 +20,27 @@ let nextJobId = 1;
 // Since the mock doesn't model citation_content, we check:
 //   1. An explicit has_content field (set directly by suggest tests), OR
 //   2. content_hash being non-null (proxy for content having been fetched)
-function toSuggestShape(row: Record<string, unknown>): { id: string; url: string; title: string | null; fetched_at: Date | null; has_content: boolean } {
+function toSuggestShape(row: ResourceRow): {
+  id: string;
+  url: string;
+  title: string | null;
+  fetched_at: Date | null;
+  has_content: boolean;
+} {
   return {
-    id: row.id as string,
-    url: row.url as string,
-    title: (row.title as string | null) ?? null,
-    fetched_at: (row.fetched_at as Date | null) ?? null,
-    has_content: row.has_content === true || (row.content_hash != null && row.content_hash !== ""),
+    id: row.id,
+    url: row.url,
+    title: row.title ?? null,
+    fetched_at: row.fetched_at ?? null,
+    has_content:
+      row.has_content === true || (row.content_hash != null && row.content_hash !== ""),
   };
 }
 
-let nextSlugIntId = 1000;
-const slugIntIdMap = new Map<string, number>();
-
-function getIntIdForSlug(slug: string): number {
-  if (!slugIntIdMap.has(slug)) {
-    slugIntIdMap.set(slug, nextSlugIntId++);
-  }
-  return slugIntIdMap.get(slug)!;
-}
-
-/** Non-allocating lookup — returns undefined for slugs not yet in the map. */
-function lookupIntIdForSlug(slug: string): number | undefined {
-  return slugIntIdMap.get(slug);
-}
-
-/** Reverse-lookup: recover slug from integer ID. */
-function slugFromIntId(intId: number | null): string | null {
-  if (intId === null) return null;
-  for (const [slug, id] of slugIntIdMap.entries()) {
-    if (id === intId) return slug;
-  }
-  return null;
-}
-
 function resetStores() {
-  resourceStore = new Map();
-  citationStore = [];
+  store.reset();
   jobStore = new Map();
   nextJobId = 1;
-  nextSlugIntId = 1000;
-  slugIntIdMap.clear();
 }
 
 function dispatch(query: string, params: unknown[]): unknown[] {
@@ -73,7 +58,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // Must use 'from "wiki_pages"' to avoid matching JOIN queries that also reference wiki_pages.
   if (q.includes('from "wiki_pages"') && q.includes("where") && q.includes("slug") && !q.includes("as id")) {
     // Allocating on first use mirrors production where all page slugs have wiki_pages rows.
-    return params.map((p) => ({ id: getIntIdForSlug(String(p)), slug: p }));
+    return params.map((p) => ({ id: store.getOrAllocatePageId(String(p)), slug: p }));
   }
 
   // ---- ref-check: SELECT id FROM wiki_pages WHERE id IN (...) ----
@@ -83,11 +68,11 @@ function dispatch(query: string, params: unknown[]): unknown[] {
 
   // ---- TRUNCATE ----
   if (q.includes("truncate") && q.includes("resource_citations")) {
-    citationStore = [];
+    store.clearCitations();
     return [];
   }
   if (q.includes("truncate") && q.includes("resources")) {
-    resourceStore = new Map();
+    store.clearResources();
     return [];
   }
 
@@ -103,37 +88,38 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const now = new Date();
     const COLS = 27; // Number of columns in resourceValues()
     const numRows = Math.max(1, Math.floor(params.length / COLS));
-    const results: Record<string, unknown>[] = [];
+    const results: ResourceRow[] = [];
 
     for (let r = 0; r < numRows; r++) {
       const o = r * COLS;
       const id = params[o] as string;
-      const existing = resourceStore.get(id);
+      const existing = store.getById(id);
 
-      const row: Record<string, unknown> = {
+      const row: ResourceRow = {
         id,
-        url: params[o + 1],
+        url: params[o + 1] as string,
         // COALESCE(incoming, existing): non-null incoming overwrites; null preserves existing.
-        title: params[o + 2] ?? existing?.title ?? null,
-        type: params[o + 3] ?? existing?.type ?? null,
-        summary: params[o + 4] ?? existing?.summary ?? null,
-        review: params[o + 5] ?? existing?.review ?? null,
-        abstract: params[o + 6] ?? existing?.abstract ?? null,
+        title: (params[o + 2] as string | null) ?? existing?.title ?? null,
+        type: (params[o + 3] as string | null) ?? existing?.type ?? null,
+        summary: (params[o + 4] as string | null) ?? existing?.summary ?? null,
+        review: (params[o + 5] as string | null) ?? existing?.review ?? null,
+        abstract: (params[o + 6] as string | null) ?? existing?.abstract ?? null,
         key_points: params[o + 7] ?? existing?.key_points ?? null,
-        publication_id: params[o + 8] ?? existing?.publication_id ?? null,
+        publication_id: (params[o + 8] as string | null) ?? existing?.publication_id ?? null,
         authors: params[o + 9] ?? existing?.authors ?? null,
-        published_date: params[o + 10] ?? existing?.published_date ?? null,
+        published_date: (params[o + 10] as string | null) ?? existing?.published_date ?? null,
         tags: params[o + 11] ?? existing?.tags ?? null,
-        local_filename: params[o + 12] ?? existing?.local_filename ?? null,
-        credibility_override: params[o + 13] ?? existing?.credibility_override ?? null,
-        fetched_at: params[o + 14] ?? existing?.fetched_at ?? null,
-        content_hash: params[o + 15] ?? existing?.content_hash ?? null,
+        local_filename: (params[o + 12] as string | null) ?? existing?.local_filename ?? null,
+        credibility_override:
+          (params[o + 13] as number | null) ?? existing?.credibility_override ?? null,
+        fetched_at: (params[o + 14] as Date | null) ?? existing?.fetched_at ?? null,
+        content_hash: (params[o + 15] as string | null) ?? existing?.content_hash ?? null,
         // stableId is generate-once: preserve existing, only set if row didn't have one
-        stable_id: existing?.stable_id ?? params[o + 16] ?? null,
+        stable_id: existing?.stable_id ?? (params[o + 16] as string) ?? `${SID_PREFIX}${id}`,
         created_at: existing?.created_at ?? now,
         updated_at: now,
       };
-      resourceStore.set(id, row);
+      store.setResource(row);
       results.push(row);
     }
     return results;
@@ -143,110 +129,67 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("delete") && q.includes("resource_citations") && q.includes("where")) {
     // Supports both single-row (= $1) and bulk (IN ($1, $2, ...)) deletes
     for (const p of params) {
-      const resourceId = p as string;
-      citationStore = citationStore.filter((c) => c.resource_id !== resourceId);
+      store.deleteCitationsForResource(p as string);
     }
     return [];
   }
 
   // ---- INSERT INTO resource_citations (supports multi-row) ----
-  // Params: resource_id, page_id (integer)
+  // Params: resource_id (stable_id, post-QUA-566), page_id (integer)
   if (q.includes("insert into") && q.includes("resource_citations")) {
-    const COLS = 2; // resource_id, page_id
+    const COLS = 2;
     const numRows = params.length / COLS;
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
-      const resourceId = params[o] as string;
-      const pageId = params[o + 1] as number;
-      const slug = slugFromIntId(pageId) ?? `page-${pageId}`;
-      const exists = citationStore.some(
-        (c) => c.resource_id === resourceId && c.page_id === pageId
-      );
-      if (!exists) {
-        citationStore.push({
-          resource_id: resourceId,
-          page_slug: slug,
-          page_id: pageId,
-          created_at: new Date(),
-        });
-      }
+      store.insertCitationByPageId(params[o] as string, params[o + 1] as number);
     }
     return [];
   }
 
   // ---- SELECT count(distinct page_id) FROM resource_citations ----
   if (q.includes("count(distinct") && q.includes("resource_citations")) {
-    const uniquePages = new Set(citationStore.map((c) => c.page_id));
-    return [{ page_id: uniquePages.size }];
+    return [{ page_id: store.uniquePageCount() }];
   }
 
   // ---- SELECT count(*) FROM resource_citations (not GROUP BY) ----
   if (q.includes("count(*)") && q.includes("resource_citations") && !q.includes("group by")) {
-    return [{ count: citationStore.length }];
+    return [{ count: store.citationCount() }];
   }
 
   // ---- SELECT count(*) FROM resources with GROUP BY type ----
   if (q.includes("count(*)") && q.includes('"resources"') && q.includes("group by")) {
-    const counts: Record<string, number> = {};
-    for (const r of resourceStore.values()) {
-      const t = (r.type as string) ?? "unknown";
-      counts[t] = (counts[t] || 0) + 1;
-    }
-    return Object.entries(counts)
-      .map(([type, count]) => ({ type, count }))
-      .sort((a, b) => b.count - a.count);
+    return store.groupByType();
   }
 
   // ---- SELECT count(*) FROM resources (no GROUP BY, with optional WHERE) ----
   if (q.includes("count(*)") && q.includes('"resources"') && !q.includes("group by")) {
     if (q.includes("where") && params.length > 0) {
-      let count = 0;
-      for (const r of resourceStore.values()) {
-        if (r.type === params[0]) count++;
-      }
-      return [{ count }];
+      return [{ count: store.countByType(params[0] as string) }];
     }
-    return [{ count: resourceStore.size }];
+    return [{ count: store.resourceCount() }];
   }
 
   // ---- SELECT ... FROM resource_citations INNER JOIN resources (by-page) ----
-  // QUA-566 Phase B.3: resource_citations.resource_id now references
-  // resources.stable_id, so the join is on stable_id, not id.
+  // QUA-566 Phase B.3: resource_citations.resource_id references resources.stable_id.
   if (q.includes("resource_citations") && q.includes("inner join") && q.includes('"resources"')) {
     const intId = params[0] as number;
-    const results: Record<string, unknown>[] = [];
-    for (const c of citationStore) {
-      if (c.page_id === intId) {
-        // Look up by stable_id (the new join key)
-        let r: Record<string, unknown> | undefined;
-        for (const res of resourceStore.values()) {
-          if (res.stable_id === c.resource_id) {
-            r = res;
-            break;
-          }
-        }
-        if (r) {
-          results.push({
-            id: r.id,
-            url: r.url,
-            title: r.title,
-            type: r.type,
-            publication_id: r.publication_id,
-            authors: r.authors,
-            published_date: r.published_date,
-          });
-        }
-      }
-    }
-    return results;
+    return store.joinCitationsByPage(intId).map((r) => ({
+      id: r.id,
+      url: r.url,
+      title: r.title,
+      type: r.type,
+      publication_id: r.publication_id,
+      authors: r.authors,
+      published_date: r.published_date,
+    }));
   }
 
   // ---- SELECT wiki_pages.slug FROM resource_citations LEFT JOIN wiki_pages WHERE resource_id = $1 ----
   // Returns slug via LEFT JOIN wiki_pages
   if (q.includes("resource_citations") && q.includes("where") && !q.includes("delete") && !q.includes("count")) {
     const resourceId = params[0] as string;
-    return citationStore
-      .filter((c) => c.resource_id === resourceId)
+    return store
+      .getCitationsForResource(resourceId)
       .map((c) => ({ slug: c.page_slug })); // wiki_pages.slug
   }
 
@@ -255,8 +198,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   if (q.includes("from resources") && q.includes("citation_content") && q.includes("any($)")) {
     const urlList = params[0] as string[];
     const results: Record<string, unknown>[] = [];
-    for (const row of resourceStore.values()) {
-      if (urlList.includes(row.url as string)) {
+    for (const row of store.allResources()) {
+      if (urlList.includes(row.url)) {
         results.push(toSuggestShape(row));
       }
     }
@@ -266,14 +209,32 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   }
 
   // ---- /suggest: INSERT INTO resources ... unnest ... RETURNING (bulk create for new URLs) ----
+  // Prod SQL passes three unnest arrays: ids, urls, stable_ids (QUA-536).
   if (q.includes("insert into resources") && q.includes("unnest")) {
     const ids = params[0] as string[];
     const urls = params[1] as string[];
+    const stableIds = (params[2] as string[] | undefined) ?? [];
+    const now = new Date();
     const results: Record<string, unknown>[] = [];
     for (let i = 0; i < ids.length; i++) {
-      const row: Record<string, unknown> = { id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false, created_at: new Date(), updated_at: new Date() };
-      resourceStore.set(ids[i], row);
-      results.push({ id: ids[i], url: urls[i], title: null, fetched_at: null, has_content: false });
+      const row: ResourceRow = {
+        id: ids[i],
+        url: urls[i],
+        stable_id: stableIds[i] ?? `${SID_PREFIX}${ids[i]}`,
+        title: null,
+        fetched_at: null,
+        has_content: false,
+        created_at: now,
+        updated_at: now,
+      };
+      store.setResource(row);
+      results.push({
+        id: row.id,
+        url: row.url,
+        title: null,
+        fetched_at: null,
+        has_content: false,
+      });
     }
     return results;
   }
@@ -282,20 +243,24 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   // Tagged template: params = [prefixQuery, prefixQuery, limit] (interpolated values in order)
   // unsafe(): params = [prefixQuery, limit]
   if ((q.includes("to_tsquery") || q.includes("plainto_tsquery")) && q.includes("resources")) {
-    const rawQuery = (params[0] as string);
+    const rawQuery = params[0] as string;
     // Strip :* suffixes and & operators to get plain search words
     const searchTerm = rawQuery.replace(/:\*/g, "").replace(/\s*&\s*/g, " ").trim().toLowerCase();
     // The limit is always the last param (a number); earlier params are query strings.
     const lastParam = params[params.length - 1];
-    const limit = (typeof lastParam === "number" ? lastParam : 20);
+    const limit = typeof lastParam === "number" ? lastParam : 20;
     const results: Record<string, unknown>[] = [];
-    for (const r of resourceStore.values()) {
+    for (const r of store.allResources()) {
       const title = ((r.title as string) || "").toLowerCase();
       const summary = ((r.summary as string) || "").toLowerCase();
       const abstract = ((r.abstract as string) || "").toLowerCase();
       const review = ((r.review as string) || "").toLowerCase();
-      if (title.includes(searchTerm) || summary.includes(searchTerm) ||
-          abstract.includes(searchTerm) || review.includes(searchTerm)) {
+      if (
+        title.includes(searchTerm) ||
+        summary.includes(searchTerm) ||
+        abstract.includes(searchTerm) ||
+        review.includes(searchTerm)
+      ) {
         results.push({ ...r, rank: 1.0 });
       }
     }
@@ -308,36 +273,30 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const whereClause = q.split("where")[1] || "";
     if (whereClause.includes('"url"')) {
       const url = params[0] as string;
-      for (const r of resourceStore.values()) {
-        if (r.url === url) return [r];
-      }
-      return [];
+      const r = store.getByUrl(url);
+      return r ? [r] : [];
     }
     // ---- SELECT ... FROM resources WHERE id = $1 OR stable_id = $2 ----
     // QUA-573: /:id/content now accepts either hex16 id or canonical sid_.
     if (whereClause.includes('"id"') && whereClause.includes('"stable_id"')) {
       const id = params[0] as string;
       const stableId = (params[1] ?? params[0]) as string;
-      const byId = resourceStore.get(id);
+      const byId = store.getById(id);
       if (byId) return [byId];
-      for (const r of resourceStore.values()) {
-        if (r.stable_id === stableId) return [r];
-      }
-      return [];
+      const byStable = store.getByStableId(stableId);
+      return byStable ? [byStable] : [];
     }
     // ---- SELECT ... FROM resources WHERE id = $1 ----
     if (whereClause.includes('"id"')) {
       const id = params[0] as string;
-      const r = resourceStore.get(id);
+      const r = store.getById(id);
       return r ? [r] : [];
     }
   }
 
   // ---- SELECT ... FROM resources ORDER BY (paginated all) ----
   if (q.includes('"resources"') && q.includes("order by") && q.includes("limit")) {
-    const allRows = Array.from(resourceStore.values()).sort((a, b) =>
-      (a.id as string).localeCompare(b.id as string)
-    );
+    const allRows = store.allResources().sort((a, b) => a.id.localeCompare(b.id));
 
     // Filter by type if there's a WHERE clause
     let filtered = allRows;
@@ -357,26 +316,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   //                 JOIN resources r ON rc.resource_id = r.stable_id
   //                 WHERE r.id = ANY(...) GROUP BY r.id ----
   // QUA-566 Phase B.3: resource_citations.resource_id references resources.stable_id.
-  // The prod query JOINs resources and surfaces r.id (hex16) so downstream map-by-hex16
-  // lookups keep working. The mock walks resourceStore to resolve the hex16 key into
-  // the stable_id, then counts citationStore rows whose resource_id matches that stable_id.
+  // Prod surfaces r.id (hex16) so downstream map-by-hex16 lookups keep working.
   if (q.includes("resource_citations") && q.includes("group by") && q.includes("any($)")) {
-    const resourceIds = params[0] as string[];
-    const counts: Record<string, number> = {};
-    for (const resourceId of resourceIds) {
-      const r = resourceStore.get(resourceId);
-      const stableId = r?.stable_id as string | null | undefined;
-      if (!stableId) continue;
-      let n = 0;
-      for (const c of citationStore) {
-        if (c.resource_id === stableId) n++;
-      }
-      if (n > 0) counts[resourceId] = n;
-    }
-    return Object.entries(counts).map(([resource_id, cnt]) => ({
-      resource_id,
-      cnt: String(cnt),
-    }));
+    return store.citationCountsByHexIds(params[0] as string[]);
   }
 
   // ---- INSERT INTO jobs ... ON CONFLICT ... RETURNING id ----
@@ -443,7 +385,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       if (dk && dk.startsWith(prefix)) {
         const jobParams = job.params as { resourceId?: string; url?: string } | null;
         const resourceId = jobParams?.resourceId ?? null;
-        const resource = resourceId ? resourceStore.get(resourceId) : null;
+        const resource = resourceId ? store.getById(resourceId) : null;
         results.push({
           job_id: job.id,
           job_status: job.status,
@@ -529,14 +471,14 @@ describe("Resources API", () => {
         citedBy: ["page-a", "page-b"],
       });
       expect(res.status).toBe(201);
-      expect(citationStore).toHaveLength(2);
-      expect(citationStore[0].page_slug).toBe("page-a");
+      expect(store.citationCount()).toBe(2);
+      expect(store.allCitations()[0].page_slug).toBe("page-a");
     });
 
     it("updates existing resource on upsert (same id, different data)", async () => {
       // First insert
       await postJson(app, "/api/resources", sampleResource);
-      expect(resourceStore.get("abc123def456")?.title).toBe(
+      expect(store.getById("abc123def456")?.title).toBe(
         "AI Alignment: A Comprehensive Survey"
       );
 
@@ -546,7 +488,7 @@ describe("Resources API", () => {
         title: "Updated Title",
       });
       expect(res.status).toBe(201);
-      expect(resourceStore.get("abc123def456")?.title).toBe("Updated Title");
+      expect(store.getById("abc123def456")?.title).toBe("Updated Title");
     });
 
     it("preserves existing enriched fields when upserting bare resource (COALESCE)", async () => {
@@ -561,7 +503,7 @@ describe("Resources API", () => {
         publishedDate: "2025-01-15",
         tags: ["alignment", "survey"],
       });
-      const enriched = resourceStore.get("abc123def456");
+      const enriched = store.getById("abc123def456");
       expect(enriched?.summary).toBe("A comprehensive survey of AI alignment approaches.");
 
       // Upsert with bare resource (only id + url) — should NOT wipe enriched fields
@@ -571,7 +513,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
 
-      const afterBare = resourceStore.get("abc123def456");
+      const afterBare = store.getById("abc123def456");
       // Enriched text fields should be preserved (COALESCE(null, existing) = existing)
       expect(afterBare?.summary).toBe("A comprehensive survey of AI alignment approaches.");
       expect(afterBare?.review).toBe("Excellent overview of the field.");
@@ -598,7 +540,7 @@ describe("Resources API", () => {
       });
       expect(res.status).toBe(201);
 
-      const updated = resourceStore.get("abc123def456");
+      const updated = store.getById("abc123def456");
       expect(updated?.summary).toBe("Updated summary");
     });
   });
@@ -812,7 +754,7 @@ describe("Resources API", () => {
   describe("POST /api/resources/suggest — variant collision handling", () => {
     it("resolves both URLs when they are www-variants of each other and one exists in DB", async () => {
       // Pre-populate: the DB has the www version stored
-      resourceStore.set("existing-res-1", {
+      store.seedResource({
         id: "existing-res-1",
         url: "https://www.example.com",
         title: "Example Site",
@@ -845,7 +787,7 @@ describe("Resources API", () => {
 
     it("resolves both URLs when DB has the non-www version stored", async () => {
       // Pre-populate: the DB has the non-www version stored
-      resourceStore.set("existing-res-2", {
+      store.seedResource({
         id: "existing-res-2",
         url: "https://example.com",
         title: "Example Site",
@@ -875,14 +817,14 @@ describe("Resources API", () => {
 
     it("prefers exact URL match over variant match when both exist in DB", async () => {
       // DB has both www and non-www as separate resources
-      resourceStore.set("res-no-www", {
+      store.seedResource({
         id: "res-no-www",
         url: "https://example.com",
         title: "No WWW Version",
         fetched_at: new Date(),
         has_content: true,
       });
-      resourceStore.set("res-with-www", {
+      store.seedResource({
         id: "res-with-www",
         url: "https://www.example.com",
         title: "WWW Version",
@@ -907,7 +849,7 @@ describe("Resources API", () => {
 
     it("creates new resource only for genuinely unknown URLs", async () => {
       // DB has one URL; submit it along with a truly new URL
-      resourceStore.set("known-res", {
+      store.seedResource({
         id: "known-res",
         url: "https://known.com",
         title: "Known Resource",
@@ -934,7 +876,7 @@ describe("Resources API", () => {
 
     it("handles trailing slash variants correctly", async () => {
       // DB stores URL with trailing slash
-      resourceStore.set("slash-res", {
+      store.seedResource({
         id: "slash-res",
         url: "https://example.com/page/",
         title: "Page With Slash",
@@ -954,7 +896,7 @@ describe("Resources API", () => {
     });
 
     it("deduplicates identical input URLs", async () => {
-      resourceStore.set("dedup-res", {
+      store.seedResource({
         id: "dedup-res",
         url: "https://example.com",
         title: "Dedup Test",
@@ -1006,7 +948,7 @@ describe("Resources API", () => {
 
     it("does not create jobs for fresh resources", async () => {
       // Pre-populate with a fresh resource
-      resourceStore.set("fresh-res", {
+      store.seedResource({
         id: "fresh-res",
         url: "https://example.com/fresh",
         title: "Fresh Resource",
@@ -1030,7 +972,7 @@ describe("Resources API", () => {
 
     it("returns batchId only for non-fresh resources in a mixed batch", async () => {
       // One fresh, one missing
-      resourceStore.set("fresh-mixed", {
+      store.seedResource({
         id: "fresh-mixed",
         url: "https://example.com/existing",
         title: "Existing Resource",
@@ -1060,10 +1002,8 @@ describe("Resources API", () => {
     });
 
     it("sets job priority based on citation count", async () => {
-      // Pre-populate a resource with known ID, stable_id, and citations.
-      // QUA-566 Phase B.3: resource_citations.resource_id is now the resource's
-      // stable_id, so push to citationStore keyed on stable_id.
-      resourceStore.set("cited-res", {
+      // Seed a resource with an explicit stable_id; citations key on that stable_id.
+      store.seedResource({
         id: "cited-res",
         stable_id: "sid_cited-res",
         url: "https://example.com/cited",
@@ -1072,15 +1012,9 @@ describe("Resources API", () => {
         has_content: false,
       });
 
-      // Add citations: 4 pages cite this resource → priority = min(100, 4 * 5) = 20
-      const pageIds = ["page-1", "page-2", "page-3", "page-4"];
-      for (const slug of pageIds) {
-        citationStore.push({
-          resource_id: "sid_cited-res",
-          page_slug: slug,
-          page_id: getIntIdForSlug(slug),
-          created_at: new Date(),
-        });
+      // 4 pages cite this resource → priority = min(100, 4 * 5) = 20
+      for (const slug of ["page-1", "page-2", "page-3", "page-4"]) {
+        store.seedCitation({ resourceIdentifier: "cited-res", pageSlug: slug });
       }
 
       const res = await postJson(app, "/api/resources/suggest", {
@@ -1099,9 +1033,8 @@ describe("Resources API", () => {
     });
 
     it("caps priority at 100", async () => {
-      // Pre-populate resource with 25 citations → priority = min(100, 25 * 5) = 100
-      // QUA-566 Phase B.3: citations keyed by stable_id post-migration.
-      resourceStore.set("popular-res", {
+      // 25 citations → priority = min(100, 25 * 5) = 100
+      store.seedResource({
         id: "popular-res",
         stable_id: "sid_popular-res",
         url: "https://example.com/popular",
@@ -1111,12 +1044,7 @@ describe("Resources API", () => {
       });
 
       for (let i = 0; i < 25; i++) {
-        citationStore.push({
-          resource_id: "sid_popular-res",
-          page_slug: `page-${i}`,
-          page_id: getIntIdForSlug(`page-${i}`),
-          created_at: new Date(),
-        });
+        store.seedCitation({ resourceIdentifier: "popular-res", pageSlug: `page-${i}` });
       }
 
       const res = await postJson(app, "/api/resources/suggest", {
@@ -1210,8 +1138,9 @@ describe("Resources API", () => {
       // Simulate completion: mark job complete and add enrichment to resource
       const jobId = Array.from(jobStore.keys())[0];
       jobStore.get(jobId)!.status = "completed";
-      resourceStore.get(resourceId)!.enrichment_status = "enriched";
-      resourceStore.get(resourceId)!.summary = "This is an enriched summary";
+      const enrichedRow = store.getById(resourceId)!;
+      enrichedRow.enrichment_status = "enriched";
+      enrichedRow.summary = "This is an enriched summary";
 
       const statusRes = await app.request(`/api/resources/suggest/status/${batchId}`);
       const statusBody = await statusRes.json();
