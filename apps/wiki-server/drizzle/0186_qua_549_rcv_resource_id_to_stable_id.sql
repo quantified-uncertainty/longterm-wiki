@@ -26,8 +26,16 @@
 --     ON DELETE SET NULL;
 
 -- Step 1: drop the existing FK on resources.id.
+-- Both the Drizzle-generated name (*_fk) and the postgres-default name (*_fkey)
+-- can exist in prod due to historical migration paths; drop both. This pattern
+-- was missed in the pilot and caused a deploy halt when prod had *_fkey
+-- pointing at resources(id) — the Step 2 UPDATE tripped that surviving FK.
+-- Every subsequent Phase B migration (0188, 0189, 0191, 0192, 0193, 0194, 0197)
+-- drops both names; backporting the pattern here.
 ALTER TABLE resource_content_versions
   DROP CONSTRAINT IF EXISTS resource_content_versions_resource_id_resources_id_fk;
+ALTER TABLE resource_content_versions
+  DROP CONSTRAINT IF EXISTS resource_content_versions_resource_id_fkey;
 
 -- Step 2: rewrite resource_id values from hex16 → sid_<10> via JOIN.
 -- Rows where resource_id IS NULL are untouched. Rows whose resource_id is
