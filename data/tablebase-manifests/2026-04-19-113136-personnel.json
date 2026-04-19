@@ -1,0 +1,394 @@
+{
+  "table": "personnel",
+  "recordCount": 47,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:31:36.142Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 47,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "2nmP8pNhrs",
+      "personId": "c3M1lAOmBp",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Senior Vice President for Policy Research; Director, Europe Program",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "9Ogd91FCgb",
+      "personId": "Qh49BMkPpt",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Chief Operating Officer",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "PZiMNR1Y8t",
+      "personId": "FEfaCjuRx2",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Studies; Acting Director, Africa Program",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "h9Yp8iQZJO",
+      "personId": "R9S7kIMYLx",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Studies",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "cvOgUaTxgp",
+      "personId": "CBfo3swHnc",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Studies",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "tvcnWbXdse",
+      "personId": "eRlcJ4THTn",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Studies",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "CoU9HQIBCU",
+      "personId": "YKlBQhyr8r",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Development",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "s6ZXz3NkGy",
+      "personId": "GqKXGPF49T",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice President for Communications",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "0TxP00vZnD",
+      "personId": "naynEYujHP",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "James Family Chair; Vice President for Studies",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "nPpzOpSMIy",
+      "personId": "kugyRPR9K4",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Chief Financial Officer",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "NhutqYRJGj",
+      "personId": "3lmU5bLuvZ",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Chief Information Officer",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "IujajWXucz",
+      "personId": "Q9onqdo5aJ",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Chief Human Resources and Administrative Officer",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "kpbjT9YjS8",
+      "personId": "yzaV84up34",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Director, Carnegie Europe",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "Fl3mn9o63e",
+      "personId": "0KLn4HQxxd",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Director, Carnegie Russia Eurasia Center",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "W9U6lQYs9q",
+      "personId": "sDvnq9bBrH",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Director, Carnegie China; Maurice R. Greenberg Director's Chair",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "Qe9jIFdZHo",
+      "personId": "HBZLsnDHrk",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Director, Malcolm H. Kerr Carnegie Middle East Center",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    },
+    {
+      "id": "Xkvv8pOHrP",
+      "personId": "9T49d644Ln",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Chair, Board of Trustees",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "yoEaNrFy9c",
+      "personId": "EJo9qjZev3",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Vice Chair, Board of Trustees",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "kQ8FdZXSsT",
+      "personId": "K0n2artioI",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "IRwsJFXrzu",
+      "personId": "1sM8pyYOwB",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "aNi9pwTjif",
+      "personId": "WhpYnRtVMG",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "biWcDuyXIP",
+      "personId": "SCPbAwSzfg",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "YJbgPiFK1z",
+      "personId": "978SGjc9n9",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "ZnlKqwhOiE",
+      "personId": "yCmIKQfPJf",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "ylUDDDZ098",
+      "personId": "m09Iwbl9SQ",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "YzXBNqMKpB",
+      "personId": "Gi5wAiMcnS",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "pyzljHE79z",
+      "personId": "8VncsyrUNf",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "zeSq667Mbf",
+      "personId": "HTmgPfzj7j",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "6mjd9ZLOsr",
+      "personId": "b72hVJLH6D",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "c5mcSnIXn3",
+      "personId": "Xvp1vx64YG",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "lwv8laXPYD",
+      "personId": "7XyRDgP27T",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "FB6lfe9GDc",
+      "personId": "yuHk7dSm29",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "ORmjM92YR9",
+      "personId": "XnUgMSNXNz",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "6UmWrXkseA",
+      "personId": "XIABGkgIEr",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "MxLZu0pyns",
+      "personId": "EWWUaw2UQ9",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "pfcgCOaQv8",
+      "personId": "8US50y49Z0",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "TE6l9Ohfmb",
+      "personId": "SVANDCu3XW",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "9QfLjz5fn9",
+      "personId": "1rOpEs5IJI",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "4M2NrqODXP",
+      "personId": "dJLW19SQvF",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "98wRcklr8J",
+      "personId": "Eki269qgEb",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "8tdzUAn3qu",
+      "personId": "1yerbanfyg",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "oKrwDnbC4R",
+      "personId": "L6KPQKDOoV",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "vY6dVAmtnK",
+      "personId": "JeVDIFicpS",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "5yLZveMOgn",
+      "personId": "wtYHnrAEAg",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "yAMhUPkrqP",
+      "personId": "zlkIdjIRnN",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "iAT8divrI6",
+      "personId": "3XbnpBHHNo",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    },
+    {
+      "id": "5owK3f3qIO",
+      "personId": "lrxvjNBxr2",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "Trustee",
+      "source": "https://carnegieendowment.org/board-of-trustees",
+      "verdict": "none"
+    }
+  ]
+}

@@ -1,0 +1,42 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:19:43.713Z",
+  "sourcingSummary": {
+    "withSourcing": 3,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 3,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "n52KZ9ERBI",
+      "personId": "9TQhlxTn1m",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Co-Director",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "m5VWwvls1v",
+      "personId": "QX7YEcfuLQ",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "James C. Gaither Junior Fellow",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "G9iOn7j4c5",
+      "personId": "9jnwaLmcK6",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Visiting Researcher",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    }
+  ]
+}
