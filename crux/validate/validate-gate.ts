@@ -288,6 +288,14 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // Rationale in validate-workspace-dep-coverage.ts. QUA-598.
+    id: 'workspace-dep-coverage',
+    name: 'Workspace dependency coverage (no undeclared @longterm-wiki/* imports)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-workspace-dep-coverage.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-294: enforces NOT VALID on ADD CONSTRAINT for large tables.
     // Migration 0173 caused a ~12h prod deploy stall by taking ACCESS
     // EXCLUSIVE on hallucination_risk_snapshots without NOT VALID.

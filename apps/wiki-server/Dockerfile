@@ -10,6 +10,7 @@ COPY package.json pnpm-workspace.yaml pnpm-lock.yaml ./
 COPY apps/wiki-server/package.json ./apps/wiki-server/
 COPY packages/id-utils/package.json ./packages/id-utils/
 COPY packages/factbase/package.json ./packages/factbase/
+COPY packages/url-utils/package.json ./packages/url-utils/
 
 # Install wiki-server and its workspace dependencies
 RUN pnpm install --frozen-lockfile --filter wiki-server...
@@ -18,6 +19,7 @@ RUN pnpm install --frozen-lockfile --filter wiki-server...
 COPY apps/wiki-server/ ./apps/wiki-server/
 COPY packages/id-utils/ ./packages/id-utils/
 COPY packages/factbase/ ./packages/factbase/
+COPY packages/url-utils/ ./packages/url-utils/
 
 ENV NODE_ENV=production
 
