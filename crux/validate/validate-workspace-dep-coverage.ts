@@ -5,6 +5,10 @@
  * `apps/<name>/src/` or `apps/<name>/scripts/` is declared in that app's
  * `package.json` (in any dependency section).
  *
+ * Also validates the worker Docker image: every `@longterm-wiki/*` package
+ * imported from `crux/` (which `Dockerfile.worker` copies wholesale into the
+ * image) must be declared in `docker/worker/package.json`.
+ *
  * ## Why this exists
  *
  * pnpm's workspace hoisting makes undeclared workspace imports work locally
@@ -14,13 +18,16 @@
  * import will pass every local and CI check, then fail at runtime inside the
  * Docker container with `ERR_MODULE_NOT_FOUND`.
  *
- * This bug class has recurred three times (see QUA-598):
+ * This bug class has recurred four times:
  *   - `@longterm-wiki/id-utils` (earliest incident, referenced in QUA-449)
  *   - `@longterm-wiki/factbase` (2026-04-14, QUA-449)
- *   - `@longterm-wiki/url-utils` (2026-04-18, QUA-598)
+ *   - `@longterm-wiki/url-utils` in wiki-server (2026-04-18, QUA-598)
+ *   - `@longterm-wiki/url-utils` in the worker image (2026-04-19, QUA-605) —
+ *     missed by the earlier validator because it only covered apps/*, not
+ *     the standalone worker manifest at `docker/worker/package.json`.
  *
  * Each previous occurrence was fixed instance-by-instance. This validator is
- * the systemic fix — a blocking gate check so the 4th recurrence is impossible.
+ * the systemic fix — a blocking gate check so the 5th recurrence is impossible.
  *
  * ## What it checks
  *
@@ -32,13 +39,22 @@
  *      optionalDependencies).
  *   3. Fail if any used package is not declared in any section.
  *
+ * For `docker/worker/package.json` (standalone, not a workspace member):
+ *   1. Scan `crux/` recursively (excluding `*.test.*` and `__tests__/`) for
+ *      any `@longterm-wiki/<pkg>` import. The worker Dockerfile copies all of
+ *      `crux/` into the image, so any import reachable via lazy handler load
+ *      needs the dep declared.
+ *   2. Same declared-vs-used comparison as apps.
+ *
  * Imports in scope: quote-anchored `from '@longterm-wiki/X'`, `import('…')`,
  * and `require('…')` — plus subpath imports like `@longterm-wiki/factbase/types`
  * (the package name is the first path segment). The quote anchor prevents
  * false positives from bare mentions in comments or docstrings. Note: a
- * commented-out *import statement* (e.g. `// import { x } from '@longterm-wiki/foo'`)
+ * commented-out *import statement* (e.g. `// import { x } from '@longterm-wiki/EXAMPLE'`)
  * is still flagged — treating that as a real import is intentional since
- * commented-out code should be removed, not left behind.
+ * commented-out code should be removed, not left behind. (Note: EXAMPLE is
+ * uppercase so this doctring itself doesn't match the regex below, which
+ * restricts package names to lowercase per npm naming rules.)
  *
  * Why "any section" and not just `dependencies`: the Dockerfiles in this
  * repo install with `pnpm install --filter <app>...` (no `--prod`), so
@@ -89,6 +105,11 @@ interface AppCoverage {
 
 interface CheckOptions {
   appsDir?: string;
+  /** Path to the worker's standalone package.json. Defaults to
+   *  `<repo>/docker/worker/package.json`. */
+  workerPkgJson?: string;
+  /** Source tree to scan for the worker manifest check. Defaults to `<repo>/crux`. */
+  workerSourceDir?: string;
   /** Optional warning sink so tests can assert on parse errors. */
   onWarn?: (message: string) => void;
 }
@@ -100,7 +121,17 @@ interface CheckResult {
   apps: AppCoverage[];
 }
 
-function listSourceFiles(dir: string, out: string[] = []): string[] {
+interface ListOptions {
+  /** Skip __tests__ directories and *.test.* files. Used for crux scanning where
+   *  test imports shouldn't require deps in the worker image. */
+  excludeTests?: boolean;
+}
+
+function listSourceFiles(
+  dir: string,
+  out: string[] = [],
+  options: ListOptions = {},
+): string[] {
   let entries;
   try {
     entries = readdirSync(dir, { withFileTypes: true });
@@ -112,12 +143,14 @@ function listSourceFiles(dir: string, out: string[] = []): string[] {
   for (const dirent of entries) {
     const name = dirent.name;
     if (name === 'node_modules' || name.startsWith('.')) continue;
+    if (options.excludeTests && name === '__tests__') continue;
     const full = join(dir, name);
     if (dirent.isDirectory()) {
-      listSourceFiles(full, out);
+      listSourceFiles(full, out, options);
     } else if (dirent.isFile()) {
       const dot = name.lastIndexOf('.');
       if (dot !== -1 && SOURCE_EXTENSIONS.has(name.slice(dot))) {
+        if (options.excludeTests && /\.test\.[a-z]+$/.test(name)) continue;
         out.push(full);
       }
     }
@@ -202,23 +235,61 @@ function analyzeApp(
   return { app: appName, used, declared, missing, unused };
 }
 
+/**
+ * Scan a source directory recursively and compare its `@longterm-wiki/*` imports
+ * against an external package.json (i.e. one that is NOT the parent of the source
+ * directory). Used for the worker image: `crux/` is scanned, but the manifest
+ * that must declare the deps lives at `docker/worker/package.json`.
+ */
+function analyzeExternalManifest(
+  sourceDir: string,
+  pkgJsonPath: string,
+  label: string,
+  onWarn?: (message: string) => void,
+): AppCoverage | null {
+  if (!existsSync(pkgJsonPath)) return null;
+  if (!existsSync(sourceDir)) return null;
+
+  const files = listSourceFiles(sourceDir, [], { excludeTests: true });
+  const used = new Set<string>();
+  for (const file of files) {
+    let content: string;
+    try {
+      content = readFileSync(file, 'utf-8');
+    } catch {
+      continue;
+    }
+    if (!content.includes(WORKSPACE_PREFIX)) continue;
+    for (const pkg of extractWorkspaceImports(content)) used.add(pkg);
+  }
+
+  const declared = readDeclaredDeps(pkgJsonPath, onWarn);
+
+  const missing = [...used].filter((p) => !declared.has(p)).sort();
+  const unused = [...declared].filter((p) => !used.has(p)).sort();
+
+  return { app: label, used, declared, missing, unused };
+}
+
 export function runCheck(options: CheckOptions = {}): CheckResult {
   const c = getColors();
   const appsDir = options.appsDir ?? join(PROJECT_ROOT, 'apps');
+  const workerPkgJson =
+    options.workerPkgJson ?? join(PROJECT_ROOT, 'docker/worker/package.json');
+  const workerSourceDir = options.workerSourceDir ?? join(PROJECT_ROOT, 'crux');
   const onWarn = options.onWarn ?? ((msg) => console.log(`${c.yellow}${msg}${c.reset}`));
 
   console.log(
     `${c.blue}Checking workspace dependency coverage in ${appsDir}...${c.reset}\n`
   );
 
-  let appNames: string[];
+  let appNames: string[] = [];
   try {
     appNames = readdirSync(appsDir, { withFileTypes: true })
       .filter((dirent) => dirent.isDirectory())
       .map((dirent) => dirent.name);
   } catch {
-    console.log(`${c.dim}Skipping: ${appsDir} not found${c.reset}`);
-    return { passed: true, errors: 0, warnings: 0, apps: [] };
+    console.log(`${c.dim}Skipping apps: ${appsDir} not found${c.reset}`);
   }
 
   const apps: AppCoverage[] = [];
@@ -226,6 +297,16 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     const report = analyzeApp(join(appsDir, name), name, onWarn);
     if (report) apps.push(report);
   }
+
+  // Worker image: crux/ source is copied wholesale, so its imports must be
+  // declared in docker/worker/package.json.
+  const workerReport = analyzeExternalManifest(
+    workerSourceDir,
+    workerPkgJson,
+    'docker/worker',
+    onWarn,
+  );
+  if (workerReport) apps.push(workerReport);
 
   let errors = 0;
   let warnings = 0;
@@ -277,7 +358,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
       `${c.dim}Undeclared imports pass locally (pnpm hoists) but fail at runtime with ERR_MODULE_NOT_FOUND.${c.reset}`
     );
     console.log(
-      `${c.dim}See QUA-598 for the most recent incident of this class.${c.reset}`
+      `${c.dim}See QUA-598 (wiki-server) and QUA-605 (worker image) for prior incidents of this class.${c.reset}`
     );
   } else {
     console.log(

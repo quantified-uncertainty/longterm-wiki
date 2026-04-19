@@ -20,6 +20,25 @@ import {
   extractWorkspaceImports,
 } from './validate-workspace-dep-coverage.ts';
 
+function makeScratchDir(): string {
+  const root = join(
+    os.tmpdir(),
+    `workspace-dep-coverage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+  );
+  mkdirSync(root, { recursive: true });
+  return root;
+}
+
+/**
+ * Default worker-check paths for app-focused tests: point at guaranteed-missing
+ * locations so the worker scan is a no-op and doesn't pull in the real repo's
+ * docker/worker manifest.
+ */
+const NO_WORKER = {
+  workerPkgJson: '/nonexistent-worker-pkg-json',
+  workerSourceDir: '/nonexistent-crux-dir',
+};
+
 interface AppFixture {
   name: string;
   dependencies?: Record<string, string>;
@@ -98,7 +117,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(false);
     expect(result.errors).toBe(1);
     expect(result.apps).toHaveLength(1);
@@ -121,7 +140,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.errors).toBe(0);
     expect(result.apps[0].used).toEqual(
@@ -145,7 +164,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.errors).toBe(0);
     expect(result.apps[0].missing).toEqual([]);
@@ -167,7 +186,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.apps[0].used).toEqual(new Set(['@longterm-wiki/factbase']));
   });
@@ -184,7 +203,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(false);
     expect(result.apps[0].missing).toEqual(['@longterm-wiki/url-utils']);
   });
@@ -202,7 +221,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(false);
     expect(result.errors).toBe(1);
 
@@ -226,7 +245,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.errors).toBe(0);
     expect(result.warnings).toBe(1);
@@ -254,7 +273,7 @@ describe('validate-workspace-dep-coverage', () => {
       `import { x } from '@longterm-wiki/url-utils';\n`
     );
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.apps[0].used.size).toBe(0);
   });
@@ -272,7 +291,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     // No real imports → passes, no missing entries.
     expect(result.passed).toBe(true);
     expect(result.apps[0].used.size).toBe(0);
@@ -283,14 +302,17 @@ describe('validate-workspace-dep-coverage', () => {
       { name: 'stub-app' },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
     expect(result.apps).toHaveLength(1);
     expect(result.apps[0].used.size).toBe(0);
   });
 
   it('returns passed=true when the apps directory does not exist', () => {
-    const result = runCheck({ appsDir: join(os.tmpdir(), `nonexistent-${Date.now()}`) });
+    const result = runCheck({
+      appsDir: join(os.tmpdir(), `nonexistent-${Date.now()}`),
+      ...NO_WORKER,
+    });
     expect(result.passed).toBe(true);
     expect(result.apps).toEqual([]);
   });
@@ -306,7 +328,7 @@ describe('validate-workspace-dep-coverage', () => {
       },
     ]);
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(false);
     // Sorted alphabetically in the output.
     expect(result.apps[0].missing).toEqual([
@@ -327,12 +349,138 @@ describe('validate-workspace-dep-coverage', () => {
     ]);
 
     const warnings: string[] = [];
-    const result = runCheck({ appsDir: scratch, onWarn: (msg) => warnings.push(msg) });
+    const result = runCheck({
+      appsDir: scratch,
+      ...NO_WORKER,
+      onWarn: (msg) => warnings.push(msg),
+    });
 
     expect(warnings.length).toBeGreaterThan(0);
     expect(warnings[0]).toMatch(/Malformed package.json/);
     // With no declared deps, the import is still flagged as missing.
     expect(result.passed).toBe(false);
+  });
+
+  // ---------------------------------------------------------------------
+  // Worker manifest tests — docker/worker/package.json vs crux/ imports.
+  // QUA-605: the worker image copies all of crux/ wholesale, so imports
+  // there must be declared in docker/worker/package.json (which is NOT a
+  // pnpm workspace member).
+  // ---------------------------------------------------------------------
+
+  it('flags undeclared workspace imports from the worker source tree', () => {
+    scratch = makeScratchDir();
+    // Empty apps dir (points to a missing location, which the validator treats
+    // as a no-op).
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    writeFileSync(
+      join(workerDir, 'package.json'),
+      JSON.stringify({ name: 'worker', dependencies: {} })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'url.ts'),
+      `import { normalizeUrl } from '@longterm-wiki/url-utils';\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: join(workerDir, 'package.json'),
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(false);
+    const worker = result.apps.find((a) => a.app === 'docker/worker');
+    expect(worker).toBeDefined();
+    expect(worker?.missing).toEqual(['@longterm-wiki/url-utils']);
+  });
+
+  it('passes when worker manifest declares every crux-imported workspace pkg', () => {
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    writeFileSync(
+      join(workerDir, 'package.json'),
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'url.ts'),
+      `import { normalizeUrl } from '@longterm-wiki/url-utils';\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: join(workerDir, 'package.json'),
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(true);
+    const worker = result.apps.find((a) => a.app === 'docker/worker');
+    expect(worker?.missing).toEqual([]);
+    expect(worker?.used).toEqual(new Set(['@longterm-wiki/url-utils']));
+  });
+
+  it('excludes crux test files from the worker scan', () => {
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    writeFileSync(
+      join(workerDir, 'package.json'),
+      JSON.stringify({ name: 'worker', dependencies: {} })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    mkdirSync(join(cruxDir, 'lib', '__tests__'), { recursive: true });
+    // Test file imports url-utils — should NOT trigger a violation, since
+    // tests don't run in the worker image.
+    writeFileSync(
+      join(cruxDir, 'lib', 'url.test.ts'),
+      `import { normalizeUrl } from '@longterm-wiki/url-utils';\n`
+    );
+    writeFileSync(
+      join(cruxDir, 'lib', '__tests__', 'another.ts'),
+      `import { isSid } from '@longterm-wiki/id-utils';\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: join(workerDir, 'package.json'),
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(true);
+    const worker = result.apps.find((a) => a.app === 'docker/worker');
+    expect(worker?.used.size).toBe(0);
+  });
+
+  it('skips the worker check entirely when the manifest is missing', () => {
+    scratch = makeScratchDir();
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: join(scratch, 'worker-missing', 'package.json'),
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.apps.find((a) => a.app === 'docker/worker')).toBeUndefined();
   });
 
   it('skips symlinks without following them (no recursion loop)', () => {
@@ -357,7 +505,7 @@ describe('validate-workspace-dep-coverage', () => {
       return;
     }
 
-    const result = runCheck({ appsDir: scratch });
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     expect(result.passed).toBe(true);
   });
 });

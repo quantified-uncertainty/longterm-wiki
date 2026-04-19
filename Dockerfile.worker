@@ -5,6 +5,11 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 WORKDIR /deps
+# Workspace packages referenced as file:./packages/* from docker/worker/package.json
+# must be present before `pnpm install` resolves them. Without this, the install
+# succeeds but @longterm-wiki/* imports from crux hit ERR_MODULE_NOT_FOUND at
+# runtime (QUA-605; same class as QUA-598).
+COPY packages/ ./packages/
 COPY docker/worker/package.json ./
 RUN pnpm install --prod
 
@@ -48,7 +53,9 @@ RUN echo 'export const X = 1;' > /tmp/test.ts && \
 # Copy crux source (worker + all transitive imports)
 COPY crux/ ./crux/
 
-# Copy shared packages (factbase, id-utils) — crux has runtime imports from these
+# Keep packages/ available for crux scripts that read packages/factbase/data/*.yaml
+# by filesystem path (separate from workspace package resolution, which is handled
+# via node_modules above).
 COPY packages/ ./packages/
 
 # NOTE: No apps/wiki-server/ files needed — all imports are type-only (erased by tsx)
