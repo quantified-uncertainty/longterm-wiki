@@ -224,13 +224,13 @@ const missingSourcesApp = new Hono()
           .select({
             record_id: divisions.id,
             record_table: sql<string>`'divisions'`,
-            entity_id: sql<string>`COALESCE(${divisions.parentOrgId}, ${divisions.organizationId})`,
-            entity_name: sql<string>`COALESCE(${orgE.title}, ${divisions.organizationId})`,
+            entity_id: divisions.parentOrgId,
+            entity_name: sql<string>`COALESCE(${orgE.title}, ${divisions.parentOrgId})`,
             description: divisions.name,
             name: divisions.name,
           })
           .from(divisions)
-          .leftJoin(orgE, eq(orgE.stableId, sql`COALESCE(${divisions.parentOrgId}, ${divisions.organizationId})`))
+          .leftJoin(orgE, eq(orgE.stableId, divisions.parentOrgId))
           .where(whereClause)
           .limit(cap);
 
@@ -285,13 +285,13 @@ const missingSourcesApp = new Hono()
           .select({
             record_id: fundingPrograms.id,
             record_table: sql<string>`'funding_programs'`,
-            entity_id: fundingPrograms.orgEntityId,
-            entity_name: sql<string>`COALESCE(${orgE.title}, ${fundingPrograms.organizationId})`,
+            entity_id: fundingPrograms.orgId,
+            entity_name: sql<string>`COALESCE(${orgE.title}, ${fundingPrograms.orgId})`,
             description: fundingPrograms.name,
             name: fundingPrograms.name,
           })
           .from(fundingPrograms)
-          .leftJoin(orgE, eq(orgE.stableId, fundingPrograms.orgEntityId))
+          .leftJoin(orgE, eq(orgE.stableId, fundingPrograms.orgId))
           .where(whereClause)
           .limit(cap);
 
