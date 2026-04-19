@@ -198,7 +198,7 @@ Environment:
   OPENROUTER_API_KEY   Perplexity via OpenRouter (optional)
   SCRY_API_KEY         SCRY search (optional; falls back to public key)
   GITHUB_TOKEN         GitHub API (optional; needed for github provider)
-  ANTHROPIC_API_KEY    Optional: if absent, fact extraction is silently skipped
+  ANTHROPIC_BILLING_KEY    Optional: if absent, fact extraction is silently skipped
 `,
     exitCode: 0,
   };

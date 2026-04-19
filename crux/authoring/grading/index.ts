@@ -9,7 +9,7 @@
  * and statistics to stats.ts.
  *
  * Usage:
- *   ANTHROPIC_API_KEY=sk-... node crux/authoring/grading/index.ts [options]
+ *   ANTHROPIC_BILLING_KEY=sk-... node crux/authoring/grading/index.ts [options]
  *
  * Options:
  *   --page ID          Grade a single page by ID or partial match
@@ -188,9 +188,9 @@ export async function main(): Promise<void> {
   }
 
   // Check for API key
-  if (!getApiKey('ANTHROPIC_API_KEY') && !options.dryRun) {
-    console.error('Error: ANTHROPIC_API_KEY environment variable is required');
-    console.error('Usage: ANTHROPIC_API_KEY=sk-... node crux/authoring/grading/index.ts');
+  if (!getApiKey('ANTHROPIC_BILLING_KEY') && !options.dryRun) {
+    console.error('Error: ANTHROPIC_BILLING_KEY environment variable is required');
+    console.error('Usage: ANTHROPIC_BILLING_KEY=sk-... node crux/authoring/grading/index.ts');
     process.exit(1);
   }
 

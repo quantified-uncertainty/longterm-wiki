@@ -17,16 +17,16 @@ LongtermWiki uses a multi-dimensional rating system combining LLM-graded subscor
 
 ```bash
 # Grade a single page
-ANTHROPIC_API_KEY=sk-... node scripts/content/grade-content.mjs --page scheming
+ANTHROPIC_BILLING_KEY=sk-... node scripts/content/grade-content.mjs --page scheming
 
 # Grade all pages (with cost estimate)
-ANTHROPIC_API_KEY=sk-... node scripts/content/grade-content.mjs --dry-run
+ANTHROPIC_BILLING_KEY=sk-... node scripts/content/grade-content.mjs --dry-run
 
 # Grade and apply to frontmatter
-ANTHROPIC_API_KEY=sk-... node scripts/content/grade-content.mjs --apply
+ANTHROPIC_BILLING_KEY=sk-... node scripts/content/grade-content.mjs --apply
 
 # Parallel processing (faster, higher API cost)
-ANTHROPIC_API_KEY=sk-... node scripts/content/grade-content.mjs --parallel 5 --apply
+ANTHROPIC_BILLING_KEY=sk-... node scripts/content/grade-content.mjs --parallel 5 --apply
 ```
 
 ---

@@ -7,6 +7,8 @@ run-name: "Scheduled Maintenance${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSE
 # Monthly: deep cruft analysis + cleanup
 #
 # Requires: ANTHROPIC_API_KEY secret + Claude GitHub App installed.
+# (The secret name stays ANTHROPIC_API_KEY at the org level; Node processes in
+# this workflow read it as ANTHROPIC_BILLING_KEY via the env mapping below.)
 
 on:
   schedule:

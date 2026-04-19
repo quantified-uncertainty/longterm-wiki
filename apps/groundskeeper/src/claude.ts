@@ -53,8 +53,11 @@ export async function runClaude(
       stdio: ["ignore", "pipe", "pipe"],
       env: {
         ...process.env,
-        // Ensure Claude Code uses the API key from our env
-        ANTHROPIC_API_KEY: process.env["ANTHROPIC_API_KEY"],
+        // Groundskeeper runs headless in k8s with no OAuth session, so it
+        // is intentionally API-billed. Re-map ANTHROPIC_BILLING_KEY (the
+        // authoritative name in this codebase) to ANTHROPIC_API_KEY (the
+        // name the claude CLI auto-reads) on the child env only.
+        ANTHROPIC_API_KEY: process.env["ANTHROPIC_BILLING_KEY"], // anthropic-billing-key-remap-ok
       },
     });
 

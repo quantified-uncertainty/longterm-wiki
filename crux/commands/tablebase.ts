@@ -1562,7 +1562,7 @@ Options:
   --ci                      JSON output
 
 Modes:
-  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_BILLING_KEY, ~$1-2/task)
   Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:

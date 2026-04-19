@@ -439,8 +439,11 @@ async function runBatchExecution(
   }
 
   // Phase 2-4: Submit, poll, and process in chunks
-  const Anthropic = (await import('@anthropic-ai/sdk')).default;
-  const anthropicClient = new Anthropic();
+  const { createClient } = await import('../anthropic.ts');
+  const anthropicClient = createClient();
+  if (!anthropicClient) {
+    throw new Error('ANTHROPIC_BILLING_KEY not found — cannot submit Anthropic batch');
+  }
   const totalChunks = Math.ceil(batchRequests.length / BATCH_CHUNK_SIZE);
 
   for (let chunkIdx = 0; chunkIdx < totalChunks; chunkIdx++) {

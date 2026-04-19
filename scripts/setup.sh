@@ -122,10 +122,10 @@ if [ "$MODE" = "check" ]; then
 
   step "Checking environment variables"
 
-  if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-    ok "ANTHROPIC_API_KEY is set"
+  if [ -n "${ANTHROPIC_BILLING_KEY:-}" ]; then
+    ok "ANTHROPIC_BILLING_KEY is set"
   else
-    warn "ANTHROPIC_API_KEY not set — needed for content creation/improvement"
+    warn "ANTHROPIC_BILLING_KEY not set — needed for content creation/improvement"
     WARNINGS=$((WARNINGS + 1))
   fi
 
@@ -234,10 +234,10 @@ done
 
 step "Checking environment variables"
 
-if [ -n "${ANTHROPIC_API_KEY:-}" ]; then
-  ok "ANTHROPIC_API_KEY is set"
+if [ -n "${ANTHROPIC_BILLING_KEY:-}" ]; then
+  ok "ANTHROPIC_BILLING_KEY is set"
 else
-  warn "ANTHROPIC_API_KEY not set — needed for content creation/improvement"
+  warn "ANTHROPIC_BILLING_KEY not set — needed for content creation/improvement"
   WARNINGS=$((WARNINGS + 1))
 fi
 

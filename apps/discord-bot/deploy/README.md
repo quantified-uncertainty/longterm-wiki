@@ -23,7 +23,7 @@ research via Claude Code — this snapshot updates on each image rebuild.
 
 | Feature | Trigger | Auth | Description |
 |---------|---------|------|-------------|
-| Wiki Q&A | @mention | `ANTHROPIC_API_KEY` | Fast wiki search via API tools |
+| Wiki Q&A | @mention | `ANTHROPIC_BILLING_KEY` | Fast wiki search via API tools |
 | Deep research | `/ask` command | `CLAUDE_CODE_OAUTH_TOKEN` | Claude Code with file + API tools |
 
 Both features are independently optional — the bot needs at least one auth key.
@@ -51,7 +51,7 @@ image:
 
 env:
   DISCORD_TOKEN: ""                    # injected from k8s secret
-  ANTHROPIC_API_KEY: ""                # injected from k8s secret (optional if using OAuth)
+  ANTHROPIC_BILLING_KEY: ""            # injected from k8s secret (optional if using OAuth)
   CLAUDE_CODE_OAUTH_TOKEN: ""          # injected from k8s secret (enables /ask command)
   LONGTERMWIKI_SERVER_URL: ""          # injected from k8s secret
   LONGTERMWIKI_SERVER_API_KEY: ""      # injected from k8s secret
@@ -106,7 +106,7 @@ Create a secret `longterm-wiki-discord-bot-secrets` in the bot's namespace:
 ```bash
 kubectl create secret generic longterm-wiki-discord-bot-secrets \
   --from-literal=DISCORD_TOKEN=<token> \
-  --from-literal=ANTHROPIC_API_KEY=<key> \
+  --from-literal=ANTHROPIC_BILLING_KEY=<key> \
   --from-literal=CLAUDE_CODE_OAUTH_TOKEN=<oauth-token> \
   --from-literal=LONGTERMWIKI_SERVER_URL=<wiki-server-url> \
   --from-literal=LONGTERMWIKI_SERVER_API_KEY=<api-key> \

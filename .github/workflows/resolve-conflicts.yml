@@ -9,7 +9,8 @@ run-name: "Resolve Merge Conflicts${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAU
 # The Sonnet conflict resolver script (.github/scripts/resolve-conflicts.mjs)
 # handles per-file resolution and is called by the TypeScript orchestrator.
 #
-# Requires: ANTHROPIC_API_KEY secret in the repository.
+# Requires: ANTHROPIC_API_KEY secret in the repository (stored as
+# ANTHROPIC_BILLING_KEY env var; see .claude/rules for rationale).
 
 on:
   # Automatic triggers are disabled to control Anthropic API spending.
@@ -69,4 +70,4 @@ jobs:
         run: pnpm crux pr resolve-conflicts --verbose
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
