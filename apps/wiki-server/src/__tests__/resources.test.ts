@@ -1,7 +1,8 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { Hono } from "hono";
+import { SID_PREFIX } from "@longterm-wiki/id-utils";
 import { mockDbModule, postJson } from "./test-utils.js";
-import { makeResourcesStore, type ResourceRow } from "./_helpers/resources-store.js";
+import { ResourcesStore, type ResourceRow } from "./_helpers/resources-store.js";
 
 // ---- In-memory stores ----
 //
@@ -9,7 +10,7 @@ import { makeResourcesStore, type ResourceRow } from "./_helpers/resources-store
 // for the rationale (QUA-604). Jobs are a separate table with no cross-cutting mock pattern,
 // so they stay inline.
 
-const store = makeResourcesStore();
+const store = new ResourcesStore();
 let jobStore: Map<number, Record<string, unknown>>;
 let nextJobId = 1;
 
@@ -114,7 +115,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         fetched_at: (params[o + 14] as Date | null) ?? existing?.fetched_at ?? null,
         content_hash: (params[o + 15] as string | null) ?? existing?.content_hash ?? null,
         // stableId is generate-once: preserve existing, only set if row didn't have one
-        stable_id: existing?.stable_id ?? (params[o + 16] as string) ?? `sid_${id}`,
+        stable_id: existing?.stable_id ?? (params[o + 16] as string) ?? `${SID_PREFIX}${id}`,
         created_at: existing?.created_at ?? now,
         updated_at: now,
       };
@@ -219,7 +220,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row: ResourceRow = {
         id: ids[i],
         url: urls[i],
-        stable_id: stableIds[i] ?? `sid_${ids[i]}`,
+        stable_id: stableIds[i] ?? `${SID_PREFIX}${ids[i]}`,
         title: null,
         fetched_at: null,
         has_content: false,

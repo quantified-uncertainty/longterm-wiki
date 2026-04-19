@@ -5,14 +5,16 @@
  *   - Every row in `resources` has a `stable_id` (sid_) — NOT NULL since migration 0184.
  *   - `resource_citations.resource_id` FKs to `resources.stable_id` (not `resources.id`).
  *
- * Tests that need to seed a resource without caring about stable_id get one auto-derived
- * (`sid_${id}`). Tests that need a specific stable_id pass it explicitly.
+ * Tests that don't care about a specific stable_id get one auto-derived as
+ * `sid_${id}`. Tests that exercise the sid_ path pass one explicitly.
  *
  * See QUA-604 for why this exists — prior to consolidation, resources.test.ts kept a raw
  * `Map<string, Row>` keyed on hex16 `id` plus a separate `Citation[]` array, and each
  * Phase B PR that touched the mocks had to patch 2-5 dispatcher branches by hand,
  * repeatedly missing spots.
  */
+
+import { SID_PREFIX } from "@longterm-wiki/id-utils";
 
 export interface ResourceRow {
   id: string;
@@ -36,23 +38,23 @@ export interface ResourceRow {
   has_content?: boolean;
   created_at?: Date;
   updated_at?: Date;
-  [key: string]: unknown;
 }
 
-export interface Citation {
+interface Citation {
   resource_id: string;
   page_slug: string;
   page_id: number;
   created_at: Date;
 }
 
-export type ResourceSeed = Partial<ResourceRow> & { id: string; url: string };
+type ResourceSeed = Partial<ResourceRow> & { id: string; url: string };
 
 export class ResourcesStore {
   private byId = new Map<string, ResourceRow>();
   private byStableId = new Map<string, ResourceRow>();
   private citations: Citation[] = [];
   private slugToIntId = new Map<string, number>();
+  private intIdToSlug = new Map<number, string>();
   private nextIntId = 1000;
 
   reset(): void {
@@ -60,6 +62,7 @@ export class ResourcesStore {
     this.byStableId.clear();
     this.citations = [];
     this.slugToIntId.clear();
+    this.intIdToSlug.clear();
     this.nextIntId = 1000;
   }
 
@@ -69,7 +72,7 @@ export class ResourcesStore {
    * a specific stable_id should pass it explicitly.
    */
   seedResource(seed: ResourceSeed): ResourceRow {
-    const stable_id = seed.stable_id ?? `sid_${seed.id}`;
+    const stable_id = seed.stable_id ?? `${SID_PREFIX}${seed.id}`;
     const now = new Date();
     const row: ResourceRow = {
       ...seed,
@@ -86,7 +89,7 @@ export class ResourcesStore {
     return row;
   }
 
-  /** Low-level set — used by INSERT dispatch. Maintains both id and stable_id indices. */
+  /** Low-level set used by INSERT dispatch. Maintains both id and stable_id indices. */
   setResource(row: ResourceRow): void {
     const existing = this.byId.get(row.id);
     if (existing && existing.stable_id !== row.stable_id) {
@@ -104,7 +107,7 @@ export class ResourcesStore {
     return this.byStableId.get(stableId);
   }
 
-  /** Resolve identifier that may be either hex16 id or sid_. */
+  /** Resolve an identifier that may be either hex16 `id` or `sid_` stable_id. */
   resolveResource(identifier: string): ResourceRow | undefined {
     return this.byId.get(identifier) ?? this.byStableId.get(identifier);
   }
@@ -133,7 +136,7 @@ export class ResourcesStore {
   groupByType(): Array<{ type: string; count: number }> {
     const counts: Record<string, number> = {};
     for (const r of this.byId.values()) {
-      const t = (r.type as string) ?? "unknown";
+      const t = r.type ?? "unknown";
       counts[t] = (counts[t] || 0) + 1;
     }
     return Object.entries(counts)
@@ -141,6 +144,7 @@ export class ResourcesStore {
       .sort((a, b) => b.count - a.count);
   }
 
+  /** TRUNCATE resources only; does not touch citations (matches the literal TRUNCATE SQL). */
   clearResources(): void {
     this.byId.clear();
     this.byStableId.clear();
@@ -161,36 +165,18 @@ export class ResourcesStore {
           `Call seedResource first.`,
       );
     }
-    return this.insertCitation(resource.stable_id, input.pageSlug);
+    return this.insertCitationByPageId(resource.stable_id, this.getOrAllocatePageId(input.pageSlug));
   }
 
-  /** Low-level citation insert used by INSERT dispatch. Expects a resolved stable_id. */
-  insertCitation(stableId: string, pageSlug: string): Citation {
-    const page_id = this.getOrAllocatePageId(pageSlug);
-    const existing = this.citations.find(
-      (c) => c.resource_id === stableId && c.page_id === page_id,
-    );
-    if (existing) return existing;
-    const citation: Citation = {
-      resource_id: stableId,
-      page_slug: pageSlug,
-      page_id,
-      created_at: new Date(),
-    };
-    this.citations.push(citation);
-    return citation;
-  }
-
-  /** Low-level citation insert by page_id (for dispatch paths that already have the int id). */
+  /** Low-level citation insert used by INSERT dispatch; callers provide a resolved stable_id + page_id. */
   insertCitationByPageId(stableId: string, pageId: number): Citation {
-    const slug = this.slugFromPageId(pageId) ?? `page-${pageId}`;
     const existing = this.citations.find(
       (c) => c.resource_id === stableId && c.page_id === pageId,
     );
     if (existing) return existing;
     const citation: Citation = {
       resource_id: stableId,
-      page_slug: slug,
+      page_slug: this.intIdToSlug.get(pageId) ?? `page-${pageId}`,
       page_id: pageId,
       created_at: new Date(),
     };
@@ -206,6 +192,7 @@ export class ResourcesStore {
     return this.citations.filter((c) => c.resource_id === stableId);
   }
 
+  /** Read-only view; `readonly` is compile-time only, so tests should not mutate. */
   allCitations(): readonly Citation[] {
     return this.citations;
   }
@@ -235,21 +222,23 @@ export class ResourcesStore {
   }
 
   /**
-   * For a set of hex16 ids, return citation counts keyed on the input hex16 id
-   * (prod surfaces `r.id` from the JOIN so downstream map-by-hex16 lookups work).
+   * For a set of hex16 ids, return citation counts keyed on the input hex16 id.
+   * Prod surfaces `r.id` from the JOIN so downstream map-by-hex16 lookups keep working —
+   * the `cnt: string` shape mirrors the raw SQL result.
    */
   citationCountsByHexIds(hexIds: string[]): Array<{ resource_id: string; cnt: string }> {
-    const counts: Record<string, number> = {};
+    const countByStable: Record<string, number> = {};
+    for (const c of this.citations) {
+      countByStable[c.resource_id] = (countByStable[c.resource_id] || 0) + 1;
+    }
+    const results: Array<{ resource_id: string; cnt: string }> = [];
     for (const hexId of hexIds) {
       const r = this.byId.get(hexId);
       if (!r?.stable_id) continue;
-      const n = this.citations.filter((c) => c.resource_id === r.stable_id).length;
-      if (n > 0) counts[hexId] = n;
+      const n = countByStable[r.stable_id] ?? 0;
+      if (n > 0) results.push({ resource_id: hexId, cnt: String(n) });
     }
-    return Object.entries(counts).map(([resource_id, cnt]) => ({
-      resource_id,
-      cnt: String(cnt),
-    }));
+    return results;
   }
 
   // ---- page slug <-> int id ----
@@ -260,20 +249,13 @@ export class ResourcesStore {
     if (id === undefined) {
       id = this.nextIntId++;
       this.slugToIntId.set(slug, id);
+      this.intIdToSlug.set(id, slug);
     }
     return id;
   }
 
   slugFromPageId(pageId: number | null): string | null {
     if (pageId === null) return null;
-    for (const [slug, id] of this.slugToIntId.entries()) {
-      if (id === pageId) return slug;
-    }
-    return null;
+    return this.intIdToSlug.get(pageId) ?? null;
   }
-}
-
-/** Factory — tests call this in beforeEach or once at module scope and call reset() in beforeEach. */
-export function makeResourcesStore(): ResourcesStore {
-  return new ResourcesStore();
 }
