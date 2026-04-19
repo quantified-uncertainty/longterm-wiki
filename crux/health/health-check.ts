@@ -474,9 +474,9 @@ interface WorkflowRunsResponse {
   workflow_runs: WorkflowRun[];
 }
 
-// Workflows that are inherently flaky — depends on LLMs, external URLs,
-// citation checking. For these, we check if ANY of the last 5 runs
-// succeeded rather than requiring the most recent one to succeed.
+// Workflows that are inherently flaky and may transiently fail.
+// For these, we check if ANY of the last 5 runs succeeded rather than
+// requiring the most recent one to succeed.
 // scheduled-maintenance.yml uses Claude Code which can fail transiently.
 const FLAKY_WORKFLOWS = new Set(['scheduled-maintenance.yml']);
 
