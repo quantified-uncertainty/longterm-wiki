@@ -1,0 +1,210 @@
+{
+  "table": "personnel",
+  "recordCount": 24,
+  "recordsRejected": 3,
+  "submittedAt": "2026-04-19T11:19:07.206Z",
+  "sourcingSummary": {
+    "withSourcing": 24,
+    "withoutSourcing": 0,
+    "verdicts": {
+      "verified": 6,
+      "contradicted": 0,
+      "unverifiable": 18,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "8TwcL4y56w",
+      "personId": "hkPG99Rl9n",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Senior Fellow and Co-Director",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "Xqkz0t39Jb",
+      "personId": "CBfo3swHnc",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Vice President for Studies",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "4QpUpeeRvv",
+      "personId": "1YdgnlMVH6",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Senior Fellow and Director, Information Environment Project",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "O3jqmAMjKx",
+      "personId": "8klPAy4FF9",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Fellow",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "jPiXLE00OP",
+      "personId": "DKpuV4qLhZ",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Fellow",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "Guawy9TVP5",
+      "personId": "r3ZkWt9aRy",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Fellow",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "ss2gXmGAIU",
+      "personId": "dTp3nWNG3n",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Fellow",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "KwBzHTCvnI",
+      "personId": "wLrDjTsIXw",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Visiting Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "g8oWYVKekC",
+      "personId": "knrpmnaEbZ",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Visiting Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "xy9kTV5rtL",
+      "personId": "tjlupinLkZ",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Visiting Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "7AAnTrXfNN",
+      "personId": "O1bEJV9SWG",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Program Manager",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "1gceWtI4GH",
+      "personId": "4Y7LoDy6aa",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Senior Research Analyst",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "YsXk2ZVDUf",
+      "personId": "r4ebmKzG4z",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Program Coordinator",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "confirmed"
+    },
+    {
+      "id": "HMn35w1Ajd",
+      "personId": "xRojXjl7tv",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Research Analyst",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "xBkpiqZxuJ",
+      "personId": "VXmyaOHktG",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "WAqnTJjoET",
+      "personId": "QHrCqllv9J",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "lE9osNUpqW",
+      "personId": "HhROUmtU7x",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "R8MRn6U4CH",
+      "personId": "M8uBwc1TpY",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "uL1oTU5Uqd",
+      "personId": "FZdlEBXxxv",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "n00hQ7x7Lq",
+      "personId": "2lrCJIFbdP",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "4CfLyyx4kF",
+      "personId": "ntIMdCGX6R",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "hbhkBTXPKu",
+      "personId": "z1YK5K7nhh",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "Zi0laMLrnV",
+      "personId": "yadfUod3LS",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    },
+    {
+      "id": "hYmnRDXXvG",
+      "personId": "NvyLO6aa9z",
+      "organizationId": "sid_5RV1WNLBCg",
+      "role": "Nonresident Scholar",
+      "source": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program",
+      "verdict": "unverifiable"
+    }
+  ]
+}

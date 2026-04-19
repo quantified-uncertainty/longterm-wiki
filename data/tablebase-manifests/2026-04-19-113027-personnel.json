@@ -1,0 +1,26 @@
+{
+  "table": "personnel",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:30:27.362Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "aVKQfSKPvu",
+      "personId": "978SGjc9n9",
+      "organizationId": "sid_wrbWEng9gg",
+      "role": "President",
+      "source": "https://carnegieendowment.org/senior-leadership",
+      "verdict": "none"
+    }
+  ]
+}
