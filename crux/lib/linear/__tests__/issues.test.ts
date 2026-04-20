@@ -375,6 +375,8 @@ describe('issues.ts — transport helpers', () => {
                   priority: 2,
                   state: { name: 'Backlog', type: 'backlog' },
                   url: 'u1',
+                  createdAt: '2026-04-01T00:00:00.000Z',
+                  updatedAt: '2026-04-01T00:00:00.000Z',
                 },
                 {
                   identifier: 'QUA-2',
@@ -382,6 +384,8 @@ describe('issues.ts — transport helpers', () => {
                   priority: 3,
                   state: { name: 'Todo', type: 'unstarted' },
                   url: 'u2',
+                  createdAt: '2026-04-02T00:00:00.000Z',
+                  updatedAt: '2026-04-02T00:00:00.000Z',
                 },
               ],
             },

@@ -106,5 +106,3 @@ export const terminologyVariantsRule = createRule({
 function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
-
-export default terminologyVariantsRule;

@@ -64,18 +64,18 @@ export interface LlmClientOptions {
  * Create an Anthropic client with sensible defaults.
  * In OpenRouter mode, still creates a client (for type compatibility)
  * but streamingCreate will bypass it.
- * Throws if ANTHROPIC_API_KEY is not available (unless OpenRouter mode).
+ * Throws if ANTHROPIC_BILLING_KEY is not available (unless OpenRouter mode).
  */
 export function createLlmClient(options?: LlmClientOptions): Anthropic {
   if (_useOpenRouter) {
     // In OpenRouter mode, we still need a client object for type compatibility,
     // but streamingCreate will bypass it. Create with a dummy key if needed.
-    const key = options?.apiKey || getApiKey('ANTHROPIC_API_KEY') || 'openrouter-mode';
+    const key = options?.apiKey || getApiKey('ANTHROPIC_BILLING_KEY') || 'openrouter-mode';
     return new Anthropic({ apiKey: key });
   }
   const client = createClient({ apiKey: options?.apiKey });
   if (!client) {
-    throw new Error('ANTHROPIC_API_KEY not found in environment');
+    throw new Error('ANTHROPIC_BILLING_KEY not found in environment');
   }
   return client;
 }

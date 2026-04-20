@@ -31,7 +31,7 @@
 #   - Agent slots must exist (../aN/ directories, set up via `crux agent-workspace setup N`)
 #   - database.json must exist in each slot (run `pnpm build-data:content` first)
 #   - tmux session must be active
-#   - ANTHROPIC_API_KEY must be set for content improve
+#   - ANTHROPIC_BILLING_KEY must be set for content improve
 #
 # Examples:
 #   ./scripts/matrix-multi-slot.sh                                # default: 3 slots, by-dimension

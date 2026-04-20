@@ -204,5 +204,3 @@ export const entityLinkIdsRule = createRule({
     return issues;
   },
 });
-
-export default entityLinkIdsRule;

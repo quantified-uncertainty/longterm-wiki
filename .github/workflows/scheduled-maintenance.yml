@@ -7,6 +7,9 @@ run-name: "Scheduled Maintenance${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSE
 # Monthly: deep cruft analysis + cleanup
 #
 # Requires: ANTHROPIC_API_KEY secret + Claude GitHub App installed.
+# The secret name stays ANTHROPIC_API_KEY at the org level; `pnpm crux` commands
+# spawned by the maintenance prompt read it as ANTHROPIC_BILLING_KEY, mapped on
+# the "Run maintenance" step's env (see QUA-612).
 
 on:
   schedule:
@@ -108,6 +111,12 @@ jobs:
 
       - name: Run maintenance
         uses: anthropics/claude-code-action@v1
+        env:
+          # Any `pnpm crux` command spawned by the maintenance prompt reads
+          # the billing key as ANTHROPIC_BILLING_KEY (QUA-612). The action's
+          # `anthropic_api_key:` input below feeds the claude CLI; this env
+          # mapping feeds everything claude spawns.
+          ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           claude_args: '--max-turns 60 --allowedTools "Bash,Read,Write,Edit,Glob,Grep,Task,TodoWrite,WebFetch"'

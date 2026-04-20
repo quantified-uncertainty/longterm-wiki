@@ -62,7 +62,7 @@ jobs:
       - name: Run citation audit
         id: audit
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           EXA_API_KEY: ${{ secrets.EXA_API_KEY }}
         run: |

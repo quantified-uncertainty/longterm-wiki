@@ -19,8 +19,8 @@
  * - All validations run BEFORE writing resolved content to disk
  *
  * Environment variables:
- *   ANTHROPIC_API_KEY — required
- *   PR_BRANCH        — the branch to resolve conflicts on
+ *   ANTHROPIC_BILLING_KEY — required
+ *   PR_BRANCH         — the branch to resolve conflicts on
  *   PR_NUMBER         — PR number (for commit message)
  *   GITHUB_OUTPUT     — (optional) path to write diagnostic summary for the workflow
  */
@@ -29,14 +29,14 @@ import { execFileSync } from "node:child_process";
 import { readFileSync, writeFileSync, existsSync, appendFileSync } from "node:fs";
 import { extname } from "node:path";
 
-const ANTHROPIC_API_KEY = (process.env.ANTHROPIC_API_KEY || '').replace(/^["'\s]+|["'\s]+$/g, '');
+const ANTHROPIC_BILLING_KEY = (process.env.ANTHROPIC_BILLING_KEY || '').replace(/^["'\s]+|["'\s]+$/g, '');
 const PR_BRANCH = process.env.PR_BRANCH;
 const PR_NUMBER = process.env.PR_NUMBER;
 
 // ── Input validation ───────────────────────────────────────────────────
 
-if (!ANTHROPIC_API_KEY) {
-  console.error("ANTHROPIC_API_KEY is not set — cannot resolve conflicts.");
+if (!ANTHROPIC_BILLING_KEY) {
+  console.error("ANTHROPIC_BILLING_KEY is not set — cannot resolve conflicts.");
   process.exit(1); // Exit non-zero so the workflow posts a failure comment, not a success one
 }
 if (!PR_BRANCH) {
@@ -176,7 +176,7 @@ async function callAPIWithRetry(body, retries = 5) {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "x-api-key": ANTHROPIC_API_KEY,
+          "x-api-key": ANTHROPIC_BILLING_KEY,
           "anthropic-version": "2023-06-01",
         },
         body: JSON.stringify(body),

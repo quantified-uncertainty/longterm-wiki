@@ -57,5 +57,3 @@ export function ResourceTags({
     </span>
   );
 }
-
-export default ResourceTags;

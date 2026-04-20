@@ -1469,6 +1469,7 @@ export const commands = {
   'import-grants-download': importGrantsCommands.download,
   'import-divisions': importDivisionsCommands.default,
   'import-divisions-sync': importDivisionsCommands.sync,
+  'import-divisions-delete-orphans': importDivisionsCommands['delete-orphans'],
   'import-funding-programs': importFundingProgramsCommands.default,
   'import-funding-programs-sync': importFundingProgramsCommands.sync,
   // Market data commands
@@ -1567,7 +1568,7 @@ Options:
   --ci                      JSON output
 
 Modes:
-  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_BILLING_KEY, ~$1-2/task)
   Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:

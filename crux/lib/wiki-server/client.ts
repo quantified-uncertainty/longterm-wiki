@@ -17,6 +17,7 @@ import {
   WIKI_SERVER_TIMEOUT_MS as TIMEOUT_MS,
   WIKI_SERVER_BATCH_TIMEOUT_MS as BATCH_TIMEOUT_MS,
 } from '../config.ts';
+import { findSlotFromAncestors } from '../session/session-context.ts';
 export { BATCH_TIMEOUT_MS };
 
 /**
@@ -27,10 +28,25 @@ export { BATCH_TIMEOUT_MS };
  * local dev server and prod configured in `.env` and switch with one var.
  *
  *   WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"
+ *
+ * **Slot auto-detection (QUA-616).** Agent slots (`lw/a1`–`lw/a20`) do not
+ * run a local wiki-server, so the default `localhost:3113` URL fails
+ * silently — every write (agent_sessions row, session log, etc.) is
+ * silently dropped. When `WIKI_SERVER_ENV` is unset and the CWD is inside
+ * an `a<N>` slot, we auto-select the `PROD_` prefix so slot agents don't
+ * have to remember `WIKI_SERVER_ENV=prod` on every crux invocation.
+ *
+ * Escape hatch: set `WIKI_SERVER_ENV=local` to force the local prefix even
+ * from inside a slot (e.g. a slot agent testing against a locally-run
+ * wiki-server on port 3113).
  */
 function getEnvPrefix(): string {
   const env = process.env.WIKI_SERVER_ENV;
   if (env === 'prod' || env === 'production') return 'PROD_';
+  if (env === 'local' || env === 'dev') return '';
+  if (env === undefined && findSlotFromAncestors(process.cwd()) !== null) {
+    return 'PROD_';
+  }
   return '';
 }
 

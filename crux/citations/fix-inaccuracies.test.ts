@@ -1054,7 +1054,7 @@ describe('buildSearchQuery', () => {
 
 describe('generateSearchQuery', () => {
   it('falls back to buildSearchQuery when no Anthropic client available', async () => {
-    // Without ANTHROPIC_API_KEY, generateSearchQuery should gracefully
+    // Without ANTHROPIC_BILLING_KEY, generateSearchQuery should gracefully
     // fall back to the static buildSearchQuery function
     const claim = 'The organization was founded in 2015. It grew rapidly.';
     const query = await generateSearchQuery(claim);

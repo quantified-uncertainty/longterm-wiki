@@ -67,5 +67,3 @@ export const noDeprecatedComponentsRule = createRule({
     return issues;
   },
 });
-
-export default noDeprecatedComponentsRule;

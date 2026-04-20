@@ -59,6 +59,10 @@ vi.mock('../lib/linear/issues.ts', () => ({
 }));
 vi.mock('../lib/session/session-context.ts', () => ({
   getSessionContext: getSessionContextMock,
+  // Re-export so the wiki-server client's slot auto-detection (QUA-616)
+  // can call it. Default to "not in a slot" so tests that exercise the
+  // wiki-server path don't auto-select PROD_.
+  findSlotFromAncestors: vi.fn(() => null),
 }));
 
 // Mock wiki-server agent-sessions (best-effort DB sync)
@@ -488,6 +492,78 @@ describe('agent-checklist init', () => {
 
       expect(result.exitCode).toBe(0);
       expect(linearCheckDedupMock).not.toHaveBeenCalled();
+    });
+  });
+
+  // ── Fail-loud when agent_sessions write fails (QUA-617) ─────────────────
+
+  describe('agent_sessions write failure', () => {
+    let upsertAgentSessionMock: ReturnType<typeof vi.fn>;
+
+    beforeEach(async () => {
+      const mod = await import('../lib/wiki-server/agent-sessions.ts');
+      upsertAgentSessionMock = vi.mocked(mod.upsertAgentSession);
+      upsertAgentSessionMock.mockReset();
+    });
+
+    it('exits 3 with a loud warning when upsertAgentSession returns ok:false', async () => {
+      upsertAgentSessionMock.mockResolvedValueOnce({
+        ok: false,
+        error: 'unavailable',
+        message: 'PROD_LONGTERMWIKI_SERVER_URL not set',
+      });
+
+      const result = await initNoSideEffects(['A task'], { type: 'infrastructure' });
+
+      expect(result.exitCode).toBe(3);
+      expect(result.output).toContain('agent_sessions row was NOT written');
+      expect(result.output).toContain('crux sys sessions list');
+      expect(result.output).toContain('QUA-406');
+      expect(result.output).toContain('/internal/agent-sessions');
+      expect(result.output).toContain('sync-session');
+      expect(result.output).toContain('--allow-offline');
+      // The specific error message surfaces in the warning.
+      expect(result.output).toContain('PROD_LONGTERMWIKI_SERVER_URL not set');
+    });
+
+    it('exits 3 when upsertAgentSession throws', async () => {
+      upsertAgentSessionMock.mockRejectedValueOnce(new Error('ECONNREFUSED'));
+
+      const result = await initNoSideEffects(['A task'], { type: 'infrastructure' });
+
+      expect(result.exitCode).toBe(3);
+      expect(result.output).toContain('agent_sessions row was NOT written');
+      expect(result.output).toContain('ECONNREFUSED');
+    });
+
+    it('exits 0 when --allow-offline is passed, even if the write failed', async () => {
+      upsertAgentSessionMock.mockResolvedValueOnce({
+        ok: false,
+        error: 'unavailable',
+        message: 'boom',
+      });
+
+      const result = await initNoSideEffects(['A task'], {
+        type: 'infrastructure',
+        allowOffline: true,
+      });
+
+      expect(result.exitCode).toBe(0);
+      // The warning must NOT be printed when --allow-offline opts in.
+      expect(result.output).not.toContain('agent_sessions row was NOT written');
+    });
+
+    it('exits 0 when the write succeeds', async () => {
+      upsertAgentSessionMock.mockResolvedValueOnce({
+        ok: true,
+        data: { id: 'sess-1' } as never,
+      });
+
+      const result = await initNoSideEffects(['A task'], { type: 'infrastructure' });
+
+      expect(result.exitCode).toBe(0);
+      expect(result.output).toContain('Synced to wiki-server DB');
+      expect(result.output).not.toContain('agent_sessions row was NOT written');
     });
   });
 });

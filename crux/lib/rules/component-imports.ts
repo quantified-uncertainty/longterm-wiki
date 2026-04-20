@@ -186,5 +186,3 @@ export const componentImportsRule = createRule({
     return null;
   },
 });
-
-export default componentImportsRule;

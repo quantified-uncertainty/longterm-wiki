@@ -7,7 +7,7 @@
  * Usage:
  *   import { createClient, MODELS, callClaude } from './lib/anthropic.ts';
  *
- *   const client = createClient(); // Uses ANTHROPIC_API_KEY from env
+ *   const client = createClient(); // Uses ANTHROPIC_BILLING_KEY from env
  *   const response = await callClaude(client, {
  *     model: MODELS.sonnet,
  *     systemPrompt: '...',
@@ -82,13 +82,13 @@ export interface CreateClientOptions {
  * Create an Anthropic client instance
  */
 export function createClient({ apiKey, required = true }: CreateClientOptions = {}): Anthropic | null {
-  const key = apiKey || getApiKey('ANTHROPIC_API_KEY');
+  const key = apiKey || getApiKey('ANTHROPIC_BILLING_KEY');
 
   if (!key) {
     if (required) {
       throw new Error(
-        'ANTHROPIC_API_KEY not found in environment. ' +
-        'Make sure you have a .env or .env.local file with ANTHROPIC_API_KEY=sk-...'
+        'ANTHROPIC_BILLING_KEY not found in environment. ' +
+        'Make sure you have a .env or .env.local file with ANTHROPIC_BILLING_KEY=sk-...'
       );
     }
     return null;

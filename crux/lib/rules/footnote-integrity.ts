@@ -118,5 +118,3 @@ export const footnoteIntegrityRule = {
     return issues;
   },
 };
-
-export default footnoteIntegrityRule;

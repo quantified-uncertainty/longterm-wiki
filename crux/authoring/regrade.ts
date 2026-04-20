@@ -12,7 +12,7 @@
  *   node crux/authoring/regrade.ts --overrated            # Re-grade all overrated pages
  *   node crux/authoring/regrade.ts --dry-run <page-id>    # Preview without applying
  *
- * Requires ANTHROPIC_API_KEY in .env or environment.
+ * Requires ANTHROPIC_BILLING_KEY in .env or environment.
  */
 
 import dotenv from 'dotenv';
@@ -35,8 +35,8 @@ const OVERRATED_MODE: boolean = args.includes('--overrated');
 const pageIds: string[] = args.filter(a => !a.startsWith('--'));
 
 // Check for API key
-if (!getApiKey('ANTHROPIC_API_KEY')) {
-  console.error('Error: ANTHROPIC_API_KEY not found.');
+if (!getApiKey('ANTHROPIC_BILLING_KEY')) {
+  console.error('Error: ANTHROPIC_BILLING_KEY not found.');
   console.error('Add it to .env or set in environment.\n');
   process.exit(1);
 }

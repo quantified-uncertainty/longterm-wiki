@@ -116,5 +116,3 @@ export const fakeUrlsRule = createRule({
     return issues;
   },
 });
-
-export default fakeUrlsRule;

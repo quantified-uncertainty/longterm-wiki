@@ -48,7 +48,7 @@ jobs:
     timeout-minutes: 30
     env:
       WIKI_SERVER_ENV: prod
-      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       # QUA-396: repo secrets are unprefixed — no PROD_ variant exists.
       PROD_LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
       PROD_LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}

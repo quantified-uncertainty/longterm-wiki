@@ -263,5 +263,3 @@ export const componentRefsRule = createRule({
     return issues;
   },
 });
-
-export default componentRefsRule;

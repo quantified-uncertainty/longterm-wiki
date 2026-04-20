@@ -13,7 +13,7 @@
 
 import { generateId } from "../lib/grant-import/id.ts";
 import { getServerUrl } from "../lib/wiki-server/client.ts";
-import { syncDivisions } from "../lib/wiki-server/divisions.ts";
+import { deleteDivisionsBatch, syncDivisions } from "../lib/wiki-server/divisions.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
 
 // ---------------------------------------------------------------------------
@@ -371,15 +371,69 @@ const DIVISIONS: DivisionDef[] = [
   },
 
   // ---- Anthropic ----
+  // Team names and descriptions sourced from https://www.anthropic.com/research
+  // which lists the public research teams. Division records use the exact public
+  // team names so sourcing verification succeeds.
   {
     idSeed: "div|anthropic|alignment-science",
     parentOrgId: ORG_IDS.ANTHROPIC,
-    name: "Alignment Science",
+    name: "Alignment",
     divisionType: "team",
     status: "active",
     source: "https://www.anthropic.com/research",
     notes:
-      "Core alignment research team at Anthropic, working on interpretability, scalable oversight, and Constitutional AI",
+      "The Alignment team works to understand the risks of AI models and develop ways to ensure that future ones remain helpful, honest, and harmless.",
+  },
+  {
+    idSeed: "div|anthropic|mechanistic-interpretability",
+    parentOrgId: ORG_IDS.ANTHROPIC,
+    name: "Interpretability",
+    divisionType: "team",
+    status: "active",
+    startDate: "2021-01",
+    source: "https://www.anthropic.com/research",
+    notes:
+      "The Interpretability team's mission is to discover and understand how large language models work internally, as a foundation for AI safety and positive outcomes. Led by Chris Olah.",
+  },
+  {
+    idSeed: "div|anthropic|societal-impacts",
+    parentOrgId: ORG_IDS.ANTHROPIC,
+    name: "Societal Impacts",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.anthropic.com/research",
+    notes:
+      "Societal Impacts is a technical research team that explores how AI is used in the real world, working closely with the Anthropic Policy and Safeguards teams.",
+  },
+  {
+    idSeed: "div|anthropic|policy",
+    parentOrgId: ORG_IDS.ANTHROPIC,
+    name: "Policy and Safeguards",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.anthropic.com/research",
+    notes:
+      "Listed as one of Anthropic's research-adjacent teams on the Research page; AI policy research, government engagement, and model-safeguard operations.",
+  },
+  {
+    idSeed: "div|anthropic|economic-research",
+    parentOrgId: ORG_IDS.ANTHROPIC,
+    name: "Economic Research",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.anthropic.com/research",
+    notes:
+      "Listed among Anthropic's research teams on the Research page; studies the economic implications of AI.",
+  },
+  {
+    idSeed: "div|anthropic|frontier-red-team",
+    parentOrgId: ORG_IDS.ANTHROPIC,
+    name: "Frontier Red Team",
+    divisionType: "team",
+    status: "active",
+    source: "https://www.anthropic.com/research",
+    notes:
+      "The Frontier Red Team analyzes the implications of frontier AI models for cybersecurity, biosecurity, and autonomous systems.",
   },
   {
     idSeed: "div|anthropic|trust-and-safety",
@@ -387,52 +441,9 @@ const DIVISIONS: DivisionDef[] = [
     name: "Trust and Safety",
     divisionType: "team",
     status: "active",
-    source: "https://www.anthropic.com/",
+    source: "https://www.anthropic.com/legal/aup",
     notes:
-      "Responsible for content moderation, abuse prevention, and usage policy enforcement",
-  },
-  {
-    idSeed: "div|anthropic|policy",
-    parentOrgId: ORG_IDS.ANTHROPIC,
-    name: "Policy",
-    divisionType: "team",
-    status: "active",
-    source: "https://www.anthropic.com/policy",
-    notes:
-      "AI policy research and government engagement; publishes policy briefs and participates in regulatory processes",
-  },
-  {
-    idSeed: "div|anthropic|mechanistic-interpretability",
-    parentOrgId: ORG_IDS.ANTHROPIC,
-    name: "Mechanistic Interpretability",
-    divisionType: "team",
-    status: "active",
-    startDate: "2021-01",
-    source: "https://transformer-circuits.pub/2024/scaling-monosemanticity/",
-    notes:
-      "Led by Chris Olah. Understanding neural network internals through reverse-engineering; ~50 person team; MIT Tech Review 2026 Breakthrough Technology.",
-  },
-  {
-    idSeed: "div|anthropic|constitutional-ai",
-    parentOrgId: ORG_IDS.ANTHROPIC,
-    name: "Constitutional AI",
-    divisionType: "team",
-    status: "active",
-    startDate: "2022-12",
-    source: "https://arxiv.org/abs/2212.08073",
-    notes:
-      "Training AI systems to follow principles through self-critique and RLAIF. Core alignment technique used in all Claude models.",
-  },
-  {
-    idSeed: "div|anthropic|sleeper-agents",
-    parentOrgId: ORG_IDS.ANTHROPIC,
-    name: "Sleeper Agents Research",
-    divisionType: "team",
-    status: "active",
-    startDate: "2024-01",
-    source: "https://arxiv.org/abs/2401.05566",
-    notes:
-      "Investigating whether AI systems can maintain hidden behaviors through training. Seminal paper on deceptive alignment.",
+      "Non-research operational team responsible for usage-policy enforcement and user safety; reachable at usersafety@anthropic.com per Anthropic's Acceptable Use Policy.",
   },
   {
     idSeed: "div|anthropic|ai-welfare",
@@ -812,7 +823,10 @@ function cmdList() {
   }
 }
 
-async function cmdSync(dryRun: boolean) {
+async function cmdSync(
+  dryRun: boolean,
+  options?: { forceSkipSourcing?: boolean; forceSkipSourcingReason?: string },
+) {
   const items = DIVISIONS.map(toSyncDivision);
   const serverUrl = getServerUrl();
 
@@ -832,12 +846,45 @@ async function cmdSync(dryRun: boolean) {
     return;
   }
 
-  const result = await syncDivisions(items as unknown as Array<Record<string, unknown>>);
+  const result = await syncDivisions(
+    items as unknown as Array<Record<string, unknown>>,
+    {
+      forceSkipSourcing: options?.forceSkipSourcing,
+      forceSkipSourcingReason: options?.forceSkipSourcingReason,
+    },
+  );
 
   if (result.ok) {
     console.log(`Upserted ${result.data.upserted} divisions`);
   } else {
     throw new Error(`Division sync failed: ${result.message}`);
+  }
+}
+
+async function cmdDeleteOrphans(ids: string[], dryRun: boolean) {
+  if (ids.length === 0) {
+    throw new Error("Provide at least one --id=<divisionId> to delete.");
+  }
+  const serverUrl = getServerUrl();
+  if (!serverUrl) {
+    throw new Error(
+      "wiki-server URL not configured. Set LONGTERMWIKI_SERVER_URL or use WIKI_SERVER_ENV=prod."
+    );
+  }
+
+  console.log(`\nDeleting ${ids.length} division(s) from ${serverUrl}...`);
+  for (const id of ids) console.log(`  ${id}`);
+
+  if (dryRun) {
+    console.log("  (dry run -- no data written)");
+    return;
+  }
+
+  const result = await deleteDivisionsBatch(ids);
+  if (result.ok) {
+    console.log(`Deleted ${result.data.deleted} division(s); ${result.data.notFound} not found.`);
+  } else {
+    throw new Error(`Division delete-batch failed: ${result.message}`);
   }
 }
 
@@ -860,13 +907,39 @@ async function syncCommand(
   options: Record<string, unknown>
 ): Promise<CommandResult> {
   const dryRun = !!options.dryRun || !!options["dry-run"];
-  await cmdSync(dryRun);
+  const forceSkipSourcing =
+    !!options.forceSkipSourcing || !!options["force-skip-sourcing"];
+  const forceSkipSourcingReason =
+    (options.reason as string | undefined) ||
+    (options["force-skip-sourcing-reason"] as string | undefined);
+  if (forceSkipSourcing && !forceSkipSourcingReason) {
+    throw new Error(
+      "--force-skip-sourcing requires --reason=<text> for audit logging.",
+    );
+  }
+  await cmdSync(dryRun, { forceSkipSourcing, forceSkipSourcingReason });
+  return { exitCode: 0 };
+}
+
+async function deleteCommand(
+  _args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const dryRun = !!options.dryRun || !!options["dry-run"];
+  const idOpt = options.id ?? options.ids;
+  const ids = Array.isArray(idOpt)
+    ? (idOpt as string[])
+    : typeof idOpt === "string"
+      ? idOpt.split(",").map((s) => s.trim()).filter(Boolean)
+      : [];
+  await cmdDeleteOrphans(ids, dryRun);
   return { exitCode: 0 };
 }
 
 export const commands = {
   list: listCommand,
   sync: syncCommand,
+  "delete-orphans": deleteCommand,
   default: listCommand,
 };
 
@@ -875,9 +948,12 @@ export function getHelp(): string {
 Import Divisions — Sync curated organizational divisions to wiki-server
 
 Commands:
-  list               Show all known divisions (default)
-  sync               Sync divisions to wiki-server Postgres
-  sync --dry-run     Preview what would be synced without writing
+  list                                    Show all known divisions (default)
+  sync                                    Sync divisions to wiki-server Postgres
+  sync --dry-run                          Preview what would be synced without writing
+  sync --force-skip-sourcing --reason=X   Bypass sourcing enforcement (audit logged)
+  delete-orphans --id=X,Y,Z               Delete removed division records (with things cleanup)
+  delete-orphans --id=X --dry-run         Preview a delete
 
 Division Types:
   fund           Grant-making fund (e.g., Long-Term Future Fund)

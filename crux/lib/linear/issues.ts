@@ -219,6 +219,8 @@ export interface SearchedIssue {
   priority: number;
   state: { name: string; type: string };
   url: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 /**
@@ -241,6 +243,8 @@ export async function searchIssues(
           priority
           state { name type }
           url
+          createdAt
+          updatedAt
         }
       }
     }`,

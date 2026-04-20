@@ -24,6 +24,12 @@ import {
   MISSING_TOKEN_SUMMARY,
 } from '../lib/github.ts';
 import type { GitHubIssue } from '../lib/github.ts';
+import {
+  dedupLinearWellnessIssue,
+  closeLinearWellnessOnAllClear,
+  type LinearDedupDeps,
+  type LinearWellnessAction,
+} from './wellness-linear-dedup.ts';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // Types
@@ -198,10 +204,50 @@ async function ensureWellnessLabel(): Promise<void> {
   await ensureLabel('wellness', 'e4e669', 'Periodic wellness check failures');
 }
 
+/**
+ * Translate a `LinearWellnessAction` into a short-circuit result for
+ * `manageWellnessIssue`, or return null when the caller should continue
+ * to the GitHub create path.
+ */
+function handleLinearDedupAction(
+  action: LinearWellnessAction,
+): WellnessIssueResult | null {
+  switch (action.kind) {
+    case 'commented':
+      console.log(`Commented on existing Linear wellness issue ${action.identifier}`);
+      return { action: 'linear-commented', linearIdentifier: action.identifier };
+    case 'reopened':
+      console.log(`Reopened recent Linear wellness issue ${action.identifier}`);
+      return { action: 'linear-reopened', linearIdentifier: action.identifier };
+    case 'skipped':
+      return null;
+  }
+}
+
+export type WellnessIssueAction =
+  | 'created'
+  | 'updated'
+  | 'closed'
+  | 'none'
+  | 'linear-commented'
+  | 'linear-reopened';
+
+export interface WellnessIssueResult {
+  action: WellnessIssueAction;
+  issueNumber?: number;
+  linearIdentifier?: string;
+}
+
+export interface ManageWellnessOptions {
+  runUrl?: string;
+  /** Inject overrides for the Linear-side dedup path (used in tests). */
+  linearDedupDeps?: Partial<LinearDedupDeps>;
+}
+
 export async function manageWellnessIssue(
   report: WellnessReport,
-  options: { runUrl?: string } = {},
-): Promise<{ action: 'created' | 'updated' | 'closed' | 'none'; issueNumber?: number }> {
+  options: ManageWellnessOptions = {},
+): Promise<WellnessIssueResult> {
   try {
     getGitHubToken();
   } catch (e) {
@@ -229,22 +275,37 @@ export async function manageWellnessIssue(
 
       console.log(`Updated existing wellness issue #${existingIssue}`);
       return { action: 'updated', issueNumber: existingIssue };
-    } else {
-      // Create new issue with a stable title (no timestamp) so concurrent
-      // workflows can find it via findOpenWellnessIssue(). The timestamp
-      // is already in the issue body.
-      const created = await createIssue({
-        title: WELLNESS_ISSUE_TITLE,
-        body: report.issueBody,
-        labels: ['wellness', 'bug'],
-      });
-
-      // Best-effort dedup: close any duplicates from concurrent workflows
-      await deduplicateWellnessIssues();
-
-      console.log(`Created new wellness issue #${created.number}`);
-      return { action: 'created', issueNumber: created.number };
     }
+
+    // No open GitHub issue. Before filing a new one (which Linear's GitHub
+    // integration would mirror into a brand-new Linear ticket), check Linear
+    // directly for an existing open or recently-closed wellness ticket.
+    // See QUA-577 for the 8-duplicate-tickets incident this prevents.
+    const linearComment = runUrl
+      ? `Wellness check failing again at ${report.timestamp}. See [run](${runUrl}) for details.`
+      : `Wellness check failing again at ${report.timestamp}.`;
+    const linearAction = await dedupLinearWellnessIssue(
+      WELLNESS_ISSUE_TITLE,
+      linearComment,
+      options.linearDedupDeps,
+    );
+    const handled = handleLinearDedupAction(linearAction);
+    if (handled) return handled;
+
+    // Create new GitHub issue with a stable title (no timestamp) so concurrent
+    // workflows can find it via findOpenWellnessIssue(). The timestamp is
+    // already in the issue body.
+    const created = await createIssue({
+      title: WELLNESS_ISSUE_TITLE,
+      body: report.issueBody,
+      labels: ['wellness', 'bug'],
+    });
+
+    // Best-effort dedup: close any duplicates from concurrent workflows
+    await deduplicateWellnessIssues();
+
+    console.log(`Created new wellness issue #${created.number}`);
+    return { action: 'created', issueNumber: created.number };
   } else {
     // ── All clear case ─────────────────────────────────────────────────
     if (existingIssue) {
@@ -258,9 +319,23 @@ export async function manageWellnessIssue(
 
       console.log(`Closed resolved wellness issue #${existingIssue}`);
       return { action: 'closed', issueNumber: existingIssue };
-    } else {
-      console.log('All checks passed. No open wellness issue to close.');
-      return { action: 'none' };
     }
+
+    // No open GitHub issue, but there may be an open Linear ticket that
+    // we commented on during a prior failure (without creating GitHub).
+    // Close it so Linear doesn't hold a hanging open ticket.
+    const linearCloseResult = await closeLinearWellnessOnAllClear(
+      WELLNESS_ISSUE_TITLE,
+      `All wellness checks passed at ${report.timestamp}. Auto-closing.`,
+      options.linearDedupDeps,
+    );
+    if (linearCloseResult.kind === 'closed') {
+      const ids = linearCloseResult.identifiers.join(', ');
+      console.log(`Closed Linear wellness ticket(s): ${ids}`);
+      return { action: 'closed', linearIdentifier: linearCloseResult.identifiers[0] };
+    }
+
+    console.log('All checks passed. No open wellness issue to close.');
+    return { action: 'none' };
   }
 }
