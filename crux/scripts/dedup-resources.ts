@@ -46,6 +46,10 @@ interface DedupReport {
   totalResources: number;
   fkColumns: FkColumnInfo[];
   clusters: DedupCluster[];
+  /** QUA-623: true when the server's resources scan hit its cap. Clusters
+   *  past the cutoff are invisible to this report; --apply will be refused
+   *  server-side with a 409 until the cap is raised or the scan is chunked. */
+  truncated?: boolean;
 }
 
 interface ClusterMergeResult {
@@ -83,6 +87,11 @@ Environment: WIKI_SERVER_ENV=prod to target prod wiki-server.`
 
 function logReport(result: RunDedupResult): void {
   const { report, merges, errors, apply } = result;
+  if (report.truncated) {
+    console.warn(
+      `⚠ WARNING: resources scan was TRUNCATED — clusters past the server's cap are not in this report. --apply will be refused by the server until the cap is raised or chunked scanning lands.`,
+    );
+  }
   console.log(`Total resources: ${report.totalResources}`);
   console.log(`FK columns referencing resources.id: ${report.fkColumns.length}`);
   console.log(`Duplicate clusters: ${report.clusters.length}`);
@@ -151,6 +160,7 @@ function writeSnapshot(result: RunDedupResult): string {
     generatedAt: new Date().toISOString(),
     apply: result.apply,
     totalResources: result.report.totalResources,
+    scanTruncated: result.report.truncated ?? false,
     fkColumns: result.report.fkColumns,
     clustersFound: result.report.clusters.length,
     rowsToDelete: result.report.clusters.reduce(

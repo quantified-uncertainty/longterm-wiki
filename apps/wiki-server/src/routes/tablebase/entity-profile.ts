@@ -30,7 +30,7 @@ import {
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
-import { notFoundError } from "../shared/utils.js";
+import { notFoundError, applyTruncation } from "../shared/utils.js";
 import { COLUMN_DESCRIPTIONS } from "./entity-profile-descriptions.js";
 import { stripInternalColumns } from "../shared/strip-internal-columns.js";
 import type { PgTable } from "drizzle-orm/pg-core";
@@ -351,8 +351,7 @@ const entityProfileApp = new Hono()
       SECTIONS.map(async (section) => {
         try {
           const rows = await section.query(db, stableId, slug);
-          const truncated = rows.length > SECTION_ROW_LIMIT;
-          const capped = truncated ? rows.slice(0, SECTION_ROW_LIMIT) : rows;
+          const { items: capped, truncated } = applyTruncation(rows, SECTION_ROW_LIMIT);
           return {
             key: section.key,
             label: section.label,

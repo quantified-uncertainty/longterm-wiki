@@ -18,6 +18,7 @@ import type { Sql, CallableTransactionSql } from "../../db.js";
 import { beginTransaction } from "../../db.js";
 import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
 import { logger } from "../../logger.js";
+import { applyTruncation } from "../shared/utils.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -49,6 +50,33 @@ export interface DedupReport {
   totalResources: number;
   fkColumns: FkColumnInfo[];
   clusters: DedupCluster[];
+  /** True when the resources scan hit RESOURCES_SCAN_CAP — clusters beyond
+   *  the cap are invisible to this run. Raise the cap or switch to chunked
+   *  scanning before running apply=true. */
+  truncated: boolean;
+}
+
+// QUA-623: cap the full-table scan in buildReport(). resources is ~22k rows
+// today (well below this cap); the cap exists to prevent silent HTTP 503s if
+// the table grows. buildReport is an admin-only dedup tool — raising this
+// requires both a config bump and a confirmation it still completes under
+// the 30s statement_timeout.
+export const RESOURCES_SCAN_CAP = 500_000;
+
+/**
+ * Thrown from `runDedup` when `apply=true` is called on a truncated scan.
+ * HTTP handlers should catch this and translate to a 409 so CLI callers get
+ * an actionable message instead of a generic 500.
+ */
+export class ScanTruncatedError extends Error {
+  readonly scanCap: number;
+  constructor(scanCap: number) {
+    super(
+      `runDedup refused: resources scan was truncated at ${scanCap} rows; raise RESOURCES_SCAN_CAP or implement chunked scanning before applying.`,
+    );
+    this.name = "ScanTruncatedError";
+    this.scanCap = scanCap;
+  }
 }
 
 export interface ClusterMergeResult {
@@ -162,17 +190,26 @@ export async function loadResourceFks(sql: Sql): Promise<FkColumnInfo[]> {
   });
 }
 
-export async function buildReport(sql: Sql): Promise<DedupReport> {
+export async function buildReport(
+  sql: Sql,
+  opts?: { scanCap?: number },
+): Promise<DedupReport> {
+  const scanCap = opts?.scanCap ?? RESOURCES_SCAN_CAP;
   const fkColumns = await loadResourceFks(sql);
   const uniqueCols = dedupeFkColumns(fkColumns);
 
+  // QUA-623: cap with a +1 sentinel so the caller can tell the scan was
+  // partial. Dedup apply=true should refuse to run on a truncated report —
+  // clusters past the cutoff would silently survive.
   const rows = await sql<{ id: string; url: string; created_at: string }[]>`
     SELECT id, url, created_at::text AS created_at FROM resources
+    LIMIT ${scanCap + 1}
   `;
+  const { items: scanned, truncated } = applyTruncation(rows, scanCap);
 
   type Row = { id: string; url: string; createdAt: string };
   const groups = new Map<string, Row[]>();
-  for (const r of rows) {
+  for (const r of scanned) {
     const key = dedupKey(r.url);
     const list = groups.get(key);
     if (list) list.push({ id: r.id, url: r.url, createdAt: r.created_at });
@@ -221,7 +258,7 @@ export async function buildReport(sql: Sql): Promise<DedupReport> {
     return a.normalizedUrl < b.normalizedUrl ? -1 : 1;
   });
 
-  return { totalResources: rows.length, fkColumns, clusters };
+  return { totalResources: scanned.length, fkColumns, clusters, truncated };
 }
 
 // ---------------------------------------------------------------------------
@@ -334,12 +371,23 @@ export interface RunDedupResult {
 /**
  * Scan, pick canonicals, and (optionally) apply merges.
  */
-export async function runDedup(sql: Sql, apply: boolean): Promise<RunDedupResult> {
-  const report = await buildReport(sql);
+export async function runDedup(
+  sql: Sql,
+  apply: boolean,
+  opts?: { scanCap?: number },
+): Promise<RunDedupResult> {
+  const scanCap = opts?.scanCap ?? RESOURCES_SCAN_CAP;
+  const report = await buildReport(sql, { scanCap });
   const merges: ClusterMergeResult[] = [];
   const errors: RunDedupResult["errors"] = [];
 
   if (!apply) return { apply, report, merges, errors };
+
+  // Refuse apply=true when the scan was truncated. Clusters past the cutoff
+  // would silently survive — raise RESOURCES_SCAN_CAP or chunk the scan.
+  if (report.truncated) {
+    throw new ScanTruncatedError(scanCap);
+  }
 
   const rowsToDelete = report.clusters.reduce(
     (acc, c) => acc + c.duplicates.length,

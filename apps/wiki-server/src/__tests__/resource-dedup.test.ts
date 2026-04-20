@@ -23,8 +23,12 @@ import {
   dedupeFkColumns,
   validateIdent,
   mergeCluster,
+  buildReport,
+  runDedup,
+  ScanTruncatedError,
   type FkColumnInfo,
 } from "../routes/wikibase/resource-dedup.js";
+import type { Sql } from "../db.js";
 
 // ---------------------------------------------------------------------------
 // Pure helpers (no DB)
@@ -111,6 +115,78 @@ describe("dedupeFkColumns", () => {
       "entity_resources",
       "page_citations",
     ]);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// QUA-623: scan cap + truncation guard (no DB)
+// ---------------------------------------------------------------------------
+
+// Minimal fake Sql for buildReport / runDedup: routes tagged-template calls
+// based on their first literal chunk. Only what these tests exercise.
+function makeFakeSql(resourcesRows: { id: string; url: string; created_at: string }[]): Sql {
+  const fake = ((strings: TemplateStringsArray, ..._values: unknown[]) => {
+    const firstChunk = strings[0] ?? "";
+    // loadResourceFks runs two information_schema queries; return empty.
+    if (firstChunk.includes("information_schema")) return [];
+    // buildReport's resources scan.
+    if (firstChunk.includes("FROM resources")) return resourcesRows;
+    return [];
+  }) as unknown as Sql;
+  return fake;
+}
+
+describe("buildReport — QUA-623 scan cap + truncation flag", () => {
+  it("sets truncated=false when rows fit within the cap", async () => {
+    const rows = [
+      { id: "a", url: "https://x.test/1", created_at: "2024-01-01" },
+      { id: "b", url: "https://x.test/2", created_at: "2024-01-02" },
+    ];
+    const report = await buildReport(makeFakeSql(rows), { scanCap: 5 });
+    expect(report.truncated).toBe(false);
+    expect(report.totalResources).toBe(2);
+  });
+
+  it("sets truncated=true when rows exceed the cap (sentinel detection)", async () => {
+    // Postgres returns (cap + 1) rows so the sentinel fires; buildReport
+    // should slice back to the cap and flip truncated on.
+    const rows = Array.from({ length: 4 }, (_, i) => ({
+      id: `r${i}`,
+      url: `https://x.test/${i}`,
+      created_at: "2024-01-01",
+    }));
+    const report = await buildReport(makeFakeSql(rows), { scanCap: 3 });
+    expect(report.truncated).toBe(true);
+    expect(report.totalResources).toBe(3);
+  });
+});
+
+describe("runDedup — QUA-623 refuse-on-truncated guard", () => {
+  it("returns the truncated report in dry-run (apply=false) without throwing", async () => {
+    const rows = Array.from({ length: 4 }, (_, i) => ({
+      id: `r${i}`,
+      url: `https://x.test/${i}`,
+      created_at: "2024-01-01",
+    }));
+    const result = await runDedup(makeFakeSql(rows), false, { scanCap: 3 });
+    expect(result.apply).toBe(false);
+    expect(result.report.truncated).toBe(true);
+    expect(result.merges).toEqual([]);
+    expect(result.errors).toEqual([]);
+  });
+
+  it("throws ScanTruncatedError when apply=true and the scan was truncated", async () => {
+    const rows = Array.from({ length: 4 }, (_, i) => ({
+      id: `r${i}`,
+      url: `https://x.test/${i}`,
+      created_at: "2024-01-01",
+    }));
+    await expect(runDedup(makeFakeSql(rows), true, { scanCap: 3 })).rejects.toBeInstanceOf(
+      ScanTruncatedError,
+    );
+    await expect(runDedup(makeFakeSql(rows), true, { scanCap: 3 })).rejects.toThrow(
+      /scan was truncated/,
+    );
   });
 });
 
