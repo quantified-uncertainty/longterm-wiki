@@ -1469,6 +1469,7 @@ export const commands = {
   'import-grants-download': importGrantsCommands.download,
   'import-divisions': importDivisionsCommands.default,
   'import-divisions-sync': importDivisionsCommands.sync,
+  'import-divisions-delete-orphans': importDivisionsCommands['delete-orphans'],
   'import-funding-programs': importFundingProgramsCommands.default,
   'import-funding-programs-sync': importFundingProgramsCommands.sync,
   // Market data commands
