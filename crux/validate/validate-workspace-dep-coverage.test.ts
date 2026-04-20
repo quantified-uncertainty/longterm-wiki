@@ -471,6 +471,93 @@ describe('validate-workspace-dep-coverage', () => {
     expect(worker?.used.size).toBe(0);
   });
 
+  it('worker report uses docker/worker manifest path + file: protocol suggestion', () => {
+    // Regression guard for the misleading "add to apps/docker/worker/package.json
+    // with workspace:*" error that would lead a future contributor into
+    // reproducing QUA-605 all over again.
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    writeFileSync(
+      join(workerDir, 'package.json'),
+      JSON.stringify({ name: 'worker', dependencies: {} })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'url.ts'),
+      `import { normalizeUrl } from '@longterm-wiki/url-utils';\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: join(workerDir, 'package.json'),
+      workerSourceDir: cruxDir,
+    });
+
+    const worker = result.apps.find((a) => a.app === 'docker/worker');
+    expect(worker?.manifestPath).toBe('docker/worker/package.json');
+    expect(worker?.depSuggestion('@longterm-wiki/url-utils')).toBe(
+      '"file:./packages/url-utils"'
+    );
+  });
+
+  it('app report uses apps/<name>/package.json path + workspace:* suggestion', () => {
+    scratch = makeAppsDir([
+      {
+        name: 'my-app',
+        files: { 'src/a.ts': `import { x } from '@longterm-wiki/url-utils';` },
+      },
+    ]);
+
+    const result = runCheck({ appsDir: scratch, ...NO_WORKER });
+    const app = result.apps[0];
+    expect(app.manifestPath).toBe('apps/my-app/package.json');
+    expect(app.depSuggestion('@longterm-wiki/url-utils')).toBe('"workspace:*"');
+  });
+
+  it('excludes *.spec.ts, *.test-d.ts, and tests/ directories from worker scan', () => {
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    writeFileSync(
+      join(workerDir, 'package.json'),
+      JSON.stringify({ name: 'worker', dependencies: {} })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    mkdirSync(join(cruxDir, 'tests'), { recursive: true });
+    // All three should be excluded:
+    writeFileSync(
+      join(cruxDir, 'lib', 'x.spec.ts'),
+      `import { a } from '@longterm-wiki/url-utils';\n`
+    );
+    writeFileSync(
+      join(cruxDir, 'lib', 'y.test-d.ts'),
+      `import { b } from '@longterm-wiki/id-utils';\n`
+    );
+    writeFileSync(
+      join(cruxDir, 'tests', 'z.ts'),
+      `import { c } from '@longterm-wiki/factbase';\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: join(workerDir, 'package.json'),
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(true);
+    const worker = result.apps.find((a) => a.app === 'docker/worker');
+    expect(worker?.used.size).toBe(0);
+  });
+
   it('skips the worker check entirely when the manifest is missing', () => {
     scratch = makeScratchDir();
     const result = runCheck({

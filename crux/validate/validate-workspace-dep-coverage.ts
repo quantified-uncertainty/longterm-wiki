@@ -53,7 +53,7 @@
  * commented-out *import statement* (e.g. `// import { x } from '@longterm-wiki/EXAMPLE'`)
  * is still flagged — treating that as a real import is intentional since
  * commented-out code should be removed, not left behind. (Note: EXAMPLE is
- * uppercase so this doctring itself doesn't match the regex below, which
+ * uppercase so this docstring itself doesn't match the regex below, which
  * restricts package names to lowercase per npm naming rules.)
  *
  * Why "any section" and not just `dependencies`: the Dockerfiles in this
@@ -101,6 +101,11 @@ interface AppCoverage {
   declared: Set<string>;   // @longterm-wiki/X packages declared in any dep section
   missing: string[];       // used but not declared anywhere (blocking)
   unused: string[];        // declared but not used (warning)
+  /** Repo-relative path to the package.json that must be edited to fix a violation. */
+  manifestPath: string;
+  /** Dep string to suggest for a missing import. Apps use `workspace:*`; the
+   *  standalone worker manifest uses `file:./packages/<pkg>`. */
+  depSuggestion: (pkg: string) => string;
 }
 
 interface CheckOptions {
@@ -122,10 +127,15 @@ interface CheckResult {
 }
 
 interface ListOptions {
-  /** Skip __tests__ directories and *.test.* files. Used for crux scanning where
-   *  test imports shouldn't require deps in the worker image. */
+  /** Skip test directories (`__tests__/`, `tests/`) and test files (`*.test.*`,
+   *  `*.spec.*`, `*.test-d.*`). Used for crux scanning where test imports
+   *  shouldn't require deps in the worker image. */
   excludeTests?: boolean;
 }
+
+// Matches `foo.test.ts`, `foo.spec.ts`, `foo.test-d.ts` and their .js/.mjs/.jsx
+// siblings. Single source of truth so tests and the scanner agree.
+const TEST_FILE_RE = /\.(test|spec)(-d)?\.[a-z]+$/;
 
 function listSourceFiles(
   dir: string,
@@ -143,14 +153,14 @@ function listSourceFiles(
   for (const dirent of entries) {
     const name = dirent.name;
     if (name === 'node_modules' || name.startsWith('.')) continue;
-    if (options.excludeTests && name === '__tests__') continue;
+    if (options.excludeTests && (name === '__tests__' || name === 'tests')) continue;
     const full = join(dir, name);
     if (dirent.isDirectory()) {
       listSourceFiles(full, out, options);
     } else if (dirent.isFile()) {
       const dot = name.lastIndexOf('.');
       if (dot !== -1 && SOURCE_EXTENSIONS.has(name.slice(dot))) {
-        if (options.excludeTests && /\.test\.[a-z]+$/.test(name)) continue;
+        if (options.excludeTests && TEST_FILE_RE.test(name)) continue;
         out.push(full);
       }
     }
@@ -201,6 +211,33 @@ function readDeclaredDeps(
   return declared;
 }
 
+function scanImports(files: string[]): Set<string> {
+  const used = new Set<string>();
+  for (const file of files) {
+    let content: string;
+    try {
+      content = readFileSync(file, 'utf-8');
+    } catch {
+      continue;
+    }
+    if (!content.includes(WORKSPACE_PREFIX)) continue;
+    for (const pkg of extractWorkspaceImports(content)) used.add(pkg);
+  }
+  return used;
+}
+
+function buildCoverage(
+  label: string,
+  manifestPath: string,
+  depSuggestion: (pkg: string) => string,
+  used: Set<string>,
+  declared: Set<string>,
+): AppCoverage {
+  const missing = [...used].filter((p) => !declared.has(p)).sort();
+  const unused = [...declared].filter((p) => !used.has(p)).sort();
+  return { app: label, used, declared, missing, unused, manifestPath, depSuggestion };
+}
+
 function analyzeApp(
   appDir: string,
   appName: string,
@@ -215,60 +252,42 @@ function analyzeApp(
     listSourceFiles(join(appDir, sub), files);
   }
 
-  const used = new Set<string>();
-  for (const file of files) {
-    let content: string;
-    try {
-      content = readFileSync(file, 'utf-8');
-    } catch {
-      continue;
-    }
-    if (!content.includes(WORKSPACE_PREFIX)) continue;
-    for (const pkg of extractWorkspaceImports(content)) used.add(pkg);
-  }
-
-  const declared = readDeclaredDeps(pkgJson, onWarn);
-
-  const missing = [...used].filter((p) => !declared.has(p)).sort();
-  const unused = [...declared].filter((p) => !used.has(p)).sort();
-
-  return { app: appName, used, declared, missing, unused };
+  return buildCoverage(
+    appName,
+    `apps/${appName}/package.json`,
+    () => '"workspace:*"',
+    scanImports(files),
+    readDeclaredDeps(pkgJson, onWarn),
+  );
 }
 
 /**
  * Scan a source directory recursively and compare its `@longterm-wiki/*` imports
  * against an external package.json (i.e. one that is NOT the parent of the source
  * directory). Used for the worker image: `crux/` is scanned, but the manifest
- * that must declare the deps lives at `docker/worker/package.json`.
+ * that must declare the deps lives at `docker/worker/package.json` (a standalone,
+ * non-workspace manifest — so missing deps are suggested as `file:./packages/<pkg>`
+ * rather than `workspace:*`).
  */
 function analyzeExternalManifest(
   sourceDir: string,
   pkgJsonPath: string,
   label: string,
+  manifestPath: string,
+  depSuggestion: (pkg: string) => string,
   onWarn?: (message: string) => void,
 ): AppCoverage | null {
   if (!existsSync(pkgJsonPath)) return null;
   if (!existsSync(sourceDir)) return null;
 
   const files = listSourceFiles(sourceDir, [], { excludeTests: true });
-  const used = new Set<string>();
-  for (const file of files) {
-    let content: string;
-    try {
-      content = readFileSync(file, 'utf-8');
-    } catch {
-      continue;
-    }
-    if (!content.includes(WORKSPACE_PREFIX)) continue;
-    for (const pkg of extractWorkspaceImports(content)) used.add(pkg);
-  }
-
-  const declared = readDeclaredDeps(pkgJsonPath, onWarn);
-
-  const missing = [...used].filter((p) => !declared.has(p)).sort();
-  const unused = [...declared].filter((p) => !used.has(p)).sort();
-
-  return { app: label, used, declared, missing, unused };
+  return buildCoverage(
+    label,
+    manifestPath,
+    depSuggestion,
+    scanImports(files),
+    readDeclaredDeps(pkgJsonPath, onWarn),
+  );
 }
 
 export function runCheck(options: CheckOptions = {}): CheckResult {
@@ -299,11 +318,16 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
   }
 
   // Worker image: crux/ source is copied wholesale, so its imports must be
-  // declared in docker/worker/package.json.
+  // declared in docker/worker/package.json. The worker is NOT a pnpm workspace
+  // member (the whole reason QUA-605 existed), so missing-dep suggestions use
+  // the `file:./packages/<pkg>` protocol that the Dockerfile wires up, not
+  // `workspace:*`.
   const workerReport = analyzeExternalManifest(
     workerSourceDir,
     workerPkgJson,
     'docker/worker',
+    'docker/worker/package.json',
+    (pkg) => `"file:./packages/${pkg.slice(WORKSPACE_PREFIX.length)}"`,
     onWarn,
   );
   if (workerReport) apps.push(workerReport);
@@ -328,10 +352,10 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
         console.log(`  ${c.red}${pkg}${c.reset}`);
       }
       console.log(
-        `${c.dim}  Fix: add to apps/${app.app}/package.json dependencies:${c.reset}`
+        `${c.dim}  Fix: add to ${app.manifestPath} dependencies:${c.reset}`
       );
       for (const pkg of app.missing) {
-        console.log(`${c.dim}    "${pkg}": "workspace:*"${c.reset}`);
+        console.log(`${c.dim}    "${pkg}": ${app.depSuggestion(pkg)}${c.reset}`);
       }
     }
 
