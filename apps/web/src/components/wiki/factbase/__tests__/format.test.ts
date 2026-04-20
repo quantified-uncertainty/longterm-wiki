@@ -216,10 +216,6 @@ describe("formatKBFactValue additional coverage", () => {
   });
 
   it("uses fact.currency to override property unit for monetary values (QUA-620)", () => {
-    // Regression: Ada Lovelace Institute's total-funding fact is stored as
-    // 5e6 GBP. The `total-funding` property defaults to unit USD with prefix
-    // "$". Without the currency override, the overview rendered "$5 million".
-    // With currency: "GBP", it must render with the pound sign.
     const fact: Fact = {
       id: "f_Hw1vL6tN9c",
       subjectId: "sid_BgSnHHzV6g",

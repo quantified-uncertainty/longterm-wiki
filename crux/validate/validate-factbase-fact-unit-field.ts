@@ -1,22 +1,10 @@
 #!/usr/bin/env node
 
 /**
- * Validate that FactBase fact entries don't use a top-level `unit:` field.
- *
- * The Fact schema (packages/factbase/src/types.ts) declares `currency` for
- * ISO 4217 overrides. The loader (packages/factbase/src/loader.ts::parseFact)
- * only reads `currency` — a top-level `unit:` on a fact is silently dropped,
- * and the property-level unit default applies. This looks like the author
- * set a currency, but the rendered value uses the property's default symbol
- * (usually $), producing wrong output like "$5 million" for a £5M fact.
- *
- * Incident: QUA-620. Ada Lovelace Institute's total-funding fact had
- * `unit: GBP`; the overview rendered "$5 million" while the /data page's
- * funding round (correctly stored) rendered "£5M / $6.7M".
- *
- * Fix: use `currency: GBP` (or `currency: EUR` etc.) at the fact top-level.
- *
- * Usage: npx tsx crux/validate/validate-factbase-fact-unit-field.ts
+ * Reject `unit:` (and case/plural typos) at a FactBase fact top-level.
+ * The loader only reads `currency:` for ISO 4217 overrides; `unit:` is
+ * silently dropped and the property default takes over — which produced
+ * QUA-620 ("$5 million" for a £5M fact).
  */
 
 import { readFileSync, readdirSync } from "fs";
@@ -29,17 +17,10 @@ const FB_ENTITIES_DIR = join(
   "packages/factbase/data/fb-entities",
 );
 
-// Fact top-level fields live at YAML indent depth 4 (2-space indent):
-//   facts:
-//     - id: f_x
-//       property: p
-//       unit: GBP      <- depth 4 (4 spaces)
-//       value: ...
-// A `unit:` inside a structured value block would be deeper (6+ spaces).
-//
-// Case-insensitive on the key name so typos like `Unit:`, `UNIT:`, and
-// plural `units:` also surface — the loader drops all of them silently.
-const FACT_TOP_LEVEL_UNIT_RE = /^ {4}(unit|Unit|UNIT|units):\s*(\S.*?)\s*$/;
+// Fact top-level = 4-space indent; a `unit:` inside a value block would be 6+.
+// Case-insensitive + optional plural so typos (`Unit:`, `UNIT:`, `units:`) — which
+// the loader also silently drops — surface here.
+const FACT_TOP_LEVEL_UNIT_RE = /^ {4}(units?):\s*(\S.*?)\s*$/i;
 
 export interface Violation {
   file: string;
