@@ -63,7 +63,7 @@ facts:
   - id: f_3J9UcxjgVg
     property: grant-received
     value: "572000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant"
@@ -71,7 +71,7 @@ facts:
   - id: f_VYPdIhqTQR
     property: grant-received
     value: "183000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant"

@@ -98,7 +98,6 @@ facts:
   - id: f_kFj7TBgRuP
     property: euv-market-share
     value: 100
-    unit: percent
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "ASML is the sole supplier of EUV lithography machines globally; no competitor"
@@ -106,7 +105,7 @@ facts:
   - id: f_l2QMMMF9BM
     property: euv-system-price
     value: 380000000
-    unit: USD
+    currency: USD
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "High-NA EUV systems cost approximately $380M each; standard EUV ~$150-200M"

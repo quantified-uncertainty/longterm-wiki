@@ -14,7 +14,7 @@ facts:
   - id: f_cs4sXkLptL
     property: annual-revenue
     value: "1800000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://www.humanetech.com
     notes: "Approximately $1.8M annual revenue"
@@ -35,7 +35,7 @@ facts:
   - id: f_D5bcDZJL8W
     property: lobbying-spend
     value: "320000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
     notes: "Federal lobbying via Holland & Knight LLP: $80K/quarter consistently
@@ -44,7 +44,7 @@ facts:
   - id: f_Wf8azn6DG2
     property: lobbying-spend
     value: "320000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
     notes: "Same $80K/quarter pattern through Holland & Knight"
@@ -52,7 +52,7 @@ facts:
   - id: f_cFUKtV2tG7
     property: grant-received
     value: "468000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant for general support"
@@ -67,7 +67,7 @@ facts:
   - id: f_hEE9D2RAKl
     property: annual-revenue
     value: "3580000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.humanetech.com
     notes: "Most recent 990: revenue $3.58M, expenses $6.33M, net assets $6.01M,

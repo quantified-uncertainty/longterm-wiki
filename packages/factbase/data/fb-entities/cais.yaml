@@ -64,7 +64,7 @@ facts:
   - id: f_rYN3krk6tQ
     property: revenue
     value: "6660060"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310. First year of operations."
@@ -72,7 +72,7 @@ facts:
   - id: f_UgwULHbsZr
     property: revenue
     value: "16089191"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990"
@@ -80,7 +80,7 @@ facts:
   - id: f_HC5iejEJyY
     property: revenue
     value: "10235085"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310."
@@ -88,7 +88,7 @@ facts:
   - id: f_2gFP8riiGw
     property: annual-expenses
     value: "816760"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. First year of operations; low expenses relative to revenue."
@@ -96,7 +96,7 @@ facts:
   - id: f_YgMeE4EFsw
     property: annual-expenses
     value: "8134449"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. Significant increase as organization scaled up."
@@ -104,14 +104,14 @@ facts:
   - id: f_DrCHRnYm9V
     property: annual-expenses
     value: "7163607"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
 
   - id: f_iKgkztnKMQ
     property: grant-received
     value: "5160000"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support/
     notes: "Open Philanthropy general support grant to CAIS, 2022"
@@ -119,7 +119,7 @@ facts:
   - id: f_JKwyv80ODu
     property: grant-received
     value: "5460000"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/
     notes: "Open Philanthropy general support grant to CAIS, 2023. Total OP funding to CAIS across 2022-2023 was ~$10.6M per donations tracker."
@@ -127,7 +127,7 @@ facts:
   - id: f_2o7SVDOLcV
     property: grant-received
     value: "2767000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024: $1,146K to CAIS Inc + $1,621K to CAIS Action Fund = $2,767K total"
@@ -135,7 +135,7 @@ facts:
   - id: f_IFDN4UddCw
     property: grant-received
     value: "1061000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025: $289K to CAIS Inc + $772K to CAIS Action Fund = $1,061K total"
@@ -169,7 +169,7 @@ facts:
   - id: f_BnRfdZYOjA
     property: net-assets
     value: "5843300"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. End of first year."
@@ -177,7 +177,7 @@ facts:
   - id: f_Wh3ZWtew6g
     property: net-assets
     value: "8538240"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990."
@@ -185,7 +185,7 @@ facts:
   - id: f_DldXXRYERQ
     property: net-assets
     value: "11609718"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990."

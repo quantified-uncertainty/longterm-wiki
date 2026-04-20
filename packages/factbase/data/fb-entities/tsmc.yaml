@@ -110,7 +110,6 @@ facts:
   - id: f_wIySb9OLoI
     property: foundry-market-share
     value: 64
-    unit: percent
     asOf: 2024-12
     source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
     notes: "TSMC holds ~64% of global semiconductor foundry revenue"
@@ -118,7 +117,6 @@ facts:
   - id: f_Lro8d6qLqd
     property: advanced-node-market-share
     value: 92
-    unit: percent
     asOf: 2024-12
     source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
     notes: "TSMC fabricates >90% of chips at sub-7nm nodes"

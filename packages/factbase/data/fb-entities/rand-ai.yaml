@@ -58,7 +58,7 @@ facts:
   - id: f_lMgspCVlPG
     property: cumulative-funding
     value: "34500000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.openphilanthropy.org/grants/rand-corporation-emerging-technology-initiatives-2024/
     notes: "Total Open Philanthropy AI-related funding ~$34.5M across 6 grants (2020-2024)"

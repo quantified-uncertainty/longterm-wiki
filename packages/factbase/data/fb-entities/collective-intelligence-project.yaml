@@ -47,7 +47,7 @@ facts:
   - id: f_Hn1VyhLA0a
     property: annual-revenue
     value: "1908186"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/920327339
     notes: "Nearly all revenue from contributions ($1.91M). Total assets $2.47M. Net income $1.64M. Operates exclusively through philanthropic donations."

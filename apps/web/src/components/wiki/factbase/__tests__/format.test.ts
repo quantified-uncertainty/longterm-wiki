@@ -214,4 +214,21 @@ describe("formatKBFactValue additional coverage", () => {
     const fact = makeFact("weird", { type: "custom" as never, value: { a: 1 } } as never);
     expect(formatKBFactValue(fact)).toBe('{"a":1}');
   });
+
+  it("uses fact.currency to override property unit for monetary values (QUA-620)", () => {
+    const fact: Fact = {
+      id: "f_Hw1vL6tN9c",
+      subjectId: "sid_BgSnHHzV6g",
+      propertyId: "total-funding",
+      value: { type: "number", value: 5_000_000 },
+      currency: "GBP",
+    };
+    const result = formatKBFactValue(fact, "USD", {
+      divisor: 1e9,
+      prefix: "$",
+      suffix: "B",
+    });
+    expect(result).toContain("£");
+    expect(result).not.toContain("$");
+  });
 });

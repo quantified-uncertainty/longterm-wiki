@@ -37,7 +37,7 @@ facts:
   - id: f_0qD6Fk7FbN
     property: total-funding
     value: 715000
-    unit: EUR
+    currency: EUR
     asOf: 2025-12
     source: https://pauseai.info/funding
     notes: "Largest donors: Future of Life Institute (EUR 423K), Greg Colbourn (EUR 95K), Conjointly (EUR 83K), Lightspeed Grants (EUR 46K combined), SFF (EUR 9.5K)"
@@ -75,7 +75,7 @@ facts:
   - id: f_DSEdfJN0mL
     property: annual-revenue
     value: "288319"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/990899650
     notes: "PauseAI US (501(c)(3), EIN 99-0899650, San Francisco, CA). Separate from Dutch PauseAI Global Stichting, which reports donor totals of EUR 715K through 2025-12."

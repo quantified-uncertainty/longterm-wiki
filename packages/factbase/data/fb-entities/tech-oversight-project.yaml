@@ -20,7 +20,7 @@ facts:
   - id: f_nIIQPufNjQ
     property: annual-revenue
     value: "910105"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/874209086
     notes: "FY 2024 Form 990 filed Oct 30, 2025. Total expenses $889,146. Net assets $264,299."

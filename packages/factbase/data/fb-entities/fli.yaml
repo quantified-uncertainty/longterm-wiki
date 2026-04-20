@@ -22,21 +22,21 @@ facts:
   - id: f_de9hyXzJ2M
     property: grant-given
     value: "25025000"
-    unit: USD
+    currency: USD
     asOf: !date 2022-12
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization of Future of Life Foundation (FLF)
   - id: f_I1oSDd9OAz
     property: grant-given
     value: "15700000"
-    unit: USD
+    currency: USD
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2023
   - id: f_ngxodh3SNe
     property: grant-given
     value: "18100000"
-    unit: USD
+    currency: USD
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2024
@@ -44,7 +44,7 @@ facts:
   - id: f_vm1oBsIh14
     property: lobbying-spend
     value: "310000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2025&id=D000087562
     notes: "US federal lobbying via Dentons: $310K in 2024. Verified from Senate LDA filings."
@@ -52,7 +52,7 @@ facts:
   - id: f_h4e6LBhlmR
     property: lobbying-spend
     value: "360000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Future+of+Life+Institute
     notes: "US federal lobbying via Dentons: $360K in 2025 ($90K/quarter). Verified from Senate LDA."
@@ -60,7 +60,7 @@ facts:
   - id: f_LA81LD1WDK
     property: lobbying-spend
     value: "446619"
-    unit: EUR
+    currency: EUR
     asOf: 2024
     source: https://www.lobbyfacts.eu/datacard/future-of-life-institute?rid=787064543128-10
     notes: "EU advocacy spend EUR 446,619 (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
@@ -93,7 +93,7 @@ facts:
   - id: f_s83tI9sEe6
     property: grant-received
     value: "10000000"
-    unit: USD
+    currency: USD
     asOf: 2015
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
     notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on AI safety"
@@ -101,7 +101,7 @@ facts:
   - id: f_2PAHN0Iwku
     property: grant-received
     value: "665800000"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
     notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Buterin confirmed ~$500M was actually cashed out (March 2026). Majority transferred to a donor-advised fund."
@@ -115,7 +115,7 @@ facts:
   - id: f_Gz4uyRC44r
     property: revenue
     value: "549531672"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
@@ -123,7 +123,7 @@ facts:
   - id: f_J3dYwWWqrw
     property: revenue
     value: "4717340"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
@@ -131,7 +131,7 @@ facts:
   - id: f_feRFvTG4CX
     property: revenue
     value: "21273381"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
@@ -139,7 +139,7 @@ facts:
   - id: f_aEq32QQklw
     property: annual-expenses
     value: "16065773"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
@@ -147,7 +147,7 @@ facts:
   - id: f_s2O048D4tQ
     property: annual-expenses
     value: "16317712"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
@@ -155,7 +155,7 @@ facts:
   - id: f_A8f0X4bXW4
     property: annual-expenses
     value: "17399051"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
@@ -170,7 +170,7 @@ facts:
   - id: f_Gz4uyRC44r
     property: one-time-donation
     value: "549531672"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Vitalik Buterin SHIB token donation — one-time windfall,

@@ -120,7 +120,7 @@ facts:
   - id: f_MF4yOqWUTI
     property: quarterly-data-center-revenue
     value: 6.23e+10
-    unit: USD
+    currency: USD
     asOf: 2026-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026
     notes: "FY2026 Q4 data center revenue of $62.3B; record quarterly segment revenue"
