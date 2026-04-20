@@ -57,6 +57,14 @@ export const MARKDOWN_LINK_RE = /\[([^\]]*)\]\(([^)]+)\)/g;
 /** Match GFM footnote references `[^N]` (not definitions). */
 export const FOOTNOTE_REF_RE = /\[\^\d+\]/g;
 
+/**
+ * Match GFM footnote references with any alphanumeric / hyphen / underscore
+ * ID (e.g. `[^5]`, `[^rc-06ed]`). Broader than FOOTNOTE_REF_RE; use when you
+ * need to handle the full citation-system ID alphabet (citations allocate
+ * non-numeric IDs like `rc-06ed`).
+ */
+export const FOOTNOTE_REF_ANY_RE = /\[\^[a-zA-Z0-9_-]+\]/g;
+
 /** Match GFM footnote definitions `[^N]:` at start of line. */
 export const FOOTNOTE_DEF_RE = /^\[\^\d+\]:/gm;
 

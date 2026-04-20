@@ -40,7 +40,7 @@ import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
-import { stripFrontmatter, escapeDollarDigits } from '../lib/patterns.ts';
+import { stripFrontmatter, escapeDollarDigits, FOOTNOTE_REF_ANY_RE } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/session/edit-log.ts';
@@ -963,9 +963,6 @@ const SHRINK_MIN_RATIO = 0.4;
  */
 const CONTEXT_BLEED_MIN_LEN = 40;
 
-/** Matches a footnote marker like `[^5]` or `[^rc-06ed]`. */
-const FOOTNOTE_MARKER_RE = /\[\^[a-zA-Z0-9_-]+\]/g;
-
 /**
  * Matches a single-line list bullet with a bolded label followed by a colon:
  *   `- **Label**: description[^ref]`
@@ -989,9 +986,9 @@ function normalizeWhitespace(s: string): string {
   return s.replace(/\s+/g, ' ').trim();
 }
 
-/** Strip all footnote markers (`[^NN]`) from a string. */
+/** Strip all footnote markers (`[^NN]`, including non-numeric IDs) from a string. */
 function stripFootnoteMarkers(s: string): string {
-  return s.replace(FOOTNOTE_MARKER_RE, '');
+  return s.replace(FOOTNOTE_REF_ANY_RE, '');
 }
 
 export type RejectionReason =
@@ -1077,8 +1074,7 @@ function checkContextBleed(p: FixProposal, pageContent: string): string | null {
   if (normalized.length < CONTEXT_BLEED_MIN_LEN) return null;
   if (!pageContent.includes(p.original)) return null;
 
-  const segments = pageContent.split(p.original);
-  for (const seg of segments) {
+  for (const seg of pageContent.split(p.original)) {
     if (normalizeWhitespace(seg).includes(normalized)) {
       return `replacement appears verbatim elsewhere in the page (context-bleed)`;
     }

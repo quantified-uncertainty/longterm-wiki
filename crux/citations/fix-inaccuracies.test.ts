@@ -744,30 +744,20 @@ describe('filterProposals', () => {
   });
 
   // Reviewer Q3: multi-bullet `original` no longer greedy-matches across lines
-  it('mdx-structure: multi-line original (multiple bullets) does not trigger false-negative on first', () => {
-    // Before the `/s` flag was removed, a greedy `.*$` captured both bullets
-    // and the non-empty second bullet hid emptiness of the first.
+  it('mdx-structure: multi-line original falls through (no greedy capture across bullets)', () => {
+    // Before `/s` was dropped, LIST_BULLET_LABEL_RE greedily captured both
+    // bullets; the non-empty second bullet hid emptiness of the first. Now
+    // the regex anchors at end-of-line (without `/s`), so a multi-line
+    // original does not match the bullet shape at all and this filter is
+    // silent. That is the pinned behavior — structure checks for multi-line
+    // edits are intentionally out of scope for this filter.
     const p = makeProposal({
-      original: '- **A**: first bullet content[^5]\n- **B**: second bullet content[^6]',
-      replacement: '- **A**:[^5]\n- **B**: second bullet content[^6]',
+      original: '- **A**: first bullet content\n- **B**: second bullet content',
+      replacement: '- **A**:\n- **B**: second bullet content',
       fixType: 'remove_detail',
     });
     const result = filterProposals([p]);
-    // The filter does not fire (intentional — we don't reason across multi-line
-    // originals). The first bullet is clearly broken but other filters
-    // (component-drop, shrink) should catch it; this test just pins that we
-    // don't silently accept multi-line bullet edits.
-    // Other filters kick in: shrink check should reject this (remove_detail is
-    // exempt from shrink, but the structure check also passes on multi-line).
-    // The key assertion: if it was kept, that's the bug we accepted — if it
-    // was rejected for some OTHER reason, that's fine.
-    if (result.kept.length === 1) {
-      // Not caught. Document the limitation — but callers with pageContent
-      // still get context-bleed / span-overlap coverage for the apply stage.
-      expect(result.kept[0]).toBeDefined();
-    } else {
-      expect(result.rejected.length).toBeGreaterThan(0);
-    }
+    expect(result.rejected.every((r) => r.reason !== 'mdx-structure')).toBe(true);
   });
 
   // Filter precedence: ensure reported rejection reasons follow documented order
