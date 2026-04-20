@@ -373,7 +373,7 @@ const DIVISIONS: DivisionDef[] = [
   // ---- Anthropic ----
   // Team names and descriptions sourced from https://www.anthropic.com/research
   // which lists the public research teams. Division records use the exact public
-  // team names so source-check verification succeeds.
+  // team names so sourcing verification succeeds.
   {
     idSeed: "div|anthropic|alignment-science",
     parentOrgId: ORG_IDS.ANTHROPIC,
@@ -951,7 +951,7 @@ Commands:
   list                                    Show all known divisions (default)
   sync                                    Sync divisions to wiki-server Postgres
   sync --dry-run                          Preview what would be synced without writing
-  sync --force-skip-sourcing --reason=X   Bypass source-check enforcement (audit logged)
+  sync --force-skip-sourcing --reason=X   Bypass sourcing enforcement (audit logged)
   delete-orphans --id=X,Y,Z               Delete removed division records (with things cleanup)
   delete-orphans --id=X --dry-run         Preview a delete
 
