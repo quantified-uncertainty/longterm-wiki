@@ -10,17 +10,34 @@
 #   slug                  string  — matches data/entities/organizations.yaml id
 #   name                  string  — display name
 #   importance_rank       int     — 1-50 ordinal (1 = highest coverage priority).
-#                                   Rough; Ozzie-validated. Frontier labs > technical safety research >
-#                                   academic > government AISIs > policy/advocacy > field-building/funders.
-#   estimated_size_tier   enum    — coarse personnel bucket used to calibrate denominator estimation:
+#                                   Methodology: subjective coverage-value ordering as of 2026-Q2,
+#                                   weighting frontier-AI-risk relevance + active output. Clusters
+#                                   (in order): frontier labs (1-8) > technical safety research
+#                                   (9-20) > academic (21-25) > government AISIs (26-36, excl. 29)
+#                                   > policy/advocacy (29 + 37-43) > field-building/funders (44-50).
+#                                   Rough; Ozzie-validated per QUA-639 exit criteria. Expect this to
+#                                   shift after validation — the rank is a starting point, not a ruling.
+#   estimated_size_tier   enum    — coarse whole-org personnel bucket used to calibrate denominator
+#                                   estimation:
 #                                     tiny   (<10 staff)
 #                                     small  (10-50)
 #                                     medium (50-200)
 #                                     large  (200-1000)
 #                                     huge   (1000+)
 #                                   These are wiki-author intuitions, not facts; QUA-634 overwrites with
-#                                   researched estimates. Present here so the denominator command has a
-#                                   sanity-check signal and so orgs below a size floor can be fast-pathed.
+#                                   researched estimates. For multi-focus orgs (e.g. Open Philanthropy,
+#                                   Meta AI as FAIR scope) the tier is whole-org not AI-safety-specific;
+#                                   the denominator command is expected to narrow it.
+#
+# Known tradeoffs baked into this seed list:
+#   - Government AISIs (11 of 50) are over-represented relative to output — several were
+#     announced in 2024-25 with minimal confirmed staffing (Singapore, Canada, India, Australia,
+#     Korea, France). They're included for ecosystem-completeness; burst consumers should expect
+#     thin per-org denominators from these rows.
+#   - `nist-ai` is intentionally excluded — `us-aisi` is its `parentOrg` child and the safety-
+#     focused subset, so including both would double-count personnel/publications.
+#   - `pause-ai` (sid_woL5lkqLpg) is chosen over the duplicate `pauseai` (sid_qtXe9VykMz) row;
+#     the registry-side dedup is tracked separately.
 #
 # Source lists that fed this seed:
 #   - 80,000 Hours AI safety careers list
@@ -145,17 +162,21 @@ targets:
     importance_rank: 26
     estimated_size_tier: medium
   - slug: us-aisi
-    name: US AI Safety Institute
+    name: US AI Safety Institute / CAISI
     importance_rank: 27
     estimated_size_tier: small
   - slug: eu-ai-office
     name: European AI Office
     importance_rank: 28
     estimated_size_tier: medium
-  - slug: nist-ai
-    name: NIST AI (NIST AI Safety Institute)
+  # IAPS sits in the AISI/policy cluster despite being a private think tank — it's the
+  # DC-based policy-research counterpart to the government institutes. `nist-ai` was
+  # dropped here because `us-aisi` (ranked 27 above) is its parentOrg child, so both
+  # would double-count the same personnel/publications in QUA-634 denominators.
+  - slug: iaps
+    name: Institute for AI Policy and Strategy
     importance_rank: 29
-    estimated_size_tier: medium
+    estimated_size_tier: small
   - slug: japan-aisi
     name: Japan AI Safety Institute
     importance_rank: 30
