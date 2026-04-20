@@ -1,0 +1,246 @@
+# Burst Targets — Top 50 AI Safety Organizations
+#
+# Anchors the tiered defensive enrichment burst (QUA-637). Downstream consumers:
+#   - QUA-634: denominator estimation pass (per-org × record_type totals)
+#   - QUA-641: T1 saturation run across the same 50 orgs
+#   - QUA-642: T2 website corpus extraction pipeline
+#   - QUA-643: T3 subscription burst + per-org acceptance reopener
+#
+# Schema
+#   slug                  string  — matches data/entities/organizations.yaml id
+#   name                  string  — display name
+#   importance_rank       int     — 1-50 ordinal (1 = highest coverage priority).
+#                                   Rough; Ozzie-validated. Frontier labs > technical safety research >
+#                                   academic > government AISIs > policy/advocacy > field-building/funders.
+#   estimated_size_tier   enum    — coarse personnel bucket used to calibrate denominator estimation:
+#                                     tiny   (<10 staff)
+#                                     small  (10-50)
+#                                     medium (50-200)
+#                                     large  (200-1000)
+#                                     huge   (1000+)
+#                                   These are wiki-author intuitions, not facts; QUA-634 overwrites with
+#                                   researched estimates. Present here so the denominator command has a
+#                                   sanity-check signal and so orgs below a size floor can be fast-pathed.
+#
+# Source lists that fed this seed:
+#   - 80,000 Hours AI safety careers list
+#   - AlignmentForum-adjacent orgs
+#   - AIS Funding Map
+#   - EA Forum AI safety tag
+#   - Existing data/entities/organizations.yaml rows tagged `ai-safety`
+#
+# Every slug below corresponds to an existing TableBase entity row (id + stableId
+# already allocated in data/entities/organizations.yaml).
+
+targets:
+  # Frontier AI labs — highest-leverage coverage targets.
+  - slug: anthropic
+    name: Anthropic
+    importance_rank: 1
+    estimated_size_tier: huge
+  - slug: openai
+    name: OpenAI
+    importance_rank: 2
+    estimated_size_tier: huge
+  - slug: deepmind
+    name: Google DeepMind
+    importance_rank: 3
+    estimated_size_tier: huge
+  - slug: meta-ai
+    name: Meta AI
+    importance_rank: 4
+    estimated_size_tier: huge
+  - slug: xai
+    name: xAI
+    importance_rank: 5
+    estimated_size_tier: large
+  - slug: mistral-ai
+    name: Mistral AI
+    importance_rank: 6
+    estimated_size_tier: medium
+  - slug: deepseek
+    name: DeepSeek
+    importance_rank: 7
+    estimated_size_tier: medium
+  - slug: ssi
+    name: Safe Superintelligence Inc.
+    importance_rank: 8
+    estimated_size_tier: small
+
+  # Core technical AI safety research organizations.
+  - slug: miri
+    name: Machine Intelligence Research Institute
+    importance_rank: 9
+    estimated_size_tier: small
+  - slug: redwood-research
+    name: Redwood Research
+    importance_rank: 10
+    estimated_size_tier: small
+  - slug: apollo-research
+    name: Apollo Research
+    importance_rank: 11
+    estimated_size_tier: small
+  - slug: metr
+    name: METR (Model Evaluation & Threat Research)
+    importance_rank: 12
+    estimated_size_tier: small
+  - slug: far-ai
+    name: FAR AI
+    importance_rank: 13
+    estimated_size_tier: small
+  - slug: arc
+    name: Alignment Research Center
+    importance_rank: 14
+    estimated_size_tier: tiny
+  - slug: cais
+    name: Center for AI Safety
+    importance_rank: 15
+    estimated_size_tier: small
+  - slug: conjecture
+    name: Conjecture
+    importance_rank: 16
+    estimated_size_tier: small
+  - slug: palisade-research
+    name: Palisade Research
+    importance_rank: 17
+    estimated_size_tier: tiny
+  - slug: goodfire
+    name: Goodfire
+    importance_rank: 18
+    estimated_size_tier: small
+  - slug: elicit
+    name: Elicit
+    importance_rank: 19
+    estimated_size_tier: medium
+  - slug: epoch-ai
+    name: Epoch AI
+    importance_rank: 20
+    estimated_size_tier: small
+
+  # Academic AI safety centers and pipeline programs.
+  - slug: chai
+    name: Center for Human-Compatible AI (CHAI)
+    importance_rank: 21
+    estimated_size_tier: small
+  - slug: govai
+    name: Centre for the Governance of AI
+    importance_rank: 22
+    estimated_size_tier: small
+  - slug: mats
+    name: ML Alignment & Theory Scholars (MATS)
+    importance_rank: 23
+    estimated_size_tier: small
+  - slug: apart-research
+    name: Apart Research
+    importance_rank: 24
+    estimated_size_tier: small
+  - slug: cser
+    name: Centre for the Study of Existential Risk (CSER)
+    importance_rank: 25
+    estimated_size_tier: small
+
+  # Government AI Safety Institutes and NIST AI.
+  - slug: uk-aisi
+    name: UK AI Safety Institute
+    importance_rank: 26
+    estimated_size_tier: medium
+  - slug: us-aisi
+    name: US AI Safety Institute
+    importance_rank: 27
+    estimated_size_tier: small
+  - slug: eu-ai-office
+    name: European AI Office
+    importance_rank: 28
+    estimated_size_tier: medium
+  - slug: nist-ai
+    name: NIST AI (NIST AI Safety Institute)
+    importance_rank: 29
+    estimated_size_tier: medium
+  - slug: japan-aisi
+    name: Japan AI Safety Institute
+    importance_rank: 30
+    estimated_size_tier: small
+  - slug: singapore-aisi
+    name: Singapore AI Safety Institute
+    importance_rank: 31
+    estimated_size_tier: tiny
+  - slug: canada-aisi
+    name: Canadian AI Safety Institute
+    importance_rank: 32
+    estimated_size_tier: tiny
+  - slug: south-korea-aisi
+    name: Korea AI Safety Institute
+    importance_rank: 33
+    estimated_size_tier: tiny
+  - slug: france-inesia
+    name: INESIA (France)
+    importance_rank: 34
+    estimated_size_tier: tiny
+  - slug: australia-aisi
+    name: Australia AI Safety Institute
+    importance_rank: 35
+    estimated_size_tier: tiny
+  - slug: india-aisi
+    name: India AI Safety Institute
+    importance_rank: 36
+    estimated_size_tier: tiny
+
+  # Policy / advocacy / standards.
+  - slug: cset
+    name: Center for Security and Emerging Technology (CSET)
+    importance_rank: 37
+    estimated_size_tier: medium
+  - slug: fli
+    name: Future of Life Institute
+    importance_rank: 38
+    estimated_size_tier: small
+  - slug: centre-for-long-term-resilience
+    name: Centre for Long-Term Resilience
+    importance_rank: 39
+    estimated_size_tier: small
+  - slug: frontier-model-forum
+    name: Frontier Model Forum
+    importance_rank: 40
+    estimated_size_tier: tiny
+  - slug: controlai
+    name: ControlAI
+    importance_rank: 41
+    estimated_size_tier: tiny
+  - slug: pause-ai
+    name: PauseAI
+    importance_rank: 42
+    estimated_size_tier: small
+  - slug: saferai
+    name: SaferAI
+    importance_rank: 43
+    estimated_size_tier: tiny
+
+  # Field-building, infrastructure, and major funders.
+  - slug: horizon-institute
+    name: Horizon Institute for Public Service
+    importance_rank: 44
+    estimated_size_tier: small
+  - slug: bluedot-impact
+    name: BlueDot Impact
+    importance_rank: 45
+    estimated_size_tier: small
+  - slug: lightcone-infrastructure
+    name: Lightcone Infrastructure
+    importance_rank: 46
+    estimated_size_tier: tiny
+  - slug: 80000-hours
+    name: 80,000 Hours
+    importance_rank: 47
+    estimated_size_tier: medium
+  - slug: open-philanthropy
+    name: Open Philanthropy
+    importance_rank: 48
+    estimated_size_tier: medium
+  - slug: center-on-long-term-risk
+    name: Center on Long-Term Risk
+    importance_rank: 49
+    estimated_size_tier: tiny
+  - slug: pivotal-research
+    name: Pivotal Research
+    importance_rank: 50
+    estimated_size_tier: tiny
