@@ -18,6 +18,7 @@ import type { Sql, CallableTransactionSql } from "../../db.js";
 import { beginTransaction } from "../../db.js";
 import { normalizeUrlForDedup } from "@longterm-wiki/url-utils";
 import { logger } from "../../logger.js";
+import { applyTruncation } from "../shared/utils.js";
 
 // ---------------------------------------------------------------------------
 // Types
@@ -61,6 +62,22 @@ export interface DedupReport {
 // requires both a config bump and a confirmation it still completes under
 // the 30s statement_timeout.
 export const RESOURCES_SCAN_CAP = 500_000;
+
+/**
+ * Thrown from `runDedup` when `apply=true` is called on a truncated scan.
+ * HTTP handlers should catch this and translate to a 409 so CLI callers get
+ * an actionable message instead of a generic 500.
+ */
+export class ScanTruncatedError extends Error {
+  readonly scanCap: number;
+  constructor(scanCap: number) {
+    super(
+      `runDedup refused: resources scan was truncated at ${scanCap} rows; raise RESOURCES_SCAN_CAP or implement chunked scanning before applying.`,
+    );
+    this.name = "ScanTruncatedError";
+    this.scanCap = scanCap;
+  }
+}
 
 export interface ClusterMergeResult {
   canonicalId: string;
@@ -188,8 +205,7 @@ export async function buildReport(
     SELECT id, url, created_at::text AS created_at FROM resources
     LIMIT ${scanCap + 1}
   `;
-  const truncated = rows.length > scanCap;
-  const scanned = truncated ? rows.slice(0, scanCap) : rows;
+  const { items: scanned, truncated } = applyTruncation(rows, scanCap);
 
   type Row = { id: string; url: string; createdAt: string };
   const groups = new Map<string, Row[]>();
@@ -370,9 +386,7 @@ export async function runDedup(
   // Refuse apply=true when the scan was truncated. Clusters past the cutoff
   // would silently survive — raise RESOURCES_SCAN_CAP or chunk the scan.
   if (report.truncated) {
-    throw new Error(
-      `runDedup refused: resources scan was truncated at ${scanCap} rows; raise RESOURCES_SCAN_CAP or implement chunked scanning before applying.`,
-    );
+    throw new ScanTruncatedError(scanCap);
   }
 
   const rowsToDelete = report.clusters.reduce(

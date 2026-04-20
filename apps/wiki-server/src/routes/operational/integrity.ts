@@ -1,6 +1,7 @@
 import { Hono } from "hono";
 import { sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
+import { applyTruncation } from "../shared/utils.js";
 
 interface IntegrityIssue {
   table: string;
@@ -34,14 +35,13 @@ async function checkDangling(
   const capped = sql`${query} LIMIT ${MAX_MISSING_REFS + 1}`;
   const rows = (await db.execute(capped)) as Array<{ ref: string }>;
   if (rows.length === 0) return null;
-  const truncated = rows.length > MAX_MISSING_REFS;
-  const refs = truncated ? rows.slice(0, MAX_MISSING_REFS) : rows;
+  const { items, truncated } = applyTruncation(rows, MAX_MISSING_REFS);
   return {
     table,
     column,
     target_table: targetTable,
-    missing_refs: refs.map((r) => r.ref),
-    count: refs.length,
+    missing_refs: items.map((r) => r.ref),
+    count: items.length,
     truncated,
   };
 }

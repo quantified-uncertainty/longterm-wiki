@@ -48,6 +48,25 @@ export function noDuplicateIds(items: { id: string }[]) {
   return new Set(items.map((i) => i.id)).size === items.length;
 }
 
+/**
+ * Apply the "+1 sentinel → slice + flag" truncation pattern to a row set.
+ *
+ * Callers should `.limit(cap + 1)` the query so the sentinel fires cleanly
+ * when rows exceed the cap, then pass the resulting rows here. Returns the
+ * capped `items` array plus a `truncated` flag for the response body.
+ *
+ * Prefer this over hand-rolling the slice-and-flag — multiple sites across
+ * the codebase (resource-dedup, integrity, entity-resources, resources,
+ * entity-profile) do the same thing.
+ */
+export function applyTruncation<T>(
+  rows: T[],
+  cap: number,
+): { items: T[]; truncated: boolean } {
+  const truncated = rows.length > cap;
+  return { items: truncated ? rows.slice(0, cap) : rows, truncated };
+}
+
 /** Standard error codes for 400 responses. */
 export const VALIDATION_ERROR = "validation_error" as const;
 export const INVALID_JSON_ERROR = "invalid_json" as const;

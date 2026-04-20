@@ -25,6 +25,7 @@ import {
   mergeCluster,
   buildReport,
   runDedup,
+  ScanTruncatedError,
   type FkColumnInfo,
 } from "../routes/wikibase/resource-dedup.js";
 import type { Sql } from "../db.js";
@@ -174,12 +175,15 @@ describe("runDedup — QUA-623 refuse-on-truncated guard", () => {
     expect(result.errors).toEqual([]);
   });
 
-  it("throws when apply=true and the scan was truncated", async () => {
+  it("throws ScanTruncatedError when apply=true and the scan was truncated", async () => {
     const rows = Array.from({ length: 4 }, (_, i) => ({
       id: `r${i}`,
       url: `https://x.test/${i}`,
       created_at: "2024-01-01",
     }));
+    await expect(runDedup(makeFakeSql(rows), true, { scanCap: 3 })).rejects.toBeInstanceOf(
+      ScanTruncatedError,
+    );
     await expect(runDedup(makeFakeSql(rows), true, { scanCap: 3 })).rejects.toThrow(
       /scan was truncated/,
     );

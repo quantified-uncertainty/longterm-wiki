@@ -6,6 +6,7 @@ import { entityResources, resources } from "../../schema.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import { applyTruncation } from "../shared/utils.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- QUA-470 Phase 4b-B.1: entity-resource composer ----
@@ -213,8 +214,7 @@ const entityResourcesApp = new Hono()
       })
       .from(entityResources)
       .limit(EXPORT_LIMIT + 1);
-    const truncated = rows.length > EXPORT_LIMIT;
-    const items = truncated ? rows.slice(0, EXPORT_LIMIT) : rows;
+    const { items, truncated } = applyTruncation(rows, EXPORT_LIMIT);
 
     return c.json({
       items,
