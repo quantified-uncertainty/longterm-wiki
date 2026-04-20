@@ -1,0 +1,492 @@
+{
+  "runAt": "2026-04-20T04:01:09.185Z",
+  "corpus": {
+    "total": 100,
+    "knownTrue": 50,
+    "knownFalse": 50
+  },
+  "models": {
+    "haiku": {
+      "model": "haiku",
+      "modelId": "claude-haiku-4-5-20251001",
+      "itemsProcessed": 100,
+      "totalCostUsd": 0.44669100000000006,
+      "costPerItemUsd": 0.004466910000000001,
+      "avgLatencyMs": 3127.13,
+      "recallStrict": 0.92,
+      "recallLoose": 0.98,
+      "falseConfirmStrict": 0,
+      "falseConfirmLoose": 0.04,
+      "precisionStrict": 1,
+      "knownTrueVerdicts": {
+        "n": 50,
+        "confirmed": 46,
+        "contradicted": 0,
+        "unverifiable": 0,
+        "partial": 3,
+        "outdated": 0,
+        "error": 1,
+        "strictConfirmRate": 0.92,
+        "looseConfirmRate": 0.98,
+        "quoteFidelityHit": 37,
+        "quoteFidelityN": 49,
+        "costUsd": 0.22312799999999997,
+        "avgLatencyMs": 3294.18
+      },
+      "knownFalseVerdicts": {
+        "n": 50,
+        "confirmed": 0,
+        "contradicted": 48,
+        "unverifiable": 0,
+        "partial": 2,
+        "outdated": 0,
+        "error": 0,
+        "strictConfirmRate": 0,
+        "looseConfirmRate": 0.04,
+        "quoteFidelityHit": 30,
+        "quoteFidelityN": 50,
+        "costUsd": 0.22356299999999993,
+        "avgLatencyMs": 2847.7
+      },
+      "perType": {
+        "personnel": {
+          "true": {
+            "n": 20,
+            "confirmed": 18,
+            "contradicted": 0,
+            "unverifiable": 0,
+            "partial": 2,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0.9,
+            "looseConfirmRate": 1,
+            "quoteFidelityHit": 11,
+            "quoteFidelityN": 20,
+            "costUsd": 0.072774,
+            "avgLatencyMs": 2803.8
+          },
+          "false": {
+            "n": 20,
+            "confirmed": 0,
+            "contradicted": 20,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0,
+            "quoteFidelityHit": 12,
+            "quoteFidelityN": 20,
+            "costUsd": 0.072218,
+            "avgLatencyMs": 2680.95
+          }
+        },
+        "publication": {
+          "true": {
+            "n": 15,
+            "confirmed": 14,
+            "contradicted": 0,
+            "unverifiable": 0,
+            "partial": 1,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0.9333333333333333,
+            "looseConfirmRate": 1,
+            "quoteFidelityHit": 13,
+            "quoteFidelityN": 15,
+            "costUsd": 0.077593,
+            "avgLatencyMs": 3847.6666666666665
+          },
+          "false": {
+            "n": 15,
+            "confirmed": 0,
+            "contradicted": 13,
+            "unverifiable": 0,
+            "partial": 2,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0.13333333333333333,
+            "quoteFidelityHit": 8,
+            "quoteFidelityN": 15,
+            "costUsd": 0.07622,
+            "avgLatencyMs": 2982.4
+          }
+        },
+        "funding-round": {
+          "true": {
+            "n": 15,
+            "confirmed": 14,
+            "contradicted": 0,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 1,
+            "strictConfirmRate": 0.9333333333333333,
+            "looseConfirmRate": 0.9333333333333333,
+            "quoteFidelityHit": 13,
+            "quoteFidelityN": 14,
+            "costUsd": 0.072761,
+            "avgLatencyMs": 3394.5333333333333
+          },
+          "false": {
+            "n": 15,
+            "confirmed": 0,
+            "contradicted": 15,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0,
+            "quoteFidelityHit": 10,
+            "quoteFidelityN": 15,
+            "costUsd": 0.07512499999999998,
+            "avgLatencyMs": 2935.3333333333335
+          }
+        }
+      },
+      "quoteFidelityRateTrue": 0.7551020408163265,
+      "quoteFidelityRateFalse": 0.6
+    },
+    "sonnet": {
+      "model": "sonnet",
+      "modelId": "claude-sonnet-4-6",
+      "itemsProcessed": 100,
+      "totalCostUsd": 1.3680719999999997,
+      "costPerItemUsd": 0.013680719999999997,
+      "avgLatencyMs": 5533.24,
+      "recallStrict": 0.64,
+      "recallLoose": 0.94,
+      "falseConfirmStrict": 0,
+      "falseConfirmLoose": 0,
+      "precisionStrict": 1,
+      "knownTrueVerdicts": {
+        "n": 50,
+        "confirmed": 32,
+        "contradicted": 3,
+        "unverifiable": 0,
+        "partial": 15,
+        "outdated": 0,
+        "error": 0,
+        "strictConfirmRate": 0.64,
+        "looseConfirmRate": 0.94,
+        "quoteFidelityHit": 39,
+        "quoteFidelityN": 50,
+        "costUsd": 0.693123,
+        "avgLatencyMs": 6003.6
+      },
+      "knownFalseVerdicts": {
+        "n": 50,
+        "confirmed": 0,
+        "contradicted": 50,
+        "unverifiable": 0,
+        "partial": 0,
+        "outdated": 0,
+        "error": 0,
+        "strictConfirmRate": 0,
+        "looseConfirmRate": 0,
+        "quoteFidelityHit": 34,
+        "quoteFidelityN": 50,
+        "costUsd": 0.674949,
+        "avgLatencyMs": 5062.88
+      },
+      "perType": {
+        "personnel": {
+          "true": {
+            "n": 20,
+            "confirmed": 13,
+            "contradicted": 1,
+            "unverifiable": 0,
+            "partial": 6,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0.65,
+            "looseConfirmRate": 0.95,
+            "quoteFidelityHit": 10,
+            "quoteFidelityN": 20,
+            "costUsd": 0.21799199999999994,
+            "avgLatencyMs": 5158.2
+          },
+          "false": {
+            "n": 20,
+            "confirmed": 0,
+            "contradicted": 20,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0,
+            "quoteFidelityHit": 11,
+            "quoteFidelityN": 20,
+            "costUsd": 0.21240900000000001,
+            "avgLatencyMs": 4255.6
+          }
+        },
+        "publication": {
+          "true": {
+            "n": 15,
+            "confirmed": 7,
+            "contradicted": 1,
+            "unverifiable": 0,
+            "partial": 7,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0.4666666666666667,
+            "looseConfirmRate": 0.9333333333333333,
+            "quoteFidelityHit": 14,
+            "quoteFidelityN": 15,
+            "costUsd": 0.24206400000000003,
+            "avgLatencyMs": 7204.866666666667
+          },
+          "false": {
+            "n": 15,
+            "confirmed": 0,
+            "contradicted": 15,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0,
+            "quoteFidelityHit": 8,
+            "quoteFidelityN": 15,
+            "costUsd": 0.233775,
+            "avgLatencyMs": 5924.666666666667
+          }
+        },
+        "funding-round": {
+          "true": {
+            "n": 15,
+            "confirmed": 12,
+            "contradicted": 1,
+            "unverifiable": 0,
+            "partial": 2,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0.8,
+            "looseConfirmRate": 0.9333333333333333,
+            "quoteFidelityHit": 15,
+            "quoteFidelityN": 15,
+            "costUsd": 0.23306700000000002,
+            "avgLatencyMs": 5929.533333333334
+          },
+          "false": {
+            "n": 15,
+            "confirmed": 0,
+            "contradicted": 15,
+            "unverifiable": 0,
+            "partial": 0,
+            "outdated": 0,
+            "error": 0,
+            "strictConfirmRate": 0,
+            "looseConfirmRate": 0,
+            "quoteFidelityHit": 15,
+            "quoteFidelityN": 15,
+            "costUsd": 0.228765,
+            "avgLatencyMs": 5277.466666666666
+          }
+        }
+      },
+      "quoteFidelityRateTrue": 0.78,
+      "quoteFidelityRateFalse": 0.68
+    }
+  },
+  "interModelAgreementRate": 0.8282828282828283,
+  "failures": [
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-m5VWwvls1v",
+      "label": "true",
+      "description": "Noah Tan — James C. Gaither Junior Fellow at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly confirms all key fields of the record. Noah Tan is listed in the Program Staff section with the exact title 'James C. Gaither Junior Fellow, Technology and International Affairs Program' at the Carnegie Endowment for International Peace. The organization is confirmed as 'Carnegie Endowment for International Peace' (with the specific program being Technology and International Affairs, which is part of the AI Program mentioned in the record). The role 'James C. Gaither Junior Fellow' is explicitly stated. The roleType 'career' is a reasonable classification for this fellowship position and is not contradicted by the source.",
+      "sonnetReasoning": "The source confirms that Noah Tan holds the role of James C. Gaither Junior Fellow at Carnegie Endowment for International Peace, and that this role is within the Technology and International Affairs Program. However, the record claims the organization is specifically the 'AI Program,' while the source clearly states it is the 'Technology and International Affairs Program' — a broader program that covers AI, cybersecurity, biotechnology, and the information environment. The role and person are confirmed, but the specific sub-program label 'AI Program' is not supported by the source text.",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-n52KZ9ERBI",
+      "label": "true",
+      "description": "Arthur Nelson — Co-Director at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text explicitly lists 'Arthur Nelson' under 'Co-Director, Technology and International Affairs Program' with the description 'Arthur Nelson is co-director of Carnegie's Technology and International Affairs Program.' This directly confirms all key fields in the record: person (Arthur Nelson), organization (Carnegie Endowment for International Peace, specifically the Technology and International Affairs Program), role (Co-Director), and roleType (key-person). The only minor discrepancy is that the record specifies 'Carnegie Endowment for International Peace AI Program' while the source refers to the 'Technology and International Affairs Program' which covers AI as one of four focus areas. However, this is a reasonable organizational naming variation and does not contradict the core claim.",
+      "sonnetReasoning": "The source confirms that Arthur Nelson is Co-Director of the Technology and International Affairs Program at Carnegie Endowment for International Peace. However, the record claims his role is specifically 'Co-Director at Carnegie Endowment for International Peace AI Program,' which is inaccurate in its naming — the program is called the 'Technology and International Affairs Program,' not the 'AI Program.' The program does focus on AI among other areas (cybersecurity, biotechnology, information environment), but calling it the 'AI Program' is a mischaracterization of the program's name. The person, organization, and role type are otherwise confirmed, but the organization/program name in the record is imprecise.",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-xy9kTV5rtL",
+      "label": "true",
+      "description": "Alejandro N. Mayorkas — Visiting Scholar at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "partial",
+      "sonnetVerdict": "contradicted",
+      "haikuReasoning": "The source confirms that Alejandro N. Mayorkas is a Visiting Scholar at Carnegie Endowment for International Peace. However, the source lists him simply as 'Visiting Scholar' under the Technology and International Affairs Program staff section, without explicitly stating he is a 'Visiting Scholar at Carnegie Endowment for International Peace AI Program.' The source text shows he is affiliated with the Technology and International Affairs Program (which covers AI among other areas), not specifically an 'AI Program.' The record's specification of 'AI Program' is more narrow than what the source indicates. The role and person are confirmed, but the organizational unit specification in the record is not fully supported by the source text.",
+      "sonnetReasoning": "The source confirms that Mayorkas is a Visiting Scholar at the Carnegie Endowment for International Peace, but he is listed under the 'Technology and International Affairs Program' staff section — not specifically the 'AI Program'. His bio does not specify any sub-program affiliation, and unlike other staff members (e.g., Anton Leicht who is explicitly described as researching AI), Mayorkas's description makes no mention of AI. The record claims his organization is 'Carnegie Endowment for International Peace AI Program', but the source does not support this specific sub-program designation. The program is called 'Technology and International Affairs Program', not 'AI Program'. This is a meaningful inaccuracy in the organization field, making the record contradicted on that specific claim.",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-7AAnTrXfNN",
+      "label": "true",
+      "description": "Thom Crockett — Program Manager at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly lists 'Thom Crockett' with the title 'Program Manager, Technology and International Affairs Program' under the Program Staff section. The record claims he is a 'Program Manager at Carnegie Endowment for International Peace AI Program'. The source confirms the person name, organization (Carnegie Endowment for International Peace), and role (Program Manager). The only minor discrepancy is that the source refers to the 'Technology and International Affairs Program' rather than 'AI Program' specifically, but the Technology and International Affairs Program explicitly covers AI as one of its four focus areas, so this is not a contradiction—it's a more specific vs. general naming convention. The roleType 'career' is reasonable for a Program Manager position and is not contradicted by the source.",
+      "sonnetReasoning": "The source confirms that Thom Crockett holds the role of 'Program Manager' at Carnegie Endowment for International Peace, but the program is listed as 'Technology and International Affairs Program' — not specifically the 'AI Program' as claimed in the record. The Technology and International Affairs Program covers four areas (AI, information environment, cybersecurity, and biotechnology), so calling it the 'AI Program' is an inaccurate narrowing of the actual program name. The person, organization, and role type (career) are consistent with the source, but the specific program name in the record is incorrect/imprecise.",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-YsXk2ZVDUf",
+      "label": "true",
+      "description": "Isabella Wright — Program Coordinator at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text explicitly lists 'Isabella Wright' with the title 'Program Coordinator, Technology and International Affairs' at the Carnegie Endowment for International Peace. The record claims she is a 'Program Coordinator at Carnegie Endowment for International Peace AI Program'. The source confirms her name, role title, and organization. The record specifies 'AI Program' as a sub-program, while the source lists her under 'Technology and International Affairs Program' which encompasses AI as one of four focus areas. This is a minor organizational specificity difference but does not contradict the core facts—she is indeed a Program Coordinator at Carnegie Endowment for International Peace working in a program that covers AI.",
+      "sonnetReasoning": "The source confirms that Isabella Wright holds the role of Program Coordinator at the Carnegie Endowment for International Peace's Technology and International Affairs Program. However, the record specifies 'AI Program' as the organization, which is inaccurate — the correct program name is 'Technology and International Affairs Program,' which covers AI, cybersecurity, information environment, and biotechnology. The role title 'Program Coordinator' is confirmed, and the person's name is confirmed. The roleType of 'career' is not addressed by the source but is a reasonable inference. The main discrepancy is the narrowing of the program to 'AI Program' when it is actually the broader 'Technology and International Affairs Program.'",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-personnel-4QpUpeeRvv",
+      "label": "true",
+      "description": "Alicia Wanless — Senior Fellow and Director, Information Environment Project at Carnegie Endowment for International Peace AI Program",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly lists Alicia Wanless with the title 'Senior Fellow, Technology and International Affairs, Director, Information Environment Project' at Carnegie Endowment for International Peace. The record claims she is a 'Senior Fellow and Director, Information Environment Project at Carnegie Endowment for International Peace AI Program.' The source confirms her role as Senior Fellow and Director of the Information Environment Project at Carnegie. The only minor discrepancy is that the source lists her under 'Technology and International Affairs Program' rather than 'AI Program,' but the source text explicitly states that AI is one of four focus areas within the Technology and International Affairs Program, making this a matter of organizational hierarchy rather than a contradiction. All key facts are confirmed.",
+      "sonnetReasoning": "The source confirms Alicia Wanless's person, organization (Carnegie Endowment for International Peace), role as Senior Fellow and Director of the Information Environment Project, and roleType as key-person. However, the record claims her organization unit is the 'AI Program,' while the source places her in the 'Technology and International Affairs Program' — a broader program that covers AI, the information environment, cybersecurity, and biotechnology. The record's attribution to specifically the 'AI Program' is inaccurate; she belongs to the Technology and International Affairs Program. This is a partial match: the person, role title, and organization are confirmed, but the specific program/unit name is incorrect.",
+      "sourceUrl": "https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-nAmNFgpTRD",
+      "label": "true",
+      "description": "\"Military Applications of AI: Ethical Concerns in an Uncertain World\" by Forrest E. Morgan, Benjamin Boudreaux, Andrew J. Lohn, Mark Ashby, Christian Curriden, Kelly Klima, Derek Grossman (2020)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "contradicted",
+      "haikuReasoning": "All key fields in the record are directly confirmed by the source text. The title matches exactly (with minor capitalization variation in 'Artificial Intelligence' vs 'AI' in the record, which is acceptable). All seven authors are listed in the correct order. The publication date of 2020 is confirmed (published Apr 28, 2020). The publication type is confirmed as a research report from RAND Corporation. No contradictions or discrepancies were found.",
+      "sonnetReasoning": "The record's title field states 'Military Applications of AI: Ethical Concerns in an Uncertain World', omitting the word 'Artificial Intelligence' and abbreviating it as 'AI'. The source text consistently uses the full title 'Military Applications of Artificial Intelligence: Ethical Concerns in an Uncertain World' throughout (in the page heading, the citation, and the document details). While this is a minor difference, the title as claimed does not match the actual title. All other fields (authors, publishedDate: 2020, publicationType: report) are confirmed by the source.",
+      "sourceUrl": "https://www.rand.org/pubs/research_reports/RR3139-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-GWzE7Is0Cp",
+      "label": "true",
+      "description": "\"AI and the Future of Work\" by Tobias Sytsma, Melanie Zaber, Rachel Slama (2024)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly. All three authors are listed in the correct order (Tobias Sytsma, Melanie A. Zaber, Rachel Slama). The publication date is confirmed as 2024 (specifically Dec 18, 2024). The publication type is confirmed as a presentation/report—the source explicitly states 'This publication is part of the RAND presentation series' and categorizes it under 'Presentations.' All structured data fields are accurate and verifiable from the source.",
+      "sonnetReasoning": "The source confirms the title ('AI and the Future of Work'), authors (Tobias Sytsma, Melanie A. Zaber, Rachel Slama — note middle initial 'A.' for Zaber, which is a minor difference), and published date (2024, specifically Dec 18, 2024). However, the publicationType field is listed as 'report' in the record, while the source clearly identifies it as a 'presentation' (document number PT-A2655-1, part of the RAND presentation series, and labeled as a 'Video'). This is a meaningful discrepancy — the source says 'presentation', not 'report' — making the record partially correct but wrong on publicationType.",
+      "sourceUrl": "https://www.rand.org/pubs/presentations/PTA2655-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-amBuPandy0",
+      "label": "true",
+      "description": "\"Generative AI Threats to Information Integrity\" by Todd C. Helmus, Bilva Chandra (2024-04)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly (with the record using a shortened version that is accurate). Both authors are confirmed. The publication date is April 2024 (2024-04), matching the source's 'Published Apr 16, 2024'. The publication type is confirmed as a report—specifically a RAND Expert Insights perspective, which is a type of report publication. All verifiable claims in the record are supported by the source.",
+      "sonnetReasoning": "The source confirms the authors (Todd C. Helmus, Bilva Chandra), the published date (April 2024), and the general subject matter. However, the title in the record is slightly truncated — the record says 'Generative AI Threats to Information Integrity' while the source gives the full title as 'Generative Artificial Intelligence Threats to Information Integrity and Potential Policy Responses'. Additionally, the publication type in the record is listed as 'report', but the source identifies it as part of the 'Expert Insights' series (document number PE-A3089-1), which is a perspectives/expert insights publication rather than a formal report. These discrepancies make the verdict 'partial' rather than fully confirmed.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3089-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-sCuNiiPdvG",
+      "label": "true",
+      "description": "\"AI Legislation Scorecard\" by Kara Williams, EPIC (2024-06)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text confirms all key fields in the record. The title 'AI Legislation Scorecard' is explicitly stated. Kara Williams is identified as an 'EPIC Fellow' who moderated the launch webinar on June 25, 2024, confirming her authorship and EPIC affiliation. The publication date of 2024-06 (June 2024) is confirmed by the webinar date of June 25, 2024. The publication type as 'report' is appropriate given the source describes it as 'a tool' and 'a rubric' for evaluating AI bills, which aligns with report classification. All claimed fields are directly supported by the source text.",
+      "sonnetReasoning": "The title ('AI Legislation Scorecard'), publisher (EPIC), date (June 2024, confirmed by the June 25, 2024 webinar), and publication type (scorecard/report) are all confirmed. However, the author attribution is partially off: Kara Williams is identified in the source as an 'EPIC Fellow' who moderated the launch webinar, not explicitly as the author of the scorecard. The scorecard is attributed to EPIC as an organization ('EPIC set out to create a tool...'), with Kara Williams playing a prominent role. Listing 'Kara Williams, EPIC' as authors is plausible but not directly confirmed — the source doesn't explicitly credit her as the author of the document itself.",
+      "sourceUrl": "https://epic.org/aiscorecard/"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-pN8DT6RpEJ",
+      "label": "true",
+      "description": "\"Bridging the AI Governance Gap: US and China's Divergent Approaches\" by Oliver Guest, Kevin Wei (2024-12)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text confirms all key fields in the record. The title matches (with minor wording variation: 'Artificial Intelligence' vs 'AI', and 'Governing' vs 'Approaches to Governing', but these are substantively equivalent). Authors Oliver Guest and Kevin Wei are confirmed. The publication date is confirmed as December 2024 (2024-12). The publication type is confirmed as a report/expert insight from RAND Corporation. All core metadata aligns with the source document.",
+      "sonnetReasoning": "The source confirms the authors (Oliver Guest, Kevin Wei), the publication date (December 2024), and the general subject matter. However, there are two discrepancies worth noting: (1) The title in the record is shortened/paraphrased as 'Bridging the AI Governance Gap: US and China's Divergent Approaches' while the actual title is 'Bridging the Artificial Intelligence Governance Gap: The United States' and China's Divergent Approaches to Governing General-Purpose Artificial Intelligence' — this is an abbreviated version, not a contradiction per se, but not exact. (2) The publication type is listed as 'report' in the record, but the source identifies it as an 'Expert Insights' publication (part of the RAND expert insights series), which is a distinct RAND publication type from a full report. These differences make this a partial confirmation rather than full confirmation.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3703-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-5WkxjXc1DJ",
+      "label": "true",
+      "description": "\"Building a US National Strategy for the AI Era\" by Michael J. Mazarr, Anca Agachi (2025-11)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly (with the full subtitle present in source). Both authors are correctly listed. The publication date is confirmed as November 2025 (source states 'Published Nov 17, 2025'; record shows '2025-11' which is the same month-year). The publication type is confirmed as a report—the source identifies it as part of 'RAND expert insights series' which presents perspectives on policy issues, consistent with the 'report' classification. All verifiable fields match the source material.",
+      "sonnetReasoning": "The source confirms the authors (Michael J. Mazarr and Anca Agachi), the published date (November 2025, specifically Nov 17, 2025), and the general publication type as a RAND research document. However, there are two minor discrepancies: (1) The title in the record is shortened ('Building a US National Strategy for the AI Era') compared to the full title in the source ('Building a U.S. National Strategy for the Artificial Intelligence Era: Drawing Lessons from Six Archetypal Strategies') — this is an abbreviation, not a contradiction, but it is incomplete. (2) The publication type is listed as 'report' in the record, but the source identifies it as an 'Expert Insights' publication in the RAND Perspectives (PE) series, which is a distinct RAND publication type from a full report. This makes the publicationType field a partial mismatch — not entirely wrong (it is a research publication) but not precisely accurate.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4297-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-publication-E4ByIZbQGh",
+      "label": "true",
+      "description": "\"Understanding the AI Diffusion Framework\" by Lennart Heim (2025-01)",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source text directly confirms all key fields in the record. The title matches exactly: 'Understanding the Artificial Intelligence Diffusion Framework'. The author is confirmed as 'Lennart Heim'. The publication date is confirmed as January 2025 (source states 'Published Jan 14, 2025', which matches the claimed '2025-01'). The publication type is confirmed as a report—specifically labeled as 'Expert Insights' and 'Perspectives' (PE-A3776-1) by RAND, which is a research report format. All four key fields are directly supported by the source.",
+      "sonnetReasoning": "The author (Lennart Heim), publication date (January 2025), and general subject matter are confirmed. However, the record's title field ('Understanding the AI Diffusion Framework') is a shortened version of the full title ('Understanding the Artificial Intelligence Diffusion Framework: Can Export Controls Create a U.S.-Led Global Artificial Intelligence Ecosystem?'). More importantly, the publication type is listed as 'report' in the record, but the source text clearly labels it as 'Expert Insights' (a RAND-specific publication category, not a report). This is a meaningful discrepancy in publication type, making the record only partially confirmed.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA3776-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "F-publication-KPYiPyEzG0",
+      "label": "false",
+      "description": "\"The Artificial General Intelligence Race and International Security\" by Geoffrey Hinton, Yoshua Bengio (2025-09) — RAND",
+      "haikuVerdict": "partial",
+      "sonnetVerdict": "contradicted",
+      "haikuReasoning": "The record claims Geoffrey Hinton and Yoshua Bengio as authors, but the source identifies the publication as 'Edited by' Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with Contributors listed as Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Hinton and Bengio are not mentioned anywhere in the source text. The title, venue (RAND), and publication date (2025-09, confirmed as September 24, 2025) are correct. The publication type is confirmed as a report/expert insights. However, the authorship claim is fundamentally incorrect—the record lists the wrong authors entirely.",
+      "sonnetReasoning": "The record claims the authors are Geoffrey Hinton and Yoshua Bengio, but the source text clearly shows the publication was edited by Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with contributors Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Geoffrey Hinton and Yoshua Bengio are not mentioned anywhere in the source. The title (confirmed), venue/publisher RAND (confirmed), date September 2025 (confirmed), and publication type as a report/perspectives document (confirmed) are all accurate, but the authors field is directly contradicted by the source.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4155-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "F-publication-DQX7mNWbYx",
+      "label": "false",
+      "description": "\"The Artificial General Intelligence Race and International Security\" by Geoffrey Hinton, Yoshua Bengio (2025-09)",
+      "haikuVerdict": "partial",
+      "sonnetVerdict": "contradicted",
+      "haikuReasoning": "The title and publication date (2025-09) are confirmed. However, the authors field is incomplete and inaccurate. The source lists this as an edited collection with editors (Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, Joel B. Predd) and contributors (Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, Tristan A. Volpe), not authored by Geoffrey Hinton and Yoshua Bengio. Neither Hinton nor Bengio appear anywhere in the source document. The publication type is listed as 'Expert Insights' (a RAND series), not generically as 'report,' though 'report' is a reasonable categorization. The record's author attribution is fundamentally incorrect.",
+      "sonnetReasoning": "The record claims the authors are Geoffrey Hinton and Yoshua Bengio, but the source text clearly shows the publication was edited by Jim Mitre, Michael C. Horowitz, Natalia Henry, Emma Borden, and Joel B. Predd, with contributors Sarah Kreps, Miles Brundage, James D. Fearon, Karl P. Mueller, Jane Vaynman, and Tristan A. Volpe. Geoffrey Hinton and Yoshua Bengio are not mentioned anywhere in the source. The title ('The Artificial General Intelligence Race and International Security'), publication date (September 2025), and publication type (report/perspectives) are confirmed, but the authors field is directly contradicted. The publication type 'report' is close enough to RAND's 'Expert Insights' / 'Perspectives' series to be considered partial, but the author attribution is clearly and directly wrong.",
+      "sourceUrl": "https://www.rand.org/pubs/perspectives/PEA4155-1.html"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-funding-round-L9bLeqvxdU",
+      "label": "true",
+      "description": "Algorithmic Justice League — Rockefeller Foundation Grant - Algorithmic Vulnerability Bounty (2020-07), raised $150,000",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source directly confirms all key fields: company (Algorithmic Justice League), amount ($150,000), date (07.01.2020, which matches 2020-07), lead investor (Rockefeller Foundation), instrument (grant), and round name (Algorithmic Vulnerability Bounty). The description matches the stated purpose. All data points align precisely with the record.",
+      "sonnetReasoning": "The source confirms the amount ($150,000), the date (July 2020 start), the lead investor (Rockefeller Foundation), the instrument (grant), and the connection to the Algorithmic Justice League's Algorithmic Vulnerability Bounty. However, the grant is technically made to the 'New Venture Fund' (a fiscal sponsor), not directly to the Algorithmic Justice League. The record lists the company as 'Algorithmic Justice League,' which is accurate in spirit but the legal grantee is New Venture Fund. The round name and description are well-supported. This is a partial confirmation because the direct recipient organization differs slightly from what the record states.",
+      "sourceUrl": "https://www.rockefellerfoundation.org/grant/grant-new-venture-fund-2020-8/"
+    },
+    {
+      "kind": "disagreement",
+      "itemId": "T-funding-round-m5vzQLVwAu",
+      "label": "true",
+      "description": "American Civil Liberties Union (ACLU) — Ford Foundation - Social Bond Grant (2020-10), raised $8,000,000",
+      "haikuVerdict": "confirmed",
+      "sonnetVerdict": "partial",
+      "haikuReasoning": "The source confirms all key fields: (1) the recipient is the ACLU Foundation (ACLUF), which is the ACLU's grantee entity; (2) the amount is $8,000,000, matching exactly; (3) the date is October 2020, matching the claimed 2020-10; (4) the lead investor/funder is the Ford Foundation (evident from the source being Ford Foundation's grants database); (5) the instrument is 'Social Bond' as stated in the source. The only minor naming variation is 'American Civil Liberties Union Foundation (ACLUF)' vs 'American Civil Liberties Union (ACLU)' in the record, but this is a standard legal entity naming convention and does not contradict the claim. All material facts are confirmed.",
+      "sonnetReasoning": "The source confirms the grantee (ACLUF, which is the foundation arm of the ACLU), the amount ($8,000,000), the date (October 2020), and the grant type (Social Bond). However, the record names the company as 'American Civil Liberties Union (ACLU)' while the source specifies 'American Civil Liberties Union Foundation (ACLUF)' — these are related but legally distinct entities. The round name 'Ford Foundation - Social Bond Grant' is a reasonable characterization combining the funder (Ford Foundation, implied by the source being Ford Foundation's grants database) and grant type (Social Bond), though the source doesn't use that exact combined label. The instrument as 'grant' aligns with the Social Bond grant type. The lead investor as Ford Foundation is consistent with the source context (Ford Foundation's own grants database). Overall, the core financial details are confirmed, but the entity name distinction (ACLU vs. ACLUF) introduces a minor discrepancy warranting a 'partial' verdict.",
+      "sourceUrl": "https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/american-civil-liberties-union-foundation-acluf-138950/"
+    }
+  ],
+  "failureSummary": {
+    "haikuFalseConfirms": 0,
+    "sonnetFalseConfirms": 0,
+    "haikuMissedConfirms": 0,
+    "disagreements": 17
+  }
+}
