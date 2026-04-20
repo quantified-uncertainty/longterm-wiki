@@ -168,6 +168,28 @@ test.describe("Render audit — critical data tables", () => {
     expect(text).toContain("Stakeholder");
     // Valuation should be formatted (e.g., "$380B"), not raw
     expect(text).toMatch(/\$\d+(?:\.\d+)?[BMT]/);
+
+    // Regression check: editorial columns (Category, Pledge %, EA Align %)
+    // must populate for stakeholders with wiki entities. Previously broken
+    // when the equity-positions record sent holderEntityId (sid_) instead
+    // of the slug — every per-founder lookup into PLEDGE_RATES missed and
+    // only the Employee Equity Pool row kept its data.
+    //
+    // Only asserted when the stakeholder table actually populated. In PR CI
+    // `build-data.mjs` runs without LONGTERMWIKI_SERVER_URL, so the table
+    // renders its "No equity position data available" fallback and there's
+    // nothing to verify. Against prod or a locally-hydrated dev build, the
+    // table has data and the assertions fire.
+    const hasData = !text.includes("No equity position data available");
+    if (hasData) {
+      // Scope to the stakeholder table via "Totals (pledged stakeholders)" —
+      // a unique footer string; a second "Dario Amodei" row exists in the
+      // markdown-rendered Founder Donation Pledges table below.
+      const stakeholderTable = page.locator("table").filter({ hasText: "Totals (pledged stakeholders)" });
+      const dariorowText = (await stakeholderTable.locator("tr", { hasText: "Dario Amodei" }).first().textContent()) ?? "";
+      expect(dariorowText, "Dario Amodei row should show 'Co-founder' category").toContain("Co-founder");
+      expect(dariorowText, "Dario Amodei row should not be all em-dashes in editorial columns").toMatch(/80%/);
+    }
   });
 });
 
