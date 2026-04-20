@@ -12,6 +12,11 @@ describe('wiki-server/client', () => {
 
   beforeEach(async () => {
     vi.restoreAllMocks();
+    // Opt out of slot auto-detection (QUA-616): if vitest runs from inside
+    // `lw/aN/`, getEnvPrefix() would auto-select PROD_ when WIKI_SERVER_ENV
+    // is unset. Setting 'local' makes these env-var tests deterministic
+    // regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     client = await import('./client.ts');
   });
 
@@ -77,7 +82,9 @@ describe('wiki-server/client', () => {
     it('getServerUrl ignores PROD_ vars without WIKI_SERVER_ENV flag', () => {
       process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3000';
       process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
-      delete process.env.WIKI_SERVER_ENV;
+      // 'local' opts out of slot auto-detection (QUA-616); without this,
+      // running the test from inside `lw/aN/` would pick PROD_ silently.
+      process.env.WIKI_SERVER_ENV = 'local';
       expect(client.getServerUrl()).toBe('http://localhost:3000');
     });
 
@@ -94,6 +101,56 @@ describe('wiki-server/client', () => {
       process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = 'prod-key';
       const headers = client.buildHeaders();
       expect(headers['Authorization']).toBe('Bearer prod-key');
+    });
+  });
+
+  describe('slot auto-detection (QUA-616)', () => {
+    // These tests mock process.cwd() rather than CD'ing the vitest process,
+    // which would affect every other test file.
+    let cwdSpy: ReturnType<typeof vi.spyOn>;
+    afterEach(() => {
+      cwdSpy?.mockRestore();
+    });
+
+    it('auto-selects PROD_ when WIKI_SERVER_ENV is unset and CWD is inside a slot', () => {
+      cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/home/user/lw/a7/apps/web');
+      delete process.env.WIKI_SERVER_ENV;
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3113';
+      process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
+      expect(client.getServerUrl()).toBe('https://prod.example.com');
+    });
+
+    it('does NOT auto-select PROD_ when CWD is outside any slot', () => {
+      cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/home/user/lw/main/apps/web');
+      delete process.env.WIKI_SERVER_ENV;
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3113';
+      process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
+      expect(client.getServerUrl()).toBe('http://localhost:3113');
+    });
+
+    it('respects explicit WIKI_SERVER_ENV=local from inside a slot (escape hatch)', () => {
+      cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/home/user/lw/a7');
+      process.env.WIKI_SERVER_ENV = 'local';
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3113';
+      process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
+      expect(client.getServerUrl()).toBe('http://localhost:3113');
+    });
+
+    it('respects explicit WIKI_SERVER_ENV=prod from inside a slot', () => {
+      cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/home/user/lw/a7');
+      process.env.WIKI_SERVER_ENV = 'prod';
+      process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3113';
+      process.env.PROD_LONGTERMWIKI_SERVER_URL = 'https://prod.example.com';
+      expect(client.getServerUrl()).toBe('https://prod.example.com');
+    });
+
+    it('slot auto-detect also drives getApiKey (so headers use the prod key)', () => {
+      cwdSpy = vi.spyOn(process, 'cwd').mockReturnValue('/home/user/lw/a3');
+      delete process.env.WIKI_SERVER_ENV;
+      process.env.LONGTERMWIKI_SERVER_API_KEY = 'local-key';
+      process.env.PROD_LONGTERMWIKI_SERVER_API_KEY = 'prod-key';
+      expect(client.getApiKey()).toBe('prod-key');
+      expect(client.buildHeaders()['Authorization']).toBe('Bearer prod-key');
     });
   });
 

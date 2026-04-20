@@ -15,6 +15,9 @@ describe('wiki-server-client barrel exports', () => {
   let client: typeof import('../wiki-server-client.ts');
 
   beforeEach(async () => {
+    // Opt out of slot auto-detection (QUA-616) so env-var assertions are
+    // deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     client = await import('../wiki-server-client.ts');
   });
 

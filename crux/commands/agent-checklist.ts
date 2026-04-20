@@ -61,6 +61,12 @@ interface CommandOptions extends BaseOptions {
   noLinearStart?: boolean;
   /** Pass --force through to `linear start` to bypass the dedup check. */
   force?: boolean;
+  /** Acknowledge that the `agent_sessions` row could not be written to the
+   *  wiki-server and continue anyway. Used when prod is known-down or the
+   *  operator intentionally wants a local-only session. Without this flag,
+   *  init exits non-zero (QUA-617) so the operator learns at init-time that
+   *  the session will be invisible to dispatcher dedup + sync-session. */
+  allowOffline?: boolean;
 }
 
 interface GitHubIssueResponse {
@@ -240,8 +246,11 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   writeFileSync(CHECKLIST_PATH, markdown, 'utf-8');
 
-  // DB sync (best-effort)
+  // DB sync (best-effort for the active-agent + collision steps, but the
+  // `agent_sessions` row itself is load-bearing — see the fail-loud check
+  // below after all output is assembled).
   let dbSynced = false;
+  let dbSyncError: string | null = null;
   let directoryWarning = '';
   try {
     // QUA-440: persist linearId and slotNumber so the DB-first dedup query
@@ -260,6 +269,7 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
       worktree,
     });
     dbSynced = result.ok;
+    if (!result.ok) dbSyncError = `${result.error}: ${result.message}`;
 
     // Auto-register as active agent for live tracking + collision detection
     await registerAgent({
@@ -295,8 +305,11 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
         directoryWarning += `  ${c.dim}This can cause file conflicts. Consider using a separate worktree.${c.reset}\n`;
       }
     }
-  } catch {
-    // Best-effort
+  } catch (e) {
+    // Capture the error so the fail-loud check below can report it.
+    if (!dbSyncError) {
+      dbSyncError = e instanceof Error ? e.message : String(e);
+    }
   }
 
   // ── Auto-call `gh issues start <N>` ───────────────────────────────────────
@@ -392,6 +405,26 @@ async function init(args: string[], options: CommandOptions): Promise<CommandRes
 
   // Render the full checklist so callers don't need a separate `status` call.
   output += `\n${renderChecklistItems(status, c)}`;
+
+  // ── Fail-loud when the agent_sessions row was NOT written (QUA-617) ──────
+  // Without this, init silently half-succeeds: the local checklist file is on
+  // disk, Linear says "In Progress", but the DB has no row. Downstream, the
+  // session is a "ghost": invisible to dispatcher dedup (QUA-406 risk), to
+  // /internal/agent-sessions, and to sync-session at ship-time. The operator
+  // must learn at init-time, not at ship-time when it's too late to re-init.
+  if (!dbSynced && !options.allowOffline) {
+    output +=
+      `\n${c.red}⚠ agent_sessions row was NOT written to wiki-server.${c.reset}\n` +
+      `  This session will be invisible to:\n` +
+      `    ${c.red}•${c.reset} ${c.bold}crux sys sessions list${c.reset} (dispatcher dedup — QUA-406 risk)\n` +
+      `    ${c.red}•${c.reset} ${c.bold}/internal/agent-sessions${c.reset} dashboard\n` +
+      `    ${c.red}•${c.reset} ${c.bold}sync-session${c.reset} at ship-time (session log won't persist)\n` +
+      (dbSyncError ? `  ${c.dim}Error: ${dbSyncError}${c.reset}\n` : '') +
+      `  ${c.dim}Likely cause: wiki-server unreachable at init. In slots this is now auto-detected\n` +
+      `  (QUA-616); if you still see this, prod may be down or PROD_LONGTERMWIKI_SERVER_URL is unset.${c.reset}\n` +
+      `  ${c.dim}To continue anyway (session log won't persist): re-run with${c.reset} ${c.cyan}--allow-offline${c.reset}\n`;
+    return { output, exitCode: 3 };
+  }
 
   return { output, exitCode: 0 };
 }

@@ -2,12 +2,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 
 const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
 const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+const origWikiServerEnv = process.env.WIKI_SERVER_ENV;
 
 describe('wiki-server/artifacts', () => {
   let artifacts: typeof import('./artifacts.ts');
 
   beforeEach(async () => {
     vi.restoreAllMocks();
+    // Opt out of slot auto-detection (QUA-616) so env-var assertions are
+    // deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     artifacts = await import('./artifacts.ts');
   });
 
@@ -16,6 +20,8 @@ describe('wiki-server/artifacts', () => {
     else delete process.env.LONGTERMWIKI_SERVER_URL;
     if (origKey !== undefined) process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (origWikiServerEnv !== undefined) process.env.WIKI_SERVER_ENV = origWikiServerEnv;
+    else delete process.env.WIKI_SERVER_ENV;
   });
 
   describe('saveArtifacts', () => {
