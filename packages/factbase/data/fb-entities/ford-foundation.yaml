@@ -13,14 +13,14 @@ facts:
   - id: f_6sfr123pxM
     property: total-assets
     value: "17480000000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131684331
 
   - id: f_nrz9SeHOD7
     property: annual-revenue
     value: "1150000000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131684331
     notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B. Charitable disbursements ~$1.05B."
@@ -28,7 +28,7 @@ facts:
   - id: f_wnEwWXmN3A
     property: annual-grantmaking
     value: "840000000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.fordfoundation.org/work/our-grants/
     notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400 grants/year worldwide."

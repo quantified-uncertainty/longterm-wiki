@@ -20,7 +20,7 @@ facts:
   - id: f_lGRSYGn2Xw
     property: annual-revenue
     value: "1200000"
-    unit: EUR
+    currency: EUR
     asOf: 2022
     source: https://algorithmwatch.org/en/transparency/
     notes: "2022: grants EUR 1.12M + donations EUR 60K + other EUR 17K. Major funders: Alfred Landecker Foundation, BMBF, BMUV, Deutsche Postcode Lotterie"

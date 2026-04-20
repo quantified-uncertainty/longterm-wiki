@@ -390,6 +390,15 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'factbase-fact-unit-field',
+    name: 'FactBase facts use `currency:` not `unit:` (loader drops stray unit fields)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-fact-unit-field.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: `unit:` at a fact top-level is silently dropped by the loader,
+    // causing currency symbol mismatches (QUA-620: £5M fact rendered as $5M).
+  },
+  {
     id: 'dot-position',
     name: 'Dot indicator position (SourcingDot / RecordStatusDots not in first column)',
     command: 'npx',

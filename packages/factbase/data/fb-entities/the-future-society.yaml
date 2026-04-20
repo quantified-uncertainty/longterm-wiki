@@ -15,7 +15,7 @@ facts:
   - id: f_63hZuAt6Uv
     property: annual-revenue
     value: "3406697"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/813568099
     notes: "Revenue $3.4M, expenses $1.9M, assets $3.7M. EIN: 81-3568099. Growing: was $755K in 2021."
@@ -80,7 +80,7 @@ facts:
   - id: f_SALPS8hrDy
     property: annual-revenue
     value: "755388"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://www.influencewatch.org/non-profit/the-future-society/
     notes: "Revenue $755K, expenses $725K, assets $385K in 2021. Grew significantly to $3.4M by 2024."

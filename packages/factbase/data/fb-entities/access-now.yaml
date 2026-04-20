@@ -14,7 +14,7 @@ facts:
   - id: f_0gN2dWSxYB
     property: annual-revenue
     value: "15000000"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://en.wikipedia.org/wiki/Access_Now
     notes: "Approximate figure from Wikipedia. Superseded by FY 2024 Form 990 data (f_YY42DsWj0s) showing $16.15M."
@@ -36,7 +36,7 @@ facts:
   - id: f_YY42DsWj0s
     property: annual-revenue
     value: "16152454"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/270597430
     notes: "FY 2024 Form 990 (EIN 27-0597430). Total expenses $15,120,599. Net assets $8,112,583. Contributions made up 99%+ of revenue."

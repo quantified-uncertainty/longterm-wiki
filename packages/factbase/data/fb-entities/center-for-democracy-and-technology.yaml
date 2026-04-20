@@ -15,7 +15,7 @@ facts:
   - id: f_bPJsTpgjnP
     property: annual-revenue
     value: "11300000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/521905358
     notes: "Revenue $11.3M. Expenses $8.77M. Assets $21.3M. Revenue: 56% foundations, 24% corporations, 10% events."

@@ -87,7 +87,6 @@ facts:
   - id: f_YVrPBFl9Tf
     property: hbm-market-share
     value: 53
-    unit: percent
     asOf: 2024-12
     source: https://www.trendforce.com/
     notes: "SK Hynix holds ~53% of HBM market; Samsung ~38%, Micron ~9%"
