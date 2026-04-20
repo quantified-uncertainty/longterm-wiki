@@ -73,7 +73,7 @@
  */
 
 import { readdirSync, readFileSync, existsSync } from 'fs';
-import { join } from 'path';
+import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
@@ -81,6 +81,7 @@ import { getColors } from '../lib/output.ts';
 const SOURCE_EXTENSIONS = new Set(['.ts', '.tsx', '.js', '.jsx', '.mjs', '.cjs']);
 const SCAN_SUBDIRS = ['src', 'scripts'] as const;
 const WORKSPACE_PREFIX = '@longterm-wiki/';
+const WORKER_MANIFEST_PATH = 'docker/worker/package.json';
 const DEP_SECTIONS = [
   'dependencies',
   'devDependencies',
@@ -103,7 +104,8 @@ interface AppCoverage {
   unused: string[];        // declared but not used (warning)
   /** Repo-relative path to the package.json that must be edited to fix a violation. */
   manifestPath: string;
-  /** Dep string to suggest for a missing import. Apps use `workspace:*`; the
+  /** Bare dep-spec to suggest for a missing import (without surrounding JSON
+   *  quotes — those are added at print time). Apps use `workspace:*`; the
    *  standalone worker manifest uses `file:./packages/<pkg>`. */
   depSuggestion: (pkg: string) => string;
 }
@@ -255,26 +257,22 @@ function analyzeApp(
   return buildCoverage(
     appName,
     `apps/${appName}/package.json`,
-    () => '"workspace:*"',
+    () => 'workspace:*',
     scanImports(files),
     readDeclaredDeps(pkgJson, onWarn),
   );
 }
 
 /**
- * Scan a source directory recursively and compare its `@longterm-wiki/*` imports
- * against an external package.json (i.e. one that is NOT the parent of the source
- * directory). Used for the worker image: `crux/` is scanned, but the manifest
- * that must declare the deps lives at `docker/worker/package.json` (a standalone,
- * non-workspace manifest — so missing deps are suggested as `file:./packages/<pkg>`
- * rather than `workspace:*`).
+ * Scan `crux/` and compare its `@longterm-wiki/*` imports against
+ * `docker/worker/package.json`. The worker manifest is NOT a pnpm workspace
+ * member (the reason QUA-605 existed), so missing-dep suggestions use the
+ * `file:./packages/<pkg>` protocol that the Dockerfile wires up, not
+ * `workspace:*`.
  */
-function analyzeExternalManifest(
+function analyzeWorkerManifest(
   sourceDir: string,
   pkgJsonPath: string,
-  label: string,
-  manifestPath: string,
-  depSuggestion: (pkg: string) => string,
   onWarn?: (message: string) => void,
 ): AppCoverage | null {
   if (!existsSync(pkgJsonPath)) return null;
@@ -282,9 +280,9 @@ function analyzeExternalManifest(
 
   const files = listSourceFiles(sourceDir, [], { excludeTests: true });
   return buildCoverage(
-    label,
-    manifestPath,
-    depSuggestion,
+    dirname(WORKER_MANIFEST_PATH),  // "docker/worker"
+    WORKER_MANIFEST_PATH,
+    (pkg) => `file:./packages/${pkg.slice(WORKSPACE_PREFIX.length)}`,
     scanImports(files),
     readDeclaredDeps(pkgJsonPath, onWarn),
   );
@@ -294,7 +292,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
   const c = getColors();
   const appsDir = options.appsDir ?? join(PROJECT_ROOT, 'apps');
   const workerPkgJson =
-    options.workerPkgJson ?? join(PROJECT_ROOT, 'docker/worker/package.json');
+    options.workerPkgJson ?? join(PROJECT_ROOT, WORKER_MANIFEST_PATH);
   const workerSourceDir = options.workerSourceDir ?? join(PROJECT_ROOT, 'crux');
   const onWarn = options.onWarn ?? ((msg) => console.log(`${c.yellow}${msg}${c.reset}`));
 
@@ -317,19 +315,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     if (report) apps.push(report);
   }
 
-  // Worker image: crux/ source is copied wholesale, so its imports must be
-  // declared in docker/worker/package.json. The worker is NOT a pnpm workspace
-  // member (the whole reason QUA-605 existed), so missing-dep suggestions use
-  // the `file:./packages/<pkg>` protocol that the Dockerfile wires up, not
-  // `workspace:*`.
-  const workerReport = analyzeExternalManifest(
-    workerSourceDir,
-    workerPkgJson,
-    'docker/worker',
-    'docker/worker/package.json',
-    (pkg) => `"file:./packages/${pkg.slice(WORKSPACE_PREFIX.length)}"`,
-    onWarn,
-  );
+  const workerReport = analyzeWorkerManifest(workerSourceDir, workerPkgJson, onWarn);
   if (workerReport) apps.push(workerReport);
 
   let errors = 0;
@@ -355,7 +341,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
         `${c.dim}  Fix: add to ${app.manifestPath} dependencies:${c.reset}`
       );
       for (const pkg of app.missing) {
-        console.log(`${c.dim}    "${pkg}": ${app.depSuggestion(pkg)}${c.reset}`);
+        console.log(`${c.dim}    "${pkg}": "${app.depSuggestion(pkg)}"${c.reset}`);
       }
     }
 

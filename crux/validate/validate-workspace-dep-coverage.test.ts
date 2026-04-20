@@ -11,7 +11,7 @@
  */
 
 import { describe, it, expect, afterEach } from 'vitest';
-import { mkdirSync, writeFileSync, rmSync, symlinkSync } from 'fs';
+import { mkdirSync, mkdtempSync, writeFileSync, rmSync, symlinkSync } from 'fs';
 import { join } from 'path';
 import os from 'os';
 
@@ -21,12 +21,7 @@ import {
 } from './validate-workspace-dep-coverage.ts';
 
 function makeScratchDir(): string {
-  const root = join(
-    os.tmpdir(),
-    `workspace-dep-coverage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  );
-  mkdirSync(root, { recursive: true });
-  return root;
+  return mkdtempSync(join(os.tmpdir(), 'workspace-dep-coverage-'));
 }
 
 /**
@@ -52,11 +47,7 @@ interface AppFixture {
 }
 
 function makeAppsDir(fixtures: AppFixture[]): string {
-  const root = join(
-    os.tmpdir(),
-    `workspace-dep-coverage-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-  );
-  mkdirSync(root, { recursive: true });
+  const root = makeScratchDir();
   for (const app of fixtures) {
     const appDir = join(root, app.name);
     mkdirSync(appDir, { recursive: true });
@@ -501,7 +492,7 @@ describe('validate-workspace-dep-coverage', () => {
     const worker = result.apps.find((a) => a.app === 'docker/worker');
     expect(worker?.manifestPath).toBe('docker/worker/package.json');
     expect(worker?.depSuggestion('@longterm-wiki/url-utils')).toBe(
-      '"file:./packages/url-utils"'
+      'file:./packages/url-utils'
     );
   });
 
@@ -516,7 +507,7 @@ describe('validate-workspace-dep-coverage', () => {
     const result = runCheck({ appsDir: scratch, ...NO_WORKER });
     const app = result.apps[0];
     expect(app.manifestPath).toBe('apps/my-app/package.json');
-    expect(app.depSuggestion('@longterm-wiki/url-utils')).toBe('"workspace:*"');
+    expect(app.depSuggestion('@longterm-wiki/url-utils')).toBe('workspace:*');
   });
 
   it('excludes *.spec.ts, *.test-d.ts, and tests/ directories from worker scan', () => {

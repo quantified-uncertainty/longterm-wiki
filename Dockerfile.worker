@@ -5,11 +5,17 @@ ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable && corepack prepare pnpm@9.15.4 --activate
 
 WORKDIR /deps
-# Workspace packages referenced as file:./packages/* from docker/worker/package.json
+# Workspace packages referenced as file:./packages/<pkg> from docker/worker/package.json
 # must be present before `pnpm install` resolves them. Without this, the install
 # succeeds but @longterm-wiki/* imports from crux hit ERR_MODULE_NOT_FOUND at
 # runtime (QUA-605; same class as QUA-598).
-COPY packages/ ./packages/
+#
+# Copy only the packages actually declared as file: deps in worker/package.json —
+# broad `COPY packages/ ./packages/` would also pull in packages/factbase/data/*.yaml
+# (2+ MB of content that churns on every factbase sync), invalidating the
+# `pnpm install --prod` layer cache on unrelated FactBase edits. Add a line below
+# for each @longterm-wiki/* dep added to docker/worker/package.json.
+COPY packages/url-utils/ ./packages/url-utils/
 COPY docker/worker/package.json ./
 RUN pnpm install --prod
 
