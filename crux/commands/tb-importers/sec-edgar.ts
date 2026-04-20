@@ -26,6 +26,8 @@ import {
   type ProposeClientOptions,
 } from "./propose-client.ts";
 import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
+import { T1_SOURCE_PREFIXES } from "./allowlist.ts";
+import type { CommandResult } from "../../lib/command-types.ts";
 import type { EnrichmentProposal } from "./types.ts";
 
 export interface SecEdgarTarget {
@@ -252,7 +254,7 @@ export function buildProposal(
 
   return {
     tier: "T1",
-    source: `sec-edgar:${filing.accessionNumber}`,
+    source: `${T1_SOURCE_PREFIXES.secEdgar}${filing.accessionNumber}`,
     sourceUrl,
     responseHash,
     recordType: "funding-round",
@@ -312,7 +314,7 @@ export async function importTarget(
 export async function cliMain(
   args: string[],
   options: { dryRun?: boolean } = {}
-): Promise<{ exitCode: number; output: string }> {
+): Promise<CommandResult> {
   const submit = args.includes("--submit") && options.dryRun !== true;
   const targets = parseTargetsArg(args);
   if (targets.length === 0) {

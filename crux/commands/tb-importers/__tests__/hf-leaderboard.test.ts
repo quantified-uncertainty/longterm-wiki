@@ -130,10 +130,6 @@ describe("lookupRow", () => {
   it("returns null when not found", () => {
     expect(lookupRow({ byEvalName: new Map(), byFullname: new Map() }, "missing")).toBeNull();
   });
-  it("accepts a bare Map (legacy convenience)", () => {
-    const m = new Map([["a", { eval_name: "a" }]]);
-    expect(lookupRow(m, "a")?.eval_name).toBe("a");
-  });
 });
 
 describe("validateScore", () => {

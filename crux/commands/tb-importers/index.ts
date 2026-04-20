@@ -15,24 +15,14 @@ import { cliMain as secEdgarCliMain } from "./sec-edgar.ts";
 import { cliMain as ghContribCliMain } from "./github-contributors.ts";
 import { cliMain as hfLeaderboardCliMain } from "./hf-leaderboard.ts";
 
-type CommandResult = { exitCode?: number; output?: string };
-
-async function secEdgar(args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
-  return secEdgarCliMain(args);
-}
-
-async function githubContributors(args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
-  return ghContribCliMain(args);
-}
-
-async function hfLeaderboard(args: string[], _options: Record<string, unknown>): Promise<CommandResult> {
-  return hfLeaderboardCliMain(args);
-}
+// The crux dispatcher passes (args, options); the importers ignore options
+// (their flags are parsed from `args`), so a one-arg adapter is sufficient.
+const adapt = (fn: (args: string[]) => unknown) => (args: string[]) => fn(args);
 
 export const commands = {
-  "sec-edgar": secEdgar,
-  "github-contributors": githubContributors,
-  "hf-leaderboard": hfLeaderboard,
+  "sec-edgar": adapt(secEdgarCliMain),
+  "github-contributors": adapt(ghContribCliMain),
+  "hf-leaderboard": adapt(hfLeaderboardCliMain),
 };
 
 export function getHelp(): string {

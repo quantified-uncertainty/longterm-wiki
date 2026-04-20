@@ -34,6 +34,8 @@ import {
   type ProposeClientOptions,
 } from "./propose-client.ts";
 import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
+import { T1_SOURCE_PREFIXES } from "./allowlist.ts";
+import type { CommandResult } from "../../lib/command-types.ts";
 import type { EnrichmentProposal } from "./types.ts";
 
 const DATASET = "open-llm-leaderboard/contents";
@@ -168,22 +170,12 @@ export async function fetchLeaderboardSnapshot(
   return { byEvalName, byFullname };
 }
 
-/**
- * Lookup helper. O(1) on either index — eval_name first, fullname second.
- *
- * Accepts either a `LeaderboardSnapshot` or a bare `Map` for callers that
- * only build a single index (legacy convenience).
- */
+/** Lookup helper. O(1) — eval_name first, fullname second. */
 export function lookupRow(
-  snapshot: LeaderboardSnapshot | ReadonlyMap<string, HfLeaderboardRow>,
+  snapshot: LeaderboardSnapshot,
   evalName: string
 ): HfLeaderboardRow | null {
-  const isSnapshot = (s: unknown): s is LeaderboardSnapshot =>
-    typeof s === "object" && s !== null && "byEvalName" in s && "byFullname" in s;
-  if (isSnapshot(snapshot)) {
-    return snapshot.byEvalName.get(evalName) ?? snapshot.byFullname.get(evalName) ?? null;
-  }
-  return snapshot.get(evalName) ?? null;
+  return snapshot.byEvalName.get(evalName) ?? snapshot.byFullname.get(evalName) ?? null;
 }
 
 /**
@@ -206,7 +198,7 @@ export function validateScore(
  */
 export function buildProposals(
   targets: readonly HfLeaderboardTarget[],
-  snapshot: LeaderboardSnapshot | ReadonlyMap<string, HfLeaderboardRow>,
+  snapshot: LeaderboardSnapshot,
   opts: { benchmarkColumns?: readonly BenchmarkColumnMap[]; scoredAt?: string } = {}
 ): { proposals: EnrichmentProposal[]; misses: Array<{ target: HfLeaderboardTarget; reason: string }> } {
   const cols = opts.benchmarkColumns ?? DEFAULT_BENCHMARK_COLUMNS;
@@ -242,7 +234,7 @@ export function buildProposals(
       const responseHash = createHash("sha256").update(canonical).digest("hex");
       proposals.push({
         tier: "T1",
-        source: `hf-leaderboard:${t.evalName}:${col.column}`,
+        source: `${T1_SOURCE_PREFIXES.hfLeaderboard}${t.evalName}:${col.column}`,
         sourceUrl: `https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?row=${encodeURIComponent(t.evalName)}`,
         responseHash,
         recordType: "benchmark-result",
@@ -276,9 +268,7 @@ export async function importTargets(
 }
 
 /** CLI entry — `crux tb hf-leaderboard --target=slug:displayName:evalName`. */
-export async function cliMain(
-  args: string[]
-): Promise<{ exitCode: number; output: string }> {
+export async function cliMain(args: string[]): Promise<CommandResult> {
   const submit = args.includes("--submit");
   const targets = parseTargetsArg(args);
   if (targets.length === 0) {

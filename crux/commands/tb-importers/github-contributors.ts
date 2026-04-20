@@ -28,6 +28,8 @@ import {
   type ProposeClientOptions,
 } from "./propose-client.ts";
 import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
+import { T1_SOURCE_PREFIXES } from "./allowlist.ts";
+import type { CommandResult } from "../../lib/command-types.ts";
 import type { EnrichmentProposal } from "./types.ts";
 
 /**
@@ -199,7 +201,7 @@ export function buildProposals(
     const responseHash = createHash("sha256").update(canonical).digest("hex");
     return {
       tier: "T1" as const,
-      source: `github-contributors:${target.orgSlug}:${c.login}`,
+      source: `${T1_SOURCE_PREFIXES.githubContributors}${target.orgSlug}:${c.login}`,
       sourceUrl: c.htmlUrl,
       responseHash,
       recordType: "personnel" as const,
@@ -226,6 +228,11 @@ export function buildProposals(
  * Fetch + aggregate + build proposals for one target.
  * Returns the proposals AND a `failures` count for the caller; per-repo
  * errors are logged and skipped but surfaced via the count.
+ *
+ * Per-repo fetches run in parallel. GitHub's authenticated rate limit is
+ * 5000/h, so a target with 10 repos is comfortably under any cap; without
+ * a token (60/h) you're rate-limit constrained anyway and parallelism is
+ * effectively bounded by the limit.
  */
 export async function importTarget(
   target: GhContributorsTarget,
@@ -235,23 +242,27 @@ export async function importTarget(
     target.minCommits ?? opts.defaultMinCommits ?? DEFAULT_MIN_COMMITS;
   const perRepo: Record<string, GhContributor[]> = {};
   let failures = 0;
-  for (const repo of target.repos) {
-    try {
-      perRepo[repo] = await fetchRepoContributors(repo, opts);
-    } catch (e) {
-      failures++;
-      const msg = e instanceof Error ? e.message : String(e);
-      console.warn(`[github-contributors] skipping repo ${repo}: ${msg}`);
-    }
+  const settled = await Promise.all(
+    target.repos.map(async (repo) => {
+      try {
+        return { repo, contribs: await fetchRepoContributors(repo, opts) };
+      } catch (e) {
+        const msg = e instanceof Error ? e.message : String(e);
+        console.warn(`[github-contributors] skipping repo ${repo}: ${msg}`);
+        return { repo, error: msg };
+      }
+    })
+  );
+  for (const r of settled) {
+    if ("error" in r) failures++;
+    else perRepo[r.repo] = r.contribs;
   }
   const aggregated = aggregateContributors(perRepo, minCommits);
   return { proposals: buildProposals(target, aggregated), failures };
 }
 
 /** CLI entry — `crux tb github-contributors --target=anthropic:repo1,repo2`. */
-export async function cliMain(
-  args: string[]
-): Promise<{ exitCode: number; output: string }> {
+export async function cliMain(args: string[]): Promise<CommandResult> {
   const submit = args.includes("--submit");
   const targets = parseTargetsArg(args);
   if (targets.length === 0) {

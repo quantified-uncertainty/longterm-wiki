@@ -5,22 +5,26 @@
  * the propose endpoint may write a `confirmed` verdict without an LLM call".
  *
  * The propose endpoint (QUA-632) is the enforcement point. This module is the
- * source of truth that both the importers and the endpoint import from.
- *
- * Adding a new entry here is a deliberate trust decision: the source must be a
- * primary, deterministic source for the record type. Examples:
- *   - SEC EDGAR Form D filings → funding-rounds (regulatory filings, structured)
- *   - GitHub contributors API → personnel (org-controlled access lists, structured)
- *   - HuggingFace Open LLM Leaderboard → benchmark-results (auto-eval pipeline output)
- *
- * Things that are NOT T1 (and would be rejected by the gate even if listed
- * here): wikipedia, blog posts, press releases, anything LLM-summarized.
+ * source of truth that both the importers and the endpoint import from —
+ * including the prefix constants themselves, so a renamed prefix can't drift
+ * out of sync between the importer's `proposal.source` and the allowlist.
  */
 
 import type { EnrichmentRecordType } from "./types.ts";
 
+/**
+ * Canonical source-prefix strings. Importers MUST construct
+ * `proposal.source` as `${T1_SOURCE_PREFIXES.X}${id}` so renames
+ * propagate to the allowlist automatically.
+ */
+export const T1_SOURCE_PREFIXES = {
+  secEdgar: "sec-edgar:",
+  githubContributors: "github-contributors:",
+  hfLeaderboard: "hf-leaderboard:",
+} as const;
+
 export interface T1AuthorityEntry {
-  /** Prefix matched against `proposal.source`. e.g. "sec-edgar:" matches "sec-edgar:0001234..." */
+  /** Prefix matched against `proposal.source`. */
   sourcePrefix: string;
   recordType: EnrichmentRecordType;
   /** Human-readable description (shown in audit logs). */
@@ -29,19 +33,19 @@ export interface T1AuthorityEntry {
 
 export const T1_AUTHORITY_ALLOWLIST: readonly T1AuthorityEntry[] = [
   {
-    sourcePrefix: "sec-edgar:",
+    sourcePrefix: T1_SOURCE_PREFIXES.secEdgar,
     recordType: "funding-round",
     description:
       "SEC EDGAR Form D filings (regulatory filings of US private offerings).",
   },
   {
-    sourcePrefix: "github-contributors:",
+    sourcePrefix: T1_SOURCE_PREFIXES.githubContributors,
     recordType: "personnel",
     description:
       "GitHub contributors API for org-owned repositories (≥N commit threshold).",
   },
   {
-    sourcePrefix: "hf-leaderboard:",
+    sourcePrefix: T1_SOURCE_PREFIXES.hfLeaderboard,
     recordType: "benchmark-result",
     description:
       "HuggingFace Open LLM Leaderboard (deterministic auto-eval pipeline).",
