@@ -36,3 +36,20 @@ facts:
     value: https://darioamodei.com/
     source: https://www.wikidata.org/wiki/Q103335665
     notes: From Wikidata Q103335665
+
+  - id: f_Z9bwckKwAI
+    property: equity-pledge-fraction
+    value: 0.8
+    asOf: "2026-01"
+    source: https://fortune.com/2026/01/27/anthropic-billionaire-cofounders-ceo-dario-amodei-giving-away-80-percent-of-wealth-fighting-inequality-ai-revolution/
+    notes: "All seven Anthropic co-founders pledged to donate 80% of their equity
+      per Fortune's January 2026 reporting. Pledge is not legally binding."
+
+  - id: f_606Pwh7C4Q
+    property: ea-alignment-estimate
+    value: [0.8, 0.9]
+    asOf: "2026-04"
+    notes: "Editorial estimate. Dario is a Giving What We Can signatory with
+      documented EA community ties and an early GiveWell supporter; former
+      roommate of Holden Karnofsky. High confidence that donations flow to
+      EA-aligned causes."

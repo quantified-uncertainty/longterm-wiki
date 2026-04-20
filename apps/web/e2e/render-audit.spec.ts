@@ -186,9 +186,25 @@ test.describe("Render audit — critical data tables", () => {
       // a unique footer string; a second "Dario Amodei" row exists in the
       // markdown-rendered Founder Donation Pledges table below.
       const stakeholderTable = page.locator("table").filter({ hasText: "Totals (pledged stakeholders)" });
-      const dariorowText = (await stakeholderTable.locator("tr", { hasText: "Dario Amodei" }).first().textContent()) ?? "";
+      const dariorow = stakeholderTable.locator("tr", { hasText: "Dario Amodei" }).first();
+      const dariorowText = (await dariorow.textContent()) ?? "";
       expect(dariorowText, "Dario Amodei row should show 'Co-founder' category").toContain("Co-founder");
       expect(dariorowText, "Dario Amodei row should not be all em-dashes in editorial columns").toMatch(/80%/);
+
+      // Cell-level sourcing dots: three per populated row — stake (record),
+      // pledge (fact), ea-alignment (fact). Links go to /sourcing/...
+      // pages; their presence is the regression signal.
+      const dariohrefs = await dariorow
+        .locator('a[href^="/sourcing/"]')
+        .evaluateAll((els) => els.map((e) => e.getAttribute("href") ?? ""));
+      expect(
+        dariohrefs.some((h) => h.startsWith("/sourcing/equity_positions/")),
+        `Dario row should have an equity_positions sourcing link (got: ${dariohrefs.join(", ")})`,
+      ).toBe(true);
+      expect(
+        dariohrefs.filter((h) => h.startsWith("/sourcing/fact/")).length,
+        `Dario row should have 2 fact sourcing links (pledge + ea align). hrefs: ${dariohrefs.join(", ")}`,
+      ).toBe(2);
     }
   });
 });
