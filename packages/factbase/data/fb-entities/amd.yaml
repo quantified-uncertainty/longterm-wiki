@@ -19,7 +19,7 @@ facts:
 
   - id: f_OUnrXVzEjm
     property: ceo
-    value: Lisa Su
+    value: !ref sid_vr5HogmRLQ
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/AMD
     notes: "CEO since October 2014"

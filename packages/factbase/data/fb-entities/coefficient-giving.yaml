@@ -126,7 +126,7 @@ facts:
 
   - id: f_o7b7ts6XBg
     property: key-person
-    value: Elie Hassenfeld
+    value: !ref sid_xVfFkFIk3Q
     source: https://coefficientgiving.org/governance/
     notes: "Board of Managers member (not a founder of Coefficient Giving). Co-founded
       GiveWell with Holden Karnofsky in 2007; GiveWell Labs (2011) evolved into Open

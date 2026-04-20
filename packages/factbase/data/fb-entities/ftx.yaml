@@ -36,7 +36,7 @@ facts:
     notes: From Wikidata Q108864780
   - id: f_2g4ZyKBRuS
     property: ceo
-    value: Sam Bankman-Fried
+    value: !ref sid_sace2bALew
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
   - id: f_tvJUJTbJa4

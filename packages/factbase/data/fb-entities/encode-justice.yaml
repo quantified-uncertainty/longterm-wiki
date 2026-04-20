@@ -36,7 +36,7 @@ facts:
 
   - id: f_ZGxWRTLPLP
     property: founded-by
-    value: "Sneha Revanur"
+    value: !ref sid_CROBNnPrIr
     source: https://en.wikipedia.org/wiki/Sneha_Revanur
     notes: "Founded as a high school student at Evergreen Valley High School in San Jose, California. Currently a student at Williams College."
 

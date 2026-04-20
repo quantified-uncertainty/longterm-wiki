@@ -34,7 +34,7 @@ facts:
 
   - id: f_4749an0ZBo
     property: founded-by
-    value: "Jerry Taylor"
+    value: !ref sid_W8fJ41OdQH
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Former vice president of the Cato Institute. Resigned September 2021 after domestic violence charges. Core staff came from Cato during a 2012 leadership dispute."
 

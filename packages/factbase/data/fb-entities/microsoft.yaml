@@ -11,7 +11,7 @@ facts:
     notes: Migrated from old entity system
   - id: f_QYAnAj3qg6
     property: ceo
-    value: Mustafa Süleyman
+    value: !ref sid_DBq1ddu8Mg
     source: https://www.wikidata.org/wiki/Q125891217
     notes: From Wikidata Q125891217
   - id: f_cLGLs94fuy
