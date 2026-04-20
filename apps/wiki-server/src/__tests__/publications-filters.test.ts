@@ -210,6 +210,68 @@ describe("publications GET /all — filters are applied in SQL (QUA-622)", () =>
     expect(body.total).toBe(2);
   });
 
+  it("truncates by limit AFTER filtering (core QUA-622 regression)", async () => {
+    // Seed 50 non-flagship + 5 flagship rows. With ?flagshipOnly=true&limit=3
+    // the filtered set is 5, truncated to 3. Pre-fix behaviour: fetched first
+    // 3 rows by date (likely 0 flagship), JS-filtered to 0, returned total=55.
+    for (let i = 0; i < 50; i++) {
+      publicationsStore.push(
+        makePub({ id: `nonflagsh${i}`, is_flagship: false }),
+      );
+    }
+    for (let i = 0; i < 5; i++) {
+      publicationsStore.push(
+        makePub({ id: `flagship-${i}`, is_flagship: true }),
+      );
+    }
+
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/all?flagshipOnly=true&limit=3",
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      publications: DrizzlePubRow[];
+      total: number;
+    };
+    expect(body.publications).toHaveLength(3);
+    expect(body.publications.every((r) => r.isFlagship)).toBe(true);
+    // total is the filtered count, not the table total.
+    expect(body.total).toBe(5);
+  });
+
+  it("combines publicationType and flagshipOnly in a single WHERE", async () => {
+    publicationsStore.push(
+      makePub({ id: "paper-nf", publication_type: "paper", is_flagship: false }),
+    );
+    publicationsStore.push(
+      makePub({ id: "paper-fl", publication_type: "paper", is_flagship: true }),
+    );
+    publicationsStore.push(
+      makePub({ id: "report-fl", publication_type: "report", is_flagship: true }),
+    );
+
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/all?publicationType=paper&flagshipOnly=true",
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      publications: DrizzlePubRow[];
+      total: number;
+    };
+    expect(body.publications.map((r) => r.id)).toEqual(["paper-fl"]);
+    expect(body.total).toBe(1);
+  });
+
   it("passes no WHERE (filter columns absent) when no filters are supplied", async () => {
     publicationsStore.push(makePub({ id: "p1" }));
     publicationsStore.push(makePub({ id: "p2", is_flagship: true }));
@@ -236,6 +298,62 @@ describe("publications GET /by-entity/:entityId — filters apply after entityId
   beforeEach(async () => {
     resetStores();
     vi.resetModules();
+  });
+
+  it("returns all publications for an entity when no filters supplied", async () => {
+    publicationsStore.push(
+      makePub({ id: "other-ent", entity_id: "sid_otherentity" }),
+    );
+    publicationsStore.push(
+      makePub({ id: "target1", entity_id: "sid_targetentity" }),
+    );
+    publicationsStore.push(
+      makePub({ id: "target2", entity_id: "sid_targetentity" }),
+    );
+
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/by-entity/sid_targetentity",
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      publications: DrizzlePubRow[];
+      total: number;
+    };
+    expect(body.publications.map((r) => r.id).sort()).toEqual([
+      "target1",
+      "target2",
+    ]);
+    expect(body.total).toBe(2);
+  });
+
+  it("combines entity_id with publicationType", async () => {
+    publicationsStore.push(
+      makePub({ id: "target-paper", entity_id: "sid_targetentity", publication_type: "paper" }),
+    );
+    publicationsStore.push(
+      makePub({ id: "target-report", entity_id: "sid_targetentity", publication_type: "report" }),
+    );
+
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/by-entity/sid_targetentity?publicationType=paper",
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      publications: DrizzlePubRow[];
+      total: number;
+    };
+    expect(body.publications.map((r) => r.id)).toEqual(["target-paper"]);
+    expect(body.total).toBe(1);
   });
 
   it("combines entity_id with flagshipOnly in a single WHERE", async () => {
