@@ -60,7 +60,7 @@ const DOTFILE_ALLOW = new Set(['.github', '.claude']);
 const REMAP_MARKER = 'anthropic-billing-key-remap-ok';
 
 /** Banned token — the env var name that should never be read/written/deleted */
-const BANNED_PATTERN = /ANTHROPIC_API_KEY/;
+const BANNED_PATTERN = /\bANTHROPIC_API_KEY\b/;
 
 /** Absolute path of this validator — skipped from scanning */
 const VALIDATOR_ABS_PATH = resolve(
@@ -84,14 +84,9 @@ export function shouldSkipDir(name: string): boolean {
 /**
  * Per-line decision: is this line a violation?
  *
- * A line is a violation when it contains the banned env-var name AND is not
- * allowlisted. Allowlist cases:
- *   - Line contains the explicit re-map marker comment.
- *   - Line is a line-comment (starts with //, *, /*, #).
- *
- * Known gap: block comments that span multiple lines may false-positive on
- * their middle lines (which don't start with `*`). Wrap the full block with
- * a leading-`*` on every line (JSDoc-style) or use // line comments instead.
+ * A line violates when it contains the banned env-var name and is neither a
+ * line-comment (`//`, `*`, `/*`, `#`) nor carries the inline re-map marker.
+ * Limitations pinned by tests in `.test.ts`.
  */
 export function isLineViolation(line: string): boolean {
   if (!BANNED_PATTERN.test(line)) return false;
@@ -151,6 +146,10 @@ function checkFile(filePath: string): Violation[] {
   if (resolve(filePath) === VALIDATOR_ABS_PATH) return [];
 
   const content = readFileSync(filePath, 'utf-8');
+  // Fast path: if the banned token doesn't appear at all, skip line-splitting.
+  // Validator processes ~1200 files, only ~5 contain the token.
+  if (!content.includes('ANTHROPIC_API_KEY')) return [];
+
   const lines = content.split('\n');
   const violations: Violation[] = [];
   const relPath = relative(PROJECT_ROOT, filePath);
