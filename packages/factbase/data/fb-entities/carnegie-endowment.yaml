@@ -14,7 +14,7 @@ facts:
   - id: f_ry7EKNUU3Y
     property: annual-revenue
     value: "57574887"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://projects.propublica.org/nonprofits/organizations/130552040
     notes: "FY ending June 2025. Total assets $602M."

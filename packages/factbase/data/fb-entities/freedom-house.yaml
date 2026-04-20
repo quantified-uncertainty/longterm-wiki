@@ -48,7 +48,7 @@ facts:
   - id: f_RysUmFd7UE
     property: annual-revenue
     value: "90305550"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131656647
     notes: "FY ending June 2024 (EIN 13-1656647). Total expenses $88,758,068. Contributions $89,972,151 (99.6% of revenue). Previous year (FY 2023) revenue was $93.5M."

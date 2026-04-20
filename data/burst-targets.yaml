@@ -1,0 +1,502 @@
+# Burst Targets — Top 100 AI Safety Organizations
+#
+# Anchors the tiered defensive enrichment burst (QUA-637). Downstream consumers:
+#   - QUA-634: denominator estimation pass (per-org × record_type totals)
+#   - QUA-641: T1 saturation run across the same orgs
+#   - QUA-642: T2 website corpus extraction pipeline
+#   - QUA-643: T3 subscription burst + per-org acceptance reopener
+#
+# Schema
+#   slug                  string  — matches data/entities/organizations.yaml id
+#   name                  string  — display name
+#   importance_rank       int     — 1-100 ordinal (1 = highest coverage priority).
+#                                   Methodology: subjective coverage-value ordering as of 2026-Q2,
+#                                   weighting frontier-AI-risk relevance + active output. Clusters
+#                                   (in order): frontier labs (1-8) > technical safety research
+#                                   (9-20) > academic (21-25) > government AISIs (26-36, excl. 29)
+#                                   > policy/advocacy (29 + 37-43) > field-building/funders (44-50)
+#                                   > forecasting & epistemics (51-55) > biosecurity-adjacent AI-risk
+#                                   (56-61) > additional safety research (62-67) > expanded
+#                                   policy/governance (68-77) > expanded field-building / academic
+#                                   (78-87) > additional labs/tools (88-91) > expanded funders (92-97)
+#                                   > community/infrastructure (98-100).
+#                                   Rough; Ozzie-validated per QUA-639 exit criteria. Expect this to
+#                                   shift after validation — the rank is a starting point, not a ruling.
+#   estimated_size_tier   enum    — coarse whole-org personnel bucket used to calibrate denominator
+#                                   estimation:
+#                                     tiny   (<10 staff)
+#                                     small  (10-50)
+#                                     medium (50-200)
+#                                     large  (200-1000)
+#                                     huge   (1000+)
+#                                   These are wiki-author intuitions, not facts; QUA-634 overwrites with
+#                                   researched estimates. For multi-focus orgs (e.g. RAND, Meta AI as
+#                                   FAIR scope, Coefficient Giving's AI-safety portfolio) the tier is
+#                                   whole-org not AI-safety-specific; the denominator command is
+#                                   expected to narrow it.
+#
+# Known tradeoffs baked into this seed list:
+#   - Government AISIs (11 of 100) are over-represented relative to output — several were
+#     announced in 2024-25 with minimal confirmed staffing (Singapore, Canada, India, Australia,
+#     Korea, France). They're included for ecosystem-completeness; burst consumers should expect
+#     thin per-org denominators from these rows.
+#   - `nist-ai` is intentionally excluded — `us-aisi` is its `parentOrg` child and the safety-
+#     focused subset, so including both would double-count personnel/publications.
+#   - `pause-ai` (sid_woL5lkqLpg) is chosen over the duplicate `pauseai` (sid_qtXe9VykMz) row;
+#     the registry-side dedup is tracked separately (QUA-652).
+#   - `coefficient-giving` is used in the field-building/funders cluster (rank 48) rather than
+#     `open-philanthropy`. Good Ventures has rebranded to Coefficient Giving and is the active
+#     grantmaking entity as of 2026; the Open Phil entry remains as a separate research org in
+#     the wiki but is not included here to avoid double-count.
+#   - Expansion from 50 → 100 (2026-04): the additional 50 orgs are lower-rank by design; the
+#     first 50 carry higher research/output density, the 51-100 range captures ecosystem breadth
+#     (forecasting, biosecurity-adjacent, small labs, additional funders) at expected lower per-org
+#     denominators. QUA-641 T1 saturation should still hit 100 if budget allows.
+#
+# Source lists that fed this seed:
+#   - 80,000 Hours AI safety careers list
+#   - AlignmentForum-adjacent orgs
+#   - AIS Funding Map
+#   - EA Forum AI safety tag
+#   - Existing data/entities/organizations.yaml rows tagged `ai-safety`
+#
+# Every slug below corresponds to an existing TableBase entity row (id + stableId
+# already allocated in data/entities/organizations.yaml).
+
+targets:
+  # Frontier AI labs — highest-leverage coverage targets.
+  - slug: anthropic
+    name: Anthropic
+    importance_rank: 1
+    estimated_size_tier: huge
+  - slug: openai
+    name: OpenAI
+    importance_rank: 2
+    estimated_size_tier: huge
+  - slug: deepmind
+    name: Google DeepMind
+    importance_rank: 3
+    estimated_size_tier: huge
+  - slug: meta-ai
+    name: Meta AI
+    importance_rank: 4
+    estimated_size_tier: huge
+  - slug: xai
+    name: xAI
+    importance_rank: 5
+    estimated_size_tier: large
+  - slug: mistral-ai
+    name: Mistral AI
+    importance_rank: 6
+    estimated_size_tier: medium
+  - slug: deepseek
+    name: DeepSeek
+    importance_rank: 7
+    estimated_size_tier: medium
+  - slug: ssi
+    name: Safe Superintelligence Inc.
+    importance_rank: 8
+    estimated_size_tier: small
+
+  # Core technical AI safety research organizations.
+  - slug: miri
+    name: MIRI
+    importance_rank: 9
+    estimated_size_tier: small
+  - slug: redwood-research
+    name: Redwood Research
+    importance_rank: 10
+    estimated_size_tier: small
+  - slug: apollo-research
+    name: Apollo Research
+    importance_rank: 11
+    estimated_size_tier: small
+  - slug: metr
+    name: METR
+    importance_rank: 12
+    estimated_size_tier: small
+  - slug: far-ai
+    name: FAR AI
+    importance_rank: 13
+    estimated_size_tier: small
+  - slug: arc
+    name: Alignment Research Center
+    importance_rank: 14
+    estimated_size_tier: tiny
+  - slug: cais
+    name: Center for AI Safety
+    importance_rank: 15
+    estimated_size_tier: small
+  - slug: conjecture
+    name: Conjecture
+    importance_rank: 16
+    estimated_size_tier: small
+  - slug: palisade-research
+    name: Palisade Research
+    importance_rank: 17
+    estimated_size_tier: tiny
+  - slug: goodfire
+    name: Goodfire
+    importance_rank: 18
+    estimated_size_tier: small
+  - slug: elicit
+    name: Elicit
+    importance_rank: 19
+    estimated_size_tier: medium
+  - slug: epoch-ai
+    name: Epoch AI
+    importance_rank: 20
+    estimated_size_tier: small
+
+  # Academic AI safety centers and pipeline programs.
+  - slug: chai
+    name: CHAI
+    importance_rank: 21
+    estimated_size_tier: small
+  - slug: govai
+    name: GovAI
+    importance_rank: 22
+    estimated_size_tier: small
+  - slug: mats
+    name: MATS
+    importance_rank: 23
+    estimated_size_tier: small
+  - slug: apart-research
+    name: Apart Research
+    importance_rank: 24
+    estimated_size_tier: small
+  - slug: cser
+    name: CSER
+    importance_rank: 25
+    estimated_size_tier: small
+
+  # Government AI Safety Institutes and policy-research counterpart.
+  - slug: uk-aisi
+    name: UK AI Safety Institute
+    importance_rank: 26
+    estimated_size_tier: medium
+  - slug: us-aisi
+    name: US AI Safety Institute / CAISI
+    importance_rank: 27
+    estimated_size_tier: small
+  - slug: eu-ai-office
+    name: European AI Office
+    importance_rank: 28
+    estimated_size_tier: medium
+  # IAPS sits in the AISI/policy cluster despite being a private think tank — it's the
+  # DC-based policy-research counterpart to the government institutes. `nist-ai` was
+  # dropped here because `us-aisi` (ranked 27 above) is its parentOrg child, so both
+  # would double-count the same personnel/publications in QUA-634 denominators.
+  - slug: iaps
+    name: Institute for AI Policy and Strategy
+    importance_rank: 29
+    estimated_size_tier: small
+  - slug: japan-aisi
+    name: Japan AI Safety Institute
+    importance_rank: 30
+    estimated_size_tier: small
+  - slug: singapore-aisi
+    name: Singapore AI Safety Institute
+    importance_rank: 31
+    estimated_size_tier: tiny
+  - slug: canada-aisi
+    name: Canadian AI Safety Institute
+    importance_rank: 32
+    estimated_size_tier: tiny
+  - slug: south-korea-aisi
+    name: Korea AI Safety Institute
+    importance_rank: 33
+    estimated_size_tier: tiny
+  - slug: france-inesia
+    name: INESIA (France)
+    importance_rank: 34
+    estimated_size_tier: tiny
+  - slug: australia-aisi
+    name: Australia AI Safety Institute
+    importance_rank: 35
+    estimated_size_tier: tiny
+  - slug: india-aisi
+    name: India AI Safety Institute
+    importance_rank: 36
+    estimated_size_tier: tiny
+
+  # Policy / advocacy / standards.
+  - slug: cset
+    name: CSET
+    importance_rank: 37
+    estimated_size_tier: medium
+  - slug: fli
+    name: Future of Life Institute
+    importance_rank: 38
+    estimated_size_tier: small
+  - slug: centre-for-long-term-resilience
+    name: Centre for Long-Term Resilience
+    importance_rank: 39
+    estimated_size_tier: small
+  - slug: frontier-model-forum
+    name: Frontier Model Forum
+    importance_rank: 40
+    estimated_size_tier: tiny
+  - slug: controlai
+    name: ControlAI
+    importance_rank: 41
+    estimated_size_tier: tiny
+  - slug: pause-ai
+    name: PauseAI
+    importance_rank: 42
+    estimated_size_tier: small
+  - slug: saferai
+    name: SaferAI
+    importance_rank: 43
+    estimated_size_tier: tiny
+
+  # Field-building, infrastructure, and major funders.
+  - slug: horizon-institute
+    name: Horizon Institute for Public Service
+    importance_rank: 44
+    estimated_size_tier: small
+  - slug: bluedot-impact
+    name: BlueDot Impact
+    importance_rank: 45
+    estimated_size_tier: small
+  - slug: lightcone-infrastructure
+    name: Lightcone Infrastructure
+    importance_rank: 46
+    estimated_size_tier: tiny
+  - slug: 80000-hours
+    name: 80,000 Hours
+    importance_rank: 47
+    estimated_size_tier: medium
+  - slug: coefficient-giving
+    name: Coefficient Giving
+    importance_rank: 48
+    estimated_size_tier: small
+  - slug: center-on-long-term-risk
+    name: Center on Long-Term Risk
+    importance_rank: 49
+    estimated_size_tier: tiny
+  - slug: pivotal-research
+    name: Pivotal Research
+    importance_rank: 50
+    estimated_size_tier: tiny
+
+  # --- Expansion: ranks 51-100 ------------------------------------------------
+  #
+  # Forecasting & epistemics — feed AI-safety timelines, eval rigor, and
+  # situational awareness. Several are small/tiny but produce outsized research.
+  - slug: samotsvety
+    name: Samotsvety
+    importance_rank: 51
+    estimated_size_tier: tiny
+  - slug: good-judgment
+    name: Good Judgment
+    importance_rank: 52
+    estimated_size_tier: small
+  - slug: swift-centre
+    name: Swift Centre
+    importance_rank: 53
+    estimated_size_tier: tiny
+  - slug: sentinel
+    name: Sentinel
+    importance_rank: 54
+    estimated_size_tier: small
+  - slug: manifold
+    name: Manifold
+    importance_rank: 55
+    estimated_size_tier: tiny
+
+  # Biosecurity-adjacent AI-risk orgs — QUA-637 umbrella includes bio-driven AI
+  # risk; these orgs produce AI-safety-relevant outputs on dual-use and misuse.
+  - slug: securebio
+    name: SecureBio
+    importance_rank: 56
+    estimated_size_tier: small
+  - slug: securedna
+    name: SecureDNA
+    importance_rank: 57
+    estimated_size_tier: small
+  - slug: nti-bio
+    name: NTI bio
+    importance_rank: 58
+    estimated_size_tier: small
+  - slug: johns-hopkins-center-for-health-security
+    name: Johns Hopkins Center for Health Security
+    importance_rank: 59
+    estimated_size_tier: small
+  - slug: 1day-sooner
+    name: 1Day Sooner
+    importance_rank: 60
+    estimated_size_tier: small
+  - slug: blueprint-biosecurity
+    name: Blueprint Biosecurity
+    importance_rank: 61
+    estimated_size_tier: small
+
+  # Additional technical safety research — smaller scale than the core cluster
+  # but actively publishing.
+  - slug: ai-futures-project
+    name: AI Futures Project
+    importance_rank: 62
+    estimated_size_tier: tiny
+  - slug: ai-impacts
+    name: AI Impacts
+    importance_rank: 63
+    estimated_size_tier: tiny
+  - slug: rethink-priorities
+    name: Rethink Priorities
+    importance_rank: 64
+    estimated_size_tier: medium
+  - slug: median-group
+    name: Median Group
+    importance_rank: 65
+    estimated_size_tier: tiny
+  - slug: arb-research
+    name: Arb Research
+    importance_rank: 66
+    estimated_size_tier: tiny
+  - slug: seldon-lab
+    name: Seldon Lab
+    importance_rank: 67
+    estimated_size_tier: tiny
+
+  # Expanded policy / governance cluster.
+  - slug: rand-corporation
+    name: RAND Corporation
+    importance_rank: 68
+    estimated_size_tier: huge
+  - slug: aria-uk
+    name: ARIA (UK)
+    importance_rank: 69
+    estimated_size_tier: small
+  - slug: legal-priorities-project
+    name: Legal Priorities Project
+    importance_rank: 70
+    estimated_size_tier: tiny
+  - slug: global-priorities-institute
+    name: Global Priorities Institute
+    importance_rank: 71
+    estimated_size_tier: small
+  - slug: simon-institute
+    name: Simon Institute for Longterm Governance
+    importance_rank: 72
+    estimated_size_tier: tiny
+  - slug: cnas
+    name: CNAS (Center for a New American Security)
+    importance_rank: 73
+    estimated_size_tier: small
+  - slug: the-future-society
+    name: The Future Society
+    importance_rank: 74
+    estimated_size_tier: small
+  - slug: collective-intelligence-project
+    name: Collective Intelligence Project
+    importance_rank: 75
+    estimated_size_tier: tiny
+  - slug: federation-of-american-scientists
+    name: Federation of American Scientists
+    importance_rank: 76
+    estimated_size_tier: small
+  - slug: gpai
+    name: Global Partnership on AI (GPAI)
+    importance_rank: 77
+    estimated_size_tier: small
+
+  # Expanded field-building / academic cluster.
+  - slug: beri
+    name: Berkeley Existential Risk Initiative
+    importance_rank: 78
+    estimated_size_tier: tiny
+  - slug: cambridge-boston-alignment-initiative
+    name: Cambridge Boston Alignment Initiative
+    importance_rank: 79
+    estimated_size_tier: tiny
+  - slug: existential-risk-observatory
+    name: Existential Risk Observatory
+    importance_rank: 80
+    estimated_size_tier: tiny
+  - slug: ai-safety-camp
+    name: AI Safety Camp
+    importance_rank: 81
+    estimated_size_tier: tiny
+  - slug: london-initiative-safe-ai
+    name: London Initiative for Safe AI (LISA)
+    importance_rank: 82
+    estimated_size_tier: small
+  - slug: stanford-existential-risks-initiative
+    name: Stanford Existential Risks Initiative
+    importance_rank: 83
+    estimated_size_tier: small
+  - slug: arena-alignment
+    name: ARENA (Alignment Research Engineer Accelerator)
+    importance_rank: 84
+    estimated_size_tier: tiny
+  - slug: allfed
+    name: ALLFED (Alliance to Feed the Earth in Disasters)
+    importance_rank: 85
+    estimated_size_tier: small
+  - slug: global-catastrophic-risk-institute
+    name: Global Catastrophic Risk Institute
+    importance_rank: 86
+    estimated_size_tier: tiny
+  - slug: macrostrategy-research-initiative
+    name: Macrostrategy Research Initiative
+    importance_rank: 87
+    estimated_size_tier: tiny
+
+  # Additional labs / tools — small but actively publishing.
+  - slug: turion
+    name: Turion
+    importance_rank: 88
+    estimated_size_tier: tiny
+  - slug: gratified
+    name: Gratified
+    importance_rank: 89
+    estimated_size_tier: tiny
+  - slug: futuresearch
+    name: FutureSearch
+    importance_rank: 90
+    estimated_size_tier: tiny
+  - slug: lightning-rod-labs
+    name: Lightning Rod Labs
+    importance_rank: 91
+    estimated_size_tier: tiny
+
+  # Expanded funders — AI-safety grant pipelines.
+  - slug: sff
+    name: Survival and Flourishing Fund (SFF)
+    importance_rank: 92
+    estimated_size_tier: tiny
+  - slug: ltff
+    name: Long-Term Future Fund (LTFF)
+    importance_rank: 93
+    estimated_size_tier: tiny
+  - slug: longview-philanthropy
+    name: Longview Philanthropy
+    importance_rank: 94
+    estimated_size_tier: small
+  - slug: manifund
+    name: Manifund
+    importance_rank: 95
+    estimated_size_tier: tiny
+  - slug: founders-pledge
+    name: Founders Pledge
+    importance_rank: 96
+    estimated_size_tier: small
+  - slug: lionheart-ventures
+    name: Lionheart Ventures
+    importance_rank: 97
+    estimated_size_tier: tiny
+
+  # Community / infrastructure.
+  - slug: lesswrong
+    name: LessWrong
+    importance_rank: 98
+    estimated_size_tier: tiny
+  - slug: ea-funds
+    name: EA Funds
+    importance_rank: 99
+    estimated_size_tier: tiny
+  - slug: cea
+    name: Centre for Effective Altruism
+    importance_rank: 100
+    estimated_size_tier: medium

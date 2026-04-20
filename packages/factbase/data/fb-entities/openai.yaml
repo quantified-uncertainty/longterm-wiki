@@ -69,13 +69,17 @@ facts:
 
   - id: f_Sb4nW9mT7a
     property: total-funding
-    value: 5.79e+10
+    value: 5.99e+10
     asOf: 2025-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
-    notes: "Cumulative funding after SoftBank's $40B round (March 2025) at a $300B
-      valuation, bringing total to approximately $57.9B. Round co-led by
-      SoftBank ($15B from third parties, $15B from SoftBank directly, with
-      additional participants)."
+    notes: "Cumulative funding through SoftBank's $40B round (March 2025) at a
+      $300B valuation. Bottom-up sum of documented rounds: $1B founding
+      pledge (2015) + $1B Microsoft (2019) + $1B Series (2021) + $300M
+      Series (2023) + $10B Microsoft (2023) + $6.6B Series (Oct 2024) + $40B
+      SoftBank (Mar 2025) = $59.9B. OpenAI's own March 2025 announcement
+      stated \"approximately $57.9B\" — the ~$2B gap reflects OpenAI's
+      exclusion of the 2015 founding pledge (most of which was never
+      realized) from its cumulative figure."
 
   # ── Valuation ──────────────────────────────────────────────────
   - id: f_b56n3kcD2g
@@ -487,7 +491,7 @@ facts:
     notes: From Wikidata Q21708200
   - id: f_SpuWJB1YfE
     property: ceo
-    value: Sam Altman
+    value: !ref sid_JKsVHQ5stQ
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
   - id: f_XXz1yBQTkp

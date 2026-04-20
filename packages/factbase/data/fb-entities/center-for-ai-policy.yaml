@@ -33,7 +33,7 @@ facts:
   - id: f_gXQzCR6lTO
     property: lobbying-spend
     value: "281964"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
     notes: "2024 in-house federal lobbying. Lobbyists: Jason Green-Lowe, Jakub Stanger Kraus, Martin Spitzer. Verified from Senate LDA."
@@ -41,7 +41,7 @@ facts:
   - id: f_6YetHpmHhR
     property: grant-received
     value: "288000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant for general support"

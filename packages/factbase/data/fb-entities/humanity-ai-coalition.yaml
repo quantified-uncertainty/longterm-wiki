@@ -9,7 +9,7 @@ facts:
   - id: f_eQxEIIrI9c
     property: total-funding
     value: "500000000"
-    unit: USD
+    currency: USD
     asOf: 2025-10
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
     notes: "$500M over 5 years"

@@ -21,7 +21,7 @@ facts:
   - id: f_kWG7y5ECDN
     property: lobbying-spend
     value: "490000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2024&id=D000110584
     notes: "Total 2024 federal lobbying ~$490K (in-house $270K + Akin Gump $160K + Michael Best $60K). Verified from Senate LDA filings."
@@ -29,7 +29,7 @@ facts:
   - id: f_84KoWjirDP
     property: lobbying-spend
     value: "420000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+AI+Safety+Action+Fund
     notes: "Total 2025 federal lobbying ~$420K (in-house $310K + Michael Best $110K). Verified from Senate LDA."

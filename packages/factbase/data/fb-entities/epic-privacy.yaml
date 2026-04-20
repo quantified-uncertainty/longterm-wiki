@@ -35,7 +35,7 @@ facts:
   - id: f_9UHngbbF1G
     property: annual-revenue
     value: "3029134"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/522225921
     notes: "FY 2024 Form 990 (EIN 52-2225921). Total expenses $3,368,137. Net assets $4,215,708. Revenue peaked at $3.8M in 2023."

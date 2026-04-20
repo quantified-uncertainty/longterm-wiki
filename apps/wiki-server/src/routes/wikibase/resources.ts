@@ -34,6 +34,7 @@ import {
   paginationQuery,
   zv,
   clampedLimit,
+  applyTruncation,
 } from "../shared/utils.js";
 import {
   UpsertResourceSchema as SharedUpsertResourceSchema,
@@ -70,7 +71,7 @@ registerComposer<ResourceComposerRow>("resource", (row) => ({
 import { urlVariants } from "../shared/url-variants.js";
 import { generateId } from "@longterm-wiki/factbase";
 import { createHash, randomBytes } from "crypto";
-import { runDedup } from "./resource-dedup.js";
+import { runDedup, ScanTruncatedError } from "./resource-dedup.js";
 
 // ---- Raw SQL row types ----
 
@@ -1516,17 +1517,16 @@ const resourcesApp = new Hono()
       .leftJoin(wikiPages, eq(wikiPages.id, resourceCitations.pageId))
       .limit(HARD_LIMIT + 1);
 
-    const truncated = rows.length > HARD_LIMIT;
-    if (truncated) rows.length = HARD_LIMIT; // discard the probe row
+    const { items, truncated } = applyTruncation(rows, HARD_LIMIT);
 
     // Group by resourceId
     const index: Record<string, string[]> = {};
-    for (const row of rows) {
+    for (const row of items) {
       if (!index[row.resourceId]) index[row.resourceId] = [];
       if (row.pageId) index[row.resourceId].push(row.pageId);
     }
 
-    return c.json({ citations: index, count: rows.length, truncated });
+    return c.json({ citations: index, count: items.length, truncated });
   })
 
   // ---- PATCH /:id/fetch-status (update fetch status from source-fetcher) ----
@@ -2135,8 +2135,18 @@ const resourcesApp = new Hono()
     async (c) => {
       const { apply } = c.req.valid("json");
       const sql = getDb();
-      const result = await runDedup(sql, apply);
-      return c.json(result);
+      try {
+        const result = await runDedup(sql, apply);
+        return c.json(result);
+      } catch (err) {
+        // runDedup throws ScanTruncatedError when apply=true hits a truncated
+        // scan (QUA-623) — translate to a structured 409 so CLI callers get an
+        // actionable message instead of a generic 500.
+        if (err instanceof ScanTruncatedError) {
+          return c.json({ error: "scan_truncated", message: err.message }, 409);
+        }
+        throw err;
+      }
     }
   );
 

@@ -11,7 +11,7 @@ facts:
   - id: f_bhVFcp5tGp
     property: cumulative-funding
     value: "100000000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://cset.georgetown.edu/article/new-grant-agreement-boosts-cset-funding-to-more-than-100-million-over-five-years/
     notes: "Total Open Philanthropy/Coefficient Giving funding >$100M over 5 years (founding $55M 2019 + $42M renewal 2021 + additional grants)"
@@ -73,7 +73,7 @@ facts:
   - id: f_QGx6d8Eut1
     property: grant-received
     value: "5000000"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
     notes: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"

@@ -13,7 +13,7 @@ facts:
   - id: f_GGxu3k9sNa
     property: annual-revenue
     value: "37200000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/200097189
     notes: "Foundation only. Revenue: $37.2M (Major sources: license fees from Mozilla Corp and contributions). Assets: $123.3M."

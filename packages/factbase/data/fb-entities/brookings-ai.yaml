@@ -53,7 +53,7 @@ facts:
   - id: f_Cq7BVOPP2O
     property: revenue
     value: "100000000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Approximate annual operating expenses for the full Brookings Institution (~$100M)"

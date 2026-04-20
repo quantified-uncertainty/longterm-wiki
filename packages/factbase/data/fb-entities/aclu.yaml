@@ -9,7 +9,7 @@ facts:
   - id: f_2puku4DVng
     property: annual-revenue
     value: "307000000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://projects.propublica.org/nonprofits/organizations/136213516
     notes: "ACLU Foundation revenue ~$307M (FY ending March 2025). Separate

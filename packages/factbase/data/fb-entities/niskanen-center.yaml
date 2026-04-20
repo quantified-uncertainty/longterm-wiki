@@ -14,7 +14,7 @@ facts:
   - id: f_i2u0fBwEOh
     property: annual-revenue
     value: "9958495"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/455308952
     notes: "Total assets $12M. Net assets $9.7M."
@@ -34,7 +34,7 @@ facts:
 
   - id: f_4749an0ZBo
     property: founded-by
-    value: "Jerry Taylor"
+    value: !ref sid_W8fJ41OdQH
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Former vice president of the Cato Institute. Resigned September 2021 after domestic violence charges. Core staff came from Cato during a 2012 leadership dispute."
 
@@ -69,7 +69,7 @@ facts:
   - id: f_LKjEZFHThm
     property: annual-revenue
     value: "7075571"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Revenue $7.1M, expenses $7.6M"

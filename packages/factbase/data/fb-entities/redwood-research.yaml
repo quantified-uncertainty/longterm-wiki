@@ -32,7 +32,7 @@ facts:
   - id: f_djeGq9dqSA
     property: revenue
     value: "13904248"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. First year of operations."
@@ -40,7 +40,7 @@ facts:
   - id: f_NRg485oCJw
     property: revenue
     value: "12049894"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -48,7 +48,7 @@ facts:
   - id: f_2Renvd6yYg
     property: revenue
     value: "10036347"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -56,7 +56,7 @@ facts:
   - id: f_6L6LOTW5Hw
     property: revenue
     value: "22060"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Dramatic revenue decline; organization drawing down reserves."
@@ -64,7 +64,7 @@ facts:
   - id: f_zUSEWyPxrA
     property: annual-expenses
     value: "2341569"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. First year; ramping up operations."
@@ -72,7 +72,7 @@ facts:
   - id: f_C7KMno2g6Q
     property: annual-expenses
     value: "12759191"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -80,7 +80,7 @@ facts:
   - id: f_Zi6S0NWlVg
     property: annual-expenses
     value: "12590834"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -88,7 +88,7 @@ facts:
   - id: f_kBjzUvpoiw
     property: annual-expenses
     value: "2922498"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Significant reduction in spending."
@@ -110,7 +110,7 @@ facts:
   - id: f_fuHk3Y2qpQ
     property: net-assets
     value: "11562679"
-    unit: USD
+    currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -118,7 +118,7 @@ facts:
   - id: f_eUlrCHH4uQ
     property: net-assets
     value: "10853382"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -126,7 +126,7 @@ facts:
   - id: f_4DFAHutX6Q
     property: net-assets
     value: "8298895"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
@@ -134,7 +134,7 @@ facts:
   - id: f_6uYJTha67A
     property: net-assets
     value: "6497522"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Declining reserves."
