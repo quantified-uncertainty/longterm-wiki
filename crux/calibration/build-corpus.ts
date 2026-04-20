@@ -1,7 +1,7 @@
 /**
  * Calibration Corpus Builder (QUA-635)
  *
- * Samples confirmed source-check verdicts from prod, pulls the matching
+ * Samples confirmed sourcing verdicts from prod, pulls the matching
  * records + evidence + cached source content, and emits a calibration
  * corpus JSON file that the calibration runner can replay against
  * different LLM models.
