@@ -3,12 +3,16 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 // Save original env
 const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
 const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+const origWikiServerEnv = process.env.WIKI_SERVER_ENV;
 
 describe('wiki-server-client', () => {
   let client: typeof import('./wiki-server-client.ts');
 
   beforeEach(async () => {
     vi.restoreAllMocks();
+    // Opt out of slot auto-detection (QUA-616) so the env-var assertions below
+    // are deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     // Re-import to get fresh module
     client = await import('./wiki-server-client.ts');
   });
@@ -19,6 +23,8 @@ describe('wiki-server-client', () => {
     else delete process.env.LONGTERMWIKI_SERVER_URL;
     if (origKey !== undefined) process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (origWikiServerEnv !== undefined) process.env.WIKI_SERVER_ENV = origWikiServerEnv;
+    else delete process.env.WIKI_SERVER_ENV;
   });
 
   describe('isServerAvailable', () => {

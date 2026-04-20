@@ -127,9 +127,13 @@ describe("detectOrphans", () => {
 describe("fetchAllPgEntities", () => {
   const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
   const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const origWikiServerEnv = process.env.WIKI_SERVER_ENV;
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    // Opt out of slot auto-detection (QUA-616) so env-var assertions are
+    // deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     process.env.LONGTERMWIKI_SERVER_URL = "http://localhost:3000";
     process.env.LONGTERMWIKI_SERVER_API_KEY = "test-key";
   });
@@ -141,6 +145,9 @@ describe("fetchAllPgEntities", () => {
     if (origKey !== undefined)
       process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (origWikiServerEnv !== undefined)
+      process.env.WIKI_SERVER_ENV = origWikiServerEnv;
+    else delete process.env.WIKI_SERVER_ENV;
   });
 
   it("fetches all entities when they fit in one page", async () => {
@@ -267,11 +274,15 @@ describe("fetchAllPgEntities", () => {
 describe("runCheck", () => {
   const origUrl = process.env.LONGTERMWIKI_SERVER_URL;
   const origKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const origWikiServerEnv = process.env.WIKI_SERVER_ENV;
 
   beforeEach(() => {
     // Use clearAllMocks instead of restoreAllMocks to preserve the vi.mock()
     // module mock while clearing call counts and mockReturnValue overrides.
     vi.clearAllMocks();
+    // Opt out of slot auto-detection (QUA-616) so env-var assertions are
+    // deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     process.env.LONGTERMWIKI_SERVER_URL = "http://localhost:3000";
     process.env.LONGTERMWIKI_SERVER_API_KEY = "test-key";
     // Default: YAML has no entities (tests override as needed)
@@ -285,6 +296,9 @@ describe("runCheck", () => {
     if (origKey !== undefined)
       process.env.LONGTERMWIKI_SERVER_API_KEY = origKey;
     else delete process.env.LONGTERMWIKI_SERVER_API_KEY;
+    if (origWikiServerEnv !== undefined)
+      process.env.WIKI_SERVER_ENV = origWikiServerEnv;
+    else delete process.env.WIKI_SERVER_ENV;
   });
 
   it("passes when server URL is not configured (fail-open)", async () => {
