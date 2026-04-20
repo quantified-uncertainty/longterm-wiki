@@ -50,6 +50,15 @@ const COLUMN_CONFIG: Array<{ key: ColKey; shortLabel: string; defaultVisible: bo
 
 // ─── Stakeholder data ─────────────────────────────────────────────────────────
 
+/**
+ * Cell-level sourcing handle.
+ *
+ * `undefined` on a Stakeholder field = no underlying fact/record, so the cell
+ * is purely editorial and renders no dot. `verdict: null` = fact exists but
+ * hasn't been checked yet (neutral "not checked" dot).
+ */
+export type StakeholderSource = { id: string; verdict: string | null };
+
 export interface Stakeholder {
   name: string;
   category: string;
@@ -62,52 +71,31 @@ export interface Stakeholder {
   link?: string;
   notes?: string;
   includeInTotal?: boolean;
-  // Sourcing metadata — resolved server-side; the client just renders dots.
-  // `null` = fact/record exists but is unchecked. `undefined` = no underlying
-  // fact, so the cell's value is purely editorial (no dot rendered).
-  equityRecordKey: string;
-  stakeVerdict: string | null;
-  pledgeFactId?: string;
-  pledgeVerdict: string | null;
-  eaAlignFactId?: string;
-  eaAlignVerdict: string | null;
+  stakeSource: StakeholderSource;
+  pledgeSource?: StakeholderSource;
+  eaAlignSource?: StakeholderSource;
 }
 
-// ─── Cell-level sourcing dot helpers ─────────────────────────────────────────
-
-function StakeSourcingDot({
-  recordKey,
-  verdict,
+function CellDot({
+  source,
+  kind,
 }: {
-  recordKey: string;
-  verdict: string | null;
+  source?: StakeholderSource;
+  kind: "record" | "fact";
 }) {
+  if (!source) return null;
+  const status = kind === "record"
+    ? recordVerdictToStatus(source.verdict)
+    : factbaseVerdictToStatus(source.verdict);
+  const href = kind === "record"
+    ? `/sourcing/equity_positions/${encodeURIComponent(source.id)}`
+    : `/sourcing/fact/${encodeURIComponent(source.id)}`;
   return (
     <SourcingDot
-      status={recordVerdictToStatus(verdict)}
-      originalVerdict={verdict}
+      status={status}
+      originalVerdict={source.verdict}
       size="sm"
-      href={`/sourcing/equity_positions/${encodeURIComponent(recordKey)}`}
-      className="ml-1"
-    />
-  );
-}
-
-function FactCellSourcingDot({
-  factId,
-  verdict,
-}: {
-  factId?: string;
-  verdict: string | null;
-}) {
-  if (!factId) return null;
-  return (
-    <SourcingDot
-      status={factbaseVerdictToStatus(verdict)}
-      originalVerdict={verdict}
-      size="sm"
-      href={`/sourcing/fact/${encodeURIComponent(factId)}`}
-      className="ml-1"
+      href={href}
     />
   );
 }
@@ -393,7 +381,7 @@ export function AnthropicStakeholdersTableClient({
                         ) : (
                           <span className="text-muted-foreground italic text-xs">Undisclosed</span>
                         )}
-                        <StakeSourcingDot recordKey={s.equityRecordKey} verdict={s.stakeVerdict} />
+                        <CellDot source={s.stakeSource} kind="record" />
                       </span>
                     </TableCell>
                   )}
@@ -416,7 +404,7 @@ export function AnthropicStakeholdersTableClient({
                         ) : (
                           <span className="text-muted-foreground">&mdash;</span>
                         )}
-                        <FactCellSourcingDot factId={s.pledgeFactId} verdict={s.pledgeVerdict} />
+                        <CellDot source={s.pledgeSource} kind="fact" />
                       </span>
                     </TableCell>
                   )}
@@ -431,7 +419,7 @@ export function AnthropicStakeholdersTableClient({
                         ) : (
                           <span className="text-muted-foreground text-sm">&mdash;</span>
                         )}
-                        <FactCellSourcingDot factId={s.eaAlignFactId} verdict={s.eaAlignVerdict} />
+                        <CellDot source={s.eaAlignSource} kind="fact" />
                       </span>
                     </TableCell>
                   )}

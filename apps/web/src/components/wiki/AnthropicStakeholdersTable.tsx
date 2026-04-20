@@ -171,15 +171,18 @@ export async function AnthropicStakeholdersTable() {
       [eaAlignMin, eaAlignMax] = EMPLOYEE_POOL_EA_ALIGN;
     }
 
-    // Resolve sourcing state for each cell. `null` means no verdict available
-    // (renders as the default "not run" dot); `undefined` means there isn't
-    // even a fact to check (editorial-only — the client renders a distinct
-    // marker instead of a dot).
-    const stakeVerdict = getRecordVerdict("equity_positions", record.key)?.verdict ?? null;
-    const pledgeFactId = pledgeFact?.id;
-    const pledgeVerdict = pledgeFactId ? getFactBaseFactSourcing(pledgeFactId) ?? null : null;
-    const eaAlignFactId = eaAlignFact?.id;
-    const eaAlignVerdict = eaAlignFactId ? getFactBaseFactSourcing(eaAlignFactId) ?? null : null;
+    // `verdict: null` = fact/record exists but unchecked (neutral dot).
+    // `source: undefined` = no fact at all (no dot — purely editorial cell).
+    const stakeSource = {
+      id: record.key,
+      verdict: getRecordVerdict("equity_positions", record.key)?.verdict ?? null,
+    };
+    const pledgeSource = pledgeFact
+      ? { id: pledgeFact.id, verdict: getFactBaseFactSourcing(pledgeFact.id) ?? null }
+      : undefined;
+    const eaAlignSource = eaAlignFact
+      ? { id: eaAlignFact.id, verdict: getFactBaseFactSourcing(eaAlignFact.id) ?? null }
+      : undefined;
 
     // Build link from entity slug
     let link: string | undefined;
@@ -213,13 +216,9 @@ export async function AnthropicStakeholdersTable() {
       link,
       notes,
       includeInTotal,
-      // Sourcing metadata — consumed by the client to render cell-level dots
-      equityRecordKey: record.key,
-      stakeVerdict,
-      pledgeFactId,
-      pledgeVerdict,
-      eaAlignFactId,
-      eaAlignVerdict,
+      stakeSource,
+      pledgeSource,
+      eaAlignSource,
     };
   });
 
