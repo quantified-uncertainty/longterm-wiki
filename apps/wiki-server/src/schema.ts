@@ -4089,3 +4089,65 @@ export const tablebaseScannerResults = pgTable(
     uniqueIndex("uq_scanner_results_natural_key").on(table.scanRunId, table.recordType, table.entityId),
   ],
 );
+
+// ────────────────────────────────────────────────────────────────────────────
+// QUA-632 Phase 1: defensive enrichment tables.
+//
+// `enrichment_targets` — estimated denominators per (entity, record_type)
+// so bursts can track progress toward coverage goals.
+// `enrichment_runs`    — ledger of a single burst operation, updated as
+// /api/enrichment/propose requests arrive.
+// ────────────────────────────────────────────────────────────────────────────
+
+export const enrichmentTargets = pgTable(
+  "enrichment_targets",
+  {
+    id: bigserial("id", { mode: "number" }).primaryKey(),
+    entityId: text("entity_id").notNull(),
+    recordType: text("record_type").notNull(),
+    estimatedTotal: integer("estimated_total").notNull(),
+    targetPct: real("target_pct").notNull().default(0.7),
+    estimatedAt: timestamp("estimated_at", { withTimezone: true }).notNull().defaultNow(),
+    basis: text("basis"),
+    confidence: text("confidence"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_enrichment_targets_entity_record").on(table.entityId, table.recordType),
+    index("idx_enrichment_targets_record_type").on(table.recordType),
+  ],
+);
+
+export const enrichmentRuns = pgTable(
+  "enrichment_runs",
+  {
+    id: text("id").primaryKey(),
+    label: text("label"),
+    recordType: text("record_type"),
+    entityId: text("entity_id"),
+    tier: text("tier"),
+    startedAt: timestamp("started_at", { withTimezone: true }).notNull().defaultNow(),
+    finishedAt: timestamp("finished_at", { withTimezone: true }),
+    proposesTotal: integer("proposes_total").notNull().default(0),
+    proposesAccepted: integer("proposes_accepted").notNull().default(0),
+    proposesRejected: integer("proposes_rejected").notNull().default(0),
+    acceptedT1: integer("accepted_t1").notNull().default(0),
+    acceptedT2: integer("accepted_t2").notNull().default(0),
+    acceptedT3: integer("accepted_t3").notNull().default(0),
+    verdictConfirmed: integer("verdict_confirmed").notNull().default(0),
+    verdictContradicted: integer("verdict_contradicted").notNull().default(0),
+    verdictOutdated: integer("verdict_outdated").notNull().default(0),
+    verdictPartial: integer("verdict_partial").notNull().default(0),
+    verdictUnverifiable: integer("verdict_unverifiable").notNull().default(0),
+    costUsd: real("cost_usd").notNull().default(0),
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_enrichment_runs_record_type").on(table.recordType),
+    index("idx_enrichment_runs_entity").on(table.entityId),
+    index("idx_enrichment_runs_started_at").on(sql`${table.startedAt} DESC`),
+  ],
+);
