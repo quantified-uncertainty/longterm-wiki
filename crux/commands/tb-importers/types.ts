@@ -36,7 +36,22 @@ export interface EnrichmentProposal {
   responseHash: string;
   /** Target tablebase record type. */
   recordType: EnrichmentRecordType;
-  /** The record fields. Shape depends on `recordType`. */
+  /**
+   * The record fields. Shape depends on `recordType`.
+   *
+   * NOTE: this is the *enrichment proposal*, not a fully-formed PG row.
+   * The propose endpoint (QUA-632) is responsible for:
+   *   - Minting the record `id` (10-char primary key)
+   *   - Resolving `entityRefs` into entity stableIds (FK columns)
+   *   - Populating any required fields the importer doesn't know
+   *
+   * The importer's job is to emit deterministic, source-derived fields:
+   *   - funding-round: name, date, raised, instrument, source, notes,
+   *     companyDisplayName
+   *   - personnel:     role, roleType, personDisplayName, orgDisplayName,
+   *     source, notes, isFounder
+   *   - benchmark-result: score, unit, date, sourceUrl, notes
+   */
   record: Record<string, unknown>;
   /**
    * Optional foreign-key resolution hints. When present, the propose endpoint

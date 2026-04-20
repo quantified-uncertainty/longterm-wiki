@@ -99,19 +99,21 @@ export function printBatchSummary(
   results: readonly ProposeResult[],
   importerName: string
 ): void {
-  const accepted = results.filter((r) => r.status === "accepted").length;
-  const rejected = results.filter((r) => r.status === "rejected").length;
-  const pending = results.filter((r) => r.status === "pending").length;
+  const rejections: ProposeResult[] = [];
+  let accepted = 0;
+  let pending = 0;
+  for (const r of results) {
+    if (r.status === "accepted") accepted++;
+    else if (r.status === "pending") pending++;
+    else if (r.status === "rejected") rejections.push(r);
+  }
   console.log(
-    `[${importerName}] ${results.length} proposals: accepted=${accepted} rejected=${rejected} pending=${pending}`
+    `[${importerName}] ${results.length} proposals: accepted=${accepted} rejected=${rejections.length} pending=${pending}`
   );
-  if (rejected > 0) {
+  if (rejections.length > 0) {
     console.log(`[${importerName}] First 5 rejections:`);
-    results
-      .filter((r) => r.status === "rejected")
-      .slice(0, 5)
-      .forEach((r) =>
-        console.log(`  - ${r.proposal.source}: ${r.reason ?? "no reason"}`)
-      );
+    for (const r of rejections.slice(0, 5)) {
+      console.log(`  - ${r.proposal.source}: ${r.reason ?? "no reason"}`);
+    }
   }
 }

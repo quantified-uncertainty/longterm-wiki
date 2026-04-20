@@ -3,6 +3,7 @@ import {
   padCik,
   buildFormDUrl,
   parseFormDXml,
+  decodeXmlEntities,
   fetchFormDFilings,
   fetchAndParseFormD,
   buildProposal,
@@ -54,6 +55,29 @@ describe("padCik", () => {
   });
 });
 
+describe("decodeXmlEntities", () => {
+  it("decodes named entities", () => {
+    expect(decodeXmlEntities("AT&amp;T")).toBe("AT&T");
+    expect(decodeXmlEntities("&lt;tag&gt;")).toBe("<tag>");
+    expect(decodeXmlEntities("she said &quot;hi&quot;")).toBe('she said "hi"');
+    expect(decodeXmlEntities("don&apos;t")).toBe("don't");
+  });
+  it("decodes decimal numeric character references", () => {
+    expect(decodeXmlEntities("&#39;")).toBe("'");
+    expect(decodeXmlEntities("&#65;")).toBe("A");
+  });
+  it("decodes hex numeric character references", () => {
+    expect(decodeXmlEntities("&#x27;")).toBe("'");
+    expect(decodeXmlEntities("&#xA9;")).toBe("©");
+  });
+  it("preserves &amp;lt; → &lt; (not <)", () => {
+    expect(decodeXmlEntities("&amp;lt;")).toBe("&lt;");
+  });
+  it("leaves bare ampersands alone", () => {
+    expect(decodeXmlEntities("a & b")).toBe("a & b");
+  });
+});
+
 describe("buildFormDUrl", () => {
   const filing: FormDFiling = {
     accessionNumber: "0001828101-24-000001",
@@ -71,6 +95,9 @@ describe("buildFormDUrl", () => {
       "https://www.sec.gov/Archives/edgar/data/1828101/000182810124000001/primary_doc.xml"
     );
   });
+  it("throws on all-zero CIK rather than producing /data/0/...", () => {
+    expect(() => buildFormDUrl("0000000000", filing)).toThrow(/all zeros/);
+  });
 });
 
 describe("parseFormDXml", () => {
@@ -87,7 +114,7 @@ describe("parseFormDXml", () => {
     expect(e.totalAmountSold).toBeNull();
     expect(e.totalNumberAlreadyInvested).toBeNull();
     expect(e.firstSaleDate).toBeNull();
-    expect(e.issuerName).toBe("");
+    expect(e.issuerName).toBeNull();
   });
 
   it("returns null when amount field is non-numeric", () => {
@@ -98,6 +125,31 @@ describe("parseFormDXml", () => {
   it("handles empty leaf elements", () => {
     const xml = `<edgarSubmission><totalAmountSold></totalAmountSold></edgarSubmission>`;
     expect(parseFormDXml(xml).totalAmountSold).toBeNull();
+  });
+
+  it("handles namespace-prefixed tags (ns1:totalAmountSold)", () => {
+    const xml = `<ns1:edgarSubmission><ns1:totalAmountSold>500</ns1:totalAmountSold></ns1:edgarSubmission>`;
+    expect(parseFormDXml(xml).totalAmountSold).toBe(500);
+  });
+
+  it("handles tags with attributes (xml:lang on entityName)", () => {
+    const xml = `<edgarSubmission><entityName xml:lang="en">OpenAI</entityName></edgarSubmission>`;
+    expect(parseFormDXml(xml).issuerName).toBe("OpenAI");
+  });
+
+  it("handles namespace + attributes simultaneously", () => {
+    const xml = `<a><ns1:entityName xml:lang="en" foo="bar">Anthropic, PBC</ns1:entityName></a>`;
+    expect(parseFormDXml(xml).issuerName).toBe("Anthropic, PBC");
+  });
+
+  it("decodes XML entities inside element values", () => {
+    const xml = `<edgarSubmission><entityName>OpenAI &amp; Affiliates</entityName></edgarSubmission>`;
+    expect(parseFormDXml(xml).issuerName).toBe("OpenAI & Affiliates");
+  });
+
+  it("decodes numeric character references in values", () => {
+    const xml = `<edgarSubmission><entityName>L&#39;Or&#xE9;al</entityName></edgarSubmission>`;
+    expect(parseFormDXml(xml).issuerName).toBe("L'Oréal");
   });
 });
 
@@ -171,6 +223,23 @@ describe("fetchFormDFilings", () => {
     expect(out).toHaveLength(3);
   });
 
+  it("safely handles mismatched parallel-array lengths", async () => {
+    const fetchImpl = makeFetch({
+      cik: "1828101",
+      filings: {
+        recent: {
+          accessionNumber: ["A-1"],          // length 1
+          form: ["D", "D"],                   // length 2
+          filingDate: ["2024-01-01", "2024-02-01"], // length 2
+        },
+      },
+    });
+    // Should not crash on undefined access; takes the shortest array.
+    const out = await fetchFormDFilings("1828101", { fetchImpl });
+    expect(out).toHaveLength(1);
+    expect(out[0].accessionNumber).toBe("A-1");
+  });
+
   it("sends the configured User-Agent header", async () => {
     let captured = "";
     const fetchImpl = (async (_url: string, init: RequestInit | undefined) => {
@@ -185,6 +254,23 @@ describe("fetchFormDFilings", () => {
     }) as unknown as typeof fetch;
     await fetchFormDFilings("1828101", { fetchImpl, userAgent: "test-agent/1.0" });
     expect(captured).toBe("test-agent/1.0");
+  });
+
+  it("strips CR/LF from user-supplied User-Agent (header injection guard)", async () => {
+    let captured = "";
+    const fetchImpl = (async (_url: string, init: RequestInit | undefined) => {
+      captured = String((init?.headers as Record<string, string>)?.["User-Agent"] ?? "");
+      return {
+        ok: true,
+        status: 200,
+        async json() {
+          return { cik: "x", filings: { recent: {} } };
+        },
+      };
+    }) as unknown as typeof fetch;
+    await fetchFormDFilings("1828101", { fetchImpl, userAgent: "evil\r\nX-Inj: yes" });
+    expect(captured).not.toContain("\r");
+    expect(captured).not.toContain("\n");
   });
 });
 
@@ -258,24 +344,35 @@ describe("buildProposal", () => {
     const extract = parseFormDXml(SAMPLE_XML);
     const p = buildProposal(TARGET, filing, extract, SAMPLE_XML, "u");
     expect(p.record.raised).toBe(750_000_000);
+    // Prefers extract.firstSaleDate over filing.filingDate when both are present
     expect(p.record.date).toBe("2024-05-30");
+  });
+
+  it("includes the issuer name from the XML in notes (for evidence)", () => {
+    const extract = parseFormDXml(SAMPLE_XML);
+    const p = buildProposal(TARGET, filing, extract, SAMPLE_XML, "u");
     expect(String(p.record.notes)).toContain("12 investors");
+    expect(String(p.record.notes)).toContain("Issuer per Form D: Anthropic, PBC");
+  });
+
+  it("falls back to filing.filingDate when extract.firstSaleDate is null", () => {
+    const extract = parseFormDXml(`<edgarSubmission></edgarSubmission>`);
+    const p = buildProposal(TARGET, filing, extract, SAMPLE_XML, "u");
+    expect(p.record.date).toBe("2024-05-30"); // from filing.filingDate
+    expect(p.record.notes).toBeNull();
   });
 
   it("emits null raised when the extract lacks the field", () => {
     const extract = parseFormDXml(`<edgarSubmission></edgarSubmission>`);
     const p = buildProposal(TARGET, filing, extract, SAMPLE_XML, "u");
     expect(p.record.raised).toBeNull();
-    expect(p.record.notes).toBeNull();
   });
 });
 
 describe("importTarget — happy path + skip-on-error", () => {
-  it("returns proposals for fetched filings and skips broken ones", async () => {
-    let callIdx = 0;
+  it("returns proposals + failures count and skips broken filings", async () => {
     const fetchImpl = (async (url: string) => {
-      callIdx++;
-      if (url.includes("submissions/")) {
+      if (String(url).includes("submissions/")) {
         return {
           ok: true,
           status: 200,
@@ -294,8 +391,10 @@ describe("importTarget — happy path + skip-on-error", () => {
           },
         };
       }
-      // Fail the second filing fetch
-      if (callIdx === 3) return { ok: false, status: 500 };
+      // Fail filing A-2 specifically (not call-counter — robust to refactor)
+      if (String(url).includes("/A2/")) {
+        return { ok: false, status: 500 };
+      }
       return {
         ok: true,
         status: 200,
@@ -305,9 +404,10 @@ describe("importTarget — happy path + skip-on-error", () => {
       };
     }) as unknown as typeof fetch;
     const opts: SecEdgarOptions = { fetchImpl };
-    const proposals = await importTarget(TARGET, opts);
+    const { proposals, failures } = await importTarget(TARGET, opts);
     expect(proposals).toHaveLength(1);
     expect(proposals[0].source).toBe("sec-edgar:A-1");
+    expect(failures).toBe(1);
   });
 });
 
@@ -320,7 +420,25 @@ describe("parseTargetsArg", () => {
   it("ignores other flags", () => {
     expect(parseTargetsArg(["--submit", "--target=x:1"])).toHaveLength(1);
   });
-  it("throws on malformed --target", () => {
-    expect(() => parseTargetsArg(["--target=missingcik"])).toThrow(/slug:cik/);
+  it("throws on malformed --target (no colon)", () => {
+    expect(() => parseTargetsArg(["--target=missingcik"])).toThrow(/exactly one colon/);
+  });
+  it("throws on extra colons (--target=slug:cik:extra)", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:1828101:extra"])).toThrow(
+      /exactly one colon/
+    );
+  });
+  it("throws on empty slug", () => {
+    expect(() => parseTargetsArg(["--target=:1828101"])).toThrow(/non-empty/);
+  });
+  it("throws on empty cik", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:"])).toThrow(/non-empty/);
+  });
+  it("throws on non-numeric cik", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:abc"])).toThrow(/1-10 digits/);
+    expect(() => parseTargetsArg(["--target=anthropic:CIK 1"])).toThrow(/1-10 digits/);
+  });
+  it("throws on too-long cik", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:12345678901"])).toThrow(/1-10 digits/);
   });
 });

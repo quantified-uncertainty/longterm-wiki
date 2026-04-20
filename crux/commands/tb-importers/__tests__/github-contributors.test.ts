@@ -52,8 +52,19 @@ describe("fetchRepoContributors", () => {
     expect(out.map((u) => u.login)).toEqual(["alice", "bob", "carol"]);
   });
 
-  it("throws on bad owner/repo format", async () => {
+  it("throws on bad owner/repo format (missing slash)", async () => {
     await expect(fetchRepoContributors("invalid", {})).rejects.toThrow(/owner\/repo/);
+  });
+
+  it("rejects path-traversal in owner/repo (SSRF guard)", async () => {
+    // Multi-slash → caught by the parts.length check
+    await expect(fetchRepoContributors("../etc/passwd", {})).rejects.toThrow(/owner\/repo/);
+    // Encoded bytes → caught by the char allowlist
+    await expect(fetchRepoContributors("foo/%2e%2e", {})).rejects.toThrow(/A-Za-z0-9._-/);
+    // ".." as a name → caught by the explicit deny list
+    await expect(fetchRepoContributors("foo/..", {})).rejects.toThrow(/traversal/);
+    // Bad chars → caught by the char allowlist
+    await expect(fetchRepoContributors("a/b@evil.com", {})).rejects.toThrow();
   });
 
   it("throws on non-2xx HTTP", async () => {
@@ -61,6 +72,15 @@ describe("fetchRepoContributors", () => {
     await expect(
       fetchRepoContributors("a/b", { fetchImpl })
     ).rejects.toThrow(/HTTP 403/);
+  });
+
+  it("throws when API returns a non-array", async () => {
+    const fetchImpl = (async () => ({
+      ok: true,
+      status: 200,
+      async json() { return { error: "rate limited" }; },
+    })) as unknown as typeof fetch;
+    await expect(fetchRepoContributors("a/b", { fetchImpl })).rejects.toThrow(/not an array/);
   });
 
   it("sends Authorization when githubToken provided", async () => {
@@ -126,6 +146,21 @@ describe("aggregateContributors", () => {
   it("handles empty per-repo map", () => {
     expect(aggregateContributors({}, 1)).toEqual([]);
   });
+
+  it("handles a login appearing twice in the SAME repo (defensive — preserves invariant)", () => {
+    const perRepo = {
+      "a/r": [
+        { login: "alice", id: 1, contributions: 3, type: "User" as const, html_url: "u" },
+        { login: "alice", id: 1, contributions: 4, type: "User" as const, html_url: "u" },
+      ],
+    };
+    const [agg] = aggregateContributors(perRepo, 5);
+    // totalContributions === sum(perRepo.values()) invariant must hold
+    expect(agg.totalContributions).toBe(7);
+    expect(agg.perRepo).toEqual({ "a/r": 7 });
+    const sumOfPerRepo = Object.values(agg.perRepo).reduce((s, v) => s + v, 0);
+    expect(sumOfPerRepo).toBe(agg.totalContributions);
+  });
 });
 
 describe("buildProposals", () => {
@@ -151,6 +186,15 @@ describe("buildProposals", () => {
     expect(p.record.role).toBe("contributor");
     expect(p.record.roleType).toBe("career");
     expect(p.record.isFounder).toBe(false);
+  });
+
+  it("personDisplayName is null (avoids raw machine ID display)", () => {
+    const [p] = buildProposals(TARGET, [
+      { login: "alice", totalContributions: 50, perRepo: {}, htmlUrl: "u" },
+    ]);
+    expect(p.record.personDisplayName).toBeNull();
+    // login is preserved in notes for downstream resolution
+    expect(String(p.record.notes)).toContain("alice");
   });
 
   it("hashes the canonical record deterministically", () => {
@@ -182,7 +226,7 @@ describe("buildProposals", () => {
 });
 
 describe("importTarget", () => {
-  it("aggregates across repos and emits proposals above threshold", async () => {
+  it("aggregates across repos and emits proposals above threshold; returns failure count", async () => {
     const fetchImpl = makeFetch({
       "https://api.github.com/repos/anthropics/anthropic-sdk-python/contributors?per_page=100": {
         status: 200,
@@ -199,15 +243,13 @@ describe("importTarget", () => {
         ],
       },
     });
-    const out = await importTarget(TARGET, { fetchImpl });
+    const { proposals, failures } = await importTarget(TARGET, { fetchImpl });
     // alice: 11 (>=5), carol: 6 (>=5)
-    expect(out.map((p) => (p.record.personDisplayName as string))).toEqual([
-      "alice",
-      "carol",
-    ]);
+    expect(proposals.map((p) => p.entityRefs?.person)).toEqual(["alice", "carol"]);
+    expect(failures).toBe(0);
   });
 
-  it("skips broken repos and returns proposals from the others", async () => {
+  it("skips broken repos and returns failures count", async () => {
     const fetchImpl = (async (url: string) => {
       if (String(url).includes("anthropic-sdk-python")) {
         return { ok: false, status: 500, async json() { return {}; } };
@@ -220,9 +262,10 @@ describe("importTarget", () => {
         },
       };
     }) as unknown as typeof fetch;
-    const out = await importTarget(TARGET, { fetchImpl });
-    expect(out).toHaveLength(1);
-    expect((out[0].record.personDisplayName as string)).toBe("alice");
+    const { proposals, failures } = await importTarget(TARGET, { fetchImpl });
+    expect(proposals).toHaveLength(1);
+    expect(proposals[0].entityRefs?.person).toBe("alice");
+    expect(failures).toBe(1);
   });
 });
 
@@ -236,13 +279,31 @@ describe("parseTargetsArg", () => {
     const out = parseTargetsArg(["--target=anthropic:anthropics/a,anthropics/b"]);
     expect(out[0].repos).toEqual(["anthropics/a", "anthropics/b"]);
   });
-  it("throws when repo is missing the slash", () => {
+  it("throws when a repo is missing the slash", () => {
     expect(() => parseTargetsArg(["--target=anthropic:badrepo"])).toThrow(/owner\/repo/);
   });
-  it("throws when repos list is empty", () => {
+  it("throws when the repos list contains an empty entry (a/b,,a/c)", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:a/b,,a/c"])).toThrow(/empty entries/);
+  });
+  it("throws on leading or trailing comma", () => {
+    expect(() => parseTargetsArg(["--target=anthropic:,a/b"])).toThrow(/empty entries/);
+    expect(() => parseTargetsArg(["--target=anthropic:a/b,"])).toThrow(/empty entries/);
+  });
+  it("throws when repos list is empty (just colon)", () => {
     expect(() => parseTargetsArg(["--target=anthropic:"])).toThrow();
+  });
+  it("throws when a repo has bad chars (path traversal / encoded bytes)", () => {
+    // ".." as a name → caught by deny list
+    expect(() => parseTargetsArg(["--target=anthropic:foo/..,bar/baz"])).toThrow(
+      /traversal/
+    );
+    // Encoded bytes → caught by char allowlist
+    expect(() => parseTargetsArg(["--target=anthropic:foo/%2e%2e"])).toThrow(/A-Za-z0-9._-/);
   });
   it("throws when colon is missing", () => {
     expect(() => parseTargetsArg(["--target=anthropic"])).toThrow(/slug:owner\/repo/);
+  });
+  it("throws on empty slug", () => {
+    expect(() => parseTargetsArg(["--target=:a/b"])).toThrow(/non-empty/);
   });
 });

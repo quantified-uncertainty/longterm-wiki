@@ -11,8 +11,12 @@
  *   (returns recent.form[] / recent.accessionNumber[] / recent.filingDate[])
  * Form D XML index: https://www.sec.gov/Archives/edgar/data/<cik>/<accession-no-dashes>/<accession-with-dashes>-index.json
  *
- * SEC requires a User-Agent identifying the requester. We send
- * "longterm-wiki <ozzie@quantifieduncertainty.org>".
+ * The XML parser is deliberately regex-based but tolerant of:
+ *   - namespace prefixes (`<ns1:totalAmountSold>`)
+ *   - element attributes (`<entityName xml:lang="en">`)
+ *   - HTML entity references (`&amp;`, `&lt;`, `&#39;`, `&#x27;`)
+ * If you encounter Form D XML this can't parse, swap in `fast-xml-parser`
+ * here — the rest of the importer is parser-agnostic.
  */
 
 import { createHash } from "crypto";
@@ -21,9 +25,8 @@ import {
   printBatchSummary,
   type ProposeClientOptions,
 } from "./propose-client.ts";
+import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
 import type { EnrichmentProposal } from "./types.ts";
-
-const USER_AGENT = "longterm-wiki <ozzie@quantifieduncertainty.org>";
 
 export interface SecEdgarTarget {
   /** Org slug from data/entities/organizations.yaml */
@@ -34,11 +37,7 @@ export interface SecEdgarTarget {
   cik: string;
 }
 
-export interface SecEdgarOptions {
-  /** Override the global fetch — used by tests to inject responses. */
-  fetchImpl?: typeof fetch;
-  /** Override the User-Agent — keep default in production. */
-  userAgent?: string;
+export interface SecEdgarOptions extends HttpOptions {
   /** Limit on filings fetched per target (paginated APIs return many). */
   maxFilingsPerTarget?: number;
 }
@@ -72,23 +71,13 @@ export interface FormDExtract {
   totalAmountSold: number | null;
   /** Number of investors in this offering. */
   totalNumberAlreadyInvested: number | null;
-  /** Filing date (YYYY-MM-DD). */
-  filingDate: string;
   /** Issuer entity name from the Form D primary document. */
-  issuerName: string;
+  issuerName: string | null;
   /** First sale date if present (YYYY-MM-DD). */
   firstSaleDate: string | null;
 }
 
 const DEFAULT_MAX_FILINGS = 50;
-
-function getFetch(opts: SecEdgarOptions): typeof fetch {
-  return opts.fetchImpl ?? globalThis.fetch;
-}
-
-function getUserAgent(opts: SecEdgarOptions): string {
-  return opts.userAgent ?? USER_AGENT;
-}
 
 /** SEC requires CIK zero-padded to 10 digits in URL paths. */
 export function padCik(cik: string): string {
@@ -102,8 +91,9 @@ export function padCik(cik: string): string {
 /**
  * Fetch all Form D filings for one CIK from the EDGAR submissions index.
  *
- * The submissions endpoint returns parallel arrays under filings.recent —
- * we zip them, filter to Form D, and dedup.
+ * The submissions endpoint returns parallel arrays under filings.recent.
+ * If the arrays disagree on length, take the shortest to avoid undefined
+ * destructuring downstream.
  */
 export async function fetchFormDFilings(
   cik: string,
@@ -124,8 +114,14 @@ export async function fetchFormDFilings(
   }
 
   const max = opts.maxFilingsPerTarget ?? DEFAULT_MAX_FILINGS;
+  // Defensive: take the shortest parallel array to avoid out-of-bounds reads.
+  const len = Math.min(
+    recent.form.length,
+    recent.accessionNumber.length,
+    recent.filingDate.length
+  );
   const out: FormDFiling[] = [];
-  for (let i = 0; i < recent.form.length && out.length < max; i++) {
+  for (let i = 0; i < len && out.length < max; i++) {
     if (recent.form[i] !== "D" && recent.form[i] !== "D/A") continue;
     const accession = recent.accessionNumber[i];
     const filingDate = recent.filingDate[i];
@@ -143,31 +139,58 @@ export async function fetchFormDFilings(
 /**
  * Build the canonical URL for a Form D primary document XML.
  * EDGAR archive URLs use the dashed accession number for the path
- * but the un-dashed form for the directory.
+ * but a leading-zero-stripped CIK for the directory segment.
+ *
+ * If the CIK is all zeros after stripping, EDGAR has no entity at /data/0/
+ * and we throw — better to fail fast than 404 on every filing.
  */
 export function buildFormDUrl(
   cik: string,
   filing: FormDFiling
 ): string {
   const padded = padCik(cik);
-  // EDGAR strips leading zeros for the directory segment
-  const dirCik = String(parseInt(padded, 10));
+  const dirCik = padded.replace(/^0+/, "");
+  if (dirCik.length === 0) {
+    throw new Error(`CIK is all zeros after stripping: "${cik}"`);
+  }
   return `https://www.sec.gov/Archives/edgar/data/${dirCik}/${filing.accessionNoDashes}/${filing.primaryDocument}`;
 }
 
 /**
+ * Decode the small set of XML entities Form D filings use in practice.
+ * Form D doesn't carry CDATA blocks of significance in the fields we care
+ * about, so this covers `&amp;`, `&lt;`, `&gt;`, `&quot;`, `&apos;`,
+ * `&#NN;` (decimal), and `&#xHH;` (hex).
+ */
+export function decodeXmlEntities(s: string): string {
+  return s
+    .replace(/&#(\d+);/g, (_, n) => String.fromCodePoint(parseInt(n, 10)))
+    .replace(/&#x([0-9a-fA-F]+);/g, (_, n) => String.fromCodePoint(parseInt(n, 16)))
+    .replace(/&quot;/g, '"')
+    .replace(/&apos;/g, "'")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&"); // keep last so &amp;lt; → &lt;, not <
+}
+
+/**
  * Parse a Form D XML payload. Form D has a fixed schema; we extract a small
- * fixed subset. Tag names are case-sensitive in EDGAR XML.
+ * fixed subset.
  *
- * This intentionally uses regex rather than a full XML parser — Form D
- * payloads are small and the fields we want are leaf elements with no
- * attribute interactions or nested duplicates.
+ * Tolerates: optional namespace prefix (`ns1:`), optional attributes,
+ * `&amp;` `&lt;` `&gt;` `&quot;` `&apos;` `&#N;` `&#xH;` entities.
+ *
+ * Doesn't handle: CDATA sections, nested elements with the same name,
+ * elements split across the buffer (Form D filings are single-file, small).
  */
 export function parseFormDXml(xml: string): FormDExtract {
   const text = (tag: string): string | null => {
-    const re = new RegExp(`<${tag}>([^<]*)</${tag}>`);
+    // Optional namespace prefix, optional attributes, leaf element only.
+    const re = new RegExp(
+      `<(?:[\\w-]+:)?${tag}(?:\\s[^>]*)?>([^<]*)</(?:[\\w-]+:)?${tag}>`
+    );
     const m = re.exec(xml);
-    return m ? m[1].trim() : null;
+    return m ? decodeXmlEntities(m[1].trim()) : null;
   };
   const num = (tag: string): number | null => {
     const v = text(tag);
@@ -176,12 +199,10 @@ export function parseFormDXml(xml: string): FormDExtract {
     return Number.isFinite(n) ? n : null;
   };
 
-  const filingDate = text("dateOfFirstSale") ?? text("filingDate") ?? "";
   return {
     totalAmountSold: num("totalAmountSold"),
     totalNumberAlreadyInvested: num("totalNumberAlreadyInvested"),
-    filingDate: filingDate || "",
-    issuerName: text("entityName") ?? "",
+    issuerName: text("entityName"),
     firstSaleDate: text("dateOfFirstSale"),
   };
 }
@@ -203,7 +224,15 @@ export async function fetchAndParseFormD(
   return { extract: parseFormDXml(rawXml), rawXml, sourceUrl };
 }
 
-/** Build the proposal payload from one Form D extract. */
+/**
+ * Build the proposal payload from one Form D extract.
+ *
+ * We prefer `extract.firstSaleDate` for the funding-round date when present
+ * (more precise than the filing date, which can lag the actual sale by
+ * weeks), and fall back to the filing date from the index. The issuer name
+ * from the XML is stored in `notes` for evidence — the propose endpoint can
+ * verify it matches the requested target before accepting the row.
+ */
 export function buildProposal(
   target: SecEdgarTarget,
   filing: FormDFiling,
@@ -212,6 +241,15 @@ export function buildProposal(
   sourceUrl: string
 ): EnrichmentProposal {
   const responseHash = createHash("sha256").update(rawXml).digest("hex");
+  const date = extract.firstSaleDate || filing.filingDate;
+  const investorNote = extract.totalNumberAlreadyInvested != null
+    ? `${extract.totalNumberAlreadyInvested} investors per Form D`
+    : null;
+  const issuerNote = extract.issuerName
+    ? `Issuer per Form D: ${extract.issuerName}`
+    : null;
+  const notes = [investorNote, issuerNote].filter(Boolean).join(" — ") || null;
+
   return {
     tier: "T1",
     source: `sec-edgar:${filing.accessionNumber}`,
@@ -221,15 +259,13 @@ export function buildProposal(
     record: {
       // Form D doesn't tell us the round name directly — use filing date as fallback.
       name: `Form D filing ${filing.filingDate}`,
-      date: filing.filingDate,
+      date,
       raised: extract.totalAmountSold,
       // Form D explicitly labels these as "exempt offering" — instrument unknown
       // without external context. Leave null rather than guessing.
       instrument: null,
       source: sourceUrl,
-      notes: extract.totalNumberAlreadyInvested != null
-        ? `${extract.totalNumberAlreadyInvested} investors per Form D`
-        : null,
+      notes,
       companyDisplayName: target.orgName,
     },
     entityRefs: { organization: target.orgSlug },
@@ -238,14 +274,19 @@ export function buildProposal(
 
 /**
  * End-to-end import for a single target — fetch index, fetch each Form D,
- * build proposals. Errors on individual filings are logged + skipped.
+ * build proposals.
+ *
+ * Returns both the proposals AND a `failures` count for the caller —
+ * silent partial success is dangerous for T1 importers (one target with
+ * 49/50 broken filings shouldn't look like a successful import).
  */
 export async function importTarget(
   target: SecEdgarTarget,
   opts: SecEdgarOptions = {}
-): Promise<EnrichmentProposal[]> {
+): Promise<{ proposals: EnrichmentProposal[]; failures: number }> {
   const filings = await fetchFormDFilings(target.cik, opts);
   const proposals: EnrichmentProposal[] = [];
+  let failures = 0;
   for (const filing of filings) {
     try {
       const { extract, rawXml, sourceUrl } = await fetchAndParseFormD(
@@ -257,13 +298,14 @@ export async function importTarget(
         buildProposal(target, filing, extract, rawXml, sourceUrl)
       );
     } catch (e) {
+      failures++;
       const msg = e instanceof Error ? e.message : String(e);
       console.warn(
         `[sec-edgar] skipping ${target.orgSlug} filing ${filing.accessionNumber}: ${msg}`
       );
     }
   }
-  return proposals;
+  return { proposals, failures };
 }
 
 /** CLI entry point — `crux tb sec-edgar [--submit]`. */
@@ -282,28 +324,53 @@ export async function cliMain(
   }
 
   const allProposals: EnrichmentProposal[] = [];
+  let totalFailures = 0;
   for (const t of targets) {
     console.log(`[sec-edgar] fetching ${t.orgSlug} (CIK ${t.cik})...`);
-    const proposals = await importTarget(t);
-    console.log(`[sec-edgar]   → ${proposals.length} Form D proposals`);
-    allProposals.push(...proposals);
+    try {
+      const { proposals, failures } = await importTarget(t);
+      console.log(
+        `[sec-edgar]   → ${proposals.length} proposals, ${failures} per-filing failures`
+      );
+      allProposals.push(...proposals);
+      totalFailures += failures;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[sec-edgar] target ${t.orgSlug} failed entirely: ${msg}`);
+      totalFailures++;
+    }
   }
 
   const clientOpts: ProposeClientOptions = { submit };
   const results = await submitBatch(allProposals, clientOpts);
   printBatchSummary(results, "sec-edgar");
+  if (totalFailures > 0) {
+    console.warn(`[sec-edgar] ${totalFailures} per-filing/per-target failures`);
+  }
   return { exitCode: 0, output: "" };
 }
 
-/** Parse `--target=anthropic:0001234567` flags from argv. */
+/**
+ * Parse `--target=anthropic:0001234567` flags from argv.
+ * Strict: rejects extra colons, empty parts, malformed CIK input.
+ */
 export function parseTargetsArg(args: readonly string[]): SecEdgarTarget[] {
   const out: SecEdgarTarget[] = [];
   for (const arg of args) {
     if (!arg.startsWith("--target=")) continue;
     const value = arg.slice("--target=".length);
-    const [orgSlug, cik] = value.split(":");
+    const parts = value.split(":");
+    if (parts.length !== 2) {
+      throw new Error(`--target must be slug:cik (exactly one colon), got "${value}"`);
+    }
+    const [orgSlug, cik] = parts;
     if (!orgSlug || !cik) {
-      throw new Error(`--target must be slug:cik, got "${value}"`);
+      throw new Error(`--target slug and cik must both be non-empty, got "${value}"`);
+    }
+    // Validate CIK is numeric early so that downstream URL building doesn't
+    // produce a malformed request URL.
+    if (!/^\d{1,10}$/.test(cik)) {
+      throw new Error(`--target cik must be 1-10 digits, got "${cik}"`);
     }
     out.push({ orgSlug, orgName: orgSlug, cik });
   }

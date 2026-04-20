@@ -10,8 +10,11 @@
  * association, not the role. Per QUA-640: "personnel role/title still needs
  * T2 verification against team pages; this is a T1 seeding step".
  *
- * The personnel record we write therefore uses role="contributor" and
- * roleType="career" — explicitly distinguishing it from key-person rows.
+ * The personnel record uses role="contributor" / roleType="career", and
+ * `personDisplayName` is left null — the GitHub login is stored in `notes`
+ * because surfacing a raw login as a display name fails
+ * `validate-display-names.ts` ("no raw machine IDs in titles"). Resolution
+ * to a real name happens via downstream Wikidata/OpenAlex cross-reference.
  *
  * API: https://api.github.com/repos/<owner>/<repo>/contributors?per_page=100
  *   (requires no auth for public repos; rate-limited at 60/h unauth or
@@ -24,9 +27,15 @@ import {
   printBatchSummary,
   type ProposeClientOptions,
 } from "./propose-client.ts";
+import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
 import type { EnrichmentProposal } from "./types.ts";
 
-const USER_AGENT = "longterm-wiki <ozzie@quantifieduncertainty.org>";
+/**
+ * GitHub owner / repo name char allowlist (no path traversal, no encoded bytes).
+ * Also rejects the literal traversal segments "." and "..".
+ */
+const GH_NAME_RE = /^[A-Za-z0-9._-]+$/;
+const GH_DENY_NAMES = new Set([".", ".."]);
 
 export interface GhContributorsTarget {
   /** Org slug from data/entities/organizations.yaml */
@@ -39,11 +48,7 @@ export interface GhContributorsTarget {
   minCommits?: number;
 }
 
-export interface GhContributorsOptions {
-  /** Override fetch — used by tests to inject responses */
-  fetchImpl?: typeof fetch;
-  /** Override the User-Agent */
-  userAgent?: string;
+export interface GhContributorsOptions extends HttpOptions {
   /** Personal access token for higher rate limits (5000/h vs 60/h unauth) */
   githubToken?: string;
   /** Default minimum commits floor when target lacks its own (defaults to 5) */
@@ -72,20 +77,41 @@ export interface AggregatedContributor {
 
 const DEFAULT_MIN_COMMITS = 5;
 
-function getFetch(opts: GhContributorsOptions): typeof fetch {
-  return opts.fetchImpl ?? globalThis.fetch;
-}
-
 function getHeaders(opts: GhContributorsOptions): Record<string, string> {
   const h: Record<string, string> = {
     Accept: "application/vnd.github+json",
-    "User-Agent": opts.userAgent ?? USER_AGENT,
+    "User-Agent": getUserAgent(opts),
     "X-GitHub-Api-Version": "2022-11-28",
   };
   if (opts.githubToken) {
     h.Authorization = `Bearer ${opts.githubToken}`;
   }
   return h;
+}
+
+/**
+ * Validate `owner/repo` against the GitHub character allowlist.
+ * Throws on path traversal (`..`), encoded bytes (`%2e`), or any character
+ * outside `[A-Za-z0-9._-]`. Defense against SSRF when `owner/repo` arrives
+ * via CLI input.
+ */
+function assertValidOwnerRepo(ownerRepo: string): { owner: string; repo: string } {
+  const parts = ownerRepo.split("/");
+  if (parts.length !== 2) {
+    throw new Error(`expected "owner/repo", got "${ownerRepo}"`);
+  }
+  const [owner, repo] = parts;
+  if (!GH_NAME_RE.test(owner) || !GH_NAME_RE.test(repo)) {
+    throw new Error(
+      `owner/repo must match /^[A-Za-z0-9._-]+$/, got "${ownerRepo}"`
+    );
+  }
+  if (GH_DENY_NAMES.has(owner) || GH_DENY_NAMES.has(repo)) {
+    throw new Error(
+      `owner/repo cannot contain traversal segments "." or "..", got "${ownerRepo}"`
+    );
+  }
+  return { owner, repo };
 }
 
 /**
@@ -96,9 +122,7 @@ export async function fetchRepoContributors(
   ownerRepo: string,
   opts: GhContributorsOptions = {}
 ): Promise<GhContributor[]> {
-  if (!ownerRepo.includes("/")) {
-    throw new Error(`expected "owner/repo", got "${ownerRepo}"`);
-  }
+  assertValidOwnerRepo(ownerRepo);
   const url = `https://api.github.com/repos/${ownerRepo}/contributors?per_page=100`;
   const resp = await getFetch(opts)(url, { headers: getHeaders(opts) });
   if (!resp.ok) {
@@ -107,12 +131,21 @@ export async function fetchRepoContributors(
     );
   }
   const rows = (await resp.json()) as GhContributor[];
-  return rows.filter((r) => r.type === "User");
+  if (!Array.isArray(rows)) {
+    throw new Error(
+      `GitHub contributors response was not an array for ${ownerRepo}`
+    );
+  }
+  return rows.filter((r) => r?.type === "User");
 }
 
 /**
  * Aggregate contributors across all of an org's repos and apply the
  * minCommits threshold. Sorted descending by totalContributions.
+ *
+ * If the same login appears more than once in the same repo (GitHub
+ * shouldn't but defensive), the per-repo count accumulates so the
+ * invariant `totalContributions === sum(perRepo.values())` holds.
  */
 export function aggregateContributors(
   perRepo: Record<string, GhContributor[]>,
@@ -124,7 +157,7 @@ export function aggregateContributors(
       const existing = byLogin.get(c.login);
       if (existing) {
         existing.totalContributions += c.contributions;
-        existing.perRepo[repo] = c.contributions;
+        existing.perRepo[repo] = (existing.perRepo[repo] ?? 0) + c.contributions;
       } else {
         byLogin.set(c.login, {
           login: c.login,
@@ -147,6 +180,11 @@ export function aggregateContributors(
  * identifies the (org, person) tuple. The `responseHash` covers the
  * canonicalized aggregated record so retries with the same data produce
  * identical proposals.
+ *
+ * `personDisplayName` is intentionally null: surfacing the GitHub login
+ * as a person's display name fails `validate-display-names.ts`
+ * ("no raw machine IDs in titles"). The login is in `notes` for
+ * downstream Wikidata/OpenAlex resolution.
  */
 export function buildProposals(
   target: GhContributorsTarget,
@@ -169,13 +207,11 @@ export function buildProposals(
         // T1 seeding only — role is placeholder; real title comes from T2 team-page verification.
         role: "contributor",
         roleType: "career",
-        // GitHub login — will need cross-reference with Wikidata/OpenAlex
-        // by a downstream step (out of scope for QUA-640). We record the
-        // login so the resolver can do that lookup.
-        personDisplayName: c.login,
+        // Display name left null on purpose; see header comment.
+        personDisplayName: null,
         orgDisplayName: target.orgName,
         source: c.htmlUrl,
-        notes: `GitHub contributor: ${c.totalContributions} commits across ${Object.keys(c.perRepo).length} repo(s)`,
+        notes: `GitHub contributor "${c.login}": ${c.totalContributions} commits across ${Object.keys(c.perRepo).length} repo(s)`,
         isFounder: false,
       },
       entityRefs: {
@@ -188,25 +224,28 @@ export function buildProposals(
 
 /**
  * Fetch + aggregate + build proposals for one target.
- * Errors on individual repos are logged + skipped.
+ * Returns the proposals AND a `failures` count for the caller; per-repo
+ * errors are logged and skipped but surfaced via the count.
  */
 export async function importTarget(
   target: GhContributorsTarget,
   opts: GhContributorsOptions = {}
-): Promise<EnrichmentProposal[]> {
+): Promise<{ proposals: EnrichmentProposal[]; failures: number }> {
   const minCommits =
     target.minCommits ?? opts.defaultMinCommits ?? DEFAULT_MIN_COMMITS;
   const perRepo: Record<string, GhContributor[]> = {};
+  let failures = 0;
   for (const repo of target.repos) {
     try {
       perRepo[repo] = await fetchRepoContributors(repo, opts);
     } catch (e) {
+      failures++;
       const msg = e instanceof Error ? e.message : String(e);
       console.warn(`[github-contributors] skipping repo ${repo}: ${msg}`);
     }
   }
   const aggregated = aggregateContributors(perRepo, minCommits);
-  return buildProposals(target, aggregated);
+  return { proposals: buildProposals(target, aggregated), failures };
 }
 
 /** CLI entry — `crux tb github-contributors --target=anthropic:repo1,repo2`. */
@@ -226,23 +265,37 @@ export async function cliMain(
     githubToken: process.env.GITHUB_TOKEN,
   };
   const all: EnrichmentProposal[] = [];
+  let totalFailures = 0;
   for (const t of targets) {
     console.log(
       `[github-contributors] fetching ${t.orgSlug} (${t.repos.length} repos)...`
     );
-    const proposals = await importTarget(t, opts);
-    console.log(`[github-contributors]   → ${proposals.length} contributors`);
-    all.push(...proposals);
+    try {
+      const { proposals, failures } = await importTarget(t, opts);
+      console.log(
+        `[github-contributors]   → ${proposals.length} contributors, ${failures} repo failures`
+      );
+      all.push(...proposals);
+      totalFailures += failures;
+    } catch (e) {
+      const msg = e instanceof Error ? e.message : String(e);
+      console.warn(`[github-contributors] target ${t.orgSlug} failed: ${msg}`);
+      totalFailures++;
+    }
   }
   const clientOpts: ProposeClientOptions = { submit };
   const results = await submitBatch(all, clientOpts);
   printBatchSummary(results, "github-contributors");
+  if (totalFailures > 0) {
+    console.warn(`[github-contributors] ${totalFailures} repo/target failures`);
+  }
   return { exitCode: 0, output: "" };
 }
 
 /**
  * Parse `--target=slug:owner/repo,owner/repo2` flags. The repo list is
- * comma-separated and may not contain spaces.
+ * comma-separated. Empty segments (`a/b,,a/c`) are rejected as typos.
+ * Each `owner/repo` is validated against the GitHub allowlist.
  */
 export function parseTargetsArg(args: readonly string[]): GhContributorsTarget[] {
   const out: GhContributorsTarget[] = [];
@@ -257,11 +310,17 @@ export function parseTargetsArg(args: readonly string[]): GhContributorsTarget[]
     }
     const orgSlug = value.slice(0, colonIdx);
     const reposCsv = value.slice(colonIdx + 1);
-    const repos = reposCsv.split(",").filter(Boolean);
-    if (repos.length === 0 || repos.some((r) => !r.includes("/"))) {
+    if (!orgSlug) {
+      throw new Error(`--target slug must be non-empty, got "${value}"`);
+    }
+    const repos = reposCsv.split(",");
+    if (repos.length === 0 || repos.some((r) => r.length === 0)) {
       throw new Error(
-        `--target repos must each be "owner/repo", got "${reposCsv}"`
+        `--target repos must be a comma-separated list with no empty entries, got "${reposCsv}"`
       );
+    }
+    for (const r of repos) {
+      assertValidOwnerRepo(r);
     }
     out.push({ orgSlug, orgName: orgSlug, repos });
   }

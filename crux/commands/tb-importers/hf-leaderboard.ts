@@ -21,6 +21,10 @@
  * We accept a curated list of (model_slug, eval_name) pairs from the caller —
  * the leaderboard has thousands of rows; the umbrella decides which ones
  * are wiki-worthy.
+ *
+ * Score policy: `0` is treated as a legitimate result (some hard benchmarks
+ * have models that score 0). Negative scores are rejected as sentinels.
+ * Scores >100 (with `unit: "%"`) are also rejected as obvious data errors.
  */
 
 import { createHash } from "crypto";
@@ -29,9 +33,9 @@ import {
   printBatchSummary,
   type ProposeClientOptions,
 } from "./propose-client.ts";
+import { getFetch, getUserAgent, type HttpOptions } from "./http-utils.ts";
 import type { EnrichmentProposal } from "./types.ts";
 
-const USER_AGENT = "longterm-wiki <ozzie@quantifieduncertainty.org>";
 const DATASET = "open-llm-leaderboard/contents";
 
 /** One leaderboard row, partial — only the fields we extract. */
@@ -57,21 +61,19 @@ export interface HfLeaderboardRow {
 export interface BenchmarkColumnMap {
   /** Column name as it appears in the leaderboard row. */
   column: keyof HfLeaderboardRow;
-  /** TableBase benchmark id (10-char). */
-  benchmarkId: string;
-  /** Human-readable benchmark slug, used for entityRefs. */
+  /** Human-readable benchmark slug, used for entityRefs (matches `benchmarks.id` in PG). */
   benchmarkSlug: string;
   /** Score unit. The leaderboard normalizes to "%". */
   unit: string;
 }
 
 export const DEFAULT_BENCHMARK_COLUMNS: readonly BenchmarkColumnMap[] = [
-  { column: "IFEval", benchmarkId: "ifeval-inst", benchmarkSlug: "ifeval", unit: "%" },
-  { column: "BBH", benchmarkId: "bbh", benchmarkSlug: "bbh", unit: "%" },
-  { column: "MATH Lvl 5", benchmarkId: "math-lvl5", benchmarkSlug: "math-lvl-5", unit: "%" },
-  { column: "GPQA", benchmarkId: "gpqa", benchmarkSlug: "gpqa", unit: "%" },
-  { column: "MUSR", benchmarkId: "musr", benchmarkSlug: "musr", unit: "%" },
-  { column: "MMLU-PRO", benchmarkId: "mmlu-pro", benchmarkSlug: "mmlu-pro", unit: "%" },
+  { column: "IFEval", benchmarkSlug: "ifeval", unit: "%" },
+  { column: "BBH", benchmarkSlug: "bbh", unit: "%" },
+  { column: "MATH Lvl 5", benchmarkSlug: "math-lvl-5", unit: "%" },
+  { column: "GPQA", benchmarkSlug: "gpqa", unit: "%" },
+  { column: "MUSR", benchmarkSlug: "musr", unit: "%" },
+  { column: "MMLU-PRO", benchmarkSlug: "mmlu-pro", unit: "%" },
 ] as const;
 
 export interface HfLeaderboardTarget {
@@ -83,11 +85,7 @@ export interface HfLeaderboardTarget {
   evalName: string;
 }
 
-export interface HfLeaderboardOptions {
-  /** Override fetch — used by tests. */
-  fetchImpl?: typeof fetch;
-  /** Override the User-Agent. */
-  userAgent?: string;
+export interface HfLeaderboardOptions extends HttpOptions {
   /** Override the column → benchmark mapping. */
   benchmarkColumns?: readonly BenchmarkColumnMap[];
   /** Page size for the datasets-server query (max 100). */
@@ -105,15 +103,21 @@ interface RowsResponse {
 const DEFAULT_PAGE_SIZE = 100;
 const DEFAULT_MAX_ROWS = 1000;
 
-function getFetch(opts: HfLeaderboardOptions): typeof fetch {
-  return opts.fetchImpl ?? globalThis.fetch;
-}
-
 function getHeaders(opts: HfLeaderboardOptions): Record<string, string> {
   return {
     Accept: "application/json",
-    "User-Agent": opts.userAgent ?? USER_AGENT,
+    "User-Agent": getUserAgent(opts),
   };
+}
+
+/**
+ * The snapshot we return from `fetchLeaderboardSnapshot`. Holds two indices
+ * so `lookupRow` is O(1) on either eval_name or fullname (the leaderboard
+ * publishes both on some snapshots).
+ */
+export interface LeaderboardSnapshot {
+  byEvalName: ReadonlyMap<string, HfLeaderboardRow>;
+  byFullname: ReadonlyMap<string, HfLeaderboardRow>;
 }
 
 /** Build the datasets-server rows URL for one page. */
@@ -129,53 +133,70 @@ export function buildRowsUrl(offset: number, length: number): string {
 }
 
 /**
- * Page through the leaderboard, building a map keyed by `eval_name` for
- * O(1) lookup. Stops when `maxRows` reached or when a page returns < pageSize.
+ * Page through the leaderboard, building both eval_name + fullname indices.
+ * Stops when `maxRows` reached or when a page returns < pageSize.
  */
 export async function fetchLeaderboardSnapshot(
   opts: HfLeaderboardOptions = {}
-): Promise<Map<string, HfLeaderboardRow>> {
+): Promise<LeaderboardSnapshot> {
   const pageSize = Math.min(opts.pageSize ?? DEFAULT_PAGE_SIZE, 100);
   const maxRows = opts.maxRows ?? DEFAULT_MAX_ROWS;
   const fetchImpl = getFetch(opts);
   const headers = getHeaders(opts);
-  const out = new Map<string, HfLeaderboardRow>();
+  const byEvalName = new Map<string, HfLeaderboardRow>();
+  const byFullname = new Map<string, HfLeaderboardRow>();
   let offset = 0;
 
-  while (out.size < maxRows) {
+  while (byEvalName.size < maxRows) {
     const url = buildRowsUrl(offset, pageSize);
     const resp = await fetchImpl(url, { headers });
     if (!resp.ok) {
       throw new Error(`HuggingFace datasets-server HTTP ${resp.status}`);
     }
     const data = (await resp.json()) as RowsResponse;
-    if (!data.rows || data.rows.length === 0) break;
+    if (!data?.rows || data.rows.length === 0) break;
     for (const wrap of data.rows) {
-      const r = wrap.row;
+      const r = wrap?.row;
       if (r?.eval_name) {
-        out.set(r.eval_name, r);
+        byEvalName.set(r.eval_name, r);
+        if (r.fullname) byFullname.set(r.fullname, r);
       }
     }
     if (data.rows.length < pageSize) break;
     offset += pageSize;
   }
-  return out;
+  return { byEvalName, byFullname };
 }
 
 /**
- * Lookup helper. The leaderboard publishes both `eval_name` and `fullname`
- * on some snapshots; if the `eval_name` lookup misses, fall back to a
- * full scan of `fullname`.
+ * Lookup helper. O(1) on either index — eval_name first, fullname second.
+ *
+ * Accepts either a `LeaderboardSnapshot` or a bare `Map` for callers that
+ * only build a single index (legacy convenience).
  */
 export function lookupRow(
-  snapshot: ReadonlyMap<string, HfLeaderboardRow>,
+  snapshot: LeaderboardSnapshot | ReadonlyMap<string, HfLeaderboardRow>,
   evalName: string
 ): HfLeaderboardRow | null {
-  const direct = snapshot.get(evalName);
-  if (direct) return direct;
-  for (const row of snapshot.values()) {
-    if (row.fullname === evalName) return row;
+  const isSnapshot = (s: unknown): s is LeaderboardSnapshot =>
+    typeof s === "object" && s !== null && "byEvalName" in s && "byFullname" in s;
+  if (isSnapshot(snapshot)) {
+    return snapshot.byEvalName.get(evalName) ?? snapshot.byFullname.get(evalName) ?? null;
   }
+  return snapshot.get(evalName) ?? null;
+}
+
+/**
+ * Validate a score before emitting a proposal. Returns null on accept,
+ * a string reason on reject. Centralizes the score-policy decisions.
+ */
+export function validateScore(
+  score: number,
+  unit: string
+): string | null {
+  if (!Number.isFinite(score)) return "score is not finite";
+  if (score < 0) return `score ${score} is negative (sentinel rejected)`;
+  if (unit === "%" && score > 100) return `score ${score} > 100 with unit="%"`;
   return null;
 }
 
@@ -185,7 +206,7 @@ export function lookupRow(
  */
 export function buildProposals(
   targets: readonly HfLeaderboardTarget[],
-  snapshot: ReadonlyMap<string, HfLeaderboardRow>,
+  snapshot: LeaderboardSnapshot | ReadonlyMap<string, HfLeaderboardRow>,
   opts: { benchmarkColumns?: readonly BenchmarkColumnMap[]; scoredAt?: string } = {}
 ): { proposals: EnrichmentProposal[]; misses: Array<{ target: HfLeaderboardTarget; reason: string }> } {
   const cols = opts.benchmarkColumns ?? DEFAULT_BENCHMARK_COLUMNS;
@@ -200,15 +221,23 @@ export function buildProposals(
       continue;
     }
     for (const col of cols) {
-      const score = row[col.column];
-      if (typeof score !== "number" || !Number.isFinite(score)) {
+      const raw = row[col.column];
+      if (typeof raw !== "number") {
         // Don't emit a proposal for a benchmark the model didn't run.
+        continue;
+      }
+      const reject = validateScore(raw, col.unit);
+      if (reject) {
+        misses.push({
+          target: t,
+          reason: `${col.column}: ${reject}`,
+        });
         continue;
       }
       const canonical = JSON.stringify({
         eval_name: t.evalName,
         column: col.column,
-        score,
+        score: raw,
       });
       const responseHash = createHash("sha256").update(canonical).digest("hex");
       proposals.push({
@@ -218,11 +247,11 @@ export function buildProposals(
         responseHash,
         recordType: "benchmark-result",
         record: {
-          score,
+          score: raw,
           unit: col.unit,
           date,
           sourceUrl: "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard",
-          notes: `${col.column} score from HuggingFace Open LLM Leaderboard`,
+          notes: `${col.column} score from HuggingFace Open LLM Leaderboard (model: ${t.modelDisplayName})`,
         },
         entityRefs: {
           model: t.modelSlug,
@@ -261,7 +290,7 @@ export async function cliMain(
   }
   console.log(`[hf-leaderboard] fetching snapshot for ${targets.length} target(s)...`);
   const { proposals, misses } = await importTargets(targets);
-  console.log(`[hf-leaderboard] built ${proposals.length} proposals; ${misses.length} target(s) missed`);
+  console.log(`[hf-leaderboard] built ${proposals.length} proposals; ${misses.length} target+column miss(es)`);
   for (const m of misses.slice(0, 10)) {
     console.log(`  - ${m.target.modelSlug}: ${m.reason}`);
   }
@@ -273,7 +302,8 @@ export async function cliMain(
 
 /**
  * Parse `--target=modelSlug:displayName:evalName`.
- * `displayName` and `evalName` may contain forward slashes.
+ * `displayName` and `evalName` may contain forward slashes; `evalName`
+ * may contain additional colons (everything after the second colon).
  */
 export function parseTargetsArg(args: readonly string[]): HfLeaderboardTarget[] {
   const out: HfLeaderboardTarget[] = [];
