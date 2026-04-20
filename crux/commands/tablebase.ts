@@ -30,6 +30,7 @@ import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
 import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 import { commands as setupOrgCommands } from './setup-org.ts';
+import { commands as tbImporterCommands } from './tb-importers/index.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1491,6 +1492,10 @@ export const commands = {
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
   'setup-org': setupOrgCommands.default,
+  // QUA-640: T1 authoritative-source importers.
+  'sec-edgar': tbImporterCommands['sec-edgar'],
+  'github-contributors': tbImporterCommands['github-contributors'],
+  'hf-leaderboard': tbImporterCommands['hf-leaderboard'],
 };
 
 export function getHelp(): string {
@@ -1535,6 +1540,11 @@ Commands:
   data-sources-show <id>      Show details + snapshot history
   data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
   data-sources-health         Check mapping validity, staleness
+
+  T1 importers (QUA-640 — defensive enrichment):
+  sec-edgar           Fetch SEC EDGAR Form D → funding-rounds (--target=slug:cik)
+  github-contributors Fetch GitHub contributors → personnel hints (--target=slug:owner/repo[,owner/repo2])
+  hf-leaderboard      Fetch HF Open LLM Leaderboard → benchmark-results (--target=modelSlug:displayName:evalName)
 
   Website Sources:
   website-sources             Show website source help
