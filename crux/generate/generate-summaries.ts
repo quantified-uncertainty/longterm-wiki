@@ -22,7 +22,7 @@
  *   node crux/generate/generate-summaries.ts --batch 100 --concurrency 5
  *
  * Environment:
- *   ANTHROPIC_API_KEY - Required API key (from .env file)
+ *   ANTHROPIC_BILLING_KEY - Required API key (from .env file)
  */
 
 import { readFileSync } from 'fs';

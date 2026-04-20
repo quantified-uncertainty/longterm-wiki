@@ -125,7 +125,7 @@ fi
 # ─── 4. API key checks ─────────────────────────────────────────────────────────
 
 MISSING_KEYS=()
-[ -z "${ANTHROPIC_API_KEY:-}" ] && MISSING_KEYS+=("ANTHROPIC_API_KEY")
+[ -z "${ANTHROPIC_BILLING_KEY:-}" ] && MISSING_KEYS+=("ANTHROPIC_BILLING_KEY")
 [ -z "${GITHUB_TOKEN:-}" ] && MISSING_KEYS+=("GITHUB_TOKEN")
 [ -z "${OPENROUTER_API_KEY:-}" ] && MISSING_KEYS+=("OPENROUTER_API_KEY")
 

@@ -36,7 +36,7 @@ The `/healthz` endpoint returns 200 when the poll loop is active.
 |----------|--------|-------------|
 | `LONGTERMWIKI_SERVER_URL` | K8s Secret | Wiki-server base URL |
 | `LONGTERMWIKI_SERVER_API_KEY` | K8s Secret | API key for job claim/complete endpoints |
-| `ANTHROPIC_API_KEY` | K8s Secret | For LLM-powered job handlers |
+| `ANTHROPIC_BILLING_KEY` | K8s Secret | For LLM-powered job handlers (see QUA-612 for naming rationale) |
 | `WORKER_HEALTH_PORT` | ConfigMap or default | Health endpoint port (default: 3101) |
 
 ## Deployment YAML Template
@@ -87,11 +87,11 @@ spec:
                 secretKeyRef:
                   name: longterm-wiki-worker-secrets
                   key: LONGTERMWIKI_SERVER_API_KEY
-            - name: ANTHROPIC_API_KEY
+            - name: ANTHROPIC_BILLING_KEY
               valueFrom:
                 secretKeyRef:
                   name: longterm-wiki-worker-secrets
-                  key: ANTHROPIC_API_KEY
+                  key: ANTHROPIC_BILLING_KEY
             - name: WORKER_HEALTH_PORT
               value: "3101"
             - name: NODE_ENV
@@ -183,7 +183,7 @@ kubectl create secret generic longterm-wiki-worker-secrets \
   --namespace=longterm-wiki \
   --from-literal=LONGTERMWIKI_SERVER_URL=https://wiki-server.k8s.quantifieduncertainty.org \
   --from-literal=LONGTERMWIKI_SERVER_API_KEY=<api-key> \
-  --from-literal=ANTHROPIC_API_KEY=<anthropic-key>
+  --from-literal=ANTHROPIC_BILLING_KEY=<anthropic-key>
 ```
 
 These are the same values used by the wiki-server deployment. The API key

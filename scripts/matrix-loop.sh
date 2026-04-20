@@ -15,7 +15,7 @@
 #
 # Requirements:
 #   - database.json must exist (run `pnpm build-data:content` first)
-#   - ANTHROPIC_API_KEY must be set for content improve
+#   - ANTHROPIC_BILLING_KEY must be set for content improve
 #
 # Safety:
 #   - Each iteration is one page, one commit

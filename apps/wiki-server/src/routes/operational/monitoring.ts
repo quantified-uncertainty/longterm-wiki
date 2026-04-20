@@ -839,7 +839,7 @@ async function fetchApiKeyHealth() {
   const github = { configured: !!process.env.GITHUB_TOKEN, healthy: false };
 
   const [anthropic, openrouter] = await Promise.all([
-    checkKey("ANTHROPIC_API_KEY", async (key) => {
+    checkKey("ANTHROPIC_BILLING_KEY", async (key) => {
       const resp = await fetch("https://api.anthropic.com/v1/models", {
         headers: {
           "x-api-key": key,

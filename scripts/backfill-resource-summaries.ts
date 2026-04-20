@@ -56,7 +56,7 @@ Respond with JSON: { "summary": "...", "keyPoints": ["...", "..."] }`;
 async function main() {
   const client = createClient();
   if (!client) {
-    console.error("ANTHROPIC_API_KEY not set");
+    console.error("ANTHROPIC_BILLING_KEY not set");
     process.exit(1);
   }
 

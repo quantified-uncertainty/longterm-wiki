@@ -159,7 +159,7 @@ export interface PipelineOptions {
   /**
    * When true, use Anthropic SDK directly instead of Claude CLI subprocess.
    * Default: auto-detected (CLI when available, API-direct as fallback).
-   * CLI mode bills via Claude Code subscription; API-direct bills via ANTHROPIC_API_KEY.
+   * CLI mode bills via Claude Code subscription; API-direct bills via ANTHROPIC_BILLING_KEY.
    */
   apiDirect?: boolean;
   /**

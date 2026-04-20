@@ -93,7 +93,7 @@ jobs:
 
       - name: Run auto-update CI pipeline
         env:
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          ANTHROPIC_BILLING_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
           SCRY_API_KEY: ${{ secrets.SCRY_API_KEY }}
           FIRECRAWL_KEY: ${{ secrets.FIRECRAWL_KEY }}

@@ -580,6 +580,10 @@ Instructions:
 6. Stage your changes with git add but do NOT commit or push`;
 
   try {
+    // CI runs this in a headless environment with no OAuth session — the
+    // claude CLI needs ANTHROPIC_API_KEY from env to authenticate. Re-map
+    // from ANTHROPIC_BILLING_KEY (the authoritative name in this codebase)
+    // to ANTHROPIC_API_KEY on the child env only, per QUA-612.
     execFileSync(
       'claude',
       [
@@ -596,6 +600,10 @@ Instructions:
         encoding: 'utf-8',
         stdio: 'inherit',
         timeout: 10 * 60 * 1000, // 10 minute timeout
+        env: {
+          ...process.env,
+          ANTHROPIC_API_KEY: process.env.ANTHROPIC_BILLING_KEY, // anthropic-billing-key-remap-ok
+        },
       },
     );
   } catch (e: unknown) {
