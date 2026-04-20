@@ -17,8 +17,6 @@ facts:
     value: 5e+6
     currency: GBP
     usdEquivalent: 6700000
-    exchangeRate: 1.34
-    exchangeRateDate: 2018-03
     asOf: 2018-01
     source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
     notes: "Nuffield Foundation committed GBP 5 million over five years to establish the institute (~USD 6.7M at 2018 exchange rates)."

@@ -86,6 +86,41 @@ describe("validate-factbase-fact-unit-field", () => {
     expect(violations[0].text).toContain("unit: percent");
   });
 
+  it("catches case typos (Unit/UNIT/units) the loader also silently drops", () => {
+    const yaml = [
+      "facts:",
+      "  - id: f_1",
+      "    property: revenue",
+      "    Unit: EUR",
+      "  - id: f_2",
+      "    property: revenue",
+      "    UNIT: JPY",
+      "  - id: f_3",
+      "    property: revenue",
+      "    units: CAD",
+      "",
+    ].join("\n");
+
+    const violations = checkContent(yaml);
+    expect(violations).toHaveLength(3);
+    expect(violations[0].suggestion).toContain("currency: EUR");
+    expect(violations[1].suggestion).toContain("currency: JPY");
+    expect(violations[2].suggestion).toContain("currency: CAD");
+  });
+
+  it("does not flag `unit:` appearing inside a YAML comment (# marker precedes)", () => {
+    const yaml = [
+      "facts:",
+      "  - id: f_1",
+      "    property: revenue",
+      "    # unit: GBP (old, replaced by currency below)",
+      "    currency: GBP",
+      "",
+    ].join("\n");
+
+    expect(checkContent(yaml)).toHaveLength(0);
+  });
+
   it("returns no violations for a well-formed facts file", () => {
     const yaml = [
       "entity: sid_abc123",

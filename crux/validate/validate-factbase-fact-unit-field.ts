@@ -36,7 +36,10 @@ const FB_ENTITIES_DIR = join(
 //       unit: GBP      <- depth 4 (4 spaces)
 //       value: ...
 // A `unit:` inside a structured value block would be deeper (6+ spaces).
-const FACT_TOP_LEVEL_UNIT_RE = /^ {4}unit:\s*(\S.*?)\s*$/;
+//
+// Case-insensitive on the key name so typos like `Unit:`, `UNIT:`, and
+// plural `units:` also surface — the loader drops all of them silently.
+const FACT_TOP_LEVEL_UNIT_RE = /^ {4}(unit|Unit|UNIT|units):\s*(\S.*?)\s*$/;
 
 export interface Violation {
   file: string;
@@ -60,12 +63,13 @@ export function checkContent(
     const line = lines[i];
     const match = FACT_TOP_LEVEL_UNIT_RE.exec(line);
     if (!match) continue;
-    const rawValue = match[1];
+    const key = match[1];
+    const rawValue = match[2];
     violations.push({
       file: filePath,
       line: i + 1,
       text: line,
-      suggestion: `Replace \`unit: ${rawValue}\` with \`currency: ${rawValue}\` (or remove if redundant with property default).`,
+      suggestion: `Replace \`${key}: ${rawValue}\` with \`currency: ${rawValue}\` (or remove if redundant with property default).`,
     });
   }
 
