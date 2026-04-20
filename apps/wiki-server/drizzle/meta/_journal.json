@@ -1415,6 +1415,20 @@
       "when": 1786521600000,
       "tag": "0201_qua_576_resources_stableid_notnull",
       "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1786608000000,
+      "tag": "0202_qua_632_enrichment_targets",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1786608000001,
+      "tag": "0203_qua_632_enrichment_runs",
+      "breakpoints": true
     }
   ]
 }
