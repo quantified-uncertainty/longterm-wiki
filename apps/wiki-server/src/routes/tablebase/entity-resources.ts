@@ -196,7 +196,13 @@ const entityResourcesApp = new Hono()
   )
 
   // GET /api/entity-resources/export — all rows (for build pipeline)
+  // Capped to prevent unbounded scans on a growing table (QUA-623). Uses a
+  // +1 sentinel so `truncated` is false when the row count exactly equals
+  // the cap (vs. genuinely spilling past it). The build pipeline reads ~all
+  // rows; raise EXPORT_LIMIT if prod exceeds it and add cursor pagination
+  // before then.
   .get("/export", async (c) => {
+    const EXPORT_LIMIT = 200_000;
     const db = getDrizzleDb();
     const rows = await db
       .select({
@@ -205,9 +211,17 @@ const entityResourcesApp = new Hono()
         authoredByEntity: entityResources.authoredByEntity,
         isSubject: entityResources.isSubject,
       })
-      .from(entityResources);
+      .from(entityResources)
+      .limit(EXPORT_LIMIT + 1);
+    const truncated = rows.length > EXPORT_LIMIT;
+    const items = truncated ? rows.slice(0, EXPORT_LIMIT) : rows;
 
-    return c.json({ items: rows, total: rows.length });
+    return c.json({
+      items,
+      total: items.length,
+      truncated,
+      limit: EXPORT_LIMIT,
+    });
   })
 
   .post("/delete-batch", deleteBatchHandler(entityResources, "entity_resources"));

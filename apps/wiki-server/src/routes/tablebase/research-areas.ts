@@ -43,6 +43,15 @@ import {
 
 const MAX_PAGE_SIZE = 200;
 
+// QUA-623: safety caps on related-data subqueries. Hit today is small
+// (single-digit to low-hundreds per area), but `.limit()` prevents silent
+// 503s if the tables grow.
+const RELATED_DATA_CAP = 500;
+const TOP_GRANTS_CAP = 50;
+const FUNDING_BREAKDOWN_CAP = 200;
+const SCORES_LIST_CAP = 5_000;
+const EVALUATIONS_PER_AREA_CAP = 1_000;
+
 // Max possible standard deviation for a 1-10 scale (bimodal 50/50 split at extremes).
 // Used to normalize stdDev into a 0-1 "model agreement" metric.
 const MAX_SCORE_STDDEV = 4.5;
@@ -340,26 +349,31 @@ const researchAreasApp = new Hono()
       );
     }
 
-    // Fetch related data in parallel
+    // Fetch related data in parallel. Each subquery is capped (QUA-623) to
+    // prevent unbounded scans as these tables grow.
     const [orgs, papers, risks, children, topGrants, fundingByOrg] = await Promise.all([
       db
         .select()
         .from(researchAreaOrganizations)
-        .where(eq(researchAreaOrganizations.researchAreaId, id)),
+        .where(eq(researchAreaOrganizations.researchAreaId, id))
+        .limit(RELATED_DATA_CAP),
       db
         .select()
         .from(researchAreaPapers)
         .where(eq(researchAreaPapers.researchAreaId, id))
-        .orderBy(researchAreaPapers.sortOrder),
+        .orderBy(researchAreaPapers.sortOrder)
+        .limit(RELATED_DATA_CAP),
       db
         .select()
         .from(researchAreaRisks)
-        .where(eq(researchAreaRisks.researchAreaId, id)),
+        .where(eq(researchAreaRisks.researchAreaId, id))
+        .limit(RELATED_DATA_CAP),
       db
         .select()
         .from(researchAreas)
-        .where(eq(researchAreas.parentAreaId, id)),
-      // Top grants by amount (up to 50)
+        .where(eq(researchAreas.parentAreaId, id))
+        .limit(RELATED_DATA_CAP),
+      // Top grants by amount (cap: TOP_GRANTS_CAP)
       db
         .select({
           id: grants.id,
@@ -374,7 +388,7 @@ const researchAreasApp = new Hono()
         .innerJoin(grants, eq(grantResearchAreas.grantId, grants.id))
         .where(eq(grantResearchAreas.researchAreaId, id))
         .orderBy(sql`${grants.amount}::numeric DESC NULLS LAST`)
-        .limit(50),
+        .limit(TOP_GRANTS_CAP),
       // Funding breakdown by funder org
       db
         .select({
@@ -386,7 +400,8 @@ const researchAreasApp = new Hono()
         .innerJoin(grants, eq(grantResearchAreas.grantId, grants.id))
         .where(eq(grantResearchAreas.researchAreaId, id))
         .groupBy(grants.organizationId)
-        .orderBy(sql`COALESCE(SUM(${grants.amount}::numeric), 0) DESC`),
+        .orderBy(sql`COALESCE(SUM(${grants.amount}::numeric), 0) DESC`)
+        .limit(FUNDING_BREAKDOWN_CAP),
     ]);
 
     return c.json({
@@ -736,7 +751,8 @@ const researchAreasApp = new Hono()
         .select()
         .from(researchAreaScores)
         .where(conditions.length > 0 ? and(...conditions) : undefined)
-        .orderBy(researchAreaScores.researchAreaId, researchAreaScores.dimension);
+        .orderBy(researchAreaScores.researchAreaId, researchAreaScores.dimension)
+        .limit(SCORES_LIST_CAP);
 
       return c.json({
         scores: rows.map((r) => ({
@@ -765,12 +781,14 @@ const researchAreasApp = new Hono()
         .select()
         .from(researchAreaEvaluations)
         .where(eq(researchAreaEvaluations.researchAreaId, areaId))
-        .orderBy(researchAreaEvaluations.dimension, researchAreaEvaluations.evaluatedAt),
+        .orderBy(researchAreaEvaluations.dimension, researchAreaEvaluations.evaluatedAt)
+        .limit(EVALUATIONS_PER_AREA_CAP),
       db
         .select()
         .from(researchAreaScores)
         .where(eq(researchAreaScores.researchAreaId, areaId))
-        .orderBy(researchAreaScores.dimension),
+        .orderBy(researchAreaScores.dimension)
+        .limit(RELATED_DATA_CAP),
     ]);
 
     return c.json({

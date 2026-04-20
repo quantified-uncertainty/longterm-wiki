@@ -1867,6 +1867,12 @@ export async function fetchEntityResourceLinks() {
     }
     const data = await resp.json();
     const items = data.items || [];
+    if (data.truncated) {
+      logWikiServerWarning(
+        'entityResourceLinks',
+        `export truncated at ${data.limit ?? items.length} rows — raise EXPORT_LIMIT in entity-resources.ts or add cursor pagination`,
+      );
+    }
 
     // Group by entityId
     const grouped = {};

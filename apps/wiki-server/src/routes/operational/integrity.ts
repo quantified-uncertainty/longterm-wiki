@@ -8,11 +8,21 @@ interface IntegrityIssue {
   target_table: string;
   missing_refs: string[];
   count: number;
+  truncated: boolean;
 }
+
+// QUA-623: cap each SELECT DISTINCT to prevent a data-integrity regression
+// from OOMing the response or hitting statement_timeout. If refs exceed the
+// cap, we return the capped list and set `truncated: true` — the number of
+// dangling refs is a red flag either way, the exact count can be re-queried.
+const MAX_MISSING_REFS = 1000;
 
 /**
  * Run a dangling-reference check and return an issue if any are found.
  * Returns null if the table is clean.
+ *
+ * The caller's SQL should NOT include its own LIMIT — we append one with a
+ * +1 sentinel to detect truncation.
  */
 async function checkDangling(
   db: ReturnType<typeof getDrizzleDb>,
@@ -21,14 +31,18 @@ async function checkDangling(
   column: string,
   targetTable: string
 ): Promise<IntegrityIssue | null> {
-  const rows = (await db.execute(query)) as Array<{ ref: string }>;
+  const capped = sql`${query} LIMIT ${MAX_MISSING_REFS + 1}`;
+  const rows = (await db.execute(capped)) as Array<{ ref: string }>;
   if (rows.length === 0) return null;
+  const truncated = rows.length > MAX_MISSING_REFS;
+  const refs = truncated ? rows.slice(0, MAX_MISSING_REFS) : rows;
   return {
     table,
     column,
     target_table: targetTable,
-    missing_refs: rows.map((r) => r.ref),
-    count: rows.length,
+    missing_refs: refs.map((r) => r.ref),
+    count: refs.length,
+    truncated,
   };
 }
 
