@@ -25,7 +25,7 @@ facts:
 
   - id: f_lMKMcV4iQu
     property: ceo
-    value: C.C. Wei
+    value: !ref sid_NuIC1Eestw
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "CEO since 2018; Mark Liu serves as Chairman"

@@ -38,7 +38,7 @@ facts:
 
   - id: f_Z1LzeboVhP
     property: founded-by
-    value: "Christoph Winter"
+    value: !ref sid_4I7XUhwlqE
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
     notes: "Founded by researchers at Harvard University. Core team included Jonas Schuett, Eric Martinez, Cullen O'Keefe. Winter remains Director of LawAI."
 

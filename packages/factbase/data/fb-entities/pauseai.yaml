@@ -25,7 +25,7 @@ facts:
 
   - id: f_XFlpui31mp
     property: founded-by
-    value: "Joep Meindertsma"
+    value: !ref sid_iTaXQVJY8K
     source: https://en.wikipedia.org/wiki/PauseAI
     notes: "Software entrepreneur who put his CEO role on hold due to concerns about existential risks from AI"
 

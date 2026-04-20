@@ -27,7 +27,7 @@ facts:
 
   - id: f_n3aNvt6ee9
     property: ceo
-    value: Jensen Huang
+    value: !ref sid_So79iNy2sQ
     source: https://www.wikidata.org/wiki/Q182477
     notes: "CEO since founding in 1993"
 

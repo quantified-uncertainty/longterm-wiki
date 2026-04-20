@@ -148,7 +148,7 @@ facts:
 
   - id: f_W7bBjifjvv
     property: board-member
-    value: "Jaan Tallinn"
+    value: !ref sid_6gjF5d3geg
     asOf: 2024
     source: https://washingtonainetwork.com/2024/07/29/center-for-ai-safety-hosts-dc-launch-event/
 

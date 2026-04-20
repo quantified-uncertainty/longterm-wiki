@@ -39,7 +39,11 @@ facts:
 
   - id: f_rouuKIUdfN
     property: founded-by
-    value: "Nicolas Miailhe, Simon Mueller, Ionuts Lacusta, and Hugo Zylberberg"
+    value:
+      - !ref sid_znc8lhHNf9
+      - !ref sid_Y6Ge9jQiet
+      - !ref sid_UXgAQQLWOQ
+      - !ref sid_AYpMv9sXg3
     source: https://thefuturesociety.org/team-member/nicolas-miailhe/
     notes: "Founded as student club at Harvard Kennedy School by then-MPA students in fall 2014"
 
