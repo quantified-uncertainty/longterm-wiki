@@ -324,7 +324,7 @@ const PARALLEL_STEPS: Step[] = [
   },
   {
     id: 'no-anthropic-api-key-read',
-    name: 'No raw billing-key env var reads in source (QUA-612)',
+    name: 'No raw Anthropic CLI env-var reads in source (QUA-612)',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-no-anthropic-api-key-read.ts'],
     cwd: PROJECT_ROOT,

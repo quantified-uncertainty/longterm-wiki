@@ -13,7 +13,8 @@
  * which means no source code should read, set, or delete it.
  *
  * Scope:
- *   - Scans .ts / .mjs / .js / .sh under crux/, apps/, scripts/, .github/scripts/
+ *   - Scans .ts / .mjs / .js / .sh under crux/, apps/, scripts/, .github/scripts/,
+ *     .claude/hooks/
  *   - Skips test files (__tests__/, *.test.ts), node_modules/, dist/
  *   - Skips .md / .mdx / .yml docs (prose may reference the old name)
  *
@@ -21,13 +22,13 @@
  *   - Lines containing `// anthropic-billing-key-remap-ok` (inline marker for
  *     explicit re-map sites — headless services that intentionally want
  *     API billing must acknowledge the re-map inline)
- *   - This validator itself
+ *   - This validator itself (skipped by absolute path)
  *
  * Usage: npx tsx crux/validate/validate-no-anthropic-api-key-read.ts
  */
 
 import { readFileSync, readdirSync, statSync } from 'fs';
-import { join, relative, basename } from 'path';
+import { join, relative, resolve } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 
@@ -43,11 +44,29 @@ const SCAN_DIRS = [
 /** File extensions to scan */
 const SCAN_EXTENSIONS = ['.ts', '.mjs', '.js', '.sh'];
 
+/** Dirs to always skip during traversal */
+const ALWAYS_SKIP = new Set([
+  'node_modules',
+  'dist',
+  '__tests__',
+  '.next',
+  'coverage',
+]);
+
+/** Dotfile-named dirs that are allowed to be walked */
+const DOTFILE_ALLOW = new Set(['.github', '.claude']);
+
 /** Inline allowlist marker — use this on any line that intentionally re-maps */
 const REMAP_MARKER = 'anthropic-billing-key-remap-ok';
 
 /** Banned token — the env var name that should never be read/written/deleted */
 const BANNED_PATTERN = /ANTHROPIC_API_KEY/;
+
+/** Absolute path of this validator — skipped from scanning */
+const VALIDATOR_ABS_PATH = resolve(
+  PROJECT_ROOT,
+  'crux/validate/validate-no-anthropic-api-key-read.ts',
+);
 
 interface Violation {
   file: string;
@@ -55,17 +74,40 @@ interface Violation {
   text: string;
 }
 
-function shouldSkipDir(name: string): boolean {
-  return (
-    name === 'node_modules' ||
-    name === 'dist' ||
-    name === '__tests__' ||
-    name === '.next' ||
-    name === 'coverage' ||
-    name.startsWith('.')
-      ? name !== '.github' && name !== '.claude'
-      : false
-  );
+/** Whether a directory name should be skipped during traversal. */
+export function shouldSkipDir(name: string): boolean {
+  if (ALWAYS_SKIP.has(name)) return true;
+  if (name.startsWith('.') && !DOTFILE_ALLOW.has(name)) return true;
+  return false;
+}
+
+/**
+ * Per-line decision: is this line a violation?
+ *
+ * A line is a violation when it contains the banned env-var name AND is not
+ * allowlisted. Allowlist cases:
+ *   - Line contains the explicit re-map marker comment.
+ *   - Line is a line-comment (starts with //, *, /*, #).
+ *
+ * Known gap: block comments that span multiple lines may false-positive on
+ * their middle lines (which don't start with `*`). Wrap the full block with
+ * a leading-`*` on every line (JSDoc-style) or use // line comments instead.
+ */
+export function isLineViolation(line: string): boolean {
+  if (!BANNED_PATTERN.test(line)) return false;
+  if (line.includes(REMAP_MARKER)) return false;
+
+  const trimmed = line.trimStart();
+  if (
+    trimmed.startsWith('#') ||
+    trimmed.startsWith('//') ||
+    trimmed.startsWith('*') ||
+    trimmed.startsWith('/*')
+  ) {
+    return false;
+  }
+
+  return true;
 }
 
 function collectFiles(dir: string): string[] {
@@ -105,39 +147,20 @@ function collectFiles(dir: string): string[] {
 }
 
 function checkFile(filePath: string): Violation[] {
+  // Skip the validator itself — by absolute path, not basename
+  if (resolve(filePath) === VALIDATOR_ABS_PATH) return [];
+
   const content = readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   const violations: Violation[] = [];
   const relPath = relative(PROJECT_ROOT, filePath);
 
-  // Don't scan the validator itself — it literally contains the banned string
-  if (basename(filePath) === 'validate-no-anthropic-api-key-read.ts') {
-    return [];
-  }
-
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i];
-    if (!BANNED_PATTERN.test(line)) continue;
-
-    // Skip lines with the explicit re-map marker
-    if (line.includes(REMAP_MARKER)) continue;
-
-    // Skip shell comments and JS/TS line comments that only reference the name
-    // in prose (e.g. "// ANTHROPIC_API_KEY: set by groundskeeper at re-map site")
-    const trimmed = line.trimStart();
-    if (
-      trimmed.startsWith('#') ||
-      trimmed.startsWith('//') ||
-      trimmed.startsWith('*') ||
-      trimmed.startsWith('/*')
-    ) {
-      continue;
-    }
-
+    if (!isLineViolation(lines[i])) continue;
     violations.push({
       file: relPath,
       line: i + 1,
-      text: trimmed.slice(0, 160),
+      text: lines[i].trimStart().slice(0, 160),
     });
   }
 
