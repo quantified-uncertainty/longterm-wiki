@@ -45,6 +45,7 @@ import {
   storeSourcingEvidence,
   SOURCE_CHECK_CONSTANTS,
 } from '../lib/sourcing/index.ts';
+import { SOURCE_CHECK_RESPONSE_FORMAT } from '../lib/sourcing/prompt-guidelines.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -286,13 +287,7 @@ Evaluate whether this source supports the record:
 - "unverifiable": The source does not address the claim, or is off-topic.
 - "outdated": The source confirms a historically-correct-but-now-stale value.
 
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "What the source says about this record (quote or paraphrase)",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 function computeNextCheckDue(verdict: string): string {

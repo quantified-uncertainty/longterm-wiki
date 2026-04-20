@@ -20,7 +20,9 @@ describe('LlmResponseSchema', () => {
         reasoning: 'The source states the funding amount is $2.5 billion.',
       };
       const result = LlmResponseSchema.parse(input);
-      expect(result).toEqual(input);
+      // QUA-648: `source_subject` defaults to '' and `subject_matches_claim`
+      // is optional, so the parsed shape has them alongside the input.
+      expect(result).toEqual({ ...input, source_subject: '' });
     });
 
     it('parses boundary confidence values', () => {
@@ -81,11 +83,14 @@ describe('LlmResponseSchema', () => {
 
     it('defaults all fields when given an empty object', () => {
       const result = LlmResponseSchema.parse({});
+      // QUA-648: `source_subject` has a default; `subject_matches_claim` is
+      // optional and stays undefined (so it's dropped by `toEqual`).
       expect(result).toEqual({
         verdict: 'unverifiable',
         confidence: 0.5,
         extracted_value: '',
         reasoning: '',
+        source_subject: '',
       });
     });
   });

@@ -25,6 +25,19 @@ export interface LlmSourcingResult {
   confidence: number;
   extractedValue: string;
   reasoning: string;
+  /**
+   * QUA-648: the primary entity/subject the source is actually about, as
+   * identified by the LLM. When this diverges from the claim's entity,
+   * `callLlmForSourcing` downgrades `confirmed` verdicts to `partial`.
+   */
+  sourceSubject?: string;
+  /**
+   * QUA-648: whether the LLM thinks the source's subject is the same
+   * entity the claim is about. `false` triggers the programmatic
+   * downgrade. `undefined` means the LLM didn't return the field
+   * (pre-QUA-648 prompts, or a malformed response).
+   */
+  subjectMatchesClaim?: boolean;
 }
 
 /** Category of a wiki page sourcing item */
