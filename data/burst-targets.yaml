@@ -86,7 +86,7 @@ targets:
 
   # Core technical AI safety research organizations.
   - slug: miri
-    name: Machine Intelligence Research Institute
+    name: MIRI
     importance_rank: 9
     estimated_size_tier: small
   - slug: redwood-research
@@ -98,7 +98,7 @@ targets:
     importance_rank: 11
     estimated_size_tier: small
   - slug: metr
-    name: METR (Model Evaluation & Threat Research)
+    name: METR
     importance_rank: 12
     estimated_size_tier: small
   - slug: far-ai
@@ -136,15 +136,15 @@ targets:
 
   # Academic AI safety centers and pipeline programs.
   - slug: chai
-    name: Center for Human-Compatible AI (CHAI)
+    name: CHAI
     importance_rank: 21
     estimated_size_tier: small
   - slug: govai
-    name: Centre for the Governance of AI
+    name: GovAI
     importance_rank: 22
     estimated_size_tier: small
   - slug: mats
-    name: ML Alignment & Theory Scholars (MATS)
+    name: MATS
     importance_rank: 23
     estimated_size_tier: small
   - slug: apart-research
@@ -152,7 +152,7 @@ targets:
     importance_rank: 24
     estimated_size_tier: small
   - slug: cser
-    name: Centre for the Study of Existential Risk (CSER)
+    name: CSER
     importance_rank: 25
     estimated_size_tier: small
 
@@ -208,7 +208,7 @@ targets:
 
   # Policy / advocacy / standards.
   - slug: cset
-    name: Center for Security and Emerging Technology (CSET)
+    name: CSET
     importance_rank: 37
     estimated_size_tier: medium
   - slug: fli
