@@ -44,3 +44,21 @@ facts:
     value: https://en.wikipedia.org/wiki/Dustin_Moskovitz
     source: https://www.wikidata.org/wiki/Q370217
     notes: From Wikidata Q370217
+
+  - id: f_StcA4XMBiR
+    property: equity-pledge-fraction
+    value: 0.95
+    asOf: "2026-04"
+    source: https://givingpledge.org/pledger?pledgerId=177
+    notes: "Estimate based on Giving Pledge commitment (Moskovitz and Cari Tuna,
+      2010) plus $500M of Anthropic equity already moved to Good Ventures
+      nonprofit vehicle in Nov 2025. Track record: $4B+ lifetime giving through
+      Good Ventures / Open Philanthropy."
+
+  - id: f_cE6rp57HY8
+    property: ea-alignment-estimate
+    value: [0.9, 0.95]
+    asOf: "2026-04"
+    notes: "Editorial estimate. Co-founder of Good Ventures; Open Philanthropy is
+      the single largest EA-aligned grantmaker. Very high confidence that
+      donations flow to EA-aligned causes."

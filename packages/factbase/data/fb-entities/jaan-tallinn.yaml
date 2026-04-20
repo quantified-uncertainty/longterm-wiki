@@ -45,3 +45,21 @@ facts:
       Flourishing Fund) and Lightspeed Grants
     asOf: 2026-04
     source: https://en.wikipedia.org/wiki/Jaan_Tallinn
+
+  - id: f_WqT0yED9QY
+    property: equity-pledge-fraction
+    value: 0.9
+    asOf: "2026-04"
+    source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
+    notes: "Estimate based on documented giving track record — $150M+ lifetime
+      AI safety giving, primary funder of SFF and Lightspeed Grants,
+      co-founded CSER and FLI. Not a formal legal pledge."
+
+  - id: f_oVtgXAR5e5
+    property: ea-alignment-estimate
+    value: [0.9, 0.95]
+    asOf: "2026-04"
+    source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
+    notes: "Editorial estimate. Long documented EA/longtermist community ties;
+      funds EA-aligned orgs (SFF, Lightspeed, CSER, FLI); very high confidence
+      of EA-aligned giving."

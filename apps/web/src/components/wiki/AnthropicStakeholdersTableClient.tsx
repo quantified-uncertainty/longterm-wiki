@@ -18,6 +18,11 @@ import {
   Table, TableBody, TableCell, TableFooter, TableHead, TableHeader, TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import {
+  factbaseVerdictToStatus,
+  recordVerdictToStatus,
+} from "@/components/sourcing/sourcing-status";
 import { cn } from "@/lib/utils";
 
 // ─── Exported types (used by server wrapper) ─────────────────────────────────
@@ -57,6 +62,54 @@ export interface Stakeholder {
   link?: string;
   notes?: string;
   includeInTotal?: boolean;
+  // Sourcing metadata — resolved server-side; the client just renders dots.
+  // `null` = fact/record exists but is unchecked. `undefined` = no underlying
+  // fact, so the cell's value is purely editorial (no dot rendered).
+  equityRecordKey: string;
+  stakeVerdict: string | null;
+  pledgeFactId?: string;
+  pledgeVerdict: string | null;
+  eaAlignFactId?: string;
+  eaAlignVerdict: string | null;
+}
+
+// ─── Cell-level sourcing dot helpers ─────────────────────────────────────────
+
+function StakeSourcingDot({
+  recordKey,
+  verdict,
+}: {
+  recordKey: string;
+  verdict: string | null;
+}) {
+  return (
+    <SourcingDot
+      status={recordVerdictToStatus(verdict)}
+      originalVerdict={verdict}
+      size="sm"
+      href={`/sourcing/equity_positions/${encodeURIComponent(recordKey)}`}
+      className="ml-1"
+    />
+  );
+}
+
+function FactCellSourcingDot({
+  factId,
+  verdict,
+}: {
+  factId?: string;
+  verdict: string | null;
+}) {
+  if (!factId) return null;
+  return (
+    <SourcingDot
+      status={factbaseVerdictToStatus(verdict)}
+      originalVerdict={verdict}
+      size="sm"
+      href={`/sourcing/fact/${encodeURIComponent(factId)}`}
+      className="ml-1"
+    />
+  );
 }
 
 // ─── Formatting helpers ───────────────────────────────────────────────────────
@@ -334,11 +387,14 @@ export function AnthropicStakeholdersTableClient({
 
                   {show("stake") && (
                     <TableCell className="text-right text-sm tabular-nums">
-                      {stakeKnown ? (
-                        fmtStake(s.stakeMin, s.stakeMax)
-                      ) : (
-                        <span className="text-muted-foreground italic text-xs">Undisclosed</span>
-                      )}
+                      <span className="inline-flex items-center justify-end gap-1">
+                        {stakeKnown ? (
+                          fmtStake(s.stakeMin, s.stakeMax)
+                        ) : (
+                          <span className="text-muted-foreground italic text-xs">Undisclosed</span>
+                        )}
+                        <StakeSourcingDot recordKey={s.equityRecordKey} verdict={s.stakeVerdict} />
+                      </span>
                     </TableCell>
                   )}
 
@@ -354,23 +410,29 @@ export function AnthropicStakeholdersTableClient({
 
                   {show("pledge") && (
                     <TableCell className="text-right text-sm tabular-nums">
-                      {hasPledge ? (
-                        fmtPledge(s.pledgeMin, s.pledgeMax)
-                      ) : (
-                        <span className="text-muted-foreground">&mdash;</span>
-                      )}
+                      <span className="inline-flex items-center justify-end gap-1">
+                        {hasPledge ? (
+                          fmtPledge(s.pledgeMin, s.pledgeMax)
+                        ) : (
+                          <span className="text-muted-foreground">&mdash;</span>
+                        )}
+                        <FactCellSourcingDot factId={s.pledgeFactId} verdict={s.pledgeVerdict} />
+                      </span>
                     </TableCell>
                   )}
 
                   {show("eaAlign") && (
                     <TableCell className="text-right">
-                      {s.eaAlignMax > 0 ? (
-                        <Badge variant="outline" className={cn("text-[10px] whitespace-nowrap", eaCls)}>
-                          {fmtEaAlign(s.eaAlignMin, s.eaAlignMax)}&nbsp;&middot;&nbsp;{eaLabel}
-                        </Badge>
-                      ) : (
-                        <span className="text-muted-foreground text-sm">&mdash;</span>
-                      )}
+                      <span className="inline-flex items-center justify-end gap-1">
+                        {s.eaAlignMax > 0 ? (
+                          <Badge variant="outline" className={cn("text-[10px] whitespace-nowrap", eaCls)}>
+                            {fmtEaAlign(s.eaAlignMin, s.eaAlignMax)}&nbsp;&middot;&nbsp;{eaLabel}
+                          </Badge>
+                        ) : (
+                          <span className="text-muted-foreground text-sm">&mdash;</span>
+                        )}
+                        <FactCellSourcingDot factId={s.eaAlignFactId} verdict={s.eaAlignVerdict} />
+                      </span>
                     </TableCell>
                   )}
 

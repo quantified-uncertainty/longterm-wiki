@@ -1,48 +1,22 @@
 /**
  * AnthropicStakeholdersTable — server wrapper
  *
- * Reads equity stakes from PG (via KB records at build time) and overlays
- * editorial estimates for pledge rates, EA alignment, and categories.
- * These editorial fields have no PG table — they are analytical opinions,
- * not structured data.
+ * Reads equity stakes from PG (via KB records at build time) and per-
+ * stakeholder editorial estimates (pledge rate, EA alignment probability)
+ * from FactBase. Each per-row editorial value is backed by a real
+ * `Fact` with its own fact ID, which drives a cell-level sourcing dot.
+ * Categories remain a hardcoded editorial lookup — they're short labels,
+ * not claims that benefit from an explicit sourcing check.
  */
 
-import { getKBLatest, getKBRecords, getFactBaseEntity, resolveFactBaseSlug } from "@data/factbase";
-import { getTypedEntityById, getPageById, getEntityHref, resolveId } from "@/data";
+import { getKBLatest, getKBRecords, getFactBaseEntity, resolveFactBaseSlug, getFactBaseFactSourcing } from "@data/factbase";
+import { getTypedEntityById, getPageById, getEntityHref, resolveId, getRecordVerdict } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
+import type { Fact } from "@longterm-wiki/factbase";
 
-// ── Editorial data (keyed by holderId slug) ─────────────────────────────────
-// These are subjective editorial assessments, not structured data.
-// Pledge rates = fraction of equity pledged to charity.
-// EA alignment = estimated probability donations go to EA-aligned causes.
-// Categories describe the stakeholder's relationship to Anthropic.
-
-const PLEDGE_RATES: Record<string, [number, number]> = {
-  "dario-amodei":             [0.8,  0.8],
-  "daniela-amodei":           [0.8,  0.8],
-  "chris-olah":               [0.8,  0.8],
-  "jack-clark":               [0.8,  0.8],
-  "tom-brown":                [0.8,  0.8],
-  "jared-kaplan":             [0.8,  0.8],
-  "sam-mccandlish":           [0.8,  0.8],
-  "jaan-tallinn":             [0.9,  0.9],
-  "dustin-moskovitz":         [0.95, 0.95],
-  "employee-equity-pool":     [0.25, 0.5],
-};
-
-const EA_ALIGNMENT: Record<string, [number, number]> = {
-  "dario-amodei":             [0.8,  0.9],
-  "daniela-amodei":           [0.8,  0.9],
-  "chris-olah":               [0.4,  0.6],
-  "jack-clark":               [0.3,  0.5],
-  "tom-brown":                [0.15, 0.3],
-  "jared-kaplan":             [0.15, 0.3],
-  "sam-mccandlish":           [0.15, 0.3],
-  "jaan-tallinn":             [0.9,  0.95],
-  "dustin-moskovitz":         [0.9,  0.95],
-  "employee-equity-pool":     [0.4,  0.7],
-};
-
+// ── Editorial categories (slug → role label) ────────────────────────────────
+// Short descriptive labels for each stakeholder's relationship to Anthropic.
+// These are display strings, not claims — no sourcing.
 const CATEGORIES: Record<string, string> = {
   "dario-amodei":             "Co-founder, CEO",
   "daniela-amodei":           "Co-founder, President",
@@ -59,12 +33,27 @@ const CATEGORIES: Record<string, string> = {
   "series-g-institutional":   "Institutional",
 };
 
+// ── Employee-equity-pool fallback ───────────────────────────────────────────
+// The employee pool is a conceptual aggregate, not a stakeholder entity, so
+// it has no FactBase entity to hang per-row facts off. Keep its pledge/EA
+// estimates hardcoded; they surface with an editorial (not-sourced) dot.
+const EMPLOYEE_POOL_PLEDGE: [number, number] = [0.25, 0.5];
+const EMPLOYEE_POOL_EA_ALIGN: [number, number] = [0.4, 0.7];
+
 /** Extract [min, max] from a KB field that may be a number, [min, max] array, or missing. */
 function parseRange(field: unknown): [number, number] | null {
   if (typeof field === "number") return [field, field];
   if (Array.isArray(field) && field.length === 2 && typeof field[0] === "number" && typeof field[1] === "number") {
     return [field[0], field[1]];
   }
+  return null;
+}
+
+/** Extract [min, max] from a FactBase Fact whose value is a number or a range. */
+function factToRange(fact: Fact | undefined): [number, number] | null {
+  if (!fact) return null;
+  if (fact.value.type === "number") return [fact.value.value, fact.value.value];
+  if (fact.value.type === "range") return [fact.value.low, fact.value.high];
   return null;
 }
 
@@ -122,32 +111,32 @@ export async function AnthropicStakeholdersTable() {
   // Build entity previews for holders that have wiki pages
   const entityPreviews: Record<string, EntityPreview> = {};
   for (const rec of equityRecords) {
-    const holderSlug = rec.fields.holder;
-    if (typeof holderSlug !== "string") continue;
-    const entity = getTypedEntityById(holderSlug);
-    const page = getPageById(holderSlug);
+    const holderRef = rec.fields.holder;
+    if (typeof holderRef !== "string") continue;
+    const entity = getTypedEntityById(holderRef);
+    const page = getPageById(holderRef);
     if (!entity) continue;
-    const href = getEntityHref(holderSlug, entity.entityType);
+    const href = getEntityHref(holderRef, entity.entityType);
     const preview: EntityPreview = {
-      title: entity.title || holderSlug,
+      title: entity.title || holderRef,
       type: entity.entityType,
       description: page?.description || entity.description,
       href,
     };
     entityPreviews[href] = preview;
     // Also index by wiki page ID URL so /wiki/E123 stakeholder links resolve
-    const tbEnt = getTypedEntityById(holderSlug);
-    if (tbEnt?.wikiId) {
-      entityPreviews[`/wiki/${tbEnt.wikiId}`] = preview;
+    if (entity.wikiId) {
+      entityPreviews[`/wiki/${entity.wikiId}`] = preview;
     }
   }
 
-  // Transform equity records into stakeholder rows, overlaying editorial data
+  // Transform equity records into stakeholder rows. Per-row editorial values
+  // (pledge, EA alignment) come from FactBase facts on the stakeholder's
+  // entity; each fact's id drives a cell-level sourcing dot.
   const stakeholders: Stakeholder[] = equityRecords.map((record) => {
     // record.fields.holder may be either a slug ("dario-amodei") or a stableId
-    // ("sid_ENl8sgChDQ") depending on FK resolution state. Editorial lookups
-    // below (PLEDGE_RATES, EA_ALIGNMENT, CATEGORIES) are keyed by slug, so
-    // resolve to the slug form up-front.
+    // ("sid_ENl8sgChDQ") depending on FK resolution state. Normalize to slug
+    // up-front so editorial lookups (CATEGORIES) and FactBase lookups line up.
     const holderRef = typeof record.fields.holder === "string" ? record.fields.holder : record.key;
     const holderSlug = resolveId(holderRef);
     const name = resolveHolderName(holderSlug);
@@ -157,13 +146,40 @@ export async function AnthropicStakeholdersTable() {
 
     const category = CATEGORIES[holderSlug] ?? "Investor";
 
-    const pledge = PLEDGE_RATES[holderSlug];
-    const pledgeMin = pledge ? pledge[0] : 0;
-    const pledgeMax = pledge ? pledge[1] : 0;
+    // Look up per-stakeholder FactBase facts. Employee pool has no FB entity,
+    // so fall back to the hardcoded aggregate estimate and surface no dot.
+    const pledgeFact = getKBLatest(holderSlug, "equity-pledge-fraction");
+    const eaAlignFact = getKBLatest(holderSlug, "ea-alignment-estimate");
 
-    const ea = EA_ALIGNMENT[holderSlug];
-    const eaAlignMin = ea ? ea[0] : 0;
-    const eaAlignMax = ea ? ea[1] : 0;
+    let pledgeMin = 0;
+    let pledgeMax = 0;
+    let eaAlignMin = 0;
+    let eaAlignMax = 0;
+    const isEmployeePool = holderSlug === "employee-equity-pool";
+
+    const pledgeRange = factToRange(pledgeFact);
+    if (pledgeRange) {
+      [pledgeMin, pledgeMax] = pledgeRange;
+    } else if (isEmployeePool) {
+      [pledgeMin, pledgeMax] = EMPLOYEE_POOL_PLEDGE;
+    }
+
+    const eaRange = factToRange(eaAlignFact);
+    if (eaRange) {
+      [eaAlignMin, eaAlignMax] = eaRange;
+    } else if (isEmployeePool) {
+      [eaAlignMin, eaAlignMax] = EMPLOYEE_POOL_EA_ALIGN;
+    }
+
+    // Resolve sourcing state for each cell. `null` means no verdict available
+    // (renders as the default "not run" dot); `undefined` means there isn't
+    // even a fact to check (editorial-only — the client renders a distinct
+    // marker instead of a dot).
+    const stakeVerdict = getRecordVerdict("equity_positions", record.key)?.verdict ?? null;
+    const pledgeFactId = pledgeFact?.id;
+    const pledgeVerdict = pledgeFactId ? getFactBaseFactSourcing(pledgeFactId) ?? null : null;
+    const eaAlignFactId = eaAlignFact?.id;
+    const eaAlignVerdict = eaAlignFactId ? getFactBaseFactSourcing(eaAlignFactId) ?? null : null;
 
     // Build link from entity slug
     let link: string | undefined;
@@ -186,8 +202,24 @@ export async function AnthropicStakeholdersTable() {
     const notes = typeof record.fields.notes === "string" ? record.fields.notes : undefined;
 
     return {
-      name, category, stakeMin, stakeMax, pledgeMin, pledgeMax,
-      eaAlignMin, eaAlignMax, link, notes, includeInTotal,
+      name,
+      category,
+      stakeMin,
+      stakeMax,
+      pledgeMin,
+      pledgeMax,
+      eaAlignMin,
+      eaAlignMax,
+      link,
+      notes,
+      includeInTotal,
+      // Sourcing metadata — consumed by the client to render cell-level dots
+      equityRecordKey: record.key,
+      stakeVerdict,
+      pledgeFactId,
+      pledgeVerdict,
+      eaAlignFactId,
+      eaAlignVerdict,
     };
   });
 
