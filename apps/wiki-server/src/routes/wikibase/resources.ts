@@ -2135,8 +2135,22 @@ const resourcesApp = new Hono()
     async (c) => {
       const { apply } = c.req.valid("json");
       const sql = getDb();
-      const result = await runDedup(sql, apply);
-      return c.json(result);
+      try {
+        const result = await runDedup(sql, apply);
+        return c.json(result);
+      } catch (err) {
+        // runDedup throws on apply=true when the scan was truncated (QUA-623).
+        // Translate to a structured 409 so CLI callers get an actionable message
+        // instead of a generic 500.
+        const message = err instanceof Error ? err.message : String(err);
+        if (message.includes("scan was truncated")) {
+          return c.json(
+            { error: "scan_truncated", message },
+            409,
+          );
+        }
+        throw err;
+      }
     }
   );
 
