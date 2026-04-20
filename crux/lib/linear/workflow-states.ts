@@ -50,6 +50,20 @@ export function getWorkflowStateId(name: WorkflowStateName): string {
   return id;
 }
 
+/**
+ * Linear state `type` values that represent an active (non-terminal) ticket.
+ * Allowlist so unknown/future state types fail safe as "not open" — better to
+ * re-file a ticket than to accidentally comment on something terminal-looking.
+ *
+ * Callers across the codebase (wellness dedup, audit auto-close, etc.) must
+ * agree on what "open" means or their decisions diverge on edge cases.
+ */
+export const OPEN_STATE_TYPES = new Set(['triage', 'backlog', 'unstarted', 'started']);
+
+export function isOpenStateType(type: string): boolean {
+  return OPEN_STATE_TYPES.has(type);
+}
+
 export interface RemoteWorkflowState {
   id: string;
   name: string;

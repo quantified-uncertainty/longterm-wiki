@@ -31,6 +31,7 @@ import {
   updateIssueState,
   type SearchedIssue,
 } from '../lib/linear/issues.ts';
+import { isOpenStateType } from '../lib/linear/workflow-states.ts';
 
 /**
  * Window for treating a closed Linear wellness ticket as "still recent
@@ -40,15 +41,6 @@ import {
  * reopens tickets that have genuinely been triaged away.
  */
 export const REOPEN_WINDOW_MS = 48 * 60 * 60 * 1000;
-
-/**
- * Linear workflow-state `type` values that represent an actively-tracked
- * (non-terminal) ticket. Use an allowlist rather than a denylist so any
- * unknown/future state type (`triage`, custom types, etc.) fails safe as
- * "don't treat as open" — accidentally commenting on a terminal ticket
- * is worse than letting one slip through and file a fresh one.
- */
-const OPEN_STATE_TYPES = new Set(['backlog', 'unstarted', 'started', 'triage']);
 
 export type LinearWellnessAction =
   | { kind: 'commented'; identifier: string; url: string }
@@ -80,7 +72,7 @@ function parseQuaNumber(identifier: string): number {
 }
 
 function isOpen(issue: SearchedIssue): boolean {
-  return OPEN_STATE_TYPES.has(issue.state.type);
+  return isOpenStateType(issue.state.type);
 }
 
 function issueTimestampMs(issue: SearchedIssue): number {
@@ -126,14 +118,15 @@ export async function dedupLinearWellnessIssue(
   if (open.length > 0) {
     open.sort((a, b) => parseQuaNumber(a.identifier) - parseQuaNumber(b.identifier));
     const target = open[0];
-    try {
-      await comment(target.identifier, commentBody);
-    } catch (err) {
+    // The open ticket's EXISTENCE is the dedup signal; the comment is
+    // cosmetic decoration. A comment failure must NOT fall through to the
+    // GitHub create path — that would mirror into a second Linear ticket
+    // and reintroduce the duplicate-cascade this module prevents.
+    await comment(target.identifier, commentBody).catch((err) => {
       console.warn(
-        `Linear comment on ${target.identifier} failed (${err instanceof Error ? err.message : String(err)}) — falling back to GitHub create path`,
+        `Linear comment on ${target.identifier} failed (${err instanceof Error ? err.message : String(err)}); ticket is already open, skipping GitHub create`,
       );
-      return { kind: 'skipped', reason: 'lookup-failed' };
-    }
+    });
     return { kind: 'commented', identifier: target.identifier, url: target.url };
   }
 
@@ -214,20 +207,23 @@ export async function closeLinearWellnessOnAllClear(
 
   if (candidates.length === 0) return { kind: 'none' };
 
-  const closed: string[] = [];
-  const attempted: string[] = [];
-  for (const issue of candidates) {
-    attempted.push(issue.identifier);
-    try {
+  // Close in parallel. Typically 0–3 candidates; Linear API calls are
+  // independent. Promise.allSettled preserves partial-success semantics
+  // without tangling the sequential-loop error plumbing.
+  const results = await Promise.allSettled(
+    candidates.map(async (issue) => {
       await comment(issue.identifier, commentBody);
       await setState(issue.identifier, 'Done');
-      closed.push(issue.identifier);
-    } catch (err) {
-      console.warn(
-        `Failed to close Linear ${issue.identifier}: ${err instanceof Error ? err.message : String(err)}`,
-      );
-    }
-  }
+      return issue.identifier;
+    }),
+  );
+  const closed = results.flatMap((r, i) => {
+    if (r.status === 'fulfilled') return [r.value];
+    console.warn(
+      `Failed to close Linear ${candidates[i].identifier}: ${r.reason instanceof Error ? r.reason.message : String(r.reason)}`,
+    );
+    return [];
+  });
   if (closed.length > 0) return { kind: 'closed', identifiers: closed };
-  return { kind: 'close-failed', attempted };
+  return { kind: 'close-failed', attempted: candidates.map((c) => c.identifier) };
 }

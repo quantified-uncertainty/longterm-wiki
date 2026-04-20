@@ -161,7 +161,10 @@ describe('dedupLinearWellnessIssue', () => {
     expect(setState).not.toHaveBeenCalled();
   });
 
-  it('fails open when commenting on an open match throws', async () => {
+  it('returns commented (NOT skipped) when commenting on an open match throws — prevents duplicate on open path', async () => {
+    // The open ticket exists; its existence is the dedup signal. A failed
+    // comment must NOT cascade into a GitHub create — that would mirror
+    // into a second Linear ticket and reintroduce the duplicate cascade.
     const search = vi.fn().mockResolvedValue([
       makeIssue({ identifier: 'QUA-570', state: { name: 'In Progress', type: 'started' } }),
     ]);
@@ -172,7 +175,11 @@ describe('dedupLinearWellnessIssue', () => {
       search, comment, setState, now: () => NOW,
     });
 
-    expect(result).toEqual({ kind: 'skipped', reason: 'lookup-failed' });
+    expect(result).toEqual({
+      kind: 'commented',
+      identifier: 'QUA-570',
+      url: expect.any(String),
+    });
     expect(setState).not.toHaveBeenCalled();
   });
 
