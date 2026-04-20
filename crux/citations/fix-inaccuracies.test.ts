@@ -409,6 +409,319 @@ describe('filterProposals', () => {
     expect(result.rejected).toEqual([]);
     expect(result.escapedCount).toBe(0);
   });
+
+  // ------------------------------------------------------------------------
+  // QUA-588: three new filters + dedup
+  // ------------------------------------------------------------------------
+
+  // Filter: remove_ref tight-scope
+  // Background: Kalshi [^1] (2026-04-18) used action=remove_ref but also
+  // removed substantive text ("is the first federally regulated prediction
+  // market exchange in the United States") beyond the footnote marker.
+
+  it('remove_ref: accepts replacement that drops only [^NN] markers', () => {
+    const p = makeProposal({
+      original: 'Kalshi is the first federally regulated prediction market exchange[^1].',
+      replacement: 'Kalshi is the first federally regulated prediction market exchange.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+    expect(result.rejected).toHaveLength(0);
+  });
+
+  it('remove_ref: accepts replacement that drops multiple [^NN] markers', () => {
+    const p = makeProposal({
+      original: 'foo[^1][^2] bar[^rc-ab12] baz.',
+      replacement: 'foo bar baz.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('remove_ref: rejects replacement that removes substantive claim text (Kalshi 2026-04-18)', () => {
+    const p = makeProposal({
+      original: 'Kalshi is the first federally regulated prediction market exchange in the United States[^1].',
+      replacement: 'Kalshi.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected).toHaveLength(1);
+    expect(result.rejected[0].reason).toBe('remove-ref-scope');
+  });
+
+  it('remove_ref: rejects replacement that rewords (changes word) beyond marker removal', () => {
+    const p = makeProposal({
+      original: 'Anthropic raised funding[^5].',
+      replacement: 'Anthropic raised capital.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected[0].reason).toBe('remove-ref-scope');
+  });
+
+  it('remove_ref: tolerates whitespace normalization (double space after removal)', () => {
+    const p = makeProposal({
+      original: 'Foo [^3] bar.',
+      replacement: 'Foo  bar.',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('remove_ref filter only fires for remove_ref (rewrite allowed to change text)', () => {
+    const p = makeProposal({
+      original: 'foo[^1] bar.',
+      replacement: 'completely different wording.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p]);
+    // shrink may still catch it, but not remove-ref-scope
+    expect(result.rejected.every((r) => r.reason !== 'remove-ref-scope')).toBe(true);
+  });
+
+  // Filter: MDX structure preservation
+  // Background: Samotsvety [^37] (2026-04-18) changed
+  //   `- **GJO Calibration App**: Tools for forecaster training[^rc-06ed]`
+  // to
+  //   `- **GJO Calibration App**:[^rc-06ed]`
+  // leaving a dangling list bullet.
+
+  it('mdx-structure: rejects list bullet whose content-after-colon is emptied (Samotsvety 2026-04-18)', () => {
+    const p = makeProposal({
+      original: '- **GJO Calibration App**: Tools for forecaster training and improvement[^rc-06ed]',
+      replacement: '- **GJO Calibration App**:[^rc-06ed]',
+      fixType: 'remove_detail',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected).toHaveLength(1);
+    expect(result.rejected[0].reason).toBe('mdx-structure');
+  });
+
+  it('mdx-structure: accepts list bullet whose content changes but is not emptied', () => {
+    const p = makeProposal({
+      original: '- **Calibration App**: Tools for training forecasters[^5]',
+      replacement: '- **Calibration App**: A training tool[^5]',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('mdx-structure: accepts list bullet that drops only the footnote (still has content)', () => {
+    const p = makeProposal({
+      original: '- **Calibration App**: Tools for forecaster training[^5]',
+      replacement: '- **Calibration App**: Tools for forecaster training',
+      fixType: 'remove_ref',
+    });
+    const result = filterProposals([p]);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('mdx-structure: skips check when original was not a list bullet', () => {
+    const p = makeProposal({
+      original: 'Some regular sentence.',
+      replacement: 'Another regular sentence.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p]);
+    expect(result.rejected.every((r) => r.reason !== 'mdx-structure')).toBe(true);
+  });
+
+  it('mdx-structure: skips check when original bullet was already empty', () => {
+    // Pre-existing malformed bullet — our filter shouldn't newly flag it
+    const p = makeProposal({
+      original: '- **Calibration App**:[^5]',
+      replacement: '- **Calibration App**:[^5]',
+      fixType: 'rewrite',
+    });
+    // Replacement == original so parseLLMFixResponse would already filter, but
+    // covering the edge case directly:
+    const result = filterProposals([p]);
+    expect(result.rejected.every((r) => r.reason !== 'mdx-structure')).toBe(true);
+  });
+
+  // Filter: context-bleed (duplicate-content vs page)
+  // Background: chan-zuckerberg-initiative [^4] (2026-04-18) replaced a
+  // sentence with verbatim text from the prior sentence in the same paragraph,
+  // producing duplicate-content rendering.
+
+  it('context-bleed: rejects replacement that duplicates a neighboring sentence (CZI 2026-04-18)', () => {
+    const pageContent = [
+      'CZI was founded in 2015 by Mark Zuckerberg and Priscilla Chan.',
+      'Its LLC structure enables flexibility for both grants to nonprofits and investments in for-profit companies.',
+      'As of 2025, CZI announced plans to spend at least $10 billion on scientific research over the next decade.',
+    ].join('\n\n');
+    const p = makeProposal({
+      original: 'As of 2025, CZI announced plans to spend at least $10 billion on scientific research over the next decade.',
+      replacement: 'Its LLC structure enables flexibility for both grants to nonprofits and investments in for-profit companies.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p], pageContent);
+    expect(result.kept).toHaveLength(0);
+    expect(result.rejected).toHaveLength(1);
+    expect(result.rejected[0].reason).toBe('context-bleed');
+  });
+
+  it('context-bleed: accepts replacement that does not appear elsewhere', () => {
+    const pageContent = 'Alpha sentence. Beta sentence. Gamma sentence about many interesting things here.';
+    const p = makeProposal({
+      original: 'Gamma sentence about many interesting things here.',
+      replacement: 'Delta sentence with a fresh phrasing that is not present above anywhere.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p], pageContent);
+    expect(result.kept).toHaveLength(1);
+  });
+
+  it('context-bleed: skips short replacements (below min length)', () => {
+    // 22 chars, below 40-char threshold — collisions on short names are common
+    const pageContent = 'Anthropic is a company. Anthropic was founded.';
+    const p = makeProposal({
+      original: 'Anthropic was founded.',
+      replacement: 'Anthropic is a company',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p], pageContent);
+    // Not flagged as context-bleed (too short)
+    expect(result.rejected.every((r) => r.reason !== 'context-bleed')).toBe(true);
+  });
+
+  it('context-bleed: skips check when pageContent is not provided', () => {
+    const p = makeProposal({
+      original: 'As of 2025, CZI announced plans to spend at least $10 billion on scientific research over the next decade.',
+      replacement: 'Its LLC structure enables flexibility for both grants to nonprofits and investments in for-profit companies.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p]);
+    // Without pageContent, cannot detect bleed
+    expect(result.rejected.every((r) => r.reason !== 'context-bleed')).toBe(true);
+  });
+
+  it('context-bleed: skips when original not found in page (apply will fail separately)', () => {
+    const pageContent = 'Alpha. Beta. Gamma.';
+    const p = makeProposal({
+      original: 'does not appear in page text at all',
+      replacement: 'Alpha. Beta. Gamma.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p], pageContent);
+    // Original not locatable — skip bleed check (let apply fail with not_found)
+    expect(result.rejected.every((r) => r.reason !== 'context-bleed')).toBe(true);
+  });
+
+  it('context-bleed: normalizes whitespace (collapsed spaces, newlines)', () => {
+    const pageContent = 'Foo.\n\nThe replacement text that is long enough to check.\n\nTarget sentence goes here now in body.';
+    const p = makeProposal({
+      original: 'Target sentence goes here now in body.',
+      replacement: 'The   replacement\ntext that is  long enough to check.',
+      fixType: 'rewrite',
+    });
+    const result = filterProposals([p], pageContent);
+    expect(result.rejected.some((r) => r.reason === 'context-bleed')).toBe(true);
+  });
+
+  // Dedup: overlapping spans
+
+  it('span-overlap: keeps first proposal, rejects second with overlapping span', () => {
+    const pageContent = 'The paragraph lead-in phrase opens a longer discussion about many topics.';
+    const p1 = makeProposal({
+      footnote: 1,
+      original: 'The paragraph lead-in phrase opens a longer',
+      replacement: 'The paragraph lead-in phrase introduces a long',
+      fixType: 'correct',
+    });
+    const p2 = makeProposal({
+      footnote: 2,
+      original: 'lead-in phrase opens a longer discussion',
+      replacement: 'lead-in phrase starts a longer discussion',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p1, p2], pageContent);
+    expect(result.kept.map((p) => p.footnote)).toEqual([1]);
+    expect(result.rejected).toHaveLength(1);
+    expect(result.rejected[0].reason).toBe('span-overlap');
+    expect(result.rejected[0].proposal.footnote).toBe(2);
+  });
+
+  it('span-overlap: keeps non-overlapping proposals', () => {
+    const pageContent = 'First sentence here. Second sentence there. Third sentence over yonder.';
+    const p1 = makeProposal({
+      footnote: 1,
+      original: 'First sentence here.',
+      replacement: 'First phrase here.',
+      fixType: 'correct',
+    });
+    const p2 = makeProposal({
+      footnote: 2,
+      original: 'Third sentence over yonder.',
+      replacement: 'Third phrase over yonder.',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p1, p2], pageContent);
+    expect(result.kept).toHaveLength(2);
+    expect(result.rejected).toHaveLength(0);
+  });
+
+  it('span-overlap: skipped when pageContent not provided', () => {
+    const p1 = makeProposal({ footnote: 1, original: 'abc def', replacement: 'xyz def' });
+    const p2 = makeProposal({ footnote: 2, original: 'def ghi', replacement: 'def jkl' });
+    // Without pageContent, both pass through
+    const result = filterProposals([p1, p2]);
+    expect(result.kept).toHaveLength(2);
+  });
+
+  it('span-overlap: passes through proposals whose original is not located', () => {
+    const pageContent = 'Some page content with specific text.';
+    const p1 = makeProposal({
+      footnote: 1,
+      original: 'not in page at all xyz',
+      replacement: 'replacement phrase',
+      fixType: 'correct',
+    });
+    const result = filterProposals([p1], pageContent);
+    // Not rejected as overlap — passes through to apply (which will fail there)
+    expect(result.rejected.every((r) => r.reason !== 'span-overlap')).toBe(true);
+  });
+
+  it('combined: new and old filters cooperate in the same batch', () => {
+    const pageContent = [
+      'This is a long opening sentence with enough content.',
+      'The second sentence with forty-plus characters here for bleed check.',
+      'And a list item below:',
+      '- **Label**: The list item content phrase here[^10]',
+    ].join('\n\n');
+
+    const cleanRewrite = makeProposal({
+      footnote: 1,
+      original: 'This is a long opening sentence with enough content.',
+      replacement: 'This is a long opening sentence with fresh content.',
+      fixType: 'correct',
+    });
+    const bleed = makeProposal({
+      footnote: 2,
+      original: 'The second sentence with forty-plus characters here for bleed check.',
+      replacement: 'This is a long opening sentence with enough content.',
+      fixType: 'rewrite',
+    });
+    const danglingBullet = makeProposal({
+      footnote: 3,
+      original: '- **Label**: The list item content phrase here[^10]',
+      replacement: '- **Label**:[^10]',
+      fixType: 'remove_detail',
+    });
+
+    const result = filterProposals([cleanRewrite, bleed, danglingBullet], pageContent);
+    expect(result.kept.map((p) => p.footnote)).toEqual([1]);
+    expect(result.rejected).toHaveLength(2);
+    const reasons = result.rejected.map((r) => r.reason).sort();
+    expect(reasons).toEqual(['context-bleed', 'mdx-structure']);
+  });
 });
 
 describe('FIX_ACTIONS drift guard', () => {
