@@ -73,5 +73,3 @@ export const jsxInMdRule = createRule({
     return issues;
   },
 });
-
-export default jsxInMdRule;

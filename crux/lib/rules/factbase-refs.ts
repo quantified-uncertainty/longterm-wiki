@@ -289,5 +289,3 @@ export const kbfRefsRule = createRule({
     return issues;
   },
 });
-
-export default kbfRefsRule;

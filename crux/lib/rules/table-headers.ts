@@ -182,5 +182,3 @@ export const tableHeadersRule = createRule({
     return issues;
   },
 });
-
-export default tableHeadersRule;

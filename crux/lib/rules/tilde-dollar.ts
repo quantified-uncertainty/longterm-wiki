@@ -98,5 +98,3 @@ export const tildeDollarRule = createRule({
     return issues;
   },
 });
-
-export default tildeDollarRule;

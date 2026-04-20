@@ -100,5 +100,3 @@ export const hardcodedCalculationsRule = createRule({
     });
   },
 });
-
-export default hardcodedCalculationsRule;

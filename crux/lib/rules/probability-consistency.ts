@@ -246,5 +246,3 @@ export const probabilityConsistencyRule = createRule({
     return issues;
   },
 });
-
-export default probabilityConsistencyRule;

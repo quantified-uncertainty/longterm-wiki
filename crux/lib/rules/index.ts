@@ -18,5 +18,3 @@ export * from './catalog.ts';
 // the named exports. `catalog.ts` re-exports rules and ONLY rules; any non-rule
 // export added there would break this cast.
 export const allRules: Rule[] = Object.values(catalog) as Rule[];
-
-export default allRules;

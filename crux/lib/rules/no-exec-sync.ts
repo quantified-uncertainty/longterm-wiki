@@ -77,5 +77,3 @@ export const noExecSyncRule = createRule({
     return issues;
   },
 });
-
-export default noExecSyncRule;

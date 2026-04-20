@@ -84,5 +84,3 @@ export const placeholdersRule = createRule({
     return issues;
   },
 });
-
-export default placeholdersRule;

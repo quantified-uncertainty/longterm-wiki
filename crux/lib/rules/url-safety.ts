@@ -96,5 +96,3 @@ export const urlSafetyRule = createRule({
     return issues;
   },
 });
-
-export default urlSafetyRule;

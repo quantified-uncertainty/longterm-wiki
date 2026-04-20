@@ -65,5 +65,3 @@ export const comparisonOperatorsRule = createRule({
     return issues;
   },
 });
-
-export default comparisonOperatorsRule;
