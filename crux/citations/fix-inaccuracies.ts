@@ -967,11 +967,16 @@ const CONTEXT_BLEED_MIN_LEN = 40;
 const FOOTNOTE_MARKER_RE = /\[\^[a-zA-Z0-9_-]+\]/g;
 
 /**
- * Matches a list bullet with a bolded label followed by a colon:
+ * Matches a single-line list bullet with a bolded label followed by a colon:
  *   `- **Label**: description[^ref]`
  * Captures the prefix (`- **Label**:`) and the content after the colon.
+ *
+ * Intentionally no `/s` flag: if `original` spans multiple bullets we do not
+ * check structure here — a greedy `.*` with `/s` would eat neighboring bullets
+ * and hide genuine emptiness of the first one. Multi-line originals simply
+ * fall through this filter.
  */
-const LIST_BULLET_LABEL_RE = /^(\s*-\s+\*\*[^*]+\*\*:)(.*)$/s;
+const LIST_BULLET_LABEL_RE = /^(\s*-\s+\*\*[^*]+\*\*:)(.*)$/;
 
 /** Count preserved component tags in a string. */
 export function countPreservedComponents(s: string): number {
@@ -1058,24 +1063,25 @@ function checkMdxStructure(p: FixProposal): string | null {
  * pulled verbatim from a neighboring sentence in the same page, producing
  * duplicate content after apply.
  *
- * Strategy: locate the original span, mask it out, then check whether the
- * whitespace-normalized replacement appears as a substring anywhere else in
- * the page. Replacements shorter than CONTEXT_BLEED_MIN_LEN are skipped to
- * avoid false positives on short phrases or entity names.
+ * Strategy: split the page on every occurrence of `original` (masking ALL
+ * copies, not just the first), then check each remaining segment
+ * independently for the whitespace-normalized replacement. Per-segment
+ * checking avoids false positives across the boundary between before/after
+ * when the replacement happens to span what would otherwise be a joined gap.
+ *
+ * Replacements shorter than CONTEXT_BLEED_MIN_LEN are skipped to avoid false
+ * positives on short phrases or entity names.
  */
 function checkContextBleed(p: FixProposal, pageContent: string): string | null {
   const normalized = normalizeWhitespace(p.replacement);
   if (normalized.length < CONTEXT_BLEED_MIN_LEN) return null;
+  if (!pageContent.includes(p.original)) return null;
 
-  const origIdx = pageContent.indexOf(p.original);
-  if (origIdx === -1) return null;
-
-  const before = pageContent.slice(0, origIdx);
-  const after = pageContent.slice(origIdx + p.original.length);
-  const restNormalized = normalizeWhitespace(before + '\n' + after);
-
-  if (restNormalized.includes(normalized)) {
-    return `replacement appears verbatim elsewhere in the page (context-bleed)`;
+  const segments = pageContent.split(p.original);
+  for (const seg of segments) {
+    if (normalizeWhitespace(seg).includes(normalized)) {
+      return `replacement appears verbatim elsewhere in the page (context-bleed)`;
+    }
   }
   return null;
 }
@@ -1094,6 +1100,12 @@ function checkContextBleed(p: FixProposal, pageContent: string): string | null {
  * Proposals whose `original` is not located in the page are passed through
  * unchanged (they will fail later in `applyFixes`, which is a distinct
  * failure mode, not a dedup issue).
+ *
+ * Note on non-unique originals: both this function and `applyFixes` use
+ * `pageContent.indexOf(p.original)`, so two proposals sharing the same
+ * `original` string map to the same first-occurrence span. The second is
+ * rejected as `span-overlap`, matching the reality that `applyFixes` could
+ * only have patched one of them anyway.
  */
 function dedupBySpan(
   proposals: FixProposal[],
