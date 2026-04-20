@@ -8,7 +8,7 @@
  */
 
 import { getKBLatest, getKBRecords, getFactBaseEntity, resolveFactBaseSlug } from "@data/factbase";
-import { getTypedEntityById, getPageById, getEntityHref } from "@/data";
+import { getTypedEntityById, getPageById, getEntityHref, resolveId } from "@/data";
 import { AnthropicStakeholdersTableClient, type EntityPreview, type Stakeholder } from "@components/wiki/AnthropicStakeholdersTableClient";
 
 // ── Editorial data (keyed by holderId slug) ─────────────────────────────────
@@ -144,7 +144,12 @@ export async function AnthropicStakeholdersTable() {
 
   // Transform equity records into stakeholder rows, overlaying editorial data
   const stakeholders: Stakeholder[] = equityRecords.map((record) => {
-    const holderSlug = typeof record.fields.holder === "string" ? record.fields.holder : record.key;
+    // record.fields.holder may be either a slug ("dario-amodei") or a stableId
+    // ("sid_ENl8sgChDQ") depending on FK resolution state. Editorial lookups
+    // below (PLEDGE_RATES, EA_ALIGNMENT, CATEGORIES) are keyed by slug, so
+    // resolve to the slug form up-front.
+    const holderRef = typeof record.fields.holder === "string" ? record.fields.holder : record.key;
+    const holderSlug = resolveId(holderRef);
     const name = resolveHolderName(holderSlug);
     const stake = parseRange(record.fields.stake);
     const stakeMin = stake ? stake[0] : null;

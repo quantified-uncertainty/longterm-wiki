@@ -168,6 +168,17 @@ test.describe("Render audit — critical data tables", () => {
     expect(text).toContain("Stakeholder");
     // Valuation should be formatted (e.g., "$380B"), not raw
     expect(text).toMatch(/\$\d+(?:\.\d+)?[BMT]/);
+
+    // Regression check: editorial columns (Category, Pledge %, EA Align %)
+    // must populate for stakeholders with wiki entities. Previously broken
+    // when the equity-positions record sent holderEntityId (sid_) instead
+    // of the slug — every per-founder lookup into PLEDGE_RATES missed and
+    // only the Employee Equity Pool row kept its data.
+    // Scope to the first "Dario Amodei" row — the AnthropicStakeholdersTable row.
+    // A later markdown table under "Founder Donation Pledges" also mentions Dario.
+    const dariorowText = (await page.locator("tr", { hasText: "Dario Amodei" }).first().textContent()) ?? "";
+    expect(dariorowText, "Dario Amodei row should show 'Co-founder' category").toContain("Co-founder");
+    expect(dariorowText, "Dario Amodei row should not be all em-dashes in editorial columns").toMatch(/80%/);
   });
 });
 
