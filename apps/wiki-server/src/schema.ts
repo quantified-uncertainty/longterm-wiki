@@ -654,7 +654,7 @@ export const resources = pgTable(
     credibilityOverride: real("credibility_override"),
     fetchedAt: timestamp("fetched_at", { withTimezone: true }),
     contentHash: text("content_hash"),
-    stableId: text("stable_id").unique(),
+    stableId: text("stable_id").notNull().unique(),
     /** HTTP reachability of the resource URL.
      *  Values: ok | dead | soft_404 | not_found | timeout | unreachable | paywall | error.
      *  Written by resource-ingest and source-fetcher after each fetch attempt.
