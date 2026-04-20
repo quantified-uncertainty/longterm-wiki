@@ -142,5 +142,3 @@ export const outdatedNamesRule = createRule({
     return issues;
   },
 });
-
-export default outdatedNamesRule;

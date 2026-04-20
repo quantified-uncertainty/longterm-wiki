@@ -179,4 +179,3 @@ export function ResourceLink({
 }
 
 export { ResourceLink as R };
-export default ResourceLink;

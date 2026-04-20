@@ -133,5 +133,3 @@ export const personOrgAffiliationRule = createRule({
     return issues;
   },
 });
-
-export default personOrgAffiliationRule;

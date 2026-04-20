@@ -149,5 +149,3 @@ export const preferEntityLinkRule = createRule({
     return issues;
   },
 });
-
-export default preferEntityLinkRule;

@@ -93,5 +93,3 @@ export const brokenLinksRule = createRule({
     return issues;
   },
 });
-
-export default brokenLinksRule;

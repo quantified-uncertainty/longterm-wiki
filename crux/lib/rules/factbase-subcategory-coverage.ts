@@ -102,5 +102,3 @@ export const kbSubcategoryCoverageRule = {
     return issues;
   },
 };
-
-export default kbSubcategoryCoverageRule;

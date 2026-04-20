@@ -136,5 +136,3 @@ export const orphanedFootnotesRule = createRule({
     return issues;
   },
 });
-
-export default orphanedFootnotesRule;

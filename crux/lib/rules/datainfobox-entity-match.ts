@@ -65,5 +65,3 @@ export const datainfoboxEntityMatchRule = createRule({
     return issues;
   },
 });
-
-export default datainfoboxEntityMatchRule;

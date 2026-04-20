@@ -76,5 +76,3 @@ export const markdownListsRule = createRule({
     return issues;
   },
 });
-
-export default markdownListsRule;

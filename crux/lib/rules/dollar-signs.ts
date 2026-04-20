@@ -224,5 +224,3 @@ export const dollarSignsRule = createRule({
     return issues;
   },
 });
-
-export default dollarSignsRule;

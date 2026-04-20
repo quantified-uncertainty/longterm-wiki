@@ -78,5 +78,3 @@ export const resourceRefIntegrityRule = createRule({
     return issues;
   },
 });
-
-export default resourceRefIntegrityRule;
