@@ -29,7 +29,7 @@ import { z } from 'zod';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
   listVerdicts,
-  storeVerdict as storeVerdictRpc,
+  storeVerdict,
   getEvidenceByRecords,
   evidenceRecordKey,
   MAX_EVIDENCE_BY_RECORDS,
@@ -83,6 +83,19 @@ const DEFAULT_MAX_CONTENT_CHARS = 10_000;
 /** Rough Haiku cost at 10K-char content + 200-token response. Used for budget
  *  caps and dry-run estimates — not a precise meter. */
 const ESTIMATED_COST_PER_CHECK = 0.003;
+
+/** Slice previous-verdict reasoning before interpolating into the prompt —
+ *  the full reasoning can be thousands of characters, and the LLM only needs
+ *  enough to orient itself. */
+const MAX_PREVIOUS_REASONING_CHARS = 600;
+
+/** Cap each label in the mismatch prefix — keeps the reasoning column within
+ *  the server's 5000-char limit and keeps the prefix machine-parseable. */
+const MAX_PREFIX_LABEL_CHARS = 120;
+
+/** `source_check_verdicts.reasoning` is varchar(5000); leave headroom for the
+ *  prefix bracket we prepend. */
+const MAX_REASONING_CHARS = 4900;
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -175,7 +188,7 @@ export function buildSubjectIdentityPrompt(params: {
   maxContentChars: number;
 }): string {
   const content = params.sourceContent.slice(0, params.maxContentChars);
-  const previousReasoning = params.previousReasoning?.slice(0, 600) ?? '';
+  const previousReasoning = params.previousReasoning?.slice(0, MAX_PREVIOUS_REASONING_CHARS) ?? '';
 
   return `You are checking whether a web source is actually about the same entity that a claim is about.
 
@@ -319,11 +332,11 @@ export async function applyDowngrade(
   // reasoning prefix — without this a newline or "quote in the LLM's
   // `source_subject` would break any regex that later tries to extract the
   // retro-scan marker from the reasoning field.
-  const sanitize = (s: string) => s.replace(/\s+/g, ' ').replace(/"/g, "'").slice(0, 120);
+  const sanitize = (s: string) => s.replace(/\s+/g, ' ').replace(/"/g, "'").slice(0, MAX_PREFIX_LABEL_CHARS);
   const sourceSubject = sanitize(check.source_subject.trim() || '(unnamed)');
   const claimSubject = sanitize(claimSubjectLabel);
   const mismatchPrefix = `[retro-scan QUA-650: subject-mismatch — source is about "${sourceSubject}", claim is about "${claimSubject}"]`;
-  const newReasoning = `${mismatchPrefix} ${originalReasoning}`.slice(0, 4900);
+  const newReasoning = `${mismatchPrefix} ${originalReasoning}`.slice(0, MAX_REASONING_CHARS);
 
   const body: Record<string, unknown> = {
     recordType: verdict.recordType,
@@ -339,7 +352,7 @@ export async function applyDowngrade(
   if (verdict.displayName != null) body.displayName = verdict.displayName;
   if (verdict.entityDisplayName != null) body.entityDisplayName = verdict.entityDisplayName;
 
-  const response = await storeVerdictRpc(body);
+  const response = await storeVerdict(body);
   if (!response.ok) {
     throw new Error(
       `Failed to persist downgrade for ${verdict.recordType}/${verdict.recordId}: ${response.error}`,
@@ -357,7 +370,7 @@ export async function applyDowngrade(
         verdict: 'partial' as SourcingVerdict,
         confidence: check.confidence,
         extractedValue: `Source subject: ${sourceSubject}`,
-        reasoning: `QUA-650 retro-scan: ${check.reasoning}`.slice(0, 4900),
+        reasoning: `QUA-650 retro-scan: ${check.reasoning}`.slice(0, MAX_REASONING_CHARS),
         entityId: verdict.entityId,
         checkerModel: 'qua650-retro-scan-subject-identity',
         fieldName: verdict.fieldName,
@@ -643,23 +656,20 @@ async function retroScanCommand(
     estimatedCost: 0,
   };
 
-  const outcomes: ScanRowOutcome[] = [];
+  // The JSONL report is the source of truth; keep only small display buffers
+  // in-memory so a 9,578-row scan doesn't accumulate ~5MB of outcome objects.
+  const sampleOutcomes: ScanRowOutcome[] = []; // first 20, for --ci output
+  const mismatchPreview: ScanRowOutcome[] = []; // first 10 mismatches, for stdout summary
+  const SAMPLE_CAP = 20;
+  const MISMATCH_PREVIEW_CAP = 10;
 
-  // Append outcomes via a WriteStream instead of appendFileSync so concurrent
-  // processOne calls don't interleave partial JSON on the same file descriptor.
-  // `createWriteStream(..., { flags: 'a' })` serializes writes through Node's
-  // internal queue, and `appendLine` chains each new line after the previous
-  // one's drain — safe up to the default highWaterMark (64K) per line.
+  // Append outcomes via a WriteStream. Node's WriteStream serializes writes
+  // through its internal queue (FIFO on a single fd), so we don't need a
+  // promise chain to guard against interleaving — just call `.write()` and
+  // `.end(callback)` flushes pending writes before the callback fires.
   const reportStream: WriteStream = createWriteStream(reportPath, { flags: 'a' });
-  let lastWrite: Promise<void> = Promise.resolve();
   const appendLine = (obj: unknown): void => {
-    const payload = JSON.stringify(obj) + '\n';
-    lastWrite = lastWrite.then(
-      () =>
-        new Promise<void>((resolve, reject) => {
-          reportStream.write(payload, (err) => (err ? reject(err) : resolve()));
-        }),
-    );
+    reportStream.write(JSON.stringify(obj) + '\n');
   };
 
   const processOne = async (v: VerdictListEntry): Promise<void> => {
@@ -674,8 +684,11 @@ async function retroScanCommand(
       apply,
     });
 
-    outcomes.push(outcome);
     appendLine(outcome);
+    if (sampleOutcomes.length < SAMPLE_CAP) sampleOutcomes.push(outcome);
+    if (outcome.status === 'mismatch' && mismatchPreview.length < MISMATCH_PREVIEW_CAP) {
+      mismatchPreview.push(outcome);
+    }
 
     if (outcome.status.startsWith('skip:')) {
       summary.skipped++;
@@ -705,48 +718,40 @@ async function retroScanCommand(
   console.log('');
   console.log(`\x1b[1mScanning ${verdicts.length} rows (concurrency=${concurrency})...\x1b[0m`);
 
-  // Concurrency-limited loop (pattern borrowed from sourcing-orchestrate).
-  // NOTE: `budgetLimit` is a *soft* cap. The check runs between dispatches,
-  // so up to (concurrency - 1) in-flight LLM calls can push cost past the
-  // limit by roughly (concurrency - 1) × ESTIMATED_COST_PER_CHECK before
-  // the loop exits. With concurrency=5 that's ~$0.012 overshoot worst-case
-  // at the $0.003/check estimate — acceptable given we're already
-  // conservatively over-estimating per-call cost.
-  if (concurrency <= 1) {
-    for (const v of verdicts) {
-      if (summary.estimatedCost >= budgetLimit) {
-        summary.budgetExhausted = true;
-        break;
-      }
-      await processOne(v);
+  // Concurrency-limited pool (pattern borrowed from sourcing-orchestrate). The
+  // serial case (concurrency=1) is just a pool of size 1, so one loop covers
+  // both.
+  //
+  // NOTE: `budgetLimit` is a *soft* cap. The check runs before each dispatch,
+  // so up to `concurrency` in-flight LLM calls can push cost past the limit
+  // before the loop exits (the pre-dispatch check sees pre-increment cost,
+  // and each inflight call adds its ESTIMATED_COST_PER_CHECK after resolving).
+  // With concurrency=5 that's ~$0.015 overshoot worst-case at the
+  // $0.003/check estimate — acceptable given we already over-estimate per call.
+  const executing = new Set<Promise<void>>();
+  for (const v of verdicts) {
+    if (summary.estimatedCost >= budgetLimit) {
+      summary.budgetExhausted = true;
+      break;
     }
-  } else {
-    const executing = new Set<Promise<void>>();
-    for (const v of verdicts) {
-      if (summary.estimatedCost >= budgetLimit) {
-        summary.budgetExhausted = true;
-        break;
-      }
-      const p = processOne(v).finally(() => executing.delete(p));
-      executing.add(p);
-      if (executing.size >= concurrency) {
-        await Promise.race(executing);
-      }
+    const p = processOne(v).finally(() => executing.delete(p));
+    executing.add(p);
+    if (executing.size >= concurrency) {
+      await Promise.race(executing);
     }
-    await Promise.all(executing);
   }
+  await Promise.all(executing);
 
-  // Trailer — wait for the serialized write chain to drain before closing.
+  // Trailer — `stream.end(callback)` flushes all pending writes before firing.
   appendLine({ kind: 'qua650-retro-scan-trailer', finishedAt: new Date().toISOString(), summary });
-  await lastWrite;
   await new Promise<void>((resolve) => reportStream.end(resolve));
 
   const exitCode = summary.errors > 0 || summary.downgradeErrors > 0 ? 1 : 0;
 
   if (options.ci) {
-    return { exitCode, output: JSON.stringify({ summary, reportPath, sampleOutcomes: outcomes.slice(0, 20) }) };
+    return { exitCode, output: JSON.stringify({ summary, reportPath, sampleOutcomes }) };
   }
-  return { exitCode, output: formatSummaryOutput(summary, reportPath, outcomes) };
+  return { exitCode, output: formatSummaryOutput(summary, reportPath, mismatchPreview) };
 }
 
 // ── Output formatting ────────────────────────────────────────────────
@@ -804,7 +809,7 @@ function formatDryRunOutput(
 function formatSummaryOutput(
   summary: ScanSummary,
   reportPath: string,
-  outcomes: ScanRowOutcome[],
+  mismatchPreview: ScanRowOutcome[],
 ): string {
   const lines: string[] = [];
   lines.push('');
@@ -824,12 +829,10 @@ function formatSummaryOutput(
   }
   lines.push(`Report:                   ${reportPath}`);
 
-  // Show first few mismatches as a preview
-  const mismatches = outcomes.filter((o) => o.status === 'mismatch').slice(0, 10);
-  if (mismatches.length > 0) {
+  if (mismatchPreview.length > 0) {
     lines.push('');
     lines.push('\x1b[1mFirst mismatches:\x1b[0m');
-    for (const o of mismatches) {
+    for (const o of mismatchPreview) {
       lines.push(`  \x1b[33m${o.recordType}/${o.recordId}\x1b[0m`);
       lines.push(`    claim:  "${o.claimSubject}"`);
       lines.push(`    source: "${o.sourceSubject}"`);
