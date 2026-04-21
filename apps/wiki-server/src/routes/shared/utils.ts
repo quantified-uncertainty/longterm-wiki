@@ -24,6 +24,27 @@ export function clampedLimit(maxLimit: number, defaultLimit: number) {
 }
 
 /**
+ * Parse a boolean query-string value.
+ *
+ * Use this instead of `z.coerce.boolean()` for query-string params.
+ * `z.coerce.boolean()` runs the value through `Boolean(...)`, so any non-empty
+ * string — including the literal `"false"` — coerces to `true`. That means
+ * `?flag=false` silently reads as `true`, the opposite of what the caller
+ * typed (QUA-651).
+ *
+ * Accepts only the literal strings `"true"` and `"false"`. Any other value
+ * (including `"0"`, `"1"`, `"yes"`, `""`) fails validation with a 400, so
+ * silently-wrong boolean filters become impossible.
+ *
+ * Wrap with `.optional()` when the flag is not required:
+ *
+ *   const Query = z.object({ flagshipOnly: qBool.optional() });
+ */
+export const qBool = z
+  .enum(["true", "false"])
+  .transform((v) => v === "true");
+
+/**
  * Create a PaginationQuery schema with configurable limits.
  * Each route can call this with its own defaults while sharing the base shape.
  * Values above maxLimit are clamped (not rejected) so clients requesting larger
