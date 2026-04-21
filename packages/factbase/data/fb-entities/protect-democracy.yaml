@@ -187,40 +187,42 @@ facts:
   - id: f_w6ujeX5QVw
     property: revenue
     value: 2656972
-    asOf: "2017"
+    asOf: "2017-12"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
-    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017.
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017,
+      period ending 2017-12 (full fiscal year).
   - id: f_Pg7lnB0tLQ
     property: annual-expenses
     value: 1219420
-    asOf: "2017"
+    asOf: "2017-12"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
     notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
-      year 2017.
+      year 2017, period ending 2017-12 (full fiscal year).
   - id: f_YW4Gppy3Ug
     property: net-assets
     value: 3195991
-    asOf: "2017"
+    asOf: "2017-12"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
     notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
-      2017.
+      2017, period ending 2017-12 (full fiscal year).
   - id: f_BgSTVgjgRA
     property: revenue
     value: 2211623
-    asOf: "2017"
+    asOf: "2017-06"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
-    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017.
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017,
+      period ending 2017-06 (short-period filing).
   - id: f_p23WQt1QqQ
     property: annual-expenses
     value: 694638
-    asOf: "2017"
+    asOf: "2017-06"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
     notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
-      year 2017.
+      year 2017, period ending 2017-06 (short-period filing).
   - id: f_Lq12khj8PQ
     property: net-assets
     value: 1519655
-    asOf: "2017"
+    asOf: "2017-06"
     source: https://projects.propublica.org/nonprofits/organizations/814777062
     notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
-      2017.
+      2017, period ending 2017-06 (short-period filing).

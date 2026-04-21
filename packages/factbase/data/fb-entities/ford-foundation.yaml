@@ -162,29 +162,32 @@ facts:
   - id: f_i5ayee2DaQ
     property: revenue
     value: 165230380
-    asOf: "2012"
+    asOf: "2012-12"
     source: https://projects.propublica.org/nonprofits/organizations/131684331
-    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012.
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012,
+      period ending 2012-12 (short-period filing during fiscal-year transition).
   - id: f_RdOBiI0kZQ
     property: annual-expenses
     value: 157868598
-    asOf: "2012"
+    asOf: "2012-12"
     source: https://projects.propublica.org/nonprofits/organizations/131684331
     notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
-      year 2012.
+      year 2012, period ending 2012-12 (short-period filing during fiscal-year
+      transition).
   - id: f_EiZ5fYzghw
     property: revenue
     value: 453789109
-    asOf: "2012"
+    asOf: "2012-09"
     source: https://projects.propublica.org/nonprofits/organizations/131684331
-    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012.
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012,
+      period ending 2012-09 (full fiscal year).
   - id: f_DWEG27GV8g
     property: annual-expenses
     value: 616826363
-    asOf: "2012"
+    asOf: "2012-09"
     source: https://projects.propublica.org/nonprofits/organizations/131684331
     notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
-      year 2012.
+      year 2012, period ending 2012-09 (full fiscal year).
   - id: f_NXCgWUVldg
     property: revenue
     value: 559085236
