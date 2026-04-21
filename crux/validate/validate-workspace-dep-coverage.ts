@@ -19,23 +19,9 @@
  * prod Docker build uses `pnpm install --filter <app>...`, which only
  * resolves declared workspace dependencies. An undeclared `@longterm-wiki/*`
  * import will pass every local and CI check, then fail at runtime inside the
- * Docker container with `ERR_MODULE_NOT_FOUND`.
- *
- * This bug class has recurred five times:
- *   - `@longterm-wiki/id-utils` (earliest incident, referenced in QUA-449)
- *   - `@longterm-wiki/factbase` (2026-04-14, QUA-449)
- *   - `@longterm-wiki/url-utils` in wiki-server (2026-04-18, QUA-598)
- *   - `@longterm-wiki/url-utils` in the worker image (2026-04-19, QUA-605) —
- *     missed by the earlier validator because it only covered apps/*, not
- *     the standalone worker manifest at `docker/worker/package.json`.
- *   - Worker Dockerfile COPY gap (2026-04-20, QUA-654) — QUA-605's fix added
- *     the dep to the manifest but left the matching `COPY packages/<pkg>/`
- *     line in Dockerfile.worker as a manual step. Adding a new `file:` dep
- *     without the COPY line would break the image build (stage-1 pnpm
- *     install can't resolve a `file:` path whose source isn't staged).
- *
- * Each previous occurrence was fixed instance-by-instance. This validator is
- * the systemic fix — a blocking gate check so the 6th recurrence is impossible.
+ * Docker container with `ERR_MODULE_NOT_FOUND`. The same class of bug recurs
+ * one file: dep at a time without a systemic check (see QUA-449 / QUA-598 /
+ * QUA-605 / QUA-654 for instance history).
  *
  * ## What it checks
  *
@@ -54,11 +40,11 @@
  *      needs the dep declared.
  *   2. Same declared-vs-used comparison as apps.
  *
- * For `Dockerfile.worker` (QUA-654):
+ * For `Dockerfile.worker`:
  *   1. For every `@longterm-wiki/<pkg>` dep in docker/worker/package.json
  *      with a `file:./packages/<pkg>` spec, verify the Dockerfile has a
- *      matching `COPY packages/<pkg>/` line.
- *   2. Only file: deps require a COPY — workspace:* / version deps resolve
+ *      matching `COPY packages/<pkg>/` line before `pnpm install --prod`.
+ *   2. Only file: deps require a COPY — `workspace:*` / version deps resolve
  *      via pnpm and don't need staging.
  *
  * Imports in scope: quote-anchored `from '@longterm-wiki/X'`, `import('…')`,
@@ -140,17 +126,15 @@ interface AppCoverage {
 }
 
 /**
- * Dockerfile COPY coverage for the worker image. Populated when checking the
- * worker: every `file:./packages/<pkg>` dep in docker/worker/package.json must
- * have a matching `COPY packages/<pkg>/` line in Dockerfile.worker, or
- * `pnpm install --prod` fails at image build because the file: path doesn't
- * resolve. This is the second half of the QUA-605 invariant — the manifest
- * declares the dep, the Dockerfile must actually stage the source tree.
+ * Dockerfile COPY coverage for the worker image. Every `file:./packages/<pkg>`
+ * dep in docker/worker/package.json must have a matching `COPY packages/<pkg>/`
+ * line in Dockerfile.worker, or `pnpm install --prod` fails at image build
+ * because the file: path doesn't resolve.
  */
 interface DockerCopyCoverage {
   dockerfilePath: string;     // repo-relative; the file to edit to fix violations
   manifestPath: string;       // repo-relative; where the file: deps came from
-  fileDeps: Set<string>;      // package basenames (e.g. "url-utils") declared as file: deps
+  fileDeps: Set<string>;      // package basenames declared as file: deps
   copied: Set<string>;        // package basenames with a `COPY packages/<pkg>/` line
   missingCopy: string[];      // declared as file: but no COPY line (blocking)
 }
@@ -230,11 +214,21 @@ export function extractWorkspaceImports(content: string): Set<string> {
   return used;
 }
 
-function readDeclaredDeps(
+interface WorkspaceDepEntry {
+  name: string;   // full `@longterm-wiki/<pkg>` dep name
+  spec: string;   // dep spec value (e.g. `workspace:*` or `file:./packages/<pkg>`)
+}
+
+/**
+ * Parse `@longterm-wiki/*` dep entries from a package.json, across every
+ * declared-dependency section. Returns `[]` on read or JSON parse failure
+ * (after warning via `onWarn`). Shared by `readDeclaredDeps` (apps) and
+ * `readFileDeps` (worker manifest).
+ */
+function readWorkspaceDepEntries(
   packageJsonPath: string,
   onWarn?: (message: string) => void,
-): Set<string> {
-  const declared = new Set<string>();
+): WorkspaceDepEntry[] {
   let raw: string;
   try {
     raw = readFileSync(packageJsonPath, 'utf-8');
@@ -242,7 +236,7 @@ function readDeclaredDeps(
     onWarn?.(
       `Unreadable package.json at ${packageJsonPath}: ${err instanceof Error ? err.message : String(err)}`
     );
-    return declared;
+    return [];
   }
   let pkg: Record<string, unknown>;
   try {
@@ -251,16 +245,26 @@ function readDeclaredDeps(
     onWarn?.(
       `Malformed package.json at ${packageJsonPath}: ${err instanceof Error ? err.message : String(err)}`
     );
-    return declared;
+    return [];
   }
+  const entries: WorkspaceDepEntry[] = [];
   for (const section of DEP_SECTIONS) {
     const block = pkg[section];
     if (!block || typeof block !== 'object') continue;
-    for (const name of Object.keys(block as Record<string, unknown>)) {
-      if (name.startsWith(WORKSPACE_PREFIX)) declared.add(name);
+    for (const [name, spec] of Object.entries(block as Record<string, unknown>)) {
+      if (!name.startsWith(WORKSPACE_PREFIX)) continue;
+      if (typeof spec !== 'string') continue;
+      entries.push({ name, spec });
     }
   }
-  return declared;
+  return entries;
+}
+
+function readDeclaredDeps(
+  packageJsonPath: string,
+  onWarn?: (message: string) => void,
+): Set<string> {
+  return new Set(readWorkspaceDepEntries(packageJsonPath, onWarn).map((e) => e.name));
 }
 
 function scanImports(files: string[]): Set<string> {
@@ -314,53 +318,31 @@ function analyzeApp(
 }
 
 /**
- * Extract the `<pkg>` names from `file:./packages/<pkg>` dep specs in the
- * worker package.json. Only `@longterm-wiki/*` deps are in scope — other
- * `file:` deps would point outside the packages/ tree and aren't our concern.
+ * Extract `file:./packages/<pkg>` basenames from worker package.json entries.
+ * Tracks by file-path basename (what pnpm resolves against), not the declared
+ * `@longterm-wiki/<name>` — so a mismatch like
+ * `"@longterm-wiki/foo": "file:./packages/bar"` adds `bar` to the set (and
+ * emits a warning). Tracking by declared name would produce a misleading
+ * "add COPY packages/foo/" suggestion when the Dockerfile's `COPY
+ * packages/bar/` is actually correct.
  */
-function readFileDeps(
+function extractFileDeps(
+  entries: WorkspaceDepEntry[],
   packageJsonPath: string,
   onWarn?: (message: string) => void,
 ): Set<string> {
   const fileDeps = new Set<string>();
-  let raw: string;
-  try {
-    raw = readFileSync(packageJsonPath, 'utf-8');
-  } catch {
-    // readDeclaredDeps already warns on the same file; stay silent here to avoid dupes.
-    return fileDeps;
-  }
-  let pkg: Record<string, unknown>;
-  try {
-    pkg = JSON.parse(raw) as Record<string, unknown>;
-  } catch {
-    return fileDeps;
-  }
-  for (const section of DEP_SECTIONS) {
-    const block = pkg[section];
-    if (!block || typeof block !== 'object') continue;
-    for (const [name, spec] of Object.entries(block as Record<string, unknown>)) {
-      if (!name.startsWith(WORKSPACE_PREFIX)) continue;
-      if (typeof spec !== 'string') continue;
-      const match = FILE_DEP_RE.exec(spec);
-      if (!match) continue;
-      const pkgBasename = match[1];
-      const declaredBasename = name.slice(WORKSPACE_PREFIX.length);
-      // Sanity: the dep spec's packages/<pkg> path should match the package
-      // basename. A mismatch (`"@longterm-wiki/foo": "file:./packages/bar"`)
-      // would be a developer error; flag it so the mismatch is visible.
-      if (pkgBasename !== declaredBasename) {
-        onWarn?.(
-          `${packageJsonPath}: dep "${name}" points to packages/${pkgBasename} but the package name implies packages/${declaredBasename}`
-        );
-      }
-      // Track by file-path basename, not declared name — pnpm resolves the
-      // `file:` spec by path, so the Dockerfile must COPY what the path
-      // points at, not what the dep is named. Tracking by declared name
-      // would produce an incorrect "add COPY packages/<declared>" suggestion
-      // in the mismatch case above.
-      fileDeps.add(pkgBasename);
+  for (const { name, spec } of entries) {
+    const match = FILE_DEP_RE.exec(spec);
+    if (!match) continue;
+    const pkgBasename = match[1];
+    const declaredBasename = name.slice(WORKSPACE_PREFIX.length);
+    if (pkgBasename !== declaredBasename) {
+      onWarn?.(
+        `${packageJsonPath}: dep "${name}" points to packages/${pkgBasename} but the package name implies packages/${declaredBasename}`
+      );
     }
+    fileDeps.add(pkgBasename);
   }
   return fileDeps;
 }
@@ -396,24 +378,13 @@ function readDockerfileCopiedPackages(
  * Dockerfile has `COPY packages/<pkg>/`. Without the COPY line, pnpm's
  * `file:` resolution fails at image build with "ENOENT: no such file or
  * directory, scandir '/deps/packages/<pkg>'".
- *
- * This closes the second half of the QUA-605 invariant. The existing
- * analyzeWorkerManifest catches "crux imports `@longterm-wiki/foo` but
- * package.json doesn't declare it"; this catches "package.json declares
- * file:./packages/foo but the Dockerfile doesn't stage the source."
  */
 function analyzeWorkerDockerfile(
-  pkgJsonPath: string,
+  fileDeps: Set<string>,
   dockerfilePath: string,
-  onWarn?: (message: string) => void,
-): DockerCopyCoverage | null {
-  if (!existsSync(pkgJsonPath)) return null;
-  if (!existsSync(dockerfilePath)) return null;
-
-  const fileDeps = readFileDeps(pkgJsonPath, onWarn);
+): DockerCopyCoverage {
   const copied = readDockerfileCopiedPackages(dockerfilePath);
   const missingCopy = [...fileDeps].filter((p) => !copied.has(p)).sort();
-
   return {
     dockerfilePath: WORKER_DOCKERFILE_PATH,
     manifestPath: WORKER_MANIFEST_PATH,
@@ -426,25 +397,20 @@ function analyzeWorkerDockerfile(
 /**
  * Scan `crux/` and compare its `@longterm-wiki/*` imports against
  * `docker/worker/package.json`. The worker manifest is NOT a pnpm workspace
- * member (the reason QUA-605 existed), so missing-dep suggestions use the
- * `file:./packages/<pkg>` protocol that the Dockerfile wires up, not
- * `workspace:*`.
+ * member, so missing-dep suggestions use the `file:./packages/<pkg>` protocol
+ * that the Dockerfile wires up, not `workspace:*`.
  */
 function analyzeWorkerManifest(
   sourceDir: string,
-  pkgJsonPath: string,
-  onWarn?: (message: string) => void,
-): AppCoverage | null {
-  if (!existsSync(pkgJsonPath)) return null;
-  if (!existsSync(sourceDir)) return null;
-
+  declared: Set<string>,
+): AppCoverage {
   const files = listSourceFiles(sourceDir, [], { excludeTests: true });
   return buildCoverage(
     dirname(WORKER_MANIFEST_PATH),  // "docker/worker"
     WORKER_MANIFEST_PATH,
     (pkg) => `file:./packages/${pkg.slice(WORKSPACE_PREFIX.length)}`,
     scanImports(files),
-    readDeclaredDeps(pkgJsonPath, onWarn),
+    declared,
   );
 }
 
@@ -477,14 +443,27 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     if (report) apps.push(report);
   }
 
-  const workerReport = analyzeWorkerManifest(workerSourceDir, workerPkgJson, onWarn);
-  if (workerReport) apps.push(workerReport);
+  // Parse the worker manifest once, then feed the entries into both the
+  // manifest-coverage check (crux imports vs declared deps) and the
+  // Dockerfile COPY check (file: deps vs COPY lines).
+  const workerEntries = existsSync(workerPkgJson)
+    ? readWorkspaceDepEntries(workerPkgJson, onWarn)
+    : null;
 
-  const dockerCopy = analyzeWorkerDockerfile(
-    workerPkgJson,
-    workerDockerfile,
-    onWarn,
-  );
+  let dockerCopy: DockerCopyCoverage | undefined;
+  if (workerEntries !== null) {
+    if (existsSync(workerSourceDir)) {
+      apps.push(
+        analyzeWorkerManifest(workerSourceDir, new Set(workerEntries.map((e) => e.name))),
+      );
+    }
+    if (existsSync(workerDockerfile)) {
+      dockerCopy = analyzeWorkerDockerfile(
+        extractFileDeps(workerEntries, workerPkgJson, onWarn),
+        workerDockerfile,
+      );
+    }
+  }
 
   let errors = 0;
   let warnings = 0;
@@ -561,7 +540,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
       `${c.dim}Missing worker COPY lines cause \`pnpm install --prod\` to fail during image build when the file:./packages/<pkg> dep can't resolve.${c.reset}`
     );
     console.log(
-      `${c.dim}See QUA-598 (wiki-server), QUA-605 (worker image), and QUA-654 (worker Dockerfile COPY gap) for prior incidents.${c.reset}`
+      `${c.dim}See QUA-449 / QUA-598 / QUA-605 / QUA-654 for prior incidents of this class.${c.reset}`
     );
   } else {
     console.log(
@@ -574,7 +553,7 @@ export function runCheck(options: CheckOptions = {}): CheckResult {
     errors,
     warnings,
     apps,
-    dockerCopy: dockerCopy ?? undefined,
+    dockerCopy,
   };
 }
 
