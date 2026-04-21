@@ -95,6 +95,7 @@ import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts'
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
 import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
+import * as sourcingRetroScanSubjectsCommands from './commands/sourcing-retro-scan-subjects.ts';
 import * as sourcingAuditUrlsCommands from './commands/sourcing-audit-urls.ts';
 import * as sourcingBackfillHomepagesCommands from './commands/sourcing-backfill-homepages.ts';
 import * as sourcingSampleCoverageCommands from './commands/sourcing-sample-coverage.ts';
@@ -189,6 +190,7 @@ const domains = {
   verify: verifyEntityCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
   'sourcing-recheck': sourcingRecheckCommands,
+  'sourcing-retro-scan-subjects': sourcingRetroScanSubjectsCommands,
   'sourcing-audit-urls': sourcingAuditUrlsCommands,
   'sourcing-backfill-homepages': sourcingBackfillHomepagesCommands,
   'sourcing-sample-coverage': sourcingSampleCoverageCommands,
