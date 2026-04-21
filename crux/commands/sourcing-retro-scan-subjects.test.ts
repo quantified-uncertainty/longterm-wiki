@@ -24,6 +24,7 @@ vi.mock('../lib/wiki-server/sourcing-client.ts', () => ({
   storeVerdict: (...args: unknown[]) => mockStoreVerdict(...args),
   getEvidenceByRecords: (...args: unknown[]) => mockGetEvidenceByRecords(...args),
   evidenceRecordKey: (rt: string, rid: string) => `${rt}|${rid}`,
+  MAX_EVIDENCE_BY_RECORDS: 1000,
 }));
 
 const mockCallLlm = vi.fn();
@@ -278,6 +279,24 @@ describe('classifyEvidence', () => {
     expect(res.size).toBe(0);
     expect(mockGetEvidenceByRecords).not.toHaveBeenCalled();
   });
+
+  it('chunks requests larger than MAX_EVIDENCE_BY_RECORDS (1000)', async () => {
+    // 2500 verdicts → 3 chunks (1000, 1000, 500).
+    const bigList = Array.from({ length: 2500 }, (_, i) =>
+      makeVerdict({ recordId: `f_${i}` }),
+    );
+    mockGetEvidenceByRecords.mockResolvedValue({
+      ok: true,
+      data: { evidenceByKey: {} },
+    });
+    const res = await classifyEvidence(bigList as never);
+    expect(res.size).toBe(0);
+    expect(mockGetEvidenceByRecords).toHaveBeenCalledTimes(3);
+    const callArgLengths = mockGetEvidenceByRecords.mock.calls.map(
+      (c) => (c[0] as Array<unknown>).length,
+    );
+    expect(callArgLengths).toEqual([1000, 1000, 500]);
+  });
 });
 
 describe('applyDowngrade', () => {
@@ -331,6 +350,34 @@ describe('applyDowngrade', () => {
       ),
     ).rejects.toThrow(/db down/);
     expect(mockStoreSourcingEvidence).not.toHaveBeenCalled();
+  });
+
+  it('sanitizes newlines and quotes in the mismatch prefix (parseability)', async () => {
+    mockStoreVerdict.mockResolvedValueOnce({ ok: true, data: { ok: true } });
+    mockStoreSourcingEvidence.mockResolvedValueOnce(undefined);
+
+    // LLM hands us a source_subject with newlines and a stray quote — naïve
+    // interpolation would break any regex trying to extract the retro-scan
+    // marker from the reasoning field later.
+    await applyDowngrade(
+      makeVerdict() as never,
+      {
+        source_subject: 'Microsoft AI\n(subsidiary "A")\n— ref Q125891217',
+        subjects_match: false,
+        confidence: 0.9,
+        reasoning: 'r',
+      },
+      'Microsoft Corporation',
+      'https://u',
+    );
+    const body = mockStoreVerdict.mock.calls[0][0] as Record<string, unknown>;
+    const reasoning = String(body.reasoning);
+    // No raw newlines inside the bracketed prefix
+    const prefix = reasoning.split(']')[0] + ']';
+    expect(prefix).not.toContain('\n');
+    // Double-quotes replaced with single quotes so the literal delimiters stay unambiguous
+    expect(prefix).not.toMatch(/"[A-Za-z]+\s*"[A-Za-z]+/);
+    expect(prefix).toContain("Microsoft AI (subsidiary 'A')");
   });
 
   it('does not throw when evidence write fails (best-effort audit row)', async () => {

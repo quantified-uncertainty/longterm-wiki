@@ -23,7 +23,8 @@
  * and resumed post-hoc.
  */
 
-import { writeFileSync, appendFileSync } from 'node:fs';
+import { writeFileSync, createWriteStream } from 'node:fs';
+import type { WriteStream } from 'node:fs';
 import { z } from 'zod';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import {
@@ -31,6 +32,7 @@ import {
   storeVerdict as storeVerdictRpc,
   getEvidenceByRecords,
   evidenceRecordKey,
+  MAX_EVIDENCE_BY_RECORDS,
   type VerdictListEntry,
 } from '../lib/wiki-server/sourcing-client.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
@@ -258,15 +260,23 @@ export async function classifyEvidence(
   const out = new Map<string, { skip: 'deterministic' } | { sourceUrl: string }>();
   if (verdicts.length === 0) return out;
 
-  const response = await getEvidenceByRecords(
-    verdicts.map((v) => ({ recordType: v.recordType, recordId: v.recordId })),
-    { limitPerRecord: 5 },
-  );
-  if (!response.ok) {
-    throw new Error(`Batch evidence fetch failed: ${response.message ?? 'unknown error'}`);
+  // Chunk the lookup to respect the server's MAX_EVIDENCE_BY_RECORDS cap.
+  // Without this, any scan of >1000 rows fails with 400 validation error
+  // from the /evidence/by-records endpoint.
+  const allEvidence: Record<string, Array<{ sourceUrl: string | null; checkerModel: string | null }>> = {};
+  for (let i = 0; i < verdicts.length; i += MAX_EVIDENCE_BY_RECORDS) {
+    const chunk = verdicts.slice(i, i + MAX_EVIDENCE_BY_RECORDS);
+    const response = await getEvidenceByRecords(
+      chunk.map((v) => ({ recordType: v.recordType, recordId: v.recordId })),
+      { limitPerRecord: 5 },
+    );
+    if (!response.ok) {
+      throw new Error(`Batch evidence fetch failed: ${response.message ?? 'unknown error'}`);
+    }
+    Object.assign(allEvidence, response.data.evidenceByKey);
   }
 
-  for (const [key, rows] of Object.entries(response.data.evidenceByKey)) {
+  for (const [key, rows] of Object.entries(allEvidence)) {
     // Prefer the most recent evidence row with a sourceUrl as the scan target.
     // If *every* evidence row is from a deterministic checker, we can skip
     // outright — those matchers check exact IDs and are immune to the
@@ -305,8 +315,14 @@ export async function applyDowngrade(
   sourceUrl: string,
 ): Promise<void> {
   const originalReasoning = verdict.reasoning ?? '';
-  const sourceSubject = check.source_subject.trim() || '(unnamed)';
-  const mismatchPrefix = `[retro-scan QUA-650: subject-mismatch — source is about "${sourceSubject}", claim is about "${claimSubjectLabel}"]`;
+  // Collapse whitespace and cap both labels before interpolating into the
+  // reasoning prefix — without this a newline or "quote in the LLM's
+  // `source_subject` would break any regex that later tries to extract the
+  // retro-scan marker from the reasoning field.
+  const sanitize = (s: string) => s.replace(/\s+/g, ' ').replace(/"/g, "'").slice(0, 120);
+  const sourceSubject = sanitize(check.source_subject.trim() || '(unnamed)');
+  const claimSubject = sanitize(claimSubjectLabel);
+  const mismatchPrefix = `[retro-scan QUA-650: subject-mismatch — source is about "${sourceSubject}", claim is about "${claimSubject}"]`;
   const newReasoning = `${mismatchPrefix} ${originalReasoning}`.slice(0, 4900);
 
   const body: Record<string, unknown> = {
@@ -629,6 +645,23 @@ async function retroScanCommand(
 
   const outcomes: ScanRowOutcome[] = [];
 
+  // Append outcomes via a WriteStream instead of appendFileSync so concurrent
+  // processOne calls don't interleave partial JSON on the same file descriptor.
+  // `createWriteStream(..., { flags: 'a' })` serializes writes through Node's
+  // internal queue, and `appendLine` chains each new line after the previous
+  // one's drain — safe up to the default highWaterMark (64K) per line.
+  const reportStream: WriteStream = createWriteStream(reportPath, { flags: 'a' });
+  let lastWrite: Promise<void> = Promise.resolve();
+  const appendLine = (obj: unknown): void => {
+    const payload = JSON.stringify(obj) + '\n';
+    lastWrite = lastWrite.then(
+      () =>
+        new Promise<void>((resolve, reject) => {
+          reportStream.write(payload, (err) => (err ? reject(err) : resolve()));
+        }),
+    );
+  };
+
   const processOne = async (v: VerdictListEntry): Promise<void> => {
     const key = evidenceRecordKey(v.recordType, v.recordId);
     const classification = classifications.get(key);
@@ -642,7 +675,7 @@ async function retroScanCommand(
     });
 
     outcomes.push(outcome);
-    appendFileSync(reportPath, JSON.stringify(outcome) + '\n');
+    appendLine(outcome);
 
     if (outcome.status.startsWith('skip:')) {
       summary.skipped++;
@@ -673,6 +706,12 @@ async function retroScanCommand(
   console.log(`\x1b[1mScanning ${verdicts.length} rows (concurrency=${concurrency})...\x1b[0m`);
 
   // Concurrency-limited loop (pattern borrowed from sourcing-orchestrate).
+  // NOTE: `budgetLimit` is a *soft* cap. The check runs between dispatches,
+  // so up to (concurrency - 1) in-flight LLM calls can push cost past the
+  // limit by roughly (concurrency - 1) × ESTIMATED_COST_PER_CHECK before
+  // the loop exits. With concurrency=5 that's ~$0.012 overshoot worst-case
+  // at the $0.003/check estimate — acceptable given we're already
+  // conservatively over-estimating per-call cost.
   if (concurrency <= 1) {
     for (const v of verdicts) {
       if (summary.estimatedCost >= budgetLimit) {
@@ -697,12 +736,10 @@ async function retroScanCommand(
     await Promise.all(executing);
   }
 
-  // Trailer
-  appendFileSync(
-    reportPath,
-    JSON.stringify({ kind: 'qua650-retro-scan-trailer', finishedAt: new Date().toISOString(), summary }) +
-      '\n',
-  );
+  // Trailer — wait for the serialized write chain to drain before closing.
+  appendLine({ kind: 'qua650-retro-scan-trailer', finishedAt: new Date().toISOString(), summary });
+  await lastWrite;
+  await new Promise<void>((resolve) => reportStream.end(resolve));
 
   const exitCode = summary.errors > 0 || summary.downgradeErrors > 0 ? 1 : 0;
 
