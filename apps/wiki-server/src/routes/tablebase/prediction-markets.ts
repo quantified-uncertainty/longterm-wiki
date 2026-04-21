@@ -14,6 +14,7 @@ import {
   invalidJsonError,
   zv,
   clampedLimit,
+  qBool,
 } from "../shared/utils.js";
 import {
   resolveEntityId,
@@ -48,10 +49,7 @@ const QuestionsQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   platform: z.string().optional(),
   category: z.string().optional(),
-  isResolved: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
+  isResolved: qBool.optional(),
 });
 
 const ByEntityQuery = z.object({
@@ -59,10 +57,7 @@ const ByEntityQuery = z.object({
   offset: z.coerce.number().int().min(0).default(0),
   platform: z.string().optional(),
   category: z.string().optional(),
-  isResolved: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
+  isResolved: qBool.optional(),
 });
 
 const TimeseriesQuery = z.object({
