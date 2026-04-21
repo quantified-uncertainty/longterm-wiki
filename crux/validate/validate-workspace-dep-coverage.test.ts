@@ -822,10 +822,13 @@ describe('validate-workspace-dep-coverage', () => {
     expect(result.errors).toBe(0);
   });
 
-  it('warns when a @longterm-wiki/foo file: dep points to packages/bar', () => {
+  it('warns when a @longterm-wiki/foo file: dep points to packages/bar, tracks the file path', () => {
     // The file: path should match the package basename. A mismatch is a
-    // configuration error; flag it via onWarn so it surfaces instead of
-    // silently slipping past the COPY check.
+    // configuration error; we warn via onWarn AND track coverage by the
+    // file-path basename (what pnpm actually resolves against), not the
+    // declared name. Tracking by declared name would print a misleading
+    // "add COPY packages/<declared>" suggestion when the Dockerfile is
+    // actually already correct for what the file: path points at.
     scratch = makeScratchDir();
     const workerDir = join(scratch, 'worker');
     mkdirSync(workerDir, { recursive: true });
@@ -857,9 +860,80 @@ describe('validate-workspace-dep-coverage', () => {
     });
 
     expect(warnings.some((w) => /wrong-name/.test(w) && /url-utils/.test(w))).toBe(true);
-    // The package basename, not the file-path suffix, is what drives coverage —
-    // so missingCopy lists "url-utils" (declared basename) not "wrong-name".
-    expect(result.dockerCopy!.fileDeps).toEqual(new Set(['url-utils']));
+    // Coverage tracks the file-path basename (what pnpm needs), so the
+    // Dockerfile's `COPY packages/wrong-name/` correctly satisfies the dep.
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set(['wrong-name']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('ignores file: deps that do not point into packages/', () => {
+    // `file:./some-other-dir` is valid pnpm syntax but not something this
+    // validator handles — it's outside the packages/ tree so the COPY
+    // invariant doesn't apply. Must not match FILE_DEP_RE.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/weird': 'file:./some-other-dir',
+          '@longterm-wiki/bare': 'file:bare-sibling',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(dockerfile, `FROM node:20-slim AS deps\n`);
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set());
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('accepts valueless BuildKit flags (--link, --parents) before the COPY source', () => {
+    // `COPY --link packages/foo/ ./packages/foo/` is recommended for cache
+    // optimization. The parser must accept flags with AND without `=value`.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          '@longterm-wiki/other': 'file:./packages/other',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY --link packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY --link --chown=node:node packages/other/ ./packages/other/\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils', 'other']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
   });
 
   it('skips symlinks without following them (no recursion loop)', () => {

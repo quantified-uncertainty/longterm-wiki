@@ -106,14 +106,17 @@ const DEP_SECTIONS = [
 ] as const;
 
 // Matches `file:./packages/<pkg>` or `file:packages/<pkg>` dep specs in the
-// worker package.json. The Dockerfile must copy each referenced package into
-// /deps before `pnpm install --prod` or the install fails.
-const FILE_DEP_RE = /^file:\.?\/?(?:packages\/)?([a-z0-9][a-z0-9-]*)\/?$/;
+// worker package.json. The `packages/` segment is required — a `file:` dep
+// outside the packages/ tree wouldn't need a `COPY packages/` line at all
+// and is not something this validator is meant to cover.
+const FILE_DEP_RE = /^file:\.?\/?packages\/([a-z0-9][a-z0-9-]*)\/?$/;
 
 // Matches `COPY packages/<pkg>/` lines in the Dockerfile. The trailing slash on
 // `<pkg>/` is required so `COPY packages/foo-bar/` doesn't shadow `packages/foo/`.
+// Flag tokens before the source path may or may not take a value — `--chown=x`
+// takes one, `--link` / `--parents` (BuildKit) don't.
 // Runs line-by-line to skip `#`-commented lines.
-const DOCKERFILE_COPY_RE = /^\s*COPY\s+(?:--[a-z-]+=\S+\s+)*packages\/([a-z0-9][a-z0-9-]*)\//;
+const DOCKERFILE_COPY_RE = /^\s*COPY\s+(?:--[a-z-]+(?:=\S+)?\s+)*packages\/([a-z0-9][a-z0-9-]*)\//;
 
 // Matches import / import() / require() for `@longterm-wiki/<pkg>` with a
 // quote anchor so stray mentions in comments ("see @longterm-wiki/foo docs")
@@ -345,14 +348,18 @@ function readFileDeps(
       const declaredBasename = name.slice(WORKSPACE_PREFIX.length);
       // Sanity: the dep spec's packages/<pkg> path should match the package
       // basename. A mismatch (`"@longterm-wiki/foo": "file:./packages/bar"`)
-      // would be a developer error; flag it so the mismatch can't silently
-      // bypass the COPY check.
+      // would be a developer error; flag it so the mismatch is visible.
       if (pkgBasename !== declaredBasename) {
         onWarn?.(
           `${packageJsonPath}: dep "${name}" points to packages/${pkgBasename} but the package name implies packages/${declaredBasename}`
         );
       }
-      fileDeps.add(declaredBasename);
+      // Track by file-path basename, not declared name — pnpm resolves the
+      // `file:` spec by path, so the Dockerfile must COPY what the path
+      // points at, not what the dep is named. Tracking by declared name
+      // would produce an incorrect "add COPY packages/<declared>" suggestion
+      // in the mismatch case above.
+      fileDeps.add(pkgBasename);
     }
   }
   return fileDeps;
