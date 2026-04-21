@@ -1,0 +1,52 @@
+# Entity events for Redwood Research (E557)
+# Source: content/docs/knowledge-base/organizations/redwood-research.mdx (### Timeline + History sections)
+entityId: sid_dwMzc9WzPa
+entityDisplayName: Redwood Research
+events:
+  - date: "2021-09"
+    title: Tax-exempt status granted; 10 staff assembled
+    eventType: founding
+    significance: major
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+
+  - date: "2021-12"
+    title: MLAB bootcamp launches
+    eventType: launch
+    significance: moderate
+    description: Inaugural ML for Alignment Bootcamp with 40 participants; 3-week intensive teaching attendees to build BERT/GPT-2 from scratch.
+    source: https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast
+
+  - date: "2022"
+    title: Adversarial robustness research project
+    eventType: milestone
+    significance: minor
+    description: Initial adversarial training project; later acknowledged by leadership as unsuccessful.
+    source: https://blog.redwoodresearch.org/p/the-inaugural-redwood-research-podcast
+
+  - date: "2022"
+    title: Causal scrubbing methodology developed
+    eventType: publication
+    significance: moderate
+    description: Developed across 2022-2023; method for rigorously testing mechanistic interpretability claims.
+    source: https://www.lesswrong.com/posts/JvZhhzycHu2Yd57RN/causal-scrubbing-a-method-for-rigorously-testing
+
+  - date: "2023"
+    title: REMIX interpretability program runs
+    eventType: launch
+    significance: moderate
+    description: Mechanistic interpretability training program for ~10-15 junior researchers.
+    source: https://forum.effectivealtruism.org/posts/MGbdhjgd2v6cg3vjv/apply-to-the-redwood-research-mechanistic-interpretability
+
+  - date: "2024"
+    title: Buck Shlegeris becomes CEO; AI Control ICML oral
+    eventType: leadership-change
+    significance: major
+    description: Buck Shlegeris transitions from CTO to CEO and Director; Ryan Greenblatt serves as Chief Scientist. AI Control work accepted as an ICML oral.
+    source: https://projects.propublica.org/nonprofits/organizations/871702255
+
+  - date: "2024-12"
+    title: Alignment faking paper with Anthropic
+    eventType: publication
+    significance: major
+    description: Landmark collaboration with Anthropic on alignment faking research.
+    source: https://www.anthropic.com/research/alignment-faking

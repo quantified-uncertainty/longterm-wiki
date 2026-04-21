@@ -1,0 +1,62 @@
+# Entity events for Coefficient Giving (E521, formerly Open Philanthropy)
+# Source: content/docs/knowledge-base/organizations/coefficient-giving.mdx
+entityId: sid_ULjDXpSLCI
+entityDisplayName: Coefficient Giving
+events:
+  - date: "2011"
+    title: GiveWell begins advising Good Ventures
+    eventType: founding
+    significance: major
+    description: GiveWell, founded by Holden Karnofsky and Elie Hassenfeld, begins advising Good Ventures (established by Dustin Moskovitz and Cari Tuna) on how to deploy philanthropic capital effectively.
+
+  - date: "2014"
+    title: Open Philanthropy formalized as project within GiveWell
+    eventType: milestone
+    significance: major
+    description: The advising relationship formalizes into "Open Philanthropy" as a distinct project, focused on identifying high-impact giving opportunities across a broader range of cause areas than GiveWell's traditional global health focus.
+
+  - date: "2015"
+    title: First AI safety grants
+    eventType: milestone
+    significance: major
+    description: Began supporting AI safety work in 2015, when the field had ~10 full-time researchers and institutional support was minimal. Early grants helped establish MIRI, CHAI, and the Future of Humanity Institute.
+
+  - date: "2017"
+    title: Spun off from GiveWell as independent LLC
+    eventType: pivot
+    significance: major
+    description: Holden Karnofsky publishes detailed AI concerns; the spinoff enables Open Philanthropy to pursue its own strategic priorities while GiveWell continues focusing on evidence-backed global health interventions.
+    source: https://www.openphilanthropy.org/research/open-philanthropy-is-now-an-independent-organization/
+
+  - date: "2019"
+    title: AI safety spending exceeds $20M annually
+    eventType: milestone
+    significance: moderate
+
+  - date: "2022"
+    title: $150M Regranting Challenge launched (not AI-specific)
+    eventType: launch
+    significance: moderate
+
+  - date: "2023"
+    title: ~$46M AI safety spending; largest funder in the field
+    eventType: milestone
+    significance: major
+    description: AI safety becomes Open Philanthropy's largest longtermist cause area.
+
+  - date: "2024"
+    title: ~$50M AI safety committed; 68% to evaluations/benchmarking
+    eventType: milestone
+    significance: moderate
+
+  - date: "2025"
+    title: $40M Technical AI Safety RFP
+    eventType: funding
+    significance: major
+
+  - date: "2025-11-18"
+    title: Rebrand from Open Philanthropy to Coefficient Giving
+    eventType: pivot
+    significance: major
+    description: Multi-donor expansion (over $100M directed from non-Good-Ventures donors in 2024); brand clarity to disambiguate from OpenAI and Open Society Foundations; structural reorganization into 13 distinct funds.
+    source: https://coefficientgiving.org/research/open-philanthropy-is-now-coefficient-giving/

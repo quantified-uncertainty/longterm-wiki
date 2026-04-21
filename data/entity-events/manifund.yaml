@@ -1,0 +1,76 @@
+# Entity events for Manifund (E547)
+# Source: content/docs/knowledge-base/organizations/manifund.mdx (## Timeline section)
+entityId: sid_fFVOuFZCRf
+entityDisplayName: Manifund
+events:
+  - date: "2021-12"
+    title: Manifold Markets founded
+    eventType: founding
+    significance: major
+    description: Founded by Austin Chen, Stephen Grugett, and James Grugett.
+    source: https://manifund.org
+
+  - date: "2022"
+    title: Receives $500K from FTX Future Fund for charity prediction markets
+    eventType: funding
+    significance: moderate
+
+  - date: "2022"
+    title: Manifund incorporated as separate 501(c)(3)
+    eventType: milestone
+    significance: major
+
+  - date: "2022"
+    title: Scott Alexander approaches team about ACX Grants via impact certificates
+    eventType: milestone
+    significance: moderate
+
+  - date: "2022"
+    title: Rachel Weinberg joins; builds manifund.org in two weeks
+    eventType: milestone
+    significance: moderate
+
+  - date: "2023-05"
+    title: Anonymous donor "D" provides $1.5M for regranting program
+    eventType: funding
+    significance: major
+
+  - date: "2023"
+    title: Manifund launches with ~12 regrantors ($50K-400K budgets each)
+    eventType: launch
+    significance: major
+
+  - date: "2023-09"
+    title: First Manifest conference (250 attendees, Berkeley)
+    eventType: milestone
+    significance: moderate
+
+  - date: "2023"
+    title: $2.06M distributed ($2.012M grants + $45K impact certificates)
+    eventType: milestone
+    significance: moderate
+
+  - date: "2024-01"
+    title: Impact certificate experiments conclude with mixed results
+    eventType: milestone
+    significance: moderate
+
+  - date: "2024-06"
+    title: Manifest 2024 (600 attendees)
+    eventType: milestone
+    significance: moderate
+
+  - date: "2024"
+    title: ACX Grants 2024 includes impact market for 50+ proposals
+    eventType: milestone
+    significance: moderate
+
+  - date: "2025"
+    title: $2.25M raised for 10 regrantors
+    eventType: funding
+    significance: moderate
+
+  - date: "2025-01"
+    title: ACX Grants 2025 funds 42 of 654 applications
+    eventType: milestone
+    significance: moderate

@@ -1,0 +1,45 @@
+# Entity events for Alignment Research Center / ARC (E25)
+# Source: content/docs/knowledge-base/organizations/arc.mdx
+entityId: sid_QsXVXtQ0zE
+entityDisplayName: Alignment Research Center
+events:
+  - date: "2021"
+    title: Founded by Paul Christiano
+    eventType: founding
+    significance: major
+    description: Founded by Paul Christiano after his departure from OpenAI; nonprofit AI safety research organization focused on theoretical alignment.
+
+  - date: "2022"
+    title: ARC Evals incubated; Beth Barnes hired to lead it
+    eventType: launch
+    significance: major
+    description: Began incubating ARC Evals — exploratory work on independent evaluations of frontier AI models. Completed evaluations of GPT-4 (with OpenAI) and Claude (with Anthropic).
+
+  - date: "2022"
+    title: Open Philanthropy grant ($265K)
+    eventType: funding
+    significance: moderate
+    description: Documented grant from Coefficient Giving (then Open Philanthropy).
+
+  - date: "2022"
+    title: Returned $1.25M FTX Foundation grant after FTX bankruptcy
+    eventType: funding
+    significance: major
+
+  - date: "2023-09-19"
+    title: ARC Evals spin-out announced
+    eventType: pivot
+    significance: major
+    description: Growth in ARC Evals' size prompted formalization of separation.
+
+  - date: "2023-12-04"
+    title: ARC Evals formally renamed METR
+    eventType: pivot
+    significance: major
+    description: Model Evaluation & Threat Research; independent 501(c)(3) nonprofit led by Beth Barnes.
+
+  - date: "2024-04"
+    title: Christiano appointed Head of AI Safety at US AISI
+    eventType: leadership-change
+    significance: major
+    description: Personal appointment at NIST rather than an institutional contract with ARC.
