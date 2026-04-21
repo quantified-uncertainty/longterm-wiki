@@ -15,6 +15,10 @@ WORKDIR /deps
 # (2+ MB of content that churns on every factbase sync), invalidating the
 # `pnpm install --prod` layer cache on unrelated FactBase edits. Add a line below
 # for each @longterm-wiki/* dep added to docker/worker/package.json.
+#
+# Missing-COPY is enforced by crux/validate/validate-workspace-dep-coverage.ts
+# (QUA-654) — the gate will fail if you add a file: dep without the matching
+# COPY line, so this is no longer a silent gotcha.
 COPY packages/url-utils/ ./packages/url-utils/
 COPY docker/worker/package.json ./
 RUN pnpm install --prod
