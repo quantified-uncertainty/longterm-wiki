@@ -22,31 +22,205 @@ facts:
 
   - id: f_6p7ma7IfKQ
     property: project
-    value: "AI for Democracy Action Lab (AI-DAL) — brings together tech innovators, legal/policy experts, software engineers, and nonprofit leaders to defend against AI threats to democracy"
+    value: "AI for Democracy Action Lab (AI-DAL) — brings together tech innovators,
+      legal/policy experts, software engineers, and nonprofit leaders to defend
+      against AI threats to democracy"
     asOf: 2025
     source: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
 
   - id: f_9QZduVHwPm
     property: litigation
-    value: "Sued to block USDA's demand for personal data of millions of SNAP recipients, framing it as part of a federal 'panopticon' of AI-enabled surveillance"
+    value: "Sued to block USDA's demand for personal data of millions of SNAP
+      recipients, framing it as part of a federal 'panopticon' of AI-enabled
+      surveillance"
     asOf: 2025-07
     source: https://protectdemocracy.org
     notes: "Filed July 2025"
 
   - id: f_U6QEB8QMYJ
     property: litigation-detail
-    value: "Pallek v. Rollins (1:25-cv-01650, D.D.C., Judge Jia M. Cobb) — Plaintiffs include SNAP recipients, MAZON, EPIC. Counsel: National Student Legal Defense Network, Protect Democracy, National Center for Law and Economic Justice. USDA demanded SSNs and addresses of all SNAP recipients since Jan 2020. Plaintiffs filed TRO (July 17, 2025), motion for summary judgment (Aug 29, 2025)."
+    value: "Pallek v. Rollins (1:25-cv-01650, D.D.C., Judge Jia M. Cobb) —
+      Plaintiffs include SNAP recipients, MAZON, EPIC. Counsel: National Student
+      Legal Defense Network, Protect Democracy, National Center for Law and
+      Economic Justice. USDA demanded SSNs and addresses of all SNAP recipients
+      since Jan 2020. Plaintiffs filed TRO (July 17, 2025), motion for summary
+      judgment (Aug 29, 2025)."
     asOf: 2025-09
     source: https://epic.org/documents/pallek-v-rollins/
 
   - id: f_FkD2M0De3B
     property: program
-    value: "VoteShield platform: uses ML to review voter registration databases for unusual changes and malicious activity. Coverage: 120+ million voter records across 24 states (as of March 2023)."
+    value: "VoteShield platform: uses ML to review voter registration databases for
+      unusual changes and malicious activity. Coverage: 120+ million voter
+      records across 24 states (as of March 2023)."
     asOf: 2023-03
     source: https://www.voteshield.us/
 
   - id: f_veFaH652mU
     property: publication
-    value: "The Authoritarian Playbook for 2025 — published by affiliated 501(c)(4), details how technology amplifies authoritarian tactics. Co-led by Rosa Brooks (Georgetown), Barton Gellman, Nils Gilman. Included tabletop exercises (May-June 2024) simulating authoritarian scenarios."
+    value: "The Authoritarian Playbook for 2025 — published by affiliated 501(c)(4),
+      details how technology amplifies authoritarian tactics. Co-led by Rosa
+      Brooks (Georgetown), Barton Gellman, Nils Gilman. Included tabletop
+      exercises (May-June 2024) simulating authoritarian scenarios."
     asOf: 2024
     source: https://www.authoritarianplaybook2025.org/
+  - id: f_IcS6ICvkOg
+    property: revenue
+    value: 33111628
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2023.
+  - id: f_MgN7JjoC2Q
+    property: annual-expenses
+    value: 22051673
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2023.
+  - id: f_oJQjU7Ho8Q
+    property: net-assets
+    value: 71516501
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2023.
+  - id: f_G2fnuMot8Q
+    property: revenue
+    value: 32924397
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2022.
+  - id: f_TrUQ2ZNCKw
+    property: annual-expenses
+    value: 18060997
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2022.
+  - id: f_RD8JL4EFdg
+    property: net-assets
+    value: 59260077
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2022.
+  - id: f_oDlsSSjeYA
+    property: revenue
+    value: 34042265
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2021.
+  - id: f_YQDChmLu2Q
+    property: annual-expenses
+    value: 13784396
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2021.
+  - id: f_rCsA2rFj2w
+    property: net-assets
+    value: 47984733
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2021.
+  - id: f_3srkQ9UOKw
+    property: revenue
+    value: 27444503
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2020.
+  - id: f_6QIlTCL21g
+    property: annual-expenses
+    value: 12179801
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2020.
+  - id: f_T5Jtkaqjzg
+    property: net-assets
+    value: 27865951
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2020.
+  - id: f_6UY3XMehrQ
+    property: revenue
+    value: 12406551
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2019.
+  - id: f_ldd78prjdw
+    property: annual-expenses
+    value: 6879933
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2019.
+  - id: f_VLAo5O6E3g
+    property: net-assets
+    value: 12338596
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2019.
+  - id: f_40qkrXMvvg
+    property: revenue
+    value: 6963607
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2018.
+  - id: f_7jOU3DVbgQ
+    property: annual-expenses
+    value: 3883445
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2018.
+  - id: f_cRDqWgpCIw
+    property: net-assets
+    value: 6276153
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2018.
+  - id: f_w6ujeX5QVw
+    property: revenue
+    value: 2656972
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017.
+  - id: f_Pg7lnB0tLQ
+    property: annual-expenses
+    value: 1219420
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2017.
+  - id: f_YW4Gppy3Ug
+    property: net-assets
+    value: 3195991
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2017.
+  - id: f_BgSTVgjgRA
+    property: revenue
+    value: 2211623
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total revenue for tax year 2017.
+  - id: f_p23WQt1QqQ
+    property: annual-expenses
+    value: 694638
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). Total functional expenses for tax
+      year 2017.
+  - id: f_Lq12khj8PQ
+    property: net-assets
+    value: 1519655
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/814777062
+    notes: From IRS Form 990 (EIN 81-4777062). End-of-year net assets for tax year
+      2017.

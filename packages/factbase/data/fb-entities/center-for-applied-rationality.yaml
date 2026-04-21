@@ -44,3 +44,236 @@ facts:
     value: https://en.wikipedia.org/wiki/Center_for_Applied_Rationality
     source: https://www.wikidata.org/wiki/Q20715499
     notes: From Wikidata Q20715499
+  - id: f_aX8kK9qbrQ
+    property: revenue
+    value: 9087409
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2023.
+  - id: f_69EQTK5Wfg
+    property: annual-expenses
+    value: 9407213
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2023.
+  - id: f_SrwOeq0dBw
+    property: net-assets
+    value: 4404199
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2023.
+  - id: f_IUx2ArnmnQ
+    property: revenue
+    value: 11648954
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2022.
+  - id: f_IaSh3PU8fg
+    property: annual-expenses
+    value: 10163623
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2022.
+  - id: f_2bZ7p34G2w
+    property: net-assets
+    value: 4731253
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2022.
+  - id: f_pQGF7QfSRw
+    property: revenue
+    value: 4525208
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2021.
+  - id: f_anPV1SyFbg
+    property: annual-expenses
+    value: 3645850
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2021.
+  - id: f_XfLRSfB9ZQ
+    property: net-assets
+    value: 3292343
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2021.
+  - id: f_lOUhWHQ2Ag
+    property: revenue
+    value: 2323476
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2020.
+  - id: f_3SwiloMYGA
+    property: annual-expenses
+    value: 1967112
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2020.
+  - id: f_kRwbsZ7fJQ
+    property: net-assets
+    value: 2412985
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2020.
+  - id: f_GL8iSRvrHw
+    property: revenue
+    value: 1566753
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2019.
+  - id: f_cSrC9NvMgQ
+    property: annual-expenses
+    value: 2171434
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2019.
+  - id: f_lp6QCJqN3A
+    property: net-assets
+    value: 2056621
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2019.
+  - id: f_bd3bqvr4wg
+    property: revenue
+    value: 3858875
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2018.
+  - id: f_EvDV639pRw
+    property: annual-expenses
+    value: 2329592
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2018.
+  - id: f_ZJ1QDJvPgQ
+    property: net-assets
+    value: 2661302
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2018.
+  - id: f_Yx4r97lGuw
+    property: revenue
+    value: 2106184
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2017.
+  - id: f_piOxMdReag
+    property: annual-expenses
+    value: 1800171
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2017.
+  - id: f_kOdEXrzp7g
+    property: net-assets
+    value: 1132019
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2017.
+  - id: f_OJtg92LAiQ
+    property: revenue
+    value: 1979112
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2016.
+  - id: f_ynjTRfHlKw
+    property: annual-expenses
+    value: 1311803
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2016.
+  - id: f_9slD1LWpZw
+    property: net-assets
+    value: 820505
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2016.
+  - id: f_ZSTBa5STKA
+    property: revenue
+    value: 905671
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2015.
+  - id: f_naEiYD2hnA
+    property: annual-expenses
+    value: 920414
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2015.
+  - id: f_0bt886mocA
+    property: net-assets
+    value: 121177
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2015.
+  - id: f_nGHuAebZvQ
+    property: revenue
+    value: 942162
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2014.
+  - id: f_4W1OQhTVKw
+    property: annual-expenses
+    value: 817941
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2014.
+  - id: f_TfZ34MNcIg
+    property: net-assets
+    value: 127948
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2014.
+  - id: f_wuIwuRrXQA
+    property: revenue
+    value: 560681
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2013.
+  - id: f_ZHSBsV9r7w
+    property: annual-expenses
+    value: 644478
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2013.
+  - id: f_fnTuH3qfxw
+    property: net-assets
+    value: 3727
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). End-of-year net assets for tax year
+      2013.
+  - id: f_T1KtAgsgmg
+    property: revenue
+    value: 90493
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total revenue for tax year 2012.
+  - id: f_wIvkO0gHKQ
+    property: annual-expenses
+    value: 3219
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/453100226
+    notes: From IRS Form 990 (EIN 45-3100226). Total functional expenses for tax
+      year 2012.

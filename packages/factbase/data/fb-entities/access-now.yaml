@@ -17,7 +17,8 @@ facts:
     currency: USD
     asOf: 2023
     source: https://en.wikipedia.org/wiki/Access_Now
-    notes: "Approximate figure from Wikipedia. Superseded by FY 2024 Form 990 data (f_YY42DsWj0s) showing $16.15M."
+    notes: "Approximate figure from Wikipedia. Superseded by FY 2024 Form 990 data
+      (f_YY42DsWj0s) showing $16.15M."
 
   - id: f_4t8WFcs3XE
     property: campaign
@@ -25,7 +26,10 @@ facts:
       on transparency safeguards"
     asOf: 2024
     source: https://www.accessnow.org/campaign/ban-biometric-surveillance/
-    notes: "Access Now led major civil society coalition on EU AI Act. The ban-biometric-surveillance campaign page documents their 200+ org coalition work; the 110+ figure specifically refers to the AI Act advocacy coalition."
+    notes: "Access Now led major civil society coalition on EU AI Act. The
+      ban-biometric-surveillance campaign page documents their 200+ org
+      coalition work; the 110+ figure specifically refers to the AI Act advocacy
+      coalition."
 
   - id: f_6DKC4BGWxs
     property: website
@@ -39,36 +43,328 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/270597430
-    notes: "FY 2024 Form 990 (EIN 27-0597430). Total expenses $15,120,599. Net assets $8,112,583. Contributions made up 99%+ of revenue."
+    notes: "FY 2024 Form 990 (EIN 27-0597430). Total expenses $15,120,599. Net
+      assets $8,112,583. Contributions made up 99%+ of revenue."
 
   - id: f_H4wmxeLGia
     property: staff-count
-    value: "More than 70 experts worldwide, with offices in New York, Berlin, Brussels, San Jose (Costa Rica), Tunis, Delhi, Nairobi, Manila, London, and Washington DC"
+    value: "More than 70 experts worldwide, with offices in New York, Berlin,
+      Brussels, San Jose (Costa Rica), Tunis, Delhi, Nairobi, Manila, London,
+      and Washington DC"
     asOf: 2024-10
     source: https://en.wikipedia.org/wiki/Access_Now
 
   - id: f_iXIzAyns7o
     property: program
-    value: "RightsCon summit series — world's leading conference on human rights in the digital age. 2025 Taipei edition drew 5,689 participants (3,249 in-person, record) from 154 countries across 543 sessions. Next edition: May 2026 in Lusaka, Zambia."
+    value: "RightsCon summit series — world's leading conference on human rights in
+      the digital age. 2025 Taipei edition drew 5,689 participants (3,249
+      in-person, record) from 154 countries across 543 sessions. Next edition:
+      May 2026 in Lusaka, Zambia."
     asOf: 2025-02
     source: https://www.rightscon.org/rc25-outcomes-report/
 
   - id: f_ocFP9pmLe8
     property: publication
-    value: "#KeepItOn annual report: 'Emboldened Offenders, Endangered Communities' documented record 296 internet shutdowns in 54 countries in 2024, up from 283 in 39 countries in 2023. Coalition of 300+ organizations globally."
+    value: "#KeepItOn annual report: 'Emboldened Offenders, Endangered Communities'
+      documented record 296 internet shutdowns in 54 countries in 2024, up from
+      283 in 39 countries in 2023. Coalition of 300+ organizations globally."
     asOf: 2025-02
     source: https://www.accessnow.org/internet-shutdowns-2024/
-    notes: "Published February 24, 2025. India, Myanmar, Pakistan, and Russia accounted for 210 of the 296 shutdowns."
+    notes: "Published February 24, 2025. India, Myanmar, Pakistan, and Russia
+      accounted for 210 of the 296 shutdowns."
 
   - id: f_iPs3SuVzhC
     property: program
-    value: "Digital Security Helpline — 24/7 free technical support for journalists, activists, and human rights defenders. Received more than 4,000 requests for assistance in 2024."
+    value: "Digital Security Helpline — 24/7 free technical support for journalists,
+      activists, and human rights defenders. Received more than 4,000 requests
+      for assistance in 2024."
     asOf: 2024
     source: https://www.accessnow.org/help/
     notes: "Helpline formally launched in 2013, originally established 2009."
 
   - id: f_Q1raFluzOO
     property: global-presence
-    value: "Offices in 10 cities: New York (HQ), Berlin, Brussels, San Jose (Costa Rica), Tunis, Delhi, Nairobi, Manila, London, and Washington DC"
+    value: "Offices in 10 cities: New York (HQ), Berlin, Brussels, San Jose (Costa
+      Rica), Tunis, Delhi, Nairobi, Manila, London, and Washington DC"
     asOf: 2024-10
     source: https://www.accessnow.org/about-us/
+  - id: f_miJLQ8Mwaw
+    property: revenue
+    value: 14978327
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2023.
+  - id: f_mRcgRU1aLw
+    property: annual-expenses
+    value: 17935723
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2023.
+  - id: f_QMVrPI2YWw
+    property: net-assets
+    value: 7080728
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2023.
+  - id: f_y2arU8OhDw
+    property: revenue
+    value: 14808846
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2022.
+  - id: f_CuiHy23f9g
+    property: annual-expenses
+    value: 12696043
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2022.
+  - id: f_idlXlCDBYA
+    property: net-assets
+    value: 10038124
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2022.
+  - id: f_DoweUjMCLg
+    property: revenue
+    value: 14368136
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2021.
+  - id: f_Ku104CAO5g
+    property: annual-expenses
+    value: 10213009
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2021.
+  - id: f_qKjfTyLQYA
+    property: net-assets
+    value: 7925321
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2021.
+  - id: f_J6JIxSiUuA
+    property: revenue
+    value: 9838069
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2020.
+  - id: f_09VIoSovCA
+    property: annual-expenses
+    value: 8395724
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2020.
+  - id: f_Bv6d7qhsDQ
+    property: net-assets
+    value: 3770194
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2020.
+  - id: f_I8SK7KWLyg
+    property: revenue
+    value: 6163402
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2019.
+  - id: f_LcH04z0fcQ
+    property: annual-expenses
+    value: 7108845
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2019.
+  - id: f_vnBKnz4JKA
+    property: net-assets
+    value: 2327849
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2019.
+  - id: f_pqUGs8resA
+    property: revenue
+    value: 6749927
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2018.
+  - id: f_px3KcQ3GLw
+    property: annual-expenses
+    value: 5842898
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2018.
+  - id: f_S7ogr24Nkw
+    property: net-assets
+    value: 4230986
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2018.
+  - id: f_guzg9fWnYA
+    property: revenue
+    value: 7030713
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2017.
+  - id: f_H3MoM32sRQ
+    property: annual-expenses
+    value: 4891686
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2017.
+  - id: f_tZpP6hT79g
+    property: net-assets
+    value: 3325295
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2017.
+  - id: f_WCpMa9DW1Q
+    property: revenue
+    value: 4905042
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2016.
+  - id: f_Cc2DIq4dOQ
+    property: annual-expenses
+    value: 4335857
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2016.
+  - id: f_dHWq21jJag
+    property: net-assets
+    value: 1186268
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2016.
+  - id: f_8ciFi7EZMA
+    property: revenue
+    value: 3338316
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2015.
+  - id: f_LMc7xoRmhQ
+    property: annual-expenses
+    value: 3208400
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2015.
+  - id: f_q7yOIs0fXg
+    property: net-assets
+    value: 617083
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2015.
+  - id: f_Ow2oKnSHrg
+    property: revenue
+    value: 2030386
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2014.
+  - id: f_PgZ2dq7ZeQ
+    property: annual-expenses
+    value: 2892307
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2014.
+  - id: f_jJG3gxl6AQ
+    property: net-assets
+    value: 487167
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2014.
+  - id: f_tLM3ykAxVA
+    property: revenue
+    value: 2781467
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2013.
+  - id: f_wM0lbt52CA
+    property: annual-expenses
+    value: 1561158
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2013.
+  - id: f_n4bAs1olqQ
+    property: net-assets
+    value: 1349088
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2013.
+  - id: f_2RGtjH7GSA
+    property: revenue
+    value: 1257124
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2012.
+  - id: f_JHoWp5hTFA
+    property: annual-expenses
+    value: 1289986
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2012.
+  - id: f_2PWtiymxcw
+    property: net-assets
+    value: 128779
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2012.
+  - id: f_CgEvbDKopg
+    property: revenue
+    value: 1145753
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2011.
+  - id: f_iJyxV6lqag
+    property: annual-expenses
+    value: 1014115
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2011.
+  - id: f_XnkMMJUi9A
+    property: net-assets
+    value: 161641
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2011.
+  - id: f_4wAVhG3Zvw
+    property: revenue
+    value: 465925
+    asOf: "2010"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total revenue for tax year 2010.
+  - id: f_xnUM4qdTZA
+    property: annual-expenses
+    value: 438429
+    asOf: "2010"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). Total functional expenses for tax
+      year 2010.
+  - id: f_7xmiI9H2VQ
+    property: net-assets
+    value: 29733
+    asOf: "2010"
+    source: https://projects.propublica.org/nonprofits/organizations/270597430
+    notes: From IRS Form 990 (EIN 27-0597430). End-of-year net assets for tax year
+      2010.

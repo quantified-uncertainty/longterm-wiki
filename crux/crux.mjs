@@ -77,6 +77,7 @@ import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
 import * as factbaseCommands from './commands/factbase.ts';
+import * as factbaseImport990Commands from './commands/factbase-import-990.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
@@ -170,6 +171,7 @@ const domains = {
   'pr-patrol': prPatrolCommands,
   factbase: factbaseCommands,
   kb: factbaseCommands, // deprecated alias
+  'import-990': factbaseImport990Commands,
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,

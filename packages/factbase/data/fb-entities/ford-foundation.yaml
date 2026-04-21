@@ -23,7 +23,8 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131684331
-    notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B. Charitable disbursements ~$1.05B."
+    notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B.
+      Charitable disbursements ~$1.05B."
 
   - id: f_wnEwWXmN3A
     property: annual-grantmaking
@@ -31,20 +32,169 @@ facts:
     currency: USD
     asOf: 2024
     source: https://www.fordfoundation.org/work/our-grants/
-    notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400 grants/year worldwide."
+    notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400
+      grants/year worldwide."
 
   - id: f_nXukgHuGlh
     property: program
-    value: "Technology and Society program, directed by Lori McGlinchey. Focus: equitable digital access, fair regulation, civil/human rights in digital spaces, tech capacity for social justice orgs."
+    value: "Technology and Society program, directed by Lori McGlinchey. Focus:
+      equitable digital access, fair regulation, civil/human rights in digital
+      spaces, tech capacity for social justice orgs."
     asOf: 2026-03
     source: https://www.fordfoundation.org/work/challenging-inequality/technology-and-society/
 
   - id: f_zWECRhzXoM
     property: grant-given
-    value: "Partnership on AI: $550K (2023, 3yr for AI openness/transparency), $250K (2022, 2yr for AI and workers), $200K (2020, 2yr for shared prosperity)"
+    value: "Partnership on AI: $550K (2023, 3yr for AI openness/transparency), $250K
+      (2022, 2yr for AI and workers), $200K (2020, 2yr for shared prosperity)"
     source: https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/partnership-on-ai-to-benefit-people-and-society-147330/
 
   - id: f_6vKmR3ewBj
     property: coalition
-    value: "Co-led 2023 initiative where 10 major philanthropies committed $200M+ collectively to mitigate AI harms. Founding member of Humanity AI ($500M, 2025)."
+    value: "Co-led 2023 initiative where 10 major philanthropies committed $200M+
+      collectively to mitigate AI harms. Founding member of Humanity AI ($500M,
+      2025)."
     source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/philanthropies-launch-new-initiative-to-ensure-ai-advances-the-public-interest/
+  - id: f_NhGhBmLeKg
+    property: revenue
+    value: 502432276
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2023.
+  - id: f_wY0lnXhbbQ
+    property: annual-expenses
+    value: 851842660
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2023.
+  - id: f_GCaM0ixaNA
+    property: revenue
+    value: 925622223
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2022.
+  - id: f_NAIjNi0Ysw
+    property: annual-expenses
+    value: 972621627
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2022.
+  - id: f_6tukjXURwQ
+    property: revenue
+    value: 948070079
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2021.
+  - id: f_0xRuZ9TGoA
+    property: annual-expenses
+    value: 1340846631
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2021.
+  - id: f_M3O8dwtnoA
+    property: revenue
+    value: 652006894
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2020.
+  - id: f_YOCqrWmY7Q
+    property: annual-expenses
+    value: 1114835564
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2020.
+  - id: f_99BXnnojOA
+    property: revenue
+    value: 460414672
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2019.
+  - id: f_frvAVpfirQ
+    property: annual-expenses
+    value: 665707679
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2019.
+  - id: f_uLtzxM8ILQ
+    property: revenue
+    value: 486701562
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2015.
+  - id: f_xY8fzvwntA
+    property: annual-expenses
+    value: 756882561
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2015.
+  - id: f_7OZE0NFtnw
+    property: revenue
+    value: 658142937
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2014.
+  - id: f_mVnGJPfYXQ
+    property: annual-expenses
+    value: 665679476
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2014.
+  - id: f_kMLGUAz3Lg
+    property: revenue
+    value: 689997536
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2013.
+  - id: f_ifbf7MMtvA
+    property: annual-expenses
+    value: 685564893
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2013.
+  - id: f_i5ayee2DaQ
+    property: revenue
+    value: 165230380
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012.
+  - id: f_RdOBiI0kZQ
+    property: annual-expenses
+    value: 157868598
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2012.
+  - id: f_EiZ5fYzghw
+    property: revenue
+    value: 453789109
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2012.
+  - id: f_DWEG27GV8g
+    property: annual-expenses
+    value: 616826363
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2012.
+  - id: f_NXCgWUVldg
+    property: revenue
+    value: 559085236
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total revenue for tax year 2011.
+  - id: f_2M6K6UY7ig
+    property: annual-expenses
+    value: 564371235
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/131684331
+    notes: From IRS Form 990 (EIN 13-1684331). Total functional expenses for tax
+      year 2011.
