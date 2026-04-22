@@ -1,0 +1,34 @@
+{
+  "table": "personnel",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-22T11:18:43.806Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "GMha5QU7LT",
+      "personId": "sid_LWYBcu2iSQ",
+      "organizationId": "sid_JhIGCaI3Ng",
+      "role": "Team Member",
+      "source": "https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1",
+      "verdict": "none"
+    },
+    {
+      "id": "eldHexdltb",
+      "personId": "On8CZm9rk6",
+      "organizationId": "sid_JhIGCaI3Ng",
+      "role": "Adviser",
+      "source": "https://forum.effectivealtruism.org/posts/2mx6xrDrwiEKzfgks/announcing-the-future-fund-1",
+      "verdict": "none"
+    }
+  ]
+}

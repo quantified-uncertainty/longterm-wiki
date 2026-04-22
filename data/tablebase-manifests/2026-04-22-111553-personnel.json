@@ -1,0 +1,74 @@
+{
+  "table": "personnel",
+  "recordCount": 7,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-22T11:15:53.323Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 7,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "HF2WWVbDtY",
+      "personId": "sid_TnHMQ4cMOw",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Co-Founder and Managing Director",
+      "source": "https://en.wikipedia.org/wiki/Center_for_AI_Safety",
+      "verdict": "none"
+    },
+    {
+      "id": "16RQpr2hDQ",
+      "personId": "0HayjjEXVX",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Executive Director, CAIS Action Fund; Director of Government Relations & Public Policy",
+      "source": "https://www.legistorm.com/person/bio/80300/Venkatasatya_Varun_Krovi.html",
+      "verdict": "none"
+    },
+    {
+      "id": "nsqGvmsWQ2",
+      "personId": "sid_6QrJwedEnl",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Manager of Research & Development",
+      "source": "https://theorg.com/org/safe-ai/org-chart/steven-basart",
+      "verdict": "none"
+    },
+    {
+      "id": "bRQsqHFSpY",
+      "personId": "nXh9kROhyx",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Research Engineer",
+      "source": "https://theorg.com/org/safe-ai/org-chart/long-phan",
+      "verdict": "none"
+    },
+    {
+      "id": "7NGoW3HynB",
+      "personId": "161F1ZIdty",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Policy Lead and Senior Counsel, CAIS Action Fund",
+      "source": "https://www.legistorm.com/person/bio/567399/Brian_McGrail.html",
+      "verdict": "none"
+    },
+    {
+      "id": "ndzmFP7xOw",
+      "personId": "U2DwGy1rmN",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Project Manager",
+      "source": "https://theorg.com/org/safe-ai/org-chart/will-hodgkins",
+      "verdict": "none"
+    },
+    {
+      "id": "n9VBnn9awT",
+      "personId": "sid_SIfbuDzvcU",
+      "organizationId": "sid_y4bieqSeag",
+      "role": "Co-Founder",
+      "source": "https://andyzoujm.github.io/",
+      "verdict": "none"
+    }
+  ]
+}

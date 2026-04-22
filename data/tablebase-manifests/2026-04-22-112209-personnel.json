@@ -1,0 +1,74 @@
+{
+  "table": "personnel",
+  "recordCount": 7,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-22T11:22:09.150Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 7,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "ga5eGCLhRc",
+      "personId": "X8fIcIkNAM",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Associate Director",
+      "source": "https://theorg.com/org/epoch-ai/org-chart/tamay-besiroglu",
+      "verdict": "none"
+    },
+    {
+      "id": "HA1AZdb5ks",
+      "personId": "x4f4umLvlc",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Staff Researcher",
+      "source": "https://theorg.com/org/epoch-ai/org-chart/ben-cottier",
+      "verdict": "none"
+    },
+    {
+      "id": "ptNC7C0wtT",
+      "personId": "OyBuH33ede",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Staff Researcher",
+      "source": "https://theorg.com/org/epoch-ai/org-chart/anson-ho",
+      "verdict": "none"
+    },
+    {
+      "id": "Jy9kwflR2b",
+      "personId": "JOslnVZbUg",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Staff Researcher",
+      "source": "https://theorg.com/org/epoch-ai/org-chart/pablo-villalobos",
+      "verdict": "none"
+    },
+    {
+      "id": "kxkAgMVSOY",
+      "personId": "h54nvRR8LG",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Senior Researcher",
+      "source": "https://theorg.com/org/epoch-ai/org-chart/david-owen",
+      "verdict": "none"
+    },
+    {
+      "id": "K787BTlPcZ",
+      "personId": "F9tO9Hn9Aq",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Researcher",
+      "source": "https://epochai.substack.com/p/ai-progress-is-about-to-speed-up",
+      "verdict": "none"
+    },
+    {
+      "id": "Py0Gujbc9K",
+      "personId": "sid_1XMO6wYcZn",
+      "organizationId": "sid_cBPkzcVBBQ",
+      "role": "Research Fellow",
+      "source": "https://www.matsprogram.org/stream/hobbhahn",
+      "verdict": "none"
+    }
+  ]
+}
