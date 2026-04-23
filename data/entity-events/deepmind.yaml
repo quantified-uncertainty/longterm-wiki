@@ -1,0 +1,88 @@
+# Entity events for Google DeepMind (E98)
+# Source: content/docs/knowledge-base/organizations/deepmind.mdx
+entityId: sid_A4XoubikkQ
+entityDisplayName: Google DeepMind
+events:
+  - date: "2010"
+    title: DeepMind founded in London
+    eventType: founding
+    significance: major
+    description: Founded by Demis Hassabis, Shane Legg, and Mustafa Suleyman with the mission to "solve intelligence, then use that to solve everything else."
+
+  - date: "2014"
+    title: Acquired by Google
+    eventType: acquisition
+    significance: major
+    description: Acquisition structured to preserve DeepMind's autonomy — separate brand, ethics board for AGI oversight, open research publication, and UK headquarters.
+
+  - date: "2016-03"
+    title: AlphaGo defeats Lee Sedol 4-1
+    eventType: milestone
+    significance: major
+    description: 200M+ viewers; demonstrated strategic AI; "Move 37" exemplified unexpected AI strategy.
+
+  - date: "2017"
+    title: AlphaGo Zero defeats AlphaGo 100-0 via self-play
+    eventType: milestone
+    significance: major
+    description: Learning without human data.
+
+  - date: "2017"
+    title: AlphaZero generalizes to chess and shogi
+    eventType: milestone
+    significance: major
+    description: Domain-general strategic reasoning.
+
+  - date: "2018"
+    title: AlphaFold wins CASP13
+    eventType: milestone
+    significance: major
+    description: First place in protein-prediction competition; proof of concept for AI in structural biology.
+
+  - date: "2020"
+    title: AlphaFold 2 reaches ~90% accuracy at CASP14
+    eventType: milestone
+    significance: major
+    description: Addressed a 50-year grand challenge in protein folding.
+
+  - date: "2021"
+    title: AlphaFold protein database release
+    eventType: launch
+    significance: major
+    description: 200M+ protein structures freely available; accelerated global research.
+
+  - date: "2022"
+    title: Sparrow dialogue agent published
+    eventType: publication
+    significance: moderate
+    description: Applied RLHF and rule-based reward modeling with debate-style methods toward scalable oversight.
+
+  - date: "2023-04"
+    title: Merger with Google Brain ends DeepMind's independent governance
+    eventType: pivot
+    significance: major
+    description: Driven by ChatGPT competitive pressure, resource efficiency, product integration, and talent retention.
+
+  - date: "2023-12"
+    title: Gemini 1.0 launched
+    eventType: launch
+    significance: major
+    description: Multimodal from the ground up; claimed GPT-4 parity or superiority.
+
+  - date: "2024-02"
+    title: Gemini 1.5 launched
+    eventType: launch
+    significance: moderate
+    description: 2M-token context window; long-context leadership.
+
+  - date: "2024"
+    title: Nobel Prize in Chemistry awarded
+    eventType: milestone
+    significance: major
+    description: Awarded to Demis Hassabis and John Jumper of DeepMind (shared with David Baker of University of Washington for independent protein-design work) for AlphaFold.
+
+  - date: "2024-12"
+    title: Gemini 2.0 launched
+    eventType: launch
+    significance: moderate
+    description: Enhanced agentic capabilities; integrated across Google products.

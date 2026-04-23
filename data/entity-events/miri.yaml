@@ -1,0 +1,62 @@
+# Entity events for MIRI / Machine Intelligence Research Institute (E202)
+# Source: content/docs/knowledge-base/organizations/miri.mdx (## History section)
+entityId: sid_puAffUjWSS
+entityDisplayName: Machine Intelligence Research Institute
+events:
+  - date: "2000"
+    title: Singularity Institute for Artificial Intelligence founded
+    eventType: founding
+    significance: major
+    description: Founded by Eliezer Yudkowsky with the original (paradoxical) mission of accelerating AI development.
+    source: https://en.wikipedia.org/wiki/Machine_Intelligence_Research_Institute
+
+  - date: "2005"
+    title: Reorientation toward AI safety
+    eventType: pivot
+    significance: major
+    description: Yudkowsky's concerns about superintelligent AI risks prompted a fundamental reorientation toward AI safety. Organization also relocated from Atlanta to Silicon Valley that year.
+
+  - date: "2006"
+    title: First Singularity Summit
+    eventType: launch
+    significance: moderate
+    description: Annual summit organized in cooperation with Stanford University, with funding from Peter Thiel.
+
+  - date: "2012-12"
+    title: Sold name, web domain, and Singularity Summit to Singularity University
+    eventType: pivot
+    significance: major
+    description: Marked the end of the public-outreach phase.
+
+  - date: "2013-01"
+    title: Renamed to Machine Intelligence Research Institute
+    eventType: pivot
+    significance: major
+
+  - date: "2019-02"
+    title: Open Philanthropy two-year general support grant ($2.65M)
+    eventType: funding
+    significance: moderate
+    description: Provided $2,652,500 over two years; OP support grew from $1.4M (2018) to $2.31M (2019).
+    source: https://www.openphilanthropy.org/grants/machine-intelligence-research-institute-general-support-2019/
+
+  - date: "2020-04"
+    title: Largest single Open Philanthropy grant — $7.7M
+    eventType: funding
+    significance: major
+    description: $6.24M from main OP funders + $1.46M from BitMEX co-founder Ben Delo. At this peak, OP provided ~60% of MIRI's predicted budgets for 2020-2021.
+    source: https://www.openphilanthropy.org/grants/machine-intelligence-research-institute-general-support-2019/
+
+  - date: "2021-05"
+    title: $4.3M Ethereum donation from Vitalik Buterin
+    eventType: funding
+    significance: major
+    description: Contributed to a revenue spike to $25.6M in 2021.
+    source: https://intelligence.org/2021/05/13/two-major-donations/
+
+  - date: "2024"
+    title: Strategic pivot away from alignment research
+    eventType: pivot
+    significance: major
+    description: 2024 announcement; current focus on attempting to halt development of increasingly general AI models via discussions with policymakers about extreme risks.
+    source: https://intelligence.org/2024/01/04/miri-2024-mission-and-strategy-update/
