@@ -134,23 +134,9 @@ export function buildOrgShellSlots(
   // header pills. Leaving the slot empty (no headerLinks) on organization pages.
   const headerLinks: EntityProfileShellHeaderLink[] = [];
 
-  const headerFooter = data.founders.length > 0 && (
-    <p className="text-sm text-muted-foreground">
-      Founded by{" "}
-      {data.founders.map((f, i) => (
-        <span key={i}>
-          {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
-          {f.href ? (
-            <Link href={f.href} className="text-primary hover:underline">
-              {f.name}
-            </Link>
-          ) : (
-            f.name
-          )}
-        </span>
-      ))}
-    </p>
-  );
+  // Founders are available via the People tab in the sidebar — no need to
+  // duplicate them as a header-footer row.
+  const headerFooter: React.ReactNode = null;
 
   const breadcrumbs: Array<{ label: string; href?: string }> = [
     { label: "Organizations", href: "/organizations" },

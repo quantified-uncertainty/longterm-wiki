@@ -177,6 +177,40 @@ export function EntityProfileShell({
                   // Entity-level rollup pages are deferred to QUA-408 Phase 2.
                 />
               )}
+              {(metadata || (headerLinks && headerLinks.length > 0)) && (
+                <div className="ml-auto flex items-center gap-3 text-sm text-muted-foreground flex-wrap">
+                  {metadata}
+                  {headerLinks && headerLinks.length > 0 && (
+                    <span className="flex items-center gap-1.5">
+                      {headerLinks.map((link) => {
+                        const className = `px-2.5 py-0.5 rounded-md text-xs font-medium transition-colors border ${
+                          link.active
+                            ? "bg-primary/10 text-primary border-primary/20"
+                            : "text-muted-foreground border-border/50 hover:bg-muted/50"
+                        }`;
+                        if (link.external) {
+                          return (
+                            <a
+                              key={link.label}
+                              href={link.href}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className={className}
+                            >
+                              {link.label}
+                            </a>
+                          );
+                        }
+                        return (
+                          <Link key={link.label} href={link.href} className={className}>
+                            {link.label}
+                          </Link>
+                        );
+                      })}
+                    </span>
+                  )}
+                </div>
+              )}
             </div>
 
             {aliases && aliases.length > 0 && (
@@ -188,41 +222,6 @@ export function EntityProfileShell({
             {subtitle && (
               <div className="text-sm text-muted-foreground max-w-3xl leading-relaxed mt-1">
                 {subtitle}
-              </div>
-            )}
-
-            {(metadata || (headerLinks && headerLinks.length > 0)) && (
-              <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-2">
-                {metadata}
-                {headerLinks && headerLinks.length > 0 && (
-                  <span className="flex items-center gap-1.5 ml-1">
-                    {headerLinks.map((link) => {
-                      const className = `px-2.5 py-0.5 rounded-md text-xs font-medium transition-colors border ${
-                        link.active
-                          ? "bg-primary/10 text-primary border-primary/20"
-                          : "text-muted-foreground border-border/50 hover:bg-muted/50"
-                      }`;
-                      if (link.external) {
-                        return (
-                          <a
-                            key={link.label}
-                            href={link.href}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className={className}
-                          >
-                            {link.label}
-                          </a>
-                        );
-                      }
-                      return (
-                        <Link key={link.label} href={link.href} className={className}>
-                          {link.label}
-                        </Link>
-                      );
-                    })}
-                  </span>
-                )}
               </div>
             )}
 
