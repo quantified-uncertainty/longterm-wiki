@@ -26,6 +26,8 @@ interface DivisionDef {
   parentOrgId: string;
   name: string;
   divisionType: "fund" | "team" | "department" | "lab" | "program-area";
+  /** Person stableId or display name. Optional — most divisions are run by a team. */
+  lead?: string;
   status: "active" | "inactive" | "dissolved";
   startDate?: string;
   endDate?: string;
@@ -553,6 +555,7 @@ const DIVISIONS: DivisionDef[] = [
     parentOrgId: ORG_IDS.CHAI,
     name: "CHAI Research",
     divisionType: "lab",
+    lead: "Stuart Russell",
     status: "active",
     source: "https://humancompatible.ai/research",
     notes:
@@ -748,6 +751,7 @@ interface SyncDivision {
   parentOrgId: string;
   name: string;
   divisionType: string;
+  lead: string | null;
   status: string | null;
   startDate: string | null;
   endDate: string | null;
@@ -761,6 +765,7 @@ function toSyncDivision(def: DivisionDef): SyncDivision {
     parentOrgId: def.parentOrgId,
     name: def.name,
     divisionType: def.divisionType,
+    lead: def.lead ?? null,
     status: def.status,
     startDate: def.startDate ?? null,
     endDate: def.endDate ?? null,
