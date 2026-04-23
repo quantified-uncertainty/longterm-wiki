@@ -226,21 +226,28 @@ function ChipButton({
   selected: boolean;
   onClick: () => void;
 }) {
+  // Build a screen-reader label so chips read as "Funders, 55 organizations"
+  // rather than "Funders 55" run together.
+  const ariaLabel =
+    count != null ? `${label}, ${count} organization${count === 1 ? "" : "s"}` : label;
   return (
     <button
       type="button"
       onClick={onClick}
       aria-pressed={selected}
+      aria-label={ariaLabel}
       className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
         selected
           ? "bg-primary/10 border-primary/30 text-primary font-semibold"
           : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
       }`}
     >
-      {label}
-      {count != null && (
-        <span className="ml-1 text-[10px] opacity-60">{count}</span>
-      )}
+      <span aria-hidden="true">
+        {label}
+        {count != null && (
+          <span className="ml-1 text-[10px] opacity-60">{count}</span>
+        )}
+      </span>
     </button>
   );
 }
@@ -263,7 +270,10 @@ function ViewTab({
       role="tab"
       id={id}
       aria-selected={active}
-      aria-controls={controls}
+      // Only the selected tab references its panel — the inactive panel isn't
+      // in the DOM (we don't want to mount both views at once), so dangling
+      // aria-controls on the inactive tab would point at a non-existent ID.
+      aria-controls={active ? controls : undefined}
       tabIndex={active ? 0 : -1}
       type="button"
       onClick={onClick}
