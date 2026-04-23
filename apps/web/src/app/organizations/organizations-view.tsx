@@ -72,9 +72,7 @@ export function OrganizationsView({
     [typeCounts],
   );
 
-  // Track the last chip the user clicked so we can detect a repeat click
-  // (works even if the header is offscreen because the alreadyAtTop heuristic
-  // becomes unreliable mid-scroll).
+  // Last chip + timestamp — drives the "click again to expand as table" UX.
   const lastChipRef = useRef<{ key: string; at: number }>({ key: "", at: 0 });
 
   const handleChipClick = useCallback(
