@@ -1,8 +1,10 @@
 import Link from "next/link";
+import { cn } from "@lib/utils";
 import {
   Breadcrumbs,
   ProfileTabs,
   type ProfileTab,
+  type ProfileTabGroup,
 } from "@/components/directory";
 import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
@@ -82,13 +84,22 @@ export interface EntityProfileShellProps {
   tabs?: ProfileTab[];
   tabsAriaLabel?: string;
   /**
+   * Orientation for the tab nav. `"horizontal"` (default) renders a top tab row
+   * above the body; `"vertical"` renders a grouped left-side nav with content
+   * in the right column. The `sidebar` slot is ignored in vertical layout.
+   */
+  tabsLayout?: "horizontal" | "vertical";
+  /** Ordered group metadata for vertical tab nav. See `ProfileTabGroup`. */
+  tabGroups?: ProfileTabGroup[];
+  /**
    * Body content for the main column. Used when the page has no tabs, or
    * when tabs are passed and additional content should render below them.
    */
   children?: React.ReactNode;
   /**
    * Right-hand sidebar. When non-null, the main body renders in a 3-col grid
-   * (main col = 2/3, sidebar = 1/3). When absent, body is full-width.
+   * (main col = 2/3, sidebar = 1/3). When absent, body is full-width. Ignored
+   * when `tabsLayout === "vertical"` — the left nav takes the sidebar slot.
    */
   sidebar?: React.ReactNode;
 }
@@ -108,20 +119,37 @@ export function EntityProfileShell({
   statCards,
   tabs,
   tabsAriaLabel = "Entity sections",
+  tabsLayout = "horizontal",
+  tabGroups,
   children,
   sidebar,
 }: EntityProfileShellProps) {
   const hasTabs = tabs && tabs.length > 0;
+  const isVerticalTabs = tabsLayout === "vertical" && hasTabs;
 
-  const mainContent = (
+  const horizontalBody = (
     <>
       {hasTabs && <ProfileTabs tabs={tabs} ariaLabel={tabsAriaLabel} />}
       {children}
     </>
   );
 
+  const verticalTabsBlock = hasTabs ? (
+    <ProfileTabs
+      tabs={tabs}
+      ariaLabel={tabsAriaLabel}
+      layout="vertical"
+      groups={tabGroups}
+    />
+  ) : null;
+
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8 overflow-x-hidden">
+    <div
+      className={cn(
+        "mx-auto px-6 py-8 overflow-x-hidden",
+        isVerticalTabs ? "max-w-[82rem]" : "max-w-[70rem]",
+      )}
+    >
       <Breadcrumbs items={breadcrumbs} />
 
       {/* Header */}
@@ -205,13 +233,18 @@ export function EntityProfileShell({
 
       {statCards && <div className="mb-8">{statCards}</div>}
 
-      {sidebar != null ? (
+      {isVerticalTabs ? (
+        <>
+          {verticalTabsBlock}
+          {children}
+        </>
+      ) : sidebar != null ? (
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          <div className="lg:col-span-2 min-w-0">{mainContent}</div>
+          <div className="lg:col-span-2 min-w-0">{horizontalBody}</div>
           <div className="space-y-8">{sidebar}</div>
         </div>
       ) : (
-        mainContent
+        horizontalBody
       )}
     </div>
   );
