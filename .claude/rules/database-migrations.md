@@ -146,6 +146,55 @@ END $$;
 
 > **Note on batching**: `COMMIT` is not allowed inside a `DO` block. Each `DO` execution runs as a single transaction. For true inter-batch commits, run the batch SQL in a shell loop (e.g. `while psql ... -c "UPDATE ... LIMIT 10000 ..." | grep -q "10000 rows"`) or use a stored procedure with `CALL` in PostgreSQL 14+.
 
+## Swapping an FK target column — use `swap_fk_target()`
+
+When a migration needs to swap a child table's FK from `parent(from_col)` to `parent(to_col)` (e.g. `resources.id` → `resources.stable_id`, or any future type-ID consolidation), **call the `swap_fk_target()` procedure** (migration 0199 / QUA-600) instead of hand-writing the four-step DROP/UPDATE/orphan-check/ADD template.
+
+```sql
+CALL swap_fk_target(
+  child_table  => 'resource_papers',
+  child_col    => 'resource_id',
+  parent_table => 'resources',
+  from_col     => 'id',
+  to_col       => 'stable_id',
+  on_delete    => 'CASCADE'
+  -- use_not_valid       => false   -- true for tables > ~100k rows
+  -- new_constraint_name => NULL    -- default: <child>_<col>_<parent>_<to>_fk
+);
+```
+
+The helper owns the invariants that drifted across the 12 QUA-549 Phase B migrations:
+
+- **Orphan check uses `NOT EXISTS` against the parent table**, never a format heuristic like `NOT LIKE 'sid_%'`. This is the exact defect PR #4460 shipped with (and #4466 fixed post-merge).
+- **Backfill UPDATE guards against overwriting to NULL** when `parent.to_col IS NULL` — missed by #4460 as well.
+- **Old constraint enumeration via `information_schema`**, not hardcoded names. Works regardless of whether the old FK has the Drizzle-generated name or PostgreSQL's default `<table>_<col>_fkey`.
+- **Idempotent on replay** — safe to re-run; a second call is a no-op because no old FKs match, no rows need rewriting, and the new constraint already exists.
+
+Canonical source: `apps/wiki-server/drizzle/helpers/swap_fk_target.sql`. Install migration: `apps/wiki-server/drizzle/0199_install_swap_fk_target.sql`. Integration tests: `apps/wiki-server/src/__tests__/swap-fk-target-integration.test.ts`.
+
+### When to pass `use_not_valid => true`
+
+Follow the same decision rule as the `ADD CONSTRAINT ... NOT VALID` pattern above. For **small tables** (<~100k rows) leave it `false` — a plain `ADD CONSTRAINT` scans the table under ACCESS EXCLUSIVE in milliseconds.
+
+For **mid-size tables** pass `true`. The procedure splits into `ADD CONSTRAINT ... NOT VALID` + `VALIDATE CONSTRAINT`, which reduces the risk of a long validation scan hitting the 60s `lock_timeout` if something else is holding the table.
+
+For **very large tables** (>1M rows, e.g. anything comparable to `hallucination_risk_snapshots` from the QUA-302 incident), do **not** use the helper's combined `use_not_valid` path — it still runs both statements inside a single Drizzle transaction, so the ACCESS EXCLUSIVE lock is held through VALIDATE. Instead:
+
+1. Migration A: hand-write `ALTER TABLE ... ADD CONSTRAINT ... NOT VALID;`
+2. Migration B (or manual script): hand-write `ALTER TABLE ... VALIDATE CONSTRAINT ...;`
+
+So the lock releases between them. The helper still owns the FK discovery, backfill, and orphan check; just inline its pre-existing-FK drop + backfill + orphan check into Migration A before the bare `ADD CONSTRAINT ... NOT VALID`.
+
+### When NOT to use the helper
+
+- **Column renames** — if you're also renaming `child_col` at the same time, the helper can't do that; do the rename in a separate ALTER first, then call the helper.
+- **Changing `ON DELETE` policy without swapping the target** — no parent column swap, no helper; just `DROP CONSTRAINT` + `ADD CONSTRAINT` directly.
+- **Non-FK constraints** (CHECK, UNIQUE) — the helper is only for foreign-key target swaps.
+
+### Rule of thumb
+
+For FK target swaps in this codebase, the hand-rolled template is now a footgun — the helper exists precisely because the template shipped a copy-paste defect 12 times. Call it. If the helper is missing a feature you need, extend it in a follow-up PR rather than bypassing it.
+
 ## Deploy flow for DDL migrations
 
 1. Merge PR with the no-op migration — deploy succeeds without DDL contention
@@ -165,6 +214,7 @@ END $$;
 |------|---------|
 | `apps/wiki-server/src/db.ts` | Connection pools + migration runner |
 | `apps/wiki-server/drizzle/` | Drizzle migration SQL files |
+| `apps/wiki-server/drizzle/helpers/` | PL/pgSQL helper source files (`swap_fk_target.sql`, …) — canonical copies; actual installs live in numbered migrations |
 | `apps/wiki-server/scripts/` | Manual migration scripts (applied via psql) |
 | `apps/wiki-server/drizzle.config.ts` | Drizzle Kit config |
 | `.github/workflows/wiki-server-docker.yml` | Deploy pipeline with smoke test |

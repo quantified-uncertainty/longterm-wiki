@@ -49,5 +49,161 @@ facts:
         value: https://en.wikipedia.org/wiki/Wild_Animal_Initiative,
         source: https://www.wikidata.org/wiki/Q107463177,
         notes: From Wikidata Q107463177
+      },
+    {
+        id: f_gaexFYHf3g,
+        property: revenue,
+        value: 6958910,
+        asOf: "2023",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2023.
+      },
+    {
+        id: f_d4mNIlyJLQ,
+        property: annual-expenses,
+        value: 4413572,
+        asOf: "2023",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2023.
+      },
+    {
+        id: f_ZAXPLyXc2A,
+        property: net-assets,
+        value: 7531838,
+        asOf: "2023",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2023.
+      },
+    {
+        id: f_j3i4pCAOnQ,
+        property: revenue,
+        value: 1750928,
+        asOf: "2022",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2022.
+      },
+    {
+        id: f_4ZoXQsOrXw,
+        property: annual-expenses,
+        value: 1838810,
+        asOf: "2022",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2022.
+      },
+    {
+        id: f_1sancdECqQ,
+        property: net-assets,
+        value: 4931154,
+        asOf: "2022",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2022.
+      },
+    {
+        id: f_IhWpcUQrNg,
+        property: revenue,
+        value: 5086540,
+        asOf: "2021",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2021.
+      },
+    {
+        id: f_7UGITVt08w,
+        property: annual-expenses,
+        value: 513973,
+        asOf: "2021",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2021.
+      },
+    {
+        id: f_YuN0DGFZXA,
+        property: net-assets,
+        value: 5069733,
+        asOf: "2021",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2021.
+      },
+    {
+        id: f_avRsBH5HKQ,
+        property: revenue,
+        value: 605883,
+        asOf: "2020",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2020.
+      },
+    {
+        id: f_CWyylB7KgA,
+        property: annual-expenses,
+        value: 528945,
+        asOf: "2020",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2020.
+      },
+    {
+        id: f_nq39TUdIzw,
+        property: net-assets,
+        value: 497166,
+        asOf: "2020",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2020.
+      },
+    {
+        id: f_jEddKzxKHw,
+        property: revenue,
+        value: 717020,
+        asOf: "2019",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2019.
+      },
+    {
+        id: f_3wAGy1O6FQ,
+        property: annual-expenses,
+        value: 341809,
+        asOf: "2019",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2019.
+      },
+    {
+        id: f_6OCcUkVG5A,
+        property: net-assets,
+        value: 420228,
+        asOf: "2019",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2019.
+      },
+    {
+        id: f_Yin3gXZpbQ,
+        property: revenue,
+        value: 85838,
+        asOf: "2018",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total revenue for tax year 2018.
+      },
+    {
+        id: f_hXtCRz7NOQ,
+        property: annual-expenses,
+        value: 40821,
+        asOf: "2018",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). Total functional expenses for tax
+          year 2018.
+      },
+    {
+        id: f_pmiteL7ifg,
+        property: net-assets,
+        value: 45017,
+        asOf: "2018",
+        source: https://projects.propublica.org/nonprofits/organizations/822281466,
+        notes: From IRS Form 990 (EIN 82-2281466). End-of-year net assets for tax year
+          2018.
       }
   ]

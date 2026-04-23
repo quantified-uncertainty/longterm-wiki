@@ -24,6 +24,27 @@ export function clampedLimit(maxLimit: number, defaultLimit: number) {
 }
 
 /**
+ * Parse a boolean query-string value.
+ *
+ * Use this instead of `z.coerce.boolean()` for query-string params.
+ * `z.coerce.boolean()` runs the value through `Boolean(...)`, so any non-empty
+ * string — including the literal `"false"` — coerces to `true`. That means
+ * `?flag=false` silently reads as `true`, the opposite of what the caller
+ * typed (QUA-651).
+ *
+ * Accepts only the literal strings `"true"` and `"false"`. Any other value
+ * (including `"0"`, `"1"`, `"yes"`, `""`) fails validation with a 400, so
+ * silently-wrong boolean filters become impossible.
+ *
+ * Wrap with `.optional()` when the flag is not required:
+ *
+ *   const Query = z.object({ flagshipOnly: qBool.optional() });
+ */
+export const qBool = z
+  .enum(["true", "false"])
+  .transform((v) => v === "true");
+
+/**
  * Create a PaginationQuery schema with configurable limits.
  * Each route can call this with its own defaults while sharing the base shape.
  * Values above maxLimit are clamped (not rejected) so clients requesting larger
@@ -46,6 +67,25 @@ export function paginationQuery(opts?: {
  */
 export function noDuplicateIds(items: { id: string }[]) {
   return new Set(items.map((i) => i.id)).size === items.length;
+}
+
+/**
+ * Apply the "+1 sentinel → slice + flag" truncation pattern to a row set.
+ *
+ * Callers should `.limit(cap + 1)` the query so the sentinel fires cleanly
+ * when rows exceed the cap, then pass the resulting rows here. Returns the
+ * capped `items` array plus a `truncated` flag for the response body.
+ *
+ * Prefer this over hand-rolling the slice-and-flag — multiple sites across
+ * the codebase (resource-dedup, integrity, entity-resources, resources,
+ * entity-profile) do the same thing.
+ */
+export function applyTruncation<T>(
+  rows: T[],
+  cap: number,
+): { items: T[]; truncated: boolean } {
+  const truncated = rows.length > cap;
+  return { items: truncated ? rows.slice(0, cap) : rows, truncated };
 }
 
 /** Standard error codes for 400 responses. */

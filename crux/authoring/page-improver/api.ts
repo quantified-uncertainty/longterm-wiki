@@ -4,7 +4,7 @@
  * Two execution paths:
  *   1. CLI mode (default): spawns `claude -p --print` subprocess, billed via
  *      Claude Code subscription. Web search handled by Claude's native tool.
- *   2. API-direct mode: calls Anthropic SDK directly, billed via ANTHROPIC_API_KEY.
+ *   2. API-direct mode: calls Anthropic SDK directly, billed via ANTHROPIC_BILLING_KEY.
  *      Used when --api-direct is set, or inside a Claude Code SDK session.
  *
  * The CLI path was added to avoid $5-8/page API costs during batch loops.
@@ -58,7 +58,7 @@ export function setApiDirectMode(explicit?: boolean): void {
     _useApiDirect = !isClaudeCliAvailable();
   }
   log('api', _useApiDirect
-    ? 'Using API-direct mode (Anthropic SDK — billed via ANTHROPIC_API_KEY)'
+    ? 'Using API-direct mode (Anthropic SDK — billed via ANTHROPIC_BILLING_KEY)'
     : 'Using CLI mode (claude subprocess — billed via Claude Code subscription)');
 }
 
@@ -154,7 +154,12 @@ const CLI_TIMEOUT_MS = 30 * 60 * 1000; // 30 minutes — deep-tier improves on l
 
 /**
  * Run a prompt through the Claude CLI subprocess.
- * Bills via Claude Code subscription, not ANTHROPIC_API_KEY.
+ * Bills via Claude Code subscription (OAuth).
+ *
+ * The subprocess inherits env from the parent process. Since the codebase
+ * uses ANTHROPIC_BILLING_KEY (not ANTHROPIC_API_KEY) for SDK calls, the
+ * claude CLI never sees a billing key in env and falls back to OAuth
+ * naturally — no subprocess env stripping required.
  *
  * Uses --allowedTools WebSearch for phases that need web access.
  */
@@ -186,11 +191,10 @@ async function runAgentViaCli(
 
   return new Promise((resolve, reject) => {
     // Unset CLAUDECODE to allow spawning Claude inside a Claude Code session.
-    // Unset ANTHROPIC_API_KEY so the CLI uses the subscription (OAuth) instead
-    // of the API key — this is the whole point of CLI mode.
+    // No need to strip ANTHROPIC_API_KEY — this codebase uses
+    // ANTHROPIC_BILLING_KEY, which the claude CLI does not read.
     const env = { ...process.env };
     delete env.CLAUDECODE;
-    delete env.ANTHROPIC_API_KEY;
 
     const args = [
       '-p',
@@ -269,7 +273,7 @@ async function runAgentViaCli(
 /**
  * Run Claude with the appropriate backend.
  * - CLI mode (default): spawns `claude` subprocess, billed via subscription.
- * - API-direct mode: uses Anthropic SDK, billed via ANTHROPIC_API_KEY.
+ * - API-direct mode: uses Anthropic SDK, billed via ANTHROPIC_BILLING_KEY.
  */
 export async function runAgent(prompt: string, options: RunAgentOptions = {}): Promise<string> {
   if (!isApiDirect()) {

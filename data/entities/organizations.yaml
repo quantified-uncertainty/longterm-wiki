@@ -9444,4 +9444,11 @@
     - ai-governance
     - political-influence
   lastUpdated: 2026-04
+# QUA-625 — lightweight org entity for FactBase ref conversion
+- id: fathom-radiant
+  stableId: sid_mgkIm6f72W
+  type: organization
+  orgType: startup
+  title: Fathom Radiant
+  description: AI hardware company.
 

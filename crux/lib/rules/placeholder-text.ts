@@ -157,5 +157,3 @@ export const placeholderTextRule = createRule({
     return issues;
   },
 });
-
-export default placeholderTextRule;

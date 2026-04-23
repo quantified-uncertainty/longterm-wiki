@@ -86,5 +86,3 @@ export const numberedFootnotesRule = {
     return issues;
   },
 };
-
-export default numberedFootnotesRule;

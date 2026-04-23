@@ -20,7 +20,7 @@ facts:
   - id: f_jQSLOnndmf
     property: funding-received
     value: "25025000"
-    unit: USD
+    currency: USD
     asOf: !date 2022
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization from FLI in December 2022
@@ -28,7 +28,7 @@ facts:
   - id: f_wljvq2YnMl
     property: funding-received
     value: "15700000"
-    unit: USD
+    currency: USD
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2023
@@ -36,7 +36,7 @@ facts:
   - id: f_0SFSw7BkHs
     property: funding-received
     value: "18100000"
-    unit: USD
+    currency: USD
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2024
@@ -45,23 +45,25 @@ facts:
     property: affiliated-org
     value: !ref sid_d9sWZtyVwg
     source: https://www.flf.org
-    notes: "FLF is a sister organization to FLI with separate leadership, not a subsidiary. They share some board members but are distinct legal entities."
+    notes: "FLF is a sister organization to FLI with separate leadership, not a
+      subsidiary. They share some board members but are distinct legal
+      entities."
 
   - id: f_2LXRkLkKWr
     property: description
     value: >-
-      501(c)(3) nonprofit sister organization to FLI, focused on incubating
-      new organizations that steer transformative technology toward benefiting
-      life. Operates as part grant-maker, part strategic research group, part
-      VC firm. Goal of establishing 3-5 new organizations per year. Four-step
-      approach: research gaps, strategic planning, recruit founders, provide
-      operational support. Institutional overhead capped at 15%.
+      501(c)(3) nonprofit sister organization to FLI, focused on incubating new
+      organizations that steer transformative technology toward benefiting life.
+      Operates as part grant-maker, part strategic research group, part VC firm.
+      Goal of establishing 3-5 new organizations per year. Four-step approach:
+      research gaps, strategic planning, recruit founders, provide operational
+      support. Institutional overhead capped at 15%.
     asOf: !date 2026-03
 
   - id: f_sP4q9hNagi
     property: grant-given
     value: "800000"
-    unit: USD
+    currency: USD
     asOf: !date 2025-04
     source: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
     notes: Grant to Wise Ancestors for conservation genomics platform growth
@@ -69,7 +71,7 @@ facts:
   - id: f_bfOERZO5RV
     property: grant-given
     value: "1275000"
-    unit: USD
+    currency: USD
     asOf: !date 2025-07
     notes: >-
       Estimated cost of AI for Human Reasoning Fellowship: 30 fellows x
@@ -83,5 +85,28 @@ facts:
     source: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
     notes: >-
       Approximate. Aguirre said FLF had "a staff of two that recently doubled"
-      (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known
-      staff by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
+      (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known staff
+      by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
+  - id: f_ZnHMEKtjPg
+    property: revenue
+    value: 25035877
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). Total revenue for tax year 2022.
+  - id: f_5VMZfaUaXj
+    property: annual-expenses
+    value: 0
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). Total functional expenses for tax
+      year 2022 reported as $0 — FLF was newly formed and held its initial
+      $25M revenue without operational spending in its first reporting year
+      (revenue and end-of-year net assets match exactly). Backfilled per
+      CodeRabbit review on PR #4538.
+  - id: f_suNgCCT3JQ
+    property: net-assets
+    value: 25035877
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). End-of-year net assets for tax year
+      2022.

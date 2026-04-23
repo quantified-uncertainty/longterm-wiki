@@ -140,5 +140,3 @@ export const internalLinksRule = createRule({
     return issues;
   },
 });
-
-export default internalLinksRule;

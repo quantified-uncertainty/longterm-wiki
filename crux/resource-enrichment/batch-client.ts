@@ -65,8 +65,8 @@ export interface BatchResultItem {
 }
 
 function getAnthropicKey(): string {
-  const key = getApiKey('ANTHROPIC_API_KEY');
-  if (!key) throw new Error('ANTHROPIC_API_KEY not set');
+  const key = getApiKey('ANTHROPIC_BILLING_KEY');
+  if (!key) throw new Error('ANTHROPIC_BILLING_KEY not set');
   return key;
 }
 

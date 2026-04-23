@@ -14,7 +14,7 @@ facts:
   - id: f_9Z978lvcwS
     property: annual-revenue
     value: "7852814"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/851024198
     notes: "Major jump from $963K (2023) to $7.85M (2024). Assets $6.05M."
@@ -38,7 +38,7 @@ facts:
 
   - id: f_Z1LzeboVhP
     property: founded-by
-    value: "Christoph Winter"
+    value: !ref sid_4I7XUhwlqE
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
     notes: "Founded by researchers at Harvard University. Core team included Jonas Schuett, Eric Martinez, Cullen O'Keefe. Winter remains Director of LawAI."
 
@@ -50,7 +50,7 @@ facts:
   - id: f_ltwPScsmD4
     property: annual-revenue
     value: "1100000"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://forum.effectivealtruism.org/posts/xen7oLdHwoHDTG4hR/legal-priorities-project-annual-report-2022
     notes: "~$1.1M spent in 2022. Raised ~$1.3M. 14 grant applications since inception (10 fully granted, 3 partly)."

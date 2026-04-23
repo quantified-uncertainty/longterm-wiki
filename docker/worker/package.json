@@ -4,6 +4,7 @@
   "type": "module",
   "dependencies": {
     "@anthropic-ai/sdk": "^0.74.0",
+    "@longterm-wiki/url-utils": "file:./packages/url-utils",
     "dotenv": "^17.2.4",
     "gray-matter": "^4.0.3",
     "js-yaml": "^4.1.0",

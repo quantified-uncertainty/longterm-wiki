@@ -21,7 +21,7 @@ facts:
 
   - id: f_CnX33i1Q4h
     property: employed-by
-    value: "Fathom Radiant"
+    value: !ref sid_mgkIm6f72W
     role: "Head of Strategy & Governance"
     notes: "Previously Head of Strategy & Governance at Fathom Radiant before joining CNAS"
     validEnd: "2024"

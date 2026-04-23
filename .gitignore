@@ -129,3 +129,8 @@ crux/scripts/career-data.json
 # Archived data exports (large JSON files that bloat the repo)
 data/archived/
 data/archive/
+
+# Calibration raw data — regenerable via crux/calibration/run-calibration.ts
+# Only metrics.json + audit doc are committed; corpus + per-item results rebuild on demand
+crux/calibration/data/corpus.json
+crux/calibration/data/results-*.json

@@ -288,6 +288,18 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-609: enforces FK-swap migrations drop BOTH the Drizzle-generated
+    // `<table>_<col>_resources_id_fk` AND the postgres-default
+    // `<table>_<col>_fkey` names. Migration 0186 only dropped the first and
+    // halted production. Blocking — the deploy-halt cost makes any bypass
+    // strictly worse than the small surface this rule covers.
+    id: 'fk-swap-double-drop',
+    name: 'FK-swap migrations drop both _fk and _fkey names',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-fk-swap-double-drop.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // Rationale in validate-workspace-dep-coverage.ts. QUA-598.
     id: 'workspace-dep-coverage',
     name: 'Workspace dependency coverage (no undeclared @longterm-wiki/* imports)',
@@ -320,6 +332,13 @@ const PARALLEL_STEPS: Step[] = [
     name: 'No console.log in server code',
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-no-console-log.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'no-anthropic-api-key-read',
+    name: 'No raw Anthropic CLI env-var reads in source (QUA-612)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-anthropic-api-key-read.ts'],
     cwd: PROJECT_ROOT,
   },
   {
@@ -369,6 +388,15 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-factbase-stableid.ts'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'factbase-fact-unit-field',
+    name: 'FactBase facts use `currency:` not `unit:` (loader drops stray unit fields)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-factbase-fact-unit-field.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: `unit:` at a fact top-level is silently dropped by the loader,
+    // causing currency symbol mismatches (QUA-620: £5M fact rendered as $5M).
   },
   {
     id: 'dot-position',

@@ -4,7 +4,8 @@ facts:
     property: founded-date
     value: "2015-01"
     source: https://en.wikipedia.org/wiki/Niskanen_Center
-    notes: "Founded January 2015 by Jerry Taylor. Named after libertarian economist William Niskanen."
+    notes: "Founded January 2015 by Jerry Taylor. Named after libertarian economist
+      William Niskanen."
 
   - id: f_8rCv824VJ8
     property: headquarters
@@ -14,7 +15,7 @@ facts:
   - id: f_i2u0fBwEOh
     property: annual-revenue
     value: "9958495"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/455308952
     notes: "Total assets $12M. Net assets $9.7M."
@@ -28,31 +29,43 @@ facts:
 
   - id: f_oA6a0dspU9
     property: program-note
-    value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond on AI and institutions, Jennifer Pahlka on AI in government). Policy departments: Climate, Criminal Justice, Immigration, Social Policy, State Capacity, Government Affairs, Legal."
+    value: "AI policy addressed ad hoc through individual fellows (Samuel Hammond on
+      AI and institutions, Jennifer Pahlka on AI in government). Policy
+      departments: Climate, Criminal Justice, Immigration, Social Policy, State
+      Capacity, Government Affairs, Legal."
     asOf: 2026-03
     source: https://www.niskanencenter.org/leadership-and-staff/
 
   - id: f_4749an0ZBo
     property: founded-by
-    value: "Jerry Taylor"
+    value: !ref sid_W8fJ41OdQH
     source: https://en.wikipedia.org/wiki/Niskanen_Center
-    notes: "Former vice president of the Cato Institute. Resigned September 2021 after domestic violence charges. Core staff came from Cato during a 2012 leadership dispute."
+    notes: "Former vice president of the Cato Institute. Resigned September 2021
+      after domestic violence charges. Core staff came from Cato during a 2012
+      leadership dispute."
 
   - id: f_koLmOW3XFl
     property: legal-structure
-    value: "501(c)(3) nonprofit think tank (EIN 45-5308952). Also has a 501(c)(4) lobbying arm, the Niskanen Center for Public Policy (EIN 47-4946572), spun off in 2016."
+    value: "501(c)(3) nonprofit think tank (EIN 45-5308952). Also has a 501(c)(4)
+      lobbying arm, the Niskanen Center for Public Policy (EIN 47-4946572), spun
+      off in 2016."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
 
   - id: f_uIWclnY8Uz
     property: leadership
-    value: "Acting President: R.J. Lyman (from March 2026). Board Chair: Bob Litterman. Previous presidents: Ted Gayer (Aug 2022 - Feb 2026), Jerry Taylor (2015-2021)."
+    value: "Acting President: R.J. Lyman (from March 2026). Board Chair: Bob
+      Litterman. Previous presidents: Ted Gayer (Aug 2022 - Feb 2026), Jerry
+      Taylor (2015-2021)."
     asOf: 2026-03
     source: https://www.niskanencenter.org/niskanen-center-announces-leadership-transition/
     notes: "Gayer remains as senior advisor through May 2026, then senior fellow"
 
   - id: f_VQ7RbH18ge
     property: description
-    value: "Center-right policy think tank in Washington, DC advocating for evidence-based solutions to climate change, immigration reform, criminal justice reform, and effective governance. Promotes carbon tax, expanded legal immigration, and supply-side progressivism ('Abundance Agenda')."
+    value: "Center-right policy think tank in Washington, DC advocating for
+      evidence-based solutions to climate change, immigration reform, criminal
+      justice reform, and effective governance. Promotes carbon tax, expanded
+      legal immigration, and supply-side progressivism ('Abundance Agenda')."
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Niskanen_Center
 
@@ -69,12 +82,215 @@ facts:
   - id: f_LKjEZFHThm
     property: annual-revenue
     value: "7075571"
-    unit: USD
+    currency: USD
     asOf: 2022
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Revenue $7.1M, expenses $7.6M"
 
   - id: f_0ZaHbaYCio
     property: funding-sources
-    value: "Key donors include Open Philanthropy, Hewlett Foundation ($400K operations grant), Linden Trust for Conservation. The 501(c)(4) arm received funding from Open Society Foundations ($500K in 2017), Democracy Fund Voice ($175K in 2018)."
+    value: "Key donors include Open Philanthropy, Hewlett Foundation ($400K
+      operations grant), Linden Trust for Conservation. The 501(c)(4) arm
+      received funding from Open Society Foundations ($500K in 2017), Democracy
+      Fund Voice ($175K in 2018)."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
+  - id: f_aKnGglyHUA
+    property: revenue
+    value: 11280437
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2023.
+  - id: f_qSD0h02Urg
+    property: annual-expenses
+    value: 8661967
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2023.
+  - id: f_xDt2TAI0Yw
+    property: net-assets
+    value: 10060748
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2023.
+  - id: f_5hDM4i4z8Q
+    property: revenue
+    value: 6750481
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2022.
+  - id: f_LjoniIkQ9w
+    property: annual-expenses
+    value: 7598252
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2022.
+  - id: f_NcHvIlNoKw
+    property: net-assets
+    value: 7442278
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2022.
+  - id: f_DEPqWhSQug
+    property: revenue
+    value: 12163223
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2021.
+  - id: f_7vyKSfeypQ
+    property: annual-expenses
+    value: 6636908
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2021.
+  - id: f_c51uluINnA
+    property: net-assets
+    value: 8290048
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2021.
+  - id: f_iaSH3RCm5w
+    property: revenue
+    value: 4639471
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2020.
+  - id: f_rKPSCnU3Tg
+    property: annual-expenses
+    value: 4897484
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2020.
+  - id: f_YWtozMHbFw
+    property: net-assets
+    value: 2763733
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2020.
+  - id: f_U9fsynW3EA
+    property: revenue
+    value: 6548833
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2019.
+  - id: f_kAncr5bqjw
+    property: annual-expenses
+    value: 4421324
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2019.
+  - id: f_F9eAqpuBZQ
+    property: net-assets
+    value: 3021746
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2019.
+  - id: f_2KwBmVuxdA
+    property: revenue
+    value: 4349043
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2018.
+  - id: f_f1CpXa28MQ
+    property: annual-expenses
+    value: 4170789
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2018.
+  - id: f_ny5wUe1n7g
+    property: net-assets
+    value: 894237
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2018.
+  - id: f_dfLPFv1bZg
+    property: revenue
+    value: 3529677
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2017.
+  - id: f_VvBxOFquiQ
+    property: annual-expenses
+    value: 3281090
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2017.
+  - id: f_UJMIyl6hTw
+    property: net-assets
+    value: 715983
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2017.
+  - id: f_Ldq8GtR0tQ
+    property: revenue
+    value: 2250594
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2016.
+  - id: f_uLsqyBTdRw
+    property: annual-expenses
+    value: 2447205
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2016.
+  - id: f_GqcjFozbyQ
+    property: net-assets
+    value: 467396
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2016.
+  - id: f_efIVGkLIrw
+    property: revenue
+    value: 1954786
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2015.
+  - id: f_ld1sel8Yig
+    property: annual-expenses
+    value: 1665531
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2015.
+  - id: f_9POkULXgJA
+    property: net-assets
+    value: 664007
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2015.
+  - id: f_YQaqzkYqSQ
+    property: revenue
+    value: 647000
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total revenue for tax year 2014.
+  - id: f_3SjFzLSbow
+    property: annual-expenses
+    value: 272248
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). Total functional expenses for tax
+      year 2014.
+  - id: f_N7RPwVyOhA
+    property: net-assets
+    value: 374752
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/455308952
+    notes: From IRS Form 990 (EIN 45-5308952). End-of-year net assets for tax year
+      2014.

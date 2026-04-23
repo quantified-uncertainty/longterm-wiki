@@ -27,6 +27,9 @@ import { missingSourcesRoute } from "./routes/sourcing/missing-sources.js";
 // Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";
 
+// Defensive enrichment gate (QUA-632 Phase 1)
+import { enrichmentRoute } from "./routes/enrichment/enrichment.js";
+
 // FactBase routes — structured triples with temporal data
 import { factsRoute } from "./routes/factbase/facts.js";
 
@@ -210,6 +213,9 @@ export function createApp() {
 
   // Claims-first sourcing (#3253)
   app.route("/api/claims", claimsRoute);
+
+  // Defensive enrichment gate (QUA-632 Phase 1)
+  app.route("/api/enrichment", enrichmentRoute);
 
   // WikiBase assessments (not in the TableBase registry — separate concern)
   app.route("/api/assessments", assessmentsRoute);

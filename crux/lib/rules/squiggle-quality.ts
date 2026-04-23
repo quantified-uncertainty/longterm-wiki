@@ -176,5 +176,3 @@ export const squiggleQualityRule = createRule({
     return issues;
   },
 });
-
-export default squiggleQualityRule;

@@ -168,6 +168,44 @@ test.describe("Render audit — critical data tables", () => {
     expect(text).toContain("Stakeholder");
     // Valuation should be formatted (e.g., "$380B"), not raw
     expect(text).toMatch(/\$\d+(?:\.\d+)?[BMT]/);
+
+    // Regression check: editorial columns (Category, Pledge %, EA Align %)
+    // must populate for stakeholders with wiki entities. Previously broken
+    // when the equity-positions record sent holderEntityId (sid_) instead
+    // of the slug — every per-founder lookup into PLEDGE_RATES missed and
+    // only the Employee Equity Pool row kept its data.
+    //
+    // Only asserted when the stakeholder table actually populated. In PR CI
+    // `build-data.mjs` runs without LONGTERMWIKI_SERVER_URL, so the table
+    // renders its "No equity position data available" fallback and there's
+    // nothing to verify. Against prod or a locally-hydrated dev build, the
+    // table has data and the assertions fire.
+    const hasData = !text.includes("No equity position data available");
+    if (hasData) {
+      // Scope to the stakeholder table via "Totals (pledged stakeholders)" —
+      // a unique footer string; a second "Dario Amodei" row exists in the
+      // markdown-rendered Founder Donation Pledges table below.
+      const stakeholderTable = page.locator("table").filter({ hasText: "Totals (pledged stakeholders)" });
+      const dariorow = stakeholderTable.locator("tr", { hasText: "Dario Amodei" }).first();
+      const dariorowText = (await dariorow.textContent()) ?? "";
+      expect(dariorowText, "Dario Amodei row should show 'Co-founder' category").toContain("Co-founder");
+      expect(dariorowText, "Dario Amodei row should not be all em-dashes in editorial columns").toMatch(/80%/);
+
+      // Cell-level sourcing dots: three per populated row — stake (record),
+      // pledge (fact), ea-alignment (fact). Links go to /sourcing/...
+      // pages; their presence is the regression signal.
+      const dariohrefs = await dariorow
+        .locator('a[href^="/sourcing/"]')
+        .evaluateAll((els) => els.map((e) => e.getAttribute("href") ?? ""));
+      expect(
+        dariohrefs.some((h) => h.startsWith("/sourcing/equity_positions/")),
+        `Dario row should have an equity_positions sourcing link (got: ${dariohrefs.join(", ")})`,
+      ).toBe(true);
+      expect(
+        dariohrefs.filter((h) => h.startsWith("/sourcing/fact/")).length,
+        `Dario row should have 2 fact sourcing links (pledge + ea align). hrefs: ${dariohrefs.join(", ")}`,
+      ).toBe(2);
+    }
   });
 });
 

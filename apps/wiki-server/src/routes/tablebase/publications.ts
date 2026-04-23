@@ -1,11 +1,12 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql } from "drizzle-orm";
+import { and, eq, count, desc, sql, type SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { publications } from "../../schema.js";
 import {
   zv,
   clampedLimit,
+  qBool,
 } from "../shared/utils.js";
 import {
   resolveEntityId,
@@ -52,14 +53,14 @@ const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   publicationType: z.enum(VALID_PUBLICATION_TYPES).optional(),
-  flagshipOnly: z.coerce.boolean().optional(),
+  flagshipOnly: qBool.optional(),
 });
 
 const ByEntityQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   publicationType: z.enum(VALID_PUBLICATION_TYPES).optional(),
-  flagshipOnly: z.coerce.boolean().optional(),
+  flagshipOnly: qBool.optional(),
 });
 
 const SyncItemSchema = z.object({
@@ -109,29 +110,30 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       c.req.valid("query");
     const db = getDrizzleDb();
 
-    let query = db
+    const conditions: SQL[] = [];
+    if (publicationType) {
+      conditions.push(eq(publications.publicationType, publicationType));
+    }
+    if (flagshipOnly) {
+      conditions.push(eq(publications.isFlagship, true));
+    }
+    const whereClause = conditions.length > 0 ? and(...conditions) : undefined;
+
+    const rows = await db
       .select()
       .from(publications)
+      .where(whereClause)
       .orderBy(desc(publications.publishedDate), publications.id)
       .limit(limit)
       .offset(offset);
 
-    // Apply filters via post-query filtering for simplicity
-    // (Drizzle's dynamic where-building is verbose for optional combos)
-    const rows = await query;
-
-    const filtered = rows.filter((r) => {
-      if (publicationType && r.publicationType !== publicationType) return false;
-      if (flagshipOnly && !r.isFlagship) return false;
-      return true;
-    });
-
     const [{ count: total }] = await db
       .select({ count: count() })
-      .from(publications);
+      .from(publications)
+      .where(whereClause);
 
     return c.json({
-      publications: filtered,
+      publications: rows,
       total,
       limit,
       offset,
@@ -148,29 +150,31 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
         c.req.valid("query");
       const db = getDrizzleDb();
 
+      const conditions: SQL[] = [eq(publications.entityId, resolvedId)];
+      if (publicationType) {
+        conditions.push(eq(publications.publicationType, publicationType));
+      }
+      if (flagshipOnly) {
+        conditions.push(eq(publications.isFlagship, true));
+      }
+      const whereClause = and(...conditions);
+
       const rows = await db
         .select()
         .from(publications)
-        .where(eq(publications.entityId, resolvedId))
+        .where(whereClause)
         .orderBy(desc(publications.publishedDate), publications.id)
         .limit(limit)
         .offset(offset);
 
-      const filtered = rows.filter((r) => {
-        if (publicationType && r.publicationType !== publicationType)
-          return false;
-        if (flagshipOnly && !r.isFlagship) return false;
-        return true;
-      });
-
       const [{ count: total }] = await db
         .select({ count: count() })
         .from(publications)
-        .where(eq(publications.entityId, resolvedId));
+        .where(whereClause);
 
       return c.json({
         entityId: resolvedId,
-        publications: filtered,
+        publications: rows,
         total,
         limit,
         offset,

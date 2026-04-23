@@ -193,13 +193,8 @@ ${sourceText.slice(0, PROMPT_CONTENT_LENGTH)}
 ---
 
 Does the source text contain information about this entity? If so, does it confirm or contradict what we know?
-Respond with ONLY a JSON object (no markdown code fences):
-{
-  "verdict": "confirmed|contradicted|unverifiable|outdated|partial",
-  "confidence": 0.0 to 1.0,
-  "extracted_value": "Key facts the source mentions about this entity",
-  "reasoning": "Brief explanation of your verdict"
-}`;
+
+${SOURCE_CHECK_RESPONSE_FORMAT}`;
 }
 
 // ── Deterministic matching ──────────────────────────────────────────

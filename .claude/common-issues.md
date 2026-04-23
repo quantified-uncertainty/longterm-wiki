@@ -10,7 +10,7 @@ Recurring problems encountered across Claude Code sessions. When you hit a known
 The data layer must be built before `pnpm test` or `pnpm build`. If tests fail with missing data errors, run `pnpm run --filter longterm-next sync:data`. Note: `build-data.mjs` uses `process.cwd()` for path resolution and must be run from `apps/web/` (the pnpm filter handles this).
 
 ### API keys are in environment, not .env files
-Check `env | grep -i API` — keys are set as environment variables, not in `.env` files. Required: `ANTHROPIC_API_KEY`, `OPENROUTER_API_KEY`.
+Check `env | grep -i API` — keys are set as environment variables, not in `.env` files. Required: `ANTHROPIC_BILLING_KEY`, `OPENROUTER_API_KEY`.
 
 ### OpenRouter model IDs can be deprecated without warning
 Model IDs like `google/gemini-flash-1.5` get removed from OpenRouter. When a pipeline call returns a model-not-found error, check the [OpenRouter models page](https://openrouter.ai/models) for the current ID. As of Feb 2026, Gemini Flash is `google/gemini-2.0-flash-001`.

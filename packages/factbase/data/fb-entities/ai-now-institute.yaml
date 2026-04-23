@@ -130,7 +130,7 @@ facts:
   - id: f_vYiIVBXPH0
     property: grant-received
     value: "2000000"
-    unit: USD
+    currency: USD
     asOf: 2026-02
     source: https://www.macfound.org/press/press-releases/10-million-to-advance-ai-by-and-for-people
     notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security and AI"

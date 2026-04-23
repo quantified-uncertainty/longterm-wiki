@@ -77,6 +77,7 @@ import * as auditsCommands from './commands/audits.ts';
 import * as releaseCommands from './commands/release.ts';
 import * as prPatrolCommands from './commands/pr-patrol.ts';
 import * as factbaseCommands from './commands/factbase.ts';
+import * as factbaseImport990Commands from './commands/factbase-import-990.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
@@ -95,10 +96,12 @@ import * as backfillPrOutcomesCommands from './commands/backfill-pr-outcomes.ts'
 import * as factbaseMigrateEntitiesCommands from './commands/factbase-migrate-entities.ts';
 import * as verifyOrchestrateCommands from './commands/sourcing-orchestrate.ts';
 import * as sourcingRecheckCommands from './commands/sourcing-recheck.ts';
+import * as sourcingRetroScanSubjectsCommands from './commands/sourcing-retro-scan-subjects.ts';
 import * as sourcingAuditUrlsCommands from './commands/sourcing-audit-urls.ts';
 import * as sourcingBackfillHomepagesCommands from './commands/sourcing-backfill-homepages.ts';
 import * as sourcingSampleCoverageCommands from './commands/sourcing-sample-coverage.ts';
 import * as sourcingSuggestUrlsCommands from './commands/sourcing-suggest-urls.ts';
+import * as sourcingApplySuggestionsCommands from './commands/sourcing-apply-suggestions.ts';
 import * as sourcingCleanupOrphansCommands from './commands/sourcing-cleanup-orphans.ts';
 import * as migrateCitationsCommands from './commands/migrate-citations.ts';
 import * as verifyEntityCommands from './commands/verify-entity.ts';
@@ -169,6 +172,7 @@ const domains = {
   'pr-patrol': prPatrolCommands,
   factbase: factbaseCommands,
   kb: factbaseCommands, // deprecated alias
+  'import-990': factbaseImport990Commands,
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
@@ -188,10 +192,12 @@ const domains = {
   verify: verifyEntityCommands,
   'verify-orchestrate': verifyOrchestrateCommands,
   'sourcing-recheck': sourcingRecheckCommands,
+  'sourcing-retro-scan-subjects': sourcingRetroScanSubjectsCommands,
   'sourcing-audit-urls': sourcingAuditUrlsCommands,
   'sourcing-backfill-homepages': sourcingBackfillHomepagesCommands,
   'sourcing-sample-coverage': sourcingSampleCoverageCommands,
   'sourcing-suggest-urls': sourcingSuggestUrlsCommands,
+  'sourcing-apply-suggestions': sourcingApplySuggestionsCommands,
   'sourcing-cleanup-orphans': sourcingCleanupOrphansCommands,
   'migrate-citations': migrateCitationsCommands,
   'sourcing-wiki-pages': sourcingWikiPagesCommands,

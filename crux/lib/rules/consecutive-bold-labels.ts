@@ -71,5 +71,3 @@ export const consecutiveBoldLabelsRule = createRule({
     return issues;
   },
 });
-
-export default consecutiveBoldLabelsRule;

@@ -4,7 +4,7 @@ facts:
   - id: f_Ks42xuxIfv
     property: global-semiconductor-revenue
     value: 5.27e+11
-    unit: USD
+    currency: USD
     asOf: 2023-12
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue $527B in 2023; decline from 2022 peak"
@@ -12,7 +12,7 @@ facts:
   - id: f_puGJTXLsW9
     property: global-semiconductor-revenue
     value: 6.27e+11
-    unit: USD
+    currency: USD
     asOf: 2024-12
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue ~$627B in 2024; 19% YoY growth"
@@ -20,7 +20,7 @@ facts:
   - id: f_QxwvXepiT6
     property: global-semiconductor-revenue
     value: 9.10e+11
-    unit: USD
+    currency: USD
     asOf: 2026-12
     source: https://www.deloitte.com/global/en/Industries/tmt/analysis/semiconductor-industry-outlook.html
     notes: "Projected $910B by 2026; driven by AI chip demand"
@@ -29,7 +29,7 @@ facts:
   - id: f_qvrs0X6RLc
     property: chips-act-total-funding
     value: 5.27e+10
-    unit: USD
+    currency: USD
     asOf: 2022-08
     source: https://en.wikipedia.org/wiki/CHIPS_and_Science_Act
     notes: "$52.7B in CHIPS Act funding for semiconductor manufacturing and R&D"
@@ -37,7 +37,7 @@ facts:
   - id: f_dLU4O4AnWM
     property: chips-act-private-investment
     value: 6.30e+11
-    unit: USD
+    currency: USD
     asOf: 2025-12
     source: https://www.semiconductors.org/
     notes: "Over $630B in private investment catalyzed by CHIPS Act"
@@ -45,7 +45,7 @@ facts:
   - id: f_OMqgmk6JJg
     property: chips-act-rd-allocation
     value: 1.10e+10
-    unit: USD
+    currency: USD
     asOf: 2022-08
     source: https://en.wikipedia.org/wiki/CHIPS_and_Science_Act
     notes: "$11B allocated for R&D, including $3.5B for defense 'secure enclave'"
@@ -54,7 +54,6 @@ facts:
   - id: f_vd9fZ6f61O
     property: estimated-chip-diversion
     value: 140000
-    unit: chips
     asOf: 2024-12
     source: https://www.cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority
     notes: "CNAS median estimate of ~140,000 chips diverted to China in 2024, representing 6-10% of China's AI compute"
@@ -63,7 +62,7 @@ facts:
   - id: f_RrOoSNtMaR
     property: hyperscaler-ai-capex
     value: 6.50e+11
-    unit: USD
+    currency: USD
     asOf: 2025-12
     source: https://www.reuters.com/technology/
     notes: "Combined projected CapEx of Google, Amazon, Microsoft, and Meta for AI infrastructure build-out"

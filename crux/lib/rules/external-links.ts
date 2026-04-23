@@ -350,5 +350,3 @@ export const externalLinksRule = createRule({
     return issues;
   },
 });
-
-export default externalLinksRule;

@@ -158,6 +158,9 @@ const agentSessionsApp = new Hono()
       const { freshMinutes } = c.req.valid("query");
       const cutoff = new Date(Date.now() - freshMinutes * 60_000);
       const db = getDrizzleDb();
+      // QUA-623: cap result set. The dedup check only needs a handful of
+      // active sessions per Linear ID; a huge result almost certainly means
+      // a bug in the caller or an unusually active ticket — 50 is plenty.
       const rows = await db
         .select({
           id: agentSessions.id,
@@ -173,7 +176,8 @@ const agentSessionsApp = new Hono()
           eq(agentSessions.status, "active"),
           gte(agentSessions.updatedAt, cutoff),
         ))
-        .orderBy(desc(agentSessions.updatedAt));
+        .orderBy(desc(agentSessions.updatedAt))
+        .limit(50);
       return c.json({ sessions: rows, freshMinutes });
     },
   )

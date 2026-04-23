@@ -31,7 +31,7 @@ facts:
     notes: From Wikidata Q27133033
   - id: f_JivNYnSW9t
     property: ceo
-    value: John-Arne Røttingen
+    value: !ref sid_QkTjuStGuw
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
   - id: f_dypLk7qm6i

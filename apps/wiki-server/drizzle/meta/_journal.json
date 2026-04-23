@@ -1394,6 +1394,41 @@
       "when": 1786262400000,
       "tag": "0198_qua_492_facts_fact_id_check",
       "breakpoints": true
+    },
+    {
+      "idx": 199,
+      "version": "7",
+      "when": 1786348800000,
+      "tag": "0199_install_swap_fk_target",
+      "breakpoints": true
+    },
+    {
+      "idx": 200,
+      "version": "7",
+      "when": 1786435200000,
+      "tag": "0200_qua_591_url_suggestion_applied_status",
+      "breakpoints": true
+    },
+    {
+      "idx": 201,
+      "version": "7",
+      "when": 1786521600000,
+      "tag": "0201_qua_576_resources_stableid_notnull",
+      "breakpoints": true
+    },
+    {
+      "idx": 202,
+      "version": "7",
+      "when": 1786608000000,
+      "tag": "0202_qua_632_enrichment_targets",
+      "breakpoints": true
+    },
+    {
+      "idx": 203,
+      "version": "7",
+      "when": 1786608000001,
+      "tag": "0203_qua_632_enrichment_runs",
+      "breakpoints": true
     }
   ]
 }

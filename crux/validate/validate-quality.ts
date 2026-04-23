@@ -289,7 +289,7 @@ export function runCheck(options?: QualityValidatorOptions): ValidatorResult {
 
     // Show easy re-grade commands
     console.log(`${colors.bold}To re-grade these pages:${colors.reset}`);
-    console.log(`${colors.dim}(requires ANTHROPIC_API_KEY in .env or environment)${colors.reset}\n`);
+    console.log(`${colors.dim}(requires ANTHROPIC_BILLING_KEY in .env or environment)${colors.reset}\n`);
 
     // Single page commands
     console.log(`${colors.cyan}Re-grade one page:${colors.reset}`);

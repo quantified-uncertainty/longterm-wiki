@@ -80,6 +80,9 @@ describe('syncSessionFile — auth error handling (issue #2462)', () => {
 
   beforeEach(() => {
     vi.restoreAllMocks();
+    // Opt out of slot auto-detection (QUA-616) so env-var assertions are
+    // deterministic regardless of CWD.
+    process.env.WIKI_SERVER_ENV = 'local';
     process.env.LONGTERMWIKI_SERVER_URL = 'http://localhost:3000';
     process.env.LONGTERMWIKI_SERVER_API_KEY = 'test-key';
   });

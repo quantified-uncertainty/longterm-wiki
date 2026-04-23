@@ -9,7 +9,7 @@ facts:
   - id: f_ZLxIVY8SBQ
     property: annual-revenue
     value: "57900000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Brennan_Center_for_Justice
     notes: "Approximately $57.9M (FY 2023-2024). ProPublica URL 404; figure confirmed via Wikipedia."

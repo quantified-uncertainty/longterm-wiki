@@ -15,7 +15,7 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 - Test with adversarial inputs: empty strings, null/undefined, boundary values (0, -1, MAX_INT), malformed data, very large inputs.
 - No trivial assertions (`typeof result === 'object'`). Assert on specific values and shapes that would catch regressions.
 - **Test skip discipline**: No `it.skip()` without a linked GitHub issue number. Unskip in the same PR that fixes the underlying bug.
-- **Mock fidelity**: Test mocks for the same DB table must share a single in-memory store. Don't create parallel mock stores (e.g., separate `suggestResourceStore`) for different endpoints that hit the same table.
+- **Mock fidelity**: Test mocks for the same DB table must share a single in-memory store. Don't create parallel mock stores (e.g., separate `suggestResourceStore`) for different endpoints that hit the same table. When a table pair is accessed from many mock branches, extract a typed store helper — `apps/wiki-server/src/__tests__/_helpers/resources-store.ts` (QUA-604) is the canonical pattern: one class encapsulates `resources` + `resource_citations` with `seedResource` / `seedCitation` for tests and `setResource` / `insertCitation` / `joinCitationsByPage` for the dispatcher.
 
 **Bug fixes — TDD workflow:**
 1. Write a failing test that reproduces the bug FIRST

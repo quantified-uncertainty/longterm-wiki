@@ -311,5 +311,3 @@ export function References({
     </section>
   );
 }
-
-export default References;

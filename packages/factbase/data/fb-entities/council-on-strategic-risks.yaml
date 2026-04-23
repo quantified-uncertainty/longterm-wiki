@@ -2,8 +2,128 @@ entity: sid_FL52kVPTlA
 facts:
   - id: f_dmsVtlWt9A
     property: description
-    value: The Council on Strategic Risks is a DC-based nonprofit founded in 2017 that focuses on climate-security
-      intersections, strategic weapons, and ecological risks through three research centers. While the organization
-      claims nonpartisan status, its left-leaning funding sources and critical stance toward
+    value: The Council on Strategic Risks is a DC-based nonprofit founded in 2017
+      that focuses on climate-security intersections, strategic weapons, and
+      ecological risks through three research centers.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: f_MqvJ2jFa3g
+    property: revenue
+    value: 3742950
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2023.
+  - id: f_9okWZWT1WQ
+    property: annual-expenses
+    value: 5267060
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2023.
+  - id: f_l42JlWmqOA
+    property: net-assets
+    value: 4066503
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2023.
+  - id: f_F4ZsYRMVXQ
+    property: revenue
+    value: 4950222
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2022.
+  - id: f_oFoXyKfHNw
+    property: annual-expenses
+    value: 3319492
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2022.
+  - id: f_EZSSUzjkIg
+    property: net-assets
+    value: 5590290
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2022.
+  - id: f_ymTBs5rFZQ
+    property: revenue
+    value: 4326697
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2021.
+  - id: f_Qr9UGltIZg
+    property: annual-expenses
+    value: 2176627
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2021.
+  - id: f_qL1Cnsh6vg
+    property: net-assets
+    value: 3959560
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2021.
+  - id: f_SGmYFJQWCQ
+    property: revenue
+    value: 2323556
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2020.
+  - id: f_aYQnUklQkg
+    property: annual-expenses
+    value: 1199030
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2020.
+  - id: f_scKikerb7A
+    property: net-assets
+    value: 1809490
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2020.
+  - id: f_KcKZtzGKCQ
+    property: revenue
+    value: 897013
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2019.
+  - id: f_DQDDcwKnGA
+    property: annual-expenses
+    value: 593159
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2019.
+  - id: f_M8Ag7TzVyg
+    property: net-assets
+    value: 684964
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2019.
+  - id: f_ZdKxIzMTfQ
+    property: revenue
+    value: 755018
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total revenue for tax year 2018.
+  - id: f_giW9mI8fQw
+    property: annual-expenses
+    value: 379108
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). Total functional expenses for tax
+      year 2018.
+  - id: f_GmFYka8jqg
+    property: net-assets
+    value: 381110
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/823106472
+    notes: From IRS Form 990 (EIN 82-3106472). End-of-year net assets for tax year
+      2018.

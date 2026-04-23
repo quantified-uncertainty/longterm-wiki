@@ -33,7 +33,7 @@ facts:
   - id: f_sVDGE7x4Yu
     property: lobbying-spend
     value: "1080000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
     notes: "Total 2024 federal lobbying ~$1.08M (in-house $700K + external firms $380K). Verified from Senate LDA filings."
@@ -41,7 +41,7 @@ facts:
   - id: f_aFSIs1oXPv
     property: lobbying-spend
     value: "2110000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
     notes: "Total 2025 federal lobbying ~$2.11M. Largest pro-safety AI lobbying spender. Verified from Senate LDA."
@@ -49,7 +49,7 @@ facts:
   - id: f_fT7iaHWSgm
     property: pac-fundraising
     value: "91661"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/political-action-committees-pacs/americans-for-responsible-innovation/C00873356/summary/2024
     notes: "Hybrid PAC raised $91,661; contributed $60,300 to federal candidates"

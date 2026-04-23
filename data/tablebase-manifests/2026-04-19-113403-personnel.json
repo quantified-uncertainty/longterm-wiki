@@ -1,0 +1,466 @@
+{
+  "table": "personnel",
+  "recordCount": 56,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-19T11:34:03.102Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 56,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "kmngFO1j4D",
+      "personId": "nQwlZnU9a8",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "President",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "DgO9AADUsw",
+      "personId": "PZ8xicapLr",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Provost and Chief Academic Officer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "xPbSXGu3Q9",
+      "personId": "EhtXnJtQZ5",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Chair, Board of Trustees",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "EpMjU81n8S",
+      "personId": "pB09Pcvc91",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice Chair, Board of Trustees",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "99Qm2F37kk",
+      "personId": "okbWHPgQpo",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice Chair, Board of Trustees",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "H7CCBj38SC",
+      "personId": "D3ee1fDuCS",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for University Advancement",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "VU2DaY72KQ",
+      "personId": "qkABB8M6tt",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for Finance and Chief Financial Officer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "TxrdbVnyER",
+      "personId": "XAsY8eOIVn",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for Student Affairs and Dean of Students",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "VlbxzyVnXt",
+      "personId": "PiG5cSMzSG",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President and General Counsel, Secretary of the Corporation",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "Pyneg214uc",
+      "personId": "hE5dgBGCxm",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Treasurer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "drp2LDW89F",
+      "personId": "0lntD99uc6",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for University Communications and Marketing",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "NvZBGvx7oP",
+      "personId": "9noh8aKqOY",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Chief Investment Officer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "0jrQ4BjClO",
+      "personId": "y3cdrt9XBb",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Assistant Secretary of the Corporation",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "TiDUtlsBsn",
+      "personId": "GuyezByvdp",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for Research",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "Un2INE4nTs",
+      "personId": "0HbD8NxmV9",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Assistant Treasurer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "8AJpCd7X90",
+      "personId": "HJayxLF8mf",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for Information Technology and Chief Information Officer",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "f6rqfbHq6f",
+      "personId": "3P9O6aO9V4",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Vice President for Operations",
+      "source": "https://www.cmu.edu/leadership/board/officers-of-the-corporation",
+      "verdict": "none"
+    },
+    {
+      "id": "I0oPn2kDFg",
+      "personId": "OV4sSbWUoP",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "RrhZQLMYQQ",
+      "personId": "B4xJjEUzot",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "B8tgxYlYCA",
+      "personId": "6se5mwGJZW",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "Tsrlv0ZhhM",
+      "personId": "2sc2qsH4GZ",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "NIeVRWNDl1",
+      "personId": "p8UWT9wUUf",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "hdA1cqvMDZ",
+      "personId": "KtymIG0kUp",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "oAGw2uivHn",
+      "personId": "rCxE0958i7",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "8eQlNuJviI",
+      "personId": "X9L1kn5DFB",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "lZlqVdn7uM",
+      "personId": "JRZVTbEK7T",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "7mLNDbK3cI",
+      "personId": "Y5R8YHhlhH",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "9gvV292DIh",
+      "personId": "csYLI64m1z",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "4JsDnW5le0",
+      "personId": "wLtC3zFw7n",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "1yFzgnbCNx",
+      "personId": "NAaA5DKvug",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "o9nUn9mQr8",
+      "personId": "trjNmhIqlT",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "xWzmN202vf",
+      "personId": "zM3TPp58EM",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "5hT2OcgP3x",
+      "personId": "Sxd2csGBX0",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "yCDYHm59g1",
+      "personId": "m2Frf66ytt",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "JFlREMT8E8",
+      "personId": "Fgl917ByZG",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "mDFPfvmefZ",
+      "personId": "2aRndroASr",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "Dt3FN9g9wM",
+      "personId": "nhXVJT7mfw",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "5Tdyjd8Kdn",
+      "personId": "qIMVWeGsIY",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "NwX6XcTHsn",
+      "personId": "AmHHElQG3j",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "gnq2wQR0ci",
+      "personId": "U7vD8E8KXk",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "LjI6mg0Ecu",
+      "personId": "CY8W18nvvo",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "4SQYROyA9e",
+      "personId": "G5dSm795Lp",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "JkDQ7jDSOs",
+      "personId": "0H6WhO50p2",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "bSBtY5hyLq",
+      "personId": "fHD28FOF8J",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "9O23YFge6g",
+      "personId": "RIOuJ1JBeJ",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "XymB9hCdXw",
+      "personId": "zyaCWtepXn",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "294TgZUyN3",
+      "personId": "JEVJT8iR7R",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "v8Y9ulDJ16",
+      "personId": "md6HcEtszC",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "YYuSJJnjG4",
+      "personId": "nXA3VcHkqV",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "n1UjoqJJqi",
+      "personId": "ymIljdIQlX",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "zelhF9q9m8",
+      "personId": "ISzB9iuzxB",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "S14rOuqbTA",
+      "personId": "9wnJYkAOtG",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "c0COy2QYXc",
+      "personId": "n299H4RvWx",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "e70TvCs5JB",
+      "personId": "aKd6a3aHEp",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "N807bNB1j5",
+      "personId": "VSyailGlWI",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    },
+    {
+      "id": "89nFmHnmK9",
+      "personId": "RMpgKCT9WE",
+      "organizationId": "sid_lOV3OFaWMg",
+      "role": "Trustee",
+      "source": "https://www.cmu.edu/leadership/board/voting-trustees.html",
+      "verdict": "none"
+    }
+  ]
+}

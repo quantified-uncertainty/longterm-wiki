@@ -20,6 +20,10 @@ export const LlmResponseSchema = z.object({
   confidence: z.number().min(0).max(1).default(0.5),
   extracted_value: z.string().default(''),
   reasoning: z.string().default(''),
+  // QUA-648: the LLM names the source's actual subject and flags if it diverges from the claim.
+  // Both fields are optional for backward compat — pre-QUA-648 prompts don't request them.
+  source_subject: z.string().default(''),
+  subject_matches_claim: z.boolean().optional(),
 });
 
 /**
@@ -54,15 +58,37 @@ export async function callLlmForSourcing(
     };
   }
 
-  const verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.data.verdict)
+  let verdict = (VALID_SOURCE_CHECK_VERDICTS as readonly string[]).includes(parsed.data.verdict)
     ? parsed.data.verdict
     : 'unverifiable';
+  let reasoning = parsed.data.reasoning;
+
+  // QUA-648: defense-in-depth downgrade. The prompt instructs the LLM to
+  // return `subject_matches_claim: false` when the source is about a
+  // materially different entity than the claim (e.g. Microsoft AI vs.
+  // Microsoft), in which case `confirmed` must be downgraded to `partial`.
+  // The prompt also forbids the combination, but the LLM has shipped
+  // `confirmed` + mismatch anyway (see QUA-648 case study), so we enforce
+  // the rule here too. The downgrade is only applied to `confirmed` — if
+  // the LLM already chose `partial`/`unverifiable`/etc., the verdict stands.
+  if (
+    parsed.data.subject_matches_claim === false &&
+    verdict === 'confirmed'
+  ) {
+    verdict = 'partial';
+    const mismatchNote = parsed.data.source_subject
+      ? `[subject-mismatch: source is about "${parsed.data.source_subject}", not the claim's subject] `
+      : '[subject-mismatch: LLM flagged source subject as different from claim subject] ';
+    reasoning = `${mismatchNote}${reasoning}`;
+  }
 
   return {
     verdict,
     confidence: parsed.data.confidence,
     extractedValue: parsed.data.extracted_value,
-    reasoning: parsed.data.reasoning,
+    reasoning,
+    sourceSubject: parsed.data.source_subject || undefined,
+    subjectMatchesClaim: parsed.data.subject_matches_claim,
   };
 }
 

@@ -158,7 +158,14 @@ export const CURATED_COLLECTIONS = new Set([
 
 // ── Constants ─────────────────────────────────────────────────────────
 
-export const HERO_STATS = ["revenue", "valuation", "headcount", "total-funding"];
+export const HERO_STATS = [
+  "revenue",
+  "valuation",
+  "headcount",
+  "total-funding",
+  "annual-expenses",
+  "net-assets",
+];
 
 export { ORG_TYPE_LABELS, ORG_TYPE_COLORS, DEFAULT_ORG_TYPE_COLOR, ORG_STATUS_LABELS, ORG_STATUS_COLORS } from "@/app/organizations/org-constants";
 

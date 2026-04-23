@@ -35,19 +35,29 @@ if (!process.env.LONGTERMWIKI_SERVER_API_KEY) {
   process.exit(1);
 }
 
-const hasApiKey = !!process.env.ANTHROPIC_API_KEY;
+const hasApiKey = !!process.env.ANTHROPIC_BILLING_KEY;
 const hasOauthToken = !!CLAUDE_CODE_OAUTH_TOKEN;
 const hasRepoPath = !!WIKI_REPO_PATH && existsSync(WIKI_REPO_PATH);
 
+// The @mention query path uses @anthropic-ai/claude-agent-sdk, which auto-reads
+// ANTHROPIC_API_KEY from the process env. Since this codebase uses
+// ANTHROPIC_BILLING_KEY as the authoritative name (so slots' claude CLI falls
+// back to OAuth), re-map here so the SDK picks up the billing key.
+// /ask command uses CLAUDE_CODE_OAUTH_TOKEN, which takes precedence inside the
+// SDK, so this re-map doesn't interfere with OAuth-based flows.
+if (hasApiKey) {
+  process.env.ANTHROPIC_API_KEY = process.env.ANTHROPIC_BILLING_KEY; // anthropic-billing-key-remap-ok
+}
+
 if (!hasApiKey && !hasOauthToken) {
   logger.fatal(
-    "At least one of ANTHROPIC_API_KEY or CLAUDE_CODE_OAUTH_TOKEN must be set"
+    "At least one of ANTHROPIC_BILLING_KEY or CLAUDE_CODE_OAUTH_TOKEN must be set"
   );
   process.exit(1);
 }
 
 if (!hasApiKey) {
-  logger.warn("ANTHROPIC_API_KEY not set — @mention queries disabled");
+  logger.warn("ANTHROPIC_BILLING_KEY not set — @mention queries disabled");
 }
 
 const askCommandEnabled = hasOauthToken && hasRepoPath;
@@ -109,7 +119,7 @@ client.on(Events.MessageCreate, async (message) => {
 
   if (!hasApiKey) {
     await message.reply(
-      "@mention queries are not available — ANTHROPIC_API_KEY is not configured. Try the /ask command instead."
+      "@mention queries are not available — ANTHROPIC_BILLING_KEY is not configured. Try the /ask command instead."
     );
     return;
   }

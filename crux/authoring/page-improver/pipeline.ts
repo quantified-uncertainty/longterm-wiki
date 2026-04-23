@@ -118,7 +118,7 @@ async function autoLogSession(
 export async function runPipeline(pageId: string, options: PipelineOptions = {}): Promise<PipelineResults> {
   let { tier = 'standard', directions = '', dryRun = false } = options;
 
-  // Determine LLM execution mode: CLI (subscription) vs API-direct (ANTHROPIC_API_KEY)
+  // Determine LLM execution mode: CLI (subscription) vs API-direct (ANTHROPIC_BILLING_KEY)
   setApiDirectMode(options.apiDirect);
 
   // Check wiki server availability upfront so the session log can record if the

@@ -29,7 +29,7 @@ facts:
   - id: f_qM9MOhiX3V
     property: total-assets
     value: "8900000"
-    unit: USD
+    currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990 filing (fiscal year ending Dec 2024, filed Nov 2025). EIN: 77-0119168."
@@ -37,7 +37,7 @@ facts:
   - id: f_h0OSCecsVg
     property: annual-expenses
     value: "1050000"
-    unit: USD
+    currency: USD
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
@@ -45,7 +45,7 @@ facts:
   - id: f_PwmzuTbNLQ
     property: annual-expenses
     value: "1970000"
-    unit: USD
+    currency: USD
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
@@ -53,7 +53,7 @@ facts:
   - id: f_Kfhwhz9Iow
     property: annual-expenses
     value: "2620000"
-    unit: USD
+    currency: USD
     asOf: "2023"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
@@ -61,7 +61,7 @@ facts:
   - id: f_3oG8SogVOI
     property: annual-expenses
     value: "3750000"
-    unit: USD
+    currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "Total functional expenses from Form 990 (fiscal year ending Dec 2024, filed Nov 2025)"
@@ -135,7 +135,7 @@ facts:
   - id: f_StP6Vh4wkV
     property: total-funding
     value: "290000"
-    unit: USD
+    currency: USD
     asOf: "2023"
     source: https://futureoflife.org/grant/foresight-institute-existential-hope/
     notes: "Grant from Future of Life Institute for Existential Hope and Tech Tree Programs, published October 2023"
@@ -143,7 +143,7 @@ facts:
   - id: f_A3gqqlkvOg
     property: revenue
     value: "1601000"
-    unit: USD
+    currency: USD
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990. Growth year as organization expanded into AI safety."
@@ -151,7 +151,7 @@ facts:
   - id: f_TSbd1JsuHw
     property: revenue
     value: "2400000"
-    unit: USD
+    currency: USD
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
@@ -159,7 +159,7 @@ facts:
   - id: f_wYlShSVHlQ
     property: revenue
     value: "3560000"
-    unit: USD
+    currency: USD
     asOf: "2023"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
@@ -167,7 +167,7 @@ facts:
   - id: f_l8DspNqJJw
     property: revenue
     value: "9360000"
-    unit: USD
+    currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990. Significant growth year — nearly tripled from 2023."
@@ -175,7 +175,7 @@ facts:
   - id: f_7mh2tQkFnF
     property: program-service-revenue
     value: "575642"
-    unit: USD
+    currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "Program service revenue from Form 990 (subset of total revenue)"

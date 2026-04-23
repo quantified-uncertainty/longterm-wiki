@@ -1,0 +1,82 @@
+# Entity events for 80,000 Hours (E510)
+# Source: content/docs/knowledge-base/organizations/80000-hours.mdx (### Timeline section)
+entityId: sid_hvg9ecR3nA
+entityDisplayName: 80,000 Hours
+events:
+  - date: "2011"
+    title: Founded at Oxford by Benjamin Todd and William MacAskill
+    eventType: founding
+    significance: major
+    description: Started as a student project; helped establish effective altruism alongside Giving What We Can and CEA.
+
+  - date: "2012"
+    title: First full-time staff hired
+    eventType: milestone
+    significance: moderate
+    description: Organization professionalizes; begins systematic research.
+
+  - date: "2012"
+    title: Co-founded EA movement
+    eventType: milestone
+    significance: major
+    description: Helped establish effective altruism alongside Giving What We Can and CEA.
+
+  - date: "2015"
+    title: Y Combinator acceptance
+    eventType: milestone
+    significance: major
+    description: One of the first nonprofits in YC; gained startup methodology and credibility.
+
+  - date: "2016"
+    title: AI safety becomes top priority
+    eventType: pivot
+    significance: major
+    description: Identified risks from AI as the most pressing problem area.
+
+  - date: "2016"
+    title: Published career guide book
+    eventType: publication
+    significance: moderate
+    description: "80,000 Hours: Find a fulfilling career that does good."
+
+  - date: "2017"
+    title: Podcast launch
+    eventType: launch
+    significance: moderate
+    description: Rob Wiblin begins hosting The 80,000 Hours Podcast.
+
+  - date: "2020"
+    title: Reached 14 FTEs
+    eventType: milestone
+    significance: minor
+    description: Steady organizational growth.
+
+  - date: "2022"
+    title: Leadership transition — Howie Lempel becomes CEO
+    eventType: leadership-change
+    significance: major
+    description: Benjamin Todd moves from CEO to President; Howie Lempel becomes CEO.
+
+  - date: "2022"
+    title: Reached 25 FTEs
+    eventType: milestone
+    significance: moderate
+    description: Organization nearly doubles in size.
+
+  - date: "2024"
+    title: Niel Bowerman appointed CEO
+    eventType: leadership-change
+    significance: major
+    description: Former FHI Assistant Director takes over as CEO.
+
+  - date: "2025"
+    title: Strategic shift to AGI focus announced
+    eventType: pivot
+    significance: major
+    description: Announced focus on navigating transition to powerful AGI.
+
+  - date: "2025-04-01"
+    title: Spin-out from Effective Ventures
+    eventType: pivot
+    significance: major
+    description: Became an independent nonprofit (April 1, 2025).

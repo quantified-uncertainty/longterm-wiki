@@ -1,16 +1,16 @@
 ---
-description: Create an intensive plan for big functionality. Brainstorm, research, red-team, iterate, then post as GitHub Discussion.
+description: Create an intensive plan for big functionality. Brainstorm, research, red-team, iterate, then post as a Linear umbrella (or GitHub Discussion for open-ended strategy RFCs).
 argument-hint: "<feature description>"
 effort: high
 ---
 
 # Intensive Feature Planning
 
-Deep, multi-pass planning process for significant new functionality. Uses ~17 parallel subagents across 7 phases — heavy upfront research, divergent brainstorming, adversarial review with iteration, quality infrastructure planning, and a polished plan posted as a GitHub Discussion.
+Deep, multi-pass planning process for significant new functionality. Uses ~17 parallel subagents across 7 phases — heavy upfront research, divergent brainstorming, adversarial review with iteration, quality infrastructure planning, and a polished plan posted as a **Linear umbrella** with child issues (default) or a GitHub Discussion (only for open-ended strategy RFCs with no concrete implementation phases — see Phase 7c).
 
 **Argument:** `$ARGUMENTS` is the feature description. If empty, ask the user what to plan before proceeding.
 
-**Output:** A GitHub Discussion (epic) with the final plan, Phase 1 issues linked.
+**Output:** A Linear umbrella issue with the final plan as its description, child issues filed per Phase, all linked in the umbrella body. (For RFC-style plans with no concrete phases, a GitHub Discussion may be preferred — rare; default to Linear.)
 
 **Cost:** ~$15-25, 20-40 minutes.
 
@@ -62,7 +62,7 @@ In all agent prompts below, replace `{{FEATURE}}` with this problem statement.
 
 Read all three agent results. Then:
 
-1. **Check for existing plans**: If a GitHub Discussion already has a substantially complete plan for this feature, STOP and ask: "Discussion #N already has a plan for this. Should I update that plan, create a new one, or proceed knowing there's overlap?"
+1. **Check for existing plans**: Search Linear (`pnpm crux linear search "feature keywords"`) AND GitHub Discussions for existing plans. If either has a substantially complete plan for this feature, STOP and ask: "QUA-NNN / Discussion #N already has a plan for this. Should I update that plan, create a new one, or proceed knowing there's overlap?"
 
 2. **Check for prior art**: Does something in the codebase already do 80% of what's needed? List overlapping systems.
 
@@ -288,17 +288,37 @@ Verify before posting:
 - [ ] Document is 10,000-16,000 characters
 - [ ] Sections that don't apply are omitted (not left with placeholder text)
 
-### 7c. Post discussion + create issues
+### 7c. Post umbrella + create children
+
+**Default: Linear umbrella with children.** Concrete multi-phase implementation plans belong in Linear. A GitHub Discussion is only appropriate for open-ended strategy RFCs with no concrete Phase 1 — in that case, skip the umbrella, use `pnpm crux gh epic create` instead, and explain the choice to the user.
+
+Step 1 — create the umbrella (the plan body becomes its description):
 
 ```bash
-pnpm crux gh epic create "[Feature Name] — Implementation Plan" --body-file=/tmp/feature-plan.md
+pnpm crux linear create "Umbrella: [Feature Name]" \
+    --description-file=/tmp/feature-plan.md \
+    --project="<project name from linear-project-ownership.md>" \
+    --priority=2
+# → captures QUA-NNN for the umbrella; reuse it for --parent below
 ```
 
-Create Linear issues for Phase 1 tasks:
+Step 2 — file each Phase's child issues with `--parent=QUA-NNN`. At minimum, file Phase 1 tasks. Prefer one child per 1-3 session chunk, not per atomic task:
 
 ```bash
-pnpm crux linear create "Task title" --description="..."
+pnpm crux linear create "Phase 1: <task>" \
+    --description-file=/tmp/phase1-a.md \
+    --project="<same project>" \
+    --priority=2 \
+    --parent=QUA-NNN
 ```
+
+Step 3 — if the umbrella has a sibling epic (e.g. this plan complements QUA-544), post a comment on the sibling:
+
+```bash
+pnpm crux linear comment QUA-544 "Sibling: QUA-NNN tracks [complementary axis]. See [link]."
+```
+
+Project picking: follow `.claude/rules/linear-project-ownership.md`. If unsure, ask the user.
 
 ### 7d. CHECKPOINT 3 — Final report
 
@@ -307,7 +327,7 @@ Print:
 ═══════════════════════════════════════════
   PLAN COMPLETE
 ═══════════════════════════════════════════
-  Discussion: [URL]
+  Umbrella:   QUA-NNN — [URL]
   Approach:   [3-4 sentence summary]
   Phases:     [N] ([Phase 1 title] is ready to start)
   Issues:     [Phase 1 issue URLs]
@@ -323,7 +343,7 @@ Print:
 ## Error Handling
 
 - **Subagent returns empty/fails**: Note the gap and continue. Do not block on one failed agent — the other parallel agents provide redundancy.
-- **`crux gh epic create` fails**: Write the plan URL-encoded to `/tmp/feature-plan.md` (already done) and tell the user: "Discussion creation failed. Plan saved to `/tmp/feature-plan.md`. Create manually with `pnpm crux gh epic create 'Title' --body-file=/tmp/feature-plan.md`."
+- **`crux linear create` fails**: Plan is already at `/tmp/feature-plan.md`. Tell the user: "Umbrella creation failed. Plan saved to `/tmp/feature-plan.md`. Create manually with `pnpm crux linear create 'Umbrella: Title' --description-file=/tmp/feature-plan.md --project=<name> --priority=2`."
 - **WebSearch returns garbage**: Note "no actionable results" and skip the External Inspiration section.
 - **User doesn't respond at Checkpoint 2**: After presenting the comparison table, wait for the user. If they send a follow-up message that doesn't choose approaches, remind them: "Which approaches should I investigate? Pick 1-2 from the table, or tell me what's missing."
 
@@ -346,5 +366,5 @@ All agents within a phase run in parallel. Sequential between phases. 3 user che
 ## Guardrails
 
 - **Intermediate artifacts**: Write `/tmp/plan-feature-research.md` after Phase 1 and `/tmp/feature-plan-draft.md` before red team. If the session dies, the user has something to resume from.
-- **Plans are living documents**: The Discussion can be updated during implementation. But Phase 1 must be concrete enough to start without ambiguity.
+- **Plans are living documents**: The Linear umbrella's description can be edited during implementation (via Linear UI or API). But Phase 1 must be concrete enough to start without ambiguity.
 - **No implementation in this skill**: Plan only. Implementation in separate sessions via `/agent-init`.

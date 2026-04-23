@@ -38,23 +38,29 @@ Port 3001 belongs to the user's main dev server (`lw/main`). Agents must use the
 
 Agent slots (`lw/a1`–`lw/a20`) do **not** run a local wiki-server. The `.env` file points `LONGTERMWIKI_SERVER_URL` at `localhost:3113`, which is never running in slots.
 
-**Every `pnpm crux` command that hits the wiki-server API MUST use `WIKI_SERVER_ENV=prod`:**
+**As of QUA-616, crux auto-detects slot CWD and forces `WIKI_SERVER_ENV=prod`** — you don't need the prefix anymore:
 
 ```bash
-# CORRECT — always do this in agent slots:
-WIKI_SERVER_ENV=prod pnpm crux tb ids allocate my-slug
-WIKI_SERVER_ENV=prod pnpm crux query search "anthropic"
-WIKI_SERVER_ENV=prod pnpm crux context for-page anthropic
-WIKI_SERVER_ENV=prod pnpm crux fb source-check --entity=anthropic
-
-# WRONG — will fail with "Wiki server is not reachable":
+# Works now — slot CWD auto-selects the prod wiki-server:
 pnpm crux tb ids allocate my-slug
 pnpm crux query search "anthropic"
+pnpm crux context for-page anthropic
+pnpm crux fb source-check --entity=anthropic
+
+# Explicit prefix still works and overrides auto-detection:
+WIKI_SERVER_ENV=prod pnpm crux tb ids allocate my-slug
+
+# Escape hatch — force local from inside a slot (e.g. testing a local wiki-server on port 3113):
+WIKI_SERVER_ENV=local pnpm crux tb ids allocate my-slug
 ```
 
-**Commands that need `WIKI_SERVER_ENV=prod`:** `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb source-check`, `w source-check-wiki-pages`, `sys` commands, `gh` commands that fetch server data, and anything that fails with "Wiki server is not reachable".
+**How auto-detection works:** `getEnvPrefix()` in `crux/lib/wiki-server/client.ts` walks ancestors of `process.cwd()` looking for an `a<N>` directory (the slot root). If it finds one and `WIKI_SERVER_ENV` is unset, it selects the `PROD_` prefix so all wiki-server calls read `PROD_LONGTERMWIKI_SERVER_URL` and `PROD_LONGTERMWIKI_SERVER_API_KEY` from `.env.base`.
 
-**Commands that do NOT need it:** `w validate gate`, `build-data`, `w fix escaping`, `w fix markdown` — these are local-only.
+**Fail-loud on DB write failure (QUA-617):** `pnpm crux sys agent-checklist init` now exits 3 with a red warning if the `agent_sessions` row couldn't be written (e.g. prod is down, `PROD_LONGTERMWIKI_SERVER_URL` is unset). A ghost session is invisible to dispatcher dedup (QUA-406 risk) + ship-time sync-session, so the operator must see this at init-time. To continue anyway: `pnpm crux sys agent-checklist init ... --allow-offline`.
+
+**Commands that hit the wiki-server:** `tb ids allocate`, `query search`, `context for-page`, `context for-issue`, `fb source-check`, `w source-check-wiki-pages`, `sys` commands, `gh` commands that fetch server data.
+
+**Commands that do NOT hit the wiki-server:** `w validate gate`, `build-data`, `w fix escaping`, `w fix markdown` — these are local-only.
 
 ## LSP support (recommended)
 

@@ -25,7 +25,7 @@ facts:
   - id: f_vZve8M0opl
     property: grant-received
     value: "1635000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant: $1,635,000 for general support"
@@ -33,7 +33,7 @@ facts:
   - id: f_BTIfaFnsU8
     property: grant-received
     value: "142000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant: $142,000 for general support"

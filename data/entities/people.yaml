@@ -7798,3 +7798,69 @@
   stableId: sid_CT0Hmqs1wT
   type: person
   title: Juan Vazquez
+# QUA-625 — lightweight person entities for FactBase person-ref conversion
+- id: matthias-spielkamp
+  stableId: sid_VRavbPajC3
+  type: person
+  title: Matthias Spielkamp
+  description: Co-founder of AlgorithmWatch.
+- id: lorena-jaume-palasi
+  stableId: sid_xZdLyLORAZ
+  type: person
+  title: Lorena Jaume-Palasi
+  description: Co-founder of AlgorithmWatch.
+- id: lorenz-matzat
+  stableId: sid_g9Ytmyy1VI
+  type: person
+  title: Lorenz Matzat
+  description: Co-founder of AlgorithmWatch.
+- id: katharina-anna-zweig
+  stableId: sid_gIDwNGCgo9
+  type: person
+  title: Katharina Anna Zweig
+  description: Co-founder of AlgorithmWatch.
+- id: jasmine-wang
+  stableId: sid_pCK0MVa6qa
+  type: person
+  title: Jasmine Wang
+  description: Co-founder of the Collective Intelligence Project.
+- id: sneha-revanur
+  stableId: sid_CROBNnPrIr
+  type: person
+  title: Sneha Revanur
+  description: Founder of Encode Justice.
+- id: christoph-winter
+  stableId: sid_4I7XUhwlqE
+  type: person
+  title: Christoph Winter
+  description: Founder of the Legal Priorities Project.
+- id: jerry-taylor
+  stableId: sid_W8fJ41OdQH
+  type: person
+  title: Jerry Taylor
+  description: Founder of the Niskanen Center.
+- id: joep-meindertsma
+  stableId: sid_iTaXQVJY8K
+  type: person
+  title: Joep Meindertsma
+  description: Founder of PauseAI.
+- id: nicolas-miailhe
+  stableId: sid_znc8lhHNf9
+  type: person
+  title: Nicolas Miailhe
+  description: Co-founder of The Future Society.
+- id: simon-mueller
+  stableId: sid_Y6Ge9jQiet
+  type: person
+  title: Simon Mueller
+  description: Co-founder of The Future Society.
+- id: ionuts-lacusta
+  stableId: sid_UXgAQQLWOQ
+  type: person
+  title: Ionuts Lacusta
+  description: Co-founder of The Future Society.
+- id: hugo-zylberberg
+  stableId: sid_AYpMv9sXg3
+  type: person
+  title: Hugo Zylberberg
+  description: Co-founder of The Future Society.

@@ -1762,7 +1762,9 @@ export async function fetchResourcesFromPG() {
       if (rows.length < limit) break;
     }
 
-    // Fetch bulk citation index (resourceId -> pageIds[])
+    // Accept either stable_id-keyed (post-QUA-602) or hex16-keyed (pre-deploy
+    // window) citation indexes, so the build keeps working while the PR that
+    // changes the endpoint response shape is in flight.
     try {
       const citResp = await fetch(
         `${serverUrl}/api/resources/citations/all`,
@@ -1772,7 +1774,7 @@ export async function fetchResourcesFromPG() {
         const citData = await citResp.json();
         const citations = citData.citations || {};
         for (const r of allResources) {
-          const pages = citations[r.id];
+          const pages = (r.stable_id && citations[r.stable_id]) || citations[r.id];
           if (pages && pages.length > 0) {
             r.cited_by = pages;
           }
@@ -1865,6 +1867,12 @@ export async function fetchEntityResourceLinks() {
     }
     const data = await resp.json();
     const items = data.items || [];
+    if (data.truncated) {
+      logWikiServerWarning(
+        'entityResourceLinks',
+        `export truncated at ${data.limit ?? items.length} rows — raise EXPORT_LIMIT in entity-resources.ts or add cursor pagination`,
+      );
+    }
 
     // Group by entityId
     const grouped = {};

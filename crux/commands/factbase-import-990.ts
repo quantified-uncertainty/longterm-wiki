@@ -143,7 +143,7 @@ async function fetchOrganization(ein: string): Promise<ProPublicaOrg> {
 
 // ── Fact extraction ───────────────────────────────────────────────────
 
-function extractFinancialFacts(
+export function extractFinancialFacts(
   _entityId: string,
   org: ProPublicaOrg,
 ): FinancialFact[] {
@@ -151,29 +151,68 @@ function extractFinancialFacts(
   const sourceUrl = `${PROPUBLICA_PAGE_BASE}/${ein}`;
   const facts: FinancialFact[] = [];
 
-  for (const filing of org.filings_with_data) {
-    const year = String(filing.tax_prd_yr);
+  // Deduplicate filings by (tax_prd_yr, tax_prd) — ProPublica occasionally
+  // returns multiple filings for the same tax period (e.g. amended return
+  // filed twice, or a duplicate API record). Without this dedup, two filings
+  // with identical period produce identical asOf values and emit duplicate
+  // (property, asOf) facts that both get written, polluting the FactBase
+  // time series. (CodeRabbit review on PR #4538 — the bug shipped duplicate
+  // 2012 facts to ford-foundation.yaml and 2017 facts to protect-democracy.yaml.)
+  // Keep the first occurrence per (year, period) — order from ProPublica is
+  // newest-first, so the most recent revision wins ties.
+  const seenPeriod = new Set<string>();
+  const dedupedFilings: typeof org.filings_with_data = [];
+  for (const f of org.filings_with_data) {
+    const periodKey = `${f.tax_prd_yr}::${f.tax_prd}`;
+    if (seenPeriod.has(periodKey)) continue;
+    seenPeriod.add(periodKey);
+    dedupedFilings.push(f);
+  }
+
+  // Detect years with multiple filings (e.g. amended returns, fiscal-year
+  // transitions). For single-filing years, keep the simpler `YYYY` asOf to
+  // match existing data conventions; for multi-filing years, disambiguate
+  // with `YYYY-MM` derived from `tax_prd` so each filing gets a unique key.
+  const yearCounts = new Map<number, number>();
+  for (const f of dedupedFilings) {
+    yearCounts.set(f.tax_prd_yr, (yearCounts.get(f.tax_prd_yr) ?? 0) + 1);
+  }
+
+  for (const filing of dedupedFilings) {
     const einFormatted = formatEin(ein);
+    const year = String(filing.tax_prd_yr);
+    const asOf = (yearCounts.get(filing.tax_prd_yr) ?? 1) > 1
+      ? formatTaxPeriod(filing.tax_prd)
+      : year;
+    const periodNote = asOf === year
+      ? `tax year ${year}`
+      : `tax year ${year}, period ending ${asOf}`;
 
     // Revenue
     if (filing.totrevenue != null && filing.totrevenue !== 0) {
       facts.push({
         property: 'revenue',
         value: filing.totrevenue,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for tax year ${year}.`,
+        notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for ${periodNote}.`,
       });
     }
 
-    // Expenses
-    if (filing.totfuncexpns != null && filing.totfuncexpns !== 0) {
+    // Expenses — emit even when 0 (e.g., newly-formed foundations that
+    // received funds but haven't spent them yet). Skipping 0 caused
+    // future-of-life-foundation 2022 to ship without an annual-expenses
+    // fact while neighbours had it (CodeRabbit review on PR #4538).
+    if (filing.totfuncexpns != null) {
+      const expenseNote = filing.totfuncexpns === 0
+        ? `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for ${periodNote} reported as $0 (no operational spending in this period).`
+        : `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for ${periodNote}.`;
       facts.push({
         property: 'annual-expenses',
         value: filing.totfuncexpns,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for tax year ${year}.`,
+        notes: expenseNote,
       });
     }
 
@@ -182,14 +221,19 @@ function extractFinancialFacts(
       facts.push({
         property: 'net-assets',
         value: filing.totnetassetend,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for tax year ${year}.`,
+        notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for ${periodNote}.`,
       });
     }
   }
 
   return facts;
+}
+
+function formatTaxPeriod(taxPrd: number): string {
+  const s = String(taxPrd).padStart(6, '0');
+  return `${s.slice(0, 4)}-${s.slice(4, 6)}`;
 }
 
 function formatEin(ein: string): string {

@@ -127,5 +127,3 @@ export const pipelineArtifactsRule = {
     return issues;
   },
 };
-
-export default pipelineArtifactsRule;

@@ -1,0 +1,49 @@
+# Entity events for Anthropic (E22)
+# Source: content/docs/knowledge-base/organizations/anthropic.mdx (## History section)
+entityId: sid_mK9pX3rQ7n
+entityDisplayName: Anthropic
+events:
+  - date: "2020-12"
+    title: Founded by 7 ex-OpenAI researchers
+    eventType: founding
+    significance: major
+    description: Dario Amodei (CEO), Daniela Amodei (President), Chris Olah, Tom Brown, Jack Clark, Jared Kaplan, and Sam McCandlish departed OpenAI over disagreement about scaling vs. alignment priorities.
+
+  - date: "2021"
+    title: Series A led by Jaan Tallinn at $550M pre-money valuation
+    eventType: funding
+    significance: major
+    description: Skype co-founder Jaan Tallinn reportedly led the Series A. Dustin Moskovitz also participated in seed and Series A rounds.
+
+  - date: "2022"
+    title: FTX invests ~$500M
+    eventType: funding
+    significance: major
+    description: FTX reportedly invested approximately $500M in Anthropic in 2022 according to multiple news accounts.
+
+  - date: "2024-12"
+    title: Run-rate revenue ~$1B
+    eventType: milestone
+    significance: major
+    description: Beginning-of-2025 run-rate revenue figure reported as approximately $1B.
+
+  - date: "2025-07"
+    title: Annualized revenue $4B
+    eventType: milestone
+    significance: major
+
+  - date: "2025-12"
+    title: Run-rate revenue exceeds $9B
+    eventType: milestone
+    significance: major
+
+  - date: "2026-02"
+    title: Run-rate revenue reaches $14B
+    eventType: milestone
+    significance: major
+
+  - date: "2026-03"
+    title: Run-rate revenue reaches ~$19B
+    eventType: milestone
+    significance: major
+    description: Reportedly targeting $20-26B annualized revenue for 2026, with bull-case projections reaching up to $70B by 2028.

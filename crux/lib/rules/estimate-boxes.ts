@@ -52,5 +52,3 @@ export const estimateBoxesRule = createRule({
     return issues;
   },
 });
-
-export default estimateBoxesRule;

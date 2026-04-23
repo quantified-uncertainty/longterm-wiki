@@ -15,6 +15,7 @@ import {
   type LinearChildrenResult,
   type LinearTriageIssue,
 } from './issues.ts';
+import { isOpenStateType } from './workflow-states.ts';
 
 export type AuditBucket =
   | 'active'
@@ -50,7 +51,6 @@ interface GhSearchResponse {
 }
 
 export const STALE_DAYS = 7;
-const RESOLVED_STATE_TYPES = new Set(['completed', 'canceled']);
 
 /**
  * Label that opts an issue out of `audit --fix` auto-closure regardless of PR
@@ -218,9 +218,7 @@ export function classifyEntry(
 ): AuditEntry {
   const { openPRs, mergedPRs } = classifyPRs(items);
   const children = childrenResult.nodes;
-  const unresolvedChildren = children.filter(
-    (c) => !RESOLVED_STATE_TYPES.has(c.state.type),
-  );
+  const unresolvedChildren = children.filter((c) => isOpenStateType(c.state.type));
   const daysInactive = daysSince(issue.updatedAt);
 
   let bucket: AuditBucket;

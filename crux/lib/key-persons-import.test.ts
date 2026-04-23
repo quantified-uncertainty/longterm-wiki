@@ -124,10 +124,14 @@ describe('syncKeyPersons', () => {
       },
     ];
 
-    // Set a fake server URL so syncKeyPersons doesn't throw
+    // Set a fake server URL so syncKeyPersons doesn't throw.
+    // Also opt out of slot auto-detection (QUA-616) so the env-var here is
+    // actually the one getServerUrl reads, regardless of CWD.
     const envKey = 'LONGTERMWIKI_SERVER_URL';
     const originalUrl = process.env[envKey];
+    const originalWikiServerEnv = process.env.WIKI_SERVER_ENV;
     process.env[envKey] = 'http://fake-server-for-test:9999';
+    process.env.WIKI_SERVER_ENV = 'local';
 
     try {
       const result = await syncKeyPersons(items, true);
@@ -138,6 +142,11 @@ describe('syncKeyPersons', () => {
         delete process.env[envKey];
       } else {
         process.env[envKey] = originalUrl;
+      }
+      if (originalWikiServerEnv === undefined) {
+        delete process.env.WIKI_SERVER_ENV;
+      } else {
+        process.env.WIKI_SERVER_ENV = originalWikiServerEnv;
       }
       logSpy.mockRestore();
     }

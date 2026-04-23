@@ -31,7 +31,7 @@ facts:
   - id: f_ZGICR7QweU
     property: grant-received
     value: "2800000"
-    unit: USD
+    currency: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/centre-for-the-governance-of-ai-general-support-2/
     notes: "Open Philanthropy general support grant, 2023. Original URL now redirects to coefficientgiving.org."
@@ -39,7 +39,7 @@ facts:
   - id: f_scQniXpfbB
     property: grant-received
     value: "2500000"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://www.openphilanthropy.org/grants/govai-general-support-2024/
     notes: "Open Philanthropy general support grant, 2024"
@@ -47,7 +47,7 @@ facts:
   - id: f_MSACv166LQ
     property: grant-received
     value: "2995207"
-    unit: USD
+    currency: USD
     asOf: 2025-02
     source: https://www.openphilanthropy.org/grants/govai-general-support-february-2025/
     notes: "Open Philanthropy general support grant, February 2025"
@@ -55,7 +55,7 @@ facts:
   - id: f_jrvBLfs2yz
     property: grant-received
     value: "756000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant for general support"
@@ -161,7 +161,7 @@ facts:
   - id: f_FkWciW5Lpa
     property: total-funding
     value: "13300000"
-    unit: USD
+    currency: USD
     asOf: 2025
     source: https://www.openphilanthropy.org/grants/?q=govai
     notes: "Total identified Open Philanthropy/Coefficient Giving funding ~$13.3M+ across multiple grants 2020-2025"
@@ -169,7 +169,7 @@ facts:
   - id: f_N5d3TF1C6Q
     property: revenue
     value: "5748996"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/994000294
     notes: "From IRS Form 990 for the US entity (Centre for the Governance of AI Inc, EIN 99-4000294). First year of US filing; tax-exempt since September 2024. Nearly all revenue ($5.73M) from contributions."
@@ -177,7 +177,7 @@ facts:
   - id: f_vBDNosn0YQ
     property: annual-expenses
     value: "919661"
-    unit: USD
+    currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/994000294
     notes: "From IRS Form 990 for the US entity only. The UK entity (Companies House #15883729) has separate finances. Total organizational spending is significantly higher."

@@ -46,3 +46,63 @@ facts:
     value: https://en.wikipedia.org/wiki/Alignment_Research_Center
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
+  - id: f_vNukAYYT8A
+    property: revenue
+    value: 10043597
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total revenue for tax year 2023.
+  - id: f_wOiC8VTV2w
+    property: annual-expenses
+    value: 6272135
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total functional expenses for tax
+      year 2023.
+  - id: f_sXYzCAAXNQ
+    property: net-assets
+    value: 7134612
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). End-of-year net assets for tax year
+      2023.
+  - id: f_tq3MdTDkPQ
+    property: revenue
+    value: 4466022
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total revenue for tax year 2022.
+  - id: f_1Jej228AjA
+    property: annual-expenses
+    value: 1425170
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total functional expenses for tax
+      year 2022.
+  - id: f_PvevL6qDhg
+    property: net-assets
+    value: 3363150
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). End-of-year net assets for tax year
+      2022.
+  - id: f_68QtYWFwVg
+    property: revenue
+    value: 475650
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total revenue for tax year 2021.
+  - id: f_7tlA7bBpUQ
+    property: annual-expenses
+    value: 153352
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). Total functional expenses for tax
+      year 2021.
+  - id: f_mMqfjxaYMg
+    property: net-assets
+    value: 322298
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/863605182
+    notes: From IRS Form 990 (EIN 86-3605182). End-of-year net assets for tax year
+      2021.

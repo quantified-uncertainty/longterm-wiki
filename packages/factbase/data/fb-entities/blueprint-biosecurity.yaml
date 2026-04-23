@@ -2,8 +2,30 @@ entity: sid_lZRKSfs5wg
 facts:
   - id: f_KviVbST13g
     property: description
-    value: An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett, dedicated to achieving breakthroughs in
-      pandemic prevention through far-UVC germicidal light, next-generation PPE, and glycol vapor air disinfection.
-      Funded primarily by Open Philanthropy (~$1.85M) and recommended by Founders Pledge.
+    value: An EA-funded biosecurity nonprofit founded in 2023 by Jake Swett,
+      dedicated to achieving breakthroughs in pandemic prevention through
+      far-UVC germicidal light, next-generation PPE, and glycol vapor air
+      disinfection. Funded primarily by Open Philanthropy (~$1.85M) and
+      recommended by Founders Pledge.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: f_tsdMtBA9Gg
+    property: revenue
+    value: 2583112
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/932385426
+    notes: From IRS Form 990 (EIN 93-2385426). Total revenue for tax year 2023.
+  - id: f_3OtT7bMHPQ
+    property: annual-expenses
+    value: 565528
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/932385426
+    notes: From IRS Form 990 (EIN 93-2385426). Total functional expenses for tax
+      year 2023.
+  - id: f_ti6b2Q29kg
+    property: net-assets
+    value: 2017584
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/932385426
+    notes: From IRS Form 990 (EIN 93-2385426). End-of-year net assets for tax year
+      2023.

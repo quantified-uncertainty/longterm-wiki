@@ -31,6 +31,7 @@ import { commands as dataSourcesCommands } from './data-sources.ts';
 import { commands as websiteSourcesCommands } from './website-sources.ts';
 import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 import { commands as setupOrgCommands } from './setup-org.ts';
+import { commands as tbImporterCommands } from './tb-importers/index.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -455,6 +456,11 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
     params.set('skipEntityValidationReason', reason);
   }
   if (tableConfig.requireSourcing) params.set('requireSourcing', 'true');
+  if (options.skipSourcing) {
+    // forceSkipSourcing bypasses server-side sourcing enforcement (used when source URLs aren't cached yet)
+    params.set('forceSkipSourcing', 'true');
+    params.set('reason', 'cli: --skip-sourcing flag set by caller');
+  }
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
@@ -1466,6 +1472,7 @@ export const commands = {
   'import-grants-download': importGrantsCommands.download,
   'import-divisions': importDivisionsCommands.default,
   'import-divisions-sync': importDivisionsCommands.sync,
+  'import-divisions-delete-orphans': importDivisionsCommands['delete-orphans'],
   'import-funding-programs': importFundingProgramsCommands.default,
   'import-funding-programs-sync': importFundingProgramsCommands.sync,
   // Market data commands
@@ -1487,6 +1494,10 @@ export const commands = {
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
   'setup-org': setupOrgCommands.default,
+  // QUA-640: T1 authoritative-source importers.
+  'sec-edgar': tbImporterCommands['sec-edgar'],
+  'github-contributors': tbImporterCommands['github-contributors'],
+  'hf-leaderboard': tbImporterCommands['hf-leaderboard'],
 };
 
 export function getHelp(): string {
@@ -1533,6 +1544,11 @@ Commands:
   data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
   data-sources-health         Check mapping validity, staleness
 
+  T1 importers (QUA-640 — defensive enrichment):
+  sec-edgar           Fetch SEC EDGAR Form D → funding-rounds (--target=slug:cik)
+  github-contributors Fetch GitHub contributors → personnel hints (--target=slug:owner/repo[,owner/repo2])
+  hf-leaderboard      Fetch HF Open LLM Leaderboard → benchmark-results (--target=modelSlug:displayName:evalName)
+
   Website Sources:
   website-sources             Show website source help
   website-sources-list        List all registered website sources
@@ -1565,7 +1581,7 @@ Options:
   --ci                      JSON output
 
 Modes:
-  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_API_KEY, ~$1-2/task)
+  API mode:          crux tb tablebase improve / loop (uses ANTHROPIC_BILLING_KEY, ~$1-2/task)
   Subscription mode: /tablebase-enrich skill in Claude Code ($0, uses subscription)
 
 Task Types:

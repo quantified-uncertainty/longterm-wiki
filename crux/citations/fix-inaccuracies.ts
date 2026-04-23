@@ -40,7 +40,7 @@ import yaml from 'js-yaml';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { findPageFile } from '../lib/file-utils.ts';
-import { stripFrontmatter, escapeDollarDigits } from '../lib/patterns.ts';
+import { stripFrontmatter, escapeDollarDigits, FOOTNOTE_REF_ANY_RE } from '../lib/patterns.ts';
 import { callOpenRouter, stripCodeFences, DEFAULT_CITATION_MODEL, checkClaimAccuracy } from '../lib/quote-extractor.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { appendEditLog } from '../lib/session/edit-log.ts';
@@ -956,37 +956,221 @@ const SHRINK_EXEMPT_ACTIONS: ReadonlySet<FixAction> = new Set(['remove_ref', 're
 /** Minimum length ratio (replacement/original) allowed for non-shrink-exempt actions. */
 const SHRINK_MIN_RATIO = 0.4;
 
+/**
+ * Minimum replacement length (chars, whitespace-normalized) before the
+ * context-bleed check fires. Below this, collisions are likely on short
+ * phrases/names that legitimately repeat across a page.
+ */
+const CONTEXT_BLEED_MIN_LEN = 40;
+
+/**
+ * Matches a single-line list bullet with a bolded label followed by a colon:
+ *   `- **Label**: description[^ref]`
+ * Captures the prefix (`- **Label**:`) and the content after the colon.
+ *
+ * Intentionally no `/s` flag: if `original` spans multiple bullets we do not
+ * check structure here — a greedy `.*` with `/s` would eat neighboring bullets
+ * and hide genuine emptiness of the first one. Multi-line originals simply
+ * fall through this filter.
+ */
+const LIST_BULLET_LABEL_RE = /^(\s*-\s+\*\*[^*]+\*\*:)(.*)$/;
+
 /** Count preserved component tags in a string. */
 export function countPreservedComponents(s: string): number {
   const matches = s.match(PRESERVED_COMPONENT_RE);
   return matches ? matches.length : 0;
 }
 
+/** Collapse all whitespace runs to a single space and trim. */
+function normalizeWhitespace(s: string): string {
+  return s.replace(/\s+/g, ' ').trim();
+}
+
+/** Strip all footnote markers (`[^NN]`, including non-numeric IDs) from a string. */
+function stripFootnoteMarkers(s: string): string {
+  return s.replace(FOOTNOTE_REF_ANY_RE, '');
+}
+
+export type RejectionReason =
+  | 'component-drop'
+  | 'shrink'
+  | 'remove-ref-scope'
+  | 'mdx-structure'
+  | 'context-bleed'
+  | 'span-overlap';
+
 export interface FilteredProposals {
   kept: FixProposal[];
   rejected: Array<{
     proposal: FixProposal;
-    reason: 'component-drop' | 'shrink';
+    reason: RejectionReason;
     detail: string;
   }>;
   escapedCount: number;
 }
 
 /**
- * Apply proposal quality filters post-parse:
- *   1. Escape bare `$digit` → `\$digit` in the replacement (non-rejecting).
- *   2. Reject proposals that drop a preserved component (<EntityLink>, <F>, etc.).
- *   3. Reject proposals with len(replacement) < SHRINK_MIN_RATIO * len(original),
- *      unless fixType is in SHRINK_EXEMPT_ACTIONS.
+ * For fixType=remove_ref, check that the replacement equals the original with
+ * only `[^NN]` markers removed. Any other text modification indicates the LLM
+ * went beyond the intended scope of removing a citation marker.
  *
- * See QUA-349 for the dry-run evidence that motivated each filter.
+ * Returns null if the replacement is within scope, otherwise a human-readable
+ * description of the extra mutation. Whitespace is normalized on both sides
+ * because removing `[^5]` in `"foo[^5] bar"` leaves `"foo bar"` (one space) vs
+ * `"foo  bar"` (two spaces), and either is fine.
  */
-export function filterProposals(proposals: FixProposal[]): FilteredProposals {
+function checkRemoveRefScope(p: FixProposal): string | null {
+  if (p.fixType !== 'remove_ref') return null;
+  const expected = normalizeWhitespace(stripFootnoteMarkers(p.original));
+  const actual = normalizeWhitespace(stripFootnoteMarkers(p.replacement));
+  if (expected !== actual) {
+    return `remove_ref must strip only [^NN] markers; replacement differs from original after stripping markers`;
+  }
+  return null;
+}
+
+/**
+ * If the original is a list bullet with a bolded label + colon + content
+ * (e.g. `- **GJO Calibration App**: Tools for forecaster training[^37]`),
+ * and the replacement leaves the content portion empty (only footnote markers
+ * or whitespace after the colon), the MDX now renders as a dangling bullet.
+ *
+ * Only fires when both the original and replacement match the list-bullet
+ * shape — otherwise shrink/component-drop filters handle it.
+ */
+function checkMdxStructure(p: FixProposal): string | null {
+  const origMatch = p.original.match(LIST_BULLET_LABEL_RE);
+  if (!origMatch) return null;
+
+  const origContent = stripFootnoteMarkers(origMatch[2]).trim();
+  if (origContent.length === 0) return null;
+
+  const replMatch = p.replacement.match(LIST_BULLET_LABEL_RE);
+  if (!replMatch) return null;
+
+  const replContent = stripFootnoteMarkers(replMatch[2]).trim();
+  if (replContent.length === 0) {
+    return `replacement leaves empty content after list label "${origMatch[1].trim()}"`;
+  }
+  return null;
+}
+
+/**
+ * Detect "context bleed" — when the LLM fills the replacement with text it
+ * pulled verbatim from a neighboring sentence in the same page, producing
+ * duplicate content after apply.
+ *
+ * Strategy: split the page on every occurrence of `original` (masking ALL
+ * copies, not just the first), then check each remaining segment
+ * independently for the whitespace-normalized replacement. Per-segment
+ * checking avoids false positives across the boundary between before/after
+ * when the replacement happens to span what would otherwise be a joined gap.
+ *
+ * Replacements shorter than CONTEXT_BLEED_MIN_LEN are skipped to avoid false
+ * positives on short phrases or entity names.
+ */
+function checkContextBleed(p: FixProposal, pageContent: string): string | null {
+  const normalized = normalizeWhitespace(p.replacement);
+  if (normalized.length < CONTEXT_BLEED_MIN_LEN) return null;
+  if (!pageContent.includes(p.original)) return null;
+
+  for (const seg of pageContent.split(p.original)) {
+    if (normalizeWhitespace(seg).includes(normalized)) {
+      return `replacement appears verbatim elsewhere in the page (context-bleed)`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Deduplicate proposals whose `original` spans overlap in the page. The LLM
+ * often produces multiple proposals that target the same paragraph lead-in
+ * (different footnotes in the same sentence), but `applyFixes` uses
+ * content.indexOf and only the first wins — so emitting all of them inflates
+ * the clean-proposal count without increasing apply yield.
+ *
+ * Keeps the first proposal (LLM output order is priority-ranked). Later
+ * proposals whose span intersects an already-claimed span are rejected as
+ * `span-overlap`.
+ *
+ * Proposals whose `original` is not located in the page are passed through
+ * unchanged (they will fail later in `applyFixes`, which is a distinct
+ * failure mode, not a dedup issue).
+ *
+ * Note on non-unique originals: both this function and `applyFixes` use
+ * `pageContent.indexOf(p.original)`, so two proposals sharing the same
+ * `original` string map to the same first-occurrence span. The second is
+ * rejected as `span-overlap`, matching the reality that `applyFixes` could
+ * only have patched one of them anyway.
+ */
+function dedupBySpan(
+  proposals: FixProposal[],
+  pageContent: string,
+): { deduped: FixProposal[]; dropped: FilteredProposals['rejected'] } {
+  const deduped: FixProposal[] = [];
+  const dropped: FilteredProposals['rejected'] = [];
+  const claimed: Array<{ start: number; end: number }> = [];
+
+  for (const p of proposals) {
+    const start = pageContent.indexOf(p.original);
+    if (start === -1) {
+      deduped.push(p);
+      continue;
+    }
+    const end = start + p.original.length;
+    const overlap = claimed.find((c) => start < c.end && end > c.start);
+    if (overlap) {
+      dropped.push({
+        proposal: p,
+        reason: 'span-overlap',
+        detail: `span [${start},${end}) overlaps claimed [${overlap.start},${overlap.end})`,
+      });
+    } else {
+      deduped.push(p);
+      claimed.push({ start, end });
+    }
+  }
+
+  return { deduped, dropped };
+}
+
+/**
+ * Apply proposal quality filters post-parse. `pageContent` enables the two
+ * page-aware checks (context-bleed, span-overlap); without it they are
+ * skipped.
+ *
+ * Per-proposal filter order:
+ *   1. Escape bare `$digit` → `\$digit` (non-rejecting, lossless).
+ *   2. Drop if a preserved component (`<EntityLink>`, `<F>`, ...) is lost.
+ *   3. Drop if replacement shrinks below SHRINK_MIN_RATIO unless fixType is in
+ *      SHRINK_EXEMPT_ACTIONS.
+ *   4. Drop if fixType=remove_ref mutates anything beyond footnote markers.
+ *   5. Drop if the MDX list-bullet structure collapses to an empty bullet.
+ *   6. Drop if the replacement duplicates content from elsewhere in the page.
+ *
+ * Batch-wide step (runs first when pageContent is provided):
+ *   - Drop proposals whose `original` span overlaps an earlier-listed
+ *     proposal's span in the page.
+ *
+ * See QUA-349 (filters 1–3) and QUA-588 (filters 4–6 + dedup) for the
+ * dry-run evidence that motivated each filter.
+ */
+export function filterProposals(
+  proposals: FixProposal[],
+  pageContent?: string,
+): FilteredProposals {
   const kept: FixProposal[] = [];
   const rejected: FilteredProposals['rejected'] = [];
   let escapedCount = 0;
 
-  for (const raw of proposals) {
+  let candidates = proposals;
+  if (pageContent !== undefined) {
+    const { deduped, dropped } = dedupBySpan(proposals, pageContent);
+    candidates = deduped;
+    for (const d of dropped) rejected.push(d);
+  }
+
+  for (const raw of candidates) {
     const escaped = escapeDollarDigits(raw.replacement);
     const p: FixProposal = escaped === raw.replacement ? raw : { ...raw, replacement: escaped };
     if (escaped !== raw.replacement) escapedCount++;
@@ -1010,6 +1194,26 @@ export function filterProposals(proposals: FixProposal[]): FilteredProposals {
           reason: 'shrink',
           detail: `replacement is ${Math.round(ratio * 100)}% of original length (min ${Math.round(SHRINK_MIN_RATIO * 100)}% for fixType=${p.fixType})`,
         });
+        continue;
+      }
+    }
+
+    const refScopeIssue = checkRemoveRefScope(p);
+    if (refScopeIssue) {
+      rejected.push({ proposal: p, reason: 'remove-ref-scope', detail: refScopeIssue });
+      continue;
+    }
+
+    const structureIssue = checkMdxStructure(p);
+    if (structureIssue) {
+      rejected.push({ proposal: p, reason: 'mdx-structure', detail: structureIssue });
+      continue;
+    }
+
+    if (pageContent !== undefined) {
+      const bleedIssue = checkContextBleed(p, pageContent);
+      if (bleedIssue) {
+        rejected.push({ proposal: p, reason: 'context-bleed', detail: bleedIssue });
         continue;
       }
     }
@@ -1092,7 +1296,7 @@ export async function generateFixesForPage(
   });
 
   const parsed = parseLLMFixResponse(response);
-  const filtered = filterProposals(parsed);
+  const filtered = filterProposals(parsed, pageContent);
 
   if (filtered.rejected.length > 0 || filtered.escapedCount > 0) {
     const parts: string[] = [];
