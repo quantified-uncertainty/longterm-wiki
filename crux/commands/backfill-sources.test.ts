@@ -2,6 +2,8 @@ import { describe, it, expect } from 'vitest';
 import {
   extractMatchTerms,
   contentMatchesRecord,
+  buildRankingPrompt,
+  parseRankingResponse,
   type MissingSourceRecord,
 } from './backfill-sources.ts';
 
@@ -134,5 +136,96 @@ describe('contentMatchesRecord', () => {
       'Google invested in DeepMind.',
       ['google', 'anthropic'],
     )).toBe(false);
+  });
+
+  it('requires entity name in content when provided', () => {
+    // Term matches but entity name does not → reject (no false-positive on
+    // a generic SEC filing that happens to mention "revenue")
+    expect(contentMatchesRecord(
+      'Microsoft reported $200B in revenue for FY24.',
+      ['revenue'],
+      'Anthropic',
+    )).toBe(false);
+
+    // Term matches and entity name does → accept
+    expect(contentMatchesRecord(
+      'Anthropic disclosed $1.5B in revenue.',
+      ['revenue'],
+      'Anthropic',
+    )).toBe(true);
+  });
+
+  it('entity name check is case-insensitive', () => {
+    expect(contentMatchesRecord(
+      'anthropic announced new revenue milestones.',
+      ['revenue'],
+      'Anthropic',
+    )).toBe(true);
+  });
+
+  it('short entity names (<3 chars) do not gate the match', () => {
+    // Defensive: don't require two-char fragments like "AI" or single letters
+    expect(contentMatchesRecord(
+      'The revenue was reported as confidential.',
+      ['revenue'],
+      'AI',
+    )).toBe(true);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// buildRankingPrompt + parseRankingResponse
+// ---------------------------------------------------------------------------
+
+describe('buildRankingPrompt', () => {
+  it('embeds claim, entity, and each candidate URL + snippet', () => {
+    const prompt = buildRankingPrompt(
+      'Anthropic raised $4B from Amazon',
+      'Anthropic',
+      [
+        { url: 'https://anthropic.com/news', snippet: 'Anthropic announced...' },
+        { url: 'https://techcrunch.com/x', snippet: 'Anthropic, the AI startup...' },
+      ],
+    );
+    expect(prompt).toContain('Anthropic raised $4B from Amazon');
+    expect(prompt).toContain('Entity: Anthropic');
+    expect(prompt).toContain('[0] URL: https://anthropic.com/news');
+    expect(prompt).toContain('[1] URL: https://techcrunch.com/x');
+    expect(prompt).toContain('"pickedIndex"');
+  });
+
+  it('flattens whitespace in snippets', () => {
+    const prompt = buildRankingPrompt('X', 'E', [
+      { url: 'https://u', snippet: 'line 1\n\n   line 2' },
+    ]);
+    expect(prompt).toContain('line 1 line 2');
+    expect(prompt).not.toContain('\n\n   line 2');
+  });
+});
+
+describe('parseRankingResponse', () => {
+  it('parses bare JSON', () => {
+    expect(parseRankingResponse('{"pickedIndex": 2}', 5)).toBe(2);
+  });
+
+  it('extracts JSON from surrounding text', () => {
+    expect(parseRankingResponse('Here is my answer: {"pickedIndex": 1} done.', 3)).toBe(1);
+  });
+
+  it('returns null for out-of-range index', () => {
+    expect(parseRankingResponse('{"pickedIndex": 7}', 3)).toBeNull();
+    expect(parseRankingResponse('{"pickedIndex": -1}', 3)).toBeNull();
+  });
+
+  it('returns null for missing pickedIndex', () => {
+    expect(parseRankingResponse('{"other": 0}', 3)).toBeNull();
+  });
+
+  it('returns null for non-numeric pickedIndex', () => {
+    expect(parseRankingResponse('{"pickedIndex": "first"}', 3)).toBeNull();
+  });
+
+  it('returns null for unparseable text', () => {
+    expect(parseRankingResponse('I think the first one.', 3)).toBeNull();
   });
 });

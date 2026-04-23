@@ -6,16 +6,28 @@
  * These unit tests verify the route wiring and response shape using
  * a simplified mock that handles the facts table only.
  */
-import { describe, it, expect, vi } from "vitest";
-import { mockDbModule } from "./test-utils.js";
+import { describe, it, expect, vi, beforeEach } from "vitest";
+import { mockDbModule, postJson } from "./test-utils.js";
 
 const ENTITIES = [
   { stable_id: "sid_abc", title: "Anthropic" },
   { stable_id: "sid_co", title: "Chris Olah" },
 ];
 
-function dispatch(query: string, _params: unknown[]): unknown[] {
+// Tracks UPDATE calls made to the mock, so the update-source tests can assert
+// exactly which column was written and with what id/url.
+const updateLog: Array<{ query: string; params: unknown[] }> = [];
+
+function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase().trim();
+
+  if (q.startsWith("update")) {
+    updateLog.push({ query: q, params });
+    // Return a single-row RETURNING so updateRows() reports 1.
+    // Each UPDATE_BY_TABLE fn uses .returning({ id: ... }) so the row shape
+    // doesn't matter beyond length.
+    return [{ id: params[1] }];
+  }
 
   // Count queries
   if (q.includes("count(")) {
@@ -101,5 +113,120 @@ describe("GET /api/sourcing/missing-sources", () => {
   it("respects limit parameter", async () => {
     const res = await app.request("/api/sourcing/missing-sources?table=facts&limit=1");
     expect(res.status).toBe(200);
+  });
+});
+
+describe("POST /api/sourcing/missing-sources/update-source", () => {
+  let app: InstanceType<typeof import("hono").Hono>;
+
+  beforeEach(async () => {
+    updateLog.length = 0;
+    const { missingSourcesRoute } = await import(
+      "../routes/sourcing/missing-sources.js"
+    );
+    const { Hono } = await import("hono");
+    app = new Hono();
+    app.route("/api/sourcing/missing-sources", missingSourcesRoute);
+  });
+
+  it("rejects unknown table values", async () => {
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "nonsense",
+      recordId: "1",
+      url: "https://example.com/x",
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects non-URL url values", async () => {
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "personnel",
+      recordId: "abc1234567",
+      url: "not-a-url",
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects non-numeric recordId for facts", async () => {
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "facts",
+      recordId: "not-a-number",
+      url: "https://example.com/x",
+    });
+    expect(res.status).toBe(400);
+    // No UPDATE should have been issued.
+    expect(updateLog.filter((l) => l.query.includes('"facts"'))).toHaveLength(0);
+  });
+
+  it("facts UPDATE writes `source` column, not other fields", async () => {
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "facts",
+      recordId: "42",
+      url: "https://anthropic.com/revenue",
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.updated).toBe(1);
+
+    const factsUpdate = updateLog.find((l) => l.query.includes('"facts"'));
+    expect(factsUpdate).toBeDefined();
+    expect(factsUpdate!.query).toContain('"source"');
+    // Must NOT touch any of the 19 other fact columns
+    expect(factsUpdate!.query).not.toContain('"label"');
+    expect(factsUpdate!.query).not.toContain('"value"');
+    expect(factsUpdate!.query).not.toContain('"numeric"');
+    expect(factsUpdate!.query).not.toContain('"currency"');
+    expect(factsUpdate!.query).not.toContain('"note"');
+  });
+
+  it("publications UPDATE writes `url` column, NOT `source`", async () => {
+    // Regression for CRITICAL #3: publications has both url and source cols;
+    // missing-sources filters on url, so we must write url back.
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "publications",
+      recordId: "pub1234567",
+      url: "https://arxiv.org/abs/2212.08073",
+    });
+    expect(res.status).toBe(200);
+
+    const pubsUpdate = updateLog.find((l) => l.query.includes('"publications"'));
+    expect(pubsUpdate).toBeDefined();
+    expect(pubsUpdate!.query).toContain('"url"');
+    // SET clause should not mention `source`
+    const setClause = pubsUpdate!.query.split(" where ")[0];
+    expect(setClause).not.toContain('"source"');
+  });
+
+  it("page_citations UPDATE writes `url` column", async () => {
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "page_citations",
+      recordId: "99",
+      url: "https://example.com/cite",
+    });
+    expect(res.status).toBe(200);
+
+    const cit = updateLog.find((l) => l.query.includes('"page_citations"'));
+    expect(cit).toBeDefined();
+    expect(cit!.query).toContain('"url"');
+  });
+
+  it("divisions UPDATE writes only `source` (no required-field trip)", async () => {
+    // Regression for CRITICAL #2: the old code POST'd to /sync which required
+    // parentOrgId + name; sending {id, source} 400'd. The new endpoint
+    // issues a direct UPDATE touching only `source`.
+    const res = await postJson(app, "/api/sourcing/missing-sources/update-source", {
+      table: "divisions",
+      recordId: "div1234567",
+      url: "https://example.com/div",
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.updated).toBe(1);
+
+    const divUpdate = updateLog.find((l) => l.query.includes('"divisions"'));
+    expect(divUpdate).toBeDefined();
+    expect(divUpdate!.query).toContain('"source"');
+    expect(divUpdate!.query).not.toContain('"parent_org_id"');
+    expect(divUpdate!.query).not.toContain('"name"');
   });
 });

@@ -16,9 +16,15 @@
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { runResearch } from '../lib/search/research-agent.ts';
-import { getTableConfig } from '../tablebase/table-registry.ts';
+import { createLlmClient, streamingCreate, extractText, MODELS } from '../lib/llm.ts';
+import { MODEL_PRICING } from '../lib/pricing.ts';
 type CommandResult = { exitCode?: number; output?: string };
 type CommandOptions = Record<string, unknown>;
+
+/** Per-record research budget (USD). */
+const PER_RECORD_BUDGET = 0.10;
+/** Default cumulative cost ceiling (USD) if --max-cost isn't passed. */
+const DEFAULT_MAX_COST = 5.0;
 
 // ---------------------------------------------------------------------------
 // Types
@@ -102,30 +108,121 @@ export function extractMatchTerms(record: MissingSourceRecord): string[] {
 }
 
 /**
- * Check if page content contains all match terms (case-insensitive).
+ * Check if page content is a plausible source for this record.
+ *
+ * Requires BOTH:
+ *   - the entity name (when ≥3 chars of real text) appears in the content, AND
+ *   - every distinguishing match term appears in the content
+ *
+ * A single-term match like "revenue" on its own is a false positive magnet —
+ * e.g. any SEC filing or news article contains the word "revenue". Requiring
+ * the entity name too raises the bar enough that random hits are rare.
  */
-export function contentMatchesRecord(content: string, matchTerms: string[]): boolean {
+export function contentMatchesRecord(
+  content: string,
+  matchTerms: string[],
+  entityName?: string,
+): boolean {
   if (matchTerms.length === 0 || content.length === 0) return false;
   const lower = content.toLowerCase();
-  return matchTerms.every(term => lower.includes(term));
+  if (!matchTerms.every(term => lower.includes(term))) return false;
+  const entity = (entityName ?? '').trim();
+  if (entity.length >= 3 && !lower.includes(entity.toLowerCase())) return false;
+  return true;
 }
 
 // ---------------------------------------------------------------------------
-// Record type → sync API mapping
+// Ranking: when multiple sources match the content gate, ask Haiku to pick
+// the one that BEST directly supports the claim (not just the one with the
+// highest lexical overlap — that picks Wikipedia paraphrases over primary
+// sources). See crux/scripts/compare-source-ranking.ts for the evaluation
+// that motivated this choice over a Cohere rerank call (Haiku 6/6 vs
+// rerank 2/6 on the source-checking task).
 // ---------------------------------------------------------------------------
 
-/** Map from PG table name to the sourcing record type used by sync endpoints. */
-function tableToRecordType(table: string): string {
-  switch (table) {
-    case 'personnel': return 'personnel';
-    case 'investments': return 'investments';
-    case 'equity_positions': return 'equity-positions';
-    case 'policy_stakeholders': return 'policy-stakeholders';
-    case 'divisions': return 'divisions';
-    case 'funding_rounds': return 'funding-rounds';
-    case 'funding_programs': return 'funding-programs';
-    case 'publications': return 'publications';
-    default: return table;
+interface RankCandidate {
+  url: string;
+  snippet: string;
+}
+
+/**
+ * Build the Haiku prompt used to rank matching sources.
+ *
+ * Exported so tests can assert the prompt shape without mocking the LLM.
+ */
+export function buildRankingPrompt(
+  claim: string,
+  entityName: string,
+  candidates: RankCandidate[],
+): string {
+  const numbered = candidates
+    .map(
+      (c, i) =>
+        `[${i}] URL: ${c.url}\n    Snippet: ${c.snippet.replace(/\s+/g, ' ').trim()}`,
+    )
+    .join('\n\n');
+  return `You are verifying a factual claim. Pick the ONE source that BEST *directly supports* the specific claim below. Do not pick a source merely because it is topically related — pick the one whose content explicitly confirms the specific fact. Prefer primary/official sources over paraphrases.
+
+Claim: "${claim}"
+Entity: ${entityName}
+
+Candidates:
+${numbered}
+
+Respond in this exact JSON format, nothing else:
+{"pickedIndex": N}`;
+}
+
+/**
+ * Parse Haiku's ranking response. Tolerates extra text around the JSON
+ * object. Returns null on bad/out-of-range output.
+ */
+export function parseRankingResponse(text: string, numCandidates: number): number | null {
+  const match = text.match(/\{[\s\S]*?\}/);
+  if (!match) return null;
+  try {
+    const parsed = JSON.parse(match[0]);
+    const idx = typeof parsed.pickedIndex === 'number' ? parsed.pickedIndex : -1;
+    if (idx < 0 || idx >= numCandidates) return null;
+    return idx;
+  } catch {
+    return null;
+  }
+}
+
+const HAIKU_PRICING = MODEL_PRICING[MODELS.haiku];
+
+/**
+ * Ask Haiku to rank matching sources. Returns the winning candidate's index
+ * plus the USD cost of the call. On any error (network, parse failure, etc.)
+ * falls back to index 0 so the caller still gets an answer.
+ */
+async function rankMatchingSources(
+  claim: string,
+  entityName: string,
+  candidates: RankCandidate[],
+): Promise<{ index: number; cost: number }> {
+  if (candidates.length <= 1) return { index: 0, cost: 0 };
+
+  const prompt = buildRankingPrompt(claim, entityName, candidates);
+  try {
+    const client = createLlmClient();
+    const response = await streamingCreate(client, {
+      model: MODELS.haiku,
+      max_tokens: 100,
+      temperature: 0,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = extractText(response);
+    const idx = parseRankingResponse(text, candidates.length);
+    const usage = response.usage;
+    const cost = HAIKU_PRICING && usage
+      ? (usage.input_tokens * HAIKU_PRICING.inputPerM + usage.output_tokens * HAIKU_PRICING.outputPerM) / 1_000_000
+      : 0;
+    return { index: idx ?? 0, cost };
+  } catch (err: unknown) {
+    console.warn(`  Ranking call failed (${err instanceof Error ? err.message : String(err)}) — falling back to first match`);
+    return { index: 0, cost: 0 };
   }
 }
 
@@ -136,10 +233,10 @@ function tableToRecordType(table: string): string {
 async function processRecord(
   record: MissingSourceRecord,
   options: { dryRun: boolean; apply: boolean },
-): Promise<{ matched: boolean; url?: string; cost: number }> {
+): Promise<{ matched: boolean; updated: boolean; url?: string; cost: number }> {
   const matchTerms = extractMatchTerms(record);
   if (matchTerms.length === 0) {
-    return { matched: false, cost: 0 };
+    return { matched: false, updated: false, cost: 0 };
   }
 
   // Build a targeted search query
@@ -159,80 +256,76 @@ async function processRecord(
         useSemanticScholar: false,
         useFederalRegister: false,
       },
-      budgetCap: 0.10,
+      budgetCap: PER_RECORD_BUDGET,
     });
   } catch (err: unknown) {
     console.warn(`  Search failed: ${err instanceof Error ? err.message : String(err)}`);
-    return { matched: false, cost: 0 };
+    return { matched: false, updated: false, cost: 0 };
   }
 
-  const cost = researchResult.metadata.totalCost;
+  let cost = researchResult.metadata.totalCost;
 
-  // Check each source for match terms
+  // Gather ALL sources that clear the content gate, then rank.
+  const matches: RankCandidate[] = [];
   for (const source of researchResult.sources) {
     const content = source.content || '';
     if (content.length < 50) continue;
-
-    if (contentMatchesRecord(content, matchTerms)) {
-      console.log(`  ✓ Match: ${source.url}`);
-
-      if (options.apply && !options.dryRun) {
-        await updateRecordSource(record, source.url);
-      }
-
-      return { matched: true, url: source.url, cost };
+    if (contentMatchesRecord(content, matchTerms, entityName)) {
+      matches.push({ url: source.url, snippet: content.slice(0, 600) });
     }
   }
 
-  return { matched: false, cost };
+  if (matches.length === 0) return { matched: false, updated: false, cost };
+
+  let chosen: RankCandidate;
+  if (matches.length === 1) {
+    chosen = matches[0];
+  } else {
+    // Ranking claim = record description; fall back to matchTerm[0] if empty
+    const rankClaim = (record.description || matchTerms[0] || '').trim();
+    const { index, cost: rankCost } = await rankMatchingSources(rankClaim, entityName, matches);
+    cost += rankCost;
+    chosen = matches[index];
+    console.log(`  ✓ Best of ${matches.length} matches: ${chosen.url}`);
+  }
+
+  let updated = false;
+  if (options.apply && !options.dryRun) {
+    updated = await updateRecordSource(record, chosen.url);
+    if (!updated) {
+      console.warn(`  ✗ Update failed — source not written`);
+    }
+  }
+
+  return { matched: true, updated, url: chosen.url, cost };
 }
 
 // ---------------------------------------------------------------------------
-// Update source field via sync API
+// Update source field — single unified endpoint writes the correct column
+// per table, without touching any other field. See
+// apps/wiki-server/src/routes/sourcing/missing-sources.ts for the handler.
 // ---------------------------------------------------------------------------
 
 async function updateRecordSource(record: MissingSourceRecord, url: string): Promise<boolean> {
-  const table = record.record_table;
-
-  if (table === 'facts') {
-    // Facts use /api/facts/sync with { facts: [{ entityId, factId, source }] }
-    const result = await apiRequest<{ upserted?: number }>('POST', '/api/facts/sync', {
-      facts: [{
-        entityId: record.entity_id,
-        factId: record.fact_id,
-        source: url,
-        // Preserve existing fields
-        label: record.label ?? null,
-        value: record.value ?? null,
-        numeric: record.numeric ?? null,
-        measure: record.measure ?? null,
-        asOf: record.as_of ?? null,
-        format: record.format ?? null,
-      }],
-    });
-    return result.ok;
-  }
-
-  if (table === 'page_citations') {
-    // No sync endpoint for page citations — skip
-    console.warn(`  Skipping page_citation update (no sync endpoint)`);
-    return false;
-  }
-
-  // Standard tablebase records — use table registry
-  const registryName = tableToRecordType(table);
-  const config = getTableConfig(registryName);
-  if (!config) {
-    console.warn(`  No table config for ${registryName}`);
-    return false;
-  }
-
-  const result = await apiRequest<{ upserted?: number; updated?: number }>(
-    config.syncMethod,
-    config.syncPath,
-    { [config.syncBodyKey]: [{ id: record.record_id, source: url }] },
+  const response = await apiRequest<{ updated?: number; error?: string }>(
+    'POST',
+    '/api/sourcing/update-source',
+    {
+      table: record.record_table,
+      recordId: record.record_id,
+      url,
+    },
   );
-  return result.ok;
+  if (!response.ok) {
+    console.warn(`  Update API error: ${response.message}`);
+    return false;
+  }
+  const updated = response.data.updated ?? 0;
+  if (updated === 0) {
+    console.warn(`  Update wrote 0 rows (record may have been deleted): ${record.record_table}/${record.record_id}`);
+    return false;
+  }
+  return true;
 }
 
 // ---------------------------------------------------------------------------
@@ -244,11 +337,26 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   const apply = !!options.apply;
   const limit = options.limit ? parseInt(options.limit as string, 10) : 20;
   const tableFilter = (options as Record<string, unknown>).table as string | undefined;
+  const maxCost = options.maxCost
+    ? parseFloat(options.maxCost as string)
+    : DEFAULT_MAX_COST;
 
+  if (apply && dryRun) {
+    return {
+      exitCode: 1,
+      output: 'Cannot combine --dry-run and --apply. Pick one.',
+    };
+  }
   if (!apply && !dryRun) {
     return {
       exitCode: 1,
       output: 'Specify --dry-run (preview) or --apply (update records). Use --dry-run first.',
+    };
+  }
+  if (!Number.isFinite(maxCost) || maxCost <= 0) {
+    return {
+      exitCode: 1,
+      output: `--max-cost must be a positive number (got ${options.maxCost})`,
     };
   }
 
@@ -267,11 +375,12 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   }
 
   const { tables, totalMissing } = response.data;
-  console.log(`Found ${totalMissing} records without sources.\n`);
+  console.log(`Found ${totalMissing} records without sources.`);
+  console.log(`Budget cap: $${maxCost.toFixed(2)} (per-record cap $${PER_RECORD_BUDGET.toFixed(2)})\n`);
 
   // Flatten all records into a single list
   const allRecords: MissingSourceRecord[] = [];
-  for (const [tableName, { records }] of Object.entries(tables)) {
+  for (const [_tableName, { records }] of Object.entries(tables)) {
     for (const r of records) {
       allRecords.push(r);
     }
@@ -283,40 +392,59 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
 
   // 2. Process each record
   let matched = 0;
-  let skipped = 0;
+  let updatedCount = 0;
+  let updateFailed = 0;
+  let noTerms = 0;
+  let searched = 0;
+  let budgetSkipped = 0;
   let totalCost = 0;
+  let budgetStopped = false;
 
   for (let i = 0; i < allRecords.length; i++) {
     const record = allRecords[i];
-    const terms = extractMatchTerms(record);
-    if (terms.length === 0) {
-      skipped++;
+    if (extractMatchTerms(record).length === 0) {
+      noTerms++;
+      continue;
+    }
+
+    if (totalCost >= maxCost) {
+      if (!budgetStopped) {
+        budgetStopped = true;
+        console.warn(`\n[budget] Reached $${totalCost.toFixed(4)} / $${maxCost.toFixed(2)} cap — stopping remaining records`);
+      }
+      budgetSkipped++;
       continue;
     }
 
     console.log(`[${i + 1}/${allRecords.length}] ${record.record_table}: ${record.description.slice(0, 80)}`);
 
+    searched++;
     const result = await processRecord(record, { dryRun, apply });
     totalCost += result.cost;
     if (result.matched) {
       matched++;
+      if (apply) {
+        if (result.updated) updatedCount++;
+        else updateFailed++;
+      }
     }
   }
 
   const mode = apply ? 'apply' : 'dry-run';
-  const searched = allRecords.length - skipped;
-  const noMatch = searched - matched;
-  const summary = [
-    `[backfill-sources] ${mode}`,
+  const lines = [
+    `[backfill-sources] ${mode}${budgetStopped ? ' (stopped at budget cap)' : ''}`,
     `  Records: ${allRecords.length} total`,
-    `    Skipped (no search terms): ${skipped}`,
+    `    Skipped (no search terms): ${noTerms}`,
+    `    Skipped (budget cap): ${budgetSkipped}`,
     `    Searched: ${searched}`,
     `      Sources found: ${matched}`,
-    `      No match: ${noMatch}`,
-    `  Cost: $${totalCost.toFixed(4)}`,
-  ].join('\n');
-
-  return { exitCode: 0, output: summary };
+    `      No match: ${searched - matched}`,
+  ];
+  if (apply) {
+    lines.push(`    DB updates: ${updatedCount} written, ${updateFailed} failed`);
+  }
+  lines.push(`  Cost: $${totalCost.toFixed(4)} / $${maxCost.toFixed(2)} cap`);
+  return { exitCode: 0, output: lines.join('\n') };
 }
 
 export const commands = {
