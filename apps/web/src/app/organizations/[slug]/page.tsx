@@ -34,6 +34,7 @@ import { RelatedPages } from "@/components/RelatedPages";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
 import { EntityDbPage } from "@/components/directory/EntityDbPage";
 import { renderMdxPage, isMdxError } from "@/lib/mdx";
+import { TableOfContents } from "@/components/wiki/TableOfContents";
 
 // Shared components & helpers
 import {
@@ -136,8 +137,8 @@ const ORG_TAB_GROUPS: ProfileTabGroup[] = [
   { id: "entity", label: "Entity" },
   { id: "about", label: "About" },
   { id: "business", label: "Business" },
-  { id: "output", label: "Output" },
   { id: "governance", label: "Policy & Governance" },
+  { id: "output", label: "Output & Research" },
   { id: "data", label: "Data" },
 ];
 
@@ -319,15 +320,31 @@ export default async function OrgProfilePage({
   // ── Wiki tab — MDX article content rendered inline ──
   const wikiResult = entity.wikiPageId ? await renderMdxPage(entity.id) : null;
   if (wikiResult && !isMdxError(wikiResult)) {
+    const tocHeadings = wikiResult.headings.filter((h) => h.depth <= 3);
     tabs.push({
       id: "wiki",
       label: "Wiki",
       group: "entity",
       icon: <BookOpen className={ICON_CLASS} />,
       content: (
-        <article className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
-          {wikiResult.content}
-        </article>
+        <div className="space-y-4">
+          {data.wikiHref && (
+            <div className="flex justify-end">
+              <Link
+                href={data.wikiHref}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
+              >
+                Open full wiki page &#8599;
+              </Link>
+            </div>
+          )}
+          <article className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
+            {tocHeadings.length >= 3 && (
+              <TableOfContents headings={tocHeadings} />
+            )}
+            {wikiResult.content}
+          </article>
+        </div>
       ),
     });
   }
