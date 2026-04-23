@@ -2,7 +2,7 @@
  * Visual Command Handlers
  *
  * Specialized pipeline for creating, reviewing, and managing
- * diagrams, charts, Squiggle models, and other visual elements.
+ * diagrams, charts, and other visual elements.
  * Runs parallel to the main content pipeline.
  */
 
@@ -12,7 +12,7 @@ import { buildCommands } from '../lib/cli.ts';
 const SCRIPTS: Record<string, ScriptConfig> = {
   create: {
     script: 'visual/visual-create.ts',
-    description: 'AI-generate a visual for a page (mermaid, squiggle, cause-effect, comparison)',
+    description: 'AI-generate a visual for a page (mermaid, cause-effect, comparison)',
     passthrough: ['ci', 'type', 'directions', 'dryRun', 'output', 'model'],
     positional: true,
   },
@@ -59,13 +59,12 @@ ${commandList}
 
 Visual Types:
   mermaid         Mermaid flowcharts, pie, timeline, quadrant, etc.
-  squiggle        Squiggle probability distributions and models
   cause-effect    CauseEffectGraph interactive causal diagrams
   comparison      ComparisonTable side-by-side tables
   disagreement    DisagreementMap position comparison cards
 
 Options:
-  --type=<t>       Visual type (mermaid, squiggle, cause-effect, comparison, disagreement)
+  --type=<t>       Visual type (mermaid, cause-effect, comparison, disagreement)
   --directions=<d> Specific instructions for generation or improvement
   --output=<path>  Output file path (defaults to .claude/temp/visual/)
   --model=<m>      Model: haiku, sonnet (default: sonnet)
@@ -79,7 +78,6 @@ Options:
 
 Examples:
   crux w visual create existential-risk --type mermaid
-  crux w visual create compute-governance --type squiggle --directions "model compute growth"
   crux w visual review alignment-problem --screenshot
   crux w visual audit --min-words=800
   crux w visual improve existential-risk --directions "simplify the flowchart"

@@ -18,9 +18,6 @@ const nextConfig: NextConfig = {
     NEXT_PUBLIC_BUILD_TIMESTAMP: new Date().toISOString(),
   },
   transpilePackages: [
-    "@quri/squiggle-components",
-    "@quri/squiggle-lang",
-    "@quri/ui",
     "@longterm-wiki/factbase",
     "@longterm-wiki/id-utils",
     "@longterm-wiki/url-utils",

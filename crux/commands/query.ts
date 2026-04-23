@@ -898,7 +898,7 @@ export async function blocks(args: string[], options: Record<string, unknown>): 
   output += `${c.dim}Usage:\n`;
   output += `  crux query blocks <page-id>              Section structure for a page\n`;
   output += `  crux query blocks --entity=<id>           Find sections referencing entity\n`;
-  output += `  crux query blocks --component=squiggle    Pages using a component type\n`;
+  output += `  crux query blocks --component=mermaid     Pages using a component type\n`;
   output += `  crux query blocks --uncited               Sections with no citations${c.reset}`;
 
   return { output, exitCode: 0 };
@@ -950,7 +950,7 @@ Commands:
   stats                        Wiki-wide statistics (default)
   blocks <page-id>             Section structure from block-level IR
   blocks --entity=<id>         Sections referencing a given entity
-  blocks --component=<type>    Pages using a component (squiggle, mermaid, etc.)
+  blocks --component=<type>    Pages using a component (mermaid, calc, etc.)
   blocks --uncited             Sections with >50 words and no citations
 
 Options:
@@ -982,7 +982,7 @@ Examples:
   crux query stats
   crux query blocks anthropic
   crux query blocks --entity=anthropic
-  crux query blocks --component=squiggle
+  crux query blocks --component=mermaid
   crux query blocks --uncited --min-words=100
 `;
 }

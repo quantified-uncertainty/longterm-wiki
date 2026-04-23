@@ -51,15 +51,6 @@ function suggestVisualTypes(content: string): GeneratableVisualType[] {
     suggestions.push('mermaid');
   }
 
-  // Squiggle: pages with numbers, estimates, probabilities, costs
-  if (
-    /\b(estimat|probabilit|likeli|forecast|cost|funding|budget|\$|billion|million|percent|%)\b/.test(
-      body,
-    )
-  ) {
-    suggestions.push('squiggle');
-  }
-
   // CauseEffect: pages about risks, causes, effects, influences
   if (
     /\b(caus|effect|influenc|contribut|leads? to|results? in|impact|factor|driver)\b/.test(
@@ -157,7 +148,6 @@ async function main(): Promise<void> {
 
   const typeCounts = {
     mermaid: coverage.reduce((a, p) => a + p.visuals.mermaid, 0),
-    squiggle: coverage.reduce((a, p) => a + p.visuals.squiggle, 0),
     'cause-effect': coverage.reduce((a, p) => a + p.visuals['cause-effect'], 0),
     comparison: coverage.reduce((a, p) => a + p.visuals.comparison, 0),
     disagreement: coverage.reduce((a, p) => a + p.visuals.disagreement, 0),
@@ -198,7 +188,6 @@ async function main(): Promise<void> {
   console.log();
   console.log(`${colors.bold}By type:${colors.reset}`);
   console.log(`  Mermaid:         ${typeCounts.mermaid}`);
-  console.log(`  Squiggle:        ${typeCounts.squiggle}`);
   console.log(`  CauseEffect:     ${typeCounts['cause-effect']}`);
   console.log(`  Comparison:      ${typeCounts.comparison}`);
   console.log(`  Disagreement:    ${typeCounts.disagreement}`);
@@ -236,15 +225,15 @@ async function main(): Promise<void> {
         `${colors.bold}Pages with visuals (top 20):${colors.reset}\n`,
       );
       console.log(
-        `  ${'Page'.padEnd(40)} ${'M'.padEnd(3)} ${'S'.padEnd(3)} ${'CE'.padEnd(4)} ${'CT'.padEnd(4)} ${'DM'.padEnd(4)} ${'Total'}`,
+        `  ${'Page'.padEnd(40)} ${'M'.padEnd(3)} ${'CE'.padEnd(4)} ${'CT'.padEnd(4)} ${'DM'.padEnd(4)} ${'Total'}`,
       );
       console.log(
-        `  ${'─'.repeat(40)} ${'─'.repeat(3)} ${'─'.repeat(3)} ${'─'.repeat(4)} ${'─'.repeat(4)} ${'─'.repeat(4)} ${'─'.repeat(5)}`,
+        `  ${'─'.repeat(40)} ${'─'.repeat(3)} ${'─'.repeat(4)} ${'─'.repeat(4)} ${'─'.repeat(4)} ${'─'.repeat(5)}`,
       );
 
       for (const page of withVisuals) {
         console.log(
-          `  ${page.pageId.padEnd(40)} ${String(page.visuals.mermaid).padEnd(3)} ${String(page.visuals.squiggle).padEnd(3)} ${String(page.visuals['cause-effect']).padEnd(4)} ${String(page.visuals.comparison).padEnd(4)} ${String(page.visuals.disagreement).padEnd(4)} ${page.visuals.total}`,
+          `  ${page.pageId.padEnd(40)} ${String(page.visuals.mermaid).padEnd(3)} ${String(page.visuals['cause-effect']).padEnd(4)} ${String(page.visuals.comparison).padEnd(4)} ${String(page.visuals.disagreement).padEnd(4)} ${page.visuals.total}`,
         );
       }
       console.log();

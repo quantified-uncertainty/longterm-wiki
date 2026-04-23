@@ -37,10 +37,6 @@ For more details, see [the MIRI page](/knowledge-base/organizations/miri/) and
 
 The lab has published several papers[^2][^3] on <EntityLink id="interpretability">interpretability</EntityLink>.
 
-<SquiggleEstimate title="Research Output" code={\`
-researchPapers = 50 to 100
-\`} />
-
 ## Governance
 
 <MermaidDiagram code="graph TD; A-->B" />
@@ -155,13 +151,8 @@ describe('extractBlockIR', () => {
   it('detects component names per section', () => {
     const ir = extractBlockIR('test-org', FIXTURE_MDX);
 
-    // Key Research has SquiggleEstimate
-    expect(ir.sections[2].componentNames).toContain('squiggle');
-    expect(ir.sections[2].componentNames).not.toContain('mermaid');
-
     // Governance has MermaidDiagram
     expect(ir.sections[3].componentNames).toContain('mermaid');
-    expect(ir.sections[3].componentNames).not.toContain('squiggle');
 
     // Quantitative Analysis has Calc and Callout
     expect(ir.sections[4].componentNames).toContain('calc');
@@ -171,7 +162,6 @@ describe('extractBlockIR', () => {
   it('aggregates page-level component counts', () => {
     const ir = extractBlockIR('test-org', FIXTURE_MDX);
 
-    expect(ir.components.squiggle).toBe(1);
     expect(ir.components.mermaid).toBe(1);
     expect(ir.components.calc).toBe(1);
     expect(ir.components.callout).toBe(1);
@@ -389,17 +379,17 @@ More text after the chart.
 
 <SomeCustomComponent foo="bar">content</SomeCustomComponent>
 
-<SquiggleEstimate title="Test" code={\`x = 1\`} />
+<MermaidDiagram chart="graph TD; A-->B" />
 `;
     const ir = extractBlockIR('custom-comp', mdx);
 
     const section = ir.sections.find(s => s.heading === 'Section')!;
     // Only tracked components should appear
-    expect(section.componentNames).toContain('squiggle');
+    expect(section.componentNames).toContain('mermaid');
     expect(section.componentNames).toHaveLength(1);
 
     // Page-level should also only track known components
-    expect(ir.components.squiggle).toBe(1);
+    expect(ir.components.mermaid).toBe(1);
     expect(Object.keys(ir.components)).toHaveLength(1);
   });
 });

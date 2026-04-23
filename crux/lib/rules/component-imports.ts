@@ -27,7 +27,6 @@ const WIKI_COMPONENTS = [
   'ResourceTags',
   'F',
   'Calc',
-  'SquiggleEstimate',
 ];
 
 // Pattern to find any import that includes a component name

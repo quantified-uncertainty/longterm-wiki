@@ -13,7 +13,7 @@ clusters:
   - community
   - governance
 ---
-import {DataInfoBox, EntityLink, SquiggleEstimate} from '@components/wiki'
+import {DataInfoBox, EntityLink} from '@components/wiki'
 import {Calc} from '@components/facts'
 
 
@@ -81,46 +81,6 @@ As of March 2026: <FBF entity="sid_mK9pX3rQ7n" property="valuation">\$380B</FBF>
 <FBFactTable entity="sid_mK9pX3rQ7n" property="revenue" title="Revenue History (ARR)" />
 
 <FBFactTable entity="sid_mK9pX3rQ7n" property="valuation" title="Valuation History" />
-
-<SquiggleEstimate title="Anthropic Revenue Trajectory (ARR, $B)" code={`
-// Anthropic revenue growth trajectory
-rev2024 = 1    // \$1B start of 2025
-rev2025 = 9    // \$9B end of 2025
-rev2026 = 20 to 26  // guidance range
-rev2027 = rev2026 * (1.5 to 2.5)  // growth deceleration
-rev2028 = rev2027 * (1.3 to 2.0)  // further deceleration
-
-{
-  "2024 (actual)": rev2024,
-  "2025 (actual)": rev2025,
-  "2026 (guidance)": rev2026,
-  "2027 (projected)": rev2027,
-  "2028 (projected)": rev2028
-}
-`} />
-
-<SquiggleEstimate title="Anthropic Valuation Scenario Analysis" code={`
-// Revenue-based valuation model
-revenue2026 = 20 to 26  // \$B guidance
-revenueMultiple = 10 to 45  // range of forward multiples for AI companies
-impliedValuation = revenue2026 * revenueMultiple * 1e9
-
-// Scenario-weighted valuation (continuous ranges)
-bull = 400e9 to 650e9
-base = 250e9 to 450e9
-conservative = 100e9 to 220e9
-bear = 20e9 to 80e9
-
-scenarioWeighted = mixture(
-  bull, base, conservative, bear,
-  [0.15, 0.40, 0.25, 0.15]
-)
-
-{
-  "Revenue-implied ($B)": impliedValuation,
-  "Scenario-weighted ($B)": scenarioWeighted
-}
-`} />
 
 ### Talent Concentration
 

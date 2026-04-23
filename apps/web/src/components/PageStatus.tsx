@@ -801,8 +801,8 @@ function ContentCoverageSection({
       label: "Diagrams",
       actual: diagramCount,
       target: recommended.diagrams,
-      hint: "Add Mermaid diagrams or Squiggle models",
-      description: "Visual content — Mermaid diagrams, charts, or Squiggle estimate models.",
+      hint: "Add Mermaid diagrams",
+      description: "Visual content — Mermaid diagrams or charts.",
       anchor: "tables-diagrams",
     },
     {

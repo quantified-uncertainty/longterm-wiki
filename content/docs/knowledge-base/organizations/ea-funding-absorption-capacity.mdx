@@ -15,7 +15,7 @@ todos:
   - Update with post-IPO deployment data when Anthropic IPO occurs
   - Monitor new org formation rate and talent pipeline capacity
 ---
-import {EntityLink, SquiggleEstimate} from '@components/wiki';
+import {EntityLink} from '@components/wiki';
 
 :::note[Page Scope]
 This page analyzes how much capital the EA ecosystem can productively absorb per year, focused on AI safety. For the capital supply side, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink> and <EntityLink id="E858" name="ea-shareholder-diversification-anthropic">EA Shareholder Diversification from Anthropic</EntityLink>. For current funding levels, see <EntityLink id="E641" name="funders-overview">Longtermist Funders</EntityLink>.
@@ -82,26 +82,6 @@ Absorption capacity depends on several interacting factors:
 5. **Diminishing returns**: At what point does marginal spending become unproductive?
 
 ### Estimate by Category
-
-<SquiggleEstimate title="AI Safety Annual Absorption Capacity" code={`
-// Technical research capacity
-techResearchCapacity = 150e6 to 500e6  // Limited by alignment researchers
-
-// Governance and policy capacity
-govCapacity = 100e6 to 400e6  // Growing fast, but talent-limited
-
-// Field building capacity
-fieldBuildingCapacity = 50e6 to 200e6  // Scholarships, programs, etc.
-
-// Infrastructure and regranting
-infraCapacity = 50e6 to 200e6
-
-// New org creation capacity
-newOrgCapacity = 100e6 to 500e6  // Speculative
-
-totalCapacity = techResearchCapacity + govCapacity + fieldBuildingCapacity + infraCapacity + newOrgCapacity
-totalCapacity
-`} />
 
 | Category | Current Spend | Estimated Capacity | Scaling Factor | Key Constraint |
 |----------|--------------|-------------------|----------------|----------------|

@@ -122,7 +122,7 @@ async function main(): Promise<void> {
   const visuals = extractVisuals(page.content);
   if (visuals.length === 0) {
     console.log(
-      `${colors.yellow}No improvable visuals found in "${page.title}" (only mermaid and squiggle supported for improvement)${colors.reset}`,
+      `${colors.yellow}No improvable visuals found in "${page.title}" (only mermaid is supported for improvement)${colors.reset}`,
     );
     process.exit(0);
   }

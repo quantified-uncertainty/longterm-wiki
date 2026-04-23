@@ -304,7 +304,6 @@ export type CauseEffectGraph = z.infer<typeof CauseEffectGraph>;
  */
 export const VisualType = z.enum([
   'mermaid',         // MermaidDiagram — flowcharts, pie, timeline, quadrant, etc.
-  'squiggle',        // SquiggleEstimate — probability distributions and models
   'cause-effect',    // CauseEffectGraph / PageCauseEffectGraph — interactive causal diagrams
   'comparison',      // ComparisonTable — side-by-side comparison tables
   'disagreement',    // DisagreementMap — position comparison cards
@@ -320,7 +319,6 @@ export type VisualType = z.infer<typeof VisualType>;
  */
 export const VISUAL_COMPONENT_NAMES: Record<string, readonly string[]> = {
   'mermaid': ['MermaidDiagram', 'Mermaid'],
-  'squiggle': ['SquiggleEstimate'],
   'cause-effect': ['CauseEffectGraph', 'PageCauseEffectGraph'],
   'comparison': ['ComparisonTable'],
   'disagreement': ['DisagreementMap'],
@@ -346,7 +344,7 @@ export const VisualDefinition = z.object({
   description: z.string().optional(),
   usedIn: z.array(z.string()),               // Page IDs where this visual is embedded
   tags: z.array(z.string()).optional(),
-  content: z.string(),                        // Visual code (Mermaid, Squiggle, JSX, etc.)
+  content: z.string(),                        // Visual code (Mermaid, JSX, etc.)
   props: z.record(z.unknown()).optional(),     // Additional component props
   quality: z.number().min(0).max(100).optional(),
   lastReviewed: z.string().optional(),
