@@ -441,9 +441,9 @@ const DIVISIONS: DivisionDef[] = [
     name: "Trust and Safety",
     divisionType: "team",
     status: "active",
-    source: "https://www.anthropic.com/legal/aup",
+    source: "https://www.anthropic.com/transparency",
     notes:
-      "Non-research operational team responsible for usage-policy enforcement and user safety; reachable at usersafety@anthropic.com per Anthropic's Acceptable Use Policy.",
+      "Non-research operational team (publicly referred to as the \"Safeguards team\" in Anthropic's transparency reporting and Usage Policy) responsible for usage-policy enforcement, detection/monitoring, and user safety; reachable at usersafety@anthropic.com per Anthropic's Acceptable Use Policy.",
   },
   {
     idSeed: "div|anthropic|ai-welfare",
