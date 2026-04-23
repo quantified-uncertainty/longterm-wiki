@@ -679,9 +679,24 @@ export function OrganizationsTable({
                       colSpan={activeColCount}
                       className="py-8 text-center text-muted-foreground text-sm"
                     >
-                      {search
-                        ? "No organizations match your search."
-                        : "No organizations found."}
+                      <div>
+                        {search || typeFilter !== "all" || statFilter !== "all"
+                          ? "No organizations match the current filters."
+                          : "No organizations found."}
+                      </div>
+                      {(search || typeFilter !== "all" || statFilter !== "all") && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSearch("");
+                            urlSetFilter("type", "all");
+                            urlSetFilter("stat", "all");
+                          }}
+                          className="mt-2 text-xs text-primary hover:underline underline-offset-2"
+                        >
+                          Clear filters
+                        </button>
+                      )}
                     </td>
                   </tr>
                 )}

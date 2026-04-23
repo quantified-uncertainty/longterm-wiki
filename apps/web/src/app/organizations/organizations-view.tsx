@@ -36,6 +36,20 @@ export function OrganizationsView({
   const lastExplicitViewRef = useRef<ViewMode>(initialView);
   const [searchOpenedTable, setSearchOpenedTable] = useState(false);
   const prevSearchRef = useRef(search);
+  const searchInputRef = useRef<HTMLInputElement>(null);
+
+  // Cmd/Ctrl+K focuses search.
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "k") {
+        e.preventDefault();
+        searchInputRef.current?.focus();
+        searchInputRef.current?.select();
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
 
   useEffect(() => {
     const wasEmpty = prevSearchRef.current.trim() === "";
@@ -136,14 +150,43 @@ export function OrganizationsView({
           scrolling through long sections. */}
       <div className="sticky top-0 z-30 -mx-6 px-6 pt-2 pb-3 mb-5 bg-background/85 backdrop-blur-md border-b border-border/40">
         <div role="search" className="flex flex-col lg:flex-row gap-3 mb-2.5">
-          <input
-            type="text"
-            placeholder="Search name, type, people, funding programs, description..."
-            aria-label="Search organizations"
-            value={search}
-            onChange={(e) => url.setSearch(e.target.value)}
-            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full lg:w-96"
-          />
+          <div className="relative w-full lg:w-96">
+            <input
+              ref={searchInputRef}
+              type="text"
+              placeholder="Search name, type, people, funding programs, description..."
+              aria-label="Search organizations"
+              value={search}
+              onChange={(e) => url.setSearch(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Escape" && search) {
+                  e.preventDefault();
+                  url.setSearch("");
+                }
+              }}
+              className="px-3 py-2 pr-16 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full"
+            />
+            {search ? (
+              <button
+                type="button"
+                onClick={() => {
+                  url.setSearch("");
+                  searchInputRef.current?.focus();
+                }}
+                aria-label="Clear search"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-xs text-muted-foreground/70 hover:text-foreground hover:bg-muted rounded transition-colors"
+              >
+                ✕
+              </button>
+            ) : (
+              <kbd
+                aria-hidden="true"
+                className="absolute right-2 top-1/2 -translate-y-1/2 px-1.5 py-0.5 text-[10px] font-mono text-muted-foreground/60 border border-border/60 rounded bg-muted/40 pointer-events-none"
+              >
+                ⌘K
+              </kbd>
+            )}
+          </div>
           <div className="flex flex-wrap gap-1.5">
             <ChipButton
               label="All"
