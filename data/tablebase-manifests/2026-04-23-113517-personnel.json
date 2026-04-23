@@ -1,0 +1,42 @@
+{
+  "table": "personnel",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-23T11:35:17.435Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "RjibOSzepf",
+      "personId": "IRGbNa1HIU",
+      "organizationId": "sid_LgiqvRCrvg",
+      "role": "Managing Director",
+      "source": "https://www.cnas.org/people/dr-laura-courchesne",
+      "verdict": "none"
+    },
+    {
+      "id": "C7FrrqNYi5",
+      "personId": "FEgSIo1hjY",
+      "organizationId": "sid_LgiqvRCrvg",
+      "role": "President of Global Affairs, Meta (Operating Board Member)",
+      "source": "https://www.frontiermodelforum.org/updates/amazon-and-meta-join-the-frontier-model-forum-to-promote-ai-safety/",
+      "verdict": "none"
+    },
+    {
+      "id": "OYeJ2p1nRp",
+      "personId": "Usd99hGupc",
+      "organizationId": "sid_LgiqvRCrvg",
+      "role": "SVP of Global Public Policy and General Counsel, Amazon (Operating Board Member)",
+      "source": "https://www.frontiermodelforum.org/updates/amazon-and-meta-join-the-frontier-model-forum-to-promote-ai-safety/",
+      "verdict": "none"
+    }
+  ]
+}
