@@ -4,6 +4,7 @@ import {
   contentMatchesRecord,
   buildRankingPrompt,
   parseRankingResponse,
+  isSelfDomain,
   type MissingSourceRecord,
 } from './backfill-sources.ts';
 
@@ -12,22 +13,46 @@ import {
 // ---------------------------------------------------------------------------
 
 describe('extractMatchTerms', () => {
-  it('extracts label from facts', () => {
+  it('returns both value and label for facts (OR-matching widens recall)', () => {
     const record: MissingSourceRecord = {
       record_id: '1', record_table: 'facts',
       entity_id: 'sid_abc', entity_name: 'Anthropic',
       description: 'Revenue = $1.5B', label: 'Revenue', value: '$1.5B',
     };
-    expect(extractMatchTerms(record)).toEqual(['revenue']);
+    // Both forms returned — source needs entity name + either term to match
+    expect(extractMatchTerms(record)).toEqual(['$1.5b', 'revenue']);
   });
 
-  it('falls back to value when fact has no label', () => {
+  it('returns just the value when label is empty', () => {
     const record: MissingSourceRecord = {
       record_id: '2', record_table: 'facts',
       entity_id: 'sid_abc', entity_name: 'Anthropic',
       description: '1200', label: '', value: '1200',
     };
     expect(extractMatchTerms(record)).toEqual(['1200']);
+  });
+
+  it('takes the first clause of long narrative values, plus the label', () => {
+    const record: MissingSourceRecord = {
+      record_id: '4', record_table: 'facts',
+      entity_id: 'sid_ak', entity_name: 'Andrej Karpathy',
+      description: 'Notable For = Former Director of AI at Tesla, former OpenAI researcher; founded Eureka Labs',
+      label: 'Notable For',
+      value: 'Former Director of AI at Tesla, former OpenAI researcher; founded Eureka Labs',
+    };
+    expect(extractMatchTerms(record)).toEqual([
+      'former director of ai at tesla',
+      'notable for',
+    ]);
+  });
+
+  it('falls back to label when value is empty', () => {
+    const record: MissingSourceRecord = {
+      record_id: '3a', record_table: 'facts',
+      entity_id: 'sid_abc', entity_name: 'Anthropic',
+      description: 'Is Public Benefit Corp', label: 'Is Public Benefit Corp', value: '',
+    };
+    expect(extractMatchTerms(record)).toEqual(['is public benefit corp']);
   });
 
   it('returns empty for facts with both empty label and value', () => {
@@ -126,15 +151,19 @@ describe('contentMatchesRecord', () => {
     expect(contentMatchesRecord('', ['term'])).toBe(false);
   });
 
-  it('matches multiple terms (all required)', () => {
+  it('matches when any one term is present (OR semantics, widens recall)', () => {
+    // "revenue" matches even though "$1.5b" does not — Haiku filters below
     expect(contentMatchesRecord(
-      'Google invested in Anthropic at a $60B valuation.',
-      ['google', 'anthropic'],
+      'Anthropic disclosed revenue growth in Q4.',
+      ['$1.5b', 'revenue'],
+      'Anthropic',
     )).toBe(true);
 
+    // Neither term present → fail
     expect(contentMatchesRecord(
-      'Google invested in DeepMind.',
-      ['google', 'anthropic'],
+      'Anthropic launched a new model.',
+      ['$1.5b', 'revenue'],
+      'Anthropic',
     )).toBe(false);
   });
 
@@ -254,5 +283,40 @@ describe('parseRankingResponse', () => {
 
   it('returns null for unparseable text', () => {
     expect(parseRankingResponse('I think the first one.', 3)).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// isSelfDomain
+// ---------------------------------------------------------------------------
+
+describe('isSelfDomain', () => {
+  it.each([
+    'https://longtermwiki.com/x',
+    'https://www.longtermwiki.com/x',
+    'https://staging.longtermwiki.com/x',
+    'https://longtermwiki.org/x',
+    'https://www.longtermwiki.org/x',
+    'https://staging.longtermwiki.org/x',
+    'https://longterm.wiki/x',
+    'https://sub.longterm.wiki/x',
+  ])('flags self domain %s', (url) => {
+    expect(isSelfDomain(url)).toBe(true);
+  });
+
+  it.each([
+    'https://wikipedia.org/wiki/X',
+    'https://anthropic.com/news',
+    'https://www.nytimes.com/article',
+    // Lookalike hostnames — must not match
+    'https://notlongtermwiki.com/evil',
+    'https://longtermwiki.com.evil.example/x',
+  ])('does not flag non-self domain %s', (url) => {
+    expect(isSelfDomain(url)).toBe(false);
+  });
+
+  it('returns false for unparseable urls', () => {
+    expect(isSelfDomain('not a url')).toBe(false);
+    expect(isSelfDomain('')).toBe(false);
   });
 });
