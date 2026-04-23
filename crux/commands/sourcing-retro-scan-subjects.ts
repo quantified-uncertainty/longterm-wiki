@@ -290,21 +290,24 @@ export async function classifyEvidence(
   }
 
   for (const [key, rows] of Object.entries(allEvidence)) {
-    // Prefer the most recent evidence row with a sourceUrl as the scan target.
-    // If *every* evidence row is from a deterministic checker, we can skip
-    // outright — those matchers check exact IDs and are immune to the
-    // subject-identity defect.
+    // Classify by the *latest* evidence row that has a sourceUrl. If that
+    // row is from a deterministic checker (exact-ID match), the verdict is
+    // immune to the subject-identity defect — skip. Previously we picked
+    // the latest *non-deterministic* row, which let stale LLM evidence
+    // downgrade verdicts that were since re-confirmed by a deterministic
+    // checker. (CodeRabbit review on PR #4539.)
     const withUrl = rows.filter((r) => r.sourceUrl);
     if (withUrl.length === 0) continue;
 
-    const nonDeterministic = withUrl.find(
-      (r) => !r.checkerModel || !DETERMINISTIC_CHECKER_MODELS.has(r.checkerModel),
-    );
-    if (!nonDeterministic) {
+    const latestWithUrl = withUrl[0];
+    if (
+      latestWithUrl.checkerModel &&
+      DETERMINISTIC_CHECKER_MODELS.has(latestWithUrl.checkerModel)
+    ) {
       out.set(key, { skip: 'deterministic' });
       continue;
     }
-    const sourceUrl = nonDeterministic.sourceUrl;
+    const sourceUrl = latestWithUrl.sourceUrl;
     if (sourceUrl) out.set(key, { sourceUrl });
   }
   return out;
@@ -542,12 +545,25 @@ async function retroScanCommand(
   options: RetroScanOptions,
 ): Promise<CommandResult> {
   const scanOnly = options['scan-only'] === true || options.scanOnly === true;
-  const apply = options.apply === true && !scanOnly;
-  // Three modes:
-  //   default (no --apply, no --scan-only): fast preview; no LLM, no writes.
-  //   --scan-only:                          full LLM scan; no writes (pilot mode).
-  //   --apply:                              full LLM scan + persists downgrades.
-  const isPreview = !apply && !scanOnly;
+  const dryRun = options['dry-run'] === true || options.dryRun === true;
+
+  // --dry-run is documented as preview-only; reject combinations that would
+  // otherwise silently bypass it (e.g., `--dry-run --apply` would have
+  // persisted writes). CodeRabbit review on PR #4539.
+  if (dryRun && (scanOnly || options.apply === true)) {
+    return {
+      exitCode: 1,
+      output: 'Invalid mode: --dry-run cannot be combined with --scan-only or --apply.',
+    };
+  }
+
+  const apply = options.apply === true && !scanOnly && !dryRun;
+  // Four modes (mutually exclusive):
+  //   default (no flags):     fast preview; no LLM, no writes.
+  //   --dry-run:               same as default — explicit preview.
+  //   --scan-only:             full LLM scan; no writes (pilot mode).
+  //   --apply:                 full LLM scan + persists downgrades.
+  const isPreview = dryRun || (!apply && !scanOnly);
   const itemLimit = options.limit ? parseInt(String(options.limit), 10) : 50;
   const offset = options.offset ? parseInt(String(options.offset), 10) : 0;
   const budgetLimit = options.budget ? parseFloat(String(options.budget)) : 35.0;

@@ -250,7 +250,11 @@ describe('classifyEvidence', () => {
     expect(res.size).toBe(0);
   });
 
-  it('prefers the most recent non-deterministic evidence when both exist', async () => {
+  it('skips when the latest evidence row is deterministic (even if older LLM rows exist)', async () => {
+    // Per CodeRabbit review on PR #4539: classify by the *latest* evidence row,
+    // not the latest non-deterministic one. A verdict that was re-confirmed by
+    // a deterministic checker should not be downgraded by stale LLM evidence
+    // sitting underneath it. Order: index 0 = most recent.
     mockGetEvidenceByRecords.mockResolvedValueOnce({
       ok: true,
       data: {
@@ -263,9 +267,25 @@ describe('classifyEvidence', () => {
       },
     });
     const res = await classifyEvidence([makeVerdict({ recordId: 'f_mixed' }) as never]);
-    // Picks the first non-deterministic row — the LLM-sourced URL, since
-    // the wikidata-api row is filtered out as deterministic. That's the
-    // target we want: the row with the subject-identity defect potential.
+    expect(res.get('fact|f_mixed')).toEqual({ skip: 'deterministic' });
+  });
+
+  it('scans by the latest evidence row when it is non-deterministic (older deterministic row ignored)', async () => {
+    // Companion to the previous test: latest is the LLM row (index 0), so
+    // we scan with the LLM URL — the older deterministic row underneath does
+    // not factor in.
+    mockGetEvidenceByRecords.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        evidenceByKey: {
+          'fact|f_mixed': [
+            makeEvidence({ checkerModel: 'claude-haiku-4-5-20251001', sourceUrl: 'https://llm/source' }),
+            makeEvidence({ checkerModel: 'wikidata-api', sourceUrl: 'https://wd/deterministic' }),
+          ],
+        },
+      },
+    });
+    const res = await classifyEvidence([makeVerdict({ recordId: 'f_mixed' }) as never]);
     expect(res.get('fact|f_mixed')).toEqual({ sourceUrl: 'https://llm/source' });
   });
 
@@ -422,6 +442,26 @@ describe('retroScan command', () => {
     expect(parsed.totalMatching).toBe(9578);
     expect(parsed.wouldCheck).toBe(1);
     expect(mockCallLlm).not.toHaveBeenCalled();
+  });
+
+  it('rejects --dry-run combined with --apply (CodeRabbit review on PR #4539)', async () => {
+    const result = await retroScan(
+      [],
+      { 'dry-run': true, apply: true, ci: true } as never,
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toMatch(/--dry-run cannot be combined/);
+    expect(mockCallLlm).not.toHaveBeenCalled();
+    expect(mockStoreVerdict).not.toHaveBeenCalled();
+  });
+
+  it('rejects --dry-run combined with --scan-only', async () => {
+    const result = await retroScan(
+      [],
+      { 'dry-run': true, 'scan-only': true, ci: true } as never,
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toMatch(/--dry-run cannot be combined/);
   });
 
   it('--apply path downgrades a mismatched confirmed verdict', async () => {
