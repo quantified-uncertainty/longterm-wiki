@@ -40,6 +40,7 @@ import {
   validationError,
   invalidJsonError,
   escapeIlike,
+  qBool,
 } from "../shared/utils.js";
 import {
   SOURCING_EXEMPT_TYPES,
@@ -177,10 +178,7 @@ const VerdictsQuery = z.object({
   record_type: z.string().max(50).optional(),
   verdict: z.string().max(50).optional(),
   entity_id: z.string().max(200).optional(),
-  needs_recheck: z
-    .enum(["true", "false"])
-    .transform((v) => v === "true")
-    .optional(),
+  needs_recheck: qBool.optional(),
   q: z.string().max(500).optional(),
   limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),

@@ -15,6 +15,7 @@ import { platformAccounts } from "../../schema.js";
 import {
   zv,
   paginationQuery,
+  qBool,
 } from "../shared/utils.js";
 import { logger } from "../../logger.js";
 import { createSyncHandler } from "./sync-factory.js";
@@ -42,10 +43,7 @@ const SyncItemSchema = z.object({
 
 const AllQuery = paginationQuery({ maxLimit: 1000, defaultLimit: 200 }).extend({
   platform: z.string().max(100).optional(),
-  unlinked: z
-    .enum(["true", "false"])
-    .optional()
-    .transform((v) => v === "true"),
+  unlinked: qBool.optional(),
 });
 
 const platformAccountsApp = new Hono()

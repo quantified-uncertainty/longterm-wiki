@@ -272,6 +272,72 @@ describe("publications GET /all — filters are applied in SQL (QUA-622)", () =>
     expect(body.total).toBe(1);
   });
 
+  it("flagshipOnly=false returns all publications (QUA-651 regression)", async () => {
+    // Before QUA-651: the schema used `z.coerce.boolean()`, which coerces the
+    // literal string "false" to true. So ?flagshipOnly=false silently
+    // filtered to flagship-only — the opposite of what the caller typed.
+    // With qBool this is now a hard false and all rows should come through.
+    for (let i = 0; i < 3; i++) {
+      publicationsStore.push(
+        makePub({ id: `nonflagsh${i}`, is_flagship: false }),
+      );
+    }
+    for (let i = 0; i < 2; i++) {
+      publicationsStore.push(
+        makePub({ id: `flagship-${i}`, is_flagship: true }),
+      );
+    }
+
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/all?flagshipOnly=false&limit=100",
+    );
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as {
+      publications: DrizzlePubRow[];
+      total: number;
+    };
+    expect(body.publications).toHaveLength(5);
+    expect(body.total).toBe(5);
+
+    // Double-check: the route skipped the is_flagship WHERE predicate entirely
+    // (flagshipOnly=false means "no filter"), matching the `if (flagshipOnly)`
+    // gate in publications.ts. Pre-fix it would have emitted is_flagship=true.
+    const countQuery = dispatchedQueries.find(
+      (d) => d.query.toLowerCase().includes("count(")
+        && d.query.toLowerCase().includes('"publications"'),
+    );
+    expect(countQuery?.query.toLowerCase()).not.toMatch(/is_flagship/);
+  });
+
+  it("rejects flagshipOnly=FALSE (case-sensitive) with a 400 (QUA-651)", async () => {
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/all?flagshipOnly=FALSE",
+    );
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects flagshipOnly=1 with a 400 (QUA-651)", async () => {
+    const { publicationsRoute } = await import(
+      "../routes/tablebase/publications.js"
+    );
+    const app = new Hono().route("/api/publications", publicationsRoute);
+
+    const res = await app.request(
+      "/api/publications/all?flagshipOnly=1",
+    );
+    expect(res.status).toBe(400);
+  });
+
   it("passes no WHERE (filter columns absent) when no filters are supplied", async () => {
     publicationsStore.push(makePub({ id: "p1" }));
     publicationsStore.push(makePub({ id: "p2", is_flagship: true }));
