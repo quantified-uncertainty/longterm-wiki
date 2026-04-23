@@ -104,6 +104,12 @@ const FILE_DEP_RE = /^file:\.?\/?packages\/([a-z0-9][a-z0-9-]*)\/?$/;
 // Runs line-by-line to skip `#`-commented lines.
 const DOCKERFILE_COPY_RE = /^\s*COPY\s+(?:--[a-z-]+(?:=\S+)?\s+)*packages\/([a-z0-9][a-z0-9-]*)\//;
 
+// Matches the install step that resolves `file:./packages/<pkg>` deps —
+// any COPY appearing after this line is too late to satisfy pnpm's resolver
+// and would fail at image build with "ENOENT: scandir '/deps/packages/<pkg>'".
+// CodeRabbit review on PR #4545 (QUA-654 follow-up).
+const DOCKERFILE_INSTALL_RE = /^\s*RUN\s+(?:[^&|\n]*\s+)?pnpm\s+install\b/;
+
 // Matches import / import() / require() for `@longterm-wiki/<pkg>` with a
 // quote anchor so stray mentions in comments ("see @longterm-wiki/foo docs")
 // don't count. Package names are lowercase/digits/hyphens (npm naming rules).
@@ -366,6 +372,9 @@ function readDockerfileCopiedPackages(
   }
   for (const line of content.split('\n')) {
     if (line.trimStart().startsWith('#')) continue;
+    // Stop scanning at the install step — COPYs after `RUN pnpm install`
+    // can't satisfy pnpm's `file:` resolver. (CodeRabbit review on PR #4545.)
+    if (DOCKERFILE_INSTALL_RE.test(line)) break;
     const match = DOCKERFILE_COPY_RE.exec(line);
     if (match) copied.add(match[1]);
   }

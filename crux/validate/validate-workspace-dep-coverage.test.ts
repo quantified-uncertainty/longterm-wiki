@@ -621,6 +621,84 @@ describe('validate-workspace-dep-coverage', () => {
     expect(result.errors).toBeGreaterThanOrEqual(1);
   });
 
+  it('does not count COPY lines that appear after `RUN pnpm install` (CodeRabbit review on PR #4545)', () => {
+    // The COPY → install ordering matters: pnpm's `file:./packages/...`
+    // resolver runs at install time, so a COPY appearing after the install
+    // step can't satisfy the dep — the image build fails with
+    // "ENOENT: scandir '/deps/packages/<pkg>'". The parser must treat any
+    // late COPY as missing.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --prod\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.dockerCopy!.missingCopy).toEqual(['url-utils']);
+    expect(result.dockerCopy!.copied).toEqual(new Set());
+  });
+
+  it('counts COPY lines before `RUN pnpm install --frozen-lockfile`', () => {
+    // Companion to the above — verifies install-step recognition is robust
+    // to the most common flag variant we use in production Dockerfiles.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --frozen-lockfile --prod\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
   it('passes when every worker file: dep has a matching COPY line', () => {
     scratch = makeScratchDir();
     const emptyApps = join(scratch, 'apps-missing');
@@ -715,9 +793,12 @@ describe('validate-workspace-dep-coverage', () => {
     expect(result.dockerCopy!.missingCopy).toEqual([]);
   });
 
-  it('accepts COPY lines with --from/--chown flags before the path', () => {
+  it('accepts COPY lines with --from, --chown, and --parents flags before the path', () => {
     // Some Dockerfiles use `COPY --chown=user:group packages/foo/ ./packages/foo/`.
-    // The parser must tolerate flag args before the source path.
+    // The parser must tolerate flag args before the source path. CodeRabbit
+    // review on PR #4545 noted the original fixture only used --chown despite
+    // the test name advertising --from too — expanded to actually exercise
+    // --from, --chown, and the BuildKit --parents flag.
     scratch = makeScratchDir();
     const emptyApps = join(scratch, 'apps-missing');
 
@@ -730,6 +811,8 @@ describe('validate-workspace-dep-coverage', () => {
         name: 'worker',
         dependencies: {
           '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          '@longterm-wiki/other': 'file:./packages/other',
+          '@longterm-wiki/parents': 'file:./packages/parents',
         },
       })
     );
@@ -741,7 +824,9 @@ describe('validate-workspace-dep-coverage', () => {
     writeFileSync(
       dockerfile,
       `FROM node:20-slim AS deps\n` +
-        `COPY --chown=node:node packages/url-utils/ ./packages/url-utils/\n`
+        `COPY --from=builder --chown=node:node packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY --chown=node:node packages/other/ ./packages/other/\n` +
+        `COPY --parents packages/parents/ ./packages/parents/\n`
     );
 
     const result = runCheck({
@@ -751,7 +836,8 @@ describe('validate-workspace-dep-coverage', () => {
       workerSourceDir: cruxDir,
     });
 
-    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils']));
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils', 'other', 'parents']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
   });
 
   it('does not count COPY lines in comments', () => {
