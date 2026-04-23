@@ -151,18 +151,33 @@ function extractFinancialFacts(
   const sourceUrl = `${PROPUBLICA_PAGE_BASE}/${ein}`;
   const facts: FinancialFact[] = [];
 
+  // Detect years with multiple filings (e.g. amended returns, fiscal-year
+  // transitions). For single-filing years, keep the simpler `YYYY` asOf to
+  // match existing data conventions; for multi-filing years, disambiguate
+  // with `YYYY-MM` derived from `tax_prd` so each filing gets a unique key.
+  const yearCounts = new Map<number, number>();
+  for (const f of org.filings_with_data) {
+    yearCounts.set(f.tax_prd_yr, (yearCounts.get(f.tax_prd_yr) ?? 0) + 1);
+  }
+
   for (const filing of org.filings_with_data) {
-    const year = String(filing.tax_prd_yr);
     const einFormatted = formatEin(ein);
+    const year = String(filing.tax_prd_yr);
+    const asOf = (yearCounts.get(filing.tax_prd_yr) ?? 1) > 1
+      ? formatTaxPeriod(filing.tax_prd)
+      : year;
+    const periodNote = asOf === year
+      ? `tax year ${year}`
+      : `tax year ${year}, period ending ${asOf}`;
 
     // Revenue
     if (filing.totrevenue != null && filing.totrevenue !== 0) {
       facts.push({
         property: 'revenue',
         value: filing.totrevenue,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for tax year ${year}.`,
+        notes: `From IRS Form 990 (EIN ${einFormatted}). Total revenue for ${periodNote}.`,
       });
     }
 
@@ -171,9 +186,9 @@ function extractFinancialFacts(
       facts.push({
         property: 'annual-expenses',
         value: filing.totfuncexpns,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for tax year ${year}.`,
+        notes: `From IRS Form 990 (EIN ${einFormatted}). Total functional expenses for ${periodNote}.`,
       });
     }
 
@@ -182,14 +197,19 @@ function extractFinancialFacts(
       facts.push({
         property: 'net-assets',
         value: filing.totnetassetend,
-        asOf: year,
+        asOf,
         source: sourceUrl,
-        notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for tax year ${year}.`,
+        notes: `From IRS Form 990 (EIN ${einFormatted}). End-of-year net assets for ${periodNote}.`,
       });
     }
   }
 
   return facts;
+}
+
+function formatTaxPeriod(taxPrd: number): string {
+  const s = String(taxPrd).padStart(6, '0');
+  return `${s.slice(0, 4)}-${s.slice(4, 6)}`;
 }
 
 function formatEin(ein: string): string {

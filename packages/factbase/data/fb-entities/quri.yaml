@@ -4,9 +4,9 @@ facts:
     property: description
     value: >-
       Nonprofit research organization developing tools for probabilistic
-      reasoning, forecasting, and epistemic infrastructure. Key projects
-      include Squiggle, Squiggle Hub, Metaforecast, SquiggleAI, RoastMyPost,
-      and Guesstimate.
+      reasoning, forecasting, and epistemic infrastructure. Key projects include
+      Squiggle, Squiggle Hub, Metaforecast, SquiggleAI, RoastMyPost, and
+      Guesstimate.
     asOf: !date 2026-03
 
   - id: f_xGX3C9m5Ee
@@ -30,8 +30,8 @@ facts:
     asOf: !date 2026-03
     source: https://quantifieduncertainty.org/team/
     notes: >-
-      1 full-time staff (Ozzie Gooen); plus research collaborators
-      (Nuño Sempere, Eli Lifland) and past contributors
+      1 full-time staff (Ozzie Gooen); plus research collaborators (Nuño
+      Sempere, Eli Lifland) and past contributors
 
   - id: f_QR8legal01
     property: legal-structure
@@ -44,7 +44,8 @@ facts:
     value: !ref sid_t0p43V5oLA
     asOf: !date 2023
     source: https://quantifieduncertainty.org/about/
-    notes: Fiscally sponsored under Rethink Priorities Special Projects Program since 2023
+    notes: Fiscally sponsored under Rethink Priorities Special Projects Program
+      since 2023
 
   - id: f_QR9fndby01
     property: founded-by
@@ -57,3 +58,69 @@ facts:
     value: Ozzie Gooen
     source: https://quantifieduncertainty.org/about/
     notes: Text fallback for display when entity ref doesn't resolve
+  - id: f_XX7xmr10QQ
+    property: revenue
+    value: 1498
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total revenue for tax year 2023.
+  - id: f_xiGY83fsag
+    property: annual-expenses
+    value: 278862
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total functional expenses for tax
+      year 2023.
+  - id: f_k6j96P5rpQ
+    property: revenue
+    value: 679300
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total revenue for tax year 2022.
+  - id: f_bd4HRdReHw
+    property: annual-expenses
+    value: 284817
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total functional expenses for tax
+      year 2022.
+  - id: f_g4eIdKsZGw
+    property: net-assets
+    value: 581361
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). End-of-year net assets for tax year
+      2022.
+  - id: f_RHOrhJ2Jmw
+    property: revenue
+    value: 2463
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total revenue for tax year 2021.
+  - id: f_sCrz2sZrYQ
+    property: annual-expenses
+    value: 85231
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total functional expenses for tax
+      year 2021.
+  - id: f_0LYAbcdwWQ
+    property: revenue
+    value: 290538
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total revenue for tax year 2020.
+  - id: f_tMMAUnm9DA
+    property: annual-expenses
+    value: 20892
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). Total functional expenses for tax
+      year 2020.
+  - id: f_bOvuxMWw0g
+    property: net-assets
+    value: 269646
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/843847921
+    notes: From IRS Form 990 (EIN 84-3847921). End-of-year net assets for tax year
+      2020.

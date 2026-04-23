@@ -45,17 +45,19 @@ facts:
     property: affiliated-org
     value: !ref sid_d9sWZtyVwg
     source: https://www.flf.org
-    notes: "FLF is a sister organization to FLI with separate leadership, not a subsidiary. They share some board members but are distinct legal entities."
+    notes: "FLF is a sister organization to FLI with separate leadership, not a
+      subsidiary. They share some board members but are distinct legal
+      entities."
 
   - id: f_2LXRkLkKWr
     property: description
     value: >-
-      501(c)(3) nonprofit sister organization to FLI, focused on incubating
-      new organizations that steer transformative technology toward benefiting
-      life. Operates as part grant-maker, part strategic research group, part
-      VC firm. Goal of establishing 3-5 new organizations per year. Four-step
-      approach: research gaps, strategic planning, recruit founders, provide
-      operational support. Institutional overhead capped at 15%.
+      501(c)(3) nonprofit sister organization to FLI, focused on incubating new
+      organizations that steer transformative technology toward benefiting life.
+      Operates as part grant-maker, part strategic research group, part VC firm.
+      Goal of establishing 3-5 new organizations per year. Four-step approach:
+      research gaps, strategic planning, recruit founders, provide operational
+      support. Institutional overhead capped at 15%.
     asOf: !date 2026-03
 
   - id: f_sP4q9hNagi
@@ -83,5 +85,18 @@ facts:
     source: https://axrp.net/episode/2025/02/09/episode-38_7-anthony-aguirre-future-of-life-institute.html
     notes: >-
       Approximate. Aguirre said FLF had "a staff of two that recently doubled"
-      (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known
-      staff by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
+      (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known staff
+      by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
+  - id: f_ZnHMEKtjPg
+    property: revenue
+    value: 25035877
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). Total revenue for tax year 2022.
+  - id: f_suNgCCT3JQ
+    property: net-assets
+    value: 25035877
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). End-of-year net assets for tax year
+      2022.

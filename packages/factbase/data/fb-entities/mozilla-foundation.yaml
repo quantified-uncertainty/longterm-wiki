@@ -16,28 +16,295 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/200097189
-    notes: "Foundation only. Revenue: $37.2M (Major sources: license fees from Mozilla Corp and contributions). Assets: $123.3M."
+    notes: "Foundation only. Revenue: $37.2M (Major sources: license fees from
+      Mozilla Corp and contributions). Assets: $123.3M."
 
   - id: f_4k8P2XEa40
     property: organizational-change
-    value: "November 2024: laid off approximately 30% of Foundation workforce, eliminating advocacy and global programs divisions"
+    value: "November 2024: laid off approximately 30% of Foundation workforce,
+      eliminating advocacy and global programs divisions"
     asOf: 2024-11
     source: https://www.mozilla.org/en-US/foundation/annualreport/2024/
 
   - id: f_si3OEJnomV
     property: program
-    value: "Democracy x AI Cohort (2026): 10 projects at $50K each + 12 months mentorship. Top performers may receive up to $250K follow-on. Focus: information quality, institutional transparency, civic participation."
+    value: "Democracy x AI Cohort (2026): 10 projects at $50K each + 12 months
+      mentorship. Top performers may receive up to $250K follow-on. Focus:
+      information quality, institutional transparency, civic participation."
     asOf: 2026
     source: https://www.mozillafoundation.org/en/what-we-do/grantmaking/incubator/democracy-ai-cohort/
 
   - id: f_OSkEqBkktX
     property: program
-    value: "Mozilla Fellows Program 2026: up to 10 fellows. Track I: $100K ($75K stipend + $25K project). Track II: $125K ($100K + $25K). Focus: democratizing data, open infrastructure, AI auditing."
+    value: "Mozilla Fellows Program 2026: up to 10 fellows. Track I: $100K ($75K
+      stipend + $25K project). Track II: $125K ($100K + $25K). Focus:
+      democratizing data, open infrastructure, AI auditing."
     asOf: 2026
     source: https://www.mozillafoundation.org/en/what-we-do/grantmaking/fellowship/2026-nominations-request/
 
   - id: f_VvM30fWQFR
     property: subsidiary
-    value: "Mozilla.ai: $30M startup launched March 2023 to make open-source AI popular with developers. Pre-revenue/early stage."
+    value: "Mozilla.ai: $30M startup launched March 2023 to make open-source AI
+      popular with developers. Pre-revenue/early stage."
     asOf: 2024
     source: https://www.mozilla.org/en-US/foundation/annualreport/2024/
+  - id: f_v1JBItfEpA
+    property: revenue
+    value: 64660933
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2023.
+  - id: f_N10BSvOYtA
+    property: annual-expenses
+    value: 39845284
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2023.
+  - id: f_4hHhcBGv8Q
+    property: net-assets
+    value: 117957756
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2023.
+  - id: f_XYza3h708g
+    property: revenue
+    value: 49747841
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2022.
+  - id: f_Tjun1vTUzQ
+    property: annual-expenses
+    value: 30290560
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2022.
+  - id: f_4SPxrQMang
+    property: net-assets
+    value: 89364442
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2022.
+  - id: f_q8lIoeGAcQ
+    property: revenue
+    value: 30686124
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2021.
+  - id: f_V799BFjjPw
+    property: annual-expenses
+    value: 23340264
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2021.
+  - id: f_vVo9lMUgxg
+    property: net-assets
+    value: 74463329
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2021.
+  - id: f_nNiqnnS47w
+    property: revenue
+    value: 26523745
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2020.
+  - id: f_4HecdHjR7A
+    property: annual-expenses
+    value: 18160777
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2020.
+  - id: f_uIu7TgqWNA
+    property: net-assets
+    value: 64452680
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2020.
+  - id: f_brXMxYOezQ
+    property: revenue
+    value: 28388184
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2019.
+  - id: f_9N2fE6hiEw
+    property: annual-expenses
+    value: 21889786
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2019.
+  - id: f_VSXcMp7b2g
+    property: net-assets
+    value: 53411636
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2019.
+  - id: f_NMwmvFDxzw
+    property: revenue
+    value: 27531742
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2018.
+  - id: f_s7lmsjaD7w
+    property: annual-expenses
+    value: 23276272
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2018.
+  - id: f_WmXAKyt91Q
+    property: net-assets
+    value: 43840834
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2018.
+  - id: f_GuWgljmtUg
+    property: revenue
+    value: 20586446
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2017.
+  - id: f_vIHlBbW40w
+    property: annual-expenses
+    value: 24206401
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2017.
+  - id: f_JKd4VTCKzg
+    property: net-assets
+    value: 30274377
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2017.
+  - id: f_ArIRe4QfTg
+    property: revenue
+    value: 21346401
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2016.
+  - id: f_nz45E074Rg
+    property: annual-expenses
+    value: 21293197
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2016.
+  - id: f_ClY9iW8r0g
+    property: net-assets
+    value: 31901737
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2016.
+  - id: f_uRhp0n0VKA
+    property: revenue
+    value: 19458887
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2015.
+  - id: f_UERM5OwZmQ
+    property: annual-expenses
+    value: 15267138
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2015.
+  - id: f_eglf4Ji1fA
+    property: net-assets
+    value: 31023584
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2015.
+  - id: f_ZQlJYoNCVw
+    property: revenue
+    value: 19309416
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2014.
+  - id: f_t3LkLXwUVw
+    property: annual-expenses
+    value: 15855574
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2014.
+  - id: f_x6D4v2nbng
+    property: net-assets
+    value: 27463706
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2014.
+  - id: f_ceXameJisg
+    property: revenue
+    value: 13493744
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2013.
+  - id: f_lqy8r6Kylw
+    property: annual-expenses
+    value: 13728023
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2013.
+  - id: f_fl06z69MSw
+    property: net-assets
+    value: 23853505
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2013.
+  - id: f_18uiQoGy9Q
+    property: revenue
+    value: 9046361
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2012.
+  - id: f_olh7IIbxsA
+    property: annual-expenses
+    value: 9822851
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2012.
+  - id: f_0ISyXKwhXw
+    property: net-assets
+    value: 24003723
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2012.
+  - id: f_Dh0MWqX8nA
+    property: revenue
+    value: 3954108
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total revenue for tax year 2011.
+  - id: f_lP0MYTKULQ
+    property: annual-expenses
+    value: 5391119
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). Total functional expenses for tax
+      year 2011.
+  - id: f_yycZYytxKg
+    property: net-assets
+    value: 23779161
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/200097189
+    notes: From IRS Form 990 (EIN 20-0097189). End-of-year net assets for tax year
+      2011.
