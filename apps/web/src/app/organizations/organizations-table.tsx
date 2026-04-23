@@ -16,11 +16,14 @@ import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
+import { stripMdxEscapes } from "@/lib/inline-markdown";
 
 export interface OrgRow {
   id: string;
   slug: string | null;
   name: string;
+  /** One-line description (from YAML or wiki-server) — used in grouped view. */
+  description: string | null;
   wikiId: string | null;
   orgType: string | null;
   wikiPageId: string | null;
@@ -130,6 +133,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId,
       orgType: null, // Will be enriched client-side from orgTypeMap
       wikiPageId: org.wikiId,
@@ -160,6 +164,7 @@ export function OrganizationsTable({
   stats,
   serverEnabled = false,
   orgTypeMap,
+  hideHeader = false,
 }: {
   rows: OrgRow[];
   stats?: OrgStatDef[];
@@ -167,6 +172,8 @@ export function OrganizationsTable({
   serverEnabled?: boolean;
   /** Maps entity id -> orgType for enriching server results (orgType is not in the DB) */
   orgTypeMap?: Record<string, string>;
+  /** When true, hides the table's own search input + type chips (caller renders them above). */
+  hideHeader?: boolean;
 }) {
   const serverMode = serverEnabled;
 
@@ -443,26 +450,28 @@ export function OrganizationsTable({
       )}
 
       {/* Filters */}
-      <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search name, type, people, funding programs, description..."
-          aria-label="Search organizations"
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
-        />
-        <FilterChips
-          items={orgTypes.map((t) => ({
-            key: t,
-            label: ORG_TYPE_LABELS[t] ?? t,
-            count: typeCounts[t] ?? 0,
-          }))}
-          selected={typeFilter}
-          onSelect={(key) => urlSetFilter("type", key)}
-          allCount={typeCounts.all}
-        />
-      </div>
+      {!hideHeader && (
+        <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
+          <input
+            type="text"
+            placeholder="Search name, type, people, funding programs, description..."
+            aria-label="Search organizations"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
+          />
+          <FilterChips
+            items={orgTypes.map((t) => ({
+              key: t,
+              label: ORG_TYPE_LABELS[t] ?? t,
+              count: typeCounts[t] ?? 0,
+            }))}
+            selected={typeFilter}
+            onSelect={(key) => urlSetFilter("type", key)}
+            allCount={typeCounts.all}
+          />
+        </div>
+      )}
 
       {/* Results count + column picker */}
       <div className="flex items-center gap-3 mb-3">
@@ -550,26 +559,33 @@ export function OrganizationsTable({
                     key={row.id}
                     className={`hover:bg-muted/20 transition-colors ${isLoading ? "opacity-50" : ""}`}
                   >
-                    {/* Name */}
-                    <td className="py-2.5 px-3">
-                      {row.slug ? (
-                        <Link
-                          href={`/organizations/${row.slug}`}
-                          className="font-medium text-foreground hover:text-primary transition-colors"
-                        >
-                          {row.name}
-                        </Link>
-                      ) : (
-                        <span className="font-medium text-foreground">{row.name}</span>
-                      )}
-                      {row.wikiPageId && (
-                        <Link
-                          href={`/wiki/${row.wikiPageId}`}
-                          className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                          title="Wiki page"
-                        >
-                          wiki
-                        </Link>
+                    {/* Name + description */}
+                    <td className="py-2.5 px-3 max-w-[28rem]">
+                      <div className="flex items-baseline gap-2">
+                        {row.slug ? (
+                          <Link
+                            href={`/organizations/${row.slug}`}
+                            className="font-medium text-foreground hover:text-primary transition-colors"
+                          >
+                            {row.name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-foreground">{row.name}</span>
+                        )}
+                        {row.wikiPageId && (
+                          <Link
+                            href={`/wiki/${row.wikiPageId}`}
+                            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                            title="Wiki page"
+                          >
+                            wiki
+                          </Link>
+                        )}
+                      </div>
+                      {row.description && (
+                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-snug">
+                          {stripMdxEscapes(row.description)}
+                        </p>
                       )}
                     </td>
 

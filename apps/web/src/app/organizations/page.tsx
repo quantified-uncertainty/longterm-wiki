@@ -5,7 +5,8 @@ import { getTypedEntities, isOrganization, getPageById, getTypedEntityById, type
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
-import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
+import type { OrgRow, OrgStatDef } from "@/app/organizations/organizations-table";
+import { OrganizationsView } from "@/app/organizations/organizations-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
@@ -181,6 +182,7 @@ async function loadFromApi(
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId,
       orgType,
       wikiPageId: org.wikiId,
@@ -232,6 +234,7 @@ async function loadFromApi(
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId ?? null,
       orgType,
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
@@ -316,6 +319,7 @@ function loadFromLocal(): OrgPageData {
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId ?? null,
       orgType: org.orgType ?? null,
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
@@ -411,7 +415,7 @@ export default async function OrganizationsPage() {
       <DataSourceBanner source={source} apiError={apiError} />
 
       <Suspense fallback={<div>Loading...</div>}>
-        <OrganizationsTable
+        <OrganizationsView
           rows={data.rows}
           stats={data.stats}
           serverEnabled={data.serverEnabled}
