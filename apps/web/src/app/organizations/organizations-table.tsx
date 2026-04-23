@@ -403,10 +403,12 @@ export function OrganizationsTable({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showColumnPicker]);
+  // peopleCount is intentionally NOT exposed: the API doesn't return it and
+  // the local FactBase data is too sparse to be useful. Re-add when there's
+  // a server-side rollup of personnel/career counts per org.
   type OptionalColumnKey = "peopleCount" | "completionScore";
   const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
     { key: "completionScore", label: "Coverage" },
-    { key: "peopleCount", label: "People Tracked" },
   ];
   const [visibleColumns, setVisibleColumns] = useState<Set<OptionalColumnKey>>(
     () => new Set(["completionScore"]),

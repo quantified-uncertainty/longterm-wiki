@@ -203,7 +203,7 @@ async function loadFromApi(
 
       foundedDate: org.foundedDate,
 
-      peopleCount: null, // Not available from API
+      peopleCount: null, // Not available from API; column hidden in picker.
       completionScore: computeOrgCoverage(org),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -255,7 +255,7 @@ async function loadFromApi(
 
       foundedDate,
 
-      peopleCount: null,
+      peopleCount: null, // Not available from API; column hidden in picker.
       completionScore: computeOrgCoverage({ foundedDate }),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -385,7 +385,8 @@ function buildStats(rows: OrgRow[]): OrgStatDef[] {
 // ── Page component ───────────────────────────────────────────────────────
 
 export default async function OrganizationsPage() {
-  // Always build orgTypeMap from local data — orgType is not in the wiki-server DB
+  // Always build orgTypeMap and people-count map from local data — neither is in
+  // the wiki-server DB, so both server- and local-mode rows resolve them locally.
   const allEntities = getTypedEntities();
   const orgs = allEntities.filter(isOrganization).filter((e) => !e.deprecated);
   const orgTypeMap: Record<string, string> = {};
