@@ -60,12 +60,15 @@ const HORIZONTAL_TABLIST =
 const HORIZONTAL_TRIGGER =
   "shrink-0 rounded-none border-b-2 border-transparent px-4 py-2.5 text-sm font-medium text-muted-foreground shadow-none cursor-pointer transition-colors hover:bg-muted/50 hover:text-foreground data-[state=active]:border-primary data-[state=active]:bg-transparent data-[state=active]:text-foreground data-[state=active]:shadow-none";
 
-// Base styles for vertical tab triggers. The active-state treatment
-// (bg-background, ring, shadow) is defined in globals.css on
-// `.profile-tab-vertical[data-state="active"]` — Tailwind's
-// `data-[state=active]:*` variants don't compile reliably for this project.
-const VERTICAL_TRIGGER =
-  "profile-tab-vertical group relative flex items-center gap-3 w-full justify-between rounded-lg border-0 px-3 py-2 text-left text-[13px] text-muted-foreground shadow-none cursor-pointer transition-colors hover:bg-muted/40 hover:text-foreground";
+// Shared layout for every vertical-nav row (both Radix triggers and link-tabs).
+const VERTICAL_ROW_BASE =
+  "group relative flex items-center gap-3 w-full justify-between rounded-lg border-0 px-3 py-2 text-left text-[13px] text-muted-foreground shadow-none cursor-pointer transition-colors hover:bg-muted/40 hover:text-foreground";
+
+// Radix tab trigger variant. Active-state treatment (bg-background, ring,
+// shadow) is defined in globals.css on `.profile-tab-vertical[data-state="active"]`
+// — Tailwind's `data-[state=active]:*` variants don't compile reliably for
+// this project.
+const VERTICAL_TRIGGER = `profile-tab-vertical ${VERTICAL_ROW_BASE}`;
 
 function CountBadge({ count }: { count: number }) {
   return (
@@ -76,7 +79,7 @@ function CountBadge({ count }: { count: number }) {
 }
 
 function TabLabel({ tab, layout }: { tab: ProfileTab; layout: "horizontal" | "vertical" }) {
-  const showCount = tab.count != null && tab.count > 0;
+  const count = tab.count != null && tab.count > 0 ? tab.count : null;
   if (layout === "vertical") {
     return (
       <>
@@ -88,9 +91,9 @@ function TabLabel({ tab, layout }: { tab: ProfileTab; layout: "horizontal" | "ve
           )}
           <span className="truncate">{tab.label}</span>
         </span>
-        {showCount && (
+        {count !== null && (
           <span className="ml-auto text-[11px] tabular-nums text-muted-foreground/60 group-data-[state=active]:text-muted-foreground">
-            {tab.count}
+            {count}
           </span>
         )}
       </>
@@ -99,7 +102,7 @@ function TabLabel({ tab, layout }: { tab: ProfileTab; layout: "horizontal" | "ve
   return (
     <>
       {tab.label}
-      {showCount && <CountBadge count={tab.count!} />}
+      {count !== null && <CountBadge count={count} />}
     </>
   );
 }
@@ -171,12 +174,9 @@ function HorizontalTabsList({ tabs, ariaLabel }: { tabs: ProfileTab[]; ariaLabel
   );
 }
 
-// Link-tab variant — same visuals as VERTICAL_TRIGGER but no active state
-// (these always navigate away, never stay to show content). Used for Wiki,
-// whose MDX pulls in heavy third-party CSS we don't want bleeding into the
-// profile page.
-const VERTICAL_LINK =
-  "group relative flex items-center gap-3 w-full justify-between rounded-lg border-0 px-3 py-2 text-left text-[13px] text-muted-foreground no-underline shadow-none cursor-pointer transition-colors hover:bg-muted/40 hover:text-foreground";
+// Link-tab variant — same row layout, no active state (these always
+// navigate away instead of selecting a tab).
+const VERTICAL_LINK = `${VERTICAL_ROW_BASE} no-underline`;
 
 function VerticalTabsNav({
   tabs,
