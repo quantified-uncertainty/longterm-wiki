@@ -7,6 +7,10 @@ import { useDirectoryUrl } from "@/hooks/use-directory-url";
 
 type ViewMode = "groups" | "table";
 
+/** Window after a chip click during which a 2nd click on the same chip
+ *  promotes from "scroll-to-section" to "expand as filtered table view". */
+const CHIP_REPEAT_WINDOW_MS = 8000;
+
 export function OrganizationsView({
   rows,
   stats,
@@ -78,7 +82,8 @@ export function OrganizationsView({
       if (view === "groups") {
         const now = Date.now();
         const isRepeat =
-          lastChipRef.current.key === key && now - lastChipRef.current.at < 8000;
+          lastChipRef.current.key === key &&
+          now - lastChipRef.current.at < CHIP_REPEAT_WINDOW_MS;
         lastChipRef.current = { key, at: now };
 
         const sectionEl = document.getElementById(`group-${key}`);
@@ -166,10 +171,20 @@ export function OrganizationsView({
             aria-label="Organization view"
             className="inline-flex rounded-lg border border-border bg-card p-0.5 text-xs"
           >
-            <ViewTab active={view === "groups"} onClick={() => handleViewToggle("groups")}>
+            <ViewTab
+              active={view === "groups"}
+              onClick={() => handleViewToggle("groups")}
+              controls="orgs-panel-groups"
+              id="orgs-tab-groups"
+            >
               By category
             </ViewTab>
-            <ViewTab active={view === "table"} onClick={() => handleViewToggle("table")}>
+            <ViewTab
+              active={view === "table"}
+              onClick={() => handleViewToggle("table")}
+              controls="orgs-panel-table"
+              id="orgs-tab-table"
+            >
               Table view
             </ViewTab>
           </div>
@@ -182,15 +197,19 @@ export function OrganizationsView({
       </div>
 
       {view === "groups" ? (
-        <OrganizationsGrouped rows={rows} onViewAll={handleViewAll} />
+        <div role="tabpanel" id="orgs-panel-groups" aria-labelledby="orgs-tab-groups">
+          <OrganizationsGrouped rows={rows} onViewAll={handleViewAll} />
+        </div>
       ) : (
-        <OrganizationsTable
-          rows={rows}
-          stats={stats}
-          serverEnabled={serverEnabled}
-          orgTypeMap={orgTypeMap}
-          hideHeader
-        />
+        <div role="tabpanel" id="orgs-panel-table" aria-labelledby="orgs-tab-table">
+          <OrganizationsTable
+            rows={rows}
+            stats={stats}
+            serverEnabled={serverEnabled}
+            orgTypeMap={orgTypeMap}
+            hideHeader
+          />
+        </div>
       )}
     </div>
   );
@@ -229,16 +248,23 @@ function ChipButton({
 function ViewTab({
   active,
   onClick,
+  controls,
+  id,
   children,
 }: {
   active: boolean;
   onClick: () => void;
+  controls: string;
+  id: string;
   children: React.ReactNode;
 }) {
   return (
     <button
       role="tab"
+      id={id}
       aria-selected={active}
+      aria-controls={controls}
+      tabIndex={active ? 0 : -1}
       type="button"
       onClick={onClick}
       className={`px-3 py-1 rounded-md transition-colors ${

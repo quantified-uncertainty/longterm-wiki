@@ -135,6 +135,10 @@ const FALLBACK_TYPE = "generic";
 
 const MAX_FEATURED = 10;
 const MAX_TRAILING_NAMES = 8;
+/** Weight of the description field in featured-row ranking, relative to a
+ *  rendered numeric cell. Tuned so a description is enough on its own to
+ *  beat a totally blank stub but ranks below any row with hard data. */
+const DESCRIPTION_SIGNAL_WEIGHT = 0.5;
 
 // ── Featured ranking ────────────────────────────────────────────────────
 
@@ -144,7 +148,9 @@ function rowSignalCount(row: OrgRow, columns: ColumnDef[]): number {
   for (const col of columns) {
     if (col.has(row)) n++;
   }
-  if (row.description && row.description.trim().length > 0) n += 0.5;
+  if (row.description && row.description.trim().length > 0) {
+    n += DESCRIPTION_SIGNAL_WEIGHT;
+  }
   return n;
 }
 
