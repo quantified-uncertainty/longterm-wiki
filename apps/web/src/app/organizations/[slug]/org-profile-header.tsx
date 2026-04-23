@@ -65,7 +65,7 @@ export function buildOrgShellSlots(
     breadcrumbSuffix?: string;
   } = {},
 ): OrgShellSlots {
-  const { activePage, breadcrumbSuffix } = options;
+  const { breadcrumbSuffix } = options;
 
   const initials = data.name
     .split(/[\s-]+/)
@@ -130,15 +130,9 @@ export function buildOrgShellSlots(
     </>
   );
 
+  // Wiki + Data are now reachable via sidebar tabs, no need to duplicate as
+  // header pills. Leaving the slot empty (no headerLinks) on organization pages.
   const headerLinks: EntityProfileShellHeaderLink[] = [];
-  if (data.wikiHref) {
-    headerLinks.push({ label: "Wiki page", href: data.wikiHref });
-  }
-  headerLinks.push({
-    label: "Data",
-    href: `/organizations/${data.id}/data`,
-    active: activePage === "data",
-  });
 
   const headerFooter = data.founders.length > 0 && (
     <p className="text-sm text-muted-foreground">
