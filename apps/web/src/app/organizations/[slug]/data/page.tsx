@@ -38,7 +38,7 @@ export default async function OrgDataPage({
 
   const shellSlots = buildOrgShellSlots(
     { ...headerData, verdict: rollupVerdict },
-    { activePage: "data", breadcrumbSuffix: "Data" },
+    { breadcrumbSuffix: "Data" },
   );
 
   return (

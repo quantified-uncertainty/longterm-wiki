@@ -61,7 +61,6 @@ export interface OrgShellSlots {
 export function buildOrgShellSlots(
   data: OrgHeaderData,
   options: {
-    activePage?: "profile" | "data";
     breadcrumbSuffix?: string;
   } = {},
 ): OrgShellSlots {

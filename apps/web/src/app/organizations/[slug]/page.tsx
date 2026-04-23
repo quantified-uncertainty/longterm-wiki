@@ -884,7 +884,7 @@ export default async function OrgProfilePage({
       coverageInput,
       verdict: rollupVerdict,
     },
-    { activePage: "profile" },
+    {},
   );
 
   return (
