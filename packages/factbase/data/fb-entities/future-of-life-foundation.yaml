@@ -93,6 +93,16 @@ facts:
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: From IRS Form 990 (EIN 88-0926067). Total revenue for tax year 2022.
+  - id: f_5VMZfaUaXj
+    property: annual-expenses
+    value: 0
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/880926067
+    notes: From IRS Form 990 (EIN 88-0926067). Total functional expenses for tax
+      year 2022 reported as $0 — FLF was newly formed and held its initial
+      $25M revenue without operational spending in its first reporting year
+      (revenue and end-of-year net assets match exactly). Backfilled per
+      CodeRabbit review on PR #4538.
   - id: f_suNgCCT3JQ
     property: net-assets
     value: 25035877
