@@ -112,6 +112,16 @@ const CreateSnapshotSchema = z.object({
 
 const SnapshotListQuery = paginationQuery({ defaultLimit: 20, maxLimit: 100 });
 
+const PendingSnapshotsQuery = z.object({
+  limit: clampedLimit(MAX_PAGE_SIZE, 50),
+  offset: z.coerce.number().int().min(0).default(0),
+});
+
+const UpdateExtractionSchema = z.object({
+  extractionStatus: z.enum(VALID_EXTRACTION_STATUSES),
+  extractedFacts: z.unknown().nullable().optional(),
+});
+
 // ---- Typed row interfaces for raw SQL ----
 
 interface SourceWithPageCount {
@@ -540,6 +550,126 @@ const websiteSourcesApp = new Hono()
         { ok: true, id: result.id, deduplicated: false },
         201
       );
+    }
+  )
+
+  // ── List snapshots by extraction status (cross-source) ────────────
+  //
+  // Used by `crux tb website-sources extract` to find pending snapshots
+  // without iterating all sources. The snapshot route is unusual in that
+  // we expose this cross-source lookup — sources are scoped by ID for
+  // writes, but extraction-status reads are inherently global.
+
+  .get(
+    "/snapshots/pending",
+    zv("query", PendingSnapshotsQuery),
+    async (c) => {
+      const { limit, offset } = c.req.valid("query");
+      const db = getDrizzleDb();
+
+      const [totalRow] = await db
+        .select({ count: count() })
+        .from(pageSnapshots)
+        .where(eq(pageSnapshots.extractionStatus, "pending"));
+      const total = totalRow?.count ?? 0;
+
+      if (total === 0) {
+        return c.json({ snapshots: [], total: 0, limit, offset });
+      }
+
+      const rows = await db
+        .select({
+          snapshot: pageSnapshots,
+          page: websiteSourcePages,
+          source: websiteSources,
+        })
+        .from(pageSnapshots)
+        .innerJoin(
+          websiteSourcePages,
+          eq(pageSnapshots.websiteSourcePageId, websiteSourcePages.id)
+        )
+        .innerJoin(
+          websiteSources,
+          eq(websiteSourcePages.sourceId, websiteSources.id)
+        )
+        .where(eq(pageSnapshots.extractionStatus, "pending"))
+        .orderBy(pageSnapshots.fetchedAt)
+        .limit(limit)
+        .offset(offset);
+
+      return c.json({
+        snapshots: rows.map((r) => ({
+          id: r.snapshot.id,
+          websiteSourcePageId: r.snapshot.websiteSourcePageId,
+          sourceId: r.source.id,
+          domain: r.source.domain,
+          entityId: r.source.entityId,
+          entityDisplayName: r.source.entityDisplayName,
+          pagePath: r.page.path,
+          pageRole: r.page.pageRole,
+          url: r.snapshot.url,
+          fetchedAt: r.snapshot.fetchedAt.toISOString(),
+          contentHash: r.snapshot.contentHash,
+          contentLength: r.snapshot.contentLength,
+          extractionStatus: r.snapshot.extractionStatus,
+        })),
+        total,
+        limit,
+        offset,
+      });
+    }
+  )
+
+  // ── Update extraction status + facts on a snapshot ─────────────────
+  //
+  // Used by the extract pipeline after proposing extracted rows via
+  // /api/enrichment/propose. The `extractedFacts` JSONB payload is the
+  // full extraction result (people, costs, rejections) — audit trail
+  // for the per-page extraction yield.
+
+  .post(
+    "/:sourceId/snapshots/:snapshotId/extraction",
+    zv("json", UpdateExtractionSchema),
+    async (c) => {
+      const sourceId = c.req.param("sourceId");
+      const snapshotId = c.req.param("snapshotId");
+      const body = c.req.valid("json");
+      const db = getDrizzleDb();
+
+      // Verify snapshot belongs to this source before writing.
+      const [existing] = await db
+        .select({ id: pageSnapshots.id })
+        .from(pageSnapshots)
+        .innerJoin(
+          websiteSourcePages,
+          eq(pageSnapshots.websiteSourcePageId, websiteSourcePages.id)
+        )
+        .where(
+          and(
+            eq(pageSnapshots.id, snapshotId),
+            eq(websiteSourcePages.sourceId, sourceId)
+          )
+        )
+        .limit(1);
+
+      if (!existing) return notFoundError(c, "Snapshot not found");
+
+      const now = new Date();
+      await db
+        .update(pageSnapshots)
+        .set({
+          extractionStatus: body.extractionStatus,
+          extractedFacts:
+            body.extractedFacts !== undefined ? body.extractedFacts : undefined,
+          extractedAt:
+            body.extractionStatus === "extracted" ||
+            body.extractionStatus === "failed"
+              ? now
+              : null,
+        })
+        .where(eq(pageSnapshots.id, snapshotId));
+
+      return c.json({ ok: true, id: snapshotId });
     }
   )
 

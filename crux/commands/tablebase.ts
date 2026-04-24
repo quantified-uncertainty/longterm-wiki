@@ -1480,6 +1480,10 @@ export const commands = {
   'website-sources-list': websiteSourcesCommands.list,
   'website-sources-show': websiteSourcesCommands.show,
   'website-sources-fetch': websiteSourcesCommands.fetch,
+  // QUA-642: T2 website corpus extraction pipeline.
+  'website-sources-register': websiteSourcesCommands.register,
+  'website-sources-snapshot': websiteSourcesCommands.snapshot,
+  'website-sources-extract': websiteSourcesCommands.extract,
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
   'setup-org': setupOrgCommands.default,
@@ -1546,11 +1550,14 @@ Commands:
   semantic-scholar    Fetch Semantic Scholar papers by author → publications (--target=personSlug:displayName:authorId)
   crossref            Fetch Crossref DOI metadata → publications (--target=doi:10.xxx/yyy[|org=slug][|person=slug])
 
-  Website Sources:
+  Website Sources (T2 pipeline, QUA-642):
   website-sources             Show website source help
   website-sources-list        List all registered website sources
   website-sources-show <id>   Show source details with pages
+  website-sources-register    Register burst-targets.yaml orgs + default pages
   website-sources-fetch <id>  Fetch pages and store snapshots (--all for all sources)
+  website-sources-snapshot    Alias of fetch
+  website-sources-extract     LLM-extract personnel from pending snapshots → /propose T2
 
   Market data:
   markets-discover <entity>   Discover prediction market questions via LLM agent
