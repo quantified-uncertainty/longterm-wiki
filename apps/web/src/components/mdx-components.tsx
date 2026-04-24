@@ -17,6 +17,7 @@ import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
+import { EntityTimeline } from "@/components/wiki/EntityTimeline";
 
 // FactBase components — typed facts, properties, records
 import { FBFactTable } from "@/components/wiki/factbase/FBFactTable";
@@ -181,6 +182,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Anthropic-specific table
   AnthropicStakeholdersTable,
+
+  // Entity timeline — reads entity_events from factbase-data.json
+  EntityTimeline,
 
   // FactBase — typed facts, record collections, entity data
   FBFactTable,
