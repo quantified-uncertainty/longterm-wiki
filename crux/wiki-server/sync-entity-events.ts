@@ -29,14 +29,19 @@
  *   LONGTERMWIKI_SERVER_API_KEY - Bearer token for authentication
  */
 
-import { readFileSync, readdirSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { contentHash } from "../../packages/factbase/src/ids.ts";
-import { waitForHealthy, batchSync } from "./sync-common.ts";
+import { batchSync } from "./sync-common.ts";
+import {
+  asString,
+  asOptionalString,
+  assertPlainObject,
+  loadYamlDir,
+  runSyncMain,
+} from "./sync-yaml-helpers.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const EVENTS_DIR = join(PROJECT_ROOT, "data/entity-events");
@@ -67,16 +72,6 @@ type EventType = (typeof VALID_EVENT_TYPES)[number];
 type Significance = (typeof VALID_SIGNIFICANCE)[number];
 
 // --- Types ---
-
-interface RawEvent {
-  date?: unknown;
-  title?: unknown;
-  eventType?: unknown;
-  significance?: unknown;
-  description?: unknown;
-  source?: unknown;
-  notes?: unknown;
-}
 
 interface RawEventsFile {
   entityId?: unknown;
@@ -111,21 +106,6 @@ export function eventIdFor(entityId: string, date: string, title: string): strin
 
 const DATE_RE = /^\d{4}(-\d{2}(-\d{2})?)?$/;
 
-function asString(v: unknown, field: string, file: string): string {
-  if (typeof v !== "string" || v.trim() === "") {
-    throw new Error(`${file}: '${field}' must be a non-empty string`);
-  }
-  return v;
-}
-
-function asOptionalString(v: unknown, field: string, file: string): string | null {
-  if (v === undefined || v === null || v === "") return null;
-  if (typeof v !== "string") {
-    throw new Error(`${file}: '${field}' must be a string when present`);
-  }
-  return v;
-}
-
 /**
  * Load and validate one entity-events YAML file.
  * Throws on malformed input — sync should fail-closed rather than silently skip.
@@ -150,8 +130,10 @@ export function loadEventsFile(filePath: string): SyncEntityEvent[] {
 
   const out: SyncEntityEvent[] = [];
   for (let i = 0; i < parsed.events.length; i++) {
-    const ev = parsed.events[i] as RawEvent;
     const where = `${filePath} events[${i}]`;
+    const rawItem = parsed.events[i];
+    assertPlainObject(rawItem, where);
+    const ev = rawItem;
 
     const date = asString(ev.date, "date", where);
     if (!DATE_RE.test(date)) {
@@ -204,34 +186,14 @@ export function loadAllEvents(dir: string = EVENTS_DIR): {
   events: SyncEntityEvent[];
   files: string[];
 } {
-  if (!existsSync(dir)) {
-    return { events: [], files: [] };
-  }
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith(".yaml") || f.endsWith(".yml"))
-    .sort();
-
-  const all: SyncEntityEvent[] = [];
-  for (const f of files) {
-    const events = loadEventsFile(join(dir, f));
-    all.push(...events);
-  }
-
-  // Detect duplicate IDs across files — would surface as a silent overwrite
-  // server-side, so catch it here with the offending pair named.
-  const seen = new Map<string, SyncEntityEvent>();
-  for (const ev of all) {
-    const prev = seen.get(ev.id);
-    if (prev) {
-      throw new Error(
-        `Duplicate event ID ${ev.id} from (${prev.entityId}, ${prev.date}, "${prev.title}") and ` +
-          `(${ev.entityId}, ${ev.date}, "${ev.title}"). Adjust one title to disambiguate.`,
-      );
-    }
-    seen.set(ev.id, ev);
-  }
-
-  return { events: all, files };
+  const { items, files } = loadYamlDir<SyncEntityEvent>({
+    dir,
+    loadFile: loadEventsFile,
+    kindLabel: "event",
+    describe: (ev) => `${ev.entityId}, ${ev.date}, "${ev.title}"`,
+    dedupHint: "Adjust one title to disambiguate.",
+  });
+  return { events: items, files };
 }
 
 // --- Sync ---
@@ -259,78 +221,19 @@ export async function syncEntityEvents(
 // --- Main ---
 
 async function main() {
-  const args = parseCliArgs(process.argv.slice(2));
-  const dryRun = args["dry-run"] === true;
-  const batchSize = Number(args["batch-size"]) || DEFAULT_BATCH_SIZE;
-
-  const serverUrl = getServerUrl();
-  const apiKey = getApiKey();
-
-  if (!serverUrl) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_URL environment variable is required",
-    );
-    process.exit(1);
-  }
-  if (!apiKey) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_API_KEY environment variable is required",
-    );
-    process.exit(1);
-  }
-
-  console.log(`Reading entity events from: ${EVENTS_DIR}`);
-  const { events, files } = loadAllEvents();
-  console.log(`  Found ${files.length} files, ${events.length} events`);
-
-  if (events.length === 0) {
-    console.log("Nothing to sync.");
-    return;
-  }
-
-  // Per-entity counts for visibility
-  const byEntity = new Map<string, number>();
-  for (const ev of events) {
-    byEntity.set(ev.entityId, (byEntity.get(ev.entityId) ?? 0) + 1);
-  }
-  for (const [entityId, count] of [...byEntity.entries()].sort()) {
-    console.log(`  ${entityId}: ${count} events`);
-  }
-
-  if (dryRun) {
-    console.log("\n[dry-run] Would sync these events (showing first 10):");
-    for (const ev of events.slice(0, 10)) {
-      console.log(
-        `  ${ev.entityId} ${ev.date} [${ev.eventType}] ${ev.title}`,
-      );
-    }
-    if (events.length > 10) {
-      console.log(`  ... and ${events.length - 10} more`);
-    }
-    return;
-  }
-
-  console.log("\nChecking server health...");
-  const healthy = await waitForHealthy(serverUrl);
-  if (!healthy) {
-    console.error(
-      `Error: Server at ${serverUrl} is not healthy. Aborting sync.`,
-    );
-    process.exit(1);
-  }
-
-  console.log(
-    `\nSyncing ${events.length} entity events (batch size: ${batchSize})...`,
-  );
-  const result = await syncEntityEvents(serverUrl, events, batchSize);
-
-  console.log(`\nSync complete:`);
-  console.log(`  Upserted: ${result.upserted}`);
-  if (result.errors > 0) {
-    console.log(`  Errors:   ${result.errors}`);
-    console.error(`\nSync failed with ${result.errors} event errors.`);
-    process.exit(1);
-  }
+  await runSyncMain<SyncEntityEvent>({
+    dir: EVENTS_DIR,
+    label: "entity events",
+    loadAll: (d) => {
+      const { events, files } = loadAllEvents(d);
+      return { items: events, files };
+    },
+    getEntityId: (ev) => ev.entityId,
+    formatDryRun: (ev) =>
+      `${ev.entityId} ${ev.date} [${ev.eventType}] ${ev.title}`,
+    sync: syncEntityEvents,
+    defaultBatchSize: DEFAULT_BATCH_SIZE,
+  });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
