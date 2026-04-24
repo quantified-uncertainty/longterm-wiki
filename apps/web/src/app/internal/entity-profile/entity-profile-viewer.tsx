@@ -32,6 +32,7 @@ import {
   isLegacyResourceId,
 } from "./sanitize-raw-ids";
 import { formatFactValueString } from "./format-cell-value";
+import { linkifyText } from "./linkify-text";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -302,14 +303,14 @@ function tryParseNumeric(value: unknown): number | null {
 
 // ── Expandable text ───────────────────────────────────────────────────────
 
-function ExpandableText({ text }: { text: string }) {
+function ExpandableText({ children }: { children: React.ReactNode }) {
   const [expanded, setExpanded] = useState(false);
   return (
     <div>
       <span
         className={`text-[11px] whitespace-pre-wrap break-words ${expanded ? "" : "line-clamp-2"}`}
       >
-        {text}
+        {children}
       </span>
       <button
         onClick={() => setExpanded(!expanded)}
@@ -502,10 +503,10 @@ function CellValue({
         }
       } catch { /* not JSON, fall through */ }
     }
-    return <ExpandableText text={sanitizeRawIds(str)} />;
+    return <ExpandableText>{linkifyText(sanitizeRawIds(str))}</ExpandableText>;
   }
 
-  return <span className="text-[11px]">{sanitizeRawIds(str)}</span>;
+  return <span className="text-[11px]">{linkifyText(sanitizeRawIds(str))}</span>;
 }
 
 function JsonValue({ value }: { value: unknown }) {
