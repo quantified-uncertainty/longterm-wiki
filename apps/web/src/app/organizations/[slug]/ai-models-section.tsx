@@ -203,17 +203,22 @@ export function AiModelsSection({
                               <span className="tabular-nums shrink-0">{b.score}{b.unit === "%" ? "%" : ""}</span>
                             </span>
                           ))}
-                          {benchmarks && benchmarks.length > topBenchmarks.length && (
-                            <span
-                              className="inline-flex items-center px-1.5 py-0.5 rounded bg-transparent text-[10px] text-muted-foreground/60"
-                              title={benchmarks
-                                .slice(topBenchmarks.length)
-                                .map((b) => `${b.name}: ${b.score}${b.unit ? ` ${b.unit}` : ""}`)
-                                .join("\n")}
-                            >
-                              +{benchmarks.length - topBenchmarks.length}
-                            </span>
-                          )}
+                          {(() => {
+                            if (!benchmarks) return null;
+                            const shown = new Set(topBenchmarks.map((b) => b.name));
+                            const remaining = benchmarks.filter((b) => !shown.has(b.name));
+                            if (remaining.length === 0) return null;
+                            return (
+                              <span
+                                className="inline-flex items-center px-1.5 py-0.5 rounded bg-transparent text-[10px] text-muted-foreground/60"
+                                title={remaining
+                                  .map((b) => `${b.name}: ${b.score}${b.unit ? ` ${b.unit}` : ""}`)
+                                  .join("\n")}
+                              >
+                                +{remaining.length}
+                              </span>
+                            );
+                          })()}
                         </div>
                       ) : null}
                     </td>
