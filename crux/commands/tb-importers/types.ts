@@ -1,22 +1,22 @@
 /**
- * Shared types for T1 importers (QUA-640).
- *
- * Each importer fetches from an authoritative source, extracts deterministic
- * records, and emits `EnrichmentProposal` payloads that will be POSTed to
- * `POST /api/enrichment/propose` (QUA-632) with `tier=T1`.
- *
- * Until QUA-632 lands, the propose-client is a stub that writes JSON to disk
- * for inspection — the contract here is the wire format.
+ * Shared types for T1 importers. Each importer fetches from an authoritative
+ * source, extracts deterministic records, and emits `EnrichmentProposal`
+ * payloads that are POSTed to `POST /api/enrichment/propose` with `tier=T1`.
+ * See `propose-client.ts::buildProposeRequest` for the wire translation.
  */
 
-/** Tier model from QUA-637 umbrella. */
 export type EnrichmentTier = "T1" | "T2" | "T3";
 
-/** Record types this PR's importers produce. The full set lives in QUA-632. */
+/**
+ * Record types the T1 importers produce. Values MUST match the sync-route
+ * mount names (plural kebab-case) in
+ * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` — the propose
+ * endpoint dispatches on these strings, and dashboards read them verbatim.
+ */
 export type EnrichmentRecordType =
-  | "funding-round"
+  | "funding-rounds"
   | "personnel"
-  | "benchmark-result"
+  | "benchmark-results"
   | "publication"
   | "organization-fact";
 
@@ -34,42 +34,49 @@ export interface EnrichmentProposal {
   source: string;
   /** URL the data was fetched from — written to the evidence row. */
   sourceUrl: string;
-  /** SHA-256 hex of the canonical fetched payload — written to evidence. */
+  /**
+   * SHA-256 hex of the canonical fetched payload — written to evidence.
+   * MUST be pure lowercase hex (no `sha256:` prefix) because the
+   * propose-client derives `row.id` from `responseHash[:10]` and that
+   * derivation expects hex-only input.
+   */
   responseHash: string;
   /** Target tablebase record type. */
   recordType: EnrichmentRecordType;
   /**
    * The record fields. Shape depends on `recordType`.
    *
-   * NOTE: this is the *enrichment proposal*, not a fully-formed PG row.
-   * The propose endpoint (QUA-632) is responsible for:
-   *   - Minting the record `id` (10-char primary key)
-   *   - Resolving `entityRefs` into entity stableIds (FK columns)
-   *   - Populating any required fields the importer doesn't know
+   * The importer emits deterministic, source-derived fields:
+   *   - funding-rounds:     name, date, raised, instrument, source, notes,
+   *                         companyDisplayName
+   *   - personnel:          role, roleType, personDisplayName, orgDisplayName,
+   *                         source, notes, isFounder
+   *   - benchmark-results:  score, unit, date, sourceUrl, notes
+   *   - publication:        title, doi, publishedDate, venue, authors,
+   *                         publicationType, url, notes
+   *   - organization-fact:  property, value, valueType, source, notes
    *
-   * The importer's job is to emit deterministic, source-derived fields:
-   *   - funding-round: name, date, raised, instrument, source, notes,
-   *     companyDisplayName
-   *   - personnel:     role, roleType, personDisplayName, orgDisplayName,
-   *     source, notes, isFounder
-   *   - benchmark-result: score, unit, date, sourceUrl, notes
-   *   - publication:    title, doi, publishedDate, venue, authors,
-   *     publicationType, url, notes
-   *   - organization-fact: property, value, valueType, source, notes
+   * `propose-client.ts::buildProposeRequest` mints the 10-char `row.id` from
+   * `responseHash[:10]` and merges `entityRefs` into the correct FK column
+   * names before POSTing. Downstream entity-FK resolution (slug → stableId)
+   * happens in each sync handler's `resolveEntityFKs` step.
    */
   record: Record<string, unknown>;
   /**
-   * Optional foreign-key resolution hints. When present, the propose endpoint
-   * will resolve display names to entity stableIds before writing the row.
+   * Optional foreign-key resolution hints. `buildProposeRequest` maps these
+   * to the sync schema's FK columns:
+   *   - funding-rounds:     organization → companyId
+   *   - personnel:          organization → organizationId, person → personId
+   *   - benchmark-results:  model → modelId, benchmark → benchmarkId
    */
   entityRefs?: {
     /** Slug or display name of the org the record belongs to. */
     organization?: string;
     /** Slug or display name of the person (personnel only). */
     person?: string;
-    /** Slug or display name of the AI model (benchmark-result only). */
+    /** Slug or display name of the AI model (benchmark-results only). */
     model?: string;
-    /** Benchmark id (benchmark-result only). */
+    /** Benchmark id (benchmark-results only). */
     benchmark?: string;
   };
 }

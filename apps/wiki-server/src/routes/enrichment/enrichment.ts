@@ -32,6 +32,9 @@ import { logger } from "../../logger.js";
 import { parseJsonBody, validationError, invalidJsonError } from "../shared/utils.js";
 import type { InlineSourcing } from "../tablebase/sourcing-schema.js";
 import { grantsRoute } from "../tablebase/grants.js";
+import { personnelRoute } from "../tablebase/personnel.js";
+import { fundingRoundsRoute } from "../tablebase/funding-rounds.js";
+import { benchmarkResultsRoute } from "../tablebase/benchmark-results.js";
 import { checkT1Authority } from "./t1-allowlist.js";
 import { isHomepageUrl } from "./homepage-detector.js";
 
@@ -51,11 +54,21 @@ const MAX_SOURCE_CONTENT_CHARS = 200_000;
 // ── Supported record types ──────────────────────────────────────────────
 
 /**
- * Phase 1 ships grants as the initial supported record type (T1 = EA Funds
- * CSV, T2/T3 = open web).  Adding more record types = (a) import the sync
- * subapp, (b) append it here, (c) extend T1 allowlist entries that name it.
+ * Adding a new supported record type requires: (a) importing the sync subapp,
+ * (b) appending the name to `SUPPORTED_RECORD_TYPES`, (c) adding a
+ * `RECORD_TYPE_ROUTES` entry with the correct `sourceUrlField`, (d) extending
+ * `t1-allowlist.ts` entries that name it.
+ *
+ * Names MUST match the sync-route mount names in
+ * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` so readers,
+ * dashboards, and import pipelines all use the same string.
  */
-const SUPPORTED_RECORD_TYPES = ["grants"] as const;
+const SUPPORTED_RECORD_TYPES = [
+  "grants",
+  "personnel",
+  "funding-rounds",
+  "benchmark-results",
+] as const;
 type SupportedRecordType = (typeof SUPPORTED_RECORD_TYPES)[number];
 
 interface RecordTypeRoute {
@@ -64,10 +77,35 @@ interface RecordTypeRoute {
   subApp: { fetch: (req: Request) => Response | Promise<Response> };
   /** Path within the sub-app that accepts the sync POST. */
   syncPath: string;
+  /**
+   * Name of the row field that carries the evidence URL.  Different sync
+   * schemas use different column names:
+   *   - grants / funding-rounds / personnel: `source`
+   *   - benchmark-results: `sourceUrl`
+   * The propose endpoint overwrites this field with `req.sourceUrl` to keep
+   * the gate-validated URL canonical; callers mustn't smuggle a different
+   * one in the row payload.
+   */
+  sourceUrlField: "source" | "sourceUrl";
 }
 
 const RECORD_TYPE_ROUTES: Record<SupportedRecordType, RecordTypeRoute> = {
-  grants: { subApp: grantsRoute, syncPath: "/sync" },
+  grants: { subApp: grantsRoute, syncPath: "/sync", sourceUrlField: "source" },
+  personnel: {
+    subApp: personnelRoute,
+    syncPath: "/sync",
+    sourceUrlField: "source",
+  },
+  "funding-rounds": {
+    subApp: fundingRoundsRoute,
+    syncPath: "/sync",
+    sourceUrlField: "source",
+  },
+  "benchmark-results": {
+    subApp: benchmarkResultsRoute,
+    syncPath: "/sync",
+    sourceUrlField: "sourceUrl",
+  },
 };
 
 // ── Request schema ──────────────────────────────────────────────────────
@@ -169,12 +207,18 @@ const enrichmentApp = new Hono()
     }
 
     // ── Delegate to the sync handler with sourcing attached ──────────
+    // The record-type's sync schema names its source-URL field either
+    // `source` (grants, funding-rounds, personnel) or `sourceUrl`
+    // (benchmark-results).  Overriding is intentional: the gate validated
+    // this exact URL, callers mustn't smuggle a different one in the row
+    // payload.  The opposite field (if present) is also scrubbed so a caller
+    // can't round-trip one through the unused column on a per-record-type
+    // schema that strips extras silently.
+    const { source: _src, sourceUrl: _srcUrl, ...rowWithoutSourceFields } =
+      req.row;
     const itemWithSourcing = {
-      ...req.row,
-      // Grants' sync schema uses `source` (URL).  Overriding is intentional:
-      // the gate validated this exact URL, callers mustn't smuggle a different
-      // one in the row payload.
-      source: req.sourceUrl,
+      ...rowWithoutSourceFields,
+      [route.sourceUrlField]: req.sourceUrl,
       sourcing: gate.sourcing,
     };
 
