@@ -261,6 +261,13 @@ export async function buildReport(
     // candidateIds into their stable_id values before querying, then
     // translate the matched FK values back to id when accumulating refCount
     // (the refCount map is keyed by resources.id throughout).
+    //
+    // NULL stable_id in the cluster: silently filtered out below. This is
+    // correct — a resource row with NULL stable_id cannot be referenced by
+    // any stable_id-targeting FK (the FK constraint requires a target
+    // value), so its refCount under those FKs is genuinely 0. Phase A
+    // (QUA-536) made resources.stable_id NOT NULL in prod, so this filter
+    // is dead in prod and only fires in dev/test.
     const needsStable = uniqueCols.some((f) => f.targetColumn === "stable_id");
     const idToStable = new Map<string, string>();
     const stableToId = new Map<string, string>();
@@ -379,6 +386,13 @@ export async function mergeCluster(
   }
 
   for (const fk of uniqueCols) {
+    // fkUpdates is keyed by (table, column), not by (table, column, target).
+    // In the rare degenerate case where a single column has FKs to BOTH
+    // resources.id AND resources.stable_id (dedupeFkColumns triple-key
+    // keeps both FK entries so each gets its own UPDATE/DELETE pass), the
+    // counters here aggregate across the two passes. Aggregation is the
+    // right report semantics — "we moved N rows on column X" is the user-
+    // facing question, regardless of which FK constraint enforced it.
     const key = `${fk.tableName}.${fk.columnName}`;
     fkUpdates[key] = fkUpdates[key] ?? { moved: 0, deletedOnConflict: 0 };
 
