@@ -155,11 +155,15 @@ describe('enforceSourcing', () => {
     expect(res.status).toBe(200);
   });
 
-  it('error message includes table name and verify command', async () => {
+  it('error message includes table name and verify-orchestrate command (QUA-677)', async () => {
+    // Regression test: the message used to suggest `tb verify <table>` which
+    // routes to the single-entity personnel-ID check, not the sourcing
+    // orchestrator. It must point at `tb verify-orchestrate <table>`.
     const app = createTestApp('grants');
     const res = await makeRequest(app, [{ id: '1' }]);
     expect(res.status).toBe(400);
     const body = await res.json() as { message: string };
-    expect(body.message).toContain('pnpm crux tb verify grants');
+    expect(body.message).toContain('pnpm crux tb verify-orchestrate grants');
+    expect(body.message).not.toMatch(/pnpm crux tb verify grants(?!-)/);
   });
 });

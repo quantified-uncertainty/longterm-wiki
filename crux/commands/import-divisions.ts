@@ -15,6 +15,7 @@ import { generateId } from "../lib/grant-import/id.ts";
 import { getServerUrl } from "../lib/wiki-server/client.ts";
 import { deleteDivisionsBatch, syncDivisions } from "../lib/wiki-server/divisions.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
+import { fetchInlineSourcing, type InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 // ---------------------------------------------------------------------------
 // Division type (matches wiki-server SyncDivisionItemSchema)
@@ -757,6 +758,7 @@ interface SyncDivision {
   endDate: string | null;
   source: string | null;
   notes: string | null;
+  sourcing?: InlineSourcing;
 }
 
 function toSyncDivision(def: DivisionDef): SyncDivision {
@@ -841,12 +843,43 @@ async function cmdSync(
     );
   }
 
+  // Attach inline sourcing from source_check_verdicts, unless explicitly
+  // bypassed. The server requires sourcing for divisions (SOURCE_CHECK_REQUIRED
+  // in apps/wiki-server/src/routes/shared/sourcing-enforcement.ts); items
+  // without a verdict row are sent bare and the server rejects the batch with
+  // a count of unsourced records, pointing to `verify-orchestrate divisions`.
+  let attached = 0;
+  if (!options?.forceSkipSourcing) {
+    const sourcingByRecordId = await fetchInlineSourcing("division");
+    for (const item of items) {
+      const sourcing = sourcingByRecordId.get(item.id);
+      if (sourcing) {
+        item.sourcing = sourcing;
+        attached++;
+      }
+    }
+  }
+
   console.log(`\nSyncing ${items.length} divisions to ${serverUrl}...`);
+  if (!options?.forceSkipSourcing) {
+    const unsourced = items.length - attached;
+    console.log(
+      `  Sourcing: ${attached}/${items.length} records have verdicts` +
+        (unsourced > 0
+          ? ` (${unsourced} unsourced — server will reject unless you run \`pnpm crux tb verify-orchestrate divisions\` first)`
+          : ""),
+    );
+  } else {
+    console.log(
+      `  Sourcing: skipped (--force-skip-sourcing, reason: ${options?.forceSkipSourcingReason ?? "unspecified"})`,
+    );
+  }
 
   if (dryRun) {
     console.log("  (dry run -- no data written)");
     for (const d of items) {
-      console.log(`  ${d.id}  ${d.name} [${d.divisionType}]`);
+      const badge = d.sourcing ? `[${d.sourcing.verdict}]` : "[unsourced]";
+      console.log(`  ${d.id}  ${d.name} [${d.divisionType}] ${badge}`);
     }
     return;
   }

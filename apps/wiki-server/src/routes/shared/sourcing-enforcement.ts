@@ -66,7 +66,7 @@ export function enforceSourcing(
   return validationError(
     c,
     `Source-check required (${source}) but ${unchecked.length}/${items.length} records lack sourcing data. ` +
-    `Run \`pnpm crux tb verify ${tableName}\` before submitting, ` +
+    `Run \`pnpm crux tb verify-orchestrate ${tableName}\` to populate source_check_verdicts before submitting, ` +
     `or use ?forceSkipSourcing=true&reason=... to bypass with audit logging.`,
   );
 }

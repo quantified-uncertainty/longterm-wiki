@@ -91,6 +91,17 @@ export const GROUPS: Record<string, GroupDef> = {
       'political',
       'benchmarks',
       'flagship-curate',
+      // QUA-677: treat import/data-source domains with multiple subcommands
+      // as proper sub-domains so `crux tb <domain> <sub>` dispatches to the
+      // subcommand instead of silently running `.default` with `<sub>` as a
+      // swallowed positional arg. The flattened dash-form aliases
+      // (`import-divisions-sync`, etc.) in tablebase.commands keep working
+      // via the flattened path.
+      'import-grants',
+      'import-divisions',
+      'import-funding-programs',
+      'data-sources',
+      'website-sources',
     ],
     flattened: ['tablebase'],
   },
