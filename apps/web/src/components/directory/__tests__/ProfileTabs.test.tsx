@@ -261,5 +261,24 @@ describe("ProfileTabs", () => {
       // Overview content renders (it's the first non-link tab = default).
       expect(screen.getByTestId("overview")).toBeTruthy();
     });
+
+    it("post-hydration effect activates a known ?tab= param", () => {
+      mockState.search = "tab=facts";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>overview</div>),
+            tab("facts", "Facts", <div data-testid="facts-content">facts</div>),
+          ]}
+        />,
+      );
+      // jsdom runs effects synchronously on render, so by the time this
+      // assertion runs the useEffect has applied the URL param and Facts is
+      // active.
+      const activeTab = screen.getByRole("tab", { selected: true });
+      expect(activeTab.textContent).toMatch(/Facts/);
+      // Active panel is Facts'.
+      expect(screen.getByTestId("facts-content")).toBeTruthy();
+    });
   });
 });

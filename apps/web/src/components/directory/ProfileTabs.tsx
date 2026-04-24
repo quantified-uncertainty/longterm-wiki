@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -253,6 +253,12 @@ function TabsContentList({ tabs, layout }: { tabs: ProfileTab[]; layout: "horizo
 
 // ─── Layout wrappers ────────────────────────────────────────────────────
 
+// QUA-656: Both Fallback and Inner call these with `onChange` set, so the
+// rendered `<Tabs>` always uses controlled props (`value` + `onValueChange`).
+// Keeping the wire shape identical between the two Suspense states is what
+// lets the Suspense transition avoid tripping React #418 during ISR cache
+// boundaries — the only thing that changes across the transition is the
+// handler identity, not the DOM structure.
 function HorizontalLayout({
   tabs,
   activeTab,
@@ -262,23 +268,16 @@ function HorizontalLayout({
 }: {
   tabs: ProfileTab[];
   activeTab: string;
-  onChange?: (value: string) => void;
+  onChange: (value: string) => void;
   ariaLabel?: string;
   notice?: React.ReactNode;
 }) {
-  const content = (
-    <>
+  return (
+    <Tabs value={activeTab} onValueChange={onChange}>
       <HorizontalTabsList tabs={tabs} ariaLabel={ariaLabel} />
       {notice}
       <TabsContentList tabs={tabs} layout="horizontal" />
-    </>
-  );
-  return onChange ? (
-    <Tabs value={activeTab} onValueChange={onChange}>
-      {content}
     </Tabs>
-  ) : (
-    <Tabs defaultValue={activeTab}>{content}</Tabs>
   );
 }
 
@@ -292,34 +291,27 @@ function VerticalLayout({
 }: {
   tabs: ProfileTab[];
   activeTab: string;
-  onChange?: (value: string) => void;
+  onChange: (value: string) => void;
   ariaLabel?: string;
   groups?: ProfileTabGroup[];
   notice?: React.ReactNode;
 }) {
-  const content = (
-    <div className="grid grid-cols-1 md:grid-cols-[16rem_minmax(0,1fr)] gap-x-10 gap-y-6">
-      <div className="md:sticky md:top-4 md:self-start">
-        <VerticalTabsNav tabs={tabs} groups={groups} ariaLabel={ariaLabel} />
-      </div>
-      <div className="min-w-0">
-        {notice}
-        <TabsContentList tabs={tabs} layout="vertical" />
-      </div>
-    </div>
-  );
-  return onChange ? (
+  return (
     <Tabs
       value={activeTab}
       onValueChange={onChange}
       orientation="vertical"
       className="flex-col gap-0"
     >
-      {content}
-    </Tabs>
-  ) : (
-    <Tabs defaultValue={activeTab} orientation="vertical" className="flex-col gap-0">
-      {content}
+      <div className="grid grid-cols-1 md:grid-cols-[16rem_minmax(0,1fr)] gap-x-10 gap-y-6">
+        <div className="md:sticky md:top-4 md:self-start">
+          <VerticalTabsNav tabs={tabs} groups={groups} ariaLabel={ariaLabel} />
+        </div>
+        <div className="min-w-0">
+          {notice}
+          <TabsContentList tabs={tabs} layout="vertical" />
+        </div>
+      </div>
     </Tabs>
   );
 }
@@ -344,7 +336,17 @@ function UnknownTabNotice({
   );
 }
 
-function ProfileTabsBody({
+// Shared helper: pick the tab that both Fallback and Inner should start with.
+// Keeping this in one place means the two Suspense states can never diverge
+// on "which tab is active on first paint".
+function pickDefaultTab(tabs: ProfileTab[]): ProfileTab {
+  const selectable = tabs.filter((t) => !t.href);
+  return selectable[0] ?? tabs[0];
+}
+
+function noop() {}
+
+function ProfileTabsInner({
   tabs,
   ariaLabel,
   layout,
@@ -359,28 +361,29 @@ function ProfileTabsBody({
   const pathname = usePathname();
   const router = useRouter();
 
-  // Link tabs (with href) aren't Radix tabs — they navigate on click. Pick
-  // the first non-link tab as the default active id.
-  const selectableTabs = tabs.filter((t) => !t.href);
-  const defaultTab = selectableTabs[0] ?? tabs[0];
+  const defaultTab = pickDefaultTab(tabs);
   const defaultTabId = defaultTab.id;
+  const selectableTabs = tabs.filter((t) => !t.href);
 
-  // QUA-656: Initial render always uses defaultTabId on both server and
-  // client so the two render trees match exactly. URL-param sync happens
-  // post-hydration in the effect below. A prior Suspense-based design
-  // (QUA-463 for single-tab, this for multi-tab) was vulnerable to React
-  // #418 element-type mismatches during ISR cache boundaries, where the
-  // streamed HTML and RSC payload could come from different renders.
+  // QUA-656: Inner starts with the same default tab the Fallback renders,
+  // and reconciles with `?tab=` in a post-hydration effect. Prior design
+  // derived activeTab from searchParams synchronously, which — combined
+  // with the Fallback rendering `defaultValue` (uncontrolled) vs Inner's
+  // `value` (controlled) — produced structurally different Radix trees
+  // across the Suspense transition. During Vercel ISR cache boundaries,
+  // HTML and RSC could come from different renders and mis-match on
+  // hydration (React #418, args[]=HTML element-type mismatch).
   const [activeTab, setActiveTab] = useState<string>(defaultTabId);
   const [unknownTabRequested, setUnknownTabRequested] = useState<string | null>(null);
 
-  // Stable key of selectable tab ids so the effect only re-runs when the set
-  // of tabs actually changes, not on every render (tabs prop is a new array
-  // from the parent on each render).
+  // `searchParams` object identity changes every parent render; depend on
+  // the resolved `tab` value instead so the effect only fires when the URL
+  // actually changes. `selectableIdsKey` likewise guards against new array
+  // identity on every render.
+  const tabParam = searchParams.get("tab");
   const selectableIdsKey = selectableTabs.map((t) => t.id).join("|");
 
   useEffect(() => {
-    const tabParam = searchParams.get("tab");
     if (!tabParam) {
       setActiveTab(defaultTabId);
       setUnknownTabRequested(null);
@@ -394,7 +397,7 @@ function ProfileTabsBody({
       setActiveTab(defaultTabId);
       setUnknownTabRequested(tabParam);
     }
-  }, [searchParams, defaultTabId, selectableIdsKey]);
+  }, [tabParam, defaultTabId, selectableIdsKey]);
 
   function handleTabChange(value: string) {
     if (value === defaultTabId) {
@@ -428,6 +431,41 @@ function ProfileTabsBody({
   );
 }
 
+function ProfileTabsFallback({
+  tabs,
+  ariaLabel,
+  layout,
+  groups,
+}: {
+  tabs: ProfileTab[];
+  ariaLabel?: string;
+  layout: "horizontal" | "vertical";
+  groups?: ProfileTabGroup[];
+}) {
+  // QUA-656: Fallback renders the SAME controlled <Tabs value={...}
+  // onValueChange={...}> tree Inner starts with — only the handler identity
+  // differs. That way when Suspense swaps Fallback → Inner after the
+  // searchParams hook resolves, the DOM doesn't restructure and React
+  // doesn't have to reconcile incompatible tab-root configurations.
+  const defaultTabId = pickDefaultTab(tabs).id;
+  return layout === "vertical" ? (
+    <VerticalLayout
+      tabs={tabs}
+      activeTab={defaultTabId}
+      onChange={noop}
+      ariaLabel={ariaLabel}
+      groups={groups}
+    />
+  ) : (
+    <HorizontalLayout
+      tabs={tabs}
+      activeTab={defaultTabId}
+      onChange={noop}
+      ariaLabel={ariaLabel}
+    />
+  );
+}
+
 /**
  * Reusable tabbed layout for profile pages (organizations, people, etc.).
  * - Filters out tabs where `count === 0`
@@ -438,15 +476,28 @@ function ProfileTabsBody({
 export function ProfileTabs({ tabs, ariaLabel, layout = "horizontal", groups }: ProfileTabsProps) {
   const visibleTabs = tabs.filter((t) => t.count !== 0);
   if (visibleTabs.length === 0) return null;
+  // Single-tab short-circuit — matches QUA-463 hydration fix: skip Suspense
+  // so server and client agree on a plain fragment.
   if (visibleTabs.length === 1) {
     return <>{visibleTabs[0].content}</>;
   }
   return (
-    <ProfileTabsBody
-      tabs={visibleTabs}
-      ariaLabel={ariaLabel}
-      layout={layout}
-      groups={groups}
-    />
+    <Suspense
+      fallback={
+        <ProfileTabsFallback
+          tabs={visibleTabs}
+          ariaLabel={ariaLabel}
+          layout={layout}
+          groups={groups}
+        />
+      }
+    >
+      <ProfileTabsInner
+        tabs={visibleTabs}
+        ariaLabel={ariaLabel}
+        layout={layout}
+        groups={groups}
+      />
+    </Suspense>
   );
 }
