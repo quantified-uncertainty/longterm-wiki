@@ -848,8 +848,13 @@ async function cmdSync(
   // in apps/wiki-server/src/routes/shared/sourcing-enforcement.ts); items
   // without a verdict row are sent bare and the server rejects the batch with
   // a count of unsourced records, pointing to `verify-orchestrate divisions`.
+  //
+  // The fetch runs even under --dry-run: the whole point of dry-run here is
+  // to preview what the server would accept, which includes which records
+  // already have verdicts ([confirmed] badge) vs. which don't ([unsourced]).
+  const forceSkipSourcing = !!options?.forceSkipSourcing;
   let attached = 0;
-  if (!options?.forceSkipSourcing) {
+  if (!forceSkipSourcing) {
     const sourcingByRecordId = await fetchInlineSourcing("division");
     for (const item of items) {
       const sourcing = sourcingByRecordId.get(item.id);
@@ -861,18 +866,16 @@ async function cmdSync(
   }
 
   console.log(`\nSyncing ${items.length} divisions to ${serverUrl}...`);
-  if (!options?.forceSkipSourcing) {
-    const unsourced = items.length - attached;
-    console.log(
-      `  Sourcing: ${attached}/${items.length} records have verdicts` +
-        (unsourced > 0
-          ? ` (${unsourced} unsourced — server will reject unless you run \`pnpm crux tb verify-orchestrate divisions\` first)`
-          : ""),
-    );
-  } else {
+  if (forceSkipSourcing) {
     console.log(
       `  Sourcing: skipped (--force-skip-sourcing, reason: ${options?.forceSkipSourcingReason ?? "unspecified"})`,
     );
+  } else {
+    const unsourced = items.length - attached;
+    const warning = unsourced > 0
+      ? ` (${unsourced} unsourced — server will reject unless you run \`pnpm crux tb verify-orchestrate divisions\` first)`
+      : "";
+    console.log(`  Sourcing: ${attached}/${items.length} records have verdicts${warning}`);
   }
 
   if (dryRun) {

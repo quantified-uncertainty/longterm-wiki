@@ -221,4 +221,51 @@ describe("fetchInlineSourcing", () => {
       });
     await expect(fetchInlineSourcing("division")).rejects.toThrow(/offset=200/);
   });
+
+  it("falls back to error code when message is missing (no 'undefined' in text)", async () => {
+    mockListVerdicts.mockResolvedValueOnce({
+      ok: false,
+      error: "server_error",
+      message: undefined,
+    });
+    let thrown: Error | null = null;
+    try {
+      await fetchInlineSourcing("division");
+    } catch (e) {
+      thrown = e as Error;
+    }
+    expect(thrown).not.toBeNull();
+    expect(thrown!.message).toMatch(/server_error/);
+    expect(thrown!.message).not.toMatch(/undefined/);
+  });
+
+  it("truncates evidence longer than 5000 chars with a visible marker", async () => {
+    const longReasoning = "a".repeat(6000);
+    mockListVerdicts.mockResolvedValue({
+      ok: true,
+      data: {
+        verdicts: [verdict({ recordId: "a", reasoning: longReasoning })],
+        total: 1,
+      },
+    });
+    const map = await fetchInlineSourcing("division");
+    const evidence = map.get("a")?.evidence ?? "";
+    expect(evidence.length).toBeLessThanOrEqual(5000);
+    expect(evidence.endsWith("… [truncated]")).toBe(true);
+    // And the non-truncated prefix is preserved.
+    expect(evidence.startsWith("aaa")).toBe(true);
+  });
+
+  it("leaves evidence at exactly 5000 chars untouched (boundary)", async () => {
+    const exact = "b".repeat(5000);
+    mockListVerdicts.mockResolvedValueOnce({
+      ok: true,
+      data: {
+        verdicts: [verdict({ recordId: "a", reasoning: exact })],
+        total: 1,
+      },
+    });
+    const map = await fetchInlineSourcing("division");
+    expect(map.get("a")?.evidence).toBe(exact);
+  });
 });

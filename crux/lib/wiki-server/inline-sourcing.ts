@@ -31,8 +31,11 @@ export interface InlineSourcing {
   checkedBy?: string;
 }
 
-/** Verdicts that aren't accepted by InlineSourcingSchema (skipped when attaching). */
-const ATTACHABLE_VERDICTS = new Set([
+/**
+ * Verdict values accepted by InlineSourcingSchema. Kept as a typed Set so the
+ * `has` check narrows the verdict string to the enum without a type assertion.
+ */
+const ATTACHABLE_VERDICTS = new Set<InlineSourcing["verdict"]>([
   "confirmed",
   "contradicted",
   "outdated",
@@ -40,8 +43,19 @@ const ATTACHABLE_VERDICTS = new Set([
   "unverifiable",
 ]);
 
-/** Must not exceed the server's MAX_PAGE_SIZE for the verdicts endpoint. */
+/**
+ * Must not exceed the server's MAX_PAGE_SIZE for the verdicts endpoint (200),
+ * defined in apps/wiki-server/src/routes/sourcing/sourcing.ts.
+ */
 const PAGE_SIZE = 200;
+
+/**
+ * Server-side InlineSourcingSchema caps `evidence` at 5000 chars. Mirror it
+ * here so we don't ship a payload the server rejects, and so truncation is
+ * visible to readers of the helper rather than happening by silent overflow.
+ */
+const EVIDENCE_MAX_LENGTH = 5000;
+const TRUNCATION_SUFFIX = "… [truncated]";
 
 /**
  * Fetch whole-row verdicts (`fieldName === null`) for a given record_type and
@@ -66,21 +80,20 @@ export async function fetchInlineSourcing(
       offset,
     });
     if (!res.ok) {
+      const detail = res.message || res.error || "unknown error";
       throw new Error(
-        `Failed to fetch ${recordType} verdicts (offset=${offset}): ${res.message}`,
+        `Failed to fetch ${recordType} verdicts (offset=${offset}): ${detail}`,
       );
     }
 
     for (const v of res.data.verdicts) {
       if (v.fieldName != null) continue;
-      if (!ATTACHABLE_VERDICTS.has(v.verdict)) continue;
+      if (!isAttachableVerdict(v.verdict)) continue;
 
-      const sourcing: InlineSourcing = {
-        verdict: v.verdict as InlineSourcing["verdict"],
-      };
+      const sourcing: InlineSourcing = { verdict: v.verdict };
       if (v.confidence != null) sourcing.confidence = v.confidence;
       if (v.lastComputedAt) sourcing.checkedAt = v.lastComputedAt;
-      if (v.reasoning) sourcing.evidence = v.reasoning.slice(0, 5000);
+      if (v.reasoning) sourcing.evidence = truncateEvidence(v.reasoning);
 
       map.set(v.recordId, sourcing);
     }
@@ -90,4 +103,19 @@ export async function fetchInlineSourcing(
   }
 
   return map;
+}
+
+function isAttachableVerdict(v: string): v is InlineSourcing["verdict"] {
+  return (ATTACHABLE_VERDICTS as Set<string>).has(v);
+}
+
+/**
+ * Truncate evidence to the server's 5000-char cap, appending a visible marker
+ * when truncation occurs so it's not silent. The marker eats into the budget
+ * so the final string is still under the limit.
+ */
+function truncateEvidence(s: string): string {
+  if (s.length <= EVIDENCE_MAX_LENGTH) return s;
+  const head = s.slice(0, EVIDENCE_MAX_LENGTH - TRUNCATION_SUFFIX.length);
+  return head + TRUNCATION_SUFFIX;
 }
