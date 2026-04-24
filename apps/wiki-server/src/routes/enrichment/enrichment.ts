@@ -218,7 +218,7 @@ const enrichmentApp = new Hono()
     // can't round-trip one through the unused column on a per-record-type
     // schema that strips extras silently.
     const { source: _src, sourceUrl: _srcUrl, ...rowWithoutSourceFields } =
-      req.row as Record<string, unknown>;
+      req.row;
     const itemWithSourcing = {
       ...rowWithoutSourceFields,
       [route.sourceUrlField]: req.sourceUrl,

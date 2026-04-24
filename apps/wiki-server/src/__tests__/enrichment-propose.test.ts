@@ -160,6 +160,36 @@ describe("checkT1Authority", () => {
     const res = checkT1Authority("", "grants", null);
     expect(res.matched).toBe(false);
   });
+
+  it("matches github.com user-profile URLs for personnel", () => {
+    const res = checkT1Authority(
+      "https://github.com/octocat",
+      "personnel",
+      null,
+    );
+    expect(res.matched).toBe(true);
+    if (res.matched) expect(res.source.id).toBe("github-user");
+  });
+
+  it("rejects github.com reserved paths as personnel authority", () => {
+    for (const reserved of [
+      "https://github.com/settings",
+      "https://github.com/marketplace",
+      "https://github.com/orgs",
+      "https://github.com/about",
+      "https://github.com/pulls",
+      "https://github.com/issues",
+      "https://github.com/search",
+      "https://github.com/explore",
+      "https://github.com/notifications",
+      "https://github.com/login",
+      "https://github.com/features",
+      "https://github.com/pricing",
+    ]) {
+      const res = checkT1Authority(reserved, "personnel", null);
+      expect(res.matched).toBe(false);
+    }
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -800,6 +830,58 @@ describe("POST /api/enrichment/propose", () => {
     // The gate-validated URL wins; the smuggled one is dropped.
     expect(innerBody.items[0].source).toBe(
       "https://www.sec.gov/Archives/edgar/data/1/abc/primary_doc.xml",
+    );
+  });
+
+  it("scrubs a smuggled 'sourceUrl' from a funding-rounds row (opposite-field smuggle)", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "funding-rounds",
+      row: {
+        id: "fr01234567",
+        companyId: "anthropic",
+        name: "x",
+        // funding-rounds uses `source`; a caller smuggling `sourceUrl` into
+        // the row is dropped so it can't round-trip through an unused column.
+        sourceUrl: "https://attacker.example.com/smuggled",
+      },
+      sourceUrl:
+        "https://www.sec.gov/Archives/edgar/data/1/abc/primary_doc.xml",
+    });
+    expect(res.status).toBe(200);
+    const innerBody = captured[0].body as {
+      items: Array<{ source: string; sourceUrl?: unknown }>;
+    };
+    expect(innerBody.items[0].sourceUrl).toBeUndefined();
+    expect(innerBody.items[0].source).toBe(
+      "https://www.sec.gov/Archives/edgar/data/1/abc/primary_doc.xml",
+    );
+  });
+
+  it("scrubs a smuggled 'source' from a benchmark-results row (opposite-field smuggle)", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "benchmark-results",
+      row: {
+        id: "br01234567",
+        benchmarkId: "ifeval",
+        modelId: "claude-3-5-sonnet",
+        score: 75.2,
+        // benchmark-results uses `sourceUrl`; smuggled `source` is dropped.
+        source: "https://attacker.example.com/smuggled",
+      },
+      sourceUrl:
+        "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?row=x",
+    });
+    expect(res.status).toBe(200);
+    const innerBody = captured[0].body as {
+      items: Array<{ sourceUrl: string; source?: unknown }>;
+    };
+    expect(innerBody.items[0].source).toBeUndefined();
+    expect(innerBody.items[0].sourceUrl).toContain(
+      "huggingface.co/spaces/open-llm-leaderboard",
     );
   });
 });

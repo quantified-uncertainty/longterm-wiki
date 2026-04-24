@@ -93,9 +93,17 @@ export const T1_ALLOWLIST: T1Source[] = [
     // Public GitHub URLs surfaced by the github-contributors importer (T1).
     // The contributors API hits `api.github.com` above; the per-user profile
     // URLs written into `proposal.sourceUrl` live under github.com itself.
+    //
+    // Pattern excludes GitHub's reserved single-segment paths (settings,
+    // marketplace, orgs, etc.) — those aren't user profiles and must never
+    // be accepted as authoritative sources for personnel records.  The
+    // downstream github-contributors importer also independently knows the
+    // URL is a real user profile because it was surfaced by the contributors
+    // API, but this allowlist is meant to be an independent gate.
     id: "github-user",
     name: "GitHub user profile (via contributors importer)",
-    urlPattern: /^https:\/\/github\.com\/[^/]+\/?$/i,
+    urlPattern:
+      /^https:\/\/github\.com\/(?!(settings|marketplace|orgs|about|pulls|issues|explore|topics|trending|notifications|new|login|signup|join|search|sponsors|features|pricing|customer-stories|security|enterprise|team|collections|codespaces|dashboard|blog|help|site|contact)(\/|$))[A-Za-z0-9][A-Za-z0-9-]{0,38}\/?$/i,
     recordTypes: ["personnel"],
   },
 ];

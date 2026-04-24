@@ -183,6 +183,7 @@ describe("submitProposal (submit=true) — network path", () => {
   const origEnvUrl = process.env.LONGTERMWIKI_SERVER_URL;
   const origEnvProdUrl = process.env.PROD_LONGTERMWIKI_SERVER_URL;
   const origEnvKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const origWikiEnv = process.env.WIKI_SERVER_ENV;
 
   beforeEach(() => {
     fetchMock.mockReset();
@@ -194,15 +195,17 @@ describe("submitProposal (submit=true) — network path", () => {
     process.env.LONGTERMWIKI_SERVER_API_KEY = "test-key";
   });
 
+  function restoreEnv(key: string, orig: string | undefined): void {
+    if (orig === undefined) delete process.env[key];
+    else process.env[key] = orig;
+  }
+
   afterEach(() => {
     globalThis.fetch = origFetch;
-    delete process.env.WIKI_SERVER_ENV;
-    if (origEnvUrl === undefined) delete process.env.LONGTERMWIKI_SERVER_URL;
-    else process.env.LONGTERMWIKI_SERVER_URL = origEnvUrl;
-    if (origEnvProdUrl === undefined) delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
-    else process.env.PROD_LONGTERMWIKI_SERVER_URL = origEnvProdUrl;
-    if (origEnvKey === undefined) delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-    else process.env.LONGTERMWIKI_SERVER_API_KEY = origEnvKey;
+    restoreEnv("WIKI_SERVER_ENV", origWikiEnv);
+    restoreEnv("LONGTERMWIKI_SERVER_URL", origEnvUrl);
+    restoreEnv("PROD_LONGTERMWIKI_SERVER_URL", origEnvProdUrl);
+    restoreEnv("LONGTERMWIKI_SERVER_API_KEY", origEnvKey);
   });
 
   function mockResponse(status: number, body: unknown): void {

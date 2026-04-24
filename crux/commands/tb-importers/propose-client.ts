@@ -48,7 +48,6 @@ interface ProposeEndpointResponse {
   verdict?: string | null;
   confidence?: number | null;
   checkerModel?: string | null;
-  innerStatus?: number;
   rejectionReason?: string;
 }
 
@@ -143,10 +142,8 @@ export function buildProposeRequest(
 } {
   const id = deriveRecordId(p.responseHash);
   const withFks = mergeEntityRefs(p.recordType, p.record, p.entityRefs);
-  // Strip null personDisplayName (github-contributors emits null on purpose
-  // to fail-safe the display-name validator) so Zod's `.nullable()` optional
-  // keeps the null; any explicit id in the record is overwritten with the
-  // deterministic derived id so the same responseHash always upserts.
+  // Any explicit id in the record is overwritten with the deterministic
+  // derived id so the same responseHash always upserts to the same row.
   const row: Record<string, unknown> = { ...withFks, id };
   return {
     tier: p.tier,
