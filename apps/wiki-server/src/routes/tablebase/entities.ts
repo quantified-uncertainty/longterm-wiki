@@ -21,23 +21,6 @@ import {
   SyncEntitiesBatchSchema,
 } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: entity composer ----
-//
-// The simplest composer in the suite — entity titles are authoritative
-// (`e.title` is the source of truth). No fallback needed. Consolidating
-// for consistency so all 22 thing_types route through composeThing().
-interface EntityComposerRow {
-  title: string;
-  description?: string | null;
-}
-
-registerComposer<EntityComposerRow>("entity", (row) => ({
-  title: row.title,
-  description: row.description ?? null,
-  parentTitle: null,
-}));
 import {
   buildSearchCondition,
   buildTsvectorSearchCondition,
@@ -1084,24 +1067,17 @@ const entitiesApp = new Hono()
             },
           });
 
-        // Dual-write to things table via dispatch composer (QUA-470)
         await upsertThingsInTx(
           tx,
-          items.map((e) => {
-            const composed = composeThing<EntityComposerRow>("entity", e, new Map());
-            return {
-              id: e.stableId || e.id,
-              thingType: "entity" as const,
-              title: composed.title,
-              description: composed.description,
-              parentTitle: composed.parentTitle,
-              sourceTable: "entities",
-              sourceId: e.id,
-              entityType: e.entityType,
-              wikiId: e.wikiId,
-              sourceUrl: e.website,
-            };
-          })
+          items.map((e) => ({
+            id: e.stableId || e.id,
+            thingType: "entity" as const,
+            sourceTable: "entities",
+            sourceId: e.id,
+            entityType: e.entityType,
+            wikiId: e.wikiId,
+            sourceUrl: e.website,
+          }))
         );
 
         upserted = allVals.length;

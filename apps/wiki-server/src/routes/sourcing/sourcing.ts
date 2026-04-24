@@ -24,6 +24,7 @@ import {
   entities,
   divisions,
   things,
+  thingsSearch,
   facts,
   publications,
   benchmarkResults,
@@ -1688,17 +1689,17 @@ const sourcingApp = new Hono()
         names[row.slug] = row.title;
       }
     } else {
-      // Generic fallback: use the things table
+      // QUA-507: reads `things_search` MV (title lives there post denorm drop).
       const rows = await db
         .select({
-          sourceId: things.sourceId,
-          title: things.title,
+          sourceId: thingsSearch.sourceId,
+          title: thingsSearch.title,
         })
-        .from(things)
+        .from(thingsSearch)
         .where(
           and(
-            eq(things.sourceTable, record_type),
-            inArray(things.sourceId, idsToResolve)
+            eq(thingsSearch.sourceTable, record_type),
+            inArray(thingsSearch.sourceId, idsToResolve)
           )
         );
 

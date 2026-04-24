@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql, inArray } from "drizzle-orm";
+import { eq, count, desc, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { benchmarkResults, benchmarks } from "../../schema.js";
 import {
@@ -11,33 +11,6 @@ import {
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: benchmark-result composer ----
-//
-// Audit §6.5: benchmark-results was leaking raw modelId / benchmarkId slugs
-// into titles (`gpt-5 on swe-bench: 0.42`). Fix:
-//   1. Add `thingsTitleIds` so the factory pre-resolves model + benchmark.
-//   2. Compose via the registered composer using resolved titles.
-//
-// Note: benchmarkId is auto-resolved from slug → ID by the preValidate hook
-// before toThing runs, so by composer-time it's the canonical FK. The
-// titleMap lookup uses that resolved value.
-interface BenchmarkResultComposerRow {
-  modelId: string;
-  benchmarkId: string;
-  score: string | number | null;
-}
-
-registerComposer<BenchmarkResultComposerRow>("benchmark-result", (row, titleMap) => {
-  const model = titleMap.get(row.modelId) ?? row.modelId;
-  const benchmark = titleMap.get(row.benchmarkId) ?? row.benchmarkId;
-  return {
-    title: `${model} on ${benchmark}: ${row.score}`,
-    description: null,
-    parentTitle: benchmark,
-  };
-});
 
 // ---- Constants ----
 
@@ -207,39 +180,14 @@ const benchmarkResultsApp = new Hono()
         }
         return null;
       },
-      // QUA-470: pre-resolve model titles via entities (modelId is an entity
-      // slug/stableId) and benchmark titles via the benchmarks table through
-      // augmentTitleMap (benchmarkId points at benchmarks, NOT entities —
-      // resolveEntityTitles would silently miss it).
-      thingsTitleIds: (items) => [...new Set(items.map((it) => it.modelId))],
-      augmentTitleMap: async (tx, items, titleMap) => {
-        const benchmarkIds = [
-          ...new Set(items.map((i) => i.benchmarkId)),
-        ].filter((id): id is string => !!id);
-        if (benchmarkIds.length === 0) return;
-        const rows = await tx
-          .select({ id: benchmarks.id, name: benchmarks.name })
-          .from(benchmarks)
-          .where(inArray(benchmarks.id, benchmarkIds));
-        for (const r of rows) titleMap.set(r.id, r.name);
-      },
-      toThing: (item, titleMap) => {
-        const composed = composeThing<BenchmarkResultComposerRow>(
-          "benchmark-result",
-          item,
-          titleMap,
-        );
-        return {
-          id: item.id,
-          thingType: "benchmark-result" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "benchmark_results",
-          sourceId: item.id,
-          sourceUrl: item.sourceUrl,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "benchmark-result" as const,
+        parentThingId: item.benchmarkId,
+        sourceTable: "benchmark_results",
+        sourceId: item.id,
+        sourceUrl: item.sourceUrl,
+      }),
       toVerdict: (item) => ({
         recordType: "benchmark-result",
         recordId: item.id,

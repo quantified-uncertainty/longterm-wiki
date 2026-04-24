@@ -14,47 +14,6 @@ import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-enti
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
-import { formatMoney } from "../shared/format-currency.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: funding-round composer ----
-//
-// funding_rounds has no currency column yet — defaults to USD via formatMoney.
-// When the column lands, just pass row.currency here.
-interface FundingRoundComposerRow {
-  name: string;
-  companyId: string;
-  companyDisplayName?: string | null;
-  date?: string | null;
-  raised?: number | string | null;
-  instrument?: string | null;
-  leadInvestor?: string | null;
-  leadInvestorDisplayName?: string | null;
-}
-
-registerComposer<FundingRoundComposerRow>("funding-round", (row, titleMap) => {
-  // Normalize: prefer display name; fall back to the raw leadInvestor with
-  // the `new:` sentinel prefix stripped. Checking `leadInvestorDisplayName`
-  // independently catches rows where the display name was populated without
-  // a matching raw ID.
-  const leadInvestorName =
-    row.leadInvestorDisplayName ??
-    row.leadInvestor?.replace(/^new:\s*/, "").trim() ??
-    null;
-  return {
-    title: row.name + (row.date ? ` (${row.date})` : ""),
-    description:
-      [
-        row.raised != null ? `raised ${formatMoney(row.raised, "USD")}` : null,
-        row.instrument,
-        leadInvestorName ? `led by ${leadInvestorName}` : null,
-      ]
-        .filter(Boolean)
-        .join(", ") || null,
-    parentTitle:
-      titleMap.get(row.companyId) ?? row.companyDisplayName ?? row.companyId,
-  };
-});
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
@@ -304,20 +263,14 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "lead_investor", entityIdColumn: "lead_investor_entity_id", displayNameColumn: "lead_investor_display_name" },
         ],
       },
-      toThing: (item, titleMap) => {
-        const composed = composeThing<FundingRoundComposerRow>("funding-round", item, titleMap);
-        return {
-          id: item.id,
-          thingType: "funding-round" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "funding_rounds",
-          sourceId: item.id,
-          sourceUrl: item.source,
-        };
-      },
-      thingsTitleIds: (items) => [...new Set(items.map((fr) => fr.companyId))],
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "funding-round" as const,
+        parentThingId: item.companyId,
+        sourceTable: "funding_rounds",
+        sourceId: item.id,
+        sourceUrl: item.source,
+      }),
       toVerdict: (item) => ({
         recordType: "funding-round",
         recordId: item.id,

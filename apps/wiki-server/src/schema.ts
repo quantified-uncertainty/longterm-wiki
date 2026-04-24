@@ -2634,24 +2634,22 @@ export const VALID_THING_TYPES = [
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
 
+// QUA-507 (migration 0204): dropped title/description/parent_title/search_vector.
+// The `things` table is now a pointer-only index. Denormalized display fields
+// live in the `things_search` materialized view (see `thingsSearch` below).
 export const things = pgTable(
   "things",
   {
     id: text("id").primaryKey(),
     thingType: text("thing_type").notNull(),
-    title: text("title").notNull(),
     parentThingId: text("parent_thing_id").references((): any => things.id, {
       onDelete: "set null",
     }),
     sourceTable: text("source_table").notNull(),
     sourceId: text("source_id").notNull(),
     entityType: text("entity_type"),
-    description: text("description"),
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
-    parentTitle: text("parent_title"),
-    // verdict, verdict_confidence, verdict_at columns removed — sourcing
-    // verdicts now live in the unified source_check_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2661,7 +2659,6 @@ export const things = pgTable(
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    // search_vector tsvector column is managed via migration SQL (generated column)
   },
   (table) => [
     index("idx_things_type").on(table.thingType),
@@ -2669,7 +2666,6 @@ export const things = pgTable(
     index("idx_things_entity_type").on(table.entityType),
     index("idx_things_updated").on(table.updatedAt),
     uniqueIndex("idx_things_source_unique").on(table.sourceTable, table.sourceId),
-    // GIN index on search_vector is created in migration SQL
   ]
 );
 

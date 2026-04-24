@@ -158,7 +158,7 @@ const qaChecksApp = new Hono()
     const { directory, entity_type: entityType, limit } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Query things LEFT JOIN qa_page_checks to get last check time
+    // QUA-507: reads `things_search` MV (title lives there post denorm drop).
     const rows = (await db.execute(sql`
       SELECT
         t.id AS thing_id,
@@ -168,7 +168,7 @@ const qaChecksApp = new Hono()
         t.wiki_id,
         MAX(qpc.checked_at)::text AS last_checked,
         COUNT(qpc.id)::int AS check_count
-      FROM things t
+      FROM things_search t
       LEFT JOIN qa_page_checks qpc ON qpc.thing_id = t.id
       WHERE t.thing_type = 'entity'
         ${entityType ? sql`AND t.entity_type = ${entityType}` : sql``}

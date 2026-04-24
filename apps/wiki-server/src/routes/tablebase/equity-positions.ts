@@ -9,35 +9,10 @@ import {
   parseRange,
   clampedLimit,
 } from "../shared/utils.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-
-// ---- QUA-470 Phase 4b-B.1: equity-position composer ----
-//
-// Audit §6.5: equity-positions falls back to raw slug when title lookup
-// fails (`open-philanthropy stake in anthropic`). Already calls
-// resolveEntityTitles for both holder + company; the consolidation here
-// just routes through the dispatch table and adds parentTitle.
-interface EquityPositionComposerRow {
-  holderId: string;
-  companyId: string;
-}
-
-registerComposer<EquityPositionComposerRow>(
-  "equity-position",
-  (row, titleMap) => {
-    const holder = titleMap.get(row.holderId) ?? row.holderId;
-    const company = titleMap.get(row.companyId) ?? row.companyId;
-    return {
-      title: `${holder} stake in ${company}`,
-      description: null,
-      parentTitle: company,
-    };
-  },
-);
 
 // ---- Constants ----
 
@@ -272,27 +247,14 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "holder_id", entityIdColumn: "holder_entity_id", displayNameColumn: "holder_display_name" },
         ],
       },
-      thingsTitleIds: (items) => [
-        ...new Set(items.flatMap((ep) => [ep.holderId, ep.companyId])),
-      ],
-      // QUA-470: dispatch through the registered "equity-position" composer.
-      toThing: (item, titleMap) => {
-        const composed = composeThing<EquityPositionComposerRow>(
-          "equity-position",
-          item,
-          titleMap,
-        );
-        return {
-          id: item.id,
-          thingType: "equity-position" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "equity_positions",
-          sourceId: item.id,
-          sourceUrl: item.source ?? null,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "equity-position" as const,
+        parentThingId: item.companyId,
+        sourceTable: "equity_positions",
+        sourceId: item.id,
+        sourceUrl: item.source ?? null,
+      }),
     }),
   )
 
