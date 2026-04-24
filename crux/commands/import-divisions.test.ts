@@ -1,13 +1,4 @@
-/**
- * Tests for import-divisions cmdSync — QUA-677.
- *
- * Covers the sourcing-attach wiring: the command must fetch verdicts from PG,
- * map them onto the right divisions, and honor --force-skip-sourcing by not
- * fetching at all. The helper itself is tested in
- * crux/lib/wiki-server/inline-sourcing.test.ts.
- */
-
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, afterEach } from "vitest";
 
 const { mockFetchInlineSourcing, mockSyncDivisions, mockGetServerUrl } =
   vi.hoisted(() => ({
@@ -27,23 +18,25 @@ vi.mock("../lib/wiki-server/client.ts", () => ({
 }));
 
 import { commands as divisionsCommands } from "./import-divisions.ts";
+import type { InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
-/** Capture console.log so we can assert on output. */
-function captureConsole() {
-  const originalLog = console.log;
-  const lines: string[] = [];
-  console.log = (...args: unknown[]) => {
-    lines.push(args.map((a) => String(a)).join(" "));
-  };
-  return {
-    lines,
-    restore: () => {
-      console.log = originalLog;
+/**
+ * Returns a Map whose `.get(anyId)` always yields the same sourcing object.
+ * Avoids having to enumerate DIVISIONS (imported lazily by the command) just
+ * to seed a keyed map.
+ */
+function universalMap(sourcing: InlineSourcing): Map<string, InlineSourcing> {
+  return new Proxy(new Map<string, InlineSourcing>(), {
+    get(target, prop) {
+      if (prop === "get") return () => sourcing;
+      return Reflect.get(target, prop);
     },
-  };
+  }) as Map<string, InlineSourcing>;
 }
 
-describe("import-divisions sync — sourcing attach (QUA-677)", () => {
+describe("import-divisions sync — sourcing attach", () => {
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.clearAllMocks();
     mockFetchInlineSourcing.mockResolvedValue(new Map());
@@ -51,85 +44,53 @@ describe("import-divisions sync — sourcing attach (QUA-677)", () => {
       ok: true,
       data: { upserted: 0, verdictsWritten: 0, claimsLinked: 0 },
     });
+    logSpy = vi.spyOn(console, "log").mockImplementation(() => {});
   });
 
-  it("fetches verdicts and attaches sourcing to matched divisions (dry-run)", async () => {
-    // Use a recordId that exists in DIVISIONS — pick the first one. We can't
-    // import DIVISIONS directly without also importing the command side-effect,
-    // so instead set up a fetch that matches every item (wildcard by default
-    // verdict), and verify attach count equals total via the log line.
-    mockFetchInlineSourcing.mockResolvedValueOnce(
-      new Map([
-        // Return entries for common ids; unmatched items will be reported unsourced.
-        // We purposely return an empty map to assert the 0/N log line, then a
-        // separate test exercises a non-empty map via a spy.
-      ]),
-    );
-    const cap = captureConsole();
-    try {
-      const res = await divisionsCommands.sync([], { "dry-run": true });
-      expect(res.exitCode).toBe(0);
-    } finally {
-      cap.restore();
-    }
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
 
+  function logged(): string[] {
+    return logSpy.mock.calls.map((args: unknown[]) =>
+      args.map((a) => String(a)).join(" "),
+    );
+  }
+
+  it("fetches verdicts and reports 0/N sourced when no verdicts exist", async () => {
+    const res = await divisionsCommands.sync([], { "dry-run": true });
+    expect(res.exitCode).toBe(0);
     expect(mockFetchInlineSourcing).toHaveBeenCalledWith("division");
-    expect(mockSyncDivisions).not.toHaveBeenCalled(); // dry-run
-    const summary = cap.lines.find((l) => l.includes("Sourcing:"));
-    expect(summary).toBeDefined();
+    expect(mockSyncDivisions).not.toHaveBeenCalled();
+    const summary = logged().find((l) => l.includes("Sourcing:"));
     expect(summary).toMatch(/0\/\d+ records have verdicts/);
     expect(summary).toMatch(/unsourced — server will reject/);
   });
 
-  it("reports attached count when some records have verdicts", async () => {
-    // Capture the actual first id by running once with an empty map,
-    // parsing the dry-run line, then re-running with a matching map.
-    // Simpler: stub fetch to return a map that matches ANY input id via a
-    // Proxy, and count attaches.
-    const universalMap = new Proxy(new Map<string, unknown>(), {
-      get(target, prop) {
-        if (prop === "get") {
-          return (_key: string) => ({
-            verdict: "confirmed",
-            confidence: 0.9,
-            checkedAt: "2026-04-24T00:00:00.000Z",
-          });
-        }
-        return Reflect.get(target, prop);
-      },
-    });
-    mockFetchInlineSourcing.mockResolvedValueOnce(universalMap);
+  it("reports attached count when records have verdicts", async () => {
+    mockFetchInlineSourcing.mockResolvedValueOnce(
+      universalMap({
+        verdict: "confirmed",
+        confidence: 0.9,
+        checkedAt: "2026-04-24T00:00:00.000Z",
+      }),
+    );
+    await divisionsCommands.sync([], { "dry-run": true });
 
-    const cap = captureConsole();
-    try {
-      await divisionsCommands.sync([], { "dry-run": true });
-    } finally {
-      cap.restore();
-    }
-    const summary = cap.lines.find((l) => l.includes("Sourcing:"));
-    expect(summary).toBeDefined();
-    // All records attached — no "unsourced" warning suffix.
+    const summary = logged().find((l) => l.includes("Sourcing:"));
     expect(summary).toMatch(/\d+\/\d+ records have verdicts$/);
     expect(summary).not.toContain("unsourced");
-
-    // Dry-run printed per-item badges with the verdict name.
-    const itemLines = cap.lines.filter((l) => l.includes("[confirmed]"));
-    expect(itemLines.length).toBeGreaterThan(0);
+    expect(logged().some((l) => l.includes("[confirmed]"))).toBe(true);
   });
 
   it("skips the verdict fetch under --force-skip-sourcing", async () => {
-    const cap = captureConsole();
-    try {
-      await divisionsCommands.sync([], {
-        "dry-run": true,
-        "force-skip-sourcing": true,
-        reason: "smoke-test",
-      });
-    } finally {
-      cap.restore();
-    }
+    await divisionsCommands.sync([], {
+      "dry-run": true,
+      "force-skip-sourcing": true,
+      reason: "smoke-test",
+    });
     expect(mockFetchInlineSourcing).not.toHaveBeenCalled();
-    const summary = cap.lines.find((l) => l.includes("Sourcing:"));
+    const summary = logged().find((l) => l.includes("Sourcing:"));
     expect(summary).toContain("skipped");
     expect(summary).toContain("smoke-test");
   });
@@ -144,43 +105,24 @@ describe("import-divisions sync — sourcing attach (QUA-677)", () => {
 
   it("POSTs attached sourcing to syncDivisions on a real sync", async () => {
     mockFetchInlineSourcing.mockResolvedValueOnce(
-      new Proxy(new Map(), {
-        get(target, prop) {
-          if (prop === "get") {
-            return () => ({ verdict: "confirmed" });
-          }
-          return Reflect.get(target, prop);
-        },
-      }),
+      universalMap({ verdict: "confirmed" }),
     );
-
-    const cap = captureConsole();
-    try {
-      await divisionsCommands.sync([], {});
-    } finally {
-      cap.restore();
-    }
+    await divisionsCommands.sync([], {});
 
     expect(mockSyncDivisions).toHaveBeenCalledOnce();
     const [items] = mockSyncDivisions.mock.calls[0];
     expect(Array.isArray(items)).toBe(true);
     expect(items.length).toBeGreaterThan(0);
-    // Every item carries the inline sourcing payload.
     for (const item of items) {
       expect(item.sourcing).toEqual({ verdict: "confirmed" });
     }
   });
 
   it("passes forceSkipSourcing + reason through to the client on a real sync", async () => {
-    const cap = captureConsole();
-    try {
-      await divisionsCommands.sync([], {
-        "force-skip-sourcing": true,
-        reason: "ops backfill",
-      });
-    } finally {
-      cap.restore();
-    }
+    await divisionsCommands.sync([], {
+      "force-skip-sourcing": true,
+      reason: "ops backfill",
+    });
 
     expect(mockFetchInlineSourcing).not.toHaveBeenCalled();
     expect(mockSyncDivisions).toHaveBeenCalledOnce();
@@ -197,16 +139,11 @@ describe("import-divisions sync — sourcing attach (QUA-677)", () => {
       error: { status: 400 },
       message: "sourcing missing",
     });
-    const cap = captureConsole();
-    try {
-      await expect(
-        divisionsCommands.sync([], {
-          "force-skip-sourcing": true,
-          reason: "test",
-        }),
-      ).rejects.toThrow(/sourcing missing/);
-    } finally {
-      cap.restore();
-    }
+    await expect(
+      divisionsCommands.sync([], {
+        "force-skip-sourcing": true,
+        reason: "test",
+      }),
+    ).rejects.toThrow(/sourcing missing/);
   });
 });

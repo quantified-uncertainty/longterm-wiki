@@ -843,15 +843,8 @@ async function cmdSync(
     );
   }
 
-  // Attach inline sourcing from source_check_verdicts, unless explicitly
-  // bypassed. The server requires sourcing for divisions (SOURCE_CHECK_REQUIRED
-  // in apps/wiki-server/src/routes/shared/sourcing-enforcement.ts); items
-  // without a verdict row are sent bare and the server rejects the batch with
-  // a count of unsourced records, pointing to `verify-orchestrate divisions`.
-  //
-  // The fetch runs even under --dry-run: the whole point of dry-run here is
-  // to preview what the server would accept, which includes which records
-  // already have verdicts ([confirmed] badge) vs. which don't ([unsourced]).
+  // Server requires inline sourcing for divisions; missing verdicts show as
+  // [unsourced] badges so dry-run surfaces the problem before the real sync.
   const forceSkipSourcing = !!options?.forceSkipSourcing;
   let attached = 0;
   if (!forceSkipSourcing) {

@@ -155,10 +155,7 @@ describe('enforceSourcing', () => {
     expect(res.status).toBe(200);
   });
 
-  it('error message includes table name and verify-orchestrate command (QUA-677)', async () => {
-    // Regression test: the message used to suggest `tb verify <table>` which
-    // routes to the single-entity personnel-ID check, not the sourcing
-    // orchestrator. It must point at `tb verify-orchestrate <table>`.
+  it('error message points at verify-orchestrate, not the single-entity verify', async () => {
     const app = createTestApp('grants');
     const res = await makeRequest(app, [{ id: '1' }]);
     expect(res.status).toBe(400);

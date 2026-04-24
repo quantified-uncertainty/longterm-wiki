@@ -1,14 +1,3 @@
-/**
- * Tests for fetchInlineSourcing — QUA-677.
- *
- * Verifies that:
- *   - whole-row verdicts are mapped by recordId
- *   - per-field verdicts (fieldName !== null) are skipped
- *   - `unchecked` and other non-attachable verdict values are skipped
- *   - pagination continues until a short page is returned
- *   - non-ok API responses throw
- */
-
 import { describe, it, expect, vi, beforeEach } from "vitest";
 
 const { mockListVerdicts } = vi.hoisted(() => ({

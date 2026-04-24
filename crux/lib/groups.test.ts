@@ -222,11 +222,7 @@ describe('resolveGroupRouting', () => {
     expect(r).toEqual({ groupName: 'gh', domain: 'issues', command: 'search', argsStart: 2 });
   });
 
-  it('routes tb import-divisions as its own domain (QUA-677)', () => {
-    // Regression test: `pnpm crux tb import-divisions sync` used to route
-    // via the flattened path to `tablebase.import-divisions` (the .default
-    // list command) with `sync` swallowed as a positional arg. Now it
-    // routes to the import-divisions domain with sync as the command.
+  it('routes tb <subdomain> <cmd> to the subdomain, not the tablebase flattened command', () => {
     const hasCommand = (domain: string, cmd: string) => {
       const cmds: Record<string, string[]> = {
         tablebase: ['import-divisions', 'import-divisions-sync'],
@@ -242,7 +238,7 @@ describe('resolveGroupRouting', () => {
     });
   });
 
-  it('routes tb import-divisions (no command) to the domain default', () => {
+  it('routes tb <subdomain> (no command) to the subdomain default', () => {
     const r = resolveGroupRouting(['tb', 'import-divisions'], shortcuts, () => false);
     expect(r).toEqual({
       groupName: 'tablebase',
@@ -252,7 +248,7 @@ describe('resolveGroupRouting', () => {
     });
   });
 
-  it('routes tb data-sources subcommand to the domain', () => {
+  it('routes tb data-sources subcommand to the subdomain', () => {
     const r = resolveGroupRouting(['tb', 'data-sources', 'list'], shortcuts, () => false);
     expect(r).toEqual({
       groupName: 'tablebase',
@@ -262,9 +258,7 @@ describe('resolveGroupRouting', () => {
     });
   });
 
-  it('keeps flattened import-divisions-sync alias routing to tablebase', () => {
-    // `crux tb import-divisions-sync` should still find the flat command
-    // on the tablebase domain (used by scripts, docs, muscle memory).
+  it('keeps flattened dash-form aliases routing to tablebase', () => {
     const hasCommand = (domain: string, cmd: string) => {
       return domain === 'tablebase' && cmd === 'import-divisions-sync';
     };
