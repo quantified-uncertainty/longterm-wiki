@@ -90,9 +90,6 @@ function cleanPersonId(pid: string): string | null {
   return pid;
 }
 
-// cleanPersonId is still used by the /review-data endpoint below for UI display;
-// the personnel composer that previously consumed it lived here until QUA-507.
-
 const personEntity = alias(entities, "person_entity");
 const orgEntity = alias(entities, "org_entity");
 

@@ -116,7 +116,6 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     syncSchema: SyncStakeholderItemSchema,
     enforceSourcing: true,
     entityRefs: ["policyEntityId"],
-    // QUA-507: pointer-only things write.
     toThing: (item) => ({
       id: item.id,
       thingType: "policy-stakeholder" as const,

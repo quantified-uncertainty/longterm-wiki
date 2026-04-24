@@ -247,7 +247,6 @@ const equityPositionsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "holder_id", entityIdColumn: "holder_entity_id", displayNameColumn: "holder_display_name" },
         ],
       },
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "equity-position" as const,

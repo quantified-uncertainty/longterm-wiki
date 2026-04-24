@@ -180,7 +180,6 @@ const benchmarkResultsApp = new Hono()
         }
         return null;
       },
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "benchmark-result" as const,

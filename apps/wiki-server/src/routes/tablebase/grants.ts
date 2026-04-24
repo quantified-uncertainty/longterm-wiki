@@ -643,7 +643,6 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "grantee_id", entityIdColumn: "grantee_entity_id", displayNameColumn: "grantee_display_name" },
         ],
       },
-      // QUA-507: pointer-only things write; display fields live in things_search MV.
       toThing: (item) => ({
         id: item.id,
         thingType: "grant" as const,

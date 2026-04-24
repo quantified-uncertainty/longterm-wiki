@@ -98,7 +98,6 @@ const entityAssessmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     table: entityAssessments,
     syncSchema: SyncItemSchema,
     entityRefs: ["entityId"],
-    // QUA-507: pointer-only things write.
     toThing: (item) => ({
       id: item.id,
       thingType: "entity-assessment" as const,

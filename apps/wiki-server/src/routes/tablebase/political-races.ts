@@ -398,7 +398,6 @@ const politicalRacesApp = new Hono()
       table: politicalRaces,
       syncSchema: SyncRaceItemSchema,
       entityRefs: ["policyEntityId"],
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "political-race" as const,
@@ -482,7 +481,6 @@ const politicalRacesApp = new Hono()
         upserted++;
       }
 
-      // QUA-507: pointer-only things write for each candidate.
       await upsertThingsInTx(
         tx,
         items.map((item) => ({

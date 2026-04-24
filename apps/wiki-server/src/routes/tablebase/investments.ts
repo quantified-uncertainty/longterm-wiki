@@ -294,7 +294,6 @@ const investmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "investor_id", entityIdColumn: "investor_entity_id", displayNameColumn: "investor_display_name" },
         ],
       },
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "investment" as const,

@@ -168,7 +168,6 @@ const divisionPersonnelApp = new Hono()
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },
-    // QUA-507: pointer-only things write.
     toThing: (item) => ({
       id: item.id,
       thingType: "division-personnel" as const,

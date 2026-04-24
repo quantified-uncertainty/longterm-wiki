@@ -141,7 +141,6 @@ const benchmarksApp = new Hono()
       name: "benchmarks",
       table: benchmarks,
       syncSchema: SyncBenchmarkItemSchema,
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "benchmark" as const,

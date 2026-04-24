@@ -608,7 +608,6 @@ const resourcesApp = new Hono()
           WHERE id IN (${idList})
         `);
 
-        // QUA-507: pointer-only things dual-write.
         const persistedById = new Map(upsertedRows.map((row) => [row.id, row]));
         await upsertThingsInTx(
           tx,

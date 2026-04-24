@@ -523,13 +523,7 @@ const thingsApp = new Hono()
 
     const row: { thing: ThingLikeRow; verdict: string | null } = mvRows[0];
 
-    // Also fetch children count
-    const childrenResult = await db
-      .select({ count: count() })
-      .from(things)
-      .where(eq(things.parentThingId, row.thing.id));
-
-    // Fetch children summary by type
+    // childrenByType is the source of truth — childrenCount is just its sum.
     const childTypeRows = await db
       .select({
         thingType: things.thingType,
@@ -540,13 +534,15 @@ const thingsApp = new Hono()
       .groupBy(things.thingType);
 
     const childrenByType: Record<string, number> = {};
-    for (const row of childTypeRows) {
-      childrenByType[row.thingType] = row.count;
+    let childrenCount = 0;
+    for (const r of childTypeRows) {
+      childrenByType[r.thingType] = r.count;
+      childrenCount += r.count;
     }
 
     return c.json({
       ...formatThing(row.thing, row),
-      childrenCount: childrenResult[0].count,
+      childrenCount,
       childrenByType,
     });
   })

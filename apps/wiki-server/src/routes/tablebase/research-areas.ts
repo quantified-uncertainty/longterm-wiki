@@ -441,7 +441,6 @@ const researchAreasApp = new Hono()
       name: "research-areas",
       table: researchAreas,
       syncSchema: SyncResearchAreaItemSchema,
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "research-area" as const,

@@ -1067,7 +1067,6 @@ const entitiesApp = new Hono()
             },
           });
 
-        // QUA-507: pointer-only things dual-write.
         await upsertThingsInTx(
           tx,
           items.map((e) => ({

@@ -263,7 +263,6 @@ const fundingRoundsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "lead_investor", entityIdColumn: "lead_investor_entity_id", displayNameColumn: "lead_investor_display_name" },
         ],
       },
-      // QUA-507: pointer-only things write.
       toThing: (item) => ({
         id: item.id,
         thingType: "funding-round" as const,
