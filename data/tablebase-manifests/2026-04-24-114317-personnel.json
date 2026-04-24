@@ -1,0 +1,50 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-24T11:43:17.022Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "glsOOPqHEl",
+      "personId": "sid_qspeazccPg",
+      "organizationId": "sid_pg7Ym4EQ9A",
+      "role": "Major Donor",
+      "source": "https://fortune.com/2025/08/26/openai-president-greg-brockman-andreessen-horowitz-super-pac-ai-pro-innovation/",
+      "verdict": "none"
+    },
+    {
+      "id": "oBnUWhAvv2",
+      "personId": "sid_3SLFjy1eDj",
+      "organizationId": "sid_pg7Ym4EQ9A",
+      "role": "Major Donor",
+      "source": "https://www.cnbc.com/2026/01/30/ai-industry-super-pac-raises-campaign-money.html",
+      "verdict": "none"
+    },
+    {
+      "id": "p1aqEYy0Ed",
+      "personId": "c5UFq0nUE5",
+      "organizationId": "sid_pg7Ym4EQ9A",
+      "role": "Major Donor",
+      "source": "https://fortune.com/2025/08/26/openai-president-greg-brockman-andreessen-horowitz-super-pac-ai-pro-innovation/",
+      "verdict": "none"
+    },
+    {
+      "id": "EicWKhln93",
+      "personId": "T55ikB9vSI",
+      "organizationId": "sid_pg7Ym4EQ9A",
+      "role": "Major Donor",
+      "source": "https://fortune.com/2025/08/26/openai-president-greg-brockman-andreessen-horowitz-super-pac-ai-pro-innovation/",
+      "verdict": "none"
+    }
+  ]
+}
