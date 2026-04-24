@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   SCORECARD_SOURCES,
+  formatScoreCell,
   type ScorecardSourceKey,
 } from "./scorecards-constants";
 
@@ -76,11 +77,6 @@ export function ScorecardsMatrix({
                     </td>
                   );
                 }
-                const display =
-                  cell.scoreLetter ??
-                  (cell.scoreNumeric != null
-                    ? `${cell.scoreNumeric}`
-                    : cell.scoreRaw);
                 return (
                   <td
                     key={meta.source}
@@ -89,7 +85,7 @@ export function ScorecardsMatrix({
                       cell.publishedAt ? ` — ${cell.publishedAt}` : ""
                     }`}
                   >
-                    {display}
+                    {formatScoreCell(cell)}
                   </td>
                 );
               })}

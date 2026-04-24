@@ -86,17 +86,6 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
   },
 ] as const;
 
-export const SCORECARD_SOURCE_LOOKUP: Record<
-  ScorecardSourceKey,
-  ScorecardSourceMeta
-> = SCORECARD_SOURCES.reduce(
-  (acc, meta) => {
-    acc[meta.source] = meta;
-    return acc;
-  },
-  {} as Record<ScorecardSourceKey, ScorecardSourceMeta>,
-);
-
 /**
  * Look up display metadata for a scorecard source. Returns null when the
  * source key is unknown — caller should display a fallback (raw string).
@@ -104,7 +93,28 @@ export const SCORECARD_SOURCE_LOOKUP: Record<
 export function getScorecardSourceMeta(
   source: string,
 ): ScorecardSourceMeta | null {
+  return SCORECARD_SOURCES.find((meta) => meta.source === source) ?? null;
+}
+
+/**
+ * Slug used for the per-(org, source) aggregate row in `scorecard_grades`.
+ * Sibling rows hold per-dimension grades; the aggregate is treated as a
+ * regular dimension to keep matrix queries uniform.
+ */
+export const DIMENSION_OVERALL = "overall";
+
+/**
+ * Render the user-visible cell text for a scorecard grade. Letter grades
+ * win when present (sources like FLI publish letters); numeric falls back
+ * to the raw string from the source for audit fidelity.
+ */
+export function formatScoreCell(cell: {
+  scoreLetter: string | null;
+  scoreNumeric: number | null;
+  scoreRaw: string;
+}): string {
   return (
-    SCORECARD_SOURCE_LOOKUP[source as ScorecardSourceKey] ?? null
+    cell.scoreLetter ??
+    (cell.scoreNumeric != null ? String(cell.scoreNumeric) : cell.scoreRaw)
   );
 }

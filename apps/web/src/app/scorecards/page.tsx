@@ -9,6 +9,7 @@ import {
 } from "./scorecards-matrix";
 import {
   SCORECARD_SOURCES,
+  DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "./scorecards-constants";
 
@@ -56,24 +57,19 @@ interface GradeRow {
 }
 
 export default async function ScorecardsPage() {
-  // Load latest snapshots (one per source) and overall-dimension grades.
-  // The page caps load by filtering grades to dimensionSlug='overall'
-  // — per-dimension drill-down lives on the org's profile tab, not here.
-  const snapshotsRes = await fetchDetailed<{
-    items: SnapshotRow[];
-    total: number;
-  }>("/api/scorecard-snapshots/all?limit=50&latest=true", { revalidate: 300 });
-
-  const gradesRes = await fetchDetailed<{
-    items: GradeRow[];
-    total: number;
-  }>(
-    // overall=true server-side filter — matrix only renders the rollup row.
-    // Without it we'd fetch ~4,000 FMTI indicator rows just to throw them
-    // away; with it we get one cell per (org, source).
-    "/api/scorecard-grades/all?limit=1000&latest=true&overall=true",
-    { revalidate: 300 },
-  );
+  // Load latest snapshots (one per source) and overall-dimension grades in
+  // parallel. Per-dimension drill-down lives on the org's profile tab, not
+  // here — `overall=true` keeps this query bounded as FMTI lands.
+  const [snapshotsRes, gradesRes] = await Promise.all([
+    fetchDetailed<{ items: SnapshotRow[]; total: number }>(
+      "/api/scorecard-snapshots/all?limit=50&latest=true",
+      { revalidate: 300 },
+    ),
+    fetchDetailed<{ items: GradeRow[]; total: number }>(
+      "/api/scorecard-grades/all?limit=1000&latest=true&overall=true",
+      { revalidate: 300 },
+    ),
+  ]);
 
   const snapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
   const grades = gradesRes.ok ? gradesRes.data.items : [];
@@ -87,10 +83,13 @@ export default async function ScorecardsPage() {
     if (s.isLatest) latestPerSource.set(s.scorecardSource, s);
   }
 
-  // Build the org × source matrix from `overall` rows only.
+  // Build the org × source matrix from `overall` rows only. The fetch
+  // above already filters to `overall=true`, but we double-check here so
+  // an upstream change to that query never silently mixes per-dimension
+  // rows into the matrix.
   const orgMap = new Map<string, ScorecardOrgRow>();
   for (const g of grades) {
-    if (g.dimensionSlug !== "overall") continue;
+    if (g.dimensionSlug !== DIMENSION_OVERALL) continue;
     if (!g.scorecardSource) continue;
     const existing = orgMap.get(g.entityId);
     const cell: ScorecardCell = {

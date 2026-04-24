@@ -102,12 +102,7 @@ const scorecardGradesApp = new Hono()
     if (overall === true)
       conditions.push(eq(scorecardGrades.dimensionSlug, "overall"));
 
-    const where =
-      conditions.length === 0
-        ? undefined
-        : conditions.length === 1
-          ? conditions[0]
-          : and(...conditions);
+    const where = conditions.length ? and(...conditions) : undefined;
 
     const rows = await db
       .select({

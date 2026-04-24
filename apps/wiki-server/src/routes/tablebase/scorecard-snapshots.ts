@@ -81,12 +81,7 @@ const scorecardSnapshotsApp = new Hono()
     if (latest !== undefined)
       conditions.push(eq(scorecardSnapshots.isLatest, latest));
 
-    const where =
-      conditions.length === 0
-        ? undefined
-        : conditions.length === 1
-          ? conditions[0]
-          : and(...conditions);
+    const where = conditions.length ? and(...conditions) : undefined;
 
     const rows = await db
       .select()

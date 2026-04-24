@@ -1,5 +1,5 @@
 /**
- * Scorecards section on an organization's profile (QUA-688 Phase 1).
+ * Scorecards section on an organization's profile.
  *
  * Fetches every grade for the org from `/api/scorecard-grades/by-entity/...`
  * (latest snapshot per source) and renders one panel per source with
@@ -11,6 +11,8 @@ import { fetchDetailed } from "@lib/wiki-server";
 import {
   SCORECARD_SOURCES,
   getScorecardSourceMeta,
+  formatScoreCell,
+  DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
 
@@ -107,11 +109,11 @@ export function ScorecardsSection({
 
       {groups.map((group) => {
         const meta = getScorecardSourceMeta(group.source);
-        // Pull overall row first if present; render the rest below as a
-        // dimensions table.
-        const overallRow = group.rows.find((r) => r.dimensionSlug === "overall");
+        const overallRow = group.rows.find(
+          (r) => r.dimensionSlug === DIMENSION_OVERALL,
+        );
         const dimensionRows = group.rows.filter(
-          (r) => r.dimensionSlug !== "overall",
+          (r) => r.dimensionSlug !== DIMENSION_OVERALL,
         );
 
         return (
@@ -149,10 +151,7 @@ export function ScorecardsSection({
               <div className="mb-3 flex items-baseline gap-3">
                 <span className="text-sm text-muted-foreground">Overall:</span>
                 <span className="text-2xl font-mono tabular-nums">
-                  {overallRow.scoreLetter ??
-                    (overallRow.scoreNumeric != null
-                      ? overallRow.scoreNumeric
-                      : overallRow.scoreRaw)}
+                  {formatScoreCell(overallRow)}
                 </span>
               </div>
             ) : null}
@@ -160,24 +159,17 @@ export function ScorecardsSection({
             {dimensionRows.length > 0 ? (
               <table className="w-full text-sm">
                 <tbody>
-                  {dimensionRows.map((r) => {
-                    const display =
-                      r.scoreLetter ??
-                      (r.scoreNumeric != null
-                        ? `${r.scoreNumeric}`
-                        : r.scoreRaw);
-                    return (
-                      <tr
-                        key={r.id}
-                        className="border-b border-border/30 last:border-b-0"
-                      >
-                        <td className="py-1.5 pr-3">{r.dimensionLabel}</td>
-                        <td className="py-1.5 font-mono tabular-nums text-right">
-                          {display}
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {dimensionRows.map((r) => (
+                    <tr
+                      key={r.id}
+                      className="border-b border-border/30 last:border-b-0"
+                    >
+                      <td className="py-1.5 pr-3">{r.dimensionLabel}</td>
+                      <td className="py-1.5 font-mono tabular-nums text-right">
+                        {formatScoreCell(r)}
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             ) : null}
