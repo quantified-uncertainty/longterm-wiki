@@ -1,0 +1,218 @@
+{
+  "table": "personnel",
+  "recordCount": 25,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-24T11:36:16.985Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 25,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "7rZ4lVED19",
+      "personId": "XWJxoQg8HF",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "President & CEO",
+      "source": "https://cdt.org/staff/alexandra-reeve-givens/",
+      "verdict": "none"
+    },
+    {
+      "id": "m3jaDwBQ8P",
+      "personId": "ovERwo0iC9",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Vice President of Policy",
+      "source": "https://cdt.org/staff/samir-jain/",
+      "verdict": "none"
+    },
+    {
+      "id": "YXz0lT8u97",
+      "personId": "MMU2Dzf4Ix",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Chief Technology Officer",
+      "source": "https://cdt.org/staff/",
+      "verdict": "none"
+    },
+    {
+      "id": "DGw2NJanDV",
+      "personId": "sid_YrFpFk4BHx",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Founding Director, AI Governance Lab",
+      "source": "https://cdt.org/staff/miranda-bogen/",
+      "verdict": "none"
+    },
+    {
+      "id": "LqxHKUtn8Y",
+      "personId": "F7Y5fePQfW",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Director, Free Expression Project",
+      "source": "https://cdt.org/staff/",
+      "verdict": "none"
+    },
+    {
+      "id": "qtnJ7SNGhY",
+      "personId": "42xJPAHVKn",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Director, Security & Surveillance Project",
+      "source": "https://cdt.org/staff/",
+      "verdict": "none"
+    },
+    {
+      "id": "8umCAxoyOu",
+      "personId": "gHhvhwIeVw",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Senior Counsel, Data & Privacy Project",
+      "source": "https://cdt.org/staff/",
+      "verdict": "none"
+    },
+    {
+      "id": "FibJhiof0y",
+      "personId": "mwD1S9bwG2",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Deputy Director, Free Expression Project",
+      "source": "https://cdt.org/2024-annual-report-welcoming-new-faces-to-cdt/",
+      "verdict": "none"
+    },
+    {
+      "id": "u1uFVDEGmr",
+      "personId": "CVn3yXdSA8",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Director, CDT Europe",
+      "source": "https://cdt.org/press/asha-allen-joins-cdt-as-european-advocacy-director/",
+      "verdict": "none"
+    },
+    {
+      "id": "rYsdna2Y1q",
+      "personId": "n9ppHndum9",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Co-Founder & President",
+      "source": "https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology",
+      "verdict": "none"
+    },
+    {
+      "id": "xll14kjfz4",
+      "personId": "HkyaaCm6wK",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology",
+      "verdict": "none"
+    },
+    {
+      "id": "afGSjxrtvk",
+      "personId": "HeDtYoQNOf",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology",
+      "verdict": "none"
+    },
+    {
+      "id": "k6kCWsyPc9",
+      "personId": "wor1yMgB5L",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/Center_for_Democracy_and_Technology",
+      "verdict": "none"
+    },
+    {
+      "id": "nynD1KeTBR",
+      "personId": "szEv3nwvDy",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Chair",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "RAjnEk23eb",
+      "personId": "G9iYgBIpU4",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "4MJXEGcaSw",
+      "personId": "Jb5ZerGJYr",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "IfKFMJpRT3",
+      "personId": "a26QCgPI9W",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "pI4xbsTKbY",
+      "personId": "B6vFVLeqK6",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/press/former-wikimedia-foundation-ceo-katherine-maher-joins-cdt-board-of-directors/",
+      "verdict": "none"
+    },
+    {
+      "id": "qZZ4yQ1JnU",
+      "personId": "aXOHjNL1nJ",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/press/tech-leader-eric-muhlheim-joins-cdt-board-of-directors/",
+      "verdict": "none"
+    },
+    {
+      "id": "h2BmCYVemB",
+      "personId": "4tHksK4s8w",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "Kb0yq4Okv4",
+      "personId": "Y4QjEX683t",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "UTOR8j9dUK",
+      "personId": "7WYbOrHz2J",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "JpJnoj3hzL",
+      "personId": "o99UpOiUDy",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "Board Director",
+      "source": "https://cdt.org/about/board/",
+      "verdict": "none"
+    },
+    {
+      "id": "GNg029AsaE",
+      "personId": "RngiVw5Yvn",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "CDT Europe Board Director",
+      "source": "https://cdt.org/press/mireille-hildebrandt-and-morten-kjaerum-join-cdt-europe-board-of-directors/",
+      "verdict": "none"
+    },
+    {
+      "id": "vrT7GiQPqD",
+      "personId": "6n4T5SzPAk",
+      "organizationId": "sid_XkqcWk46oQ",
+      "role": "CDT Europe Board Director",
+      "source": "https://cdt.org/press/mireille-hildebrandt-and-morten-kjaerum-join-cdt-europe-board-of-directors/",
+      "verdict": "none"
+    }
+  ]
+}
