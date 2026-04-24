@@ -12,6 +12,7 @@
 
 import { describe, it, expect, beforeAll, beforeEach, afterAll } from "vitest";
 import postgres from "postgres";
+import type { CallableTransactionSql } from "../db.js";
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const describeWithDb = DATABASE_URL ? describe : describe.skip;
@@ -131,8 +132,8 @@ describeWithDb("full_audit_log trigger (migration 0204 / QUA-442)", () => {
 
   it("captures session_id and tool from SET LOCAL GUCs", async () => {
     // SET LOCAL scopes to a transaction, so wrap the write in BEGIN/COMMIT.
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js `TransactionSql` drops the tagged-template call signature via `Omit<>`; see db.ts::beginTransaction for the production workaround. Tests only need the runtime callable.
-    await sqlConn.begin(async (tx: any) => {
+    await sqlConn.begin(async (rawTx) => {
+      const tx = rawTx as unknown as CallableTransactionSql;
       await tx`SELECT set_config('app.agent_session_id', '12345', true)`;
       await tx`SELECT set_config('app.agent_tool', 'tb.scaffold', true)`;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('w1', 'tracked', 1)`;
@@ -152,8 +153,8 @@ describeWithDb("full_audit_log trigger (migration 0204 / QUA-442)", () => {
   });
 
   it("skips audit rows when app.audit_skip = 'true'", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js `TransactionSql` drops the tagged-template call signature via `Omit<>`; see db.ts::beginTransaction for the production workaround. Tests only need the runtime callable.
-    await sqlConn.begin(async (tx: any) => {
+    await sqlConn.begin(async (rawTx) => {
+      const tx = rawTx as unknown as CallableTransactionSql;
       await tx`SELECT set_config('app.audit_skip', 'true', true)`;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('w1', 'silent', 1)`;
       await tx`UPDATE audit_test_widgets SET qty = 2 WHERE id = 'w1'`;
@@ -164,8 +165,8 @@ describeWithDb("full_audit_log trigger (migration 0204 / QUA-442)", () => {
   });
 
   it("groups multi-row writes in one transaction under a single txn_id", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js `TransactionSql` drops the tagged-template call signature via `Omit<>`; see db.ts::beginTransaction for the production workaround. Tests only need the runtime callable.
-    await sqlConn.begin(async (tx: any) => {
+    await sqlConn.begin(async (rawTx) => {
+      const tx = rawTx as unknown as CallableTransactionSql;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('a', 'x', 1)`;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('b', 'y', 2)`;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('c', 'z', 3)`;
@@ -201,8 +202,8 @@ describeWithDb("full_audit_log trigger (migration 0204 / QUA-442)", () => {
   });
 
   it("treats empty-string GUCs as NULL in the audit row", async () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any -- postgres.js `TransactionSql` drops the tagged-template call signature via `Omit<>`; see db.ts::beginTransaction for the production workaround. Tests only need the runtime callable.
-    await sqlConn.begin(async (tx: any) => {
+    await sqlConn.begin(async (rawTx) => {
+      const tx = rawTx as unknown as CallableTransactionSql;
       await tx`SELECT set_config('app.agent_session_id', '', true)`;
       await tx`SELECT set_config('app.agent_tool', '', true)`;
       await tx`INSERT INTO audit_test_widgets (id, name, qty) VALUES ('w1', 'empty', 1)`;

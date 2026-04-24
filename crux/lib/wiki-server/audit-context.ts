@@ -23,6 +23,7 @@
 
 import { currentBranch } from '../git.ts';
 import { getAgentSessionByBranch } from './agent-sessions.ts';
+import { getServerUrl } from './client.ts';
 
 // `undefined` = not yet attempted, `null` = attempted and no value found
 // (so `buildHeaders()` doesn't retry on every request), `string` = value
@@ -50,10 +51,13 @@ export function primeAuditSessionId(): Promise<void> {
         return;
       }
 
-      // Skip the DB lookup when the CLI hasn't configured a server URL or
-      // API key yet. Commands that don't use the wiki-server (e.g. local
-      // validate) shouldn't pay for the lookup.
-      if (!process.env.LONGTERMWIKI_SERVER_URL && !process.env.PROD_LONGTERMWIKI_SERVER_URL) {
+      // Skip the DB lookup when no server URL is configured for the
+      // active env prefix. `getServerUrl()` honors `WIKI_SERVER_ENV` and
+      // the slot auto-detection logic, so e.g. an explicit
+      // `WIKI_SERVER_ENV=local` with only `PROD_*` vars set will
+      // correctly return empty and skip — a raw dual-env-var check
+      // would have tried to prime against the wrong URL.
+      if (!getServerUrl()) {
         cachedSessionId = null;
         return;
       }

@@ -246,7 +246,6 @@ const dataSourcesApp = new Hono()
     let actualStableId = "";
 
     await db.transaction(async (tx) => {
-      // Audit-log attribution (QUA-442).
       await applyAuditContext(tx, c);
       // Upsert resource row. ON CONFLICT on URL handles the case where
       // a resource was created by resource-ingest with a different ID scheme.

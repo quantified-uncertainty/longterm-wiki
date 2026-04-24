@@ -579,9 +579,6 @@ export function createSyncHandler<
       config.conflictSet ?? deriveConflictSet(table, allVals[0] ?? {});
 
     await db.transaction(async (tx) => {
-      // Seed universal-audit-log attribution (QUA-442) — `SET LOCAL` GUCs
-      // that the `audit_trigger_fn()` trigger reads. Scoped to this
-      // transaction; auto-resets on COMMIT/ROLLBACK.
       await applyAuditContext(tx, c);
 
       // ---- Phase 3: upsert (chunked) + Phase 4: audit ----

@@ -496,7 +496,6 @@ const resourcesApp = new Hono()
     let results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
-        // Audit-log attribution (QUA-442).
         await applyAuditContext(tx, c);
         // Pre-resolve all citedBy page IDs in one batch query
         const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];

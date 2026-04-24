@@ -1857,7 +1857,7 @@ export const fullAuditLog = pgTable(
   {
     id: bigserial("id", { mode: "bigint" }).primaryKey(),
     tableName: text("table_name").notNull(),
-    operation: text("operation").notNull(), // INSERT / UPDATE / DELETE
+    operation: text("operation").$type<"INSERT" | "UPDATE" | "DELETE">().notNull(),
     oldRow: jsonb("old_row"),
     newRow: jsonb("new_row"),
     txnId: bigint("txn_id", { mode: "bigint" }),
