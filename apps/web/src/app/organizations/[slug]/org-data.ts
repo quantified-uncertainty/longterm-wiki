@@ -16,6 +16,8 @@ import {
   getKBRecords,
   getAllKBRecords,
   getKBFactsByProperty,
+  getEntityEvents,
+  type EntityEvent,
 } from "@/data/factbase";
 import type { Fact } from "@longterm-wiki/factbase";
 import {
@@ -1055,6 +1057,9 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
   const sortedMilestones = sortKBRecords(safetyMilestones, "date", false);
   const sortedPartnerships = sortKBRecords(strategicPartnerships, "date", false);
 
+  // Entity timeline events (PG entity_events, merged into factbase-data.json)
+  const entityEvents: EntityEvent[] = getEntityEvents(entity.id);
+
   // Sort key persons: current first, then by start date descending
   const sortedPersons = [...keyPersons].sort((a, b) => {
     const endA = a.fields.end ? 1 : 0;
@@ -1487,6 +1492,7 @@ export function loadOrgPageData(entity: OrgEntity, slug: string) {
     sortedRounds,
     sortedModels,
     sortedMilestones,
+    entityEvents,
     sortedPartnerships,
     sortedPersons,
     wikiHref,
