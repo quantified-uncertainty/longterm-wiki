@@ -212,6 +212,13 @@ const VerdictsQuery = z.object({
   entity_id: z.string().max(200).optional(),
   needs_recheck: qBool.optional(),
   q: z.string().max(500).optional(),
+  /**
+   * QUA-661: when true, only return rows where `display_name` or
+   * `entity_display_name` is a raw `sid_`-prefixed stableId. Used by
+   * `validate-sid-display` to avoid paginating all ~14k verdict rows
+   * on every gate run.
+   */
+  display_name_is_sid: qBool.optional(),
   limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -594,7 +601,7 @@ const sourcingApp = new Hono()
 
   // ---- GET /verdicts ----
   .get("/verdicts", zv("query", VerdictsQuery), async (c) => {
-    const { record_type, verdict, entity_id, needs_recheck, q, limit, offset } =
+    const { record_type, verdict, entity_id, needs_recheck, q, display_name_is_sid, limit, offset } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
@@ -610,6 +617,13 @@ const sourcingApp = new Hono()
     }
     if (entity_id) {
       conditions.push(eq(sourceVerdicts.entityId, entity_id));
+    }
+    if (display_name_is_sid) {
+      // Matches the isSid() contract (prefix-only). Used by validate-sid-display
+      // (QUA-661) so the gate check doesn't scan all rows just to find zero leaks.
+      conditions.push(
+        sql`(starts_with(${sourceVerdicts.displayName}, 'sid_') OR starts_with(${sourceVerdicts.entityDisplayName}, 'sid_'))`
+      );
     }
     if (q) {
       const pattern = `%${escapeIlike(q)}%`;

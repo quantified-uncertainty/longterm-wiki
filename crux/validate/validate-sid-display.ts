@@ -185,7 +185,10 @@ export const TABLE_DISPLAY_SPECS: TableDisplaySpec[] = [
     // coerces sid_ to NULL on write, but this validator catches any historical
     // rows written before that protection, or future write paths that bypass
     // the POST /verdicts endpoint.
-    apiPath: "/api/sourcing/verdicts",
+    //
+    // `display_name_is_sid=true` pushes the filter to the server so we only
+    // paginate the (typically zero) leaked rows — not all ~14k verdict rows.
+    apiPath: "/api/sourcing/verdicts?display_name_is_sid=true",
     responseKey: "verdicts",
     displayFields: [
       { displayField: "displayName" },
