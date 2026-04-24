@@ -38,7 +38,7 @@ export function MobileNav() {
   }, [open]);
 
   return (
-    <div ref={menuRef} className="md:hidden relative">
+    <div ref={menuRef} className="lg:hidden relative">
       <button
         type="button"
         onClick={() => setOpen(!open)}

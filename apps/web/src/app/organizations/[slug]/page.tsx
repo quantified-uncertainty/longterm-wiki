@@ -337,7 +337,7 @@ export default async function OrgProfilePage({
     label: "Facts",
     group: "data",
     icon: <ListTree className={ICON_CLASS} />,
-    content: <FactBaseEntityBody entityId={entity.id} skipVerdicts />,
+    content: <FactBaseEntityBody entityId={entity.id} skipVerdicts skipHeroStats />,
   });
 
   // ── Database Records tab (embedded EntityProfileViewer) ──

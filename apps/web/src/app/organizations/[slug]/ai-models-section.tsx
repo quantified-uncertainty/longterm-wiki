@@ -47,7 +47,9 @@ const FEATURED_BENCHMARKS = [
 /** Pick top N benchmark scores, preferring featured benchmarks. */
 function pickTopBenchmarks(
   benchmarks: BenchmarkScore[],
-  maxCount = 3,
+  // QUA-669: 3 benchmarks per row wrapped onto 3 lines when names were long;
+  // 2 keeps the column height consistent across the table.
+  maxCount = 2,
 ): BenchmarkScore[] {
   if (benchmarks.length === 0) return [];
 
@@ -194,13 +196,29 @@ export function AiModelsSection({
                           {topBenchmarks.map((b) => (
                             <span
                               key={b.name}
-                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/50 text-[10px] text-muted-foreground"
+                              className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded bg-muted/50 text-[10px] text-muted-foreground max-w-[14rem]"
                               title={`${b.name}: ${b.score}${b.unit ? ` ${b.unit}` : ""}`}
                             >
-                              <span className="font-medium text-foreground/80">{b.name}</span>
-                              <span className="tabular-nums">{b.score}{b.unit === "%" ? "%" : ""}</span>
+                              <span className="font-medium text-foreground/80 truncate">{b.name}</span>
+                              <span className="tabular-nums shrink-0">{b.score}{b.unit === "%" ? "%" : ""}</span>
                             </span>
                           ))}
+                          {(() => {
+                            if (!benchmarks) return null;
+                            const shown = new Set(topBenchmarks.map((b) => b.name));
+                            const remaining = benchmarks.filter((b) => !shown.has(b.name));
+                            if (remaining.length === 0) return null;
+                            return (
+                              <span
+                                className="inline-flex items-center px-1.5 py-0.5 rounded bg-transparent text-[10px] text-muted-foreground/60"
+                                title={remaining
+                                  .map((b) => `${b.name}: ${b.score}${b.unit ? ` ${b.unit}` : ""}`)
+                                  .join("\n")}
+                              >
+                                +{remaining.length}
+                              </span>
+                            );
+                          })()}
                         </div>
                       ) : null}
                     </td>
