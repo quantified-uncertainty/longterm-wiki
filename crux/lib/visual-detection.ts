@@ -47,7 +47,6 @@ const MERMAID_CODE_BLOCK_PATTERN = /```mermaid/g;
 
 export interface VisualCounts {
   mermaid: number;
-  squiggle: number;
   'cause-effect': number;
   comparison: number;
   disagreement: number;
@@ -65,7 +64,6 @@ export interface VisualCounts {
 export function countVisuals(content: string): VisualCounts {
   const counts: VisualCounts = {
     mermaid: 0,
-    squiggle: 0,
     'cause-effect': 0,
     comparison: 0,
     disagreement: 0,
@@ -110,12 +108,12 @@ export function countVisuals(content: string): VisualCounts {
 // ============================================================================
 
 /**
- * Count all diagram-type visuals (mermaid + squiggle + cause-effect).
+ * Count all diagram-type visuals (mermaid + cause-effect).
  * Drop-in replacement for the old countDiagrams() in metrics-extractor.
  */
 export function countDiagrams(content: string): number {
   const counts = countVisuals(content);
-  return counts.mermaid + counts.squiggle + counts['cause-effect'];
+  return counts.mermaid + counts['cause-effect'];
 }
 
 /**
@@ -133,7 +131,7 @@ export function countTables(content: string): number {
 
 export interface ExtractedVisual {
   type: string;
-  /** The inner code (Mermaid chart code, Squiggle model code, etc.) */
+  /** The inner code (Mermaid chart code, etc.) */
   code: string;
   /** The full raw JSX/markdown match */
   raw: string;
@@ -159,20 +157,6 @@ export function extractVisuals(content: string): ExtractedVisual[] {
   while ((match = mermaidRegex.exec(content)) !== null) {
     visuals.push({
       type: 'mermaid',
-      code: match[1],
-      raw: match[0],
-      line: getLineNumber(content, match.index),
-      startOffset: match.index,
-      endOffset: match.index + match[0].length,
-    });
-  }
-
-  // Squiggle: <SquiggleEstimate code={`...`} />
-  const squiggleRegex =
-    /<SquiggleEstimate[^>]*code=\{`([\s\S]*?)`\}[^>]*\/?>/g;
-  while ((match = squiggleRegex.exec(content)) !== null) {
-    visuals.push({
-      type: 'squiggle',
       code: match[1],
       raw: match[0],
       line: getLineNumber(content, match.index),

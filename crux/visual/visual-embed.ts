@@ -71,7 +71,7 @@ function generateMdxSnippet(visual: VisualDefinition): string {
   if (!isGeneratableVisualType(visual.type)) {
     throw new Error(
       `Visual type "${visual.type}" cannot be embedded. ` +
-      `Supported types: mermaid, squiggle, cause-effect, comparison, disagreement`,
+      `Supported types: mermaid, cause-effect, comparison, disagreement`,
     );
   }
   const componentInfo = VISUAL_COMPONENT_MAP[visual.type];
@@ -82,12 +82,6 @@ function generateMdxSnippet(visual: VisualDefinition): string {
     case 'mermaid':
       snippet += `<MermaidDiagram chart={\`\n${visual.content}\n\`} />`;
       break;
-
-    case 'squiggle': {
-      const title = visual.props?.title || visual.title;
-      snippet += `<SquiggleEstimate\n  title="${title}"\n  code={\`\n${visual.content}\n\`}\n/>`;
-      break;
-    }
 
     case 'cause-effect':
     case 'comparison':

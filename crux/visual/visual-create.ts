@@ -8,7 +8,6 @@
  *
  * Usage:
  *   crux visual create <page-id> --type mermaid
- *   crux visual create <page-id> --type squiggle --directions "model compute growth rates"
  *   crux visual create <page-id> --type cause-effect
  */
 
@@ -49,10 +48,9 @@ CRITICAL RULES:
 2. The visual must be accurate to the source content. Do not invent facts.
 3. Keep visuals focused: one clear concept per diagram.
 4. For Mermaid: max 15-20 nodes, prefer flowchart TD, use the project color palette.
-5. For Squiggle: use distributions (not point values), 5-30 lines, name variables clearly.
-6. For CauseEffectGraph: use proper node/edge data structure with typed nodes.
-7. For ComparisonTable: keep to 3-6 columns, use meaningful row names.
-8. For DisagreementMap: include diverse positions with evidence/reasoning.
+5. For CauseEffectGraph: use proper node/edge data structure with typed nodes.
+6. For ComparisonTable: keep to 3-6 columns, use meaningful row names.
+7. For DisagreementMap: include diverse positions with evidence/reasoning.
 
 OUTPUT FORMAT:
 Return a valid JSX snippet that can be directly embedded in an MDX file.
@@ -140,7 +138,7 @@ async function main(): Promise<void> {
 
   if (!type || !isGeneratableVisualType(type)) {
     console.error(
-      `${colors.red}Error: --type required. Valid types: mermaid, squiggle, cause-effect, comparison, disagreement${colors.reset}`,
+      `${colors.red}Error: --type required. Valid types: mermaid, cause-effect, comparison, disagreement${colors.reset}`,
     );
     process.exit(1);
   }

@@ -81,7 +81,7 @@ describe('crux query blocks', () => {
 
     it('rejects page-id combined with --component', async () => {
       seedIndex([makePage('test', [makeSection()])]);
-      const result = await blocks(['test'], { component: 'squiggle' });
+      const result = await blocks(['test'], { component: 'mermaid' });
       expect(result.exitCode).toBe(1);
       expect(result.output).toContain('mutually exclusive');
     });
@@ -95,7 +95,7 @@ describe('crux query blocks', () => {
 
     it('rejects --entity combined with --component', async () => {
       seedIndex([makePage('test', [makeSection()])]);
-      const result = await blocks([], { entity: 'anthropic', component: 'squiggle' });
+      const result = await blocks([], { entity: 'anthropic', component: 'mermaid' });
       expect(result.exitCode).toBe(1);
       expect(result.output).toContain('only one of');
     });
@@ -109,7 +109,7 @@ describe('crux query blocks', () => {
 
     it('rejects --component combined with --uncited', async () => {
       seedIndex([makePage('test', [makeSection()])]);
-      const result = await blocks([], { component: 'squiggle', uncited: true });
+      const result = await blocks([], { component: 'mermaid', uncited: true });
       expect(result.exitCode).toBe(1);
       expect(result.output).toContain('only one of');
     });
@@ -155,23 +155,23 @@ describe('crux query blocks', () => {
     });
 
     it('returns JSON for --json flag', async () => {
-      seedIndex([makePage('test-page', [makeSection()], { squiggle: 2 })]);
+      seedIndex([makePage('test-page', [makeSection()], { mermaid: 2 })]);
       const result = await blocks(['test-page'], { json: true });
       expect(result.exitCode).toBe(0);
       const parsed = JSON.parse(result.output);
       expect(parsed.pageId).toBe('test-page');
-      expect(parsed.components.squiggle).toBe(2);
+      expect(parsed.components.mermaid).toBe(2);
     });
 
     it('displays component summary', async () => {
       seedIndex([makePage('test-page', [
-        makeSection({ componentNames: ['squiggle'] }),
-      ], { squiggle: 1, mermaid: 2 })]);
+        makeSection({ componentNames: ['mermaid', 'calc'] }),
+      ], { mermaid: 2, calc: 1 })]);
 
       const result = await blocks(['test-page'], {});
       expect(result.exitCode).toBe(0);
-      expect(result.output).toContain('squiggle');
       expect(result.output).toContain('mermaid');
+      expect(result.output).toContain('calc');
     });
   });
 
@@ -224,12 +224,12 @@ describe('crux query blocks', () => {
   describe('--component filter', () => {
     it('finds pages using a component', async () => {
       seedIndex([
-        makePage('page-a', [makeSection()], { squiggle: 3 }),
-        makePage('page-b', [makeSection()], { squiggle: 1 }),
-        makePage('page-c', [makeSection()], { mermaid: 2 }),
+        makePage('page-a', [makeSection()], { mermaid: 3 }),
+        makePage('page-b', [makeSection()], { mermaid: 1 }),
+        makePage('page-c', [makeSection()], { calc: 2 }),
       ]);
 
-      const result = await blocks([], { component: 'squiggle' });
+      const result = await blocks([], { component: 'mermaid' });
       expect(result.exitCode).toBe(0);
       expect(result.output).toContain('2 page');
       expect(result.output).toContain('page-a');
@@ -237,26 +237,26 @@ describe('crux query blocks', () => {
     });
 
     it('is case-insensitive', async () => {
-      seedIndex([makePage('test', [makeSection()], { squiggle: 1 })]);
-      const result = await blocks([], { component: 'Squiggle' });
+      seedIndex([makePage('test', [makeSection()], { mermaid: 1 })]);
+      const result = await blocks([], { component: 'Mermaid' });
       expect(result.exitCode).toBe(0);
       expect(result.output).toContain('1 page');
     });
 
     it('suggests known components for unknown type', async () => {
-      seedIndex([makePage('test', [makeSection()], { squiggle: 1, mermaid: 2 })]);
+      seedIndex([makePage('test', [makeSection()], { calc: 1, mermaid: 2 })]);
       const result = await blocks([], { component: 'nonexistent' });
       expect(result.exitCode).toBe(0);
       expect(result.output).toContain('Known:');
-      expect(result.output).toContain('squiggle');
+      expect(result.output).toContain('mermaid');
     });
 
     it('sorts by count descending', async () => {
       seedIndex([
-        makePage('page-a', [makeSection()], { squiggle: 1 }),
-        makePage('page-b', [makeSection()], { squiggle: 5 }),
+        makePage('page-a', [makeSection()], { mermaid: 1 }),
+        makePage('page-b', [makeSection()], { mermaid: 5 }),
       ]);
-      const result = await blocks([], { component: 'squiggle', json: true });
+      const result = await blocks([], { component: 'mermaid', json: true });
       const parsed = JSON.parse(result.output);
       expect(parsed[0].pageId).toBe('page-b');
       expect(parsed[0].count).toBe(5);

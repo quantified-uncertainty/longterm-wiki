@@ -12,7 +12,7 @@ clusters:
   - ai-safety
   - governance
 ---
-import {Mermaid, EntityLink, SquiggleEstimate} from '@components/wiki';
+import {Mermaid, EntityLink} from '@components/wiki';
 
 ## Quick Assessment
 
@@ -34,29 +34,6 @@ For two consecutive years, Wall Street consensus estimates for AI capex were sub
 To contextualize the \$700 billion figure: it represents approximately 2.1% of projected 2026 US GDP flowing from five companies into infrastructure buildout in a single year — more than four times the combined annual capital expenditure of the entire publicly traded US energy sector.[^rc-10ad]
 
 This spending trajectory influences AI governance dynamics: the physical infrastructure being deployed determines the compute available for training frontier models, the geographic distribution of AI capabilities, and the economic incentives shaping competitive dynamics between AI developers.
-
-<SquiggleEstimate title="Cumulative Hyperscaler AI Capex 2024-2030 ($T)" code={`
-// Goldman/JPMorgan project ≈\$5T cumulative through 2030
-// 2024-2026 are known; 2027-2030 carry increasing uncertainty
-capex2024 = 0.235
-capex2025 = 0.397
-capex2026 = 0.685
-capex2027 = capex2026 * (0.9 to 1.3)
-capex2028 = capex2027 * (0.85 to 1.2)
-capex2029 = capex2028 * (0.8 to 1.15)
-capex2030 = capex2029 * (0.75 to 1.1)
-cumulative = capex2024 + capex2025 + capex2026 + capex2027 + capex2028 + capex2029 + capex2030
-{
-  "2024 (actual)": capex2024,
-  "2025 (actual)": capex2025,
-  "2026 (guided)": capex2026,
-  "2027": capex2027,
-  "2028": capex2028,
-  "2029": capex2029,
-  "2030": capex2030,
-  "Cumulative 2024-2030": cumulative
-}
-`} />
 
 ## Historical Context
 
@@ -227,27 +204,6 @@ Hardware depreciation significantly impacts the actual economics of AI infrastru
 | 4 years | Alphabet, Microsoft | \$25B annual depreciation per \$100B invested; moderate lifecycle |
 | 5 years | Amazon (some equipment) | \$20B annual depreciation per \$100B invested; optimistic on longevity |
 
-<SquiggleEstimate title="Annual Depreciation Burden from AI Capex ($B)" code={`
-// Each year's capex creates ~4 years of depreciation at 25%/year
-// Shows how depreciation costs compound as investment accumulates
-dep2025 = 238 * 0.25  // from 2024 capex
-dep2026 = dep2025 + 415 * 0.25  // add 2025 layer
-dep2027 = dep2026 + 700 * 0.25  // add 2026 layer
-capex2027 = 700 * (0.9 to 1.3)
-dep2028 = dep2027 + capex2027 * 0.25  // add 2027 layer, 2024 rolls off
-   - 238 * 0.25
-capex2028 = capex2027 * (0.85 to 1.2)
-dep2029 = dep2028 + capex2028 * 0.25  // 2025 rolls off
-   - 415 * 0.25
-{
-  "2025": dep2025,
-  "2026": dep2026,
-  "2027": dep2027,
-  "2028": dep2028,
-  "2029": dep2029
-}
-`} />
-
 If the \$700 billion in 2026 capex is depreciated over 4 years on average, these companies face \$175 billion in annual depreciation expenses starting in 2027, which must be covered by revenue from AI products and services to maintain profitability. Additionally, technological advancement in AI accelerators creates functional obsolescence risk: H100 GPUs from 2023 are already being replaced by H200 and GB200 systems with 2-3x performance improvements, potentially rendering older hardware economically obsolete before the end of its depreciation schedule.[^rc-3706]
 
 ### Funding Mechanisms
@@ -326,24 +282,6 @@ For context on the \$1 trillion annual revenue target, current AI revenue data p
 | GitHub Copilot | \$2B estimated | \$5B projected | Developer subscriptions | [Microsoft Disclosures](https://microsoft.com)[^rc-be3f] |
 | Other Enterprise AI | \$10B estimated | \$25B projected | Various vendors | Industry estimates |
 | **Total** | **≈\$90B** | **≈\$190B** | | |
-
-<SquiggleEstimate title="AI Revenue Growth Trajectory to 2030 ($B)" code={`
-// Can AI revenue grow from ≈\$90B to the \$1T needed for 10% ROIC?
-rev2025 = 90
-rev2026 = 160 to 220
-rev2027 = rev2026 * (1.4 to 2.0)
-rev2028 = rev2027 * (1.3 to 1.8)
-rev2029 = rev2028 * (1.2 to 1.6)
-rev2030 = rev2029 * (1.15 to 1.5)
-{
-  "2025 (est.)": rev2025,
-  "2026": rev2026,
-  "2027": rev2027,
-  "2028": rev2028,
-  "2029": rev2029,
-  "2030": rev2030
-}
-`} />
 
 Current 2025 AI revenue of approximately \$90 billion would need to grow to \$1 trillion by 2030, implying a compound annual growth rate (CAGR) of approximately 61% — faster than cloud computing's 40% CAGR during 2010-2020 but slower than mobile app revenue's 85% CAGR during 2008-2015.[^rc-d88a]
 
@@ -442,22 +380,6 @@ AI infrastructure at the projected scale requires substantial electrical power g
 | US DOE | 15-20 GW incremental | 50-75 GW cumulative | Based on announced data center projects | [DOE Grid Study 2025](https://energy.gov)[^rc-7247] |
 | Goldman Sachs | 18 GW incremental | 60 GW cumulative | Extrapolation from hyperscaler capex plans | [Goldman Infrastructure Report 2025](https://goldmansachs.com)[^rc-0742] |
 | EPRI | 12-25 GW range | 40-80 GW range | Scenarios based on AI adoption rates | [EPRI Data Center Study 2025](https://epri.com)[^rc-8c87] |
-
-<SquiggleEstimate title="Cumulative AI Data Center Power Demand (GW)" code={`
-// DOE estimates: 15-20 GW incremental in 2026, 50-75 GW cumulative by 2030
-capacity2026 = 15 to 25
-capacity2027 = capacity2026 * (1.3 to 1.6)
-capacity2028 = capacity2027 * (1.2 to 1.4)
-capacity2029 = capacity2028 * (1.1 to 1.3)
-capacity2030 = capacity2029 * (1.05 to 1.2)
-{
-  "2026": capacity2026,
-  "2027": capacity2027,
-  "2028": capacity2028,
-  "2029": capacity2029,
-  "2030": capacity2030
-}
-`} />
 
 For context, 1 gigawatt serves approximately 700,000 US homes.[^rc-88b2] The projected 15-20 GW of incremental 2026 demand equals the residential power consumption of 10-14 million homes, or roughly the entire state of Pennsylvania.
 

@@ -18,7 +18,7 @@ todos:
   - Document legal status of founder pledges (binding vs. aspirational) - employee equity pledges appear legally binding (transferred to DAFs), but founder 80% pledges are reportedly not legally binding per LessWrong sources
   - Research whether matching program changes signal shift in company priorities - confirmed reduced from 3:1@50% to lower terms for new hires; original program no longer available per LessWrong reports; existing pledges still in effect
 ---
-import {EntityLink, SquiggleEstimate, F} from '@components/wiki';
+import {EntityLink, F} from '@components/wiki';
 
 :::note[Page Scope]
 This page covers EA-aligned philanthropic capital at Anthropic, including founder pledges, employee matching programs, EA investor stakes, and cause allocation. For valuation analysis, see <EntityLink id="E405" name="anthropic-valuation">Anthropic Valuation Analysis</EntityLink>. For company overview, see <EntityLink id="E22" name="anthropic">Anthropic</EntityLink>.
@@ -561,75 +561,6 @@ The base scenario analysis caps at \$500B. Anthropic's revenue has reportedly gr
 At 10x current valuation (\$3.5T), total EA-aligned capital could exceed \$1 trillion — though probability-weighted, this adds only an estimated \$8–16B to expected value given the low assigned likelihood.
 
 ### Interactive Estimate Models
-
-<SquiggleEstimate title="Anthropic Valuation Scenarios (probability-weighted)" code={`
-// Valuation scenarios as continuous distributions
-bull = 400e9 to 650e9           // wide bull case
-base = 250e9 to 450e9           // broad base case
-conservative = 100e9 to 220e9   // conservative range
-bear = 20e9 to 80e9             // bear / down-round range
-
-valuationDist = mixture(
-  bull, base, conservative, bear,
-  [0.15, 0.40, 0.25, 0.15]
-)
-
-valuationDist
-`} />
-
-<SquiggleEstimate title="Founder Equity: EA-Directed Capital" code={`
-// 7 founders, 2-3% stake each, 80% pledged
-founderStakePct = 0.02 to 0.03
-numFounders = 7
-pledgeRate = 0.8
-valuation = mixture(
-  400e9 to 650e9, 250e9 to 450e9,
-  100e9 to 220e9, 20e9 to 80e9,
-  [0.15, 0.4, 0.25, 0.15]
-)
-
-totalFounderEquity = valuation * founderStakePct * numFounders
-pledgedAmount = totalFounderEquity * pledgeRate
-
-// Only 2/7 founders have strong EA connections
-// Probability each founder's pledged amount goes to EA causes
-eaFounderFraction = beta(3, 4) // ~40% expected, wide uncertainty
-eaDirectedCapital = pledgedAmount * eaFounderFraction
-
-eaDirectedCapital
-`} />
-
-<SquiggleEstimate title="Total EA-Aligned Capital (all sources)" code={`
-// Valuation distribution (continuous scenarios)
-valuation = mixture(
-  400e9 to 650e9, 250e9 to 450e9,
-  100e9 to 220e9, 20e9 to 80e9,
-  [0.15, 0.4, 0.25, 0.15]
-)
-
-// Founder capital (7 founders, 2-3% each, 80% pledged)
-founderEquity = valuation * (0.02 to 0.03) * 7 * 0.8
-// Risk-adjust: only ~40-60% likely to go to EA causes
-founderEA = founderEquity * beta(5, 5)
-
-// EA Investor capital (Tallinn + Moskovitz)
-tallinnStake = valuation * (0.006 to 0.017) * (0.7 to 0.9)
-moskovitzStake = valuation * (0.008 to 0.025) * (0.9 to 1.0)
-investorEA = tallinnStake + moskovitzStake
-
-// Employee pledges + matching (legally bound in DAFs)
-employeePool = valuation * (0.12 to 0.18)
-eaEmployeeFraction = 0.15 to 0.40
-participationRate = 0.3 to 0.7
-avgPledgePct = 0.3 to 0.5
-directPledges = employeePool * eaEmployeeFraction * participationRate * avgPledgePct
-// Matching: mix of old 3:1 and new 1:1 programs
-matchMultiplier = 1.5 to 3.0
-employeeEA = directPledges * (1 + matchMultiplier) * (0.8 to 0.95)
-
-totalEA = founderEA + investorEA + employeeEA
-totalEA
-`} />
 
 ### Expected Value Calculation
 

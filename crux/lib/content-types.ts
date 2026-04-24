@@ -457,5 +457,4 @@ export const QUALITY_RULES: string[] = [
   'unsourced-biographical-claims',
   'evaluative-flattery',
   'orphaned-footnotes',
-  'squiggle-quality',
 ];
