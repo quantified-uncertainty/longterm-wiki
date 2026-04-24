@@ -208,13 +208,16 @@ Your job is to research and add benchmark scores for "${task.entityName}".
 ${SHARED_RULES}
 
 ## Common Benchmarks to Check
-- MMLU, MMLU-Pro
-- HumanEval, MBPP
-- GSM8K, MATH
-- HellaSwag, ARC-Challenge
-- TruthfulQA
-- MT-Bench
-- Arena ELO
+- General reasoning: MMLU, MMLU-Pro, MMMU-Pro, BIG-Bench Hard
+- Coding: HumanEval, MBPP, BigCodeBench, SWE-bench Verified, Aider Polyglot
+- Math: GSM8K, MATH, MATH-500, AIME 2024, AIME 2025
+- Scientific: GPQA Diamond, FrontierMath
+- Knowledge: HellaSwag, ARC-Challenge, TruthfulQA, WinoGrande
+- Agentic / tool-use: TAU-bench, OSWorld, Terminal-Bench, BrowseComp, RE-Bench
+- Multilingual / instruction-following: Multi-IF, IFEval, MGSM
+- Arenas / judging: MT-Bench, Arena ELO, Arena-Hard-Auto
+
+Prioritize benchmarks that are widely reported for frontier models AND that this model's developer explicitly reports in their launch blog / model card / technical report.
 
 ## Benchmark Result Fields
 - benchmarkId: Entity ID for the benchmark (use resolve_entity)
