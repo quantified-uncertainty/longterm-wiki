@@ -68,6 +68,8 @@ export interface SourceCacheEntry {
   author?: string;
   /** ISO date string, e.g. '2023-06-15'. */
   date?: string;
+  /** Provider(s) that surfaced this URL, joined with '+' if multiple (e.g. 'exa+perplexity'). */
+  provider?: string;
   /**
    * Full or excerpt content of the page.  Truncated to MAX_SOURCE_CONTENT_CHARS
    * before being included in the prompt.  Prefer pre-extracted excerpts here

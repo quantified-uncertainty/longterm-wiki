@@ -131,6 +131,8 @@ export interface ResearchResult {
     /** Total USD cost (search + LLM calls). */
     totalCost: number;
     costBreakdown: ResearchCostBreakdown;
+    /** Count of fetched sources attributed to each provider key (e.g. 'exa', 'exa+perplexity'). */
+    providerCounts: Record<string, number>;
     /** Wall-clock duration in milliseconds. */
     durationMs: number;
   };
@@ -791,10 +793,21 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
 
   const sources: SourceCacheEntry[] = [];
 
+  // Build per-URL provider list for SourceCacheEntry attribution + per-provider tallies
+  const providerCounts: Record<string, number> = {};
+  function providersFor(url: string): string {
+    const hits = urlToHits.get(url) ?? [];
+    const seen = new Set<string>();
+    for (const h of hits) seen.add(h.provider);
+    return [...seen].sort().join('+');
+  }
+
   for (let i = 0; i < fetchedSources.length; i++) {
     const fetched = fetchedSources[i];
     const url = urlsToFetch[i];
     const title = fetched.title || (urlBestTitle.get(url) ?? url);
+    const provider = providersFor(url);
+    providerCounts[provider] = (providerCounts[provider] ?? 0) + 1;
 
     if (totalCost >= budgetCap) {
       // Budget exhausted — still add the source but skip fact extraction
@@ -802,6 +815,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         id: `SRC-${i + 1}`,
         url: fetched.url,
         title,
+        provider,
         content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
         facts: [],
       });
@@ -826,6 +840,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       id: `SRC-${i + 1}`,
       url: fetched.url,
       title,
+      provider,
       content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
       facts: facts.length > 0 ? facts : undefined,
     });
@@ -865,6 +880,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         searchCost,
         factExtractionCost,
       },
+      providerCounts,
       durationMs,
     },
   };

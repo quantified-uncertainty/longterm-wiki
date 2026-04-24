@@ -196,6 +196,7 @@ export function contentMatchesRecord(
 interface RankCandidate {
   url: string;
   snippet: string;
+  provider?: string;
 }
 
 /**
@@ -299,13 +300,27 @@ async function rankMatchingSources(
 // Core: process one record
 // ---------------------------------------------------------------------------
 
+interface CostBreakdown {
+  searchCost: number;       // Perplexity search
+  factExtractionCost: number; // Haiku fact-extraction (0 when extractFacts: false)
+  rankCost: number;         // Haiku ranking of multi-candidate matches
+}
+
+function emptyCost(): CostBreakdown {
+  return { searchCost: 0, factExtractionCost: 0, rankCost: 0 };
+}
+
+function totalOf(c: CostBreakdown): number {
+  return c.searchCost + c.factExtractionCost + c.rankCost;
+}
+
 async function processRecord(
   record: MissingSourceRecord,
   options: { dryRun: boolean; apply: boolean },
-): Promise<{ matched: boolean; updated: boolean; url?: string; cost: number }> {
+): Promise<{ matched: boolean; updated: boolean; url?: string; provider?: string; cost: CostBreakdown; reason?: string }> {
   const matchTerms = extractMatchTerms(record);
   if (matchTerms.length === 0) {
-    return { matched: false, updated: false, cost: 0 };
+    return { matched: false, updated: false, cost: emptyCost(), reason: 'no search terms' };
   }
 
   // Build a targeted search query
@@ -328,11 +343,16 @@ async function processRecord(
       budgetCap: PER_RECORD_BUDGET,
     });
   } catch (err: unknown) {
-    console.warn(`  Search failed: ${err instanceof Error ? err.message : String(err)}`);
-    return { matched: false, updated: false, cost: 0 };
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`  Search failed: ${msg}`);
+    return { matched: false, updated: false, cost: emptyCost(), reason: `search failed: ${msg}` };
   }
 
-  let cost = researchResult.metadata.totalCost;
+  const cost: CostBreakdown = {
+    searchCost: researchResult.metadata.costBreakdown.searchCost,
+    factExtractionCost: researchResult.metadata.costBreakdown.factExtractionCost,
+    rankCost: 0,
+  };
 
   // Gather ALL sources that clear the content gate, then rank. Skip self-
   // domain hits — they're circular (sourcing wiki facts against wiki pages).
@@ -342,11 +362,11 @@ async function processRecord(
     const content = source.content || '';
     if (content.length < 50) continue;
     if (contentMatchesRecord(content, matchTerms, entityName)) {
-      matches.push({ url: source.url, snippet: content.slice(0, 600) });
+      matches.push({ url: source.url, snippet: content.slice(0, 600), provider: source.provider });
     }
   }
 
-  if (matches.length === 0) return { matched: false, updated: false, cost };
+  if (matches.length === 0) return { matched: false, updated: false, cost, reason: 'no source matched content gate' };
 
   let chosen: RankCandidate;
   if (matches.length === 1) {
@@ -356,7 +376,7 @@ async function processRecord(
     // Ranking claim = record description; fall back to matchTerm[0] if empty
     const rankClaim = (record.description || matchTerms[0] || '').trim();
     const { index, cost: rankCost } = await rankMatchingSources(rankClaim, entityName, matches);
-    cost += rankCost;
+    cost.rankCost += rankCost;
     chosen = matches[index];
     console.log(`  ✓ Best of ${matches.length} matches: ${chosen.url}`);
   }
@@ -369,7 +389,7 @@ async function processRecord(
     }
   }
 
-  return { matched: true, updated, url: chosen.url, cost };
+  return { matched: true, updated, url: chosen.url, provider: chosen.provider, cost };
 }
 
 // ---------------------------------------------------------------------------
@@ -461,45 +481,65 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   }
 
   // 2. Process each record
+  type Outcome =
+    | { kind: 'matched'; url: string; provider?: string; updated?: boolean; cost: CostBreakdown }
+    | { kind: 'no-match'; reason: string; cost: CostBreakdown }
+    | { kind: 'skipped'; reason: string };
+  const outcomes: Array<{ record: MissingSourceRecord; outcome: Outcome }> = [];
+
   let matched = 0;
   let updatedCount = 0;
   let updateFailed = 0;
   let noTerms = 0;
   let searched = 0;
   let budgetSkipped = 0;
-  let totalCost = 0;
+  const totalBreakdown: CostBreakdown = emptyCost();
+  const winningProviderCounts: Record<string, number> = {};
   let budgetStopped = false;
 
   for (let i = 0; i < allRecords.length; i++) {
     const record = allRecords[i];
     if (extractMatchTerms(record).length === 0) {
       noTerms++;
+      outcomes.push({ record, outcome: { kind: 'skipped', reason: 'no search terms' } });
       continue;
     }
 
-    if (totalCost >= maxCost) {
+    if (totalOf(totalBreakdown) >= maxCost) {
       if (!budgetStopped) {
         budgetStopped = true;
-        console.warn(`\n[budget] Reached $${totalCost.toFixed(4)} / $${maxCost.toFixed(2)} cap — stopping remaining records`);
+        console.warn(`\n[budget] Reached $${totalOf(totalBreakdown).toFixed(4)} / $${maxCost.toFixed(2)} cap — stopping remaining records`);
       }
       budgetSkipped++;
+      outcomes.push({ record, outcome: { kind: 'skipped', reason: 'budget cap' } });
       continue;
     }
 
-    console.log(`[${i + 1}/${allRecords.length}] ${record.record_table}: ${record.description.slice(0, 80)}`);
+    console.log(`[${i + 1}/${allRecords.length}] ${record.record_table}/${record.record_id}: ${record.description.slice(0, 80)}`);
 
     searched++;
     const result = await processRecord(record, { dryRun, apply });
-    totalCost += result.cost;
-    if (result.matched) {
+    totalBreakdown.searchCost += result.cost.searchCost;
+    totalBreakdown.factExtractionCost += result.cost.factExtractionCost;
+    totalBreakdown.rankCost += result.cost.rankCost;
+
+    if (result.matched && result.url) {
       matched++;
+      const providerKey = result.provider ?? 'unknown';
+      winningProviderCounts[providerKey] = (winningProviderCounts[providerKey] ?? 0) + 1;
+      let recordUpdated: boolean | undefined;
       if (apply) {
+        recordUpdated = result.updated;
         if (result.updated) updatedCount++;
         else updateFailed++;
       }
+      outcomes.push({ record, outcome: { kind: 'matched', url: result.url, provider: result.provider, updated: recordUpdated, cost: result.cost } });
+    } else {
+      outcomes.push({ record, outcome: { kind: 'no-match', reason: result.reason ?? 'unknown', cost: result.cost } });
     }
   }
 
+  const totalCost = totalOf(totalBreakdown);
   const mode = apply ? 'apply' : 'dry-run';
   const lines = [
     `[backfill-sources] ${mode}${budgetStopped ? ' (stopped at budget cap)' : ''}`,
@@ -514,6 +554,38 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
     lines.push(`    DB updates: ${updatedCount} written, ${updateFailed} failed`);
   }
   lines.push(`  Cost: $${totalCost.toFixed(4)} / $${maxCost.toFixed(2)} cap`);
+  lines.push(`    Perplexity search:   $${totalBreakdown.searchCost.toFixed(4)}`);
+  lines.push(`    Haiku fact-extract:  $${totalBreakdown.factExtractionCost.toFixed(4)}`);
+  lines.push(`    Haiku ranking:       $${totalBreakdown.rankCost.toFixed(4)}`);
+
+  // Per-provider winning-source counts
+  if (matched > 0) {
+    lines.push(`  Winning source by provider (${matched} total):`);
+    const sorted = Object.entries(winningProviderCounts).sort(([, a], [, b]) => b - a);
+    for (const [key, count] of sorted) {
+      lines.push(`    ${key.padEnd(24)} ${count}`);
+    }
+  }
+
+  // Per-record report
+  lines.push('', '=== Per-record outcomes ===');
+  for (const { record, outcome } of outcomes) {
+    const id = `${record.record_table}/${record.record_id}`;
+    const desc = record.description.slice(0, 80);
+    if (outcome.kind === 'matched') {
+      const tag = outcome.updated === undefined ? '✓' : outcome.updated ? '✓ (written)' : '✓ (write failed)';
+      const c = totalOf(outcome.cost);
+      const prov = outcome.provider ? ` from ${outcome.provider}` : '';
+      lines.push(`  ${tag} ${id} — ${desc}  [$${c.toFixed(4)}${prov}]`);
+      lines.push(`        → ${outcome.url}`);
+    } else if (outcome.kind === 'no-match') {
+      const c = totalOf(outcome.cost);
+      lines.push(`  ✗ ${id} — ${desc}  [${outcome.reason}; $${c.toFixed(4)}]`);
+    } else {
+      lines.push(`  · ${id} — ${desc}  [skipped: ${outcome.reason}]`);
+    }
+  }
+
   return { exitCode: 0, output: lines.join('\n') };
 }
 
