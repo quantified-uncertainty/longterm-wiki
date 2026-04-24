@@ -17,6 +17,7 @@
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import type { TaskType } from '../tablebase/types.ts';
 import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
+import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
 
 // Consolidated orphan domain imports
 import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
@@ -503,22 +504,9 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
         }).length,
       },
     },
-    records: recordsToSubmit.map((r: Record<string, unknown>) => {
-      const summary: Record<string, unknown> = { id: r.id };
-      if (r.personId) summary.personId = r.personId;
-      if (r.organizationId) summary.organizationId = r.organizationId;
-      if (r.role) summary.role = r.role;
-      if (r.name || r.title) summary.name = r.name || r.title;
-      if (r.source) summary.source = r.source;
-      if (r.sourcing) {
-        const v = r.sourcing as Record<string, unknown>;
-        summary.verdict = v.verdict;
-        summary.evidence = v.evidence;
-      } else {
-        summary.verdict = 'none';
-      }
-      return summary;
-    }),
+    records: recordsToSubmit.map((r: Record<string, unknown>) =>
+      summarizeRecordForManifest(r),
+    ),
   };
 
   await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
