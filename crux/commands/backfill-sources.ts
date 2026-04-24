@@ -432,6 +432,9 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   const maxCost = options.maxCost
     ? parseFloat(options.maxCost as string)
     : DEFAULT_MAX_COST;
+  const verbose = !!(options as Record<string, unknown>).verbose;
+  const unmatchedOut = ((options as Record<string, unknown>).unmatchedOut as string | undefined)
+    ?? `dev/reports/backfill-unmatched-${new Date().toISOString().replace(/[:.]/g, '-')}.json`;
   if (apply && dryRun) {
     return {
       exitCode: 1,
@@ -567,22 +570,69 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
     }
   }
 
-  // Per-record report
-  lines.push('', '=== Per-record outcomes ===');
-  for (const { record, outcome } of outcomes) {
-    const id = `${record.record_table}/${record.record_id}`;
-    const desc = record.description.slice(0, 80);
-    if (outcome.kind === 'matched') {
-      const tag = outcome.updated === undefined ? '✓' : outcome.updated ? '✓ (written)' : '✓ (write failed)';
-      const c = totalOf(outcome.cost);
-      const prov = outcome.provider ? ` from ${outcome.provider}` : '';
-      lines.push(`  ${tag} ${id} — ${desc}  [$${c.toFixed(4)}${prov}]`);
-      lines.push(`        → ${outcome.url}`);
-    } else if (outcome.kind === 'no-match') {
-      const c = totalOf(outcome.cost);
-      lines.push(`  ✗ ${id} — ${desc}  [${outcome.reason}; $${c.toFixed(4)}]`);
-    } else {
-      lines.push(`  · ${id} — ${desc}  [skipped: ${outcome.reason}]`);
+  // Per-record report (verbose only)
+  if (verbose) {
+    lines.push('', '=== Per-record outcomes ===');
+    for (const { record, outcome } of outcomes) {
+      const id = `${record.record_table}/${record.record_id}`;
+      const desc = record.description.slice(0, 80);
+      if (outcome.kind === 'matched') {
+        const tag = outcome.updated === undefined ? '✓' : outcome.updated ? '✓ (written)' : '✓ (write failed)';
+        const c = totalOf(outcome.cost);
+        const prov = outcome.provider ? ` from ${outcome.provider}` : '';
+        lines.push(`  ${tag} ${id} — ${desc}  [$${c.toFixed(4)}${prov}]`);
+        lines.push(`        → ${outcome.url}`);
+      } else if (outcome.kind === 'no-match') {
+        const c = totalOf(outcome.cost);
+        lines.push(`  ✗ ${id} — ${desc}  [${outcome.reason}; $${c.toFixed(4)}]`);
+      } else {
+        lines.push(`  · ${id} — ${desc}  [skipped: ${outcome.reason}]`);
+      }
+    }
+  }
+
+  // Always write unmatched (no-match + skipped) to JSON for post-processing
+  const unmatched = outcomes
+    .filter(o => o.outcome.kind !== 'matched')
+    .map(({ record, outcome }) => ({
+      record_table: record.record_table,
+      record_id: record.record_id,
+      entity_name: record.entity_name ?? null,
+      description: record.description,
+      outcome: outcome.kind, // 'no-match' | 'skipped'
+      reason: outcome.kind === 'no-match' ? outcome.reason
+        : outcome.kind === 'skipped' ? outcome.reason
+        : null,
+      cost_usd: outcome.kind === 'no-match' ? totalOf(outcome.cost) : 0,
+    }));
+
+  if (unmatched.length > 0) {
+    try {
+      const { mkdirSync, writeFileSync } = await import('fs');
+      const { dirname } = await import('path');
+      mkdirSync(dirname(unmatchedOut), { recursive: true });
+      writeFileSync(
+        unmatchedOut,
+        JSON.stringify(
+          {
+            generated_at: new Date().toISOString(),
+            mode,
+            totals: {
+              records: allRecords.length,
+              searched,
+              matched,
+              unmatched: unmatched.length,
+            },
+            items: unmatched,
+          },
+          null,
+          2,
+        ),
+      );
+      lines.push(`  Unmatched written: ${unmatchedOut} (${unmatched.length} items)`);
+    } catch (err: unknown) {
+      const msg = err instanceof Error ? err.message : String(err);
+      lines.push(`  Unmatched write FAILED (${unmatched.length} items): ${msg}`);
     }
   }
 
