@@ -436,6 +436,15 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   // by submit_records validation. Without this, batch-creating entities before
   // the first submit_records leaves them missing from the set (it was null).
   getKnownStableIds().add(stableId);
+  // Populate stableId → slug directly so resolveNonEntityForeignKeys finds
+  // benchmark entities created mid-session (e.g. agent creates a missing
+  // benchmark and then submits benchmark-results referencing it). Without
+  // this, the sid_→slug translation misses and the server rejects the row.
+  // Store both prefixed and bare forms — resolveNonEntityForeignKeys tries
+  // lookup(val) then lookup(stripSid(val)).
+  const slugMap = getStableIdToSlugMap();
+  slugMap.set(ensureSidPrefix(stableId), slug);
+  slugMap.set(stripSid(stableId), slug);
 
   return JSON.stringify({
     created: true,

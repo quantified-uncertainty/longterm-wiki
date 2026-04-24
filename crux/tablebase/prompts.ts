@@ -213,9 +213,9 @@ ${SHARED_RULES}
 - Math: GSM8K, MATH, MATH-500, AIME 2024, AIME 2025
 - Scientific: GPQA Diamond, FrontierMath
 - Knowledge: HellaSwag, ARC-Challenge, TruthfulQA, WinoGrande
-- Agentic / tool-use: TAU-bench, OSWorld, Terminal-Bench, BrowseComp, RE-Bench
+- Agentic / tool-use: TAU-bench, OSWorld, Terminal-Bench Hard, Terminal-Bench 2, BrowseComp, RE-Bench
 - Multilingual / instruction-following: Multi-IF, IFEval, MGSM
-- Arenas / judging: MT-Bench, Arena ELO, Arena-Hard-Auto
+- Arenas / judging: Chatbot Arena Elo, Arena-Hard-Auto
 
 Prioritize benchmarks that are widely reported for frontier models AND that this model's developer explicitly reports in their launch blog / model card / technical report.
 
