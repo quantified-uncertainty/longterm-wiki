@@ -17,6 +17,7 @@ import { tmpdir } from "os";
 import { execFileSync } from "child_process";
 import { Readable } from "stream";
 import { pipeline } from "stream/promises";
+import { escapeRegex } from "../claim-text-utils.ts";
 import type { AiidEntityRaw, AiidIncidentRaw, AiidReportRaw } from "./transform.ts";
 
 export const AIID_R2_BASE = "https://pub-72b2b2fc36ec423189843747af98f80e.r2.dev";
@@ -38,8 +39,7 @@ export async function discoverLatestSnapshotUrl(): Promise<string> {
     );
   }
   const html = await res.text();
-  const escapedBase = AIID_R2_BASE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const re = new RegExp(`${escapedBase}/backup-(\\d{14})\\.tar\\.bz2`, "g");
+  const re = new RegExp(`${escapeRegex(AIID_R2_BASE)}/backup-(\\d{14})\\.tar\\.bz2`, "g");
   const matches = Array.from(html.matchAll(re));
   if (matches.length === 0) {
     throw new Error(

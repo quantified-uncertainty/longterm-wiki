@@ -1,12 +1,8 @@
 /**
- * ai-incidents — Phase 6 of QUA-687 (QUA-693).
- *
- * Mirrors the MIT AI Incident Database (AIID; CC-BY-SA 4.0). OECD AIM ingest
- * deferred to Phase 7 — see Linear QUA-693 for the Day-0 format-check result.
- *
- * The factory handles parse + upsert + FK backfill + things dual-write.
- * Natural key is `(source, source_incident_id)` so re-runs of the nightly
- * snapshot ingest are idempotent.
+ * Mirror of the MIT AI Incident Database (AIID; CC-BY-SA 4.0). The
+ * `reports.text` / `reports.plain_text` fields are CC-BY-SA-excluded and
+ * must never be persisted — see crux/lib/aiid/transform.ts and the
+ * validate-aiid-no-report-text gate check.
  */
 
 import { Hono } from "hono";
@@ -23,11 +19,9 @@ import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
-// ---- QUA-693: ai_incident composer ----
-//
-// Title: incident title verbatim. Description: short summary preview.
-// parentTitle: deployer org > developer org > model — whichever has a
-// resolved entity title. Falls back to null when no attribution.
+// Composer parentTitle priority: deployer org > developer org > model.
+// Falls back to null when nothing resolves — incidents without attribution
+// stay loose in things search.
 interface AiIncidentComposerRow {
   title: string;
   summary: string;
@@ -36,7 +30,13 @@ interface AiIncidentComposerRow {
   aiModelId?: string | null;
 }
 
-registerComposer<AiIncidentComposerRow>("ai_incident", (row, titleMap) => {
+const THING_TYPE = "ai_incident" as const;
+const TABLE_NAME = "ai_incidents" as const;
+
+const SUMMARY_PREVIEW_CHARS = 300;
+const SUMMARY_PREVIEW_TRIM = 297;
+
+registerComposer<AiIncidentComposerRow>(THING_TYPE, (row, titleMap) => {
   const parent =
     (row.orgId && titleMap.get(row.orgId)) ||
     (row.developerOrgId && titleMap.get(row.developerOrgId)) ||
@@ -45,14 +45,12 @@ registerComposer<AiIncidentComposerRow>("ai_incident", (row, titleMap) => {
   return {
     title: row.title,
     description:
-      row.summary.length > 300
-        ? row.summary.slice(0, 297) + "..."
+      row.summary.length > SUMMARY_PREVIEW_CHARS
+        ? row.summary.slice(0, SUMMARY_PREVIEW_TRIM) + "..."
         : row.summary,
     parentTitle: parent,
   };
 });
-
-// ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 
@@ -454,7 +452,7 @@ const aiIncidentsApp = new Hono()
         syncedAt: now,
         updatedAt: now,
       }),
-      auditRecordType: "ai_incidents",
+      auditRecordType: TABLE_NAME,
       thingsTitleIds: (items: AiIncidentItem[]) => [
         ...new Set(
           items
@@ -464,46 +462,52 @@ const aiIncidentsApp = new Hono()
       ],
       toThing: (item: AiIncidentItem, titleMap: Map<string, string>) => {
         const composed = composeThing<AiIncidentComposerRow>(
-          "ai_incident",
+          THING_TYPE,
           item,
           titleMap,
         );
         return {
           id: item.id,
-          thingType: "ai_incident",
+          thingType: THING_TYPE,
           title: composed.title,
           description: composed.description,
           parentTitle: composed.parentTitle,
-          sourceTable: "ai_incidents",
+          sourceTable: TABLE_NAME,
           sourceId: item.id,
           sourceUrl: item.fullReportUrl ?? null,
         };
       },
-      // Reports upsert is "replace-all for this incident" — do it in the
-      // same transaction so an ingest crash can't leave orphan rows.
+      // Reports replace-all per incident, batched into 2 round-trips total
+      // (one DELETE, one INSERT) regardless of batch size. Skips incidents
+      // whose `reports` is undefined — that's "leave existing reports
+      // alone", distinct from `reports: []` which clears them.
       postUpsert: async (tx, items: AiIncidentItem[]) => {
-        for (const item of items) {
-          if (item.reports === undefined) continue;
-          await tx
-            .delete(aiIncidentReports)
-            .where(eq(aiIncidentReports.incidentId, item.id));
-          if (item.reports.length === 0) continue;
-          await tx.insert(aiIncidentReports).values(
-            item.reports.map((r) => ({
-              incidentId: item.id,
-              url: r.url,
-              title: r.title ?? null,
-              publisher: r.publisher ?? null,
-              publishedAt: r.publishedAt ?? null,
-              language: r.language ?? null,
-            })),
-          );
+        const itemsWithReports = items.filter((i) => i.reports !== undefined);
+        if (itemsWithReports.length === 0) return;
+
+        const incidentIds = itemsWithReports.map((i) => i.id);
+        await tx
+          .delete(aiIncidentReports)
+          .where(sql`${aiIncidentReports.incidentId} = ANY(${incidentIds})`);
+
+        const allReportRows = itemsWithReports.flatMap((item) =>
+          (item.reports ?? []).map((r) => ({
+            incidentId: item.id,
+            url: r.url,
+            title: r.title ?? null,
+            publisher: r.publisher ?? null,
+            publishedAt: r.publishedAt ?? null,
+            language: r.language ?? null,
+          })),
+        );
+        if (allReportRows.length > 0) {
+          await tx.insert(aiIncidentReports).values(allReportRows);
         }
       },
     }),
   )
 
-  .post("/delete-batch", deleteBatchHandler(aiIncidents, "ai_incidents"));
+  .post("/delete-batch", deleteBatchHandler(aiIncidents, TABLE_NAME));
 
 // ---- Exports ----
 

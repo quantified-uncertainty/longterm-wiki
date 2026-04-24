@@ -142,7 +142,6 @@ async function runIngest(
   const noResolve =
     options["no-resolve"] === true || options.noResolve === true;
 
-  // 1. Resolve archive path (download, or use local).
   let archivePath: string;
   if (typeof options.input === "string" && options.input.length > 0) {
     archivePath = options.input;
@@ -171,13 +170,11 @@ async function runIngest(
 
   const upstreamFetchedAt = new Date().toISOString();
 
-  // 2. Extract.
   log(`Extracting archive ...`);
   const extractDir = extractSnapshot(archivePath);
   log(`  Extracted to ${extractDir}`);
 
   try {
-    // 3. Parse collections.
     log(`Loading collections ...`);
     const { incidents, reports, entities: aiidEntities } =
       loadSnapshotCollections(extractDir);
@@ -185,7 +182,6 @@ async function runIngest(
       `  Parsed ${incidents.length} incidents, ${reports.length} reports, ${aiidEntities.length} AIID entities`,
     );
 
-    // 4. Build lookups.
     const aiidEntityNames = buildAiidEntityNameMap(aiidEntities);
     const reportIndex = indexReportsByNumber(reports);
 
@@ -200,7 +196,6 @@ async function runIngest(
       ourEntityIndex = await fetchOurEntityIndex(log);
     }
 
-    // 5. Transform each incident.
     log(`Transforming incidents ...`);
     const items: AiIncidentSyncItem[] = [];
     const toProcess = limitN ? incidents.slice(0, limitN) : incidents;
@@ -216,13 +211,16 @@ async function runIngest(
       );
     }
 
-    const attributedOrg = items.filter((i) => i.orgId).length;
-    const attributedDev = items.filter((i) => i.developerOrgId).length;
+    let attributedOrg = 0;
+    let attributedDev = 0;
+    for (const i of items) {
+      if (i.orgId) attributedOrg++;
+      if (i.developerOrgId) attributedDev++;
+    }
     log(
       `  Transformed ${items.length} incidents (${attributedOrg} with org attribution, ${attributedDev} with developer attribution)`,
     );
 
-    // 6. Sync (unless dry-run).
     if (dryRun) {
       log(`(dry run — no sync)`);
       if (items.length > 0) {
