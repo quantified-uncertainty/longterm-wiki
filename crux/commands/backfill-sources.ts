@@ -16,7 +16,6 @@
 
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { runResearch } from '../lib/search/research-agent.ts';
-import { getApiKey } from '../lib/api-keys.ts';
 import { createLlmClient, streamingCreate, extractText, MODELS } from '../lib/llm.ts';
 import { MODEL_PRICING } from '../lib/pricing.ts';
 type CommandResult = { exitCode?: number; output?: string };
@@ -150,7 +149,12 @@ export function extractMatchTerms(record: MissingSourceRecord): string[] {
  * domains flagged in CLAUDE.md so we don't self-source via an old redirect.
  * Extend this list if staging/mirror domains need to be excluded too.
  */
-const SELF_DOMAINS = ['longtermwiki.com', 'longtermwiki.org', 'longterm.wiki'];
+const SELF_DOMAINS = [
+  'longtermwiki.com',
+  'longtermwiki.org',
+  'longterm.wiki',
+  'longterm-wiki.vercel.app',
+];
 
 /**
  * True if the URL's host is the longtermwiki domain (or a subdomain thereof).
@@ -255,79 +259,6 @@ export function parseRankingResponse(text: string, numCandidates: number): numbe
   }
 }
 
-// ─── Ranker transports ──────────────────────────────────────────────────────
-//
-// Two interchangeable backends for the Haiku ranking call. Both return the
-// same `{text, cost}` shape so `rankMatchingSources` is transport-agnostic.
-//
-//   - `anthropic`   — direct Anthropic SDK via createLlmClient()
-//                     (reads ANTHROPIC_BILLING_KEY, billed to that account)
-//   - `openrouter`  — OpenRouter chat completions
-//                     (reads OPENROUTER_API_KEY, billed via OpenRouter)
-//
-// Select with the `--ranker=<name>` CLI flag. Default: auto — `anthropic` if
-// ANTHROPIC_BILLING_KEY is present, otherwise `openrouter`.
-// ────────────────────────────────────────────────────────────────────────────
-
-export type RankerTransport = 'anthropic' | 'openrouter';
-
-function resolveTransport(requested?: string): RankerTransport {
-  if (requested === 'anthropic' || requested === 'openrouter') return requested;
-  // Auto: prefer direct Anthropic when its key is present; else OpenRouter.
-  return getApiKey('ANTHROPIC_BILLING_KEY') ? 'anthropic' : 'openrouter';
-}
-
-async function callRankerViaOpenRouter(
-  prompt: string,
-): Promise<{ text: string; cost: number }> {
-  const apiKey = getApiKey('OPENROUTER_API_KEY');
-  if (!apiKey) throw new Error('OPENROUTER_API_KEY not set');
-
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
-      'HTTP-Referer': 'https://www.longtermwiki.com',
-      'X-Title': 'backfill-sources',
-    },
-    body: JSON.stringify({
-      model: 'anthropic/claude-haiku-4.5',
-      messages: [{ role: 'user', content: prompt }],
-      temperature: 0,
-      max_tokens: 100,
-      usage: { include: true },
-    }),
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}: ${(await response.text()).slice(0, 200)}`);
-  }
-  const data = await response.json();
-  return {
-    text: data.choices?.[0]?.message?.content ?? '',
-    cost: data.usage?.cost ?? 0,
-  };
-}
-
-async function callRankerViaAnthropic(
-  prompt: string,
-): Promise<{ text: string; cost: number }> {
-  const client = createLlmClient();
-  const response = await streamingCreate(client, {
-    model: MODELS.haiku,
-    max_tokens: 100,
-    temperature: 0,
-    messages: [{ role: 'user', content: prompt }],
-  });
-  const text = extractText(response);
-  const pricing = MODEL_PRICING[MODELS.haiku];
-  const u = response.usage;
-  const cost = pricing && u
-    ? (u.input_tokens * pricing.inputPerM + u.output_tokens * pricing.outputPerM) / 1_000_000
-    : 0;
-  return { text, cost };
-}
-
 /**
  * Ask Haiku to rank matching sources. Returns the winning candidate's index
  * plus the USD cost of the call. On any error falls back to index 0 so the
@@ -337,19 +268,28 @@ async function rankMatchingSources(
   claim: string,
   entityName: string,
   candidates: RankCandidate[],
-  transport: RankerTransport = resolveTransport(),
 ): Promise<{ index: number; cost: number }> {
   if (candidates.length <= 1) return { index: 0, cost: 0 };
 
   const prompt = buildRankingPrompt(claim, entityName, candidates);
   try {
-    const { text, cost } = transport === 'anthropic'
-      ? await callRankerViaAnthropic(prompt)
-      : await callRankerViaOpenRouter(prompt);
+    const client = createLlmClient();
+    const response = await streamingCreate(client, {
+      model: MODELS.haiku,
+      max_tokens: 100,
+      temperature: 0,
+      messages: [{ role: 'user', content: prompt }],
+    });
+    const text = extractText(response);
+    const pricing = MODEL_PRICING[MODELS.haiku];
+    const u = response.usage;
+    const cost = pricing && u
+      ? (u.input_tokens * pricing.inputPerM + u.output_tokens * pricing.outputPerM) / 1_000_000
+      : 0;
     const idx = parseRankingResponse(text, candidates.length);
     return { index: idx ?? 0, cost };
   } catch (err: unknown) {
-    console.warn(`  Ranking call failed via ${transport} (${err instanceof Error ? err.message : String(err)}) — falling back to first match`);
+    console.warn(`  Ranking call failed (${err instanceof Error ? err.message : String(err)}) — falling back to first match`);
     return { index: 0, cost: 0 };
   }
 }
@@ -360,7 +300,7 @@ async function rankMatchingSources(
 
 async function processRecord(
   record: MissingSourceRecord,
-  options: { dryRun: boolean; apply: boolean; ranker: RankerTransport },
+  options: { dryRun: boolean; apply: boolean },
 ): Promise<{ matched: boolean; updated: boolean; url?: string; cost: number }> {
   const matchTerms = extractMatchTerms(record);
   if (matchTerms.length === 0) {
@@ -414,7 +354,7 @@ async function processRecord(
   } else {
     // Ranking claim = record description; fall back to matchTerm[0] if empty
     const rankClaim = (record.description || matchTerms[0] || '').trim();
-    const { index, cost: rankCost } = await rankMatchingSources(rankClaim, entityName, matches, options.ranker);
+    const { index, cost: rankCost } = await rankMatchingSources(rankClaim, entityName, matches);
     cost += rankCost;
     chosen = matches[index];
     console.log(`  ✓ Best of ${matches.length} matches: ${chosen.url}`);
@@ -471,8 +411,6 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
   const maxCost = options.maxCost
     ? parseFloat(options.maxCost as string)
     : DEFAULT_MAX_COST;
-  const rankerArg = (options as Record<string, unknown>).ranker as string | undefined;
-
   if (apply && dryRun) {
     return {
       exitCode: 1,
@@ -491,14 +429,6 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
       output: `--max-cost must be a positive number (got ${options.maxCost})`,
     };
   }
-  if (rankerArg && rankerArg !== 'anthropic' && rankerArg !== 'openrouter') {
-    return {
-      exitCode: 1,
-      output: `--ranker must be 'anthropic' or 'openrouter' (got ${rankerArg})`,
-    };
-  }
-  const ranker = resolveTransport(rankerArg);
-
   // 1. Fetch records missing sources
   const qs = new URLSearchParams({ limit: String(limit) });
   if (tableFilter) qs.set('table', tableFilter);
@@ -515,8 +445,7 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
 
   const { tables, totalMissing } = response.data;
   console.log(`Found ${totalMissing} records without sources.`);
-  console.log(`Budget cap: $${maxCost.toFixed(2)} (per-record cap $${PER_RECORD_BUDGET.toFixed(2)})`);
-  console.log(`Ranker:     ${ranker}\n`);
+  console.log(`Budget cap: $${maxCost.toFixed(2)} (per-record cap $${PER_RECORD_BUDGET.toFixed(2)})\n`);
 
   // Flatten all records into a single list
   const allRecords: MissingSourceRecord[] = [];
@@ -559,7 +488,7 @@ async function backfillSourcesCommand(args: string[], options: CommandOptions): 
     console.log(`[${i + 1}/${allRecords.length}] ${record.record_table}: ${record.description.slice(0, 80)}`);
 
     searched++;
-    const result = await processRecord(record, { dryRun, apply, ranker });
+    const result = await processRecord(record, { dryRun, apply });
     totalCost += result.cost;
     if (result.matched) {
       matched++;
