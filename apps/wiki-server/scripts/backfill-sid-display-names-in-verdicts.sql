@@ -24,6 +24,9 @@ BEGIN;
 -- Diagnostic: show count of leaked rows before the fix
 -- ---------------------------------------------------------------------------
 
+-- Matches the server-side isSid() contract: anything starting with `sid_`.
+-- Use starts_with() (PG 11+) instead of LIKE with escape — cleaner, no
+-- dependency on standard_conforming_strings, and identical semantics to isSid.
 DO $$
 DECLARE
   display_name_leaks integer;
@@ -31,11 +34,11 @@ DECLARE
 BEGIN
   SELECT COUNT(*) INTO display_name_leaks
   FROM source_check_verdicts
-  WHERE display_name LIKE 'sid\_%' ESCAPE '\';
+  WHERE starts_with(display_name, 'sid_');
 
   SELECT COUNT(*) INTO entity_display_name_leaks
   FROM source_check_verdicts
-  WHERE entity_display_name LIKE 'sid\_%' ESCAPE '\';
+  WHERE starts_with(entity_display_name, 'sid_');
 
   RAISE NOTICE '=== Pre-fix State ===';
   RAISE NOTICE 'Rows with sid_ in display_name: %', display_name_leaks;
@@ -43,25 +46,20 @@ BEGIN
 END $$;
 
 -- ---------------------------------------------------------------------------
--- Clear leaked sid_ values from display_name
+-- Clear leaked sid_ values from display_name and entity_display_name
 -- ---------------------------------------------------------------------------
--- LIKE 'sid\_%' ESCAPE '\' matches any value starting with the literal
--- characters `sid_` (the underscore is escaped so it's treated literally,
--- not as a single-char wildcard).
+-- `updated_at` is intentionally NOT bumped: this is a display-name bookkeeping
+-- fix, not a verdict-content change. Bumping `updated_at` would make these
+-- rows appear "freshly computed" on dashboards that sort or filter by that
+-- column (stale-evidence, due-for-recheck, recent-activity).
 
 UPDATE source_check_verdicts
-SET display_name = NULL,
-    updated_at = now()
-WHERE display_name LIKE 'sid\_%' ESCAPE '\';
-
--- ---------------------------------------------------------------------------
--- Clear leaked sid_ values from entity_display_name
--- ---------------------------------------------------------------------------
+SET display_name = NULL
+WHERE starts_with(display_name, 'sid_');
 
 UPDATE source_check_verdicts
-SET entity_display_name = NULL,
-    updated_at = now()
-WHERE entity_display_name LIKE 'sid\_%' ESCAPE '\';
+SET entity_display_name = NULL
+WHERE starts_with(entity_display_name, 'sid_');
 
 -- ---------------------------------------------------------------------------
 -- Verify zero leaked rows remain
@@ -73,8 +71,8 @@ DECLARE
 BEGIN
   SELECT COUNT(*) INTO remaining
   FROM source_check_verdicts
-  WHERE display_name LIKE 'sid\_%' ESCAPE '\'
-     OR entity_display_name LIKE 'sid\_%' ESCAPE '\';
+  WHERE starts_with(display_name, 'sid_')
+     OR starts_with(entity_display_name, 'sid_');
 
   RAISE NOTICE '=== Post-fix State ===';
   RAISE NOTICE 'Remaining leaked rows: %', remaining;

@@ -116,18 +116,23 @@ describe("shouldSkipAutoFlag — cooldown helper (QUA-313)", () => {
 });
 
 describe("coerceDisplayName — reject sid_ in display columns (QUA-661)", () => {
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+
   beforeEach(() => {
     vi.restoreAllMocks();
+    warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => logger);
   });
 
-  it("returns null unchanged", () => {
+  it("returns null unchanged and does not log", () => {
     expect(coerceDisplayName(null, "displayName", "fact", "f_abc")).toBeNull();
+    expect(warnSpy).not.toHaveBeenCalled();
   });
 
-  it("passes through a human-readable name", () => {
+  it("passes through a human-readable name without logging", () => {
     expect(
       coerceDisplayName("xAI", "entityDisplayName", "fact", "f_abc"),
     ).toBe("xAI");
+    expect(warnSpy).not.toHaveBeenCalled();
   });
 
   it("passes through a name that coincidentally contains 'sid' but isn't a sid_", () => {
@@ -137,10 +142,10 @@ describe("coerceDisplayName — reject sid_ in display columns (QUA-661)", () =>
     expect(
       coerceDisplayName("sidwell-park", "displayName", "fact", "f_abc"),
     ).toBe("sidwell-park");
+    expect(warnSpy).not.toHaveBeenCalled();
   });
 
   it("coerces a raw stableId to null and logs a warning", () => {
-    const warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => logger);
     const result = coerceDisplayName(
       "sid_GLXKjYAEKw",
       "entityDisplayName",
@@ -160,22 +165,22 @@ describe("coerceDisplayName — reject sid_ in display columns (QUA-661)", () =>
   });
 
   it("coerces displayName sid_ to null, independent of entityDisplayName", () => {
-    vi.spyOn(logger, "warn").mockImplementation(() => logger);
     expect(
       coerceDisplayName("sid_abcdefghij", "displayName", "grant", "g_1"),
     ).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
   });
 
   it("coerces ANY sid_-prefixed string (permissive — catches malformed stableIds too)", () => {
     // isSid() only checks the prefix — we mirror that behavior so an upstream
     // bug that writes `sid_<anything>` still gets nulled out at this layer
     // instead of leaking into the display column.
-    vi.spyOn(logger, "warn").mockImplementation(() => logger);
     expect(
       coerceDisplayName("sid_abcde", "displayName", "fact", "f_abc"),
     ).toBeNull();
     expect(
       coerceDisplayName("sid_abcdefghij12345", "displayName", "fact", "f_abc"),
     ).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(2);
   });
 });
