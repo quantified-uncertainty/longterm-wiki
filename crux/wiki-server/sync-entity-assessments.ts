@@ -31,14 +31,19 @@
  *   LONGTERMWIKI_SERVER_API_KEY - Bearer token for authentication
  */
 
-import { readFileSync, readdirSync, existsSync } from "fs";
+import { readFileSync } from "fs";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { parse as parseYaml } from "yaml";
-import { parseCliArgs } from "../lib/cli.ts";
-import { getServerUrl, getApiKey } from "../lib/wiki-server/client.ts";
 import { contentHash } from "../../packages/factbase/src/ids.ts";
-import { waitForHealthy, batchSync } from "./sync-common.ts";
+import { batchSync } from "./sync-common.ts";
+import {
+  asString,
+  asOptionalString,
+  assertPlainObject,
+  loadYamlDir,
+  runSyncMain,
+} from "./sync-yaml-helpers.ts";
 
 const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 const ASSESSMENTS_DIR = join(PROJECT_ROOT, "data/entity-assessments");
@@ -66,16 +71,6 @@ const DATE_RE = /^\d{4}-\d{2}-\d{2}$/;
 const DIMENSION_RE = /^[a-z0-9]+(-[a-z0-9]+)*$/;
 
 // --- Types ---
-
-interface RawAssessment {
-  dimension?: unknown;
-  rating?: unknown;
-  evidence?: unknown;
-  assessor?: unknown;
-  assessedAt?: unknown;
-  source?: unknown;
-  notes?: unknown;
-}
 
 interface RawAssessmentsFile {
   entityId?: unknown;
@@ -111,21 +106,6 @@ export function assessmentIdFor(
   return contentHash(["entity-assessment", entityId, dimension, assessor]);
 }
 
-function asString(v: unknown, field: string, file: string): string {
-  if (typeof v !== "string" || v.trim() === "") {
-    throw new Error(`${file}: '${field}' must be a non-empty string`);
-  }
-  return v;
-}
-
-function asOptionalString(v: unknown, field: string, file: string): string | null {
-  if (v === undefined || v === null || v === "") return null;
-  if (typeof v !== "string") {
-    throw new Error(`${file}: '${field}' must be a string when present`);
-  }
-  return v;
-}
-
 /**
  * Load and validate one entity-assessments YAML file.
  * Throws on malformed input — sync should fail-closed rather than silently skip.
@@ -152,10 +132,8 @@ export function loadAssessmentsFile(filePath: string): SyncEntityAssessment[] {
   for (let i = 0; i < parsed.assessments.length; i++) {
     const where = `${filePath} assessments[${i}]`;
     const rawItem = parsed.assessments[i];
-    if (!rawItem || typeof rawItem !== "object" || Array.isArray(rawItem)) {
-      throw new Error(`${where}: must be an object`);
-    }
-    const a = rawItem as RawAssessment;
+    assertPlainObject(rawItem, where);
+    const a = rawItem;
 
     const dimension = asString(a.dimension, "dimension", where);
     if (!DIMENSION_RE.test(dimension)) {
@@ -221,34 +199,14 @@ export function loadAllAssessments(dir: string = ASSESSMENTS_DIR): {
   assessments: SyncEntityAssessment[];
   files: string[];
 } {
-  if (!existsSync(dir)) {
-    return { assessments: [], files: [] };
-  }
-  const files = readdirSync(dir)
-    .filter((f) => f.endsWith(".yaml") || f.endsWith(".yml"))
-    .sort();
-
-  const all: SyncEntityAssessment[] = [];
-  for (const f of files) {
-    const assessments = loadAssessmentsFile(join(dir, f));
-    all.push(...assessments);
-  }
-
-  // Detect duplicate IDs across files — would surface as a silent overwrite
-  // server-side, so catch it here with the offending pair named.
-  const seen = new Map<string, SyncEntityAssessment>();
-  for (const a of all) {
-    const prev = seen.get(a.id);
-    if (prev) {
-      throw new Error(
-        `Duplicate assessment ID ${a.id} from (${prev.entityId}, ${prev.dimension}, ${prev.assessor}) and ` +
-          `(${a.entityId}, ${a.dimension}, ${a.assessor}). Adjust dimension or assessor to disambiguate.`,
-      );
-    }
-    seen.set(a.id, a);
-  }
-
-  return { assessments: all, files };
+  const { items, files } = loadYamlDir<SyncEntityAssessment>({
+    dir,
+    loadFile: loadAssessmentsFile,
+    kindLabel: "assessment",
+    describe: (a) => `${a.entityId}, ${a.dimension}, ${a.assessor}`,
+    dedupHint: "Adjust dimension or assessor to disambiguate.",
+  });
+  return { assessments: items, files };
 }
 
 // --- Sync ---
@@ -276,78 +234,19 @@ export async function syncEntityAssessments(
 // --- Main ---
 
 async function main() {
-  const args = parseCliArgs(process.argv.slice(2));
-  const dryRun = args["dry-run"] === true;
-  const batchSize = Number(args["batch-size"]) || DEFAULT_BATCH_SIZE;
-
-  const serverUrl = getServerUrl();
-  const apiKey = getApiKey();
-
-  if (!serverUrl) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_URL environment variable is required",
-    );
-    process.exit(1);
-  }
-  if (!apiKey) {
-    console.error(
-      "Error: LONGTERMWIKI_SERVER_API_KEY environment variable is required",
-    );
-    process.exit(1);
-  }
-
-  console.log(`Reading entity assessments from: ${ASSESSMENTS_DIR}`);
-  const { assessments, files } = loadAllAssessments();
-  console.log(`  Found ${files.length} files, ${assessments.length} assessments`);
-
-  if (assessments.length === 0) {
-    console.log("Nothing to sync.");
-    return;
-  }
-
-  // Per-entity counts for visibility
-  const byEntity = new Map<string, number>();
-  for (const a of assessments) {
-    byEntity.set(a.entityId, (byEntity.get(a.entityId) ?? 0) + 1);
-  }
-  for (const [entityId, count] of [...byEntity.entries()].sort()) {
-    console.log(`  ${entityId}: ${count} assessments`);
-  }
-
-  if (dryRun) {
-    console.log("\n[dry-run] Would sync these assessments (showing first 10):");
-    for (const a of assessments.slice(0, 10)) {
-      console.log(
-        `  ${a.entityId} [${a.assessor}] ${a.dimension}: ${a.rating.slice(0, 60)}${a.rating.length > 60 ? "…" : ""}`,
-      );
-    }
-    if (assessments.length > 10) {
-      console.log(`  ... and ${assessments.length - 10} more`);
-    }
-    return;
-  }
-
-  console.log("\nChecking server health...");
-  const healthy = await waitForHealthy(serverUrl);
-  if (!healthy) {
-    console.error(
-      `Error: Server at ${serverUrl} is not healthy. Aborting sync.`,
-    );
-    process.exit(1);
-  }
-
-  console.log(
-    `\nSyncing ${assessments.length} entity assessments (batch size: ${batchSize})...`,
-  );
-  const result = await syncEntityAssessments(serverUrl, assessments, batchSize);
-
-  console.log(`\nSync complete:`);
-  console.log(`  Upserted: ${result.upserted}`);
-  if (result.errors > 0) {
-    console.log(`  Errors:   ${result.errors}`);
-    console.error(`\nSync failed with ${result.errors} assessment errors.`);
-    process.exit(1);
-  }
+  await runSyncMain<SyncEntityAssessment>({
+    dir: ASSESSMENTS_DIR,
+    label: "entity assessments",
+    loadAll: (d) => {
+      const { assessments, files } = loadAllAssessments(d);
+      return { items: assessments, files };
+    },
+    getEntityId: (a) => a.entityId,
+    formatDryRun: (a) =>
+      `${a.entityId} [${a.assessor}] ${a.dimension}: ${a.rating.slice(0, 60)}${a.rating.length > 60 ? "…" : ""}`,
+    sync: syncEntityAssessments,
+    defaultBatchSize: DEFAULT_BATCH_SIZE,
+  });
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
