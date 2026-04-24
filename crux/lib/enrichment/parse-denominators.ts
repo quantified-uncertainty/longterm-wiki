@@ -1,24 +1,10 @@
 /**
  * Parser for `docs/audits/qua-634-denominator-estimates.md`.
  *
- * The doc contains markdown tables shaped like:
- *
- *   | Rank | Slug      | Record type   | Estimated total | Confidence | Basis  |
- *   |------|-----------|---------------|-----------------|------------|--------|
- *   | 1    | anthropic | personnel     | 1000            | high       | ...    |
- *
- * This parser extracts `(slug, recordType, estimatedTotal, confidence, basis)`
- * rows and skips headers/separators/comments. It's deliberately tolerant:
- *
- *   - Any table row whose 2nd column looks like a slug (kebab-case) and 4th
- *     column parses as an integer counts as a data row.
- *   - Target-pct is not in the doc (the server default of 0.7 applies).
- *   - Trailing notes sections and narrative paragraphs between tables are
- *     ignored automatically because they're not pipe-delimited.
- *
- * The format doesn't carry a machine-readable schema, so the tolerance is
- * intentional — we prefer "row gets dropped with a warning" over "whole
- * parse fails on one typo" during the Phase 4 burst ramp.
+ * The doc isn't machine-generated, so this parser is intentionally tolerant:
+ * we'd rather drop one bad row silently than fail the whole seed on a typo.
+ * Accepts both ranked (`| rank | slug | type | total | ...`) and unranked
+ * (`| slug | type | total | ...`) table shapes; everything else is skipped.
  */
 
 export interface DenominatorTarget {

@@ -35,6 +35,7 @@ import { grantsRoute } from "../tablebase/grants.js";
 import { personnelRoute } from "../tablebase/personnel.js";
 import { fundingRoundsRoute } from "../tablebase/funding-rounds.js";
 import { benchmarkResultsRoute } from "../tablebase/benchmark-results.js";
+import { enrichmentTargets } from "../../schema.js";
 import { checkT1Authority } from "./t1-allowlist.js";
 import { isHomepageUrl } from "./homepage-detector.js";
 
@@ -148,13 +149,10 @@ const ProposeRequestSchema = z
     // ─── Optional metadata ────
     runId: z.string().max(64).optional(),
     /**
-     * Optional USD cost the caller paid for the verdict-LLM step on this
-     * proposal. Accumulates into `enrichment_runs.cost_usd` when a runId is
-     * supplied. Feeds the spend watchdog (QUA-643): the watchdog polls that
-     * column over a time window and kills a run if $/hour exceeds a cap.
-     * Callers who don't track per-call cost (e.g. T1 importers, subscription-
-     * mode where billing is flat) can omit it; the watchdog will simply see
-     * zero spend.
+     * Optional USD cost for the verdict-LLM step on this proposal. When
+     * provided alongside `runId`, accumulates into `enrichment_runs.cost_usd`
+     * so the watchdog can compute $/hour. T1 and subscription-mode callers
+     * can omit it.
      */
     costUsd: z.number().nonnegative().max(1000).optional(),
     /**
@@ -174,13 +172,8 @@ const ProposeRequestSchema = z
 
 type ProposeRequest = z.infer<typeof ProposeRequestSchema>;
 
-// ── QUA-643: targets upsert schema ──────────────────────────────────────
-//
-// The acceptance-reopener reads denominators from `enrichment_targets`. This
-// endpoint lets the seed CLI (crux enrichment sync-targets) upsert rows
-// from the QUA-634 denominator estimates doc. Single-row POSTs are cheap
-// enough that we don't need a bulk path.
-
+// Targets upsert schema — cap at 500 rows/call so we stay well under
+// Postgres's parameter limit when the seed CLI chunks.
 const TargetsUpsertSchema = z
   .object({
     targets: z
@@ -332,15 +325,7 @@ const enrichmentApp = new Hono()
   })
 
   // ── QUA-643: targets + coverage for the acceptance reopener ─────────────
-  //
-  // `enrichment_targets` is the denominator: estimated_total × target_pct =
-  // target accepted rows for this (entity, record_type). The coverage
-  // endpoint joins that against the actual confirmed-verdict count from the
-  // tablebase so the reopener (crux enrichment acceptance-report) can
-  // decide which orgs missed the burst target.
-  //
-  // Auth is enforced by the global /api/* middleware in app.ts — both the
-  // read and write endpoints below require an API key.
+  // Auth is enforced by the global /api/* middleware in app.ts.
   .post("/targets", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -350,34 +335,31 @@ const enrichmentApp = new Hono()
     const { targets } = parsed.data;
     if (targets.length === 0) return c.json({ upserted: 0 });
 
-    // Build one multi-row INSERT so a 500-row upsert is a single round-trip
-    // and partial-failure in the middle rolls back cleanly. The alternative
-    // (per-row INSERT in a loop) both multiplied round-trips and left
-    // half-written state on mid-batch error.
-    const values = sql.join(
-      targets.map(
-        (t) =>
-          sql`(${t.entityId}, ${t.recordType}, ${t.estimatedTotal}, ${
-            t.targetPct ?? 0.7
-          }, ${t.basis ?? null}, ${t.confidence ?? null}, NOW())`,
-      ),
-      sql`, `,
-    );
-
     try {
       const db = getDrizzleDb();
-      await db.execute(sql`
-        INSERT INTO enrichment_targets (
-          entity_id, record_type, estimated_total, target_pct, basis, confidence, estimated_at
-        ) VALUES ${values}
-        ON CONFLICT (entity_id, record_type) DO UPDATE SET
-          estimated_total = EXCLUDED.estimated_total,
-          target_pct = EXCLUDED.target_pct,
-          basis = COALESCE(EXCLUDED.basis, enrichment_targets.basis),
-          confidence = COALESCE(EXCLUDED.confidence, enrichment_targets.confidence),
-          estimated_at = NOW(),
-          updated_at = NOW()
-      `);
+      await db
+        .insert(enrichmentTargets)
+        .values(
+          targets.map((t) => ({
+            entityId: t.entityId,
+            recordType: t.recordType,
+            estimatedTotal: t.estimatedTotal,
+            targetPct: t.targetPct ?? 0.7,
+            basis: t.basis ?? null,
+            confidence: t.confidence ?? null,
+          })),
+        )
+        .onConflictDoUpdate({
+          target: [enrichmentTargets.entityId, enrichmentTargets.recordType],
+          set: {
+            estimatedTotal: sql`EXCLUDED.estimated_total`,
+            targetPct: sql`EXCLUDED.target_pct`,
+            basis: sql`COALESCE(EXCLUDED.basis, enrichment_targets.basis)`,
+            confidence: sql`COALESCE(EXCLUDED.confidence, enrichment_targets.confidence)`,
+            estimatedAt: sql`NOW()`,
+            updatedAt: sql`NOW()`,
+          },
+        });
       return c.json({ upserted: targets.length });
     } catch (e: unknown) {
       logger.error(
@@ -433,26 +415,12 @@ const enrichmentApp = new Hono()
     const entityId = c.req.query("entityId");
     try {
       const db = getDrizzleDb();
-      // Count confirmed verdicts per (entity, record_type) by joining each
-      // supported record-type's tablebase table into source_check_verdicts.
-      // Only record types we currently sourcing-verify have entries in
-      // the confirmed_by_entity CTE — other record_types in enrichment_targets
-      // (e.g. 'publications', 'divisions') fall through to actual_accepted=0,
-      // which is the honest answer: we have no verdict signal for them yet.
-      //
-      // For each record type we fan out the entity FK column in two flavors:
-      // the legacy slug/free-text column (`organization_id`, `company_id`,
-      // `model_id`) AND the resolved stableId FK (`org_entity_id`, etc.).
-      // `enrichment_targets.entity_id` is populated with the slug from the
-      // QUA-634 denominators doc, so legacy-column rows match directly.
-      // Records synced via propose get the legacy slug preserved; records
-      // from older paths may only have the stableId populated — both must
-      // be matchable or the coverage count undercounts silently.
-      //
-      // The UNION-vs-JOIN-GROUP choice: two UNIONs per record type + OUTER
-      // dedup gets ugly; instead we OR both columns in the join predicate
-      // and use DISTINCT on verdict record_id to prevent double-counting
-      // when both legacy and entity columns point at the same target.
+      // Record types without an entry in confirmed_by_entity (e.g.
+      // 'publications', 'divisions' from the denominator doc) fall through
+      // to actual_accepted=0. Each arm OR-matches both the legacy slug
+      // column and the resolved stableId column so targets keyed by slug
+      // still count records synced with either ID shape; DISTINCT on
+      // verdict record_id prevents double-counting when both match.
       const rows = await db.execute<{
         entity_id: string;
         record_type: string;
@@ -576,12 +544,8 @@ const enrichmentApp = new Hono()
     }
   })
   .get("/runs", async (c) => {
-    // Listing endpoint for the watchdog. Supports two filter modes:
-    //   - `?id=<runId>`: returns just that row (watchdog's happy path — no
-    //     chance of the target run getting scrolled past by newer activity)
-    //   - `?since=<iso>`: returns recent runs updated since the timestamp
-    //     (caps at 50 for dashboards; watchdog uses `id` instead)
-    // Without either filter we return the 50 most-recently-updated runs.
+    // `?id=<runId>` short-circuits the 50-row cap so the watchdog can't
+    // miss its target on a busy server.
     const idFilter = c.req.query("id");
     const sinceIso = c.req.query("since");
     try {

@@ -1,41 +1,21 @@
 /**
- * Enrichment watchdog — QUA-643.
+ * Spend-rate watchdog for defensive-enrichment bursts.
  *
- * Long-running bursts can accidentally burn budget if an agent goes into a
- * runaway loop or if the verdict-LLM rejection rate collapses (so the same
- * payload keeps re-costing the LLM). The watchdog polls an
- * `enrichment_runs.id` and computes the average $/hour over a recent
- * window. When that rate exceeds `maxSpendPerHour`, it:
+ * Polls `enrichment_runs.cost_usd`, computes $/hour over a sliding window,
+ * and writes `~/.cache/enrichment/kill-<runId>` when the rate exceeds the
+ * cap. File-based because slot-isolation rules (`.claude/rules/slot-
+ * isolation.md`) forbid cross-slot signals — the burst loop polls the
+ * marker between iterations and exits voluntarily.
  *
- *   1. Writes a kill marker file at `~/.cache/enrichment/kill-<runId>` — the
- *      burst loop is expected to check for this file between iterations and
- *      exit voluntarily. File-based kill, not a signal, because the
- *      subscription-mode Claude sessions run in separate tmux windows that
- *      the watchdog doesn't own (`.claude/rules/slot-isolation.md`).
- *   2. Optionally posts to a Discord webhook with a summary of the kill
- *      reason. Fail-silent if Discord is unreachable — the kill marker is
- *      the load-bearing signal.
- *   3. Returns `killed: true` so the caller can exit 2.
- *
- * Spend rate calculation:
- *   - Ask `/api/enrichment/runs?since=<now - windowMinutes>` for a snapshot.
- *   - Poll every `pollSeconds`; diff the cost_usd against the first sample's
- *     snapshot of the same row to compute the rate over the last
- *     `windowMinutes` minutes of *observed* activity.
- *   - If the DB doesn't have `windowMinutes` of runtime yet (e.g. run just
- *     started), require at least 3 minutes of observed delta before killing.
- *     Below that, we don't have enough signal to trust the rate.
- *
- * The watchdog is intentionally simple and file-based. Writing a full
- * streaming spend tracker is out of scope; the per-propose cost tracking
- * in enrichment_runs.cost_usd (added in QUA-643 Phase 4) is the primary
- * signal.
+ * The 3-minute reliability gate (see MIN_OBSERVATION_MINUTES) exists because
+ * very short windows can show extreme rates from a single costly proposal
+ * that aren't representative of steady-state spend.
  */
 
 import { mkdirSync, writeFileSync, existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
-import { apiRequest } from '../wiki-server/client.ts';
+import { getRunById } from '../wiki-server/enrichment.ts';
 
 export interface WatchdogOptions {
   runId: string;
@@ -131,18 +111,9 @@ async function defaultDiscordPost(
 export async function fetchRunSnapshot(
   runId: string,
 ): Promise<WatchdogRunSnapshot | null> {
-  // Use the server's explicit id filter so the watchdog can't miss the
-  // target run if it scrolls past the 50-row default page on a busy server.
-  const encoded = encodeURIComponent(runId);
-  const res = await apiRequest<{
-    runs: Array<{
-      id: string;
-      costUsd: number;
-      proposesAccepted: number;
-      proposesRejected: number;
-      updatedAt: string;
-    }>;
-  }>('GET', `/api/enrichment/runs?id=${encoded}`);
+  // Server's id filter short-circuits the 50-row LIMIT so the watchdog
+  // can't miss its target run on a busy server.
+  const res = await getRunById(runId);
   if (!res.ok) return null;
   const match = res.data.runs.find((r) => r.id === runId);
   if (!match) return null;

@@ -1,14 +1,15 @@
 /**
- * Enrichment API — wiki-server client module (QUA-655).
+ * Enrichment API — wiki-server client module.
  *
- * Typed RPC client for `POST /api/enrichment/propose` — the defensive
- * enrichment gate shipped in QUA-632 Phase 1 (PR #4527). Used by the
- * tablebase loop (`crux tb tablebase loop --via-propose`) to route writes
- * through the server-validated tier gate instead of direct `/sync` calls.
+ * Typed RPC wrappers around `/api/enrichment/*`. Response types are inferred
+ * from the Hono RPC route via `InferResponseType<>` so a server-side schema
+ * change fails the crux build instead of breaking silently at runtime.
  *
- * Response types are inferred from the Hono RPC route type via
- * `InferResponseType<>`, matching the pattern in sibling files
- * (`benchmark-results.ts`, `sourcing-client.ts`, etc.).
+ * Covers three call sites:
+ *   - `proposeEnrichment` — the defensive gate (QUA-632); used by the
+ *     tablebase loop + T1/T3 importers.
+ *   - `upsertTargets` / `getCoverage` / `getRunById` — the burst tooling
+ *     (QUA-643): denominators, acceptance report, spend watchdog.
  */
 
 import { apiRequest, type ApiResult } from './client.ts';
@@ -34,6 +35,16 @@ export type ProposeRejectedResponse = InferResponseType<
   400
 >;
 
+export type TargetsUpsertResult = InferResponseType<RpcClient['targets']['$post'], 200>;
+export type ListTargetsResult = InferResponseType<RpcClient['targets']['$get'], 200>;
+export type CoverageResult = InferResponseType<RpcClient['coverage']['$get'], 200>;
+export type RunsResult = InferResponseType<RpcClient['runs']['$get'], 200>;
+
+/** One row from the coverage report. Shared with reopener + CLI. */
+export type CoverageRow = CoverageResult['coverage'][number];
+/** One run row from the /runs list. Consumed by the watchdog. */
+export type RunRow = RunsResult['runs'][number];
+
 /** Record types the endpoint currently accepts. Keep in sync with
  *  `SUPPORTED_RECORD_TYPES` in `apps/wiki-server/src/routes/enrichment/enrichment.ts`. */
 export type SupportedRecordType =
@@ -45,7 +56,7 @@ export type SupportedRecordType =
 export type EnrichmentTier = 'T1' | 'T2' | 'T3';
 
 // ---------------------------------------------------------------------------
-// Request payload
+// Request payloads
 // ---------------------------------------------------------------------------
 
 /**
@@ -71,12 +82,31 @@ export interface ProposeRequest {
   checkerModel?: string;
 
   runId?: string;
+  /** USD cost the caller paid for the verdict-LLM step on this proposal.
+   *  Accumulates into `enrichment_runs.cost_usd` when `runId` is set. */
+  costUsd?: number;
   /** Phase-1 endpoint rejects non-null `fieldName`. Always send null/undefined. */
   fieldName?: null;
 }
 
+export interface TargetsUpsertInput {
+  targets: Array<{
+    entityId: string;
+    recordType: string;
+    estimatedTotal: number;
+    targetPct?: number;
+    basis?: string;
+    confidence?: 'high' | 'medium' | 'low';
+  }>;
+}
+
+export interface CoverageQuery {
+  recordType?: string;
+  entityId?: string;
+}
+
 // ---------------------------------------------------------------------------
-// API function
+// API functions
 // ---------------------------------------------------------------------------
 
 /**
@@ -94,6 +124,34 @@ export function proposeEnrichment(
     'POST',
     '/api/enrichment/propose',
     body,
+  );
+}
+
+export async function upsertTargets(
+  body: TargetsUpsertInput,
+): Promise<ApiResult<TargetsUpsertResult>> {
+  return apiRequest<TargetsUpsertResult>('POST', '/api/enrichment/targets', body);
+}
+
+export async function getCoverage(
+  q: CoverageQuery = {},
+): Promise<ApiResult<CoverageResult>> {
+  const params = new URLSearchParams();
+  if (q.recordType) params.set('recordType', q.recordType);
+  if (q.entityId) params.set('entityId', q.entityId);
+  const qs = params.toString();
+  return apiRequest<CoverageResult>(
+    'GET',
+    `/api/enrichment/coverage${qs ? `?${qs}` : ''}`,
+  );
+}
+
+export async function getRunById(
+  runId: string,
+): Promise<ApiResult<RunsResult>> {
+  return apiRequest<RunsResult>(
+    'GET',
+    `/api/enrichment/runs?id=${encodeURIComponent(runId)}`,
   );
 }
 

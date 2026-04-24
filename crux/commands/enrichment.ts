@@ -59,7 +59,7 @@ async function syncTargetsCommand(
   const { readFileSync, existsSync } = await import('fs');
   const { join } = await import('path');
   const { PROJECT_ROOT } = await import('../lib/content-types.ts');
-  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const { upsertTargets } = await import('../lib/wiki-server/enrichment.ts');
 
   const file =
     (options.file as string) ||
@@ -88,20 +88,11 @@ async function syncTargetsCommand(
     };
   }
 
-  // Chunk — server max is 500 per request; we stay at 200 to keep each call
-  // well under the wiki-server body-size limit.
-  const chunks: typeof targets[] = [];
-  for (let i = 0; i < targets.length; i += 200) {
-    chunks.push(targets.slice(i, i + 200));
-  }
-
+  // Server cap is 500/request; keep each batch well under the body limit.
   let total = 0;
-  for (const chunk of chunks) {
-    const res = await apiRequest<{ upserted: number }>(
-      'POST',
-      '/api/enrichment/targets',
-      { targets: chunk },
-    );
+  for (let i = 0; i < targets.length; i += 200) {
+    const chunk = targets.slice(i, i + 200);
+    const res = await upsertTargets({ targets: chunk });
     if (!res.ok) {
       return {
         exitCode: 1,
@@ -119,35 +110,19 @@ async function syncTargetsCommand(
   };
 }
 
-interface CoverageRow {
-  entityId: string;
-  recordType: string;
-  estimatedTotal: number;
-  targetPct: number;
-  targetAcceptedCount: number;
-  actualAcceptedCount: number;
-  gapCount: number;
-  gapPct: number;
-  meetsTarget: boolean;
-}
-
 async function acceptanceReportCommand(
   _args: string[],
   options: CommandOptions,
 ): Promise<CommandResult> {
-  const { apiRequest } = await import('../lib/wiki-server/client.ts');
-
-  const params = new URLSearchParams();
-  if (options.recordType) params.set('recordType', options.recordType);
-  if (options.entity) params.set('entityId', options.entity);
-  const qs = params.toString();
-  const path = `/api/enrichment/coverage${qs ? `?${qs}` : ''}`;
-
-  const res = await apiRequest<{ coverage: CoverageRow[] }>('GET', path);
+  const { getCoverage } = await import('../lib/wiki-server/enrichment.ts');
+  const res = await getCoverage({
+    recordType: options.recordType,
+    entityId: options.entity,
+  });
   if (!res.ok) {
     return {
       exitCode: 1,
-      output: `GET ${path} failed: ${res.error}: ${res.message}`,
+      output: `GET /api/enrichment/coverage failed: ${res.error}: ${res.message}`,
     };
   }
   const coverage = res.data.coverage;
