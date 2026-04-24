@@ -9,6 +9,14 @@ describe("T1_AUTHORITY_ALLOWLIST", () => {
     expect(sources).toContain("hf-leaderboard:");
   });
 
+  it("includes the four QUA-666 importers", () => {
+    const sources = T1_AUTHORITY_ALLOWLIST.map((e) => e.sourcePrefix);
+    expect(sources).toContain("wikidata:");
+    expect(sources).toContain("openalex:");
+    expect(sources).toContain("semantic-scholar:");
+    expect(sources).toContain("crossref:");
+  });
+
   it("each entry has a description", () => {
     for (const entry of T1_AUTHORITY_ALLOWLIST) {
       expect(entry.description.length).toBeGreaterThan(10);
@@ -30,6 +38,10 @@ describe("isT1Authoritative", () => {
     expect(isT1Authoritative("sec-edgar:0001234567-25-000001", "funding-round")).toBe(true);
     expect(isT1Authoritative("github-contributors:anthropic:alice", "personnel")).toBe(true);
     expect(isT1Authoritative("hf-leaderboard:meta-llama/M:IFEval", "benchmark-result")).toBe(true);
+    expect(isT1Authoritative("wikidata:Q108542504:P571", "organization-fact")).toBe(true);
+    expect(isT1Authoritative("openalex:W100", "publication")).toBe(true);
+    expect(isT1Authoritative("semantic-scholar:abc123", "publication")).toBe(true);
+    expect(isT1Authoritative("crossref:10.1/x", "publication")).toBe(true);
   });
 
   it("rejects when source matches but recordType doesn't", () => {

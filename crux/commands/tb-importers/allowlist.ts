@@ -21,6 +21,10 @@ export const T1_SOURCE_PREFIXES = {
   secEdgar: "sec-edgar:",
   githubContributors: "github-contributors:",
   hfLeaderboard: "hf-leaderboard:",
+  wikidata: "wikidata:",
+  openalex: "openalex:",
+  semanticScholar: "semantic-scholar:",
+  crossref: "crossref:",
 } as const;
 
 export interface T1AuthorityEntry {
@@ -49,6 +53,30 @@ export const T1_AUTHORITY_ALLOWLIST: readonly T1AuthorityEntry[] = [
     recordType: "benchmark-result",
     description:
       "HuggingFace Open LLM Leaderboard (deterministic auto-eval pipeline).",
+  },
+  {
+    sourcePrefix: T1_SOURCE_PREFIXES.wikidata,
+    recordType: "organization-fact",
+    description:
+      "Wikidata SPARQL (Q-entity facts: founded, HQ, country, CEO name, employees, etc.).",
+  },
+  {
+    sourcePrefix: T1_SOURCE_PREFIXES.openalex,
+    recordType: "publication",
+    description:
+      "OpenAlex works API (publications by institution ID, deterministic metadata).",
+  },
+  {
+    sourcePrefix: T1_SOURCE_PREFIXES.semanticScholar,
+    recordType: "publication",
+    description:
+      "Semantic Scholar Academic Graph (papers by author ID, deterministic metadata).",
+  },
+  {
+    sourcePrefix: T1_SOURCE_PREFIXES.crossref,
+    recordType: "publication",
+    description:
+      "Crossref DOI metadata (canonical bibliographic registry for published works).",
   },
 ] as const;
 
