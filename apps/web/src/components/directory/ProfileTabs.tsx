@@ -258,15 +258,18 @@ function HorizontalLayout({
   activeTab,
   onChange,
   ariaLabel,
+  notice,
 }: {
   tabs: ProfileTab[];
   activeTab: string;
   onChange?: (value: string) => void;
   ariaLabel?: string;
+  notice?: React.ReactNode;
 }) {
   const content = (
     <>
       <HorizontalTabsList tabs={tabs} ariaLabel={ariaLabel} />
+      {notice}
       <TabsContentList tabs={tabs} layout="horizontal" />
     </>
   );
@@ -285,12 +288,14 @@ function VerticalLayout({
   onChange,
   ariaLabel,
   groups,
+  notice,
 }: {
   tabs: ProfileTab[];
   activeTab: string;
   onChange?: (value: string) => void;
   ariaLabel?: string;
   groups?: ProfileTabGroup[];
+  notice?: React.ReactNode;
 }) {
   const content = (
     <div className="grid grid-cols-1 md:grid-cols-[16rem_minmax(0,1fr)] gap-x-10 gap-y-6">
@@ -298,6 +303,7 @@ function VerticalLayout({
         <VerticalTabsNav tabs={tabs} groups={groups} ariaLabel={ariaLabel} />
       </div>
       <div className="min-w-0">
+        {notice}
         <TabsContentList tabs={tabs} layout="vertical" />
       </div>
     </div>
@@ -320,6 +326,24 @@ function VerticalLayout({
 
 // ─── Public component with URL-sync + Suspense fallback ────────────────
 
+function UnknownTabNotice({
+  requested,
+  fallback,
+}: {
+  requested: string;
+  fallback: string;
+}) {
+  return (
+    <div
+      role="status"
+      className="mb-4 rounded-md border border-amber-300/60 bg-amber-50/50 px-3 py-2 text-xs text-amber-900 dark:border-amber-700/50 dark:bg-amber-950/30 dark:text-amber-200"
+    >
+      No <span className="font-mono">{requested}</span> data for this entity — showing{" "}
+      <span className="font-medium">{fallback}</span> instead.
+    </div>
+  );
+}
+
 function ProfileTabsInner({
   tabs,
   ariaLabel,
@@ -338,10 +362,12 @@ function ProfileTabsInner({
   // Link tabs (with href) aren't Radix tabs — they navigate on click. Pick
   // the first non-link tab as the default active id.
   const selectableTabs = tabs.filter((t) => !t.href);
-  const defaultTabId = selectableTabs[0]?.id ?? tabs[0].id;
+  const defaultTab = selectableTabs[0] ?? tabs[0];
+  const defaultTabId = defaultTab.id;
   const tabParam = searchParams.get("tab");
-  const activeTab =
-    tabParam && selectableTabs.some((t) => t.id === tabParam) ? tabParam : defaultTabId;
+  const hasTabMatch = tabParam ? selectableTabs.some((t) => t.id === tabParam) : false;
+  const activeTab = hasTabMatch ? (tabParam as string) : defaultTabId;
+  const unknownTabRequested = tabParam && !hasTabMatch ? tabParam : null;
 
   function handleTabChange(value: string) {
     if (value === defaultTabId) {
@@ -351,6 +377,10 @@ function ProfileTabsInner({
     }
   }
 
+  const notice = unknownTabRequested ? (
+    <UnknownTabNotice requested={unknownTabRequested} fallback={defaultTab.label} />
+  ) : null;
+
   return layout === "vertical" ? (
     <VerticalLayout
       tabs={tabs}
@@ -358,6 +388,7 @@ function ProfileTabsInner({
       onChange={handleTabChange}
       ariaLabel={ariaLabel}
       groups={groups}
+      notice={notice}
     />
   ) : (
     <HorizontalLayout
@@ -365,6 +396,7 @@ function ProfileTabsInner({
       activeTab={activeTab}
       onChange={handleTabChange}
       ariaLabel={ariaLabel}
+      notice={notice}
     />
   );
 }

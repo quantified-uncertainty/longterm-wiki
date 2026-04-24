@@ -1,13 +1,19 @@
 // @vitest-environment jsdom
-/** ProfileTabs — verifies the single-tab short-circuit path (QUA-463). */
+/** ProfileTabs — single-tab short-circuit (QUA-463) and URL-sync (QUA-668). */
 import React from "react";
-import { describe, expect, it, vi } from "vitest";
-import { render, screen, within } from "@testing-library/react";
+import { describe, expect, it, vi, beforeEach } from "vitest";
+import { render, screen, within, fireEvent } from "@testing-library/react";
+
+// Per-test mutable state so we can drive the mocked router/searchParams.
+const mockState = {
+  search: "",
+  replace: vi.fn() as ReturnType<typeof vi.fn>,
+};
 
 vi.mock("next/navigation", () => ({
-  useSearchParams: () => new URLSearchParams(),
+  useSearchParams: () => new URLSearchParams(mockState.search),
   usePathname: () => "/organizations/x",
-  useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
+  useRouter: () => ({ replace: mockState.replace, push: vi.fn() }),
 }));
 
 import {
@@ -15,6 +21,11 @@ import {
   type ProfileTab,
   type ProfileTabGroup,
 } from "@components/directory/ProfileTabs";
+
+beforeEach(() => {
+  mockState.search = "";
+  mockState.replace = vi.fn();
+});
 
 function tab(
   id: string,
@@ -157,6 +168,78 @@ describe("ProfileTabs", () => {
       // fallback header using its id.
       expect(screen.getByText("extra")).toBeTruthy();
       expect(screen.getByText("About")).toBeTruthy();
+    });
+  });
+
+  describe("URL sync + scroll preservation (QUA-668)", () => {
+    function clickTab(el: HTMLElement) {
+      // Radix Tabs listens for mouseDown (pointer events) on the trigger; jsdom
+      // + fireEvent.click alone doesn't always route through Radix's handler.
+      fireEvent.mouseDown(el);
+      fireEvent.click(el);
+    }
+
+    it("calls router.replace with scroll:false when a non-default tab is clicked", () => {
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      clickTab(screen.getByRole("tab", { name: /Facts/ }));
+      expect(mockState.replace).toHaveBeenCalledWith(
+        "/organizations/x?tab=facts",
+        { scroll: false },
+      );
+    });
+
+    it("strips ?tab= from URL when the default tab is clicked", () => {
+      mockState.search = "tab=facts";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      clickTab(screen.getByRole("tab", { name: /Overview/ }));
+      expect(mockState.replace).toHaveBeenCalledWith("/organizations/x", {
+        scroll: false,
+      });
+    });
+
+    it("shows a banner and falls back to the default tab when ?tab= names an unknown tab", () => {
+      mockState.search = "tab=shareholders";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      // Banner names the requested tab + the fallback target.
+      const banner = screen.getByRole("status");
+      expect(banner.textContent).toMatch(/shareholders/);
+      expect(banner.textContent).toMatch(/Overview/);
+      // Default tab's content is shown.
+      expect(screen.getByTestId("overview-content")).toBeTruthy();
+    });
+
+    it("does NOT show the banner when ?tab= matches a known tab", () => {
+      mockState.search = "tab=facts";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      expect(screen.queryByRole("status")).toBeNull();
     });
   });
 });

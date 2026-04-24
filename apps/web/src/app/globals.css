@@ -106,6 +106,20 @@
   color: var(--muted-foreground);
 }
 
+/* Keyboard focus ring. The shared `focus:outline-none` on Tailwind's button
+   reset strips the default ring; Radix's `focus-visible` state isn't styled
+   by the tab classes, so we paint it here. (QUA-670) */
+.profile-tab-vertical:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px var(--background),
+              0 0 0 4px oklch(from var(--ring) l c h / 0.8);
+}
+.profile-tab-vertical[data-state="active"]:focus-visible {
+  box-shadow: 0 0 0 1px oklch(from var(--border) l c h / 0.8),
+              0 0 0 3px var(--background),
+              0 0 0 5px oklch(from var(--ring) l c h / 0.8);
+}
+
 /* ============================================================================
    PAGE META (last updated + GitHub link)
    ============================================================================ */

@@ -28,6 +28,21 @@ const nextConfig: NextConfig = {
   // server resources during concurrent static generation.
   staticPageGenerationTimeout: 300,
 
+  // Rewrites to rescue legacy URLs. `afterFiles` mode runs only when a
+  // filesystem route didn't match, so `/factbase/entity`, `/factbase/facts`,
+  // etc. still take precedence over the single-segment catch.
+  async rewrites() {
+    return {
+      afterFiles: [
+        // Legacy /factbase/<entity> URL used before the split into /factbase/entity/*.
+        // QUA-670: previously 404'd; rewrite to the canonical factbase-entity page.
+        { source: "/factbase/:slug", destination: "/factbase/entity/:slug" },
+      ],
+      beforeFiles: [],
+      fallback: [],
+    };
+  },
+
   async redirects() {
     return [
       // Vanity URL: /about → wiki page E755
