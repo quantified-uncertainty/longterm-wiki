@@ -54,17 +54,14 @@ const MAX_SOURCE_CONTENT_CHARS = 200_000;
 // ── Supported record types ──────────────────────────────────────────────
 
 /**
- * Phase 1 shipped only `grants`. Phase 1.5 (QUA-665) extends this to the three
- * T1 importers shipped in QUA-640 (sec-edgar → funding-rounds,
- * github-contributors → personnel, hf-leaderboard → benchmark-results).
+ * Adding a new supported record type requires: (a) importing the sync subapp,
+ * (b) appending the name to `SUPPORTED_RECORD_TYPES`, (c) adding a
+ * `RECORD_TYPE_ROUTES` entry with the correct `sourceUrlField`, (d) extending
+ * `t1-allowlist.ts` entries that name it.
  *
- * Adding more record types = (a) import the sync subapp, (b) append the
- * recordType to `SUPPORTED_RECORD_TYPES`, (c) add a `RECORD_TYPE_ROUTES`
- * entry, (d) extend `t1-allowlist.ts` entries that name it (or add new ones).
- *
- * Record-type names MUST match the sync-route mount names in
- * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` so the value
- * readers / dashboards / import pipelines all use the same string.
+ * Names MUST match the sync-route mount names in
+ * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` so readers,
+ * dashboards, and import pipelines all use the same string.
  */
 const SUPPORTED_RECORD_TYPES = [
   "grants",

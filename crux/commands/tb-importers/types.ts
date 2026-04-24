@@ -1,19 +1,14 @@
 /**
- * Shared types for T1 importers (QUA-640, wired in QUA-665).
- *
- * Each importer fetches from an authoritative source, extracts deterministic
- * records, and emits `EnrichmentProposal` payloads that are POSTed to
- * `POST /api/enrichment/propose` (QUA-632) with `tier=T1`.
- *
- * The propose-client translates these proposals into the endpoint's
- * `ProposeRequestSchema` (see `propose-client.ts::buildProposeRequest`).
+ * Shared types for T1 importers. Each importer fetches from an authoritative
+ * source, extracts deterministic records, and emits `EnrichmentProposal`
+ * payloads that are POSTed to `POST /api/enrichment/propose` with `tier=T1`.
+ * See `propose-client.ts::buildProposeRequest` for the wire translation.
  */
 
-/** Tier model from QUA-637 umbrella. */
 export type EnrichmentTier = "T1" | "T2" | "T3";
 
 /**
- * Record types this PR's importers produce. Values MUST match the sync-route
+ * Record types the T1 importers produce. Values MUST match the sync-route
  * mount names (plural kebab-case) in
  * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` — the propose
  * endpoint dispatches on these strings, and dashboards read them verbatim.

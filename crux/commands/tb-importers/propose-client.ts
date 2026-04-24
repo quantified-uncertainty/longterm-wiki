@@ -1,20 +1,16 @@
 /**
- * Client for `POST /api/enrichment/propose` (QUA-632 / QUA-665).
+ * Client for `POST /api/enrichment/propose`.
  *
  * Translates an importer-emitted `EnrichmentProposal` into the
  * `ProposeRequestSchema` shape the endpoint expects, then POSTs it and
  * classifies the response.
  *
- * Translation responsibilities (the importer's job ends at
- * `{record, entityRefs, sourceUrl, responseHash}`):
- *   - Mint a deterministic 10-char `row.id` from the responseHash so repeat
- *     submissions upsert the same record.
- *   - Merge `entityRefs.{organization,person,model,benchmark}` into the row as
- *     the FK column names the sync schema expects (`companyId`, `personId`,
- *     `organizationId`, `modelId`, `benchmarkId`). Sync handlers accept
- *     slugs here and resolve them to stableIds via `resolveEntityFKs`.
+ * Translation steps (see `buildProposeRequest`):
+ *   - Derive a deterministic 10-char `row.id` from `responseHash[:10]`.
+ *   - Merge `entityRefs` into the sync schema's FK column names per
+ *     `ENTITY_REF_FK_MAP`. Sync handlers resolve slugs to stableIds
+ *     downstream via `resolveEntityFKs`.
  *   - Rename `responseHash` → `sourceContentHash` (the endpoint's name).
- *   - Preserve the wire-format `tier` and `recordType`.
  */
 
 import { apiRequest } from "../../lib/wiki-server/client.ts";
@@ -35,20 +31,18 @@ export interface ProposeClientOptions {
 }
 
 /**
- * Server-side `POST /api/enrichment/propose` response shape. Duplicated here
- * rather than imported from wiki-server because crux is a separate package
- * that doesn't depend on `apps/wiki-server/*`. The matching server-side type
- * is inferred by Hono RPC from `enrichment.ts` — if the two drift, the
- * endpoint integration test (enrichment-propose.test.ts) will fail.
+ * Accepted response from `/api/enrichment/propose` — duplicated here rather
+ * than imported from wiki-server because crux is a separate package. Rejections
+ * always return HTTP 400, so on the success (HTTP 200) path `status` is always
+ * `"accepted"`.
  */
-interface ProposeEndpointResponse {
-  status: "accepted" | "rejected";
+interface AcceptedProposeResponse {
+  status: "accepted";
   tier: "T1" | "T2" | "T3";
   recordId?: string | null;
   verdict?: string | null;
   confidence?: number | null;
   checkerModel?: string | null;
-  rejectionReason?: string;
 }
 
 /**
@@ -89,40 +83,25 @@ export function deriveRecordId(responseHash: string): string {
 }
 
 /**
- * Map `entityRefs.{organization,person,model,benchmark}` into the sync-schema
- * FK column names the target record type expects. Unmapped entityRefs are
- * dropped silently — the sync handler will reject missing required FKs via
- * its own schema validation, which produces a clearer error message than
- * any client-side check would.
+ * Maps each record type to the `(entityRef key → row FK column)` pairs the
+ * corresponding sync schema expects. Single source of truth for the FK
+ * contract — the docstring on `EnrichmentProposal.entityRefs` in `types.ts`
+ * should match this table exactly.
  */
-function mergeEntityRefs(
-  recordType: EnrichmentRecordType,
-  record: Record<string, unknown>,
-  entityRefs: EnrichmentProposal["entityRefs"] | undefined
-): Record<string, unknown> {
-  if (!entityRefs) return record;
-  const row = { ...record };
-  if (recordType === "funding-rounds") {
-    if (entityRefs.organization != null && row.companyId == null) {
-      row.companyId = entityRefs.organization;
-    }
-  } else if (recordType === "personnel") {
-    if (entityRefs.organization != null && row.organizationId == null) {
-      row.organizationId = entityRefs.organization;
-    }
-    if (entityRefs.person != null && row.personId == null) {
-      row.personId = entityRefs.person;
-    }
-  } else if (recordType === "benchmark-results") {
-    if (entityRefs.model != null && row.modelId == null) {
-      row.modelId = entityRefs.model;
-    }
-    if (entityRefs.benchmark != null && row.benchmarkId == null) {
-      row.benchmarkId = entityRefs.benchmark;
-    }
-  }
-  return row;
-}
+const ENTITY_REF_FK_MAP: Record<
+  EnrichmentRecordType,
+  ReadonlyArray<[keyof NonNullable<EnrichmentProposal["entityRefs"]>, string]>
+> = {
+  "funding-rounds": [["organization", "companyId"]],
+  personnel: [
+    ["organization", "organizationId"],
+    ["person", "personId"],
+  ],
+  "benchmark-results": [
+    ["model", "modelId"],
+    ["benchmark", "benchmarkId"],
+  ],
+};
 
 /**
  * Build the `/api/enrichment/propose` request body from a proposal.
@@ -140,11 +119,19 @@ export function buildProposeRequest(
   sourceContentHash: string;
   runId?: string;
 } {
-  const id = deriveRecordId(p.responseHash);
-  const withFks = mergeEntityRefs(p.recordType, p.record, p.entityRefs);
-  // Any explicit id in the record is overwritten with the deterministic
-  // derived id so the same responseHash always upserts to the same row.
-  const row: Record<string, unknown> = { ...withFks, id };
+  // One spread, then in-place mutation: FK columns pulled from entityRefs
+  // (without overwriting values already in the record), and an id derived
+  // from responseHash so the same response always upserts to the same row.
+  const row: Record<string, unknown> = { ...p.record };
+  if (p.entityRefs) {
+    for (const [refKey, rowKey] of ENTITY_REF_FK_MAP[p.recordType]) {
+      const refValue = p.entityRefs[refKey];
+      if (refValue != null && row[rowKey] == null) {
+        row[rowKey] = refValue;
+      }
+    }
+  }
+  row.id = deriveRecordId(p.responseHash);
   return {
     tier: p.tier,
     recordType: p.recordType,
@@ -188,15 +175,15 @@ async function submitToServer(
     return { proposal: p, status: "rejected", reason: `client error: ${msg}` };
   }
 
-  const res = await apiRequest<ProposeEndpointResponse>(
+  const res = await apiRequest<AcceptedProposeResponse>(
     "POST",
     "/api/enrichment/propose",
     body
   );
 
   if (!res.ok) {
-    // Bad-request responses still return a JSON body with `rejectionReason`
-    // on the server side; apiRequest drops that body into `res.message`.
+    // Rejections always return HTTP 400 with a `rejectionReason` body;
+    // apiRequest collapses that into `res.message`.
     return {
       proposal: p,
       status: res.error === "bad_request" ? "rejected" : "pending",
@@ -204,18 +191,10 @@ async function submitToServer(
     };
   }
 
-  if (res.data.status === "accepted") {
-    return {
-      proposal: p,
-      status: "accepted",
-      recordId: res.data.recordId ?? undefined,
-    };
-  }
-
   return {
     proposal: p,
-    status: "rejected",
-    reason: res.data.rejectionReason ?? "server rejected without a reason",
+    status: "accepted",
+    recordId: res.data.recordId ?? undefined,
   };
 }
 

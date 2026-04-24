@@ -690,7 +690,7 @@ describe("POST /api/enrichment/propose", () => {
     expect(runQueries.length).toBe(1);
   });
 
-  // ── QUA-665: Phase 1.5 — new record types wired in ──────────────────────
+  // ── Per-record-type routing: personnel / funding-rounds / benchmark-results ──
 
   it("routes funding-rounds T1 requests to the funding-rounds sync subapp", async () => {
     const app = buildApp();
