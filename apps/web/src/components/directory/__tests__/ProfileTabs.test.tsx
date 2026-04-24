@@ -242,4 +242,43 @@ describe("ProfileTabs", () => {
       expect(screen.queryByRole("status")).toBeNull();
     });
   });
+
+  describe("QUA-656: hydration safety", () => {
+    // SSR path: the server renders the component without access to URL search
+    // params; the initial render on BOTH server and client must pick the first
+    // selectable tab so the two trees match exactly. URL-based selection is
+    // applied via useEffect after hydration.
+    it("first visible tab is a link — default is the first non-link tab", () => {
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("wiki", "Wiki", null, undefined, { href: "/wiki/E1" }),
+            tab("overview", "Overview", <div data-testid="overview">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      // Overview content renders (it's the first non-link tab = default).
+      expect(screen.getByTestId("overview")).toBeTruthy();
+    });
+
+    it("post-hydration effect activates a known ?tab= param", () => {
+      mockState.search = "tab=facts";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>overview</div>),
+            tab("facts", "Facts", <div data-testid="facts-content">facts</div>),
+          ]}
+        />,
+      );
+      // jsdom runs effects synchronously on render, so by the time this
+      // assertion runs the useEffect has applied the URL param and Facts is
+      // active.
+      const activeTab = screen.getByRole("tab", { selected: true });
+      expect(activeTab.textContent).toMatch(/Facts/);
+      // Active panel is Facts'.
+      expect(screen.getByTestId("facts-content")).toBeTruthy();
+    });
+  });
 });
