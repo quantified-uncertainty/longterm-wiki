@@ -16,6 +16,7 @@ import {
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
 import { registerComposer, composeThing } from "../shared/compose-thing.js";
+import { formatCompactAmount } from "../shared/format-currency.js";
 import { formatFactLabel } from "@longterm-wiki/factbase";
 import { logger } from "../../logger.js";
 
@@ -63,6 +64,25 @@ interface FactComposerRow {
   measure?: string | null;
   value?: string | null;
   numeric?: string | number | null;
+  currency?: string | null;
+}
+
+/**
+ * Render a fact value for `things.description`. Prefers `row.value` (the
+ * serialized human-facing string, which preserves ranges, refs, booleans,
+ * etc.) and falls back to `row.numeric`. Numeric values are compacted so
+ * large magnitudes never appear as bare 10+ digit runs in user-visible text.
+ */
+function renderFactDescriptionValue(row: FactComposerRow): string | null {
+  if (row.value != null && row.value.length > 0) {
+    const compact = formatCompactAmount(row.value, row.currency ?? null);
+    return compact ?? row.value;
+  }
+  if (row.numeric != null) {
+    const compact = formatCompactAmount(row.numeric, row.currency ?? null);
+    return compact ?? String(row.numeric);
+  }
+  return null;
 }
 
 registerComposer<FactComposerRow>("fact", (row, titleMap) => {
@@ -71,11 +91,8 @@ registerComposer<FactComposerRow>("fact", (row, titleMap) => {
     label: row.label,
     measure: row.measure,
   });
-  const description = row.value
-    ? `${factLabel}: ${row.value}`
-    : row.numeric != null
-      ? `${factLabel}: ${row.numeric}`
-      : null;
+  const displayValue = renderFactDescriptionValue(row);
+  const description = displayValue != null ? `${factLabel}: ${displayValue}` : null;
   return {
     title: `${factLabel} — ${entityName}`,
     description,

@@ -11,6 +11,7 @@ import {
 } from "@lib/search";
 import { ENTITY_TYPES, ENTITY_GROUPS } from "@data/entity-ontology";
 import { stripMdxEscapes } from "@lib/inline-markdown";
+import { sanitizeRawLargeNumbers } from "@lib/format-compact";
 
 // ---------------------------------------------------------------------------
 // Directory route mapping — entity types with dedicated directory pages
@@ -447,7 +448,7 @@ export function SearchDialog() {
                         )}
                         {t.description && (
                           <div className="text-xs text-muted-foreground line-clamp-1 mt-0.5">
-                            {t.description}
+                            {sanitizeRawLargeNumbers(t.description)}
                           </div>
                         )}
                       </div>
@@ -522,7 +523,9 @@ export function SearchDialog() {
  */
 function HighlightedSnippet({ result }: { result: SearchResult }) {
   const { description: rawDescription, match, terms, snippet } = result;
-  const description = rawDescription ? stripMdxEscapes(rawDescription) : rawDescription;
+  const description = rawDescription
+    ? sanitizeRawLargeNumbers(stripMdxEscapes(rawDescription))
+    : rawDescription;
 
   // Prefer server-generated snippet with <mark> tags from ts_headline()
   if (snippet && snippet.includes("<mark>")) {
