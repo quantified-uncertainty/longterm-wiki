@@ -44,6 +44,8 @@ interface CommandOptions extends BaseOptions {
   /** Required when --skipEntityValidation is set. */
   skipEntityValidationReason?: string;
   skipSourcing?: boolean;
+  /** QUA-655: route supported record types through `/api/enrichment/propose` */
+  viaPropose?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -1111,6 +1113,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     entityTypes,
     model,
     skipSourcing: !!options.skipSourcing,
+    viaPropose: !!options.viaPropose,
   });
 
   if (options.ci) {
@@ -1565,6 +1568,8 @@ Options:
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
   --skip-sourcing       Skip sourcing before submit (for testing)
+  --via-propose             Route supported record types (grants, Phase 1) through
+                            /api/enrichment/propose instead of direct /sync (QUA-655)
   --apply                   For source-discover: also link discovered resources to records
   --v2                      For source-discover: use claims-first agent (extracts + submits claims)
   --claims-only             For source-discover --v2: submit claims but don't apply results
@@ -1603,6 +1608,7 @@ Examples:
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
+  crux tb tablebase loop --via-propose --task-type=grant-grantee-backfill  # Route grants through /propose (QUA-655)
   crux tb tablebase sourcing-records --table=personnel --source=deterministic  # Fast structural checks
   crux tb tablebase sourcing-records --table=personnel --source=batch --limit=100  # LLM check 100 records
   crux tb tablebase sourcing-records --table=personnel --source=all   # Full sourcing

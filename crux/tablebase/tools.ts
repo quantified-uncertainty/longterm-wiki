@@ -11,6 +11,11 @@ import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { getVerdictsByEntity } from '../lib/wiki-server/sourcing.ts';
+import {
+  proposeEnrichment,
+  isT1UrlAuthoritative,
+  type SupportedRecordType,
+} from '../lib/wiki-server/enrichment.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
@@ -24,6 +29,17 @@ import {
   dedupInvestments,
   dedupBenchmarkResults,
 } from './dedup.ts';
+
+/**
+ * Tables the `--via-propose` path supports in Phase 1 (QUA-655).
+ *
+ * Only `grants` is wired for now. The endpoint accepts all four types in
+ * `SUPPORTED_RECORD_TYPES` (grants, personnel, funding-rounds,
+ * benchmark-results), but the loop's enrichment prompts don't all produce
+ * records that satisfy the /propose tier gate today — extend this list
+ * record-type by record-type as each one proves out. See QUA-655 item 4.
+ */
+const VIA_PROPOSE_TABLES: ReadonlySet<SupportedRecordType> = new Set(['grants']);
 
 // ---------------------------------------------------------------------------
 // Tool definitions (passed to Claude API)
@@ -424,6 +440,7 @@ async function handleSubmitRecords(
   task: EnrichmentTask,
   dryRun: boolean,
   skipSourcing: boolean = false,
+  viaPropose: boolean = false,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -580,6 +597,19 @@ async function handleSubmitRecords(
     return `[DRY RUN] Would submit ${deduped.length} records to ${table} (${records.length - deduped.length} duplicates filtered):\n${JSON.stringify(deduped, null, 2)}`;
   }
 
+  // QUA-655: route supported record types through POST /api/enrichment/propose
+  // instead of the direct sync endpoint. Each record is gated server-side by
+  // the tier allowlist and written atomically with (row + evidence + verdict).
+  if (viaPropose && VIA_PROPOSE_TABLES.has(table as SupportedRecordType)) {
+    const dupCount = records.length - deduped.length;
+    return submitRecordsViaPropose(
+      table as SupportedRecordType,
+      recordsToSubmit,
+      dupCount,
+      sourcingSummary,
+    );
+  }
+
   const syncConfig = getTableConfig(table);
   if (!syncConfig) return `Error: Unknown table "${table}"`;
 
@@ -606,6 +636,94 @@ async function handleSubmitRecords(
   const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
   const dupCount = records.length - deduped.length;
   return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${sourcingSummary}.`;
+}
+
+/**
+ * Submit records one-at-a-time through `POST /api/enrichment/propose`.
+ *
+ * Each record is classified T1 (URL on the allowlist) or skipped with a
+ * clear message. T2/T3 paths require a caller-supplied verdict-LLM output
+ * (`quotedText`, `checkerModel`, `reasoning`) which the loop agent does not
+ * produce today — those records are deliberately left out of scope for
+ * Phase 1 so that a non-T1 source is a signal to the agent, not a silent
+ * fall-back to the direct sync path.
+ *
+ * Returns a human-readable summary for the agent's tool-result channel.
+ */
+async function submitRecordsViaPropose(
+  recordType: SupportedRecordType,
+  records: Array<Record<string, unknown>>,
+  dupCount: number,
+  sourcingSummary: string,
+): Promise<string> {
+  let acceptedCount = 0;
+  const rejected: Array<{ id: string; reason: string }> = [];
+  const skippedNonT1: Array<{ id: string; sourceUrl: string }> = [];
+
+  for (const record of records) {
+    const recordId = typeof record.id === 'string' ? record.id : '?';
+    const sourceUrl =
+      (record.source as string | undefined) ??
+      (record.sourceUrl as string | undefined);
+
+    if (!sourceUrl) {
+      rejected.push({ id: recordId, reason: 'missing source URL' });
+      continue;
+    }
+
+    // Phase 1: T1-only. Non-T1 sources are surfaced to the agent instead of
+    // silently dropping into the direct sync path — the point of the gate is
+    // to pressure the agent toward authoritative sources.
+    if (!isT1UrlAuthoritative(sourceUrl, recordType)) {
+      skippedNonT1.push({ id: recordId, sourceUrl });
+      continue;
+    }
+
+    // Strip fields the /propose endpoint rejects or manages itself. `sourcing`
+    // was attached by pre-submit-sourcing for the legacy path; /propose owns
+    // verdict construction.
+    const { sourcing: _sourcing, ...rowForPropose } = record;
+
+    const res = await proposeEnrichment({
+      tier: 'T1',
+      recordType,
+      row: rowForPropose,
+      sourceUrl,
+    });
+
+    if (!res.ok) {
+      rejected.push({ id: recordId, reason: `${res.error}: ${res.message}` });
+      continue;
+    }
+
+    acceptedCount++;
+  }
+
+  const lines: string[] = [];
+  lines.push(
+    `Via /api/enrichment/propose: ${acceptedCount}/${records.length} accepted (${dupCount} duplicates filtered)${sourcingSummary}.`,
+  );
+  if (skippedNonT1.length > 0) {
+    lines.push(
+      `  ${skippedNonT1.length} record(s) skipped — source not on T1 authority allowlist (Phase 1 via-propose accepts T1 only):`,
+    );
+    for (const s of skippedNonT1.slice(0, 5)) {
+      lines.push(`    - ${s.id}: ${s.sourceUrl}`);
+    }
+    if (skippedNonT1.length > 5) {
+      lines.push(`    ...and ${skippedNonT1.length - 5} more`);
+    }
+  }
+  if (rejected.length > 0) {
+    lines.push(`  ${rejected.length} record(s) rejected by /propose:`);
+    for (const r of rejected.slice(0, 5)) {
+      lines.push(`    - ${r.id}: ${r.reason}`);
+    }
+    if (rejected.length > 5) {
+      lines.push(`    ...and ${rejected.length - 5} more`);
+    }
+  }
+  return lines.join('\n');
 }
 
 // ---------------------------------------------------------------------------
@@ -736,9 +854,10 @@ async function handleLinkSource(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipSourcing?: boolean; apply?: boolean } = {},
+  options: { skipSourcing?: boolean; apply?: boolean; viaPropose?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
   const skipSourcing = options.skipSourcing ?? false;
+  const viaPropose = options.viaPropose ?? false;
   const isSourceDiscovery = task.taskType === 'source-discovery';
 
   const handlers: Record<string, (input: Record<string, unknown>) => Promise<string>> = {
@@ -748,7 +867,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing, viaPropose),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),
