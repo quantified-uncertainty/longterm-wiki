@@ -347,6 +347,38 @@ describe("validateAllTables", () => {
     expect(results[0].displayErrors).toHaveLength(0);
   });
 
+  it("recordIdExtractor treats empty-string fieldName as no fieldName (QUA-661)", async () => {
+    mockFetchAllRecords.mockResolvedValue([
+      {
+        recordType: "fact",
+        recordId: "f_empty",
+        fieldName: "", // empty string — should NOT produce a [] suffix
+        displayName: "sid_LEAK",
+        verdict: "confirmed",
+      },
+    ]);
+
+    const specs = [
+      {
+        apiPath: "/api/sourcing/verdicts",
+        responseKey: "verdicts",
+        displayFields: [{ displayField: "displayName" }],
+        idFields: [],
+        maxLimit: 200,
+        recordIdExtractor: (record: Record<string, unknown>) => {
+          const base = `${String(record.recordType ?? "unknown")}/${String(record.recordId ?? "unknown")}`;
+          return record.fieldName != null && record.fieldName !== ""
+            ? `${base}[${String(record.fieldName)}]`
+            : base;
+        },
+      },
+    ];
+
+    const results = await validateAllTables(specs);
+    expect(results[0].displayErrors).toHaveLength(1);
+    expect(results[0].displayErrors[0].recordId).toBe("fact/f_empty");
+  });
+
   it("detects sid_ leak in source_check_verdicts using composite recordIdExtractor (QUA-661)", async () => {
     mockFetchAllRecords.mockResolvedValue([
       {

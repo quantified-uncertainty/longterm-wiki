@@ -199,8 +199,12 @@ export const TABLE_DISPLAY_SPECS: TableDisplaySpec[] = [
     // it as an ID warning.
     idFields: [],
     maxLimit: 200,
-    recordIdExtractor: (record) =>
-      `${String(record.recordType ?? "unknown")}/${String(record.recordId ?? "unknown")}${record.fieldName ? `[${String(record.fieldName)}]` : ""}`,
+    recordIdExtractor: (record) => {
+      const base = `${String(record.recordType ?? "unknown")}/${String(record.recordId ?? "unknown")}`;
+      return record.fieldName != null && record.fieldName !== ""
+        ? `${base}[${String(record.fieldName)}]`
+        : base;
+    },
   },
 ];
 

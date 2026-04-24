@@ -25,7 +25,7 @@ import {
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
-import { coerceDisplayName } from "../sourcing/sourcing.js";
+import { coerceDisplayName } from "../shared/display-name-coerce.js";
 
 // ---- Constants ----
 
@@ -140,17 +140,11 @@ async function dualWriteToSourcing(
     }
   }
 
-  // QUA-661: coerce any sid_ value to NULL before persisting. `displayName` is
-  // synthesized from pageSlug so it's safe, but `entityDisplayName` is sourced
-  // from entities.title / wikiPages.title — if that ever contains a sid_
-  // (upstream data corruption), we want to null it out here, not leak it into
-  // the UI.
-  const safeDisplayName = coerceDisplayName(
-    displayName.slice(0, 500),
-    "displayName",
-    "citation",
-    recordId,
-  );
+  // QUA-661: `entityDisplayName` is sourced from entities.title / wikiPages.title
+  // — if either ever contains a sid_ (upstream data corruption), we want to null
+  // it out here, not leak it into the UI. The local `displayName` is synthesized
+  // as `[slug] fnN: ...` so it can't be a sid_ and doesn't need coercion.
+  const safeDisplayName = displayName.slice(0, 500);
   const safeEntityDisplayName = coerceDisplayName(
     entityDisplayName?.slice(0, 500) ?? null,
     "entityDisplayName",

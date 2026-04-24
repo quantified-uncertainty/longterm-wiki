@@ -20,6 +20,11 @@
 
 BEGIN;
 
+-- Use $DATABASE_MIGRATION_URL (unlimited statement_timeout) — the app pool
+-- has a 30s cap. If the script is run against $DATABASE_URL by mistake, drop
+-- the per-statement timeout for this transaction so the backfill completes.
+SET LOCAL statement_timeout = 0;
+
 -- ---------------------------------------------------------------------------
 -- Diagnostic: show count of leaked rows before the fix
 -- ---------------------------------------------------------------------------

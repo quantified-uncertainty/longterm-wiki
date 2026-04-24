@@ -46,8 +46,7 @@ import {
   SOURCING_EXEMPT_TYPES,
   isSourcingExempt,
 } from "../../api-types.js";
-import { isSid } from "@longterm-wiki/id-utils";
-import { logger } from "../../logger.js";
+import { coerceDisplayName } from "../shared/display-name-coerce.js";
 
 // ---- Constants ----
 
@@ -76,36 +75,6 @@ export function shouldSkipAutoFlag(
 ): boolean {
   if (updatedAt == null) return false;
   return now.getTime() - updatedAt.getTime() < cooldownMs;
-}
-
-/**
- * QUA-661: coerce a candidate display-name value to NULL if it's a raw
- * stableId (anything starting with `sid_`; see `isSid` in
- * `@longterm-wiki/id-utils`). Display-name columns on `source_check_verdicts`
- * must hold human-readable names or NULL — a raw `sid_` leaks to UI and
- * defeats QUA-650's retro-scans that match on subject labels.
- *
- * When we drop a sid_, we log a warning identifying the record so the
- * offending caller can be traced. The verdict is still written, just with
- * NULL in the display column — an honest signal of "unknown name".
- *
- * Exported for unit tests.
- */
-export function coerceDisplayName(
-  value: string | null,
-  fieldName: "displayName" | "entityDisplayName",
-  recordType: string,
-  recordId: string,
-): string | null {
-  if (value == null) return null;
-  if (isSid(value)) {
-    logger.warn(
-      { field: fieldName, value, recordType, recordId },
-      `Rejected sid_ in source_check_verdicts.${fieldName} — coerced to NULL`,
-    );
-    return null;
-  }
-  return value;
 }
 
 const VALID_VERDICTS = [

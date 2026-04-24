@@ -17,8 +17,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   shouldSkipAutoFlag,
   AUTO_FLAG_COOLDOWN_MS,
-  coerceDisplayName,
 } from "../routes/sourcing/sourcing.js";
+import { coerceDisplayName } from "../routes/shared/display-name-coerce.js";
 import { logger } from "../logger.js";
 
 // Re-parse the VerdictUpsertBody schema by importing it indirectly via a
