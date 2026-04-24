@@ -165,7 +165,7 @@ cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && pnpm crux sys audits lis
 PR patrol doesn't currently log dollar cost (see QUA-324 — follow-up to add `cost_usd` to `runs.jsonl`). As a proxy until that lands, count `pr_result` entries in the last 24h from `~/.cache/pr-patrol/runs.jsonl`. **Also surface the daemon's age** — long-running daemons (>2 days) are running stale code and miss every patrol fix that has merged since they started. Empirically the daemon dies silently on credit-balance issues + races, so users need a visible signal (this skill is the only place it surfaces).
 
 ```bash
-PATROL_PID=$(pgrep -f "crux\s+(gh\s+)?pr-patrol\s+(run|parallel)" | head -1)
+PATROL_PID=$(pgrep -f "crux[[:space:]]+(gh[[:space:]]+)?pr-patrol[[:space:]]+(run|parallel)" | head -1)
 if [ -n "$PATROL_PID" ]; then
   # Daemon age in days (compare lstart timestamp to now). BSD `ps -p PID -o lstart=`
   # returns e.g. "Tue Apr 22 09:26:17 2026". macOS-only; on Linux use --etime.
@@ -219,7 +219,7 @@ echo "Restart patrol now? (Re-runs the Section 1c block — kill old daemon + st
 
 Restart steps (use only on user confirmation, OR automatically if `--auto-restart-stale` is passed):
 ```bash
-pkill -f "crux\s+(gh\s+)?pr-patrol\s+(run|parallel)" 2>/dev/null
+pkill -f "crux[[:space:]]+(gh[[:space:]]+)?pr-patrol[[:space:]]+(run|parallel)" 2>/dev/null
 sleep 2
 cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
   export GITHUB_TOKEN=$(gh auth token) && \
@@ -229,7 +229,7 @@ disown
 
 **6b. Print the summary block:**
 
-```
+```text
 === Admin session ready ===
 Date:        2026-04-10
 Background:  rename-loop ✓ | ws-refresh ✓ | <PATROL_STATUS from 6a>
