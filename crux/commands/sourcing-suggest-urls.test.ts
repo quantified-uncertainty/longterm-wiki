@@ -60,7 +60,7 @@ function makeVerdict(overrides: Partial<Record<string, unknown>> = {}): Record<s
   };
 }
 
-function stubDryRunPrereqs() {
+function stubEmptyPrereqs() {
   // Pre-fetch of pending suggestions returns empty (no dedup skips).
   mockListUrlSuggestions.mockResolvedValue({
     ok: true,
@@ -103,7 +103,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('defaults to verdict=unverifiable when --verdict is omitted (back-compat)', async () => {
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [makeVerdict({ verdict: 'unverifiable' })], total: 1 },
@@ -117,7 +117,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('passes --verdict=partial through to listVerdicts (QUA-587)', async () => {
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [makeVerdict()], total: 1 },
@@ -131,7 +131,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('normalizes case in --verdict (PARTIAL -> partial)', async () => {
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [], total: 0 },
@@ -144,7 +144,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('empty-result message names the active verdict', async () => {
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [], total: 0 },
@@ -167,7 +167,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('emits JSON when --json is set (no human log lines in output)', async () => {
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [], total: 0 },
@@ -189,7 +189,7 @@ describe('sourcing-suggest-urls --verdict', () => {
     // -> upsert) still runs correctly once the verdict flag is threaded
     // through. Without this, a bug where `verdict=partial` silently
     // bypassed upsert would not be caught by the dry-run tests above.
-    stubDryRunPrereqs();
+    stubEmptyPrereqs();
     mockListVerdicts.mockResolvedValueOnce({
       ok: true,
       data: { verdicts: [makeVerdict({ recordId: 'g_a', entityId: 'anthropic' })], total: 1 },

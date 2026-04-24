@@ -31,6 +31,7 @@ import {
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
 import { suggestUrls, GENERATOR_MODEL } from '../lib/sourcing/suggest-urls.ts';
+import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
@@ -42,7 +43,7 @@ const PREFETCH_MAX = 2000;
 const UPSERT_CHUNK = 100;
 const DEFAULT_CONCURRENCY = 5;
 
-const DEFAULT_VERDICT = 'unverifiable';
+const DEFAULT_VERDICT: SourcingVerdict = 'unverifiable';
 // Only verdicts where weak source URLs are the suspected root cause.
 // `partial` added per QUA-587 — QUA-546 found re-verification was
 // ineffective for partials because the source URLs themselves are weak.
@@ -61,7 +62,16 @@ const DEFAULT_VERDICT = 'unverifiable';
 // NOTE: sourcing-recheck.ts uses a broader allowlist (all 5 real verdicts)
 // because its semantics differ — it reruns the LLM against current
 // evidence, which is valid for any verdict type.
-const ALLOWED_SUGGEST_VERDICTS = new Set(['unverifiable', 'partial']);
+// Outer type is Set<string> so .has() accepts raw user input; members are
+// typed SourcingVerdict so TS catches a typo or invalid verdict here.
+const ALLOWED_SUGGEST_VERDICTS: ReadonlySet<string> = new Set<SourcingVerdict>([
+  'unverifiable',
+  'partial',
+]);
+// Guard drift between DEFAULT_VERDICT and the allowlist.
+if (!ALLOWED_SUGGEST_VERDICTS.has(DEFAULT_VERDICT)) {
+  throw new Error(`DEFAULT_VERDICT "${DEFAULT_VERDICT}" is not in ALLOWED_SUGGEST_VERDICTS`);
+}
 
 interface SuggestOptions extends BaseOptions {
   limit?: string;
