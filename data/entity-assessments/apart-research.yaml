@@ -1,7 +1,6 @@
 # Entity assessments for Apart Research (E1156)
 # Source: content/docs/knowledge-base/organizations/apart-research.mdx (## Quick Assessment)
 entityId: sid_5WqgebIWFQ
-entityDisplayName: Apart Research
 assessments:
   - dimension: type
     rating: Independent non-profit research organization

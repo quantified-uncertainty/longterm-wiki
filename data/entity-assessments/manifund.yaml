@@ -1,7 +1,6 @@
 # Entity assessments for Manifund (E547)
 # Source: content/docs/knowledge-base/organizations/manifund.mdx (## Quick Assessment)
 entityId: sid_fFVOuFZCRf
-entityDisplayName: Manifund
 assessments:
   - dimension: scale
     rating: Growing

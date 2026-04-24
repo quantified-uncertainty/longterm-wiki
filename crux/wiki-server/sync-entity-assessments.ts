@@ -7,7 +7,6 @@
  * (the "Quick Assessment" tables previously embedded in wiki pages):
  *
  *   entityId: sid_xxxxxxxxxx              # FK to entities.stable_id
- *   entityDisplayName: "Anthropic"        # optional fallback display name
  *   assessments:
  *     - dimension: mission-alignment      # kebab-case string (free-form, not enum)
  *       rating: "Public benefit corp"    # short rating value (required)
@@ -80,14 +79,12 @@ interface RawAssessment {
 
 interface RawAssessmentsFile {
   entityId?: unknown;
-  entityDisplayName?: unknown;
   assessments?: unknown;
 }
 
 export interface SyncEntityAssessment {
   id: string;
   entityId: string;
-  entityDisplayName: string | null;
   dimension: string;
   rating: string;
   evidence: string | null;
@@ -141,11 +138,6 @@ export function loadAssessmentsFile(filePath: string): SyncEntityAssessment[] {
   }
 
   const entityId = asString(parsed.entityId, "entityId", filePath);
-  const entityDisplayName = asOptionalString(
-    parsed.entityDisplayName,
-    "entityDisplayName",
-    filePath,
-  );
 
   if (!Array.isArray(parsed.assessments)) {
     throw new Error(`${filePath}: 'assessments' must be an array`);
@@ -158,8 +150,12 @@ export function loadAssessmentsFile(filePath: string): SyncEntityAssessment[] {
   const seenInFile = new Set<string>();
 
   for (let i = 0; i < parsed.assessments.length; i++) {
-    const a = parsed.assessments[i] as RawAssessment;
     const where = `${filePath} assessments[${i}]`;
+    const rawItem = parsed.assessments[i];
+    if (!rawItem || typeof rawItem !== "object" || Array.isArray(rawItem)) {
+      throw new Error(`${where}: must be an object`);
+    }
+    const a = rawItem as RawAssessment;
 
     const dimension = asString(a.dimension, "dimension", where);
     if (!DIMENSION_RE.test(dimension)) {
@@ -203,7 +199,6 @@ export function loadAssessmentsFile(filePath: string): SyncEntityAssessment[] {
     out.push({
       id: assessmentIdFor(entityId, dimension, assessor),
       entityId,
-      entityDisplayName,
       dimension,
       rating,
       evidence: asOptionalString(a.evidence, "evidence", where),

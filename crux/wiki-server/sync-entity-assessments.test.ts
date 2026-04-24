@@ -56,7 +56,6 @@ describe("assessmentIdFor", () => {
 describe("loadAssessmentsFile", () => {
   const validYaml = `
 entityId: sid_abc1234567
-entityDisplayName: Test Org
 assessments:
   - dimension: mission-alignment
     rating: Public benefit corp
@@ -73,7 +72,6 @@ assessments:
     expect(assessments).toHaveLength(2);
     expect(assessments[0]).toMatchObject({
       entityId: "sid_abc1234567",
-      entityDisplayName: "Test Org",
       dimension: "mission-alignment",
       rating: "Public benefit corp",
       evidence: "Board structure with safety governance",
@@ -189,6 +187,19 @@ assessments: "oops"
   it("rejects non-object top-level YAML", () => {
     const f = writeFile("t.yaml", `- foo`);
     expect(() => loadAssessmentsFile(f)).toThrow(/object/);
+  });
+
+  it("rejects null/primitive items in the assessments array", () => {
+    const f = writeFile(
+      "t.yaml",
+      `
+entityId: sid_abc1234567
+assessments:
+  - null
+  - { dimension: speed, rating: Fast }
+`,
+    );
+    expect(() => loadAssessmentsFile(f)).toThrow(/assessments\[0\].*must be an object/);
   });
 
   it("rejects duplicate (dimension, assessor) within a single file", () => {

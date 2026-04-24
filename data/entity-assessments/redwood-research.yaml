@@ -1,7 +1,6 @@
 # Entity assessments for Redwood Research (E557)
 # Source: content/docs/knowledge-base/organizations/redwood-research.mdx (## Quick Assessment)
 entityId: sid_dwMzc9WzPa
-entityDisplayName: Redwood Research
 assessments:
   - dimension: focus-area
     rating: AI systems acting against developer interests

@@ -1,7 +1,6 @@
 # Entity assessments for Anthropic (E22)
 # Source: content/docs/knowledge-base/organizations/anthropic.mdx (## Quick Assessment)
 entityId: sid_mK9pX3rQ7n
-entityDisplayName: Anthropic
 assessments:
   - dimension: mission-alignment
     rating: Public benefit corporation with safety governance

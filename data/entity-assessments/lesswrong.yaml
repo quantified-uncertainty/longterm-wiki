@@ -1,7 +1,6 @@
 # Entity assessments for LessWrong (E538)
 # Source: content/docs/knowledge-base/organizations/lesswrong.mdx (## Quick Assessment)
 entityId: sid_BEKEqQDmkQ
-entityDisplayName: LessWrong
 assessments:
   - dimension: influence-on-ai-safety
     rating: High

@@ -1,7 +1,6 @@
 # Entity assessments for MATS (E548)
 # Source: content/docs/knowledge-base/organizations/mats.mdx (## Quick Assessment)
 entityId: sid_yYtGSTsXuw
-entityDisplayName: MATS (ML Alignment Theory Scholars program)
 assessments:
   - dimension: program-scale
     rating: High

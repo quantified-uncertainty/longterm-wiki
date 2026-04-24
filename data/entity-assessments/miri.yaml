@@ -1,7 +1,6 @@
 # Entity assessments for MIRI (E202)
 # Source: content/docs/knowledge-base/organizations/miri.mdx (## Quick Assessment)
 entityId: sid_puAffUjWSS
-entityDisplayName: Machine Intelligence Research Institute (MIRI)
 assessments:
   - dimension: historical-significance
     rating: First organization to focus on ASI alignment as technical problem

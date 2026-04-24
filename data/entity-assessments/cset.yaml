@@ -1,7 +1,6 @@
 # Entity assessments for CSET (E524)
 # Source: content/docs/knowledge-base/organizations/cset.mdx (## Quick Assessment)
 entityId: sid_lvsDuyzPcg
-entityDisplayName: CSET (Center for Security and Emerging Technology)
 assessments:
   - dimension: policy-influence
     rating: Very High

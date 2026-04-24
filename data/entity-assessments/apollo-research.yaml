@@ -1,7 +1,6 @@
 # Entity assessments for Apollo Research (E24)
 # Source: content/docs/knowledge-base/organizations/apollo-research.mdx (## Quick Assessment)
 entityId: sid_pKeaWwP6sQ
-entityDisplayName: Apollo Research
 assessments:
   - dimension: research-output
     rating: High Impact

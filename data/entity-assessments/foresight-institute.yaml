@@ -1,7 +1,6 @@
 # Entity assessments for Foresight Institute (E1210)
 # Source: content/docs/knowledge-base/organizations/foresight-institute.mdx (## Quick Assessment)
 entityId: sid_NPPTvNqRXA
-entityDisplayName: Foresight Institute
 assessments:
   - dimension: type
     rating: Nonprofit research organization and think tank

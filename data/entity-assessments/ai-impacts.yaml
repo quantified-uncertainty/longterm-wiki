@@ -1,7 +1,6 @@
 # Entity assessments for AI Impacts (E512)
 # Source: content/docs/knowledge-base/organizations/ai-impacts.mdx (## Quick Assessment)
 entityId: sid_TdbypiKyCw
-entityDisplayName: AI Impacts
 assessments:
   - dimension: type
     rating: Research organization

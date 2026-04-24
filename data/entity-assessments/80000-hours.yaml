@@ -1,7 +1,6 @@
 # Entity assessments for 80,000 Hours (E510)
 # Source: content/docs/knowledge-base/organizations/80000-hours.mdx (## Quick Assessment)
 entityId: sid_hvg9ecR3nA
-entityDisplayName: 80,000 Hours
 assessments:
   - dimension: scale
     rating: Largest EA Career Organization

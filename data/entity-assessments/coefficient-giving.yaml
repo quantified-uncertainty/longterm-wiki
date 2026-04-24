@@ -1,7 +1,6 @@
 # Entity assessments for Coefficient Giving (E521)
 # Source: content/docs/knowledge-base/organizations/coefficient-giving.mdx (## Quick Assessment)
 entityId: sid_ULjDXpSLCI
-entityDisplayName: Coefficient Giving
 assessments:
   - dimension: scale
     rating: Dominant
