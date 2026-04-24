@@ -333,6 +333,9 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'text/plain',
+          // Default cap (~$0.000347) was too low for full-text search across mv_*_posts;
+          // bump to $0.01 per query to fit substantive queries.
+          'x-scry-max-exposure': '10000000',
         },
         body: sql,
         signal: AbortSignal.timeout(15_000),

@@ -154,6 +154,7 @@ const SELF_DOMAINS = [
   'longtermwiki.org',
   'longterm.wiki',
   'longterm-wiki.vercel.app',
+  'ea-crux-project.vercel.app',
 ];
 
 /**
