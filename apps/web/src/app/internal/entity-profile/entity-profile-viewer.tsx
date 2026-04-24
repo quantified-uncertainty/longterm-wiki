@@ -438,11 +438,9 @@ function CellValue({
     }
   }
 
-  // Facts `value` column holds the serialized fact value as text (e.g.
-  // "70000000000" for a number fact, "Menlo Park, CA" for a text fact,
-  // "[sid_...]" for refs). Format pure-numeric strings so the Database tab
-  // never renders a bare 10+ digit run alongside the (already-formatted)
-  // sibling `numeric` cell. Regression of QUA-82, tracked as QUA-673.
+  // Facts `value` is a text column that stringifies number facts to
+  // "70000000000" and similar. Format pure-numeric entries so the Database
+  // tab never renders a bare 10+ digit run.
   if (columnName === "value" && typeof value === "string") {
     const formatted = formatFactValueString(value, (row?.currency as string) ?? null);
     if (formatted !== null) {
@@ -486,10 +484,9 @@ function CellValue({
 
   let str = String(value);
 
-  // `things.description` is composed server-side and — for rows synced before
-  // QUA-673 — may still embed a raw numeric literal (e.g. "Internal Revenue:
-  // 1700000000"). Rewrite bare 10+ digit runs to their compact form so the
-  // Database tab shows "$1.7B" without requiring a full facts re-sync.
+  // Older composed things.description rows embed raw numeric literals
+  // (e.g. "Internal Revenue: 1700000000"). Rewrite at render time so the
+  // Database tab heals without a full facts re-sync.
   if (columnName === "description" && typeof value === "string") {
     str = sanitizeRawLargeNumbers(str);
   }

@@ -68,13 +68,10 @@ interface FactComposerRow {
 }
 
 /**
- * Render a fact's value for `things.description`.
- *
- * Prefers `row.value` (the serialized human-facing string, which captures
- * ranges, refs, booleans, etc.) but falls back to `row.numeric` when value
- * is missing. Pure numeric values are rendered compactly with a grouping
- * separator or SI suffix so large magnitudes never appear as bare 10+ digit
- * runs (regression of QUA-82, tracked as QUA-673).
+ * Render a fact value for `things.description`. Prefers `row.value` (the
+ * serialized human-facing string, which preserves ranges, refs, booleans,
+ * etc.) and falls back to `row.numeric`. Numeric values are compacted so
+ * large magnitudes never appear as bare 10+ digit runs in user-visible text.
  */
 function renderFactDescriptionValue(row: FactComposerRow): string | null {
   if (row.value != null && row.value.length > 0) {

@@ -523,8 +523,6 @@ export function SearchDialog() {
  */
 function HighlightedSnippet({ result }: { result: SearchResult }) {
   const { description: rawDescription, match, terms, snippet } = result;
-  // sanitizeRawLargeNumbers heals un-resynced things.description rows that
-  // still embed raw fact values (QUA-673 defense in depth).
   const description = rawDescription
     ? sanitizeRawLargeNumbers(stripMdxEscapes(rawDescription))
     : rawDescription;

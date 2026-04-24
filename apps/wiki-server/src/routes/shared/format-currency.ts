@@ -34,17 +34,42 @@ export function formatMoney(
 const PURE_NUMERIC_RE = /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
 
 /**
- * Format an amount compactly for display in things.description where
- * readability matters more than precision (e.g. "$1.7B", "70B", "£1.3B").
- *
- * Values below 1,000 are rendered with grouping separators (e.g. "$500") so
- * the output never contains a bare 10+ digit run — critical for the e2e
- * render-audit regression that caught raw numbers like "1700000000" leaking
- * into fact thing descriptions (QUA-673).
- *
- * Accepts number, pure-numeric string ("7e+10", "1700000000", "-0.5"), or
- * nullish. Returns null for nullish / non-finite / non-numeric inputs so the
- * caller can fall back to the raw text.
+ * Bounded cache of `Intl.NumberFormat` instances keyed by the (currency,
+ * fractionDigits) tuple. A batch fact sync composes hundreds of rows back
+ * to back; allocating a new formatter per row dominates the compose cost.
+ * Currencies are few (USD/EUR/GBP/…) and fractionDigits is 0 or 1, so the
+ * cache stays under ~20 entries.
+ */
+const FORMATTER_CACHE = new Map<string, Intl.NumberFormat>();
+
+function getCompactFormatter(
+  currency: string | null,
+  fractionDigits: number,
+): Intl.NumberFormat {
+  const key = `${currency ?? ""}|${fractionDigits}`;
+  const cached = FORMATTER_CACHE.get(key);
+  if (cached) return cached;
+  const opts: Intl.NumberFormatOptions = {
+    notation: "compact",
+    maximumFractionDigits: fractionDigits,
+    minimumFractionDigits: 0,
+  };
+  if (currency) {
+    opts.style = "currency";
+    opts.currency = currency;
+  }
+  const formatter = new Intl.NumberFormat("en-US", opts);
+  FORMATTER_CACHE.set(key, formatter);
+  return formatter;
+}
+
+/**
+ * Compact-format an amount for display in things.description
+ * (e.g. `"$1.7B"`, `"70B"`, `"£1.3B"`). Accepts number, pure-numeric
+ * string (`"7e+10"`, `"1700000000"`, `"-0.5"`), or nullish — returns null
+ * for nullish / non-finite / non-numeric so the caller can fall back to
+ * the raw text. Output never contains a bare 10+ digit run (every scale
+ * branch uses a grouping separator or SI suffix).
  */
 export function formatCompactAmount(
   amount: number | string | null | undefined,
@@ -61,12 +86,10 @@ export function formatCompactAmount(
   }
   if (!Number.isFinite(n)) return null;
 
-  // Match the client's format-compact.ts precision rules so a fact's
-  // server-composed `things.description` and its client-rendered sibling
-  // cells render with the same compactness: below 10 of a unit → keep
-  // 1 decimal ("$1.7B"), at or above 10 of a unit → drop decimals
-  // ("$70B", "$165B"). Without this Intl always keeps 1 decimal, so the
-  // Database tab would show "$164.5B" next to "165B" for the same value.
+  // Precision mirrors apps/web/src/lib/format-compact.ts: below 10 of a
+  // unit keep 1 decimal ("$1.7B"); at or above, drop decimals ("$70B").
+  // Without this rule Intl always keeps 1 decimal, and the Database tab
+  // would show server "$164.5B" next to client "165B" for the same value.
   const abs = Math.abs(n);
   let scaleAbs: number;
   if (abs >= 1e12) scaleAbs = abs / 1e12;
@@ -77,17 +100,8 @@ export function formatCompactAmount(
   const fractionDigits = scaleAbs < 10 && abs >= 1e3 ? 1 : 0;
 
   const code = currency ? currency.toUpperCase() : null;
-  const opts: Intl.NumberFormatOptions = {
-    notation: "compact",
-    maximumFractionDigits: fractionDigits,
-    minimumFractionDigits: 0,
-  };
-  if (code) {
-    opts.style = "currency";
-    opts.currency = code;
-  }
   try {
-    return new Intl.NumberFormat("en-US", opts).format(n);
+    return getCompactFormatter(code, fractionDigits).format(n);
   } catch {
     // Malformed currency code — fall back to grouped decimal so no bare
     // run of 10+ digits leaks to callers that use this for display.

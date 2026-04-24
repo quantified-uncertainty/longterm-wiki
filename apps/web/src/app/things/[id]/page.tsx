@@ -366,9 +366,8 @@ export default async function ThingDetailPage({ params }: PageProps) {
   }
 
   if (thing.description) {
-    // Some fact things synced before QUA-673 still embed raw numeric
-    // literals (e.g. "Internal Revenue: 1700000000"). Rewrite at render
-    // time so the detail page heals without a facts re-sync.
+    // Older composed fact descriptions embed raw numeric literals
+    // (e.g. "Internal Revenue: 1700000000"); rewrite at render time.
     const sanitized = sanitizeRawLargeNumbers(thing.description);
     metadataRows.push({
       label: "Description",
