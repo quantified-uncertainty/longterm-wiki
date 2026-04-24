@@ -27,6 +27,10 @@ import {
   isOpaqueLegacyFactId,
   isLegacyResourceId,
 } from "./sanitize-raw-ids";
+import {
+  formatFactValueString,
+  sanitizeRawLargeNumbers,
+} from "./format-cell-value";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -433,6 +437,22 @@ function CellValue({
     }
   }
 
+  // Facts `value` column holds the serialized fact value as text (e.g.
+  // "70000000000" for a number fact, "Menlo Park, CA" for a text fact,
+  // "[sid_...]" for refs). Format pure-numeric strings so the Database tab
+  // never renders a bare 10+ digit run alongside the (already-formatted)
+  // sibling `numeric` cell. Regression of QUA-82, tracked as QUA-673.
+  if (columnName === "value" && typeof value === "string") {
+    const formatted = formatFactValueString(value, (row?.currency as string) ?? null);
+    if (formatted !== null) {
+      return (
+        <span className="text-[11px] tabular-nums font-medium whitespace-nowrap" title={value}>
+          {formatted}
+        </span>
+      );
+    }
+  }
+
   // Generic number values (real/doublePrecision columns arrive as typeof number)
   if (typeof value === "number" && isFinite(value)) {
     const formatted = Math.abs(value) >= 1000
@@ -463,7 +483,15 @@ function CellValue({
     );
   }
 
-  const str = String(value);
+  let str = String(value);
+
+  // `things.description` is composed server-side and — for rows synced before
+  // QUA-673 — may still embed a raw numeric literal (e.g. "Internal Revenue:
+  // 1700000000"). Rewrite bare 10+ digit runs to their compact form so the
+  // Database tab shows "$1.7B" without requiring a full facts re-sync.
+  if (columnName === "description" && typeof value === "string") {
+    str = sanitizeRawLargeNumbers(str);
+  }
 
   // Long text -> expandable with line-clamp
   if (str.length > 80) {

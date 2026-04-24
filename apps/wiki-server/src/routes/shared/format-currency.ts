@@ -29,3 +29,55 @@ export function formatMoney(
     return n.toLocaleString("en-US");
   }
 }
+
+/** Regex matching a pure numeric string (optionally signed, decimal, or in scientific notation). */
+const PURE_NUMERIC_RE = /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
+
+/**
+ * Format an amount compactly for display in things.description where
+ * readability matters more than precision (e.g. "$1.7B", "70B", "£1.3B").
+ *
+ * Values below 1,000 are rendered with grouping separators (e.g. "$500") so
+ * the output never contains a bare 10+ digit run — critical for the e2e
+ * render-audit regression that caught raw numbers like "1700000000" leaking
+ * into fact thing descriptions (QUA-673).
+ *
+ * Accepts number, pure-numeric string ("7e+10", "1700000000", "-0.5"), or
+ * nullish. Returns null for nullish / non-finite / non-numeric inputs so the
+ * caller can fall back to the raw text.
+ */
+export function formatCompactAmount(
+  amount: number | string | null | undefined,
+  currency?: string | null
+): string | null {
+  if (amount == null) return null;
+  let n: number;
+  if (typeof amount === "number") {
+    n = amount;
+  } else {
+    const trimmed = amount.trim();
+    if (!PURE_NUMERIC_RE.test(trimmed)) return null;
+    n = Number(trimmed);
+  }
+  if (!Number.isFinite(n)) return null;
+
+  const code = currency ? currency.toUpperCase() : null;
+  const opts: Intl.NumberFormatOptions = {
+    notation: "compact",
+    // Together these give us "1.7B" (kept) but "70B" / "125B" / "$0" (no
+    // trailing ".0"). Without minimumFractionDigits: 0 Intl renders "$70.0B".
+    maximumFractionDigits: 1,
+    minimumFractionDigits: 0,
+  };
+  if (code) {
+    opts.style = "currency";
+    opts.currency = code;
+  }
+  try {
+    return new Intl.NumberFormat("en-US", opts).format(n);
+  } catch {
+    // Malformed currency code — fall back to grouped decimal so no bare
+    // run of 10+ digits leaks to callers that use this for display.
+    return n.toLocaleString("en-US");
+  }
+}
