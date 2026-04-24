@@ -1,0 +1,22 @@
+# Entity assessments for AI Impacts (E512)
+# Source: content/docs/knowledge-base/organizations/ai-impacts.mdx (## Quick Assessment)
+entityId: sid_TdbypiKyCw
+entityDisplayName: AI Impacts
+assessments:
+  - dimension: type
+    rating: Research organization
+
+  - dimension: founded
+    rating: ~2010s
+
+  - dimension: focus
+    rating: Empirical analysis of AI timelines, risks, and human-level AI impacts
+
+  - dimension: key-people
+    rating: Katja Grace (Lead Researcher), Rick Korzekwa (Director)
+
+  - dimension: approach
+    rating: Survey research, historical trend analysis, evidence synthesis
+
+  - dimension: community-ties
+    rating: LessWrong, Effective Altruism

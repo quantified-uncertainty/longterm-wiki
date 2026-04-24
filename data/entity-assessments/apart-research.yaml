@@ -1,0 +1,34 @@
+# Entity assessments for Apart Research (E1156)
+# Source: content/docs/knowledge-base/organizations/apart-research.mdx (## Quick Assessment)
+entityId: sid_5WqgebIWFQ
+entityDisplayName: Apart Research
+assessments:
+  - dimension: type
+    rating: Independent non-profit research organization
+
+  - dimension: founded
+    rating: "2022"
+
+  - dimension: focus
+    rating: AI safety research, talent development, hackathons
+
+  - dimension: director-of-research
+    rating: Jason Hoelscher-Obermaier
+
+  - dimension: founder
+    rating: Esben Kran (Board Member)
+
+  - dimension: ceo
+    rating: Jaime Raldúa Veuthey
+
+  - dimension: funding-2025
+    rating: $619,921
+
+  - dimension: publications
+    rating: 22 peer-reviewed papers (including 2 ICLR 2025 orals)
+
+  - dimension: research-sprint-participants
+    rating: 3,500+ across 42 sprints
+
+  - dimension: fellows-supported
+    rating: 100+

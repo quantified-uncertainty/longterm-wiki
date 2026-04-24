@@ -1,0 +1,16 @@
+# Entity assessments for LessWrong (E538)
+# Source: content/docs/knowledge-base/organizations/lesswrong.mdx (## Quick Assessment)
+entityId: sid_BEKEqQDmkQ
+entityDisplayName: LessWrong
+assessments:
+  - dimension: influence-on-ai-safety
+    rating: High
+    evidence: "Material influenced formation of MIRI and CFAR; attracted major tech donors; 31% of EA survey respondents in 2014 first heard of EA through LessWrong [Wikipedia](https://en.wikipedia.org/wiki/LessWrong), [Rationality - LessWrong](https://www.lesswrong.com/rationality)"
+
+  - dimension: community-scale
+    rating: Medium
+    evidence: "2016 survey had ~3,000 respondents; 2023 survey had 558 respondents; peak 15,000 daily pageviews [Wikipedia](https://en.wikipedia.org/wiki/LessWrong), [2023 Survey](https://www.lesswrong.com/posts/WRaq4SzxhunLoFKCs/2023-survey-results)"
+
+  - dimension: funding-base
+    rating: Substantial
+    evidence: "Over $5 million from Survival and Flourishing Fund, Future Fund, and Coefficient Giving combined [EA Forum](https://forum-bots.effectivealtruism.org/topics/lesswrong)"

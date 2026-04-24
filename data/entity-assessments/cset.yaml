@@ -1,0 +1,32 @@
+# Entity assessments for CSET (E524)
+# Source: content/docs/knowledge-base/organizations/cset.mdx (## Quick Assessment)
+entityId: sid_lvsDuyzPcg
+entityDisplayName: CSET (Center for Security and Emerging Technology)
+assessments:
+  - dimension: policy-influence
+    rating: Very High
+    evidence: Hundreds of government briefings annually, regular congressional testimony, research cited in export control decisions
+
+  - dimension: research-rigor
+    rating: High
+    evidence: Data-driven methodology, 80+ annual publications, peer-reviewed work in major venues
+
+  - dimension: data-infrastructure
+    rating: Very High
+    evidence: Emerging Technology Observatory with 10 public tools and 8 open datasets
+
+  - dimension: china-expertise
+    rating: Very High
+    evidence: In-house translation team, extensive Chinese-language research analysis
+
+  - dimension: funding-stability
+    rating: Very High
+    evidence: $100M+ secured through 2025, diversified funding base
+
+  - dimension: staff-size
+    rating: Large
+    evidence: 50+ full-time staff as of 2022
+
+  - dimension: independence
+    rating: High
+    evidence: Nonpartisan, university-affiliated, philanthropically funded

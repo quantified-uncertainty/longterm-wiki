@@ -1,0 +1,24 @@
+# Entity assessments for MIRI (E202)
+# Source: content/docs/knowledge-base/organizations/miri.mdx (## Quick Assessment)
+entityId: sid_puAffUjWSS
+entityDisplayName: Machine Intelligence Research Institute (MIRI)
+assessments:
+  - dimension: historical-significance
+    rating: First organization to focus on ASI alignment as technical problem
+    evidence: "Among first to recognize ASI as most important event in 21st century [MIRI About](https://intelligence.org/about/)"
+
+  - dimension: current-strategy
+    rating: Policy advocacy to halt AI development
+    evidence: "Major 2024 pivot after acknowledging alignment research 'extremely unlikely to succeed in time' [MIRI About](https://intelligence.org/about/)"
+
+  - dimension: research-output
+    rating: Minimal recent publications
+    evidence: "Near-zero new publications from core researchers between 2018 and 2022 [LessWrong](https://www.lesswrong.com/posts/rfNHWe5JWhGuSqMHN/steelmanning-miri-critics)"
+
+  - dimension: financial-status
+    rating: Operating at deficit with ~2 year runway
+    evidence: "$4.97M net loss in 2024, $15.24M in net assets [ProPublica](https://projects.propublica.org/nonprofits/organizations/582565917)"
+
+  - dimension: field-impact
+    rating: Controversial but influential
+    evidence: "Raised awareness but faced criticism for theoretical approach and failed research programs [LessWrong](https://www.lesswrong.com/posts/rfNHWe5JWhGuSqMHN/steelmanning-miri-critics)"

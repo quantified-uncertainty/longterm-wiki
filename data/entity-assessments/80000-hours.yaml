@@ -1,0 +1,36 @@
+# Entity assessments for 80,000 Hours (E510)
+# Source: content/docs/knowledge-base/organizations/80000-hours.mdx (## Quick Assessment)
+entityId: sid_hvg9ecR3nA
+entityDisplayName: 80,000 Hours
+assessments:
+  - dimension: scale
+    rating: Largest EA Career Organization
+    evidence: 10M+ website readers; 400K+ newsletter subscribers
+
+  - dimension: primary-focus
+    rating: AI Safety Careers
+    evidence: Top priority since 2016; explicit AGI focus since 2025
+
+  - dimension: key-outputs
+    rating: Career Advice + Research
+    evidence: Problem profiles, career reviews, podcast, job board
+
+  - dimension: impact-metric
+    rating: Career Plan Changes
+    evidence: 3,000+ self-reported significant changes
+
+  - dimension: funding-model
+    rating: Philanthropic Grants
+    evidence: 80% from Coefficient Giving; 20% from other donors
+
+  - dimension: cumulative-funding
+    rating: $10M+
+    evidence: Primarily from Coefficient Giving
+
+  - dimension: independence
+    rating: Newly Independent
+    evidence: Spun out from Effective Ventures in April 2025
+
+  - dimension: target-audience
+    rating: Analytical Altruists
+    evidence: College-educated, 18-45, English-speaking, impact-focused

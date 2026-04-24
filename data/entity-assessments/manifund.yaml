@@ -1,0 +1,36 @@
+# Entity assessments for Manifund (E547)
+# Source: content/docs/knowledge-base/organizations/manifund.mdx (## Quick Assessment)
+entityId: sid_fFVOuFZCRf
+entityDisplayName: Manifund
+assessments:
+  - dimension: scale
+    rating: Growing
+    evidence: "$2M+ in 2023; $2.25M raised for 2025 regrants"
+
+  - dimension: speed
+    rating: Very Fast
+    evidence: Grant recommendation to disbursement in under 1 week
+
+  - dimension: mechanism-innovation
+    rating: High
+    evidence: Pioneered impact certificates, regranting at scale
+
+  - dimension: transparency
+    rating: Very High
+    evidence: All grants public with explanations
+
+  - dimension: team-size
+    rating: Small
+    evidence: ~3 core staff (Austin Chen, Rachel Weinberg, Saul Munn)
+
+  - dimension: fiscal-sponsorship
+    rating: "Yes"
+    evidence: 501(c)(3) status; 5% fee for large donors
+
+  - dimension: focus-areas
+    rating: AI Safety Primary
+    evidence: ~80% of grants to x-risk/AI safety
+
+  - dimension: related-platform
+    rating: Manifold Markets
+    evidence: Shared founders, infrastructure, community
