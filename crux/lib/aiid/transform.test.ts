@@ -349,6 +349,27 @@ describe("generateIncidentId", () => {
   });
 });
 
+// Cross-package constant alignment — see SUMMARY_MAX_CHARS docstring in
+// transform.ts for why we duplicate instead of importing.
+import { readFileSync } from "fs";
+import { fileURLToPath } from "url";
+import { dirname, resolve } from "path";
+
+describe("constants stay in sync with the route", () => {
+  it("SUMMARY_MAX_CHARS matches the route's MAX_SUMMARY_CHARS literal", () => {
+    const here = dirname(fileURLToPath(import.meta.url));
+    const routePath = resolve(
+      here,
+      "../../..",
+      "apps/wiki-server/src/routes/tablebase/ai-incidents.ts",
+    );
+    const src = readFileSync(routePath, "utf-8");
+    const match = src.match(/const MAX_SUMMARY_CHARS = (\d+);/);
+    expect(match).not.toBeNull();
+    expect(Number(match![1])).toBe(SUMMARY_MAX_CHARS);
+  });
+});
+
 describe("buildAiidEntityNameMap", () => {
   it("maps entity_id to name", () => {
     const aiidEntities: AiidEntityRaw[] = [

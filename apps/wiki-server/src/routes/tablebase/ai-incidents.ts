@@ -68,6 +68,10 @@ const VALID_SOURCES = ["mit-aiid"] as const;
  * report text. If an upstream field blows past this, the ingest truncates
  * with an ellipsis — intentional: the `full_report_url` is the authoritative
  * reading path.
+ *
+ * MUST stay equal to `SUMMARY_MAX_CHARS` in `crux/lib/aiid/transform.ts`.
+ * Cross-package imports would create a wiki-server ↔ crux dependency cycle,
+ * so the value is duplicated and a unit test asserts equality.
  */
 const MAX_SUMMARY_CHARS = 4000;
 
@@ -237,10 +241,10 @@ const aiIncidentsApp = new Hono()
       .groupBy(aiIncidents.source);
 
     return c.json({
-      total: totalsRow?.total ?? 0,
+      total: Number(totalsRow?.total ?? 0),
       withOrg: Number(totalsRow?.withOrg ?? 0),
       withModel: Number(totalsRow?.withModel ?? 0),
-      bySource: bySource.map((r) => ({ source: r.source, total: r.total })),
+      bySource: bySource.map((r) => ({ source: r.source, total: Number(r.total) })),
     });
   })
 
@@ -396,6 +400,10 @@ const aiIncidentsApp = new Hono()
   // ---- GET /:id/reports ----
   .get("/:id/reports", async (c) => {
     const id = c.req.param("id");
+    // ai_incidents.id is varchar(10) generated via generateId() — strict format.
+    if (!/^[A-Za-z0-9]{10}$/.test(id)) {
+      return c.json({ error: "Invalid incident id format" }, 400);
+    }
     const db = getDrizzleDb();
 
     const rows = await db
@@ -419,6 +427,9 @@ const aiIncidentsApp = new Hono()
         `${item.source}::${item.sourceIncidentId}`,
       naturalKeyError:
         "Duplicate (source, sourceIncidentId) in batch — each upstream incident must appear at most once",
+      // Pre-tx FK validation. Null/undefined values are filtered by the
+      // factory shorthand, so unattributed incidents are not affected.
+      entityRefs: ["aiModelId", "orgId", "developerOrgId"],
       toRow: (item: AiIncidentItem, now: Date) => ({
         id: item.id,
         source: item.source,

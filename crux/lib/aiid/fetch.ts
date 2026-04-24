@@ -19,25 +19,27 @@ import { Readable } from "stream";
 import { pipeline } from "stream/promises";
 import type { AiidEntityRaw, AiidIncidentRaw, AiidReportRaw } from "./transform.ts";
 
-const R2_PUBLIC_BASE = "https://pub-72b2b2fc36ec423189843747af98f80e.r2.dev";
-const SNAPSHOTS_PAGE_URL = "https://incidentdatabase.ai/research/snapshots";
+export const AIID_R2_BASE = "https://pub-72b2b2fc36ec423189843747af98f80e.r2.dev";
+export const AIID_SNAPSHOTS_PAGE = "https://incidentdatabase.ai/research/snapshots";
 
 /**
  * Scrape the documented snapshots page for the latest backup URL.
- * The page links each snapshot by filename, e.g.
- *   <a href="https://pub-...r2.dev/backup-20260420103651.tar.bz2">
+ *
+ * The regex is **pinned to the known R2 bucket** (not just any `pub-*.r2.dev`
+ * host) so a typo'd or hostile link on the snapshots page can't redirect us
+ * to an attacker-controlled bucket. Defense-in-depth: the CLI also checks
+ * `startsWith(AIID_R2_BASE)` before downloading.
  */
 export async function discoverLatestSnapshotUrl(): Promise<string> {
-  const res = await fetch(SNAPSHOTS_PAGE_URL);
+  const res = await fetch(AIID_SNAPSHOTS_PAGE);
   if (!res.ok) {
     throw new Error(
       `Failed to fetch AIID snapshots page: ${res.status} ${res.statusText}`,
     );
   }
   const html = await res.text();
-  // Anchor href with the R2 base and `backup-<digits>.tar.bz2`
-  const re =
-    /https:\/\/pub-[0-9a-f]+\.r2\.dev\/backup-(\d{14})\.tar\.bz2/g;
+  const escapedBase = AIID_R2_BASE.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const re = new RegExp(`${escapedBase}/backup-(\\d{14})\\.tar\\.bz2`, "g");
   const matches = Array.from(html.matchAll(re));
   if (matches.length === 0) {
     throw new Error(
@@ -78,6 +80,46 @@ export async function downloadSnapshot(
 }
 
 /**
+ * Validate a tar archive's entries do not escape the extraction root. AIID
+ * archives come from a third-party R2 bucket; even though tar typically
+ * rejects `..` traversal at extract time, we double-check here so the
+ * trust model is explicit.
+ *
+ * Rejected entry shapes:
+ *   - Absolute paths (`/foo`)
+ *   - Paths containing `..` segments
+ *   - Symlinks pointing outside the archive root (best-effort)
+ */
+export function listTarEntries(archivePath: string): string[] {
+  const out = execFileSync("tar", ["-tjf", archivePath], {
+    stdio: ["ignore", "pipe", "pipe"],
+    encoding: "utf-8",
+    maxBuffer: 64 * 1024 * 1024, // AIID dump has ~30k entries; 64 MB string is plenty
+  });
+  return out
+    .split("\n")
+    .map((l) => l.trim())
+    .filter((l) => l.length > 0);
+}
+
+/**
+ * Throws if any entry name is unsafe. Consumers must call this before
+ * extraction. Pure: no I/O.
+ */
+export function assertSafeTarEntries(entries: string[]): void {
+  for (const entry of entries) {
+    if (entry.startsWith("/")) {
+      throw new Error(`Refusing to extract absolute path from archive: ${entry}`);
+    }
+    // `..` must not appear as its own segment — also catches `foo/../bar`.
+    const segments = entry.split("/");
+    if (segments.some((s) => s === "..")) {
+      throw new Error(`Refusing to extract traversal path from archive: ${entry}`);
+    }
+  }
+}
+
+/**
  * Extract a tar.bz2 into a fresh temp directory. Returns the directory path.
  *
  * The MongoDB dump layout looks roughly like:
@@ -91,14 +133,35 @@ export async function downloadSnapshot(
  *
  * We don't assume a specific root directory name — we just recursively
  * look for the JSON filenames we need.
+ *
+ * Hardening (Zip-Slip / path-traversal):
+ *   1. List entries first via `tar -tjf` and reject absolute or `..` paths.
+ *   2. Pass `--no-same-owner` and `--no-same-permissions` to drop archive
+ *      uid/gid/mode bits on extraction (defense if running with elevated
+ *      privileges; harmless otherwise).
  */
 export function extractSnapshot(archivePath: string): string {
+  // 1. Pre-scan entries.
+  const entries = listTarEntries(archivePath);
+  assertSafeTarEntries(entries);
+
+  // 2. Extract into a fresh temp dir. `tar` is in coreutils on Darwin + Linux.
+  //    `execFileSync` argv form prevents shell interpretation of archivePath.
   const dir = mkdtempSync(join(tmpdir(), "aiid-extract-"));
-  // `tar` is in coreutils on Darwin + Linux. Use execFileSync for argv
-  // safety (no shell interpretation of archivePath).
-  execFileSync("tar", ["-xjf", archivePath, "-C", dir], {
-    stdio: ["ignore", "pipe", "pipe"],
-  });
+  execFileSync(
+    "tar",
+    [
+      "-xjf",
+      archivePath,
+      "-C",
+      dir,
+      "--no-same-owner",
+      "--no-same-permissions",
+    ],
+    {
+      stdio: ["ignore", "pipe", "pipe"],
+    },
+  );
   return dir;
 }
 
@@ -195,6 +258,3 @@ export function cleanupDir(dir: string): void {
     // Log-and-ignore intentional: cleanup is a nice-to-have.
   }
 }
-
-export const AIID_R2_BASE = R2_PUBLIC_BASE;
-export const AIID_SNAPSHOTS_PAGE = SNAPSHOTS_PAGE_URL;

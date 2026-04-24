@@ -10,6 +10,7 @@ import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { AiIncidentsRoute } from '../../../apps/wiki-server/src/routes/tablebase/ai-incidents.ts';
 import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
+import type { AiIncidentSyncItem } from '../aiid/transform.ts';
 
 type RpcClient = ReturnType<typeof hc<AiIncidentsRoute>>;
 
@@ -30,9 +31,9 @@ export async function getAllAiIncidents(
   );
 }
 
-/** Sync ai-incidents (upsert). */
+/** Sync ai-incidents (upsert). Items must match the route's Zod schema. */
 export async function syncAiIncidents(
-  items: Array<Record<string, unknown>>,
+  items: AiIncidentSyncItem[],
 ): Promise<ApiResult<AiIncidentsSyncResult>> {
   return apiRequest<AiIncidentsSyncResult>('POST', '/api/ai-incidents/sync', { items });
 }

@@ -383,12 +383,12 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
 
   'ai-incidents': {
     fetchByEntityPath: (id) => `/api/ai-incidents/by-entity/${encodeURIComponent(id)}`,
-    resultKey: 'items', // TODO: rename to match the /all response shape
+    resultKey: 'incidents',
     syncPath: '/api/ai-incidents/sync',
     syncMethod: 'POST',
     syncBodyKey: 'items',
     deletePath: '/api/ai-incidents/delete-batch',
-    thingsSourceTable: 'ai_incidents', // TODO: set to null if this table doesn't sync to things
+    thingsSourceTable: 'ai_incidents',
   },
 };
 

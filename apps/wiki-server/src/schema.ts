@@ -4830,6 +4830,7 @@ export const aiIncidents = pgTable(
     index("idx_ai_incidents_developer_org").on(table.developerOrgId),
     index("idx_ai_incidents_reported_date").on(table.reportedDate),
     index("idx_ai_incidents_incident_date").on(table.incidentDate),
+    index("idx_ai_incidents_tags_gin").using("gin", table.tags),
   ],
 );
 

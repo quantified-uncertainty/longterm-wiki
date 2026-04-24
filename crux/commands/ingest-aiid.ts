@@ -30,6 +30,7 @@ import {
 } from "../lib/aiid/fetch.ts";
 import {
   buildAiidEntityNameMap,
+  buildEntityNameIndex,
   indexReportsByNumber,
   resolveIncidentReports,
   transformIncident,
@@ -51,14 +52,19 @@ async function fetchOurEntityIndex(
     );
   }
 
-  const index = new Map<string, string>();
+  const allRows: Array<{
+    title: string;
+    stableId: string | null;
+    aliases?: string[] | null;
+  }> = [];
   let offset = 0;
   const limit = 1000;
-  let fetched = 0;
-  // Defensive upper bound — at 1000/page this caps ingest at 10k orgs per
-  // run, which is far above the current ~3k catalog. If we grow past this,
-  // fail loudly rather than silently truncate.
-  for (let page = 0; page < 10; page++) {
+  // Hard upper bound — at 1000/page this caps ingest at 50k orgs per run.
+  // The current catalog is ~3k orgs (2026-04). If we grow past this, fail
+  // loudly rather than silently truncate attribution.
+  const MAX_PAGES = 50;
+  let page = 0;
+  for (; page < MAX_PAGES; page++) {
     const res = await exportEntities({
       limit,
       offset,
@@ -72,25 +78,28 @@ async function fetchOurEntityIndex(
       stableId: string | null;
       aliases?: string[] | null;
     }>;
-    for (const r of rows) {
-      if (!r.stableId) continue;
-      const primary = r.title?.trim();
-      if (primary) {
-        const key = primary.toLowerCase();
-        if (!index.has(key)) index.set(key, r.stableId);
-      }
-      for (const alias of r.aliases ?? []) {
-        const ak = alias?.trim().toLowerCase();
-        if (!ak) continue;
-        if (!index.has(ak)) index.set(ak, r.stableId);
-      }
-    }
-    fetched += rows.length;
+    allRows.push(...rows);
     if (rows.length < limit) break;
     offset += limit;
   }
+  // If we hit the page cap with a still-saturated last page, the catalog
+  // outgrew our pagination budget — abort instead of attributing on a
+  // truncated index.
+  if (page === MAX_PAGES) {
+    throw new Error(
+      `Entity catalog pagination saturated at ${MAX_PAGES} pages (${allRows.length} orgs). ` +
+        `Raise MAX_PAGES in fetchOurEntityIndex or revisit attribution strategy.`,
+    );
+  }
+  const index = buildEntityNameIndex(
+    allRows.map((r) => ({
+      name: r.title,
+      stableId: r.stableId,
+      aliases: r.aliases,
+    })),
+  );
   log(
-    `  Loaded ${fetched} org entities → ${index.size} name keys for attribution`,
+    `  Loaded ${allRows.length} org entities → ${index.size} name keys for attribution`,
   );
   return index;
 }
@@ -103,9 +112,7 @@ async function syncItemsInBatches(
   let total = 0;
   for (let i = 0; i < items.length; i += batchSize) {
     const chunk = items.slice(i, i + batchSize);
-    const res = await syncAiIncidents(
-      chunk as unknown as Array<Record<string, unknown>>,
-    );
+    const res = await syncAiIncidents(chunk);
     if (!res.ok) {
       throw new Error(
         `AIID sync batch failed at offset ${i}: ${res.message}`,
@@ -137,16 +144,14 @@ async function runIngest(
 
   // 1. Resolve archive path (download, or use local).
   let archivePath: string;
-  let snapshotUrl: string;
   if (typeof options.input === "string" && options.input.length > 0) {
     archivePath = options.input;
-    snapshotUrl = `file://${archivePath}`;
     const st = statSync(archivePath);
     log(
       `Using local archive ${archivePath} (${(st.size / (1024 * 1024)).toFixed(1)} MB)`,
     );
   } else {
-    snapshotUrl =
+    const snapshotUrl =
       typeof options.url === "string" && options.url.length > 0
         ? options.url
         : await discoverLatestSnapshotUrl();

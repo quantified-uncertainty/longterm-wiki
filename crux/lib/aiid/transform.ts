@@ -90,8 +90,21 @@ export interface AiIncidentSyncItem {
   }>;
 }
 
-/** Max chars before summary is truncated. Must stay <= MAX_SUMMARY_CHARS in route. */
+/**
+ * Max chars before summary is truncated. The route's Zod schema also caps
+ * `summary` at this same bound — keep them equal. The route imports this
+ * constant from here, so they cannot drift.
+ */
 export const SUMMARY_MAX_CHARS = 4000;
+
+/**
+ * Confidence assigned when AIID's own `entities` collection produces a
+ * deterministic case-insensitive name match against our entities catalog.
+ * Future LLM-based attribution should produce strictly lower values; the
+ * route's docstring describes a 0.7 threshold below which FKs must NOT
+ * be populated.
+ */
+export const DETERMINISTIC_MATCH_CONFIDENCE = 1.0;
 
 /**
  * Fields on AIID `reports` that carry the excluded full article body.
@@ -115,20 +128,31 @@ export function generateIncidentId(sourceIncidentId: string): string {
 
 /**
  * Build a case-insensitive name → stableId lookup from our entities catalog.
- * The caller supplies `(name, stableId)` pairs pulled from the wiki-server
- * entities table; we normalize keys to lowercase + trim.
+ * The caller supplies `(name, stableId, aliases?)` rows pulled from the
+ * wiki-server entities table; we normalize keys to lowercase + trim.
+ *
+ * `aliases` populate the same map under each alias key so AIID's display
+ * name match against any one of them resolves the entity. First-wins on
+ * collision (across primary names and aliases alike).
  */
 export function buildEntityNameIndex(
-  rows: Array<{ name: string; stableId: string | null }>,
+  rows: Array<{
+    name: string;
+    stableId: string | null;
+    aliases?: string[] | null;
+  }>,
 ): Map<string, string> {
   const idx = new Map<string, string>();
+  const tryAdd = (raw: string | undefined | null, stableId: string) => {
+    if (!raw) return;
+    const key = raw.trim().toLowerCase();
+    if (!key) return;
+    if (!idx.has(key)) idx.set(key, stableId);
+  };
   for (const r of rows) {
     if (!r.stableId) continue;
-    const key = r.name.trim().toLowerCase();
-    if (!key) continue;
-    // First wins: if two entities share a name, keep the one we saw first
-    // rather than silently picking a different match on re-runs.
-    if (!idx.has(key)) idx.set(key, r.stableId);
+    tryAdd(r.name, r.stableId);
+    for (const alias of r.aliases ?? []) tryAdd(alias, r.stableId);
   }
   return idx;
 }
@@ -192,6 +216,14 @@ export function sanitizeRawReport(
 }
 
 /**
+ * Hard cap on number of tags per incident. Must stay <= the route's Zod
+ * `tags.max(50)` limit; if AIID has a pathological incident with more
+ * entities than this, we truncate (sorted lex) rather than exceed and
+ * fail validation.
+ */
+export const MAX_TAGS_PER_INCIDENT = 50;
+
+/**
  * Build tags by capturing AIID's classification-adjacent fields: alleged
  * deployers, developers, and harmed parties. These become free-text tags
  * for now — a follow-up attribution pass turns the strong matches into
@@ -212,7 +244,7 @@ function buildTags(
   push(inc["Alleged deployer of AI system"]);
   push(inc["Alleged developer of AI system"]);
   push(inc["Alleged harmed or nearly harmed parties"]);
-  return Array.from(tags).sort();
+  return Array.from(tags).sort().slice(0, MAX_TAGS_PER_INCIDENT);
 }
 
 /** Tighten a free-form summary into the column budget without hard-breaking words. */
@@ -289,7 +321,7 @@ export function transformIncident(
     aiModelId: null,
     orgId: deployerMatch?.stableId ?? null,
     developerOrgId: developerMatch?.stableId ?? null,
-    attributionConfidence: hasAttribution ? 1.0 : null,
+    attributionConfidence: hasAttribution ? DETERMINISTIC_MATCH_CONFIDENCE : null,
     tags: buildTags(inc, opts.aiidEntityNames),
     // Store the full upstream incident + sanitized reports for future
     // attribution passes. Report bodies are stripped.
