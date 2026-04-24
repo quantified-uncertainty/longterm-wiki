@@ -347,6 +347,60 @@ describe("validateAllTables", () => {
     expect(results[0].displayErrors).toHaveLength(0);
   });
 
+  it("detects sid_ leak in source_check_verdicts using composite recordIdExtractor (QUA-661)", async () => {
+    mockFetchAllRecords.mockResolvedValue([
+      {
+        // No `id` column — identity is (recordType, recordId[, fieldName])
+        recordType: "fact",
+        recordId: "f_mwjUCVDWoA",
+        fieldName: null,
+        entityId: "sid_GLXKjYAEKw",
+        displayName: "sid_GLXKjYAEKw",        // leaked
+        entityDisplayName: "sid_GLXKjYAEKw", // leaked
+        verdict: "confirmed",
+      },
+      {
+        // Clean row — both display names are human-readable
+        recordType: "fact",
+        recordId: "f_2",
+        fieldName: "position",
+        entityId: "sid_anthropic",
+        displayName: "CEO fact",
+        entityDisplayName: "Anthropic",
+        verdict: "confirmed",
+      },
+    ]);
+
+    const specs = [
+      {
+        apiPath: "/api/sourcing/verdicts",
+        responseKey: "verdicts",
+        displayFields: [
+          { displayField: "displayName" },
+          { displayField: "entityDisplayName" },
+        ],
+        idFields: [],
+        maxLimit: 200,
+        recordIdExtractor: (record: Record<string, unknown>) =>
+          `${String(record.recordType ?? "unknown")}/${String(record.recordId ?? "unknown")}${record.fieldName ? `[${String(record.fieldName)}]` : ""}`,
+      },
+    ];
+
+    const results = await validateAllTables(specs);
+    expect(results).toHaveLength(1);
+    expect(results[0].displayErrors).toHaveLength(2);
+    // Both errors reference the same composite recordId since they're on the
+    // same row.
+    expect(results[0].displayErrors[0].recordId).toBe("fact/f_mwjUCVDWoA");
+    expect(results[0].displayErrors[0].field).toBe("displayName");
+    expect(results[0].displayErrors[0].value).toBe("sid_GLXKjYAEKw");
+    expect(results[0].displayErrors[1].recordId).toBe("fact/f_mwjUCVDWoA");
+    expect(results[0].displayErrors[1].field).toBe("entityDisplayName");
+    expect(results[0].displayErrors[1].value).toBe("sid_GLXKjYAEKw");
+    // The clean row is not flagged.
+    expect(results[0].idWarnings).toHaveLength(0);
+  });
+
   it("detects both display errors and ID warnings on the same record", async () => {
     mockFetchAllRecords.mockResolvedValue([
       {
