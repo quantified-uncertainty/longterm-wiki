@@ -1,0 +1,130 @@
+{
+  "table": "personnel",
+  "recordCount": 14,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-24T11:22:13.466Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 14,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "SCF9AWlU0X",
+      "personId": "7Md8X7LG9P",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Co-Founder & CEO",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "BBAo9otCsF",
+      "personId": "sid_zvMaj29XJk",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Executive Director",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "lj9h6g4PYB",
+      "personId": "BmZ5FYgdzt",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Technical Content Lead",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "XHV4nyZZVR",
+      "personId": "CkF19onxcE",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Government Affairs Director",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "fsUgfEhD9j",
+      "personId": "m87AXelAcn",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Government Relations Director",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "p6KgUJIEFk",
+      "personId": "d0sYFk4Zz4",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "External Affairs Director",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "aZE9afN773",
+      "personId": "GZMxKO570D",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Communications Director",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "9sTDjoOY1v",
+      "personId": "zm6ciQBsFr",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Chief of Staff",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "751CbiQ9p2",
+      "personId": "26Q92a6Dmx",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "National Advocacy Coordinator",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "Wl3eOhwt7v",
+      "personId": "PEStGrup5R",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Senior Policy Analyst",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "wlLhyjIkUf",
+      "personId": "Aeh2Wn4YDa",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Technical Policy Analyst",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "qEcgsWnuAK",
+      "personId": "gL8qV9Q0k2",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Research Fellow",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "PrHXGuTYje",
+      "personId": "sid_HZSUA7YGIw",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Affiliated Researcher",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    },
+    {
+      "id": "EvTf89OQuM",
+      "personId": "sid_ATFBoSnuqA",
+      "organizationId": "sid_V3NJg9djng",
+      "role": "Affiliated Researcher",
+      "source": "https://www.centeraipolicy.org/team",
+      "verdict": "none"
+    }
+  ]
+}
