@@ -1,66 +1,44 @@
 /**
- * Manifest record summarization (QUA-672).
+ * Build the per-record summary written to `data/tablebase-manifests/*.json`.
  *
- * Takes a record submitted to a `/sync` endpoint and returns a
- * human-readable summary for `data/tablebase-manifests/*.json`.
- *
- * Design rationale: the manifest is the audit trail reviewers see in PRs.
- * Earlier versions only kept a hand-picked allowlist of fields (id, role,
- * source, verdict) which omitted temporal fields like startDate/endDate
- * and triggered CodeRabbit "missing endDate" false-positives even when the
- * actual data on prod was correct. We now spread the full record, with
- * two transformations:
- *
- *   1. Long freetext fields are truncated so the manifest stays diff-able.
- *   2. The inline `sourcing` object is hoisted: verdict + evidence + confidence
- *      become top-level fields so reviewers don't have to drill in.
- *
- * Fields stored as null/undefined are dropped to keep manifests compact.
+ * Spreads every non-null field of the submitted record so reviewers can see
+ * temporal/lead/status fields directly, truncates a few bloat-prone freetext
+ * columns, and hoists `sourcing.{verdict,evidence,confidence}` to the top
+ * level. See QUA-672 for context.
  */
 
-const TRUNCATE_FIELDS = ['notes', 'background', 'description'] as const;
+const TRUNCATE_FIELDS = new Set(['notes', 'background', 'description']);
 const TRUNCATE_AT = 300;
 
-function truncateIfLong(value: unknown): unknown {
-  if (typeof value !== 'string') return value;
-  if (value.length <= TRUNCATE_AT) return value;
-  return `${value.slice(0, TRUNCATE_AT)}… [truncated, ${value.length - TRUNCATE_AT} more chars]`;
+function truncate(s: string): string {
+  if (s.length <= TRUNCATE_AT) return s;
+  return `${s.slice(0, TRUNCATE_AT)}… [truncated, ${s.length - TRUNCATE_AT} more chars]`;
 }
 
-/**
- * Build the manifest summary for a single submitted record.
- *
- * Always emits `id` first and `verdict` last (or 'none' when no sourcing
- * was attached) for stable diffs.
- */
+function truncateIfString(value: unknown): unknown {
+  return typeof value === 'string' ? truncate(value) : value;
+}
+
 export function summarizeRecordForManifest(
   r: Record<string, unknown>,
 ): Record<string, unknown> {
   const summary: Record<string, unknown> = {};
 
-  // 1. Spread non-null/undefined record fields, with truncation for bloat-prone freetext.
-  //    Skip `sourcing` and `claimIds` here — they're handled separately.
   for (const [key, value] of Object.entries(r)) {
     if (key === 'sourcing' || key === 'claimIds') continue;
     if (value === null || value === undefined) continue;
-    if ((TRUNCATE_FIELDS as readonly string[]).includes(key)) {
-      summary[key] = truncateIfLong(value);
-    } else {
-      summary[key] = value;
-    }
+    summary[key] = TRUNCATE_FIELDS.has(key) ? truncateIfString(value) : value;
   }
 
-  // 2. Hoist sourcing fields. Trim evidence the same way as freetext.
-  if (r.sourcing && typeof r.sourcing === 'object') {
-    const v = r.sourcing as Record<string, unknown>;
-    summary.verdict = v.verdict;
-    if (v.evidence !== undefined && v.evidence !== null) {
-      summary.evidence = truncateIfLong(v.evidence);
-    }
-    if (typeof v.confidence === 'number') {
-      summary.confidence = v.confidence;
-    }
+  const sourcing = r.sourcing;
+  if (sourcing && typeof sourcing === 'object') {
+    const s = sourcing as Record<string, unknown>;
+    summary.verdict = s.verdict;
+    if (typeof s.evidence === 'string') summary.evidence = truncate(s.evidence);
+    if (typeof s.confidence === 'number') summary.confidence = s.confidence;
   } else {
+    // Backward-compat: existing manifests use 'none' for absent sourcing;
+    // validate-sourcing-coverage and PR reviewers both rely on this sentinel.
     summary.verdict = 'none';
   }
 
