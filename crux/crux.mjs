@@ -135,6 +135,7 @@ import * as sessionFinalizeCommands from './commands/session-finalize.ts';
 import * as dispatchCommands from './commands/dispatch.ts';
 import * as auditCommands from './commands/audit.ts';
 import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
+import * as aiidCommands from './commands/ingest-aiid.ts';
 
 const domains = {
   validate: validateCommands,
@@ -233,6 +234,7 @@ const domains = {
   'session-finalize': sessionFinalizeCommands,
   dispatch: dispatchCommands,
   audit: auditCommands,
+  aiid: aiidCommands,
 };
 
 const shortcutMap = buildShortcutMap();

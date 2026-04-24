@@ -2685,6 +2685,7 @@ export const VALID_THING_TYPES = [
   "safety-framework-version",
   "framework-threshold",
   "framework-diff",
+  "ai_incident",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -4743,5 +4744,119 @@ export const pendingBenchmarkLinks = pgTable(
       table.modelSystemCardId,
       table.citedNameNormalized,
     ),
+  ],
+);
+
+// ============================================================================
+// AI Incidents — Phase 6 of QUA-687 (QUA-693)
+//
+// Mirrors the MIT AI Incident Database (AIID; CC-BY-SA 4.0). OECD AI Incident
+// Monitor ingest deferred to Phase 7 pending structured-export verification.
+//
+// Per AIID license, the `reports.text` field is explicitly EXCLUDED from
+// CC-BY-SA. We mirror report URL/title/publisher/published_at only — never
+// the article body. validate-aiid-no-report-text.ts defends this invariant.
+//
+// Attribution FKs (`ai_model_id`, `org_id`, `developer_org_id`) populate only
+// when `attribution_confidence >= 0.7` AND the candidate resolves to an
+// existing entity; NULL is correct when ambiguous.
+// ============================================================================
+
+export const aiIncidents = pgTable(
+  "ai_incidents",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** 'mit-aiid' today; 'oecd-aim' when Phase 7 lands. CHECK-constrained. */
+    source: varchar("source", { length: 16 }).notNull(),
+    /** Upstream identifier, composite-unique with `source` for idempotent upsert. */
+    sourceIncidentId: varchar("source_incident_id", { length: 128 }).notNull(),
+    /** Date the incident was first reported (when upstream recorded it). */
+    reportedDate: date("reported_date"),
+    /** Date the underlying incident occurred (often different from reportedDate). */
+    incidentDate: date("incident_date"),
+    /** Normalized: low|medium|high|critical. AIM supplies this natively; AIID not. */
+    severity: varchar("severity", { length: 32 }),
+    /** Raw upstream severity label before normalization. */
+    upstreamSeverity: varchar("upstream_severity", { length: 64 }),
+    title: text("title").notNull(),
+    /** Short summary, <=2000 chars. NOT the full report body. */
+    summary: text("summary").notNull(),
+    fullReportUrl: text("full_report_url"),
+    /** FK → entities.stable_id for the attributed model. Null when unresolved. */
+    aiModelId: text("ai_model_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the alleged deployer. Null when unresolved. */
+    orgId: text("org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the model's developer. Null when unresolved. */
+    developerOrgId: text("developer_org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** LLM attribution confidence [0.00, 1.00]. FKs only populated when >= 0.7. */
+    attributionConfidence: numeric("attribution_confidence", {
+      precision: 3,
+      scale: 2,
+    }),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    /** Full upstream record for auditing / future backfills. */
+    raw: jsonb("raw").notNull(),
+    /** When we fetched the upstream snapshot containing this row. */
+    upstreamFetchedAt: timestamp("upstream_fetched_at", {
+      withTimezone: true,
+    }).notNull(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_ai_incidents_source_incident").on(
+      table.source,
+      table.sourceIncidentId,
+    ),
+    index("idx_ai_incidents_source").on(table.source),
+    index("idx_ai_incidents_ai_model").on(table.aiModelId),
+    index("idx_ai_incidents_org").on(table.orgId),
+    index("idx_ai_incidents_developer_org").on(table.developerOrgId),
+    index("idx_ai_incidents_reported_date").on(table.reportedDate),
+    index("idx_ai_incidents_incident_date").on(table.incidentDate),
+  ],
+);
+
+/**
+ * Reports are a 1:N join off incidents. AIID averages ~12 reports/incident.
+ * We store URL/title/publisher/published_at ONLY — the `text` field on the
+ * AIID reports collection is CC-BY-SA excluded and must never land here.
+ */
+export const aiIncidentReports = pgTable(
+  "ai_incident_reports",
+  {
+    incidentId: varchar("incident_id", { length: 10 })
+      .notNull()
+      .references(() => aiIncidents.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title"),
+    publisher: text("publisher"),
+    publishedAt: date("published_at"),
+    language: varchar("language", { length: 8 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.incidentId, table.url] }),
+    index("idx_ai_incident_reports_published_at").on(table.publishedAt),
+  ],
+);
   ],
 );
