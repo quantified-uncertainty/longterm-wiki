@@ -343,6 +343,33 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: '/api/framework-diff-items/delete-batch',
     thingsSourceTable: null,
   },
+
+  // QUA-688: External scorecard mirror (FLI, SaferAI, AI Lab Watch, FMTI,
+  // Seoul Tracker). Parent + child shape — `scorecard_snapshots` is one row
+  // per (source, wave); `scorecard_grades` is one row per (snapshot, org,
+  // dimension). Neither syncs to `things` because they're aggregated /
+  // dimensional, not first-class entities.
+  'scorecard-snapshots': {
+    // Snapshots aren't keyed to an entity; the by-entity endpoint is unused.
+    // Kept consistent in case a discovery pass needs it later.
+    fetchByEntityPath: (id) => `/api/scorecard-snapshots/all?source=${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/scorecard-snapshots/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/scorecard-snapshots/delete-batch',
+    thingsSourceTable: null,
+  },
+
+  'scorecard-grades': {
+    fetchByEntityPath: (id) => `/api/scorecard-grades/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/scorecard-grades/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/scorecard-grades/delete-batch',
+    thingsSourceTable: null,
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form

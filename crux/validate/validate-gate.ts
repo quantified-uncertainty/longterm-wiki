@@ -521,6 +521,19 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
+    id: 'scorecard-refs',
+    name: 'Scorecard data integrity (is_latest invariant + entity refs)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-scorecard-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires the wiki-server (scorecard tables live only in PG).
+    // Skips silently when offline. QUA-688 — will promote to blocking once
+    // ingesters land and the data baseline stabilizes.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
     id: 'sid-display',
     name: 'No sid_ values in display name columns',
     command: 'npx',
