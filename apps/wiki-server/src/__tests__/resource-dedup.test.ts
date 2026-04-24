@@ -103,11 +103,11 @@ describe("pickCanonical", () => {
 });
 
 describe("dedupeFkColumns", () => {
-  it("collapses multiple FK constraints on the same (table, column)", () => {
+  it("collapses multiple FK constraints on the same (table, column, target)", () => {
     const fks: FkColumnInfo[] = [
-      { tableName: "page_citations", columnName: "resource_id", uniqueGroups: [] },
-      { tableName: "page_citations", columnName: "resource_id", uniqueGroups: [] },
-      { tableName: "entity_resources", columnName: "resource_id", uniqueGroups: [] },
+      { tableName: "page_citations", columnName: "resource_id", targetColumn: "id", uniqueGroups: [] },
+      { tableName: "page_citations", columnName: "resource_id", targetColumn: "id", uniqueGroups: [] },
+      { tableName: "entity_resources", columnName: "resource_id", targetColumn: "stable_id", uniqueGroups: [] },
     ];
     const out = dedupeFkColumns(fks);
     expect(out).toHaveLength(2);
@@ -115,6 +115,19 @@ describe("dedupeFkColumns", () => {
       "entity_resources",
       "page_citations",
     ]);
+  });
+
+  it("keeps two FKs on the same (table, column) when they target different resources columns", () => {
+    // Defensive: the degenerate case where one column has FKs to BOTH
+    // resources.id and resources.stable_id. Both must survive so the merge
+    // rewrites the value under whichever interpretation holds.
+    const fks: FkColumnInfo[] = [
+      { tableName: "weird_table", columnName: "resource_id", targetColumn: "id", uniqueGroups: [] },
+      { tableName: "weird_table", columnName: "resource_id", targetColumn: "stable_id", uniqueGroups: [] },
+    ];
+    const out = dedupeFkColumns(fks);
+    expect(out).toHaveLength(2);
+    expect(out.map((f) => f.targetColumn).sort()).toEqual(["id", "stable_id"]);
   });
 });
 
@@ -236,30 +249,43 @@ describeIntegration(
     });
 
     beforeEach(async () => {
-      // Reset isolated tables under the test schema.
+      // Reset isolated tables under the test schema. resources.stable_id
+      // is NOT NULL UNIQUE in prod (Phase A); the mixed-target test below
+      // exercises FKs to both id and stable_id forms.
       await sqlConn.unsafe(`
         DROP TABLE IF EXISTS ${SCHEMA}.resource_papers CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.entity_resources CASCADE;
+        DROP TABLE IF EXISTS ${SCHEMA}.publications CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.resources CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.things CASCADE;
 
         CREATE TABLE ${SCHEMA}.resources (
           id text PRIMARY KEY,
+          stable_id text NOT NULL UNIQUE,
           url text NOT NULL UNIQUE,
           created_at timestamptz NOT NULL DEFAULT now()
         );
 
-        -- entity_resources: regular FK, no uniqueness on resource_id.
+        -- entity_resources: regular FK on resources.id (legacy form).
         CREATE TABLE ${SCHEMA}.entity_resources (
           id serial PRIMARY KEY,
           entity_id text NOT NULL,
           resource_id text REFERENCES ${SCHEMA}.resources(id) ON DELETE CASCADE
         );
 
-        -- resource_papers: resource_id is the PK (at most one row per resource).
+        -- resource_papers: resource_id is the PK and references resources.id (legacy).
         CREATE TABLE ${SCHEMA}.resource_papers (
           resource_id text PRIMARY KEY REFERENCES ${SCHEMA}.resources(id) ON DELETE CASCADE,
           arxiv_id text
+        );
+
+        -- publications: QUA-549 Phase B.1 — FK targets resources.stable_id.
+        -- resource_id is unique (one publication per resource) so the merge
+        -- has to also handle the deduped-on-conflict path for stable_id FKs.
+        CREATE TABLE ${SCHEMA}.publications (
+          id serial PRIMARY KEY,
+          resource_id text UNIQUE REFERENCES ${SCHEMA}.resources(stable_id) ON DELETE SET NULL,
+          title text
         );
 
         -- things: cross-base index mirror — mergeCluster cleans up dup rows here
@@ -276,10 +302,10 @@ describeIntegration(
     it("merges a 3-row cluster with 5 FK refs split across 2 tables", async () => {
       // 3 resource rows with URL variants that collapse to the same key.
       await sqlConn.unsafe(`
-        INSERT INTO ${SCHEMA}.resources (id, url, created_at) VALUES
-          ('r_canon', 'https://www.example.org/x',     '2024-01-01'),
-          ('r_dup1',  'http://example.org/x/',         '2024-02-01'),
-          ('r_dup2',  'https://example.org/x#frag',    '2024-03-01')
+        INSERT INTO ${SCHEMA}.resources (id, stable_id, url, created_at) VALUES
+          ('r_canon', 'sid_canon01', 'https://www.example.org/x',     '2024-01-01'),
+          ('r_dup1',  'sid_dup101',  'http://example.org/x/',         '2024-02-01'),
+          ('r_dup2',  'sid_dup201',  'https://example.org/x#frag',    '2024-03-01')
       `);
       // 5 FK refs split across 2 tables:
       //   entity_resources: 3 refs (2 on canonical, 1 on dup1)
@@ -321,17 +347,20 @@ describeIntegration(
           AND tc.table_schema = ${SCHEMA}
       `;
       // Map to FkColumnInfo. resource_papers.resource_id is a PK (single-column).
+      // Both FKs in this test target resources.id (legacy, pre-Phase B).
       const fkColumns: FkColumnInfo[] = fkRows.map((row) => {
         if (row.tablename === "resource_papers") {
           return {
             tableName: row.tablename,
             columnName: row.columnname,
+            targetColumn: "id",
             uniqueGroups: [{ otherCols: [] }],
           };
         }
         return {
           tableName: row.tablename,
           columnName: row.columnname,
+          targetColumn: "id",
           uniqueGroups: [],
         };
       });
@@ -400,9 +429,9 @@ describeIntegration(
     it("handles PK conflict: canonical already has a paper", async () => {
       // Canonical has a paper; dup also has one → dup's is deleted-on-conflict.
       await sqlConn.unsafe(`
-        INSERT INTO ${SCHEMA}.resources (id, url, created_at) VALUES
-          ('r_canon', 'https://www.example.org/y', '2024-01-01'),
-          ('r_dup',   'http://example.org/y/',    '2024-02-01');
+        INSERT INTO ${SCHEMA}.resources (id, stable_id, url, created_at) VALUES
+          ('r_canon', 'sid_pk_canon', 'https://www.example.org/y', '2024-01-01'),
+          ('r_dup',   'sid_pk_dup',   'http://example.org/y/',    '2024-02-01');
         INSERT INTO ${SCHEMA}.resource_papers (resource_id, arxiv_id) VALUES
           ('r_canon', 'arxiv-canon'),
           ('r_dup',   'arxiv-dup');
@@ -412,11 +441,13 @@ describeIntegration(
         {
           tableName: "resource_papers",
           columnName: "resource_id",
+          targetColumn: "id",
           uniqueGroups: [{ otherCols: [] }],
         },
         {
           tableName: "entity_resources",
           columnName: "resource_id",
+          targetColumn: "id",
           uniqueGroups: [],
         },
       ];
@@ -450,27 +481,23 @@ describeIntegration(
       });
     });
 
-    it("buildReport + loadResourceFks discover live FK metadata", async () => {
+    it("buildReport + loadResourceFks discover live FK metadata across both id and stable_id targets", async () => {
       await sqlConn.unsafe(`
-        INSERT INTO ${SCHEMA}.resources (id, url, created_at) VALUES
-          ('r_canon', 'https://www.example.org/z', '2024-01-01'),
-          ('r_dup',   'http://example.org/z/',    '2024-02-01'),
-          ('r_solo',  'https://unique.example/w', '2024-03-01');
+        INSERT INTO ${SCHEMA}.resources (id, stable_id, url, created_at) VALUES
+          ('r_canon', 'sid_meta_canon', 'https://www.example.org/z', '2024-01-01'),
+          ('r_dup',   'sid_meta_dup',   'http://example.org/z/',    '2024-02-01'),
+          ('r_solo',  'sid_meta_solo',  'https://unique.example/w', '2024-03-01');
         INSERT INTO ${SCHEMA}.entity_resources (entity_id, resource_id) VALUES
           ('e1', 'r_canon');
       `);
 
-      // Run helpers under the test schema's search_path.
-      // postgres.js connections have connection-level search_path via SET.
-      await sqlConn.unsafe(`SET search_path TO ${SCHEMA}, public`);
-
-      // Override the loader's 'public' schema filter by fetching via a
-      // dedicated connection where search_path is our test schema. The
-      // helper hardcodes schema='public' so we fetch manually here instead.
+      // QUA-589: discovery must surface BOTH id-targeting and stable_id-
+      // targeting FKs. Query exactly the helper's logic but scoped to the
+      // test schema (loadResourceFks itself hardcodes schema='public').
       const fkRows = await sqlConn<
-        { table_name: string; column_name: string }[]
+        { table_name: string; column_name: string; target_column: string }[]
       >`
-        SELECT DISTINCT tc.table_name, kcu.column_name
+        SELECT DISTINCT tc.table_name, kcu.column_name, ccu.column_name AS target_column
         FROM information_schema.table_constraints tc
         JOIN information_schema.key_column_usage kcu
           ON tc.constraint_name = kcu.constraint_name
@@ -480,12 +507,16 @@ describeIntegration(
           AND tc.table_schema = ccu.table_schema
         WHERE tc.constraint_type = 'FOREIGN KEY'
           AND ccu.table_name = 'resources'
-          AND ccu.column_name = 'id'
+          AND ccu.column_name IN ('id', 'stable_id')
           AND tc.table_schema = ${SCHEMA}
       `;
-      expect(fkRows.map((r) => r.table_name).sort()).toEqual([
-        "entity_resources",
-        "resource_papers",
+      const summary = fkRows
+        .map((r) => `${r.table_name}.${r.column_name}->${r.target_column}`)
+        .sort();
+      expect(summary).toEqual([
+        "entity_resources.resource_id->id",
+        "publications.resource_id->stable_id",
+        "resource_papers.resource_id->id",
       ]);
 
       // pickCanonical-style picking with refCount=1 for canonical, 0 for dup
@@ -495,6 +526,141 @@ describeIntegration(
         { id: "r_dup", refCount: 0, createdAt: "2024-02-01" },
       ];
       expect(pickCanonical(cluster).id).toBe("r_canon");
+    });
+
+    it("merges a cluster with FKs targeting both resources.id AND resources.stable_id (QUA-589)", async () => {
+      // QUA-589: post-Phase B, FKs target either resources.id (legacy) OR
+      // resources.stable_id (migrated). The merge must rewrite each FK using
+      // the right value type. This test asserts:
+      //   1. Legacy id-targeting FK (entity_resources) is rewritten id→id.
+      //   2. Phase B stable_id-targeting FK with a UNIQUE constraint
+      //      (publications) gets the deduped-on-conflict path AND the moved
+      //      row's value translated to canonical's stable_id.
+      await sqlConn.unsafe(`
+        INSERT INTO ${SCHEMA}.resources (id, stable_id, url, created_at) VALUES
+          ('r_canon', 'sid_mix_canon', 'https://www.example.org/m',  '2024-01-01'),
+          ('r_dup1',  'sid_mix_dup1',  'http://example.org/m/',      '2024-02-01'),
+          ('r_dup2',  'sid_mix_dup2',  'https://example.org/m#frag', '2024-03-01');
+
+        -- entity_resources (FK → resources.id, no uniqueness): 3 refs
+        --   1 on canonical, 1 on dup1, 1 on dup2 — all should land on canonical.
+        INSERT INTO ${SCHEMA}.entity_resources (entity_id, resource_id) VALUES
+          ('e1', 'r_canon'),
+          ('e2', 'r_dup1'),
+          ('e3', 'r_dup2');
+
+        -- publications (FK → resources.stable_id, UNIQUE on resource_id):
+        --   canonical has none; dup1 and dup2 each have one. The merge should
+        --   keep one (move it onto canonical's stable_id) and conflict-delete
+        --   the other.
+        INSERT INTO ${SCHEMA}.publications (resource_id, title) VALUES
+          ('sid_mix_dup1', 'paper-from-dup1'),
+          ('sid_mix_dup2', 'paper-from-dup2');
+
+        INSERT INTO ${SCHEMA}.things (id, source_table, source_id, title) VALUES
+          ('t_canon', 'resources', 'r_canon', 'canon'),
+          ('t_dup1',  'resources', 'r_dup1',  'dup1'),
+          ('t_dup2',  'resources', 'r_dup2',  'dup2');
+      `);
+
+      const fkColumns: FkColumnInfo[] = [
+        {
+          tableName: "entity_resources",
+          columnName: "resource_id",
+          targetColumn: "id",
+          uniqueGroups: [],
+        },
+        {
+          tableName: "publications",
+          columnName: "resource_id",
+          targetColumn: "stable_id",
+          // UNIQUE constraint on resource_id alone → otherCols is empty.
+          uniqueGroups: [{ otherCols: [] }],
+        },
+      ];
+
+      const merge = (await sqlConn.begin(async (tx) => {
+        return mergeCluster(
+          tx as unknown as CallableTransactionSql,
+          "r_canon",
+          ["r_dup1", "r_dup2"],
+          fkColumns,
+        );
+      })) as {
+        resourcesDeleted: number;
+        fkUpdates: Record<string, { moved: number; deletedOnConflict: number }>;
+      };
+
+      expect(merge.resourcesDeleted).toBe(2);
+
+      // entity_resources: 2 rows moved (e2, e3 onto r_canon), 0 conflicts.
+      expect(merge.fkUpdates["entity_resources.resource_id"]).toEqual({
+        moved: 2,
+        deletedOnConflict: 0,
+      });
+
+      // publications: dup1/dup2 each have a row (UNIQUE) → one survives + is
+      // rewritten to sid_mix_canon, the other is conflict-deleted.
+      expect(merge.fkUpdates["publications.resource_id"]).toEqual({
+        moved: 1,
+        deletedOnConflict: 1,
+      });
+
+      // Post-state: only canonical resource remains.
+      const remainingResources = await sqlConn<{ id: string }[]>`
+        SELECT id FROM ${sqlConn(SCHEMA)}.resources ORDER BY id
+      `;
+      expect(remainingResources.map((r) => r.id)).toEqual(["r_canon"]);
+
+      // entity_resources: all 3 rows now point at r_canon (id form).
+      const remainingEr = await sqlConn<{ entity_id: string; resource_id: string }[]>`
+        SELECT entity_id, resource_id FROM ${sqlConn(SCHEMA)}.entity_resources
+        ORDER BY entity_id
+      `;
+      expect(remainingEr).toHaveLength(3);
+      expect(remainingEr.every((r) => r.resource_id === "r_canon")).toBe(true);
+
+      // publications: 1 surviving row, rewritten to canonical's stable_id.
+      const remainingPubs = await sqlConn<{ resource_id: string; title: string }[]>`
+        SELECT resource_id, title FROM ${sqlConn(SCHEMA)}.publications
+      `;
+      expect(remainingPubs).toHaveLength(1);
+      expect(remainingPubs[0].resource_id).toBe("sid_mix_canon");
+      // The surviving title is whichever ctid won — both are valid.
+      expect(["paper-from-dup1", "paper-from-dup2"]).toContain(remainingPubs[0].title);
+    });
+
+    it("throws if a clustered resource has NULL stable_id and any FK targets stable_id (QUA-589)", async () => {
+      // Defensive: a duplicate with NULL stable_id can't be rewritten by the
+      // stable_id-targeting FK path. mergeCluster should refuse rather than
+      // silently leaving orphan child rows.
+      await sqlConn.unsafe(`
+        ALTER TABLE ${SCHEMA}.resources DROP CONSTRAINT resources_stable_id_key;
+        ALTER TABLE ${SCHEMA}.resources ALTER COLUMN stable_id DROP NOT NULL;
+        INSERT INTO ${SCHEMA}.resources (id, stable_id, url, created_at) VALUES
+          ('r_canon', 'sid_null_canon', 'https://www.example.org/n', '2024-01-01'),
+          ('r_dup',   NULL,             'http://example.org/n/',     '2024-02-01');
+      `);
+
+      const fkColumns: FkColumnInfo[] = [
+        {
+          tableName: "publications",
+          columnName: "resource_id",
+          targetColumn: "stable_id",
+          uniqueGroups: [{ otherCols: [] }],
+        },
+      ];
+
+      await expect(
+        sqlConn.begin(async (tx) => {
+          return mergeCluster(
+            tx as unknown as CallableTransactionSql,
+            "r_canon",
+            ["r_dup"],
+            fkColumns,
+          );
+        }),
+      ).rejects.toThrow(/NULL stable_id/);
     });
   }
 );
