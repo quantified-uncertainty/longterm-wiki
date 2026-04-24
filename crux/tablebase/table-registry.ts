@@ -286,6 +286,16 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: null,
     thingsSourceTable: null,
   },
+
+  'model-system-cards': {
+    fetchByEntityPath: (id) => `/api/model-system-cards/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/model-system-cards/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/model-system-cards/delete-batch',
+    thingsSourceTable: 'model_system_cards',
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form

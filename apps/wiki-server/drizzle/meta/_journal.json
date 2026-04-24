@@ -1436,6 +1436,13 @@
       "when": 1787300000000,
       "tag": "0204_qua_507_drop_things_denorm",
       "breakpoints": true
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1787386400000,
+      "tag": "0205_qua_690_model_system_cards",
+      "breakpoints": true
     }
   ]
 }

@@ -61,6 +61,7 @@ import { scannerResultsRoute } from "./scanner-results.js";
 import { secondaryMarketPricesRoute } from "./secondary-market-prices.js";
 import { talentFlowsRoute } from "./talent-flows.js";
 import { websiteSourcesRoute } from "./website-sources.js";
+import { modelSystemCardsRoute } from "./model-system-cards.js";
 
 /**
  * The widest Hono route type that still satisfies `app.route()`. Every
@@ -127,6 +128,7 @@ export const TABLEBASE_MOUNTS: readonly TablebaseMount[] = [
   { path: "/api/secondary-market-prices", route: secondaryMarketPricesRoute },
   { path: "/api/talent-flows", route: talentFlowsRoute },
   { path: "/api/website-sources", route: websiteSourcesRoute },
+  { path: "/api/model-system-cards", route: modelSystemCardsRoute },
 ];
 
 /**

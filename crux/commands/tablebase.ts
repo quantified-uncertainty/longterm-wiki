@@ -32,6 +32,7 @@ import { commands as websiteSourcesCommands } from './website-sources.ts';
 import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 import { commands as setupOrgCommands } from './setup-org.ts';
 import { commands as tbImporterCommands } from './tb-importers/index.ts';
+import { commands as systemCardsCommands } from './system-cards.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1496,6 +1497,9 @@ export const commands = {
   'openalex': tbImporterCommands['openalex'],
   'semantic-scholar': tbImporterCommands['semantic-scholar'],
   'crossref': tbImporterCommands['crossref'],
+  // QUA-690: system-card extraction.
+  'system-cards': systemCardsCommands.default,
+  'system-cards-extract': systemCardsCommands.extract,
 };
 
 export function getHelp(): string {
