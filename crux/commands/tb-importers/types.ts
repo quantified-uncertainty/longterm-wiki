@@ -16,7 +16,9 @@ export type EnrichmentTier = "T1" | "T2" | "T3";
 export type EnrichmentRecordType =
   | "funding-round"
   | "personnel"
-  | "benchmark-result";
+  | "benchmark-result"
+  | "publication"
+  | "organization-fact";
 
 /**
  * One record proposal. The propose endpoint validates `(source, recordType)`
@@ -51,6 +53,9 @@ export interface EnrichmentProposal {
    *   - personnel:     role, roleType, personDisplayName, orgDisplayName,
    *     source, notes, isFounder
    *   - benchmark-result: score, unit, date, sourceUrl, notes
+   *   - publication:    title, doi, publishedDate, venue, authors,
+   *     publicationType, url, notes
+   *   - organization-fact: property, value, valueType, source, notes
    */
   record: Record<string, unknown>;
   /**
