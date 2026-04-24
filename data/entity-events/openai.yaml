@@ -1,0 +1,76 @@
+# Entity events for OpenAI (E218)
+# Source: content/docs/knowledge-base/organizations/openai.mdx
+entityId: sid_1LcLlMGLbw
+entityDisplayName: OpenAI
+events:
+  - date: "2015"
+    title: Founded as non-profit with ~$1B founder commitment
+    eventType: founding
+    significance: major
+    description: Founding mission "AGI benefits all humanity"; "open by default" research publishing, "safety over competitive advantage."
+
+  - date: "2018"
+    title: GPT-1 released (117M parameters)
+    eventType: launch
+    significance: moderate
+    description: First transformer language model from OpenAI; established the architecture.
+
+  - date: "2019"
+    title: GPT-2 released (1.5B parameters)
+    eventType: launch
+    significance: major
+    description: Initially withheld due to misuse concerns; demonstrated growing capability of large language models.
+
+  - date: "2019"
+    title: Restructured to capped-profit LLC
+    eventType: pivot
+    significance: major
+    description: Created OpenAI LP capped-profit subsidiary to raise commercial capital while preserving the non-profit parent.
+
+  - date: "2020"
+    title: GPT-3 released (175B parameters)
+    eventType: launch
+    significance: major
+    description: Few-shot learning breakthrough that sparked the modern scaling race.
+
+  - date: "2022-11"
+    title: ChatGPT launched
+    eventType: launch
+    significance: major
+    description: InstructGPT/ChatGPT (GPT-3.5 + RLHF) drove mainstream AI adoption; established RLHF as a standard alignment technique.
+
+  - date: "2023-03"
+    title: GPT-4 released
+    eventType: launch
+    significance: major
+    description: Undisclosed multimodal model; human-level performance on many tasks; dangerous capabilities acknowledged.
+
+  - date: "2023-11"
+    title: Board crisis and Sam Altman ouster/return
+    eventType: leadership-change
+    significance: major
+    description: Brief removal of Sam Altman by the non-profit board, followed by his return; restructured board with commercial representation.
+
+  - date: "2024"
+    title: o1 reasoning model released
+    eventType: launch
+    significance: major
+    description: Advanced chain-of-thought; mathematical/scientific reasoning advances; raised hidden reasoning and deception risks.
+
+  - date: "2024"
+    title: o3 preview released
+    eventType: launch
+    significance: moderate
+    description: Next-generation reasoning model; near-frontier performance on some tasks.
+
+  - date: "2025"
+    title: o3-mini released
+    eventType: launch
+    significance: moderate
+    description: Efficient reasoning model; broader reasoning availability.
+
+  - date: "2025"
+    title: Converted to Public Benefit Corporation
+    eventType: pivot
+    significance: major
+    description: Converted from capped-profit LLC; cumulative funding reaches $59.9B (including $11B+ Microsoft and a $40B SoftBank round).

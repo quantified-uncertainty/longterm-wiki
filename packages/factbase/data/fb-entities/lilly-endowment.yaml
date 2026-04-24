@@ -49,5 +49,175 @@ facts:
         value: https://en.wikipedia.org/wiki/Lilly_Endowment,
         source: https://www.wikidata.org/wiki/Q6548359,
         notes: From Wikidata Q6548359
+      },
+    {
+        id: f_guCenpIsSQ,
+        property: revenue,
+        value: 2061897636,
+        asOf: "2023",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2023.
+      },
+    {
+        id: f_ZXKllFAwuQ,
+        property: annual-expenses,
+        value: 1580523182,
+        asOf: "2023",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2023.
+      },
+    {
+        id: f_0leXs34YjQ,
+        property: revenue,
+        value: 1915656584,
+        asOf: "2022",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2022.
+      },
+    {
+        id: f_exvFhRX6sg,
+        property: annual-expenses,
+        value: 1372463741,
+        asOf: "2022",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2022.
+      },
+    {
+        id: f_xWlxnFqWaA,
+        property: revenue,
+        value: 1327229144,
+        asOf: "2021",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2021.
+      },
+    {
+        id: f_K5JGOaBRCw,
+        property: annual-expenses,
+        value: 763728694,
+        asOf: "2021",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2021.
+      },
+    {
+        id: f_2XB6PHvhyQ,
+        property: revenue,
+        value: 929189401,
+        asOf: "2020",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2020.
+      },
+    {
+        id: f_aBhW3gwk9Q,
+        property: annual-expenses,
+        value: 822110444,
+        asOf: "2020",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2020.
+      },
+    {
+        id: f_vOodFCUs9w,
+        property: revenue,
+        value: 774168355,
+        asOf: "2019",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2019.
+      },
+    {
+        id: f_6nGHZlwCdQ,
+        property: annual-expenses,
+        value: 566066523,
+        asOf: "2019",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2019.
+      },
+    {
+        id: f_HRjETF7l8A,
+        property: revenue,
+        value: 573870254,
+        asOf: "2015",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2015.
+      },
+    {
+        id: f_yuaemRdPFQ,
+        property: annual-expenses,
+        value: 465071963,
+        asOf: "2015",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2015.
+      },
+    {
+        id: f_VWvre1cNfg,
+        property: revenue,
+        value: 553862010,
+        asOf: "2014",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2014.
+      },
+    {
+        id: f_7dR3UWjpuA,
+        property: annual-expenses,
+        value: 357168131,
+        asOf: "2014",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2014.
+      },
+    {
+        id: f_SxAt86ObEA,
+        property: revenue,
+        value: 284418612,
+        asOf: "2013",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2013.
+      },
+    {
+        id: f_YG4KZ6llkw,
+        property: annual-expenses,
+        value: 295277886,
+        asOf: "2013",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2013.
+      },
+    {
+        id: f_JSQyvUXHEA,
+        property: revenue,
+        value: 284122066,
+        asOf: "2012",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2012.
+      },
+    {
+        id: f_3m0k3MDO9w,
+        property: annual-expenses,
+        value: 254711388,
+        asOf: "2012",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2012.
+      },
+    {
+        id: f_SK8uA1rjtg,
+        property: revenue,
+        value: 302564008,
+        asOf: "2011",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total revenue for tax year 2011.
+      },
+    {
+        id: f_KntQ6Efhiw,
+        property: annual-expenses,
+        value: 231776725,
+        asOf: "2011",
+        source: https://projects.propublica.org/nonprofits/organizations/350868122,
+        notes: From IRS Form 990 (EIN 35-0868122). Total functional expenses for tax
+          year 2011.
       }
   ]

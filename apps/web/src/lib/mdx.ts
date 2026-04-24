@@ -255,7 +255,7 @@ async function compileFromPath(filePath: string, slug: string): Promise<MdxPage 
         parseFrontmatter: false,
         // next-mdx-remote v6 blocks JS expressions by default. Our MDX
         // content uses JSX components with JS attribute expressions
-        // (e.g. SquiggleEstimate code={...}), so we must allow them.
+        // (e.g. `<Calc expr={...}>`), so we must allow them.
         blockJS: false,
         mdxOptions: {
           remarkPlugins: [remarkGfm, remarkMath, remarkDirective, remarkCallouts],

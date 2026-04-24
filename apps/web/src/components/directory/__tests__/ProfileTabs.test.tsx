@@ -2,7 +2,7 @@
 /** ProfileTabs — verifies the single-tab short-circuit path (QUA-463). */
 import React from "react";
 import { describe, expect, it, vi } from "vitest";
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(),
@@ -10,10 +10,20 @@ vi.mock("next/navigation", () => ({
   useRouter: () => ({ replace: vi.fn(), push: vi.fn() }),
 }));
 
-import { ProfileTabs, type ProfileTab } from "@components/directory/ProfileTabs";
+import {
+  ProfileTabs,
+  type ProfileTab,
+  type ProfileTabGroup,
+} from "@components/directory/ProfileTabs";
 
-function tab(id: string, label: string, content: React.ReactNode, count?: number): ProfileTab {
-  return { id, label, content, count };
+function tab(
+  id: string,
+  label: string,
+  content: React.ReactNode,
+  count?: number,
+  extras: Partial<ProfileTab> = {},
+): ProfileTab {
+  return { id, label, content, count, ...extras };
 }
 
 describe("ProfileTabs", () => {
@@ -70,5 +80,83 @@ describe("ProfileTabs", () => {
       "People",
       "Projects5",
     ]);
+  });
+
+  describe("vertical layout + grouping", () => {
+    const groups: ProfileTabGroup[] = [
+      { id: "about", label: "About" },
+      { id: "business", label: "Business" },
+    ];
+
+    it("renders group headers in the order specified by `groups`", () => {
+      render(
+        <ProfileTabs
+          layout="vertical"
+          groups={groups}
+          tabs={[
+            tab("funding", "Funding", <div>f</div>, 3, { group: "business" }),
+            tab("overview", "Overview", <div>o</div>, undefined, { group: "about" }),
+            tab("people", "People", <div>p</div>, 12, { group: "about" }),
+          ]}
+        />,
+      );
+      const headers = screen
+        .getAllByText(/^(About|Business)$/)
+        .map((el) => el.textContent);
+      expect(headers).toEqual(["About", "Business"]);
+    });
+
+    it("renders icons next to labels and counts to the right", () => {
+      render(
+        <ProfileTabs
+          layout="vertical"
+          groups={groups}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>, undefined, {
+              group: "about",
+              icon: <svg data-testid="overview-icon" />,
+            }),
+            tab("people", "People", <div>p</div>, 12, { group: "about" }),
+          ]}
+        />,
+      );
+      expect(screen.getByTestId("overview-icon")).toBeTruthy();
+      // Count appears as bare number (no badge pill styling in vertical mode).
+      const peopleTab = screen.getByRole("tab", { name: /People/ });
+      expect(within(peopleTab).getByText("12")).toBeTruthy();
+    });
+
+    it("renders tabs without a group in a leading ungrouped bucket, no header", () => {
+      render(
+        <ProfileTabs
+          layout="vertical"
+          groups={groups}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("people", "People", <div>p</div>, undefined, { group: "about" }),
+          ]}
+        />,
+      );
+      // Ungrouped tab should render a tab element but no preceding "__ungrouped" label.
+      expect(screen.queryByText("__ungrouped")).toBeNull();
+      expect(screen.getAllByRole("tab")).toHaveLength(2);
+    });
+
+    it("falls back to the group id as the label when a group referenced by a tab isn't declared", () => {
+      render(
+        <ProfileTabs
+          layout="vertical"
+          groups={[{ id: "about", label: "About" }]}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>, undefined, { group: "about" }),
+            tab("other", "Other", <div>x</div>, undefined, { group: "extra" }),
+          ]}
+        />,
+      );
+      // "extra" group wasn't declared in `groups` but should still render as a
+      // fallback header using its id.
+      expect(screen.getByText("extra")).toBeTruthy();
+      expect(screen.getByText("About")).toBeTruthy();
+    });
   });
 });

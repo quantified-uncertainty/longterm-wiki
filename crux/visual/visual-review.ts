@@ -139,44 +139,10 @@ function analyzeMermaidSyntax(code: string): SyntaxIssue[] {
   return issues;
 }
 
-function analyzeSquiggleSyntax(code: string): SyntaxIssue[] {
-  const issues: SyntaxIssue[] = [];
-
-  // Check for point values in mixture()
-  const mixtureRegex = /mixture\s*\(([\s\S]*?)\)/g;
-  let match: RegExpExecArray | null;
-  while ((match = mixtureRegex.exec(code)) !== null) {
-    const args = match[1];
-    const bareNumbers = args.match(/(?<!\w)(\d+(?:\.\d+)?(?:e\d+)?)(?!\s*to\b)/g);
-    if (bareNumbers && bareNumbers.length > 0) {
-      issues.push({
-        severity: 'warning',
-        message:
-          'Point values in mixture() create jagged spikes. Use ranges like "X to Y" instead.',
-        fix: 'Replace bare numbers with ranges: 500e9 → 400e9 to 650e9',
-      });
-    }
-  }
-
-  // Check line count
-  const lineCount = code.split('\n').filter((l) => l.trim()).length;
-  if (lineCount > 30) {
-    issues.push({
-      severity: 'warning',
-      message: `Model is ${lineCount} lines (recommended max: 30). Consider splitting.`,
-      fix: 'Split into multiple SquiggleEstimate components.',
-    });
-  }
-
-  return issues;
-}
-
 function analyzeVisualSyntax(visual: ExtractedVisual): SyntaxIssue[] {
   switch (visual.type) {
     case 'mermaid':
       return analyzeMermaidSyntax(visual.code);
-    case 'squiggle':
-      return analyzeSquiggleSyntax(visual.code);
     default:
       return [];
   }
@@ -403,12 +369,9 @@ async function main(): Promise<void> {
         }
       }
 
-      // AI quality review (for Mermaid and Squiggle where we have the raw code)
+      // AI quality review (for Mermaid where we have the raw code)
       let qualityReview = null;
-      if (
-        verbose &&
-        (visual.type === 'mermaid' || visual.type === 'squiggle')
-      ) {
+      if (verbose && visual.type === 'mermaid') {
         qualityReview = await reviewWithAI(visual, page.title);
         if (qualityReview && !ci) {
           console.log(

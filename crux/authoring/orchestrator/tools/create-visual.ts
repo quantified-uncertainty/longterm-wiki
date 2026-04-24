@@ -16,7 +16,7 @@ export const tool: ToolRegistration = {
   definition: {
     name: 'create_visual',
     description:
-      'Analyze visual elements on the current page: Mermaid diagrams, Squiggle estimates, comparison tables, cause-effect graphs, and markdown tables. Returns counts and positions of existing visuals. Use this to decide whether the page needs more visual content before calling rewrite_section to add it. Cost: $0 (local analysis).',
+      'Analyze visual elements on the current page: Mermaid diagrams, comparison tables, cause-effect graphs, and markdown tables. Returns counts and positions of existing visuals. Use this to decide whether the page needs more visual content before calling rewrite_section to add it. Cost: $0 (local analysis).',
     input_schema: {
       type: 'object' as const,
       properties: {},

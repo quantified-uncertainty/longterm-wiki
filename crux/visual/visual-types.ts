@@ -26,7 +26,6 @@ export { countVisuals, extractVisuals } from '../lib/visual-detection.ts';
 
 export const GENERATABLE_VISUAL_TYPES = [
   'mermaid',
-  'squiggle',
   'cause-effect',
   'comparison',
   'disagreement',
@@ -51,11 +50,6 @@ export const VISUAL_COMPONENT_MAP: Record<
     component: 'MermaidDiagram',
     import: "import { MermaidDiagram } from '@components/wiki/MermaidDiagram';",
     propsType: 'chart: string',
-  },
-  squiggle: {
-    component: 'SquiggleEstimate',
-    import: "import { SquiggleEstimate } from '@components/wiki/SquiggleEstimate';",
-    propsType: 'title: string, code: string',
   },
   'cause-effect': {
     component: 'CauseEffectGraph',

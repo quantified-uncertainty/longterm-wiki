@@ -2,8 +2,50 @@ entity: sid_QFIL8r7vPA
 facts:
   - id: f_rwGRhie6mA
     property: description
-    value: A biosecurity nonprofit applying the Delay/Detect/Defend framework to protect against catastrophic pandemics,
-      including AI-enabled biological threats, through wastewater surveillance (Nucleic Acid Observatory) and AI
-      capability evaluations (Virology Capabilities Test). Co-founded by Kevin Esvelt, wh
+    value: A biosecurity nonprofit applying the Delay/Detect/Defend framework to
+      protect against catastrophic pandemics, including AI-enabled biological
+      threats, through wastewater surveillance (Nucleic Acid Observatory) and AI
+      capability evaluations (Virology Capabilities Test). Co-founded by Kevin
+      Esvelt.
     asOf: 2026-03
     notes: Migrated from old entity system
+  - id: f_xwrWbUvMXQ
+    property: revenue
+    value: 4319125
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). Total revenue for tax year 2023.
+  - id: f_w3SlUN88Og
+    property: annual-expenses
+    value: 2853790
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). Total functional expenses for tax
+      year 2023.
+  - id: f_aKJDiznL7Q
+    property: net-assets
+    value: 4715189
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). End-of-year net assets for tax year
+      2023.
+  - id: f_5vskSu1PbQ
+    property: revenue
+    value: 3436133
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). Total revenue for tax year 2022.
+  - id: f_nEFjwsawEQ
+    property: annual-expenses
+    value: 186279
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). Total functional expenses for tax
+      year 2022.
+  - id: f_Oqio91XzIA
+    property: net-assets
+    value: 3249854
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/883068255
+    notes: From IRS Form 990 (EIN 88-3068255). End-of-year net assets for tax year
+      2022.

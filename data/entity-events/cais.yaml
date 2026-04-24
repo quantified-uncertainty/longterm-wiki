@@ -1,0 +1,41 @@
+# Entity events for Center for AI Safety / CAIS (E47)
+# Source: content/docs/knowledge-base/organizations/cais.mdx
+entityId: sid_y4bieqSeag
+entityDisplayName: Center for AI Safety
+events:
+  - date: "2022"
+    title: Founded by Dan Hendrycks and Oliver Zhang
+    eventType: founding
+    significance: major
+    description: Nonprofit research organization (EIN 88-1751310) focused on technical AI safety research, field-building, and public communication.
+
+  - date: "2022"
+    title: '"Unsolved Problems in ML Safety" published'
+    eventType: publication
+    significance: major
+    description: Taxonomy of open technical challenges in machine learning safety, intended partly as a research agenda for the field.
+
+  - date: "2023"
+    title: Representation Engineering paper published
+    eventType: publication
+    significance: major
+    description: Methods for reading and steering model internal representations.
+
+  - date: "2023"
+    title: MACHIAVELLI benchmark released
+    eventType: publication
+    significance: moderate
+    description: Benchmark for evaluating goal-directed and deceptive behavior in AI systems.
+
+  - date: "2023-05"
+    title: Statement on AI Risk released
+    eventType: milestone
+    significance: major
+    description: One-sentence statement on AI extinction risk attracted signatures from over 350 AI researchers and industry figures, including Turing Award recipients (Hinton, Bengio, Russell) and CEOs of major AI labs (Altman, Amodei, Hassabis).
+
+  - date: "2024"
+    title: Reported revenue of $10.2M (FY2024)
+    eventType: milestone
+    significance: moderate
+    description: Cumulative funding reaches ~$33M since founding ($6.7M in 2022, $16.1M in 2023, $10.2M in 2024).
+    source: https://projects.propublica.org/nonprofits/organizations/881751310

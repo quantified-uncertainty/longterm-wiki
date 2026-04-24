@@ -31,6 +31,7 @@ function makeScratchDir(): string {
  */
 const NO_WORKER = {
   workerPkgJson: '/nonexistent-worker-pkg-json',
+  workerDockerfile: '/nonexistent-worker-dockerfile',
   workerSourceDir: '/nonexistent-crux-dir',
 };
 
@@ -559,6 +560,466 @@ describe('validate-workspace-dep-coverage', () => {
 
     expect(result.passed).toBe(true);
     expect(result.apps.find((a) => a.app === 'docker/worker')).toBeUndefined();
+  });
+
+  // ---------------------------------------------------------------------
+  // Dockerfile COPY tests — every file:./packages/<pkg> dep in the worker
+  // manifest must have a matching `COPY packages/<pkg>/` line in
+  // Dockerfile.worker, or `pnpm install --prod` fails at image build.
+  // QUA-654: the second half of the QUA-605 invariant.
+  // ---------------------------------------------------------------------
+
+  it('flags file: deps without a matching COPY line in Dockerfile.worker', () => {
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          '@longterm-wiki/forgotten': 'file:./packages/forgotten',
+        },
+      })
+    );
+
+    // Crux imports are fine — this test isolates the COPY-line check.
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'a.ts'),
+      `import { x } from '@longterm-wiki/url-utils';\n` +
+        `import { y } from '@longterm-wiki/forgotten';\n`
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n` +
+        // NOTE: forgotten/ COPY is missing on purpose.
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --prod\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.dockerCopy).toBeDefined();
+    expect(result.dockerCopy!.missingCopy).toEqual(['forgotten']);
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set(['url-utils', 'forgotten']));
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils']));
+    expect(result.errors).toBeGreaterThanOrEqual(1);
+  });
+
+  it('does not count COPY lines that appear after `RUN pnpm install` (CodeRabbit review on PR #4545)', () => {
+    // The COPY → install ordering matters: pnpm's `file:./packages/...`
+    // resolver runs at install time, so a COPY appearing after the install
+    // step can't satisfy the dep — the image build fails with
+    // "ENOENT: scandir '/deps/packages/<pkg>'". The parser must treat any
+    // late COPY as missing.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --prod\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.dockerCopy!.missingCopy).toEqual(['url-utils']);
+    expect(result.dockerCopy!.copied).toEqual(new Set());
+  });
+
+  it('counts COPY lines before `RUN pnpm install --frozen-lockfile`', () => {
+    // Companion to the above — verifies install-step recognition is robust
+    // to the most common flag variant we use in production Dockerfiles.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --frozen-lockfile --prod\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('passes when every worker file: dep has a matching COPY line', () => {
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'a.ts'),
+      `import { x } from '@longterm-wiki/url-utils';\n`
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY docker/worker/package.json ./\n` +
+        `RUN pnpm install --prod\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(true);
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('ignores workspace:* deps — only file: deps need a COPY line', () => {
+    // Sanity: the Dockerfile COPY check should not fire for `workspace:*`
+    // or `^1.0.0` deps, since those resolve via pnpm's workspace or npm
+    // registry and don't need a local packages/<pkg>/ directory.
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          // workspace:* and version-range deps should be ignored by the COPY check.
+          '@longterm-wiki/hoisted': 'workspace:*',
+          'zod': '^3.25.0',
+        },
+      })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(join(cruxDir, 'lib'), { recursive: true });
+    writeFileSync(
+      join(cruxDir, 'lib', 'a.ts'),
+      `import { x } from '@longterm-wiki/url-utils';\n` +
+        `import { y } from '@longterm-wiki/hoisted';\n`
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/url-utils/ ./packages/url-utils/\n` +
+        `RUN pnpm install --prod\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set(['url-utils']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('accepts COPY lines with --from, --chown, and --parents flags before the path', () => {
+    // Some Dockerfiles use `COPY --chown=user:group packages/foo/ ./packages/foo/`.
+    // The parser must tolerate flag args before the source path. CodeRabbit
+    // review on PR #4545 noted the original fixture only used --chown despite
+    // the test name advertising --from too — expanded to actually exercise
+    // --from, --chown, and the BuildKit --parents flag.
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          '@longterm-wiki/other': 'file:./packages/other',
+          '@longterm-wiki/parents': 'file:./packages/parents',
+        },
+      })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(cruxDir, { recursive: true });
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY --from=builder --chown=node:node packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY --chown=node:node packages/other/ ./packages/other/\n` +
+        `COPY --parents packages/parents/ ./packages/parents/\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils', 'other', 'parents']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('does not count COPY lines in comments', () => {
+    // A commented-out COPY line must not satisfy the coverage check —
+    // otherwise a reviewer commenting out a line to debug would silently
+    // re-introduce the QUA-605 failure mode.
+    scratch = makeScratchDir();
+    const emptyApps = join(scratch, 'apps-missing');
+
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const cruxDir = join(scratch, 'crux');
+    mkdirSync(cruxDir, { recursive: true });
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `# COPY packages/url-utils/ ./packages/url-utils/\n`
+    );
+
+    const result = runCheck({
+      appsDir: emptyApps,
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: cruxDir,
+    });
+
+    expect(result.passed).toBe(false);
+    expect(result.dockerCopy!.missingCopy).toEqual(['url-utils']);
+  });
+
+  it('skips the Dockerfile check entirely when the Dockerfile is missing', () => {
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+        },
+      })
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: join(scratch, 'Dockerfile.missing'),
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    // No Dockerfile means no coverage report — don't generate false errors.
+    expect(result.dockerCopy).toBeUndefined();
+    expect(result.errors).toBe(0);
+  });
+
+  it('warns when a @longterm-wiki/foo file: dep points to packages/bar, tracks the file path', () => {
+    // The file: path should match the package basename. A mismatch is a
+    // configuration error; we warn via onWarn AND track coverage by the
+    // file-path basename (what pnpm actually resolves against), not the
+    // declared name. Tracking by declared name would print a misleading
+    // "add COPY packages/<declared>" suggestion when the Dockerfile is
+    // actually already correct for what the file: path points at.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/wrong-name',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY packages/wrong-name/ ./packages/wrong-name/\n`
+    );
+
+    const warnings: string[] = [];
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+      onWarn: (m) => warnings.push(m),
+    });
+
+    expect(warnings.some((w) => /wrong-name/.test(w) && /url-utils/.test(w))).toBe(true);
+    // Coverage tracks the file-path basename (what pnpm needs), so the
+    // Dockerfile's `COPY packages/wrong-name/` correctly satisfies the dep.
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set(['wrong-name']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('ignores file: deps that do not point into packages/', () => {
+    // `file:./some-other-dir` is valid pnpm syntax but not something this
+    // validator handles — it's outside the packages/ tree so the COPY
+    // invariant doesn't apply. Must not match FILE_DEP_RE.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/weird': 'file:./some-other-dir',
+          '@longterm-wiki/bare': 'file:bare-sibling',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(dockerfile, `FROM node:20-slim AS deps\n`);
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.fileDeps).toEqual(new Set());
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
+  });
+
+  it('accepts valueless BuildKit flags (--link, --parents) before the COPY source', () => {
+    // `COPY --link packages/foo/ ./packages/foo/` is recommended for cache
+    // optimization. The parser must accept flags with AND without `=value`.
+    scratch = makeScratchDir();
+    const workerDir = join(scratch, 'worker');
+    mkdirSync(workerDir, { recursive: true });
+    const workerPkg = join(workerDir, 'package.json');
+    writeFileSync(
+      workerPkg,
+      JSON.stringify({
+        name: 'worker',
+        dependencies: {
+          '@longterm-wiki/url-utils': 'file:./packages/url-utils',
+          '@longterm-wiki/other': 'file:./packages/other',
+        },
+      })
+    );
+
+    const dockerfile = join(scratch, 'Dockerfile.worker');
+    writeFileSync(
+      dockerfile,
+      `FROM node:20-slim AS deps\n` +
+        `COPY --link packages/url-utils/ ./packages/url-utils/\n` +
+        `COPY --link --chown=node:node packages/other/ ./packages/other/\n`
+    );
+
+    const result = runCheck({
+      appsDir: join(scratch, 'apps-missing'),
+      workerPkgJson: workerPkg,
+      workerDockerfile: dockerfile,
+      workerSourceDir: join(scratch, 'crux-missing'),
+    });
+
+    expect(result.dockerCopy!.copied).toEqual(new Set(['url-utils', 'other']));
+    expect(result.dockerCopy!.missingCopy).toEqual([]);
   });
 
   it('skips symlinks without following them (no recursion loop)', () => {

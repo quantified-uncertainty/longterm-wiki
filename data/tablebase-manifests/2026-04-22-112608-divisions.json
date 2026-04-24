@@ -1,0 +1,30 @@
+{
+  "table": "divisions",
+  "recordCount": 2,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-22T11:26:08.806Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 2,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "Ine7nH1yZD",
+      "name": "CHAI Research",
+      "source": "https://humancompatible.ai/people",
+      "verdict": "none"
+    },
+    {
+      "id": "Ine7_H1yZD",
+      "name": "CHAI Research",
+      "source": "https://humancompatible.ai/people",
+      "verdict": "none"
+    }
+  ]
+}

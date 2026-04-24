@@ -17,6 +17,7 @@ import {
   paginationQuery,
   zv,
   clampedLimit,
+  qBool,
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
@@ -45,10 +46,7 @@ const VALID_PAGE_ROLES = [
 const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
-  enabled: z
-    .enum(["true", "false"])
-    .optional()
-    .transform((v) => (v === undefined ? undefined : v === "true")),
+  enabled: qBool.optional(),
 });
 
 const ByEntityQuery = z.object({

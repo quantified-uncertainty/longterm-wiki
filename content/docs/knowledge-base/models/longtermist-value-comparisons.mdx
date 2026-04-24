@@ -11,7 +11,7 @@ clusters:
   - ai-safety
   - community
 ---
-import {DataInfoBox, KeyQuestions, Mermaid, EntityLink, SquiggleEstimate} from '@components/wiki';
+import {DataInfoBox, KeyQuestions, Mermaid, EntityLink} from '@components/wiki';
 
 
 ## Overview
@@ -244,121 +244,11 @@ The table below expresses all pairwise comparisons as ratios. Read across a row 
 
 This model encodes the core value chain. All values are expressed in GEUs (\$1 to GiveWell = 1). The output dictionary shows the estimated GEU-per-dollar across all six comparison vehicles.
 
-<SquiggleEstimate title="Relative Longtermist Value Comparisons (GEUs per dollar)" code={`
-// Units: GEU = \$1 to GiveWell top charities (reference = 1)
-// 90% CI captures genuine uncertainty across longtermist worldviews
-
-// ═══ Philosophical parameters ═══
-// P(AI existential catastrophe): Carlsmith >10%, XPT survey ~5%, skeptics ~0.5%
-pXrisk = 0.01 to 0.40
-
-// Moral weight of future generations (0 = pure present-focus, 1 = full longtermist)
-futureMoralWeight = 0.2 to 1.0
-
-// ═══ Core tractability: how much does \$1M in AI safety move x-risk? ═══
-// Low end: AI safety has no measurable impact on x-risk per dollar
-// High end: robust tractability as per strong longtermist models
-// Combined into a single multiplier vs GiveWell (the key unknown)
-tractabilityVsGWE = 10 to 10^8   // log-uniform; the heart of the debate
-
-// ═══ Non-AI longtermist allocations ═══
-pandemicPrep = 3 to 300          // Neglected catastrophic risk; tractable
-farmAnimalWelfare = 0.001 to 100 // Almost entirely a moral-weight crux
-nuclearPolicy = 1 to 500         // X-risk, somewhat less neglected
-
-// ═══ AI safety vehicles ═══
-// Core value multiplier vs GiveWell (given longtermist assumptions)
-aiSafetyCore = pXrisk * futureMoralWeight * tractabilityVsGWE
-
-// Coefficient Navigating TAI Fund: professional, well-evaluated, dominant funder
-// Some counterfactual concern (alternative funders would cover some grants)
-coefficientTAI = aiSafetyCore * (0.5 to 2.0)
-
-// Long-Term Future Fund: fills neglected gaps, higher variance
-// Bimodal: either finds exceptional neglected work (5-10x) or duplicates Coefficient (0.3x)
-ltffMultiplier = mixture(0.3 to 1.5, 1.5 to 10, [0.6, 0.4])
-ltff = aiSafetyCore * ltffMultiplier
-
-// Anthropic stock (secondary market): near-zero safety impact, possible acceleration harm
-// Direct safety influence: ~0–5% of Coefficient TAI per dollar (no capital transfer)
-anthroInfluence = aiSafetyCore * (0 to 0.05)
-// Acceleration risk: sustaining high valuation may accelerate timelines
-anthroAccelRisk = -(aiSafetyCore * (0.001 to 0.40))
-anthropicSecondary = anthroInfluence + anthroAccelRisk
-
-// ═══ Output ═══
-{
-  "GiveWell Global Health": 1,
-  "Pandemic Preparedness": pandemicPrep,
-  "Farm Animal Welfare": farmAnimalWelfare,
-  "Nuclear Policy": nuclearPolicy,
-  "Coefficient TAI Fund": coefficientTAI,
-  "Long-Term Future Fund": ltff,
-  "Anthropic Stock (secondary)": anthropicSecondary
-}
-`} />
-
 ---
 
 ## Interactive Calculator
 
 Adjust the key parameters — P(x-risk), moral weight, tractability — to see how your assumptions change the relative values. The model is intentionally transparent: the ratio of Coefficient TAI Fund to GiveWell is almost entirely determined by three variables.
-
-<SquiggleEstimate title="Longtermist Value Calculator — adjust parameters to explore" showEditor={true} code={`
-// ════════════════════════════════════════════
-// LONGTERMIST VALUE CALCULATOR
-// Adjust the parameters below to match your worldview.
-// All outputs are in GEUs (GiveWell-Equivalent Units, reference = 1).
-// ════════════════════════════════════════════
-
-// ── YOUR KEY ASSUMPTIONS ─────────────────────
-// Change these to explore how conclusions depend on worldview
-
-// P(AI causes existential catastrophe by 2100):
-//   Carlsmith: >10%  |  Toby Ord: 10%  |  Skeptics: &lt;1%  |  XPT median: ~5%
-pXrisk = 0.10
-
-// Moral weight of future generations (relative to present people):
-//   Full longtermism: 1.0  |  Moderate discounting: 0.5  |  Pure present-focus: 0.0
-futureMoralWeight = 0.6
-
-// Tractability: how much does 1M USD in AI safety move x-risk?
-//   Optimistic: 1e-4% per 1M  |  Central: 1e-6% per 1M  |  Pessimistic: 1e-8% per 1M
-// Expressed as a multiplier vs GiveWell (10 = 10x better, 10^6 = million times better)
-tractabilityVsGWE = 1000
-
-// Counterfactual: fraction of Coefficient grants that would get funded anyway (by SFF, LTFF, etc.)
-// 0 = fully counterfactual, 0.5 = half would be funded elsewhere
-counterfactualDiscount = 0.3
-
-// ── DERIVED VALUES ───────────────────────────
-// Core AI safety value multiplier
-aiSafetyCore = pXrisk * futureMoralWeight * tractabilityVsGWE
-
-// Coefficient TAI Fund (adjusted for counterfactual)
-coefficientTAI = aiSafetyCore * (1 - counterfactualDiscount)
-
-// LTFF: assume 70% as counterfactual as Coefficient (more niche work)
-ltffCounterfactual = counterfactualDiscount * 0.3
-ltff = aiSafetyCore * (1 - ltffCounterfactual) * 1.2  // slight premium for gap-filling
-
-// Anthropic secondary stock: ~0–5% of Coefficient effectiveness, minus acceleration risk
-anthropicSafetyBenefit = coefficientTAI * 0.02
-anthropicAccelHarm = coefficientTAI * 0.15   // moderate acceleration concern
-anthropicSecondary = anthropicSafetyBenefit - anthropicAccelHarm
-
-// ── OUTPUTS ──────────────────────────────────
-{
-  "GiveWell Global Health (\$1)": 1,
-  "Pandemic Preparedness (\$1)": 20,
-  "Farm Animal Welfare (\$1)": 0.01 to 50,
-  "Coefficient TAI Fund (\$1)": coefficientTAI,
-  "Long-Term Future Fund (\$1)": ltff,
-  "Anthropic Stock Secondary (\$1)": anthropicSecondary,
-  "Ratio: Coefficient TAI / GiveWell": coefficientTAI,
-  "Ratio: LTFF / Coefficient TAI": ltff / coefficientTAI
-}
-`} />
 
 ---
 

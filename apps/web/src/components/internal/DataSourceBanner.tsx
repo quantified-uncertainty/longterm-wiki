@@ -6,13 +6,8 @@ interface DataSourceBannerProps {
 }
 
 export function DataSourceBanner({ source, apiError }: DataSourceBannerProps) {
-  if (source === "api") {
-    return (
-      <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-4">
-        Live data from wiki-server
-      </p>
-    );
-  }
+  // Success case is the expected default — no need to announce it.
+  if (source === "api") return null;
 
   if (!apiError || apiError.type === "not-configured") {
     return (

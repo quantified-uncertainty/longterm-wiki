@@ -48,6 +48,11 @@ const SCRIPTS = {
     description: 'Sync page assessments (quality, importance, ratings) to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
+  'sync-entity-events': {
+    script: 'wiki-server/sync-entity-events.ts',
+    description: 'Sync data/entity-events/*.yaml (org timelines) to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-coverage-scans': {
     script: 'wiki-server/sync-coverage-scans.ts',
     description: 'Compute entity coverage scores and sync to wiki-server',
@@ -99,6 +104,7 @@ Examples:
   crux sys wiki-server sync-session .claude/sessions/2026-02-21_my-branch.yaml
   crux sys wiki-server sync-sessions           Sync all session logs
   crux sys wiki-server sync-auto-update-runs   Sync all auto-update runs
+  crux sys wiki-server sync-entity-events      Sync org timelines from data/entity-events/
   crux sys wiki-server snapshot-resources      Export PG resources to snapshot JSON
 `;
 }

@@ -38,41 +38,318 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/522225921
-    notes: "FY 2024 Form 990 (EIN 52-2225921). Total expenses $3,368,137. Net assets $4,215,708. Revenue peaked at $3.8M in 2023."
+    notes: "FY 2024 Form 990 (EIN 52-2225921). Total expenses $3,368,137. Net assets
+      $4,215,708. Revenue peaked at $3.8M in 2023."
 
   - id: f_EcOoH0xzDh
     property: litigation
-    value: "Filed lawsuit (NACA v. RentGrow) against tenant screening company RentGrow for unfair and deceptive algorithmic practices under DC Consumer Protection Procedures Act. Survived motion to dismiss November 2024."
+    value: "Filed lawsuit (NACA v. RentGrow) against tenant screening company
+      RentGrow for unfair and deceptive algorithmic practices under DC Consumer
+      Protection Procedures Act. Survived motion to dismiss November 2024."
     asOf: 2024-11
     source: https://epic.org/documents/naca-v-rentgrow/
-    notes: "Filed Oct 1, 2024 with Richman Law & Policy and NACA. Alleges RentGrow generates screening reports with serious errors disproportionately affecting marginalized communities."
+    notes: "Filed Oct 1, 2024 with Richman Law & Policy and NACA. Alleges RentGrow
+      generates screening reports with serious errors disproportionately
+      affecting marginalized communities."
 
   - id: f_nj2oAQYBTN
     property: litigation
-    value: "Filed FTC complaint against OpenAI (Oct 29, 2024) urging investigation of GPTs and third-party APIs for failing to meet responsible AI standards, unsafe security/privacy practices, and perpetuating unfair and deceptive practices"
+    value: "Filed FTC complaint against OpenAI (Oct 29, 2024) urging investigation
+      of GPTs and third-party APIs for failing to meet responsible AI standards,
+      unsafe security/privacy practices, and perpetuating unfair and deceptive
+      practices"
     asOf: 2024-11
     source: https://epic.org/press-release-epic-files-complaint-urging-the-ftc-to-investigate-openais-gpts-and-third-party-apis/
 
   - id: f_twu71qJcbg
     property: litigation
-    value: "Filed FOIA lawsuit against OPM over DOGE access to federal personnel data containing personal information of millions of current and former federal workers (2025)"
+    value: "Filed FOIA lawsuit against OPM over DOGE access to federal personnel
+      data containing personal information of millions of current and former
+      federal workers (2025)"
     asOf: 2025
     source: https://epic.org/documents/epic-v-opm-information-security-violations/
 
   - id: f_QTgB4VySkD
     property: executive-compensation
-    value: "President Alan Butler received $210,350; Deputy Director Caitriona Fitzgerald received $197,410; Senior Counsel Jeramie Scott received $166,200; Senior Counsel John Davisson received $150,861"
+    value: "President Alan Butler received $210,350; Deputy Director Caitriona
+      Fitzgerald received $197,410; Senior Counsel Jeramie Scott received
+      $166,200; Senior Counsel John Davisson received $150,861"
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/522225921
 
   - id: f_N2luGXwXx2
     property: publications
-    value: "Publishes multiple books including Privacy in the Modern Age, Privacy Law Sourcebook, Privacy and Human Rights, and Litigation Under the Federal Open Government Laws. Also publishes monthly EPIC Alert newsletter."
+    value: "Publishes multiple books including Privacy in the Modern Age, Privacy
+      Law Sourcebook, Privacy and Human Rights, and Litigation Under the Federal
+      Open Government Laws. Also publishes monthly EPIC Alert newsletter."
     asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
 
   - id: f_BVwCCUQ2FG
     property: foia-track-record
-    value: "Prevailed in FOIA cases against CIA, DHS, Department of Education, FBI, NSA, ODNI, and TSA. EPIC v. DHS led to removal of x-ray body scanners from US airports; EPIC v. NSA resulted in release of NSA cybersecurity authority documents."
+    value: "Prevailed in FOIA cases against CIA, DHS, Department of Education, FBI,
+      NSA, ODNI, and TSA. EPIC v. DHS led to removal of x-ray body scanners from
+      US airports; EPIC v. NSA resulted in release of NSA cybersecurity
+      authority documents."
     asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
+  - id: f_j84p23kapg
+    property: revenue
+    value: 3816503
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2023.
+  - id: f_tpcyvkD7vw
+    property: annual-expenses
+    value: 3310717
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2023.
+  - id: f_TcGK7PyQPg
+    property: net-assets
+    value: 4571426
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2023.
+  - id: f_FJWyMiHKNQ
+    property: revenue
+    value: 2370686
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2022.
+  - id: f_lpQxcZEksA
+    property: annual-expenses
+    value: 2859359
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2022.
+  - id: f_4VbEuG2X0g
+    property: net-assets
+    value: 4010900
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2022.
+  - id: f_gulR8rL72Q
+    property: revenue
+    value: 2926682
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2021.
+  - id: f_FoChWQ93Jw
+    property: annual-expenses
+    value: 2175103
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2021.
+  - id: f_unrM1omtmA
+    property: net-assets
+    value: 4609081
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2021.
+  - id: f_fQOK6b6tdA
+    property: revenue
+    value: 2993652
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2020.
+  - id: f_ZEWocwqCLA
+    property: annual-expenses
+    value: 2142621
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2020.
+  - id: f_zIzxqMYu2w
+    property: net-assets
+    value: 3677088
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2020.
+  - id: f_vgu9am2OIw
+    property: revenue
+    value: 2347778
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2019.
+  - id: f_xszsgW5yNQ
+    property: annual-expenses
+    value: 2163350
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2019.
+  - id: f_vNNsdNtLnQ
+    property: net-assets
+    value: 2756643
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2019.
+  - id: f_TGFILThwjQ
+    property: revenue
+    value: 2099893
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2018.
+  - id: f_0FKQC5ZMkQ
+    property: annual-expenses
+    value: 2019030
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2018.
+  - id: f_zkLuNMknvA
+    property: net-assets
+    value: 2547138
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2018.
+  - id: f_OxmNiHJINg
+    property: revenue
+    value: 1715419
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2017.
+  - id: f_WwNOGxpHkg
+    property: annual-expenses
+    value: 1523199
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2017.
+  - id: f_r8k6TjdWhA
+    property: net-assets
+    value: 2621059
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2017.
+  - id: f_JBA4xlTxmQ
+    property: revenue
+    value: 1622722
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2016.
+  - id: f_eHNx09eAxg
+    property: annual-expenses
+    value: 1452735
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2016.
+  - id: f_LGsjKBqHig
+    property: net-assets
+    value: 2275806
+    asOf: "2016"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2016.
+  - id: f_XWMrIX3j2w
+    property: revenue
+    value: 1119662
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2015.
+  - id: f_gEe9o4Z5bA
+    property: annual-expenses
+    value: 1329127
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2015.
+  - id: f_HPfXKaXkxQ
+    property: net-assets
+    value: 2010960
+    asOf: "2015"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2015.
+  - id: f_eeTznqPxag
+    property: revenue
+    value: 1644839
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2014.
+  - id: f_7ND3qYAO4Q
+    property: annual-expenses
+    value: 1097815
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2014.
+  - id: f_f4iFpEMbLw
+    property: net-assets
+    value: 2273878
+    asOf: "2014"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2014.
+  - id: f_lD2qrSLo8w
+    property: revenue
+    value: 804145
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2013.
+  - id: f_mKOkNWSmOA
+    property: annual-expenses
+    value: 1129606
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2013.
+  - id: f_8EZvf9op4g
+    property: net-assets
+    value: 1663405
+    asOf: "2013"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2013.
+  - id: f_ECrEcA3KFA
+    property: revenue
+    value: 900041
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2012.
+  - id: f_Ic6V2NuvrA
+    property: annual-expenses
+    value: 1098886
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2012.
+  - id: f_fbU8BsHaNA
+    property: net-assets
+    value: 1916870
+    asOf: "2012"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2012.
+  - id: f_DxjI0AhSaw
+    property: revenue
+    value: 1151696
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total revenue for tax year 2011.
+  - id: f_un4zR4Vb6w
+    property: annual-expenses
+    value: 1098866
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). Total functional expenses for tax
+      year 2011.
+  - id: f_R9gXx9ckXQ
+    property: net-assets
+    value: 2038427
+    asOf: "2011"
+    source: https://projects.propublica.org/nonprofits/organizations/522225921
+    notes: From IRS Form 990 (EIN 52-2225921). End-of-year net assets for tax year
+      2011.

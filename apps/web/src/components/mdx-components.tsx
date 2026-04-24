@@ -10,7 +10,6 @@ import { Backlinks } from "@/components/wiki/Backlinks";
 import { DataExternalLinks } from "@/components/wiki/DataExternalLinks";
 import { InfoBox } from "@/components/wiki/InfoBox";
 import { ExternalLinks } from "@/components/wiki/ExternalLinks";
-import { SquiggleEstimate } from "@/components/wiki/SquiggleEstimate";
 import { Callout } from "@/components/wiki/Callout";
 import { StarlightCard, CardGrid, LinkCard } from "@/components/wiki/StarlightCards";
 import { ComparisonTable } from "@/components/wiki/ComparisonTable";
@@ -160,9 +159,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Mermaid — client-side rendered diagrams
   Mermaid: MermaidDiagram,
-
-  // Squiggle — probabilistic estimate visualizations
-  SquiggleEstimate,
 
   // Callout — rendered from :::note, :::tip, :::caution, :::danger directives
   Callout,

@@ -36,8 +36,8 @@ facts:
     property: description
     value: "Multi-stakeholder organization bringing together academics, civil
       society, industry, and media to advance understanding of AI technologies.
-      Founded by six major tech companies, PAI now has 138 partner
-      organizations and focuses on responsible AI practices and guidelines."
+      Founded by six major tech companies, PAI now has 138 partner organizations
+      and focuses on responsible AI practices and guidelines."
     asOf: 2026-03
     source: https://partnershiponai.org/about/
   - id: f_nRX8DIdvUb
@@ -61,7 +61,8 @@ facts:
     value: "143"
     asOf: 2026-03
     source: https://partnershiponai.org/partners/
-    notes: "143 partner organizations across tech companies, civil society, academia, and media"
+    notes: "143 partner organizations across tech companies, civil society,
+      academia, and media"
 
   - id: f_7cjV8ehCYn
     property: country
@@ -77,13 +78,155 @@ facts:
 
   - id: f_mzFQ2P1f6M
     property: program
-    value: "ABOUT ML — framework and resources for transparency reporting on machine learning systems"
+    value: "ABOUT ML — framework and resources for transparency reporting on machine
+      learning systems"
     asOf: 2023
     source: https://partnershiponai.org/workstream/about-ml/
     notes: "Key PAI workstream on ML documentation and transparency"
 
   - id: f_xxEEEDdNDP
     property: program
-    value: "Responsible AI Synthetic Media Framework — guidelines for responsible development and use of synthetic media and deepfakes"
+    value: "Responsible AI Synthetic Media Framework — guidelines for responsible
+      development and use of synthetic media and deepfakes"
     asOf: 2023
     source: https://partnershiponai.org/workstream/synthetic-media/
+  - id: f_k9iKKHV3Lg
+    property: revenue
+    value: 6455261
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2023.
+  - id: f_JV7W6er81Q
+    property: annual-expenses
+    value: 8001683
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2023.
+  - id: f_lvpj0pIMBg
+    property: net-assets
+    value: 6593207
+    asOf: "2023"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2023.
+  - id: f_ca03hbL6vQ
+    property: revenue
+    value: 6581231
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2022.
+  - id: f_SY27D4eIIQ
+    property: annual-expenses
+    value: 8001974
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2022.
+  - id: f_xzipDYyE1g
+    property: net-assets
+    value: 8139629
+    asOf: "2022"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2022.
+  - id: f_dXEu8MgRCw
+    property: revenue
+    value: 6018330
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2021.
+  - id: f_wvsfDznlWQ
+    property: annual-expenses
+    value: 8477867
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2021.
+  - id: f_5ncedmeooQ
+    property: net-assets
+    value: 9560372
+    asOf: "2021"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2021.
+  - id: f_b7pfg7cZbQ
+    property: revenue
+    value: 7720140
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2020.
+  - id: f_FKhI8xlUGQ
+    property: annual-expenses
+    value: 8483594
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2020.
+  - id: f_D7lHU6eh3w
+    property: net-assets
+    value: 12019909
+    asOf: "2020"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2020.
+  - id: f_PPPy6retxA
+    property: revenue
+    value: 6144178
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2019.
+  - id: f_lWHe1VkCEw
+    property: annual-expenses
+    value: 7247495
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2019.
+  - id: f_gjizHBwbAQ
+    property: net-assets
+    value: 12783363
+    asOf: "2019"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2019.
+  - id: f_FPMNopkFGg
+    property: revenue
+    value: 10248956
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2018.
+  - id: f_WBk6KVL3kA
+    property: annual-expenses
+    value: 2988025
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2018.
+  - id: f_89VZUv0hRA
+    property: net-assets
+    value: 13886680
+    asOf: "2018"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2018.
+  - id: f_Qj9hA8X8yQ
+    property: revenue
+    value: 7453964
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total revenue for tax year 2017.
+  - id: f_cWbKs7REbA
+    property: annual-expenses
+    value: 828215
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). Total functional expenses for tax
+      year 2017.
+  - id: f_CtEBoEtLdA
+    property: net-assets
+    value: 6625749
+    asOf: "2017"
+    source: https://projects.propublica.org/nonprofits/organizations/320518917
+    notes: From IRS Form 990 (EIN 32-0518917). End-of-year net assets for tax year
+      2017.

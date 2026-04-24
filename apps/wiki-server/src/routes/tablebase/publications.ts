@@ -6,6 +6,7 @@ import { publications } from "../../schema.js";
 import {
   zv,
   clampedLimit,
+  qBool,
 } from "../shared/utils.js";
 import {
   resolveEntityId,
@@ -52,14 +53,14 @@ const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 200),
   offset: z.coerce.number().int().min(0).default(0),
   publicationType: z.enum(VALID_PUBLICATION_TYPES).optional(),
-  flagshipOnly: z.coerce.boolean().optional(),
+  flagshipOnly: qBool.optional(),
 });
 
 const ByEntityQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   publicationType: z.enum(VALID_PUBLICATION_TYPES).optional(),
-  flagshipOnly: z.coerce.boolean().optional(),
+  flagshipOnly: qBool.optional(),
 });
 
 const SyncItemSchema = z.object({
