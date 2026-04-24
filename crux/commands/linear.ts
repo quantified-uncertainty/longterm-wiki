@@ -50,6 +50,7 @@ import {
   type OpenPrMatch,
   type RecentStartClaim,
 } from '../lib/linear/dedup.ts';
+import { detectRedFlags, formatRedFlagsWarning } from '../lib/linear/sizing-red-flags.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
 import { execSync } from 'child_process';
@@ -78,6 +79,11 @@ interface CommandOptions extends BaseOptions {
   // already ran the pre-check and shouldn't pay for it again (and
   // shouldn't mark the comment as forced). Not exposed on the CLI.
   skipDedupCheck?: boolean;
+  // Bypass ticket-sizing red-flag check on `crux linear create`. Without
+  // this, oversized-ticket patterns (Phase/Wave language, row-count
+  // batching, mixed shapes, multi-table enumeration) refuse the create.
+  // See QUA-575 + .claude/rules/ticket-sizing.md.
+  allowBig?: boolean;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -436,6 +442,27 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   // Resolve description from flag or file
   const descFromFile = readBodyFlag(options.descriptionFile);
   const description = descFromFile ?? options.description ?? '';
+
+  // Ticket-sizing red-flag detection (QUA-575). Refuses to create a ticket
+  // whose title/body contains patterns that empirically predict mid-session
+  // splits unless the caller passes --allow-big. See
+  // .claude/rules/ticket-sizing.md.
+  const flags = detectRedFlags(title, description);
+  if (flags.length > 0) {
+    const warning = formatRedFlagsWarning(flags);
+    if (!options.allowBig) {
+      // Refuse with exit 2 (distinct from 1 = other errors). Caller may
+      // re-run with --allow-big to bypass when the ticket is legitimately
+      // large and atomic.
+      return {
+        output: `${c.yellow}${warning}${c.reset}`,
+        exitCode: 2,
+      };
+    }
+    // --allow-big set: print the warning to stderr so it's visible in the
+    // session log without polluting --json output, and proceed to create.
+    process.stderr.write(warning);
+  }
 
   // Parse priority (Linear: 1=urgent, 2=high, 3=medium, 4=low)
   let priority: number | undefined;
@@ -1022,6 +1049,7 @@ Options (create):
   --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
   --parent=QUA-NNN           Parent issue (sets the child link to an epic)
   --project=<name|uuid>      Project (UUID or case-insensitive exact name)
+  --allow-big                Bypass the ticket-sizing red-flag check (see .claude/rules/ticket-sizing.md)
 
 Options (comment):
   --body-file=<path>  Comment body from file (safe for multiline / escaped content)
