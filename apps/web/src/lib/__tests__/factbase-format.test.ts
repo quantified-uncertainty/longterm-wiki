@@ -15,12 +15,12 @@ import type { Fact } from "@longterm-wiki/factbase";
 
 describe("formatKBNumber", () => {
   describe("with known unit (smart formatter)", () => {
-    it("formats USD billions", () => {
-      expect(formatKBNumber(5_500_000_000, "USD")).toBe("$5.5 billion");
+    it("formats USD billions in compact short", () => {
+      expect(formatKBNumber(5_500_000_000, "USD")).toBe("$5.5B");
     });
 
-    it("formats USD millions", () => {
-      expect(formatKBNumber(850_000_000, "USD")).toBe("$850 million");
+    it("formats USD millions in compact short", () => {
+      expect(formatKBNumber(850_000_000, "USD")).toBe("$850M");
     });
 
     it("formats percent", () => {
@@ -123,7 +123,7 @@ describe("formatKBFactValue", () => {
     it("formats large USD number with unit (property found)", () => {
       // employee-tender-offer with unit: USD
       const fact = makeFact("employee-tender-offer", { type: "number", value: 5_500_000_000 });
-      expect(formatKBFactValue(fact, "USD")).toBe("$5.5 billion");
+      expect(formatKBFactValue(fact, "USD")).toBe("$5.5B");
     });
 
     it("formats large number without unit using smart magnitude fallback", () => {
@@ -145,7 +145,7 @@ describe("formatKBFactValue", () => {
 
     it("formats range with USD unit (property found)", () => {
       const fact = makeFact("revenue", { type: "range", low: 1_000_000_000, high: 2_000_000_000 });
-      expect(formatKBFactValue(fact, "USD")).toBe("$1 billion\u2013$2 billion");
+      expect(formatKBFactValue(fact, "USD")).toBe("$1B\u2013$2B");
     });
   });
 
@@ -188,12 +188,12 @@ describe("formatKBFactValue", () => {
   describe("Bug #3305: JSON-wrapped nested FactValue objects", () => {
     it("unwraps nested number from json format", () => {
       const fact = makeFact("valuation", { type: "json", value: { type: "number", value: 500_000_000_000 } });
-      expect(formatKBFactValue(fact, "USD")).toBe("$500 billion");
+      expect(formatKBFactValue(fact, "USD")).toBe("$500B");
     });
 
     it("unwraps nested number with unit from json format", () => {
       const fact = makeFact("valuation", { type: "json", value: { type: "number", value: 500_000_000_000, unit: "USD" } });
-      expect(formatKBFactValue(fact)).toBe("$500 billion");
+      expect(formatKBFactValue(fact)).toBe("$500B");
     });
 
     it("unwraps nested text from json format", () => {
@@ -221,25 +221,26 @@ describe("formatKBFactValue", () => {
     it("formats 15B without raw digits (Meta AI infra-investment)", () => {
       const fact = makeFact("infrastructure-investment", { type: "number", value: 15_000_000_000 });
       const result = formatKBFactValue(fact, "USD");
-      expect(result).toBe("$15 billion");
+      expect(result).toBe("$15B");
       expect(result).not.toMatch(/\d{10,}/);
     });
 
-    it("formats 13.5B without raw digits", () => {
+    it("formats 13.5B without raw digits (≥10 drops decimal by convention)", () => {
       const fact = makeFact("infrastructure-investment", { type: "number", value: 13_500_000_000 });
       const result = formatKBFactValue(fact, "USD");
-      expect(result).toBe("$13.5 billion");
+      expect(result).toBe("$14B");
       expect(result).not.toMatch(/\d{10,}/);
     });
 
     it("formats 380B without raw digits (Anthropic valuation)", () => {
       const fact = makeFact("valuation", { type: "number", value: 380_000_000_000 });
       const result = formatKBFactValue(fact, "USD");
-      expect(result).toBe("$380 billion");
+      expect(result).toBe("$380B");
       expect(result).not.toMatch(/\d{10,}/);
     });
 
     it("formats large number without unit and produces no raw digits", () => {
+      // Fallback (no unit) still uses long form — "201 billion" is fine here.
       const fact = makeFact("parent-revenue", { type: "number", value: 200_970_000_000 });
       const result = formatKBFactValue(fact);
       expect(result).not.toMatch(/\d{10,}/);
