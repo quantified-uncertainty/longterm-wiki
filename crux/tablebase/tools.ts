@@ -208,6 +208,18 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
 // Tool handler implementations
 // ---------------------------------------------------------------------------
 
+/**
+ * Ensure a stableId has exactly one `sid_` prefix. Idempotent.
+ *
+ * Stored stableIds in `database.json` are already `sid_`-prefixed, so naive
+ * `SID_PREFIX + stableId` concatenation produces `sid_sid_XXX` which the
+ * wiki-server's `/sync` validators reject as "reference not found". This
+ * helper strips any existing prefix first, so callers can always prepend.
+ */
+export function ensureSidPrefix(value: string): string {
+  return SID_PREFIX + stripSid(value);
+}
+
 let _entityMatcher: ReturnType<typeof buildEntityMatcher> | null = null;
 
 function getEntityMatcher() {
@@ -260,7 +272,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
 
   if (!result.ok) return `Error: ${result.message}`;
   return JSON.stringify(result.data.results.map(r => ({
-    id: r.stableId ? SID_PREFIX + r.stableId : r.id,
+    id: r.stableId ? ensureSidPrefix(r.stableId) : r.id,
     slug: r.id,
     title: r.title,
     entityType: r.entityType,
@@ -287,7 +299,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
   // Try direct match first
   const match = matcher.match(name);
   if (match) {
-    return JSON.stringify({ found: true, stableId: SID_PREFIX + match.stableId, slug: match.slug, name: match.name });
+    return JSON.stringify({ found: true, stableId: ensureSidPrefix(match.stableId), slug: match.slug, name: match.name });
   }
 
   // Try matching with grantee normalization (strips Inc, LLC, etc.)
@@ -296,7 +308,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
     const m = matcher.match(granteeMatch);
     return JSON.stringify({
       found: true,
-      stableId: SID_PREFIX + granteeMatch,
+      stableId: ensureSidPrefix(granteeMatch),
       slug: m?.slug || '',
       name: m?.name || name,
       matchedVia: 'normalization',
@@ -318,7 +330,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const matcher = getEntityMatcher();
   const existing = matcher.match(name);
   if (existing) {
-    return JSON.stringify({ created: false, existing: true, stableId: SID_PREFIX + existing.stableId, name: existing.name });
+    return JSON.stringify({ created: false, existing: true, stableId: ensureSidPrefix(existing.stableId), name: existing.name });
   }
 
   // Generate sid_-prefixed stableId (no wikiId — not a full wiki entity)
