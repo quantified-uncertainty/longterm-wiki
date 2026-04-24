@@ -249,10 +249,9 @@ describeIntegration(
     });
 
     beforeEach(async () => {
-      // Reset isolated tables under the test schema. QUA-589: resources now
-      // has a UNIQUE stable_id column (Phase A QUA-536 made it NOT NULL +
-      // UNIQUE in prod) so FKs can target either id or stable_id. The
-      // mixed-target test case below exercises both forms in one cluster.
+      // Reset isolated tables under the test schema. resources.stable_id
+      // is NOT NULL UNIQUE in prod (Phase A); the mixed-target test below
+      // exercises FKs to both id and stable_id forms.
       await sqlConn.unsafe(`
         DROP TABLE IF EXISTS ${SCHEMA}.resource_papers CASCADE;
         DROP TABLE IF EXISTS ${SCHEMA}.entity_resources CASCADE;

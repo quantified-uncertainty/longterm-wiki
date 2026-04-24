@@ -232,19 +232,33 @@ export async function buildReport(
   // QUA-623: cap with a +1 sentinel so the caller can tell the scan was
   // partial. Dedup apply=true should refuse to run on a truncated report —
   // clusters past the cutoff would silently survive.
-  const rows = await sql<{ id: string; url: string; created_at: string }[]>`
-    SELECT id, url, created_at::text AS created_at FROM resources
+  // QUA-589: pull `stable_id` in the same scan so the FK refCount loop
+  // below can translate id↔stable_id without a second round-trip.
+  const rows = await sql<
+    { id: string; stable_id: string | null; url: string; created_at: string }[]
+  >`
+    SELECT id, stable_id, url, created_at::text AS created_at FROM resources
     LIMIT ${scanCap + 1}
   `;
   const { items: scanned, truncated } = applyTruncation(rows, scanCap);
 
   type Row = { id: string; url: string; createdAt: string };
   const groups = new Map<string, Row[]>();
+  // QUA-589: id↔stable_id translation maps. NULL stable_id rows are
+  // silently absent — they can't be referenced by any stable_id-targeting
+  // FK (the FK requires a target value), so their refCount under those
+  // FKs is genuinely 0. Phase A (QUA-536) made stable_id NOT NULL in prod.
+  const idToStable = new Map<string, string>();
+  const stableToId = new Map<string, string>();
   for (const r of scanned) {
     const key = dedupKey(r.url);
     const list = groups.get(key);
     if (list) list.push({ id: r.id, url: r.url, createdAt: r.created_at });
     else groups.set(key, [{ id: r.id, url: r.url, createdAt: r.created_at }]);
+    if (r.stable_id) {
+      idToStable.set(r.id, r.stable_id);
+      stableToId.set(r.stable_id, r.id);
+    }
   }
 
   const candidateIds = new Set<string>();
@@ -255,33 +269,6 @@ export async function buildReport(
   const refCounts = new Map<string, number>();
   if (candidateIds.size > 0) {
     const idsArr = [...candidateIds];
-
-    // QUA-589: FKs may target either resources.id or resources.stable_id.
-    // For stable_id-targeting FKs we have to translate the id-keyed
-    // candidateIds into their stable_id values before querying, then
-    // translate the matched FK values back to id when accumulating refCount
-    // (the refCount map is keyed by resources.id throughout).
-    //
-    // NULL stable_id in the cluster: silently filtered out below. This is
-    // correct — a resource row with NULL stable_id cannot be referenced by
-    // any stable_id-targeting FK (the FK constraint requires a target
-    // value), so its refCount under those FKs is genuinely 0. Phase A
-    // (QUA-536) made resources.stable_id NOT NULL in prod, so this filter
-    // is dead in prod and only fires in dev/test.
-    const needsStable = uniqueCols.some((f) => f.targetColumn === "stable_id");
-    const idToStable = new Map<string, string>();
-    const stableToId = new Map<string, string>();
-    if (needsStable) {
-      const mapRows = await sql<{ id: string; stable_id: string | null }[]>`
-        SELECT id, stable_id FROM resources WHERE id = ANY(${idsArr})
-      `;
-      for (const r of mapRows) {
-        if (r.stable_id) {
-          idToStable.set(r.id, r.stable_id);
-          stableToId.set(r.stable_id, r.id);
-        }
-      }
-    }
 
     for (const fk of uniqueCols) {
       const isStable = fk.targetColumn === "stable_id";
