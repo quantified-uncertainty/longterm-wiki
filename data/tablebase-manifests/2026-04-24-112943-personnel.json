@@ -1,0 +1,258 @@
+{
+  "table": "personnel",
+  "recordCount": 30,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-24T11:29:43.803Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 30,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "JHAY9AoJjb",
+      "personId": "9KmxgtbwgP",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "CEO",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "K5UHLOBe85",
+      "personId": "Au340YI5rh",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "COO",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "oeuD9y9j3Z",
+      "personId": "sid_p1P9oQwB6w",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Co-Founder",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "Etbh3iJZtj",
+      "personId": "A186Y0bWu1",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Director of Podcast",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "QISXeKoG5I",
+      "personId": "2cgoCX8z9B",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Director of Growth",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "tstaX9kqEb",
+      "personId": "1F3CY7z43R",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Web Programme Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "WveGQtkM8v",
+      "personId": "6wn62uJngh",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Director of Career Services",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "F40ZeKndAU",
+      "personId": "Fovzi9oRjz",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Head of Finance & Governance",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "LunHIKBc6C",
+      "personId": "h44XCICT7F",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Head of Video",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "n6tC6pvBdR",
+      "personId": "m7LhIByUGk",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Head of Business Operations",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "AFTRMA9hTv",
+      "personId": "G1M8jDFTnP",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Strategic Analysis Lead",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "En5DVgiNqQ",
+      "personId": "72vC2pqwVn",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Acting Director of Operations",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "jGk650gQZ5",
+      "personId": "VNg2Vsrftv",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Chief of Staff",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "eebMaRpKGw",
+      "personId": "3XDbpzs03N",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Marketing Lead",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "SKj99vtAYu",
+      "personId": "5XtOLvpfpa",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Recruiting Lead",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "lnPjjHXuSK",
+      "personId": "uQbFtW415u",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Headhunting Lead",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "hAC5BwNEtm",
+      "personId": "BioEVpuSgg",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Podcast Host",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "Pa6KxImAlq",
+      "personId": "FumfgA0lCi",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Podcast Host",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "KSm6LVzkln",
+      "personId": "Pmua4BufVX",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Researcher",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "PXPb0sWoNp",
+      "personId": "6wb9YrN2tt",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Researcher",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "cpiVfpADtV",
+      "personId": "ZPG1InWVhy",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "AI Product Engineer",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "AoyAb1C9UW",
+      "personId": "3EAXJ9Zqp6",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Board Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "Qye6gefVsS",
+      "personId": "9xc2m2qmdE",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Board Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "hitqW0DcR5",
+      "personId": "I2ZbHNYQPn",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Board Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "BJprxWHDnM",
+      "personId": "kJxOOZm1gn",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Board Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "S1xnxD91ab",
+      "personId": "96L8DYlsCu",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Board Director",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "7mPB94u2Eo",
+      "personId": "sid_8nmqy7vFiA",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "External Advisor",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "hPT9DgtwPr",
+      "personId": "sid_GAlcP90tvw",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "External Advisor",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "KVpXj4l82V",
+      "personId": "ZOSk5QE2wz",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "External Advisor",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    },
+    {
+      "id": "8ilOhnvxWH",
+      "personId": "9RjxR7SraS",
+      "organizationId": "sid_hvg9ecR3nA",
+      "role": "Advisor",
+      "source": "https://80000hours.org/about/meet-the-team/",
+      "verdict": "none"
+    }
+  ]
+}
