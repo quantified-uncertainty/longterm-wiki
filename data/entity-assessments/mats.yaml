@@ -1,0 +1,23 @@
+# Entity assessments for MATS (E548)
+# Source: content/docs/knowledge-base/organizations/mats.mdx (## Quick Assessment)
+entityId: sid_yYtGSTsXuw
+assessments:
+  - dimension: program-scale
+    rating: High
+    evidence: 98 scholars and 57 mentors in most recent cohort (MATS 8.0, Summer 2025)
+
+  - dimension: research-output
+    rating: Strong
+    evidence: 160+ publications, 8,000+ citations, h-index of 40 over 4 years
+
+  - dimension: career-impact
+    rating: Very High
+    evidence: 80% of alumni work in AI alignment; placements at Anthropic, OpenAI, DeepMind
+
+  - dimension: funding-per-scholar
+    rating: $27k
+    evidence: $15k stipend + $12k compute resources, plus housing and meals
+
+  - dimension: selectivity
+    rating: Very Competitive
+    evidence: ~15% acceptance rate; 40+ mentors with independent selection

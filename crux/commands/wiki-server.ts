@@ -53,6 +53,11 @@ const SCRIPTS = {
     description: 'Sync data/entity-events/*.yaml (org timelines) to wiki-server',
     passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
   },
+  'sync-entity-assessments': {
+    script: 'wiki-server/sync-entity-assessments.ts',
+    description: 'Sync data/entity-assessments/*.yaml (org Quick Assessment tables) to wiki-server',
+    passthrough: ['dryRun', 'dry-run', 'batchSize', 'batch-size'],
+  },
   'sync-coverage-scans': {
     script: 'wiki-server/sync-coverage-scans.ts',
     description: 'Compute entity coverage scores and sync to wiki-server',
