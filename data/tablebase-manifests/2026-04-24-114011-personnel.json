@@ -1,0 +1,162 @@
+{
+  "table": "personnel",
+  "recordCount": 18,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-24T11:40:11.486Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 18,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "OHjbBQrh9b",
+      "personId": "vnQdUi3fbV",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Co-Founder & General Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "2NDBBHAS1L",
+      "personId": "AO6b5sYv2N",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "ZUgEdaVXBI",
+      "personId": "9aceC2960V",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Co-Founder",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "5FaphUknrA",
+      "personId": "knk04lk8VT",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "General Partner",
+      "source": "https://www.cnbc.com/2024/12/03/peter-thiels-founders-fund-loses-early-partner-brian-singerman.html",
+      "verdict": "none"
+    },
+    {
+      "id": "E4bduXdRdt",
+      "personId": "QSIDdyCvnR",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "General Partner",
+      "source": "https://techcrunch.com/2024/12/03/brian-singerman-to-take-a-step-back-from-founders-fund/",
+      "verdict": "none"
+    },
+    {
+      "id": "l5ZSXpgD8Z",
+      "personId": "3sNljQsk9K",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner & COO",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "RuUYnxyvIr",
+      "personId": "JwL9IsFgtA",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "VlxA3vPSZH",
+      "personId": "KwocM1kLBm",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "8NhPWHmrXY",
+      "personId": "DnVs67ePC0",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "106KfJ2wSt",
+      "personId": "Y7y8FjJ6A9",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "8wM9RSixPC",
+      "personId": "JhrruIzX1T",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "I6NFh7M5Jx",
+      "personId": "I6BYJLaugT",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://techcrunch.com/2023/07/10/flexports-ryan-petersen-joins-venture-firm-founders-fund-as-a-partner/",
+      "verdict": "none"
+    },
+    {
+      "id": "lMDHNBW3gI",
+      "personId": "czGgpz9MiK",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner Emeritus",
+      "source": "https://techcrunch.com/2024/12/03/brian-singerman-to-take-a-step-back-from-founders-fund/",
+      "verdict": "none"
+    },
+    {
+      "id": "M4v85OSsZ3",
+      "personId": "OPRL2n6ELf",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://techcrunch.com/2024/01/09/keith-rabois-dishes-on-his-surprising-return-to-khosla-ventures-after-leaving-the-firm-in-2019-for-founders-fund/",
+      "verdict": "none"
+    },
+    {
+      "id": "MHnkKqkCsY",
+      "personId": "7OqhEXe2TX",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://techcrunch.com/2020/03/02/cyan-banister-leaves-founders-fund-for-long-journey-ventures/",
+      "verdict": "none"
+    },
+    {
+      "id": "yMVzH2seKw",
+      "personId": "Kx2j1JpQyw",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Partner",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "Son7ZqTCeW",
+      "personId": "tDuMgzAgIM",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Chief Marketing Officer",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    },
+    {
+      "id": "E0WsliG3bk",
+      "personId": "WtQtbPElM6",
+      "organizationId": "sid_LYfneQJbSA",
+      "role": "Chief Financial Officer",
+      "source": "https://en.wikipedia.org/wiki/Founders_Fund",
+      "verdict": "none"
+    }
+  ]
+}
