@@ -131,6 +131,8 @@ import * as linearCommands from './commands/linear.ts';
 import * as flagshipCurateCommands from './commands/flagship-curate.ts';
 import * as sessionFinalizeCommands from './commands/session-finalize.ts';
 import * as dispatchCommands from './commands/dispatch.ts';
+import * as auditCommands from './commands/audit.ts';
+import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
 
 const domains = {
   validate: validateCommands,
@@ -226,6 +228,7 @@ const domains = {
   'flagship-curate': flagshipCurateCommands,
   'session-finalize': sessionFinalizeCommands,
   dispatch: dispatchCommands,
+  audit: auditCommands,
 };
 
 const shortcutMap = buildShortcutMap();
@@ -483,6 +486,20 @@ async function main() {
     }
     process.exit(1);
   }
+
+  // Publish the current crux command so client.ts can stamp
+  // X-Agent-Tool on every wiki-server request (QUA-442). Set before
+  // the audit-session-id priming so both headers are ready by the
+  // time the command issues its first request.
+  if (!process.env.CRUX_COMMAND) {
+    process.env.CRUX_COMMAND = `${domain} ${commandName}`.trim();
+  }
+
+  // Prime the X-Agent-Session-Id cache (best-effort, never blocks on
+  // errors). Fire-and-forget into a bounded promise; individual
+  // commands that hit the server right away will await the same
+  // promise via the internal cache guard.
+  primeAuditSessionId().catch(() => {});
 
   // Run the command
   try {

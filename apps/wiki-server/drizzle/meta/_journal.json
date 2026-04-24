@@ -1457,6 +1457,13 @@
       "when": 1787559200000,
       "tag": "0207_qua_688_scorecard_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 210,
+      "version": "7",
+      "when": 1787818000000,
+      "tag": "0210_qua_442_audit_log_universal_trigger",
+      "breakpoints": true
     }
   ]
 }

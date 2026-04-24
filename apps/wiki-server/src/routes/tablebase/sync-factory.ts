@@ -59,6 +59,7 @@ import {
   type ThingSyncInput,
 } from "../shared/thing-sync.js";
 import { logAuditEntries } from "./audit-log.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 import {
   writeInlineVerdicts,
   logSourcingCoverage,
@@ -578,6 +579,11 @@ export function createSyncHandler<
       config.conflictSet ?? deriveConflictSet(table, allVals[0] ?? {});
 
     await db.transaction(async (tx) => {
+      // Seed universal-audit-log attribution (QUA-442) — `SET LOCAL` GUCs
+      // that the `audit_trigger_fn()` trigger reads. Scoped to this
+      // transaction; auto-resets on COMMIT/ROLLBACK.
+      await applyAuditContext(tx, c);
+
       // ---- Phase 3: upsert (chunked) + Phase 4: audit ----
       for (let offset = 0; offset < allVals.length; offset += chunkSize) {
         const chunk = allVals.slice(offset, offset + chunkSize);
