@@ -9,13 +9,14 @@
  * or be NULL. This validator catches cases where the enrichment pipeline
  * incorrectly stores a stableId as a display name.
  *
- * Checks all 6 tables with display name columns:
+ * Checks all 7 tables with display name columns:
  * - personnel: person_display_name, org_display_name
  * - grants: grantee_display_name, org_display_name
  * - funding_rounds: company_display_name, lead_investor_display_name
  * - investments: company_display_name, investor_display_name
  * - equity_positions: company_display_name, holder_display_name
  * - entity_events: entity_display_name
+ * - source_check_verdicts: display_name, entity_display_name (QUA-661)
  *
  * Also checks that raw ID fields (person_id, grantee_id, etc.) that contain
  * sid_-prefixed values have a resolved entity FK.
@@ -95,6 +96,12 @@ interface TableDisplaySpec {
   displayFields: DisplayFieldSpec[];
   idFields: IdFieldSpec[];
   maxLimit?: number;
+  /**
+   * Optional custom record ID extractor. Defaults to `record.id`. Used for
+   * tables like `source_check_verdicts` where the identity is a composite
+   * (recordType, recordId, fieldName) instead of a single `id` column.
+   */
+  recordIdExtractor?: (record: Record<string, unknown>) => string;
 }
 
 export const TABLE_DISPLAY_SPECS: TableDisplaySpec[] = [
@@ -173,6 +180,32 @@ export const TABLE_DISPLAY_SPECS: TableDisplaySpec[] = [
     idFields: [],
     maxLimit: 200,
   },
+  {
+    // QUA-661: catch sid_ leaks into verdict display columns. The server
+    // coerces sid_ to NULL on write, but this validator catches any historical
+    // rows written before that protection, or future write paths that bypass
+    // the POST /verdicts endpoint.
+    //
+    // `display_name_is_sid=true` pushes the filter to the server so we only
+    // paginate the (typically zero) leaked rows — not all ~14k verdict rows.
+    apiPath: "/api/sourcing/verdicts?display_name_is_sid=true",
+    responseKey: "verdicts",
+    displayFields: [
+      { displayField: "displayName" },
+      { displayField: "entityDisplayName" },
+    ],
+    // source_check_verdicts has no resolved-FK columns — entityId is the
+    // only ID-shaped column and is meant to hold a sid_, so we don't treat
+    // it as an ID warning.
+    idFields: [],
+    maxLimit: 200,
+    recordIdExtractor: (record) => {
+      const base = `${String(record.recordType ?? "unknown")}/${String(record.recordId ?? "unknown")}`;
+      return record.fieldName != null && record.fieldName !== ""
+        ? `${base}[${String(record.fieldName)}]`
+        : base;
+    },
+  },
 ];
 
 // ---------------------------------------------------------------------------
@@ -205,7 +238,9 @@ export async function validateTableDisplay(
   result.totalRecords = records.length;
 
   for (const record of records) {
-    const recordId = String(record.id ?? "unknown");
+    const recordId = spec.recordIdExtractor
+      ? spec.recordIdExtractor(record)
+      : String(record.id ?? "unknown");
 
     // Check display name columns for sid_ values — always an error
     for (const { displayField } of spec.displayFields) {

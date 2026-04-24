@@ -25,3 +25,4 @@ export { upsertThingsInTx, resolveEntityTitles, type ThingSyncInput } from "./th
 export { resolveEntityStableId } from "./entity-resolution.js";
 export { buildSearchCondition, parseSort, paginationMeta, type PaginationMeta } from "./query-helpers.js";
 export { validateEntityRefs, findMissingEntityRefs, type EntityRefField } from "./validate-entity-refs.js";
+export { coerceDisplayName } from "./display-name-coerce.js";

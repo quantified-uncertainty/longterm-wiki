@@ -13,11 +13,13 @@
  * the DB already has `needs_recheck: true` set).
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 import {
   shouldSkipAutoFlag,
   AUTO_FLAG_COOLDOWN_MS,
 } from "../routes/sourcing/sourcing.js";
+import { coerceDisplayName } from "../routes/shared/display-name-coerce.js";
+import { logger } from "../logger.js";
 
 // Re-parse the VerdictUpsertBody schema by importing it indirectly via a
 // known-good HTTP-level test would be ideal — but the schema is module-
@@ -110,5 +112,75 @@ describe("shouldSkipAutoFlag — cooldown helper (QUA-313)", () => {
     // diff is negative < cooldown → still skip (conservative).
     const updatedAt = new Date(now.getTime() + 60 * 1000); // 1 min in the future
     expect(shouldSkipAutoFlag(updatedAt, now)).toBe(true);
+  });
+});
+
+describe("coerceDisplayName — reject sid_ in display columns (QUA-661)", () => {
+  let warnSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    vi.restoreAllMocks();
+    warnSpy = vi.spyOn(logger, "warn").mockImplementation(() => logger);
+  });
+
+  it("returns null unchanged and does not log", () => {
+    expect(coerceDisplayName(null, "displayName", "fact", "f_abc")).toBeNull();
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("passes through a human-readable name without logging", () => {
+    expect(
+      coerceDisplayName("xAI", "entityDisplayName", "fact", "f_abc"),
+    ).toBe("xAI");
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("passes through a name that coincidentally contains 'sid' but isn't a sid_", () => {
+    expect(
+      coerceDisplayName("Consider this", "displayName", "fact", "f_abc"),
+    ).toBe("Consider this");
+    expect(
+      coerceDisplayName("sidwell-park", "displayName", "fact", "f_abc"),
+    ).toBe("sidwell-park");
+    expect(warnSpy).not.toHaveBeenCalled();
+  });
+
+  it("coerces a raw stableId to null and logs a warning", () => {
+    const result = coerceDisplayName(
+      "sid_GLXKjYAEKw",
+      "entityDisplayName",
+      "fact",
+      "f_mwjUCVDWoA",
+    );
+    expect(result).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+    const [payload, message] = warnSpy.mock.calls[0];
+    expect(payload).toMatchObject({
+      field: "entityDisplayName",
+      value: "sid_GLXKjYAEKw",
+      recordType: "fact",
+      recordId: "f_mwjUCVDWoA",
+    });
+    expect(String(message)).toMatch(/entityDisplayName/);
+  });
+
+  it("coerces displayName sid_ to null, independent of entityDisplayName", () => {
+    expect(
+      coerceDisplayName("sid_abcdefghij", "displayName", "grant", "g_1"),
+    ).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("coerces ANY sid_-prefixed string (permissive — catches malformed stableIds too)", () => {
+    // isSid() only checks the prefix — we mirror that behavior so an upstream
+    // bug that writes `sid_<anything>` still gets nulled out at this layer
+    // instead of leaking into the display column.
+    expect(
+      coerceDisplayName("sid_abcde", "displayName", "fact", "f_abc"),
+    ).toBeNull();
+    expect(
+      coerceDisplayName("sid_abcdefghij12345", "displayName", "fact", "f_abc"),
+    ).toBeNull();
+    expect(warnSpy).toHaveBeenCalledTimes(2);
   });
 });
