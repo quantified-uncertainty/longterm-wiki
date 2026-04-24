@@ -307,6 +307,80 @@ describe('linear create', () => {
       projectId: 'project-uuid',
     });
   });
+
+  // ── Ticket-sizing red flags (QUA-575) ────────────────────────────────────
+
+  it('refuses creation with exit=2 when title contains red-flag tokens', async () => {
+    const r = await commands.create(['Phase 2: closeout'], { ci: true });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('phase-or-wave');
+    expect(r.output).toContain('--allow-big');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses creation when description contains red-flag tokens', async () => {
+    const r = await commands.create(['Update tooling'], {
+      ci: true,
+      description: 'We need to migrate 5,000 facts into the new schema.',
+    });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('row-count-batching');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('does not warn on ordinary tickets', async () => {
+    const r = await commands.create(['Fix typo in README'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).not.toContain('red flag');
+    expect(createIssueMock).toHaveBeenCalled();
+  });
+
+  it('proceeds when --allow-big is set despite red flags', async () => {
+    // Capture stderr so the test environment doesn't print the warning.
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(
+        ['Phase 2: migrate 5,000 rows across `foo`, `bar`, `baz`'],
+        { ci: true, allowBig: true },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(createIssueMock).toHaveBeenCalled();
+      // Warning was printed to stderr (not stdout) so --json consumers don't see it.
+      expect(stderrSpy).toHaveBeenCalled();
+      const stderrContent = stderrSpy.mock.calls.map((c) => String(c[0])).join('');
+      expect(stderrContent).toContain('phase-or-wave');
+      expect(stderrContent).toContain('row-count-batching');
+      expect(stderrContent).toContain('multi-table-enumeration');
+    } finally {
+      stderrSpy.mockRestore();
+    }
+  });
+
+  it('detects all three flags from the canonical example', async () => {
+    const r = await commands.create(
+      ['Phase 2: migrate 5,000 rows across `foo`, `bar`, `baz`'],
+      { ci: true },
+    );
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('phase-or-wave');
+    expect(r.output).toContain('row-count-batching');
+    expect(r.output).toContain('multi-table-enumeration');
+  });
+
+  it('emits structured JSON on red-flag refusal when --json is set', async () => {
+    const r = await commands.create(['Phase 2: closeout'], {
+      ci: true,
+      json: true,
+    });
+    expect(r.exitCode).toBe(2);
+    // Output must be valid JSON — no ANSI color codes, no warning text.
+    const parsed = JSON.parse(r.output);
+    expect(parsed.error).toBe('ticket-sizing-red-flag');
+    expect(Array.isArray(parsed.flags)).toBe(true);
+    expect(parsed.flags[0].kind).toBe('phase-or-wave');
+    expect(parsed.hint).toContain('--allow-big');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------
