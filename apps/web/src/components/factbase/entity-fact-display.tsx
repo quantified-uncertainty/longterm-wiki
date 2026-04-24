@@ -115,6 +115,39 @@ export function CategoryFactSection({
           const property = getKBProperty(propertyId);
           const latestFact = facts[0];
 
+          const isMultiPoint = facts.length > 1;
+
+          // Single-point facts: render a plain row that links to the fact
+          // detail page. Skip the `<details>` chrome + 4-column sub-table —
+          // it's pure noise for 1-row data (QUA-671).
+          if (!isMultiPoint) {
+            return (
+              <div
+                key={propertyId}
+                id={propertyId}
+                className="scroll-mt-16 flex items-center gap-4 px-4 py-3 text-sm hover:bg-muted/20 transition-colors"
+              >
+                <span className="inline-flex items-center gap-1.5 font-semibold min-w-[10rem] text-foreground/90">
+                  <FactSourcingDot factId={latestFact.id} sourceUrl={latestFact.source} size="sm" />
+                  {property?.name ?? propertyId}
+                </span>
+                <span className="flex-1 text-muted-foreground truncate font-mono text-[13px]">
+                  <FactValueDisplay fact={latestFact} property={property} />
+                </span>
+                <span className="text-muted-foreground/60 text-xs whitespace-nowrap">
+                  {formatKBDate(latestFact.asOf)}
+                </span>
+                <Link
+                  href={`/factbase/fact/${latestFact.id}`}
+                  className="text-blue-600 hover:underline dark:text-blue-400 text-xs whitespace-nowrap"
+                  title={latestFact.id}
+                >
+                  view &rarr;
+                </Link>
+              </div>
+            );
+          }
+
           return (
             <details key={propertyId} id={propertyId} className="group scroll-mt-16">
               <summary className="flex items-center gap-4 px-4 py-3 cursor-pointer hover:bg-muted/30 text-sm select-none transition-colors">
@@ -128,11 +161,9 @@ export function CategoryFactSection({
                 <span className="text-muted-foreground/60 text-xs whitespace-nowrap">
                   {formatKBDate(latestFact.asOf)}
                 </span>
-                {facts.length > 1 && (
-                  <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
-                    {facts.length} pts
-                  </span>
-                )}
+                <span className="text-[10px] font-medium tabular-nums px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground whitespace-nowrap">
+                  {facts.length} pts
+                </span>
                 <span className="text-muted-foreground/50 text-xs group-open:rotate-90 transition-transform">
                   &#9654;
                 </span>
@@ -152,7 +183,9 @@ export function CategoryFactSection({
                     <tr className="text-xs text-muted-foreground border-b border-border">
                       <th className="text-left py-1 pr-3 font-medium">As Of</th>
                       <th className="text-left py-1 pr-3 font-medium">Value</th>
-                      <th className="text-left py-1 pr-3 font-medium">Fact ID</th>
+                      {/* "Fact ID" header dropped (QUA-671) — the cell shows "view →",
+                          not an ID, so the label was misleading. */}
+                      <th className="text-left py-1 pr-3 font-medium w-12 sr-only">Link</th>
                       <th className="text-left py-1 font-medium w-5"></th>
                     </tr>
                   </thead>

@@ -18,7 +18,11 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
-import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
+import {
+  formatCompactCurrency,
+  formatCompactNumber,
+  sanitizeRawLargeNumbers,
+} from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
 import {
@@ -27,6 +31,7 @@ import {
   isOpaqueLegacyFactId,
   isLegacyResourceId,
 } from "./sanitize-raw-ids";
+import { formatFactValueString } from "./format-cell-value";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 
@@ -433,6 +438,20 @@ function CellValue({
     }
   }
 
+  // Facts `value` is a text column that stringifies number facts to
+  // "70000000000" and similar. Format pure-numeric entries so the Database
+  // tab never renders a bare 10+ digit run.
+  if (columnName === "value" && typeof value === "string") {
+    const formatted = formatFactValueString(value, (row?.currency as string) ?? null);
+    if (formatted !== null) {
+      return (
+        <span className="text-[11px] tabular-nums font-medium whitespace-nowrap" title={value}>
+          {formatted}
+        </span>
+      );
+    }
+  }
+
   // Generic number values (real/doublePrecision columns arrive as typeof number)
   if (typeof value === "number" && isFinite(value)) {
     const formatted = Math.abs(value) >= 1000
@@ -463,7 +482,14 @@ function CellValue({
     );
   }
 
-  const str = String(value);
+  let str = String(value);
+
+  // Older composed things.description rows embed raw numeric literals
+  // (e.g. "Internal Revenue: 1700000000"). Rewrite at render time so the
+  // Database tab heals without a full facts re-sync.
+  if (columnName === "description" && typeof value === "string") {
+    str = sanitizeRawLargeNumbers(str);
+  }
 
   // Long text -> expandable with line-clamp
   if (str.length > 80) {

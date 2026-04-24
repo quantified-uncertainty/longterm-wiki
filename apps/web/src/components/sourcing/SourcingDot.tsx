@@ -33,7 +33,7 @@ interface SourcingDotProps {
   error?: string | null;
   /** Optional: original verdict string for additional context */
   originalVerdict?: string | null;
-  /** Dot size: sm = 6px (inline), md = 8px (table cell) */
+  /** Dot size: sm = 6px (inline/table), md = 10px (cards/headers, QUA-670) */
   size?: "sm" | "md";
   /** Link to sourcing detail page. When provided, the element becomes clickable. */
   href?: string;
@@ -95,7 +95,7 @@ export function SourcingDot({
   className = "",
 }: SourcingDotProps) {
   const config = SOURCE_CHECK_STATUS_CONFIG[status];
-  const dotSize = size === "md" ? "w-[7px] h-[7px]" : "w-1.5 h-1.5";
+  const dotSize = size === "md" ? "w-[10px] h-[10px]" : "w-1.5 h-1.5";
   const tooltip = buildTooltip({
     status,
     lastChecked,
@@ -108,6 +108,8 @@ export function SourcingDot({
     <span
       className={`inline-flex items-center shrink-0 ${className}`}
       title={tooltip}
+      role="img"
+      aria-label={`Sourcing: ${config.label}`}
     >
       <span
         className={`inline-block ${dotSize} rounded-full shrink-0 ${config.dotColor} ${config.borderColor}`}

@@ -33,6 +33,7 @@ import {
 import { RelatedPages } from "@/components/RelatedPages";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
 import { EntityDbPage } from "@/components/directory/EntityDbPage";
+import { EntityTimeline } from "@/components/wiki/EntityTimeline";
 
 // Shared components & helpers
 import {
@@ -129,6 +130,7 @@ import {
   BookOpen,
   Database,
   ListTree,
+  Clock,
 } from "lucide-react";
 
 const ORG_TAB_GROUPS: ProfileTabGroup[] = [
@@ -337,7 +339,7 @@ export default async function OrgProfilePage({
     label: "Facts",
     group: "data",
     icon: <ListTree className={ICON_CLASS} />,
-    content: <FactBaseEntityBody entityId={entity.id} skipVerdicts />,
+    content: <FactBaseEntityBody entityId={entity.id} skipVerdicts skipHeroStats />,
   });
 
   // ── Database Records tab (embedded EntityProfileViewer) ──
@@ -473,6 +475,18 @@ export default async function OrgProfilePage({
       content: <PeopleSection people={allPeople} unresolvedCount={pgResult.unresolvedCount} />,
       group: "about",
       icon: <Users className={ICON_CLASS} />,
+    });
+  }
+
+  // ── Timeline tab (entity_events from PG, merged into factbase-data.json) ──
+  if (data.entityEvents.length > 0) {
+    tabs.push({
+      id: "timeline",
+      label: "Timeline",
+      count: data.entityEvents.length,
+      group: "about",
+      icon: <Clock className={ICON_CLASS} />,
+      content: <EntityTimeline events={data.entityEvents} />,
     });
   }
 

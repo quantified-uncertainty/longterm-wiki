@@ -237,7 +237,7 @@ export function buildProposals(
         source: `${T1_SOURCE_PREFIXES.hfLeaderboard}${t.evalName}:${col.column}`,
         sourceUrl: `https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?row=${encodeURIComponent(t.evalName)}`,
         responseHash,
-        recordType: "benchmark-result",
+        recordType: "benchmark-results",
         record: {
           score: raw,
           unit: col.unit,

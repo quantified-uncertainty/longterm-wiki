@@ -502,6 +502,70 @@ export function getAllFactBaseRecordsByCollection(collection: string): FactBaseR
   return getAllFactBaseRecords(collection);
 }
 
+// ── Entity Events (PG-sourced timeline events per entity) ──
+
+/** Allowed significance levels for an EntityEvent. */
+export type EntityEventSignificance = "major" | "moderate" | "minor";
+
+/**
+ * Structured shape of an entity_events record after parsing the underlying
+ * FactBaseRecordEntry.fields bag. Mirrors the columns on the wiki-server
+ * `entity_events` table (schema.ts:2446).
+ */
+export interface EntityEvent {
+  /** Stable record id (10-char) from the entity_events table. */
+  id: string;
+  /** Entity the event belongs to (stableId, e.g. "sid_XXXXXXXXXX"). */
+  entityId: string;
+  /** Event title. PG enforces NOT NULL; typed optional as a defensive shim. */
+  title: string;
+  /** Event date (YYYY, YYYY-MM, or YYYY-MM-DD). PG enforces NOT NULL. */
+  date?: string;
+  /** Event type tag (founding, pivot, launch, publication, etc). PG enforces NOT NULL. */
+  eventType?: string;
+  /** Optional longer description. */
+  description?: string;
+  /** Significance level (major/moderate/minor). */
+  significance?: EntityEventSignificance;
+  /** Optional URL to a primary source. */
+  source?: string;
+  /** Optional editorial notes. */
+  notes?: string;
+}
+
+function parseEntityEvent(entry: FactBaseRecordEntry): EntityEvent {
+  const f = entry.fields as Record<string, unknown>;
+  const asString = (v: unknown): string | undefined =>
+    typeof v === "string" && v.length > 0 ? v : undefined;
+  const sig = asString(f.significance);
+  return {
+    id: entry.key,
+    entityId: entry.ownerEntityId,
+    title: asString(f.title) ?? "",
+    date: asString(f.date),
+    eventType: asString(f.eventType),
+    description: asString(f.description),
+    significance:
+      sig === "major" || sig === "moderate" || sig === "minor" ? sig : undefined,
+    source: asString(f.source),
+    notes: asString(f.notes),
+  };
+}
+
+/**
+ * Get all entity_events for a given entity (slug, stableId, or wikiId).
+ * Events are returned in the order they were merged; callers that need
+ * chronological order should sort by `date` themselves.
+ */
+export function getEntityEvents(entityId: string): EntityEvent[] {
+  return getFactBaseRecords(entityId, "entity-events").map(parseEntityEvent);
+}
+
+/** Get all entity_events across all entities (used by cross-entity views). */
+export function getAllEntityEvents(): EntityEvent[] {
+  return getAllFactBaseRecords("entity-events").map(parseEntityEvent);
+}
+
 /**
  * Get all unique record collection names present in factbase-data.json.
  * Derived dynamically from the data so new collections are picked up automatically.

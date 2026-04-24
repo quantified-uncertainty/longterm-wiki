@@ -46,6 +46,10 @@ jobs:
         run: pnpm crux health check --check=server --report --auto-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # QUA-667: required for Linear-side dedup (see crux/health/wellness-linear-dedup.ts).
+          # Without this the dedup silently falls back to GitHub create, which Linear's
+          # GitHub integration mirrors into a brand-new QUA ticket each run.
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           # QUA-583: crux health defaults to WIKI_SERVER_ENV=prod, which reads PROD_* vars.
@@ -55,6 +59,7 @@ jobs:
         run: pnpm crux health check --check=api --report --auto-issue
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           # QUA-583: crux health defaults to WIKI_SERVER_ENV=prod, which reads PROD_* vars.

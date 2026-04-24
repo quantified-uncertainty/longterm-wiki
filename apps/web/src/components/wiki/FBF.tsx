@@ -68,6 +68,12 @@ export function FBF({
 
   // Error state: red badge for missing fact
   if (!fact) {
+    // Never render the raw entity id in visible text — `entity` may be a
+    // stableId like `sid_xxx` which leaks into user-facing pages (QUA-657).
+    // Prefer author-provided children, else the human property name, else
+    // the raw property key (which is not a stableId).
+    const propertyName = prop?.name ?? property;
+    const fallback = children ?? `[missing: ${propertyName}]`;
     return (
       <span
         className={cn(
@@ -76,7 +82,7 @@ export function FBF({
         )}
         title={`Missing FactBase fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
-        {children || `[missing: ${entity}.${property}]`}
+        {fallback}
       </span>
     );
   }

@@ -164,7 +164,7 @@ describe("buildProposals", () => {
     expect(misses).toHaveLength(0);
     expect(proposals).toHaveLength(DEFAULT_BENCHMARK_COLUMNS.length);
     expect(proposals.every((p) => p.tier === "T1")).toBe(true);
-    expect(proposals.every((p) => p.recordType === "benchmark-result")).toBe(true);
+    expect(proposals.every((p) => p.recordType === "benchmark-results")).toBe(true);
   });
 
   it("records a miss when target eval_name is absent", () => {

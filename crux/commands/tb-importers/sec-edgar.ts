@@ -257,7 +257,7 @@ export function buildProposal(
     source: `${T1_SOURCE_PREFIXES.secEdgar}${filing.accessionNumber}`,
     sourceUrl,
     responseHash,
-    recordType: "funding-round",
+    recordType: "funding-rounds",
     record: {
       // Form D doesn't tell us the round name directly — use filing date as fallback.
       name: `Form D filing ${filing.filingDate}`,
