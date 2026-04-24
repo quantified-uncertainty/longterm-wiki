@@ -32,12 +32,18 @@ export interface ReopenerResult {
 /**
  * Build the canonical ticket title. Uniqueness of this string across open
  * tickets is what lets us dedupe re-runs without a DB ledger.
+ *
+ * Uses ASCII " - " (not an em-dash) because Linear's search tokenizer
+ * treats em-dashes inconsistently — a fuzzy match on a Unicode-punctuation
+ * title can split on the em-dash and return unrelated "Coverage gap:"
+ * tickets, making the dedup weaker than exact-string compare already
+ * needs it to be.
  */
 export function buildReopenerTitle(
   entityId: string,
   recordType: string,
 ): string {
-  return `Coverage gap: ${entityId} — ${recordType}`;
+  return `Coverage gap: ${entityId} - ${recordType}`;
 }
 
 function buildReopenerBody(row: CoverageGap): string {
@@ -58,26 +64,32 @@ function buildReopenerBody(row: CoverageGap): string {
     '',
     `1. Re-run T1 importers for the org (SEC EDGAR, OpenAlex, Wikidata, etc.) to catch authoritative rows that were missed in prior bursts.`,
     `2. Run T2 website extraction against the org's team / about / research pages.`,
-    `3. If gaps persist, add (org × record_type) to the next T3 subscription queue.`,
+    `3. If gaps persist, add (org x record_type) to the next T3 subscription queue.`,
     '',
     `Filed automatically by QUA-643 Phase 4 acceptance reopener. Close if the`,
-    `denominator estimate is wrong — update \`docs/audits/qua-634-denominator-estimates.md\``,
+    `denominator estimate is wrong: update \`docs/audits/qua-634-denominator-estimates.md\``,
     `and re-sync with \`crux enrichment sync-targets\`.`,
   ].join('\n');
 }
 
-/** Exposed for testing. */
-export async function isTicketAlreadyOpen(
-  title: string,
-): Promise<boolean> {
-  // Linear's free-text search is token-based. We fetch a small page and
-  // filter for an exact title match with a non-closed state. An identical
-  // closed ticket does NOT count — closing means "we decided not to pursue"
-  // and the coordinator may want to re-open it the next burst.
-  const results = await searchIssues(title, 10);
-  return results.some(
-    (r) => r.title === title && r.state.type !== 'completed' && r.state.type !== 'canceled',
-  );
+/**
+ * Pre-fetch every open "Coverage gap:" ticket once, so the per-gap dedup
+ * check doesn't do O(n) Linear round-trips for a large acceptance report.
+ * Exposed for testing.
+ */
+export async function fetchOpenReopenerTitles(): Promise<Set<string>> {
+  // "Coverage gap:" is the unique prefix of every reopener title. Pulling
+  // 100 matches covers even a worst-case burst where every target missed.
+  // Linear's fuzzy search may include tickets that merely *contain* the
+  // prefix, so we still filter by exact-prefix at JS level.
+  const results = await searchIssues('Coverage gap:', 100);
+  const open = new Set<string>();
+  for (const r of results) {
+    if (r.state.type === 'completed' || r.state.type === 'canceled') continue;
+    if (!r.title.startsWith('Coverage gap:')) continue;
+    open.add(r.title);
+  }
+  return open;
 }
 
 export async function fileAcceptanceIssues(
@@ -95,10 +107,13 @@ export async function fileAcceptanceIssues(
     );
   }
 
+  // One Linear round-trip, shared across every gap this run.
+  const openTitles = await fetchOpenReopenerTitles();
+
   for (const gap of gaps) {
     const title = buildReopenerTitle(gap.entityId, gap.recordType);
     try {
-      if (await isTicketAlreadyOpen(title)) {
+      if (openTitles.has(title)) {
         result.skipped += 1;
         continue;
       }
@@ -110,6 +125,8 @@ export async function fileAcceptanceIssues(
         // who want to bump specific ones can do so in Linear.
         priority: 3,
       });
+      // Prevent duplicate within the same run (e.g. if `gaps` has dupes).
+      openTitles.add(title);
       result.created += 1;
     } catch (e: unknown) {
       result.errors.push({

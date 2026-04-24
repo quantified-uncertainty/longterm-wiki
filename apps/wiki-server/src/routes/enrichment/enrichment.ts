@@ -339,8 +339,8 @@ const enrichmentApp = new Hono()
   // tablebase so the reopener (crux enrichment acceptance-report) can
   // decide which orgs missed the burst target.
   //
-  // No auth required — coverage is derived from already-public data and the
-  // reopener runs from agent slots that can't easily hold an API key.
+  // Auth is enforced by the global /api/* middleware in app.ts — both the
+  // read and write endpoints below require an API key.
   .post("/targets", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -350,30 +350,35 @@ const enrichmentApp = new Hono()
     const { targets } = parsed.data;
     if (targets.length === 0) return c.json({ upserted: 0 });
 
+    // Build one multi-row INSERT so a 500-row upsert is a single round-trip
+    // and partial-failure in the middle rolls back cleanly. The alternative
+    // (per-row INSERT in a loop) both multiplied round-trips and left
+    // half-written state on mid-batch error.
+    const values = sql.join(
+      targets.map(
+        (t) =>
+          sql`(${t.entityId}, ${t.recordType}, ${t.estimatedTotal}, ${
+            t.targetPct ?? 0.7
+          }, ${t.basis ?? null}, ${t.confidence ?? null}, NOW())`,
+      ),
+      sql`, `,
+    );
+
     try {
       const db = getDrizzleDb();
-      // One parameterized INSERT per row keeps the generated SQL small and
-      // lets ON CONFLICT take the natural-key path for updates.
-      let upserted = 0;
-      for (const t of targets) {
-        await db.execute(sql`
-          INSERT INTO enrichment_targets (
-            entity_id, record_type, estimated_total, target_pct, basis, confidence, estimated_at
-          ) VALUES (
-            ${t.entityId}, ${t.recordType}, ${t.estimatedTotal},
-            ${t.targetPct ?? 0.7}, ${t.basis ?? null}, ${t.confidence ?? null}, NOW()
-          )
-          ON CONFLICT (entity_id, record_type) DO UPDATE SET
-            estimated_total = EXCLUDED.estimated_total,
-            target_pct = EXCLUDED.target_pct,
-            basis = COALESCE(EXCLUDED.basis, enrichment_targets.basis),
-            confidence = COALESCE(EXCLUDED.confidence, enrichment_targets.confidence),
-            estimated_at = NOW(),
-            updated_at = NOW()
-        `);
-        upserted += 1;
-      }
-      return c.json({ upserted });
+      await db.execute(sql`
+        INSERT INTO enrichment_targets (
+          entity_id, record_type, estimated_total, target_pct, basis, confidence, estimated_at
+        ) VALUES ${values}
+        ON CONFLICT (entity_id, record_type) DO UPDATE SET
+          estimated_total = EXCLUDED.estimated_total,
+          target_pct = EXCLUDED.target_pct,
+          basis = COALESCE(EXCLUDED.basis, enrichment_targets.basis),
+          confidence = COALESCE(EXCLUDED.confidence, enrichment_targets.confidence),
+          estimated_at = NOW(),
+          updated_at = NOW()
+      `);
+      return c.json({ upserted: targets.length });
     } catch (e: unknown) {
       logger.error(
         { err: e instanceof Error ? e.message : String(e) },
@@ -435,9 +440,19 @@ const enrichmentApp = new Hono()
       // (e.g. 'publications', 'divisions') fall through to actual_accepted=0,
       // which is the honest answer: we have no verdict signal for them yet.
       //
-      // Keeping this per-record-type in SQL (vs. a generic `entity_id` column
-      // on the verdict) avoids denormalizing entity FKs onto the verdict
-      // table — which would duplicate what the tablebase tables already know.
+      // For each record type we fan out the entity FK column in two flavors:
+      // the legacy slug/free-text column (`organization_id`, `company_id`,
+      // `model_id`) AND the resolved stableId FK (`org_entity_id`, etc.).
+      // `enrichment_targets.entity_id` is populated with the slug from the
+      // QUA-634 denominators doc, so legacy-column rows match directly.
+      // Records synced via propose get the legacy slug preserved; records
+      // from older paths may only have the stableId populated — both must
+      // be matchable or the coverage count undercounts silently.
+      //
+      // The UNION-vs-JOIN-GROUP choice: two UNIONs per record type + OUTER
+      // dedup gets ugly; instead we OR both columns in the join predicate
+      // and use DISTINCT on verdict record_id to prevent double-counting
+      // when both legacy and entity columns point at the same target.
       const rows = await db.execute<{
         entity_id: string;
         record_type: string;
@@ -446,45 +461,84 @@ const enrichmentApp = new Hono()
         target_accepted: number;
         actual_accepted: number;
       }>(sql`
-        WITH confirmed_by_entity AS (
-          SELECT 'personnel'::text AS record_type, p.organization_id AS entity_id, COUNT(*)::int AS cnt
-          FROM personnel p
+        WITH resolved_targets AS (
+          -- Resolve each target entity_id (typically a slug from the
+          -- denominator doc) to BOTH its slug and its stable_id, so the
+          -- confirmed_by_entity subqueries can match against either the
+          -- legacy org_id/company_id/model_id columns or the resolved
+          -- entity FK columns.
+          SELECT
+            et.entity_id AS raw_entity_id,
+            et.record_type,
+            et.estimated_total,
+            et.target_pct,
+            COALESCE(e.id, et.entity_id) AS slug,
+            COALESCE(e.stable_id, et.entity_id) AS stable_id
+          FROM enrichment_targets et
+          LEFT JOIN entities e
+            ON e.id = et.entity_id OR e.stable_id = et.entity_id
+        ),
+        confirmed_by_entity AS (
+          SELECT
+            'personnel'::text AS record_type,
+            rt.raw_entity_id AS entity_id,
+            COUNT(DISTINCT v.record_id)::int AS cnt
+          FROM resolved_targets rt
+          JOIN personnel p
+            ON p.organization_id IN (rt.slug, rt.stable_id)
+            OR p.org_entity_id = rt.stable_id
           JOIN source_check_verdicts v
             ON v.record_id = p.id
            AND v.record_type = 'personnel'
            AND v.verdict = 'confirmed'
-          GROUP BY p.organization_id
+          WHERE rt.record_type = 'personnel'
+          GROUP BY rt.raw_entity_id
           UNION ALL
-          SELECT 'grants'::text, g.organization_id, COUNT(*)::int
-          FROM grants g
+          SELECT
+            'grants'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          JOIN grants g
+            ON g.organization_id IN (rt.slug, rt.stable_id)
+            OR g.org_entity_id = rt.stable_id
           JOIN source_check_verdicts v
             ON v.record_id = g.id
            AND v.record_type = 'grants'
            AND v.verdict = 'confirmed'
-          GROUP BY g.organization_id
+          WHERE rt.record_type = 'grants'
+          GROUP BY rt.raw_entity_id
           UNION ALL
-          SELECT 'funding-rounds'::text, fr.company_id, COUNT(*)::int
-          FROM funding_rounds fr
+          SELECT
+            'funding-rounds'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          JOIN funding_rounds fr
+            ON fr.company_id IN (rt.slug, rt.stable_id)
+            OR fr.company_entity_id = rt.stable_id
           JOIN source_check_verdicts v
             ON v.record_id = fr.id
            AND v.record_type = 'funding-rounds'
            AND v.verdict = 'confirmed'
-          GROUP BY fr.company_id
+          WHERE rt.record_type = 'funding-rounds'
+          GROUP BY rt.raw_entity_id
           UNION ALL
-          SELECT 'benchmark-results'::text, br.model_id, COUNT(*)::int
-          FROM benchmark_results br
+          SELECT
+            'benchmark-results'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          -- benchmark_results.model_id references entities.stable_id
+          -- directly (no legacy column), so only the stable_id path matches.
+          JOIN benchmark_results br ON br.model_id = rt.stable_id
           JOIN source_check_verdicts v
             ON v.record_id = br.id
            AND v.record_type = 'benchmark-results'
            AND v.verdict = 'confirmed'
-          GROUP BY br.model_id
+          WHERE rt.record_type = 'benchmark-results'
+          GROUP BY rt.raw_entity_id
         )
         SELECT
           et.entity_id,
           et.record_type,
           et.estimated_total,
           et.target_pct,
-          CEIL(et.estimated_total::real * et.target_pct)::int AS target_accepted,
+          CEIL(et.estimated_total::numeric * et.target_pct::numeric)::int AS target_accepted,
           COALESCE(c.cnt, 0) AS actual_accepted
         FROM enrichment_targets et
         LEFT JOIN confirmed_by_entity c
@@ -493,7 +547,7 @@ const enrichmentApp = new Hono()
         WHERE (${recordType ?? null}::text IS NULL OR et.record_type = ${recordType ?? null})
           AND (${entityId ?? null}::text IS NULL OR et.entity_id = ${entityId ?? null})
         ORDER BY
-          (CEIL(et.estimated_total::real * et.target_pct)::int - COALESCE(c.cnt, 0)) DESC,
+          (CEIL(et.estimated_total::numeric * et.target_pct::numeric)::int - COALESCE(c.cnt, 0)) DESC,
           et.record_type
       `);
       return c.json({
@@ -522,10 +576,14 @@ const enrichmentApp = new Hono()
     }
   })
   .get("/runs", async (c) => {
-    // Minimal listing endpoint for the watchdog. Returns recent runs
-    // ordered by started_at descending. No pagination — the watchdog only
-    // needs the most recent activity window and 50 rows is plenty.
-    const sinceIso = c.req.query("since"); // ISO timestamp lower bound
+    // Listing endpoint for the watchdog. Supports two filter modes:
+    //   - `?id=<runId>`: returns just that row (watchdog's happy path — no
+    //     chance of the target run getting scrolled past by newer activity)
+    //   - `?since=<iso>`: returns recent runs updated since the timestamp
+    //     (caps at 50 for dashboards; watchdog uses `id` instead)
+    // Without either filter we return the 50 most-recently-updated runs.
+    const idFilter = c.req.query("id");
+    const sinceIso = c.req.query("since");
     try {
       const db = getDrizzleDb();
       const rows = await db.execute<{
@@ -547,7 +605,8 @@ const enrichmentApp = new Hono()
                proposes_total, proposes_accepted, proposes_rejected,
                cost_usd, updated_at
         FROM enrichment_runs
-        WHERE (${sinceIso ?? null}::timestamptz IS NULL OR updated_at >= ${sinceIso ?? null}::timestamptz)
+        WHERE (${idFilter ?? null}::text IS NULL OR id = ${idFilter ?? null})
+          AND (${sinceIso ?? null}::timestamptz IS NULL OR updated_at >= ${sinceIso ?? null}::timestamptz)
         ORDER BY updated_at DESC
         LIMIT 50
       `);

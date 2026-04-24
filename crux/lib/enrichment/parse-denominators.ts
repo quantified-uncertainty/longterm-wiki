@@ -88,7 +88,12 @@ function isSeparator(cells: string[]): boolean {
 
 export function parseDenominatorDoc(content: string): DenominatorTarget[] {
   const out: DenominatorTarget[] = [];
-  const seen = new Set<string>(); // `${entityId}:${recordType}` — later rows win but we dedup
+  // First appearance of a `${entityId}:${recordType}` pair wins; later
+  // duplicates are silently dropped. The doc isn't supposed to have dupes,
+  // but multiple tables in different sections (ranked + summary) can
+  // accidentally repeat rows, and we prefer deterministic seed over
+  // last-write-wins.
+  const seen = new Set<string>();
 
   for (const rawLine of content.split('\n')) {
     const line = rawLine.trimEnd();

@@ -131,6 +131,9 @@ async function defaultDiscordPost(
 export async function fetchRunSnapshot(
   runId: string,
 ): Promise<WatchdogRunSnapshot | null> {
+  // Use the server's explicit id filter so the watchdog can't miss the
+  // target run if it scrolls past the 50-row default page on a busy server.
+  const encoded = encodeURIComponent(runId);
   const res = await apiRequest<{
     runs: Array<{
       id: string;
@@ -139,7 +142,7 @@ export async function fetchRunSnapshot(
       proposesRejected: number;
       updatedAt: string;
     }>;
-  }>('GET', `/api/enrichment/runs`);
+  }>('GET', `/api/enrichment/runs?id=${encoded}`);
   if (!res.ok) return null;
   const match = res.data.runs.find((r) => r.id === runId);
   if (!match) return null;
@@ -188,8 +191,13 @@ export async function runWatchdog(
   const fetchSnap = opts.fetchSnapshot ?? fetchRunSnapshot;
   const maxIterations = opts.maxIterations ?? 120; // 120 * 30s default = 1h
 
-  let firstSnapshot: WatchdogRunSnapshot | null = null;
-  let lastSnapshot: WatchdogRunSnapshot | null = null;
+  // Ring buffer of recent snapshots. On each poll we trim entries older
+  // than `windowMinutes` (by observed updatedAt) off the front, so the
+  // oldest remaining sample is always the start of a window ≤ windowMinutes.
+  // This avoids the "reset to current" blind spot that would hide runaway
+  // spend for a full window after the buffer first fills up.
+  const windowMs = opts.windowMinutes * 60_000;
+  const recent: WatchdogRunSnapshot[] = [];
 
   for (let i = 0; i < maxIterations; i += 1) {
     const snap = await fetchSnap(opts.runId);
@@ -210,23 +218,32 @@ export async function runWatchdog(
       continue;
     }
 
-    // Slide the window based on observed snapshot times (not wall-clock),
-    // so the window behaves the same whether the watchdog is polling live
-    // or replaying a fixture. Drop first-sample when (last.updatedAt -
-    // first.updatedAt) exceeds windowMinutes.
-    if (firstSnapshot === null) {
-      firstSnapshot = snap;
-    } else {
-      const observedMs =
-        new Date(snap.updatedAt).getTime() -
-        new Date(firstSnapshot.updatedAt).getTime();
-      if (observedMs > opts.windowMinutes * 60_000) {
-        firstSnapshot = snap;
-      }
+    recent.push(snap);
+    // Deduplicate consecutive identical snapshots (server hasn't ticked
+    // since last poll) so the rate calculation stays stable.
+    if (
+      recent.length >= 2 &&
+      recent[recent.length - 1].updatedAt ===
+        recent[recent.length - 2].updatedAt
+    ) {
+      recent.pop();
     }
-    lastSnapshot = snap;
 
-    const rate = computeSpendRate(firstSnapshot, lastSnapshot);
+    const latest = recent[recent.length - 1];
+    const latestMs = new Date(latest.updatedAt).getTime();
+    // Trim anything older than windowMinutes — but keep at least one older
+    // sample so we can compute a rate; if the oldest is already outside
+    // the window, it becomes the "first" for a slightly-larger-than-window
+    // measurement (more conservative, not less — we kill earlier, not later).
+    while (
+      recent.length > 2 &&
+      latestMs - new Date(recent[0].updatedAt).getTime() > windowMs
+    ) {
+      recent.shift();
+    }
+
+    const first = recent[0];
+    const rate = computeSpendRate(first, latest);
     if (rate.reliable && rate.spendPerHour > opts.maxSpendPerHour) {
       const markerPath = writeKillMarker(opts.runId, opts.killMarkerDir);
       const summary =
@@ -267,8 +284,8 @@ export async function runWatchdog(
 
   // Exhausted maxIterations. Report the last observed rate without killing.
   const final =
-    firstSnapshot && lastSnapshot
-      ? computeSpendRate(firstSnapshot, lastSnapshot)
+    recent.length >= 2
+      ? computeSpendRate(recent[0], recent[recent.length - 1])
       : { spendPerHour: 0, deltaUsd: 0, deltaMinutes: 0, reliable: false };
   return {
     killed: false,
