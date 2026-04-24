@@ -69,14 +69,15 @@ describe("formatKBNumber edge cases", () => {
     expect(formatKBNumber(0, "USD")).toBe("$0");
   });
 
-  it("formats negative numbers with USD", () => {
+  it("formats negative numbers with USD in compact form", () => {
     const result = formatKBNumber(-500_000_000, "USD");
     expect(result).toContain("$");
-    expect(result).toContain("million");
+    expect(result).toContain("M");
+    expect(result.startsWith("-$")).toBe(true);
   });
 
-  it("formats very large number (trillion+)", () => {
-    expect(formatKBNumber(2_500_000_000_000, "USD")).toBe("$2.5 trillion");
+  it("formats very large number (trillion+) in compact form", () => {
+    expect(formatKBNumber(2_500_000_000_000, "USD")).toBe("$2.5T");
   });
 
   it("uses currency override (GBP) with display config", () => {
@@ -103,9 +104,9 @@ describe("formatKBCellValue", () => {
   });
 
   describe("with field definition", () => {
-    it("formats number with unit", () => {
+    it("formats number with unit in compact form", () => {
       const fd: FieldDef = { type: "number", unit: "USD", description: "" };
-      expect(formatKBCellValue(1_000_000_000, fd)).toBe("$1 billion");
+      expect(formatKBCellValue(1_000_000_000, fd)).toBe("$1B");
     });
 
     it("formats date string", () => {
@@ -195,13 +196,13 @@ describe("formatKBFactValue additional coverage", () => {
 
   it("formats min value with >= prefix", () => {
     const fact = makeFact("revenue", { type: "min", value: 5_000_000_000 });
-    expect(formatKBFactValue(fact, "USD")).toBe("\u2265$5 billion");
+    expect(formatKBFactValue(fact, "USD")).toBe("\u2265$5B");
   });
 
   it("formats number fact with value-level unit when property unit absent", () => {
     const fact = makeFact("some-val", { type: "number", value: 100_000_000, unit: "USD" });
     // value.unit = "USD" should be used when property unit is not provided
-    expect(formatKBFactValue(fact)).toBe("$100 million");
+    expect(formatKBFactValue(fact)).toBe("$100M");
   });
 
   it("handles unknown/default case for unrecognized value types gracefully", () => {
