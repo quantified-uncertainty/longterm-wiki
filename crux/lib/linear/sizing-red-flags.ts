@@ -12,6 +12,8 @@
  * it past filing.
  */
 
+import { formatCount } from '../output.ts';
+
 export type RedFlagKind =
   | 'phase-or-wave'
   | 'row-count-batching'
@@ -35,42 +37,30 @@ interface Detector {
 const DETECTORS: Detector[] = [
   {
     kind: 'phase-or-wave',
-    // \b(phase|wave) [0-9ABC]+\b — "Phase 2", "Phase 1A", "Wave B".
-    // Implies multi-step work; each step is usually its own PR.
-    pattern: /\b(phase|wave) [0-9ABC]+\b/gi,
+    pattern: /\b(phase|wave) [0-9ABC]+\b/i,
     reason:
       'Phase/Wave language implies multi-step work — each step is usually its own ticket.',
   },
   {
-    kind: 'row-count-batching',
-    // \b(migrate|backfill|populate|rewrite) [0-9,]+\b — "migrate 5,000".
-    // Batch execution is budget-gated, not PR-gated; should be a separate
-    // ticket from the plumbing that enables it.
     // Anchor on a leading digit so degenerate inputs like "migrate ,5" or
-    // "migrate ,," can't match. The trailing characters allow comma-grouping
-    // (e.g. "5,000").
-    pattern: /\b(migrate|backfill|populate|rewrite) [0-9][0-9,]*\b/gi,
+    // "migrate ,," can't match. Trailing chars allow comma-grouping ("5,000").
+    kind: 'row-count-batching',
+    pattern: /\b(migrate|backfill|populate|rewrite) [0-9][0-9,]*\b/i,
     reason:
       'Row-count batching mixes PR-shaped plumbing with budget-gated execution — file as separate tickets.',
   },
   {
     kind: 'mixed-shapes',
-    // \b(audit and|design and)\b — "Audit and fix", "Design and ship".
-    // Mixed shapes (audit+implement, design+execute) have different
-    // completion semantics and should split.
-    pattern: /\b(audit and|design and)\b/gi,
+    pattern: /\b(audit and|design and)\b/i,
     reason:
       'Mixed shapes (audit+implement, design+execute) have different completion semantics — split at the "and".',
   },
   {
+    // ≥3 backtick-delimited identifiers separated by commas. The trailing
+    // {2,} on the second-and-onward groups means we need at least three
+    // total identifiers to fire.
     kind: 'multi-table-enumeration',
-    // ≥3 backtick-delimited identifiers separated by commas:
-    //   `foo`, `bar`, `baz`           — fires
-    //   `foo`, `bar`                  — does not fire (only 2)
-    // Each backticked identifier is a typical surface for tables, modules,
-    // or files. Three+ enumerated surfaces means the PR will span multiple
-    // review areas.
-    pattern: /`[A-Za-z_][A-Za-z0-9_]*`(?:\s*,\s*`[A-Za-z_][A-Za-z0-9_]*`){2,}/g,
+    pattern: /`[A-Za-z_][A-Za-z0-9_]*`(?:\s*,\s*`[A-Za-z_][A-Za-z0-9_]*`){2,}/,
     reason:
       '≥3 enumerated code surfaces in one ticket — PR will span multiple review areas; group by code footprint and split.',
   },
@@ -87,12 +77,8 @@ export function detectRedFlags(title: string, description: string): RedFlag[] {
   const haystack = [title, description].filter(Boolean).join('\n');
   const out: RedFlag[] = [];
   for (const det of DETECTORS) {
-    // Reset state — `g` flag patterns are stateful per regex instance.
-    det.pattern.lastIndex = 0;
     const m = det.pattern.exec(haystack);
-    if (m) {
-      out.push({ kind: det.kind, match: m[0], reason: det.reason });
-    }
+    if (m) out.push({ kind: det.kind, match: m[0], reason: det.reason });
   }
   return out;
 }
@@ -104,7 +90,7 @@ export function detectRedFlags(title: string, description: string): RedFlag[] {
  */
 export function formatRedFlagsWarning(flags: RedFlag[]): string {
   if (flags.length === 0) return '';
-  let out = `⚠ Ticket-sizing red flag${flags.length === 1 ? '' : 's'} detected (${flags.length}):\n`;
+  let out = `⚠ Ticket-sizing ${formatCount(flags.length, 'red flag')} detected:\n`;
   for (const f of flags) {
     out += `  • [${f.kind}] matched "${f.match}"\n`;
     out += `    ${f.reason}\n`;

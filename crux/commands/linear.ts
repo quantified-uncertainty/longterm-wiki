@@ -427,6 +427,43 @@ async function parse(args: string[], options: CommandOptions): Promise<CommandRe
   return { output: `${id}\n`, exitCode: 0 };
 }
 
+/**
+ * Run the ticket-sizing red-flag check used by `crux linear create`. Returns
+ * a refusal `CommandResult` (exit 2) when a flag fires without `--allow-big`,
+ * or `null` when the caller may proceed. With `--json`, the refusal is a
+ * structured payload so pipes into `jq` don't choke on the human warning.
+ *
+ * Side effect: when `--allow-big` is set and flags fired, prints the warning
+ * to stderr so the bypass stays visible in session logs.
+ */
+function checkRedFlagsOrRefuse(
+  title: string,
+  description: string,
+  options: CommandOptions,
+  c: ReturnType<typeof createLogger>['colors'],
+): CommandResult | null {
+  const flags = detectRedFlags(title, description);
+  if (flags.length === 0) return null;
+
+  const warning = formatRedFlagsWarning(flags);
+  if (options.allowBig) {
+    process.stderr.write(warning);
+    return null;
+  }
+  if (options.json) {
+    return {
+      output:
+        JSON.stringify(
+          { error: 'ticket-sizing-red-flag', flags, hint: 'Re-run with --allow-big to bypass.' },
+          null,
+          2,
+        ) + '\n',
+      exitCode: 2,
+    };
+  }
+  return { output: `${c.yellow}${warning}${c.reset}`, exitCode: 2 };
+}
+
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
@@ -443,38 +480,9 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const descFromFile = readBodyFlag(options.descriptionFile);
   const description = descFromFile ?? options.description ?? '';
 
-  // Ticket-sizing red-flag detection (QUA-575). Refuses to create a ticket
-  // whose title/body contains patterns that empirically predict mid-session
-  // splits unless the caller passes --allow-big. See
-  // .claude/rules/ticket-sizing.md.
-  const flags = detectRedFlags(title, description);
-  if (flags.length > 0) {
-    const warning = formatRedFlagsWarning(flags);
-    if (!options.allowBig) {
-      // Refuse with exit 2 (distinct from 1 = other errors). Caller may
-      // re-run with --allow-big to bypass when the ticket is legitimately
-      // large and atomic. With --json, emit a structured error payload so
-      // pipes-into-jq don't choke on the human-readable warning.
-      if (options.json) {
-        return {
-          output:
-            JSON.stringify(
-              { error: 'ticket-sizing-red-flag', flags, hint: 'Re-run with --allow-big to bypass.' },
-              null,
-              2,
-            ) + '\n',
-          exitCode: 2,
-        };
-      }
-      return {
-        output: `${c.yellow}${warning}${c.reset}`,
-        exitCode: 2,
-      };
-    }
-    // --allow-big set: print the warning to stderr so it's visible in the
-    // session log without polluting --json stdout, and proceed to create.
-    process.stderr.write(warning);
-  }
+  // QUA-575: refuse on ticket-sizing red flags unless --allow-big is set.
+  const sizingRefusal = checkRedFlagsOrRefuse(title, description, options, c);
+  if (sizingRefusal) return sizingRefusal;
 
   // Parse priority (Linear: 1=urgent, 2=high, 3=medium, 4=low)
   let priority: number | undefined;
