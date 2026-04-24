@@ -94,3 +94,110 @@ export async function createPageSnapshot(
     input,
   );
 }
+
+// ---------------------------------------------------------------------------
+// Sync helpers — upsert sources and pages (QUA-642 register command)
+// ---------------------------------------------------------------------------
+
+export interface SyncWebsiteSourceInput {
+  id: string;
+  domain: string;
+  entityId?: string | null;
+  entityDisplayName?: string | null;
+  reliability?: 'high' | 'medium' | 'low';
+  refreshIntervalDays?: number;
+  enabled?: boolean;
+  notes?: string | null;
+}
+
+export interface SyncWebsitePageInput {
+  id: string;
+  sourceId: string;
+  path: string;
+  pageRole?:
+    | 'about'
+    | 'team'
+    | 'research'
+    | 'pricing'
+    | 'careers'
+    | 'docs'
+    | 'landing'
+    | 'blog-index'
+    | 'other'
+    | null;
+  extractTargets?: string[] | null;
+  refreshIntervalDays?: number | null;
+  enabled?: boolean;
+}
+
+export async function syncWebsiteSources(
+  items: SyncWebsiteSourceInput[],
+): Promise<ApiResult<{ upserted: number }>> {
+  return apiRequest<{ upserted: number }>(
+    'POST',
+    '/api/website-sources/sync',
+    { items },
+  );
+}
+
+export async function syncWebsitePages(
+  items: SyncWebsitePageInput[],
+): Promise<ApiResult<{ upserted: number }>> {
+  return apiRequest<{ upserted: number }>(
+    'POST',
+    '/api/website-sources/sync-pages',
+    { items },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Extraction workflow helpers (QUA-642 extract command)
+// ---------------------------------------------------------------------------
+
+export interface PendingSnapshot {
+  id: string;
+  websiteSourcePageId: string;
+  sourceId: string;
+  domain: string;
+  entityId: string | null;
+  entityDisplayName: string | null;
+  pagePath: string;
+  pageRole: string | null;
+  url: string;
+  fetchedAt: string;
+  contentHash: string;
+  contentLength: number;
+  extractionStatus: string;
+}
+
+export async function listPendingSnapshots(
+  limit = 50,
+  offset = 0,
+): Promise<
+  ApiResult<{
+    snapshots: PendingSnapshot[];
+    total: number;
+    limit: number;
+    offset: number;
+  }>
+> {
+  return apiRequest(
+    'GET',
+    `/api/website-sources/snapshots/pending?limit=${limit}&offset=${offset}`,
+  );
+}
+
+export async function updateSnapshotExtraction(
+  sourceId: string,
+  snapshotId: string,
+  extractionStatus: 'pending' | 'extracted' | 'failed' | 'skipped',
+  extractedFacts: unknown = null,
+): Promise<ApiResult<{ ok: true; id: string }>> {
+  return apiRequest(
+    'POST',
+    `/api/website-sources/${encodeURIComponent(sourceId)}/snapshots/${encodeURIComponent(
+      snapshotId,
+    )}/extraction`,
+    { extractionStatus, extractedFacts },
+  );
+}
