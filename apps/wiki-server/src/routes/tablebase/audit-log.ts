@@ -53,20 +53,15 @@ export async function logAuditEntries(
   // request set one via `SET LOCAL app.agent_session_id` (middleware +
   // applyAuditContext), pull it from the GUC so the existing rich
   // audit log gets session attribution too. Runs once per call, not
-  // per-row. Empty / unset GUC comes back as an empty string; treat
-  // that as NULL.
-  let gucSession: string | null = null;
-  try {
-    const [row] = (await tx.execute(
-      sql`SELECT current_setting('app.agent_session_id', true) AS session_id`,
-    )) as unknown as Array<{ session_id: string | null }>;
-    const raw = row?.session_id ?? null;
-    gucSession = raw && raw.length > 0 ? raw : null;
-  } catch {
-    // Fail-open: audit attribution is best-effort. If this tx doesn't support
-    // current_setting for any reason, fall back to NULL.
-    gucSession = null;
-  }
+  // per-row. `current_setting(..., true)` with missing_ok=true never
+  // throws for an unset GUC — it returns an empty string — so no
+  // defensive try/catch is needed; a thrown error would mean the tx
+  // is already doomed and the subsequent INSERT would fail anyway.
+  const [gucRow] = (await tx.execute(
+    sql`SELECT current_setting('app.agent_session_id', true) AS session_id`,
+  )) as unknown as Array<{ session_id: string | null }>;
+  const rawSession = gucRow?.session_id ?? null;
+  const gucSession = rawSession && rawSession.length > 0 ? rawSession : null;
 
   await tx.insert(tablebaseAuditLog).values(
     entries.map((e) => ({

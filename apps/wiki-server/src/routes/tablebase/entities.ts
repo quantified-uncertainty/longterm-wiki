@@ -21,6 +21,7 @@ import {
   SyncEntitiesBatchSchema,
 } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 import {
   buildSearchCondition,
   buildTsvectorSearchCondition,
@@ -988,6 +989,8 @@ const entitiesApp = new Hono()
         // Increase statement_timeout for bulk sync — default 30s is too tight
         // for batches of 100 entities with FK cascade checks on referencing tables.
         await tx.execute(sql`SET LOCAL statement_timeout = '120000'`); // 2 min
+        // Audit-log attribution (QUA-442). Scoped to this transaction.
+        await applyAuditContext(tx, c);
         const allVals = items.map((e) => ({
           id: e.id,
           wikiId: e.wikiId ?? null,
@@ -1164,6 +1167,8 @@ const entitiesApp = new Hono()
 
       try {
         await db.transaction(async (tx) => {
+          // Audit-log attribution (QUA-442).
+          await applyAuditContext(tx, c);
           // Delete from things table first (references entities via source_id)
           await tx
             .delete(things)

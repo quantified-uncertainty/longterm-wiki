@@ -9,9 +9,10 @@
 --       application-layer entries).
 --   2. `audit_trigger_fn()` plpgsql function.
 --   3. `apply_audit_trigger(text)` / `remove_audit_trigger(text)` helpers.
---   4. Attaches the trigger to an initial allow-list of TableBase domain
---       tables (~25 tables). Expansion to remaining tables is a one-line
---       follow-up migration per table.
+--   4. Attaches the trigger to an initial allow-list of 28 TableBase
+--       domain tables (including the two flagship non-factory tables,
+--       `entities` and `facts`, plus `resources`). Expansion to remaining
+--       tables is a one-line follow-up migration per table.
 --
 -- Source of truth for the procedure bodies lives at
 -- apps/wiki-server/drizzle/helpers/audit_log_trigger.sql. That file is kept
@@ -42,6 +43,11 @@ CREATE INDEX IF NOT EXISTS idx_full_audit_log_session
 
 CREATE INDEX IF NOT EXISTS idx_full_audit_log_txn
   ON full_audit_log (txn_id);
+
+-- Time-only index: unfiltered `/api/audit-log/recent` with just `since`
+-- would otherwise degrade to a seq scan once the table grows.
+CREATE INDEX IF NOT EXISTS idx_full_audit_log_changed_at
+  ON full_audit_log (changed_at DESC);
 
 -- ---- 2. Trigger function -----------------------------------------------
 CREATE OR REPLACE FUNCTION audit_trigger_fn() RETURNS trigger
@@ -121,12 +127,16 @@ END;
 $proc$;
 
 -- ---- 4. Attach to allow-list -------------------------------------------
--- Initial allow-list covers all factory-using TableBase domain tables plus
--- the two flagship non-factory ones (`entities`, `facts`). Deliberately
--- excluded for v1: high-volume time-series (*_snapshots, secondary_market_prices),
--- system/pipeline state (agent_sessions, jobs, groundskeeper_runs, ...),
--- the audit tables themselves, the derived `things` cross-base index, and
--- the claims pipeline (already has its own attribution).
+-- Initial allow-list covers all factory-using TableBase domain tables
+-- plus `entities`, `facts`, and `resources` (the three high-traffic
+-- non-factory write targets with dedicated middleware wiring added in
+-- this PR — see apps/wiki-server/src/routes/tablebase/entities.ts,
+-- .../tablebase/data-sources.ts, .../wikibase/resources.ts). Deliberately
+-- excluded for v1: high-volume time-series (*_snapshots,
+-- secondary_market_prices), system/pipeline state (agent_sessions, jobs,
+-- groundskeeper_runs, ...), the audit tables themselves, the derived
+-- `things` cross-base index, and the claims pipeline (already has its
+-- own attribution).
 --
 -- Expanding: a follow-up migration may call `apply_audit_trigger('<table>')`
 -- for any non-listed domain table.

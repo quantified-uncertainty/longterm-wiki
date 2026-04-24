@@ -12,7 +12,7 @@ import {
   auditContextMiddleware,
   getAuditContext,
   applyAuditContext,
-  setAuditContextRaw,
+  applyAuditContextValues,
   AUDIT_SESSION_HEADER,
   AUDIT_TOOL_HEADER,
 } from "../middleware/audit-context.js";
@@ -83,22 +83,41 @@ describe("auditContextMiddleware", () => {
   });
 });
 
-describe("applyAuditContext / setAuditContextRaw", () => {
+describe("applyAuditContext / applyAuditContextValues", () => {
+  /**
+   * Drizzle's `sql` template tag produces an `SQL` object whose `.queryChunks`
+   * alternate between `StringChunk { value: string[] }` (literal SQL) and the
+   * raw JS values inlined by `${}`. Parameters are the non-StringChunk items.
+   */
+  function extractParams(query: unknown): unknown[] {
+    if (typeof query !== "object" || query === null) return [];
+    const chunks = (query as { queryChunks?: unknown[] }).queryChunks;
+    if (!Array.isArray(chunks)) return [];
+    const params: unknown[] = [];
+    for (const chunk of chunks) {
+      // StringChunk is an object literal `{ value: string[] }`; anything
+      // else (string / number / etc.) is a parameter value.
+      if (chunk && typeof chunk === "object" && "value" in (chunk as Record<string, unknown>)) {
+        continue;
+      }
+      params.push(chunk);
+    }
+    return params;
+  }
+
   function makeFakeTx() {
-    const calls: Array<{ query: string; params: unknown[] }> = [];
+    const queries: unknown[] = [];
     const fakeTx = {
-      execute: vi.fn(async (query: { queryChunks?: unknown[] } | string) => {
-        // Drizzle sql template: we just record the input so the test can
-        // assert `set_config` was called with the right value.
-        calls.push({ query: JSON.stringify(query), params: [] });
+      execute: vi.fn(async (query: unknown) => {
+        queries.push(query);
         return [] as unknown[];
       }),
     };
-    return { fakeTx, calls };
+    return { fakeTx, queries };
   }
 
-  it("applyAuditContext issues two set_config calls with request values", async () => {
-    const { fakeTx, calls } = makeFakeTx();
+  it("applyAuditContext issues one SELECT with both parameters bound", async () => {
+    const { fakeTx, queries } = makeFakeTx();
     const app = new Hono().use(auditContextMiddleware()).get("/x", async (c) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await applyAuditContext(fakeTx as any, c);
@@ -110,27 +129,34 @@ describe("applyAuditContext / setAuditContextRaw", () => {
         [AUDIT_TOOL_HEADER]: "crux.audit",
       },
     });
-    expect(fakeTx.execute).toHaveBeenCalledTimes(2);
-    const stringified = calls.map((c) => c.query).join(" | ");
-    expect(stringified).toMatch(/agent_session_id/);
-    expect(stringified).toMatch(/agent_tool/);
+    expect(fakeTx.execute).toHaveBeenCalledTimes(1);
+    const params = extractParams(queries[0]);
+    expect(params).toContain("abc");
+    expect(params).toContain("crux.audit");
   });
 
-  it("applyAuditContext writes empty strings when headers are absent", async () => {
-    const { fakeTx } = makeFakeTx();
+  it("applyAuditContext binds empty strings when headers are absent", async () => {
+    const { fakeTx, queries } = makeFakeTx();
     const app = new Hono().use(auditContextMiddleware()).get("/x", async (c) => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       await applyAuditContext(fakeTx as any, c);
       return c.json({ ok: true });
     });
     await app.request("/x");
-    expect(fakeTx.execute).toHaveBeenCalledTimes(2);
+    expect(fakeTx.execute).toHaveBeenCalledTimes(1);
+    const params = extractParams(queries[0]);
+    // Both bindings must be the empty string, not null/undefined — the
+    // trigger function treats '' as NULL but set_config() rejects NULL.
+    expect(params.filter((v) => v === "")).toHaveLength(2);
   });
 
-  it("setAuditContextRaw issues two set_config calls with raw values", async () => {
-    const { fakeTx } = makeFakeTx();
+  it("applyAuditContextValues binds the raw values provided", async () => {
+    const { fakeTx, queries } = makeFakeTx();
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    await setAuditContextRaw(fakeTx as any, { sessionId: "99", tool: "batch" });
-    expect(fakeTx.execute).toHaveBeenCalledTimes(2);
+    await applyAuditContextValues(fakeTx as any, { sessionId: "99", tool: "batch" });
+    expect(fakeTx.execute).toHaveBeenCalledTimes(1);
+    const params = extractParams(queries[0]);
+    expect(params).toContain("99");
+    expect(params).toContain("batch");
   });
 });

@@ -50,6 +50,7 @@ import {
 } from "../../api-types.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 import { resolveResourceIds } from "../shared/resolve-resource-id.js";
 import { urlVariants } from "../shared/url-variants.js";
 import { generateId } from "@longterm-wiki/factbase";
@@ -495,6 +496,8 @@ const resourcesApp = new Hono()
     let results: Array<{ id: string; url: string }> = [];
     try {
       await db.transaction(async (tx) => {
+        // Audit-log attribution (QUA-442).
+        await applyAuditContext(tx, c);
         // Pre-resolve all citedBy page IDs in one batch query
         const allCitedByIds = [...new Set(items.flatMap((item) => item.citedBy ?? []))];
         const intIdMap = allCitedByIds.length > 0

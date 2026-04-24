@@ -1875,6 +1875,7 @@ export const fullAuditLog = pgTable(
     ),
     index("idx_full_audit_log_session").on(table.sessionId),
     index("idx_full_audit_log_txn").on(table.txnId),
+    index("idx_full_audit_log_changed_at").on(table.changedAt),
   ],
 );
 

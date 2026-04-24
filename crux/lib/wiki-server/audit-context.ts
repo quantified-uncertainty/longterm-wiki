@@ -93,12 +93,17 @@ export function getCachedAuditSessionId(): string | null {
 /**
  * The tool name published via `process.env.CRUX_COMMAND` by crux.mjs.
  * Returns null if unset (e.g. non-crux callers of the client lib).
+ *
+ * Capped at 256 chars to match the server-side header sanitizer. Even
+ * though normal `<domain> <command>` is much shorter, clamp defensively.
  */
+const TOOL_NAME_MAX = 256;
 export function getCruxToolName(): string | null {
   const raw = process.env.CRUX_COMMAND;
   if (!raw) return null;
   const trimmed = raw.trim();
-  return trimmed.length > 0 ? trimmed : null;
+  if (trimmed.length === 0) return null;
+  return trimmed.length > TOOL_NAME_MAX ? trimmed.slice(0, TOOL_NAME_MAX) : trimmed;
 }
 
 /** Test-only helper: reset the module-level cache. */

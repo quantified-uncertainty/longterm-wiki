@@ -82,34 +82,29 @@ type DrizzleTx = PgTransaction<
  * Null-or-empty attribution is written as empty strings; the trigger
  * function treats '' as NULL so recording still works and `IS NULL`
  * filters behave predictably.
+ *
+ * Both `set_config` calls are issued in a single SELECT to save a
+ * round-trip per transaction.
  */
 export async function applyAuditContext(
   tx: DrizzleTx,
   c: Context,
 ): Promise<void> {
   const ctx = getAuditContext(c);
-  // Two calls instead of one; Postgres doesn't have a set_many primitive and
-  // merging into a single SELECT is no cheaper.
-  await tx.execute(
-    sql`SELECT set_config('app.agent_session_id', ${ctx.sessionId ?? ""}, true)`,
-  );
-  await tx.execute(
-    sql`SELECT set_config('app.agent_tool', ${ctx.tool ?? ""}, true)`,
-  );
+  await applyAuditContextValues(tx, ctx);
 }
 
 /**
- * Convenience for non-Hono callers (background jobs, tests) that want to
- * seed the audit attribution without a Context object.
+ * Lower-level variant: apply a raw `AuditContext` to the transaction.
+ * Useful for non-Hono callers (background jobs, tests, cron) that don't
+ * have a `Context` but still want to seed attribution.
  */
-export async function setAuditContextRaw(
+export async function applyAuditContextValues(
   tx: DrizzleTx,
   ctx: AuditContext,
 ): Promise<void> {
   await tx.execute(
-    sql`SELECT set_config('app.agent_session_id', ${ctx.sessionId ?? ""}, true)`,
-  );
-  await tx.execute(
-    sql`SELECT set_config('app.agent_tool', ${ctx.tool ?? ""}, true)`,
+    sql`SELECT set_config('app.agent_session_id', ${ctx.sessionId ?? ""}, true),
+               set_config('app.agent_tool', ${ctx.tool ?? ""}, true)`,
   );
 }

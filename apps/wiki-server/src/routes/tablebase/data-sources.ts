@@ -17,6 +17,7 @@ import { sourceSnapshots, resources, resourceTabularSources } from "../../schema
 import { paginationQuery, zv, notFoundError } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 import { generateId } from "@longterm-wiki/factbase";
 
 // ---- Zod schemas ----
@@ -245,6 +246,8 @@ const dataSourcesApp = new Hono()
     let actualStableId = "";
 
     await db.transaction(async (tx) => {
+      // Audit-log attribution (QUA-442).
+      await applyAuditContext(tx, c);
       // Upsert resource row. ON CONFLICT on URL handles the case where
       // a resource was created by resource-ingest with a different ID scheme.
       const [upsertedResource] = await tx
