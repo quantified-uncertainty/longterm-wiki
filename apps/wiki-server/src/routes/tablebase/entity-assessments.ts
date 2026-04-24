@@ -14,21 +14,6 @@ import {
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: entity-assessment composer ----
-interface EntityAssessmentComposerRow {
-  dimension: string;
-  rating: string | number;
-  entityId: string;
-  evidence?: string | null;
-}
-
-registerComposer<EntityAssessmentComposerRow>("entity-assessment", (row, titleMap) => ({
-  title: `${row.dimension}: ${row.rating}`,
-  description: row.evidence ?? null,
-  parentTitle: titleMap.get(row.entityId) ?? row.entityId,
-}));
 
 // ---- Constants ----
 
@@ -113,21 +98,15 @@ const entityAssessmentsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     table: entityAssessments,
     syncSchema: SyncItemSchema,
     entityRefs: ["entityId"],
-    toThing: (item, titleMap) => {
-      const composed = composeThing<EntityAssessmentComposerRow>("entity-assessment", item, titleMap);
-      return {
-        id: item.id,
-        thingType: "entity-assessment" as const,
-        title: composed.title,
-        description: composed.description,
-        parentTitle: composed.parentTitle,
-        sourceTable: "entity_assessments",
-        sourceId: item.id,
-        parentThingId: item.entityId,
-        sourceUrl: item.source ?? null,
-      };
-    },
-    thingsTitleIds: (items) => [...new Set(items.map((i) => i.entityId))],
+    // QUA-507: pointer-only things write.
+    toThing: (item) => ({
+      id: item.id,
+      thingType: "entity-assessment" as const,
+      sourceTable: "entity_assessments",
+      sourceId: item.id,
+      parentThingId: item.entityId,
+      sourceUrl: item.source ?? null,
+    }),
   }))
 
   .post("/delete-batch", deleteBatchHandler(entityAssessments, "entity_assessments"));

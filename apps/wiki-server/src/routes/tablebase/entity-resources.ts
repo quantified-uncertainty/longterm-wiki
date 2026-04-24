@@ -2,42 +2,11 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, inArray, sql } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { entityResources, resources } from "../../schema.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
+import { entityResources } from "../../schema.js";
+import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { applyTruncation } from "../shared/utils.js";
 import { createSyncHandler } from "./sync-factory.js";
-
-// ---- QUA-470 Phase 4b-B.1: entity-resource composer ----
-//
-// entity-resource was missing from VALID_THING_TYPES until QUA-433 added it.
-// Title falls back to the resourceId when the resource title isn't found.
-// description encodes the relationship type (authored / about / linked).
-interface EntityResourceComposerRow {
-  resourceId: string;
-  entityId: string;
-  authoredByEntity?: boolean;
-  isSubject?: boolean;
-}
-
-// The composer needs both the resource title map AND the entity title map.
-// We pass a single combined map at the call site (resourceId → title and
-// entityId → title in the same Map). The keyspaces don't collide because
-// resourceIds and entityIds use different prefixes.
-registerComposer<EntityResourceComposerRow>("entity-resource", (row, titleMap) => ({
-  title: titleMap.get(row.resourceId) ?? row.resourceId,
-  // "linked" fallback keeps plain-link rows searchable. SyncItemSchema
-  // defaults both booleans to false, so the plain-link path is the common
-  // case; returning null would drop the relationship label entirely from
-  // things.description.
-  description: row.authoredByEntity
-    ? "authored"
-    : row.isSubject
-      ? "about"
-      : "linked",
-  parentTitle: titleMap.get(row.entityId) ?? row.entityId,
-}));
 
 const SyncItemSchema = z.object({
   entityId: z.string().min(1).max(200),
@@ -112,27 +81,19 @@ const entityResourcesApp = new Hono()
         isSubject: item.isSubject,
         inferenceSource: item.inferenceSource ?? null,
       }),
-      // The entity-resource composer needs BOTH resource titles (from the
-      // resources table) AND entity titles in one combined map, plus the
-      // auto-generated row id for things.sourceId. The factory's toThing
-      // only receives entity titles, so we do the things dual-write in a
-      // postUpsert hook instead.
+      // QUA-507: pointer-only things dual-write. Re-fetch the upserted rows
+      // so we get the auto-generated `id` (for things.sourceId).
       postUpsert: async (tx, items) => {
         if (items.length === 0) return;
 
         const entityIds = [...new Set(items.map((i) => i.entityId))];
         const resourceIds = [...new Set(items.map((i) => i.resourceId))];
 
-        // Re-fetch the rows we just upserted so we get the auto-generated
-        // `id` (for things.sourceId) and the merged boolean flags (for the
-        // composer's description).
         const rows = await tx
           .select({
             id: entityResources.id,
             entityId: entityResources.entityId,
             resourceId: entityResources.resourceId,
-            authoredByEntity: entityResources.authoredByEntity,
-            isSubject: entityResources.isSubject,
           })
           .from(entityResources)
           .where(
@@ -142,9 +103,7 @@ const entityResourcesApp = new Hono()
             ),
           );
 
-        // Narrow to exactly the (entityId, resourceId) pairs we synced —
-        // the IN..IN above is a superset when multiple entities share
-        // resources within the same batch.
+        // Narrow to exactly the (entityId, resourceId) pairs we synced.
         const pairKeys = new Set(
           items.map((i) => `${i.entityId}\x00${i.resourceId}`),
         );
@@ -153,44 +112,15 @@ const entityResourcesApp = new Hono()
         );
         if (matched.length === 0) return;
 
-        // Resolve resource titles and entity titles into a single combined
-        // map (resourceId → title + entityId → title). The composer uses
-        // one lookup map; after QUA-567 both keys are stable IDs, so this
-        // relies on stable IDs being globally unique across these tables.
-        const [resourceRows, entityTitleMap] = await Promise.all([
-          tx
-            .select({ stableId: resources.stableId, title: resources.title, url: resources.url })
-            .from(resources)
-            .where(inArray(resources.stableId, resourceIds)),
-          resolveEntityTitles(tx, entityIds),
-        ]);
-        const combinedTitleMap = new Map<string, string>([
-          ...resourceRows
-            .filter((r): r is { stableId: string; title: string | null; url: string } => r.stableId !== null)
-            .map(
-              (r) => [r.stableId, r.title ?? r.url ?? r.stableId] as [string, string],
-            ),
-          ...entityTitleMap.entries(),
-        ]);
-
         await upsertThingsInTx(
           tx,
-          matched.map((r) => {
-            const composed = composeThing<EntityResourceComposerRow>(
-              "entity-resource",
-              r,
-              combinedTitleMap,
-            );
-            return {
-              id: `er:${r.entityId}:${r.resourceId}`,
-              thingType: "entity-resource" as const,
-              title: composed.title,
-              description: composed.description,
-              parentTitle: composed.parentTitle,
-              sourceTable: "entity_resources",
-              sourceId: String(r.id),
-            };
-          }),
+          matched.map((r) => ({
+            id: `er:${r.entityId}:${r.resourceId}`,
+            thingType: "entity-resource" as const,
+            parentThingId: r.entityId,
+            sourceTable: "entity_resources",
+            sourceId: String(r.id),
+          })),
         );
       },
     }),

@@ -13,19 +13,6 @@ import {
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: research-area composer ----
-interface ResearchAreaComposerRow {
-  title: string;
-  description?: string | null;
-}
-
-registerComposer<ResearchAreaComposerRow>("research-area", (row) => ({
-  title: row.title,
-  description: row.description ?? null,
-  parentTitle: null,
-}));
 import {
   researchAreas,
   researchAreaOrganizations,
@@ -454,19 +441,14 @@ const researchAreasApp = new Hono()
       name: "research-areas",
       table: researchAreas,
       syncSchema: SyncResearchAreaItemSchema,
-      toThing: (item) => {
-        const composed = composeThing<ResearchAreaComposerRow>("research-area", item, new Map());
-        return {
-          id: item.id,
-          thingType: "research-area" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "research_areas",
-          sourceId: item.id,
-          sourceUrl: item.source,
-        };
-      },
+      // QUA-507: pointer-only things write.
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "research-area" as const,
+        sourceTable: "research_areas",
+        sourceId: item.id,
+        sourceUrl: item.source,
+      }),
     }),
   )
 

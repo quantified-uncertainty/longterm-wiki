@@ -22,6 +22,7 @@ import {
   benchmarkResults,
   facts,
   things,
+  thingsSearch,
   wikiPages,
   researchAreaOrganizations,
   sourceVerdicts,
@@ -267,10 +268,12 @@ const SECTIONS: SectionDef[] = [
     key: "things",
     label: "Things",
     description: "Cross-base unified index entries parented to this entity",
+    // QUA-507: base `things` table is pointer-only post denorm drop; read
+    // display fields from the `things_search` MV instead.
     table: things,
     tableName: "things",
     query: (db, stableId) =>
-      db.select().from(things).where(eq(things.parentThingId, stableId)).limit(FETCH_LIMIT),
+      db.select().from(thingsSearch).where(eq(thingsSearch.parentThingId, stableId)).limit(FETCH_LIMIT),
   },
   {
     key: "wikiPages",

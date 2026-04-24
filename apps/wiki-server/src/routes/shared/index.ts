@@ -21,7 +21,7 @@ export {
 } from "./utils.js";
 export { checkRefsExist } from "./ref-check.js";
 export { resolvePageIntId, resolvePageIntIds, allocateAndResolvePageIntIds } from "./page-id-helpers.js";
-export { upsertThingsInTx, resolveEntityTitles, type ThingSyncInput } from "./thing-sync.js";
+export { upsertThingsInTx, type ThingSyncInput } from "./thing-sync.js";
 export { resolveEntityStableId } from "./entity-resolution.js";
 export { buildSearchCondition, parseSort, paginationMeta, type PaginationMeta } from "./query-helpers.js";
 export { validateEntityRefs, findMissingEntityRefs, type EntityRefField } from "./validate-entity-refs.js";

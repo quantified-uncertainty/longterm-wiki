@@ -22,37 +22,6 @@ import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { validateEntityRefs } from "../shared/validate-entity-refs.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: political-race + race-candidate composers ----
-//
-// political-race uses item.state as parentTitle (a string, not an entity
-// title) — this is the only handler in the suite that does that.
-interface PoliticalRaceComposerRow {
-  name: string;
-  state?: string | null;
-  aiAngle?: string | null;
-}
-
-registerComposer<PoliticalRaceComposerRow>("political-race", (row) => ({
-  title: row.name,
-  description: row.aiAngle ?? null,
-  parentTitle: row.state ?? null,
-}));
-
-interface RaceCandidateComposerRow {
-  candidateDisplayName: string;
-  raceId: string;
-  aiStance?: string | null;
-}
-
-registerComposer<RaceCandidateComposerRow>("race-candidate", (row, titleMap) => ({
-  title: row.candidateDisplayName,
-  description: row.aiStance ?? null,
-  // raceId is a thing key (composite), not an entity slug — the title map
-  // typically won't contain it; fall back to null (matches old behavior).
-  parentTitle: titleMap.get(row.raceId) ?? null,
-}));
 
 // ---- Constants ----
 
@@ -429,20 +398,15 @@ const politicalRacesApp = new Hono()
       table: politicalRaces,
       syncSchema: SyncRaceItemSchema,
       entityRefs: ["policyEntityId"],
-      toThing: (item) => {
-        const composed = composeThing<PoliticalRaceComposerRow>("political-race", item, new Map());
-        return {
-          id: item.id,
-          thingType: "political-race" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "political_races",
-          sourceId: item.id,
-          parentThingId: null,
-          sourceUrl: item.source ?? null,
-        };
-      },
+      // QUA-507: pointer-only things write.
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "political-race" as const,
+        sourceTable: "political_races",
+        sourceId: item.id,
+        parentThingId: null,
+        sourceUrl: item.source ?? null,
+      }),
     }),
   )
 
@@ -518,23 +482,17 @@ const politicalRacesApp = new Hono()
         upserted++;
       }
 
-      // Upsert into things for each candidate via dispatch composer (QUA-470)
+      // QUA-507: pointer-only things write for each candidate.
       await upsertThingsInTx(
         tx,
-        items.map((item) => {
-          const composed = composeThing<RaceCandidateComposerRow>("race-candidate", item, new Map());
-          return {
-            id: item.id,
-            thingType: "race-candidate" as const,
-            title: composed.title,
-            description: composed.description,
-            parentTitle: composed.parentTitle,
-            sourceTable: "race_candidates",
-            sourceId: item.id,
-            parentThingId: item.raceId,
-            sourceUrl: item.source ?? null,
-          };
-        }),
+        items.map((item) => ({
+          id: item.id,
+          thingType: "race-candidate" as const,
+          sourceTable: "race_candidates",
+          sourceId: item.id,
+          parentThingId: item.raceId,
+          sourceUrl: item.source ?? null,
+        })),
       );
     });
 

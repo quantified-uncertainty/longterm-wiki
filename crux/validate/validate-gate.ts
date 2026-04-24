@@ -390,6 +390,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'things-denorm-dead',
+    name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-things-denorm-dead.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'factbase-fact-unit-field',
     name: 'FactBase facts use `currency:` not `unit:` (loader drops stray unit fields)',
     command: 'npx',

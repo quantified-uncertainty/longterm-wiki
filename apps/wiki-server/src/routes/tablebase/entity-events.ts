@@ -14,21 +14,6 @@ import {
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: entity-event composer ----
-interface EntityEventComposerRow {
-  title: string;
-  date: string;
-  entityId: string;
-  description?: string | null;
-}
-
-registerComposer<EntityEventComposerRow>("entity-event", (row, titleMap) => ({
-  title: `${row.title} (${row.date})`,
-  description: row.description ?? null,
-  parentTitle: titleMap.get(row.entityId) ?? row.entityId,
-}));
 
 // ---- Constants ----
 
@@ -127,21 +112,15 @@ const entityEventsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     table: entityEvents,
     syncSchema: SyncItemSchema,
     entityRefs: ["entityId"],
-    toThing: (item, titleMap) => {
-      const composed = composeThing<EntityEventComposerRow>("entity-event", item, titleMap);
-      return {
-        id: item.id,
-        thingType: "entity-event" as const,
-        title: composed.title,
-        description: composed.description,
-        parentTitle: composed.parentTitle,
-        sourceTable: "entity_events",
-        sourceId: item.id,
-        parentThingId: item.entityId,
-        sourceUrl: item.source ?? null,
-      };
-    },
-    thingsTitleIds: (items) => [...new Set(items.map((i) => i.entityId))],
+    // QUA-507: pointer-only things write.
+    toThing: (item) => ({
+      id: item.id,
+      thingType: "entity-event" as const,
+      sourceTable: "entity_events",
+      sourceId: item.id,
+      parentThingId: item.entityId,
+      sourceUrl: item.source ?? null,
+    }),
   }))
 
   .post("/delete-batch", deleteBatchHandler(entityEvents, "entity_events"));

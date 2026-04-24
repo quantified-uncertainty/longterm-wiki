@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, and, or, count, sql, desc, isNull, like, inArray } from "drizzle-orm";
+import { eq, and, or, count, sql, desc, isNull, like } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../db.js";
 import { personnel, entities, things, sourceVerdicts } from "../../schema.js";
@@ -18,8 +18,6 @@ import {
   noDuplicateIds,
   clampedLimit,
 } from "../shared/utils.js";
-import { upsertThingsInTx, resolveEntityTitles } from "../shared/thing-sync.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { logAuditEntries } from "./audit-log.js";
@@ -92,41 +90,8 @@ function cleanPersonId(pid: string): string | null {
   return pid;
 }
 
-/**
- * Row shape passed into the personnel composer. Only the fields the composer
- * reads are listed — keeps the contract narrow and makes refactors safe.
- */
-interface PersonnelComposerRow {
-  personId: string;
-  personDisplayName: string | null;
-  personEntityId: string | null;
-  role: string;
-  organizationId: string;
-}
-
-// Phase 4b-B.1 (QUA-470): personnel composer is registered in the dispatch
-// table at module load. The postUpsert hook below calls composeThing()
-// instead of inlining the 4-step fallback. See compose-thing.ts.
-//
-// The 4-step person-name fallback (entity title → display name → cleaned ID
-// → raw ID) is preserved verbatim — this is a refactor, not a behavior
-// change. Phase 4b-B.2 will eliminate the column entirely.
-registerComposer<PersonnelComposerRow>("personnel", (row, titleMap) => {
-  const personName =
-    (row.personEntityId ? titleMap.get(row.personEntityId) : null) ??
-    row.personDisplayName ??
-    cleanPersonId(row.personId) ??
-    row.personId;
-  const orgName = titleMap.get(row.organizationId) ?? row.organizationId;
-  return {
-    title: `${personName} — ${row.role} at ${orgName}`,
-    description: null,
-    // parentTitle was missing from the inlined version (audit §6 finding #4
-    // class). Setting it here also includes the parent org name in the
-    // generated `things.search_vector` (weight B), improving FTS relevance.
-    parentTitle: orgName,
-  };
-});
+// cleanPersonId is still used by the /review-data endpoint below for UI display;
+// the personnel composer that previously consumed it lived here until QUA-507.
 
 const personEntity = alias(entities, "person_entity");
 const orgEntity = alias(entities, "org_entity");
@@ -431,18 +396,20 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
         sourceUrl: item.source ?? null,
         sourcing: item.sourcing ?? null,
       }),
-      // Personnel has unique post-fkResolve handling that the factory's
-      // standard `toThing` can't express:
-      //   1. Strip the "new:" prefix from personId for display name backfill
-      //   2. Re-fetch rows from PG (because fkResolve has updated person_entity_id)
-      //   3. Resolve person + org titles for the things table
-      //   4. Compose title as "personName — role at orgName"
-      // This is the personnel route's 1-hook escape hatch (per Phase 0 audit).
+      // QUA-507: things dual-write is pointer-only via `toThing` below.
+      // `postUpsert` is kept solely for the "new:" prefix display-name backfill.
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "personnel" as const,
+        parentThingId: item.organizationId,
+        sourceTable: "personnel",
+        sourceId: item.id,
+        sourceUrl: item.source ?? null,
+      }),
       postUpsert: async (tx, items) => {
         const syncedIds = items.map((i) => i.id);
         const idList = sqlInList(syncedIds);
-
-        // 1. Backfill display name from "new:" prefix (strip prefix)
+        // Backfill display name from "new:" prefix (strip prefix).
         await tx.execute(sql`
           UPDATE personnel SET
             person_display_name = trim(substring(person_id FROM 5))
@@ -450,54 +417,6 @@ const personnelApp = new Hono<{ Variables: ResolvedEntityVars }>()
             AND person_display_name IS NULL
             AND id IN (${idList})
         `);
-
-        // 2. Re-fetch rows so things sync uses fkResolve-updated values
-        const resolvedItems = await tx
-          .select({
-            id: personnel.id,
-            personId: personnel.personId,
-            personDisplayName: personnel.personDisplayName,
-            personEntityId: personnel.personEntityId,
-            role: personnel.role,
-            organizationId: personnel.organizationId,
-            source: personnel.source,
-          })
-          .from(personnel)
-          .where(inArray(personnel.id, syncedIds));
-
-        // 3. Resolve person + org IDs to human-readable titles in a single query
-        const resolvedPersonIds = resolvedItems
-          .filter((r) => r.personEntityId)
-          .map((r) => r.personEntityId!);
-        const orgIds = [...new Set(resolvedItems.map((p) => p.organizationId))];
-        const titleMap = await resolveEntityTitles(tx, [
-          ...resolvedPersonIds,
-          ...orgIds,
-        ]);
-
-        // 4. Dual-write to things table via composer dispatch table
-        // (QUA-470 Phase 4b-B.1). The 4-step person-name fallback lives in
-        // the registered "personnel" composer at the top of this file.
-        await upsertThingsInTx(
-          tx,
-          resolvedItems.map((p) => {
-            const composed = composeThing<PersonnelComposerRow>(
-              "personnel",
-              p,
-              titleMap,
-            );
-            return {
-              id: p.id,
-              thingType: "personnel" as const,
-              title: composed.title,
-              description: composed.description,
-              parentTitle: composed.parentTitle,
-              sourceTable: "personnel",
-              sourceId: p.id,
-              sourceUrl: p.source,
-            };
-          }),
-        );
       },
     }),
   )
