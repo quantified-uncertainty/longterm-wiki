@@ -46,8 +46,21 @@ const DEFAULT_VERDICT = 'unverifiable';
 // Only verdicts where weak source URLs are the suspected root cause.
 // `partial` added per QUA-587 — QUA-546 found re-verification was
 // ineffective for partials because the source URLs themselves are weak.
-// `contradicted` / `outdated` / `confirmed` are excluded: their URLs are
-// relevant, just disagreeing or aging, so URL replacement isn't the fix.
+// Deliberately excluded:
+//   - `confirmed`: the source works; no reason to replace it.
+//   - `contradicted`: the source disagrees substantively; replacing the
+//     URL would mask the disagreement. Route through crux sourcing-recheck
+//     instead.
+//   - `outdated`: handled via the recheck path (crux sourcing-recheck
+//     --verdict=outdated re-fetches the same URL looking for updates),
+//     not URL replacement. Staleness is a value-refresh problem, not a
+//     URL-quality problem. If this turns out to be wrong in practice we
+//     can widen the allowlist — the ticket (QUA-587) explicitly scopes
+//     this change to unverifiable + partial.
+//   - `unchecked`: no verdict yet to remediate.
+// NOTE: sourcing-recheck.ts uses a broader allowlist (all 5 real verdicts)
+// because its semantics differ — it reruns the LLM against current
+// evidence, which is valid for any verdict type.
 const ALLOWED_SUGGEST_VERDICTS = new Set(['unverifiable', 'partial']);
 
 interface SuggestOptions extends BaseOptions {
@@ -235,7 +248,7 @@ async function suggestCommand(
   if (!ALLOWED_SUGGEST_VERDICTS.has(verdictFilter)) {
     return {
       exitCode: 1,
-      output: `Invalid --verdict "${options.verdict}". Must be one of: ${[...ALLOWED_SUGGEST_VERDICTS].join(', ')}`,
+      output: `Invalid --verdict "${verdictFilter}". Must be one of: ${[...ALLOWED_SUGGEST_VERDICTS].sort().join(', ')}`,
     };
   }
   const dryRun = Boolean(options['dry-run'] ?? options.dryRun);
@@ -435,7 +448,7 @@ Usage:
 
 Options:
   --verdict=X            Verdict type to sweep (default: ${DEFAULT_VERDICT}).
-                         Allowed: ${[...ALLOWED_SUGGEST_VERDICTS].join(', ')}.
+                         Allowed: ${[...ALLOWED_SUGGEST_VERDICTS].sort().join(', ')}.
   --limit=N              Max verdicts to scan (default: ${DEFAULT_LIMIT}, max: ${MAX_LIMIT})
   --budget=N             Soft cap in USD on search-provider spend (default: $${DEFAULT_BUDGET_USD.toFixed(2)}).
                          Checked before each record — a single in-flight call can overshoot.

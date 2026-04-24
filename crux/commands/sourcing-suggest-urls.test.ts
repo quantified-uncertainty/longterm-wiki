@@ -29,8 +29,15 @@ vi.mock('../lib/sourcing/suggest-urls.ts', () => ({
 }));
 
 import { commands } from './sourcing-suggest-urls.ts';
+import { suggestUrls } from '../lib/sourcing/suggest-urls.ts';
 
 const suggest = commands.default;
+const mockSuggestUrls = vi.mocked(suggestUrls);
+
+// Typed helper so tests don't pass options through an `as never` escape hatch.
+// Accepts any subset of the command's option flags.
+type TestOpts = Record<string, string | boolean | undefined>;
+const run = (opts: TestOpts) => suggest([], opts as Parameters<typeof suggest>[1]);
 
 function makeVerdict(overrides: Partial<Record<string, unknown>> = {}): Record<string, unknown> {
   return {
@@ -72,7 +79,7 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('rejects unknown verdict values before any API calls', async () => {
-    const result = await suggest([], { verdict: 'typo', 'dry-run': true } as never);
+    const result = await run({ verdict: 'typo', 'dry-run': true });
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain('Invalid --verdict');
     expect(mockListVerdicts).not.toHaveBeenCalled();
@@ -81,9 +88,12 @@ describe('sourcing-suggest-urls --verdict', () => {
   });
 
   it('rejects allowed-elsewhere verdicts that URL-replacement does not address', async () => {
-    for (const verdict of ['confirmed', 'contradicted', 'outdated']) {
+    // Includes `unchecked` — which is a legitimate verdict elsewhere but
+    // doesn't make sense here (no verdict yet to remediate). Listed
+    // explicitly so a future widening of the allowlist has to update the test.
+    for (const verdict of ['confirmed', 'contradicted', 'outdated', 'unchecked']) {
       mockListVerdicts.mockClear();
-      const result = await suggest([], { verdict, 'dry-run': true } as never);
+      const result = await run({ verdict, 'dry-run': true });
       expect(result.exitCode).toBe(1);
       expect(result.output).toMatch(/Invalid --verdict/);
       expect(result.output).toContain('unverifiable');
@@ -98,7 +108,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       ok: true,
       data: { verdicts: [makeVerdict({ verdict: 'unverifiable' })], total: 1 },
     });
-    const result = await suggest([], { 'dry-run': true } as never);
+    const result = await run({ 'dry-run': true });
     expect(result.exitCode).toBe(0);
     expect(mockListVerdicts).toHaveBeenCalledTimes(1);
     expect(mockListVerdicts).toHaveBeenCalledWith(
@@ -112,7 +122,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       ok: true,
       data: { verdicts: [makeVerdict()], total: 1 },
     });
-    const result = await suggest([], { verdict: 'partial', 'dry-run': true } as never);
+    const result = await run({ verdict: 'partial', 'dry-run': true });
     expect(result.exitCode).toBe(0);
     expect(mockListVerdicts).toHaveBeenCalledTimes(1);
     expect(mockListVerdicts).toHaveBeenCalledWith(
@@ -126,7 +136,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       ok: true,
       data: { verdicts: [], total: 0 },
     });
-    const result = await suggest([], { verdict: 'PARTIAL', 'dry-run': true } as never);
+    const result = await run({ verdict: 'PARTIAL', 'dry-run': true });
     expect(result.exitCode).toBe(0);
     expect(mockListVerdicts).toHaveBeenCalledWith(
       expect.objectContaining({ verdict: 'partial' }),
@@ -139,7 +149,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       ok: true,
       data: { verdicts: [], total: 0 },
     });
-    const result = await suggest([], { verdict: 'partial', 'dry-run': true } as never);
+    const result = await run({ verdict: 'partial', 'dry-run': true });
     expect(result.exitCode).toBe(0);
     expect(result.output).toMatch(/No partial verdicts matched/i);
   });
@@ -150,7 +160,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       message: 'boom',
       error: { code: 'HTTP_500' },
     });
-    const result = await suggest([], { verdict: 'partial', 'dry-run': true } as never);
+    const result = await run({ verdict: 'partial', 'dry-run': true });
     expect(result.exitCode).toBe(1);
     expect(result.output).toMatch(/Failed to list partial verdicts/i);
     expect(result.output).toContain('boom');
@@ -162,15 +172,55 @@ describe('sourcing-suggest-urls --verdict', () => {
       ok: true,
       data: { verdicts: [], total: 0 },
     });
-    const result = await suggest([], {
+    const result = await run({
       verdict: 'partial',
       'dry-run': true,
       json: true,
-    } as never);
+    });
     expect(result.exitCode).toBe(0);
     const parsed = JSON.parse(result.output);
     expect(parsed.summary).toBeDefined();
     expect(parsed.summary.dry_run).toBe(true);
     expect(parsed.summary.scanned).toBe(0);
+  });
+
+  it('upserts candidates for --verdict=partial in the non-dry-run path', async () => {
+    // Not dry-run: proves the full pipeline (list -> evidence -> suggest
+    // -> upsert) still runs correctly once the verdict flag is threaded
+    // through. Without this, a bug where `verdict=partial` silently
+    // bypassed upsert would not be caught by the dry-run tests above.
+    stubDryRunPrereqs();
+    mockListVerdicts.mockResolvedValueOnce({
+      ok: true,
+      data: { verdicts: [makeVerdict({ recordId: 'g_a', entityId: 'anthropic' })], total: 1 },
+    });
+    mockSuggestUrls.mockResolvedValueOnce({
+      candidates: [
+        { url: 'https://example.com/a', title: 'A', snippet: null, relevanceScore: null, sourceProvider: 'exa' },
+      ],
+      providersUsed: ['exa'],
+      providersSkipped: [],
+      query: 'test',
+      costUsd: 0,
+    });
+    mockUpsertUrlSuggestions.mockResolvedValueOnce({
+      ok: true,
+      data: { upserted: 1 },
+    });
+
+    const result = await run({ verdict: 'partial', limit: '10' });
+
+    expect(result.exitCode).toBe(0);
+    expect(mockSuggestUrls).toHaveBeenCalledTimes(1);
+    expect(mockUpsertUrlSuggestions).toHaveBeenCalledTimes(1);
+    const upsertArg = mockUpsertUrlSuggestions.mock.calls[0][0];
+    expect(upsertArg).toHaveLength(1);
+    expect(upsertArg[0]).toMatchObject({
+      recordType: 'grant',
+      recordId: 'g_a',
+      entityId: 'anthropic',
+      suggestedUrl: 'https://example.com/a',
+      status: 'pending',
+    });
   });
 });
