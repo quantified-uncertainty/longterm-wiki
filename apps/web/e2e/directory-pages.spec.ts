@@ -41,9 +41,13 @@ test.describe("Directory pages load", () => {
 test.describe("Directory pages have content", () => {
   test("/organizations shows org entries", async ({ page }) => {
     await page.goto("/organizations", { timeout: 45000 });
-    // Org table is client-rendered; wait for any table row or link to appear
-    const tableBody = page.locator("table tbody, [role='table']").first();
-    await expect(tableBody).toBeVisible({ timeout: 20000 });
+    // Default landing view is grouped-by-type (PR #4552); table only renders
+    // after clicking the Table toggle or searching. Match org links which are
+    // present in both views.
+    const orgLinks = page.locator("a[href^='/organizations/']");
+    await expect(orgLinks.first()).toBeVisible({ timeout: 20000 });
+    const count = await orgLinks.count();
+    expect(count).toBeGreaterThan(5);
   });
 
   test("/people shows person entries", async ({ page }) => {

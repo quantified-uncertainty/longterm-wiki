@@ -65,85 +65,71 @@ async function findBlankRows(scope: Locator): Promise<string[]> {
 
   for (let t = 0; t < tableCount; t++) {
     const table = tables.nth(t);
-    const rows = table.locator("tbody tr");
-    const rowCount = await rows.count();
 
-    for (let r = 0; r < rowCount; r++) {
-      const row = rows.nth(r);
+    // Do all per-row/per-cell inspection inside a single browser evaluate
+    // instead of round-tripping per cell. The prior implementation issued
+    // ~3 evaluate() calls per cell, which blew past the 60s test budget on
+    // the redesigned vertical-tab profile (QUA-674).
+    const tableIssues = await table.evaluate((tableEl) => {
+      const out: { row: number; kind: "first-blank" | "all-blank"; preview: string; totalDataCells: number }[] = [];
+      const rows = Array.from(tableEl.querySelectorAll("tbody tr"));
+      rows.forEach((rowEl, r) => {
+        const row = rowEl as HTMLElement;
+        if (getComputedStyle(row).display === "none") return;
 
-      // Skip hidden rows
-      const isHidden = await row.evaluate(
-        (el) => getComputedStyle(el).display === "none",
-      );
-      if (isHidden) continue;
+        const cells = Array.from(row.querySelectorAll("td")) as HTMLElement[];
+        let blankCount = 0;
+        let totalDataCells = 0;
+        let firstCellBlank = false;
 
-      const cells = row.locator("td");
-      const cellCount = await cells.count();
+        cells.forEach((cell, c) => {
+          const style = getComputedStyle(cell);
+          if (style.display === "none" || style.visibility === "hidden") return;
+          if (cell.getBoundingClientRect().width <= 60) return;
 
-      let blankCount = 0;
-      let totalDataCells = 0;
-      let firstCellBlank = false;
+          totalDataCells++;
 
-      for (let c = 0; c < cellCount; c++) {
-        const cell = cells.nth(c);
-
-        // Skip cells that are hidden
-        const cellHidden = await cell.evaluate(
-          (el) =>
-            getComputedStyle(el).display === "none" ||
-            getComputedStyle(el).visibility === "hidden",
-        );
-        if (cellHidden) continue;
-
-        // Skip narrow status/action columns (dot indicators, buttons, icons)
-        const cellWidth = await cell.evaluate(
-          (el) => el.getBoundingClientRect().width,
-        );
-        if (cellWidth <= 60) continue;
-
-        totalDataCells++;
-
-        // Check if cell has meaningful content
-        const hasContent = await cell.evaluate((el) => {
-          // Has interactive/visual elements
-          if (el.querySelector("svg, img, button, input, canvas"))
-            return true;
-          if (el.querySelector("[class*='rounded-full']")) return true;
-          const text = (el.textContent ?? "").trim();
-          // Any non-empty text counts, including em-dashes and "N/A"
-          return text.length > 0;
+          const hasChild =
+            cell.querySelector("svg, img, button, input, canvas") !== null ||
+            cell.querySelector("[class*='rounded-full']") !== null;
+          const text = (cell.textContent ?? "").trim();
+          if (!hasChild && text.length === 0) {
+            blankCount++;
+            if (c === 0) firstCellBlank = true;
+          }
         });
 
-        if (!hasContent) {
-          blankCount++;
-          if (c === 0) firstCellBlank = true;
+        if (totalDataCells === 0) return;
+
+        if (firstCellBlank) {
+          out.push({
+            row: r + 1,
+            kind: "first-blank",
+            preview: (row.textContent ?? "").trim().substring(0, 50).replace(/\s+/g, " "),
+            totalDataCells,
+          });
         }
-      }
+        if (blankCount === totalDataCells) {
+          out.push({ row: r + 1, kind: "all-blank", preview: "", totalDataCells });
+        }
+      });
+      return out;
+    });
 
-      // Flag: first (identifier) column is blank
-      if (firstCellBlank && totalDataCells > 0) {
-        const rowPreview = await getRowPreview(row);
+    for (const issue of tableIssues) {
+      if (issue.kind === "first-blank") {
         issues.push(
-          `Table ${t + 1}, row ${r + 1}: first column is blank (row: "${rowPreview}")`,
+          `Table ${t + 1}, row ${issue.row}: first column is blank (row: "${issue.preview}")`,
         );
-      }
-
-      // Flag: entire row is blank (all data cells empty)
-      if (totalDataCells > 0 && blankCount === totalDataCells) {
+      } else {
         issues.push(
-          `Table ${t + 1}, row ${r + 1}: all ${totalDataCells} data cells are blank`,
+          `Table ${t + 1}, row ${issue.row}: all ${issue.totalDataCells} data cells are blank`,
         );
       }
     }
   }
 
   return issues;
-}
-
-async function getRowPreview(row: Locator): Promise<string> {
-  return row.evaluate((el) =>
-    (el.textContent ?? "").trim().substring(0, 50).replace(/\s+/g, " "),
-  );
 }
 
 /**
@@ -495,9 +481,17 @@ test.describe("Anthropic org page — blank cell regression", () => {
   test("comprehensive sweep: no tab has a fully-blank table row", async ({
     page,
   }) => {
+    // The vertical-layout profile shell (PR #4553) has more tabs and a
+    // slower first paint than the pre-redesign horizontal tabs; a 60s budget
+    // is tight even with the findBlankRows optimization above (QUA-674).
+    test.setTimeout(120_000);
+
     await loadPage(page, "/organizations/anthropic");
 
-    const tabs = page.locator("[role='tab'], button[data-state]");
+    // Narrow the selector to actual Radix tab triggers. `button[data-state]`
+    // previously over-matched other Radix primitives (accordions, dialogs,
+    // collapsibles) that are now rendered on the redesigned profile page.
+    const tabs = page.locator("[role='tab']");
     const tabCount = await tabs.count();
 
     const tabsWithIssues: string[] = [];
@@ -506,8 +500,13 @@ test.describe("Anthropic org page — blank cell regression", () => {
       const tab = tabs.nth(i);
       const tabLabel = ((await tab.textContent()) ?? "").trim();
 
-      // Skip the Overview tab (stat cards, not data tables)
+      // Skip the Overview tab (stat cards, not data tables). Skip the
+      // Database tab too — it's a raw PG-record inspector (EntityDbPage)
+      // whose tables surface internal columns like bare "ID" on link-table
+      // rows that are legitimately empty for users but would trip the
+      // first-column-blank heuristic (QUA-674).
       if (/^overview$/i.test(tabLabel)) continue;
+      if (/^database$/i.test(tabLabel)) continue;
 
       const state = await tab.getAttribute("data-state");
       if (state !== "active") {
