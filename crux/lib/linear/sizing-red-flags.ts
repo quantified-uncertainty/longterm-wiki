@@ -46,7 +46,10 @@ const DETECTORS: Detector[] = [
     // \b(migrate|backfill|populate|rewrite) [0-9,]+\b — "migrate 5,000".
     // Batch execution is budget-gated, not PR-gated; should be a separate
     // ticket from the plumbing that enables it.
-    pattern: /\b(migrate|backfill|populate|rewrite) [0-9,]+\b/gi,
+    // Anchor on a leading digit so degenerate inputs like "migrate ,5" or
+    // "migrate ,," can't match. The trailing characters allow comma-grouping
+    // (e.g. "5,000").
+    pattern: /\b(migrate|backfill|populate|rewrite) [0-9][0-9,]*\b/gi,
     reason:
       'Row-count batching mixes PR-shaped plumbing with budget-gated execution — file as separate tickets.',
   },

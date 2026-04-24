@@ -366,6 +366,21 @@ describe('linear create', () => {
     expect(r.output).toContain('row-count-batching');
     expect(r.output).toContain('multi-table-enumeration');
   });
+
+  it('emits structured JSON on red-flag refusal when --json is set', async () => {
+    const r = await commands.create(['Phase 2: closeout'], {
+      ci: true,
+      json: true,
+    });
+    expect(r.exitCode).toBe(2);
+    // Output must be valid JSON — no ANSI color codes, no warning text.
+    const parsed = JSON.parse(r.output);
+    expect(parsed.error).toBe('ticket-sizing-red-flag');
+    expect(Array.isArray(parsed.flags)).toBe(true);
+    expect(parsed.flags[0].kind).toBe('phase-or-wave');
+    expect(parsed.hint).toContain('--allow-big');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
 });
 
 // ---------------------------------------------------------------------------
