@@ -221,4 +221,53 @@ describe('resolveGroupRouting', () => {
     const r = resolveGroupRouting(['gh', 'search', 'topic'], shortcuts, mockHasCommand);
     expect(r).toEqual({ groupName: 'gh', domain: 'issues', command: 'search', argsStart: 2 });
   });
+
+  it('routes tb <subdomain> <cmd> to the subdomain, not the tablebase flattened command', () => {
+    const hasCommand = (domain: string, cmd: string) => {
+      const cmds: Record<string, string[]> = {
+        tablebase: ['import-divisions', 'import-divisions-sync'],
+      };
+      return cmds[domain]?.includes(cmd) ?? false;
+    };
+    const r = resolveGroupRouting(['tb', 'import-divisions', 'sync'], shortcuts, hasCommand);
+    expect(r).toEqual({
+      groupName: 'tablebase',
+      domain: 'import-divisions',
+      command: 'sync',
+      argsStart: 3,
+    });
+  });
+
+  it('routes tb <subdomain> (no command) to the subdomain default', () => {
+    const r = resolveGroupRouting(['tb', 'import-divisions'], shortcuts, () => false);
+    expect(r).toEqual({
+      groupName: 'tablebase',
+      domain: 'import-divisions',
+      command: null,
+      argsStart: 3,
+    });
+  });
+
+  it('routes tb data-sources subcommand to the subdomain', () => {
+    const r = resolveGroupRouting(['tb', 'data-sources', 'list'], shortcuts, () => false);
+    expect(r).toEqual({
+      groupName: 'tablebase',
+      domain: 'data-sources',
+      command: 'list',
+      argsStart: 3,
+    });
+  });
+
+  it('keeps flattened dash-form aliases routing to tablebase', () => {
+    const hasCommand = (domain: string, cmd: string) => {
+      return domain === 'tablebase' && cmd === 'import-divisions-sync';
+    };
+    const r = resolveGroupRouting(['tb', 'import-divisions-sync'], shortcuts, hasCommand);
+    expect(r).toEqual({
+      groupName: 'tablebase',
+      domain: 'tablebase',
+      command: 'import-divisions-sync',
+      argsStart: 2,
+    });
+  });
 });
