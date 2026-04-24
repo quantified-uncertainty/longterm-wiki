@@ -39,6 +39,9 @@ interface DedupCluster {
 interface FkColumnInfo {
   tableName: string;
   columnName: string;
+  /** QUA-589: which resources column this FK targets — `id` (legacy hex16)
+   *  or `stable_id` (canonical sid_, post-Phase B). */
+  targetColumn: "id" | "stable_id";
   uniqueGroups: { otherCols: string[] }[];
 }
 
@@ -93,7 +96,15 @@ function logReport(result: RunDedupResult): void {
     );
   }
   console.log(`Total resources: ${report.totalResources}`);
-  console.log(`FK columns referencing resources.id: ${report.fkColumns.length}`);
+  // QUA-589: discovery includes both resources.id and resources.stable_id targets.
+  const idFks = report.fkColumns.filter((f) => f.targetColumn === "id").length;
+  const stableFks = report.fkColumns.filter(
+    (f) => f.targetColumn === "stable_id",
+  ).length;
+  console.log(
+    `FK columns referencing resources: ${report.fkColumns.length} (` +
+      `${idFks} → resources.id, ${stableFks} → resources.stable_id)`,
+  );
   console.log(`Duplicate clusters: ${report.clusters.length}`);
   const rowsToDelete = report.clusters.reduce(
     (acc, c) => acc + c.duplicates.length,
