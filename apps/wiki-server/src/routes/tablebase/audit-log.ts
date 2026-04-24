@@ -59,7 +59,7 @@ export async function logAuditEntries(
   // is already doomed and the subsequent INSERT would fail anyway.
   const [gucRow] = (await tx.execute(
     sql`SELECT current_setting('app.agent_session_id', true) AS session_id`,
-  )) as unknown as Array<{ session_id: string | null }>;
+  )) as unknown as Array<{ session_id: string | null }>; // as-any-ok: Drizzle's tx.execute returns an untyped row array for raw SQL; narrowing to the known one-column shape is the pattern used elsewhere for current_setting reads.
   const rawSession = gucRow?.session_id ?? null;
   const gucSession = rawSession && rawSession.length > 0 ? rawSession : null;
 
