@@ -4230,7 +4230,7 @@ export const modelSystemCards = pgTable(
     uniqueIndex("uq_msc_natural_key").on(
       table.aiModelId,
       sql`COALESCE(${table.version}, '')`,
-      sql`COALESCE(${table.releaseDate}::text, '')`,
+      sql`COALESCE(${table.releaseDate}, '0001-01-01'::date)`,
     ),
   ],
 );

@@ -68,11 +68,15 @@ CREATE INDEX IF NOT EXISTS "idx_msc_release_date"
 
 -- Natural key: (ai_model_id, version, release_date). COALESCE'd so NULL
 -- version or release_date doesn't fall through the uniqueness check.
+-- We avoid `::text` on the date column because date->text conversion
+-- depends on `DateStyle` and is therefore not IMMUTABLE; Postgres rejects
+-- it inside an index expression. Sentinel '0001-01-01' is older than any
+-- real release date, so a NULL release_date collates with itself.
 CREATE UNIQUE INDEX IF NOT EXISTS "uq_msc_natural_key"
   ON "model_system_cards" (
     "ai_model_id",
     COALESCE("version", ''),
-    COALESCE("release_date"::text, '')
+    COALESCE("release_date", '0001-01-01'::date)
   );
 
 -- source_format allowlist. Added NOT VALID so this DDL is lock-cheap
