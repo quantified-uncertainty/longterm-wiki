@@ -38,6 +38,8 @@ vi.mock('../lib/github.ts', () => ({
 import {
   buildWellnessReport,
   manageWellnessIssue,
+  prependMisconfigBanner,
+  MISCONFIG_BANNER_MARKER,
   WELLNESS_ISSUE_TITLE,
 } from './wellness-report.ts';
 
@@ -260,6 +262,45 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     expect(mockCreateIssue).not.toHaveBeenCalled();
   });
 
+  it('stamps the misconfig banner on the new GitHub issue when LINEAR_API_KEY is missing (QUA-676)', async () => {
+    // Reproduces the QUA-676 cascade: Linear-side dedup throws because the
+    // secret is missing → caller falls through to createIssue. The new issue
+    // body must carry the misconfig banner so whoever reads the ticket sees
+    // the cause + the fix path. Without the banner, the duplicate cascade
+    // recurs invisibly (which is what happened from QUA-577 → QUA-686).
+    const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
+    const search = vi.fn().mockRejectedValue(apiKeyError);
+    mockCreateIssue.mockResolvedValue({ number: 4577 });
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    vi.useFakeTimers();
+    try {
+      const report = buildWellnessReport(failingChecks);
+      const promise = manageWellnessIssue(report, {
+        linearDedupDeps: { search, comment: vi.fn(), setState: vi.fn(), now: () => 0 },
+      });
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      expect(result.action).toBe('created');
+      // The body argument to createIssue MUST start with the banner marker.
+      // Substring check (not equality) leaves the rest of the body unconstrained
+      // so the test isn't brittle to issue-body formatting tweaks.
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.stringContaining(MISCONFIG_BANNER_MARKER),
+        }),
+      );
+      // Misconfig must also fire the loud CI annotation, not just the body banner.
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('::error title=Wellness dedup misconfigured::'),
+      );
+    } finally {
+      vi.useRealTimers();
+      consoleErrorSpy.mockRestore();
+    }
+  });
+
   it('closes a lingering open Linear ticket when checks recover and no GitHub issue is open', async () => {
     const search = vi.fn().mockResolvedValue([
       {
@@ -284,5 +325,23 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     expect(result.action).toBe('closed');
     expect(result.linearIdentifier).toBe('QUA-570');
     expect(setState).toHaveBeenCalledWith('QUA-570', 'Done');
+  });
+});
+
+describe('prependMisconfigBanner', () => {
+  it('prepends the marker above the body content', () => {
+    const out = prependMisconfigBanner('## Original body\n\nDetails here.');
+    // Banner must appear FIRST so Linear's truncated GitHub-mirror preview
+    // shows the cause, not the wellness check details.
+    expect(out.indexOf(MISCONFIG_BANNER_MARKER)).toBe(0);
+    expect(out).toContain('## Original body');
+    expect(out).toContain('Details here.');
+  });
+
+  it('includes the secrets-page URL and the QUA-676 reference', () => {
+    const out = prependMisconfigBanner('');
+    expect(out).toContain('quantified-uncertainty/longterm-wiki/settings/secrets/actions');
+    expect(out).toContain('QUA-676');
+    expect(out).toContain('LINEAR_API_KEY');
   });
 });

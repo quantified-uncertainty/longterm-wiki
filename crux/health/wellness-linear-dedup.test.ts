@@ -20,6 +20,7 @@ import { describe, it, expect, vi } from 'vitest';
 import {
   dedupLinearWellnessIssue,
   closeLinearWellnessOnAllClear,
+  isMissingLinearApiKeyError,
   REOPEN_WINDOW_MS,
 } from './wellness-linear-dedup.ts';
 import type { SearchedIssue } from '../lib/linear/issues.ts';
@@ -264,6 +265,34 @@ describe('dedupLinearWellnessIssue', () => {
     expect(setState).not.toHaveBeenCalled();
   });
 
+  it('returns skipped/misconfig (NOT skipped/lookup-failed) when LINEAR_API_KEY is missing', async () => {
+    // QUA-676: discriminating misconfig from transient outage matters because
+    // the caller stamps a banner on the GitHub issue body in the misconfig
+    // case. If both errors were collapsed under `lookup-failed`, the caller
+    // would treat a permanent missing-secret problem as a transient blip and
+    // the duplicate cascade would keep happening invisibly.
+    const apiKeyError = new Error(
+      'LINEAR_API_KEY not set. Required for Linear API calls.\n' +
+        'It should be in .env.base at the workspace root — sync it into the slot .env or export it.',
+    );
+    const search = vi.fn().mockRejectedValue(apiKeyError);
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      const result = await dedupLinearWellnessIssue(TITLE, COMMENT, {
+        search, comment: vi.fn(), setState: vi.fn(), now: () => NOW,
+      });
+      expect(result).toEqual({ kind: 'skipped', reason: 'misconfig' });
+      // Loud failure is the whole point — assert the ::error annotation
+      // pattern fires so this can't regress to a quiet warn.
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('::error title=Wellness dedup misconfigured::'),
+      );
+    } finally {
+      consoleErrorSpy.mockRestore();
+    }
+  });
+
   it('treats unknown state types as NOT open (allowlist safety)', async () => {
     // If Linear adds a new state type, we want to fail closed — better to
     // treat it as "already closed, maybe reopen" than to accidentally
@@ -346,6 +375,32 @@ describe('closeLinearWellnessOnAllClear', () => {
     expect(result).toEqual({ kind: 'lookup-failed' });
   });
 
+  it('returns misconfig (NOT lookup-failed) when LINEAR_API_KEY is missing — and stays QUIET', async () => {
+    // The all-clear path must not re-emit the loud ::error banner that the
+    // failure path already emitted; otherwise every recovery cycle floods
+    // the run summary with the same misconfig annotation. The failure path
+    // is the canonical place to surface it.
+    const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
+    const search = vi.fn().mockRejectedValue(apiKeyError);
+    const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+
+    try {
+      const result = await closeLinearWellnessOnAllClear(TITLE, closeComment, {
+        search,
+        comment: vi.fn(),
+        setState: vi.fn(),
+        now: () => NOW,
+      });
+      expect(result).toEqual({ kind: 'misconfig' });
+      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(consoleWarnSpy).not.toHaveBeenCalled();
+    } finally {
+      consoleErrorSpy.mockRestore();
+      consoleWarnSpy.mockRestore();
+    }
+  });
+
   it('returns close-failed (NOT lookup-failed) when search succeeds but every close throws', async () => {
     // Discriminating search failure from close failure matters for telemetry —
     // the two failure modes have different root causes and different remediations.
@@ -381,5 +436,37 @@ describe('closeLinearWellnessOnAllClear', () => {
     });
 
     expect(result).toEqual({ kind: 'closed', identifiers: ['QUA-570'] });
+  });
+});
+
+describe('isMissingLinearApiKeyError', () => {
+  it('matches the exact error thrown by getLinearApiKey()', () => {
+    const err = new Error(
+      'LINEAR_API_KEY not set. Required for Linear API calls.\n' +
+        'It should be in .env.base at the workspace root — sync it into the slot .env or export it.',
+    );
+    expect(isMissingLinearApiKeyError(err)).toBe(true);
+  });
+
+  it('matches when the message is wrapped or quoted as a substring', () => {
+    // Defensive: error wrapping (e.g., `new Error("upstream failed: " + e.message)`)
+    // is a common pattern. Substring match keeps the detector robust against it.
+    expect(isMissingLinearApiKeyError(new Error('upstream call failed: LINEAR_API_KEY not set'))).toBe(
+      true,
+    );
+  });
+
+  it('does not match generic Linear errors', () => {
+    expect(isMissingLinearApiKeyError(new Error('Linear API returned 500'))).toBe(false);
+    expect(isMissingLinearApiKeyError(new Error('fetch failed'))).toBe(false);
+    expect(isMissingLinearApiKeyError(undefined)).toBe(false);
+    expect(isMissingLinearApiKeyError(null)).toBe(false);
+  });
+
+  it('handles non-Error values (string thrown, etc.)', () => {
+    // `throw "foo"` is unusual but legal in JS and would otherwise crash
+    // the err.message access. The String(err) fallback covers it.
+    expect(isMissingLinearApiKeyError('LINEAR_API_KEY not set in env')).toBe(true);
+    expect(isMissingLinearApiKeyError({ toString: () => 'LINEAR_API_KEY not set yo' })).toBe(true);
   });
 });

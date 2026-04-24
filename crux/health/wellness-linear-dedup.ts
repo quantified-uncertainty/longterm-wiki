@@ -45,7 +45,20 @@ export const REOPEN_WINDOW_MS = 48 * 60 * 60 * 1000;
 export type LinearWellnessAction =
   | { kind: 'commented'; identifier: string; url: string }
   | { kind: 'reopened'; identifier: string; url: string }
-  | { kind: 'skipped'; reason: 'no-match' | 'lookup-failed' };
+  | { kind: 'skipped'; reason: 'no-match' | 'lookup-failed' | 'misconfig' };
+
+/**
+ * Detect the specific error thrown by `getLinearApiKey()` when LINEAR_API_KEY
+ * is unset in the env. This is a permanent misconfiguration (vs a transient
+ * Linear API outage), so the caller surfaces it loudly instead of silently
+ * falling through to the GitHub create path. The check is substring-based so
+ * it survives wrapping in additional error context — `getLinearApiKey()`'s
+ * exact message is "LINEAR_API_KEY not set. Required for Linear API calls."
+ */
+export function isMissingLinearApiKeyError(err: unknown): boolean {
+  const msg = err instanceof Error ? err.message : String(err);
+  return msg.includes('LINEAR_API_KEY not set');
+}
 
 export interface LinearDedupDeps {
   search: typeof searchIssues;
@@ -101,6 +114,16 @@ export async function dedupLinearWellnessIssue(
     const results = await search(title, 20);
     candidates = results.filter((r) => r.title === title);
   } catch (err) {
+    if (isMissingLinearApiKeyError(err)) {
+      // Permanent misconfig — surfaced via stderr (CI annotation) so the
+      // missing-secret cause shows up in the run summary, not just the log.
+      // The caller stamps a banner onto the GitHub issue body so the cause is
+      // visible to whoever reads the wellness ticket too.
+      console.error(
+        '::error title=Wellness dedup misconfigured::LINEAR_API_KEY secret not set in repo — Linear-side dedup is dormant; expect duplicate wellness tickets until the secret is added (Settings → Secrets and variables → Actions).',
+      );
+      return { kind: 'skipped', reason: 'misconfig' };
+    }
     console.warn(
       `Linear wellness dedup lookup failed (${err instanceof Error ? err.message : String(err)}) — falling back to GitHub create path`,
     );
@@ -179,6 +202,8 @@ export type CloseLinearWellnessResult =
   | { kind: 'none' }
   /** Discriminates "didn't reach Linear" from "reached Linear but every close call threw." */
   | { kind: 'lookup-failed' }
+  /** Permanent misconfig: LINEAR_API_KEY missing. Distinguished so the all-clear path stays quiet — there's nothing to close on Linear when we never opened anything there. */
+  | { kind: 'misconfig' }
   | { kind: 'close-failed'; attempted: string[] };
 
 /**
@@ -199,6 +224,12 @@ export async function closeLinearWellnessOnAllClear(
     const results = await search(title, 20);
     candidates = results.filter((r) => r.title === title && isOpen(r));
   } catch (err) {
+    if (isMissingLinearApiKeyError(err)) {
+      // All-clear path stays quiet on misconfig — the failure path already
+      // emitted the loud ::error banner; no point repeating it on every
+      // recovery cycle.
+      return { kind: 'misconfig' };
+    }
     console.warn(
       `Linear wellness close lookup failed (${err instanceof Error ? err.message : String(err)})`,
     );
