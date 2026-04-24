@@ -33,8 +33,6 @@ import {
 import { RelatedPages } from "@/components/RelatedPages";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
 import { EntityDbPage } from "@/components/directory/EntityDbPage";
-import { renderMdxPage, isMdxError } from "@/lib/mdx";
-import { TableOfContents } from "@/components/wiki/TableOfContents";
 
 // Shared components & helpers
 import {
@@ -317,35 +315,19 @@ export default async function OrgProfilePage({
     icon: <Home className={ICON_CLASS} />,
   });
 
-  // ── Wiki tab — MDX article content rendered inline ──
-  const wikiResult = entity.wikiPageId ? await renderMdxPage(entity.id) : null;
-  if (wikiResult && !isMdxError(wikiResult)) {
-    const tocHeadings = wikiResult.headings.filter((h) => h.depth <= 3);
+  // ── Wiki tab — navigates to the standalone /wiki/E<N> page.
+  // We render as a link-tab (not inline) because MDX wiki content references
+  // resources by stableId that may only exist in the wiki-server (not in the
+  // build-time database.json), and the R component falls back to [sid_...]
+  // which breaks the no-raw-ids e2e test. The standalone wiki page has its
+  // own resource-resolution path that handles this correctly.
+  if (entity.wikiPageId && data.wikiHref) {
     tabs.push({
       id: "wiki",
       label: "Wiki",
       group: "entity",
       icon: <BookOpen className={ICON_CLASS} />,
-      content: (
-        <div className="space-y-4">
-          {data.wikiHref && (
-            <div className="flex justify-end">
-              <Link
-                href={data.wikiHref}
-                className="inline-flex items-center gap-1.5 text-sm font-medium text-primary hover:text-primary/80 transition-colors"
-              >
-                Open full wiki page &#8599;
-              </Link>
-            </div>
-          )}
-          <article className="prose prose-sm prose-neutral dark:prose-invert max-w-none">
-            {tocHeadings.length >= 3 && (
-              <TableOfContents headings={tocHeadings} />
-            )}
-            {wikiResult.content}
-          </article>
-        </div>
-      ),
+      href: data.wikiHref,
     });
   }
 
