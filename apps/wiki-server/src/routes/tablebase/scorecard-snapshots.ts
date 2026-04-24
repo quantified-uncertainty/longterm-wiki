@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, and, ne, inArray } from "drizzle-orm";
+import { eq, count, desc, and, ne } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { scorecardSnapshots } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
@@ -178,9 +178,6 @@ const scorecardSnapshotsApp = new Hono()
   )
 
   .post("/delete-batch", deleteBatchHandler(scorecardSnapshots, null, { maxIdLength: 100 }));
-
-// Type-check unused imports
-void inArray;
 
 export const scorecardSnapshotsRoute = scorecardSnapshotsApp;
 export type ScorecardSnapshotsRoute = typeof scorecardSnapshotsApp;

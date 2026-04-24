@@ -9,7 +9,6 @@ import {
 } from "./scorecards-matrix";
 import {
   SCORECARD_SOURCES,
-  getScorecardSourceMeta,
   type ScorecardSourceKey,
 } from "./scorecards-constants";
 
@@ -248,5 +247,3 @@ export default async function ScorecardsPage() {
     </div>
   );
 }
-
-void getScorecardSourceMeta;
