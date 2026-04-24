@@ -33,9 +33,13 @@ export function ResourceLink({
   const resource = resolveResource(id);
 
   if (!resource) {
+    // Never render the raw id in visible text — it leaks stableIds like
+    // `sid_xxx` into user-facing pages (QUA-657). Fall back to the
+    // author-provided label/children, or a generic placeholder.
+    const fallback = children ?? label ?? "missing resource";
     return (
       <span className={cn("text-destructive italic", className)} title={`Resource not found: ${id}`}>
-        [{id}]
+        {fallback}
       </span>
     );
   }

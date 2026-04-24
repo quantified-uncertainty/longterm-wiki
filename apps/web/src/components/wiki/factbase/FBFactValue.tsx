@@ -49,6 +49,11 @@ export function FBFactValue({
   }
 
   if (!fact) {
+    // Never render the raw entity id in visible text — `entity` may be a
+    // stableId like `sid_xxx` which leaks into user-facing pages (QUA-657).
+    // Use the human property name if available, else the raw property key
+    // (which is not a stableId).
+    const propertyName = prop?.name ?? property;
     return (
       <span
         className={cn(
@@ -57,7 +62,7 @@ export function FBFactValue({
         )}
         title={`Missing FactBase fact: ${entity}.${property}${asOf ? ` (${asOf})` : ""}`}
       >
-        [missing: {entity}.{property}]
+        [missing: {propertyName}]
       </span>
     );
   }
