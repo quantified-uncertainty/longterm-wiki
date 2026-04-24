@@ -38,6 +38,10 @@ Run `pnpm crux w validate gate --fix` to catch CI-blocking issues.
 - Refresh the snapshot from live prod: `WIKI_SERVER_ENV=prod pnpm crux sys wiki-server snapshot-resources` (~30s).
 - If `LONGTERMWIKI_SERVER_URL` points at a local wiki-server that lags prod, force the snapshot path for one push: `LONGTERMWIKI_SERVER_URL= git push`. `WIKI_SERVER_ENV=prod` doesn't help — build-data reads the URL directly, ignoring env prefixes.
 
+### Push appears to "succeed" but remote doesn't move
+
+If you don't see `To github.com:...` after `git push`, the push didn't happen — the pre-push hook killed it. The gate's output is loud enough to bury the failure. Scroll up past the gate output to find the real error.
+
 ## 4. UI verification with Playwright (if modifying .tsx pages or components)
 
 When your PR changes pages or UI components, **verify them visually with Playwright** before opening the PR. Do not ask the user to manually check pages you could verify programmatically.
