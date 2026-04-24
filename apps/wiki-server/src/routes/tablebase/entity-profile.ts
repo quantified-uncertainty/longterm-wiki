@@ -269,7 +269,9 @@ const SECTIONS: SectionDef[] = [
     label: "Things",
     description: "Cross-base unified index entries parented to this entity",
     // QUA-507: base `things` table is pointer-only post denorm drop; read
-    // display fields from the `things_search` MV instead.
+    // display fields from the `things_search` MV. `table`/`tableName`
+    // remain "things" because downstream renderers key on that label for
+    // the section heading; the actual fetch target is the MV.
     table: things,
     tableName: "things",
     query: (db, stableId) =>

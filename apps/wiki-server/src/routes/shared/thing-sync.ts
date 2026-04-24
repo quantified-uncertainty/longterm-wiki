@@ -110,9 +110,10 @@ export interface ThingSyncInput {
 
 /**
  * Upsert things rows inside an existing transaction.
- * Uses ON CONFLICT (source_table, source_id) DO UPDATE to keep things in sync.
- * Skips parentThingId in the UPDATE set — it's backfilled by migration 0087
- * and rarely changes, keeping the upsert lean.
+ * Uses ON CONFLICT (id) DO UPDATE to keep things in sync. Note that the
+ * `tablebase/things.ts /sync` route separately uses ON CONFLICT
+ * (sourceTable, sourceId) and covers `parentThingId` in its UPDATE set —
+ * divergence is intentional for that path (see QUA-435 follow-ups).
  */
 export async function upsertThingsInTx(
   tx: DbOrTx,

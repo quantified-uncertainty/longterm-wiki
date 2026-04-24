@@ -278,9 +278,11 @@ const peopleApp = new Hono()
           ? sql`AND ${trigramConditions.reduce((acc, cond, i) => (i === 0 ? cond : sql`${acc} AND ${cond}`))}`
           : sql``;
 
+      // QUA-507: reads `things_search` (title/description live there
+      // post denorm-column drop).
       const trigramCountResult = (await db.execute(sql`
         SELECT COUNT(*)::int AS total
-        FROM things t
+        FROM things_search t
         WHERE t.thing_type = 'entity'
           AND t.entity_type = 'person'
           ${trigramExtraWhere}
@@ -301,7 +303,7 @@ const peopleApp = new Hono()
             ${employerSubquery} AS "employerName",
             ${bornYearSubquery} AS "bornYear",
             ${netWorthSubquery} AS "netWorth"
-          FROM things t
+          FROM things_search t
           WHERE t.thing_type = 'entity'
             AND t.entity_type = 'person'
             ${trigramExtraWhere}

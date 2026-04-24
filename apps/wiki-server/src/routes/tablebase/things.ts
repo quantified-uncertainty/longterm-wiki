@@ -196,8 +196,10 @@ const SyncThingSchema = z.object({
 const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
-  // QUA-506: reads from the `things_search` MV; trigram fallback still
-  // reads `things` because the MV has no pg_trgm index yet.
+  // QUA-507: reads from the `things_search` MV (the base `things` table
+  // no longer has title/description/parent_title). Trigram fallback also
+  // reads the MV — sequential scan, no pg_trgm index yet (acceptable
+  // because fallback only fires when FTS + ILIKE return zero).
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -481,9 +483,12 @@ const thingsApp = new Hono()
   // See discussion #2950.
 
   // ---- GET /:id ----
-  // QUA-507: reads exclusively from the `things_search` MV — the base `things`
-  // table no longer has title/description/parent_title. Rows freshly inserted
-  // into `things` become visible after the next MV refresh (hourly).
+  // QUA-507: reads exclusively from the `things_search` MV. A freshly
+  // synced row is visible after the next REFRESH MATERIALIZED VIEW
+  // CONCURRENTLY (hourly groundskeeper job at
+  // `operational/things-search-refresh`). A row that exists in the base
+  // `things` table but not yet in the MV surfaces a `not_found_pending_refresh`
+  // error so callers can distinguish "not yet refreshed" from "deleted".
   .get("/:id", async (c) => {
     const id = c.req.param("id");
     const db = getDrizzleDb();
@@ -495,14 +500,28 @@ const thingsApp = new Hono()
       .where(eq(thingsSearch.id, id))
       .limit(1);
 
-    const row: { thing: ThingLikeRow; verdict: string | null } | undefined = mvRows[0];
-
-    if (!row) {
+    if (mvRows.length === 0) {
+      const baseRows = await db
+        .select({ id: things.id })
+        .from(things)
+        .where(eq(things.id, id))
+        .limit(1);
+      if (baseRows.length > 0) {
+        return c.json(
+          {
+            error: "not_found_pending_refresh",
+            message: `Thing ${id} exists in the index but is pending the next things_search MV refresh. Retry after the hourly refresh or trigger one via POST /api/operational/things-search-refresh.`,
+          },
+          404,
+        );
+      }
       return c.json(
         { error: "not_found", message: `Thing not found: ${id}` },
-        404
+        404,
       );
     }
+
+    const row: { thing: ThingLikeRow; verdict: string | null } = mvRows[0];
 
     // Also fetch children count
     const childrenResult = await db
