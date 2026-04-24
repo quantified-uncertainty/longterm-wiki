@@ -22,6 +22,18 @@ export type WebsiteSourcePages = InferResponseType<RpcClient[':sourceId']['pages
 export type PageSnapshotList = InferResponseType<RpcClient[':sourceId']['snapshots']['$get'], 200>;
 export type PageSnapshotDetail = InferResponseType<RpcClient[':sourceId']['snapshots'][':snapshotId']['$get'], 200>;
 export type PageSnapshotCreateResult = InferResponseType<RpcClient[':sourceId']['snapshots']['$post'], 201>;
+export type PendingSnapshotsResult = InferResponseType<RpcClient['snapshots']['pending']['$get'], 200>;
+export type UpdateExtractionResult = InferResponseType<RpcClient[':sourceId']['snapshots'][':snapshotId']['extraction']['$post'], 200>;
+// The /sync handler is created via `createSyncHandler()` factory, which
+// returns a generic Hono handler Hono RPC infers as `{}`. Hand-write the
+// response shape instead — it's stable and documented in the factory
+// source at apps/wiki-server/src/routes/tablebase/sync-factory.ts.
+export interface SyncWebsiteSourcesResult {
+  upserted: number;
+  verdictsWritten?: number;
+  claimsLinked?: number;
+}
+export type SyncWebsitePagesResult = InferResponseType<RpcClient['sync-pages']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Client functions
@@ -132,8 +144,8 @@ export interface SyncWebsitePageInput {
 
 export async function syncWebsiteSources(
   items: SyncWebsiteSourceInput[],
-): Promise<ApiResult<{ upserted: number }>> {
-  return apiRequest<{ upserted: number }>(
+): Promise<ApiResult<SyncWebsiteSourcesResult>> {
+  return apiRequest<SyncWebsiteSourcesResult>(
     'POST',
     '/api/website-sources/sync',
     { items },
@@ -142,8 +154,8 @@ export async function syncWebsiteSources(
 
 export async function syncWebsitePages(
   items: SyncWebsitePageInput[],
-): Promise<ApiResult<{ upserted: number }>> {
-  return apiRequest<{ upserted: number }>(
+): Promise<ApiResult<SyncWebsitePagesResult>> {
+  return apiRequest<SyncWebsitePagesResult>(
     'POST',
     '/api/website-sources/sync-pages',
     { items },
@@ -154,34 +166,14 @@ export async function syncWebsitePages(
 // Extraction workflow helpers (QUA-642 extract command)
 // ---------------------------------------------------------------------------
 
-export interface PendingSnapshot {
-  id: string;
-  websiteSourcePageId: string;
-  sourceId: string;
-  domain: string;
-  entityId: string | null;
-  entityDisplayName: string | null;
-  pagePath: string;
-  pageRole: string | null;
-  url: string;
-  fetchedAt: string;
-  contentHash: string;
-  contentLength: number;
-  extractionStatus: string;
-}
+/** One row from the `/snapshots/pending` response — inferred from the route. */
+export type PendingSnapshot = PendingSnapshotsResult['snapshots'][number];
 
 export async function listPendingSnapshots(
   limit = 50,
   offset = 0,
-): Promise<
-  ApiResult<{
-    snapshots: PendingSnapshot[];
-    total: number;
-    limit: number;
-    offset: number;
-  }>
-> {
-  return apiRequest(
+): Promise<ApiResult<PendingSnapshotsResult>> {
+  return apiRequest<PendingSnapshotsResult>(
     'GET',
     `/api/website-sources/snapshots/pending?limit=${limit}&offset=${offset}`,
   );
@@ -192,8 +184,8 @@ export async function updateSnapshotExtraction(
   snapshotId: string,
   extractionStatus: 'pending' | 'extracted' | 'failed' | 'skipped',
   extractedFacts: unknown = null,
-): Promise<ApiResult<{ ok: true; id: string }>> {
-  return apiRequest(
+): Promise<ApiResult<UpdateExtractionResult>> {
+  return apiRequest<UpdateExtractionResult>(
     'POST',
     `/api/website-sources/${encodeURIComponent(sourceId)}/snapshots/${encodeURIComponent(
       snapshotId,
