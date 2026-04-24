@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useSearchParams, usePathname, useRouter } from "next/navigation";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
@@ -344,7 +344,7 @@ function UnknownTabNotice({
   );
 }
 
-function ProfileTabsInner({
+function ProfileTabsBody({
   tabs,
   ariaLabel,
   layout,
@@ -364,10 +364,37 @@ function ProfileTabsInner({
   const selectableTabs = tabs.filter((t) => !t.href);
   const defaultTab = selectableTabs[0] ?? tabs[0];
   const defaultTabId = defaultTab.id;
-  const tabParam = searchParams.get("tab");
-  const hasTabMatch = tabParam ? selectableTabs.some((t) => t.id === tabParam) : false;
-  const activeTab = hasTabMatch ? (tabParam as string) : defaultTabId;
-  const unknownTabRequested = tabParam && !hasTabMatch ? tabParam : null;
+
+  // QUA-656: Initial render always uses defaultTabId on both server and
+  // client so the two render trees match exactly. URL-param sync happens
+  // post-hydration in the effect below. A prior Suspense-based design
+  // (QUA-463 for single-tab, this for multi-tab) was vulnerable to React
+  // #418 element-type mismatches during ISR cache boundaries, where the
+  // streamed HTML and RSC payload could come from different renders.
+  const [activeTab, setActiveTab] = useState<string>(defaultTabId);
+  const [unknownTabRequested, setUnknownTabRequested] = useState<string | null>(null);
+
+  // Stable key of selectable tab ids so the effect only re-runs when the set
+  // of tabs actually changes, not on every render (tabs prop is a new array
+  // from the parent on each render).
+  const selectableIdsKey = selectableTabs.map((t) => t.id).join("|");
+
+  useEffect(() => {
+    const tabParam = searchParams.get("tab");
+    if (!tabParam) {
+      setActiveTab(defaultTabId);
+      setUnknownTabRequested(null);
+      return;
+    }
+    const ids = selectableIdsKey.split("|");
+    if (ids.includes(tabParam)) {
+      setActiveTab(tabParam);
+      setUnknownTabRequested(null);
+    } else {
+      setActiveTab(defaultTabId);
+      setUnknownTabRequested(tabParam);
+    }
+  }, [searchParams, defaultTabId, selectableIdsKey]);
 
   function handleTabChange(value: string) {
     if (value === defaultTabId) {
@@ -401,26 +428,6 @@ function ProfileTabsInner({
   );
 }
 
-function ProfileTabsFallback({
-  tabs,
-  ariaLabel,
-  layout,
-  groups,
-}: {
-  tabs: ProfileTab[];
-  ariaLabel?: string;
-  layout: "horizontal" | "vertical";
-  groups?: ProfileTabGroup[];
-}) {
-  const selectable = tabs.filter((t) => !t.href);
-  const activeTab = selectable[0]?.id ?? tabs[0].id;
-  return layout === "vertical" ? (
-    <VerticalLayout tabs={tabs} activeTab={activeTab} ariaLabel={ariaLabel} groups={groups} />
-  ) : (
-    <HorizontalLayout tabs={tabs} activeTab={activeTab} ariaLabel={ariaLabel} />
-  );
-}
-
 /**
  * Reusable tabbed layout for profile pages (organizations, people, etc.).
  * - Filters out tabs where `count === 0`
@@ -431,28 +438,15 @@ function ProfileTabsFallback({
 export function ProfileTabs({ tabs, ariaLabel, layout = "horizontal", groups }: ProfileTabsProps) {
   const visibleTabs = tabs.filter((t) => t.count !== 0);
   if (visibleTabs.length === 0) return null;
-  // Single-tab short-circuit — matches QUA-463 hydration fix: skip Suspense so
-  // server and client agree on a plain fragment.
   if (visibleTabs.length === 1) {
     return <>{visibleTabs[0].content}</>;
   }
   return (
-    <Suspense
-      fallback={
-        <ProfileTabsFallback
-          tabs={visibleTabs}
-          ariaLabel={ariaLabel}
-          layout={layout}
-          groups={groups}
-        />
-      }
-    >
-      <ProfileTabsInner
-        tabs={visibleTabs}
-        ariaLabel={ariaLabel}
-        layout={layout}
-        groups={groups}
-      />
-    </Suspense>
+    <ProfileTabsBody
+      tabs={visibleTabs}
+      ariaLabel={ariaLabel}
+      layout={layout}
+      groups={groups}
+    />
   );
 }
