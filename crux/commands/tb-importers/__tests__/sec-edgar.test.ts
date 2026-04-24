@@ -317,7 +317,7 @@ describe("buildProposal", () => {
     accessionNoDashes: "000182810124000001",
   };
 
-  it("emits T1 + sec-edgar source + funding-round recordType", () => {
+  it("emits T1 + sec-edgar source + funding-rounds recordType", () => {
     const extract = parseFormDXml(SAMPLE_XML);
     const p = buildProposal(
       TARGET,
@@ -328,7 +328,7 @@ describe("buildProposal", () => {
     );
     expect(p.tier).toBe("T1");
     expect(p.source).toBe("sec-edgar:0001828101-24-000001");
-    expect(p.recordType).toBe("funding-round");
+    expect(p.recordType).toBe("funding-rounds");
     expect(p.entityRefs?.organization).toBe("anthropic");
   });
 

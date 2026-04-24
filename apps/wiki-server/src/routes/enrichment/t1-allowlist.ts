@@ -76,13 +76,26 @@ export const T1_ALLOWLIST: T1Source[] = [
   {
     id: "hf-leaderboard",
     name: "Hugging Face Leaderboard",
+    // Leaderboard "row" query-string URLs are also accepted — the datasets-server
+    // deep-links use ?row=<evalName> (see hf-leaderboard importer).
     urlPattern: /^https:\/\/huggingface\.co\/spaces\/[^/]+\/[^/]*leaderboard/i,
-    recordTypes: ["benchmarks"],
+    // Maps to the `benchmark-results` sync route (auto-eval scores), not the
+    // `benchmarks` definition table.
+    recordTypes: ["benchmark-results"],
   },
   {
     id: "github-api",
     name: "GitHub API",
     urlPattern: /^https:\/\/api\.github\.com\/repos\/[^/]+\/[^/]+\/(contributors|collaborators)/i,
+    recordTypes: ["personnel"],
+  },
+  {
+    // Public GitHub URLs surfaced by the github-contributors importer (T1).
+    // The contributors API hits `api.github.com` above; the per-user profile
+    // URLs written into `proposal.sourceUrl` live under github.com itself.
+    id: "github-user",
+    name: "GitHub user profile (via contributors importer)",
+    urlPattern: /^https:\/\/github\.com\/[^/]+\/?$/i,
     recordTypes: ["personnel"],
   },
 ];

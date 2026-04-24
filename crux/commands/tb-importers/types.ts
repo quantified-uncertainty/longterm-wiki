@@ -12,11 +12,16 @@
 /** Tier model from QUA-637 umbrella. */
 export type EnrichmentTier = "T1" | "T2" | "T3";
 
-/** Record types this PR's importers produce. The full set lives in QUA-632. */
+/**
+ * Record types this PR's importers produce. Values MUST match the sync-route
+ * mount names (plural kebab-case) in
+ * `apps/wiki-server/src/routes/tablebase/mount-registry.ts` — the propose
+ * endpoint dispatches on these strings, and dashboards read them verbatim.
+ */
 export type EnrichmentRecordType =
-  | "funding-round"
+  | "funding-rounds"
   | "personnel"
-  | "benchmark-result"
+  | "benchmark-results"
   | "publication"
   | "organization-fact";
 

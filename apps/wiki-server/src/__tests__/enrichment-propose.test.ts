@@ -6,15 +6,18 @@ import {
   type SqlDispatcher,
 } from "./test-utils";
 
-// ── Mock the inner grants sync route so we don't drag in the full sync pipeline ──
+// ── Mock the inner sync routes so we don't drag in the full sync pipeline ──
 //
-// The grants Hono sub-app is imported by enrichment.ts at module load, so we
-// replace it with a tiny stub that records every POST it receives and returns
+// The sync sub-apps are imported by enrichment.ts at module load, so we
+// replace them with tiny stubs that record every POST they receive and return
 // a configurable response.  That lets us assert both (a) exactly what the
-// propose endpoint forwards (row + sourcing) and (b) how the endpoint
-// translates downstream failures into rejection reasons.
+// propose endpoint forwards to each record-type's sync handler (row +
+// sourcing) and (b) how the endpoint translates downstream failures into
+// rejection reasons.
 
 interface CapturedInnerCall {
+  /** Which record-type's sync stub captured this call. */
+  route: "grants" | "personnel" | "funding-rounds" | "benchmark-results";
   path: string;
   body: unknown;
 }
@@ -27,8 +30,8 @@ let innerResponseBody: Record<string, unknown> = {
   claimsLinked: 0,
 };
 
-vi.mock("../routes/tablebase/grants.js", () => {
-  const stub = new Hono().post("/sync", async (c) => {
+function makeStub(route: CapturedInnerCall["route"]) {
+  return new Hono().post("/sync", async (c) => {
     const bodyText = await c.req.text();
     let body: unknown;
     try {
@@ -36,11 +39,17 @@ vi.mock("../routes/tablebase/grants.js", () => {
     } catch {
       body = bodyText;
     }
-    captured.push({ path: new URL(c.req.url).pathname, body });
+    captured.push({ route, path: new URL(c.req.url).pathname, body });
     return c.json(innerResponseBody, innerResponseStatus as 200 | 400 | 500);
   });
-  return { grantsRoute: stub };
-});
+}
+
+vi.mock("../routes/tablebase/grants.js", () => ({ grantsRoute: makeStub("grants") }));
+vi.mock("../routes/tablebase/personnel.js", () => ({ personnelRoute: makeStub("personnel") }));
+vi.mock("../routes/tablebase/funding-rounds.js", () => ({ fundingRoundsRoute: makeStub("funding-rounds") }));
+vi.mock("../routes/tablebase/benchmark-results.js", () => ({
+  benchmarkResultsRoute: makeStub("benchmark-results"),
+}));
 
 // ── DB mock — enrichment_runs logging is the only server-side DB call.
 // Tests that care about the logRunResult SQL assert on `dbQueries`.
@@ -543,7 +552,10 @@ describe("POST /api/enrichment/propose", () => {
     const app = buildApp();
     const res = await postJson(app, "/api/enrichment/propose", {
       tier: "T1",
-      recordType: "personnel", // not in SUPPORTED_RECORD_TYPES for Phase 1
+      // "publications" is a future record type named in the T1 allowlist
+      // (openalex) but not yet wired into RECORD_TYPE_ROUTES — the Zod
+      // SUPPORTED_RECORD_TYPES enum rejects it before any routing happens.
+      recordType: "publications",
       row: { id: "x" },
       sourceUrl: "https://api.openalex.org/works/W1",
     });
@@ -646,5 +658,148 @@ describe("POST /api/enrichment/propose", () => {
       q.query.includes("enrichment_runs"),
     );
     expect(runQueries.length).toBe(1);
+  });
+
+  // ── QUA-665: Phase 1.5 — new record types wired in ──────────────────────
+
+  it("routes funding-rounds T1 requests to the funding-rounds sync subapp", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "funding-rounds",
+      row: {
+        id: "fr01234567",
+        companyId: "anthropic",
+        name: "Form D filing 2024-05-30",
+      },
+      sourceUrl:
+        "https://www.sec.gov/Archives/edgar/data/1828101/000182810124000001/primary_doc.xml",
+      sourceContentHash: "sha256:abc",
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("accepted");
+    expect(body.recordId).toBe("fr01234567");
+
+    expect(captured).toHaveLength(1);
+    expect(captured[0].route).toBe("funding-rounds");
+    const innerBody = captured[0].body as { items: Array<{
+      id: string; companyId: string; source: string;
+      sourcing: { verdict: string; checkedBy: string };
+    }> };
+    expect(innerBody.items[0].companyId).toBe("anthropic");
+    // funding-rounds uses `source` for the URL (not `sourceUrl`).
+    expect(innerBody.items[0].source).toBe(
+      "https://www.sec.gov/Archives/edgar/data/1828101/000182810124000001/primary_doc.xml",
+    );
+    expect(innerBody.items[0].sourcing.checkedBy).toBe("t1-sec-edgar");
+  });
+
+  it("routes personnel T1 requests to the personnel sync subapp", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "personnel",
+      row: {
+        id: "per0123456",
+        personId: "alice",
+        organizationId: "anthropic",
+        role: "contributor",
+        roleType: "career",
+      },
+      sourceUrl: "https://github.com/alice",
+      sourceContentHash: "sha256:def",
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("accepted");
+
+    expect(captured).toHaveLength(1);
+    expect(captured[0].route).toBe("personnel");
+    const innerBody = captured[0].body as { items: Array<{
+      id: string; personId: string; organizationId: string;
+      source: string; sourcing: { verdict: string; checkedBy: string };
+    }> };
+    expect(innerBody.items[0].personId).toBe("alice");
+    expect(innerBody.items[0].organizationId).toBe("anthropic");
+    expect(innerBody.items[0].sourcing.checkedBy).toBe("t1-github-user");
+  });
+
+  it("routes benchmark-results T1 requests to the benchmark-results sync subapp", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "benchmark-results",
+      row: {
+        id: "br01234567",
+        benchmarkId: "ifeval",
+        modelId: "claude-3-5-sonnet",
+        score: 75.2,
+        unit: "%",
+      },
+      sourceUrl:
+        "https://huggingface.co/spaces/open-llm-leaderboard/open_llm_leaderboard?row=claude-3-5-sonnet",
+      sourceContentHash: "sha256:xyz",
+    });
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.status).toBe("accepted");
+
+    expect(captured).toHaveLength(1);
+    expect(captured[0].route).toBe("benchmark-results");
+    const innerBody = captured[0].body as { items: Array<{
+      id: string; benchmarkId: string; modelId: string; score: number;
+      sourceUrl: string; source?: unknown;
+      sourcing: { verdict: string; checkedBy: string };
+    }> };
+    // benchmark-results uses `sourceUrl` (not `source`) for the URL field.
+    expect(innerBody.items[0].sourceUrl).toContain(
+      "huggingface.co/spaces/open-llm-leaderboard",
+    );
+    // The opposite field is scrubbed so callers can't smuggle a divergent URL.
+    expect(innerBody.items[0].source).toBeUndefined();
+    expect(innerBody.items[0].sourcing.checkedBy).toBe("t1-hf-leaderboard");
+  });
+
+  it("rejects a funding-rounds T1 request when the source is not on the allowlist", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "funding-rounds",
+      row: {
+        id: "fr01234567",
+        companyId: "anthropic",
+        name: "x",
+      },
+      sourceUrl: "https://crunchbase.com/company/anthropic",
+    });
+    expect(res.status).toBe(400);
+    const body = await res.json();
+    expect(body.rejectionReason).toMatch(/No T1 authority matches/);
+    expect(captured).toHaveLength(0);
+  });
+
+  it("overwrites a caller-supplied 'source' with the gate-validated sourceUrl even on non-grants routes", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "funding-rounds",
+      row: {
+        id: "fr01234567",
+        companyId: "anthropic",
+        name: "x",
+        // Caller tries to smuggle a different source URL in the row.
+        source: "https://attacker.example.com/fake-form-d",
+      },
+      sourceUrl:
+        "https://www.sec.gov/Archives/edgar/data/1/abc/primary_doc.xml",
+    });
+    expect(res.status).toBe(200);
+    expect(captured).toHaveLength(1);
+    const innerBody = captured[0].body as { items: Array<{ source: string }> };
+    // The gate-validated URL wins; the smuggled one is dropped.
+    expect(innerBody.items[0].source).toBe(
+      "https://www.sec.gov/Archives/edgar/data/1/abc/primary_doc.xml",
+    );
   });
 });

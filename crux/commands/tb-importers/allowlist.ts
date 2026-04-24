@@ -38,7 +38,7 @@ export interface T1AuthorityEntry {
 export const T1_AUTHORITY_ALLOWLIST: readonly T1AuthorityEntry[] = [
   {
     sourcePrefix: T1_SOURCE_PREFIXES.secEdgar,
-    recordType: "funding-round",
+    recordType: "funding-rounds",
     description:
       "SEC EDGAR Form D filings (regulatory filings of US private offerings).",
   },
@@ -50,7 +50,7 @@ export const T1_AUTHORITY_ALLOWLIST: readonly T1AuthorityEntry[] = [
   },
   {
     sourcePrefix: T1_SOURCE_PREFIXES.hfLeaderboard,
-    recordType: "benchmark-result",
+    recordType: "benchmark-results",
     description:
       "HuggingFace Open LLM Leaderboard (deterministic auto-eval pipeline).",
   },
