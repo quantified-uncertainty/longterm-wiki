@@ -65,6 +65,7 @@ import * as queryCommands from './commands/query.ts';
 import * as jobsCommands from './commands/jobs.ts';
 import * as contextCommands from './commands/context.ts';
 import * as enrichCommands from './commands/enrich.ts';
+import * as enrichmentCommands from './commands/enrichment.ts';
 import * as sessionsCommands from './commands/sessions.ts';
 import * as researchCommands from './commands/research.ts';
 import * as evalsCommands from './commands/evals.ts';
@@ -159,6 +160,7 @@ const domains = {
   jobs: jobsCommands,
   context: contextCommands,
   enrich: enrichCommands,
+  enrichment: enrichmentCommands,
   sessions: sessionsCommands,
   research: researchCommands,
   evals: evalsCommands,

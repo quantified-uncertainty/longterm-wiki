@@ -659,6 +659,81 @@ describe("POST /api/enrichment/propose", () => {
     expect(runQueries[0].params).toContain("anthropic-personnel-t1-2026-04-20");
   });
 
+  // QUA-643 Phase 4 — the watchdog polls enrichment_runs.cost_usd.
+  // An accepted row with costUsd must be added to the accumulator; the
+  // UPSERT SET clause has to include cost_usd or the watchdog sees zero.
+  it("accumulates costUsd on accepted proposals (QUA-643 watchdog signal)", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "grants",
+      row: VALID_GRANT_ROW,
+      sourceUrl: "https://funds.effectivealtruism.org/grants/abc",
+      runId: "qua-643-cost-test",
+      costUsd: 0.42,
+    });
+    expect(res.status).toBe(200);
+    const runQueries = dbQueries.filter((q) =>
+      q.query.includes("enrichment_runs"),
+    );
+    expect(runQueries.length).toBe(1);
+    // cost_usd must appear in both the INSERT and the UPDATE SET clause so
+    // the first write AND subsequent increments both land in the column.
+    expect(runQueries[0].query).toMatch(/INSERT INTO enrichment_runs[\s\S]*cost_usd/);
+    expect(runQueries[0].query).toMatch(/cost_usd\s*=\s*enrichment_runs\.cost_usd\s*\+\s*EXCLUDED\.cost_usd/);
+    // The cost must be bound as a param (not inlined as zero).
+    expect(runQueries[0].params).toContain(0.42);
+  });
+
+  it("also records costUsd when the proposal is rejected", async () => {
+    // Rejected rows still burn LLM cost — the watchdog wants them counted.
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "grants",
+      row: VALID_GRANT_ROW,
+      sourceUrl: "https://random.example.com/not-allowlisted",
+      runId: "qua-643-rejected-cost",
+      costUsd: 0.15,
+    });
+    expect(res.status).toBe(400);
+    const runQueries = dbQueries.filter((q) =>
+      q.query.includes("enrichment_runs"),
+    );
+    expect(runQueries.length).toBe(1);
+    expect(runQueries[0].params).toContain(0.15);
+  });
+
+  it("defaults costUsd to 0 when not supplied so param bindings stay typed", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "grants",
+      row: VALID_GRANT_ROW,
+      sourceUrl: "https://funds.effectivealtruism.org/grants/abc",
+      runId: "qua-643-no-cost",
+    });
+    expect(res.status).toBe(200);
+    const runQueries = dbQueries.filter((q) =>
+      q.query.includes("enrichment_runs"),
+    );
+    expect(runQueries.length).toBe(1);
+    // Omitted costUsd should bind as 0 (not null/undefined).
+    expect(runQueries[0].params).toContain(0);
+  });
+
+  it("rejects negative costUsd at the zod gate (no server-side undercount)", async () => {
+    const app = buildApp();
+    const res = await postJson(app, "/api/enrichment/propose", {
+      tier: "T1",
+      recordType: "grants",
+      row: VALID_GRANT_ROW,
+      sourceUrl: "https://funds.effectivealtruism.org/grants/abc",
+      costUsd: -5,
+    });
+    expect(res.status).toBe(400);
+  });
+
   it("skips enrichment_runs UPSERT when runId is omitted", async () => {
     const app = buildApp();
     const res = await postJson(app, "/api/enrichment/propose", {
