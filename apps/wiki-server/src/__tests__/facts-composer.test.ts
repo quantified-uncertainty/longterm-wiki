@@ -140,7 +140,8 @@ describe("facts composer (QUA-673)", () => {
       numeric: 78800,
       currency: null,
     });
-    expect(result.description).toBe("Headcount: 78.8K");
+    // Precision matches client format-compact.ts: >= 10 of unit drops decimals.
+    expect(result.description).toBe("Headcount: 79K");
   });
 
   it("leaves small numbers as-is (no suffix, no 10+ digit run risk)", () => {

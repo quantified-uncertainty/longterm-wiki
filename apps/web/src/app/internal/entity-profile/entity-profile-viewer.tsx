@@ -18,7 +18,11 @@ import * as HoverCard from "@radix-ui/react-hover-card";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
-import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact";
+import {
+  formatCompactCurrency,
+  formatCompactNumber,
+  sanitizeRawLargeNumbers,
+} from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
 import {
@@ -27,10 +31,7 @@ import {
   isOpaqueLegacyFactId,
   isLegacyResourceId,
 } from "./sanitize-raw-ids";
-import {
-  formatFactValueString,
-  sanitizeRawLargeNumbers,
-} from "./format-cell-value";
+import { formatFactValueString } from "./format-cell-value";
 
 // ── Types ──────────────────────────────────────────────────────────────────
 

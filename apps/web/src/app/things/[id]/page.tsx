@@ -11,6 +11,7 @@ import {
 import { Breadcrumbs } from "@/components/directory/Breadcrumbs";
 import { fetchDetailed } from "@/lib/wiki-server";
 import type { RpcSourcingDetailResult } from "@/lib/wiki-server";
+import { sanitizeRawLargeNumbers } from "@/lib/format-compact";
 import {
   VerdictBadge,
   formatRecordType,
@@ -365,13 +366,17 @@ export default async function ThingDetailPage({ params }: PageProps) {
   }
 
   if (thing.description) {
+    // Some fact things synced before QUA-673 still embed raw numeric
+    // literals (e.g. "Internal Revenue: 1700000000"). Rewrite at render
+    // time so the detail page heals without a facts re-sync.
+    const sanitized = sanitizeRawLargeNumbers(thing.description);
     metadataRows.push({
       label: "Description",
       value: (
         <span className="text-sm">
-          {thing.description.length > 300
-            ? thing.description.slice(0, 300) + "\u2026"
-            : thing.description}
+          {sanitized.length > 300
+            ? sanitized.slice(0, 300) + "\u2026"
+            : sanitized}
         </span>
       ),
     });

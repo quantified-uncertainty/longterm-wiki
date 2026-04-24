@@ -69,6 +69,40 @@ export function formatCompactNumber(n: number | null | undefined): string {
   return n.toLocaleString();
 }
 
+/**
+ * Replace any bare 10+ digit run inside a display string with its compact
+ * form (e.g. `"Internal Revenue: 1700000000"` → `"Internal Revenue: 1.7B"`).
+ *
+ * Defense-in-depth for text fields (primarily `things.description`) that
+ * were composed server-side before the composer started formatting numeric
+ * fact values in QUA-673. The composer now formats at write time, so
+ * freshly-synced rows never need this — but older rows still embed raw
+ * literals and this helper heals them at render time until the next full
+ * facts re-sync.
+ *
+ * Boundaries are tuned for mid-string decimal safety:
+ *   - Negative look-behind blocks runs preceded by a letter, digit,
+ *     underscore, or dot — so `"abc1234567890def"`, `"1.7000000000"`, and
+ *     `"Version 2.1700000000"` are left alone.
+ *   - Negative look-ahead blocks runs followed by a letter or digit AND
+ *     also by `.<digit>` (the decimal fraction case) — so `"1700000000.5"`
+ *     stays intact, but `"1700000000. "` (period ending a sentence)
+ *     still matches.
+ *   - Digits preceded by `-`, `$`, `:`, or whitespace still match so
+ *     signed / currency-prefixed amounts and `Label: number` strings
+ *     format as expected.
+ */
+export function sanitizeRawLargeNumbers(s: string): string {
+  return s.replace(
+    /(?<![a-zA-Z_\d.])(\d{10,})(?![a-zA-Z\d])(?!\.\d)/g,
+    (m) => {
+      const n = Number(m);
+      if (!isFinite(n) || Math.abs(n) < 1000) return m;
+      return formatCompactNumber(n);
+    },
+  );
+}
+
 /** Return href only if it is a safe HTTP(S) URL; otherwise "#". Prevents XSS via javascript: URIs. */
 export function safeHref(url: string): string {
   return /^https?:\/\//i.test(url) ? url : "#";

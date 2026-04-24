@@ -25,22 +25,6 @@ import { formatCompactCurrency, formatCompactNumber } from "@/lib/format-compact
 export const PURE_NUMERIC_STRING_RE = /^-?(?:\d+\.?\d*|\.\d+)(?:e[+-]?\d+)?$/i;
 
 /**
- * Replace any bare 10+ digit run inside a display string with its compact
- * form (e.g. `"Internal Revenue: 1700000000"` → `"Internal Revenue: 1.7B"`).
- *
- * Skips runs that are embedded in word/number-adjacent context (e.g. a hash
- * like `abc1234567890def` stays untouched) and leaves small magnitudes alone
- * so ordinal / count strings aren't mangled.
- */
-export function sanitizeRawLargeNumbers(s: string): string {
-  return s.replace(/(?<![a-zA-Z_\d])(\d{10,})(?![a-zA-Z\d])/g, (m) => {
-    const n = Number(m);
-    if (!isFinite(n) || Math.abs(n) < 1000) return m;
-    return formatCompactNumber(n);
-  });
-}
-
-/**
  * If `value` (from the `facts.value` column) is a pure-numeric string whose
  * magnitude is ≥ 1000, return its compact-formatted form. Otherwise return
  * null so the caller falls through to the generic string renderer.

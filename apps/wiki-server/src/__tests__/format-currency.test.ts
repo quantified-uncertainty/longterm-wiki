@@ -98,13 +98,15 @@ describe('formatCompactAmount (QUA-673)', () => {
   });
 
   it('compacts sub-billion values', () => {
-    expect(formatCompactAmount(78_800, null)).toBe('78.8K');
+    // Precision matches client format-compact.ts: >= 10 of unit drops decimals.
+    expect(formatCompactAmount(78_800, null)).toBe('79K');
     expect(formatCompactAmount(6_300_000, null)).toBe('6.3M');
   });
 
   it('accepts scientific notation strings', () => {
     expect(formatCompactAmount('7e+10', 'USD')).toBe('$70B');
-    expect(formatCompactAmount('1.645e+11', 'USD')).toBe('$164.5B');
+    // Precision matches client's format-compact.ts: >= 10 of unit drops decimals.
+    expect(formatCompactAmount('1.645e+11', 'USD')).toBe('$165B');
   });
 
   it('accepts plain numeric strings', () => {

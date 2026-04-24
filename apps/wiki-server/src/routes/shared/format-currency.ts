@@ -61,12 +61,25 @@ export function formatCompactAmount(
   }
   if (!Number.isFinite(n)) return null;
 
+  // Match the client's format-compact.ts precision rules so a fact's
+  // server-composed `things.description` and its client-rendered sibling
+  // cells render with the same compactness: below 10 of a unit → keep
+  // 1 decimal ("$1.7B"), at or above 10 of a unit → drop decimals
+  // ("$70B", "$165B"). Without this Intl always keeps 1 decimal, so the
+  // Database tab would show "$164.5B" next to "165B" for the same value.
+  const abs = Math.abs(n);
+  let scaleAbs: number;
+  if (abs >= 1e12) scaleAbs = abs / 1e12;
+  else if (abs >= 1e9) scaleAbs = abs / 1e9;
+  else if (abs >= 1e6) scaleAbs = abs / 1e6;
+  else if (abs >= 1e3) scaleAbs = abs / 1e3;
+  else scaleAbs = abs;
+  const fractionDigits = scaleAbs < 10 && abs >= 1e3 ? 1 : 0;
+
   const code = currency ? currency.toUpperCase() : null;
   const opts: Intl.NumberFormatOptions = {
     notation: "compact",
-    // Together these give us "1.7B" (kept) but "70B" / "125B" / "$0" (no
-    // trailing ".0"). Without minimumFractionDigits: 0 Intl renders "$70.0B".
-    maximumFractionDigits: 1,
+    maximumFractionDigits: fractionDigits,
     minimumFractionDigits: 0,
   };
   if (code) {

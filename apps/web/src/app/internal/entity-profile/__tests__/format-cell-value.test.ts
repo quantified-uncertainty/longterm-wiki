@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   PURE_NUMERIC_STRING_RE,
   formatFactValueString,
-  sanitizeRawLargeNumbers,
 } from "../format-cell-value";
+import { sanitizeRawLargeNumbers } from "@/lib/format-compact";
 
 describe("PURE_NUMERIC_STRING_RE", () => {
   it("accepts plain integers and decimals", () => {
@@ -135,6 +135,22 @@ describe("sanitizeRawLargeNumbers (QUA-673)", () => {
   it("is idempotent on an already-formatted description", () => {
     const formatted = "Internal Revenue: $1.7B";
     expect(sanitizeRawLargeNumbers(formatted)).toBe(formatted);
+  });
+
+  it("does not corrupt decimals that happen to contain a 10+ digit tail", () => {
+    // Regression: an earlier regex fired on "1700000000.5" because the
+    // trailing "." was not in the negative look-ahead, producing "1.7B.5".
+    expect(sanitizeRawLargeNumbers("1700000000.5")).toBe("1700000000.5");
+    expect(sanitizeRawLargeNumbers("Version 2.1700000000")).toBe("Version 2.1700000000");
+    expect(sanitizeRawLargeNumbers("ratio 0.1700000000")).toBe("ratio 0.1700000000");
+  });
+
+  it("still rewrites currency-prefixed amounts and negatives", () => {
+    // $ / space / start-of-string boundary should still allow a match.
+    expect(sanitizeRawLargeNumbers("Total $1700000000")).toBe("Total $1.7B");
+    // Negative values: the `-` is outside the captured digit run, so the
+    // replacement happens and the sign is preserved in the surrounding text.
+    expect(sanitizeRawLargeNumbers("Losses -1700000000")).toBe("Losses -1.7B");
   });
 
   it("eliminates every run the render-audit regex flags", () => {
