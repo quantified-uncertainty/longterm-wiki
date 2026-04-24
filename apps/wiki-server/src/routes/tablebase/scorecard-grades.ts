@@ -21,6 +21,11 @@ const AllQuery = z.object({
   entityId: z.string().max(200).optional(),
   scorecardSource: z.string().max(50).optional(),
   latest: z.coerce.boolean().optional(),
+  // overall=true filters to the per-org rollup row only. Lets the
+  // /scorecards directory pull one cell per (org, source) without
+  // scanning thousands of FMTI indicator rows just to throw them away
+  // client-side.
+  overall: z.coerce.boolean().optional(),
 });
 
 // ---- Sync schema ----
@@ -83,7 +88,7 @@ function formatRow(r: GradeRow) {
 const scorecardGradesApp = new Hono()
   // GET /all
   .get("/all", zv("query", AllQuery), async (c) => {
-    const { limit, offset, snapshotId, entityId, scorecardSource, latest } =
+    const { limit, offset, snapshotId, entityId, scorecardSource, latest, overall } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
@@ -94,6 +99,8 @@ const scorecardGradesApp = new Hono()
       conditions.push(eq(scorecardSnapshots.scorecardSource, scorecardSource));
     if (latest !== undefined)
       conditions.push(eq(scorecardSnapshots.isLatest, latest));
+    if (overall === true)
+      conditions.push(eq(scorecardGrades.dimensionSlug, "overall"));
 
     const where =
       conditions.length === 0

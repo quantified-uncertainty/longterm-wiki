@@ -1,6 +1,6 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, and, ne } from "drizzle-orm";
+import { eq, count, desc, and } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { scorecardSnapshots } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
@@ -144,34 +144,67 @@ const scorecardSnapshotsApp = new Hono()
       table: scorecardSnapshots,
       syncSchema: SyncScorecardSnapshotsItemSchema,
       auditRecordType: "scorecard_snapshots",
-      // is_latest invariant: at most one TRUE per scorecardSource. The
-      // partial unique index enforces it at the storage level; this hook
-      // resets siblings to FALSE when a new is_latest=true row is upserted,
-      // so the upsert can succeed without a unique-violation.
+      // is_latest invariant: at most one TRUE per scorecardSource, enforced
+      // by the partial unique index uq_scorecard_snapshots_latest_per_source.
+      //
+      // The naive shape — INSERT with is_latest=true + postUpsert reset of
+      // siblings — fails on every multi-wave sync: the partial index blocks
+      // the INSERT before postUpsert ever runs (ON CONFLICT (id) doesn't
+      // catch this — the conflict is on (source) WHERE is_latest=true).
+      //
+      // Instead: force is_latest=false on every INSERT so the index is
+      // never tripped, then in postUpsert (still inside the tx) reset old
+      // siblings and promote the just-inserted row to is_latest=true.
+      // Between the two UPDATE statements, no row has is_latest=true, so
+      // the partial unique index never fires.
+      toRow: (item, now) => ({
+        id: item.id,
+        scorecardSource: item.scorecardSource,
+        waveLabel: item.waveLabel ?? null,
+        publishedAt: item.publishedAt,
+        sourceUrl: item.sourceUrl,
+        methodologyUrl: item.methodologyUrl ?? null,
+        license: item.license ?? null,
+        orgCount: item.orgCount,
+        dimensionCount: item.dimensionCount,
+        notes: item.notes ?? null,
+        // Force false at insert time; postUpsert promotes the latest row.
+        isLatest: false,
+        sourceActive: item.sourceActive,
+        syncedAt: now,
+        updatedAt: now,
+      }),
       postUpsert: async (tx, items) => {
-        const latestPerSource = new Map<string, string>();
+        const promoteByLatestId = new Map<string, string>();
         for (const item of items) {
           if (item.isLatest) {
-            // If multiple items in the batch claim is_latest for the same
-            // source, the last one wins — sync handlers are not the place
-            // to enforce intra-batch uniqueness on this field; ingesters
-            // should send at most one is_latest=true per source.
-            latestPerSource.set(item.scorecardSource, item.id);
+            // Last-write-wins if a batch sends multiple is_latest=true for
+            // the same source; ingesters should only send one per source.
+            promoteByLatestId.set(item.scorecardSource, item.id);
           }
         }
-        if (latestPerSource.size === 0) return;
+        if (promoteByLatestId.size === 0) return;
 
-        for (const [source, latestId] of latestPerSource) {
+        const now = new Date();
+        for (const [source, latestId] of promoteByLatestId) {
+          // Step 1: clear any existing is_latest=true for this source
+          // (both old siblings and, defensively, our newly-inserted row
+          // even though toRow already set it false). Single statement
+          // touches at most one row thanks to the partial unique index.
           await tx
             .update(scorecardSnapshots)
-            .set({ isLatest: false, updatedAt: new Date() })
+            .set({ isLatest: false, updatedAt: now })
             .where(
               and(
                 eq(scorecardSnapshots.scorecardSource, source),
-                ne(scorecardSnapshots.id, latestId),
                 eq(scorecardSnapshots.isLatest, true),
               ),
             );
+          // Step 2: promote the new row.
+          await tx
+            .update(scorecardSnapshots)
+            .set({ isLatest: true, updatedAt: now })
+            .where(eq(scorecardSnapshots.id, latestId));
         }
       },
     }),

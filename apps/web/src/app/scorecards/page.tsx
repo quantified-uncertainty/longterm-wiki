@@ -67,7 +67,13 @@ export default async function ScorecardsPage() {
   const gradesRes = await fetchDetailed<{
     items: GradeRow[];
     total: number;
-  }>("/api/scorecard-grades/all?limit=1000&latest=true", { revalidate: 300 });
+  }>(
+    // overall=true server-side filter — matrix only renders the rollup row.
+    // Without it we'd fetch ~4,000 FMTI indicator rows just to throw them
+    // away; with it we get one cell per (org, source).
+    "/api/scorecard-grades/all?limit=1000&latest=true&overall=true",
+    { revalidate: 300 },
+  );
 
   const snapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
   const grades = gradesRes.ok ? gradesRes.data.items : [];
