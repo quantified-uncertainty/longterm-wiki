@@ -1,0 +1,36 @@
+entity: sid_XtZkjYKvrQ
+facts:
+  - id: f_6JDWYlgAAC
+    property: incident-date
+    value: "2021-05-07"
+    asOf: "2021-05-07"
+    source: https://www.cisa.gov/news-events/cybersecurity-advisories/aa21-131a
+    notes: "Colonial Pipeline shutdown begins; DarkSide ransomware deployment"
+
+  - id: f_TP9gyv1plB
+    property: financial-impact
+    value: 4.4e+6
+    asOf: "2021-05-08"
+    source: https://www.bloomberg.com/news/articles/2021-05-13/colonial-pipeline-paid-hackers-nearly-5-million-in-ransom
+    notes: "Initial ransom paid ~$4.4M (75 BTC); FBI later recovered ~$2.3M (~64% of bitcoin amount, lower in USD due to BTC depreciation)"
+
+  - id: f_Arp5B1Id9Z
+    property: financial-impact
+    value: 5e+9
+    asOf: "2021-12"
+    source: https://www.gao.gov/products/gao-22-104746
+    notes: "GAO-cited estimate of broader economic impact including fuel-supply disruption, panic buying, price spikes; methodology disputed"
+
+  - id: f_850kEnydx9
+    property: financial-impact
+    value: 1e+9
+    asOf: "2021-12"
+    source: https://www.eia.gov/petroleum/weekly/archive/2021/210512/includes/analysis_print.cfm
+    notes: "Conservative estimate based on direct fuel-supply impact (EIA fuel-flow data); excludes downstream economic effects"
+
+  - id: f_qWCA79ISjs
+    property: incident-status
+    value: resolved
+    asOf: "2021-05-12"
+    source: https://www.cnn.com/2021/06/07/politics/colonial-pipeline-ransomware-recovered/index.html
+    notes: "Pipeline restarted May 12, 2021 (6-day shutdown); DOJ recovered $2.3M of ransom by June 7, 2021"

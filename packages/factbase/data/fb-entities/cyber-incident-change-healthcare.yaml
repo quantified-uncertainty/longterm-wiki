@@ -1,0 +1,36 @@
+entity: sid_i29w8fSb5g
+facts:
+  - id: f_YsP6ihgIqL
+    property: incident-date
+    value: "2024-02-21"
+    asOf: "2024-02-21"
+    source: https://www.cisa.gov/news-events/cybersecurity-advisories/aa24-060b
+    notes: "BlackCat/ALPHV ransomware attack on Change Healthcare (UnitedHealth subsidiary)"
+
+  - id: f_SmNqE40fAr
+    property: financial-impact
+    value: 2.2e+7
+    asOf: "2024-03"
+    source: https://www.wired.com/story/alphv-change-healthcare-ransom-payment-chainalysis/
+    notes: "UnitedHealth reportedly paid $22M to BlackCat; affiliate Notchy/RansomHub later attempted secondary extortion"
+
+  - id: f_aVNqTIAae2
+    property: financial-impact
+    value: 2.87e+9
+    asOf: "2024-12"
+    source: https://www.unitedhealthgroup.com/content/dam/UHG/PDF/investors/2024/UNH-Q4-2024-Release.pdf
+    notes: "UnitedHealth reported direct cyberattack-related costs ~$2.87B in FY2024 earnings (Q4 2024 release)"
+
+  - id: f_4HZKjht3X1
+    property: financial-impact
+    value: 1e+10
+    asOf: "2024-12"
+    source: https://www.healthcaredive.com/news/change-healthcare-cyberattack-aha-survey-providers-financial-impact/717090/
+    notes: "Provider-side cumulative cost estimate >$10B (American Hospital Association cited $1B+/day in delayed payments at peak); high-uncertainty aggregate"
+
+  - id: f_3npgW2zMj5
+    property: incident-status
+    value: resolved
+    asOf: "2024-04"
+    source: https://www.unitedhealthgroup.com/newsroom/2024/2024-04-22-uhg-update-on-change-healthcare-cyberattack.html
+    notes: "Most services restored by April 2024 (~2 months); pharmacy fulfillment + claims processing restored phased; litigation + congressional hearings continued through 2025"

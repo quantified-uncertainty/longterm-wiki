@@ -1,0 +1,43 @@
+entity: sid_PlakEpcSJw
+facts:
+  - id: f_NbrnTP3fAb
+    property: incident-date
+    value: "2017-06-27"
+    asOf: "2017-06-27"
+    source: https://www.wired.com/story/notpetya-cyberattack-ukraine-russia-code-crashed-the-world/
+    notes: "Initial deployment via M.E.Doc tax software update"
+
+  - id: f_nFbmOHnKYa
+    property: financial-impact
+    value: 8e+9
+    asOf: "2018-08"
+    source: https://www.whitehouse.gov/briefings-statements/statement-press-secretary-25/
+    notes: "Lower-bound estimate cited by White House attribution statement (~$8B)"
+
+  - id: f_XRvj7uff0L
+    property: financial-impact
+    value: 1e+10
+    asOf: "2018-08"
+    source: https://www.wired.com/story/notpetya-cyberattack-ukraine-russia-code-crashed-the-world/
+    notes: "Most-cited central estimate of ~$10B in global damages; sources include White House, Wired, multiple academic analyses"
+
+  - id: f_YTH8xIZM1J
+    property: financial-impact
+    value: 3e+8
+    asOf: "2017-08"
+    source: https://www.maersk.com/news/articles/2017/08/16/notpetya-update
+    notes: "Maersk-only direct loss estimate ($250-300M); single-victim subset of total"
+
+  - id: f_RcoreogrNw
+    property: financial-impact
+    value: 1.4e+9
+    asOf: "2024-01"
+    source: https://www.merck.com/wp-content/uploads/sites/124/2018/12/2017-AR.pdf
+    notes: "Merck-only documented cost of ~$1.4B (insurance settlement; war-exclusion litigation Merck v. Ace)"
+
+  - id: f_wmq6OLkTkx
+    property: incident-status
+    value: resolved
+    asOf: "2018-02"
+    source: https://www.justice.gov/opa/pr/six-russian-gru-officers-charged-connection-worldwide-deployment-destructive-malware-and
+    notes: "DOJ indictments of 6 GRU officers (Oct 2020); attribution to GRU Unit 74455 confirmed by US/UK/AU/CA"
