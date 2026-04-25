@@ -304,14 +304,16 @@ const modelSystemCardsApp = new Hono()
       batchSchema: SyncModelSystemCardsBatchSchema,
       entityRefs: ["aiModelId"],
       // Drizzle's numeric() insert type is `string`; Zod schema emits
-      // numbers. Custom toRow to coerce just the two numeric columns
-      // and let the factory handle the rest.
+      // numbers. timestamp() insert type is Date; Zod schema emits ISO
+      // strings on the wire. Coerce all three before passing to the
+      // factory and let it handle the rest.
       toRow: (item, now) => ({
         ...item,
         trainingComputeFlops:
           item.trainingComputeFlops != null ? String(item.trainingComputeFlops) : null,
         trainingGpuHours:
           item.trainingGpuHours != null ? String(item.trainingGpuHours) : null,
+        extractedAt: item.extractedAt ? new Date(item.extractedAt) : null,
         syncedAt: now,
         updatedAt: now,
       }),
