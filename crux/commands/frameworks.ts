@@ -1,7 +1,8 @@
 /**
- * Frontier-safety-framework subcommands — `crux tb frameworks ...` (QUA-691).
+ * Frontier-safety-framework subcommands — `crux tb frameworks ...`
+ * (QUA-691 foundation, QUA-707 registry-driven ingest).
  *
- * Subcommands:
+ * Per-URL subcommands (manual single-version ingest):
  *   extract <url>  --framework=<sid> --version=<label>
  *                  [--apply]           POST thresholds to wiki-server /sync
  *                  [--model=sonnet]    LLM model override
@@ -16,9 +17,13 @@
  *   fetch <url>    [--skip-wayback]    download + hash + Wayback push
  *                  [--json]            raw JSON output
  *
- * The command wiring is minimal — it exists so agents can ingest a
- * framework end-to-end from the CLI during Phase 4 development. Scheduled
- * re-fetches live in `crux/scripts/refresh-frameworks.ts` (follow-up PR).
+ * Registry-driven subcommands (end-to-end batch from data/frameworks/frameworks.yaml):
+ *   list           Print the loaded registry
+ *   seed [--apply] Sync framework rows
+ *   ingest [--apply] [--only=<key>] [--max=N] [--skip-extract|skip-diffs|...]
+ *
+ * Both `tb frameworks <sub>` (two-word) and `tb frameworks-<sub>` (hyphenated)
+ * dispatches are wired up in `tablebase.ts` and the `default` handler.
  */
 
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
@@ -34,11 +39,29 @@ import {
   structuralDiff,
   aggregateDiff,
   type DiffAggregate,
-  type DiffItem,
 } from '../frameworks/diff.ts';
 import { fetchFramework } from '../frameworks/fetch.ts';
 import { MODELS } from '../lib/anthropic.ts';
 import { createLogger } from '../lib/output.ts';
+import {
+  toThresholdSyncItems,
+  toDiffSyncPayloads,
+} from '../frameworks/sync-payloads.ts';
+import {
+  loadRegistry,
+  type RegistryFramework,
+} from '../frameworks/registry.ts';
+import {
+  buildFrameworkSyncItems,
+  defaultIngestDeps,
+  runIngest,
+  type IngestOptions,
+  type IngestSummary,
+} from '../frameworks/orchestrator.ts';
+
+// Re-export the sync-payload helpers for backward compatibility with the
+// existing `commands/frameworks.test.ts` tests and any external callers.
+export { toThresholdSyncItems, toDiffSyncPayloads };
 
 interface FrameworkOptions extends CommandOptions {
   url?: string;
@@ -61,87 +84,6 @@ function resolveLlmModel(name?: string): string {
   if (lower === 'sonnet') return MODELS.sonnet;
   if (lower === 'opus') return MODELS.opus;
   return name;
-}
-
-/**
- * Build sync-item payloads for `/api/framework-capability-thresholds/sync`
- * from an extract result. Each row gets a deterministic `id` so re-runs
- * upsert cleanly.
- */
-export function toThresholdSyncItems(
-  versionId: string,
-  thresholds: ExtractedThreshold[],
-  meta: { extractionModel: string },
-): Array<Record<string, unknown>> {
-  return thresholds.map((t) => ({
-    id: generateId(
-      `framework-threshold:${versionId}:${t.riskDomainCanonical}:${t.tierSortOrder}`,
-    ),
-    versionId,
-    riskDomainCanonical: t.riskDomainCanonical,
-    riskDomainLabel: t.riskDomainLabel,
-    tierLabel: t.tierLabel,
-    tierSortOrder: t.tierSortOrder,
-    triggerDescription: t.triggerDescription,
-    sourceQuote: t.sourceQuote,
-    sourcePageHint: t.sourcePageHint,
-    requiredMitigations: t.requiredMitigations,
-    associatedEvals: t.associatedEvals,
-    commitmentLanguage: t.commitmentLanguage,
-    extractedByModel: meta.extractionModel,
-    extractionConfidence: t.extractionConfidence,
-    humanReviewed: false,
-    humanReviewNotes: null,
-  }));
-}
-
-/**
- * Build the `framework_diffs` + `framework_diff_items` sync payloads.
- */
-export function toDiffSyncPayloads(
-  fromVersionId: string,
-  toVersionId: string,
-  aggregate: DiffAggregate,
-  meta: { classifiedByModel: string | null },
-): {
-  diff: Record<string, unknown>;
-  items: Array<Record<string, unknown>>;
-} {
-  const diffId = generateId(`framework-diff:${fromVersionId}:${toVersionId}`);
-  return {
-    diff: {
-      id: diffId,
-      fromVersionId,
-      toVersionId,
-      changeSummary: aggregate.changeSummary,
-      weakeningFlagged: aggregate.weakeningFlagged,
-      strengtheningFlagged: aggregate.strengtheningFlagged,
-      neutralChangesCount: aggregate.neutralChangesCount,
-      diffDetails: { itemCount: aggregate.items.length },
-      overallDirection: aggregate.overallDirection,
-      humanReviewed: false,
-      reviewVerdict: 'unreviewed',
-      reviewNotes: null,
-      classifiedByModel: meta.classifiedByModel,
-    },
-    items: aggregate.items.map((item: DiffItem, idx: number) => ({
-      id: generateId(
-        `framework-diff-item:${diffId}:${idx}:${item.changeType}:${item.riskDomainCanonical ?? 'none'}`,
-      ),
-      diffId,
-      changeType: item.changeType,
-      riskDomainCanonical: item.riskDomainCanonical,
-      beforeSnapshot: item.beforeSnapshot
-        ? (item.beforeSnapshot as unknown as Record<string, unknown>)
-        : null,
-      afterSnapshot: item.afterSnapshot
-        ? (item.afterSnapshot as unknown as Record<string, unknown>)
-        : null,
-      severity: item.severity,
-      classifierTag: item.classifierTag,
-      rationale: item.rationale,
-    })),
-  };
 }
 
 // ---------------------------------------------------------------------------
@@ -375,21 +317,242 @@ async function fetchCommand(opts: FrameworkOptions): Promise<CommandResult> {
 }
 
 // ---------------------------------------------------------------------------
-// Registration
+// Registry-driven subcommands (QUA-707)
+//
+// These take `(args, options)` per the canonical dispatcher signature
+// (see crux.mjs::main and crux/commands/people.ts for the pattern).
+// `args` is the raw positional tail — `extract`/`diff`/`fetch` above use
+// the older single-arg signature which routes positionals through opts.args;
+// the new commands below intentionally use the two-arg signature so options
+// like `--apply`, `--only`, `--max`, etc. arrive through `options` correctly.
 // ---------------------------------------------------------------------------
+
+interface RegistryDrivenOptions extends CommandOptions {
+  apply?: boolean;
+  json?: boolean;
+  only?: string;
+  max?: string;
+  skipExtract?: boolean;
+  skipDiffs?: boolean;
+  forceReextract?: boolean;
+  skipWayback?: boolean;
+  skipClassifier?: boolean;
+  dryRun?: boolean;
+  model?: string;
+}
+
+async function listCommand(
+  _args: string[],
+  options: RegistryDrivenOptions,
+): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  let registry: RegistryFramework[];
+  try {
+    registry = loadRegistry();
+  } catch (err) {
+    log.error(
+      `Failed to load registry: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return { output: '', exitCode: 1 };
+  }
+
+  if (options.json) {
+    const items = buildFrameworkSyncItems(registry).map((item, idx) => ({
+      ...item,
+      key: registry[idx].key,
+      versions: registry[idx].versions.map((v) => ({
+        versionLabel: v.versionLabel,
+        publishedDate: v.publishedDate,
+        sourceUrl: v.sourceUrl,
+        isDraft: v.isDraft,
+        versionSortOrder: v.versionSortOrder,
+      })),
+    }));
+    console.log(JSON.stringify(items, null, 2));
+    return { output: '', exitCode: 0 };
+  }
+
+  log.info(
+    `Loaded ${registry.length} framework(s) with ${registry.reduce((n, e) => n + e.versions.length, 0)} version(s):`,
+  );
+  for (const e of registry) {
+    log.info(
+      `  ${e.key} (${e.frameworkId.slice(0, 8)}…) — ${e.name} [${e.orgId}] — ${e.versions.length} version(s)`,
+    );
+    for (const v of e.versions) {
+      log.info(
+        `    ${v.versionSortOrder}. ${v.versionLabel}  (${v.publishedDate})${v.isDraft ? ' [draft]' : ''}  ${v.sourceUrl}`,
+      );
+    }
+  }
+
+  return { output: '', exitCode: 0 };
+}
+
+async function seedCommand(
+  _args: string[],
+  options: RegistryDrivenOptions,
+): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  let registry: RegistryFramework[];
+  try {
+    registry = loadRegistry();
+  } catch (err) {
+    log.error(
+      `Failed to load registry: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return { output: '', exitCode: 1 };
+  }
+
+  const items = buildFrameworkSyncItems(registry);
+  log.info(`${items.length} framework row(s) ready to sync:`);
+  for (const item of items) {
+    log.info(`  ${item.id.slice(0, 8)}…  ${item.orgId} → ${item.name} (${item.currentStatus})`);
+  }
+
+  if (!options.apply) {
+    log.info('Dry-run; pass --apply to sync to /api/safety-frameworks/sync');
+    return { output: '', exitCode: 0 };
+  }
+
+  const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  const res = await apiRequest<{ upserted: number }>(
+    'POST',
+    '/api/safety-frameworks/sync',
+    { items },
+  );
+  if (!res.ok) {
+    log.error(`Sync failed: ${res.error} — ${res.message}`);
+    return { output: '', exitCode: 2 };
+  }
+  log.info(`✓ Synced ${items.length} framework row(s).`);
+  return { output: '', exitCode: 0 };
+}
+
+async function ingestCommand(
+  _args: string[],
+  options: RegistryDrivenOptions,
+): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+
+  const ingestOpts: IngestOptions = {
+    frameworkKey: options.only,
+    maxVersions: options.max ? Math.max(1, parseInt(options.max, 10)) : undefined,
+    // Default to dry-run unless --apply is given. --dry-run is also accepted
+    // as an explicit hint for symmetry with other tooling, but `apply` is
+    // the primary opt-in.
+    dryRun: Boolean(options.dryRun) || !options.apply,
+    skipExtract: Boolean(options.skipExtract),
+    skipDiffs: Boolean(options.skipDiffs),
+    forceReextract: Boolean(options.forceReextract),
+    skipWayback: Boolean(options.skipWayback),
+    skipClassifier: Boolean(options.skipClassifier),
+    llmModel: options.model ? resolveLlmModel(options.model) : undefined,
+  };
+
+  if (ingestOpts.dryRun) {
+    log.info(
+      'Dry-run: fetching + extracting will run, but no /sync POSTs will be issued. Pass --apply to write to wiki-server.',
+    );
+  }
+
+  let summary: IngestSummary;
+  try {
+    const deps = await defaultIngestDeps({
+      log: (level, msg) => {
+        if (level === 'error') log.error(msg);
+        else if (level === 'warn') log.warn(msg);
+        else log.info(msg);
+      },
+    });
+    summary = await runIngest(deps, ingestOpts);
+  } catch (err) {
+    log.error(
+      `Ingest aborted: ${err instanceof Error ? err.message : String(err)}`,
+    );
+    return { output: '', exitCode: 2 };
+  }
+
+  if (options.json) {
+    console.log(JSON.stringify(summary, null, 2));
+  } else {
+    log.info('');
+    log.info(`Frameworks: ${summary.frameworksSynced}`);
+    log.info(
+      `Versions:  attempted=${summary.versionsAttempted} synced=${summary.versionsSynced} skipped=${summary.versionsSkipped} failed=${summary.versionsFailed}`,
+    );
+    log.info(`Diffs:     synced=${summary.diffsSynced} failed=${summary.diffsFailed}`);
+    if (summary.versionsFailed > 0 || summary.diffsFailed > 0) {
+      log.warn(
+        'One or more versions/diffs failed — see per-line errors above. Re-run after addressing the cause.',
+      );
+    }
+  }
+
+  return {
+    output: '',
+    exitCode: summary.versionsFailed > 0 || summary.diffsFailed > 0 ? 1 : 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
+// Registration
+//
+// extract / diff / fetch use the legacy `(opts)` single-arg signature which
+// is leftover from how QUA-691 first wrote them — they're left as-is for
+// this PR. The new list / seed / ingest commands use the proper
+// `(args, options)` two-arg signature, since they need flag-driven options.
+//
+// `default` dispatches based on the first positional arg: `crux tb frameworks
+// list` → listCommand; `seed` / `ingest` similarly. Otherwise falls back to
+// listCommand. The hyphenated aliases (`frameworks-list`, `frameworks-seed`,
+// `frameworks-ingest`) registered in tablebase.ts always work too.
+// ---------------------------------------------------------------------------
+
+type ArgsOptionsHandler = (args: string[], options: CommandOptions) => Promise<CommandResult>;
+type LegacyOptsHandler = (opts: FrameworkOptions) => Promise<CommandResult>;
+
+const REGISTRY_DRIVEN: Record<string, ArgsOptionsHandler> = {
+  list: listCommand,
+  seed: seedCommand,
+  ingest: ingestCommand,
+};
+
+const LEGACY: Record<string, LegacyOptsHandler> = {
+  extract: extractCommand,
+  diff: diffCommand,
+  fetch: fetchCommand,
+};
+
+async function defaultCommand(
+  args: string[],
+  options: CommandOptions,
+): Promise<CommandResult> {
+  const first = Array.isArray(args) && typeof args[0] === 'string' ? args[0] : null;
+  if (first && first in REGISTRY_DRIVEN) {
+    return REGISTRY_DRIVEN[first]!(args.slice(1), options);
+  }
+  if (first && first in LEGACY) {
+    return LEGACY[first]!({ ...options, args: args.slice(1) } as FrameworkOptions);
+  }
+  return listCommand(args, options as RegistryDrivenOptions);
+}
 
 export const commands = {
   extract: extractCommand,
   diff: diffCommand,
   fetch: fetchCommand,
-  default: extractCommand,
+  list: listCommand,
+  seed: seedCommand,
+  ingest: ingestCommand,
+  default: defaultCommand,
 };
 
 export function getHelp(): string {
   return `
-Frameworks — Frontier safety framework tracker (QUA-691)
+Frameworks — Frontier safety framework tracker (QUA-691, QUA-707)
 
-Subcommands:
+Per-URL subcommands (low-level, manual ingest of a single version):
   extract <url>   Two-pass LLM extraction of capability thresholds
                   --framework=<sid>         framework stableId (required)
                   --version=<label>         version label (required)
@@ -407,10 +570,31 @@ Subcommands:
                   --skip-wayback            skip the Wayback push
                   --json                    raw JSON output
 
-Examples:
-  crux tb frameworks extract https://anthropic.com/rsp-v3.1.pdf \\
-      --framework=sid_XXXXXXXXXX --version=v3.1
+Registry-driven subcommands (QUA-707, end-to-end batch):
+  list           Print the loaded registry (12 frameworks / ~22 versions)
+                  --json                    raw JSON output
 
-  crux tb frameworks diff sid_FROM sid_TO --apply
+  seed           Sync the framework registry rows
+                  --apply                   POST to /api/safety-frameworks/sync
+                  (without --apply this is a dry-run)
+
+  ingest         Run the full pipeline: fetch → extract → sync versions +
+                  thresholds → diff consecutive pairs → sync diffs
+                  --apply                   actually POST (default is dry-run)
+                  --only=<key>              process only one framework key
+                  --max=N                   cap versions per framework
+                  --skip-extract            skip the LLM extraction pass
+                  --skip-diffs              skip the diff pass
+                  --force-reextract         re-extract even if version exists
+                  --skip-classifier         skip LLM diff classifier
+                  --skip-wayback            skip Wayback push
+                  --model=haiku|sonnet      LLM (default sonnet)
+                  --json                    summary as JSON
+
+Examples:
+  crux tb frameworks list
+  crux tb frameworks seed --apply
+  crux tb frameworks ingest --only=anthropic-rsp --max=1
+  crux tb frameworks ingest --apply
 `.trim();
 }
