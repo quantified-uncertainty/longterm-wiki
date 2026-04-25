@@ -2406,6 +2406,12 @@ export const benchmarkResults = pgTable(
     date: text("date"),
     sourceUrl: text("source_url"),
     notes: text("notes"),
+    // QUA-702: provenance. NULL = legacy / unknown; 'self-report' = inserted
+    // by the model_system_cards post-upsert hook from a lab-published card;
+    // 'third-party' = independent benchmark run. Constraint enforced in
+    // migration 0212. The hook's upsert logic only overwrites self-report
+    // rows, so NULL and 'third-party' are protected.
+    testedBy: text("tested_by"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2419,6 +2425,7 @@ export const benchmarkResults = pgTable(
   (table) => [
     index("idx_br_benchmark").on(table.benchmarkId),
     index("idx_br_model").on(table.modelId),
+    index("idx_br_tested_by").on(table.testedBy),
     uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
   ]
 );
@@ -4668,5 +4675,58 @@ export const thirdPartyEvaluationModels = pgTable(
   (table) => [
     primaryKey({ columns: [table.evaluationId, table.aiModelId] }),
     index("idx_tpem_ai_model").on(table.aiModelId),
+  ],
+);
+
+/**
+ * Pending benchmark links — queue for cited benchmarks in
+ * `model_system_cards.eval_scores_cited` whose name could not be resolved
+ * to a row in `benchmarks`.
+ *
+ * QUA-702. Populated by the model_system_cards sync postUpsert hook;
+ * resolved entries graduate to `benchmark_results` via a follow-up job
+ * once a human (or a future fuzzy matcher) maps `cited_name` to a real
+ * `benchmarks.id`.
+ *
+ * Idempotency on re-extract: unique on (model_system_card_id, cited_name).
+ * Re-running the extractor upserts the same row (refreshing the score),
+ * never creates duplicates.
+ */
+export const pendingBenchmarkLinks = pgTable(
+  "pending_benchmark_links",
+  {
+    id: text("id").primaryKey(), // sid_-style 10-char id
+    modelSystemCardId: text("model_system_card_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // entities.stable_id
+    citedName: text("cited_name").notNull(),
+    citedScore: doublePrecision("cited_score"),
+    citedMetric: text("cited_metric"),
+    citedSetup: text("cited_setup"),
+    citedExcerpt: text("cited_excerpt"),
+    /** When the queue entry has been mapped to a real benchmark, this is set. */
+    resolvedBenchmarkId: text("resolved_benchmark_id"),
+    /** pending | resolved | rejected | auto-resolved */
+    status: text("status").notNull().default("pending"),
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pbl_card").on(table.modelSystemCardId),
+    index("idx_pbl_model").on(table.aiModelId),
+    index("idx_pbl_status").on(table.status),
+    index("idx_pbl_resolved_benchmark").on(table.resolvedBenchmarkId),
+    uniqueIndex("uq_pbl_card_name").on(
+      table.modelSystemCardId,
+      table.citedName,
+    ),
   ],
 );

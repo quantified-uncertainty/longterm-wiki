@@ -24,7 +24,13 @@ import {
   PricingTab,
   BenchmarksTab,
   FamilyTab,
+  SystemCardTab,
 } from "@/app/ai-models/[slug]/tabs";
+import {
+  fetchFromWikiServer,
+  type RpcModelSystemCardsByModelResult,
+  type RpcModelSystemCardRow,
+} from "@lib/wiki-server";
 
 export function generateStaticParams() {
   return getAiModelSlugs().map((slug) => ({ slug }));
@@ -45,15 +51,29 @@ export async function generateMetadata({
 
 export default async function AiModelDetailPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ slug: string }>;
+  searchParams?: Promise<{ card?: string }>;
 }) {
   const { slug } = await params;
+  const sp = (await searchParams) ?? {};
   const entity = resolveAiModelBySlug(slug);
   if (!entity) {
     const canonical = resolveSlugAlias(slug);
     if (canonical) permanentRedirect(`/ai-models/${canonical}`);
     return notFound();
+  }
+
+  // Fetch system cards (QUA-702). Best-effort: a wiki-server outage shouldn't
+  // break the whole page, just hide the tab.
+  let systemCards: RpcModelSystemCardRow[] = [];
+  if (entity.stableId) {
+    const result = await fetchFromWikiServer<RpcModelSystemCardsByModelResult>(
+      `/api/model-system-cards/by-model/${entity.stableId}?limit=20`,
+      { revalidate: 300 },
+    );
+    if (result?.items) systemCards = result.items;
   }
 
   // Resolve developer
@@ -128,6 +148,21 @@ export default async function AiModelDetailPage({
       label: "Benchmarks",
       count: entity.benchmarks.length,
       content: <BenchmarksTab entity={entity} />,
+    });
+  }
+
+  if (systemCards.length > 0) {
+    tabs.push({
+      id: "system-card",
+      label: "System Card",
+      count: systemCards.length > 1 ? systemCards.length : undefined,
+      content: (
+        <SystemCardTab
+          cards={systemCards}
+          selectedCardId={sp.card}
+          modelSlug={slug}
+        />
+      ),
     });
   }
 

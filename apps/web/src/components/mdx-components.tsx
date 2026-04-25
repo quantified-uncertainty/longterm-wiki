@@ -71,6 +71,7 @@ import { SystemHealthContent } from "@/app/internal/system-health/system-health-
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
+import { SystemCardsDashboardContent } from "@/app/internal/system-cards-dashboard/system-cards-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
@@ -237,6 +238,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   PRDashboardContent,
   GrantsDashboardContent,
   DivisionsDashboardContent,
+  SystemCardsDashboardContent,
   FundingProgramsDashboardContent,
   PeopleCoverageContent,
   AgentActivityContent,
