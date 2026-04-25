@@ -21,32 +21,13 @@ import {
 } from "../shared/utils.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import {
+  VALID_RISK_DOMAINS,
+  VALID_COMMITMENT_LANGUAGES as VALID_COMMITMENT_LANG,
+} from "../shared/framework-constants.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 const MAX_PAGE_SIZE = 500;
-
-// Mirror of migration 0206 CHECK allowlist.
-const VALID_RISK_DOMAINS = [
-  "cbrn",
-  "bio",
-  "chem",
-  "nuclear",
-  "radiological",
-  "cyber",
-  "autonomy_replication",
-  "ai_rd",
-  "scheming",
-  "persuasion",
-  "loss_of_control",
-  "other",
-] as const;
-
-const VALID_COMMITMENT_LANG = [
-  "committed",
-  "aspirational",
-  "conditional",
-  "informational",
-] as const;
 
 const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 200),

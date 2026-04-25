@@ -211,6 +211,7 @@ import type { PoliticalOfficesRoute } from "@wiki-server/political-offices-route
 import type { PoliticalVotesRoute } from "@wiki-server/political-votes-route";
 import type { CampaignFinanceRoute } from "@wiki-server/campaign-finance-route";
 import type { ModelSystemCardsRoute } from "@wiki-server/model-system-cards-route";
+import type { FrameworkReviewRoute } from "@wiki-server/framework-review-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -624,4 +625,52 @@ export type RpcModelSystemCardRow = RpcModelSystemCardsAllResult['items'][number
 
 /** Inferred response type for GET /api/model-system-cards/by-model/:modelId */
 export type RpcModelSystemCardsByModelResult = InferResponseType<ModelSystemCardsClient['by-model'][':modelId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Framework Review API (QUA-710)
+// ============================================================================
+
+type FrameworkReviewClient = ReturnType<typeof hc<FrameworkReviewRoute>>;
+
+/** Inferred response type for GET /api/framework-review/stats */
+export type RpcFrameworkReviewStatsResult = InferResponseType<
+  FrameworkReviewClient['stats']['$get'],
+  200
+>;
+
+/** Inferred response type for GET /api/framework-review/pending-versions */
+export type RpcFrameworkReviewPendingVersionsResult = InferResponseType<
+  FrameworkReviewClient['pending-versions']['$get'],
+  200
+>;
+
+/** A single pending version row from /pending-versions */
+export type RpcFrameworkReviewPendingVersion =
+  RpcFrameworkReviewPendingVersionsResult['versions'][number];
+
+/** Inferred response type for GET /api/framework-review/version/:id */
+export type RpcFrameworkReviewVersionResult = InferResponseType<
+  FrameworkReviewClient['version'][':id']['$get'],
+  200
+>;
+
+/** A single threshold (with parsed verdict) from /version/:id */
+export type RpcFrameworkReviewThreshold =
+  RpcFrameworkReviewVersionResult['thresholds'][number];
+
+/** Inferred response type for GET /api/framework-review/unreviewed-diffs */
+export type RpcFrameworkReviewUnreviewedDiffsResult = InferResponseType<
+  FrameworkReviewClient['unreviewed-diffs']['$get'],
+  200
+>;
+
+/** A single unreviewed diff row from /unreviewed-diffs */
+export type RpcFrameworkReviewUnreviewedDiff =
+  RpcFrameworkReviewUnreviewedDiffsResult['diffs'][number];
+
+/** Inferred response type for GET /api/framework-review/diff/:id */
+export type RpcFrameworkReviewDiffResult = InferResponseType<
+  FrameworkReviewClient['diff'][':id']['$get'],
+  200
+>;
 
