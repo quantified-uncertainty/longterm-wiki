@@ -205,7 +205,7 @@ describe("backfillEvaluator", () => {
     vi.mocked(syncThirdPartyEvaluations)
       .mockResolvedValueOnce({
         ok: false,
-        error: "SERVER_ERROR",
+        error: "server_error",
         message: "boom",
       } as never)
       .mockResolvedValueOnce({
@@ -222,6 +222,92 @@ describe("backfillEvaluator", () => {
     expect(result.synced).toBe(2); // only the 2nd batch succeeded
     expect(result.syncFailures).toHaveLength(1);
     expect(result.syncFailures[0].error).toContain("boom");
+  });
+
+  it("handles zero-candidates input cleanly (no extract/sync calls)", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: [],
+      errors: [],
+    });
+
+    const result = await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+    });
+
+    expect(result.candidates).toBe(0);
+    expect(result.extracted).toBe(0);
+    expect(result.synced).toBe(0);
+    expect(vi.mocked(extractEvalReport)).not.toHaveBeenCalled();
+    expect(vi.mocked(syncThirdPartyEvaluations)).not.toHaveBeenCalled();
+  });
+
+  it("handles exact batch-size boundary (no spurious empty trailing batch)", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: makeCandidates(6),
+      errors: [],
+    });
+    vi.mocked(extractEvalReport).mockResolvedValue(okExtract as never);
+    vi.mocked(syncThirdPartyEvaluations).mockResolvedValue({
+      ok: true,
+      data: { upserted: 0, verdictsWritten: 0, claimsLinked: 0 },
+    } as never);
+
+    const result = await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      batchSize: 3,
+    });
+
+    expect(result.synced).toBe(6);
+    // 6 / 3 = 2 batches exactly — no third call with empty array
+    expect(vi.mocked(syncThirdPartyEvaluations)).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(syncThirdPartyEvaluations).mock.calls[0][0]).toHaveLength(3);
+    expect(vi.mocked(syncThirdPartyEvaluations).mock.calls[1][0]).toHaveLength(3);
+  });
+
+  it("handles multiple consecutive sync-batch failures", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: makeCandidates(6),
+      errors: [],
+    });
+    vi.mocked(extractEvalReport).mockResolvedValue(okExtract as never);
+    vi.mocked(syncThirdPartyEvaluations).mockResolvedValue({
+      ok: false,
+      error: "unavailable",
+      message: "wiki-server down",
+    } as never);
+
+    const result = await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      batchSize: 2,
+    });
+
+    expect(result.synced).toBe(0);
+    expect(result.syncFailures).toHaveLength(3);
+    expect(result.syncFailures.map((f) => f.batchIndex)).toEqual([0, 1, 2]);
+  });
+
+  it("serial concurrency=1 still works", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: makeCandidates(3),
+      errors: [],
+    });
+    vi.mocked(extractEvalReport).mockResolvedValue(okExtract as never);
+
+    const result = await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      concurrency: 1,
+      dryRun: true,
+    });
+
+    expect(result.extracted).toBe(3);
   });
 
   it("emits onProgress events for extract and sync", async () => {

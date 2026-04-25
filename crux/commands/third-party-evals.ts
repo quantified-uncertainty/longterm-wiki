@@ -53,6 +53,27 @@ interface ThirdPartyEvalOptions extends CommandOptions {
   dryRun?: boolean;
 }
 
+/**
+ * Parse a CLI numeric flag. Returns:
+ *   - undefined when the flag wasn't passed (caller falls back to default)
+ *   - Error with a usage message when the value is non-numeric or non-positive
+ *     (NaN would otherwise silently propagate to `pLimit(NaN)` and hang)
+ *   - the parsed positive integer otherwise
+ */
+function parsePositiveInt(
+  value: string | undefined,
+  flagName: string,
+): number | undefined | Error {
+  if (value === undefined) return undefined;
+  const n = parseInt(value, 10);
+  if (!Number.isFinite(n) || n < 1) {
+    return new Error(
+      `--${flagName} must be a positive integer (got '${value}')`,
+    );
+  }
+  return n;
+}
+
 function resolveLlmModel(name?: string): string {
   if (!name) return MODELS.haiku;
   const lower = name.toLowerCase();
@@ -300,13 +321,12 @@ async function backfillSubcommand(
     };
   }
 
-  const concurrency = options.concurrency
-    ? Math.max(1, parseInt(options.concurrency, 10))
-    : undefined;
-  const batchSize = options.batchSize
-    ? Math.max(1, parseInt(options.batchSize, 10))
-    : undefined;
-  const limit = options.limit ? Math.max(1, parseInt(options.limit, 10)) : undefined;
+  const concurrency = parsePositiveInt(options.concurrency, "concurrency");
+  if (concurrency instanceof Error) return { output: concurrency.message, exitCode: 1 };
+  const batchSize = parsePositiveInt(options.batchSize, "batch-size");
+  if (batchSize instanceof Error) return { output: batchSize.message, exitCode: 1 };
+  const limit = parsePositiveInt(options.limit, "limit");
+  if (limit instanceof Error) return { output: limit.message, exitCode: 1 };
 
   const result = await backfillEvaluator({
     evaluator,
