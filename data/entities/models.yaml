@@ -2566,3 +2566,28 @@
     - ai-governance
     - revolving-door
   lastUpdated: 2026-04
+
+- id: ai-cyber-damage-estimates
+  stableId: sid_n5k9L5Ky9g
+  wikiId: E2515
+  type: analysis
+  title: AI Cyber Damage Estimates
+  description: >-
+    Side-by-side methodology comparison of seven major global cyber damage estimates (Cybersecurity Ventures, FBI IC3,
+    IBM, Munich Re, Romanosky 2016, Anderson et al. 2012/2019, ENISA). Translates each to GDP fraction and explains
+    the ~600x spread between the lowest and highest figures.
+  customFields:
+    - label: Model Type
+      value: Methodology Comparison
+    - label: Target Risk
+      value: Cyber Offense / Cyberweapons
+  relatedEntries:
+    - id: sid_7c6UC46TWQ
+      type: risk
+      relationship: related
+  tags:
+    - cyber-damage
+    - methodology
+    - cybercrime-cost
+    - economic-impact
+  lastUpdated: 2026-04
