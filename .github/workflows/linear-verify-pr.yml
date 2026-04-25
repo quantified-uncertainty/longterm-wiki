@@ -30,9 +30,11 @@ on:
         required: false
         type: string
 
-# Per-PR runs use the PR number as the concurrency group so re-merging or
-# rapid close+reopen events don't pile up. Nightly audit + dispatch get their
-# own groups so they don't cancel a per-PR run.
+# Concurrency: queue (don't cancel) duplicate events for the same PR.
+# `pull_request: closed` fires once per close so this is mostly inert, but
+# it covers the close → reopen → close edge case where two events arrive
+# back-to-back. Nightly audit + dispatch get their own groups so they
+# never block per-PR runs.
 concurrency:
   group: linear-verify-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.event.schedule || github.run_id }}
   cancel-in-progress: false
@@ -50,13 +52,18 @@ jobs:
     #   - PRs to non-main branches (release PRs main → production reuse refs
     #     already verified when each component PR merged into main)
     #   - PRs that closed without merging
+    #   - PRs from forks (defense-in-depth — `merged == true` already means
+    #     the fork code is now in main, but the head.repo gate makes the
+    #     trust boundary explicit and survives if someone refactors this
+    #     condition later)
     #   - manual dispatches with no pr_number (those run audit-fix below)
     if: >-
       vars.AUTOMATION_PAUSED != 'true' &&
       (
         (github.event_name == 'pull_request' &&
          github.event.pull_request.merged == true &&
-         github.event.pull_request.base.ref == 'main') ||
+         github.event.pull_request.base.ref == 'main' &&
+         github.event.pull_request.head.repo.full_name == github.repository) ||
         (github.event_name == 'workflow_dispatch' &&
          github.event.inputs.pr_number != '')
       )

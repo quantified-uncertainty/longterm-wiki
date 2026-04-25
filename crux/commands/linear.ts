@@ -684,13 +684,18 @@ async function verifyPr(args: string[], options: CommandOptions): Promise<Comman
       exitCode: 1,
     };
   }
-  const prNum = parseInt(prArg.replace(/^#/, ''), 10);
-  if (Number.isNaN(prNum)) {
+  // Strict: digits only after an optional leading "#". `parseInt` is too
+  // lenient — `parseInt('4275abc')` returns 4275, so a workflow_dispatch
+  // input of "4275; rm -rf /" would silently verify PR 4275 instead of
+  // failing. Accept only `\d+` to fail loud on any garbage.
+  const prDigits = prArg.replace(/^#/, '');
+  if (!/^\d+$/.test(prDigits)) {
     return {
       output: `${c.red}Invalid PR number: ${prArg}${c.reset}\n`,
       exitCode: 1,
     };
   }
+  const prNum = parseInt(prDigits, 10);
 
   interface GhPullResponse {
     number: number;

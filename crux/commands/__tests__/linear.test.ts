@@ -701,6 +701,22 @@ describe('linear verify-pr', () => {
     expect(githubApiMock).not.toHaveBeenCalled();
   });
 
+  // Without strict validation, `parseInt('4275abc')` returns 4275 — a
+  // workflow_dispatch input of "4275; rm -rf /" would silently verify PR
+  // 4275 instead of failing. Strict `^\d+$` is what gates this.
+  it.each([
+    ['4275abc', 'trailing garbage'],
+    ['4275; echo pwned', 'shell injection attempt'],
+    [' 4275', 'leading whitespace'],
+    ['4275 ', 'trailing whitespace'],
+    ['#', 'just a # with no digits'],
+  ])('rejects %s (%s)', async (input, _label) => {
+    const r = await commands['verify-pr']([input], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid PR number');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
   it('accepts a leading "#" on the PR number', async () => {
     mockPr({ number: 4275, body: 'no fixes here', merged: true });
     const r = await commands['verify-pr'](['#4275'], { ci: true });
@@ -803,6 +819,42 @@ describe('linear verify-pr', () => {
     expect(r.exitCode).toBe(1);
     expect(r.output).toContain('QUA-300');
     expect(r.output).toContain('timed out');
+  });
+
+  // Real-world transient failure scenario: a 4-issue batched PR where two
+  // Linear calls succeed and two fail (e.g., one timeout + one rate-limit).
+  // The watchdog should reconcile what it can, surface every failure by ID,
+  // and exit non-zero so the workflow run is visibly red.
+  it('aggregates mixed success and failure across multiple refs', async () => {
+    mockPr({
+      body: 'Fixes QUA-501\nFixes QUA-502\nFixes QUA-503\nFixes QUA-504',
+      merged: true,
+    });
+    const inProgress = (id: string) => ({
+      ...mockIssue,
+      identifier: id,
+      state: { id: 'state-active', name: 'In Review', type: 'started' as const },
+    });
+    getIssueMock
+      .mockResolvedValueOnce(inProgress('QUA-501'))
+      .mockRejectedValueOnce(new Error('Linear GraphQL request timed out after 15s'))
+      .mockResolvedValueOnce(inProgress('QUA-503'))
+      .mockRejectedValueOnce(new Error('Linear GraphQL returned 429: rate limited'));
+    updateIssueStateMock.mockResolvedValue({ identifier: '', state: 'Done' });
+    commentOnIssueMock.mockResolvedValue(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    // Exit non-zero — the failures must be visible in CI.
+    expect(r.exitCode).toBe(1);
+    // Successes were reconciled.
+    expect(updateIssueStateMock).toHaveBeenCalledTimes(2);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-501', 'Done');
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-503', 'Done');
+    // Both failures are named in the output so the operator knows which to retry.
+    expect(r.output).toContain('QUA-502');
+    expect(r.output).toContain('timed out');
+    expect(r.output).toContain('QUA-504');
+    expect(r.output).toContain('rate limited');
   });
 
   it('reconciles only In-Progress / In-Review (started type), regardless of name spelling', async () => {
