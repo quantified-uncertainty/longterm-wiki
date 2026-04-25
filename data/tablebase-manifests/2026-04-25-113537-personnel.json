@@ -1,0 +1,230 @@
+{
+  "table": "personnel",
+  "recordCount": 20,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-25T11:35:37.797Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 20,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "eaaLVIpYjh",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Chief Executive Officer",
+      "roleType": "key-person",
+      "startDate": "2024",
+      "source": "https://www.businesswire.com/news/home/20240117293802/en/Nina-Taylor-to-Lead-The-Center-for-Election-Science-as-New-CEO",
+      "notes": "Nina Taylor joined as CEO in January 2024. Per BusinessWire press release dated 2024-01-17.",
+      "id": "WLUGzzhzWF",
+      "verdict": "none"
+    },
+    {
+      "personId": "cAiP2KyLeD",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Director of Operations",
+      "roleType": "key-person",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Listed as Director of Operations in IRS Form 990 filings. Licensed attorney and therapist.",
+      "id": "bPdq2L17gx",
+      "verdict": "none"
+    },
+    {
+      "personId": "RHT7shthDO",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Director of Applied Data & Research",
+      "roleType": "key-person",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Listed as Director of Applied Data & Research. Ph.D. in Political Science from USC.",
+      "id": "H95ZiYhduK",
+      "verdict": "none"
+    },
+    {
+      "personId": "iS4ycDF37U",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Director of Markets & Partnerships",
+      "roleType": "key-person",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Listed as Director of Markets & Partnerships. M.A. in English literature from Florida International University.",
+      "id": "8lq5COGxR1",
+      "verdict": "none"
+    },
+    {
+      "personId": "gjlEk8xeeb",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Communications",
+      "roleType": "career",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Listed as press/media contact at chris@electionscience.org. Appeared on podcasts representing CES.",
+      "id": "KjsbYzWT8q",
+      "verdict": "none"
+    },
+    {
+      "personId": "4c3npRKan0",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Executive Director",
+      "roleType": "key-person",
+      "endDate": "2024",
+      "isFounder": true,
+      "source": "https://en.wikipedia.org/wiki/Center_for_Election_Science",
+      "notes": "Co-founder and Executive Director from founding until departure circa 2023-2024. Licensed attorney. Per Wikipedia and IRS 990 filings.",
+      "id": "5WrDjtFRrU",
+      "verdict": "none"
+    },
+    {
+      "personId": "U00iN6O3RL",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Chair",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Chair as of 2024 IRS Form 990. Actor (also known as Michael James Bell); former database engineer based in Los Angeles, CA.",
+      "id": "fojTlpYdWQ",
+      "verdict": "none"
+    },
+    {
+      "personId": "otUwvLdCgH",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Vice Chair",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Vice Chair as of 2024 IRS Form 990. Head of Monetization at Meta, based in Menlo Park, CA.",
+      "id": "tZEWi0XkBb",
+      "verdict": "none"
+    },
+    {
+      "personId": "jGVT6nbYrW",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Treasurer",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Treasurer as of 2024 IRS Form 990. CEO & Founder of L.M. Lewis Consulting, Los Angeles, CA.",
+      "id": "XMFnDITZb9",
+      "verdict": "none"
+    },
+    {
+      "personId": "9nk2U80v1u",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Secretary",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Secretary as of 2024 IRS Form 990. President of Sapientia Strategic Consulting, Denver, CO.",
+      "id": "h3R7mOT7jV",
+      "verdict": "none"
+    },
+    {
+      "personId": "vfkKlJZU0H",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Director as of 2024 IRS Form 990.",
+      "id": "YcYntQpCPU",
+      "verdict": "none"
+    },
+    {
+      "personId": "4utPdkPUVZ",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Director as of 2024 IRS Form 990. Deputy County Counsel, County of Santa Clara, based in Burlingame, CA.",
+      "id": "EPMogLwwJN",
+      "verdict": "none"
+    },
+    {
+      "personId": "1DgVddnuAO",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Current Board Director as of 2024 IRS Form 990. Founder of Political Equity Project; Managing Partner at STRUO Strategies; former WA State Representative (D-30).",
+      "id": "3391Zr7ABQ",
+      "verdict": "none"
+    },
+    {
+      "personId": "G5UNFbNpC7",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Chair",
+      "roleType": "board",
+      "endDate": "2024",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Board Chair as of 2023 IRS Form 990; no longer on board per 2024 filing. Senior Engineering Manager (previously at Truework/Snyk).",
+      "id": "34GjyzasJj",
+      "verdict": "none"
+    },
+    {
+      "personId": "YegisGs3EX",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Treasurer",
+      "roleType": "board",
+      "endDate": "2024",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Board Treasurer as of 2023 IRS Form 990; no longer on board per 2024 filing.",
+      "id": "aZLfFiXXnm",
+      "verdict": "none"
+    },
+    {
+      "personId": "rwtc4C523i",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Secretary",
+      "roleType": "board",
+      "endDate": "2024",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Board Secretary as of 2023 IRS Form 990; no longer on board per 2024 filing. Degrees from Stanford in physics and industrial engineering.",
+      "id": "2gIWjXupm0",
+      "verdict": "none"
+    },
+    {
+      "personId": "wcZeFGLIop",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Director",
+      "roleType": "board",
+      "endDate": "2024",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Board Director as of 2023 IRS Form 990; no longer on board per 2024 filing.",
+      "id": "Rqn34HmmcE",
+      "verdict": "none"
+    },
+    {
+      "personId": "8H46xCRpQi",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Board Director",
+      "roleType": "board",
+      "endDate": "2024",
+      "source": "https://projects.propublica.org/nonprofits/organizations/452334002",
+      "notes": "Board Director as of 2023 IRS Form 990; no longer on board per 2024 filing.",
+      "id": "SOLmnLQVeL",
+      "verdict": "none"
+    },
+    {
+      "personId": "HLN9YipK9w",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Co-founder",
+      "roleType": "key-person",
+      "startDate": "2011",
+      "isFounder": true,
+      "source": "https://en.wikipedia.org/wiki/Center_for_Election_Science",
+      "notes": "Co-founded The Center for Election Science in 2011. Per Wikipedia.",
+      "id": "lcY9ywANdZ",
+      "verdict": "none"
+    },
+    {
+      "personId": "FDdKK5hdrW",
+      "organizationId": "sid_gBpjt2fx66",
+      "role": "Co-founder",
+      "roleType": "key-person",
+      "startDate": "2011",
+      "isFounder": true,
+      "source": "https://en.wikipedia.org/wiki/Center_for_Election_Science",
+      "notes": "Co-founded The Center for Election Science in 2011. Per Wikipedia.",
+      "id": "ENECu3yPrQ",
+      "verdict": "none"
+    }
+  ]
+}
