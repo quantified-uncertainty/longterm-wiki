@@ -4356,6 +4356,7 @@ export const safetyFrameworkVersions = pgTable(
     contentHash: text("content_hash").notNull(), // sha256 of normalized text
     contentLengthChars: integer("content_length_chars"),
     summary: text("summary"), // LLM-generated 2-3 sentence summary
+    notes: text("notes"), // Free-form ops note (e.g. "Wayback push skipped")
     isDraft: boolean("is_draft").notNull().default(false),
     supersededByVersionId: text("superseded_by_version_id"),
     ingestStatus: text("ingest_status").notNull().default("pending_review"),
