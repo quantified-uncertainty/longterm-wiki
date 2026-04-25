@@ -36,6 +36,7 @@ import { ingestMetr } from "../third-party-evals/ingesters/metr-rss.ts";
 import { ingestApollo } from "../third-party-evals/ingesters/apollo-research.ts";
 import { ingestCaisi } from "../third-party-evals/ingesters/caisi-blog.ts";
 import type { IngestResult } from "../third-party-evals/ingesters/types.ts";
+import { backfillEvaluator } from "../third-party-evals/backfill.ts";
 
 interface ThirdPartyEvalOptions extends CommandOptions {
   evaluator?: string;
@@ -46,6 +47,10 @@ interface ThirdPartyEvalOptions extends CommandOptions {
   sourceSystem?: "sitemap" | "rss" | "html-scrape" | "manual";
   maxSourceChars?: string;
   ci?: boolean;
+  concurrency?: string;
+  batchSize?: string;
+  limit?: string;
+  dryRun?: boolean;
 }
 
 function resolveLlmModel(name?: string): string {
@@ -274,9 +279,96 @@ async function extractSubcommand(
   return { output: lines.join("\n"), exitCode: 0 };
 }
 
+async function backfillSubcommand(
+  args: string[],
+  options: ThirdPartyEvalOptions,
+): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const evaluator = args[0];
+  if (!evaluator) {
+    return {
+      output:
+        "Usage: crux tb third-party-evals backfill <uk-aisi|us-aisi|metr|apollo> --evaluator=<orgStableId> [--limit=N] [--concurrency=N] [--batch-size=N] [--since=YYYY-MM-DD] [--dry-run] [--model=haiku|sonnet]",
+      exitCode: 1,
+    };
+  }
+  if (!options.evaluator) {
+    return {
+      output:
+        "--evaluator=<orgStableId> is required (the stableId of the evaluator org entity).",
+      exitCode: 1,
+    };
+  }
+
+  const concurrency = options.concurrency
+    ? Math.max(1, parseInt(options.concurrency, 10))
+    : undefined;
+  const batchSize = options.batchSize
+    ? Math.max(1, parseInt(options.batchSize, 10))
+    : undefined;
+  const limit = options.limit ? Math.max(1, parseInt(options.limit, 10)) : undefined;
+
+  const result = await backfillEvaluator({
+    evaluator,
+    evaluatorOrgId: options.evaluator,
+    llmModel: resolveLlmModel(options.model),
+    concurrency,
+    batchSize,
+    limit,
+    since: options.since,
+    dryRun: Boolean(options.dryRun),
+    onProgress: (event) => {
+      if (event.kind === "extracted") {
+        log.dim(`  [${event.index}/${event.total}] ✓ ${event.url}`);
+      } else if (event.kind === "extract-error") {
+        log.warn(`  [${event.index}/${event.total}] ✗ ${event.url} — ${event.error}`);
+      } else if (event.kind === "synced") {
+        log.info(`  → synced batch ${event.batchIndex} (${event.count} rows)`);
+      } else {
+        log.error(`  → sync batch ${event.batchIndex} failed: ${event.error}`);
+      }
+    },
+  });
+
+  const lines: string[] = [];
+  lines.push("");
+  lines.push(`Backfill complete: ${result.evaluator}`);
+  lines.push(`  candidates:        ${result.candidates}`);
+  lines.push(`  extracted:         ${result.extracted}`);
+  lines.push(`  extract failures:  ${result.extractFailures.length}`);
+  lines.push(`  synced:            ${result.synced}${options.dryRun ? "  (dry-run, nothing posted)" : ""}`);
+  lines.push(`  sync failures:     ${result.syncFailures.length}`);
+  lines.push(`  duration:          ${(result.durationMs / 1000).toFixed(1)}s`);
+  if (result.extractFailures.length > 0) {
+    lines.push(``);
+    lines.push(`Extract failures:`);
+    for (const f of result.extractFailures.slice(0, 20)) {
+      lines.push(`  ${f.url}\n    ${f.error}`);
+    }
+    if (result.extractFailures.length > 20) {
+      lines.push(`  ... and ${result.extractFailures.length - 20} more`);
+    }
+  }
+  if (result.syncFailures.length > 0) {
+    lines.push(``);
+    lines.push(`Sync failures:`);
+    for (const f of result.syncFailures) {
+      lines.push(`  batch ${f.batchIndex}: ${f.error}`);
+    }
+  }
+
+  const exitCode =
+    result.syncFailures.length > 0
+      ? 2
+      : result.extractFailures.length === result.candidates && result.candidates > 0
+        ? 2
+        : 0;
+  return { output: lines.join("\n"), exitCode };
+}
+
 /**
  * Default dispatcher — reads the first positional arg as the
- * sub-subcommand verb and routes to ingest/extract.
+ * sub-subcommand verb and routes to ingest/extract/backfill.
  */
 async function defaultCommand(
   args: string[],
@@ -292,8 +384,11 @@ async function defaultCommand(
   if (verb === "extract") {
     return extractSubcommand(args.slice(1), options);
   }
+  if (verb === "backfill") {
+    return backfillSubcommand(args.slice(1), options);
+  }
   return {
-    output: `Unknown subcommand '${verb}'. Use 'ingest' or 'extract'.\n\n${getHelp()}`,
+    output: `Unknown subcommand '${verb}'. Use 'ingest', 'extract', or 'backfill'.\n\n${getHelp()}`,
     exitCode: 1,
   };
 }
@@ -304,6 +399,7 @@ export const commands: Record<
 > = {
   ingest: async (args, options) => ingestSubcommand(args, options),
   extract: async (args, options) => extractSubcommand(args, options),
+  backfill: async (args, options) => backfillSubcommand(args, options),
   default: defaultCommand,
 };
 
@@ -329,13 +425,25 @@ Subcommands:
                           --model=haiku|sonnet    LLM (default haiku)
                           --json                  raw JSON output
 
+  backfill <evaluator>  Ingest + extract + sync end-to-end (QUA-705)
+                          --evaluator=<orgId>     stableId of evaluator org (required)
+                          --concurrency=N         parallel extract calls (default 4)
+                          --batch-size=N          items per /sync POST (default 25)
+                          --limit=N               cap candidates (smoke test)
+                          --since=YYYY-MM-DD      skip older URLs (UK AISI only)
+                          --dry-run               extract but don't POST
+                          --model=haiku|sonnet    LLM (default haiku)
+
 Examples:
   crux tb third-party-evals ingest uk-aisi --since=2026-01-01
 
   crux tb third-party-evals extract https://www.aisi.gov.uk/blog/foo \\
       --evaluator=sid_aX0jkoaekQ --source-system=sitemap
 
-  crux tb third-party-evals extract https://metr.org/blog/bar \\
-      --evaluator=sid_rQEkFJxS5w --source-system=rss --apply
+  crux tb third-party-evals backfill uk-aisi --evaluator=sid_aX0jkoaekQ \\
+      --since=2025-01-01 --concurrency=4
+
+  crux tb third-party-evals backfill metr --evaluator=sid_rQEkFJxS5w \\
+      --limit=2 --dry-run
 `.trim();
 }
