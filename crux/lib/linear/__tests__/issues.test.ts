@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import {
   getIssue,
   getComments,
+  updateIssue,
   updateIssueState,
   commentOnIssue,
   createIssue,
@@ -251,6 +252,78 @@ describe('issues.ts — transport helpers', () => {
         updateIssueState('QUA-184', 'Pending')
       ).rejects.toThrow(/Unknown Linear workflow state/);
       expect(fetchSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('updateIssue', () => {
+    it('sends projectId in the IssueUpdateInput', async () => {
+      const fetchSpy = vi.fn().mockResolvedValue(
+        jsonResponse({
+          data: {
+            issueUpdate: {
+              success: true,
+              issue: { identifier: 'QUA-184' },
+            },
+          },
+        })
+      );
+      globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+      await updateIssue('QUA-184', { projectId: 'proj-uuid-1' });
+      const [, init] = fetchSpy.mock.calls[0];
+      const body = JSON.parse((init as RequestInit).body as string);
+      expect(body.variables.id).toBe('QUA-184');
+      expect(body.variables.input).toEqual({ projectId: 'proj-uuid-1' });
+    });
+
+    it('passes null projectId through to clear the project', async () => {
+      const fetchSpy = vi.fn().mockResolvedValue(
+        jsonResponse({
+          data: { issueUpdate: { success: true, issue: { identifier: 'QUA-184' } } },
+        })
+      );
+      globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+      await updateIssue('QUA-184', { projectId: null });
+      const [, init] = fetchSpy.mock.calls[0];
+      const body = JSON.parse((init as RequestInit).body as string);
+      expect(body.variables.input.projectId).toBeNull();
+    });
+
+    it('supports priority + title + description in one call', async () => {
+      const fetchSpy = vi.fn().mockResolvedValue(
+        jsonResponse({
+          data: { issueUpdate: { success: true, issue: { identifier: 'QUA-184' } } },
+        })
+      );
+      globalThis.fetch = fetchSpy as unknown as typeof fetch;
+
+      await updateIssue('QUA-184', {
+        priority: 2,
+        title: 'New title',
+        description: 'New body',
+      });
+      const [, init] = fetchSpy.mock.calls[0];
+      const body = JSON.parse((init as RequestInit).body as string);
+      expect(body.variables.input).toEqual({
+        priority: 2,
+        title: 'New title',
+        description: 'New body',
+      });
+    });
+
+    it('throws when issueUpdate reports success=false', async () => {
+      globalThis.fetch = vi.fn().mockResolvedValue(
+        jsonResponse({
+          data: {
+            issueUpdate: { success: false, issue: { identifier: 'QUA-184' } },
+          },
+        })
+      ) as unknown as typeof fetch;
+
+      await expect(updateIssue('QUA-184', { priority: 1 })).rejects.toThrow(
+        /refused to update QUA-184/
+      );
     });
   });
 
