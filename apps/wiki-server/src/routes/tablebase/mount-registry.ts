@@ -183,4 +183,5 @@ export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
   "audit-log.ts",
   "write-inline-verdicts.ts",
   "entity-profile-descriptions.ts",
+  "system-card-benchmark-linker.ts",
 ];

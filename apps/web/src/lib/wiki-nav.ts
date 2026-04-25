@@ -287,6 +287,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Funding Programs", href: internalHref("funding-programs-dashboard") },
         { label: "Talent Flows", href: internalHref("talent-flows-dashboard") },
         { label: "Jobs", href: internalHref("jobs-dashboard") },
+        { label: "System Cards", href: internalHref("system-cards-dashboard") },
         { label: "Coverage", href: internalHref("tablebase-coverage-dashboard") },
       ],
     },

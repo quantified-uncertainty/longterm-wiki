@@ -210,6 +210,7 @@ import type { PoliticalScoresRoute } from "@wiki-server/political-scores-route";
 import type { PoliticalOfficesRoute } from "@wiki-server/political-offices-route";
 import type { PoliticalVotesRoute } from "@wiki-server/political-votes-route";
 import type { CampaignFinanceRoute } from "@wiki-server/campaign-finance-route";
+import type { ModelSystemCardsRoute } from "@wiki-server/model-system-cards-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -605,4 +606,22 @@ export type RpcPoliticalVotesByLegislationResult = InferResponseType<PoliticalVo
 
 /** A single political vote record */
 export type RpcPoliticalVoteRecord = RpcPoliticalVotesByEntityResult['votes'][number];
+
+// ============================================================================
+// Hono RPC client — Model System Cards API (QUA-690 / QUA-702)
+// ============================================================================
+
+type ModelSystemCardsClient = ReturnType<typeof hc<ModelSystemCardsRoute>>;
+
+/** Inferred response type for GET /api/model-system-cards/stats */
+export type RpcModelSystemCardsStatsResult = InferResponseType<ModelSystemCardsClient['stats']['$get'], 200>;
+
+/** Inferred response type for GET /api/model-system-cards/all */
+export type RpcModelSystemCardsAllResult = InferResponseType<ModelSystemCardsClient['all']['$get'], 200>;
+
+/** A single system card row from the all-cards list */
+export type RpcModelSystemCardRow = RpcModelSystemCardsAllResult['items'][number];
+
+/** Inferred response type for GET /api/model-system-cards/by-model/:modelId */
+export type RpcModelSystemCardsByModelResult = InferResponseType<ModelSystemCardsClient['by-model'][':modelId']['$get'], 200>;
 

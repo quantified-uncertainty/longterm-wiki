@@ -14,6 +14,7 @@ import { paginatedQuery } from "../shared/paginated-query.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { alias } from "drizzle-orm/pg-core";
+import { linkSystemCardBenchmarks } from "./system-card-benchmark-linker.js";
 
 // ---- Constants ----
 
@@ -372,6 +373,21 @@ const modelSystemCardsApp = new Hono()
         sourceId: item.id,
         sourceUrl: item.sourceUrl,
       }),
+      // QUA-702: post-upsert hook links cited benchmarks into
+      // benchmark_results (with tested_by='self-report'); unresolved cited
+      // names land in pending_benchmark_links for follow-up.
+      postUpsert: async (tx, items) => {
+        await linkSystemCardBenchmarks(
+          tx,
+          items.map((item) => ({
+            id: item.id,
+            aiModelId: item.aiModelId,
+            sourceUrl: item.sourceUrl,
+            releaseDate: item.releaseDate ?? null,
+            evalScoresCited: item.evalScoresCited ?? null,
+          })),
+        );
+      },
     }),
   )
 

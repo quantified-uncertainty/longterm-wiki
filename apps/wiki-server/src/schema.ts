@@ -2406,6 +2406,14 @@ export const benchmarkResults = pgTable(
     date: text("date"),
     sourceUrl: text("source_url"),
     notes: text("notes"),
+    // QUA-702: provenance. NULL = legacy / unknown; 'self-report' = inserted
+    // by the model_system_cards post-upsert hook from a lab-published card;
+    // 'third-party' = independent benchmark run. Constraint enforced in
+    // migration 0212. The hook's upsert protects 'third-party' rows
+    // unconditionally; NULL rows are protected unless they are empty legacy
+    // stubs (NULL tested_by + NULL source_url) that no one curated. See
+    // system-card-benchmark-linker.ts for the exact WHERE clause.
+    testedBy: text("tested_by"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2419,6 +2427,7 @@ export const benchmarkResults = pgTable(
   (table) => [
     index("idx_br_benchmark").on(table.benchmarkId),
     index("idx_br_model").on(table.modelId),
+    index("idx_br_tested_by").on(table.testedBy),
     uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
   ]
 );
@@ -4668,5 +4677,71 @@ export const thirdPartyEvaluationModels = pgTable(
   (table) => [
     primaryKey({ columns: [table.evaluationId, table.aiModelId] }),
     index("idx_tpem_ai_model").on(table.aiModelId),
+  ],
+);
+
+/**
+ * Pending benchmark links — queue for cited benchmarks in
+ * `model_system_cards.eval_scores_cited` whose name could not be resolved
+ * to a row in `benchmarks`.
+ *
+ * QUA-702. Populated by the model_system_cards sync postUpsert hook;
+ * resolved entries graduate to `benchmark_results` via a follow-up job
+ * once a human (or a future fuzzy matcher) maps `cited_name` to a real
+ * `benchmarks.id`.
+ *
+ * Idempotency on re-extract: unique on
+ * (model_system_card_id, cited_name_normalized) where the normalized form
+ * matches `normalizeBenchmarkName(s)` in the linker
+ * (`lower(s).replace(/[^a-z0-9]/g, "")`). Without normalization, repeated
+ * extractions can return name variants ("SWE-bench Verified" /
+ * "swe-bench-verified" / "SWE Bench Verified") that produce duplicate
+ * queue rows for the same underlying benchmark.
+ */
+export const pendingBenchmarkLinks = pgTable(
+  "pending_benchmark_links",
+  {
+    id: text("id").primaryKey(), // sid_-style 10-char id
+    modelSystemCardId: text("model_system_card_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // entities.stable_id
+    citedName: text("cited_name").notNull(),
+    /**
+     * Generated normalized form of `cited_name` — must match
+     * `normalizeBenchmarkName()` in `system-card-benchmark-linker.ts`. Stored
+     * (not virtual) so the unique index can reference it. Update both
+     * together if the normalization rules change.
+     */
+    citedNameNormalized: text("cited_name_normalized").generatedAlwaysAs(
+      sql`regexp_replace(lower(cited_name), '[^a-z0-9]', '', 'g')`,
+    ),
+    citedScore: doublePrecision("cited_score"),
+    citedMetric: text("cited_metric"),
+    citedSetup: text("cited_setup"),
+    citedExcerpt: text("cited_excerpt"),
+    /** When the queue entry has been mapped to a real benchmark, this is set. */
+    resolvedBenchmarkId: text("resolved_benchmark_id"),
+    /** pending | resolved | rejected | auto-resolved */
+    status: text("status").notNull().default("pending"),
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pbl_card").on(table.modelSystemCardId),
+    index("idx_pbl_model").on(table.aiModelId),
+    index("idx_pbl_status").on(table.status),
+    index("idx_pbl_resolved_benchmark").on(table.resolvedBenchmarkId),
+    uniqueIndex("uq_pbl_card_name").on(
+      table.modelSystemCardId,
+      table.citedNameNormalized,
+    ),
   ],
 );
