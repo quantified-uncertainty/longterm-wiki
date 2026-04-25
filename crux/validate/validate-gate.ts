@@ -544,6 +544,31 @@ const PARALLEL_STEPS: Step[] = [
     emitOutputInCi: true,
   },
   {
+    id: 'framework-thresholds',
+    name: 'Framework capability threshold integrity (source_quote verified or human-reviewed)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-framework-thresholds.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking (QUA-711): every published threshold must have either
+    // extraction_confidence ≥ 0.7 (verifyExcerpt round-trip succeeded at
+    // extract time) or human_reviewed=true with non-empty human_review_notes.
+    // No-ops while no rows are published yet. Requires wiki-server.
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'framework-versions',
+    name: 'Framework version archival integrity (wayback_snapshot_url or notes)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-framework-versions.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking (QUA-711): every published safety_framework_versions row must
+    // have either wayback_snapshot_url populated or notes flagging Wayback
+    // skipped. No-ops while no rows are published yet. Requires wiki-server.
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
     id: 'sid-display',
     name: 'No sid_ values in display name columns',
     command: 'npx',
@@ -756,6 +781,19 @@ const PARALLEL_STEPS: Step[] = [
     // `submissions` and `reports.text`/`reports.plain_text`. This validator
     // greps the AIID ingest + schema paths for symptoms of re-introducing
     // those fields. QUA-693.
+  },
+  {
+    id: 'benchmark-result-provenance',
+    name: 'Benchmark result provenance (tested_by + source_url)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-benchmark-result-provenance.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory until Phase 2 ingesters have populated tested_by + source_url
+    // for the bulk of rows (target: one week clean before promoting to
+    // blocking). Surfaces verifiability gaps without wedging current PRs.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
   },
 ];
 

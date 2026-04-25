@@ -95,45 +95,87 @@ export interface TarEntry {
 }
 
 /**
- * Verbose tar listing — `-tvjf` includes the permission string (whose first
- * char is the entry type) and, for link entries, ` -> target` or ` link to
- * target`. We parse those out so `assertSafeTarEntries()` can reject any
- * link entries before extraction. AIID archives come from a third-party R2
- * bucket; checking entry-name text alone is not enough — a crafted archive
- * could contain a symlink whose target escapes the extraction root.
+ * List every entry in a tar.bz2 archive as a `{ name, type, linkTarget? }`
+ * triple, using two complementary `tar` passes:
+ *
+ *   1. `tar -tjf` — one *plain* filename per line, no metadata. Source of
+ *      truth for the entry name — no parsing required.
+ *   2. `tar -tvjf` — same archive, same entry order; we read only the
+ *      first character of each line (the entry-type indicator) and any
+ *      trailing link-target on `l`/`h` entries.
+ *
+ * If the two passes disagree on entry count, fail closed — that mismatch
+ * is the expected signal of a maliciously-crafted archive.
+ *
+ * **Why two passes** — Verbose output's middle columns vary by tar
+ * implementation (GNU's `owner/group SIZE YYYY-MM-DD HH:MM` vs bsdtar's
+ * `links OWNER GROUP SIZE Mon DD HH:MM`, with bsdtar further degrading
+ * to `Mon DD  YYYY` for files older than ~6 months), and a single regex
+ * that handles all three is fragile. Worse, an attacker who controls the
+ * filename can inject a whitespace-bracketed time-like pattern
+ * (`../escape 01:23 harmless.json`) and steal a regex anchor, parsing
+ * the path as a "harmless" name and slipping `..` past
+ * `assertSafeTarEntries`. AIID archives come from a third-party R2
+ * bucket, so the parser must not have such a surface. Reading names
+ * from `tar -tjf` directly removes the entire class of vulnerability.
+ * See QUA-733 (the regression) and its review-pass for the full story.
  */
 export function listTarEntries(archivePath: string): TarEntry[] {
-  const out = execFileSync("tar", ["-tvjf", archivePath], {
-    stdio: ["ignore", "pipe", "pipe"],
-    encoding: "utf-8",
+  const tarOpts = {
+    stdio: ["ignore", "pipe", "pipe"] as const,
+    encoding: "utf-8" as const,
     maxBuffer: 64 * 1024 * 1024, // AIID dump has ~30k entries; 64 MB string is plenty
-  });
+  };
+
+  const splitTarOutput = (s: string): string[] =>
+    s
+      .split("\n")
+      .map((l) => l.replace(/\r$/, ""))
+      .filter((l) => l.length > 0);
+
+  const names = splitTarOutput(execFileSync("tar", ["-tjf", archivePath], tarOpts));
+  const verboseLines = splitTarOutput(
+    execFileSync("tar", ["-tvjf", archivePath], tarOpts),
+  );
+
+  if (names.length !== verboseLines.length) {
+    throw new Error(
+      `tar listing mismatch: -tjf returned ${names.length} entries but ` +
+        `-tvjf returned ${verboseLines.length} — refusing to extract ` +
+        `(possible filename injection in archive)`,
+    );
+  }
 
   const entries: TarEntry[] = [];
-  for (const rawLine of out.split("\n")) {
-    const line = rawLine.replace(/\r$/, "");
-    if (!line.trim()) continue;
+  for (let i = 0; i < names.length; i++) {
+    const verboseLine = verboseLines[i];
+    // First non-whitespace char of the perms string is the type indicator.
+    // `?` for unparseable lines (empty perms field, etc.) — rejected by
+    // assertSafeTarEntries downstream.
+    const permsMatch = verboseLine.match(/^(\S+)/);
+    const type = permsMatch ? permsMatch[1][0] : "?";
 
-    // Verbose format: `<perms> <owner> <size> <date> <time> <name>[ -> target | link to target]`
-    // The permission string (first whitespace-separated token) starts with the
-    // type char; anything we don't recognize as a regular file or directory is
-    // treated as a link/special and rejected by assertSafeTarEntries.
-    const m = line.match(/^(\S+)\s+\S+\s+\d+\s+\S+\s+\S+\s+(.+)$/);
-    if (!m) {
-      // Unparseable line — be conservative and reject by giving it an unknown type.
-      entries.push({ name: line.trim(), type: "?" });
-      continue;
-    }
-    const type = m[1][0] ?? "?";
-    let rest = m[2];
+    let name = names[i];
     let linkTarget: string | undefined;
-    // bsdtar / GNU tar format symlinks as " -> target" and hardlinks as " link to target".
-    const linkMatch = rest.match(/^(.+?)\s+(?:->|link to)\s+(.+)$/);
-    if (linkMatch) {
-      rest = linkMatch[1];
-      linkTarget = linkMatch[2];
+
+    // Symlinks/hardlinks: GNU tar's `-tjf` may emit `link -> target`;
+    // bsdtar's `-tjf` emits just the name and puts the target on the
+    // verbose line as ` -> target` or ` link to target`. Diagnostics-only —
+    // the validator rejects all link entries regardless of target shape.
+    if (type === "l" || type === "h") {
+      const arrowMatch = name.match(/^(.+?)\s+->\s+(.+)$/);
+      if (arrowMatch) {
+        name = arrowMatch[1];
+        linkTarget = arrowMatch[2];
+      } else {
+        const verboseTargetMatch = verboseLine.match(
+          /\s(?:->|link to)\s+(.+?)\s*$/,
+        );
+        if (verboseTargetMatch) linkTarget = verboseTargetMatch[1];
+      }
     }
-    entries.push({ name: rest, type, linkTarget });
+
+    entries.push({ name, type, linkTarget });
   }
   return entries;
 }

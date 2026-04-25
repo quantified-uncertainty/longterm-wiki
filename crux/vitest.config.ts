@@ -24,6 +24,7 @@ export default defineConfig({
       'resource-enrichment/**/*.test.ts',
       'system-cards/**/*.test.ts',
       'frameworks/**/*.test.ts',
+      'scripts/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

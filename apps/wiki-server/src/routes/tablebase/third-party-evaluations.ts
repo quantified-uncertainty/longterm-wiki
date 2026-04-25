@@ -399,12 +399,15 @@ const thirdPartyEvaluationsApp = new Hono()
       batchSchema: SyncThirdPartyEvaluationsBatchSchema,
       entityRefs: ["evaluatorOrgId"],
       // Strip the `models` field before insert — it goes to the join table
-      // in postUpsert, not the main row.
+      // in postUpsert, not the main row. Coerce `extractedAt` from the
+      // wire-format ISO string into a Date so postgres-js can serialize the
+      // timestamp column (it calls `.toISOString()` internally).
       toRow: (item, now) => {
-        const { models: _models, ...row } = item;
+        const { models: _models, extractedAt, ...row } = item;
         void _models;
         return {
           ...row,
+          extractedAt: extractedAt ? new Date(extractedAt) : null,
           syncedAt: now,
           updatedAt: now,
         };

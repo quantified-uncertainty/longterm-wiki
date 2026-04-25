@@ -1,0 +1,96 @@
+name: Refresh Frontier Safety Frameworks
+run-name: "Refresh Frameworks${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Weekly re-fetch of the ~12 frontier safety framework source URLs.
+# QUA-711 / QUA-706 Phase 4-D.
+#
+# What it does:
+#   - Iterates data/frameworks/frameworks.yaml.
+#   - Calls fetchFramework() per URL → sha256 content hash + Wayback push.
+#   - Logs the verdict (unchanged | new_version | silent_update_detected | fetch_failed)
+#     to framework_ingest_log via /api/framework-ingest-log/insert.
+#   - On silent_update_detected, posts a Discord webhook
+#     (DISCORD_FRAMEWORK_WEBHOOK_URL or DISCORD_WEBHOOK_URL).
+#
+# Pipeline logic lives in `crux/scripts/refresh-frameworks.ts`. This workflow
+# only handles trigger / setup / the single crux invocation.
+
+on:
+  # schedule disabled — labs rarely change frameworks AND the script's first
+  # production run benefits from manual oversight (some URLs may have moved
+  # since the manifest was authored). Re-enable once the manual runs settle.
+  # Treatment matches `auto-update.yml` per `.claude/rules/auto-update-system.md`:
+  # if you uncomment the schedule, also add `refresh-frameworks.yml` to the
+  # workflow-staleness list in `crux/health/health-check.ts::workflowFiles`.
+  # Tracked in QUA-31 alongside the auto-update re-enable question.
+  # schedule:
+  #   - cron: '0 6 * * 0'  # Sundays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: 'Skip ingest-log writes and Discord alerts'
+        required: false
+        default: false
+        type: boolean
+      skip_wayback:
+        description: 'Skip the Wayback Save Page Now push (faster + no external side effects)'
+        required: false
+        default: false
+        type: boolean
+      skip_discord:
+        description: 'Skip Discord webhook (silent_update_detected stays in the log only)'
+        required: false
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+# Only one refresh at a time — back-to-back runs would race on the
+# (framework_id, content_hash, fetched_at_minute) ingest-log idempotency key.
+concurrency:
+  group: refresh-frameworks
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    # Global circuit breaker — skip when automation is paused.
+    if: vars.AUTOMATION_PAUSED != 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run framework refresh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
+          LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
+          DISCORD_FRAMEWORK_WEBHOOK_URL: ${{ secrets.DISCORD_FRAMEWORK_WEBHOOK_URL }}
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+        run: |
+          ARGS=""
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
+            ARGS="$ARGS --dry-run"
+          fi
+          if [ "${{ inputs.skip_wayback }}" = "true" ]; then
+            ARGS="$ARGS --skip-wayback"
+          fi
+          if [ "${{ inputs.skip_discord }}" = "true" ]; then
+            ARGS="$ARGS --skip-discord"
+          fi
+          echo "Running: node --import tsx/esm crux/scripts/refresh-frameworks.ts $ARGS"
+          node --import tsx/esm crux/scripts/refresh-frameworks.ts $ARGS
