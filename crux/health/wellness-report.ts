@@ -133,6 +133,38 @@ export function buildWellnessReport(checks: CheckResult[]): WellnessReport {
 export const WELLNESS_ISSUE_TITLE = 'System wellness check failing';
 
 /**
+ * Sentinel marker for the misconfig banner. Tests assert against this
+ * verbatim; production code uses it via {@link prependMisconfigBanner}.
+ */
+export const MISCONFIG_BANNER_MARKER = '⚠️ **Wellness Linear-side dedup is DORMANT**';
+
+/**
+ * Prepend a banner explaining that this ticket is one of the duplicates the
+ * Linear-side dedup was supposed to prevent (QUA-577 / QUA-667 / QUA-676), and
+ * that the cure is to add the LINEAR_API_KEY secret. Keeps the banner above
+ * the fold so the cause is visible in the Linear ticket preview too — Linear's
+ * GitHub-mirror integration truncates aggressively.
+ */
+export function prependMisconfigBanner(body: string): string {
+  const banner = [
+    MISCONFIG_BANNER_MARKER,
+    '',
+    'The wellness-check workflow tried to dedup against existing Linear tickets',
+    'but `LINEAR_API_KEY` is not set as a GitHub Actions secret in this repo.',
+    'Until that secret is added, every close-then-reopen cycle of the wellness',
+    'GitHub issue spawns a brand-new QUA ticket via Linear\'s GitHub integration.',
+    '',
+    '**Fix:** add the `LINEAR_API_KEY` secret at',
+    '<https://github.com/quantified-uncertainty/longterm-wiki/settings/secrets/actions>',
+    '(value lives in `lw/.env.base` at the workspace root). Reference: QUA-676.',
+    '',
+    '---',
+    '',
+  ].join('\n');
+  return banner + body;
+}
+
+/**
  * Find the existing open wellness issue (if any).
  * Returns the issue number, or null if none exists.
  *
@@ -292,12 +324,20 @@ export async function manageWellnessIssue(
     const handled = handleLinearDedupAction(linearAction);
     if (handled) return handled;
 
+    // Misconfig path (QUA-676): if Linear dedup is dormant because the
+    // LINEAR_API_KEY secret is missing, every close-then-reopen cycle of the
+    // GitHub issue mirrors into a fresh QUA ticket — that's the duplicate
+    // cascade. We can't fix the secret from code, but we can stamp a banner
+    // on the GitHub issue so whoever reads it sees the cause + the action.
+    const misconfig = linearAction.kind === 'skipped' && linearAction.reason === 'misconfig';
+    const issueBody = misconfig ? prependMisconfigBanner(report.issueBody) : report.issueBody;
+
     // Create new GitHub issue with a stable title (no timestamp) so concurrent
     // workflows can find it via findOpenWellnessIssue(). The timestamp is
     // already in the issue body.
     const created = await createIssue({
       title: WELLNESS_ISSUE_TITLE,
-      body: report.issueBody,
+      body: issueBody,
       labels: ['wellness', 'bug'],
     });
 
