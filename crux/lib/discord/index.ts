@@ -47,6 +47,19 @@ export function resolveWebhookUrl(env: NodeJS.ProcessEnv = process.env): string 
   return null;
 }
 
+/**
+ * Scrub the webhook URL out of an error message before logging. Node's
+ * `fetch()` puts the full URL (including the `<ID>/<TOKEN>` path) into
+ * `TypeError`s and connection-failure messages, so naively logging the raw
+ * error message will leak the webhook secret into any centralized log store.
+ */
+function redactWebhookUrl(raw: string, webhookUrl: string): string {
+  if (!webhookUrl) return raw;
+  // Replace both the full URL and the bare token-bearing path component (the
+  // latter survives some error formatters that split on whitespace).
+  return raw.split(webhookUrl).join("<redacted-webhook-url>");
+}
+
 export async function sendDiscordMessage(
   message: string,
   options: DiscordWebhookOptions = {},
@@ -67,6 +80,12 @@ export async function sendDiscordMessage(
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         content: message.slice(0, DISCORD_MAX_CONTENT_CHARS),
+        // Belt-and-suspenders against @everyone / @here / role-ping injection
+        // via interpolated content (e.g., a fat-fingered framework label or a
+        // future enrichment-pipeline value). escapeForDiscord() in the
+        // builders below handles markdown-link / code-block injection; this
+        // disables Discord's own mention parser as the second layer.
+        allowed_mentions: { parse: [] },
       }),
     });
     if (!response.ok) {
@@ -77,14 +96,36 @@ export async function sendDiscordMessage(
     }
     return { delivered: true };
   } catch (err) {
+    const raw = err instanceof Error ? err.message : String(err);
     log.error(
-      `[discord] webhook POST failed: ${err instanceof Error ? err.message : String(err)}`,
+      `[discord] webhook POST failed: ${redactWebhookUrl(raw, webhookUrl)}`,
     );
     return { delivered: false, reason: "network-error" };
   }
 }
 
 // ── Framework-specific message builders ────────────────────────────────────
+
+/**
+ * Escape Discord markdown / mention metacharacters so an interpolated label
+ * cannot render as a link, code block, mass-ping, or formatting injection.
+ *
+ * Today the labels come from a PR-reviewed YAML (`data/frameworks/*.yaml`),
+ * but this is defense-in-depth: a fat-fingered label like `@everyone` would
+ * otherwise mass-ping the channel, and a future enrichment pipeline that
+ * pulls labels from less-trusted sources would silently inherit the gap.
+ *
+ * The ZWSP after `@` is the documented mitigation for `@everyone` / `@here`
+ * — it breaks Discord's mention tokenizer without altering the visual
+ * rendering. `allowed_mentions: { parse: [] }` in `sendDiscordMessage` is
+ * the second layer.
+ */
+export function escapeForDiscord(s: string): string {
+  return s
+    .replace(/\\/g, "\\\\")
+    .replace(/[`*_~|>#\-+=\[\]()!]/g, (ch) => `\\${ch}`)
+    .replace(/@/g, "@\u200b");
+}
 
 export interface PendingReviewAlert {
   frameworkLabel: string; // e.g. "Anthropic RSP"
@@ -95,11 +136,16 @@ export interface PendingReviewAlert {
 }
 
 export function formatPendingReviewMessage(alert: PendingReviewAlert): string {
-  const review = alert.reviewUrl ? `\n→ Review: ${alert.reviewUrl}` : "";
+  const label = escapeForDiscord(alert.frameworkLabel);
+  const version = escapeForDiscord(alert.versionLabel);
+  const versionId = escapeForDiscord(alert.versionId);
+  const sourceUrl = escapeForDiscord(alert.sourceUrl);
+  const reviewUrl = alert.reviewUrl ? escapeForDiscord(alert.reviewUrl) : null;
+  const review = reviewUrl ? `\n→ Review: ${reviewUrl}` : "";
   return [
     `🆕 **New framework version pending review**`,
-    `**${alert.frameworkLabel} ${alert.versionLabel}** (\`${alert.versionId}\`)`,
-    `Source: ${alert.sourceUrl}${review}`,
+    `**${label} ${version}** (\`${versionId}\`)`,
+    `Source: ${sourceUrl}${review}`,
   ].join("\n");
 }
 
@@ -114,15 +160,18 @@ export interface SilentUpdateAlert {
 }
 
 export function formatSilentUpdateMessage(alert: SilentUpdateAlert): string {
-  const prev = alert.previousContentHash.slice(0, 12);
-  const next = alert.newContentHash.slice(0, 12);
+  const label = escapeForDiscord(alert.frameworkLabel);
+  const frameworkId = escapeForDiscord(alert.frameworkId);
+  const sourceUrl = escapeForDiscord(alert.sourceUrl);
+  const prev = escapeForDiscord(alert.previousContentHash.slice(0, 12));
+  const next = escapeForDiscord(alert.newContentHash.slice(0, 12));
   const supersedes = alert.latestKnownVersionId
-    ? ` (supersedes \`${alert.latestKnownVersionId}\`)`
+    ? ` (supersedes \`${escapeForDiscord(alert.latestKnownVersionId)}\`)`
     : "";
   return [
     `⚠️ **Silent framework update detected**`,
-    `**${alert.frameworkLabel}** (\`${alert.frameworkId}\`) — published page changed without a version bump${supersedes}`,
-    `Source: ${alert.sourceUrl}`,
+    `**${label}** (\`${frameworkId}\`) — published page changed without a version bump${supersedes}`,
+    `Source: ${sourceUrl}`,
     `Hash: \`${prev}…\` → \`${next}…\``,
   ].join("\n");
 }

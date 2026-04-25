@@ -13,6 +13,7 @@
 
 import { describe, it, expect, vi } from "vitest";
 import {
+  escapeForDiscord,
   resolveWebhookUrl,
   sendDiscordMessage,
   formatPendingReviewMessage,
@@ -86,7 +87,10 @@ describe("sendDiscordMessage", () => {
     expect(url).toBe("https://example/hook");
     expect(init.method).toBe("POST");
     expect(init.headers["Content-Type"]).toBe("application/json");
-    expect(JSON.parse(init.body)).toEqual({ content: "hello world" });
+    expect(JSON.parse(init.body)).toEqual({
+      content: "hello world",
+      allowed_mentions: { parse: [] },
+    });
   });
 
   it("returns http-error on non-2xx", async () => {
@@ -165,9 +169,11 @@ describe("formatPendingReviewMessage", () => {
     });
     expect(msg).toContain("New framework version pending review");
     expect(msg).toContain("Anthropic RSP v3.1");
-    expect(msg).toContain("ver_abc123");
-    expect(msg).toContain("https://anthropic.com/rsp");
-    expect(msg).toContain("https://internal/review/v3.1");
+    // ver_abc123's underscore is markdown-escaped (\_) by escapeForDiscord
+    // so the literal substring is "ver\\_abc123" in JS string form.
+    expect(msg).toContain("ver\\_abc123");
+    expect(msg).toContain("anthropic.com/rsp");
+    expect(msg).toContain("internal/review/v3.1");
   });
 
   it("omits review line when reviewUrl is absent", () => {
@@ -197,7 +203,8 @@ describe("formatSilentUpdateMessage", () => {
     expect(msg).toContain("abcdef123456");
     expect(msg).toContain("fedcba098765");
     expect(msg).toContain("supersedes");
-    expect(msg).toContain("ver_meta_v1");
+    // Underscore in version ID is markdown-escaped by escapeForDiscord.
+    expect(msg).toContain("ver\\_meta\\_v1");
   });
 
   it("omits supersedes clause when no prior version id", () => {
@@ -237,6 +244,8 @@ describe("sendPendingReviewAlert / sendSilentUpdateAlert", () => {
     expect(r1.delivered).toBe(true);
     const body1 = JSON.parse(fetchImpl.mock.calls[0][1].body);
     expect(body1.content).toContain("DeepMind FSF v2.0");
+    // Confirm the @everyone-injection mitigation surfaces in the payload.
+    expect(body1.allowed_mentions).toEqual({ parse: [] });
 
     const r2 = await sendSilentUpdateAlert(
       {
@@ -256,5 +265,53 @@ describe("sendPendingReviewAlert / sendSilentUpdateAlert", () => {
     expect(r2.delivered).toBe(true);
     const body2 = JSON.parse(fetchImpl.mock.calls[1][1].body);
     expect(body2.content).toContain("Silent framework update detected");
+  });
+});
+describe("escapeForDiscord", () => {
+  it("escapes markdown link / code / format characters", () => {
+    expect(escapeForDiscord("**bold**")).toBe("\\*\\*bold\\*\\*");
+    expect(escapeForDiscord("`code`")).toBe("\\`code\\`");
+    expect(escapeForDiscord("[link](https://x)")).toBe(
+      "\\[link\\]\\(https://x\\)",
+    );
+    expect(escapeForDiscord("__under__")).toBe("\\_\\_under\\_\\_");
+    expect(escapeForDiscord("~~strike~~")).toBe("\\~\\~strike\\~\\~");
+    expect(escapeForDiscord("> quote")).toBe("\\> quote");
+  });
+
+  it("breaks @everyone / @here mass-pings via ZWSP", () => {
+    const out = escapeForDiscord("@everyone hi");
+    expect(out).not.toContain("@everyone");
+    // Visually still reads as @everyone, but the @ has a zero-width space after it.
+    expect(out).toBe("@\u200beveryone hi");
+  });
+
+  it("is idempotent on plain text", () => {
+    expect(escapeForDiscord("Anthropic RSP v3.1")).toBe("Anthropic RSP v3.1");
+  });
+});
+
+describe("sendDiscordMessage error redaction", () => {
+  it("redacts the webhook URL from logged error messages", async () => {
+    const webhookUrl =
+      "https://discord.com/api/webhooks/9999/SECRET_TOKEN_VALUE";
+    const fetchImpl = vi
+      .fn()
+      .mockRejectedValue(
+        new TypeError(`fetch failed at ${webhookUrl} (ECONNRESET)`),
+      );
+    const logger = { warn: vi.fn(), error: vi.fn() };
+    await sendDiscordMessage("hi", {
+      webhookUrl,
+      fetchImpl: fetchImpl as unknown as typeof fetch,
+      logger,
+    });
+    expect(logger.error).toHaveBeenCalledOnce();
+    const logged = logger.error.mock.calls[0][0] as string;
+    expect(logged).not.toContain("SECRET_TOKEN_VALUE");
+    expect(logged).not.toContain(webhookUrl);
+    expect(logged).toContain("<redacted-webhook-url>");
+    // Underlying error reason is still preserved.
+    expect(logged).toContain("ECONNRESET");
   });
 });
