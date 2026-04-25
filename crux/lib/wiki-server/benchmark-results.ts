@@ -15,6 +15,7 @@ import type { BenchmarkResultsRoute } from '../../../apps/wiki-server/src/routes
 type RpcClient = ReturnType<typeof hc<BenchmarkResultsRoute>>;
 
 export type BenchmarkResultsByModelResult = InferResponseType<RpcClient['by-model'][':modelId']['$get'], 200>;
+export type BenchmarkResultsAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
 export type BenchmarkResultsSyncResult = InferResponseType<RpcClient['sync']['$post'], 200>;
 
 /** A single benchmark result row. */
@@ -35,5 +36,19 @@ export async function getBenchmarkResultsByModel(
   return apiRequest<BenchmarkResultsByModelResult>(
     'GET',
     `/api/benchmark-results/by-model/${encodeURIComponent(modelId)}${qs ? `?${qs}` : ''}`,
+  );
+}
+
+/** Fetch all benchmark results with pagination. Used by the provenance validator. */
+export async function getAllBenchmarkResults(
+  options?: { limit?: number; offset?: number },
+): Promise<ApiResult<BenchmarkResultsAllResult>> {
+  const params = new URLSearchParams();
+  if (options?.limit != null) params.set('limit', String(options.limit));
+  if (options?.offset != null) params.set('offset', String(options.offset));
+  const qs = params.toString();
+  return apiRequest<BenchmarkResultsAllResult>(
+    'GET',
+    `/api/benchmark-results/all${qs ? `?${qs}` : ''}`,
   );
 }

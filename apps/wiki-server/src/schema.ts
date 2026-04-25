@@ -2365,7 +2365,11 @@ export const benchmarks = pgTable(
     id: text("id").primaryKey(),
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
-    category: text("category"), // coding | reasoning | math | knowledge | multimodal | safety | agentic | general
+    // CHECK constraint enforced by chk_benchmarks_category — see migration
+    // 0207. Allowed: general, reasoning, math, coding, knowledge, multimodal,
+    // agentic, safety, dangerous-capability, robustness, honesty, adversarial.
+    category: text("category"),
+    subCategory: text("sub_category"),
     description: text("description"),
     website: text("website"),
     scoringMethod: text("scoring_method"),
@@ -2406,14 +2410,19 @@ export const benchmarkResults = pgTable(
     date: text("date"),
     sourceUrl: text("source_url"),
     notes: text("notes"),
-    // QUA-702: provenance. NULL = legacy / unknown; 'self-report' = inserted
-    // by the model_system_cards post-upsert hook from a lab-published card;
-    // 'third-party' = independent benchmark run. Constraint enforced in
-    // migration 0212. The hook's upsert protects 'third-party' rows
-    // unconditionally; NULL rows are protected unless they are empty legacy
-    // stubs (NULL tested_by + NULL source_url) that no one curated. See
-    // system-card-benchmark-linker.ts for the exact WHERE clause.
-    testedBy: text("tested_by"),
+    // Provenance — who ran the eval and when (extended in QUA-689 from
+    // QUA-702's nullable tested_by). The CHECK constraint is enforced by
+    // chk_br_tested_by — see migration 0215. Allowed values: self-report,
+    // leaderboard, aisi-uk, aisi-us, metr, apollo, third-party-paper,
+    // epoch-ai, unknown, plus the legacy 'third-party' value from QUA-702
+    // (kept for backward compat).
+    testedBy: text("tested_by").notNull().default("unknown"),
+    testedByOrgId: text("tested_by_org_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" },
+    ),
+    evaluationDate: text("evaluation_date"),
+    methodologyNotes: text("methodology_notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2428,7 +2437,19 @@ export const benchmarkResults = pgTable(
     index("idx_br_benchmark").on(table.benchmarkId),
     index("idx_br_model").on(table.modelId),
     index("idx_br_tested_by").on(table.testedBy),
-    uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
+    index("idx_br_tested_by_org_id").on(table.testedByOrgId),
+    index("idx_br_evaluation_date").on(sql`${table.evaluationDate} DESC`),
+    // Widened in QUA-689 from (benchmarkId, modelId) so the same model can
+    // have multiple results on the same benchmark distinguished by who ran
+    // the eval and when (self-report vs HELM vs AISI-UK at different dates).
+    // Migration 0214 drops idx_br_benchmark_model and creates this one in
+    // its place.
+    uniqueIndex("idx_br_benchmark_model_testedby_date").on(
+      table.benchmarkId,
+      table.modelId,
+      table.testedBy,
+      sql`COALESCE(${table.evaluationDate}, '')`,
+    ),
   ]
 );
 
@@ -4661,6 +4682,53 @@ export const thirdPartyEvaluations = pgTable(
 );
 
 /**
+ * Model aliases — maps lowercased external alias strings (as they appear on
+ * leaderboards and in vendor publications) to their canonical AI-model
+ * entity. Replaces the hardcoded 40-entry alias maps duplicated across the
+ * older sync code so Phase 2 ingesters can resolve raw model names without
+ * teaching every plugin about every rename.
+ *
+ * QUA-689 — Phase 2 of the AI safety data layer (parent: QUA-687).
+ *
+ * Alias is the natural primary key — the lookup is "given a raw external
+ * string, find the canonical model entity". If the same alias appears on
+ * different sources for the same model that's redundant, not informative;
+ * a flat PK records each alias once. Conflicts (same alias → different
+ * models) must be surfaced by the ingester, not silently last-write-wins.
+ */
+export const modelAliases = pgTable(
+  "model_aliases",
+  {
+    alias: text("alias").primaryKey(),
+    modelStableId: text("model_stable_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    // Where this alias was observed: 'yaml-seed' for the initial bulk load
+    // from ai-models.yaml `aliases:` arrays, then leaderboard slugs once
+    // ingesters start writing.
+    source: text("source").notNull().default("yaml-seed"),
+    // CHECK enforced by chk_model_aliases_confidence (migration 0207):
+    //   exact  — byte-for-byte match in source data
+    //   fuzzy  — Levenshtein match suggested by ingester, awaiting promote
+    //   manual — promoted by a human via /internal/benchmark-quarantine
+    confidence: text("confidence").notNull().default("exact"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_model_aliases_model").on(table.modelStableId),
+    index("idx_model_aliases_source").on(table.source),
+  ],
+);
+
+/**
  * Many-to-many: a single third-party evaluation report can cover multiple
  * AI models (METR multi-model reviews, Apollo cross-lab evaluations).
  * `match_confidence` tracks how the link was made so we can surface an
@@ -4858,5 +4926,81 @@ export const aiIncidentReports = pgTable(
   (table) => [
     primaryKey({ columns: [table.incidentId, table.url] }),
     index("idx_ai_incident_reports_published_at").on(table.publishedAt),
+  ],
+);
+
+/**
+ * Benchmark results pending — quarantine queue for ingester rows whose
+ * source model name didn't resolve to any entity (no exact alias match,
+ * fuzzy resolution below confidence threshold, or never-seen-before name).
+ *
+ * Reviewed via the /internal/benchmark-quarantine dashboard (follow-up PR).
+ * On resolution the row is promoted to `benchmark_results`, an alias is
+ * added to `model_aliases`, and `status` flips to 'resolved'.
+ *
+ * The natural key includes the literal lowercase form of the raw name so
+ * the same ingester run is idempotent — re-running an ingester that hits
+ * the same unresolved name twice gets one quarantine row, not two.
+ *
+ * QUA-689 — Phase 2 of the AI safety data layer (parent: QUA-687).
+ *
+ * Distinct from `pendingBenchmarkLinks` (QUA-702): that queue holds
+ * citation strings extracted from system cards (where `benchmark_id`
+ * itself is unresolved); this queue holds ingester rows where the
+ * `benchmark_id` is known but the `model_id` is not.
+ */
+export const benchmarkResultsPending = pgTable(
+  "benchmark_results_pending",
+  {
+    id: text("id").primaryKey(),
+    benchmarkId: text("benchmark_id")
+      .notNull()
+      .references(() => benchmarks.id, { onDelete: "cascade" }),
+    // The exact string the source emitted ("Claude 3.5 Sonnet (new)",
+    // "claude-3-5-sonnet-2024-10"). Preserves case for human readability;
+    // dedup happens via the natural-key index using lower(raw_model_name).
+    rawModelName: text("raw_model_name").notNull(),
+    score: doublePrecision("score"),
+    scoreText: text("score_text"),
+    unit: text("unit"),
+    evaluationDate: text("evaluation_date"),
+    testedBy: text("tested_by").notNull().default("unknown"),
+    sourceUrl: text("source_url"),
+    methodologyNotes: text("methodology_notes"),
+    rawPayload: jsonb("raw_payload").$type<Record<string, unknown>>(),
+    // CHECK enforced by chk_brp_status (migration 0215):
+    //   pending  — not yet reviewed
+    //   resolved — promoted to benchmark_results + alias recorded
+    //   rejected — explicitly excluded (e.g. obvious test row, deprecated)
+    status: text("status").notNull().default("pending"),
+    ingesterSource: text("ingester_source").notNull(),
+    resolvedToStableId: text("resolved_to_stable_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" },
+    ),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedBy: text("resolved_by"),
+    rejectedReason: text("rejected_reason"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_brp_benchmark").on(table.benchmarkId),
+    index("idx_brp_status").on(table.status),
+    index("idx_brp_ingester_source").on(table.ingesterSource),
+    index("idx_brp_created_at").on(sql`${table.createdAt} DESC`),
+    uniqueIndex("uq_brp_natural_key").on(
+      table.ingesterSource,
+      table.benchmarkId,
+      sql`lower(${table.rawModelName})`,
+      sql`COALESCE(${table.evaluationDate}, '')`,
+    ),
   ],
 );

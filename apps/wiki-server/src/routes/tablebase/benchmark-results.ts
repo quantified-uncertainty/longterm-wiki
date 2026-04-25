@@ -1,16 +1,16 @@
 import { Hono } from "hono";
 import { z } from "zod";
-import { eq, count, desc, sql } from "drizzle-orm";
+import { eq, count, desc } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { benchmarkResults, benchmarks } from "../../schema.js";
 import {
-  validationError,
   zv,
   clampedLimit,
 } from "../shared/utils.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { VALID_TESTED_BY, resolveBenchmarkRefs } from "./benchmark-shared.js";
 
 // ---- Constants ----
 
@@ -44,6 +44,14 @@ const SyncBenchmarkResultItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  // Provenance — added by QUA-689 Phase 2 foundation. Defaults preserve
+  // backwards compatibility with pre-Phase-2 ingesters that didn't supply
+  // these fields. The tested_by default 'unknown' lets the existing 357
+  // prod rows pass the CHECK on first sync without an explicit backfill.
+  testedBy: z.enum(VALID_TESTED_BY).default("unknown"),
+  testedByOrgId: z.string().max(200).nullable().optional(),
+  evaluationDate: z.string().max(20).nullable().optional(),
+  methodologyNotes: z.string().max(5000).nullable().optional(),
   sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
@@ -60,6 +68,10 @@ function formatRow(r: typeof benchmarkResults.$inferSelect) {
     date: r.date,
     sourceUrl: r.sourceUrl,
     notes: r.notes,
+    testedBy: r.testedBy,
+    testedByOrgId: r.testedByOrgId,
+    evaluationDate: r.evaluationDate,
+    methodologyNotes: r.methodologyNotes,
     syncedAt: r.syncedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -149,37 +161,8 @@ const benchmarkResultsApp = new Hono()
       syncSchema: SyncBenchmarkResultItemSchema,
       entityRefs: ["modelId"],
       // benchmarkId references the `benchmarks` table (not entities), so we
-      // validate and auto-resolve slugs→IDs in a preValidate hook.
-      preValidate: async (c, db, items) => {
-        const benchmarkIds = [...new Set(items.map((i) => i.benchmarkId))];
-        if (benchmarkIds.length === 0) return null;
-        const placeholders = benchmarkIds.map((id) => sql`${id}`);
-        const inList = sql.join(placeholders, sql`, `);
-        // Check both id (10-char hash) and slug (e.g., "mmlu") since the
-        // enrichment agent may submit either format.
-        const found = await db.execute<{ id: string; slug: string }>(sql`
-          SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
-        `);
-        const foundIdSet = new Set(found.map((r) => r.id));
-        const foundSlugSet = new Set(found.map((r) => r.slug));
-        const slugToId = new Map(found.map((r) => [r.slug, r.id]));
-        const missing = benchmarkIds.filter(
-          (id) => !foundIdSet.has(id) && !foundSlugSet.has(id),
-        );
-        if (missing.length > 0) {
-          return validationError(
-            c,
-            `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first (pnpm crux wiki-server sync-benchmarks).`,
-          );
-        }
-        // Auto-resolve slugs to IDs so the upsert uses the correct FK
-        for (const item of items) {
-          if (slugToId.has(item.benchmarkId)) {
-            item.benchmarkId = slugToId.get(item.benchmarkId)!;
-          }
-        }
-        return null;
-      },
+      // validate and auto-resolve slugs→IDs via the shared helper.
+      preValidate: (c, db, items) => resolveBenchmarkRefs(c, db, items),
       toThing: (item) => ({
         id: item.id,
         thingType: "benchmark-result" as const,

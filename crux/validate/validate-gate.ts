@@ -782,6 +782,19 @@ const PARALLEL_STEPS: Step[] = [
     // greps the AIID ingest + schema paths for symptoms of re-introducing
     // those fields. QUA-693.
   },
+  {
+    id: 'benchmark-result-provenance',
+    name: 'Benchmark result provenance (tested_by + source_url)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-benchmark-result-provenance.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory until Phase 2 ingesters have populated tested_by + source_url
+    // for the bulk of rows (target: one week clean before promoting to
+    // blocking). Surfaces verifiability gaps without wedging current PRs.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
