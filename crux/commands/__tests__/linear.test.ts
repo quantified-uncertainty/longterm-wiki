@@ -671,6 +671,159 @@ describe('linear done', () => {
 });
 
 // ---------------------------------------------------------------------------
+// verify-pr — watchdog for the Linear-webhook miss class (QUA-441)
+// ---------------------------------------------------------------------------
+
+describe('linear verify-pr', () => {
+  function mockPr(overrides: Partial<{ number: number; body: string | null; merged: boolean }> = {}) {
+    githubApiMock.mockResolvedValueOnce({
+      number: overrides.number ?? 4275,
+      title: 'test pr',
+      body: overrides.body ?? null,
+      state: 'closed',
+      merged: overrides.merged ?? true,
+      merged_at: '2026-04-25T00:00:00Z',
+      html_url: `https://github.com/quantified-uncertainty/longterm-wiki/pull/${overrides.number ?? 4275}`,
+    });
+  }
+
+  it('prints usage when no PR number is given', async () => {
+    const r = await commands['verify-pr']([], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Usage');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-numeric PR argument', async () => {
+    const r = await commands['verify-pr'](['notanumber'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid PR number');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts a leading "#" on the PR number', async () => {
+    mockPr({ number: 4275, body: 'no fixes here', merged: true });
+    const r = await commands['verify-pr'](['#4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(githubApiMock).toHaveBeenCalledWith('/repos/quantified-uncertainty/longterm-wiki/pulls/4275');
+  });
+
+  it('returns 0 with no-op message when the PR is not merged', async () => {
+    mockPr({ merged: false });
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('not merged');
+    expect(getIssueMock).not.toHaveBeenCalled();
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 0 when the merged PR has no Fixes refs', async () => {
+    mockPr({ body: 'just a refactor — see related #1234', merged: true });
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('no Fixes QUA-NNN refs');
+    expect(getIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('reconciles every Fixes ref on a batched PR (the QUA-441 scenario)', async () => {
+    // Linear's webhook drops 3 of 4 — verify-pr corrects all of them.
+    mockPr({
+      number: 4275,
+      body: 'Fixes QUA-374\nFixes QUA-375\nFixes QUA-376\nFixes QUA-377',
+      merged: true,
+    });
+    const inProgress = (id: string) => ({
+      ...mockIssue,
+      identifier: id,
+      state: { id: 'state-active', name: 'In Review', type: 'started' as const },
+    });
+    getIssueMock
+      .mockResolvedValueOnce(inProgress('QUA-374'))
+      .mockResolvedValueOnce(inProgress('QUA-375'))
+      .mockResolvedValueOnce(inProgress('QUA-376'))
+      .mockResolvedValueOnce(inProgress('QUA-377'));
+    updateIssueStateMock.mockResolvedValue({ identifier: '', state: 'Done' });
+    commentOnIssueMock.mockResolvedValue(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalledTimes(4);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-374', 'Done');
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-377', 'Done');
+    expect(commentOnIssueMock).toHaveBeenCalledTimes(4);
+    // The watchdog comment should reference the PR URL so humans can audit
+    // the reconciliation trail.
+    const firstComment = commentOnIssueMock.mock.calls[0][1];
+    expect(firstComment).toContain('https://github.com/quantified-uncertainty/longterm-wiki/pull/4275');
+    expect(firstComment).toContain('reconciled');
+    expect(r.output).toContain('4 issue(s) corrected');
+  });
+
+  it('respects deliberate non-active states (Backlog / Canceled / Done) — no override', async () => {
+    mockPr({
+      body: 'Fixes QUA-100\nFixes QUA-101\nFixes QUA-102',
+      merged: true,
+    });
+    getIssueMock
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-100', state: { id: 's', name: 'Done', type: 'completed' } })
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-101', state: { id: 's', name: 'Canceled', type: 'canceled' } })
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-102', state: { id: 's', name: 'Backlog', type: 'backlog' } });
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+    expect(commentOnIssueMock).not.toHaveBeenCalled();
+    expect(r.output).toContain('not in active state');
+  });
+
+  it('handles a missing-issue ref gracefully and continues to the next', async () => {
+    mockPr({ body: 'Fixes QUA-9999\nFixes QUA-200', merged: true });
+    getIssueMock
+      .mockResolvedValueOnce(null) // QUA-9999 — deleted/never existed
+      .mockResolvedValueOnce({
+        ...mockIssue,
+        identifier: 'QUA-200',
+        state: { id: 's', name: 'In Progress', type: 'started' },
+      });
+    updateIssueStateMock.mockResolvedValueOnce({ identifier: 'QUA-200', state: 'Done' });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('QUA-9999');
+    expect(r.output).toContain('not found');
+    expect(updateIssueStateMock).toHaveBeenCalledExactlyOnceWith('QUA-200', 'Done');
+  });
+
+  it('exits 1 when a Linear API call fails — surfaces the error to CI', async () => {
+    mockPr({ body: 'Fixes QUA-300', merged: true });
+    getIssueMock.mockRejectedValueOnce(new Error('Linear GraphQL request timed out after 15s'));
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('QUA-300');
+    expect(r.output).toContain('timed out');
+  });
+
+  it('reconciles only In-Progress / In-Review (started type), regardless of name spelling', async () => {
+    mockPr({ body: 'Fixes QUA-400', merged: true });
+    // Custom workflow state name "Working On" of type 'started' should still
+    // be reconciled — the watchdog gates on type, not name.
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      identifier: 'QUA-400',
+      state: { id: 's', name: 'Working On', type: 'started' },
+    });
+    updateIssueStateMock.mockResolvedValueOnce({ identifier: 'QUA-400', state: 'Done' });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-400', 'Done');
+  });
+});
+
+// ---------------------------------------------------------------------------
 // comment
 // ---------------------------------------------------------------------------
 
