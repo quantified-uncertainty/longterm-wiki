@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { normalizeClosesSyntax, validateTestPlan, bigramSimilarity, injectLinearRefs } from './pr.ts';
+import {
+  normalizeClosesSyntax,
+  validateTestPlan,
+  bigramSimilarity,
+  injectLinearRefs,
+  extractLinearAutoCloseRefs,
+  checkLinearPrCollisions,
+} from './pr.ts';
 
 describe('normalizeClosesSyntax', () => {
   it('rewrites comma-separated Closes to one-per-line', () => {
@@ -251,5 +258,82 @@ describe('bigramSimilarity', () => {
   it('ignores punctuation', () => {
     const sim = bigramSimilarity('hello, world!', 'hello world');
     expect(sim).toBe(1.0);
+  });
+});
+
+describe('extractLinearAutoCloseRefs', () => {
+  it('extracts Fixes/Closes/Resolves references', () => {
+    const body = 'Fixes QUA-100\nCloses QUA-101\nResolves QUA-102';
+    expect(extractLinearAutoCloseRefs(body).sort()).toEqual(['QUA-100', 'QUA-101', 'QUA-102']);
+  });
+
+  it('dedupes duplicate IDs across keywords', () => {
+    const body = 'Fixes QUA-100\n\nCloses QUA-100';
+    expect(extractLinearAutoCloseRefs(body)).toEqual(['QUA-100']);
+  });
+
+  it('is case-insensitive on both keyword and prefix', () => {
+    const body = 'fixes qua-42\nCLOSES QUA-43';
+    expect(extractLinearAutoCloseRefs(body).sort()).toEqual(['QUA-42', 'QUA-43']);
+  });
+
+  it('ignores bare QUA mentions without a keyword', () => {
+    // Incidental mentions shouldn't trigger the dedup block — only auto-close
+    // refs matter, because only those compete for the Linear claim.
+    const body = 'Related to QUA-500 but not closing it';
+    expect(extractLinearAutoCloseRefs(body)).toEqual([]);
+  });
+
+  it('returns empty for a body without any Linear refs', () => {
+    expect(extractLinearAutoCloseRefs('## Summary\nSome changes')).toEqual([]);
+  });
+});
+
+describe('checkLinearPrCollisions', () => {
+  it('returns empty when no Linear IDs are being claimed', async () => {
+    const lookup = async () => {
+      throw new Error('should not be called');
+    };
+    const collisions = await checkLinearPrCollisions([], lookup);
+    expect(collisions).toEqual([]);
+  });
+
+  it('returns empty when lookup finds no open PRs for any claimed ID', async () => {
+    const lookup = async () => [];
+    const collisions = await checkLinearPrCollisions(['QUA-100', 'QUA-101'], lookup);
+    expect(collisions).toEqual([]);
+  });
+
+  it('returns collisions for each Linear ID with open PRs', async () => {
+    const lookup = async (id: string) => {
+      if (id === 'QUA-100') {
+        return [{ number: 4212, title: 'fix: something', url: 'https://github.com/x/y/pull/4212' }];
+      }
+      return [];
+    };
+    const collisions = await checkLinearPrCollisions(['QUA-100', 'QUA-101'], lookup);
+    expect(collisions).toHaveLength(1);
+    expect(collisions[0].linearId).toBe('QUA-100');
+    expect(collisions[0].prs).toHaveLength(1);
+    expect(collisions[0].prs[0].number).toBe(4212);
+  });
+
+  it('reports multiple Linear IDs when each has an open PR', async () => {
+    const lookup = async (id: string) => [
+      { number: id === 'QUA-100' ? 10 : 20, title: `fix: ${id}`, url: `https://github.com/x/y/pull/${id}` },
+    ];
+    const collisions = await checkLinearPrCollisions(['QUA-100', 'QUA-101'], lookup);
+    expect(collisions).toHaveLength(2);
+    expect(collisions.map((c) => c.linearId).sort()).toEqual(['QUA-100', 'QUA-101']);
+  });
+
+  it('fails open when lookup returns [] (the real helper swallows API errors)', async () => {
+    // findOpenPrsMentioningLinearId's contract is "fail-open on API error by
+    // returning []". Confirms that contract composes cleanly: an API outage
+    // degrades to "no collision detected" rather than blocking PR creation
+    // on infrastructure glitches.
+    const lookup = async () => [];
+    const collisions = await checkLinearPrCollisions(['QUA-100'], lookup);
+    expect(collisions).toEqual([]);
   });
 });

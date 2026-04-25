@@ -55,6 +55,12 @@ IDs already referenced in the body (`Fixes`, `Closes`, `Resolves`) are skipped t
 
 **Always use `crux gh pr create`**, not raw `gh pr create`. The crux wrapper handles Linear injection, body corruption detection, and GitHub API validation. The agent-push-and-verify skill enforces this.
 
+### Pre-PR Linear dedup (QUA-304)
+
+After injecting Linear refs, `crux gh pr create` extracts every `Fixes|Closes|Resolves QUA-NNN` from the final PR body and searches GitHub for other **open** PRs that already reference any of those IDs. If any match, the command exits with code 2 and lists the colliding PRs — no PR is created. This is the last line of defense when two sessions race on the same Linear ticket and `crux linear start`'s dedup (QUA-406/440) was bypassed or never ran (e.g. the second session didn't know the Linear ID until PR creation).
+
+To bypass the check (existing PR abandoned, explicit handoff, etc.) re-run with `--force`. The check fails open on GitHub API errors — a search outage doesn't wedge PR creation.
+
 ## 4. Agent workflow state transitions
 
 The `crux linear` commands manage issue state through the agent session lifecycle:
@@ -124,10 +130,11 @@ The parser in `crux/lib/linear/parse-id.ts` uses an allowlist of known team keys
 | Mistake | Consequence | Fix |
 |---------|------------|-----|
 | Branch `claude/tier0-data-integrity` instead of `claude/qua-155-tier0-data-integrity` | Linear issue stays open after merge | Always include `qua-NNN` in branch name |
-| Using raw `gh pr create` | No `Fixes QUA-NNN` injection, no corruption detection | Use `crux gh pr create` |
+| Using raw `gh pr create` | No `Fixes QUA-NNN` injection, no corruption detection, no pre-PR dedup (QUA-304) | Use `crux gh pr create` |
 | Calling `crux linear done QUA-NNN` without `--pr` when a PR exists | Issue goes to Done instead of In Review; skips the merge-triggered auto-close | Pass `--pr=URL` when shipping a PR |
 | Forgetting `LINEAR_API_KEY` | Silent skip of all Linear state updates | Sync `.env.base` or `export LINEAR_API_KEY=...` |
 | Manually moving issues in Linear UI during active agent session | Agent's `crux linear done` may override the manual state | Let the agent pipeline manage state |
+| Bypassing pre-PR dedup with `--force` without investigating the other PR | Two PRs racing on the same Linear ticket | Read the other PR first; reconcile or close before forcing |
 
 ## 9. Project ownership — which project does an issue belong in?
 
