@@ -120,6 +120,7 @@ import * as dataQualityCommands from './commands/data-quality.ts';
 import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
 import * as politicalDataCommands from './commands/political-data.ts';
+import * as scorecardsCommands from './commands/scorecards.ts';
 import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
@@ -216,6 +217,7 @@ const domains = {
   bluesky: blueskyCommands,
   races: politicalRacesCommands,
   political: politicalDataCommands,
+  scorecards: scorecardsCommands,
   branches: branchesCommands,
   'deploy-tasks': deployTasksCommands,
   'agent-reset': agentResetCommands,
