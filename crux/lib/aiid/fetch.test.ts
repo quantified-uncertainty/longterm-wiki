@@ -13,12 +13,7 @@ import { mkdtempSync, rmSync } from "fs";
 import { execFileSync } from "child_process";
 import { tmpdir } from "os";
 import { join } from "path";
-import {
-  assertSafeTarEntries,
-  listTarEntries,
-  tarVerboseLineType,
-  type TarEntry,
-} from "./fetch.ts";
+import { assertSafeTarEntries, listTarEntries, type TarEntry } from "./fetch.ts";
 
 /** Helper: build a regular-file TarEntry from just a path. */
 const f = (name: string): TarEntry => ({ name, type: "-" });
@@ -122,62 +117,6 @@ describe("assertSafeTarEntries", () => {
 });
 
 /**
- * Type-char extractor — both GNU tar and bsdtar emit the permissions
- * string as the first whitespace-delimited token regardless of locale,
- * timestamp format, or column layout, so this lookup is trivial. Lines
- * that don't match the pattern (blank, garbage) get `?` and are rejected
- * downstream by `assertSafeTarEntries()`.
- */
-describe("tarVerboseLineType", () => {
-  it("returns `d` for directory entries (bsdtar with HH:MM)", () => {
-    expect(
-      tarVerboseLineType(
-        "drwxr-xr-x  0 runner runner      0 Apr 20 03:37 mongodump_full_snapshot/",
-      ),
-    ).toBe("d");
-  });
-
-  it("returns `d` for directory entries (bsdtar with year fallback)", () => {
-    // Files with mtime older than ~6 months show year instead of HH:MM.
-    expect(
-      tarVerboseLineType(
-        "drwxr-xr-x  0 runner runner      0 Dec 31  1969 ancient/",
-      ),
-    ).toBe("d");
-  });
-
-  it("returns `-` for regular file entries (GNU tar)", () => {
-    expect(
-      tarVerboseLineType(
-        "-rw-r--r-- runner/runner 1234 2024-04-20 03:37 backup/data.json",
-      ),
-    ).toBe("-");
-  });
-
-  it("returns `l` for symlink entries", () => {
-    expect(
-      tarVerboseLineType(
-        "lrwxr-xr-x  0 runner runner      0 Apr 20 03:37 link -> target",
-      ),
-    ).toBe("l");
-  });
-
-  it("returns `h` for hardlink entries (GNU `link to` syntax)", () => {
-    expect(
-      tarVerboseLineType(
-        "hrw-r--r-- runner/runner 0 2024-04-20 03:37 hl link to file",
-      ),
-    ).toBe("h");
-  });
-
-  it("returns `?` for blank, whitespace-only, or CR-only lines", () => {
-    expect(tarVerboseLineType("")).toBe("?");
-    expect(tarVerboseLineType("   ")).toBe("?");
-    expect(tarVerboseLineType("\r")).toBe("?");
-  });
-});
-
-/**
  * Integration tests for `listTarEntries`. We synthesize tiny tar.bz2
  * archives with the local `tar` (bsdtar on macOS, GNU tar on Linux CI) so
  * the test exercises the same parser path that AIID ingest uses, including
@@ -199,20 +138,40 @@ describe("listTarEntries (integration)", () => {
     rmSync(scratch, { recursive: true, force: true });
   });
 
-  function makeArchive(filenames: string[]): string {
-    // Use a Node tar archive so we can inject pathological filenames
-    // (containing `..`, ` -> `, `01:23` etc.) that the local filesystem
-    // would otherwise refuse. We write via Python's tarfile module —
-    // available on every dev machine and CI image.
+  /**
+   * Tar archive fixture spec — used by `makeArchive()` to synthesize tiny
+   * bz2 archives via Python's tarfile module, the only path that lets us
+   * inject filenames the local filesystem would otherwise refuse (`..`-
+   * prefixed, `\n`-embedded, etc.).
+   */
+  type FixtureItem =
+    | string
+    | {
+        name: string;
+        kind?: "file" | "symlink";
+        linkname?: string;
+        mtime?: number;
+      };
+
+  function makeArchive(items: FixtureItem[]): string {
     const archivePath = join(scratch, "test.tar.bz2");
+    const normalized = items.map((it) => (typeof it === "string" ? { name: it } : it));
     const py = `
 import tarfile, io
 buf = io.BytesIO()
+items = ${JSON.stringify(normalized)}
 with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
-    for name in ${JSON.stringify(filenames)}:
-        info = tarfile.TarInfo(name=name)
+    for it in items:
+        info = tarfile.TarInfo(name=it['name'])
         info.size = 0
-        tf.addfile(info, io.BytesIO(b''))
+        if it.get('kind') == 'symlink':
+            info.type = tarfile.SYMTYPE
+            info.linkname = it['linkname']
+            tf.addfile(info)
+        else:
+            if 'mtime' in it:
+                info.mtime = it['mtime']
+            tf.addfile(info, io.BytesIO(b''))
 open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
 `;
     execFileSync("python3", ["-c", py], { stdio: ["ignore", "pipe", "pipe"] });
@@ -271,55 +230,22 @@ open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
   });
 
   it("rejects an actual symlink (regardless of how the local tar formats the line)", () => {
-    const archivePath = join(scratch, "symlink.tar.bz2");
-    execFileSync(
-      "python3",
-      [
-        "-c",
-        `
-import tarfile, io
-buf = io.BytesIO()
-with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
-    info = tarfile.TarInfo(name='evil')
-    info.type = tarfile.SYMTYPE
-    info.linkname = '../../etc/passwd'
-    info.size = 0
-    tf.addfile(info)
-open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
-`,
-      ],
-      { stdio: ["ignore", "pipe", "pipe"] },
-    );
-    const entries = listTarEntries(archivePath);
+    const archive = makeArchive([
+      { name: "evil", kind: "symlink", linkname: "../../etc/passwd" },
+    ]);
+    const entries = listTarEntries(archive);
     expect(entries).toHaveLength(1);
     expect(entries[0].type).toBe("l");
-    // linkTarget is best-effort; we assert it's set when bsdtar/GNU emit it
     expect(entries[0].linkTarget).toBe("../../etc/passwd");
     expect(() => assertSafeTarEntries(entries)).toThrow(/link entry/);
   });
 
   it("preserves filenames with bsdtar's year fallback (mtime older than ~6 months)", () => {
-    // Build the archive then manually rewrite mtimes via Python so the
-    // local tar shows year format on listing.
-    const archivePath = join(scratch, "ancient.tar.bz2");
-    execFileSync(
-      "python3",
-      [
-        "-c",
-        `
-import tarfile, io
-buf = io.BytesIO()
-with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
-    info = tarfile.TarInfo(name='backup/old.json')
-    info.size = 0
-    info.mtime = 0  # 1970-01-01 → year fallback in bsdtar
-    tf.addfile(info, io.BytesIO(b''))
-open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
-`,
-      ],
-      { stdio: ["ignore", "pipe", "pipe"] },
-    );
-    const entries = listTarEntries(archivePath);
+    // mtime 0 = 1970-01-01, well past bsdtar's 6-month HH:MM cutoff →
+    // verbose listing degrades to `Mon DD  YYYY` format. The previous
+    // regex implementation had no `HH:MM` to anchor on and broke entirely.
+    const archive = makeArchive([{ name: "backup/old.json", mtime: 0 }]);
+    const entries = listTarEntries(archive);
     expect(entries[0].name).toBe("backup/old.json");
     expect(entries[0].type).toBe("-");
   });
