@@ -33,6 +33,7 @@ import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 import { commands as setupOrgCommands } from './setup-org.ts';
 import { commands as tbImporterCommands } from './tb-importers/index.ts';
 import { commands as systemCardsCommands } from './system-cards.ts';
+import { commands as frameworksCommands } from './frameworks.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1500,6 +1501,11 @@ export const commands = {
   // QUA-690: system-card extraction.
   'system-cards': systemCardsCommands.default,
   'system-cards-extract': systemCardsCommands.extract,
+  // QUA-691: frontier-safety-framework tracker.
+  'frameworks': frameworksCommands.default,
+  'frameworks-extract': frameworksCommands.extract,
+  'frameworks-diff': frameworksCommands.diff,
+  'frameworks-fetch': frameworksCommands.fetch,
 };
 
 export function getHelp(): string {

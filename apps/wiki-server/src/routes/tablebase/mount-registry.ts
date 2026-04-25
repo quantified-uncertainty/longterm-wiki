@@ -62,6 +62,11 @@ import { secondaryMarketPricesRoute } from "./secondary-market-prices.js";
 import { talentFlowsRoute } from "./talent-flows.js";
 import { websiteSourcesRoute } from "./website-sources.js";
 import { modelSystemCardsRoute } from "./model-system-cards.js";
+import { safetyFrameworksRoute } from "./safety-frameworks.js";
+import { safetyFrameworkVersionsRoute } from "./safety-framework-versions.js";
+import { frameworkCapabilityThresholdsRoute } from "./framework-capability-thresholds.js";
+import { frameworkDiffsRoute } from "./framework-diffs.js";
+import { frameworkDiffItemsRoute } from "./framework-diff-items.js";
 
 /**
  * The widest Hono route type that still satisfies `app.route()`. Every
@@ -129,6 +134,11 @@ export const TABLEBASE_MOUNTS: readonly TablebaseMount[] = [
   { path: "/api/talent-flows", route: talentFlowsRoute },
   { path: "/api/website-sources", route: websiteSourcesRoute },
   { path: "/api/model-system-cards", route: modelSystemCardsRoute },
+  { path: "/api/safety-frameworks", route: safetyFrameworksRoute },
+  { path: "/api/safety-framework-versions", route: safetyFrameworkVersionsRoute },
+  { path: "/api/framework-capability-thresholds", route: frameworkCapabilityThresholdsRoute },
+  { path: "/api/framework-diffs", route: frameworkDiffsRoute },
+  { path: "/api/framework-diff-items", route: frameworkDiffItemsRoute },
 ];
 
 /**
