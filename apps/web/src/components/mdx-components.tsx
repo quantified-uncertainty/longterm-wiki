@@ -85,6 +85,7 @@ import { ResourcePipelineDashboardContent } from "@/app/internal/resource-pipeli
 import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
 import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
+import { FrameworkReviewContent } from "@/app/internal/framework-review/framework-review-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -252,6 +253,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DataSourcesContent,
   TablebaseCoverageContent,
   AutomationLandscapeContent,
+  FrameworkReviewContent,
 
   // Table view components
   SafetyApproachesTableView,

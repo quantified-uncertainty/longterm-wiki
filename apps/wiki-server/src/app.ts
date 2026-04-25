@@ -66,6 +66,7 @@ import { dataQualityRoute } from "./routes/operational/data-quality.js";
 import { thingsSearchRefreshRoute } from "./routes/operational/things-search-refresh.js";
 import { operationsLogRoute } from "./routes/operational/operations-log.js";
 import { auditLogRoute } from "./routes/operational/audit-log.js";
+import { frameworkReviewRoute } from "./routes/operational/framework-review.js";
 
 let requestCounter = 0;
 
@@ -251,6 +252,7 @@ export function createApp() {
   app.route("/api/things-search", thingsSearchRefreshRoute);
   app.route("/api/operations-log", operationsLogRoute);
   app.route("/api/audit-log", auditLogRoute);
+  app.route("/api/framework-review", frameworkReviewRoute);
 
   return app;
 }

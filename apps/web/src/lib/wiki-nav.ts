@@ -288,6 +288,7 @@ export function getInternalNav(): NavSection[] {
         { label: "Talent Flows", href: internalHref("talent-flows-dashboard") },
         { label: "Jobs", href: internalHref("jobs-dashboard") },
         { label: "System Cards", href: internalHref("system-cards-dashboard") },
+        { label: "Framework Review", href: internalHref("framework-review-dashboard") },
         { label: "Coverage", href: internalHref("tablebase-coverage-dashboard") },
       ],
     },
