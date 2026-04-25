@@ -1,0 +1,43 @@
+{
+  "publishedAt": "2025-09-01",
+  "waveLabel": "Final (Sept 2025)",
+  "sourceUrl": "https://ailabwatch.org",
+  "isLatest": true,
+  "dimensions": [
+    { "slug": "risk-assessment", "label": "Risk Assessment", "weight": 0.2 },
+    { "slug": "scheming-prevention", "label": "Scheming Prevention", "weight": 0.15 },
+    { "slug": "safety-research", "label": "Safety Research", "weight": 0.15 },
+    { "slug": "misuse-prevention", "label": "Misuse Prevention", "weight": 0.1 },
+    { "slug": "security", "label": "Security", "weight": 0.1 },
+    { "slug": "info-sharing", "label": "Info Sharing", "weight": 0.15 },
+    { "slug": "planning", "label": "Planning", "weight": 0.15 }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "55%",
+        "risk-assessment": "60%",
+        "scheming-prevention": "45%",
+        "safety-research": "70%",
+        "misuse-prevention": "50%",
+        "security": "60%",
+        "info-sharing": "50%",
+        "planning": "55%"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "30%",
+        "risk-assessment": "35%",
+        "scheming-prevention": "20%",
+        "safety-research": "40%",
+        "misuse-prevention": "30%",
+        "security": "30%",
+        "info-sharing": "25%",
+        "planning": "30%"
+      }
+    }
+  ]
+}

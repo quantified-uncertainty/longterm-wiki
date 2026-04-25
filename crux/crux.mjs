@@ -82,6 +82,7 @@ import * as factbaseImport990Commands from './commands/factbase-import-990.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
+import * as importScorecardsCommands from './commands/import-scorecards.ts';
 import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
 import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
@@ -180,6 +181,7 @@ const domains = {
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
+  'import-scorecards': importScorecardsCommands,
   'backfill-grantee-ids': backfillGranteeIdsCommands,
   'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,

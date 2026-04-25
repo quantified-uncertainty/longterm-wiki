@@ -1,0 +1,38 @@
+{
+  "publishedAt": "2025-09-01",
+  "waveLabel": "September 2025",
+  "sourceUrl": "https://www.seoul-tracker.org",
+  "license": "CC BY 4.0",
+  "isLatest": true,
+  "dimensions": [
+    { "slug": "risk-thresholds", "label": "Risk Thresholds" },
+    { "slug": "safe-development", "label": "Safe Development" },
+    { "slug": "risk-evaluation", "label": "Risk Evaluation" },
+    { "slug": "transparency", "label": "Transparency" },
+    { "slug": "governance", "label": "Governance" }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "Fulfilled",
+        "risk-thresholds": "Fulfilled",
+        "safe-development": "Fulfilled",
+        "risk-evaluation": "Fulfilled",
+        "transparency": "Partial",
+        "governance": "Fulfilled"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "Partial",
+        "risk-thresholds": "Partial",
+        "safe-development": "Partial",
+        "risk-evaluation": "Partial",
+        "transparency": "Unfulfilled",
+        "governance": "Partial"
+      }
+    }
+  ]
+}
