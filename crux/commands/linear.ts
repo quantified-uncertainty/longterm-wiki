@@ -104,6 +104,26 @@ function priorityLabel(priority: number): string {
   return ['none', 'urgent', 'high', 'medium', 'low'][priority] ?? `P${priority}`;
 }
 
+/**
+ * Parse a CLI priority flag. `create` only accepts 1–4 (Linear creates with no
+ * priority by default); `update` accepts 0 too so users can clear an existing
+ * priority without leaving the field unchanged.
+ */
+function parsePriorityFlag(
+  raw: string,
+  { allowZero }: { allowZero: boolean },
+): { ok: true; value: number } | { ok: false; error: string } {
+  const value = parseInt(raw, 10);
+  const min = allowZero ? 0 : 1;
+  if (Number.isNaN(value) || value < min || value > 4) {
+    const range = allowZero
+      ? '0 (none), 1 (urgent), 2 (high), 3 (medium), or 4 (low)'
+      : '1 (urgent), 2 (high), 3 (medium), or 4 (low)';
+    return { ok: false, error: `Invalid priority "${raw}" — must be ${range}` };
+  }
+  return { ok: true, value };
+}
+
 async function view(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
@@ -488,16 +508,13 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   const sizingRefusal = checkRedFlagsOrRefuse(title, description, options, c);
   if (sizingRefusal) return sizingRefusal;
 
-  // Parse priority (Linear: 1=urgent, 2=high, 3=medium, 4=low)
   let priority: number | undefined;
   if (options.priority) {
-    priority = parseInt(options.priority, 10);
-    if (Number.isNaN(priority) || priority < 1 || priority > 4) {
-      return {
-        output: `${c.red}Invalid priority "${options.priority}" — must be 1 (urgent), 2 (high), 3 (medium), or 4 (low)${c.reset}\n`,
-        exitCode: 1,
-      };
+    const parsed = parsePriorityFlag(options.priority, { allowZero: false });
+    if (!parsed.ok) {
+      return { output: `${c.red}${parsed.error}${c.reset}\n`, exitCode: 1 };
     }
+    priority = parsed.value;
   }
 
   // Resolve parent issue (QUA-NNN → internal UUID)
@@ -559,9 +576,6 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
 /**
  * Update a non-state field on an existing issue (project, priority, title,
  * description, parent). Workflow-state changes go through `start` / `done`.
- *
- * QUA-516: previously the only way to change an issue's project was a one-off
- * GraphQL script. This exposes the existing `issueUpdate` mutation cleanly.
  */
 async function update(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
@@ -621,15 +635,12 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
   }
 
   if (typeof options.priority === 'string') {
-    const priority = parseInt(options.priority, 10);
-    if (Number.isNaN(priority) || priority < 0 || priority > 4) {
-      return {
-        output: `${c.red}Invalid priority "${options.priority}" — must be 0 (none), 1 (urgent), 2 (high), 3 (medium), or 4 (low)${c.reset}\n`,
-        exitCode: 1,
-      };
+    const parsed = parsePriorityFlag(options.priority, { allowZero: true });
+    if (!parsed.ok) {
+      return { output: `${c.red}${parsed.error}${c.reset}\n`, exitCode: 1 };
     }
-    input.priority = priority;
-    changed.push(`priority=${priorityLabel(priority)}`);
+    input.priority = parsed.value;
+    changed.push(`priority=${priorityLabel(parsed.value)}`);
   }
 
   if (typeof options.title === 'string') {

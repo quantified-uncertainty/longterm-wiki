@@ -114,6 +114,7 @@ beforeEach(() => {
   // and leaves queued `mockResolvedValueOnce` values intact. Without this,
   // a test that queues a Once value without consuming it will poison the
   // next test's mock queue.
+  getIssueMock.mockReset();
   getCommentsMock.mockReset();
   githubApiMock.mockReset();
   // Default: dedup checks find nothing. Individual tests override.
