@@ -1,0 +1,54 @@
+{
+  "publishedAt": "2025-07-15",
+  "waveLabel": "Summer 2025",
+  "sourceUrl": "https://futureoflife.org/ai-safety-index-summer-2025/",
+  "methodologyUrl": "https://futureoflife.org/document/ai-safety-index-2025-methodology/",
+  "license": "CC BY 4.0",
+  "isLatest": true,
+  "dimensions": [
+    { "slug": "risk-assessment", "label": "Risk Assessment" },
+    { "slug": "current-harms", "label": "Current Harms" },
+    { "slug": "safety-frameworks", "label": "Safety Frameworks" },
+    { "slug": "existential-safety", "label": "Existential Safety Strategy" },
+    { "slug": "governance", "label": "Governance & Accountability" },
+    { "slug": "info-sharing", "label": "Information Sharing" }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "C+",
+        "risk-assessment": "C+",
+        "current-harms": "B-",
+        "safety-frameworks": "C+",
+        "existential-safety": "D+",
+        "governance": "C",
+        "info-sharing": "C+"
+      }
+    },
+    {
+      "org": "Google DeepMind",
+      "scores": {
+        "overall": "C-",
+        "risk-assessment": "D+",
+        "current-harms": "C",
+        "safety-frameworks": "C-",
+        "existential-safety": "D",
+        "governance": "C-",
+        "info-sharing": "C"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "D+",
+        "risk-assessment": "D",
+        "current-harms": "C-",
+        "safety-frameworks": "C-",
+        "existential-safety": "F",
+        "governance": "D",
+        "info-sharing": "D+"
+      }
+    }
+  ]
+}

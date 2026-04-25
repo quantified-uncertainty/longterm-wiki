@@ -96,6 +96,7 @@ export const GROUPS: Record<string, GroupDef> = {
       // dash-form aliases (`import-divisions-sync`, etc.) still resolve via
       // the flattened path.
       'import-grants',
+      'import-scorecards',
       'import-divisions',
       'import-funding-programs',
       'data-sources',
