@@ -137,7 +137,15 @@ async function runIngest(
 
   const dryRun =
     options["dry-run"] === true || options.dryRun === true;
-  const batchSize = options.batch ? Number(options.batch) : DEFAULT_BATCH;
+  const batchSizeRaw =
+    options.batch === undefined ? DEFAULT_BATCH : Number(options.batch);
+  if (!Number.isInteger(batchSizeRaw) || batchSizeRaw <= 0) {
+    return {
+      exitCode: 1,
+      output: "--batch must be a positive integer",
+    };
+  }
+  const batchSize = batchSizeRaw;
   const limitN = options.limit ? Number(options.limit) : undefined;
   const noResolve =
     options["no-resolve"] === true || options.noResolve === true;
@@ -154,7 +162,20 @@ async function runIngest(
       typeof options.url === "string" && options.url.length > 0
         ? options.url
         : await discoverLatestSnapshotUrl();
-    if (!snapshotUrl.startsWith(AIID_R2_BASE)) {
+    let parsedSnapshotUrl: URL;
+    try {
+      parsedSnapshotUrl = new URL(snapshotUrl);
+    } catch {
+      return {
+        exitCode: 1,
+        output: `Refusing to download from invalid URL: ${snapshotUrl}`,
+      };
+    }
+    const expectedR2 = new URL(AIID_R2_BASE);
+    if (
+      parsedSnapshotUrl.origin !== expectedR2.origin ||
+      !/^\/backup-\d{14}\.tar\.bz2$/.test(parsedSnapshotUrl.pathname)
+    ) {
       return {
         exitCode: 1,
         output: `Refusing to download from unexpected host: ${snapshotUrl} (expected ${AIID_R2_BASE})`,

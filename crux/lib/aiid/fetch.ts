@@ -53,6 +53,11 @@ export async function discoverLatestSnapshotUrl(): Promise<string> {
 
 /**
  * Stream-download the given URL to a path under `/tmp`. Returns the path.
+ *
+ * Hardening: the redirect mode is `error` so a redirect to an unexpected
+ * origin is rejected — the caller has already pinned `url` to the AIID R2
+ * bucket and we don't want a redirect (intentional or hostile) to widen
+ * that trust.
  */
 export async function downloadSnapshot(
   url: string,
@@ -62,7 +67,7 @@ export async function downloadSnapshot(
     targetPath ??
     join(mkdtempSync(join(tmpdir(), "aiid-snapshot-")), "backup.tar.bz2");
 
-  const res = await fetch(url);
+  const res = await fetch(url, { redirect: "error" });
   if (!res.ok) {
     throw new Error(
       `Failed to download snapshot ${url}: ${res.status} ${res.statusText}`,
@@ -79,42 +84,91 @@ export async function downloadSnapshot(
   return out;
 }
 
+/** A tar entry as produced by `listTarEntries()`. */
+export interface TarEntry {
+  /** Path of the entry within the archive. */
+  name: string;
+  /** Entry type: `-` regular, `d` directory, `l` symlink, `h` hardlink, etc. */
+  type: string;
+  /** Symlink/hardlink target if this is a link entry, otherwise undefined. */
+  linkTarget?: string;
+}
+
 /**
- * Validate a tar archive's entries do not escape the extraction root. AIID
- * archives come from a third-party R2 bucket; even though tar typically
- * rejects `..` traversal at extract time, we double-check here so the
- * trust model is explicit.
- *
- * Rejected entry shapes:
- *   - Absolute paths (`/foo`)
- *   - Paths containing `..` segments
- *   - Symlinks pointing outside the archive root (best-effort)
+ * Verbose tar listing — `-tvjf` includes the permission string (whose first
+ * char is the entry type) and, for link entries, ` -> target` or ` link to
+ * target`. We parse those out so `assertSafeTarEntries()` can reject any
+ * link entries before extraction. AIID archives come from a third-party R2
+ * bucket; checking entry-name text alone is not enough — a crafted archive
+ * could contain a symlink whose target escapes the extraction root.
  */
-export function listTarEntries(archivePath: string): string[] {
-  const out = execFileSync("tar", ["-tjf", archivePath], {
+export function listTarEntries(archivePath: string): TarEntry[] {
+  const out = execFileSync("tar", ["-tvjf", archivePath], {
     stdio: ["ignore", "pipe", "pipe"],
     encoding: "utf-8",
     maxBuffer: 64 * 1024 * 1024, // AIID dump has ~30k entries; 64 MB string is plenty
   });
-  return out
-    .split("\n")
-    .map((l) => l.trim())
-    .filter((l) => l.length > 0);
+
+  const entries: TarEntry[] = [];
+  for (const rawLine of out.split("\n")) {
+    const line = rawLine.replace(/\r$/, "");
+    if (!line.trim()) continue;
+
+    // Verbose format: `<perms> <owner> <size> <date> <time> <name>[ -> target | link to target]`
+    // The permission string (first whitespace-separated token) starts with the
+    // type char; anything we don't recognize as a regular file or directory is
+    // treated as a link/special and rejected by assertSafeTarEntries.
+    const m = line.match(/^(\S+)\s+\S+\s+\d+\s+\S+\s+\S+\s+(.+)$/);
+    if (!m) {
+      // Unparseable line — be conservative and reject by giving it an unknown type.
+      entries.push({ name: line.trim(), type: "?" });
+      continue;
+    }
+    const type = m[1][0] ?? "?";
+    let rest = m[2];
+    let linkTarget: string | undefined;
+    // bsdtar / GNU tar format symlinks as " -> target" and hardlinks as " link to target".
+    const linkMatch = rest.match(/^(.+?)\s+(?:->|link to)\s+(.+)$/);
+    if (linkMatch) {
+      rest = linkMatch[1];
+      linkTarget = linkMatch[2];
+    }
+    entries.push({ name: rest, type, linkTarget });
+  }
+  return entries;
 }
 
 /**
- * Throws if any entry name is unsafe. Consumers must call this before
- * extraction. Pure: no I/O.
+ * Throws if any entry is unsafe. Consumers must call this before extraction.
+ * Pure: no I/O.
+ *
+ * Rejected entry shapes:
+ *   - Absolute paths (`/foo`)
+ *   - Paths containing `..` segments
+ *   - Symlinks and hardlinks (any link entry, regardless of target — link
+ *     targets to absolute paths or `..` are obviously dangerous, but even
+ *     in-archive links can be combined with a later traversal walk to escape
+ *     the extraction root, so we reject all link entries unconditionally).
+ *   - Unknown / special entry types (devices, fifos, etc.)
  */
-export function assertSafeTarEntries(entries: string[]): void {
+export function assertSafeTarEntries(entries: TarEntry[]): void {
   for (const entry of entries) {
-    if (entry.startsWith("/")) {
-      throw new Error(`Refusing to extract absolute path from archive: ${entry}`);
+    if (entry.name.startsWith("/")) {
+      throw new Error(`Refusing to extract absolute path from archive: ${entry.name}`);
     }
-    // `..` must not appear as its own segment — also catches `foo/../bar`.
-    const segments = entry.split("/");
+    const segments = entry.name.split("/");
     if (segments.some((s) => s === "..")) {
-      throw new Error(`Refusing to extract traversal path from archive: ${entry}`);
+      throw new Error(`Refusing to extract traversal path from archive: ${entry.name}`);
+    }
+    if (entry.type === "l" || entry.type === "h") {
+      throw new Error(
+        `Refusing to extract link entry from archive: ${entry.name} -> ${entry.linkTarget ?? "(unknown)"}`,
+      );
+    }
+    if (entry.type !== "-" && entry.type !== "d") {
+      throw new Error(
+        `Refusing to extract unsupported entry type '${entry.type}' from archive: ${entry.name}`,
+      );
     }
   }
 }

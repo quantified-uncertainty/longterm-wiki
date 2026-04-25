@@ -9,48 +9,65 @@
  */
 
 import { describe, it, expect } from "vitest";
-import { assertSafeTarEntries } from "./fetch.ts";
+import { assertSafeTarEntries, type TarEntry } from "./fetch.ts";
+
+/** Helper: build a regular-file TarEntry from just a path. */
+const f = (name: string): TarEntry => ({ name, type: "-" });
+/** Helper: build a directory TarEntry. */
+const d = (name: string): TarEntry => ({ name, type: "d" });
+/** Helper: build a symlink TarEntry pointing somewhere. */
+const sym = (name: string, target: string): TarEntry => ({
+  name,
+  type: "l",
+  linkTarget: target,
+});
+/** Helper: build a hardlink TarEntry. */
+const hard = (name: string, target: string): TarEntry => ({
+  name,
+  type: "h",
+  linkTarget: target,
+});
 
 describe("assertSafeTarEntries", () => {
   it("accepts a normal nested layout", () => {
     expect(() =>
       assertSafeTarEntries([
-        "backup-20260420103651/",
-        "backup-20260420103651/aiidprod/",
-        "backup-20260420103651/aiidprod/incidents.json",
-        "backup-20260420103651/aiidprod/reports.json",
-        "backup-20260420103651/aiidprod/entities.json",
+        d("backup-20260420103651/"),
+        d("backup-20260420103651/aiidprod/"),
+        f("backup-20260420103651/aiidprod/incidents.json"),
+        f("backup-20260420103651/aiidprod/reports.json"),
+        f("backup-20260420103651/aiidprod/entities.json"),
       ]),
     ).not.toThrow();
   });
 
   it("rejects absolute paths", () => {
-    expect(() => assertSafeTarEntries(["/etc/passwd"])).toThrow(/absolute path/);
-    expect(() => assertSafeTarEntries(["/foo/bar"])).toThrow(/absolute path/);
+    expect(() => assertSafeTarEntries([f("/etc/passwd")])).toThrow(/absolute path/);
+    expect(() => assertSafeTarEntries([f("/foo/bar")])).toThrow(/absolute path/);
   });
 
   it("rejects parent-directory traversal", () => {
-    expect(() => assertSafeTarEntries(["foo/../../bar"])).toThrow(/traversal/);
-    expect(() => assertSafeTarEntries(["../sibling"])).toThrow(/traversal/);
+    expect(() => assertSafeTarEntries([f("foo/../../bar")])).toThrow(/traversal/);
+    expect(() => assertSafeTarEntries([f("../sibling")])).toThrow(/traversal/);
   });
 
   it("rejects bare '..' entry", () => {
-    expect(() => assertSafeTarEntries([".."])).toThrow(/traversal/);
+    expect(() => assertSafeTarEntries([f("..")])).toThrow(/traversal/);
   });
 
   it("rejects mixed safe + unsafe entries (fails fast on first)", () => {
     expect(() =>
       assertSafeTarEntries([
-        "safe/file.json",
-        "../escape.txt",
-        "another/safe/file.json",
+        f("safe/file.json"),
+        f("../escape.txt"),
+        f("another/safe/file.json"),
       ]),
     ).toThrow(/traversal/);
   });
 
   it("treats '.' as a normal current-dir reference (allowed)", () => {
     // Tar dumps sometimes contain a literal `./` or `.` entry for the root.
-    expect(() => assertSafeTarEntries([".", "./foo"])).not.toThrow();
+    expect(() => assertSafeTarEntries([f("."), f("./foo")])).not.toThrow();
   });
 
   it("accepts an empty list (no entries to validate)", () => {
@@ -59,8 +76,38 @@ describe("assertSafeTarEntries", () => {
 
   it("rejects entries that look benign but contain '..' as a segment", () => {
     // `foo..bar` (no slash) is fine — it's just an unusual filename.
-    expect(() => assertSafeTarEntries(["foo..bar"])).not.toThrow();
+    expect(() => assertSafeTarEntries([f("foo..bar")])).not.toThrow();
     // But `foo/../bar` is traversal.
-    expect(() => assertSafeTarEntries(["foo/../bar"])).toThrow(/traversal/);
+    expect(() => assertSafeTarEntries([f("foo/../bar")])).toThrow(/traversal/);
+  });
+
+  it("rejects symlink entries unconditionally (even with safe targets)", () => {
+    expect(() =>
+      assertSafeTarEntries([sym("backup/link", "incidents.json")]),
+    ).toThrow(/link entry/);
+    expect(() =>
+      assertSafeTarEntries([sym("backup/escape", "/etc/passwd")]),
+    ).toThrow(/link entry/);
+    expect(() =>
+      assertSafeTarEntries([sym("backup/up", "../../etc/passwd")]),
+    ).toThrow(/link entry/);
+  });
+
+  it("rejects hardlink entries unconditionally", () => {
+    expect(() =>
+      assertSafeTarEntries([hard("backup/hl", "incidents.json")]),
+    ).toThrow(/link entry/);
+  });
+
+  it("rejects unsupported entry types (devices, fifos, etc.)", () => {
+    expect(() =>
+      assertSafeTarEntries([{ name: "backup/dev", type: "c" }]),
+    ).toThrow(/unsupported entry type/);
+    expect(() =>
+      assertSafeTarEntries([{ name: "backup/fifo", type: "p" }]),
+    ).toThrow(/unsupported entry type/);
+    expect(() =>
+      assertSafeTarEntries([{ name: "backup/?", type: "?" }]),
+    ).toThrow(/unsupported entry type/);
   });
 });

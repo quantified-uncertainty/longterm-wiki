@@ -91,9 +91,12 @@ export interface AiIncidentSyncItem {
 }
 
 /**
- * Max chars before summary is truncated. The route's Zod schema also caps
- * `summary` at this same bound — keep them equal. The route imports this
- * constant from here, so they cannot drift.
+ * Max chars before summary is truncated. The route's Zod schema caps
+ * `summary` at this same bound — keep them equal. The route declares its
+ * own literal `MAX_SUMMARY_CHARS` (rather than importing this constant)
+ * to avoid a cross-package dependency from wiki-server into crux; the
+ * test in `transform.test.ts` reads the route as text and asserts the
+ * two values match so they cannot silently drift.
  */
 export const SUMMARY_MAX_CHARS = 4000;
 
@@ -229,6 +232,17 @@ export const MAX_TAGS_PER_INCIDENT = 50;
  * for now — a follow-up attribution pass turns the strong matches into
  * proper entity FKs.
  */
+/**
+ * Per-tag length must stay under the route's Zod `z.string().max(64)` cap
+ * (see `apps/wiki-server/src/routes/tablebase/ai-incidents.ts`). With the
+ * 12-char `aiid-entity:` prefix, that leaves 52 chars for the entity name.
+ * AIID has long government / NGO display names that exceed this, so we
+ * truncate rather than drop — preserves the prefix-driven uniqueness even
+ * for the long tail.
+ */
+const TAG_MAX_CHARS = 64;
+const TAG_PREFIX = "aiid-entity:";
+
 function buildTags(
   inc: AiidIncidentRaw,
   aiidEntityNames: Map<string, string>,
@@ -238,7 +252,9 @@ function buildTags(
     if (!arr) return;
     for (const id of arr) {
       const name = aiidEntityNames.get(id);
-      if (name) tags.add(`aiid-entity:${name}`);
+      if (!name) continue;
+      const tag = `${TAG_PREFIX}${name}`.slice(0, TAG_MAX_CHARS);
+      tags.add(tag);
     }
   };
   push(inc["Alleged deployer of AI system"]);
