@@ -2566,3 +2566,57 @@
     - ai-governance
     - revolving-door
   lastUpdated: 2026-04
+
+- id: ai-cyber-damage-estimates
+  stableId: sid_n5k9L5Ky9g
+  wikiId: E2515
+  type: analysis
+  title: AI Cyber Damage Estimates
+  description: >-
+    Side-by-side methodology comparison of seven major global cyber damage estimates (Cybersecurity Ventures, FBI IC3,
+    IBM, Munich Re, Romanosky 2016, Anderson et al. 2012/2019, ENISA). Translates each to GDP fraction and explains
+    the ~600x spread between the lowest and highest figures.
+  customFields:
+    - label: Model Type
+      value: Methodology Comparison
+    - label: Target Risk
+      value: Cyber Offense / Cyberweapons
+  relatedEntries:
+    - id: sid_7c6UC46TWQ
+      type: risk
+      relationship: related
+  tags:
+    - cyber-damage
+    - methodology
+    - cybercrime-cost
+    - economic-impact
+  lastUpdated: 2026-04
+
+- id: cyber-insurance-market-signals
+  stableId: sid_HsUBQguk2g
+  wikiId: E2516
+  type: analysis
+  title: Cyber Insurance Market Signals
+  description: >-
+    Cyber insurance pricing, capacity limits, war exclusions, and reinsurance structures as revealed-preference
+    evidence on the market's expected damage distribution. Argues the market treats correlated systemic events
+    as largely uninsurable; insurable upper bound ≈$20-46B (Munich Re 200-year return period).
+  customFields:
+    - label: Model Type
+      value: Market Signal Analysis
+    - label: Target Risk
+      value: Cyber Offense / Cyberweapons
+  relatedEntries:
+    - id: sid_7c6UC46TWQ
+      type: risk
+      relationship: related
+    - id: sid_n5k9L5Ky9g
+      type: analysis
+      relationship: related
+  tags:
+    - cyber-insurance
+    - market-signals
+    - reinsurance
+    - cat-bonds
+    - protection-gap
+  lastUpdated: 2026-04

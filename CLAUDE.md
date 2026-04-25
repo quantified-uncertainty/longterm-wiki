@@ -220,4 +220,5 @@ These are "mental model" maps. They list the components, endpoints, helpers, and
 - `.claude/rules/three-bases-architecture.md` — TableBase/FactBase/WikiBase naming and which layer owns what
 - `.claude/rules/id-system.md` — `numericId` vs `stableId` vs `tableId`, allocation, validation
 - `.claude/rules/validation-gate-system.md` — `crux/validate/` 80+ validators, gate wiring, blocking vs advisory
+- `.claude/rules/audit-log.md` — Universal PG audit log (QUA-442) + legacy `tablebase_audit_log`. Read before touching trigger, middleware, or bulk migrations.
 - `docs/audits/things-denormalization-audit.md` — **Historical reference** (denorm columns dropped in QUA-507 / migration 0204). Retained for pre-QUA-507 composer logic per thing_type (useful if the `things_search` MV composition ever needs to change) and for the `*_display_name` sibling pattern audit (~20 columns across 13 tables) before proposing a new cache column.

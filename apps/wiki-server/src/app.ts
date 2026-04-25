@@ -7,6 +7,7 @@ import {
   rateLimitMiddleware,
   createDefaultRateLimiters,
 } from "./rate-limit.js";
+import { auditContextMiddleware } from "./middleware/audit-context.js";
 // TableBase routes — typed relational entity records
 // Most routes are mounted automatically via TABLEBASE_MOUNTS (QUA-454).
 // The 5 imports below are the ones mounted manually in this file because
@@ -64,6 +65,8 @@ import { qaChecksRoute } from "./routes/operational/qa-checks.js";
 import { dataQualityRoute } from "./routes/operational/data-quality.js";
 import { thingsSearchRefreshRoute } from "./routes/operational/things-search-refresh.js";
 import { operationsLogRoute } from "./routes/operational/operations-log.js";
+import { auditLogRoute } from "./routes/operational/audit-log.js";
+import { frameworkReviewRoute } from "./routes/operational/framework-review.js";
 
 let requestCounter = 0;
 
@@ -166,6 +169,13 @@ export function createApp() {
   // API routes — all require a valid API key
   app.use("/api/*", validateApiKey());
 
+  // Audit-context middleware (QUA-442). Reads X-Agent-Session-Id and
+  // X-Agent-Tool from authenticated API requests and stashes them on the
+  // Hono context for `applyAuditContext(tx, c)` to pick up. No DB
+  // interaction here — all SET LOCAL happens inside the route's
+  // transaction.
+  app.use("/api/*", auditContextMiddleware());
+
   // ── Route mounting ───────────────────────────────────────────────────
   // Routes are grouped by which data layer ("Base") they primarily serve.
   // See content/docs/internal/data-architecture.mdx for the Three Bases guide.
@@ -241,6 +251,8 @@ export function createApp() {
   app.route("/api/data-quality", dataQualityRoute);
   app.route("/api/things-search", thingsSearchRefreshRoute);
   app.route("/api/operations-log", operationsLogRoute);
+  app.route("/api/audit-log", auditLogRoute);
+  app.route("/api/framework-review", frameworkReviewRoute);
 
   return app;
 }

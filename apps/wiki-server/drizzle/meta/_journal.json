@@ -1457,6 +1457,41 @@
       "when": 1787559200000,
       "tag": "0207_qua_688_scorecard_tables",
       "breakpoints": true
+    },
+    {
+      "idx": 210,
+      "version": "7",
+      "when": 1787818000000,
+      "tag": "0210_qua_442_audit_log_universal_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 209,
+      "version": "7",
+      "when": 1787818200000,
+      "tag": "0209_qua_692_third_party_evaluations",
+      "breakpoints": true
+    },
+    {
+      "idx": 212,
+      "version": "7",
+      "when": 1787818500000,
+      "tag": "0212_qua_702_benchmark_link_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 213,
+      "version": "7",
+      "when": 1787876400000,
+      "tag": "0213_qua_723_flagship_curate_orphan_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 214,
+      "version": "7",
+      "when": 1787876500000,
+      "tag": "0214_qua_693_ai_incidents",
+      "breakpoints": true
     }
   ]
 }

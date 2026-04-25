@@ -1839,6 +1839,47 @@ export const sourcingUrlSuggestions = pgTable(
 );
 
 /**
+ * Universal PG audit log (QUA-442).
+ *
+ * Written by the `audit_trigger_fn()` PL/pgSQL trigger attached to every
+ * non-excluded table. Captures every INSERT/UPDATE/DELETE with full before
+ * and after JSONB, plus session attribution pulled from `SET LOCAL`
+ * GUCs (`app.agent_session_id`, `app.agent_tool`).
+ *
+ * This is the comprehensive floor; `tablebase_audit_log` (below) stays as
+ * the richer application-layer log for TableBase sync handlers that want
+ * verdict/source-URL/evidence attribution.
+ *
+ * Migration: 0204_qua_442_audit_log_universal_trigger.sql
+ */
+export const fullAuditLog = pgTable(
+  "full_audit_log",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    tableName: text("table_name").notNull(),
+    operation: text("operation").$type<"INSERT" | "UPDATE" | "DELETE">().notNull(),
+    oldRow: jsonb("old_row"),
+    newRow: jsonb("new_row"),
+    txnId: bigint("txn_id", { mode: "bigint" }),
+    sessionId: text("session_id"),
+    tool: text("tool"),
+    applicationName: text("application_name"),
+    changedAt: timestamp("changed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_full_audit_log_table_time").on(
+      table.tableName,
+      table.changedAt,
+    ),
+    index("idx_full_audit_log_session").on(table.sessionId),
+    index("idx_full_audit_log_txn").on(table.txnId),
+    index("idx_full_audit_log_changed_at").on(table.changedAt),
+  ],
+);
+
+/**
  * Audit log for TableBase changes — records every insert/update/delete
  * to PG-primary tables (personnel, grants, funding_rounds, etc.).
  * Provides git-like change history for data that bypasses git.
@@ -2365,6 +2406,14 @@ export const benchmarkResults = pgTable(
     date: text("date"),
     sourceUrl: text("source_url"),
     notes: text("notes"),
+    // QUA-702: provenance. NULL = legacy / unknown; 'self-report' = inserted
+    // by the model_system_cards post-upsert hook from a lab-published card;
+    // 'third-party' = independent benchmark run. Constraint enforced in
+    // migration 0212. The hook's upsert protects 'third-party' rows
+    // unconditionally; NULL rows are protected unless they are empty legacy
+    // stubs (NULL tested_by + NULL source_url) that no one curated. See
+    // system-card-benchmark-linker.ts for the exact WHERE clause.
+    testedBy: text("tested_by"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2378,6 +2427,7 @@ export const benchmarkResults = pgTable(
   (table) => [
     index("idx_br_benchmark").on(table.benchmarkId),
     index("idx_br_model").on(table.modelId),
+    index("idx_br_tested_by").on(table.testedBy),
     uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
   ]
 );
@@ -2635,6 +2685,7 @@ export const VALID_THING_TYPES = [
   "safety-framework-version",
   "framework-threshold",
   "framework-diff",
+  "ai_incident",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -4560,4 +4611,251 @@ export const scorecardGrades = pgTable(
       table.dimensionSlug
     ),
   ]
+);
+
+/**
+ * Third-party AI model evaluations — published pre-deployment evaluations and
+ * red-team reports from external evaluators (UK AISI, US AISI / CAISI, METR,
+ * Apollo Research). One row per published report. The `report_url` is the
+ * natural key — a single report covering N models is one row, with the model
+ * fan-out captured in `third_party_evaluation_models`.
+ *
+ * QUA-692 — Phase 5 of the AI safety data layer (parent: QUA-687).
+ */
+export const thirdPartyEvaluations = pgTable(
+  "third_party_evaluations",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    evaluatorOrgId: text("evaluator_org_id").notNull(), // FK resolved to entities.stable_id
+    evaluatorOrgDisplayName: text("evaluator_org_display_name"),
+    reportUrl: text("report_url").notNull().unique(),
+    reportPdfUrl: text("report_pdf_url"),
+    title: text("title").notNull(),
+    publishedDate: date("published_date"),
+    riskDomain: text("risk_domain").array().notNull(), // controlled vocab; CHECK in migration
+    preDeployment: boolean("pre_deployment"), // null = ambiguous (methodology post)
+    findingsSummary: text("findings_summary"),
+    capabilityLevelsAssessed: jsonb("capability_levels_assessed").$type<Record<string, string>>(),
+    methodologyUrl: text("methodology_url"),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    sourceSystem: text("source_system").notNull(), // sitemap | rss | html-scrape | manual
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_tpe_evaluator").on(table.evaluatorOrgId),
+    index("idx_tpe_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_tpe_pre_deployment").on(table.preDeployment),
+    // GIN over the array enables `risk_domain && ARRAY['cyber']` filters in O(log n).
+    index("idx_tpe_risk_domain_gin").using("gin", table.riskDomain),
+  ],
+);
+
+/**
+ * Many-to-many: a single third-party evaluation report can cover multiple
+ * AI models (METR multi-model reviews, Apollo cross-lab evaluations).
+ * `match_confidence` tracks how the link was made so we can surface an
+ * unlinked-queue dashboard for low-confidence rows.
+ */
+export const thirdPartyEvaluationModels = pgTable(
+  "third_party_evaluation_models",
+  {
+    evaluationId: text("evaluation_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id
+    aiModelDisplayName: text("ai_model_display_name"),
+    rawNameInReport: text("raw_name_in_report"), // verbatim model string from the report
+    matchConfidence: text("match_confidence").notNull(), // exact | fuzzy | manual
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.evaluationId, table.aiModelId] }),
+    index("idx_tpem_ai_model").on(table.aiModelId),
+  ],
+);
+
+/**
+ * Pending benchmark links — queue for cited benchmarks in
+ * `model_system_cards.eval_scores_cited` whose name could not be resolved
+ * to a row in `benchmarks`.
+ *
+ * QUA-702. Populated by the model_system_cards sync postUpsert hook;
+ * resolved entries graduate to `benchmark_results` via a follow-up job
+ * once a human (or a future fuzzy matcher) maps `cited_name` to a real
+ * `benchmarks.id`.
+ *
+ * Idempotency on re-extract: unique on
+ * (model_system_card_id, cited_name_normalized) where the normalized form
+ * matches `normalizeBenchmarkName(s)` in the linker
+ * (`lower(s).replace(/[^a-z0-9]/g, "")`). Without normalization, repeated
+ * extractions can return name variants ("SWE-bench Verified" /
+ * "swe-bench-verified" / "SWE Bench Verified") that produce duplicate
+ * queue rows for the same underlying benchmark.
+ */
+export const pendingBenchmarkLinks = pgTable(
+  "pending_benchmark_links",
+  {
+    id: text("id").primaryKey(), // sid_-style 10-char id
+    modelSystemCardId: text("model_system_card_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // entities.stable_id
+    citedName: text("cited_name").notNull(),
+    /**
+     * Generated normalized form of `cited_name` — must match
+     * `normalizeBenchmarkName()` in `system-card-benchmark-linker.ts`. Stored
+     * (not virtual) so the unique index can reference it. Update both
+     * together if the normalization rules change.
+     */
+    citedNameNormalized: text("cited_name_normalized").generatedAlwaysAs(
+      sql`regexp_replace(lower(cited_name), '[^a-z0-9]', '', 'g')`,
+    ),
+    citedScore: doublePrecision("cited_score"),
+    citedMetric: text("cited_metric"),
+    citedSetup: text("cited_setup"),
+    citedExcerpt: text("cited_excerpt"),
+    /** When the queue entry has been mapped to a real benchmark, this is set. */
+    resolvedBenchmarkId: text("resolved_benchmark_id"),
+    /** pending | resolved | rejected | auto-resolved */
+    status: text("status").notNull().default("pending"),
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pbl_card").on(table.modelSystemCardId),
+    index("idx_pbl_model").on(table.aiModelId),
+    index("idx_pbl_status").on(table.status),
+    index("idx_pbl_resolved_benchmark").on(table.resolvedBenchmarkId),
+    uniqueIndex("uq_pbl_card_name").on(
+      table.modelSystemCardId,
+      table.citedNameNormalized,
+    ),
+  ],
+);
+
+// ============================================================================
+// AI Incidents — Phase 6 of QUA-687 (QUA-693)
+//
+// Mirrors the MIT AI Incident Database (AIID; CC-BY-SA 4.0). OECD AI Incident
+// Monitor ingest deferred to Phase 7 pending structured-export verification.
+//
+// Per AIID license, the `reports.text` field is explicitly EXCLUDED from
+// CC-BY-SA. We mirror report URL/title/publisher/published_at only — never
+// the article body. validate-aiid-no-report-text.ts defends this invariant.
+//
+// Attribution FKs (`ai_model_id`, `org_id`, `developer_org_id`) populate only
+// when `attribution_confidence >= 0.7` AND the candidate resolves to an
+// existing entity; NULL is correct when ambiguous.
+// ============================================================================
+
+export const aiIncidents = pgTable(
+  "ai_incidents",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** 'mit-aiid' today; 'oecd-aim' when Phase 7 lands. CHECK-constrained. */
+    source: varchar("source", { length: 16 }).notNull(),
+    /** Upstream identifier, composite-unique with `source` for idempotent upsert. */
+    sourceIncidentId: varchar("source_incident_id", { length: 128 }).notNull(),
+    /** Date the incident was first reported (when upstream recorded it). */
+    reportedDate: date("reported_date"),
+    /** Date the underlying incident occurred (often different from reportedDate). */
+    incidentDate: date("incident_date"),
+    /** Normalized: low|medium|high|critical. AIM supplies this natively; AIID not. */
+    severity: varchar("severity", { length: 32 }),
+    /** Raw upstream severity label before normalization. */
+    upstreamSeverity: varchar("upstream_severity", { length: 64 }),
+    title: text("title").notNull(),
+    /** Short summary, <=2000 chars. NOT the full report body. */
+    summary: text("summary").notNull(),
+    fullReportUrl: text("full_report_url"),
+    /** FK → entities.stable_id for the attributed model. Null when unresolved. */
+    aiModelId: text("ai_model_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the alleged deployer. Null when unresolved. */
+    orgId: text("org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the model's developer. Null when unresolved. */
+    developerOrgId: text("developer_org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** LLM attribution confidence [0.00, 1.00]. FKs only populated when >= 0.7. */
+    attributionConfidence: numeric("attribution_confidence", {
+      precision: 3,
+      scale: 2,
+    }),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    /** Full upstream record for auditing / future backfills. */
+    raw: jsonb("raw").notNull(),
+    /** When we fetched the upstream snapshot containing this row. */
+    upstreamFetchedAt: timestamp("upstream_fetched_at", {
+      withTimezone: true,
+    }).notNull(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_ai_incidents_source_incident").on(
+      table.source,
+      table.sourceIncidentId,
+    ),
+    index("idx_ai_incidents_source").on(table.source),
+    index("idx_ai_incidents_ai_model").on(table.aiModelId),
+    index("idx_ai_incidents_org").on(table.orgId),
+    index("idx_ai_incidents_developer_org").on(table.developerOrgId),
+    index("idx_ai_incidents_reported_date").on(table.reportedDate),
+    index("idx_ai_incidents_incident_date").on(table.incidentDate),
+    index("idx_ai_incidents_tags_gin").using("gin", table.tags),
+  ],
+);
+
+/**
+ * Reports are a 1:N join off incidents. AIID averages ~12 reports/incident.
+ * We store URL/title/publisher/published_at ONLY — the `text` field on the
+ * AIID reports collection is CC-BY-SA excluded and must never land here.
+ */
+export const aiIncidentReports = pgTable(
+  "ai_incident_reports",
+  {
+    incidentId: varchar("incident_id", { length: 10 })
+      .notNull()
+      .references(() => aiIncidents.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title"),
+    publisher: text("publisher"),
+    publishedAt: date("published_at"),
+    language: varchar("language", { length: 8 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.incidentId, table.url] }),
+    index("idx_ai_incident_reports_published_at").on(table.publishedAt),
+  ],
 );

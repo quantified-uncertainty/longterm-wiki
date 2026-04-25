@@ -71,6 +71,7 @@ import { SystemHealthContent } from "@/app/internal/system-health/system-health-
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
+import { SystemCardsDashboardContent } from "@/app/internal/system-cards-dashboard/system-cards-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
@@ -84,6 +85,7 @@ import { ResourcePipelineDashboardContent } from "@/app/internal/resource-pipeli
 import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
 import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
+import { FrameworkReviewContent } from "@/app/internal/framework-review/framework-review-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -237,6 +239,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   PRDashboardContent,
   GrantsDashboardContent,
   DivisionsDashboardContent,
+  SystemCardsDashboardContent,
   FundingProgramsDashboardContent,
   PeopleCoverageContent,
   AgentActivityContent,
@@ -250,6 +253,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DataSourcesContent,
   TablebaseCoverageContent,
   AutomationLandscapeContent,
+  FrameworkReviewContent,
 
   // Table view components
   SafetyApproachesTableView,

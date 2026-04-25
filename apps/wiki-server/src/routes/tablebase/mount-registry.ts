@@ -69,6 +69,8 @@ import { frameworkDiffsRoute } from "./framework-diffs.js";
 import { frameworkDiffItemsRoute } from "./framework-diff-items.js";
 import { scorecardSnapshotsRoute } from "./scorecard-snapshots.js";
 import { scorecardGradesRoute } from "./scorecard-grades.js";
+import { thirdPartyEvaluationsRoute } from "./third-party-evaluations.js";
+import { aiIncidentsRoute } from "./ai-incidents.js";
 
 /**
  * The widest Hono route type that still satisfies `app.route()`. Every
@@ -143,6 +145,8 @@ export const TABLEBASE_MOUNTS: readonly TablebaseMount[] = [
   { path: "/api/framework-diff-items", route: frameworkDiffItemsRoute },
   { path: "/api/scorecard-snapshots", route: scorecardSnapshotsRoute },
   { path: "/api/scorecard-grades", route: scorecardGradesRoute },
+  { path: "/api/third-party-evaluations", route: thirdPartyEvaluationsRoute },
+  { path: "/api/ai-incidents", route: aiIncidentsRoute },
 ];
 
 /**
@@ -181,4 +185,5 @@ export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
   "audit-log.ts",
   "write-inline-verdicts.ts",
   "entity-profile-descriptions.ts",
+  "system-card-benchmark-linker.ts",
 ];

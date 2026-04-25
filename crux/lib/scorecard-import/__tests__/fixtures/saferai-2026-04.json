@@ -1,0 +1,45 @@
+{
+  "publishedAt": "2026-04-01",
+  "waveLabel": "April 2026",
+  "sourceUrl": "https://ratings.safer-ai.org",
+  "license": "CC BY-SA 4.0",
+  "isLatest": true,
+  "dimensions": [
+    { "slug": "risk-identification", "label": "Risk Identification", "weight": 0.25 },
+    { "slug": "risk-analysis", "label": "Risk Analysis & Evaluation", "weight": 0.25 },
+    { "slug": "risk-treatment", "label": "Risk Treatment", "weight": 0.25 },
+    { "slug": "governance", "label": "Governance", "weight": 0.25 }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "73%",
+        "risk-identification": "85%",
+        "risk-analysis": "70%",
+        "risk-treatment": "65%",
+        "governance": "72%"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "42%",
+        "risk-identification": "55%",
+        "risk-analysis": "40%",
+        "risk-treatment": "35%",
+        "governance": "38%"
+      }
+    },
+    {
+      "org": "Mistral AI",
+      "scores": {
+        "overall": "12%",
+        "risk-identification": "10%",
+        "risk-analysis": "N/A",
+        "risk-treatment": "15%",
+        "governance": "10%"
+      }
+    }
+  ]
+}

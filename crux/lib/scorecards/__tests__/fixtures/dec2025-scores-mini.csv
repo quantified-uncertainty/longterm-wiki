@@ -1,0 +1,6 @@
+Indicator,AcmeAI,BetaLabs,GammaCorp
+Data acquisition methods,1,0,1
+Public datasets,1,1,0
+Compute usage,0,0,1
+Model capabilities,1,1,1
+User impact,0,1,1

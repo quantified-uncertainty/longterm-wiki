@@ -1,0 +1,36 @@
+entity: sid_Me6yx7Sd9A
+facts:
+  - id: f_VHWGaub52Z
+    property: incident-date
+    value: "2020-03"
+    asOf: "2020-12-13"
+    source: https://www.cisa.gov/news-events/cybersecurity-advisories/aa20-352a
+    notes: "Earliest confirmed compromise activity; CISA AA20-352A. Public disclosure December 13, 2020."
+
+  - id: f_td26fEeVVh
+    property: financial-impact
+    value: 1.2e+7
+    asOf: "2021-06"
+    source: https://www2.deloitte.com/us/en/insights/industry/financial-services/cost-of-solarwinds-attack.html
+    notes: "Average estimated remediation cost per affected organization (~$12M); lower-bound aggregate ~$100B if applied to ~9,000 high-value targets"
+
+  - id: f_DIq2AnHTmt
+    property: financial-impact
+    value: 1e+11
+    asOf: "2021-12"
+    source: https://www.cisa.gov/news-events/news/remarks-cisa-director-jen-easterly-rsa-conference-2022
+    notes: "Aggregate recovery-cost estimate ~$100B is widely cited but methodology heterogeneous; figure carries high uncertainty"
+
+  - id: f_9OBGhnuKon
+    property: financial-impact
+    value: 1.5e+7
+    asOf: "2021-02"
+    source: https://www.microsoft.com/en-us/security/blog/2021/02/18/microsoft-internal-solorigate-investigation-final-update/
+    notes: "Microsoft internal investigation cost ~$15M; single-org subset"
+
+  - id: f_eNo41eoPni
+    property: incident-status
+    value: resolved
+    asOf: "2024-10"
+    source: https://www.justice.gov/opa/pr/seven-hackers-associated-chinese-government-charged-computer-intrusions-targeting-perceived
+    notes: "Attribution to Russian SVR APT29; resulted in EO 14028 (May 2021), CMMC, and a long tail of follow-on remediation across federal civilian agencies"

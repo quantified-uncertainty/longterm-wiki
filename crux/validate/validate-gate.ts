@@ -390,6 +390,16 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'third-party-eval-refs',
+    name: 'third_party_evaluations vocab arrays match route ↔ migration (QUA-692)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-third-party-eval-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: a vocab drift between the Zod schema in the route and the
+    // CHECK constraint in the migration shows up at sync time as a 500
+    // error from PG. Static-checkable, so we keep it cheap and CI-blocking.
+  },
+  {
     id: 'things-denorm-dead',
     name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
     command: 'npx',
@@ -735,6 +745,17 @@ const PARALLEL_STEPS: Step[] = [
     // Blocking: sid_ stableIds must never appear in display positions in
     // built data files (database.json, factbase-data.json). This is the
     // last line of defense — catches the symptom regardless of cause.
+  },
+  {
+    id: 'aiid-no-report-text',
+    name: 'AIID ingest does not persist CC-BY-SA-excluded report bodies',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-aiid-no-report-text.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: MIT AI Incident Database snapshots are CC-BY-SA 4.0 except
+    // `submissions` and `reports.text`/`reports.plain_text`. This validator
+    // greps the AIID ingest + schema paths for symptoms of re-introducing
+    // those fields. QUA-693.
   },
 ];
 

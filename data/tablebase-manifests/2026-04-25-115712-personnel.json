@@ -1,0 +1,203 @@
+{
+  "table": "personnel",
+  "recordCount": 18,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-25T11:57:12.178Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 18,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "mUxunKK2Uv",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Founder & President",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://www.longview.org/about/natalie-cargill/",
+      "notes": "Founder and President of Longview Philanthropy. Former barrister at Serjeants' Inn Chambers; double first from Oxford. Per Longview about page.",
+      "id": "VKtdyhi7wn",
+      "verdict": "none"
+    },
+    {
+      "personId": "7YwkYO0yjp",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "CEO",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/",
+      "notes": "CEO coordinating research, grantmaking, and advising work. Former research analyst at Goldman Sachs; CFA charterholder; PPE from Oxford. Per Longview about page.",
+      "id": "mXVtl5uo7H",
+      "verdict": "none"
+    },
+    {
+      "personId": "JC3SQUpi9Q",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Chief Operating Officer",
+      "roleType": "key-person",
+      "startDate": "2024",
+      "source": "https://www.longview.org/about/katie-hearsum/",
+      "notes": "COO since February 2024. Joined July 2021 as Senior Operations Analyst, promoted to Head of Operations July 2022, then COO in February 2024. Former Associate VP at Citibank. Per Longview profile page.",
+      "id": "adbeaVqqen",
+      "verdict": "none"
+    },
+    {
+      "personId": "gRHKbKZa1q",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Chief Partnerships Officer",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/alysha-glenn/",
+      "notes": "Chief Partnerships Officer overseeing advisory, content, and events. Founded AG Philanthropy Group; 15+ years advising major donors. Per Longview profile page.",
+      "id": "FEGP4EonCV",
+      "verdict": "none"
+    },
+    {
+      "personId": "0dDe9ufVzm",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Chief of Staff",
+      "roleType": "key-person",
+      "startDate": "2024",
+      "source": "https://www.longview.org/about/",
+      "notes": "Chief of Staff since January 2024. Previously at Forethought Foundation; US House of Representatives. Per LinkedIn and EA Forum sources.",
+      "id": "TQnltO0WL0",
+      "verdict": "none"
+    },
+    {
+      "personId": "1OlL7DyUpq",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "HR Director",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/",
+      "notes": "HR Director (People Operations). Experience in US labour compliance, recruitment, and management coaching; previously at University of Utah and State of Utah. Per Longview about page.",
+      "id": "dYC3rFnPnG",
+      "verdict": "none"
+    },
+    {
+      "personId": "3bXZMnSn8p",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "AI Program Director",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/michael-aird/",
+      "notes": "Leads AI grantmaking program. Former Associate Director at RAND Center on AI, Security, and Technology; co-founder of Institute for AI Policy and Strategy; former Research Scholar at Oxford FHI. Per Longview profile page.",
+      "id": "pQHxU4YtTG",
+      "verdict": "none"
+    },
+    {
+      "personId": "nD00J7PvL6",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Chief of Staff, AI Program",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/suryansh-mehta/",
+      "notes": "Leads AI grantmaking, strategy, and donor advising; previously built Longview Content Team. Co-edited 'AI Safety, Ethics, and Society' textbook with Dan Hendrycks; co-founded Future Impact Group. Per Longview profile page.",
+      "id": "CDeXDEvmS2",
+      "verdict": "none"
+    },
+    {
+      "personId": "sid_SM7cEzpYvl",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "AI Program Officer",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/aidan-ogara/",
+      "notes": "Conducts grant investigations in AI, particularly technical AI safety research. DPhil candidate in AI at Oxford; prior research at GovAI, Epoch, Cornell, AI Impacts, Center for AI Safety. Per Longview profile page.",
+      "id": "eFWetkXnqU",
+      "verdict": "none"
+    },
+    {
+      "personId": "n7KCrJuGtN",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "AI Program Officer",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/zach-freitas-groff/",
+      "notes": "Conducts grant investigations in AI focusing on digital sentience and EU AI governance. PhD in Economics from Stanford. Per Longview profile page.",
+      "id": "KXLzmDIEQg",
+      "verdict": "none"
+    },
+    {
+      "personId": "Bm2P7Cmn2k",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Nuclear Weapons Policy Program Director",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/carl-robichaud/",
+      "notes": "Leads nuclear weapons policy program and co-manages the Nuclear Weapons Policy Fund. 10+ years of grantmaking in nuclear security at Carnegie Corporation of New York. Per Longview profile page.",
+      "id": "rQsdnoGcDD",
+      "verdict": "none"
+    },
+    {
+      "personId": "nCOIfOufS4",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Nuclear Weapons Policy Program Officer",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/matthew-gentzel/",
+      "notes": "Conducts grant investigations for nuclear weapons policy. Former policy researcher at OpenAI; analyst at US DoD Innovation Steering Group. Per Longview profile page.",
+      "id": "riVGVaFTsg",
+      "verdict": "none"
+    },
+    {
+      "personId": "NBexxY0eT8",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Nuclear Program Associate",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/shane-ward/",
+      "notes": "Conducts grant investigations and supports donor engagement on nuclear weapons policy. MA in security studies from Georgetown Walsh School. Per Longview profile page.",
+      "id": "pVnLFgOZxX",
+      "verdict": "none"
+    },
+    {
+      "personId": "YK2EXxcbsI",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Research & Content Manager",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/mariam-kvaratskhelia/",
+      "notes": "Supports grantmaking and advisory teams on AI governance, biosecurity, and nuclear policy. National Security Fellow at Young Professionals in Foreign Policy. Per Longview profile page.",
+      "id": "1p2fT6zJVc",
+      "verdict": "none"
+    },
+    {
+      "personId": "18WrKYARnA",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Head of Grants Management & Compliance",
+      "roleType": "key-person",
+      "source": "https://www.longview.org/about/andrew-player/",
+      "notes": "Manages grants system and ensures compliance. Previously led operations at Charity Entrepreneurship; worked with ICRC and MSF in Myanmar, South Sudan, and DR Congo. Per Longview profile page.",
+      "id": "X6ZhS95t8d",
+      "verdict": "none"
+    },
+    {
+      "personId": "OTFuKX03H0",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Grants & Compliance Manager",
+      "roleType": "career",
+      "source": "https://www.longview.org/about/will-sherman/",
+      "notes": "Supports grants system and compliance. Previously at Atlantic Council and CAF America. Per Longview profile page.",
+      "id": "gIJ0nnIjfL",
+      "verdict": "none"
+    },
+    {
+      "personId": "3ZDBgn6rDG",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "People Operations Manager",
+      "roleType": "career",
+      "startDate": "2021",
+      "source": "https://www.longview.org/about/ruth-wallis/",
+      "notes": "Joined December 2021. Oversees HR including onboarding, payroll, and employee engagement. Former Operations Administrator at Centre for Effective Altruism. Per Longview profile page.",
+      "id": "0qVEE1glJX",
+      "verdict": "none"
+    },
+    {
+      "personId": "wyGctSmuc9",
+      "organizationId": "sid_gV4U3qi2QA",
+      "role": "Advisor / Programme Officer",
+      "roleType": "career",
+      "startDate": "2018",
+      "source": "https://www.longview.org/about/",
+      "notes": "Advisor since December 2018. Leads on grant investigations and researches promising fields including nuclear security grantmaking. Per The Org and EA Forum sources.",
+      "id": "gaiipee3cq",
+      "verdict": "none"
+    }
+  ]
+}

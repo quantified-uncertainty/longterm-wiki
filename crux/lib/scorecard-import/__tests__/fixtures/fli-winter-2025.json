@@ -1,0 +1,28 @@
+{
+  "publishedAt": "2025-02-15",
+  "waveLabel": "Winter 2025",
+  "sourceUrl": "https://futureoflife.org/ai-safety-index-winter-2025/",
+  "isLatest": false,
+  "dimensions": [
+    { "slug": "risk-assessment", "label": "Risk Assessment" },
+    { "slug": "current-harms", "label": "Current Harms" }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "C",
+        "risk-assessment": "C",
+        "current-harms": "C+"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D-",
+        "current-harms": "D+"
+      }
+    }
+  ]
+}

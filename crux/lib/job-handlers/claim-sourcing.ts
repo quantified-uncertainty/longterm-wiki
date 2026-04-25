@@ -1,7 +1,7 @@
 /**
  * Claim Source-Check Job Handler
  *
- * Processes `claim-verification` jobs (server-side job type name) created by POST /api/claims/propose.
+ * Processes `claim-sourcing` jobs (server-side job type name) created by POST /api/claims/propose.
  * Each job verifies a batch of claims against a shared resource's content.
  *
  * Flow:
