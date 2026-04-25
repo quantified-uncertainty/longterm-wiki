@@ -111,6 +111,29 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: '/api/benchmark-results/delete-batch',
     thingsSourceTable: 'benchmark_results',
   },
+  'benchmark-results-pending': {
+    // No by-entity endpoint — quarantine rows are reviewed via the
+    // /internal/benchmark-quarantine dashboard (follow-up PR), not via
+    // entity-page surfaces. Fall back to /all for completeness checks.
+    fetchByEntityPath: () => '/api/benchmark-results-pending/all',
+    resultKey: 'items',
+    syncPath: '/api/benchmark-results-pending/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/benchmark-results-pending/delete-batch',
+    thingsSourceTable: null,
+  },
+  'model-aliases': {
+    // Aliases are not an entity-scoped table — `fetchByEntityPath` falls
+    // back to /all, mirroring `benchmarks`.
+    fetchByEntityPath: () => '/api/model-aliases/all',
+    resultKey: 'items',
+    syncPath: '/api/model-aliases/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/model-aliases/delete-batch',
+    thingsSourceTable: null,
+  },
   'prediction-market-questions': {
     fetchByEntityPath: (id) => `/api/prediction-markets/questions/by-entity/${encodeURIComponent(id)}`,
     resultKey: 'questions',
@@ -416,6 +439,8 @@ const TABLE_ALIASES: Record<string, string> = {
   platform_accounts: 'platform-accounts',
   model_system_cards: 'model-system-cards',
   third_party_evaluations: 'third-party-evaluations',
+  model_aliases: 'model-aliases',
+  benchmark_results_pending: 'benchmark-results-pending',
 };
 
 export function getTableConfig(table: string): TableConfig | null {

@@ -35,6 +35,19 @@ const AllQuery = z.object({
 
 // ---- Sync schema ----
 
+// Must stay in sync with chk_br_tested_by (migration 0207).
+const VALID_TESTED_BY = [
+  "self-report",
+  "leaderboard",
+  "aisi-uk",
+  "aisi-us",
+  "metr",
+  "apollo",
+  "third-party-paper",
+  "epoch-ai",
+  "unknown",
+] as const;
+
 const SyncBenchmarkResultItemSchema = z.object({
   id: z.string().length(10),
   benchmarkId: z.string().min(1).max(200),
@@ -44,6 +57,14 @@ const SyncBenchmarkResultItemSchema = z.object({
   date: z.string().max(20).nullable().optional(),
   sourceUrl: z.string().max(2000).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+  // Provenance — added by QUA-689 Phase 2 foundation. Defaults preserve
+  // backwards compatibility with pre-Phase-2 ingesters that didn't supply
+  // these fields. The tested_by default 'unknown' lets the existing 357
+  // prod rows pass the CHECK on first sync without an explicit backfill.
+  testedBy: z.enum(VALID_TESTED_BY).default("unknown"),
+  testedByOrgId: z.string().max(200).nullable().optional(),
+  evaluationDate: z.string().max(20).nullable().optional(),
+  methodologyNotes: z.string().max(5000).nullable().optional(),
   sourcing: InlineSourcingSchema.optional(),
   claimIds: z.array(z.number().int().positive()).optional(),
 });
@@ -60,6 +81,10 @@ function formatRow(r: typeof benchmarkResults.$inferSelect) {
     date: r.date,
     sourceUrl: r.sourceUrl,
     notes: r.notes,
+    testedBy: r.testedBy,
+    testedByOrgId: r.testedByOrgId,
+    evaluationDate: r.evaluationDate,
+    methodologyNotes: r.methodologyNotes,
     syncedAt: r.syncedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,

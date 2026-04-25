@@ -1492,6 +1492,13 @@
       "when": 1787876500000,
       "tag": "0214_qua_693_ai_incidents",
       "breakpoints": true
+    },
+    {
+      "idx": 215,
+      "version": "7",
+      "when": 1787876600000,
+      "tag": "0215_qua_689_safety_benchmark_foundation",
+      "breakpoints": true
     }
   ]
 }
