@@ -250,7 +250,7 @@ describe("parseExtractionResponse", () => {
     const text = '{"value": "not-a-number", "is_numeric": true, "description": "Bad extraction"}';
     const result = parseExtractionResponse(text);
     expect(result.correctValue).toBeNull();
-    expect(result.description).toContain("not a valid number");
+    expect(result.description).toContain("not a valid finite number");
   });
 
   it("parses zero correctly", () => {

@@ -18,6 +18,72 @@
 import { createHash } from 'crypto';
 import { fetchSource } from '../lib/search/source-fetcher.ts';
 
+/**
+ * SSRF defense-in-depth for framework URLs (QUA-711 review feedback).
+ *
+ * Today the URLs come from a PR-reviewed YAML (`data/frameworks/*.yaml`),
+ * so the practical attack surface is small. But adding this guard now
+ * means the architecture is safe to evolve: any future move of these URLs
+ * into a database column, an enrichment proposal, or a webhook-driven
+ * surface inherits the defense automatically. Cloud-metadata (IMDS at
+ * 169.254.169.254) and internal-cluster RFC1918 services are the
+ * highest-value SSRF pivots and are explicitly rejected here.
+ *
+ * Tested against: loopback (127.x), all RFC1918 ranges (10.x, 172.16-31,
+ * 192.168.x), link-local (169.254.x), multicast (224+), 0.0.0.0,
+ * `localhost` and `*.localhost`, IPv6 loopback (::1), IPv6 unique-local
+ * (fc00::/7), IPv6 link-local (fe80::/10), and non-http(s) protocols
+ * (file://, ftp://). Returns the parsed URL on success.
+ */
+export function assertPublicHttpUrl(rawUrl: string): URL {
+  let parsed: URL;
+  try {
+    parsed = new URL(rawUrl);
+  } catch {
+    throw new Error(`framework URL is not a valid URL: ${rawUrl}`);
+  }
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') {
+    throw new Error(
+      `framework URL must be http(s), got ${parsed.protocol} for ${rawUrl}`,
+    );
+  }
+  const host = parsed.hostname.toLowerCase();
+  // IPv4 literal — explicit private / loopback / link-local / multicast / 0.x ranges.
+  const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
+  if (v4) {
+    const oct1 = Number(v4[1]);
+    const oct2 = Number(v4[2]);
+    if (
+      oct1 === 0 ||
+      oct1 === 10 ||
+      oct1 === 127 ||
+      oct1 >= 224 ||
+      (oct1 === 172 && oct2 >= 16 && oct2 <= 31) ||
+      (oct1 === 192 && oct2 === 168) ||
+      (oct1 === 169 && oct2 === 254)
+    ) {
+      throw new Error(
+        `framework URL resolves to a private/loopback IPv4 address (${host}): ${rawUrl}`,
+      );
+    }
+  }
+  // Hostname-literal loopback / IPv6 loopback / unique-local / link-local.
+  if (
+    host === 'localhost' ||
+    host.endsWith('.localhost') ||
+    host === '::1' ||
+    host.startsWith('[::1') ||
+    host.startsWith('[fc') ||
+    host.startsWith('[fd') ||
+    host.startsWith('[fe80')
+  ) {
+    throw new Error(
+      `framework URL resolves to a loopback/private host (${host}): ${rawUrl}`,
+    );
+  }
+  return parsed;
+}
+
 export interface FetchOptions {
   url: string;
   /** Max chars to include in the content hash / text payload. Default 200k. */
@@ -97,6 +163,12 @@ function mapContentType(
  */
 export async function fetchFramework(options: FetchOptions): Promise<FetchResult> {
   const { url, maxChars = 200_000, skipWayback = false, pushWayback = pushToWayback } = options;
+
+  // Reject private/loopback URLs before fetchSource() ever sees them — it
+  // calls Node fetch() directly and will happily walk into IMDS or
+  // RFC1918 internal services if a hostile URL ever lands in the YAML
+  // (or in any future source we add).
+  assertPublicHttpUrl(url);
 
   const fetched = await fetchSource({ url, extractMode: 'full' });
   if (fetched.status !== 'ok' || !fetched.content) {
