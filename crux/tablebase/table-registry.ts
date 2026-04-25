@@ -380,6 +380,16 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: '/api/third-party-evaluations/delete-batch',
     thingsSourceTable: 'third_party_evaluations',
   },
+
+  'ai-incidents': {
+    fetchByEntityPath: (id) => `/api/ai-incidents/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'incidents',
+    syncPath: '/api/ai-incidents/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/ai-incidents/delete-batch',
+    thingsSourceTable: 'ai_incidents',
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form

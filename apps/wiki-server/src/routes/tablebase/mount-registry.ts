@@ -70,6 +70,7 @@ import { frameworkDiffItemsRoute } from "./framework-diff-items.js";
 import { scorecardSnapshotsRoute } from "./scorecard-snapshots.js";
 import { scorecardGradesRoute } from "./scorecard-grades.js";
 import { thirdPartyEvaluationsRoute } from "./third-party-evaluations.js";
+import { aiIncidentsRoute } from "./ai-incidents.js";
 
 /**
  * The widest Hono route type that still satisfies `app.route()`. Every
@@ -145,6 +146,7 @@ export const TABLEBASE_MOUNTS: readonly TablebaseMount[] = [
   { path: "/api/scorecard-snapshots", route: scorecardSnapshotsRoute },
   { path: "/api/scorecard-grades", route: scorecardGradesRoute },
   { path: "/api/third-party-evaluations", route: thirdPartyEvaluationsRoute },
+  { path: "/api/ai-incidents", route: aiIncidentsRoute },
 ];
 
 /**

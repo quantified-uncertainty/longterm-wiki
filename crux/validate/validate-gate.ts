@@ -746,6 +746,17 @@ const PARALLEL_STEPS: Step[] = [
     // built data files (database.json, factbase-data.json). This is the
     // last line of defense — catches the symptom regardless of cause.
   },
+  {
+    id: 'aiid-no-report-text',
+    name: 'AIID ingest does not persist CC-BY-SA-excluded report bodies',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-aiid-no-report-text.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: MIT AI Incident Database snapshots are CC-BY-SA 4.0 except
+    // `submissions` and `reports.text`/`reports.plain_text`. This validator
+    // greps the AIID ingest + schema paths for symptoms of re-introducing
+    // those fields. QUA-693.
+  },
 ];
 
 // Phase 4 (--full only): Runs after all validations pass
