@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { toSyncItem } from './system-cards.ts';
+import { afterEach, beforeEach, describe, it, expect, vi } from 'vitest';
+import { commands, toSyncItem } from './system-cards.ts';
 import type { ExtractResult, ExtractedCard } from '../system-cards/extract-system-card.ts';
 import type { VerifyResult } from '../system-cards/span-verify.ts';
 
@@ -152,5 +152,102 @@ describe('toSyncItem', () => {
       sourceUrl: 'https://example.com/card.pdf',
     });
     expect(item.aiModelDisplayName).toBe('Claude 4.5 Sonnet');
+  });
+});
+
+// QUA-735: regression — argument parsing was broken because extractCommand
+// declared (opts) instead of (args, options), so the dispatcher's positional
+// args were silently dropped. These tests pin the standard signature by
+// driving extractCommand and the verb dispatcher through their validation
+// guards (which are reached before any LLM call) and asserting the right
+// usage/error message is emitted for each input shape.
+describe('extractCommand argument parsing', () => {
+  let logs: string[];
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    logs = [];
+    logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logs.push(args.map((a) => String(a)).join(' '));
+    });
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  it('errors with Usage when no URL is provided', async () => {
+    const result = await commands.extract([], { aiModel: 'sid_XXXXXXXXXX' });
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/Usage: crux tb system-cards extract <url>/);
+  });
+
+  it('errors with --ai-model required when URL is provided positionally', async () => {
+    const result = await commands.extract(['https://example.com/card.pdf'], {});
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/--ai-model=<entityId> is required/);
+  });
+
+  it('errors with --ai-model required when URL is provided via --url flag', async () => {
+    const result = await commands.extract([], { url: 'https://example.com/card.pdf' });
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/--ai-model=<entityId> is required/);
+  });
+
+  it('treats first non-flag arg as the URL even when flags appear first in args', async () => {
+    const result = await commands.extract(
+      ['--apply', 'https://example.com/card.pdf'],
+      {},
+    );
+    // URL was parsed → next guard (ai-model) is the one that fires.
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/--ai-model=<entityId> is required/);
+  });
+});
+
+describe('default subcommand dispatcher', () => {
+  let logs: string[];
+  let logSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    logs = [];
+    logSpy = vi.spyOn(console, 'log').mockImplementation((...args: unknown[]) => {
+      logs.push(args.map((a) => String(a)).join(' '));
+    });
+  });
+
+  afterEach(() => {
+    logSpy.mockRestore();
+  });
+
+  it('strips the `extract` verb so positional URL is preserved', async () => {
+    // `crux tb system-cards extract <url>` — dispatcher resolves command='system-cards'
+    // and routes args=['extract', '<url>', ...] here. The verb must be stripped
+    // before extractCommand reads the URL from args[0].
+    const result = await commands.default(
+      ['extract', 'https://example.com/card.pdf'],
+      {},
+    );
+    expect(result.exitCode).toBe(1);
+    // Got past the URL guard → ai-model guard is the one that fires.
+    expect(logs.join('\n')).toMatch(/--ai-model=<entityId> is required/);
+  });
+
+  it('handles bare URL (flat-form alias `system-cards-extract <url>`)', async () => {
+    const result = await commands.default(['https://example.com/card.pdf'], {});
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/--ai-model=<entityId> is required/);
+  });
+
+  it('errors with Usage when only the verb is given (no URL)', async () => {
+    const result = await commands.default(['extract'], {});
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/Usage: crux tb system-cards extract <url>/);
+  });
+
+  it('errors with Usage on completely empty args', async () => {
+    const result = await commands.default([], {});
+    expect(result.exitCode).toBe(1);
+    expect(logs.join('\n')).toMatch(/Usage: crux tb system-cards extract <url>/);
   });
 });

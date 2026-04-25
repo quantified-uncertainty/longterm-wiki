@@ -108,12 +108,12 @@ function resolveLlmModel(name?: string): string {
   return name;
 }
 
-async function extractCommand(opts: SystemCardOptions): Promise<CommandResult> {
+async function extractCommand(args: string[], opts: SystemCardOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(opts.ci));
 
-  // Support both positional URL (via --args=<url>) and --url flag.
-  const args = (opts as { args?: unknown[] }).args;
-  const positional = Array.isArray(args) && typeof args[0] === 'string' ? (args[0] as string) : undefined;
+  // Support both positional URL and --url flag. The dispatcher passes the
+  // raw positional arg array, so the URL is the first non-flag entry.
+  const positional = args.find((a) => typeof a === 'string' && !a.startsWith('--'));
   const url = opts.url ?? positional;
   if (!url) {
     log.error('Usage: crux tb system-cards extract <url> --ai-model=<entityId> [--apply] [--lab=<key>]');
@@ -205,9 +205,23 @@ async function extractCommand(opts: SystemCardOptions): Promise<CommandResult> {
   return { output: '', exitCode: 0 };
 }
 
+// Dispatch the `extract` sub-subcommand. When invoked as
+// `crux tb system-cards extract <url>`, the dispatcher routes the trailing
+// args (including the verb `extract`) here; we strip the verb before
+// forwarding to extractCommand. When invoked as
+// `crux tb system-cards-extract <url>` (the flat alias), the verb is
+// already absent.
+async function defaultCommand(args: string[], opts: SystemCardOptions): Promise<CommandResult> {
+  const first = args[0];
+  if (first === 'extract') {
+    return extractCommand(args.slice(1), opts);
+  }
+  return extractCommand(args, opts);
+}
+
 export const commands = {
   extract: extractCommand,
-  default: extractCommand,
+  default: defaultCommand,
 };
 
 export function getHelp(): string {

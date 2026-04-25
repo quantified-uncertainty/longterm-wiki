@@ -90,11 +90,10 @@ function resolveLlmModel(name?: string): string {
 // Subcommands
 // ---------------------------------------------------------------------------
 
-async function extractCommand(opts: FrameworkOptions): Promise<CommandResult> {
+async function extractCommand(args: string[], opts: FrameworkOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(opts.ci));
 
-  const args = (opts as { args?: unknown[] }).args;
-  const positional = Array.isArray(args) && typeof args[0] === 'string' ? (args[0] as string) : undefined;
+  const positional = args.find((a) => typeof a === 'string' && !a.startsWith('--'));
   const url = opts.url ?? positional;
   if (!url) {
     log.error(
@@ -188,13 +187,12 @@ async function extractCommand(opts: FrameworkOptions): Promise<CommandResult> {
   return { output: '', exitCode: 0 };
 }
 
-async function diffCommand(opts: FrameworkOptions): Promise<CommandResult> {
+async function diffCommand(args: string[], opts: FrameworkOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(opts.ci));
 
-  const args = (opts as { args?: unknown[] }).args;
-  const positional = Array.isArray(args) ? args : [];
-  const fromVersion = opts.fromVersion ?? (typeof positional[0] === 'string' ? positional[0] : undefined);
-  const toVersion = opts.toVersion ?? (typeof positional[1] === 'string' ? positional[1] : undefined);
+  const positional = args.filter((a) => typeof a === 'string' && !a.startsWith('--'));
+  const fromVersion = opts.fromVersion ?? positional[0];
+  const toVersion = opts.toVersion ?? positional[1];
   if (!fromVersion || !toVersion) {
     log.error(
       'Usage: crux tb frameworks diff <fromVersionId> <toVersionId> [--apply] [--skip-classifier]',
@@ -285,11 +283,10 @@ async function diffCommand(opts: FrameworkOptions): Promise<CommandResult> {
   return { output: '', exitCode: 0 };
 }
 
-async function fetchCommand(opts: FrameworkOptions): Promise<CommandResult> {
+async function fetchCommand(args: string[], opts: FrameworkOptions): Promise<CommandResult> {
   const log = createLogger(Boolean(opts.ci));
 
-  const args = (opts as { args?: unknown[] }).args;
-  const positional = Array.isArray(args) && typeof args[0] === 'string' ? (args[0] as string) : undefined;
+  const positional = args.find((a) => typeof a === 'string' && !a.startsWith('--'));
   const url = opts.url ?? positional;
   if (!url) {
     log.error('Usage: crux tb frameworks fetch <url> [--skip-wayback] [--json]');
@@ -516,24 +513,21 @@ async function ingestCommand(
 // `(args, options)` two-arg signature, since they need flag-driven options.
 //
 // `default` dispatches based on the first positional arg: `crux tb frameworks
-// list` → listCommand; `seed` / `ingest` similarly. Otherwise falls back to
-// listCommand. The hyphenated aliases (`frameworks-list`, `frameworks-seed`,
-// `frameworks-ingest`) registered in tablebase.ts always work too.
+// list` → listCommand; `seed` / `ingest` / `extract` / `diff` / `fetch`
+// similarly. Otherwise falls back to listCommand. The hyphenated aliases
+// (`frameworks-list`, `frameworks-seed`, `frameworks-ingest`,
+// `frameworks-extract`, etc.) registered in tablebase.ts always work too.
 // ---------------------------------------------------------------------------
 
-type ArgsOptionsHandler = (args: string[], options: CommandOptions) => Promise<CommandResult>;
-type LegacyOptsHandler = (opts: FrameworkOptions) => Promise<CommandResult>;
+type SubcommandHandler = (args: string[], options: CommandOptions) => Promise<CommandResult>;
 
-const REGISTRY_DRIVEN: Record<string, ArgsOptionsHandler> = {
-  list: listCommand,
-  seed: seedCommand,
-  ingest: ingestCommand,
-};
-
-const LEGACY: Record<string, LegacyOptsHandler> = {
-  extract: extractCommand,
-  diff: diffCommand,
-  fetch: fetchCommand,
+const SUBCOMMANDS: Record<string, SubcommandHandler> = {
+  list: listCommand as SubcommandHandler,
+  seed: seedCommand as SubcommandHandler,
+  ingest: ingestCommand as SubcommandHandler,
+  extract: extractCommand as SubcommandHandler,
+  diff: diffCommand as SubcommandHandler,
+  fetch: fetchCommand as SubcommandHandler,
 };
 
 async function defaultCommand(
@@ -541,11 +535,8 @@ async function defaultCommand(
   options: CommandOptions,
 ): Promise<CommandResult> {
   const first = Array.isArray(args) && typeof args[0] === 'string' ? args[0] : null;
-  if (first && first in REGISTRY_DRIVEN) {
-    return REGISTRY_DRIVEN[first]!(args.slice(1), options);
-  }
-  if (first && first in LEGACY) {
-    return LEGACY[first]!({ ...options, args: args.slice(1) } as FrameworkOptions);
+  if (first && first in SUBCOMMANDS) {
+    return SUBCOMMANDS[first]!(args.slice(1), options);
   }
   return listCommand(args, options as RegistryDrivenOptions);
 }
