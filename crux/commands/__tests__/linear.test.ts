@@ -598,6 +598,105 @@ describe('linear update', () => {
     expect(parsed.identifier).toBe('QUA-184');
     expect(parsed.changed).toEqual(['priority=medium']);
   });
+
+  // ── Bare-flag rejection (boolean coercion guard) ────────────────────────
+
+  it('rejects bare --project (boolean true) instead of crashing', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      // Mimics the CLI parser: `--project` with no value becomes boolean true.
+      project: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--project requires a value');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects bare --parent', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--parent requires a value');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects bare --title', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      title: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--title requires a value');
+  });
+
+  it('rejects empty --title (would clobber the issue title)', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      title: '',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--title cannot be empty');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('updates description from --description-file', async () => {
+    const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+    const { tmpdir } = await import('os');
+    const { join } = await import('path');
+    const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+    const file = join(dir, 'desc.md');
+    writeFileSync(file, '## New body');
+
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      descriptionFile: file,
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      description: '## New body',
+    });
+    unlinkSync(file);
+  });
+
+  it('reports failure when parent issue does not exist', async () => {
+    getIssueMock
+      .mockResolvedValueOnce(mockIssue) // initial issue lookup OK
+      .mockResolvedValueOnce(null);     // parent lookup fails
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: 'QUA-9999',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Parent issue not found');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects negative priority', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '-1',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid priority');
+  });
+
+  it('rejects priority above 4', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '5',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid priority');
+  });
 });
 
 // ---------------------------------------------------------------------------

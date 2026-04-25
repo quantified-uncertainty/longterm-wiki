@@ -570,7 +570,7 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
   const id = parseLinearId(args[0]);
   if (!id) {
     return {
-      output: `${c.red}Usage: crux linear update <QUA-NNN> [--project=<name|uuid>] [--priority=1-4] [--title=...] [--description=...] [--description-file=<path>] [--parent=QUA-NNN|none]${c.reset}\n`,
+      output: `${c.red}Usage: crux linear update <QUA-NNN> [--project=<name|uuid|none>] [--priority=0-4] [--title=...] [--description=...] [--description-file=<path>] [--parent=QUA-NNN|none]${c.reset}\n`,
       exitCode: 1,
     };
   }
@@ -580,10 +580,30 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
     return { output: `${c.red}Issue ${id} not found${c.reset}\n`, exitCode: 1 };
   }
 
+  // The CLI flag parser turns bare flags (e.g. `--title` with no value) into
+  // boolean `true`. Reject those upfront so we never coerce a boolean into a
+  // GraphQL string field. Each branch below assumes the option is a string.
+  const stringFlags: Array<[keyof CommandOptions, string]> = [
+    ['project', '--project'],
+    ['title', '--title'],
+    ['description', '--description'],
+    ['parent', '--parent'],
+    ['priority', '--priority'],
+  ];
+  for (const [key, flag] of stringFlags) {
+    const v = options[key];
+    if (v !== undefined && typeof v !== 'string') {
+      return {
+        output: `${c.red}${flag} requires a value, e.g. ${flag}="value"${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
+
   const input: UpdateIssueInput = {};
   const changed: string[] = [];
 
-  if (options.project !== undefined) {
+  if (typeof options.project === 'string') {
     if (options.project === '' || options.project.toLowerCase() === 'none') {
       input.projectId = null;
       changed.push('project=(cleared)');
@@ -600,7 +620,7 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
     }
   }
 
-  if (options.priority !== undefined) {
+  if (typeof options.priority === 'string') {
     const priority = parseInt(options.priority, 10);
     if (Number.isNaN(priority) || priority < 0 || priority > 4) {
       return {
@@ -612,7 +632,13 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
     changed.push(`priority=${priorityLabel(priority)}`);
   }
 
-  if (options.title !== undefined) {
+  if (typeof options.title === 'string') {
+    if (options.title.trim() === '') {
+      return {
+        output: `${c.red}--title cannot be empty${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
     input.title = options.title;
     changed.push('title');
   }
@@ -621,12 +647,12 @@ async function update(args: string[], options: CommandOptions): Promise<CommandR
   if (descFromFile !== null) {
     input.description = descFromFile;
     changed.push('description');
-  } else if (options.description !== undefined) {
+  } else if (typeof options.description === 'string') {
     input.description = options.description;
     changed.push('description');
   }
 
-  if (options.parent !== undefined) {
+  if (typeof options.parent === 'string') {
     if (options.parent === '' || options.parent.toLowerCase() === 'none') {
       input.parentId = null;
       changed.push('parent=(cleared)');
