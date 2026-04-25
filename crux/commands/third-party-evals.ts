@@ -31,11 +31,8 @@ import {
 } from "../third-party-evals/extract-eval-report.ts";
 import { verifyExtractedReport } from "../third-party-evals/span-verify.ts";
 import { resolveAiModel } from "../lib/ai-model-resolver.ts";
-import { ingestUkAisi } from "../third-party-evals/ingesters/uk-aisi-sitemap.ts";
-import { ingestMetr } from "../third-party-evals/ingesters/metr-rss.ts";
-import { ingestApollo } from "../third-party-evals/ingesters/apollo-research.ts";
-import { ingestCaisi } from "../third-party-evals/ingesters/caisi-blog.ts";
-import type { IngestResult } from "../third-party-evals/ingesters/types.ts";
+import { dispatchIngest } from "../third-party-evals/ingesters/dispatch.ts";
+import { backfillEvaluator } from "../third-party-evals/backfill.ts";
 
 interface ThirdPartyEvalOptions extends CommandOptions {
   evaluator?: string;
@@ -46,6 +43,31 @@ interface ThirdPartyEvalOptions extends CommandOptions {
   sourceSystem?: "sitemap" | "rss" | "html-scrape" | "manual";
   maxSourceChars?: string;
   ci?: boolean;
+  concurrency?: string;
+  batchSize?: string;
+  limit?: string;
+  dryRun?: boolean;
+}
+
+/**
+ * Parse a CLI numeric flag. Returns:
+ *   - undefined when the flag wasn't passed (caller falls back to default)
+ *   - Error with a usage message when the value is non-numeric or non-positive
+ *     (NaN would otherwise silently propagate to `pLimit(NaN)` and hang)
+ *   - the parsed positive integer otherwise
+ */
+function parsePositiveInt(
+  value: string | undefined,
+  flagName: string,
+): number | undefined | Error {
+  if (value === undefined) return undefined;
+  const n = parseInt(value, 10);
+  if (!Number.isFinite(n) || n < 1) {
+    return new Error(
+      `--${flagName} must be a positive integer (got '${value}')`,
+    );
+  }
+  return n;
 }
 
 function resolveLlmModel(name?: string): string {
@@ -55,28 +77,6 @@ function resolveLlmModel(name?: string): string {
   if (lower === "sonnet") return MODELS.sonnet;
   if (lower === "opus") return MODELS.opus;
   return name;
-}
-
-async function ingesterFor(
-  evaluator: string,
-  options: ThirdPartyEvalOptions,
-): Promise<IngestResult> {
-  const key = evaluator.trim().toLowerCase();
-  if (key === "uk-aisi" || key === "ukaisi") {
-    return ingestUkAisi({ sinceDate: options.since });
-  }
-  if (key === "us-aisi" || key === "caisi" || key === "usaisi") {
-    return ingestCaisi();
-  }
-  if (key === "metr") {
-    return ingestMetr();
-  }
-  if (key === "apollo" || key === "apollo-research") {
-    return ingestApollo();
-  }
-  throw new Error(
-    `Unknown evaluator '${evaluator}'. Valid: uk-aisi, us-aisi, metr, apollo`,
-  );
 }
 
 async function ingestSubcommand(
@@ -96,9 +96,9 @@ async function ingestSubcommand(
     };
   }
 
-  let result: IngestResult;
+  let result;
   try {
-    result = await ingesterFor(evaluator, options);
+    result = await dispatchIngest(evaluator, { since: options.since });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { output: msg, exitCode: 1 };
@@ -274,9 +274,99 @@ async function extractSubcommand(
   return { output: lines.join("\n"), exitCode: 0 };
 }
 
+async function backfillSubcommand(
+  args: string[],
+  options: ThirdPartyEvalOptions,
+): Promise<CommandResult> {
+  const log = createLogger(Boolean(options.ci));
+  const evaluator = args[0];
+  if (!evaluator) {
+    return {
+      output:
+        "Usage: crux tb third-party-evals backfill <uk-aisi|us-aisi|metr|apollo> --evaluator=<orgStableId> [--limit=N] [--concurrency=N] [--batch-size=N] [--since=YYYY-MM-DD] [--dry-run] [--model=haiku|sonnet]",
+      exitCode: 1,
+    };
+  }
+  if (!options.evaluator) {
+    return {
+      output:
+        "--evaluator=<orgStableId> is required (the stableId of the evaluator org entity).",
+      exitCode: 1,
+    };
+  }
+
+  const concurrency = parsePositiveInt(options.concurrency, "concurrency");
+  if (concurrency instanceof Error) return { output: concurrency.message, exitCode: 1 };
+  const batchSize = parsePositiveInt(options.batchSize, "batch-size");
+  if (batchSize instanceof Error) return { output: batchSize.message, exitCode: 1 };
+  const limit = parsePositiveInt(options.limit, "limit");
+  if (limit instanceof Error) return { output: limit.message, exitCode: 1 };
+
+  const result = await backfillEvaluator({
+    evaluator,
+    evaluatorOrgId: options.evaluator,
+    llmModel: resolveLlmModel(options.model),
+    concurrency,
+    batchSize,
+    limit,
+    since: options.since,
+    dryRun: Boolean(options.dryRun),
+    onProgress: (event) => {
+      if (event.kind === "extracted") {
+        log.dim(`  [${event.index}/${event.total}] ✓ ${event.url}`);
+      } else if (event.kind === "extract-error") {
+        log.warn(`  [${event.index}/${event.total}] ✗ ${event.url} — ${event.error}`);
+      } else if (event.kind === "synced") {
+        log.info(`  → synced batch ${event.batchIndex} (${event.count} rows)`);
+      } else {
+        log.error(`  → sync batch ${event.batchIndex} failed: ${event.error}`);
+      }
+    },
+  });
+
+  const lines: string[] = [];
+  lines.push("");
+  lines.push(`Backfill complete: ${result.evaluator}`);
+  lines.push(`  candidates:        ${result.candidates}`);
+  lines.push(`  extracted:         ${result.extracted}`);
+  lines.push(`  extract failures:  ${result.extractFailures.length}`);
+  lines.push(`  synced:            ${result.synced}${options.dryRun ? "  (dry-run, nothing posted)" : ""}`);
+  lines.push(`  sync failures:     ${result.syncFailures.length}`);
+  lines.push(`  duration:          ${(result.durationMs / 1000).toFixed(1)}s`);
+  if (result.extractFailures.length > 0) {
+    lines.push(``);
+    lines.push(`Extract failures:`);
+    for (const f of result.extractFailures.slice(0, 20)) {
+      lines.push(`  ${f.url}\n    ${f.error}`);
+    }
+    if (result.extractFailures.length > 20) {
+      lines.push(`  ... and ${result.extractFailures.length - 20} more`);
+    }
+  }
+  if (result.syncFailures.length > 0) {
+    lines.push(``);
+    lines.push(`Sync failures:`);
+    for (const f of result.syncFailures) {
+      lines.push(`  batch ${f.batchIndex}: ${f.error}`);
+    }
+  }
+
+  return { output: lines.join("\n"), exitCode: backfillExitCode(result) };
+}
+
+function backfillExitCode(result: {
+  candidates: number;
+  extractFailures: unknown[];
+  syncFailures: unknown[];
+}): number {
+  if (result.syncFailures.length > 0) return 2;
+  if (result.candidates > 0 && result.extractFailures.length === result.candidates) return 2;
+  return 0;
+}
+
 /**
  * Default dispatcher — reads the first positional arg as the
- * sub-subcommand verb and routes to ingest/extract.
+ * sub-subcommand verb and routes to ingest/extract/backfill.
  */
 async function defaultCommand(
   args: string[],
@@ -292,8 +382,11 @@ async function defaultCommand(
   if (verb === "extract") {
     return extractSubcommand(args.slice(1), options);
   }
+  if (verb === "backfill") {
+    return backfillSubcommand(args.slice(1), options);
+  }
   return {
-    output: `Unknown subcommand '${verb}'. Use 'ingest' or 'extract'.\n\n${getHelp()}`,
+    output: `Unknown subcommand '${verb}'. Use 'ingest', 'extract', or 'backfill'.\n\n${getHelp()}`,
     exitCode: 1,
   };
 }
@@ -304,6 +397,7 @@ export const commands: Record<
 > = {
   ingest: async (args, options) => ingestSubcommand(args, options),
   extract: async (args, options) => extractSubcommand(args, options),
+  backfill: async (args, options) => backfillSubcommand(args, options),
   default: defaultCommand,
 };
 
@@ -329,13 +423,25 @@ Subcommands:
                           --model=haiku|sonnet    LLM (default haiku)
                           --json                  raw JSON output
 
+  backfill <evaluator>  Ingest + extract + sync end-to-end (QUA-705)
+                          --evaluator=<orgId>     stableId of evaluator org (required)
+                          --concurrency=N         parallel extract calls (default 4)
+                          --batch-size=N          items per /sync POST (default 25)
+                          --limit=N               cap candidates (smoke test)
+                          --since=YYYY-MM-DD      skip older URLs (UK AISI only)
+                          --dry-run               extract but don't POST
+                          --model=haiku|sonnet    LLM (default haiku)
+
 Examples:
   crux tb third-party-evals ingest uk-aisi --since=2026-01-01
 
   crux tb third-party-evals extract https://www.aisi.gov.uk/blog/foo \\
       --evaluator=sid_aX0jkoaekQ --source-system=sitemap
 
-  crux tb third-party-evals extract https://metr.org/blog/bar \\
-      --evaluator=sid_rQEkFJxS5w --source-system=rss --apply
+  crux tb third-party-evals backfill uk-aisi --evaluator=sid_aX0jkoaekQ \\
+      --since=2025-01-01 --concurrency=4
+
+  crux tb third-party-evals backfill metr --evaluator=sid_rQEkFJxS5w \\
+      --limit=2 --dry-run
 `.trim();
 }

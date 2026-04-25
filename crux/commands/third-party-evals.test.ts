@@ -49,4 +49,56 @@ describe("third-party-evals CLI dispatcher", () => {
     expect(r.exitCode).toBe(1);
     expect(r.output).toContain("Usage: crux tb third-party-evals extract");
   });
+
+  it("backfill requires evaluator name", async () => {
+    const r = await commands.backfill([], {});
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("Usage: crux tb third-party-evals backfill");
+  });
+
+  it("backfill requires --evaluator flag", async () => {
+    const r = await commands.backfill(["uk-aisi"], {});
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("--evaluator=");
+  });
+
+  it("default routes to backfill on 'backfill' verb", async () => {
+    const r = await commands.default(["backfill"], {});
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("Usage: crux tb third-party-evals backfill");
+  });
+
+  it("default rejects unknown verb with new error message", async () => {
+    const r = await commands.default(["bogus"], {});
+    expect(r.exitCode).toBe(1);
+    // mentions all three valid verbs
+    expect(r.output).toMatch(/ingest.*extract.*backfill/);
+  });
+
+  it("backfill rejects non-numeric --concurrency (would otherwise hang on pLimit(NaN))", async () => {
+    const r = await commands.backfill(["uk-aisi"], {
+      evaluator: "sid_aX0jkoaekQ",
+      concurrency: "abc",
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("--concurrency must be a positive integer");
+  });
+
+  it("backfill rejects zero/negative --batch-size", async () => {
+    const r = await commands.backfill(["uk-aisi"], {
+      evaluator: "sid_aX0jkoaekQ",
+      batchSize: "0",
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("--batch-size must be a positive integer");
+  });
+
+  it("backfill rejects non-numeric --limit", async () => {
+    const r = await commands.backfill(["uk-aisi"], {
+      evaluator: "sid_aX0jkoaekQ",
+      limit: "many",
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain("--limit must be a positive integer");
+  });
 });
