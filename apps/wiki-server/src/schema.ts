@@ -4147,3 +4147,90 @@ export const enrichmentRuns = pgTable(
     index("idx_enrichment_runs_started_at").on(sql`${table.startedAt} DESC`),
   ],
 );
+
+/**
+ * Model system cards — structured extraction of fields published in flagship
+ * AI model / system cards. One row per published card. A model can have
+ * multiple cards over time (lab-side republications, hub updates).
+ *
+ * QUA-690 — Phase 3 of the AI safety data layer (parent: QUA-687).
+ *
+ * Uniqueness: (ai_model_id, version, release_date). `source_hash` captures
+ * silent edits — new hash for the same version = a new row documenting the
+ * drift, not an overwrite.
+ */
+export const modelSystemCards = pgTable(
+  "model_system_cards",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id at sync
+    aiModelDisplayName: text("ai_model_display_name"),
+    version: text("version"),
+    releaseDate: date("release_date"),
+    deprecationDate: date("deprecation_date"),
+    trainingCutoff: date("training_cutoff"),
+    trainingComputeFlops: numeric("training_compute_flops"),
+    trainingGpuHours: numeric("training_gpu_hours"),
+    trainingHardware: text("training_hardware"),
+    parametersTotal: bigint("parameters_total", { mode: "number" }),
+    parametersActive: bigint("parameters_active", { mode: "number" }),
+    architecture: text("architecture"), // dense | MoE | dense+thinking-switch | ...
+    modalitiesIn: text("modalities_in").array(),
+    modalitiesOut: text("modalities_out").array(),
+    contextWindowTokens: integer("context_window_tokens"),
+    outputWindowTokens: integer("output_window_tokens"),
+    languagesSupported: text("languages_supported").array(),
+    safetyFramework: text("safety_framework"), // ASL | Preparedness | FSF | RSP | ...
+    safetyTier: text("safety_tier"), // ASL-3 | High | Critical Level 2 | CCL-1 | ...
+    safetyTierDomains: jsonb("safety_tier_domains").$type<Record<string, string>>(),
+    safeguardsSummary: text("safeguards_summary"),
+    classifierDetails: jsonb("classifier_details").$type<Record<string, unknown>>(),
+    fineTuningPolicy: text("fine_tuning_policy"), // api-only | research-access | weights-released | closed
+    deploymentChannels: text("deployment_channels").array(),
+    evalScoresCited: jsonb("eval_scores_cited").$type<
+      Array<{
+        benchmark: string;
+        benchmarkId?: string | null;
+        score: number;
+        metric?: string | null;
+        setup?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    thirdPartyEvals: jsonb("third_party_evals").$type<
+      Array<{
+        evaluator: string;
+        url?: string | null;
+        summary?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    redTeamSummary: text("red_team_summary"),
+    incidentDisclosures: text("incident_disclosures"),
+    sourceUrl: text("source_url").notNull(),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    systemPromptUrl: text("system_prompt_url"),
+    usagePolicyUrl: text("usage_policy_url"),
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_msc_ai_model").on(table.aiModelId),
+    index("idx_msc_safety_framework").on(table.safetyFramework),
+    index("idx_msc_safety_tier").on(table.safetyTier),
+    index("idx_msc_release_date").on(sql`${table.releaseDate} DESC`),
+    uniqueIndex("uq_msc_natural_key").on(
+      table.aiModelId,
+      sql`COALESCE(${table.version}, '')`,
+      sql`COALESCE(${table.releaseDate}, '0001-01-01'::date)`,
+    ),
+  ],
+);
