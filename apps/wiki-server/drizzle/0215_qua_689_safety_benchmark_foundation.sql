@@ -1,5 +1,12 @@
 -- QUA-689 Phase 2 (foundation): Safety-benchmark ingestion schema extensions.
 --
+-- Numbering note: this migration is 0207, not 0206. The 0206 prefix is
+-- reserved for QUA-688 (`0206_qua_688_scorecard_tables.sql`), which is in
+-- review on `claude/qua-688-scorecard-mirror`. Skipping 0206 here avoids a
+-- duplicate-prefix collision regardless of merge order. The journal entry
+-- mirrors this gap (idx 205 → 207). The drizzle journal validator allows
+-- non-contiguous idx values; only duplicates are rejected.
+--
 -- Three changes to unblock the parallel ingester work in follow-up PRs:
 --
 --   1. benchmarks: extend the category vocabulary via a CHECK constraint and
@@ -116,6 +123,17 @@ CREATE INDEX IF NOT EXISTS "idx_br_tested_by_org_id"
 -- 2e. Re-apply the wider CHECK. 'third-party' is kept for backward compat
 -- with rows tagged by the QUA-702 model_system_cards postUpsert hook
 -- before this migration ran.
+
+-- Also forbid empty-string evaluation_date so it can't silently collide
+-- with NULL through the COALESCE(evaluation_date, '') in
+-- idx_br_benchmark_model_testedby_date. Either supply a real date string
+-- (preferably ISO YYYY-MM-DD) or NULL.
+ALTER TABLE "benchmark_results"
+  ADD CONSTRAINT "chk_br_evaluation_date_nonempty"
+  CHECK ("evaluation_date" IS NULL OR length("evaluation_date") > 0) NOT VALID;
+
+ALTER TABLE "benchmark_results" VALIDATE CONSTRAINT "chk_br_evaluation_date_nonempty";
+
 ALTER TABLE "benchmark_results"
   ADD CONSTRAINT "chk_br_tested_by"
   CHECK ("tested_by" IN (

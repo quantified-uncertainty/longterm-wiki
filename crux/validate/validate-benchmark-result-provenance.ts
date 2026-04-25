@@ -174,9 +174,12 @@ async function main(): Promise<void> {
 }
 
 // Only run main() when invoked as a script, not when imported by tests.
+// Strict equality only — a fallback like `endsWith(process.argv[1] ?? "")`
+// becomes `endsWith("")` when argv[1] is undefined, which matches ANY URL
+// and would call process.exit(0) inside test runners that import this module.
 const invokedAsScript =
-  import.meta.url === `file://${process.argv[1]}` ||
-  import.meta.url.endsWith(process.argv[1] ?? "");
+  typeof process.argv[1] === "string" &&
+  import.meta.url === `file://${process.argv[1]}`;
 if (invokedAsScript) {
   main().catch((err) => {
     console.error("validate-benchmark-result-provenance crashed:", err);

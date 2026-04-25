@@ -167,4 +167,36 @@ describe("benchmark_results_pending /sync", () => {
     });
     expect(res.status).toBe(400);
   });
+
+  it("rejects intra-batch duplicates AFTER slug resolution (post-resolution dedup)", async () => {
+    // The factory's naturalKey runs BEFORE preValidate, so without the
+    // post-resolution dedup added by QUA-689 the two items below would
+    // pass intra-batch dedup (different `benchmarkId` values: "mmlu"
+    // vs "bench-mmlu1") and only collide on PG's uq_brp_natural_key
+    // with a confusing SQL-level duplicate-key error instead of a
+    // clean 400. This test locks in the cleaner behavior.
+    const app = buildApp();
+    const res = await postJson(app, "/sync", {
+      items: [
+        {
+          id: "brp_postdup_1",
+          benchmarkId: "mmlu", // slug — preValidate rewrites to bench-mmlu1
+          rawModelName: "Claude 3.5 Sonnet",
+          ingesterSource: "helm-safety",
+          evaluationDate: "2025-10-01",
+        },
+        {
+          id: "brp_postdup_2",
+          benchmarkId: "bench-mmlu1", // already canonical
+          rawModelName: "Claude 3.5 Sonnet",
+          ingesterSource: "helm-safety",
+          evaluationDate: "2025-10-01",
+        },
+      ],
+    });
+    expect(res.status).toBe(400);
+    const body = (await res.json()) as { error?: string; message?: string };
+    const errMessage = body.message ?? body.error ?? "";
+    expect(errMessage.toLowerCase()).toMatch(/post slug-resolution|duplicate/);
+  });
 });

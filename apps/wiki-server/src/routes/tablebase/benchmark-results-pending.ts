@@ -192,16 +192,20 @@ const benchmarkResultsPendingApp = new Hono()
       name: "benchmark-results-pending",
       table: benchmarkResultsPending,
       syncSchema: SyncBenchmarkResultPendingItemSchema,
-      auditRecordType: "benchmark-results-pending",
-      naturalKey: (item) =>
-        [
-          item.ingesterSource,
-          item.benchmarkId,
-          item.rawModelName.toLowerCase(),
-          item.evaluationDate ?? "",
-        ].join("|"),
-      naturalKeyError:
-        "Duplicate (ingesterSource, benchmarkId, rawModelName, evaluationDate) in batch — see uq_brp_natural_key",
+      // No `auditRecordType` — pending row IDs (e.g. `brp_quarantine_helm_1`)
+      // can exceed the 10-char limit on `tablebase_audit_log.record_id`
+      // (varchar(10) NOT NULL). The factory writes `recordId: row.id` into
+      // that column, so audit logging would fail with "value too long" on
+      // every realistic ingester payload. Quarantine rows are also a
+      // short-lived, operator-curated queue — the relevant audit trail is
+      // the `resolved_*` columns recording who promoted/rejected each row.
+      // Note: we deliberately don't use the factory's `naturalKey` for
+      // intra-batch dedup here. The factory runs naturalKey BEFORE
+      // preValidate, but preValidate is what canonicalizes
+      // benchmarkId (slug → 10-char id). Two items with `mmlu` and
+      // `bench-mmlu1` for the same model would dedup-pass on raw input
+      // then collide on `uq_brp_natural_key` post-resolution. We do the
+      // dedup inside preValidate instead, on the post-resolution form.
       // benchmarkId references the benchmarks table (not entities), so we
       // can't use the factory's `entityRefs` shorthand. Validate it via
       // preValidate, mirroring benchmark-results.ts. Slug fallback is allowed
@@ -230,6 +234,27 @@ const benchmarkResultsPendingApp = new Hono()
           if (slugToId.has(item.benchmarkId)) {
             item.benchmarkId = slugToId.get(item.benchmarkId)!;
           }
+        }
+        // Post-resolution intra-batch dedup. Catches batches that mix slug
+        // and 10-char id forms of the same benchmark for the same
+        // (ingesterSource, model, evaluationDate). PG's uq_brp_natural_key
+        // would fail the upsert, but with a confusing duplicate-key SQL
+        // error instead of a clean 400.
+        const seen = new Set<string>();
+        for (const item of items) {
+          const key = [
+            item.ingesterSource,
+            item.benchmarkId,
+            item.rawModelName.toLowerCase(),
+            item.evaluationDate ?? "",
+          ].join("|");
+          if (seen.has(key)) {
+            return validationError(
+              c,
+              `Duplicate (ingesterSource, benchmarkId, rawModelName, evaluationDate) in batch (post slug-resolution): ${key}`,
+            );
+          }
+          seen.add(key);
         }
         return null;
       },

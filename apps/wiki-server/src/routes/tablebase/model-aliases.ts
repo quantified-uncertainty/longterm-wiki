@@ -195,7 +195,14 @@ const modelAliasesApp = new Hono()
       // with an unknown model_stable_id surfaces as a constraint-violation
       // error from the upsert phase. Phase 2 ingesters always resolve
       // canonical stable_ids before sync, so this is the right boundary.
-      auditRecordType: "model-aliases",
+      //
+      // No `auditRecordType` — the factory's audit log assumes the table has
+      // an `id` column and writes `recordId: row.id` into
+      // `tablebase_audit_log.record_id` (varchar(10) NOT NULL). model_aliases
+      // uses `alias` as its PK, so audit logging would produce undefined
+      // recordIds and fail at insert time. Audit logging on an alias map is
+      // also low value — the canonical write history lives on the
+      // `model_stable_id` entity itself.
       toRow: (item, now) => ({
         alias: item.alias,
         modelStableId: item.modelStableId,
