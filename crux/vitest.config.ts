@@ -22,6 +22,8 @@ export default defineConfig({
       'tablebase/**/*.test.ts',
       'qa-sweep/**/*.test.ts',
       'resource-enrichment/**/*.test.ts',
+      'system-cards/**/*.test.ts',
+      'frameworks/**/*.test.ts',
     ],
     exclude: [],
     root: __dirname,

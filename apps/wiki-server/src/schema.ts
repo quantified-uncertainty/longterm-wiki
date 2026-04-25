@@ -2630,6 +2630,11 @@ export const VALID_THING_TYPES = [
   "publication",
   "political-race",
   "race-candidate",
+  "model-system-card",
+  "safety-framework",
+  "safety-framework-version",
+  "framework-threshold",
+  "framework-diff",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
@@ -4232,5 +4237,186 @@ export const modelSystemCards = pgTable(
       sql`COALESCE(${table.version}, '')`,
       sql`COALESCE(${table.releaseDate}, '0001-01-01'::date)`,
     ),
+  ],
+);
+
+// ============================================================================
+// QUA-691 / Phase 4 — Frontier safety framework tracker
+//
+// Structured tracker for the ~12 published frontier-safety frameworks
+// (Anthropic RSP, OpenAI Preparedness, DeepMind FSF, Meta, xAI, ...) with
+// per-version archival, extracted capability thresholds, and inter-version
+// diffs surfaced for weakening detection.
+//
+// Design:
+// - `safety_frameworks` — one row per lab's framework (~12 rows).
+// - `safety_framework_versions` — one row per published version. Natural
+//   key on (framework_id, content_hash) so silent lab edits become new
+//   rows documenting drift rather than overwrites.
+// - `framework_capability_thresholds` — extracted thresholds per version.
+//   Dual risk_domain columns: `risk_domain_canonical` (enum, for
+//   cross-lab matrix) + `risk_domain_label` (lab-native, for fidelity).
+//   `source_quote` MANDATORY — grounds every threshold row.
+// - `framework_diffs` — version-pair diff aggregate. Never auto-publish
+//   weakening: `review_verdict` defaults to 'unreviewed' and the public
+//   UI must gate on a human-confirmed verdict.
+// - `framework_diff_items` — per-change atomic rows that compose a diff.
+// - `framework_ingest_log` — audit trail of every fetch; enables
+//   silent-update detection.
+// ============================================================================
+
+export const safetyFrameworks = pgTable(
+  "safety_frameworks",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    orgId: text("org_id").notNull(), // FK resolved to entities.stable_id at sync
+    orgDisplayName: text("org_display_name"),
+    name: text("name").notNull(), // "Responsible Scaling Policy"
+    shortName: text("short_name"), // "RSP"
+    latestVersionId: text("latest_version_id"),
+    firstPublishedDate: date("first_published_date"),
+    currentStatus: text("current_status"), // active | archived | superseded | draft
+    frameworkFamily: text("framework_family"), // groups Meta FAF+AASF as same family
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sf_org").on(table.orgId),
+    index("idx_sf_status").on(table.currentStatus),
+    index("idx_sf_family").on(table.frameworkFamily),
+  ],
+);
+
+export const safetyFrameworkVersions = pgTable(
+  "safety_framework_versions",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    versionLabel: text("version_label").notNull(), // "3.1", "v2 draft", "Feb 2025"
+    versionSortOrder: integer("version_sort_order").notNull(), // monotonic
+    publishedDate: date("published_date"),
+    discoveredDate: date("discovered_date").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    sourceUrlCanonical: text("source_url_canonical"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    pdfArchiveUrl: text("pdf_archive_url"),
+    contentHash: text("content_hash").notNull(), // sha256 of normalized text
+    contentLengthChars: integer("content_length_chars"),
+    summary: text("summary"), // LLM-generated 2-3 sentence summary
+    isDraft: boolean("is_draft").notNull().default(false),
+    supersededByVersionId: text("superseded_by_version_id"),
+    ingestStatus: text("ingest_status").notNull().default("pending_review"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sfv_framework").on(table.frameworkId),
+    index("idx_sfv_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_sfv_ingest_status").on(table.ingestStatus),
+    uniqueIndex("uq_sfv_content_hash").on(table.frameworkId, table.contentHash),
+  ],
+);
+
+export const frameworkCapabilityThresholds = pgTable(
+  "framework_capability_thresholds",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    versionId: text("version_id").notNull(),
+    riskDomainCanonical: text("risk_domain_canonical").notNull(),
+    riskDomainLabel: text("risk_domain_label").notNull(),
+    tierLabel: text("tier_label").notNull(),
+    tierSortOrder: integer("tier_sort_order").notNull(), // 1=lowest, 4=severe
+    triggerDescription: text("trigger_description").notNull(),
+    sourceQuote: text("source_quote").notNull(), // MANDATORY — grounds extraction
+    sourcePageHint: text("source_page_hint"), // "§3.2", "p. 14"
+    requiredMitigations: jsonb("required_mitigations").$type<Record<string, unknown>>(),
+    associatedEvals: jsonb("associated_evals").$type<Record<string, unknown>>(),
+    commitmentLanguage: text("commitment_language"), // committed|aspirational|conditional|informational
+    extractedByModel: text("extracted_by_model"),
+    extractionConfidence: numeric("extraction_confidence"),
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    humanReviewNotes: text("human_review_notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fct_version").on(table.versionId),
+    index("idx_fct_canonical_domain").on(table.riskDomainCanonical),
+    index("idx_fct_tier_sort").on(table.tierSortOrder),
+    index("idx_fct_reviewed").on(table.humanReviewed),
+  ],
+);
+
+export const frameworkDiffs = pgTable(
+  "framework_diffs",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    fromVersionId: text("from_version_id").notNull(),
+    toVersionId: text("to_version_id").notNull(),
+    changeSummary: text("change_summary").notNull(),
+    weakeningFlagged: boolean("weakening_flagged").notNull().default(false),
+    strengtheningFlagged: boolean("strengthening_flagged").notNull().default(false),
+    neutralChangesCount: integer("neutral_changes_count"),
+    diffDetails: jsonb("diff_details").$type<Record<string, unknown>>(),
+    overallDirection: text("overall_direction"), // weaker|stronger|mixed|neutral|rewrite
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    reviewVerdict: text("review_verdict").notNull().default("unreviewed"),
+    reviewNotes: text("review_notes"),
+    classifiedByModel: text("classified_by_model"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fd_from").on(table.fromVersionId),
+    index("idx_fd_to").on(table.toVersionId),
+    index("idx_fd_weakening").on(table.weakeningFlagged),
+    index("idx_fd_direction").on(table.overallDirection),
+    uniqueIndex("uq_fd_version_pair").on(table.fromVersionId, table.toVersionId),
+  ],
+);
+
+export const frameworkDiffItems = pgTable(
+  "framework_diff_items",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    diffId: text("diff_id").notNull(),
+    changeType: text("change_type").notNull(), // threshold_added|threshold_removed|...
+    riskDomainCanonical: text("risk_domain_canonical"),
+    beforeSnapshot: jsonb("before_snapshot").$type<Record<string, unknown>>(),
+    afterSnapshot: jsonb("after_snapshot").$type<Record<string, unknown>>(),
+    severity: integer("severity"), // 1-3
+    classifierTag: text("classifier_tag"), // weaker|stronger|rewrite_equivalent|...
+    rationale: text("rationale"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fdi_diff").on(table.diffId),
+    index("idx_fdi_change_type").on(table.changeType),
+  ],
+);
+
+export const frameworkIngestLog = pgTable(
+  "framework_ingest_log",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    sourceUrl: text("source_url").notNull(),
+    contentHash: text("content_hash"),
+    status: text("status").notNull(), // new_version|unchanged|silent_update_detected|fetch_failed
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fil_framework").on(table.frameworkId),
+    index("idx_fil_status").on(table.status),
+    index("idx_fil_fetched_at").on(sql`${table.fetchedAt} DESC`),
   ],
 );

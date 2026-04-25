@@ -296,6 +296,53 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: '/api/model-system-cards/delete-batch',
     thingsSourceTable: 'model_system_cards',
   },
+
+  // ── Frontier safety framework tracker (QUA-691 Phase 4) ───────────────
+  'safety-frameworks': {
+    fetchByEntityPath: (id) => `/api/safety-frameworks/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/safety-frameworks/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/safety-frameworks/delete-batch',
+    thingsSourceTable: 'safety_frameworks',
+  },
+  'safety-framework-versions': {
+    fetchByEntityPath: (id) => `/api/safety-framework-versions/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/safety-framework-versions/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/safety-framework-versions/delete-batch',
+    thingsSourceTable: 'safety_framework_versions',
+  },
+  'framework-capability-thresholds': {
+    fetchByEntityPath: (id) => `/api/framework-capability-thresholds/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-capability-thresholds/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-capability-thresholds/delete-batch',
+    thingsSourceTable: 'framework_capability_thresholds',
+  },
+  'framework-diffs': {
+    fetchByEntityPath: (id) => `/api/framework-diffs/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-diffs/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-diffs/delete-batch',
+    thingsSourceTable: 'framework_diffs',
+  },
+  'framework-diff-items': {
+    fetchByEntityPath: (id) => `/api/framework-diff-items/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-diff-items/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-diff-items/delete-batch',
+    thingsSourceTable: null,
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form

@@ -1443,6 +1443,13 @@
       "when": 1787386400000,
       "tag": "0205_qua_690_model_system_cards",
       "breakpoints": true
+    },
+    {
+      "idx": 206,
+      "version": "7",
+      "when": 1787472800000,
+      "tag": "0206_qua_691_safety_frameworks",
+      "breakpoints": true
     }
   ]
 }
