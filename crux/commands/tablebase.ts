@@ -1503,10 +1503,14 @@ export const commands = {
   'system-cards': systemCardsCommands.default,
   'system-cards-extract': systemCardsCommands.extract,
   // QUA-691: frontier-safety-framework tracker.
+  // QUA-707 added registry-driven `list`, `seed`, and `ingest` subcommands.
   'frameworks': frameworksCommands.default,
   'frameworks-extract': frameworksCommands.extract,
   'frameworks-diff': frameworksCommands.diff,
   'frameworks-fetch': frameworksCommands.fetch,
+  'frameworks-list': frameworksCommands.list,
+  'frameworks-seed': frameworksCommands.seed,
+  'frameworks-ingest': frameworksCommands.ingest,
   // QUA-692: third-party evaluation index.
   'third-party-evals': thirdPartyEvalsCommands.default,
   'third-party-evals-ingest': thirdPartyEvalsCommands.ingest,
