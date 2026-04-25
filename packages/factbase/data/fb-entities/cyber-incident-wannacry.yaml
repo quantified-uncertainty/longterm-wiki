@@ -1,0 +1,43 @@
+entity: sid_PORgT8PnXQ
+facts:
+  - id: f_9NIQ0Wobtq
+    property: incident-date
+    value: "2017-05-12"
+    asOf: "2017-05-12"
+    source: https://www.cisa.gov/news-events/news/wannacry-ransomware
+    notes: "Worldwide propagation via EternalBlue SMB exploit; kill switch identified within hours"
+
+  - id: f_n62tOy4Cqp
+    property: financial-impact
+    value: 1e+9
+    asOf: "2017-12"
+    source: https://www.kaspersky.com/about/press-releases/2017_wannacry-and-other-cyberattacks
+    notes: "Lower-bound industry estimate (~$1B direct costs)"
+
+  - id: f_IqK3yn9Ffc
+    property: financial-impact
+    value: 4e+9
+    asOf: "2017-12"
+    source: https://www.cyberscoop.com/wannacry-cost-4-billion-cyence/
+    notes: "Cyence central estimate of ~$4B global damages"
+
+  - id: f_gMXAdx9G81
+    property: financial-impact
+    value: 8e+9
+    asOf: "2017-12"
+    source: https://www.cyberscoop.com/wannacry-cost-4-billion-cyence/
+    notes: "Cyence upper-bound scenario; includes business-interruption costs"
+
+  - id: f_aSQHqNgAC7
+    property: financial-impact
+    value: 9.2e+7
+    asOf: "2018-10"
+    source: https://www.gov.uk/government/news/securing-cyber-resilience-in-health-and-care-progress-update-on-the-departments-cyber-programme
+    notes: "UK NHS direct cost estimate ~£92M (Department of Health & Social Care)"
+
+  - id: f_2qFl41sNLj
+    property: incident-status
+    value: resolved
+    asOf: "2018-09"
+    source: https://www.justice.gov/opa/pr/north-korean-regime-backed-programmer-charged-conspiracy-conduct-multiple-cyber-attacks-and
+    notes: "DOJ charges against Park Jin Hyok (Lazarus Group, Sept 2018); kill switch neutralized propagation"
