@@ -88,6 +88,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
         dryRun: options.dryRun,
         model,
         skipSourcing: options.skipSourcing,
+        viaPropose: options.viaPropose,
       });
       results.push(result);
       totalCost += result.cost;

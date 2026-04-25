@@ -1,0 +1,123 @@
+# Risk-domain alias map for frontier safety frameworks (QUA-691 Phase 4).
+#
+# Each framework uses its own risk-domain terminology. This YAML maps
+# lab-specific labels to a canonical enum so the cross-lab matrix view
+# aligns rows, while per-framework detail pages preserve native labels.
+#
+# The canonical enum must stay in sync with migration 0206's
+# `chk_fct_risk_domain_canonical` CHECK constraint and
+# `frameworkCapabilityThresholds.riskDomainCanonical` validator
+# in the sync route.
+#
+# Update this file (not the code) when a new framework or a renamed
+# category lands. The extractor loads it at runtime.
+
+version: 1
+
+domains:
+  cbrn:
+    description: >
+      CBRN (chemical, biological, radiological, nuclear) considered
+      together. Use the more-specific 'bio', 'chem', 'nuclear', or
+      'radiological' where the framework separates them.
+    aliases:
+      - CBRN
+      - CBRNE
+      - Chemical, Biological, Radiological, Nuclear
+      - Weapons of Mass Destruction
+      - WMD
+
+  bio:
+    description: Biological / bioweapons domain.
+    aliases:
+      - Biological
+      - Bio
+      - Biological weapons
+      - Bioweapons
+      - Biosecurity
+      - Biological and Chemical
+      - Chem/Bio
+      - Chemical and biological
+
+  chem:
+    description: Chemical weapons / toxicology domain.
+    aliases:
+      - Chemical
+      - Chem
+      - Chemical weapons
+
+  nuclear:
+    description: Nuclear-weapons-related uplift.
+    aliases:
+      - Nuclear
+
+  radiological:
+    description: Radiological-weapons-related uplift.
+    aliases:
+      - Radiological
+
+  cyber:
+    description: Cyber-offense, cyber-attack, or cyber-uplift capabilities.
+    aliases:
+      - Cyber
+      - Cyberoffense
+      - Cyber offense
+      - Cybersecurity
+      - Offensive cyber
+      - Cyber capabilities
+
+  autonomy_replication:
+    description: >
+      Autonomous self-replication, self-exfiltration, resource acquisition.
+      Not the same as ai_rd (automation of ML research).
+    aliases:
+      - Autonomy
+      - Autonomous replication
+      - Self-replication
+      - Self-exfiltration
+      - Resource acquisition
+
+  ai_rd:
+    description: >
+      Automation or uplift of AI R&D itself (fine-tuning, training,
+      capability research). Increases recursive-improvement risk.
+    aliases:
+      - AI R&D
+      - AI Research and Development
+      - AI self-improvement
+      - Automated AI research
+      - ML R&D
+      - Model self-improvement
+      - Automated research
+
+  scheming:
+    description: Deceptive alignment, sandbagging, or scheming behavior.
+    aliases:
+      - Scheming
+      - Deceptive alignment
+      - Sandbagging
+      - Deception
+
+  persuasion:
+    description: >
+      Targeted persuasion, manipulation, or influence operations.
+      OpenAI v2 moved this out of Preparedness Framework into Model Spec;
+      track original placement when versioning.
+    aliases:
+      - Persuasion
+      - Manipulation
+      - Influence
+
+  loss_of_control:
+    description: >
+      Generic "loss of control" category used by Meta's Frontier AI
+      Framework. Spans autonomy + scheming + catastrophic misuse.
+    aliases:
+      - Loss of Control
+      - Loss-of-control
+
+  other:
+    description: >
+      Catch-all for categories that don't cleanly map to the above.
+      Preserves the verbatim label in risk_domain_label.
+    aliases: []

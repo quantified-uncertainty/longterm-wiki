@@ -9,22 +9,6 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: benchmark composer ----
-//
-// Trivial composer: title is item.name, description is item.description.
-// No leak risk; consolidating for consistency.
-interface BenchmarkComposerRow {
-  name: string;
-  description?: string | null;
-}
-
-registerComposer<BenchmarkComposerRow>("benchmark", (row) => ({
-  title: row.name,
-  description: row.description ?? null,
-  parentTitle: null,
-}));
 
 // ---- Constants ----
 
@@ -157,20 +141,14 @@ const benchmarksApp = new Hono()
       name: "benchmarks",
       table: benchmarks,
       syncSchema: SyncBenchmarkItemSchema,
-      toThing: (item) => {
-        const composed = composeThing<BenchmarkComposerRow>("benchmark", item, new Map());
-        return {
-          id: item.id,
-          thingType: "benchmark" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "benchmarks",
-          sourceId: item.id,
-          sourceUrl: item.website,
-          wikiId: item.slug,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "benchmark" as const,
+        sourceTable: "benchmarks",
+        sourceId: item.id,
+        sourceUrl: item.website,
+        wikiId: item.slug,
+      }),
     }),
   )
 

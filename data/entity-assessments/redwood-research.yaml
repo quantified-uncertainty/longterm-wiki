@@ -1,0 +1,19 @@
+# Entity assessments for Redwood Research (E557)
+# Source: content/docs/knowledge-base/organizations/redwood-research.mdx (## Quick Assessment)
+entityId: sid_dwMzc9WzPa
+assessments:
+  - dimension: focus-area
+    rating: AI systems acting against developer interests
+    evidence: Primary research on AI Control and alignment faking
+
+  - dimension: funding
+    rating: $25M+ from Coefficient Giving
+    evidence: "$9.4M (2021), $10.7M (2022), $5.3M (2023)"
+
+  - dimension: team-size
+    rating: 10 staff (2021), 6-15 research staff (2023 estimate)
+    evidence: Early team of 10 expanded to research organization
+
+  - dimension: key-concern
+    rating: Research output relative to funding
+    evidence: 2023 critics cited limited publications; subsequent ICML, NeurIPS work addressed this

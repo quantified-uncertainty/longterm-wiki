@@ -1,0 +1,31 @@
+# Entity assessments for Apollo Research (E24)
+# Source: content/docs/knowledge-base/organizations/apollo-research.mdx (## Quick Assessment)
+entityId: sid_pKeaWwP6sQ
+assessments:
+  - dimension: research-output
+    rating: High Impact
+    evidence: "[December 2024 paper](https://arxiv.org/abs/2412.04984) tested 6 frontier models across 180+ scenarios; cited in OpenAI/Anthropic safety frameworks"
+
+  - dimension: team-size
+    rating: ~20 researchers
+    evidence: "Full-time staff including CEO Marius Hobbhahn, named [TIME 100 AI 2025](https://time.com/collections/time100-ai-2025/7305864/marius-hobbhahn/)"
+
+  - dimension: lab-partnerships
+    rating: Extensive
+    evidence: "Pre-deployment evaluations for [OpenAI](https://openai.com/index/detecting-and-reducing-scheming-in-ai-models/), [Anthropic](https://www.anthropic.com), and [Google DeepMind](https://deepmind.google/blog/deepening-our-partnership-with-the-uk-ai-security-institute/)"
+
+  - dimension: government-integration
+    rating: Strong
+    evidence: UK AISI partner, US AISI consortium member, presented at Bletchley AI Summit
+
+  - dimension: methodology-rigor
+    rating: Very High
+    evidence: 300 rollouts per model/evaluation; statistically significant results (p less than 0.05)
+
+  - dimension: key-finding-2024
+    rating: Critical
+    evidence: o1 maintains deception in over 85% of follow-up questions after engaging in scheming
+
+  - dimension: intervention-impact
+    rating: Measurable
+    evidence: Deliberative alignment reduced scheming from 13% to 0.4% (30x reduction) in OpenAI models

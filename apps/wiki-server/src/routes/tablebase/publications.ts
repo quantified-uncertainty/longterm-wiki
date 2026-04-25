@@ -15,23 +15,6 @@ import {
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: publication composer ----
-interface PublicationComposerRow {
-  title: string;
-  entityId: string;
-  authors?: string | null;
-  venue?: string | null;
-  publishedDate?: string | null;
-}
-
-registerComposer<PublicationComposerRow>("publication", (row, titleMap) => ({
-  title: row.title,
-  description:
-    [row.authors, row.venue, row.publishedDate].filter(Boolean).join(", ") || null,
-  parentTitle: titleMap.get(row.entityId) ?? row.entityId,
-}));
 
 // ---- Constants ----
 
@@ -189,23 +172,14 @@ const publicationsApp = new Hono<{ Variables: ResolvedEntityVars }>()
       table: publications,
       syncSchema: SyncItemSchema,
       entityRefs: ["entityId"],
-      toThing: (item, titleMap) => {
-        const composed = composeThing<PublicationComposerRow>("publication", item, titleMap);
-        return {
-          id: item.id,
-          thingType: "publication" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "publications",
-          sourceId: item.id,
-          parentThingId: item.entityId,
-          sourceUrl: item.url ?? item.source ?? null,
-        };
-      },
-      thingsTitleIds: (items) => [
-        ...new Set(items.map((i) => i.entityId)),
-      ],
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "publication" as const,
+        sourceTable: "publications",
+        sourceId: item.id,
+        parentThingId: item.entityId,
+        sourceUrl: item.url ?? item.source ?? null,
+      }),
       toVerdict: (item) => ({
         recordType: "publication",
         recordId: item.id,

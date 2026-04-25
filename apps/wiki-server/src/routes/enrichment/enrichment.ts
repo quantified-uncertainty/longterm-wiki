@@ -35,6 +35,7 @@ import { grantsRoute } from "../tablebase/grants.js";
 import { personnelRoute } from "../tablebase/personnel.js";
 import { fundingRoundsRoute } from "../tablebase/funding-rounds.js";
 import { benchmarkResultsRoute } from "../tablebase/benchmark-results.js";
+import { enrichmentTargets } from "../../schema.js";
 import { checkT1Authority } from "./t1-allowlist.js";
 import { isHomepageUrl } from "./homepage-detector.js";
 
@@ -148,6 +149,13 @@ const ProposeRequestSchema = z
     // ─── Optional metadata ────
     runId: z.string().max(64).optional(),
     /**
+     * Optional USD cost for the verdict-LLM step on this proposal. When
+     * provided alongside `runId`, accumulates into `enrichment_runs.cost_usd`
+     * so the watchdog can compute $/hour. T1 and subscription-mode callers
+     * can omit it.
+     */
+    costUsd: z.number().nonnegative().max(1000).optional(),
+    /**
      * Per-field verdicts are NOT supported in Phase 1.  `writeInlineVerdicts`
      * hardcodes `field_name = NULL`, so accepting a non-null `fieldName` here
      * would gate the T1 field-restriction correctly but then write a
@@ -163,6 +171,25 @@ const ProposeRequestSchema = z
   .strict();
 
 type ProposeRequest = z.infer<typeof ProposeRequestSchema>;
+
+// Targets upsert schema — cap at 500 rows/call so we stay well under
+// Postgres's parameter limit when the seed CLI chunks.
+const TargetsUpsertSchema = z
+  .object({
+    targets: z
+      .array(
+        z.object({
+          entityId: z.string().min(1).max(200),
+          recordType: z.string().min(1).max(64),
+          estimatedTotal: z.number().int().nonnegative().max(1_000_000),
+          targetPct: z.number().min(0).max(1).optional(),
+          basis: z.string().max(500).optional(),
+          confidence: z.enum(["high", "medium", "low"]).optional(),
+        }),
+      )
+      .max(500),
+  })
+  .strict();
 
 // ── Route ───────────────────────────────────────────────────────────────
 
@@ -186,6 +213,7 @@ const enrichmentApp = new Hono()
         tier: req.tier,
         accepted: false,
         rejectionReason: gate.rejectionReason,
+        costUsd: req.costUsd,
       });
       logger.info(
         {
@@ -251,6 +279,7 @@ const enrichmentApp = new Hono()
         tier: req.tier,
         accepted: false,
         rejectionReason: reason.slice(0, 500),
+        costUsd: req.costUsd,
       });
       logger.warn(
         {
@@ -281,6 +310,7 @@ const enrichmentApp = new Hono()
       tier: req.tier,
       accepted: true,
       verdict: gate.sourcing.verdict,
+      costUsd: req.costUsd,
     });
 
     return c.json({
@@ -292,6 +322,281 @@ const enrichmentApp = new Hono()
       checkerModel: gate.sourcing.checkedBy ?? null,
       innerStatus: innerRes.status,
     });
+  })
+
+  // ── QUA-643: targets + coverage for the acceptance reopener ─────────────
+  // Auth is enforced by the global /api/* middleware in app.ts.
+  .post("/targets", async (c) => {
+    const body = await parseJsonBody(c);
+    if (!body) return invalidJsonError(c);
+
+    const parsed = TargetsUpsertSchema.safeParse(body);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+    const { targets } = parsed.data;
+    if (targets.length === 0) return c.json({ upserted: 0 });
+
+    try {
+      const db = getDrizzleDb();
+      await db
+        .insert(enrichmentTargets)
+        .values(
+          targets.map((t) => ({
+            entityId: t.entityId,
+            recordType: t.recordType,
+            estimatedTotal: t.estimatedTotal,
+            targetPct: t.targetPct ?? 0.7,
+            basis: t.basis ?? null,
+            confidence: t.confidence ?? null,
+          })),
+        )
+        .onConflictDoUpdate({
+          target: [enrichmentTargets.entityId, enrichmentTargets.recordType],
+          set: {
+            estimatedTotal: sql`EXCLUDED.estimated_total`,
+            targetPct: sql`EXCLUDED.target_pct`,
+            basis: sql`COALESCE(EXCLUDED.basis, enrichment_targets.basis)`,
+            confidence: sql`COALESCE(EXCLUDED.confidence, enrichment_targets.confidence)`,
+            estimatedAt: sql`NOW()`,
+            updatedAt: sql`NOW()`,
+          },
+        });
+      return c.json({ upserted: targets.length });
+    } catch (e: unknown) {
+      logger.error(
+        { err: e instanceof Error ? e.message : String(e) },
+        "enrichment.targets: upsert failed",
+      );
+      return c.json({ error: "database error" }, 500);
+    }
+  })
+  .get("/targets", async (c) => {
+    const recordType = c.req.query("recordType");
+    const entityId = c.req.query("entityId");
+    try {
+      const db = getDrizzleDb();
+      // Drizzle's dynamic WHERE builder is overkill for two optional filters;
+      // the COALESCE-on-NULL pattern compiles cleanly under postgres.js.
+      const rows = await db.execute<{
+        entity_id: string;
+        record_type: string;
+        estimated_total: number;
+        target_pct: number;
+        basis: string | null;
+        confidence: string | null;
+        estimated_at: string;
+      }>(sql`
+        SELECT entity_id, record_type, estimated_total, target_pct, basis, confidence, estimated_at
+        FROM enrichment_targets
+        WHERE (${recordType ?? null}::text IS NULL OR record_type = ${recordType ?? null})
+          AND (${entityId ?? null}::text IS NULL OR entity_id = ${entityId ?? null})
+        ORDER BY record_type, entity_id
+      `);
+      return c.json({
+        targets: rows.map((r) => ({
+          entityId: r.entity_id,
+          recordType: r.record_type,
+          estimatedTotal: r.estimated_total,
+          targetPct: r.target_pct,
+          basis: r.basis,
+          confidence: r.confidence,
+          estimatedAt: r.estimated_at,
+        })),
+      });
+    } catch (e: unknown) {
+      logger.error(
+        { err: e instanceof Error ? e.message : String(e) },
+        "enrichment.targets: query failed",
+      );
+      return c.json({ error: "database error" }, 500);
+    }
+  })
+  .get("/coverage", async (c) => {
+    const recordType = c.req.query("recordType");
+    const entityId = c.req.query("entityId");
+    try {
+      const db = getDrizzleDb();
+      // Record types without an entry in confirmed_by_entity (e.g.
+      // 'publications', 'divisions' from the denominator doc) fall through
+      // to actual_accepted=0. Each arm OR-matches both the legacy slug
+      // column and the resolved stableId column so targets keyed by slug
+      // still count records synced with either ID shape; DISTINCT on
+      // verdict record_id prevents double-counting when both match.
+      const rows = await db.execute<{
+        entity_id: string;
+        record_type: string;
+        estimated_total: number;
+        target_pct: number;
+        target_accepted: number;
+        actual_accepted: number;
+      }>(sql`
+        WITH resolved_targets AS (
+          -- Resolve each target entity_id (typically a slug from the
+          -- denominator doc) to BOTH its slug and its stable_id, so the
+          -- confirmed_by_entity subqueries can match against either the
+          -- legacy org_id/company_id/model_id columns or the resolved
+          -- entity FK columns.
+          SELECT
+            et.entity_id AS raw_entity_id,
+            et.record_type,
+            et.estimated_total,
+            et.target_pct,
+            COALESCE(e.id, et.entity_id) AS slug,
+            COALESCE(e.stable_id, et.entity_id) AS stable_id
+          FROM enrichment_targets et
+          LEFT JOIN entities e
+            ON e.id = et.entity_id OR e.stable_id = et.entity_id
+        ),
+        confirmed_by_entity AS (
+          SELECT
+            'personnel'::text AS record_type,
+            rt.raw_entity_id AS entity_id,
+            COUNT(DISTINCT v.record_id)::int AS cnt
+          FROM resolved_targets rt
+          JOIN personnel p
+            ON p.organization_id IN (rt.slug, rt.stable_id)
+            OR p.org_entity_id = rt.stable_id
+          JOIN source_check_verdicts v
+            ON v.record_id = p.id
+           AND v.record_type = 'personnel'
+           AND v.verdict = 'confirmed'
+          WHERE rt.record_type = 'personnel'
+          GROUP BY rt.raw_entity_id
+          UNION ALL
+          SELECT
+            'grants'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          JOIN grants g
+            ON g.organization_id IN (rt.slug, rt.stable_id)
+            OR g.org_entity_id = rt.stable_id
+          JOIN source_check_verdicts v
+            ON v.record_id = g.id
+           AND v.record_type = 'grants'
+           AND v.verdict = 'confirmed'
+          WHERE rt.record_type = 'grants'
+          GROUP BY rt.raw_entity_id
+          UNION ALL
+          SELECT
+            'funding-rounds'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          JOIN funding_rounds fr
+            ON fr.company_id IN (rt.slug, rt.stable_id)
+            OR fr.company_entity_id = rt.stable_id
+          JOIN source_check_verdicts v
+            ON v.record_id = fr.id
+           AND v.record_type = 'funding-rounds'
+           AND v.verdict = 'confirmed'
+          WHERE rt.record_type = 'funding-rounds'
+          GROUP BY rt.raw_entity_id
+          UNION ALL
+          SELECT
+            'benchmark-results'::text, rt.raw_entity_id, COUNT(DISTINCT v.record_id)::int
+          FROM resolved_targets rt
+          -- benchmark_results.model_id references entities.stable_id
+          -- directly (no legacy column), so only the stable_id path matches.
+          JOIN benchmark_results br ON br.model_id = rt.stable_id
+          JOIN source_check_verdicts v
+            ON v.record_id = br.id
+           AND v.record_type = 'benchmark-results'
+           AND v.verdict = 'confirmed'
+          WHERE rt.record_type = 'benchmark-results'
+          GROUP BY rt.raw_entity_id
+        )
+        SELECT
+          et.entity_id,
+          et.record_type,
+          et.estimated_total,
+          et.target_pct,
+          CEIL(et.estimated_total::numeric * et.target_pct::numeric)::int AS target_accepted,
+          COALESCE(c.cnt, 0) AS actual_accepted
+        FROM enrichment_targets et
+        LEFT JOIN confirmed_by_entity c
+          ON c.entity_id = et.entity_id
+         AND c.record_type = et.record_type
+        WHERE (${recordType ?? null}::text IS NULL OR et.record_type = ${recordType ?? null})
+          AND (${entityId ?? null}::text IS NULL OR et.entity_id = ${entityId ?? null})
+        ORDER BY
+          (CEIL(et.estimated_total::numeric * et.target_pct::numeric)::int - COALESCE(c.cnt, 0)) DESC,
+          et.record_type
+      `);
+      return c.json({
+        coverage: rows.map((r) => {
+          const gap = Math.max(0, r.target_accepted - r.actual_accepted);
+          const gapPct = r.target_accepted > 0 ? gap / r.target_accepted : 0;
+          return {
+            entityId: r.entity_id,
+            recordType: r.record_type,
+            estimatedTotal: r.estimated_total,
+            targetPct: r.target_pct,
+            targetAcceptedCount: r.target_accepted,
+            actualAcceptedCount: r.actual_accepted,
+            gapCount: gap,
+            gapPct,
+            meetsTarget: gap === 0,
+          };
+        }),
+      });
+    } catch (e: unknown) {
+      logger.error(
+        { err: e instanceof Error ? e.message : String(e) },
+        "enrichment.coverage: query failed",
+      );
+      return c.json({ error: "database error" }, 500);
+    }
+  })
+  .get("/runs", async (c) => {
+    // `?id=<runId>` short-circuits the 50-row cap so the watchdog can't
+    // miss its target on a busy server.
+    const idFilter = c.req.query("id");
+    const sinceIso = c.req.query("since");
+    try {
+      const db = getDrizzleDb();
+      const rows = await db.execute<{
+        id: string;
+        label: string | null;
+        tier: string | null;
+        entity_id: string | null;
+        record_type: string | null;
+        started_at: string;
+        finished_at: string | null;
+        proposes_total: number;
+        proposes_accepted: number;
+        proposes_rejected: number;
+        cost_usd: number;
+        updated_at: string;
+      }>(sql`
+        SELECT id, label, tier, entity_id, record_type,
+               started_at, finished_at,
+               proposes_total, proposes_accepted, proposes_rejected,
+               cost_usd, updated_at
+        FROM enrichment_runs
+        WHERE (${idFilter ?? null}::text IS NULL OR id = ${idFilter ?? null})
+          AND (${sinceIso ?? null}::timestamptz IS NULL OR updated_at >= ${sinceIso ?? null}::timestamptz)
+        ORDER BY updated_at DESC
+        LIMIT 50
+      `);
+      return c.json({
+        runs: rows.map((r) => ({
+          id: r.id,
+          label: r.label,
+          tier: r.tier,
+          entityId: r.entity_id,
+          recordType: r.record_type,
+          startedAt: r.started_at,
+          finishedAt: r.finished_at,
+          proposesTotal: r.proposes_total,
+          proposesAccepted: r.proposes_accepted,
+          proposesRejected: r.proposes_rejected,
+          costUsd: r.cost_usd,
+          updatedAt: r.updated_at,
+        })),
+      });
+    } catch (e: unknown) {
+      logger.error(
+        { err: e instanceof Error ? e.message : String(e) },
+        "enrichment.runs: query failed",
+      );
+      return c.json({ error: "database error" }, 500);
+    }
   });
 
 // ── Internals ────────────────────────────────────────────────────────────
@@ -411,6 +716,9 @@ interface LogRunArgs {
   accepted: boolean;
   rejectionReason?: string;
   verdict?: string;
+  /** USD cost the caller paid for this proposal's verdict-LLM step. Accumulates
+   *  into `enrichment_runs.cost_usd` for the watchdog (QUA-643). */
+  costUsd?: number;
 }
 
 async function logRunResult(args: LogRunArgs): Promise<void> {
@@ -429,6 +737,9 @@ async function logRunResult(args: LogRunArgs): Promise<void> {
   const vOu = args.accepted && args.verdict === "outdated" ? 1 : 0;
   const vPa = args.accepted && args.verdict === "partial" ? 1 : 0;
   const vUn = args.accepted && args.verdict === "unverifiable" ? 1 : 0;
+  // Accumulate caller-reported cost. Rejected proposals still cost money (the
+  // verdict LLM ran), so we bill both paths.
+  const cost = typeof args.costUsd === "number" && args.costUsd >= 0 ? args.costUsd : 0;
 
   try {
     const db = getDrizzleDb();
@@ -437,13 +748,15 @@ async function logRunResult(args: LogRunArgs): Promise<void> {
         id, tier, started_at,
         proposes_total, proposes_accepted, proposes_rejected,
         accepted_t1, accepted_t2, accepted_t3,
-        verdict_confirmed, verdict_contradicted, verdict_outdated, verdict_partial, verdict_unverifiable
+        verdict_confirmed, verdict_contradicted, verdict_outdated, verdict_partial, verdict_unverifiable,
+        cost_usd
       )
       VALUES (
         ${args.runId}, ${args.tier}, NOW(),
         1, ${a}, ${r},
         ${t1}, ${t2}, ${t3},
-        ${vCo}, ${vCn}, ${vOu}, ${vPa}, ${vUn}
+        ${vCo}, ${vCn}, ${vOu}, ${vPa}, ${vUn},
+        ${cost}
       )
       ON CONFLICT (id) DO UPDATE SET
         proposes_total = enrichment_runs.proposes_total + 1,
@@ -457,6 +770,7 @@ async function logRunResult(args: LogRunArgs): Promise<void> {
         verdict_outdated = enrichment_runs.verdict_outdated + EXCLUDED.verdict_outdated,
         verdict_partial = enrichment_runs.verdict_partial + EXCLUDED.verdict_partial,
         verdict_unverifiable = enrichment_runs.verdict_unverifiable + EXCLUDED.verdict_unverifiable,
+        cost_usd = enrichment_runs.cost_usd + EXCLUDED.cost_usd,
         updated_at = NOW()
     `);
   } catch (e: unknown) {

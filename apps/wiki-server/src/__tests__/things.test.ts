@@ -93,18 +93,22 @@ function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
 
   // --- things: INSERT ... ON CONFLICT DO UPDATE ---
+  // QUA-507: pointer-only schema (8 cols). The mock store still carries
+  // title/description/parent_title because we treat `things_search` as a
+  // synonym of `things`, so reads need those fields; seedThing layers them
+  // on top of the insert.
   if (q.includes("insert into") && q.includes('"things"')) {
-    // id, thingType, title, parentThingId, sourceTable, sourceId, entityType,
-    // description, sourceUrl, wikiId, parentTitle
-    const COLS = 11;
+    // id, thingType, parentThingId, sourceTable, sourceId, entityType,
+    // sourceUrl, wikiId
+    const COLS = 8;
     const numRows = params.length / COLS;
     const rows: Record<string, unknown>[] = [];
     const now = new Date();
     for (let i = 0; i < numRows; i++) {
       const o = i * COLS;
       const id = params[o] as string;
-      const sourceTable = params[o + 4] as string;
-      const sourceId = params[o + 5] as string;
+      const sourceTable = params[o + 3] as string;
+      const sourceId = params[o + 4] as string;
       const sourceKey = `${sourceTable}\0${sourceId}`;
 
       // Check if source key already exists (upsert)
@@ -114,15 +118,17 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       const row = makeThing({
         id: existing ? (existing.id as string) : id,
         thing_type: params[o + 1],
-        title: params[o + 2],
-        parent_thing_id: params[o + 3],
+        parent_thing_id: params[o + 2],
         source_table: sourceTable,
         source_id: sourceId,
-        entity_type: params[o + 6],
-        description: params[o + 7],
-        source_url: params[o + 8],
-        wiki_id: params[o + 9],
-        parent_title: params[o + 10],
+        entity_type: params[o + 5],
+        source_url: params[o + 6],
+        wiki_id: params[o + 7],
+        // Preserve title/description/parent_title set by seedThing; writers
+        // in real code stopped populating these at QUA-507.
+        title: existing?.title ?? null,
+        description: existing?.description ?? null,
+        parent_title: existing?.parent_title ?? null,
         created_at: existing?.created_at ?? now,
         updated_at: now,
         synced_at: now,
@@ -242,10 +248,10 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [{ count: filtered.length }];
   }
 
-  // --- things: SELECT by id (single thing lookup) ---
+  // --- things / things_search: SELECT by id (single thing lookup) ---
   // Matches: WHERE "id" = $1 LIMIT — no ORDER BY, no ILIKE, no FTS
   if (
-    q.includes('"things"') &&
+    hasThings &&
     q.includes("where") &&
     q.includes("limit") &&
     !q.includes("order by") &&
@@ -259,9 +265,9 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return row ? [row] : [];
   }
 
-  // --- things: SELECT with ORDER BY + LIMIT (paginated listing) ---
+  // --- things / things_search: SELECT with ORDER BY + LIMIT (paginated listing) ---
   if (
-    q.includes('"things"') &&
+    hasThings &&
     q.includes("order by") &&
     q.includes("limit") &&
     !q.includes("count(") &&
@@ -272,7 +278,7 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     const filtered = applyThingsFilters(q, params);
 
     filtered.sort((a, b) =>
-      (a.title as string).localeCompare(b.title as string)
+      (a.title as string ?? "").localeCompare(b.title as string ?? "")
     );
 
     // Last two numeric params are limit and offset
@@ -302,28 +308,37 @@ const { createApp } = await import("../app.js");
 
 // ---- Helpers ----
 
-function seedThing(
+async function seedThing(
   app: Hono,
   id: string,
   title: string,
   opts: Record<string, unknown> = {}
 ) {
-  return postJson(app, "/api/things/sync", {
+  // QUA-507: title / description / parent_title are NOT written by the
+  // pointer-only /sync endpoint. We inject them into the in-memory store
+  // post-sync so the mock MV (which shares the same store) returns them
+  // for reads.
+  const res = await postJson(app, "/api/things/sync", {
     things: [
       {
         id,
         thingType: opts.thingType ?? "entity",
-        title,
         sourceTable: opts.sourceTable ?? "entities",
         sourceId: opts.sourceId ?? id,
         entityType: opts.entityType ?? undefined,
-        description: opts.description ?? undefined,
         sourceUrl: opts.sourceUrl ?? undefined,
         wikiId: opts.wikiId ?? undefined,
         parentThingId: opts.parentThingId ?? undefined,
       },
     ],
   });
+  const row = thingsStore.get(id);
+  if (row) {
+    row.title = title;
+    if (opts.description !== undefined) row.description = opts.description;
+    if (opts.parentTitle !== undefined) row.parent_title = opts.parentTitle;
+  }
+  return res;
 }
 
 // ---- Tests ----
@@ -346,7 +361,6 @@ describe("Things API", () => {
           {
             id: "thing-anthropic",
             thingType: "entity",
-            title: "Anthropic",
             sourceTable: "entities",
             sourceId: "anthropic",
             entityType: "organization",
@@ -354,7 +368,6 @@ describe("Things API", () => {
           {
             id: "thing-openai",
             thingType: "entity",
-            title: "OpenAI",
             sourceTable: "entities",
             sourceId: "openai",
             entityType: "organization",
@@ -367,42 +380,18 @@ describe("Things API", () => {
       expect(body.upserted).toBe(2);
     });
 
-    it("persists parentTitle when supplied (QUA-435)", async () => {
-      const res = await postJson(app, "/api/things/sync", {
-        things: [
-          {
-            id: "thing-grant-1",
-            thingType: "grant",
-            title: "Grant to X",
-            sourceTable: "grants",
-            sourceId: "g1",
-            parentTitle: "Open Philanthropy",
-          },
-        ],
-      });
-
-      expect(res.status).toBe(200);
-      const stored = Array.from(thingsStore.values()).find(
-        (r) => r.source_id === "g1",
-      );
-      expect(stored).toBeDefined();
-      expect(stored?.parent_title).toBe("Open Philanthropy");
-    });
-
     it("rejects duplicate (sourceTable, sourceId) pairs within a batch", async () => {
       const res = await postJson(app, "/api/things/sync", {
         things: [
           {
             id: "thing-1",
             thingType: "entity",
-            title: "First",
             sourceTable: "entities",
             sourceId: "same-id",
           },
           {
             id: "thing-2",
             thingType: "entity",
-            title: "Second",
             sourceTable: "entities",
             sourceId: "same-id",
           },
@@ -423,7 +412,6 @@ describe("Things API", () => {
       const items = Array.from({ length: 201 }, (_, i) => ({
         id: `thing-${i}`,
         thingType: "entity" as const,
-        title: `Thing ${i}`,
         sourceTable: "entities",
         sourceId: `entity-${i}`,
       }));
@@ -432,13 +420,12 @@ describe("Things API", () => {
       expect(res.status).toBe(400);
     });
 
-    it("validates required fields (id, thingType, title, sourceTable, sourceId)", async () => {
+    it("validates required fields (id, thingType, sourceTable, sourceId)", async () => {
       // Missing id
       let res = await postJson(app, "/api/things/sync", {
         things: [
           {
             thingType: "entity",
-            title: "No ID",
             sourceTable: "entities",
             sourceId: "x",
           },
@@ -451,20 +438,6 @@ describe("Things API", () => {
         things: [
           {
             id: "thing-1",
-            title: "No Type",
-            sourceTable: "entities",
-            sourceId: "x",
-          },
-        ],
-      });
-      expect(res.status).toBe(400);
-
-      // Missing title
-      res = await postJson(app, "/api/things/sync", {
-        things: [
-          {
-            id: "thing-1",
-            thingType: "entity",
             sourceTable: "entities",
             sourceId: "x",
           },
@@ -478,7 +451,6 @@ describe("Things API", () => {
           {
             id: "thing-1",
             thingType: "entity",
-            title: "No Source",
             sourceId: "x",
           },
         ],
@@ -491,7 +463,6 @@ describe("Things API", () => {
           {
             id: "thing-1",
             thingType: "entity",
-            title: "No Source ID",
             sourceTable: "entities",
           },
         ],
@@ -505,7 +476,6 @@ describe("Things API", () => {
           {
             id: "thing-1",
             thingType: "invalid-type",
-            title: "Bad Type",
             sourceTable: "entities",
             sourceId: "x",
           },

@@ -20,6 +20,10 @@ import { rebaseAllPrs } from '../lib/pr-rebase.ts';
 import { resolveAllConflicts } from '../lib/conflict-resolution.ts';
 import { parseDeployTasksFromBody } from '../lib/deploy-tasks/detect.ts';
 import { parseLinearId } from '../lib/linear/parse-id.ts';
+import {
+  findOpenPrsMentioningLinearId,
+  type OpenPrMatch,
+} from '../lib/linear/dedup.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Test plan validation ─────────────────────────────────────────────────────
@@ -213,6 +217,51 @@ export function injectLinearRefs(
     injected: toInject,
     warnings,
   };
+}
+
+/**
+ * Extract the set of Linear IDs that will auto-close on PR merge, based on
+ * the `Fixes|Closes|Resolves QUA-NNN` markers GitHub/Linear parse. Used by
+ * the pre-PR dedup check to ask "which tickets is this PR about to claim?"
+ *
+ * Deliberately narrower than "any QUA-NNN mention" — we only block on
+ * auto-close collisions. Incidental mentions in the PR description (e.g.
+ * "related to QUA-500") are not a dedup signal.
+ */
+export function extractLinearAutoCloseRefs(body: string): string[] {
+  const ids = new Set<string>();
+  for (const m of body.matchAll(/(?:Fixes|Closes|Resolves)\s+(QUA-\d+)/gi)) {
+    ids.add(m[1].toUpperCase());
+  }
+  return [...ids];
+}
+
+export interface LinearPrCollision {
+  linearId: string;
+  prs: OpenPrMatch[];
+}
+
+/**
+ * For each Linear ID the PR is about to claim, find open PRs already
+ * referencing it. Any hit is a collision (QUA-304 Layer 3) — two sessions
+ * racing to ship the same ticket produces duplicate work.
+ *
+ * The `lookupPrs` dependency is injectable so callers can unit-test the
+ * decision logic without hitting the GitHub API. In production it defaults
+ * to `findOpenPrsMentioningLinearId`, which fails open on API errors.
+ *
+ * Lookups run in parallel — for an epic PR claiming several IDs, sequential
+ * awaits would add a network round-trip per ID. The GitHub Search API's
+ * 30/min rate limit comfortably absorbs the few-at-a-time burst.
+ */
+export async function checkLinearPrCollisions(
+  linearIds: string[],
+  lookupPrs: (id: string) => Promise<OpenPrMatch[]> = findOpenPrsMentioningLinearId,
+): Promise<LinearPrCollision[]> {
+  const results = await Promise.all(
+    linearIds.map(async (id) => ({ linearId: id, prs: await lookupPrs(id) })),
+  );
+  return results.filter((r) => r.prs.length > 0);
 }
 
 interface GitHubPR {
@@ -462,6 +511,35 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
         `  ${c.dim}Use \`crux gh pr fix-body\` to update the body if needed.${c.reset}\n`,
       exitCode: 0,
     };
+  }
+
+  // ── Pre-PR Linear dedup (QUA-304 Layer 3) ───────────────────────────────
+  // If this PR is about to claim a Linear ticket that another *open* PR
+  // already claims, refuse — two agents shipping duplicate PRs for the
+  // same QUA-NNN is the exact incident shape that motivated this check.
+  // Fail-open: `findOpenPrsMentioningLinearId` swallows API errors into an
+  // empty list, so a GitHub glitch never blocks PR creation.
+  if (body && !(options.force ?? options['allow-duplicate-linear'])) {
+    const claimedIds = extractLinearAutoCloseRefs(body);
+    if (claimedIds.length > 0) {
+      const collisions = await checkLinearPrCollisions(claimedIds);
+      if (collisions.length > 0) {
+        let msg = `${c.red}✗ Linear dedup collision — another open PR already claims this ticket.${c.reset}\n\n`;
+        for (const col of collisions) {
+          const label = col.prs.length === 1 ? 'Open PR' : `${col.prs.length} open PRs`;
+          msg += `  ${c.bold}${col.linearId}${c.reset} — ${label}:\n`;
+          for (const pr of col.prs) {
+            msg += `    ${c.cyan}#${pr.number}${c.reset} ${pr.title}\n`;
+            msg += `    ${c.dim}${pr.url}${c.reset}\n`;
+          }
+        }
+        msg +=
+          `\n  ${c.yellow}Investigate the existing PR(s) before opening a duplicate.${c.reset}\n` +
+          `  If the other PR is abandoned or you have explicit authorization,\n` +
+          `  re-run with ${c.bold}--force${c.reset} to bypass this check.\n`;
+        return { output: msg, exitCode: 2 };
+      }
+    }
   }
 
   const pr = await githubApi<GitHubPR>(`/repos/${REPO}/pulls`, {
@@ -1074,6 +1152,8 @@ Options (create):
   --skip-test-plan    Skip test plan validation (not recommended).
   --linear=QUA-NNN    Inject Linear issue references (comma-separated for epics: QUA-155,QUA-151).
                       Auto-detected from branch name and .claude/wip-checklist.md if omitted.
+  --force             Bypass the Linear dedup check (QUA-304). Use when the existing open PR is
+                      abandoned or you have explicit authorization to take over the claim.
   (stdin)             If --body and --body-file are absent and stdin is a pipe, body is read from stdin.
 
 Options (ready):

@@ -286,6 +286,90 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: null,
     thingsSourceTable: null,
   },
+
+  'model-system-cards': {
+    fetchByEntityPath: (id) => `/api/model-system-cards/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/model-system-cards/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/model-system-cards/delete-batch',
+    thingsSourceTable: 'model_system_cards',
+  },
+
+  // ── Frontier safety framework tracker (QUA-691 Phase 4) ───────────────
+  'safety-frameworks': {
+    fetchByEntityPath: (id) => `/api/safety-frameworks/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/safety-frameworks/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/safety-frameworks/delete-batch',
+    thingsSourceTable: 'safety_frameworks',
+  },
+  'safety-framework-versions': {
+    fetchByEntityPath: (id) => `/api/safety-framework-versions/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/safety-framework-versions/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/safety-framework-versions/delete-batch',
+    thingsSourceTable: 'safety_framework_versions',
+  },
+  'framework-capability-thresholds': {
+    fetchByEntityPath: (id) => `/api/framework-capability-thresholds/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-capability-thresholds/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-capability-thresholds/delete-batch',
+    thingsSourceTable: 'framework_capability_thresholds',
+  },
+  'framework-diffs': {
+    fetchByEntityPath: (id) => `/api/framework-diffs/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-diffs/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-diffs/delete-batch',
+    thingsSourceTable: 'framework_diffs',
+  },
+  'framework-diff-items': {
+    fetchByEntityPath: (id) => `/api/framework-diff-items/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/framework-diff-items/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/framework-diff-items/delete-batch',
+    thingsSourceTable: null,
+  },
+
+  // QUA-688: External scorecard mirror (FLI, SaferAI, AI Lab Watch, FMTI,
+  // Seoul Tracker). Parent + child shape — `scorecard_snapshots` is one row
+  // per (source, wave); `scorecard_grades` is one row per (snapshot, org,
+  // dimension). Neither syncs to `things` because they're aggregated /
+  // dimensional, not first-class entities.
+  'scorecard-snapshots': {
+    // Snapshots aren't keyed to an entity; the by-entity endpoint is unused.
+    // Kept consistent in case a discovery pass needs it later.
+    fetchByEntityPath: (id) => `/api/scorecard-snapshots/all?source=${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/scorecard-snapshots/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/scorecard-snapshots/delete-batch',
+    thingsSourceTable: null,
+  },
+
+  'scorecard-grades': {
+    fetchByEntityPath: (id) => `/api/scorecard-grades/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/scorecard-grades/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/scorecard-grades/delete-batch',
+    thingsSourceTable: null,
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form

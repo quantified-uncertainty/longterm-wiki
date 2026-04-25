@@ -13,20 +13,6 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: division composer ----
-interface DivisionComposerRow {
-  name: string;
-  parentOrgId: string;
-  divisionType?: string | null;
-}
-
-registerComposer<DivisionComposerRow>("division", (row, titleMap) => ({
-  title: row.name,
-  description: row.divisionType ?? null,
-  parentTitle: titleMap.get(row.parentOrgId) ?? row.parentOrgId,
-}));
 
 // ---- Constants ----
 
@@ -232,20 +218,14 @@ const divisionsApp = new Hono()
         syncedAt: sql`now()`,
         updatedAt: sql`now()`,
       },
-      thingsTitleIds: (items) => [...new Set(items.map((d) => d.parentOrgId))],
-      toThing: (item, titleMap) => {
-        const composed = composeThing<DivisionComposerRow>("division", item, titleMap);
-        return {
-          id: item.id,
-          thingType: "division" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "divisions",
-          sourceId: item.id,
-          sourceUrl: item.website ?? null,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "division" as const,
+        parentThingId: item.parentOrgId,
+        sourceTable: "divisions",
+        sourceId: item.id,
+        sourceUrl: item.website ?? null,
+      }),
       toVerdict: (item) => ({
         recordType: "division",
         recordId: item.id,

@@ -139,6 +139,13 @@ export interface LoopOptions {
   model?: string;
   /** Skip sourcing before submitting records */
   skipSourcing?: boolean;
+  /**
+   * QUA-655: route supported record types through
+   * `POST /api/enrichment/propose` (tier-aware defensive gate) instead of the
+   * direct `/sync` endpoint. Phase 1 supports grants only; non-T1 sources are
+   * surfaced to the agent instead of silently falling back.
+   */
+  viaPropose?: boolean;
 }
 
 /**

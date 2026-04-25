@@ -390,6 +390,13 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'things-denorm-dead',
+    name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-things-denorm-dead.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'factbase-fact-unit-field',
     name: 'FactBase facts use `currency:` not `unit:` (loader drops stray unit fields)',
     command: 'npx',
@@ -509,6 +516,19 @@ const PARALLEL_STEPS: Step[] = [
     // Advisory: depends on wiki-server being reachable. The check skips
     // gracefully when the server is unavailable (fail-open). Promotes to
     // blocking once orphan entities are consistently zero.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'scorecard-refs',
+    name: 'Scorecard data integrity (is_latest invariant + entity refs)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-scorecard-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires the wiki-server (scorecard tables live only in PG).
+    // Skips silently when offline. QUA-688 — will promote to blocking once
+    // ingesters land and the data baseline stabilizes.
     advisory: true,
     requiresServer: true,
     emitOutputInCi: true,

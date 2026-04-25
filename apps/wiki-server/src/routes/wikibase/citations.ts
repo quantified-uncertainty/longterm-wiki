@@ -25,6 +25,7 @@ import {
 } from "../../api-types.js";
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
+import { coerceDisplayName } from "../shared/display-name-coerce.js";
 
 // ---- Constants ----
 
@@ -139,12 +140,24 @@ async function dualWriteToSourcing(
     }
   }
 
+  // QUA-661: `entityDisplayName` is sourced from entities.title / wikiPages.title
+  // — if either ever contains a sid_ (upstream data corruption), we want to null
+  // it out here, not leak it into the UI. The local `displayName` is synthesized
+  // as `[slug] fnN: ...` so it can't be a sid_ and doesn't need coercion.
+  const safeDisplayName = displayName.slice(0, 500);
+  const safeEntityDisplayName = coerceDisplayName(
+    entityDisplayName?.slice(0, 500) ?? null,
+    "entityDisplayName",
+    "citation",
+    recordId,
+  );
+
   const verdictUpdated = await tx
     .update(sourceVerdicts)
     .set({
       entityId,
-      displayName: displayName.slice(0, 500),
-      entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
+      displayName: safeDisplayName,
+      entityDisplayName: safeEntityDisplayName,
       verdict: mappedVerdict,
       confidence: params.accuracyScore,
       reasoning: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
@@ -164,8 +177,8 @@ async function dualWriteToSourcing(
     try {
       await tx.insert(sourceVerdicts).values({
         recordType: "citation", recordId, fieldName: null,
-        entityId, displayName: displayName.slice(0, 500),
-        entityDisplayName: entityDisplayName?.slice(0, 500) ?? null,
+        entityId, displayName: safeDisplayName,
+        entityDisplayName: safeEntityDisplayName,
         verdict: mappedVerdict, confidence: params.accuracyScore,
         reasoning: params.issues ?? `Citation accuracy: ${params.accuracyVerdict}`,
         sourcesChecked: 1, needsRecheck: false,

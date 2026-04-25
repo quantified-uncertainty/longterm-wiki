@@ -1,0 +1,19 @@
+# Entity assessments for Anthropic (E22)
+# Source: content/docs/knowledge-base/organizations/anthropic.mdx (## Quick Assessment)
+entityId: sid_mK9pX3rQ7n
+assessments:
+  - dimension: mission-alignment
+    rating: Public benefit corporation with safety governance
+    evidence: "Long-Term Benefit Trust holds Class T stock with board voting power increasing from 1/5 directors (2023) to majority by 2027 [Harvard Law](https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/)"
+
+  - dimension: technical-capabilities
+    rating: 80.9% on SWE-bench Verified (Nov 2025)
+    evidence: "Claude Opus 4.5 first model above 80% on SWE-bench Verified; 42% enterprise coding market share vs OpenAI's 21% [Anthropic](https://www.anthropic.com/news/claude-opus-4-5), [TechCrunch](https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/)"
+
+  - dimension: safety-research
+    rating: Constitutional AI, mechanistic interpretability, model welfare
+    evidence: "Dictionary learning monitors ~10M neural features; 34M interpretable features identified via sparse autoencoders (2024); MIT Technology Review named interpretability work a 2026 Breakthrough Technology [Anthropic](https://transformer-circuits.pub/2024/scaling-monosemanticity/index.html), [MIT TR](https://www.technologyreview.com/2026/01/12/1130003/mechanistic-interpretability-ai-research-models-2026-breakthrough-technologies/)"
+
+  - dimension: known-risks
+    rating: Self-preservation behavior in testing
+    evidence: "Claude 3 Opus showed 12% alignment faking rate; Claude Opus 4 exhibited self-preservation actions in contrived test scenarios [Bank Info Security](https://www.bankinfosecurity.com/models-strategically-lie-finds-anthropic-study-a-27136), [Axios](https://www.axios.com/2025/05/23/anthropic-ai-deception-risk)"

@@ -132,7 +132,6 @@ function buildVerdictJoin(
     sql`${sourceVerdicts.fieldName} IS NULL`,
   );
 }
-const verdictJoinOnThings = buildVerdictJoin(things.sourceTable, things.sourceId);
 const verdictJoinOnThingsSearch = buildVerdictJoin(
   thingsSearch.sourceTable,
   thingsSearch.sourceId,
@@ -170,27 +169,26 @@ function formatThing(
 // formatSourcing and formatVerdict removed — sourcing live in
 // the unified /api/sourcing route. See discussion #2950.
 
-const sortColumns = {
-  title: things.title,
-  updated_at: things.updatedAt,
-  created_at: things.createdAt,
-  thing_type: things.thingType,
+// QUA-507: title/description moved to the things_search MV. List/children
+// endpoints read from `things_search` and sort on thingsSearch columns.
+const sortColumnsSearch = {
+  title: thingsSearch.title,
+  updated_at: thingsSearch.updatedAt,
+  created_at: thingsSearch.createdAt,
+  thing_type: thingsSearch.thingType,
 } as const;
 
-// ---- Sync schema ----
+// ---- Sync schema (QUA-507: pointer-only) ----
 
 const SyncThingSchema = z.object({
   id: z.string().min(1).max(200),
   thingType: z.enum(VALID_THING_TYPES),
-  title: z.string().min(1).max(2000),
   parentThingId: z.string().max(200).optional(),
   sourceTable: z.string().min(1).max(100),
   sourceId: z.string().min(1).max(200),
   entityType: z.string().max(100).optional(),
-  description: z.string().max(10000).optional(),
   sourceUrl: z.string().max(2048).optional(),
   wikiId: z.string().max(20).optional(),
-  parentTitle: z.string().max(500).optional(),
 });
 
 // ---- Route definition (method-chained for Hono RPC type inference) ----
@@ -198,8 +196,10 @@ const SyncThingSchema = z.object({
 const thingsApp = new Hono()
 
   // ---- GET /search?q=...&thing_type=...&limit=20 ----
-  // QUA-506: reads from the `things_search` MV; trigram fallback still
-  // reads `things` because the MV has no pg_trgm index yet.
+  // QUA-507: reads from the `things_search` MV (the base `things` table
+  // no longer has title/description/parent_title). Trigram fallback also
+  // reads the MV — sequential scan, no pg_trgm index yet (acceptable
+  // because fallback only fires when FTS + ILIKE return zero).
   .get("/search", zv("query", SearchQuery), async (c) => {
     const { q: rawQ, thing_type, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
@@ -299,8 +299,10 @@ const thingsApp = new Hono()
         params.push(thing_type);
       }
 
-      // Reads `things` not `things_search` — MV has no pg_trgm index
-      // (deferred post-QUA-507).
+      // QUA-507: reads `things_search` (title/description/parent_title live
+      // there post denorm-column drop). MV has no pg_trgm index — sequential
+      // scan is acceptable for the fallback path which is only triggered when
+      // FTS + ILIKE return few results.
       const trigramRows = await rawDb.unsafe<ThingSearchRow[]>(
         `SELECT
           t.id, t.thing_type, t.title, t.parent_thing_id, t.source_table, t.source_id,
@@ -308,9 +310,9 @@ const thingsApp = new Hono()
           t.created_at, t.updated_at, t.synced_at,
           similarity(t.title, $1) AS similarity,
           scv.verdict
-        FROM things t
+        FROM things_search t
         LEFT JOIN source_check_verdicts scv
-          -- CASE mirrors verdictJoinOnThings above; keep in sync if adding irregular plurals
+          -- CASE mirrors verdictJoinOnThingsSearch above; keep in sync if adding irregular plurals
           ON scv.record_type = CASE t.source_table
             WHEN 'entities' THEN 'entity'
             ELSE regexp_replace(replace(t.source_table, '_', '-'), 's$', '')
@@ -441,23 +443,25 @@ const thingsApp = new Hono()
   })
 
   // ---- GET /children/:parentId ----
+  // QUA-507: reads from the `things_search` MV (title/description/parent_title
+  // live there post-denorm-drop).
   .get("/children/:parentId", zv("query", ListQuery), async (c) => {
     const parentId = c.req.param("parentId");
     const { thing_type, sort, order, limit, offset } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    const conditions = [eq(things.parentThingId, parentId)];
-    if (thing_type) conditions.push(eq(things.thingType, thing_type));
+    const conditions = [eq(thingsSearch.parentThingId, parentId)];
+    if (thing_type) conditions.push(eq(thingsSearch.thingType, thing_type));
 
     const whereClause = and(...conditions);
 
-    const sortCol = sortColumns[sort];
+    const sortCol = sortColumnsSearch[sort];
     const orderFn = order === "desc" ? desc(sortCol) : asc(sortCol);
 
     const rows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -465,7 +469,7 @@ const thingsApp = new Hono()
 
     const countResult = await db
       .select({ count: count() })
-      .from(things)
+      .from(thingsSearch)
       .where(whereClause);
 
     return c.json({
@@ -479,15 +483,15 @@ const thingsApp = new Hono()
   // See discussion #2950.
 
   // ---- GET /:id ----
-  // QUA-506: try `things_search` first (MV has resolved titles + the
-  // additional thing_types not synced to the base table). Fall back to
-  // `things` for rows freshly synced but not yet in the MV, and for the
-  // edge case where the two tables have diverged IDs.
+  // QUA-507: reads exclusively from the `things_search` MV. A freshly
+  // synced row is visible after the next REFRESH MATERIALIZED VIEW
+  // CONCURRENTLY (hourly groundskeeper job at
+  // `operational/things-search-refresh`). A row that exists in the base
+  // `things` table but not yet in the MV surfaces a `not_found_pending_refresh`
+  // error so callers can distinguish "not yet refreshed" from "deleted".
   .get("/:id", async (c) => {
     const id = c.req.param("id");
     const db = getDrizzleDb();
-
-    let row: { thing: ThingLikeRow; verdict: string | null } | undefined;
 
     const mvRows = await db
       .select({ thing: thingsSearchSelect, ...verdictFields })
@@ -495,32 +499,31 @@ const thingsApp = new Hono()
       .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
       .where(eq(thingsSearch.id, id))
       .limit(1);
-    if (mvRows.length > 0) {
-      row = mvRows[0];
-    } else {
-      const fallbackRows = await db
-        .select({ thing: things, ...verdictFields })
+
+    if (mvRows.length === 0) {
+      const baseRows = await db
+        .select({ id: things.id })
         .from(things)
-        .leftJoin(sourceVerdicts, verdictJoinOnThings)
         .where(eq(things.id, id))
         .limit(1);
-      if (fallbackRows.length > 0) row = fallbackRows[0];
-    }
-
-    if (!row) {
+      if (baseRows.length > 0) {
+        return c.json(
+          {
+            error: "not_found_pending_refresh",
+            message: `Thing ${id} exists in the index but is pending the next things_search MV refresh. Retry after the hourly refresh or trigger one via POST /api/operational/things-search-refresh.`,
+          },
+          404,
+        );
+      }
       return c.json(
         { error: "not_found", message: `Thing not found: ${id}` },
-        404
+        404,
       );
     }
 
-    // Also fetch children count
-    const childrenResult = await db
-      .select({ count: count() })
-      .from(things)
-      .where(eq(things.parentThingId, row.thing.id));
+    const row: { thing: ThingLikeRow; verdict: string | null } = mvRows[0];
 
-    // Fetch children summary by type
+    // childrenByType is the source of truth — childrenCount is just its sum.
     const childTypeRows = await db
       .select({
         thingType: things.thingType,
@@ -531,18 +534,21 @@ const thingsApp = new Hono()
       .groupBy(things.thingType);
 
     const childrenByType: Record<string, number> = {};
-    for (const row of childTypeRows) {
-      childrenByType[row.thingType] = row.count;
+    let childrenCount = 0;
+    for (const r of childTypeRows) {
+      childrenByType[r.thingType] = r.count;
+      childrenCount += r.count;
     }
 
     return c.json({
       ...formatThing(row.thing, row),
-      childrenCount: childrenResult[0].count,
+      childrenCount,
       childrenByType,
     });
   })
 
   // ---- GET / (paginated listing) ----
+  // QUA-507: reads from the `things_search` MV.
   .get("/", zv("query", ListQuery), async (c) => {
     const {
       thing_type,
@@ -557,21 +563,21 @@ const thingsApp = new Hono()
     const db = getDrizzleDb();
 
     const conditions = [];
-    if (thing_type) conditions.push(eq(things.thingType, thing_type));
-    if (entity_type) conditions.push(eq(things.entityType, entity_type));
-    if (parent_id) conditions.push(eq(things.parentThingId, parent_id));
-    if (source_table) conditions.push(eq(things.sourceTable, source_table));
+    if (thing_type) conditions.push(eq(thingsSearch.thingType, thing_type));
+    if (entity_type) conditions.push(eq(thingsSearch.entityType, entity_type));
+    if (parent_id) conditions.push(eq(thingsSearch.parentThingId, parent_id));
+    if (source_table) conditions.push(eq(thingsSearch.sourceTable, source_table));
 
     const whereClause =
       conditions.length > 0 ? and(...conditions) : undefined;
 
-    const sortCol = sortColumns[sort];
+    const sortCol = sortColumnsSearch[sort];
     const orderFn = order === "desc" ? desc(sortCol) : asc(sortCol);
 
     const rows = await db
-      .select({ thing: things, ...verdictFields })
-      .from(things)
-      .leftJoin(sourceVerdicts, verdictJoinOnThings)
+      .select({ thing: thingsSearchSelect, ...verdictFields })
+      .from(thingsSearch)
+      .leftJoin(sourceVerdicts, verdictJoinOnThingsSearch)
       .where(whereClause)
       .orderBy(orderFn)
       .limit(limit)
@@ -579,7 +585,7 @@ const thingsApp = new Hono()
 
     const countResult = await db
       .select({ count: count() })
-      .from(things)
+      .from(thingsSearch)
       .where(whereClause);
 
     return c.json({
@@ -604,27 +610,21 @@ const thingsApp = new Hono()
     toRow: (item) => ({
       id: item.id,
       thingType: item.thingType,
-      title: item.title,
       parentThingId: item.parentThingId ?? null,
       sourceTable: item.sourceTable,
       sourceId: item.sourceId,
       entityType: item.entityType ?? null,
-      description: item.description ?? null,
       sourceUrl: item.sourceUrl ?? null,
       wikiId: item.wikiId ?? null,
-      parentTitle: item.parentTitle ?? null,
     }),
     conflictTarget: [things.sourceTable, things.sourceId],
     conflictSet: {
       // Do NOT update `id`, `sourceTable`, `sourceId` — composite key + PK must stay stable
       thingType: sql`excluded.thing_type`,
-      title: sql`excluded.title`,
       parentThingId: sql`excluded.parent_thing_id`,
       entityType: sql`excluded.entity_type`,
-      description: sql`excluded.description`,
       sourceUrl: sql`excluded.source_url`,
       wikiId: sql`excluded.wiki_id`,
-      parentTitle: sql`excluded.parent_title`,
       syncedAt: sql`now()`,
       updatedAt: sql`now()`,
     },

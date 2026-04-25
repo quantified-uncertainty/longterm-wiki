@@ -2630,28 +2630,31 @@ export const VALID_THING_TYPES = [
   "publication",
   "political-race",
   "race-candidate",
+  "model-system-card",
+  "safety-framework",
+  "safety-framework-version",
+  "framework-threshold",
+  "framework-diff",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
 
+// QUA-507 (migration 0204): dropped title/description/parent_title/search_vector.
+// The `things` table is now a pointer-only index. Denormalized display fields
+// live in the `things_search` materialized view (see `thingsSearch` below).
 export const things = pgTable(
   "things",
   {
     id: text("id").primaryKey(),
     thingType: text("thing_type").notNull(),
-    title: text("title").notNull(),
     parentThingId: text("parent_thing_id").references((): any => things.id, {
       onDelete: "set null",
     }),
     sourceTable: text("source_table").notNull(),
     sourceId: text("source_id").notNull(),
     entityType: text("entity_type"),
-    description: text("description"),
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
-    parentTitle: text("parent_title"),
-    // verdict, verdict_confidence, verdict_at columns removed — sourcing
-    // verdicts now live in the unified source_check_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2661,7 +2664,6 @@ export const things = pgTable(
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    // search_vector tsvector column is managed via migration SQL (generated column)
   },
   (table) => [
     index("idx_things_type").on(table.thingType),
@@ -2669,7 +2671,6 @@ export const things = pgTable(
     index("idx_things_entity_type").on(table.entityType),
     index("idx_things_updated").on(table.updatedAt),
     uniqueIndex("idx_things_source_unique").on(table.sourceTable, table.sourceId),
-    // GIN index on search_vector is created in migration SQL
   ]
 );
 
@@ -4150,4 +4151,413 @@ export const enrichmentRuns = pgTable(
     index("idx_enrichment_runs_entity").on(table.entityId),
     index("idx_enrichment_runs_started_at").on(sql`${table.startedAt} DESC`),
   ],
+);
+
+/**
+ * Model system cards — structured extraction of fields published in flagship
+ * AI model / system cards. One row per published card. A model can have
+ * multiple cards over time (lab-side republications, hub updates).
+ *
+ * QUA-690 — Phase 3 of the AI safety data layer (parent: QUA-687).
+ *
+ * Uniqueness: (ai_model_id, version, release_date). `source_hash` captures
+ * silent edits — new hash for the same version = a new row documenting the
+ * drift, not an overwrite.
+ */
+export const modelSystemCards = pgTable(
+  "model_system_cards",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id at sync
+    aiModelDisplayName: text("ai_model_display_name"),
+    version: text("version"),
+    releaseDate: date("release_date"),
+    deprecationDate: date("deprecation_date"),
+    trainingCutoff: date("training_cutoff"),
+    trainingComputeFlops: numeric("training_compute_flops"),
+    trainingGpuHours: numeric("training_gpu_hours"),
+    trainingHardware: text("training_hardware"),
+    parametersTotal: bigint("parameters_total", { mode: "number" }),
+    parametersActive: bigint("parameters_active", { mode: "number" }),
+    architecture: text("architecture"), // dense | MoE | dense+thinking-switch | ...
+    modalitiesIn: text("modalities_in").array(),
+    modalitiesOut: text("modalities_out").array(),
+    contextWindowTokens: integer("context_window_tokens"),
+    outputWindowTokens: integer("output_window_tokens"),
+    languagesSupported: text("languages_supported").array(),
+    safetyFramework: text("safety_framework"), // ASL | Preparedness | FSF | RSP | ...
+    safetyTier: text("safety_tier"), // ASL-3 | High | Critical Level 2 | CCL-1 | ...
+    safetyTierDomains: jsonb("safety_tier_domains").$type<Record<string, string>>(),
+    safeguardsSummary: text("safeguards_summary"),
+    classifierDetails: jsonb("classifier_details").$type<Record<string, unknown>>(),
+    fineTuningPolicy: text("fine_tuning_policy"), // api-only | research-access | weights-released | closed
+    deploymentChannels: text("deployment_channels").array(),
+    evalScoresCited: jsonb("eval_scores_cited").$type<
+      Array<{
+        benchmark: string;
+        benchmarkId?: string | null;
+        score: number;
+        metric?: string | null;
+        setup?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    thirdPartyEvals: jsonb("third_party_evals").$type<
+      Array<{
+        evaluator: string;
+        url?: string | null;
+        summary?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    redTeamSummary: text("red_team_summary"),
+    incidentDisclosures: text("incident_disclosures"),
+    sourceUrl: text("source_url").notNull(),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    systemPromptUrl: text("system_prompt_url"),
+    usagePolicyUrl: text("usage_policy_url"),
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_msc_ai_model").on(table.aiModelId),
+    index("idx_msc_safety_framework").on(table.safetyFramework),
+    index("idx_msc_safety_tier").on(table.safetyTier),
+    index("idx_msc_release_date").on(sql`${table.releaseDate} DESC`),
+    uniqueIndex("uq_msc_natural_key").on(
+      table.aiModelId,
+      sql`COALESCE(${table.version}, '')`,
+      sql`COALESCE(${table.releaseDate}, '0001-01-01'::date)`,
+    ),
+  ],
+);
+
+// ============================================================================
+// QUA-691 / Phase 4 — Frontier safety framework tracker
+//
+// Structured tracker for the ~12 published frontier-safety frameworks
+// (Anthropic RSP, OpenAI Preparedness, DeepMind FSF, Meta, xAI, ...) with
+// per-version archival, extracted capability thresholds, and inter-version
+// diffs surfaced for weakening detection.
+//
+// Design:
+// - `safety_frameworks` — one row per lab's framework (~12 rows).
+// - `safety_framework_versions` — one row per published version. Natural
+//   key on (framework_id, content_hash) so silent lab edits become new
+//   rows documenting drift rather than overwrites.
+// - `framework_capability_thresholds` — extracted thresholds per version.
+//   Dual risk_domain columns: `risk_domain_canonical` (enum, for
+//   cross-lab matrix) + `risk_domain_label` (lab-native, for fidelity).
+//   `source_quote` MANDATORY — grounds every threshold row.
+// - `framework_diffs` — version-pair diff aggregate. Never auto-publish
+//   weakening: `review_verdict` defaults to 'unreviewed' and the public
+//   UI must gate on a human-confirmed verdict.
+// - `framework_diff_items` — per-change atomic rows that compose a diff.
+// - `framework_ingest_log` — audit trail of every fetch; enables
+//   silent-update detection.
+// ============================================================================
+
+export const safetyFrameworks = pgTable(
+  "safety_frameworks",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    orgId: text("org_id").notNull(), // FK resolved to entities.stable_id at sync
+    orgDisplayName: text("org_display_name"),
+    name: text("name").notNull(), // "Responsible Scaling Policy"
+    shortName: text("short_name"), // "RSP"
+    latestVersionId: text("latest_version_id"),
+    firstPublishedDate: date("first_published_date"),
+    currentStatus: text("current_status"), // active | archived | superseded | draft
+    frameworkFamily: text("framework_family"), // groups Meta FAF+AASF as same family
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sf_org").on(table.orgId),
+    index("idx_sf_status").on(table.currentStatus),
+    index("idx_sf_family").on(table.frameworkFamily),
+  ],
+);
+
+export const safetyFrameworkVersions = pgTable(
+  "safety_framework_versions",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    versionLabel: text("version_label").notNull(), // "3.1", "v2 draft", "Feb 2025"
+    versionSortOrder: integer("version_sort_order").notNull(), // monotonic
+    publishedDate: date("published_date"),
+    discoveredDate: date("discovered_date").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    sourceUrlCanonical: text("source_url_canonical"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    pdfArchiveUrl: text("pdf_archive_url"),
+    contentHash: text("content_hash").notNull(), // sha256 of normalized text
+    contentLengthChars: integer("content_length_chars"),
+    summary: text("summary"), // LLM-generated 2-3 sentence summary
+    isDraft: boolean("is_draft").notNull().default(false),
+    supersededByVersionId: text("superseded_by_version_id"),
+    ingestStatus: text("ingest_status").notNull().default("pending_review"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sfv_framework").on(table.frameworkId),
+    index("idx_sfv_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_sfv_ingest_status").on(table.ingestStatus),
+    uniqueIndex("uq_sfv_content_hash").on(table.frameworkId, table.contentHash),
+  ],
+);
+
+export const frameworkCapabilityThresholds = pgTable(
+  "framework_capability_thresholds",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    versionId: text("version_id").notNull(),
+    riskDomainCanonical: text("risk_domain_canonical").notNull(),
+    riskDomainLabel: text("risk_domain_label").notNull(),
+    tierLabel: text("tier_label").notNull(),
+    tierSortOrder: integer("tier_sort_order").notNull(), // 1=lowest, 4=severe
+    triggerDescription: text("trigger_description").notNull(),
+    sourceQuote: text("source_quote").notNull(), // MANDATORY — grounds extraction
+    sourcePageHint: text("source_page_hint"), // "§3.2", "p. 14"
+    requiredMitigations: jsonb("required_mitigations").$type<Record<string, unknown>>(),
+    associatedEvals: jsonb("associated_evals").$type<Record<string, unknown>>(),
+    commitmentLanguage: text("commitment_language"), // committed|aspirational|conditional|informational
+    extractedByModel: text("extracted_by_model"),
+    extractionConfidence: numeric("extraction_confidence"),
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    humanReviewNotes: text("human_review_notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fct_version").on(table.versionId),
+    index("idx_fct_canonical_domain").on(table.riskDomainCanonical),
+    index("idx_fct_tier_sort").on(table.tierSortOrder),
+    index("idx_fct_reviewed").on(table.humanReviewed),
+  ],
+);
+
+export const frameworkDiffs = pgTable(
+  "framework_diffs",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    fromVersionId: text("from_version_id").notNull(),
+    toVersionId: text("to_version_id").notNull(),
+    changeSummary: text("change_summary").notNull(),
+    weakeningFlagged: boolean("weakening_flagged").notNull().default(false),
+    strengtheningFlagged: boolean("strengthening_flagged").notNull().default(false),
+    neutralChangesCount: integer("neutral_changes_count"),
+    diffDetails: jsonb("diff_details").$type<Record<string, unknown>>(),
+    overallDirection: text("overall_direction"), // weaker|stronger|mixed|neutral|rewrite
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    reviewVerdict: text("review_verdict").notNull().default("unreviewed"),
+    reviewNotes: text("review_notes"),
+    classifiedByModel: text("classified_by_model"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fd_from").on(table.fromVersionId),
+    index("idx_fd_to").on(table.toVersionId),
+    index("idx_fd_weakening").on(table.weakeningFlagged),
+    index("idx_fd_direction").on(table.overallDirection),
+    uniqueIndex("uq_fd_version_pair").on(table.fromVersionId, table.toVersionId),
+  ],
+);
+
+export const frameworkDiffItems = pgTable(
+  "framework_diff_items",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    diffId: text("diff_id").notNull(),
+    changeType: text("change_type").notNull(), // threshold_added|threshold_removed|...
+    riskDomainCanonical: text("risk_domain_canonical"),
+    beforeSnapshot: jsonb("before_snapshot").$type<Record<string, unknown>>(),
+    afterSnapshot: jsonb("after_snapshot").$type<Record<string, unknown>>(),
+    severity: integer("severity"), // 1-3
+    classifierTag: text("classifier_tag"), // weaker|stronger|rewrite_equivalent|...
+    rationale: text("rationale"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fdi_diff").on(table.diffId),
+    index("idx_fdi_change_type").on(table.changeType),
+  ],
+);
+
+export const frameworkIngestLog = pgTable(
+  "framework_ingest_log",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    sourceUrl: text("source_url").notNull(),
+    contentHash: text("content_hash"),
+    status: text("status").notNull(), // new_version|unchanged|silent_update_detected|fetch_failed
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fil_framework").on(table.frameworkId),
+    index("idx_fil_status").on(table.status),
+    index("idx_fil_fetched_at").on(sql`${table.fetchedAt} DESC`),
+  ],
+);
+
+// ── External scorecard mirror (QUA-688 / QUA-687 Phase 1) ─────────────────
+//
+// Mirrors the five major external AI-safety scorecards (FLI AI Safety Index,
+// SaferAI, AI Lab Watch, Stanford FMTI, Seoul Commitment Tracker) into a
+// unified parent + child table.
+//
+// Two tables instead of one because dimension counts vary by 25× (4 for
+// SaferAI vs 100 for FMTI). A flat shape would force NULL overload or drop
+// subdomain structure.
+//
+// Authoritative source is data/scorecards/snapshots/*.yaml; PG is a read
+// mirror. is_latest is held to "exactly one TRUE per scorecard_source" by a
+// partial unique index + the sync handler.
+
+export const scorecardSnapshots = pgTable(
+  "scorecard_snapshots",
+  {
+    /** Stable, human-readable id, e.g. `fli-summer-2025`, `fmti-dec-2025`. */
+    id: text("id").primaryKey(),
+    /**
+     * Source enum: `fli_index`, `saferai`, `ailabwatch`, `fmti`,
+     * `seoul_tracker`. CHECK constraint enumerated against prod when
+     * additional sources are added (see .claude/rules/database-migrations.md).
+     */
+    scorecardSource: text("scorecard_source").notNull(),
+    /** Human label for the wave, e.g. "Summer 2025" or "v1.1 May 2024". */
+    waveLabel: text("wave_label"),
+    /** Publication date of this wave. */
+    publishedAt: date("published_at").notNull(),
+    /** When we ingested this snapshot. */
+    capturedAt: timestamp("captured_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** Canonical URL for this wave (top-level page on source site). */
+    sourceUrl: text("source_url").notNull(),
+    /** Methodology PDF / arXiv / docs URL. */
+    methodologyUrl: text("methodology_url"),
+    /** Reuse license. e.g. `CC-BY-4.0`, `fair-use-citation`. */
+    license: text("license"),
+    /** Denormalized counts for dashboards. */
+    orgCount: integer("org_count").notNull().default(0),
+    dimensionCount: integer("dimension_count").notNull().default(0),
+    /** Free-form notes (e.g. "maintenance ceased 2025-09"). */
+    notes: text("notes"),
+    /**
+     * Exactly one TRUE per scorecardSource — enforced by a partial unique
+     * index below + the sync handler.
+     */
+    isLatest: boolean("is_latest").notNull().default(false),
+    /**
+     * Whether the source is still actively updated. AI Lab Watch is frozen
+     * (Sept 2025); we keep its snapshot but mark it inactive so the UI can
+     * label it appropriately.
+     */
+    sourceActive: boolean("source_active").notNull().default(true),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_snapshots_source").on(table.scorecardSource),
+    index("idx_scorecard_snapshots_published").on(sql`${table.publishedAt} DESC`),
+    uniqueIndex("uq_scorecard_snapshots_latest_per_source")
+      .on(table.scorecardSource)
+      .where(sql`${table.isLatest} = true`),
+  ]
+);
+
+export const scorecardGrades = pgTable(
+  "scorecard_grades",
+  {
+    /** Composite-derived id: `<snapshot>__<entity>__<dim>`, max 200 chars. */
+    id: text("id").primaryKey(),
+    /** Parent snapshot. */
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => scorecardSnapshots.id, { onDelete: "cascade" }),
+    /** FK to entities.stable_id — the scored organization. */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /**
+     * Display-name cache (sibling pattern, see
+     * docs/audits/things-denormalization-audit.md). Backfilled at ingest.
+     */
+    entityDisplayName: text("entity_display_name").notNull(),
+    /**
+     * Dimension key. `overall` is the aggregate row; per-source slugs
+     * otherwise (e.g. `risk-assessment`, `fmti-indicator-42`).
+     */
+    dimensionSlug: text("dimension_slug").notNull(),
+    /** Human label, e.g. "Risk Assessment". */
+    dimensionLabel: text("dimension_label").notNull(),
+    /** Optional weight (0..1). NULL when the source is unweighted. */
+    dimensionWeight: numeric("dimension_weight"),
+    /**
+     * Optional rollup parent slug — lets FMTI's 100 indicators nest under
+     * 13 subdomains without a third table.
+     */
+    dimensionParentSlug: text("dimension_parent_slug"),
+    /** Normalized 0–100 percent where the source provides numeric scoring. */
+    scoreNumeric: numeric("score_numeric"),
+    /**
+     * Letter or categorical grade (`A-`, `C+`, `F`, `Fulfilled`, `Partial`).
+     * Either `scoreNumeric` or `scoreLetter` is set; both may be set.
+     */
+    scoreLetter: text("score_letter"),
+    /** The exact string from the source for audit (`"2.64"`, `"34%"`, `"C+"`). */
+    scoreRaw: text("score_raw").notNull(),
+    /** Per-cell free-form notes from the source. */
+    notes: text("notes"),
+    /** Deep-link URL to this specific row on the source page when available. */
+    sourceUrl: text("source_url"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_grades_snapshot").on(table.snapshotId),
+    index("idx_scorecard_grades_entity").on(table.entityId),
+    index("idx_scorecard_grades_dimension").on(table.dimensionSlug),
+    uniqueIndex("uq_scorecard_grades_natural_key").on(
+      table.snapshotId,
+      table.entityId,
+      table.dimensionSlug
+    ),
+  ]
 );

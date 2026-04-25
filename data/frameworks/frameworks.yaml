@@ -1,0 +1,177 @@
+# Frontier safety framework registry (QUA-691 Phase 4).
+#
+# Source-of-truth manifest of the ~12 published frontier-safety
+# frameworks. Drives both the `safety_frameworks` and
+# `safety_framework_versions` seed rows. Re-fetching a version URL
+# uses this file as the dispatch table.
+#
+# Ingestion ordering for Phase 4 Day 2-4:
+#   High-signal (rich history): anthropic, openai, deepmind, xai.
+#   Single-version: meta, g42, cohere, magic, naver, amazon.
+#   Lightweight (no dedicated framework): microsoft, nvidia.
+#
+# URLs verified in the issue body comment; we push every one to Wayback
+# on first ingest so the canonical URL drifting doesn't orphan versions.
+
+version: 1
+
+frameworks:
+  anthropic-rsp:
+    org_slug: anthropic
+    name: "Responsible Scaling Policy"
+    short_name: "RSP"
+    framework_family: "rsp"
+    status: active
+    versions:
+      - version_label: "v1.0"
+        published_date: "2023-09-19"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+      - version_label: "v2.0"
+        published_date: "2024-10-15"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+      - version_label: "v2.1"
+        published_date: "2025-03-31"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+      - version_label: "v2.2"
+        published_date: "2025-05-14"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+      - version_label: "v3.0"
+        published_date: "2026-02-24"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+      - version_label: "v3.1"
+        published_date: "2026-04-02"
+        source_url: "https://www.anthropic.com/responsible-scaling-policy"
+
+  openai-preparedness:
+    org_slug: openai
+    name: "Preparedness Framework"
+    short_name: "PF"
+    framework_family: "preparedness"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2023-12-18"
+        source_url: "https://openai.com/safety/preparedness"
+      - version_label: "v2"
+        published_date: "2025-04-15"
+        source_url: "https://openai.com/index/updating-our-preparedness-framework/"
+
+  deepmind-fsf:
+    org_slug: google-deepmind
+    name: "Frontier Safety Framework"
+    short_name: "FSF"
+    framework_family: "fsf"
+    status: active
+    versions:
+      - version_label: "v1.0"
+        published_date: "2024-05-17"
+        source_url: "https://deepmind.google/discover/blog/introducing-the-frontier-safety-framework/"
+      - version_label: "v2.0"
+        published_date: "2025-02-04"
+        source_url: "https://deepmind.google/discover/blog/updating-the-frontier-safety-framework/"
+
+  meta-faf:
+    org_slug: meta
+    name: "Frontier AI Framework"
+    short_name: "FAF"
+    framework_family: "meta-faf"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2025-02-03"
+        source_url: "https://about.fb.com/news/2025/02/meta-approach-frontier-ai/"
+
+  xai-rmf:
+    org_slug: xai
+    name: "Risk Management Framework"
+    short_name: "RMF"
+    framework_family: "rmf"
+    status: active
+    versions:
+      - version_label: "v1 draft"
+        published_date: "2025-02-20"
+        source_url: "https://x.ai/documents/2025.02.20-RMF-Draft.pdf"
+        is_draft: true
+      - version_label: "v1"
+        published_date: "2025-08-20"
+        source_url: "https://data.x.ai/2025-08-20-xai-risk-management-framework.pdf"
+
+  amazon-fmsf:
+    org_slug: amazon
+    name: "Frontier Model Safety Framework"
+    short_name: "FMSF"
+    framework_family: "amazon"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2025-05-01"
+        source_url: "https://www.amazon.science/publications/amazons-frontier-model-safety-framework"
+
+  g42-fasf:
+    org_slug: g42
+    name: "Frontier AI Safety Framework"
+    short_name: "FASF"
+    framework_family: "g42"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2025-02-04"
+        source_url: "https://g42.ai/resources/publications/g42-frontier-ai-safety-framework"
+
+  cohere-sfm:
+    org_slug: cohere
+    name: "Secure AI Frontier Model Framework"
+    short_name: "SFM"
+    framework_family: "cohere"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2025-02-11"
+        source_url: "https://cohere.com/security/the-secure-ai-frontier-model-framework-february-2025.pdf"
+
+  magic-arp:
+    org_slug: magic
+    name: "AGI Readiness Policy"
+    short_name: "ARP"
+    framework_family: "magic"
+    status: active
+    versions:
+      - version_label: "v1"
+        published_date: "2024-05-01"
+        source_url: "https://magic.dev/agi-readiness-policy"
+
+  naver-asf:
+    org_slug: naver
+    name: "AI Safety Framework"
+    short_name: "ASF"
+    framework_family: "naver"
+    status: active
+    notes: "Korean-primary source; translation pass needed before extraction."
+    versions:
+      - version_label: "v1"
+        published_date: "2024-06-01"
+        source_url: "https://clova.ai/en/tech-blog/en-navers-ai-safety-framework-asf"
+
+  microsoft-rait:
+    org_slug: microsoft
+    name: "Responsible AI Transparency Report"
+    short_name: "RAIT"
+    framework_family: "microsoft"
+    status: active
+    notes: "No standalone frontier-safety PDF; closest equivalent is the Frontier Governance section of the Responsible AI Transparency Report."
+    versions:
+      - version_label: "2024"
+        published_date: "2024-05-01"
+        source_url: "https://www.microsoft.com/en-us/ai/responsible-ai-transparency-report"
+
+  nvidia-tai:
+    org_slug: nvidia
+    name: "Trustworthy AI Policy"
+    short_name: "TAI"
+    framework_family: "nvidia"
+    status: active
+    notes: "Domain-specific rather than catastrophic-risk framing — weakest Phase 4 candidate; track as placeholder."
+    versions:
+      - version_label: "v1"
+        published_date: "2025-01-01"
+        source_url: "https://www.nvidia.com/en-us/ai-trust-center/"

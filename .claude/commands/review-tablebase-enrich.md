@@ -1,32 +1,55 @@
 ---
-description: Enrich structured data (personnel, funding, investments, benchmarks) using subscription mode.
+description: Enrich structured data (personnel, funding, benchmarks) via tier=T3 defensive propose, subscription mode.
 effort: medium
 ---
 
-# TableBase Enrich (Subscription Mode)
+# TableBase Enrich — Subscription / T3 Mode (QUA-643)
 
-Enrich structured data (personnel, funding rounds, investments, benchmarks) using the subscription instead of API billing. Processes up to 5 tasks per invocation.
+Enrich structured data (personnel, funding rounds, benchmark-results) using the Claude subscription instead of API billing. Every submitted record goes through `/api/enrichment/propose` with `tier=T3` so the defensive gate + strict verdict check still applies. Processes up to 5 tasks per invocation.
 
 **Schedule:** `/loop 4h /review-tablebase-enrich` for periodic runs.
 
 **Do NOT run `/agent-init`** — this skill manages its own workflow.
 
-## Model Tiering
+## Why T3, not direct sync
 
-Different task types have different complexity. Use the right model for the job:
+QUA-632 Phase 1 introduced `/api/enrichment/propose` — a gate that atomically writes `(row + evidence + verdict)` inside one transaction and rejects rows that don't pass the strict `confirmed`-only check. T1 importers (QUA-640/QUA-665/QUA-666) already go through it; T2 website extraction (QUA-642) is being wired.
 
-| Task Type | Recommended Model | Why |
-|-----------|------------------|-----|
-| `personnel-enrichment` | **Sonnet** | Complex: role disambiguation, date extraction, deciding who's "key" vs minor |
-| `grant-grantee-backfill` | **Sonnet** | Entity resolution requires judgment |
-| `funding-round-research` | **Haiku** | Structured financial data, straightforward extraction |
-| `investment-linking` | **Haiku** | Structured financial data |
-| `benchmark-result-fill` | **Haiku** | Numeric lookup, low ambiguity |
+T3 = "agent-researched, quote-verified". We route subscription-mode rows through the same gate so the burst never writes unverified rows to the tablebase. The defensive gate is cheap insurance.
 
-When running the API-billed loop, use `--model=auto` to automatically tier:
+## Kill-switch — check this first
+
+Before picking a task, check whether the watchdog has killed this burst:
+
 ```bash
-pnpm crux tb loop --model=auto --max=20 --budget=15
+# Watchdog writes ~/.cache/enrichment/kill-<runId> when spend exceeds cap.
+ls -la ~/.cache/enrichment/kill-${ENRICHMENT_RUN_ID:-unset} 2>/dev/null && {
+  echo "Run killed by watchdog — stopping.";
+  exit 0;
+}
 ```
+
+If the kill marker exists, stop immediately — no new proposals this session.
+
+## Kickoff — set a run id
+
+Each burst session should share a `run_id` so `enrichment_runs` counters aggregate cleanly and the watchdog has one row to watch:
+
+```bash
+export ENRICHMENT_RUN_ID="t3-$(date -u +%Y%m%d-%H)-${SLOT:-local}"
+```
+
+Pass this as `--run-id=$ENRICHMENT_RUN_ID` on every propose call.
+
+## Target-aware queue
+
+`crux tb prepare` ranks by `completenessPercent × taskTypeWeight × importance`. That's fine for general enrichment but ignores the QUA-637 acceptance targets. Before starting, check which (org, record_type) pairs are farthest from target:
+
+```bash
+pnpm crux enrichment acceptance-report --threshold=0.30
+```
+
+Prioritize any org + record_type pair showing ≥30% gap. If `tb prepare` picks a task on an org that already meets target, skip it — use `tb mark-done <taskId>` to exclude it and re-run `tb prepare`.
 
 ## The loop
 
@@ -38,86 +61,97 @@ Repeat this cycle up to 5 times:
 pnpm crux tb prepare
 ```
 
-If output is `NO_TASKS`, stop. Otherwise, read the task details, search queries, and record template.
+If output is `NO_TASKS`, stop. Otherwise read the task details, search queries, record template.
 
 ### Step 2: Research
 
 Follow the **research strategy** from the prepare output:
 
-1. **Try the team page first** (if URLs are provided). Use WebFetch with the prompt: "List ALL team members with their full names and roles/titles." Try each URL until one works — team pages often yield 10-50+ people in one call.
-
-2. **If WebFetch returns empty/404**, the page may be JS-rendered. Use Playwright:
-   ```bash
-   pnpm crux tb fetch-page "https://example.com/team"
-   ```
-   This renders the page with a real browser and returns the text content.
-
-3. **Fall back to WebSearch** if team pages don't work. Use the suggested search queries. Also try `"<org name>" site:linkedin.com/company` for additional context.
-
-4. **If divisions are listed**, look specifically for team leads of each division — these are high-priority personnel targets.
-
-5. **For notable researchers** at large orgs (Anthropic, DeepMind, etc.), search for specific people by name to find roles, start dates, and publications. Researchers with many papers or media mentions are higher priority.
+1. **Try the team page first** (if URLs are provided). Use WebFetch with: "List ALL team members with their full names and roles/titles." Team pages often yield 10-50+ people in one call.
+2. **If WebFetch returns empty/404**, fall back to Playwright: `pnpm crux tb fetch-page "https://example.com/team"`.
+3. **Fall back to WebSearch** if team pages don't work. Also try `"<org name>" site:linkedin.com/company`.
+4. **If divisions are listed**, look specifically for team leads of each division — high-priority personnel targets.
+5. **For notable researchers**, search for specific people by name for roles, start dates, publications.
 
 ### Step 3: Resolve or create entities
 
-Collect all person names found in research into a JSON array and run:
+Collect person names into a JSON array and run:
 
 ```bash
-echo '["Jaime Sevilla","Ben Cottier","David Owen"]' | pnpm crux tb ensure-entities --type=person --ci
+echo '["Jaime Sevilla","Ben Cottier"]' | pnpm crux tb ensure-entities --type=person --ci
 ```
 
-This resolves existing entities and creates new ones in a single batch call. Output is a JSON array of `{name, stableId, created}` — use each `stableId` in your records.
+This resolves existing entities and creates new ones in one batch call. Use each returned `stableId` in your records.
 
-For a single entity, you can also use:
+### Step 4: Build proposals — one per row
+
+For every record, you **must** produce a proposal payload the propose endpoint accepts. T3 requires the verdict-LLM fields so the gate can verify the claim is backed by a verbatim quote:
+
+```json
+{
+  "tier": "T3",
+  "recordType": "personnel",
+  "row": {
+    "id": "<sha256[:10] of sourceUrl + canonical claim>",
+    "personId": "<stableId from ensure-entities>",
+    "organizationId": "<org stableId>",
+    "role": "Head of Alignment",
+    "roleType": "key-person",
+    "startDate": "2024-03",
+    "source": "https://example.com/team"
+  },
+  "sourceUrl": "https://example.com/team",
+  "sourceContentHash": "<sha256 hex of fetched page>",
+  "verdict": "confirmed",
+  "confidence": 0.9,
+  "quotedText": "Jane Doe joined as Head of Alignment in March 2024.",
+  "reasoning": "Page explicitly states role and start date.",
+  "checkerModel": "claude-opus-4-7",
+  "costUsd": 0.03,
+  "runId": "<env ENRICHMENT_RUN_ID>"
+}
+```
+
+Requirements (strict — the gate rejects anything short):
+- `verdict` MUST be `"confirmed"`. If the source only *partially* supports the claim, don't submit — route to a triage ticket.
+- `quotedText` MUST be a verbatim substring of the page, ≥40 chars. Paraphrasing is rejected.
+- `sourceContentHash` is the SHA-256 hex of the fetched page content. Use it consistently so `row.id` derivation is stable (the wiki-server computes `row.id` from `sourceContentHash[:10]` when absent — but we send our own id so retries land on the same row).
+- `costUsd` — your honest guess at the verdict-LLM cost for this proposal (tokens × $/token). In subscription mode this is 0, but pass something if you want the watchdog to see non-zero spend.
+- `runId` — the `$ENRICHMENT_RUN_ID` you set at kickoff.
+
+### Step 5: Submit proposals
+
+One record per request (the propose endpoint is single-row):
+
 ```bash
-pnpm crux tb resolve "Person Name" --ci
-# If not found:
-pnpm crux tb create-entity "Person Name" --type=person --ci
+# proposal.json is the object above, rendered to disk.
+curl -fsS -X POST \
+  -H "content-type: application/json" \
+  -H "x-api-key: $LONGTERMWIKI_SERVER_API_KEY" \
+  -d @proposal.json \
+  $LONGTERMWIKI_SERVER_URL/api/enrichment/propose
 ```
 
-### Step 3b: Research dates
+Read the response:
+- `status: "accepted"` — row is in the tablebase with a `confirmed` verdict. Done.
+- `status: "rejected", rejectionReason: "..."` — gate rejected. Read the reason:
+  - "quotedText too short" → your quote is <40 chars; grab a longer span.
+  - "quotedText is not a verbatim substring" → you paraphrased. Copy-paste the exact text.
+  - "T3: sourceUrl is a homepage" → pick a sub-page (e.g. `/team` not `/`).
+  - other → log and move on; don't retry with the same proposal.
 
-For each person, try to find when they started their role:
-- Search `"[person name]" joined "[org name]"` or `"[person name]" appointed "[org name]"`
-- Check Wikipedia for founding/appointment dates
-- Board announcements usually have exact dates
+### Step 6: Watchdog heartbeat
 
-If you can't find a start date, that's OK — be honest in the notes field.
-
-### Step 4: Submit records
-
-Pipe a JSON array of records using the template from Step 1:
+After each batch, spot-check the watchdog isn't about to kill:
 
 ```bash
-cat <<'RECORDS' | pnpm crux tb submit --table=<table>
-[
-  {"personId":"<stableId>","organizationId":"<entityId>","role":"CEO","roleType":"key-person","startDate":"2021","source":"https://...","notes":"Confirmed on team page as of 2026-03-16."}
-]
-RECORDS
+pnpm crux enrichment watchdog --run-id=$ENRICHMENT_RUN_ID --oneshot --max-spend-per-hour=20
 ```
 
-Every record **must** have:
-- A `source` URL
-- A `notes` field stating when the info was confirmed (e.g., "Confirmed on team page as of 2026-03-16" or "Per Wikipedia, appointed October 2025")
-- A `startDate` if findable — search specifically for this. If unknown, leave it out but note "Start date unknown" in notes.
+- Exit 0 with a rate line → healthy, continue.
+- Exit 2 → kill marker written, stop this session.
 
-### Step 5: Verify submitted records
-
-After submitting, run source-check verification on what was just submitted to get immediate feedback:
-
-```bash
-# Verify the records just submitted for this entity
-pnpm crux tb verify <table> --entity=<entityStableId> --limit=50
-```
-
-For example, after submitting personnel for Anthropic:
-```bash
-pnpm crux tb verify personnel --entity=sid_anthropic --limit=50
-```
-
-This catches errors immediately — contradicted verdicts mean the submitted data doesn't match the source URL. Fix any contradictions before moving on.
-
-### Step 6: Mark done and continue
+### Step 7: Mark done and continue
 
 ```bash
 pnpm crux tb mark-done <taskId>
@@ -128,41 +162,33 @@ Go back to Step 1.
 ## Rules
 
 - Only submit data confirmed by web search. No fabrication.
-- Every record needs a source URL.
+- Every proposal needs a source URL AND a ≥40-char verbatim quote.
 - Cross-reference key facts across 2+ sources when possible.
 - If you can only find a year, use `YYYY` — don't guess month/day.
 - `roleType` must be: `key-person`, `board`, or `career`.
-
-## Verification
-
-Run verification after every enrichment batch to catch errors:
-
-```bash
-# Per-entity verification (run in Step 5 after each submission)
-pnpm crux tb verify personnel --entity=<stableId> --limit=50
-
-# Full table verification via Batch API (~$0.01/item with 50% batch discount)
-pnpm crux tb verify personnel --batch --limit=200
-
-# Dry run to preview what would be checked
-pnpm crux tb verify personnel --dry-run
-
-# Check coverage stats
-pnpm crux tb verify stats
-```
-
-Verification catches: contradicted claims (data doesn't match source URL), dead links (source URL returns 404), and unverifiable records (source page lacks relevant content). Fix contradictions immediately — they indicate incorrect data.
-
-## Cost Comparison
-
-| Mode | Cost per task | Best for |
-|------|-------------|----------|
-| **Subscription (this skill)** | $0 (uses Max sub time) | Interactive research, small batches |
-| **API loop (haiku)** | ~$0.05-0.15 | High-volume simple tasks (benchmarks, investments) |
-| **API loop (sonnet)** | ~$0.20-0.35 | Complex tasks (personnel, grants) |
-| **API loop (auto)** | ~$0.10-0.25 avg | Mixed workloads — tiers automatically |
-| **Verification batch** | ~$0.01-0.03/100 records | Post-enrichment quality check |
+- **Do not call `crux tb submit` from this skill.** Direct sync bypasses the propose gate. Use `/api/enrichment/propose` as above.
 
 ## At the end
 
-Print a one-line summary: `Enriched X entities, Y records created, Z entities created.`
+Print a one-line summary: `T3 burst: run=$ENRICHMENT_RUN_ID, accepted=N, rejected=M, tasks=K`.
+
+Optionally refresh the gap report:
+
+```bash
+pnpm crux enrichment acceptance-report --threshold=0.30 | head -20
+```
+
+## Cost comparison
+
+| Mode | Cost per task | Best for |
+|------|-------------|----------|
+| **Subscription (this skill)** | $0 (Max sub time) | Interactive research, burst runs |
+| **API loop (haiku)** | ~$0.05-0.15 | High-volume simple tasks |
+| **API loop (sonnet)** | ~$0.20-0.35 | Complex tasks |
+
+## See also
+
+- `crux/commands/tb-importers/propose-client.ts` — reference implementation of the propose request shape.
+- `apps/wiki-server/src/routes/enrichment/enrichment.ts` — gate rules (verdict + quote-length + homepage-rejection).
+- `crux/lib/enrichment/watchdog.ts` — spend monitor.
+- QUA-637 — umbrella.

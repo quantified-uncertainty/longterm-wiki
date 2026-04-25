@@ -39,15 +39,15 @@ const PROJECT_ROOT = join(import.meta.dirname!, "../..");
 
 // ---- Types ----
 
+// QUA-507: pointer-only row shape. title/description no longer accepted by
+// /api/things/sync; display fields live in the things_search MV.
 interface ThingRecord {
   id: string;
   thingType: string;
-  title: string;
   parentThingId?: string;
   sourceTable: string;
   sourceId: string;
   entityType?: string;
-  description?: string;
   sourceUrl?: string;
   wikiId?: string;
 }
@@ -77,11 +77,9 @@ function loadEntities(): ThingRecord[] {
       records.push({
         id: e.stableId || e.id,
         thingType: "entity",
-        title: e.title,
         sourceTable: "entities",
         sourceId: e.id,
         entityType: resolveEntityType(e.type),
-        description: e.description,
         sourceUrl: e.website,
         wikiId: e.wikiId,
       });
@@ -107,10 +105,8 @@ function loadResources(): ThingRecord[] {
       records.push({
         id: r.stableId || r.id,
         thingType: "resource",
-        title: r.title || r.url,
         sourceTable: "resources",
         sourceId: r.id,
-        description: r.summary || r.abstract,
         sourceUrl: r.url,
       });
     }

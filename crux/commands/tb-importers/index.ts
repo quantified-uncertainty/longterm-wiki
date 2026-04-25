@@ -14,9 +14,9 @@
  *     - `crux tb semantic-scholar    --target=personSlug:displayName:authorId [--submit]`
  *     - `crux tb crossref            --target=doi:10.xxx/yyy[|org=slug][|person=slug] [--submit]`
  *
- * `--submit` is wired through to the propose-client; today the endpoint
- * (QUA-632) does not yet exist so submit-mode returns `pending`. Until then,
- * default behavior (dry-run) prints what would be sent.
+ * `--submit` POSTs proposals to `/api/enrichment/propose` (wired in QUA-665
+ * for personnel / funding-rounds / benchmark-results on top of QUA-632's
+ * grants endpoint). Default behavior is dry-run — prints what would be sent.
  */
 
 import { cliMain as secEdgarCliMain } from "./sec-edgar.ts";
@@ -66,6 +66,6 @@ Usage:
   crux tb crossref --target=doi:10.1145/3442188.3445922|org=anthropic [--submit]
 
 All importers default to dry-run mode (print proposals, don't POST).
-Pass --submit to attempt POST to /api/enrichment/propose (blocked on QUA-632).
+Pass --submit to POST proposals to /api/enrichment/propose.
 `;
 }

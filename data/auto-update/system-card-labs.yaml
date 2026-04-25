@@ -1,0 +1,198 @@
+# Per-lab hints for the system-card extractor (QUA-690).
+#
+# Loaded by crux/system-cards/lab-hints.ts. The extractor passes the matching
+# lab's hints to the LLM prompt — section names, expected fields, known
+# absences — so the generic extractor can adapt to each lab's format without
+# a per-lab extractor.
+#
+# These are HINTS, not rules. The extractor emits `null` for any field not
+# found in the source, regardless of what this file claims.
+#
+# Matching: laboratory key is matched against the URL hostname/path first,
+# then against an explicit --lab=<key> override.
+
+labs:
+  anthropic:
+    safety_framework: ASL
+    source_canonical: https://www.anthropic.com/system-cards
+    url_patterns:
+      - anthropic.com
+      - www-cdn.anthropic.com
+      - assets.anthropic.com
+    expected_fields:
+      - version
+      - release_date
+      - context_window_tokens
+      - modalities_in
+      - safety_tier
+      - safeguards_summary
+      - third_party_evals
+      - eval_scores_cited
+    known_absent:
+      - training_compute_flops
+      - training_gpu_hours
+      - parameters_total
+    section_hints:
+      safety_tier: "Look for 'ASL-N' tier or a Responsible Scaling Policy (RSP) section."
+      eval_scores_cited: "Tables captioned 'Capability Evaluations' or 'Benchmark Results'."
+      third_party_evals: "A 'Third-Party Evaluations' or 'External Red Teaming' section."
+      safeguards_summary: "Sections covering 'Safeguards', 'Classifiers', or 'Constitutional Classifiers'."
+
+  openai:
+    safety_framework: Preparedness
+    source_canonical: https://openai.com/safety
+    url_patterns:
+      - openai.com
+      - cdn.openai.com
+      - deploymentsafety.openai.com
+    expected_fields:
+      - version
+      - release_date
+      - safety_tier
+      - safety_tier_domains
+      - third_party_evals
+      - eval_scores_cited
+    known_absent:
+      - training_compute_flops
+      - parameters_total
+    section_hints:
+      safety_tier: "Look for 'Preparedness Framework' tier (Low/Medium/High/Critical) per domain (Cybersecurity, CBRN, Persuasion, Model Autonomy)."
+      safety_tier_domains: "Usually a table or list mapping each domain to its tier."
+      third_party_evals: "Sections about 'External Testers', 'UK AISI', 'US AISI', 'METR', 'Apollo'."
+      deployment_channels: "Usually listed under 'Deployment' — e.g., API, ChatGPT, Microsoft Copilot, Azure."
+
+  google-deepmind:
+    safety_framework: FSF
+    source_canonical: https://deepmind.google/models/
+    url_patterns:
+      - deepmind.google
+      - storage.googleapis.com/deepmind-media
+    expected_fields:
+      - version
+      - release_date
+      - context_window_tokens
+      - modalities_in
+      - modalities_out
+      - safety_tier
+      - eval_scores_cited
+    known_absent:
+      - training_compute_flops
+      - parameters_total
+      - training_cutoff
+    section_hints:
+      safety_tier: "Look for 'Frontier Safety Framework' (FSF) Critical Capability Level (CCL) — e.g., CCL-1, CCL-2."
+      modalities_in: "Gemini models are typically multimodal — check for 'text', 'image', 'audio', 'video'."
+
+  meta:
+    safety_framework: ""
+    source_canonical: https://github.com/meta-llama/llama-models
+    url_patterns:
+      - github.com/meta-llama
+      - llama.meta.com
+      - ai.meta.com
+    expected_fields:
+      - version
+      - release_date
+      - training_cutoff
+      - parameters_total
+      - parameters_active
+      - training_gpu_hours
+      - training_hardware
+      - context_window_tokens
+      - modalities_in
+      - languages_supported
+      - eval_scores_cited
+    known_absent:
+      - safety_tier
+      - third_party_evals
+    section_hints:
+      training_gpu_hours: "Meta reports GPU-hours and CO2 emissions, not FLOPs."
+      fine_tuning_policy: "Llama models release open weights — note license ('Llama Community License')."
+      safeguards_summary: "Look for 'Llama Guard', 'Prompt Guard', 'Code Shield' section."
+
+  xai:
+    safety_framework: ""
+    source_canonical: https://x.ai/model-card
+    url_patterns:
+      - data.x.ai
+      - x.ai
+    expected_fields:
+      - version
+      - release_date
+      - safeguards_summary
+    known_absent:
+      - training_compute_flops
+      - parameters_total
+      - eval_scores_cited
+      - third_party_evals
+    section_hints:
+      safeguards_summary: "xAI model cards focus on refusal evaluations and abuse-potential scenarios."
+
+  mistral:
+    safety_framework: ""
+    source_canonical: https://mistral.ai/news/
+    url_patterns:
+      - mistral.ai
+    expected_fields:
+      - version
+      - release_date
+      - parameters_total
+      - context_window_tokens
+      - eval_scores_cited
+    known_absent:
+      - safety_tier
+      - third_party_evals
+
+  cohere:
+    safety_framework: ""
+    source_canonical: https://docs.cohere.com/docs/responsible-use
+    url_patterns:
+      - cohere.com
+      - docs.cohere.com
+    expected_fields:
+      - version
+      - safeguards_summary
+    known_absent:
+      - training_compute_flops
+      - parameters_total
+      - safety_tier
+    section_hints:
+      safeguards_summary: "Cohere cards cover BOLD bias evals and intended-use limits."
+
+  deepseek:
+    safety_framework: ""
+    source_canonical: https://huggingface.co/deepseek-ai
+    url_patterns:
+      - deepseek.com
+      - huggingface.co/deepseek-ai
+      - arxiv.org
+    expected_fields:
+      - version
+      - parameters_total
+      - parameters_active
+      - architecture
+      - context_window_tokens
+      - eval_scores_cited
+    known_absent:
+      - safety_tier
+      - third_party_evals
+    section_hints:
+      architecture: "DeepSeek models are typically MoE — set architecture='MoE' and populate parameters_active."
+
+  alibaba-qwen:
+    safety_framework: ""
+    source_canonical: https://qwenlm.github.io/blog/
+    url_patterns:
+      - qwenlm.github.io
+      - huggingface.co/Qwen
+    expected_fields:
+      - version
+      - release_date
+      - parameters_total
+      - context_window_tokens
+      - modalities_in
+      - eval_scores_cited
+    known_absent:
+      - safety_tier
+      - training_compute_flops
+      - training_cutoff

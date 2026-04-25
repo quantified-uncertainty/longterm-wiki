@@ -1429,6 +1429,34 @@
       "when": 1786608000001,
       "tag": "0203_qua_632_enrichment_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1787300000000,
+      "tag": "0204_qua_507_drop_things_denorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1787386400000,
+      "tag": "0205_qua_690_model_system_cards",
+      "breakpoints": true
+    },
+    {
+      "idx": 206,
+      "version": "7",
+      "when": 1787472800000,
+      "tag": "0206_qua_691_safety_frameworks",
+      "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1787559200000,
+      "tag": "0207_qua_688_scorecard_tables",
+      "breakpoints": true
     }
   ]
 }

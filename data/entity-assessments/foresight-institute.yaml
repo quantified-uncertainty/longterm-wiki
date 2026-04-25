@@ -1,0 +1,33 @@
+# Entity assessments for Foresight Institute (E1210)
+# Source: content/docs/knowledge-base/organizations/foresight-institute.mdx (## Quick Assessment)
+entityId: sid_NPPTvNqRXA
+assessments:
+  - dimension: type
+    rating: Nonprofit research organization and think tank
+
+  - dimension: founded
+    rating: 1986, San Francisco, CA
+
+  - dimension: founders
+    rating: Christine Peterson, K. Eric Drexler, James C. Bennett
+
+  - dimension: focus-areas
+    rating: Nanotechnology, secure AI, neurotechnology, longevity biotechnology, space, existential hope
+
+  - dimension: key-programs
+    rating: Grants, Feynman Prize, fellowships, Vision Weekend conferences, AI Nodes, tech trees
+
+  - dimension: employees
+    rating: ~6 (recent estimates)
+
+  - dimension: total-assets
+    rating: ~$8.9M (2024 filing)
+
+  - dimension: annual-program-spending
+    rating: ~$3.7M (2024 filing, total functional expenses)
+
+  - dimension: ai-safety-relevance
+    rating: Funds AI safety research in security, human-AI cooperation, neurotechnology, and forecasting
+
+  - dimension: ein
+    rating: 77-0119168

@@ -91,6 +91,15 @@ export const GROUPS: Record<string, GroupDef> = {
       'political',
       'benchmarks',
       'flagship-curate',
+      // Domains with multiple subcommands — list them so `tb <domain> <sub>`
+      // dispatches to the subcommand rather than the domain default. Flat
+      // dash-form aliases (`import-divisions-sync`, etc.) still resolve via
+      // the flattened path.
+      'import-grants',
+      'import-divisions',
+      'import-funding-programs',
+      'data-sources',
+      'website-sources',
     ],
     flattened: ['tablebase'],
   },
