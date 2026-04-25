@@ -221,8 +221,10 @@ describe("refreshOneFramework", () => {
     expect(discordFetch).toHaveBeenCalledOnce();
     const body = JSON.parse(discordFetch.mock.calls[0][1].body);
     expect(body.content).toContain("Silent framework update detected");
-    expect(body.content).toContain("h_prev_old_h"); // previous hash prefix
-    expect(body.content).toContain("h_v3_1_new_h"); // new hash prefix
+    // Underscores in hash prefixes are markdown-escaped (\_) by escapeForDiscord
+    // (see crux/lib/discord/index.ts) so the literal substring is "h\\_prev\\_old\\_h" in JS.
+    expect(body.content).toContain("h\\_prev\\_old\\_h"); // previous hash prefix
+    expect(body.content).toContain("h\\_v3\\_1\\_new\\_h"); // new hash prefix
 
     // Log row should be silent_update_detected.
     const logCall = calls.find((c) => c.path === "/api/framework-ingest-log/insert");
