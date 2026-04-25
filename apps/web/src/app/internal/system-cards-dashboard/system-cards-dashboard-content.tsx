@@ -178,6 +178,19 @@ function ageInDays(timestamp: string | null): number | null {
 
 // ── Content Component ────────────────────────────────────────────────────
 
+
+/**
+ * Safely extract hostname; returns the raw URL if URL parsing fails. Defends
+ * the dashboard render against malformed sourceUrl values from extraction.
+ */
+function safeHostname(url: string): string {
+  try {
+    return new URL(url).hostname;
+  } catch {
+    return url;
+  }
+}
+
 export async function SystemCardsDashboardContent() {
   const { data, source, apiError } = await withApiFallback(
     loadFromApi,
@@ -188,7 +201,10 @@ export async function SystemCardsDashboardContent() {
   const labs = buildLabCoverage(cards);
   const staleCards = findStaleCards(cards, STALE_THRESHOLD_DAYS);
 
-  const totalFieldsPossible = stats.total * COVERAGE_FIELDS.length;
+  // Compute over the loaded sample (`cards.length`), not stats.total — labs is
+  // built from the fetched page (?limit=200), so the numerator only covers loaded
+  // cards. Using stats.total would bias the fill rate low once cards > 200.
+  const totalFieldsPossible = cards.length * COVERAGE_FIELDS.length;
   const totalFieldsFilled = labs.reduce(
     (sum, lab) =>
       sum +
@@ -316,15 +332,19 @@ export async function SystemCardsDashboardContent() {
                       {ageInDays(c.extractedAt) ?? "—"}
                     </td>
                     <td className="py-2 px-3">
-                      <a
-                        href={c.sourceUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-xs text-primary hover:underline truncate max-w-xs inline-block"
-                        title={c.sourceUrl}
-                      >
-                        {new URL(c.sourceUrl).hostname}
-                      </a>
+                      {c.sourceUrl ? (
+                        <a
+                          href={c.sourceUrl}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-xs text-primary hover:underline truncate max-w-xs inline-block"
+                          title={c.sourceUrl}
+                        >
+                          {safeHostname(c.sourceUrl)}
+                        </a>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
                     </td>
                   </tr>
                 ))}

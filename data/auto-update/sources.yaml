@@ -280,7 +280,7 @@ sources:
   - id: anthropic-system-cards
     name: Anthropic System Cards
     type: web-search
-    query: "site:anthropic.com (system card OR model card) Claude 2026"
+    query: "site:anthropic.com (system card OR model card) Claude"
     frequency: weekly
     categories: [ai-labs, models, safety, system-cards]
     reliability: high
@@ -289,7 +289,7 @@ sources:
   - id: openai-system-cards
     name: OpenAI System Cards
     type: web-search
-    query: "site:openai.com OR site:cdn.openai.com (system card OR preparedness) GPT 2026"
+    query: "(site:openai.com OR site:cdn.openai.com) (system card OR preparedness) GPT"
     frequency: weekly
     categories: [ai-labs, models, safety, system-cards]
     reliability: high
@@ -298,7 +298,7 @@ sources:
   - id: deepmind-model-cards
     name: Google DeepMind Model Cards
     type: web-search
-    query: "site:deepmind.google (model card OR Frontier Safety) Gemini 2026"
+    query: "site:deepmind.google (model card OR Frontier Safety) Gemini"
     frequency: weekly
     categories: [ai-labs, models, safety, system-cards]
     reliability: high
@@ -307,7 +307,7 @@ sources:
   - id: meta-llama-cards
     name: Meta Llama Model Cards
     type: web-search
-    query: "site:github.com/meta-llama OR site:llama.meta.com (model card) 2026"
+    query: "(site:github.com/meta-llama OR site:llama.meta.com) (model card OR README) Llama"
     frequency: weekly
     categories: [ai-labs, models, open-source, system-cards]
     reliability: high
@@ -316,7 +316,7 @@ sources:
   - id: xai-model-cards
     name: xAI Model Cards
     type: web-search
-    query: "site:x.ai OR site:data.x.ai model card Grok 2026"
+    query: "(site:x.ai OR site:data.x.ai) model card Grok"
     frequency: weekly
     categories: [ai-labs, models, system-cards]
     reliability: medium

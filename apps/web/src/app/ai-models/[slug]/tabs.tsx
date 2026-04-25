@@ -271,7 +271,7 @@ function formatFlops(s: number | string | null | undefined): string {
 }
 
 function waybackUrl(originalUrl: string): string {
-  return `https://web.archive.org/web/*/${originalUrl}`;
+  return `https://web.archive.org/web/2/${originalUrl}`;
 }
 
 interface SystemCardTabProps {
@@ -552,9 +552,7 @@ export function SystemCardTab({ cards, selectedCardId, modelSlug }: SystemCardTa
       {/* Extraction provenance footer */}
       <p className="text-[10px] text-muted-foreground/60 pt-2 border-t border-border/40">
         Extracted{" "}
-        {card.extractedAt
-          ? new Date(card.extractedAt).toLocaleDateString()
-          : "—"}{" "}
+        {card.extractedAt ? card.extractedAt.slice(0, 10) : "—"}{" "}
         via {card.extractionModel ?? "?"} (extractor{" "}
         {card.extractorVersion ?? "?"}).
       </p>

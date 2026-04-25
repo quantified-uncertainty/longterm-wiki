@@ -8,8 +8,12 @@
  *     and `benchmarks.slug`.
  *  2. For matches: upserts a row into `benchmark_results` with
  *     `tested_by='self-report'` and `source_url` pointing at the system
- *     card. Self-reports never overwrite rows whose `tested_by` is NULL
- *     (legacy / unknown) or `'third-party'`.
+ *     card. Self-reports never overwrite rows whose `tested_by` is
+ *     `'third-party'`. Rows with `tested_by IS NULL AND source_url IS NULL`
+ *     (empty legacy stubs that no one ever filled) are treated as fillable
+ *     and may be replaced by a self-report — but a NULL `tested_by` with a
+ *     `source_url` is still protected (someone curated it from another
+ *     source and forgot to set `tested_by`).
  *  3. For non-matches: enqueues a row in `pending_benchmark_links` for
  *     human/follow-up resolution. Idempotent on re-extract via the
  *     `(model_system_card_id, cited_name)` unique index.
@@ -219,7 +223,7 @@ async function linkOneCard(
     } else {
       // Queue for human review.
       const id = generateId().replace(/^sid_/, "").slice(0, 10);
-      await tx.execute(sql`
+      const queueResult = await tx.execute<{ id: string }>(sql`
         INSERT INTO pending_benchmark_links (
           id, model_system_card_id, ai_model_id, cited_name,
           cited_score, cited_metric, cited_setup, cited_excerpt,
@@ -230,7 +234,7 @@ async function linkOneCard(
           ${cite.score ?? null}, ${cite.metric ?? null}, ${cite.setup ?? null},
           ${cite.excerpt ?? null}, 'pending', ${now}, ${now}, ${now}
         )
-        ON CONFLICT (model_system_card_id, cited_name)
+        ON CONFLICT (model_system_card_id, cited_name_normalized)
         DO UPDATE SET
           cited_score = EXCLUDED.cited_score,
           cited_metric = EXCLUDED.cited_metric,
@@ -239,8 +243,16 @@ async function linkOneCard(
           synced_at = EXCLUDED.synced_at,
           updated_at = EXCLUDED.updated_at
         WHERE pending_benchmark_links.status = 'pending'
+        RETURNING id
       `);
-      result.queued += 1;
+      // RETURNING id is empty when the WHERE clause filtered out the
+      // conflict row — i.e., the existing queue entry is already resolved
+      // or rejected. Counting it as queued would over-report queue activity.
+      if (queueResult.length > 0) {
+        result.queued += 1;
+      } else {
+        result.protectedSkips += 1;
+      }
     }
   }
 

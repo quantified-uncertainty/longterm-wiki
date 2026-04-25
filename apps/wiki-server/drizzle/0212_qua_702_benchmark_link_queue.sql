@@ -42,6 +42,12 @@ CREATE TABLE IF NOT EXISTS "pending_benchmark_links" (
   "model_system_card_id" text NOT NULL,
   "ai_model_id" text NOT NULL,
   "cited_name" text NOT NULL,
+  -- Generated stored column. Mirrors normalizeBenchmarkName() in
+  -- apps/wiki-server/src/routes/tablebase/system-card-benchmark-linker.ts.
+  -- Update both together if the normalization rules change.
+  "cited_name_normalized" text GENERATED ALWAYS AS (
+    regexp_replace(lower("cited_name"), '[^a-z0-9]', '', 'g')
+  ) STORED,
   "cited_score" double precision,
   "cited_metric" text,
   "cited_setup" text,
@@ -68,10 +74,11 @@ CREATE INDEX IF NOT EXISTS "idx_pbl_resolved_benchmark"
   ON "pending_benchmark_links" ("resolved_benchmark_id");
 
 -- Idempotency on re-extract: the same card can mention the same benchmark
--- name only once. Re-running the extractor should upsert this row, not
--- insert duplicates.
+-- name only once, even across name variants ("SWE-bench Verified" vs
+-- "swe-bench-verified"). Re-running the extractor should upsert this row,
+-- not insert duplicates.
 CREATE UNIQUE INDEX IF NOT EXISTS "uq_pbl_card_name"
-  ON "pending_benchmark_links" ("model_system_card_id", "cited_name");
+  ON "pending_benchmark_links" ("model_system_card_id", "cited_name_normalized");
 
 ALTER TABLE "pending_benchmark_links"
   ADD CONSTRAINT "chk_pbl_status"

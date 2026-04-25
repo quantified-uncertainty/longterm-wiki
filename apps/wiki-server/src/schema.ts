@@ -2409,8 +2409,10 @@ export const benchmarkResults = pgTable(
     // QUA-702: provenance. NULL = legacy / unknown; 'self-report' = inserted
     // by the model_system_cards post-upsert hook from a lab-published card;
     // 'third-party' = independent benchmark run. Constraint enforced in
-    // migration 0212. The hook's upsert logic only overwrites self-report
-    // rows, so NULL and 'third-party' are protected.
+    // migration 0212. The hook's upsert protects 'third-party' rows
+    // unconditionally; NULL rows are protected unless they are empty legacy
+    // stubs (NULL tested_by + NULL source_url) that no one curated. See
+    // system-card-benchmark-linker.ts for the exact WHERE clause.
     testedBy: text("tested_by"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
@@ -4688,9 +4690,13 @@ export const thirdPartyEvaluationModels = pgTable(
  * once a human (or a future fuzzy matcher) maps `cited_name` to a real
  * `benchmarks.id`.
  *
- * Idempotency on re-extract: unique on (model_system_card_id, cited_name).
- * Re-running the extractor upserts the same row (refreshing the score),
- * never creates duplicates.
+ * Idempotency on re-extract: unique on
+ * (model_system_card_id, cited_name_normalized) where the normalized form
+ * matches `normalizeBenchmarkName(s)` in the linker
+ * (`lower(s).replace(/[^a-z0-9]/g, "")`). Without normalization, repeated
+ * extractions can return name variants ("SWE-bench Verified" /
+ * "swe-bench-verified" / "SWE Bench Verified") that produce duplicate
+ * queue rows for the same underlying benchmark.
  */
 export const pendingBenchmarkLinks = pgTable(
   "pending_benchmark_links",
@@ -4699,6 +4705,15 @@ export const pendingBenchmarkLinks = pgTable(
     modelSystemCardId: text("model_system_card_id").notNull(),
     aiModelId: text("ai_model_id").notNull(), // entities.stable_id
     citedName: text("cited_name").notNull(),
+    /**
+     * Generated normalized form of `cited_name` — must match
+     * `normalizeBenchmarkName()` in `system-card-benchmark-linker.ts`. Stored
+     * (not virtual) so the unique index can reference it. Update both
+     * together if the normalization rules change.
+     */
+    citedNameNormalized: text("cited_name_normalized").generatedAlwaysAs(
+      sql`regexp_replace(lower(cited_name), '[^a-z0-9]', '', 'g')`,
+    ),
     citedScore: doublePrecision("cited_score"),
     citedMetric: text("cited_metric"),
     citedSetup: text("cited_setup"),
@@ -4726,7 +4741,7 @@ export const pendingBenchmarkLinks = pgTable(
     index("idx_pbl_resolved_benchmark").on(table.resolvedBenchmarkId),
     uniqueIndex("uq_pbl_card_name").on(
       table.modelSystemCardId,
-      table.citedName,
+      table.citedNameNormalized,
     ),
   ],
 );
