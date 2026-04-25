@@ -361,29 +361,17 @@ const modelSystemCardsApp = new Hono()
         updatedAt: sql`now()`,
       },
       auditRecordType: "model_system_cards",
-      // Things dual-write: model system cards are surfaced in search so
-      // users land directly on the card detail view rather than only via
-      // the parent AI model entity.
-      thingsTitleIds: (items) => [
-        ...new Set(items.map((c) => c.aiModelId)),
-      ],
-      toThing: (item, titleMap) => {
-        const parentTitle = titleMap.get(item.aiModelId) ?? item.aiModelDisplayName ?? item.aiModelId;
-        const versionPart = item.version ? ` ${item.version}` : "";
-        const datePart = item.releaseDate ? ` (${item.releaseDate})` : "";
-        return {
-          id: item.id,
-          thingType: "model-system-card" as const,
-          title: `${parentTitle}${versionPart} — System Card${datePart}`,
-          description: item.safetyTier
-            ? `${item.safetyFramework ?? "Safety"} tier: ${item.safetyTier}`
-            : (item.safeguardsSummary?.slice(0, 200) ?? null),
-          parentTitle,
-          sourceTable: "model_system_cards",
-          sourceId: item.id,
-          sourceUrl: item.sourceUrl,
-        };
-      },
+      // Things dual-write (pointer-only post-QUA-507): system cards surface in
+      // search via the things_search MV. Display fields (title, description,
+      // parent_title) are composed at read time from the source table.
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "model-system-card" as const,
+        parentThingId: item.aiModelId,
+        sourceTable: "model_system_cards",
+        sourceId: item.id,
+        sourceUrl: item.sourceUrl,
+      }),
     }),
   )
 
