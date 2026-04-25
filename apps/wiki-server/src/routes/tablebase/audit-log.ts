@@ -8,6 +8,7 @@
 import type { PgTransaction } from "drizzle-orm/pg-core";
 import type { PostgresJsQueryResultHKT } from "drizzle-orm/postgres-js";
 import type { ExtractTablesWithRelations } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import type * as schema from "../../schema.js";
 import { tablebaseAuditLog } from "../../schema.js";
 
@@ -48,6 +49,20 @@ export async function logAuditEntries(
 ): Promise<void> {
   if (entries.length === 0) return;
 
+  // QUA-442: if the caller didn't pass an agent_session_id but the
+  // request set one via `SET LOCAL app.agent_session_id` (middleware +
+  // applyAuditContext), pull it from the GUC so the existing rich
+  // audit log gets session attribution too. Runs once per call, not
+  // per-row. `current_setting(..., true)` with missing_ok=true never
+  // throws for an unset GUC — it returns an empty string — so no
+  // defensive try/catch is needed; a thrown error would mean the tx
+  // is already doomed and the subsequent INSERT would fail anyway.
+  const [gucRow] = (await tx.execute(
+    sql`SELECT current_setting('app.agent_session_id', true) AS session_id`,
+  )) as unknown as Array<{ session_id: string | null }>; // as-any-ok: Drizzle's tx.execute returns an untyped row array for raw SQL; narrowing to the known one-column shape is the pattern used elsewhere for current_setting reads.
+  const rawSession = gucRow?.session_id ?? null;
+  const gucSession = rawSession && rawSession.length > 0 ? rawSession : null;
+
   await tx.insert(tablebaseAuditLog).values(
     entries.map((e) => ({
       recordType: e.recordType,
@@ -58,7 +73,7 @@ export async function logAuditEntries(
       sourceUrl: e.sourceUrl ?? null,
       verdict: e.verdict ?? null,
       evidence: e.evidence ?? null,
-      agentSessionId: e.agentSessionId ?? null,
+      agentSessionId: e.agentSessionId ?? gucSession,
       prNumber: e.prNumber ?? null,
     }))
   );

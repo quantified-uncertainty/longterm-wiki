@@ -1839,6 +1839,47 @@ export const sourcingUrlSuggestions = pgTable(
 );
 
 /**
+ * Universal PG audit log (QUA-442).
+ *
+ * Written by the `audit_trigger_fn()` PL/pgSQL trigger attached to every
+ * non-excluded table. Captures every INSERT/UPDATE/DELETE with full before
+ * and after JSONB, plus session attribution pulled from `SET LOCAL`
+ * GUCs (`app.agent_session_id`, `app.agent_tool`).
+ *
+ * This is the comprehensive floor; `tablebase_audit_log` (below) stays as
+ * the richer application-layer log for TableBase sync handlers that want
+ * verdict/source-URL/evidence attribution.
+ *
+ * Migration: 0204_qua_442_audit_log_universal_trigger.sql
+ */
+export const fullAuditLog = pgTable(
+  "full_audit_log",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    tableName: text("table_name").notNull(),
+    operation: text("operation").$type<"INSERT" | "UPDATE" | "DELETE">().notNull(),
+    oldRow: jsonb("old_row"),
+    newRow: jsonb("new_row"),
+    txnId: bigint("txn_id", { mode: "bigint" }),
+    sessionId: text("session_id"),
+    tool: text("tool"),
+    applicationName: text("application_name"),
+    changedAt: timestamp("changed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_full_audit_log_table_time").on(
+      table.tableName,
+      table.changedAt,
+    ),
+    index("idx_full_audit_log_session").on(table.sessionId),
+    index("idx_full_audit_log_txn").on(table.txnId),
+    index("idx_full_audit_log_changed_at").on(table.changedAt),
+  ],
+);
+
+/**
  * Audit log for TableBase changes — records every insert/update/delete
  * to PG-primary tables (personnel, grants, funding_rounds, etc.).
  * Provides git-like change history for data that bypasses git.
