@@ -1450,6 +1450,13 @@
       "when": 1787472800000,
       "tag": "0206_qua_691_safety_frameworks",
       "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1787559200000,
+      "tag": "0207_qua_688_scorecard_tables",
+      "breakpoints": true
     }
   ]
 }

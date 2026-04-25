@@ -108,6 +108,12 @@ import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
 import Markdown from "react-markdown";
 
+// External scorecard mirror (QUA-688)
+import {
+  loadScorecardsForEntity,
+  ScorecardsSection,
+} from "./scorecards-section";
+
 import type { ProfileTab as OrgTab, ProfileTabGroup } from "@/components/directory";
 import {
   Home,
@@ -131,6 +137,7 @@ import {
   Database,
   ListTree,
   Clock,
+  Award,
 } from "lucide-react";
 
 const ORG_TAB_GROUPS: ProfileTabGroup[] = [
@@ -192,7 +199,7 @@ export default async function OrgProfilePage({
 
   // ── Fetch PG data (personnel + market data + grants + sourcing) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
@@ -204,6 +211,7 @@ export default async function OrgProfilePage({
       { revalidate: 3600, timeoutMs: 10_000 },
     ),
     fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
+    loadScorecardsForEntity(entityStableId),
   ]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
@@ -753,6 +761,30 @@ export default async function OrgProfilePage({
         <PolicyPositionsSection positions={policyPositions} />
       ),
     });
+  }
+
+  // ── Scorecards tab — external safety/transparency scorecards (QUA-688) ──
+  if (scorecardsData) {
+    if ("fetchError" in scorecardsData) {
+      // Transient wiki-server failure — surface an unavailable state rather
+      // than silently dropping the tab.
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={[]} fetchError />,
+      });
+    } else if (scorecardsData.groups.length > 0) {
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        count: scorecardsData.groups.length,
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={scorecardsData.groups} />,
+      });
+    }
   }
 
   // ── Projects tab: projects founded by this org ──

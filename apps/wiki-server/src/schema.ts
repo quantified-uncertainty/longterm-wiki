@@ -4420,3 +4420,144 @@ export const frameworkIngestLog = pgTable(
     index("idx_fil_fetched_at").on(sql`${table.fetchedAt} DESC`),
   ],
 );
+
+// ── External scorecard mirror (QUA-688 / QUA-687 Phase 1) ─────────────────
+//
+// Mirrors the five major external AI-safety scorecards (FLI AI Safety Index,
+// SaferAI, AI Lab Watch, Stanford FMTI, Seoul Commitment Tracker) into a
+// unified parent + child table.
+//
+// Two tables instead of one because dimension counts vary by 25× (4 for
+// SaferAI vs 100 for FMTI). A flat shape would force NULL overload or drop
+// subdomain structure.
+//
+// Authoritative source is data/scorecards/snapshots/*.yaml; PG is a read
+// mirror. is_latest is held to "exactly one TRUE per scorecard_source" by a
+// partial unique index + the sync handler.
+
+export const scorecardSnapshots = pgTable(
+  "scorecard_snapshots",
+  {
+    /** Stable, human-readable id, e.g. `fli-summer-2025`, `fmti-dec-2025`. */
+    id: text("id").primaryKey(),
+    /**
+     * Source enum: `fli_index`, `saferai`, `ailabwatch`, `fmti`,
+     * `seoul_tracker`. CHECK constraint enumerated against prod when
+     * additional sources are added (see .claude/rules/database-migrations.md).
+     */
+    scorecardSource: text("scorecard_source").notNull(),
+    /** Human label for the wave, e.g. "Summer 2025" or "v1.1 May 2024". */
+    waveLabel: text("wave_label"),
+    /** Publication date of this wave. */
+    publishedAt: date("published_at").notNull(),
+    /** When we ingested this snapshot. */
+    capturedAt: timestamp("captured_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** Canonical URL for this wave (top-level page on source site). */
+    sourceUrl: text("source_url").notNull(),
+    /** Methodology PDF / arXiv / docs URL. */
+    methodologyUrl: text("methodology_url"),
+    /** Reuse license. e.g. `CC-BY-4.0`, `fair-use-citation`. */
+    license: text("license"),
+    /** Denormalized counts for dashboards. */
+    orgCount: integer("org_count").notNull().default(0),
+    dimensionCount: integer("dimension_count").notNull().default(0),
+    /** Free-form notes (e.g. "maintenance ceased 2025-09"). */
+    notes: text("notes"),
+    /**
+     * Exactly one TRUE per scorecardSource — enforced by a partial unique
+     * index below + the sync handler.
+     */
+    isLatest: boolean("is_latest").notNull().default(false),
+    /**
+     * Whether the source is still actively updated. AI Lab Watch is frozen
+     * (Sept 2025); we keep its snapshot but mark it inactive so the UI can
+     * label it appropriately.
+     */
+    sourceActive: boolean("source_active").notNull().default(true),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_snapshots_source").on(table.scorecardSource),
+    index("idx_scorecard_snapshots_published").on(sql`${table.publishedAt} DESC`),
+    uniqueIndex("uq_scorecard_snapshots_latest_per_source")
+      .on(table.scorecardSource)
+      .where(sql`${table.isLatest} = true`),
+  ]
+);
+
+export const scorecardGrades = pgTable(
+  "scorecard_grades",
+  {
+    /** Composite-derived id: `<snapshot>__<entity>__<dim>`, max 200 chars. */
+    id: text("id").primaryKey(),
+    /** Parent snapshot. */
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => scorecardSnapshots.id, { onDelete: "cascade" }),
+    /** FK to entities.stable_id — the scored organization. */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /**
+     * Display-name cache (sibling pattern, see
+     * docs/audits/things-denormalization-audit.md). Backfilled at ingest.
+     */
+    entityDisplayName: text("entity_display_name").notNull(),
+    /**
+     * Dimension key. `overall` is the aggregate row; per-source slugs
+     * otherwise (e.g. `risk-assessment`, `fmti-indicator-42`).
+     */
+    dimensionSlug: text("dimension_slug").notNull(),
+    /** Human label, e.g. "Risk Assessment". */
+    dimensionLabel: text("dimension_label").notNull(),
+    /** Optional weight (0..1). NULL when the source is unweighted. */
+    dimensionWeight: numeric("dimension_weight"),
+    /**
+     * Optional rollup parent slug — lets FMTI's 100 indicators nest under
+     * 13 subdomains without a third table.
+     */
+    dimensionParentSlug: text("dimension_parent_slug"),
+    /** Normalized 0–100 percent where the source provides numeric scoring. */
+    scoreNumeric: numeric("score_numeric"),
+    /**
+     * Letter or categorical grade (`A-`, `C+`, `F`, `Fulfilled`, `Partial`).
+     * Either `scoreNumeric` or `scoreLetter` is set; both may be set.
+     */
+    scoreLetter: text("score_letter"),
+    /** The exact string from the source for audit (`"2.64"`, `"34%"`, `"C+"`). */
+    scoreRaw: text("score_raw").notNull(),
+    /** Per-cell free-form notes from the source. */
+    notes: text("notes"),
+    /** Deep-link URL to this specific row on the source page when available. */
+    sourceUrl: text("source_url"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_grades_snapshot").on(table.snapshotId),
+    index("idx_scorecard_grades_entity").on(table.entityId),
+    index("idx_scorecard_grades_dimension").on(table.dimensionSlug),
+    uniqueIndex("uq_scorecard_grades_natural_key").on(
+      table.snapshotId,
+      table.entityId,
+      table.dimensionSlug
+    ),
+  ]
+);
