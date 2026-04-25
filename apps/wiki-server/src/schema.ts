@@ -4859,5 +4859,3 @@ export const aiIncidentReports = pgTable(
     index("idx_ai_incident_reports_published_at").on(table.publishedAt),
   ],
 );
-  ],
-);

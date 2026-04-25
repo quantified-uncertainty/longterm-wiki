@@ -15,42 +15,11 @@ import { aiIncidents, aiIncidentReports, entities } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
 import { buildSearchCondition } from "../shared/query-helpers.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
-// Composer parentTitle priority: deployer org > developer org > model.
-// Falls back to null when nothing resolves — incidents without attribution
-// stay loose in things search.
-interface AiIncidentComposerRow {
-  title: string;
-  summary: string;
-  orgId?: string | null;
-  developerOrgId?: string | null;
-  aiModelId?: string | null;
-}
-
 const THING_TYPE = "ai_incident" as const;
 const TABLE_NAME = "ai_incidents" as const;
-
-const SUMMARY_PREVIEW_CHARS = 300;
-const SUMMARY_PREVIEW_TRIM = 297;
-
-registerComposer<AiIncidentComposerRow>(THING_TYPE, (row, titleMap) => {
-  const parent =
-    (row.orgId && titleMap.get(row.orgId)) ||
-    (row.developerOrgId && titleMap.get(row.developerOrgId)) ||
-    (row.aiModelId && titleMap.get(row.aiModelId)) ||
-    null;
-  return {
-    title: row.title,
-    description:
-      row.summary.length > SUMMARY_PREVIEW_CHARS
-        ? row.summary.slice(0, SUMMARY_PREVIEW_TRIM) + "..."
-        : row.summary,
-    parentTitle: parent,
-  };
-});
 
 const MAX_PAGE_SIZE = 200;
 
@@ -453,30 +422,18 @@ const aiIncidentsApp = new Hono()
         updatedAt: now,
       }),
       auditRecordType: TABLE_NAME,
-      thingsTitleIds: (items: AiIncidentItem[]) => [
-        ...new Set(
-          items
-            .flatMap((i) => [i.orgId, i.developerOrgId, i.aiModelId])
-            .filter((id): id is string => id != null),
-        ),
-      ],
-      toThing: (item: AiIncidentItem, titleMap: Map<string, string>) => {
-        const composed = composeThing<AiIncidentComposerRow>(
-          THING_TYPE,
-          item,
-          titleMap,
-        );
-        return {
-          id: item.id,
-          thingType: THING_TYPE,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: TABLE_NAME,
-          sourceId: item.id,
-          sourceUrl: item.fullReportUrl ?? null,
-        };
-      },
+      // QUA-507: things rows are pointer-only — display fields resolved at
+      // read time from things_search MV. parentThingId picks the most
+      // specific attribution we have (deployer > developer > model).
+      toThing: (item: AiIncidentItem) => ({
+        id: item.id,
+        thingType: THING_TYPE,
+        parentThingId:
+          item.orgId ?? item.developerOrgId ?? item.aiModelId ?? null,
+        sourceTable: TABLE_NAME,
+        sourceId: item.id,
+        sourceUrl: item.fullReportUrl ?? null,
+      }),
       // Reports replace-all per incident, batched into 2 round-trips total
       // (one DELETE, one INSERT) regardless of batch size. Skips incidents
       // whose `reports` is undefined — that's "leave existing reports
