@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useProxyAction } from "./use-proxy-action";
 
 interface Props {
   versionId: string;
@@ -30,36 +31,22 @@ export function PublishButton({
   thresholdCount,
 }: Props) {
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, error, submit } = useProxyAction();
   const [mode, setMode] = useState<"idle" | "rejecting">("idle");
   const [notes, setNotes] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   function publish(verdict: "published" | "rejected") {
-    setError(null);
-    startTransition(async () => {
-      try {
-        const res = await fetch(
-          `/api/framework-review-proxy?path=version/${encodeURIComponent(versionId)}/publish`,
-          {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ verdict, notes: notes || null }),
-          },
-        );
-        if (!res.ok) {
-          const errBody: { message?: string } = await res.json().catch(() => ({}));
-          setError(errBody.message ?? `Request failed (${res.status})`);
-          return;
-        }
+    submit(
+      `version/${encodeURIComponent(versionId)}/publish`,
+      { verdict, notes: notes || null },
+      () => {
         setMode("idle");
         setNotes("");
-        router.refresh();
+        // Navigate back to the queue overview after a successful action.
+        // useProxyAction has already called router.refresh().
         router.push("/wiki/E2505");
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      }
-    });
+      },
+    );
   }
 
   if (mode === "rejecting") {

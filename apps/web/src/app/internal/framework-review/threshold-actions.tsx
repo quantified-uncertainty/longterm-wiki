@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useProxyAction } from "./use-proxy-action";
 
 interface Props {
   thresholdId: string;
@@ -36,40 +36,23 @@ export function ThresholdActions({
   currentNotes,
   fields,
 }: Props) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, error, submit } = useProxyAction();
   const [mode, setMode] = useState<Mode>("idle");
   const [notes, setNotes] = useState("");
-  const [error, setError] = useState<string | null>(null);
   const [edits, setEdits] = useState({
     triggerDescription: fields.triggerDescription,
     sourceQuote: fields.sourceQuote,
   });
 
   function callProxy(verdict: string, body: Record<string, unknown>) {
-    setError(null);
-    startTransition(async () => {
-      try {
-        const res = await fetch(
-          `/api/framework-review-proxy?path=threshold/${encodeURIComponent(thresholdId)}`,
-          {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ verdict, ...body }),
-          },
-        );
-        if (!res.ok) {
-          const errBody: { message?: string } = await res.json().catch(() => ({}));
-          setError(errBody.message ?? `Request failed (${res.status})`);
-          return;
-        }
+    submit(
+      `threshold/${encodeURIComponent(thresholdId)}`,
+      { verdict, ...body },
+      () => {
         setMode("idle");
         setNotes("");
-        router.refresh();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      }
-    });
+      },
+    );
   }
 
   return (

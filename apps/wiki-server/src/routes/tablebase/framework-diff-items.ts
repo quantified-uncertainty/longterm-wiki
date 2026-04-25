@@ -47,11 +47,7 @@ const VALID_CLASSIFIER_TAG = [
   "clarification",
 ] as const;
 
-const VALID_RISK_DOMAINS = [
-  "cbrn", "bio", "chem", "nuclear", "radiological",
-  "cyber", "autonomy_replication", "ai_rd",
-  "scheming", "persuasion", "loss_of_control", "other",
-] as const;
+import { VALID_RISK_DOMAINS } from "../shared/framework-constants.js";
 
 const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 500),

@@ -21,18 +21,13 @@ import {
 } from "../shared/utils.js";
 import { paginatedQuery } from "../shared/paginated-query.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import {
+  VALID_OVERALL_DIRECTIONS as VALID_OVERALL,
+  VALID_REVIEW_VERDICTS as VALID_VERDICT,
+} from "../shared/framework-constants.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 const MAX_PAGE_SIZE = 500;
-
-const VALID_OVERALL = ["weaker", "stronger", "mixed", "neutral", "rewrite"] as const;
-const VALID_VERDICT = [
-  "confirmed_weakening",
-  "confirmed_strengthening",
-  "false_positive",
-  "nuanced",
-  "unreviewed",
-] as const;
 
 const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 200),

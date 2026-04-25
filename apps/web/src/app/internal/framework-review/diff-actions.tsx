@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { useProxyAction } from "./use-proxy-action";
 
 interface Props {
   diffId: string;
@@ -37,36 +37,19 @@ const VERDICTS = [
  * not just what.
  */
 export function DiffActions({ diffId, currentVerdict }: Props) {
-  const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const { pending, error, submit } = useProxyAction();
   const [pickedVerdict, setPickedVerdict] = useState<string | null>(null);
   const [notes, setNotes] = useState("");
-  const [error, setError] = useState<string | null>(null);
 
   function callProxy(verdict: string) {
-    setError(null);
-    startTransition(async () => {
-      try {
-        const res = await fetch(
-          `/api/framework-review-proxy?path=diff/${encodeURIComponent(diffId)}`,
-          {
-            method: "POST",
-            headers: { "content-type": "application/json" },
-            body: JSON.stringify({ verdict, notes: notes || null }),
-          },
-        );
-        if (!res.ok) {
-          const errBody: { message?: string } = await res.json().catch(() => ({}));
-          setError(errBody.message ?? `Request failed (${res.status})`);
-          return;
-        }
+    submit(
+      `diff/${encodeURIComponent(diffId)}`,
+      { verdict, notes: notes || null },
+      () => {
         setPickedVerdict(null);
         setNotes("");
-        router.refresh();
-      } catch (e) {
-        setError(e instanceof Error ? e.message : String(e));
-      }
-    });
+      },
+    );
   }
 
   return (

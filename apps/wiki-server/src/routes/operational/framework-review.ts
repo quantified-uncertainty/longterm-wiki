@@ -43,6 +43,11 @@ import {
   notFoundError,
   validationError,
 } from "../shared/utils.js";
+import {
+  VALID_RISK_DOMAINS,
+  VALID_COMMITMENT_LANGUAGES as VALID_COMMITMENT_LANG,
+  VALID_DASHBOARD_DIFF_VERDICTS as VALID_DIFF_VERDICTS,
+} from "../shared/framework-constants.js";
 
 // ─── Verdict encoding helpers ─────────────────────────────────────────────
 
@@ -75,25 +80,6 @@ export function formatThresholdNotes(
   const trimmed = notes?.trim();
   return trimmed ? `[${verdict}] ${trimmed}` : `[${verdict}]`;
 }
-
-// ─── Schemas ──────────────────────────────────────────────────────────────
-
-const VALID_RISK_DOMAINS = [
-  "cbrn", "bio", "chem", "nuclear", "radiological",
-  "cyber", "autonomy_replication", "ai_rd",
-  "scheming", "persuasion", "loss_of_control", "other",
-] as const;
-
-const VALID_COMMITMENT_LANG = [
-  "committed", "aspirational", "conditional", "informational",
-] as const;
-
-const VALID_DIFF_VERDICTS = [
-  "confirmed_weakening",
-  "confirmed_strengthening",
-  "false_positive",
-  "nuanced",
-] as const;
 
 const ThresholdReviewBody = z.object({
   verdict: z.enum(VERDICT_TAGS),
@@ -161,7 +147,7 @@ const frameworkReviewApp = new Hono()
         eq(safetyFrameworks.id, safetyFrameworkVersions.frameworkId),
       )
       .where(eq(safetyFrameworkVersions.ingestStatus, "pending_review"))
-      .orderBy(safetyFrameworkVersions.discoveredDate);
+      .orderBy(safetyFrameworkVersions.discoveredDate, safetyFrameworkVersions.id);
 
     if (pendingVersions.length === 0) {
       return c.json({ versions: [] });
