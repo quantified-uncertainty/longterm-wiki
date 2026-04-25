@@ -1,0 +1,7 @@
+Domain,Subdomain,Indicator,Definition,Notes,Example disclosure
+Upstream,Data Acquisition,Data acquisition methods,"What methods does the developer use to acquire data used to build the model?","Multi-line
+notes here.",
+Upstream,Data Acquisition,Public datasets,"Are public datasets used?",,
+Upstream,Compute,Compute usage,"How much compute is used?",,
+Model,Capabilities,Model capabilities,"What can the model do?",,
+Downstream,Impact,User impact,"How does the model impact users, including ""quoted"" content?",,
