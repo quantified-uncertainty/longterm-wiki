@@ -8,6 +8,7 @@
  *   crux linear view <QUA-NNN>          Show full issue + comments
  *   crux linear search <query>          Search QUA team issues
  *   crux linear create <title>          Create a new issue
+ *   crux linear update <QUA-NNN>        Update project, priority, title, description, parent
  *   crux linear comment <QUA-NNN> <msg> Post a comment
  *   crux linear start <QUA-NNN>         Move to In Progress + start comment
  *   crux linear done <QUA-NNN> --pr=URL Move to In Review + done comment
@@ -23,7 +24,9 @@ import {
   getComments,
   getIssue,
   searchIssues,
+  updateIssue,
   updateIssueState,
+  type UpdateIssueInput,
 } from '../lib/linear/issues.ts';
 import {
   createProjectUpdate,
@@ -67,6 +70,7 @@ interface CommandOptions extends BaseOptions {
   priority?: string;
   parent?: string;
   project?: string;
+  title?: string;
   content?: string;
   contentFile?: string;
   name?: string;
@@ -499,6 +503,7 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   // Resolve parent issue (QUA-NNN → internal UUID)
   let parentId: string | undefined;
   let parentLabel: string | undefined;
+  let parentProject: { id: string; name: string } | null = null;
   if (options.parent) {
     const parent = await getIssue(options.parent);
     if (!parent) {
@@ -509,11 +514,15 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
     parentId = parent.id;
     parentLabel = `${parent.identifier} — ${parent.title}`;
+    parentProject = parent.project;
   }
 
-  // Resolve project (UUID or case-insensitive exact name)
+  // Resolve project (UUID or case-insensitive exact name).
+  // QUA-516: when --parent has a project and --project is omitted, inherit
+  // it. Explicit --project always wins.
   let projectId: string | undefined;
   let projectLabel: string | undefined;
+  let projectInherited = false;
   if (options.project) {
     const project = await getProject(options.project);
     if (!project) {
@@ -524,6 +533,10 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     }
     projectId = project.id;
     projectLabel = project.name;
+  } else if (parentProject) {
+    projectId = parentProject.id;
+    projectLabel = parentProject.name;
+    projectInherited = true;
   }
 
   const result = await createIssue({ title, description, priority, parentId, projectId });
@@ -535,8 +548,116 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
   let out = '';
   out += `${c.green}✓${c.reset} Created ${c.cyan}${result.identifier}${c.reset} — ${title}\n`;
   if (parentLabel) out += `  ${c.dim}parent:${c.reset}  ${parentLabel}\n`;
-  if (projectLabel) out += `  ${c.dim}project:${c.reset} ${projectLabel}\n`;
+  if (projectLabel) {
+    const tag = projectInherited ? ` ${c.dim}(inherited from parent)${c.reset}` : '';
+    out += `  ${c.dim}project:${c.reset} ${projectLabel}${tag}\n`;
+  }
   out += `  ${result.url}\n`;
+  return { output: out, exitCode: 0 };
+}
+
+/**
+ * Update a non-state field on an existing issue (project, priority, title,
+ * description, parent). Workflow-state changes go through `start` / `done`.
+ *
+ * QUA-516: previously the only way to change an issue's project was a one-off
+ * GraphQL script. This exposes the existing `issueUpdate` mutation cleanly.
+ */
+async function update(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const id = parseLinearId(args[0]);
+  if (!id) {
+    return {
+      output: `${c.red}Usage: crux linear update <QUA-NNN> [--project=<name|uuid>] [--priority=1-4] [--title=...] [--description=...] [--description-file=<path>] [--parent=QUA-NNN|none]${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  const issue = await getIssue(id);
+  if (!issue) {
+    return { output: `${c.red}Issue ${id} not found${c.reset}\n`, exitCode: 1 };
+  }
+
+  const input: UpdateIssueInput = {};
+  const changed: string[] = [];
+
+  if (options.project !== undefined) {
+    if (options.project === '' || options.project.toLowerCase() === 'none') {
+      input.projectId = null;
+      changed.push('project=(cleared)');
+    } else {
+      const project = await getProject(options.project);
+      if (!project) {
+        return {
+          output: `${c.red}Project not found: ${options.project}${c.reset}\n  Run ${c.cyan}crux linear project list${c.reset} to see available projects.\n`,
+          exitCode: 1,
+        };
+      }
+      input.projectId = project.id;
+      changed.push(`project=${project.name}`);
+    }
+  }
+
+  if (options.priority !== undefined) {
+    const priority = parseInt(options.priority, 10);
+    if (Number.isNaN(priority) || priority < 0 || priority > 4) {
+      return {
+        output: `${c.red}Invalid priority "${options.priority}" — must be 0 (none), 1 (urgent), 2 (high), 3 (medium), or 4 (low)${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+    input.priority = priority;
+    changed.push(`priority=${priorityLabel(priority)}`);
+  }
+
+  if (options.title !== undefined) {
+    input.title = options.title;
+    changed.push('title');
+  }
+
+  const descFromFile = readBodyFlag(options.descriptionFile);
+  if (descFromFile !== null) {
+    input.description = descFromFile;
+    changed.push('description');
+  } else if (options.description !== undefined) {
+    input.description = options.description;
+    changed.push('description');
+  }
+
+  if (options.parent !== undefined) {
+    if (options.parent === '' || options.parent.toLowerCase() === 'none') {
+      input.parentId = null;
+      changed.push('parent=(cleared)');
+    } else {
+      const parent = await getIssue(options.parent);
+      if (!parent) {
+        return {
+          output: `${c.red}Parent issue not found: ${options.parent}${c.reset}\n`,
+          exitCode: 1,
+        };
+      }
+      input.parentId = parent.id;
+      changed.push(`parent=${parent.identifier}`);
+    }
+  }
+
+  if (Object.keys(input).length === 0) {
+    return {
+      output: `${c.red}Nothing to update. Pass --project, --priority, --title, --description, --description-file, or --parent.${c.reset}\n`,
+      exitCode: 1,
+    };
+  }
+
+  await updateIssue(id, input);
+
+  if (options.json) {
+    return { output: JSON.stringify({ identifier: id, changed }, null, 2) + '\n', exitCode: 0 };
+  }
+
+  let out = `${c.green}✓${c.reset} Updated ${c.cyan}${id}${c.reset} — ${changed.join(', ')}\n`;
+  out += `  ${issue.url}\n`;
   return { output: out, exitCode: 0 };
 }
 
@@ -1033,6 +1154,7 @@ export const commands = {
   search,
   comment,
   create,
+  update,
   start,
   done,
   audit,
@@ -1052,6 +1174,7 @@ Commands:
   view <QUA-NNN>                Show full issue + recent comments (default)
   search <query>                Search QUA team issues
   create <title>                Create a new issue in the QUA team
+  update <QUA-NNN>              Update project, priority, title, description, or parent
   comment <QUA-NNN> <message>   Post a comment on an issue
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
@@ -1068,8 +1191,18 @@ Options (create):
   --description-file=<path>  Issue description from file (safe for multiline)
   --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
   --parent=QUA-NNN           Parent issue (sets the child link to an epic)
-  --project=<name|uuid>      Project (UUID or case-insensitive exact name)
+  --project=<name|uuid>      Project (UUID or case-insensitive exact name).
+                             When --parent has a project and --project is
+                             omitted, the parent's project is inherited.
   --allow-big                Bypass the ticket-sizing red-flag check (see .claude/rules/ticket-sizing.md)
+
+Options (update):
+  --project=<name|uuid|none> Set or clear the project (use "none" to clear)
+  --priority=N               Priority: 0=none, 1=urgent, 2=high, 3=medium, 4=low
+  --title=<text>             Rename the issue
+  --description=<text>       Replace the description (inline)
+  --description-file=<path>  Replace the description from file (safe for multiline)
+  --parent=QUA-NNN|none      Set or clear the parent issue link
 
 Options (comment):
   --body-file=<path>  Comment body from file (safe for multiline / escaped content)
@@ -1102,6 +1235,10 @@ Examples:
   crux linear create "Broken login page" --description="The login form crashes on submit"
   crux linear create "Add retry logic" --description-file=/tmp/desc.md --priority=3
   crux linear create "Migrate X" --parent=QUA-408 --project="Data Model Unwind" --priority=2
+  crux linear create "Sub-task" --parent=QUA-408   # inherits QUA-408's project
+  crux linear update QUA-184 --project="Data Model Unwind"
+  crux linear update QUA-184 --priority=2 --title="Clearer title"
+  crux linear update QUA-184 --project=none        # clear the project
   crux linear view QUA-184
   crux linear search "agent checklist"
   crux linear start QUA-184
