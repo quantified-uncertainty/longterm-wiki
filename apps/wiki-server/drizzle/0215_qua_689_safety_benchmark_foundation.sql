@@ -199,7 +199,6 @@ CREATE TABLE IF NOT EXISTS "model_aliases" (
   -- match suggested by ingester, awaiting human confirmation; 'manual' =
   -- promoted by a human via /internal/benchmark-quarantine.
   "confidence" text NOT NULL DEFAULT 'exact',
-  "added_at" timestamp with time zone NOT NULL DEFAULT now(),
   "synced_at" timestamp with time zone NOT NULL DEFAULT now(),
   "created_at" timestamp with time zone NOT NULL DEFAULT now(),
   "updated_at" timestamp with time zone NOT NULL DEFAULT now()

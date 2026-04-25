@@ -35,6 +35,7 @@
  * outages.
  */
 
+import { fileURLToPath } from "url";
 import { getAllBenchmarkResults } from "../lib/wiki-server/benchmark-results.ts";
 import { getColors } from "../lib/output.ts";
 
@@ -54,8 +55,11 @@ interface CheckResult {
   errors: string[];
 }
 
+// Server-side `MAX_PAGE_SIZE` on /api/benchmark-results/all is 200 — bumping
+// PAGE_SIZE further would overflow the route's clampedLimit and silently
+// fetch only 200 anyway. 50 pages × 200 = 10,000 row hard cap.
 const PAGE_SIZE = 200;
-const MAX_PAGES = 50; // 10,000 rows hard cap
+const MAX_PAGES = 50;
 
 export async function runCheck(): Promise<CheckResult> {
   const result: CheckResult = {
@@ -88,10 +92,7 @@ export async function runCheck(): Promise<CheckResult> {
 
     for (const row of rows) {
       result.scanned += 1;
-      // The /all endpoint returns testedBy from formatRow (added in this
-      // PR). Older clients used to omit it; defensive fallback to 'unknown'.
-      const testedBy =
-        (row as { testedBy?: string }).testedBy ?? "unknown";
+      const testedBy = row.testedBy ?? "unknown";
       if (testedBy === "unknown") {
         result.soft.push({
           id: row.id,
@@ -174,13 +175,13 @@ async function main(): Promise<void> {
 }
 
 // Only run main() when invoked as a script, not when imported by tests.
-// Strict equality only — a fallback like `endsWith(process.argv[1] ?? "")`
-// becomes `endsWith("")` when argv[1] is undefined, which matches ANY URL
-// and would call process.exit(0) inside test runners that import this module.
-const invokedAsScript =
+// fileURLToPath() is the same pattern 14+ other validators use; safer than
+// import.meta.url string comparison (which is sensitive to trailing-slash
+// and protocol differences).
+if (
   typeof process.argv[1] === "string" &&
-  import.meta.url === `file://${process.argv[1]}`;
-if (invokedAsScript) {
+  process.argv[1] === fileURLToPath(import.meta.url)
+) {
   main().catch((err) => {
     console.error("validate-benchmark-result-provenance crashed:", err);
     process.exit(0); // advisory-only — even crashes shouldn't block

@@ -10,37 +10,20 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { and, count, desc, eq, ilike, or, sql } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import {
-  benchmarkResultsPending,
-  benchmarks,
-} from "../../schema.js";
-import {
-  zv,
-  clampedLimit,
-  validationError,
-} from "../shared/utils.js";
+import { benchmarkResultsPending } from "../../schema.js";
+import { zv, clampedLimit, validationError } from "../shared/utils.js";
+import { buildSearchCondition } from "../shared/query-helpers.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { VALID_TESTED_BY, resolveBenchmarkRefs } from "./benchmark-shared.js";
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 500;
 
 const VALID_STATUS = ["pending", "resolved", "rejected"] as const;
-
-const VALID_TESTED_BY = [
-  "self-report",
-  "leaderboard",
-  "aisi-uk",
-  "aisi-us",
-  "metr",
-  "apollo",
-  "third-party-paper",
-  "epoch-ai",
-  "unknown",
-] as const;
 
 // ---- Query schemas ----
 
@@ -109,27 +92,23 @@ const benchmarkResultsPendingApp = new Hono()
   // GET /stats — quarantine queue depth, used by the dashboard sidebar.
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
-
-    const [{ total }] = await db
-      .select({ total: count() })
-      .from(benchmarkResultsPending);
-
-    const byStatus = await db
-      .select({
-        status: benchmarkResultsPending.status,
-        total: count(),
-      })
-      .from(benchmarkResultsPending)
-      .groupBy(benchmarkResultsPending.status);
-
-    const bySource = await db
-      .select({
-        ingesterSource: benchmarkResultsPending.ingesterSource,
-        total: count(),
-      })
-      .from(benchmarkResultsPending)
-      .groupBy(benchmarkResultsPending.ingesterSource);
-
+    const [[{ total }], byStatus, bySource] = await Promise.all([
+      db.select({ total: count() }).from(benchmarkResultsPending),
+      db
+        .select({
+          status: benchmarkResultsPending.status,
+          total: count(),
+        })
+        .from(benchmarkResultsPending)
+        .groupBy(benchmarkResultsPending.status),
+      db
+        .select({
+          ingesterSource: benchmarkResultsPending.ingesterSource,
+          total: count(),
+        })
+        .from(benchmarkResultsPending)
+        .groupBy(benchmarkResultsPending.ingesterSource),
+    ]);
     return c.json({
       total,
       byStatus: byStatus.map((r) => ({ status: r.status, total: r.total })),
@@ -153,29 +132,28 @@ const benchmarkResultsPendingApp = new Hono()
     if (benchmarkId)
       conditions.push(eq(benchmarkResultsPending.benchmarkId, benchmarkId));
     if (q) {
-      const pattern = `%${q.toLowerCase()}%`;
-      conditions.push(
-        or(
-          ilike(benchmarkResultsPending.rawModelName, pattern),
-          ilike(benchmarkResultsPending.benchmarkId, pattern),
-        ),
+      const search = buildSearchCondition(
+        [benchmarkResultsPending.rawModelName, benchmarkResultsPending.benchmarkId],
+        q,
       );
+      if (search) conditions.push(search);
     }
 
     const where = conditions.length ? and(...conditions) : undefined;
 
-    const rows = await db
-      .select()
-      .from(benchmarkResultsPending)
-      .where(where)
-      .orderBy(desc(benchmarkResultsPending.createdAt))
-      .limit(limit)
-      .offset(offset);
-
-    const [{ total }] = await db
-      .select({ total: count() })
-      .from(benchmarkResultsPending)
-      .where(where);
+    const [rows, [{ total }]] = await Promise.all([
+      db
+        .select()
+        .from(benchmarkResultsPending)
+        .where(where)
+        .orderBy(desc(benchmarkResultsPending.createdAt))
+        .limit(limit)
+        .offset(offset),
+      db
+        .select({ total: count() })
+        .from(benchmarkResultsPending)
+        .where(where),
+    ]);
 
     return c.json({
       items: rows.map(formatRow),
@@ -192,54 +170,18 @@ const benchmarkResultsPendingApp = new Hono()
       name: "benchmark-results-pending",
       table: benchmarkResultsPending,
       syncSchema: SyncBenchmarkResultPendingItemSchema,
-      // No `auditRecordType` — pending row IDs (e.g. `brp_quarantine_helm_1`)
-      // can exceed the 10-char limit on `tablebase_audit_log.record_id`
-      // (varchar(10) NOT NULL). The factory writes `recordId: row.id` into
-      // that column, so audit logging would fail with "value too long" on
-      // every realistic ingester payload. Quarantine rows are also a
-      // short-lived, operator-curated queue — the relevant audit trail is
-      // the `resolved_*` columns recording who promoted/rejected each row.
-      // Note: we deliberately don't use the factory's `naturalKey` for
-      // intra-batch dedup here. The factory runs naturalKey BEFORE
-      // preValidate, but preValidate is what canonicalizes
-      // benchmarkId (slug → 10-char id). Two items with `mmlu` and
-      // `bench-mmlu1` for the same model would dedup-pass on raw input
-      // then collide on `uq_brp_natural_key` post-resolution. We do the
-      // dedup inside preValidate instead, on the post-resolution form.
-      // benchmarkId references the benchmarks table (not entities), so we
-      // can't use the factory's `entityRefs` shorthand. Validate it via
-      // preValidate, mirroring benchmark-results.ts. Slug fallback is allowed
-      // for ingesters that submit benchmark slugs rather than 10-char IDs.
+      // Why no `auditRecordType`: row IDs (e.g. `brp_quarantine_helm_1`)
+      // can exceed `tablebase_audit_log.record_id`'s varchar(10), so audit
+      // logging would fail with "value too long" on real payloads.
+      // Why no factory `naturalKey`: the factory's natural-key dedup runs
+      // BEFORE `preValidate`, but `preValidate` is what canonicalizes the
+      // benchmarkId (slug → 10-char id). The post-resolution dedup below
+      // catches batches that mix slug and id forms.
+      // Why no `entityRefs`: benchmarkId references the `benchmarks` table,
+      // not entities. Validated in `preValidate` via the shared helper.
       preValidate: async (c, db, items) => {
-        const benchmarkIds = [...new Set(items.map((i) => i.benchmarkId))];
-        if (benchmarkIds.length === 0) return null;
-        const placeholders = benchmarkIds.map((id) => sql`${id}`);
-        const inList = sql.join(placeholders, sql`, `);
-        const found = await db.execute<{ id: string; slug: string }>(sql`
-          SELECT id, slug FROM benchmarks WHERE id IN (${inList}) OR slug IN (${inList})
-        `);
-        const foundIdSet = new Set(found.map((r) => r.id));
-        const foundSlugSet = new Set(found.map((r) => r.slug));
-        const slugToId = new Map(found.map((r) => [r.slug, r.id]));
-        const missing = benchmarkIds.filter(
-          (id) => !foundIdSet.has(id) && !foundSlugSet.has(id),
-        );
-        if (missing.length > 0) {
-          return validationError(
-            c,
-            `Benchmark references not found in benchmarks table: ${missing.join(", ")}. Ensure benchmarks are synced first.`,
-          );
-        }
-        for (const item of items) {
-          if (slugToId.has(item.benchmarkId)) {
-            item.benchmarkId = slugToId.get(item.benchmarkId)!;
-          }
-        }
-        // Post-resolution intra-batch dedup. Catches batches that mix slug
-        // and 10-char id forms of the same benchmark for the same
-        // (ingesterSource, model, evaluationDate). PG's uq_brp_natural_key
-        // would fail the upsert, but with a confusing duplicate-key SQL
-        // error instead of a clean 400.
+        const refErr = await resolveBenchmarkRefs(c, db, items);
+        if (refErr) return refErr;
         const seen = new Set<string>();
         for (const item of items) {
           const key = [

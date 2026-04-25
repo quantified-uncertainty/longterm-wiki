@@ -11,10 +11,11 @@
 
 import { Hono } from "hono";
 import { z } from "zod";
-import { and, count, desc, eq, ilike, or } from "drizzle-orm";
+import { and, count, desc, eq } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { modelAliases } from "../../schema.js";
 import { zv, clampedLimit } from "../shared/utils.js";
+import { buildSearchCondition } from "../shared/query-helpers.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
@@ -65,7 +66,6 @@ function formatRow(r: typeof modelAliases.$inferSelect) {
     modelStableId: r.modelStableId,
     source: r.source,
     confidence: r.confidence,
-    addedAt: r.addedAt,
     syncedAt: r.syncedAt,
     createdAt: r.createdAt,
     updatedAt: r.updatedAt,
@@ -79,21 +79,17 @@ const modelAliasesApp = new Hono()
   // GET /stats — distribution by source + confidence, used by quarantine UI.
   .get("/stats", async (c) => {
     const db = getDrizzleDb();
-
-    const [{ total }] = await db
-      .select({ total: count() })
-      .from(modelAliases);
-
-    const bySource = await db
-      .select({ source: modelAliases.source, total: count() })
-      .from(modelAliases)
-      .groupBy(modelAliases.source);
-
-    const byConfidence = await db
-      .select({ confidence: modelAliases.confidence, total: count() })
-      .from(modelAliases)
-      .groupBy(modelAliases.confidence);
-
+    const [[{ total }], bySource, byConfidence] = await Promise.all([
+      db.select({ total: count() }).from(modelAliases),
+      db
+        .select({ source: modelAliases.source, total: count() })
+        .from(modelAliases)
+        .groupBy(modelAliases.source),
+      db
+        .select({ confidence: modelAliases.confidence, total: count() })
+        .from(modelAliases)
+        .groupBy(modelAliases.confidence),
+    ]);
     return c.json({
       total,
       bySource: bySource.map((r) => ({ source: r.source, total: r.total })),
@@ -116,29 +112,25 @@ const modelAliasesApp = new Hono()
     if (source) conditions.push(eq(modelAliases.source, source));
     if (confidence) conditions.push(eq(modelAliases.confidence, confidence));
     if (q) {
-      const pattern = `%${q.toLowerCase()}%`;
-      conditions.push(
-        or(
-          ilike(modelAliases.alias, pattern),
-          ilike(modelAliases.modelStableId, pattern),
-        ),
+      const search = buildSearchCondition(
+        [modelAliases.alias, modelAliases.modelStableId],
+        q,
       );
+      if (search) conditions.push(search);
     }
 
     const where = conditions.length ? and(...conditions) : undefined;
 
-    const rows = await db
-      .select()
-      .from(modelAliases)
-      .where(where)
-      .orderBy(desc(modelAliases.addedAt), modelAliases.alias)
-      .limit(limit)
-      .offset(offset);
-
-    const [{ total }] = await db
-      .select({ total: count() })
-      .from(modelAliases)
-      .where(where);
+    const [rows, [{ total }]] = await Promise.all([
+      db
+        .select()
+        .from(modelAliases)
+        .where(where)
+        .orderBy(desc(modelAliases.createdAt), modelAliases.alias)
+        .limit(limit)
+        .offset(offset),
+      db.select({ total: count() }).from(modelAliases).where(where),
+    ]);
 
     return c.json({
       items: rows.map(formatRow),
@@ -184,25 +176,16 @@ const modelAliasesApp = new Hono()
       name: "model-aliases",
       table: modelAliases,
       syncSchema: SyncModelAliasItemSchema,
+      // alias is the PK (not id). conflictTarget overrides the factory's
+      // default; auditRecordType is omitted because the factory writes
+      // `recordId: row.id` (which model_aliases doesn't have) into
+      // `tablebase_audit_log.record_id` varchar(10). entityRefs shorthand
+      // is skipped because the FK target is entities.stable_id, not .id —
+      // the PG constraint catches unknown stable_ids at upsert time.
       conflictTarget: modelAliases.alias,
       naturalKey: (item) => item.alias,
       naturalKeyError:
         "Duplicate alias in batch — model_aliases.alias is the primary key, intra-batch dedup before sync",
-      // FK target is entities.stable_id, not entities.id, so we can't use the
-      // factory's `entityRefs` shorthand (which assumes entities.id). The FK
-      // constraint in PG (model_aliases.model_stable_id REFERENCES
-      // entities.stable_id) is the authoritative check; an attempted sync
-      // with an unknown model_stable_id surfaces as a constraint-violation
-      // error from the upsert phase. Phase 2 ingesters always resolve
-      // canonical stable_ids before sync, so this is the right boundary.
-      //
-      // No `auditRecordType` — the factory's audit log assumes the table has
-      // an `id` column and writes `recordId: row.id` into
-      // `tablebase_audit_log.record_id` (varchar(10) NOT NULL). model_aliases
-      // uses `alias` as its PK, so audit logging would produce undefined
-      // recordIds and fail at insert time. Audit logging on an alias map is
-      // also low value — the canonical write history lives on the
-      // `model_stable_id` entity itself.
       toRow: (item, now) => ({
         alias: item.alias,
         modelStableId: item.modelStableId,

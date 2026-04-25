@@ -2412,7 +2412,7 @@ export const benchmarkResults = pgTable(
     notes: text("notes"),
     // Provenance — who ran the eval and when (extended in QUA-689 from
     // QUA-702's nullable tested_by). The CHECK constraint is enforced by
-    // chk_br_tested_by — see migration 0214. Allowed values: self-report,
+    // chk_br_tested_by — see migration 0215. Allowed values: self-report,
     // leaderboard, aisi-uk, aisi-us, metr, apollo, third-party-paper,
     // epoch-ai, unknown, plus the legacy 'third-party' value from QUA-702
     // (kept for backward compat).
@@ -4711,9 +4711,6 @@ export const modelAliases = pgTable(
     //   fuzzy  — Levenshtein match suggested by ingester, awaiting promote
     //   manual — promoted by a human via /internal/benchmark-quarantine
     confidence: text("confidence").notNull().default("exact"),
-    addedAt: timestamp("added_at", { withTimezone: true })
-      .notNull()
-      .defaultNow(),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

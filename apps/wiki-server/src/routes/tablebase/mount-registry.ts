@@ -190,4 +190,5 @@ export const TABLEBASE_NON_ROUTE_FILES: readonly string[] = [
   "write-inline-verdicts.ts",
   "entity-profile-descriptions.ts",
   "system-card-benchmark-linker.ts",
+  "benchmark-shared.ts",
 ];
