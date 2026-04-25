@@ -271,7 +271,7 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
     const search = vi.fn().mockRejectedValue(apiKeyError);
     mockCreateIssue.mockResolvedValue({ number: 4577 });
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     vi.useFakeTimers();
     try {
@@ -292,12 +292,12 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
         }),
       );
       // Misconfig must also fire the loud CI annotation, not just the body banner.
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('::error title=Wellness dedup misconfigured::'),
       );
     } finally {
       vi.useRealTimers();
-      consoleErrorSpy.mockRestore();
+      consoleLogSpy.mockRestore();
     }
   });
 

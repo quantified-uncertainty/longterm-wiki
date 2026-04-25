@@ -276,7 +276,7 @@ describe('dedupLinearWellnessIssue', () => {
         'It should be in .env.base at the workspace root — sync it into the slot .env or export it.',
     );
     const search = vi.fn().mockRejectedValue(apiKeyError);
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     try {
       const result = await dedupLinearWellnessIssue(TITLE, COMMENT, {
@@ -285,11 +285,11 @@ describe('dedupLinearWellnessIssue', () => {
       expect(result).toEqual({ kind: 'skipped', reason: 'misconfig' });
       // Loud failure is the whole point — assert the ::error annotation
       // pattern fires so this can't regress to a quiet warn.
-      expect(consoleErrorSpy).toHaveBeenCalledWith(
+      expect(consoleLogSpy).toHaveBeenCalledWith(
         expect.stringContaining('::error title=Wellness dedup misconfigured::'),
       );
     } finally {
-      consoleErrorSpy.mockRestore();
+      consoleLogSpy.mockRestore();
     }
   });
 
@@ -383,7 +383,7 @@ describe('closeLinearWellnessOnAllClear', () => {
     const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
     const search = vi.fn().mockRejectedValue(apiKeyError);
     const consoleWarnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    const consoleLogSpy = vi.spyOn(console, 'log').mockImplementation(() => {});
 
     try {
       const result = await closeLinearWellnessOnAllClear(TITLE, closeComment, {
@@ -393,10 +393,10 @@ describe('closeLinearWellnessOnAllClear', () => {
         now: () => NOW,
       });
       expect(result).toEqual({ kind: 'misconfig' });
-      expect(consoleErrorSpy).not.toHaveBeenCalled();
+      expect(consoleLogSpy).not.toHaveBeenCalled();
       expect(consoleWarnSpy).not.toHaveBeenCalled();
     } finally {
-      consoleErrorSpy.mockRestore();
+      consoleLogSpy.mockRestore();
       consoleWarnSpy.mockRestore();
     }
   });

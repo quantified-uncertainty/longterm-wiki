@@ -115,11 +115,11 @@ export async function dedupLinearWellnessIssue(
     candidates = results.filter((r) => r.title === title);
   } catch (err) {
     if (isMissingLinearApiKeyError(err)) {
-      // Permanent misconfig — surfaced via stderr (CI annotation) so the
-      // missing-secret cause shows up in the run summary, not just the log.
-      // The caller stamps a banner onto the GitHub issue body so the cause is
-      // visible to whoever reads the wellness ticket too.
-      console.error(
+      // Permanent misconfig — surfaced via stdout because GitHub Actions
+      // workflow commands (::error::) are parsed only from stdout. The caller
+      // also stamps a banner onto the GitHub issue body so the cause is
+      // visible to whoever reads the wellness ticket.
+      console.log(
         '::error title=Wellness dedup misconfigured::LINEAR_API_KEY secret not set in repo — Linear-side dedup is dormant; expect duplicate wellness tickets until the secret is added (Settings → Secrets and variables → Actions).',
       );
       return { kind: 'skipped', reason: 'misconfig' };
