@@ -95,6 +95,49 @@ export interface TarEntry {
 }
 
 /**
+ * Parse a single line of `tar -tvjf` output into a `TarEntry`.
+ *
+ * Verbose tar listings vary by implementation:
+ *   GNU tar:  `drwxr-xr-x runner/runner    0 2024-04-20 03:37 dir/`
+ *   bsdtar:   `drwxr-xr-x  0 runner runner  0 Apr 20 03:37 dir/`
+ *
+ * Both share two reliable anchors:
+ *   1. The first whitespace-separated token is a permissions string whose
+ *      first character is the entry type (`d`, `-`, `l`, `h`, `c`, `b`, `p`,
+ *      `s`).
+ *   2. A `HH:MM` timestamp precedes the name field by exactly one whitespace
+ *      run; the name (with optional ` -> target` or ` link to target`
+ *      suffix) is everything after that timestamp.
+ *
+ * We anchor the parser on those two invariants instead of trying to count
+ * the variable middle-column tokens, which is what made the previous
+ * implementation reject bsdtar output (token 3 was `\d+`, but bsdtar puts
+ * the group name there). See QUA-733.
+ *
+ * Returns `null` for blank lines, and a `{ type: "?" }` entry for lines
+ * that don't match the anchor — the validator will reject those defensively.
+ */
+export function parseTarVerboseLine(line: string): TarEntry | null {
+  const trimmed = line.replace(/\r$/, "");
+  if (!trimmed.trim()) return null;
+
+  const m = trimmed.match(/^(\S+)\s+.*\s\d{1,2}:\d{2}\s+(.+)$/);
+  if (!m) {
+    return { name: trimmed.trim(), type: "?" };
+  }
+  const type = m[1][0] ?? "?";
+  let rest = m[2];
+  let linkTarget: string | undefined;
+  // bsdtar / GNU tar format symlinks as ` -> target` and hardlinks as ` link to target`.
+  const linkMatch = rest.match(/^(.+?)\s+(?:->|link to)\s+(.+)$/);
+  if (linkMatch) {
+    rest = linkMatch[1];
+    linkTarget = linkMatch[2];
+  }
+  return { name: rest, type, linkTarget };
+}
+
+/**
  * Verbose tar listing — `-tvjf` includes the permission string (whose first
  * char is the entry type) and, for link entries, ` -> target` or ` link to
  * target`. We parse those out so `assertSafeTarEntries()` can reject any
@@ -111,29 +154,8 @@ export function listTarEntries(archivePath: string): TarEntry[] {
 
   const entries: TarEntry[] = [];
   for (const rawLine of out.split("\n")) {
-    const line = rawLine.replace(/\r$/, "");
-    if (!line.trim()) continue;
-
-    // Verbose format: `<perms> <owner> <size> <date> <time> <name>[ -> target | link to target]`
-    // The permission string (first whitespace-separated token) starts with the
-    // type char; anything we don't recognize as a regular file or directory is
-    // treated as a link/special and rejected by assertSafeTarEntries.
-    const m = line.match(/^(\S+)\s+\S+\s+\d+\s+\S+\s+\S+\s+(.+)$/);
-    if (!m) {
-      // Unparseable line — be conservative and reject by giving it an unknown type.
-      entries.push({ name: line.trim(), type: "?" });
-      continue;
-    }
-    const type = m[1][0] ?? "?";
-    let rest = m[2];
-    let linkTarget: string | undefined;
-    // bsdtar / GNU tar format symlinks as " -> target" and hardlinks as " link to target".
-    const linkMatch = rest.match(/^(.+?)\s+(?:->|link to)\s+(.+)$/);
-    if (linkMatch) {
-      rest = linkMatch[1];
-      linkTarget = linkMatch[2];
-    }
-    entries.push({ name: rest, type, linkTarget });
+    const entry = parseTarVerboseLine(rawLine);
+    if (entry) entries.push(entry);
   }
   return entries;
 }
