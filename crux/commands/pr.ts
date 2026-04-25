@@ -249,17 +249,19 @@ export interface LinearPrCollision {
  * The `lookupPrs` dependency is injectable so callers can unit-test the
  * decision logic without hitting the GitHub API. In production it defaults
  * to `findOpenPrsMentioningLinearId`, which fails open on API errors.
+ *
+ * Lookups run in parallel — for an epic PR claiming several IDs, sequential
+ * awaits would add a network round-trip per ID. The GitHub Search API's
+ * 30/min rate limit comfortably absorbs the few-at-a-time burst.
  */
 export async function checkLinearPrCollisions(
   linearIds: string[],
   lookupPrs: (id: string) => Promise<OpenPrMatch[]> = findOpenPrsMentioningLinearId,
 ): Promise<LinearPrCollision[]> {
-  const collisions: LinearPrCollision[] = [];
-  for (const id of linearIds) {
-    const prs = await lookupPrs(id);
-    if (prs.length > 0) collisions.push({ linearId: id, prs });
-  }
-  return collisions;
+  const results = await Promise.all(
+    linearIds.map(async (id) => ({ linearId: id, prs: await lookupPrs(id) })),
+  );
+  return results.filter((r) => r.prs.length > 0);
 }
 
 interface GitHubPR {

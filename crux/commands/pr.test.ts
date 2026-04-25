@@ -336,4 +336,21 @@ describe('checkLinearPrCollisions', () => {
     const collisions = await checkLinearPrCollisions(['QUA-100'], lookup);
     expect(collisions).toEqual([]);
   });
+
+  it('runs lookups in parallel, not sequentially', async () => {
+    // Regression guard: a sequential implementation would serialize N
+    // GitHub API round-trips for an epic PR. Measure wall-clock against
+    // a slow-lookup stub; parallel total should be ~the single-lookup
+    // cost, not ~N×.
+    const LATENCY_MS = 50;
+    const lookup = async (_id: string) => {
+      await new Promise((r) => setTimeout(r, LATENCY_MS));
+      return [];
+    };
+    const start = Date.now();
+    await checkLinearPrCollisions(['QUA-100', 'QUA-101', 'QUA-102', 'QUA-103'], lookup);
+    const elapsed = Date.now() - start;
+    // Parallel: ~50ms. Sequential: ~200ms. Allow slack for scheduler.
+    expect(elapsed).toBeLessThan(LATENCY_MS * 3);
+  });
 });
