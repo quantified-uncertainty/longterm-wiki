@@ -2620,3 +2620,41 @@
     - cat-bonds
     - protection-gap
   lastUpdated: 2026-04
+
+- id: ai-cyber-damage-bounding-tail
+  stableId: sid_4HXcSryurA
+  wikiId: E2520
+  type: analysis
+  title: "AI Cyber Damage: Bounding the Tail"
+  description: >-
+    Probability-weighted synthesis answer to "How likely is AI-enabled cyber damage to exceed 10% of global GDP
+    by year Y?" Headline estimate: 5-20% probability of exceeding 10% GDP in any single year through 2035, dominated
+    by single-event catastrophic-cascade tail risk in payment systems / hyperscaler cloud / industrial control
+    systems, with secondary contribution from sustained AI capability escalation.
+  customFields:
+    - label: Model Type
+      value: Synthesis / Probability Estimate
+    - label: Target Risk
+      value: Cyber Offense / Cyberweapons
+    - label: Headline Probability
+      value: 5-20% (>10% GDP cyber damage in any year through 2035)
+  relatedEntries:
+    - id: sid_7c6UC46TWQ
+      type: risk
+      relationship: related
+    - id: sid_n5k9L5Ky9g
+      type: analysis
+      relationship: related
+    - id: sid_HsUBQguk2g
+      type: analysis
+      relationship: related
+    - id: sid_6vupR53LHg
+      type: risk
+      relationship: related
+  tags:
+    - synthesis
+    - probability-estimate
+    - cyber-damage
+    - tail-risk
+    - 10-percent-gdp
+  lastUpdated: 2026-04
