@@ -1464,6 +1464,13 @@
       "when": 1787818000000,
       "tag": "0210_qua_442_audit_log_universal_trigger",
       "breakpoints": true
+    },
+    {
+      "idx": 209,
+      "version": "7",
+      "when": 1787818200000,
+      "tag": "0209_qua_692_third_party_evaluations",
+      "breakpoints": true
     }
   ]
 }

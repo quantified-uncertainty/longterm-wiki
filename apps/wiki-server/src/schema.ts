@@ -4602,3 +4602,71 @@ export const scorecardGrades = pgTable(
     ),
   ]
 );
+
+/**
+ * Third-party AI model evaluations — published pre-deployment evaluations and
+ * red-team reports from external evaluators (UK AISI, US AISI / CAISI, METR,
+ * Apollo Research). One row per published report. The `report_url` is the
+ * natural key — a single report covering N models is one row, with the model
+ * fan-out captured in `third_party_evaluation_models`.
+ *
+ * QUA-692 — Phase 5 of the AI safety data layer (parent: QUA-687).
+ */
+export const thirdPartyEvaluations = pgTable(
+  "third_party_evaluations",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    evaluatorOrgId: text("evaluator_org_id").notNull(), // FK resolved to entities.stable_id
+    evaluatorOrgDisplayName: text("evaluator_org_display_name"),
+    reportUrl: text("report_url").notNull().unique(),
+    reportPdfUrl: text("report_pdf_url"),
+    title: text("title").notNull(),
+    publishedDate: date("published_date"),
+    riskDomain: text("risk_domain").array().notNull(), // controlled vocab; CHECK in migration
+    preDeployment: boolean("pre_deployment"), // null = ambiguous (methodology post)
+    findingsSummary: text("findings_summary"),
+    capabilityLevelsAssessed: jsonb("capability_levels_assessed").$type<Record<string, string>>(),
+    methodologyUrl: text("methodology_url"),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    sourceSystem: text("source_system").notNull(), // sitemap | rss | html-scrape | manual
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_tpe_evaluator").on(table.evaluatorOrgId),
+    index("idx_tpe_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_tpe_pre_deployment").on(table.preDeployment),
+    // GIN over the array enables `risk_domain && ARRAY['cyber']` filters in O(log n).
+    index("idx_tpe_risk_domain_gin").using("gin", table.riskDomain),
+  ],
+);
+
+/**
+ * Many-to-many: a single third-party evaluation report can cover multiple
+ * AI models (METR multi-model reviews, Apollo cross-lab evaluations).
+ * `match_confidence` tracks how the link was made so we can surface an
+ * unlinked-queue dashboard for low-confidence rows.
+ */
+export const thirdPartyEvaluationModels = pgTable(
+  "third_party_evaluation_models",
+  {
+    evaluationId: text("evaluation_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id
+    aiModelDisplayName: text("ai_model_display_name"),
+    rawNameInReport: text("raw_name_in_report"), // verbatim model string from the report
+    matchConfidence: text("match_confidence").notNull(), // exact | fuzzy | manual
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.evaluationId, table.aiModelId] }),
+    index("idx_tpem_ai_model").on(table.aiModelId),
+  ],
+);

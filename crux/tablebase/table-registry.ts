@@ -370,6 +370,16 @@ const TABLE_CONFIGS: Record<string, TableConfig> = {
     deletePath: '/api/scorecard-grades/delete-batch',
     thingsSourceTable: null,
   },
+
+  'third-party-evaluations': {
+    fetchByEntityPath: (id) => `/api/third-party-evaluations/by-entity/${encodeURIComponent(id)}`,
+    resultKey: 'items',
+    syncPath: '/api/third-party-evaluations/sync',
+    syncMethod: 'POST',
+    syncBodyKey: 'items',
+    deletePath: '/api/third-party-evaluations/delete-batch',
+    thingsSourceTable: 'third_party_evaluations',
+  },
 };
 
 // Scanner uses underscored table names — map them to the canonical hyphenated form
@@ -394,6 +404,8 @@ const TABLE_ALIASES: Record<string, string> = {
   website_sources: 'website-sources',
   data_sources: 'data-sources',
   platform_accounts: 'platform-accounts',
+  model_system_cards: 'model-system-cards',
+  third_party_evaluations: 'third-party-evaluations',
 };
 
 export function getTableConfig(table: string): TableConfig | null {

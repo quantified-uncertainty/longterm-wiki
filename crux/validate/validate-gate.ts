@@ -390,6 +390,16 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'third-party-eval-refs',
+    name: 'third_party_evaluations vocab arrays match route ↔ migration (QUA-692)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-third-party-eval-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: a vocab drift between the Zod schema in the route and the
+    // CHECK constraint in the migration shows up at sync time as a 500
+    // error from PG. Static-checkable, so we keep it cheap and CI-blocking.
+  },
+  {
     id: 'things-denorm-dead',
     name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
     command: 'npx',

@@ -34,6 +34,7 @@ import { commands as setupOrgCommands } from './setup-org.ts';
 import { commands as tbImporterCommands } from './tb-importers/index.ts';
 import { commands as systemCardsCommands } from './system-cards.ts';
 import { commands as frameworksCommands } from './frameworks.ts';
+import { commands as thirdPartyEvalsCommands } from './third-party-evals.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -1506,6 +1507,10 @@ export const commands = {
   'frameworks-extract': frameworksCommands.extract,
   'frameworks-diff': frameworksCommands.diff,
   'frameworks-fetch': frameworksCommands.fetch,
+  // QUA-692: third-party evaluation index.
+  'third-party-evals': thirdPartyEvalsCommands.default,
+  'third-party-evals-ingest': thirdPartyEvalsCommands.ingest,
+  'third-party-evals-extract': thirdPartyEvalsCommands.extract,
 };
 
 export function getHelp(): string {
