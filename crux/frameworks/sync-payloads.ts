@@ -22,8 +22,13 @@ export function toThresholdSyncItems(
   meta: { extractionModel: string },
 ): Array<Record<string, unknown>> {
   return thresholds.map((t) => ({
+    // Mix tierLabel into the seed so two thresholds within the same
+    // (riskDomain, tierSortOrder) — e.g. an LLM that extracted two distinct
+    // triggers in the same domain/tier — get distinct stable ids. The schema
+    // has no unique constraint on (versionId, riskDomain, tierSortOrder), so
+    // collapsing them silently overwrites the first row in upsert.
     id: generateId(
-      `framework-threshold:${versionId}:${t.riskDomainCanonical}:${t.tierSortOrder}`,
+      `framework-threshold:${versionId}:${t.riskDomainCanonical}:${t.tierSortOrder}:${t.tierLabel}`,
     ),
     versionId,
     riskDomainCanonical: t.riskDomainCanonical,
@@ -72,9 +77,20 @@ export function toDiffSyncPayloads(
       reviewNotes: null,
       classifiedByModel: meta.classifiedByModel,
     },
-    items: aggregate.items.map((item: DiffItem, idx: number) => ({
+    items: aggregate.items.map((item: DiffItem) => {
+      // Discriminator must be stable across diff sorts — using array index
+      // would churn the entire row set whenever structuralDiff happened to
+      // reorder same-domain items, orphaning the previous N and inserting N
+      // new ones with identical content. Prefer the snapshots' tierLabel
+      // (always present on at least one of beforeSnapshot/afterSnapshot for
+      // every changeType in the diff pipeline), with classifierTag as a
+      // tiebreaker for the rare case of two same-tier changes.
+      const tierKey =
+        item.beforeSnapshot?.tierLabel ?? item.afterSnapshot?.tierLabel ?? 'unknown';
+      const tagKey = item.classifierTag ?? 'unclassified';
+      return {
       id: generateId(
-        `framework-diff-item:${diffId}:${idx}:${item.changeType}:${item.riskDomainCanonical ?? 'none'}`,
+        `framework-diff-item:${diffId}:${tierKey}:${tagKey}:${item.changeType}:${item.riskDomainCanonical ?? 'none'}`,
       ),
       diffId,
       changeType: item.changeType,
@@ -88,6 +104,7 @@ export function toDiffSyncPayloads(
       severity: item.severity,
       classifierTag: item.classifierTag,
       rationale: item.rationale,
-    })),
+      };
+    }),
   };
 }

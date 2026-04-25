@@ -362,8 +362,12 @@ async function ingestVersion(
   const versionId = versionItem.id;
 
   // Skip-if-already-synced (saves an LLM call).
+  // Note: do NOT swallow errors here — defaultIngestDeps.fetchExistingVersion
+  // throws loudly on server/auth/unavailable errors so we don't proceed under
+  // a false negative (re-extracting + paying the LLM bill on every transient
+  // 5xx). A "version not found" lookup returns null instead of throwing.
   if (!options.forceReextract) {
-    const existing = await deps.fetchExistingVersion(versionId).catch(() => null);
+    const existing = await deps.fetchExistingVersion(versionId);
     if (existing) {
       deps.log('info', `[${tag}] version already synced (${versionId.slice(0, 8)}…) — skipping extraction`);
       return {
@@ -557,7 +561,14 @@ export async function defaultIngestDeps(opts: {
         `/api/safety-framework-versions/${encodeURIComponent(id)}`,
       );
       if (!res.ok) {
-        if (res.error === 'bad_request') return null; // 404 is bad_request via classifyStatus
+        // The wiki-server's apiRequest coerces all 4xx to `bad_request`, but
+        // 400/422/429 are legitimate errors we don't want to silently swallow
+        // as "not found". Narrow on the "404" message prefix the same way
+        // setup-org.ts::adaptIdLookup does. If classifyStatus ever splits
+        // out a dedicated 'not_found' variant, also accept that.
+        if (res.error === 'bad_request' && /^404[:\s]/.test(res.message)) {
+          return null;
+        }
         // Surface server / auth / unavailable errors loudly — don't pretend the
         // version doesn't exist. The caller will skip the LLM bill anyway by
         // falling through to the rest of the pipeline if forceReextract is set.

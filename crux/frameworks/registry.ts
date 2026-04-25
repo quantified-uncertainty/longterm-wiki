@@ -65,7 +65,7 @@ interface RawRegistry {
 
 const SUPPORTED_REGISTRY_VERSION = 1;
 
-let _cache: RegistryFramework[] | null = null;
+const _cache = new Map<string, RegistryFramework[]>();
 
 function asString(v: unknown, max = 2000): string | null {
   if (v == null) return null;
@@ -223,14 +223,19 @@ export function defaultRegistryPath(rootDir = process.cwd()): string {
 }
 
 export function loadRegistry(filePath?: string): RegistryFramework[] {
-  if (_cache) return _cache;
   const fp = filePath ?? defaultRegistryPath();
+  // Key by resolved path so loadRegistry('/A') followed by loadRegistry('/B')
+  // returns each file's data — the previous shared singleton silently returned
+  // A's data on the second call (only the test suite's beforeEach saved it).
+  const cached = _cache.get(fp);
+  if (cached) return cached;
   const raw = fs.readFileSync(fp, 'utf-8');
-  _cache = parseRegistry(raw);
-  return _cache;
+  const parsed = parseRegistry(raw);
+  _cache.set(fp, parsed);
+  return parsed;
 }
 
 /** Test-only: clear the cache so subsequent loads re-read the file. */
 export function _resetRegistryCache(): void {
-  _cache = null;
+  _cache.clear();
 }

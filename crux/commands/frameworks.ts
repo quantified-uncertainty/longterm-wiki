@@ -435,9 +435,21 @@ async function ingestCommand(
 ): Promise<CommandResult> {
   const log = createLogger(Boolean(options.ci));
 
+  let maxVersions: number | undefined;
+  if (options.max !== undefined) {
+    const n = parseInt(String(options.max), 10);
+    if (!Number.isFinite(n) || n < 1) {
+      return {
+        exitCode: 1,
+        output: `--max must be a positive integer (got "${options.max}")`,
+      };
+    }
+    maxVersions = n;
+  }
+
   const ingestOpts: IngestOptions = {
     frameworkKey: options.only,
-    maxVersions: options.max ? Math.max(1, parseInt(options.max, 10)) : undefined,
+    maxVersions,
     // Default to dry-run unless --apply is given. --dry-run is also accepted
     // as an explicit hint for symmetry with other tooling, but `apply` is
     // the primary opt-in.
