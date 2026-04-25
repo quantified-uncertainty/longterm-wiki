@@ -2,8 +2,8 @@ import { describe, it, expect } from "vitest";
 import {
   rowsToCellsForVersion,
   activeDomains,
-} from "../matrix-aggregation";
-import type { ThresholdRow } from "../frameworks-data";
+} from "@/app/frontier-safety-frameworks/matrix-aggregation";
+import type { ThresholdRow } from "@/app/frontier-safety-frameworks/frameworks-data";
 
 function makeRow(over: Partial<ThresholdRow>): ThresholdRow {
   return {

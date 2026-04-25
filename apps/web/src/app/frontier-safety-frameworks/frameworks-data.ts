@@ -9,7 +9,7 @@
  */
 
 import { fetchDetailed } from "@lib/wiki-server";
-import type { CanonicalRiskDomain } from "./risk-domain-constants";
+import type { CanonicalRiskDomain } from "@/app/frontier-safety-frameworks/risk-domain-constants";
 
 export interface FrameworkRow {
   id: string;

@@ -6,8 +6,8 @@
 import {
   CANONICAL_RISK_DOMAINS,
   type CanonicalRiskDomain,
-} from "./risk-domain-constants";
-import type { ThresholdRow } from "./frameworks-data";
+} from "@/app/frontier-safety-frameworks/risk-domain-constants";
+import type { ThresholdRow } from "@/app/frontier-safety-frameworks/frameworks-data";
 
 export interface MatrixCell {
   /** Highest tier_label found for (framework version × domain). */

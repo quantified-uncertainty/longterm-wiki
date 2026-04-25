@@ -72,16 +72,31 @@ test.describe("QUA-709 — /frontier-safety-frameworks", () => {
     // never gate to the directional badge for an unreviewed diff.
     const pendingPills = page.locator("text=Pending review");
     const pendingCount = await pendingPills.count();
+    let checkedEntries = 0;
     for (let i = 0; i < pendingCount; i++) {
       const pill = pendingPills.nth(i);
-      // The closest <li> is the timeline entry. Use locator XPath fallback.
-      const entry = pill.locator("xpath=ancestor::li[1]");
+      // Walk up to whatever ancestor encloses the timeline entry. <li> is the
+      // current implementation, but tolerate role=listitem and div wrappers
+      // so a layout refactor doesn't silently make this assertion vacuous.
+      const entry = pill.locator(
+        "xpath=ancestor::*[self::li or @role='listitem' or @data-timeline-entry][1]",
+      );
       if ((await entry.count()) === 0) continue;
+      checkedEntries++;
       const entryText = (await entry.first().innerText()).toLowerCase();
       expect.soft(
         entryText.includes("weakening") || entryText.includes("strengthening"),
         `Pending-review timeline entry leaked directional language: "${entryText.slice(0, 200)}"`,
       ).toBe(false);
+    }
+    if (pendingCount > 0) {
+      // Guard against the test silently passing when the timeline ancestor
+      // selector drifts away from <li>: if there were "Pending review" pills,
+      // we must have actually exercised the directional-language check.
+      expect(
+        checkedEntries,
+        "Found 'Pending review' pills but no resolvable timeline entries — selector drifted from <li>",
+      ).toBeGreaterThan(0);
     }
   });
 });

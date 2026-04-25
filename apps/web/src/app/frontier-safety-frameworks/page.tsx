@@ -8,11 +8,11 @@ import {
   fetchDiffsForVersion,
   type FrameworkRow,
   type FrameworkVersionRow,
-} from "./frameworks-data";
-import { rowsToCellsForVersion, activeDomains } from "./matrix-aggregation";
-import { MatrixView, type MatrixRow } from "./matrix-view";
-import { TimelineView, type TimelineEntry } from "./timeline-view";
-import { FrameworksViewToggle } from "./frameworks-view-toggle";
+} from "@/app/frontier-safety-frameworks/frameworks-data";
+import { rowsToCellsForVersion, activeDomains } from "@/app/frontier-safety-frameworks/matrix-aggregation";
+import { MatrixView, type MatrixRow } from "@/app/frontier-safety-frameworks/matrix-view";
+import { TimelineView, type TimelineEntry } from "@/app/frontier-safety-frameworks/timeline-view";
+import { FrameworksViewToggle } from "@/app/frontier-safety-frameworks/frameworks-view-toggle";
 
 export const metadata: Metadata = {
   title: "Frontier Safety Frameworks",
@@ -30,7 +30,20 @@ export default async function FrontierSafetyFrameworksPage() {
   // For matrix view: latest published version per framework + its thresholds.
   // We fetch all published versions and pick the highest-sort one per framework
   // in a single pass, then fan out threshold queries.
-  const allPublishedVersions = await fetchAllPublishedVersions(500);
+  //
+  // Cap is intentionally generous — current dataset is ~50 versions across all
+  // frameworks (12 frameworks × ~3-5 versions each). If the count grows past
+  // PUBLISHED_VERSIONS_FETCH_LIMIT we silently truncate the timeline + matrix,
+  // so we assert below to catch that early. Switch to pagination if this fires.
+  const PUBLISHED_VERSIONS_FETCH_LIMIT = 500;
+  const allPublishedVersions = await fetchAllPublishedVersions(
+    PUBLISHED_VERSIONS_FETCH_LIMIT,
+  );
+  if (allPublishedVersions.length >= PUBLISHED_VERSIONS_FETCH_LIMIT) {
+    console.warn(
+      `[frontier-safety-frameworks] fetchAllPublishedVersions returned ${allPublishedVersions.length} rows — at or near the ${PUBLISHED_VERSIONS_FETCH_LIMIT} cap. Timeline + matrix may be truncated; switch to pagination.`,
+    );
+  }
   const latestVersionByFramework = new Map<string, FrameworkVersionRow>();
   for (const v of allPublishedVersions) {
     const existing = latestVersionByFramework.get(v.frameworkId);

@@ -4,10 +4,10 @@ import {
   RISK_DOMAIN_SHORT_LABELS,
   tierColor,
   type CanonicalRiskDomain,
-} from "./risk-domain-constants";
-import type { MatrixCell } from "./matrix-aggregation";
-import type { FrameworkRow, FrameworkVersionRow } from "./frameworks-data";
-import { frameworkSlug } from "./frameworks-data";
+} from "@/app/frontier-safety-frameworks/risk-domain-constants";
+import type { MatrixCell } from "@/app/frontier-safety-frameworks/matrix-aggregation";
+import type { FrameworkRow, FrameworkVersionRow } from "@/app/frontier-safety-frameworks/frameworks-data";
+import { frameworkSlug } from "@/app/frontier-safety-frameworks/frameworks-data";
 
 export interface MatrixRow {
   framework: FrameworkRow;
@@ -65,7 +65,6 @@ export function MatrixView({ rows, domains }: MatrixViewProps) {
         <tbody className="divide-y divide-border/40">
           {rows.map(({ framework, latestVersion, cells }) => {
             const slug = frameworkSlug(framework);
-            const cellCount = Object.keys(cells).length;
             return (
               <tr key={framework.id} className="hover:bg-muted/15 transition-colors">
                 <td className="py-2.5 px-3 align-top sticky left-0 bg-background hover:bg-muted/15">
@@ -125,9 +124,6 @@ export function MatrixView({ rows, domains }: MatrixViewProps) {
                     </td>
                   );
                 })}
-                {cellCount === 0 && (
-                  <td colSpan={Math.max(0, domains.length - 1)} />
-                )}
               </tr>
             );
           })}

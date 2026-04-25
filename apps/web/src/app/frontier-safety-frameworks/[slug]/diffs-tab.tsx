@@ -1,12 +1,12 @@
 import {
   isVerdictPublished,
   REVIEW_VERDICT_LABELS,
-} from "../risk-domain-constants";
+} from "@/app/frontier-safety-frameworks/risk-domain-constants";
 import type {
   DiffRow,
   DiffItemRow,
   FrameworkVersionRow,
-} from "../frameworks-data";
+} from "@/app/frontier-safety-frameworks/frameworks-data";
 
 export interface DiffWithItems {
   diff: DiffRow;

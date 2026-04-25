@@ -1,7 +1,7 @@
 import Link from "next/link";
-import type { FrameworkRow, FrameworkVersionRow, DiffRow } from "./frameworks-data";
-import { frameworkSlug } from "./frameworks-data";
-import { isVerdictPublished, REVIEW_VERDICT_LABELS } from "./risk-domain-constants";
+import type { FrameworkRow, FrameworkVersionRow, DiffRow } from "@/app/frontier-safety-frameworks/frameworks-data";
+import { frameworkSlug } from "@/app/frontier-safety-frameworks/frameworks-data";
+import { isVerdictPublished, REVIEW_VERDICT_LABELS } from "@/app/frontier-safety-frameworks/risk-domain-constants";
 
 export interface TimelineEntry {
   version: FrameworkVersionRow;
@@ -100,7 +100,7 @@ export function TimelineView({ entries }: TimelineViewProps) {
                 {version.summary}
               </p>
             )}
-            {inboundDiff && (
+            {inboundDiff && isVerdictPublished(inboundDiff.reviewVerdict) && (
               <p className="text-xs text-muted-foreground mt-1.5 max-w-3xl">
                 <span className="font-medium text-foreground/70">
                   What changed:

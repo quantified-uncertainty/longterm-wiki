@@ -1,8 +1,8 @@
 import {
   RISK_DOMAIN_LABELS,
   tierColor,
-} from "../risk-domain-constants";
-import type { ThresholdRow } from "../frameworks-data";
+} from "@/app/frontier-safety-frameworks/risk-domain-constants";
+import type { ThresholdRow } from "@/app/frontier-safety-frameworks/frameworks-data";
 
 interface ThresholdMatrixTabProps {
   thresholds: ThresholdRow[];

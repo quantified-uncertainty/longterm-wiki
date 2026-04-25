@@ -4,9 +4,9 @@ import {
   RISK_DOMAIN_SHORT_LABELS,
   tierColor,
   type CanonicalRiskDomain,
-} from "../risk-domain-constants";
-import type { ThresholdRow, FrameworkVersionRow } from "../frameworks-data";
-import { rowsToCellsForVersion, activeDomains } from "../matrix-aggregation";
+} from "@/app/frontier-safety-frameworks/risk-domain-constants";
+import type { ThresholdRow, FrameworkVersionRow } from "@/app/frontier-safety-frameworks/frameworks-data";
+import { rowsToCellsForVersion, activeDomains } from "@/app/frontier-safety-frameworks/matrix-aggregation";
 
 interface LatestVersionTabProps {
   version: FrameworkVersionRow | null;

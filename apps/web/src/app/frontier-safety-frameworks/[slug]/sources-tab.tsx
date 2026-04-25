@@ -1,4 +1,4 @@
-import type { FrameworkVersionRow } from "../frameworks-data";
+import type { FrameworkVersionRow } from "@/app/frontier-safety-frameworks/frameworks-data";
 
 interface SourcesTabProps {
   versions: FrameworkVersionRow[];

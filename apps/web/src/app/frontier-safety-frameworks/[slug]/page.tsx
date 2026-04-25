@@ -20,12 +20,12 @@ import {
   frameworkSlug,
   type FrameworkVersionRow,
   type DiffRow,
-} from "../frameworks-data";
-import { LatestVersionTab } from "./latest-version-tab";
-import { VersionHistoryTab } from "./version-history-tab";
-import { ThresholdMatrixTab } from "./threshold-matrix-tab";
-import { DiffsTab, type DiffWithItems } from "./diffs-tab";
-import { SourcesTab } from "./sources-tab";
+} from "@/app/frontier-safety-frameworks/frameworks-data";
+import { LatestVersionTab } from "@/app/frontier-safety-frameworks/[slug]/latest-version-tab";
+import { VersionHistoryTab } from "@/app/frontier-safety-frameworks/[slug]/version-history-tab";
+import { ThresholdMatrixTab } from "@/app/frontier-safety-frameworks/[slug]/threshold-matrix-tab";
+import { DiffsTab, type DiffWithItems } from "@/app/frontier-safety-frameworks/[slug]/diffs-tab";
+import { SourcesTab } from "@/app/frontier-safety-frameworks/[slug]/sources-tab";
 
 export const revalidate = 300;
 
