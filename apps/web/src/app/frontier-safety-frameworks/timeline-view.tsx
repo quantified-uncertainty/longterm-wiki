@@ -83,12 +83,19 @@ export function TimelineView({ entries }: TimelineViewProps) {
                 </span>
               )}
               {diffBadge(inboundDiff)}
-              {inboundDiff && (
+              {inboundDiff && (inboundDiff.neutralChangesCount ?? 0) > 0 && (
+                // Label is "neutral changes" (not just "changes") because
+                // weakeningFlagged / strengtheningFlagged are separate booleans
+                // on DiffRow, not counts — folding them in here would
+                // overstate, and showing "(0 changes)" next to a directional
+                // pill (when only flagged changes occurred) reads as a
+                // contradiction.
                 <span
                   className="text-[11px] text-muted-foreground/70"
                   title={REVIEW_VERDICT_LABELS[inboundDiff.reviewVerdict] ?? inboundDiff.reviewVerdict}
                 >
-                  ({inboundDiff.neutralChangesCount ?? 0} changes)
+                  ({inboundDiff.neutralChangesCount} neutral change
+                  {inboundDiff.neutralChangesCount === 1 ? "" : "s"})
                 </span>
               )}
             </div>

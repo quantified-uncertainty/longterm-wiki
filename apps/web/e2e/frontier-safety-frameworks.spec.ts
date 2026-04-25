@@ -53,7 +53,13 @@ test.describe("QUA-709 — /frontier-safety-frameworks", () => {
     // on review_verdict and never shown for unreviewed diffs.
     const lower = text.toLowerCase();
     expect(lower).toContain("unreviewed diff");
-    expect(lower).toMatch(/(never|no directional summary).*unreviewed|unreviewed.*(never|no directional)/);
+    // [\s\S] instead of . — innerText() inserts \n between block-level
+    // elements, and the default JS regex `.` does not cross newlines, so the
+    // policy clause + "unreviewed" landing in different paragraphs would have
+    // failed the assertion even though the page satisfied the policy.
+    expect(lower).toMatch(
+      /(never|no directional summary)[\s\S]*unreviewed|unreviewed[\s\S]*(never|no directional)/,
+    );
   });
 
   test("unreviewed diffs do not surface directional language on directory", async ({ page }) => {

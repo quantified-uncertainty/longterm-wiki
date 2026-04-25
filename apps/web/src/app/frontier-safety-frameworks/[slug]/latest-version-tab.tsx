@@ -133,7 +133,7 @@ export function LatestVersionTab({ version, thresholds }: LatestVersionTabProps)
             </table>
           </div>
           <p className="text-xs text-muted-foreground mt-2">
-            See the <Link href="#threshold-matrix" className="underline">Threshold Matrix tab</Link> for trigger language and source quotes.
+            See the <Link href="?tab=thresholds" className="underline">Threshold Matrix tab</Link> for trigger language and source quotes.
           </p>
         </section>
       )}
