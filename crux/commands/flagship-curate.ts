@@ -569,6 +569,11 @@ async function resetStaleVerdicts(
     if (allowedRecordIds !== null && !allowedRecordIds.has(record.recordId)) continue;
 
     try {
+      // QUA-723: set needsRecheck=true and nextCheckDue=NOW() so the weekly
+      // sourcing-recheck cron picks these up if the in-process verify step
+      // fails or is cut off by budget/timeout. Without this, reset verdicts
+      // become permanent orphans (`getDueForRecheck()` only matches rows
+      // with needs_recheck=true OR next_check_due <= NOW()).
       await storeVerdict({
         recordType: record.recordType,
         recordId: record.recordId,
@@ -576,6 +581,8 @@ async function resetStaleVerdicts(
         confidence: 0,
         reasoning: 'Reset by flagship-curate before re-verification',
         sourcesChecked: 0,
+        needsRecheck: true,
+        nextCheckDue: new Date().toISOString(),
         ...(record.entityId ? { entityId: record.entityId } : {}),
       });
       resetCount++;

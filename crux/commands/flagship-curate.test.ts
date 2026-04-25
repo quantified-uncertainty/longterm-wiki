@@ -936,6 +936,41 @@ describe('flagship-curate', () => {
       expect(resetCalls()).toEqual([]);
     });
 
+    it('reset payload sets needsRecheck=true and nextCheckDue (QUA-723)', async () => {
+      // Without these fields, the weekly sourcing-recheck cron skips
+      // reset rows permanently — they become orphans if Step 5's
+      // in-process verify is cut off by budget/timeout.
+      mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
+      mockGetVerdictsByEntity.mockResolvedValue(
+        makeVerdicts([
+          { recordType: 'personnel', recordId: 'p1', verdict: 'partial', displayName: 'Alice' },
+        ]),
+      );
+      mockGetPersonnelByEntity.mockResolvedValue(makePersonnel([{ id: 'p1' }]));
+      mockStoreVerdict.mockResolvedValue({ ok: true });
+
+      const before = Date.now();
+      const result = await commands.default([], {
+        entity: 'anthropic',
+        budget: '5',
+        'skip-research': true,
+        iterations: '1',
+      });
+      const after = Date.now();
+
+      expect(result.exitCode).toBe(0);
+      const resets = mockStoreVerdict.mock.calls
+        .map((call) => call[0] as Record<string, unknown>)
+        .filter((arg) => arg?.['verdict'] === 'unchecked');
+      expect(resets).toHaveLength(1);
+      const payload = resets[0]!;
+      expect(payload['needsRecheck']).toBe(true);
+      expect(typeof payload['nextCheckDue']).toBe('string');
+      const due = new Date(payload['nextCheckDue'] as string).getTime();
+      expect(due).toBeGreaterThanOrEqual(before);
+      expect(due).toBeLessThanOrEqual(after);
+    });
+
     it('does not reset contradicted records (only unverifiable/partial/outdated are resettable)', async () => {
       mockGetEntity.mockResolvedValue(makeEntity('anthropic', 'Anthropic'));
       mockGetVerdictsByEntity.mockResolvedValue(
