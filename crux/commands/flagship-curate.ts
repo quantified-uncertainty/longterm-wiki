@@ -579,6 +579,8 @@ async function resetStaleVerdicts(
         recordId: record.recordId,
         verdict: 'unchecked',
         confidence: 0,
+        // Migration 0213 (QUA-723) matches this exact literal to backfill
+        // historical orphans — do not change without a follow-up migration.
         reasoning: 'Reset by flagship-curate before re-verification',
         sourcesChecked: 0,
         needsRecheck: true,
