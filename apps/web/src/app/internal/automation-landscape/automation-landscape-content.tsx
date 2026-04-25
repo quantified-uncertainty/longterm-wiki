@@ -65,7 +65,7 @@ const entries: AutomationEntry[] = [
     type: "GHA (scheduled + dispatch)",
     schedule: "Every 30 min + on-demand dispatch",
     description:
-      "Polls wiki-server job queue, claims and executes jobs. Types: ping, citation-verify, page-improve, page-create, batch-commit, auto-update-digest, claim-verification, resource-ingest, resource-enrich.",
+      "Polls wiki-server job queue, claims and executes jobs. Types: ping, citation-verify, page-improve, page-create, batch-commit, auto-update-digest, claim-sourcing, resource-ingest, resource-enrich.",
     status: "active",
     file: "job-worker.yml",
   },

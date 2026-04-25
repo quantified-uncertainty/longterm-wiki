@@ -65,7 +65,7 @@ describe('issue #3692: resource-ingest 59% failure + 146 pending', () => {
       totalJobs: 8155,
       hours: 48,
       byType: {
-        'claim-verification': makeStats({ pending: 0, running: 0, failed: 0, failureRate: 0, recentTotal: 5, recentFailed: 0 }), // server-side job type name
+        'claim-sourcing': makeStats({ pending: 0, running: 0, failed: 0, failureRate: 0, recentTotal: 5, recentFailed: 0 }), // server-side job type name
         'ping': makeStats({ pending: 0, running: 0, failed: 0, failureRate: 0, recentTotal: 2, recentFailed: 0 }),
         'resource-enrich': makeStats({ pending: 0, running: 0, failed: 0, failureRate: 0, recentTotal: 3, recentFailed: 0 }),
         'resource-ingest': makeStats({
