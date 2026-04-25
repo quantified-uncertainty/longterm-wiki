@@ -26,7 +26,8 @@ interface SnapshotRow {
 }
 
 let store: Map<string, SnapshotRow>;
-const sqlLog: string[] = [];
+interface SqlEntry { q: string; params: unknown[]; }
+const sqlLog: SqlEntry[] = [];
 
 function resetStore() {
   store = new Map();
@@ -35,7 +36,7 @@ function resetStore() {
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
-  sqlLog.push(q);
+  sqlLog.push({ q, params });
 
   // SELECT pre-fetch for audit log (Drizzle: select ... from "scorecard_snapshots" where ... in (...))
   if (q.includes("select") && q.includes('"scorecard_snapshots"') && q.includes("where") && !q.includes("update")) {
@@ -108,14 +109,14 @@ describe("scorecard_snapshots is_latest invariant", () => {
     // statements: INSERT must happen BEFORE the UPDATE that promotes
     // is_latest=true.
     const insertIdx = sqlLog.findIndex(
-      (q) =>
+      ({ q }) =>
         q.includes("insert into") && q.includes('"scorecard_snapshots"'),
     );
     expect(insertIdx).toBeGreaterThanOrEqual(0);
 
     // The promote UPDATE must come strictly after the INSERT.
     const promoteIdx = sqlLog.findIndex(
-      (q, i) =>
+      ({ q }, i) =>
         i > insertIdx &&
         q.includes("update") &&
         q.includes('"scorecard_snapshots"') &&
@@ -152,15 +153,49 @@ describe("scorecard_snapshots is_latest invariant", () => {
     });
     expect(res.status).toBe(200);
 
-    // Filter to UPDATE statements on scorecard_snapshots.
-    const updates = sqlLog.filter(
-      (q) => q.includes("update") && q.includes('"scorecard_snapshots"'),
-    );
+    // For each source, the clear (is_latest=false) UPDATE must precede the
+    // promote (is_latest=true) UPDATE in the SQL log. A reordered or
+    // missing pair would have tripped the partial unique index pre-fix.
+    // Identify clear/promote by SQL shape:
+    //   clear:   WHERE scorecard_source = $X AND is_latest = $Y, params include source name + true (clearing the prior latest)
+    //   promote: WHERE id = $X, params include the new item id + true
+    function assertClearBeforePromote(source: string, itemId: string) {
+      const updates = sqlLog
+        .map((entry, i) => ({ ...entry, i }))
+        .filter(
+          ({ q }) =>
+            q.includes("update") &&
+            q.includes('"scorecard_snapshots"') &&
+            q.includes('"is_latest"'),
+        );
+      const clearIdx = updates.find(
+        ({ q, params }) =>
+          q.includes("scorecard_source") &&
+          params.includes(source) &&
+          params.includes(false),
+      )?.i;
+      const promoteIdx = updates.find(
+        ({ q, params }) =>
+          !q.includes("scorecard_source") &&
+          params.includes(itemId) &&
+          params.includes(true),
+      )?.i;
+      expect(
+        clearIdx,
+        `clear UPDATE missing for source=${source}`,
+      ).toBeDefined();
+      expect(
+        promoteIdx,
+        `promote UPDATE missing for id=${itemId}`,
+      ).toBeDefined();
+      expect(
+        clearIdx! < promoteIdx!,
+        `clear must precede promote for ${itemId} (clear=${clearIdx}, promote=${promoteIdx})`,
+      ).toBe(true);
+    }
 
-    // We expect at least 4 UPDATEs: clear+promote per source × 2 sources.
-    // The exact count may include the auto-derived ON CONFLICT DO UPDATE
-    // from the INSERT, so >= 4 is the floor.
-    expect(updates.length).toBeGreaterThanOrEqual(4);
+    assertClearBeforePromote("fli_index", "fli-summer-2025");
+    assertClearBeforePromote("fmti", "fmti-dec-2025");
   });
 
   it("rejects an invalid scorecardSource via Zod enum", async () => {

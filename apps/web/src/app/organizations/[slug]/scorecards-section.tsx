@@ -44,17 +44,23 @@ interface SourceGroup {
 }
 
 /**
- * Fetch + group an org's scorecard grades. Returns null when there are no
- * grades — caller suppresses the tab in that case.
+ * Fetch + group an org's scorecard grades.
+ * - Returns null when the org has no grades (caller suppresses the tab).
+ * - Returns { fetchError: true } on transient wiki-server failure (caller renders
+ *   an "unavailable" state instead of dropping the tab).
  */
+export type ScorecardsLoadResult =
+  | { groups: SourceGroup[]; totalRows: number }
+  | { fetchError: true };
+
 export async function loadScorecardsForEntity(
   entityStableId: string,
-): Promise<{ groups: SourceGroup[]; totalRows: number } | null> {
+): Promise<ScorecardsLoadResult | null> {
   const result = await fetchDetailed<ByEntityResponse>(
     `/api/scorecard-grades/by-entity/${encodeURIComponent(entityStableId)}`,
     { revalidate: 300 },
   );
-  if (!result.ok) return null;
+  if (!result.ok) return { fetchError: true };
   if (result.data.items.length === 0) return null;
 
   const groupsBySource = new Map<string, SourceGroup>();
@@ -84,9 +90,18 @@ export async function loadScorecardsForEntity(
 
 export function ScorecardsSection({
   groups,
+  fetchError,
 }: {
   groups: SourceGroup[];
+  fetchError?: boolean;
 }) {
+  if (fetchError) {
+    return (
+      <p className="text-sm text-muted-foreground">
+        Scorecard grades are temporarily unavailable. Try again later.
+      </p>
+    );
+  }
   if (groups.length === 0) {
     return (
       <p className="text-sm text-muted-foreground">

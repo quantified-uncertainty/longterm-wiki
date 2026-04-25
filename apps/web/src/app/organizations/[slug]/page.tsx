@@ -764,15 +764,27 @@ export default async function OrgProfilePage({
   }
 
   // ── Scorecards tab — external safety/transparency scorecards (QUA-688) ──
-  if (scorecardsData && scorecardsData.groups.length > 0) {
-    tabs.push({
-      id: "scorecards",
-      label: "Scorecards",
-      count: scorecardsData.groups.length,
-      group: "governance",
-      icon: <Award className={ICON_CLASS} />,
-      content: <ScorecardsSection groups={scorecardsData.groups} />,
-    });
+  if (scorecardsData) {
+    if ("fetchError" in scorecardsData) {
+      // Transient wiki-server failure — surface an unavailable state rather
+      // than silently dropping the tab.
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={[]} fetchError />,
+      });
+    } else if (scorecardsData.groups.length > 0) {
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        count: scorecardsData.groups.length,
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={scorecardsData.groups} />,
+      });
+    }
   }
 
   // ── Projects tab: projects founded by this org ──

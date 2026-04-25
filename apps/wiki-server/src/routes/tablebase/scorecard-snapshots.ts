@@ -3,7 +3,7 @@ import { z } from "zod";
 import { eq, count, desc, and } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { scorecardSnapshots } from "../../schema.js";
-import { zv, clampedLimit } from "../shared/utils.js";
+import { zv, clampedLimit, qBool } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
@@ -25,7 +25,7 @@ const AllQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 100),
   offset: z.coerce.number().int().min(0).default(0),
   source: z.enum(VALID_SOURCES).optional(),
-  latest: z.coerce.boolean().optional(),
+  latest: qBool.optional(),
 });
 
 // ---- Sync schema ----

@@ -4,7 +4,7 @@ import { eq, and, count, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { scorecardGrades, scorecardSnapshots, entities } from "../../schema.js";
-import { zv, clampedLimit } from "../shared/utils.js";
+import { zv, clampedLimit, qBool } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
 
@@ -20,12 +20,12 @@ const AllQuery = z.object({
   snapshotId: z.string().max(100).optional(),
   entityId: z.string().max(200).optional(),
   scorecardSource: z.string().max(50).optional(),
-  latest: z.coerce.boolean().optional(),
+  latest: qBool.optional(),
   // overall=true filters to the per-org rollup row only. Lets the
   // /scorecards directory pull one cell per (org, source) without
   // scanning thousands of FMTI indicator rows just to throw them away
   // client-side.
-  overall: z.coerce.boolean().optional(),
+  overall: qBool.optional(),
 });
 
 // ---- Sync schema ----

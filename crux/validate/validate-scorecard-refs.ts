@@ -71,9 +71,11 @@ interface EntitiesResponse {
 }
 
 async function fetchAllSnapshots(): Promise<ApiResult<SnapshotRow[]>> {
+  // Only is_latest=true rows are relevant to the is_latest invariant. At most
+  // one per source, so 200 is a generous cap (5 sources × ~few waves max).
   const result = await apiRequest<SnapshotsResponse>(
     "GET",
-    `/api/scorecard-snapshots/all?limit=200`,
+    `/api/scorecard-snapshots/all?latest=true&limit=200`,
   );
   if (!result.ok) return result;
   return { ok: true, data: result.data.items };

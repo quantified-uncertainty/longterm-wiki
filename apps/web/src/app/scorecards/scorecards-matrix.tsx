@@ -3,7 +3,7 @@ import {
   SCORECARD_SOURCES,
   formatScoreCell,
   type ScorecardSourceKey,
-} from "./scorecards-constants";
+} from "@/app/scorecards/scorecards-constants";
 
 export interface ScorecardCell {
   source: ScorecardSourceKey;

@@ -11,7 +11,7 @@ import {
   SCORECARD_SOURCES,
   DIMENSION_OVERALL,
   type ScorecardSourceKey,
-} from "./scorecards-constants";
+} from "@/app/scorecards/scorecards-constants";
 
 export const metadata: Metadata = {
   title: "Scorecards",
@@ -56,6 +56,43 @@ interface GradeRow {
   scoreRaw: string;
 }
 
+/**
+ * Fetch every `overall=true` grade for the latest snapshots, paginating
+ * through `/api/scorecard-grades/all` until `total` is exhausted. Returns
+ * `{ ok: false }` if any page fetch fails so callers can surface an
+ * unavailable state instead of silently rendering a truncated matrix.
+ *
+ * Hard-capped at MAX_OVERALL_GRADES rows as a safety net — if hit, we log
+ * and return what we have rather than looping forever on a misbehaving API.
+ */
+const PAGE_SIZE = 200;
+const MAX_OVERALL_GRADES = 5000;
+
+async function fetchAllOverallGrades(): Promise<
+  { ok: true; items: GradeRow[] } | { ok: false }
+> {
+  const items: GradeRow[] = [];
+  let offset = 0;
+  while (items.length < MAX_OVERALL_GRADES) {
+    const res = await fetchDetailed<{ items: GradeRow[]; total: number }>(
+      `/api/scorecard-grades/all?limit=${PAGE_SIZE}&offset=${offset}&latest=true&overall=true`,
+      { revalidate: 300 },
+    );
+    if (!res.ok) return { ok: false };
+    items.push(...res.data.items);
+    if (res.data.items.length < PAGE_SIZE || items.length >= res.data.total) {
+      break;
+    }
+    offset += PAGE_SIZE;
+  }
+  if (items.length >= MAX_OVERALL_GRADES) {
+    console.warn(
+      `[scorecards] hit MAX_OVERALL_GRADES=${MAX_OVERALL_GRADES}; matrix may be truncated`,
+    );
+  }
+  return { ok: true, items };
+}
+
 export default async function ScorecardsPage() {
   // Load latest snapshots (one per source) and overall-dimension grades in
   // parallel. Per-dimension drill-down lives on the org's profile tab, not
@@ -65,14 +102,11 @@ export default async function ScorecardsPage() {
       "/api/scorecard-snapshots/all?limit=50&latest=true",
       { revalidate: 300 },
     ),
-    fetchDetailed<{ items: GradeRow[]; total: number }>(
-      "/api/scorecard-grades/all?limit=1000&latest=true&overall=true",
-      { revalidate: 300 },
-    ),
+    fetchAllOverallGrades(),
   ]);
 
   const snapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
-  const grades = gradesRes.ok ? gradesRes.data.items : [];
+  const grades = gradesRes.ok ? gradesRes.items : [];
   const fetchOk = snapshotsRes.ok && gradesRes.ok;
 
   // Index latest snapshot per source (defensive — partial unique index
