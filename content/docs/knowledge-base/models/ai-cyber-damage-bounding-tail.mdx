@@ -38,7 +38,7 @@ Each sub-question has different evidence and different bounds.
 
 Reasoning:
 - The methodology-credible upper bound for current annual damage is bounded above by the Cybersecurity Ventures top-down forecast: \$10.5T/yr in 2025 (~9.5% of global GDP). However, that figure includes productivity loss, IP theft, and reputational harm — categories largely already captured in national accounts. Methodologically explicit aggregates (Anderson 2012/2019, Romanosky 2016) put aggregate damage in the tens to low hundreds of billions, well below 1% of GDP.
-- AI-enabled offense most plausibly multiplies the volume and success rate of attacks (phishing, vulnerability discovery, exploit generation), but the September 2025 Anthropic-disclosed campaign demonstrated machine-speed capability is not yet 100x faster in *successful* operations, only ~10x faster in attempted operations against well-defended targets. The bottleneck is target validation and lateral movement, not raw operation speed.
+- AI-enabled offense most plausibly multiplies the volume and success rate of attacks (phishing, vulnerability discovery, exploit generation), but the [September 2025 Anthropic-disclosed campaign](https://www.anthropic.com/news/disrupting-AI-espionage) demonstrated that even when an AI agent autonomously executes 80-90% of tactical operations at machine speed (multiple requests per second), only a small number of confirmed breaches resulted from ~30 attempted targets. The bottleneck is target validation and post-exploitation persistence, not raw operation speed; aggregate damage scales sub-linearly with attempted-operation speed.
 - Cybersecurity Ventures' own 2025 revision dropped the assumed growth rate from 15%/yr to 2.5%/yr — a tacit admission that linear extrapolation overshoots. Even at 2.5%/yr from \$10.5T (2025), the trajectory crosses 10% of *global* GDP only if global GDP itself grows slower than projected (or measurement scope expands).
 
 **Confidence:** medium. Heavily dependent on whether the loss-of-productivity component continues to be counted as a separate damage category vs. recognized as already-captured in GDP itself.
@@ -48,9 +48,9 @@ Reasoning:
 **P(single event exceeds 10% GDP, in any year through 2035) ≈ 5-15%.**
 
 Reasoning, drawing on <EntityLink id="E2519" name="catastrophic-cyber-tail-risk">Catastrophic Cyber Tail Risk</EntityLink>:
-- Of 8 cataloged systemic single points of failure, only **payment systems** plausibly exceed 10% GDP from a single event under conservative assumptions. The conservative-case estimate for a multi-day SWIFT or Fedwire disruption is \$500B-\$10T (0.5-9% of global GDP) — at the high end, this crosses the threshold.
-- Three other systems (hyperscaler cloud, ICS, OS/browser monoculture) reach the 10% threshold only under aggressive assumptions: multi-week duration, full data corruption rather than mere unavailability, and attack hits multiple targets simultaneously.
-- Historical base rate: largest single events to date (NotPetya ≈\$10B, SolarWinds ≈\$100B aggregate over years, Change Healthcare ≈\$10B sector cascade) are 2-3 orders of magnitude below the threshold.
+- Of 8 cataloged systemic single points of failure, only **payment systems** approach the 10% GDP threshold within E2519's cited range. The aggressive high-end estimate for a multi-day SWIFT or Fedwire disruption is \$500B-\$10T (0.5-9% of global GDP) — even the upper bound is just below the 10% line, not above it.
+- Three other systems (hyperscaler cloud, ICS, OS/browser monoculture) reach the 10% threshold only under above-aggressive assumptions that exceed E2519's table bounds: simultaneous multi-target attacks, multi-week duration, and full data corruption rather than mere unavailability.
+- Historical base rate: largest single events to date — [NotPetya ≈\$10B (White House attribution per WIRED)](https://www.wired.com/story/notpetya-cyberattack-ukraine-russia-code-crashed-the-world/), [SolarWinds remediation projected up to \$100B across 18,000 affected entities (Rendition Infosec/Roll Call, 2021)](https://rollcall.com/2021/01/11/cleaning-up-solarwinds-hack-may-cost-as-much-as-100-billion/) (a forward-looking cleanup-spend projection rather than realized damages, with documented insured losses ≈\$90M and per-company costs averaging \$12M), Change Healthcare ≈\$2.87B+ direct costs to UnitedHealth (FY2024) — are 2-3 orders of magnitude below the threshold.
 - Cyber insurance market signal is consistent with this estimate. The market caps insurable cyber loss at ≈\$20-46B per Munich Re's 200-year return period estimate (a probability-weighted estimate). This says insurers do not believe events ~50× larger are pricing-feasible to underwrite — but it does not say they believe such events are impossible. The market handles such events by exclusion (war / state-actor exclusions, capacity ceilings), shifting them to the sovereign-default / war risk bucket.
 - AI-enabled offense most plausibly affects this probability via the *attribution* axis — making attribution harder reduces deterrence and raises the probability that state-sponsored actors attempt catastrophic actions against another state's infrastructure.
 
@@ -69,11 +69,11 @@ Reasoning:
 
 ## Combined estimate
 
-**Headline answer: P(AI-enabled cyber damage exceeds 10% of global GDP in any single year through 2035) ≈ 5-20%.**
+**Headline answer: P(AI-enabled cyber damage exceeds 10% of global GDP in any single year through 2035) ≈ 5-20%, low-to-medium confidence.**
 
 This is dominated by sub-question 2 (catastrophic single event) for near-term (through 2030), then increasingly augmented by sub-question 3 (sustained escalation) for the late 2030s. Sub-question 1 (linear baseline scaling alone) does not plausibly cross the threshold.
 
-The estimate is materially uncertain — the 5-20% spread reflects genuine disagreement on both the catastrophic-event probability (5-15% over the 10-year window) and the AI capability trajectory (E87 conservative vs aggressive scenarios differ by 2-3 years and ~2x in projected damage).
+The estimate is materially uncertain. The 5-20% spread reflects genuine disagreement on both the catastrophic-event probability (5-15% over the 10-year window) and the AI capability trajectory (E87 conservative vs aggressive scenarios differ by 2-3 years and ~2x in projected damage). Confidence is bounded by the lowest-confidence input: sub-question 3 carries low confidence (compounded AI-trajectory + defense-investment + AI-attribution uncertainty), so the headline range should be read as low-to-medium confidence overall, not as actuarial.
 
 ## What would meaningfully update the estimate
 
@@ -93,32 +93,32 @@ The estimate is materially uncertain — the 5-20% spread reflects genuine disag
 | **C4: Insurability of catastrophic events** | Market correctly prices tail at &lt;\$50B; sovereign backstop adequate | Market is systematically under-pricing tail; uninsured exposure is much larger than market believes |
 | **C5: Linear vs cascade compounding** | Linear scaling dominates; estimate stays at ≈5% | Cascade scenarios (especially payment systems) drive the estimate; estimate moves to ≈15-25% |
 
-## Comparison with adjacent risk categories
+## Comparison with adjacent published estimates
 
-For context, similar probability-weighted thresholds for other AI risk categories:
+No published source uses the "P(>10% global GDP through 2035)" framing for other AI risk categories — the published literature uses different thresholds (existential, transformative, full disempowerment) and different time horizons (typically 2070 or 2100). Direct numerical comparison would require reframing those estimates onto this page's threshold, which the cited sources do not authorize. The closest *adjacent* estimates from the literature are:
 
-| Risk category | P(>10% GDP impact through 2035) | Reasoning |
-|---|---|---|
-| AI-enabled cyber (this page) | 5-20% | Dominated by single-event tail risk in payment systems |
-| AI-driven labor displacement | 30-60% | Likely to manifest as productivity gains + frictional unemployment, not GDP destruction; but counted differently |
-| AI-enabled bioweapons (one event) | 1-5% | Lower base rate than cyber; harder to deploy |
-| AI alignment failure leading to disempowerment | 10-30% | Wide spread; depends heavily on AI capability trajectory |
+- **AI-enabled bioweapons.** Toby Ord, *The Precipice* (2020), estimates ≈3% (1/30) probability of existential catastrophe from engineered pandemics this century — framed as existential, not 10%-GDP.[^ord] [RAND (RRA2977-2, 2024)](https://www.rand.org/pubs/research_reports/RRA2977-2.html) found no statistically significant uplift from current LLMs for biological-attack viability.
+- **AI alignment failure / disempowerment.** Joseph Carlsmith, ["Is Power-Seeking AI an Existential Risk?"](https://arxiv.org/abs/2206.13353) (2021/2022), estimates >10% probability of full disempowerment by 2070 — framed as full disempowerment over a much longer window than 2035. Toby Ord estimates ≈10% existential risk from unaligned AI this century (also framed existentially / century-scale).[^ord]
+- **AI labor-market impact.** Goldman Sachs (2023) projects +7% global GDP from AI productivity over a decade; [Acemoglu (2024)](https://www.nber.org/papers/w32487) estimates +1.1% TFP over a decade. The published literature is overwhelmingly about *productivity gains*, not GDP destruction; no published source places a probability on net negative GDP impact from labor displacement on the 10%-by-2035 framing.
 
-Cyber sits in the middle of the AI-risk spectrum: more likely than catastrophic bio events but less likely than first-order economic transition impacts. This positioning is consistent with cyber's status as a *near-term, observed* threat with a *tail* that is not yet realized.
+Because none of these estimates use the same threshold or time horizon as the headline cyber estimate, this page does not attempt a side-by-side numerical comparison. The qualitative picture is that cyber is among the more *near-term, observed-and-measurable* AI risks, while bioweapons and alignment failure are framed in the literature as longer-horizon catastrophic / existential outcomes. Reframing those estimates onto a 2035 / 10%-GDP basis would be a separate analysis, not a citation.
+
+[^ord]: Ord, Toby. *The Precipice: Existential Risk and the Future of Humanity*. Bloomsbury, 2020 — see Chapter 5 estimates.
 
 ## Limitations
 
 - **Probability estimates are illustrative, not actuarial.** The 5-20% headline is an attempt at calibrated reasoning, not a model output. Treat ranges as wide.
 - **The 10% GDP threshold is arbitrary.** Different policy thresholds (1%, 3%, 5%) produce materially different probability estimates. The 10% threshold corresponds roughly to "events large enough to require sovereign-scale response" rather than market-clearing recovery.
+- **No published source uses the same threshold + horizon framing.** Numerical comparisons with bio, alignment, or labor-displacement risk would require reframing those estimates onto this page's basis (10% GDP / 2035) — work the cited sources do not perform. The "Comparison with adjacent published estimates" section deliberately avoids a side-by-side numerical table for this reason.
 - **The synthesis treats the four prior pages as authoritative.** Errors in damage methodology, insurance market interpretation, or tail-risk cataloging propagate. Cross-checks recommended.
 - **AI offense / defense balance assumes current trajectory.** Discontinuities (AI breakthroughs, defensive AI breakthroughs, international agreements, large-scale war) could move estimates by 2-3x in either direction.
 - **No discount rate applied.** Damage in 2040 is treated as comparable to damage in 2027.
 
 ## Conclusions for downstream pages
 
-The headline estimate (5-20% probability of >10% GDP cyber damage in any year through 2035) implies several positions for the wiki to take:
+The headline estimate (5-20% probability of >10% GDP cyber damage in any year through 2035, low-to-medium confidence) implies several positions for the wiki to take:
 
-1. **Cyber damage is a top-tier AI risk for the late 2020s** — comparable to or larger than near-term bio-risk in expected GDP impact, though smaller than alignment-failure tail risk.
+1. **Cyber damage is a near-term, observed-and-measurable AI risk** with a tail dominated by single-event scenarios in payment systems and other systemic chokepoints. It does not require speculation about transformative AI capability to motivate concern.
 2. **The market signal does not invalidate the threshold-event scenario** — it confirms that such events are uninsurable, which is consistent with their being plausible but rare.
 3. **The most actionable interventions are infrastructure-level**: payment system resilience, hyperscaler diversification, ICS air-gapping, healthcare clearinghouse competition, OS/browser diversity. These are the cascade-prevention levers that bound the catastrophic single-event probability.
 4. **Defensive AI investment is a high-leverage policy lever** — the 3-10x underfunding gap (per E88) means modest increases in defensive AI investment plausibly halve the headline estimate.
