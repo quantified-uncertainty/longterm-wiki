@@ -31,11 +31,7 @@ import {
 } from "../third-party-evals/extract-eval-report.ts";
 import { verifyExtractedReport } from "../third-party-evals/span-verify.ts";
 import { resolveAiModel } from "../lib/ai-model-resolver.ts";
-import { ingestUkAisi } from "../third-party-evals/ingesters/uk-aisi-sitemap.ts";
-import { ingestMetr } from "../third-party-evals/ingesters/metr-rss.ts";
-import { ingestApollo } from "../third-party-evals/ingesters/apollo-research.ts";
-import { ingestCaisi } from "../third-party-evals/ingesters/caisi-blog.ts";
-import type { IngestResult } from "../third-party-evals/ingesters/types.ts";
+import { dispatchIngest } from "../third-party-evals/ingesters/dispatch.ts";
 import { backfillEvaluator } from "../third-party-evals/backfill.ts";
 
 interface ThirdPartyEvalOptions extends CommandOptions {
@@ -83,28 +79,6 @@ function resolveLlmModel(name?: string): string {
   return name;
 }
 
-async function ingesterFor(
-  evaluator: string,
-  options: ThirdPartyEvalOptions,
-): Promise<IngestResult> {
-  const key = evaluator.trim().toLowerCase();
-  if (key === "uk-aisi" || key === "ukaisi") {
-    return ingestUkAisi({ sinceDate: options.since });
-  }
-  if (key === "us-aisi" || key === "caisi" || key === "usaisi") {
-    return ingestCaisi();
-  }
-  if (key === "metr") {
-    return ingestMetr();
-  }
-  if (key === "apollo" || key === "apollo-research") {
-    return ingestApollo();
-  }
-  throw new Error(
-    `Unknown evaluator '${evaluator}'. Valid: uk-aisi, us-aisi, metr, apollo`,
-  );
-}
-
 async function ingestSubcommand(
   args: string[],
   options: ThirdPartyEvalOptions,
@@ -122,9 +96,9 @@ async function ingestSubcommand(
     };
   }
 
-  let result: IngestResult;
+  let result;
   try {
-    result = await ingesterFor(evaluator, options);
+    result = await dispatchIngest(evaluator, { since: options.since });
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     return { output: msg, exitCode: 1 };
@@ -377,13 +351,17 @@ async function backfillSubcommand(
     }
   }
 
-  const exitCode =
-    result.syncFailures.length > 0
-      ? 2
-      : result.extractFailures.length === result.candidates && result.candidates > 0
-        ? 2
-        : 0;
-  return { output: lines.join("\n"), exitCode };
+  return { output: lines.join("\n"), exitCode: backfillExitCode(result) };
+}
+
+function backfillExitCode(result: {
+  candidates: number;
+  extractFailures: unknown[];
+  syncFailures: unknown[];
+}): number {
+  if (result.syncFailures.length > 0) return 2;
+  if (result.candidates > 0 && result.extractFailures.length === result.candidates) return 2;
+  return 0;
 }
 
 /**

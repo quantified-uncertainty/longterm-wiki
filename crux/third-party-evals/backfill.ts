@@ -1,19 +1,10 @@
 /**
  * Third-party-evals backfill driver (QUA-705).
  *
- * Wraps the existing `ingest` + `extract` + sync flow into a single batch
- * pass over an evaluator's published reports. Each candidate URL goes
- * through:
- *
- *   1. `extractEvalReport()` — LLM extraction with span verification
- *   2. `resolveAiModel()`     — match every named model against entities
- *   3. `toSyncItem()`         — build the wiki-server sync payload
- *   4. `syncThirdPartyEvaluations()` (batched) — POST to /api/.../sync
- *
- * Concurrency is capped (default 4) for the extract step. Sync items are
- * batched (default 25 per request) to stay well under the 500-item limit
- * and amortize HTTP/rate-limit overhead. Errors are non-fatal — failed
- * extractions are logged and skipped, succeeded items still ship.
+ * Errors are non-fatal: failed extractions are logged and skipped so a single
+ * bad source doesn't waste the LLM spend on the rest of the batch; failed sync
+ * batches don't abort later batches so a transient wiki-server hiccup doesn't
+ * lose previous progress.
  */
 import { generateId } from "../lib/grant-import/id.ts";
 import { resolveAiModel } from "../lib/ai-model-resolver.ts";
@@ -23,16 +14,8 @@ import {
   toSyncItem,
 } from "./extract-eval-report.ts";
 import { verifyExtractedReport } from "./span-verify.ts";
-import {
-  ingestUkAisi,
-} from "./ingesters/uk-aisi-sitemap.ts";
-import { ingestMetr } from "./ingesters/metr-rss.ts";
-import { ingestApollo } from "./ingesters/apollo-research.ts";
-import { ingestCaisi } from "./ingesters/caisi-blog.ts";
-import type {
-  IngestCandidate,
-  IngestResult,
-} from "./ingesters/types.ts";
+import { dispatchIngest } from "./ingesters/dispatch.ts";
+import type { IngestCandidate } from "./ingesters/types.ts";
 
 export interface BackfillOptions {
   /** Evaluator key — uk-aisi | metr | apollo | caisi (us-aisi). */
@@ -74,31 +57,8 @@ export interface BackfillResult {
 const DEFAULT_CONCURRENCY = 4;
 const DEFAULT_BATCH_SIZE = 25;
 
-/**
- * Map evaluator key → ingester. Mirrors the same dispatch in the CLI.
- */
-async function ingestFor(
-  evaluator: string,
-  options: BackfillOptions,
-): Promise<IngestResult> {
-  const key = evaluator.trim().toLowerCase();
-  if (key === "uk-aisi" || key === "ukaisi") {
-    return ingestUkAisi({ sinceDate: options.since });
-  }
-  if (key === "us-aisi" || key === "caisi" || key === "usaisi") {
-    return ingestCaisi();
-  }
-  if (key === "metr") return ingestMetr();
-  if (key === "apollo" || key === "apollo-research") return ingestApollo();
-  throw new Error(
-    `Unknown evaluator '${evaluator}'. Valid: uk-aisi, us-aisi, metr, apollo`,
-  );
-}
-
-/**
- * Minimal concurrency limiter — same shape used in citation-auditor.ts.
- * Avoids pulling in p-limit as a dependency.
- */
+// Same shape as crux/lib/citation/citation-auditor.ts::pLimit. Two callers
+// today; if a third appears, extract to crux/lib/.
 function pLimit(concurrencyLimit: number) {
   let active = 0;
   const queue: Array<() => void> = [];
@@ -187,7 +147,7 @@ export async function backfillEvaluator(
   const batchSize = options.batchSize ?? DEFAULT_BATCH_SIZE;
   const onProgress = options.onProgress ?? (() => {});
 
-  const ingest = await ingestFor(options.evaluator, options);
+  const ingest = await dispatchIngest(options.evaluator, { since: options.since });
   let candidates = ingest.candidates;
   if (options.limit != null && options.limit > 0) {
     candidates = candidates.slice(0, options.limit);
@@ -232,15 +192,9 @@ export async function backfillEvaluator(
         synced += chunk.length;
         onProgress({ kind: "synced", count: chunk.length, batchIndex });
       } else {
-        syncFailures.push({
-          batchIndex,
-          error: `${r.error}: ${r.message}`,
-        });
-        onProgress({
-          kind: "sync-error",
-          error: `${r.error}: ${r.message}`,
-          batchIndex,
-        });
+        const errorMsg = `${r.error}: ${r.message}`;
+        syncFailures.push({ batchIndex, error: errorMsg });
+        onProgress({ kind: "sync-error", error: errorMsg, batchIndex });
       }
     }
   }
