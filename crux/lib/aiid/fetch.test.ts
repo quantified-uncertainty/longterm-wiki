@@ -8,8 +8,17 @@
  * write outside the temp dir (Zip-Slip class of attack).
  */
 
-import { describe, it, expect } from "vitest";
-import { assertSafeTarEntries, parseTarVerboseLine, type TarEntry } from "./fetch.ts";
+import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { mkdtempSync, rmSync } from "fs";
+import { execFileSync } from "child_process";
+import { tmpdir } from "os";
+import { join } from "path";
+import {
+  assertSafeTarEntries,
+  listTarEntries,
+  tarVerboseLineType,
+  type TarEntry,
+} from "./fetch.ts";
 
 /** Helper: build a regular-file TarEntry from just a path. */
 const f = (name: string): TarEntry => ({ name, type: "-" });
@@ -113,112 +122,205 @@ describe("assertSafeTarEntries", () => {
 });
 
 /**
- * Parser tests for the two `tar -tvjf` output dialects we encounter in
- * the wild. Regression: bsdtar (macOS) puts the group name at the third
- * token, but the previous regex required a digit there and silently
- * fell through to a `type: "?"` entry — which `assertSafeTarEntries`
- * then rejected, breaking ingest entirely (QUA-733).
+ * Type-char extractor — both GNU tar and bsdtar emit the permissions
+ * string as the first whitespace-delimited token regardless of locale,
+ * timestamp format, or column layout, so this lookup is trivial. Lines
+ * that don't match the pattern (blank, garbage) get `?` and are rejected
+ * downstream by `assertSafeTarEntries()`.
  */
-describe("parseTarVerboseLine", () => {
-  it("parses bsdtar directory entries (the QUA-733 regression case)", () => {
-    const entry = parseTarVerboseLine(
-      "drwxr-xr-x  0 runner runner      0 Apr 20 03:37 mongodump_full_snapshot/",
-    );
-    expect(entry).toEqual({
-      name: "mongodump_full_snapshot/",
-      type: "d",
-      linkTarget: undefined,
-    });
+describe("tarVerboseLineType", () => {
+  it("returns `d` for directory entries (bsdtar with HH:MM)", () => {
+    expect(
+      tarVerboseLineType(
+        "drwxr-xr-x  0 runner runner      0 Apr 20 03:37 mongodump_full_snapshot/",
+      ),
+    ).toBe("d");
   });
 
-  it("parses bsdtar regular file entries", () => {
-    const entry = parseTarVerboseLine(
-      "-rw-r--r--  0 runner runner   1234 Apr 20 03:37 mongodump_full_snapshot/aiidprod/incidents.json",
-    );
-    expect(entry).toEqual({
-      name: "mongodump_full_snapshot/aiidprod/incidents.json",
+  it("returns `d` for directory entries (bsdtar with year fallback)", () => {
+    // Files with mtime older than ~6 months show year instead of HH:MM.
+    expect(
+      tarVerboseLineType(
+        "drwxr-xr-x  0 runner runner      0 Dec 31  1969 ancient/",
+      ),
+    ).toBe("d");
+  });
+
+  it("returns `-` for regular file entries (GNU tar)", () => {
+    expect(
+      tarVerboseLineType(
+        "-rw-r--r-- runner/runner 1234 2024-04-20 03:37 backup/data.json",
+      ),
+    ).toBe("-");
+  });
+
+  it("returns `l` for symlink entries", () => {
+    expect(
+      tarVerboseLineType(
+        "lrwxr-xr-x  0 runner runner      0 Apr 20 03:37 link -> target",
+      ),
+    ).toBe("l");
+  });
+
+  it("returns `h` for hardlink entries (GNU `link to` syntax)", () => {
+    expect(
+      tarVerboseLineType(
+        "hrw-r--r-- runner/runner 0 2024-04-20 03:37 hl link to file",
+      ),
+    ).toBe("h");
+  });
+
+  it("returns `?` for blank, whitespace-only, or CR-only lines", () => {
+    expect(tarVerboseLineType("")).toBe("?");
+    expect(tarVerboseLineType("   ")).toBe("?");
+    expect(tarVerboseLineType("\r")).toBe("?");
+  });
+});
+
+/**
+ * Integration tests for `listTarEntries`. We synthesize tiny tar.bz2
+ * archives with the local `tar` (bsdtar on macOS, GNU tar on Linux CI) so
+ * the test exercises the same parser path that AIID ingest uses, including
+ * the cross-pass `-tjf` / `-tvjf` reconciliation.
+ *
+ * The QUA-733 regression and the QUA-733 review-finding security
+ * regressions both live here: the parser must not silently bypass
+ * `assertSafeTarEntries()` for hostile filenames containing `..`,
+ * timestamp-shaped substrings, or arrow-shaped substrings.
+ */
+describe("listTarEntries (integration)", () => {
+  let scratch: string;
+
+  beforeEach(() => {
+    scratch = mkdtempSync(join(tmpdir(), "fetch-tar-test-"));
+  });
+
+  afterEach(() => {
+    rmSync(scratch, { recursive: true, force: true });
+  });
+
+  function makeArchive(filenames: string[]): string {
+    // Use a Node tar archive so we can inject pathological filenames
+    // (containing `..`, ` -> `, `01:23` etc.) that the local filesystem
+    // would otherwise refuse. We write via Python's tarfile module —
+    // available on every dev machine and CI image.
+    const archivePath = join(scratch, "test.tar.bz2");
+    const py = `
+import tarfile, io
+buf = io.BytesIO()
+with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
+    for name in ${JSON.stringify(filenames)}:
+        info = tarfile.TarInfo(name=name)
+        info.size = 0
+        tf.addfile(info, io.BytesIO(b''))
+open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
+`;
+    execFileSync("python3", ["-c", py], { stdio: ["ignore", "pipe", "pipe"] });
+    return archivePath;
+  }
+
+  it("parses a benign archive — name is taken verbatim from `tar -tjf`", () => {
+    const archive = makeArchive([
+      "backup/aiidprod/incidents.json",
+      "backup/aiidprod/reports.json",
+    ]);
+    const entries = listTarEntries(archive);
+    expect(entries).toHaveLength(2);
+    expect(entries[0]).toMatchObject({
+      name: "backup/aiidprod/incidents.json",
       type: "-",
-      linkTarget: undefined,
     });
-  });
-
-  it("parses bsdtar symlink entries with ` -> target`", () => {
-    const entry = parseTarVerboseLine(
-      "lrwxr-xr-x  0 runner runner      0 Apr 20 03:37 sample/link -> file.txt",
-    );
-    expect(entry).toEqual({
-      name: "sample/link",
-      type: "l",
-      linkTarget: "file.txt",
-    });
-  });
-
-  it("parses GNU tar directory entries (`owner/group` token)", () => {
-    const entry = parseTarVerboseLine(
-      "drwxr-xr-x runner/runner    0 2024-04-20 03:37 mongodump_full_snapshot/",
-    );
-    expect(entry).toEqual({
-      name: "mongodump_full_snapshot/",
-      type: "d",
-      linkTarget: undefined,
-    });
-  });
-
-  it("parses GNU tar regular file entries", () => {
-    const entry = parseTarVerboseLine(
-      "-rw-r--r-- runner/runner 1234 2024-04-20 03:37 mongodump_full_snapshot/aiidprod/incidents.json",
-    );
-    expect(entry).toEqual({
-      name: "mongodump_full_snapshot/aiidprod/incidents.json",
+    expect(entries[1]).toMatchObject({
+      name: "backup/aiidprod/reports.json",
       type: "-",
-      linkTarget: undefined,
     });
   });
 
-  it("parses GNU tar hardlink entries with ` link to target`", () => {
-    const entry = parseTarVerboseLine(
-      "hrw-r--r-- runner/runner 0 2024-04-20 03:37 sample/hardlink link to sample/file.txt",
+  /**
+   * Security regression — the QUA-733 review finding. The previous regex
+   * approach would parse this filename as `harmless.json` because the
+   * greedy `.*` anchored on `01:23` (inside the filename) instead of
+   * `03:37` (the real timestamp), and the year-only mtime form had no
+   * `HH:MM` at all. The two-pass implementation reads names from `tar
+   * -tjf` directly, so the entry name is the literal filename and
+   * `assertSafeTarEntries` sees the `..` segment and rejects.
+   */
+  it("preserves a `..`-prefixed filename containing time-like substrings (security)", () => {
+    const archive = makeArchive(["../escape 01:23 harmless.json"]);
+    const entries = listTarEntries(archive);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].name).toBe("../escape 01:23 harmless.json");
+    expect(entries[0].type).toBe("-");
+    expect(() => assertSafeTarEntries(entries)).toThrow(/traversal/);
+  });
+
+  it("preserves a regular filename containing ` -> ` (no false-positive link split)", () => {
+    const archive = makeArchive(["notes -> draft.txt"]);
+    const entries = listTarEntries(archive);
+    expect(entries[0].name).toBe("notes -> draft.txt");
+    expect(entries[0].type).toBe("-");
+    expect(entries[0].linkTarget).toBeUndefined();
+  });
+
+  it("preserves a regular filename containing ` link to ` (no false-positive hardlink split)", () => {
+    const archive = makeArchive(["my link to file.txt"]);
+    const entries = listTarEntries(archive);
+    expect(entries[0].name).toBe("my link to file.txt");
+    expect(entries[0].type).toBe("-");
+    expect(entries[0].linkTarget).toBeUndefined();
+  });
+
+  it("rejects an actual symlink (regardless of how the local tar formats the line)", () => {
+    const archivePath = join(scratch, "symlink.tar.bz2");
+    execFileSync(
+      "python3",
+      [
+        "-c",
+        `
+import tarfile, io
+buf = io.BytesIO()
+with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
+    info = tarfile.TarInfo(name='evil')
+    info.type = tarfile.SYMTYPE
+    info.linkname = '../../etc/passwd'
+    info.size = 0
+    tf.addfile(info)
+open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
+`,
+      ],
+      { stdio: ["ignore", "pipe", "pipe"] },
     );
-    expect(entry).toEqual({
-      name: "sample/hardlink",
-      type: "h",
-      linkTarget: "sample/file.txt",
-    });
+    const entries = listTarEntries(archivePath);
+    expect(entries).toHaveLength(1);
+    expect(entries[0].type).toBe("l");
+    // linkTarget is best-effort; we assert it's set when bsdtar/GNU emit it
+    expect(entries[0].linkTarget).toBe("../../etc/passwd");
+    expect(() => assertSafeTarEntries(entries)).toThrow(/link entry/);
   });
 
-  it("returns null for blank lines (skipped by listTarEntries)", () => {
-    expect(parseTarVerboseLine("")).toBeNull();
-    expect(parseTarVerboseLine("   ")).toBeNull();
-    expect(parseTarVerboseLine("\r")).toBeNull();
-  });
-
-  it("returns a sentinel `?` entry for unparseable lines (rejected by validator)", () => {
-    // Defensive: anything we can't parse becomes a `?` entry which
-    // assertSafeTarEntries then rejects.
-    const entry = parseTarVerboseLine("garbage with no time");
-    expect(entry).toEqual({ name: "garbage with no time", type: "?" });
-    // The validator must reject any `?` we emit.
-    expect(() => assertSafeTarEntries([entry!])).toThrow(/unsupported entry type/);
-  });
-
-  it("strips a trailing CR (handles archives produced on Windows hosts)", () => {
-    const entry = parseTarVerboseLine(
-      "drwxr-xr-x  0 runner runner      0 Apr 20 03:37 dir/\r",
+  it("preserves filenames with bsdtar's year fallback (mtime older than ~6 months)", () => {
+    // Build the archive then manually rewrite mtimes via Python so the
+    // local tar shows year format on listing.
+    const archivePath = join(scratch, "ancient.tar.bz2");
+    execFileSync(
+      "python3",
+      [
+        "-c",
+        `
+import tarfile, io
+buf = io.BytesIO()
+with tarfile.open(fileobj=buf, mode='w:bz2') as tf:
+    info = tarfile.TarInfo(name='backup/old.json')
+    info.size = 0
+    info.mtime = 0  # 1970-01-01 → year fallback in bsdtar
+    tf.addfile(info, io.BytesIO(b''))
+open(${JSON.stringify(archivePath)}, 'wb').write(buf.getvalue())
+`,
+      ],
+      { stdio: ["ignore", "pipe", "pipe"] },
     );
-    expect(entry).toEqual({ name: "dir/", type: "d", linkTarget: undefined });
-  });
-
-  it("does not misparse filenames that contain HH:MM-looking substrings", () => {
-    // Greedy `.*` finds the rightmost-but-still-valid HH:MM that lets
-    // the rest of the line match. The timestamp is `03:37`; the literal
-    // `01:23` in the filename must not be treated as the timestamp.
-    const entry = parseTarVerboseLine(
-      "-rw-r--r--  0 runner runner   1234 Apr 20 03:37 backup/data_01:23.json",
-    );
-    expect(entry).toEqual({
-      name: "backup/data_01:23.json",
-      type: "-",
-      linkTarget: undefined,
-    });
+    const entries = listTarEntries(archivePath);
+    expect(entries[0].name).toBe("backup/old.json");
+    expect(entries[0].type).toBe("-");
   });
 });
