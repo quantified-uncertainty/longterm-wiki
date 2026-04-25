@@ -118,7 +118,9 @@ async function fetchAllEntityStableIds(): Promise<ApiResult<Set<string>>> {
       if (e.stableId) stableIds.add(e.stableId);
     }
     total = result.data.total;
-    offset += PAGE_SIZE;
+    // Use the response's actual limit rather than PAGE_SIZE — defensive
+    // against silent server-side clamping (e.g. if maxLimit shrinks).
+    offset += result.data.limit ?? PAGE_SIZE;
   }
   return { ok: true, data: stableIds };
 }

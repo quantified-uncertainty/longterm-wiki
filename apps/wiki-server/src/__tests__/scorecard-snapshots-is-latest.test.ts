@@ -34,6 +34,83 @@ function resetStore() {
   sqlLog.length = 0;
 }
 
+/**
+ * Enforce `uq_scorecard_snapshots_latest_per_source` — at most one row with
+ * is_latest=true per scorecard_source. Mirrors the partial unique index in
+ * migration 0206. Throws on violation so a regression to the naive
+ * "INSERT with is_latest=true" pattern fails the test loudly.
+ */
+function assertLatestUniqueness(): void {
+  const latestBySource = new Map<string, string[]>();
+  for (const row of store.values()) {
+    if (!row.is_latest) continue;
+    const ids = latestBySource.get(row.scorecard_source) ?? [];
+    ids.push(row.id);
+    latestBySource.set(row.scorecard_source, ids);
+  }
+  for (const [source, ids] of latestBySource) {
+    if (ids.length > 1) {
+      throw new Error(
+        `uq_scorecard_snapshots_latest_per_source violation: source=${source} has ${ids.length} latest rows (${ids.join(", ")})`,
+      );
+    }
+  }
+}
+
+/**
+ * Parse an INSERT into scorecard_snapshots and mutate `store`. The
+ * sync-factory emits one row at a time via the audit-log pre-fetch then a
+ * batched INSERT ... ON CONFLICT DO UPDATE; the schema column order (from
+ * schema.ts) fixes the param positions:
+ *   [id, scorecard_source, wave_label, published_at, source_url,
+ *    methodology_url, license, org_count, dimension_count, notes,
+ *    is_latest, source_active, synced_at, updated_at]  = 14 params per row
+ * (captured_at and created_at use SQL defaults, so are not in params.)
+ */
+const COLS_PER_ROW = 14;
+
+function applyInsert(params: unknown[]): void {
+  for (let i = 0; i < params.length; i += COLS_PER_ROW) {
+    const row: SnapshotRow = {
+      id: params[i] as string,
+      scorecard_source: params[i + 1] as string,
+      is_latest: Boolean(params[i + 10]),
+      published_at: params[i + 3] as string,
+    };
+    store.set(row.id, row);
+  }
+  assertLatestUniqueness();
+}
+
+/**
+ * Parse an UPDATE on scorecard_snapshots and mutate `store`.
+ *
+ * The route emits two UPDATE shapes:
+ *   1. SET is_latest=$1, updated_at=$2 WHERE scorecard_source=$3 AND is_latest=$4
+ *      (clear prior latest for a source)
+ *   2. SET is_latest=$1, updated_at=$2 WHERE id=$3
+ *      (promote a specific row to latest)
+ */
+function applyUpdate(q: string, params: unknown[]): void {
+  const newIsLatest = Boolean(params[0]);
+  if (q.includes("scorecard_source")) {
+    // Shape 1: clear matching source rows.
+    const source = params[2] as string;
+    const matchIsLatest = Boolean(params[3]);
+    for (const row of store.values()) {
+      if (row.scorecard_source === source && row.is_latest === matchIsLatest) {
+        row.is_latest = newIsLatest;
+      }
+    }
+  } else if (q.includes('"id"')) {
+    // Shape 2: promote by id.
+    const id = params[2] as string;
+    const row = store.get(id);
+    if (row) row.is_latest = newIsLatest;
+  }
+  assertLatestUniqueness();
+}
+
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
   sqlLog.push({ q, params });
@@ -45,18 +122,15 @@ function dispatch(query: string, params: unknown[]): unknown[] {
       .map((p) => store.get(p as string)!);
   }
 
-  // INSERT INTO "scorecard_snapshots"
-  // The sync-factory chunks by column count; we can't reconstruct the row
-  // exactly without parsing column ordering. Instead, capture that an
-  // insert happened with these param values and treat the items array
-  // (passed in via the test) as the source of truth for what got inserted.
+  // INSERT INTO "scorecard_snapshots" — mutate store + enforce unique index.
   if (q.includes("insert into") && q.includes('"scorecard_snapshots"')) {
+    applyInsert(params);
     return [];
   }
 
-  // UPDATE "scorecard_snapshots" SET is_latest=false WHERE source=X AND is_latest=true
-  // and UPDATE ... SET is_latest=true WHERE id=X
+  // UPDATE "scorecard_snapshots" — mutate store + enforce unique index.
   if (q.includes("update") && q.includes('"scorecard_snapshots"')) {
+    applyUpdate(q, params);
     return [];
   }
 
@@ -196,6 +270,42 @@ describe("scorecard_snapshots is_latest invariant", () => {
 
     assertClearBeforePromote("fli_index", "fli-summer-2025");
     assertClearBeforePromote("fmti", "fmti-dec-2025");
+  });
+
+  it("allows a new wave for a source that already has an is_latest=true row (clear must precede promote)", async () => {
+    // Seed a prior latest row that the store now actively enforces via
+    // assertLatestUniqueness. If the route ever regressed to inserting
+    // is_latest=true before running the clear, the INSERT would push a
+    // second latest row into the store and the invariant check would throw.
+    store.set("fli-spring-2024", {
+      id: "fli-spring-2024",
+      scorecard_source: "fli_index",
+      is_latest: true,
+      published_at: "2024-04-01",
+    });
+
+    const app = buildApp();
+    const res = await postJson(app, "/sync", {
+      items: [
+        {
+          id: "fli-summer-2025",
+          scorecardSource: "fli_index",
+          publishedAt: "2025-07-17",
+          sourceUrl: "https://example.com/fli",
+          orgCount: 7,
+          dimensionCount: 7,
+          isLatest: true,
+          sourceActive: true,
+        },
+      ],
+    });
+    expect(res.status).toBe(200);
+
+    // Final state: exactly one is_latest=true for the source, on the new id.
+    const latestRows = [...store.values()].filter(
+      (r) => r.scorecard_source === "fli_index" && r.is_latest,
+    );
+    expect(latestRows.map((r) => r.id)).toEqual(["fli-summer-2025"]);
   });
 
   it("rejects an invalid scorecardSource via Zod enum", async () => {

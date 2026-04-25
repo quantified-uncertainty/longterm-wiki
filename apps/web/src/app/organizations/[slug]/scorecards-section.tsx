@@ -172,21 +172,19 @@ export function ScorecardsSection({
             ) : null}
 
             {dimensionRows.length > 0 ? (
-              <table className="w-full text-sm">
-                <tbody>
-                  {dimensionRows.map((r) => (
-                    <tr
-                      key={r.id}
-                      className="border-b border-border/30 last:border-b-0"
-                    >
-                      <td className="py-1.5 pr-3">{r.dimensionLabel}</td>
-                      <td className="py-1.5 font-mono tabular-nums text-right">
-                        {formatScoreCell(r)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <dl className="w-full text-sm grid grid-cols-[1fr_auto] gap-x-3">
+                {dimensionRows.map((r) => (
+                  <div
+                    key={r.id}
+                    className="contents border-b border-border/30 last:border-b-0"
+                  >
+                    <dt className="py-1.5">{r.dimensionLabel}</dt>
+                    <dd className="py-1.5 font-mono tabular-nums text-right">
+                      {formatScoreCell(r)}
+                    </dd>
+                  </div>
+                ))}
+              </dl>
             ) : null}
           </article>
         );
