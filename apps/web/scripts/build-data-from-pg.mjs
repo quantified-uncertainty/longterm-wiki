@@ -52,6 +52,7 @@ import { buildUrlToResourceMap } from "./lib/unconverted-links.mjs";
 import { buildIdRegistry } from "./lib/id-registry.mjs";
 import { collectPageWikiIds } from "./lib/frontmatter-scanner.mjs";
 import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
+import { getServerUrl, getApiKey, getEnvPrefix } from "./lib/wiki-server-env.mjs";
 import { fetchPersistentIdRegistry } from "./lib/id-client.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
@@ -65,17 +66,12 @@ const AUDIT_DIR = join(REPO_ROOT, "docs", "audits");
 const SAMPLE_ARG = process.argv.find((a) => a.startsWith("--sample="));
 const SAMPLE = SAMPLE_ARG ? Number(SAMPLE_ARG.split("=")[1]) : Infinity;
 
-const envPrefix =
-  process.env.WIKI_SERVER_ENV === "prod" ||
-  process.env.WIKI_SERVER_ENV === "production"
-    ? "PROD_"
-    : "";
-const SERVER_URL = process.env[`${envPrefix}LONGTERMWIKI_SERVER_URL`];
-const API_KEY = process.env[`${envPrefix}LONGTERMWIKI_SERVER_API_KEY`];
+const SERVER_URL = getServerUrl();
+const API_KEY = getApiKey();
 
 if (!SERVER_URL) {
   console.error(
-    `error: ${envPrefix}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
+    `error: ${getEnvPrefix()}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
   );
   process.exit(1);
 }

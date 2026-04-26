@@ -10,6 +10,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import { getServerUrl, getApiKey } from './wiki-server-env.mjs';
 
 // ---------------------------------------------------------------------------
 // Shared ID detection helpers
@@ -77,7 +78,7 @@ function logWikiServerWarning(context, reason) {
 /** Build headers for wiki-server API requests, including auth if configured. */
 export function buildHeaders() {
   const headers = { 'Content-Type': 'application/json' };
-  const apiKey = process.env.LONGTERMWIKI_SERVER_API_KEY;
+  const apiKey = getApiKey();
   if (apiKey) headers['Authorization'] = `Bearer ${apiKey}`;
   return headers;
 }
@@ -170,7 +171,7 @@ export async function fetchJsonWithRetry(url, opts = {}) {
  * Falls back to an empty map if the server is unavailable.
  */
 export async function buildEditLogDateMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  editLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return new Map();
@@ -209,7 +210,7 @@ export async function buildEditLogDateMap() {
  * Falls back to an empty map if the server is unavailable.
  */
 export async function buildEarliestEditLogDateMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  earliestEditLogDates: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return new Map();
@@ -247,7 +248,7 @@ export async function buildEarliestEditLogDateMap() {
  * Falls back to an empty map if the server is unavailable.
  */
 export async function buildCitationStatsMap() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  citationStats: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return new Map();
@@ -294,7 +295,7 @@ export async function buildCitationStatsMap() {
  * Returns { [pageId]: CitationQuote[] } or empty object if unavailable.
  */
 export async function buildCitationQuotesBundle() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  citationQuotes: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return {};
@@ -396,7 +397,7 @@ export function buildRatingsFromAssessment(assessment, fmRatings) {
  * Falls back to empty map if wiki-server is unavailable.
  */
 export async function fetchAssessments() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  assessments: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return new Map();
@@ -472,7 +473,7 @@ export async function fetchAssessments() {
  * Falls back to empty object if wiki-server is unavailable.
  */
 export async function fetchBenchmarkResults() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  benchmark-results: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return {};
@@ -555,7 +556,7 @@ export async function fetchBenchmarkResults() {
  * Falls back to empty array if wiki-server is unavailable.
  */
 export async function fetchResearchAreas() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  research-areas: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return [];
@@ -599,7 +600,7 @@ export async function fetchResearchAreas() {
  * This replaces the ISR-based per-page fetch that was unreliable during builds.
  */
 export async function fetchResearchAreaDetails(areaIds) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl || areaIds.length === 0) {
     console.log('  research-area-details: skipped (no server or no areas)');
     return {};
@@ -681,7 +682,7 @@ function isStrictVerdictsMode() {
  *     and discarding everything
  */
 export async function fetchRecordVerdicts({ fetchImpl, sleepImpl } = {}) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  record-verdicts: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return {};
@@ -759,7 +760,7 @@ export async function fetchRecordVerdicts({ fetchImpl, sleepImpl } = {}) {
  * making PG the source of truth for facts.
  */
 export async function fetchFactBaseFromServer() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  factbase-export: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return null;
@@ -794,7 +795,7 @@ export async function fetchFactBaseFromServer() {
  * the entity stableId when looking up — not the slug.
  */
 export async function fetchPolicyStakeholderIds() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  policy-stakeholder-ids: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return {};
@@ -852,7 +853,7 @@ export async function fetchPolicyStakeholderIds() {
  * @param {Array} typedEntities — the full typedEntities array from database
  */
 export async function syncPolicyStakeholders(typedEntities) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  policy-stakeholder-sync: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return;
@@ -1341,7 +1342,7 @@ function normalizePGEntityId(id) {
  * Returns facts grouped by entityId in the KB Fact shape, or null if unavailable.
  */
 export async function fetchFactsFromPG() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  kb-facts-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return null;
@@ -1367,7 +1368,7 @@ export async function fetchFactsFromPG() {
 }
 
 export async function mergePGRecordsIntoKB(kb) {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  kb-pg: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return { personnel: 0, grants: 0, fundingRounds: 0, investments: 0, equityPositions: 0, divisions: 0, fundingPrograms: 0, divisionPersonnel: 0, entityEvents: 0, entityAssessments: 0, publications: 0 };
@@ -1668,7 +1669,7 @@ export async function mergePGRecordsIntoKB(kb) {
  * Falls back to null if the server is unavailable (caller should use YAML).
  */
 export async function fetchResourcesFromPG() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) return null;
 
   const headers = buildHeaders();
@@ -1798,7 +1799,7 @@ export async function fetchResourcesFromPG() {
  * Falls back to an empty object if the server is unavailable.
  */
 export async function buildPageReferenceIndex() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  pageReferenceIndex: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return {};
@@ -1850,7 +1851,7 @@ export async function buildPageReferenceIndex() {
  * Returns: { [stableId]: { authored: resourceId[], subject: resourceId[] } }
  */
 export async function fetchEntityResourceLinks() {
-  const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const serverUrl = getServerUrl();
   if (!serverUrl) {
     console.log('  entityResourceLinks: skipped (LONGTERMWIKI_SERVER_URL not set)');
     return null;
