@@ -1889,7 +1889,10 @@ export const tablebaseAuditLog = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     recordType: text("record_type").notNull(),
-    recordId: varchar("record_id", { length: 10 }).notNull(),
+    // QUA-753: widened from varchar(10) to text. Composite/derived record IDs
+    // (e.g. scorecard snapshot IDs `<source>-<wave>` or grade IDs
+    // `<snap>|<entity>|<dim>`) blew through the 10-char ceiling and 500'd.
+    recordId: text("record_id").notNull(),
     operation: text("operation").notNull(), // 'insert', 'update', 'delete'
     oldData: jsonb("old_data"),
     newData: jsonb("new_data").notNull(),

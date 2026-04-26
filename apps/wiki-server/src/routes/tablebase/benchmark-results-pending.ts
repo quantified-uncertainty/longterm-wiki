@@ -170,9 +170,7 @@ const benchmarkResultsPendingApp = new Hono()
       name: "benchmark-results-pending",
       table: benchmarkResultsPending,
       syncSchema: SyncBenchmarkResultPendingItemSchema,
-      // Why no `auditRecordType`: row IDs (e.g. `brp_quarantine_helm_1`)
-      // can exceed `tablebase_audit_log.record_id`'s varchar(10), so audit
-      // logging would fail with "value too long" on real payloads.
+      auditRecordType: "benchmark_results_pending",
       // Why no factory `naturalKey`: the factory's natural-key dedup runs
       // BEFORE `preValidate`, but `preValidate` is what canonicalizes the
       // benchmarkId (slug → 10-char id). The post-resolution dedup below

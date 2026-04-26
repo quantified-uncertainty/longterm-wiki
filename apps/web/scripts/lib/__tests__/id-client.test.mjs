@@ -9,14 +9,20 @@ beforeEach(() => {
   savedEnv = {
     LONGTERMWIKI_SERVER_URL: process.env.LONGTERMWIKI_SERVER_URL,
     LONGTERMWIKI_SERVER_API_KEY: process.env.LONGTERMWIKI_SERVER_API_KEY,
+    PROD_LONGTERMWIKI_SERVER_URL: process.env.PROD_LONGTERMWIKI_SERVER_URL,
+    PROD_LONGTERMWIKI_SERVER_API_KEY: process.env.PROD_LONGTERMWIKI_SERVER_API_KEY,
     WIKI_SERVER_ENV: process.env.WIKI_SERVER_ENV,
   };
   // Default: no server configured, and no PROD_ prefix routing.
   // WIKI_SERVER_ENV=prod would make getEnv() read PROD_LONGTERMWIKI_SERVER_URL,
   // which tests never set — unset it so tests are hermetic regardless of shell env.
+  // WIKI_SERVER_ENV=local disables the QUA-747 slot-CWD auto-detect that
+  // would otherwise pick up PROD_ vars when tests run from inside an a<N> slot.
   delete process.env.LONGTERMWIKI_SERVER_URL;
   delete process.env.LONGTERMWIKI_SERVER_API_KEY;
-  delete process.env.WIKI_SERVER_ENV;
+  delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
+  delete process.env.PROD_LONGTERMWIKI_SERVER_API_KEY;
+  process.env.WIKI_SERVER_ENV = "local";
 });
 
 afterEach(() => {
