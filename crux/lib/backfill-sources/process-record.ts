@@ -40,6 +40,17 @@ export async function processRecord(
   options: ProcessOptions,
 ): Promise<ProcessResult> {
   const cost = emptyCost();
+
+  // Short-circuit: when a fact's value is itself an http(s) URL (e.g.
+  // `Google Scholar = https://scholar.google.com/...`, `Website = https://...`),
+  // the value IS the citation — no web search needed. Free, no LLM calls,
+  // perfect precision.
+  const selfSource = selfSourcingUrl(record);
+  if (selfSource) {
+    console.log(`  ✓ Self-sourced (value is a URL): ${selfSource}`);
+    return { matched: true, url: selfSource, provider: 'self-sourced', cost };
+  }
+
   const entityName = (record.entity_name ?? '').trim();
   const matchTerms = extractMatchTerms(record);
   const claim = humanizeClaim(record) || matchTerms[0] || '';
@@ -227,4 +238,25 @@ async function pickBestMatch(
   addCost(cost, rankCost);
 
   return candidates[result.index];
+}
+
+// ---------------------------------------------------------------------------
+// Helper: detect facts whose `value` IS the source
+// ---------------------------------------------------------------------------
+
+/**
+ * Returns the URL to use as the source when a fact's `value` is itself an
+ * http(s) URL (the value IS the citation), or null when the record isn't
+ * self-sourcing. Only applies to the `facts` table — other tables (personnel,
+ * investments, etc.) don't have a free-form `value` column with this shape.
+ *
+ * Strict scheme + no embedded whitespace: "see https://x for details" is text
+ * with a URL embedded, not a URL value, and shouldn't trigger self-sourcing.
+ */
+export function selfSourcingUrl(record: MissingSourceRecord): string | null {
+  if (record.record_table !== 'facts') return null;
+  const value = record.value;
+  if (typeof value !== 'string') return null;
+  const trimmed = value.trim();
+  return /^https?:\/\/\S+$/i.test(trimmed) ? trimmed : null;
 }
