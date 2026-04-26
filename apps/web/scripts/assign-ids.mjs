@@ -25,6 +25,7 @@ import { CONTENT_DIR, DATA_DIR, TOP_LEVEL_CONTENT_DIRS, REPO_ROOT } from './lib/
 import { scanFrontmatterEntities } from './lib/frontmatter-scanner.mjs';
 import { buildIdMaps, filterEligiblePages } from './lib/id-assignment.mjs';
 import { isServerAvailable, allocateIds, fetchServerEntityIdMap } from './lib/id-client.mjs';
+import { getServerUrl } from './lib/wiki-server-env.mjs';
 
 // ---------------------------------------------------------------------------
 // .env loading — must run before any process.env access
@@ -157,7 +158,7 @@ async function main() {
   // only fail if we actually need to allocate new IDs.
   const serverAvailable = await isServerAvailable();
   if (serverAvailable) {
-    console.log(`  Using wiki server at ${process.env.LONGTERMWIKI_SERVER_URL}`);
+    console.log(`  Using wiki server at ${getServerUrl()}`);
   } else if (DRY_RUN) {
     console.log('  Wiki server unavailable — dry-run will show entities needing IDs but cannot preview assignments');
   } else {

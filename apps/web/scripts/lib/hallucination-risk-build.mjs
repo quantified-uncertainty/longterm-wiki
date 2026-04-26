@@ -8,6 +8,7 @@
  */
 
 import { recordRiskSnapshots } from './risk-client.mjs';
+import { getServerUrl } from './wiki-server-env.mjs';
 
 /**
  * Compute hallucination risk for all pages and build aggregated stats.
@@ -82,7 +83,7 @@ export async function syncRiskSnapshots(pages, contentOnly) {
     return;
   }
 
-  if (!process.env.LONGTERMWIKI_SERVER_URL) return;
+  if (!getServerUrl()) return;
 
   const snapshots = pages
     .filter(p => p.hallucinationRisk)
