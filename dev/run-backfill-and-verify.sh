@@ -17,6 +17,16 @@ LIMIT="${1:-10}"
 BUDGET="${2:-5}"
 DRY_RUN="${DRY_RUN:-}"
 
+# Refuse to run against prod. backfill --apply writes; one stray prefix
+# (WIKI_SERVER_ENV=prod) would silently target the prod wiki-server.
+# Override with ALLOW_PROD=1 if you really mean it.
+if [ "${WIKI_SERVER_ENV:-}" = "prod" ] && [ "${ALLOW_PROD:-}" != "1" ]; then
+  printf '\033[31mRefusing to run: WIKI_SERVER_ENV=prod is set.\033[0m\n' >&2
+  printf 'This script writes to the DB. Unset WIKI_SERVER_ENV (or set =local) to run locally,\n' >&2
+  printf 'or set ALLOW_PROD=1 to override.\n' >&2
+  exit 2
+fi
+
 cd "$(dirname "$0")/.."
 
 bold() { printf '\033[1m%s\033[0m\n' "$*"; }

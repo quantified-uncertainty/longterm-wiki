@@ -318,6 +318,19 @@ export async function searchPerplexity(
 
 const VALID_SCRY_TABLES = ['mv_eaforum_posts', 'mv_lesswrong_posts'] as const;
 
+// Dampener for SCRY HTTP errors — when the upstream is down (e.g. Cloudflare 502),
+// every record in a long batch produces the same multi-line HTML body. Log the
+// first occurrence per (table, status) per process; suppress repeats with a
+// periodic count. Reset on first success per table.
+const scryErrorCounts = new Map<string, number>();
+const scryHadSuccess = new Set<string>();
+
+function summarizeScryBody(body: string): string {
+  const trimmed = body.trim();
+  if (/^<(!doctype|html|head)/i.test(trimmed)) return '(HTML error page)';
+  return trimmed.slice(0, 120).replace(/\s+/g, ' ');
+}
+
 async function searchScry(query: string, maxResults: number): Promise<SearchHit[]> {
   const apiKey = getApiKey('SCRY_API_KEY') ?? SCRY_PUBLIC_KEY;
 
@@ -344,9 +357,30 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
       });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => '(no body)');
-        console.error(`SCRY ${table}: HTTP ${response.status} — ${errorText.slice(0, 200)}`);
+        const key = `${table}:${response.status}`;
+        const prev = scryErrorCounts.get(key) ?? 0;
+        const next = prev + 1;
+        scryErrorCounts.set(key, next);
+        // First occurrence per (table, status): log once with short body.
+        // Every 50th: emit a single rollup line. Otherwise silent.
+        if (next === 1) {
+          const errorText = await response.text().catch(() => '(no body)');
+          console.error(
+            `SCRY ${table}: HTTP ${response.status} — ${summarizeScryBody(errorText)} (suppressing repeats)`,
+          );
+        } else if (next % 50 === 0) {
+          console.error(`SCRY ${table}: HTTP ${response.status} — ${next} total`);
+        }
         continue;
+      }
+
+      // Note recovery so a fresh batch of failures gets re-logged.
+      if (!scryHadSuccess.has(table)) {
+        scryHadSuccess.add(table);
+        // Clear counters for this table so the next failure logs again.
+        for (const k of [...scryErrorCounts.keys()]) {
+          if (k.startsWith(`${table}:`)) scryErrorCounts.delete(k);
+        }
       }
 
       const data = await response.json() as ScryApiResponse;

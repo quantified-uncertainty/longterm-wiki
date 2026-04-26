@@ -2,9 +2,10 @@
  * Wiki-server I/O for the backfill-sources command.
  *
  * The two endpoints used here both live in
- * apps/wiki-server/src/routes/sourcing/missing-sources.ts:
- *   GET  /api/sourcing/missing-sources  — return records lacking a source URL
- *   POST /api/sourcing/update-source    — write a source URL to one record
+ * apps/wiki-server/src/routes/sourcing/missing-sources.ts, mounted at
+ * /api/sourcing/missing-sources in app.ts:
+ *   GET  /api/sourcing/missing-sources                — records lacking a source URL
+ *   POST /api/sourcing/missing-sources/update-source  — write a source URL to one record
  *
  * The update endpoint knows which column holds the source per table (e.g.
  * `source_url` vs `source` vs `evidence_url`) so callers don't need to.
@@ -57,7 +58,7 @@ export async function updateRecordSource(
 ): Promise<boolean> {
   const response = await apiRequest<{ updated?: number; error?: string }>(
     'POST',
-    '/api/sourcing/update-source',
+    '/api/sourcing/missing-sources/update-source',
     {
       table: record.record_table,
       recordId: record.record_id,
