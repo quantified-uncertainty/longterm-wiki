@@ -12,7 +12,7 @@
  */
 
 import type { CommandResult } from '../../lib/command-types.ts';
-import { buildAuthorLookup, normalizeName } from './shared.ts';
+import { buildAuthorLookup, normalizeName, loadYaml, type EntityEntry, type PersonEntity } from './shared.ts';
 import {
   syncPlatformAccounts,
   getAllPlatformAccounts,
@@ -106,7 +106,11 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
 
   // Step 1: Load person entities and build name lookup
   console.log('  Loading entities...');
-  const authorLookup = await buildAuthorLookup();
+  const peopleRaw = loadYaml<EntityEntry[]>('data/entities/people.yaml') ?? [];
+  const people: PersonEntity[] = peopleRaw
+    .filter((e) => e.type === 'person' && e.title)
+    .map((e) => ({ id: e.id, title: e.title!, wikiId: e.wikiId }));
+  const authorLookup = buildAuthorLookup(people);
   console.log(`  Author lookup: ${authorLookup.size} entries`);
 
   // Step 2: Load stableId lookup (slug → stableId)

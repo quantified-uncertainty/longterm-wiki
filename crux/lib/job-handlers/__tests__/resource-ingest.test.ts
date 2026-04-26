@@ -46,7 +46,7 @@ vi.mock('../../wiki-server/resources.ts', () => ({
   findResourcesByContentHash: (...args: unknown[]) => mockFindResourcesByContentHash(...args),
 }));
 
-const mockCreateJob = vi.fn<() => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
+const mockCreateJob = vi.fn<(...args: unknown[]) => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
 
 vi.mock('../../wiki-server/jobs.ts', () => ({
   createJob: (...args: unknown[]) => mockCreateJob(...args),

@@ -802,6 +802,19 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     return [...seen].sort().join('+');
   }
 
+  // Pack what downstream consumers see as the source's content. Excerpts
+  // are search-keyword-filtered (paragraphs without query tokens are
+  // dropped), which can hide entity-name mentions that consumers like
+  // backfill-sources rely on. Always include a slice of the full body so
+  // both focused snippets and unfiltered context are available.
+  const SOURCE_CONTENT_CHARS = 6_000;
+  function packContent(fetched: { content: string; relevantExcerpts: string[] }): string {
+    const body = fetched.content.slice(0, SOURCE_CONTENT_CHARS);
+    const excerpts = fetched.relevantExcerpts.join('\n\n');
+    if (!excerpts) return body;
+    return `${excerpts}\n\n--- additional page content ---\n\n${body}`;
+  }
+
   for (let i = 0; i < fetchedSources.length; i++) {
     const fetched = fetchedSources[i];
     const url = urlsToFetch[i];
@@ -816,7 +829,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         url: fetched.url,
         title,
         provider,
-        content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
+        content: packContent(fetched),
         facts: [],
       });
       continue;
@@ -841,7 +854,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       url: fetched.url,
       title,
       provider,
-      content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
+      content: packContent(fetched),
       facts: facts.length > 0 ? facts : undefined,
     });
   }

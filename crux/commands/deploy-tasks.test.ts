@@ -156,7 +156,7 @@ describe('isPatBlockedError (QUA-409)', () => {
 
 describe('isCommitOnProduction (QUA-450)', () => {
   it('returns { on: true } when compare.ahead_by === 0 (commit is on production)', async () => {
-    const api = vi.fn(async () => ({ ahead_by: 0, behind_by: 42 }));
+    const api = vi.fn(async (..._args: unknown[]) => ({ ahead_by: 0, behind_by: 42 }));
     const res = await isCommitOnProduction('abc123', api as never);
     expect(res).toEqual({ on: true });
     expect(api.mock.calls[0][0]).toMatch(/compare\/production\.\.\.abc123/);
@@ -183,7 +183,7 @@ describe('isCommitOnProduction (QUA-450)', () => {
   });
 
   it('URL-encodes the commit sha', async () => {
-    const api = vi.fn(async () => ({ ahead_by: 0 }));
+    const api = vi.fn(async (..._args: unknown[]) => ({ ahead_by: 0 }));
     await isCommitOnProduction('weird/sha with spaces', api as never);
     expect(api.mock.calls[0][0]).toMatch(/weird%2Fsha%20with%20spaces/);
   });

@@ -123,6 +123,7 @@ async function queryInvestments(db: Db, cap: number): Promise<TableResult> {
 
 async function queryPolicyStakeholders(db: Db, cap: number): Promise<TableResult> {
   const stakE = alias(entities, "stak_e");
+  const polE = alias(entities, "pol_e");
   const whereClause = or(isNull(policyStakeholders.source), eq(policyStakeholders.source, ""));
 
   const rows = await db
@@ -131,13 +132,15 @@ async function queryPolicyStakeholders(db: Db, cap: number): Promise<TableResult
       record_table: sql<string>`'policy_stakeholders'`,
       entity_id: sql<string>`COALESCE(${policyStakeholders.stakeholderEntityId}, ${policyStakeholders.policyEntityId})`,
       entity_name: sql<string>`COALESCE(${stakE.title}, ${policyStakeholders.stakeholderDisplayName})`,
-      description: sql<string>`COALESCE(${policyStakeholders.stakeholderDisplayName}, ${stakE.title}, 'unknown') || ' (' || COALESCE(${policyStakeholders.position}, '') || ')'`,
+      description: sql<string>`COALESCE(${policyStakeholders.stakeholderDisplayName}, ${stakE.title}, 'unknown') || ' (' || COALESCE(${policyStakeholders.position}, '') || ') on ' || COALESCE(${polE.title}, ${policyStakeholders.policyEntityId}, 'unknown policy')`,
       stakeholder_display_name: policyStakeholders.stakeholderDisplayName,
       position: policyStakeholders.position,
       policy_entity_id: policyStakeholders.policyEntityId,
+      policy_name: sql<string>`COALESCE(${polE.title}, ${policyStakeholders.policyEntityId})`.as("policy_name"),
     })
     .from(policyStakeholders)
     .leftJoin(stakE, eq(stakE.stableId, policyStakeholders.stakeholderEntityId))
+    .leftJoin(polE, eq(polE.stableId, policyStakeholders.policyEntityId))
     .where(whereClause)
     .limit(cap);
 
