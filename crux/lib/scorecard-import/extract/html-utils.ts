@@ -1,13 +1,14 @@
 /**
- * Shared HTML helpers for scorecard extractors (QUA-749/750/751).
+ * Shared HTML helpers for scorecard extractors.
  *
- * Two responsibilities:
- *   1. `fetchToCache()` — download a URL to `<cacheDir>/<filename>` once,
- *      then read from disk on subsequent calls. Re-extraction never re-pays
- *      bandwidth or accidentally re-snapshots a moved page.
- *   2. `stripHtmlForLlm()` — drop <script>, <style>, <noscript>, comments,
- *      and most attributes so the LLM extractor sees just structure + text.
- *      Cuts the FLI index page from ~840KB to ~70KB without losing data.
+ *   `fetchToCache()` — download a URL to disk once, then read from disk on
+ *   subsequent calls. Lets us re-run extraction without re-fetching or
+ *   accidentally re-snapshotting a moved page.
+ *
+ *   `stripHtmlForLlm()` — best-effort regex strip of script/style/comments
+ *   and most attributes so the LLM sees structural skeleton + text only.
+ *   Typically shrinks scorecard pages by ~10×. Not a sanitizer; see
+ *   `stripHtmlForLlm` docstring below.
  */
 
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "fs";
@@ -97,46 +98,41 @@ export async function fetchToCache(
  * scorecard pages) but do NOT use this for security-sensitive HTML
  * sanitization — reach for a real parser (cheerio/parse5) instead.
  */
+// Compiled once and reused per call — avoids re-parsing 8 regex literals
+// every invocation. The strip helper sees one ~840KB FLI page per
+// extraction, so this is not hot, but the cost is also free.
+const RE_DROP_BLOCKS: ReadonlyArray<RegExp> = [
+  /<script\b[^>]*>[\s\S]*?<\/script>/gi,
+  /<style\b[^>]*>[\s\S]*?<\/style>/gi,
+  /<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi,
+  /<svg\b[^>]*>[\s\S]*?<\/svg>/gi,   // logos: lots of bytes, no signal
+  /<head\b[^>]*>[\s\S]*?<\/head>/gi, // favicon/meta/links
+  /<!--[\s\S]*?-->/g,
+];
+const RE_OPEN_TAG = /<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*?)(\/?)>/g;
+const RE_ATTR = /([a-zA-Z\-][a-zA-Z0-9\-_:]*)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/g;
+const RE_WHITESPACE = /\s+/g;
+const RE_BLOCK_CLOSE = /<\/(div|p|li|tr|td|th|h\d|section|article|main|header|footer|nav|table|tbody|thead)>/gi;
+const KEEP_ATTRS = new Set(["class", "data-company", "data-title", "data-id", "alt", "title"]);
+
 export function stripHtmlForLlm(html: string): string {
   let out = html;
-  // Drop script/style/noscript blocks (and their content).
-  out = out.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, "");
-  out = out.replace(/<style\b[^>]*>[\s\S]*?<\/style>/gi, "");
-  out = out.replace(/<noscript\b[^>]*>[\s\S]*?<\/noscript>/gi, "");
-  // Drop SVGs (logos blow up token count without adding info).
-  out = out.replace(/<svg\b[^>]*>[\s\S]*?<\/svg>/gi, "");
-  // Drop <head> entirely — we don't need favicon/meta/links.
-  out = out.replace(/<head\b[^>]*>[\s\S]*?<\/head>/gi, "");
-  // Drop comments.
-  out = out.replace(/<!--[\s\S]*?-->/g, "");
-  // Whitelist attributes per element. Keep `class`, `data-company`,
-  // `data-title`, `data-id` — drop everything else. Self-closing OK.
-  out = out.replace(/<([a-zA-Z][a-zA-Z0-9]*)\s+([^>]*?)(\/?)>/g, (_m, tag, attrs, slash) => {
+  for (const re of RE_DROP_BLOCKS) out = out.replace(re, "");
+  // Whitelist attributes per element; drop everything else. Self-closing OK.
+  out = out.replace(RE_OPEN_TAG, (_m, tag, attrs, slash) => {
     const kept: string[] = [];
-    const re = /([a-zA-Z\-][a-zA-Z0-9\-_:]*)\s*=\s*("([^"]*)"|'([^']*)'|([^\s>]+))/g;
+    RE_ATTR.lastIndex = 0;
     let am: RegExpExecArray | null;
-    while ((am = re.exec(attrs)) !== null) {
+    while ((am = RE_ATTR.exec(attrs)) !== null) {
       const name = am[1].toLowerCase();
-      const val = am[3] ?? am[4] ?? am[5] ?? "";
-      if (
-        name === "class" ||
-        name === "data-company" ||
-        name === "data-title" ||
-        name === "data-id" ||
-        name === "alt" ||
-        name === "title"
-      ) {
+      if (KEEP_ATTRS.has(name)) {
+        const val = am[3] ?? am[4] ?? am[5] ?? "";
         kept.push(`${name}="${val}"`);
       }
     }
     return kept.length ? `<${tag} ${kept.join(" ")}${slash}>` : `<${tag}${slash}>`;
   });
-  // Normalize whitespace across block boundaries.
-  out = out.replace(/\s+/g, " ");
-  // Insert newlines after closing structural tags so the LLM sees layout.
-  out = out.replace(
-    /<\/(div|p|li|tr|td|th|h\d|section|article|main|header|footer|nav|table|tbody|thead)>/gi,
-    "</$1>\n",
-  );
+  out = out.replace(RE_WHITESPACE, " ");
+  out = out.replace(RE_BLOCK_CLOSE, "</$1>\n");
   return out.trim();
 }

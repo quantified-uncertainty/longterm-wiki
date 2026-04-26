@@ -372,33 +372,24 @@ async function scrapeCommand(
   };
 }
 
-async function cmdFetch(
-  source: string,
-  wave: string,
-  force: boolean,
-): Promise<CommandResult> {
+function assertFetchExtractSourceSupported(source: string, op: "fetch" | "extract"): void {
   if (source !== "fli_index") {
     throw new Error(
-      `fetch is only implemented for source "fli_index" so far (got "${source}"). ` +
-        `Other sources will land in QUA-750/751.`,
+      `${op} is only implemented for source "fli_index" so far (got "${source}").`,
     );
   }
+}
+
+async function cmdFetch(source: string, wave: string, force: boolean): Promise<CommandResult> {
+  assertFetchExtractSourceSupported(source, "fetch");
   console.log(`Fetching FLI wave ${wave}${force ? " (force)" : ""}...`);
   const r = await fetchFliWave(wave, undefined, { force });
   console.log(`✓ ${r.path} (${r.bytes.toLocaleString()} bytes)`);
   return { exitCode: 0 };
 }
 
-async function cmdExtract(
-  source: string,
-  wave: string,
-): Promise<CommandResult> {
-  if (source !== "fli_index") {
-    throw new Error(
-      `extract is only implemented for source "fli_index" so far (got "${source}"). ` +
-        `Other sources will land in QUA-750/751.`,
-    );
-  }
+async function cmdExtract(source: string, wave: string): Promise<CommandResult> {
+  assertFetchExtractSourceSupported(source, "extract");
   console.log(`Extracting FLI wave ${wave} (LLM call — may take ~30s)...`);
   const r = await extractFliWave(wave);
   console.log(`✓ ${r.outputPath}`);

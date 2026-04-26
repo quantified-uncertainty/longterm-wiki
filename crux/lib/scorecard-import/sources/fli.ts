@@ -49,13 +49,13 @@ import type {
 const SOURCE_KEY = "fli_index";
 const DEFAULT_RAW_DIR = resolve("data/scorecards/raw/fli");
 
-interface FLIDimension {
+export interface FLIDimension {
   slug: string;
   label: string;
   weight?: number | null;
 }
 
-interface FLIWaveFile {
+export interface FLIWaveFile {
   publishedAt: string;
   waveLabel: string;
   sourceUrl: string;

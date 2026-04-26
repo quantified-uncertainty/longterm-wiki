@@ -9,7 +9,7 @@ import {
   extractWaveFromCache,
   extractWaveFromHtml,
   extractWaveFromPdf,
-  latestWaveSlug,
+  LATEST_WAVE_SLUG,
 } from "../fli.ts";
 import type { FliWaveFile, FliWaveConfig } from "../fli.ts";
 import type { CallClaudeResult } from "../../../anthropic.ts";
@@ -446,20 +446,11 @@ describe("extractWaveFromCache (PDF path)", () => {
   });
 });
 
-describe("latestWaveSlug", () => {
-  it("returns the wave with the most recent publishedAt", () => {
-    const expected = [...FLI_WAVES].sort((a, b) =>
-      a.publishedAt.localeCompare(b.publishedAt),
-    ).at(-1)!.waveSlug;
-    expect(latestWaveSlug()).toBe(expected);
-  });
-
-  it("does not depend on FLI_WAVES being sorted", () => {
-    // The sort is internal — we verify by checking that the result is
-    // the maximum of all publishedAt values, regardless of array order.
+describe("LATEST_WAVE_SLUG", () => {
+  it("is the slug of the wave with the maximum publishedAt", () => {
     const max = FLI_WAVES.reduce((a, b) =>
       a.publishedAt > b.publishedAt ? a : b,
     );
-    expect(latestWaveSlug()).toBe(max.waveSlug);
+    expect(LATEST_WAVE_SLUG).toBe(max.waveSlug);
   });
 });
