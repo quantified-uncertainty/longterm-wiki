@@ -17,7 +17,7 @@
 
 import fs from 'fs';
 import path from 'path';
-import { spawnSync, execSync } from 'child_process';
+import { spawnSync, execFileSync } from 'child_process';
 import { parseCliArgs } from '../lib/cli.ts';
 import { createLlmClient, callLlm } from '../lib/llm.ts';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
@@ -173,7 +173,7 @@ async function takeScreenshot(
 
   const devPort = process.env.DEV_PORT || '3001';
   try {
-    execSync(`curl -s -o /dev/null -w "%{http_code}" http://localhost:${devPort}`, {
+    execFileSync('curl', ['-s', '-o', '/dev/null', '-w', '%{http_code}', `http://localhost:${devPort}`], {
       stdio: 'pipe',
     });
   } catch {

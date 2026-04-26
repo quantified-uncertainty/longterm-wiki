@@ -21,9 +21,22 @@
  */
 
 import { fileURLToPath } from 'url';
+import { resolve } from 'path';
+import { config as dotenvConfig } from 'dotenv';
 import { ValidationEngine, Severity, type Issue } from '../lib/validation/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
 import { getColors } from '../lib/output.ts';
+
+// Load .env so PROD_LONGTERMWIKI_SERVER_URL is available when this validator
+// is invoked as a standalone subprocess (e.g. by the gate). Without this, rules
+// that fetch from the wiki-server (resource-ref-integrity) fall back to the
+// stale local snapshot and emit thousands of false-positive errors. Quiet mode
+// + override:false respects already-set env vars (e.g. CI). See QUA-755.
+dotenvConfig({
+  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  quiet: true,
+  override: false,
+});
 
 interface ParsedArgs {
   ci: boolean;

@@ -605,8 +605,8 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
     return { exitCode: 1, output: 'Usage: crux tb tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
   }
 
-  const { execSync } = await import('child_process');
-  const { writeFileSync, unlinkSync } = await import('fs');
+  const { execSync, execFileSync } = await import('child_process');
+  const { writeFileSync, unlinkSync, realpathSync } = await import('fs');
   const { tmpdir } = await import('os');
   const { join } = await import('path');
 
@@ -629,9 +629,9 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   // Resolve playwright's node_modules path dynamically
   let nodePath: string | undefined;
   try {
-    const playwrightPath = execSync('which playwright', { encoding: 'utf-8' }).trim();
+    const playwrightPath = execFileSync('which', ['playwright'], { encoding: 'utf-8' }).trim();
     // Follow symlinks: /opt/homebrew/bin/playwright → ../lib/node_modules/playwright/...
-    const resolved = execSync(`realpath "${playwrightPath}"`, { encoding: 'utf-8' }).trim();
+    const resolved = realpathSync(playwrightPath);
     nodePath = resolved.replace(/\/playwright.*$/, '');
   } catch {
     // Fall back to common paths

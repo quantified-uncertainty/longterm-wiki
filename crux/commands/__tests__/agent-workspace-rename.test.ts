@@ -18,6 +18,21 @@ vi.mock('child_process', async () => {
       execCalls.push({ cmd, opts });
       return execScript(cmd);
     }),
+    // execFileSync calls are also recorded as a synthesized command string so
+    // the existing assertions (which match on `cmd.includes('rename-window')`,
+    // `-t "1"`, etc.) keep working after the QUA-755 shell-injection fixes
+    // converted template-literal execSync calls to execFileSync arg arrays.
+    execFileSync: vi.fn((file: string, args: readonly string[], opts?: unknown) => {
+      // Synthesize a shell-style command string so the existing assertions
+      // — which match on substrings like `rename-window`, `-t "1"`, `"LW"` —
+      // keep working. Flag-like args (-t, --foo) stay unquoted; everything
+      // else is quoted so the assertions see the same surface they did
+      // before the QUA-755 execSync→execFileSync conversion.
+      const quote = (a: string) => (a.startsWith('-') ? a : `"${a}"`);
+      const cmd = [file, ...args.map(quote)].join(' ');
+      execCalls.push({ cmd, opts });
+      return execScript(cmd);
+    }),
   };
 });
 

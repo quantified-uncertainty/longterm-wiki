@@ -8,7 +8,7 @@ lastEdited: 2026-03-09
 update_frequency: 60
 summary: Documentation for the wiki's multi-layer data storage architecture. The wiki-server PostgreSQL database stores citation content, audit results, claims, facts, and structured data accessed via Hono RPC API. An in-memory LRU cache provides session-local caching for source fetching. YAML files in data/ define entities, facts, and resources. The build pipeline compiles YAML + MDX into database.json for the Next.js frontend.
 ---
-import { Mermaid } from '@components/wiki';
+import { EntityLink, Mermaid, FBF, FBFactValue, Calc } from '@components/wiki';
 
 The wiki uses a multi-layer storage architecture. There is no single database — different kinds of data live in the storage layer best suited for them.
 

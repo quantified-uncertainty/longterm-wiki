@@ -10,7 +10,7 @@ createdAt: 2026-02-16
 evergreen: false
 summary: Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine, Loki/OpenFactVerification, GPT-Researcher, RefChecker), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks.
 ---
-import { Mermaid } from '@components/wiki';
+import { EntityLink, Mermaid, FBF, Calc, R } from '@components/wiki';
 
 <Aside type="note" title="Status: Vision Document">
 This is an architecture proposal, not a description of the current system. Some elements have been partially implemented (section-level rewriting, KB fact system, basic citation verification), but the full multi-agent orchestrator has not been built. The KB system (`packages/kb/`) now provides the structured data layer that this architecture assumes as a prerequisite — structured facts in YAML, `<FBF>` for inline values, and `<Calc>` for computed values.
