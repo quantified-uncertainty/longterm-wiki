@@ -35,10 +35,21 @@
  *   1 = One or more checks failed
  */
 
-import { execSync, spawn, type ChildProcess } from 'child_process';
+import { execSync, execFileSync, spawn, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { config as dotenvConfig } from 'dotenv';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+
+// Load .env so child validators inherit PROD_LONGTERMWIKI_SERVER_URL etc.
+// Without this, validators that fetch from wiki-server fall back to the local
+// snapshot (often stale), which manifests as gate-baseline-drift between
+// local and CI. See QUA-755.
+dotenvConfig({
+  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  quiet: true,
+  override: false,
+});
 import { getColors } from '../lib/output.ts';
 import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
@@ -116,7 +127,7 @@ function getChangedFiles(): string[] {
       const base = execSync('git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
         { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
       if (base) {
-        diffOutput = execSync(`git diff --name-only ${base} HEAD`,
+        diffOutput = execFileSync('git', ['diff', '--name-only', base, 'HEAD'],
           { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
       }
     } catch {

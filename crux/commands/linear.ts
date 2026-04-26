@@ -56,7 +56,7 @@ import {
 import { detectRedFlags, formatRedFlagsWarning } from '../lib/linear/sizing-red-flags.ts';
 import { currentBranch } from '../lib/session/session-checklist.ts';
 import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
-import { execSync } from 'child_process';
+import { execSync, execFileSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
 
 interface CommandOptions extends BaseOptions {
@@ -972,7 +972,7 @@ async function leakCheck(_args: string[], options: CommandOptions): Promise<Comm
       stdio: ['pipe', 'pipe', 'ignore'],
     }).trim();
     if (mergeBase) {
-      const commits = execSync(`git log ${mergeBase}..HEAD --format=%B`, {
+      const commits = execFileSync('git', ['log', `${mergeBase}..HEAD`, '--format=%B'], {
         encoding: 'utf-8',
         stdio: ['pipe', 'pipe', 'ignore'],
       });

@@ -17,9 +17,9 @@ import { EntityLink } from '@components/wiki';
 
 A natural question for AI safety policy: *given the rise of AI-enhanced cyber capabilities, how likely is it that AI-enabled cyber damage exceeds 10% of global GDP by year Y?* This page is the synthesis answer, drawing from four prior pages in the QUA-715 epic:
 
-- <EntityLink id="E2515" name="ai-cyber-damage-estimates">AI Cyber Damage Estimates</EntityLink> — methodology comparison across the major damage-estimate sources
-- <EntityLink id="E2516" name="cyber-insurance-market-signals">Cyber Insurance Market Signals</EntityLink> — revealed-preference market evidence on insurable damage
-- <EntityLink id="E2519" name="catastrophic-cyber-tail-risk">Catastrophic Cyber Tail Risk</EntityLink> — catalog of systemic single points of failure
+- AI Cyber Damage Estimates — methodology comparison across the major damage-estimate sources
+- Cyber Insurance Market Signals — revealed-preference market evidence on insurable damage
+- Catastrophic Cyber Tail Risk — catalog of systemic single points of failure
 - The seeded cyber incident `event` entities (NotPetya, WannaCry, SolarWinds, Colonial Pipeline, CDK Global, Change Healthcare, Anthropic-disclosed Sept 2025) for empirical anchoring
 
 ## Decomposition
@@ -47,7 +47,7 @@ Reasoning:
 
 **P(single event exceeds 10% GDP, in any year through 2035) ≈ 5-15%.**
 
-Reasoning, drawing on <EntityLink id="E2519" name="catastrophic-cyber-tail-risk">Catastrophic Cyber Tail Risk</EntityLink>:
+Reasoning, drawing on Catastrophic Cyber Tail Risk:
 - Of 8 cataloged systemic single points of failure, only **payment systems** approach the 10% GDP threshold within E2519's cited range. The aggressive high-end estimate for a multi-day SWIFT or Fedwire disruption is \$500B-\$10T (0.5-9% of global GDP) — even the upper bound is just below the 10% line, not above it.
 - Three other systems (hyperscaler cloud, ICS, OS/browser monoculture) reach the 10% threshold only under above-aggressive assumptions that exceed E2519's table bounds: simultaneous multi-target attacks, multi-week duration, and full data corruption rather than mere unavailability.
 - Historical base rate: largest single events to date — [NotPetya ≈\$10B (White House attribution per WIRED)](https://www.wired.com/story/notpetya-cyberattack-ukraine-russia-code-crashed-the-world/), [SolarWinds remediation projected up to \$100B across 18,000 affected entities (Rendition Infosec/Roll Call, 2021)](https://rollcall.com/2021/01/11/cleaning-up-solarwinds-hack-may-cost-as-much-as-100-billion/) (a forward-looking cleanup-spend projection rather than realized damages, with documented insured losses ≈\$90M and per-company costs averaging \$12M), Change Healthcare ≈\$2.87B+ direct costs to UnitedHealth (FY2024) — are 2-3 orders of magnitude below the threshold.
@@ -129,9 +129,9 @@ For continuing analysis, see the QUA-715 epic and its child issues. The wiki pag
 
 This page is a synthesis; primary sources are cited on the four prior pages:
 
-- <EntityLink id="E2515" name="ai-cyber-damage-estimates">AI Cyber Damage Estimates</EntityLink>
-- <EntityLink id="E2516" name="cyber-insurance-market-signals">Cyber Insurance Market Signals</EntityLink>
-- <EntityLink id="E2519" name="catastrophic-cyber-tail-risk">Catastrophic Cyber Tail Risk</EntityLink>
+- AI Cyber Damage Estimates
+- Cyber Insurance Market Signals
+- Catastrophic Cyber Tail Risk
 - <EntityLink id="E86" name="cyberweapons">Cyberweapons</EntityLink> (E86), <EntityLink id="E87" name="cyberweapons-attack-automation">E87</EntityLink>, <EntityLink id="E88" name="cyberweapons-offense-defense">E88</EntityLink>
 
 Plus the cyber incident event entities (NotPetya / WannaCry / SolarWinds / Colonial / CDK / Change Healthcare / Anthropic-disclosed) for empirical anchoring.

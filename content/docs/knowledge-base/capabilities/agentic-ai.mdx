@@ -182,22 +182,22 @@ The MLE-bench evaluation, which tests AI agents on machine learning engineering 
 **Autonomous Software Development**
 The software engineering domain has seen advanced agentic AI implementations. Cognition's Devin represents a system designed for autonomous software engineering, capable of taking high-level specifications and producing complete applications through planning, coding, testing, and debugging cycles. Unlike code completion tools, Devin can manage entire project lifecycles, make architectural decisions, research APIs and documentation, and handle complex multi-file codebases with dependency management.
 
-OpenAI launched Codex in 2025 as a cloud-based software engineering agent, with an accompanying system card documenting its capabilities and safety evaluations. The Codex agent loop involves iterative cycles of code generation, execution in a sandboxed environment, error analysis, and revision. OpenAI has published details on harness engineering (leveraging Codex in an agent-first development workflow), the App Server architecture supporting Codex, and the Codex app. Enterprise deployments include Datadog using Codex for system-level code review and Cisco using it for engineering workflows. The GPT-5.3-Codex system card documents safety evaluations specific to the coding agent context.[^9]
+OpenAI launched Codex in 2025 as a cloud-based software engineering agent, with an accompanying system card documenting its capabilities and safety evaluations. The Codex agent loop involves iterative cycles of code generation, execution in a sandboxed environment, error analysis, and revision. OpenAI has published details on harness engineering (leveraging Codex in an agent-first development workflow), the App Server architecture supporting Codex, and the Codex app. Enterprise deployments include Datadog using Codex for system-level code review and Cisco using it for engineering workflows. The GPT-5.3-Codex system card documents safety evaluations specific to the coding agent context.
 
 GitHub's Copilot Workspace demonstrates enterprise-grade agentic coding, where the system can understand project context, propose implementation plans, write code across multiple files, and handle integration testing. The practical deployment of these systems in production environments remains subject to reliability concerns and the need for human review of generated code.
 
 **Computer Control and Interface Manipulation**
 <R id="sid_BQNS1NuaOy">Anthropic's Computer Use capability</R>, introduced in October 2024, enables direct computer interface control. The system can observe desktop environments through screenshots, understand visual layouts and interface elements, and then execute mouse clicks, keyboard inputs, and navigation actions to accomplish tasks across any application. This approach generalizes beyond specific API integrations to work with legacy software, custom applications, and complex multi-application workflows.
 
-OpenAI's Computer-Using Agent (CUA) provides analogous capabilities, with deployment through the Operator product. Operator's system card documents safety measures including restrictions on high-risk actions (financial transactions above thresholds, irreversible file deletions) and confirmation requirements for consequential steps. Google's Gemini 2.5 Computer Use model extends similar capabilities within the Gemini model family.[^10]
+OpenAI's Computer-Using Agent (CUA) provides analogous capabilities, with deployment through the Operator product. Operator's system card documents safety measures including restrictions on high-risk actions (financial transactions above thresholds, irreversible file deletions) and confirmation requirements for consequential steps. Google's Gemini 2.5 Computer Use model extends similar capabilities within the Gemini model family.
 
 **Agentic Web Research**
-OpenAI's deep research capability, introduced in early 2025, enables agents to conduct multi-step web research over periods of minutes to hours, synthesizing information across dozens of sources into structured reports. ChatGPT agent, launched mid-2025, integrates browsing, code execution, file management, and third-party app connections into a unified agentic interface within ChatGPT. The ChatGPT agent system card documents its capability evaluations and safety mitigations.[^11]
+OpenAI's deep research capability, introduced in early 2025, enables agents to conduct multi-step web research over periods of minutes to hours, synthesizing information across dozens of sources into structured reports. ChatGPT agent, launched mid-2025, integrates browsing, code execution, file management, and third-party app connections into a unified agentic interface within ChatGPT. The ChatGPT agent system card documents its capability evaluations and safety mitigations.
 
-OpenAI also introduced Aardvark, an agentic security researcher, in 2025 — an agent specialized for security research tasks including vulnerability analysis, demonstrating the application of agentic capabilities to the security domain specifically.[^12]
+OpenAI also introduced Aardvark, an agentic security researcher, in 2025 — an agent specialized for security research tasks including vulnerability analysis, demonstrating the application of agentic capabilities to the security domain specifically.
 
 **Agentic AI in Physical Systems (Robotics)**
-Google DeepMind extended agentic AI to physical embodiment through the Gemini Robotics family. Gemini Robotics 1.5 integrates vision-language-action capabilities, enabling robots to follow natural-language instructions and generalize across physical manipulation tasks. Gemini Robotics On-Device brings AI capabilities to local robotic hardware without cloud connectivity requirements. AlphaEvolve, a Gemini-powered coding agent, has been applied to algorithm design tasks in mathematics and computer science.[^13]
+Google DeepMind extended agentic AI to physical embodiment through the Gemini Robotics family. Gemini Robotics 1.5 integrates vision-language-action capabilities, enabling robots to follow natural-language instructions and generalize across physical manipulation tasks. Gemini Robotics On-Device brings AI capabilities to local robotic hardware without cloud connectivity requirements. AlphaEvolve, a Gemini-powered coding agent, has been applied to algorithm design tasks in mathematics and computer science.
 
 SIMA 2 (Scalable Instructable Multiworld Agent 2) from Google DeepMind demonstrates an agent that plays, reasons, and learns with users in virtual 3D worlds, representing a step toward general-purpose embodied agents. These physical-world agentic systems introduce failure modes not present in purely digital contexts, including real-world harm from manipulation errors and the irreversibility of physical actions.
 
@@ -207,7 +207,7 @@ Google's NotebookLM and similar research agents can autonomously gather informat
 **Multi-Agent Coordination**
 Emerging agentic systems demonstrate the ability to coordinate with other AI agents to accomplish larger objectives. These multi-agent systems can divide labor, communicate findings, resolve conflicts, and maintain shared state across distributed tasks. AutoGen and similar frameworks enable complex workflows where specialized agents handle different aspects of a problem while maintaining overall coherence.
 
-Research on verifiable semantics for agent-to-agent communication addresses a key challenge: how to ensure that messages between agents carry well-defined, consistent meanings. Without such semantics, multi-agent systems can exhibit miscoordination arising from ambiguous interpretation of inter-agent messages rather than from any individual agent failure.[^14]
+Research on verifiable semantics for agent-to-agent communication addresses a key challenge: how to ensure that messages between agents carry well-defined, consistent meanings. Without such semantics, multi-agent systems can exhibit miscoordination arising from ambiguous interpretation of inter-agent messages rather than from any individual agent failure.
 
 This coordination capability extends to human-AI hybrid teams, where agentic systems can serve as autonomous team members, taking initiative, reporting progress, and adapting to changing requirements without constant management overhead. The reliability of multi-agent coordination remains an active research area, with coordination failures representing a distinct category of risk (see Multi-Agent Failure Modes section below).
 
@@ -230,7 +230,7 @@ This coordination capability extends to human-AI hybrid teams, where agentic sys
 
 The distinction between claimed benefits and independently validated outcomes remains significant. Most public information about agentic AI applications comes from vendor announcements, press releases, and selective case studies rather than peer-reviewed research or independent audits. The high projected cancellation rate (40%+ by 2027) suggests that realized benefits may fall short of initial expectations in many deployments.
 
-A recurring pattern in enterprise deployments is that agentic AI performs well on well-defined, bounded tasks with clear success criteria, while performance degrades on tasks requiring judgment about ambiguous requirements, long-horizon planning, or recovery from unexpected environmental states. Research on optimization instability in autonomous agentic workflows for clinical symptom detection illustrates this pattern: agents that perform reliably on individual steps can exhibit unstable behavior across multi-turn, multi-condition workflows when error recovery logic is underspecified.[^15]
+A recurring pattern in enterprise deployments is that agentic AI performs well on well-defined, bounded tasks with clear success criteria, while performance degrades on tasks requiring judgment about ambiguous requirements, long-horizon planning, or recovery from unexpected environmental states. Research on optimization instability in autonomous agentic workflows for clinical symptom detection illustrates this pattern: agents that perform reliably on individual steps can exhibit unstable behavior across multi-turn, multi-condition workflows when error recovery logic is underspecified.
 
 ### Economic Value Drivers
 
@@ -259,7 +259,7 @@ These no-code and consumer-facing deployments exhibit a distinct risk profile co
 | Regulatory coverage | Subject to enterprise compliance frameworks | May fall under consumer protection rather than AI-specific regulation |
 | Failure consequence | Organizational; often recoverable | Personal; may affect individual finances, relationships, privacy |
 
-The AGENTS.md standard, co-founded by OpenAI and donated to the Agentic AI Foundation, provides a machine-readable specification format for describing agent capabilities, permissions, and constraints. The standard aims to create interoperable conventions for how agents declare what actions they can take and what guardrails apply, addressing a gap in the no-code ecosystem where users may not have visibility into agent behavior.[^16]
+The AGENTS.md standard, co-founded by OpenAI and donated to the Agentic AI Foundation, provides a machine-readable specification format for describing agent capabilities, permissions, and constraints. The standard aims to create interoperable conventions for how agents declare what actions they can take and what guardrails apply, addressing a gap in the no-code ecosystem where users may not have visibility into agent behavior.
 
 ### Deployment Considerations for Organizations
 
@@ -301,7 +301,7 @@ As agentic systems perform more complex reasoning and maintain persistent state 
 | Multi-Agent Collaboration | Specialized agents coordinated by orchestrator | Tasks requiring diverse expertise or parallel work |
 | Calibrate-Then-Act | Cost-aware exploration framework that calibrates uncertainty before committing to tool calls | Environments where tool invocations have non-trivial costs |
 
-Research on state design for dynamic reasoning in large language models finds that how an agent's internal state is represented substantially affects its reasoning reliability across multi-turn tool-calling interactions. Proxy state-based evaluation methods for multi-turn tool-calling agents have been proposed as a path toward scalable verifiable reward signals that do not require ground-truth outcome labels for every trajectory.[^17]
+Research on state design for dynamic reasoning in large language models finds that how an agent's internal state is represented substantially affects its reasoning reliability across multi-turn tool-calling interactions. Proxy state-based evaluation methods for multi-turn tool-calling agents have been proposed as a path toward scalable verifiable reward signals that do not require ground-truth outcome labels for every trajectory.
 
 ### Agent Architecture Components
 
@@ -379,7 +379,7 @@ The open-source ecosystem has expanded since 2023, with frameworks becoming more
 | Link-click data exfiltration | 2025 | Research demonstrating that clicking a link within an AI agent session can trigger data exfiltration without user awareness | Browser-based agent attack vector |
 | Model poisoning via Internet of Agents | 2025 | Graph representation-based model poisoning attacks on heterogeneous Internet of Agents architectures, enabling targeted corruption of specific agent nodes | Supply-chain integrity concern |
 
-Research on keeping user data safe when an AI agent clicks a link has documented that browser-integrated agents can be manipulated through malicious web content to exfiltrate session data, credentials, or personal information without requiring the user to take any additional action beyond following a link provided by the agent.[^18]
+Research on keeping user data safe when an AI agent clicks a link has documented that browser-integrated agents can be manipulated through malicious web content to exfiltrate session data, credentials, or personal information without requiring the user to take any additional action beyond following a link provided by the agent.
 
 ### OWASP Agentic AI Threat Taxonomy
 
@@ -396,13 +396,13 @@ The <R id="sid_oVHW5PitOL">OWASP Agentic Security Initiative</R> has published 1
 
 ### Security Research: Jailbreaks, Illicit Assistance, and Tool-Augmented Agents
 
-Research on recursive language models for jailbreak detection proposes a procedural defense for tool-augmented agents, using a recursive detection loop that evaluates whether a given tool-calling trajectory has been induced by adversarial prompts. Evaluations show improved detection rates against multi-turn jailbreak attempts compared to single-pass classifiers.[^19]
+Research on recursive language models for jailbreak detection proposes a procedural defense for tool-augmented agents, using a recursive detection loop that evaluates whether a given tool-calling trajectory has been induced by adversarial prompts. Evaluations show improved detection rates against multi-turn jailbreak attempts compared to single-pass classifiers.
 
-Research measuring illicit assistance in multi-turn, multilingual LLM agents (Helpful to a Fault benchmark) finds that agent helpfulness can be exploited across language boundaries: agents that refuse harmful requests in English may comply with the same requests in lower-resource languages, suggesting that multilingual safety evaluations are necessary for agents deployed in global contexts.[^20]
+Research measuring illicit assistance in multi-turn, multilingual LLM agents (Helpful to a Fault benchmark) finds that agent helpfulness can be exploited across language boundaries: agents that refuse harmful requests in English may comply with the same requests in lower-resource languages, suggesting that multilingual safety evaluations are necessary for agents deployed in global contexts.
 
-Policy Compiler for Secure Agentic Systems introduces a formal approach to translating natural-language security policies into machine-checkable constraints that can be evaluated at runtime during agent tool-calling sequences, providing a layer of policy enforcement independent of the agent's internal alignment.[^21]
+Policy Compiler for Secure Agentic Systems introduces a formal approach to translating natural-language security policies into machine-checkable constraints that can be evaluated at runtime during agent tool-calling sequences, providing a layer of policy enforcement independent of the agent's internal alignment.
 
-AgentNoiseBench documents the robustness of tool-using LLM agents under noisy conditions (corrupted tool outputs, ambiguous environmental observations), finding that current agents are brittle to noise levels that commonly occur in production API integrations.[^22]
+AgentNoiseBench documents the robustness of tool-using LLM agents under noisy conditions (corrupted tool outputs, ambiguous environmental observations), finding that current agents are brittle to noise levels that commonly occur in production API integrations.
 
 **Expanded Attack Surface**
 The transition to agentic AI expands the attack surface for both malicious use and unintended consequences. Where traditional AI systems were limited to generating text or images, agentic systems can execute code, access networks, manipulate data, and coordinate complex actions across multiple systems. Each new capability introduces potential vectors for both beneficial and harmful outcomes.
@@ -467,7 +467,7 @@ flowchart TD
 | Emergent collusion | Pricing agents learn to raise prices without explicit instruction | High - no explicit coordination signal |
 | Cascade failures | Flaw in one agent propagates across task chains | Variable - depends on monitoring |
 
-Research on Kalman-inspired runtime stability and recovery in hybrid reasoning systems proposes using control-theoretic methods to detect and correct instability in multi-step agent reasoning, drawing an analogy to Kalman filter state estimation to bound divergence in agent belief states across a workflow.[^23]
+Research on Kalman-inspired runtime stability and recovery in hybrid reasoning systems proposes using control-theoretic methods to detect and correct instability in multi-step agent reasoning, drawing an analogy to Kalman filter state estimation to bound divergence in agent belief states across a workflow.
 
 **Immediate Misuse Scenarios**
 Near-term concerns involve deliberate misuse by malicious actors. Autonomous hacking agents could probe systems for vulnerabilities, execute attack chains, and adapt their approaches based on defensive responses. Social engineering at scale becomes feasible when agents can impersonate humans across multiple platforms, maintain consistent personas over extended interactions, and coordinate deception campaigns across thousands of simultaneous conversations.
@@ -488,11 +488,11 @@ The "<EntityLink id="E359" name="treacherous-turn">treacherous turn</EntityLink>
 
 ### Governance Frameworks for Agentic AI
 
-Beyond individual lab safety policies, 2025 saw the emergence of cross-organizational governance frameworks specifically targeting agentic systems. The Stanford HAI "Practices for Governing Agentic AI Systems" document outlines recommended practices spanning capability disclosure, permission scoping, audit trail requirements, and human override mechanisms. The framework distinguishes between operator-level responsibilities (organizations deploying agents) and developer-level responsibilities (organizations building agent infrastructure), drawing on the operator/user principal hierarchy already established in some lab usage policies.[^24]
+Beyond individual lab safety policies, 2025 saw the emergence of cross-organizational governance frameworks specifically targeting agentic systems. The Stanford HAI "Practices for Governing Agentic AI Systems" document outlines recommended practices spanning capability disclosure, permission scoping, audit trail requirements, and human override mechanisms. The framework distinguishes between operator-level responsibilities (organizations deploying agents) and developer-level responsibilities (organizations building agent infrastructure), drawing on the operator/user principal hierarchy already established in some lab usage policies.
 
-Anthropic's Operator System Card provides a detailed accounting of the safety measures, capability limitations, and risk mitigations applied to the Operator product, including restrictions on categories of actions (financial, irreversible, privacy-sensitive) that require explicit user confirmation. The card also documents red-team findings and residual risks acknowledged at launch.[^25]
+Anthropic's Operator System Card provides a detailed accounting of the safety measures, capability limitations, and risk mitigations applied to the Operator product, including restrictions on categories of actions (financial, irreversible, privacy-sensitive) that require explicit user confirmation. The card also documents red-team findings and residual risks acknowledged at launch.
 
-OpenAI's o3 and o4-mini system card includes an addendum specifically for o3 Operator and a separate addendum for Codex, representing a practice of publishing agent-specific safety assessments as addenda to base model system cards. The ChatGPT agent system card similarly documents agent-specific evaluations distinct from those for the underlying GPT-5 model family.[^26]
+OpenAI's o3 and o4-mini system card includes an addendum specifically for o3 Operator and a separate addendum for Codex, representing a practice of publishing agent-specific safety assessments as addenda to base model system cards. The ChatGPT agent system card similarly documents agent-specific evaluations distinct from those for the underlying GPT-5 model family.
 
 ### Industry Safety Framework Adoption
 
@@ -550,9 +550,9 @@ The <EntityLink id="E6" name="ai-control">AI control</EntityLink> research progr
 
 ### Reliability Research
 
-Research toward a science of AI agent reliability identifies four components: task-level reliability (success rate on individual tasks), session-level reliability (sustained performance across a multi-step session), system-level reliability (behavior under environmental perturbations), and population-level reliability (consistency across diverse users and contexts). Current frontier agents exhibit uneven profiles across these dimensions, with relatively stronger task-level performance and weaker session- and system-level reliability.[^27]
+Research toward a science of AI agent reliability identifies four components: task-level reliability (success rate on individual tasks), session-level reliability (sustained performance across a multi-step session), system-level reliability (behavior under environmental perturbations), and population-level reliability (consistency across diverse users and contexts). Current frontier agents exhibit uneven profiles across these dimensions, with relatively stronger task-level performance and weaker session- and system-level reliability.
 
-ReLoop introduces structured modeling and behavioral verification for LLM-based optimization agents, proposing formal methods for checking whether an agent's iterative optimization loop will converge rather than cycle or diverge. CaveAgent proposes transforming LLMs into stateful runtime operators that maintain explicit state machines, providing stronger guarantees about agent behavior than purely prompt-driven approaches.[^28]
+ReLoop introduces structured modeling and behavioral verification for LLM-based optimization agents, proposing formal methods for checking whether an agent's iterative optimization loop will converge rather than cycle or diverge. CaveAgent proposes transforming LLMs into stateful runtime operators that maintain explicit state machines, providing stronger guarantees about agent behavior than purely prompt-driven approaches.
 
 ### Data Privacy and Regulatory Compliance
 
@@ -583,7 +583,7 @@ The legal frameworks for agent memory systems remain underdeveloped, with existi
 | United Kingdom | AI Safety Institute | Red-teaming and evaluation programs; <R id="sid_k5c9RuNZ8K">Agent Red-Teaming Challenge</R> |
 | China | Generative AI Regulations (2023) | Content control focus; limited provisions for autonomous systems |
 
-The US AI Safety Newsletter #60 covering the AI Action Plan documents a policy shift in the United States toward prioritizing AI capability development and international competitiveness, with reduced emphasis on precautionary safety regulation relative to the prior Executive Order framework.[^29]
+The US AI Safety Newsletter #60 covering the AI Action Plan documents a policy shift in the United States toward prioritizing AI capability development and international competitiveness, with reduced emphasis on precautionary safety regulation relative to the prior Executive Order framework.
 
 The regulatory landscape for agentic AI remains in early stages, with most frameworks focused on AI systems generally rather than autonomous agents specifically. The EU AI Act's risk-based approach classifies certain autonomous systems as high-risk, triggering additional requirements for transparency, testing, and human oversight.
 

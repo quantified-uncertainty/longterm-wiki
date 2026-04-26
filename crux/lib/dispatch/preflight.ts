@@ -22,7 +22,7 @@
  * mocking argument parsing or tmux invocation.
  */
 
-import { execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { existsSync } from 'fs';
 
 import {
@@ -108,7 +108,7 @@ export function runSlotState(slotDir: string): SlotStateCheck {
 
 function safeGit(cwd: string, args: string[]): string {
   try {
-    return execSync(`git ${args.join(' ')}`, {
+    return execFileSync('git', args, {
       cwd,
       encoding: 'utf-8',
       timeout: 5000,
