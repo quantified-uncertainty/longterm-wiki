@@ -13,6 +13,12 @@
 import { mkdirSync, writeFileSync, readFileSync, existsSync } from "fs";
 import { dirname } from "path";
 
+/** Default 30s wall-clock timeout for the network fetch. */
+const DEFAULT_FETCH_TIMEOUT_MS = 30_000;
+/** Default 32 MB byte cap — same as Anthropic's PDF size limit, which is
+ *  the largest payload we expect to send downstream. */
+const DEFAULT_MAX_BYTES = 32 * 1024 * 1024;
+
 export interface FetchOptions {
   /** Override the User-Agent. Defaults to the longterm-wiki importer. */
   userAgent?: string;
@@ -20,11 +26,16 @@ export interface FetchOptions {
   force?: boolean;
   /** Optional fetch implementation override (testing). */
   fetchImpl?: typeof fetch;
+  /** Wall-clock timeout in ms. Defaults to 30s. */
+  timeoutMs?: number;
+  /** Maximum response size in bytes. Defaults to 32 MB. */
+  maxBytes?: number;
 }
 
 /**
  * Download `url` to `dest` if missing (or `force=true`), then return the
- * file contents. Throws on non-2xx HTTP. The caller is responsible for
+ * file contents. Throws on non-2xx HTTP, on response size > `maxBytes`,
+ * or if the fetch exceeds `timeoutMs`. The caller is responsible for
  * passing a binary-safe `dest` path for non-HTML payloads (e.g., PDFs).
  */
 export async function fetchToCache(
@@ -39,13 +50,31 @@ export async function fetchToCache(
   const ua =
     opts.userAgent ??
     "Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)";
-  const response = await fetchFn(url, { headers: { "User-Agent": ua } });
+  const timeoutMs = opts.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
+  const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
+  const response = await fetchFn(url, {
+    headers: { "User-Agent": ua },
+    signal: AbortSignal.timeout(timeoutMs),
+  });
   if (!response.ok) {
     throw new Error(
       `fetch failed for ${url}: HTTP ${response.status} ${response.statusText}`,
     );
   }
+  // Pre-flight check via Content-Length when present — saves us from
+  // streaming a multi-GB body just to reject it.
+  const declared = response.headers.get("content-length");
+  if (declared && Number(declared) > maxBytes) {
+    throw new Error(
+      `fetch refused for ${url}: declared content-length ${declared} exceeds limit ${maxBytes}`,
+    );
+  }
   const buf = Buffer.from(await response.arrayBuffer());
+  if (buf.length > maxBytes) {
+    throw new Error(
+      `fetch refused for ${url}: body length ${buf.length} exceeds limit ${maxBytes}`,
+    );
+  }
   mkdirSync(dirname(dest), { recursive: true });
   writeFileSync(dest, buf);
   return buf;
@@ -60,6 +89,13 @@ export async function fetchToCache(
  * The output is NOT rendered HTML — it's a token-cheap structural skeleton
  * for the extractor LLM. Newlines around block elements are normalized so
  * Claude sees natural paragraph boundaries instead of one giant line.
+ *
+ * **Best-effort, regex-based.** Mishandles attribute values containing `>`
+ * inside quoted strings, unquoted attribute values containing `/`, and
+ * `<script>` content where the closing tag appears within a JS string
+ * literal. Acceptable for our use case (LLM input from trusted-but-noisy
+ * scorecard pages) but do NOT use this for security-sensitive HTML
+ * sanitization — reach for a real parser (cheerio/parse5) instead.
  */
 export function stripHtmlForLlm(html: string): string {
   let out = html;

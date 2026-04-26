@@ -132,4 +132,53 @@ describe("fetchToCache", () => {
       fetchToCache("https://example.test/missing", dest, { fetchImpl: fakeFetch as typeof fetch }),
     ).rejects.toThrow(/HTTP 404/);
   });
+
+  it("rejects responses that exceed maxBytes via Content-Length pre-check", async () => {
+    dir = mkdtempSync(join(tmpdir(), "fetch-cache-"));
+    const dest = join(dir, "page.html");
+    const fakeFetch = async (_url: string) =>
+      new Response("body", {
+        status: 200,
+        headers: { "content-length": String(10_000_000) },
+      });
+    await expect(
+      fetchToCache("https://example.test/huge", dest, {
+        fetchImpl: fakeFetch as typeof fetch,
+        maxBytes: 1024,
+      }),
+    ).rejects.toThrow(/exceeds limit/);
+  });
+
+  it("rejects responses that exceed maxBytes when Content-Length is absent", async () => {
+    dir = mkdtempSync(join(tmpdir(), "fetch-cache-"));
+    const dest = join(dir, "page.html");
+    // No content-length header — the post-fetch length check catches it.
+    const fakeFetch = async (_url: string) => new Response("a".repeat(2048), { status: 200 });
+    await expect(
+      fetchToCache("https://example.test/no-cl", dest, {
+        fetchImpl: fakeFetch as typeof fetch,
+        maxBytes: 1024,
+      }),
+    ).rejects.toThrow(/exceeds limit/);
+  });
+
+  it("propagates AbortSignal.timeout when the fetch hangs", async () => {
+    dir = mkdtempSync(join(tmpdir(), "fetch-cache-"));
+    const dest = join(dir, "page.html");
+    // Fake fetch that respects the signal — resolves the promise once the
+    // signal fires, simulating an aborted slow request.
+    const fakeFetch = (_url: string, init?: RequestInit) =>
+      new Promise<Response>((_resolve, reject) => {
+        const sig = init?.signal;
+        if (sig) {
+          sig.addEventListener("abort", () => reject(sig.reason ?? new Error("aborted")));
+        }
+      });
+    await expect(
+      fetchToCache("https://example.test/slow", dest, {
+        fetchImpl: fakeFetch as typeof fetch,
+        timeoutMs: 50,
+      }),
+    ).rejects.toThrow();
+  });
 });
