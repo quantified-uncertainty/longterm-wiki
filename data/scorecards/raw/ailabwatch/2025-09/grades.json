@@ -1,0 +1,139 @@
+{
+  "publishedAt": "2025-09-01",
+  "waveLabel": "September 2025 (frozen)",
+  "sourceUrl": "https://ailabwatch.org/",
+  "methodologyUrl": "https://ailabwatch.org/about",
+  "license": null,
+  "notes": "AI Lab Watch (ailabwatch.org) — frozen as of September 2025 per the author. Seven dimensions × seven frontier labs; per-cell scores in 0-100 percent. Overall is the site's published weighted total.",
+  "isLatest": true,
+  "dimensions": [
+    {
+      "slug": "risk-assessment",
+      "label": "Risk assessment",
+      "weight": null
+    },
+    {
+      "slug": "scheming",
+      "label": "Scheming risk prevention",
+      "weight": null
+    },
+    {
+      "slug": "safety-research",
+      "label": "Boosting safety research",
+      "weight": null
+    },
+    {
+      "slug": "misuse",
+      "label": "Misuse prevention",
+      "weight": null
+    },
+    {
+      "slug": "security",
+      "label": "Prep for extreme security",
+      "weight": null
+    },
+    {
+      "slug": "information-sharing",
+      "label": "Risk info sharing",
+      "weight": null
+    },
+    {
+      "slug": "planning",
+      "label": "Planning",
+      "weight": null
+    }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "28%",
+        "risk-assessment": "44%",
+        "scheming": "4%",
+        "safety-research": "70%",
+        "misuse": "14%",
+        "security": "3%",
+        "information-sharing": "35%",
+        "planning": "14%"
+      }
+    },
+    {
+      "org": "DeepMind",
+      "scores": {
+        "overall": "20%",
+        "risk-assessment": "29%",
+        "scheming": "8%",
+        "safety-research": "52%",
+        "misuse": "4%",
+        "security": "5%",
+        "information-sharing": "13%",
+        "planning": "26%"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "18%",
+        "risk-assessment": "34%",
+        "scheming": "3%",
+        "safety-research": "35%",
+        "misuse": "9%",
+        "security": "0%",
+        "information-sharing": "32%",
+        "planning": "0%"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "overall": "5%",
+        "risk-assessment": "6%",
+        "scheming": "2%",
+        "safety-research": "25%",
+        "misuse": "0%",
+        "security": "0%",
+        "information-sharing": "0%",
+        "planning": "0%"
+      }
+    },
+    {
+      "org": "xAI",
+      "scores": {
+        "overall": "4%",
+        "risk-assessment": "6%",
+        "scheming": "2%",
+        "safety-research": "0%",
+        "misuse": "1%",
+        "security": "0%",
+        "information-sharing": "28%",
+        "planning": "0%"
+      }
+    },
+    {
+      "org": "Microsoft",
+      "scores": {
+        "overall": "3%",
+        "risk-assessment": "1%",
+        "scheming": "2%",
+        "safety-research": "13%",
+        "misuse": "0%",
+        "security": "0%",
+        "information-sharing": "0%",
+        "planning": "1%"
+      }
+    },
+    {
+      "org": "DeepSeek",
+      "scores": {
+        "overall": "1%",
+        "risk-assessment": "0%",
+        "scheming": "2%",
+        "safety-research": "8%",
+        "misuse": "0%",
+        "security": "0%",
+        "information-sharing": "0%",
+        "planning": "0%"
+      }
+    }
+  ]
+}
