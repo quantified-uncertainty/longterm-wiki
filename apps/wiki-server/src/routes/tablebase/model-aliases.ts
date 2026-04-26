@@ -178,10 +178,10 @@ const modelAliasesApp = new Hono()
       syncSchema: SyncModelAliasItemSchema,
       // alias is the PK (not id). conflictTarget overrides the factory's
       // default; auditRecordType is omitted because the factory writes
-      // `recordId: row.id` (which model_aliases doesn't have) into
-      // `tablebase_audit_log.record_id` varchar(10). entityRefs shorthand
-      // is skipped because the FK target is entities.stable_id, not .id —
-      // the PG constraint catches unknown stable_ids at upsert time.
+      // `recordId: row.id`, which model_aliases doesn't have. entityRefs
+      // shorthand is skipped because the FK target is entities.stable_id,
+      // not .id — the PG constraint catches unknown stable_ids at upsert
+      // time.
       conflictTarget: modelAliases.alias,
       naturalKey: (item) => item.alias,
       naturalKeyError:
