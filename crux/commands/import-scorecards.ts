@@ -20,10 +20,16 @@
  *   pnpm crux tb import-scorecards sync --source=saferai
  */
 
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
+import { join, resolve } from "path";
 import { ALL_SOURCES, getAdapter, listSourceKeys } from "../lib/scorecard-import/sources/index.ts";
 import { buildOrgResolver } from "../lib/scorecard-import/org-aliases.ts";
+import { scrapeSaferaiHtml } from "../lib/scorecard-import/sources/saferai-scraper.ts";
 import { analyzeSource, syncSource } from "../lib/scorecard-import/sync.ts";
 import type { ScorecardSourceAdapter, ScorecardSourceKey } from "../lib/scorecard-import/types.ts";
+
+const SAFERAI_DEFAULT_URL = "https://ratings.safer-ai.org/comparison/";
+const SAFERAI_RAW_DIR = resolve("data/scorecards/raw/saferai");
 
 type CommandResult = { exitCode?: number; output?: string };
 
@@ -101,6 +107,82 @@ async function cmdSync(
   return { exitCode: 0 };
 }
 
+interface ScrapeSaferaiOptions {
+  url: string;
+  wave?: string;
+  refetch: boolean;
+  dryRun: boolean;
+}
+
+/**
+ * Fetch + parse the SaferAI comparison page and write a `grades.json`
+ * file under `data/scorecards/raw/saferai/<wave>/`.
+ *
+ * - `--url` overrides the source URL (default: comparison page).
+ * - `--wave` overrides the wave slug (default: derived from the page's
+ *   "Up to date as of <Month> <YYYY>" footer, formatted as YYYY-MM).
+ * - Without `--refetch`, an existing `comparison.html` in the wave dir is
+ *   reused. With `--refetch`, the page is re-downloaded.
+ * - `--dry-run` prints the parsed wave to stdout without writing.
+ */
+async function cmdScrapeSaferai(opts: ScrapeSaferaiOptions): Promise<CommandResult> {
+  // Determine the wave dir up-front so cached HTML can be reused if present.
+  // When --wave isn't given, do a probe parse to derive it from the page itself.
+  let waveSlug = opts.wave;
+  let waveDir = waveSlug ? join(SAFERAI_RAW_DIR, waveSlug) : null;
+
+  let html: string | null = null;
+  if (waveDir && !opts.refetch) {
+    const cached = join(waveDir, "comparison.html");
+    if (existsSync(cached)) {
+      html = readFileSync(cached, "utf8");
+      console.log(`✓ Reusing cached HTML: ${cached}`);
+    }
+  }
+  if (html == null) {
+    console.log(`Fetching ${opts.url} ...`);
+    const resp = await fetch(opts.url);
+    if (!resp.ok) {
+      return {
+        exitCode: 1,
+        output: `[saferai-scrape] fetch failed: ${resp.status} ${resp.statusText}`,
+      };
+    }
+    html = await resp.text();
+  }
+
+  const probe = scrapeSaferaiHtml(html, { sourceUrl: opts.url });
+
+  if (!waveSlug) {
+    // Default wave slug: YYYY-MM (e.g. "2025-10") derived from publishedAt.
+    waveSlug = probe.publishedAt.slice(0, 7);
+    waveDir = join(SAFERAI_RAW_DIR, waveSlug);
+  }
+  if (!waveDir) waveDir = join(SAFERAI_RAW_DIR, waveSlug);
+
+  if (opts.dryRun) {
+    console.log(JSON.stringify(probe, null, 2));
+    console.log(`\n(dry run — would write to ${waveDir}/grades.json)`);
+    return { exitCode: 0 };
+  }
+
+  mkdirSync(waveDir, { recursive: true });
+  const htmlPath = join(waveDir, "comparison.html");
+  if (!existsSync(htmlPath) || opts.refetch) {
+    writeFileSync(htmlPath, html);
+    console.log(`✓ Wrote raw HTML: ${htmlPath}`);
+  }
+  const gradesPath = join(waveDir, "grades.json");
+  writeFileSync(gradesPath, JSON.stringify(probe, null, 2) + "\n");
+  console.log(
+    `✓ Wrote grades.json: ${gradesPath}  (publishedAt=${probe.publishedAt}, ${probe.grades.length} orgs, ${probe.dimensions.length + 1} dimensions incl. overall)`,
+  );
+  console.log(
+    `\nNext: pnpm crux tb import-scorecards analyze --source=saferai`,
+  );
+  return { exitCode: 0 };
+}
+
 async function cmdList(): Promise<CommandResult> {
   console.log("=== Scorecard Sources ===\n");
   const ctx = buildOrgResolver();
@@ -141,10 +223,29 @@ async function listCommand(
   return cmdList();
 }
 
+async function scrapeCommand(
+  _args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const source = (options.source as string) || "saferai";
+  if (source !== "saferai") {
+    return {
+      exitCode: 1,
+      output: `[scrape] only --source=saferai is currently implemented; use the manual extraction step for ${source} (see crux/lib/scorecard-import/sources/${source}.ts).`,
+    };
+  }
+  const url = (options.url as string) || SAFERAI_DEFAULT_URL;
+  const wave = (options.wave as string) || undefined;
+  const refetch = !!options.refetch;
+  const dryRun = !!options.dryRun || !!options["dry-run"];
+  return cmdScrapeSaferai({ url, wave, refetch, dryRun });
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   list: listCommand,
+  scrape: scrapeCommand,
   default: analyzeCommand,
 };
 
@@ -157,12 +258,21 @@ Commands:
   sync                 Upsert all snapshots + grades to wiki-server
   sync --dry-run       Show what would be synced without writing
   list                 List available source adapters and on-disk state
+  scrape               Fetch the source page and emit grades.json
+                       (currently only --source=saferai is implemented)
 
 Options:
   --source=<key>       Filter to a single source (fli_index, saferai,
                        ailabwatch, seoul_tracker)
   --verbose            Print API payloads (debug)
-  --dry-run            Skip the wiki-server POST
+  --dry-run            Skip the wiki-server POST (also: print the parsed
+                       wave instead of writing grades.json for scrape)
+  --url=<url>          (scrape) Source URL — defaults to SaferAI's
+                       comparison page
+  --wave=<slug>        (scrape) Override the wave slug — defaults to
+                       YYYY-MM derived from the page's "as of" footer
+  --refetch            (scrape) Re-download the page even if cached HTML
+                       already exists in the wave directory
 
 Sources:
   ${ALL_SOURCES.map((s) => `- ${s.source.padEnd(16)} (${s.name})`).join("\n  ")}

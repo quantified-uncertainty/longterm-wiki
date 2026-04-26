@@ -9452,3 +9452,61 @@
   title: Fathom Radiant
   description: AI hardware company.
 
+# QUA-750 — lightweight org entities for SaferAI scorecard ingest
+- id: cohere
+  stableId: sid_JDg4Sr7Cr1
+  type: organization
+  orgType: frontier-lab
+  title: Cohere
+  website: https://cohere.com
+  description: >-
+    Toronto-based AI company building large language models for enterprise
+    use, founded by ex-Google Brain researchers including Aidan Gomez (a
+    "Attention Is All You Need" co-author). Develops the Command family
+    of models with a focus on retrieval-augmented generation and
+    multilingual capability.
+
+- id: g42
+  stableId: sid_m2o07tj196
+  type: organization
+  orgType: frontier-lab
+  title: G42
+  aliases:
+    - G42 (Group 42)
+  website: https://g42.ai
+  description: >-
+    Abu Dhabi-based AI and cloud-computing holding company chaired by
+    Sheikh Tahnoon bin Zayed Al Nahyan. Builds the Falcon and Jais
+    foundation-model families and operates regional cloud infrastructure;
+    received a $1.5B Microsoft investment in April 2024.
+
+- id: magic
+  stableId: sid_lSkLLa6gqy
+  type: organization
+  orgType: startup
+  title: Magic
+  aliases:
+    - Magic.dev
+    - Magic AI
+  website: https://magic.dev
+  description: >-
+    San Francisco AI startup focused on training frontier coding-agent
+    models with very long context windows. Backed by Nat Friedman,
+    Daniel Gross, CapitalG, and others.
+
+- id: naver
+  stableId: sid_574DWqM1nU
+  type: organization
+  orgType: frontier-lab
+  title: Naver
+  aliases:
+    - NAVER
+    - Naver Corporation
+    - Naver Cloud
+  website: https://www.navercorp.com
+  description: >-
+    South Korean technology conglomerate operating the Naver search
+    portal, LINE messenger, and Naver Cloud. Develops the HyperCLOVA X
+    family of large language models, optimised for Korean and other
+    Asian languages.
+
