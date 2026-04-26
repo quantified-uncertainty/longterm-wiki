@@ -1,0 +1,104 @@
+{
+  "table": "personnel",
+  "recordCount": 8,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-26T11:19:06.513Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 8,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "sid_afuYa1WcnH",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "Co-Founder",
+      "roleType": "key-person",
+      "startDate": "2017",
+      "isFounder": true,
+      "source": "https://www.schmidtsciences.org/team/",
+      "notes": "Eric Schmidt co-founded Schmidt Futures in 2017 with Wendy Schmidt. Confirmed on team page as of 2026-04-26.",
+      "id": "hm9vAGaHRt",
+      "verdict": "none"
+    },
+    {
+      "personId": "6zkF7CAPi2",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "Co-Founder",
+      "roleType": "key-person",
+      "startDate": "2017",
+      "isFounder": true,
+      "source": "https://www.schmidtsciences.org/team/",
+      "notes": "Wendy Schmidt co-founded Schmidt Futures in 2017 with Eric Schmidt. Confirmed on team page as of 2026-04-26.",
+      "id": "HF03lMZYbh",
+      "verdict": "none"
+    },
+    {
+      "personId": "WtK9mgU8JG",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "President",
+      "roleType": "key-person",
+      "startDate": "2024",
+      "source": "https://www.schmidtsciences.org/team/",
+      "notes": "Stuart Feldman became President of Schmidt Sciences (rebranded from Schmidt Futures) in 2024. Previously served as Chief Scientist and interim co-CEO. Confirmed on team page as of 2026-04-26.",
+      "id": "EldIpid7CX",
+      "verdict": "none"
+    },
+    {
+      "personId": "gU4n69eqnY",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "Vice President",
+      "roleType": "key-person",
+      "source": "https://www.schmidtsciences.org/team/",
+      "notes": "Mark Greaves listed as Vice President on Schmidt Sciences team page as of 2026-04-26.",
+      "id": "JgrKQUoSSu",
+      "verdict": "none"
+    },
+    {
+      "personId": "3TRCgn8ysU",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "CEO",
+      "roleType": "key-person",
+      "endDate": "2023",
+      "source": "https://www.axios.com/2023/08/15/eric-braverman-leaves-ceo-schmidt-futures",
+      "notes": "Eric Braverman departed as CEO in August 2023 to found Telescope. Reported by Axios 2023-08-15.",
+      "id": "WKki9bBgQF",
+      "verdict": "none"
+    },
+    {
+      "personId": "QnQRCmKX9n",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "EVP Talent Ventures",
+      "roleType": "key-person",
+      "source": "https://www.schmidtfutures.com/person/elizabeth-young-mcnally/",
+      "notes": "Elizabeth Young McNally served as EVP of Talent Ventures and as interim co-CEO following Eric Braverman's departure in 2023.",
+      "id": "Lel558ZUOT",
+      "verdict": "none"
+    },
+    {
+      "personId": "llGdYcxsZd",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "Chief Innovation Officer",
+      "roleType": "key-person",
+      "source": "https://www.influencewatch.org/organization/schmidt-futures/",
+      "notes": "Tom Kalil served as Chief Innovation Officer at Schmidt Futures before departing to co-found Renaissance Philanthropy.",
+      "id": "4qhMeZUudw",
+      "verdict": "none"
+    },
+    {
+      "personId": "dt04eU9CM7",
+      "organizationId": "sid_h6ntSGk8fg",
+      "role": "VP of Partnerships",
+      "roleType": "key-person",
+      "source": "https://www.schmidtfutures.com/person/kumar-garg/",
+      "notes": "Kumar Garg served as VP of Partnerships and Managing Director before departing to co-found Renaissance Philanthropy.",
+      "id": "YK5AkFCfRp",
+      "verdict": "none"
+    }
+  ]
+}

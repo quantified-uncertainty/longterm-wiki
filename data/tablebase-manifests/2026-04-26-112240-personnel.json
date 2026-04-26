@@ -1,0 +1,59 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-26T11:22:40.242Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "zfWibgVCJ9",
+      "organizationId": "sid_YlrwnKhMqQ",
+      "role": "Director",
+      "roleType": "key-person",
+      "isFounder": true,
+      "source": "https://www.swiftcentre.org/about-us-draft",
+      "notes": "Michael Story is a founder and Director of Swift Centre. Previously Managing Director at Good Judgment Project. Confirmed via swiftcentre.org and LinkedIn as of 2026-04-26.",
+      "id": "BzGlzfZUjs",
+      "verdict": "none"
+    },
+    {
+      "personId": "ovtPUIqYlx",
+      "organizationId": "sid_YlrwnKhMqQ",
+      "role": "Executive Director",
+      "roleType": "key-person",
+      "source": "https://www.linkedin.com/in/james-newport-a42a51ab/",
+      "notes": "James Newport is Executive Director at Swift Centre, leading client engagement, applied forecasting programmes, and strategic foresight. Background at HM Treasury. Confirmed via LinkedIn as of 2026-04-26.",
+      "id": "R92yipRSZZ",
+      "verdict": "none"
+    },
+    {
+      "personId": "jSUB6LcQ0l",
+      "organizationId": "sid_YlrwnKhMqQ",
+      "role": "Operations Manager",
+      "roleType": "career",
+      "source": "https://uk.linkedin.com/in/eleanor-parr-4ba3958b",
+      "notes": "Eleanor Parr is Operations Manager at Swift Centre, overseeing operational frameworks, forecasting methodologies, and forecaster coordination. Confirmed via LinkedIn as of 2026-04-26.",
+      "id": "V09TMkKLdf",
+      "verdict": "none"
+    },
+    {
+      "personId": "zArQ5UtvTg",
+      "organizationId": "sid_YlrwnKhMqQ",
+      "role": "Software Engineer",
+      "roleType": "career",
+      "source": "https://www.linkedin.com/in/mledwich/",
+      "notes": "Mark Ledwich is a Software Engineer at Swift Centre, working on full-stack, data and visualisation. Confirmed via LinkedIn as of 2026-04-26.",
+      "id": "Vt0my9gMtE",
+      "verdict": "none"
+    }
+  ]
+}

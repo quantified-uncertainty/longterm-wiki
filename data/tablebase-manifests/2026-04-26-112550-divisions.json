@@ -1,0 +1,52 @@
+{
+  "table": "divisions",
+  "recordCount": 3,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-26T11:25:50.654Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 3,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "qfnjY7N2P1",
+      "parentOrgId": "sid_d9sWZtyVwg",
+      "name": "Policy & Advocacy",
+      "divisionType": "program-area",
+      "lead": "Mark Brakel",
+      "status": "active",
+      "source": "https://futureoflife.org/about-us/our-people/",
+      "notes": "Campaigns include Asilomar Principles (5,700+ signatories), 2023 Pause Letter (33,000+ signatories), AI Act advocacy. EU and UN engagement. Led by Mark Brakel (Global Director of Policy).",
+      "verdict": "none"
+    },
+    {
+      "id": "ov901J11Xp",
+      "parentOrgId": "sid_d9sWZtyVwg",
+      "name": "FLI Grants Program",
+      "divisionType": "program-area",
+      "lead": "Andrea Berman",
+      "status": "active",
+      "source": "https://futureoflife.org/about-us/our-people/",
+      "notes": "FLI's grantmaking arm. $25M+ distributed since 2015 across AI safety, nuclear risk, governance, and existential risk reduction. Andrea Berman is Grants Manager.",
+      "verdict": "none"
+    },
+    {
+      "id": "6HSiapvNnm",
+      "parentOrgId": "sid_d9sWZtyVwg",
+      "name": "Fellowship Programs",
+      "divisionType": "program-area",
+      "lead": "Andrea Berman",
+      "status": "active",
+      "startDate": "2022",
+      "source": "https://futureoflife.org/about-us/our-people/",
+      "notes": "Vitalik Buterin PhD and Postdoctoral Fellowships in AI Existential Safety. Run with BAIF. 14+ PhD fellows and 4+ postdocs at top universities. Falls under Operations & Grants team.",
+      "verdict": "none"
+    }
+  ]
+}
