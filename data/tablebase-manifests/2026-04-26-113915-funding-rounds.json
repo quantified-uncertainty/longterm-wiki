@@ -1,0 +1,90 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 6,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-26T11:39:15.057Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 6,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "FTX Future Fund Grant 2022",
+      "date": "2022",
+      "raised": 6500000,
+      "instrument": "grant",
+      "leadInvestor": "FTX Future Fund",
+      "source": "https://www.bloomberg.com/news/articles/2023-10-25/ftx-probing-6-5-million-paid-to-center-for-ai-safety",
+      "notes": "$6.5M received in 2022. FTX bankruptcy estate issued subpoenas to CAIS in October 2023 seeking return of funds. Aligns with CAIS 2022 total revenue of $6.66M (IRS Form 990).",
+      "id": "JbvC3DE6t3",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "Open Philanthropy General Support 2023",
+      "date": "2023-04",
+      "raised": 4000000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/",
+      "notes": "$4,000,000 general support grant from Open Philanthropy, April 2023.",
+      "id": "BPiW9qyHpQ",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "Open Philanthropy General Support 2024",
+      "date": "2024",
+      "raised": 8500000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/",
+      "notes": "$8,500,000 general support grant from Open Philanthropy in 2024. Confirmed via OP 2024 progress report.",
+      "id": "PQrBTM2skw",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "SFF General Support 2023-H1 (Jaan Tallinn)",
+      "date": "2023",
+      "raised": 22000,
+      "instrument": "grant",
+      "leadInvestor": "Jaan Tallinn",
+      "source": "https://survivalandflourishing.fund/recommendations",
+      "notes": "$22,000 from Jaan Tallinn via Survival and Flourishing Fund, H1 2023.",
+      "id": "LS8icm7VoX",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "SFF General Support 2023-H2 (Jaan Tallinn)",
+      "date": "2023",
+      "raised": 909000,
+      "instrument": "grant",
+      "leadInvestor": "Jaan Tallinn",
+      "source": "https://survivalandflourishing.fund/recommendations",
+      "notes": "$909,000 from Jaan Tallinn via Survival and Flourishing Fund, H2 2023.",
+      "id": "aBhKPMXJYl",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_y4bieqSeag",
+      "name": "SFF General Support 2024 (Jaan Tallinn)",
+      "date": "2024",
+      "raised": 1146000,
+      "instrument": "grant",
+      "leadInvestor": "Jaan Tallinn",
+      "source": "https://survivalandflourishing.fund/recommendations",
+      "notes": "$1,146,000 from Jaan Tallinn via Survival and Flourishing Fund, 2024.",
+      "id": "vC9x3Q6kMh",
+      "verdict": "none"
+    }
+  ]
+}

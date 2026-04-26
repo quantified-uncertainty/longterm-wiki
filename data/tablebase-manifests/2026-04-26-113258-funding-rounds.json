@@ -1,0 +1,102 @@
+{
+  "table": "funding-rounds",
+  "recordCount": 7,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-26T11:32:58.396Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 7,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "Open Philanthropy General Support 2016",
+      "date": "2016",
+      "raised": 32000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/ai-impacts-general-support-2016/",
+      "notes": "General support grant to AI Impacts via MIRI as fiscal sponsor.",
+      "id": "4Irzx6iFjC",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "Open Philanthropy General Support 2018",
+      "date": "2018",
+      "raised": 100000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/ai-impacts-general-support-2018/",
+      "notes": "$100,000 over 2 years general support grant to AI Impacts.",
+      "id": "nEDjpWrw3Q",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "Open Philanthropy General Support 2020",
+      "date": "2020",
+      "raised": 50000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/ai-impacts-general-support-2020/",
+      "notes": "General support grant to AI Impacts, approximately $50,000.",
+      "id": "6KiZjtXaTn",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "Open Philanthropy Expert Survey on Progress in AI",
+      "date": "2022",
+      "raised": 345000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/ai-impacts-expert-survey-on-progress-in-ai/",
+      "notes": "Grant for AI Impacts Expert Survey on Progress in AI research project.",
+      "id": "gS9mDpbY9a",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "Open Philanthropy General Support 2022",
+      "date": "2022",
+      "raised": 620000,
+      "instrument": "grant",
+      "leadInvestor": "Open Philanthropy",
+      "source": "https://www.openphilanthropy.org/grants/ai-impacts-general-support/",
+      "notes": "$620,000 over 2 years general support grant to AI Impacts.",
+      "id": "nBaaIPyxk1",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "SFF General Support 2021-H1 (Jaan Tallinn)",
+      "date": "2021",
+      "raised": 221000,
+      "instrument": "grant",
+      "leadInvestor": "Jaan Tallinn",
+      "source": "https://survivalandflourishing.fund/recommendations",
+      "notes": "SFF 2021-H1 round: $221,000 from Jaan Tallinn via Survival and Flourishing Fund to MIRI for AI Impacts general support.",
+      "id": "SDcnKn4k7C",
+      "verdict": "none"
+    },
+    {
+      "companyId": "sid_TdbypiKyCw",
+      "name": "SFF General Support 2022-H2 (Jaan Tallinn)",
+      "date": "2022",
+      "raised": 546000,
+      "instrument": "grant",
+      "leadInvestor": "Jaan Tallinn",
+      "source": "https://survivalandflourishing.fund/recommendations",
+      "notes": "SFF 2022-H2 round: $546,000 from Jaan Tallinn via Survival and Flourishing Fund to MIRI for AI Impacts general support.",
+      "id": "h7zkXtvcqq",
+      "verdict": "none"
+    }
+  ]
+}
