@@ -12,30 +12,36 @@
  * no longer maintaining this website" — Zach Stein-Perlman, on the home
  * page). The script is idempotent: re-running with `--use-cache` skips
  * the network and re-parses the cached HTML, so emitting `grades.json`
- * after a hand-edit is trivial.
+ * after a hand-edit is trivial. By default, it refuses to overwrite an
+ * existing cached HTML — pass `--force-fetch` to re-fetch.
  *
  * Usage:
- *   pnpm tsx crux/scripts/scrape-ailabwatch.ts                  # fetch + write
+ *   pnpm tsx crux/scripts/scrape-ailabwatch.ts                  # fetch + write (refuses if cache exists)
  *   pnpm tsx crux/scripts/scrape-ailabwatch.ts --use-cache      # parse cached HTML
- *   pnpm tsx crux/scripts/scrape-ailabwatch.ts --wave=2025-09   # custom wave slug
+ *   pnpm tsx crux/scripts/scrape-ailabwatch.ts --force-fetch    # re-fetch + overwrite cache
+ *   pnpm tsx crux/scripts/scrape-ailabwatch.ts --wave=2025-09   # custom wave slug (YYYY-MM)
  *   pnpm tsx crux/scripts/scrape-ailabwatch.ts --print          # print grades to stdout
  */
 
 import { mkdirSync, readFileSync, writeFileSync, existsSync } from "node:fs";
 import { dirname, join, resolve } from "node:path";
+import { fileURLToPath } from "node:url";
 import {
   parseAILabWatchHtml,
-  AILW_DIMENSIONS,
-  AILW_ORGS,
+  buildAILabWatchGradesFile,
 } from "../lib/scorecard-import/parse-ailabwatch.ts";
 
 const SOURCE_URL = "https://ailabwatch.org/";
 const DEFAULT_WAVE = "2025-09";
-const PUBLISHED_AT = "2025-09-01"; // Site states "as of September 2025" as the freeze date.
+const FROZEN_NOTES =
+  "AI Lab Watch (ailabwatch.org) — frozen as of September 2025 per the " +
+  "author. Seven dimensions × seven frontier labs; per-cell scores in " +
+  "0-100 percent. Overall is the site's published weighted total.";
 
 interface Args {
   wave: string;
   useCache: boolean;
+  forceFetch: boolean;
   print: boolean;
   rawDir: string;
 }
@@ -44,22 +50,45 @@ function parseArgs(argv: string[]): Args {
   const out: Args = {
     wave: DEFAULT_WAVE,
     useCache: false,
+    forceFetch: false,
     print: false,
     rawDir: resolve("data/scorecards/raw/ailabwatch"),
   };
   for (const arg of argv.slice(2)) {
     if (arg === "--use-cache") out.useCache = true;
+    else if (arg === "--force-fetch") out.forceFetch = true;
     else if (arg === "--print") out.print = true;
     else if (arg.startsWith("--wave=")) out.wave = arg.slice("--wave=".length);
     else if (arg.startsWith("--raw-dir=")) out.rawDir = resolve(arg.slice("--raw-dir=".length));
     else if (arg === "--help" || arg === "-h") {
       console.log(
-        "Usage: tsx crux/scripts/scrape-ailabwatch.ts [--wave=YYYY-MM] [--use-cache] [--print] [--raw-dir=PATH]",
+        "Usage: tsx crux/scripts/scrape-ailabwatch.ts [--wave=YYYY-MM] [--use-cache | --force-fetch] [--print] [--raw-dir=PATH]",
       );
       process.exit(0);
     } else throw new Error(`Unknown argument "${arg}"`);
   }
+  if (out.useCache && out.forceFetch) {
+    throw new Error("--use-cache and --force-fetch are mutually exclusive");
+  }
   return out;
+}
+
+/**
+ * Convert a wave slug (`YYYY-MM`) into a publishedAt date (`YYYY-MM-01`).
+ * Hardcoding `2025-09-01` regardless of `--wave` was a latent bug —
+ * passing `--wave=2025-12` would have written a snapshot dated
+ * 2025-09-01 anyway. Strict-validate the format here.
+ */
+export function publishedAtFromWave(wave: string): string {
+  const m = /^(\d{4})-(\d{2})$/.exec(wave);
+  if (!m) {
+    throw new Error(`--wave must be YYYY-MM (got "${wave}")`);
+  }
+  const month = Number(m[2]);
+  if (month < 1 || month > 12) {
+    throw new Error(`--wave month out of range: "${wave}"`);
+  }
+  return `${wave}-01`;
 }
 
 async function fetchSourceHtml(url: string): Promise<string> {
@@ -77,9 +106,12 @@ async function fetchSourceHtml(url: string): Promise<string> {
     );
   }
   const html = await resp.text();
-  if (html.length < 10_000) {
+  if (!html.includes("AI Companies Scorecard")) {
+    // Catches CDN error pages, redirected captive portals, etc. The
+    // strict parser would also fail, but this gives a clearer error
+    // earlier — before we overwrite the cached HTML on disk.
     throw new Error(
-      `GET ${url} returned suspiciously short body (${html.length} bytes) — site layout may have changed`,
+      `GET ${url} returned ${html.length} bytes but no "AI Companies Scorecard" marker — site layout may have changed`,
     );
   }
   return html;
@@ -89,73 +121,11 @@ function ensureDir(path: string): void {
   mkdirSync(path, { recursive: true });
 }
 
-interface GradesFile {
-  publishedAt: string;
-  waveLabel: string;
-  sourceUrl: string;
-  methodologyUrl: string;
-  license: string | null;
-  notes: string;
-  isLatest: boolean;
-  dimensions: Array<{ slug: string; label: string; weight: number | null }>;
-  grades: Array<{
-    org: string;
-    aliases?: string[];
-    scores: Record<string, string>;
-    sourceUrls?: Record<string, string>;
-  }>;
-}
-
-function buildGradesFile(parsed: ReturnType<typeof parseAILabWatchHtml>): GradesFile {
-  const dims = AILW_DIMENSIONS.map((d) => ({
-    slug: d.slug,
-    label: d.label,
-    // The site does publish per-category weights internally, but they are
-    // not surfaced as numeric values in HTML — only as the "Weighted score"
-    // visualization. We intentionally leave weights null rather than
-    // hand-encoding them; the adapter treats null as "no weight published"
-    // and the matrix display still works.
-    weight: null,
-  }));
-
-  const grades: GradesFile["grades"] = [];
-  for (const org of AILW_ORGS) {
-    const overall = parsed.overall[org.slug];
-    const perDim = parsed.perDimension[org.slug];
-    const scores: Record<string, string> = { overall: `${overall}%` };
-    for (const d of AILW_DIMENSIONS) {
-      scores[d.slug] = `${perDim[d.slug]}%`;
-    }
-    grades.push({
-      org: org.display,
-      scores,
-    });
-  }
-
-  return {
-    publishedAt: PUBLISHED_AT,
-    waveLabel: "September 2025 (frozen)",
-    sourceUrl: SOURCE_URL,
-    methodologyUrl: "https://ailabwatch.org/about",
-    // The site has no explicit license declaration. Author is Zach
-    // Stein-Perlman; the grades are public and originally CC-0-spirited.
-    // Leave null to avoid asserting a license we can't verify.
-    license: null,
-    notes:
-      "AI Lab Watch (ailabwatch.org) — frozen as of September 2025 per the " +
-      "author. Seven dimensions × seven frontier labs; per-cell scores in " +
-      "0-100 percent. Overall is the site's published weighted total.",
-    isLatest: true,
-    dimensions: dims,
-    grades,
-  };
-}
-
-async function main(): Promise<void> {
-  const args = parseArgs(process.argv);
+export async function runScrape(args: Args): Promise<void> {
   const waveDir = join(args.rawDir, args.wave);
   const htmlPath = join(waveDir, "index.html");
   const gradesPath = join(waveDir, "grades.json");
+  const publishedAt = publishedAtFromWave(args.wave);
 
   ensureDir(waveDir);
 
@@ -167,6 +137,11 @@ async function main(): Promise<void> {
     html = readFileSync(htmlPath, "utf8");
     console.log(`[scrape-ailabwatch] reading cached HTML from ${htmlPath} (${html.length} bytes)`);
   } else {
+    if (existsSync(htmlPath) && !args.forceFetch) {
+      throw new Error(
+        `${htmlPath} already exists. Use --use-cache to re-parse it, or --force-fetch to re-download (overwrites the cached file).`,
+      );
+    }
     console.log(`[scrape-ailabwatch] fetching ${SOURCE_URL}`);
     html = await fetchSourceHtml(SOURCE_URL);
     writeFileSync(htmlPath, html, "utf8");
@@ -174,7 +149,13 @@ async function main(): Promise<void> {
   }
 
   const parsed = parseAILabWatchHtml(html);
-  const out = buildGradesFile(parsed);
+  const out = buildAILabWatchGradesFile(parsed, {
+    publishedAt,
+    waveLabel: `${monthName(publishedAt)} (frozen)`,
+    sourceUrl: SOURCE_URL,
+    methodologyUrl: "https://ailabwatch.org/about",
+    notes: FROZEN_NOTES,
+  });
 
   if (args.print) {
     console.log(JSON.stringify(out, null, 2));
@@ -190,7 +171,38 @@ async function main(): Promise<void> {
   console.log(`[scrape-ailabwatch] next: pnpm crux tb import-scorecards analyze --source=ailabwatch`);
 }
 
-main().catch((err) => {
-  console.error(`[scrape-ailabwatch] ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
-  process.exit(1);
-});
+function monthName(isoDate: string): string {
+  const [y, m] = isoDate.split("-");
+  const names = [
+    "",
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  return `${names[Number(m)]} ${y}`;
+}
+
+// Only execute when invoked directly. Exposing helpers + runScrape for
+// import-time reuse (e.g., a test that drives the script against a
+// fixture HTML) without triggering an unintended fetch.
+const isEntryPoint = import.meta.url === `file://${process.argv[1]}` ||
+  fileURLToPath(import.meta.url) === process.argv[1];
+
+if (isEntryPoint) {
+  // `parseArgs` throws synchronously on bad input — wrap in an async IIFE
+  // so its errors land in the same handler as runtime errors instead of
+  // bypassing the catch and dumping a raw stack trace.
+  (async () => runScrape(parseArgs(process.argv)))().catch((err) => {
+    console.error(`[scrape-ailabwatch] ${err instanceof Error ? err.stack ?? err.message : String(err)}`);
+    process.exit(1);
+  });
+}
