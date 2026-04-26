@@ -162,6 +162,25 @@ describe("fetchToCache", () => {
     ).rejects.toThrow(/exceeds limit/);
   });
 
+  it("rejects cached files larger than maxBytes (re-read protection)", async () => {
+    dir = mkdtempSync(join(tmpdir(), "fetch-cache-"));
+    const dest = join(dir, "page.html");
+    // Pre-populate the cache with a "big" file (10 KB).
+    writeFileSync(dest, "a".repeat(10_240));
+    let calls = 0;
+    const fakeFetch = async (_url: string) => {
+      calls++;
+      return new Response("never-fetched", { status: 200 });
+    };
+    await expect(
+      fetchToCache("https://example.test/cached", dest, {
+        fetchImpl: fakeFetch as typeof fetch,
+        maxBytes: 1024,
+      }),
+    ).rejects.toThrow(/cache refused/);
+    expect(calls).toBe(0); // never went to the network
+  });
+
   it("propagates AbortSignal.timeout when the fetch hangs", async () => {
     dir = mkdtempSync(join(tmpdir(), "fetch-cache-"));
     const dest = join(dir, "page.html");

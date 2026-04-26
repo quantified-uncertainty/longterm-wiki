@@ -195,7 +195,7 @@ Return a single JSON object matching this exact schema (no prose, no markdown fe
 
 Rules:
 - Include every organization shown in the scorecard.
-- Include every dimension/domain that has scored cells. Use kebab-case slugs derived from the visible label (e.g. "Risk Assessment" -> "risk-assessment", "Information Sharing" -> "info-sharing").
+- Include every dimension/domain that has scored cells. Use FULL kebab-case of the visible label (no abbreviations) — e.g. "Risk Assessment" -> "risk-assessment", "Information Sharing" -> "information-sharing", "Governance & Accountability" -> "governance-accountability". Consistency across waves matters so the same dimension keeps the same slug over time.
 - The "overall" key is mandatory for every org.
 - Score values are verbatim letter grades (e.g. "C+", "B-", "F"). NEVER invent or compute. If a cell is blank/N/A, omit that key entirely (don't write "" or "N/A").
 - Org display names are exactly what's on the page (e.g. "Google Deepmind", not "Google DeepMind"; "Anthropic" not "Anthropic PBC").

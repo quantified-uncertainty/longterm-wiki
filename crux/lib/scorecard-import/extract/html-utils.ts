@@ -11,7 +11,7 @@
  *   `stripHtmlForLlm` docstring below.
  */
 
-import { mkdirSync, writeFileSync, readFileSync, existsSync } from "fs";
+import { mkdirSync, writeFileSync, readFileSync, existsSync, statSync } from "fs";
 import { dirname } from "path";
 
 /** Default 30s wall-clock timeout for the network fetch. */
@@ -44,7 +44,17 @@ export async function fetchToCache(
   dest: string,
   opts: FetchOptions = {},
 ): Promise<Buffer> {
+  const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
   if (!opts.force && existsSync(dest)) {
+    // Cap cached reads too — protects against re-reading a stale huge
+    // file that bypassed an earlier limit (or was written with a larger
+    // maxBytes than the current call allows).
+    const cachedSize = statSync(dest).size;
+    if (cachedSize > maxBytes) {
+      throw new Error(
+        `cache refused for ${dest}: cached file size ${cachedSize} exceeds limit ${maxBytes}`,
+      );
+    }
     return readFileSync(dest);
   }
   const fetchFn = opts.fetchImpl ?? fetch;
@@ -52,7 +62,6 @@ export async function fetchToCache(
     opts.userAgent ??
     "Mozilla/5.0 (compatible; LongtermWikiBot/1.0; +https://www.longtermwiki.com)";
   const timeoutMs = opts.timeoutMs ?? DEFAULT_FETCH_TIMEOUT_MS;
-  const maxBytes = opts.maxBytes ?? DEFAULT_MAX_BYTES;
   const response = await fetchFn(url, {
     headers: { "User-Agent": ua },
     signal: AbortSignal.timeout(timeoutMs),
@@ -62,20 +71,40 @@ export async function fetchToCache(
       `fetch failed for ${url}: HTTP ${response.status} ${response.statusText}`,
     );
   }
-  // Pre-flight check via Content-Length when present — saves us from
-  // streaming a multi-GB body just to reject it.
+  // Pre-flight via Content-Length when honest — fast reject for declared-huge bodies.
   const declared = response.headers.get("content-length");
   if (declared && Number(declared) > maxBytes) {
     throw new Error(
       `fetch refused for ${url}: declared content-length ${declared} exceeds limit ${maxBytes}`,
     );
   }
-  const buf = Buffer.from(await response.arrayBuffer());
-  if (buf.length > maxBytes) {
-    throw new Error(
-      `fetch refused for ${url}: body length ${buf.length} exceeds limit ${maxBytes}`,
-    );
+  // Stream-and-cap: a hostile server can omit Content-Length and stream
+  // a multi-GB body. Accumulate chunks and bail past the cap so we never
+  // hold more than maxBytes + one chunk in memory.
+  const reader = response.body?.getReader();
+  if (!reader) {
+    throw new Error(`fetch failed for ${url}: empty response body`);
   }
+  const chunks: Buffer[] = [];
+  let total = 0;
+  try {
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      const chunk = Buffer.from(value);
+      total += chunk.length;
+      if (total > maxBytes) {
+        await reader.cancel();
+        throw new Error(
+          `fetch refused for ${url}: body length ${total} exceeds limit ${maxBytes}`,
+        );
+      }
+      chunks.push(chunk);
+    }
+  } finally {
+    reader.releaseLock?.();
+  }
+  const buf = Buffer.concat(chunks, total);
   mkdirSync(dirname(dest), { recursive: true });
   writeFileSync(dest, buf);
   return buf;
