@@ -1,9 +1,10 @@
-import { describe, it, expect } from 'vitest';
+import { describe, it, expect, vi } from 'vitest';
 import {
   categorizeCommit,
   groupCommits,
   generateReleaseBody,
   evaluateReleasePreflight,
+  fetchSubPrDeployTasks,
 } from './release.ts';
 import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 
@@ -279,5 +280,170 @@ describe('evaluateReleasePreflight', () => {
     const decision = evaluateReleasePreflight(healthySuccess, { force: true });
     expect(decision.ok).toBe(true);
     if (decision.ok) expect(decision.warning).toBeNull();
+  });
+});
+
+// ── fetchSubPrDeployTasks (QUA-756) ─────────────────────────────────────────
+
+describe('fetchSubPrDeployTasks (QUA-756)', () => {
+  const NOW = new Date().getTime();
+  const DAY = 1000 * 60 * 60 * 24;
+
+  const DEPLOY_TASK_BODY = [
+    '## Deploy Checklist',
+    '<!-- deploy-tasks:v1 -->',
+    '- [ ] Restart wiki-server',
+    '- [ ] Verify endpoint',
+    '<!-- /deploy-tasks -->',
+  ].join('\n');
+
+  function prFixture(overrides: {
+    number: number;
+    sha?: string | null;
+    body?: string | null;
+    mergedDaysAgo?: number;
+  }) {
+    const merged = overrides.mergedDaysAgo ?? 1;
+    return {
+      number: overrides.number,
+      title: `PR ${overrides.number}`,
+      body: overrides.body ?? DEPLOY_TASK_BODY,
+      merged_at: new Date(NOW - merged * DAY).toISOString(),
+      merge_commit_sha:
+        overrides.sha === undefined ? `sha-${overrides.number}` : overrides.sha,
+      updated_at: new Date(NOW - merged * DAY).toISOString(),
+    };
+  }
+
+  it('returns empty array when the release diff is empty (nothing to ship)', async () => {
+    const api = vi.fn();
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas: new Set(),
+      api: api as never,
+    });
+    expect(tasks).toEqual([]);
+    // No PR pagination should occur — empty diff is a fast no-op.
+    expect(api).not.toHaveBeenCalled();
+  });
+
+  it('only includes tasks from PRs whose merge commit is in the release diff', async () => {
+    // PRs 100 and 101 are in the release diff; PR 200 (already-shipped) is not.
+    const releaseDiffShas = new Set(['sha-100', 'sha-101']);
+
+    const api = vi.fn(async (endpoint: string) => {
+      if (endpoint.includes('/pulls?')) {
+        return [
+          prFixture({ number: 100 }),
+          prFixture({ number: 101 }),
+          prFixture({ number: 200 }), // already shipped — sha not in diff
+        ];
+      }
+      throw new Error(`Unexpected endpoint: ${endpoint}`);
+    });
+
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+    });
+
+    // Each in-diff PR contributes its 2 unchecked tasks; the already-shipped
+    // PR contributes none. Tasks are tagged with their originating PR.
+    expect(tasks).toHaveLength(4);
+    expect(tasks).toEqual(
+      expect.arrayContaining([
+        'Restart wiki-server _(from PR #100)_',
+        'Verify endpoint _(from PR #100)_',
+        'Restart wiki-server _(from PR #101)_',
+        'Verify endpoint _(from PR #101)_',
+      ]),
+    );
+    // No tasks from PR #200 (already shipped).
+    expect(tasks.some((t) => t.includes('PR #200'))).toBe(false);
+  });
+
+  it('drops PRs with null merge_commit_sha defensively', async () => {
+    // GitHub returns null merge_commit_sha for unmerged PRs and (briefly) for
+    // newly-merged ones whose merge commit is still being computed. Either way
+    // we cannot match SHA membership — drop them rather than over-include.
+    const releaseDiffShas = new Set(['sha-100']);
+    const api = vi.fn(async () => [
+      prFixture({ number: 100 }),
+      prFixture({ number: 101, sha: null }),
+    ]);
+
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+    });
+
+    expect(tasks.every((t) => t.includes('PR #100'))).toBe(true);
+    expect(tasks.some((t) => t.includes('PR #101'))).toBe(false);
+  });
+
+  it('skips PRs without a deploy-tasks block', async () => {
+    const releaseDiffShas = new Set(['sha-100', 'sha-101']);
+    const api = vi.fn(async () => [
+      prFixture({ number: 100 }),
+      prFixture({ number: 101, body: 'A regular PR body with no deploy section.' }),
+    ]);
+
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+    });
+
+    expect(tasks.every((t) => t.includes('PR #100'))).toBe(true);
+    expect(tasks.some((t) => t.includes('PR #101'))).toBe(false);
+  });
+
+  it('skips already-checked tasks within an in-diff PR', async () => {
+    const partiallyCheckedBody = [
+      '## Deploy Checklist',
+      '<!-- deploy-tasks:v1 -->',
+      '- [x] Already done',
+      '- [ ] Still pending',
+      '<!-- /deploy-tasks -->',
+    ].join('\n');
+
+    const releaseDiffShas = new Set(['sha-100']);
+    const api = vi.fn(async () => [
+      prFixture({ number: 100, body: partiallyCheckedBody }),
+    ]);
+
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+    });
+
+    expect(tasks).toEqual(['Still pending _(from PR #100)_']);
+  });
+
+  it('repro for QUA-756: stale shipped tasks do NOT leak into next release', async () => {
+    // Simulate the QUA-756 scenario: prior release (PR #4619) shipped PRs
+    // #4587..#4617 with unchecked deploy tasks. The current release ships only
+    // PRs #4624 + #4625. The new behaviour: only #4624 + #4625 contribute
+    // tasks, even though #4587..#4617 have unchecked items still.
+    const releaseDiffShas = new Set(['sha-4624', 'sha-4625']);
+    const oldShippedPrs = [4587, 4588, 4589, 4590, 4596, 4599, 4600, 4601, 4608, 4613];
+    const newPrs = [4624, 4625];
+    const allPrs = [...oldShippedPrs, ...newPrs].map((n) =>
+      prFixture({ number: n }),
+    );
+    const api = vi.fn(async () => allPrs);
+
+    const tasks = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+    });
+
+    // Every task must be from #4624 or #4625; none from the prior release.
+    for (const task of tasks) {
+      const match = task.match(/from PR #(\d+)/);
+      expect(match).not.toBeNull();
+      const prNum = match ? Number(match[1]) : NaN;
+      expect(newPrs).toContain(prNum);
+    }
+    // Each new PR contributes 2 unchecked tasks → 4 total.
+    expect(tasks).toHaveLength(4);
   });
 });

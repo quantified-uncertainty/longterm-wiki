@@ -21,6 +21,7 @@ import {
   parseDeployTasksFromBody,
   preserveCheckedState,
 } from '../lib/deploy-tasks/detect.ts';
+import { fetchMergedPrsInWindow } from './deploy-tasks.ts';
 import {
   checkDeployHealth,
   type DeployHealthStatus,
@@ -114,32 +115,62 @@ export function groupCommits(subjects: string[]): Record<CommitCategory, string[
 
 // ── Sub-PR deploy task aggregation ──────────────────────────────────────────
 
-interface SubPrData {
-  number: number;
-  title: string;
-  body: string | null;
-  merged_at: string | null;
+/**
+ * Returns the set of commit SHAs reachable from `origin/main` but not from
+ * `origin/production` — i.e. the commits this release would actually deploy.
+ *
+ * Used by `fetchSubPrDeployTasks` to filter sub-PR tasks down to PRs whose
+ * merge commit is part of this release's diff. PRs whose merge commits are
+ * already on production have, by definition, already shipped — their
+ * checklist items belong to a prior release PR (QUA-756).
+ */
+export function commitShasInReleaseDiff(): Set<string> {
+  const output = git('log', 'origin/production..origin/main', '--format=%H');
+  if (!output) return new Set();
+  return new Set(output.split('\n').filter(Boolean));
 }
 
 /**
- * Fetch unchecked deploy tasks from PRs merged to main since the last release.
- * These are tasks that individual PRs declared but that the file-diff detector
- * wouldn't pick up (e.g., manually added tasks, env vars not yet in code).
+ * Fetch unchecked deploy tasks from PRs whose merge commit is part of this
+ * release's diff (`origin/production..origin/main`). These are tasks that
+ * individual PRs declared but that the file-diff detector wouldn't pick up
+ * (e.g., manually added tasks, env vars not yet in code).
+ *
+ * Filtering by release-diff SHA membership — not by a 14-day lookback —
+ * ensures the checklist for each release PR contains only tasks belonging
+ * to PRs actually being deployed by THIS release. Without this, every new
+ * release PR re-listed unchecked items from prior releases (QUA-756).
+ *
+ * The `lookbackDays` window only bounds the GitHub PR pagination scan; it
+ * is intentionally generous (60 days) so a long-paused release cadence or
+ * a long-lived branch still gets discovered before SHA-membership prunes
+ * the list. PRs outside the window but still in the release diff would be
+ * silently dropped, so prefer over-fetching here.
  */
-export async function fetchSubPrDeployTasks(): Promise<string[]> {
-  const lookbackDays = 14;
+export async function fetchSubPrDeployTasks(opts: {
+  releaseDiffShas?: Set<string>;
+  api?: typeof githubApi;
+  lookbackDays?: number;
+} = {}): Promise<string[]> {
+  const releaseDiffShas = opts.releaseDiffShas ?? commitShasInReleaseDiff();
+
+  // Empty release diff (no commits to ship) → no sub-PR tasks apply.
+  if (releaseDiffShas.size === 0) return [];
+
+  const api = opts.api ?? githubApi;
+  const lookbackDays = opts.lookbackDays ?? 60;
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
-  const prs = await githubApi<SubPrData[]>(
-    `/repos/${REPO}/pulls?state=closed&base=main&sort=created&direction=desc&per_page=50`
-  );
+  const { prs } = await fetchMergedPrsInWindow(cutoff, api);
 
   const tasks: string[] = [];
 
   for (const pr of prs) {
-    if (!pr.merged_at || !pr.body) continue;
-    if (new Date(pr.merged_at) < cutoff) continue;
+    if (!pr.body || !pr.merge_commit_sha) continue;
+    // Only include PRs whose merge commit is part of this release's diff.
+    // PRs already on production are by definition not in this release.
+    if (!releaseDiffShas.has(pr.merge_commit_sha)) continue;
 
     const parsed = parseDeployTasksFromBody(pr.body);
     if (!parsed || parsed.unchecked === 0) continue;
