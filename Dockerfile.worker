@@ -67,7 +67,13 @@ COPY crux/ ./crux/
 # via node_modules above).
 COPY packages/ ./packages/
 
-# NOTE: No apps/wiki-server/ files needed — all imports are type-only (erased by tsx)
+# crux/lib/wiki-server/agent-sessions.ts does a runtime value re-export of PR_OUTCOMES
+# from this file. All other apps/wiki-server/ imports in crux are type-only and erased
+# by tsx; this single file is the only runtime value crossing that boundary.
+# See QUA-746.
+COPY apps/wiki-server/src/api-types.ts ./apps/wiki-server/src/api-types.ts
+
+# NOTE: No other apps/wiki-server/ files needed — all other imports are type-only (erased by tsx)
 # NOTE: No content/, data/, apps/web/ needed — worker is stateless
 # NOTE: Only stateless handlers (claim-verification, ping) work in this image.
 # citation-verify shells out to crux CLI (needs full monorepo deps).
