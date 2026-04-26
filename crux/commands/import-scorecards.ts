@@ -8,16 +8,18 @@
  *   - seoul_tracker   The Midas Project Seoul Commitment Tracker
  *
  * Each adapter reads from `data/scorecards/raw/<source>/<wave>/grades.json`.
- * The fetch + extract steps that produce those files are intentionally
- * out-of-band (manual or LLM-assisted) — this command only handles the
- * pipeline from cached JSON to wiki-server. Re-runs are idempotent
- * because IDs are deterministic (`<snapshotId>|<entityId>|<dimensionSlug>`).
+ * `fetch` + `extract` produce that file (per-source extractors live in
+ * `crux/lib/scorecard-import/extract/`); `sync` writes it through to PG.
+ * Re-runs are idempotent because IDs are deterministic
+ * (`<snapshotId>|<entityId>|<dimensionSlug>`).
  *
  * Usage:
  *   pnpm crux tb import-scorecards analyze                # all sources
  *   pnpm crux tb import-scorecards analyze --source=fli_index
  *   pnpm crux tb import-scorecards sync --dry-run         # all, no writes
  *   pnpm crux tb import-scorecards sync --source=saferai
+ *   pnpm crux tb import-scorecards fetch --source=fli_index --wave=summer-2025
+ *   pnpm crux tb import-scorecards extract --source=fli_index --wave=summer-2025
  */
 
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "fs";
@@ -31,6 +33,11 @@ import {
 } from "../lib/scorecard-import/sources/seoul-scraper.ts";
 import { analyzeSource, syncSource } from "../lib/scorecard-import/sync.ts";
 import type { ScorecardSourceAdapter, ScorecardSourceKey } from "../lib/scorecard-import/types.ts";
+import {
+  FLI_WAVES,
+  fetchAndCacheRawWave as fetchFliWave,
+  extractWaveFromCache as extractFliWave,
+} from "../lib/scorecard-import/extract/fli.ts";
 
 const SAFERAI_DEFAULT_URL = "https://ratings.safer-ai.org/comparison/";
 const SAFERAI_RAW_DIR = resolve("data/scorecards/raw/saferai");
@@ -365,11 +372,87 @@ async function scrapeCommand(
   };
 }
 
+async function cmdFetch(
+  source: string,
+  wave: string,
+  force: boolean,
+): Promise<CommandResult> {
+  if (source !== "fli_index") {
+    throw new Error(
+      `fetch is only implemented for source "fli_index" so far (got "${source}"). ` +
+        `Other sources will land in QUA-750/751.`,
+    );
+  }
+  console.log(`Fetching FLI wave ${wave}${force ? " (force)" : ""}...`);
+  const r = await fetchFliWave(wave, undefined, { force });
+  console.log(`✓ ${r.path} (${r.bytes.toLocaleString()} bytes)`);
+  return { exitCode: 0 };
+}
+
+async function cmdExtract(
+  source: string,
+  wave: string,
+): Promise<CommandResult> {
+  if (source !== "fli_index") {
+    throw new Error(
+      `extract is only implemented for source "fli_index" so far (got "${source}"). ` +
+        `Other sources will land in QUA-750/751.`,
+    );
+  }
+  console.log(`Extracting FLI wave ${wave} (LLM call — may take ~30s)...`);
+  const r = await extractFliWave(wave);
+  console.log(`✓ ${r.outputPath}`);
+  console.log(`  ${r.orgs} orgs × ${r.dimensions} dimensions`);
+  if (r.usage) {
+    console.log(
+      `  tokens: ${r.usage.input_tokens.toLocaleString()} in, ${r.usage.output_tokens.toLocaleString()} out`,
+    );
+  }
+  return { exitCode: 0 };
+}
+
+async function fetchCommand(
+  _args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const source = (options.source as string) ?? "";
+  const wave = (options.wave as string) ?? "";
+  const force = !!options.force;
+  if (!source || !wave) {
+    return {
+      exitCode: 1,
+      output:
+        "Usage: pnpm crux tb import-scorecards fetch --source=<key> --wave=<slug> [--force]\n" +
+        `FLI waves available: ${FLI_WAVES.map((w) => w.waveSlug).join(", ")}`,
+    };
+  }
+  return cmdFetch(source, wave, force);
+}
+
+async function extractCommand(
+  _args: string[],
+  options: Record<string, unknown>,
+): Promise<CommandResult> {
+  const source = (options.source as string) ?? "";
+  const wave = (options.wave as string) ?? "";
+  if (!source || !wave) {
+    return {
+      exitCode: 1,
+      output:
+        "Usage: pnpm crux tb import-scorecards extract --source=<key> --wave=<slug>\n" +
+        `FLI waves available: ${FLI_WAVES.map((w) => w.waveSlug).join(", ")}`,
+    };
+  }
+  return cmdExtract(source, wave);
+}
+
 export const commands = {
   analyze: analyzeCommand,
   sync: syncCommand,
   list: listCommand,
   scrape: scrapeCommand,
+  fetch: fetchCommand,
+  extract: extractCommand,
   default: analyzeCommand,
 };
 
@@ -385,10 +468,14 @@ Commands:
   scrape               Fetch the source page and emit grades.json
                        (--source=saferai or --source=seoul_tracker;
                        other sources still use manual extraction)
+  fetch                Download a wave's source page/PDF into the cache
+  extract              Run the LLM extractor on a cached wave -> grades.json
 
 Options:
   --source=<key>       Filter to a single source (fli_index, saferai,
                        ailabwatch, seoul_tracker)
+  --wave=<slug>        Wave slug for fetch/extract (e.g. summer-2025)
+  --force              For fetch: re-download even if cached
   --verbose            Print API payloads (debug)
   --dry-run            Skip the wiki-server POST (also: print the parsed
                        wave instead of writing grades.json for scrape)

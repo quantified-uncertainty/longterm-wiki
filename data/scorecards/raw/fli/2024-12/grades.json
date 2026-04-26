@@ -1,0 +1,115 @@
+{
+  "publishedAt": "2024-12-11",
+  "waveLabel": "December 2024",
+  "sourceUrl": "https://futureoflife.org/wp-content/uploads/2024/12/AI-Safety-Index-2024-Full-Report-27-May-25.pdf",
+  "methodologyUrl": "https://futureoflife.org/document/fli-ai-safety-index-2024/",
+  "license": null,
+  "notes": "Grading uses the US GPA system: A+, A, A-, B+, ..., F corresponding to numerical values 4.3, 4.0, 3.7, 3.3, ..., 0. Overall grades are derived from average scores across six domains.",
+  "dimensions": [
+    {
+      "slug": "risk-assessment",
+      "label": "Risk Assessment",
+      "weight": null
+    },
+    {
+      "slug": "current-harms",
+      "label": "Current Harms",
+      "weight": null
+    },
+    {
+      "slug": "safety-frameworks",
+      "label": "Safety Frameworks",
+      "weight": null
+    },
+    {
+      "slug": "existential-safety-strategy",
+      "label": "Existential Safety Strategy",
+      "weight": null
+    },
+    {
+      "slug": "governance-accountability",
+      "label": "Governance & Accountability",
+      "weight": null
+    },
+    {
+      "slug": "transparency-communication",
+      "label": "Transparency & Communication",
+      "weight": null
+    }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "C",
+        "risk-assessment": "C+",
+        "current-harms": "B-",
+        "safety-frameworks": "D+",
+        "existential-safety-strategy": "D+",
+        "governance-accountability": "C+",
+        "transparency-communication": "D+"
+      }
+    },
+    {
+      "org": "Google DeepMind",
+      "scores": {
+        "overall": "D+",
+        "risk-assessment": "C",
+        "current-harms": "C+",
+        "safety-frameworks": "D-",
+        "existential-safety-strategy": "D",
+        "governance-accountability": "D+",
+        "transparency-communication": "D"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "D+",
+        "risk-assessment": "C",
+        "current-harms": "D+",
+        "safety-frameworks": "D-",
+        "existential-safety-strategy": "D-",
+        "governance-accountability": "D+",
+        "transparency-communication": "D-"
+      }
+    },
+    {
+      "org": "Zhipu AI",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D+",
+        "current-harms": "D+",
+        "safety-frameworks": "F",
+        "existential-safety-strategy": "F",
+        "governance-accountability": "D",
+        "transparency-communication": "C"
+      }
+    },
+    {
+      "org": "x.AI",
+      "scores": {
+        "overall": "D-",
+        "risk-assessment": "F",
+        "current-harms": "D",
+        "safety-frameworks": "F",
+        "existential-safety-strategy": "F",
+        "governance-accountability": "F",
+        "transparency-communication": "C"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "overall": "F",
+        "risk-assessment": "D+",
+        "current-harms": "D",
+        "safety-frameworks": "F",
+        "existential-safety-strategy": "F",
+        "governance-accountability": "D-",
+        "transparency-communication": "F"
+      }
+    }
+  ],
+  "isLatest": false
+}
