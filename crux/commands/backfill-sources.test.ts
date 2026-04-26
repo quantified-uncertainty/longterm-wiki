@@ -1,20 +1,22 @@
 import { describe, it, expect } from 'vitest';
+import { extractMatchTerms } from '../lib/backfill-sources/match-terms.ts';
 import {
-  extractMatchTerms,
   contentMentionsEntity,
-  buildRankingPrompt,
-  parseRankingResponse,
-  buildQuoteExtractionPrompt,
-  parseQuoteResponse,
-  verifyQuoteInContent,
-  buildEntailmentPrompt,
-  parseEntailmentResponse,
-  personNameVariants,
-  orgNameVariants,
-  humanizeClaim,
   isSelfDomain,
-  type MissingSourceRecord,
-} from './backfill-sources.ts';
+  orgNameVariants,
+  personNameVariants,
+} from '../lib/backfill-sources/entity-mention.ts';
+import { humanizeClaim } from '../lib/backfill-sources/humanize-claim.ts';
+import {
+  buildEntailmentPrompt,
+  buildQuoteExtractionPrompt,
+  buildRankingPrompt,
+  parseEntailmentResponse,
+  parseQuoteResponse,
+  parseRankingResponse,
+  verifyQuoteInContent,
+} from '../lib/backfill-sources/prompts.ts';
+import type { MissingSourceRecord } from '../lib/backfill-sources/types.ts';
 
 // ---------------------------------------------------------------------------
 // extractMatchTerms
