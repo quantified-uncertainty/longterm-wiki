@@ -54,7 +54,7 @@ async function queryFacts(db: Db, cap: number): Promise<TableResult> {
       record_table: sql<string>`'facts'`.as("record_table"),
       entity_id: facts.entityId,
       entity_name: sql<string>`COALESCE(${factsEntity.title}, ${facts.entityId})`.as("entity_name"),
-      description: sql<string>`COALESCE(${facts.label}, '') || CASE WHEN ${facts.value} IS NOT NULL THEN ' = ' || LEFT(${facts.value}, 200) ELSE '' END`.as("description"),
+      description: sql<string>`COALESCE(${factsEntity.title}, ${facts.entityId}) || ': ' || COALESCE(${facts.label}, '') || CASE WHEN ${facts.value} IS NOT NULL THEN ' = ' || LEFT(${facts.value}, 200) ELSE '' END`.as("description"),
       label: facts.label,
       value: facts.value,
       measure: facts.measure,
