@@ -43,11 +43,9 @@ export async function fetchDetailed<T>(
     try {
       const res = await fetch(`${config.serverUrl}${path}`, {
         headers: config.headers,
-        // `next` is Next.js's RequestInit augmentation — not in the standard
-        // RequestInit, but valid at runtime in app code.
         next: { revalidate: options?.revalidate ?? 300 },
         signal: AbortSignal.timeout(options?.timeoutMs ?? 10_000),
-      } as RequestInit);
+      });
       if (!res.ok) {
         return {
           ok: false,
