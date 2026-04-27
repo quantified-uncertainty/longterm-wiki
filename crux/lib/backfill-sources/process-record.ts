@@ -10,7 +10,8 @@
  */
 
 import { runResearch } from '../search/research-agent.ts';
-import { PER_RECORD_BUDGET, SEARCH_QUERY_MAX_LENGTH } from './config.ts';
+import { buildSearchQuery } from './build-search-query.ts';
+import { PER_RECORD_BUDGET } from './config.ts';
 import { addCost, emptyCost } from './cost.ts';
 import { entitiesToMention } from './entity-mention.ts';
 import { humanizeClaim } from './humanize-claim.ts';
@@ -90,7 +91,7 @@ async function fetchCandidateSources(
   cost: CostBreakdown,
 ): Promise<{ url: string; content: string; title?: string; provider?: string }[] | null> {
   const entityName = (record.entity_name ?? '').trim();
-  const searchQuery = `${entityName} ${record.description}`.trim().slice(0, SEARCH_QUERY_MAX_LENGTH);
+  const searchQuery = buildSearchQuery(record);
 
   try {
     const research = await runResearch({
