@@ -209,9 +209,11 @@ describe('buildQuoteExtractionPrompt', () => {
   });
 
   it('truncates very long content', () => {
-    const p = buildQuoteExtractionPrompt('X', 'E', 'a'.repeat(100_000));
-    // 12K cap on article body
-    expect(p.length).toBeLessThan(15_000);
+    const p = buildQuoteExtractionPrompt('X', 'E', 'a'.repeat(200_000));
+    // 100K cap on article body (Haiku 4.5 has a 200K context window;
+    // upstream fetchSources already caps pages at ~100KB so we pass through).
+    expect(p.length).toBeLessThan(105_000);
+    expect(p.length).toBeGreaterThan(50_000);
   });
 });
 

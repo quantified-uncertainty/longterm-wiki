@@ -837,14 +837,18 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   // Pack what downstream consumers see as the source's content. Excerpts
   // are search-keyword-filtered (paragraphs without query tokens are
   // dropped), which can hide entity-name mentions that consumers like
-  // backfill-sources rely on. Always include a slice of the full body so
-  // both focused snippets and unfiltered context are available.
-  const SOURCE_CONTENT_CHARS = 6_000;
+  // backfill-sources rely on. Always include the full body so both
+  // focused snippets and unfiltered context are available.
+  //
+  // Upstream `fetchSources()` already caps each page at MAX_CONTENT_CHARS
+  // (~100KB), and Haiku 4.5 has a 200K context window — no need to slice
+  // here. A previous 6KB cap caused ~67% of pages to truncate before the
+  // entity name was reachable; see `crux/lib/backfill-sources/prompts.ts`
+  // for the matching prompt-side bump.
   function packContent(fetched: { content: string; relevantExcerpts: string[] }): string {
-    const body = fetched.content.slice(0, SOURCE_CONTENT_CHARS);
     const excerpts = fetched.relevantExcerpts.join('\n\n');
-    if (!excerpts) return body;
-    return `${excerpts}\n\n--- additional page content ---\n\n${body}`;
+    if (!excerpts) return fetched.content;
+    return `${excerpts}\n\n--- additional page content ---\n\n${fetched.content}`;
   }
 
   for (let i = 0; i < fetchedSources.length; i++) {
