@@ -7,7 +7,7 @@
  * downstream backfill pipeline uses to render claims and search queries).
  */
 
-import { isNull, or, eq, sql, count, and, notInArray } from "drizzle-orm";
+import { isNull, or, eq, sql, count, and, notInArray, type AnyColumn } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { getDrizzleDb } from "../../../db.js";
 import {
@@ -36,6 +36,7 @@ async function queryFacts(db: Db, cap: number): Promise<TableResult> {
   const whereClause = and(
     or(isNull(facts.source), eq(facts.source, "")),
     or(isNull(facts.measure), notInArray(facts.measure, SKIP_MEASURES)),
+    nameIsUsable(factsEntity.title, facts.entityId),
   );
 
   const rows = await db
@@ -55,14 +56,22 @@ async function queryFacts(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(facts).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(facts)
+    .leftJoin(factsEntity, eq(factsEntity.stableId, facts.entityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryPersonnel(db: Db, cap: number): Promise<TableResult> {
   const personE = alias(entities, "person_e");
   const orgE = alias(entities, "org_e");
-  const whereClause = or(isNull(personnel.source), eq(personnel.source, ""));
+  const whereClause = and(
+    or(isNull(personnel.source), eq(personnel.source, "")),
+    nameIsUsable(personE.title, personnel.personId),
+    nameIsUsable(orgE.title, personnel.organizationId),
+  );
 
   const rows = await db
     .select({
@@ -81,14 +90,42 @@ async function queryPersonnel(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(personnel).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(personnel)
+    .leftJoin(personE, eq(personE.stableId, personnel.personEntityId))
+    .leftJoin(orgE, eq(orgE.stableId, personnel.orgEntityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
+}
+
+/**
+ * SQL fragment: the resolved display value for an entity reference,
+ * with `sid_*` machine-ID leaks and empty strings nulled out.
+ *
+ * Used in WHERE clauses to skip rows whose displayed name would be
+ * garbage (a `sid_*` token leaking from a malformed FK fallback, or
+ * an empty raw column). See QUA-764 for the data-side cleanup ticket.
+ */
+function resolvedName(joinedTitle: AnyColumn, rawFallback: AnyColumn) {
+  return sql<string>`NULLIF(COALESCE(${joinedTitle}, NULLIF(${rawFallback}, '')), '')`;
+}
+
+function nameIsUsable(joinedTitle: AnyColumn, rawFallback: AnyColumn) {
+  return sql<boolean>`${resolvedName(joinedTitle, rawFallback)} IS NOT NULL AND ${resolvedName(joinedTitle, rawFallback)} NOT LIKE 'sid\\_%' ESCAPE '\\'`;
 }
 
 async function queryInvestments(db: Db, cap: number): Promise<TableResult> {
   const invE = alias(entities, "inv_e");
   const compE = alias(entities, "comp_e");
-  const whereClause = or(isNull(investments.source), eq(investments.source, ""));
+  // Skip rows whose company display name would be a `sid_*` machine-ID
+  // leak — the claim/search-query is useless and we'd burn API spend on
+  // garbage. Rows with a valid human-readable fallback (e.g. companyId
+  // = 'algolia') still flow through. See QUA-764.
+  const whereClause = and(
+    or(isNull(investments.source), eq(investments.source, "")),
+    nameIsUsable(compE.title, investments.companyId),
+  );
 
   const rows = await db
     .select({
@@ -107,14 +144,24 @@ async function queryInvestments(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(investments).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(investments)
+    .leftJoin(compE, eq(compE.stableId, investments.companyEntityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryPolicyStakeholders(db: Db, cap: number): Promise<TableResult> {
   const stakE = alias(entities, "stak_e");
   const polE = alias(entities, "pol_e");
-  const whereClause = or(isNull(policyStakeholders.source), eq(policyStakeholders.source, ""));
+  // Stakeholder side: rows can fall back to `stakeholderDisplayName` when
+  // the entity-FK fails, so the usability check covers both options.
+  const whereClause = and(
+    or(isNull(policyStakeholders.source), eq(policyStakeholders.source, "")),
+    nameIsUsable(stakE.title, policyStakeholders.stakeholderDisplayName),
+    nameIsUsable(polE.title, policyStakeholders.policyEntityId),
+  );
 
   const rows = await db
     .select({
@@ -134,14 +181,23 @@ async function queryPolicyStakeholders(db: Db, cap: number): Promise<TableResult
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(policyStakeholders).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(policyStakeholders)
+    .leftJoin(stakE, eq(stakE.stableId, policyStakeholders.stakeholderEntityId))
+    .leftJoin(polE, eq(polE.stableId, policyStakeholders.policyEntityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryEquityPositions(db: Db, cap: number): Promise<TableResult> {
   const holdE = alias(entities, "hold_e");
   const compE = alias(entities, "comp_e2");
-  const whereClause = or(isNull(equityPositions.source), eq(equityPositions.source, ""));
+  const whereClause = and(
+    or(isNull(equityPositions.source), eq(equityPositions.source, "")),
+    nameIsUsable(holdE.title, equityPositions.holderId),
+    nameIsUsable(compE.title, equityPositions.companyId),
+  );
 
   const rows = await db
     .select({
@@ -159,13 +215,21 @@ async function queryEquityPositions(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(equityPositions).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(equityPositions)
+    .leftJoin(holdE, eq(holdE.stableId, equityPositions.holderEntityId))
+    .leftJoin(compE, eq(compE.stableId, equityPositions.companyEntityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryDivisions(db: Db, cap: number): Promise<TableResult> {
   const orgE = alias(entities, "div_org_e");
-  const whereClause = or(isNull(divisions.source), eq(divisions.source, ""));
+  const whereClause = and(
+    or(isNull(divisions.source), eq(divisions.source, "")),
+    nameIsUsable(orgE.title, divisions.parentOrgId),
+  );
 
   const rows = await db
     .select({
@@ -181,13 +245,20 @@ async function queryDivisions(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(divisions).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(divisions)
+    .leftJoin(orgE, eq(orgE.stableId, divisions.parentOrgId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryFundingRounds(db: Db, cap: number): Promise<TableResult> {
   const compE = alias(entities, "fr_comp_e");
-  const whereClause = or(isNull(fundingRounds.source), eq(fundingRounds.source, ""));
+  const whereClause = and(
+    or(isNull(fundingRounds.source), eq(fundingRounds.source, "")),
+    nameIsUsable(compE.title, fundingRounds.companyId),
+  );
 
   const rows = await db
     .select({
@@ -204,13 +275,20 @@ async function queryFundingRounds(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(fundingRounds).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(fundingRounds)
+    .leftJoin(compE, eq(compE.stableId, fundingRounds.companyEntityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryFundingPrograms(db: Db, cap: number): Promise<TableResult> {
   const orgE = alias(entities, "fp_org_e");
-  const whereClause = or(isNull(fundingPrograms.source), eq(fundingPrograms.source, ""));
+  const whereClause = and(
+    or(isNull(fundingPrograms.source), eq(fundingPrograms.source, "")),
+    nameIsUsable(orgE.title, fundingPrograms.orgId),
+  );
 
   const rows = await db
     .select({
@@ -226,13 +304,20 @@ async function queryFundingPrograms(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(fundingPrograms).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(fundingPrograms)
+    .leftJoin(orgE, eq(orgE.stableId, fundingPrograms.orgId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 
 async function queryPublications(db: Db, cap: number): Promise<TableResult> {
   const pubE = alias(entities, "pub_e");
-  const whereClause = or(isNull(publications.url), eq(publications.url, ""));
+  const whereClause = and(
+    or(isNull(publications.url), eq(publications.url, "")),
+    nameIsUsable(pubE.title, publications.entityId),
+  );
 
   const rows = await db
     .select({
@@ -249,7 +334,11 @@ async function queryPublications(db: Db, cap: number): Promise<TableResult> {
     .where(whereClause)
     .limit(cap);
 
-  const [{ cnt }] = await db.select({ cnt: count() }).from(publications).where(whereClause);
+  const [{ cnt }] = await db
+    .select({ cnt: count() })
+    .from(publications)
+    .leftJoin(pubE, eq(pubE.stableId, publications.entityId))
+    .where(whereClause);
   return { total: cnt, records: rows };
 }
 

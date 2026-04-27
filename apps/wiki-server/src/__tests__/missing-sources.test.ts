@@ -18,8 +18,13 @@ const ENTITIES = [
 // exactly which column was written and with what id/url.
 const updateLog: Array<{ query: string; params: unknown[] }> = [];
 
+// Tracks every SELECT issued by the missing-sources route so tests can
+// assert the WHERE clause filters out unresolved/sid-leaked entity rows.
+const selectLog: Array<{ query: string; params: unknown[] }> = [];
+
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase().trim();
+  if (q.startsWith("select")) selectLog.push({ query: q, params });
 
   if (q.startsWith("update")) {
     updateLog.push({ query: q, params });
@@ -114,6 +119,26 @@ describe("GET /api/sourcing/missing-sources", () => {
     const res = await app.request("/api/sourcing/missing-sources?table=facts&limit=1");
     expect(res.status).toBe(200);
   });
+
+  // Regression for QUA-764 (sid_* leak): every entity-joining query must
+  // skip rows whose displayed entity name would be NULL/empty/sid_-prefixed.
+  // Asserts the WHERE clause filters this at the SQL level so corrupt data
+  // never reaches the backfill pipeline.
+  it.each(["facts", "investments", "personnel", "equity_positions", "divisions", "funding_rounds", "funding_programs", "policy_stakeholders", "publications"])(
+    "%s query filters out sid_-prefixed display names",
+    async (table) => {
+      selectLog.length = 0;
+      const res = await app.request(`/api/sourcing/missing-sources?table=${table}`);
+      expect(res.status).toBe(200);
+      // Every SELECT against this table should embed the sid_* filter.
+      const tableSelects = selectLog.filter((l) => l.query.includes(`"${table}"`));
+      expect(tableSelects.length).toBeGreaterThan(0);
+      for (const l of tableSelects) {
+        expect(l.query).toContain("not like 'sid");
+        expect(l.query).toContain("escape");
+      }
+    }
+  );
 });
 
 describe("POST /api/sourcing/missing-sources/update-source", () => {
