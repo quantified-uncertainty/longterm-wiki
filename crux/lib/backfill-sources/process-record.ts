@@ -11,7 +11,7 @@
 
 import { runResearch } from '../search/research-agent.ts';
 import { buildSearchQuery } from './build-search-query.ts';
-import { PER_RECORD_BUDGET } from './config.ts';
+import { PER_RECORD_BUDGET, SELF_DOMAINS } from './config.ts';
 import { addCost, emptyCost } from './cost.ts';
 import { entitiesToMention } from './entity-mention.ts';
 import { humanizeClaim } from './humanize-claim.ts';
@@ -96,6 +96,9 @@ async function fetchCandidateSources(
   try {
     const research = await runResearch({
       topic: searchQuery,
+      // Drop self-domain URLs before fetch — verifySource would reject
+      // them anyway, but fetching wastes Playwright + Wayback time.
+      excludeHosts: SELF_DOMAINS,
       pageContext: { title: entityName, type: 'unknown' },
       config: {
         maxResultsPerSource: 3,

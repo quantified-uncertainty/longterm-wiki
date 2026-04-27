@@ -90,6 +90,13 @@ export interface ResearchRequest {
   topic: string;
   /** Alternative search query if different from topic (e.g. more specific). */
   query?: string;
+  /**
+   * Hostnames (or registrable suffixes) to drop from results before fetching.
+   * Useful when the caller knows certain domains are "self" / circular and
+   * fetching them is wasted spend (e.g. backfill-sources doesn't want to
+   * source-check our own wiki against itself).
+   */
+  excludeHosts?: string[];
   /** Optional page context to narrow research focus. */
   pageContext?: ResearchPageContext;
   /** Search provider configuration. */
@@ -580,6 +587,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   const {
     topic,
     query = topic,
+    excludeHosts = [],
     pageContext,
     config = {},
     budgetCap = DEFAULT_BUDGET_CAP,
@@ -789,6 +797,24 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   for (const [url, hits] of urlToHits) {
     if (pgNormalizedUrls.has(url) && hits.some(h => h.provider !== 'pg')) {
       urlsAlreadyInPG++;
+    }
+  }
+
+  // Drop excluded hosts before any further work — these would be rejected
+  // by downstream verification anyway, and fetching them (Playwright,
+  // Wayback) wastes time and money.
+  if (excludeHosts.length > 0) {
+    const exclude = excludeHosts.map(h => h.toLowerCase().replace(/^www\./, ''));
+    for (const url of [...urlToHits.keys()]) {
+      let host: string;
+      try {
+        host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+      } catch {
+        continue;
+      }
+      if (exclude.some(d => host === d || host.endsWith('.' + d))) {
+        urlToHits.delete(url);
+      }
     }
   }
 
