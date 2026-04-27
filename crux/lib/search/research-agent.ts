@@ -321,9 +321,9 @@ const VALID_SCRY_TABLES = ['mv_eaforum_posts', 'mv_lesswrong_posts'] as const;
 // Dampener for SCRY HTTP errors — when the upstream is down (e.g. Cloudflare 502),
 // every record in a long batch produces the same multi-line HTML body. Log the
 // first occurrence per (table, status) per process; suppress repeats with a
-// periodic count. Reset on first success per table.
+// periodic count. Counters reset whenever a request to that table succeeds, so
+// each fresh outage emits a "first occurrence" log again.
 const scryErrorCounts = new Map<string, number>();
-const scryHadSuccess = new Set<string>();
 
 function summarizeScryBody(body: string): string {
   const trimmed = body.trim();
@@ -374,13 +374,11 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
         continue;
       }
 
-      // Note recovery so a fresh batch of failures gets re-logged.
-      if (!scryHadSuccess.has(table)) {
-        scryHadSuccess.add(table);
-        // Clear counters for this table so the next failure logs again.
-        for (const k of [...scryErrorCounts.keys()]) {
-          if (k.startsWith(`${table}:`)) scryErrorCounts.delete(k);
-        }
+      // Clear counters for this table on every success so a fresh outage
+      // re-emits the "first occurrence" log instead of going straight to silent.
+      const tablePrefix = `${table}:`;
+      for (const k of scryErrorCounts.keys()) {
+        if (k.startsWith(tablePrefix)) scryErrorCounts.delete(k);
       }
 
       const data = await response.json() as ScryApiResponse;
