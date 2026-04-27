@@ -87,6 +87,8 @@ const SIMPLE_PAGES = [
   "/wiki/E815",  // Anthropic Stakeholders — critical table page
   "/browse",
   "/data-sources/ea-funds",  // Data source detail page (QUA-81)
+  "/frontier-safety-frameworks",  // QUA-709 directory page
+  "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────

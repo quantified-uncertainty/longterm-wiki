@@ -1,0 +1,24 @@
+{
+  "table": "divisions",
+  "recordCount": 1,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-23T11:46:34.115Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 1,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "X4J697BMeH",
+      "name": "Research",
+      "source": "https://safe.ai/about",
+      "verdict": "none"
+    }
+  ]
+}

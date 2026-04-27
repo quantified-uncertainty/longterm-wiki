@@ -61,11 +61,10 @@ export interface OrgShellSlots {
 export function buildOrgShellSlots(
   data: OrgHeaderData,
   options: {
-    activePage?: "profile" | "data";
     breadcrumbSuffix?: string;
   } = {},
 ): OrgShellSlots {
-  const { activePage, breadcrumbSuffix } = options;
+  const { breadcrumbSuffix } = options;
 
   const initials = data.name
     .split(/[\s-]+/)
@@ -130,33 +129,13 @@ export function buildOrgShellSlots(
     </>
   );
 
+  // Wiki + Data are now reachable via sidebar tabs, no need to duplicate as
+  // header pills. Leaving the slot empty (no headerLinks) on organization pages.
   const headerLinks: EntityProfileShellHeaderLink[] = [];
-  if (data.wikiHref) {
-    headerLinks.push({ label: "Wiki page", href: data.wikiHref });
-  }
-  headerLinks.push({
-    label: "Data",
-    href: `/organizations/${data.id}/data`,
-    active: activePage === "data",
-  });
 
-  const headerFooter = data.founders.length > 0 && (
-    <p className="text-sm text-muted-foreground">
-      Founded by{" "}
-      {data.founders.map((f, i) => (
-        <span key={i}>
-          {i > 0 && (i === data.founders.length - 1 ? ", and " : ", ")}
-          {f.href ? (
-            <Link href={f.href} className="text-primary hover:underline">
-              {f.name}
-            </Link>
-          ) : (
-            f.name
-          )}
-        </span>
-      ))}
-    </p>
-  );
+  // Founders are available via the People tab in the sidebar — no need to
+  // duplicate them as a header-footer row.
+  const headerFooter: React.ReactNode = null;
 
   const breadcrumbs: Array<{ label: string; href?: string }> = [
     { label: "Organizations", href: "/organizations" },

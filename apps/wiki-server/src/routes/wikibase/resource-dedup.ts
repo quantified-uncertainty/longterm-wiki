@@ -27,6 +27,10 @@ import { applyTruncation } from "../shared/utils.js";
 export interface FkColumnInfo {
   tableName: string;
   columnName: string;
+  /** Which column on `resources` this FK targets. QUA-549 Phase B has
+   *  swapped most FKs from `id` to `stable_id`; the dedup flow tracks both
+   *  forms (QUA-589) so per-FK rewrites use the right value type. */
+  targetColumn: "id" | "stable_id";
   /** PK/UNIQUE constraints on this table that include columnName. otherCols
    *  is the set of columns in the constraint besides columnName. Empty
    *  otherCols means this column alone must be unique. */
@@ -125,14 +129,18 @@ function q(name: string): string {
   return `"${name}"`;
 }
 
-/** Dedupe FK metadata by (table, column). A column CAN be referenced by more
- *  than one FK constraint in Postgres; we keep this helper defensively even
- *  after QUA-569 reconciled the last known duplicate (page_citations.resource_id
- *  was the historical case — migration 0193 dropped its duplicate pair). */
+/** Dedupe FK metadata by (table, column, targetColumn). A column CAN be
+ *  referenced by more than one FK constraint in Postgres; we keep this helper
+ *  defensively even after QUA-569 reconciled the last known duplicate
+ *  (page_citations.resource_id was the historical case — migration 0193
+ *  dropped its duplicate pair). The targetColumn part of the key is defensive
+ *  for the unusual case where a single (table, column) has FKs pointing at
+ *  both resources.id and resources.stable_id simultaneously — keep both so
+ *  the merge rewrites whichever values are actually stored. */
 export function dedupeFkColumns(fks: FkColumnInfo[]): FkColumnInfo[] {
   const seen = new Map<string, FkColumnInfo>();
   for (const f of fks) {
-    const key = `${f.tableName}.${f.columnName}`;
+    const key = `${f.tableName}.${f.columnName}:${f.targetColumn}`;
     if (!seen.has(key)) seen.set(key, f);
   }
   return [...seen.values()];
@@ -143,8 +151,17 @@ export function dedupeFkColumns(fks: FkColumnInfo[]): FkColumnInfo[] {
 // ---------------------------------------------------------------------------
 
 export async function loadResourceFks(sql: Sql): Promise<FkColumnInfo[]> {
-  const fkRows = await sql<{ table_name: string; column_name: string }[]>`
-    SELECT DISTINCT tc.table_name, kcu.column_name
+  // QUA-589: include both resources.id and resources.stable_id as valid FK
+  // targets. QUA-549 Phase B has swapped most FKs from id → stable_id;
+  // restricting discovery to id silently dropped migrated tables off the
+  // dedup sweep (CASCADE still cleaned them on resource delete, but the
+  // FK-rewrite-to-canonical path no longer fired).
+  const fkRows = await sql<{
+    table_name: string;
+    column_name: string;
+    target_column: string;
+  }[]>`
+    SELECT DISTINCT tc.table_name, kcu.column_name, ccu.column_name AS target_column
     FROM information_schema.table_constraints tc
     JOIN information_schema.key_column_usage kcu
       ON tc.constraint_name = kcu.constraint_name
@@ -154,9 +171,9 @@ export async function loadResourceFks(sql: Sql): Promise<FkColumnInfo[]> {
       AND tc.table_schema = ccu.table_schema
     WHERE tc.constraint_type = 'FOREIGN KEY'
       AND ccu.table_name = 'resources'
-      AND ccu.column_name = 'id'
+      AND ccu.column_name IN ('id', 'stable_id')
       AND tc.table_schema = 'public'
-    ORDER BY tc.table_name, kcu.column_name
+    ORDER BY tc.table_name, kcu.column_name, ccu.column_name
   `;
   if (fkRows.length === 0) return [];
 
@@ -186,7 +203,21 @@ export async function loadResourceFks(sql: Sql): Promise<FkColumnInfo[]> {
     const uniqueGroups = uniques
       .filter((u) => u.columns.includes(fk.column_name))
       .map((u) => ({ otherCols: u.columns.filter((c) => c !== fk.column_name) }));
-    return { tableName: fk.table_name, columnName: fk.column_name, uniqueGroups };
+    if (fk.target_column !== "id" && fk.target_column !== "stable_id") {
+      // Defensive: the SQL filter restricts to ('id', 'stable_id'), so this
+      // branch is unreachable. Throw rather than silently mis-categorize a
+      // future FK target we haven't taught mergeCluster how to translate.
+      throw new Error(
+        `loadResourceFks: unexpected FK target resources.${fk.target_column} ` +
+          `on ${fk.table_name}.${fk.column_name}`,
+      );
+    }
+    return {
+      tableName: fk.table_name,
+      columnName: fk.column_name,
+      targetColumn: fk.target_column,
+      uniqueGroups,
+    };
   });
 }
 
@@ -201,19 +232,33 @@ export async function buildReport(
   // QUA-623: cap with a +1 sentinel so the caller can tell the scan was
   // partial. Dedup apply=true should refuse to run on a truncated report —
   // clusters past the cutoff would silently survive.
-  const rows = await sql<{ id: string; url: string; created_at: string }[]>`
-    SELECT id, url, created_at::text AS created_at FROM resources
+  // QUA-589: pull `stable_id` in the same scan so the FK refCount loop
+  // below can translate id↔stable_id without a second round-trip.
+  const rows = await sql<
+    { id: string; stable_id: string | null; url: string; created_at: string }[]
+  >`
+    SELECT id, stable_id, url, created_at::text AS created_at FROM resources
     LIMIT ${scanCap + 1}
   `;
   const { items: scanned, truncated } = applyTruncation(rows, scanCap);
 
   type Row = { id: string; url: string; createdAt: string };
   const groups = new Map<string, Row[]>();
+  // QUA-589: id↔stable_id translation maps. NULL stable_id rows are
+  // silently absent — they can't be referenced by any stable_id-targeting
+  // FK (the FK requires a target value), so their refCount under those
+  // FKs is genuinely 0. Phase A (QUA-536) made stable_id NOT NULL in prod.
+  const idToStable = new Map<string, string>();
+  const stableToId = new Map<string, string>();
   for (const r of scanned) {
     const key = dedupKey(r.url);
     const list = groups.get(key);
     if (list) list.push({ id: r.id, url: r.url, createdAt: r.created_at });
     else groups.set(key, [{ id: r.id, url: r.url, createdAt: r.created_at }]);
+    if (r.stable_id) {
+      idToStable.set(r.id, r.stable_id);
+      stableToId.set(r.stable_id, r.id);
+    }
   }
 
   const candidateIds = new Set<string>();
@@ -224,16 +269,30 @@ export async function buildReport(
   const refCounts = new Map<string, number>();
   if (candidateIds.size > 0) {
     const idsArr = [...candidateIds];
+
     for (const fk of uniqueCols) {
+      const isStable = fk.targetColumn === "stable_id";
+      const valueSet = isStable
+        ? idsArr
+            .map((id) => idToStable.get(id))
+            .filter((v): v is string => v !== undefined)
+        : idsArr;
+      if (valueSet.length === 0) continue;
+
       const results = await sql.unsafe<{ id: string; c: number | string }[]>(
         `SELECT ${q(fk.columnName)} AS id, COUNT(*)::int AS c
          FROM ${q(fk.tableName)}
          WHERE ${q(fk.columnName)} = ANY($1::text[])
          GROUP BY ${q(fk.columnName)}`,
-        [idsArr]
+        [valueSet]
       );
       for (const row of results) {
-        refCounts.set(row.id, (refCounts.get(row.id) ?? 0) + Number(row.c));
+        const resourceId = isStable ? stableToId.get(row.id) : row.id;
+        if (!resourceId) continue;
+        refCounts.set(
+          resourceId,
+          (refCounts.get(resourceId) ?? 0) + Number(row.c)
+        );
       }
     }
   }
@@ -289,9 +348,49 @@ export async function mergeCluster(
   const uniqueCols = dedupeFkColumns(fkColumns);
   const allIds = [canonicalId, ...duplicateIds];
 
+  // QUA-589: Phase B FKs target resources.stable_id, not resources.id.
+  // Pre-resolve (id → stable_id) for the cluster so per-FK SQL can use the
+  // right value type. Fail loudly if any clustered resource is missing a
+  // stable_id — silently skipping a stable_id-targeting FK would leave
+  // orphan child rows pointing at the about-to-be-deleted duplicate.
+  const needsStable = uniqueCols.some((f) => f.targetColumn === "stable_id");
+  const idToStable = new Map<string, string>();
+  if (needsStable) {
+    const mapRows = await tx<{ id: string; stable_id: string | null }[]>`
+      SELECT id, stable_id FROM resources WHERE id = ANY(${allIds})
+    `;
+    for (const r of mapRows) {
+      if (r.stable_id) idToStable.set(r.id, r.stable_id);
+    }
+    const missing = allIds.filter((id) => !idToStable.has(id));
+    if (missing.length > 0) {
+      throw new Error(
+        `mergeCluster: ${missing.length} clustered resource(s) have NULL stable_id ` +
+          `(${missing.join(", ")}); cannot rewrite stable_id-targeting FKs. ` +
+          `Backfill resources.stable_id (see migration 0184_qua_536) before retrying.`,
+      );
+    }
+  }
+
   for (const fk of uniqueCols) {
+    // fkUpdates is keyed by (table, column), not by (table, column, target).
+    // In the rare degenerate case where a single column has FKs to BOTH
+    // resources.id AND resources.stable_id (dedupeFkColumns triple-key
+    // keeps both FK entries so each gets its own UPDATE/DELETE pass), the
+    // counters here aggregate across the two passes. Aggregation is the
+    // right report semantics — "we moved N rows on column X" is the user-
+    // facing question, regardless of which FK constraint enforced it.
     const key = `${fk.tableName}.${fk.columnName}`;
-    fkUpdates[key] = { moved: 0, deletedOnConflict: 0 };
+    fkUpdates[key] = fkUpdates[key] ?? { moved: 0, deletedOnConflict: 0 };
+
+    const isStable = fk.targetColumn === "stable_id";
+    const canonValue = isStable ? idToStable.get(canonicalId)! : canonicalId;
+    const allValues = isStable
+      ? allIds.map((id) => idToStable.get(id)!)
+      : allIds;
+    const dupValues = isStable
+      ? duplicateIds.map((id) => idToStable.get(id)!)
+      : duplicateIds;
 
     // For each unique constraint involving this column, delete cluster rows
     // that would collide with canonical's existing rows post-UPDATE. Prefer
@@ -317,8 +416,8 @@ export async function mergeCluster(
         RETURNING 1
       `;
       const deleted = await tx.unsafe<unknown[]>(deleteSql, [
-        canonicalId,
-        allIds,
+        canonValue,
+        allValues,
       ]);
       fkUpdates[key].deletedOnConflict += deleted.length;
     }
@@ -330,8 +429,8 @@ export async function mergeCluster(
       RETURNING 1
     `;
     const moved = await tx.unsafe<unknown[]>(updateSql, [
-      canonicalId,
-      duplicateIds,
+      canonValue,
+      dupValues,
     ]);
     fkUpdates[key].moved += moved.length;
   }

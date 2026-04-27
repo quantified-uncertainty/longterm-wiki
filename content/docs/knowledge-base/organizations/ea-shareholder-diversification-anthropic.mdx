@@ -17,7 +17,7 @@ todos:
   - Update with post-IPO diversification data when IPO occurs
   - Research legal constraints on coordinated shareholder action
 ---
-import {EntityLink, SquiggleEstimate} from '@components/wiki';
+import {EntityLink, Mermaid} from '@components/wiki';
 
 :::note[Page Scope]
 This page analyzes diversification strategies for EA-aligned Anthropic shareholders. For the underlying capital estimates, see <EntityLink id="E406" name="anthropic-investors">Anthropic (Funder)</EntityLink>. For IPO timeline, see <EntityLink id="E409" name="anthropic-ipo">Anthropic IPO</EntityLink>. For pre-IPO DAF transfer mechanics, see <EntityLink id="E412" name="anthropic-pre-ipo-daf-transfers">Anthropic Pre-IPO DAF Transfers</EntityLink>. For interventions targeting founder pledge fulfillment, see <EntityLink id="E411" name="anthropic-pledge-enforcement">Anthropic Founder Pledge Interventions</EntityLink>.
@@ -61,22 +61,6 @@ No prudent financial strategy would hold 95%+ of *expected future capital* in a 
 ### Why This Is Dangerous
 
 **Single-point-of-failure risk.** If Anthropic's valuation drops 80%—comparable to historical tech corrections like WeWork, Snap's 2022 decline, or the 2000 dot-com bust—\$20-60B in expected EA capital evaporates. The remaining \$5-15B would still be significant but represents a fundamentally different philanthropic future than the \$27-76B base case.
-
-<SquiggleEstimate title="EA Capital Loss Under Valuation Decline" code={`
-// Current risk-adjusted EA capital
-baseCapital = 27e9 to 76e9
-
-// Valuation decline scenarios
-decline = mixture(
-  0.2 to 0.4,     // mild correction (20-40%)
-  0.5 to 0.7,     // moderate correction (50-70%)
-  0.8 to 0.95,    // severe correction (80-95%)
-  [0.5, 0.35, 0.15]
-)
-
-capitalLost = baseCapital * decline
-capitalLost
-`} />
 
 **Liquidity risk.** All this capital is illiquid until an IPO, which prediction markets place at a median of June 2027. [Manifold Markets](https://manifold.markets/search?q=anthropic%20ipo) If the IPO is delayed to 2029-2030, capital remains locked for 3-4 additional years during a critical window for AI governance.
 

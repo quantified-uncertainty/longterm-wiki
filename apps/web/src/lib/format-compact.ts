@@ -69,6 +69,30 @@ export function formatCompactNumber(n: number | null | undefined): string {
   return n.toLocaleString();
 }
 
+/**
+ * Rewrite bare 10+ digit runs inside a display string as compact numbers
+ * (`"Revenue: 1700000000"` → `"Revenue: 1.7B"`).
+ *
+ * Boundaries are tuned so embedded digit runs stay untouched:
+ *   - Look-behind blocks letters, digits, underscores, and `.` so hashes
+ *     (`abc1234567890def`) and decimals (`0.1700000000`, `2.1700000000`)
+ *     are skipped.
+ *   - Look-ahead blocks letters, digits, and `.<digit>` so decimals like
+ *     `"1700000000.5"` stay intact while a sentence-ending `"1700000000. "`
+ *     still matches. `-`, `$`, `:`, and whitespace stay unblocked so
+ *     signed / currency-prefixed / `Label: N` strings format as expected.
+ */
+export function sanitizeRawLargeNumbers(s: string): string {
+  return s.replace(
+    /(?<![a-zA-Z_\d.])(\d{10,})(?![a-zA-Z\d]|\.\d)/g,
+    (m) => {
+      const n = Number(m);
+      if (!Number.isFinite(n) || Math.abs(n) < 1000) return m;
+      return formatCompactNumber(n);
+    },
+  );
+}
+
 /** Return href only if it is a safe HTTP(S) URL; otherwise "#". Prevents XSS via javascript: URIs. */
 export function safeHref(url: string): string {
   return /^https?:\/\//i.test(url) ? url : "#";

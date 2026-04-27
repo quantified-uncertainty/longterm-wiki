@@ -162,12 +162,19 @@ describe('fetchJsonWithRetry', () => {
 
 describe('fetchRecordVerdicts — QUA-421 strict-mode behavior (QUA-448: no env-var override)', () => {
   const originalServerUrl = process.env.LONGTERMWIKI_SERVER_URL;
+  const originalProdServerUrl = process.env.PROD_LONGTERMWIKI_SERVER_URL;
+  const originalWikiServerEnv = process.env.WIKI_SERVER_ENV;
   const originalCi = process.env.CI;
   const originalStrict = process.env.STRICT_VERDICTS;
   const noSleep = async () => {};
 
   beforeEach(() => {
     process.env.LONGTERMWIKI_SERVER_URL = 'http://fake-server';
+    // Disable QUA-747 slot-CWD auto-detect so tests are hermetic when run
+    // from inside an a<N> slot. Also clear PROD_ vars in case they're set
+    // from .env so getServerUrl() doesn't fall through to them.
+    process.env.WIKI_SERVER_ENV = 'local';
+    delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
     delete process.env.CI;
     delete process.env.STRICT_VERDICTS;
     setFullBuildMode(false);
@@ -178,6 +185,16 @@ describe('fetchRecordVerdicts — QUA-421 strict-mode behavior (QUA-448: no env-
       process.env.LONGTERMWIKI_SERVER_URL = originalServerUrl;
     } else {
       delete process.env.LONGTERMWIKI_SERVER_URL;
+    }
+    if (originalProdServerUrl !== undefined) {
+      process.env.PROD_LONGTERMWIKI_SERVER_URL = originalProdServerUrl;
+    } else {
+      delete process.env.PROD_LONGTERMWIKI_SERVER_URL;
+    }
+    if (originalWikiServerEnv !== undefined) {
+      process.env.WIKI_SERVER_ENV = originalWikiServerEnv;
+    } else {
+      delete process.env.WIKI_SERVER_ENV;
     }
     if (originalCi !== undefined) {
       process.env.CI = originalCi;

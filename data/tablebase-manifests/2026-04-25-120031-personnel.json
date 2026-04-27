@@ -1,0 +1,108 @@
+{
+  "table": "personnel",
+  "recordCount": 9,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-25T12:00:31.126Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 9,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "fTD0mTLLmn",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "EAGx Senior Coordinator",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. EAGx coordinates community-run EA Global x events.",
+      "id": "Snt7rQGOo9",
+      "verdict": "none"
+    },
+    {
+      "personId": "vqin3wfpIT",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "Events Associate",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13.",
+      "id": "WaEA5BF870",
+      "verdict": "none"
+    },
+    {
+      "personId": "8iqPmRl7td",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "EAGx Coordinator",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. EAGx coordinates community-run EA Global x events.",
+      "id": "vlCxP5Cgfp",
+      "verdict": "none"
+    },
+    {
+      "personId": "BKqxQ4MNmA",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "AI Events Senior Associate",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. Part of the AI Events line of conferences.",
+      "id": "BKsghUGTVJ",
+      "verdict": "none"
+    },
+    {
+      "personId": "MWdr41VO10",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "EAGx Coordinator",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. EAGx coordinates community-run EA Global x events.",
+      "id": "qMbzVYREah",
+      "verdict": "none"
+    },
+    {
+      "personId": "IoXNnWOpRK",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "Project Manager, AI Events",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. Part of the AI Events line of conferences.",
+      "id": "qYjARhn0WX",
+      "verdict": "none"
+    },
+    {
+      "personId": "npD0y6FIac",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "EAGx Program Lead",
+      "roleType": "key-person",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. Leads EAGx community-run events program.",
+      "id": "Cm40fz6vRz",
+      "verdict": "none"
+    },
+    {
+      "personId": "ikgC07z9Op",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "Senior Events Associate",
+      "roleType": "career",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13.",
+      "id": "BfdgzzycxJ",
+      "verdict": "none"
+    },
+    {
+      "personId": "nJwompN7T6",
+      "organizationId": "sid_k4IPgRP98A",
+      "role": "AI Events Program Lead",
+      "roleType": "key-person",
+      "source": "https://www.centreforeffectivealtruism.org/team",
+      "notes": "Listed on CEA team page (Events team) as of 2026-03-13. Leads the AI Events line of conferences.",
+      "id": "dAUY3JlItx",
+      "verdict": "none"
+    }
+  ]
+}

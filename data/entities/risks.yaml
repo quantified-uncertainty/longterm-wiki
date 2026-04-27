@@ -2468,3 +2468,32 @@
     - epistemic
     - governance
   lastUpdated: 2026-03
+
+- id: catastrophic-cyber-tail-risk
+  stableId: sid_6vupR53LHg
+  wikiId: E2519
+  type: risk
+  summaryPage: structural-overview
+  title: Catastrophic Cyber Tail Risk
+  severity: high
+  likelihood:
+    level: low
+    status: theoretical
+  timeframe:
+    median: 2030
+    earliest: 2025
+    latest: 2040
+  description: >-
+    Catalog of systemic single points of failure in cyber infrastructure that could plausibly
+    produce >$1T damage events. Treats which catastrophic cyber scenarios are reachable
+    (payment systems, hyperscaler cloud, industrial control systems) and which are bounded
+    by structural features of the affected systems. Concludes that ordinary cyber damage
+    extrapolation cannot reach 10% of GDP without a cascading single-event failure in a
+    universally-depended-on system.
+  tags:
+    - tail-risk
+    - cyber
+    - cascade
+    - critical-infrastructure
+    - systemic
+  lastUpdated: 2026-04

@@ -35,10 +35,21 @@
  *   1 = One or more checks failed
  */
 
-import { execSync, spawn, type ChildProcess } from 'child_process';
+import { execSync, execFileSync, spawn, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join } from 'path';
+import { join, resolve } from 'path';
+import { config as dotenvConfig } from 'dotenv';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
+
+// Load .env so child validators inherit PROD_LONGTERMWIKI_SERVER_URL etc.
+// Without this, validators that fetch from wiki-server fall back to the local
+// snapshot (often stale), which manifests as gate-baseline-drift between
+// local and CI. See QUA-755.
+dotenvConfig({
+  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  quiet: true,
+  override: false,
+});
 import { getColors } from '../lib/output.ts';
 import { categorizeFiles, canSkipBuildData, triageGateChecks, type TriageResult } from './gate-triage.ts';
 import { isServerAvailable } from '../lib/wiki-server/client.ts';
@@ -116,7 +127,7 @@ function getChangedFiles(): string[] {
       const base = execSync('git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main 2>/dev/null',
         { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
       if (base) {
-        diffOutput = execSync(`git diff --name-only ${base} HEAD`,
+        diffOutput = execFileSync('git', ['diff', '--name-only', base, 'HEAD'],
           { cwd: PROJECT_ROOT, encoding: 'utf-8' }).trim();
       }
     } catch {
@@ -390,6 +401,23 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'third-party-eval-refs',
+    name: 'third_party_evaluations vocab arrays match route ↔ migration (QUA-692)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-third-party-eval-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: a vocab drift between the Zod schema in the route and the
+    // CHECK constraint in the migration shows up at sync time as a 500
+    // error from PG. Static-checkable, so we keep it cheap and CI-blocking.
+  },
+  {
+    id: 'things-denorm-dead',
+    name: 'No writes/reads of dropped things.title/description/parent_title (QUA-507)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-things-denorm-dead.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'factbase-fact-unit-field',
     name: 'FactBase facts use `currency:` not `unit:` (loader drops stray unit fields)',
     command: 'npx',
@@ -510,6 +538,44 @@ const PARALLEL_STEPS: Step[] = [
     // gracefully when the server is unavailable (fail-open). Promotes to
     // blocking once orphan entities are consistently zero.
     advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'scorecard-refs',
+    name: 'Scorecard data integrity (is_latest invariant + entity refs)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-scorecard-refs.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory: requires the wiki-server (scorecard tables live only in PG).
+    // Skips silently when offline. QUA-688 — will promote to blocking once
+    // ingesters land and the data baseline stabilizes.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'framework-thresholds',
+    name: 'Framework capability threshold integrity (source_quote verified or human-reviewed)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-framework-thresholds.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking (QUA-711): every published threshold must have either
+    // extraction_confidence ≥ 0.7 (verifyExcerpt round-trip succeeded at
+    // extract time) or human_reviewed=true with non-empty human_review_notes.
+    // No-ops while no rows are published yet. Requires wiki-server.
+    requiresServer: true,
+    emitOutputInCi: true,
+  },
+  {
+    id: 'framework-versions',
+    name: 'Framework version archival integrity (wayback_snapshot_url or notes)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-framework-versions.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking (QUA-711): every published safety_framework_versions row must
+    // have either wayback_snapshot_url populated or notes flagging Wayback
+    // skipped. No-ops while no rows are published yet. Requires wiki-server.
     requiresServer: true,
     emitOutputInCi: true,
   },
@@ -715,6 +781,30 @@ const PARALLEL_STEPS: Step[] = [
     // Blocking: sid_ stableIds must never appear in display positions in
     // built data files (database.json, factbase-data.json). This is the
     // last line of defense — catches the symptom regardless of cause.
+  },
+  {
+    id: 'aiid-no-report-text',
+    name: 'AIID ingest does not persist CC-BY-SA-excluded report bodies',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-aiid-no-report-text.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: MIT AI Incident Database snapshots are CC-BY-SA 4.0 except
+    // `submissions` and `reports.text`/`reports.plain_text`. This validator
+    // greps the AIID ingest + schema paths for symptoms of re-introducing
+    // those fields. QUA-693.
+  },
+  {
+    id: 'benchmark-result-provenance',
+    name: 'Benchmark result provenance (tested_by + source_url)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-benchmark-result-provenance.ts'],
+    cwd: PROJECT_ROOT,
+    // Advisory until Phase 2 ingesters have populated tested_by + source_url
+    // for the bulk of rows (target: one week clean before promoting to
+    // blocking). Surfaces verifiability gaps without wedging current PRs.
+    advisory: true,
+    requiresServer: true,
+    emitOutputInCi: true,
   },
 ];
 

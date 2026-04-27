@@ -15,6 +15,7 @@ import { generateId } from "../lib/grant-import/id.ts";
 import { getServerUrl } from "../lib/wiki-server/client.ts";
 import { deleteDivisionsBatch, syncDivisions } from "../lib/wiki-server/divisions.ts";
 import { ORG_IDS } from "../lib/grant-import/constants.ts";
+import { fetchInlineSourcing, type InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 // ---------------------------------------------------------------------------
 // Division type (matches wiki-server SyncDivisionItemSchema)
@@ -757,6 +758,7 @@ interface SyncDivision {
   endDate: string | null;
   source: string | null;
   notes: string | null;
+  sourcing?: InlineSourcing;
 }
 
 function toSyncDivision(def: DivisionDef): SyncDivision {
@@ -841,12 +843,39 @@ async function cmdSync(
     );
   }
 
+  // Server requires inline sourcing for divisions; missing verdicts show as
+  // [unsourced] badges so dry-run surfaces the problem before the real sync.
+  const forceSkipSourcing = !!options?.forceSkipSourcing;
+  let attached = 0;
+  if (!forceSkipSourcing) {
+    const sourcingByRecordId = await fetchInlineSourcing("division");
+    for (const item of items) {
+      const sourcing = sourcingByRecordId.get(item.id);
+      if (sourcing) {
+        item.sourcing = sourcing;
+        attached++;
+      }
+    }
+  }
+
   console.log(`\nSyncing ${items.length} divisions to ${serverUrl}...`);
+  if (forceSkipSourcing) {
+    console.log(
+      `  Sourcing: skipped (--force-skip-sourcing, reason: ${options?.forceSkipSourcingReason ?? "unspecified"})`,
+    );
+  } else {
+    const unsourced = items.length - attached;
+    const warning = unsourced > 0
+      ? ` (${unsourced} unsourced — server will reject unless you run \`pnpm crux tb verify-orchestrate divisions\` first)`
+      : "";
+    console.log(`  Sourcing: ${attached}/${items.length} records have verdicts${warning}`);
+  }
 
   if (dryRun) {
     console.log("  (dry run -- no data written)");
     for (const d of items) {
-      console.log(`  ${d.id}  ${d.name} [${d.divisionType}]`);
+      const badge = d.sourcing ? `[${d.sourcing.verdict}]` : "[unsourced]";
+      console.log(`  ${d.id}  ${d.name} [${d.divisionType}] ${badge}`);
     }
     return;
   }

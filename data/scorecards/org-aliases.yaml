@@ -1,0 +1,43 @@
+# Hand-curated org-name → entity slug overrides for scorecard ingesters
+# (QUA-698). Used when the entity matcher (database.json titles + aliases
+# + suffix normalization) fails to resolve a name a scorecard publisher uses.
+#
+# Lookup order in `resolveOrg()`:
+#   1. exact match in this file (case-insensitive on the key)
+#   2. exact match against entity title or alias in database.json
+#   3. normalized match (strip Inc./Ltd./Corp./LLC suffix etc.)
+#   4. return null — caller hard-fails the sync (analyze prints + exits 1)
+#
+# Keys are the org name as the SOURCE publishes it.
+# Values are the entity slug (matches entities.id in database.json).
+#
+# Prefer adding to the entity's YAML `aliases:` block in `data/entities/`
+# instead — that surfaces the alias everywhere, not just to the scorecard
+# pipeline. Use this file only when:
+#   - The alias is truly scorecard-specific and shouldn't appear elsewhere
+#   - The org doesn't have its own entity yet (rare; create the entity)
+#
+# Most common cases (suffix variants like "Anthropic PBC", "OpenAI Inc.",
+# "Mistral AI" with the trailing "AI") are already handled by the matcher
+# via existing entity aliases or normalization — verify with
+# `pnpm crux tb import-scorecards analyze --source=<key>` before adding
+# an override here.
+
+overrides:
+  # AI Lab Watch occasionally writes "lab" as a suffix on headers. Direct
+  # override since this isn't useful as a real alias on the entity.
+  "Anthropic (lab)": anthropic
+  "OpenAI (lab)": openai
+  "DeepMind (lab)": deepmind
+
+  # AI Lab Watch (QUA-751) grades the parent company "Meta", but our
+  # frontier-lab entity is `meta-ai` (Meta AI / FAIR). Bare "Meta" is too
+  # generic to add as a real alias on the entity (would collide with
+  # entities like meta-atep, meta-california-pac), so override here only.
+  "Meta": meta-ai
+
+  # Examples — uncomment + edit when you encounter unresolved names in
+  # `analyze` output. Always check `data/entities/organizations.yaml` to
+  # confirm the slug exists before committing.
+  #
+  #   "Some Display Name From Source": entity-slug

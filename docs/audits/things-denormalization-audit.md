@@ -4,6 +4,10 @@
 **Deliverable type**: audit-only (no code changes)
 **Author**: Claude Code (slot a6), 2026-04-13
 
+> **Status (2026-04-24)**: **RESOLVED.** Phase 4b-B.2c ([QUA-507](https://linear.app/quantifieduncertainty/issue/QUA-507)) dropped `things.title` / `things.description` / `things.parent_title` in migration 0204 and converted `upsertThingsInTx` to pointer-only. Display fields now live exclusively in the `things_search` materialized view (see migration 0190). The 22 write sites collapse to a single pointer-only writer. A gate validator (`validate-things-denorm-dead`) blocks reintroduction.
+>
+> This document is retained for historical reference — to understand which composer logic lived in which handler pre-QUA-507 (useful if the MV's per-thing_type composition ever needs to change).
+
 ## Purpose
 
 Enumerate every denormalized / derived column on the `things` table, every write site, and every consumer, so Phase 4b-B can safely replace write-time denormalization with read-time resolution.

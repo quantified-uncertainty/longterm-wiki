@@ -45,7 +45,7 @@ export interface ContentMetrics {
   structuralScoreNormalized: number;
   /** Content format used for scoring. */
   contentFormat?: ContentFormat;
-  /** Per-type visual counts (mermaid, squiggle, cause-effect, etc.) */
+  /** Per-type visual counts (mermaid, cause-effect, etc.) */
   visualCounts?: VisualCounts;
 }
 

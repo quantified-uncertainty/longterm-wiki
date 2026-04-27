@@ -53,7 +53,6 @@ export const MARKUP_DETECTORS: Array<{ pattern: RegExp; label: string }> = [
   { pattern: /<F\s+/, label: 'F-tag' },
   { pattern: /<R\s+id="/, label: 'R-tag' },
   { pattern: /<Calc>/, label: 'Calc' },
-  { pattern: /<SquiggleEstimate\b/, label: 'SquiggleEstimate' },
   { pattern: /\{\/\*/, label: 'MDX-comment' },
   { pattern: /\{#\w/, label: 'MDX-expression' },
   { pattern: /\\\$/, label: 'escaped-dollar' },

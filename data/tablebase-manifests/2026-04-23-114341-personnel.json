@@ -1,0 +1,50 @@
+{
+  "table": "personnel",
+  "recordCount": 4,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-23T11:43:41.003Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 4,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "id": "h7Y4Dbj3I5",
+      "personId": "fptv1LEZ59",
+      "organizationId": "sid_p2h6bEqhvQ",
+      "role": "Co-Chair, Steering Committee",
+      "source": "https://www.joannashields.com/government-service",
+      "verdict": "none"
+    },
+    {
+      "id": "EAJCjFAvaH",
+      "personId": "znMHshnTDG",
+      "organizationId": "sid_p2h6bEqhvQ",
+      "role": "Co-Chair, Steering Committee",
+      "source": "https://magazine.gpai.paris/en/interview-of-yoichi-iida-incoming-co-chair-of-the-steering-committee/",
+      "verdict": "none"
+    },
+    {
+      "id": "B90gBrDqmL",
+      "personId": "dMqRli7Hyl",
+      "organizationId": "sid_p2h6bEqhvQ",
+      "role": "Chair, Multi-Stakeholder Expert Group (MEG) Plenary",
+      "source": "https://www.gettyimages.com/detail/news-photo/inma-martinez-gpai-amandeep-singh-gill-secretary-generals-news-photo/1756897288",
+      "verdict": "none"
+    },
+    {
+      "id": "9UnghqmgXW",
+      "personId": "UwCnnK5Nd7",
+      "organizationId": "sid_p2h6bEqhvQ",
+      "role": "Head of Secretariat",
+      "source": "https://intgovforum.org/en/content/igf-2023-day-3-open-forum-111-gpai-a-multistakeholder-initiative-on-trustworthy-ai-raw",
+      "verdict": "none"
+    }
+  ]
+}

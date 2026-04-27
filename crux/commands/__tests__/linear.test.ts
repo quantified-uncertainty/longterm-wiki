@@ -10,6 +10,7 @@ import { describe, it, expect, beforeEach, vi } from 'vitest';
 const {
   getIssueMock,
   getCommentsMock,
+  updateIssueMock,
   updateIssueStateMock,
   commentOnIssueMock,
   searchIssuesMock,
@@ -24,6 +25,7 @@ const {
 } = vi.hoisted(() => ({
   getIssueMock: vi.fn(),
   getCommentsMock: vi.fn(),
+  updateIssueMock: vi.fn(),
   updateIssueStateMock: vi.fn(),
   commentOnIssueMock: vi.fn(),
   searchIssuesMock: vi.fn(),
@@ -45,6 +47,7 @@ const {
 vi.mock('../../lib/linear/issues.ts', () => ({
   getIssue: getIssueMock,
   getComments: getCommentsMock,
+  updateIssue: updateIssueMock,
   updateIssueState: updateIssueStateMock,
   commentOnIssue: commentOnIssueMock,
   searchIssues: searchIssuesMock,
@@ -111,6 +114,7 @@ beforeEach(() => {
   // and leaves queued `mockResolvedValueOnce` values intact. Without this,
   // a test that queues a Once value without consuming it will poison the
   // next test's mock queue.
+  getIssueMock.mockReset();
   getCommentsMock.mockReset();
   githubApiMock.mockReset();
   // Default: dedup checks find nothing. Individual tests override.
@@ -306,6 +310,393 @@ describe('linear create', () => {
       parentId: 'parent-uuid',
       projectId: 'project-uuid',
     });
+  });
+
+  // ── QUA-516: parent-project inheritance ───────────────────────────────────
+
+  it('inherits the parent project when --project is omitted', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Epic',
+      project: { id: 'inherited-project-uuid', name: 'Data Model Unwind' },
+    });
+    const r = await commands.create(['Child ticket'], {
+      ci: true,
+      parent: 'QUA-408',
+    });
+    expect(r.exitCode).toBe(0);
+    // No getProject lookup needed — the inherited UUID is on the parent.
+    expect(getProjectMock).not.toHaveBeenCalled();
+    expect(createIssueMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        parentId: 'parent-uuid',
+        projectId: 'inherited-project-uuid',
+      }),
+    );
+    expect(r.output).toContain('Data Model Unwind');
+    expect(r.output).toContain('inherited from parent');
+  });
+
+  it('explicit --project overrides parent inheritance', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Epic',
+      project: { id: 'parent-project-uuid', name: 'Parent Project' },
+    });
+    getProjectMock.mockResolvedValueOnce({
+      id: 'override-project-uuid',
+      name: 'Other Project',
+    });
+    const r = await commands.create(['Child'], {
+      ci: true,
+      parent: 'QUA-408',
+      project: 'Other Project',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(getProjectMock).toHaveBeenCalledWith('Other Project');
+    expect(createIssueMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        parentId: 'parent-uuid',
+        projectId: 'override-project-uuid',
+      }),
+    );
+    expect(r.output).toContain('Other Project');
+    expect(r.output).not.toContain('inherited from parent');
+  });
+
+  it('does not set a project when parent has none and --project is omitted', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Epic',
+      project: null,
+    });
+    const r = await commands.create(['Child'], { ci: true, parent: 'QUA-408' });
+    expect(r.exitCode).toBe(0);
+    expect(createIssueMock).toHaveBeenCalledWith(
+      expect.objectContaining({
+        parentId: 'parent-uuid',
+        projectId: undefined,
+      }),
+    );
+    expect(r.output).not.toContain('inherited from parent');
+  });
+
+  // ── Ticket-sizing red flags (QUA-575) ────────────────────────────────────
+
+  it('refuses creation with exit=2 when title contains red-flag tokens', async () => {
+    const r = await commands.create(['Phase 2: closeout'], { ci: true });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('phase-or-wave');
+    expect(r.output).toContain('--allow-big');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses creation when description contains red-flag tokens', async () => {
+    const r = await commands.create(['Update tooling'], {
+      ci: true,
+      description: 'We need to migrate 5,000 facts into the new schema.',
+    });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('row-count-batching');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('does not warn on ordinary tickets', async () => {
+    const r = await commands.create(['Fix typo in README'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).not.toContain('red flag');
+    expect(createIssueMock).toHaveBeenCalled();
+  });
+
+  it('proceeds when --allow-big is set despite red flags', async () => {
+    // Capture stderr so the test environment doesn't print the warning.
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(
+        ['Phase 2: migrate 5,000 rows across `foo`, `bar`, `baz`'],
+        { ci: true, allowBig: true },
+      );
+      expect(r.exitCode).toBe(0);
+      expect(createIssueMock).toHaveBeenCalled();
+      // Warning was printed to stderr (not stdout) so --json consumers don't see it.
+      expect(stderrSpy).toHaveBeenCalled();
+      const stderrContent = stderrSpy.mock.calls.map((c) => String(c[0])).join('');
+      expect(stderrContent).toContain('phase-or-wave');
+      expect(stderrContent).toContain('row-count-batching');
+      expect(stderrContent).toContain('multi-table-enumeration');
+    } finally {
+      stderrSpy.mockRestore();
+    }
+  });
+
+  it('detects all three flags from the canonical example', async () => {
+    const r = await commands.create(
+      ['Phase 2: migrate 5,000 rows across `foo`, `bar`, `baz`'],
+      { ci: true },
+    );
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('phase-or-wave');
+    expect(r.output).toContain('row-count-batching');
+    expect(r.output).toContain('multi-table-enumeration');
+  });
+
+  it('emits structured JSON on red-flag refusal when --json is set', async () => {
+    const r = await commands.create(['Phase 2: closeout'], {
+      ci: true,
+      json: true,
+    });
+    expect(r.exitCode).toBe(2);
+    // Output must be valid JSON — no ANSI color codes, no warning text.
+    const parsed = JSON.parse(r.output);
+    expect(parsed.error).toBe('ticket-sizing-red-flag');
+    expect(Array.isArray(parsed.flags)).toBe(true);
+    expect(parsed.flags[0].kind).toBe('phase-or-wave');
+    expect(parsed.hint).toContain('--allow-big');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// update — QUA-516
+// ---------------------------------------------------------------------------
+
+describe('linear update', () => {
+  beforeEach(() => {
+    updateIssueMock.mockResolvedValue({ identifier: 'QUA-184' });
+  });
+
+  it('prints usage when no ID is given', async () => {
+    const r = await commands.update([], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Usage');
+  });
+
+  it('prints not-found when the issue does not exist', async () => {
+    getIssueMock.mockResolvedValueOnce(null);
+    const r = await commands.update(['QUA-9999'], {
+      ci: true,
+      project: 'Some Project',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('not found');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects when no fields are provided', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Nothing to update');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('updates the project by name', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    getProjectMock.mockResolvedValueOnce({
+      id: 'project-uuid',
+      name: 'Data Model Unwind',
+    });
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      project: 'Data Model Unwind',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      projectId: 'project-uuid',
+    });
+    expect(r.output).toContain('Data Model Unwind');
+  });
+
+  it('clears the project with --project=none', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      project: 'none',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(getProjectMock).not.toHaveBeenCalled();
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      projectId: null,
+    });
+    expect(r.output).toContain('cleared');
+  });
+
+  it('fails cleanly when --project does not match a known project', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    getProjectMock.mockResolvedValueOnce(null);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      project: 'Nonexistent',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Project not found');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('updates priority + title in one call', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '2',
+      title: 'Clearer title',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      priority: 2,
+      title: 'Clearer title',
+    });
+  });
+
+  it('rejects an out-of-range priority', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '99',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid priority');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('clears the parent with --parent=none', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: 'none',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      parentId: null,
+    });
+  });
+
+  it('resolves --parent QUA-NNN to the parent UUID', async () => {
+    getIssueMock
+      .mockResolvedValueOnce(mockIssue) // initial issue lookup
+      .mockResolvedValueOnce({ ...mockIssue, id: 'parent-uuid', identifier: 'QUA-408' }); // parent lookup
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: 'QUA-408',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      parentId: 'parent-uuid',
+    });
+  });
+
+  it('emits JSON when --json is set', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      json: true,
+      priority: '3',
+    });
+    expect(r.exitCode).toBe(0);
+    const parsed = JSON.parse(r.output);
+    expect(parsed.identifier).toBe('QUA-184');
+    expect(parsed.changed).toEqual(['priority=medium']);
+  });
+
+  // ── Bare-flag rejection (boolean coercion guard) ────────────────────────
+
+  it('rejects bare --project (boolean true) instead of crashing', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      // Mimics the CLI parser: `--project` with no value becomes boolean true.
+      project: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--project requires a value');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects bare --parent', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--parent requires a value');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects bare --title', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      title: true as unknown as string,
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--title requires a value');
+  });
+
+  it('rejects empty --title (would clobber the issue title)', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      title: '',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('--title cannot be empty');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('updates description from --description-file', async () => {
+    const { writeFileSync, unlinkSync, mkdtempSync } = await import('fs');
+    const { tmpdir } = await import('os');
+    const { join } = await import('path');
+    const dir = mkdtempSync(join(tmpdir(), 'linear-test-'));
+    const file = join(dir, 'desc.md');
+    writeFileSync(file, '## New body');
+
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      descriptionFile: file,
+    });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueMock).toHaveBeenCalledWith('QUA-184', {
+      description: '## New body',
+    });
+    unlinkSync(file);
+  });
+
+  it('reports failure when parent issue does not exist', async () => {
+    getIssueMock
+      .mockResolvedValueOnce(mockIssue) // initial issue lookup OK
+      .mockResolvedValueOnce(null);     // parent lookup fails
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      parent: 'QUA-9999',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Parent issue not found');
+    expect(updateIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects negative priority', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '-1',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid priority');
+  });
+
+  it('rejects priority above 4', async () => {
+    getIssueMock.mockResolvedValueOnce(mockIssue);
+    const r = await commands.update(['QUA-184'], {
+      ci: true,
+      priority: '5',
+    });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid priority');
   });
 });
 
@@ -593,6 +984,211 @@ describe('linear done', () => {
     expect(r.exitCode).toBe(1);
     expect(r.output).toContain('not found');
     expect(updateIssueStateMock).not.toHaveBeenCalled();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// verify-pr — watchdog for the Linear-webhook miss class (QUA-441)
+// ---------------------------------------------------------------------------
+
+describe('linear verify-pr', () => {
+  function mockPr(overrides: Partial<{ number: number; body: string | null; merged: boolean }> = {}) {
+    githubApiMock.mockResolvedValueOnce({
+      number: overrides.number ?? 4275,
+      title: 'test pr',
+      body: overrides.body ?? null,
+      state: 'closed',
+      merged: overrides.merged ?? true,
+      merged_at: '2026-04-25T00:00:00Z',
+      html_url: `https://github.com/quantified-uncertainty/longterm-wiki/pull/${overrides.number ?? 4275}`,
+    });
+  }
+
+  it('prints usage when no PR number is given', async () => {
+    const r = await commands['verify-pr']([], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Usage');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  it('rejects a non-numeric PR argument', async () => {
+    const r = await commands['verify-pr'](['notanumber'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid PR number');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  // Without strict validation, `parseInt('4275abc')` returns 4275 — a
+  // workflow_dispatch input of "4275; rm -rf /" would silently verify PR
+  // 4275 instead of failing. Strict `^\d+$` is what gates this.
+  it.each([
+    ['4275abc', 'trailing garbage'],
+    ['4275; echo pwned', 'shell injection attempt'],
+    [' 4275', 'leading whitespace'],
+    ['4275 ', 'trailing whitespace'],
+    ['#', 'just a # with no digits'],
+  ])('rejects %s (%s)', async (input, _label) => {
+    const r = await commands['verify-pr']([input], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('Invalid PR number');
+    expect(githubApiMock).not.toHaveBeenCalled();
+  });
+
+  it('accepts a leading "#" on the PR number', async () => {
+    mockPr({ number: 4275, body: 'no fixes here', merged: true });
+    const r = await commands['verify-pr'](['#4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(githubApiMock).toHaveBeenCalledWith('/repos/quantified-uncertainty/longterm-wiki/pulls/4275');
+  });
+
+  it('returns 0 with no-op message when the PR is not merged', async () => {
+    mockPr({ merged: false });
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('not merged');
+    expect(getIssueMock).not.toHaveBeenCalled();
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+  });
+
+  it('returns 0 when the merged PR has no Fixes refs', async () => {
+    mockPr({ body: 'just a refactor — see related #1234', merged: true });
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('no Fixes QUA-NNN refs');
+    expect(getIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('reconciles every Fixes ref on a batched PR (the QUA-441 scenario)', async () => {
+    // Linear's webhook drops 3 of 4 — verify-pr corrects all of them.
+    mockPr({
+      number: 4275,
+      body: 'Fixes QUA-374\nFixes QUA-375\nFixes QUA-376\nFixes QUA-377',
+      merged: true,
+    });
+    const inProgress = (id: string) => ({
+      ...mockIssue,
+      identifier: id,
+      state: { id: 'state-active', name: 'In Review', type: 'started' as const },
+    });
+    getIssueMock
+      .mockResolvedValueOnce(inProgress('QUA-374'))
+      .mockResolvedValueOnce(inProgress('QUA-375'))
+      .mockResolvedValueOnce(inProgress('QUA-376'))
+      .mockResolvedValueOnce(inProgress('QUA-377'));
+    updateIssueStateMock.mockResolvedValue({ identifier: '', state: 'Done' });
+    commentOnIssueMock.mockResolvedValue(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalledTimes(4);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-374', 'Done');
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-377', 'Done');
+    expect(commentOnIssueMock).toHaveBeenCalledTimes(4);
+    // The watchdog comment should reference the PR URL so humans can audit
+    // the reconciliation trail.
+    const firstComment = commentOnIssueMock.mock.calls[0][1];
+    expect(firstComment).toContain('https://github.com/quantified-uncertainty/longterm-wiki/pull/4275');
+    expect(firstComment).toContain('reconciled');
+    expect(r.output).toContain('4 issue(s) corrected');
+  });
+
+  it('respects deliberate non-active states (Backlog / Canceled / Done) — no override', async () => {
+    mockPr({
+      body: 'Fixes QUA-100\nFixes QUA-101\nFixes QUA-102',
+      merged: true,
+    });
+    getIssueMock
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-100', state: { id: 's', name: 'Done', type: 'completed' } })
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-101', state: { id: 's', name: 'Canceled', type: 'canceled' } })
+      .mockResolvedValueOnce({ ...mockIssue, identifier: 'QUA-102', state: { id: 's', name: 'Backlog', type: 'backlog' } });
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).not.toHaveBeenCalled();
+    expect(commentOnIssueMock).not.toHaveBeenCalled();
+    expect(r.output).toContain('not in active state');
+  });
+
+  it('handles a missing-issue ref gracefully and continues to the next', async () => {
+    mockPr({ body: 'Fixes QUA-9999\nFixes QUA-200', merged: true });
+    getIssueMock
+      .mockResolvedValueOnce(null) // QUA-9999 — deleted/never existed
+      .mockResolvedValueOnce({
+        ...mockIssue,
+        identifier: 'QUA-200',
+        state: { id: 's', name: 'In Progress', type: 'started' },
+      });
+    updateIssueStateMock.mockResolvedValueOnce({ identifier: 'QUA-200', state: 'Done' });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).toContain('QUA-9999');
+    expect(r.output).toContain('not found');
+    expect(updateIssueStateMock).toHaveBeenCalledExactlyOnceWith('QUA-200', 'Done');
+  });
+
+  it('exits 1 when a Linear API call fails — surfaces the error to CI', async () => {
+    mockPr({ body: 'Fixes QUA-300', merged: true });
+    getIssueMock.mockRejectedValueOnce(new Error('Linear GraphQL request timed out after 15s'));
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(1);
+    expect(r.output).toContain('QUA-300');
+    expect(r.output).toContain('timed out');
+  });
+
+  // Real-world transient failure scenario: a 4-issue batched PR where two
+  // Linear calls succeed and two fail (e.g., one timeout + one rate-limit).
+  // The watchdog should reconcile what it can, surface every failure by ID,
+  // and exit non-zero so the workflow run is visibly red.
+  it('aggregates mixed success and failure across multiple refs', async () => {
+    mockPr({
+      body: 'Fixes QUA-501\nFixes QUA-502\nFixes QUA-503\nFixes QUA-504',
+      merged: true,
+    });
+    const inProgress = (id: string) => ({
+      ...mockIssue,
+      identifier: id,
+      state: { id: 'state-active', name: 'In Review', type: 'started' as const },
+    });
+    getIssueMock
+      .mockResolvedValueOnce(inProgress('QUA-501'))
+      .mockRejectedValueOnce(new Error('Linear GraphQL request timed out after 15s'))
+      .mockResolvedValueOnce(inProgress('QUA-503'))
+      .mockRejectedValueOnce(new Error('Linear GraphQL returned 429: rate limited'));
+    updateIssueStateMock.mockResolvedValue({ identifier: '', state: 'Done' });
+    commentOnIssueMock.mockResolvedValue(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    // Exit non-zero — the failures must be visible in CI.
+    expect(r.exitCode).toBe(1);
+    // Successes were reconciled.
+    expect(updateIssueStateMock).toHaveBeenCalledTimes(2);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-501', 'Done');
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-503', 'Done');
+    // Both failures are named in the output so the operator knows which to retry.
+    expect(r.output).toContain('QUA-502');
+    expect(r.output).toContain('timed out');
+    expect(r.output).toContain('QUA-504');
+    expect(r.output).toContain('rate limited');
+  });
+
+  it('reconciles only In-Progress / In-Review (started type), regardless of name spelling', async () => {
+    mockPr({ body: 'Fixes QUA-400', merged: true });
+    // Custom workflow state name "Working On" of type 'started' should still
+    // be reconciled — the watchdog gates on type, not name.
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      identifier: 'QUA-400',
+      state: { id: 's', name: 'Working On', type: 'started' },
+    });
+    updateIssueStateMock.mockResolvedValueOnce({ identifier: 'QUA-400', state: 'Done' });
+    commentOnIssueMock.mockResolvedValueOnce(undefined);
+
+    const r = await commands['verify-pr'](['4275'], { ci: true });
+    expect(r.exitCode).toBe(0);
+    expect(updateIssueStateMock).toHaveBeenCalledWith('QUA-400', 'Done');
   });
 });
 

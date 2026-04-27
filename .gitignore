@@ -84,6 +84,9 @@ crux/coverage/
 # MCP config (contains tokens)
 .mcp.json
 
+# Serena MCP server local config (cache + project.local.yml)
+.serena/
+
 # Session logs (operational state — stored in PostgreSQL via wiki-server)
 .claude/sessions/
 

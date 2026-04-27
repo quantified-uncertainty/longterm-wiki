@@ -36,8 +36,18 @@ describe('job-handlers/index', () => {
     expect(types).toContain('page-create');
     expect(types).toContain('batch-commit');
     expect(types).toContain('auto-update-digest');
+    expect(types).toContain('claim-sourcing');
     expect(types).toContain('resource-ingest');
     expect(types).toContain('resource-enrich');
+  });
+
+  // QUA-699: server-side job type was renamed claim-verification → claim-sourcing
+  // in QUA-237 but the handler registry was missed, causing 100% failure on every
+  // claim-sourcing job ("Unknown job type: claim-sourcing").
+  it('dispatches the server-side claim-sourcing job type to a handler', async () => {
+    const { getHandler, isKnownType } = await import('./index.ts');
+    expect(isKnownType('claim-sourcing')).toBe(true);
+    expect(typeof getHandler('claim-sourcing')).toBe('function');
   });
 
   it('isKnownType returns true for registered types', async () => {

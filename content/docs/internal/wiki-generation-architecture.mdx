@@ -10,7 +10,7 @@ createdAt: 2026-02-16
 evergreen: false
 summary: Architecture proposal for next-generation wiki page generation. Analyzes current single-pipeline limitations, surveys state-of-the-art (Stanford STORM, GraphRAG, CrewAI, Self-Refine, Loki/OpenFactVerification, GPT-Researcher, RefChecker), and proposes a multi-agent multi-pass architecture with 8 specialist agents, 12+ composable passes, knowledge graph-driven linking, and dynamic computation embedding. Includes concrete implementation plan, composable module architecture, and academic foundations drawing on proposition-level retrieval (Dense X Retrieval), FActScore verification, nanopublications, and argumentation frameworks.
 ---
-import { Mermaid } from '@components/wiki';
+import { EntityLink, Mermaid, FBF, Calc, R } from '@components/wiki';
 
 <Aside type="note" title="Status: Vision Document">
 This is an architecture proposal, not a description of the current system. Some elements have been partially implemented (section-level rewriting, KB fact system, basic citation verification), but the full multi-agent orchestrator has not been built. The KB system (`packages/kb/`) now provides the structured data layer that this architecture assumes as a prerequisite — structured facts in YAML, `<FBF>` for inline values, and `<Calc>` for computed values.
@@ -334,7 +334,7 @@ This is the biggest departure from the current system. Instead of one synthesis 
 
 **Pass E2: Computation Embedding**
 - Input: Draft + facts database + graph data
-- Process: Identify quantitative claims that could be dynamic. Create Squiggle models that compute from wiki data (KB facts in `packages/kb/data/things/`, entity metrics). Embed `<SquiggleEstimate>` components.
+- Process: Identify quantitative claims that could be dynamic. Use `<FBF>` to pull KB fact values from `packages/kb/data/things/` and `<Calc>` to derive aggregates where relevant.
 - Output: Draft with dynamic computations
 - Agent: Enricher
 - Cost: \$0.50-1
@@ -499,40 +499,19 @@ These summaries can be used by the Writer agent as context when synthesizing con
 
 ### The Vision
 
-**Partial implementation note**: The `<Calc>` and `<FBF>` (KB Fact) components now partially implement the "computation embedding" vision described here. `<FBF>` pulls live values from KB YAML files in `packages/kb/data/things/`, and `<Calc>` computes derived values from those facts. The Squiggle-based uncertainty modeling described below remains aspirational.
+**Partial implementation note**: The `<Calc>` and `<FBF>` (KB Fact) components now partially implement the "computation embedding" vision described here. `<FBF>` pulls live values from KB YAML files in `packages/kb/data/things/`, and `<Calc>` computes derived values from those facts.
 
 Wiki pages shouldn't just *state* numbers -- they should *compute* them from the knowledge base.
 
-Example: A page about "AI lab safety spending" could include:
-
-```
-<SquiggleEstimate
-  title="Estimated AI Safety Spending (2025)"
-  code={`
-    anthropicRevenue = 2B to 3.5B
-    openaiRevenue = 3B to 5B
-    deepmindBudget = 1.5B to 2.5B
-
-    safetyFraction = {
-      anthropic: 0.15 to 0.25,
-      openai: 0.05 to 0.12,
-      deepmind: 0.10 to 0.20
-    }
-
-    totalSafetySpending = anthropicRevenue * safetyFraction.anthropic
-      + openaiRevenue * safetyFraction.openai
-      + deepmindBudget * safetyFraction.deepmind
-  `}
-/>
-```
+Example: A page about "AI lab safety spending" could reference `<FBF>` values for each lab's revenue and a `<Calc>` block that multiplies those by a per-lab safety fraction to produce an aggregate estimate, so the number stays in sync as underlying facts are updated.
 
 ### How the Enricher Agent Creates These
 
 1. **Identify computational opportunities**: Scan the draft for quantitative claims that involve estimation or aggregation
 2. **Pull from KB facts**: Use existing KB fact values from `packages/kb/data/things/` as inputs where available
-3. **Create Squiggle models**: Write distribution-based models (never point estimates) following the Squiggle style guide
-4. **Validate**: Run the Squiggle code to ensure it executes without errors
-5. **Embed**: Place `<SquiggleEstimate>` components at appropriate locations
+3. **Compose `<Calc>` expressions**: Derive point estimates (and small ranges where available) from the referenced facts
+4. **Validate**: Ensure the expression evaluates against the current fact values
+5. **Embed**: Place `<FBF>` / `<Calc>` components at appropriate locations
 
 ### Fact Feedback Loop
 

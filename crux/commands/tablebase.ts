@@ -17,6 +17,7 @@
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import type { TaskType } from '../tablebase/types.ts';
 import { TASK_TYPES, toSlug } from '../tablebase/types.ts';
+import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
 
 // Consolidated orphan domain imports
 import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
@@ -32,6 +33,9 @@ import { commands as websiteSourcesCommands } from './website-sources.ts';
 import { commands as scaffoldCommands } from './tablebase-scaffold.ts';
 import { commands as setupOrgCommands } from './setup-org.ts';
 import { commands as tbImporterCommands } from './tb-importers/index.ts';
+import { commands as systemCardsCommands } from './system-cards.ts';
+import { commands as frameworksCommands } from './frameworks.ts';
+import { commands as thirdPartyEvalsCommands } from './third-party-evals.ts';
 
 interface CommandOptions extends BaseOptions {
   top?: string;
@@ -44,6 +48,8 @@ interface CommandOptions extends BaseOptions {
   /** Required when --skipEntityValidation is set. */
   skipEntityValidationReason?: string;
   skipSourcing?: boolean;
+  /** QUA-655: route supported record types through `/api/enrichment/propose` */
+  viaPropose?: boolean;
   fix?: boolean;
   apply?: boolean;
   max?: string;
@@ -504,22 +510,9 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
         }).length,
       },
     },
-    records: recordsToSubmit.map((r: Record<string, unknown>) => {
-      const summary: Record<string, unknown> = { id: r.id };
-      if (r.personId) summary.personId = r.personId;
-      if (r.organizationId) summary.organizationId = r.organizationId;
-      if (r.role) summary.role = r.role;
-      if (r.name || r.title) summary.name = r.name || r.title;
-      if (r.source) summary.source = r.source;
-      if (r.sourcing) {
-        const v = r.sourcing as Record<string, unknown>;
-        summary.verdict = v.verdict;
-        summary.evidence = v.evidence;
-      } else {
-        summary.verdict = 'none';
-      }
-      return summary;
-    }),
+    records: recordsToSubmit.map((r: Record<string, unknown>) =>
+      summarizeRecordForManifest(r),
+    ),
   };
 
   await fsPromises.writeFile(manifestPath, JSON.stringify(manifest, null, 2) + '\n');
@@ -613,8 +606,8 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
     return { exitCode: 1, output: 'Usage: crux tb tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
   }
 
-  const { execSync } = await import('child_process');
-  const { writeFileSync, unlinkSync } = await import('fs');
+  const { execSync, execFileSync } = await import('child_process');
+  const { writeFileSync, unlinkSync, realpathSync } = await import('fs');
   const { tmpdir } = await import('os');
   const { join } = await import('path');
 
@@ -637,9 +630,9 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   // Resolve playwright's node_modules path dynamically
   let nodePath: string | undefined;
   try {
-    const playwrightPath = execSync('which playwright', { encoding: 'utf-8' }).trim();
+    const playwrightPath = execFileSync('which', ['playwright'], { encoding: 'utf-8' }).trim();
     // Follow symlinks: /opt/homebrew/bin/playwright → ../lib/node_modules/playwright/...
-    const resolved = execSync(`realpath "${playwrightPath}"`, { encoding: 'utf-8' }).trim();
+    const resolved = realpathSync(playwrightPath);
     nodePath = resolved.replace(/\/playwright.*$/, '');
   } catch {
     // Fall back to common paths
@@ -1124,6 +1117,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     entityTypes,
     model,
     skipSourcing: !!options.skipSourcing,
+    viaPropose: !!options.viaPropose,
   });
 
   if (options.ci) {
@@ -1491,6 +1485,10 @@ export const commands = {
   'website-sources-list': websiteSourcesCommands.list,
   'website-sources-show': websiteSourcesCommands.show,
   'website-sources-fetch': websiteSourcesCommands.fetch,
+  // QUA-642: T2 website corpus extraction pipeline.
+  'website-sources-register': websiteSourcesCommands.register,
+  'website-sources-snapshot': websiteSourcesCommands.snapshot,
+  'website-sources-extract': websiteSourcesCommands.extract,
   // QUA-455: scaffold a new tablebase entity type.
   scaffold: scaffoldCommands.scaffold,
   'setup-org': setupOrgCommands.default,
@@ -1498,6 +1496,27 @@ export const commands = {
   'sec-edgar': tbImporterCommands['sec-edgar'],
   'github-contributors': tbImporterCommands['github-contributors'],
   'hf-leaderboard': tbImporterCommands['hf-leaderboard'],
+  // QUA-666: additional T1 authoritative-source importers.
+  'wikidata': tbImporterCommands['wikidata'],
+  'openalex': tbImporterCommands['openalex'],
+  'semantic-scholar': tbImporterCommands['semantic-scholar'],
+  'crossref': tbImporterCommands['crossref'],
+  // QUA-690: system-card extraction.
+  'system-cards': systemCardsCommands.default,
+  'system-cards-extract': systemCardsCommands.extract,
+  // QUA-691: frontier-safety-framework tracker.
+  // QUA-707 added registry-driven `list`, `seed`, and `ingest` subcommands.
+  'frameworks': frameworksCommands.default,
+  'frameworks-extract': frameworksCommands.extract,
+  'frameworks-diff': frameworksCommands.diff,
+  'frameworks-fetch': frameworksCommands.fetch,
+  'frameworks-list': frameworksCommands.list,
+  'frameworks-seed': frameworksCommands.seed,
+  'frameworks-ingest': frameworksCommands.ingest,
+  // QUA-692: third-party evaluation index.
+  'third-party-evals': thirdPartyEvalsCommands.default,
+  'third-party-evals-ingest': thirdPartyEvalsCommands.ingest,
+  'third-party-evals-extract': thirdPartyEvalsCommands.extract,
 };
 
 export function getHelp(): string {
@@ -1544,16 +1563,23 @@ Commands:
   data-sources-snapshot <id>  Capture a new snapshot (--all for all sources)
   data-sources-health         Check mapping validity, staleness
 
-  T1 importers (QUA-640 — defensive enrichment):
+  T1 importers (QUA-640/QUA-666 — defensive enrichment):
   sec-edgar           Fetch SEC EDGAR Form D → funding-rounds (--target=slug:cik)
   github-contributors Fetch GitHub contributors → personnel hints (--target=slug:owner/repo[,owner/repo2])
   hf-leaderboard      Fetch HF Open LLM Leaderboard → benchmark-results (--target=modelSlug:displayName:evalName)
+  wikidata            Fetch Wikidata SPARQL → organization-fact records (--target=slug:Qnumber)
+  openalex            Fetch OpenAlex works by institution → publications (--target=slug:Iinstitution_id)
+  semantic-scholar    Fetch Semantic Scholar papers by author → publications (--target=personSlug:displayName:authorId)
+  crossref            Fetch Crossref DOI metadata → publications (--target=doi:10.xxx/yyy[|org=slug][|person=slug])
 
-  Website Sources:
+  Website Sources (T2 pipeline, QUA-642):
   website-sources             Show website source help
   website-sources-list        List all registered website sources
   website-sources-show <id>   Show source details with pages
+  website-sources-register    Register burst-targets.yaml orgs + default pages
   website-sources-fetch <id>  Fetch pages and store snapshots (--all for all sources)
+  website-sources-snapshot    Alias of fetch
+  website-sources-extract     LLM-extract personnel from pending snapshots → /propose T2
 
   Market data:
   markets-discover <entity>   Discover prediction market questions via LLM agent
@@ -1571,6 +1597,8 @@ Options:
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
   --skip-sourcing       Skip sourcing before submit (for testing)
+  --via-propose             Route supported record types (grants, Phase 1) through
+                            /api/enrichment/propose instead of direct /sync (QUA-655)
   --apply                   For source-discover: also link discovered resources to records
   --v2                      For source-discover: use claims-first agent (extracts + submits claims)
   --claims-only             For source-discover --v2: submit claims but don't apply results
@@ -1609,6 +1637,7 @@ Examples:
   crux tb tablebase loop --max=3 --budget=10               # 3-task loop with $10 cap
   crux tb tablebase loop --model=auto --max=20             # Auto-tier: haiku for simple, sonnet for complex
   crux tb tablebase loop --model=haiku --task-type=benchmark-result-fill  # All-haiku for benchmarks
+  crux tb tablebase loop --via-propose --task-type=grant-grantee-backfill  # Route grants through /propose (QUA-655)
   crux tb tablebase sourcing-records --table=personnel --source=deterministic  # Fast structural checks
   crux tb tablebase sourcing-records --table=personnel --source=batch --limit=100  # LLM check 100 records
   crux tb tablebase sourcing-records --table=personnel --source=all   # Full sourcing

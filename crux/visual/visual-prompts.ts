@@ -51,68 +51,6 @@ flowchart TD
 \`\`\`
 `;
 
-export const SQUIGGLE_STYLE_GUIDE = `
-## Squiggle Model Style Guide
-
-### Core Principles
-- Use distributions, NEVER point values in mixture() calls
-- Use "X to Y" syntax for uncertain quantities (e.g., 100 to 500)
-- Keep models 5-30 lines
-- Name variables clearly and descriptively
-- Default sampleCount: 5000
-
-### Common Patterns
-
-**Simple estimate:**
-\`\`\`
-annualCost = 10M to 50M  // Use M/B/T for millions/billions/trillions
-\`\`\`
-
-**Mixture of scenarios:**
-\`\`\`
-// GOOD: use ranges
-result = mixture(
-  100 to 300,    // optimistic scenario
-  300 to 800,    // middle scenario
-  800 to 2000,   // pessimistic scenario
-  [0.3, 0.5, 0.2]
-)
-
-// BAD: point values create jagged spikes
-result = mixture(200, 500, 1000, [0.3, 0.5, 0.2])
-\`\`\`
-
-**Conditional model:**
-\`\`\`
-pSuccess = 0.3 to 0.7
-benefitIfSuccess = 1B to 10B
-benefitIfFailure = -500M to 100M
-expectedBenefit = pSuccess * benefitIfSuccess + (1 - pSuccess) * benefitIfFailure
-\`\`\`
-
-### MDX Component Format
-\`\`\`jsx
-import { SquiggleEstimate } from '@components/wiki/SquiggleEstimate';
-
-<SquiggleEstimate
-  title="Expected Annual AI Safety Funding"
-  code={\`
-    currentFunding = 300M to 600M
-    growthRate = 1.1 to 1.4
-    yearsFuture = 5
-    futureFunding = currentFunding * growthRate ^ yearsFuture
-    futureFunding
-  \`}
-/>
-\`\`\`
-
-### Anti-Patterns
-- Point values in mixtures (creates ugly spikes)
-- Overly complex models (>30 lines — split into multiple estimates)
-- Missing title prop
-- Using exact numbers when ranges are more honest
-`;
-
 export const CAUSE_EFFECT_STYLE_GUIDE = `
 ## CauseEffectGraph Style Guide
 
@@ -248,8 +186,6 @@ export function getStyleGuide(type: string): string {
   switch (type) {
     case 'mermaid':
       return MERMAID_STYLE_GUIDE;
-    case 'squiggle':
-      return SQUIGGLE_STYLE_GUIDE;
     case 'cause-effect':
       return CAUSE_EFFECT_STYLE_GUIDE;
     case 'comparison':

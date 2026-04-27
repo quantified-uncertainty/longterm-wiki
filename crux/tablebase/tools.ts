@@ -11,6 +11,11 @@ import { resolve } from 'path';
 import { apiRequest } from '../lib/wiki-server/client.ts';
 import { proposeClaims, getClaimStatus } from '../lib/wiki-server/claims.ts';
 import { getVerdictsByEntity } from '../lib/wiki-server/sourcing.ts';
+import {
+  proposeEnrichment,
+  isT1UrlAuthoritative,
+  type SupportedRecordType,
+} from '../lib/wiki-server/enrichment.ts';
 import { suggestResources } from '../lib/search/suggest-resources.ts';
 import { generateId } from '../lib/grant-import/id.ts';
 import { generateSid, isAnySid, isSid, stripSid, SID_PREFIX } from '../../packages/id-utils/src/index.ts';
@@ -24,6 +29,17 @@ import {
   dedupInvestments,
   dedupBenchmarkResults,
 } from './dedup.ts';
+
+/**
+ * Tables the `--via-propose` path supports in Phase 1 (QUA-655).
+ *
+ * Only `grants` is wired for now. The endpoint accepts all four types in
+ * `SUPPORTED_RECORD_TYPES` (grants, personnel, funding-rounds,
+ * benchmark-results), but the loop's enrichment prompts don't all produce
+ * records that satisfy the /propose tier gate today — extend this list
+ * record-type by record-type as each one proves out. See QUA-655 item 4.
+ */
+const VIA_PROPOSE_TABLES: ReadonlySet<SupportedRecordType> = new Set(['grants']);
 
 // ---------------------------------------------------------------------------
 // Tool definitions (passed to Claude API)
@@ -208,6 +224,18 @@ export function getToolDefinitions(options?: { taskType?: TaskType; apply?: bool
 // Tool handler implementations
 // ---------------------------------------------------------------------------
 
+/**
+ * Ensure a stableId has exactly one `sid_` prefix. Idempotent.
+ *
+ * Stored stableIds in `database.json` are already `sid_`-prefixed, so naive
+ * `SID_PREFIX + stableId` concatenation produces `sid_sid_XXX` which the
+ * wiki-server's `/sync` validators reject as "reference not found". This
+ * helper strips any existing prefix first, so callers can always prepend.
+ */
+export function ensureSidPrefix(value: string): string {
+  return SID_PREFIX + stripSid(value);
+}
+
 let _entityMatcher: ReturnType<typeof buildEntityMatcher> | null = null;
 
 function getEntityMatcher() {
@@ -248,6 +276,85 @@ function getKnownStableIds(): Set<string> {
   }
 }
 
+let _stableIdToSlug: Map<string, string> | null = null;
+
+/**
+ * Fields that look like `entityFields` (used in validation) but actually FK
+ * into a PG-primary table rather than `entities`. The agent's resolve_entity
+ * returns entity stableIds; for these fields we translate sid_ → slug before
+ * submission so the server's `IN (slug…)` branch matches.
+ *
+ * Exported via `__testing__` so tests can assert the mapping without exporting
+ * the raw constant.
+ */
+const NON_ENTITY_REFS_BY_TABLE: Record<string, string[]> = {
+  'benchmark-results': ['benchmarkId'],
+};
+
+/**
+ * Translate entity stableIds into slugs in-place for fields whose FK target
+ * is a PG-primary tablebase (e.g. `benchmarks`), not the `entities` table.
+ *
+ * The agent's `resolve_entity` returns entity stableIds (`sid_XXX`), which
+ * the server rejects for non-entity FKs because `benchmarks.id`/`slug` don't
+ * look like stableIds. This function is the client-side bridge: it looks up
+ * each sid_ value in database.json's `idRegistry.byStableId` (or the
+ * typedEntities fallback) and substitutes the entity's slug. The server's
+ * existing `slug IN (...)` branch then matches.
+ *
+ * No-op if the field value is missing, unprefixed, or the stableId isn't in
+ * database.json — those cases fall through to existing server-side validation.
+ */
+function resolveNonEntityForeignKeys(
+  table: string,
+  records: Array<Record<string, unknown>>,
+  stableIdToSlug: Map<string, string>,
+): void {
+  const fields = NON_ENTITY_REFS_BY_TABLE[table] ?? [];
+  if (fields.length === 0) return;
+  for (const record of records) {
+    for (const field of fields) {
+      const val = record[field] as string | undefined;
+      if (!val || !isSid(val)) continue;
+      const slug = stableIdToSlug.get(val) ?? stableIdToSlug.get(stripSid(val));
+      if (slug) record[field] = slug;
+    }
+  }
+}
+
+/**
+ * Load a stableId → slug map from database.json, covering both `sid_`-prefixed
+ * and bare forms. Used to translate entity stableIds into slugs for table
+ * references that target PG-primary tables (e.g. benchmarks) rather than
+ * entities — see `resolveNonEntityForeignKeys` above.
+ */
+function getStableIdToSlugMap(): Map<string, string> {
+  if (_stableIdToSlug) return _stableIdToSlug;
+  const map = new Map<string, string>();
+  try {
+    const db = JSON.parse(readFileSync(resolve('apps/web/src/data/database.json'), 'utf8'));
+    // idRegistry.byStableId maps stableId → slug directly.
+    if (db.idRegistry?.byStableId) {
+      for (const [sid, slug] of Object.entries<string>(db.idRegistry.byStableId)) {
+        if (typeof slug !== 'string') continue;
+        map.set(sid, slug);
+        map.set(SID_PREFIX + stripSid(sid), slug);
+      }
+    }
+    // Fall back to typedEntities (slug lives on `id`).
+    for (const e of db.typedEntities || []) {
+      if (e.stableId && e.id) {
+        map.set(e.stableId, e.id);
+        map.set(SID_PREFIX + stripSid(e.stableId), e.id);
+      }
+    }
+  } catch {
+    // database.json missing — leave map empty; callers fall through to server-side validation.
+  }
+  _stableIdToSlug = map;
+  return map;
+}
+
 async function handleQueryEntities(input: Record<string, unknown>): Promise<string> {
   const query = input.query as string;
   const entityType = input.entityType as string | undefined;
@@ -260,7 +367,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
 
   if (!result.ok) return `Error: ${result.message}`;
   return JSON.stringify(result.data.results.map(r => ({
-    id: r.stableId ? SID_PREFIX + r.stableId : r.id,
+    id: r.stableId ? ensureSidPrefix(r.stableId) : r.id,
     slug: r.id,
     title: r.title,
     entityType: r.entityType,
@@ -287,7 +394,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
   // Try direct match first
   const match = matcher.match(name);
   if (match) {
-    return JSON.stringify({ found: true, stableId: SID_PREFIX + match.stableId, slug: match.slug, name: match.name });
+    return JSON.stringify({ found: true, stableId: ensureSidPrefix(match.stableId), slug: match.slug, name: match.name });
   }
 
   // Try matching with grantee normalization (strips Inc, LLC, etc.)
@@ -296,7 +403,7 @@ function handleResolveEntity(input: Record<string, unknown>): string {
     const m = matcher.match(granteeMatch);
     return JSON.stringify({
       found: true,
-      stableId: SID_PREFIX + granteeMatch,
+      stableId: ensureSidPrefix(granteeMatch),
       slug: m?.slug || '',
       name: m?.name || name,
       matchedVia: 'normalization',
@@ -318,7 +425,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const matcher = getEntityMatcher();
   const existing = matcher.match(name);
   if (existing) {
-    return JSON.stringify({ created: false, existing: true, stableId: SID_PREFIX + existing.stableId, name: existing.name });
+    return JSON.stringify({ created: false, existing: true, stableId: ensureSidPrefix(existing.stableId), name: existing.name });
   }
 
   // Generate sid_-prefixed stableId (no wikiId — not a full wiki entity)
@@ -345,6 +452,15 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   // by submit_records validation. Without this, batch-creating entities before
   // the first submit_records leaves them missing from the set (it was null).
   getKnownStableIds().add(stableId);
+  // Populate stableId → slug directly so resolveNonEntityForeignKeys finds
+  // benchmark entities created mid-session (e.g. agent creates a missing
+  // benchmark and then submits benchmark-results referencing it). Without
+  // this, the sid_→slug translation misses and the server rejects the row.
+  // Store both prefixed and bare forms — resolveNonEntityForeignKeys tries
+  // lookup(val) then lookup(stripSid(val)).
+  const slugMap = getStableIdToSlugMap();
+  slugMap.set(ensureSidPrefix(stableId), slug);
+  slugMap.set(stripSid(stableId), slug);
 
   return JSON.stringify({
     created: true,
@@ -424,6 +540,7 @@ async function handleSubmitRecords(
   task: EnrichmentTask,
   dryRun: boolean,
   skipSourcing: boolean = false,
+  viaPropose: boolean = false,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -506,6 +623,14 @@ async function handleSubmitRecords(
     return `Error: ${invalidRefs.length} entity reference(s) could not be verified. These look like fabricated stableIds — use resolve_entity or create_entity to get valid IDs.\n${invalidRefs.join('\n')}`;
   }
 
+  // Translate stableIds to slugs for fields whose target table is NOT `entities`.
+  // For example, `benchmark_results.benchmarkId` is a FK to the `benchmarks`
+  // PG-primary table (10-char `id` or kebab-case `slug`), not to `entities`.
+  // The agent's resolve_entity tool returns `sid_XXX` entity stableIds, which
+  // the benchmark-results /sync endpoint rejects. Converting sid_ → slug here
+  // means the server's existing `slug IN (...)` branch matches.
+  resolveNonEntityForeignKeys(table, records, getStableIdToSlugMap());
+
   // Generate IDs for new records
   for (const record of records) {
     if (!record.id) {
@@ -580,6 +705,19 @@ async function handleSubmitRecords(
     return `[DRY RUN] Would submit ${deduped.length} records to ${table} (${records.length - deduped.length} duplicates filtered):\n${JSON.stringify(deduped, null, 2)}`;
   }
 
+  // QUA-655: route supported record types through POST /api/enrichment/propose
+  // instead of the direct sync endpoint. Each record is gated server-side by
+  // the tier allowlist and written atomically with (row + evidence + verdict).
+  if (viaPropose && VIA_PROPOSE_TABLES.has(table as SupportedRecordType)) {
+    const dupCount = records.length - deduped.length;
+    return submitRecordsViaPropose(
+      table as SupportedRecordType,
+      recordsToSubmit,
+      dupCount,
+      sourcingSummary,
+    );
+  }
+
   const syncConfig = getTableConfig(table);
   if (!syncConfig) return `Error: Unknown table "${table}"`;
 
@@ -606,6 +744,94 @@ async function handleSubmitRecords(
   const count = result.data.upserted ?? result.data.updated ?? recordsToSubmit.length;
   const dupCount = records.length - deduped.length;
   return `Successfully submitted ${count} records to ${table} (${dupCount} duplicates filtered)${sourcingSummary}.`;
+}
+
+/**
+ * Submit records one-at-a-time through `POST /api/enrichment/propose`.
+ *
+ * Each record is classified T1 (URL on the allowlist) or skipped with a
+ * clear message. T2/T3 paths require a caller-supplied verdict-LLM output
+ * (`quotedText`, `checkerModel`, `reasoning`) which the loop agent does not
+ * produce today — those records are deliberately left out of scope for
+ * Phase 1 so that a non-T1 source is a signal to the agent, not a silent
+ * fall-back to the direct sync path.
+ *
+ * Returns a human-readable summary for the agent's tool-result channel.
+ */
+async function submitRecordsViaPropose(
+  recordType: SupportedRecordType,
+  records: Array<Record<string, unknown>>,
+  dupCount: number,
+  sourcingSummary: string,
+): Promise<string> {
+  let acceptedCount = 0;
+  const rejected: Array<{ id: string; reason: string }> = [];
+  const skippedNonT1: Array<{ id: string; sourceUrl: string }> = [];
+
+  for (const record of records) {
+    const recordId = typeof record.id === 'string' ? record.id : '?';
+    const sourceUrl =
+      (record.source as string | undefined) ??
+      (record.sourceUrl as string | undefined);
+
+    if (!sourceUrl) {
+      rejected.push({ id: recordId, reason: 'missing source URL' });
+      continue;
+    }
+
+    // Phase 1: T1-only. Non-T1 sources are surfaced to the agent instead of
+    // silently dropping into the direct sync path — the point of the gate is
+    // to pressure the agent toward authoritative sources.
+    if (!isT1UrlAuthoritative(sourceUrl, recordType)) {
+      skippedNonT1.push({ id: recordId, sourceUrl });
+      continue;
+    }
+
+    // Strip fields the /propose endpoint rejects or manages itself. `sourcing`
+    // was attached by pre-submit-sourcing for the legacy path; /propose owns
+    // verdict construction.
+    const { sourcing: _sourcing, ...rowForPropose } = record;
+
+    const res = await proposeEnrichment({
+      tier: 'T1',
+      recordType,
+      row: rowForPropose,
+      sourceUrl,
+    });
+
+    if (!res.ok) {
+      rejected.push({ id: recordId, reason: `${res.error}: ${res.message}` });
+      continue;
+    }
+
+    acceptedCount++;
+  }
+
+  const lines: string[] = [];
+  lines.push(
+    `Via /api/enrichment/propose: ${acceptedCount}/${records.length} accepted (${dupCount} duplicates filtered)${sourcingSummary}.`,
+  );
+  if (skippedNonT1.length > 0) {
+    lines.push(
+      `  ${skippedNonT1.length} record(s) skipped — source not on T1 authority allowlist (Phase 1 via-propose accepts T1 only):`,
+    );
+    for (const s of skippedNonT1.slice(0, 5)) {
+      lines.push(`    - ${s.id}: ${s.sourceUrl}`);
+    }
+    if (skippedNonT1.length > 5) {
+      lines.push(`    ...and ${skippedNonT1.length - 5} more`);
+    }
+  }
+  if (rejected.length > 0) {
+    lines.push(`  ${rejected.length} record(s) rejected by /propose:`);
+    for (const r of rejected.slice(0, 5)) {
+      lines.push(`    - ${r.id}: ${r.reason}`);
+    }
+    if (rejected.length > 5) {
+      lines.push(`    ...and ${rejected.length - 5} more`);
+    }
+  }
+  return lines.join('\n');
 }
 
 // ---------------------------------------------------------------------------
@@ -736,9 +962,10 @@ async function handleLinkSource(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipSourcing?: boolean; apply?: boolean } = {},
+  options: { skipSourcing?: boolean; apply?: boolean; viaPropose?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
   const skipSourcing = options.skipSourcing ?? false;
+  const viaPropose = options.viaPropose ?? false;
   const isSourceDiscovery = task.taskType === 'source-discovery';
 
   const handlers: Record<string, (input: Record<string, unknown>) => Promise<string>> = {
@@ -748,7 +975,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing, viaPropose),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),
@@ -781,3 +1008,9 @@ export function taskTypeToTable(taskType: TaskType): string {
     case 'benchmark-source-fill': return 'benchmark-results';
   }
 }
+
+// Test-only exports. Not part of the public API.
+export const __testing__ = {
+  NON_ENTITY_REFS_BY_TABLE,
+  resolveNonEntityForeignKeys,
+};

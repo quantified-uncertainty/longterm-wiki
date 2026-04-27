@@ -9,36 +9,27 @@ import {
 } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { createSyncHandler } from "./sync-factory.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
-
-// ---- QUA-470 Phase 4b-B.1: benchmark composer ----
-//
-// Trivial composer: title is item.name, description is item.description.
-// No leak risk; consolidating for consistency.
-interface BenchmarkComposerRow {
-  name: string;
-  description?: string | null;
-}
-
-registerComposer<BenchmarkComposerRow>("benchmark", (row) => ({
-  title: row.name,
-  description: row.description ?? null,
-  parentTitle: null,
-}));
 
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
 
+// Must stay in sync with the chk_benchmarks_category CHECK constraint in
+// migration 0207. Adding a value here without updating the constraint will
+// pass schema validation and then fail at upsert time.
 const VALID_CATEGORIES = [
-  "coding",
+  "general",
   "reasoning",
   "math",
+  "coding",
   "knowledge",
   "multimodal",
-  "safety",
   "agentic",
-  "general",
+  "safety",
+  "dangerous-capability",
+  "robustness",
+  "honesty",
+  "adversarial",
 ] as const;
 
 // ---- Query schemas ----
@@ -56,6 +47,9 @@ const SyncBenchmarkItemSchema = z.object({
   slug: z.string().min(1).max(200),
   name: z.string().min(1).max(500),
   category: z.enum(VALID_CATEGORIES).nullable().optional(),
+  // Free-text sub-classification (HELM sub-scenarios, AIR-Bench taxonomy
+  // leaves). Slash-joined hierarchy strings allowed. No CHECK constraint.
+  subCategory: z.string().max(500).nullable().optional(),
   description: z.string().max(5000).nullable().optional(),
   website: z.string().max(2000).nullable().optional(),
   scoringMethod: z.string().max(50).nullable().optional(),
@@ -73,6 +67,7 @@ function formatRow(r: typeof benchmarks.$inferSelect) {
     slug: r.slug,
     name: r.name,
     category: r.category,
+    subCategory: r.subCategory,
     description: r.description,
     website: r.website,
     scoringMethod: r.scoringMethod,
@@ -157,20 +152,14 @@ const benchmarksApp = new Hono()
       name: "benchmarks",
       table: benchmarks,
       syncSchema: SyncBenchmarkItemSchema,
-      toThing: (item) => {
-        const composed = composeThing<BenchmarkComposerRow>("benchmark", item, new Map());
-        return {
-          id: item.id,
-          thingType: "benchmark" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "benchmarks",
-          sourceId: item.id,
-          sourceUrl: item.website,
-          wikiId: item.slug,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "benchmark" as const,
+        sourceTable: "benchmarks",
+        sourceId: item.id,
+        sourceUrl: item.website,
+        wikiId: item.slug,
+      }),
     }),
   )
 

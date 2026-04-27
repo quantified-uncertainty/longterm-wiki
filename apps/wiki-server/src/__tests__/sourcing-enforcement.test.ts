@@ -155,11 +155,12 @@ describe('enforceSourcing', () => {
     expect(res.status).toBe(200);
   });
 
-  it('error message includes table name and verify command', async () => {
+  it('error message points at verify-orchestrate, not the single-entity verify', async () => {
     const app = createTestApp('grants');
     const res = await makeRequest(app, [{ id: '1' }]);
     expect(res.status).toBe(400);
     const body = await res.json() as { message: string };
-    expect(body.message).toContain('pnpm crux tb verify grants');
+    expect(body.message).toContain('pnpm crux tb verify-orchestrate grants');
+    expect(body.message).not.toMatch(/pnpm crux tb verify grants(?!-)/);
   });
 });

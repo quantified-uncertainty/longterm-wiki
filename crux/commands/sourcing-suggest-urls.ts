@@ -1,12 +1,12 @@
 /**
- * Sourcing Suggest URLs — QUA-64
+ * Sourcing Suggest URLs — QUA-64 (QUA-587: extended to partial verdicts)
  *
- * For records whose sourcing verdict is `unverifiable`, run web search for
- * the claim + entity name and store 1-3 candidate URLs for human review or
- * auto-recheck.
+ * For records whose sourcing verdict is `unverifiable` (default) or `partial`,
+ * run web search for the claim + entity name and store 1-3 candidate URLs for
+ * human review or auto-recheck.
  *
  * Workflow:
- *   1. List verdicts with verdict='unverifiable' (optional --type/--entity filter).
+ *   1. List verdicts with verdict=<flag> (optional --type/--entity filter).
  *   2. For each, pull one evidence row to learn the existing URL (so we skip it).
  *   3. Generate candidates via crux/lib/sourcing/suggest-urls.ts
  *   4. Batch-upsert to /api/sourcing/url-suggestions.
@@ -31,6 +31,7 @@ import {
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
 import { suggestUrls, GENERATOR_MODEL } from '../lib/sourcing/suggest-urls.ts';
+import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 const DEFAULT_LIMIT = 50;
 const MAX_LIMIT = 1000;
@@ -42,11 +43,42 @@ const PREFETCH_MAX = 2000;
 const UPSERT_CHUNK = 100;
 const DEFAULT_CONCURRENCY = 5;
 
+const DEFAULT_VERDICT: SourcingVerdict = 'unverifiable';
+// Only verdicts where weak source URLs are the suspected root cause.
+// `partial` added per QUA-587 — QUA-546 found re-verification was
+// ineffective for partials because the source URLs themselves are weak.
+// Deliberately excluded:
+//   - `confirmed`: the source works; no reason to replace it.
+//   - `contradicted`: the source disagrees substantively; replacing the
+//     URL would mask the disagreement. Route through crux sourcing-recheck
+//     instead.
+//   - `outdated`: handled via the recheck path (crux sourcing-recheck
+//     --verdict=outdated re-fetches the same URL looking for updates),
+//     not URL replacement. Staleness is a value-refresh problem, not a
+//     URL-quality problem. If this turns out to be wrong in practice we
+//     can widen the allowlist — the ticket (QUA-587) explicitly scopes
+//     this change to unverifiable + partial.
+//   - `unchecked`: no verdict yet to remediate.
+// NOTE: sourcing-recheck.ts uses a broader allowlist (all 5 real verdicts)
+// because its semantics differ — it reruns the LLM against current
+// evidence, which is valid for any verdict type.
+// Outer type is Set<string> so .has() accepts raw user input; members are
+// typed SourcingVerdict so TS catches a typo or invalid verdict here.
+const ALLOWED_SUGGEST_VERDICTS: ReadonlySet<string> = new Set<SourcingVerdict>([
+  'unverifiable',
+  'partial',
+]);
+// Guard drift between DEFAULT_VERDICT and the allowlist.
+if (!ALLOWED_SUGGEST_VERDICTS.has(DEFAULT_VERDICT)) {
+  throw new Error(`DEFAULT_VERDICT "${DEFAULT_VERDICT}" is not in ALLOWED_SUGGEST_VERDICTS`);
+}
+
 interface SuggestOptions extends BaseOptions {
   limit?: string;
   budget?: string;
   type?: string;
   entity?: string;
+  verdict?: string;
   'max-candidates'?: string;
   maxCandidates?: string;
   'dry-run'?: boolean;
@@ -222,6 +254,13 @@ async function suggestCommand(
   );
   const recordTypeFilter = options.type?.trim() || undefined;
   const entityFilter = options.entity?.trim() || undefined;
+  const verdictFilter = (options.verdict?.trim() || DEFAULT_VERDICT).toLowerCase();
+  if (!ALLOWED_SUGGEST_VERDICTS.has(verdictFilter)) {
+    return {
+      exitCode: 1,
+      output: `Invalid --verdict "${verdictFilter}". Must be one of: ${[...ALLOWED_SUGGEST_VERDICTS].sort().join(', ')}`,
+    };
+  }
   const dryRun = Boolean(options['dry-run'] ?? options.dryRun);
   const skipExisting = options['skip-existing'] ?? options.skipExisting ?? true;
   const isJson = Boolean(options.json || options.ci);
@@ -229,6 +268,7 @@ async function suggestCommand(
   const log = (msg: string) => { if (!isJson) console.log(msg); };
 
   log(`Sourcing Suggest URLs (QUA-64)`);
+  log(`  verdict:        ${verdictFilter}`);
   log(`  limit:          ${limit}`);
   log(`  budget:         $${budgetCap.toFixed(2)}`);
   log(`  max-candidates: ${maxCandidates}`);
@@ -240,14 +280,14 @@ async function suggestCommand(
   const summary = makeSummary();
 
   const verdictsResult = await listVerdicts({
-    verdict: 'unverifiable',
+    verdict: verdictFilter,
     recordType: recordTypeFilter,
     limit,
   });
   if (!verdictsResult.ok) {
     return {
       exitCode: 1,
-      output: `Failed to list unverifiable verdicts: ${verdictsResult.message ?? 'unknown error'}`,
+      output: `Failed to list ${verdictFilter} verdicts: ${verdictsResult.message ?? 'unknown error'}`,
     };
   }
 
@@ -259,12 +299,12 @@ async function suggestCommand(
       )
     : verdictsResult.data.verdicts;
 
-  log(`Fetched ${verdictRows.length} unverifiable verdict(s).`);
+  log(`Fetched ${verdictRows.length} ${verdictFilter} verdict(s).`);
 
   if (verdictRows.length === 0) {
     const output = isJson
       ? JSON.stringify({ summary: summaryToJson(summary, dryRun) })
-      : 'No unverifiable verdicts matched.';
+      : `No ${verdictFilter} verdicts matched.`;
     return { exitCode: 0, output };
   }
 
@@ -411,13 +451,15 @@ export const commands = {
 
 export function getHelp(): string {
   return `
-Sourcing Suggest URLs — auto-suggest better source URLs for unverifiable verdicts
+Sourcing Suggest URLs — auto-suggest better source URLs for weak-URL verdicts
 
 Usage:
   crux sourcing-suggest-urls [options]
 
 Options:
-  --limit=N              Max unverifiable verdicts to scan (default: ${DEFAULT_LIMIT}, max: ${MAX_LIMIT})
+  --verdict=X            Verdict type to sweep (default: ${DEFAULT_VERDICT}).
+                         Allowed: ${[...ALLOWED_SUGGEST_VERDICTS].sort().join(', ')}.
+  --limit=N              Max verdicts to scan (default: ${DEFAULT_LIMIT}, max: ${MAX_LIMIT})
   --budget=N             Soft cap in USD on search-provider spend (default: $${DEFAULT_BUDGET_USD.toFixed(2)}).
                          Checked before each record — a single in-flight call can overshoot.
   --type=X               Filter by record type (e.g., fact, grant, personnel)
@@ -428,7 +470,7 @@ Options:
   --json / --ci          Machine-readable JSON output
 
 Workflow:
-  1. Lists verdicts with verdict='unverifiable' from /api/sourcing/verdicts.
+  1. Lists verdicts with verdict=<--verdict> from /api/sourcing/verdicts.
   2. Runs web search (Exa + Perplexity) for the claim + entity name.
   3. Batch-upserts candidates to /api/sourcing/url-suggestions for human review
      or auto-recheck. Human decisions (approved/rejected) are preserved on re-runs.

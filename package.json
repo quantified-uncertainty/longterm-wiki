@@ -41,6 +41,7 @@
     "@types/pdf-parse": "^1.1.5",
     "@types/proper-lockfile": "^4.1.4",
     "@vitest/coverage-v8": "4.0.18",
+    "cheerio": "^1.2.0",
     "hono": "^4.12.4",
     "playwright": "^1.50.0",
     "proper-lockfile": "^4.1.2",

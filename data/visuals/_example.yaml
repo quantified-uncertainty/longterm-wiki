@@ -7,12 +7,12 @@
 #
 # Each visual definition has:
 #   id:          Unique identifier (used in embed command)
-#   type:        One of: mermaid, squiggle, cause-effect, comparison, disagreement
+#   type:        One of: mermaid, cause-effect, comparison, disagreement
 #   title:       Human-readable title
 #   description: What this visual shows
 #   usedIn:      List of page IDs where this visual is embedded
 #   tags:        Categorization tags
-#   content:     The visual code (Mermaid syntax, Squiggle code, JSX, etc.)
+#   content:     The visual code (Mermaid syntax, JSX, etc.)
 #   props:       Additional component props (optional)
 #   quality:     Quality score from last review (0-100, optional)
 #   lastReviewed: Date of last review (optional)

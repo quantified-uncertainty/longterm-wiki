@@ -23,41 +23,12 @@ import {
 } from "../shared/utils.js";
 import { parseSort, buildSearchCondition } from "../shared/query-helpers.js";
 import { formatMoney } from "../shared/format-currency.js";
-import { registerComposer, composeThing } from "../shared/compose-thing.js";
 import { resolveEntityId, type ResolvedEntityVars } from "../shared/resolve-entity-middleware.js";
 import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { shouldSkipEntityValidation } from "../shared/validate-entity-refs.js";
 import { createSyncHandler } from "./sync-factory.js";
-
-// ---- QUA-470 Phase 4b-B.1: grant composer ----
-//
-// Grant titles are authoritative (`g.name`). The description aggregates
-// grantee, amount (currency-aware via formatMoney), and date.
-interface GrantComposerRow {
-  name: string;
-  organizationId: string;
-  granteeId?: string | null;
-  amount?: number | string | null;
-  currency?: string | null;
-  date?: string | null;
-}
-
-registerComposer<GrantComposerRow>("grant", (row, titleMap) => ({
-  title: row.name,
-  description:
-    [
-      row.granteeId
-        ? `to ${titleMap.get(row.granteeId) ?? row.granteeId}`
-        : null,
-      row.amount != null ? formatMoney(row.amount, row.currency) : null,
-      row.date,
-    ]
-      .filter(Boolean)
-      .join(", ") || null,
-  parentTitle: titleMap.get(row.organizationId) ?? row.organizationId,
-}));
 
 // ---- Constants ----
 
@@ -672,28 +643,14 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
           { rawIdColumn: "grantee_id", entityIdColumn: "grantee_entity_id", displayNameColumn: "grantee_display_name" },
         ],
       },
-      thingsTitleIds: (items) => [
-        ...new Set([
-          ...items.map((g) => g.organizationId),
-          ...items
-            .map((g) => g.granteeId)
-            .filter((id): id is string => id != null),
-        ]),
-      ],
-      // QUA-470: dispatch through the registered "grant" composer.
-      toThing: (item, titleMap) => {
-        const composed = composeThing<GrantComposerRow>("grant", item, titleMap);
-        return {
-          id: item.id,
-          thingType: "grant" as const,
-          title: composed.title,
-          description: composed.description,
-          parentTitle: composed.parentTitle,
-          sourceTable: "grants",
-          sourceId: item.id,
-          sourceUrl: item.source ?? null,
-        };
-      },
+      toThing: (item) => ({
+        id: item.id,
+        thingType: "grant" as const,
+        parentThingId: item.organizationId,
+        sourceTable: "grants",
+        sourceId: item.id,
+        sourceUrl: item.source ?? null,
+      }),
       toVerdict: (item) => ({
         recordType: "grant",
         recordId: item.id,

@@ -5,7 +5,8 @@ import { getTypedEntities, isOrganization, getPageById, getTypedEntityById, type
 import { resolveOrgBySlug } from "@/app/organizations/org-utils";
 import { formatKBFactValue } from "@/components/wiki/factbase/format";
 import type { Fact, Property } from "@longterm-wiki/factbase";
-import { OrganizationsTable, type OrgRow, type OrgStatDef } from "@/app/organizations/organizations-table";
+import type { OrgRow, OrgStatDef } from "@/app/organizations/organizations-table";
+import { OrganizationsView } from "@/app/organizations/organizations-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
@@ -181,6 +182,7 @@ async function loadFromApi(
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId,
       orgType,
       wikiPageId: org.wikiId,
@@ -201,7 +203,7 @@ async function loadFromApi(
 
       foundedDate: org.foundedDate,
 
-      peopleCount: null, // Not available from API
+      peopleCount: null, // Not available from API; column hidden in picker.
       completionScore: computeOrgCoverage(org),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -232,6 +234,7 @@ async function loadFromApi(
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId ?? null,
       orgType,
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
@@ -252,7 +255,7 @@ async function loadFromApi(
 
       foundedDate,
 
-      peopleCount: null,
+      peopleCount: null, // Not available from API; column hidden in picker.
       completionScore: computeOrgCoverage({ foundedDate }),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -316,6 +319,7 @@ function loadFromLocal(): OrgPageData {
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId ?? null,
       orgType: org.orgType ?? null,
       wikiPageId: org.wikiId && getPageById(org.id) ? org.wikiId : null,
@@ -381,7 +385,8 @@ function buildStats(rows: OrgRow[]): OrgStatDef[] {
 // ── Page component ───────────────────────────────────────────────────────
 
 export default async function OrganizationsPage() {
-  // Always build orgTypeMap from local data — orgType is not in the wiki-server DB
+  // Always build orgTypeMap and people-count map from local data — neither is in
+  // the wiki-server DB, so both server- and local-mode rows resolve them locally.
   const allEntities = getTypedEntities();
   const orgs = allEntities.filter(isOrganization).filter((e) => !e.deprecated);
   const orgTypeMap: Record<string, string> = {};
@@ -411,7 +416,7 @@ export default async function OrganizationsPage() {
       <DataSourceBanner source={source} apiError={apiError} />
 
       <Suspense fallback={<div>Loading...</div>}>
-        <OrganizationsTable
+        <OrganizationsView
           rows={data.rows}
           stats={data.stats}
           serverEnabled={data.serverEnabled}

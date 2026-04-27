@@ -1,0 +1,11 @@
+# Raw input for scorecard ingesters (QUA-698).
+#
+# Layout: data/scorecards/raw/<source>/<wave-slug>/grades.json
+#
+# `grades.json` is the canonical extracted input — committed to git. Large
+# binary inputs (PDFs, full HTML pages) used during the LLM-extraction
+# step can sit alongside `grades.json` in the same wave directory; commit
+# them when they're useful for audit, gitignore them when they're large.
+#
+# See `crux/lib/scorecard-import/sources/<source>.ts` for the per-source
+# JSON schema.

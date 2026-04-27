@@ -1839,6 +1839,47 @@ export const sourcingUrlSuggestions = pgTable(
 );
 
 /**
+ * Universal PG audit log (QUA-442).
+ *
+ * Written by the `audit_trigger_fn()` PL/pgSQL trigger attached to every
+ * non-excluded table. Captures every INSERT/UPDATE/DELETE with full before
+ * and after JSONB, plus session attribution pulled from `SET LOCAL`
+ * GUCs (`app.agent_session_id`, `app.agent_tool`).
+ *
+ * This is the comprehensive floor; `tablebase_audit_log` (below) stays as
+ * the richer application-layer log for TableBase sync handlers that want
+ * verdict/source-URL/evidence attribution.
+ *
+ * Migration: 0204_qua_442_audit_log_universal_trigger.sql
+ */
+export const fullAuditLog = pgTable(
+  "full_audit_log",
+  {
+    id: bigserial("id", { mode: "bigint" }).primaryKey(),
+    tableName: text("table_name").notNull(),
+    operation: text("operation").$type<"INSERT" | "UPDATE" | "DELETE">().notNull(),
+    oldRow: jsonb("old_row"),
+    newRow: jsonb("new_row"),
+    txnId: bigint("txn_id", { mode: "bigint" }),
+    sessionId: text("session_id"),
+    tool: text("tool"),
+    applicationName: text("application_name"),
+    changedAt: timestamp("changed_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_full_audit_log_table_time").on(
+      table.tableName,
+      table.changedAt,
+    ),
+    index("idx_full_audit_log_session").on(table.sessionId),
+    index("idx_full_audit_log_txn").on(table.txnId),
+    index("idx_full_audit_log_changed_at").on(table.changedAt),
+  ],
+);
+
+/**
  * Audit log for TableBase changes — records every insert/update/delete
  * to PG-primary tables (personnel, grants, funding_rounds, etc.).
  * Provides git-like change history for data that bypasses git.
@@ -1848,7 +1889,10 @@ export const tablebaseAuditLog = pgTable(
   {
     id: bigserial("id", { mode: "number" }).primaryKey(),
     recordType: text("record_type").notNull(),
-    recordId: varchar("record_id", { length: 10 }).notNull(),
+    // QUA-753: widened from varchar(10) to text. Composite/derived record IDs
+    // (e.g. scorecard snapshot IDs `<source>-<wave>` or grade IDs
+    // `<snap>|<entity>|<dim>`) blew through the 10-char ceiling and 500'd.
+    recordId: text("record_id").notNull(),
     operation: text("operation").notNull(), // 'insert', 'update', 'delete'
     oldData: jsonb("old_data"),
     newData: jsonb("new_data").notNull(),
@@ -2324,7 +2368,11 @@ export const benchmarks = pgTable(
     id: text("id").primaryKey(),
     slug: text("slug").notNull().unique(),
     name: text("name").notNull(),
-    category: text("category"), // coding | reasoning | math | knowledge | multimodal | safety | agentic | general
+    // CHECK constraint enforced by chk_benchmarks_category — see migration
+    // 0207. Allowed: general, reasoning, math, coding, knowledge, multimodal,
+    // agentic, safety, dangerous-capability, robustness, honesty, adversarial.
+    category: text("category"),
+    subCategory: text("sub_category"),
     description: text("description"),
     website: text("website"),
     scoringMethod: text("scoring_method"),
@@ -2365,6 +2413,19 @@ export const benchmarkResults = pgTable(
     date: text("date"),
     sourceUrl: text("source_url"),
     notes: text("notes"),
+    // Provenance — who ran the eval and when (extended in QUA-689 from
+    // QUA-702's nullable tested_by). The CHECK constraint is enforced by
+    // chk_br_tested_by — see migration 0215. Allowed values: self-report,
+    // leaderboard, aisi-uk, aisi-us, metr, apollo, third-party-paper,
+    // epoch-ai, unknown, plus the legacy 'third-party' value from QUA-702
+    // (kept for backward compat).
+    testedBy: text("tested_by").notNull().default("unknown"),
+    testedByOrgId: text("tested_by_org_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" },
+    ),
+    evaluationDate: text("evaluation_date"),
+    methodologyNotes: text("methodology_notes"),
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2378,7 +2439,20 @@ export const benchmarkResults = pgTable(
   (table) => [
     index("idx_br_benchmark").on(table.benchmarkId),
     index("idx_br_model").on(table.modelId),
-    uniqueIndex("idx_br_benchmark_model").on(table.benchmarkId, table.modelId),
+    index("idx_br_tested_by").on(table.testedBy),
+    index("idx_br_tested_by_org_id").on(table.testedByOrgId),
+    index("idx_br_evaluation_date").on(sql`${table.evaluationDate} DESC`),
+    // Widened in QUA-689 from (benchmarkId, modelId) so the same model can
+    // have multiple results on the same benchmark distinguished by who ran
+    // the eval and when (self-report vs HELM vs AISI-UK at different dates).
+    // Migration 0214 drops idx_br_benchmark_model and creates this one in
+    // its place.
+    uniqueIndex("idx_br_benchmark_model_testedby_date").on(
+      table.benchmarkId,
+      table.modelId,
+      table.testedBy,
+      sql`COALESCE(${table.evaluationDate}, '')`,
+    ),
   ]
 );
 
@@ -2630,28 +2704,32 @@ export const VALID_THING_TYPES = [
   "publication",
   "political-race",
   "race-candidate",
+  "model-system-card",
+  "safety-framework",
+  "safety-framework-version",
+  "framework-threshold",
+  "framework-diff",
+  "ai_incident",
 ] as const;
 
 export type ThingType = (typeof VALID_THING_TYPES)[number];
 
+// QUA-507 (migration 0204): dropped title/description/parent_title/search_vector.
+// The `things` table is now a pointer-only index. Denormalized display fields
+// live in the `things_search` materialized view (see `thingsSearch` below).
 export const things = pgTable(
   "things",
   {
     id: text("id").primaryKey(),
     thingType: text("thing_type").notNull(),
-    title: text("title").notNull(),
     parentThingId: text("parent_thing_id").references((): any => things.id, {
       onDelete: "set null",
     }),
     sourceTable: text("source_table").notNull(),
     sourceId: text("source_id").notNull(),
     entityType: text("entity_type"),
-    description: text("description"),
     sourceUrl: text("source_url"),
     wikiId: text("wiki_id"),
-    parentTitle: text("parent_title"),
-    // verdict, verdict_confidence, verdict_at columns removed — sourcing
-    // verdicts now live in the unified source_check_verdicts table. See migration 0127.
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
@@ -2661,7 +2739,6 @@ export const things = pgTable(
     syncedAt: timestamp("synced_at", { withTimezone: true })
       .notNull()
       .defaultNow(),
-    // search_vector tsvector column is managed via migration SQL (generated column)
   },
   (table) => [
     index("idx_things_type").on(table.thingType),
@@ -2669,7 +2746,6 @@ export const things = pgTable(
     index("idx_things_entity_type").on(table.entityType),
     index("idx_things_updated").on(table.updatedAt),
     uniqueIndex("idx_things_source_unique").on(table.sourceTable, table.sourceId),
-    // GIN index on search_vector is created in migration SQL
   ]
 );
 
@@ -4149,5 +4225,785 @@ export const enrichmentRuns = pgTable(
     index("idx_enrichment_runs_record_type").on(table.recordType),
     index("idx_enrichment_runs_entity").on(table.entityId),
     index("idx_enrichment_runs_started_at").on(sql`${table.startedAt} DESC`),
+  ],
+);
+
+/**
+ * Model system cards — structured extraction of fields published in flagship
+ * AI model / system cards. One row per published card. A model can have
+ * multiple cards over time (lab-side republications, hub updates).
+ *
+ * QUA-690 — Phase 3 of the AI safety data layer (parent: QUA-687).
+ *
+ * Uniqueness: (ai_model_id, version, release_date). `source_hash` captures
+ * silent edits — new hash for the same version = a new row documenting the
+ * drift, not an overwrite.
+ */
+export const modelSystemCards = pgTable(
+  "model_system_cards",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id at sync
+    aiModelDisplayName: text("ai_model_display_name"),
+    version: text("version"),
+    releaseDate: date("release_date"),
+    deprecationDate: date("deprecation_date"),
+    trainingCutoff: date("training_cutoff"),
+    trainingComputeFlops: numeric("training_compute_flops"),
+    trainingGpuHours: numeric("training_gpu_hours"),
+    trainingHardware: text("training_hardware"),
+    parametersTotal: bigint("parameters_total", { mode: "number" }),
+    parametersActive: bigint("parameters_active", { mode: "number" }),
+    architecture: text("architecture"), // dense | MoE | dense+thinking-switch | ...
+    modalitiesIn: text("modalities_in").array(),
+    modalitiesOut: text("modalities_out").array(),
+    contextWindowTokens: integer("context_window_tokens"),
+    outputWindowTokens: integer("output_window_tokens"),
+    languagesSupported: text("languages_supported").array(),
+    safetyFramework: text("safety_framework"), // ASL | Preparedness | FSF | RSP | ...
+    safetyTier: text("safety_tier"), // ASL-3 | High | Critical Level 2 | CCL-1 | ...
+    safetyTierDomains: jsonb("safety_tier_domains").$type<Record<string, string>>(),
+    safeguardsSummary: text("safeguards_summary"),
+    classifierDetails: jsonb("classifier_details").$type<Record<string, unknown>>(),
+    fineTuningPolicy: text("fine_tuning_policy"), // api-only | research-access | weights-released | closed
+    deploymentChannels: text("deployment_channels").array(),
+    evalScoresCited: jsonb("eval_scores_cited").$type<
+      Array<{
+        benchmark: string;
+        benchmarkId?: string | null;
+        score: number;
+        metric?: string | null;
+        setup?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    thirdPartyEvals: jsonb("third_party_evals").$type<
+      Array<{
+        evaluator: string;
+        url?: string | null;
+        summary?: string | null;
+        excerpt?: string | null;
+      }>
+    >(),
+    redTeamSummary: text("red_team_summary"),
+    incidentDisclosures: text("incident_disclosures"),
+    sourceUrl: text("source_url").notNull(),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    systemPromptUrl: text("system_prompt_url"),
+    usagePolicyUrl: text("usage_policy_url"),
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_msc_ai_model").on(table.aiModelId),
+    index("idx_msc_safety_framework").on(table.safetyFramework),
+    index("idx_msc_safety_tier").on(table.safetyTier),
+    index("idx_msc_release_date").on(sql`${table.releaseDate} DESC`),
+    uniqueIndex("uq_msc_natural_key").on(
+      table.aiModelId,
+      sql`COALESCE(${table.version}, '')`,
+      sql`COALESCE(${table.releaseDate}, '0001-01-01'::date)`,
+    ),
+  ],
+);
+
+// ============================================================================
+// QUA-691 / Phase 4 — Frontier safety framework tracker
+//
+// Structured tracker for the ~12 published frontier-safety frameworks
+// (Anthropic RSP, OpenAI Preparedness, DeepMind FSF, Meta, xAI, ...) with
+// per-version archival, extracted capability thresholds, and inter-version
+// diffs surfaced for weakening detection.
+//
+// Design:
+// - `safety_frameworks` — one row per lab's framework (~12 rows).
+// - `safety_framework_versions` — one row per published version. Natural
+//   key on (framework_id, content_hash) so silent lab edits become new
+//   rows documenting drift rather than overwrites.
+// - `framework_capability_thresholds` — extracted thresholds per version.
+//   Dual risk_domain columns: `risk_domain_canonical` (enum, for
+//   cross-lab matrix) + `risk_domain_label` (lab-native, for fidelity).
+//   `source_quote` MANDATORY — grounds every threshold row.
+// - `framework_diffs` — version-pair diff aggregate. Never auto-publish
+//   weakening: `review_verdict` defaults to 'unreviewed' and the public
+//   UI must gate on a human-confirmed verdict.
+// - `framework_diff_items` — per-change atomic rows that compose a diff.
+// - `framework_ingest_log` — audit trail of every fetch; enables
+//   silent-update detection.
+// ============================================================================
+
+export const safetyFrameworks = pgTable(
+  "safety_frameworks",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    orgId: text("org_id").notNull(), // FK resolved to entities.stable_id at sync
+    orgDisplayName: text("org_display_name"),
+    name: text("name").notNull(), // "Responsible Scaling Policy"
+    shortName: text("short_name"), // "RSP"
+    latestVersionId: text("latest_version_id"),
+    firstPublishedDate: date("first_published_date"),
+    currentStatus: text("current_status"), // active | archived | superseded | draft
+    frameworkFamily: text("framework_family"), // groups Meta FAF+AASF as same family
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sf_org").on(table.orgId),
+    index("idx_sf_status").on(table.currentStatus),
+    index("idx_sf_family").on(table.frameworkFamily),
+  ],
+);
+
+export const safetyFrameworkVersions = pgTable(
+  "safety_framework_versions",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    versionLabel: text("version_label").notNull(), // "3.1", "v2 draft", "Feb 2025"
+    versionSortOrder: integer("version_sort_order").notNull(), // monotonic
+    publishedDate: date("published_date"),
+    discoveredDate: date("discovered_date").notNull(),
+    sourceUrl: text("source_url").notNull(),
+    sourceUrlCanonical: text("source_url_canonical"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    pdfArchiveUrl: text("pdf_archive_url"),
+    contentHash: text("content_hash").notNull(), // sha256 of normalized text
+    contentLengthChars: integer("content_length_chars"),
+    summary: text("summary"), // LLM-generated 2-3 sentence summary
+    notes: text("notes"), // Free-form ops note (e.g. "Wayback push skipped")
+    isDraft: boolean("is_draft").notNull().default(false),
+    supersededByVersionId: text("superseded_by_version_id"),
+    ingestStatus: text("ingest_status").notNull().default("pending_review"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_sfv_framework").on(table.frameworkId),
+    index("idx_sfv_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_sfv_ingest_status").on(table.ingestStatus),
+    uniqueIndex("uq_sfv_content_hash").on(table.frameworkId, table.contentHash),
+  ],
+);
+
+export const frameworkCapabilityThresholds = pgTable(
+  "framework_capability_thresholds",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    versionId: text("version_id").notNull(),
+    riskDomainCanonical: text("risk_domain_canonical").notNull(),
+    riskDomainLabel: text("risk_domain_label").notNull(),
+    tierLabel: text("tier_label").notNull(),
+    tierSortOrder: integer("tier_sort_order").notNull(), // 1=lowest, 4=severe
+    triggerDescription: text("trigger_description").notNull(),
+    sourceQuote: text("source_quote").notNull(), // MANDATORY — grounds extraction
+    sourcePageHint: text("source_page_hint"), // "§3.2", "p. 14"
+    requiredMitigations: jsonb("required_mitigations").$type<Record<string, unknown>>(),
+    associatedEvals: jsonb("associated_evals").$type<Record<string, unknown>>(),
+    commitmentLanguage: text("commitment_language"), // committed|aspirational|conditional|informational
+    extractedByModel: text("extracted_by_model"),
+    extractionConfidence: numeric("extraction_confidence"),
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    humanReviewNotes: text("human_review_notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fct_version").on(table.versionId),
+    index("idx_fct_canonical_domain").on(table.riskDomainCanonical),
+    index("idx_fct_tier_sort").on(table.tierSortOrder),
+    index("idx_fct_reviewed").on(table.humanReviewed),
+  ],
+);
+
+export const frameworkDiffs = pgTable(
+  "framework_diffs",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    fromVersionId: text("from_version_id").notNull(),
+    toVersionId: text("to_version_id").notNull(),
+    changeSummary: text("change_summary").notNull(),
+    weakeningFlagged: boolean("weakening_flagged").notNull().default(false),
+    strengtheningFlagged: boolean("strengthening_flagged").notNull().default(false),
+    neutralChangesCount: integer("neutral_changes_count"),
+    diffDetails: jsonb("diff_details").$type<Record<string, unknown>>(),
+    overallDirection: text("overall_direction"), // weaker|stronger|mixed|neutral|rewrite
+    humanReviewed: boolean("human_reviewed").notNull().default(false),
+    reviewVerdict: text("review_verdict").notNull().default("unreviewed"),
+    reviewNotes: text("review_notes"),
+    classifiedByModel: text("classified_by_model"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fd_from").on(table.fromVersionId),
+    index("idx_fd_to").on(table.toVersionId),
+    index("idx_fd_weakening").on(table.weakeningFlagged),
+    index("idx_fd_direction").on(table.overallDirection),
+    uniqueIndex("uq_fd_version_pair").on(table.fromVersionId, table.toVersionId),
+  ],
+);
+
+export const frameworkDiffItems = pgTable(
+  "framework_diff_items",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    diffId: text("diff_id").notNull(),
+    changeType: text("change_type").notNull(), // threshold_added|threshold_removed|...
+    riskDomainCanonical: text("risk_domain_canonical"),
+    beforeSnapshot: jsonb("before_snapshot").$type<Record<string, unknown>>(),
+    afterSnapshot: jsonb("after_snapshot").$type<Record<string, unknown>>(),
+    severity: integer("severity"), // 1-3
+    classifierTag: text("classifier_tag"), // weaker|stronger|rewrite_equivalent|...
+    rationale: text("rationale"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fdi_diff").on(table.diffId),
+    index("idx_fdi_change_type").on(table.changeType),
+  ],
+);
+
+export const frameworkIngestLog = pgTable(
+  "framework_ingest_log",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    frameworkId: text("framework_id").notNull(),
+    fetchedAt: timestamp("fetched_at", { withTimezone: true }).notNull().defaultNow(),
+    sourceUrl: text("source_url").notNull(),
+    contentHash: text("content_hash"),
+    status: text("status").notNull(), // new_version|unchanged|silent_update_detected|fetch_failed
+    notes: text("notes"),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_fil_framework").on(table.frameworkId),
+    index("idx_fil_status").on(table.status),
+    index("idx_fil_fetched_at").on(sql`${table.fetchedAt} DESC`),
+  ],
+);
+
+// ── External scorecard mirror (QUA-688 / QUA-687 Phase 1) ─────────────────
+//
+// Mirrors the five major external AI-safety scorecards (FLI AI Safety Index,
+// SaferAI, AI Lab Watch, Stanford FMTI, Seoul Commitment Tracker) into a
+// unified parent + child table.
+//
+// Two tables instead of one because dimension counts vary by 25× (4 for
+// SaferAI vs 100 for FMTI). A flat shape would force NULL overload or drop
+// subdomain structure.
+//
+// Authoritative source is data/scorecards/snapshots/*.yaml; PG is a read
+// mirror. is_latest is held to "exactly one TRUE per scorecard_source" by a
+// partial unique index + the sync handler.
+
+export const scorecardSnapshots = pgTable(
+  "scorecard_snapshots",
+  {
+    /** Stable, human-readable id, e.g. `fli-summer-2025`, `fmti-dec-2025`. */
+    id: text("id").primaryKey(),
+    /**
+     * Source enum: `fli_index`, `saferai`, `ailabwatch`, `fmti`,
+     * `seoul_tracker`. CHECK constraint enumerated against prod when
+     * additional sources are added (see .claude/rules/database-migrations.md).
+     */
+    scorecardSource: text("scorecard_source").notNull(),
+    /** Human label for the wave, e.g. "Summer 2025" or "v1.1 May 2024". */
+    waveLabel: text("wave_label"),
+    /** Publication date of this wave. */
+    publishedAt: date("published_at").notNull(),
+    /** When we ingested this snapshot. */
+    capturedAt: timestamp("captured_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    /** Canonical URL for this wave (top-level page on source site). */
+    sourceUrl: text("source_url").notNull(),
+    /** Methodology PDF / arXiv / docs URL. */
+    methodologyUrl: text("methodology_url"),
+    /** Reuse license. e.g. `CC-BY-4.0`, `fair-use-citation`. */
+    license: text("license"),
+    /** Denormalized counts for dashboards. */
+    orgCount: integer("org_count").notNull().default(0),
+    dimensionCount: integer("dimension_count").notNull().default(0),
+    /** Free-form notes (e.g. "maintenance ceased 2025-09"). */
+    notes: text("notes"),
+    /**
+     * Exactly one TRUE per scorecardSource — enforced by a partial unique
+     * index below + the sync handler.
+     */
+    isLatest: boolean("is_latest").notNull().default(false),
+    /**
+     * Whether the source is still actively updated. AI Lab Watch is frozen
+     * (Sept 2025); we keep its snapshot but mark it inactive so the UI can
+     * label it appropriately.
+     */
+    sourceActive: boolean("source_active").notNull().default(true),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_snapshots_source").on(table.scorecardSource),
+    index("idx_scorecard_snapshots_published").on(sql`${table.publishedAt} DESC`),
+    uniqueIndex("uq_scorecard_snapshots_latest_per_source")
+      .on(table.scorecardSource)
+      .where(sql`${table.isLatest} = true`),
+  ]
+);
+
+export const scorecardGrades = pgTable(
+  "scorecard_grades",
+  {
+    /** Composite-derived id: `<snapshot>__<entity>__<dim>`, max 200 chars. */
+    id: text("id").primaryKey(),
+    /** Parent snapshot. */
+    snapshotId: text("snapshot_id")
+      .notNull()
+      .references(() => scorecardSnapshots.id, { onDelete: "cascade" }),
+    /** FK to entities.stable_id — the scored organization. */
+    entityId: text("entity_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    /**
+     * Display-name cache (sibling pattern, see
+     * docs/audits/things-denormalization-audit.md). Backfilled at ingest.
+     */
+    entityDisplayName: text("entity_display_name").notNull(),
+    /**
+     * Dimension key. `overall` is the aggregate row; per-source slugs
+     * otherwise (e.g. `risk-assessment`, `fmti-indicator-42`).
+     */
+    dimensionSlug: text("dimension_slug").notNull(),
+    /** Human label, e.g. "Risk Assessment". */
+    dimensionLabel: text("dimension_label").notNull(),
+    /** Optional weight (0..1). NULL when the source is unweighted. */
+    dimensionWeight: numeric("dimension_weight"),
+    /**
+     * Optional rollup parent slug — lets FMTI's 100 indicators nest under
+     * 13 subdomains without a third table.
+     */
+    dimensionParentSlug: text("dimension_parent_slug"),
+    /** Normalized 0–100 percent where the source provides numeric scoring. */
+    scoreNumeric: numeric("score_numeric"),
+    /**
+     * Letter or categorical grade (`A-`, `C+`, `F`, `Fulfilled`, `Partial`).
+     * Either `scoreNumeric` or `scoreLetter` is set; both may be set.
+     */
+    scoreLetter: text("score_letter"),
+    /** The exact string from the source for audit (`"2.64"`, `"34%"`, `"C+"`). */
+    scoreRaw: text("score_raw").notNull(),
+    /** Per-cell free-form notes from the source. */
+    notes: text("notes"),
+    /** Deep-link URL to this specific row on the source page when available. */
+    sourceUrl: text("source_url"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_scorecard_grades_snapshot").on(table.snapshotId),
+    index("idx_scorecard_grades_entity").on(table.entityId),
+    index("idx_scorecard_grades_dimension").on(table.dimensionSlug),
+    uniqueIndex("uq_scorecard_grades_natural_key").on(
+      table.snapshotId,
+      table.entityId,
+      table.dimensionSlug
+    ),
+  ]
+);
+
+/**
+ * Third-party AI model evaluations — published pre-deployment evaluations and
+ * red-team reports from external evaluators (UK AISI, US AISI / CAISI, METR,
+ * Apollo Research). One row per published report. The `report_url` is the
+ * natural key — a single report covering N models is one row, with the model
+ * fan-out captured in `third_party_evaluation_models`.
+ *
+ * QUA-692 — Phase 5 of the AI safety data layer (parent: QUA-687).
+ */
+export const thirdPartyEvaluations = pgTable(
+  "third_party_evaluations",
+  {
+    id: text("id").primaryKey(), // sid_-prefixed
+    evaluatorOrgId: text("evaluator_org_id").notNull(), // FK resolved to entities.stable_id
+    evaluatorOrgDisplayName: text("evaluator_org_display_name"),
+    reportUrl: text("report_url").notNull().unique(),
+    reportPdfUrl: text("report_pdf_url"),
+    title: text("title").notNull(),
+    publishedDate: date("published_date"),
+    riskDomain: text("risk_domain").array().notNull(), // controlled vocab; CHECK in migration
+    preDeployment: boolean("pre_deployment"), // null = ambiguous (methodology post)
+    findingsSummary: text("findings_summary"),
+    capabilityLevelsAssessed: jsonb("capability_levels_assessed").$type<Record<string, string>>(),
+    methodologyUrl: text("methodology_url"),
+    sourceFormat: text("source_format"), // pdf | html | markdown | arxiv-paper | missing
+    sourceHash: text("source_hash"),
+    waybackSnapshotUrl: text("wayback_snapshot_url"),
+    sourceSystem: text("source_system").notNull(), // sitemap | rss | html-scrape | manual
+    extractedAt: timestamp("extracted_at", { withTimezone: true }),
+    extractorVersion: text("extractor_version"),
+    extractionModel: text("extraction_model"),
+    extractionConfidence: jsonb("extraction_confidence").$type<Record<string, number>>(),
+    notes: text("notes"),
+    syncedAt: timestamp("synced_at", { withTimezone: true }).notNull().defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    index("idx_tpe_evaluator").on(table.evaluatorOrgId),
+    index("idx_tpe_published_date").on(sql`${table.publishedDate} DESC`),
+    index("idx_tpe_pre_deployment").on(table.preDeployment),
+    // GIN over the array enables `risk_domain && ARRAY['cyber']` filters in O(log n).
+    index("idx_tpe_risk_domain_gin").using("gin", table.riskDomain),
+  ],
+);
+
+/**
+ * Model aliases — maps lowercased external alias strings (as they appear on
+ * leaderboards and in vendor publications) to their canonical AI-model
+ * entity. Replaces the hardcoded 40-entry alias maps duplicated across the
+ * older sync code so Phase 2 ingesters can resolve raw model names without
+ * teaching every plugin about every rename.
+ *
+ * QUA-689 — Phase 2 of the AI safety data layer (parent: QUA-687).
+ *
+ * Alias is the natural primary key — the lookup is "given a raw external
+ * string, find the canonical model entity". If the same alias appears on
+ * different sources for the same model that's redundant, not informative;
+ * a flat PK records each alias once. Conflicts (same alias → different
+ * models) must be surfaced by the ingester, not silently last-write-wins.
+ */
+export const modelAliases = pgTable(
+  "model_aliases",
+  {
+    alias: text("alias").primaryKey(),
+    modelStableId: text("model_stable_id")
+      .notNull()
+      .references(() => entities.stableId, { onDelete: "cascade" }),
+    // Where this alias was observed: 'yaml-seed' for the initial bulk load
+    // from ai-models.yaml `aliases:` arrays, then leaderboard slugs once
+    // ingesters start writing.
+    source: text("source").notNull().default("yaml-seed"),
+    // CHECK enforced by chk_model_aliases_confidence (migration 0207):
+    //   exact  — byte-for-byte match in source data
+    //   fuzzy  — Levenshtein match suggested by ingester, awaiting promote
+    //   manual — promoted by a human via /internal/benchmark-quarantine
+    confidence: text("confidence").notNull().default("exact"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_model_aliases_model").on(table.modelStableId),
+    index("idx_model_aliases_source").on(table.source),
+  ],
+);
+
+/**
+ * Many-to-many: a single third-party evaluation report can cover multiple
+ * AI models (METR multi-model reviews, Apollo cross-lab evaluations).
+ * `match_confidence` tracks how the link was made so we can surface an
+ * unlinked-queue dashboard for low-confidence rows.
+ */
+export const thirdPartyEvaluationModels = pgTable(
+  "third_party_evaluation_models",
+  {
+    evaluationId: text("evaluation_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // FK resolved to entities.stable_id
+    aiModelDisplayName: text("ai_model_display_name"),
+    rawNameInReport: text("raw_name_in_report"), // verbatim model string from the report
+    matchConfidence: text("match_confidence").notNull(), // exact | fuzzy | manual
+    createdAt: timestamp("created_at", { withTimezone: true }).notNull().defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.evaluationId, table.aiModelId] }),
+    index("idx_tpem_ai_model").on(table.aiModelId),
+  ],
+);
+
+/**
+ * Pending benchmark links — queue for cited benchmarks in
+ * `model_system_cards.eval_scores_cited` whose name could not be resolved
+ * to a row in `benchmarks`.
+ *
+ * QUA-702. Populated by the model_system_cards sync postUpsert hook;
+ * resolved entries graduate to `benchmark_results` via a follow-up job
+ * once a human (or a future fuzzy matcher) maps `cited_name` to a real
+ * `benchmarks.id`.
+ *
+ * Idempotency on re-extract: unique on
+ * (model_system_card_id, cited_name_normalized) where the normalized form
+ * matches `normalizeBenchmarkName(s)` in the linker
+ * (`lower(s).replace(/[^a-z0-9]/g, "")`). Without normalization, repeated
+ * extractions can return name variants ("SWE-bench Verified" /
+ * "swe-bench-verified" / "SWE Bench Verified") that produce duplicate
+ * queue rows for the same underlying benchmark.
+ */
+export const pendingBenchmarkLinks = pgTable(
+  "pending_benchmark_links",
+  {
+    id: text("id").primaryKey(), // sid_-style 10-char id
+    modelSystemCardId: text("model_system_card_id").notNull(),
+    aiModelId: text("ai_model_id").notNull(), // entities.stable_id
+    citedName: text("cited_name").notNull(),
+    /**
+     * Generated normalized form of `cited_name` — must match
+     * `normalizeBenchmarkName()` in `system-card-benchmark-linker.ts`. Stored
+     * (not virtual) so the unique index can reference it. Update both
+     * together if the normalization rules change.
+     */
+    citedNameNormalized: text("cited_name_normalized").generatedAlwaysAs(
+      sql`regexp_replace(lower(cited_name), '[^a-z0-9]', '', 'g')`,
+    ),
+    citedScore: doublePrecision("cited_score"),
+    citedMetric: text("cited_metric"),
+    citedSetup: text("cited_setup"),
+    citedExcerpt: text("cited_excerpt"),
+    /** When the queue entry has been mapped to a real benchmark, this is set. */
+    resolvedBenchmarkId: text("resolved_benchmark_id"),
+    /** pending | resolved | rejected | auto-resolved */
+    status: text("status").notNull().default("pending"),
+    resolutionNotes: text("resolution_notes"),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_pbl_card").on(table.modelSystemCardId),
+    index("idx_pbl_model").on(table.aiModelId),
+    index("idx_pbl_status").on(table.status),
+    index("idx_pbl_resolved_benchmark").on(table.resolvedBenchmarkId),
+    uniqueIndex("uq_pbl_card_name").on(
+      table.modelSystemCardId,
+      table.citedNameNormalized,
+    ),
+  ],
+);
+
+// ============================================================================
+// AI Incidents — Phase 6 of QUA-687 (QUA-693)
+//
+// Mirrors the MIT AI Incident Database (AIID; CC-BY-SA 4.0). OECD AI Incident
+// Monitor ingest deferred to Phase 7 pending structured-export verification.
+//
+// Per AIID license, the `reports.text` field is explicitly EXCLUDED from
+// CC-BY-SA. We mirror report URL/title/publisher/published_at only — never
+// the article body. validate-aiid-no-report-text.ts defends this invariant.
+//
+// Attribution FKs (`ai_model_id`, `org_id`, `developer_org_id`) populate only
+// when `attribution_confidence >= 0.7` AND the candidate resolves to an
+// existing entity; NULL is correct when ambiguous.
+// ============================================================================
+
+export const aiIncidents = pgTable(
+  "ai_incidents",
+  {
+    id: varchar("id", { length: 10 }).primaryKey(),
+    /** 'mit-aiid' today; 'oecd-aim' when Phase 7 lands. CHECK-constrained. */
+    source: varchar("source", { length: 16 }).notNull(),
+    /** Upstream identifier, composite-unique with `source` for idempotent upsert. */
+    sourceIncidentId: varchar("source_incident_id", { length: 128 }).notNull(),
+    /** Date the incident was first reported (when upstream recorded it). */
+    reportedDate: date("reported_date"),
+    /** Date the underlying incident occurred (often different from reportedDate). */
+    incidentDate: date("incident_date"),
+    /** Normalized: low|medium|high|critical. AIM supplies this natively; AIID not. */
+    severity: varchar("severity", { length: 32 }),
+    /** Raw upstream severity label before normalization. */
+    upstreamSeverity: varchar("upstream_severity", { length: 64 }),
+    title: text("title").notNull(),
+    /** Short summary, <=2000 chars. NOT the full report body. */
+    summary: text("summary").notNull(),
+    fullReportUrl: text("full_report_url"),
+    /** FK → entities.stable_id for the attributed model. Null when unresolved. */
+    aiModelId: text("ai_model_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the alleged deployer. Null when unresolved. */
+    orgId: text("org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** FK → entities.stable_id for the model's developer. Null when unresolved. */
+    developerOrgId: text("developer_org_id").references(() => entities.stableId, {
+      onDelete: "set null",
+    }),
+    /** LLM attribution confidence [0.00, 1.00]. FKs only populated when >= 0.7. */
+    attributionConfidence: numeric("attribution_confidence", {
+      precision: 3,
+      scale: 2,
+    }),
+    tags: text("tags")
+      .array()
+      .notNull()
+      .default(sql`'{}'::text[]`),
+    /** Full upstream record for auditing / future backfills. */
+    raw: jsonb("raw").notNull(),
+    /** When we fetched the upstream snapshot containing this row. */
+    upstreamFetchedAt: timestamp("upstream_fetched_at", {
+      withTimezone: true,
+    }).notNull(),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    uniqueIndex("uq_ai_incidents_source_incident").on(
+      table.source,
+      table.sourceIncidentId,
+    ),
+    index("idx_ai_incidents_source").on(table.source),
+    index("idx_ai_incidents_ai_model").on(table.aiModelId),
+    index("idx_ai_incidents_org").on(table.orgId),
+    index("idx_ai_incidents_developer_org").on(table.developerOrgId),
+    index("idx_ai_incidents_reported_date").on(table.reportedDate),
+    index("idx_ai_incidents_incident_date").on(table.incidentDate),
+    index("idx_ai_incidents_tags_gin").using("gin", table.tags),
+  ],
+);
+
+/**
+ * Reports are a 1:N join off incidents. AIID averages ~12 reports/incident.
+ * We store URL/title/publisher/published_at ONLY — the `text` field on the
+ * AIID reports collection is CC-BY-SA excluded and must never land here.
+ */
+export const aiIncidentReports = pgTable(
+  "ai_incident_reports",
+  {
+    incidentId: varchar("incident_id", { length: 10 })
+      .notNull()
+      .references(() => aiIncidents.id, { onDelete: "cascade" }),
+    url: text("url").notNull(),
+    title: text("title"),
+    publisher: text("publisher"),
+    publishedAt: date("published_at"),
+    language: varchar("language", { length: 8 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    primaryKey({ columns: [table.incidentId, table.url] }),
+    index("idx_ai_incident_reports_published_at").on(table.publishedAt),
+  ],
+);
+
+/**
+ * Benchmark results pending — quarantine queue for ingester rows whose
+ * source model name didn't resolve to any entity (no exact alias match,
+ * fuzzy resolution below confidence threshold, or never-seen-before name).
+ *
+ * Reviewed via the /internal/benchmark-quarantine dashboard (follow-up PR).
+ * On resolution the row is promoted to `benchmark_results`, an alias is
+ * added to `model_aliases`, and `status` flips to 'resolved'.
+ *
+ * The natural key includes the literal lowercase form of the raw name so
+ * the same ingester run is idempotent — re-running an ingester that hits
+ * the same unresolved name twice gets one quarantine row, not two.
+ *
+ * QUA-689 — Phase 2 of the AI safety data layer (parent: QUA-687).
+ *
+ * Distinct from `pendingBenchmarkLinks` (QUA-702): that queue holds
+ * citation strings extracted from system cards (where `benchmark_id`
+ * itself is unresolved); this queue holds ingester rows where the
+ * `benchmark_id` is known but the `model_id` is not.
+ */
+export const benchmarkResultsPending = pgTable(
+  "benchmark_results_pending",
+  {
+    id: text("id").primaryKey(),
+    benchmarkId: text("benchmark_id")
+      .notNull()
+      .references(() => benchmarks.id, { onDelete: "cascade" }),
+    // The exact string the source emitted ("Claude 3.5 Sonnet (new)",
+    // "claude-3-5-sonnet-2024-10"). Preserves case for human readability;
+    // dedup happens via the natural-key index using lower(raw_model_name).
+    rawModelName: text("raw_model_name").notNull(),
+    score: doublePrecision("score"),
+    scoreText: text("score_text"),
+    unit: text("unit"),
+    evaluationDate: text("evaluation_date"),
+    testedBy: text("tested_by").notNull().default("unknown"),
+    sourceUrl: text("source_url"),
+    methodologyNotes: text("methodology_notes"),
+    rawPayload: jsonb("raw_payload").$type<Record<string, unknown>>(),
+    // CHECK enforced by chk_brp_status (migration 0215):
+    //   pending  — not yet reviewed
+    //   resolved — promoted to benchmark_results + alias recorded
+    //   rejected — explicitly excluded (e.g. obvious test row, deprecated)
+    status: text("status").notNull().default("pending"),
+    ingesterSource: text("ingester_source").notNull(),
+    resolvedToStableId: text("resolved_to_stable_id").references(
+      () => entities.stableId,
+      { onDelete: "set null" },
+    ),
+    resolvedAt: timestamp("resolved_at", { withTimezone: true }),
+    resolvedBy: text("resolved_by"),
+    rejectedReason: text("rejected_reason"),
+    syncedAt: timestamp("synced_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+    updatedAt: timestamp("updated_at", { withTimezone: true })
+      .notNull()
+      .defaultNow(),
+  },
+  (table) => [
+    index("idx_brp_benchmark").on(table.benchmarkId),
+    index("idx_brp_status").on(table.status),
+    index("idx_brp_ingester_source").on(table.ingesterSource),
+    index("idx_brp_created_at").on(sql`${table.createdAt} DESC`),
+    uniqueIndex("uq_brp_natural_key").on(
+      table.ingesterSource,
+      table.benchmarkId,
+      sql`lower(${table.rawModelName})`,
+      sql`COALESCE(${table.evaluationDate}, '')`,
+    ),
   ],
 );

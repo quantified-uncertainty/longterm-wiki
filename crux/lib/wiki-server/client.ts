@@ -18,6 +18,10 @@ import {
   WIKI_SERVER_BATCH_TIMEOUT_MS as BATCH_TIMEOUT_MS,
 } from '../config.ts';
 import { findSlotFromAncestors } from '../session/session-context.ts';
+import {
+  getCachedAuditSessionId,
+  getCruxToolName,
+} from './audit-context.ts';
 export { BATCH_TIMEOUT_MS };
 
 /**
@@ -65,12 +69,29 @@ export function getApiKey(): string {
 
 /**
  * Build HTTP headers with the API key for wiki-server requests.
+ *
+ * Also stamps QUA-442 audit-attribution headers when known:
+ *   - `X-Agent-Session-Id`: the current agent-checklist session id, if
+ *     primed by `primeAuditSessionId()` (called from crux.mjs).
+ *   - `X-Agent-Tool`: the current crux subcommand
+ *     (e.g. `tb.scaffold`), set via `process.env.CRUX_COMMAND`.
+ *
+ * Missing values are simply omitted — the server middleware treats absent
+ * headers as unknown attribution, not as an error.
  */
 export function buildHeaders(): Record<string, string> {
   const headers: Record<string, string> = { 'Content-Type': 'application/json' };
   const apiKey = getApiKey();
   if (apiKey) {
     headers['Authorization'] = `Bearer ${apiKey}`;
+  }
+  const sessionId = getCachedAuditSessionId();
+  if (sessionId) {
+    headers['X-Agent-Session-Id'] = sessionId;
+  }
+  const tool = getCruxToolName();
+  if (tool) {
+    headers['X-Agent-Tool'] = tool;
   }
   return headers;
 }

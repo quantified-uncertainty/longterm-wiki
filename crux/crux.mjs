@@ -65,6 +65,7 @@ import * as queryCommands from './commands/query.ts';
 import * as jobsCommands from './commands/jobs.ts';
 import * as contextCommands from './commands/context.ts';
 import * as enrichCommands from './commands/enrich.ts';
+import * as enrichmentCommands from './commands/enrichment.ts';
 import * as sessionsCommands from './commands/sessions.ts';
 import * as researchCommands from './commands/research.ts';
 import * as evalsCommands from './commands/evals.ts';
@@ -81,6 +82,7 @@ import * as factbaseImport990Commands from './commands/factbase-import-990.ts';
 import * as footnotesCommands from './commands/footnotes.ts';
 import * as agentWorkspaceCommands from './commands/agent-workspace.ts';
 import * as importGrantsCommands from './commands/import-grants.ts';
+import * as importScorecardsCommands from './commands/import-scorecards.ts';
 import * as backfillGranteeIdsCommands from './commands/backfill-grantee-ids.ts';
 import * as backfillProgramIdsCommands from './commands/backfill-program-ids.ts';
 import * as importDivisionsCommands from './commands/import-divisions.ts';
@@ -119,6 +121,7 @@ import * as dataQualityCommands from './commands/data-quality.ts';
 import * as blueskyCommands from './commands/bluesky.ts';
 import * as politicalRacesCommands from './commands/political-races.ts';
 import * as politicalDataCommands from './commands/political-data.ts';
+import * as scorecardsCommands from './commands/scorecards.ts';
 import * as branchesCommands from './commands/branches.ts';
 import * as deployTasksCommands from './commands/deploy-tasks.ts';
 import * as agentResetCommands from './commands/agent-reset.ts';
@@ -130,6 +133,9 @@ import * as linearCommands from './commands/linear.ts';
 import * as flagshipCurateCommands from './commands/flagship-curate.ts';
 import * as sessionFinalizeCommands from './commands/session-finalize.ts';
 import * as dispatchCommands from './commands/dispatch.ts';
+import * as auditCommands from './commands/audit.ts';
+import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
+import * as aiidCommands from './commands/ingest-aiid.ts';
 
 const domains = {
   validate: validateCommands,
@@ -159,6 +165,7 @@ const domains = {
   jobs: jobsCommands,
   context: contextCommands,
   enrich: enrichCommands,
+  enrichment: enrichmentCommands,
   sessions: sessionsCommands,
   research: researchCommands,
   evals: evalsCommands,
@@ -176,6 +183,7 @@ const domains = {
   footnotes: footnotesCommands,
   'agent-workspace': agentWorkspaceCommands,
   'import-grants': importGrantsCommands,
+  'import-scorecards': importScorecardsCommands,
   'backfill-grantee-ids': backfillGranteeIdsCommands,
   'backfill-program-ids': backfillProgramIdsCommands,
   'import-divisions': importDivisionsCommands,
@@ -214,6 +222,7 @@ const domains = {
   bluesky: blueskyCommands,
   races: politicalRacesCommands,
   political: politicalDataCommands,
+  scorecards: scorecardsCommands,
   branches: branchesCommands,
   'deploy-tasks': deployTasksCommands,
   'agent-reset': agentResetCommands,
@@ -224,6 +233,8 @@ const domains = {
   'flagship-curate': flagshipCurateCommands,
   'session-finalize': sessionFinalizeCommands,
   dispatch: dispatchCommands,
+  audit: auditCommands,
+  aiid: aiidCommands,
 };
 
 const shortcutMap = buildShortcutMap();
@@ -481,6 +492,20 @@ async function main() {
     }
     process.exit(1);
   }
+
+  // Publish the current crux command so client.ts can stamp
+  // X-Agent-Tool on every wiki-server request (QUA-442). Set before
+  // the audit-session-id priming so both headers are ready by the
+  // time the command issues its first request.
+  if (!process.env.CRUX_COMMAND) {
+    process.env.CRUX_COMMAND = `${domain} ${commandName}`.trim();
+  }
+
+  // Prime the X-Agent-Session-Id cache (best-effort, never blocks on
+  // errors). Fire-and-forget into a bounded promise; individual
+  // commands that hit the server right away will await the same
+  // promise via the internal cache guard.
+  primeAuditSessionId().catch(() => {});
 
   // Run the command
   try {

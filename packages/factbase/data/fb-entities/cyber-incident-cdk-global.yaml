@@ -1,0 +1,36 @@
+entity: sid_cYIOXoS7EA
+facts:
+  - id: f_8JHUdKF0j7
+    property: incident-date
+    value: "2024-06-18"
+    asOf: "2024-06-18"
+    source: https://www.bleepingcomputer.com/news/security/cdk-global-cyberattack-impacts-thousands-of-us-car-dealerships/
+    notes: "First CDK ransomware attack; second attack June 19 disrupted recovery"
+
+  - id: f_elKPoh3pKM
+    property: financial-impact
+    value: 2.5e+7
+    asOf: "2024-06-21"
+    source: https://www.bloomberg.com/news/articles/2024-06-21/cdk-global-paid-25-million-bitcoin-ransom-to-russian-hackers
+    notes: "CDK reportedly paid ~$25M in bitcoin to BlackSuit; ransom demand initially escalated from $10M to $50M+"
+
+  - id: f_zKG5mSoyPs
+    property: financial-impact
+    value: 1.02e+9
+    asOf: "2024-07"
+    source: https://www.andersoneconomicgroup.com/cdk-global-cyber-attack-cost-dealers-1-billion-in-2-weeks/
+    notes: "Anderson Economic Group estimate of total dealer losses ~$1.02B over 2-week disruption"
+
+  - id: f_tUeC99enq5
+    property: financial-impact
+    value: 5e+8
+    asOf: "2024-12"
+    source: https://www.wsj.com/articles/cdk-cyberattack-cost-dealerships-just-the-start-1baa6519
+    notes: "Estimated CDK direct costs (incident response, legal, lost revenue); medium-confidence estimate, not publicly broken out"
+
+  - id: f_22wjZRL9Oa
+    property: incident-status
+    value: resolved
+    asOf: "2024-07-04"
+    source: https://www.reuters.com/technology/cybersecurity/cdk-restores-services-most-dealerships-after-cyber-attack-2024-07-04/
+    notes: "Services largely restored by July 4, 2024 (~2-week disruption); litigation continuing"

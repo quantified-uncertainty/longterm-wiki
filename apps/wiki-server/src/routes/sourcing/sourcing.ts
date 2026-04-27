@@ -24,6 +24,7 @@ import {
   entities,
   divisions,
   things,
+  thingsSearch,
   facts,
   publications,
   benchmarkResults,
@@ -46,6 +47,7 @@ import {
   SOURCING_EXEMPT_TYPES,
   isSourcingExempt,
 } from "../../api-types.js";
+import { coerceDisplayName } from "../shared/display-name-coerce.js";
 
 // ---- Constants ----
 
@@ -180,6 +182,13 @@ const VerdictsQuery = z.object({
   entity_id: z.string().max(200).optional(),
   needs_recheck: qBool.optional(),
   q: z.string().max(500).optional(),
+  /**
+   * QUA-661: when true, only return rows where `display_name` or
+   * `entity_display_name` is a raw `sid_`-prefixed stableId. Used by
+   * `validate-sid-display` to avoid paginating all ~14k verdict rows
+   * on every gate run.
+   */
+  display_name_is_sid: qBool.optional(),
   limit: defaultClampedLimit,
   offset: z.coerce.number().int().min(0).default(0),
 });
@@ -562,7 +571,7 @@ const sourcingApp = new Hono()
 
   // ---- GET /verdicts ----
   .get("/verdicts", zv("query", VerdictsQuery), async (c) => {
-    const { record_type, verdict, entity_id, needs_recheck, q, limit, offset } =
+    const { record_type, verdict, entity_id, needs_recheck, q, display_name_is_sid, limit, offset } =
       c.req.valid("query");
     const db = getDrizzleDb();
 
@@ -578,6 +587,13 @@ const sourcingApp = new Hono()
     }
     if (entity_id) {
       conditions.push(eq(sourceVerdicts.entityId, entity_id));
+    }
+    if (display_name_is_sid) {
+      // Matches the isSid() contract (prefix-only). Used by validate-sid-display
+      // (QUA-661) so the gate check doesn't scan all rows just to find zero leaks.
+      conditions.push(
+        sql`(starts_with(${sourceVerdicts.displayName}, 'sid_') OR starts_with(${sourceVerdicts.entityDisplayName}, 'sid_'))`
+      );
     }
     if (q) {
       const pattern = `%${escapeIlike(q)}%`;
@@ -1257,8 +1273,23 @@ const sourcingApp = new Hono()
     // issues across PG versions with the postgres.js driver.
     const fieldNameVal = body.fieldName ?? null;
     const entityIdVal = body.entityId ?? null;
-    const displayNameVal = body.displayName ?? null;
-    const entityDisplayNameVal = body.entityDisplayName ?? null;
+    // QUA-661: coerce raw stableIds to NULL before persisting. Display-name
+    // columns must hold human-readable names or NULL — never a raw `sid_`.
+    // Callers that pass an unresolved sid_ get a NULL here (honest signal of
+    // "unknown") plus a warn-level log so the leak is traceable back to the
+    // source code path.
+    const displayNameVal = coerceDisplayName(
+      body.displayName ?? null,
+      "displayName",
+      body.recordType,
+      body.recordId,
+    );
+    const entityDisplayNameVal = coerceDisplayName(
+      body.entityDisplayName ?? null,
+      "entityDisplayName",
+      body.recordType,
+      body.recordId,
+    );
 
     // Use Drizzle ORM insert/update instead of raw SQL to avoid driver issues
     // with bare literals and COALESCE expressions.
@@ -1658,17 +1689,17 @@ const sourcingApp = new Hono()
         names[row.slug] = row.title;
       }
     } else {
-      // Generic fallback: use the things table
+      // QUA-507: reads `things_search` MV (title lives there post denorm drop).
       const rows = await db
         .select({
-          sourceId: things.sourceId,
-          title: things.title,
+          sourceId: thingsSearch.sourceId,
+          title: thingsSearch.title,
         })
-        .from(things)
+        .from(thingsSearch)
         .where(
           and(
-            eq(things.sourceTable, record_type),
-            inArray(things.sourceId, idsToResolve)
+            eq(thingsSearch.sourceTable, record_type),
+            inArray(thingsSearch.sourceId, idsToResolve)
           )
         );
 

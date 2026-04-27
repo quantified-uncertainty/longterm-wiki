@@ -57,16 +57,19 @@ export default function RootLayout({
         {/* Top nav bar */}
         <header className="sticky top-0 z-40 border-b border-border bg-card">
           <div className="flex items-center max-w-full">
-            <Link href="/" className="w-64 shrink-0 px-4 py-3 text-lg font-bold no-underline text-foreground max-md:w-auto">
+            {/* Wordmark: w-64 only at lg+ (1024px) where the desktop nav can fit
+                alongside it. Below lg, shrink to `w-auto` so the wordmark + hamburger
+                don't collide (QUA-670). */}
+            <Link href="/" className="lg:w-64 shrink-0 px-4 py-3 text-lg font-bold no-underline text-foreground">
               Longterm Wiki
             </Link>
             <nav aria-label="Main navigation" className="flex-1 flex items-center justify-end gap-4 px-6 py-3 min-w-0">
-              <div className="hidden md:flex items-center gap-4">
+              <div className="hidden lg:flex items-center gap-4">
                 <DesktopNav />
               </div>
               <Link
                 href="/feed.xml"
-                className="hidden md:inline text-muted-foreground no-underline hover:text-foreground transition-colors"
+                className="hidden lg:inline text-muted-foreground no-underline hover:text-foreground transition-colors"
                 title="Atom feed"
                 target="_blank"
               >

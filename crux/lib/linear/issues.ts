@@ -117,6 +117,45 @@ export async function getComments(
   }
 }
 
+export interface UpdateIssueInput {
+  projectId?: string | null;
+  priority?: number;
+  title?: string;
+  description?: string;
+  parentId?: string | null;
+}
+
+/**
+ * Generic issue update — projectId, priority, title, description, parentId.
+ *
+ * Pass `null` for `projectId` or `parentId` to clear the field. Workflow
+ * state changes go through `updateIssueState()` (which resolves state names
+ * to UUIDs).
+ */
+export async function updateIssue(
+  identifier: string,
+  input: UpdateIssueInput,
+): Promise<{ identifier: string }> {
+  const data = await linearGraphQL<{
+    issueUpdate: {
+      success: boolean;
+      issue: { identifier: string };
+    };
+  }>(
+    `mutation UpdateIssue($id: String!, $input: IssueUpdateInput!) {
+      issueUpdate(id: $id, input: $input) {
+        success
+        issue { identifier }
+      }
+    }`,
+    { id: identifier, input },
+  );
+  if (!data.issueUpdate.success) {
+    throw new Error(`Linear refused to update ${identifier}`);
+  }
+  return { identifier: data.issueUpdate.issue.identifier };
+}
+
 /**
  * Update an issue's workflow state.
  *

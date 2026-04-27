@@ -37,7 +37,6 @@ export { consecutiveBoldLabelsRule } from './consecutive-bold-labels.ts';
 export { componentImportsRule } from './component-imports.ts';
 export { citationUrlsRule } from './citation-urls.ts';
 export { vagueCitationsRule } from './vague-citations.ts';
-export { squiggleQualityRule } from './squiggle-quality.ts';
 export { datainfoboxEntityMatchRule } from './datainfobox-entity-match.ts';
 
 // External link validation

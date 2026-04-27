@@ -25,6 +25,7 @@ import { join, dirname } from "path";
 import { fileURLToPath } from "url";
 
 import { fetchJsonWithRetry } from "./lib/wiki-server-data.mjs";
+import { getServerUrl, getApiKey, getEnvPrefix } from "./lib/wiki-server-env.mjs";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const REPO_ROOT = join(__dirname, "..", "..", "..");
@@ -32,17 +33,12 @@ const AUDIT_DIR = join(REPO_ROOT, "docs", "audits");
 const FACTBASE_DATA_DIR = join(REPO_ROOT, "packages", "factbase", "data");
 const OUT_MD_DIR = join(REPO_ROOT, "apps", "web", "src", "data");
 
-const envPrefix =
-  process.env.WIKI_SERVER_ENV === "prod" ||
-  process.env.WIKI_SERVER_ENV === "production"
-    ? "PROD_"
-    : "";
-const SERVER_URL = process.env[`${envPrefix}LONGTERMWIKI_SERVER_URL`];
-const API_KEY = process.env[`${envPrefix}LONGTERMWIKI_SERVER_API_KEY`];
+const SERVER_URL = getServerUrl();
+const API_KEY = getApiKey();
 
 if (!SERVER_URL) {
   console.error(
-    `error: ${envPrefix}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
+    `error: ${getEnvPrefix()}LONGTERMWIKI_SERVER_URL is not set. Use WIKI_SERVER_ENV=prod.`
   );
   process.exit(1);
 }

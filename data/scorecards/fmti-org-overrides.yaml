@@ -1,0 +1,41 @@
+# Manual org-name → entity-slug overrides for the FMTI ingester.
+#
+# The ingester's resolver tries (1) overrides → (2) direct entity matcher
+# (title/alias) → (3) normalized name (strips Inc., Labs, ...) before falling
+# back to creating a stub entity (only when --ensure-stub-entities is set).
+#
+# Add an entry here for any FMTI display name that doesn't match a real
+# entity slug or alias automatically. Keys MUST match the column header in
+# the FMTI scores CSV exactly (case-sensitive).
+#
+# Source: github.com/stanford-crfm/fmti
+overrides:
+  # Dec 2025 wave (13 orgs)
+  "AI21 Labs": ai21-labs
+  Alibaba: alibaba
+  Amazon: amazon
+  Anthropic: anthropic
+  DeepSeek: deepseek
+  Google: google
+  IBM: ibm
+  Meta: meta-ai
+  Midjourney: midjourney
+  Mistral: mistral-ai
+  OpenAI: openai
+  Writer: writer
+  xAI: xai
+
+  # May 2024 wave (14 orgs) — adds Adept, Aleph Alpha, BigCode, Microsoft,
+  # Stability; drops Alibaba, DeepSeek, Midjourney, xAI.
+  Adept: adept
+  "Aleph Alpha": aleph-alpha
+  BigCode: bigcode
+  Microsoft: microsoft
+  Stability: stability-ai
+
+  # Oct 2023 wave (10 orgs) — adds Cohere, Hugging Face, Inflection, Stability AI;
+  # also "Stability AI" (trailing AI) as an alias.
+  Cohere: cohere
+  "Hugging Face": hugging-face
+  Inflection: inflection-ai
+  "Stability AI": stability-ai

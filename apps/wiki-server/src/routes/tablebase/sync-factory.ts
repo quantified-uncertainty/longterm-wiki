@@ -7,7 +7,7 @@
  *   3. Upsert (batch INSERT...ON CONFLICT, auto-chunked for Postgres param limit)
  *   4. Audit log (single batch insert per chunk; existing-row pre-fetch in batch)
  *   5. Entity FK resolve (post-upsert backfill via resolveEntityFKs)
- *   6. Things dual-write (resolveEntityTitles + upsertThingsInTx)
+ *   6. Things dual-write (pointer-only upsertThingsInTx, QUA-507)
  *   7. Verdicts + claim linking (writeInlineVerdicts in tx; linkClaimsToRecords post-tx)
  *
  * Each phase is gated by config presence — a route that doesn't need a feature
@@ -56,10 +56,10 @@ import {
 } from "../shared/resolve-entity-fks.js";
 import {
   upsertThingsInTx,
-  resolveEntityTitles,
   type ThingSyncInput,
 } from "../shared/thing-sync.js";
 import { logAuditEntries } from "./audit-log.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 import {
   writeInlineVerdicts,
   logSourcingCoverage,
@@ -238,55 +238,18 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
    */
   auditSourceUrl?: (item: TItem) => string | null;
 
-  // ---- Things sync (dual-write) ----
+  // ---- Things sync (pointer-only index) ----
 
   /**
    * Map an item to a `things` table row. Setting this enables things sync:
-   * the factory calls `resolveEntityTitles` for the IDs returned by
-   * `thingsTitleIds`, then `upsertThingsInTx`.
+   * the factory calls `upsertThingsInTx` with the returned pointer-only rows.
    *
-   * The titleMap is keyed by both slug and stableId.
+   * QUA-507: post denorm-column drop, `ThingSyncInput` contains only pointer
+   * fields (`id`, `thingType`, `sourceTable`, `sourceId`, optional
+   * `parentThingId` / `entityType` / `sourceUrl` / `wikiId`). Display fields
+   * are resolved at read time from the `things_search` MV.
    */
-  toThing?: (item: TItem, titleMap: Map<string, string>) => ThingSyncInput;
-
-  /**
-   * Entity IDs to resolve to titles for the `parentTitle` field on things rows.
-   * Default: empty (no titles resolved).
-   *
-   * Only resolves IDs from the `entities` table. If your route references
-   * non-entity tables (e.g. `benchmarks`, `divisions`), use `augmentTitleMap`
-   * to populate additional (id → title) pairs before `toThing` runs.
-   */
-  thingsTitleIds?: (items: TItem[]) => string[];
-
-  /**
-   * Hook for pre-resolving title-map entries from non-entity tables.
-   *
-   * Runs after `thingsTitleIds` → `resolveEntityTitles`, but before `toThing`.
-   * Called with the Drizzle transaction handle, the items batch, and the
-   * mutable `titleMap` that `toThing` will receive. Handlers use this to
-   * SELECT from their own reference tables (e.g. `benchmarks`, `divisions`)
-   * and merge `(id → title)` pairs into the map.
-   *
-   * Example (benchmark-results):
-   * ```ts
-   * augmentTitleMap: async (tx, items, titleMap) => {
-   *   const ids = [...new Set(items.map((i) => i.benchmarkId))];
-   *   const rows = await tx.select({ id: benchmarks.id, name: benchmarks.name })
-   *     .from(benchmarks)
-   *     .where(inArray(benchmarks.id, ids));
-   *   for (const r of rows) titleMap.set(r.id, r.name);
-   * }
-   * ```
-   *
-   * QUA-470: introduced for routes whose composers reference rows in domain
-   * tables that `resolveEntityTitles` doesn't know about.
-   */
-  augmentTitleMap?: (
-    tx: Tx,
-    items: TItem[],
-    titleMap: Map<string, string>,
-  ) => Promise<void>;
+  toThing?: (item: TItem) => ThingSyncInput;
 
   // ---- Entity FK resolution (post-upsert backfill) ----
 
@@ -616,6 +579,8 @@ export function createSyncHandler<
       config.conflictSet ?? deriveConflictSet(table, allVals[0] ?? {});
 
     await db.transaction(async (tx) => {
+      await applyAuditContext(tx, c);
+
       // ---- Phase 3: upsert (chunked) + Phase 4: audit ----
       for (let offset = 0; offset < allVals.length; offset += chunkSize) {
         const chunk = allVals.slice(offset, offset + chunkSize);
@@ -690,22 +655,10 @@ export function createSyncHandler<
         });
       }
 
-      // ---- Phase 6: things sync ----
+      // ---- Phase 6: things sync (QUA-507: pointer-only) ----
       if (config.toThing) {
         await runPhase(name, "things", async () => {
-          const titleIds = config.thingsTitleIds
-            ? config.thingsTitleIds(items)
-            : [];
-          const titleMap =
-            titleIds.length > 0
-              ? await resolveEntityTitles(tx, titleIds)
-              : new Map<string, string>();
-          // QUA-470: let handlers populate the title map from non-entity
-          // tables (benchmarks, divisions, etc.) before toThing composes.
-          if (config.augmentTitleMap) {
-            await config.augmentTitleMap(tx, items, titleMap);
-          }
-          const thingsRows = items.map((item) => config.toThing!(item, titleMap));
+          const thingsRows = items.map((item) => config.toThing!(item));
           await upsertThingsInTx(tx, thingsRows);
         });
       }

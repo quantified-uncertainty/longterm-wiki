@@ -13,7 +13,7 @@ interface CoverageDotsProps {
   label?: string;
   /** Tooltip text (shown on hover) */
   tooltip?: string;
-  /** Circle size: sm = 7px (table rows), md = 9px (cards/headers) */
+  /** Circle size: sm = 6px (table rows), md = 11px (cards/headers, QUA-670) */
   size?: "sm" | "md";
   className?: string;
 }
@@ -27,7 +27,7 @@ export function CoverageDots({
 }: CoverageDotsProps) {
   const clampedScore = Math.max(1, Math.min(4, Math.round(score)));
   const pct = clampedScore * 25; // 25%, 50%, 75%, 100%
-  const dim = size === "md" ? 7 : 6;
+  const dim = size === "md" ? 11 : 6;
   const ariaLabel = label ?? `Coverage: ${pct}%`;
 
   return (

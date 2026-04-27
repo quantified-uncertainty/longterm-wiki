@@ -107,9 +107,16 @@ interface FactBaseEntityBodyProps {
   entityId: string;
   /** Skip fetching verdicts from wiki-server (for embedding in directory pages that use local data only). */
   skipVerdicts?: boolean;
+  /**
+   * Hide the hero stat-cards row. Use when the parent already renders the same
+   * KPIs (e.g. the Overview tab in the organization profile shows the same
+   * revenue/valuation/headcount cards, so rendering them again in the Facts
+   * tab is pure duplication — QUA-671).
+   */
+  skipHeroStats?: boolean;
 }
 
-export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEntityBodyProps) {
+export async function FactBaseEntityBody({ entityId, skipVerdicts, skipHeroStats }: FactBaseEntityBodyProps) {
   const entity = getKBEntity(entityId);
   if (!entity) {
     return (
@@ -174,8 +181,8 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
         </div>
       )}
 
-      {/* Hero Stat Cards */}
-      {heroProps.length > 0 && (
+      {/* Hero Stat Cards — suppressed when the parent already renders them (QUA-671). */}
+      {heroProps.length > 0 && !skipHeroStats && (
         <section className="mb-8">
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-6 gap-3">
             {heroProps.map((propId) => (
@@ -292,31 +299,34 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
           Internal Metadata
         </summary>
         <div className="mt-2 border border-border/50 rounded-lg overflow-hidden">
+          {/* Each row has an explicit " : " separator in page text so a non-CSS reader
+              (Playwright page.textContent, screen reader linear walk) still sees
+              "ID: sid_..." instead of a label/value concatenation (QUA-671). */}
           <table className="w-full text-xs">
             <tbody className="divide-y divide-border/50">
               <tr>
-                <td className="py-1.5 px-3 font-medium text-muted-foreground w-[8rem] bg-muted/20">ID</td>
+                <td className="py-1.5 px-3 font-medium text-muted-foreground w-[8rem] bg-muted/20">ID:{" "}</td>
                 <td className="py-1.5 px-3 font-mono">{entity.id}</td>
               </tr>
               {entity.stableId && (
                 <tr>
-                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Stable ID</td>
+                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Stable ID:{" "}</td>
                   <td className="py-1.5 px-3 font-mono">{entity.stableId}</td>
                 </tr>
               )}
               {entity.wikiId && (
                 <tr>
-                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Wiki ID</td>
+                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Wiki ID:{" "}</td>
                   <td className="py-1.5 px-3 font-mono">{entity.wikiId}</td>
                 </tr>
               )}
               <tr>
-                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Type</td>
+                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Type:{" "}</td>
                 <td className="py-1.5 px-3">{entity.type}</td>
               </tr>
               {entity.parent && (
                 <tr>
-                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Parent</td>
+                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Parent:{" "}</td>
                   <td className="py-1.5 px-3">
                     <Link href={`/factbase/entity/${entity.parent}`} className="text-blue-600 hover:underline dark:text-blue-400">
                       {getKBEntity(entity.parent)?.name ?? entity.parent}
@@ -325,11 +335,11 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
                 </tr>
               )}
               <tr>
-                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">YAML Source</td>
+                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">YAML Source:{" "}</td>
                 <td className="py-1.5 px-3 font-mono">packages/factbase/data/fb-entities/{entityId}.yaml</td>
               </tr>
               <tr>
-                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Facts</td>
+                <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Facts:{" "}</td>
                 <td className="py-1.5 px-3">
                   {structuredFacts.length} structured
                   {allFacts.length !== structuredFacts.length && ` (${allFacts.length} total)`}
@@ -337,7 +347,7 @@ export async function FactBaseEntityBody({ entityId, skipVerdicts }: FactBaseEnt
               </tr>
               {totalItems > 0 && (
                 <tr>
-                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Records</td>
+                  <td className="py-1.5 px-3 font-medium text-muted-foreground bg-muted/20">Records:{" "}</td>
                   <td className="py-1.5 px-3">
                     {totalItems} in {totalCollections} collection{totalCollections !== 1 ? "s" : ""}
                   </td>

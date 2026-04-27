@@ -16,11 +16,14 @@ import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
+import { stripMdxEscapes } from "@/lib/inline-markdown";
 
 export interface OrgRow {
   id: string;
   slug: string | null;
   name: string;
+  /** One-line description (from YAML or wiki-server) — used in grouped view. */
+  description: string | null;
   wikiId: string | null;
   orgType: string | null;
   wikiPageId: string | null;
@@ -130,6 +133,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       id: org.id,
       slug: org.id,
       name: org.title,
+      description: org.description ?? null,
       wikiId: org.wikiId,
       orgType: null, // Will be enriched client-side from orgTypeMap
       wikiPageId: org.wikiId,
@@ -160,6 +164,7 @@ export function OrganizationsTable({
   stats,
   serverEnabled = false,
   orgTypeMap,
+  hideHeader = false,
 }: {
   rows: OrgRow[];
   stats?: OrgStatDef[];
@@ -167,6 +172,8 @@ export function OrganizationsTable({
   serverEnabled?: boolean;
   /** Maps entity id -> orgType for enriching server results (orgType is not in the DB) */
   orgTypeMap?: Record<string, string>;
+  /** When true, hides the table's own search input + type chips (caller renders them above). */
+  hideHeader?: boolean;
 }) {
   const serverMode = serverEnabled;
 
@@ -396,10 +403,12 @@ export function OrganizationsTable({
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showColumnPicker]);
+  // peopleCount is intentionally NOT exposed: the API doesn't return it and
+  // the local FactBase data is too sparse to be useful. Re-add when there's
+  // a server-side rollup of personnel/career counts per org.
   type OptionalColumnKey = "peopleCount" | "completionScore";
   const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
     { key: "completionScore", label: "Coverage" },
-    { key: "peopleCount", label: "People Tracked" },
   ];
   const [visibleColumns, setVisibleColumns] = useState<Set<OptionalColumnKey>>(
     () => new Set(["completionScore"]),
@@ -443,26 +452,28 @@ export function OrganizationsTable({
       )}
 
       {/* Filters */}
-      <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
-        <input
-          type="text"
-          placeholder="Search name, type, people, funding programs, description..."
-          aria-label="Search organizations"
-          value={search}
-          onChange={(e) => handleSearch(e.target.value)}
-          className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
-        />
-        <FilterChips
-          items={orgTypes.map((t) => ({
-            key: t,
-            label: ORG_TYPE_LABELS[t] ?? t,
-            count: typeCounts[t] ?? 0,
-          }))}
-          selected={typeFilter}
-          onSelect={(key) => urlSetFilter("type", key)}
-          allCount={typeCounts.all}
-        />
-      </div>
+      {!hideHeader && (
+        <div role="search" className="flex flex-col sm:flex-row gap-3 mb-5">
+          <input
+            type="text"
+            placeholder="Search name, type, people, funding programs, description..."
+            aria-label="Search organizations"
+            value={search}
+            onChange={(e) => handleSearch(e.target.value)}
+            className="px-3 py-2 text-sm rounded-lg border border-border bg-card placeholder:text-muted-foreground/50 focus:outline-none focus:ring-2 focus:ring-primary/20 focus:border-primary/40 w-full sm:w-96"
+          />
+          <FilterChips
+            items={orgTypes.map((t) => ({
+              key: t,
+              label: ORG_TYPE_LABELS[t] ?? t,
+              count: typeCounts[t] ?? 0,
+            }))}
+            selected={typeFilter}
+            onSelect={(key) => urlSetFilter("type", key)}
+            allCount={typeCounts.all}
+          />
+        </div>
+      )}
 
       {/* Results count + column picker */}
       <div className="flex items-center gap-3 mb-3">
@@ -550,26 +561,33 @@ export function OrganizationsTable({
                     key={row.id}
                     className={`hover:bg-muted/20 transition-colors ${isLoading ? "opacity-50" : ""}`}
                   >
-                    {/* Name */}
-                    <td className="py-2.5 px-3">
-                      {row.slug ? (
-                        <Link
-                          href={`/organizations/${row.slug}`}
-                          className="font-medium text-foreground hover:text-primary transition-colors"
-                        >
-                          {row.name}
-                        </Link>
-                      ) : (
-                        <span className="font-medium text-foreground">{row.name}</span>
-                      )}
-                      {row.wikiPageId && (
-                        <Link
-                          href={`/wiki/${row.wikiPageId}`}
-                          className="ml-2 text-xs text-muted-foreground hover:text-primary transition-colors"
-                          title="Wiki page"
-                        >
-                          wiki
-                        </Link>
+                    {/* Name + description */}
+                    <td className="py-2.5 px-3 max-w-[28rem]">
+                      <div className="flex items-baseline gap-2">
+                        {row.slug ? (
+                          <Link
+                            href={`/organizations/${row.slug}`}
+                            className="font-medium text-foreground hover:text-primary transition-colors"
+                          >
+                            {row.name}
+                          </Link>
+                        ) : (
+                          <span className="font-medium text-foreground">{row.name}</span>
+                        )}
+                        {row.wikiPageId && (
+                          <Link
+                            href={`/wiki/${row.wikiPageId}`}
+                            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                            title="Wiki page"
+                          >
+                            wiki
+                          </Link>
+                        )}
+                      </div>
+                      {row.description && (
+                        <p className="mt-0.5 text-xs text-muted-foreground line-clamp-2 leading-snug">
+                          {stripMdxEscapes(row.description)}
+                        </p>
                       )}
                     </td>
 
@@ -663,9 +681,24 @@ export function OrganizationsTable({
                       colSpan={activeColCount}
                       className="py-8 text-center text-muted-foreground text-sm"
                     >
-                      {search
-                        ? "No organizations match your search."
-                        : "No organizations found."}
+                      <div>
+                        {search || typeFilter !== "all" || statFilter !== "all"
+                          ? "No organizations match the current filters."
+                          : "No organizations found."}
+                      </div>
+                      {(search || typeFilter !== "all" || statFilter !== "all") && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            handleSearch("");
+                            urlSetFilter("type", "all");
+                            urlSetFilter("stat", "all");
+                          }}
+                          className="mt-2 text-xs text-primary hover:underline underline-offset-2"
+                        >
+                          Clear filters
+                        </button>
+                      )}
                     </td>
                   </tr>
                 )}

@@ -44,32 +44,42 @@ function makeProperty(unit?: string, display?: Property["display"]): Property {
 
 describe("FactValueDisplay", () => {
   describe("monetary values (production data)", () => {
-    it("renders Anthropic valuation as '$61.5 billion' not '61500000000'", () => {
+    it("renders Anthropic valuation as compact '$62B' not '61500000000'", () => {
+      // 61.5 rounds to 62 because ≥10 drops decimal (QUA-681).
       const fact = makeFact({ type: "number", value: 61_500_000_000, unit: "USD" });
       const prop = makeProperty("USD");
       render(<FactValueDisplay fact={fact} property={prop} />);
-      expect(screen.getByText("$61.5 billion")).toBeInTheDocument();
+      expect(screen.getByText("$62B")).toBeInTheDocument();
     });
 
-    it("renders OpenAI valuation as '$300 billion'", () => {
+    it("renders OpenAI valuation as '$300B'", () => {
       const fact = makeFact({ type: "number", value: 300_000_000_000, unit: "USD" });
       const prop = makeProperty("USD");
       render(<FactValueDisplay fact={fact} property={prop} />);
-      expect(screen.getByText("$300 billion")).toBeInTheDocument();
+      expect(screen.getByText("$300B")).toBeInTheDocument();
     });
 
-    it("renders revenue in millions correctly", () => {
+    it("renders revenue in millions compactly", () => {
       const fact = makeFact({ type: "number", value: 850_000_000, unit: "USD" });
       const prop = makeProperty("USD");
       render(<FactValueDisplay fact={fact} property={prop} />);
-      expect(screen.getByText("$850 million")).toBeInTheDocument();
+      expect(screen.getByText("$850M")).toBeInTheDocument();
     });
 
-    it("renders total funding correctly", () => {
+    it("renders total funding compactly", () => {
       const fact = makeFact({ type: "number", value: 10_750_000_000, unit: "USD" });
       const prop = makeProperty("USD");
       render(<FactValueDisplay fact={fact} property={prop} />);
-      expect(screen.getByText("$10.8 billion")).toBeInTheDocument();
+      // 10.75 rounds to 11 because ≥10 drops decimal (QUA-681).
+      expect(screen.getByText("$11B")).toBeInTheDocument();
+    });
+
+    it("renders small revenue as compact thousands (Redwood Research bug from QUA-681)", () => {
+      // Before the fix, this rendered as "$22,060" on /organizations/redwood-research.
+      const fact = makeFact({ type: "number", value: 22_060, unit: "USD" });
+      const prop = makeProperty("USD");
+      render(<FactValueDisplay fact={fact} property={prop} />);
+      expect(screen.getByText("$22K")).toBeInTheDocument();
     });
   });
 
@@ -147,8 +157,8 @@ describe("FactValueDisplay", () => {
       const prop = makeProperty("USD");
       const { container } = render(<FactValueDisplay fact={fact} property={prop} />);
       const text = container.querySelector("span")?.textContent ?? "";
-      expect(text).toContain("$1 billion");
-      expect(text).toContain("$2 billion");
+      expect(text).toContain("$1B");
+      expect(text).toContain("$2B");
     });
   });
 
@@ -166,7 +176,7 @@ describe("FactValueDisplay", () => {
       const { container } = render(<FactValueDisplay fact={fact} property={prop} />);
       const text = container.querySelector("span")?.textContent ?? "";
       expect(text).toContain("≥");
-      expect(text).toContain("$5 billion");
+      expect(text).toContain("$5B");
     });
   });
 });

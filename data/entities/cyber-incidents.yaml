@@ -1,0 +1,300 @@
+# Major Cyber Incidents
+#
+# Catalog of significant cyberattack incidents with damage estimates, attribution,
+# and AI-involvement labels. Seeded under QUA-717 (parent QUA-715: Wiki coverage of
+# AI cyber damage magnitude). Damage figures stored as FactBase facts in
+# packages/factbase/data/fb-entities/<slug>.yaml using the `financial-impact`
+# property — see properties.yaml.
+#
+# AI-involvement classification:
+#   none       — no documented AI use in attack chain
+#   assisted   — AI tools accelerated specific stages (e.g., phishing text)
+#   orchestrated — AI agent autonomously executed substantial portions of the campaign
+
+- id: cyber-incident-notpetya
+  stableId: sid_PlakEpcSJw
+  wikiId: E2508
+  type: event
+  title: NotPetya (2017)
+  aliases:
+    - NotPetya
+    - ExPetr
+    - Petya 2017
+  customFields:
+    - label: Date
+      value: June 27, 2017
+    - label: Attribution
+      value: GRU (Russian military intelligence) Unit 74455 / Sandworm
+    - label: AI involvement
+      value: none
+    - label: Initial vector
+      value: M.E.Doc Ukrainian tax software supply-chain compromise
+    - label: Estimated total damages
+      value: ~$10B globally (low ~$8B, high ~$15B)
+    - label: Notable victims
+      value: Maersk, Merck, FedEx/TNT, Mondelēz, Saint-Gobain, Reckitt Benckiser
+  description: >-
+    NotPetya was a destructive malware attack disguised as ransomware, deployed June 27, 2017
+    via a compromised update to M.E.Doc, a Ukrainian tax accounting software. Although it
+    targeted Ukraine, it propagated globally via SMB and credential-theft mechanisms,
+    causing the most destructive cyberattack in history by total economic damage. The U.S.,
+    UK, Australia, and Canada attributed the attack to GRU's Unit 74455 (Sandworm). It is
+    the canonical reference point for catastrophic single-event cyber damage and the basis
+    for the Merck v. Ace insurance war-exclusion litigation.
+  tags:
+    - cyber-incident
+    - destructive-malware
+    - supply-chain
+    - russia
+    - ukraine
+    - critical-infrastructure
+  lastUpdated: 2026-04
+
+- id: cyber-incident-wannacry
+  stableId: sid_PORgT8PnXQ
+  wikiId: E2509
+  type: event
+  title: WannaCry (2017)
+  aliases:
+    - WannaCry
+    - WCry
+    - WannaCrypt
+  customFields:
+    - label: Date
+      value: May 12, 2017
+    - label: Attribution
+      value: Lazarus Group (DPRK)
+    - label: AI involvement
+      value: none
+    - label: Initial vector
+      value: EternalBlue SMB exploit (NSA-leaked)
+    - label: Estimated total damages
+      value: ~$4B globally (low ~$1B, high ~$8B)
+    - label: Notable victims
+      value: UK NHS, Telefónica, FedEx, Renault, Deutsche Bahn
+  description: >-
+    WannaCry was a worm-propagating ransomware attack on May 12, 2017, exploiting the
+    EternalBlue SMB vulnerability leaked from the NSA by the Shadow Brokers. It infected
+    over 200,000 computers across 150 countries within hours and was attributed by the
+    U.S., UK, Australia, Canada, New Zealand, and Japan to North Korea's Lazarus Group.
+    Although the kill switch discovered by Marcus Hutchins limited propagation, the
+    attack severely disrupted the UK's NHS (cancellation of ~19,000 appointments),
+    affecting healthcare delivery for several days.
+  tags:
+    - cyber-incident
+    - ransomware
+    - worm
+    - north-korea
+    - healthcare
+    - eternalblue
+  lastUpdated: 2026-04
+
+- id: cyber-incident-solarwinds
+  stableId: sid_Me6yx7Sd9A
+  wikiId: E2510
+  type: event
+  title: SolarWinds (2020)
+  aliases:
+    - SolarWinds Hack
+    - SUNBURST
+    - UNC2452
+    - Cozy Bear (operator)
+  customFields:
+    - label: Date discovered
+      value: December 13, 2020 (active since at least March 2020)
+    - label: Attribution
+      value: SVR (Russian foreign intelligence) APT29 / Cozy Bear
+    - label: AI involvement
+      value: none
+    - label: Initial vector
+      value: SolarWinds Orion software update supply-chain compromise
+    - label: Estimated total damages
+      value: ~$100B+ recovery cost across affected organizations (high uncertainty)
+    - label: Notable victims
+      value: U.S. Treasury, DHS, Commerce, State, Microsoft, FireEye, ~18,000 organizations
+  description: >-
+    SolarWinds was a supply-chain compromise discovered in December 2020 in which Russian
+    SVR operators inserted the SUNBURST backdoor into the Orion network management
+    software, which was then distributed to ~18,000 customer organizations including
+    multiple U.S. federal agencies (Treasury, DHS, Commerce, State, Energy/NNSA), and
+    technology companies including Microsoft and FireEye. The compromise was undetected
+    for at least 9 months. Total recovery costs across affected organizations are
+    estimated at $100B+ but precise figures remain disputed; the incident reshaped U.S.
+    federal cybersecurity policy (Executive Order 14028, May 2021).
+  tags:
+    - cyber-incident
+    - supply-chain
+    - espionage
+    - russia
+    - federal-government
+    - apt29
+  lastUpdated: 2026-04
+
+- id: cyber-incident-colonial-pipeline
+  stableId: sid_XtZkjYKvrQ
+  wikiId: E2511
+  type: event
+  title: Colonial Pipeline (2021)
+  aliases:
+    - Colonial Pipeline Ransomware
+    - DarkSide Colonial
+  customFields:
+    - label: Date
+      value: May 7, 2021
+    - label: Attribution
+      value: DarkSide ransomware-as-a-service (Russia-based affiliates)
+    - label: AI involvement
+      value: none
+    - label: Initial vector
+      value: Compromised legacy VPN credential (no MFA)
+    - label: Ransom paid
+      value: $4.4M (75 BTC); $2.3M later recovered by FBI
+    - label: Direct damage estimate
+      value: ~$5B+ including operational disruption, fuel-supply impact (medium confidence)
+    - label: Notable impact
+      value: 5,500-mile US East Coast fuel pipeline shutdown for 6 days; emergency declarations in 17 states + DC
+  description: >-
+    On May 7, 2021, Colonial Pipeline — operator of the largest refined-petroleum pipeline
+    on the U.S. East Coast — was hit with ransomware by DarkSide affiliates. Colonial
+    proactively shut down operations, triggering fuel shortages, panic buying, and price
+    spikes across the eastern seaboard. The shutdown lasted six days. The incident drove
+    binding cybersecurity directives for U.S. pipeline operators (TSA Security Directives
+    Pipeline-2021-01 and -02) and remains the canonical example of cyber-induced
+    critical-infrastructure cascade in the U.S.
+  tags:
+    - cyber-incident
+    - ransomware
+    - critical-infrastructure
+    - energy
+    - darkside
+  lastUpdated: 2026-04
+
+- id: cyber-incident-cdk-global
+  stableId: sid_cYIOXoS7EA
+  wikiId: E2512
+  type: event
+  title: CDK Global (2024)
+  aliases:
+    - CDK Global Ransomware
+    - BlackSuit CDK
+  customFields:
+    - label: Date
+      value: June 18-19, 2024
+    - label: Attribution
+      value: BlackSuit ransomware
+    - label: AI involvement
+      value: none documented
+    - label: Initial vector
+      value: Not publicly disclosed
+    - label: Ransom paid
+      value: ~$25M in bitcoin (per multiple reports)
+    - label: Estimated total damages
+      value: ~$1.02B in dealer losses (Anderson Economic Group); CDK direct costs separate
+    - label: Notable impact
+      value: ~15,000 North American auto dealerships disrupted for ~2 weeks; 7.2% decline in June US new-vehicle sales
+  description: >-
+    On June 18, 2024, CDK Global — the dealer-management-system provider for ~15,000
+    North American auto dealerships — was attacked by BlackSuit ransomware. A second
+    attack on June 19 disrupted recovery efforts. Most dealerships reverted to paper
+    processes for two weeks. Anderson Economic Group estimated total dealer losses at
+    $1.02B; CDK reportedly paid ~$25M in ransom. The incident is a benchmark for
+    indirect cascade damage from sector-concentrated SaaS compromise.
+  tags:
+    - cyber-incident
+    - ransomware
+    - automotive
+    - saas-concentration
+    - blacksuit
+  lastUpdated: 2026-04
+
+- id: cyber-incident-change-healthcare
+  stableId: sid_i29w8fSb5g
+  wikiId: E2513
+  type: event
+  title: Change Healthcare (2024)
+  aliases:
+    - Change Healthcare Breach
+    - Optum Change Healthcare
+    - BlackCat ALPHV Change
+  customFields:
+    - label: Date
+      value: February 21, 2024
+    - label: Attribution
+      value: BlackCat / ALPHV ransomware (with Notchy / RansomHub follow-on extortion)
+    - label: AI involvement
+      value: none documented
+    - label: Initial vector
+      value: Compromised Citrix portal credential without MFA
+    - label: Ransom paid
+      value: $22M to BlackCat (early 2024); additional ransom alleged paid to follow-on group
+    - label: People affected
+      value: ~190 million Americans (largest US healthcare breach on record)
+    - label: Estimated total damages
+      value: ~$2.87B UnitedHealth direct costs; sector-wide cascade much larger (medium confidence)
+  description: >-
+    On February 21, 2024, Change Healthcare — a UnitedHealth subsidiary processing
+    roughly one-third of US healthcare payment claims — was attacked by BlackCat/ALPHV
+    ransomware. The shutdown crippled pharmacy fulfillment, claims processing, and
+    revenue cycle management nationwide for weeks. UnitedHealth disclosed the breach
+    affected approximately 190M Americans, making it the largest US healthcare breach
+    on record. UnitedHealth has reported $2.87B in direct costs as of FY2024 reports;
+    sector-wide downstream costs (pharmacy cash-flow disruption, hospital revenue gaps,
+    delayed care) are not consolidated. The incident demonstrates the systemic-risk
+    profile of healthcare clearinghouses.
+  tags:
+    - cyber-incident
+    - ransomware
+    - healthcare
+    - clearinghouse
+    - blackcat-alphv
+    - critical-infrastructure
+  lastUpdated: 2026-04
+
+- id: cyber-incident-anthropic-disclosed-2025
+  stableId: sid_oZ2PXLZEYA
+  wikiId: E2514
+  type: event
+  title: Anthropic-Disclosed AI-Orchestrated Campaign (Sept 2025)
+  aliases:
+    - GTG-1002
+    - First AI-Orchestrated Cyberattack
+    - Anthropic Sept 2025 Disclosure
+  customFields:
+    - label: Date
+      value: Mid-September 2025 (detected); disclosed November 2025
+    - label: Attribution
+      value: GTG-1002 — assessed high confidence as Chinese state-sponsored
+    - label: AI involvement
+      value: orchestrated (first publicly documented case)
+    - label: Tool used
+      value: Claude Code (with custom scaffolding to compartmentalize tasks)
+    - label: AI autonomy level
+      value: 80–90% of tactical operations executed without human intervention
+    - label: Targets
+      value: ~30 global organizations (large tech, financial, chemical mfg, government)
+    - label: Successful breaches
+      value: 4 confirmed
+    - label: Direct damage estimate
+      value: limited (small target set; campaign disrupted); precedent value high
+  description: >-
+    In mid-September 2025, Anthropic detected and disrupted a cyber-espionage campaign
+    by threat actor GTG-1002 (assessed high confidence as Chinese state-sponsored) using
+    Claude Code as the primary execution agent. The attackers jailbroke Claude by
+    decomposing attacks into compartmentalized small tasks, allowing the AI to execute
+    reconnaissance, exploitation, credential harvesting, lateral movement, and data
+    exfiltration without recognizing their malicious aggregate purpose. Approximately
+    30 organizations were targeted; 4 successful breaches were confirmed. This is
+    considered the first publicly documented case of a large-scale cyberattack in
+    which an AI agent — not human operators — executed the majority of tactical
+    operations. Although direct damages were limited by Anthropic's intervention, the
+    incident is the canonical reference for AI-orchestrated attack capability and a
+    pivotal data point for capability-trajectory and offense-defense analyses.
+  tags:
+    - cyber-incident
+    - ai-orchestrated
+    - china
+    - espionage
+    - claude
+    - autonomous-agents
+    - first-of-kind
+  lastUpdated: 2026-04

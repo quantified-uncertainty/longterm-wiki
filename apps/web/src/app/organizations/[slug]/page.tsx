@@ -31,6 +31,9 @@ import {
   rollupVerdictFromSummary,
 } from "@/components/entity/entity-sourcing";
 import { RelatedPages } from "@/components/RelatedPages";
+import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
+import { EntityDbPage } from "@/components/directory/EntityDbPage";
+import { EntityTimeline } from "@/components/wiki/EntityTimeline";
 
 // Shared components & helpers
 import {
@@ -105,7 +108,48 @@ import { fetchFromWikiServer } from "@/lib/wiki-server";
 import type { RpcGrantsByEntityResult } from "@/lib/wiki-server";
 import Markdown from "react-markdown";
 
-import type { ProfileTab as OrgTab } from "@/components/directory";
+// External scorecard mirror (QUA-688)
+import {
+  loadScorecardsForEntity,
+  ScorecardsSection,
+} from "./scorecards-section";
+
+import type { ProfileTab as OrgTab, ProfileTabGroup } from "@/components/directory";
+import {
+  Home,
+  Users,
+  LayoutGrid,
+  DollarSign,
+  TrendingUp,
+  Package,
+  FileText,
+  Bell,
+  Newspaper,
+  Shield,
+  Landmark,
+  Briefcase,
+  PieChart,
+  Gift,
+  Coins,
+  Banknote,
+  Handshake,
+  BookOpen,
+  Database,
+  ListTree,
+  Clock,
+  Award,
+} from "lucide-react";
+
+const ORG_TAB_GROUPS: ProfileTabGroup[] = [
+  { id: "entity", label: "Entity" },
+  { id: "about", label: "About" },
+  { id: "business", label: "Business" },
+  { id: "governance", label: "Policy & Governance" },
+  { id: "output", label: "Output & Research" },
+  { id: "data", label: "Data" },
+];
+
+const ICON_CLASS = "w-4 h-4";
 
 // ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
 export const revalidate = 3600;
@@ -155,7 +199,7 @@ export default async function OrgProfilePage({
 
   // ── Fetch PG data (personnel + market data + grants + sourcing) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
@@ -167,6 +211,7 @@ export default async function OrgProfilePage({
       { revalidate: 3600, timeoutMs: 10_000 },
     ),
     fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
+    loadScorecardsForEntity(entityStableId),
   ]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
 
@@ -272,7 +317,54 @@ export default async function OrgProfilePage({
     </div>
   );
 
-  tabs.push({ id: "overview", label: "Overview", content: overviewContent });
+  tabs.push({
+    id: "overview",
+    label: "Overview",
+    content: overviewContent,
+    group: "entity",
+    icon: <Home className={ICON_CLASS} />,
+  });
+
+  // ── Wiki tab — navigates to the standalone /wiki/E<N> page.
+  // We render as a link-tab (not inline) because MDX wiki content references
+  // resources by stableId that may only exist in the wiki-server (not in the
+  // build-time database.json), and the R component falls back to [sid_...]
+  // which breaks the no-raw-ids e2e test. The standalone wiki page has its
+  // own resource-resolution path that handles this correctly.
+  if (entity.wikiPageId && data.wikiHref) {
+    tabs.push({
+      id: "wiki",
+      label: "Wiki",
+      group: "entity",
+      icon: <BookOpen className={ICON_CLASS} />,
+      href: data.wikiHref,
+    });
+  }
+
+  // ── Facts tab (structured FactBase view) ──
+  tabs.push({
+    id: "facts",
+    label: "Facts",
+    group: "data",
+    icon: <ListTree className={ICON_CLASS} />,
+    content: <FactBaseEntityBody entityId={entity.id} skipVerdicts skipHeroStats />,
+  });
+
+  // ── Database Records tab (embedded EntityProfileViewer) ──
+  tabs.push({
+    id: "database",
+    label: "Database",
+    group: "data",
+    icon: <Database className={ICON_CLASS} />,
+    content: (
+      <EntityDbPage
+        slug={slug}
+        backHref={`/organizations/${slug}`}
+        backLabel="Back to Organization profile"
+        embedded
+      />
+    ),
+  });
 
   // ── People tab: key personnel + board + PG personnel data ──
   const pgResult = pgPersonnelToEntries(pgPersonnelRows);
@@ -389,6 +481,20 @@ export default async function OrgProfilePage({
       label: "People",
       count: allPeople.length,
       content: <PeopleSection people={allPeople} unresolvedCount={pgResult.unresolvedCount} />,
+      group: "about",
+      icon: <Users className={ICON_CLASS} />,
+    });
+  }
+
+  // ── Timeline tab (entity_events from PG, merged into factbase-data.json) ──
+  if (data.entityEvents.length > 0) {
+    tabs.push({
+      id: "timeline",
+      label: "Timeline",
+      count: data.entityEvents.length,
+      group: "about",
+      icon: <Clock className={ICON_CLASS} />,
+      content: <EntityTimeline events={data.entityEvents} />,
     });
   }
 
@@ -404,74 +510,107 @@ export default async function OrgProfilePage({
   // Filter equity positions to only those with a resolved holder name
   const meaningfulEquity = data.equityPositions.filter((pos) => pos.holderName && pos.holderName !== "");
 
-  const hasFundingData =
-    data.sortedRounds.length > 0 ||
-    meaningfulInvestments.length > 0 ||
-    meaningfulEquity.length > 0 ||
-    data.grantsReceived.length > 0 ||
-    data.grantsMade.length > 0 ||
-    pgGrantCount > 0 ||
-    data.sortedPartnerships.length > 0 ||
-    data.fundingPrograms.length > 0;
-
-  if (hasFundingData) {
-    const fundingCount =
-      data.sortedRounds.length +
-      meaningfulInvestments.length +
-      meaningfulEquity.length +
-      data.sortedPartnerships.length +
-      Math.max(data.grantsMade.length, pgGrantCount) +
-      data.grantsReceived.length;
-
+  // ── Funding Rounds tab ──
+  if (data.sortedRounds.length > 0 || meaningfulInvestments.length > 0) {
     tabs.push({
-      id: "funding",
-      label: "Funding",
-      count: fundingCount,
+      id: "funding-rounds",
+      label: "Funding Rounds",
+      count: data.sortedRounds.length || meaningfulInvestments.length,
+      group: "business",
+      icon: <DollarSign className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
-          <FundingHistorySection rounds={data.sortedRounds} />
-
+          {data.sortedRounds.length > 0 && (
+            <FundingHistorySection rounds={data.sortedRounds} />
+          )}
           {meaningfulInvestments.length > 0 && (
             <InvestorParticipationSection investments={meaningfulInvestments} />
           )}
-
-          {meaningfulEquity.length > 0 && (
-            <EquityPositionsSection
-              positions={meaningfulEquity}
-              investments={data.investmentsReceived}
-              latestValuation={data.chartData.latestValuation}
-              charitablePledges={data.charitablePledges}
-            />
-          )}
-
-          {(data.grantsMade.length > 0 || pgGrantCount > 0) && (
-            <GrantsSection
-              grants={data.grantsMade}
-              direction="given"
-              entityId={entityStableId}
-              orgSlug={slug}
-              pgGrantCount={pgGrantCount}
-            />
-          )}
-          {(data.grantsReceived.length > 0 || pgReceivedCount > 0) && (
-            <GrantsSection
-              grants={data.grantsReceived}
-              direction="received"
-              entityId={entityStableId}
-              orgSlug={slug}
-              pgGrantCount={pgReceivedCount}
-            />
-          )}
-
-          {data.sortedPartnerships.length > 0 && (
-            <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />
-          )}
-
-          {data.fundingPrograms.length > 0 && (
-            <FundingProgramsSection programs={data.fundingPrograms} />
-          )}
         </div>
       ),
+    });
+  }
+
+  // ── Shareholders / Equity Positions tab ──
+  if (meaningfulEquity.length > 0) {
+    tabs.push({
+      id: "shareholders",
+      label: "Shareholders",
+      count: meaningfulEquity.length,
+      group: "business",
+      icon: <PieChart className={ICON_CLASS} />,
+      content: (
+        <EquityPositionsSection
+          positions={meaningfulEquity}
+          investments={data.investmentsReceived}
+          latestValuation={data.chartData.latestValuation}
+          charitablePledges={data.charitablePledges}
+        />
+      ),
+    });
+  }
+
+  // ── Grants Made tab ──
+  if (data.grantsMade.length > 0 || pgGrantCount > 0) {
+    tabs.push({
+      id: "grants-made",
+      label: "Grants Made",
+      count: Math.max(data.grantsMade.length, pgGrantCount),
+      group: "business",
+      icon: <Gift className={ICON_CLASS} />,
+      content: (
+        <GrantsSection
+          grants={data.grantsMade}
+          direction="given"
+          entityId={entityStableId}
+          orgSlug={slug}
+          pgGrantCount={pgGrantCount}
+        />
+      ),
+    });
+  }
+
+  // ── Grants Received tab ──
+  if (data.grantsReceived.length > 0 || pgReceivedCount > 0) {
+    tabs.push({
+      id: "grants-received",
+      label: "Grants Received",
+      count: Math.max(data.grantsReceived.length, pgReceivedCount),
+      group: "business",
+      icon: <Coins className={ICON_CLASS} />,
+      content: (
+        <GrantsSection
+          grants={data.grantsReceived}
+          direction="received"
+          entityId={entityStableId}
+          orgSlug={slug}
+          pgGrantCount={pgReceivedCount}
+        />
+      ),
+    });
+  }
+
+  // ── Funding Programs tab ──
+  if (data.fundingPrograms.length > 0) {
+    tabs.push({
+      id: "funding-programs",
+      label: "Funding Programs",
+      count: data.fundingPrograms.length,
+      group: "business",
+      icon: <Banknote className={ICON_CLASS} />,
+      content: <FundingProgramsSection programs={data.fundingPrograms} />,
+    });
+  }
+
+  // ── Partnerships & MOUs tab (governance) ──
+  if (data.sortedPartnerships.length > 0) {
+    tabs.push({
+      id: "partnerships",
+      label: "Partners & MOUs",
+      count: data.sortedPartnerships.length,
+      group: "governance",
+      icon: <Handshake className={ICON_CLASS} />,
+      content: <StrategicPartnershipsSection partnerships={data.sortedPartnerships} />,
     });
   }
 
@@ -482,6 +621,8 @@ export default async function OrgProfilePage({
       label: "Market Data",
       count: getMarketDataCount(marketData),
       content: <MarketDataSection data={marketData} />,
+      group: "business",
+      icon: <TrendingUp className={ICON_CLASS} />,
     });
   }
 
@@ -497,6 +638,8 @@ export default async function OrgProfilePage({
       id: "products",
       label: "Products & Models",
       count: productCount,
+      group: "business",
+      icon: <Package className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
           <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
@@ -514,6 +657,8 @@ export default async function OrgProfilePage({
       id: "safety",
       label: "Safety",
       count: data.sortedMilestones.length,
+      group: "output",
+      icon: <Shield className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
           <SafetyMilestonesSection milestones={data.sortedMilestones} />
@@ -534,6 +679,8 @@ export default async function OrgProfilePage({
       id: "publications",
       label: "Publications",
       count: data.resourcePublications.length,
+      group: "output",
+      icon: <FileText className={ICON_CLASS} />,
       content: (
         <OrgResourcesSection
           resources={data.resourcePublications}
@@ -551,6 +698,8 @@ export default async function OrgProfilePage({
       id: "announcements",
       label: "Announcements",
       count: data.resourceAnnouncements.length,
+      group: "output",
+      icon: <Bell className={ICON_CLASS} />,
       content: (
         <OrgResourcesSection
           resources={data.resourceAnnouncements}
@@ -569,6 +718,8 @@ export default async function OrgProfilePage({
       id: "press",
       label: "Press",
       count: data.resourcesAboutOrg.length,
+      group: "output",
+      icon: <Newspaper className={ICON_CLASS} />,
       content: (
         <OrgResourcesSection
           resources={data.resourcesAboutOrg}
@@ -587,6 +738,8 @@ export default async function OrgProfilePage({
       id: "divisions",
       label: "Divisions",
       count: data.divisions.length,
+      group: "about",
+      icon: <LayoutGrid className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
           <DivisionsSection divisions={data.divisions} leadResolved={data.divisionLeadResolved} spending={data.divisionSpending} members={data.divisionMembers} />
@@ -602,10 +755,36 @@ export default async function OrgProfilePage({
       id: "policy",
       label: "Policy Positions",
       count: policyPositions.length,
+      group: "governance",
+      icon: <Landmark className={ICON_CLASS} />,
       content: (
         <PolicyPositionsSection positions={policyPositions} />
       ),
     });
+  }
+
+  // ── Scorecards tab — external safety/transparency scorecards (QUA-688) ──
+  if (scorecardsData) {
+    if ("fetchError" in scorecardsData) {
+      // Transient wiki-server failure — surface an unavailable state rather
+      // than silently dropping the tab.
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={[]} fetchError />,
+      });
+    } else if (scorecardsData.groups.length > 0) {
+      tabs.push({
+        id: "scorecards",
+        label: "Scorecards",
+        count: scorecardsData.groups.length,
+        group: "governance",
+        icon: <Award className={ICON_CLASS} />,
+        content: <ScorecardsSection groups={scorecardsData.groups} />,
+      });
+    }
   }
 
   // ── Projects tab: projects founded by this org ──
@@ -629,6 +808,8 @@ export default async function OrgProfilePage({
       id: "projects",
       label: "Projects",
       count: orgProjects.length,
+      group: "output",
+      icon: <Briefcase className={ICON_CLASS} />,
       content: (
         <section>
           <SectionHeader title="Projects" count={orgProjects.length} />
@@ -731,7 +912,7 @@ export default async function OrgProfilePage({
       coverageInput,
       verdict: rollupVerdict,
     },
-    { activePage: "profile" },
+    {},
   );
 
   return (
@@ -739,6 +920,8 @@ export default async function OrgProfilePage({
       {...shellSlots}
       tabs={tabs}
       tabsAriaLabel="Organization sections"
+      tabsLayout="vertical"
+      tabGroups={ORG_TAB_GROUPS}
     />
   );
 }

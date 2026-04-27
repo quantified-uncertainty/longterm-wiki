@@ -1429,6 +1429,90 @@
       "when": 1786608000001,
       "tag": "0203_qua_632_enrichment_runs",
       "breakpoints": true
+    },
+    {
+      "idx": 204,
+      "version": "7",
+      "when": 1787300000000,
+      "tag": "0204_qua_507_drop_things_denorm",
+      "breakpoints": true
+    },
+    {
+      "idx": 205,
+      "version": "7",
+      "when": 1787386400000,
+      "tag": "0205_qua_690_model_system_cards",
+      "breakpoints": true
+    },
+    {
+      "idx": 206,
+      "version": "7",
+      "when": 1787472800000,
+      "tag": "0206_qua_691_safety_frameworks",
+      "breakpoints": true
+    },
+    {
+      "idx": 207,
+      "version": "7",
+      "when": 1787559200000,
+      "tag": "0207_qua_688_scorecard_tables",
+      "breakpoints": true
+    },
+    {
+      "idx": 210,
+      "version": "7",
+      "when": 1787818000000,
+      "tag": "0210_qua_442_audit_log_universal_trigger",
+      "breakpoints": true
+    },
+    {
+      "idx": 209,
+      "version": "7",
+      "when": 1787818200000,
+      "tag": "0209_qua_692_third_party_evaluations",
+      "breakpoints": true
+    },
+    {
+      "idx": 212,
+      "version": "7",
+      "when": 1787818500000,
+      "tag": "0212_qua_702_benchmark_link_queue",
+      "breakpoints": true
+    },
+    {
+      "idx": 211,
+      "version": "7",
+      "when": 1787818600000,
+      "tag": "0211_qua_711_safety_framework_versions_notes",
+      "breakpoints": true
+    },
+    {
+      "idx": 213,
+      "version": "7",
+      "when": 1787876400000,
+      "tag": "0213_qua_723_flagship_curate_orphan_backfill",
+      "breakpoints": true
+    },
+    {
+      "idx": 214,
+      "version": "7",
+      "when": 1787876500000,
+      "tag": "0214_qua_693_ai_incidents",
+      "breakpoints": true
+    },
+    {
+      "idx": 215,
+      "version": "7",
+      "when": 1787876600000,
+      "tag": "0215_qua_689_safety_benchmark_foundation",
+      "breakpoints": true
+    },
+    {
+      "idx": 216,
+      "version": "7",
+      "when": 1787876700000,
+      "tag": "0216_qua_753_widen_audit_log_record_id",
+      "breakpoints": true
     }
   ]
 }

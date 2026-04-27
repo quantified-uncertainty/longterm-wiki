@@ -1,0 +1,109 @@
+{
+  "table": "personnel",
+  "recordCount": 9,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-25T12:04:43.206Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 9,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "vnQdUi3fbV",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Chairman of the Board",
+      "roleType": "board",
+      "isFounder": true,
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Founder and Chairman of the Board of the Thiel Foundation. Co-founder of PayPal and Palantir. Per IRS Form 990-PF via ProPublica.",
+      "id": "2YoFO0Lp0n",
+      "verdict": "none"
+    },
+    {
+      "personId": "T7jVChbcNZ",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "President",
+      "roleType": "key-person",
+      "source": "https://www.businesswire.com/news/home/20260420984007/en/Thiel-Foundation-Announces-2026-Class-of-Thiel-Fellows",
+      "notes": "Current President of the Thiel Foundation. Also COO at Thiel Capital LLC and President at Fifth Down Capital Partners. Confirmed in 2023-2026 press releases.",
+      "id": "h6NfRjaqfz",
+      "verdict": "none"
+    },
+    {
+      "personId": "SFfOujEfqg",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Director on Thiel Foundation Board. Former U.S. Senate candidate in Arizona; Thiel associate. Per IRS Form 990-PF via ProPublica.",
+      "id": "6HIPqiLD2T",
+      "verdict": "none"
+    },
+    {
+      "personId": "WRBfbdEDUa",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Director on Thiel Foundation Board. Per IRS Form 990-PF via ProPublica.",
+      "id": "v4cpHeYnOz",
+      "verdict": "none"
+    },
+    {
+      "personId": "czNNAgLoj8",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Board Director",
+      "roleType": "board",
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Director on Thiel Foundation Board. Per IRS Form 990-PF via ProPublica.",
+      "id": "Wu0nuxvAJ8",
+      "verdict": "none"
+    },
+    {
+      "personId": "D1x0IJVX9W",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Program Manager",
+      "roleType": "career",
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Program Manager at the Thiel Foundation. Compensation ~$160,000 per IRS Form 990-PF via ProPublica.",
+      "id": "kKSB0GIUhA",
+      "verdict": "none"
+    },
+    {
+      "personId": "mxD6nfDDnR",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Program Manager",
+      "roleType": "career",
+      "source": "https://projects.propublica.org/nonprofits/organizations/203846597",
+      "notes": "Program Manager at the Thiel Foundation. Compensation ~$130,000 per IRS Form 990-PF via ProPublica.",
+      "id": "TEosTbvTWK",
+      "verdict": "none"
+    },
+    {
+      "personId": "54pwTUyLQc",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Director of Thiel Fellowship",
+      "roleType": "key-person",
+      "source": "https://www.businesswire.com/news/home/20240320742346/en/Thiel-Foundation-Announces-Next-Thiel-Fellow-Class",
+      "notes": "Director of the Thiel Fellowship program. Confirmed in 2023-2024 press releases as program director/director.",
+      "id": "Qh5zMbQHMq",
+      "verdict": "none"
+    },
+    {
+      "personId": "59rZzII4q4",
+      "organizationId": "sid_y4AUeiPifQ",
+      "role": "Foundation Administrator",
+      "roleType": "career",
+      "source": "https://www.thielfoundation.org/",
+      "notes": "Foundation Administrator listed on the official Thiel Foundation website. Per thielfoundation.org and LinkedIn.",
+      "id": "0x38V93092",
+      "verdict": "none"
+    }
+  ]
+}

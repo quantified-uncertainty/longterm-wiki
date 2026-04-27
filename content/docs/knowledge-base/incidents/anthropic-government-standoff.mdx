@@ -13,7 +13,7 @@ clusters:
   - governance
   - community
 ---
-import {DataInfoBox, EntityLink, SquiggleEstimate} from '@components/wiki'
+import {DataInfoBox, EntityLink} from '@components/wiki'
 import {F} from '@components/facts'
 
 
@@ -208,46 +208,6 @@ The wide spread between platforms (\$259-\$417) reflects genuine uncertainty abo
 
 ### Valuation Impact Modeling
 
-<SquiggleEstimate title="Anthropic Valuation Under Pentagon Standoff Scenarios" code={`
-// Baseline: \$380B Series G valuation (Feb 2026)
-baselineValuation = 380e9
-
-// Scenario 1: Designation overturned in court (40% probability)
-// Modest valuation hit from uncertainty, then recovery
-courtWin = baselineValuation * (0.85 to 1.1)
-
-// Scenario 2: Designation stands but narrowly interpreted (25%)
-// Pentagon contractors affected, but broader enterprise unscathed
-narrowDesignation = baselineValuation * (0.65 to 0.85)
-
-// Scenario 3: Broad chilling effect on enterprise customers (20%)
-// Regulated industries pull back, IPO delayed
-broadChill = baselineValuation * (0.4 to 0.7)
-
-// Scenario 4: Full escalation — Defense Production Act invoked (10%)
-// Severe but not existential — non-US and consumer revenue persists
-fullEscalation = baselineValuation * (0.25 to 0.55)
-
-// Scenario 5: Political resolution / negotiated settlement (5%)
-// Quick reversal, minimal damage
-settlement = baselineValuation * (0.9 to 1.15)
-
-scenarioWeighted = mixture(
-  courtWin, narrowDesignation, broadChill, fullEscalation, settlement,
-  [0.40, 0.25, 0.20, 0.10, 0.05]
-)
-
-{
-  "Baseline ($B)": baselineValuation,
-  "Court win ($B)": courtWin,
-  "Narrow designation ($B)": narrowDesignation,
-  "Broad chill ($B)": broadChill,
-  "Full escalation ($B)": fullEscalation,
-  "Settlement ($B)": settlement,
-  "Scenario-weighted ($B)": scenarioWeighted
-}
-`} />
-
 Key assumptions:
 - The 40% probability of a court win reflects the legal novelty of applying the supply chain risk statute to a domestic policy dispute and the likely sympathy of federal courts for a First Amendment / due process argument
 - The "broad chill" scenario is the most consequential for long-term valuation — if regulated industries begin viewing Anthropic as politically radioactive, the damage compounds over time regardless of the legal outcome
@@ -255,58 +215,7 @@ Key assumptions:
 
 ### Revenue Impact Distribution
 
-<SquiggleEstimate title="Revenue Impact Over 12 Months (Reduction from \$14B Baseline)" code={`
-// Direct Pentagon contract loss
-directLoss = 200e6  // \$200M, certain
-
-// Enterprise customer attrition from supply chain cascade
-// Depends on how many customers have Pentagon contractor relationships
-enterpriseAttrition = 0.02 to 0.20  // 2-20% of enterprise revenue
-enterpriseBase = 14e9 * 0.8  // 80% from enterprise
-enterpriseImpact = enterpriseBase * enterpriseAttrition
-
-// Regulated industry pullback (financial, healthcare, etc.)
-regulatedPullback = 0 to 0.10  // 0-10% of relevant revenue
-regulatedRevenue = 14e9 * 0.3  // ~30% estimate; exact share undisclosed
-regulatedImpact = regulatedRevenue * regulatedPullback
-
-// New customer acquisition slowdown
-acquisitionSlowdown = 0 to 0.15  // 0-15% reduction in new logos
-newRevenue = 14e9 * 0.2  // ~20% from new customers
-acquisitionImpact = newRevenue * acquisitionSlowdown
-
-totalImpact = directLoss + enterpriseImpact + regulatedImpact + acquisitionImpact
-
-{
-  "Direct loss ($M)": directLoss,
-  "Enterprise attrition ($B)": enterpriseImpact,
-  "Regulated pullback ($B)": regulatedImpact,
-  "Acquisition slowdown ($B)": acquisitionImpact,
-  "Total 12-month impact ($B)": totalImpact
-}
-`} />
-
 ### IPO Timeline Impact
-
-<SquiggleEstimate title="Anthropic IPO Probability by Window" code={`
-// Pre-standoff: prediction markets priced 2026 IPO at ~70%+
-// Post-standoff: significantly reduced
-// Note: these are independent estimates per window, not a partition
-
-ipoQ32026 = 0.05 to 0.15  // Near-impossible with active litigation
-ipoQ42026 = 0.10 to 0.25  // Possible if court rules favorably
-ipoH12027 = 0.20 to 0.45  // More likely if designation overturned
-ipoH22027 = 0.25 to 0.50  // Enough time for resolution
-ipoLater = 0.10 to 0.30   // Delayed beyond 2027
-
-{
-  "Q3 2026": ipoQ32026,
-  "Q4 2026": ipoQ42026,
-  "H1 2027": ipoH12027,
-  "H2 2027": ipoH22027,
-  "2028+": ipoLater
-}
-`} />
 
 ## Implications for the AI Industry
 
@@ -352,35 +261,6 @@ The standoff highlights a tension between Anthropic's technical alignment work a
 This is not necessarily contradictory — one can coherently believe that specific military applications are dangerous while also believing that pausing training unilaterally is counterproductive. But it complicates the narrative of Anthropic as a purely mission-driven organization.
 
 ## Key Uncertainties
-
-<SquiggleEstimate title="Key Probability Estimates" code={`
-// Will the supply chain risk designation survive legal challenge?
-designationSurvives = 0.25 to 0.50  // Novel legal territory
-
-// Will Anthropic eventually reach a deal with the Pentagon?
-eventualDeal = 0.30 to 0.55  // Either under this or future administration
-
-// Will other AI companies adopt similar red lines?
-industryRedLines = 0.15 to 0.40  // Employee pressure vs commercial incentives
-
-// Will the standoff delay Anthropic's IPO past 2027?
-ipoDelayed = 0.30 to 0.55  // Depends on designation outcome
-
-// Will this trigger broader AI regulation?
-triggersRegulation = 0.20 to 0.45  // Congressional attention is high
-
-// Probability designation is reversed within 6 months
-reversedSoon = 0.15 to 0.35  // Political deal or court injunction
-
-{
-  "Designation survives court": designationSurvives,
-  "Eventual Pentagon deal": eventualDeal,
-  "Industry adopts red lines": industryRedLines,
-  "IPO delayed past 2027": ipoDelayed,
-  "Triggers AI regulation": triggersRegulation,
-  "Reversed within 6 months": reversedSoon
-}
-`} />
 
 ## Related Pages
 

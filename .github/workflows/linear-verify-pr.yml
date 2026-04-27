@@ -1,0 +1,123 @@
+name: Linear Verify PR
+run-name: "Linear Verify PR${{ vars.AUTOMATION_PAUSED == 'true' && ' [PAUSED]' || '' }}"
+
+# Closes the "Linear-webhook miss" class (QUA-441).
+#
+# Linear's GitHub integration silently drops webhooks on PR merge, leaving
+# QUA issues stuck "In Review" indefinitely. Most common on batched PRs with
+# multiple `Fixes QUA-NNN` lines — Linear processes the first, drops the rest.
+#
+# Two layers:
+#   1. on PR close → `crux linear verify-pr <PR>` reconciles that PR's refs
+#      within minutes of merge.
+#   2. nightly schedule → `crux linear audit --fix` as a backstop for cases
+#      the per-PR run missed (workflow itself failed, PR re-opened+re-closed,
+#      cross-repo links, etc.).
+#
+# Both verify-pr and audit are conservative: they only reconcile from active
+# workflow states (In Progress / In Review). Issues already in Done, Backlog,
+# Canceled, or Duplicate are respected as deliberate human decisions.
+
+on:
+  pull_request:
+    types: [closed]
+  schedule:
+    - cron: "20 8 * * *" # 8:20 AM UTC daily — staggered from ci-pr-health.yml (8:10)
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to verify (leave blank to run nightly audit instead)"
+        required: false
+        type: string
+
+# Concurrency: queue (don't cancel) duplicate events for the same PR.
+# `pull_request: closed` fires once per close so this is mostly inert, but
+# it covers the close → reopen → close edge case where two events arrive
+# back-to-back. Nightly audit + dispatch get their own groups so they
+# never block per-PR runs.
+concurrency:
+  group: linear-verify-${{ github.event.pull_request.number || github.event.inputs.pr_number || github.event.schedule || github.run_id }}
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  paused-notice:
+    uses: ./.github/workflows/_paused-notice.yml
+
+  verify-pr:
+    # Per-merge reconciliation. Skips:
+    #   - PRs to non-main branches (release PRs main → production reuse refs
+    #     already verified when each component PR merged into main)
+    #   - PRs that closed without merging
+    #   - PRs from forks (defense-in-depth — `merged == true` already means
+    #     the fork code is now in main, but the head.repo gate makes the
+    #     trust boundary explicit and survives if someone refactors this
+    #     condition later)
+    #   - manual dispatches with no pr_number (those run audit-fix below)
+    if: >-
+      vars.AUTOMATION_PAUSED != 'true' &&
+      (
+        (github.event_name == 'pull_request' &&
+         github.event.pull_request.merged == true &&
+         github.event.pull_request.base.ref == 'main' &&
+         github.event.pull_request.head.repo.full_name == github.repository) ||
+        (github.event_name == 'workflow_dispatch' &&
+         github.event.inputs.pr_number != '')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Verify Linear refs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          PR_NUMBER: ${{ github.event.pull_request.number || github.event.inputs.pr_number }}
+        run: pnpm crux linear verify-pr "$PR_NUMBER"
+
+  audit-fix:
+    # Nightly backstop. Catches issues the per-PR run missed:
+    #   - per-PR workflow run failed (Linear API blip, runner outage)
+    #   - PR closed before workflow existed (historical sweep)
+    #   - PR has no `Fixes QUA-NNN` ref but the work shipped anyway
+    if: >-
+      vars.AUTOMATION_PAUSED != 'true' &&
+      (
+        github.event_name == 'schedule' ||
+        (github.event_name == 'workflow_dispatch' &&
+         github.event.inputs.pr_number == '')
+      )
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Reconcile In-Progress Linear issues
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+        run: pnpm crux linear audit --fix

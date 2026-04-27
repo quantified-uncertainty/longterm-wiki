@@ -60,7 +60,7 @@ export interface SectionIR {
   externalLinks: string[];
   tables: TableBlock[];
   wordCount: number;
-  /** Component names present in this section (e.g. ['squiggle', 'mermaid']) */
+  /** Component names present in this section (e.g. ['mermaid', 'calc']) */
   componentNames: string[];
 }
 
@@ -72,7 +72,6 @@ export type SectionBlock = SectionIR;
  * New components can be added here — the rest of the code is data-driven.
  */
 const TRACKED_COMPONENTS: Record<string, string> = {
-  SquiggleEstimate: 'squiggle',
   MermaidDiagram: 'mermaid',
   Calc: 'calc',
   Callout: 'callout',
@@ -82,7 +81,7 @@ const TRACKED_COMPONENTS: Record<string, string> = {
 export interface PageBlockIR {
   pageId: string;
   sections: SectionIR[];
-  /** Component counts keyed by normalized name (e.g. { squiggle: 1, mermaid: 2 }) */
+  /** Component counts keyed by normalized name (e.g. { mermaid: 2, calc: 1 }) */
   components: Record<string, number>;
 }
 

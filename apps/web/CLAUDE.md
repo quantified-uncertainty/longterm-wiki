@@ -48,7 +48,7 @@ Available aliases:
 ### MDX Components
 All MDX components are registered in `src/components/mdx-components.tsx`. Import statements in MDX source are stripped by `preprocessMdx()` — components are injected globally.
 
-Key ported components: `EntityLink`, `ResourceLink`, `R`, `FBFactValue`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `SquiggleEstimate`, `Callout`
+Key ported components: `EntityLink`, `ResourceLink`, `R`, `FBFactValue`, `DataInfoBox`, `Backlinks`, `InfoBox`, `ExternalLinks`, `MermaidDiagram`, `Callout`
 
 42+ stub components exist for not-yet-ported Astro components.
 
@@ -100,7 +100,7 @@ Entities have both string slugs (`geoffrey-hinton`) and numeric IDs (`E42`). Wik
 ## Key Patterns
 
 ### Server Components (default)
-All pages and most components are React Server Components. Only add `"use client"` when needed for interactivity (e.g., `DevModeToggle`, `ExploreGrid`, `SquiggleEstimate`).
+All pages and most components are React Server Components. Only add `"use client"` when needed for interactivity (e.g., `DevModeToggle`, `ExploreGrid`).
 
 ### Static Generation
 Wiki pages use `generateStaticParams()` to pre-render all pages at build time from the ID registry.
@@ -130,13 +130,3 @@ Each page's `subcategory` field (e.g., `risk-models`) is extracted at build time
 - **Runtime enrichment**: `src/data/index.ts` `transformEntity()` merges expert data (role, affiliation), assigns org subtypes (lab-* → organization + orgType), and assigns risk categories
 - Legacy types still in database.json: `lab`, `lab-academic`, `lab-research`, `researcher` (remapped at runtime)
 
-## Squiggle Model Style Guide
-
-When creating or editing `<SquiggleEstimate>` models in MDX pages:
-
-- **Never use point values in mixtures.** `mixture(500e9, 350e9, ...)` creates jagged spikes. Use distributions: `mixture(400e9 to 650e9, 250e9 to 450e9, ...)`.
-- **Use `X to Y` syntax** for quantities with uncertainty. Reserve `normal()` for symmetric quantities near zero.
-- **Keep models 5–30 lines.** Break larger analyses into multiple blocks.
-- **Always add a title**: `<SquiggleEstimate title="Descriptive Title" code={...} />`.
-- **Name variables clearly**: `founderEquity`, not `x` or `temp`.
-- Default `sampleCount` is 5000. The `squiggle-quality` validation rule enforces these conventions.

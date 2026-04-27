@@ -26,6 +26,17 @@ import { resolveEntityType } from '../../../crux/lib/hallucination-risk.ts';
 import { filterBulkImportDates } from './lib/git-date-utils.mjs';
 import { computeRedundancy } from './lib/redundancy.mjs';
 import { CONTENT_DIR, DATA_DIR, OUTPUT_DIR, REPO_ROOT, TOP_LEVEL_CONTENT_DIRS } from './lib/content-types.mjs';
+
+// Load .env from repo root so wiki-server env vars are available without
+// pre-setting them in the shell. Mirrors the pattern in assign-ids.mjs.
+// dotenv.config() is a no-op when the file is absent or vars are already set.
+try {
+  const { config } = await import('dotenv');
+  config({ path: join(REPO_ROOT, '.env') });
+} catch {
+  // dotenv not available or .env missing — rely on shell environment
+}
+
 import { generateLLMFiles } from './generate-llm-files.mjs';
 import { buildUrlToResourceMap, urlKey as resourceUrlKey } from './lib/unconverted-links.mjs';
 import { normalizeUrlForDedup } from '@longterm-wiki/url-utils';
@@ -86,6 +97,7 @@ import {
   generateLinkHealth,
   generateEntityMatrix,
 } from './lib/output-writer.mjs';
+import { getServerUrl } from './lib/wiki-server-env.mjs';
 
 // ---------------------------------------------------------------------------
 // Scope flag — `--scope=content` or `--quick` skips expensive non-content steps
@@ -1014,7 +1026,7 @@ async function main() {
   // Sync page links to wiki-server (optional — skips if server unavailable)
   if (CONTENT_ONLY) {
     console.log('  linkSync: skipped (content-only scope)');
-  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
+  } else if (getServerUrl()) {
     const linkSignals = collectLinkSignals(entities, pages, contentInbound, tagIndex, byStableId);
     await syncLinksAndRefreshGraph(linkSignals);
   }
@@ -1032,7 +1044,7 @@ async function main() {
     let pageChangeHistory = null;
     let changeHistorySource = 'yaml';
 
-    const serverUrl = process.env.LONGTERMWIKI_SERVER_URL;
+    const serverUrl = getServerUrl();
     if (serverUrl) {
       try {
         const headers = buildHeaders();
@@ -1161,7 +1173,7 @@ async function main() {
   // =========================================================================
   if (CONTENT_ONLY) {
     console.log('  buildMetricsSync: skipped (content-only scope)');
-  } else if (process.env.LONGTERMWIKI_SERVER_URL) {
+  } else if (getServerUrl()) {
     await syncBuildMetrics({ pages, updateScheduleItems });
   }
 

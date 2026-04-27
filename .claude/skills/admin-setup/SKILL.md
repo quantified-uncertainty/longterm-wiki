@@ -160,13 +160,28 @@ cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && pnpm crux sys audits lis
 
 ### Section 6: Print orientation summary
 
-**6a. Compute PR patrol 24h activity.** PR patrol doesn't currently log dollar cost (see QUA-324 — follow-up to add `cost_usd` to `runs.jsonl`). As a proxy until that lands, count `pr_result` entries in the last 24h from `~/.cache/pr-patrol/runs.jsonl`:
+**6a. Compute PR patrol status — alive, age, 24h activity.**
+
+PR patrol doesn't currently log dollar cost (see QUA-324 — follow-up to add `cost_usd` to `runs.jsonl`). As a proxy until that lands, count `pr_result` entries in the last 24h from `~/.cache/pr-patrol/runs.jsonl`. **Also surface the daemon's age** — long-running daemons (>2 days) are running stale code and miss every patrol fix that has merged since they started. Empirically the daemon dies silently on credit-balance issues + races, so users need a visible signal (this skill is the only place it surfaces).
 
 ```bash
-if pgrep -f "crux gh pr-patrol run" > /dev/null; then
+PATROL_PID=$(pgrep -f "crux[[:space:]]+(gh[[:space:]]+)?pr-patrol[[:space:]]+(run|parallel)" | head -1)
+if [ -n "$PATROL_PID" ]; then
+  # Daemon age in days (compare lstart timestamp to now). BSD `ps -p PID -o lstart=`
+  # returns e.g. "Tue Apr 22 09:26:17 2026". macOS-only; on Linux use --etime.
+  STARTED=$(ps -p "$PATROL_PID" -o lstart= 2>/dev/null | sed 's/^ *//')
+  STARTED_TS=$(date -j -f "%a %b %d %T %Y" "$STARTED" "+%s" 2>/dev/null || echo 0)
+  NOW_TS=$(date +%s)
+  if [ "$STARTED_TS" -gt 0 ]; then
+    AGE_DAYS=$(( (NOW_TS - STARTED_TS) / 86400 ))
+    AGE_NOTE=" — started ${AGE_DAYS}d ago"
+    [ "$AGE_DAYS" -ge 2 ] && AGE_NOTE="${AGE_NOTE} ⚠ STALE (running pre-${AGE_DAYS}d code; restart to pick up fixes)"
+  else
+    AGE_NOTE=""
+  fi
+
   RUNS_24H=$(awk -v cutoff="$(date -u -v-24H +%Y-%m-%dT%H:%M:%S 2>/dev/null || date -u -d '24 hours ago' +%Y-%m-%dT%H:%M:%S)" '
     /"type":"pr_result"/ {
-      # extract timestamp
       if (match($0, /"timestamp":"[^"]+"/)) {
         ts = substr($0, RSTART+13, RLENGTH-14)
         if (ts >= cutoff) count++
@@ -175,30 +190,57 @@ if pgrep -f "crux gh pr-patrol run" > /dev/null; then
     END { print count+0 }
   ' ~/.cache/pr-patrol/runs.jsonl 2>/dev/null || echo 0)
   # Warn threshold: >40 fix attempts in 24h is unusually high (normal is ~5-15).
-  # Chosen because each attempt takes ~3-10min of Claude time — 40+ suggests a
-  # runaway loop or an oscillating PR. Downgrade to raw dollars once QUA-324 lands.
+  # 40+ suggests a runaway loop or an oscillating PR. Downgrade to raw $ when QUA-324 lands.
   if [ "$RUNS_24H" -gt 40 ]; then
-    PATROL_STATUS="⚠ pr-patrol ✓ (${RUNS_24H} runs/24h — unusually high)"
+    PATROL_STATUS="⚠ pr-patrol ✓ (${RUNS_24H} runs/24h — unusually high)${AGE_NOTE}"
   else
-    PATROL_STATUS="pr-patrol ✓ (${RUNS_24H} runs/24h)"
+    PATROL_STATUS="pr-patrol ✓ (${RUNS_24H} runs/24h)${AGE_NOTE}"
+  fi
+
+  # Also flag if patrol source code has changed since the daemon started — a
+  # restart will pick up new turn-budget tunings, scoring rules, etc.
+  if [ "$STARTED_TS" -gt 0 ]; then
+    LAST_PATROL_COMMIT_TS=$(cd "$CLAUDE_PROJECT_DIR" 2>/dev/null && git log -1 --format=%ct -- crux/pr-patrol/ 2>/dev/null || echo 0)
+    if [ "$LAST_PATROL_COMMIT_TS" -gt "$STARTED_TS" ]; then
+      PATROL_STATUS="${PATROL_STATUS} | ⚠ source updated since daemon start — restart recommended"
+    fi
   fi
 else
-  PATROL_STATUS="pr-patrol –"
+  PATROL_STATUS="pr-patrol – (NOT RUNNING — restart with the Section 1c block)"
 fi
 echo "$PATROL_STATUS"
 ```
 
+**If the daemon is stale (≥2d) or its source code has been updated**, offer to restart it before reporting the summary:
+
+```bash
+echo "Restart patrol now? (Re-runs the Section 1c block — kill old daemon + start fresh.)"
+```
+
+Restart steps (use only on user confirmation, OR automatically if `--auto-restart-stale` is passed):
+```bash
+pkill -f "crux[[:space:]]+(gh[[:space:]]+)?pr-patrol[[:space:]]+(run|parallel)" 2>/dev/null
+sleep 2
+cd /Users/ozziegooen/Documents/GitHub.nosync/lw/main && \
+  export GITHUB_TOKEN=$(gh auth token) && \
+  nohup pnpm crux gh pr-patrol run > /tmp/lw-pr-patrol.log 2>&1 &
+disown
+```
+
 **6b. Print the summary block:**
 
-```
+```text
 === Admin session ready ===
 Date:        2026-04-10
 Background:  rename-loop ✓ | ws-refresh ✓ | <PATROL_STATUS from 6a>
+                                              # PATROL_STATUS now includes age + stale-source warning
 Production:  healthy | uptime Xs
 Linear:      N stale In Progress | M ready P1/P2
 CI (main):   N failures in last 24h
 Slots:       N active | M idle
 ```
+
+If `PATROL_STATUS` contains `⚠ STALE` or `⚠ source updated`, surface that prominently in your first user message — those signal the patrol is running pre-fix code and needs a restart cycle.
 
 Then ask the user: "What would you like to work on?"
 
@@ -207,6 +249,7 @@ Then ask the user: "What would you like to work on?"
 - `/admin-setup` — full setup with all sections
 - `/admin-setup --no-loops` — skip starting background processes (for read-only audits)
 - `/admin-setup --quiet` — only print orientation summary, suppress section headers
+- `/admin-setup --auto-restart-stale` — restart patrol without confirmation if it's ≥2d old or its source has been updated
 
 ## Important
 

@@ -22,6 +22,18 @@ export type WebsiteSourcePages = InferResponseType<RpcClient[':sourceId']['pages
 export type PageSnapshotList = InferResponseType<RpcClient[':sourceId']['snapshots']['$get'], 200>;
 export type PageSnapshotDetail = InferResponseType<RpcClient[':sourceId']['snapshots'][':snapshotId']['$get'], 200>;
 export type PageSnapshotCreateResult = InferResponseType<RpcClient[':sourceId']['snapshots']['$post'], 201>;
+export type PendingSnapshotsResult = InferResponseType<RpcClient['snapshots']['pending']['$get'], 200>;
+export type UpdateExtractionResult = InferResponseType<RpcClient[':sourceId']['snapshots'][':snapshotId']['extraction']['$post'], 200>;
+// The /sync handler is created via `createSyncHandler()` factory, which
+// returns a generic Hono handler Hono RPC infers as `{}`. Hand-write the
+// response shape instead — it's stable and documented in the factory
+// source at apps/wiki-server/src/routes/tablebase/sync-factory.ts.
+export interface SyncWebsiteSourcesResult {
+  upserted: number;
+  verdictsWritten?: number;
+  claimsLinked?: number;
+}
+export type SyncWebsitePagesResult = InferResponseType<RpcClient['sync-pages']['$post'], 200>;
 
 // ---------------------------------------------------------------------------
 // Client functions
@@ -92,5 +104,92 @@ export async function createPageSnapshot(
     'POST',
     `/api/website-sources/${encodeURIComponent(sourceId)}/snapshots`,
     input,
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Sync helpers — upsert sources and pages (QUA-642 register command)
+// ---------------------------------------------------------------------------
+
+export interface SyncWebsiteSourceInput {
+  id: string;
+  domain: string;
+  entityId?: string | null;
+  entityDisplayName?: string | null;
+  reliability?: 'high' | 'medium' | 'low';
+  refreshIntervalDays?: number;
+  enabled?: boolean;
+  notes?: string | null;
+}
+
+export interface SyncWebsitePageInput {
+  id: string;
+  sourceId: string;
+  path: string;
+  pageRole?:
+    | 'about'
+    | 'team'
+    | 'research'
+    | 'pricing'
+    | 'careers'
+    | 'docs'
+    | 'landing'
+    | 'blog-index'
+    | 'other'
+    | null;
+  extractTargets?: string[] | null;
+  refreshIntervalDays?: number | null;
+  enabled?: boolean;
+}
+
+export async function syncWebsiteSources(
+  items: SyncWebsiteSourceInput[],
+): Promise<ApiResult<SyncWebsiteSourcesResult>> {
+  return apiRequest<SyncWebsiteSourcesResult>(
+    'POST',
+    '/api/website-sources/sync',
+    { items },
+  );
+}
+
+export async function syncWebsitePages(
+  items: SyncWebsitePageInput[],
+): Promise<ApiResult<SyncWebsitePagesResult>> {
+  return apiRequest<SyncWebsitePagesResult>(
+    'POST',
+    '/api/website-sources/sync-pages',
+    { items },
+  );
+}
+
+// ---------------------------------------------------------------------------
+// Extraction workflow helpers (QUA-642 extract command)
+// ---------------------------------------------------------------------------
+
+/** One row from the `/snapshots/pending` response — inferred from the route. */
+export type PendingSnapshot = PendingSnapshotsResult['snapshots'][number];
+
+export async function listPendingSnapshots(
+  limit = 50,
+  offset = 0,
+): Promise<ApiResult<PendingSnapshotsResult>> {
+  return apiRequest<PendingSnapshotsResult>(
+    'GET',
+    `/api/website-sources/snapshots/pending?limit=${limit}&offset=${offset}`,
+  );
+}
+
+export async function updateSnapshotExtraction(
+  sourceId: string,
+  snapshotId: string,
+  extractionStatus: 'pending' | 'extracted' | 'failed' | 'skipped',
+  extractedFacts: unknown = null,
+): Promise<ApiResult<UpdateExtractionResult>> {
+  return apiRequest<UpdateExtractionResult>(
+    'POST',
+    `/api/website-sources/${encodeURIComponent(sourceId)}/snapshots/${encodeURIComponent(
+      snapshotId,
+    )}/extraction`,
+    { extractionStatus, extractedFacts },
   );
 }

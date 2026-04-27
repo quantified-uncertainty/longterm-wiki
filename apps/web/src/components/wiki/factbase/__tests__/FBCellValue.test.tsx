@@ -71,16 +71,16 @@ describe("FBCellValue", () => {
   });
 
   // ── Path 4: number with currency unit (USD) ──
-  it("formats number with USD unit as currency", () => {
+  it("formats number with USD unit as compact currency", () => {
     const fieldDef: FieldDef = { type: "number", unit: "USD", description: "" };
     render(<FBCellValue value={380_000_000_000} fieldName="valuation" fieldDef={fieldDef} />);
-    expect(screen.getByText("$380 billion")).toBeInTheDocument();
+    expect(screen.getByText("$380B")).toBeInTheDocument();
   });
 
-  it("formats smaller USD amount", () => {
+  it("formats smaller USD amount compactly", () => {
     const fieldDef: FieldDef = { type: "number", unit: "USD", description: "" };
     render(<FBCellValue value={850_000_000} fieldName="revenue" fieldDef={fieldDef} />);
-    expect(screen.getByText("$850 million")).toBeInTheDocument();
+    expect(screen.getByText("$850M")).toBeInTheDocument();
   });
 
   // ── Path 5: number with fraction field → percentage ──
@@ -107,13 +107,13 @@ describe("FBCellValue", () => {
   });
 
   // ── Path 7: array range with currency ──
-  it("formats array range with USD unit as currency range", () => {
+  it("formats array range with USD unit as compact currency range", () => {
     const fieldDef: FieldDef = { type: "number", unit: "USD", description: "" };
     const { container } = render(
       <FBCellValue value={[5_000_000, 10_000_000]} fieldName="amount" fieldDef={fieldDef} />
     );
-    expect(container.textContent).toContain("$5 million");
-    expect(container.textContent).toContain("$10 million");
+    expect(container.textContent).toContain("$5M");
+    expect(container.textContent).toContain("$10M");
   });
 
   // ── Path 8: date ──
@@ -141,14 +141,14 @@ describe("FBCellValue", () => {
     const { container } = render(
       <FBCellValue value={[5_000_000, 10_000_000]} fieldName="amount" />
     );
-    expect(container.textContent).toContain("$5 million");
-    expect(container.textContent).toContain("$10 million");
+    expect(container.textContent).toContain("$5M");
+    expect(container.textContent).toContain("$10M");
   });
 
   // ── Path 12: fallback number without schema ──
   it("formats plain number with currency hint from field name", () => {
     render(<FBCellValue value={1_000_000_000} fieldName="valuation" />);
-    expect(screen.getByText("$1 billion")).toBeInTheDocument();
+    expect(screen.getByText("$1B")).toBeInTheDocument();
   });
 
   it("formats plain number without currency hint", () => {
@@ -198,7 +198,7 @@ describe("FBCellValue", () => {
 
   it("infers USD for amount field without schema", () => {
     render(<FBCellValue value={50_000_000} fieldName="amount" />);
-    expect(screen.getByText("$50 million")).toBeInTheDocument();
+    expect(screen.getByText("$50M")).toBeInTheDocument();
   });
 
   // Drizzle numeric() columns return JS strings. These tests guard the
@@ -206,22 +206,22 @@ describe("FBCellValue", () => {
   describe("string-typed PG numeric fallback", () => {
     it("formats string-typed funding round raised as USD", () => {
       render(<FBCellValue value="8000000000" fieldName="raised" />);
-      expect(screen.getByText("$8 billion")).toBeInTheDocument();
+      expect(screen.getByText("$8B")).toBeInTheDocument();
     });
 
     it("formats string-typed valuation as USD", () => {
       render(<FBCellValue value="380000000000" fieldName="valuation" />);
-      expect(screen.getByText("$380 billion")).toBeInTheDocument();
+      expect(screen.getByText("$380B")).toBeInTheDocument();
     });
 
     it("formats camelCase raisedLow (PG column) as USD", () => {
       render(<FBCellValue value="2600000000" fieldName="raisedLow" />);
-      expect(screen.getByText("$2.6 billion")).toBeInTheDocument();
+      expect(screen.getByText("$2.6B")).toBeInTheDocument();
     });
 
-    it("formats impliedValuation as USD", () => {
+    it("formats impliedValuation as USD (≥10 drops decimal: 61.5 → 62)", () => {
       render(<FBCellValue value="61500000000" fieldName="impliedValuation" />);
-      expect(screen.getByText("$61.5 billion")).toBeInTheDocument();
+      expect(screen.getByText("$62B")).toBeInTheDocument();
     });
 
     it("formats string-typed fraction field as percentage", () => {
@@ -269,8 +269,8 @@ describe("FBCellValue", () => {
     it("formats negative string currency correctly", () => {
       // Would only occur for NAV-style fields, but the parse path handles it.
       render(<FBCellValue value="-5000000" fieldName="amount" />);
-      const el = screen.getByText(/5 million/);
-      expect(el.textContent).toMatch(/-|\$/);
+      const el = screen.getByText(/5M/);
+      expect(el.textContent).toMatch(/-\$/);
     });
   });
 });

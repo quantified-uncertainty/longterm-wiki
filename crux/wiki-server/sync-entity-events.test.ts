@@ -189,6 +189,22 @@ events: "oops"
     expect(() => loadEventsFile(f)).toThrow(/object/);
   });
 
+  it("rejects null/primitive items in the events array", () => {
+    // Regression for pre-existing bug: the events loader used to cast the
+    // raw item to RawEvent without a runtime shape check, so a null or
+    // primitive array entry would crash later with a bare TypeError.
+    const f = writeFile(
+      "t.yaml",
+      `
+entityId: sid_abc1234567
+events:
+  - null
+  - { date: "2020", title: OK, eventType: founding }
+`,
+    );
+    expect(() => loadEventsFile(f)).toThrow(/events\[0\].*must be an object/);
+  });
+
   it("includes the file path in error messages", () => {
     const f = writeFile(
       "broken.yaml",

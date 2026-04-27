@@ -1,0 +1,275 @@
+{
+  "table": "personnel",
+  "recordCount": 25,
+  "recordsRejected": 0,
+  "submittedAt": "2026-04-25T11:46:17.410Z",
+  "sourcingSummary": {
+    "withSourcing": 0,
+    "withoutSourcing": 25,
+    "verdicts": {
+      "verified": 0,
+      "contradicted": 0,
+      "unverifiable": 0,
+      "other": 0
+    }
+  },
+  "records": [
+    {
+      "personId": "We9Sg9MfKL",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Co-founder & President Emerita",
+      "roleType": "key-person",
+      "startDate": "2001",
+      "isFounder": true,
+      "source": "https://www.cgdev.org/about-cgd",
+      "notes": "Co-founder and first President of CGD (2001). Now President Emerita and board member. Per CGD website.",
+      "id": "MLXbZb9is8",
+      "verdict": "none"
+    },
+    {
+      "personId": "9YnPn6ND07",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Co-founder & Chair Emeritus",
+      "roleType": "board",
+      "startDate": "2001",
+      "isFounder": true,
+      "source": "https://www.cgdev.org/board",
+      "notes": "Co-founder of CGD (2001) and Chair Emeritus of Board of Directors. Per CGD website.",
+      "id": "ubPJzj0XT0",
+      "verdict": "none"
+    },
+    {
+      "personId": "ZT7cDG2G6T",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Co-founder",
+      "roleType": "key-person",
+      "startDate": "2001",
+      "isFounder": true,
+      "source": "https://www.cgdev.org/about-cgd",
+      "notes": "Co-founder of CGD (2001). Senior Fellow & Director Emeritus at Peterson Institute. Per CGD website.",
+      "id": "LOQMvqIX4a",
+      "verdict": "none"
+    },
+    {
+      "personId": "aI4IYlje3G",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "President",
+      "roleType": "key-person",
+      "source": "https://www.cgdev.org/leadership",
+      "notes": "Current President of CGD. Per CGD leadership page.",
+      "id": "XD6BbBAONv",
+      "verdict": "none"
+    },
+    {
+      "personId": "VttM0S3X5x",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "President Emeritus",
+      "roleType": "key-person",
+      "startDate": "2017",
+      "source": "https://www.cgdev.org/page/president-emeritus",
+      "notes": "Joined CGD in 2017, became President Emeritus in July 2024. Per CGD website.",
+      "id": "T49rmALxtt",
+      "verdict": "none"
+    },
+    {
+      "personId": "zf7A9OdG5n",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Vice President and Senior Fellow",
+      "roleType": "key-person",
+      "source": "https://www.cgdev.org/leadership",
+      "notes": "Vice President and Senior Fellow at CGD. Per CGD leadership page.",
+      "id": "LP4bqJYe23",
+      "verdict": "none"
+    },
+    {
+      "personId": "52ZeTiCEaB",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Vice President and Senior Fellow",
+      "roleType": "key-person",
+      "source": "https://www.cgdev.org/leadership",
+      "notes": "Vice President and Senior Fellow at CGD. Per CGD leadership page.",
+      "id": "zJhNaMZnqz",
+      "verdict": "none"
+    },
+    {
+      "personId": "vnOYx4GMT7",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Managing Director, Europe and Senior Fellow",
+      "roleType": "key-person",
+      "source": "https://www.cgdev.org/leadership",
+      "notes": "Managing Director of CGD Europe and Senior Fellow. Per CGD leadership page.",
+      "id": "0LrLFDX7e6",
+      "verdict": "none"
+    },
+    {
+      "personId": "SMyV2r7tYN",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Interim Board Chair",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Interim Chair of the Board of Directors. Per CGD board page.",
+      "id": "FbUZUNJpfE",
+      "verdict": "none"
+    },
+    {
+      "personId": "rTdw4qt5J3",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "SYjzLmnXH8",
+      "verdict": "none"
+    },
+    {
+      "personId": "oXMzcjjf7g",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors and CGD Europe Board of Trustees. Per CGD board page.",
+      "id": "2t7wnaBBMf",
+      "verdict": "none"
+    },
+    {
+      "personId": "fbg7Y93431",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "KjUw14AWzC",
+      "verdict": "none"
+    },
+    {
+      "personId": "3tYlxhskBf",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "SmP99vuDUZ",
+      "verdict": "none"
+    },
+    {
+      "personId": "SuAIVA0TnN",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "EiwYOjiRJn",
+      "verdict": "none"
+    },
+    {
+      "personId": "B5mb95f4z9",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "9Mn3MdB4bt",
+      "verdict": "none"
+    },
+    {
+      "personId": "0ZgllezUJV",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "8nv5phNUf0",
+      "verdict": "none"
+    },
+    {
+      "personId": "BzNe9hgsp9",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "hG8h6azR1H",
+      "verdict": "none"
+    },
+    {
+      "personId": "EY42tRA4Ej",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "bsvG9Hz9S3",
+      "verdict": "none"
+    },
+    {
+      "personId": "XF6BRum877",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "CbfoGIi8R6",
+      "verdict": "none"
+    },
+    {
+      "personId": "HZJOXl8tMt",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "5TW3PqEwA8",
+      "verdict": "none"
+    },
+    {
+      "personId": "RfKmI2a6oW",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "SnJVbin414",
+      "verdict": "none"
+    },
+    {
+      "personId": "3tfIdLrFpq",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "Board Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/board",
+      "notes": "Member of CGD Board of Directors. Per CGD board page.",
+      "id": "AvQhCcPihM",
+      "verdict": "none"
+    },
+    {
+      "personId": "yLfnP6lgZH",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "CGD Europe Board of Trustees Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/page/cgd-europe-board-trustees",
+      "notes": "Trustee on CGD Europe Board of Trustees. Per CGD Europe board page.",
+      "id": "iGvVXRV0h4",
+      "verdict": "none"
+    },
+    {
+      "personId": "dG8lRt6HHg",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "CGD Europe Board of Trustees Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/page/cgd-europe-board-trustees",
+      "notes": "Trustee on CGD Europe Board of Trustees. Per CGD Europe board page.",
+      "id": "dlMRs1Za4t",
+      "verdict": "none"
+    },
+    {
+      "personId": "4c6T2BSJcQ",
+      "organizationId": "sid_b4M1tU9tGw",
+      "role": "CGD Europe Board of Trustees Member",
+      "roleType": "board",
+      "source": "https://www.cgdev.org/page/cgd-europe-board-trustees",
+      "notes": "Trustee on CGD Europe Board of Trustees. Per CGD Europe board page.",
+      "id": "AUknZkhpFm",
+      "verdict": "none"
+    }
+  ]
+}

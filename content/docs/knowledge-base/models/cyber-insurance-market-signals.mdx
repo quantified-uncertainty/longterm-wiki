@@ -1,0 +1,181 @@
+---
+wikiId: E2516
+title: Cyber Insurance Market Signals
+description: Cyber insurance pricing, capacity limits, war exclusions, and reinsurance structures as revealed-preference evidence on the market's expected damage distribution and catastrophic tail risk.
+sidebar:
+  order: 50
+subcategory: analysis-models
+lastEdited: 2026-04-25
+summary: "Analyzes cyber insurance market signals (2017–2024) as revealed-preference evidence on catastrophic cyber risk, using premium data, loss ratios, war exclusions, reinsurance structures, and cat bond issuance to argue that the market treats correlated systemic cyber events as largely uninsurable; Munich Re's 200-year return period estimates range from \\$20–46B in industry losses against \\$16.6B in annual premiums, with \\$575M in cyber cat bonds representing ~1.3% of total cat bond market."
+clusters:
+  - cyber
+  - ai-safety
+---
+## Overview
+
+The cyber insurance market provides a window into how commercial underwriters price and bound aggregate cyber risk. Unlike public statements or model outputs, insurance pricing and structural decisions—capacity limits, exclusion clauses, reinsurance arrangements, and capital markets participation—reflect financial commitments with real loss exposure. The market's behavior from 2017 to the present encodes a revealed-preference estimate of the cyber damage distribution: where risk is insurable, at what price, and where it is not.
+
+Global cyber insurance written premiums grew from roughly \$4.5 billion in 2019 to approximately \$16.6 billion in 2024.[^rc-2042] This growth occurred alongside a pronounced hardening cycle (2020–2022), a subsequent rate correction, and systematic structural changes to what the market will and will not cover. Collectively, these signals bear on questions that actuarial and probabilistic models address only partially: what is the plausible upper bound of insurable cyber losses, and where does the market judge risk to be too correlated, too uncertain, or too catastrophic to underwrite?
+
+For context on the underlying loss distribution this market is pricing, see AI Cyber Damage Estimates.
+
+## Conceptual Framework
+
+Insurance markets aggregate dispersed private information about risk. When a large commercial underwriter sets a premium, defines a coverage limit, or writes an exclusion clause, it is embedding an implicit model of expected loss frequency and severity. Several structural features of cyber insurance are particularly informative as signals about the damage distribution:
+
+**Capacity limits** indicate where insurers lose confidence in their actuarial models. A carrier willing to write \$5 million in coverage but unwilling to write \$500 million is expressing a view about the correlation structure of cyber losses—specifically, that large aggregate events are too uncertain or too correlated across policyholders to price and diversify at scale.
+
+**Exclusion clauses** identify categories of risk the market has explicitly decided are uninsurable under standard commercial terms. State-actor exclusions adopted after 2022 reflect a structural judgment that state-sponsored systemic events produce correlated losses that cannot be covered without sovereign-scale backstops. Whether this reflects actuarial modeling, legal strategy, or both is a contested question (discussed under Limitations).
+
+**Loss ratios** are retrospective signals. When the US market ran loss ratios above 65% in 2020–2021, this reflected both unanticipated ransomware frequency and inadequate initial pricing. The subsequent correction—tighter underwriting, higher premiums, reduced limits—represents a market update on the underlying risk distribution. The reversion to loss ratios below 45% by 2023 reflects changed underwriting terms, not necessarily a reduction in underlying hazard.
+
+**Reinsurance and cat bond structures** reveal the market's view of the tail. Reinsurers and capital markets investors who accept cyber tranches are pricing the probability of large aggregate events; where capacity is thin or absent (as in cyber ILS through 2022), this reflects either modeling uncertainty or a judgment that the risk is not diversifiable at available pricing.
+
+**The protection gap**—the ratio of economic losses to insured losses—provides an inverse signal: where economic losses far exceed insured losses, the market has implicitly declined to cover the risk, either because it cannot price it or because buyers have not yet demanded coverage at offered terms.
+
+## Quantitative Analysis
+
+### Premium Volume and Rate Cycle
+
+Global cyber insurance written premiums more than tripled between 2019 and 2023, then stabilized as rate corrections offset exposure growth.[^rc-2042][^rc-dfdf][^rc-b9ee]
+
+| Year | Global Premium (est.) | US Direct Written Premium | US YoY Change | Key Driver |
+|------|----------------------|--------------------------|---------------|-----------|
+| 2019 | ≈\$4.5B | \$3.15B | +21% | Steady growth phase |
+| 2020 | ≈\$6B | \$4.06B | +29% | Initial ransomware surge |
+| 2021 | ≈\$10B | \$6.54B | +61% | Ransomware crisis; hardening begins |
+| 2022 | ≈\$13B | \$9.68B | +48% | Rate peak; H1 >+100% YoY |
+| 2023 | ≈\$15B | \$9.84B | +2% | Stabilization; rate softening begins |
+| 2024 | ≈\$16.6B | ≈\$10B | ~flat | Rate declines continue |
+
+Sources: [NAIC 2024](https://content.naic.org/sites/default/files/cmte-h-cyber-wg-2024-cyber-ins-report.pdf), [Guy Carpenter / Risk & Insurance 2024](https://riskandinsurance.com/global-cyber-insurance-market-reaches-16-6-billion-in-2024/), [Howden 2024](https://www.howdengroupholdings.com/sites/default/files/2024-06/howden-2024-cyber-report.pdf)
+
+The rate cycle was pronounced. Howden's Global Cyber Insurance Pricing Index recorded annual rate increases exceeding 100% in the first half of 2022,[^rc-4a42] followed by a sustained correction of approximately 22% from the mid-2022 peak through early 2025.[^rc-e501] Aon reported ten consecutive quarters of pricing decreases through Q1 2025, with premiums falling 6.7% in 2024.[^rc-4c34] Swiss Re revised its long-term CAGR forecast for global cyber insurance down to 5%, citing rate deterioration and market saturation in the large-corporate segment.[^rc-afa2]
+
+### Loss Ratio History
+
+Loss ratios provide retrospective evidence on model accuracy and risk severity. The ransomware surge of 2020–2021 produced a significant market correction; subsequent underwriting tightening drove ratios back to near-historical levels by 2023.
+
+| Year | US Top-20 Groups | US Standalone Policies | Lloyd's Cyber Market (UY, ultimate) |
+|------|-----------------|------------------------|--------------------------------------|
+| 2017 | 32.4% | ≈45% | — |
+| 2019 | — | — | 129% (UY2019) |
+| 2020 | 66.9% | 73% | 91% (UY2020) |
+| 2021 | 66.4% | 65% | 59% (UY2021) |
+| 2022 | ≈45% | 43% | — |
+| 2023 | 41.6% | 44% | — |
+
+Sources: [NAIC 2024 Cyber Insurance Report](https://content.naic.org/sites/default/files/cmte-h-cyber-wg-2024-cyber-ins-report.pdf),[^rc-b9ee] [Aon U.S. Cyber Market Update 2024](https://www.aon.com/getmedia/4afa8654-6534-48c3-91c1-b27d57170cdb/20240806-US-Cyber-Market-Update.pdf),[^rc-a525] [NAIC Journal of Insurance Regulation 2023](https://content.naic.org/sites/default/files/cipr-jir-2023-4.pdf)[^rc-4b82]
+
+The Lloyd's market's ultimate loss and DCCE ratio for underwriting year 2019 reached 129%, reflecting both the ransomware wave and long-tail development of prior-year claims.[^rc-4b82] The correction from 2020 onward reflects tightened underwriting, mandatory sublimits on ransomware, and higher attachment points rather than a reduction in the underlying threat environment.
+
+### Capacity Limits and Tower Structure
+
+Individual cyber insurers typically write per-occurrence limits of \$5–10 million for mid-to-large commercial risks.[^rc-8b66] Enterprises requiring higher total coverage construct layered "towers" by stacking primary and excess coverage from multiple carriers, reaching \$25–50 million or more in aggregate.[^rc-8b66][^rc-d8c8] Per-insurer line sizes declined significantly during and after the 2020–2022 hardening cycle as carriers reduced their maximum individual exposure per account.
+
+| Insured Segment | Typical Per-Occurrence Limit | Maximum Tower (stacked) |
+|----------------|------------------------------|------------------------|
+| Small business (&lt;50 employees) | \$1–2M | \$1–2M |
+| Mid-size (50–249 employees) | \$2–5M | \$5M+ |
+| Large enterprise (250+ employees) | \$5–10M | \$25–50M |
+| High-risk sectors (healthcare, finance) | \$10–50M | \$50M+ |
+
+Source: [Insurance Curator, 2024](https://insurancecurator.com/sample-cyber-limits-policy-structures-how-much-coverage-should-your-business-buy/)
+
+The capacity constraint at the individual-insurer level reflects a structural feature of the market: above per-insurer retention thresholds, losses become too correlated or too uncertain to model reliably at scale. Tower construction allows aggregate coverage to exceed individual carrier limits, but does not eliminate the constraint on total market-wide capacity.
+
+### War and State-Actor Exclusions
+
+The most structurally significant development in the cyber insurance market is the systematic exclusion of state-backed cyber operations. On January 18, 2023, Lloyd's Market Association published eight new clauses (LMA5564A/B through LMA5567A/B) mandating state-actor exclusions for all standalone cyber policies incepted or renewed after March 31, 2023.[^rc-2826] Lloyd's Market Bulletin Y5381 required all standalone cyber-attack policies to contain an exclusion for losses arising from state-backed cyberattacks, unless otherwise agreed by Lloyd's.[^rc-951e] Munich Re, one of the largest cyber reinsurers, publicly supported the Lloyd's approach.[^rc-cda5]
+
+The LMA5564 series defines four clause types ranging from full exclusion of all state-backed cyberattacks (Type 1) to more limited exclusions tied to "significant impairment" of state functioning (Types 2–3). The attribution mechanism under LMA5564A ties exclusion determinations to the government of the state where the affected computer system is physically located, while the "B" versions remove this attribution requirement.[^rc-2826]
+
+The *Merck & Co. v. ACE American Insurance Co.* litigation illustrates the stakes of definitional disputes over war exclusions. Merck claimed approximately \$1.4 billion in losses from the 2017 NotPetya cyberattack, attributed by multiple intelligence agencies to Russian state actors.[^rc-c4d9] Merck's all-risk property insurers sought to deny coverage under "hostile/warlike action" exclusions. The New Jersey Superior Court initially ruled for Merck, finding that war exclusion language drafted in the pre-digital era was not intended to cover state-sponsored malware attacks, and the state appellate court affirmed this finding in 2021.[^rc-6bea] Insurers appealed to the New Jersey Supreme Court; the case settled in early 2024 with terms undisclosed, shortly before oral arguments were scheduled.[^rc-c4d9][^rc-6bea]
+
+The industry's response—systematic adoption of the LMA clauses—reflects a judgment that ambiguous legacy exclusion language creates unresolvable coverage disputes. Whether the new language reflects primarily a legal strategy to reduce dispute exposure or primarily an actuarial judgment about state-actor risk is addressed under Limitations.
+
+### Reinsurance and Capital Markets Structures
+
+Global cyber reinsurance premiums are expected to grow at 8–11% CAGR, with growth concentrated in non-proportional (excess-of-loss) structures as carriers seek targeted tail-risk protection.[^rc-773d] As of the January 2025 renewal, the top five reinsurers provided approximately 50% of cyber reinsurance capacity, down from 70% two years earlier, as market breadth expanded with new entrants.[^rc-773d] Primary insurers cede approximately 36% of gross written premium to reinsurers, and reinsurers in turn retrocede approximately 7% to retrocessionaires, per Howden Re's 2025 analysis.[^rc-245d]
+
+**Cyber catastrophe bonds** emerged as a new instrument for transferring tail risk to capital markets. The first cyber catastrophe bond was the Beazley-sponsored "Cairney" transaction: a \$45 million Section 4(2) private placement issued in January 2023, listed on the Bermuda Stock Exchange, with Fermat Capital Management (≈\$10 billion AUM) as the principal investor.[^rc-8f7d] The bond provided excess-of-loss coverage for cyber claims exceeding a \$300 million attachment point.[^rc-8f7d]
+
+The first fully public (144A registered) cyber catastrophe bond was AXIS Capital's "Long Walk Re 2024-1," a \$75 million indemnity-per-occurrence transaction pricing at 9.75%, protecting against systemic cyber events arising from a single point of failure, issued November 2023.[^rc-3777] In addition, Stone Ridge Asset Management provided \$100 million to Hannover Re in early 2023 in the first proportional reinsurance transaction involving a capital-markets investor for cyber risk, though this was not a cat bond structure.[^rc-d4f2]
+
+| Transaction | Sponsor | Size | Date | Type | Key Terms |
+|-------------|---------|------|------|------|-----------|
+| Cairney | Beazley | \$45M | Jan 2023 | Private (Sec. 4(2)) | Indemnity; \$300M attachment; Fermat Capital investor |
+| Long Walk Re 2024-1 | AXIS Capital | \$75M | Nov 2023 | 144A public | Indemnity; systemic events; 9.75% spread |
+| Market total (through mid-2024) | Various | \$575M | 2023–2024 | Mix | 5 bonds, 4 sponsors |
+
+Sources: [Artemis/AM Best 2024](https://www.artemis.bm/news/cyber-parametric-ils-gain-momentum-as-cat-bond-market-evolves-am-best/), [Aon ILS Annual Report 2024](https://www.aon.com/getmedia/154b74d4-b861-45a5-a14c-bc258c88d19f/20240830-ils-annual-report-2024.pdf), [Fitch/Royal Gazette 2023](https://www.royalgazette.com/re-insurance/business/article/20230131/fitch-ils-cyber-bond-issue-encouraging-for-re-insurers/)
+
+The \$575 million in total cyber cat bond issuance through mid-2024 represents approximately 1.3% of the total catastrophe bond market (\$45.6 billion outstanding).[^rc-3777][^rc-5914] The narrow investor base, limited secondary market liquidity, and high initial spreads (9.75% for Long Walk Re) reflect investor caution about the correlation properties of cyber risk, as noted in the Geneva Association's December 2024 report on cyber ILS.[^rc-61b8]
+
+### Catastrophe Modeling and Return Periods
+
+Munich Re's accumulation modeling estimates the global industry modeled loss potential at a 200-year return period as between \$20 billion and \$46 billion, reflecting extreme scenarios such as widespread malware attacks or large-scale cloud service provider outages.[^rc-ef1d] Guy Carpenter's analysis noted that this 200-year range implies market-wide loss ratios of between 120% and 277% relative to 2024 premium volumes.[^rc-2042] The wide range reflects divergent assumptions among modeling vendors about the correlation structure and severity distribution of systemic cyber events.
+
+| Scenario | Return Period | Estimated Industry Loss |
+|----------|---------------|------------------------|
+| Modeled accumulation (Munich Re lower bound) | 1-in-200 year | ≈\$20B |
+| Modeled accumulation (Munich Re upper bound) | 1-in-200 year | ≈\$46B |
+| Total global cyber premiums (2024) | — | ≈\$16.6B |
+
+Source: [Munich Re, "Dealing with Cyber Accumulation Risk," 2023–2024](https://www.munichre.com/en/insights/cyber/dealing-with-cyber-accumulation-risk.html); [Guy Carpenter / Risk & Insurance, April 2025](https://riskandinsurance.com/global-cyber-insurance-market-reaches-16-6-billion-in-2024/)
+
+## Strategic Importance
+
+The structural features of the cyber insurance market, taken together, are consistent with a market view that the worst-case distribution of cyber losses is not fully amenable to standard commercial risk pooling. Several signals point in this direction:
+
+**Capacity ceiling relative to modeled catastrophes**: The market writes aggregate coverage far below potential catastrophic loss levels. A well-structured large-enterprise insurance tower reaches \$25–50 million, while Munich Re's 200-year scenario estimates industry-wide losses of \$20–46 billion.[^rc-ef1d][^rc-8b66] The per-insured coverage ceiling is several orders of magnitude below the modeled catastrophe scenario, not because coverage is unavailable in principle but because carriers decline to write above their per-account retention thresholds.
+
+**Coordinated exclusions for correlated scenarios**: The adoption of LMA5564-series state-actor exclusions after March 2023 signals market consensus that state-sponsored systemic attacks generate loss correlations that cannot be diversified within a private insurance pool.[^rc-2826][^rc-951e] The exclusions extend to non-war state-actor attacks that cause "significant impairment" of state functioning, which encompasses scenarios more likely to produce correlated multi-policyholder losses.
+
+**Protection gap as revealed non-insurability**: Munich Re estimates that the vast majority of global cyber risk remains uninsured.[^rc-0fbd] Swiss Re's projection of 5% CAGR reflects a judgment that organic growth is constrained by the boundary between insurable attritional losses and uninsurable catastrophic tail risk.[^rc-afa2] The protection gap is largest precisely in the scenarios—systemic infrastructure attacks, major cloud provider outages—where the divergence between economic loss and insured loss would be greatest.
+
+**Capital markets caution about correlation**: Despite the emergence of cyber catastrophe bonds in 2023, the ILS market for cyber remains nascent. The Geneva Association's 2024 report notes that "the cost of risk transfer remains high" and that investors remain cautious about "the potential for incidents to impact many companies simultaneously and reduce the prices of a wide array of financial assets."[^rc-61b8] This correlation concern—that a catastrophic cyber event would not be diversifying in a financial markets portfolio—is structurally distinct from the concern about natural catastrophe bonds and represents a binding constraint on cyber ILS growth.
+
+These signals are appropriately read as market behavior consistent with the view that catastrophic, correlated cyber events lie beyond the effective boundary of commercial insurability at current pricing and modeling maturity—not as proof about the probability of such events. The insurable upper bound implied by Munich Re's 200-year return period (\$20–46 billion in industry losses) represents events the market can price within broad confidence intervals, not an upper bound on what could happen.
+
+## Limitations
+
+Several factors constrain how directly market behavior can be interpreted as evidence on the underlying damage distribution:
+
+**Adverse selection and data disclosure**: Insurers lack visibility into the true distribution of loss severity for large systemic events that have not yet occurred. Publicly available loss data from NAIC and Lloyd's reflects filed claims, not economic losses, and captures the attritional loss distribution (ransomware, business email compromise, data breach) with limited data on catastrophic systemic scenarios. The claims history that drives current pricing is not representative of the scenarios that motivate concern about cyber tail risk.
+
+**Legal strategy versus actuarial judgment**: Exclusion clauses serve multiple purposes. State-actor exclusions may reflect a legal strategy to reduce coverage disputes by making exclusions explicit, rather than—or in addition to—a purely actuarial judgment about the probability of state-sponsored attacks. The *Merck* litigation history illustrates that courts have not consistently accepted legacy war exclusion arguments,[^rc-6bea] creating incentives for clearer contractual language. Whether LMA5564 reflects insurers' risk beliefs or their desire for legal certainty—or both—cannot be cleanly separated from the policy text alone.
+
+**US market dominance**: North America accounts for approximately 63% of global cyber premiums.[^rc-2042] Market structure, regulatory environment, claims culture, and loss history outside North America differ substantially. Conclusions drawn primarily from US NAIC data may not generalize to the global market or to the global damage distribution.
+
+**Cat bond market immaturity**: With approximately \$575 million in issuance through mid-2024, the cyber catastrophe bond market is too small for reliable price discovery at catastrophic loss levels.[^rc-3777] The high spreads observed on early transactions (9.75% for Long Walk Re) may reflect information asymmetry, illiquidity premia, and investor unfamiliarity rather than calibrated risk pricing. The total cyber ILS market remains less than 1.7% of the total catastrophe bond market.[^rc-61b8]
+
+**Protection gap interpretation**: The gap between economic and insured cyber losses can reflect either that losses are uninsurable (too correlated or uncertain) or that buyers have not yet purchased available coverage. Munich Re identifies SMEs as the largest underserved market segment,[^rc-0fbd] and there is evidence that SME underinsurance reflects cost and awareness barriers rather than supply-side judgments about insurability. Distinguishing demand-side underpurchase from supply-side non-insurability is analytically difficult at the aggregate level.
+
+**Rate cycle effects**: The 2020–2022 hardening cycle substantially tightened underwriting standards and reduced limits, but this reflected a correction to prior under-pricing rather than a stable steady-state view of the risk. The subsequent softening (approximately 22% from the mid-2022 peak by 2025)[^rc-e501] complicates interpretation of current pricing as a reliable long-run signal. Swiss Re has warned that the rate correction may be outpacing justified improvement in the underlying risk.[^rc-afa2]
+
+[^rc-2042]: Guy Carpenter / Risk & Insurance, "Global Cyber Insurance Market Reaches \$16.6 Billion in 2024," April 2025, https://riskandinsurance.com/global-cyber-insurance-market-reaches-16-6-billion-in-2024/
+[^rc-dfdf]: DeepStrike, "Cyber Insurance Statistics 2025: Key Market and Threat Insights," 2025, https://deepstrike.io/blog/cyber-insurance-statistics-2025
+[^rc-b9ee]: NAIC, "2024 Cyber Insurance Report," October 2024, https://content.naic.org/sites/default/files/cmte-h-cyber-wg-2024-cyber-ins-report.pdf
+[^rc-4c34]: Aon, "Global 2025 Cyber Risk Report: Cyber Risk Insurance Market Remains Buyer-Friendly," 2025, https://www.aon.com/cyber-risk-report/cyber-risk-insurance-market-remains-buyer-friendly
+[^rc-4a42]: Howden, "Cyber Insurance 2024: Risk, Resilience and Relevance," June 2024, https://www.howdengroupholdings.com/sites/default/files/2024-06/howden-2024-cyber-report.pdf
+[^rc-e501]: Howden Re, "Into the Cyberverse," April 2025, https://www.howdenre.com/sites/howdenre.howdenprod.com/files/2025-04/howdenre_into_the_cyberverse_report_april_2025.pdf; Howden, "Rebooting Growth," September 2025, https://www.howdengroupholdings.com/sites/default/files/2025-09/howden-2025-cyber-report-rebooting-growth.pdf
+[^rc-afa2]: Swiss Re, "Reality check on the future of the cyber insurance market," 2024, https://www.swissre.com/risk-knowledge/advancing-societal-benefits-digitalisation/about-cyber-insurance-market.html; Cybersecurity Dive, "Swiss Re warns of rate deterioration in cyber insurance," 2024, https://www.cybersecuritydive.com/news/swiss-re-rate-deterioration-cyber-insurance/759370/
+[^rc-a525]: Aon, "U.S. Cyber Market Update: 2023 U.S. Cyber Insurance Profits and Performance," August 2024, https://www.aon.com/getmedia/4afa8654-6534-48c3-91c1-b27d57170cdb/20240806-US-Cyber-Market-Update.pdf
+[^rc-4b82]: NAIC Journal of Insurance Regulation, "The Current State of Cyber Insurance," 2023, https://content.naic.org/sites/default/files/cipr-jir-2023-4.pdf
+[^rc-8b66]: Insurance Curator, "Sample Cyber Limits & Policy Structures," 2024, https://insurancecurator.com/sample-cyber-limits-policy-structures-how-much-coverage-should-your-business-buy/
+[^rc-d8c8]: Advisen, "Higher and Higher: Cyber Insurance Towers Take Careful Construction," September 2015, https://www.advisenltd.com/2015/09/24/higher-and-higher-cyber-insurance-towers-take-careful-construction/
+[^rc-2826]: Lloyd's Market Association, "LMA Cyber War Clauses," January 2023, https://lmalloyds.com/specialist-areas/underwriting/wordings/cyber-war-clauses/
+[^rc-cda5]: Insurance Journal, "Lloyd's Cyber War Exclusions: Confusing, Disruptive, but Necessary?" May 2023, https://www.insurancejournal.com/news/international/2023/05/09/720020.htm
+[^rc-951e]: Clifford Chance, "Lloyd's Cyber War Exclusion," September 2023, https://www.cliffordchance.com/insights/resources/blogs/insurance-insights/2023/09/lloyds-cyber-war-exclusion.html
+[^rc-c4d9]: Pro Policyholder, "Merck Settlement of \$1.4 Billion Coverage Dispute Over NotPetya Cyberattack," January 2024, https://www.propolicyholder.com/2024/01/merck-settlement-1-4-billion-coverage-dispute-notpetya-cyberattack-places-renewed-spotlight-war-exclusions-2024/
+[^rc-6bea]: Insurance Journal, "Merck Settles Coverage Dispute With Insurers Over War Exclusion in NotPetya Attack," January 2024, https://www.insurancejournal.com/news/national/2024/01/05/754582.htm
+[^rc-773d]: Aon, "Reinsurance Market Dynamics — January 2025 Renewal," January 2025, https://www.insurancejournal.com/app/uploads/2025/01/aon-reinsurance-market-dynamics-jan-2025-report.pdf
+[^rc-245d]: Howden Re, "Into the Cyberverse," April 2025, https://www.howdenre.com/sites/howdenre.howdenprod.com/files/2025-04/howdenre_into_the_cyberverse_report_april_2025.pdf
+[^rc-8f7d]: Royal Gazette / Fitch, "Fitch: ILS Cyber Bond Issue Encouraging for Re/Insurers," January 2023, https://www.royalgazette.com/re-insurance/business/article/20230131/fitch-ils-cyber-bond-issue-encouraging-for-re-insurers/
+[^rc-3777]: Aon, "ILS Annual Report 2024," August 2024, https://www.aon.com/getmedia/154b74d4-b861-45a5-a14c-bc258c88d19f/20240830-ils-annual-report-2024.pdf
+[^rc-d4f2]: Risk Management Magazine, "Using Insurance-Linked Securities for Cyberrisk," June 2023, https://www.rmmagazine.com/articles/article/2023/06/01/using-insurance-linked-securities-for-cyberrisk
+[^rc-5914]: Risk & Insurance, "Catastrophe Bond Market Exceeds Records, Reaches \$45.6B in Capital," 2024, https://riskandinsurance.com/catastrophe-bond-market-exceeds-records-reaches-45-6b/
+[^rc-61b8]: Geneva Association, "Catalysing Cyber Risk Transfer to Capital Markets," December 2024, https://www.genevaassociation.org/sites/default/files/2024-12/cyber_ils_report_1213.pdf
+[^rc-ef1d]: Munich Re, "Dealing with Cyber Accumulation Risk," 2023–2024, https://www.munichre.com/en/insights/cyber/dealing-with-cyber-accumulation-risk.html
+[^rc-0fbd]: Munich Re, "From Gap to Gains: Protection Gap in Cyber Insurance," 2024, https://www.munichre.com/en/insights/cyber/cyber-protection-gap.html; Industrial Cyber / Munich Re, "Munich Re Sees Untapped Potential in \$15.3B Cyber Insurance Market," 2024, https://industrialcyber.co/reports/munich-re-sees-untapped-potential-in-15-3b-cyber-insurance-market-amid-rising-threats-and-evolving-risks/

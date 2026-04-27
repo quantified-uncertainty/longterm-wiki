@@ -1,0 +1,22 @@
+entity: sid_oZ2PXLZEYA
+facts:
+  - id: f_18Y2bTu5X1
+    property: incident-date
+    value: "2025-09"
+    asOf: "2025-11-13"
+    source: https://www.anthropic.com/news/disrupting-AI-espionage
+    notes: "Anthropic detected and disrupted the campaign in mid-September 2025; publicly disclosed November 13, 2025"
+
+  - id: f_YqWg21nYCs
+    property: incident-status
+    value: resolved
+    asOf: "2025-09"
+    source: https://www.anthropic.com/news/disrupting-AI-espionage
+    notes: "Anthropic terminated GTG-1002 access during campaign; 4 successful breaches confirmed out of ~30 targets. Considered the first publicly documented AI-orchestrated cyberattack."
+
+  - id: f_Xoblu17rNy
+    property: financial-impact
+    value: 5e+7
+    asOf: "2025-11"
+    source: https://www.anthropic.com/news/disrupting-AI-espionage
+    notes: "Direct damages estimated low (~$50M order of magnitude) due to early disruption and limited successful breach scope. Precedent and capability-trajectory significance is the primary cost dimension; not captured here."

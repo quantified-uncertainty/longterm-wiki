@@ -10,7 +10,6 @@ import { Backlinks } from "@/components/wiki/Backlinks";
 import { DataExternalLinks } from "@/components/wiki/DataExternalLinks";
 import { InfoBox } from "@/components/wiki/InfoBox";
 import { ExternalLinks } from "@/components/wiki/ExternalLinks";
-import { SquiggleEstimate } from "@/components/wiki/SquiggleEstimate";
 import { Callout } from "@/components/wiki/Callout";
 import { StarlightCard, CardGrid, LinkCard } from "@/components/wiki/StarlightCards";
 import { ComparisonTable } from "@/components/wiki/ComparisonTable";
@@ -18,6 +17,7 @@ import CauseEffectGraph from "@/components/wiki/CauseEffectGraph";
 import { PageCauseEffectGraph } from "@/components/wiki/PageCauseEffectGraph";
 import { OverviewBanner } from "@/components/wiki/OverviewBanner";
 import { AnthropicStakeholdersTable } from "@/components/wiki/AnthropicStakeholdersTable";
+import { EntityTimeline } from "@/components/wiki/EntityTimeline";
 
 // FactBase components — typed facts, properties, records
 import { FBFactTable } from "@/components/wiki/factbase/FBFactTable";
@@ -71,6 +71,7 @@ import { SystemHealthContent } from "@/app/internal/system-health/system-health-
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
 import { DivisionsDashboardContent } from "@/app/internal/divisions-dashboard/divisions-dashboard-content";
+import { SystemCardsDashboardContent } from "@/app/internal/system-cards-dashboard/system-cards-dashboard-content";
 import { FundingProgramsDashboardContent } from "@/app/internal/funding-programs-dashboard/funding-programs-dashboard-content";
 import { PeopleCoverageContent } from "@/app/internal/people-coverage/people-coverage-content";
 import { AgentActivityContent } from "@/app/internal/agent-activity/agent-activity-content";
@@ -84,6 +85,7 @@ import { ResourcePipelineDashboardContent } from "@/app/internal/resource-pipeli
 import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
 import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
+import { FrameworkReviewContent } from "@/app/internal/framework-review/framework-review-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -161,9 +163,6 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   // Mermaid — client-side rendered diagrams
   Mermaid: MermaidDiagram,
 
-  // Squiggle — probabilistic estimate visualizations
-  SquiggleEstimate,
-
   // Callout — rendered from :::note, :::tip, :::caution, :::danger directives
   Callout,
 
@@ -185,6 +184,9 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
 
   // Anthropic-specific table
   AnthropicStakeholdersTable,
+
+  // Entity timeline — reads entity_events from factbase-data.json
+  EntityTimeline,
 
   // FactBase — typed facts, record collections, entity data
   FBFactTable,
@@ -237,6 +239,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   PRDashboardContent,
   GrantsDashboardContent,
   DivisionsDashboardContent,
+  SystemCardsDashboardContent,
   FundingProgramsDashboardContent,
   PeopleCoverageContent,
   AgentActivityContent,
@@ -250,6 +253,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   DataSourcesContent,
   TablebaseCoverageContent,
   AutomationLandscapeContent,
+  FrameworkReviewContent,
 
   // Table view components
   SafetyApproachesTableView,

@@ -20,6 +20,11 @@ export interface AgentRunOptions {
   skipSourcing?: boolean;
   /** For source-discovery: also link discovered resources to records */
   apply?: boolean;
+  /**
+   * QUA-655: route supported record types through `POST /api/enrichment/propose`
+   * (tier-aware defensive gate) instead of the direct `/sync` endpoint.
+   */
+  viaPropose?: boolean;
 }
 
 /**
@@ -30,7 +35,13 @@ export async function runEnrichmentAgent(
   task: EnrichmentTask,
   options: AgentRunOptions = {},
 ): Promise<TaskResult> {
-  const { dryRun = false, model = MODELS.sonnet, skipSourcing = false, apply = false } = options;
+  const {
+    dryRun = false,
+    model = MODELS.sonnet,
+    skipSourcing = false,
+    apply = false,
+    viaPropose = false,
+  } = options;
   const startTime = Date.now();
   const tracker = new CostTracker();
 
@@ -38,7 +49,7 @@ export async function runEnrichmentAgent(
   const systemPrompt = getSystemPrompt(task);
   const userPrompt = getUserPrompt(task);
   const { tools: regularTools, serverTools } = getToolDefinitions({ taskType: task.taskType, apply });
-  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourcing, apply });
+  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourcing, apply, viaPropose });
 
   let totalRecordsCreated = 0;
 

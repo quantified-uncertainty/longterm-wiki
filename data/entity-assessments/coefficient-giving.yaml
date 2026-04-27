@@ -1,0 +1,27 @@
+# Entity assessments for Coefficient Giving (E521)
+# Source: content/docs/knowledge-base/organizations/coefficient-giving.mdx (## Quick Assessment)
+entityId: sid_ULjDXpSLCI
+assessments:
+  - dimension: scale
+    rating: Dominant
+    evidence: "$4B+ total grants; ~$46M AI safety in 2023"
+
+  - dimension: structure
+    rating: 13 cause-specific funds
+    evidence: Multi-donor pooled funds since Nov 2025 rebrand
+
+  - dimension: ai-safety-focus
+    rating: Leading funder
+    evidence: "$336M+ to AI safety since 2014; ~60% of external AI safety funding"
+
+  - dimension: application-model
+    rating: Rolling RFPs + regranting
+    evidence: 300-word EOI, 2-week response; supports platforms like Manifund
+
+  - dimension: transparency
+    rating: High
+    evidence: Public grants database, annual progress reports
+
+  - dimension: key-funders
+    rating: Good Ventures (primary)
+    evidence: Dustin Moskovitz & Cari Tuna; expanding to multi-donor model
