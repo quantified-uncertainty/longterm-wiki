@@ -22,7 +22,7 @@ import { TABLEBASE_MOUNTS } from "./routes/tablebase/mount-registry.js";
 // Unified sourcing system (replaces legacy factbase + record sourcing)
 import { sourcingRoute } from "./routes/sourcing/sourcing.js";
 import { urlSuggestionsRoute } from "./routes/sourcing/url-suggestions.js";
-import { missingSourcesRoute } from "./routes/sourcing/missing-sources.js";
+import { missingSourcesRoute } from "./routes/sourcing/missing-sources/route.js";
 
 // Claims-first sourcing system (#3253)
 import { claimsRoute } from "./routes/claims/claims.js";

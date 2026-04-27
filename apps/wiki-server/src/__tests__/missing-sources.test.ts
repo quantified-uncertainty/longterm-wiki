@@ -66,7 +66,7 @@ describe("GET /api/sourcing/missing-sources", () => {
 
   it("loads the route and returns 200", async () => {
     const { missingSourcesRoute } = await import(
-      "../routes/sourcing/missing-sources.js"
+      "../routes/sourcing/missing-sources/route.js"
     );
     const { Hono } = await import("hono");
     app = new Hono();
@@ -122,7 +122,7 @@ describe("POST /api/sourcing/missing-sources/update-source", () => {
   beforeEach(async () => {
     updateLog.length = 0;
     const { missingSourcesRoute } = await import(
-      "../routes/sourcing/missing-sources.js"
+      "../routes/sourcing/missing-sources/route.js"
     );
     const { Hono } = await import("hono");
     app = new Hono();
