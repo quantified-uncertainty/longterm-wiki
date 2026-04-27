@@ -195,34 +195,6 @@ So the lock releases between them. The helper still owns the FK discovery, backf
 
 For FK target swaps in this codebase, the hand-rolled template is now a footgun — the helper exists precisely because the template shipped a copy-paste defect 12 times. Call it. If the helper is missing a feature you need, extend it in a follow-up PR rather than bypassing it.
 
-## Bulk backfills — skip the universal audit trigger
-
-As of QUA-442 (migration 0204), every allow-listed domain table has an
-`AFTER INSERT OR UPDATE OR DELETE` trigger that writes to `full_audit_log`.
-A naive bulk migration — `UPDATE things SET ...` across millions of rows —
-would produce one audit row per modified row.
-
-Opt out at the top of any bulk-rewrite migration that doesn't need per-row
-audit capture (the git history of the migration IS the audit trail):
-
-```sql
-SET LOCAL app.audit_skip = 'true';
-UPDATE big_table SET x = y WHERE ...;
-```
-
-Accepted truthy values: `'true'`, `'on'`, `'1'`. `SET LOCAL` scopes this to
-the current transaction, so it never leaks into application writes.
-
-**When to use it**: planned bulk rewrites you authored and expect (e.g.,
-the QUA-408 Phase 4b-B `things` denormalization rewrites).
-
-**When NOT to use it**: application code or bug fixes — the audit trail
-catches unplanned state changes that diverge from what the migration
-intended. The per-row overhead is ~5–10% per INSERT/UPDATE and rarely
-matters outside bulk migrations.
-
-Full docs: `.claude/rules/audit-log.md`.
-
 ## Deploy flow for DDL migrations
 
 1. Merge PR with the no-op migration — deploy succeeds without DDL contention

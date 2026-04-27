@@ -1,6 +1,6 @@
 # TableBase Sync Handler Factory
 
-The `createSyncHandler<T>()` factory in `apps/wiki-server/src/routes/tablebase/sync-factory.ts` is the canonical pattern for TableBase POST /sync routes. As of 2026-04, **28 routes** use the factory (migration from discussion #4088 / issue #4090 is effectively complete except for the 5 permanently-excluded routes below).
+The `createSyncHandler<T>()` factory in `apps/wiki-server/src/routes/tablebase/sync-factory.ts` is the canonical pattern for new TableBase POST /sync routes. Mass migration of existing routes is in progress (discussion #4088, issue #4090).
 
 ## When to use it
 
@@ -30,7 +30,7 @@ Use `pnpm crux tb scaffold <kebab-name>` (QUA-455). It generates the route file,
 
 The factory provides three escape hatches: `preValidate`, `postUpsert`, `conflictSet`. **Routes should use at most 1.** If you find yourself reaching for a second hook, that's a signal the factory isn't the right fit — hand-roll the route instead.
 
-Representative examples from the 28 factory-using routes:
+The 3 Phase 1 pilot routes follow this rule:
 
 | Route | Hook | Reason |
 |-------|------|--------|

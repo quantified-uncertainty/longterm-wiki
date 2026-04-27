@@ -34,28 +34,6 @@ Closes #533
 Closes #538
 ```
 
-## CodeRabbit "Addressed in commit X" markers — DO NOT TRUST
-
-CodeRabbit sometimes appends `✅ Addressed in commit <sha>` to its review threads when it thinks a follow-up commit fixed the finding. Empirically these markers are **unreliable** in two ways:
-
-1. **The referenced SHA may not exist.** Saw `✅ Addressed in commit 3d5cbbe` on PR #4538 (ford-foundation, protect-democracy duplicate-fact findings) and `✅ Addressed in commits 760b1ba to 2ce2219` on PR #4482 (swap-fk-target findings). `git show` returned `unknown revision` for both. CodeRabbit was confidently citing phantom commits.
-2. **Even when the SHA exists, the relevant code may not actually reflect the fix.** PR #4482 finding 3 (information_schema joins missing schema) was marked addressed but the joins still matched on `constraint_name` only — the partial WHERE-clause hardening that did land was unrelated and didn't address the original concern.
-
-**Always verify** before treating a finding as resolved:
-
-```bash
-# 1. Confirm the cited commit exists
-git show <sha> --stat
-
-# 2. Grep the current file for the bug pattern the finding flagged
-grep -n "<bad-pattern>" <path>
-
-# 3. If both are clean, the finding is genuinely addressed.
-#    Otherwise treat it as an outstanding finding regardless of the marker.
-```
-
-This applies whether you're reviewing a teammate's PR, addressing comments on your own PR, or deciding whether to merge — the marker has no authority on its own.
-
 ## Ending a session
 
 Every session should end with one of:

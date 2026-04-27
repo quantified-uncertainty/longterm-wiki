@@ -1,0 +1,45 @@
+# Internal Dashboards for New Features
+
+**When building significant new features, always consider creating an internal dashboard page** to visualize the feature's data, status, and history. Dashboards are essential for debugging, monitoring, and iterating on features later.
+
+## When to build a dashboard
+
+Any feature that:
+- Produces data over time (run history, discovered items, status tracking, metrics)
+- Involves a pipeline with multiple stages (where seeing intermediate results aids debugging)
+
+## How to build one (Pattern A — MANDATORY)
+
+All dashboards **must** use the MDX wiki page pattern (Pattern A). Do not create raw `/internal/<name>` App Router pages without entity IDs.
+
+1. **Allocate an entity ID**: `pnpm crux tb ids allocate <slug>-dashboard`
+2. **Create content component**: `apps/web/src/app/internal/<name>/<name>-content.tsx`
+   - Export a named function (e.g., `MyFeatureContent`)
+   - No `<article>` wrapper, no `<h1>`, no `metadata` export — the wiki page shell handles those
+   - Keep data loading, stats, tables, `DataSourceBanner`
+3. **Create MDX stub**: `content/docs/internal/<slug>-dashboard.mdx`
+   ```yaml
+   ---
+   wikiId: E<id>
+   title: "<Title>"
+   description: "<Description>"
+   subcategory: dashboards          # or citations
+   contentFormat: dashboard
+   lastEdited: "<date>"
+   ---
+   <MyFeatureContent />
+   ```
+4. **Register component** in `apps/web/src/components/mdx-components.tsx`
+5. **Create redirect page**: Convert `page.tsx` to `redirect("/wiki/E<id>")`
+6. **Create table component** (if needed): `<name>-table.tsx` — client component with `"use client"` and `DataTable`
+7. **Add sidebar entry** in `apps/web/src/lib/wiki-nav.ts` using `internalHref("<slug>-dashboard")`
+
+Follow existing patterns in `apps/web/src/app/internal/entities/` (Pattern A reference implementation).
+
+## Existing dashboards
+
+Most dashboards have entity IDs and use Pattern A (MDX stub + content component + redirect). Exceptions are noted below.
+
+**Dashboards:** System Health (E927), PR Dashboard (E1011), Entities & Pages (E908), Page Changes (E909), Update Schedule (E900), Suggested Pages (E910), Improve Runs (E911), Agent Activity (E1281), Auto-Update Runs (E914), Auto-Update News (E915), Groundskeeper Runs (E926), Grants (E1055), Divisions (E1058), Funding Programs (E1059), People Coverage (E1099), Entity Profile (E1929), Source Checks (E2200), Data Quality (E2600), Data Sources (E2131), Talent Flows (E2084), Jobs (E2120), Source Check Coverage (no entity ID — needs Pattern A migration).
+
+**Citations:** Citation Accuracy (E917), Citation Content (E918), Hallucination Risk (E919).
