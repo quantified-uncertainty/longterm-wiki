@@ -156,6 +156,7 @@ async function verifyAllSources(
 
 const REJECTION_LABELS: Record<RejectionReason, string> = {
   'self-domain': 'self domain',
+  'placeholder-url': 'placeholder URL',
   'too-short': 'content too short',
   'no-entity-mention': 'no entity mention',
   'no-quote': 'no supporting quote',
@@ -169,7 +170,7 @@ const REJECTION_LABELS: Record<RejectionReason, string> = {
  * structural skips (not content failures) and would clutter the report.
  */
 function summarizeRejections(counts: Partial<Record<RejectionReason, number>>): string {
-  const reportable: RejectionReason[] = ['no-entity-mention', 'no-quote', 'quote-fabricated', 'entailment-failed'];
+  const reportable: RejectionReason[] = ['placeholder-url', 'no-entity-mention', 'no-quote', 'quote-fabricated', 'entailment-failed'];
   const parts = reportable
     .filter(r => (counts[r] ?? 0) > 0)
     .map(r => `${counts[r]} ${REJECTION_LABELS[r]}`);
@@ -189,6 +190,9 @@ function logVerifyResult(url: string, result: VerifyResult): void {
   switch (result.reason) {
     case 'self-domain':
       console.log(`    [self-domain] ${url}`);
+      break;
+    case 'placeholder-url':
+      console.log(`    [placeholder-url] ${url}`);
       break;
     case 'too-short':
       console.log(`    [too-short] ${url}`);

@@ -23,11 +23,42 @@ import type { RankCandidate } from './types.ts';
 
 export type RejectionReason =
   | 'self-domain'
+  | 'placeholder-url'
   | 'too-short'
   | 'no-entity-mention'
   | 'no-quote'
   | 'quote-fabricated'
   | 'entailment-failed';
+
+/**
+ * Patterns that indicate an editor-side placeholder URL (auto-saved draft,
+ * preview, admin page, raw post-id). These pages aren't stable — they may
+ * 404 by the time anyone clicks through, or change content arbitrarily.
+ *
+ * Real example seen in the wild: `https://theverge.com/news/627849/auto-draft`
+ * matched against an Anthropic investment row.
+ */
+const PLACEHOLDER_URL_PATTERNS: RegExp[] = [
+  /\/auto-draft(?:\/|$)/i,            // WordPress auto-saved draft (exact slug)
+  /\/wp-admin(?:\/|$)/i,               // WordPress admin (never content)
+  /[?&]p=\d+(?:&|$)/i,                 // raw WP post-id query (?p=12345)
+  /\/\d{4}-\d{2}-\d{2}\/?$/i,          // date-only slug, no title segment
+];
+// Deliberately excluded: `/draft-*` (false-positive risk on legal/policy
+// articles like "draft bill on AI safety") and `/preview/...` (real
+// content directories on news/sports sites). Keep this list tight —
+// false-negatives are cheaper than rejecting real sources.
+
+export function isPlaceholderUrl(rawUrl: string): boolean {
+  let url: URL;
+  try {
+    url = new URL(rawUrl);
+  } catch {
+    return false;
+  }
+  const pathAndQuery = url.pathname + url.search;
+  return PLACEHOLDER_URL_PATTERNS.some(re => re.test(pathAndQuery));
+}
 
 /** USD spent on LLM calls during one source's verification. */
 export interface VerifyCost {
@@ -67,6 +98,10 @@ export async function verifySource(
 
   if (isSelfDomain(source.url)) {
     return { kind: 'rejected', reason: 'self-domain', cost };
+  }
+
+  if (isPlaceholderUrl(source.url)) {
+    return { kind: 'rejected', reason: 'placeholder-url', cost };
   }
 
   if (source.content.length < MIN_CONTENT_LENGTH) {
