@@ -151,7 +151,14 @@ async function cmdScrapeSaferai(opts: ScrapeSaferaiOptions): Promise<CommandResu
     html = await resp.text();
   }
 
-  const probe = scrapeSaferaiHtml(html, { sourceUrl: opts.url });
+  // If --wave=YYYY-MM is provided, derive publishedAt from it as a fallback
+  // so layout drift on the "as of …" footer doesn't block the operator.
+  const wavePublishedAt =
+    waveSlug && /^\d{4}-\d{2}$/.test(waveSlug) ? `${waveSlug}-01` : undefined;
+  const probe = scrapeSaferaiHtml(html, {
+    sourceUrl: opts.url,
+    publishedAt: wavePublishedAt,
+  });
 
   if (!waveSlug) {
     // Default wave slug: YYYY-MM (e.g. "2025-10") derived from publishedAt.
