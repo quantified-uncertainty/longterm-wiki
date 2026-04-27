@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { buildSearchQuery } from './build-search-query.ts';
-import type { MissingSourceRecord } from './types.ts';
+import { buildSearchQuery } from '../build-search-query.ts';
+import type { MissingSourceRecord } from '../types.ts';
 
 describe('buildSearchQuery', () => {
   function rec(table: string, fields: Record<string, unknown>): MissingSourceRecord {

@@ -4,7 +4,7 @@ import {
   isSelfDomain,
   orgNameVariants,
   personNameVariants,
-} from './entity-mention.ts';
+} from '../entity-mention.ts';
 
 describe('isSelfDomain', () => {
   it.each([

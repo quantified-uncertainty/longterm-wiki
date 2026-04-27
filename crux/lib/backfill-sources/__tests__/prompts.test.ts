@@ -7,7 +7,7 @@ import {
   parseQuoteResponse,
   parseRankingResponse,
   verifyQuoteInContent,
-} from './prompts.ts';
+} from '../prompts.ts';
 
 describe('buildRankingPrompt', () => {
   it('embeds claim, entity, and each candidate URL + snippet', () => {

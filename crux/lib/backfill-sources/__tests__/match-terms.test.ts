@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { extractMatchTerms } from './match-terms.ts';
-import type { MissingSourceRecord } from './types.ts';
+import { extractMatchTerms } from '../match-terms.ts';
+import type { MissingSourceRecord } from '../types.ts';
 
 describe('extractMatchTerms', () => {
   it('returns both value and label for facts (OR-matching widens recall)', () => {

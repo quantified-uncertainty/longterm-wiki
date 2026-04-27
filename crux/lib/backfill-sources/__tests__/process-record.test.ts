@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { selfSourcingUrl } from './process-record.ts';
-import type { MissingSourceRecord } from './types.ts';
+import { selfSourcingUrl } from '../process-record.ts';
+import type { MissingSourceRecord } from '../types.ts';
 
 function mkRecord(table: string, fields: Record<string, unknown> = {}): MissingSourceRecord {
   return {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { isPlaceholderUrl } from './verify-source.ts';
+import { isPlaceholderUrl } from '../verify-source.ts';
 
 describe('isPlaceholderUrl', () => {
   it.each([

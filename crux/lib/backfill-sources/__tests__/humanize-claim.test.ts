@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { humanizeClaim } from './humanize-claim.ts';
-import type { MissingSourceRecord } from './types.ts';
+import { humanizeClaim } from '../humanize-claim.ts';
+import type { MissingSourceRecord } from '../types.ts';
 
 // Test fixture builder: fills housekeeping defaults so each test only spells
 // out the fields that matter to the assertion.

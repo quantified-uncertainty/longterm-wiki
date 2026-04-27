@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { splitProviders } from './report.ts';
+import { splitProviders } from '../report.ts';
 
 describe('splitProviders', () => {
   it('splits a multi-provider tag into a sorted array', () => {
