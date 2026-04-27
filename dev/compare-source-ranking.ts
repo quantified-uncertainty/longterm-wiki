@@ -12,19 +12,19 @@
  * table plus per-scenario reasoning.
  *
  * Usage:
- *   OPENROUTER_API_KEY=sk-... pnpm tsx crux/scripts/compare-source-ranking.ts
+ *   OPENROUTER_API_KEY=sk-... pnpm tsx dev/compare-source-ranking.ts
  *
  *   # Single scenario:
- *   pnpm tsx crux/scripts/compare-source-ranking.ts --only=anthropic-amazon
+ *   pnpm tsx dev/compare-source-ranking.ts --only=anthropic-amazon
  *
  *   # Different rerank model (default: cohere/rerank-4-fast):
- *   pnpm tsx crux/scripts/compare-source-ranking.ts --rerank=cohere/rerank-4-pro
+ *   pnpm tsx dev/compare-source-ranking.ts --rerank=cohere/rerank-4-pro
  */
 
 import dotenv from 'dotenv';
 dotenv.config();
 
-import { getApiKey } from '../lib/api-keys.ts';
+import { getApiKey } from '../crux/lib/api-keys.ts';
 
 const OPENROUTER_KEY = getApiKey('OPENROUTER_API_KEY');
 const RERANK_URL = 'https://openrouter.ai/api/v1/rerank';

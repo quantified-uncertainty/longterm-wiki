@@ -142,7 +142,7 @@ export function parseEntailmentResponse(text: string): boolean | null {
  * Build the prompt that asks Haiku to rank matching sources. Picks the ONE
  * source that BEST DIRECTLY supports the claim, not the one with the highest
  * lexical overlap (lexical overlap picks Wikipedia paraphrases over primary
- * sources). See crux/scripts/compare-source-ranking.ts for the eval that
+ * sources). See dev/compare-source-ranking.ts for the eval that
  * picked Haiku over a Cohere rerank call (Haiku 6/6 vs rerank 2/6).
  */
 export function buildRankingPrompt(
