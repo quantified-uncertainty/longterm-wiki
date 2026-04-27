@@ -38,7 +38,7 @@ describe('buildSearchQuery', () => {
     expect(q).toBe('Anthropic Total Funding Raised 15000000000');
   });
 
-  it('investments: builds a clean phrase, dropping arrow-shape from description', () => {
+  it('investments: drops the verb so AND-style engines do not filter out matching press', () => {
     const q = buildSearchQuery(rec('investments', {
       entity_name: 'Y Combinator',
       investor_name: 'Y Combinator',
@@ -46,7 +46,17 @@ describe('buildSearchQuery', () => {
       round_name: 'YC batch',
       description: 'Y Combinator -> Ello',
     }));
-    expect(q).toBe('Y Combinator invested in Ello YC batch');
+    expect(q).toBe('Y Combinator Ello YC batch');
+  });
+
+  it('policy_stakeholders: drops the position word so press using "signed/endorsed/joined" still surfaces', () => {
+    const q = buildSearchQuery(rec('policy_stakeholders', {
+      entity_name: 'Anthropic',
+      stakeholder_display_name: 'Anthropic',
+      position: 'support',
+      policy_name: 'Seoul Declaration on AI Safety',
+    }));
+    expect(q).toBe('Anthropic Seoul Declaration on AI Safety');
   });
 
   it('page_citations: ignores the synthetic "Page #N" entity_name', () => {

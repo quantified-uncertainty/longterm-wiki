@@ -34,7 +34,11 @@ const BUILDERS: Record<string, Builder> = {
     const investor = preferShortVariant(String(r.investor_name ?? r.entity_name ?? '').trim());
     const company = preferShortVariant(String(r.company_name ?? '').trim());
     const round = String(r.round_name ?? '').trim();
-    return [investor, 'invested in', company, round];
+    // No verb in the query — press uses "invested", "backed", "funded",
+    // "portfolio" interchangeably, and AND-style search engines drop
+    // pages that don't match the verb we picked. Sonnet's entailment
+    // check confirms the relationship.
+    return [investor, company, round];
   },
   equity_positions: (r) => {
     const holder = preferShortVariant(String(r.holder_name ?? '').trim());
@@ -43,9 +47,12 @@ const BUILDERS: Record<string, Builder> = {
   },
   policy_stakeholders: (r) => {
     const stakeholder = preferShortVariant(String(r.stakeholder_display_name ?? r.entity_name ?? '').trim());
-    const position = String(r.position ?? '').trim();
     const policy = preferShortVariant(String(r.policy_name ?? '').trim());
-    return [stakeholder, position, policy];
+    // No position word — press almost never says "X support Y", they
+    // say "signed", "endorsed", "joined", etc. Pinning a verb in the
+    // query causes AND-style search engines to drop matching pages.
+    // Sonnet's entailment check confirms the actual position.
+    return [stakeholder, policy];
   },
   facts: (r) => {
     const entity = preferShortVariant(String(r.entity_name ?? '').trim());
