@@ -150,6 +150,20 @@ export function writeOutcomesJson(input: OutcomeFileInput): string {
   }
 }
 
+/**
+ * Split research-agent's `'exa+perplexity'` provider string back into an
+ * array. Empty/null input → `[]`. Trims and dedupes for safety.
+ */
+export function splitProviders(provider: string | null | undefined): string[] {
+  if (!provider) return [];
+  const seen = new Set<string>();
+  for (const p of provider.split('+')) {
+    const trimmed = p.trim();
+    if (trimmed) seen.add(trimmed);
+  }
+  return [...seen].sort();
+}
+
 function serializeOutcome({ record, outcome }: RecordOutcome) {
   const base = {
     record_table: record.record_table,
@@ -164,6 +178,11 @@ function serializeOutcome({ record, outcome }: RecordOutcome) {
       outcome: 'matched' as const,
       url: outcome.url,
       provider: outcome.provider ?? null,
+      // Full provider list (one entry per source that returned this URL).
+      // research-agent encodes multi-provider hits as `'exa+perplexity'`;
+      // splitting back to an array makes the field easy to aggregate when
+      // tuning provider weights from past runs.
+      providers: splitProviders(outcome.provider),
       // Verbatim quotes Sonnet judged as supporting the claim — included so a
       // human can spot-check for false positives without re-running.
       quotes: outcome.quotes ?? [],
