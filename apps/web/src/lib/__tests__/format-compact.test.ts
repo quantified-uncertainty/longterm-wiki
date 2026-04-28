@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { formatCompactCurrency, formatCompactNumber, formatIntroducedDate } from "../format-compact";
+import {
+  formatCompactCurrency,
+  formatCompactNumber,
+  formatDateShapedInteger,
+  formatIntroducedDate,
+  sanitizeRawLargeNumbers,
+} from "../format-compact";
 
 describe("formatCompactCurrency", () => {
   it("formats trillions", () => {
@@ -206,5 +212,120 @@ describe("formatIntroducedDate", () => {
       // Day 32 is invalid — fall through to unknown-format branch
       expect(formatIntroducedDate("2021-01-32")).toBe("2021-01-32");
     });
+  });
+});
+
+describe("formatDateShapedInteger (QUA-684)", () => {
+  describe("recognized shapes", () => {
+    it("formats 14-digit YYYYMMDDhhmmss with full timestamp", () => {
+      // The exact value the QUA-684 issue cited from the openai render audit.
+      expect(formatDateShapedInteger(20240601000000)).toBe(
+        "Jun 1, 2024 00:00:00 UTC"
+      );
+      expect(formatDateShapedInteger(19991231235959)).toBe(
+        "Dec 31, 1999 23:59:59 UTC"
+      );
+    });
+
+    it("formats 12-digit YYYYMMDDhhmm with hours and minutes", () => {
+      expect(formatDateShapedInteger(202406010000)).toBe(
+        "Jun 1, 2024 00:00 UTC"
+      );
+      expect(formatDateShapedInteger(202312311800)).toBe(
+        "Dec 31, 2023 18:00 UTC"
+      );
+    });
+
+    it("formats 8-digit YYYYMMDD as date only", () => {
+      expect(formatDateShapedInteger(20240601)).toBe("Jun 1, 2024");
+      expect(formatDateShapedInteger(19501225)).toBe("Dec 25, 1950");
+      expect(formatDateShapedInteger(20991231)).toBe("Dec 31, 2099");
+    });
+  });
+
+  describe("rejects shapes that aren't dates", () => {
+    it("rejects 9, 10, 11, 13 digit lengths (Unix epoch — too ambiguous)", () => {
+      // 10 digit: ~2001-2033 epoch seconds, but also a plausible billion-scale
+      // count. Skip per QUA-684 issue note.
+      expect(formatDateShapedInteger(1700000000)).toBeNull();
+      expect(formatDateShapedInteger(1700000000000)).toBeNull(); // 13-digit ms
+      expect(formatDateShapedInteger(170000000)).toBeNull(); // 9-digit
+      expect(formatDateShapedInteger(17000000000)).toBeNull(); // 11-digit
+    });
+
+    it("rejects years outside 1900-2099", () => {
+      expect(formatDateShapedInteger(18991231)).toBeNull();
+      expect(formatDateShapedInteger(21000101)).toBeNull();
+    });
+
+    it("rejects invalid month (00 or 13+)", () => {
+      expect(formatDateShapedInteger(20240001)).toBeNull(); // month 00
+      expect(formatDateShapedInteger(20241301)).toBeNull(); // month 13
+    });
+
+    it("rejects invalid day (00 or 32+)", () => {
+      expect(formatDateShapedInteger(20240100)).toBeNull(); // day 00
+      expect(formatDateShapedInteger(20240132)).toBeNull(); // day 32
+    });
+
+    it("rejects calendar-invalid dates (Feb 30, Feb 29 in non-leap years)", () => {
+      expect(formatDateShapedInteger(20240230)).toBeNull(); // Feb 30
+      expect(formatDateShapedInteger(20230229)).toBeNull(); // Feb 29 in non-leap year
+      expect(formatDateShapedInteger(20240431)).toBeNull(); // Apr 31
+    });
+
+    it("accepts Feb 29 in leap years", () => {
+      expect(formatDateShapedInteger(20240229)).toBe("Feb 29, 2024");
+    });
+
+    it("rejects invalid hour/minute/second in 12/14-digit shapes", () => {
+      expect(formatDateShapedInteger(202406012400)).toBeNull(); // hour 24
+      expect(formatDateShapedInteger(202406010060)).toBeNull(); // minute 60
+      expect(formatDateShapedInteger(20240601235960)).toBeNull(); // second 60
+    });
+
+    it("rejects non-positive integers", () => {
+      expect(formatDateShapedInteger(0)).toBeNull();
+      expect(formatDateShapedInteger(-20240601)).toBeNull();
+    });
+
+    it("rejects non-finite and non-integer values", () => {
+      expect(formatDateShapedInteger(NaN)).toBeNull();
+      expect(formatDateShapedInteger(Infinity)).toBeNull();
+      expect(formatDateShapedInteger(20240601.5)).toBeNull();
+    });
+
+    it("rejects plausible 8-digit magnitudes that don't form a calendar date", () => {
+      // 19,000,000 → "19000000" — month 00, rejected.
+      expect(formatDateShapedInteger(19000000)).toBeNull();
+      // 20,240,000 → "20240000" — month 00, rejected.
+      expect(formatDateShapedInteger(20240000)).toBeNull();
+    });
+  });
+});
+
+describe("sanitizeRawLargeNumbers + dates (QUA-684)", () => {
+  it("rewrites 14-digit timestamps as dates, not magnitudes", () => {
+    expect(sanitizeRawLargeNumbers("Last seen: 20240601000000")).toBe(
+      "Last seen: Jun 1, 2024 00:00:00 UTC"
+    );
+  });
+
+  it("rewrites 12-digit timestamps as dates", () => {
+    expect(sanitizeRawLargeNumbers("Captured 202406010000")).toBe(
+      "Captured Jun 1, 2024 00:00 UTC"
+    );
+  });
+
+  it("preserves 10-digit financial magnitudes (compact form, not dates)", () => {
+    expect(sanitizeRawLargeNumbers("Revenue: 1700000000")).toBe(
+      "Revenue: 1.7B"
+    );
+  });
+
+  it("8-digit dates are below the 10-digit sanitize threshold and stay raw", () => {
+    // sanitizeRawLargeNumbers only fires on 10+ digit runs; 8-digit dates
+    // are not its concern. They're handled by the cell renderer directly.
+    expect(sanitizeRawLargeNumbers("Released 20240601")).toBe("Released 20240601");
   });
 });

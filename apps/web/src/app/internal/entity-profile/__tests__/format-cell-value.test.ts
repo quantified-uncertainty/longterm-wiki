@@ -95,6 +95,51 @@ describe("formatFactValueString (QUA-673)", () => {
   });
 });
 
+describe("formatFactValueString — date-shaped integers (QUA-684)", () => {
+  it("renders 14-digit YYYYMMDDhhmmss as a date, not a magnitude", () => {
+    // Without the date-shape check this would render as "$20.2T" — the
+    // openai render-audit-flagged value 20240601000000 (a Wayback Machine
+    // timestamp) being mistaken for a financial magnitude.
+    expect(formatFactValueString("20240601000000", "USD")).toBe(
+      "Jun 1, 2024 00:00:00 UTC"
+    );
+    expect(formatFactValueString("20240601000000", null)).toBe(
+      "Jun 1, 2024 00:00:00 UTC"
+    );
+  });
+
+  it("renders 12-digit YYYYMMDDhhmm as a date with hh:mm UTC", () => {
+    expect(formatFactValueString("202406011830", "USD")).toBe(
+      "Jun 1, 2024 18:30 UTC"
+    );
+  });
+
+  it("renders 8-digit YYYYMMDD as a date with no time", () => {
+    expect(formatFactValueString("20240601", null)).toBe("Jun 1, 2024");
+  });
+
+  it("date-shape check fires regardless of the 1000-magnitude floor", () => {
+    // 19500101 = 19.5M — well above the floor anyway, but the test asserts
+    // that the date branch wins even when both branches would otherwise fire.
+    expect(formatFactValueString("19500101", "USD")).toBe("Jan 1, 1950");
+    // 20240229 (Feb 29 of a leap year) — calendar-valid date.
+    expect(formatFactValueString("20240229", null)).toBe("Feb 29, 2024");
+  });
+
+  it("8-digit numbers that aren't valid dates stay raw or compact-formatted", () => {
+    // 19000000 has month=00 → not a date → falls through to magnitude path → "19M".
+    expect(formatFactValueString("19000000", null)).toBe("19M");
+    // 12345678 — not a date (12=month=12 valid? yes 12; day=34 invalid → not a date) → "12M".
+    expect(formatFactValueString("12345678", null)).toBe("12M");
+  });
+
+  it("does not trip the render-audit regex for date-shaped 12/14-digit values", () => {
+    const bigDigitRegex = /(?<![a-zA-Z_])\d{10,}(?![a-zA-Z])/;
+    expect(formatFactValueString("20240601000000", "USD")).not.toMatch(bigDigitRegex);
+    expect(formatFactValueString("202406011830", null)).not.toMatch(bigDigitRegex);
+  });
+});
+
 describe("sanitizeRawLargeNumbers (QUA-673)", () => {
   it("rewrites a bare 10+ digit run inside a label: value description", () => {
     // formatCompactNumber rounds to 1-decimal precision only below 10 of a

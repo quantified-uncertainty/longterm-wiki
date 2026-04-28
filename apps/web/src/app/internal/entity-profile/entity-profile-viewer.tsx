@@ -21,6 +21,7 @@ import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 import {
   formatCompactCurrency,
   formatCompactNumber,
+  formatDateShapedInteger,
   sanitizeRawLargeNumbers,
 } from "@/lib/format-compact";
 import { isAnySid } from "@longterm-wiki/id-utils";
@@ -455,9 +456,13 @@ function CellValue({
 
   // Generic number values (real/doublePrecision columns arrive as typeof number)
   if (typeof value === "number" && isFinite(value)) {
-    const formatted = Math.abs(value) >= 1000
-      ? formatCompactNumber(value)
-      : Number.isInteger(value) ? value.toLocaleString() : value.toFixed(2);
+    // Date-shaped integers take priority over magnitude formatting (QUA-684).
+    const dateShape = formatDateShapedInteger(value);
+    const formatted = dateShape ?? (
+      Math.abs(value) >= 1000
+        ? formatCompactNumber(value)
+        : Number.isInteger(value) ? value.toLocaleString() : value.toFixed(2)
+    );
     return (
       <span className="text-[11px] tabular-nums" title={String(value)}>
         {formatted}

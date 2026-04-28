@@ -69,9 +69,76 @@ export function formatCompactNumber(n: number | null | undefined): string {
   return n.toLocaleString();
 }
 
+const MONTH_ABBR_FULL = [
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
+];
+
+/**
+ * If `n` is a plausible YYYYMMDD-family timestamp encoded as a single
+ * positive integer (8/12/14 digits, year 1900-2099, calendar-valid
+ * month/day, valid hour/minute/second when present), return a human
+ * date string; otherwise return null.
+ *
+ * Catches BIGINT timestamp columns surfacing on the Database tab as raw
+ * integers (e.g. `20240601000000` from a `*_at` column stored as bigint
+ * encoded YYYYMMDDhhmmss instead of TIMESTAMPTZ). Without this check the
+ * compact-number formatter would render the value as a magnitude
+ * (`"$20.2T"` / `"20.2T"`) — technically not a 10+ digit leak but a
+ * misleading display. QUA-684.
+ *
+ * 9, 10, 11, 13 digit lengths (Unix epoch seconds/ms) are intentionally
+ * NOT detected — they overlap the plausible-magnitude range for headcount
+ * and revenue facts. Caller must opt-in for those via a column-name hint.
+ */
+export function formatDateShapedInteger(n: number): string | null {
+  if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) return null;
+  const s = String(n);
+  if (s.length !== 8 && s.length !== 12 && s.length !== 14) return null;
+
+  const year = Number(s.slice(0, 4));
+  const month = Number(s.slice(4, 6));
+  const day = Number(s.slice(6, 8));
+  if (year < 1900 || year > 2099) return null;
+  if (month < 1 || month > 12) return null;
+  if (day < 1 || day > 31) return null;
+
+  let hour = 0;
+  let minute = 0;
+  let second = 0;
+  if (s.length >= 12) {
+    hour = Number(s.slice(8, 10));
+    minute = Number(s.slice(10, 12));
+    if (hour > 23 || minute > 59) return null;
+  }
+  if (s.length === 14) {
+    second = Number(s.slice(12, 14));
+    if (second > 59) return null;
+  }
+
+  // Calendar-validity check (Feb 30, Feb 29 in non-leap years, etc.)
+  const d = new Date(Date.UTC(year, month - 1, day, hour, minute, second));
+  if (
+    d.getUTCFullYear() !== year ||
+    d.getUTCMonth() !== month - 1 ||
+    d.getUTCDate() !== day
+  ) return null;
+
+  const datePart = `${MONTH_ABBR_FULL[month - 1]} ${day}, ${year}`;
+  if (s.length === 8) return datePart;
+  const hh = String(hour).padStart(2, "0");
+  const mm = String(minute).padStart(2, "0");
+  if (s.length === 12) return `${datePart} ${hh}:${mm} UTC`;
+  const ss = String(second).padStart(2, "0");
+  return `${datePart} ${hh}:${mm}:${ss} UTC`;
+}
+
 /**
  * Rewrite bare 10+ digit runs inside a display string as compact numbers
- * (`"Revenue: 1700000000"` → `"Revenue: 1.7B"`).
+ * (`"Revenue: 1700000000"` → `"Revenue: 1.7B"`). 12/14-digit runs that
+ * match a YYYYMMDD[hhmm[ss]] shape render as dates instead, so a stray
+ * `20240601000000` in a description is rewritten as `Jun 1, 2024 ...` not
+ * `20.2T`. QUA-684.
  *
  * Boundaries are tuned so embedded digit runs stay untouched:
  *   - Look-behind blocks letters, digits, underscores, and `.` so hashes
@@ -88,6 +155,8 @@ export function sanitizeRawLargeNumbers(s: string): string {
     (m) => {
       const n = Number(m);
       if (!Number.isFinite(n) || Math.abs(n) < 1000) return m;
+      const dateShape = formatDateShapedInteger(n);
+      if (dateShape) return dateShape;
       return formatCompactNumber(n);
     },
   );
