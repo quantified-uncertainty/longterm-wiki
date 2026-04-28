@@ -1427,15 +1427,35 @@ const sourcingApp = new Hono()
 
     // QUA-791: trigger server-side recompute so the persisted aggregate
     // reflects all evidence rows (not just whatever the last caller passed).
+    //
+    // **Only recompute when evidence rows exist** — preserves back-compat
+    // for callers that use POST /verdicts as a verdict-only write
+    // (e.g. metadata-only updates, manual marker writes). If we
+    // unconditionally recomputed, those writes would resolve to
+    // 'unchecked' because there's no evidence to roll up.
+    //
     // Best-effort: a recompute failure does not fail the underlying write.
-    await recomputeVerdictBestEffort(db, {
-      recordType: body.recordType,
-      recordId: body.recordId,
-      fieldName: fieldNameVal,
-      entityId: entityIdVal,
-      displayName: displayNameVal,
-      entityDisplayName: entityDisplayNameVal,
-    });
+    const fieldNameForRecompute = fieldNameVal ?? "";
+    const evidenceCount = await db
+      .select({ count: count() })
+      .from(recordSources)
+      .where(
+        and(
+          eq(recordSources.recordType, body.recordType),
+          eq(recordSources.recordId, body.recordId),
+          sql`COALESCE(${recordSources.fieldName}, '') = ${fieldNameForRecompute}`,
+        ),
+      );
+    if ((evidenceCount[0]?.count ?? 0) > 0) {
+      await recomputeVerdictBestEffort(db, {
+        recordType: body.recordType,
+        recordId: body.recordId,
+        fieldName: fieldNameVal,
+        entityId: entityIdVal,
+        displayName: displayNameVal,
+        entityDisplayName: entityDisplayNameVal,
+      });
+    }
 
     return c.json({ ok: true }, 200);
   })

@@ -37,8 +37,20 @@ const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");
 const limitArg = args.find((a) => a.startsWith("--limit="));
 const concurrencyArg = args.find((a) => a.startsWith("--concurrency="));
-const LIMIT = limitArg ? parseInt(limitArg.split("=")[1], 10) : undefined;
-const CONCURRENCY = concurrencyArg ? parseInt(concurrencyArg.split("=")[1], 10) : 5;
+
+function parsePositiveInt(raw: string, name: string): number {
+  const n = Number(raw);
+  if (!Number.isFinite(n) || !Number.isInteger(n) || n <= 0) {
+    console.error(`ERROR: --${name}=${raw} must be a positive integer`);
+    process.exit(2);
+  }
+  return n;
+}
+
+const LIMIT = limitArg ? parsePositiveInt(limitArg.split("=")[1], "limit") : undefined;
+const CONCURRENCY = concurrencyArg
+  ? parsePositiveInt(concurrencyArg.split("=")[1], "concurrency")
+  : 5;
 
 const isProd = process.env.WIKI_SERVER_ENV === "prod";
 const BASE_URL = isProd

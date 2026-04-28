@@ -139,18 +139,38 @@ export function aggregateEvidence(
     };
   }
 
-  // Step 4: weighted score per verdict bucket. Only rows above the
+  // Step 4: per-verdict aggregates in one pass. Only rows above the
   // threshold get to vote — otherwise low-relevance noise can swing
   // ties between high-relevance verdicts. By construction, every row
   // in `aboveThreshold` has verdict ∈ {confirmed, contradicted, outdated,
   // partial, unverifiable} — `not_applicable` was filtered in step 1
   // and `unchecked` is not a valid evidence verdict.
-  const buckets = new Map<AggregateVerdict, number>();
+  //
+  // Track confidence per bucket too (sum of `confidence × weight` and
+  // sum of weights for rows that reported a confidence value). Rows
+  // with NULL confidence are skipped from the average — they don't
+  // drag it toward zero, but they don't elevate it either.
+  interface Bucket {
+    weight: number;
+    rowCount: number;
+    confidenceWeightedSum: number;
+    confidenceWeightSum: number;
+  }
+  const buckets = new Map<AggregateVerdict, Bucket>();
   for (const row of aboveThreshold) {
-    if (row.verdict === "not_applicable") continue;
-    const w = effectiveWeight(row);
     const verdict = row.verdict as AggregateVerdict;
-    buckets.set(verdict, (buckets.get(verdict) ?? 0) + w);
+    const w = effectiveWeight(row);
+    let bucket = buckets.get(verdict);
+    if (!bucket) {
+      bucket = { weight: 0, rowCount: 0, confidenceWeightedSum: 0, confidenceWeightSum: 0 };
+      buckets.set(verdict, bucket);
+    }
+    bucket.weight += w;
+    bucket.rowCount += 1;
+    if (w > 0 && typeof row.confidence === "number") {
+      bucket.confidenceWeightedSum += row.confidence * w;
+      bucket.confidenceWeightSum += w;
+    }
   }
   if (buckets.size === 0) {
     return {
@@ -164,37 +184,25 @@ export function aggregateEvidence(
 
   // Step 5: pick winner. Score desc, then priority asc.
   const ranked = [...buckets.entries()].sort((a, b) => {
-    if (a[1] !== b[1]) return b[1] - a[1];
+    if (a[1].weight !== b[1].weight) return b[1].weight - a[1].weight;
     const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a[0]] ?? 99;
     const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b[0]] ?? 99;
     return aPri - bPri;
   });
   const winningVerdict = ranked[0][0];
+  const winningBucket = ranked[0][1];
 
-  // Step 6: confidence as weighted average among contributing rows that
-  // reported a confidence value. Rows with NULL confidence are skipped
-  // entirely (don't drag the average down); if no contributing row
-  // reported confidence, the aggregate confidence is NULL.
-  const contributingRows = aboveThreshold.filter(
-    (r) => r.verdict === winningVerdict,
-  );
-  let weightSum = 0;
-  let weightedConfidence = 0;
-  for (const row of contributingRows) {
-    const w = effectiveWeight(row);
-    if (w === 0) continue;
-    if (typeof row.confidence !== "number") continue;
-    weightSum += w;
-    weightedConfidence += row.confidence * w;
-  }
-  const confidence = weightSum > 0 ? weightedConfidence / weightSum : null;
+  // Step 6: confidence = weighted average of the winning bucket's rows
+  // that reported a confidence value (computed in step 4).
+  const confidence =
+    winningBucket.confidenceWeightSum > 0
+      ? winningBucket.confidenceWeightedSum / winningBucket.confidenceWeightSum
+      : null;
 
-  const contributing: ContributingVerdict[] = ranked.map(([verdict, weight]) => ({
+  const contributing: ContributingVerdict[] = ranked.map(([verdict, b]) => ({
     verdict,
-    weight,
-    rowCount: aboveThreshold.filter(
-      (r) => (r.verdict as AggregateVerdict) === verdict,
-    ).length,
+    weight: b.weight,
+    rowCount: b.rowCount,
   }));
 
   return {

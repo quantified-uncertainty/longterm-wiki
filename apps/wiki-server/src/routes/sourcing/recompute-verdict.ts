@@ -24,6 +24,42 @@ import {
 import { logger } from "../../logger.js";
 
 /**
+ * Walk the error's cause chain looking for a postgres unique-violation
+ * (code 23505 / "duplicate key" / "unique constraint" message). Drizzle
+ * wraps the underlying postgres-js error in `Error("Failed query: ...")`
+ * with the original on `.cause`, so a top-level `err.message.includes(...)`
+ * misses the actual signal. We also check `err.code === "23505"` since
+ * postgres-js sets it directly on the original error object.
+ */
+function isUniqueViolation(err: unknown): boolean {
+  let current: unknown = err;
+  let depth = 0;
+  while (current && depth < 5) {
+    if (current instanceof Error) {
+      const code = (current as Error & { code?: string }).code;
+      if (code === "23505") return true;
+      const msg = current.message;
+      if (
+        msg.includes("23505") ||
+        msg.includes("unique") ||
+        msg.includes("duplicate")
+      ) {
+        return true;
+      }
+      current = (current as Error).cause;
+    } else {
+      const s = String(current);
+      if (s.includes("23505") || s.includes("unique") || s.includes("duplicate")) {
+        return true;
+      }
+      break;
+    }
+    depth++;
+  }
+  return false;
+}
+
+/**
  * Accept either a top-level Drizzle DB or a transaction handle. Same
  * pattern used by `routes/tablebase/audit-log.ts::logAuditEntries`.
  * Lets callers atomically write evidence + recompute verdict in one tx.
@@ -190,6 +226,13 @@ export async function recomputeVerdict(
 
   // Insert fresh row. If a concurrent call beat us to it, the unique
   // index throws and we retry with UPDATE.
+  //
+  // Match the 90-day default that POST /verdicts and writeInlineVerdicts
+  // use (sourcing.ts:1390, write-inline-verdicts.ts:64) so newly-inserted
+  // recompute rows participate in the `due-for-recheck` cycle. Without
+  // this, recompute-only rows would sit at NULL `next_check_due` forever
+  // and never be picked up by the recheck pipeline.
+  const ninetyDays = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
   try {
     await db.insert(sourceVerdicts).values({
       recordType: args.recordType,
@@ -203,14 +246,14 @@ export async function recomputeVerdict(
       reasoning: result.reasoning,
       sourcesChecked: aggregate.sourcesChecked,
       needsRecheck: false,
+      nextCheckDue: ninetyDays,
       lastComputedAt: now,
       createdAt: now,
       updatedAt: now,
     });
     return result;
   } catch (err: unknown) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505")) {
+    if (isUniqueViolation(err)) {
       await db
         .update(sourceVerdicts)
         .set({

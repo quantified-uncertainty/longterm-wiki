@@ -26,7 +26,7 @@ import {
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { coerceDisplayName } from "../shared/display-name-coerce.js";
-import { recomputeVerdictBestEffort } from "../sourcing/recompute-verdict.js";
+import { recomputeVerdict } from "../sourcing/recompute-verdict.js";
 
 // ---- Constants ----
 
@@ -193,8 +193,14 @@ async function dualWriteToSourcing(
 
   // QUA-791: reconcile the just-written verdict against all evidence rows.
   // Without this, the verdict above is whatever this single citation
-  // accuracy check produced (last-writer-wins). Best-effort.
-  await recomputeVerdictBestEffort(tx, {
+  // accuracy check produced (last-writer-wins).
+  //
+  // **Not best-effort** — this runs inside the enclosing tx, and best-effort
+  // wrapping would swallow real DB errors that should rollback. If recompute
+  // fails (e.g. constraint violation, deadlock), postgres marks the tx
+  // aborted and any subsequent statement throws 25P02; letting the error
+  // propagate gives the caller a clean rollback instead.
+  await recomputeVerdict(tx, {
     recordType: "citation",
     recordId,
     fieldName: null,

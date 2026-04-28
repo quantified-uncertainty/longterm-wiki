@@ -77,24 +77,22 @@ describe("aggregateEvidence — single-row inputs", () => {
 });
 
 describe("aggregateEvidence — relevance weighting", () => {
-  it("a single high-relevance confirmed beats three low-relevance unverifiables (per ticket spec)", () => {
-    // From QUA-791 description: "A single `confirmed` from a high-relevance
+  it("above-threshold dissent outvotes a single high-relevance row when N×weight > high-rel weight", () => {
+    // QUA-791 description claimed: "A single `confirmed` from a high-relevance
     // source should dominate three `unverifiable`s from low-relevance sources."
+    // That claim ONLY holds when the dissenting rows are sub-threshold (see
+    // the next test). When dissent is above-threshold, simple weighted majority
+    // applies: 3 sources × 0.4–0.5 weight (1.35 total) outvote 1 × 0.9.
+    //
+    // This is a deliberate semantic — we count corroboration even at lower
+    // relevance, so long as it crosses the relevance bar at all. The
+    // sub-threshold filter is the gate that prevents true noise from voting.
     const r = aggregateEvidence([
       row("confirmed", 0.9, 0.85),
       row("unverifiable", 0.4, 0.7),
       row("unverifiable", 0.45, 0.7),
       row("unverifiable", 0.5, 0.7),
     ]);
-    // confirmed weight = 0.9
-    // unverifiable weight = 0.4 + 0.45 + 0.5 = 1.35
-    // Wait — three low-relevance still outweigh one high-relevance arithmetically.
-    // The ticket calls "0.4–0.5" low-relevance but those are above the 0.3
-    // threshold and individually count fully. The result here is that
-    // the THREE unverifiables outweigh the one confirmed (1.35 > 0.9), and
-    // that's correct: with 3:1 corroboration even at lower relevance, the
-    // aggregate reflects the dissent. The ticket spec only holds when the
-    // low-relevance rows are sub-threshold OR when they're truly low (0.1ish).
     expect(r.verdict).toBe("unverifiable");
   });
 
