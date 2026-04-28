@@ -210,6 +210,7 @@ describe('sourcing-suggest-urls --verdict', () => {
       providersSkipped: [],
       query: 'test',
       costUsd: 0,
+      subjectMismatches: [],
     });
     mockUpsertUrlSuggestions.mockResolvedValueOnce({
       ok: true,
@@ -230,6 +231,44 @@ describe('sourcing-suggest-urls --verdict', () => {
       suggestedUrl: 'https://example.com/a',
       status: 'pending',
     });
+  });
+
+  it('reports subject-mismatch drops in summary and skips upsert when all candidates were dropped (QUA-724)', async () => {
+    // Verifies the CLI plumbs through the gate's drop list: when suggestUrls
+    // returns 0 candidates with subjectMismatches recorded, the CLI counts
+    // the drop, logs it, and skips the upsert step. This is the primary
+    // observability hook for the QUA-650 retro-pattern (xAI sources for
+    // Anthropic records being dropped at suggest time).
+    stubEmptyPrereqs();
+    mockListVerdicts.mockResolvedValueOnce({
+      ok: true,
+      data: { verdicts: [makeVerdict({ recordId: 'g_b', entityId: 'anthropic' })], total: 1 },
+    });
+    mockSuggestUrls.mockResolvedValueOnce({
+      candidates: [],
+      providersUsed: ['exa'],
+      providersSkipped: [],
+      query: 'test',
+      costUsd: 0,
+      subjectMismatches: [
+        {
+          url: 'https://wikidata.org/wiki/Q117104853',
+          candidateQid: 'Q117104853',
+          entityQid: 'Q108542504',
+        },
+      ],
+    });
+
+    const result = await run({ verdict: 'partial', limit: '10', json: true });
+
+    expect(result.exitCode).toBe(0);
+    expect(mockUpsertUrlSuggestions).not.toHaveBeenCalled();
+    const summary = JSON.parse(result.output as string).summary;
+    expect(summary.subject_mismatches_dropped).toBe(1);
+    expect(summary.suggestions_written).toBe(0);
+    // Generated-for-records counts records that produced ≥1 surviving
+    // candidate. When the gate drops everything, the record contributes 0.
+    expect(summary.generated_for_records).toBe(0);
   });
 });
 

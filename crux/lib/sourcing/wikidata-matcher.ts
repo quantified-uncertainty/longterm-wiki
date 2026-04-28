@@ -104,16 +104,49 @@ export function clearEntityCache(): void {
 const QID_REGEX = /Q(\d+)/;
 
 /**
+ * Match `wikidata.org/wiki/Q<n>` or `wikidata.org/entity/Q<n>` anywhere in a
+ * string, ignoring trailing punctuation. Used by `extractQidFromHtml` to find
+ * Wikidata references inside HTML body, schema.org `sameAs`, `<link rel>`
+ * blocks, etc.
+ */
+const WIKIDATA_REF_RE = /wikidata\.org\/(?:wiki|entity)\/(Q\d+)/i;
+
+/**
  * Extract QID from a source URL.
+ *
  * Handles:
  *   - https://www.wikidata.org/wiki/Q123
  *   - https://www.wikidata.org/wiki/Q123,
  *   - https://www.wikidata.org/entity/Q123
+ *
+ * Returns null for URLs that don't reference wikidata.org or that point at
+ * non-item pages (e.g. `Property:P856`).
  */
 export function extractQid(url: string): string | null {
   if (!url.includes('wikidata.org')) return null;
   const match = url.match(QID_REGEX);
   return match ? `Q${match[1]}` : null;
+}
+
+/**
+ * Find the first Wikidata QID referenced inside an HTML/text payload.
+ *
+ * Looks for `wikidata.org/wiki/Q<n>` or `wikidata.org/entity/Q<n>` patterns,
+ * which cover the common emission paths:
+ *   - `<link rel="alternate" href="https://www.wikidata.org/wiki/Q...">`
+ *   - schema.org `sameAs` arrays
+ *   - article-body links to Wikidata pages
+ *   - Open Graph / Twitter cards that reference the canonical Wikidata URL
+ *
+ * Returns null if no Wikidata reference is found. Callers should treat null
+ * as "unknown subject" (fail-open) rather than "different subject".
+ *
+ * Subject-identity gate (QUA-724) uses this to compare a candidate URL's
+ * primary subject against the entity's QID before persisting suggestions.
+ */
+export function extractQidFromHtml(html: string): string | null {
+  const m = html.match(WIKIDATA_REF_RE);
+  return m ? m[1] : null;
 }
 
 // ── Wikidata API calls ──────────────────────────────────────────────

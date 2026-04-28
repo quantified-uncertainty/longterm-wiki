@@ -1,5 +1,11 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { tryWikidataMatch, extractQid, clearEntityCache, fetchEntities } from './wikidata-matcher.ts';
+import {
+  tryWikidataMatch,
+  extractQid,
+  extractQidFromHtml,
+  clearEntityCache,
+  fetchEntities,
+} from './wikidata-matcher.ts';
 import type { VerifyItem, FactItemData } from './orchestrator-types.ts';
 
 // ── Mock Wikidata API at HTTP level ─────────────────────────────────
@@ -165,6 +171,40 @@ describe('extractQid', () => {
 
   it('returns null for URL without QID', () => {
     expect(extractQid('https://www.wikidata.org/wiki/Property:P856')).toBeNull();
+  });
+});
+
+describe('extractQidFromHtml', () => {
+  it('extracts QID from a wikidata.org/wiki/Q<n> reference inside HTML', () => {
+    const html = `<link rel="alternate" href="https://www.wikidata.org/wiki/Q108542504">`;
+    expect(extractQidFromHtml(html)).toBe('Q108542504');
+  });
+
+  it('extracts QID from a wikidata.org/entity/Q<n> reference inside HTML', () => {
+    const html = `{"sameAs":"https://www.wikidata.org/entity/Q42"}`;
+    expect(extractQidFromHtml(html)).toBe('Q42');
+  });
+
+  it('returns the first QID when multiple are present', () => {
+    const html = `https://www.wikidata.org/wiki/Q1
+                  https://www.wikidata.org/wiki/Q2`;
+    expect(extractQidFromHtml(html)).toBe('Q1');
+  });
+
+  it('is case-insensitive on the host', () => {
+    const html = `<a href="https://www.WIKIDATA.org/wiki/Q42">`;
+    expect(extractQidFromHtml(html)).toBe('Q42');
+  });
+
+  it('returns null when no Wikidata reference is present', () => {
+    expect(extractQidFromHtml('<html><body>nothing here</body></html>')).toBeNull();
+  });
+
+  it('ignores non-item references like Property:P856', () => {
+    // The regex requires `Q\d+` after the path prefix, so property pages
+    // (which use `Property:P\d+`) are correctly ignored.
+    const html = `<a href="https://www.wikidata.org/wiki/Property:P856">`;
+    expect(extractQidFromHtml(html)).toBeNull();
   });
 });
 

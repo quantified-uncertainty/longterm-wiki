@@ -195,6 +195,55 @@ describe('suggestUrls', () => {
     expect(result.candidates).toHaveLength(2);
   });
 
+  it('drops candidates that point at a different Wikidata entity (subject-identity gate, QUA-724)', async () => {
+    // Anthropic Q108542504 vs xAI Q117104853 — the canonical mismatch from QUA-722.
+    // (Note: dedupeHits normalizes www-prefixed hosts; we use bare wikidata.org
+    // so the asserted URLs match the normalized output.)
+    mockSearchExa.mockResolvedValue([
+      { url: 'https://wikidata.org/wiki/Q117104853', title: 'xAI', provider: 'exa' },
+      { url: 'https://wikidata.org/wiki/Q108542504', title: 'Anthropic', provider: 'exa' },
+      { url: 'https://reuters.com/anthropic-news', title: 'Reuters', provider: 'exa' },
+    ]);
+    mockSearchPerplexity.mockResolvedValue({ hits: [], cost: 0 });
+
+    const result = await suggestUrls({
+      entityName: 'Anthropic',
+      claimText: 'Anthropic raised $13B Series F',
+      entityWikidataQid: 'Q108542504',
+      maxCandidates: 3,
+    });
+
+    const urls = result.candidates.map((c) => c.url);
+    expect(urls).not.toContain('https://wikidata.org/wiki/Q117104853');
+    expect(urls).toContain('https://wikidata.org/wiki/Q108542504');
+    expect(urls).toContain('https://reuters.com/anthropic-news');
+    expect(result.subjectMismatches).toHaveLength(1);
+    expect(result.subjectMismatches[0]).toEqual({
+      url: 'https://wikidata.org/wiki/Q117104853',
+      candidateQid: 'Q117104853',
+      entityQid: 'Q108542504',
+    });
+  });
+
+  it('subject-identity gate is fail-open when entityWikidataQid is omitted', async () => {
+    // No entityWikidataQid → all candidates pass even when one is a wikidata
+    // URL that would mismatch any other entity.
+    mockSearchExa.mockResolvedValue([
+      { url: 'https://wikidata.org/wiki/Q117104853', title: 'xAI', provider: 'exa' },
+      { url: 'https://reuters.com/news', title: 'R', provider: 'exa' },
+    ]);
+    mockSearchPerplexity.mockResolvedValue({ hits: [], cost: 0 });
+
+    const result = await suggestUrls({
+      entityName: 'Anthropic',
+      claimText: 'fact',
+      maxCandidates: 3,
+    });
+
+    expect(result.candidates).toHaveLength(2);
+    expect(result.subjectMismatches).toEqual([]);
+  });
+
   it('sets sourceProvider per candidate from the search provider', async () => {
     mockSearchExa.mockResolvedValue([
       { url: 'https://a.com/p', title: 'A', provider: 'exa' },

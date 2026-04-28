@@ -22,6 +22,7 @@ import {
 } from "../search/research-agent.ts";
 import { getApiKey } from "../api-keys.ts";
 import { normalizeUrlForJoin as normalizeUrl } from "./url-quality.ts";
+import { subjectIdentityGate } from "./subject-identity-gate.ts";
 
 /** Version tag for stored suggestions — bump when the generator changes shape. */
 export const GENERATOR_MODEL = "qua-64/suggest-urls-v1";
@@ -40,6 +41,15 @@ export interface SuggestUrlsInput {
   /** Provider toggles (auto-disabled when the key is missing). */
   useExa?: boolean;
   usePerplexity?: boolean;
+  /**
+   * Parent entity's Wikidata QID (e.g. "Q108542504"). When present, enables
+   * the subject-identity gate (QUA-724): candidates whose URL points at a
+   * different Wikidata entity are dropped with reason `subject-mismatch`
+   * before they are persisted. Pass `null` / omit to disable the gate
+   * (fail-open default — matches today's behaviour for entities without a
+   * known QID).
+   */
+  entityWikidataQid?: string | null;
 }
 
 export type SuggestUrlsProvider = 'manual' | 'exa' | 'perplexity' | 'scry';
@@ -59,6 +69,18 @@ export interface SuggestUrlsResult {
   query: string;
   /** Approximate USD cost (currently only Perplexity reports cost). */
   costUsd: number;
+  /**
+   * Candidates dropped by the subject-identity gate (QUA-724). Empty when
+   * the gate is disabled (no `entityWikidataQid` supplied) or when no
+   * candidate had an extractable Wikidata QID. Each entry records the
+   * dropped URL, the offending QID, and the entity QID so callers can log
+   * for observability without re-running the gate.
+   */
+  subjectMismatches: Array<{
+    url: string;
+    candidateQid: string;
+    entityQid: string;
+  }>;
 }
 
 // ---------------------------------------------------------------------------
@@ -123,6 +145,7 @@ export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsR
   const {
     entityName, claimText, fieldName, existingUrl,
     maxCandidates = 3, useExa = true, usePerplexity = true,
+    entityWikidataQid = null,
   } = input;
 
   const query = buildSearchQuery({ entityName, claimText, fieldName });
@@ -170,15 +193,43 @@ export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsR
   ).flat();
 
   const excludeKey = existingUrl ? normalizeUrl(existingUrl) : null;
-  const candidates: UrlSuggestion[] = dedupeHits(allHits, maxCandidates, excludeKey).map(
-    (hit) => ({
+  // Dedupe + cap first, then apply the subject-identity gate (QUA-724).
+  // The gate may shrink the result below `maxCandidates`; we don't backfill
+  // here because the wider pipeline (QUA-722) is the right place to ask the
+  // search providers for more if too many were dropped.
+  const dedupedHits = dedupeHits(allHits, maxCandidates, excludeKey);
+
+  const gateResult = subjectIdentityGate({
+    entityQid: entityWikidataQid,
+    candidates: dedupedHits.map((hit) => ({ url: hit.url, _hit: hit })),
+  });
+
+  const candidates: UrlSuggestion[] = gateResult.kept.map((c) => {
+    const hit = c._hit;
+    return {
       url: hit.url,
       title: hit.title,
       snippet: hit.snippet ?? null,
       relevanceScore: null, // No cross-provider score model yet.
       sourceProvider: hit.provider as SuggestUrlsProvider,
-    }),
-  );
+    };
+  });
 
-  return { candidates, providersUsed, providersSkipped, query, costUsd };
+  const subjectMismatches = gateResult.dropped.map((d) => {
+    const [candidateQid, entityQidPart] = d.detail.split(' != ');
+    return {
+      url: d.candidate.url,
+      candidateQid,
+      entityQid: entityQidPart,
+    };
+  });
+
+  return {
+    candidates,
+    providersUsed,
+    providersSkipped,
+    query,
+    costUsd,
+    subjectMismatches,
+  };
 }
