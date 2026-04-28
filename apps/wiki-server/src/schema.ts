@@ -1725,8 +1725,14 @@ export const recordSources = pgTable(
     sourceUrl: text("source_url"), // direct URL
     extractedValue: text("extracted_value"), // what the source says
     extractedQuote: text("extracted_quote"), // relevant passage from source
-    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial
+    verdict: text("verdict").notNull(), // confirmed | contradicted | unverifiable | outdated | partial | not_applicable
     confidence: real("confidence"), // 0.0 to 1.0
+    /**
+     * QUA-791: source-relevance weight for verdict aggregation.
+     * 0..1, NULL treated as 1.0 by the aggregation rule. Populated by the
+     * relevance gate (QUA-426) when present, otherwise defaults to full weight.
+     */
+    relevanceScore: real("relevance_score"),
     isPrimarySource: boolean("is_primary_source").notNull().default(false),
     checkerModel: text("checker_model"),
     notes: text("notes"),

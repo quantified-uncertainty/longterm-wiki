@@ -26,6 +26,7 @@ import {
 import { logger } from "../../logger.js";
 import { resolvePageIntId, resolvePageIntIds } from "../shared/page-id-helpers.js";
 import { coerceDisplayName } from "../shared/display-name-coerce.js";
+import { recomputeVerdictBestEffort } from "../sourcing/recompute-verdict.js";
 
 // ---- Constants ----
 
@@ -189,6 +190,18 @@ async function dualWriteToSourcing(
       if (!(msg.includes("unique") || msg.includes("duplicate") || msg.includes("23505"))) throw insertErr;
     }
   }
+
+  // QUA-791: reconcile the just-written verdict against all evidence rows.
+  // Without this, the verdict above is whatever this single citation
+  // accuracy check produced (last-writer-wins). Best-effort.
+  await recomputeVerdictBestEffort(tx, {
+    recordType: "citation",
+    recordId,
+    fieldName: null,
+    entityId,
+    displayName: safeDisplayName,
+    entityDisplayName: safeEntityDisplayName,
+  });
 
   }); // end transaction
 }

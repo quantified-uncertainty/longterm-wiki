@@ -5,6 +5,7 @@ import type { ExtractTablesWithRelations } from "drizzle-orm";
 import type * as schema from "../../schema.js";
 import type { InlineSourcing } from "./sourcing-schema.js";
 import { logger } from "../../logger.js";
+import { recomputeVerdictBestEffort } from "../sourcing/recompute-verdict.js";
 
 type DbOrTx =
   | import("drizzle-orm/postgres-js").PostgresJsDatabase<typeof schema>
@@ -105,6 +106,17 @@ export async function writeInlineVerdicts(
           updated_at = NOW()
       `);
     }
+
+    // QUA-791: reconcile the just-written verdict against all evidence
+    // rows for this record. Without this, the verdict above is whatever
+    // this single inline-sourcing call passed in (last-writer-wins).
+    // Best-effort: a recompute failure does not fail the inline write.
+    await recomputeVerdictBestEffort(tx, {
+      recordType: record.recordType,
+      recordId: record.recordId,
+      fieldName: null,
+      entityId: record.entityId ?? null,
+    });
   }
 
   return { written: withSourcing.length };

@@ -431,6 +431,9 @@ export async function verifySingleItem(
         reasoning: `[relevance_gate] ${gate.reason}`,
         sourceUrl: verifiedSourceUrl,
         checkerModel: 'relevance-gate',
+        // QUA-791: explicit zero so aggregation drops this row even if
+        // the not_applicable filter is later relaxed. Belt + suspenders.
+        relevanceScore: 0,
       };
     }
   }
@@ -499,6 +502,7 @@ export async function storeResult(item: VerifyItem, result: VerifyResult): Promi
         reasoning: result.reasoning,
         isPrimarySource: true,
         checkerModel: result.checkerModel,
+        relevanceScore: result.relevanceScore ?? null,
       }, '[sourcing]');
     } catch (e: unknown) {
       firstError = e;
@@ -533,6 +537,7 @@ export async function storeResult(item: VerifyItem, result: VerifyResult): Promi
         reasoning: result.reasoning,
         entityId: recordData.entityId,
         checkerModel: result.checkerModel,
+        relevanceScore: result.relevanceScore ?? null,
       }, '[sourcing]');
     } catch (e: unknown) {
       firstError = e;
