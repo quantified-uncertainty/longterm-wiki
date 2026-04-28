@@ -407,8 +407,9 @@ export function detectNewRoutes(files: ChangedFile[]): DeployTask[] {
   for (const file of routeFiles) {
     const filename = basename(file.path);
 
-    // Re-export hubs and shared helpers are never routes.
+    // Re-export hubs, test files, and shared helpers are never routes.
     if (filename === "index.ts") continue;
+    if (filename.endsWith(".test.ts") || filename.endsWith(".test-d.ts")) continue;
     if (file.path.startsWith(SHARED_PREFIX)) continue;
 
     // Tablebase helpers (system-card-benchmark-linker, sync-factory, schemas, etc.)

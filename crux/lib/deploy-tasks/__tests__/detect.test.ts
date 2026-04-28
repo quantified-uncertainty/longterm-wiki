@@ -1412,11 +1412,21 @@ describe('detectNewRoutes', () => {
   });
 
   it('skips system-card-benchmark-linker.ts (regression: QUA-712)', () => {
-    // PR #4600 / QUA-702: this helper module was flagged as a route.
+    // The helper was incorrectly flagged as a route in PR #4600 (QUA-702 work).
+    // QUA-712 is the fix tracked here.
     const tasks = detectNewRoutes([
       added(
         'apps/wiki-server/src/routes/tablebase/system-card-benchmark-linker.ts',
       ),
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('skips test files (.test.ts, .test-d.ts) in route directories', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/sync-factory.test-d.ts'),
+      added('apps/wiki-server/src/routes/operational/agent-sessions.test.ts'),
+      added('apps/wiki-server/src/routes/factbase/facts.test.ts'),
     ]);
     expect(tasks).toEqual([]);
   });
