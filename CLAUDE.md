@@ -58,7 +58,7 @@ pnpm crux tb people discover                 # Discover people entities
 
 # Linear (primary issue tracker)
 pnpm crux linear search "query"              # Search Linear issues
-pnpm crux linear create "title" --description="..."  # Create a new Linear issue
+pnpm crux linear create "title" --description="..." --project="..."  # Create a new Linear issue (--project required)
 pnpm crux linear start QUA-NNN              # Signal work start on issue
 pnpm crux linear done QUA-NNN --pr=URL      # Signal completion
 pnpm crux linear view QUA-NNN              # View issue details

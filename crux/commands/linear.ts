@@ -88,6 +88,11 @@ interface CommandOptions extends BaseOptions {
   // batching, mixed shapes, multi-table enumeration) refuse the create.
   // See QUA-575 + .claude/rules/ticket-sizing.md.
   allowBig?: boolean;
+  // Bypass the "no project" refusal on `crux linear create`. Without this,
+  // a create with neither --project nor a project-bearing --parent refuses
+  // (orphan-prevention). Use only when the issue genuinely has no home
+  // project yet — e.g. exploratory tickets pending triage.
+  allowNoProject?: boolean;
 }
 
 function readBodyFlag(path: string | undefined): string | null {
@@ -488,6 +493,29 @@ function checkRedFlagsOrRefuse(
   return { output: `${c.yellow}${warning}${c.reset}`, exitCode: 2 };
 }
 
+/**
+ * Format the human-readable refusal when `crux linear create` runs without
+ * a project (and without inheritable parent project). Plain text so it can
+ * be wrapped in color codes by callers and reused for stderr bypass output.
+ */
+function formatNoProjectRefusal(
+  parentArg: string | undefined,
+  parentProject: { id: string; name: string } | null,
+): string {
+  let out = '⚠ Refusing to create an issue without a project.\n\n';
+  if (parentArg && !parentProject) {
+    out += `  --parent=${parentArg} was given, but that issue has no project to inherit from.\n`;
+  }
+  out += 'Why: 9% of recent QUA issues were filed projectless, breaking the\n';
+  out += 'project-ownership doctrine in .claude/rules/linear-project-ownership.md.\n';
+  out += 'Run `pnpm crux linear hygiene` to see current orphan count.\n\n';
+  out += 'Fix: pick one —\n';
+  out += '  1) --project="<name>" — see `pnpm crux linear project list`\n';
+  out += '  2) --parent=QUA-NNN — child inherits the parent\'s project\n';
+  out += '  3) --allow-no-project — bypass (only if the issue genuinely has no home yet)\n';
+  return out;
+}
+
 async function create(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
@@ -554,6 +582,32 @@ async function create(args: string[], options: CommandOptions): Promise<CommandR
     projectId = parentProject.id;
     projectLabel = parentProject.name;
     projectInherited = true;
+  }
+
+  // Orphan-prevention: refuse a create with no project unless --allow-no-project is set.
+  // Reason: 9% of recent open issues were filed projectless, breaking the project-ownership
+  // doctrine in .claude/rules/linear-project-ownership.md. The hygiene scan catches them
+  // after the fact; this catches them at creation time.
+  if (!projectId) {
+    const refusal = formatNoProjectRefusal(options.parent, parentProject);
+    if (options.allowNoProject) {
+      process.stderr.write(refusal);
+    } else if (options.json) {
+      return {
+        output:
+          JSON.stringify(
+            {
+              error: 'no-project',
+              hint: 'Pass --project=<name>, or --parent=QUA-NNN where the parent has a project, or --allow-no-project to bypass.',
+            },
+            null,
+            2,
+          ) + '\n',
+        exitCode: 2,
+      };
+    } else {
+      return { output: `${c.yellow}${refusal}${c.reset}`, exitCode: 2 };
+    }
   }
 
   const result = await createIssue({ title, description, priority, parentId, projectId });
@@ -1234,9 +1288,13 @@ Options (create):
   --priority=N               Priority: 1=urgent, 2=high, 3=medium, 4=low (default: none)
   --parent=QUA-NNN           Parent issue (sets the child link to an epic)
   --project=<name|uuid>      Project (UUID or case-insensitive exact name).
+                             Required unless --parent inherits a project or
+                             --allow-no-project is set.
                              When --parent has a project and --project is
                              omitted, the parent's project is inherited.
   --allow-big                Bypass the ticket-sizing red-flag check (see .claude/rules/ticket-sizing.md)
+  --allow-no-project         Bypass the no-project refusal (creates an orphan).
+                             Only use when the issue genuinely has no project home yet.
 
 Options (update):
   --project=<name|uuid|none> Set or clear the project (use "none" to clear)

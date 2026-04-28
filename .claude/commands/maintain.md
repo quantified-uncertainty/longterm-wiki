@@ -55,10 +55,11 @@ The report categorizes work into priority tiers. Review the output and decide wh
 
 ### Filing new issues
 
-When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost:
+When the sweep reveals problems too large to fix now, **create Linear issues** so they aren't lost. `--project` is required (see `.claude/rules/linear-project-ownership.md` to pick one):
 ```bash
 pnpm crux linear create "Descriptive title" \
-  --description="What's wrong and why it matters"
+  --description="What's wrong and why it matters" \
+  --project="<Project Name>"
 ```
 
 To update existing Linear issues with context:
