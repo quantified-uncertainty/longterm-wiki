@@ -16,8 +16,8 @@
  */
 
 import { z } from 'zod';
-import Anthropic from '@anthropic-ai/sdk';
-import { callLlm, MODELS } from '../llm.ts';
+import type Anthropic from '@anthropic-ai/sdk';
+import { callLlm, createLlmClient, MODELS } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import { escapeXml } from '../prompt-utils.ts';
 import { getApiKey } from '../api-keys.ts';
@@ -25,8 +25,7 @@ import { calculateCost } from '../pricing.ts';
 
 /** Notes emitted to the suggestions row are sliced to this length so we stay
  *  well under the server's 2000-char `notes` cap even after the prefix. */
-const MAX_REASONING_CHARS = 200;
-/** Truncation cap for grader error messages when surfaced as `reason`. */
+export const MAX_REASONING_CHARS = 200;
 const MAX_ERROR_REASON_CHARS = 160;
 
 const GraderResponseSchema = z.object({
@@ -58,8 +57,6 @@ export interface GraderOptions {
   client?: Anthropic;
   /** Model name (full or shorthand). Defaults to Haiku. */
   model?: string;
-  /** Label for the retry harness. */
-  retryLabel?: string;
 }
 
 /** Default model used by the grader when no override is supplied. */
@@ -105,7 +102,6 @@ export async function gradeSuggestion(
   options: GraderOptions = {},
 ): Promise<GraderOutcome> {
   const model = options.model ?? DEFAULT_GRADER_MODEL;
-  const retryLabel = options.retryLabel ?? 'grade-url-suggestion';
 
   // Fail-closed if the key is missing. Don't construct a client only to
   // have it explode later — return a structured no-op outcome the caller
@@ -113,20 +109,15 @@ export async function gradeSuggestion(
   if (!options.client && !getApiKey('ANTHROPIC_BILLING_KEY')) {
     return { ok: false, reason: 'ANTHROPIC_BILLING_KEY not set', costUsd: 0 };
   }
-
-  const client =
-    options.client ??
-    new Anthropic({ apiKey: getApiKey('ANTHROPIC_BILLING_KEY') as string });
-
-  const prompt = buildGraderPrompt(input);
+  const client = options.client ?? createLlmClient();
 
   let result: Awaited<ReturnType<typeof callLlm>>;
   try {
-    result = await callLlm(client, prompt, {
+    result = await callLlm(client, buildGraderPrompt(input), {
       model,
       maxTokens: 200,
       temperature: 0,
-      retryLabel,
+      retryLabel: 'grade-url-suggestion',
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
@@ -137,11 +128,8 @@ export async function gradeSuggestion(
     };
   }
 
-  // Compute real spend from the API's reported usage. `calculateCost`
-  // returns 0 (with a warning) if the model is unknown — that's
-  // acceptable since only documented Anthropic IDs flow through the
-  // sweep, and unknown costs default to under-reporting rather than
-  // mis-reporting a fake number.
+  // calculateCost returns 0 with a warning for unknown models — under-
+  // reporting rather than fabricating a number is the right default.
   const costUsd = calculateCost(model, {
     inputTokens: result.usage.input_tokens,
     outputTokens: result.usage.output_tokens,
@@ -175,5 +163,3 @@ export async function gradeSuggestion(
     costUsd,
   };
 }
-
-export { MAX_REASONING_CHARS };

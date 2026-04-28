@@ -35,7 +35,6 @@ import {
   gradeSuggestion,
   DEFAULT_GRADER_MODEL,
   MAX_REASONING_CHARS,
-  type GraderOutcome,
 } from '../lib/sourcing/grade-suggestion.ts';
 import { createClient as createAnthropicClient } from '../lib/anthropic.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
@@ -130,22 +129,26 @@ function parsePositiveFloat(raw: unknown, fallback: number, flag: string): numbe
   return n;
 }
 
+type ThresholdResult =
+  | { ok: true; value: number | null }
+  | { ok: false; error: string };
+
 /**
- * Parse a [0, 1] confidence threshold. Returns `null` (auto-approve disabled)
- * when the flag is absent. Out-of-range or non-numeric values exit with an
- * error rather than silently disabling — auto-approval is high-stakes enough
- * (it bypasses human review) that a typo should fail loudly, not coast through
- * as "off."
+ * Parse a [0, 1] confidence threshold. Returns `value: null` when the flag
+ * is absent (auto-approve disabled). Out-of-range or non-numeric values
+ * fail loudly because auto-approval bypasses human review — a typo must
+ * not silently disable the feature.
  */
-function parseAutoApproveThreshold(raw: unknown): number | null | { error: string } {
-  if (raw === undefined || raw === null || raw === '') return null;
+function parseAutoApproveThreshold(raw: unknown): ThresholdResult {
+  if (raw === undefined || raw === null || raw === '') return { ok: true, value: null };
   const n = parseFloat(String(raw));
   if (!Number.isFinite(n) || n < 0 || n > 1) {
     return {
+      ok: false,
       error: `Invalid --auto-approve-threshold "${String(raw)}". Must be a number in [0, 1].`,
     };
   }
-  return n;
+  return { ok: true, value: n };
 }
 
 /**
@@ -306,34 +309,26 @@ async function suggestCommand(
   const skipExisting = options['skip-existing'] ?? options.skipExisting ?? true;
   const isJson = Boolean(options.json || options.ci);
 
-  // Auto-approve threshold is opt-in — absence keeps the historical
-  // status='pending' behavior. Any non-empty value is parsed strictly:
-  // out-of-range or non-numeric values fail the command rather than
-  // silently disabling, because a typo here would invisibly route a
-  // sweep past the human-review queue.
   const thresholdParsed = parseAutoApproveThreshold(
     options['auto-approve-threshold'] ?? options.autoApproveThreshold,
   );
-  if (thresholdParsed !== null && typeof thresholdParsed === 'object') {
+  if (!thresholdParsed.ok) {
     return { exitCode: 1, output: thresholdParsed.error };
   }
-  const autoApproveThreshold: number | null = thresholdParsed;
+  const autoApproveThreshold = thresholdParsed.value;
   const autoApproveModel =
     (options['auto-approve-model'] ?? options.autoApproveModel)?.trim() ||
     DEFAULT_GRADER_MODEL;
 
-  // Build the LLM client once and reuse across all grader calls; the alternative
-  // (one new client per candidate) is wasteful for sweeps that grade thousands
-  // of suggestions. `required: false` keeps the grader's fail-closed contract:
-  // a missing key returns a null client and gradeSuggestion handles it itself.
+  // Reuse one Anthropic client across grader calls — `required: false` keeps
+  // a missing key from crashing the sweep, and the warning below tells the
+  // user every candidate will fail-closed to 'pending' rather than silently
+  // succeeding with a $0.00 cost line.
   const graderClient =
     autoApproveThreshold !== null
       ? createAnthropicClient({ required: false })
       : null;
   if (autoApproveThreshold !== null && !graderClient) {
-    // The user explicitly asked for auto-approval but the key isn't set, so
-    // every candidate will fail-closed to 'pending'. Warn loudly so they
-    // don't read a clean run summary and assume the grader did its job.
     process.stderr.write(
       'warning: --auto-approve-threshold is set but ANTHROPIC_BILLING_KEY is missing — every candidate will fail-closed to status=pending\n',
     );
@@ -480,59 +475,35 @@ async function suggestCommand(
     if (result.candidates.length === 0) return;
     summary.generatedForRecords++;
 
-    // When auto-approval is on, grade each candidate via a cheap LLM and
-    // promote ≥threshold to `auto_verified`. Grader failures fall through
-    // to `pending` (fail-closed). The grader is per-candidate (not
-    // per-record) because the same record may have one strong + two weak
-    // candidates — we want only the strong one promoted.
-    if (autoApproveThreshold !== null) {
-      const threshold = autoApproveThreshold; // narrow for the inner loop
-      // Sequential grading inside a record. Records still run in parallel
-      // via the outer runWithConcurrency, so the effective LLM concurrency
-      // is bounded by DEFAULT_CONCURRENCY (5), not by N records × M
-      // candidates. With max-candidates=10 and 5 records in flight, a
-      // Promise.all here would fire up to 50 simultaneous Haiku calls and
-      // bump into Anthropic rate limits at scale.
-      const outcomes: GraderOutcome[] = [];
-      for (const cand of result.candidates) {
-        outcomes.push(
-          await gradeSuggestion(
-            {
-              entityName,
-              claimText,
-              fieldName: v.fieldName ?? null,
-              candidate: { url: cand.url, title: cand.title, snippet: cand.snippet },
-            },
-            // Pass the shared client when present; null means the key was
-            // missing at startup, in which case the grader's own
-            // fail-closed branch handles it.
-            graderClient
-              ? { model: autoApproveModel, client: graderClient }
-              : { model: autoApproveModel },
-          ),
-        );
-      }
-      // Roll grader spend into the run-wide cost meter so `--budget`
-      // accounts for it and the summary's "Cost:" line is honest.
-      for (const o of outcomes) summary.costUsd += o.costUsd;
+    // Sequential grading bounds effective LLM concurrency to the outer
+    // DEFAULT_CONCURRENCY (5). A Promise.all here would fan out to
+    // records × candidates simultaneous Haiku calls and trip rate limits.
+    //
+    // Notes audit-trail rule: emit `notes` only when promoting to
+    // auto_verified. The server upsert is `notes = COALESCE(EXCLUDED.notes,
+    // sourcing_url_suggestions.notes)` and `status = CASE WHEN status =
+    // 'pending' THEN EXCLUDED.status ELSE status END`. So a re-run that
+    // grades a previously-promoted row below threshold would leave the
+    // status as 'auto_verified' but flip its notes to "below-threshold..."
+    // — contradictory. Omitting notes on non-promotion preserves any
+    // prior audit note. Aggregate visibility lives in the run summary's
+    // auto_approve_* counters.
+    const threshold = autoApproveThreshold;
+    for (const cand of result.candidates) {
+      let status: 'pending' | 'auto_verified' = 'pending';
+      let notes: string | undefined;
 
-      for (let i = 0; i < result.candidates.length; i++) {
-        const cand = result.candidates[i];
-        const outcome = outcomes[i];
-        // Audit-trail rule: only emit `notes` when we are actively
-        // promoting this row to `auto_verified`. Below-threshold and
-        // grader-error cases must NOT overwrite an existing row's notes
-        // — the server's `notes = COALESCE(EXCLUDED.notes, ...)` clause
-        // preserves prior notes only when EXCLUDED.notes is absent. If
-        // we sent a "below-threshold" note here for a row that was
-        // previously promoted (status preserved by the server's CASE),
-        // its original "auto-approve" audit note would be silently
-        // overwritten while status stayed `auto_verified` — a
-        // contradictory state. Net effect: pending/error rows carry no
-        // grader trace in the row itself, but the run summary's
-        // auto_approve counts give the aggregate visibility.
-        let status: 'pending' | 'auto_verified' = 'pending';
-        let notes: string | undefined;
+      if (threshold !== null) {
+        const outcome = await gradeSuggestion(
+          {
+            entityName,
+            claimText,
+            fieldName: v.fieldName ?? null,
+            candidate: { url: cand.url, title: cand.title, snippet: cand.snippet },
+          },
+          { model: autoApproveModel, client: graderClient ?? undefined },
+        );
+        summary.costUsd += outcome.costUsd;
         if (outcome.ok) {
           if (outcome.confidence >= threshold) {
             status = 'auto_verified';
@@ -542,26 +513,8 @@ async function suggestCommand(
         } else {
           summary.autoApproveGraderErrors++;
         }
-        toUpsert.push({
-          recordType: v.recordType,
-          recordId: v.recordId,
-          fieldName: v.fieldName,
-          entityId: v.entityId,
-          suggestedUrl: cand.url,
-          title: cand.title,
-          snippet: cand.snippet,
-          relevanceScore: cand.relevanceScore,
-          sourceProvider: cand.sourceProvider,
-          generatorModel: GENERATOR_MODEL,
-          status,
-          ...(notes !== undefined && { notes }),
-        });
       }
-      return;
-    }
 
-    // Auto-approve disabled: simple loop, no grader, all rows pending.
-    for (const cand of result.candidates) {
       toUpsert.push({
         recordType: v.recordType,
         recordId: v.recordId,
@@ -573,7 +526,8 @@ async function suggestCommand(
         relevanceScore: cand.relevanceScore,
         sourceProvider: cand.sourceProvider,
         generatorModel: GENERATOR_MODEL,
-        status: 'pending',
+        status,
+        ...(notes !== undefined && { notes }),
       });
     }
   });
