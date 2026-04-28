@@ -215,14 +215,11 @@ export async function suggestUrls(input: SuggestUrlsInput): Promise<SuggestUrlsR
     };
   });
 
-  const subjectMismatches = gateResult.dropped.map((d) => {
-    const [candidateQid, entityQidPart] = d.detail.split(' != ');
-    return {
-      url: d.candidate.url,
-      candidateQid,
-      entityQid: entityQidPart,
-    };
-  });
+  const subjectMismatches = gateResult.dropped.map((d) => ({
+    url: d.candidate.url,
+    candidateQid: d.candidateQid,
+    entityQid: d.entityQid,
+  }));
 
   return {
     candidates,

@@ -56,7 +56,12 @@ export interface SubjectIdentityDrop<C extends SubjectIdentityCandidate> {
   candidate: C;
   /** Stable machine-readable code: "subject-mismatch". */
   reason: 'subject-mismatch';
-  /** Human-readable detail (`<candidateQid> != <entityQid>`). */
+  /** Wikidata QID extracted from the candidate URL or HTML. */
+  candidateQid: string;
+  /** Wikidata QID of the parent entity that the candidate disagreed with. */
+  entityQid: string;
+  /** Human-readable detail (`<candidateQid> != <entityQid>`). Kept alongside
+   *  the structured QIDs above for log lines that want a single string. */
   detail: string;
 }
 
@@ -108,6 +113,8 @@ export function subjectIdentityGate<C extends SubjectIdentityCandidate>(
     dropped.push({
       candidate,
       reason: 'subject-mismatch',
+      candidateQid,
+      entityQid,
       detail: `${candidateQid} != ${entityQid}`,
     });
   }

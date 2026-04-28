@@ -128,6 +128,11 @@ export function extractQid(url: string): string | null {
   return match ? `Q${match[1]}` : null;
 }
 
+/** Cap how much HTML the QID extractor scans. Wikidata references on a page
+ *  are almost always in the head/early body (canonical link, sameAs, og:url);
+ *  we cap to 64KB to bound the regex cost when callers pass full pages. */
+const HTML_SCAN_LIMIT = 64 * 1024;
+
 /**
  * Find the first Wikidata QID referenced inside an HTML/text payload.
  *
@@ -138,6 +143,10 @@ export function extractQid(url: string): string | null {
  *   - article-body links to Wikidata pages
  *   - Open Graph / Twitter cards that reference the canonical Wikidata URL
  *
+ * Only the first `HTML_SCAN_LIMIT` chars are scanned — a limit that comfortably
+ * covers `<head>` plus the first screen of body, where canonical / sameAs links
+ * always live, while bounding regex cost on multi-megabyte payloads.
+ *
  * Returns null if no Wikidata reference is found. Callers should treat null
  * as "unknown subject" (fail-open) rather than "different subject".
  *
@@ -145,7 +154,8 @@ export function extractQid(url: string): string | null {
  * primary subject against the entity's QID before persisting suggestions.
  */
 export function extractQidFromHtml(html: string): string | null {
-  const m = html.match(WIKIDATA_REF_RE);
+  const slice = html.length > HTML_SCAN_LIMIT ? html.slice(0, HTML_SCAN_LIMIT) : html;
+  const m = slice.match(WIKIDATA_REF_RE);
   return m ? m[1] : null;
 }
 

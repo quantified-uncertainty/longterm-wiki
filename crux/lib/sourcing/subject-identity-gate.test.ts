@@ -24,6 +24,8 @@ describe('subjectIdentityGate', () => {
     expect(result.kept).toEqual([]);
     expect(result.dropped).toHaveLength(1);
     expect(result.dropped[0].reason).toBe('subject-mismatch');
+    expect(result.dropped[0].candidateQid).toBe(XAI_QID);
+    expect(result.dropped[0].entityQid).toBe(ANTHROPIC_QID);
     expect(result.dropped[0].detail).toBe(`${XAI_QID} != ${ANTHROPIC_QID}`);
     expect(result.dropped[0].candidate.url).toBe(
       `https://www.wikidata.org/wiki/${XAI_QID}`,
@@ -61,6 +63,8 @@ describe('subjectIdentityGate', () => {
     });
     expect(result.kept).toEqual([]);
     expect(result.dropped).toHaveLength(1);
+    expect(result.dropped[0].candidateQid).toBe(XAI_QID);
+    expect(result.dropped[0].entityQid).toBe(ANTHROPIC_QID);
     expect(result.dropped[0].detail).toBe(`${XAI_QID} != ${ANTHROPIC_QID}`);
   });
 

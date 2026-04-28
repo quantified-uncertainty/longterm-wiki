@@ -206,6 +206,20 @@ describe('extractQidFromHtml', () => {
     const html = `<a href="https://www.wikidata.org/wiki/Property:P856">`;
     expect(extractQidFromHtml(html)).toBeNull();
   });
+
+  it('caps the scan to bound regex cost on multi-megabyte payloads', () => {
+    // The QID is past the 64KB scan limit — a naive `html.match(...)` would
+    // still find it, but the cap means we deliberately don't scan that far.
+    // This protects against ReDoS-shaped pathological inputs and keeps the
+    // gate's cost predictable per candidate.
+    const padding = 'x'.repeat(70_000);
+    const html = `${padding}https://www.wikidata.org/wiki/Q42`;
+    expect(extractQidFromHtml(html)).toBeNull();
+
+    // Same QID, but inside the cap — found.
+    const small = `prefix https://www.wikidata.org/wiki/Q42 suffix`;
+    expect(extractQidFromHtml(small)).toBe('Q42');
+  });
 });
 
 describe('tryWikidataMatch', () => {
