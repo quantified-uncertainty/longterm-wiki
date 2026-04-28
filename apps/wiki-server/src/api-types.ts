@@ -967,6 +967,14 @@ export const UpdateResourceFetchStatusSchema = z.object({
   fetchStatus: z.enum(["ok", "dead", "soft_404", "not_found", "timeout", "unreachable", "paywall", "error"]),
   lastFetchedAt: z.string().datetime(),
   fetchedTitle: z.string().max(1000).optional(),
+  /**
+   * SHA-256 (first 16 hex) of the freshly-fetched content. When provided,
+   * persisted to `resources.content_hash` so subsequent re-ingest jobs can
+   * pass it as `previousContentHash` and detect content drift via the
+   * QUA-312 Phase 2 skip-guard bypass. Null/empty content (dead links,
+   * paywalls) skips this update.
+   */
+  contentHash: z.string().min(1).max(64).optional(),
 });
 export type UpdateResourceFetchStatus = z.infer<typeof UpdateResourceFetchStatusSchema>;
 

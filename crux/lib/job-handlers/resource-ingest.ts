@@ -309,7 +309,10 @@ export async function handleResourceIngest(
 
     // Persist fetch_status to the resource record.
     // Content caching is already handled by fetchSource() internally.
-    await persistFetchStatus(resourceId, status, ctx);
+    // Also persist the new contentHash (when present) so the next re-ingest
+    // can pass it as previousContentHash and the QUA-312 Phase 2 skip-guard
+    // bypass activates when content drifts.
+    await persistFetchStatus(resourceId, status, ctx, contentHash);
 
     // Chain: enqueue resource-enrich job for reachable resources with content.
     // Skip if content is empty — fetchSource returns ok but no content for some
@@ -378,17 +381,24 @@ export async function handleResourceIngest(
 /**
  * Update the resource's fetch_status. Fire-and-forget — errors are logged
  * but don't fail the job. Content caching is handled by fetchSource().
+ *
+ * When `contentHash` is provided (non-empty content was fetched), it is
+ * persisted to `resources.content_hash` so future re-ingests can pass it
+ * as `previousContentHash` and detect content drift (QUA-329).
  */
 async function persistFetchStatus(
   resourceId: string,
   status: ResourceStatus,
   ctx: JobHandlerContext,
+  contentHash?: string | null,
 ): Promise<void> {
   try {
-    await updateResourceFetchStatus(resourceId, {
+    const payload: UpdateResourceFetchStatus = {
       fetchStatus: toFetchStatus(status),
       lastFetchedAt: new Date().toISOString(),
-    });
+      ...(contentHash ? { contentHash } : {}),
+    };
+    await updateResourceFetchStatus(resourceId, payload);
     if (ctx.verbose) {
       console.log(`[resource-ingest] Updated fetch_status=${toFetchStatus(status)} for ${resourceId}`);
     }

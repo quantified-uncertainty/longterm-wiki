@@ -829,7 +829,13 @@ async function enqueueResourceReingest(_args: string[], options: CommandOptions)
   let pageOffset = 0;
   let total = 0;
   const now = Date.now();
-  const stale: Array<{ id: string; url: string; lifecycle: string | null; lastFetchedAt: string }> = [];
+  const stale: Array<{
+    id: string;
+    url: string;
+    lifecycle: string | null;
+    lastFetchedAt: string;
+    contentHash: string | null;
+  }> = [];
   let immutableSkipped = 0;
   let neverFetched = 0;
 
@@ -873,7 +879,13 @@ async function enqueueResourceReingest(_args: string[], options: CommandOptions)
       const ageDays = ageMs / (24 * 60 * 60 * 1000);
 
       if (ageDays >= thresholdDays) {
-        stale.push({ id: r.id, url: r.url, lifecycle: r.contentLifecycle, lastFetchedAt: r.lastFetchedAt });
+        stale.push({
+          id: r.id,
+          url: r.url,
+          lifecycle: r.contentLifecycle,
+          lastFetchedAt: r.lastFetchedAt,
+          contentHash: r.contentHash ?? null,
+        });
       }
     }
 
@@ -928,9 +940,18 @@ async function enqueueResourceReingest(_args: string[], options: CommandOptions)
 
     // eslint-disable-next-line no-constant-condition
     while (true) {
+      // QUA-329: pass previousContentHash so the resource-ingest handler can
+      // compute contentChanged and bypass the resource-enrich skip-guard when
+      // content has shifted since the last fetch (QUA-312 Phase 2). The hash
+      // is the SHA-256 first 16 hex of previously-fetched content, persisted
+      // to `resources.content_hash` by the previous ingest run.
       const result = await createJob({
         type: 'resource-ingest',
-        params: { resourceId: r.id, url: r.url, previousContentHash: undefined },
+        params: {
+          resourceId: r.id,
+          url: r.url,
+          ...(r.contentHash ? { previousContentHash: r.contentHash } : {}),
+        },
         priority: 2,
         maxRetries: 3,
         dedupKey: `reingest:${r.id}`,
