@@ -89,10 +89,17 @@ const MONTH_ABBR = [
  *
  * 9, 10, 11, 13 digit lengths (Unix epoch seconds/ms) are intentionally
  * NOT detected — they overlap the plausible-magnitude range for headcount
- * and revenue facts. Caller must opt-in for those via a column-name hint.
+ * and revenue facts.
  */
 export function formatDateShapedInteger(n: number): string | null {
-  if (!Number.isFinite(n) || n <= 0 || !Number.isInteger(n)) return null;
+  // Range gate skips String(n) allocation for the vast majority of non-date
+  // numbers (small counts, sub-1900 values, magnitudes beyond Dec 31, 2099).
+  if (
+    !Number.isFinite(n) ||
+    !Number.isInteger(n) ||
+    n < 19000101 ||
+    n > 20991231235959
+  ) return null;
   const s = String(n);
   if (s.length !== 8 && s.length !== 12 && s.length !== 14) return null;
 
