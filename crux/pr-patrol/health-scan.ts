@@ -693,6 +693,34 @@ export async function checkDeployStatus(
   return evaluateDeployStatus(runs, options.now);
 }
 
+/**
+ * Conclusions GitHub returns on individual checks. We only care about
+ * distinguishing real failures from cancellations; everything else falls
+ * through to the rollup state.
+ */
+export type CheckConclusion =
+  | 'SUCCESS'
+  | 'FAILURE'
+  | 'CANCELLED'
+  | 'TIMED_OUT'
+  | 'STARTUP_FAILURE'
+  | 'ACTION_REQUIRED'
+  | 'STALE'
+  | 'NEUTRAL'
+  | 'SKIPPED'
+  | null;
+
+export type StatusContextState = 'ERROR' | 'EXPECTED' | 'FAILURE' | 'PENDING' | 'SUCCESS';
+
+/**
+ * One leaf check on a commit's status-check rollup. Either a CheckRun (with
+ * `conclusion`) or a StatusContext (with `state`). We use the `__typename`
+ * discriminator to decide which field to read.
+ */
+export type RollupContext =
+  | { __typename: 'CheckRun'; conclusion: CheckConclusion }
+  | { __typename: 'StatusContext'; state: StatusContextState };
+
 interface MainCommitsGql {
   repository: {
     ref: {
@@ -704,6 +732,9 @@ interface MainCommitsGql {
             url: string;
             statusCheckRollup: {
               state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL';
+              contexts: {
+                nodes: RollupContext[];
+              };
             } | null;
           }>;
         };
@@ -725,6 +756,17 @@ const MAIN_COMMITS_QUERY = /* GraphQL */ `
                 url
                 statusCheckRollup {
                   state
+                  contexts(first: 100) {
+                    nodes {
+                      __typename
+                      ... on CheckRun {
+                        conclusion
+                      }
+                      ... on StatusContext {
+                        state
+                      }
+                    }
+                  }
                 }
               }
             }
@@ -760,20 +802,75 @@ export async function checkMainCi(
     sha: n.oid,
     url: n.url,
     createdAt: n.committedDate,
-    conclusion: mapRollupState(n.statusCheckRollup?.state ?? null),
+    conclusion: mapRollupState(
+      n.statusCheckRollup?.state ?? null,
+      n.statusCheckRollup?.contexts?.nodes ?? [],
+    ),
   }));
 
   return evaluateMainCi(commits);
 }
 
+/**
+ * Map GitHub's aggregate `statusCheckRollup.state` to our internal CommitStatus
+ * conclusion. When the rollup is FAILURE/ERROR we examine the individual checks
+ * via `contexts`: a rollup that failed only because some checks were CANCELLED
+ * (with no real failures alongside) is treated as `neutral`, not `failure`.
+ *
+ * Why: GitHub's rollup is FAILURE if any check is cancelled, even if every
+ * test/build job passed. When a workflow uses `cancel-in-progress: true` on a
+ * concurrency group (e.g. `sync-content`), back-to-back merges to main produce
+ * commits whose rollup is FAILURE even though the actual CI completed cleanly.
+ * The patrol's main-ci-red gate would then trip on phantom failures and halt
+ * PR work indefinitely (QUA-731).
+ *
+ * `contexts` is optional for backwards-compat with callers that haven't been
+ * updated to fetch it; without contexts we fall back to the rollup state alone.
+ */
 export function mapRollupState(
   state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL' | null,
+  contexts: RollupContext[] = [],
 ): CommitStatus['conclusion'] {
   if (state === 'SUCCESS') return 'success';
-  if (state === 'FAILURE' || state === 'ERROR') return 'failure';
   if (state === 'PENDING' || state === 'EXPECTED') return 'pending';
   if (state === 'NEUTRAL') return 'neutral';
+  if (state === 'FAILURE' || state === 'ERROR') {
+    // Without contexts we can't distinguish cancellation from real failure —
+    // err on the side of the existing behaviour (treat as failure).
+    if (contexts.length === 0) return 'failure';
+    if (rollupFailureIsCancellationOnly(contexts)) return 'neutral';
+    return 'failure';
+  }
   return null;
+}
+
+/**
+ * Return true when every non-success leaf in the rollup is a CANCELLED check
+ * (with at least one cancellation observed). A rollup with any real failure
+ * — `FAILURE`, `TIMED_OUT`, `STARTUP_FAILURE`, `ACTION_REQUIRED`, `STALE`, or a
+ * status context in the `FAILURE` / `ERROR` state — is not cancellation-only.
+ *
+ * Exported for testing.
+ */
+export function rollupFailureIsCancellationOnly(contexts: RollupContext[]): boolean {
+  let sawCancellation = false;
+  for (const ctx of contexts) {
+    if (ctx.__typename === 'CheckRun') {
+      const c = ctx.conclusion;
+      if (c === 'SUCCESS' || c === 'NEUTRAL' || c === 'SKIPPED' || c == null) continue;
+      if (c === 'CANCELLED') {
+        sawCancellation = true;
+        continue;
+      }
+      // Any other conclusion (FAILURE, TIMED_OUT, STARTUP_FAILURE, ACTION_REQUIRED,
+      // STALE) is a real failure.
+      return false;
+    } else {
+      // StatusContext has no CANCELLED state; FAILURE/ERROR are always real.
+      if (ctx.state === 'FAILURE' || ctx.state === 'ERROR') return false;
+    }
+  }
+  return sawCancellation;
 }
 
 /**

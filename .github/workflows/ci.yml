@@ -370,10 +370,13 @@ jobs:
     needs: [ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     # Serialize syncs so concurrent pushes don't saturate the wiki-server rate limiter.
-    # cancel-in-progress: true drops stale queued runs — the latest state always subsumes them.
+    # cancel-in-progress: false — queue, don't cancel. Cancelling left the LATEST
+    # commit's sync incomplete (so the wiki-server missed that commit's content)
+    # AND turned the workflow rollup into FAILURE for cancelled commits, tripping
+    # the patrol's main-ci-red gate on phantom failures (QUA-731).
     concurrency:
       group: sync-content-main
-      cancel-in-progress: true
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
