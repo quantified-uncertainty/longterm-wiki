@@ -4,21 +4,28 @@
  * https://www.seoul-tracker.org
  *
  * Author: The Midas Project. Tracks adherence to the Seoul Frontier AI
- * Safety Commitments — five red-line components signed by 16 frontier
- * developers in May 2024:
+ * Safety Commitments — five components signed by 16 frontier developers
+ * at the May 2024 AI Seoul Summit. The tracker uses these dimension slugs
+ * (verified against the live tracker page chunk on 2026-04-28; see
+ * QUA-752 / `seoul-scraper.ts`):
  *
- *   1. risk-thresholds      — Define risk thresholds & cases
- *   2. safe-development     — Halt or modify development past thresholds
- *   3. risk-evaluation      — Risk-evaluation processes
- *   4. transparency         — Share approaches publicly
- *   5. governance           — Internal governance structures
+ *   1. risk-evaluations     — Risk Evaluation
+ *   2. risk-thresholds      — Risk Thresholds
+ *   3. risk-mitigations     — Risk Mitigations
+ *   4. halting-procedures   — Halting Procedures
+ *   5. safety-investment    — Safety Investment
  *
  * Verdict per (org, commitment): "Fulfilled" | "Partial" | "Unfulfilled" |
  * "Not Applicable". The tracker also publishes an "overall" summary
- * verdict per org (typically the strongest verdict + a qualifier).
+ * verdict per org. The tracker's own categorical bands collapse the
+ * underlying 1-4 numeric scale into three labels (1 → Unfulfilled,
+ * 2 → Partial, 3 and 4 both → Fulfilled).
  *
  * Storage matches the FLI/SaferAI pattern — a JSON snapshot at
- * `data/scorecards/raw/seoul/<wave>/grades.json`.
+ * `data/scorecards/raw/seoul/<wave>/grades.json`. The scraper that
+ * extracts the snapshot from the live tracker lives in
+ * `seoul-scraper.ts` and is invoked via
+ * `pnpm crux tb import-scorecards scrape --source=seoul_tracker`.
  *
  * Categorical scores get a numeric encoding for sorting:
  *   Fulfilled = 1.0, Partial = 0.5, Unfulfilled = 0.0,
