@@ -1,13 +1,7 @@
 /**
  * Recompute a `source_check_verdicts` row from its underlying
- * `source_check_evidence` rows (QUA-791 Phase 1).
- *
- * The single canonical aggregator. Every code path that wants to derive
- * an aggregate verdict from raw evidence MUST go through this helper.
- *
- * Replaces the pre-Phase-1 last-writer-wins behavior at `POST /verdicts`,
- * which let whoever wrote last set the aggregate regardless of what the
- * other evidence rows said.
+ * `source_check_evidence` rows. The canonical write path: every code path
+ * that derives an aggregate verdict from raw evidence MUST go through here.
  */
 
 import { eq, and, sql } from "drizzle-orm";
@@ -24,45 +18,24 @@ import {
 import { logger } from "../../logger.js";
 
 /**
- * Walk the error's cause chain looking for a postgres unique-violation
- * (code 23505 / "duplicate key" / "unique constraint" message). Drizzle
- * wraps the underlying postgres-js error in `Error("Failed query: ...")`
- * with the original on `.cause`, so a top-level `err.message.includes(...)`
- * misses the actual signal. We also check `err.code === "23505"` since
- * postgres-js sets it directly on the original error object.
+ * Detect a postgres unique-violation. Drizzle wraps postgres-js errors as
+ * `Error("Failed query: ...")` with the original on `.cause`, so checking
+ * only `err.message` misses the signal. Check `code === '23505'` and the
+ * canonical substrings on both the top-level error and its cause.
  */
 function isUniqueViolation(err: unknown): boolean {
-  let current: unknown = err;
-  let depth = 0;
-  while (current && depth < 5) {
-    if (current instanceof Error) {
-      const code = (current as Error & { code?: string }).code;
-      if (code === "23505") return true;
-      const msg = current.message;
-      if (
-        msg.includes("23505") ||
-        msg.includes("unique") ||
-        msg.includes("duplicate")
-      ) {
-        return true;
-      }
-      current = (current as Error).cause;
-    } else {
-      const s = String(current);
-      if (s.includes("23505") || s.includes("unique") || s.includes("duplicate")) {
-        return true;
-      }
-      break;
-    }
-    depth++;
-  }
-  return false;
+  const matches = (e: unknown): boolean => {
+    if (!e) return false;
+    if ((e as { code?: string }).code === "23505") return true;
+    const msg = e instanceof Error ? e.message : "";
+    return msg.includes("23505") || msg.includes("unique") || msg.includes("duplicate");
+  };
+  return matches(err) || matches((err as { cause?: unknown } | null)?.cause);
 }
 
 /**
- * Accept either a top-level Drizzle DB or a transaction handle. Same
- * pattern used by `routes/tablebase/audit-log.ts::logAuditEntries`.
- * Lets callers atomically write evidence + recompute verdict in one tx.
+ * Accept either a top-level Drizzle DB or a transaction handle so callers
+ * can write evidence + recompute the verdict atomically in one tx.
  */
 type Db =
   | import("drizzle-orm/postgres-js").PostgresJsDatabase<typeof schema>
@@ -135,10 +108,9 @@ async function loadEvidenceRows(
 }
 
 /**
- * Build the human-readable `reasoning` string written to
- * `source_check_verdicts.reasoning`. Reflects the aggregator's input so
- * the disagree-warning surface (QUA-792 Phase 3) can read the same
- * computation without re-deriving it.
+ * Human-readable `reasoning` string for `source_check_verdicts.reasoning`.
+ * Reflects the aggregator's contributing breakdown so the disagree-warning
+ * surface (QUA-792) can render the same computation without re-deriving it.
  */
 function buildReasoning(aggregate: AggregationResult): string {
   if (aggregate.verdict === "unchecked") {
@@ -149,14 +121,11 @@ function buildReasoning(aggregate: AggregationResult): string {
     }
     return `${aggregate.sourcesChecked} source(s) checked but none were relevant enough to draw a conclusion.`;
   }
-  const winner = aggregate.contributing[0];
-  const dissent = aggregate.contributing.slice(1);
-  const winnerStr = `${winner.rowCount} source(s) → ${winner.verdict}`;
-  if (dissent.length === 0) return winnerStr;
-  const dissentStr = dissent
-    .map((d) => `${d.rowCount} → ${d.verdict}`)
-    .join(", ");
-  return `${winnerStr}; dissent: ${dissentStr}`;
+  const fmt = (c: { rowCount: number; verdict: string }) =>
+    `${c.rowCount} → ${c.verdict}`;
+  const [winner, ...dissent] = aggregate.contributing;
+  if (dissent.length === 0) return fmt(winner);
+  return `${fmt(winner)}; dissent: ${dissent.map(fmt).join(", ")}`;
 }
 
 /**
@@ -190,12 +159,22 @@ export async function recomputeVerdict(
     reasoning: buildReasoning(aggregate),
   };
 
+  // No evidence at all → don't write a verdict row. Preserves back-compat
+  // for callers that use POST /verdicts as a verdict-only marker write
+  // (no evidence to roll up). When evidence later exists, the next
+  // POST /evidence call's recompute will populate the row.
+  if (evidence.length === 0) return result;
+
   const now = new Date();
 
   // Try UPDATE first. On no match, INSERT. Race-safe via the
   // unique-violation retry pattern used by the rest of this module.
-  // COALESCE the optional metadata fields so re-running recompute
-  // without them doesn't blow away previously-persisted display names.
+  // The metadata fields use the conditional-spread idiom so that
+  // `undefined` (caller omitted the field) preserves the existing DB
+  // value, while explicit `null` clears it. Callers like
+  // writeInlineVerdicts omit display-name fields and rely on existing
+  // values being kept; POST /verdicts/recompute may pass null explicitly
+  // (e.g. coerceDisplayName scrubbed a leaked sid_) and expects a clear.
   const updated = await db
     .update(sourceVerdicts)
     .set({
@@ -224,14 +203,9 @@ export async function recomputeVerdict(
 
   if (updated.length > 0) return result;
 
-  // Insert fresh row. If a concurrent call beat us to it, the unique
-  // index throws and we retry with UPDATE.
-  //
-  // Match the 90-day default that POST /verdicts and writeInlineVerdicts
-  // use (sourcing.ts:1390, write-inline-verdicts.ts:64) so newly-inserted
-  // recompute rows participate in the `due-for-recheck` cycle. Without
-  // this, recompute-only rows would sit at NULL `next_check_due` forever
-  // and never be picked up by the recheck pipeline.
+  // INSERT fresh row; on race-loss to a concurrent INSERT, retry as UPDATE.
+  // 90-day `next_check_due` matches POST /verdicts and writeInlineVerdicts
+  // so recompute-inserted rows participate in the `due-for-recheck` cycle.
   const ninetyDays = new Date(now.getTime() + 90 * 24 * 60 * 60 * 1000);
   try {
     await db.insert(sourceVerdicts).values({
