@@ -1,0 +1,209 @@
+{
+  "publishedAt": "2025-02-10",
+  "waveLabel": "February 2025",
+  "sourceUrl": "https://www.seoul-tracker.org",
+  "methodologyUrl": "https://www.seoul-tracker.org",
+  "license": null,
+  "notes": null,
+  "isLatest": true,
+  "dimensions": [
+    {
+      "slug": "risk-evaluations",
+      "label": "Risk Evaluation"
+    },
+    {
+      "slug": "risk-thresholds",
+      "label": "Risk Thresholds"
+    },
+    {
+      "slug": "risk-mitigations",
+      "label": "Risk Mitigations"
+    },
+    {
+      "slug": "halting-procedures",
+      "label": "Halting Procedures"
+    },
+    {
+      "slug": "safety-investment",
+      "label": "Safety Investment"
+    }
+  ],
+  "grades": [
+    {
+      "org": "Amazon",
+      "scores": {
+        "risk-evaluations": "Partial",
+        "risk-thresholds": "Partial",
+        "risk-mitigations": "Partial",
+        "halting-procedures": "Partial",
+        "safety-investment": "Fulfilled",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "Anthropic",
+      "scores": {
+        "risk-evaluations": "Partial",
+        "risk-thresholds": "Fulfilled",
+        "risk-mitigations": "Fulfilled",
+        "halting-procedures": "Fulfilled",
+        "safety-investment": "Fulfilled",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "Cohere",
+      "scores": {
+        "risk-evaluations": "Partial",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Partial",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Fulfilled",
+        "overall": "Partial"
+      }
+    },
+    {
+      "org": "Google",
+      "scores": {
+        "risk-evaluations": "Partial",
+        "risk-thresholds": "Fulfilled",
+        "risk-mitigations": "Fulfilled",
+        "halting-procedures": "Partial",
+        "safety-investment": "Partial",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "G42",
+      "scores": {
+        "risk-evaluations": "Fulfilled",
+        "risk-thresholds": "Partial",
+        "risk-mitigations": "Partial",
+        "halting-procedures": "Partial",
+        "safety-investment": "Fulfilled",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "IBM",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    },
+    {
+      "org": "Inflection AI",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "risk-evaluations": "Partial",
+        "risk-thresholds": "Partial",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Fulfilled",
+        "safety-investment": "Partial",
+        "overall": "Partial"
+      }
+    },
+    {
+      "org": "Microsoft",
+      "scores": {
+        "risk-evaluations": "Fulfilled",
+        "risk-thresholds": "Partial",
+        "risk-mitigations": "Partial",
+        "halting-procedures": "Fulfilled",
+        "safety-investment": "Partial",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "Mistral AI",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    },
+    {
+      "org": "Naver",
+      "scores": {
+        "risk-evaluations": "Fulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Partial",
+        "safety-investment": "Partial",
+        "overall": "Partial"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "risk-evaluations": "Fulfilled",
+        "risk-thresholds": "Fulfilled",
+        "risk-mitigations": "Partial",
+        "halting-procedures": "Partial",
+        "safety-investment": "Partial",
+        "overall": "Fulfilled"
+      }
+    },
+    {
+      "org": "Samsung Electronics",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    },
+    {
+      "org": "Technology Innovation Institute",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    },
+    {
+      "org": "xAI",
+      "scores": {
+        "risk-evaluations": "Fulfilled",
+        "risk-thresholds": "Fulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Partial",
+        "safety-investment": "Partial",
+        "overall": "Partial"
+      }
+    },
+    {
+      "org": "Zhipu.ai",
+      "scores": {
+        "risk-evaluations": "Unfulfilled",
+        "risk-thresholds": "Unfulfilled",
+        "risk-mitigations": "Unfulfilled",
+        "halting-procedures": "Unfulfilled",
+        "safety-investment": "Unfulfilled",
+        "overall": "Unfulfilled"
+      }
+    }
+  ]
+}

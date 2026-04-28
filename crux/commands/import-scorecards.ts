@@ -25,11 +25,17 @@ import { join, resolve } from "path";
 import { ALL_SOURCES, getAdapter, listSourceKeys } from "../lib/scorecard-import/sources/index.ts";
 import { buildOrgResolver } from "../lib/scorecard-import/org-aliases.ts";
 import { scrapeSaferaiHtml } from "../lib/scorecard-import/sources/saferai-scraper.ts";
+import {
+  findPageChunkUrl,
+  scrapeSeoul,
+} from "../lib/scorecard-import/sources/seoul-scraper.ts";
 import { analyzeSource, syncSource } from "../lib/scorecard-import/sync.ts";
 import type { ScorecardSourceAdapter, ScorecardSourceKey } from "../lib/scorecard-import/types.ts";
 
 const SAFERAI_DEFAULT_URL = "https://ratings.safer-ai.org/comparison/";
 const SAFERAI_RAW_DIR = resolve("data/scorecards/raw/saferai");
+const SEOUL_DEFAULT_URL = "https://www.seoul-tracker.org";
+const SEOUL_RAW_DIR = resolve("data/scorecards/raw/seoul");
 
 type CommandResult = { exitCode?: number; output?: string };
 
@@ -230,22 +236,133 @@ async function listCommand(
   return cmdList();
 }
 
+interface ScrapeSeoulOptions {
+  url: string;
+  wave?: string;
+  refetch: boolean;
+  dryRun: boolean;
+}
+
+/**
+ * Fetch + parse the Seoul Commitment Tracker (a Next.js SPA) and write a
+ * `grades.json` file under `data/scorecards/raw/seoul/<wave>/`.
+ *
+ * The tracker renders verdicts client-side, so we cache two raw files in
+ * the wave directory: `index.html` (the SPA shell, used to find the page
+ * chunk URL + the deadline header) and `page-chunk.js` (the chunk that
+ * embeds the actual data literals).
+ */
+async function cmdScrapeSeoul(opts: ScrapeSeoulOptions): Promise<CommandResult> {
+  let waveSlug = opts.wave;
+  let waveDir = waveSlug ? join(SEOUL_RAW_DIR, waveSlug) : null;
+
+  let indexHtml: string | null = null;
+  let pageChunkJs: string | null = null;
+  if (waveDir && !opts.refetch) {
+    const cachedHtml = join(waveDir, "index.html");
+    const cachedChunk = join(waveDir, "page-chunk.js");
+    if (existsSync(cachedHtml) && existsSync(cachedChunk)) {
+      indexHtml = readFileSync(cachedHtml, "utf8");
+      pageChunkJs = readFileSync(cachedChunk, "utf8");
+      console.log(`✓ Reusing cached HTML + chunk: ${waveDir}`);
+    }
+  }
+
+  if (indexHtml == null) {
+    console.log(`Fetching ${opts.url} ...`);
+    const resp = await fetch(opts.url);
+    if (!resp.ok) {
+      return {
+        exitCode: 1,
+        output: `[seoul-scrape] index fetch failed: ${resp.status} ${resp.statusText}`,
+      };
+    }
+    indexHtml = await resp.text();
+  }
+
+  if (pageChunkJs == null) {
+    const chunkPath = findPageChunkUrl(indexHtml);
+    if (!chunkPath) {
+      return {
+        exitCode: 1,
+        output: `[seoul-scrape] could not find page-chunk URL in index HTML. Tracker may have changed its bundle layout.`,
+      };
+    }
+    const chunkUrl = new URL(chunkPath, opts.url).toString();
+    console.log(`Fetching ${chunkUrl} ...`);
+    const chunkResp = await fetch(chunkUrl);
+    if (!chunkResp.ok) {
+      return {
+        exitCode: 1,
+        output: `[seoul-scrape] page-chunk fetch failed: ${chunkResp.status} ${chunkResp.statusText}`,
+      };
+    }
+    pageChunkJs = await chunkResp.text();
+  }
+
+  // If --wave=YYYY-MM is provided, derive publishedAt from it as a fallback
+  // so layout drift on the deadline header doesn't block the operator.
+  const wavePublishedAt =
+    waveSlug && /^\d{4}-\d{2}$/.test(waveSlug) ? `${waveSlug}-01` : undefined;
+  const wave = scrapeSeoul(indexHtml, pageChunkJs, {
+    sourceUrl: opts.url,
+    publishedAt: wavePublishedAt,
+  });
+
+  if (!waveSlug) {
+    waveSlug = wave.publishedAt.slice(0, 7);
+    waveDir = join(SEOUL_RAW_DIR, waveSlug);
+  }
+  if (!waveDir) waveDir = join(SEOUL_RAW_DIR, waveSlug);
+
+  if (opts.dryRun) {
+    console.log(JSON.stringify(wave, null, 2));
+    console.log(`\n(dry run — would write to ${waveDir}/grades.json)`);
+    return { exitCode: 0 };
+  }
+
+  mkdirSync(waveDir, { recursive: true });
+  const htmlPath = join(waveDir, "index.html");
+  if (!existsSync(htmlPath) || opts.refetch) {
+    writeFileSync(htmlPath, indexHtml);
+    console.log(`✓ Wrote raw HTML: ${htmlPath}`);
+  }
+  const chunkPath = join(waveDir, "page-chunk.js");
+  if (!existsSync(chunkPath) || opts.refetch) {
+    writeFileSync(chunkPath, pageChunkJs);
+    console.log(`✓ Wrote raw chunk: ${chunkPath}`);
+  }
+  const gradesPath = join(waveDir, "grades.json");
+  writeFileSync(gradesPath, JSON.stringify(wave, null, 2) + "\n");
+  console.log(
+    `✓ Wrote grades.json: ${gradesPath}  (publishedAt=${wave.publishedAt}, ${wave.grades.length} orgs, ${wave.dimensions.length} dimensions + overall)`,
+  );
+  console.log(
+    `\nNext: pnpm crux tb import-scorecards analyze --source=seoul_tracker`,
+  );
+  return { exitCode: 0 };
+}
+
 async function scrapeCommand(
   _args: string[],
   options: Record<string, unknown>,
 ): Promise<CommandResult> {
   const source = (options.source as string) || "saferai";
-  if (source !== "saferai") {
-    return {
-      exitCode: 1,
-      output: `[scrape] only --source=saferai is currently implemented; use the manual extraction step for ${source} (see crux/lib/scorecard-import/sources/${source}.ts).`,
-    };
-  }
-  const url = (options.url as string) || SAFERAI_DEFAULT_URL;
   const wave = (options.wave as string) || undefined;
   const refetch = !!options.refetch;
   const dryRun = !!options.dryRun || !!options["dry-run"];
-  return cmdScrapeSaferai({ url, wave, refetch, dryRun });
+  if (source === "saferai") {
+    const url = (options.url as string) || SAFERAI_DEFAULT_URL;
+    return cmdScrapeSaferai({ url, wave, refetch, dryRun });
+  }
+  if (source === "seoul_tracker" || source === "seoul") {
+    const url = (options.url as string) || SEOUL_DEFAULT_URL;
+    return cmdScrapeSeoul({ url, wave, refetch, dryRun });
+  }
+  return {
+    exitCode: 1,
+    output: `[scrape] --source=${source} not implemented; supported: saferai, seoul_tracker. Use the manual extraction step for other sources (see crux/lib/scorecard-import/sources/${source}.ts).`,
+  };
 }
 
 export const commands = {
@@ -266,7 +383,8 @@ Commands:
   sync --dry-run       Show what would be synced without writing
   list                 List available source adapters and on-disk state
   scrape               Fetch the source page and emit grades.json
-                       (currently only --source=saferai is implemented)
+                       (--source=saferai or --source=seoul_tracker;
+                       other sources still use manual extraction)
 
 Options:
   --source=<key>       Filter to a single source (fli_index, saferai,
@@ -274,10 +392,10 @@ Options:
   --verbose            Print API payloads (debug)
   --dry-run            Skip the wiki-server POST (also: print the parsed
                        wave instead of writing grades.json for scrape)
-  --url=<url>          (scrape) Source URL — defaults to SaferAI's
-                       comparison page
+  --url=<url>          (scrape) Source URL — defaults to the source's
+                       canonical entry page
   --wave=<slug>        (scrape) Override the wave slug — defaults to
-                       YYYY-MM derived from the page's "as of" footer
+                       YYYY-MM derived from the page's date hint
   --refetch            (scrape) Re-download the page even if cached HTML
                        already exists in the wave directory
 

@@ -9510,3 +9510,52 @@
     family of large language models, optimised for Korean and other
     Asian languages.
 
+# QUA-752 — lightweight org entities for Seoul Commitment Tracker ingest
+- id: samsung-electronics
+  stableId: sid_vtVXpMSmLA
+  type: organization
+  orgType: frontier-lab
+  title: Samsung Electronics
+  aliases:
+    - Samsung
+  website: https://www.samsung.com
+  description: >-
+    South Korean multinational electronics conglomerate and the largest
+    Samsung Group affiliate. Operates Samsung Research, which develops
+    the Gauss family of generative-AI models (text, code, image) used
+    inside Galaxy devices and consumer software. Signed the Frontier AI
+    Safety Commitments at the 2024 AI Seoul Summit.
+
+- id: technology-innovation-institute
+  stableId: sid_vdiqZuY7zQ
+  type: organization
+  orgType: frontier-lab
+  title: Technology Innovation Institute
+  aliases:
+    - TII
+    - TII UAE
+  website: https://www.tii.ae
+  description: >-
+    Abu Dhabi government-backed applied research institute under the
+    Advanced Technology Research Council. Best known for the open-weight
+    Falcon family of large language models (Falcon-7B/40B/180B and
+    Falcon 2). Signed the Frontier AI Safety Commitments at the 2024
+    AI Seoul Summit.
+
+- id: zhipu-ai
+  stableId: sid_DjBpGIOiGQ
+  type: organization
+  orgType: frontier-lab
+  title: Zhipu AI
+  aliases:
+    - Zhipu.ai
+    - 智谱 AI
+    - Zhipu
+  website: https://www.zhipuai.cn
+  description: >-
+    Beijing-based AI lab spun out of Tsinghua University's Knowledge
+    Engineering Group. Develops the GLM (General Language Model) and
+    ChatGLM families of bilingual Chinese-English LLMs, plus the
+    GLM-4-Vision multimodal series. Signed the Frontier AI Safety
+    Commitments at the 2024 AI Seoul Summit.
+
