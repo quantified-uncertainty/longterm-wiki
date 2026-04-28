@@ -37,16 +37,19 @@
 
 import { execSync, execFileSync, spawn, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { config as dotenvConfig } from 'dotenv';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // Load .env so child validators inherit PROD_LONGTERMWIKI_SERVER_URL etc.
 // Without this, validators that fetch from wiki-server fall back to the local
 // snapshot (often stale), which manifests as gate-baseline-drift between
-// local and CI. See QUA-755.
+// local and CI. See QUA-755. Falls back to fileURLToPath(import.meta.url) when
+// import.meta.dirname is undefined (older tsx CJS transforms).
+const HERE = import.meta.dirname ?? dirname(fileURLToPath(import.meta.url));
 dotenvConfig({
-  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  path: resolve(HERE, '..', '..', '.env'),
   quiet: true,
   override: false,
 });
