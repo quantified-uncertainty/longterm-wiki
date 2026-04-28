@@ -116,6 +116,16 @@ export function groupCommits(subjects: string[]): Record<CommitCategory, string[
 // ── Sub-PR deploy task aggregation ──────────────────────────────────────────
 
 /**
+ * Default lookback window for paginating closed PRs. 60 days is generous —
+ * the SHA-membership filter (`commitShasInReleaseDiff`) is what actually
+ * decides inclusion, so this only bounds the pagination scan. Long-paused
+ * release cadences or long-lived branches still get discovered. Tradeoff:
+ * pushing past `fetchMergedPrsInWindow`'s page cap (~1000 PRs) trips the
+ * `truncated` warning surfaced below.
+ */
+const SUB_PR_LOOKBACK_DAYS = 60;
+
+/**
  * Returns the set of commit SHAs reachable from `origin/main` but not from
  * `origin/production` — i.e. the commits this release would actually deploy.
  *
@@ -123,9 +133,23 @@ export function groupCommits(subjects: string[]): Record<CommitCategory, string[
  * merge commit is part of this release's diff. PRs whose merge commits are
  * already on production have, by definition, already shipped — their
  * checklist items belong to a prior release PR (QUA-756).
+ *
+ * Returns an empty Set when `origin/production` doesn't exist (first deploy,
+ * fresh clone, deleted branch). Distinguishable by the caller from "diff is
+ * legitimately empty" via the `gitFn` injection point — tests pass a fake.
  */
-export function commitShasInReleaseDiff(): Set<string> {
-  const output = git('log', 'origin/production..origin/main', '--format=%H');
+export function commitShasInReleaseDiff(
+  gitFn: (...args: string[]) => string = git,
+): Set<string> {
+  // Guard against missing `origin/production` — git log would throw. Without
+  // this, a transient git failure is swallowed by generateReleaseBody's
+  // catch and produces an empty sub-PR task list with no operator signal.
+  try {
+    gitFn('rev-parse', '--verify', 'origin/production');
+  } catch {
+    return new Set();
+  }
+  const output = gitFn('log', 'origin/production..origin/main', '--format=%H');
   if (!output) return new Set();
   return new Set(output.split('\n').filter(Boolean));
 }
@@ -141,28 +165,29 @@ export function commitShasInReleaseDiff(): Set<string> {
  * to PRs actually being deployed by THIS release. Without this, every new
  * release PR re-listed unchecked items from prior releases (QUA-756).
  *
- * The `lookbackDays` window only bounds the GitHub PR pagination scan; it
- * is intentionally generous (60 days) so a long-paused release cadence or
- * a long-lived branch still gets discovered before SHA-membership prunes
- * the list. PRs outside the window but still in the release diff would be
- * silently dropped, so prefer over-fetching here.
+ * Returns `{ tasks, truncated }`. `truncated` is `true` when the GitHub PR
+ * pagination hit its page cap before reaching `lookbackDays`-old PRs — in
+ * that case PRs in the release diff but past the cap are silently omitted
+ * from `tasks`, which is the same silent-drop class QUA-450 hardened
+ * `pending`/`verify` against. Callers should surface this to operators.
  */
 export async function fetchSubPrDeployTasks(opts: {
   releaseDiffShas?: Set<string>;
   api?: typeof githubApi;
   lookbackDays?: number;
-} = {}): Promise<string[]> {
+} = {}): Promise<{ tasks: string[]; truncated: boolean }> {
   const releaseDiffShas = opts.releaseDiffShas ?? commitShasInReleaseDiff();
 
-  // Empty release diff (no commits to ship) → no sub-PR tasks apply.
-  if (releaseDiffShas.size === 0) return [];
+  // Empty release diff (no commits to ship, or origin/production missing)
+  // → no sub-PR tasks apply. Skip the GitHub fetch entirely.
+  if (releaseDiffShas.size === 0) return { tasks: [], truncated: false };
 
   const api = opts.api ?? githubApi;
-  const lookbackDays = opts.lookbackDays ?? 60;
+  const lookbackDays = opts.lookbackDays ?? SUB_PR_LOOKBACK_DAYS;
   const cutoff = new Date();
   cutoff.setDate(cutoff.getDate() - lookbackDays);
 
-  const { prs } = await fetchMergedPrsInWindow(cutoff, api);
+  const { prs, truncated } = await fetchMergedPrsInWindow(cutoff, api);
 
   const tasks: string[] = [];
 
@@ -182,7 +207,7 @@ export async function fetchSubPrDeployTasks(opts: {
     }
   }
 
-  return tasks;
+  return { tasks, truncated };
 }
 
 /**
@@ -234,8 +259,11 @@ export async function generateReleaseBody(opts: {
 
   // Fetch unchecked deploy tasks from sub-PRs merged to main
   let subPrTasks: string[] = [];
+  let subPrTruncated = false;
   try {
-    subPrTasks = await fetchSubPrDeployTasks();
+    const result = await fetchSubPrDeployTasks();
+    subPrTasks = result.tasks;
+    subPrTruncated = result.truncated;
   } catch (e: unknown) {
     const msg = e instanceof Error ? e.message : String(e);
     console.warn(`Warning: failed to fetch sub-PR deploy tasks: ${msg}`);
@@ -247,6 +275,15 @@ export async function generateReleaseBody(opts: {
   // Build the deploy checklist section
   const deploySection = formatDeployTasksSection(diffTasks, dedupedSubPrTasks);
   lines.push(deploySection);
+  // Surface pagination truncation so reviewers know some sub-PR tasks may
+  // be silently missing from the checklist (QUA-450 silent-drop class).
+  if (subPrTruncated) {
+    lines.push('');
+    lines.push('> [!WARNING]');
+    lines.push(
+      `> Sub-PR scan hit GitHub's pagination cap; PRs older than ~1000 closed PRs may be missing from the deploy checklist above. Run \`pnpm crux gh deploy-tasks pending\` for a wider scan.`,
+    );
+  }
   lines.push('');
 
   lines.push('---');
