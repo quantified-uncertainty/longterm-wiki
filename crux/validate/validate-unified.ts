@@ -21,7 +21,7 @@
  */
 
 import { fileURLToPath } from 'url';
-import { resolve } from 'path';
+import { dirname, resolve } from 'path';
 import { config as dotenvConfig } from 'dotenv';
 import { ValidationEngine, Severity, type Issue } from '../lib/validation/validation-engine.ts';
 import { allRules } from '../lib/rules/index.ts';
@@ -32,8 +32,11 @@ import { getColors } from '../lib/output.ts';
 // that fetch from the wiki-server (resource-ref-integrity) fall back to the
 // stale local snapshot and emit thousands of false-positive errors. Quiet mode
 // + override:false respects already-set env vars (e.g. CI). See QUA-755.
+// Falls back to fileURLToPath(import.meta.url) when import.meta.dirname is
+// undefined (older tsx CJS transforms).
+const HERE = import.meta.dirname ?? dirname(fileURLToPath(import.meta.url));
 dotenvConfig({
-  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  path: resolve(HERE, '..', '..', '.env'),
   quiet: true,
   override: false,
 });
