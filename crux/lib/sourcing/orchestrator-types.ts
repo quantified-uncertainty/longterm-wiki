@@ -98,6 +98,14 @@ export interface VerifyResult {
   errorType?: SourceFetchErrorType;
   /** 'deterministic-row-match' for snapshot matching, or undefined for LLM */
   checkerModel?: string;
+  /**
+   * QUA-791: source-relevance weight that propagates into
+   * `source_check_evidence.relevance_score`. NULL means "not supplied"
+   * — the aggregator treats it as full weight (1.0). Currently set to
+   * 0 when the relevance gate short-circuits to `not_applicable`; future
+   * iterations can populate this on passed rows too.
+   */
+  relevanceScore?: number | null;
 }
 
 export interface VerifyError {

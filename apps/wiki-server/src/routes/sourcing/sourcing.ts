@@ -48,6 +48,10 @@ import {
   isSourcingExempt,
 } from "../../api-types.js";
 import { coerceDisplayName } from "../shared/display-name-coerce.js";
+import {
+  recomputeVerdict,
+  recomputeVerdictBestEffort,
+} from "./recompute-verdict.js";
 
 // ---- Constants ----
 
@@ -145,9 +149,32 @@ const EvidenceBody = z.object({
   extractedQuote: z.string().max(5000).nullable().optional(),
   verdict: z.enum(VALID_VERDICTS),
   confidence: z.number().min(0).max(1).nullable().optional(),
+  /**
+   * QUA-791: relevance weight for verdict aggregation. NULL means "not
+   * supplied"; the aggregator treats it as full weight (1.0). Populated
+   * by the QUA-426 relevance gate when present.
+   */
+  relevanceScore: z.number().min(0).max(1).nullable().optional(),
   isPrimarySource: z.boolean().default(false),
   checkerModel: z.string().max(100).nullable().optional(),
   notes: z.string().max(5000).nullable().optional(),
+});
+
+/**
+ * QUA-791 Phase 1: server-side verdict recomputation.
+ *
+ * Reads all evidence rows for the (recordType, recordId, fieldName) key,
+ * applies the canonical aggregation rule, upserts source_check_verdicts.
+ * Replaces the last-writer-wins behavior of POST /verdicts.
+ */
+const VerdictRecomputeBody = z.object({
+  recordType: z.string().min(1).max(50),
+  recordId: z.string().min(1).max(MAX_ID_LENGTH),
+  fieldName: z.string().max(200).nullable().optional(),
+  entityId: z.string().max(200).nullable().optional(),
+  /** Persisted into source_check_verdicts.display_name. */
+  displayName: z.string().max(500).nullable().optional(),
+  entityDisplayName: z.string().max(500).nullable().optional(),
 });
 
 const VerdictUpsertBody = z.object({
@@ -844,6 +871,7 @@ const sourcingApp = new Hono()
         extractedQuote: body.extractedQuote ?? null,
         verdict: body.verdict,
         confidence: body.confidence ?? null,
+        relevanceScore: body.relevanceScore ?? null,
         isPrimarySource: body.isPrimarySource,
         notes: body.notes ?? null,
         checkedAt: now,
@@ -882,6 +910,7 @@ const sourcingApp = new Hono()
             extractedQuote: body.extractedQuote ?? null,
             verdict: body.verdict,
             confidence: body.confidence ?? null,
+            relevanceScore: body.relevanceScore ?? null,
             isPrimarySource: body.isPrimarySource,
             checkerModel: checkerModelVal,
             notes: body.notes ?? null,
@@ -909,6 +938,7 @@ const sourcingApp = new Hono()
               extractedQuote: body.extractedQuote ?? null,
               verdict: body.verdict,
               confidence: body.confidence ?? null,
+              relevanceScore: body.relevanceScore ?? null,
               isPrimarySource: body.isPrimarySource,
               notes: body.notes ?? null,
               checkedAt: now,
@@ -953,6 +983,19 @@ const sourcingApp = new Hono()
         )
       )
       .returning({ recordId: sourceVerdicts.recordId });
+
+    // QUA-791: recompute the aggregate so it reflects the row we just
+    // wrote (or updated). Best-effort: failure here does not fail the
+    // underlying evidence write — the next recompute call picks it up.
+    // Recompute clears `needs_recheck`; do this AFTER the auto-flag
+    // update so the recompute supersedes it (we just looked, no need
+    // to flag a recheck on this same write).
+    await recomputeVerdictBestEffort(db, {
+      recordType: body.recordType,
+      recordId: body.recordId,
+      fieldName: body.fieldName ?? null,
+      entityId: body.entityId ?? null,
+    });
 
     return c.json(
       {
@@ -1382,7 +1425,94 @@ const sourcingApp = new Hono()
       }
     }
 
+    // QUA-791: trigger server-side recompute so the persisted aggregate
+    // reflects all evidence rows (not just whatever the last caller passed).
+    //
+    // **Only recompute when evidence rows exist** — preserves back-compat
+    // for callers that use POST /verdicts as a verdict-only write
+    // (e.g. metadata-only updates, manual marker writes). If we
+    // unconditionally recomputed, those writes would resolve to
+    // 'unchecked' because there's no evidence to roll up.
+    //
+    // Best-effort: a recompute failure does not fail the underlying write.
+    const fieldNameForRecompute = fieldNameVal ?? "";
+    const evidenceCount = await db
+      .select({ count: count() })
+      .from(recordSources)
+      .where(
+        and(
+          eq(recordSources.recordType, body.recordType),
+          eq(recordSources.recordId, body.recordId),
+          sql`COALESCE(${recordSources.fieldName}, '') = ${fieldNameForRecompute}`,
+        ),
+      );
+    if ((evidenceCount[0]?.count ?? 0) > 0) {
+      await recomputeVerdictBestEffort(db, {
+        recordType: body.recordType,
+        recordId: body.recordId,
+        fieldName: fieldNameVal,
+        entityId: entityIdVal,
+        displayName: displayNameVal,
+        entityDisplayName: entityDisplayNameVal,
+      });
+    }
+
     return c.json({ ok: true }, 200);
+  })
+
+  // ---- POST /verdicts/recompute (QUA-791) ----
+  //
+  // Single canonical aggregation: read all evidence rows for
+  // (recordType, recordId, fieldName), apply the relevance-weighted rule
+  // from `sourcing-aggregation.ts`, upsert `source_check_verdicts`.
+  //
+  // Replaces the pre-Phase-1 last-writer-wins behavior at POST /verdicts.
+  // POST /verdicts itself still works for back-compat but now also calls
+  // this same code path so the persisted aggregate matches the rule.
+  .post("/verdicts/recompute", async (c) => {
+    const raw = await parseJsonBody(c);
+    if (!raw) return invalidJsonError(c);
+
+    const parsed = VerdictRecomputeBody.safeParse(raw);
+    if (!parsed.success) return validationError(c, parsed.error.message);
+
+    const body = parsed.data;
+    const db = getDrizzleDb();
+
+    const displayNameVal = coerceDisplayName(
+      body.displayName ?? null,
+      "displayName",
+      body.recordType,
+      body.recordId,
+    );
+    const entityDisplayNameVal = coerceDisplayName(
+      body.entityDisplayName ?? null,
+      "entityDisplayName",
+      body.recordType,
+      body.recordId,
+    );
+
+    const result = await recomputeVerdict(db, {
+      recordType: body.recordType,
+      recordId: body.recordId,
+      fieldName: body.fieldName ?? null,
+      entityId: body.entityId ?? null,
+      displayName: displayNameVal,
+      entityDisplayName: entityDisplayNameVal,
+    });
+
+    return c.json({
+      ok: true,
+      recordType: result.recordType,
+      recordId: result.recordId,
+      fieldName: result.fieldName,
+      verdict: result.aggregate.verdict,
+      confidence: result.aggregate.confidence,
+      sourcesChecked: result.aggregate.sourcesChecked,
+      droppedNotApplicable: result.aggregate.droppedNotApplicable,
+      contributing: result.aggregate.contributing,
+      reasoning: result.reasoning,
+    });
   })
 
   // ---- GET /resolve-names ----

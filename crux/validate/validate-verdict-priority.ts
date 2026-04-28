@@ -37,9 +37,18 @@ import { getColors } from '../lib/output.ts';
 
 const SCAN_DIRS = ['apps/web/src', 'apps/wiki-server/src', 'crux'];
 
-/** Files that legitimately define the canonical priority map. */
+/**
+ * Files that legitimately define the canonical priority map.
+ *
+ * The wiki-server cannot import from `apps/web` (architectural separation),
+ * so the same numeric ladder is mirrored in `sourcing-aggregation.ts` with
+ * an explicit "keep in sync" comment (QUA-791). Both files MUST stay
+ * aligned — a mismatch produces different aggregate verdicts on the same
+ * data depending on which side computed it.
+ */
 const ALLOWLIST = new Set<string>([
   'apps/web/src/components/shared/verdict-styles.ts',
+  'apps/wiki-server/src/routes/sourcing/sourcing-aggregation.ts',
 ]);
 
 const VERDICT_NAMES = [

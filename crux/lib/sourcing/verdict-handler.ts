@@ -40,6 +40,12 @@ export async function storeSourcingEvidence(params: {
   fieldName?: string | null;
   /** Expected value from the source data (e.g., stakeholder position + reason) */
   expectedValue?: string | null;
+  /**
+   * QUA-791: source-relevance weight for verdict aggregation. 0..1, NULL
+   * treated as 1.0 (full weight). Populated from the QUA-426 relevance
+   * gate or any other relevance heuristic the caller has available.
+   */
+  relevanceScore?: number | null;
 }, logPrefix = '[sourcing]'): Promise<void> {
   let resolvedResourceId = params.resourceId ?? null;
   if (!resolvedResourceId && params.sourceUrl) {
@@ -81,6 +87,7 @@ export async function storeSourcingEvidence(params: {
     resourceId: resolvedResourceId,
     ...(params.fieldName != null ? { fieldName: params.fieldName } : {}),
     ...(params.expectedValue != null ? { expectedValue: params.expectedValue.slice(0, 2000) } : {}),
+    ...(params.relevanceScore != null ? { relevanceScore: params.relevanceScore } : {}),
   };
 
   const response = await storeEvidenceRpc(body);
