@@ -32,6 +32,7 @@ vi.mock('../api-keys.ts', async () => {
   };
 });
 
+import type Anthropic from '@anthropic-ai/sdk';
 import {
   gradeSuggestion,
   buildGraderPrompt,
@@ -51,11 +52,7 @@ const baseInput: GraderInput = {
 
 // A non-null injected client bypasses the missing-key fail-closed branch in
 // gradeSuggestion. Stub identity is irrelevant because callLlm is mocked.
-const fakeClient = {} as Parameters<typeof gradeSuggestion>[1] extends
-  | { client?: infer C }
-  | undefined
-  ? NonNullable<C>
-  : never;
+const fakeClient = {} as unknown as Anthropic;
 
 describe('buildGraderPrompt', () => {
   it('escapes XML metacharacters in entity, claim, title, and snippet', () => {
@@ -119,58 +116,87 @@ describe('gradeSuggestion', () => {
   it('returns ok:true with parsed confidence on a valid response', async () => {
     mockCallLlm.mockResolvedValue({
       text: JSON.stringify({ confidence: 0.85, reasoning: 'title mentions exact claim' }),
+      usage: { input_tokens: 200, output_tokens: 50 },
     });
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(true);
     if (out.ok) {
       expect(out.confidence).toBe(0.85);
       expect(out.reasoning).toBe('title mentions exact claim');
+      // Haiku at $0.80/M in + $4.00/M out:
+      //   200/1e6 * 0.80 + 50/1e6 * 4.00 = 0.00016 + 0.0002 = 0.00036
+      expect(out.costUsd).toBeCloseTo(0.00036, 7);
     }
   });
 
   it('preserves boundary confidences (0 and 1) without clamping or rounding', async () => {
     mockCallLlm.mockResolvedValueOnce({
       text: JSON.stringify({ confidence: 0, reasoning: 'unrelated' }),
+      usage: { input_tokens: 100, output_tokens: 20 },
     });
     const lo = await gradeSuggestion(baseInput, { client: fakeClient });
-    expect(lo.ok && lo.confidence === 0).toBe(true);
+    expect(lo.ok).toBe(true);
+    if (lo.ok) expect(lo.confidence).toBe(0);
 
     mockCallLlm.mockResolvedValueOnce({
       text: JSON.stringify({ confidence: 1, reasoning: 'exact' }),
+      usage: { input_tokens: 100, output_tokens: 20 },
     });
     const hi = await gradeSuggestion(baseInput, { client: fakeClient });
-    expect(hi.ok && hi.confidence === 1).toBe(true);
+    expect(hi.ok).toBe(true);
+    if (hi.ok) expect(hi.confidence).toBe(1);
   });
 
-  it('fails closed when the response is not valid JSON', async () => {
-    mockCallLlm.mockResolvedValue({ text: 'not json at all just prose' });
+  it('fails closed when the response is not valid JSON, but still reports the cost the LLM charged', async () => {
+    // Token-cost rationale: the LLM was actually called and we paid for it.
+    // Reporting costUsd=0 here would let a sweep grade thousands of times
+    // with garbage responses while showing zero spend in the summary.
+    mockCallLlm.mockResolvedValue({
+      text: 'not json at all just prose',
+      usage: { input_tokens: 100, output_tokens: 30 },
+    });
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(false);
-    if (!out.ok) expect(out.reason).toMatch(/JSON parse/i);
+    if (!out.ok) {
+      expect(out.reason).toMatch(/JSON parse/i);
+      expect(out.costUsd).toBeGreaterThan(0);
+    }
   });
 
   it('fails closed when JSON parses but confidence is out of range', async () => {
     mockCallLlm.mockResolvedValue({
       text: JSON.stringify({ confidence: 1.5, reasoning: 'too high' }),
+      usage: { input_tokens: 100, output_tokens: 20 },
     });
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(false);
-    if (!out.ok) expect(out.reason).toMatch(/Schema validation/i);
+    if (!out.ok) {
+      expect(out.reason).toMatch(/Schema validation/i);
+      // Schema failure happens after the API call — cost should be real, not 0.
+      expect(out.costUsd).toBeGreaterThan(0);
+    }
   });
 
   it('fails closed when JSON parses but confidence is missing entirely', async () => {
     mockCallLlm.mockResolvedValue({
       text: JSON.stringify({ reasoning: 'forgot confidence' }),
+      usage: { input_tokens: 100, output_tokens: 20 },
     });
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(false);
   });
 
-  it('fails closed when the LLM call itself throws', async () => {
+  it('fails closed when the LLM call itself throws and reports zero cost', async () => {
+    // A pre-API failure (e.g., DNS error before a single token was streamed)
+    // legitimately costs nothing — distinct from the parse/schema failures
+    // above where the API actually charged us.
     mockCallLlm.mockRejectedValue(new Error('network blew up'));
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(false);
-    if (!out.ok) expect(out.reason).toMatch(/LLM call failed.*network blew up/i);
+    if (!out.ok) {
+      expect(out.reason).toMatch(/LLM call failed.*network blew up/i);
+      expect(out.costUsd).toBe(0);
+    }
   });
 
   it('fails closed when ANTHROPIC_BILLING_KEY is missing AND no client is injected', async () => {
@@ -187,6 +213,7 @@ describe('gradeSuggestion', () => {
     mockGetApiKey.mockReturnValue(undefined);
     mockCallLlm.mockResolvedValue({
       text: JSON.stringify({ confidence: 0.5, reasoning: 'mid' }),
+      usage: { input_tokens: 100, output_tokens: 20 },
     });
     const out = await gradeSuggestion(baseInput, { client: fakeClient });
     expect(out.ok).toBe(true);

@@ -21,6 +21,13 @@ import { callLlm, MODELS } from '../llm.ts';
 import { parseJsonResponse } from '../anthropic.ts';
 import { escapeXml } from '../prompt-utils.ts';
 import { getApiKey } from '../api-keys.ts';
+import { calculateCost } from '../pricing.ts';
+
+/** Notes emitted to the suggestions row are sliced to this length so we stay
+ *  well under the server's 2000-char `notes` cap even after the prefix. */
+const MAX_REASONING_CHARS = 200;
+/** Truncation cap for grader error messages when surfaced as `reason`. */
+const MAX_ERROR_REASON_CHARS = 160;
 
 const GraderResponseSchema = z.object({
   confidence: z.number().min(0).max(1),
@@ -87,9 +94,11 @@ confidence: float in [0.0, 1.0]. 1.0 = title/snippet clearly contains the exact 
 
 /**
  * Grade a single suggestion. Always resolves — never throws — so callers
- * can safely Promise.all() across a batch. Cost is reported even on
- * failure (in practice 0 for missing-key, possibly nonzero for a parsed
- * response that failed schema validation).
+ * can safely Promise.all() across a batch. `costUsd` is the per-call
+ * grader spend computed from token usage; sweep code is responsible for
+ * accumulating it into any aggregate budget meter. Failures before the
+ * LLM call (missing key, network exception) report 0; failures after the
+ * call (parse / schema) still report the real cost the LLM charged.
  */
 export async function gradeSuggestion(
   input: GraderInput,
@@ -121,15 +130,33 @@ export async function gradeSuggestion(
     });
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { ok: false, reason: `LLM call failed: ${msg.slice(0, 160)}`, costUsd: 0 };
+    return {
+      ok: false,
+      reason: `LLM call failed: ${msg.slice(0, MAX_ERROR_REASON_CHARS)}`,
+      costUsd: 0,
+    };
   }
+
+  // Compute real spend from the API's reported usage. `calculateCost`
+  // returns 0 (with a warning) if the model is unknown — that's
+  // acceptable since only documented Anthropic IDs flow through the
+  // sweep, and unknown costs default to under-reporting rather than
+  // mis-reporting a fake number.
+  const costUsd = calculateCost(model, {
+    inputTokens: result.usage.input_tokens,
+    outputTokens: result.usage.output_tokens,
+  });
 
   let raw: unknown;
   try {
     raw = parseJsonResponse(result.text);
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
-    return { ok: false, reason: `JSON parse failed: ${msg.slice(0, 160)}`, costUsd: 0 };
+    return {
+      ok: false,
+      reason: `JSON parse failed: ${msg.slice(0, MAX_ERROR_REASON_CHARS)}`,
+      costUsd,
+    };
   }
 
   const parsed = GraderResponseSchema.safeParse(raw);
@@ -137,7 +164,7 @@ export async function gradeSuggestion(
     return {
       ok: false,
       reason: `Schema validation failed: ${parsed.error.issues[0]?.message ?? 'unknown'}`,
-      costUsd: 0,
+      costUsd,
     };
   }
 
@@ -145,9 +172,8 @@ export async function gradeSuggestion(
     ok: true,
     confidence: parsed.data.confidence,
     reasoning: parsed.data.reasoning,
-    costUsd: 0, // Token-cost reporting is left to the caller via tracker; the
-                // grader runs with no tracker by default to keep the surface
-                // minimal. Sweep cost is dominated by Exa/Perplexity, not
-                // Haiku grading.
+    costUsd,
   };
 }
+
+export { MAX_REASONING_CHARS };

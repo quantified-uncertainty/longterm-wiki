@@ -31,6 +31,7 @@ vi.mock('../lib/sourcing/suggest-urls.ts', () => ({
 vi.mock('../lib/sourcing/grade-suggestion.ts', () => ({
   gradeSuggestion: vi.fn(),
   DEFAULT_GRADER_MODEL: 'test-grader-model',
+  MAX_REASONING_CHARS: 200,
 }));
 
 import { commands } from './sourcing-suggest-urls.ts';
@@ -287,6 +288,26 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     expect(mockGradeSuggestion).not.toHaveBeenCalled();
   });
 
+  it('accepts --auto-approve-threshold=0 (boundary): every successful grade promotes', async () => {
+    // Documenting the corner case: threshold=0 means "any successful grade
+    // is good enough to auto-approve". Realistic values are 0.5–0.9 but
+    // the contract is `confidence >= threshold` and 0 is a legal value.
+    // If we wanted to forbid it, we'd reject in the parser. Currently we
+    // don't, so this test pins that 0 means "auto-approve anything that
+    // grades successfully" — not "disable auto-approve".
+    stubSingleCandidateRun([{ url: 'https://example.com/a', title: 'A' }]);
+    mockGradeSuggestion.mockResolvedValueOnce({
+      ok: true,
+      confidence: 0,
+      reasoning: 'totally unrelated',
+      costUsd: 0,
+    });
+    const result = await run({ 'auto-approve-threshold': '0', limit: '10' });
+    expect(result.exitCode).toBe(0);
+    const upsertArg = mockUpsertUrlSuggestions.mock.calls[0][0];
+    expect(upsertArg[0].status).toBe('auto_verified');
+  });
+
   it('does not call the grader when --auto-approve-threshold is absent (default off)', async () => {
     stubSingleCandidateRun([{ url: 'https://example.com/a', title: 'A' }]);
     const result = await run({ limit: '10' });
@@ -316,7 +337,13 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     expect(upsertArg[0].notes).toMatch(/auto-approve.*confidence=0\.90/);
   });
 
-  it('keeps a candidate as pending when confidence < threshold', async () => {
+  it('keeps a candidate as pending when confidence < threshold AND emits NO notes', async () => {
+    // Audit-trail rule: a below-threshold candidate must not write a notes
+    // value, because the server's COALESCE-on-notes clause would overwrite
+    // an already-present audit note from a prior auto_verified promotion
+    // (the row's status would stay auto_verified per the SQL CASE, but its
+    // notes would silently flip to "below-threshold..."). Omitting notes
+    // here keeps re-runs idempotent for already-promoted rows.
     stubSingleCandidateRun([{ url: 'https://example.com/a', title: 'A' }]);
     mockGradeSuggestion.mockResolvedValueOnce({
       ok: true,
@@ -328,7 +355,7 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     expect(result.exitCode).toBe(0);
     const upsertArg = mockUpsertUrlSuggestions.mock.calls[0][0];
     expect(upsertArg[0].status).toBe('pending');
-    expect(upsertArg[0].notes).toMatch(/below-threshold/);
+    expect(upsertArg[0].notes).toBeUndefined();
   });
 
   it('treats >= threshold as inclusive (boundary case)', async () => {
@@ -348,7 +375,11 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     expect(upsertArg[0].status).toBe('auto_verified');
   });
 
-  it('falls back to pending and counts a grader error when grader returns ok=false', async () => {
+  it('falls back to pending, counts a grader error, AND emits NO notes', async () => {
+    // Same audit-trail rule as the below-threshold case: a grader error
+    // must not produce a notes value that could overwrite an existing
+    // auto-approve audit note on re-runs. Visibility lives in the
+    // run summary's auto_approve_grader_errors counter, not in the row.
     stubSingleCandidateRun([{ url: 'https://example.com/a', title: 'A' }]);
     mockGradeSuggestion.mockResolvedValueOnce({
       ok: false,
@@ -366,7 +397,7 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     expect(parsed.summary.auto_approve_grader_errors).toBe(1);
     const upsertArg = mockUpsertUrlSuggestions.mock.calls[0][0];
     expect(upsertArg[0].status).toBe('pending');
-    expect(upsertArg[0].notes).toMatch(/grader error.*fail-closed/);
+    expect(upsertArg[0].notes).toBeUndefined();
   });
 
   it('grades candidates per-record so mixed batches end up with mixed statuses', async () => {
@@ -430,5 +461,31 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     const parsed = JSON.parse(result.output);
     expect(parsed.summary.auto_approved_candidates).toBe(1);
     expect(parsed.summary.auto_approve_grader_errors).toBe(0);
+  });
+
+  it('accumulates grader costUsd into the run-wide cost meter', async () => {
+    // Why this matters: --budget would be a fiction if grader spend went
+    // untracked. With Haiku at ~$0.001/grade × 3 candidates × 750 records,
+    // a sweep can accumulate ~$2 of LLM spend invisibly. The grader
+    // returns real costUsd computed from token usage; this test pins
+    // that the call site is summing it.
+    stubSingleCandidateRun([
+      { url: 'https://example.com/a', title: 'A' },
+      { url: 'https://example.com/b', title: 'B' },
+    ]);
+    mockGradeSuggestion
+      .mockResolvedValueOnce({ ok: true, confidence: 0.9, reasoning: 'a', costUsd: 0.0007 })
+      .mockResolvedValueOnce({ ok: false, reason: 'parse fail', costUsd: 0.0003 });
+    const result = await run({
+      'auto-approve-threshold': '0.8',
+      limit: '10',
+      json: true,
+    });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    // Search-provider cost from the suggestUrls mock is 0; grader cost is
+    // 0.0007 + 0.0003 = 0.001. Anything <= 0 would mean the call site
+    // dropped the grader's costUsd field.
+    expect(parsed.summary.cost_usd).toBeCloseTo(0.001, 4);
   });
 });
