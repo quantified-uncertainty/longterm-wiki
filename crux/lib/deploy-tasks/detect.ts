@@ -1,6 +1,8 @@
 import { execFileSync } from "child_process";
 import { readFileSync } from "fs";
-import { basename, join } from "path";
+import { basename } from "path";
+
+import { TABLEBASE_NON_ROUTE_FILES } from "../../../apps/wiki-server/src/routes/tablebase/mount-registry.ts";
 
 import type {
   DeployTask,
@@ -32,7 +34,7 @@ const KNOWN_ENV_VARS = new Set([
   "npm_package_name",
 ]);
 
-interface ChangedFile {
+export interface ChangedFile {
   status: "A" | "M" | "D" | "R" | "C" | "T" | "U";
   path: string;
   /** For renames, the original path */
@@ -371,7 +373,30 @@ function detectConfigChanges(files: ChangedFile[]): DeployTask[] {
   return tasks;
 }
 
-function detectNewRoutes(files: ChangedFile[]): DeployTask[] {
+const TABLEBASE_PREFIX = "apps/wiki-server/src/routes/tablebase/";
+const SHARED_PREFIX = "apps/wiki-server/src/routes/shared/";
+
+/**
+ * Set of TableBase filenames that are NOT routes (helpers, schemas, the
+ * registry itself). Mirrors the canonical list maintained in `mount-registry.ts`
+ * and consumed by `validate-tablebase-completeness.ts`,
+ * `validate-tablebase-registry.ts`, and `mount-registry.test.ts` — drift in
+ * either direction is prevented by the mount-registry test pair.
+ */
+const TABLEBASE_NON_ROUTES = new Set<string>(TABLEBASE_NON_ROUTE_FILES);
+
+/**
+ * Detect new wiki-server routes from added files.
+ *
+ * The detector excludes obvious non-routes:
+ *   - `index.ts` (re-export hubs)
+ *   - anything under `apps/wiki-server/src/routes/shared/` (utility helpers)
+ *   - tablebase files in `TABLEBASE_NON_ROUTE_FILES` (QUA-712 — these are
+ *     helpers like `system-card-benchmark-linker.ts` colocated with routes)
+ *
+ * Exported so tests can drive it with a controlled set of changed files.
+ */
+export function detectNewRoutes(files: ChangedFile[]): DeployTask[] {
   const tasks: DeployTask[] = [];
   const routeFiles = files.filter(
     (f) =>
@@ -380,6 +405,22 @@ function detectNewRoutes(files: ChangedFile[]): DeployTask[] {
   );
 
   for (const file of routeFiles) {
+    const filename = basename(file.path);
+
+    // Re-export hubs and shared helpers are never routes.
+    if (filename === "index.ts") continue;
+    if (file.path.startsWith(SHARED_PREFIX)) continue;
+
+    // Tablebase helpers (system-card-benchmark-linker, sync-factory, schemas, etc.)
+    // are colocated with route files. The canonical exclusion list lives in
+    // mount-registry.ts and is enforced by the mount-registry test pair.
+    if (
+      file.path.startsWith(TABLEBASE_PREFIX) &&
+      TABLEBASE_NON_ROUTES.has(filename)
+    ) {
+      continue;
+    }
+
     const routeName = extractRouteName(file.path);
     tasks.push({
       id: `route-${routeName}`,

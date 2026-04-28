@@ -5,6 +5,8 @@ import {
   parseDeployTasksFromBody,
   formatDeployTasksSection,
   preserveCheckedState,
+  detectNewRoutes,
+  type ChangedFile,
 } from '../detect.ts';
 import type { DeployTask } from '../types.ts';
 
@@ -1378,5 +1380,106 @@ describe('extractVerifyCommand', () => {
       'curl -sf "$WIKI_SERVER_URL/health"'
     );
     expect(extractVerifyCommand(parsed!.items[2].text)).toBeNull();
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// detectNewRoutes — QUA-712 (skip tablebase helpers via TABLEBASE_NON_ROUTE_FILES)
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('detectNewRoutes', () => {
+  function added(path: string): ChangedFile {
+    return { status: 'A', path };
+  }
+
+  it('flags a registered tablebase route', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/benchmarks.ts'),
+    ]);
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].id).toBe('route-benchmarks');
+    expect(tasks[0].sourceFiles).toEqual([
+      'apps/wiki-server/src/routes/tablebase/benchmarks.ts',
+    ]);
+  });
+
+  it('flags a manually-mounted tablebase route (things)', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/things.ts'),
+    ]);
+    expect(tasks).toHaveLength(1);
+    expect(tasks[0].id).toBe('route-things');
+  });
+
+  it('skips system-card-benchmark-linker.ts (regression: QUA-712)', () => {
+    // PR #4600 / QUA-702: this helper module was flagged as a route.
+    const tasks = detectNewRoutes([
+      added(
+        'apps/wiki-server/src/routes/tablebase/system-card-benchmark-linker.ts',
+      ),
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('skips other tablebase non-route files (sync-factory, schemas, audit, shared helpers)', () => {
+    // These all live in TABLEBASE_NON_ROUTE_FILES.
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/sync-factory.ts'),
+      added('apps/wiki-server/src/routes/tablebase/sourcing-schema.ts'),
+      added('apps/wiki-server/src/routes/tablebase/audit-log.ts'),
+      added('apps/wiki-server/src/routes/tablebase/benchmark-shared.ts'),
+      added('apps/wiki-server/src/routes/tablebase/write-inline-verdicts.ts'),
+      added('apps/wiki-server/src/routes/tablebase/entity-profile-descriptions.ts'),
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('skips index.ts re-export hubs in any subdirectory', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/index.ts'),
+      added('apps/wiki-server/src/routes/operational/index.ts'),
+      added('apps/wiki-server/src/routes/factbase/index.ts'),
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('skips files under routes/shared/ (utility helpers, never routes)', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/shared/delete-batch.ts'),
+      added('apps/wiki-server/src/routes/shared/query-helpers.ts'),
+      added('apps/wiki-server/src/routes/shared/validate-entity-refs.ts'),
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('flags non-tablebase routes (operational, factbase, sourcing)', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/operational/agent-sessions.ts'),
+      added('apps/wiki-server/src/routes/factbase/facts.ts'),
+      added('apps/wiki-server/src/routes/sourcing/sourcing.ts'),
+    ]);
+    expect(tasks).toHaveLength(3);
+    expect(tasks.map((t) => t.id).sort()).toEqual([
+      'route-agent-sessions',
+      'route-facts',
+      'route-sourcing',
+    ]);
+  });
+
+  it('ignores modifications and deletions (only flags new files)', () => {
+    const tasks = detectNewRoutes([
+      { status: 'M', path: 'apps/wiki-server/src/routes/tablebase/benchmarks.ts' },
+      { status: 'D', path: 'apps/wiki-server/src/routes/tablebase/grants.ts' },
+    ]);
+    expect(tasks).toEqual([]);
+  });
+
+  it('produces verify command with the correct route name', () => {
+    const tasks = detectNewRoutes([
+      added('apps/wiki-server/src/routes/tablebase/safety-frameworks.ts'),
+    ]);
+    expect(tasks[0].verifyCommand).toBe(
+      'curl -sf "$WIKI_SERVER_URL/safety-frameworks" -o /dev/null -w "%{http_code}"',
+    );
   });
 });
