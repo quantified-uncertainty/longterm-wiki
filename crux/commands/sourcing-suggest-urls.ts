@@ -31,6 +31,12 @@ import {
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
 import { suggestUrls, GENERATOR_MODEL } from '../lib/sourcing/suggest-urls.ts';
+import {
+  gradeSuggestion,
+  DEFAULT_GRADER_MODEL,
+  type GraderOutcome,
+} from '../lib/sourcing/grade-suggestion.ts';
+import { createClient as createAnthropicClient } from '../lib/anthropic.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 const DEFAULT_LIMIT = 50;
@@ -87,6 +93,10 @@ interface SuggestOptions extends BaseOptions {
   ci?: boolean;
   'skip-existing'?: boolean;
   skipExisting?: boolean;
+  'auto-approve-threshold'?: string;
+  autoApproveThreshold?: string;
+  'auto-approve-model'?: string;
+  autoApproveModel?: string;
 }
 
 /**
@@ -115,6 +125,24 @@ function parsePositiveFloat(raw: unknown, fallback: number, flag: string): numbe
   if (!Number.isFinite(n) || n <= 0) {
     process.stderr.write(`warning: ignoring --${flag}=${raw} (expected positive number)\n`);
     return fallback;
+  }
+  return n;
+}
+
+/**
+ * Parse a [0, 1] confidence threshold. Returns `null` (auto-approve disabled)
+ * when the flag is absent. Out-of-range or non-numeric values exit with an
+ * error rather than silently disabling — auto-approval is high-stakes enough
+ * (it bypasses human review) that a typo should fail loudly, not coast through
+ * as "off."
+ */
+function parseAutoApproveThreshold(raw: unknown): number | null | { error: string } {
+  if (raw === undefined || raw === null || raw === '') return null;
+  const n = parseFloat(String(raw));
+  if (!Number.isFinite(n) || n < 0 || n > 1) {
+    return {
+      error: `Invalid --auto-approve-threshold "${String(raw)}". Must be a number in [0, 1].`,
+    };
   }
   return n;
 }
@@ -151,6 +179,8 @@ interface RunSummary {
   budgetExhausted: boolean;
   providersUsed: Set<string>;
   providersSkipped: Set<string>;
+  autoApprovedCandidates: number;
+  autoApproveGraderErrors: number;
 }
 
 function makeSummary(): RunSummary {
@@ -165,6 +195,8 @@ function makeSummary(): RunSummary {
     budgetExhausted: false,
     providersUsed: new Set(),
     providersSkipped: new Set(),
+    autoApprovedCandidates: 0,
+    autoApproveGraderErrors: 0,
   };
 }
 
@@ -188,6 +220,8 @@ function summaryToJson(s: RunSummary, dryRun: boolean) {
     budget_exhausted: s.budgetExhausted,
     providers_used: used,
     providers_skipped: skipped,
+    auto_approved_candidates: s.autoApprovedCandidates,
+    auto_approve_grader_errors: s.autoApproveGraderErrors,
     dry_run: dryRun,
   };
 }
@@ -198,6 +232,12 @@ function formatSummary(s: RunSummary, dryRun: boolean): string {
   const skippedLine = skipped.length > 0
     ? `\nProviders skipped:      ${skipped.join(', ')}`
     : '';
+  // Only include auto-approve lines when the feature was actually used
+  // (i.e. at least one candidate was graded). Keeps default output unchanged.
+  const autoApproveLines =
+    s.autoApprovedCandidates > 0 || s.autoApproveGraderErrors > 0
+      ? `\nAuto-approved:          ${s.autoApprovedCandidates}\nGrader errors:          ${s.autoApproveGraderErrors}`
+      : '';
   return (
 `
 === Summary ===
@@ -209,7 +249,7 @@ Suggestions written:    ${s.suggestionsWritten}${dryRun ? ' (dry-run)' : ''}
 Provider errors:        ${s.providerErrors}
 Cost:                   $${s.costUsd.toFixed(4)}
 Budget exhausted:       ${s.budgetExhausted ? 'yes' : 'no'}
-Providers used:         ${usedList}${skippedLine}`
+Providers used:         ${usedList}${skippedLine}${autoApproveLines}`
   );
 }
 
@@ -265,6 +305,39 @@ async function suggestCommand(
   const skipExisting = options['skip-existing'] ?? options.skipExisting ?? true;
   const isJson = Boolean(options.json || options.ci);
 
+  // Auto-approve threshold is opt-in — absence keeps the historical
+  // status='pending' behavior. Any non-empty value is parsed strictly:
+  // out-of-range or non-numeric values fail the command rather than
+  // silently disabling, because a typo here would invisibly route a
+  // sweep past the human-review queue.
+  const thresholdParsed = parseAutoApproveThreshold(
+    options['auto-approve-threshold'] ?? options.autoApproveThreshold,
+  );
+  if (thresholdParsed !== null && typeof thresholdParsed === 'object') {
+    return { exitCode: 1, output: thresholdParsed.error };
+  }
+  const autoApproveThreshold: number | null = thresholdParsed;
+  const autoApproveModel =
+    (options['auto-approve-model'] ?? options.autoApproveModel)?.trim() ||
+    DEFAULT_GRADER_MODEL;
+
+  // Build the LLM client once and reuse across all grader calls; the alternative
+  // (one new client per candidate) is wasteful for sweeps that grade thousands
+  // of suggestions. `required: false` keeps the grader's fail-closed contract:
+  // a missing key returns a null client and gradeSuggestion handles it itself.
+  const graderClient =
+    autoApproveThreshold !== null
+      ? createAnthropicClient({ required: false })
+      : null;
+  if (autoApproveThreshold !== null && !graderClient) {
+    // The user explicitly asked for auto-approval but the key isn't set, so
+    // every candidate will fail-closed to 'pending'. Warn loudly so they
+    // don't read a clean run summary and assume the grader did its job.
+    process.stderr.write(
+      'warning: --auto-approve-threshold is set but ANTHROPIC_BILLING_KEY is missing — every candidate will fail-closed to status=pending\n',
+    );
+  }
+
   const log = (msg: string) => { if (!isJson) console.log(msg); };
 
   log(`Sourcing Suggest URLs (QUA-64)`);
@@ -274,6 +347,9 @@ async function suggestCommand(
   log(`  max-candidates: ${maxCandidates}`);
   if (recordTypeFilter) log(`  record type:    ${recordTypeFilter}`);
   if (entityFilter) log(`  entity:         ${entityFilter}`);
+  if (autoApproveThreshold !== null) {
+    log(`  auto-approve:   threshold=${autoApproveThreshold} model=${autoApproveModel}`);
+  }
   if (dryRun) log(`  dry-run:        yes`);
   log('');
 
@@ -403,7 +479,52 @@ async function suggestCommand(
     if (result.candidates.length === 0) return;
     summary.generatedForRecords++;
 
-    for (const cand of result.candidates) {
+    // When auto-approval is on, grade each candidate via a cheap LLM and
+    // promote ≥threshold to `auto_verified`. Grader failures fall through
+    // to `pending` (fail-closed). The grader is per-candidate (not
+    // per-record) because the same record may have one strong + two weak
+    // candidates — we want only the strong one promoted.
+    let outcomes: GraderOutcome[] | null = null;
+    if (autoApproveThreshold !== null) {
+      outcomes = await Promise.all(
+        result.candidates.map((cand) =>
+          gradeSuggestion(
+            {
+              entityName,
+              claimText,
+              fieldName: v.fieldName ?? null,
+              candidate: { url: cand.url, title: cand.title, snippet: cand.snippet },
+            },
+            // Pass the shared client when present; null means the key was
+            // missing at startup, in which case the grader's own
+            // fail-closed branch handles it.
+            graderClient
+              ? { model: autoApproveModel, client: graderClient }
+              : { model: autoApproveModel },
+          ),
+        ),
+      );
+    }
+
+    for (let i = 0; i < result.candidates.length; i++) {
+      const cand = result.candidates[i];
+      let status: 'pending' | 'auto_verified' = 'pending';
+      let notes: string | undefined;
+      if (outcomes) {
+        const outcome = outcomes[i];
+        if (outcome.ok) {
+          if (outcome.confidence >= (autoApproveThreshold as number)) {
+            status = 'auto_verified';
+            summary.autoApprovedCandidates++;
+            notes = `auto-approve: confidence=${outcome.confidence.toFixed(2)} model=${autoApproveModel} reasoning=${outcome.reasoning.slice(0, 200)}`;
+          } else {
+            notes = `auto-approve: below-threshold confidence=${outcome.confidence.toFixed(2)}`;
+          }
+        } else {
+          summary.autoApproveGraderErrors++;
+          notes = `auto-approve: grader error (fail-closed to pending) — ${outcome.reason.slice(0, 200)}`;
+        }
+      }
       toUpsert.push({
         recordType: v.recordType,
         recordId: v.recordId,
@@ -415,7 +536,8 @@ async function suggestCommand(
         relevanceScore: cand.relevanceScore,
         sourceProvider: cand.sourceProvider,
         generatorModel: GENERATOR_MODEL,
-        status: 'pending',
+        status,
+        ...(notes !== undefined && { notes }),
       });
     }
   });
@@ -466,6 +588,11 @@ Options:
   --entity=X             Filter by entityId or entityDisplayName
   --max-candidates=N     Candidates per record (default: ${DEFAULT_MAX_CANDIDATES}, max: ${MAX_CANDIDATES_PER_RECORD})
   --skip-existing        Skip records with existing pending suggestions (default: on)
+  --auto-approve-threshold=N   LLM-grade each candidate (title+snippet only; no fetch)
+                         and write status='auto_verified' for confidence >= N (0..1).
+                         Default: off (all suggestions stay 'pending'). Grader failures
+                         fail-closed to 'pending'.
+  --auto-approve-model=X       Override the grader model (default: ${DEFAULT_GRADER_MODEL}).
   --dry-run              Enumerate records without calling providers or writing
   --json / --ci          Machine-readable JSON output
 
@@ -475,7 +602,9 @@ Workflow:
   3. Batch-upserts candidates to /api/sourcing/url-suggestions for human review
      or auto-recheck. Human decisions (approved/rejected) are preserved on re-runs.
 
-Requires EXA_API_KEY and/or OPENROUTER_API_KEY. Missing keys degrade gracefully.
+Requires EXA_API_KEY and/or OPENROUTER_API_KEY for URL discovery. Missing keys
+degrade gracefully (--auto-approve-threshold additionally requires
+ANTHROPIC_BILLING_KEY; missing it fails-closed: every grade returns "pending").
 Requires WIKI_SERVER_ENV=prod in agent slots.
 `.trim();
 }
