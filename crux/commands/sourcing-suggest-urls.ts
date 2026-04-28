@@ -48,6 +48,11 @@ const PREFETCH_PAGE_SIZE = 200;
 const PREFETCH_MAX = 2000;
 const UPSERT_CHUNK = 100;
 const DEFAULT_CONCURRENCY = 5;
+// Server schema (apps/wiki-server/.../url-suggestions.ts SuggestionInput) caps
+// these fields. Search providers occasionally return values that exceed them,
+// which would reject the entire batch upsert (~100 records). Truncate defensively.
+const MAX_TITLE_CHARS = 500;
+const MAX_SNIPPET_CHARS = 2000;
 
 const DEFAULT_VERDICT: SourcingVerdict = 'unverifiable';
 // Only verdicts where weak source URLs are the suspected root cause.
@@ -77,6 +82,14 @@ const ALLOWED_SUGGEST_VERDICTS: ReadonlySet<string> = new Set<SourcingVerdict>([
 // Guard drift between DEFAULT_VERDICT and the allowlist.
 if (!ALLOWED_SUGGEST_VERDICTS.has(DEFAULT_VERDICT)) {
   throw new Error(`DEFAULT_VERDICT "${DEFAULT_VERDICT}" is not in ALLOWED_SUGGEST_VERDICTS`);
+}
+
+export function clampForUpsert(
+  value: string | null | undefined,
+  max: number,
+): string | null | undefined {
+  if (value == null) return value;
+  return value.length <= max ? value : value.slice(0, max);
 }
 
 interface SuggestOptions extends BaseOptions {
@@ -521,8 +534,8 @@ async function suggestCommand(
         fieldName: v.fieldName,
         entityId: v.entityId,
         suggestedUrl: cand.url,
-        title: cand.title,
-        snippet: cand.snippet,
+        title: clampForUpsert(cand.title, MAX_TITLE_CHARS),
+        snippet: clampForUpsert(cand.snippet, MAX_SNIPPET_CHARS),
         relevanceScore: cand.relevanceScore,
         sourceProvider: cand.sourceProvider,
         generatorModel: GENERATOR_MODEL,

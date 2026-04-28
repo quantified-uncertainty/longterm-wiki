@@ -34,7 +34,7 @@ vi.mock('../lib/sourcing/grade-suggestion.ts', () => ({
   MAX_REASONING_CHARS: 200,
 }));
 
-import { commands } from './sourcing-suggest-urls.ts';
+import { commands, clampForUpsert } from './sourcing-suggest-urls.ts';
 import { suggestUrls } from '../lib/sourcing/suggest-urls.ts';
 import { gradeSuggestion } from '../lib/sourcing/grade-suggestion.ts';
 
@@ -487,5 +487,65 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
     // 0.0007 + 0.0003 = 0.001. Anything <= 0 would mean the call site
     // dropped the grader's costUsd field.
     expect(parsed.summary.cost_usd).toBeCloseTo(0.001, 4);
+  });
+});
+
+describe('sourcing-suggest-urls field length clamping', () => {
+  // Server schema rejects suggestions where title > 500 or snippet > 2000
+  // (apps/wiki-server/.../url-suggestions.ts). Search providers occasionally
+  // return values past those caps, which would reject the entire ~100-row
+  // upsert chunk. Real failure observed during the QUA-594 sweep:
+  // `upsert failed at chunk 3: title String must contain at most 500 character(s)`.
+  beforeEach(() => {
+    vi.clearAllMocks();
+  });
+
+  it('clampForUpsert returns short values unchanged and truncates over-long values', () => {
+    expect(clampForUpsert('short', 500)).toBe('short');
+    expect(clampForUpsert(null, 500)).toBe(null);
+    expect(clampForUpsert(undefined, 500)).toBe(undefined);
+    const long = 'x'.repeat(800);
+    const clamped = clampForUpsert(long, 500);
+    expect(clamped).toHaveLength(500);
+    expect(clamped).toBe('x'.repeat(500));
+  });
+
+  it('clamps over-long candidate titles and snippets before upsert', async () => {
+    stubEmptyPrereqs();
+    mockListVerdicts.mockResolvedValueOnce({
+      ok: true,
+      data: { verdicts: [makeVerdict({ recordId: 'g_long', entityId: 'anthropic' })], total: 1 },
+    });
+    const longTitle = 'T'.repeat(900);
+    const longSnippet = 'S'.repeat(3000);
+    mockSuggestUrls.mockResolvedValueOnce({
+      candidates: [
+        {
+          url: 'https://example.com/long',
+          title: longTitle,
+          snippet: longSnippet,
+          relevanceScore: 0.5,
+          sourceProvider: 'exa',
+        },
+      ],
+      providersUsed: ['exa'],
+      providersSkipped: [],
+      query: 'test',
+      costUsd: 0,
+    });
+    mockUpsertUrlSuggestions.mockResolvedValueOnce({
+      ok: true,
+      data: { upserted: 1 },
+    });
+
+    const result = await run({ limit: '10' });
+    expect(result.exitCode).toBe(0);
+    expect(mockUpsertUrlSuggestions).toHaveBeenCalledTimes(1);
+    const payload = mockUpsertUrlSuggestions.mock.calls[0][0] as Array<{
+      title: string | null;
+      snippet: string | null;
+    }>;
+    expect(payload[0].title).toHaveLength(500);
+    expect(payload[0].snippet).toHaveLength(2000);
   });
 });
