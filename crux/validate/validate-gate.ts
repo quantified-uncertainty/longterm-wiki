@@ -387,6 +387,16 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'verdict-priority',
+    name: 'Verdict severity priority is canonical (QUA-429)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-verdict-priority.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new ad-hoc verdict priority maps from drifting from
+    // SOURCE_CHECK_VERDICT_PRIORITY in verdict-styles.ts. Distinct priorities
+    // (recheck scheduling, curation order) opt out via `// verdict-priority-ok`.
+  },
+  {
     id: 'dangerous-patterns',
     name: 'Data-integrity anti-patterns (silent catch, as any in routes, skipEntityValidation without reason)',
     command: 'npx',
