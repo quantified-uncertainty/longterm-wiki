@@ -733,6 +733,7 @@ interface MainCommitsGql {
             statusCheckRollup: {
               state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL';
               contexts: {
+                pageInfo: { hasNextPage: boolean };
                 nodes: RollupContext[];
               };
             } | null;
@@ -757,6 +758,9 @@ const MAIN_COMMITS_QUERY = /* GraphQL */ `
                 statusCheckRollup {
                   state
                   contexts(first: 100) {
+                    pageInfo {
+                      hasNextPage
+                    }
                     nodes {
                       __typename
                       ... on CheckRun {
@@ -805,6 +809,7 @@ export async function checkMainCi(
     conclusion: mapRollupState(
       n.statusCheckRollup?.state ?? null,
       n.statusCheckRollup?.contexts?.nodes ?? [],
+      { contextsTruncated: n.statusCheckRollup?.contexts?.pageInfo?.hasNextPage ?? false },
     ),
   }));
 
@@ -813,9 +818,10 @@ export async function checkMainCi(
 
 /**
  * Map GitHub's aggregate `statusCheckRollup.state` to our internal CommitStatus
- * conclusion. When the rollup is FAILURE/ERROR we examine the individual checks
- * via `contexts`: a rollup that failed only because some checks were CANCELLED
- * (with no real failures alongside) is treated as `neutral`, not `failure`.
+ * conclusion. When the rollup is FAILURE or ERROR we examine the individual
+ * checks via `contexts`: a rollup that failed only because some checks were
+ * CANCELLED (with no real failures alongside) is treated as `neutral`, not
+ * `failure`.
  *
  * Why: GitHub's rollup is FAILURE if any check is cancelled, even if every
  * test/build job passed. When a workflow uses `cancel-in-progress: true` on a
@@ -824,20 +830,26 @@ export async function checkMainCi(
  * The patrol's main-ci-red gate would then trip on phantom failures and halt
  * PR work indefinitely (QUA-731).
  *
- * `contexts` is optional for backwards-compat with callers that haven't been
- * updated to fetch it; without contexts we fall back to the rollup state alone.
+ * Fail-closed: if `contexts` is empty (caller didn't fetch them) or
+ * `contextsTruncated` is true (more checks exist than were fetched, so a real
+ * failure could be hiding in the tail), we preserve the original FAILURE/ERROR
+ * mapping rather than reclassifying based on incomplete data.
+ *
+ * `contexts` defaults to `[]` for backwards-compat with existing callers and
+ * tests that don't pass check-context info.
  */
 export function mapRollupState(
   state: 'SUCCESS' | 'FAILURE' | 'PENDING' | 'ERROR' | 'EXPECTED' | 'NEUTRAL' | null,
   contexts: RollupContext[] = [],
+  options: { contextsTruncated?: boolean } = {},
 ): CommitStatus['conclusion'] {
   if (state === 'SUCCESS') return 'success';
   if (state === 'PENDING' || state === 'EXPECTED') return 'pending';
   if (state === 'NEUTRAL') return 'neutral';
   if (state === 'FAILURE' || state === 'ERROR') {
-    // Without contexts we can't distinguish cancellation from real failure —
-    // err on the side of the existing behaviour (treat as failure).
-    if (contexts.length === 0) return 'failure';
+    // Without complete context info we can't safely distinguish cancellation
+    // from real failure — preserve the existing FAILURE mapping.
+    if (contexts.length === 0 || options.contextsTruncated) return 'failure';
     if (rollupFailureIsCancellationOnly(contexts)) return 'neutral';
     return 'failure';
   }

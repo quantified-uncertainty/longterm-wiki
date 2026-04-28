@@ -1024,13 +1024,20 @@ describe('mapRollupState — cancellation-only rollup failures', () => {
     expect(mapRollupState('NEUTRAL', cancelledOnly)).toBe('neutral');
   });
 
-  it('treats SKIPPED checks as not-a-failure (same as success)', () => {
+  it('SKIPPED + CANCELLED + SUCCESS still maps to neutral (SKIPPED is not a failure)', () => {
     const contexts: RollupContext[] = [
       checkRun('SUCCESS'),
       checkRun('SKIPPED'),
       checkRun('CANCELLED'),
     ];
     expect(mapRollupState('FAILURE', contexts)).toBe('neutral');
+  });
+
+  it('SKIPPED-only (no cancellation) is degenerate — falls through to failure', () => {
+    // GitHub shouldn't return rollup FAILURE without a real failing or
+    // cancelled check, but if it does we should not silently reclassify.
+    const contexts: RollupContext[] = [checkRun('SUCCESS'), checkRun('SKIPPED')];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
   });
 
   it('treats null check conclusion as ignorable (in-progress at rollup time)', () => {
@@ -1040,6 +1047,33 @@ describe('mapRollupState — cancellation-only rollup failures', () => {
       checkRun('CANCELLED'),
     ];
     expect(mapRollupState('FAILURE', contexts)).toBe('neutral');
+  });
+
+  it('applies the same cancellation logic to ERROR rollup state', () => {
+    const cancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(mapRollupState('ERROR', cancelledOnly)).toBe('neutral');
+
+    const realFailure: RollupContext[] = [checkRun('CANCELLED'), checkRun('FAILURE')];
+    expect(mapRollupState('ERROR', realFailure)).toBe('failure');
+  });
+
+  it('fails closed (returns failure) when contexts are truncated — a real failure could hide past the page', () => {
+    // If GitHub's contexts(first: 100) hit pagination and we only see the
+    // first page, a real failure could be lurking past the cutoff. Treat
+    // FAILURE as failure rather than reclassify based on partial info.
+    const visibleCancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(
+      mapRollupState('FAILURE', visibleCancelledOnly, { contextsTruncated: true }),
+    ).toBe('failure');
+    // Sanity: same context list without truncation still returns neutral.
+    expect(mapRollupState('FAILURE', visibleCancelledOnly)).toBe('neutral');
+  });
+
+  it('contextsTruncated: false behaves the same as omitting the flag', () => {
+    const cancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(
+      mapRollupState('FAILURE', cancelledOnly, { contextsTruncated: false }),
+    ).toBe('neutral');
   });
 });
 

@@ -374,6 +374,10 @@ jobs:
     # commit's sync incomplete (so the wiki-server missed that commit's content)
     # AND turned the workflow rollup into FAILURE for cancelled commits, tripping
     # the patrol's main-ci-red gate on phantom failures (QUA-731).
+    # Trade-off: an N-PR burst now serializes (≈N × sync duration ≈ 5 min for 5
+    # PRs) instead of cancel-and-replace (~1 min). Each queued run still
+    # checks-out at its own SHA and syncs that snapshot, so the queue tail's
+    # final state matches the latest main commit. Acceptable for the volume.
     concurrency:
       group: sync-content-main
       cancel-in-progress: false
