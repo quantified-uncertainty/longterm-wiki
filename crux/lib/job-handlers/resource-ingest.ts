@@ -312,7 +312,14 @@ export async function handleResourceIngest(
     // Also persist the new contentHash (when present) so the next re-ingest
     // can pass it as previousContentHash and the QUA-312 Phase 2 skip-guard
     // bypass activates when content drifts.
-    await persistFetchStatus(resourceId, status, ctx, contentHash);
+    //
+    // ONLY persist on 'reachable' — soft_404 and cookie_blocked still produce
+    // a content body (and hence a hash), but it's the hash of the placeholder.
+    // Persisting it would lock future re-ingests of the same URL into
+    // `contentChanged: false` even after the page recovers, permanently
+    // blocking re-enrichment via the skip-guard. See QUA-329 review.
+    const persistedHash = status === 'reachable' ? contentHash : null;
+    await persistFetchStatus(resourceId, status, ctx, persistedHash);
 
     // Chain: enqueue resource-enrich job for reachable resources with content.
     // Skip if content is empty — fetchSource returns ok but no content for some

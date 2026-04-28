@@ -384,6 +384,56 @@ describe('handleResourceIngest — fetch_status persistence', () => {
     const call = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls[0];
     expect(call?.[1]).not.toHaveProperty('contentHash');
   });
+
+  // QUA-329 review: soft_404 / cookie_blocked pages still produce a content
+  // body and a hash, but it's the hash of the placeholder, not real content.
+  // Persisting it would lock future re-ingests into contentChanged:false even
+  // after the page recovers, permanently blocking re-enrichment.
+  it('does NOT persist contentHash for soft_404 status', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: 'Page not found. The page you requested does not exist.',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-soft404', url: 'https://example.com/missing' },
+      CTX,
+    );
+
+    expect(result.data.status).toBe('soft_404');
+
+    const calls = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls;
+    const softCall = calls.find((c) => (c?.[0] as string) === 'res-soft404');
+    expect(softCall, 'fetch-status patch should be issued for the resource').toBeTruthy();
+    expect(softCall?.[1]).not.toHaveProperty('contentHash');
+  });
+
+  it('does NOT persist contentHash for cookie_blocked status', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    // A short page with cookie-consent text triggers cookie_blocked internal
+    // status. Note: toFetchStatus() maps cookie_blocked → 'error' for the
+    // wire format, so the patch's fetchStatus is 'error' (not 'cookie_blocked').
+    // The internal-status assertion lives on result.data.status separately.
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: '<html><body><h1>This site requires cookies</h1><p>Please enable cookies to continue.</p></body></html>',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie', url: 'https://example.com/wall' },
+      CTX,
+    );
+
+    // Confirm the cookie path was actually exercised
+    expect(result.data.status).toBe('cookie_blocked');
+
+    // The persisted patch should NOT carry contentHash (status !== 'reachable')
+    const calls = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls;
+    const cookieCall = calls.find((c) => (c?.[0] as string) === 'res-cookie');
+    expect(cookieCall, 'fetch-status patch should be issued for the resource').toBeTruthy();
+    expect(cookieCall?.[1]).not.toHaveProperty('contentHash');
+  });
 });
 
 describe('handleResourceIngest — enrichment chaining', () => {

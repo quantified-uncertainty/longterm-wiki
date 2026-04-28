@@ -968,13 +968,17 @@ export const UpdateResourceFetchStatusSchema = z.object({
   lastFetchedAt: z.string().datetime(),
   fetchedTitle: z.string().max(1000).optional(),
   /**
-   * SHA-256 (first 16 hex) of the freshly-fetched content. When provided,
-   * persisted to `resources.content_hash` so subsequent re-ingest jobs can
-   * pass it as `previousContentHash` and detect content drift via the
-   * QUA-312 Phase 2 skip-guard bypass. Null/empty content (dead links,
-   * paywalls) skips this update.
+   * SHA-256 prefix (lowercase hex) of the freshly-fetched content. When
+   * provided, persisted to `resources.content_hash` so subsequent re-ingest
+   * jobs can pass it as `previousContentHash` and detect content drift via
+   * the QUA-312 Phase 2 skip-guard bypass. Null/empty content (dead links,
+   * paywalls) skips this update. Soft-404 / cookie-wall responses also
+   * skip — see resource-ingest.ts persistedHash logic.
+   *
+   * Length cap of 64 accommodates any prefix of SHA-256 (production today
+   * uses the first 16 hex via CONTENT_HASH_PREFIX_LENGTH).
    */
-  contentHash: z.string().min(1).max(64).optional(),
+  contentHash: z.string().regex(/^[0-9a-f]+$/, "must be lowercase hex").min(1).max(64).optional(),
 });
 export type UpdateResourceFetchStatus = z.infer<typeof UpdateResourceFetchStatusSchema>;
 
