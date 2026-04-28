@@ -61,6 +61,16 @@ const TABBED_PAGES = [
   "/ai-models/claude-opus-4-5",
   "/ai-models/gemini-2-5-pro",
   "/ai-models/gpt-4o",
+  // Legislation — migrated to EntityProfileShell in QUA-485
+  "/legislation/ai-lead-act",
+  "/legislation/ai-risk-evaluation-act",
+];
+
+/** Pages with sidebar but no tabs — load and check text + sidebar render. */
+const SIDEBAR_ONLY_PAGES = [
+  // Projects — migrated to EntityProfileShell in QUA-485
+  "/projects/ai-economist",
+  "/projects/aaa-ai-arbitrator",
 ];
 
 /** Pages with stat cards — check for empty values. */
@@ -150,6 +160,15 @@ test.describe("Render audit — tabbed pages", () => {
 
 test.describe("Render audit — simple pages", () => {
   for (const url of SIMPLE_PAGES) {
+    test(url, async ({ page }) => {
+      await loadPage(page, url);
+      checkAntiPatterns(await getMainText(page), url);
+    });
+  }
+});
+
+test.describe("Render audit — sidebar-only pages", () => {
+  for (const url of SIDEBAR_ONLY_PAGES) {
     test(url, async ({ page }) => {
       await loadPage(page, url);
       checkAntiPatterns(await getMainText(page), url);
