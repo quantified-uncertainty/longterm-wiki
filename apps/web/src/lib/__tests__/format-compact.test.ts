@@ -278,6 +278,13 @@ describe("formatDateShapedInteger (QUA-684)", () => {
       expect(formatDateShapedInteger(20240229)).toBe("Feb 29, 2024");
     });
 
+    it("applies the Gregorian century-year leap rule", () => {
+      // 1900 is divisible by 100 but not 400 → NOT a leap year.
+      expect(formatDateShapedInteger(19000229)).toBeNull();
+      // 2000 is divisible by 400 → IS a leap year.
+      expect(formatDateShapedInteger(20000229)).toBe("Feb 29, 2000");
+    });
+
     it("rejects invalid hour/minute/second in 12/14-digit shapes", () => {
       expect(formatDateShapedInteger(202406012400)).toBeNull(); // hour 24
       expect(formatDateShapedInteger(202406010060)).toBeNull(); // minute 60

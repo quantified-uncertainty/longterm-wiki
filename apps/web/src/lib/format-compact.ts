@@ -69,7 +69,7 @@ export function formatCompactNumber(n: number | null | undefined): string {
   return n.toLocaleString();
 }
 
-const MONTH_ABBR_FULL = [
+const MONTH_ABBR = [
   "Jan", "Feb", "Mar", "Apr", "May", "Jun",
   "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
 ];
@@ -124,7 +124,7 @@ export function formatDateShapedInteger(n: number): string | null {
     d.getUTCDate() !== day
   ) return null;
 
-  const datePart = `${MONTH_ABBR_FULL[month - 1]} ${day}, ${year}`;
+  const datePart = `${MONTH_ABBR[month - 1]} ${day}, ${year}`;
   if (s.length === 8) return datePart;
   const hh = String(hour).padStart(2, "0");
   const mm = String(minute).padStart(2, "0");
@@ -166,11 +166,6 @@ export function sanitizeRawLargeNumbers(s: string): string {
 export function safeHref(url: string): string {
   return /^https?:\/\//i.test(url) ? url : "#";
 }
-
-const MONTH_ABBR = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec",
-];
 
 /**
  * Format a legislation `introduced` date string with appropriate precision:

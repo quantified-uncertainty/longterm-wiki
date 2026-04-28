@@ -127,9 +127,9 @@ describe("formatFactValueString — date-shaped integers (QUA-684)", () => {
   });
 
   it("8-digit numbers that aren't valid dates stay raw or compact-formatted", () => {
-    // 19000000 has month=00 → not a date → falls through to magnitude path → "19M".
+    // 19000000 → year=1900 valid, month=00 invalid → not a date → "19M".
     expect(formatFactValueString("19000000", null)).toBe("19M");
-    // 12345678 — not a date (12=month=12 valid? yes 12; day=34 invalid → not a date) → "12M".
+    // 12345678 → year=1234 outside 1900-2099 → not a date → "12M".
     expect(formatFactValueString("12345678", null)).toBe("12M");
   });
 
