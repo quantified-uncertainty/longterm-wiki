@@ -17,7 +17,7 @@ ADRs follow a [MADR](https://adr.github.io/madr/)-inspired template. See `0000-t
 
 ## Lifecycle
 
-```
+```text
 Charter → Proposed → Accepted | Rejected
                   ↘ Superseded by ADR-NNNN
 ```

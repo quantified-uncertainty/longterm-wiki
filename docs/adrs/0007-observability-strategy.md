@@ -62,3 +62,8 @@ A chosen observability stack with:
 ## Success criteria
 
 ADR ends with a chosen tooling stack and a rollout phase 1 plan. "Status quo + make `automation-landscape` live" is acceptable if defended — but the QUA-302 question must be answered: what do we look at next time?
+
+## Dependencies
+
+- **Blocks (soft):** ADR-0008 (internal dashboards layer — observability tooling choice may absorb some dashboards)
+- **Blocked by:** none

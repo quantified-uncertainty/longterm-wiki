@@ -53,3 +53,8 @@ A bare deletion list does NOT count — that's downstream tactical work.
 ## Success criteria
 
 ADR ends with `Status: Accepted` (with named package architecture + migration plan) or `Status: Rejected` (with explicit reason — e.g., "monolithic crux/ is correct, here's why"). Either is acceptable.
+
+## Dependencies
+
+- **Blocks (soft):** ADR-0009 (multi-app coordination — type-sharing story depends on whether crux is one or many packages)
+- **Blocked by:** none

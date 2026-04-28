@@ -30,7 +30,7 @@ Specifically:
 
 1. Should `apps/groundskeeper` be collapsed into the wiki-server worker, or promoted to own all scheduled work?
 2. Where do new ingest pipelines belong — and what's the principle?
-3. What's the type-sharing story (the existing `api-types.ts` re-export, or something stronger like tRPC / Hono RPC?)
+3. What's the type-sharing story? CLAUDE.md mandates Hono RPC method-chaining for *new* wiki-server routes — but the existing routes use a mix of `api-types.ts` re-exports and partial RPC adoption. Should we accelerate the RPC migration for existing routes, formalize a parallel pattern for non-RPC consumers (crux, groundskeeper, discord-bot), or accept the current heterogeneity?
 4. Are there code paths that genuinely need to live in multiple apps, or is duplication accidental?
 
 ## What counts as a decision
