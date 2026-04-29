@@ -16,7 +16,12 @@
  * Phase 1 of the persistent patrol brain design described in discussion #1882.
  */
 
-import { githubApi } from '../lib/github.ts';
+import {
+  githubApi,
+  getGitHubToken,
+  isMissingTokenError,
+  MISSING_TOKEN_SUMMARY,
+} from '../lib/github.ts';
 import { appendJsonl, cl, log, JSONL_FILE } from './state.ts';
 import { fetchSinglePr } from '../lib/pr-analysis/index.ts';
 import { detectIssues, computeScore } from '../lib/pr-analysis/index.ts';
@@ -144,6 +149,20 @@ function hasMergeableIssues(pr: GqlPrNode, staleThresholdMs: number): boolean {
 export async function runBranchAgent(config: BranchAgentConfig): Promise<void> {
   const { prNumber, repo, maxInvocations, ciPollIntervalSeconds, ciTimeoutSeconds } = config;
   const staleThresholdMs = config.staleHours * 60 * 60 * 1000;
+
+  // Preflight: GITHUB_TOKEN is mandatory — every cycle calls fetchSinglePr
+  // and label endpoints. Without it the agent loops forever, swallowing 401s
+  // into generic "failed to fetch" log lines (QUA-799). Match runDaemon /
+  // runParallelDaemon behaviour: log loud + exit 1.
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      log(`${cl.red}ERROR: ${MISSING_TOKEN_SUMMARY}${cl.reset}`);
+      process.exit(1);
+    }
+    throw e;
+  }
 
   log(`${cl.bold}Branch Agent — PR #${prNumber}${cl.reset} (${repo})`);
   log(`  Max invocations: ${maxInvocations}, per-session timeout: ${config.timeoutMinutes}m`);

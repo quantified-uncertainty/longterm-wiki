@@ -128,6 +128,9 @@ describe('runHealthGate — env escape hatch', () => {
     const decision = await runHealthGate({ ...deps, scan });
     expect(decision.proceed).toBe(true);
     expect(decision.bypassed).toBe(true);
+    // Bypass NEVER reports a permanent fault — the operator explicitly opted
+    // into ignoring the gate, so the daemon must not exit on this path.
+    expect(decision.permanentFault).toBe(false);
     expect(deps.logs.some((l) => l.includes('BYPASSED'))).toBe(true);
     expect(deps.events).toHaveLength(0);
   });
@@ -202,6 +205,7 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
     expect(scanCalled).toBe(false);
     expect(decision.proceed).toBe(false);
     expect(decision.bypassed).toBe(false);
+    expect(decision.permanentFault).toBe(true);
     expect(decision.reason).toContain('GITHUB_TOKEN');
     expect(deps.events).toHaveLength(1);
     expect(deps.events[0]).toMatchObject({
@@ -219,6 +223,7 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
     });
     expect(decision.proceed).toBe(false);
     expect(decision.reason).toContain('GITHUB_TOKEN');
+    expect(decision.permanentFault).toBe(true);
   });
 
   it('resets the consecutive-error counter when halting on missing token', async () => {
@@ -266,6 +271,7 @@ describe('runHealthGate — missing GITHUB_TOKEN', () => {
 
     expect(decision.proceed).toBe(false);
     expect(decision.reason).toContain('GITHUB_TOKEN');
+    expect(decision.permanentFault).toBe(true);
     // Counter did not tick up — permanent errors shouldn't use streak budget.
     expect(store.getCount('__scan_error_count__')).toBe(0);
     expect(deps.events.some((e) => e.type === 'health_gate_missing_token')).toBe(true);
@@ -321,6 +327,7 @@ describe('runHealthGate — scanner error', () => {
       },
     });
     expect(decision.proceed).toBe(true);
+    expect(decision.permanentFault).toBe(false);
     expect(deps.events).toHaveLength(1);
     expect(deps.events[0]).toMatchObject({
       type: 'health_scan_error',
@@ -343,6 +350,10 @@ describe('runHealthGate — scanner error', () => {
     // First N-1 proceed; Nth halts
     expect(lastDecision!.proceed).toBe(false);
     expect(lastDecision!.reason).toContain('consecutively');
+    // QUA-799: a transient streak halt is NOT a permanent fault — the
+    // daemon should keep cycling (the streak may clear when GitHub recovers),
+    // unlike a missing-token halt which exits the daemon outright.
+    expect(lastDecision!.permanentFault).toBe(false);
     expect(store.getCount('__scan_error_count__')).toBe(MAX_CONSECUTIVE_SCAN_ERRORS);
   });
 
@@ -414,6 +425,19 @@ describe('runHealthGate — unhealthy', () => {
     expect(decision.emittedIssues).toHaveLength(0);
     expect(decision.suppressedIssues).toHaveLength(1);
     expect(deps.events).toHaveLength(0); // no new JSONL emission
+  });
+
+  it('reports permanentFault=false for fleet-level signals (deploy-stuck etc.)', async () => {
+    // QUA-799 regression: deploy-stuck and similar signals are transient by
+    // construction — the patrol should keep cycling and re-checking. Only
+    // missing-token sets permanentFault.
+    const deps = makeDeps();
+    const decision = await runHealthGate({
+      ...deps,
+      scan: async () => unhealthyScan([deployStuckIssue()]),
+    });
+    expect(decision.proceed).toBe(false);
+    expect(decision.permanentFault).toBe(false);
   });
 });
 

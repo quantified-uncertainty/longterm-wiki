@@ -283,10 +283,23 @@ function preflightChecks(config: PatrolConfig): string[] {
 
 // ── Check cycle ──────────────────────────────────────────────────────────────
 
+/**
+ * Outcome of a check cycle.
+ *
+ * `permanentFault` is set when the gate detected a config fault that the
+ * daemon cannot recover from on its own (e.g. missing GITHUB_TOKEN). The
+ * daemon loop exits in that case rather than cycling silently — see QUA-799
+ * for the silent-degradation incident this guards against.
+ */
+interface CycleOutcome {
+  permanentFault: boolean;
+  permanentFaultReason: string;
+}
+
 async function runCheckCycle(
   cycleCount: number,
   config: PatrolConfig,
-): Promise<void> {
+): Promise<CycleOutcome> {
   logHeader(`Check cycle #${cycleCount}`);
 
   // 0. Health gate (QUA-300 Phase 3) — check fleet-level signals FIRST.
@@ -304,8 +317,12 @@ async function runCheckCycle(
       pr_processed: null,
       health_gate_tripped: true,
       health_gate_reason: gate.reason,
+      permanent_fault: gate.permanentFault,
     });
-    return;
+    return {
+      permanentFault: gate.permanentFault,
+      permanentFaultReason: gate.permanentFault ? gate.reason : '',
+    };
   }
 
   // 0a. Check if a tracked main-branch fix PR has been merged
@@ -347,7 +364,7 @@ async function runCheckCycle(
       pr_processed: null,
       main_branch_fix: true,
     });
-    return; // Main takes the whole cycle; PRs wait
+    return { permanentFault: false, permanentFaultReason: '' }; // Main takes the whole cycle; PRs wait
   }
 
   // 0b. Check deploy health
@@ -592,6 +609,8 @@ async function runCheckCycle(
     deploy_healthy: deployHealth.healthy,
     deploy_failing_since: deployHealth.failingSince ?? undefined,
   });
+
+  return { permanentFault: false, permanentFaultReason: '' };
 }
 
 // ── Daemon loop ─────────────────────────────────────────────────────────────
@@ -631,8 +650,23 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   process.on('SIGINT', () => void shutdown());
   process.on('SIGTERM', () => void shutdown());
 
+  // Exit cleanly on a permanent config fault (e.g. missing GITHUB_TOKEN).
+  // The daemon cannot recover from this on its own, so cycling forever just
+  // produces silent JSONL churn instead of forcing operator attention. See
+  // QUA-799.
+  const exitOnPermanentFault = (outcome: CycleOutcome): void => {
+    if (!outcome.permanentFault) return;
+    log(
+      `${cl.red}✗ Patrol cannot continue: ${outcome.permanentFaultReason}. ` +
+        `Exiting daemon (QUA-799). Fix the env and restart.${cl.reset}`,
+    );
+    removePidFile();
+    process.exit(1);
+  };
+
   if (config.once) {
-    await runCheckCycle(1, config);
+    const outcome = await runCheckCycle(1, config);
+    exitOnPermanentFault(outcome);
     return;
   }
 
@@ -640,7 +674,8 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   while (!shuttingDown) {
     cycleCount++;
     try {
-      await runCheckCycle(cycleCount, config);
+      const outcome = await runCheckCycle(cycleCount, config);
+      exitOnPermanentFault(outcome);
     } catch (e) {
       log(
         `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,

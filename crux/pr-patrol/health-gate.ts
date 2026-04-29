@@ -66,6 +66,16 @@ export interface HealthGateDecision {
   suppressedIssues: HealthIssue[];
   /** True when the env escape hatch was engaged. */
   bypassed: boolean;
+  /**
+   * True when the gate detected a permanent config fault that the daemon
+   * loop cannot recover from on its own (e.g. `GITHUB_TOKEN` missing). The
+   * daemon should EXIT (not just halt the cycle), so a process supervisor
+   * sees the failure and an operator can fix the env. Without this, a
+   * missing token would let the daemon cycle forever, silently emitting
+   * `health_gate_missing_token` events into JSONL while the rest of the
+   * fleet stays blind to fleet-level incidents (QUA-799).
+   */
+  permanentFault: boolean;
 }
 
 export interface HealthGateDeps {
@@ -226,6 +236,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: true,
+      permanentFault: false,
     };
   }
 
@@ -239,7 +250,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
   if (!env.GITHUB_TOKEN) {
     log(
       `${cl.red}✗ ${MISSING_TOKEN_SUMMARY} — health gate cannot scan GitHub. ` +
-        `Halting patrol until token is set.${cl.reset}`,
+        `Exiting patrol so a supervisor restart picks up the corrected env (QUA-799).${cl.reset}`,
     );
     writeEvent({
       type: 'health_gate_missing_token',
@@ -256,6 +267,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: false,
+      permanentFault: true,
     };
   }
 
@@ -285,7 +297,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
         reason: message,
       });
       log(
-        `${cl.red}✗ GITHUB_TOKEN became unavailable during scan — halting patrol.${cl.reset}`,
+        `${cl.red}✗ GITHUB_TOKEN became unavailable during scan — exiting patrol (QUA-799).${cl.reset}`,
       );
       return {
         proceed: false,
@@ -294,6 +306,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
         emittedIssues: [],
         suppressedIssues: [],
         bypassed: false,
+        permanentFault: true,
       };
     }
 
@@ -320,6 +333,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
         emittedIssues: [],
         suppressedIssues: [],
         bypassed: false,
+        permanentFault: false,
       };
     }
 
@@ -334,6 +348,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: false,
+      permanentFault: false,
     };
   }
 
@@ -345,6 +360,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       emittedIssues: [],
       suppressedIssues: [],
       bypassed: false,
+      permanentFault: false,
     };
   }
 
@@ -398,5 +414,6 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
     emittedIssues: emitted,
     suppressedIssues: suppressed,
     bypassed: false,
+    permanentFault: false,
   };
 }
