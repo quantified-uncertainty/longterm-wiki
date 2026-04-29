@@ -4,12 +4,11 @@ import { notFound } from "next/navigation";
 import { fetchDetailed } from "@lib/wiki-server";
 import { ProfileStatCard } from "@/components/directory";
 import {
-  DIMENSION_OVERALL,
   SCORECARD_SOURCES,
   formatScoreCell,
   getScorecardSourceMeta,
-  type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
+import { buildOrgDimensionMatrix, type MatrixGrade } from "./matrix";
 
 export const revalidate = 300;
 
@@ -33,39 +32,42 @@ interface SnapshotRow {
   notes: string | null;
 }
 
-interface GradeRow {
-  id: string;
+interface GradeRow extends MatrixGrade {
   snapshotId: string;
-  scorecardSource: string | null;
-  publishedAt: string | null;
-  isLatest: boolean | null;
-  entityId: string;
-  entityDisplayName: string;
-  entitySlug: string | null;
-  dimensionSlug: string;
-  dimensionLabel: string;
-  scoreNumeric: number | null;
-  scoreLetter: string | null;
-  scoreRaw: string;
 }
 
 const PAGE_SIZE = 200;
 const MAX_GRADES = 5000;
 
+/** Treat whitespace-only and empty strings the same as null/undefined. */
+function nonEmpty(s: string | null | undefined): string | null {
+  if (s == null) return null;
+  const trimmed = s.trim();
+  return trimmed.length > 0 ? trimmed : null;
+}
+
 /**
- * Page through `/api/scorecard-grades/all` for one source's latest snapshot,
- * returning every dimension (not just `overall`). Returns `{ ok: false }`
- * on any page failure so the route can render an "unavailable" panel
- * instead of silently truncating the matrix.
+ * Page through `/api/scorecard-grades/all` for one specific snapshot. Pinning
+ * to `snapshotId=...` (rather than `latest=true`) is critical: offset-based
+ * pagination over an `ORDER BY publishedAt DESC` set is unstable if a new
+ * snapshot lands mid-fetch and flips the latest-marker, but a snapshot's
+ * grades are append-only once published. Returns `{ ok: false }` on any
+ * page failure so the route can render an "unavailable" panel rather than
+ * silently truncating the matrix.
  */
-async function fetchAllGradesForSource(
-  source: ScorecardSourceKey,
-): Promise<{ ok: true; items: GradeRow[] } | { ok: false }> {
+async function fetchAllGradesForSnapshot(
+  snapshotId: string,
+): Promise<
+  { ok: true; items: GradeRow[]; truncated: boolean } | { ok: false }
+> {
   const items: GradeRow[] = [];
   let offset = 0;
+  // URL-encode the snapshotId — it's drawn from a server response but
+  // could contain characters that need escaping (e.g. spaces in wave labels).
+  const encoded = encodeURIComponent(snapshotId);
   while (items.length < MAX_GRADES) {
     const res = await fetchDetailed<{ items: GradeRow[]; total: number }>(
-      `/api/scorecard-grades/all?limit=${PAGE_SIZE}&offset=${offset}&latest=true&scorecardSource=${source}`,
+      `/api/scorecard-grades/all?limit=${PAGE_SIZE}&offset=${offset}&snapshotId=${encoded}`,
       { revalidate: 300 },
     );
     if (!res.ok) return { ok: false };
@@ -75,12 +77,7 @@ async function fetchAllGradesForSource(
     }
     offset += PAGE_SIZE;
   }
-  if (items.length >= MAX_GRADES) {
-    console.warn(
-      `[scorecards/${source}] hit MAX_GRADES=${MAX_GRADES}; matrix may be truncated`,
-    );
-  }
-  return { ok: true, items };
+  return { ok: true, items, truncated: items.length >= MAX_GRADES };
 }
 
 export function generateStaticParams() {
@@ -101,13 +98,6 @@ export async function generateMetadata({
   };
 }
 
-interface OrgDimensionRow {
-  entityId: string;
-  displayName: string;
-  slug: string | null;
-  cells: Record<string, GradeRow>;
-}
-
 export default async function ScorecardDetailPage({
   params,
 }: {
@@ -118,67 +108,41 @@ export default async function ScorecardDetailPage({
   if (!meta) return notFound();
   const sourceKey = meta.source;
 
-  // Every snapshot for this source (for history table; the latest is
-  // picked from the same response) + every grade for the latest snapshot
-  // (every dimension, not just overall). The /all endpoint orders by
-  // `publishedAt DESC` so the first `isLatest=true` row is the latest.
-  const [snapshotsRes, gradesRes] = await Promise.all([
-    fetchDetailed<{ items: SnapshotRow[]; total: number }>(
-      `/api/scorecard-snapshots/all?limit=200&source=${sourceKey}`,
-      { revalidate: 300 },
-    ),
-    fetchAllGradesForSource(sourceKey),
-  ]);
-
+  // Resolve all snapshots first so we can pick the latest snapshot id and
+  // page grades against it deterministically. The /all endpoint orders by
+  // `publishedAt DESC`; the partial unique index
+  // `uq_scorecard_snapshots_latest_per_source` means at most one row per
+  // source has `isLatest=true`.
+  const snapshotsRes = await fetchDetailed<{
+    items: SnapshotRow[];
+    total: number;
+  }>(`/api/scorecard-snapshots/all?limit=200&source=${sourceKey}`, {
+    revalidate: 300,
+  });
   const allSnapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
   const latestSnapshot = allSnapshots.find((s) => s.isLatest) ?? null;
+
+  // Pull grades only when we have a concrete snapshot to pin to. Skipping
+  // the fetch when there's no latest also avoids a wasted request on
+  // sources with no ingested snapshots (FMTI today).
+  const gradesRes = latestSnapshot
+    ? await fetchAllGradesForSnapshot(latestSnapshot.id)
+    : ({ ok: true, items: [] as GradeRow[], truncated: false } as const);
+
   const grades = gradesRes.ok ? gradesRes.items : [];
+  const truncated = gradesRes.ok && gradesRes.truncated;
   const fetchOk = snapshotsRes.ok && gradesRes.ok;
 
-  // Build org × dimension matrix. `dimensionLabel` order is dictated by
-  // first-seen order in the API response, which itself is sorted by
-  // `entityDisplayName, dimensionSlug`. That gives a stable column order
-  // per source even though the dimension set differs across sources.
-  const orgMap = new Map<string, OrgDimensionRow>();
-  const dimensionOrder: { slug: string; label: string }[] = [];
-  const seenDimensions = new Set<string>();
-
-  for (const g of grades) {
-    if (!seenDimensions.has(g.dimensionSlug)) {
-      seenDimensions.add(g.dimensionSlug);
-      dimensionOrder.push({ slug: g.dimensionSlug, label: g.dimensionLabel });
-    }
-    const existing = orgMap.get(g.entityId);
-    if (existing) {
-      existing.cells[g.dimensionSlug] = g;
-    } else {
-      orgMap.set(g.entityId, {
-        entityId: g.entityId,
-        displayName: g.entityDisplayName,
-        slug: g.entitySlug,
-        cells: { [g.dimensionSlug]: g },
-      });
-    }
-  }
-
-  // Surface the overall column as leftmost when present — readers expect the
-  // headline score before the per-pillar breakdown.
-  dimensionOrder.sort((a, b) => {
-    if (a.slug === DIMENSION_OVERALL && b.slug !== DIMENSION_OVERALL) return -1;
-    if (b.slug === DIMENSION_OVERALL && a.slug !== DIMENSION_OVERALL) return 1;
-    return a.label.localeCompare(b.label);
-  });
-  const hasOverall = dimensionOrder.some((d) => d.slug === DIMENSION_OVERALL);
-
-  const orgRows = [...orgMap.values()].sort((a, b) =>
-    a.displayName.localeCompare(b.displayName),
-  );
+  const matrix = buildOrgDimensionMatrix(grades);
+  const { orgRows, dimensionOrder, hasOverall } = matrix;
 
   const totalOrgs = orgRows.length;
   const totalDimensions = dimensionOrder.length;
   const totalSnapshots = allSnapshots.length;
   const latestWaveLabel =
-    latestSnapshot?.waveLabel ?? latestSnapshot?.publishedAt ?? "—";
+    nonEmpty(latestSnapshot?.waveLabel) ??
+    nonEmpty(latestSnapshot?.publishedAt) ??
+    "—";
 
   const stats = [
     { label: "Organizations", value: String(totalOrgs) },
@@ -254,6 +218,14 @@ export default async function ScorecardDetailPage({
         </div>
       ) : null}
 
+      {truncated ? (
+        <div className="rounded-lg border border-amber-300 bg-amber-50 dark:bg-amber-950/40 p-4 text-sm mb-6">
+          Showing the first {MAX_GRADES.toLocaleString()} grades for this
+          snapshot — the matrix may be truncated. Re-run the ingester to
+          confirm completeness or paginate via the API directly.
+        </div>
+      ) : null}
+
       {fetchOk && totalOrgs === 0 ? (
         <div className="rounded-lg border border-border/60 bg-muted/30 p-6 text-sm space-y-2 mb-8">
           <p className="font-medium">No grades ingested yet.</p>
@@ -279,7 +251,7 @@ export default async function ScorecardDetailPage({
             <table className="w-full text-sm">
               <thead>
                 <tr className="bg-muted/40 text-left">
-                  <th className="px-3 py-2 font-semibold border-b border-border/60 sticky left-0 bg-muted/40">
+                  <th className="px-3 py-2 font-semibold border-b border-border/60 sticky left-0 z-20 bg-muted/40">
                     Organization
                   </th>
                   {dimensionOrder.map((dim) => (
@@ -296,7 +268,7 @@ export default async function ScorecardDetailPage({
               <tbody>
                 {orgRows.map((row) => (
                   <tr key={row.entityId} className="hover:bg-muted/20">
-                    <td className="px-3 py-2 border-b border-border/30 sticky left-0 bg-background">
+                    <td className="px-3 py-2 border-b border-border/30 sticky left-0 z-10 bg-background">
                       {row.slug ? (
                         <Link
                           href={`/organizations/${row.slug}`}
@@ -321,9 +293,10 @@ export default async function ScorecardDetailPage({
                         );
                       }
                       const formatted = formatScoreCell(cell);
+                      const rawTrimmed = nonEmpty(cell.scoreRaw);
                       const rawSuffix =
-                        cell.scoreRaw && cell.scoreRaw !== formatted
-                          ? ` — raw: ${cell.scoreRaw}`
+                        rawTrimmed && rawTrimmed !== formatted
+                          ? ` — raw: ${rawTrimmed}`
                           : "";
                       return (
                         <td
