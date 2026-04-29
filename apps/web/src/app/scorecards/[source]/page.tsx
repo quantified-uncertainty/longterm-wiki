@@ -117,13 +117,11 @@ export default async function ScorecardDetailPage({
   if (!meta) return notFound();
   const sourceKey = meta.source;
 
-  // Latest snapshot for this source + every snapshot (for history table) +
-  // every grade for the latest snapshot (every dimension, not just overall).
-  const [latestRes, allSnapshotsRes, gradesRes] = await Promise.all([
-    fetchDetailed<{ items: SnapshotRow[]; total: number }>(
-      `/api/scorecard-snapshots/all?limit=1&latest=true&source=${sourceKey}`,
-      { revalidate: 300 },
-    ),
+  // Every snapshot for this source (for history table; the latest is
+  // picked from the same response) + every grade for the latest snapshot
+  // (every dimension, not just overall). The /all endpoint orders by
+  // `publishedAt DESC` so the first `isLatest=true` row is the latest.
+  const [snapshotsRes, gradesRes] = await Promise.all([
     fetchDetailed<{ items: SnapshotRow[]; total: number }>(
       `/api/scorecard-snapshots/all?limit=200&source=${sourceKey}`,
       { revalidate: 300 },
@@ -131,10 +129,10 @@ export default async function ScorecardDetailPage({
     fetchAllGradesForSource(sourceKey),
   ]);
 
-  const latestSnapshot = latestRes.ok ? latestRes.data.items[0] ?? null : null;
-  const allSnapshots = allSnapshotsRes.ok ? allSnapshotsRes.data.items : [];
+  const allSnapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
+  const latestSnapshot = allSnapshots.find((s) => s.isLatest) ?? null;
   const grades = gradesRes.ok ? gradesRes.items : [];
-  const fetchOk = latestRes.ok && allSnapshotsRes.ok && gradesRes.ok;
+  const fetchOk = snapshotsRes.ok && gradesRes.ok;
 
   // Build org × dimension matrix. `dimensionLabel` order is dictated by
   // first-seen order in the API response, which itself is sorted by
