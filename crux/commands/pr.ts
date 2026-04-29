@@ -24,6 +24,7 @@ import {
   findOpenPrsMentioningLinearId,
   type OpenPrMatch,
 } from '../lib/linear/dedup.ts';
+import { checkReviewMarker } from '../lib/review-marker.ts';
 import type { CommandOptions, CommandResult } from '../lib/command-types.ts';
 
 // ── Test plan validation ─────────────────────────────────────────────────────
@@ -319,12 +320,23 @@ async function detect(_args: string[], options: CommandOptions): Promise<Command
  * to constructing curl commands with jq in bash.
  *
  * Options:
- *   --title="PR title"      Required. Title for the PR.
- *   --body="PR body"        Body as inline string (vulnerable to shell expansion).
- *   --body-file=<path>      Body from a file (safe for markdown with backticks).
- *   --base=main             Base branch (default: main).
- *   --draft                 Create as draft PR.
+ *   --title="PR title"          Required. Title for the PR.
+ *   --body="PR body"            Body as inline string (vulnerable to shell expansion).
+ *   --body-file=<path>          Body from a file (safe for markdown with backticks).
+ *   --base=main                 Base branch (default: main).
+ *   --draft                     Create as draft PR.
+ *   --skip-review-check         Bypass the /agent-review-pr marker check.
+ *      --reason="<why>"           REQUIRED with --skip-review-check.
+ *   --force                     Bypass Linear-ID dedup check (existing).
+ *   --allow-empty-body          Allow PR body to be empty (existing, discouraged).
+ *   --skip-test-plan            Bypass test-plan validation (existing).
  *   (default: ready — agents verify before creating PRs)
+ *
+ * Pre-checks (in order, all refuse with exit 2 unless bypassed):
+ *   1. Body not empty                                (--allow-empty-body)
+ *   2. Test plan section present                     (--skip-test-plan)
+ *   3. /agent-review-pr marker fresh against HEAD    (--skip-review-check, QUA-849 #7)
+ *   4. No open PR already claims a referenced Linear (--force)
  *
  * If a PR already exists for this branch, reports it instead of creating a duplicate.
  */
@@ -400,6 +412,53 @@ async function create(_args: string[], options: CommandOptions): Promise<Command
       output: `${c.red}Usage: crux gh pr create --title="PR title" --body="PR body" [--body-file=<path>] [--base=main] [--draft]${c.reset}\n`,
       exitCode: 1,
     };
+  }
+
+  // ── Review-marker check (QUA-849 #7) ────────────────────────────────────
+  // Refuse PR creation unless `.claude/review-done` exists and is fresh
+  // against HEAD's commit + diff hash. This catches the failure mode where
+  // an agent goes straight from `git push` to `crux gh pr create` without
+  // running `/agent-review-pr` (the upstream cousin of QUA-849's
+  // "ran skill, lied about phases" — see the QUA-728 incident PR #4689).
+  //
+  // Bypass: --skip-review-check with a required --reason. We require the
+  // reason because the rule's purpose is to make "I considered it" not a
+  // possible path; an empty bypass would defeat the gate.
+  const skipReviewCheck = Boolean(
+    options.skipReviewCheck ?? options['skip-review-check'],
+  );
+  const reviewReason = (options.reason as string | undefined) ?? '';
+  if (skipReviewCheck) {
+    if (!reviewReason.trim()) {
+      return {
+        output:
+          `${c.red}--skip-review-check requires --reason="<why>".${c.reset}\n` +
+          `  The reason gets logged to PR creation telemetry so a forced\n` +
+          `  bypass stays traceable. Empty bypasses defeat the gate.\n`,
+        exitCode: 1,
+      };
+    }
+    log.warn(`⚠ Skipping /agent-review-pr marker check (--reason: ${reviewReason})`);
+  } else {
+    const marker = checkReviewMarker();
+    if (!marker.ok) {
+      return {
+        output:
+          `${c.red}✗ Review marker check failed (code: ${marker.code}).${c.reset}\n` +
+          `  ${marker.message}\n\n` +
+          `  ${c.yellow}Why this exists:${c.reset} skipping /agent-review-pr has shipped\n` +
+          `  HIGH-severity correctness bugs that the agent's own tests didn't catch\n` +
+          `  (see QUA-728 incident PR #4689). The hostile-reviewer subagent in\n` +
+          `  /agent-review-pr reads the diff with no context and catches things\n` +
+          `  CodeRabbit and automated checks miss.\n\n` +
+          `  ${c.bold}To fix:${c.reset} run ${c.cyan}/agent-review-pr${c.reset} now, address its findings,\n` +
+          `  then re-run this command.\n\n` +
+          `  ${c.dim}Genuine emergencies only: re-run with --skip-review-check\n` +
+          `  --reason="<why>" to bypass.${c.reset}\n`,
+        exitCode: 2,
+      };
+    }
+    log.info(marker.message);
   }
 
   // Quality checks on PR body: dedup (#819) and copy-paste detection
