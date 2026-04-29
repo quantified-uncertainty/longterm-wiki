@@ -18,7 +18,7 @@
  * 5. Wiki ID without name + display text matches the registry entity:
  *    advisory (WARNING, auto-fixable to add cross-check)
  * 6. Wiki ID without name + display text does NOT match the registry entity:
- *    ERROR (NO auto-fix — see QUA-759). Same hallucination shape as QUA-761:
+ *    WARNING (NO auto-fix — see QUA-759). Same hallucination shape as QUA-761:
  *    silently injecting name="${slug}" would lock in a "valid" cross-check on
  *    a link whose visible text disagrees with where the ID currently points,
  *    making future detection of the bad wikiId harder.
