@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { lineHasViolation, extractInlineComment, isInsideStringAt } from './validate-typed-client.ts';
+import { lineHasViolation } from './validate-typed-client.ts';
+
+// Note: extractInlineComment, findInlineCommentStart, isInsideStringAt, and
+// buildSuppressionRegex are tested directly in `lib/comment-utils.test.ts`.
+// This file focuses on lineHasViolation, which composes those helpers.
 
 // ---------------------------------------------------------------------------
 // lineHasViolation — typed-client violations and suppression
@@ -34,6 +38,29 @@ describe('lineHasViolation — does NOT flag', () => {
 
   it('apiRequest mentioned in a template literal', () => {
     expect(lineHasViolation('console.log(`Found apiRequest<T> calls`);')).toBe(false);
+  });
+
+  // Regression: prior to the comment-position check, this line was
+  // flagged because the regex matched inside the comment. The fix
+  // skips matches that fall after the inline comment opener.
+  it('apiRequest mentioned in an inline comment after real code', () => {
+    expect(
+      lineHasViolation('foo(); // see apiRequest<T> docs for details'),
+    ).toBe(false);
+  });
+
+  it('apiRequest mentioned in a trailing block comment', () => {
+    expect(
+      lineHasViolation('foo(); /* TODO: switch to apiRequest<T> here */'),
+    ).toBe(false);
+  });
+
+  it('does flag when real code call precedes a comment-only mention', () => {
+    expect(
+      lineHasViolation(
+        'await apiRequest<T>("GET", "/x"); // see apiRequest<T> docs',
+      ),
+    ).toBe(true);
   });
 
   it('different function (myApiRequest<T>)', () => {
@@ -106,56 +133,3 @@ describe('lineHasViolation — suppression with typed-client-ok marker', () => {
   });
 });
 
-// ---------------------------------------------------------------------------
-// isInsideStringAt — string literal detection
-// ---------------------------------------------------------------------------
-
-describe('isInsideStringAt — string-state walking', () => {
-  it('reports outside strings as false', () => {
-    const line = 'const x = apiRequest<T>(';
-    const idx = line.indexOf('apiRequest');
-    expect(isInsideStringAt(line, idx)).toBe(false);
-  });
-
-  it('reports inside double-quoted string as true', () => {
-    const line = 'const x = "use apiRequest<T> here";';
-    const idx = line.indexOf('apiRequest');
-    expect(isInsideStringAt(line, idx)).toBe(true);
-  });
-
-  it('reports inside single-quoted string as true', () => {
-    const line = "const x = 'apiRequest<T>';";
-    const idx = line.indexOf('apiRequest');
-    expect(isInsideStringAt(line, idx)).toBe(true);
-  });
-
-  it('reports inside template literal as true', () => {
-    const line = 'const x = `Found apiRequest<T> calls`;';
-    const idx = line.indexOf('apiRequest');
-    expect(isInsideStringAt(line, idx)).toBe(true);
-  });
-
-  it('handles escaped quotes correctly', () => {
-    const line = 'const x = "with \\"quotes\\""; const y = apiRequest<T>(';
-    const idx = line.indexOf('apiRequest');
-    expect(isInsideStringAt(line, idx)).toBe(false);
-  });
-});
-
-// ---------------------------------------------------------------------------
-// extractInlineComment — sanity (mirrors validate-dangerous-patterns)
-// ---------------------------------------------------------------------------
-
-describe('extractInlineComment', () => {
-  it('returns text after //', () => {
-    expect(extractInlineComment('const x = 1; // hello')).toBe(' hello');
-  });
-
-  it('returns null when no inline comment', () => {
-    expect(extractInlineComment('const x = 1;')).toBe(null);
-  });
-
-  it('does not treat // inside string as comment', () => {
-    expect(extractInlineComment('const url = "http://example.com";')).toBe(null);
-  });
-});

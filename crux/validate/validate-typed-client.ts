@@ -34,6 +34,12 @@ import { readFileSync, readdirSync, statSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import {
+  extractInlineComment,
+  findInlineCommentStart,
+  isInsideStringAt,
+  buildSuppressionRegex,
+} from './lib/comment-utils.ts';
 
 /** Directories to scan (relative to PROJECT_ROOT). */
 const SCAN_DIRS = ['crux'];
@@ -65,91 +71,17 @@ interface Violation {
  *   a separate, narrower rule if/when added)
  * Does NOT match: `myApiRequest<T>` (different name)
  *
+ * Known limitation: only matches when `apiRequest<` is on the same line.
+ * A multi-line form like `apiRequest\n<T>(` is not detected. The current
+ * codebase formatter never produces this form; if it ever appears, fall
+ * back to a stricter AST-based detector.
+ *
  * Used with a global flag so we can iterate matches and check each one's
  * position against string-literal state.
  */
 const TYPED_API_REQUEST_PATTERN_G = /\bapiRequest\s*</g;
 
-/**
- * Test whether a position in a line falls inside a string or template
- * literal. This prevents false positives when the validator (or any other
- * file) mentions the literal text `apiRequest<T>` in error messages or
- * documentation strings.
- *
- * Walks characters tracking quote/backtick state, identical in spirit to
- * `extractInlineComment` but stopping at the target index instead of at
- * the inline comment.
- *
- * Exported for unit tests.
- */
-export function isInsideStringAt(line: string, index: number): boolean {
-  let i = 0;
-  let inSingle = false;
-  let inDouble = false;
-  let inBacktick = false;
-  while (i < index && i < line.length) {
-    const ch = line[i];
-    if (inSingle) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === "'") inSingle = false;
-    } else if (inDouble) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '"') inDouble = false;
-    } else if (inBacktick) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '`') inBacktick = false;
-    } else {
-      if (ch === "'") inSingle = true;
-      else if (ch === '"') inDouble = true;
-      else if (ch === '`') inBacktick = true;
-    }
-    i++;
-  }
-  return inSingle || inDouble || inBacktick;
-}
-
-function buildSuppressionRegex(marker: string): RegExp {
-  const escaped = marker.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-  return new RegExp(`\\b${escaped}\\s*:\\s*\\S`);
-}
-
 const SUPPRESSION_REGEX = buildSuppressionRegex(SUPPRESSION_MARKER);
-
-/**
- * Extract the inline comment portion of a line, ignoring `//` sequences
- * inside string or template literals. Mirrors the helper in
- * `validate-dangerous-patterns.ts`.
- *
- * Exported for unit tests.
- */
-export function extractInlineComment(line: string): string | null {
-  let i = 0;
-  let inSingle = false;
-  let inDouble = false;
-  let inBacktick = false;
-  while (i < line.length) {
-    const ch = line[i];
-    const next = line[i + 1];
-    if (inSingle) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === "'") inSingle = false;
-    } else if (inDouble) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '"') inDouble = false;
-    } else if (inBacktick) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '`') inBacktick = false;
-    } else {
-      if (ch === "'") inSingle = true;
-      else if (ch === '"') inDouble = true;
-      else if (ch === '`') inBacktick = true;
-      else if (ch === '/' && next === '/') return line.slice(i + 2);
-      else if (ch === '/' && next === '*') return line.slice(i + 2);
-    }
-    i++;
-  }
-  return null;
-}
 
 /**
  * Check a single line for the typed-client violation. Returns true if the
@@ -167,12 +99,18 @@ export function lineHasViolation(
     return false;
   }
 
-  // Find apiRequest<...> matches that are NOT inside a string literal.
-  // The regex is reset each call (separate state per pattern test).
+  // Find apiRequest<...> matches that are NOT inside a string literal AND
+  // NOT inside an inline comment. The regex is reset each call (separate
+  // state per pattern test). Skipping matches that fall after the inline
+  // comment opener prevents false positives like:
+  //   foo(); // see apiRequest<T> docs
+  // where the regex would otherwise match the literal text in the comment.
+  const commentStart = findInlineCommentStart(line);
   const re = new RegExp(TYPED_API_REQUEST_PATTERN_G.source, 'g');
   let match: RegExpExecArray | null;
   let foundRealMatch = false;
   while ((match = re.exec(line)) !== null) {
+    if (commentStart !== -1 && match.index >= commentStart) continue;
     if (!isInsideStringAt(line, match.index)) {
       foundRealMatch = true;
       break;
@@ -221,7 +159,12 @@ function collectTsFiles(dir: string): string[] {
           continue;
         }
         walk(fullPath);
-      } else if (entry.endsWith('.ts') && !entry.endsWith('.test.ts')) {
+      } else if (
+        // Scan .ts and .tsx; skip *.test.ts and *.test.tsx test files.
+        (entry.endsWith('.ts') || entry.endsWith('.tsx')) &&
+        !entry.endsWith('.test.ts') &&
+        !entry.endsWith('.test.tsx')
+      ) {
         results.push(fullPath);
       }
     }
