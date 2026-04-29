@@ -8,7 +8,7 @@ import {
   formatScoreCell,
   getScorecardSourceMeta,
 } from "@/app/scorecards/scorecards-constants";
-import { buildOrgDimensionMatrix, type MatrixGrade } from "./matrix";
+import { buildOrgDimensionMatrix, type MatrixGrade } from "@/app/scorecards/[source]/matrix";
 
 export const revalidate = 300;
 
@@ -62,6 +62,7 @@ async function fetchAllGradesForSnapshot(
 > {
   const items: GradeRow[] = [];
   let offset = 0;
+  let total = 0;
   // URL-encode the snapshotId — it's drawn from a server response but
   // could contain characters that need escaping (e.g. spaces in wave labels).
   const encoded = encodeURIComponent(snapshotId);
@@ -71,13 +72,14 @@ async function fetchAllGradesForSnapshot(
       { revalidate: 300 },
     );
     if (!res.ok) return { ok: false };
+    total = res.data.total;
     items.push(...res.data.items);
     if (res.data.items.length < PAGE_SIZE || items.length >= res.data.total) {
       break;
     }
     offset += PAGE_SIZE;
   }
-  return { ok: true, items, truncated: items.length >= MAX_GRADES };
+  return { ok: true, items, truncated: items.length < total };
 }
 
 export function generateStaticParams() {
@@ -136,8 +138,8 @@ export default async function ScorecardDetailPage({
   const matrix = buildOrgDimensionMatrix(grades);
   const { orgRows, dimensionOrder, hasOverall } = matrix;
 
-  const totalOrgs = orgRows.length;
-  const totalDimensions = dimensionOrder.length;
+  const totalOrgs = latestSnapshot?.orgCount ?? orgRows.length;
+  const totalDimensions = latestSnapshot?.dimensionCount ?? dimensionOrder.length;
   const totalSnapshots = allSnapshots.length;
   const latestWaveLabel =
     nonEmpty(latestSnapshot?.waveLabel) ??
@@ -355,7 +357,7 @@ export default async function ScorecardDetailPage({
                 {allSnapshots.map((snap) => (
                   <tr key={snap.id} className="hover:bg-muted/20">
                     <td className="px-3 py-2 border-b border-border/30">
-                      {snap.waveLabel ?? snap.publishedAt}
+                      {nonEmpty(snap.waveLabel) ?? snap.publishedAt}
                       {snap.isLatest ? (
                         <span className="ml-2 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-300">
                           latest

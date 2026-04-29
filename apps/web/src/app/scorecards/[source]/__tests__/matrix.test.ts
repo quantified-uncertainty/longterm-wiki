@@ -1,5 +1,5 @@
 import { describe, it, expect } from "vitest";
-import { buildOrgDimensionMatrix, type MatrixGrade } from "../matrix";
+import { buildOrgDimensionMatrix, type MatrixGrade } from "@/app/scorecards/[source]/matrix";
 
 function grade(
   entityId: string,
