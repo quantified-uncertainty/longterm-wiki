@@ -61,6 +61,42 @@ export function getSkippedDataSources() {
 }
 
 /**
+ * Reset wiki-server warning state — for tests only.
+ * Production code should never call this; the counters are intended to be
+ * monotonic across a single build process.
+ * @internal
+ */
+export function _resetWikiServerWarningsForTests() {
+  wikiServerWarningCount = 0;
+  skippedDataSources.length = 0;
+}
+
+/**
+ * Should the build FAIL HARD on wiki-server warnings?
+ *
+ * Strict in CI only (`CI=true`) AND only in full builds (not content-only).
+ * Mirrors `isStrictVerdictsMode()` but applies to the aggregate post-build
+ * decision rather than a single fetcher.
+ *
+ * Why CI-only: CI runs against authenticated prod, so any wiki-server failure
+ * means a real regression worth halting the build over. Local dev / agent
+ * slots may not have server access for legitimate reasons (offline, prod
+ * outage, slot doesn't have prod creds), and we'd rather degrade gracefully
+ * with a loud warning than block the agent's iteration loop.
+ *
+ * Why not in content-only mode: `--scope=content` explicitly opts out of
+ * server-dependent steps. Treating wiki-server unavailability as fatal there
+ * defeats the purpose of the flag.
+ *
+ * @param {object} [opts]
+ * @param {boolean} [opts.contentOnly] - whether build is in content-only mode
+ * @param {NodeJS.ProcessEnv} [opts.env] - env for testing (default process.env)
+ */
+export function isStrictWikiServerMode({ contentOnly = false, env = process.env } = {}) {
+  return env.CI === 'true' && !contentOnly;
+}
+
+/**
  * Log a wiki-server API failure and increment the warning counter.
  * In full build mode, uses console.error for visibility.
  * In content-only mode, uses console.log (expected behavior).
