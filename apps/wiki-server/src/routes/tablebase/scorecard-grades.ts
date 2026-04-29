@@ -3,10 +3,33 @@ import { z } from "zod";
 import { eq, and, count, desc } from "drizzle-orm";
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { scorecardGrades, scorecardSnapshots, entities } from "../../schema.js";
+import {
+  scorecardGrades,
+  scorecardSnapshots,
+  entities,
+  sourceVerdicts,
+} from "../../schema.js";
 import { zv, clampedLimit, qBool } from "../shared/utils.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
+import {
+  verdictJoinCondition,
+  verdictSelectFields,
+  formatSourcing,
+  type VerdictJoinFields,
+} from "../shared/sourcing-join.js";
 import { createSyncHandler } from "./sync-factory.js";
+
+/**
+ * Record-type identifier for `source_check_verdicts.record_type`.
+ *
+ * Singular, matching the existing convention (`personnel`, `grant`,
+ * `division`, etc.). Renders the `SourcingDot` on `/scorecards` matrix
+ * cells and on the org-tab scorecards panels.
+ *
+ * Verdict generation is out of scope for QUA-839 — all grades currently
+ * have no row here, so the dot renders in `not_run` (white) state.
+ */
+const SCORECARD_GRADE_RECORD_TYPE = "scorecard_grade";
 
 // ---- Constants ----
 
@@ -48,7 +71,7 @@ const SyncScorecardGradesItemSchema = z.object({
 
 // ---- Helpers ----
 
-interface GradeRow {
+interface GradeRow extends VerdictJoinFields {
   grade: typeof scorecardGrades.$inferSelect;
   entityTitle: string | null;
   entitySlug: string | null;
@@ -80,6 +103,7 @@ function formatRow(r: GradeRow) {
     notes: g.notes,
     sourceUrl: g.sourceUrl,
     syncedAt: g.syncedAt,
+    sourcing: formatSourcing(r),
   };
 }
 
@@ -112,6 +136,7 @@ const scorecardGradesApp = new Hono()
         scorecardSource: scorecardSnapshots.scorecardSource,
         publishedAt: scorecardSnapshots.publishedAt,
         isLatest: scorecardSnapshots.isLatest,
+        ...verdictSelectFields,
       })
       .from(scorecardGrades)
       .leftJoin(
@@ -119,6 +144,13 @@ const scorecardGradesApp = new Hono()
         eq(scorecardGrades.snapshotId, scorecardSnapshots.id),
       )
       .leftJoin(entities, eq(scorecardGrades.entityId, entities.stableId))
+      .leftJoin(
+        sourceVerdicts,
+        verdictJoinCondition(
+          SCORECARD_GRADE_RECORD_TYPE,
+          scorecardGrades.id,
+        ),
+      )
       .where(where)
       .orderBy(
         desc(scorecardSnapshots.publishedAt),
@@ -158,6 +190,7 @@ const scorecardGradesApp = new Hono()
         scorecardSource: scorecardSnapshots.scorecardSource,
         publishedAt: scorecardSnapshots.publishedAt,
         isLatest: scorecardSnapshots.isLatest,
+        ...verdictSelectFields,
       })
       .from(scorecardGrades)
       .leftJoin(
@@ -165,6 +198,13 @@ const scorecardGradesApp = new Hono()
         eq(scorecardGrades.snapshotId, scorecardSnapshots.id),
       )
       .leftJoin(entities, eq(scorecardGrades.entityId, entities.stableId))
+      .leftJoin(
+        sourceVerdicts,
+        verdictJoinCondition(
+          SCORECARD_GRADE_RECORD_TYPE,
+          scorecardGrades.id,
+        ),
+      )
       .where(
         and(
           eq(scorecardGrades.entityId, entityId),

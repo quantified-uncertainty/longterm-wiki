@@ -262,6 +262,63 @@ test.describe("Render audit — critical data tables", () => {
   });
 });
 
+test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
+  // Scorecard grades got SourceCheckDot indicators in QUA-839. Each
+  // populated matrix cell renders one dot via SourcingDot
+  // (role="img", aria-label starts with "Sourcing:"). Empty cells (em-dash
+  // placeholders) render no dot. Regression check: at least one dot must
+  // appear on /scorecards once any grade has been ingested.
+  test("/scorecards renders sourcing dots in matrix cells", async ({ page }) => {
+    await loadPage(page, "/scorecards");
+
+    const text = await getMainText(page);
+    const hasMatrix = !text.includes("No scorecard grades ingested yet");
+
+    if (hasMatrix) {
+      const dots = await page
+        .locator('[role="img"][aria-label^="Sourcing:"]')
+        .count();
+      expect(
+        dots,
+        "/scorecards should render at least one sourcing dot once grades are ingested",
+      ).toBeGreaterThan(0);
+    }
+  });
+
+  // Org-tab scorecards section must also render a dot for each panel grade.
+  // Anthropic is a stable target — it's covered by all five scorecard sources.
+  test("/organizations/anthropic ?tab=scorecards renders sourcing dots", async ({ page }) => {
+    await loadPage(page, "/organizations/anthropic");
+
+    // Click the Scorecards tab if present. The tab is suppressed when the
+    // org has no grades, so a missing tab is acceptable in CI builds where
+    // wiki-server isn't reachable.
+    const scorecardsTab = page.getByRole("tab", { name: /scorecards/i });
+    if ((await scorecardsTab.count()) === 0) return;
+
+    await scorecardsTab.click();
+    await page.waitForTimeout(800);
+
+    // Scope to the scorecards panels rather than the whole page — the
+    // EntityProfileShell header always renders its own rollup sourcing
+    // dot, so a global page count would pass even without QUA-839's
+    // per-grade dots. Each scorecard panel is keyed by its publisher
+    // ("by Future of Life Institute"), so we look for sourcing dots that
+    // live inside one of those panels.
+    const fliPanel = page.locator('article', {
+      hasText: "Future of Life Institute",
+    });
+    if ((await fliPanel.count()) === 0) return; // no FLI grades yet
+    const dotsInPanel = await fliPanel
+      .locator('[role="img"][aria-label^="Sourcing:"]')
+      .count();
+    expect(
+      dotsInPanel,
+      "FLI scorecard panel should render at least one sourcing dot",
+    ).toBeGreaterThan(0);
+  });
+});
+
 test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => {
   // Entity profile pages render a SourcingDot in the header. It must NOT
   // link to /sourcing/entity/<id> — that path is not a real record_type

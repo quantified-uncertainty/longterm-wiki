@@ -54,6 +54,13 @@ interface GradeRow {
   scoreNumeric: number | null;
   scoreLetter: string | null;
   scoreRaw: string;
+  /** Inline sourcing verdict (QUA-839). Null when never checked. */
+  sourcing: {
+    verdict: string;
+    confidence: number | null;
+    sourcesChecked: number;
+    checkedAt: string | null;
+  } | null;
 }
 
 /**
@@ -132,6 +139,9 @@ export default async function ScorecardsPage() {
       scoreLetter: g.scoreLetter,
       scoreRaw: g.scoreRaw,
       publishedAt: g.publishedAt,
+      sourcing: g.sourcing
+        ? { verdict: g.sourcing.verdict, checkedAt: g.sourcing.checkedAt }
+        : null,
     };
     if (existing) {
       existing.cells[g.scorecardSource] = cell;
