@@ -51,6 +51,11 @@ import {
   recomputeVerdict,
   recomputeVerdictBestEffort,
 } from "./recompute-verdict.js";
+import {
+  aggregateEvidence,
+  type AggregationResult,
+  type EvidenceRow,
+} from "./sourcing-aggregation.js";
 
 // ---- Constants ----
 
@@ -358,6 +363,7 @@ function mapEvidenceRow(e: {
   extractedQuote: string | null;
   verdict: string;
   confidence: number | null;
+  relevanceScore: number | null;
   isPrimarySource: boolean;
   checkerModel: string | null;
   notes: string | null;
@@ -376,6 +382,7 @@ function mapEvidenceRow(e: {
     extractedQuote: e.extractedQuote,
     verdict: e.verdict,
     confidence: e.confidence,
+    relevanceScore: e.relevanceScore,
     isPrimarySource: e.isPrimarySource,
     checkerModel: e.checkerModel,
     isStale: isStaleModel(e.checkerModel),
@@ -700,21 +707,57 @@ const sourcingApp = new Hono()
       return c.json({ error: "not_found", message: "Verdict not found" }, 404);
     }
 
-    // Return all verdicts for this record (row-level + any cell-level)
-    // Order by sourceUrl first (for grouping), then by checkedAt descending
-    const evidenceRows = await db
-      .select()
-      .from(recordSources)
-      .where(
-        and(
-          eq(recordSources.recordType, recordType),
-          eq(recordSources.recordId, recordId),
-        )
-      )
-      .orderBy(recordSources.sourceUrl, desc(recordSources.checkedAt))
-      .limit(200);
+    // QUA-792: pull the complete evidence set in one unbounded query so the
+    // aggregation matches what `recomputeVerdict` saw on write. The display
+    // payload caps at 200 rows in JS — fetching twice would double the
+    // index scan with no benefit.
+    const [allEvidence, claimProvenance] = await Promise.all([
+      db
+        .select()
+        .from(recordSources)
+        .where(
+          and(
+            eq(recordSources.recordType, recordType),
+            eq(recordSources.recordId, recordId),
+          )
+        ),
+      fetchClaimProvenance(db, recordType, recordId),
+    ]);
 
-    const claimProvenance = await fetchClaimProvenance(db, recordType, recordId);
+    // Re-run the canonical aggregation on read so the detail page renders
+    // the headline verdict and the disagree-explainer from the same
+    // `AggregationResult`. Keyed by `fieldName ?? ""` to mirror the
+    // `COALESCE(field_name, '')` key used by recomputeVerdict on write.
+    const verdictAggregations: Record<string, AggregationResult> = {};
+    const evidenceByFieldKey = new Map<string, EvidenceRow[]>();
+    for (const e of allEvidence) {
+      const key = e.fieldName ?? "";
+      let bucket = evidenceByFieldKey.get(key);
+      if (!bucket) {
+        bucket = [];
+        evidenceByFieldKey.set(key, bucket);
+      }
+      bucket.push({
+        verdict: e.verdict as EvidenceRow["verdict"],
+        relevanceScore: e.relevanceScore,
+        confidence: e.confidence,
+      });
+    }
+    for (const [key, rows] of evidenceByFieldKey) {
+      verdictAggregations[key] = aggregateEvidence(rows);
+    }
+
+    // Mirror the original ORDER BY (sourceUrl ASC, checkedAt DESC) + LIMIT 200
+    // for the display payload — done in JS to avoid a second SQL round trip.
+    const evidenceRows = [...allEvidence]
+      .sort((a, b) => {
+        const su = (a.sourceUrl ?? "").localeCompare(b.sourceUrl ?? "");
+        if (su !== 0) return su;
+        const at = a.checkedAt?.getTime() ?? 0;
+        const bt = b.checkedAt?.getTime() ?? 0;
+        return bt - at;
+      })
+      .slice(0, 200);
 
     return c.json({
       verdicts: verdictRows.map((v) => ({
@@ -731,6 +774,7 @@ const sourcingApp = new Hono()
         lastComputedAt: v.lastComputedAt,
       })),
       evidence: evidenceRows.map(mapEvidenceRow),
+      verdictAggregations,
       claimProvenance,
       currentCheckerModel: CURRENT_CHECKER_MODEL,
     });

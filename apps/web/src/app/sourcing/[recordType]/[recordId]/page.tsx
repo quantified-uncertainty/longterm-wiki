@@ -24,6 +24,10 @@ import { UncheckedSourcingState } from "@/components/sourcing/UncheckedSourcingS
 
 import { canonicalizeSourcingRecordType } from "./canonicalize-record-type";
 import { recordTypeToTable } from "@/lib/sourcing/record-type-table-map";
+import {
+  VerdictHeader,
+  type AggregationResultLike,
+} from "./VerdictHeader";
 
 export const revalidate = 3600;
 export const dynamicParams = true;
@@ -330,7 +334,20 @@ export default async function SourcingDetailPage({ params }: PageProps) {
     );
   }
 
-  const { verdicts, evidence } = detailResult.data;
+  const { verdicts, evidence, verdictAggregations } = detailResult.data;
+  // QUA-792: per-fieldName aggregation result keyed by `fieldName ?? ""`.
+  // Server-side `aggregateEvidence()` is the single source of truth; the
+  // headline label and the disagreement explainer both derive from it.
+
+  // Bucket evidence by fieldName once so the verdict map below is O(N+M)
+  // instead of O(N·M) (one filter per verdict iteration).
+  const evidenceByField = new Map<string | null, typeof evidence>();
+  for (const e of evidence) {
+    const key = e.fieldName ?? null;
+    const bucket = evidenceByField.get(key);
+    if (bucket) bucket.push(e);
+    else evidenceByField.set(key, [e]);
+  }
   const rawResolvedName = namesResult.ok
     ? namesResult.data.names[recordId]
     : null;
@@ -550,85 +567,24 @@ export default async function SourcingDetailPage({ params }: PageProps) {
       {verdicts.length > 0 ? (
         <div className="space-y-3 mb-10">
           {verdicts.map((v, i) => {
-            const fieldEvidence = evidence.filter(
-              (e) => (e.fieldName ?? null) === (v.fieldName ?? null)
-            );
+            const fieldEvidence = evidenceByField.get(v.fieldName ?? null) ?? [];
             const fieldUniqueUrls = new Set(
               fieldEvidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
             );
-            const verdictColor =
-              v.verdict === "confirmed" ? "text-emerald-700 dark:text-emerald-400"
-              : v.verdict === "contradicted" ? "text-red-700 dark:text-red-400"
-              : v.verdict === "outdated" ? "text-amber-700 dark:text-amber-400"
-              : v.verdict === "partial" ? "text-amber-700 dark:text-amber-400"
-              : "text-muted-foreground";
-
-            // Detect cross-check disagreement: multiple distinct verdict values in evidence
-            const evidenceVerdicts = fieldEvidence.map((e) => e.verdict);
-            const uniqueEvidenceVerdicts = [...new Set(evidenceVerdicts)];
-            const hasDisagreement = uniqueEvidenceVerdicts.length > 1;
-            const disagreementCounts = uniqueEvidenceVerdicts.map(
-              (ev) => `${evidenceVerdicts.filter((x) => x === ev).length} ${ev}`
-            );
+            const aggregation =
+              (verdictAggregations?.[v.fieldName ?? ""] as
+                | AggregationResultLike
+                | undefined) ?? null;
 
             return (
-              <div
+              <VerdictHeader
                 key={`${v.fieldName ?? "overall"}-${i}`}
-                className="flex flex-wrap items-baseline gap-x-4 gap-y-1"
-              >
-                <div className="flex items-baseline gap-3">
-                  <span className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground font-mono">
-                    Verdict
-                  </span>
-                  <span className={`text-xl font-semibold tracking-tight ${verdictColor}`}>
-                    {v.verdict}
-                  </span>
-                  {v.confidence != null && (
-                    <span
-                      className="text-sm tabular-nums text-foreground/70"
-                    >
-                      {Math.round(v.confidence * 100)}%
-                    </span>
-                  )}
-                </div>
-                {v.fieldName && (
-                  <span
-                    className="text-xs text-muted-foreground"
-                  >
-                    field: {v.fieldName}
-                  </span>
-                )}
-                <span className="ml-auto text-[10px] uppercase tracking-[0.15em] text-muted-foreground font-mono">
-                  {fieldEvidence.length > 0 && (
-                    <>
-                      {fieldEvidence.length} check{fieldEvidence.length !== 1 ? "s" : ""}
-                      {fieldUniqueUrls.size > 0 && fieldUniqueUrls.size !== fieldEvidence.length && (
-                        <> · {fieldUniqueUrls.size} src</>
-                      )}
-                    </>
-                  )}
-                  {v.lastComputedAt && (
-                    <> · {new Date(v.lastComputedAt).toLocaleDateString()}</>
-                  )}
-                  {v.needsRecheck && (
-                    <> · <span className="text-amber-600 font-semibold">recheck</span></>
-                  )}
-                </span>
-                {hasDisagreement && (
-                  <div className="basis-full mt-1">
-                    <span className="inline-flex items-center gap-1.5 text-xs text-amber-700 dark:text-amber-400 bg-amber-50 dark:bg-amber-950/30 border border-amber-200 dark:border-amber-800/50 rounded px-2 py-0.5">
-                      ⚠ Checks disagree: {disagreementCounts.join(", ")}
-                    </span>
-                  </div>
-                )}
-                {v.reasoning && (
-                  <p
-                    className="basis-full text-sm text-muted-foreground italic leading-relaxed mt-1"
-                  >
-                    {stripInternalTags(v.reasoning)}
-                  </p>
-                )}
-              </div>
+                verdict={v}
+                aggregation={aggregation}
+                evidenceCount={fieldEvidence.length}
+                uniqueSourceCount={fieldUniqueUrls.size}
+                stripInternalTags={stripInternalTags}
+              />
             );
           })}
         </div>
