@@ -9,11 +9,14 @@
  *
  * Checks:
  * 1. ID resolves to a known entity (via pathRegistry, entities DB, or content file)
- * 2. Slug IDs should use numeric format instead (ERROR, auto-fixable)
- * 3. Wiki ID + name: validates name matches the entity's slug (ERROR if mismatch,
+ * 2. Slug IDs should use numeric format instead (ERROR, auto-fixable from
+ *    user-typed slug — safe)
+ * 3. Bare numeric ID (e.g. "35"): normalize to E-prefix only (ERROR,
+ *    auto-fixable; see QUA-761 — does not inject name= from registry)
+ * 4. Wiki ID + name: validates name matches the entity's slug (ERROR if mismatch,
  *    NO auto-fix — see QUA-761)
- * 4. Wiki ID without name: advisory (WARNING, auto-fixable)
- * 5. Unknown wiki ID: warning
+ * 5. Wiki ID without name: advisory (WARNING, auto-fixable)
+ * 6. Unknown wiki ID: warning
  */
 
 import { createRule, Issue, Severity, FixType, type ContentFile, type ValidationEngine } from '../validation/validation-engine.ts';
@@ -93,7 +96,13 @@ export const entityLinkIdsRule = createRule({
         if (/^\d+$/.test(rawId)) {
           const eId = `E${rawId}`;
           const slug = engine.idRegistry?.byWikiId[eId];
-          const nameStr = slug ? ` name="${slug}"` : '';
+          // Only normalize the E-prefix. Don't auto-inject name="${slug}" —
+          // (a) if the wiki ID was reassigned the registry slug mismatches
+          //     the prose (same hallucination as QUA-761's name-mismatch case),
+          // (b) if the original tag already has a name= attribute, injecting
+          //     produces a duplicate name= which breaks JSX compilation.
+          // The next validation pass surfaces the missing-name advisory if
+          // applicable, where the human can decide what to write.
           issues.push(new Issue({
             rule: this.id,
             file: content.path,
@@ -103,7 +112,7 @@ export const entityLinkIdsRule = createRule({
             fix: {
               type: FixType.REPLACE_TEXT,
               oldText: `id="${rawId}"`,
-              newText: `id="${eId}"${nameStr}`,
+              newText: `id="${eId}"`,
             },
           }));
           continue;

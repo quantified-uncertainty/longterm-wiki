@@ -1195,6 +1195,22 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
   });
 
+  it('normalizes bare numeric ID without injecting name= (QUA-761)', () => {
+    // Bare-numeric-ID auto-fix used to inject name="${currentSlug}", which
+    // had the same hallucination risk as the name-mismatch case if the wiki
+    // ID had been reassigned. Now the fix only normalizes the E-prefix.
+    const content = mockContent(
+      '<EntityLink id="42">Anthropic</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('bare wiki ID');
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.oldText).toBe('id="42"');
+    expect(issues[0].fix!.newText).toBe('id="E42"');
+  });
+
   it('passes for wiki ID with correct name', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="anthropic">Anthropic</EntityLink>',
