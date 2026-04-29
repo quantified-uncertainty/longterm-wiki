@@ -7,11 +7,6 @@ facts:
     asOf: 2023-12
     source: https://sacra.com/c/anthropic/
     notes: "Approximate ARR at end of 2023, pre-growth acceleration"
-    sourcing:
-      verdict: outdated
-      evidence: "1 → outdated; dissent: 1 → unverifiable"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.554Z
 
   - id: f_xZ7bD2nM4c
     property: revenue
@@ -19,11 +14,6 @@ facts:
     asOf: 2024-06
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "Approximately $1B ARR by mid-2024"
-    sourcing:
-      verdict: outdated
-      evidence: "2 → outdated; dissent: 1 → contradicted, 1 → unverifiable"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.534Z
 
   - id: f_i59sRXPSZw
     property: revenue
@@ -31,11 +21,6 @@ facts:
     asOf: 2025-01
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "ARR reached ~$1B by start of 2025 (corrected from end of 2024)"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → outdated, 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.535Z
 
   - id: f_pL4wK8vF2j
     property: revenue
@@ -43,11 +28,6 @@ facts:
     asOf: 2025-03
     source: https://www.reuters.com/technology/anthropic-on-track-raise-money-2-billion-run-rate-revenue-sources-2025-03-15/
     notes: "Run-rate revenue March 2025"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.665Z
 
   - id: f_WLpl0xLCEA
     property: revenue
@@ -55,11 +35,6 @@ facts:
     asOf: 2025-08
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "ARR exceeded $5B by August 2025 per source (corrected from $4B)"
-    sourcing:
-      verdict: contradicted
-      evidence: "2 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.533Z
 
   - id: f_5KhEeJqXzg
     property: revenue
@@ -67,11 +42,6 @@ facts:
     asOf: 2025-10
     source: https://www.pminsights.com/insights/anthropic-approaches-7b-run-rate-in-2025-outpaces-openai
     notes: "ARR approaching $7B; outpacing OpenAI growth rate"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:07.459Z
 
   - id: f_tG6nH1yS3b
     property: revenue
@@ -79,11 +49,6 @@ facts:
     asOf: 2025-12
     source: https://finance.yahoo.com/news/anthropic-secures-13b-series-f-094048133.html
     notes: "Run-rate exceeding $9B at end of 2025"
-    sourcing:
-      verdict: outdated
-      evidence: "1 → outdated; dissent: 1 → partial, 1 → unverifiable, 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.430Z
 
   - id: f_esWJIYxVFQ
     property: revenue
@@ -92,11 +57,6 @@ facts:
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     notes: "Run-rate revenue at Series G announcement; 500+ customers spending $1M+
       annually"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.579Z
 
   - id: f_dW5cR9mJ8q
     property: revenue
@@ -104,11 +64,6 @@ facts:
     asOf: 2026-03
     source: https://www.bloomberg.com/news/articles/2026-03-03/anthropic-nears-20-billion-revenue-run-rate-amid-pentagon-feud
     notes: "Nearing $20B ARR; company guidance $20-26B for 2026"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.431Z
 
   # ── Valuation ───────────────────────────────────────────────────
   - id: f_Ovz6tO7Sw0
@@ -117,11 +72,6 @@ facts:
     asOf: 2021-05
     source: https://www.anthropic.com/news/anthropic-raises-124-million-to-build-more-reliable-general-ai-systems
     notes: "Series A post-money valuation ($124M raised)"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.547Z
 
   - id: f_EWHMgxrxiJ
     property: valuation
@@ -129,11 +79,6 @@ facts:
     asOf: 2022-04
     source: https://www.anthropic.com/news/anthropic-raises-series-b-to-build-safe-reliable-ai
     notes: "Series B post-money valuation ($580M raised, led by Spark Capital)"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.550Z
 
   - id: f_P58xiOXz6l
     property: valuation
@@ -141,11 +86,6 @@ facts:
     asOf: 2023-05
     source: https://www.anthropic.com/news/anthropic-series-c
     notes: "Series C post-money valuation ($450M raised, led by Spark Capital)"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.546Z
 
   - id: f_CdywhhCodg
     property: valuation
@@ -153,11 +93,6 @@ facts:
     asOf: 2024-02
     source: https://www.reuters.com/technology/anthropic-valued-184-bln-latest-funding-round-sources-say-2024-02-20/
     notes: "Series D post-money valuation"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.766Z
 
   - id: f_Vs2y6JyGAA
     property: valuation
@@ -165,11 +100,6 @@ facts:
     asOf: 2025-03
     source: https://www.anthropic.com/news/anthropic-raises-series-e-at-usd61-5b-post-money-valuation
     notes: "Series E post-money valuation"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:07.431Z
 
   - id: f_QNbaTzUdGQ
     property: valuation
@@ -177,11 +107,6 @@ facts:
     asOf: 2025-09
     source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
     notes: "Series F post-money valuation"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:07.366Z
 
   - id: f_mN3pQ7kX2r
     property: valuation
@@ -190,11 +115,6 @@ facts:
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     notes: "Series G post-money valuation; second-largest venture deal ever behind
       OpenAI's $40B"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.545Z
 
   - id: f_kR8wT3vN6m
     property: secondary-valuation
@@ -206,11 +126,6 @@ facts:
       $259-306 in Feb 2026 secondary markets. Represents ~57% premium over $380B
       Series G. Oracle price ~$520, suggesting actual OTC trades at lower levels
       (~$580B implied)."
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.139Z
 
   # ── Employee Tender Offer ───────────────────────────────────────
   - id: f_nQ4xW7mK9p
@@ -221,11 +136,6 @@ facts:
     notes: "Employee share sale program, $5-6B at $350B pre-money valuation (below
       the $380B post-money Series G). Provides employee liquidity while company
       remains private. Launched Feb 2026 per Bloomberg."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:04:28.357Z
 
   # ── Total Funding ───────────────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -253,11 +163,6 @@ facts:
       strategic investments. Excludes Microsoft/Nvidia 'up to $15B' commitment
       (not fully deployed). The FTX ~$500M investment (2022) was sold to
       creditors after FTX's collapse and is not counted in the live total."
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:45.490Z
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_zBoko30S4g
@@ -266,11 +171,6 @@ facts:
     asOf: 2022
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "Annual headcount figure for 2022"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.506Z
 
   - id: f_a7TezcOwMA
     property: headcount
@@ -278,11 +178,6 @@ facts:
     asOf: 2024-09
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
     notes: "As of September 2024 per seo.ai; 331% growth from 240 in 2023"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.322Z
 
   - id: f_Z7oaVivRvE
     property: headcount
@@ -291,27 +186,14 @@ facts:
       - 300
     asOf: 2023-06
     source: https://seo.ai/blog/how-many-people-work-at-anthropic
-    notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other
-      sources suggest up to 300"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.321Z
+    notes: "Approximate headcount mid-2023; seo.ai reports ~240 for 2023, other sources suggest up to 300"
 
   # UNVERIFIED ESTIMATE — range, not point value
   - id: f_0PxEBZyv45
     property: headcount
     value: 600
     asOf: 2024-03
-    notes: "Rough mid-point estimate for early 2024. No published source;
-      interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as
-      range [500,700]; simplified to point estimate for consistency."
-    sourcing:
-      verdict: outdated
-      evidence: "1 → outdated; dissent: 1 → unverifiable"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:28.332Z
+    notes: "Rough mid-point estimate for early 2024. No published source; interpolated between 240 (2023) and 1,035 (Sep 2024). Previously stored as range [500,700]; simplified to point estimate for consistency."
 
   - id: f_J3yAxRJ05k
     property: headcount
@@ -320,13 +202,7 @@ facts:
       - 1300
     asOf: 2025-03
     source: https://electroiq.com/stats/anthropic-statistics/
-    notes: "Sources report ~1,097 employees in early 2025; company planned to double
-      by year-end"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:07.322Z
+    notes: "Sources report ~1,097 employees in early 2025; company planned to double by year-end"
 
   - id: f_arY5X2VqcY
     property: headcount
@@ -335,27 +211,15 @@ facts:
       - 2000
     asOf: 2025-09
     source: https://www.anthropic.com/news/anthropic-raises-series-f-at-usd183b-post-money-valuation
-    notes: "At Series F announcement; tripling international headcount was announced
-      but not yet completed"
-    sourcing:
-      verdict: unverifiable
-      evidence: "3 → unverifiable; dissent: 1 → contradicted"
-      confidence: 0.73333335
-      checkedAt: 2026-04-29T16:01:45.448Z
+    notes: "At Series F announcement; tripling international headcount was announced but not yet completed"
 
   # UNVERIFIED ESTIMATE
   - id: f_BdGi5l9dOg
     property: headcount
     value: 4074
     asOf: 2026-01
-    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic
-      planned to triple international headcount in late 2025. Treat as rough
-      estimate."
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:05:52.403Z
+    notes: "Estimate; Tracxn source could not be verified (paywall). Anthropic planned
+      to triple international headcount in late 2025. Treat as rough estimate."
 
   # ── Organizational ──────────────────────────────────────────────
   - id: f_8kX2pQ7mNr
@@ -363,11 +227,6 @@ facts:
     value: 2021-01
     source: https://anthropic.com/company
     notes: "Founded by seven former OpenAI researchers in January 2021"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.9
-      checkedAt: 2026-04-29T16:01:45.447Z
 
   - id: f_tAtOfKqDjg
     property: founded-by
@@ -381,21 +240,11 @@ facts:
       - !ref sid_YqSmRNVRAg
     source: https://anthropic.com/company
     notes: "Seven former OpenAI researchers"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.272Z
 
   - id: f_vB2hE7oA5k
     property: headquarters
     value: "San Francisco, CA"
     source: https://anthropic.com/company
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.232Z
 
   - id: f_jY8uL5xV1w
     property: legal-structure
@@ -403,11 +252,6 @@ facts:
     source: https://corpgov.law.harvard.edu/2023/10/28/anthropic-long-term-benefit-trust/
     notes: "Incorporated as Delaware PBC with Long-Term Benefit Trust holding Class
       T stock"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.232Z
 
   # ── Financial Detail ────────────────────────────────────────────
   - id: f_gM7xR4nW2b
@@ -417,11 +261,6 @@ facts:
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "Actual 2025 gross margin; 10 percentage points below previous estimate;
       inference costs surged 23% more than expected"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.231Z
 
   - id: f_VeJPtr2gAQ
     property: gross-margin
@@ -429,11 +268,6 @@ facts:
     asOf: 2026-12
     source: https://www.theinformation.com/articles/anthropics-finances
     notes: "2026 target gross margin (forward-looking); 2028 target is 77%"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.230Z
 
   - id: f_TaHnceQDdQ
     property: cash-burn
@@ -441,11 +275,6 @@ facts:
     asOf: 2024-12
     source: https://www.investing.com/news/company-news/anthropic-set-to-become-profitable-before-openai-amid-ai-race-4349418
     notes: "Annual cash burn for 2024"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.187Z
 
   - id: f_SImz3xFPTw
     property: cash-burn
@@ -453,11 +282,6 @@ facts:
     asOf: 2025-12
     source: https://cybernews.com/ai-news/openai-anthropic-profit-revenue-ai/
     notes: "Expected cash burn for 2025; down from $5.6B in 2024"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.140Z
 
   # ── Market Share ────────────────────────────────────────────────
   - id: f_bqY8WIQxNg
@@ -466,11 +290,6 @@ facts:
     asOf: 2024-12
     source: https://www.emarketer.com/content/openai-leads--anthropic-surges-enterprise-ai-shifts-multi-model-reality
     notes: "Enterprise AI assistant market share"
-    sourcing:
-      verdict: outdated
-      evidence: "1 → outdated; dissent: 1 → unverifiable"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.138Z
 
   - id: f_nitUVudRdQ
     property: enterprise-market-share
@@ -478,25 +297,13 @@ facts:
     asOf: 2025-07
     source: https://dataconomy.com/2025/08/04/anthropic-leads-enterprise-llms-with-32-market-share/
     notes: "Menlo Ventures survey; up from 12% two years prior. OpenAI at 50% → 25%"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.139Z
 
   - id: f_qgj5UBfOAg
     property: enterprise-market-share
     value: 32
     asOf: 2025-07
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
-    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey
-      (corrected from coding-market-share — source describes overall enterprise
-      usage, not coding-specific)"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.137Z
+    notes: "32% enterprise LLM market share by usage per Menlo Ventures survey (corrected from coding-market-share — source describes overall enterprise usage, not coding-specific)"
 
   # ── Product & Usage ─────────────────────────────────────────────
   - id: f_JoN2Jr8liA
@@ -505,11 +312,6 @@ facts:
     asOf: 2025-03
     source: https://backlinko.com/claude-users
     notes: "Monthly active users across claude.ai"
-    sourcing:
-      verdict: outdated
-      evidence: 2 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.089Z
 
   - id: f_GYoFtt5wsw
     property: business-customers
@@ -518,11 +320,6 @@ facts:
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     notes: "Grew from fewer than 1,000 businesses to 300,000+ in two years; 80% of
       revenue from business"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.050Z
 
   - id: f_Nje8oobrCw
     property: api-calls-monthly
@@ -530,11 +327,6 @@ facts:
     asOf: 2025-12
     source: https://www.businessofapps.com/data/claude-statistics/
     notes: "Monthly API calls"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.050Z
 
   - id: f_C3f6dHDO8Q
     property: product-revenue
@@ -543,11 +335,6 @@ facts:
     source: https://www.reuters.com/technology/anthropic-closes-30-billion-funding-round-2026-02-01/
     notes: "Claude Code run-rate revenue; hit $1B milestone in Nov 2025, doubled by
       Feb 2026"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.053Z
 
   # ── Safety ──────────────────────────────────────────────────────
   - id: f_BnkEWenniQ
@@ -557,11 +344,6 @@ facts:
     validEnd: 2026-02
     source: https://www.anthropic.com/news/activating-asl3-protections
     notes: "First activation of ASL-3 for Claude Opus 4; precautionary/provisional"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.052Z
 
   - id: f_R59LmVVzcw
     property: safety-level
@@ -570,11 +352,6 @@ facts:
     source: https://www.anthropic.com/news/activating-asl3-protections
     notes: "Opus 4.6 launched Feb 2026 under ASL-3; all Opus-tier models are ASL-3,
       Sonnet/Haiku remain ASL-2"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.9
-      checkedAt: 2026-04-29T16:04:06.999Z
 
   - id: f_ddR2zmZ1ZQ
     property: safety-researcher-count
@@ -596,8 +373,7 @@ facts:
     property: secondary-valuation
     value: 3.5e+11
     asOf: 2025-11
-    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to
-      secondary-valuation."
+    notes: "Valuation at Microsoft/Nvidia commitment. No primary source — moved to secondary-valuation."
 
   - id: f_U3LMAv6zjQ
     property: revenue-guidance
@@ -691,31 +467,16 @@ facts:
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.951Z
   - id: f_BSBLpMsrV9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.951Z
   - id: f_d4KxinkJcv
     property: founded-by-name
     value: Chris Olah
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.949Z
   - id: f_b9ssNpugov
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Anthropic

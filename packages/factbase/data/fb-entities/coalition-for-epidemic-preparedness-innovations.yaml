@@ -13,25 +13,12 @@ facts:
     property: founded-date
     value: "2017-01"
     source: https://www.wikidata.org/wiki/Q27133033
-    notes: "Launched January 2017 at World Economic Forum in Davos (corrected from
-      2016-08). Wikidata lists 30 August 2016 as inception (the incorporation
-      date); we use the formal public launch date per
-      cepi.net/cepi-officially-launched."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.196Z
+    notes: "Launched January 2017 at World Economic Forum in Davos (corrected from 2016-08). Wikidata lists 30 August 2016 as inception (the incorporation date); we use the formal public launch date per cepi.net/cepi-officially-launched."
   - id: f_nW59QxWSK9
     property: headquarters
     value: Oslo
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.156Z
   - id: f_h29qhzOnXy
     property: website
     value: https://cepi.net
@@ -42,51 +29,26 @@ facts:
     value: Norway
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.156Z
   - id: f_JivNYnSW9t
     property: ceo
     value: !ref sid_QkTjuStGuw
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.155Z
   - id: f_dypLk7qm6i
     property: revenue
     value: 1273354629
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.121Z
   - id: f_qFoyma6iMq
     property: founded-by-name
     value: Japan
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.089Z
   - id: f_sBcLONCBVu
     property: legal-structure
     value: forening/lag/innretning
     source: https://www.wikidata.org/wiki/Q27133033
     notes: From Wikidata Q27133033
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.066Z
   - id: f_p4A03REJu7
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Coalition_for_Epidemic_Preparedness_Innovations

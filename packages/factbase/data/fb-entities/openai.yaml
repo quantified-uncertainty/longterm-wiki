@@ -4,23 +4,13 @@ facts:
     property: founded-date
     value: "2015-12-11"
     source: https://openai.com/blog/introducing-openai
-    notes: "Founded December 11, 2015 by Sam Altman, Ilya Sutskever, Greg Brockman,
-      Elon Musk, Wojciech Zaremski, and John Schulman. Blog post dated Dec 11."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:51.239Z
+    notes: "Founded December 11, 2015 by Sam Altman, Ilya Sutskever, Greg Brockman, Elon
+      Musk, Wojciech Zaremski, and John Schulman. Blog post dated Dec 11."
 
   - id: f_jyRF7MXyWw
     property: headquarters
     value: "San Francisco, CA"
     source: https://openai.com/about
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.186Z
 
   - id: f_78GQ07iiCQ
     property: legal-structure
@@ -29,11 +19,6 @@ facts:
     validEnd: "2019-03"
     source: https://openai.com/blog/introducing-openai
     notes: "Originally incorporated as nonprofit OpenAI Inc."
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:51.157Z
 
   - id: f_tuq7f39JMg
     property: legal-structure
@@ -42,11 +27,6 @@ facts:
     validEnd: "2025"
     source: https://openai.com/blog/openai-lp
     notes: "Created capped-profit subsidiary OpenAI LP"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.154Z
 
   - id: f_tz2t0YfIWg
     property: legal-structure
@@ -56,11 +36,6 @@ facts:
     source: https://openai.com/blog/openai-lp
     notes: "Announced conversion to PBC in early 2025; superseded by completed
       restructuring in October 2025"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.153Z
 
   - id: f_fRR7Yodhrw
     property: legal-structure
@@ -70,11 +45,6 @@ facts:
     notes: "Completed restructuring into OpenAI Group PBC on October 28, 2025.
       Nonprofit OpenAI Foundation holds 26% equity stake ($130B) and retains
       legal control. $500B valuation. Microsoft holds 27% stake ($135B)."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.144Z
 
   - id: f_A4ImW0y2sw
     property: founded-by
@@ -86,11 +56,6 @@ facts:
       - !ref sid_4eNHxKcml1
       - !ref sid_ZocUS6ej6S
     source: https://openai.com/blog/introducing-openai
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:51.101Z
 
   - id: f_HfB3WmNDFQ
     property: total-funding
@@ -101,29 +66,20 @@ facts:
     notes: "Cumulative funding including $6.6B round in October 2024 (led by Thrive
       Capital, with Microsoft, NVIDIA, SoftBank, and others) on top of ~$11.3B
       in prior rounds. Superseded by SoftBank $40B round in March 2025."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.785Z
 
   - id: f_Sb4nW9mT7a
     property: total-funding
     value: 5.99e+10
     asOf: 2025-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
-    notes: "Cumulative funding through SoftBank's $40B round (March 2025) at a $300B
-      valuation. Bottom-up sum of documented rounds: $1B founding pledge (2015)
-      + $1B Microsoft (2019) + $1B Series (2021) + $300M Series (2023) + $10B
-      Microsoft (2023) + $6.6B Series (Oct 2024) + $40B SoftBank (Mar 2025) =
-      $59.9B. OpenAI's own March 2025 announcement stated \"approximately
-      $57.9B\" — the ~$2B gap reflects OpenAI's exclusion of the 2015 founding
-      pledge (most of which was never realized) from its cumulative figure."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.870Z
+    notes: "Cumulative funding through SoftBank's $40B round (March 2025) at a
+      $300B valuation. Bottom-up sum of documented rounds: $1B founding
+      pledge (2015) + $1B Microsoft (2019) + $1B Series (2021) + $300M
+      Series (2023) + $10B Microsoft (2023) + $6.6B Series (Oct 2024) + $40B
+      SoftBank (Mar 2025) = $59.9B. OpenAI's own March 2025 announcement
+      stated \"approximately $57.9B\" — the ~$2B gap reflects OpenAI's
+      exclusion of the 2015 founding pledge (most of which was never
+      realized) from its cumulative figure."
 
   # ── Valuation ──────────────────────────────────────────────────
   - id: f_b56n3kcD2g
@@ -138,11 +94,6 @@ facts:
     asOf: 2025-03
     source: https://openai.com/index/softbank-openai-joint-announcement/
     notes: "SoftBank $40B funding round valuation, March 2025"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.826Z
 
   - id: f_YZ7zzKgBsA
     property: valuation
@@ -150,11 +101,6 @@ facts:
     asOf: 2025-10
     source: https://www.cnbc.com/2025/10/28/open-ai-for-profit-microsoft.html
     notes: "PBC restructuring valuation, October 2025"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.066Z
 
   # ── Revenue ────────────────────────────────────────────────────
   - id: f_yvm9QNFjdA
@@ -170,24 +116,14 @@ facts:
     source: https://www.pymnts.com/artificial-intelligence-2/2026/openais-annual-recurring-revenue-tripled-to-20-billion-in-2025/
     notes: "Full-year 2025 actual revenue of $13.1B, beating $13B forecast by $100M.
       ARR exceeded $20B by year-end per CFO Sarah Friar."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.062Z
 
   - id: f_8XLLtHLMdg
     property: revenue
     value: 2.5e+10
     asOf: 2026-02
     source: https://sacra.com/c/openai/
-    notes: "Annualized revenue run rate as of February 2026 per Sacra; up from $20B
-      at end of 2025"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.061Z
+    notes: "Annualized revenue run rate as of February 2026 per Sacra; up from
+      $20B at end of 2025"
 
   # ── Headcount ──────────────────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -204,11 +140,6 @@ facts:
     source: https://www.cnbc.com/2026/03/21/openai-to-nearly-double-workforce-to-8000-by-end-2026-ft-reports.html
     notes: "Current headcount as of March 2026; OpenAI plans to nearly double
       workforce to 8,000 by end of 2026 per FT/CNBC reports"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.056Z
 
   # ── Market Share ───────────────────────────────────────────────
   - id: f_xW3cN7mP4q
@@ -218,25 +149,15 @@ facts:
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
     notes: "Enterprise LLM API market share per Menlo Ventures survey; dominant
       position at the time"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:51.018Z
 
   - id: f_rK9bF2vL6s
     property: market-share
     value: 27
     asOf: 2025-12
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
-    notes: "Enterprise LLM API market share per Menlo Ventures December 2025 report;
-      lost nearly half of market since 2023 (50% to 27%) as Anthropic (40%)
-      overtook OpenAI"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.973Z
+    notes: "Enterprise LLM API market share per Menlo Ventures December 2025
+      report; lost nearly half of market since 2023 (50% to 27%) as Anthropic
+      (40%) overtook OpenAI"
 
   # ── Gross Margin ───────────────────────────────────────────────
   - id: f_hJ5dQ8nT3w
@@ -246,11 +167,6 @@ facts:
     source: https://sacra.com/c/openai/
     notes: "Adjusted gross margin for 2025; down from 40% in 2024 and below 46%
       target. Inference costs reached $8.4B in 2025, constraining margins."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.974Z
 
   # ── Monthly Active Users ──────────────────────────────────────
   - id: f_5VcbvP89LA
@@ -267,11 +183,6 @@ facts:
     source: https://nerdynav.com/chatgpt-statistics/
     notes: "Estimated MAU based on traffic data and weekly active user
       extrapolation; OpenAI does not officially disclose MAU"
-    sourcing:
-      verdict: outdated
-      evidence: 1 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.971Z
 
   # ── Weekly Active Users ──────────────────────────────────────
   - id: f_br0wYi0tog
@@ -281,24 +192,14 @@ facts:
     source: https://openai.com/index/400-million-users/
     notes: "ChatGPT weekly active users as of February 2025; reported by OpenAI CEO
       Sam Altman"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.851Z
 
   - id: f_OXCw5BvQtQ
     property: weekly-active-users
     value: 8e+8
     asOf: 2025-10
     source: https://www.demandsage.com/chatgpt-statistics/
-    notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman. Some
-      sources estimate 1B+ MAU by January 2026."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.967Z
+    notes: "800M weekly active users (WAU) as of October 2025, per Sam Altman.
+      Some sources estimate 1B+ MAU by January 2026."
 
   - id: f_irWobt0L9Q
     property: weekly-active-users
@@ -306,11 +207,6 @@ facts:
     asOf: 2026-02
     source: https://almcorp.com/blog/chatgpt-900-million-weekly-active-users/
     notes: "ChatGPT reached 900M weekly active users announced February 27, 2026"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.933Z
 
   # ── Business Customers ────────────────────────────────────────
   - id: f_CAsPvnUElQ
@@ -318,13 +214,8 @@ facts:
     value: 1000000
     asOf: 2025-09
     source: https://openai.com/index/1-million-businesses-putting-ai-to-work/
-    notes: "Reached 1 million business customers milestone; fastest-growing business
-      platform in history per OpenAI"
-    sourcing:
-      verdict: outdated
-      evidence: 1 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.882Z
+    notes: "Reached 1 million business customers milestone; fastest-growing
+      business platform in history per OpenAI"
 
   - id: f_PpiIFr576g
     property: business-customers
@@ -332,13 +223,8 @@ facts:
     asOf: 2026-02
     source: https://sacra.com/c/openai/
     notes: "9M+ paying business users as of February 2026; includes ChatGPT
-      Enterprise, Team, and business API customers. Enterprise seats grew 9x
-      year-over-year."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.882Z
+      Enterprise, Team, and business API customers. Enterprise seats grew
+      9x year-over-year."
 
   # ── Product Revenue ───────────────────────────────────────────
   - id: f_F6F2FrPKGg
@@ -347,13 +233,7 @@ facts:
     asOf: 2025-12
     source: https://sacra.com/c/openai/
     notes: "Full-year 2025 revenue ~$20B per CFO Sarah Friar. Consumer subscriptions
-      ~75%, API revenue exceeded $1B ARR. Annualized run rate rose to $25B by
-      Feb 2026."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.880Z
+      ~75%, API revenue exceeded $1B ARR. Annualized run rate rose to $25B by Feb 2026."
 
   # ── Cash Burn ─────────────────────────────────────────────────
   - id: f_Fy9eOKxsbA
@@ -363,11 +243,6 @@ facts:
     source: https://fortune.com/2025/11/12/openai-cash-burn-rate-annual-losses-2028-profitable-2030-financial-documents/
     notes: "Annual net loss of approximately $5B in 2024 excluding stock-based
       compensation; total operating costs ~$9B against ~$4B revenue"
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.874Z
 
   - id: f_SiRGFVNapg
     property: cash-burn
@@ -376,11 +251,6 @@ facts:
     source: https://sacra.com/c/openai/
     notes: "Cash burn of ~$8.5B on ~$20B in revenue for 2025; cash burn rate
       approximately 43% of revenue."
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.847Z
 
   # ── Enterprise Market Share ───────────────────────────────────
   - id: f_wwhRjMvagg
@@ -388,39 +258,24 @@ facts:
     value: 50
     asOf: 2023-12
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
-    notes: "Enterprise LLM API market share per Menlo Ventures; dominant position
-      before Anthropic's rise"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.794Z
+    notes: "Enterprise LLM API market share per Menlo Ventures; dominant
+      position before Anthropic's rise"
 
   - id: f_4YoVOtpBdg
     property: enterprise-market-share
     value: 25
     asOf: 2025-07
     source: https://menlovc.com/perspective/2025-mid-year-llm-market-update/
-    notes: "Enterprise LLM market share per Menlo Ventures mid-2025 update; halved
-      from 50% in 2023 as Anthropic rose to 32%"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:50.794Z
+    notes: "Enterprise LLM market share per Menlo Ventures mid-2025 update;
+      halved from 50% in 2023 as Anthropic rose to 32%"
 
   - id: f_spJ9bPCr0w
     property: enterprise-market-share
     value: 27
     asOf: 2025-12
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
-    notes: "Enterprise LLM API market share per Menlo Ventures December 2025 report;
-      Anthropic at 40%, Google at 21%"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.795Z
+    notes: "Enterprise LLM API market share per Menlo Ventures December 2025
+      report; Anthropic at 40%, Google at 21%"
 
   # ── Coding Market Share ───────────────────────────────────────
   - id: f_PS27ufSjTA
@@ -430,11 +285,6 @@ facts:
     source: https://techcrunch.com/2025/07/31/enterprises-prefer-anthropics-ai-models-over-anyone-elses-including-openais/
     notes: "Enterprise coding assistant market share per Menlo Ventures mid-2025;
       Anthropic at 42%, more than double OpenAI's share"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.787Z
 
   - id: f_8OwwUfsBMw
     property: coding-market-share
@@ -443,11 +293,6 @@ facts:
     source: https://menlovc.com/perspective/2025-the-state-of-generative-ai-in-the-enterprise/
     notes: "Enterprise coding market share per Menlo Ventures December 2025;
       Anthropic expanded to 54%. Coding is a $4B category."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.761Z
 
   # ── Safety Level ──────────────────────────────────────────────
   - id: f_fVImwrRN8A
@@ -455,15 +300,10 @@ facts:
     value: "High/Critical capability thresholds (Preparedness Framework v2)"
     asOf: 2025-04
     source: https://cdn.openai.com/pdf/18a02b5d-6b67-4cec-ab64-68cdfbddebcd/preparedness-framework-v2.pdf
-    notes: "OpenAI uses its own Preparedness Framework (v2, April 2025) rather than
-      Anthropic's ASL system. Two thresholds: 'High capability' (could amplify
-      existing harm pathways) and 'Critical capability' (unprecedented new harm
-      pathways). No models currently rated at Critical level."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.700Z
+    notes: "OpenAI uses its own Preparedness Framework (v2, April 2025) rather
+      than Anthropic's ASL system. Two thresholds: 'High capability' (could
+      amplify existing harm pathways) and 'Critical capability' (unprecedented
+      new harm pathways). No models currently rated at Critical level."
 
   # ── Safety Researcher Count ───────────────────────────────────
   - id: f_yF0X77SvbQ
@@ -472,13 +312,8 @@ facts:
     asOf: 2025-12
     source: https://sqmagazine.co.uk/how-many-people-work-at-openai/
     notes: "650+ employees across trust, safety, and alignment divisions. Includes
-      Preparedness team, Safety Systems team, and alignment researchers. Daily
-      human review audits exceed 500,000 samples."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:13.270Z
+      Preparedness team, Safety Systems team, and alignment researchers.
+      Daily human review audits exceed 500,000 samples."
 
   # ── Interpretability Team Size ────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -497,14 +332,9 @@ facts:
     value: 3e+10
     asOf: 2026-01
     source: https://epoch.ai/gradient-updates/openai-is-projecting-unprecedented-revenue-growth
-    notes: "2026 revenue projection of ~$30B (2.3x growth from 2025's $13.1B); 2027
-      projected at ~$62B (2x), 2028 at ~$100B (1.6x), 2030 target $280B per CFO
-      Sarah Friar"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.699Z
+    notes: "2026 revenue projection of ~$30B (2.3x growth from 2025's $13.1B);
+      2027 projected at ~$62B (2x), 2028 at ~$100B (1.6x), 2030 target
+      $280B per CFO Sarah Friar"
 
   # ── Retention Rate ────────────────────────────────────────────
   - id: f_mu9366g8mA
@@ -513,13 +343,8 @@ facts:
     asOf: 2025-06
     source: https://www.pymnts.com/artificial-intelligence-2/2025/report-chatgpt-plus-has-top-retention-rate-among-ai-subscription-services/
     notes: "ChatGPT Plus paid user retention rate of 71% at six months, ranking
-      first among AI subscription services. 89% after one quarter, 74% after
-      three quarters, 68% at 12 months. Paid churn under 4% monthly."
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:46.135Z
+      first among AI subscription services. 89% after one quarter, 74%
+      after three quarters, 68% at 12 months. Paid churn under 4% monthly."
 
   # ── Customer Concentration ────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -528,9 +353,9 @@ facts:
     value: 10
     asOf: 2025-12
     notes: "Estimate; no published source. Revenue concentration from largest
-      customer (likely Microsoft via API/Azure partnership) estimated at ~10%.
-      With 1M+ business customers and 15M+ Plus subscribers, OpenAI has
-      relatively low customer concentration compared to B2B-focused
+      customer (likely Microsoft via API/Azure partnership) estimated at
+      ~10%. With 1M+ business customers and 15M+ Plus subscribers, OpenAI
+      has relatively low customer concentration compared to B2B-focused
       competitors."
 
   # ── Infrastructure Investment ─────────────────────────────────
@@ -539,15 +364,10 @@ facts:
     value: 6e+11
     asOf: 2026-02
     source: https://www.cnbc.com/2026/02/20/openai-resets-spend-expectations-targets-around-600-billion-by-2030.html
-    notes: "Cumulative compute spending TARGET of $600B by 2030 (down from earlier
-      $1.4T commitment). This is a future projection, not current spend.
-      Includes $250B Microsoft Azure commitment and $38B AWS commitment. Compute
-      capacity reached 1.9GW by end of 2025, a 9.5x increase from 2023."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.698Z
+    notes: "Cumulative compute spending TARGET of $600B by 2030 (down from
+      earlier $1.4T commitment). This is a future projection, not current spend.
+      Includes $250B Microsoft Azure commitment and $38B AWS commitment.
+      Compute capacity reached 1.9GW by end of 2025, a 9.5x increase from 2023."
 
   # ── Equity Stake ──────────────────────────────────────────────
   - id: f_FZb1inTwrQ
@@ -555,14 +375,10 @@ facts:
     value: 27
     asOf: 2025-10
     source: https://fortune.com/2025/10/28/openai-for-profit-restructuring-microsoft-stake/
-    notes: "Microsoft equity stake in OpenAI Group PBC after restructuring; valued
-      at approximately $135B on $500B valuation. Down from previous 32.5% stake.
-      Microsoft invested $13.8B total ($11.6B funded as of September 2025)."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:28.330Z
+    notes: "Microsoft equity stake in OpenAI Group PBC after restructuring;
+      valued at approximately $135B on $500B valuation. Down from previous
+      32.5% stake. Microsoft invested $13.8B total ($11.6B funded as of
+      September 2025)."
 
   - id: f_12O2XaCyPA
     property: equity-stake-percent
@@ -570,13 +386,8 @@ facts:
     asOf: 2025-10
     source: https://www.cnbc.com/2025/10/28/open-ai-for-profit-microsoft.html
     notes: "OpenAI Foundation equity stake in OpenAI Group PBC; valued at ~$130B.
-      Foundation retains legal control. 47% held by current/former employees and
-      investors."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:28.315Z
+      Foundation retains legal control. 47% held by current/former employees
+      and investors."
 
   # ── Equity Value ──────────────────────────────────────────────
   - id: f_swFnF8WXew
@@ -584,13 +395,8 @@ facts:
     value: 1.35e+11
     asOf: 2025-10
     source: https://www.constellationr.com/blog-news/insights/microsoft-owns-27-openai-worth-135-billion
-    notes: "Microsoft's 27% equity stake valued at $135B based on $500B valuation at
-      PBC restructuring"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:28.273Z
+    notes: "Microsoft's 27% equity stake valued at $135B based on $500B
+      valuation at PBC restructuring"
 
   # ── Annual Expenses ───────────────────────────────────────────
   - id: f_1tj27H2wMw
@@ -598,13 +404,8 @@ facts:
     value: 9e+9
     asOf: 2024-12
     source: https://sanj.dev/post/real-cost-of-ai-openai-financials
-    notes: "Total operating costs approximately $9B in 2024; includes ~$3B training
-      compute, ~$2B inference compute, plus staff and operations"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:03:50.699Z
+    notes: "Total operating costs approximately $9B in 2024; includes ~$3B
+      training compute, ~$2B inference compute, plus staff and operations"
 
   - id: f_DtyJCdGd1g
     property: annual-expenses
@@ -614,11 +415,6 @@ facts:
     notes: "Total anticipated spending of ~$22B in 2025 against $13.1B revenue;
       inference costs of $8.4B, R&D of $6.7B in H1 alone, plus $2.5B in
       stock-based compensation in H1"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:50.676Z
 
   # ── Safety Staffing Ratio ─────────────────────────────────────
   # UNVERIFIED ESTIMATE
@@ -626,8 +422,8 @@ facts:
     property: safety-staffing-ratio
     value: 19
     asOf: 2025-12
-    notes: "Estimate; no published source. 650+ safety/trust/alignment staff out of
-      ~3,500 total employees, approximately 19% of workforce"
+    notes: "Estimate; no published source. 650+ safety/trust/alignment staff out
+      of ~3,500 total employees, approximately 19% of workforce"
 
   # ── API Calls Monthly ────────────────────────────────────────
   - id: f_DJyrjvvvIg
@@ -636,14 +432,9 @@ facts:
     asOf: 2025-10
     source: https://techcrunch.com/2025/10/06/sam-altman-says-chatgpt-has-hit-800m-weekly-active-users/
     notes: "Approximate monthly API calls derived from Sam Altman's October 2025
-      disclosure of 6B tokens per minute on the API, up 20x over two years. At
-      6B tokens/min and ~1,000 tokens per call average, this implies roughly
-      8.6T tokens/day processed."
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:03:50.607Z
+      disclosure of 6B tokens per minute on the API, up 20x over two years.
+      At 6B tokens/min and ~1,000 tokens per call average, this implies
+      roughly 8.6T tokens/day processed."
 
   # ── GPU Count ─────────────────────────────────────────────────
   - id: f_eC8eggO7bA
@@ -651,14 +442,9 @@ facts:
     value: 1000000
     asOf: 2025-12
     source: https://www.tomshardware.com/tech-industry/sam-altman-teases-100-million-gpu-scale-for-openai-that-could-cost-usd3-trillion-chatgpt-maker-to-cross-well-over-1-million-by-end-of-year
-    notes: "Sam Altman stated in July 2025 that OpenAI was on track to bring 'well
-      over' 1M GPUs online by end of 2025. Compute capacity reached 1.9GW by end
-      of 2025. Stargate Project aims for ~2M chips."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.608Z
+    notes: "Sam Altman stated in July 2025 that OpenAI was on track to bring
+      'well over' 1M GPUs online by end of 2025. Compute capacity reached
+      1.9GW by end of 2025. Stargate Project aims for ~2M chips."
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_ZencK2XFDA
@@ -667,11 +453,6 @@ facts:
     asOf: 2020-06
     source: https://arxiv.org/abs/2005.14165
     notes: "GPT-3 parameter count."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:50.608Z
 
   - id: f_W5pFmO2ocw
     property: benchmark-score
@@ -703,41 +484,21 @@ facts:
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.600Z
   - id: f_7eIhCIM4Xq
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:50.592Z
   - id: f_SpuWJB1YfE
     property: ceo
     value: !ref sid_JKsVHQ5stQ
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.518Z
   - id: f_XXz1yBQTkp
     property: founded-by-name
     value: Elon Musk
     source: https://www.wikidata.org/wiki/Q21708200
     notes: From Wikidata Q21708200; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.517Z
   - id: f_9CgX0edk2o
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/OpenAI

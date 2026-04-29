@@ -16,11 +16,6 @@ facts:
     value: University of Cambridge; Beijing Language and Culture University
     source: https://www.wikidata.org/wiki/Q14946860
     notes: From Wikidata Q14946860
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.485Z
   - id: f_SGZhfJvEAg
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Ian_Hogarth

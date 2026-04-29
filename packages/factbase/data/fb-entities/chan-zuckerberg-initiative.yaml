@@ -6,11 +6,6 @@ facts:
     asOf: "2015-12"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     notes: "Initial value of 99% Facebook share pledge at founding"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.614Z
 
   - id: f_xL0PjvPDlQ
     property: total-funding
@@ -18,11 +13,6 @@ facts:
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative
     notes: "Current value of 99% Facebook share pledge, exceeds $200B"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.568Z
 
   - id: f_bQVfcGecvg
     property: revenue
@@ -30,11 +20,6 @@ facts:
     asOf: "2025"
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
     notes: "Approximate annual operating budget as of 2025"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.531Z
 
   - id: f_nwzajasrug
     property: gpu-count
@@ -42,11 +27,6 @@ facts:
     asOf: "2024"
     source: https://chanzuckerberg.com/rfa/ai-computing-gpu/
     notes: "NVIDIA H100 DGX SuperPOD cluster (1,024 GPUs) for life sciences AI"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.97
-      checkedAt: 2026-04-29T16:04:03.530Z
 
   - id: f_WeyydGaZNw
     property: gpu-count
@@ -54,11 +34,6 @@ facts:
     asOf: "2025"
     source: https://www.science.org/content/article/ai-drives-dramatic-expansion-chan-zuckerberg-initiative-s-funding-end-all-diseases
     notes: "Planned 10x expansion of GPU cluster by 2028 (10,000 GPUs)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.520Z
 
   - id: f_60fN0AilQQ
     property: headcount
@@ -67,31 +42,16 @@ facts:
     source: https://fortune.com/2026/02/01/chan-zuckerberg-initiative-layoffs-all-in-on-ai-biomedical-research/
     notes: "Approximately 805 employees after laying off ~70 (~8% of ~875 workforce)
       to refocus on AI-biomedical research"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:03.496Z
   - id: f_PAnwg8Yht1
     property: founded-date
     value: "2015"
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.478Z
   - id: f_dICgd5ylsZ
     property: headquarters
     value: Redwood City
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.444Z
   - id: f_NlU8nCaeX7
     property: website
     value: https://chanzuckerberg.com/
@@ -102,32 +62,16 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.442Z
   - id: f_AfbJs94h6b
     property: founded-by-name
     value: Mark Zuckerberg and Priscilla Chan
     source: https://www.wikidata.org/wiki/Q21623039
-    notes: "Co-founded by Mark Zuckerberg and Priscilla Chan (corrected — previously
-      listed only Mark)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.430Z
+    notes: "Co-founded by Mark Zuckerberg and Priscilla Chan (corrected — previously listed only Mark)"
   - id: f_Ifl9HbfGOb
     property: legal-structure
     value: limited liability company
     source: https://www.wikidata.org/wiki/Q21623039
     notes: From Wikidata Q21623039
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.409Z
   - id: f_jnCNhvmZBU
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Chan_Zuckerberg_Initiative

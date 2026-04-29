@@ -6,42 +6,21 @@ facts:
         property: founded-date,
         value: 1930-01,
         source: https://www.wikidata.org/wiki/Q7945762,
-        notes: From Wikidata Q7945762,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:03:55.799Z
-          }
+        notes: From Wikidata Q7945762
       },
     {
         id: f_3x9E3dn24E,
         property: headquarters,
         value: Battle Creek,
         source: https://www.wikidata.org/wiki/Q7945762,
-        notes: From Wikidata Q7945762,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:55.750Z
-          }
+        notes: From Wikidata Q7945762
       },
     {
         id: f_R8c9oRmzem,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q7945762,
-        notes: From Wikidata Q7945762,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:55.736Z
-          }
+        notes: From Wikidata Q7945762
       },
     {
         id: f_B77zuYkTLw,
@@ -55,28 +34,14 @@ facts:
         property: founded-by-name,
         value: Will Keith Kellogg,
         source: https://www.wikidata.org/wiki/Q7945762,
-        notes: From Wikidata Q7945762; text value (not entity ref),
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:55.734Z
-          }
+        notes: From Wikidata Q7945762; text value (not entity ref)
       },
     {
         id: f_nXEfk8qQDl,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q7945762,
-        notes: From Wikidata Q7945762,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:55.723Z
-          }
+        notes: From Wikidata Q7945762
       },
     {
         id: f_aWTgW5zCHn,

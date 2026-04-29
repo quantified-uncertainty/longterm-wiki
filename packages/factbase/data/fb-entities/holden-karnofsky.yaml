@@ -5,34 +5,17 @@ facts:
     value: 1981
     source: https://en.wikipedia.org/wiki/Holden_Karnofsky
     notes: "Born approximately 1981"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.908Z
 
   - id: f_hK1aB2cD3e
     property: education
     value: "BA in Social Studies, Harvard University"
     source: https://en.wikipedia.org/wiki/Holden_Karnofsky
     notes: "Worked at Bridgewater Associates hedge fund before founding GiveWell"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.893Z
 
   - id: f_hK4fG5hI6j
     property: notable-for
-    value: "Co-founder of GiveWell and Open Philanthropy; influential figure in
-      effective altruism; author of 'Most Important Century' blog series on
-      transformative AI"
+    value: "Co-founder of GiveWell and Open Philanthropy; influential figure in effective altruism; author of 'Most Important Century' blog series on transformative AI"
     source: https://en.wikipedia.org/wiki/Holden_Karnofsky
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:56.848Z
 
   - id: f_hK7kL8mN9o
     property: social-media

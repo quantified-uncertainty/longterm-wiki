@@ -5,11 +5,6 @@ facts:
     value: !date 2022
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Tax-exempt since January 2023 (EIN 88-0926067)
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:58.878Z
 
   - id: f_LscyxflWSF
     property: website
@@ -21,11 +16,6 @@ facts:
     value: Campbell, CA
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: "300 Orchard City Dr Suite 134, Campbell, CA 95008"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:58.876Z
 
   - id: f_jQSLOnndmf
     property: funding-received
@@ -34,11 +24,6 @@ facts:
     asOf: !date 2022
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization from FLI in December 2022
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:58.824Z
 
   - id: f_wljvq2YnMl
     property: funding-received
@@ -47,11 +32,6 @@ facts:
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2023
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:58.797Z
 
   - id: f_0SFSw7BkHs
     property: funding-received
@@ -60,11 +40,6 @@ facts:
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional FLI grant in 2024
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:58.971Z
 
   - id: f_FPrim5dVXV
     property: affiliated-org
@@ -73,11 +48,6 @@ facts:
     notes: "FLF is a sister organization to FLI with separate leadership, not a
       subsidiary. They share some board members but are distinct legal
       entities."
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:58.791Z
 
   - id: f_2LXRkLkKWr
     property: description
@@ -97,11 +67,6 @@ facts:
     asOf: !date 2025-04
     source: https://www.wiseancestors.org/discover/wise-ancestors-receives-grant-from-future-of-life-foundation-supporting-the-growth-of-its-highly-collaborative-decentralized-conservation-genomics-platform
     notes: Grant to Wise Ancestors for conservation genomics platform growth
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:58.788Z
 
   - id: f_bfOERZO5RV
     property: grant-given
@@ -122,11 +87,6 @@ facts:
       Approximate. Aguirre said FLF had "a staff of two that recently doubled"
       (Feb 2025 AXRP). Goldhaber joined early 2025 as Projects Lead. Known staff
       by mid-2025: Aguirre, Jacobson, Goldhaber, Sourbut, Garrett.
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:58.737Z
   - id: f_ZnHMEKtjPg
     property: revenue
     value: 25035877
@@ -139,10 +99,10 @@ facts:
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: From IRS Form 990 (EIN 88-0926067). Total functional expenses for tax
-      year 2022 reported as $0 — FLF was newly formed and held its initial $25M
-      revenue without operational spending in its first reporting year (revenue
-      and end-of-year net assets match exactly). Backfilled per CodeRabbit
-      review on PR #4538.
+      year 2022 reported as $0 — FLF was newly formed and held its initial
+      $25M revenue without operational spending in its first reporting year
+      (revenue and end-of-year net assets match exactly). Backfilled per
+      CodeRabbit review on PR #4538.
   - id: f_suNgCCT3JQ
     property: net-assets
     value: 25035877

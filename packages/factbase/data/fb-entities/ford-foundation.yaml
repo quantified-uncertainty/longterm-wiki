@@ -4,21 +4,11 @@ facts:
     property: founded-date
     value: "1936"
     source: https://en.wikipedia.org/wiki/Ford_Foundation
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:59.690Z
 
   - id: f_pgsY40n7vc
     property: headquarters
     value: "320 E 43rd St, New York, NY 10017"
     source: https://www.fordfoundation.org
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.687Z
 
   - id: f_6sfr123pxM
     property: total-assets
@@ -26,11 +16,6 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/131684331
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:59.676Z
 
   - id: f_nrz9SeHOD7
     property: annual-revenue
@@ -40,11 +25,6 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/131684331
     notes: "92.8% from investment sales, 6.9% dividends. Total expenses $1.04B.
       Charitable disbursements ~$1.05B."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.98
-      checkedAt: 2026-04-29T16:03:59.670Z
 
   - id: f_wnEwWXmN3A
     property: annual-grantmaking
@@ -54,11 +34,6 @@ facts:
     source: https://www.fordfoundation.org/work/our-grants/
     notes: "$4.2B in grants over past 5 years (~$840M/year average). ~1,400
       grants/year worldwide."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.620Z
 
   - id: f_nXukgHuGlh
     property: program
@@ -67,22 +42,12 @@ facts:
       spaces, tech capacity for social justice orgs."
     asOf: 2026-03
     source: https://www.fordfoundation.org/work/challenging-inequality/technology-and-society/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:59.604Z
 
   - id: f_zWECRhzXoM
     property: grant-given
     value: "Partnership on AI: $550K (2023, 3yr for AI openness/transparency), $250K
       (2022, 2yr for AI and workers), $200K (2020, 2yr for shared prosperity)"
     source: https://www.fordfoundation.org/work/our-grants/awarded-grants/grants-database/partnership-on-ai-to-benefit-people-and-society-147330/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:59.600Z
 
   - id: f_6vKmR3ewBj
     property: coalition
@@ -90,11 +55,6 @@ facts:
       collectively to mitigate AI harms. Founding member of Humanity AI ($500M,
       2025)."
     source: https://www.fordfoundation.org/news-and-stories/news-and-press/news/philanthropies-launch-new-initiative-to-ensure-ai-advances-the-public-interest/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.585Z
   - id: f_NhGhBmLeKg
     property: revenue
     value: 502432276

@@ -6,41 +6,21 @@ facts:
     value: "1987-09"
     source: https://en.wikipedia.org/wiki/Huawei
     notes: "Founded by Ren Zhengfei in Shenzhen"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.707Z
 
   - id: f_fLlSpowocv
     property: headquarters
     value: "Shenzhen, China"
     source: https://en.wikipedia.org/wiki/Huawei
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.673Z
 
   - id: f_m55GKMUtqR
     property: country
     value: China
     source: https://en.wikipedia.org/wiki/Huawei
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.658Z
 
   - id: f_WflKB9UOgS
     property: legal-structure
     value: "Private company (employee-owned)"
     source: https://en.wikipedia.org/wiki/Huawei
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:56.654Z
 
   - id: f_6ZubfvlNg5
     property: website
@@ -56,10 +36,10 @@ facts:
   - id: f_DXRaHXViGz
     property: description
     value: >-
-      Chinese tech company that designs Ascend AI accelerator chips through its
-      HiSilicon subsidiary. Despite being placed on the U.S. Entity List in May
-      2019, Huawei has continued AI chip development using SMIC's domestic
-      fabrication. Key case study in the limits of export control effectiveness.
+      Chinese tech company that designs Ascend AI accelerator chips through its HiSilicon
+      subsidiary. Despite being placed on the U.S. Entity List in May 2019, Huawei has
+      continued AI chip development using SMIC's domestic fabrication. Key case study in
+      the limits of export control effectiveness.
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
@@ -69,11 +49,6 @@ facts:
     asOf: 2024-12
     source: https://www.huawei.com/en/annual-report
     notes: "2024 annual revenue (~CNY 862B / ~$120B)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.645Z
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_eZ19mPVLr1
@@ -82,11 +57,6 @@ facts:
     asOf: 2024-12
     source: https://www.huawei.com/en/annual-report
     notes: "Approximately 207,000 employees worldwide"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.623Z
 
   # ── Key events ──────────────────────────────────────────────────
   - id: f_GKZAnQHvgd
@@ -94,36 +64,18 @@ facts:
     value: "Placed on U.S. Entity List, restricting access to U.S. technology"
     asOf: 2019-05
     source: https://en.wikipedia.org/wiki/Huawei
-    notes: "Blocked from accessing TSMC fabrication, Google services, and U.S.
-      semiconductor tools"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:03:56.583Z
+    notes: "Blocked from accessing TSMC fabrication, Google services, and U.S. semiconductor tools"
 
   - id: f_RSS30zVb6K
     property: key-event
     value: "Ascend 910B AI chip entered mass production using SMIC fabrication"
     asOf: 2023-08
     source: https://www.tomshardware.com/news/huawei-mate-60-pro-teardown-reveals-smic-5nm-processor
-    notes: "Demonstrated China's ability to produce competitive AI accelerators
-      despite export controls"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.562Z
+    notes: "Demonstrated China's ability to produce competitive AI accelerators despite export controls"
 
   - id: f_gnV8jF8wyI
     property: key-event
     value: "Ascend 910C reportedly in development as next-generation AI accelerator"
     asOf: 2025-01
     source: https://www.reuters.com/technology/
-    notes: "Targeted at competing with Nvidia H100-class performance for domestic
-      market"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.575Z
+    notes: "Targeted at competing with Nvidia H100-class performance for domestic market"

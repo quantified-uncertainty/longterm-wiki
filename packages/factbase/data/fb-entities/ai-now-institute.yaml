@@ -5,11 +5,6 @@ facts:
     value: "2017"
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "Founded at New York University by Kate Crawford and Meredith Whittaker"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:09.153Z
 
   - id: f_e1ELWXLFHS
     property: headquarters
@@ -17,11 +12,6 @@ facts:
     source: https://ainowinstitute.org/about
     notes: "Based at New York University; became independent research institute in
       mid-2022"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:09.080Z
 
   - id: f_H3jscXNPlN
     property: founded-by
@@ -31,11 +21,6 @@ facts:
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "Co-founded by Kate Crawford (researcher) and Meredith Whittaker (now
       Signal president)"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:09.078Z
 
   - id: f_bYj3YUbF9D
     property: description
@@ -46,11 +31,6 @@ facts:
       unregulated facial recognition.
     asOf: 2025-12
     source: https://ainowinstitute.org/about
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:09.075Z
 
   - id: f_eO1ZrfJ6aj
     property: headcount
@@ -66,21 +46,11 @@ facts:
     value: "Independent nonprofit research institute"
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "Originally housed at NYU; became independent in mid-2022"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:09.061Z
   - id: f_qHSt1VTtkm
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:09.056Z
   - id: f_lHx3PnmxCG
     property: website
     value: https://ainowinstitute.org/
@@ -91,11 +61,6 @@ facts:
     value: Kate Crawford
     source: https://www.wikidata.org/wiki/Q55602948
     notes: From Wikidata Q55602948; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.986Z
   - id: f_xC9nJkGoI9
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/AI_Now_Institute
@@ -106,13 +71,7 @@ facts:
     property: independence-date
     value: "2022"
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
-    notes: "AI Now left NYU in mid-2022 to become an independent nonprofit research
-      institute"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:08.985Z
+    notes: "AI Now left NYU in mid-2022 to become an independent nonprofit research institute"
 
   - id: f_ntfwCB5oLi
     property: key-person
@@ -122,97 +81,51 @@ facts:
     asOf: 2023
     source: https://ainowinstitute.org/about
     notes: "Amba Kak and Sarah Myers West serve as Co-Executive Directors since 2023"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.984Z
 
   - id: f_Zvam4VgqCC
     property: funding-policy
     value: "Refuses corporate and tech industry funding since 2022"
     asOf: 2022
     source: https://ainowinstitute.org/about
-    notes: "Distinctive policy — one of few AI research orgs that explicitly
-      declines industry funding"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.965Z
+    notes: "Distinctive policy — one of few AI research orgs that explicitly declines industry funding"
 
   - id: f_tjvsWtm5t3
     property: publication
-    value: "AI Now 2017 Report — second annual report examining social implications
-      of AI across health, criminal justice, labor, and disability rights"
+    value: "AI Now 2017 Report — second annual report examining social implications of AI across health, criminal justice, labor, and disability rights"
     asOf: 2017
     source: https://ainowinstitute.org/publication/ai-now-2017-report
-    notes: "Second annual report; the first was the 2016 AI Now Report from the
-      White House OSTP symposium"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → partial"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.964Z
+    notes: "Second annual report; the first was the 2016 AI Now Report from the White House OSTP symposium"
 
   - id: f_bWrhn03JAn
     property: publication
-    value: "AI Now 2018 Report — expanded analysis of AI accountability gaps, bias
-      in automated decision systems, and surveillance technologies"
+    value: "AI Now 2018 Report — expanded analysis of AI accountability gaps, bias in automated decision systems, and surveillance technologies"
     asOf: 2018
     source: https://ainowinstitute.org/publication/ai-now-2018-report
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.891Z
 
   - id: f_szs4GuARON
     property: publication
-    value: "AI Now 2019 Report — focused on facial recognition regulation,
-      algorithmic accountability legislation, and climate impacts of AI"
+    value: "AI Now 2019 Report — focused on facial recognition regulation, algorithmic accountability legislation, and climate impacts of AI"
     asOf: 2019
     source: https://ainowinstitute.org/publication/ai-now-2019-report
-    sourcing:
-      verdict: partial
-      evidence: 2 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:08.890Z
 
   - id: f_Kj8F5PumOG
     property: funder
     value: "Open Society Foundations"
     source: https://ainowinstitute.org/about
     notes: "One of AI Now's primary funders"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.889Z
 
   - id: f_BApgldQwr9
     property: funder
     value: "Ford Foundation"
     source: https://ainowinstitute.org/about
     notes: "Major funder of AI Now"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.875Z
 
   - id: f_mTj0FFarXf
     property: funder
     value: "Mozilla Foundation"
     asOf: 2022
     source: https://ainowinstitute.org/about
-    notes: "Historical funder of AI Now prior to mid-2022. AI Now stopped accepting
-      corporate and tech industry funding when it became independent in 2022."
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.874Z
+    notes: "Historical funder of AI Now prior to mid-2022. AI Now stopped accepting corporate and tech industry funding when it became independent in 2022."
 
   - id: f_vYiIVBXPH0
     property: grant-received
@@ -220,48 +133,24 @@ facts:
     currency: USD
     asOf: 2026-02
     source: https://www.macfound.org/press/press-releases/10-million-to-advance-ai-by-and-for-people
-    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M
-      Humanity AI initiative for national security and AI"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.790Z
+    notes: "MacArthur Foundation $2M grant announced Feb 12, 2026, part of $10M Humanity AI initiative for national security and AI"
 
   - id: f_N10dTfD8W6
     property: funder
     value: "Omidyar Network / Luminate"
     asOf: 2021
     source: https://ainowinstitute.org/about
-    notes: "Historical funder prior to mid-2022 independence. AI Now stopped
-      accepting corporate/tech funding when it became independent in 2022."
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → unverifiable"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.787Z
+    notes: "Historical funder prior to mid-2022 independence. AI Now stopped accepting corporate/tech funding when it became independent in 2022."
 
   - id: f_diDp4Ck5W9
     property: policy-influence
-    value: "Advocated for facial recognition moratoriums; influenced bans in
-      multiple US cities (San Francisco 2019, Portland 2020, and others)"
+    value: "Advocated for facial recognition moratoriums; influenced bans in multiple US cities (San Francisco 2019, Portland 2020, and others)"
     asOf: 2020
     source: https://en.wikipedia.org/wiki/AI_Now_Institute
     notes: "One of AI Now's most concrete policy wins"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.784Z
 
   - id: f_33wDWBZkk2
     property: recognition
-    value: "Co-Executive Director Amba Kak named to TIME 100 Most Influential People
-      in AI (2024)"
+    value: "Co-Executive Director Amba Kak named to TIME 100 Most Influential People in AI (2024)"
     asOf: 2024
     source: https://time.com/collection/time100-ai-2024/
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.783Z

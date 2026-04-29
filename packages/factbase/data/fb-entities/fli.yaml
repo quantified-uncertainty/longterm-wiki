@@ -14,11 +14,6 @@ facts:
     value: 2014-03
     source: https://www.wikidata.org/wiki/Q18356657
     notes: From Wikidata Q18356657
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.132Z
   - id: f_akrbCF6YZC
     property: website
     value: https://futureoflife.org/
@@ -31,11 +26,6 @@ facts:
     asOf: !date 2022-12
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Initial capitalization of Future of Life Foundation (FLF)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:00.120Z
   - id: f_I1oSDd9OAz
     property: grant-given
     value: "15700000"
@@ -43,11 +33,6 @@ facts:
     asOf: !date 2023
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2023
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.060Z
   - id: f_ngxodh3SNe
     property: grant-given
     value: "18100000"
@@ -55,11 +40,6 @@ facts:
     asOf: !date 2024
     source: https://projects.propublica.org/nonprofits/organizations/880926067
     notes: Additional grant to FLF in 2024
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.057Z
 
   - id: f_vm1oBsIh14
     property: lobbying-spend
@@ -67,13 +47,7 @@ facts:
     currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2025&id=D000087562
-    notes: "US federal lobbying via Dentons: $310K in 2024. Verified from Senate LDA
-      filings."
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.043Z
+    notes: "US federal lobbying via Dentons: $310K in 2024. Verified from Senate LDA filings."
 
   - id: f_h4e6LBhlmR
     property: lobbying-spend
@@ -81,13 +55,7 @@ facts:
     currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Future+of+Life+Institute
-    notes: "US federal lobbying via Dentons: $360K in 2025 ($90K/quarter). Verified
-      from Senate LDA."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.033Z
+    notes: "US federal lobbying via Dentons: $360K in 2025 ($90K/quarter). Verified from Senate LDA."
 
   - id: f_LA81LD1WDK
     property: lobbying-spend
@@ -95,67 +63,32 @@ facts:
     currency: EUR
     asOf: 2024
     source: https://www.lobbyfacts.eu/datacard/future-of-life-institute?rid=787064543128-10
-    notes: "EU advocacy spend EUR 446,619 (includes staff + Dentons Global
-      Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.031Z
+    notes: "EU advocacy spend EUR 446,619 (includes staff + Dentons Global Advisors). 2.5 FTE, 5 lobbyists, 3 EP accreditation passes."
 
   - id: f_UuGWvCoFVs
     property: campaign
-    value: "Pro-Human AI Declaration (March 2026): 5 pillars, 150+ signatory
-      organizations (AFL-CIO to Congress of Christian Leaders), individual
-      signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph
-      Nader"
+    value: "Pro-Human AI Declaration (March 2026): 5 pillars, 150+ signatory organizations (AFL-CIO to Congress of Christian Leaders), individual signatories include Yoshua Bengio, Daron Acemoglu, Steve Bannon, Ralph Nader"
     asOf: 2026-03
     source: https://humanstatement.org/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:59.972Z
 
   - id: f_KMfmkTzWNL
     property: campaign
-    value: "Superintelligence Prohibition Statement (October 2025): calls for
-      prohibition on superintelligence development until 'broad scientific
-      consensus on safety'; 69,000+ signatories including Geoffrey Hinton,
-      Yoshua Bengio, Steve Wozniak"
+    value: "Superintelligence Prohibition Statement (October 2025): calls for prohibition on superintelligence development until 'broad scientific consensus on safety'; 69,000+ signatories including Geoffrey Hinton, Yoshua Bengio, Steve Wozniak"
     asOf: 2025-10
     source: https://superintelligence-statement.org/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.950Z
 
   - id: f_EkPWWD2ipv
     property: publication
-    value: "AI Safety Index published biannually (Summer 2025, Winter 2025).
-      Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter
-      2025 finding: no company has adequate guardrails for catastrophic misuse."
+    value: "AI Safety Index published biannually (Summer 2025, Winter 2025). Evaluates 7 leading AI companies on 33 indicators across 6 domains. Winter 2025 finding: no company has adequate guardrails for catastrophic misuse."
     asOf: 2025-12
     source: https://futureoflife.org/ai-safety-index-winter-2025/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:59.951Z
 
   - id: f_iMTwhUJoEg
     property: headcount
     value: "29"
     asOf: 2025
     source: https://futureoflife.org/about-us/our-people/
-    notes: "29 named team members on People page: Policy (16), Futures (3),
-      Communications (4), Operations & Grants (5), plus CEO"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.935Z
+    notes: "29 named team members on People page: Policy (16), Futures (3), Communications (4), Operations & Grants (5), plus CEO"
 
   - id: f_s83tI9sEe6
     property: grant-received
@@ -163,13 +96,7 @@ facts:
     currency: USD
     asOf: 2015
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
-    notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on
-      AI safety"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.934Z
+    notes: "Elon Musk donated $10M to FLI in January 2015 to fund research grants on AI safety"
 
   - id: f_2PAHN0Iwku
     property: grant-received
@@ -177,25 +104,13 @@ facts:
     currency: USD
     asOf: 2021
     source: https://en.wikipedia.org/wiki/Future_of_Life_Institute
-    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021.
-      Buterin confirmed ~$500M was actually cashed out (March 2026). Majority
-      transferred to a donor-advised fund."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.884Z
+    notes: "Vitalik Buterin donated $665.8M in SHIB tokens to FLI in May 2021. Buterin confirmed ~$500M was actually cashed out (March 2026). Majority transferred to a donor-advised fund."
 
   - id: f_75y1H4K4ln
     property: legal-identifier
     value: "47-1052538 (EIN)"
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "IRS 501(c)(3) nonprofit"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:59.865Z
 
   - id: f_Gz4uyRC44r
     property: revenue
@@ -204,11 +119,6 @@ facts:
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. Spike from Vitalik Buterin SHIB token donation."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.860Z
 
   - id: f_J3dYwWWqrw
     property: revenue
@@ -217,11 +127,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:59.848Z
 
   - id: f_feRFvTG4CX
     property: revenue
@@ -229,13 +134,7 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
-    notes: "From IRS Form 990. Only $85K in new donor contributions; rest from
-      endowment."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.847Z
+    notes: "From IRS Form 990. Only $85K in new donor contributions; rest from endowment."
 
   - id: f_aEq32QQklw
     property: annual-expenses
@@ -244,11 +143,6 @@ facts:
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:13.267Z
 
   - id: f_s2O048D4tQ
     property: annual-expenses
@@ -257,11 +151,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:59.794Z
 
   - id: f_A8f0X4bXW4
     property: annual-expenses
@@ -269,13 +158,7 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/471052538
-    notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events
-      5%, Other 2%"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.779Z
+    notes: "Breakdown: Grants 49%, Personnel 20%, Contractors 13%, Media 11%, Events 5%, Other 2%"
 
   - id: f_wwzIPj7vNQ
     property: headcount
@@ -283,11 +166,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/471052538
     notes: "From IRS Form 990. FLI was still in rapid growth phase in 2023."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.772Z
 
   - id: f_Gz4uyRC44r
     property: one-time-donation
@@ -295,46 +173,25 @@ facts:
     currency: USD
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/471052538
-    notes: "From IRS Form 990. Vitalik Buterin SHIB token donation — one-time
-      windfall, not operational revenue. Moved from 'revenue' to
-      'one-time-donation' to avoid distorting revenue time-series charts."
+    notes: "From IRS Form 990. Vitalik Buterin SHIB token donation — one-time windfall,
+      not operational revenue. Moved from 'revenue' to 'one-time-donation' to avoid
+      distorting revenue time-series charts."
 
   - id: f_1tGoi9N3Fi
     property: subsidiary
     value: "Future of Life Action and Research, Inc. (FLARE) — 501(c)(4) advocacy arm"
     asOf: 2025
     source: https://futureoflife.org/about-us/
-    notes: "Newer advocacy entity being established; enables political lobbying not
-      allowed under 501(c)(3)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.761Z
+    notes: "Newer advocacy entity being established; enables political lobbying not allowed under 501(c)(3)"
 
   - id: f_PWTfxjV4X6
     property: campaign
-    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI
-      development adopted at the Asilomar Conference. 5,700+ signatories
-      including Stuart Russell, Elon Musk, and Demis Hassabis."
+    value: "Asilomar AI Principles (January 2017): 23 principles for beneficial AI development adopted at the Asilomar Conference. 5,700+ signatories including Stuart Russell, Elon Musk, and Demis Hassabis."
     asOf: 2017-01
     source: https://futureoflife.org/open-letter/ai-principles/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:59.755Z
 
   - id: f_ewg1hQG7EQ
     property: campaign
-    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a
-      6-month moratorium on training AI systems more powerful than GPT-4.
-      33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve
-      Wozniak, Elon Musk."
+    value: "Pause Giant AI Experiments Open Letter (March 2023): called for a 6-month moratorium on training AI systems more powerful than GPT-4. 33,000+ signatories including Yoshua Bengio, Stuart Russell, Steve Wozniak, Elon Musk."
     asOf: 2023-03
     source: https://futureoflife.org/open-letter/pause-giant-ai-experiments/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:59.705Z

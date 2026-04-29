@@ -11,11 +11,6 @@ facts:
       School; University of North Dakota
     source: https://www.wikidata.org/wiki/Q100604534
     notes: From Wikidata Q100604534
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:57.138Z
   - id: f_kurARWjFmw
     property: website
     value: https://gregbrockman.com/

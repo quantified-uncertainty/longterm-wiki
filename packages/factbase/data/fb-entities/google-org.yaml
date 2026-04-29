@@ -6,14 +6,7 @@ facts:
         property: founded-date,
         value: 2005-01,
         source: https://www.wikidata.org/wiki/Q1377855,
-        notes: From Wikidata Q1377855,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:03:57.613Z
-          }
+        notes: From Wikidata Q1377855
       },
     {
         id: f_NkS190525B,
@@ -27,14 +20,7 @@ facts:
         property: parent-organization,
         value: Google,
         source: https://www.wikidata.org/wiki/Q1377855,
-        notes: From Wikidata Q1377855,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:57.580Z
-          }
+        notes: From Wikidata Q1377855
       },
     {
         id: f_vyLiVAYSTg,
@@ -48,13 +34,6 @@ facts:
         property: description,
         value: Google.org is a subsidiary/division of Google.,
         source: https://www.wikidata.org/wiki/Q1377855,
-        notes: Parent organization from Wikidata Q1377855,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:57.575Z
-          }
+        notes: Parent organization from Wikidata Q1377855
       }
   ]

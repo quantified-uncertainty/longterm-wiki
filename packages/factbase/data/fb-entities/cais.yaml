@@ -5,36 +5,17 @@ facts:
     value: 3.3e+7
     asOf: "2025"
     source: https://projects.propublica.org/nonprofits/organizations/881751310
-    notes: "Estimated cumulative funding raised 2022-2024 based on summing 990
-      revenue filings ($6.7M in 2022 + $16.1M in 2023 + $10.2M in 2024 = ~$33M).
-      Major known sources: Open Philanthropy ~$10.6M (2022-2023), SFF grants
-      ~$3.8M (2024-2025), Good Ventures ~$1.9M (2024), Founders Pledge ~$0.9M
-      (2024). Previously understated at $6.4M (SFF grants only)."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.187Z
+    notes: "Estimated cumulative funding raised 2022-2024 based on summing 990 revenue filings ($6.7M in 2022 + $16.1M in 2023 + $10.2M in 2024 = ~$33M). Major known sources: Open Philanthropy ~$10.6M (2022-2023), SFF grants ~$3.8M (2024-2025), Good Ventures ~$1.9M (2024), Founders Pledge ~$0.9M (2024). Previously understated at $6.4M (SFF grants only)."
   - id: f_WEJAAlcumi
     property: founded-date
     value: "2022"
     source: https://www.wikidata.org/wiki/Q119084607
     notes: From Wikidata Q119084607
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.171Z
   - id: f_JNek3J9XLZ
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q119084607
     notes: From Wikidata Q119084607
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.132Z
   - id: f_XngdN9qY68
     property: website
     value: https://www.safe.ai/
@@ -44,19 +25,13 @@ facts:
   - id: f_1BWsBJuBcg
     property: description
     value: >-
-      The Center for AI Safety (CAIS) is a San Francisco-based nonprofit focused
-      on reducing societal-scale risks from AI through technical safety
-      research, field-building, and public communication. Founded by Dan
-      Hendrycks and Oliver Zhang. Known for the MMLU benchmark, representation
-      engineering, and the May 2023 "Statement on AI Risk" signed by 350+ AI
-      leaders.
+      The Center for AI Safety (CAIS) is a San Francisco-based nonprofit focused on
+      reducing societal-scale risks from AI through technical safety research,
+      field-building, and public communication. Founded by Dan Hendrycks and Oliver
+      Zhang. Known for the MMLU benchmark, representation engineering, and the May
+      2023 "Statement on AI Risk" signed by 350+ AI leaders.
     asOf: 2025
     source: https://www.safe.ai/about
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:05.111Z
 
   - id: f_Alru3kK8mb
     property: key-person
@@ -65,54 +40,26 @@ facts:
     asOf: 2025
     source: https://www.safe.ai/about
     notes: "Dan Hendrycks serves as Executive & Research Director"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.135Z
 
   - id: f_2nM7F6dimB
     property: infrastructure
-    value: "Compute cluster with 256 NVIDIA A100 GPUs available for AI safety
-      researchers"
+    value: "Compute cluster with 256 NVIDIA A100 GPUs available for AI safety researchers"
     asOf: 2024
     source: https://www.safe.ai/compute
-    notes: "Major infrastructure investment; provides compute to safety researchers
-      who may lack institutional access"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:05.089Z
+    notes: "Major infrastructure investment; provides compute to safety researchers who may lack institutional access"
 
   - id: f_JDvO7S37HY
     property: campaign
-    value: "Statement on AI Risk (May 2023): one-sentence statement 'Mitigating the
-      risk of extinction from AI should be a global priority alongside other
-      societal-scale risks such as pandemics and nuclear war.' Signed by 350+ AI
-      leaders including Geoffery Hinton, Demis Hassabis, Sam Altman, and Dario
-      Amodei."
+    value: "Statement on AI Risk (May 2023): one-sentence statement 'Mitigating the risk of extinction from AI should be a global priority alongside other societal-scale risks such as pandemics and nuclear war.' Signed by 350+ AI leaders including Geoffery Hinton, Demis Hassabis, Sam Altman, and Dario Amodei."
     asOf: 2023-05
     source: https://www.safe.ai/statement-on-ai-risk
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:05.081Z
 
   - id: f_qSFmYhdDFx
     property: program
-    value: "ML Safety Scholars — educational program training hundreds of students
-      in AI safety fundamentals. Includes online course, reading groups, and
-      mentorship."
+    value: "ML Safety Scholars — educational program training hundreds of students in AI safety fundamentals. Includes online course, reading groups, and mentorship."
     asOf: 2024
     source: https://www.mlsafety.org/
     notes: "Key field-building program"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:04:05.040Z
 
   - id: f_rYN3krk6tQ
     property: revenue
@@ -121,11 +68,6 @@ facts:
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310. First year of operations."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.98
-      checkedAt: 2026-04-29T16:04:05.023Z
 
   - id: f_UgwULHbsZr
     property: revenue
@@ -134,11 +76,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:05.017Z
 
   - id: f_HC5iejEJyY
     property: revenue
@@ -147,11 +84,6 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. EIN: 88-1751310."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:05.000Z
 
   - id: f_2gFP8riiGw
     property: annual-expenses
@@ -159,13 +91,7 @@ facts:
     currency: USD
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
-    notes: "From IRS Form 990. First year of operations; low expenses relative to
-      revenue."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.992Z
+    notes: "From IRS Form 990. First year of operations; low expenses relative to revenue."
 
   - id: f_YgMeE4EFsw
     property: annual-expenses
@@ -174,11 +100,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. Significant increase as organization scaled up."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.951Z
 
   - id: f_DrCHRnYm9V
     property: annual-expenses
@@ -186,11 +107,6 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.98
-      checkedAt: 2026-04-29T16:04:04.934Z
 
   - id: f_iKgkztnKMQ
     property: grant-received
@@ -199,11 +115,6 @@ facts:
     asOf: 2022
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support/
     notes: "Open Philanthropy general support grant to CAIS, 2022"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.926Z
 
   - id: f_JKwyv80ODu
     property: grant-received
@@ -211,13 +122,7 @@ facts:
     currency: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/center-for-ai-safety-general-support-2023/
-    notes: "Open Philanthropy general support grant to CAIS, 2023. Total OP funding
-      to CAIS across 2022-2023 was ~$10.6M per donations tracker."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.909Z
+    notes: "Open Philanthropy general support grant to CAIS, 2023. Total OP funding to CAIS across 2022-2023 was ~$10.6M per donations tracker."
 
   - id: f_2o7SVDOLcV
     property: grant-received
@@ -225,13 +130,7 @@ facts:
     currency: USD
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
-    notes: "SFF 2024: $1,146K to CAIS Inc + $1,621K to CAIS Action Fund = $2,767K
-      total"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.896Z
+    notes: "SFF 2024: $1,146K to CAIS Inc + $1,621K to CAIS Action Fund = $2,767K total"
 
   - id: f_IFDN4UddCw
     property: grant-received
@@ -240,61 +139,32 @@ facts:
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025: $289K to CAIS Inc + $772K to CAIS Action Fund = $1,061K total"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.853Z
 
   - id: f_JwpqYYKOyt
     property: compensation
     value: "Dan Hendrycks takes $1 annual salary as Executive Director"
     asOf: 2025
     source: https://safe.ai/about
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.830Z
 
   - id: f_W7bBjifjvv
     property: board-member
     value: !ref sid_6gjF5d3geg
     asOf: 2024
     source: https://washingtonainetwork.com/2024/07/29/center-for-ai-safety-hosts-dc-launch-event/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.815Z
 
   - id: f_mGXpFffUh7
     property: publication
-    value: "Measuring Massive Multitask Language Understanding (MMLU) — widely-used
-      benchmark for evaluating LLM capabilities across 57 academic subjects"
+    value: "Measuring Massive Multitask Language Understanding (MMLU) — widely-used benchmark for evaluating LLM capabilities across 57 academic subjects"
     asOf: 2021-01
     source: https://arxiv.org/abs/2009.03300
     notes: "Created by Hendrycks et al.; became one of the most-cited AI benchmarks"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.92
-      checkedAt: 2026-04-29T16:04:04.802Z
 
   - id: f_4j56kTwGW5
     property: publication
-    value: "Representation Engineering: A Top-Down Approach to AI Transparency —
-      proposes methods to read and control LLM internal representations for
-      safety"
+    value: "Representation Engineering: A Top-Down Approach to AI Transparency — proposes methods to read and control LLM internal representations for safety"
     asOf: 2023-10
     source: https://arxiv.org/abs/2310.01405
-    notes: "By Zou, Phan, Chen, Campbell, Guo, Ren, Pan, Yin, Mazeika, Dombrowski,
-      Goel, Li, Byun, Wang, Mallen, Basart, Koyejo, Song, Li, Hendrycks"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.801Z
+    notes: "By Zou, Phan, Chen, Campbell, Guo, Ren, Pan, Yin, Mazeika, Dombrowski, Goel, Li, Byun, Wang, Mallen, Basart, Koyejo, Song, Li, Hendrycks"
 
   - id: f_BnRfdZYOjA
     property: net-assets
@@ -303,11 +173,6 @@ facts:
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990. End of first year."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.768Z
 
   - id: f_Wh3ZWtew6g
     property: net-assets
@@ -316,11 +181,6 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.726Z
 
   - id: f_DldXXRYERQ
     property: net-assets
@@ -329,22 +189,10 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/881751310
     notes: "From IRS Form 990."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.707Z
 
   - id: f_apd264NL5h
     property: publication
-    value: "The WMDP Benchmark: Measuring and Reducing Malicious Use With Unlearning
-      — benchmark for evaluating dual-use AI capabilities in biosecurity,
-      cybersecurity, and chemical weapons"
+    value: "The WMDP Benchmark: Measuring and Reducing Malicious Use With Unlearning — benchmark for evaluating dual-use AI capabilities in biosecurity, cybersecurity, and chemical weapons"
     asOf: 2024-03
     source: https://arxiv.org/abs/2403.03218
     notes: "By Li et al."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.710Z

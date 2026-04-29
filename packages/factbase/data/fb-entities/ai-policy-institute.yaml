@@ -5,44 +5,22 @@ facts:
     value: "2023-08"
     source: https://theaipi.org/poll-shows-overwhelming-concern-about-risks-from-ai-as-new-institute-launches-to-understand-public-opinion-and-advocate-for-responsible-ai-policies/
     notes: "Launched in August 2023 by Daniel Colson"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.781Z
 
   - id: f_Jn8vL4qT6b
     property: headquarters
     value: "Washington, DC"
     source: https://theaipi.org/about/
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.685Z
 
   - id: f_Xt2yH7wK5c
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://theaipi.org/about/
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.686Z
 
   - id: f_Bw4gC8rZ3f
     property: description
-    value: "Research and advocacy nonprofit focused on seeking political solutions
-      to catastrophic risks from emerging AI technology, known for conducting
-      public opinion polling on AI policy issues."
+    value: "Research and advocacy nonprofit focused on seeking political solutions to catastrophic risks from emerging AI technology, known for conducting public opinion polling on AI policy issues."
     asOf: 2026-03
     source: https://theaipi.org/about/
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.685Z
 
   - id: f_vZve8M0opl
     property: grant-received
@@ -51,11 +29,6 @@ facts:
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant: $1,635,000 for general support"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.679Z
 
   - id: f_BTIfaFnsU8
     property: grant-received
@@ -64,34 +37,16 @@ facts:
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant: $142,000 for general support"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:08.684Z
 
   - id: f_PrRhuFieEu
     property: polling-finding
-    value: "83% of Americans believe AI could accidentally cause a catastrophic
-      event; 77% say government should do more to regulate AI; 73% believe AI
-      companies should be liable for harms"
+    value: "83% of Americans believe AI could accidentally cause a catastrophic event; 77% say government should do more to regulate AI; 73% believe AI companies should be liable for harms"
     asOf: 2024
     source: https://theaipi.org/
     notes: "Aggregate findings across multiple AIPI polls 2023-2024"
-    sourcing:
-      verdict: partial
-      evidence: 2 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:08.580Z
 
   - id: f_BwLw7PxVYD
     property: polling-finding
-    value: "Three out of four voters skeptical of 'race China' arguments for AI
-      deregulation; 76% prefer candidates supporting AI regulation"
+    value: "Three out of four voters skeptical of 'race China' arguments for AI deregulation; 76% prefer candidates supporting AI regulation"
     asOf: 2024
     source: https://time.com/6996090/ai-china-american-voters-poll/
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:08.576Z

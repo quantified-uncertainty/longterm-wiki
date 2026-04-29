@@ -4,63 +4,33 @@ facts:
     property: founded-date
     value: "2024-02"
     source: https://www.meti.go.jp/english/press/2024/0214_002.html
-    notes: "Launched 14 February 2024 under the Ministry of Economy, Trade and
-      Industry (METI)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.036Z
+    notes: "Launched 14 February 2024 under the Ministry of Economy, Trade and Industry (METI)"
 
   - id: f_Bh93mWtZ76
     property: headquarters
     value: "Tokyo, Japan"
     source: https://aisi.go.jp/en/
-    notes: "Secretariat located within the Information-technology Promotion Agency
-      (IPA)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.839Z
+    notes: "Secretariat located within the Information-technology Promotion Agency (IPA)"
 
   - id: f_CjfhJWFU2e
     property: headcount
     value: 30
     asOf: 2025-01
     source: https://aisi.go.jp/assets/pdf/20250501_AISI_en.pdf
-    notes: "About 30 people including full-time and part-time staff as of January
-      2025; plans to grow to ~200 staff"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.032Z
+    notes: "About 30 people including full-time and part-time staff as of January 2025; plans to grow to ~200 staff"
 
   - id: f_H4f5t1SWiN
     property: description
     value: >-
-      Japan's national AI safety institute, established within the
-      Information-technology Promotion Agency (IPA) under METI. Focuses on AI
-      evaluation methods, safety standards research, and security testing.
-      Organized into five teams. Part of the international AISI network
-      established through the Seoul Declaration.
+      Japan's national AI safety institute, established within the Information-technology
+      Promotion Agency (IPA) under METI. Focuses on AI evaluation methods, safety standards
+      research, and security testing. Organized into five teams. Part of the international
+      AISI network established through the Seoul Declaration.
     asOf: 2025-12
     source: https://aisi.go.jp/en/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.856Z
 
   - id: f_93zLbb5sTv
     property: legal-structure
     value: "Government institute (under METI/IPA)"
     source: https://aisi.go.jp/en/
-    notes: "Established within IPA in collaboration with Cabinet Office and relevant
-      ministries"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.770Z
+    notes: "Established within IPA in collaboration with Cabinet Office and relevant ministries"

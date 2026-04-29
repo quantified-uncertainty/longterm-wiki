@@ -20,27 +20,13 @@ facts:
         property: born-year,
         value: 1994,
         source: https://www.wikidata.org/wiki/Q16197959,
-        notes: From Wikidata Q16197959,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:46.059Z
-          }
+        notes: From Wikidata Q16197959
       },
     {
         id: f_9NYXb9ryEE,
         property: education,
         value: University of Waterloo; The Abelard School,
         source: https://www.wikidata.org/wiki/Q16197959,
-        notes: From Wikidata Q16197959,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:46.037Z
-          }
+        notes: From Wikidata Q16197959
       }
   ]

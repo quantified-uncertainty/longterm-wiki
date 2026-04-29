@@ -6,41 +6,21 @@ facts:
     value: "2000-04"
     source: https://en.wikipedia.org/wiki/SMIC
     notes: "Founded by Richard Chang in Shanghai"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.933Z
 
   - id: f_Q6ogTOrr02
     property: headquarters
     value: "Shanghai, China"
     source: https://en.wikipedia.org/wiki/SMIC
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.933Z
 
   - id: f_tzfmADi4u7
     property: country
     value: China
     source: https://en.wikipedia.org/wiki/SMIC
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.926Z
 
   - id: f_nzjhw0pnOu
     property: legal-structure
     value: "Public company (HKEX: 0981, SSE STAR: 688981)"
     source: https://en.wikipedia.org/wiki/SMIC
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.862Z
 
   - id: f_XZu7dnUw2E
     property: website
@@ -56,50 +36,31 @@ facts:
   - id: f_r3ESeo9ztk
     property: description
     value: >-
-      China's largest and most advanced semiconductor foundry. Despite being cut
-      off from EUV lithography by export controls, SMIC has reportedly
-      manufactured 5nm-class circuits using multi-patterning DUV techniques. Key
-      case study in the limits of export control effectiveness.
+      China's largest and most advanced semiconductor foundry. Despite being cut off
+      from EUV lithography by export controls, SMIC has reportedly manufactured 5nm-class
+      circuits using multi-patterning DUV techniques. Key case study in the limits of
+      export control effectiveness.
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_x5mGft3RMt
     property: revenue
-    value: 8.03e+9
+    value: 8.03e+09
     asOf: 2024-12
     source: https://www.smics.com/site/company_annual
-    notes: "2024 annual revenue (~$8.03B); significant growth driven by domestic
-      demand"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.559Z
+    notes: "2024 annual revenue (~$8.03B); significant growth driven by domestic demand"
 
   # ── Key events ──────────────────────────────────────────────────
   - id: f_Bqrw4hfcyL
     property: key-event
-    value: "Added to U.S. Entity List, restricting access to U.S. semiconductor
-      technology"
+    value: "Added to U.S. Entity List, restricting access to U.S. semiconductor technology"
     asOf: 2020-12
     source: https://en.wikipedia.org/wiki/SMIC
     notes: "BIS placed SMIC on Entity List in December 2020"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.844Z
 
   - id: f_GKNLJ5zs5A
     property: key-event
-    value: "Reportedly manufactured 5nm-class circuits for Huawei's Kirin 9000S
-      processor"
+    value: "Reportedly manufactured 5nm-class circuits for Huawei's Kirin 9000S processor"
     asOf: 2023-09
     source: https://www.tomshardware.com/news/huawei-mate-60-pro-teardown-reveals-smic-5nm-processor
-    notes: "Discovered in Huawei Mate 60 Pro teardown; used multi-patterning DUV
-      techniques without EUV"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.566Z
+    notes: "Discovered in Huawei Mate 60 Pro teardown; used multi-patterning DUV techniques without EUV"

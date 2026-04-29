@@ -2,31 +2,15 @@ entity: sid_pCun4K9Bf8
 facts:
   - id: f_qPylVVHUot
     property: description
-    value: "AI chip governance researcher; Senior Adjunct Fellow at CNAS Technology
-      and National Security Program. Co-authored foundational policy papers on
-      hardware-enabled mechanisms including 'Secure, Governable Chips' and
-      'Technology to Secure the AI Chip Supply Chain'. Coined 'on-chip
-      governance' term."
+    value: "AI chip governance researcher; Senior Adjunct Fellow at CNAS Technology and National Security Program. Co-authored foundational policy papers on hardware-enabled mechanisms including 'Secure, Governable Chips' and 'Technology to Secure the AI Chip Supply Chain'. Coined 'on-chip governance' term."
     asOf: "2026-03"
     source: https://www.cnas.org/people/tim-fist
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:46.942Z
 
   - id: f_H9izLxJ0AN
     property: notable-for
-    value: "Co-authored 'Secure, Governable Chips' (Jan 2024) and 'Technology to
-      Secure the AI Chip Supply Chain' (Dec 2024) establishing the CNAS policy
-      framework for hardware-enabled AI governance"
+    value: "Co-authored 'Secure, Governable Chips' (Jan 2024) and 'Technology to Secure the AI Chip Supply Chain' (Dec 2024) establishing the CNAS policy framework for hardware-enabled AI governance"
     source: https://www.cnas.org/publications
     asOf: "2026-03"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.936Z
 
   - id: f_pN4TGlSX4c
     property: employed-by
@@ -34,16 +18,10 @@ facts:
     role: "Senior Adjunct Fellow, Technology and National Security Program"
     source: https://www.cnas.org/people/tim-fist
     asOf: "2024"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.916Z
 
   - id: f_CnX33i1Q4h
     property: employed-by
     value: !ref sid_mgkIm6f72W
     role: "Head of Strategy & Governance"
-    notes: "Previously Head of Strategy & Governance at Fathom Radiant before
-      joining CNAS"
+    notes: "Previously Head of Strategy & Governance at Fathom Radiant before joining CNAS"
     validEnd: "2024"

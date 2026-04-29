@@ -39,11 +39,6 @@ facts:
     value: University of California, Berkeley
     source: https://www.wikidata.org/wiki/Q107261221
     notes: From Wikidata Q107261221
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.102Z
   - id: f_WIQ7ZK53wV
     property: website
     value: https://people.eecs.berkeley.edu/~hendrycks/

@@ -11,21 +11,11 @@ facts:
     value: 1987
     source: https://www.wikidata.org/wiki/Q119721378
     notes: From Wikidata Q119721378
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.006Z
   - id: f_m26ev2nS4o
     property: education
     value: University of California, Santa Cruz
     source: https://www.wikidata.org/wiki/Q119721378
     notes: From Wikidata Q119721378
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.007Z
   - id: f_t9EbWYwryE
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Daniela_Amodei
@@ -42,7 +32,7 @@ facts:
 
   - id: f_vgq29V8MAr
     property: ea-alignment-estimate
-    value: [ 0.8, 0.9 ]
+    value: [0.8, 0.9]
     asOf: "2026-04"
     notes: "Editorial estimate. Daniela is married to Holden Karnofsky (GiveWell
       co-founder, now at Anthropic); strong documented EA community ties."

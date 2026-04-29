@@ -30,11 +30,6 @@ facts:
     value: 1987
     source: https://en.wikipedia.org/wiki/William_MacAskill
     notes: "Born 24 March 1987 in Glasgow, Scotland"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:45.931Z
 
   - id: f_wM5eD2014o
     property: education
@@ -43,11 +38,6 @@ facts:
     source: https://en.wikipedia.org/wiki/William_MacAskill
     notes: "Youngest person appointed as Associate Professor of Philosophy at time
       of appointment"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:45.848Z
 
   - id: f_wM6sM0twit
     property: social-media

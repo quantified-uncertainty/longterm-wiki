@@ -6,11 +6,6 @@ facts:
       Daniel Gross"
     source: https://ssi.inc
     notes: SSI co-founder; previously ML researcher
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.010Z
   - id: f_NXLWypb56w
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Daniel_Levy_(businessman)

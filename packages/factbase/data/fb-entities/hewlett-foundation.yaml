@@ -14,21 +14,11 @@ facts:
     value: "1966"
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:57.014Z
   - id: f_KGVdw0WgBL
     property: headquarters
     value: Menlo Park
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.993Z
   - id: f_9alU3tQVKD
     property: website
     value: https://www.hewlett.org/
@@ -39,41 +29,21 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.979Z
   - id: f_ZEbDstc9bG
     property: revenue
     value: 289396942
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.939Z
   - id: f_gQXsc9HHBR
     property: founded-by-name
     value: William Redington Hewlett
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.930Z
   - id: f_tbfZzuzCRr
     property: legal-structure
     value: foundation
     source: https://www.wikidata.org/wiki/Q1288412
     notes: From Wikidata Q1288412
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.924Z
   - id: f_wXlXMAHr9G
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Hewlett_Foundation

@@ -7,11 +7,6 @@ facts:
     asOf: 2025-01
     source: https://www.bloomberg.com/news/articles/2025-12-10/federal-workforce-s-toll-after-a-year-of-doge-and-trump-317-000
     notes: "Federal civilian workforce at start of 2025, before DOGE cuts"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:59.097Z
 
   - id: f_QwS2K4F2m1
     property: federal-civilian-workforce
@@ -19,11 +14,6 @@ facts:
     asOf: 2025-12
     source: https://www.bloomberg.com/news/articles/2025-12-10/federal-workforce-s-toll-after-a-year-of-doge-and-trump-317-000
     notes: "After 317,000+ left in 2025; largest peacetime workforce cut on record"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:04:59.109Z
 
   # ── IT workforce losses ────────────────────────────────────────
   - id: f_eDAemGhZqF
@@ -31,14 +21,7 @@ facts:
     value: 17000
     asOf: 2025-12
     source: https://federalnewsnetwork.com/workforce/2026/01/how-staffing-cuts-in-2025-transformed-the-federal-workforce/
-    notes: "17,000+ IT and telecom workers left federal service in 2025 (8,910
-      deferred resignation, 435 RIF, remainder via voluntary
-      resignation/retirement/attrition)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:46.242Z
+    notes: "17,000+ IT and telecom workers left federal service in 2025 (8,910 deferred resignation, 435 RIF, remainder via voluntary resignation/retirement/attrition)"
 
   # ── IT workforce age demographics ──────────────────────────────
   - id: f_rgCn4rEO8z
@@ -47,11 +30,6 @@ facts:
     asOf: 2025-12
     source: https://federalnewsnetwork.com/workforce/2026/03/after-deep-staffing-cuts-agencies-seek-mix-of-hiring-and-ai-tools-to-rebuild-capacity/
     notes: "Over 40% of federal IT professionals are now eligible for retirement"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.230Z
 
   - id: f_QP6uEY2oPY
     property: under-30-pct
@@ -59,11 +37,6 @@ facts:
     asOf: 2025-12
     source: https://federalnewsnetwork.com/workforce/2026/03/after-deep-staffing-cuts-agencies-seek-mix-of-hiring-and-ai-tools-to-rebuild-capacity/
     notes: "~7% of gov workforce under 30 vs ~22% in private sector"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.167Z
 
   # ── Federal AI R&D spending ────────────────────────────────────
   - id: f_ueHdkz691s
@@ -72,11 +45,6 @@ facts:
     asOf: 2025-01
     source: https://federalbudgetiq.com/insights/federal-ai-and-it-research-and-development-spending-analysis/
     notes: "FY2025: $1.95B core AI + $1.36B crosscut = $3.3B total federal AI R&D"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:46.165Z
 
   # ── DoD AI budget ──────────────────────────────────────────────
   - id: f_BQDp01waAp
@@ -85,11 +53,6 @@ facts:
     asOf: 2026-01
     source: https://defensescoop.com/2025/12/08/emil-michael-dod-deliver-ai-at-scale-under-trump/
     notes: "DoD FY2026 request for autonomy and AI systems"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.132Z
 
   # ── Tech Force program ─────────────────────────────────────────
   - id: f_KB0xpcEW8r
@@ -97,10 +60,4 @@ facts:
     value: 1000
     asOf: 2025-12
     source: https://news.clearancejobs.com/2025/12/17/inside-the-u-s-tech-force-what-the-federal-governments-ai-hiring-push-means/
-    notes: "U.S. Tech Force targeting 1,000 technologists per annual cohort,
-      $150-200K salary, 2-year terms"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:46.133Z
+    notes: "U.S. Tech Force targeting 1,000 technologists per annual cohort, $150-200K salary, 2-year terms"

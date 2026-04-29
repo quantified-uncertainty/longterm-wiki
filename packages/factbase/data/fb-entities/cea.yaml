@@ -13,11 +13,6 @@ facts:
     asOf: "2024"
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186 (as of 2024)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.327Z
   - id: f_iYQEAWahqJ
     property: website
     value: https://www.centreforeffectivealtruism.org
@@ -28,51 +23,26 @@ facts:
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.323Z
   - id: f_E84LwIuoTU
     property: headcount
     value: 11
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.322Z
   - id: f_E8PyECvvln
     property: revenue
     value: 3507482
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:04.261Z
   - id: f_IR0efkM6nB
     property: founded-by-name
     value: Toby Ord
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186; text value (not entity ref)
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.259Z
   - id: f_sCsBaQQimH
     property: legal-structure
     value: charitable organization
     source: https://www.wikidata.org/wiki/Q58844186
     notes: From Wikidata Q58844186
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.237Z
   - id: f_fS8wn8Jo89
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Centre_for_Effective_Altruism

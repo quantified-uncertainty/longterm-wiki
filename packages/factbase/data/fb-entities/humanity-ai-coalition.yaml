@@ -5,11 +5,6 @@ facts:
     value: "2025-10-14"
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
     notes: "Launched October 14, 2025 per MacArthur Foundation press release"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.569Z
 
   - id: f_eQxEIIrI9c
     property: total-funding
@@ -18,45 +13,22 @@ facts:
     asOf: 2025-10
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
     notes: "$500M over 5 years"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.551Z
 
   - id: f_FuxFSRcGek
     property: governance
     value: "Jointly led by Omidyar Network and MacArthur Foundation"
     asOf: 2025
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-    notes: "Both organizations' presidents featured prominently; source does not use
-      formal 'co-chair' designation"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:56.536Z
+    notes: "Both organizations' presidents featured prominently; source does not use formal 'co-chair' designation"
 
   - id: f_JwqBzO6sxD
     property: founding-members
-    value: "Doris Duke Foundation, Ford Foundation, Lumina Foundation, Kapor
-      Foundation, Mellon Foundation, Mozilla Foundation, Siegel Family
-      Endowment, David and Lucile Packard Foundation"
+    value: "Doris Duke Foundation, Ford Foundation, Lumina Foundation, Kapor Foundation, Mellon Foundation, Mozilla Foundation, Siegel Family Endowment, David and Lucile Packard Foundation"
     asOf: 2025-10
     source: https://www.mellon.org/news/humanity-ai-commits-500m-build-people-centered-future-ai
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.500Z
 
   - id: f_sDIu9aTWHe
     property: focus-areas
     value: "Democracy, education, humanities and culture, labor and economy, security"
     asOf: 2025
     source: https://www.macfound.org/press/press-releases/humanity-ai-commits-500-million-to-build-a-people-centered-future-for-ai
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.492Z

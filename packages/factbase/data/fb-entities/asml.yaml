@@ -6,31 +6,16 @@ facts:
     value: "1984-04"
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "Founded as a joint venture between ASM International and Philips"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:06.107Z
 
   - id: f_7R5oO6JWlH
     property: headquarters
     value: "Veldhoven, Netherlands"
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.105Z
 
   - id: f_VKOKW4zPyR
     property: country
     value: Netherlands
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.075Z
 
   - id: f_InNDVXbQ9N
     property: ceo
@@ -38,21 +23,11 @@ facts:
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/ASML_Holding
     notes: "CEO since April 2024, succeeding Peter Wennink"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.073Z
 
   - id: f_kTy7rT996c
     property: legal-structure
     value: "Public company (Euronext: ASML, NASDAQ: ASML)"
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.074Z
 
   - id: f_uW5kOqtOA5
     property: website
@@ -68,11 +43,11 @@ facts:
   - id: f_VUFx5IngKN
     property: description
     value: >-
-      Sole global supplier of extreme ultraviolet (EUV) lithography machines
-      required to manufacture chips at advanced nodes (sub-7nm). ASML's monopoly
-      on EUV technology makes it one of the most critical chokepoints in the AI
-      chip supply chain. Dutch export restrictions on ASML equipment are among
-      the most effective levers in chip governance.
+      Sole global supplier of extreme ultraviolet (EUV) lithography machines required
+      to manufacture chips at advanced nodes (sub-7nm). ASML's monopoly on EUV technology
+      makes it one of the most critical chokepoints in the AI chip supply chain. Dutch
+      export restrictions on ASML equipment are among the most effective levers in chip
+      governance.
     asOf: 2026-03
 
   # ── Headcount ───────────────────────────────────────────────────
@@ -82,11 +57,6 @@ facts:
     asOf: 2022-12
     source: https://www.macrotrends.net/stocks/charts/ASML/asml-holding/number-of-employees
     notes: "39,086 employees at end of 2022; 22% increase from 2021"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.015Z
 
   - id: f_asHc2023nt
     property: headcount
@@ -94,11 +64,6 @@ facts:
     asOf: 2023-12
     source: https://www.asml.com/en/investors/annual-report/2023
     notes: "42,416 FTE at end of 2023; 8.5% increase from 2022"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.018Z
 
   - id: f_aIgq7Ix4Zo
     property: headcount
@@ -106,11 +71,6 @@ facts:
     asOf: 2024-12
     source: https://www.asml.com/en/investors/annual-report
     notes: "44,027 employees worldwide at end of 2024; 3.8% increase from 2023"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.982Z
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_6NXQtC3WZW
@@ -119,11 +79,6 @@ facts:
     asOf: 2023-12
     source: https://www.asml.com/en/investors/annual-report
     notes: "2023 annual revenue EUR 27.6B, converted at ~1.08 EUR/USD = ~$29.8B"
-    sourcing:
-      verdict: outdated
-      evidence: 1 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.983Z
 
   - id: f_eYPanfCIhM
     property: revenue
@@ -131,11 +86,6 @@ facts:
     asOf: 2024-12
     source: https://www.asml.com/en/investors/annual-report
     notes: "2024 annual revenue EUR 28.3B, converted at ~1.08 EUR/USD = ~$30.6B"
-    sourcing:
-      verdict: outdated
-      evidence: 1 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.981Z
 
   - id: f_gq5tiOrIkN
     property: revenue
@@ -143,11 +93,6 @@ facts:
     asOf: 2025-12
     source: https://www.asml.com/en/investors/annual-report
     notes: "2025 full-year revenue EUR 32.7B, converted at ~1.08 EUR/USD = ~$35.3B"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.928Z
 
   # ── EUV monopoly ────────────────────────────────────────────────
   - id: f_kFj7TBgRuP
@@ -155,13 +100,7 @@ facts:
     value: 100
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    notes: "ASML is the sole supplier of EUV lithography machines globally; no
-      competitor"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.926Z
+    notes: "ASML is the sole supplier of EUV lithography machines globally; no competitor"
 
   - id: f_l2QMMMF9BM
     property: euv-system-price
@@ -169,13 +108,7 @@ facts:
     currency: USD
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    notes: "High-NA EUV systems cost approximately $380M each; standard EUV
-      ~$150-200M"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.892Z
+    notes: "High-NA EUV systems cost approximately $380M each; standard EUV ~$150-200M"
 
   # ── Market cap ──────────────────────────────────────────────────
   - id: f_TFCy4KADFM
@@ -184,36 +117,18 @@ facts:
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/asml/market-cap/
     notes: "Market cap ~$491B as of March 30, 2026"
-    sourcing:
-      verdict: outdated
-      evidence: 1 → outdated
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:05.891Z
 
   # ── Export control events ───────────────────────────────────────
   - id: f_SWXfrtmsdO
     property: key-event
-    value: "Dutch government implemented export restrictions on ASML DUV equipment
-      to China, aligned with U.S. policy"
+    value: "Dutch government implemented export restrictions on ASML DUV equipment to China, aligned with U.S. policy"
     asOf: 2023-09
     source: https://en.wikipedia.org/wiki/ASML_Holding
-    notes: "ASML had already been restricted from selling EUV systems to China since
-      2019"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:05.891Z
+    notes: "ASML had already been restricted from selling EUV systems to China since 2019"
 
   - id: f_FStYWr7rnE
     property: key-event
-    value: "Additional Dutch export controls expanded to cover maintenance and
-      servicing of existing ASML machines in China"
+    value: "Additional Dutch export controls expanded to cover maintenance and servicing of existing ASML machines in China"
     asOf: 2024-01
     source: https://www.reuters.com/technology/asml-hit-by-more-dutch-restrictions-ai-chip-machines-2024-09-06/
     notes: "Restrictions progressively tightened over 2023-2024"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.666Z

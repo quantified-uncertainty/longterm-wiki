@@ -5,11 +5,6 @@ facts:
     value: "2016-11"
     source: https://en.wikipedia.org/wiki/Protect_Democracy
     notes: "Formed November 2016; incorporated and launched publicly in early 2017"
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.970Z
 
   - id: f_1Mqq9p4LHQ
     property: employee-count
@@ -17,11 +12,6 @@ facts:
     asOf: 2025
     source: https://protectdemocracy.org/about/
     notes: "100+ staff (lawyers, strategists, other professionals)"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.970Z
 
   - id: f_AavMjo7v7g
     property: lawsuits-filed
@@ -29,11 +19,6 @@ facts:
     asOf: 2025
     source: https://protectdemocracy.org
     notes: "100+ lawsuits filed challenging authoritarian actions"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.969Z
 
   - id: f_6p7ma7IfKQ
     property: project
@@ -42,11 +27,6 @@ facts:
       against AI threats to democracy"
     asOf: 2025
     source: https://protectdemocracy.org/data-technology/ai-democracy-action-lab/
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.958Z
 
   - id: f_9QZduVHwPm
     property: litigation
@@ -56,11 +36,6 @@ facts:
     asOf: 2025-07
     source: https://protectdemocracy.org
     notes: "Filed July 2025"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.876Z
 
   - id: f_U6QEB8QMYJ
     property: litigation-detail
@@ -72,11 +47,6 @@ facts:
       judgment (Aug 29, 2025)."
     asOf: 2025-09
     source: https://epic.org/documents/pallek-v-rollins/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:49.878Z
 
   - id: f_FkD2M0De3B
     property: program
@@ -85,11 +55,6 @@ facts:
       records across 24 states (as of March 2023)."
     asOf: 2023-03
     source: https://www.voteshield.us/
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.877Z
 
   - id: f_veFaH652mU
     property: publication
@@ -99,11 +64,6 @@ facts:
       exercises (May-June 2024) simulating authoritarian scenarios."
     asOf: 2024
     source: https://www.authoritarianplaybook2025.org/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:03:49.870Z
   - id: f_IcS6ICvkOg
     property: revenue
     value: 33111628

@@ -10,22 +10,12 @@ facts:
     value: "BS in Economics and BS in Physics, University of Pennsylvania; briefly
       attended Stanford PhD program (dropped out after 2 days)"
     source: https://en.wikipedia.org/wiki/Elon_Musk
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:00.878Z
 
   - id: f_eM4fG5hI6j
     property: notable-for
     value: "CEO of Tesla and SpaceX; founder of xAI; co-founder of OpenAI; owner of
       X/Twitter; one of the wealthiest people in history"
     source: https://en.wikipedia.org/wiki/Elon_Musk
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.869Z
 
   - id: f_eM7kL8mN9o
     property: net-worth
@@ -34,11 +24,6 @@ facts:
     source: https://www.bloomberg.com/billionaires/
     notes: "Fluctuates significantly with Tesla stock price; Bloomberg Billionaires
       Index estimate as of March 2026"
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.868Z
 
   - id: f_SxwgL1y46Q
     property: social-media

@@ -6,28 +6,14 @@ facts:
         property: headquarters,
         value: Sacramento,
         source: https://www.wikidata.org/wiki/Q136680743,
-        notes: From Wikidata Q136680743,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:04:04.708Z
-          }
+        notes: From Wikidata Q136680743
       },
     {
         id: f_fG3cHovtm2,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q136680743,
-        notes: From Wikidata Q136680743,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:04:04.668Z
-          }
+        notes: From Wikidata Q136680743
       },
     {
         id: f_s79wqGkTUJ,

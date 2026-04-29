@@ -6,42 +6,21 @@ facts:
         property: founded-date,
         value: 1934-01,
         source: https://www.wikidata.org/wiki/Q1200258,
-        notes: From Wikidata Q1200258,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:03:48.020Z
-          }
+        notes: From Wikidata Q1200258
       },
     {
         id: f_6No2ueuLmv,
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q1200258,
-        notes: From Wikidata Q1200258,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:48.021Z
-          }
+        notes: From Wikidata Q1200258
       },
     {
         id: f_xOm51Gl9ne,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q1200258,
-        notes: From Wikidata Q1200258,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:48.015Z
-          }
+        notes: From Wikidata Q1200258
       },
     {
         id: f_pmnledwo1V,
@@ -55,28 +34,14 @@ facts:
         property: founded-by-name,
         value: Alfred P. Sloan,
         source: https://www.wikidata.org/wiki/Q1200258,
-        notes: From Wikidata Q1200258; text value (not entity ref),
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:47.949Z
-          }
+        notes: From Wikidata Q1200258; text value (not entity ref)
       },
     {
         id: f_3DrO8ZfpZq,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q1200258,
-        notes: From Wikidata Q1200258,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:47.934Z
-          }
+        notes: From Wikidata Q1200258
       },
     {
         id: f_rnHd3rvbBw,

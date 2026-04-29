@@ -6,11 +6,6 @@ facts:
     value: "2010"
     source: https://codeforamerica.org
     notes: "Founded by Jennifer Pahlka"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.925
-      checkedAt: 2026-04-29T16:04:14.521Z
 
   # ── Scale ──────────────────────────────────────────────────────
   - id: f_HP66HDaMfu
@@ -19,11 +14,6 @@ facts:
     asOf: 2025-01
     source: https://codeforamerica.org
     notes: "Helps over 100 government agencies improve digital service delivery"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.975
-      checkedAt: 2026-04-29T16:02:30.858Z
 
   # ── Founder role ───────────────────────────────────────────────
   - id: f_jJ6lESgNPs
@@ -33,21 +23,11 @@ facts:
     source: https://codeforamerica.org
     notes: "Jennifer Pahlka; also served as U.S. Deputy CTO under Obama and helped
       establish USDS"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.975
-      checkedAt: 2026-04-29T16:02:30.930Z
   - id: f_Swro0x0bxF
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q5140068
     notes: From Wikidata Q5140068
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.066Z
   - id: f_srC2Ay3wIM
     property: website
     value: http://www.codeforamerica.org/

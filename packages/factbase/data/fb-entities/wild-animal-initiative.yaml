@@ -6,42 +6,21 @@ facts:
         property: founded-date,
         value: 2019-01,
         source: https://www.wikidata.org/wiki/Q107463177,
-        notes: From Wikidata Q107463177,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:03:46.038Z
-          }
+        notes: From Wikidata Q107463177
       },
     {
         id: f_6EJYzYGbjo,
         property: headquarters,
         value: Farmington,
         source: https://www.wikidata.org/wiki/Q107463177,
-        notes: From Wikidata Q107463177,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:46.029Z
-          }
+        notes: From Wikidata Q107463177
       },
     {
         id: f_fr9F84LZg4,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q107463177,
-        notes: From Wikidata Q107463177,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:45.978Z
-          }
+        notes: From Wikidata Q107463177
       },
     {
         id: f_j5cfCeOx3G,
@@ -55,28 +34,14 @@ facts:
         property: revenue,
         value: 85838,
         source: https://www.wikidata.org/wiki/Q107463177,
-        notes: From Wikidata Q107463177,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:45.939Z
-          }
+        notes: From Wikidata Q107463177
       },
     {
         id: f_nCEgKxu58c,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q107463177,
-        notes: From Wikidata Q107463177,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:45.938Z
-          }
+        notes: From Wikidata Q107463177
       },
     {
         id: f_ckuIT01umX,

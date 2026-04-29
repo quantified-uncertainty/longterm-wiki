@@ -13,32 +13,17 @@ facts:
     value: "2021"
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.634Z
   - id: f_aPnEBS00QI
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.635Z
   - id: f_aiwf9oJIG0
     property: headcount
     value: 500
     asOf: "2024"
     source: https://www.wikidata.org/wiki/Q116758847
     notes: From Wikidata Q116758847 (as of 2024)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:07.599Z
   - id: f_CpkQe9ec46
     property: website
     value: https://www.anthropic.com/

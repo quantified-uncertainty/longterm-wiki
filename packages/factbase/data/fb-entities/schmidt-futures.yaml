@@ -14,21 +14,11 @@ facts:
     value: "2017"
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.583Z
   - id: f_cYQY5a9GTW
     property: headquarters
     value: Chelsea
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.554Z
   - id: f_bGqkNbEgzn
     property: website
     value: https://www.schmidtfutures.com/
@@ -39,21 +29,11 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.553Z
   - id: f_lodweEF2uU
     property: founded-by-name
     value: Eric Schmidt
     source: https://www.wikidata.org/wiki/Q111146691
     notes: From Wikidata Q111146691; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.548Z
   - id: f_FS9HgJrNAp
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Schmidt_Futures

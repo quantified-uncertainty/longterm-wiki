@@ -7,27 +7,14 @@ facts:
 
   - id: f_yL1aB2cD3e
     property: education
-    value: "PhD in Computer Science, Université Pierre et Marie Curie (Paris VI,
-      1987); Diplome d'Ingenieur, ESIEE Paris"
+    value: "PhD in Computer Science, Universit\u00E9 Pierre et Marie Curie (Paris VI, 1987); Diplome d'Ingenieur, ESIEE Paris"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with
-      Geoffrey Hinton"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:45.346Z
+    notes: "PhD advisor was Maurice Milgram; postdoc at University of Toronto with Geoffrey Hinton"
 
   - id: f_yL4fG5hI6j
     property: notable-for
-    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at
-      Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
+    value: "Pioneer of convolutional neural networks (CNNs); Chief AI Scientist at Meta; Turing Award 2018; vocal skeptic of AGI existential risk"
     source: https://en.wikipedia.org/wiki/Yann_LeCun
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:45.343Z
 
   - id: f_yL7kL8mN9o
     property: social-media

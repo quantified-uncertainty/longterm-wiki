@@ -4,23 +4,12 @@ facts:
     property: founded-date
     value: "2020-08"
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
-    notes: "Idea from EA group at Harvard Law School (Fall 2018); launched August
-      30, 2020. Rebranded to Institute for Law & AI (LawAI) around 2023-2024."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.626Z
+    notes: "Idea from EA group at Harvard Law School (Fall 2018); launched August 30, 2020. Rebranded to Institute for Law & AI (LawAI) around 2023-2024."
 
   - id: f_VXXEULKRwO
     property: headquarters
     value: "6 Liberty Square, #6079, Boston, MA"
     source: https://law-ai.org/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.581Z
 
   - id: f_9Z978lvcwS
     property: annual-revenue
@@ -29,11 +18,6 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/851024198
     notes: "Major jump from $963K (2023) to $7.85M (2024). Assets $6.05M."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:55.561Z
 
   - id: f_nhdUjzdFe3
     property: employee-count
@@ -41,57 +25,27 @@ facts:
     asOf: 2026
     source: https://law-ai.org/team/
     notes: "28 core team + 9 affiliates. Grew from 6.1 FTE in 2022."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.560Z
 
   - id: f_9Tznq9C3O9
     property: research-areas
-    value: "AI governance and regulation, law-following AI systems, treaty-following
-      AI, automated compliance, AI transparency and trade secrets, AI agent
-      governance"
+    value: "AI governance and regulation, law-following AI systems, treaty-following AI, automated compliance, AI transparency and trade secrets, AI agent governance"
     source: https://law-ai.org/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:55.536Z
 
   - id: f_c2bFixti1q
     property: organizational-change
-    value: "Rebranded from Legal Priorities Project to Institute for Law & AI
-      (LawAI) around 2023-2024"
+    value: "Rebranded from Legal Priorities Project to Institute for Law & AI (LawAI) around 2023-2024"
     source: https://law-ai.org/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:55.535Z
 
   - id: f_Z1LzeboVhP
     property: founded-by
     value: !ref sid_4I7XUhwlqE
     source: https://forum.effectivealtruism.org/posts/PvBLDPkqKvdHQkKPn/introducing-the-legal-priorities-project
-    notes: "Founded by researchers at Harvard University. Core team included Jonas
-      Schuett, Eric Martinez, Cullen O'Keefe. Winter remains Director of LawAI."
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.497Z
+    notes: "Founded by researchers at Harvard University. Core team included Jonas Schuett, Eric Martinez, Cullen O'Keefe. Winter remains Director of LawAI."
 
   - id: f_CnJ5VnpBrH
     property: legal-structure
-    value: "501(c)(3) nonprofit (Legal Priorities Inc, EIN 85-1024198). Fully remote
-      team."
+    value: "501(c)(3) nonprofit (Legal Priorities Inc, EIN 85-1024198). Fully remote team."
     source: https://projects.propublica.org/nonprofits/organizations/851024198
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.471Z
 
   - id: f_ltwPScsmD4
     property: annual-revenue
@@ -99,28 +53,13 @@ facts:
     currency: USD
     asOf: 2022
     source: https://forum.effectivealtruism.org/posts/xen7oLdHwoHDTG4hR/legal-priorities-project-annual-report-2022
-    notes: "~$1.1M spent in 2022. Raised ~$1.3M. 14 grant applications since
-      inception (10 fully granted, 3 partly)."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.457Z
+    notes: "~$1.1M spent in 2022. Raised ~$1.3M. 14 grant applications since inception (10 fully granted, 3 partly)."
 
   - id: f_wf4U8v9eLb
     property: description
-    value: "Independent research institute focused on the legal challenges of AI.
-      Researches AI governance and regulation, law-following AI systems,
-      automated compliance, and AI transparency. Originally focused broadly on
-      legal priorities for longtermism; shifted focus to AI risk mitigation
-      during 2023 rebrand."
+    value: "Independent research institute focused on the legal challenges of AI. Researches AI governance and regulation, law-following AI systems, automated compliance, and AI transparency. Originally focused broadly on legal priorities for longtermism; shifted focus to AI risk mitigation during 2023 rebrand."
     asOf: 2026-03
     source: https://law-ai.org/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:55.453Z
 
   - id: f_WKHE2Kos1e
     property: website
@@ -131,21 +70,9 @@ facts:
     property: country
     value: "United States"
     source: https://law-ai.org/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.447Z
 
   - id: f_hhVOFqMgRK
     property: program
-    value: "Legal Priorities Summer Institute (473 applications, 35 admitted from 18
-      countries in 2022). Law & Longtermism Network (~300 members). Writing
-      Competition with prizes $2,500-$30,000."
+    value: "Legal Priorities Summer Institute (473 applications, 35 admitted from 18 countries in 2022). Law & Longtermism Network (~300 members). Writing Competition with prizes $2,500-$30,000."
     asOf: 2022
     source: https://forum.effectivealtruism.org/posts/xen7oLdHwoHDTG4hR/legal-priorities-project-annual-report-2022
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.410Z

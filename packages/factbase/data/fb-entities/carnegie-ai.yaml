@@ -4,25 +4,13 @@ facts:
     property: founded-date
     value: "1910-12-14"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
-    notes: "Formal deed of gift presented December 14, 1910 (Carnegie announced
-      intention on November 25, 1910). Established with $10 million gift."
-    sourcing:
-      verdict: contradicted
-      evidence: "1 → contradicted; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.538Z
+    notes: "Formal deed of gift presented December 14, 1910 (Carnegie announced intention on November 25, 1910). Established with $10 million gift."
 
   - id: f_Cp7gK2sW4b
     property: headquarters
     value: "Washington, DC"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
-    notes: "Moved from New York to Washington, DC in 1970; additional offices in
-      Beirut, Berlin, Brussels, and New Delhi"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.507Z
+    notes: "Moved from New York to Washington, DC in 1970; additional offices in Beirut, Berlin, Brussels, and New Delhi"
 
   - id: f_Eq1vL5tN8c
     property: headcount
@@ -30,53 +18,28 @@ facts:
     asOf: 2025-06
     source: https://carnegieendowment.org/about
     notes: "Approximately 170 experts across global offices"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:04.504Z
 
   - id: f_Gw3cJ6mQ2d
     property: revenue
     value: 5.76e+7
     asOf: 2025-06
     source: https://projects.propublica.org/nonprofits/organizations/130552040
-    notes: "Revenue from FY2025 IRS Form 990 filing (~$57.6M). Previous year FY2023
-      was ~$59.9M."
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.496Z
+    notes: "Revenue from FY2025 IRS Form 990 filing (~$57.6M). Previous year FY2023 was ~$59.9M."
 
   - id: f_Iy7dR9wK6e
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
     notes: "Private, nonprofit think tank"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:04.487Z
 
   - id: f_Kz5aH1vB3f
     property: website
     value: "https://carnegieendowment.org/"
     source: https://carnegieendowment.org/
     notes: "Official website"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:43.044Z
 
   - id: f_Mn4bP8tR7g
     property: description
-    value: "Global think tank with the Technology and International Affairs Program
-      studying AI, cybersecurity, biotechnology, and the information
-      environment. Carnegie's AI work focuses on international AI governance,
-      science-based policy, and anticipating both short-term (2-5 year) and
-      medium-term (5-10 year) AI security challenges."
+    value: "Global think tank with the Technology and International Affairs Program studying AI, cybersecurity, biotechnology, and the information environment. Carnegie's AI work focuses on international AI governance, science-based policy, and anticipating both short-term (2-5 year) and medium-term (5-10 year) AI security challenges."
     asOf: 2026-03
     source: https://carnegieendowment.org/programs/technology-and-international-affairs/artificial-intelligence

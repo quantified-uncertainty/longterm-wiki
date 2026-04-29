@@ -10,42 +10,22 @@ facts:
     asOf: "2025"
     source: https://en.wikipedia.org/wiki/Jaan_Tallinn
     notes: "Estimated net worth; primary funder of SFF and Lightspeed Grants"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.230Z
 
   - id: f_1QqEUKiNaw
     property: description
     value: "Personal foundation giving (2024): $20M (excludes SFF amounts)"
     source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
     notes: "Allocated through personal foundation in 2024"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.208Z
   - id: f_ZbWZ3tzTaf
     property: born-year
     value: 1972
     source: https://www.wikidata.org/wiki/Q3156998
     notes: From Wikidata Q3156998
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:56.156Z
   - id: f_XXixZKKyUT
     property: education
     value: University of Tartu; Gustav Adolf Grammar School
     source: https://www.wikidata.org/wiki/Q3156998
     notes: From Wikidata Q3156998
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.143Z
   - id: f_EZnSjqqhyA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Jaan_Tallinn
@@ -59,37 +39,27 @@ facts:
       Grants; major philanthropic donor to AI safety research
     asOf: 2026-04
     source: https://en.wikipedia.org/wiki/Jaan_Tallinn
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:56.128Z
   - id: f_UWG1ka4xug
     property: role
     value: Founder and philanthropist; primary funder of SFF (Survival and
       Flourishing Fund) and Lightspeed Grants
     asOf: 2026-04
     source: https://en.wikipedia.org/wiki/Jaan_Tallinn
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:56.126Z
 
   - id: f_WqT0yED9QY
     property: equity-pledge-fraction
     value: 0.9
     asOf: "2026-04"
     source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
-    notes: "Estimate based on documented giving track record — $150M+ lifetime AI
-      safety giving, primary funder of SFF and Lightspeed Grants, co-founded
-      CSER and FLI. Not a formal legal pledge."
+    notes: "Estimate based on documented giving track record — $150M+ lifetime
+      AI safety giving, primary funder of SFF and Lightspeed Grants,
+      co-founded CSER and FLI. Not a formal legal pledge."
 
   - id: f_oVtgXAR5e5
     property: ea-alignment-estimate
-    value: [ 0.9, 0.95 ]
+    value: [0.9, 0.95]
     asOf: "2026-04"
     source: https://www.lesswrong.com/posts/8ojWtREJjKmyvWdDb/jaan-tallinn-s-2024-philanthropy-overview
-    notes: "Editorial estimate. Long documented EA/longtermist community ties; funds
-      EA-aligned orgs (SFF, Lightspeed, CSER, FLI); very high confidence of
-      EA-aligned giving."
+    notes: "Editorial estimate. Long documented EA/longtermist community ties;
+      funds EA-aligned orgs (SFF, Lightspeed, CSER, FLI); very high confidence
+      of EA-aligned giving."

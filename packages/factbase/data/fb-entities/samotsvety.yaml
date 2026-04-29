@@ -14,28 +14,16 @@ facts:
     value: 1971-01
     source: https://www.wikidata.org/wiki/Q4406987
     notes: From Wikidata Q4406987
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:48.665Z
   - id: f_w55LyhmTPf
     property: country
     value: Russia
     source: https://www.wikidata.org/wiki/Q4406987
     notes: From Wikidata Q4406987
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:48.662Z
   - id: f_n79Tqd69f6
     property: website
     value: https://samotsvety.org
     source: https://samotsvety.org
-    notes: "Official website of Samotsvety Forecasting. Previous values
-      (samotsvetu.ru, samotsvety.ru) were for the unrelated Russian pop band
-      (Wikidata Q4406987)."
+    notes: "Official website of Samotsvety Forecasting. Previous values (samotsvetu.ru, samotsvety.ru) were for the unrelated Russian pop band (Wikidata Q4406987)."
   - id: f_0OMBy9lasl
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Samotsvety

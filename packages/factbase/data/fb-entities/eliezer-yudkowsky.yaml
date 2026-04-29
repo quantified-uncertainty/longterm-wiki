@@ -5,11 +5,6 @@ facts:
     value: 1979
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
     notes: "Born September 11, 1979 in Chicago, Illinois"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:00.955Z
 
   - id: f_eY1aB2cD3e
     property: education
@@ -17,11 +12,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
     notes: "Autodidact; dropped out of school at age 12; taught himself AI and
       mathematics"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.941Z
 
   - id: f_eY4fG5hI6j
     property: notable-for
@@ -29,11 +19,6 @@ facts:
       Sequences' on rationality; author of Harry Potter and the Methods of
       Rationality; prominent AI doomer"
     source: https://en.wikipedia.org/wiki/Eliezer_Yudkowsky
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:00.906Z
 
   - id: f_eY7kL8mN9o
     property: social-media

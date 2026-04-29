@@ -2,8 +2,7 @@ entity: sid_2smzyptQJg
 facts:
   - id: f_WXk4Z58tdg
     property: description
-    value: Dynamic, contamination-free benchmark for evaluating LLM forecasting
-      capabilities, published at ICLR 2025.
+    value: Dynamic, contamination-free benchmark for evaluating LLM forecasting capabilities, published at ICLR 2025.
     asOf: 2026-03
     notes: Migrated from old entity system
 
@@ -17,15 +16,9 @@ facts:
     value: "2024-09"
     notes: Public leaderboard launched September 2024
     source: https://forecastbench.org
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:03:59.584Z
 
   - id: f_cXt8zK1eFf
     property: founded-by
     value:
       - !ref sid_KslhqGaeJw
-    notes: Created by Forecasting Research Institute (FRI), led by Ezra Karger and
-      Philip Tetlock
+    notes: Created by Forecasting Research Institute (FRI), led by Ezra Karger and Philip Tetlock

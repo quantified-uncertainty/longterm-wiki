@@ -6,11 +6,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Google_DeepMind
     notes: "Founded September 2010 in London by Demis Hassabis, Shane Legg, and
       Mustafa Suleyman"
-    sourcing:
-      verdict: partial
-      evidence: 2 → partial
-      confidence: 0.9
-      checkedAt: 2026-04-29T16:04:01.897Z
 
   - id: f_pjpNfsuNKw
     property: headquarters
@@ -18,11 +13,6 @@ facts:
     source: https://deepmind.google/about
     notes: "Headquarters remain in London; additional offices in Mountain View,
       Paris, and other cities"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.9
-      checkedAt: 2026-04-29T16:04:01.887Z
 
   - id: f_nq7RXAwqsw
     property: legal-structure
@@ -30,11 +20,6 @@ facts:
     source: https://en.wikipedia.org/wiki/Google_DeepMind
     notes: "Acquired by Google in January 2014 for approximately $500M; merged with
       Google Brain in April 2023 to form Google DeepMind"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.821Z
 
   - id: f_AX7AnnLZQQ
     property: founded-by
@@ -43,11 +28,6 @@ facts:
       - !ref sid_muueuPOHfg
       - !ref sid_DBq1ddu8Mg
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.804Z
 
   - id: f_R4dJwT8nPg
     property: headcount
@@ -56,24 +36,14 @@ facts:
     source: https://usesignhouse.com/blog/deepmind-stats/
     notes: "1,567 employees at DeepMind as of end of 2022, before the April 2023
       merger with Google Brain to form Google DeepMind"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.793Z
 
   - id: f_KtTrbGQynQ
     property: headcount
     value: 6000
     asOf: 2025-06
     source: https://en.wikipedia.org/wiki/Google_DeepMind
-    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew
-      significantly after Google Brain merger in April 2023"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.806Z
+    notes: "Approximately 6,000 employees as of 2025 per Wikipedia; grew significantly
+      after Google Brain merger in April 2023"
 
   # ── Revenue (UK entity filings — internal R&D remuneration from Alphabet) ──
   - id: f_Wq9Bxn5mKg
@@ -82,14 +52,8 @@ facts:
     asOf: "2023"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2023-deepmind-fullaccounts.pdf
     notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,527M (~$1.96B) for
-      2023. Represents R&D remuneration from other Alphabet group undertakings,
-      not external commercial revenue. Moved from 'revenue' to
-      'internal-revenue'."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.792Z
+      2023. Represents R&D remuneration from other Alphabet group undertakings, not
+      external commercial revenue. Moved from 'revenue' to 'internal-revenue'."
 
   - id: f_8pLqVz3nRg
     property: internal-revenue
@@ -97,13 +61,8 @@ facts:
     asOf: "2024"
     source: https://gwern.net/doc/reinforcement-learning/deepmind/2024-deepmind-fullaccounts.pdf
     notes: "DeepMind Technologies Ltd UK filing: turnover of GBP1,325M (~$1.7B) for
-      2024. Decrease from 2023 likely due to reorganization of internal billing
-      after Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.725Z
+      2024. Decrease from 2023 likely due to reorganization of internal billing after
+      Google Brain merger. Moved from 'revenue' to 'internal-revenue'."
 
   # UNVERIFIED ESTIMATE
   - id: f_dANFu1eouA
@@ -141,51 +100,26 @@ facts:
     value: London
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.704Z
   - id: f_YKQ6MEQi9M
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:01.696Z
   - id: f_8FlgkYy95w
     property: parent-organization
     value: Alphabet Inc.
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.683Z
   - id: f_fLQe7jpuiE
     property: founded-by-name
     value: Demis Hassabis
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.682Z
   - id: f_7tmkguuxno
     property: legal-structure
     value: subsidiary company
     source: https://www.wikidata.org/wiki/Q15733006
     notes: From Wikidata Q15733006
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:01.623Z
   - id: f_BEWKvqywtQ
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Google_DeepMind

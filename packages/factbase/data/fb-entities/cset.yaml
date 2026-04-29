@@ -2,11 +2,9 @@ entity: sid_lvsDuyzPcg
 facts:
   - id: f_5GrL7XHIjQ
     property: description
-    value: CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven
-      AI policy research, particularly on U.S.-China competition and export
-      controls. The center conducts hundreds of annual government briefings and
-      operates the Emerging Technology Observatory with 10 public tools and 8
-      datasets.
+    value: CSET is a $100M+ Georgetown center with 50+ staff conducting data-driven AI policy research, particularly on
+      U.S.-China competition and export controls. The center conducts hundreds of annual government briefings and
+      operates the Emerging Technology Observatory with 10 public tools and 8 datasets.
     asOf: 2026-03
     notes: Migrated from old entity system
 
@@ -16,126 +14,61 @@ facts:
     currency: USD
     asOf: 2025
     source: https://cset.georgetown.edu/article/new-grant-agreement-boosts-cset-funding-to-more-than-100-million-over-five-years/
-    notes: "Total Open Philanthropy/Coefficient Giving funding >$100M over 5 years
-      (founding $55M 2019 + $42M renewal 2021 + additional grants)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.416Z
+    notes: "Total Open Philanthropy/Coefficient Giving funding >$100M over 5 years (founding $55M 2019 + $42M renewal 2021 + additional grants)"
 
   - id: f_9Y54gOBxZU
     property: publication
-    value: "China's Military AI Wish List (Feb 2026) — examined thousands of
-      Chinese-language PLA procurement requests (2023-2024), revealing AI
-      priorities in command, control, communications, intelligence, and
-      targeting"
+    value: "China's Military AI Wish List (Feb 2026) — examined thousands of Chinese-language PLA procurement requests (2023-2024), revealing AI priorities in command, control, communications, intelligence, and targeting"
     asOf: 2026-02
     source: https://cset.georgetown.edu/publication/chinas-military-ai-wish-list/
     notes: "By Probasco, Bresnick, McFaul"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.417Z
 
   - id: f_Dx9D0sCeeb
     property: publication
-    value: "AI Governance at the Frontier: Unpacking Foundational Assumptions (Nov
-      2025) — dissects five governance proposals, offers analytic framework
-      based on four guiding questions"
+    value: "AI Governance at the Frontier: Unpacking Foundational Assumptions (Nov 2025) — dissects five governance proposals, offers analytic framework based on four guiding questions"
     asOf: 2025-11
     source: https://cset.georgetown.edu/publication/ai-governance-at-the-frontier/
     notes: "By Narayanan, Ji, Venkatram, Luong"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.408Z
 
   - id: f_bnVpOgB52u
     property: publication
-    value: "A Bigger Yard, A Higher Fence (Dec 2023) — analyzes expanded US export
-      controls on advanced computing chips, examining 100+ relevant chips"
+    value: "A Bigger Yard, A Higher Fence (Dec 2023) — analyzes expanded US export controls on advanced computing chips, examining 100+ relevant chips"
     asOf: 2023-12
     source: https://cset.georgetown.edu/article/bis-2023-update-explainer/
     notes: "By Dohmen, Feldgoise"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.365Z
 
   - id: f_W1suqx3PKN
     property: founded-date
     value: "2019-01"
     source: https://cset.georgetown.edu/about-us/
     notes: "Founded January 2019 with $55M Open Philanthropy grant"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.322Z
 
   - id: f_ZJyNizm93P
     property: headquarters
     value: "Georgetown University, Washington, DC"
     source: https://cset.georgetown.edu/about-us/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.324Z
 
   - id: f_EDYvEEi5Rk
     property: employee-count
     value: "50"
     asOf: 2026
     source: https://cset.georgetown.edu/team/
-    notes: "Approximately 50 staff across analysis, data science, ETO, translations,
-      and operations"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.317Z
+    notes: "Approximately 50 staff across analysis, data science, ETO, translations, and operations"
 
   - id: f_TvwrDAkCZm
     property: program
-    value: "Emerging Technology Observatory (ETO) — 10 public tools and 8 datasets
-      for tracking emerging technology trends, including AI patent clusters,
-      AGORA (AI legislation tracker), and Country Activity Tracker"
+    value: "Emerging Technology Observatory (ETO) — 10 public tools and 8 datasets for tracking emerging technology trends, including AI patent clusters, AGORA (AI legislation tracker), and Country Activity Tracker"
     source: https://cset.georgetown.edu/about-us/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:04:02.272Z
 
   - id: f_6hiba4OWK7
     property: program
-    value: "CyberAI Project — Hewlett Foundation-funded program examining the
-      intersection of AI, cybersecurity, and geopolitics ($2M initial 2019, $3M
-      renewal 2022, $5M total)"
+    value: "CyberAI Project — Hewlett Foundation-funded program examining the intersection of AI, cybersecurity, and geopolitics ($2M initial 2019, $3M renewal 2022, $5M total)"
     source: https://cset.georgetown.edu/article/cset-receives-2-million-grant-to-fund-new-cyberai-project/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.391Z
 
   - id: f_RtJB5XxjsA
     property: program
-    value: "Chinese Policy Translations Program — translates Chinese government AI
-      and technology policy documents into English, led by Ben Murphy. Major
-      source of English-language Chinese AI policy intelligence for US
-      policymakers."
+    value: "Chinese Policy Translations Program — translates Chinese government AI and technology policy documents into English, led by Ben Murphy. Major source of English-language Chinese AI policy intelligence for US policymakers."
     source: https://cset.georgetown.edu/team/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.232Z
 
   - id: f_QGx6d8Eut1
     property: grant-received
@@ -143,10 +76,4 @@ facts:
     currency: USD
     asOf: 2022
     source: https://cset.georgetown.edu/article/the-hewlett-foundation-awards-cset-an-additional-3-million-to-continue-cyber-and-ai-research/
-    notes: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal
-      in 2022)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.227Z
+    notes: "Hewlett Foundation CyberAI grants totaling $5M ($2M in 2019, $3M renewal in 2022)"

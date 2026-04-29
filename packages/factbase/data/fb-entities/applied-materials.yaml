@@ -5,41 +5,21 @@ facts:
     property: founded-date
     value: "1967-11"
     source: https://en.wikipedia.org/wiki/Applied_Materials
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.557Z
 
   - id: f_6z6GYDhdnb
     property: headquarters
     value: "Santa Clara, CA"
     source: https://en.wikipedia.org/wiki/Applied_Materials
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.555Z
 
   - id: f_qhaABxtbqj
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Applied_Materials
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.533Z
 
   - id: f_Y7llW2osd1
     property: legal-structure
     value: "Public company (NASDAQ: AMAT)"
     source: https://en.wikipedia.org/wiki/Applied_Materials
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:06.465Z
 
   - id: f_9dsy2Kh9nc
     property: website
@@ -55,11 +35,10 @@ facts:
   - id: f_DAMCGCZhCa
     property: description
     value: >-
-      World's largest supplier of semiconductor manufacturing equipment,
-      providing deposition, etching, and inspection tools. Together with Lam
-      Research and Tokyo Electron, constitutes a key equipment chokepoint in the
-      semiconductor supply chain. Subject to U.S. export controls on
-      semiconductor manufacturing equipment.
+      World's largest supplier of semiconductor manufacturing equipment, providing
+      deposition, etching, and inspection tools. Together with Lam Research and Tokyo
+      Electron, constitutes a key equipment chokepoint in the semiconductor supply chain.
+      Subject to U.S. export controls on semiconductor manufacturing equipment.
     asOf: 2026-03
 
   # ── Revenue ─────────────────────────────────────────────────────
@@ -69,8 +48,3 @@ facts:
     asOf: 2024-10
     source: https://ir.appliedmaterials.com/
     notes: "FY2024 annual revenue ($27.2B); fiscal year ends October"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.464Z

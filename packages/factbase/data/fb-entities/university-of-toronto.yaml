@@ -6,42 +6,21 @@ facts:
         property: founded-date,
         value: 1827-03,
         source: https://www.wikidata.org/wiki/Q180865,
-        notes: From Wikidata Q180865,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:46.419Z
-          }
+        notes: From Wikidata Q180865
       },
     {
         id: f_xTAeeXSLhN,
         property: headquarters,
         value: Toronto,
         source: https://www.wikidata.org/wiki/Q180865,
-        notes: From Wikidata Q180865,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:46.419Z
-          }
+        notes: From Wikidata Q180865
       },
     {
         id: f_1XXQ7NXrCr,
         property: country,
         value: Canada,
         source: https://www.wikidata.org/wiki/Q180865,
-        notes: From Wikidata Q180865,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:46.403Z
-          }
+        notes: From Wikidata Q180865
       },
     {
         id: f_fhX3zKvf6v,

@@ -14,21 +14,11 @@ facts:
     value: 1978-01
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.523Z
   - id: f_IHajncrExS
     property: headquarters
     value: Marquette Building
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.499Z
   - id: f_RS2qfB635y
     property: website
     value: https://www.macfound.org/
@@ -38,53 +28,27 @@ facts:
     property: founded-date
     value: 1978-01-06
     source: https://www.wikidata.org/wiki/Q1424691
-    notes: "From Wikidata Q1424691; January 6, 1978 per official history. Wikidata
-      also has 1970 from ROR but 1978 is authoritative."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.489Z
+    notes: "From Wikidata Q1424691; January 6, 1978 per official history. Wikidata also has 1970 from ROR but 1978 is authoritative."
   - id: f_u9fWOLhL5Q
     property: headquarters
     value: Illinois
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.490Z
   - id: f_B6NC3nChz9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:54.443Z
   - id: f_C1CLrpggNd
     property: founded-by-name
     value: John D. MacArthur
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.421Z
   - id: f_byh5n39iMl
     property: legal-structure
     value: charity
     source: https://www.wikidata.org/wiki/Q1424691
     notes: From Wikidata Q1424691
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:54.400Z
   - id: f_glsiyQzYCD
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/MacArthur_Foundation

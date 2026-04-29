@@ -12,22 +12,12 @@ facts:
     property: born-year
     value: 1967
     source: https://en.wikipedia.org/wiki/Reid_Hoffman
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:49.046Z
 
   - id: f_mI1D9F9YjL
     property: education
     value: "B.S. Symbolic Systems, Stanford; M.St. Philosophy, Oxford (Marshall
       Scholar)"
     source: https://en.wikipedia.org/wiki/Reid_Hoffman
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.044Z
 
   - id: f_kBEnmPVUDD
     property: notable-for
@@ -37,11 +27,6 @@ facts:
       donor and democracy-focused philanthropist.
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Reid_Hoffman
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.042Z
   - id: f_qquhh05S1g
     property: website
     value: http://reidhoffman.org/

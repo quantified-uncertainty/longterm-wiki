@@ -6,24 +6,13 @@ facts:
     asOf: "2025"
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "2025 grant round total; three-track structure (Main, Freedom, Fairness)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:48.398Z
 
   - id: f_XsQ4aRyDsA
     property: total-funding
-    value: 1.52e+8
+    value: 152e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/recommendations
-    notes: "Cumulative grants organized since founding in 2019 through 2025. SFF
-      reports ~$152MM total."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:48.383Z
+    notes: "Cumulative grants organized since founding in 2019 through 2025. SFF reports ~$152MM total."
 
   - id: f_fv1CZsQBGQ
     property: market-share
@@ -31,37 +20,20 @@ facts:
     asOf: "2025"
     source: https://forum.effectivealtruism.org/posts/vhw6R5P52qJr6opou/sff-2025-funding-by-cause-area-usd34-million-to-ai-86-bio-7
     notes: "86% of 2025 grants went to AI safety/governance; up from ~50% in 2019"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.98
-      checkedAt: 2026-04-29T16:03:48.380Z
 
   - id: f_bUXNUigmsw
     property: program-budget
-    value: 1.6e+7
+    value: 16e6
     asOf: "2025"
     source: https://survivalandflourishing.fund/speculation-grants
-    notes: "Speculation Grants total budget across ~35 grantors; up from $4M
-      initially. Distinct from SFF's main total-funding figure."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.378Z
+    notes: "Speculation Grants total budget across ~35 grantors; up from $4M initially. Distinct from SFF's main total-funding figure."
 
   - id: f_UO9PzO5cdQ
     property: revenue
     value: 1950000
     asOf: "2019"
     source: https://survivalandflourishing.fund/recommendations
-    notes: "Total grants distributed in 2019 (Q3: ~$880K + Q4: ~$1,070K). First year
-      of operations."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.317Z
+    notes: "Total grants distributed in 2019 (Q3: ~$880K + Q4: ~$1,070K). First year of operations."
 
   - id: f_ODn0SgCS4g
     property: revenue
@@ -69,24 +41,13 @@ facts:
     asOf: "2020"
     source: https://survivalandflourishing.fund/recommendations
     notes: "Total grants distributed in 2020 (H1: ~$1,456K + H2: ~$4,262K)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.309Z
 
   - id: f_99sA1gtWmA
     property: revenue
     value: 19584000
     asOf: "2021"
     source: https://survivalandflourishing.fund/recommendations
-    notes: "Total grants distributed in 2021 (H1: ~$10,758K + H2: ~$8,826K). Major
-      growth year."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.298Z
+    notes: "Total grants distributed in 2021 (H1: ~$10,758K + H2: ~$8,826K). Major growth year."
 
   - id: f_fbfEOMTVKA
     property: revenue
@@ -94,34 +55,17 @@ facts:
     asOf: "2022"
     source: https://survivalandflourishing.fund/recommendations
     notes: "Total grants distributed in 2022 (H1: ~$10,943K + H2: ~$11,417K)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.292Z
 
   - id: f_j3BDtVNVfw
     property: revenue
     value: 31697000
     asOf: "2023"
     source: https://survivalandflourishing.fund/recommendations
-    notes: "Total grants distributed in 2023 (H1: ~$21,558K + H2: ~$10,139K).
-      Largest year before 2025."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.293Z
+    notes: "Total grants distributed in 2023 (H1: ~$21,558K + H2: ~$10,139K). Largest year before 2025."
 
   - id: f_MS2cGoMp1g
     property: revenue
     value: 19860000
     asOf: "2024"
     source: https://survivalandflourishing.fund/2024/recommendations
-    notes: "Main S-Process round. Additionally: Initiative Committee ($13.2M) and
-      FlexHEGs ($3.9M) bring 2024 total to ~$36.9M."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:48.224Z
+    notes: "Main S-Process round. Additionally: Initiative Committee ($13.2M) and FlexHEGs ($3.9M) bring 2024 total to ~$36.9M."

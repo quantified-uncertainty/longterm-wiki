@@ -5,32 +5,17 @@ facts:
     value: !date 2025-11
     source: https://www.redqueenbio.com/
     notes: "Launched November 2025; spun out of HelixNano"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.657Z
 
   - id: f_uytPwpHPUA
     property: headquarters
     value: "Boston, MA"
     source: https://www.redqueenbio.com/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.693Z
 
   - id: f_8HoTluYT0g
     property: legal-structure
     value: "Public Benefit Corporation (PBC)"
     source: https://www.redqueenbio.com/
     notes: "Governance ensures mission precedence over individual partnerships"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:31.690Z
 
   - id: f_YndqOVXiTA
     property: founded-by
@@ -38,21 +23,10 @@ facts:
       - !ref sid_CBNE3Hszkr
       - !ref sid_9VlZhCkPBE
     source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.475Z
 
   - id: f_iNzsKTtpRQ
     property: total-funding
     value: 15000000
     asOf: !date 2025-11
     source: https://techcrunch.com/2025/11/19/red-queen-bio-openai-biosecurity/
-    notes: "$15M seed round led by OpenAI; additional investors: Cerberus Ventures,
-      Fifty Years, Halcyon Futures, Dhuna Ventures, LongeVC"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:49.417Z
+    notes: "$15M seed round led by OpenAI; additional investors: Cerberus Ventures, Fifty Years, Halcyon Futures, Dhuna Ventures, LongeVC"

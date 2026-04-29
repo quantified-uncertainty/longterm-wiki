@@ -7,11 +7,6 @@ facts:
     asOf: "2025-06"
     source: https://coefficientgiving.org/
     notes: "Over $5 billion in grants directed since inception across all cause areas"
-    sourcing:
-      verdict: outdated
-      evidence: "1 → outdated; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.065Z
 
   - id: f_r91eebAciw
     property: total-funding
@@ -19,11 +14,6 @@ facts:
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Total grants recommended 2017-2024 per annual reports"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.020Z
 
   - id: f_d67GqRtcgA
     property: total-funding
@@ -31,11 +21,6 @@ facts:
     asOf: "2024"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Annual grantmaking figure for 2024"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.999Z
 
   # ── AI Safety Funding ─────────────────────────────────────────
   - id: f_0YdbAnlRHg
@@ -44,44 +29,24 @@ facts:
     source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
     notes: "Per third-party LessWrong analysis; approximately 12% of $2.8B total
       giving"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.969Z
 
   - id: f_krRH5KLlug
     property: description
     value: "AI safety spending (2023): $46M"
     source: https://www.lesswrong.com/posts/WGpFFJo2uFe5ssgEb/an-overview-of-the-ai-safety-funding-situation
     notes: "Annual AI safety deployment; made it dominant external funder"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.967Z
 
   - id: f_q67pppG5Tg
     property: description
     value: "AI safety spending (2024): $63.6M"
     source: https://www.openphilanthropy.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Reportedly ~60% of all external AI safety investment globally"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.965Z
 
   - id: f_Si8mt9hzyQ
     property: description
     value: "Technical AI Safety RFP (2025): $40M across 21 research areas"
     source: https://coefficientgiving.org/funds/navigating-transformative-ai/request-for-proposals-technical-ai-safety-research/
     notes: "2025 RFP; more available based on quality"
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.923Z
 
   # ── Market Position ───────────────────────────────────────────
   - id: f_ysi8mrHkuQ
@@ -95,11 +60,6 @@ facts:
     value: "68% of technical AI safety grants went to evaluations/benchmarking (2024)"
     source: https://www.lesswrong.com/posts/adzfKEW98TswZEA6T/brief-analysis-of-op-technical-ai-safety-funding
     notes: "68% of $28M recorded technical AI safety grants"
-    sourcing:
-      verdict: confirmed
-      evidence: "2 → confirmed; dissent: 1 → partial"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:01:47.081Z
 
   - id: f_ndeeWPYfIA
     property: description
@@ -113,33 +73,18 @@ facts:
     asOf: "2025"
     source: https://coefficientgiving.org/about-us/team/
     notes: "150+ staff after rebrand to Coefficient Giving (November 2025)"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.909Z
   - id: f_dJwyNJCar5
     property: founded-date
     value: "2017-06"
     source: https://www.wikidata.org/wiki/Q25345685
-    notes: "Became independent LLC in June 2017 (previously operated as Open
-      Philanthropy Project within GiveWell from 2014). Rebranded from Open
-      Philanthropy to Coefficient Giving in November 2025."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.881Z
+    notes: "Became independent LLC in June 2017 (previously operated as Open Philanthropy
+      Project within GiveWell from 2014). Rebranded from Open Philanthropy to Coefficient
+      Giving in November 2025."
   - id: f_y5nngeYo4q
     property: headquarters
     value: San Francisco
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.875Z
   - id: f_fpMRnvguKp
     property: website
     value: https://www.coefficientgiving.org
@@ -150,21 +95,11 @@ facts:
     value: United States
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.876Z
   - id: f_zvV3Z9sxGI
     property: founded-by-name
     value: Dustin Moskovitz
     source: https://www.wikidata.org/wiki/Q25345685
     notes: From Wikidata Q25345685; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.834Z
   - id: f_B2PUHlC7Jh
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Coefficient_Giving
@@ -178,55 +113,34 @@ facts:
       - !ref sid_Jtj6jHbuQ7
       - !ref sid_eQh3ZhWv8D
     source: https://en.wikipedia.org/wiki/Coefficient_Giving
-    notes: "Dustin Moskovitz and Holden Karnofsky. Moskovitz co-founded Good
-      Ventures with Cari Tuna in 2011; Karnofsky co-founded GiveWell Labs
-      (precursor) in 2014 and served as CEO/co-CEO until 2023."
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.822Z
+    notes: "Dustin Moskovitz and Holden Karnofsky. Moskovitz co-founded Good Ventures
+      with Cari Tuna in 2011; Karnofsky co-founded GiveWell Labs (precursor) in 2014
+      and served as CEO/co-CEO until 2023."
 
   - id: f_G1BnwqSzSg
     property: founded-by-name
     value: Cari Tuna
     source: https://en.wikipedia.org/wiki/Cari_Tuna
-    notes: "Co-founder and Chair of Coefficient Giving; co-founded Good Ventures
-      with Dustin Moskovitz in 2011, which funded the Open Philanthropy
-      Project."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.787Z
+    notes: "Co-founder and Chair of Coefficient Giving; co-founded Good Ventures with
+      Dustin Moskovitz in 2011, which funded the Open Philanthropy Project."
 
   - id: f_o7b7ts6XBg
     property: key-person
     value: !ref sid_xVfFkFIk3Q
     source: https://coefficientgiving.org/governance/
-    notes: "Board of Managers member (not a founder of Coefficient Giving).
-      Co-founded GiveWell with Holden Karnofsky in 2007; GiveWell Labs (2011)
-      evolved into Open Philanthropy Project (2014)."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.794Z
+    notes: "Board of Managers member (not a founder of Coefficient Giving). Co-founded
+      GiveWell with Holden Karnofsky in 2007; GiveWell Labs (2011) evolved into Open
+      Philanthropy Project (2014)."
 
   # ── Legal Structure ──────────────────────────────────────────
   - id: f_LUa4wxC8YQ
     property: legal-structure
     value: "Limited liability company (LLC)"
     source: https://coefficientgiving.org/research/the-open-philanthropy-project-is-now-an-independent-organization/
-    notes: "Became independent LLC in June 2017 when separating from GiveWell.
-      Structured as LLC rather than nonprofit for operational flexibility; Board
-      of Managers includes Cari Tuna (Chair), Dustin Moskovitz, Elie Hassenfeld,
-      and Alexander Berger."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.785Z
+    notes: "Became independent LLC in June 2017 when separating from GiveWell. Structured
+      as LLC rather than nonprofit for operational flexibility; Board of Managers
+      includes Cari Tuna (Chair), Dustin Moskovitz, Elie Hassenfeld, and Alexander
+      Berger."
 
   # ── Funding Received (non-Good Ventures donors) ─────────────
   - id: f_NfLWUHRT2A
@@ -236,8 +150,3 @@ facts:
     source: https://coefficientgiving.org/research/our-progress-in-2024-and-plans-for-2025/
     notes: "Directed $100M+ to high-impact causes from donors besides Good Ventures
       in 2024; more than doubled in 2025."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.748Z

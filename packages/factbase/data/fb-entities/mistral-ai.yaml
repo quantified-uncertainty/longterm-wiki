@@ -7,32 +7,17 @@ facts:
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "Founded April 2023 by Arthur Mensch (ex-Google DeepMind), Guillaume
       Lample and Timothee Lacroix (both ex-Meta)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:53.263Z
 
   - id: f_HAKYM9y3Sw
     property: headquarters
     value: "Paris, France"
     source: https://mistral.ai/about
     notes: "Headquartered in Paris; Europe's leading frontier AI company"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:53.203Z
 
   - id: f_U7ANQCVQGw
     property: country
     value: France
     source: https://en.wikipedia.org/wiki/Mistral_AI
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:53.198Z
 
   - id: f_x90PPOWZbQ
     property: founded-by-name
@@ -40,42 +25,22 @@ facts:
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "CEO; formerly at Google DeepMind. Co-founders Guillaume Lample and
       Timothee Lacroix were at Meta. All three met at Ecole Polytechnique."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:53.180Z
 
   - id: f_7V5SjA2xDQ
     property: legal-structure
     value: "Private company (SAS)"
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "French simplified joint-stock company (societe par actions simplifiee)"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:53.184Z
 
   - id: f_385ekJF6iA
     property: website
     value: https://mistral.ai
     source: https://mistral.ai/about
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:37.476Z
 
   - id: f_klZWruQFSA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Mistral_AI
     source: https://en.wikipedia.org/wiki/Mistral_AI
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:37.476Z
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_mPbQ4kR7Dg
@@ -85,11 +50,6 @@ facts:
     source: https://aifundingtracker.com/mistral-ai-funding-unicorn-valuation/
     notes: "Approximately 500 employees by March 2024; grew from ~50 at founding in
       June 2023 — roughly 900% growth in nine months"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:53.180Z
 
   - id: f_CSa0ePCYZw
     property: headcount
@@ -97,11 +57,6 @@ facts:
     asOf: 2026-01
     source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
     notes: "783 employees as of Jan 31, 2026 per Tracxn"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.119Z
 
   # ── Funding ─────────────────────────────────────────────────────
   - id: f_AAtA1On16g
@@ -109,14 +64,7 @@ facts:
     value: 1.17e+8
     asOf: 2023-06
     source: https://www.polytechnique.edu/en/news/mistral-ai-french-ai-nugget-co-founded-two-x-alumni-raised-eu500-mlns-2023
-    notes: "Seed round only: EUR105M ($117M). Source URL mentions €500M total raised
-      by end of 2023 across multiple rounds — this fact captures only the June
-      2023 seed. See later total-funding facts for cumulative figures."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.111Z
+    notes: "Seed round only: EUR105M ($117M). Source URL mentions €500M total raised by end of 2023 across multiple rounds — this fact captures only the June 2023 seed. See later total-funding facts for cumulative figures."
 
   - id: f_OnBjHPgr6g
     property: total-funding
@@ -124,11 +72,6 @@ facts:
     asOf: 2023-12
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "After Series A of EUR385M ($428M); cumulative ~$528M raised"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.090Z
 
   - id: f_askP9byerA
     property: total-funding
@@ -136,24 +79,14 @@ facts:
     asOf: 2024-06
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "After Series B of EUR600M (~$660M); cumulative ~$1.19B"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.092Z
 
   - id: f_PgaGTRoKvg
     property: total-funding
     value: 3.05e+9
     asOf: 2025-09
     source: https://tracxn.com/d/companies/mistralai/__SLZq7rzxLYqqA97jtPwO09jLDeb76RVJVb306OhciWU
-    notes: "Total of $3.05B raised over 7 rounds; includes Series C of EUR1.7B ($2B)
-      led by ASML"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:53.088Z
+    notes: "Total of $3.05B raised over 7 rounds; includes Series C of EUR1.7B
+      ($2B) led by ASML"
 
   # ── Valuation ───────────────────────────────────────────────────
   - id: f_EBAJlOJh2Q
@@ -162,11 +95,6 @@ facts:
     asOf: 2023-06
     source: https://aifundingtracker.com/mistral-ai-funding-unicorn-valuation/
     notes: "Seed round post-money valuation; $260M valuation on $113M raised"
-    sourcing:
-      verdict: contradicted
-      evidence: 1 → contradicted
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.037Z
 
   - id: f_DxtX0AahVA
     property: valuation
@@ -174,11 +102,6 @@ facts:
     asOf: 2023-12
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "Series A post-money valuation of approximately $2B"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.024Z
 
   - id: f_E5sGyVOYpQ
     property: valuation
@@ -186,11 +109,6 @@ facts:
     asOf: 2024-06
     source: https://en.wikipedia.org/wiki/Mistral_AI
     notes: "Series B post-money valuation of approximately $6B"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.002Z
 
   - id: f_uui3ueOjbQ
     property: valuation
@@ -199,11 +117,6 @@ facts:
     source: https://www.cnbc.com/2025/09/09/ai-firm-mistral-valued-at-14-billion-as-asml-takes-major-stake.html
     notes: "Series C post-money valuation of EUR11.7B (~$14B); led by ASML with
       participation from a16z, General Catalyst, DST Global"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.98
-      checkedAt: 2026-04-29T16:03:53.003Z
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_VnTz3QwR5g
@@ -212,13 +125,7 @@ facts:
     asOf: "2024"
     source: https://electroiq.com/stats/mistral-ai-statistics/
     notes: "Approximately $30M (EUR28M) in annual revenue for 2024; up from ~$10M in
-      2023. Revenue primarily from model API licensing and enterprise
-      contracts."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:53.000Z
+      2023. Revenue primarily from model API licensing and enterprise contracts."
 
   - id: f_75QHFTc8ig
     property: revenue
@@ -228,11 +135,6 @@ facts:
     notes: "EUR300M ARR (~$330M) as of September 2025; 20x growth from prior year.
       Revenue from model licensing, Chat Enterprise, and Le Chat consumer
       subscriptions."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.765Z
 
   - id: f_7Xou3dBrAA
     property: revenue-guidance
@@ -241,11 +143,6 @@ facts:
     source: https://mlq.ai/news/mistral-ai-surges-revenue-20-fold-to-over-400-million-arr/
     notes: "Target to exceed EUR1B (~$1.1B) in revenue by end of 2026
       (forward-looking). Moved from 'revenue' to 'revenue-guidance'."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 1
-      checkedAt: 2026-04-29T16:02:30.761Z
 
   # ── Product ─────────────────────────────────────────────────────
   - id: f_MvZxq7j5sA
@@ -255,8 +152,3 @@ facts:
     source: https://anthemcreation.com/en/artificial-intelligence/mistral-ai-le-chat-ia-better-chatgpt/
     notes: "Le Chat had 4.2 million active users in its first month after February
       2025 launch"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.948Z

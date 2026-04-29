@@ -14,21 +14,11 @@ facts:
     value: 1992
     source: https://www.wikidata.org/wiki/Q123475976
     notes: From Wikidata Q123475976
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:57.038Z
   - id: f_e6tvuU4XIf
     property: education
     value: Georgetown University; University of Melbourne
     source: https://www.wikidata.org/wiki/Q123475976
     notes: From Wikidata Q123475976
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:57.031Z
   - id: f_hT6tN2pQ4v
     property: notable-for
     value: "Former OpenAI board member who voted to remove Sam Altman in November

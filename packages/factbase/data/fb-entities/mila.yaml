@@ -6,28 +6,14 @@ facts:
         property: founded-date,
         value: 1993-01,
         source: https://www.wikidata.org/wiki/Q67182995,
-        notes: From Wikidata Q67182995,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:03:53.639Z
-          }
+        notes: From Wikidata Q67182995
       },
     {
         id: f_5xoCogPU87,
         property: country,
         value: Canada,
         source: https://www.wikidata.org/wiki/Q67182995,
-        notes: From Wikidata Q67182995,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:03:53.638Z
-          }
+        notes: From Wikidata Q67182995
       },
     {
         id: f_woCCUhnRWn,
@@ -41,14 +27,7 @@ facts:
         property: founded-by-name,
         value: Yoshua Bengio,
         source: https://www.wikidata.org/wiki/Q67182995,
-        notes: From Wikidata Q67182995; text value (not entity ref),
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:03:53.637Z
-          }
+        notes: From Wikidata Q67182995; text value (not entity ref)
       },
     {
         id: f_zuG8LQuLnM,

@@ -11,11 +11,6 @@ facts:
     value: "2011"
     source: https://www.wikidata.org/wiki/Q4468073
     notes: From Wikidata Q4468073
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:06.163Z
   - id: f_wwJ3alLc4O
     property: website
     value: https://asana.com

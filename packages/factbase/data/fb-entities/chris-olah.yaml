@@ -5,11 +5,6 @@ facts:
     value: "Attended University of Toronto (did not complete degree); Thiel Fellow"
     source: https://colah.github.io/about.html
     notes: "Received Thiel Fellowship in 2012; largely self-taught in deep learning"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.338Z
 
   - id: f_cO4fG5hI6j
     property: notable-for
@@ -17,11 +12,6 @@ facts:
       of Anthropic; creator of Distill.pub and the Circuits thread at
       Transformer Circuits"
     source: https://colah.github.io/
-    sourcing:
-      verdict: partial
-      evidence: 2 → partial
-      confidence: 0.8
-      checkedAt: 2026-04-29T16:04:03.311Z
 
   - id: f_cO7kL8mN9o
     property: social-media
@@ -60,9 +50,8 @@ facts:
 
   - id: f_oxVU2XTpRV
     property: ea-alignment-estimate
-    value: [ 0.4, 0.6 ]
+    value: [0.4, 0.6]
     asOf: "2026-04"
     notes: "Editorial estimate. Interpretability pioneer; participated in EA events;
       safety-focused work closely aligned with EA priorities but less explicit
-      commitment to EA cause-area giving than Dario/Daniela. Moderate
-      confidence."
+      commitment to EA cause-area giving than Dario/Daniela. Moderate confidence."

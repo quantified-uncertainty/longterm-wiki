@@ -6,21 +6,11 @@ facts:
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Founded January 2015 by Jerry Taylor. Named after libertarian economist
       William Niskanen."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.604Z
 
   - id: f_8rCv824VJ8
     property: headquarters
     value: "1201 New York Ave NW, Suite 200B, Washington, DC 20005"
     source: https://www.niskanencenter.org/contact-us/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:52.568Z
 
   - id: f_i2u0fBwEOh
     property: annual-revenue
@@ -29,11 +19,6 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/455308952
     notes: "Total assets $12M. Net assets $9.7M."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:52.558Z
 
   - id: f_7KSbsQvazt
     property: employee-count
@@ -41,11 +26,6 @@ facts:
     asOf: 2026
     source: https://www.niskanencenter.org/leadership-and-staff/
     notes: "~45 named employees across 7 policy departments + 54 Senior Fellows"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.554Z
 
   - id: f_oA6a0dspU9
     property: program-note
@@ -55,11 +35,6 @@ facts:
       Capacity, Government Affairs, Legal."
     asOf: 2026-03
     source: https://www.niskanencenter.org/leadership-and-staff/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:52.520Z
 
   - id: f_4749an0ZBo
     property: founded-by
@@ -68,11 +43,6 @@ facts:
     notes: "Former vice president of the Cato Institute. Resigned September 2021
       after domestic violence charges. Core staff came from Cato during a 2012
       leadership dispute."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.478Z
 
   - id: f_koLmOW3XFl
     property: legal-structure
@@ -80,11 +50,6 @@ facts:
       lobbying arm, the Niskanen Center for Public Policy (EIN 47-4946572), spun
       off in 2016."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.462Z
 
   - id: f_uIWclnY8Uz
     property: leadership
@@ -94,11 +59,6 @@ facts:
     asOf: 2026-03
     source: https://www.niskanencenter.org/niskanen-center-announces-leadership-transition/
     notes: "Gayer remains as senior advisor through May 2026, then senior fellow"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.461Z
 
   - id: f_VQ7RbH18ge
     property: description
@@ -108,11 +68,6 @@ facts:
       legal immigration, and supply-side progressivism ('Abundance Agenda')."
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/Niskanen_Center
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.435Z
 
   - id: f_9JLS6a7tu1
     property: website
@@ -123,11 +78,6 @@ facts:
     property: country
     value: "United States"
     source: https://www.niskanencenter.org/contact-us/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:52.557Z
 
   - id: f_LKjEZFHThm
     property: annual-revenue
@@ -136,11 +86,6 @@ facts:
     asOf: 2022
     source: https://en.wikipedia.org/wiki/Niskanen_Center
     notes: "Revenue $7.1M, expenses $7.6M"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:52.379Z
 
   - id: f_0ZaHbaYCio
     property: funding-sources
@@ -149,11 +94,6 @@ facts:
       received funding from Open Society Foundations ($500K in 2017), Democracy
       Fund Voice ($175K in 2018)."
     source: https://www.influencewatch.org/non-profit/niskanen-center/
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:52.376Z
   - id: f_aKnGglyHUA
     property: revenue
     value: 11280437

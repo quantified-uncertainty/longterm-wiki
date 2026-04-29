@@ -2,40 +2,24 @@ entity: sid_izkduIMBDg
 facts:
   - id: f_qMoglL9DLg
     property: description
-    value: Comprehensive biographical profile of Leopold Aschenbrenner, covering his
-      trajectory from Columbia valedictorian to OpenAI researcher to $1.5B hedge
-      fund founder, with detailed documentation of his controversial
-      "Situational Awareness" essay predicting AGI by 2027, his disputed firing
-      from OpenAI ov
+    value: Comprehensive biographical profile of Leopold Aschenbrenner, covering his trajectory from Columbia valedictorian
+      to OpenAI researcher to $1.5B hedge fund founder, with detailed documentation of his controversial "Situational
+      Awareness" essay predicting AGI by 2027, his disputed firing from OpenAI ov
     asOf: 2026-03
     notes: Migrated from old entity system
   - id: f_lA6tN2pQ2v
     property: notable-for
-    value: "Author of Situational Awareness: The Decade Ahead predicting AGI by
-      2027; Columbia University valedictorian at age 19; former OpenAI
-      Superalignment team researcher; founder of $1.5B+ AI-focused hedge fund"
+    value: "Author of Situational Awareness: The Decade Ahead predicting AGI by 2027; Columbia University valedictorian at age 19; former OpenAI Superalignment team researcher; founder of $1.5B+ AI-focused hedge fund"
     asOf: 2026-03
     notes: Enriched from wiki page
   - id: f_lAcY8fL8kA
     property: born-year
     value: 2001
     source: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
-    notes: Born 2001 or 2002 in Germany; graduated Columbia as valedictorian at 19
-      in 2021
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.368Z
+    notes: Born 2001 or 2002 in Germany; graduated Columbia as valedictorian at 19 in 2021
 
   - id: f_lAfB4gN1mD
     property: education
-    value: "B.A. Economics and Mathematics-Statistics, Columbia University
-      (valedictorian, 2021); attended John F. Kennedy School in Berlin"
+    value: "B.A. Economics and Mathematics-Statistics, Columbia University (valedictorian, 2021); attended John F. Kennedy School in Berlin"
     source: https://en.wikipedia.org/wiki/Leopold_Aschenbrenner
     notes: Enriched from wiki page; enrolled at age 15, graduated at 19
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.361Z

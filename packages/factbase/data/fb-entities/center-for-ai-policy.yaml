@@ -5,60 +5,30 @@ facts:
     value: "2023-06"
     source: https://www.lesswrong.com/posts/unwRBRQivd2LYRfuP/introducing-the-center-for-ai-policy-and-we-re-hiring
     notes: "Announced in June 2023 on LessWrong"
-    sourcing:
-      verdict: partial
-      evidence: 2 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:04.235Z
 
   - id: f_Ip7gK1sW2b
     property: headquarters
     value: "Washington, DC"
     source: https://www.centeraipolicy.org/about
     notes: "Based in Washington, DC for proximity to Congress"
-    sourcing:
-      verdict: unverifiable
-      evidence: "1 → unverifiable; dissent: 1 → confirmed"
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.229Z
 
   - id: f_Kq2vL8tN6c
     property: legal-structure
     value: "501(c)(4) nonprofit"
     source: https://www.centeraipolicy.org/about
     notes: "Non-partisan, nonprofit advocacy organization"
-    sourcing:
-      verdict: unverifiable
-      evidence: 2 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.173Z
 
   - id: f_Mw6cJ3mQ9d
     property: website
     value: "https://www.centeraipolicy.org/"
     source: https://www.centeraipolicy.org/
     notes: "Official website"
-    sourcing:
-      verdict: confirmed
-      evidence: 2 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:42.974Z
 
   - id: f_Oy1dR4wK5e
     property: description
-    value: "Non-partisan advocacy organization that worked with Congress from June
-      2023 through mid-2025 to promote commonsense solutions to catastrophic
-      risks from advanced AI. Co-founded by Thomas Larsen (Director of Strategy)
-      and led by Executive Director Jason Green-Lowe. Has ceased most active
-      operations due to funding constraints but continues its Policy Advocacy
-      Network and legislative review service."
+    value: "Non-partisan advocacy organization that worked with Congress from June 2023 through mid-2025 to promote commonsense solutions to catastrophic risks from advanced AI. Co-founded by Thomas Larsen (Director of Strategy) and led by Executive Director Jason Green-Lowe. Has ceased most active operations due to funding constraints but continues its Policy Advocacy Network and legislative review service."
     asOf: 2026-03
     source: https://www.centeraipolicy.org/about
-    sourcing:
-      verdict: partial
-      evidence: "1 → partial; dissent: 1 → unverifiable"
-      confidence: 0.65
-      checkedAt: 2026-04-29T16:04:04.169Z
 
   - id: f_gXQzCR6lTO
     property: lobbying-spend
@@ -66,13 +36,7 @@ facts:
     currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/orgs/center-for-ai-policy/summary?id=D000110490
-    notes: "2024 in-house federal lobbying. Lobbyists: Jason Green-Lowe, Jakub
-      Stanger Kraus, Martin Spitzer. Verified from Senate LDA."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:04.147Z
+    notes: "2024 in-house federal lobbying. Lobbyists: Jason Green-Lowe, Jakub Stanger Kraus, Martin Spitzer. Verified from Senate LDA."
 
   - id: f_6YetHpmHhR
     property: grant-received
@@ -81,20 +45,9 @@ facts:
     asOf: 2024
     source: https://survivalandflourishing.fund/2024/recommendations
     notes: "SFF 2024 grant for general support"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:04.146Z
 
   - id: f_MiZzb2dkTh
     property: organizational-status
-    value: "Ceased most active operations around May 2025 due to funding
-      constraints. Cash reserves approximately $150K at shutdown."
+    value: "Ceased most active operations around May 2025 due to funding constraints. Cash reserves approximately $150K at shutdown."
     asOf: 2025-05
     source: https://www.lesswrong.com/posts/Ed3naAyEEe7zZvzsj/the-center-for-ai-policy-has-shut-down
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:04.142Z

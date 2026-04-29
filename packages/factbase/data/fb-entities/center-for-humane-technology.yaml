@@ -5,21 +5,11 @@ facts:
     value: "2018"
     source: https://www.humanetech.com
     notes: "Co-founded in 2018 by Tristan Harris and Aza Raskin; groundwork from 2013"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.798Z
 
   - id: f_PmHaCbnqDm
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.humanetech.com
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.796Z
 
   - id: f_cs4sXkLptL
     property: annual-revenue
@@ -28,11 +18,6 @@ facts:
     asOf: 2025
     source: https://www.humanetech.com
     notes: "Approximately $1.8M annual revenue"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.790Z
 
   - id: f_M9yuQnUlgZ
     property: employee-count
@@ -40,22 +25,12 @@ facts:
     asOf: 2025
     source: https://www.humanetech.com
     notes: "25-28 employees across 3 continents"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.752Z
 
   - id: f_05waDx8sTH
     property: coalition-membership
     value: "Signatory of FLI Pro-Human AI Declaration (March 2026)"
     asOf: 2026-03
     source: https://humanstatement.org/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:03.713Z
 
   - id: f_D5bcDZJL8W
     property: lobbying-spend
@@ -65,11 +40,6 @@ facts:
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
     notes: "Federal lobbying via Holland & Knight LLP: $80K/quarter consistently
       since Q3 2023. Verified from Senate LDA."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.710Z
 
   - id: f_Wf8azn6DG2
     property: lobbying-spend
@@ -78,11 +48,6 @@ facts:
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+Humane+Technology
     notes: "Same $80K/quarter pattern through Holland & Knight"
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.710Z
 
   - id: f_cFUKtV2tG7
     property: grant-received
@@ -91,11 +56,6 @@ facts:
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant for general support"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.703Z
 
   - id: f_LkgFUd1n4N
     property: media-reach
@@ -103,11 +63,6 @@ facts:
       episodes, part of TED Audio Collective"
     asOf: 2026
     source: https://www.humanetech.com/podcast
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.661Z
 
   - id: f_hEE9D2RAKl
     property: annual-revenue
@@ -117,11 +72,6 @@ facts:
     source: https://www.humanetech.com
     notes: "Most recent 990: revenue $3.58M, expenses $6.33M, net assets $6.01M,
       grants distributed $395K"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:03.622Z
   - id: f_xaRFIO4v90
     property: website
     value: http://www.timewellspent.io/

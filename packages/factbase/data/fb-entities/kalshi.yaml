@@ -14,21 +14,11 @@ facts:
     value: "2018"
     source: https://www.wikidata.org/wiki/Q114586938
     notes: From Wikidata Q114586938
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.838Z
   - id: f_V9ktcRGrpm
     property: headquarters
     value: New York City
     source: https://www.wikidata.org/wiki/Q114586938
     notes: From Wikidata Q114586938
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:55.829Z
   - id: f_9ad0cFJmGb
     property: website
     value: https://kalshi.com/

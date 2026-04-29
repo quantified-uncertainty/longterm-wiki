@@ -5,11 +5,6 @@ facts:
     value: 1962
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
     notes: "Born February 5, 1962 in Portsmouth, England"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:03:47.473Z
 
   - id: f_sR1aB2cD3e
     property: education
@@ -17,22 +12,12 @@ facts:
       of Oxford (First Class Honours)"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
     notes: "PhD supervised by Michael Genesereth"
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.474Z
 
   - id: f_sR4fG5hI6j
     property: notable-for
     value: "Co-author of 'AI: A Modern Approach' (the standard AI textbook); founder
       of CHAI at UC Berkeley; leading advocate for provably beneficial AI"
     source: https://en.wikipedia.org/wiki/Stuart_J._Russell
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:47.475Z
 
   - id: f_sR7kL8mN9o
     property: social-media

@@ -14,11 +14,6 @@ facts:
     value: 2020-01
     source: https://www.wikidata.org/wiki/Q123502863
     notes: From Wikidata Q123502863
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:03:50.043Z
   - id: f_1hjmqYgqjy
     property: website
     value: https://polymarket.com
@@ -29,11 +24,6 @@ facts:
     value: Shayne Coplan
     source: https://www.wikidata.org/wiki/Q123502863
     notes: From Wikidata Q123502863; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:03:50.036Z
   - id: f_kVmxD8qfow
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Polymarket

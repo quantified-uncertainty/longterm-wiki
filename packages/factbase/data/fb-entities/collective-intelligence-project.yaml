@@ -5,48 +5,23 @@ facts:
     value: "2022"
     source: https://forum.effectivealtruism.org/posts/suKkvQPxgG6ihvhfP/launching-the-collective-intelligence-project-whitepaper-and
     notes: "Co-founded late 2022; public launch February 2023"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.727Z
 
   - id: f_fEzfznFf0k
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.cip.org/
     notes: "Opened SF office in 2024. Tax filing: Encino, CA. EIN: 92-0327339."
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.690Z
 
   - id: f_qrGK0rPByA
     property: program
-    value: "Alignment Assemblies: democratic forums to surface public views on AI
-      alignment. Launched Feb 2023. Engaged 1,200+ participants across 68
-      countries by 2024."
+    value: "Alignment Assemblies: democratic forums to surface public views on AI alignment. Launched Feb 2023. Engaged 1,200+ participants across 68 countries by 2024."
     asOf: 2024
     source: https://www.cip.org/alignmentassemblies
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.75
-      checkedAt: 2026-04-29T16:04:02.689Z
 
   - id: f_BoWuW5hsFf
     property: funding-sources
-    value: "Funders: Omidyar Network (from $30M inclusive AI fund, 2023), Robert
-      Wood Johnson Foundation, Google.org, Ford Foundation, ONE Project, Future
-      of Life Institute, Amaranth Foundation, SFF. Partners: Anthropic, OpenAI,
-      Mistral, Jigsaw, Mozilla, Chatham House, Taiwan MODA."
+    value: "Funders: Omidyar Network (from $30M inclusive AI fund, 2023), Robert Wood Johnson Foundation, Google.org, Ford Foundation, ONE Project, Future of Life Institute, Amaranth Foundation, SFF. Partners: Anthropic, OpenAI, Mistral, Jigsaw, Mozilla, Chatham House, Taiwan MODA."
     source: https://www.cip.org/funding-partnerships
-    sourcing:
-      verdict: unverifiable
-      evidence: 1 → unverifiable
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.684Z
 
   - id: f_rTrsGNAgVc
     property: employee-count
@@ -54,11 +29,6 @@ facts:
     asOf: 2026
     source: https://www.cip.org/team
     notes: "10 core team + 12-person Advisory Council + 20+ Community Council"
-    sourcing:
-      verdict: partial
-      evidence: 1 → partial
-      confidence: 0.85
-      checkedAt: 2026-04-29T16:04:02.655Z
 
   - id: f_CVXL2QGbQc
     property: founded-by
@@ -67,24 +37,12 @@ facts:
       - !ref sid_YZDwyYuU8r
       - !ref sid_pCK0MVa6qa
     source: https://forum.effectivealtruism.org/posts/suKkvQPxgG6ihvhfP/launching-the-collective-intelligence-project-whitepaper-and
-    notes: "Siddarth is executive director. Previously at Microsoft Office of the
-      CTO and UK AI Safety Institute."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.634Z
+    notes: "Siddarth is executive director. Previously at Microsoft Office of the CTO and UK AI Safety Institute."
 
   - id: f_QekKZp8yte
     property: legal-structure
-    value: "501(c)(3) nonprofit (Collective Intelligence Project Inc, EIN
-      92-0327339). Tax-exempt status granted October 2024."
+    value: "501(c)(3) nonprofit (Collective Intelligence Project Inc, EIN 92-0327339). Tax-exempt status granted October 2024."
     source: https://projects.propublica.org/nonprofits/organizations/920327339
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.599Z
 
   - id: f_Hn1VyhLA0a
     property: annual-revenue
@@ -92,28 +50,13 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/920327339
-    notes: "Nearly all revenue from contributions ($1.91M). Total assets $2.47M. Net
-      income $1.64M. Operates exclusively through philanthropic donations."
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.99
-      checkedAt: 2026-04-29T16:04:02.597Z
+    notes: "Nearly all revenue from contributions ($1.91M). Total assets $2.47M. Net income $1.64M. Operates exclusively through philanthropic donations."
 
   - id: f_w2LVBd3Phw
     property: description
-    value: "Experimental research organization advancing collective intelligence
-      capabilities for the democratic governance of transformative technologies.
-      Develops decision-making tools, processes, and institutions that expand
-      groups' capacity to cooperate toward shared goals. Known for Alignment
-      Assemblies and community-driven AI model alignment."
+    value: "Experimental research organization advancing collective intelligence capabilities for the democratic governance of transformative technologies. Develops decision-making tools, processes, and institutions that expand groups' capacity to cooperate toward shared goals. Known for Alignment Assemblies and community-driven AI model alignment."
     asOf: 2026-03
     source: https://www.cip.org/
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.598Z
 
   - id: f_uBqyVYBiqo
     property: website
@@ -124,8 +67,3 @@ facts:
     property: country
     value: "United States"
     source: https://projects.propublica.org/nonprofits/organizations/920327339
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:02.566Z

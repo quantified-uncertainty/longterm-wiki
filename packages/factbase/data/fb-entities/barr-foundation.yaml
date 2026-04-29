@@ -6,14 +6,7 @@ facts:
         property: founded-date,
         value: "1999",
         source: https://www.wikidata.org/wiki/Q30270964,
-        notes: From Wikidata Q30270964,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:04:05.833Z
-          }
+        notes: From Wikidata Q30270964
       },
     {
         id: f_E2qTlaU9eJ,

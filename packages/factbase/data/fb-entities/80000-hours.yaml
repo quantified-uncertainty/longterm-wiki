@@ -14,21 +14,11 @@ facts:
     value: "2011"
     source: https://www.wikidata.org/wiki/Q4644323
     notes: From Wikidata Q4644323
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T22:18:53.103Z
   - id: f_NWgSHuRiX7
     property: headquarters
     value: London
     source: https://www.wikidata.org/wiki/Q4644323
     notes: From Wikidata Q4644323
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:09.657Z
   - id: f_lIx48bnU7P
     property: website
     value: https://80000hours.org/
@@ -39,21 +29,11 @@ facts:
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q4644323
     notes: From Wikidata Q4644323
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:09.650Z
   - id: f_uk4aZs7Zdz
     property: founded-by-name
     value: William MacAskill
     source: https://www.wikidata.org/wiki/Q4644323
     notes: From Wikidata Q4644323; text value (not entity ref)
-    sourcing:
-      verdict: confirmed
-      evidence: 1 → confirmed
-      confidence: 0.95
-      checkedAt: 2026-04-29T16:04:09.639Z
   - id: f_3CREf9uXjP
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/80,000_Hours

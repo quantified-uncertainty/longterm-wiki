@@ -6,28 +6,14 @@ facts:
         property: founded-date,
         value: 2011-01,
         source: https://www.wikidata.org/wiki/Q85847679,
-        notes: From Wikidata Q85847679,
-        sourcing:
-          {
-            verdict: partial,
-            evidence: 1 → partial,
-            confidence: 0.85,
-            checkedAt: 2026-04-29T16:04:03.916Z
-          }
+        notes: From Wikidata Q85847679
       },
     {
         id: f_9ypVlmUfoU,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q85847679,
-        notes: From Wikidata Q85847679,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.99,
-            checkedAt: 2026-04-29T16:04:03.879Z
-          }
+        notes: From Wikidata Q85847679
       },
     {
         id: f_yZpC8kWpNs,
@@ -41,28 +27,14 @@ facts:
         property: revenue,
         value: 18189,
         source: https://www.wikidata.org/wiki/Q85847679,
-        notes: From Wikidata Q85847679,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:04:03.842Z
-          }
+        notes: From Wikidata Q85847679
       },
     {
         id: f_ThZBkB1Eeu,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q85847679,
-        notes: From Wikidata Q85847679,
-        sourcing:
-          {
-            verdict: confirmed,
-            evidence: 1 → confirmed,
-            confidence: 0.95,
-            checkedAt: 2026-04-29T16:04:03.799Z
-          }
+        notes: From Wikidata Q85847679
       },
     {
         id: f_5kMLnVnnGW,
