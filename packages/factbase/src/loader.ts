@@ -496,6 +496,25 @@ function parseFact(
 
 // ── Helper: read all .yaml files from a directory ─────────────────────
 
+/**
+ * Parse YAML content with file-path context attached on failure.
+ *
+ * Why: the `yaml` package's parse errors include line/column but not the file
+ * path, so a build that surfaces "implicit map keys need to be on a single
+ * line at line 47, column 3" gives the operator no way to find the broken
+ * file in a tree of ~700 YAMLs. We rethrow with the path prepended so
+ * fail-closed messages name the file explicitly (per QUA-772 acceptance:
+ * "block the build with a clear message naming the file + line").
+ */
+function parseYamlWithPath(content: string, filePath: string): unknown {
+  try {
+    return parseYaml(content, { customTags: CUSTOM_TAGS });
+  } catch (error: unknown) {
+    const msg = error instanceof Error ? error.message : String(error);
+    throw new Error(`[kb/loader] YAML parse error in ${filePath}: ${msg}`);
+  }
+}
+
 async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unknown }[]> {
   let entries: string[];
   try {
@@ -513,8 +532,9 @@ async function readYamlFiles(dir: string): Promise<{ name: string; parsed: unkno
 
   const results = await Promise.all(
     yamlFiles.map(async (filename) => {
-      const content = await readFile(join(dir, filename), "utf-8");
-      return { name: filename, parsed: parseYaml(content, { customTags: CUSTOM_TAGS }) };
+      const filePath = join(dir, filename);
+      const content = await readFile(filePath, "utf-8");
+      return { name: filename, parsed: parseYamlWithPath(content, filePath) };
     })
   );
 
@@ -559,10 +579,11 @@ async function discoverEntityFiles(
       seenSlugs.add(slug);
 
       // Single-file entity (existing behavior)
-      const content = await readFile(join(entitiesDir, entry.name), "utf-8");
+      const filePath = join(entitiesDir, entry.name);
+      const content = await readFile(filePath, "utf-8");
       results.push({
         name: entry.name,
-        parsed: parseYaml(content, { customTags: CUSTOM_TAGS }),
+        parsed: parseYamlWithPath(content, filePath),
       });
     } else if (entry.isDirectory()) {
       if (seenSlugs.has(entry.name)) {
@@ -738,12 +759,10 @@ export async function loadKB(dataDir: string, options?: LoadOptions): Promise<Lo
 
   // 1. Load properties
   let properties = new Map<string, Property>();
+  const propertiesPath = join(dataDir, "properties.yaml");
   try {
-    const propertiesContent = await readFile(
-      join(dataDir, "properties.yaml"),
-      "utf-8"
-    );
-    properties = parseProperties(parseYaml(propertiesContent));
+    const propertiesContent = await readFile(propertiesPath, "utf-8");
+    properties = parseProperties(parseYamlWithPath(propertiesContent, propertiesPath));
   } catch (error: unknown) {
     if ((error as NodeJS.ErrnoException).code !== "ENOENT") {
       throw error; // Malformed YAML or permission errors should surface
