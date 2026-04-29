@@ -21,6 +21,7 @@ function org(partial: Partial<OrgRow> & Pick<OrgRow, "id" | "name">): OrgRow {
     totalFundingNum: null,
     foundedDate: null,
     peopleCount: null,
+    grantsGivenCount: null,
     completionScore: 1,
     verdictString: null,
     searchText: "",
