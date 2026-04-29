@@ -71,6 +71,11 @@ const SIDEBAR_ONLY_PAGES = [
   // Projects — migrated to EntityProfileShell in QUA-485
   "/projects/ai-economist",
   "/projects/aaa-ai-arbitrator",
+  // Financial / publication record pages — migrated to EntityProfileShell in QUA-487
+  "/investments/2OcNxLqfEr",
+  "/funding-rounds/2uXzVFJgb-",
+  "/funding-programs/pJ9oHvQ1Bb",
+  "/publications/nature",
 ];
 
 /**
