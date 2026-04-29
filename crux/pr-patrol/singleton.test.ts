@@ -1,10 +1,10 @@
 /**
- * PR Patrol — daemon singleton guard tests (QUA-835).
+ * PR Patrol — daemon singleton acquisition tests.
  *
- * Verifies that `checkSingletonDaemon()` correctly detects when another live
- * patrol process owns the PID file — the guard `runDaemon` uses to refuse
- * second invocations. Without it, parallel daemons spawn and each maintains
- * its own cycle counter (visible as cycle resets in production logs).
+ * Verifies `acquirePidFile()`'s atomic claim semantics (the production code
+ * path used by `runDaemon`) plus the underlying `getDaemonPid()` reader.
+ * Without these, two `pr-patrol run` invocations spawn parallel loops with
+ * independent cycle counters (the QUA-835 production symptom).
  */
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
@@ -13,11 +13,7 @@ import { tmpdir } from 'os';
 import { dirname, join } from 'path';
 import { spawn, type ChildProcess } from 'child_process';
 
-import {
-  acquirePidFile,
-  checkSingletonDaemon,
-  getDaemonPid,
-} from './index.ts';
+import { acquirePidFile, getDaemonPid } from './index.ts';
 
 function makePidFile(): string {
   const dir = mkdtempSync(join(tmpdir(), 'pr-patrol-singleton-test-'));
@@ -33,10 +29,11 @@ function cleanup(file: string): void {
 }
 
 /**
- * Spawn a long-lived child for "live PID" tests, return it + a cleanup
- * function that awaits the child's exit. Using `await stop()` in finally{}
- * guarantees we don't leak the child past the test, which Vitest's worker
- * pool would otherwise carry across test files.
+ * Spawn a long-lived child for "live PID" tests. Returns the child + a
+ * cleanup function that awaits the child's exit. Awaiting the exit (rather
+ * than fire-and-forget) prevents leaking child processes into Vitest's
+ * worker pool. The fallback timer is `.unref()`'d so it doesn't pin the
+ * event loop past the test.
  */
 async function spawnLiveChild(): Promise<{ child: ChildProcess; pid: number; stop: () => Promise<void> }> {
   const child = spawn(process.execPath, [
@@ -52,23 +49,32 @@ async function spawnLiveChild(): Promise<{ child: ChildProcess; pid: number; sto
       resolve();
       return;
     }
-    const onExit = (): void => resolve();
+    let fallback: NodeJS.Timeout | undefined;
+    const onExit = (): void => {
+      if (fallback) clearTimeout(fallback);
+      resolve();
+    };
     child.once('exit', onExit);
     try {
       child.kill('SIGTERM');
     } catch {
-      // already gone — exit handler will fire (or we resolve via fallback)
+      // already gone — exit handler will fire (or fallback resolves)
     }
-    // Fallback timeout — never block tests forever on a stuck child.
-    setTimeout(() => {
+    // Escalate to SIGKILL if SIGTERM doesn't take. unref() so a stuck child
+    // can never pin the event loop past test completion.
+    fallback = setTimeout(() => {
+      try { child.kill('SIGKILL'); } catch { /* already gone */ }
       child.removeListener('exit', onExit);
       resolve();
     }, 2000);
+    fallback.unref?.();
   });
   return { child, pid, stop };
 }
 
-describe('checkSingletonDaemon', () => {
+// ── getDaemonPid (read-only liveness probe) ────────────────────────────────
+
+describe('getDaemonPid', () => {
   let file: string;
 
   beforeEach(() => {
@@ -78,44 +84,25 @@ describe('checkSingletonDaemon', () => {
     cleanup(file);
   });
 
-  it('returns { running: false } when no PID file exists', () => {
+  it('returns null when no PID file exists', () => {
     expect(existsSync(file)).toBe(false);
-    expect(checkSingletonDaemon(file)).toEqual({ running: false });
+    expect(getDaemonPid(file)).toBeNull();
   });
 
-  it('returns { running: false } when the PID file points at a dead process', async () => {
-    // Spawn a short-lived child, capture its PID, await exit, then write
-    // that (now-dead) PID. Cross-platform "definitely dead" pattern.
+  it('returns null when the PID file points at a dead process', async () => {
     const child = spawn(process.execPath, ['-e', 'process.exit(0)']);
     const deadPid = child.pid!;
     await new Promise<void>((resolve) => child.once('exit', () => resolve()));
-    // Give the OS a moment to reap the PID.
-    await new Promise((r) => setTimeout(r, 50));
     writeFileSync(file, String(deadPid));
-    expect(checkSingletonDaemon(file)).toEqual({ running: false });
+    expect(getDaemonPid(file)).toBeNull();
   });
 
-  it('returns { running: false } when the PID file contains the current process pid (idempotent re-entry)', () => {
+  it('returns the current process pid when the file contains it (self-reference)', () => {
     writeFileSync(file, String(process.pid));
-    expect(checkSingletonDaemon(file)).toEqual({ running: false });
+    expect(getDaemonPid(file)).toBe(process.pid);
   });
 
-  it('returns { running: true, pid } when the PID file points at a different live process', async () => {
-    const { pid: livePid, stop } = await spawnLiveChild();
-    try {
-      writeFileSync(file, String(livePid));
-      expect(checkSingletonDaemon(file)).toEqual({ running: true, pid: livePid });
-    } finally {
-      await stop();
-    }
-  });
-
-  it('returns { running: false } when the PID file is malformed', () => {
-    writeFileSync(file, 'not-a-number');
-    expect(checkSingletonDaemon(file)).toEqual({ running: false });
-  });
-
-  it('getDaemonPid mirrors checkSingletonDaemon for live external pids', async () => {
+  it('returns the live PID when a different process owns the file', async () => {
     const { pid: livePid, stop } = await spawnLiveChild();
     try {
       writeFileSync(file, String(livePid));
@@ -123,6 +110,11 @@ describe('checkSingletonDaemon', () => {
     } finally {
       await stop();
     }
+  });
+
+  it('returns null when the PID file is malformed', () => {
+    writeFileSync(file, 'not-a-number');
+    expect(getDaemonPid(file)).toBeNull();
   });
 });
 
@@ -144,24 +136,21 @@ describe('acquirePidFile', () => {
     expect(readFileSync(file, 'utf-8').trim()).toBe(String(process.pid));
   });
 
-  it('replaces a stale PID file (owner is dead) and returns { ok: true }', async () => {
-    // Use a definitely-dead PID by spawning + awaiting exit.
+  it('replaces a stale PID file (owner is dead) and writes our pid', async () => {
     const child = spawn(process.execPath, ['-e', 'process.exit(0)']);
     const deadPid = child.pid!;
     await new Promise<void>((resolve) => child.once('exit', () => resolve()));
-    await new Promise((r) => setTimeout(r, 50));
     writeFileSync(file, String(deadPid));
 
     expect(acquirePidFile(file)).toEqual({ ok: true });
     expect(readFileSync(file, 'utf-8').trim()).toBe(String(process.pid));
   });
 
-  it('returns { ok: false, existingPid } when a different live process owns the file', async () => {
+  it('refuses with { ok: false, existingPid } when a different live process owns the file', async () => {
     const { pid: livePid, stop } = await spawnLiveChild();
     try {
       writeFileSync(file, String(livePid));
-      const result = acquirePidFile(file);
-      expect(result).toEqual({ ok: false, existingPid: livePid });
+      expect(acquirePidFile(file)).toEqual({ ok: false, existingPid: livePid });
       // Critical: must NOT have overwritten the file. The owner's PID stays.
       expect(readFileSync(file, 'utf-8').trim()).toBe(String(livePid));
     } finally {

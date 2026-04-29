@@ -42,6 +42,7 @@ import {
   getAbandonedSha,
   getProcessedBlockingCommentIds,
   isAbandoned,
+  isHealthyState,
   isPendingCICheck,
   isRecentlyProcessed,
   JSONL_FILE,
@@ -292,24 +293,6 @@ export function detectAllPrIssuesFromNodes(
  */
 export const STUCK_CYCLE_THRESHOLD = 3;
 
-/**
- * QUA-832: A PR's state fingerprint is "healthy" when the PR is in a state a
- * human reviewer would consider merge-ready or merge-imminent. Repeating this
- * state across cycles means the PR is awaiting human approval, not stuck on
- * something the patrol can fix.
- *
- * Healthy = mergeable in {MERGEABLE, UNKNOWN} AND rollup not FAIL AND zero
- * top-level blocking comments. UNKNOWN is included because GitHub frequently
- * lags the mergeability lookup; persistent UNKNOWN with a passing CI is more
- * likely a stale-cache PR than a broken one. Anything FAIL is unhealthy
- * regardless of mergeability.
- */
-export function isFingerprintHealthy(fingerprint: string): boolean {
-  const parts = fingerprint.split(':');
-  if (parts.length !== 3) return false;
-  const [m, r, c] = parts;
-  return (m === 'MERGEABLE' || m === 'UNKNOWN') && r !== 'FAIL' && c === '0';
-}
 
 /**
  * Collapse the status-check rollup into a single conclusion string suitable
@@ -406,18 +389,16 @@ export async function applyStuckCycleDetection(
       log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     });
 
-    // Annotate trending and stuck cycles. Note QUA-832: a healthy fingerprint
-    // (mergeable/unknown + CI not failing + zero blocking comments) means the
-    // PR is awaiting human approval, not stuck on a fixable problem. Don't
-    // push 'stuck' onto issues for those — the existing hasExceededMaxAttempts
-    // guard still catches dispatch churn on residual soft issues like
-    // bot-review-major.
+    // A healthy state (mergeable/unknown + CI not failing + zero blocking
+    // comments) means the PR is awaiting human approval, not stuck on a
+    // fixable problem. Skip the 'stuck' tag for those — hasExceededMaxAttempts
+    // still catches dispatch churn on residual soft issues.
     if (stuckCycles >= 2) {
       pr.stuckCycles = stuckCycles;
       pr.stuckReason = fingerprint;
 
       if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
-        if (isFingerprintHealthy(fingerprint)) {
+        if (isHealthyState({ mergeable, rollupConclusion, blockingCommentCount })) {
           log(`  ${cl.dim}PR #${pr.number}: in healthy state (${fingerprint}) for ${stuckCycles} cycles — awaiting human approval${cl.reset}`);
         } else {
           if (!pr.issues.includes('stuck')) pr.issues.push('stuck');

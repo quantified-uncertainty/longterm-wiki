@@ -684,6 +684,24 @@ export function stateFingerprint(parts: {
 }
 
 /**
+ * A "healthy" fingerprint state means the PR is awaiting human approval, not
+ * stuck on a problem the patrol can fix. UNKNOWN mergeable is included
+ * because GitHub frequently lags the mergeability lookup; persistent UNKNOWN
+ * with passing CI is more likely a stale-cache PR than a broken one. FAIL on
+ * the rollup is unhealthy regardless of mergeability.
+ */
+export function isHealthyState(parts: {
+  mergeable?: string | null;
+  rollupConclusion?: string | null;
+  blockingCommentCount?: number | null;
+}): boolean {
+  const m = (parts.mergeable ?? '').toString().toUpperCase();
+  const r = (parts.rollupConclusion ?? '').toString().toUpperCase();
+  const c = parts.blockingCommentCount ?? 0;
+  return (m === 'MERGEABLE' || m === 'UNKNOWN') && r !== 'FAIL' && c === 0;
+}
+
+/**
  * Read the most-recent N `pr_cycle_snapshot` entries for a PR from JSONL,
  * in newest-first order. Malformed lines are skipped.
  *

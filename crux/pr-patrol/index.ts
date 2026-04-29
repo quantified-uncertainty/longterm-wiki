@@ -161,72 +161,52 @@ export function getDaemonPid(file: string = PID_FILE): number | null {
 }
 
 /**
- * QUA-835: Singleton guard for the daemon. Reads the PID file and reports
- * whether a different live patrol process is already running.
+ * Atomically acquire the PID file. Uses `flag: 'wx'` (exclusive create) so
+ * two simultaneous patrol launches can't both succeed: only one wins the
+ * create, the other sees EEXIST and either bails (live owner) or reclaims
+ * (stale owner). Bounded retry handles the rare race where two processes
+ * both detect a stale file at the same instant.
  *
- * Returns:
- *   - { running: false } when the PID file is missing, stale (process dead),
- *     or points at the current process (idempotent re-entry).
- *   - { running: true, pid } when another live process owns the file.
- *
- * Read-only: doesn't write or modify the PID file. For the actual start-time
- * race-safe acquisition, see `acquirePidFile()`.
- */
-export function checkSingletonDaemon(
-  file: string = PID_FILE,
-): { running: false } | { running: true; pid: number } {
-  const pid = getDaemonPid(file);
-  if (pid === null || pid === process.pid) return { running: false };
-  return { running: true, pid };
-}
-
-/**
- * Atomically acquire the PID file, returning a structured result instead of
- * the bare PID. Fixes the TOCTOU race where two simultaneous `pr-patrol run`
- * invocations both pass `checkSingletonDaemon` (because neither has written
- * yet) and then both call `writeFileSync`, leaving two daemons alive.
- *
- * Strategy: try `flag: 'wx'` (exclusive create — fails on EEXIST). On EEXIST,
- * read the file: if the recorded PID is dead, atomically replace; if alive,
- * report the collision; if the recorded PID is ours, treat as idempotent
- * re-entry. The retry handles the rare case where two processes both detected
- * a stale file at the same time.
+ * Returns `{ ok: false, existingPid }` when another live process owns the
+ * file. Returns `{ ok: true }` only after this process's PID has been
+ * persisted to disk — never lies about acquisition.
  */
 export function acquirePidFile(
   file: string = PID_FILE,
 ): { ok: true } | { ok: false; existingPid: number } {
-  // Two-attempt loop: first try exclusive-create; on EEXIST, inspect the
-  // existing file and either bail (live owner) or replace (stale owner) and
-  // try once more. Bounded retry — no unbounded recovery.
-  for (let attempt = 0; attempt < 2; attempt++) {
+  // Bounded retry — stale-PID reclamation can race with a peer doing the
+  // same. After two attempts we surface failure rather than spin.
+  for (let i = 0; i < 2; i++) {
     try {
       writeFileSync(file, String(process.pid), { flag: 'wx' });
       return { ok: true };
     } catch (e) {
       const code = (e as NodeJS.ErrnoException).code;
       if (code !== 'EEXIST') {
-        console.error(`${cl.yellow}Warning: could not write PID file ${file}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
-        return { ok: true };
+        // EACCES, ENOSPC, EROFS, etc. — we couldn't write, so we can't claim.
+        // Surface as failure so the daemon refuses to start (better than
+        // silently running without singleton enforcement).
+        console.error(`${cl.red}ERROR: could not write PID file ${file}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        return { ok: false, existingPid: -1 };
       }
       const existing = getDaemonPid(file);
       if (existing === process.pid) return { ok: true };
       if (existing !== null) return { ok: false, existingPid: existing };
-      // File exists but owner is dead — try to clear it and retry.
+      // File exists but owner is dead — try to clear it and loop.
       try {
         unlinkSync(file);
       } catch {
-        // Another process raced us to clear it; that's fine, the next loop
-        // iteration will either succeed or detect the new owner.
+        // Another process raced us to clear it. Next iteration will
+        // either succeed or detect the new owner.
       }
     }
   }
-  // Lost both rounds (extreme contention). Surface a collision rather than
-  // double-write.
+  // Lost both rounds (extreme contention). Re-read once to get the final
+  // owner; if the file vanished, treat as our last failed write rather than
+  // falsely reporting success.
   const finalOwner = getDaemonPid(file);
-  if (finalOwner !== null && finalOwner !== process.pid) {
-    return { ok: false, existingPid: finalOwner };
-  }
-  return { ok: true };
+  if (finalOwner === process.pid) return { ok: true };
+  return { ok: false, existingPid: finalOwner ?? -1 };
 }
 
 /** Stop a running patrol daemon. Returns true if one was stopped. */
@@ -679,29 +659,30 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 
   ensureDirs();
 
-  // QUA-835: refuse to start a continuous daemon if another is already
-  // running. Two `pr-patrol run` invocations would spawn parallel loops
-  // that each maintain their own cycle counter (visible as cycle resets in
-  // the logs) and double-process the PR queue. acquirePidFile combines the
-  // collision check with the PID write atomically (flag: 'wx') so true
-  // simultaneous starts can't both succeed.
+  // Refuse to start a continuous daemon if another is already running —
+  // otherwise two `pr-patrol run` invocations spawn parallel loops with
+  // independent cycle counters and double-process the queue.
   //
   // `once` mode is intentionally NOT checked: it does a single pass and
-  // exits, so running it alongside a debugging daemon is the documented
-  // workflow. (The PR queue still gets some races but that's pre-existing.)
+  // exits, so debugging a daemon with `once` runs is the documented workflow.
   if (!config.once) {
     const acquired = acquirePidFile();
     if (!acquired.ok) {
-      console.error(
-        `${cl.red}ERROR: Another PR patrol daemon is already running (pid ${acquired.existingPid}).${cl.reset}`,
-      );
-      console.error(`  PID file: ${PID_FILE}`);
-      console.error(
-        `  Run \`crux gh pr-patrol stop\` to stop it, \`crux gh pr-patrol status\` to check,`,
-      );
-      console.error(
-        `  or remove the PID file manually if the listed PID is not actually a patrol process.`,
-      );
+      if (acquired.existingPid === -1) {
+        // Write failure (EACCES, ENOSPC, etc.) — the message was already
+        // logged inside acquirePidFile. Just bail.
+      } else {
+        console.error(
+          `${cl.red}ERROR: Another PR patrol daemon is already running (pid ${acquired.existingPid}).${cl.reset}`,
+        );
+        console.error(`  PID file: ${PID_FILE}`);
+        console.error(
+          `  Run \`crux gh pr-patrol stop\` to stop it, \`crux gh pr-patrol status\` to check,`,
+        );
+        console.error(
+          `  or remove the PID file manually if the listed PID is not actually a patrol process.`,
+        );
+      }
       process.exit(1);
     }
   }
