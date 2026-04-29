@@ -9,9 +9,8 @@ import { formatStake } from "@/app/organizations/[slug]/org-data";
 import type { KBRecordEntry } from "@/data/factbase";
 import { getTypedEntityById, getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
-import { Breadcrumbs } from "@/components/directory";
-import { SourcingDot } from "@/components/sourcing/SourcingDot";
-import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+import { ProfileStatCard } from "@/components/directory";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import { safeHref } from "@/lib/directory-utils";
 import {
   resolveEntityLink,
@@ -163,189 +162,164 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
     ? `${investment.investorName} → ${companyDisplayName}`
     : `Investment in ${companyDisplayName}`;
 
-  return (
-    <div className="max-w-4xl mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: "Organizations", href: "/organizations" },
-          ...(investment.companyHref
-            ? [{ label: companyDisplayName, href: investment.companyHref }]
-            : []),
-          { label: investment.investorName ? `Investment by ${investment.investorName}` : "Investment" },
-        ]}
-      />
-
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-start gap-3 mb-3">
-          <h1 className="text-2xl font-extrabold tracking-tight flex-1">
-            {displayTitle}
-          </h1>
-          <div className="flex gap-2 shrink-0">
-            {investment.role && (
-              <span
-                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                  ROLE_COLORS[investment.role] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                {titleCase(investment.role)}
-              </span>
-            )}
-            {investment.instrument && (
-              <span
-                className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                  INSTRUMENT_COLORS[investment.instrument] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
-                }`}
-              >
-                {titleCase(investment.instrument)}
-              </span>
-            )}
-            <SourcingDot
-              status={recordVerdictToStatus(investmentVerdict?.verdict)}
-              originalVerdict={investmentVerdict?.verdict}
-              size="md"
-              href={investmentVerdict?.verdict ? `/sourcing/investment/${encodeURIComponent(String(investment.key))}` : undefined}
-            />
-          </div>
-        </div>
-
-        {/* Amount hero */}
-        {investment.amount != null && (
-          <div className="text-3xl font-bold tabular-nums tracking-tight text-primary mb-1">
-            {formatCompactCurrency(investment.amount)}
-          </div>
-        )}
-        {investment.stakeAcquired != null && (
-          <div className="text-lg tabular-nums tracking-tight text-muted-foreground">
-            {formatStake(investment.stakeAcquired)}
-            <span className="text-sm font-normal ml-2">stake acquired</span>
-          </div>
-        )}
-      </div>
-
-      {/* Details grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        {/* Left column: key details */}
-        <div className="space-y-4">
-          <DetailSection title="Company">
-            <EntityLinkDisplay
-              name={companyDisplayName}
-              href={investment.companyHref}
-            />
-            {companyWikiPageId && (
-              <Link
-                href={`/wiki/${companyWikiPageId}`}
-                className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
-                title="Wiki page"
-              >
-                wiki
-              </Link>
-            )}
-          </DetailSection>
-
-          {(investment.investorId || investment.investorName) && (
-            <DetailSection title="Investor">
-              <EntityLinkDisplay
-                name={investment.investorName}
-                href={investment.investorHref}
-              />
-            </DetailSection>
-          )}
-
-          {investment.roundName && (
-            <DetailSection title="Funding Round">
-              {fundingRoundHref ? (
-                <Link
-                  href={fundingRoundHref}
-                  className="text-sm font-medium text-primary hover:underline"
-                >
-                  {investment.roundName}
-                </Link>
-              ) : (
-                <span className="text-sm text-foreground">{investment.roundName}</span>
-              )}
-            </DetailSection>
-          )}
-
-          {investment.date && (
-            <DetailSection title="Date">
-              <span className="text-sm text-foreground">
-                {formatKBDate(investment.date)}
-              </span>
-            </DetailSection>
-          )}
-        </div>
-
-        {/* Right column: supplementary info */}
-        <div className="space-y-4">
-          {investment.source && (
-            <DetailSection title="Source">
-              {isUrl(investment.source) ? (
-                <a
-                  href={safeHref(investment.source)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-sm text-primary hover:underline break-all"
-                >
-                  {shortDomain(investment.source)}
-                  <span className="text-muted-foreground ml-1">{"\u2197"}</span>
-                </a>
-              ) : (
-                <span className="text-sm text-foreground">{investment.source}</span>
-              )}
-            </DetailSection>
-          )}
-
-          {investment.notes && (
-            <DetailSection title="Notes">
-              <p className="text-sm text-muted-foreground leading-relaxed">
-                {investment.notes}
-              </p>
-            </DetailSection>
-          )}
-        </div>
-      </div>
-
-      {/* Other investments in same company */}
-      {otherInSameCompany.length > 0 && (
-        <RelatedInvestmentsSection
-          title={`Other Investments in ${companyDisplayName}`}
-          investments={otherInSameCompany.slice(0, 10)}
-          totalCount={otherInSameCompany.length}
-          showInvestor
-        />
+  const titlePills = (
+    <>
+      {investment.role && (
+        <span
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+            ROLE_COLORS[investment.role] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+          }`}
+        >
+          {titleCase(investment.role)}
+        </span>
       )}
-
-      {/* Other investments by same investor */}
-      {otherBySameInvestor.length > 0 && (
-        <RelatedInvestmentsSection
-          title={`Other Investments by ${investment.investorName}`}
-          investments={otherBySameInvestor.slice(0, 10)}
-          totalCount={otherBySameInvestor.length}
-          showCompany
-        />
+      {investment.instrument && (
+        <span
+          className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+            INSTRUMENT_COLORS[investment.instrument] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"
+          }`}
+        >
+          {titleCase(investment.instrument)}
+        </span>
       )}
+    </>
+  );
 
-      {/* Back to company */}
-      <div className="mt-8 pt-6 border-t border-border/60">
-        {investment.companyHref ? (
-          <Link
-            href={investment.companyHref}
-            className="text-sm text-primary hover:underline"
-          >
-            &larr; Back to {companyDisplayName}
-          </Link>
-        ) : (
-          <Link
-            href="/organizations"
-            className="text-sm text-primary hover:underline"
-          >
-            &larr; Back to organizations
-          </Link>
-        )}
-      </div>
+  const stats: Array<{ label: string; value: string }> = [];
+  if (investment.amount != null) {
+    stats.push({ label: "Amount", value: formatCompactCurrency(investment.amount) });
+  }
+  if (investment.stakeAcquired != null) {
+    stats.push({ label: "Stake acquired", value: formatStake(investment.stakeAcquired) });
+  }
+  if (investment.date) {
+    stats.push({ label: "Date", value: formatKBDate(investment.date) });
+  }
+
+  const statCards = stats.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {stats.map((s) => (
+        <ProfileStatCard key={s.label} {...s} />
+      ))}
     </div>
+  );
+
+  return (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "Organizations", href: "/organizations" },
+        ...(investment.companyHref
+          ? [{ label: companyDisplayName, href: investment.companyHref }]
+          : []),
+        { label: investment.investorName ? `Investment by ${investment.investorName}` : "Investment" },
+      ]}
+      title={displayTitle}
+      titlePills={titlePills}
+      verdict={investmentVerdict?.verdict ?? null}
+      verdictHref={
+        investmentVerdict?.verdict
+          ? `/sourcing/investment/${encodeURIComponent(String(investment.key))}`
+          : undefined
+      }
+      statCards={statCards}
+    >
+      <div className="space-y-8">
+        {/* Details grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* Left column: key details */}
+          <div className="space-y-4">
+            <DetailSection title="Company">
+              <EntityLinkDisplay
+                name={companyDisplayName}
+                href={investment.companyHref}
+              />
+              {companyWikiPageId && (
+                <Link
+                  href={`/wiki/${companyWikiPageId}`}
+                  className="ml-2 text-[10px] text-muted-foreground/50 hover:text-primary transition-colors"
+                  title="Wiki page"
+                >
+                  wiki
+                </Link>
+              )}
+            </DetailSection>
+
+            {(investment.investorId || investment.investorName) && (
+              <DetailSection title="Investor">
+                <EntityLinkDisplay
+                  name={investment.investorName}
+                  href={investment.investorHref}
+                />
+              </DetailSection>
+            )}
+
+            {investment.roundName && (
+              <DetailSection title="Funding Round">
+                {fundingRoundHref ? (
+                  <Link
+                    href={fundingRoundHref}
+                    className="text-sm font-medium text-primary hover:underline"
+                  >
+                    {investment.roundName}
+                  </Link>
+                ) : (
+                  <span className="text-sm text-foreground">{investment.roundName}</span>
+                )}
+              </DetailSection>
+            )}
+          </div>
+
+          {/* Right column: supplementary info */}
+          <div className="space-y-4">
+            {investment.source && (
+              <DetailSection title="Source">
+                {isUrl(investment.source) ? (
+                  <a
+                    href={safeHref(investment.source)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-sm text-primary hover:underline break-all"
+                  >
+                    {shortDomain(investment.source)}
+                    <span className="text-muted-foreground ml-1">{"↗"}</span>
+                  </a>
+                ) : (
+                  <span className="text-sm text-foreground">{investment.source}</span>
+                )}
+              </DetailSection>
+            )}
+
+            {investment.notes && (
+              <DetailSection title="Notes">
+                <p className="text-sm text-muted-foreground leading-relaxed">
+                  {investment.notes}
+                </p>
+              </DetailSection>
+            )}
+          </div>
+        </div>
+
+        {/* Other investments in same company */}
+        {otherInSameCompany.length > 0 && (
+          <RelatedInvestmentsSection
+            title={`Other Investments in ${companyDisplayName}`}
+            investments={otherInSameCompany.slice(0, 10)}
+            totalCount={otherInSameCompany.length}
+            showInvestor
+          />
+        )}
+
+        {/* Other investments by same investor */}
+        {otherBySameInvestor.length > 0 && (
+          <RelatedInvestmentsSection
+            title={`Other Investments by ${investment.investorName}`}
+            investments={otherBySameInvestor.slice(0, 10)}
+            totalCount={otherBySameInvestor.length}
+            showCompany
+          />
+        )}
+      </div>
+    </EntityProfileShell>
   );
 }
 
@@ -365,7 +339,7 @@ function RelatedInvestmentsSection({
   showCompany?: boolean;
 }) {
   return (
-    <section className="mb-8">
+    <section>
       <div className="flex items-center gap-3 mb-4">
         <h2 className="text-base font-bold tracking-tight">{title}</h2>
         <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">

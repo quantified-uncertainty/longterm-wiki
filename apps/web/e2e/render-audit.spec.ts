@@ -71,6 +71,13 @@ const SIDEBAR_ONLY_PAGES = [
   // Projects — migrated to EntityProfileShell in QUA-485
   "/projects/ai-economist",
   "/projects/aaa-ai-arbitrator",
+  // Publications — migrated to EntityProfileShell in QUA-487. Uses YAML
+  // publications data so it's available in CI without PG access.
+  // Note: investments/[id], funding-rounds/[id], funding-programs/[id] were
+  // also migrated in QUA-487 but their records live only in PG, so they
+  // 404 in the CI build (LONGTERMWIKI_SERVER_URL unset → kb-pg merge skipped).
+  // Validated locally with a dev server pointed at prod data.
+  "/publications/nature",
 ];
 
 /**

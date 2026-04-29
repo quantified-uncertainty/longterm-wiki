@@ -65,6 +65,13 @@ export interface EntityProfileShellProps {
    * so every entity page has a visible sourcing badge.
    */
   verdict?: string | null;
+  /**
+   * Optional href for the SourcingDot. Set this on record-level profile pages
+   * (investments, funding-rounds, publications, etc.) where the verdict points
+   * at a real `/sourcing/<recordType>/<id>` page. Entity-level pages should
+   * leave this unset — see the QUA-418 comment in the shell body.
+   */
+  verdictHref?: string;
   /** Subtitle/description block rendered immediately below the title row. */
   subtitle?: React.ReactNode;
   /** Metadata row — founded date, HQ, website, etc. */
@@ -112,6 +119,7 @@ export function EntityProfileShell({
   titlePills,
   coverage,
   verdict,
+  verdictHref,
   subtitle,
   metadata,
   headerLinks,
@@ -172,9 +180,11 @@ export function EntityProfileShell({
                   status={recordVerdictToStatus(verdict ?? null)}
                   originalVerdict={verdict ?? null}
                   size="md"
-                  // QUA-418: no href — "entity" is not a real record_type in
-                  // VALID_RECORD_TYPES, so /sourcing/entity/<id> always 404s.
-                  // Entity-level rollup pages are deferred to QUA-408 Phase 2.
+                  // QUA-418: entity-level pages omit href — "entity" is not a
+                  // real record_type so /sourcing/entity/<id> always 404s.
+                  // Record-level pages (investments, funding-rounds, etc.)
+                  // pass verdictHref since /sourcing/<recordType>/<id> exists.
+                  href={verdictHref}
                 />
               )}
               {(metadata || (headerLinks && headerLinks.length > 0)) && (
