@@ -119,7 +119,6 @@ async function extractOne(
     const id = generateId(`third-party-eval:${candidate.url}:${extract.sourceHash}`);
     const sourcing = spanVerifyToInlineSourcing(verify, {
       sourceContentHash: extract.sourceHash,
-      checkedAt: extract.extractedAt,
     });
     const item = toSyncItem(extract, {
       id,

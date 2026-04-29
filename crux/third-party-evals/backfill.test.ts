@@ -366,11 +366,10 @@ describe("backfillEvaluator", () => {
     });
 
     // span-verify helper was called once per candidate, with the source hash
-    // and timestamp threaded through from the extract.
+    // threaded through from the extract.
     expect(vi.mocked(spanVerifyToInlineSourcing)).toHaveBeenCalledTimes(2);
     expect(vi.mocked(spanVerifyToInlineSourcing).mock.calls[0][1]).toMatchObject({
       sourceContentHash: "deadbeef",
-      checkedAt: "2026-04-25T00:00:00.000Z",
     });
 
     // toSyncItem received the verdict via opts.sourcing

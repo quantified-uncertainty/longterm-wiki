@@ -98,7 +98,10 @@ describe("third-party-evaluations /sync — inline sourcing (QUA-727)", () => {
     expect(evidenceInsertCount).toBeGreaterThan(0);
   });
 
-  it("strips sourcing from the row insert (it's not a third_party_evaluations column)", async () => {
+  it("never emits 'sourcing' as a column in the third_party_evaluations INSERT", async () => {
+    // Regression guard: if `toRow` ever stops stripping `sourcing`, postgres
+    // would error with `column "sourcing" of relation "third_party_evaluations"
+    // does not exist`. Verifies the auto-derived SET clause stays clean.
     const app = new Hono().route("/", thirdPartyEvaluationsRoute);
 
     await postJson(app, "/sync", {
@@ -163,6 +166,52 @@ describe("third-party-evaluations /sync — inline sourcing (QUA-727)", () => {
           sourcing: {
             verdict: "bogus" as unknown as "confirmed",
             confidence: 0.9,
+          },
+        },
+      ],
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects sourcing.confidence outside [0,1]", async () => {
+    const app = new Hono().route("/", thirdPartyEvaluationsRoute);
+
+    const res = await postJson(app, "/sync", {
+      items: [
+        {
+          id: "abcdef0005",
+          evaluatorOrgId: "sid_pKeaWwP6sQ",
+          reportUrl: "https://example.com/r5.pdf",
+          title: "Bad confidence",
+          riskDomain: ["cyber"],
+          sourceSystem: "manual",
+          sourcing: {
+            verdict: "confirmed",
+            confidence: 1.5,
+          },
+        },
+      ],
+    });
+
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects oversized sourcing.evidence (>5000 chars)", async () => {
+    const app = new Hono().route("/", thirdPartyEvaluationsRoute);
+
+    const res = await postJson(app, "/sync", {
+      items: [
+        {
+          id: "abcdef0006",
+          evaluatorOrgId: "sid_pKeaWwP6sQ",
+          reportUrl: "https://example.com/r6.pdf",
+          title: "Huge evidence",
+          riskDomain: ["cyber"],
+          sourceSystem: "manual",
+          sourcing: {
+            verdict: "confirmed",
+            evidence: "x".repeat(5001),
           },
         },
       ],

@@ -191,47 +191,56 @@ function camelToSnake(s: string): string {
 /** Identifier written to InlineSourcing.checkedBy for span-verify verdicts. */
 export const SPAN_VERIFY_CHECKER = "span-verify-v1";
 
-/** Confidence threshold for picking an excerpt as evidence. */
-const EVIDENCE_CONFIDENCE_FLOOR = 0.7;
+/**
+ * `FieldVerdict.reason` values that indicate a field was bypassed (not actually
+ * span-checked). Used to filter out URL/metadata/list fields when aggregating
+ * the record-level verdict — these carry `verified: true, confidence: 0.5` but
+ * tell us nothing about whether the extraction matches the source.
+ */
+const BYPASS_REASONS: ReadonlySet<FieldVerdict["reason"]> = new Set([
+  "skipped",
+] as const);
 
 /**
  * Aggregate per-field span-verify output into a record-level inline sourcing
  * verdict. Used by ingesters to populate the `sourcing` block on /sync so
  * source_check_verdicts get written atomically with the row.
  *
- * Verdict mapping:
+ * Verdict mapping (semantics: "is the data we extracted grounded in the
+ * source", NOT "is the report fully covered" — coverage is a separate
+ * concern handled by entity-coverage scoring):
  *   - confirmed: at least one core field verified, no fields dropped after
- *     initially being non-null
+ *     initially being non-null. A `confirmed` verdict on a sparse extraction
+ *     means "the few fields we extracted are grounded", not "the report is
+ *     comprehensively covered".
  *   - partial:   some fields verified, some dropped (the LLM gave us mixed-
  *     quality output and span-verify rescued only part of it)
  *   - unverifiable: nothing verified — every excerpt failed to ground
  *
- * Returns null when `verdicts` is empty (the extractor produced no checkable
- * fields), so the caller can choose to omit `sourcing` entirely rather than
- * record a meaningless verdict.
+ * Returns null when only bypassed fields exist (URL/metadata/list), so the
+ * caller can omit `sourcing` entirely rather than record a meaningless
+ * verdict.
  *
- * `evidence` is the highest-confidence verified excerpt (>= 0.7) — we'd
- * rather show no evidence than a fuzzy match.
+ * `evidence` is the highest-confidence verified excerpt — `verifyExcerpt()`
+ * only returns `verified: true` when confidence ≥ jaccardThreshold (default
+ * 0.7), so any verified field's excerpt is fair game.
  *
- * `confidence` is the mean of verified-field confidences.
+ * `confidence` is the mean of verified-field confidences over span-checked
+ * fields. Bypassed fields are excluded so their fixed 0.5 doesn't drag
+ * confirmed verdicts toward the middle.
  */
 export function spanVerifyToInlineSourcing(
   verify: VerifyResult,
   options: { sourceContentHash?: string; checkedAt?: string } = {},
 ): InlineSourcing | null {
-  // "Real" verdicts are span-checked fields; skipped fields (URL/methodology
-  // bypasses, modelsNamed) carry verified=true with confidence 0.5 but
-  // didn't actually go through span-check, so they don't tell us the
-  // record was meaningfully validated.
   const checkedFields = Object.entries(verify.verdicts).filter(
-    ([, v]) => v.reason !== "skipped",
+    ([, v]) => !BYPASS_REASONS.has(v.reason),
   );
   const droppedCount = verify.droppedFields.length;
 
-  // Nothing was span-checked AND nothing was dropped — the extractor
-  // returned only skipped fields (URLs, models). We have no signal about
-  // whether the record matches the source, so return null and let the
-  // caller decide whether to omit `sourcing` entirely.
+  // Nothing span-checked AND nothing dropped — the extractor returned only
+  // bypassed fields. We have no signal about whether the record matches the
+  // source, so return null and let the caller decide.
   if (checkedFields.length === 0 && droppedCount === 0) return null;
 
   const verifiedCheckedFields = checkedFields.filter(([, v]) => v.verified);
@@ -245,22 +254,17 @@ export function spanVerifyToInlineSourcing(
     verdict = "partial";
   }
 
-  // Mean confidence over span-checked fields (skipped fields excluded so
-  // their fixed 0.5 doesn't drag confirmed verdicts toward the middle).
-  const verifiedConfidences = verifiedCheckedFields
-    .map(([, v]) => v.confidence)
-    .filter((c) => c > 0);
+  const verifiedConfidences = verifiedCheckedFields.map(([, v]) => v.confidence);
   const meanConfidence =
     verifiedConfidences.length > 0
       ? verifiedConfidences.reduce((a, b) => a + b, 0) /
         verifiedConfidences.length
       : 0;
 
-  const excerpts = verify.verifiedReport.excerpts ?? {};
+  const excerpts = verify.verifiedReport.excerpts;
   let bestExcerpt: string | undefined;
   let bestExcerptConfidence = 0;
   for (const [f, fieldVerdict] of verifiedCheckedFields) {
-    if (fieldVerdict.confidence < EVIDENCE_CONFIDENCE_FLOOR) continue;
     const excerpt = excerpts[camelToSnake(f)] ?? excerpts[f] ?? "";
     if (excerpt && fieldVerdict.confidence > bestExcerptConfidence) {
       bestExcerpt = excerpt;

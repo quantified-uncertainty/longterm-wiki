@@ -185,7 +185,6 @@ async function extractSubcommand(
 
   const sourcing = spanVerifyToInlineSourcing(verify, {
     sourceContentHash: extract.sourceHash,
-    checkedAt: extract.extractedAt,
   });
 
   const item = toSyncItem(extract, {
