@@ -37,6 +37,7 @@ import {
   MAX_REASONING_CHARS,
 } from '../lib/sourcing/grade-suggestion.ts';
 import { createClient as createAnthropicClient } from '../lib/anthropic.ts';
+import { getEntityWikidataQid } from '../lib/sourcing/entity-wikidata-qid.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 const DEFAULT_LIMIT = 50;
@@ -191,6 +192,8 @@ interface RunSummary {
   skippedNoClaim: number;
   generatedForRecords: number;
   suggestionsWritten: number;
+  /** Candidates dropped by the subject-identity gate (QUA-724). */
+  subjectMismatchesDropped: number;
   providerErrors: number;
   costUsd: number;
   budgetExhausted: boolean;
@@ -207,6 +210,7 @@ function makeSummary(): RunSummary {
     skippedNoClaim: 0,
     generatedForRecords: 0,
     suggestionsWritten: 0,
+    subjectMismatchesDropped: 0,
     providerErrors: 0,
     costUsd: 0,
     budgetExhausted: false,
@@ -232,6 +236,7 @@ function summaryToJson(s: RunSummary, dryRun: boolean) {
     skipped_no_claim: s.skippedNoClaim,
     generated_for_records: s.generatedForRecords,
     suggestions_written: s.suggestionsWritten,
+    subject_mismatches_dropped: s.subjectMismatchesDropped,
     provider_errors: s.providerErrors,
     cost_usd: Number(s.costUsd.toFixed(4)),
     budget_exhausted: s.budgetExhausted,
@@ -263,6 +268,7 @@ Skipped (had pending):  ${s.skippedHadSuggestion}
 Skipped (no claim):     ${s.skippedNoClaim}
 Generated for records:  ${s.generatedForRecords}
 Suggestions written:    ${s.suggestionsWritten}${dryRun ? ' (dry-run)' : ''}
+Subject mismatch drops: ${s.subjectMismatchesDropped}
 Provider errors:        ${s.providerErrors}
 Cost:                   $${s.costUsd.toFixed(4)}
 Budget exhausted:       ${s.budgetExhausted ? 'yes' : 'no'}
@@ -470,12 +476,19 @@ async function suggestCommand(
       return;
     }
 
+    // QUA-724: pass the entity's Wikidata QID (if known) so suggestUrls'
+    // subject-identity gate can drop candidates that point at a different
+    // Wikidata entity. Fail-open for entities with no recorded QID — the gate
+    // returns all candidates unchanged in that case.
+    const entityWikidataQid = getEntityWikidataQid(v.entityId);
+
     const result = await suggestUrls({
       entityName,
       claimText,
       fieldName: v.fieldName ?? undefined,
       existingUrl,
       maxCandidates,
+      entityWikidataQid,
     });
 
     summary.costUsd += result.costUsd;
@@ -483,6 +496,17 @@ async function suggestCommand(
     for (const p of result.providersSkipped) {
       summary.providersSkipped.add(p);
       if (!p.endsWith(':no-key')) summary.providerErrors++;
+    }
+    if (result.subjectMismatches.length > 0) {
+      summary.subjectMismatchesDropped += result.subjectMismatches.length;
+      // Per-record line so the dropped URL + offending QID are auditable
+      // alongside the existing dry-run/processing log entries.
+      for (const mm of result.subjectMismatches) {
+        log(
+          `  [subject-mismatch] ${v.recordType}/${v.recordId} ` +
+            `entity=${v.entityId ?? '?'} (Q=${mm.entityQid}) dropped ${mm.url} (Q=${mm.candidateQid})`,
+        );
+      }
     }
 
     if (result.candidates.length === 0) return;
