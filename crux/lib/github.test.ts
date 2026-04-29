@@ -1,6 +1,9 @@
 import { describe, it, expect, afterEach, vi } from 'vitest';
 import {
   getGitHubToken,
+  GITHUB_API_TIMEOUT_MS,
+  githubApi,
+  githubGraphQL,
   isMissingTokenError,
   MissingTokenError,
   MISSING_TOKEN_HELP_MESSAGE,
@@ -146,5 +149,72 @@ describe('isMissingTokenError', () => {
     expect(isMissingTokenError('MissingTokenError')).toBe(false);
     expect(isMissingTokenError(42)).toBe(false);
     expect(isMissingTokenError({})).toBe(false);
+  });
+});
+
+// QUA-823: bare "fetch failed" errors must be wrapped with URL/method context
+// so the patrol log shows what was being attempted, not just an opaque
+// 5-character TypeError message. Also asserts the timeout constant is in a
+// sensible range so a future tweak doesn't accidentally drop to 0 or balloon
+// past the patrol cycle interval.
+describe('githubApi — fetch error wrapping', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.restoreAllMocks();
+  });
+
+  it('exposes a sensible timeout constant', () => {
+    expect(GITHUB_API_TIMEOUT_MS).toBeGreaterThanOrEqual(5_000);
+    expect(GITHUB_API_TIMEOUT_MS).toBeLessThanOrEqual(120_000);
+  });
+
+  it('wraps a network error with the method + endpoint context', async () => {
+    vi.stubEnv('GITHUB_TOKEN', 'test-token');
+    const cause = new Error('getaddrinfo ENOTFOUND api.github.com');
+    const fetchErr = new TypeError('fetch failed');
+    Object.assign(fetchErr, { cause });
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(fetchErr);
+
+    await expect(githubApi('/repos/foo/bar/issues')).rejects.toThrow(
+      /GitHub API GET \/repos\/foo\/bar\/issues fetch failed: fetch failed: getaddrinfo ENOTFOUND/,
+    );
+  });
+
+  it('wraps an AbortError (timeout) with a clear "timed out" message', async () => {
+    vi.stubEnv('GITHUB_TOKEN', 'test-token');
+    const abort = new Error('The operation was aborted');
+    abort.name = 'TimeoutError';
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(abort);
+
+    await expect(githubApi('/user')).rejects.toThrow(
+      new RegExp(`GitHub API GET /user timed out after ${GITHUB_API_TIMEOUT_MS}ms`),
+    );
+  });
+
+  it('wraps GraphQL fetch errors with a /graphql endpoint marker', async () => {
+    vi.stubEnv('GITHUB_TOKEN', 'test-token');
+    vi.spyOn(globalThis, 'fetch').mockRejectedValue(new TypeError('fetch failed'));
+
+    await expect(githubGraphQL('query { viewer { login } }')).rejects.toThrow(
+      /GitHub API POST \/graphql fetch failed: fetch failed/,
+    );
+  });
+
+  it('passes an AbortSignal to fetch (so a hung connection cannot block forever)', async () => {
+    vi.stubEnv('GITHUB_TOKEN', 'test-token');
+    const fetchSpy = vi
+      .spyOn(globalThis, 'fetch')
+      .mockResolvedValue(
+        new Response(JSON.stringify({ ok: true }), {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      );
+
+    await githubApi('/user');
+
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    const init = fetchSpy.mock.calls[0][1];
+    expect(init?.signal).toBeInstanceOf(AbortSignal);
   });
 });
