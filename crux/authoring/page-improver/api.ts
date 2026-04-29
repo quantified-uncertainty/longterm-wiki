@@ -115,7 +115,7 @@ export async function executeScrySearch(query: string, table: string = 'mv_eafor
     LIMIT 10`;
 
   try {
-    const response = await fetch('https://api.exopriors.com/v1/scry/query', {
+    const response = await fetch('https://api.scry.io/v1/scry/query', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${SCRY_PUBLIC_KEY}`,

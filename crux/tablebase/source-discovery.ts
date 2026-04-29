@@ -202,7 +202,7 @@ async function discoverForEntity(
     totalCost += researchResult.metadata.totalCost;
   } catch (err: unknown) {
     console.warn(`[source-discover]   Research agent failed: ${err instanceof Error ? err.message : String(err)}`);
-    researchResult = { sources: [], metadata: { sourcesSearched: [], urlsFound: 0, urlsFetched: 0, urlsDeduplicated: 0, urlsAlreadyInPG: 0, newResourcesRegistered: 0, pgCacheInitialized: false, totalCost: 0, costBreakdown: { searchCost: 0, factExtractionCost: 0 }, durationMs: 0 } };
+    researchResult = { sources: [], metadata: { sourcesSearched: [], urlsFound: 0, urlsFetched: 0, urlsDeduplicated: 0, urlsAlreadyInPG: 0, newResourcesRegistered: 0, pgCacheInitialized: false, totalCost: 0, costBreakdown: { searchCost: 0, factExtractionCost: 0 }, providerCounts: {}, durationMs: 0 } };
   }
 
   // Match entity-level sources against person names

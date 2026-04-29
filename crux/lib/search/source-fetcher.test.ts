@@ -96,6 +96,13 @@ vi.mock('./fetch-strategies.ts', () => ({
   fetchWaybackContent: vi.fn().mockResolvedValue(null),
 }));
 
+// Mock the Playwright fallback. Without this, the real `playwright` package
+// (added to the root manifest) gets dynamically imported, which triggers real
+// network fetches inside tests whenever content is below the fallback threshold.
+vi.mock('./playwright-fetcher.ts', () => ({
+  fetchWithPlaywright: vi.fn().mockResolvedValue(null),
+}));
+
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------

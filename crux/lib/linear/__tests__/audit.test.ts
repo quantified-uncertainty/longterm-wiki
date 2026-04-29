@@ -38,7 +38,7 @@ function makePr(overrides: {
 }
 
 function makeChild(state: { name: string; type: string }): LinearChildIssue {
-  return { identifier: 'QUA-X', title: 'Child', state };
+  return { identifier: 'QUA-X', title: 'Child', priority: 0, url: 'https://linear.app/qua/QUA-X', state };
 }
 
 const daysAgo = (n: number) =>
