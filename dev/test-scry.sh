@@ -1,9 +1,9 @@
 #!/bin/bash
 # SCRY smoke test — matches the URL + Bearer auth used by production code
 # (crux/lib/search/research-agent.ts, crux/authoring/creator/research.ts).
-# Override the key with SCRY_API_KEY if you have a private one.
-KEY="${SCRY_API_KEY:-exopriors_public_readonly_v1_2025}"
-curl -s \
+set -euo pipefail
+KEY="${SCRY_API_KEY:?set SCRY_API_KEY in your environment}"
+curl -sS --fail \
   -X POST \
   -H 'Content-Type: application/json' \
   -H "Authorization: Bearer ${KEY}" \

@@ -22,8 +22,8 @@ export interface FetchOptions {
 /**
  * Fetch records that are missing a source URL across all tracked tables, then
  * flatten the per-table buckets into a single list (the order of tables is
- * preserved). Returns null when the endpoint errors so the caller can decide
- * whether to retry / surface the failure.
+ * preserved). On endpoint failure returns `{ error: string }` so the caller
+ * can surface the message; on success returns `{ records, totalMissing }`.
  */
 export async function fetchMissingSources(
   options: FetchOptions,

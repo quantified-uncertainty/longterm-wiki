@@ -113,13 +113,19 @@ psql_dev() {
 }
 
 psql_prod() {
-    # Load PROD_DATABASE_URL from .env
+    # Load PROD_DATABASE_URL from .env. Inject via env var (not argv) so the
+    # connection string never appears in `ps` / `docker inspect`. Strip
+    # surrounding quotes if the .env value is wrapped.
     local env_file="$REPO_ROOT/.env"
     if [ -f "$env_file" ]; then
         local prod_url
         prod_url=$(grep '^PROD_DATABASE_URL=' "$env_file" | cut -d= -f2-)
+        prod_url=${prod_url#\"}; prod_url=${prod_url%\"}
+        prod_url=${prod_url#\'}; prod_url=${prod_url%\'}
         if [ -n "$prod_url" ]; then
-            docker run --network=host --rm -i postgres:16 psql "$prod_url" "$@"
+            docker run --network=host --rm -i \
+                -e PGURL="$prod_url" \
+                postgres:16 sh -c 'psql "$PGURL" "$@"' sh "$@"
             return
         fi
     fi

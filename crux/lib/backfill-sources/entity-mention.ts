@@ -1,6 +1,11 @@
 import { SELF_DOMAINS } from './config.ts';
 import type { MissingSourceRecord } from './types.ts';
 
+// Mirrors isSid() from @longterm-wiki/id-utils. crux/tsconfig has no path
+// mapping for that package, so use a local regex (same form as setup-org.ts
+// and validate-factbase-record-refs.ts).
+const SID_RE = /^sid_[A-Za-z0-9]{10}$/;
+
 // ---------------------------------------------------------------------------
 // Self-domain detection
 // ---------------------------------------------------------------------------
@@ -156,6 +161,6 @@ export function entitiesToMention(record: MissingSourceRecord): string[][] {
  */
 function stripMachineId(name: string): string | null {
   if (!name) return null;
-  if (name.startsWith('sid_')) return null;
+  if (SID_RE.test(name)) return null;
   return name;
 }
