@@ -65,6 +65,7 @@ For longer descriptions, use `--description-file=/tmp/description.md`.
 
 - **Evidence required**: You must have *observed* the problem in the current session — do not file speculative or hypothetical issues. Point to a specific file, error message, or behavior you encountered.
 - **Volume target**: 0-2 issues per session is normal. If you're finding 10+ problems, file the top 2-3 and batch the rest into one umbrella issue.
+- **Re-verify before dispatching** *(applies when picking up a previously-filed ticket, not when filing a new one)*: tickets get fixed between filing and dispatch. Before starting work on a ticket that claims a prod symptom, run the acceptance test that would catch it (render-audit, e2e spec, etc.) and confirm it still fails. If it passes, comment with the test result and close — don't write a fix for a bug that's already gone. See `implementation-quality.md` § "Bug fixes — TDD workflow" step 0.
 
 ## Mandatory tracking — red flags that MUST produce a ticket
 
