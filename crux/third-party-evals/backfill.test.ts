@@ -24,11 +24,14 @@ vi.mock("./extract-eval-report.ts", () => ({
 }));
 vi.mock("./span-verify.ts", () => ({
   verifyExtractedReport: vi.fn(() => ({
-    verifiedReport: { modelsNamed: [] },
+    verifiedReport: { modelsNamed: [], excerpts: {} },
+    verdicts: {},
     droppedFields: [],
     ungroundedFields: [],
     confidenceMap: {},
   })),
+  spanVerifyToInlineSourcing: vi.fn(() => null),
+  SPAN_VERIFY_CHECKER: "span-verify-v1",
 }));
 vi.mock("../lib/wiki-server/third-party-evaluations.ts", () => ({
   syncThirdPartyEvaluations: vi.fn(),
@@ -39,7 +42,8 @@ vi.mock("../lib/ai-model-resolver.ts", () => ({
 
 import { ingestUkAisi } from "./ingesters/uk-aisi-sitemap.ts";
 import { ingestMetr } from "./ingesters/metr-rss.ts";
-import { extractEvalReport } from "./extract-eval-report.ts";
+import { extractEvalReport, toSyncItem } from "./extract-eval-report.ts";
+import { spanVerifyToInlineSourcing } from "./span-verify.ts";
 import { syncThirdPartyEvaluations } from "../lib/wiki-server/third-party-evaluations.ts";
 import { backfillEvaluator } from "./backfill.ts";
 
@@ -334,5 +338,68 @@ describe("backfillEvaluator", () => {
     expect(events).toContain("extracted");
     expect(events).toContain("extract-error");
     expect(events).toContain("synced");
+  });
+
+  it("populates sourcing block on each sync item via span-verify (QUA-727)", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: makeCandidates(2),
+      errors: [],
+    });
+    vi.mocked(extractEvalReport).mockResolvedValue(okExtract as never);
+    vi.mocked(spanVerifyToInlineSourcing).mockReturnValue({
+      verdict: "confirmed",
+      confidence: 0.95,
+      checkedBy: "span-verify-v1",
+      checkedAt: "2026-04-25T00:00:00.000Z",
+      sourceContentHash: "deadbeef",
+      evidence: "Pre-deployment evaluation excerpt",
+    });
+    vi.mocked(syncThirdPartyEvaluations).mockResolvedValue({
+      ok: true,
+      data: { upserted: 0, verdictsWritten: 0, claimsLinked: 0 },
+    } as never);
+
+    await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+    });
+
+    // span-verify helper was called once per candidate, with the source hash
+    // and timestamp threaded through from the extract.
+    expect(vi.mocked(spanVerifyToInlineSourcing)).toHaveBeenCalledTimes(2);
+    expect(vi.mocked(spanVerifyToInlineSourcing).mock.calls[0][1]).toMatchObject({
+      sourceContentHash: "deadbeef",
+      checkedAt: "2026-04-25T00:00:00.000Z",
+    });
+
+    // toSyncItem received the verdict via opts.sourcing
+    const toSyncOpts = vi.mocked(toSyncItem).mock.calls[0][1];
+    expect(toSyncOpts.sourcing).toMatchObject({
+      verdict: "confirmed",
+      checkedBy: "span-verify-v1",
+    });
+  });
+
+  it("omits sourcing block when span-verify returns null (no checkable fields)", async () => {
+    vi.mocked(ingestUkAisi).mockResolvedValue({
+      evaluator: "uk-aisi",
+      candidates: makeCandidates(1),
+      errors: [],
+    });
+    vi.mocked(extractEvalReport).mockResolvedValue(okExtract as never);
+    vi.mocked(spanVerifyToInlineSourcing).mockReturnValue(null);
+    vi.mocked(syncThirdPartyEvaluations).mockResolvedValue({
+      ok: true,
+      data: { upserted: 0, verdictsWritten: 0, claimsLinked: 0 },
+    } as never);
+
+    await backfillEvaluator({
+      evaluator: "uk-aisi",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+    });
+
+    const toSyncOpts = vi.mocked(toSyncItem).mock.calls[0][1];
+    expect(toSyncOpts.sourcing).toBeNull();
   });
 });

@@ -33,6 +33,7 @@ import { paginatedQuery } from "../shared/paginated-query.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { sqlInList } from "../shared/query-helpers.js";
 import { createSyncHandler } from "./sync-factory.js";
+import { InlineSourcingSchema } from "./sourcing-schema.js";
 
 // ---- Constants ----
 
@@ -139,6 +140,10 @@ const SyncThirdPartyEvalItemSchema = z.object({
   // Inline join-table fan-out. Empty array clears all links for this evaluation;
   // omitted (undefined) leaves existing links untouched (partial sync).
   models: z.array(EvaluationModelLinkSchema).max(50).optional(),
+  // Inline sourcing verdict (QUA-727). When present, the sync handler writes
+  // a source_check_verdicts row atomically with the evaluation. Ingesters
+  // populate this from span-verify output via `spanVerifyToInlineSourcing()`.
+  sourcing: InlineSourcingSchema.optional(),
 });
 
 export type ThirdPartyEvaluationSyncItem = z.infer<typeof SyncThirdPartyEvalItemSchema>;
@@ -398,13 +403,15 @@ const thirdPartyEvaluationsApp = new Hono()
       table: thirdPartyEvaluations,
       batchSchema: SyncThirdPartyEvaluationsBatchSchema,
       entityRefs: ["evaluatorOrgId"],
-      // Strip the `models` field before insert — it goes to the join table
-      // in postUpsert, not the main row. Coerce `extractedAt` from the
+      // Strip the `models` and `sourcing` fields before insert — `models`
+      // goes to the join table in postUpsert; `sourcing` goes to
+      // source_check_verdicts via toVerdict. Coerce `extractedAt` from the
       // wire-format ISO string into a Date so postgres-js can serialize the
       // timestamp column (it calls `.toISOString()` internally).
       toRow: (item, now) => {
-        const { models: _models, extractedAt, ...row } = item;
+        const { models: _models, sourcing: _sourcing, extractedAt, ...row } = item;
         void _models;
+        void _sourcing;
         return {
           ...row,
           extractedAt: extractedAt ? new Date(extractedAt) : null,
@@ -449,6 +456,16 @@ const thirdPartyEvaluationsApp = new Hono()
         sourceTable: "third_party_evaluations",
         sourceId: item.id,
         sourceUrl: item.reportUrl,
+      }),
+      // Inline sourcing verdict (QUA-727). Ingesters that ran span-verify
+      // populate `item.sourcing`; the factory writes source_check_verdicts
+      // atomically with the row. Items without `sourcing` skip this phase.
+      toVerdict: (item) => ({
+        recordType: "third-party-evaluation",
+        recordId: item.id,
+        entityId: item.evaluatorOrgId,
+        sourceUrl: item.reportUrl,
+        sourcing: item.sourcing ?? null,
       }),
       // Synchronize the join-table fan-out inside the same transaction.
       // Items where `models` is undefined leave existing links untouched

@@ -23,6 +23,7 @@ import {
   VALID_RISK_DOMAINS,
   type ThirdPartyEvaluationSyncItem,
 } from "../../apps/wiki-server/src/routes/tablebase/third-party-evaluations.ts";
+import type { InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 export const EXTRACTOR_VERSION = "third-party-eval-extractor@1.0";
 
@@ -338,6 +339,13 @@ interface ToSyncItemOptions {
   models?: ThirdPartyEvaluationSyncItem["models"];
   /** Per-field confidence map produced by span-verify. */
   confidenceMap: Record<string, number>;
+  /**
+   * Inline sourcing verdict derived from span-verify output (QUA-727).
+   * When provided, the sync handler writes a source_check_verdicts row
+   * atomically with the evaluation. Caller builds this via
+   * `spanVerifyToInlineSourcing()`.
+   */
+  sourcing?: InlineSourcing | null;
 }
 
 /**
@@ -378,5 +386,6 @@ export function toSyncItem(
     extractionConfidence: opts.confidenceMap,
     notes: r.notes,
     ...(opts.models !== undefined ? { models: opts.models } : {}),
+    ...(opts.sourcing ? { sourcing: opts.sourcing } : {}),
   };
 }

@@ -12,6 +12,7 @@
  */
 
 import type { ExtractedReport } from "./extract-eval-report.ts";
+import type { InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 export interface VerifyOptions {
   jaccardThreshold?: number;
@@ -181,4 +182,100 @@ export function verifyExtractedReport(
 /** "publishedDate" → "published_date". The extractor emits snake_case excerpt keys. */
 function camelToSnake(s: string): string {
   return s.replace(/[A-Z]/g, (m) => "_" + m.toLowerCase());
+}
+
+// ---------------------------------------------------------------------------
+// Map span-verify output → inline sourcing verdict (QUA-727)
+// ---------------------------------------------------------------------------
+
+/** Identifier written to InlineSourcing.checkedBy for span-verify verdicts. */
+export const SPAN_VERIFY_CHECKER = "span-verify-v1";
+
+/** Confidence threshold for picking an excerpt as evidence. */
+const EVIDENCE_CONFIDENCE_FLOOR = 0.7;
+
+/**
+ * Aggregate per-field span-verify output into a record-level inline sourcing
+ * verdict. Used by ingesters to populate the `sourcing` block on /sync so
+ * source_check_verdicts get written atomically with the row.
+ *
+ * Verdict mapping:
+ *   - confirmed: at least one core field verified, no fields dropped after
+ *     initially being non-null
+ *   - partial:   some fields verified, some dropped (the LLM gave us mixed-
+ *     quality output and span-verify rescued only part of it)
+ *   - unverifiable: nothing verified — every excerpt failed to ground
+ *
+ * Returns null when `verdicts` is empty (the extractor produced no checkable
+ * fields), so the caller can choose to omit `sourcing` entirely rather than
+ * record a meaningless verdict.
+ *
+ * `evidence` is the highest-confidence verified excerpt (>= 0.7) — we'd
+ * rather show no evidence than a fuzzy match.
+ *
+ * `confidence` is the mean of verified-field confidences.
+ */
+export function spanVerifyToInlineSourcing(
+  verify: VerifyResult,
+  options: { sourceContentHash?: string; checkedAt?: string } = {},
+): InlineSourcing | null {
+  // "Real" verdicts are span-checked fields; skipped fields (URL/methodology
+  // bypasses, modelsNamed) carry verified=true with confidence 0.5 but
+  // didn't actually go through span-check, so they don't tell us the
+  // record was meaningfully validated.
+  const checkedFields = Object.entries(verify.verdicts).filter(
+    ([, v]) => v.reason !== "skipped",
+  );
+  const droppedCount = verify.droppedFields.length;
+
+  // Nothing was span-checked AND nothing was dropped — the extractor
+  // returned only skipped fields (URLs, models). We have no signal about
+  // whether the record matches the source, so return null and let the
+  // caller decide whether to omit `sourcing` entirely.
+  if (checkedFields.length === 0 && droppedCount === 0) return null;
+
+  const verifiedCheckedFields = checkedFields.filter(([, v]) => v.verified);
+
+  let verdict: InlineSourcing["verdict"];
+  if (verifiedCheckedFields.length === 0) {
+    verdict = "unverifiable";
+  } else if (droppedCount === 0) {
+    verdict = "confirmed";
+  } else {
+    verdict = "partial";
+  }
+
+  // Mean confidence over span-checked fields (skipped fields excluded so
+  // their fixed 0.5 doesn't drag confirmed verdicts toward the middle).
+  const verifiedConfidences = verifiedCheckedFields
+    .map(([, v]) => v.confidence)
+    .filter((c) => c > 0);
+  const meanConfidence =
+    verifiedConfidences.length > 0
+      ? verifiedConfidences.reduce((a, b) => a + b, 0) /
+        verifiedConfidences.length
+      : 0;
+
+  const excerpts = verify.verifiedReport.excerpts ?? {};
+  let bestExcerpt: string | undefined;
+  let bestExcerptConfidence = 0;
+  for (const [f, fieldVerdict] of verifiedCheckedFields) {
+    if (fieldVerdict.confidence < EVIDENCE_CONFIDENCE_FLOOR) continue;
+    const excerpt = excerpts[camelToSnake(f)] ?? excerpts[f] ?? "";
+    if (excerpt && fieldVerdict.confidence > bestExcerptConfidence) {
+      bestExcerpt = excerpt;
+      bestExcerptConfidence = fieldVerdict.confidence;
+    }
+  }
+
+  const sourcing: InlineSourcing = {
+    verdict,
+    confidence: Number(meanConfidence.toFixed(2)),
+    checkedAt: options.checkedAt ?? new Date().toISOString(),
+    checkedBy: SPAN_VERIFY_CHECKER,
+  };
+  if (bestExcerpt) sourcing.evidence = bestExcerpt;
+  if (options.sourceContentHash) sourcing.sourceContentHash = options.sourceContentHash;
+
+  return sourcing;
 }

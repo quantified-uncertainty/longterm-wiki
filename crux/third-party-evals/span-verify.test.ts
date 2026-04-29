@@ -1,5 +1,10 @@
 import { describe, it, expect } from "vitest";
-import { verifyExcerpt, verifyExtractedReport } from "./span-verify.ts";
+import {
+  verifyExcerpt,
+  verifyExtractedReport,
+  spanVerifyToInlineSourcing,
+  SPAN_VERIFY_CHECKER,
+} from "./span-verify.ts";
 import type { ExtractedReport } from "./extract-eval-report.ts";
 
 const SOURCE = `Pre-deployment evaluation of Anthropic's upgraded Claude 3.5 Sonnet
@@ -140,5 +145,118 @@ describe("verifyExtractedReport", () => {
     const result = verifyExtractedReport(makeReport(), SOURCE);
     expect(result.droppedFields).toHaveLength(0);
     expect(result.ungroundedFields).toHaveLength(0);
+  });
+});
+
+describe("spanVerifyToInlineSourcing", () => {
+  const FIXED_CHECKED_AT = "2026-04-29T00:00:00.000Z";
+
+  it("returns 'confirmed' when every checked field verified", () => {
+    const report = makeReport({
+      title: "Pre-deployment evaluation of Claude 3.5 Sonnet",
+      publishedDate: "2026-01-15",
+      preDeployment: true,
+      findingsSummary:
+        "limited uplift on biological risks and no significant new capability on cyber",
+      excerpts: {
+        title: "Pre-deployment evaluation of Anthropic's upgraded Claude 3.5 Sonnet",
+        published_date: "Published 2026-01-15",
+        pre_deployment: "Pre-deployment evaluation",
+        findings_summary:
+          "limited uplift on biological risks and no significant new capability on cyber",
+      },
+    });
+    const verify = verifyExtractedReport(report, SOURCE);
+    const sourcing = spanVerifyToInlineSourcing(verify, {
+      checkedAt: FIXED_CHECKED_AT,
+      sourceContentHash: "abc123",
+    });
+
+    expect(sourcing).not.toBeNull();
+    expect(sourcing?.verdict).toBe("confirmed");
+    expect(sourcing?.checkedBy).toBe(SPAN_VERIFY_CHECKER);
+    expect(sourcing?.checkedAt).toBe(FIXED_CHECKED_AT);
+    expect(sourcing?.sourceContentHash).toBe("abc123");
+    // Confidence is mean of verified-field confidences (>0).
+    expect(sourcing?.confidence).toBeGreaterThan(0);
+    expect(sourcing?.confidence).toBeLessThanOrEqual(1);
+    // Evidence picks the highest-confidence verified excerpt.
+    expect(sourcing?.evidence).toBeTruthy();
+  });
+
+  it("returns 'partial' when some fields verified but others dropped", () => {
+    const report = makeReport({
+      title: "Pre-deployment evaluation of Claude 3.5 Sonnet",
+      findingsSummary: "Models are catastrophically dangerous",
+      excerpts: {
+        title: "Pre-deployment evaluation of Anthropic's upgraded Claude 3.5 Sonnet",
+        // Hallucinated — not in source
+        findings_summary:
+          "Models are catastrophically dangerous and should be banned immediately",
+      },
+    });
+    const verify = verifyExtractedReport(report, SOURCE);
+    const sourcing = spanVerifyToInlineSourcing(verify, {
+      checkedAt: FIXED_CHECKED_AT,
+    });
+
+    expect(sourcing).not.toBeNull();
+    expect(sourcing?.verdict).toBe("partial");
+  });
+
+  it("returns 'unverifiable' when nothing verified", () => {
+    const report = makeReport({
+      title: "Hallucinated title",
+      findingsSummary: "Hallucinated finding",
+      excerpts: {
+        title: "totally fabricated quantum supremacy claim about Claude",
+        findings_summary: "another fabricated finding about superintelligence",
+      },
+    });
+    const verify = verifyExtractedReport(report, SOURCE);
+    const sourcing = spanVerifyToInlineSourcing(verify, {
+      checkedAt: FIXED_CHECKED_AT,
+    });
+
+    expect(sourcing).not.toBeNull();
+    expect(sourcing?.verdict).toBe("unverifiable");
+    expect(sourcing?.confidence).toBe(0);
+    expect(sourcing?.evidence).toBeUndefined();
+  });
+
+  it("returns null when there are no checkable fields", () => {
+    const verify = verifyExtractedReport(makeReport(), SOURCE);
+    expect(spanVerifyToInlineSourcing(verify)).toBeNull();
+  });
+
+  it("returns null when only skipped fields exist (URL/models only, no span checks)", () => {
+    // Only methodology url + models — both skipped by the verifier
+    // (confidence 0.5, reason 'skipped'). No real span-check happened, so
+    // there's nothing meaningful to record as a verdict.
+    const report = makeReport({
+      methodologyUrl: "https://example.com/methodology",
+      modelsNamed: ["Some Model"],
+      excerpts: {},
+    });
+    const verify = verifyExtractedReport(report, SOURCE);
+    expect(spanVerifyToInlineSourcing(verify)).toBeNull();
+  });
+
+  it("defaults checkedAt to current time when not provided", () => {
+    const report = makeReport({
+      title: "Pre-deployment evaluation of Claude 3.5 Sonnet",
+      excerpts: {
+        title: "Pre-deployment evaluation of Anthropic's upgraded Claude 3.5 Sonnet",
+      },
+    });
+    const verify = verifyExtractedReport(report, SOURCE);
+    const before = Date.now();
+    const sourcing = spanVerifyToInlineSourcing(verify);
+    const after = Date.now();
+
+    expect(sourcing?.checkedAt).toBeDefined();
+    const checkedTs = new Date(sourcing!.checkedAt!).getTime();
+    expect(checkedTs).toBeGreaterThanOrEqual(before);
+    expect(checkedTs).toBeLessThanOrEqual(after);
   });
 });
