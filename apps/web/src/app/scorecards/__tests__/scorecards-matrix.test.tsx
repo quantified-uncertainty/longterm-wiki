@@ -110,6 +110,41 @@ describe("ScorecardsMatrix — source-check dots", () => {
     expect(screen.getByText("B+")).toBeInTheDocument();
   });
 
+  // Cover every TableBase verdict state the unified mapping exposes
+  // (see apps/web/src/components/sourcing/sourcing-status.ts). If the
+  // mapping regresses for one state, this catches it without relying
+  // on the matrix component being aware of every value.
+  const VERDICT_CASES: Array<{ verdict: string; label: RegExp }> = [
+    { verdict: "outdated", label: /Needs attention/i },
+    { verdict: "partial", label: /Needs attention/i },
+    { verdict: "unverifiable", label: /Needs attention/i },
+    { verdict: "not_applicable", label: /Not checked/i },
+  ];
+
+  for (const { verdict, label } of VERDICT_CASES) {
+    it(`renders the right dot for verdict=${verdict}`, () => {
+      render(
+        <ScorecardsMatrix
+          orgRows={[
+            row({
+              fmti: {
+                source: "fmti",
+                scoreNumeric: 50,
+                scoreLetter: null,
+                scoreRaw: "50",
+                publishedAt: "2025-08-01",
+                sourcing: { verdict, checkedAt: null },
+              },
+            }),
+          ]}
+        />,
+      );
+
+      const dot = screen.getByRole("img", { name: /sourcing/i });
+      expect(dot.getAttribute("aria-label")).toMatch(label);
+    });
+  }
+
   it("does not render a dot when the cell is missing (em-dash placeholder)", () => {
     render(<ScorecardsMatrix orgRows={[row({})]} />);
 

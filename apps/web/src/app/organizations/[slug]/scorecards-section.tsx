@@ -35,13 +35,11 @@ interface GradeRow {
   /**
    * Inline sourcing verdict (QUA-839). Null when never checked —
    * `recordVerdictToStatus` then renders an `unchecked` (white) dot.
+   * The wiki-server returns more fields (confidence, sourcesChecked) but
+   * panels only render verdict + checkedAt; widen this only when a tooltip
+   * surface starts using them.
    */
-  sourcing: {
-    verdict: string;
-    confidence: number | null;
-    sourcesChecked: number;
-    checkedAt: string | null;
-  } | null;
+  sourcing: { verdict: string; checkedAt: string | null } | null;
 }
 
 interface ByEntityResponse {

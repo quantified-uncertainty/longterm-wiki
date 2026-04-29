@@ -290,6 +290,10 @@ test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
   test("/organizations/anthropic ?tab=scorecards renders sourcing dots", async ({ page }) => {
     await loadPage(page, "/organizations/anthropic");
 
+    // Positive load assertion — fail loudly if the org page itself broke
+    // (vs. silently passing every "no scorecards tab" branch below).
+    await expect(page.locator("h1, h2").first()).toBeVisible({ timeout: 10000 });
+
     // Click the Scorecards tab if present. The tab is suppressed when the
     // org has no grades, so a missing tab is acceptable in CI builds where
     // wiki-server isn't reachable.
@@ -297,7 +301,6 @@ test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
     if ((await scorecardsTab.count()) === 0) return;
 
     await scorecardsTab.click();
-    await page.waitForTimeout(800);
 
     // Scope to the scorecards panels rather than the whole page — the
     // EntityProfileShell header always renders its own rollup sourcing
@@ -305,10 +308,18 @@ test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
     // per-grade dots. Each scorecard panel is keyed by its publisher
     // ("by Future of Life Institute"), so we look for sourcing dots that
     // live inside one of those panels.
-    const fliPanel = page.locator('article', {
+    //
+    // Use toBeAttached() polling instead of a hardcoded waitForTimeout —
+    // QUA-822 retrospective showed fixed timeouts flake on slow renders
+    // and waste time on fast ones.
+    const fliPanel = page.locator("article", {
       hasText: "Future of Life Institute",
     });
-    if ((await fliPanel.count()) === 0) return; // no FLI grades yet
+    try {
+      await expect(fliPanel.first()).toBeAttached({ timeout: 5000 });
+    } catch {
+      return; // tab present but no FLI grades — acceptable; nothing to assert
+    }
     const dotsInPanel = await fliPanel
       .locator('[role="img"][aria-label^="Sourcing:"]')
       .count();
