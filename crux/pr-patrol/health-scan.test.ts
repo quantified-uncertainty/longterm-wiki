@@ -9,6 +9,7 @@ import {
   checkRatchetDriftForFile,
   readBaselineTotal,
   mapRollupState,
+  rollupFailureIsCancellationOnly,
   DEPLOY_STUCK_MIN_CONSECUTIVE_FAILURES,
   MAIN_CI_RED_STREAK_MIN,
   DEPLOY_STALE_THRESHOLD_HOURS,
@@ -21,6 +22,8 @@ import {
   type CommitStatus,
   type BaselineObservation,
   type RatchetDriftResult,
+  type RollupContext,
+  type CheckConclusion,
 } from './health-scan.ts';
 import type { RatchetConfig } from './ratchet-config.ts';
 
@@ -927,5 +930,204 @@ describe('mapRollupState', () => {
   });
   it('maps null → null', () => {
     expect(mapRollupState(null)).toBeNull();
+  });
+});
+
+// ── mapRollupState — cancellation-only failures (QUA-731) ───────────────────
+
+describe('mapRollupState — cancellation-only rollup failures', () => {
+  function checkRun(conclusion: CheckConclusion): RollupContext {
+    return { __typename: 'CheckRun', conclusion };
+  }
+  function statusCtx(state: 'SUCCESS' | 'FAILURE' | 'ERROR' | 'PENDING' | 'EXPECTED'): RollupContext {
+    return { __typename: 'StatusContext', state };
+  }
+
+  it('maps FAILURE → neutral when contexts contain only success + cancelled checks', () => {
+    // Real QUA-731 scenario: every test/build job passed, but sync-content was
+    // cancelled by its concurrency group, flipping the rollup to FAILURE.
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('SUCCESS'),
+      checkRun('CANCELLED'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('neutral');
+  });
+
+  it('maps FAILURE → failure when any check actually failed alongside a cancellation', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('FAILURE'),
+      checkRun('CANCELLED'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when a check timed out (real failure, not cancellation)', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('TIMED_OUT'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when a check had STARTUP_FAILURE', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('STARTUP_FAILURE'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when a status context is in FAILURE state', () => {
+    const contexts: RollupContext[] = [
+      checkRun('CANCELLED'),
+      statusCtx('FAILURE'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when a status context is in ERROR state', () => {
+    const contexts: RollupContext[] = [
+      checkRun('CANCELLED'),
+      statusCtx('ERROR'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when contexts list is empty (no info — preserve existing behaviour)', () => {
+    expect(mapRollupState('FAILURE', [])).toBe('failure');
+    // Same when called without the contexts arg at all.
+    expect(mapRollupState('FAILURE')).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when contexts contain no cancellations (just real failures)', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('FAILURE'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('maps FAILURE → failure when contexts are all SUCCESS with no cancellation (degenerate — fall through)', () => {
+    // GitHub shouldn't return rollup FAILURE with all-success contexts, but
+    // be defensive: without a cancellation observed we shouldn't reclassify.
+    const contexts: RollupContext[] = [checkRun('SUCCESS'), checkRun('SUCCESS')];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('does not affect SUCCESS / PENDING / NEUTRAL mappings', () => {
+    const cancelledOnly: RollupContext[] = [checkRun('CANCELLED')];
+    // The contexts arg is only consulted when the rollup state is FAILURE/ERROR.
+    expect(mapRollupState('SUCCESS', cancelledOnly)).toBe('success');
+    expect(mapRollupState('PENDING', cancelledOnly)).toBe('pending');
+    expect(mapRollupState('NEUTRAL', cancelledOnly)).toBe('neutral');
+  });
+
+  it('SKIPPED + CANCELLED + SUCCESS still maps to neutral (SKIPPED is not a failure)', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun('SKIPPED'),
+      checkRun('CANCELLED'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('neutral');
+  });
+
+  it('SKIPPED-only (no cancellation) is degenerate — falls through to failure', () => {
+    // GitHub shouldn't return rollup FAILURE without a real failing or
+    // cancelled check, but if it does we should not silently reclassify.
+    const contexts: RollupContext[] = [checkRun('SUCCESS'), checkRun('SKIPPED')];
+    expect(mapRollupState('FAILURE', contexts)).toBe('failure');
+  });
+
+  it('treats null check conclusion as ignorable (in-progress at rollup time)', () => {
+    const contexts: RollupContext[] = [
+      checkRun('SUCCESS'),
+      checkRun(null),
+      checkRun('CANCELLED'),
+    ];
+    expect(mapRollupState('FAILURE', contexts)).toBe('neutral');
+  });
+
+  it('applies the same cancellation logic to ERROR rollup state', () => {
+    const cancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(mapRollupState('ERROR', cancelledOnly)).toBe('neutral');
+
+    const realFailure: RollupContext[] = [checkRun('CANCELLED'), checkRun('FAILURE')];
+    expect(mapRollupState('ERROR', realFailure)).toBe('failure');
+  });
+
+  it('fails closed (returns failure) when contexts are truncated — a real failure could hide past the page', () => {
+    // If GitHub's contexts(first: 100) hit pagination and we only see the
+    // first page, a real failure could be lurking past the cutoff. Treat
+    // FAILURE as failure rather than reclassify based on partial info.
+    const visibleCancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(
+      mapRollupState('FAILURE', visibleCancelledOnly, { contextsTruncated: true }),
+    ).toBe('failure');
+    // Sanity: same context list without truncation still returns neutral.
+    expect(mapRollupState('FAILURE', visibleCancelledOnly)).toBe('neutral');
+  });
+
+  it('contextsTruncated: false behaves the same as omitting the flag', () => {
+    const cancelledOnly: RollupContext[] = [checkRun('SUCCESS'), checkRun('CANCELLED')];
+    expect(
+      mapRollupState('FAILURE', cancelledOnly, { contextsTruncated: false }),
+    ).toBe('neutral');
+  });
+});
+
+describe('rollupFailureIsCancellationOnly', () => {
+  function checkRun(conclusion: CheckConclusion): RollupContext {
+    return { __typename: 'CheckRun', conclusion };
+  }
+  function statusCtx(state: 'SUCCESS' | 'FAILURE' | 'ERROR'): RollupContext {
+    return { __typename: 'StatusContext', state };
+  }
+
+  it('returns false on an empty list (no cancellation observed)', () => {
+    expect(rollupFailureIsCancellationOnly([])).toBe(false);
+  });
+
+  it('returns true when only cancellations and successes are present', () => {
+    expect(
+      rollupFailureIsCancellationOnly([checkRun('SUCCESS'), checkRun('CANCELLED')]),
+    ).toBe(true);
+  });
+
+  it('returns false when there is a real CheckRun failure', () => {
+    expect(
+      rollupFailureIsCancellationOnly([checkRun('CANCELLED'), checkRun('FAILURE')]),
+    ).toBe(false);
+  });
+
+  it('returns false when a StatusContext is in ERROR state', () => {
+    expect(
+      rollupFailureIsCancellationOnly([checkRun('CANCELLED'), statusCtx('ERROR')]),
+    ).toBe(false);
+  });
+
+  it('returns false when nothing was cancelled (degenerate input)', () => {
+    expect(rollupFailureIsCancellationOnly([checkRun('SUCCESS')])).toBe(false);
+  });
+});
+
+// ── evaluateMainCi — concurrency-cancelled commits should not trip red streak ─
+
+describe('evaluateMainCi — cancelled-only commits do not count as failures', () => {
+  it('does NOT trip main-ci-red when 4 consecutive commits are cancelled-only (real QUA-731 burst)', () => {
+    // Simulates what happens when 5 PRs merge in rapid succession: each
+    // commit's sync-content is cancelled by the next, so the rollup is
+    // FAILURE even though every test/build job succeeded. Pre-fix this
+    // would trip a 4-streak; post-fix the commits map to neutral.
+    const commits: CommitStatus[] = [
+      commit({ sha: 'a', conclusion: 'neutral' }),
+      commit({ sha: 'b', conclusion: 'neutral' }),
+      commit({ sha: 'c', conclusion: 'neutral' }),
+      commit({ sha: 'd', conclusion: 'neutral' }),
+    ];
+    const result = evaluateMainCi(commits);
+    expect(result.healthy).toBe(true);
+    expect(result.failingCount).toBe(0);
   });
 });

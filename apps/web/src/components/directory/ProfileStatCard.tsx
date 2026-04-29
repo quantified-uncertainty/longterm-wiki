@@ -36,6 +36,7 @@ export function ProfileStatCard({
     return (
       <Link
         href={href}
+        data-testid="stat-card"
         className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4 hover:border-primary/30 hover:shadow-md transition-all"
       >
         {content}
@@ -44,7 +45,10 @@ export function ProfileStatCard({
   }
 
   return (
-    <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4">
+    <div
+      data-testid="stat-card"
+      className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
+    >
       {content}
     </div>
   );

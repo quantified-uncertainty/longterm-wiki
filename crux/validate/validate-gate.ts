@@ -26,7 +26,6 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
- *   --force        Override soft-enforcement blocks (e.g., sourcing coverage)
  *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
  *                    unified-blocking + yaml-schema (no stamp cache written)
  *
@@ -37,16 +36,19 @@
 
 import { execSync, execFileSync, spawn, type ChildProcess } from 'child_process';
 import { existsSync, readFileSync, writeFileSync } from 'fs';
-import { join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
+import { fileURLToPath } from 'url';
 import { config as dotenvConfig } from 'dotenv';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 
 // Load .env so child validators inherit PROD_LONGTERMWIKI_SERVER_URL etc.
 // Without this, validators that fetch from wiki-server fall back to the local
 // snapshot (often stale), which manifests as gate-baseline-drift between
-// local and CI. See QUA-755.
+// local and CI. See QUA-755. Falls back to fileURLToPath(import.meta.url) when
+// import.meta.dirname is undefined (older tsx CJS transforms).
+const HERE = import.meta.dirname ?? dirname(fileURLToPath(import.meta.url));
 dotenvConfig({
-  path: resolve(import.meta.dirname!, '..', '..', '.env'),
+  path: resolve(HERE, '..', '..', '.env'),
   quiet: true,
   override: false,
 });
@@ -72,7 +74,6 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const FULL_GATE: boolean = args.includes('--full-gate');
 const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
 const NO_CACHE: boolean = args.includes('--no-cache') || FULL_GATE || CI_MODE;
-const FORCE_MODE: boolean = args.includes('--force');
 const SCOPE: string = args.find(a => a.startsWith('--scope='))?.split('=')[1] || '';
 const CONTENT_ONLY: boolean = SCOPE === 'content';
 
@@ -385,6 +386,16 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-prompt-escaping.ts'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'verdict-priority',
+    name: 'Verdict severity priority is canonical (QUA-429)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-verdict-priority.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new ad-hoc verdict priority maps from drifting from
+    // SOURCE_CHECK_VERDICT_PRIORITY in verdict-styles.ts. Distinct priorities
+    // (recheck scheduling, curation order) opt out via `// verdict-priority-ok`.
   },
   {
     id: 'dangerous-patterns',
@@ -702,22 +713,6 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
     // Advisory: detects when the same entity has different dates (founding,
     // departure, employment ranges) stated across multiple wiki pages.
-    advisory: true,
-    emitOutputInCi: true,
-  },
-  {
-    id: 'sourcing-coverage',
-    name: 'TableBase sourcing coverage',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-sourcing-coverage.ts',
-      // Advisory until existing unverified manifests are backfilled (Discussion #3875).
-      // Switch to --enforcement=soft after personnel/grants backfill is complete.
-      '--enforcement=advisory',
-      ...(FORCE_MODE ? ['--force'] : [])],
-    cwd: PROJECT_ROOT,
-    // Advisory for now — warns but doesn't block. Will become soft enforcement
-    // (blocking, --force override) once backfill coverage reaches >50% for
-    // personnel and grants. Hard-enforced tables (Phase 5) are always blocking.
     advisory: true,
     emitOutputInCi: true,
   },

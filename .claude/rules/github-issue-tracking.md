@@ -75,9 +75,13 @@ pnpm crux gh issues done <ISSUE_NUM> --pr=<PR_URL>
 # Search first:
 pnpm crux linear search "your topic here"
 
-# Create:
-pnpm crux linear create "Descriptive title" --description="What's wrong and why it matters"
+# Create (--project is required, or --parent inherits one):
+pnpm crux linear create "Descriptive title" \
+  --description="What's wrong and why it matters" \
+  --project="<Project Name>"
 ```
+
+The CLI refuses with exit 2 if `--project` is omitted and no parent inherits one. See `.claude/rules/linear-project-ownership.md` to pick the right project. Bypass with `--allow-no-project` only when the issue genuinely has no home.
 
 Do NOT use `gh issue create` or `pnpm crux gh issues create` for new issues. See `.claude/rules/proactive-issue-filing.md` for when and how to file.
 

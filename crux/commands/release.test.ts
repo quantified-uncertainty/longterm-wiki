@@ -5,6 +5,7 @@ import {
   generateReleaseBody,
   evaluateReleasePreflight,
   fetchSubPrDeployTasks,
+  commitShasInReleaseDiff,
 } from './release.ts';
 import type { DeployHealthStatus } from '../lib/pr-analysis/deploy-status.ts';
 
@@ -315,13 +316,14 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
     };
   }
 
-  it('returns empty array when the release diff is empty (nothing to ship)', async () => {
+  it('returns empty tasks when the release diff is empty (nothing to ship)', async () => {
     const api = vi.fn();
-    const tasks = await fetchSubPrDeployTasks({
+    const result = await fetchSubPrDeployTasks({
       releaseDiffShas: new Set(),
       api: api as never,
     });
-    expect(tasks).toEqual([]);
+    expect(result.tasks).toEqual([]);
+    expect(result.truncated).toBe(false);
     // No PR pagination should occur — empty diff is a fast no-op.
     expect(api).not.toHaveBeenCalled();
   });
@@ -341,7 +343,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
       throw new Error(`Unexpected endpoint: ${endpoint}`);
     });
 
-    const tasks = await fetchSubPrDeployTasks({
+    const { tasks, truncated } = await fetchSubPrDeployTasks({
       releaseDiffShas,
       api: api as never,
     });
@@ -359,6 +361,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
     );
     // No tasks from PR #200 (already shipped).
     expect(tasks.some((t) => t.includes('PR #200'))).toBe(false);
+    expect(truncated).toBe(false);
   });
 
   it('drops PRs with null merge_commit_sha defensively', async () => {
@@ -371,7 +374,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
       prFixture({ number: 101, sha: null }),
     ]);
 
-    const tasks = await fetchSubPrDeployTasks({
+    const { tasks } = await fetchSubPrDeployTasks({
       releaseDiffShas,
       api: api as never,
     });
@@ -387,7 +390,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
       prFixture({ number: 101, body: 'A regular PR body with no deploy section.' }),
     ]);
 
-    const tasks = await fetchSubPrDeployTasks({
+    const { tasks } = await fetchSubPrDeployTasks({
       releaseDiffShas,
       api: api as never,
     });
@@ -410,7 +413,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
       prFixture({ number: 100, body: partiallyCheckedBody }),
     ]);
 
-    const tasks = await fetchSubPrDeployTasks({
+    const { tasks } = await fetchSubPrDeployTasks({
       releaseDiffShas,
       api: api as never,
     });
@@ -431,7 +434,7 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
     );
     const api = vi.fn(async () => allPrs);
 
-    const tasks = await fetchSubPrDeployTasks({
+    const { tasks } = await fetchSubPrDeployTasks({
       releaseDiffShas,
       api: api as never,
     });
@@ -445,5 +448,115 @@ describe('fetchSubPrDeployTasks (QUA-756)', () => {
     }
     // Each new PR contributes 2 unchecked tasks → 4 total.
     expect(tasks).toHaveLength(4);
+  });
+
+  it('propagates truncation signal from fetchMergedPrsInWindow (silent-drop guard)', async () => {
+    // If GitHub pagination hits its page cap, PRs in the release diff but
+    // past the cap are silently omitted from `tasks`. We MUST surface this
+    // upstream so generateReleaseBody emits an operator-facing warning —
+    // otherwise this is the same silent-drop class QUA-450 hardened against.
+    //
+    // To trip truncation: every page must be a FULL page (length === perPage,
+    // default 100) and all updated_at must be inside the cutoff window. Then
+    // fetchMergedPrsInWindow keeps paging until maxPages (default 10) and
+    // exits the loop with truncated=true.
+    const releaseDiffShas = new Set(['sha-1']);
+    const fullPage = Array.from({ length: 100 }, (_, i) =>
+      prFixture({ number: i + 1, mergedDaysAgo: 1 }),
+    );
+    const api = vi.fn(async () => fullPage);
+
+    const { tasks, truncated } = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+      lookbackDays: 365,
+    });
+
+    expect(tasks.length).toBeGreaterThan(0); // PR #1 is in the diff
+    expect(truncated).toBe(true);
+    // Sanity check we actually exhausted pagination, not just one call.
+    expect(api).toHaveBeenCalledTimes(10);
+  });
+
+  it('uses 60-day default lookback when not specified', async () => {
+    // The default lookback is 60 days. Verify by feeding in a 50d-old PR
+    // (kept) and a 70d-old PR (cut by fetchMergedPrsInWindow's merged_at
+    // filter) and omitting `lookbackDays` so the default applies.
+    const releaseDiffShas = new Set(['sha-100', 'sha-101']);
+    const api = vi.fn(async () => [
+      prFixture({ number: 100, mergedDaysAgo: 50 }),
+      prFixture({ number: 101, mergedDaysAgo: 70 }),
+    ]);
+
+    const { tasks } = await fetchSubPrDeployTasks({
+      releaseDiffShas,
+      api: api as never,
+      // intentionally omit lookbackDays — exercises the SUB_PR_LOOKBACK_DAYS default
+    });
+
+    expect(tasks.some((t) => t.includes('PR #100'))).toBe(true);
+    expect(tasks.some((t) => t.includes('PR #101'))).toBe(false);
+  });
+});
+
+// ── commitShasInReleaseDiff (QUA-756) ───────────────────────────────────────
+
+describe('commitShasInReleaseDiff (QUA-756)', () => {
+  it('returns parsed SHA Set when origin/production and origin/main both exist', () => {
+    const gitFn = vi.fn((..._args: string[]): string => {
+      const [cmd, ...rest] = _args;
+      if (cmd === 'rev-parse') return 'abc123';
+      if (cmd === 'log' && rest[0] === 'origin/production..origin/main') {
+        return 'sha1\nsha2\nsha3';
+      }
+      throw new Error(`Unexpected git invocation: ${_args.join(' ')}`);
+    });
+
+    const result = commitShasInReleaseDiff(gitFn);
+    expect(result).toEqual(new Set(['sha1', 'sha2', 'sha3']));
+    // rev-parse + log = 2 calls.
+    expect(gitFn).toHaveBeenCalledTimes(2);
+  });
+
+  it('returns empty Set when origin/production does not exist (first deploy / fresh clone)', () => {
+    // git rev-parse --verify exits non-zero → execFileSync throws. We must
+    // NOT swallow this with a generic warning that hides the missing branch.
+    // Instead the caller should treat it as "no release diff" — same semantics
+    // as a legitimately empty diff.
+    const gitFn = vi.fn((..._args: string[]): string => {
+      if (_args[0] === 'rev-parse') {
+        throw new Error("fatal: Needed a single revision");
+      }
+      throw new Error('log should not run when production missing');
+    });
+
+    const result = commitShasInReleaseDiff(gitFn);
+    expect(result).toEqual(new Set());
+    // log MUST NOT be invoked after rev-parse fails.
+    expect(gitFn).toHaveBeenCalledTimes(1);
+    expect(gitFn).toHaveBeenCalledWith('rev-parse', '--verify', 'origin/production');
+  });
+
+  it('returns empty Set when production and main are at the same commit (legitimately empty diff)', () => {
+    const gitFn = vi.fn((..._args: string[]): string => {
+      if (_args[0] === 'rev-parse') return 'abc123';
+      if (_args[0] === 'log') return ''; // empty diff
+      throw new Error('unexpected');
+    });
+
+    const result = commitShasInReleaseDiff(gitFn);
+    expect(result).toEqual(new Set());
+  });
+
+  it('handles trailing newlines in git log output', () => {
+    const gitFn = vi.fn((..._args: string[]): string => {
+      if (_args[0] === 'rev-parse') return 'abc123';
+      if (_args[0] === 'log') return 'sha1\nsha2\n'; // trailing newline
+      throw new Error('unexpected');
+    });
+
+    const result = commitShasInReleaseDiff(gitFn);
+    expect(result).toEqual(new Set(['sha1', 'sha2']));
+    expect(result.size).toBe(2); // no empty-string entry from trailing newline
   });
 });

@@ -1513,6 +1513,20 @@
       "when": 1787876700000,
       "tag": "0216_qua_753_widen_audit_log_record_id",
       "breakpoints": true
+    },
+    {
+      "idx": 217,
+      "version": "7",
+      "when": 1787876800000,
+      "tag": "0217_qua_791_evidence_relevance_score",
+      "breakpoints": true
+    },
+    {
+      "idx": 218,
+      "version": "7",
+      "when": 1787876900000,
+      "tag": "0218_qua_526_entities_status_check",
+      "breakpoints": true
     }
   ]
 }

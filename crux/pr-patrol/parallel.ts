@@ -9,10 +9,9 @@
  * tracking, and claim labels. New subcommand: `crux pr-patrol parallel`.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, statSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
-import { statSync } from 'fs';
 import { tryRebaseAndVerify } from './rebase-verify.ts';
 import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';

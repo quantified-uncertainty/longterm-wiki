@@ -234,21 +234,32 @@ describe('linear create', () => {
     expect(r.output).toContain('Usage');
   });
 
-  it('creates an issue with just a title', async () => {
-    const r = await commands.create(['My', 'ticket'], { ci: true });
-    expect(r.exitCode).toBe(0);
-    expect(createIssueMock).toHaveBeenCalledWith({
-      title: 'My ticket',
-      description: '',
-      priority: undefined,
-      parentId: undefined,
-      projectId: undefined,
-    });
-    expect(r.output).toContain('QUA-999');
+  it('creates an issue with just a title (when --allow-no-project is set)', async () => {
+    // Capture stderr — the no-project warning prints there even on bypass.
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(['My', 'ticket'], { ci: true, allowNoProject: true });
+      expect(r.exitCode).toBe(0);
+      expect(createIssueMock).toHaveBeenCalledWith({
+        title: 'My ticket',
+        description: '',
+        priority: undefined,
+        parentId: undefined,
+        projectId: undefined,
+      });
+      expect(r.output).toContain('QUA-999');
+    } finally {
+      stderrSpy.mockRestore();
+    }
   });
 
-  it('resolves --parent QUA-NNN to the parent UUID', async () => {
-    getIssueMock.mockResolvedValueOnce({ ...mockIssue, id: 'parent-uuid', title: 'Epic' });
+  it('resolves --parent QUA-NNN to the parent UUID (with project on parent)', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Epic',
+      project: { id: 'parent-project-uuid', name: 'Some Project' },
+    });
     const r = await commands.create(['Child ticket'], { ci: true, parent: 'QUA-184' });
     expect(r.exitCode).toBe(0);
     expect(getIssueMock).toHaveBeenCalledWith('QUA-184');
@@ -366,22 +377,31 @@ describe('linear create', () => {
     expect(r.output).not.toContain('inherited from parent');
   });
 
-  it('does not set a project when parent has none and --project is omitted', async () => {
+  it('does not set a project when parent has none and --allow-no-project is set', async () => {
     getIssueMock.mockResolvedValueOnce({
       ...mockIssue,
       id: 'parent-uuid',
       title: 'Epic',
       project: null,
     });
-    const r = await commands.create(['Child'], { ci: true, parent: 'QUA-408' });
-    expect(r.exitCode).toBe(0);
-    expect(createIssueMock).toHaveBeenCalledWith(
-      expect.objectContaining({
-        parentId: 'parent-uuid',
-        projectId: undefined,
-      }),
-    );
-    expect(r.output).not.toContain('inherited from parent');
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(['Child'], {
+        ci: true,
+        parent: 'QUA-408',
+        allowNoProject: true,
+      });
+      expect(r.exitCode).toBe(0);
+      expect(createIssueMock).toHaveBeenCalledWith(
+        expect.objectContaining({
+          parentId: 'parent-uuid',
+          projectId: undefined,
+        }),
+      );
+      expect(r.output).not.toContain('inherited from parent');
+    } finally {
+      stderrSpy.mockRestore();
+    }
   });
 
   // ── Ticket-sizing red flags (QUA-575) ────────────────────────────────────
@@ -404,20 +424,29 @@ describe('linear create', () => {
     expect(createIssueMock).not.toHaveBeenCalled();
   });
 
-  it('does not warn on ordinary tickets', async () => {
-    const r = await commands.create(['Fix typo in README'], { ci: true });
-    expect(r.exitCode).toBe(0);
-    expect(r.output).not.toContain('red flag');
-    expect(createIssueMock).toHaveBeenCalled();
+  it('does not warn on ordinary tickets (when --allow-no-project is set)', async () => {
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(['Fix typo in README'], {
+        ci: true,
+        allowNoProject: true,
+      });
+      expect(r.exitCode).toBe(0);
+      expect(r.output).not.toContain('red flag');
+      expect(createIssueMock).toHaveBeenCalled();
+    } finally {
+      stderrSpy.mockRestore();
+    }
   });
 
   it('proceeds when --allow-big is set despite red flags', async () => {
     // Capture stderr so the test environment doesn't print the warning.
+    // Set allowNoProject too — we're testing red-flag bypass, not no-project.
     const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
     try {
       const r = await commands.create(
         ['Phase 2: migrate 5,000 rows across `foo`, `bar`, `baz`'],
-        { ci: true, allowBig: true },
+        { ci: true, allowBig: true, allowNoProject: true },
       );
       expect(r.exitCode).toBe(0);
       expect(createIssueMock).toHaveBeenCalled();
@@ -456,6 +485,95 @@ describe('linear create', () => {
     expect(parsed.flags[0].kind).toBe('phase-or-wave');
     expect(parsed.hint).toContain('--allow-big');
     expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  // ── Orphan prevention (no-project refusal) ────────────────────────────────
+
+  it('refuses creation with exit=2 when --project is omitted and no parent', async () => {
+    const r = await commands.create(['Ordinary ticket'], { ci: true });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('without a project');
+    expect(r.output).toContain('--allow-no-project');
+    expect(r.output).toContain('--project=');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('refuses when --parent is given but the parent has no project', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Orphan epic',
+      project: null,
+    });
+    const r = await commands.create(['Child of orphan parent'], {
+      ci: true,
+      parent: 'QUA-408',
+    });
+    expect(r.exitCode).toBe(2);
+    expect(r.output).toContain('without a project');
+    expect(r.output).toContain('QUA-408');
+    expect(r.output).toContain('no project to inherit');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('emits structured JSON on no-project refusal when --json is set', async () => {
+    const r = await commands.create(['Ordinary ticket'], {
+      ci: true,
+      json: true,
+    });
+    expect(r.exitCode).toBe(2);
+    const parsed = JSON.parse(r.output);
+    expect(parsed.error).toBe('no-project');
+    expect(parsed.hint).toContain('--project');
+    expect(parsed.hint).toContain('--allow-no-project');
+    expect(createIssueMock).not.toHaveBeenCalled();
+  });
+
+  it('proceeds when --allow-no-project bypass is set, prints warning to stderr', async () => {
+    const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+    try {
+      const r = await commands.create(['Ordinary ticket'], {
+        ci: true,
+        allowNoProject: true,
+      });
+      expect(r.exitCode).toBe(0);
+      expect(createIssueMock).toHaveBeenCalled();
+      // Warning was printed to stderr so consumers see the bypass.
+      const stderrContent = stderrSpy.mock.calls.map((c) => String(c[0])).join('');
+      expect(stderrContent).toContain('without a project');
+    } finally {
+      stderrSpy.mockRestore();
+    }
+  });
+
+  it('does not refuse when --project is set', async () => {
+    getProjectMock.mockResolvedValueOnce({
+      id: 'project-uuid',
+      name: 'Automation & Infrastructure',
+    });
+    const r = await commands.create(['Ordinary ticket'], {
+      ci: true,
+      project: 'Automation & Infrastructure',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).not.toContain('without a project');
+    expect(createIssueMock).toHaveBeenCalled();
+  });
+
+  it('does not refuse when --parent has a project (inherits)', async () => {
+    getIssueMock.mockResolvedValueOnce({
+      ...mockIssue,
+      id: 'parent-uuid',
+      title: 'Epic',
+      project: { id: 'parent-project-uuid', name: 'Data Model Unwind' },
+    });
+    const r = await commands.create(['Child ticket'], {
+      ci: true,
+      parent: 'QUA-408',
+    });
+    expect(r.exitCode).toBe(0);
+    expect(r.output).not.toContain('without a project');
+    expect(createIssueMock).toHaveBeenCalled();
   });
 });
 

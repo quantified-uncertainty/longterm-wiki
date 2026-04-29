@@ -38,7 +38,7 @@ export function summarizeRecordForManifest(
     if (typeof s.confidence === 'number') summary.confidence = s.confidence;
   } else {
     // Backward-compat: existing manifests use 'none' for absent sourcing;
-    // validate-sourcing-coverage and PR reviewers both rely on this sentinel.
+    // PR reviewers rely on this sentinel for the audit trail.
     summary.verdict = 'none';
   }
 

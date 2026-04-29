@@ -137,3 +137,4 @@ data/archive/
 # Only metrics.json + audit doc are committed; corpus + per-item results rebuild on demand
 crux/calibration/data/corpus.json
 crux/calibration/data/results-*.json
+.claude/scratch/

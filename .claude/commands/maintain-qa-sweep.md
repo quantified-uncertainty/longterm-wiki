@@ -324,7 +324,7 @@ Include the coverage table in the report.
 
 - **File one Linear issue per finding** (P0, P1, and P2). Do not batch unrelated issues into umbrella issues.
 - Closely related findings (e.g., 5 entities with the same data problem) may be grouped into one issue.
-- Use `pnpm crux linear create "title" --description="..."` for each.
+- Use `pnpm crux linear create "title" --description="..." --project="<Project Name>"` for each (`--project` is required; see `.claude/rules/linear-project-ownership.md`).
 - **Expected volume:** 5-15 issues per deep sweep is normal.
 - **Do NOT skip P1 and P2 filing.** Every confirmed finding must become a Linear issue. If you compiled it into the report, file it.
 

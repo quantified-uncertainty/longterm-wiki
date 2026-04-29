@@ -1,0 +1,153 @@
+{
+  "publishedAt": "2025-10-01",
+  "waveLabel": "October 2025",
+  "sourceUrl": "https://ratings.safer-ai.org/comparison/",
+  "methodologyUrl": "https://ratings.safer-ai.org/methodology/",
+  "license": "CC BY-SA 4.0",
+  "notes": null,
+  "isLatest": true,
+  "dimensions": [
+    {
+      "slug": "risk-identification",
+      "label": "Risk Identification",
+      "weight": 0.25
+    },
+    {
+      "slug": "risk-analysis-evaluation",
+      "label": "Risk Analysis and Evaluation",
+      "weight": 0.25
+    },
+    {
+      "slug": "risk-treatment",
+      "label": "Risk Treatment",
+      "weight": 0.25
+    },
+    {
+      "slug": "risk-governance",
+      "label": "Risk Governance",
+      "weight": 0.25
+    }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "34%",
+        "risk-identification": "26%",
+        "risk-analysis-evaluation": "21%",
+        "risk-treatment": "41%",
+        "risk-governance": "49%"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "33%",
+        "risk-identification": "32%",
+        "risk-analysis-evaluation": "28%",
+        "risk-treatment": "38%",
+        "risk-governance": "35%"
+      }
+    },
+    {
+      "org": "G42",
+      "scores": {
+        "overall": "24%",
+        "risk-identification": "17%",
+        "risk-analysis-evaluation": "18%",
+        "risk-treatment": "24%",
+        "risk-governance": "38%"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "overall": "21%",
+        "risk-identification": "23%",
+        "risk-analysis-evaluation": "27%",
+        "risk-treatment": "20%",
+        "risk-governance": "15%"
+      }
+    },
+    {
+      "org": "DeepMind",
+      "scores": {
+        "overall": "20%",
+        "risk-identification": "22%",
+        "risk-analysis-evaluation": "21%",
+        "risk-treatment": "27%",
+        "risk-governance": "12%"
+      }
+    },
+    {
+      "org": "Microsoft",
+      "scores": {
+        "overall": "18%",
+        "risk-identification": "7%",
+        "risk-analysis-evaluation": "13%",
+        "risk-treatment": "28%",
+        "risk-governance": "25%"
+      }
+    },
+    {
+      "org": "Amazon",
+      "scores": {
+        "overall": "18%",
+        "risk-identification": "11%",
+        "risk-analysis-evaluation": "16%",
+        "risk-treatment": "23%",
+        "risk-governance": "21%"
+      }
+    },
+    {
+      "org": "xAI",
+      "scores": {
+        "overall": "16%",
+        "risk-identification": "22%",
+        "risk-analysis-evaluation": "21%",
+        "risk-treatment": "5%",
+        "risk-governance": "16%"
+      }
+    },
+    {
+      "org": "NVIDIA",
+      "scores": {
+        "overall": "16%",
+        "risk-identification": "14%",
+        "risk-analysis-evaluation": "11%",
+        "risk-treatment": "14%",
+        "risk-governance": "23%"
+      }
+    },
+    {
+      "org": "Magic",
+      "scores": {
+        "overall": "11%",
+        "risk-identification": "12%",
+        "risk-analysis-evaluation": "14%",
+        "risk-treatment": "8%",
+        "risk-governance": "10%"
+      }
+    },
+    {
+      "org": "Naver",
+      "scores": {
+        "overall": "10%",
+        "risk-identification": "7%",
+        "risk-analysis-evaluation": "7%",
+        "risk-treatment": "8%",
+        "risk-governance": "18%"
+      }
+    },
+    {
+      "org": "Cohere",
+      "scores": {
+        "overall": "8%",
+        "risk-identification": "7%",
+        "risk-analysis-evaluation": "5%",
+        "risk-treatment": "12%",
+        "risk-governance": "7%"
+      }
+    }
+  ]
+}

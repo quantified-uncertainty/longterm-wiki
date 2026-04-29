@@ -18,11 +18,22 @@ Applies to sessions that write or modify code (not content-only MDX/YAML edits).
 - **Mock fidelity**: Test mocks for the same DB table must share a single in-memory store. Don't create parallel mock stores (e.g., separate `suggestResourceStore`) for different endpoints that hit the same table. When a table pair is accessed from many mock branches, extract a typed store helper — `apps/wiki-server/src/__tests__/_helpers/resources-store.ts` (QUA-604) is the canonical pattern: one class encapsulates `resources` + `resource_citations` with `seedResource` / `seedCitation` for tests and `setResource` / `insertCitation` / `joinCitationsByPage` for the dispatcher.
 
 **Bug fixes — TDD workflow:**
-1. Write a failing test that reproduces the bug FIRST
-2. Confirm the test fails
-3. Fix the bug
-4. Confirm the test passes
-5. Do NOT edit code without a reproducing test
+
+For tickets claiming a prod symptom ("X is leaking on /<page>", "Y returns wrong value", "Z is broken in production"), the first step is to reproduce the symptom against current prod, NOT to write code:
+
+0. **Reproduce the symptom against current prod first.** Run the existing acceptance test that would catch it (render-audit, e2e spec, integration test, manual browser check). If it passes, the bug is already fixed by an earlier change — halt, comment on the ticket with the test result, and close it. Do not proceed to write a fix. Tickets get fixed between filing and dispatch all the time; verify the symptom still exists before spending compute on it.
+
+Then for any bug fix:
+
+1. Write a failing unit test that reproduces the bug.
+2. Confirm the test fails.
+3. Fix the bug.
+4. Confirm the test passes.
+5. Do NOT edit code without a reproducing test.
+
+Reference incident: QUA-684 / PR #4650 (Apr 2026). Ticket claimed `/organizations/openai` Database tab still leaked `20240601000000`. The render-audit had passed since QUA-675 shipped 4 days earlier — running `PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com npx playwright test e2e/render-audit.spec.ts -g openai` would have caught this in 10 seconds. PR was written, reviewed, and closed without merging.
+
+**Latent-class framing is a yellow flag.** If your fix's stated purpose is "close a latent class flagged in the issue" rather than "fix this observed instance," halt and require evidence the class has fired beyond the original (possibly already-fixed) instance. PR descriptions like "QUA-X healed the original symptom on prod. This PR closes the latent class flagged in the issue" are the agent telling you, in plain English, that the observable bug is gone and the rest is speculative. That's the moment to stop and check current data — not to ship coverage for hypothetical scenarios. Same logic as `proactive-github-filing.md` § "Hypothetical problems you have not observed," applied to fixes rather than filings.
 
 ## Simplicity
 

@@ -283,7 +283,8 @@ async function discoverRecordsNeedingCuration(
     }
   }
 
-  // Priority: unchecked first, then unverifiable, partial, outdated, contradicted
+  // verdict-priority-ok: curation order (unchecked first, needs review most),
+  // intentionally distinct from canonical severity rollup.
   const priority: Record<string, number> = {
     unchecked: 0,
     unverifiable: 1,

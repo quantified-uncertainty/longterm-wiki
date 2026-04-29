@@ -73,7 +73,7 @@ describe("transformEntity", () => {
       website: "https://anthropic.com",
       tags: ["ai-safety", "frontier-lab"],
       clusters: ["ai-labs"],
-      status: "active",
+      status: "published",
       lastUpdated: "2025-06",
       customFields: [{ label: "Founded", value: "2021" }],
       relatedEntries: [{ id: "openai", type: "organization" }],
