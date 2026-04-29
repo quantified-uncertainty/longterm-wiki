@@ -42,6 +42,7 @@ import {
   getAbandonedSha,
   getProcessedBlockingCommentIds,
   isAbandoned,
+  isHealthyState,
   isPendingCICheck,
   isRecentlyProcessed,
   JSONL_FILE,
@@ -292,6 +293,7 @@ export function detectAllPrIssuesFromNodes(
  */
 export const STUCK_CYCLE_THRESHOLD = 3;
 
+
 /**
  * Collapse the status-check rollup into a single conclusion string suitable
  * for fingerprinting. We want something that changes when a previously-failing
@@ -387,16 +389,22 @@ export async function applyStuckCycleDetection(
       log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     });
 
-    if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+    // A healthy state (mergeable/unknown + CI not failing + zero blocking
+    // comments) means the PR is awaiting human approval, not stuck on a
+    // fixable problem. Skip the 'stuck' tag for those — hasExceededMaxAttempts
+    // still catches dispatch churn on residual soft issues.
+    if (stuckCycles >= 2) {
       pr.stuckCycles = stuckCycles;
       pr.stuckReason = fingerprint;
-      if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
-      log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
-    } else if (stuckCycles >= 2) {
-      // Not yet at threshold but trending — annotate so the fix prompt can
-      // warn the agent.
-      pr.stuckCycles = stuckCycles;
-      pr.stuckReason = fingerprint;
+
+      if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+        if (isHealthyState({ mergeable, rollupConclusion, blockingCommentCount })) {
+          log(`  ${cl.dim}PR #${pr.number}: in healthy state (${fingerprint}) for ${stuckCycles} cycles — awaiting human approval${cl.reset}`);
+        } else {
+          if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
+          log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
+        }
+      }
     }
   }
 }

@@ -128,31 +128,85 @@ const cl = getColors();
 
 import { join as joinPath } from 'path';
 
-const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
+export const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
 
-function writePidFile(): void {
+function removePidFile(file: string = PID_FILE): void {
   try {
-    writeFileSync(PID_FILE, String(process.pid));
-  } catch { /* best-effort */ }
-}
-
-function removePidFile(): void {
-  try {
-    unlinkSync(PID_FILE);
-  } catch { /* best-effort */ }
+    unlinkSync(file);
+  } catch (e) {
+    // ENOENT is expected when the file is already gone (e.g. another shutdown
+    // path beat us to it). Anything else (EACCES, EPERM) is a real surprise
+    // worth surfacing.
+    const code = (e as NodeJS.ErrnoException).code;
+    if (code !== 'ENOENT') {
+      console.error(`${cl.yellow}Warning: could not remove PID file ${file}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+    }
+  }
 }
 
 /** Read the PID of a running patrol daemon, or null if none. */
-export function getDaemonPid(): number | null {
+export function getDaemonPid(file: string = PID_FILE): number | null {
   try {
-    const pid = parseInt(readFileSync(PID_FILE, 'utf-8').trim(), 10);
+    const pid = parseInt(readFileSync(file, 'utf-8').trim(), 10);
     if (isNaN(pid)) return null;
-    // Check if process is alive
+    // Check if process is alive. Note: this only verifies _some_ process owns
+    // the PID — after a crash + enough new PID allocations, the OS will reuse
+    // the dead daemon's PID for an unrelated process. Acceptable failure mode:
+    // the new daemon refuses to start until the user clears the PID file.
     process.kill(pid, 0);
     return pid;
   } catch {
     return null;
   }
+}
+
+/**
+ * Atomically acquire the PID file. Uses `flag: 'wx'` (exclusive create) so
+ * two simultaneous patrol launches can't both succeed: only one wins the
+ * create, the other sees EEXIST and either bails (live owner) or reclaims
+ * (stale owner). Bounded retry handles the rare race where two processes
+ * both detect a stale file at the same instant.
+ *
+ * Returns `{ ok: false, existingPid }` when another live process owns the
+ * file. Returns `{ ok: true }` only after this process's PID has been
+ * persisted to disk — never lies about acquisition.
+ */
+export function acquirePidFile(
+  file: string = PID_FILE,
+): { ok: true } | { ok: false; existingPid: number } {
+  // Bounded retry — stale-PID reclamation can race with a peer doing the
+  // same. After two attempts we surface failure rather than spin.
+  for (let i = 0; i < 2; i++) {
+    try {
+      writeFileSync(file, String(process.pid), { flag: 'wx' });
+      return { ok: true };
+    } catch (e) {
+      const code = (e as NodeJS.ErrnoException).code;
+      if (code !== 'EEXIST') {
+        // EACCES, ENOSPC, EROFS, etc. — we couldn't write, so we can't claim.
+        // Surface as failure so the daemon refuses to start (better than
+        // silently running without singleton enforcement).
+        console.error(`${cl.red}ERROR: could not write PID file ${file}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
+        return { ok: false, existingPid: -1 };
+      }
+      const existing = getDaemonPid(file);
+      if (existing === process.pid) return { ok: true };
+      if (existing !== null) return { ok: false, existingPid: existing };
+      // File exists but owner is dead — try to clear it and loop.
+      try {
+        unlinkSync(file);
+      } catch {
+        // Another process raced us to clear it. Next iteration will
+        // either succeed or detect the new owner.
+      }
+    }
+  }
+  // Lost both rounds (extreme contention). Re-read once to get the final
+  // owner; if the file vanished, treat as our last failed write rather than
+  // falsely reporting success.
+  const finalOwner = getDaemonPid(file);
+  if (finalOwner === process.pid) return { ok: true };
+  return { ok: false, existingPid: finalOwner ?? -1 };
 }
 
 /** Stop a running patrol daemon. Returns true if one was stopped. */
@@ -605,8 +659,40 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 
   ensureDirs();
 
-  // Write PID file so `pr-patrol stop` can find us
-  writePidFile();
+  // Tracks whether THIS process acquired the PID file. `once` mode skips
+  // acquisition (line below), so it must also skip release in shutdown,
+  // otherwise a one-shot run that catches SIGINT/SIGTERM would delete the
+  // continuous daemon's PID file (CodeRabbit, PR #4701).
+  let ownsPidFile = false;
+
+  // Refuse to start a continuous daemon if another is already running —
+  // otherwise two `pr-patrol run` invocations spawn parallel loops with
+  // independent cycle counters and double-process the queue.
+  //
+  // `once` mode is intentionally NOT checked: it does a single pass and
+  // exits, so debugging a daemon with `once` runs is the documented workflow.
+  if (!config.once) {
+    const acquired = acquirePidFile();
+    if (!acquired.ok) {
+      if (acquired.existingPid === -1) {
+        // Write failure (EACCES, ENOSPC, etc.) — the message was already
+        // logged inside acquirePidFile. Just bail.
+      } else {
+        console.error(
+          `${cl.red}ERROR: Another PR patrol daemon is already running (pid ${acquired.existingPid}).${cl.reset}`,
+        );
+        console.error(`  PID file: ${PID_FILE}`);
+        console.error(
+          `  Run \`crux gh pr-patrol stop\` to stop it, \`crux gh pr-patrol status\` to check,`,
+        );
+        console.error(
+          `  or remove the PID file manually if the listed PID is not actually a patrol process.`,
+        );
+      }
+      process.exit(1);
+    }
+    ownsPidFile = true;
+  }
 
   logHeader('PR Patrol starting');
   log(
@@ -624,7 +710,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
     log('Shutting down...');
-    removePidFile();
+    if (ownsPidFile) removePidFile();
     await releaseCurrentClaim(config.repo);
     process.exit(0);
   };
