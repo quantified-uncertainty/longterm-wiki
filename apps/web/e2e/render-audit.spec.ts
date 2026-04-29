@@ -271,18 +271,27 @@ test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
   test("/scorecards renders sourcing dots in matrix cells", async ({ page }) => {
     await loadPage(page, "/scorecards");
 
-    const text = await getMainText(page);
-    const hasMatrix = !text.includes("No scorecard grades ingested yet");
+    // Gate on the matrix's own h2, which only renders when `orgRows.length > 0`.
+    // Three failure modes look different in the page text and we want to skip
+    // all of them, not just the "no grades ingested" one:
+    //   1. wiki-server unreachable in CI (LONGTERMWIKI_SERVER_URL unset) →
+    //      "The wiki-server was unreachable" panel
+    //   2. wiki-server reachable but no grades ingested →
+    //      "No scorecard grades ingested yet" panel
+    //   3. wiki-server reachable + grades ingested → matrix h2 visible
+    // A negation check on the "no grades" string falsely passes case 1.
+    const matrixHeading = page.getByRole("heading", {
+      name: /overall grades.*latest wave/i,
+    });
+    if ((await matrixHeading.count()) === 0) return;
 
-    if (hasMatrix) {
-      const dots = await page
-        .locator('[role="img"][aria-label^="Sourcing:"]')
-        .count();
-      expect(
-        dots,
-        "/scorecards should render at least one sourcing dot once grades are ingested",
-      ).toBeGreaterThan(0);
-    }
+    const dots = await page
+      .locator('[role="img"][aria-label^="Sourcing:"]')
+      .count();
+    expect(
+      dots,
+      "/scorecards should render at least one sourcing dot once grades are ingested",
+    ).toBeGreaterThan(0);
   });
 
   // Org-tab scorecards section must also render a dot for each panel grade.
