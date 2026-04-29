@@ -114,7 +114,49 @@ Using the `crux sys usage-patterns` output from Phase 1:
 - "40% of sessions are from mobile with short messages — consider a mobile-optimized prompt template"
 - "You rarely use /maintain — consider scheduling it weekly"
 
-## Phase 3: Write the Report
+The output of Phase 2 is a *draft* recommendation list. Do not write the final report yet — Phase 3 fact-checks each draft.
+
+## Phase 3: Verify Recommendations
+
+**Most retrospective recommendations sound right at first glance and turn out to be misinformed when fact-checked.** Before writing the final report, run each draft recommendation through verification. This phase exists because the 2026-04-29 retro produced 4 recommendations and 3 were wrong on inspection (one was already-filed, one was a misdiagnosis, one was about an intentionally-long-running epic that should not be triaged).
+
+For each draft recommendation, do all three steps:
+
+### 3a. Linear-search for existing tickets
+
+```bash
+pnpm crux linear search "<2-3 keyword variants>"
+```
+
+Read the top hits. The work may already be tracked:
+- **Open + actively-tracked** (recent comments / updates) → cite as `prioritize:QUA-NNN`. Do not re-file.
+- **Closed as duplicate / Done** → check whether the closed work actually addressed your concern. Often `drop:already-tracked`.
+- **Backlog with no activity in >30 days** → may be `new` (file or update), but note the relationship.
+
+### 3b. Verify the diagnosis with a current-state check
+
+Confirm the problem still exists with concrete evidence:
+- Recommending a baseline cleanup? Read the actual baseline file + current count.
+- Recommending a rename sweep? `grep` for the pattern; count results.
+- Calling a ticket "stuck"? Read its recent comments — it may be intentionally long-running.
+- Pointing at a "leaking integration" or auto-filer? Trace the code path to confirm the mechanism, not just the symptom.
+
+If verification falsifies the diagnosis, **drop the recommendation**. Do not reframe it to fit the data.
+
+### 3c. Pick a disposition for each recommendation
+
+| Disposition | Meaning | Action |
+|---|---|---|
+| `new` | Novel finding, not yet tracked, user-actionable | File or implement; include in report |
+| `prioritize:QUA-NNN` | Already tracked; retro's value is signaling priority | Cite ticket; optionally comment with retro evidence (skip if ticket is rich) |
+| `drop:already-tracked` | Tracked + ticket is rich enough that more evidence is noise | Mention in passing; no new filing |
+| `drop:misdiagnosed` | Verification falsified the premise | Surface as a meta-finding about the retro itself |
+
+### 3d. Honesty rule
+
+If verification reveals the original framing was wrong, **say so in the report**. A retrospective that buries its own misdiagnoses to look polished is worse than no retrospective. List `drop:misdiagnosed` items in the report so the reader can recalibrate their trust in the rest.
+
+## Phase 4: Write the Report
 
 ### Report structure
 
@@ -143,9 +185,12 @@ Using the `crux sys usage-patterns` output from Phase 1:
 ### Process Recommendations
 [Specific, actionable changes — not vague "we should do better"]
 Each recommendation should state:
-- What to change
+- What to change (or: which existing ticket to prioritize)
+- **Disposition** from Phase 3: `new` / `prioritize:QUA-NNN` / `drop:already-tracked` / `drop:misdiagnosed`
 - Why (with evidence from this retrospective)
 - Expected impact
+
+Include `drop:*` items in the report — they reveal where the retro's pattern recognition was directionally off, which is information the reader needs to calibrate trust in the surviving recommendations.
 
 ### Usage Pattern Insights
 - Sessions: X total, Y short (≤2 msgs), Z avg messages/session
@@ -156,12 +201,12 @@ Each recommendation should state:
 - Workflow optimization opportunities: [2-3 specific suggestions]
 ```
 
-## Phase 4: Act
+## Phase 5: Act
 
-For each recommendation:
-- **Process changes** (updating rules, CLAUDE.md, or conventions): Make the change now if it's clear-cut, or note it for user discussion if it involves tradeoffs.
-- **Tooling fixes**: File a Linear issue if you can't fix it in this session.
-- **Propagate learnings**: Update `.claude/rules/` or `CLAUDE.md` with any recurring patterns identified.
+Drive each recommendation by its disposition (set in Phase 3):
+- `new` — Make the change now if clear-cut, file a Linear ticket if not, or note for user discussion if it involves tradeoffs. Update `.claude/rules/` or `CLAUDE.md` for recurring patterns.
+- `prioritize:QUA-NNN` — Optionally post a comment on the existing ticket with this retro's evidence. Skip if the ticket is already rich.
+- `drop:already-tracked` / `drop:misdiagnosed` — No further action; the disposition already lives in the report for next time.
 
 ## Guardrails
 
