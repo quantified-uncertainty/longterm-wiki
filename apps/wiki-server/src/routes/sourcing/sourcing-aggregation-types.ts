@@ -1,5 +1,5 @@
 /**
- * Shared types for source-check verdict aggregation (QUA-791).
+ * Shared types for sourcing verdict aggregation (QUA-791).
  *
  * Lives in a separate file from the aggregation logic so consumers
  * (route, tests, callers) can import the types without pulling the

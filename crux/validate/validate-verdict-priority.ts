@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Validate that source-check verdict severity/priority is defined in exactly
+ * Validate that sourcing verdict severity/priority is defined in exactly
  * one place: SOURCE_CHECK_VERDICT_PRIORITY in apps/web/src/components/shared/verdict-styles.ts.
  *
  * QUA-429 found two helpers (`pickWorstVerdict`, `rollupVerdictFromSummary`)

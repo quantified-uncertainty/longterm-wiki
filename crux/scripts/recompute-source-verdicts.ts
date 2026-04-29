@@ -1,6 +1,6 @@
 #!/usr/bin/env -S node --import tsx/esm
 /**
- * One-time backfill: recompute every source-check verdict from its
+ * One-time backfill: recompute every sourcing verdict from its
  * underlying evidence rows (QUA-791).
  *
  * The pre-Phase-1 `POST /verdicts` endpoint was last-writer-wins —
