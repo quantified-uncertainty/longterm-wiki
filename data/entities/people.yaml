@@ -7864,3 +7864,23 @@
   type: person
   title: Hugo Zylberberg
   description: Co-founder of The Future Society.
+
+# QUA-836 — backfill missing scorecard publisher entity
+- id: zach-stein-perlman
+  stableId: sid_vYltmfWMag
+  wikiId: E2537
+  type: person
+  title: Zach Stein-Perlman
+  description: >-
+    AI safety researcher and sole maintainer of AI Lab Watch
+    (ailabwatch.org), an independent project evaluating frontier AI labs
+    on their safety commitments and practices. Publishes regular analyses
+    of lab policy changes on the AI Lab Watch Substack.
+  tags:
+    - ai-safety-advocacy
+    - ai-governance
+    - transparency
+  customFields:
+    - label: Role
+      value: Founder & sole maintainer, AI Lab Watch
+  lastUpdated: 2026-04
