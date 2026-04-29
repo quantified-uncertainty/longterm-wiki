@@ -54,6 +54,7 @@ interface CorpusItem {
 
 async function fetchConfirmedVerdicts(recordType: RecordType, limit: number) {
   // The /verdicts endpoint returns aggregate verdicts, pageable with limit up to 500.
+  // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
   const r = await apiRequest<{
     verdicts: Array<{
       recordType: string; recordId: string; entityId: string | null;
@@ -83,6 +84,7 @@ async function fetchPublication(id: string) {
     publicationCache = new Map();
     let offset = 0;
     while (true) {
+      // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
       const r = await apiRequest<{ publications: Array<Record<string, unknown>>; total: number }>(
         'GET', `/api/publications/all?limit=200&offset=${offset}`,
       );
@@ -102,6 +104,7 @@ async function fetchFundingRound(id: string) {
     fundingRoundCache = new Map();
     let offset = 0;
     while (true) {
+      // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
       const r = await apiRequest<{ fundingRounds: Array<Record<string, unknown>>; total: number }>(
         'GET', `/api/funding-rounds/all?limit=200&offset=${offset}`,
       );
@@ -117,6 +120,7 @@ async function fetchFundingRound(id: string) {
 
 /** Fetch a personnel row by scanning by-entity for the parent org. */
 async function fetchPersonnelByEntity(orgId: string, recordId: string): Promise<Record<string, unknown> | null> {
+  // typed-client-ok: QUA-770 baseline — calibration corpus builder, direct typing acceptable for ad-hoc analysis queries
   const r = await apiRequest<{
     personnel: Array<Record<string, unknown>>;
   }>('GET', `/api/personnel/by-entity/${encodeURIComponent(orgId)}?limit=500`);

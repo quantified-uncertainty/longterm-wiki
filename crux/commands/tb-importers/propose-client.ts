@@ -175,6 +175,7 @@ async function submitToServer(
     return { proposal: p, status: "rejected", reason: `client error: ${msg}` };
   }
 
+  // typed-client-ok: QUA-770 baseline — tb-importer client script, follow-up migration to typed client tracked
   const res = await apiRequest<AcceptedProposeResponse>(
     "POST",
     "/api/enrichment/propose",

@@ -352,6 +352,7 @@ async function discoverOrgs(dryRun: boolean): Promise<void> {
   }> = [];
 
   for (const area of areas) {
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const detailResult = await apiRequest<AreaDetailResponse>(
       "GET",
       `/api/research-areas/${area.id}`

@@ -78,6 +78,7 @@ async function fetchAllThresholds(): Promise<ApiResult<ThresholdRow[]>> {
   let total = Infinity;
 
   for (let i = 0; i < MAX_PAGES && offset < total; i++) {
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<ThresholdsResponse>(
       "GET",
       `/api/framework-capability-thresholds/all?limit=${PAGE_SIZE}&offset=${offset}`,
@@ -98,6 +99,7 @@ async function fetchAllVersions(): Promise<ApiResult<VersionRow[]>> {
   let total = Infinity;
 
   for (let i = 0; i < MAX_PAGES && offset < total; i++) {
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<VersionsResponse>(
       "GET",
       `/api/safety-framework-versions/all?limit=${PAGE_SIZE}&offset=${offset}`,

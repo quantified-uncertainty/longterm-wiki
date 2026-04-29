@@ -221,6 +221,7 @@ async function fetchTitle(url: string): Promise<string | null> {
 // ---------------------------------------------------------------------------
 
 async function applyFix(fix: ResourceFix): Promise<boolean> {
+  // typed-client-ok: QUA-770 baseline — one-shot maintenance script
   const result = await apiRequest<{ id: string }>("POST", "/api/resources", {
     id: fix.id,
     url: fix.url,

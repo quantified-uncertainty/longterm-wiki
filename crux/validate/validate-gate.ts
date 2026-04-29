@@ -417,6 +417,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    id: 'typed-client',
+    name: 'Direct apiRequest<T> calls (QUA-770) — must use typed wiki-server client or // typed-client-ok marker',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-typed-client.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new hand-written apiRequest<T> calls from
+    // bypassing the typed wiki-server client modules. Existing callers
+    // are annotated with // typed-client-ok: <reason> as a baseline;
+    // see QUA-770 for the migration plan.
+  },
+  {
     id: 'factbase-stableid',
     name: 'FactBase lookups use stableIds (not slugs)',
     command: 'npx',

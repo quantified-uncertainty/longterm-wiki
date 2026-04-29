@@ -82,6 +82,7 @@ async function fetchAllRecords(
   const pageSize = 500;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<Record<string, unknown>>(
       'GET',
       `${config.path}?limit=${pageSize}&offset=${offset}`,

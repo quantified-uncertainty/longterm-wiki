@@ -191,6 +191,7 @@ async function main(): Promise<void> {
   console.log(`QUA-561 resource dedup (${apply ? "APPLY" : "dry-run"})`);
   console.log(`Calling /api/resources/dedup…`);
 
+  // typed-client-ok: QUA-770 baseline — one-shot maintenance script
   const res = await apiRequest<RunDedupResult>(
     "POST",
     "/api/resources/dedup",

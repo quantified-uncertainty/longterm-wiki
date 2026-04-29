@@ -369,6 +369,7 @@ export async function cmdRefreshTitles(opts: ParsedOpts): Promise<void> {
 
     while (retries > 0 && !success) {
       try {
+        // typed-client-ok: QUA-770 baseline — resource title refresh script
         const result = await apiRequest<{ id: string }>(
           'POST',
           '/api/resources',

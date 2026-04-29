@@ -184,6 +184,7 @@ export async function enrichForumsCommand(
 
     for (let i = 0; i < forumBatch.length; i += 200) {
       const batch = forumBatch.slice(i, i + 200);
+      // typed-client-ok: QUA-770 baseline — resource enrichment pipeline, internal write path
       const result = await apiRequest<{ ok: boolean; upserted: { forumPosts: number } }>(
         'POST',
         '/api/resources/batch-details',

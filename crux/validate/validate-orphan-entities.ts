@@ -117,6 +117,7 @@ export async function fetchAllPgEntities(): Promise<ApiResult<PgEntityRecord[]>>
 
   while (offset < total && pageCount < MAX_PAGES) {
     pageCount++;
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<PgListResponse>(
       "GET",
       `/api/entities?limit=${PAGE_SIZE}&offset=${offset}`,
@@ -236,6 +237,7 @@ async function pruneOrphans(
     }
 
     try {
+      // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
       const result = await apiRequest<{ deleted: number; ids: string[] }>(
         "POST",
         "/api/entities/prune",

@@ -24,6 +24,7 @@ interface EntityEntry {
 // ── Entity loading ──────────────────────────────────────────────────────────
 
 async function loadEntities(): Promise<EntityEntry[]> {
+  // typed-client-ok: QUA-770 baseline — resource enrichment pipeline, internal write path
   const result = await apiRequest<{ entities: EntityEntry[] }>(
     'GET',
     '/api/entities/all?limit=5000',

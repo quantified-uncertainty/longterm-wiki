@@ -172,6 +172,7 @@ async function extractCommand(args: string[], opts: FrameworkOptions): Promise<C
       log.warn('No thresholds extracted — skipping --apply.');
       return { output: '', exitCode: 0 };
     }
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<{ upserted: number }>(
       'POST',
       '/api/framework-capability-thresholds/sync',
@@ -202,10 +203,12 @@ async function diffCommand(args: string[], opts: FrameworkOptions): Promise<Comm
 
   // Fetch thresholds for both versions.
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const fromRes = await apiRequest<{ items: ExtractedThreshold[] }>(
     'GET',
     `/api/framework-capability-thresholds/by-version/${encodeURIComponent(fromVersion)}?limit=500`,
   );
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const toRes = await apiRequest<{ items: ExtractedThreshold[] }>(
     'GET',
     `/api/framework-capability-thresholds/by-version/${encodeURIComponent(toVersion)}?limit=500`,
@@ -257,6 +260,7 @@ async function diffCommand(args: string[], opts: FrameworkOptions): Promise<Comm
     const payload = toDiffSyncPayloads(fromVersion, toVersion, aggregate, {
       classifiedByModel,
     });
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const diffRes = await apiRequest<{ upserted: number }>(
       'POST',
       '/api/framework-diffs/sync',
@@ -267,6 +271,7 @@ async function diffCommand(args: string[], opts: FrameworkOptions): Promise<Comm
       return { output: '', exitCode: 2 };
     }
     if (payload.items.length > 0) {
+      // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
       const itemsRes = await apiRequest<{ upserted: number }>(
         'POST',
         '/api/framework-diff-items/sync',
@@ -413,6 +418,7 @@ async function seedCommand(
   }
 
   const { apiRequest } = await import('../lib/wiki-server/client.ts');
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const res = await apiRequest<{ upserted: number }>(
     'POST',
     '/api/safety-frameworks/sync',

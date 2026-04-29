@@ -45,6 +45,7 @@ async function fetchMappingFromServer(): Promise<Map<string, string> | null> {
   const limit = 200;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — one-shot maintenance script
     const result = await apiRequest<ResourceAllResponse>(
       "GET",
       `/api/resources/all?limit=${limit}&offset=${offset}`,

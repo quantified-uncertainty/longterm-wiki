@@ -216,6 +216,7 @@ export async function getAll${pascal}(
   if (options?.limit != null) params.set('limit', String(options.limit));
   if (options?.offset != null) params.set('offset', String(options.offset));
   const qs = params.toString();
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   return apiRequest<${pascal}AllResult>(
     'GET',
     \`/api/${name}/all\${qs ? \`?\${qs}\` : ''}\`,
@@ -226,6 +227,7 @@ export async function getAll${pascal}(
 export async function sync${pascal}(
   items: Array<Record<string, unknown>>,
 ): Promise<ApiResult<${pascal}SyncResult>> {
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   return apiRequest<${pascal}SyncResult>('POST', '/api/${name}/sync', { items });
 }
 `;

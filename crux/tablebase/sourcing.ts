@@ -585,6 +585,7 @@ async function fetchAllRecords(table: string, limit?: number): Promise<GenericRe
   const pageSize = 200;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
     const result = await apiRequest<Record<string, unknown>>(
       'GET',
       `${allPath}?limit=${pageSize}&offset=${offset}`,

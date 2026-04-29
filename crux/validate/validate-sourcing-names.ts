@@ -50,6 +50,7 @@ export async function validateSourcingNames(): Promise<{
 
   for (const recordType of RECORD_TYPES) {
     // Fetch a sample of verdicts
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const verdictsResult = await apiRequest<VerdictsResponse>(
       'GET',
       `/api/sourcing/verdicts?record_type=${recordType}&limit=20`
@@ -90,6 +91,7 @@ export async function validateSourcingNames(): Promise<{
 
     // Resolve record names
     const idList = [...recordIds].join(',');
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const namesResult = await apiRequest<ResolveNamesResponse>(
       'GET',
       `/api/sourcing/resolve-names?record_type=${recordType}&record_ids=${encodeURIComponent(idList)}`

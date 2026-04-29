@@ -73,6 +73,7 @@ interface EntitiesResponse {
 async function fetchAllSnapshots(): Promise<ApiResult<SnapshotRow[]>> {
   // Only is_latest=true rows are relevant to the is_latest invariant. At most
   // one per source, so 200 is a generous cap (5 sources × ~few waves max).
+  // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
   const result = await apiRequest<SnapshotsResponse>(
     "GET",
     `/api/scorecard-snapshots/all?latest=true&limit=200`,
@@ -89,6 +90,7 @@ async function fetchAllGrades(): Promise<ApiResult<GradeRow[]>> {
   let total = Infinity;
 
   for (let i = 0; i < MAX_PAGES && offset < total; i++) {
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<GradesResponse>(
       "GET",
       `/api/scorecard-grades/all?limit=${PAGE_SIZE}&offset=${offset}`,
@@ -109,6 +111,7 @@ async function fetchAllEntityStableIds(): Promise<ApiResult<Set<string>>> {
   let total = Infinity;
 
   for (let i = 0; i < MAX_PAGES && offset < total; i++) {
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<EntitiesResponse>(
       "GET",
       `/api/entities?limit=${PAGE_SIZE}&offset=${offset}`,

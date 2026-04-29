@@ -173,6 +173,7 @@ async function backfillCommand(
   for (const endpoint of ['/api/grants/all', '/api/personnel/all']) {
     let offset = 0;
     while (true) {
+      // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
       const r = await apiRequest<{ grants?: Array<{ source?: string }>; personnel?: Array<{ source?: string }>; total: number }>(
         'GET', `${endpoint}?limit=200&offset=${offset}`,
       );

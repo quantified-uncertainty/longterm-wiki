@@ -75,6 +75,7 @@ async function runCommand(
   for (let i = 0; i < slugToStableId.length; i += batchSize) {
     const batch = slugToStableId.slice(i, i + batchSize);
     const isLastBatch = i + batchSize >= slugToStableId.length;
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<BackfillResult>(
       'POST',
       '/api/ids/backfill-stable-ids',
@@ -92,6 +93,7 @@ async function runCommand(
 
   // Handle edge case: no KB entities found, but still need to finalize
   if (slugToStableId.length === 0) {
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<BackfillResult>(
       'POST',
       '/api/ids/backfill-stable-ids',

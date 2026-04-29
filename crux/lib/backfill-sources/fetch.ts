@@ -31,6 +31,7 @@ export async function fetchMissingSources(
   const qs = new URLSearchParams({ limit: String(options.limit) });
   if (options.table) qs.set('table', options.table);
 
+  // typed-client-ok: QUA-770 baseline — sources backfill, internal write path
   const response = await apiRequest<MissingSourcesResponse>(
     'GET',
     `/api/sourcing/missing-sources?${qs.toString()}`,
@@ -56,6 +57,7 @@ export async function updateRecordSource(
   record: MissingSourceRecord,
   url: string,
 ): Promise<boolean> {
+  // typed-client-ok: QUA-770 baseline — sources backfill, internal write path
   const response = await apiRequest<{ updated?: number; error?: string }>(
     'POST',
     '/api/sourcing/missing-sources/update-source',
