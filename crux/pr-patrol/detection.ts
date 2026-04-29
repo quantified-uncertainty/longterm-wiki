@@ -293,6 +293,25 @@ export function detectAllPrIssuesFromNodes(
 export const STUCK_CYCLE_THRESHOLD = 3;
 
 /**
+ * QUA-832: A PR's state fingerprint is "healthy" when the PR is in a state a
+ * human reviewer would consider merge-ready or merge-imminent. Repeating this
+ * state across cycles means the PR is awaiting human approval, not stuck on
+ * something the patrol can fix.
+ *
+ * Healthy = mergeable in {MERGEABLE, UNKNOWN} AND rollup not FAIL AND zero
+ * top-level blocking comments. UNKNOWN is included because GitHub frequently
+ * lags the mergeability lookup; persistent UNKNOWN with a passing CI is more
+ * likely a stale-cache PR than a broken one. Anything FAIL is unhealthy
+ * regardless of mergeability.
+ */
+export function isFingerprintHealthy(fingerprint: string): boolean {
+  const parts = fingerprint.split(':');
+  if (parts.length !== 3) return false;
+  const [m, r, c] = parts;
+  return (m === 'MERGEABLE' || m === 'UNKNOWN') && r !== 'FAIL' && c === '0';
+}
+
+/**
  * Collapse the status-check rollup into a single conclusion string suitable
  * for fingerprinting. We want something that changes when a previously-failing
  * check passes (or vice versa) but tolerates minor flux in pending states.
@@ -387,29 +406,23 @@ export async function applyStuckCycleDetection(
       log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     });
 
-    // QUA-832: A PR with fingerprint MERGEABLE:PASS:0 (mergeable, CI passing,
-    // zero top-level blocking comments) is in a healthy "merge-ready" state,
-    // not stuck on a problem the patrol can fix. Repeating this fingerprint
-    // means the PR is awaiting human approval (stage:approved label or
-    // review). Don't push 'stuck' onto pr.issues — that would trigger a
-    // no-op coordinator escalation and waste cycles re-polling. The existing
-    // hasExceededMaxAttempts guard still catches dispatch churn on residual
-    // soft issues like bot-review-major.
-    const isHealthyFingerprint = fingerprint === 'MERGEABLE:PASS:0';
+    // Annotate trending and stuck cycles. Note QUA-832: a healthy fingerprint
+    // (mergeable/unknown + CI not failing + zero blocking comments) means the
+    // PR is awaiting human approval, not stuck on a fixable problem. Don't
+    // push 'stuck' onto issues for those — the existing hasExceededMaxAttempts
+    // guard still catches dispatch churn on residual soft issues like
+    // bot-review-major.
+    if (stuckCycles >= 2) {
+      pr.stuckCycles = stuckCycles;
+      pr.stuckReason = fingerprint;
 
-    if (stuckCycles >= STUCK_CYCLE_THRESHOLD && !isHealthyFingerprint) {
-      pr.stuckCycles = stuckCycles;
-      pr.stuckReason = fingerprint;
-      if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
-      log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
-    } else if (stuckCycles >= 2) {
-      // Not yet at threshold but trending — annotate so the fix prompt can
-      // warn the agent. Healthy-fingerprint PRs land here too: stuckCycles
-      // is recorded for visibility but no escalation flag is set.
-      pr.stuckCycles = stuckCycles;
-      pr.stuckReason = fingerprint;
-      if (isHealthyFingerprint && stuckCycles >= STUCK_CYCLE_THRESHOLD) {
-        log(`  ${cl.dim}PR #${pr.number}: in healthy state (${fingerprint}) for ${stuckCycles} cycles — awaiting human approval${cl.reset}`);
+      if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+        if (isFingerprintHealthy(fingerprint)) {
+          log(`  ${cl.dim}PR #${pr.number}: in healthy state (${fingerprint}) for ${stuckCycles} cycles — awaiting human approval${cl.reset}`);
+        } else {
+          if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
+          log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
+        }
       }
     }
   }

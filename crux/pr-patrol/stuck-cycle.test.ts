@@ -24,6 +24,7 @@ import {
 import {
   applyStuckCycleDetection,
   computeRollupConclusion,
+  isFingerprintHealthy,
   STUCK_CYCLE_THRESHOLD,
 } from './detection.ts';
 import type { DetectedPr, GqlPrNode } from './types.ts';
@@ -441,28 +442,56 @@ describe('applyStuckCycleDetection', () => {
     }
   });
 
-  it('does NOT escalate as stuck when fingerprint is MERGEABLE:PASS:0 (QUA-832)', async () => {
-    // QUA-832: A PR whose fingerprint is MERGEABLE:PASS:0 (mergeable, CI
-    // passing, no top-level blocking comments) is in a healthy state — the
-    // PR is awaiting human approval, not stuck on a problem the patrol can
-    // fix. Repeating this state across cycles should NOT push 'stuck' onto
-    // pr.issues; doing so leads to a no-op coordinator escalation that
-    // wastes cycles re-polling the same merge-ready PR.
+  it.each([
+    ['MERGEABLE:PASS:0',  true,  'mergeable + CI pass + no blocking comments'],
+    ['MERGEABLE:NONE:0',  true,  'mergeable + no CI configured (docs PR) + no blockers'],
+    ['UNKNOWN:PASS:0',    true,  'GitHub still computing mergeability + CI pass'],
+    ['MERGEABLE:PASS:1',  false, 'has a blocking comment'],
+    ['MERGEABLE:FAIL:0',  false, 'CI is failing'],
+    ['CONFLICTING:PASS:0', false, 'has merge conflicts'],
+    ['UNKNOWN:FAIL:0',    false, 'CI is failing even if mergeability unknown'],
+    ['MERGEABLE:PENDING:0', true, 'CI still in progress is treated as not-failing'],
+  ])('isFingerprintHealthy(%s) = %s (%s)', (fingerprint, expected, _why) => {
+    expect(isFingerprintHealthy(fingerprint)).toBe(expected);
+  });
+
+  // QUA-832: A PR in a "healthy" state (mergeable in {MERGEABLE, UNKNOWN},
+  // CI not failing, zero top-level blocking comments) is awaiting human
+  // approval, not stuck on a problem the patrol can fix. Repeating this
+  // state across cycles should NOT push 'stuck' onto pr.issues; doing so
+  // triggered a no-op coordinator escalation that wasted cycles re-polling
+  // the same merge-ready PR.
+  it.each([
+    {
+      label: 'MERGEABLE:PASS:0',
+      mergeable: 'MERGEABLE',
+      rollupContexts: [{ conclusion: 'SUCCESS', name: 'build' }],
+      expectedFingerprint: 'MERGEABLE:PASS:0',
+    },
+    {
+      label: 'MERGEABLE:NONE:0 (docs PR with no CI)',
+      mergeable: 'MERGEABLE',
+      rollupContexts: [],
+      expectedFingerprint: 'MERGEABLE:NONE:0',
+    },
+    {
+      label: 'UNKNOWN:PASS:0 (mergeability lookup racing)',
+      mergeable: 'UNKNOWN',
+      rollupContexts: [{ conclusion: 'SUCCESS', name: 'build' }],
+      expectedFingerprint: 'UNKNOWN:PASS:0',
+    },
+  ])('does NOT escalate as stuck for healthy fingerprint $label (QUA-832)', async ({ mergeable, rollupContexts, expectedFingerprint }) => {
     const prNum = 100;
     const healthyNode = (sha: string): GqlPrNode => makePrNode({
       number: prNum,
       headRefOid: sha,
-      mergeable: 'MERGEABLE',
-      // Replace the default failing rollup with a passing one so
-      // computeRollupConclusion() returns 'PASS'.
+      mergeable,
       commits: {
         nodes: [
           {
             commit: {
               statusCheckRollup: {
-                contexts: {
-                  nodes: [{ conclusion: 'SUCCESS', name: 'build' }],
-                },
+                contexts: { nodes: rollupContexts },
               },
             },
           },
@@ -470,8 +499,8 @@ describe('applyStuckCycleDetection', () => {
       },
     });
 
-    // Run 5 consecutive cycles all with MERGEABLE:PASS:0. Even at cycle 5
-    // (well past STUCK_CYCLE_THRESHOLD = 3) the PR must NOT be flagged.
+    // Run 5 consecutive cycles. Even at cycle 5 (well past
+    // STUCK_CYCLE_THRESHOLD = 3) the PR must NOT be flagged.
     let last: DetectedPr | undefined;
     for (let cycle = 1; cycle <= 5; cycle++) {
       const detected = [makeDetectedPr({ number: prNum, issues: ['bot-review-major'] })];
@@ -480,10 +509,44 @@ describe('applyStuckCycleDetection', () => {
     }
     expect(last).toBeDefined();
     expect(last!.issues).not.toContain('stuck');
-    // stuckCycles is still annotated (so the prompt layer can warn) but
-    // 'stuck' is the issue tag that drives escalation.
     expect(last!.stuckCycles).toBeGreaterThanOrEqual(STUCK_CYCLE_THRESHOLD);
-    expect(last!.stuckReason).toBe('MERGEABLE:PASS:0');
+    expect(last!.stuckReason).toBe(expectedFingerprint);
+  });
+
+  it('still escalates as stuck when fingerprint transitions from healthy to unhealthy', async () => {
+    // 3 healthy cycles followed by 3 conflicting cycles: must escalate at
+    // the 3rd conflicting cycle. Verifies the healthy-fingerprint guard
+    // doesn't somehow leak across fingerprint transitions.
+    const prNum = 101;
+
+    for (let cycle = 1; cycle <= 3; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum })];
+      await applyStuckCycleDetection(
+        detected,
+        [makePrNode({
+          number: prNum,
+          headRefOid: `sha${cycle}`,
+          mergeable: 'MERGEABLE',
+          commits: { nodes: [{ commit: { statusCheckRollup: { contexts: { nodes: [{ conclusion: 'SUCCESS', name: 'build' }] } } } }] },
+        })],
+        file,
+      );
+      expect(detected[0].issues).not.toContain('stuck');
+    }
+
+    let last: DetectedPr | undefined;
+    for (let cycle = 4; cycle <= 6; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum })];
+      await applyStuckCycleDetection(
+        detected,
+        [makePrNode({ number: prNum, headRefOid: `sha${cycle}` })], // CONFLICTING:FAIL default
+        file,
+      );
+      last = detected[0];
+    }
+    expect(last).toBeDefined();
+    expect(last!.issues).toContain('stuck');
+    expect(last!.stuckReason).toBe('CONFLICTING:FAIL:0');
   });
 
   it('persists a pr_cycle_snapshot entry to the JSONL file each cycle', async () => {
