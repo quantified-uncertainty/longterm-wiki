@@ -383,23 +383,35 @@ function assertFetchExtractSourceSupported(source: string, op: "fetch" | "extrac
 async function cmdFetch(source: string, wave: string, force: boolean): Promise<CommandResult> {
   assertFetchExtractSourceSupported(source, "fetch");
   console.log(`Fetching FLI wave ${wave}${force ? " (force)" : ""}...`);
-  const r = await fetchFliWave(wave, undefined, { force });
-  console.log(`✓ ${r.path} (${r.bytes.toLocaleString()} bytes)`);
-  return { exitCode: 0 };
+  try {
+    const r = await fetchFliWave(wave, undefined, { force });
+    console.log(`✓ ${r.path} (${r.bytes.toLocaleString()} bytes)`);
+    return { exitCode: 0 };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`✗ fetch ${source}/${wave}: ${message}`);
+    return { exitCode: 1 };
+  }
 }
 
 async function cmdExtract(source: string, wave: string): Promise<CommandResult> {
   assertFetchExtractSourceSupported(source, "extract");
   console.log(`Extracting FLI wave ${wave} (LLM call — may take ~30s)...`);
-  const r = await extractFliWave(wave);
-  console.log(`✓ ${r.outputPath}`);
-  console.log(`  ${r.orgs} orgs × ${r.dimensions} dimensions`);
-  if (r.usage) {
-    console.log(
-      `  tokens: ${r.usage.input_tokens.toLocaleString()} in, ${r.usage.output_tokens.toLocaleString()} out`,
-    );
+  try {
+    const r = await extractFliWave(wave);
+    console.log(`✓ ${r.outputPath}`);
+    console.log(`  ${r.orgs} orgs × ${r.dimensions} dimensions`);
+    if (r.usage) {
+      console.log(
+        `  tokens: ${r.usage.input_tokens.toLocaleString()} in, ${r.usage.output_tokens.toLocaleString()} out`,
+      );
+    }
+    return { exitCode: 0 };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error(`✗ extract ${source}/${wave}: ${message}`);
+    return { exitCode: 1 };
   }
-  return { exitCode: 0 };
 }
 
 async function fetchCommand(

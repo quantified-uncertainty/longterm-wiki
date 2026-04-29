@@ -165,7 +165,18 @@ export function createFliAdapter(rawDir: string = DEFAULT_RAW_DIR): ScorecardSou
     listSnapshots(): RawSnapshot[] {
       const waves = loadWaves(rawDir);
       if (waves.length === 0) return [];
-      const latestId = snapshotId(waves[waves.length - 1].waveSlug);
+      const explicitLatest = waves.filter((w) => w.data.isLatest === true);
+      if (explicitLatest.length > 1) {
+        throw new Error(
+          `[fli_index] multiple waves set isLatest=true: ${explicitLatest
+            .map((w) => w.waveSlug)
+            .join(", ")}`,
+        );
+      }
+      const latestId =
+        explicitLatest.length === 1
+          ? snapshotId(explicitLatest[0].waveSlug)
+          : snapshotId(waves[waves.length - 1].waveSlug);
       return waves.map(({ waveSlug, data }) => {
         const id = snapshotId(waveSlug);
         return {
@@ -177,9 +188,7 @@ export function createFliAdapter(rawDir: string = DEFAULT_RAW_DIR): ScorecardSou
           methodologyUrl: data.methodologyUrl ?? null,
           license: data.license ?? null,
           notes: data.notes ?? null,
-          // File-level isLatest wins if explicitly set; otherwise pick the
-          // most recent wave by date.
-          isLatest: data.isLatest ?? id === latestId,
+          isLatest: id === latestId,
           sourceActive: true,
         };
       });

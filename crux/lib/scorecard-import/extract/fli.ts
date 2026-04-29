@@ -143,6 +143,9 @@ export function validateWaveFile(file: unknown, ctx: string): asserts file is Fl
     if (!/^[a-z0-9-]+$/.test(d.slug)) {
       throw new Error(`${ctx}: dimension slug "${d.slug}" must be kebab-case`);
     }
+    if (dimSlugs.has(d.slug)) {
+      throw new Error(`${ctx}: duplicate dimension slug "${d.slug}"`);
+    }
     dimSlugs.add(d.slug);
   }
   for (const g of f.grades) {
