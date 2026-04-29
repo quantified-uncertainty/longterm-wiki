@@ -1163,23 +1163,29 @@ describe('entitylink-ids rule', () => {
         'anthropic': 'E42',
         'nick-bostrom': 'E140',
         'miri': 'E100',
+        'cea': 'E517',
+        'open-philanthropy': 'E552',
       },
       byWikiId: {
         'E42': 'anthropic',
         'E140': 'nick-bostrom',
         'E100': 'miri',
+        'E517': 'cea',
+        'E552': 'open-philanthropy',
       },
     },
     pathRegistry: {
       'anthropic': '/knowledge-base/organizations/anthropic/',
       'nick-bostrom': '/knowledge-base/people/nick-bostrom/',
       'miri': '/knowledge-base/organizations/miri/',
+      'cea': '/knowledge-base/organizations/cea/',
     },
-    entities: {
-      'anthropic': { type: 'organization' },
-      'nick-bostrom': { type: 'person' },
-      'miri': { type: 'organization' },
-    },
+    entities: [
+      { id: 'anthropic', title: 'Anthropic', type: 'organization' },
+      { id: 'nick-bostrom', title: 'Nick Bostrom', type: 'person' },
+      { id: 'miri', title: 'MIRI', aliases: ['Machine Intelligence Research Institute'], type: 'organization' },
+      { id: 'cea', title: 'Centre for Effective Altruism', aliases: ['CEA'], type: 'organization' },
+    ],
   };
 
   it('errors when slug ID used instead of wiki ID, with auto-fix to numeric+name', () => {
@@ -1265,6 +1271,77 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix).not.toBeNull();
     expect(issues[0].fix!.oldText).toBe('id="E140"');
     expect(issues[0].fix!.newText).toBe('id="E140" name="nick-bostrom"');
+  });
+
+  it('auto-fix when display matches entity title (acronym slug, QUA-759)', () => {
+    // CEA's slug is "cea" but display text is the full name "Centre for
+    // Effective Altruism" — that's the entity's title. Auto-fix should still
+    // fire because the display text identifies the same entity.
+    const content = mockContent(
+      '<EntityLink id="E517">Centre for Effective Altruism</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E517" name="cea"');
+  });
+
+  it('auto-fix when display matches an entity alias (QUA-759)', () => {
+    // MIRI's slug is "miri" but display text is the full name from aliases.
+    const content = mockContent(
+      '<EntityLink id="E100">Machine Intelligence Research Institute</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E100" name="miri"');
+  });
+
+  it('errors when display name disagrees with wiki ID, with NO auto-fix (QUA-759)', () => {
+    // E42 currently maps to anthropic but the prose says "Open Philanthropy".
+    // Same hallucination shape as QUA-761 — silently injecting name="anthropic"
+    // would lock in a "valid" cross-check on a link that visibly says "Open
+    // Philanthropy" but routes to anthropic's page. Refuse the auto-fix and
+    // surface the suspected reassignment to a human reviewer.
+    const content = mockContent(
+      '<EntityLink id="E42">Open Philanthropy</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('display name');
+    expect(issues[0].message).toContain('"anthropic"');
+    expect(issues[0].message).toContain('reassigned');
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('auto-fix for self-closing EntityLink (no display text to compare)', () => {
+    // Self-closing tags get their display from the registry, so adding name=
+    // is trivially safe (the cross-check matches what the renderer will use).
+    const content = mockContent(
+      '<EntityLink id="E42" />',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
+  });
+
+  it('auto-fix when display contains JSX (cannot extract plain text)', () => {
+    // We can't reliably slugify JSX-containing children, so fall back to the
+    // safer "always cross-check" behavior. A reviewer of the diff still sees
+    // the surrounding prose for context.
+    const content = mockContent(
+      '<EntityLink id="E42"><strong>Anthropic</strong></EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
   });
 
   it('warns for unregistered wiki ID', () => {
