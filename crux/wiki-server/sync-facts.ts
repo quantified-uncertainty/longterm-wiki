@@ -133,10 +133,6 @@ export function transformFact(fact: Fact, property?: Property): SyncFact {
     exchangeRate: fact.exchangeRate ?? null,
     exchangeRateDate: fact.exchangeRateDate ?? null,
     dollarYear: fact.dollarYear ?? null,
-    // QUA-729 Phase A: thread the optional inline sourcing block through to
-    // the wiki-server. When present, /sync writes a `source_check_verdicts`
-    // row in the same transaction as the fact upsert.
-    ...(fact.sourcing !== undefined && { sourcing: fact.sourcing }),
   };
 }
 

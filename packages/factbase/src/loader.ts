@@ -491,9 +491,6 @@ function parseFact(
     ...(rawFact.exchangeRate !== undefined && { exchangeRate: Number(rawFact.exchangeRate) }),
     ...(rawFact.exchangeRateDate !== undefined && { exchangeRateDate: rawFact.exchangeRateDate }),
     ...(rawFact.dollarYear !== undefined && { dollarYear: Number(rawFact.dollarYear) }),
-    // QUA-850 Phase A: pass through the inline sourcing block unchanged. The
-    // wiki-server /sync route validates the shape via `InlineSourcingSchema`.
-    ...(rawFact.sourcing !== undefined && { sourcing: rawFact.sourcing }),
   };
 }
 

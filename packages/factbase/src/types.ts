@@ -41,36 +41,6 @@ export interface Entity {
   wikiId?: string;
 }
 
-// ── Inline sourcing ────────────────────────────────────────────────
-
-/**
- * Optional source-check verdict that can be attached to a Fact.
- *
- * Mirrors the wiki-server's `InlineSourcingSchema` (apps/wiki-server/src/
- * routes/tablebase/sourcing-schema.ts). When a fact carries this block, the
- * FactBase /sync route writes a `source_check_verdicts` row alongside the
- * fact upsert so verified state survives a YAML → PG round-trip.
- */
-export interface InlineSourcing {
-  /** Verdict bucket — must match the wiki-server's enum. */
-  verdict:
-    | "confirmed"
-    | "contradicted"
-    | "outdated"
-    | "partial"
-    | "unverifiable";
-  /** Free-text supporting quote / reasoning (max 5000 chars on the wire). */
-  evidence?: string;
-  /** Confidence score in [0, 1]. */
-  confidence?: number;
-  /** SHA-256 (first 16 hex) of the source content at check time. */
-  sourceContentHash?: string;
-  /** ISO datetime of when the check was performed. */
-  checkedAt?: string;
-  /** Identifier of the checker (model name, agent session, or "inline-submission"). */
-  checkedBy?: string;
-}
-
 // ── Fact ────────────────────────────────────────────────────────────
 
 export interface Fact {
@@ -104,13 +74,6 @@ export interface Fact {
   exchangeRateDate?: string;
   /** Dollar year for inflation context (e.g., 2024). Reserved for future use. */
   dollarYear?: number;
-  /**
-   * Optional source-check verdict (QUA-729 Phase A). When present, the wiki-
-   * server's /api/facts/sync route writes a `source_check_verdicts` row in the
-   * same transaction as the fact upsert. Phase A only stores the value; Phase
-   * C will flip enforcement so writes without sourcing are rejected.
-   */
-  sourcing?: InlineSourcing;
 }
 
 // ── Property ────────────────────────────────────────────────────────
@@ -241,12 +204,6 @@ export interface RawFact {
   exchangeRateDate?: string;
   /** Dollar year for inflation context (reserved for future use) */
   dollarYear?: number;
-  /**
-   * Optional source-check verdict block (QUA-729 Phase A). Carried through
-   * unchanged by the loader/serializer; consumed by the wiki-server /sync
-   * route via `writeInlineVerdicts`.
-   */
-  sourcing?: InlineSourcing;
 }
 
 /** Shape of properties.yaml */
