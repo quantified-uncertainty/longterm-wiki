@@ -24,11 +24,44 @@ export const PERCENTAGE_COLUMNS = new Set([
 /** Visible entity-ref columns that should fall back to a raw legacy text
  *  column (typically also in HIDDEN_COLUMNS) when the FK is null. Avoids
  *  showing em-dash on funding-round rows that only have legacy raw text. */
-export const ENTITY_REF_FALLBACKS: Record<string, string> = {
+export const ENTITY_REF_FALLBACKS: Partial<Record<string, string>> = {
   // lead_investor_entity_id renders as the "Lead Investor" column. When the
   // FK is unresolved, fall back to the raw legacy text column.
   lead_investor_entity_id: "leadInvestor",
 };
+
+/**
+ * Resolve the value for a cell in the entity-profile rendering loop, applying
+ * the `ENTITY_REF_FALLBACKS` mapping when the primary value is empty.
+ *
+ * Returns `{ value, isFallback }` so the caller can visually mark fallback
+ * renders — the admin DB Records tab is a debugging surface, and silently
+ * substituting legacy text for a null FK could hide data-quality issues if
+ * we didn't call it out.
+ *
+ * Fallback only fires when:
+ *   - the column has an entry in `ENTITY_REF_FALLBACKS`,
+ *   - the primary value is `null` / `undefined` / empty string,
+ *   - the fallback row key resolves to a non-empty *string* (objects /
+ *     numbers / booleans are rejected — a column labeled "Lead Investor"
+ *     showing a JSON blob would be worse than em-dash).
+ */
+export function resolveFallbackValue(
+  primary: unknown,
+  columnName: string,
+  row: Record<string, unknown> | undefined,
+): { value: unknown; isFallback: boolean } {
+  if (primary !== null && primary !== undefined && primary !== "") {
+    return { value: primary, isFallback: false };
+  }
+  const fallbackKey = ENTITY_REF_FALLBACKS[columnName];
+  if (!fallbackKey || !row) return { value: primary, isFallback: false };
+  const candidate = row[fallbackKey];
+  if (typeof candidate !== "string" || candidate === "") {
+    return { value: primary, isFallback: false };
+  }
+  return { value: candidate, isFallback: true };
+}
 
 /**
  * Try to parse a value as a finite number. Accepts both `number` (already

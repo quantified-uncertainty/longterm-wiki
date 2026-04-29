@@ -5,6 +5,7 @@ import {
   ENTITY_REF_FALLBACKS,
   tryParseNumeric,
   formatPercentage,
+  resolveFallbackValue,
 } from "../format-numeric";
 
 describe("tryParseNumeric (QUA-767)", () => {
@@ -103,14 +104,17 @@ describe("formatPercentage (QUA-767)", () => {
 });
 
 describe("CURRENCY_COLUMNS membership (QUA-767)", () => {
-  it("includes the columns named in the QUA-767 task list", () => {
-    const required = [
+  it("includes every column the set is documented to contain", () => {
+    // Locking down the full membership so a future drop / rename / typo
+    // surfaces as a test failure instead of a silent regression in formatting.
+    const expected = [
       "amount", "raised", "raised_low", "raised_high",
       "valuation", "valuation_low", "valuation_high",
       "amount_low", "amount_high", "total_budget",
-      "usd_equivalent",
+      "usd_equivalent", "cost_usd",
     ];
-    for (const col of required) {
+    expect(CURRENCY_COLUMNS.size).toBe(expected.length);
+    for (const col of expected) {
       expect(CURRENCY_COLUMNS.has(col), `expected ${col} in CURRENCY_COLUMNS`).toBe(true);
     }
   });
@@ -147,7 +151,68 @@ describe("ENTITY_REF_FALLBACKS (QUA-767)", () => {
     // arrive with camelCase keys, so a snake_case fallback target would
     // silently miss every row.
     for (const fallback of Object.values(ENTITY_REF_FALLBACKS)) {
+      if (fallback === undefined) continue;
       expect(fallback, `fallback ${fallback} must be camelCase`).not.toMatch(/_/);
     }
+  });
+});
+
+describe("resolveFallbackValue (QUA-767)", () => {
+  const row = {
+    leadInvestor: "Sequoia Capital",
+    leadInvestorEntityId: null,
+    notes: "ok",
+  };
+
+  it("returns the primary value untouched when it is non-empty", () => {
+    const r = resolveFallbackValue("sid_abc", "lead_investor_entity_id", row);
+    expect(r).toEqual({ value: "sid_abc", isFallback: false });
+  });
+
+  it("falls back to the legacy text column when primary is null", () => {
+    const r = resolveFallbackValue(null, "lead_investor_entity_id", row);
+    expect(r).toEqual({ value: "Sequoia Capital", isFallback: true });
+  });
+
+  it("falls back when primary is undefined", () => {
+    const r = resolveFallbackValue(undefined, "lead_investor_entity_id", row);
+    expect(r).toEqual({ value: "Sequoia Capital", isFallback: true });
+  });
+
+  it("falls back when primary is the empty string", () => {
+    const r = resolveFallbackValue("", "lead_investor_entity_id", row);
+    expect(r).toEqual({ value: "Sequoia Capital", isFallback: true });
+  });
+
+  it("does NOT fall back when the column has no fallback configured", () => {
+    const r = resolveFallbackValue(null, "company_entity_id", row);
+    expect(r).toEqual({ value: null, isFallback: false });
+  });
+
+  it("does NOT fall back when the fallback row key is missing on the row", () => {
+    const r = resolveFallbackValue(null, "lead_investor_entity_id", { foo: "bar" });
+    expect(r).toEqual({ value: null, isFallback: false });
+  });
+
+  it("does NOT fall back when the fallback row key is the empty string", () => {
+    const r = resolveFallbackValue(null, "lead_investor_entity_id", { leadInvestor: "" });
+    expect(r).toEqual({ value: null, isFallback: false });
+  });
+
+  it("rejects non-string fallback candidates so a 'Lead Investor' column never renders a JSON blob", () => {
+    // A stray numeric / object / boolean in the legacy column would otherwise
+    // flow into `CellValue` and render through the JsonValue / boolean paths,
+    // producing absurd output in a column labeled "Lead Investor".
+    expect(resolveFallbackValue(null, "lead_investor_entity_id", { leadInvestor: 42 }))
+      .toEqual({ value: null, isFallback: false });
+    expect(resolveFallbackValue(null, "lead_investor_entity_id", { leadInvestor: { name: "x" } }))
+      .toEqual({ value: null, isFallback: false });
+    expect(resolveFallbackValue(null, "lead_investor_entity_id", { leadInvestor: true }))
+      .toEqual({ value: null, isFallback: false });
+  });
+
+  it("returns the primary value untouched when row is undefined", () => {
+    const r = resolveFallbackValue(null, "lead_investor_entity_id", undefined);
+    expect(r).toEqual({ value: null, isFallback: false });
   });
 });

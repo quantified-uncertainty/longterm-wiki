@@ -28,9 +28,9 @@ import { isEntityRefColumn } from "./entity-ref-columns";
 import {
   CURRENCY_COLUMNS,
   PERCENTAGE_COLUMNS,
-  ENTITY_REF_FALLBACKS,
   tryParseNumeric,
   formatPercentage,
+  resolveFallbackValue,
 } from "./format-numeric";
 import {
   sanitizeRawIds,
@@ -750,18 +750,22 @@ function ProfileSection({
                     })()}
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
-                      let value = camelKey in row ? row[camelKey] : row[col.name];
-                      // Fall back to a raw legacy column when the entity-ref FK is
-                      // null. Without this, funding rounds whose `lead_investor`
-                      // never resolved render as em-dash even though the legacy
-                      // text column has a usable display name.
-                      if ((value === null || value === undefined || value === "") && ENTITY_REF_FALLBACKS[col.name]) {
-                        const fallback = row[ENTITY_REF_FALLBACKS[col.name]];
-                        if (fallback != null && fallback !== "") value = fallback;
-                      }
+                      const primary = camelKey in row ? row[camelKey] : row[col.name];
+                      // Resolve through the entity-ref fallback map so funding
+                      // rounds whose `lead_investor` FK never resolved still
+                      // render the legacy raw text instead of em-dash. The
+                      // helper rejects non-string fallback candidates so a
+                      // column labeled "Lead Investor" can never accidentally
+                      // render a JSON blob.
+                      const { value, isFallback } = resolveFallbackValue(primary, col.name, row);
+                      const cell = <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />;
                       return (
-                        <td key={col.name} className="px-3 py-2 align-top">
-                          <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />
+                        <td
+                          key={col.name}
+                          className="px-3 py-2 align-top"
+                          title={isFallback ? "Fallback: entity FK is null, showing legacy raw text" : undefined}
+                        >
+                          {isFallback ? <span className="italic text-muted-foreground">{cell}</span> : cell}
                         </td>
                       );
                     })}
