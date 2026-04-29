@@ -1007,6 +1007,13 @@ export type ContentStatus = (typeof CONTENT_STATUS_VALUES)[number];
 // Entities
 // ---------------------------------------------------------------------------
 
+/**
+ * Editorial status values for entities. Matches the EntityStatus Zod enum in
+ * data/schema.ts and the CHECK constraint chk_entities_status added in
+ * migration 0218 (QUA-526). Update all three together if values change.
+ */
+export const ENTITY_STATUS_VALUES = ["stub", "draft", "published", "verified"] as const;
+
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   wikiId: z.string().max(20).nullable().optional(),
@@ -1017,7 +1024,7 @@ export const SyncEntitySchema = z.object({
   website: z.string().max(2000).nullable().optional(),
   tags: z.array(z.string().max(200)).max(100).nullable().optional(),
   clusters: z.array(z.string().max(200)).max(50).nullable().optional(),
-  status: z.string().max(100).nullable().optional(),
+  status: z.enum(ENTITY_STATUS_VALUES).nullable().optional(),
   lastUpdated: z.string().max(50).nullable().optional(),
   customFields: z
     .array(

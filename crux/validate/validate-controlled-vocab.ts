@@ -1,27 +1,29 @@
 #!/usr/bin/env node
 
 /**
- * Controlled Vocabulary Validator
+ * Controlled Vocabulary Validator (YAML-only, post-QUA-526).
  *
- * Validates that free-text fields in YAML entities and PG-primary tables
- * match their expected controlled vocabularies. Reports unknown/non-standard
- * values as warnings and suggests corrections for typos.
+ * Validates that free-text fields in YAML entities match their expected
+ * controlled vocabularies. Reports unknown/non-standard values as warnings
+ * and suggests corrections for typos.
  *
- * Checked fields (YAML entities):
+ * **PG-primary fields are no longer checked here.** They have PG `CHECK`
+ * constraints that enforce the same enums at write time:
+ *   - `personnel.role_type` — chk_personnel_role_type (migration 0173)
+ *   - `divisions.division_type` — chk_divisions_division_type (migration 0173)
+ *   - `divisions.status` — chk_divisions_status (migration 0169)
+ *   - `entities.status` — chk_entities_status (migration 0218, this PR)
+ *
+ * Checked fields (YAML entities, no PG column to CHECK):
  *   - type (entityType): canonical entity types + known aliases
  *   - relatedEntries[].relationship: RelationshipType enum
  *   - orgType: organization sub-type enum
  *   - severity: severity level enum
  *   - maturity: ResearchMaturity enum
- *   - status: EntityStatus enum
  *   - clusters: topic cluster enum
  *   - policyStatus: de facto policy status vocabulary
  *   - projectStatus: project status enum
- *
- * Checked fields (PG-primary, via wiki-server API):
- *   - personnel.roleType: VALID_ROLE_TYPES
- *   - divisions.divisionType: VALID_DIVISION_TYPES
- *   - divisions.status: VALID_STATUSES
+ *   - orgStatus: operational status enum
  *
  * Usage:
  *   pnpm crux validate controlled-vocab             # Run full check
@@ -34,13 +36,11 @@
  */
 
 import { readFileSync, readdirSync, existsSync } from "fs";
-import { join, basename } from "path";
+import { join } from "path";
 import { parse as parseYaml } from "yaml";
 import { getColors } from "../lib/output.ts";
 import { PROJECT_ROOT, DATA_DIR } from "../lib/content-types.ts";
-import { fetchAllRecords } from "./validate-soft-fks.ts";
 import type { ValidatorResult } from "./types.ts";
-import type { Colors } from "../lib/output.ts";
 
 // Canonical sources for vocabulary lists
 import {
@@ -48,7 +48,6 @@ import {
 } from "../../apps/web/src/data/entity-type-names.ts";
 import {
   RelationshipType as RelationshipTypeEnum,
-  EntityStatus as EntityStatusEnum,
   ResearchMaturity as ResearchMaturityEnum,
 } from "../../data/schema.ts";
 
@@ -106,13 +105,9 @@ export const VALID_SEVERITIES = new Set([
 export const VALID_MATURITIES = new Set<string>(ResearchMaturityEnum.options);
 
 /**
- * Valid entity status values — imported from data/schema.ts EntityStatus enum.
- */
-export const VALID_STATUSES = new Set<string>(EntityStatusEnum.options);
-
-/**
  * Valid organization operational status values.
- * Distinct from EntityStatus (stub/draft/published/verified) which tracks editorial state.
+ * Distinct from `entities.status` (the editorial state — stub/draft/published/
+ * verified — which is enforced by chk_entities_status, migration 0218).
  */
 export const VALID_ORG_STATUSES = new Set([
   "active", "merged", "acquired", "defunct", "dissolved", "inactive",
@@ -162,41 +157,6 @@ export const VALID_PROJECT_STATUSES = new Set([
   "beta",
 ] as const);
 
-/**
- * Valid personnel roleType values.
- * Canonical source: apps/wiki-server/src/routes/tablebase/personnel.ts VALID_ROLE_TYPES.
- * Last synced: 2026-03-19.
- */
-export const VALID_ROLE_TYPES = new Set([
-  "key-person",
-  "board",
-  "career",
-] as const);
-
-/**
- * Valid division type values.
- * Canonical source: apps/wiki-server/src/routes/tablebase/divisions.ts VALID_DIVISION_TYPES.
- * Last synced: 2026-03-19.
- */
-export const VALID_DIVISION_TYPES = new Set([
-  "fund",
-  "team",
-  "department",
-  "lab",
-  "program-area",
-] as const);
-
-/**
- * Valid division status values.
- * Canonical source: apps/wiki-server/src/routes/tablebase/divisions.ts VALID_STATUSES.
- * Last synced: 2026-03-19.
- */
-export const VALID_DIVISION_STATUSES = new Set([
-  "active",
-  "inactive",
-  "dissolved",
-] as const);
-
 // ---------------------------------------------------------------------------
 // Interfaces
 // ---------------------------------------------------------------------------
@@ -226,22 +186,6 @@ export interface EntityData {
     relationship?: string;
     strength?: string;
   }>;
-  [key: string]: unknown;
-}
-
-interface PersonnelRow {
-  roleType: string;
-  personId: string;
-  organizationId: string;
-  role: string;
-  [key: string]: unknown;
-}
-
-interface DivisionRow {
-  divisionType: string;
-  name: string;
-  parentOrgId: string;
-  status?: string | null;
   [key: string]: unknown;
 }
 
@@ -373,8 +317,7 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
     // 4. maturity
     checkValue("maturity", entity.maturity, VALID_MATURITIES, id, src, issues);
 
-    // 5. status
-    checkValue("status", entity.status, VALID_STATUSES, id, src, issues);
+    // (entity.status is now PG-enforced — chk_entities_status in migration 0218)
 
     // 6. clusters
     if (Array.isArray(entity.clusters)) {
@@ -438,83 +381,12 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
 }
 
 // ---------------------------------------------------------------------------
-// PG-primary data checks (via wiki-server API)
-// ---------------------------------------------------------------------------
-
-export async function checkPersonnel(): Promise<VocabIssue[]> {
-  const issues: VocabIssue[] = [];
-
-  const records = await fetchAllRecords(
-    "/api/tablebase/personnel",
-    "items",
-    200
-  );
-  if (!records) {
-    // Wiki-server unavailable — skip PG checks gracefully
-    return issues;
-  }
-
-  for (const row of records) {
-    const r = row as PersonnelRow;
-    checkValue(
-      "personnel.roleType",
-      r.roleType,
-      VALID_ROLE_TYPES,
-      `personnel:${r.personId}@${r.organizationId}`,
-      "wiki-server:personnel",
-      issues
-    );
-  }
-
-  return issues;
-}
-
-export async function checkDivisions(): Promise<VocabIssue[]> {
-  const issues: VocabIssue[] = [];
-
-  const records = await fetchAllRecords(
-    "/api/tablebase/divisions",
-    "items",
-    200
-  );
-  if (!records) {
-    return issues;
-  }
-
-  for (const row of records) {
-    const r = row as DivisionRow;
-    checkValue(
-      "divisions.divisionType",
-      r.divisionType,
-      VALID_DIVISION_TYPES,
-      `division:${r.name}@${r.parentOrgId}`,
-      "wiki-server:divisions",
-      issues
-    );
-    if (r.status != null) {
-      checkValue(
-        "divisions.status",
-        r.status,
-        VALID_DIVISION_STATUSES,
-        `division:${r.name}@${r.parentOrgId}`,
-        "wiki-server:divisions",
-        issues
-      );
-    }
-  }
-
-  return issues;
-}
-
-// ---------------------------------------------------------------------------
 // Main
 // ---------------------------------------------------------------------------
 
 export interface ControlledVocabResult extends ValidatorResult {
   issues: VocabIssue[];
   checkedEntities: number;
-  checkedPersonnel: boolean;
-  checkedDivisions: boolean;
 }
 
 export async function validateControlledVocab(options?: {
@@ -525,39 +397,8 @@ export async function validateControlledVocab(options?: {
   const verbose = options?.verbose ?? false;
   const c = getColors(ci);
 
-  // Phase 1: Check YAML entities
   const entities = loadYamlEntities();
-  const yamlIssues = checkYamlEntities(entities);
-
-  // Phase 2: Check PG-primary data (best-effort)
-  let personnelIssues: VocabIssue[] = [];
-  let divisionIssues: VocabIssue[] = [];
-  let checkedPersonnel = false;
-  let checkedDivisions = false;
-
-  try {
-    personnelIssues = await checkPersonnel();
-    checkedPersonnel = true;
-  } catch (e: unknown) {
-    if (!ci) {
-      console.log(
-        `${c.dim}  Skipped personnel checks (wiki-server unavailable)${c.reset}`
-      );
-    }
-  }
-
-  try {
-    divisionIssues = await checkDivisions();
-    checkedDivisions = true;
-  } catch (e: unknown) {
-    if (!ci) {
-      console.log(
-        `${c.dim}  Skipped division checks (wiki-server unavailable)${c.reset}`
-      );
-    }
-  }
-
-  const allIssues = [...yamlIssues, ...personnelIssues, ...divisionIssues];
+  const allIssues = checkYamlEntities(entities);
 
   // Group issues by field for readable output
   const byField = new Map<string, VocabIssue[]>();
@@ -572,7 +413,7 @@ export async function validateControlledVocab(options?: {
       `\n${c.bold}Controlled Vocabulary Validation${c.reset}`
     );
     console.log(
-      `${c.dim}  Checked ${entities.length} YAML entities${checkedPersonnel ? ", personnel" : ""}${checkedDivisions ? ", divisions" : ""}${c.reset}\n`
+      `${c.dim}  Checked ${entities.length} YAML entities${c.reset}\n`
     );
 
     if (allIssues.length === 0) {
@@ -616,7 +457,8 @@ export async function validateControlledVocab(options?: {
     }
 
     if (verbose) {
-      // Show summary of all valid vocabularies
+      // Show summary of all valid vocabularies (YAML-only — PG-enforced fields
+      // are CHECK-constrained server-side and don't appear here).
       console.log(`${c.bold}Valid vocabularies:${c.reset}`);
       const vocabs = [
         { name: "type", values: VALID_ENTITY_TYPES },
@@ -625,13 +467,9 @@ export async function validateControlledVocab(options?: {
         { name: "orgStatus", values: VALID_ORG_STATUSES },
         { name: "severity", values: VALID_SEVERITIES },
         { name: "maturity", values: VALID_MATURITIES },
-        { name: "status", values: VALID_STATUSES },
         { name: "clusters", values: VALID_CLUSTERS },
         { name: "policyStatus", values: VALID_POLICY_STATUSES },
         { name: "projectStatus", values: VALID_PROJECT_STATUSES },
-        { name: "personnel.roleType", values: VALID_ROLE_TYPES },
-        { name: "divisions.divisionType", values: VALID_DIVISION_TYPES },
-        { name: "divisions.status", values: VALID_DIVISION_STATUSES },
       ];
       for (const v of vocabs) {
         console.log(
@@ -649,8 +487,6 @@ export async function validateControlledVocab(options?: {
         warnings: allIssues.length,
         errors: 0,
         checkedEntities: entities.length,
-        checkedPersonnel,
-        checkedDivisions,
         issues: allIssues.map((i) => ({
           field: i.field,
           value: i.value,
@@ -668,8 +504,6 @@ export async function validateControlledVocab(options?: {
     warnings: allIssues.length,
     issues: allIssues,
     checkedEntities: entities.length,
-    checkedPersonnel,
-    checkedDivisions,
   };
 }
 
@@ -682,8 +516,7 @@ async function main(): Promise<void> {
   const ci = args.includes("--ci");
   const verbose = args.includes("--verbose");
 
-  const result = await validateControlledVocab({ ci, verbose });
-
+  await validateControlledVocab({ ci, verbose });
 }
 
 main().catch((err) => {
