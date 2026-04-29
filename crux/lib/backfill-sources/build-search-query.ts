@@ -85,11 +85,7 @@ const BUILDERS: Record<string, Builder> = {
 function defaultBuilder(r: MissingSourceRecord): string[] {
   const entity = preferShortVariant(String(r.entity_name ?? '').trim());
   const description = String(r.description ?? '').trim();
-  // If description embeds the entity name, drop the duplicate copy.
-  const cleanedDesc = entity && description.toLowerCase().includes(entity.toLowerCase())
-    ? description
-    : description;
-  return [entity, dedupeEntityFromDescription(cleanedDesc, r.entity_name ?? '')];
+  return [entity, dedupeEntityFromDescription(description, entity)];
 }
 
 /**

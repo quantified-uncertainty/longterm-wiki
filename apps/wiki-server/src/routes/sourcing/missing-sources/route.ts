@@ -61,7 +61,7 @@ const missingSourcesApp = new Hono()
     } catch (e: unknown) {
       const msg = e instanceof Error ? e.message : String(e);
       console.warn(`[update-source] ${table}/${recordId}: ${msg}`);
-      return c.json({ updated: 0, error: msg }, 500);
+      return c.json({ updated: 0, error: "internal update failure" }, 500);
     }
   });
 

@@ -17,8 +17,8 @@ describe('selfSourcingUrl', () => {
   it('returns the URL when a fact value is an http URL', () => {
     expect(selfSourcingUrl(mkRecord('facts', {
       label: 'Google Scholar',
-      value: 'https://scholar.google.com/citations?user=abc',
-    }))).toBe('https://scholar.google.com/citations?user=abc');
+      value: 'http://example.com/source',
+    }))).toBe('http://example.com/source');
   });
 
   it('returns the URL when a fact value is an https URL', () => {
@@ -63,6 +63,12 @@ describe('selfSourcingUrl', () => {
     }))).toBeNull();
     expect(selfSourcingUrl(mkRecord('investments', {
       value: 'https://example.com',
+    }))).toBeNull();
+  });
+
+  it('returns null for self-domain URLs to prevent circular sourcing', () => {
+    expect(selfSourcingUrl(mkRecord('facts', {
+      value: 'https://www.longtermwiki.com/wiki/E1',
     }))).toBeNull();
   });
 });

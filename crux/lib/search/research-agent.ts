@@ -803,6 +803,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   // Drop excluded hosts before any further work — these would be rejected
   // by downstream verification anyway, and fetching them (Playwright,
   // Wayback) wastes time and money.
+  const uniqueBeforeExclusion = urlToHits.size;
   if (excludeHosts.length > 0) {
     const exclude = excludeHosts.map(h => h.toLowerCase().replace(/^www\./, ''));
     for (const url of [...urlToHits.keys()]) {
@@ -820,7 +821,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
 
   const urlsFound = urlToHits.size;
   const totalHitsBeforeDedup = allHitArrays.reduce((sum, arr) => sum + arr.length, 0) + pgHits.length;
-  const urlsDeduplicated = totalHitsBeforeDedup - urlsFound;
+  const urlsDeduplicated = totalHitsBeforeDedup - uniqueBeforeExclusion;
 
   // Build a best-title mapping from all hits for each URL
   const urlBestTitle = new Map<string, string>();

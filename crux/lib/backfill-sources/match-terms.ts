@@ -25,7 +25,11 @@ const MATCH_TERM_EXTRACTORS: Record<string, Extractor> = {
   funding_programs: r => oneTerm(r.name),
   funding_rounds: r => oneTerm(r.name),
   publications: r => oneTerm(r.title, { minLength: 4 }),
-  page_citations: r => oneTerm(r.note ?? r.cit_title, { minLength: 11, maxLength: 80 }),
+  page_citations: r => {
+    const note = String(r.note ?? '').trim();
+    const title = String(r.cit_title ?? '').trim();
+    return oneTerm(note || title, { minLength: 11, maxLength: 80 });
+  },
 };
 
 /** Extract a single lowercased term from a string field, or [] if too short. */

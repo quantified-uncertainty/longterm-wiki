@@ -22,6 +22,7 @@ import { verifyQuoteInContent } from './prompts.ts';
 import type { RankCandidate } from './types.ts';
 
 export type RejectionReason =
+  | 'invalid-url'
   | 'self-domain'
   | 'placeholder-url'
   | 'too-short'
@@ -29,6 +30,15 @@ export type RejectionReason =
   | 'no-quote'
   | 'quote-fabricated'
   | 'entailment-failed';
+
+function isHttpUrl(rawUrl: string): boolean {
+  try {
+    const u = new URL(rawUrl);
+    return u.protocol === 'http:' || u.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
 
 /**
  * Patterns that indicate an editor-side placeholder URL (auto-saved draft,
@@ -95,6 +105,10 @@ export async function verifySource(
   mentionTargets: string[][],
 ): Promise<VerifyResult> {
   const cost: VerifyCost = { quoteExtractCost: 0, entailmentCost: 0 };
+
+  if (!isHttpUrl(source.url)) {
+    return { kind: 'rejected', reason: 'invalid-url', cost };
+  }
 
   if (isSelfDomain(source.url)) {
     return { kind: 'rejected', reason: 'self-domain', cost };

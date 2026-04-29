@@ -109,10 +109,15 @@ function parseOptions(o: CommandOptions): ParsedOptions | { error: string } {
     return { error: `--max-cost must be a positive number (got ${o.maxCost})` };
   }
 
+  const limit = o.limit ? parseInt(o.limit as string, 10) : 20;
+  if (!Number.isFinite(limit) || limit <= 0) {
+    return { error: `--limit must be a positive integer (got ${o.limit})` };
+  }
+
   return {
     dryRun,
     apply,
-    limit: o.limit ? parseInt(o.limit as string, 10) : 20,
+    limit,
     table: o.table as string | undefined,
     recordIdFilter: o.recordId as string | undefined,
     maxCost,

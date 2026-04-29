@@ -67,7 +67,9 @@ export function parseQuoteResponse(text: string): string[] | null {
  * cause spurious rejections.
  */
 export function verifyQuoteInContent(quote: string, content: string): boolean {
-  return normalizeForSubstring(content).includes(normalizeForSubstring(quote));
+  const normalizedQuote = normalizeForSubstring(quote);
+  if (!normalizedQuote) return false;
+  return normalizeForSubstring(content).includes(normalizedQuote);
 }
 
 function normalizeForSubstring(s: string): string {

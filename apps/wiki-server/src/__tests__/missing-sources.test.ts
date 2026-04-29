@@ -6,7 +6,7 @@
  * These unit tests verify the route wiring and response shape using
  * a simplified mock that handles the facts table only.
  */
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { describe, it, expect, vi, beforeEach, beforeAll } from "vitest";
 import { mockDbModule, postJson } from "./test-utils.js";
 
 const ENTITIES = [
@@ -69,14 +69,16 @@ vi.mock("../db.js", () => mockDbModule(dispatch));
 describe("GET /api/sourcing/missing-sources", () => {
   let app: InstanceType<typeof import("hono").Hono>;
 
-  it("loads the route and returns 200", async () => {
+  beforeAll(async () => {
     const { missingSourcesRoute } = await import(
       "../routes/sourcing/missing-sources/route.js"
     );
     const { Hono } = await import("hono");
     app = new Hono();
     app.route("/api/sourcing/missing-sources", missingSourcesRoute);
+  });
 
+  it("loads the route and returns 200", async () => {
     // Query just facts to avoid mock complexity for all 10 tables
     const res = await app.request("/api/sourcing/missing-sources?table=facts");
     expect(res.status).toBe(200);

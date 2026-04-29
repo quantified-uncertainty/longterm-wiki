@@ -11,7 +11,7 @@
  * is a deliberate change.
  */
 
-import { eq } from "drizzle-orm";
+import { and, eq, isNull } from "drizzle-orm";
 import {
   facts,
   personnel,
@@ -55,7 +55,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(facts)
         .set({ source: url })
-        .where(eq(facts.id, Number(id)))
+        .where(and(eq(facts.id, Number(id)), isNull(facts.source)))
         .returning({ id: facts.id }),
     ),
   personnel: (db, id, url) =>
@@ -63,7 +63,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(personnel)
         .set({ source: url })
-        .where(eq(personnel.id, id))
+        .where(and(eq(personnel.id, id), isNull(personnel.source)))
         .returning({ id: personnel.id }),
     ),
   investments: (db, id, url) =>
@@ -71,7 +71,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(investments)
         .set({ source: url })
-        .where(eq(investments.id, id))
+        .where(and(eq(investments.id, id), isNull(investments.source)))
         .returning({ id: investments.id }),
     ),
   policy_stakeholders: (db, id, url) =>
@@ -79,7 +79,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(policyStakeholders)
         .set({ source: url })
-        .where(eq(policyStakeholders.id, id))
+        .where(and(eq(policyStakeholders.id, id), isNull(policyStakeholders.source)))
         .returning({ id: policyStakeholders.id }),
     ),
   equity_positions: (db, id, url) =>
@@ -87,7 +87,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(equityPositions)
         .set({ source: url })
-        .where(eq(equityPositions.id, id))
+        .where(and(eq(equityPositions.id, id), isNull(equityPositions.source)))
         .returning({ id: equityPositions.id }),
     ),
   divisions: (db, id, url) =>
@@ -95,7 +95,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(divisions)
         .set({ source: url })
-        .where(eq(divisions.id, id))
+        .where(and(eq(divisions.id, id), isNull(divisions.source)))
         .returning({ id: divisions.id }),
     ),
   funding_rounds: (db, id, url) =>
@@ -103,7 +103,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(fundingRounds)
         .set({ source: url })
-        .where(eq(fundingRounds.id, id))
+        .where(and(eq(fundingRounds.id, id), isNull(fundingRounds.source)))
         .returning({ id: fundingRounds.id }),
     ),
   funding_programs: (db, id, url) =>
@@ -111,7 +111,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(fundingPrograms)
         .set({ source: url })
-        .where(eq(fundingPrograms.id, id))
+        .where(and(eq(fundingPrograms.id, id), isNull(fundingPrograms.source)))
         .returning({ id: fundingPrograms.id }),
     ),
   // publications + page_citations store the source URL in the `url` column,
@@ -122,7 +122,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(publications)
         .set({ url })
-        .where(eq(publications.id, id))
+        .where(and(eq(publications.id, id), isNull(publications.url)))
         .returning({ id: publications.id }),
     ),
   page_citations: (db, id, url) =>
@@ -130,7 +130,7 @@ export const UPDATE_BY_TABLE: Record<(typeof UPDATE_TABLE_KEYS)[number], UpdateF
       db
         .update(pageCitations)
         .set({ url })
-        .where(eq(pageCitations.id, Number(id)))
+        .where(and(eq(pageCitations.id, Number(id)), isNull(pageCitations.url)))
         .returning({ id: pageCitations.id }),
     ),
 };

@@ -13,7 +13,7 @@ import { runResearch } from '../search/research-agent.ts';
 import { buildSearchQuery } from './build-search-query.ts';
 import { PER_RECORD_BUDGET, SELF_DOMAINS } from './config.ts';
 import { addCost, emptyCost } from './cost.ts';
-import { entitiesToMention } from './entity-mention.ts';
+import { entitiesToMention, isSelfDomain } from './entity-mention.ts';
 import { humanizeClaim } from './humanize-claim.ts';
 import { rankMatchingSources } from './llm-calls.ts';
 import { extractMatchTerms } from './match-terms.ts';
@@ -266,5 +266,7 @@ export function selfSourcingUrl(record: MissingSourceRecord): string | null {
   const value = record.value;
   if (typeof value !== 'string') return null;
   const trimmed = value.trim();
-  return /^https?:\/\/\S+$/i.test(trimmed) ? trimmed : null;
+  if (!/^https?:\/\/\S+$/i.test(trimmed)) return null;
+  if (isSelfDomain(trimmed)) return null;
+  return trimmed;
 }

@@ -169,7 +169,7 @@ async function queryPolicyStakeholders(db: Db, cap: number): Promise<TableResult
       record_table: sql<string>`'policy_stakeholders'`,
       entity_id: sql<string>`COALESCE(${policyStakeholders.stakeholderEntityId}, ${policyStakeholders.policyEntityId})`,
       entity_name: sql<string>`COALESCE(${stakE.title}, ${policyStakeholders.stakeholderDisplayName})`,
-      description: sql<string>`COALESCE(${policyStakeholders.stakeholderDisplayName}, ${stakE.title}, 'unknown') || ' (' || COALESCE(${policyStakeholders.position}, '') || ') on ' || COALESCE(${polE.title}, ${policyStakeholders.policyEntityId}, 'unknown policy')`,
+      description: sql<string>`COALESCE(${stakE.title}, ${policyStakeholders.stakeholderDisplayName}, 'unknown') || ' (' || COALESCE(${policyStakeholders.position}, '') || ') on ' || COALESCE(${polE.title}, ${policyStakeholders.policyEntityId}, 'unknown policy')`,
       stakeholder_display_name: policyStakeholders.stakeholderDisplayName,
       position: policyStakeholders.position,
       policy_entity_id: policyStakeholders.policyEntityId,
