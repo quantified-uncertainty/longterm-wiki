@@ -1,8 +1,9 @@
 #!/usr/bin/env node
 
 /**
- * Validate that every `${{ secrets.NAME }}` reference in .github/workflows/*.yml
- * resolves to a real GitHub secret (repo-level or org-inherited).
+ * Validate that every `${{ secrets.NAME }}` reference in
+ * .github/workflows/*.yml resolves to a real GitHub repo secret (or to
+ * an explicitly allowlisted org-inherited secret).
  *
  * Background: QUA-676 (PR #4581). PR #4559 plumbed
  * `LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}` into three workflows, but
@@ -16,15 +17,21 @@
  *
  * Usage: npx tsx crux/validate/validate-workflow-secrets.ts
  *
+ * Org-inherited secrets (those not visible to `gh secret list` from repo
+ * scope) can be allowlisted via the `KNOWN_INHERITED_SECRETS` env var:
+ *
+ *   KNOWN_INHERITED_SECRETS=OPENROUTER_API_KEY,EXA_API_KEY \
+ *     npx tsx crux/validate/validate-workflow-secrets.ts
+ *
  * Fail-open conditions (exit 0 with a warning):
  *   - `gh` CLI not installed
  *   - `gh` not authenticated
  *   - `gh secret list` returns a network/permission error
  *
- * These are the same fail-open shape as `assign-ids` and other gate steps
- * that depend on external services. The CI environment runs with
- * GITHUB_TOKEN and full secret-list permission, so the check is effective
- * there; local/fork environments without auth get an advisory pass.
+ * These match `assign-ids` and other gate steps that depend on external
+ * services. CI runs with GITHUB_TOKEN + full secret-list permission so
+ * the check is effective there; local/fork environments without auth
+ * get an advisory pass.
  */
 
 import { execSync } from 'child_process';
@@ -125,43 +132,64 @@ function readWorkflowFiles(): Array<{ path: string; content: string }> {
 }
 
 /**
- * Read repo + inherited secret names via `gh secret list`. Returns null on
- * any error (fail-open).
+ * Read repo-level secret names via `gh secret list`. Returns null on
+ * error (the caller treats null as fail-open).
+ *
+ * Note: `gh secret list` only enumerates repo-scoped secrets. Org-inherited
+ * secrets visible to a workflow are NOT returned here (the CLI has no
+ * `--include-inherited` flag for `secret list`). For the longterm-wiki
+ * org there are currently zero org-level Action secrets configured —
+ * verified via `gh api repos/.../actions/organization-secrets`. If that
+ * changes, pass an allowlist via `KNOWN_INHERITED_SECRETS=A,B,C` env var.
  */
-function fetchKnownSecrets(repo: string): { secrets: Set<string>; reason?: string } | null {
-  // Runs `gh secret list` once for repo-scoped secrets and once with
-  // --include-inherited for org-level. The union is what the workflows
-  // actually see at runtime.
-  const sets: Set<string> = new Set();
-  for (const args of [
-    ['secret', 'list', '-R', repo, '--json', 'name'],
-    ['secret', 'list', '-R', repo, '--include-inherited', '--json', 'name'],
-  ]) {
-    let raw: string;
-    try {
-      raw = execSync(`gh ${args.map((a) => `'${a}'`).join(' ')}`, {
-        encoding: 'utf-8',
-        stdio: ['pipe', 'pipe', 'pipe'],
-      });
-    } catch (err) {
-      // --include-inherited may not be supported on older gh versions, or
-      // the user/CI may lack org-level read. Fall through if the
-      // repo-scoped call already gave us names.
-      if (sets.size > 0) continue;
-      const msg = err instanceof Error ? err.message : String(err);
-      return { secrets: sets, reason: `gh secret list failed: ${msg.split('\n')[0]}` };
-    }
-    let parsed: Array<{ name: string }>;
-    try {
-      parsed = JSON.parse(raw);
-    } catch {
-      continue;
-    }
-    for (const item of parsed) {
-      if (item && typeof item.name === 'string') sets.add(item.name);
+function fetchKnownSecrets(repo: string): Set<string> | null {
+  let raw: string;
+  try {
+    raw = execSync(`gh secret list -R '${repo}' --json name`, {
+      encoding: 'utf-8',
+      stdio: ['pipe', 'pipe', 'pipe'],
+    });
+  } catch {
+    return null;
+  }
+  let parsed: unknown;
+  try {
+    parsed = JSON.parse(raw);
+  } catch {
+    return null;
+  }
+  if (!Array.isArray(parsed)) return null;
+  const secrets = new Set<string>();
+  for (const item of parsed) {
+    if (
+      item != null &&
+      typeof item === 'object' &&
+      'name' in item &&
+      typeof (item as { name: unknown }).name === 'string'
+    ) {
+      secrets.add((item as { name: string }).name);
     }
   }
-  return { secrets: sets };
+  return secrets;
+}
+
+/**
+ * Parse a comma-separated allowlist of inherited secret names. Empty,
+ * whitespace-only, and lowercase entries are dropped. Exported for
+ * testing.
+ */
+export function parseInheritedAllowlist(raw: string | undefined): Set<string> {
+  if (!raw) return new Set();
+  return new Set(
+    raw
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => /^[A-Z0-9_]+$/.test(s)),
+  );
+}
+
+function readInheritedAllowlist(): Set<string> {
+  return parseInheritedAllowlist(process.env.KNOWN_INHERITED_SECRETS);
 }
 
 function ghAvailable(): { ok: boolean; reason?: string } {
@@ -205,9 +233,9 @@ export function runCheck(opts: { repo?: string } = {}): CheckResult {
     return { passed: true, errors: 0, violations: [], checked: false, skipReason: gh.reason };
   }
 
-  const fetched = fetchKnownSecrets(repo);
-  if (!fetched) {
-    console.log(`${c.yellow}⚠ Skipping: gh secret list unavailable.${c.reset}`);
+  const repoSecrets = fetchKnownSecrets(repo);
+  if (!repoSecrets) {
+    console.log(`${c.yellow}⚠ Skipping: gh secret list unavailable (no auth or API error).${c.reset}`);
     return {
       passed: true,
       errors: 0,
@@ -217,11 +245,13 @@ export function runCheck(opts: { repo?: string } = {}): CheckResult {
     };
   }
 
-  const missing = findMissingSecrets(refs, fetched.secrets);
+  const inherited = readInheritedAllowlist();
+  const known = new Set<string>([...repoSecrets, ...inherited]);
+  const missing = findMissingSecrets(refs, known);
 
   if (missing.length === 0) {
     console.log(
-      `${c.green}All ${refs.length} secret reference(s) resolve to a known secret (${fetched.secrets.size} secrets visible).${c.reset}`,
+      `${c.green}All ${refs.length} secret reference(s) resolve (${repoSecrets.size} repo + ${inherited.size} inherited).${c.reset}`,
     );
     return { passed: true, errors: 0, violations: [], checked: true };
   }

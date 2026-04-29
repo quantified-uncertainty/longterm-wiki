@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { findSecretRefs, findMissingSecrets } from './validate-workflow-secrets.ts';
+import {
+  findSecretRefs,
+  findMissingSecrets,
+  parseInheritedAllowlist,
+} from './validate-workflow-secrets.ts';
 
 describe('validate-workflow-secrets', () => {
   describe('findSecretRefs', () => {
@@ -113,6 +117,42 @@ describe('validate-workflow-secrets', () => {
       const refs = [{ file: 'a.yml', line: 1, name: 'FOO' }];
       const missing = findMissingSecrets(refs, new Set(['foo']));
       expect(missing).toEqual(refs);
+    });
+  });
+
+  describe('parseInheritedAllowlist', () => {
+    it('returns empty set for undefined', () => {
+      expect(parseInheritedAllowlist(undefined)).toEqual(new Set());
+    });
+
+    it('returns empty set for empty string', () => {
+      expect(parseInheritedAllowlist('')).toEqual(new Set());
+    });
+
+    it('parses a single name', () => {
+      expect(parseInheritedAllowlist('FOO')).toEqual(new Set(['FOO']));
+    });
+
+    it('parses comma-separated names with whitespace', () => {
+      expect(parseInheritedAllowlist('FOO, BAR ,BAZ')).toEqual(
+        new Set(['FOO', 'BAR', 'BAZ']),
+      );
+    });
+
+    it('drops lowercase entries (GitHub secret names are uppercase)', () => {
+      expect(parseInheritedAllowlist('FOO,bar,Baz')).toEqual(new Set(['FOO']));
+    });
+
+    it('drops entries with disallowed characters', () => {
+      expect(parseInheritedAllowlist('FOO,BAR-X,BAZ.Y,QUX')).toEqual(
+        new Set(['FOO', 'QUX']),
+      );
+    });
+
+    it('accepts digits and underscores', () => {
+      expect(parseInheritedAllowlist('FOO_2,BAR_API_KEY')).toEqual(
+        new Set(['FOO_2', 'BAR_API_KEY']),
+      );
     });
   });
 });
