@@ -6,11 +6,17 @@ import { mockDbModule, postJson } from "./test-utils.js";
 
 let factsStore: Map<string, Record<string, unknown>>;
 let thingsStore: Map<string, Record<string, unknown>>; // key: `${source_table}::${source_id}`
+/** key: `${recordType}::${recordId}::${fieldName ?? ''}` (matches the verdicts PK) */
+let verdictsStore: Map<string, Record<string, unknown>>;
+/** key: `${recordType}::${recordId}::${sourceUrl ?? ''}::${checkerModel ?? ''}` */
+let evidenceStore: Map<string, Record<string, unknown>>;
 let nextId: number;
 
 function resetStores() {
   factsStore = new Map();
   thingsStore = new Map();
+  verdictsStore = new Map();
+  evidenceStore = new Map();
   nextId = 1;
 }
 
@@ -299,6 +305,85 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
+  // --- source_check_verdicts: INSERT ... ON CONFLICT (writeInlineVerdicts) ---
+  // writeInlineVerdicts emits literal `NULL` for field_name and SQL constants
+  // for sources_checked / needs_recheck / next_check_due / NOW() values, so
+  // those slots do not appear in `params`. Param order matches the bound
+  // template variables in writeInlineVerdicts.ts:
+  //   [recordType, recordId, entityId, verdict, confidence, reasoning]
+  if (
+    q.includes("insert into source_check_verdicts") ||
+    (q.includes("source_check_verdicts") && q.includes("on conflict"))
+  ) {
+    const recordType = String(params[0] ?? "");
+    const recordId = String(params[1] ?? "");
+    const entityId = params[2] ?? null;
+    const verdict = params[3] ?? null;
+    const confidence = params[4] ?? null;
+    const reasoning = params[5] ?? null;
+    verdictsStore.set(`${recordType}::${recordId}::`, {
+      record_type: recordType,
+      record_id: recordId,
+      field_name: null,
+      entity_id: entityId,
+      verdict,
+      confidence,
+      reasoning,
+    });
+    return [];
+  }
+
+  // --- source_check_evidence: INSERT ... ON CONFLICT (writeInlineVerdicts) ---
+  // Param order:
+  //   [recordType, recordId, entityId, sourceUrl, verdict, confidence,
+  //    extractedQuote, checkerModel, (checkedAt if explicit)]
+  if (
+    q.includes("insert into source_check_evidence") ||
+    (q.includes("source_check_evidence") && q.includes("on conflict"))
+  ) {
+    const recordType = String(params[0] ?? "");
+    const recordId = String(params[1] ?? "");
+    const entityId = params[2] ?? null;
+    const sourceUrl = String(params[3] ?? "");
+    const verdict = params[4] ?? null;
+    const confidence = params[5] ?? null;
+    const extractedQuote = params[6] ?? null;
+    const checkerModel = String(params[7] ?? "");
+    evidenceStore.set(
+      `${recordType}::${recordId}::${sourceUrl}::${checkerModel}`,
+      {
+        record_type: recordType,
+        record_id: recordId,
+        field_name: null,
+        entity_id: entityId,
+        source_url: sourceUrl,
+        verdict,
+        confidence,
+        extracted_quote: extractedQuote,
+        checker_model: checkerModel,
+      },
+    );
+    return [];
+  }
+
+  // --- recomputeVerdict: SELECT FROM source_check_evidence ---
+  // Returns existing evidence rows for the (recordType, recordId, fieldName).
+  // Tests don't care about the exact aggregate result, so return empty —
+  // recomputeVerdict will short-circuit to "unchecked" without DELETing.
+  if (q.includes("source_check_evidence") && q.includes("select")) {
+    return [];
+  }
+
+  // --- recomputeVerdict: UPDATE source_check_verdicts (when no evidence) ---
+  if (q.includes("update") && q.includes("source_check_verdicts")) {
+    return [];
+  }
+
+  // --- recomputeVerdict: DELETE source_check_verdicts (when aggregate=unchecked) ---
+  if (q.includes("delete") && q.includes("source_check_verdicts")) {
+    return [];
+  }
+
   // --- entity_ids: COUNT (for health check) ---
   if (q.includes("count(*)") && !q.includes('"facts"')) {
     return [{ count: 0 }];
@@ -522,6 +607,130 @@ describe("Facts API", () => {
         ],
       });
       expect(res.status).toBe(200);
+    });
+
+    // ---- QUA-850: inline sourcing wiring ----
+
+    it("writes a verdict row when a fact carries an inline `sourcing` block", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "rev2024",
+            label: "Revenue",
+            value: "1000000000",
+            numeric: 1000000000,
+            asOf: "2024",
+            measure: "revenue",
+            source: "https://anthropic.com/about",
+            sourcing: {
+              verdict: "confirmed",
+              evidence: "Annual report states $1B revenue.",
+              confidence: 0.9,
+              checkedAt: "2026-04-29T00:00:00.000Z",
+              checkedBy: "claude-haiku-4-5-20251001",
+            },
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { upserted: number; verdictsWritten: number };
+      expect(body.upserted).toBe(1);
+      expect(body.verdictsWritten).toBe(1);
+
+      // The verdict was upserted via record_type='fact', record_id=factId.
+      const verdict = verdictsStore.get("fact::rev2024::");
+      expect(verdict).toBeDefined();
+      expect(verdict!.verdict).toBe("confirmed");
+      expect(verdict!.entity_id).toBe("anthropic");
+
+      // Evidence row was upserted at the fact's source URL using the
+      // sourcing.checkedBy as the checker_model — same convention used by
+      // tablebase routes.
+      const evidence = evidenceStore.get(
+        "fact::rev2024::https://anthropic.com/about::claude-haiku-4-5-20251001",
+      );
+      expect(evidence).toBeDefined();
+      expect(evidence!.verdict).toBe("confirmed");
+      expect(evidence!.extracted_quote).toBe("Annual report states $1B revenue.");
+    });
+
+    it("is backwards-compatible: facts without sourcing succeed and write zero verdicts", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "rev2025",
+            value: "2000000000",
+            numeric: 2000000000,
+            asOf: "2025",
+            measure: "revenue",
+            // no sourcing block
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { upserted: number; verdictsWritten: number };
+      expect(body.upserted).toBe(1);
+      expect(body.verdictsWritten).toBe(0);
+      expect(verdictsStore.size).toBe(0);
+      expect(evidenceStore.size).toBe(0);
+    });
+
+    it("writes verdicts for the subset of facts that carry sourcing in a mixed batch", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "fact-a",
+            value: "100",
+            numeric: 100,
+            measure: "revenue",
+          },
+          {
+            entityId: "anthropic",
+            factId: "fact-b",
+            value: "200",
+            numeric: 200,
+            measure: "revenue",
+            sourcing: { verdict: "partial", confidence: 0.5 },
+          },
+          {
+            entityId: "anthropic",
+            factId: "fact-c",
+            value: "300",
+            numeric: 300,
+            measure: "revenue",
+            sourcing: { verdict: "contradicted" },
+          },
+        ],
+      });
+      expect(res.status).toBe(200);
+      const body = (await res.json()) as { upserted: number; verdictsWritten: number };
+      expect(body.upserted).toBe(3);
+      expect(body.verdictsWritten).toBe(2);
+      expect(verdictsStore.has("fact::fact-a::")).toBe(false);
+      expect(verdictsStore.get("fact::fact-b::")?.verdict).toBe("partial");
+      expect(verdictsStore.get("fact::fact-c::")?.verdict).toBe("contradicted");
+    });
+
+    it("rejects an invalid verdict enum value with 400 (not silent fail-open)", async () => {
+      const res = await postJson(app, "/api/facts/sync", {
+        facts: [
+          {
+            entityId: "anthropic",
+            factId: "rev-bad",
+            value: "100",
+            numeric: 100,
+            measure: "revenue",
+            sourcing: { verdict: "definitely-not-a-real-verdict" },
+          },
+        ],
+      });
+      expect(res.status).toBe(400);
+      // Schema rejection — no rows written.
+      expect(factsStore.size).toBe(0);
+      expect(verdictsStore.size).toBe(0);
     });
   });
 
