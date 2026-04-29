@@ -721,12 +721,12 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       const outcome = await runCheckCycle(cycleCount, config);
       await exitIfFault(outcome);
     } catch (e) {
-      // If runCheckCycle (or runHealthGate inside it) threw a MissingTokenError
-      // before reaching its return, treat it as a permanent fault — otherwise
-      // the daemon swallows it as a transient cycle error and keeps cycling
-      // silently, defeating the QUA-799 guard.
+      // A MissingTokenError thrown before runCheckCycle could return is a
+      // permanent fault; without this branch the daemon would log "Check
+      // cycle failed" and keep cycling silently (QUA-799).
       if (isMissingTokenError(e)) {
         await handlePermanentFault(MISSING_TOKEN_SUMMARY, faultDeps);
+        continue; // Unreachable in prod; explicit for test mocks.
       }
       log(
         `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,

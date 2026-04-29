@@ -173,10 +173,7 @@ export function requireGitHubTokenOrExit(
     if (isMissingTokenError(e)) {
       log(`ERROR: ${MISSING_TOKEN_SUMMARY}`);
       exit(1);
-      // In production `exit` does not return; this path is only reached when
-      // a test injects a mock that doesn't kill the runner. Return to avoid
-      // re-throwing the MissingTokenError after the mock-exit swallows it.
-      return;
+      return; // Test-only: real process.exit() never returns; bare return prevents re-throw under mocked exit.
     }
     throw e;
   }

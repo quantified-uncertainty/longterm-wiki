@@ -351,9 +351,9 @@ describe('runHealthGate — scanner error', () => {
     // First N-1 proceed; Nth halts
     expect(lastDecision!.proceed).toBe(false);
     expect(lastDecision!.reason).toContain('consecutively');
-    // QUA-799: a transient streak halt is NOT a permanent fault — the
-    // daemon should keep cycling (the streak may clear when GitHub recovers),
-    // unlike a missing-token halt which exits the daemon outright.
+    // A transient streak halt is NOT a permanent fault — the daemon should
+    // keep cycling (the streak may clear when GitHub recovers), unlike a
+    // missing-token halt which exits the daemon outright.
     expect(lastDecision!.permanentFault).toBe(false);
     expect(store.getCount('__scan_error_count__')).toBe(MAX_CONSECUTIVE_SCAN_ERRORS);
   });
@@ -429,9 +429,8 @@ describe('runHealthGate — unhealthy', () => {
   });
 
   it('reports permanentFault=false for fleet-level signals (deploy-stuck etc.)', async () => {
-    // QUA-799 regression: deploy-stuck and similar signals are transient by
-    // construction — the patrol should keep cycling and re-checking. Only
-    // missing-token sets permanentFault.
+    // Deploy-stuck and similar signals are transient — the patrol should keep
+    // cycling and re-checking. Only missing-token sets permanentFault.
     const deps = makeDeps();
     const decision = await runHealthGate({
       ...deps,

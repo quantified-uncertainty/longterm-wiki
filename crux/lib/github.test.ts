@@ -150,9 +150,6 @@ describe('isMissingTokenError', () => {
   });
 });
 
-// Shared preflight used by every long-running patrol entry point — see
-// QUA-799 for the silent-degradation incident that motivated extracting this
-// from three duplicated copies in the patrol code.
 describe('requireGitHubTokenOrExit', () => {
   afterEach(() => {
     vi.unstubAllEnvs();
