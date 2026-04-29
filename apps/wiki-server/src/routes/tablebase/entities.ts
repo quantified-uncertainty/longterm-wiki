@@ -4,7 +4,7 @@ import { eq, and, count, asc, sql, ilike, or, inArray, notInArray, gte } from "d
 import type { SQL } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
-import { entities, facts, things } from "../../schema.js";
+import { entities, facts, grants, things } from "../../schema.js";
 import { isAnySid, isSid } from "@longterm-wiki/id-utils";
 import { checkRefsExist } from "../shared/ref-check.js";
 import {
@@ -120,7 +120,7 @@ const SearchQuery = z.object({
 
 // ---- Organizations query schema ----
 
-const ORG_SORT_ALLOWED = ["name", "revenue", "valuation", "headcount", "totalFunding", "founded"] as const;
+const ORG_SORT_ALLOWED = ["name", "revenue", "valuation", "headcount", "totalFunding", "founded", "grantsGiven"] as const;
 
 const OrganizationsQuery = z.object({
   limit: clampedLimit(MAX_PAGE_SIZE, 50),
@@ -357,6 +357,14 @@ const entitiesApp = new Hono()
       LIMIT 1
     )`;
 
+    // Count of grants where this org is the grantor (entity acts as funder).
+    // Uses idx_grants_org_entity on org_entity_id; returns 0 for non-funder orgs.
+    const grantsGivenCountExpr = sql`(
+      SELECT COUNT(*)::int
+      FROM ${grants} g
+      WHERE g.org_entity_id = ${entities.stableId}
+    )`;
+
     // Build ORDER BY
     const { field, dir } = parseSort(sort, ORG_SORT_ALLOWED, "name", "asc");
     const sortColMap: Record<string, SQL> = {
@@ -366,6 +374,7 @@ const entitiesApp = new Hono()
       headcount: latestFact("headcount"),
       totalFunding: latestFact("total-funding"),
       founded: latestFactText("founded-date"),
+      grantsGiven: grantsGivenCountExpr,
     };
     const sortCol = sortColMap[field] ?? sql`${entities.title}`;
     const orderClause =
@@ -402,6 +411,7 @@ const entitiesApp = new Hono()
       headcountDate: string | null;
       totalFundingNum: number | null;
       foundedDate: string | null;
+      grantsGivenCount: number | null;
     }
 
     let rows: OrgRow[] = await db
@@ -420,6 +430,7 @@ const entitiesApp = new Hono()
         headcountDate: sql<string | null>`${latestFactAsOf("headcount")}`,
         totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
         foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
+        grantsGivenCount: sql<number | null>`${grantsGivenCountExpr}`,
       })
       .from(entities)
       .where(where)
@@ -461,6 +472,7 @@ const entitiesApp = new Hono()
             headcountDate: sql<string | null>`${latestFactAsOf("headcount")}`,
             totalFundingNum: sql<number | null>`${latestFact("total-funding")}`,
             foundedDate: sql<string | null>`${latestFactText("founded-date")}`,
+            grantsGivenCount: sql<number | null>`${grantsGivenCountExpr}`,
           })
           .from(entities)
           .where(trigramWhere)
@@ -486,6 +498,7 @@ const entitiesApp = new Hono()
         headcountDate: r.headcountDate,
         totalFundingNum: r.totalFundingNum != null ? Number(r.totalFundingNum) : null,
         foundedDate: r.foundedDate,
+        grantsGivenCount: r.grantsGivenCount != null ? Number(r.grantsGivenCount) : 0,
       })),
       total,
       limit,

@@ -25,6 +25,7 @@ function makeRow(overrides: Partial<OrgRow> = {}): OrgRow {
     totalFundingNum: null,
     foundedDate: null,
     peopleCount: null,
+    grantsGivenCount: null,
     completionScore: 1,
     verdictString: null,
     searchText: "",
@@ -189,6 +190,46 @@ describe("compareOrgRows", () => {
       const withCount = makeRow({ name: "A", peopleCount: 5 });
       const noCount = makeRow({ name: "B", peopleCount: null });
       expect(compareOrgRows(withCount, noCount, "peopleCount", "asc")).toBeLessThan(0);
+    });
+  });
+
+  describe("grantsGiven sorting", () => {
+    it("returns grantsGivenCount via getOrgSortValue", () => {
+      expect(
+        getOrgSortValue(makeRow({ grantsGivenCount: 27 }), "grantsGiven"),
+      ).toBe(27);
+      expect(
+        getOrgSortValue(makeRow({ grantsGivenCount: null }), "grantsGiven"),
+      ).toBe(null);
+      expect(
+        getOrgSortValue(makeRow({ grantsGivenCount: 0 }), "grantsGiven"),
+      ).toBe(0);
+    });
+
+    it("sorts by grantsGivenCount ascending", () => {
+      const low = makeRow({ name: "A", grantsGivenCount: 3 });
+      const high = makeRow({ name: "B", grantsGivenCount: 100 });
+      expect(compareOrgRows(low, high, "grantsGiven", "asc")).toBeLessThan(0);
+    });
+
+    it("sorts by grantsGivenCount descending (funders first)", () => {
+      const nonFunder = makeRow({ name: "A", grantsGivenCount: 0 });
+      const funder = makeRow({ name: "B", grantsGivenCount: 50 });
+      expect(compareOrgRows(funder, nonFunder, "grantsGiven", "desc")).toBeLessThan(0);
+    });
+
+    it("puts null grantsGivenCount last in ascending order", () => {
+      const withCount = makeRow({ name: "A", grantsGivenCount: 5 });
+      const noCount = makeRow({ name: "B", grantsGivenCount: null });
+      expect(
+        compareOrgRows(withCount, noCount, "grantsGiven", "asc"),
+      ).toBeLessThan(0);
+    });
+
+    it("treats 0 as a real value (sorted before positive counts in asc)", () => {
+      const zero = makeRow({ name: "A", grantsGivenCount: 0 });
+      const some = makeRow({ name: "B", grantsGivenCount: 5 });
+      expect(compareOrgRows(zero, some, "grantsGiven", "asc")).toBeLessThan(0);
     });
   });
 
