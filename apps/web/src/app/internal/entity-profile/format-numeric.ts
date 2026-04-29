@@ -63,14 +63,8 @@ export function resolveFallbackValue(
   return { value: candidate, isFallback: true };
 }
 
-/**
- * Try to parse a value as a finite number. Accepts both `number` (already
- * parsed) and `string` (Drizzle numeric()/bigint encoding). Rejects:
- *   - null / undefined / non-numeric types
- *   - empty / whitespace-only strings
- *   - range strings like "[0.07, 0.15]" or JSON object/array literals
- *   - NaN, Infinity, -Infinity
- */
+/** Parse a value as a finite number, accepting Drizzle's string encoding for
+ *  numeric() and rejecting JSON-array / range-string literals like "[0.07, 0.15]". */
 export function tryParseNumeric(value: unknown): number | null {
   if (typeof value === "number") return Number.isFinite(value) ? value : null;
   if (typeof value !== "string") return null;
@@ -80,11 +74,9 @@ export function tryParseNumeric(value: unknown): number | null {
   return Number.isFinite(n) ? n : null;
 }
 
-/**
- * Format a numeric stake/percentage value. PG stores stakes as 0–1 decimals
- * (`0.07` = 7%), but a few legacy rows already encode them as percent points
- * (`15` = 15%). We disambiguate on `Math.abs(n) > 1`.
- */
+/** Format a numeric stake as `X.X%`. Legacy rows encode percent points
+ *  directly (`15` = 15%) while modern rows use 0–1 decimals (`0.15` = 15%) —
+ *  disambiguate on `Math.abs(n) > 1`. */
 export function formatPercentage(n: number): string {
   const pct = Math.abs(n) > 1 ? n : n * 100;
   return `${pct.toFixed(1).replace(/\.0$/, "")}%`;

@@ -751,12 +751,6 @@ function ProfileSection({
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
                       const primary = camelKey in row ? row[camelKey] : row[col.name];
-                      // Resolve through the entity-ref fallback map so funding
-                      // rounds whose `lead_investor` FK never resolved still
-                      // render the legacy raw text instead of em-dash. The
-                      // helper rejects non-string fallback candidates so a
-                      // column labeled "Lead Investor" can never accidentally
-                      // render a JSON blob.
                       const { value, isFallback } = resolveFallbackValue(primary, col.name, row);
                       const cell = <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />;
                       return (

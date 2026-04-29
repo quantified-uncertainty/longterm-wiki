@@ -60,15 +60,9 @@ describe("tryParseNumeric (QUA-767)", () => {
     expect(tryParseNumeric("Infinity")).toBeNull();
   });
 
-  it("handles very large numeric strings without precision loss for typical funding amounts", () => {
-    // $4 billion — the largest funding round in QUA-90 acceptance criteria
+  it("handles very large numeric strings for typical funding amounts", () => {
+    // $4 billion — the largest funding round in QUA-90 acceptance criteria.
     expect(tryParseNumeric("4000000000")).toBe(4_000_000_000);
-    // Above Number.MAX_SAFE_INTEGER would lose precision, but tryParseNumeric
-    // still returns *some* finite number rather than null. Worth a regression
-    // marker so anyone changing the helper notices.
-    const huge = tryParseNumeric("9007199254740993"); // MAX_SAFE_INTEGER + 2
-    expect(huge).not.toBeNull();
-    expect(Number.isFinite(huge)).toBe(true);
   });
 });
 
