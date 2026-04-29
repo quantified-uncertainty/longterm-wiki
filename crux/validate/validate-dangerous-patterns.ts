@@ -37,7 +37,7 @@
  * Usage: npx tsx crux/validate/validate-dangerous-patterns.ts
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
@@ -45,6 +45,7 @@ import {
   extractInlineComment as sharedExtractInlineComment,
   buildSuppressionRegex as sharedBuildSuppressionRegex,
 } from './lib/comment-utils.ts';
+import { collectTsFiles } from './lib/file-walker.ts';
 
 // Re-export for backward-compat with this validator's test file. The shared
 // implementation lives in `./lib/comment-utils.ts` and is used by both
@@ -239,46 +240,6 @@ export function checkLine(
     if (prevComment !== null && re.test(prevComment)) return false;
     return true;
   });
-}
-
-// ---------------------------------------------------------------------------
-// File walking
-// ---------------------------------------------------------------------------
-
-/** Recursively collect .ts files, excluding tests and node_modules. */
-function collectTsFiles(dir: string): string[] {
-  const results: string[] = [];
-
-  function walk(current: string): void {
-    let entries: string[];
-    try {
-      entries = readdirSync(current);
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const fullPath = join(current, entry);
-      let stat;
-      try {
-        stat = statSync(fullPath);
-      } catch {
-        continue;
-      }
-
-      if (stat.isDirectory()) {
-        if (entry === '__tests__' || entry === 'node_modules' || entry === 'dist') {
-          continue;
-        }
-        walk(fullPath);
-      } else if (entry.endsWith('.ts') && !entry.endsWith('.test.ts')) {
-        results.push(fullPath);
-      }
-    }
-  }
-
-  walk(dir);
-  return results;
 }
 
 function isRouteFile(absPath: string): boolean {

@@ -30,16 +30,16 @@
  * Usage: npx tsx crux/validate/validate-typed-client.ts
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
 import {
-  extractInlineComment,
   findInlineCommentStart,
   isInsideStringAt,
   buildSuppressionRegex,
 } from './lib/comment-utils.ts';
+import { collectTsFiles } from './lib/file-walker.ts';
 
 /** Directories to scan (relative to PROJECT_ROOT). */
 const SCAN_DIRS = ['crux'];
@@ -99,26 +99,23 @@ export function lineHasViolation(
     return false;
   }
 
-  // Find apiRequest<...> matches that are NOT inside a string literal AND
-  // NOT inside an inline comment. The regex is reset each call (separate
-  // state per pattern test). Skipping matches that fall after the inline
-  // comment opener prevents false positives like:
-  //   foo(); // see apiRequest<T> docs
-  // where the regex would otherwise match the literal text in the comment.
+  // Find apiRequest<...> matches that are real code: not inside an inline
+  // comment, not inside a string literal. Skipping matches past the comment
+  // opener avoids false positives like `foo(); // see apiRequest<T> docs`.
   const commentStart = findInlineCommentStart(line);
-  const re = new RegExp(TYPED_API_REQUEST_PATTERN_G.source, 'g');
-  let match: RegExpExecArray | null;
   let foundRealMatch = false;
-  while ((match = re.exec(line)) !== null) {
-    if (commentStart !== -1 && match.index >= commentStart) continue;
-    if (!isInsideStringAt(line, match.index)) {
+  for (const match of line.matchAll(TYPED_API_REQUEST_PATTERN_G)) {
+    const idx = match.index ?? 0;
+    if (commentStart !== -1 && idx >= commentStart) continue;
+    if (!isInsideStringAt(line, idx)) {
       foundRealMatch = true;
       break;
     }
   }
   if (!foundRealMatch) return false;
 
-  const inlineComment = extractInlineComment(line);
+  // Reuse `commentStart` to extract the inline comment without a second walk.
+  const inlineComment = commentStart === -1 ? null : line.slice(commentStart + 2);
   if (inlineComment !== null && SUPPRESSION_REGEX.test(inlineComment)) {
     return false;
   }
@@ -132,46 +129,6 @@ export function lineHasViolation(
   }
 
   return true;
-}
-
-function collectTsFiles(dir: string): string[] {
-  const results: string[] = [];
-
-  function walk(current: string): void {
-    let entries: string[];
-    try {
-      entries = readdirSync(current);
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const fullPath = join(current, entry);
-      let stat;
-      try {
-        stat = statSync(fullPath);
-      } catch {
-        continue;
-      }
-
-      if (stat.isDirectory()) {
-        if (entry === '__tests__' || entry === 'node_modules' || entry === 'dist') {
-          continue;
-        }
-        walk(fullPath);
-      } else if (
-        // Scan .ts and .tsx; skip *.test.ts and *.test.tsx test files.
-        (entry.endsWith('.ts') || entry.endsWith('.tsx')) &&
-        !entry.endsWith('.test.ts') &&
-        !entry.endsWith('.test.tsx')
-      ) {
-        results.push(fullPath);
-      }
-    }
-  }
-
-  walk(dir);
-  return results;
 }
 
 function isExcluded(absPath: string): boolean {
@@ -211,7 +168,9 @@ export function runCheck(): {
   const allFiles: string[] = [];
   for (const dir of SCAN_DIRS) {
     const absDir = join(PROJECT_ROOT, dir);
-    allFiles.push(...collectTsFiles(absDir).filter((p) => !isExcluded(p)));
+    allFiles.push(
+      ...collectTsFiles(absDir, { includeTsx: true }).filter((p) => !isExcluded(p)),
+    );
   }
 
   if (allFiles.length === 0) {
