@@ -25,7 +25,7 @@
  * `git push` to `crux gh pr create`.
  */
 
-import { execSync } from 'node:child_process';
+import { execFileSync } from 'node:child_process';
 import { readFileSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 
@@ -78,16 +78,21 @@ export function parseMarker(line: string): ParsedMarker | null {
  * (likely fresh worktree, no main reference) or rethrow.
  */
 export function computeDiffHash(cwd: string = process.cwd()): string {
+  // Use execFileSync everywhere instead of execSync so interpolated values
+  // (mergeBase) cannot be shell-interpreted. The unified-rule validator
+  // `no-exec-sync` rejects template-literal execSync for exactly this
+  // reason — defense-in-depth even though `git merge-base` output is
+  // always a 40-char hex SHA in practice.
   let mergeBase: string;
   try {
-    mergeBase = execSync('git merge-base HEAD origin/main', {
+    mergeBase = execFileSync('git', ['merge-base', 'HEAD', 'origin/main'], {
       cwd,
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf-8',
     }).trim();
   } catch {
     // Fallback to local `main` ref.
-    mergeBase = execSync('git merge-base HEAD main', {
+    mergeBase = execFileSync('git', ['merge-base', 'HEAD', 'main'], {
       cwd,
       stdio: ['ignore', 'pipe', 'ignore'],
       encoding: 'utf-8',
@@ -96,9 +101,10 @@ export function computeDiffHash(cwd: string = process.cwd()): string {
   if (!mergeBase) {
     throw new Error('Could not resolve merge-base with main / origin/main');
   }
-  // Use Buffer mode so binary diffs hash identically to shasum's behavior.
-  // The marker writer pipes the raw `git diff` output to `shasum -a 256`.
-  const diffOutput = execSync(`git diff ${mergeBase}...HEAD`, {
+  // Use Buffer mode (no encoding) so binary diffs hash identically to
+  // shasum's behavior. The marker writer pipes the raw `git diff` output
+  // to `shasum -a 256`.
+  const diffOutput = execFileSync('git', ['diff', `${mergeBase}...HEAD`], {
     cwd,
     stdio: ['ignore', 'pipe', 'ignore'],
     maxBuffer: 256 * 1024 * 1024, // 256MB; large enough for any realistic PR
@@ -111,7 +117,7 @@ export function computeDiffHash(cwd: string = process.cwd()): string {
 
 /** Get current HEAD SHA. */
 function getHeadSha(cwd: string = process.cwd()): string {
-  return execSync('git rev-parse HEAD', {
+  return execFileSync('git', ['rev-parse', 'HEAD'], {
     cwd,
     stdio: ['ignore', 'pipe', 'ignore'],
     encoding: 'utf-8',
