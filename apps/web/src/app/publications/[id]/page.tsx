@@ -12,6 +12,7 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { ProfileStatCard } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { safeHref } from "@/lib/directory-utils";
 import {
   PublicationResourcesTable,
@@ -25,7 +26,6 @@ import {
   BookOpen,
   CheckCircle2,
 } from "lucide-react";
-import { safeHref } from "@/lib/directory-utils";
 
 // Cache for 1 hour — on-demand rendered to reduce build size.
 export const revalidate = 3600;
@@ -137,16 +137,13 @@ export default async function PublicationDetailPage({ params }: PageProps) {
       titlePills={titlePills}
       verdict={pubVerdict?.verdict ?? null}
       verdictHref={
-        pubVerdict?.verdict
-          ? `/sourcing/publication/${encodeURIComponent(pub.id)}`
-          : undefined
+        pubVerdict?.verdict ? getSourcingHref("publication", pub.id) : undefined
       }
       subtitle={pub.description || undefined}
       headerLinks={headerLinks}
       statCards={statCards}
     >
       <div className="space-y-8">
-        {/* Credibility Rationale */}
         <section className="p-4 rounded-lg border border-border bg-card">
           <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
             Credibility Rating
@@ -170,7 +167,6 @@ export default async function PublicationDetailPage({ params }: PageProps) {
           </div>
         </section>
 
-        {/* Tracked Domains */}
         {pub.domains.length > 0 && (
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
@@ -190,7 +186,6 @@ export default async function PublicationDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Resources Table */}
         {resources.length > 0 && (
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-3">
@@ -201,7 +196,6 @@ export default async function PublicationDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Citing pages */}
         {pageSet.size > 0 && (
           <section>
             <h2 className="text-sm font-semibold uppercase tracking-wide text-muted-foreground mb-2">
@@ -226,7 +220,6 @@ export default async function PublicationDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Footer */}
         <div className="text-xs text-muted-foreground border-t border-border pt-4">
           Publication ID:{" "}
           <code className="px-1 py-0.5 bg-muted rounded">{pub.id}</code>

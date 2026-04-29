@@ -18,6 +18,8 @@ import {
   EntityLinkDisplay,
   INSTRUMENT_COLORS,
 } from "@/lib/record-detail-ui";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SectionHeader } from "@/components/factbase/entity-section-header";
 import {
   formatKBDate,
   titleCase,
@@ -210,15 +212,13 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
       verdict={roundVerdict?.verdict ?? null}
       verdictHref={
         roundVerdict?.verdict
-          ? `/sourcing/funding-round/${encodeURIComponent(String(round.key))}`
+          ? getSourcingHref("funding-round", String(round.key))
           : undefined
       }
       statCards={statCards}
     >
       <div className="space-y-8">
-        {/* Details grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left column: key details */}
           <div className="space-y-4">
             <DetailSection title="Company">
               <EntityLinkDisplay
@@ -246,7 +246,6 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Right column: supplementary info */}
           <div className="space-y-4">
             {round.source && (
               <DetailSection title="Source">
@@ -276,16 +275,9 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Investments in this round */}
         {roundInvestments.length > 0 && (
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-base font-bold tracking-tight">Investors in This Round</h2>
-              <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                {roundInvestments.length}
-              </span>
-              <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-            </div>
+            <SectionHeader title="Investors in This Round" count={roundInvestments.length} />
             <div className="border border-border/60 rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
@@ -331,18 +323,12 @@ export default async function FundingRoundDetailPage({ params }: PageProps) {
           </section>
         )}
 
-        {/* Other rounds by same company */}
         {otherRounds.length > 0 && (
           <section>
-            <div className="flex items-center gap-3 mb-4">
-              <h2 className="text-base font-bold tracking-tight">
-                Other Rounds by {round.companyName}
-              </h2>
-              <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-                {otherRounds.length}
-              </span>
-              <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-            </div>
+            <SectionHeader
+              title={`Other Rounds by ${round.companyName}`}
+              count={otherRounds.length}
+            />
             <div className="border border-border/60 rounded-xl overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>

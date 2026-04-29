@@ -18,6 +18,8 @@ import {
   EntityLinkDisplay,
   INSTRUMENT_COLORS,
 } from "@/lib/record-detail-ui";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { SectionHeader } from "@/components/factbase/entity-section-header";
 import {
   formatKBDate,
   titleCase,
@@ -218,15 +220,13 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
       verdict={investmentVerdict?.verdict ?? null}
       verdictHref={
         investmentVerdict?.verdict
-          ? `/sourcing/investment/${encodeURIComponent(String(investment.key))}`
+          ? getSourcingHref("investment", String(investment.key))
           : undefined
       }
       statCards={statCards}
     >
       <div className="space-y-8">
-        {/* Details grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left column: key details */}
           <div className="space-y-4">
             <DetailSection title="Company">
               <EntityLinkDisplay
@@ -269,7 +269,6 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Right column: supplementary info */}
           <div className="space-y-4">
             {investment.source && (
               <DetailSection title="Source">
@@ -299,7 +298,6 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Other investments in same company */}
         {otherInSameCompany.length > 0 && (
           <RelatedInvestmentsSection
             title={`Other Investments in ${companyDisplayName}`}
@@ -309,7 +307,6 @@ export default async function InvestmentDetailPage({ params }: PageProps) {
           />
         )}
 
-        {/* Other investments by same investor */}
         {otherBySameInvestor.length > 0 && (
           <RelatedInvestmentsSection
             title={`Other Investments by ${investment.investorName}`}
@@ -340,13 +337,7 @@ function RelatedInvestmentsSection({
 }) {
   return (
     <section>
-      <div className="flex items-center gap-3 mb-4">
-        <h2 className="text-base font-bold tracking-tight">{title}</h2>
-        <span className="text-[11px] font-medium tabular-nums px-2 py-0.5 rounded-full bg-muted text-muted-foreground">
-          {totalCount}
-        </span>
-        <div className="flex-1 h-px bg-gradient-to-r from-border/60 to-transparent" />
-      </div>
+      <SectionHeader title={title} count={totalCount} />
       <div className="border border-border/60 rounded-xl overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
