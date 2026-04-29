@@ -75,7 +75,6 @@ const CI_MODE: boolean = args.includes('--ci') || process.env.CI === 'true';
 const FULL_GATE: boolean = args.includes('--full-gate');
 const NO_TRIAGE: boolean = args.includes('--no-triage') || FULL_GATE || CI_MODE;
 const NO_CACHE: boolean = args.includes('--no-cache') || FULL_GATE || CI_MODE;
-const FORCE_MODE: boolean = args.includes('--force');
 const SCOPE: string = args.find(a => a.startsWith('--scope='))?.split('=')[1] || '';
 const CONTENT_ONLY: boolean = SCOPE === 'content';
 
@@ -715,22 +714,6 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
     // Advisory: detects when the same entity has different dates (founding,
     // departure, employment ranges) stated across multiple wiki pages.
-    advisory: true,
-    emitOutputInCi: true,
-  },
-  {
-    id: 'sourcing-coverage',
-    name: 'TableBase sourcing coverage',
-    command: 'npx',
-    args: ['tsx', 'crux/validate/validate-sourcing-coverage.ts',
-      // Advisory until existing unverified manifests are backfilled (Discussion #3875).
-      // Switch to --enforcement=soft after personnel/grants backfill is complete.
-      '--enforcement=advisory',
-      ...(FORCE_MODE ? ['--force'] : [])],
-    cwd: PROJECT_ROOT,
-    // Advisory for now — warns but doesn't block. Will become soft enforcement
-    // (blocking, --force override) once backfill coverage reaches >50% for
-    // personnel and grants. Hard-enforced tables (Phase 5) are always blocking.
     advisory: true,
     emitOutputInCi: true,
   },

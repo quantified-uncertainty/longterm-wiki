@@ -65,7 +65,7 @@ This audit classifies all 62 `crux/validate/validate-*.ts` validators into three
 | **validate-display-formatting** | No [object Object], no unescaped MDX in titles | blocking | S | Schema constraint + write-path assertion | small | QUA-497 |
 | **validate-person-refs** | FactBase person refs resolve with names | blocking | R | Keep as validator (requires entity display name lookup) | — | None |
 | **validate-rendered-sid** | No sid_ leaks in built data (database.json, factbase-data.json) | blocking | R | Keep as validator (last-line-of-defense build check) | — | None |
-| **validate-sourcing-coverage** | TableBase sourcing manifest coverage (advisory) | advisory | W | Route `/sync` handler assertion | small | QUA-470 |
+| **validate-sourcing-coverage** | TableBase sourcing manifest coverage (advisory) | DELETED | W | Route `/sync` handler assertion (shipped via `enforceSourcing()` in sync-factory; QUA-528) | small | QUA-470 |
 | **validate-tablebase-completeness** | Routes have `/delete-batch`, entity-ref validation | blocking | W | Route pattern enforcement or linter | small | None |
 | **validate-tablebase-registry** | Registry ↔ route file cross-check | blocking | S | Build-time registry validator | small | QUA-456 |
 | **validate-factbase-schema** | KB schema validation (required fields, refs, data quality) | blocking | R | Keep as validator (semantic KB structure) | — | None |
