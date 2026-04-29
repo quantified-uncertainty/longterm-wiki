@@ -290,11 +290,14 @@ function preflightChecks(config: PatrolConfig): string[] {
  * daemon cannot recover from on its own (e.g. missing GITHUB_TOKEN). The
  * daemon loop exits in that case rather than cycling silently — see QUA-799
  * for the silent-degradation incident this guards against.
+ *
+ * Discriminated union so the reason field is only present (and required) on
+ * the fault branch — a future caller can't accidentally read an empty string
+ * as "no problem".
  */
-interface CycleOutcome {
-  permanentFault: boolean;
-  permanentFaultReason: string;
-}
+type CycleOutcome =
+  | { permanentFault: false }
+  | { permanentFault: true; reason: string };
 
 async function runCheckCycle(
   cycleCount: number,
@@ -319,10 +322,9 @@ async function runCheckCycle(
       health_gate_reason: gate.reason,
       permanent_fault: gate.permanentFault,
     });
-    return {
-      permanentFault: gate.permanentFault,
-      permanentFaultReason: gate.permanentFault ? gate.reason : '',
-    };
+    return gate.permanentFault
+      ? { permanentFault: true, reason: gate.reason }
+      : { permanentFault: false };
   }
 
   // 0a. Check if a tracked main-branch fix PR has been merged
@@ -363,8 +365,9 @@ async function runCheckCycle(
       queue_size: 0,
       pr_processed: null,
       main_branch_fix: true,
+      permanent_fault: false,
     });
-    return { permanentFault: false, permanentFaultReason: '' }; // Main takes the whole cycle; PRs wait
+    return { permanentFault: false }; // Main takes the whole cycle; PRs wait
   }
 
   // 0b. Check deploy health
@@ -608,9 +611,50 @@ async function runCheckCycle(
     merge_eligible: eligibleForMerge.length,
     deploy_healthy: deployHealth.healthy,
     deploy_failing_since: deployHealth.failingSince ?? undefined,
+    permanent_fault: false,
   });
 
-  return { permanentFault: false, permanentFaultReason: '' };
+  return { permanentFault: false };
+}
+
+// ── Permanent-fault handling ────────────────────────────────────────────────
+
+/**
+ * Side-effect dependencies for {@link handlePermanentFault}, broken out so
+ * unit tests can assert without actually killing the test runner.
+ */
+export interface PermanentFaultDeps {
+  log: (msg: string) => void;
+  removePidFile: () => void;
+  releaseClaim: () => Promise<void>;
+  exit: (code: number) => never;
+}
+
+/**
+ * Handle a permanent fault detected during a cycle: log loudly, release any
+ * held PR claim (otherwise the next daemon process can't pick it up), remove
+ * the PID file, and exit with code 1 so a process supervisor sees the
+ * failure. See QUA-799 for the silent-degradation incident this guards
+ * against.
+ *
+ * Awaits `releaseClaim` so an in-flight claim doesn't leak in PG when the
+ * gate trips mid-cycle. Mirrors the existing SIGTERM `shutdown` handler.
+ */
+export async function handlePermanentFault(
+  reason: string,
+  deps: PermanentFaultDeps,
+): Promise<never> {
+  deps.log(
+    `✗ Patrol cannot continue: ${reason}. ` +
+      `Exiting daemon (QUA-799). Fix the env and restart.`,
+  );
+  await deps.releaseClaim().catch((e: unknown) => {
+    deps.log(
+      `Warning: failed to release claim during permanent-fault exit: ${e instanceof Error ? e.message : String(e)}`,
+    );
+  });
+  deps.removePidFile();
+  return deps.exit(1);
 }
 
 // ── Daemon loop ─────────────────────────────────────────────────────────────
@@ -654,19 +698,19 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   // The daemon cannot recover from this on its own, so cycling forever just
   // produces silent JSONL churn instead of forcing operator attention. See
   // QUA-799.
-  const exitOnPermanentFault = (outcome: CycleOutcome): void => {
-    if (!outcome.permanentFault) return;
-    log(
-      `${cl.red}✗ Patrol cannot continue: ${outcome.permanentFaultReason}. ` +
-        `Exiting daemon (QUA-799). Fix the env and restart.${cl.reset}`,
-    );
-    removePidFile();
-    process.exit(1);
+  const faultDeps: PermanentFaultDeps = {
+    log: (msg) => log(`${cl.red}${msg}${cl.reset}`),
+    removePidFile,
+    releaseClaim: () => releaseCurrentClaim(config.repo),
+    exit: process.exit as (code: number) => never,
+  };
+  const exitIfFault = async (outcome: CycleOutcome): Promise<void> => {
+    if (outcome.permanentFault) await handlePermanentFault(outcome.reason, faultDeps);
   };
 
   if (config.once) {
     const outcome = await runCheckCycle(1, config);
-    exitOnPermanentFault(outcome);
+    await exitIfFault(outcome);
     return;
   }
 
@@ -675,8 +719,15 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     cycleCount++;
     try {
       const outcome = await runCheckCycle(cycleCount, config);
-      exitOnPermanentFault(outcome);
+      await exitIfFault(outcome);
     } catch (e) {
+      // If runCheckCycle (or runHealthGate inside it) threw a MissingTokenError
+      // before reaching its return, treat it as a permanent fault — otherwise
+      // the daemon swallows it as a transient cycle error and keeps cycling
+      // silently, defeating the QUA-799 guard.
+      if (isMissingTokenError(e)) {
+        await handlePermanentFault(MISSING_TOKEN_SUMMARY, faultDeps);
+      }
       log(
         `${cl.red}Check cycle failed: ${e instanceof Error ? e.message : String(e)}${cl.reset}`,
       );

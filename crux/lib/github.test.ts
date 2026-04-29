@@ -5,6 +5,7 @@ import {
   MissingTokenError,
   MISSING_TOKEN_HELP_MESSAGE,
   MISSING_TOKEN_SUMMARY,
+  requireGitHubTokenOrExit,
 } from './github.ts';
 
 // Use `vi.stubEnv()` instead of mutating `process.env` directly. This is
@@ -146,5 +147,59 @@ describe('isMissingTokenError', () => {
     expect(isMissingTokenError('MissingTokenError')).toBe(false);
     expect(isMissingTokenError(42)).toBe(false);
     expect(isMissingTokenError({})).toBe(false);
+  });
+});
+
+// Shared preflight used by every long-running patrol entry point — see
+// QUA-799 for the silent-degradation incident that motivated extracting this
+// from three duplicated copies in the patrol code.
+describe('requireGitHubTokenOrExit', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+  });
+
+  it('does not log or exit when GITHUB_TOKEN is set', () => {
+    vi.stubEnv('GITHUB_TOKEN', 'ghp_abc123');
+    const logs: string[] = [];
+    const exits: number[] = [];
+    requireGitHubTokenOrExit(
+      (msg) => logs.push(msg),
+      ((code: number) => {
+        exits.push(code);
+        return undefined as never;
+      }),
+    );
+    expect(logs).toHaveLength(0);
+    expect(exits).toHaveLength(0);
+  });
+
+  it('logs the canonical summary and calls exit(1) when GITHUB_TOKEN is missing', () => {
+    vi.stubEnv('GITHUB_TOKEN', undefined as unknown as string);
+    const logs: string[] = [];
+    const exits: number[] = [];
+    requireGitHubTokenOrExit(
+      (msg) => logs.push(msg),
+      ((code: number) => {
+        exits.push(code);
+        return undefined as never;
+      }),
+    );
+    expect(logs).toEqual([`ERROR: ${MISSING_TOKEN_SUMMARY}`]);
+    expect(exits).toEqual([1]);
+  });
+
+  it('logs and exits when GITHUB_TOKEN is whitespace-only (delegates to getGitHubToken)', () => {
+    vi.stubEnv('GITHUB_TOKEN', '   \n');
+    const logs: string[] = [];
+    const exits: number[] = [];
+    requireGitHubTokenOrExit(
+      (msg) => logs.push(msg),
+      ((code: number) => {
+        exits.push(code);
+        return undefined as never;
+      }),
+    );
+    expect(exits).toEqual([1]);
+    expect(logs[0]).toContain(MISSING_TOKEN_SUMMARY);
   });
 });

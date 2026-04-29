@@ -301,7 +301,10 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
       );
       return {
         proceed: false,
-        reason: `${MISSING_TOKEN_SUMMARY} in environment`,
+        // Include the original error message so operator-visible logs (and
+        // the eventual `crux gh pr-patrol status` view of cycle_summary)
+        // can distinguish "no env var" from a corrupted-token variant.
+        reason: `${MISSING_TOKEN_SUMMARY} in environment: ${message}`,
         result: syntheticScanFailureResult(message),
         emittedIssues: [],
         suppressedIssues: [],

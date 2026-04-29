@@ -15,12 +15,7 @@ import { execSync } from 'child_process';
 import { tryRebaseAndVerify } from './rebase-verify.ts';
 import { gitIn, gitSafe, gitSafeIn } from '../lib/git.ts';
 import { parseIntOpt } from '../lib/cli.ts';
-import {
-  getGitHubToken,
-  isMissingTokenError,
-  MISSING_TOKEN_SUMMARY,
-  REPO,
-} from '../lib/github.ts';
+import { requireGitHubTokenOrExit, REPO } from '../lib/github.ts';
 import type { PatrolConfig, ScoredPr, FixOutcome } from './types.ts';
 import {
   appendJsonl,
@@ -734,15 +729,7 @@ export async function runParallelDaemon(config: ParallelConfig): Promise<void> {
   log(`  mode=${config.once ? 'single pass' : config.dryRun ? 'dry run' : 'continuous'}`);
   log(`  JSONL: ${JSONL_FILE}`);
 
-  try {
-    getGitHubToken();
-  } catch (e) {
-    if (isMissingTokenError(e)) {
-      log(`${cl.red}ERROR: ${MISSING_TOKEN_SUMMARY}${cl.reset}`);
-      process.exit(1);
-    }
-    throw e;
-  }
+  requireGitHubTokenOrExit((msg) => log(`${cl.red}${msg}${cl.reset}`));
 
   // Signal handlers for graceful shutdown
   let shuttingDown = false;

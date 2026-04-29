@@ -9,6 +9,7 @@ import {
   DISABLE_ENV_VAR,
   type HealthGateDeps,
 } from './health-gate.ts';
+import { handlePermanentFault, type PermanentFaultDeps } from './index.ts';
 import type { HealthScanResult, HealthIssue } from './health-scan.ts';
 
 // ── Fixtures ─────────────────────────────────────────────────────────────────
@@ -646,5 +647,78 @@ describe('fingerprintIssue', () => {
     expect(a).toBe('ratchet-drift:foo');
     expect(b).toBe('ratchet-drift:bar');
     expect(a).not.toBe(b);
+  });
+});
+
+// ── Permanent-fault handling (QUA-799) ───────────────────────────────────────
+
+describe('handlePermanentFault', () => {
+  function makeFaultDeps() {
+    const logs: string[] = [];
+    const exits: number[] = [];
+    let claimReleased = 0;
+    const removed: number[] = [];
+    const deps: PermanentFaultDeps = {
+      log: (msg) => logs.push(msg),
+      removePidFile: () => removed.push(removed.length),
+      releaseClaim: async () => {
+        claimReleased += 1;
+      },
+      exit: ((code: number) => {
+        exits.push(code);
+        // Mock exit must throw to abort the awaiting caller — production
+        // process.exit never returns, and tests need a reliable abort signal.
+        throw new Error(`__test_exit_${code}__`);
+      }) as (code: number) => never,
+    };
+    return {
+      deps,
+      logs,
+      exits,
+      removed,
+      claimReleasedCount: () => claimReleased,
+    };
+  }
+
+  it('logs the reason, releases the claim, removes the pid file, and exits 1', async () => {
+    const t = makeFaultDeps();
+    await expect(
+      handlePermanentFault('GITHUB_TOKEN not set in environment', t.deps),
+    ).rejects.toThrow('__test_exit_1__');
+
+    expect(t.exits).toEqual([1]);
+    // Claim release must happen BEFORE exit so the next daemon process can
+    // pick up the PR — the SIGTERM `shutdown` handler does the same thing.
+    expect(t.claimReleasedCount()).toBe(1);
+    expect(t.removed).toHaveLength(1);
+    expect(t.logs.some((l) => l.includes('GITHUB_TOKEN not set'))).toBe(true);
+    expect(t.logs.some((l) => l.includes('Exiting daemon'))).toBe(true);
+  });
+
+  it('still exits 1 even if releaseClaim rejects (logs the warning)', async () => {
+    // Realistic case: wiki-server is also down or the claim row was already
+    // removed manually. The fault path must not get stuck waiting on cleanup.
+    const logs: string[] = [];
+    const exits: number[] = [];
+    const deps: PermanentFaultDeps = {
+      log: (msg) => logs.push(msg),
+      removePidFile: () => {},
+      releaseClaim: async () => {
+        throw new Error('wiki-server unreachable');
+      },
+      exit: ((code: number) => {
+        exits.push(code);
+        throw new Error(`__test_exit_${code}__`);
+      }) as (code: number) => never,
+    };
+    await expect(handlePermanentFault('test reason', deps)).rejects.toThrow(
+      '__test_exit_1__',
+    );
+    expect(exits).toEqual([1]);
+    expect(
+      logs.some((l) =>
+        l.includes('failed to release claim during permanent-fault exit'),
+      ),
+    ).toBe(true);
   });
 });

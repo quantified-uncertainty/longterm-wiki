@@ -151,6 +151,38 @@ export function getGitHubToken(): string {
 }
 
 /**
+ * Daemon preflight helper used by every long-running patrol entry point
+ * (`runDaemon`, `runParallelDaemon`, `runBranchAgent`). Verifies a non-empty
+ * `GITHUB_TOKEN` is present in the environment; if missing, logs the canonical
+ * one-liner via `log` and exits with code 1 via `exit`.
+ *
+ * Centralised here so the three daemons share a single tested implementation
+ * — without it, each daemon hand-rolls the same try/catch/exit block and the
+ * code drifts (one daemon already had no preflight at all, see QUA-799).
+ *
+ * `log` and `exit` are injectable so unit tests can assert on the side
+ * effects without actually killing the test runner.
+ */
+export function requireGitHubTokenOrExit(
+  log: (msg: string) => void,
+  exit: (code: number) => never = process.exit as (code: number) => never,
+): void {
+  try {
+    getGitHubToken();
+  } catch (e) {
+    if (isMissingTokenError(e)) {
+      log(`ERROR: ${MISSING_TOKEN_SUMMARY}`);
+      exit(1);
+      // In production `exit` does not return; this path is only reached when
+      // a test injects a mock that doesn't kill the runner. Return to avoid
+      // re-throwing the MissingTokenError after the mock-exit swallows it.
+      return;
+    }
+    throw e;
+  }
+}
+
+/**
  * Check a string for signs of shell-expansion corruption or ANSI escape codes
  * before it gets posted to GitHub.
  *
