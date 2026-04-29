@@ -18,6 +18,44 @@
 export const REPO = 'quantified-uncertainty/longterm-wiki';
 
 /**
+ * Per-request timeout for GitHub API and GraphQL fetches. Without this, a hung
+ * TCP connection or stalled TLS handshake blocks the caller indefinitely —
+ * which in the patrol loop manifested as "fetch failed" persisting for hours
+ * with no specifics about what was being attempted (QUA-823).
+ *
+ * 30s is generous: GitHub's documented p99 is well under 5s, and our largest
+ * payloads (PR creation with long bodies) finish in single-digit seconds.
+ */
+export const GITHUB_API_TIMEOUT_MS = 30_000;
+
+/**
+ * Wrap a `fetch` rejection (TypeError "fetch failed", AbortError on timeout,
+ * etc.) with the URL/method context so the patrol log shows what was being
+ * attempted. Plain `fetch` errors do not include the URL — see QUA-823 where
+ * 37+ consecutive "fetch failed" log lines gave no hint at the failing
+ * endpoint. Re-throws as a normal `Error` so existing `instanceof
+ * GitHubApiError` / `isMissingTokenError` checks remain unaffected.
+ */
+function wrapFetchError(method: string, endpoint: string, err: unknown): Error {
+  const isAbort =
+    err instanceof Error && (err.name === 'AbortError' || err.name === 'TimeoutError');
+  const cause = err instanceof Error ? err.message : String(err);
+  // Surface the underlying cause too — Node wraps DNS/connection errors as
+  // `error.cause` on the outer TypeError; without this the log loses "ENOTFOUND"
+  // / "ECONNREFUSED" specifics.
+  const inner =
+    err instanceof Error && (err as { cause?: unknown }).cause instanceof Error
+      ? `: ${(err as { cause: Error }).cause.message}`
+      : '';
+  if (isAbort) {
+    return new Error(
+      `GitHub API ${method} ${endpoint} timed out after ${GITHUB_API_TIMEOUT_MS}ms`,
+    );
+  }
+  return new Error(`GitHub API ${method} ${endpoint} fetch failed: ${cause}${inner}`);
+}
+
+/**
  * Short one-liner for display summaries ("GITHUB_TOKEN not set"). Kept in one
  * place so the ~7 display call sites (health-check / pr-quality / ci-main-health
  * summaries, wellness-report warning, github-lookup error, pr-patrol index
@@ -229,13 +267,22 @@ export async function githubApi<T = unknown>(
     Accept: 'application/vnd.github+json',
   };
 
-  const fetchOptions: RequestInit = { method, headers };
+  const fetchOptions: RequestInit = {
+    method,
+    headers,
+    signal: AbortSignal.timeout(GITHUB_API_TIMEOUT_MS),
+  };
   if (body) {
     headers['Content-Type'] = 'application/json';
     fetchOptions.body = JSON.stringify(body);
   }
 
-  const resp = await fetch(url, fetchOptions);
+  let resp: Response;
+  try {
+    resp = await fetch(url, fetchOptions);
+  } catch (e) {
+    throw wrapFetchError(method, endpoint, e);
+  }
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => '(no body)');
@@ -319,14 +366,20 @@ export async function githubGraphQL<T = unknown>(
     }
   }
 
-  const resp = await fetch('https://api.github.com/graphql', {
-    method: 'POST',
-    headers: {
-      Authorization: `bearer ${token}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ query, variables }),
-  });
+  let resp: Response;
+  try {
+    resp = await fetch('https://api.github.com/graphql', {
+      method: 'POST',
+      headers: {
+        Authorization: `bearer ${token}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ query, variables }),
+      signal: AbortSignal.timeout(GITHUB_API_TIMEOUT_MS),
+    });
+  } catch (e) {
+    throw wrapFetchError('POST', '/graphql', e);
+  }
 
   if (!resp.ok) {
     const text = await resp.text().catch(() => '(no body)');

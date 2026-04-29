@@ -6,6 +6,7 @@ import {
   fingerprintIssue,
   HEALTH_GATE_COOLDOWN_MINUTES,
   MAX_CONSECUTIVE_SCAN_ERRORS,
+  SCAN_FAILURE_PROCEED_AFTER_MINUTES,
   DISABLE_ENV_VAR,
   type HealthGateDeps,
 } from './health-gate.ts';
@@ -364,6 +365,80 @@ describe('runHealthGate — scanner error', () => {
       },
     });
     expect(decision.proceed).toBe(true);
+  });
+
+  // QUA-823: prolonged scan failures must not halt patrol indefinitely.
+  it(`fails OPEN after ${SCAN_FAILURE_PROCEED_AFTER_MINUTES}min of consecutive failures (regression: indefinite-halt risk)`, async () => {
+    const store = inMemoryCooldown();
+    const baseDeps = makeDeps({ cooldownStore: store });
+    const scan = async () => {
+      throw new Error('GitHub API GET /repos/.../runs fetch failed: ENOTFOUND api.github.com');
+    };
+
+    // Cycle 1 at NOW: first failure starts the streak.
+    await runHealthGate({ ...baseDeps, scan, now: () => NOW });
+
+    // Cycle 2 at NOW + 5min: still in streak, would halt at MAX_CONSECUTIVE.
+    const fiveMinIn = new Date(NOW.getTime() + 5 * 60_000);
+    await runHealthGate({ ...baseDeps, scan, now: () => fiveMinIn });
+
+    // Cycle N at NOW + 31min: streak duration past the threshold.
+    const pastThreshold = new Date(
+      NOW.getTime() + (SCAN_FAILURE_PROCEED_AFTER_MINUTES + 1) * 60_000,
+    );
+    const decision = await runHealthGate({ ...baseDeps, scan, now: () => pastThreshold });
+
+    expect(decision.proceed).toBe(true);
+    expect(decision.bypassed).toBe(false);
+    expect(
+      baseDeps.events.some((e) => e.type === 'health_gate_proceed_blind'),
+    ).toBe(true);
+    // The "proceeding WITHOUT" warning fires loudly so an operator can see it.
+    expect(
+      baseDeps.logs.some((l) => l.includes('proceeding WITHOUT fleet-health visibility')),
+    ).toBe(true);
+  });
+
+  it('records streak duration on every error event so operators can see progress toward fail-open', async () => {
+    const store = inMemoryCooldown();
+    const baseDeps = makeDeps({ cooldownStore: store });
+    const scan = async () => {
+      throw new Error('fetch failed');
+    };
+
+    await runHealthGate({ ...baseDeps, scan, now: () => NOW });
+    const tenMinIn = new Date(NOW.getTime() + 10 * 60_000);
+    await runHealthGate({ ...baseDeps, scan, now: () => tenMinIn });
+
+    const errors = baseDeps.events.filter((e) => e.type === 'health_scan_error');
+    expect(errors).toHaveLength(2);
+    expect(errors[0]).toMatchObject({ streak_duration_minutes: 0 });
+    expect(errors[1]).toMatchObject({ streak_duration_minutes: 10 });
+  });
+
+  it('clears the streak start time on a successful scan', async () => {
+    const store = inMemoryCooldown();
+    const baseDeps = makeDeps({ cooldownStore: store });
+
+    // Build up a streak
+    await runHealthGate({
+      ...baseDeps,
+      scan: async () => {
+        throw new Error('blip');
+      },
+      now: () => NOW,
+    });
+    expect(store.getCount('__scan_error_first_at_ms__')).toBeGreaterThan(0);
+
+    // One successful scan resets both markers
+    const tenMinIn = new Date(NOW.getTime() + 10 * 60_000);
+    await runHealthGate({
+      ...baseDeps,
+      scan: async () => healthyScan(),
+      now: () => tenMinIn,
+    });
+    expect(store.getCount('__scan_error_count__')).toBe(0);
+    expect(store.getCount('__scan_error_first_at_ms__')).toBe(0);
   });
 });
 

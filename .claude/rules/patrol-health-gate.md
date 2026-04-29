@@ -49,6 +49,20 @@ cycle start
 
 Per-fingerprint cooldown (30min) prevents spam when an underlying issue takes hours to resolve. The same "deploy-stuck" signal is re-emitted at most once per 30min, but the patrol still halts PR work on every cycle that sees unhealthy state — the cooldown only affects whether we write another escalation line, not whether we keep touching PRs.
 
+## Scanner failure modes (QUA-823)
+
+The scanner itself can fail (GitHub API outage, DNS hiccup, TLS glitch). Behavior depends on streak duration:
+
+| Streak duration | Cycles | Behavior |
+|---|---|---|
+| 1st-2nd consecutive failure | 1-2 | Proceed with caution; log warning, write `health_scan_error` event |
+| ≥ `MAX_CONSECUTIVE_SCAN_ERRORS` (3), under 30min | 3+ | **Halt** PR work; log halt warning |
+| ≥ `SCAN_FAILURE_PROCEED_AFTER_MINUTES` (30) | varies | **Fail-open** (proceed without fleet visibility); log loud warning, write `health_gate_proceed_blind` event |
+
+The 30-minute cap exists because count-based halts blocked patrol for 3+ hours during transient API outages (QUA-823). Past 30min we assume the scanner is broken (not prod), so patrol resumes — with the trade-off that a real prod incident during this window won't trip the gate. Each error event records `streak_duration_minutes` so operators can see progress toward fail-open.
+
+GitHub API requests have a 30s `AbortSignal` timeout (`GITHUB_API_TIMEOUT_MS`); a hung connection no longer waits indefinitely. Fetch errors include URL + method context (e.g. `GitHub API GET /repos/.../runs fetch failed: ENOTFOUND api.github.com`) instead of bare "fetch failed".
+
 ## When the gate misbehaves
 
 `PATROL_DISABLE_HEALTH_GATE=1` bypasses the gate entirely. Use this only when the gate itself is broken and needs debugging — NOT when prod is red and you want the patrol to "keep working anyway."
