@@ -1203,7 +1203,10 @@ describe('entitylink-ids rule', () => {
     expect(issues.length).toBe(0);
   });
 
-  it('errors when wiki ID has wrong name (hallucination catch)', () => {
+  it('errors when wiki ID has wrong name, with NO auto-fix (QUA-761)', () => {
+    // No auto-fix: the wiki ID may have been reassigned. A mechanical
+    // name=→slug rewrite would silently corrupt prose like "MIRI is..."
+    // by renaming MIRI to "anthropic" because E42 now points there.
     const content = mockContent(
       '<EntityLink id="E42" name="miri">MIRI</EntityLink>',
     );
@@ -1212,9 +1215,27 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].message).toContain('name mismatch');
     expect(issues[0].message).toContain('"anthropic"');
-    expect(issues[0].fix).not.toBeNull();
-    expect(issues[0].fix!.oldText).toBe('name="miri"');
-    expect(issues[0].fix!.newText).toBe('name="anthropic"');
+    // Hint surfaces when the prose-name resolves to a different wiki ID,
+    // strongly suggesting the wiki ID was reassigned.
+    expect(issues[0].message).toContain('"miri" currently maps to E100');
+    expect(issues[0].message).toContain('reassigned');
+    expect(issues[0].message).toContain('Verify the prose');
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('errors with no hint when name does not match any known slug', () => {
+    // When the name attribute doesn't resolve to any current entity, the
+    // hint about reassignment is omitted (could be a typo, not necessarily
+    // a reassignment).
+    const content = mockContent(
+      '<EntityLink id="E42" name="some-old-name">Old Name</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('name mismatch');
+    expect(issues[0].message).not.toContain('reassigned');
+    expect(issues[0].fix).toBeNull();
   });
 
   it('warns when wiki ID used without name, with auto-fix to add name', () => {

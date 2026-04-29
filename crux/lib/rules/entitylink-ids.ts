@@ -10,7 +10,8 @@
  * Checks:
  * 1. ID resolves to a known entity (via pathRegistry, entities DB, or content file)
  * 2. Slug IDs should use numeric format instead (ERROR, auto-fixable)
- * 3. Wiki ID + name: validates name matches the entity's slug (ERROR if mismatch)
+ * 3. Wiki ID + name: validates name matches the entity's slug (ERROR if mismatch,
+ *    NO auto-fix — see QUA-761)
  * 4. Wiki ID without name: advisory (WARNING, auto-fixable)
  * 5. Unknown wiki ID: warning
  */
@@ -115,18 +116,22 @@ export const entityLinkIdsRule = createRule({
             // Wiki ID resolves — check name attribute
             if (nameAttr) {
               if (nameAttr !== slug) {
-                // Name mismatch — ERROR (hallucination or stale reference)
+                // Name mismatch — ERROR. No auto-fix: the wiki ID may have been
+                // reassigned to a different entity since the prose was written
+                // (e.g., E3613 was Michael Kratsios, now Melania Trump). A
+                // mechanical name=→slug rewrite would silently corrupt the
+                // surrounding prose. Human judgment required.
+                // engine.idRegistry is guaranteed non-null here (outer `if`).
+                const idForCurrentName = engine.idRegistry.bySlug[nameAttr];
+                const hint = idForCurrentName
+                  ? ` (name "${nameAttr}" currently maps to ${idForCurrentName} — wiki ID may have been reassigned)`
+                  : '';
                 issues.push(new Issue({
                   rule: this.id,
                   file: content.path,
                   line: lineNum,
-                  message: `EntityLink id="${rawId}" name="${nameAttr}" — name mismatch: ${rawId} is "${slug}", not "${nameAttr}"`,
+                  message: `EntityLink id="${rawId}" name="${nameAttr}" — name mismatch: ${rawId} is "${slug}", not "${nameAttr}"${hint}. Verify the prose and fix manually (no auto-fix: see QUA-761).`,
                   severity: Severity.ERROR,
-                  fix: {
-                    type: FixType.REPLACE_TEXT,
-                    oldText: `name="${nameAttr}"`,
-                    newText: `name="${slug}"`,
-                  },
                 }));
               }
               // else: name matches — perfect, no issue
