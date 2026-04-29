@@ -53,8 +53,6 @@ const SKIP_FILENAMES = [
   'validate-sourcing-lint-guard.ts',
   'validate-sourcing-lint-guard.test.ts',
   'validate-sourcing-names.ts',
-  'validate-sourcing-coverage.ts',
-  'validate-sourcing-coverage.test.ts',
 ];
 
 /**

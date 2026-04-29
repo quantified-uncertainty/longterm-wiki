@@ -104,7 +104,7 @@ The following validators are **defined but not wired into the gate** (no entry i
 | **validate-internal-links** | Internal markdown links resolve to content | R | Should be wired to gate as blocking |
 | **validate-financials** | Stale financial data, missing holdings, inconsistencies | R | Content quality; consider advisory gate wire |
 | **validate-hallucination-risk** | Hallucination risk scoring and reporting | R | Build-time content quality; informational |
-| **validate-sourcing-names** | TableBase sourcing manifest names and paths | W | Related to sourcing-coverage; check for consolidation |
+| **validate-sourcing-names** | TableBase sourcing manifest names and paths | W | Re-evaluate independently; sourcing-coverage was deleted (QUA-528) — check whether server-side enforceSourcing() also subsumes this. |
 
 ---
 
@@ -202,10 +202,10 @@ The following validators are **already redundant with shipped constraints** or *
 | S (small) | 10 | returning-guard, drizzle-journal, conflict-markers, tsconfig-aliases, migration-large-table-ddl, actions-yaml, numeric-ranges, pg-temporal, display-names, factbase-stableid | 2-4 | 25 |
 | S (med) | 4 | controlled-vocab, factbase-entity-ids, kb-entity-slugs, tablebase-registry | 6-8 | 28 |
 | W (small) | 8 | untyped-rows, no-console-log, sourcing-lint-guard, inline-pagination, prompt-escaping, dangerous-patterns, placeholder-citations, manual-api-types | 2-4 | 24 |
-| W (med) | 7 | yaml-entity-refs, sid-display, resource-refs, related-entry-types, sourcing-coverage, tablebase-completeness, zod-check-parity | 4-6 | 35 |
+| W (med) | 6 | yaml-entity-refs, sid-display, resource-refs, related-entry-types, tablebase-completeness, zod-check-parity | 4-6 | 30 |
 | W (dot-position) | 1 | dot-position | 8 | 8 |
 | R (keep) | 12 | mdx-compile, entity-refs, factbase-entities, temporal, numeric-consistency, stale-content, cross-page-dates, orphan-entities, factbase-record-refs, soft-fks, resource-quality, cross-base, person-refs, rendered-sid, factbase-schema, review-marker | — | — |
-| **Total migration cost** | 30 | | | **120 hours** |
+| **Total migration cost** | 29 | (sourcing-coverage deleted in QUA-528) | | **115 hours** |
 
 ---
 

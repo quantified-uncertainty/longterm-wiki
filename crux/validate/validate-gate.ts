@@ -26,7 +26,6 @@
  *   --fix          Auto-fix escaping + markdown before validation
  *   --full         Include full Next.js production build
  *   --ci           JSON output for CI pipelines (implies --no-cache)
- *   --force        Override soft-enforcement blocks (e.g., sourcing coverage)
  *   --scope=content  Content-only: skip build-data/tests/typechecks, run only
  *                    unified-blocking + yaml-schema (no stamp cache written)
  *
