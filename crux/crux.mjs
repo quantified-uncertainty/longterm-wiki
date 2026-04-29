@@ -136,6 +136,7 @@ import * as dispatchCommands from './commands/dispatch.ts';
 import * as auditCommands from './commands/audit.ts';
 import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
 import * as aiidCommands from './commands/ingest-aiid.ts';
+import * as oecdAimCommands from './commands/ingest-oecd-aim.ts';
 
 const domains = {
   validate: validateCommands,
@@ -235,6 +236,7 @@ const domains = {
   dispatch: dispatchCommands,
   audit: auditCommands,
   aiid: aiidCommands,
+  'oecd-aim': oecdAimCommands,
 };
 
 const shortcutMap = buildShortcutMap();

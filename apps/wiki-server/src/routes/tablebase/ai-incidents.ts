@@ -24,10 +24,12 @@ const TABLE_NAME = "ai_incidents" as const;
 const MAX_PAGE_SIZE = 200;
 
 /**
- * Valid `source` values. CHECK-enforced at the DB layer. Expand here and in
- * the SQL constraint in lockstep when adding OECD AIM.
+ * Valid `source` values. CHECK-enforced at the DB layer. The
+ * `validate-ai-incidents-source-enum` gate check parses the migration that
+ * widens this CHECK and asserts the two stay in lockstep — adding a new
+ * source here without a paired migration (or vice versa) fails CI.
  */
-const VALID_SOURCES = ["mit-aiid"] as const;
+const VALID_SOURCES = ["mit-aiid", "oecd-aim"] as const;
 
 /**
  * Hard cap on the `summary` field. AIID `description` is usually ≤2 KB;

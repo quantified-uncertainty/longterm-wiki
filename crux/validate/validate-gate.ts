@@ -789,6 +789,27 @@ const PARALLEL_STEPS: Step[] = [
     // those fields. QUA-693.
   },
   {
+    id: 'oecd-aim-no-article-body',
+    name: 'OECD AIM ingest does not persist article body text',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-oecd-aim-no-article-body.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: OECD AIM has no explicit open-data license at oecd.ai. We
+    // mirror metadata + link-out only. This validator greps the OECD AIM
+    // ingest + schema paths for symptoms of persisting `body`/`thumbImage`.
+    // QUA-696.
+  },
+  {
+    id: 'ai-incidents-source-enum',
+    name: 'ai_incidents.source enum lockstep (route VALID_SOURCES <-> CHECK constraint)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-ai-incidents-source-enum.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents widening VALID_SOURCES in the route without a
+    // paired migration that widens chk_ai_incidents_source (or vice versa).
+    // QUA-696.
+  },
+  {
     id: 'benchmark-result-provenance',
     name: 'Benchmark result provenance (tested_by + source_url)',
     command: 'npx',

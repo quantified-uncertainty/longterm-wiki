@@ -10,12 +10,22 @@ import { apiRequest, type ApiResult } from './client.ts';
 import type { hc, InferResponseType } from 'hono/client';
 import type { AiIncidentsRoute } from '../../../apps/wiki-server/src/routes/tablebase/ai-incidents.ts';
 import type { SyncResponse } from '../../../apps/wiki-server/src/routes/tablebase/sync-factory.ts';
-import type { AiIncidentSyncItem } from '../aiid/transform.ts';
+import type { AiIncidentSyncItem as AiidSyncItem } from '../aiid/transform.ts';
+import type { AiIncidentSyncItem as OecdAimSyncItem } from '../oecd-aim/transform.ts';
 
 type RpcClient = ReturnType<typeof hc<AiIncidentsRoute>>;
 
 export type AiIncidentsAllResult = InferResponseType<RpcClient['all']['$get'], 200>;
 export type AiIncidentsSyncResult = SyncResponse;
+
+/**
+ * Union of all sync-item shapes the route accepts. Each ingester
+ * (`crux/lib/aiid`, `crux/lib/oecd-aim`) emits a per-source-narrowed
+ * variant; the route's Zod schema then re-validates against
+ * `z.enum(VALID_SOURCES)` server-side. New sources should add their
+ * variant here so the client stays type-safe across all sources.
+ */
+export type AiIncidentSyncItem = AiidSyncItem | OecdAimSyncItem;
 
 /** Fetch all ai-incidents rows with pagination. */
 export async function getAllAiIncidents(
