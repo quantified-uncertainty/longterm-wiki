@@ -154,13 +154,16 @@ test.describe("Render audit — tabbed pages", () => {
       // access (QUA-763).
       if (STAT_CARD_PAGES.includes(url)) {
         const cards = page.locator('[data-testid="stat-card"]');
+        // Auto-retry until at least one stat-card is attached. Pages in
+        // STAT_CARD_PAGES are guaranteed to have them (Microsoft is excluded);
+        // if none appear within the timeout, that's a real regression and
+        // toBeAttached fails the test with a clear message. The previous
+        // count > 0 snapshot check flaked on the render-monitor cron when
+        // hitting prod from CI — Suspense boundaries / hydration timing
+        // could produce a transient count of 0 even when the markup was
+        // present (QUA-822).
+        await expect(cards.first()).toBeAttached({ timeout: 5000 });
         const count = await cards.count();
-        // Guard against silent no-op if data-testid is removed by a refactor.
-        // Pages in STAT_CARD_PAGES are guaranteed to have stat cards (see the
-        // list comment above — Microsoft is excluded for that reason).
-        expect
-          .soft(count > 0, `No [data-testid="stat-card"] elements on ${url}`)
-          .toBe(true);
         for (let i = 0; i < count; i++) {
           const value = (await cards.nth(i).locator(".text-xl, .text-2xl, .text-3xl, .tabular-nums").first().textContent())?.trim() ?? "";
           expect.soft(value.length > 0, `Empty stat card in ${url} (${i + 1}/${count})`).toBe(true);
