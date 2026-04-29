@@ -111,9 +111,11 @@ export function runCheck(): CheckResult {
 
   if (!existsSync(ROUTE_FILE)) {
     return {
-      passed: true,
-      errors: 0,
-      message: `(skipped: ${ROUTE_FILE} not found)`,
+      passed: false,
+      errors: 1,
+      message:
+        `${c.red}Route file not found: ${ROUTE_FILE}.${c.reset}\n` +
+        `Update ROUTE_FILE in validate-ai-incidents-source-enum.ts if the route was moved.`,
     };
   }
   const routeSrc = readFileSync(ROUTE_FILE, "utf-8");

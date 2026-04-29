@@ -256,10 +256,12 @@ function pickPrimaryReportUrl(
   articles: OecdAimArticleRaw[],
   incidentId: string,
 ): string {
-  const withUrls = articles.filter(
-    (a): a is OecdAimArticleRaw & { url: string } =>
-      typeof a.url === "string" && a.url.length > 0,
-  );
+  const withUrls = articles
+    .filter(
+      (a): a is OecdAimArticleRaw & { url: string } =>
+        typeof a.url === "string" && a.url.trim().length > 0,
+    )
+    .map((a) => ({ ...a, url: a.url.trim() }));
   if (withUrls.length === 0) return aimPermalink(incidentId);
   const sorted = [...withUrls].sort((a, b) => {
     const da = a.date ?? "";
@@ -337,10 +339,10 @@ export function transformIncident(
     reports: articles
       .filter(
         (a): a is OecdAimArticleRaw & { url: string } =>
-          typeof a.url === "string" && a.url.length > 0,
+          typeof a.url === "string" && a.url.trim().length > 0,
       )
       .map((a) => ({
-        url: a.url,
+        url: a.url.trim(),
         title: a.title?.trim() ? a.title.trim().slice(0, 1000) : null,
         publisher: a.publisher?.trim() ? a.publisher.trim().slice(0, 500) : null,
         publishedAt: a.date ?? null,

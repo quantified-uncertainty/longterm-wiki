@@ -79,7 +79,14 @@ async function runIngest(
     return { exitCode: 1, output: "--batch must be a positive integer" };
   }
   const batchSize = batchSizeRaw;
-  const limitN = options.limit ? Number(options.limit) : undefined;
+  const limitN =
+    options.limit === undefined ? undefined : Number(options.limit);
+  if (
+    limitN !== undefined &&
+    (!Number.isInteger(limitN) || limitN < 0)
+  ) {
+    return { exitCode: 1, output: "--limit must be a non-negative integer" };
+  }
 
   const fromDate = (options.from as string | undefined) ?? AIM_EARLIEST_DATE;
   const toDate = (options.to as string | undefined) ?? todayUTC();
@@ -110,7 +117,8 @@ async function runIngest(
     `  ${incidents.length} incidents (${listRequests} list requests, ${windowSplits} window splits)`,
   );
 
-  const toProcess = limitN ? incidents.slice(0, limitN) : incidents;
+  const toProcess =
+    limitN === undefined ? incidents : incidents.slice(0, limitN);
 
   log(`Transforming ${toProcess.length} incidents ...`);
   const items: AiIncidentSyncItem[] = [];

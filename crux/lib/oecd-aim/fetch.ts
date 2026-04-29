@@ -134,7 +134,13 @@ async function postList(
     );
   }
   const json = (await res.json()) as ListEndpointResponse;
-  if (!json || typeof json !== "object" || !Array.isArray(json.incidents)) {
+  if (
+    !json ||
+    typeof json !== "object" ||
+    !Array.isArray(json.incidents) ||
+    typeof json.total_results !== "number" ||
+    !Number.isFinite(json.total_results)
+  ) {
     throw new Error(
       `AIM list endpoint returned unexpected shape: ${JSON.stringify(json).slice(0, 200)}`,
     );
@@ -244,9 +250,10 @@ export async function fetchAllIncidents(
     const res = await postList(url, body, fetchImpl);
     if (delayMs > 0) await sleep(delayMs);
 
+    const spanDays = daysBetween(sliceFrom, sliceTo) + 1;
     if (
       res.total_results > MAX_NUM_RESULTS &&
-      daysBetween(sliceFrom, sliceTo) >= MIN_WINDOW_DAYS * 2
+      spanDays > MIN_WINDOW_DAYS
     ) {
       // Recurse: halve the slice. Both halves get the boundary day; we
       // dedup by id below.
