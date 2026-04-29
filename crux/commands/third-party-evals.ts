@@ -29,7 +29,10 @@ import {
   toSyncItem,
   EXTRACTOR_VERSION,
 } from "../third-party-evals/extract-eval-report.ts";
-import { verifyExtractedReport } from "../third-party-evals/span-verify.ts";
+import {
+  verifyExtractedReport,
+  spanVerifyToInlineSourcing,
+} from "../third-party-evals/span-verify.ts";
 import { resolveAiModel } from "../lib/ai-model-resolver.ts";
 import { dispatchIngest } from "../third-party-evals/ingesters/dispatch.ts";
 import { backfillEvaluator } from "../third-party-evals/backfill.ts";
@@ -180,6 +183,10 @@ async function extractSubcommand(
 
   const id = generateId(`third-party-eval:${url}:${extract.sourceHash}`);
 
+  const sourcing = spanVerifyToInlineSourcing(verify, {
+    sourceContentHash: extract.sourceHash,
+  });
+
   const item = toSyncItem(extract, {
     id,
     evaluatorOrgId: options.evaluator,
@@ -187,6 +194,7 @@ async function extractSubcommand(
     sourceSystem,
     models: modelLinks,
     confidenceMap: verify.confidenceMap,
+    sourcing,
   });
 
   if (options.json) {
