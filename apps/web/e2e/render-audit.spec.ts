@@ -116,6 +116,8 @@ const SIMPLE_PAGES = [
   "/data-sources/ea-funds",  // Data source detail page (QUA-81)
   "/frontier-safety-frameworks",  // QUA-709 directory page
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
+  "/scorecards",  // QUA-688 scorecards directory
+  "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
