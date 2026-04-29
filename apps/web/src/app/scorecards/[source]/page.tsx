@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { fetchDetailed } from "@lib/wiki-server";
+import { getEntityHref } from "@/data/entity-nav";
 import { ProfileStatCard } from "@/components/directory";
 import {
   SCORECARD_SOURCES,
@@ -82,6 +83,26 @@ async function fetchAllGradesForSnapshot(
   return { ok: true, items, truncated: items.length < total };
 }
 
+/** Page through `/api/scorecard-snapshots/all` for one source. */
+async function fetchAllSnapshotsForSource(
+  sourceKey: string,
+): Promise<{ ok: true; items: SnapshotRow[] } | { ok: false }> {
+  const items: SnapshotRow[] = [];
+  let offset = 0;
+  const encoded = encodeURIComponent(sourceKey);
+  while (true) {
+    const res = await fetchDetailed<{ items: SnapshotRow[]; total: number }>(
+      `/api/scorecard-snapshots/all?limit=${PAGE_SIZE}&offset=${offset}&source=${encoded}`,
+      { revalidate: 300 },
+    );
+    if (!res.ok) return { ok: false };
+    items.push(...res.data.items);
+    if (items.length >= res.data.total || res.data.items.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+  return { ok: true, items };
+}
+
 export function generateStaticParams() {
   return SCORECARD_SOURCES.map((meta) => ({ source: meta.source }));
 }
@@ -115,13 +136,8 @@ export default async function ScorecardDetailPage({
   // `publishedAt DESC`; the partial unique index
   // `uq_scorecard_snapshots_latest_per_source` means at most one row per
   // source has `isLatest=true`.
-  const snapshotsRes = await fetchDetailed<{
-    items: SnapshotRow[];
-    total: number;
-  }>(`/api/scorecard-snapshots/all?limit=200&source=${sourceKey}`, {
-    revalidate: 300,
-  });
-  const allSnapshots = snapshotsRes.ok ? snapshotsRes.data.items : [];
+  const snapshotsRes = await fetchAllSnapshotsForSource(sourceKey);
+  const allSnapshots = snapshotsRes.ok ? snapshotsRes.items : [];
   const latestSnapshot = allSnapshots.find((s) => s.isLatest) ?? null;
 
   // Pull grades only when we have a concrete snapshot to pin to. Skipping
@@ -175,7 +191,7 @@ export default async function ScorecardDetailPage({
           by{" "}
           {meta.publisherSlug ? (
             <Link
-              href={`/organizations/${meta.publisherSlug}`}
+              href={getEntityHref(meta.publisherSlug)}
               className="text-primary hover:underline"
             >
               {meta.publisher}
@@ -284,7 +300,7 @@ export default async function ScorecardDetailPage({
                     <td className="px-3 py-2 border-b border-border/30 sticky left-0 z-10 bg-background group-hover:bg-muted/20">
                       {row.slug ? (
                         <Link
-                          href={`/organizations/${row.slug}`}
+                          href={getEntityHref(row.slug)}
                           className="text-primary hover:underline"
                         >
                           {row.displayName}
