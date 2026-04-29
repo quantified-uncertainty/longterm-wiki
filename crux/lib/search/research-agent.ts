@@ -94,7 +94,7 @@ export interface ResearchRequest {
    * Hostnames (or registrable suffixes) to drop from results before fetching.
    * Useful when the caller knows certain domains are "self" / circular and
    * fetching them is wasted spend (e.g. backfill-sources doesn't want to
-   * source-check our own wiki against itself).
+   * sourcing-check our own wiki against itself).
    */
   excludeHosts?: string[];
   /** Optional page context to narrow research focus. */
