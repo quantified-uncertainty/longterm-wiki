@@ -12,13 +12,12 @@
  */
 
 import type { CommandResult } from '../../lib/command-types.ts';
-import { buildAuthorLookup, normalizeName } from './shared.ts';
+import { buildAuthorLookup, loadPersonEntitiesFromPg, normalizeName } from './shared.ts';
 import {
   syncPlatformAccounts,
   getAllPlatformAccounts,
   type SyncPlatformAccountItem,
 } from '../../lib/wiki-server/platform-accounts.ts';
-import { listEntities } from '../../lib/wiki-server/entities.ts';
 import { listResources } from '../../lib/wiki-server/resources.ts';
 import { apiRequest } from '../../lib/wiki-server/client.ts';
 
@@ -104,25 +103,15 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
   console.log('🔍 Platform Account Discovery\n');
   console.log(`  Mode: ${apply ? 'APPLY' : 'DRY RUN'}\n`);
 
-  // Step 1: Load person entities and build name lookup
-  console.log('  Loading entities...');
-  const authorLookup = await buildAuthorLookup();
-  console.log(`  Author lookup: ${authorLookup.size} entries`);
-
-  // Step 2: Load stableId lookup (slug → stableId)
-  const idRegistryResult = await listEntities(5000, 0);
-  const stableIdMap = new Map<string, string>();
-  const entityTitleMap = new Map<string, string>(); // stableId → title
-  if (idRegistryResult.ok) {
-    for (const e of idRegistryResult.data.entities) {
-      if (e.stableId) {
-        // entities list returns slug as `id`
-        stableIdMap.set(e.id, e.stableId);
-        entityTitleMap.set(e.stableId, e.title);
-      }
-    }
-  }
-  console.log(`  Entities loaded: ${stableIdMap.size}`);
+  // Step 1: Load person entities from PG and derive lookup maps in one pass.
+  // PG (not data/entities/people.yaml) is the source of truth — the table has
+  // significantly more persons than the YAML file.
+  console.log('  Loading person entities...');
+  const { people, slugToStableId, titleByStableId } = await loadPersonEntitiesFromPg();
+  const authorLookup = buildAuthorLookup(people);
+  console.log(
+    `  Person entities: ${people.length}, author lookup: ${authorLookup.size} entries`,
+  );
 
   // Step 3: Fetch forum post author data
   console.log('  Loading forum post authors...');
@@ -168,7 +157,7 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
     if (displayName) {
       const slugMatch = authorLookup.get(normalizeName(displayName));
       if (slugMatch) {
-        entityStableId = stableIdMap.get(slugMatch) ?? null;
+        entityStableId = slugToStableId.get(slugMatch) ?? null;
       }
     }
 
@@ -215,7 +204,7 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
   if (verbose) {
     console.log('\n  Linked accounts:');
     for (const c of [...candidates.values()].filter(c => c.entityStableId).slice(0, 50)) {
-      const entityTitle = c.entityStableId ? entityTitleMap.get(c.entityStableId) ?? '?' : '?';
+      const entityTitle = c.entityStableId ? titleByStableId.get(c.entityStableId) ?? '?' : '?';
       console.log(`    ${c.platform}/${c.platformUsername} → ${entityTitle}`);
     }
 

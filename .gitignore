@@ -1,3 +1,7 @@
+# ad-hoc SQL scripts
+dev/sql/
+dev/reports/
+
 # build output
 dist/
 

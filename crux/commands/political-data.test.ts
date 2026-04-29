@@ -121,16 +121,18 @@ describe("scores list — score percentage formatting", () => {
           {
             id: "s1",
             politicianDisplayName: "Alice Smith",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             scorerOrg: "LCV",
             year: 2024,
             score: 75,
             maxScore: 100,
             scoreType: null,
             notes: null,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -149,16 +151,18 @@ describe("scores list — score percentage formatting", () => {
           {
             id: "s2",
             politicianDisplayName: "Bob Jones",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             scorerOrg: "HW",
             year: 2023,
             score: 1,
             maxScore: 3,
             scoreType: null,
             notes: null,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -174,16 +178,18 @@ describe("scores list — score percentage formatting", () => {
           {
             id: "s3",
             politicianDisplayName: "Carol White",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             scorerOrg: "XYZ",
             year: 2022,
             score: 42,
             maxScore: 0,
             scoreType: null,
             notes: null,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -200,16 +206,18 @@ describe("scores list — score percentage formatting", () => {
           {
             id: "s4",
             politicianDisplayName: "Dana Brown",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             scorerOrg: "LCV",
             year: 2024,
             score: 80,
             maxScore: 100,
             scoreType: "environmental",
             notes: null,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -220,7 +228,7 @@ describe("scores list — score percentage formatting", () => {
   it("returns empty-list message when no scores found", async () => {
     mockGetAllScores.mockResolvedValue({
       ok: true,
-      data: { scores: [], total: 0 },
+      data: { scores: [], total: 0, limit: 0, offset: 0 },
     });
 
     const result = await commands.scores([], {});
@@ -231,6 +239,7 @@ describe("scores list — score percentage formatting", () => {
   it("returns error when server call fails", async () => {
     mockGetAllScores.mockResolvedValue({
       ok: false,
+      error: 'unavailable',
       message: "connection refused",
     });
 
@@ -257,16 +266,18 @@ describe("finance list — dollar formatting", () => {
           {
             id: "f1",
             politicianDisplayName: "Sen. Tester",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             cycle: 2024,
             party: "democratic",
             state: "MT",
             officeType: "senate",
             totalRaised: 5_400_000,
             totalSpent: 4_100_000,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -284,16 +295,18 @@ describe("finance list — dollar formatting", () => {
           {
             id: "f2",
             politicianDisplayName: "Rep. Unknown",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             cycle: 2024,
             party: null,
             state: null,
             officeType: null,
             totalRaised: null,
             totalSpent: null,
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -304,7 +317,7 @@ describe("finance list — dollar formatting", () => {
   it("returns empty-list message when no records", async () => {
     mockGetAllFinance.mockResolvedValue({
       ok: true,
-      data: { records: [], total: 0 },
+      data: { records: [], total: 0, limit: 0, offset: 0 },
     });
 
     const result = await commands.finance(["list"], {});
@@ -404,6 +417,8 @@ describe("finance ingest — cycle validation", () => {
 
   it("accepts valid even-year cycle and proceeds to fetch", async () => {
     mockFetchFecData.mockResolvedValue({
+      source: 'sample',
+      cycle: 2024,
       records: [],
       warnings: [],
       usedSampleData: false,
@@ -450,15 +465,17 @@ describe("offices list — formatting", () => {
           {
             id: "o1",
             politicianDisplayName: "Jane Doe",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             officeType: "senator",
             jurisdiction: "CA",
             district: null,
             party: "democratic",
             status: "incumbent",
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -478,15 +495,17 @@ describe("offices list — formatting", () => {
           {
             id: "o2",
             politicianDisplayName: "John Rep",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             officeType: "representative",
             jurisdiction: "TX",
             district: "TX-10",
             party: "republican",
             status: "incumbent",
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -498,7 +517,7 @@ describe("offices list — formatting", () => {
   it("returns empty-list message when no offices", async () => {
     mockGetAllOffices.mockResolvedValue({
       ok: true,
-      data: { offices: [], total: 0 },
+      data: { offices: [], total: 0, limit: 0, offset: 0 },
     });
 
     const result = await commands.offices([], {});
@@ -524,15 +543,17 @@ describe("votes list — formatting", () => {
           {
             id: "v1",
             politicianDisplayName: "Sen. Smith",
-            politician: null,
+            politician: null as unknown as { entityId: string | null; slug: string | null; name: string | null },
             vote: "yea",
             legislationTitle: "AI Safety Act",
             legislationEntityId: "ai-safety-act",
             chamber: "senate",
             voteDate: "2025-03-15",
-          },
+          } as never,
         ],
         total: 1,
+        limit: 0,
+        offset: 0,
       },
     });
 
@@ -546,7 +567,7 @@ describe("votes list — formatting", () => {
   it("returns empty-list message when no votes", async () => {
     mockGetAllVotes.mockResolvedValue({
       ok: true,
-      data: { votes: [], total: 0 },
+      data: { votes: [], total: 0, limit: 0, offset: 0 },
     });
 
     const result = await commands.votes([], {});

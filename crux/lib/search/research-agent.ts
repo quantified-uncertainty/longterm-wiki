@@ -90,6 +90,13 @@ export interface ResearchRequest {
   topic: string;
   /** Alternative search query if different from topic (e.g. more specific). */
   query?: string;
+  /**
+   * Hostnames (or registrable suffixes) to drop from results before fetching.
+   * Useful when the caller knows certain domains are "self" / circular and
+   * fetching them is wasted spend (e.g. backfill-sources doesn't want to
+   * source-check our own wiki against itself).
+   */
+  excludeHosts?: string[];
   /** Optional page context to narrow research focus. */
   pageContext?: ResearchPageContext;
   /** Search provider configuration. */
@@ -131,6 +138,8 @@ export interface ResearchResult {
     /** Total USD cost (search + LLM calls). */
     totalCost: number;
     costBreakdown: ResearchCostBreakdown;
+    /** Count of fetched sources attributed to each provider key (e.g. 'exa', 'exa+perplexity'). */
+    providerCounts: Record<string, number>;
     /** Wall-clock duration in milliseconds. */
     durationMs: number;
   };
@@ -316,6 +325,19 @@ export async function searchPerplexity(
 
 const VALID_SCRY_TABLES = ['mv_eaforum_posts', 'mv_lesswrong_posts'] as const;
 
+// Dampener for SCRY HTTP errors — when the upstream is down (e.g. Cloudflare 502),
+// every record in a long batch produces the same multi-line HTML body. Log the
+// first occurrence per (table, status) per process; suppress repeats with a
+// periodic count. Counters reset whenever a request to that table succeeds, so
+// each fresh outage emits a "first occurrence" log again.
+const scryErrorCounts = new Map<string, number>();
+
+function summarizeScryBody(body: string): string {
+  const trimmed = body.trim();
+  if (/^<(!doctype|html|head)/i.test(trimmed)) return '(HTML error page)';
+  return trimmed.slice(0, 120).replace(/\s+/g, ' ');
+}
+
 async function searchScry(query: string, maxResults: number): Promise<SearchHit[]> {
   const apiKey = getApiKey('SCRY_API_KEY') ?? SCRY_PUBLIC_KEY;
 
@@ -328,20 +350,42 @@ async function searchScry(query: string, maxResults: number): Promise<SearchHit[
     try {
       const sql = `SELECT title, uri, snippet FROM scry.search('${query.replace(/'/g, "''")}', '${table}') WHERE title IS NOT NULL AND kind = 'post' LIMIT ${perTable}`;
 
-      const response = await fetch('https://api.exopriors.com/v1/scry/query', {
+      const response = await fetch('https://api.scry.io/v1/scry/query', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${apiKey}`,
           'Content-Type': 'text/plain',
+          // Default cap (~$0.000347) was too low for full-text search across mv_*_posts;
+          // bump to $0.01 per query to fit substantive queries.
+          'x-scry-max-exposure': '10000000',
         },
         body: sql,
         signal: AbortSignal.timeout(15_000),
       });
 
       if (!response.ok) {
-        const errorText = await response.text().catch(() => '(no body)');
-        console.error(`SCRY ${table}: HTTP ${response.status} — ${errorText.slice(0, 200)}`);
+        const key = `${table}:${response.status}`;
+        const prev = scryErrorCounts.get(key) ?? 0;
+        const next = prev + 1;
+        scryErrorCounts.set(key, next);
+        // First occurrence per (table, status): log once with short body.
+        // Every 50th: emit a single rollup line. Otherwise silent.
+        if (next === 1) {
+          const errorText = await response.text().catch(() => '(no body)');
+          console.error(
+            `SCRY ${table}: HTTP ${response.status} — ${summarizeScryBody(errorText)} (suppressing repeats)`,
+          );
+        } else if (next % 50 === 0) {
+          console.error(`SCRY ${table}: HTTP ${response.status} — ${next} total`);
+        }
         continue;
+      }
+
+      // Clear counters for this table on every success so a fresh outage
+      // re-emits the "first occurrence" log instead of going straight to silent.
+      const tablePrefix = `${table}:`;
+      for (const k of scryErrorCounts.keys()) {
+        if (k.startsWith(tablePrefix)) scryErrorCounts.delete(k);
       }
 
       const data = await response.json() as ScryApiResponse;
@@ -543,6 +587,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
   const {
     topic,
     query = topic,
+    excludeHosts = [],
     pageContext,
     config = {},
     budgetCap = DEFAULT_BUDGET_CAP,
@@ -755,9 +800,28 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
     }
   }
 
+  // Drop excluded hosts before any further work — these would be rejected
+  // by downstream verification anyway, and fetching them (Playwright,
+  // Wayback) wastes time and money.
+  const uniqueBeforeExclusion = urlToHits.size;
+  if (excludeHosts.length > 0) {
+    const exclude = excludeHosts.map(h => h.toLowerCase().replace(/^www\./, ''));
+    for (const url of [...urlToHits.keys()]) {
+      let host: string;
+      try {
+        host = new URL(url).hostname.toLowerCase().replace(/^www\./, '');
+      } catch {
+        continue;
+      }
+      if (exclude.some(d => host === d || host.endsWith('.' + d))) {
+        urlToHits.delete(url);
+      }
+    }
+  }
+
   const urlsFound = urlToHits.size;
   const totalHitsBeforeDedup = allHitArrays.reduce((sum, arr) => sum + arr.length, 0) + pgHits.length;
-  const urlsDeduplicated = totalHitsBeforeDedup - urlsFound;
+  const urlsDeduplicated = totalHitsBeforeDedup - uniqueBeforeExclusion;
 
   // Build a best-title mapping from all hits for each URL
   const urlBestTitle = new Map<string, string>();
@@ -788,10 +852,38 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
 
   const sources: SourceCacheEntry[] = [];
 
+  // Build per-URL provider list for SourceCacheEntry attribution + per-provider tallies
+  const providerCounts: Record<string, number> = {};
+  function providersFor(url: string): string {
+    const hits = urlToHits.get(url) ?? [];
+    const seen = new Set<string>();
+    for (const h of hits) seen.add(h.provider);
+    return [...seen].sort().join('+');
+  }
+
+  // Pack what downstream consumers see as the source's content. Excerpts
+  // are search-keyword-filtered (paragraphs without query tokens are
+  // dropped), which can hide entity-name mentions that consumers like
+  // backfill-sources rely on. Always include the full body so both
+  // focused snippets and unfiltered context are available.
+  //
+  // Upstream `fetchSources()` already caps each page at MAX_CONTENT_CHARS
+  // (~100KB), and Haiku 4.5 has a 200K context window — no need to slice
+  // here. A previous 6KB cap caused ~67% of pages to truncate before the
+  // entity name was reachable; see `crux/lib/backfill-sources/prompts.ts`
+  // for the matching prompt-side bump.
+  function packContent(fetched: { content: string; relevantExcerpts: string[] }): string {
+    const excerpts = fetched.relevantExcerpts.join('\n\n');
+    if (!excerpts) return fetched.content;
+    return `${excerpts}\n\n--- additional page content ---\n\n${fetched.content}`;
+  }
+
   for (let i = 0; i < fetchedSources.length; i++) {
     const fetched = fetchedSources[i];
     const url = urlsToFetch[i];
     const title = fetched.title || (urlBestTitle.get(url) ?? url);
+    const provider = providersFor(url);
+    providerCounts[provider] = (providerCounts[provider] ?? 0) + 1;
 
     if (totalCost >= budgetCap) {
       // Budget exhausted — still add the source but skip fact extraction
@@ -799,7 +891,8 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         id: `SRC-${i + 1}`,
         url: fetched.url,
         title,
-        content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
+        provider,
+        content: packContent(fetched),
         facts: [],
       });
       continue;
@@ -823,7 +916,8 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
       id: `SRC-${i + 1}`,
       url: fetched.url,
       title,
-      content: fetched.relevantExcerpts.join('\n\n') || fetched.content.slice(0, 3_000),
+      provider,
+      content: packContent(fetched),
       facts: facts.length > 0 ? facts : undefined,
     });
   }
@@ -862,6 +956,7 @@ export async function runResearch(request: ResearchRequest): Promise<ResearchRes
         searchCost,
         factExtractionCost,
       },
+      providerCounts,
       durationMs,
     },
   };

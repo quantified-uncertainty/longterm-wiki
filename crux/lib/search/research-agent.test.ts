@@ -158,7 +158,7 @@ function makeFetchMock(scenario: 'all-success' | 'exa-only' | 'no-keys' | 'scry-
     }
 
     // SCRY search
-    if (url === 'https://api.exopriors.com/v1/scry/query') {
+    if (url === 'https://api.scry.io/v1/scry/query') {
       if (scenario === 'scry-fails') throw new Error('SCRY unavailable');
       return {
         ok: true,
@@ -402,7 +402,7 @@ describe('runResearch', () => {
 
   it('degrades gracefully when SCRY returns HTTP error', async () => {
     const fetchMock = vi.fn(async (url: string) => {
-      if ((url as string).includes('exopriors.com')) {
+      if ((url as string).includes('scry.io')) {
         return { ok: false, status: 429, json: async () => ({ error: 'rate limited' }) };
       }
       if ((url as string).includes('exa.ai')) {
