@@ -334,19 +334,20 @@ export default async function SourcingDetailPage({ params }: PageProps) {
     );
   }
 
-  const { verdicts, evidence } = detailResult.data;
-  // QUA-792: per-fieldName aggregation result, keyed by `fieldName ?? ""`.
+  const { verdicts, evidence, verdictAggregations } = detailResult.data;
+  // QUA-792: per-fieldName aggregation result keyed by `fieldName ?? ""`.
   // Server-side `aggregateEvidence()` is the single source of truth; the
   // headline label and the disagreement explainer both derive from it.
-  // The `?? {}` is a defensive fallback for older wiki-server responses
-  // during a rolling deploy that haven't yet learned to emit this field.
-  // The cast widens the inferred string verdict to AggregateVerdict — the
-  // server only ever writes the canonical six values.
-  const rawAggregations =
-    (detailResult.data as { verdictAggregations?: unknown })
-      .verdictAggregations ?? {};
-  const verdictAggregations: Record<string, AggregationResultLike> =
-    rawAggregations as Record<string, AggregationResultLike>;
+
+  // Bucket evidence by fieldName once so the verdict map below is O(N+M)
+  // instead of O(N·M) (one filter per verdict iteration).
+  const evidenceByField = new Map<string | null, typeof evidence>();
+  for (const e of evidence) {
+    const key = e.fieldName ?? null;
+    const bucket = evidenceByField.get(key);
+    if (bucket) bucket.push(e);
+    else evidenceByField.set(key, [e]);
+  }
   const rawResolvedName = namesResult.ok
     ? namesResult.data.names[recordId]
     : null;
@@ -566,14 +567,14 @@ export default async function SourcingDetailPage({ params }: PageProps) {
       {verdicts.length > 0 ? (
         <div className="space-y-3 mb-10">
           {verdicts.map((v, i) => {
-            const fieldEvidence = evidence.filter(
-              (e) => (e.fieldName ?? null) === (v.fieldName ?? null)
-            );
+            const fieldEvidence = evidenceByField.get(v.fieldName ?? null) ?? [];
             const fieldUniqueUrls = new Set(
               fieldEvidence.filter((e) => e.sourceUrl).map((e) => e.sourceUrl)
             );
             const aggregation =
-              verdictAggregations[v.fieldName ?? ""] ?? null;
+              (verdictAggregations?.[v.fieldName ?? ""] as
+                | AggregationResultLike
+                | undefined) ?? null;
 
             return (
               <VerdictHeader

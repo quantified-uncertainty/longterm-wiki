@@ -193,14 +193,15 @@ export function aggregateEvidence(
   }
 
   // Step 5: pick winner. Score desc, then priority asc.
-  const ranked = [...buckets.entries()].sort((a, b) => {
-    if (a[1].weight !== b[1].weight) return b[1].weight - a[1].weight;
-    const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a[0]] ?? 99;
-    const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b[0]] ?? 99;
-    return aPri - bPri;
-  });
-  const winningVerdict = ranked[0][0];
-  const winningBucket = ranked[0][1];
+  const contributing = sortContributing(
+    [...buckets.entries()].map(([verdict, b]) => ({
+      verdict,
+      weight: b.weight,
+      rowCount: b.rowCount,
+    })),
+  );
+  const winningVerdict = contributing[0].verdict;
+  const winningBucket = buckets.get(winningVerdict)!;
 
   // Step 6: confidence = weighted average of the winning bucket's rows
   // that reported a confidence value (computed in step 4).
@@ -208,12 +209,6 @@ export function aggregateEvidence(
     winningBucket.confidenceWeightSum > 0
       ? winningBucket.confidenceWeightedSum / winningBucket.confidenceWeightSum
       : null;
-
-  const contributing: ContributingVerdict[] = ranked.map(([verdict, b]) => ({
-    verdict,
-    weight: b.weight,
-    rowCount: b.rowCount,
-  }));
 
   return {
     verdict: winningVerdict,

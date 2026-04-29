@@ -1,54 +1,27 @@
 /**
- * Reconciles the disagree-warning with the headline verdict (QUA-792).
- *
- * Both the headline verdict label and the "checks disagree" explainer are
- * derived from the same `AggregationResult` so the page never shows a
- * headline that contradicts its own dissent breakdown. The aggregation is
- * computed by `aggregateEvidence()` on the wiki-server side
- * (`apps/wiki-server/src/routes/sourcing/sourcing-aggregation.ts`) and
- * delivered alongside the persisted verdict row.
- *
- * When `aggregation` is missing (legacy callers, or no evidence rows yet),
- * the component falls back to the persisted `verdict.verdict` and never
- * renders the explainer — there's nothing to explain without contributing
- * counts.
+ * Renders the per-field verdict header on the public sourcing detail page.
+ * Headline label and disagreement explainer derive from the same
+ * `AggregationResult`, so they cannot drift (QUA-792).
  */
 
-/**
- * The aggregate verdicts that the canonical aggregation function can emit.
- * Must stay in sync with `AggregateVerdict` in
- * `apps/wiki-server/src/routes/sourcing/sourcing-aggregation-types.ts`.
- */
-export type AggregateVerdict =
-  | "confirmed"
-  | "contradicted"
-  | "outdated"
-  | "partial"
-  | "unverifiable"
-  | "unchecked";
+import type { SourcingVerdictType } from "@/components/shared/verdict-styles";
 
 export interface ContributingVerdict {
-  verdict: AggregateVerdict;
+  verdict: SourcingVerdictType;
   weight: number;
   rowCount: number;
 }
 
 export interface AggregationResultLike {
-  verdict: AggregateVerdict;
+  verdict: SourcingVerdictType;
   confidence: number | null;
   sourcesChecked: number;
   contributing: readonly ContributingVerdict[];
-  /**
-   * Per-verdict counts of rows that were below the relevance threshold and
-   * filtered out before bucketing. Surfaces low-relevance dissent the
-   * headline doesn't see.
-   */
   droppedLowRelevance: readonly ContributingVerdict[];
   droppedNotApplicable: number;
 }
 
 export interface VerdictHeaderProps {
-  /** Persisted verdict row metadata (fieldName, lastComputedAt, needsRecheck, reasoning). */
   verdict: {
     fieldName: string | null;
     verdict: string;
@@ -57,16 +30,10 @@ export interface VerdictHeaderProps {
     lastComputedAt: string | Date | null;
     needsRecheck: boolean | null;
   };
-  /**
-   * Fresh aggregation of underlying evidence. When non-null, this is the
-   * single source of truth for both the headline label and the explainer.
-   */
+  /** Fresh aggregation; null when no evidence rows exist for this field. */
   aggregation: AggregationResultLike | null;
-  /** Total field-level evidence rows (pre-filter). Used for the "n checks" caption. */
   evidenceCount: number;
-  /** Distinct source URLs across the field-level evidence. */
   uniqueSourceCount: number;
-  /** Optional internal-tag stripper for the persisted reasoning text. */
   stripInternalTags?: (s: string) => string;
 }
 
@@ -77,18 +44,6 @@ const VERDICT_COLORS: Record<string, string> = {
   partial: "text-amber-700 dark:text-amber-400",
 };
 
-function getVerdictColor(verdict: string): string {
-  return VERDICT_COLORS[verdict] ?? "text-muted-foreground";
-}
-
-/**
- * Format one contributing bucket for the explainer. `tier` annotates
- * whether the rows met the relevance threshold ("high") or were filtered
- * below it ("low"). Aggregator semantics: `aggregateEvidence` only puts
- * above-threshold rows into `contributing`, and below-threshold rows into
- * `droppedLowRelevance`, so the tag is determined by which list the
- * caller drew from — never by inferring an average.
- */
 function describeContributor(
   c: ContributingVerdict,
   tier: "high" | "low",
@@ -99,10 +54,8 @@ function describeContributor(
 }
 
 /**
- * Build the disagreement-explainer sentence. Returns `null` when there's
- * no disagreement to explain — i.e. one contributing bucket and zero
- * filtered-out low-relevance rows, or the aggregate is `unchecked`.
- * Keeps the string locale-neutral and parseable in tests.
+ * Returns `null` when there's no disagreement to explain — single contributing
+ * bucket with no filtered low-relevance dissent, or the aggregate is `unchecked`.
  */
 export function buildDisagreementExplainer(
   aggregation: AggregationResultLike,
@@ -126,34 +79,29 @@ export function VerdictHeader({
   uniqueSourceCount,
   stripInternalTags,
 }: VerdictHeaderProps) {
-  // Trust the fresh aggregation when it produced a real bucket.
   // When aggregation collapses to "unchecked" but the persisted verdict
-  // was substantive, the persisted row is what every other surface on
-  // the site already shows — fall back to it so the page doesn't
-  // contradict the rest of the site (and so we don't render the
-  // incoherent "unchecked 90% — All sources confirmed" combination).
-  const useAggregation =
-    aggregation != null && aggregation.verdict !== "unchecked";
-  const headlineVerdict = useAggregation ? aggregation!.verdict : verdict.verdict;
-  const headlineConfidence = useAggregation
-    ? (aggregation!.confidence ?? verdict.confidence)
-    : verdict.confidence;
-  const verdictColor = getVerdictColor(headlineVerdict);
-  const explainer = useAggregation
-    ? buildDisagreementExplainer(aggregation!)
+  // was substantive, fall back to the persisted row — every other surface
+  // on the site shows the persisted value, and rendering "unchecked 90% —
+  // All sources confirmed" would self-contradict.
+  const liveAggregation =
+    aggregation != null && aggregation.verdict !== "unchecked"
+      ? aggregation
+      : null;
+  const headlineVerdict = liveAggregation?.verdict ?? verdict.verdict;
+  const headlineConfidence =
+    liveAggregation?.confidence ?? verdict.confidence;
+  const verdictColor =
+    VERDICT_COLORS[headlineVerdict] ?? "text-muted-foreground";
+  const explainer = liveAggregation
+    ? buildDisagreementExplainer(liveAggregation)
     : null;
-  const hasDisagreement = explainer !== null;
 
-  // Hono RPC serializes Dates to ISO strings on the wire, so this is
-  // always a string at runtime when set.
   const lastComputedAt = verdict.lastComputedAt
     ? new Date(verdict.lastComputedAt)
     : null;
 
   const reasoningText = verdict.reasoning
-    ? stripInternalTags
-      ? stripInternalTags(verdict.reasoning)
-      : verdict.reasoning
+    ? (stripInternalTags?.(verdict.reasoning) ?? verdict.reasoning)
     : null;
 
   return (
@@ -188,9 +136,7 @@ export function VerdictHeader({
             )}
           </>
         )}
-        {lastComputedAt && (
-          <> · {lastComputedAt.toLocaleDateString()}</>
-        )}
+        {lastComputedAt && <> · {lastComputedAt.toLocaleDateString()}</>}
         {verdict.needsRecheck && (
           <>
             {" "}
@@ -198,7 +144,7 @@ export function VerdictHeader({
           </>
         )}
       </span>
-      {hasDisagreement && (
+      {explainer && (
         <div className="basis-full mt-1">
           <span
             data-testid="verdict-explainer"
