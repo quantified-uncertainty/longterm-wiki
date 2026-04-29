@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { fetchDetailed } from "@lib/wiki-server";
 import { ProfileStatCard } from "@/components/directory";
 import {
+  DIMENSION_OVERALL,
   SCORECARD_SOURCES,
   formatScoreCell,
   getScorecardSourceMeta,
@@ -160,13 +161,14 @@ export default async function ScorecardDetailPage({
     }
   }
 
-  // Surface "overall" as the leftmost grade column when present — readers
-  // expect to see the headline score before the per-pillar breakdown.
+  // Surface the overall column as leftmost when present — readers expect the
+  // headline score before the per-pillar breakdown.
   dimensionOrder.sort((a, b) => {
-    if (a.slug === "overall" && b.slug !== "overall") return -1;
-    if (b.slug === "overall" && a.slug !== "overall") return 1;
+    if (a.slug === DIMENSION_OVERALL && b.slug !== DIMENSION_OVERALL) return -1;
+    if (b.slug === DIMENSION_OVERALL && a.slug !== DIMENSION_OVERALL) return 1;
     return a.label.localeCompare(b.label);
   });
+  const hasOverall = dimensionOrder.some((d) => d.slug === DIMENSION_OVERALL);
 
   const orgRows = [...orgMap.values()].sort((a, b) =>
     a.displayName.localeCompare(b.displayName),
@@ -271,10 +273,7 @@ export default async function ScorecardDetailPage({
           <p className="text-xs text-muted-foreground mb-4">
             Rows are organizations; columns are the dimensions {meta.shortLabel}{" "}
             scores. Cell text is the published grade
-            {dimensionOrder.some((d) => d.slug === "overall")
-              ? " (overall first, then per-pillar)"
-              : ""}
-            .
+            {hasOverall ? " (overall first, then per-pillar)" : ""}.
           </p>
           <div className="overflow-x-auto rounded-lg border border-border/60">
             <table className="w-full text-sm">
@@ -321,17 +320,18 @@ export default async function ScorecardDetailPage({
                           </td>
                         );
                       }
+                      const formatted = formatScoreCell(cell);
+                      const rawSuffix =
+                        cell.scoreRaw && cell.scoreRaw !== formatted
+                          ? ` — raw: ${cell.scoreRaw}`
+                          : "";
                       return (
                         <td
                           key={dim.slug}
                           className="px-3 py-2 border-b border-border/30 font-mono tabular-nums"
-                          title={`${dim.label}${
-                            cell.scoreRaw && cell.scoreRaw !== formatScoreCell(cell)
-                              ? ` — raw: ${cell.scoreRaw}`
-                              : ""
-                          }`}
+                          title={`${dim.label}${rawSuffix}`}
                         >
-                          {formatScoreCell(cell)}
+                          {formatted}
                         </td>
                       );
                     })}
