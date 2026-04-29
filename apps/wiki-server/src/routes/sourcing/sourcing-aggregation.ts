@@ -1,5 +1,5 @@
 /**
- * Canonical source-check verdict aggregation.
+ * Canonical sourcing verdict aggregation.
  *
  * Single source of truth for collapsing per-source `source_check_evidence`
  * rows into one `source_check_verdicts` row. Every code path that derives
