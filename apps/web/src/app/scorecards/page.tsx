@@ -54,6 +54,13 @@ interface GradeRow {
   scoreNumeric: number | null;
   scoreLetter: string | null;
   scoreRaw: string;
+  /**
+   * Inline sourcing verdict (QUA-839). Null when never checked.
+   * The wiki-server returns more fields (confidence, sourcesChecked) but
+   * the matrix only renders verdict + checkedAt; pull more fields through
+   * here only when a tooltip surface starts using them.
+   */
+  sourcing: { verdict: string; checkedAt: string | null } | null;
 }
 
 /**
@@ -132,6 +139,9 @@ export default async function ScorecardsPage() {
       scoreLetter: g.scoreLetter,
       scoreRaw: g.scoreRaw,
       publishedAt: g.publishedAt,
+      sourcing: g.sourcing
+        ? { verdict: g.sourcing.verdict, checkedAt: g.sourcing.checkedAt }
+        : null,
     };
     if (existing) {
       existing.cells[g.scorecardSource] = cell;

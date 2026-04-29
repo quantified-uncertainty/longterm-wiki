@@ -15,6 +15,8 @@ import {
   DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
 
 interface GradeRow {
   id: string;
@@ -30,6 +32,14 @@ interface GradeRow {
   scoreLetter: string | null;
   scoreRaw: string;
   notes: string | null;
+  /**
+   * Inline sourcing verdict (QUA-839). Null when never checked —
+   * `recordVerdictToStatus` then renders an `unchecked` (white) dot.
+   * The wiki-server returns more fields (confidence, sourcesChecked) but
+   * panels only render verdict + checkedAt; widen this only when a tooltip
+   * surface starts using them.
+   */
+  sourcing: { verdict: string; checkedAt: string | null } | null;
 }
 
 interface ByEntityResponse {
@@ -165,8 +175,16 @@ export function ScorecardsSection({
             {overallRow ? (
               <div className="mb-3 flex items-baseline gap-3">
                 <span className="text-sm text-muted-foreground">Overall:</span>
-                <span className="text-2xl font-mono tabular-nums">
-                  {formatScoreCell(overallRow)}
+                <span className="inline-flex items-baseline gap-2">
+                  <span className="text-2xl font-mono tabular-nums">
+                    {formatScoreCell(overallRow)}
+                  </span>
+                  <SourcingDot
+                    status={recordVerdictToStatus(overallRow.sourcing?.verdict)}
+                    originalVerdict={overallRow.sourcing?.verdict ?? null}
+                    lastChecked={overallRow.sourcing?.checkedAt ?? null}
+                    size="md"
+                  />
                 </span>
               </div>
             ) : null}
@@ -180,7 +198,15 @@ export function ScorecardsSection({
                   >
                     <dt className="py-1.5">{r.dimensionLabel}</dt>
                     <dd className="py-1.5 font-mono tabular-nums text-right">
-                      {formatScoreCell(r)}
+                      <span className="inline-flex items-center gap-1.5 justify-end">
+                        <span>{formatScoreCell(r)}</span>
+                        <SourcingDot
+                          status={recordVerdictToStatus(r.sourcing?.verdict)}
+                          originalVerdict={r.sourcing?.verdict ?? null}
+                          lastChecked={r.sourcing?.checkedAt ?? null}
+                          size="sm"
+                        />
+                      </span>
                     </dd>
                   </div>
                 ))}
