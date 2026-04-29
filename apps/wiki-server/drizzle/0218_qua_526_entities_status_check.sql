@@ -13,10 +13,9 @@
 -- (see PR description for the enumeration query output).
 --
 -- Uses the NOT VALID + VALIDATE CONSTRAINT pattern per
--- .claude/rules/database-migrations.md so the ACCESS EXCLUSIVE lock window
--- on the entities table stays minimal. Table is small (~3.4k rows) but
--- the table is wide (jsonb columns) and the same lock would also block any
--- /api/entities reader.
+-- .claude/rules/database-migrations.md. At ~3.4k rows the lock contention
+-- risk is small; following the pattern keeps the migration consistent with
+-- 0169 / 0173 / 0183 and ready for re-use as the table grows.
 
 DO $$ BEGIN
   ALTER TABLE "entities"

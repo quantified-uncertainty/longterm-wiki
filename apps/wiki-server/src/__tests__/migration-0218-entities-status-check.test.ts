@@ -11,14 +11,6 @@ const MIGRATION_FILE = path.resolve(
   "../../drizzle/0218_qua_526_entities_status_check.sql",
 );
 
-/**
- * Schema-drift test for migration 0218 (QUA-526 Phase 4a-2).
- *
- * Asserts the migration declares chk_entities_status with the correct
- * allowed-value set, the NULL allowance, and the NOT VALID + VALIDATE
- * pattern. If the file is edited, this test fails until the regexes are
- * updated to match — the regexes are the canonical contract.
- */
 describe("migration 0218 — QUA-526 entities.status CHECK constraint", () => {
   const sql = readFileSync(MIGRATION_FILE, "utf-8");
 
@@ -27,10 +19,10 @@ describe("migration 0218 — QUA-526 entities.status CHECK constraint", () => {
     expect(sql).toMatch(/ADD\s+CONSTRAINT\s+chk_entities_status\b/);
   });
 
-  it("allows NULL and the four EntityStatus values", () => {
-    expect(sql).toMatch(
-      /CHECK\s*\(\s*status\s+IS\s+NULL\s+OR\s+status\s+IN\s*\(\s*'stub'\s*,\s*'draft'\s*,\s*'published'\s*,\s*'verified'\s*\)\s*\)/,
-    );
+  it("permits NULL via 'status IS NULL OR status IN (...)' shape", () => {
+    // Shape only — value list is asserted by the parity guard below so
+    // legitimate reorderings of the enum don't break this test.
+    expect(sql).toMatch(/CHECK\s*\(\s*status\s+IS\s+NULL\s+OR\s+status\s+IN\s*\(/);
   });
 
   it("CHECK allowed-list matches ENTITY_STATUS_VALUES exactly (parity guard)", () => {
@@ -38,16 +30,12 @@ describe("migration 0218 — QUA-526 entities.status CHECK constraint", () => {
     // production incidents. Parse the literal values out of the migration's
     // IN clause and assert set-equality with ENTITY_STATUS_VALUES so the
     // canonical Zod enum and the migration cannot drift independently.
-    const inClause = sql.match(
-      /status\s+IN\s*\(\s*((?:'[a-z_-]+'\s*,?\s*)+)\)/,
-    );
+    const inClause = sql.match(/status\s+IN\s*\(([^)]+)\)/);
     expect(inClause, "could not parse IN clause from migration").not.toBeNull();
-    const migrationValues = (inClause?.[1] ?? "")
-      .match(/'([^']+)'/g)
-      ?.map((s) => s.slice(1, -1)) ?? [];
-    expect([...migrationValues].sort()).toEqual(
-      [...ENTITY_STATUS_VALUES].sort(),
+    const migrationValues = [...(inClause?.[1] ?? "").matchAll(/'([^']+)'/g)].map(
+      (m) => m[1],
     );
+    expect([...migrationValues].sort()).toEqual([...ENTITY_STATUS_VALUES].sort());
   });
 
   it("uses NOT VALID + VALIDATE CONSTRAINT", () => {

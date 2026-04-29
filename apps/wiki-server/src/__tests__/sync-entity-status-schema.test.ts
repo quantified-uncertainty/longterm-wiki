@@ -1,12 +1,6 @@
-/**
- * Zod parity test for QUA-526 — SyncEntitySchema.status must reject any
- * value outside the EntityStatus enum, matching the chk_entities_status
- * CHECK constraint added in migration 0218.
- *
- * Drift between this Zod enum, the CHECK constraint, and EntityStatus in
- * data/schema.ts has caused real incidents (see QUA-283 / migration 0173).
- * Pin all three together by spot-checking each accepted/rejected value here.
- */
+// Zod parity test for QUA-526 — SyncEntitySchema.status must mirror
+// chk_entities_status (migration 0218). See QUA-283 for prior incidents
+// caused by Zod ↔ CHECK drift.
 
 import { describe, it, expect } from "vitest";
 import {
@@ -24,12 +18,11 @@ const validBase = {
 describe("SyncEntitySchema.status — QUA-526 parity with chk_entities_status", () => {
   it("exports the canonical EntityStatus value list", () => {
     // Source of truth that the migration + data/schema.ts must mirror.
-    expect([...ENTITY_STATUS_VALUES]).toEqual([
-      "stub",
-      "draft",
-      "published",
-      "verified",
-    ]);
+    // Set-equality, not order-equality, so legitimate reorderings don't
+    // break this test — the migration parity guard does the same.
+    expect([...ENTITY_STATUS_VALUES].sort()).toEqual(
+      ["draft", "published", "stub", "verified"].sort(),
+    );
   });
 
   for (const value of ENTITY_STATUS_VALUES) {
