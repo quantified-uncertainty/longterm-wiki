@@ -73,13 +73,23 @@ const SIDEBAR_ONLY_PAGES = [
   "/projects/aaa-ai-arbitrator",
 ];
 
-/** Pages with stat cards — check for empty values. */
+/**
+ * Pages that MUST render at least one [data-testid="stat-card"]. Used to
+ * verify (a) stat cards are present and (b) each card has a non-empty value.
+ *
+ * Microsoft is intentionally excluded — its data has no HERO_STATS facts,
+ * so 0 stat cards is the expected state, not a regression.
+ *
+ * If you add a page here, make sure it actually uses `ProfileStatCard` or
+ * `StatCard` (org-shared) — both tag their root with `data-testid="stat-card"`.
+ * Inline stat-card markup elsewhere in the codebase is not tagged and would
+ * cause this assertion to fail.
+ */
 const STAT_CARD_PAGES = [
   "/organizations/anthropic",
   "/organizations/openai",
   "/organizations/google-deepmind",
   "/organizations/meta-ai",
-  "/organizations/microsoft",
   "/ai-models/claude-opus-4-5",
   "/ai-models/gemini-2-5-pro",
 ];
@@ -126,6 +136,30 @@ test.describe("Render audit — tabbed pages", () => {
     test(url, async ({ page }) => {
       await loadPage(page, url);
 
+      // Stat card check runs BEFORE the tab loop because on some pages
+      // (organizations) stat cards live inside the Overview tab, which is
+      // active on initial load but gets unmounted when later tabs are clicked.
+      // Targets [data-testid="stat-card"] tagged on ProfileStatCard +
+      // StatCard (org-shared.tsx) — narrower than the old class-based
+      // filter, which over-matched Family tables, the Details sidebar, and
+      // other rounded containers with `tabular-nums` descendants and produced
+      // an `nth(N).textContent` race when DOM mutated between count and
+      // access (QUA-763).
+      if (STAT_CARD_PAGES.includes(url)) {
+        const cards = page.locator('[data-testid="stat-card"]');
+        const count = await cards.count();
+        // Guard against silent no-op if data-testid is removed by a refactor.
+        // Pages in STAT_CARD_PAGES are guaranteed to have stat cards (see the
+        // list comment above — Microsoft is excluded for that reason).
+        expect
+          .soft(count > 0, `No [data-testid="stat-card"] elements on ${url}`)
+          .toBe(true);
+        for (let i = 0; i < count; i++) {
+          const value = (await cards.nth(i).locator(".text-xl, .text-2xl, .text-3xl, .tabular-nums").first().textContent())?.trim() ?? "";
+          expect.soft(value.length > 0, `Empty stat card in ${url} (${i + 1}/${count})`).toBe(true);
+        }
+      }
+
       const tabs = page.locator("[role='tab'], button[data-state]");
       const tabCount = await tabs.count();
 
@@ -141,18 +175,6 @@ test.describe("Render audit — tabbed pages", () => {
         }
       } else {
         checkAntiPatterns(await getMainText(page), url);
-      }
-
-      // Stat card check for org pages
-      if (STAT_CARD_PAGES.includes(url)) {
-        const cards = page.locator(".rounded-xl.border, .rounded-lg.border").filter({
-          has: page.locator(".text-xl, .text-2xl, .text-3xl, .tabular-nums"),
-        });
-        const count = await cards.count();
-        for (let i = 0; i < count; i++) {
-          const value = (await cards.nth(i).locator(".text-xl, .text-2xl, .text-3xl, .tabular-nums").first().textContent())?.trim() ?? "";
-          expect.soft(value.length > 0, `Empty stat card in ${url} (${i + 1}/${count})`).toBe(true);
-        }
       }
     });
   }

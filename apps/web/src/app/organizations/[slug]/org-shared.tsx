@@ -49,7 +49,10 @@ export function StatCard({
   sub?: string;
 }) {
   return (
-    <div className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4">
+    <div
+      data-testid="stat-card"
+      className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
+    >
       <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
         {label}
       </div>
