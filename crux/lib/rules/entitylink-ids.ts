@@ -86,17 +86,23 @@ function getPagesBySlug(): Map<string, PageEntry> {
 
 /**
  * Try to extract the plain-text children of an `<EntityLink ...>` whose
- * opening tag begins at `startIdx` of `line`. Returns:
+ * opening tag begins at `startIdx` of `text` (typically the full content
+ * body, not a single line — see the call site, which tracks the absolute
+ * body offset so multi-line tags resolve correctly). Returns:
  *   - undefined if the tag is self-closing (no children to compare)
  *   - undefined if the children contain JSX/markup (cannot reliably slugify)
+ *   - undefined if no closing `</EntityLink>` is reached
  *   - the trimmed text otherwise
  */
-function extractEntityLinkChildren(line: string, startIdx: number): string | undefined {
-  const slice = line.slice(startIdx);
+function extractEntityLinkChildren(text: string, startIdx: number): string | undefined {
+  const slice = text.slice(startIdx);
   // Self-closing tag: `<EntityLink ... />` — no children, return undefined
   // (caller treats as "cannot compare", keeps safe auto-fix behavior).
   if (/^<EntityLink[^>]*\/\s*>/.test(slice)) return undefined;
-  // Plain-text children: `<EntityLink ...>(no other tags)</EntityLink>`
+  // Plain-text children: `<EntityLink ...>(no other tags, possibly multi-line)</EntityLink>`.
+  // `[^<]*` already permits newlines, so the only thing we need from the
+  // body-wide scan is to reach the closing tag — which may be on a later
+  // line than the opening tag.
   const m = /^<EntityLink[^>]*>([^<]*)<\/EntityLink>/.exec(slice);
   if (!m) return undefined;
   const children = m[1].trim();
@@ -109,16 +115,25 @@ function extractEntityLinkChildren(line: string, startIdx: number): string | und
  *
  * The rendered link's visible text comes from this children string, so a
  * mismatch here is exactly the QUA-761-style silent corruption: the link
- * displays one identity but routes to another. We err on the side of
- * accepting matches (false negatives = a few extra auto-fixes, which the
- * reviewer sees in the diff) rather than rejecting (false positives =
- * spurious blocking errors).
+ * displays one identity but routes to another.
  *
- * Accepts:
- *   - exact slug match after lowercasing/punctuation-collapse
- *   - one slug being a substring of the other (e.g., "anthropic" ⊆ "anthropic-research")
- *   - display text equal to (or substring of) the entity's title
- *   - display text equal to one of the entity's aliases
+ * Substring matching is dangerous for short slugs ("miri" wrongly matches
+ * inside "Miriam Cohen", "ai" wrongly matches anywhere) so the heuristic
+ * uses three layered checks instead, in order of strictness:
+ *   1. Exact slug match
+ *   2. Word-boundary match (slug words appear as complete tokens in display)
+ *   3. Hyphen-collapsed substring with a length floor (handles digit-attached
+ *      slugs like "sb-1047" inside "california-sb1047")
+ *   4. Entity/page title equality, alias equality, length-floored substring
+ *   5. 2+ significant-word overlap with slug or title (handles paraphrased
+ *      display variants like "Brookings Institution's AI Initiative" vs
+ *      title "Brookings Institution AI and Emerging Technology Initiative")
+ *
+ * The minimum length floor of 5 chars on substring matching is the load-
+ * bearing change vs the original implementation: it lets short canonical
+ * slugs like "cea"/"fhi"/"miri" match through the entity-title path
+ * (where exact equality is reliable) while preventing them from matching
+ * inside arbitrary unrelated longer strings.
  */
 function displayMatchesEntity(
   displayText: string,
@@ -129,15 +144,29 @@ function displayMatchesEntity(
   const ds = slugify(displayText);
   if (!ds) return true; // no signal to reject on
   if (ds === registrySlug) return true;
-  if (ds.includes(registrySlug) || registrySlug.includes(ds)) return true;
-  // Collapse hyphens so "sb-1047" matches inside "california-sb1047" etc.
-  // (slugify inserts a hyphen between letters and digits that the registry
-  // slug doesn't necessarily have).
-  const dsCompact = ds.replace(/-/g, '');
-  const slugCompact = registrySlug.replace(/-/g, '');
-  if (dsCompact && (dsCompact === slugCompact || dsCompact.includes(slugCompact) || slugCompact.includes(dsCompact))) {
+
+  // (2) Word-boundary match. Single-word slugs (e.g. "anthropic", "miri")
+  // must appear as a complete token of `ds`. Multi-word slugs (e.g.
+  // "anthropic-research") match if every slug word appears in the display.
+  const dsWords = ds.split('-');
+  const slugWords = registrySlug.split('-');
+  if (slugWords.length === 1) {
+    if (dsWords.includes(slugWords[0])) return true;
+  } else if (slugWords.every((w) => dsWords.includes(w))) {
     return true;
   }
+
+  // (3) Hyphen-collapsed substring with min-length 5. Catches digit-attached
+  // slugs like "sb-1047" inside "california-sb1047" without false-positiving
+  // on short acronyms.
+  const dsCompact = ds.replace(/-/g, '');
+  const slugCompact = registrySlug.replace(/-/g, '');
+  if (dsCompact.length >= 5 && slugCompact.length >= 5) {
+    if (dsCompact === slugCompact) return true;
+    if (dsCompact.includes(slugCompact) || slugCompact.includes(dsCompact)) return true;
+  }
+
+  // (4) Entity/page title equality + length-floored substring + aliases.
   const dt = displayText.toLowerCase().trim();
   const titles: string[] = [];
   if (entity?.title) titles.push(entity.title);
@@ -145,29 +174,27 @@ function displayMatchesEntity(
   for (const t of titles) {
     const et = t.toLowerCase().trim();
     if (dt === et) return true;
-    if (et.includes(dt) || dt.includes(et)) return true;
+    if (dt.length >= 5 && et.length >= 5 && (et.includes(dt) || dt.includes(et))) return true;
   }
   if (entity?.aliases) {
     for (const alias of entity.aliases) {
       if (typeof alias === 'string' && alias.toLowerCase().trim() === dt) return true;
     }
   }
-  // 2+ significant-word (length ≥ 3) overlap. We compare the display-text
+
+  // (5) 2+ significant-word (length ≥ 3) overlap. Compares the display-text
   // word set against both (a) the registry slug words and (b) the entity/page
-  // title words. Many entities have short canonical slugs (acronyms like
-  // "cset") but descriptive display variants ("Georgetown Center for Security
-  // and Emerging Technology") — those should match against the title.
-  // The 2-word floor avoids matching unrelated entities that share a single
-  // common token like "ai".
-  const dsWords = new Set(ds.split('-').filter((w) => w.length >= 3));
-  const slugWords = new Set(registrySlug.split('-').filter((w) => w.length >= 3));
+  // title words. The 2-word floor avoids matching unrelated entities that
+  // share a single common token like "ai".
+  const dsSigWords = new Set(dsWords.filter((w) => w.length >= 3));
+  const slugSigWords = new Set(slugWords.filter((w) => w.length >= 3));
   let overlap = 0;
-  for (const w of dsWords) if (slugWords.has(w)) overlap++;
+  for (const w of dsSigWords) if (slugSigWords.has(w)) overlap++;
   if (overlap >= 2) return true;
   for (const t of titles) {
     const titleWords = new Set(slugify(t).split('-').filter((w) => w.length >= 3));
     let titleOverlap = 0;
-    for (const w of dsWords) if (titleWords.has(w)) titleOverlap++;
+    for (const w of dsSigWords) if (titleWords.has(w)) titleOverlap++;
     if (titleOverlap >= 2) return true;
   }
   return false;
@@ -229,6 +256,7 @@ export const entityLinkIdsRule = createRule({
     const regex = new RegExp(ENTITY_LINK_RE.source, 'g');
     let match: RegExpExecArray | null;
     let lineNum = 0;
+    let bodyOffset = 0;
     const lines = content.body.split('\n');
 
     for (const line of lines) {
@@ -300,7 +328,7 @@ export const entityLinkIdsRule = createRule({
               // injecting a "valid" cross-check on a link whose prose says
               // something else permanently locks in the bad wikiId. See
               // QUA-759.
-              const children = extractEntityLinkChildren(line, match.index);
+              const children = extractEntityLinkChildren(content.body, bodyOffset + match.index);
               const entitiesBySlug = getEntitiesBySlug(engine);
               const entity = entitiesBySlug.get(slug);
               const pageTitle = getPagesBySlug().get(slug)?.title;
@@ -387,6 +415,10 @@ export const entityLinkIdsRule = createRule({
           }
         }
       }
+      // Track absolute byte position in body so that downstream child-text
+      // extraction works for multi-line EntityLink tags. `+ 1` accounts for
+      // the newline removed by `split('\n')`.
+      bodyOffset += line.length + 1;
     }
 
     return issues;

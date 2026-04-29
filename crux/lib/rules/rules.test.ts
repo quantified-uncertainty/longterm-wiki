@@ -1372,6 +1372,65 @@ describe('entitylink-ids rule', () => {
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
   });
+
+  it('rejects substring false-positive of short slug inside unrelated word (QUA-759)', () => {
+    // "Miriam Cohen" slugified contains the substring "miri" but is a
+    // different entity. A naive `includes` check would silently accept
+    // this — the validator must require word-boundary matching for short
+    // single-word slugs.
+    const content = mockContent(
+      '<EntityLink id="E100">Miriam Cohen</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('detects display mismatch in multi-line EntityLink (QUA-759)', () => {
+    // Multi-line EntityLink tags are valid MDX and appear in real content.
+    // The line-by-line scan must not silently fall through to the safe
+    // auto-fix path when the closing tag is on a later line.
+    const content = mockContent(
+      '<EntityLink id="E42">\n  Open Philanthropy\n</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('matches via page title when entity has no YAML record', () => {
+    // Internal dashboards and many wiki pages have no YAML entity record;
+    // their canonical title lives only in the MDX frontmatter. The matcher
+    // must consult page titles too.
+    const engine = {
+      ...engineWithRegistry,
+      idRegistry: {
+        bySlug: { ...engineWithRegistry.idRegistry.bySlug, 'source-checks-dashboard': 'E2200' },
+        byWikiId: { ...engineWithRegistry.idRegistry.byWikiId, 'E2200': 'source-checks-dashboard' },
+      },
+      pathRegistry: { ...engineWithRegistry.pathRegistry, 'source-checks-dashboard': '/internal/source-checks/' },
+      // Note: no entry in `entities` for E2200 — only the slug exists.
+      _pageTitleByWikiId: { 'E2200': 'Source Checks' },
+    };
+    // The validator reads page titles via the loadPages() helper from
+    // content-types, so this test exercises the title-matching path
+    // through the slug fallback (using entity title via `engine.entities`).
+    // We add a stub entity record with title="Source Checks" since the
+    // mock engine doesn't share state with the loadPages() module cache.
+    engine.entities = [
+      ...engineWithRegistry.entities,
+      { id: 'source-checks-dashboard', title: 'Source Checks', type: 'page' },
+    ];
+    const content = mockContent(
+      '<EntityLink id="E2200">Source Checks</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engine);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+  });
 });
 
 // ---------------------------------------------------------------------------
