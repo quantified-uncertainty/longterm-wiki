@@ -14,7 +14,32 @@
  */
 
 import { z } from "zod";
-import { InlineSourcingSchema } from "./routes/tablebase/sourcing-schema.js";
+
+/**
+ * Optional sourcing data submitted alongside any record on a /sync endpoint.
+ *
+ * Defined here (the canonical source) rather than in
+ * `./routes/tablebase/sourcing-schema.js` because `api-types.ts` is bundled
+ * by `apps/web/`, which webpack cannot resolve from a deep relative `.js`
+ * path under `apps/wiki-server/src/routes/`. The tablebase `sourcing-schema.ts`
+ * now re-exports from here so existing route imports keep working.
+ */
+export const InlineSourcingSchema = z.object({
+  verdict: z.enum([
+    "confirmed",
+    "contradicted",
+    "outdated",
+    "partial",
+    "unverifiable",
+  ]),
+  evidence: z.string().max(5000).optional(),
+  confidence: z.number().min(0).max(1).optional(),
+  sourceContentHash: z.string().max(100).optional(),
+  checkedAt: z.string().datetime().optional(),
+  checkedBy: z.string().max(100).optional(),
+});
+
+export type InlineSourcing = z.infer<typeof InlineSourcingSchema>;
 
 // ---------------------------------------------------------------------------
 // Shared constants
