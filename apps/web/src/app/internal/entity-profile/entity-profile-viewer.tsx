@@ -26,6 +26,13 @@ import {
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { isEntityRefColumn } from "./entity-ref-columns";
 import {
+  CURRENCY_COLUMNS,
+  PERCENTAGE_COLUMNS,
+  ENTITY_REF_FALLBACKS,
+  tryParseNumeric,
+  formatPercentage,
+} from "./format-numeric";
+import {
   sanitizeRawIds,
   isClickableFactId,
   isOpaqueLegacyFactId,
@@ -269,37 +276,6 @@ const GLOBAL_HIDDEN_COLUMNS = new Set(["id"]);
 
 /** Max rows to show initially before "Show all" */
 const INITIAL_ROW_LIMIT = 20;
-
-// ── Numeric formatting columns ────────────────────────────────────────────
-
-/** Columns representing monetary amounts (Drizzle returns numeric() as strings) */
-const CURRENCY_COLUMNS = new Set([
-  "amount", "raised", "raised_low", "raised_high",
-  "valuation", "valuation_low", "valuation_high",
-  "amount_low", "amount_high", "total_budget",
-  "usd_equivalent", "cost_usd",
-]);
-
-/** Columns representing 0-1 decimal fractions displayed as percentages */
-const PERCENTAGE_COLUMNS = new Set([
-  "stake_low", "stake_high",
-]);
-
-function formatPercentage(n: number): string {
-  // Values > 1 are likely already percentages (e.g., 15 = 15%), not decimals
-  const pct = Math.abs(n) > 1 ? n : n * 100;
-  return `${pct.toFixed(1).replace(/\.0$/, "")}%`;
-}
-
-/** Try to parse a value as a number. Returns null if not parseable or is a range string like "[0.07, 0.15]". */
-function tryParseNumeric(value: unknown): number | null {
-  if (typeof value === "number") return isFinite(value) ? value : null;
-  if (typeof value !== "string") return null;
-  const trimmed = value.trim();
-  if (!trimmed || trimmed.startsWith("[") || trimmed.startsWith("{")) return null;
-  const n = Number(trimmed);
-  return isFinite(n) ? n : null;
-}
 
 // ── Expandable text ───────────────────────────────────────────────────────
 
@@ -774,7 +750,15 @@ function ProfileSection({
                     })()}
                     {visibleColumns.map((col) => {
                       const camelKey = snakeToCamel(col.name);
-                      const value = camelKey in row ? row[camelKey] : row[col.name];
+                      let value = camelKey in row ? row[camelKey] : row[col.name];
+                      // Fall back to a raw legacy column when the entity-ref FK is
+                      // null. Without this, funding rounds whose `lead_investor`
+                      // never resolved render as em-dash even though the legacy
+                      // text column has a usable display name.
+                      if ((value === null || value === undefined || value === "") && ENTITY_REF_FALLBACKS[col.name]) {
+                        const fallback = row[ENTITY_REF_FALLBACKS[col.name]];
+                        if (fallback != null && fallback !== "") value = fallback;
+                      }
                       return (
                         <td key={col.name} className="px-3 py-2 align-top">
                           <CellValue value={value} columnName={col.name} displayNames={displayNames} row={row} />
