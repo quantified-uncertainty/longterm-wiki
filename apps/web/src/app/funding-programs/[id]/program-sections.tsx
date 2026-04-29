@@ -103,30 +103,3 @@ export function GrantsAwardedSection({
   );
 }
 
-// ── Back to Funder Link ──────────────────────────────────────────────
-
-export function BackToFunderLink({
-  funder,
-}: {
-  funder: { name: string; href: string | null };
-}) {
-  return (
-    <div className="mt-8 pt-6 border-t border-border/60">
-      {funder.href ? (
-        <Link
-          href={funder.href}
-          className="text-sm text-primary hover:underline"
-        >
-          &larr; Back to {funder.name}
-        </Link>
-      ) : (
-        <Link
-          href="/organizations"
-          className="text-sm text-primary hover:underline"
-        >
-          &larr; Back to organizations
-        </Link>
-      )}
-    </div>
-  );
-}

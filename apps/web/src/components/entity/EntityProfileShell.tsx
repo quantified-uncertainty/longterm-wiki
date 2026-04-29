@@ -180,10 +180,6 @@ export function EntityProfileShell({
                   status={recordVerdictToStatus(verdict ?? null)}
                   originalVerdict={verdict ?? null}
                   size="md"
-                  // QUA-418: entity-level pages omit href — "entity" is not a
-                  // real record_type so /sourcing/entity/<id> always 404s.
-                  // Record-level pages (investments, funding-rounds, etc.)
-                  // pass verdictHref since /sourcing/<recordType>/<id> exists.
                   href={verdictHref}
                 />
               )}

@@ -2,9 +2,11 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { safeHref } from "@/lib/directory-utils";
 import {
   formatKBDate,
@@ -66,6 +68,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
   if (!record) return notFound();
 
   const data = loadProgramPageData(record);
+  const programVerdict = getRecordVerdict("funding-program", String(data.program.key));
 
   const titlePills = (
     <>
@@ -121,12 +124,16 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
       ]}
       title={data.program.name}
       titlePills={titlePills}
+      verdict={programVerdict?.verdict ?? null}
+      verdictHref={
+        programVerdict?.verdict
+          ? getSourcingHref("funding-program", String(data.program.key))
+          : undefined
+      }
       statCards={statCards}
     >
       <div className="space-y-8">
-        {/* Details grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* Left column: key details */}
           <div className="space-y-4">
             <DetailSection title="Funder Organization">
               <EntityLinkDisplay
@@ -180,7 +187,6 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
             )}
           </div>
 
-          {/* Right column: supplementary info */}
           <div className="space-y-4">
             {data.program.applicationUrl && (
               <DetailSection title="Application">
@@ -232,7 +238,6 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Grants awarded through this program */}
         <GrantsAwardedSection
           grants={data.programGrants}
           totalGranted={data.totalGranted}
