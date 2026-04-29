@@ -13,7 +13,8 @@ import { existsSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
-import { parseJsonResponse } from '../lib/anthropic.ts';
+import { z } from 'zod';
+import { parseAndValidate } from '../lib/json-parsing.ts';
 
 // ── File categories ──────────────────────────────────────────────────────────
 
@@ -150,6 +151,11 @@ Only include steps you want to skip. Empty "skip" object means run everything.`;
 const TRIAGE_TIMEOUT_MS = 3000;
 const MAX_SKIPPABLE = 5; // Safety cap: never skip more than this many checks
 
+/** Schema for the triage LLM response (QUA-158 / Tier 3). */
+const TriageSkipResponseSchema = z.object({
+  skip: z.record(z.string(), z.string()).optional(),
+}).passthrough();
+
 /**
  * Ask Haiku which gate checks can be skipped based on changed files.
  *
@@ -206,19 +212,21 @@ export async function triageGateChecks(
       return { skip: {}, llmCalled: true, durationMs: Date.now() - start };
     }
 
-    // Parse and validate the response
-    const parsed = parseJsonResponse(result.text) as { skip?: Record<string, string> };
-
-    if (!parsed || typeof parsed.skip !== 'object') {
-      return { skip: {}, llmCalled: true, durationMs: Date.now() - start };
-    }
+    // Zod-validated parse: any malformed shape falls through to "skip nothing".
+    // Triage is an optimization, not a gate, so the fallback is safe.
+    const parsed = parseAndValidate(
+      result.text,
+      TriageSkipResponseSchema,
+      'gate-triage',
+      () => ({ skip: {} as Record<string, string> }),
+    );
 
     // Filter: only keep known step IDs, cap at MAX_SKIPPABLE
     const validSkips: Record<string, string> = {};
     const stepIdSet = new Set(allStepIds);
     let count = 0;
 
-    for (const [id, reason] of Object.entries(parsed.skip)) {
+    for (const [id, reason] of Object.entries(parsed.skip ?? {})) {
       if (count >= MAX_SKIPPABLE) break;
       if (stepIdSet.has(id) && typeof reason === 'string') {
         validSkips[id] = reason;

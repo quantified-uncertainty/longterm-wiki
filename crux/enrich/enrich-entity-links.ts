@@ -24,8 +24,9 @@ import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
+import { z } from 'zod';
 import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
-import { parseJsonResponse } from '../lib/anthropic.ts';
+import { parseAndValidate } from '../lib/json-parsing.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { WIKI_ID_RE } from '../lib/patterns.ts';
@@ -53,13 +54,18 @@ export interface EntityLinkEnrichResult {
   replacements: EntityLinkReplacement[];
 }
 
-interface LlmEntityLinkResponse {
-  replacements?: Array<{
-    searchText?: string;
-    entityId?: string;
-    displayName?: string;
-  }>;
-}
+/**
+ * Zod schema for the entity-link enrichment LLM response.
+ * Validates the outer envelope; replacements with missing fields are
+ * filtered out at the call site.
+ */
+const LlmEntityLinkResponseSchema = z.object({
+  replacements: z.array(z.object({
+    searchText: z.string().optional(),
+    entityId: z.string().optional(),
+    displayName: z.string().optional(),
+  })).optional(),
+}).passthrough();
 
 // ---------------------------------------------------------------------------
 // Core logic (exportable library functions)
@@ -309,14 +315,16 @@ Identify entity mentions and return replacement instructions as JSON.`;
     temperature: 0,
   });
 
-  let parsed: LlmEntityLinkResponse | null = null;
-  try {
-    parsed = parseJsonResponse(result.text) as LlmEntityLinkResponse | null;
-  } catch {
-    // LLM returned invalid JSON — return empty replacements rather than crashing
-    return [];
-  }
-  if (!parsed?.replacements || !Array.isArray(parsed.replacements)) return [];
+  // Zod-validated parse; on parse OR validation failure, returns empty
+  // replacements via the fallback rather than crashing or trusting a
+  // malformed response.
+  const parsed = parseAndValidate(
+    result.text,
+    LlmEntityLinkResponseSchema,
+    'entity-links',
+    () => ({ replacements: [] }),
+  );
+  if (!parsed.replacements) return [];
 
   return parsed.replacements
     .filter(r => r.searchText && r.entityId && r.displayName)

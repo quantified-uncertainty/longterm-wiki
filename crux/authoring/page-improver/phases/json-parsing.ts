@@ -1,14 +1,13 @@
 /**
  * Shared JSON Parsing for LLM Responses (page-improver phases)
  *
- * Re-exports parseJsonFromLlm from the shared crux/lib/json-parsing.ts module,
- * and adds page-improver-specific Zod schemas and the parseAndValidate helper.
+ * Re-exports parseJsonFromLlm and parseAndValidate from the shared
+ * crux/lib/json-parsing.ts module, and adds page-improver-specific Zod
+ * schemas.
  */
 
 import { z } from 'zod';
-import { log } from '../utils.ts';
-import { parseJsonFromLlm } from '../../../lib/json-parsing.ts';
-export { parseJsonFromLlm } from '../../../lib/json-parsing.ts';
+export { parseJsonFromLlm, parseAndValidate } from '../../../lib/json-parsing.ts';
 
 // ---------------------------------------------------------------------------
 // Zod Schemas for LLM response validation
@@ -71,25 +70,3 @@ export const AdversarialReviewResultSchema = z.object({
   overallAssessment: z.string(),
 }).passthrough();
 
-/**
- * Parse and validate an LLM response against a Zod schema.
- * Returns the validated result or the fallback on failure.
- *
- * When validation fails, returns the fallback rather than casting the
- * raw parsed object — the `as T` cast would defeat schema protection
- * and allow malformed objects into downstream code.
- */
-export function parseAndValidate<T>(
-  raw: string,
-  schema: z.ZodType<T>,
-  phase: string,
-  fallback: (raw: string, error?: string) => T,
-): T {
-  const parsed = parseJsonFromLlm(raw, phase, fallback);
-  const result = schema.safeParse(parsed);
-  if (result.success) {
-    return result.data;
-  }
-  log(phase, `Warning: ${phase} result failed schema validation: ${result.error.message.slice(0, 200)}`);
-  return fallback(raw, result.error.message);
-}

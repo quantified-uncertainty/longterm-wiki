@@ -11,6 +11,7 @@
  * QUA-92: Wikidata deterministic matcher for sourcing pipeline.
  */
 
+import { z } from 'zod';
 import type { VerifyItem, VerifyResult, FactItemData } from './orchestrator-types.ts';
 import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { nameMatches, dateMatches } from './fuzzy-match.ts';
@@ -39,10 +40,17 @@ interface WikidataEntity {
   sitelinks?: Record<string, { site: string; title: string }>;
 }
 
-/** Wikidata API response for wbgetentities */
-interface WbGetEntitiesResponse {
-  entities: Record<string, WikidataEntity>;
-}
+/**
+ * Zod schema for the wbgetentities response envelope (QUA-158 / Tier 3).
+ * Only validates the outer shape — `entities` exists and is an object —
+ * so a corrupt/error response (HTML error page, rate-limit envelope, etc.)
+ * fails validation up front. Per-claim narrowing is done by the strategy
+ * matchers below via the existing `getStringValue` / `getTimeValue` /
+ * `getEntityRefQid` / `getQuantityValue` helpers.
+ */
+const WbGetEntitiesResponseSchema = z.object({
+  entities: z.record(z.string(), z.unknown()),
+}).passthrough();
 
 /** Match strategy for a property */
 type MatchStrategy =
@@ -197,10 +205,25 @@ export async function fetchEntities(qids: string[]): Promise<Map<string, Wikidat
         continue;
       }
 
-      const data = (await response.json()) as WbGetEntitiesResponse;
+      const rawJson: unknown = await response.json().catch(() => null);
+      const parsed = WbGetEntitiesResponseSchema.safeParse(rawJson);
+      if (!parsed.success) {
+        console.warn(`[wikidata-matcher] Invalid wbgetentities response for batch ${i / 50 + 1}: ${parsed.error.message.slice(0, 200)}`);
+        for (const qid of batch) entityCache.set(qid, null);
+        continue;
+      }
+      const data = parsed.data;
       for (const qid of batch) {
-        const entity = data.entities[qid];
-        if (entity && !('missing' in entity)) {
+        const rawEntity = data.entities[qid];
+        // Treat anything missing the wikidata-entity shape (or flagged `missing`)
+        // as a non-result. The shape narrowing here matches the original cast
+        // surface — strategy matchers below tolerate undefined fields.
+        if (
+          rawEntity &&
+          typeof rawEntity === 'object' &&
+          !('missing' in (rawEntity as Record<string, unknown>))
+        ) {
+          const entity = rawEntity as WikidataEntity;
           entityCache.set(qid, entity);
           result.set(qid, entity);
         } else {

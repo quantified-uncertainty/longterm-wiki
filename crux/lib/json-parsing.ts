@@ -4,8 +4,12 @@
  * Centralizes the try/catch JSON.parse pattern used across LLM-calling scripts.
  * Provides type-safe parsing with structured fallbacks and partial recovery for
  * truncated responses (e.g. when long output hits token limits).
+ *
+ * For Zod-validated parsing (QUA-158 / Tier 3), prefer `parseAndValidate()` —
+ * it adds runtime schema enforcement on top of `parseJsonFromLlm`'s salvage.
  */
 
+import type { ZodType } from 'zod';
 import { createPhaseLogger } from './output.ts';
 
 const log = createPhaseLogger();
@@ -147,4 +151,42 @@ export function parseJsonFromLlm<T>(
   const errorMsg = `Could not parse ${phase} result as JSON (response may have been truncated)`;
   log(phase, `Warning: ${errorMsg}`);
   return fallback(raw, errorMsg);
+}
+
+/**
+ * Parse and validate an LLM response against a Zod schema.
+ *
+ * This is the recommended way to handle untrusted LLM output across the
+ * codebase (QUA-158 / Tier 3). Combines `parseJsonFromLlm`'s truncation
+ * salvage with Zod runtime validation, so callers get a fully-typed value
+ * or a deterministic fallback — never an unsafe `as T` cast.
+ *
+ * On schema-validation failure, logs the validation error and returns the
+ * fallback rather than the raw parsed object — passing the malformed object
+ * through would defeat the validation.
+ *
+ * @example
+ * ```ts
+ * const Schema = z.object({ verdict: z.string(), confidence: z.number() });
+ * const result = parseAndValidate(
+ *   llmResult.text,
+ *   Schema,
+ *   'verify',
+ *   () => ({ verdict: 'unverifiable', confidence: 0 }),
+ * );
+ * ```
+ */
+export function parseAndValidate<T>(
+  raw: string,
+  schema: ZodType<T>,
+  phase: string,
+  fallback: (raw: string, error?: string) => T,
+): T {
+  const parsed = parseJsonFromLlm<unknown>(raw, phase, fallback as (raw: string, error?: string) => unknown);
+  const result = schema.safeParse(parsed);
+  if (result.success) {
+    return result.data;
+  }
+  log(phase, `Warning: ${phase} result failed schema validation: ${result.error.message.slice(0, 200)}`);
+  return fallback(raw, result.error.message);
 }
