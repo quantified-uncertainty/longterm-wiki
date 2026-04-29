@@ -229,3 +229,62 @@ describe("aggregateEvidence — multi-source disagreement (Phase 3 input)", () =
     expect(r.contributing[2].rowCount).toBe(1);
   });
 });
+
+describe("aggregateEvidence — droppedLowRelevance (QUA-792)", () => {
+  it("is empty when every row is above the relevance threshold", () => {
+    const r = aggregateEvidence([
+      row("confirmed", 0.9),
+      row("confirmed", 0.85),
+    ]);
+    expect(r.droppedLowRelevance).toEqual([]);
+  });
+
+  it("groups below-threshold rows by verdict separate from contributing", () => {
+    const r = aggregateEvidence([
+      row("confirmed", 0.9),
+      row("confirmed", 0.85),
+      // Below threshold (0.3) — filtered from contributing.
+      row("contradicted", 0.2),
+      row("contradicted", 0.1),
+      row("outdated", 0.15),
+    ]);
+    expect(r.verdict).toBe("confirmed");
+    expect(r.contributing.map((c) => c.verdict)).toEqual(["confirmed"]);
+    expect(r.contributing[0].rowCount).toBe(2);
+
+    expect(r.droppedLowRelevance.map((c) => c.verdict)).toEqual([
+      "contradicted",
+      "outdated",
+    ]);
+    const contradicted = r.droppedLowRelevance.find(
+      (c) => c.verdict === "contradicted",
+    );
+    expect(contradicted?.rowCount).toBe(2);
+    expect(contradicted?.weight).toBeCloseTo(0.3, 5);
+  });
+
+  it("preserves dropped low-relevance breakdown even when the headline is unchecked", () => {
+    const r = aggregateEvidence([
+      row("confirmed", 0.2),
+      row("contradicted", 0.1),
+    ]);
+    expect(r.verdict).toBe("unchecked");
+    expect(r.contributing).toEqual([]);
+    expect(r.droppedLowRelevance.map((c) => c.verdict).sort()).toEqual([
+      "confirmed",
+      "contradicted",
+    ]);
+  });
+
+  it("does not double-count not_applicable rows in droppedLowRelevance", () => {
+    const r = aggregateEvidence([
+      row("confirmed", 0.9),
+      row("not_applicable", 0.0),
+      row("contradicted", 0.1),
+    ]);
+    expect(r.droppedNotApplicable).toBe(1);
+    expect(r.droppedLowRelevance.map((c) => c.verdict)).toEqual([
+      "contradicted",
+    ]);
+  });
+});

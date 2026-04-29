@@ -707,8 +707,27 @@ const sourcingApp = new Hono()
       return c.json({ error: "not_found", message: "Verdict not found" }, 404);
     }
 
-    // Return all verdicts for this record (row-level + any cell-level)
-    // Order by sourceUrl first (for grouping), then by checkedAt descending
+    // QUA-792: aggregation runs over the COMPLETE evidence set so the
+    // freshly-computed verdict matches what `recomputeVerdict` produced on
+    // write. Read only the columns aggregation needs — no row cap.
+    const aggregationRows = await db
+      .select({
+        fieldName: recordSources.fieldName,
+        verdict: recordSources.verdict,
+        relevanceScore: recordSources.relevanceScore,
+        confidence: recordSources.confidence,
+      })
+      .from(recordSources)
+      .where(
+        and(
+          eq(recordSources.recordType, recordType),
+          eq(recordSources.recordId, recordId),
+        )
+      );
+
+    // The display payload still caps at 200 rows for response-size control.
+    // The disagreement explainer reads from `verdictAggregations` (computed
+    // over the full set above), not from this truncated list.
     const evidenceRows = await db
       .select()
       .from(recordSources)
@@ -729,7 +748,7 @@ const sourcingApp = new Hono()
     // COALESCE(field_name, '') key used by recomputeVerdict on write.
     const verdictAggregations: Record<string, AggregationResult> = {};
     const evidenceByFieldKey = new Map<string, EvidenceRow[]>();
-    for (const e of evidenceRows) {
+    for (const e of aggregationRows) {
       const key = e.fieldName ?? "";
       let bucket = evidenceByFieldKey.get(key);
       if (!bucket) {

@@ -69,6 +69,18 @@ export interface AggregationResult {
    * is `unchecked`.
    */
   contributing: ContributingVerdict[];
+  /**
+   * Per-verdict counts of rows that were considered (not `not_applicable`)
+   * but had `effectiveWeight < minRelevance` and so were filtered out
+   * before bucketing. Surfaces low-relevance dissent so the
+   * QUA-792 disagreement explainer can say "1 low-relevance source
+   * contradicted (filtered)" instead of pretending those rows didn't exist.
+   *
+   * Empty when no row was below the threshold. The verdicts here can
+   * overlap with `contributing` (e.g. one high-relevance + one
+   * low-relevance row may both have `verdict = 'contradicted'`).
+   */
+  droppedLowRelevance: ContributingVerdict[];
   /** Count of `not_applicable` rows that were filtered out before aggregation. */
   droppedNotApplicable: number;
 }

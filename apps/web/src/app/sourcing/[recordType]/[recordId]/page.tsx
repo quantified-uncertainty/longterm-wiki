@@ -334,13 +334,17 @@ export default async function SourcingDetailPage({ params }: PageProps) {
     );
   }
 
-  const { verdicts, evidence, verdictAggregations: rawAggregations } =
-    detailResult.data;
+  const { verdicts, evidence } = detailResult.data;
   // QUA-792: per-fieldName aggregation result, keyed by `fieldName ?? ""`.
   // Server-side `aggregateEvidence()` is the single source of truth; the
   // headline label and the disagreement explainer both derive from it.
-  // Cast widens the inferred string verdict to AggregateVerdict — the
+  // The `?? {}` is a defensive fallback for older wiki-server responses
+  // during a rolling deploy that haven't yet learned to emit this field.
+  // The cast widens the inferred string verdict to AggregateVerdict — the
   // server only ever writes the canonical six values.
+  const rawAggregations =
+    (detailResult.data as { verdictAggregations?: unknown })
+      .verdictAggregations ?? {};
   const verdictAggregations: Record<string, AggregationResultLike> =
     rawAggregations as Record<string, AggregationResultLike>;
   const rawResolvedName = namesResult.ok

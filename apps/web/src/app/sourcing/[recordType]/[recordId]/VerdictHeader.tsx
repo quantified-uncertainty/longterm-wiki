@@ -14,8 +14,6 @@
  * counts.
  */
 
-import { DEFAULT_MIN_RELEVANCE } from "./aggregation-constants";
-
 /**
  * The aggregate verdicts that the canonical aggregation function can emit.
  * Must stay in sync with `AggregateVerdict` in
@@ -40,6 +38,12 @@ export interface AggregationResultLike {
   confidence: number | null;
   sourcesChecked: number;
   contributing: readonly ContributingVerdict[];
+  /**
+   * Per-verdict counts of rows that were below the relevance threshold and
+   * filtered out before bucketing. Surfaces low-relevance dissent the
+   * headline doesn't see.
+   */
+  droppedLowRelevance: readonly ContributingVerdict[];
   droppedNotApplicable: number;
 }
 
@@ -78,30 +82,40 @@ function getVerdictColor(verdict: string): string {
 }
 
 /**
- * Format a single contributing bucket for the explainer line. Annotates
- * relevance qualitatively so the reader can see *why* low-relevance dissent
- * didn't move the headline.
+ * Format one contributing bucket for the explainer. `tier` annotates
+ * whether the rows met the relevance threshold ("high") or were filtered
+ * below it ("low"). Aggregator semantics: `aggregateEvidence` only puts
+ * above-threshold rows into `contributing`, and below-threshold rows into
+ * `droppedLowRelevance`, so the tag is determined by which list the
+ * caller drew from — never by inferring an average.
  */
-function describeContributor(c: ContributingVerdict): string {
-  const avgWeight = c.rowCount > 0 ? c.weight / c.rowCount : 0;
-  const relevanceTag =
-    avgWeight >= DEFAULT_MIN_RELEVANCE ? "high-relevance" : "low-relevance";
+function describeContributor(
+  c: ContributingVerdict,
+  tier: "high" | "low",
+): string {
   const sourceWord = c.rowCount === 1 ? "source" : "sources";
-  return `${c.rowCount} ${relevanceTag} ${sourceWord} ${c.verdict}`;
+  const tag = tier === "high" ? "high-relevance" : "low-relevance";
+  return `${c.rowCount} ${tag} ${sourceWord} ${c.verdict}`;
 }
 
 /**
  * Build the disagreement-explainer sentence. Returns `null` when there's
- * no disagreement (only one contributing bucket, or the aggregate is
- * `unchecked`). Keeps the string locale-neutral and parseable in tests.
+ * no disagreement to explain — i.e. one contributing bucket and zero
+ * filtered-out low-relevance rows, or the aggregate is `unchecked`.
+ * Keeps the string locale-neutral and parseable in tests.
  */
 export function buildDisagreementExplainer(
   aggregation: AggregationResultLike,
 ): string | null {
   if (aggregation.verdict === "unchecked") return null;
-  if (aggregation.contributing.length <= 1) return null;
+  const dropped = aggregation.droppedLowRelevance ?? [];
+  if (aggregation.contributing.length <= 1 && dropped.length === 0) return null;
   const [winner, ...dissent] = aggregation.contributing;
-  const parts = [describeContributor(winner), ...dissent.map(describeContributor)];
+  const parts: string[] = [
+    describeContributor(winner, "high"),
+    ...dissent.map((d) => describeContributor(d, "high")),
+    ...dropped.map((d) => describeContributor(d, "low")),
+  ];
   return `Headline ${aggregation.verdict} — ${parts.join(", ")}.`;
 }
 
@@ -112,19 +126,29 @@ export function VerdictHeader({
   uniqueSourceCount,
   stripInternalTags,
 }: VerdictHeaderProps) {
-  const headlineVerdict = aggregation?.verdict ?? verdict.verdict;
-  const headlineConfidence =
-    aggregation?.confidence != null ? aggregation.confidence : verdict.confidence;
+  // Trust the fresh aggregation when it produced a real bucket.
+  // When aggregation collapses to "unchecked" but the persisted verdict
+  // was substantive, the persisted row is what every other surface on
+  // the site already shows — fall back to it so the page doesn't
+  // contradict the rest of the site (and so we don't render the
+  // incoherent "unchecked 90% — All sources confirmed" combination).
+  const useAggregation =
+    aggregation != null && aggregation.verdict !== "unchecked";
+  const headlineVerdict = useAggregation ? aggregation!.verdict : verdict.verdict;
+  const headlineConfidence = useAggregation
+    ? (aggregation!.confidence ?? verdict.confidence)
+    : verdict.confidence;
   const verdictColor = getVerdictColor(headlineVerdict);
-  const explainer = aggregation ? buildDisagreementExplainer(aggregation) : null;
+  const explainer = useAggregation
+    ? buildDisagreementExplainer(aggregation!)
+    : null;
   const hasDisagreement = explainer !== null;
 
-  const lastComputedAt =
-    verdict.lastComputedAt instanceof Date
-      ? verdict.lastComputedAt
-      : verdict.lastComputedAt
-        ? new Date(verdict.lastComputedAt)
-        : null;
+  // Hono RPC serializes Dates to ISO strings on the wire, so this is
+  // always a string at runtime when set.
+  const lastComputedAt = verdict.lastComputedAt
+    ? new Date(verdict.lastComputedAt)
+    : null;
 
   const reasoningText = verdict.reasoning
     ? stripInternalTags

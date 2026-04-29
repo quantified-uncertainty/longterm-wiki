@@ -120,22 +120,43 @@ export function aggregateEvidence(
       confidence: null,
       sourcesChecked: 0,
       contributing: [],
+      droppedLowRelevance: [],
       droppedNotApplicable: rows.length,
     };
   }
 
   const droppedNotApplicable = rows.length - considered.length;
 
-  // Step 3: any row above the relevance threshold?
-  const aboveThreshold = considered.filter(
-    (r) => effectiveWeight(r) >= minRelevance,
-  );
+  // Step 3: split into above/below threshold. Below-threshold rows are
+  // filtered out from the headline but their per-verdict counts are
+  // surfaced separately so QUA-792's explainer can mention low-relevance
+  // dissent.
+  const aboveThreshold: EvidenceRow[] = [];
+  const belowThresholdBuckets = new Map<AggregateVerdict, ContributingVerdict>();
+  for (const r of considered) {
+    const w = effectiveWeight(r);
+    if (w >= minRelevance) {
+      aboveThreshold.push(r);
+      continue;
+    }
+    const v = r.verdict as AggregateVerdict;
+    const existing = belowThresholdBuckets.get(v);
+    if (existing) {
+      existing.weight += w;
+      existing.rowCount += 1;
+    } else {
+      belowThresholdBuckets.set(v, { verdict: v, weight: w, rowCount: 1 });
+    }
+  }
+  const droppedLowRelevance = sortContributing([...belowThresholdBuckets.values()]);
+
   if (aboveThreshold.length === 0) {
     return {
       verdict: "unchecked",
       confidence: null,
       sourcesChecked: considered.length,
       contributing: [],
+      droppedLowRelevance,
       droppedNotApplicable,
     };
   }
@@ -166,6 +187,7 @@ export function aggregateEvidence(
       confidence: null,
       sourcesChecked: considered.length,
       contributing: [],
+      droppedLowRelevance,
       droppedNotApplicable,
     };
   }
@@ -198,6 +220,17 @@ export function aggregateEvidence(
     confidence,
     sourcesChecked: considered.length,
     contributing,
+    droppedLowRelevance,
     droppedNotApplicable,
   };
+}
+
+/** Sort contributing buckets by weight desc, ties broken by priority. */
+function sortContributing(items: ContributingVerdict[]): ContributingVerdict[] {
+  return [...items].sort((a, b) => {
+    if (a.weight !== b.weight) return b.weight - a.weight;
+    const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a.verdict] ?? 99;
+    const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b.verdict] ?? 99;
+    return aPri - bPri;
+  });
 }
