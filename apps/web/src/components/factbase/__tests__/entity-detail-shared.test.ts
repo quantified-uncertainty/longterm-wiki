@@ -1,8 +1,3 @@
-/**
- * Tests for the canonical display-name helpers in entity-detail-shared.ts
- * (QUA-771). These replace `?? ?? ??` chains that were duplicated across
- * the wiki frontend.
- */
 import { describe, expect, it } from "vitest";
 
 import type { FactBaseRecordEntry } from "@/data/factbase";
@@ -64,8 +59,6 @@ describe("getRecordDisplayName", () => {
   });
 
   it("falls back when name is an empty string (truthy semantics)", () => {
-    // Matches the original `r.fields.name ? String(r.fields.name) : titleCase(r.key)`
-    // pattern in charts.ts — empty strings are treated as missing.
     const item = makeEntry({ key: "round-x", fields: { name: "" } });
     expect(getRecordDisplayName(item)).toBe("Round X");
   });
