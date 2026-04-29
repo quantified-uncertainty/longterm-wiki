@@ -319,14 +319,14 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
 
     // (entity.status is now PG-enforced — chk_entities_status in migration 0218)
 
-    // 6. clusters
+    // 5. clusters
     if (Array.isArray(entity.clusters)) {
       for (const cluster of entity.clusters) {
         checkValue("clusters", cluster, VALID_CLUSTERS, id, src, issues);
       }
     }
 
-    // 7. policyStatus (only for policy entities)
+    // 6. policyStatus (only for policy entities)
     if (entity.type === "policy" && entity.policyStatus) {
       checkValue(
         "policyStatus",
@@ -338,7 +338,7 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
       );
     }
 
-    // 8. projectStatus (only for project entities)
+    // 7. projectStatus (only for project entities)
     if (entity.type === "project" && entity.projectStatus) {
       checkValue(
         "projectStatus",
@@ -350,7 +350,7 @@ export function checkYamlEntities(entities: Array<EntityData & { _sourceFile: st
       );
     }
 
-    // 9. relatedEntries — check relationship and entry type
+    // 8. relatedEntries — check relationship and entry type
     if (Array.isArray(entity.relatedEntries)) {
       for (const entry of entity.relatedEntries) {
         if (entry.relationship) {

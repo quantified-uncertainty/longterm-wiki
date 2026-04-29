@@ -2,6 +2,7 @@ import { describe, it, expect } from "vitest";
 import { readFileSync } from "fs";
 import { fileURLToPath } from "url";
 import path from "path";
+import { ENTITY_STATUS_VALUES } from "../api-types.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -29,6 +30,23 @@ describe("migration 0218 — QUA-526 entities.status CHECK constraint", () => {
   it("allows NULL and the four EntityStatus values", () => {
     expect(sql).toMatch(
       /CHECK\s*\(\s*status\s+IS\s+NULL\s+OR\s+status\s+IN\s*\(\s*'stub'\s*,\s*'draft'\s*,\s*'published'\s*,\s*'verified'\s*\)\s*\)/,
+    );
+  });
+
+  it("CHECK allowed-list matches ENTITY_STATUS_VALUES exactly (parity guard)", () => {
+    // QUA-283 lesson: enum drift between Zod and PG CHECK has caused real
+    // production incidents. Parse the literal values out of the migration's
+    // IN clause and assert set-equality with ENTITY_STATUS_VALUES so the
+    // canonical Zod enum and the migration cannot drift independently.
+    const inClause = sql.match(
+      /status\s+IN\s*\(\s*((?:'[a-z_-]+'\s*,?\s*)+)\)/,
+    );
+    expect(inClause, "could not parse IN clause from migration").not.toBeNull();
+    const migrationValues = (inClause?.[1] ?? "")
+      .match(/'([^']+)'/g)
+      ?.map((s) => s.slice(1, -1)) ?? [];
+    expect([...migrationValues].sort()).toEqual(
+      [...ENTITY_STATUS_VALUES].sort(),
     );
   });
 
