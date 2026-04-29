@@ -358,11 +358,17 @@ const entitiesApp = new Hono()
     )`;
 
     // Count of grants where this org is the grantor (entity acts as funder).
-    // Uses idx_grants_org_entity on org_entity_id; returns 0 for non-funder orgs.
+    // Matches three columns to bridge mixed-state data:
+    //   - org_entity_id (canonical FK to entities.stable_id, set when migrated)
+    //   - organization_id (legacy: may contain a stableId or a slug)
+    // The conditions are an OR over the same row, so no double-counting.
+    // Uses idx_grants_org_entity + idx_grants_org; returns 0 for non-funder orgs.
     const grantsGivenCountExpr = sql`(
       SELECT COUNT(*)::int
       FROM ${grants} g
       WHERE g.org_entity_id = ${entities.stableId}
+         OR g.organization_id = ${entities.stableId}
+         OR g.organization_id = ${entities.id}
     )`;
 
     // Build ORDER BY
