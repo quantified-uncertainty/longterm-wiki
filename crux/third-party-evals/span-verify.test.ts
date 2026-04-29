@@ -177,11 +177,12 @@ describe("spanVerifyToInlineSourcing", () => {
     expect(sourcing?.checkedBy).toBe(SPAN_VERIFY_CHECKER);
     expect(sourcing?.checkedAt).toBe(FIXED_CHECKED_AT);
     expect(sourcing?.sourceContentHash).toBe("abc123");
-    // Confidence is mean of verified-field confidences (>0).
     expect(sourcing?.confidence).toBeGreaterThan(0);
     expect(sourcing?.confidence).toBeLessThanOrEqual(1);
-    // Evidence picks the highest-confidence verified excerpt.
-    expect(sourcing?.evidence).toBeTruthy();
+    // Evidence is one of the verified excerpts from the source-text.
+    expect(sourcing?.evidence).toMatch(
+      /Pre-deployment evaluation|Published 2026-01-15|limited uplift on biological/,
+    );
   });
 
   it("returns 'partial' when some fields verified but others dropped", () => {

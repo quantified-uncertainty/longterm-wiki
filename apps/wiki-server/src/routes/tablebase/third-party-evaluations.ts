@@ -39,6 +39,8 @@ import { InlineSourcingSchema } from "./sourcing-schema.js";
 
 const MAX_PAGE_SIZE = 200;
 
+const RECORD_TYPE = "third-party-evaluation" as const;
+
 // Mirror the CHECK constraint in migration 0206. Source-of-truth for the
 // same vocab also referenced by validate-third-party-eval-refs.ts.
 export const VALID_RISK_DOMAINS = [
@@ -140,9 +142,9 @@ const SyncThirdPartyEvalItemSchema = z.object({
   // Inline join-table fan-out. Empty array clears all links for this evaluation;
   // omitted (undefined) leaves existing links untouched (partial sync).
   models: z.array(EvaluationModelLinkSchema).max(50).optional(),
-  // Inline sourcing verdict (QUA-727). When present, the sync handler writes
-  // a source_check_verdicts row atomically with the evaluation. Ingesters
-  // populate this from span-verify output via `spanVerifyToInlineSourcing()`.
+  // When present, the sync handler writes a source_check_verdicts row
+  // atomically with the evaluation. Ingesters populate this from span-verify
+  // output via `spanVerifyToInlineSourcing()`.
   sourcing: InlineSourcingSchema.optional(),
 });
 
@@ -451,17 +453,17 @@ const thirdPartyEvaluationsApp = new Hono()
       // composed at read time from the source table.
       toThing: (item) => ({
         id: item.id,
-        thingType: "third-party-evaluation" as const,
+        thingType: RECORD_TYPE,
         parentThingId: item.evaluatorOrgId,
         sourceTable: "third_party_evaluations",
         sourceId: item.id,
         sourceUrl: item.reportUrl,
       }),
-      // Inline sourcing verdict (QUA-727). Ingesters that ran span-verify
-      // populate `item.sourcing`; the factory writes source_check_verdicts
-      // atomically with the row. Items without `sourcing` skip this phase.
+      // Ingesters that ran span-verify populate `item.sourcing`; the factory
+      // writes source_check_verdicts atomically with the row. Items without
+      // `sourcing` skip this phase.
       toVerdict: (item) => ({
-        recordType: "third-party-evaluation",
+        recordType: RECORD_TYPE,
         recordId: item.id,
         entityId: item.evaluatorOrgId,
         sourceUrl: item.reportUrl,

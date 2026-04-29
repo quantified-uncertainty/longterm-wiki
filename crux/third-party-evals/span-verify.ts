@@ -155,8 +155,7 @@ export function verifyExtractedReport(
       continue;
     }
 
-    const excerptKey = camelToSnake(field);
-    const excerpt = report.excerpts[excerptKey] ?? report.excerpts[field] ?? "";
+    const excerpt = lookupExcerpt(report.excerpts, field);
     const verdict = verifyExcerpt(excerpt, sourceText, options);
     verdicts[field] = verdict;
     confidenceMap[field] = Number(verdict.confidence.toFixed(2));
@@ -184,22 +183,17 @@ function camelToSnake(s: string): string {
   return s.replace(/[A-Z]/g, (m) => "_" + m.toLowerCase());
 }
 
+/** Look up an excerpt by field name, accepting both snake_case (extractor) and camelCase. */
+function lookupExcerpt(excerpts: Record<string, string>, field: string): string {
+  return excerpts[camelToSnake(field)] ?? excerpts[field] ?? "";
+}
+
 // ---------------------------------------------------------------------------
 // Map span-verify output → inline sourcing verdict (QUA-727)
 // ---------------------------------------------------------------------------
 
 /** Identifier written to InlineSourcing.checkedBy for span-verify verdicts. */
 export const SPAN_VERIFY_CHECKER = "span-verify-v1";
-
-/**
- * `FieldVerdict.reason` values that indicate a field was bypassed (not actually
- * span-checked). Used to filter out URL/metadata/list fields when aggregating
- * the record-level verdict — these carry `verified: true, confidence: 0.5` but
- * tell us nothing about whether the extraction matches the source.
- */
-const BYPASS_REASONS: ReadonlySet<FieldVerdict["reason"]> = new Set([
-  "skipped",
-] as const);
 
 /**
  * Aggregate per-field span-verify output into a record-level inline sourcing
@@ -233,8 +227,11 @@ export function spanVerifyToInlineSourcing(
   verify: VerifyResult,
   options: { sourceContentHash?: string; checkedAt?: string } = {},
 ): InlineSourcing | null {
+  // Bypassed fields (URL/metadata/list) carry `verified: true, confidence: 0.5`
+  // with reason "skipped" but didn't go through real span-check, so they
+  // don't tell us anything about whether the extraction matches the source.
   const checkedFields = Object.entries(verify.verdicts).filter(
-    ([, v]) => !BYPASS_REASONS.has(v.reason),
+    ([, v]) => v.reason !== "skipped",
   );
   const droppedCount = verify.droppedFields.length;
 
@@ -261,11 +258,10 @@ export function spanVerifyToInlineSourcing(
         verifiedConfidences.length
       : 0;
 
-  const excerpts = verify.verifiedReport.excerpts;
   let bestExcerpt: string | undefined;
   let bestExcerptConfidence = 0;
   for (const [f, fieldVerdict] of verifiedCheckedFields) {
-    const excerpt = excerpts[camelToSnake(f)] ?? excerpts[f] ?? "";
+    const excerpt = lookupExcerpt(verify.verifiedReport.excerpts, f);
     if (excerpt && fieldVerdict.confidence > bestExcerptConfidence) {
       bestExcerpt = excerpt;
       bestExcerptConfidence = fieldVerdict.confidence;
