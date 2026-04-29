@@ -528,7 +528,7 @@ async function main(): Promise<void> {
   } else if (FIX_MODE) {
     console.log(`${colors.green}Fixed ${results.fixed} broken links${colors.reset}`);
     if (fixedFiles.length > 0) {
-      logBulkFixes(fixedFiles, {
+      await logBulkFixes(fixedFiles, {
         tool: 'crux-fix',
         agency: 'automated',
         note: 'Fixed broken internal links',

@@ -347,6 +347,18 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-388: ESLint with @typescript-eslint/no-floating-promises.
+    // Blocking. Catches unhandled-promise patterns that ranked highest
+    // in the PR-review survey (~18% of findings). Each future rule
+    // (no-misused-promises, import/no-unresolved, etc.) lands as its
+    // own follow-up PR.
+    id: 'eslint',
+    name: 'ESLint (no-floating-promises)',
+    command: 'pnpm',
+    args: ['lint'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'no-anthropic-api-key-read',
     name: 'No raw Anthropic CLI env-var reads in source (QUA-612)',
     command: 'npx',

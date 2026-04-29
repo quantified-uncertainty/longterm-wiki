@@ -30,7 +30,7 @@ export function SourcingStatus({ entityId }: SourcingStatusProps) {
   useEffect(() => {
     let cancelled = false;
 
-    (async () => {
+    void (async () => {
       try {
         const res = await fetch(
           `/api/sourcing-verdicts-proxy?entity_id=${encodeURIComponent(entityId)}&limit=50`

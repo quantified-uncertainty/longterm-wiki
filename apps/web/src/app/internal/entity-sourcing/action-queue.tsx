@@ -95,7 +95,7 @@ export function ActionQueue() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         // Fetch contradicted, outdated, and needs-recheck items in parallel
         const [contradictedRes, outdatedRes, recheckRes] = await Promise.all([

@@ -1,0 +1,42 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "allowImportingTsExtensions": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "checkJs": false,
+    "noEmit": true,
+    "jsx": "preserve",
+    "strict": false,
+    "isolatedModules": true
+  },
+  "include": [
+    "eslint.config.js",
+    "apps/**/*.ts",
+    "apps/**/*.tsx",
+    "apps/**/*.mts",
+    "crux/**/*.ts",
+    "crux/**/*.mts",
+    "packages/**/*.ts",
+    "packages/**/*.tsx",
+    "scripts/**/*.ts",
+    "scripts/**/*.mts",
+    "docs/**/*.ts",
+    "docs/**/*.mts",
+    "data/**/*.ts"
+  ],
+  "exclude": [
+    "**/node_modules/**",
+    "**/dist/**",
+    "**/build/**",
+    "**/.next/**",
+    "**/out/**",
+    "**/*.d.ts",
+    "apps/web/public/**",
+    "apps/wiki-server/drizzle/meta/**"
+  ]
+}

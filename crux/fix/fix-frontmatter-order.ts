@@ -257,7 +257,7 @@ console.log(`  Total fields reordered: ${results.reduce((s, r) => s + r.fieldsRe
 if (!APPLY_MODE) {
   console.log(`\n${colors.yellow}Dry run — no files modified. Use --apply to apply changes.${colors.reset}`);
 } else if (results.length > 0) {
-  logBulkFixes(
+  await logBulkFixes(
     results.map(r => r.filePath),
     {
       tool: 'crux-fix',

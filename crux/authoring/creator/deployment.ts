@@ -138,12 +138,14 @@ export function deployToDestination(topic: string, destPath: string, { ROOT, get
     console.log(`  Converted ${count} EntityLink ID(s) to numeric format`);
   }
 
-  // Log page creation in edit log
+  // Log page creation in edit log (best-effort — wiki-server may be down)
   appendEditLog(sanitizedTopic, {
     tool: 'crux-create',
     agency: 'ai-directed',
     requestedBy: getDefaultRequestedBy(),
     note: `Page created via Crux pipeline, deployed to ${destPath}/${sanitizedTopic}`,
+  }).catch((err) => {
+    console.warn(`Failed to record page creation in edit log: ${err instanceof Error ? err.message : String(err)}`);
   });
 
   return {

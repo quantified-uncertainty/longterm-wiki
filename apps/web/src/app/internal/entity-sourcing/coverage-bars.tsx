@@ -21,7 +21,7 @@ export function CoverageBars() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const res = await fetch("/api/sourcing-coverage-proxy");
         if (!res.ok) throw new Error(`HTTP ${res.status}`);

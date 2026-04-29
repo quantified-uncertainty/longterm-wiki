@@ -461,5 +461,8 @@ async function main(): Promise<void> {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((err) => {
+    console.error("refresh-frameworks crashed:", err);
+    process.exit(1);
+  });
 }

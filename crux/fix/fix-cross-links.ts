@@ -632,7 +632,7 @@ async function main(): Promise<void> {
   }
 
   if (APPLY_MODE && modifiedFiles.length > 0) {
-    logBulkFixes(modifiedFiles, {
+    await logBulkFixes(modifiedFiles, {
       tool: 'crux-fix',
       agency: 'automated',
       note: 'Auto-linked EntityLink components',

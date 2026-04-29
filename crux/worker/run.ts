@@ -106,7 +106,9 @@ for (const sig of ['SIGTERM', 'SIGINT'] as const) {
     shuttingDown = true;
     // If idle (no jobs in flight), exit immediately
     if (activeJobIds.size === 0) {
-      cleanup().then(() => process.exit(0));
+      cleanup()
+        .then(() => process.exit(0))
+        .catch(() => process.exit(0));
     }
     // Otherwise, the main loop will exit after in-flight jobs complete
   });
@@ -741,6 +743,8 @@ if (config.smokeTest) {
     .then(() => process.exit(0))
     .catch(err => {
       console.error(`[worker] Fatal error: ${err}`);
-      cleanup().then(() => process.exit(1));
+      cleanup()
+        .then(() => process.exit(1))
+        .catch(() => process.exit(1));
     });
 }

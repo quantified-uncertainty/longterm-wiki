@@ -314,7 +314,7 @@ export function ClaimsViewer() {
 
   // Fetch stats once
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         const res = await fetch("/api/claims-proxy?type=stats");
         if (res.ok) {
@@ -328,7 +328,7 @@ export function ClaimsViewer() {
 
   // Fetch claims
   useEffect(() => {
-    (async () => {
+    void (async () => {
       setIsLoading(true);
       setError(null);
       try {
