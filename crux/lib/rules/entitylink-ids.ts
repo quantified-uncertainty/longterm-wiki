@@ -148,11 +148,17 @@ function displayMatchesEntity(
   // (2) Word-boundary match. Single-word slugs (e.g. "anthropic", "miri")
   // must appear as a complete token of `ds`. Multi-word slugs (e.g.
   // "anthropic-research") match if every slug word appears in the display.
+  // Also: short-display acronyms (e.g. display="RAND" against slug
+  // "rand-corporation") match if the entire display is one of the slug's
+  // words — the user often abbreviates a multi-word entity to its
+  // distinctive token in prose.
   const dsWords = ds.split('-');
   const slugWords = registrySlug.split('-');
   if (slugWords.length === 1) {
     if (dsWords.includes(slugWords[0])) return true;
   } else if (slugWords.every((w) => dsWords.includes(w))) {
+    return true;
+  } else if (dsWords.length === 1 && slugWords.includes(dsWords[0])) {
     return true;
   }
 
@@ -337,12 +343,23 @@ export const entityLinkIdsRule = createRule({
                 const hint = idForDisplay
                   ? ` (display "${children}" currently maps to ${idForDisplay} — wiki ID may have been reassigned)`
                   : '';
+                // WARNING (not ERROR) and no auto-fix: surfaces the
+                // suspected reassignment without blocking the gate on
+                // pre-existing drift. The old behavior (auto-injecting
+                // name="${slug}" from the registry) is what we are
+                // explicitly preventing — refusing the auto-fix is the
+                // load-bearing change. Severity remains low because
+                // tightening to ERROR would block CI on tens of latent
+                // mismatches that need per-file content review (and
+                // sometimes new entity allocation) before they can be
+                // fixed. Promotion to ERROR is a follow-up once the
+                // backlog is drained.
                 issues.push(new Issue({
                   rule: this.id,
                   file: content.path,
                   line: lineNum,
                   message: `EntityLink id="${rawId}" — display name "${children}" does not identify the entity at ${rawId} (registry: "${slug}")${hint}. Verify the prose and fix manually (no auto-fix: see QUA-759).`,
-                  severity: Severity.ERROR,
+                  severity: Severity.WARNING,
                 }));
               } else {
                 // Display matches (or cannot be extracted, e.g., self-closing

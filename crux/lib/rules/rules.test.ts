@@ -1299,18 +1299,20 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('id="E100" name="miri"');
   });
 
-  it('errors when display name disagrees with wiki ID, with NO auto-fix (QUA-759)', () => {
+  it('warns when display name disagrees with wiki ID, with NO auto-fix (QUA-759)', () => {
     // E42 currently maps to anthropic but the prose says "Open Philanthropy".
     // Same hallucination shape as QUA-761 — silently injecting name="anthropic"
     // would lock in a "valid" cross-check on a link that visibly says "Open
-    // Philanthropy" but routes to anthropic's page. Refuse the auto-fix and
-    // surface the suspected reassignment to a human reviewer.
+    // Philanthropy" but routes to anthropic's page. The load-bearing change
+    // is refusing the auto-fix; severity is WARNING (not ERROR) so the
+    // tens of latent mismatches don't block the gate while content owners
+    // work through the backlog.
     const content = mockContent(
       '<EntityLink id="E42">Open Philanthropy</EntityLink>',
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
-    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].message).toContain('display name');
     expect(issues[0].message).toContain('"anthropic"');
     expect(issues[0].message).toContain('reassigned');
@@ -1383,7 +1385,7 @@ describe('entitylink-ids rule', () => {
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
-    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].fix).toBeNull();
   });
 
@@ -1396,7 +1398,7 @@ describe('entitylink-ids rule', () => {
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(1);
-    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].severity).toBe(Severity.WARNING);
     expect(issues[0].fix).toBeNull();
   });
 
