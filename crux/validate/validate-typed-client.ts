@@ -131,16 +131,11 @@ export function lineHasViolation(
   return true;
 }
 
-function isExcluded(absPath: string): boolean {
-  const rel = relative(PROJECT_ROOT, absPath);
-  return EXCLUDE_PATHS.some((dir) => rel.startsWith(dir));
-}
-
-function checkFile(filePath: string): Violation[] {
+function checkFile(filePath: string, projectRoot: string = PROJECT_ROOT): Violation[] {
   const content = readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   const violations: Violation[] = [];
-  const relPath = relative(PROJECT_ROOT, filePath);
+  const relPath = relative(projectRoot, filePath);
 
   for (let i = 0; i < lines.length; i++) {
     if (lineHasViolation(lines[i], { previousLine: i > 0 ? lines[i - 1] : undefined })) {
@@ -155,63 +150,68 @@ function checkFile(filePath: string): Violation[] {
   return violations;
 }
 
-export function runCheck(): {
+export interface RunCheckOptions {
+  /** Override scan directories (relative to projectRoot). Defaults to `SCAN_DIRS`. */
+  scanDirs?: readonly string[];
+  /** Override exclude paths (relative to projectRoot). Defaults to `EXCLUDE_PATHS`. */
+  excludePaths?: readonly string[];
+  /** Override project root. Defaults to repo `PROJECT_ROOT`. */
+  projectRoot?: string;
+  /** Suppress console output (useful for tests). */
+  silent?: boolean;
+}
+
+export function runCheck(opts: RunCheckOptions = {}): {
   passed: boolean;
   errors: number;
   violations: Violation[];
 } {
   const c = getColors();
-  console.log(
-    `${c.blue}Checking for direct apiRequest<T> calls (QUA-770)...${c.reset}\n`
-  );
+  const scanDirs = opts.scanDirs ?? SCAN_DIRS;
+  const excludePaths = opts.excludePaths ?? EXCLUDE_PATHS;
+  const projectRoot = opts.projectRoot ?? PROJECT_ROOT;
+  const log = opts.silent ? () => {} : console.log;
+
+  log(`${c.blue}Checking for direct apiRequest<T> calls (QUA-770)...${c.reset}\n`);
+
+  const isExcludedHere = (absPath: string): boolean => {
+    const rel = relative(projectRoot, absPath);
+    return excludePaths.some((dir) => rel.startsWith(dir));
+  };
 
   const allFiles: string[] = [];
-  for (const dir of SCAN_DIRS) {
-    const absDir = join(PROJECT_ROOT, dir);
+  for (const dir of scanDirs) {
+    const absDir = join(projectRoot, dir);
     allFiles.push(
-      ...collectTsFiles(absDir, { includeTsx: true }).filter((p) => !isExcluded(p)),
+      ...collectTsFiles(absDir, { includeTsx: true }).filter((p) => !isExcludedHere(p)),
     );
   }
 
   if (allFiles.length === 0) {
-    console.log(`${c.dim}No files found to check${c.reset}`);
+    log(`${c.dim}No files found to check${c.reset}`);
     return { passed: true, errors: 0, violations: [] };
   }
 
   const allViolations: Violation[] = [];
   for (const file of allFiles) {
-    allViolations.push(...checkFile(file));
+    allViolations.push(...checkFile(file, projectRoot));
   }
 
   if (allViolations.length === 0) {
-    console.log(
-      `${c.green}No direct apiRequest<T> violations (${allFiles.length} files checked)${c.reset}`
-    );
+    log(`${c.green}No direct apiRequest<T> violations (${allFiles.length} files checked)${c.reset}`);
     return { passed: true, errors: 0, violations: [] };
   }
 
-  console.log(
-    `${c.red}Found ${allViolations.length} direct apiRequest<T> violation(s):${c.reset}\n`
-  );
-  console.log(
-    `${c.dim}Hand-written apiRequest<T> calls bypass typed wiki-server client modules (crux/lib/wiki-server/*.ts)`
-  );
-  console.log(
-    `and lose InferResponseType<> benefits. Either:`
-  );
-  console.log(
-    `  1. Use an existing typed client function (preferred), or`
-  );
-  console.log(
-    `  2. Create a new typed client module under crux/lib/wiki-server/, or`
-  );
-  console.log(
-    `  3. Add \`// typed-client-ok: <reason>\` on the same line if direct typing is intentional${c.reset}\n`
-  );
+  log(`${c.red}Found ${allViolations.length} direct apiRequest<T> violation(s):${c.reset}\n`);
+  log(`${c.dim}Hand-written apiRequest<T> calls bypass typed wiki-server client modules (crux/lib/wiki-server/*.ts)`);
+  log(`and lose InferResponseType<> benefits. Either:`);
+  log(`  1. Use an existing typed client function (preferred), or`);
+  log(`  2. Create a new typed client module under crux/lib/wiki-server/, or`);
+  log(`  3. Add \`// typed-client-ok: <reason>\` on the same line if direct typing is intentional${c.reset}\n`);
 
   for (const v of allViolations) {
-    console.log(`  ${c.red}${v.file}:${v.line}${c.reset}`);
-    console.log(`    ${c.dim}${v.text}${c.reset}`);
+    log(`  ${c.red}${v.file}:${v.line}${c.reset}`);
+    log(`    ${c.dim}${v.text}${c.reset}`);
   }
 
   return {

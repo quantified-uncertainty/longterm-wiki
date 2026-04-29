@@ -104,6 +104,34 @@ describe('isInsideStringAt', () => {
     const idx = line.indexOf('apiRequest');
     expect(isInsideStringAt(line, idx)).toBe(false);
   });
+
+  // Template-expression handling — apiRequest<T> inside `${...}` is real
+  // code (not a string literal), and should be flagged.
+  it('reports inside ${} expression of a template literal as false (code context)', () => {
+    const line = 'const x = `result: ${await apiRequest<X>("GET", "/x")}`;';
+    const idx = line.indexOf('apiRequest');
+    expect(isInsideStringAt(line, idx)).toBe(false);
+  });
+
+  it('reports inside string portion of a template literal as true', () => {
+    const line = 'const x = `apiRequest<T>`;';
+    const idx = line.indexOf('apiRequest');
+    expect(isInsideStringAt(line, idx)).toBe(true);
+  });
+
+  // Known limitation: nested template literals (a template literal whose
+  // expression interpolates ANOTHER template literal) are not handled
+  // correctly because our backtick state is a single boolean, not a stack.
+  // The validator may flag `apiRequest<T>` inside a nested template's
+  // string portion. Mitigation: developers can add a `// typed-client-ok`
+  // marker. No instances of this pattern exist in the codebase today.
+  it('known limitation: nested template literals are not handled correctly', () => {
+    const line = 'const x = `${`apiRequest<T>`}`;';
+    const idx = line.indexOf('apiRequest');
+    // Documenting the current (incorrect) behavior. If this assertion
+    // ever flips, the implementation has been improved — update the test.
+    expect(isInsideStringAt(line, idx)).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------
