@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getAllKBRecords } from "@/data/factbase";
+import { getRecordVerdict } from "@/data/tablebase";
 import { formatCompactCurrency } from "@/lib/format-compact";
 import { ProfileStatCard } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
@@ -66,6 +67,7 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
   if (!record) return notFound();
 
   const data = loadProgramPageData(record);
+  const programVerdict = getRecordVerdict("funding-program", String(data.program.key));
 
   const titlePills = (
     <>
@@ -121,6 +123,12 @@ export default async function FundingProgramDetailPage({ params }: PageProps) {
       ]}
       title={data.program.name}
       titlePills={titlePills}
+      verdict={programVerdict?.verdict ?? null}
+      verdictHref={
+        programVerdict?.verdict
+          ? `/sourcing/funding-program/${encodeURIComponent(String(data.program.key))}`
+          : undefined
+      }
       statCards={statCards}
     >
       <div className="space-y-8">

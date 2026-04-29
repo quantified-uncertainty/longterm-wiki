@@ -12,6 +12,7 @@ import { getRecordVerdict } from "@/data/tablebase";
 import { CredibilityBadge } from "@/components/wiki/CredibilityBadge";
 import { ProfileStatCard } from "@/components/directory";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import { safeHref } from "@/lib/directory-utils";
 import {
   PublicationResourcesTable,
   type PublicationResourceRow,
