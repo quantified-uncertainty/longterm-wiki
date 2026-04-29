@@ -659,6 +659,12 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
 
   ensureDirs();
 
+  // Tracks whether THIS process acquired the PID file. `once` mode skips
+  // acquisition (line below), so it must also skip release in shutdown,
+  // otherwise a one-shot run that catches SIGINT/SIGTERM would delete the
+  // continuous daemon's PID file (CodeRabbit, PR #4701).
+  let ownsPidFile = false;
+
   // Refuse to start a continuous daemon if another is already running —
   // otherwise two `pr-patrol run` invocations spawn parallel loops with
   // independent cycle counters and double-process the queue.
@@ -685,6 +691,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
       }
       process.exit(1);
     }
+    ownsPidFile = true;
   }
 
   logHeader('PR Patrol starting');
@@ -703,7 +710,7 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
     if (shuttingDown) return;
     shuttingDown = true;
     log('Shutting down...');
-    removePidFile();
+    if (ownsPidFile) removePidFile();
     await releaseCurrentClaim(config.repo);
     process.exit(0);
   };
