@@ -16,12 +16,6 @@ dotenv.config();
 import { getApiKey } from './api-keys.ts';
 import { OpenRouterChatResponseSchema } from './openrouter-schemas.ts';
 
-// Re-export so existing `import { OpenRouterChatResponseSchema } from '.../openrouter.ts'`
-// callers keep working — but new callers should import from `openrouter-schemas.ts`
-// directly, which has no module-load side effects.
-export { OpenRouterChatResponseSchema } from './openrouter-schemas.ts';
-export type { OpenRouterChatResponse } from './openrouter-schemas.ts';
-
 const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
 

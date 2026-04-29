@@ -151,9 +151,17 @@ Only include steps you want to skip. Empty "skip" object means run everything.`;
 const TRIAGE_TIMEOUT_MS = 3000;
 const MAX_SKIPPABLE = 5; // Safety cap: never skip more than this many checks
 
-/** Schema for the triage LLM response (QUA-158 / Tier 3). */
+/**
+ * Schema for the triage LLM response (QUA-158 / Tier 3).
+ *
+ * The `skip` field is parsed as `unknown` and each entry is then individually
+ * validated below. This preserves partial fidelity: if the LLM returns
+ * `{ skip: { "valid-id": "reason", "broken-id": 123 } }`, the valid entry
+ * still goes through. Validating `skip` as `z.record(z.string(), z.string())`
+ * would reject the entire map.
+ */
 const TriageSkipResponseSchema = z.object({
-  skip: z.record(z.string(), z.string()).optional(),
+  skip: z.record(z.string(), z.unknown()).optional(),
 }).passthrough();
 
 /**
@@ -212,13 +220,15 @@ export async function triageGateChecks(
       return { skip: {}, llmCalled: true, durationMs: Date.now() - start };
     }
 
-    // Zod-validated parse: any malformed shape falls through to "skip nothing".
-    // Triage is an optimization, not a gate, so the fallback is safe.
+    // Zod-validated parse: any malformed outer shape falls through to
+    // "skip nothing". Triage is an optimization, not a gate, so fallback
+    // is safe. Per-item filtering (typeof string) below preserves partial
+    // valid skip sets when only one entry is malformed.
     const parsed = parseAndValidate(
       result.text,
       TriageSkipResponseSchema,
       'gate-triage',
-      () => ({ skip: {} as Record<string, string> }),
+      () => ({ skip: {} as Record<string, unknown> }),
     );
 
     // Filter: only keep known step IDs, cap at MAX_SKIPPABLE

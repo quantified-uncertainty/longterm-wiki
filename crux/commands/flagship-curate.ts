@@ -57,17 +57,18 @@ const NEEDS_CURATION_VERDICTS = new Set([
 ]);
 
 /**
- * Schema for the URL-research LLM response (QUA-158 / Tier 3).
- * Items missing required fields are dropped at validation time rather
- * than passing through unchecked.
+ * Schema for a single URL-research result item (QUA-158 / Tier 3).
+ * The outer response is parsed as `unknown[]` and each item is validated
+ * individually so a single malformed item doesn't drop the entire batch
+ * (matches the original per-item filtering behavior).
  */
-const ResearchUrlsResponseSchema = z.array(
-  z.object({
-    index: z.number().int().nonnegative(),
-    urls: z.array(z.string()),
-    reasoning: z.string().optional().default(''),
-  }).passthrough(),
-);
+const ResearchUrlItemSchema = z.object({
+  index: z.number().int().nonnegative(),
+  urls: z.array(z.string()),
+  reasoning: z.string().optional().default(''),
+}).passthrough();
+
+const ResearchUrlsArraySchema = z.array(z.unknown());
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -389,19 +390,25 @@ If you cannot find a good URL for a record, omit it from the array.`;
       label: 'flagship-curate-research',
     });
 
-    const parsed = parseAndValidate(
+    // Parse the outer array, then safeParse each item individually so one
+    // malformed entry doesn't drop the whole batch (preserves original
+    // per-item filtering behavior).
+    const rawArray = parseAndValidate(
       result.text,
-      ResearchUrlsResponseSchema,
+      ResearchUrlsArraySchema,
       'flagship-curate-research',
       () => [],
     );
 
-    if (parsed.length === 0) {
+    if (rawArray.length === 0) {
       console.warn(`${LOG_PREFIX} Failed to parse research response`);
       return [];
     }
 
-    for (const item of parsed) {
+    for (const raw of rawArray) {
+      const itemParse = ResearchUrlItemSchema.safeParse(raw);
+      if (!itemParse.success) continue;
+      const item = itemParse.data;
       const record = records[item.index];
       if (!record) continue;
 
@@ -414,7 +421,7 @@ If you cannot find a good URL for a record, omit it from the array.`;
         results.push({
           recordId: record.recordId,
           urls: validUrls,
-          reasoning: item.reasoning ?? '',
+          reasoning: item.reasoning,
         });
       }
     }

@@ -55,16 +55,18 @@ export interface EntityLinkEnrichResult {
 }
 
 /**
- * Zod schema for the entity-link enrichment LLM response.
- * Validates the outer envelope; replacements with missing fields are
- * filtered out at the call site.
+ * Zod schemas for the entity-link enrichment LLM response (QUA-158 / Tier 3).
+ * The outer envelope is validated, then each replacement is individually
+ * safeParsed so one malformed item doesn't drop the entire batch.
  */
-const LlmEntityLinkResponseSchema = z.object({
-  replacements: z.array(z.object({
-    searchText: z.string().optional(),
-    entityId: z.string().optional(),
-    displayName: z.string().optional(),
-  })).optional(),
+const LlmEntityLinkEnvelopeSchema = z.object({
+  replacements: z.array(z.unknown()).optional(),
+}).passthrough();
+
+const LlmEntityLinkReplacementSchema = z.object({
+  searchText: z.string().min(1),
+  entityId: z.string().min(1),
+  displayName: z.string().min(1),
 }).passthrough();
 
 // ---------------------------------------------------------------------------
@@ -315,24 +317,28 @@ Identify entity mentions and return replacement instructions as JSON.`;
     temperature: 0,
   });
 
-  // Zod-validated parse; on parse OR validation failure, returns empty
-  // replacements via the fallback rather than crashing or trusting a
-  // malformed response.
-  const parsed = parseAndValidate(
+  // Zod-validated parse; on outer parse failure, returns empty replacements.
+  // Each replacement is then individually safeParsed so a single malformed
+  // item doesn't drop the whole batch.
+  const envelope = parseAndValidate(
     result.text,
-    LlmEntityLinkResponseSchema,
+    LlmEntityLinkEnvelopeSchema,
     'entity-links',
-    () => ({ replacements: [] }),
+    () => ({ replacements: [] as unknown[] }),
   );
-  if (!parsed.replacements) return [];
+  const rawReplacements = envelope.replacements ?? [];
 
-  return parsed.replacements
-    .filter(r => r.searchText && r.entityId && r.displayName)
-    .map(r => ({
-      searchText: r.searchText!,
-      entityId: r.entityId!,
-      displayName: r.displayName!,
-    }));
+  const out: EntityLinkReplacement[] = [];
+  for (const raw of rawReplacements) {
+    const parsed = LlmEntityLinkReplacementSchema.safeParse(raw);
+    if (!parsed.success) continue;
+    out.push({
+      searchText: parsed.data.searchText,
+      entityId: parsed.data.entityId,
+      displayName: parsed.data.displayName,
+    });
+  }
+  return out;
 }
 
 /**

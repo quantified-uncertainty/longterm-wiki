@@ -182,7 +182,15 @@ export function parseAndValidate<T>(
   phase: string,
   fallback: (raw: string, error?: string) => T,
 ): T {
-  const parsed = parseJsonFromLlm<unknown>(raw, phase, fallback as (raw: string, error?: string) => unknown);
+  // Use a sentinel object to detect "JSON parse failed" inside parseJsonFromLlm
+  // without sending the user-supplied fallback through schema.safeParse twice
+  // (which would either succeed silently or produce a confusing
+  // "schema validation failed" log line about the fallback's own shape).
+  const PARSE_FAILED = {} as const;
+  const parsed = parseJsonFromLlm<unknown>(raw, phase, () => PARSE_FAILED);
+  if (parsed === PARSE_FAILED) {
+    return fallback(raw, 'Could not parse JSON from LLM response');
+  }
   const result = schema.safeParse(parsed);
   if (result.success) {
     return result.data;
