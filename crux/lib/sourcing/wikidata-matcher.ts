@@ -41,21 +41,41 @@ interface WikidataEntity {
 }
 
 /**
- * Zod schema for a single Wikidata entity inside a wbgetentities response
- * (QUA-158 / Tier 3). Validates the high-level shape of `id`, `claims`,
- * `labels`, `sitelinks` so a "wrong-type" entity (e.g. `"Q42": "string"`)
- * fails validation at the entity boundary rather than reaching the
- * strategy matchers. Per-claim narrowing (`datavalue.type === 'string'` etc.)
- * is still done by `getStringValue` / `getTimeValue` / `getEntityRefQid` /
- * `getQuantityValue` below — those helpers return null on shape mismatches
- * and surface as "unverifiable".
+ * Zod schema for the wbgetentities response. Validates each entity's
+ * top-level shape (`id`, `labels`, `claims`, `sitelinks`) and each claim's
+ * `mainsnak` + `rank`, so the downstream `as WikidataEntity` cast is
+ * structurally honest. Per-claim narrowing on `datavalue.type` is still
+ * done by `getStringValue` / `getTimeValue` / `getEntityRefQid` /
+ * `getQuantityValue` below.
  */
+const WikidataClaimSchema = z.object({
+  mainsnak: z.object({
+    snaktype: z.string(),
+    property: z.string(),
+    datavalue: z.object({
+      type: z.string(),
+      value: z.unknown(),
+    }).optional(),
+  }).passthrough(),
+  rank: z.enum(['preferred', 'normal', 'deprecated']),
+}).passthrough();
+
+const WikidataLabelSchema = z.object({
+  language: z.string(),
+  value: z.string(),
+}).passthrough();
+
+const WikidataSitelinkSchema = z.object({
+  site: z.string(),
+  title: z.string(),
+}).passthrough();
+
 const WikidataEntitySchema = z.object({
   id: z.string().optional(),
   missing: z.unknown().optional(),
-  labels: z.record(z.string(), z.unknown()).optional(),
-  claims: z.record(z.string(), z.array(z.unknown())).optional(),
-  sitelinks: z.record(z.string(), z.unknown()).optional(),
+  labels: z.record(z.string(), WikidataLabelSchema).optional(),
+  claims: z.record(z.string(), z.array(WikidataClaimSchema)).optional(),
+  sitelinks: z.record(z.string(), WikidataSitelinkSchema).optional(),
 }).passthrough();
 
 const WbGetEntitiesResponseSchema = z.object({

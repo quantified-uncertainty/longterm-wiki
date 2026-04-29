@@ -25,7 +25,7 @@ import type { CommandResult } from '../lib/command-types.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CreditExhaustedError, isCreditExhaustedError } from '../lib/resilience.ts';
-import { parseAndValidate } from '../lib/json-parsing.ts';
+import { parseAndValidateArray } from '../lib/json-parsing.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import { getPersonnelByEntity, syncPersonnel } from '../lib/wiki-server/personnel.ts';
 import { getVerdictsByEntity, type ByEntityResponse } from '../lib/wiki-server/sourcing.ts';
@@ -57,18 +57,15 @@ const NEEDS_CURATION_VERDICTS = new Set([
 ]);
 
 /**
- * Schema for a single URL-research result item (QUA-158 / Tier 3).
- * The outer response is parsed as `unknown[]` and each item is validated
- * individually so a single malformed item doesn't drop the entire batch
- * (matches the original per-item filtering behavior).
+ * Schema for a single URL-research result item. The outer response is an
+ * array; `parseAndValidateArray` validates each item individually so a
+ * single malformed entry doesn't drop the entire batch.
  */
 const ResearchUrlItemSchema = z.object({
   index: z.number().int().nonnegative(),
   urls: z.array(z.string()),
   reasoning: z.string().optional().default(''),
 }).passthrough();
-
-const ResearchUrlsArraySchema = z.array(z.unknown());
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -390,25 +387,13 @@ If you cannot find a good URL for a record, omit it from the array.`;
       label: 'flagship-curate-research',
     });
 
-    // Parse the outer array, then safeParse each item individually so one
-    // malformed entry doesn't drop the whole batch (preserves original
-    // per-item filtering behavior).
-    const rawArray = parseAndValidate(
-      result.text,
-      ResearchUrlsArraySchema,
-      'flagship-curate-research',
-      () => [],
-    );
-
-    if (rawArray.length === 0) {
+    const items = parseAndValidateArray(result.text, ResearchUrlItemSchema, 'flagship-curate-research');
+    if (items.length === 0) {
       console.warn(`${LOG_PREFIX} Failed to parse research response`);
       return [];
     }
 
-    for (const raw of rawArray) {
-      const itemParse = ResearchUrlItemSchema.safeParse(raw);
-      if (!itemParse.success) continue;
-      const item = itemParse.data;
+    for (const item of items) {
       const record = records[item.index];
       if (!record) continue;
 
@@ -421,7 +406,7 @@ If you cannot find a good URL for a record, omit it from the array.`;
         results.push({
           recordId: record.recordId,
           urls: validUrls,
-          reasoning: item.reasoning,
+          reasoning: item.reasoning ?? '',
         });
       }
     }

@@ -8,7 +8,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { z } from 'zod';
-import { parseAndValidate } from './json-parsing.ts';
+import { parseAndValidate, parseAndValidateArray } from './json-parsing.ts';
 
 const Schema = z.object({
   verdict: z.enum(['confirmed', 'contradicted', 'unverifiable']),
@@ -102,5 +102,48 @@ describe('parseAndValidate', () => {
     parseAndValidate('{"verdict":"maybe","confidence":0.5}', Schema, 'test', recordingFallback);
     expect(capturedRaw).toContain('"maybe"');
     expect(capturedError).toBeTruthy();
+  });
+});
+
+describe('parseAndValidateArray', () => {
+  const ItemSchema = z.object({
+    id: z.number().int().nonnegative(),
+    name: z.string().min(1),
+  });
+
+  it('returns all items when every entry validates', () => {
+    const raw = '[{"id":1,"name":"a"},{"id":2,"name":"b"},{"id":3,"name":"c"}]';
+    const items = parseAndValidateArray(raw, ItemSchema, 'test');
+    expect(items).toHaveLength(3);
+    expect(items[0]).toEqual({ id: 1, name: 'a' });
+  });
+
+  it('drops malformed items and keeps the valid ones (partial recovery)', () => {
+    // Two valid items, one with a negative id, one missing name, one valid
+    const raw = '[{"id":1,"name":"a"},{"id":-1,"name":"b"},{"id":3},{"id":4,"name":"d"}]';
+    const items = parseAndValidateArray(raw, ItemSchema, 'test');
+    expect(items.map(i => i.id)).toEqual([1, 4]);
+  });
+
+  it('returns empty array when JSON is unparseable', () => {
+    const items = parseAndValidateArray('not json', ItemSchema, 'test');
+    expect(items).toEqual([]);
+  });
+
+  it('returns empty array when payload is an object instead of array', () => {
+    const items = parseAndValidateArray('{"id":1,"name":"a"}', ItemSchema, 'test');
+    expect(items).toEqual([]);
+  });
+
+  it('strips markdown code fences', () => {
+    const raw = '```json\n[{"id":1,"name":"a"}]\n```';
+    const items = parseAndValidateArray(raw, ItemSchema, 'test');
+    expect(items).toHaveLength(1);
+  });
+
+  it('returns empty array when every item is malformed', () => {
+    const raw = '[{"id":-1,"name":""},{"id":"not-a-number","name":"x"}]';
+    const items = parseAndValidateArray(raw, ItemSchema, 'test');
+    expect(items).toEqual([]);
   });
 });

@@ -55,9 +55,9 @@ export interface EntityLinkEnrichResult {
 }
 
 /**
- * Zod schemas for the entity-link enrichment LLM response (QUA-158 / Tier 3).
- * The outer envelope is validated, then each replacement is individually
- * safeParsed so one malformed item doesn't drop the entire batch.
+ * Zod schemas for the entity-link enrichment LLM response. The outer
+ * envelope is validated, then each replacement is individually safeParsed
+ * so one malformed item doesn't drop the entire batch.
  */
 const LlmEntityLinkEnvelopeSchema = z.object({
   replacements: z.array(z.unknown()).optional(),

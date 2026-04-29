@@ -152,13 +152,10 @@ const TRIAGE_TIMEOUT_MS = 3000;
 const MAX_SKIPPABLE = 5; // Safety cap: never skip more than this many checks
 
 /**
- * Schema for the triage LLM response (QUA-158 / Tier 3).
- *
- * The `skip` field is parsed as `unknown` and each entry is then individually
- * validated below. This preserves partial fidelity: if the LLM returns
- * `{ skip: { "valid-id": "reason", "broken-id": 123 } }`, the valid entry
- * still goes through. Validating `skip` as `z.record(z.string(), z.string())`
- * would reject the entire map.
+ * Schema for the triage LLM response. The `skip` field's values are parsed
+ * as `unknown` and each entry is then individually filtered for `typeof
+ * reason === 'string'` below. Validating `skip` as a `record(string, string)`
+ * would reject the entire map if any one entry was malformed.
  */
 const TriageSkipResponseSchema = z.object({
   skip: z.record(z.string(), z.unknown()).optional(),
