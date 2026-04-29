@@ -63,6 +63,23 @@ describe("getRecordDisplayName", () => {
     expect(getRecordDisplayName(item)).toBe("Model 3");
   });
 
+  it("falls back when name is an empty string (truthy semantics)", () => {
+    // Matches the original `r.fields.name ? String(r.fields.name) : titleCase(r.key)`
+    // pattern in charts.ts — empty strings are treated as missing.
+    const item = makeEntry({ key: "round-x", fields: { name: "" } });
+    expect(getRecordDisplayName(item)).toBe("Round X");
+  });
+
+  it("falls back when name is 0 or false", () => {
+    expect(getRecordDisplayName(makeEntry({ key: "round-y", fields: { name: 0 } }))).toBe("Round Y");
+    expect(getRecordDisplayName(makeEntry({ key: "round-z", fields: { name: false } }))).toBe("Round Z");
+  });
+
+  it("falls back when name is an array or object (no '[object Object]' / 'A,B' leak)", () => {
+    expect(getRecordDisplayName(makeEntry({ key: "round-q", fields: { name: ["A", "B"] } }))).toBe("Round Q");
+    expect(getRecordDisplayName(makeEntry({ key: "round-w", fields: { name: { a: 1 } } }))).toBe("Round W");
+  });
+
   it("handles snake_case keys", () => {
     const item = makeEntry({ key: "claude_3_opus" });
     expect(getRecordDisplayName(item)).toBe("Claude 3 Opus");
@@ -104,10 +121,20 @@ describe("getPersonRecordName", () => {
     expect(getPersonRecordName(item)).toBe("Dave Eggers");
   });
 
-  it("ignores empty entity name and falls through", () => {
-    // Defensive: a defined entity with null name shouldn't be picked.
+  it("falls through empty-string entity name to next rung", () => {
+    // Defensive: an entity with an empty-string name shouldn't be picked.
     const item = makeEntry({ key: "ed", displayName: "Ed (alt)" });
-    expect(getPersonRecordName(item, null)).toBe("Ed (alt)");
+    expect(getPersonRecordName(item, { name: "" })).toBe("Ed (alt)");
+  });
+
+  it("falls through empty displayName to display_name field", () => {
+    const item = makeEntry({ key: "fern", displayName: "", fields: { display_name: "Fern Doe" } });
+    expect(getPersonRecordName(item)).toBe("Fern Doe");
+  });
+
+  it("rejects array/object display_name (no garbage labels)", () => {
+    const item = makeEntry({ key: "gabe", fields: { display_name: ["A", "B"] } });
+    expect(getPersonRecordName(item)).toBe("Gabe");
   });
 });
 
@@ -126,6 +153,10 @@ describe("getPropertyLabel", () => {
 
   it("falls back when prop has no name", () => {
     expect(getPropertyLabel({ name: null }, "context-window")).toBe("Context Window");
+  });
+
+  it("falls back when prop has empty-string name (truthy semantics)", () => {
+    expect(getPropertyLabel({ name: "" }, "valuation")).toBe("Valuation");
   });
 
   it("handles snake_case property IDs", () => {

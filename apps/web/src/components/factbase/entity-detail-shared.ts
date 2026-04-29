@@ -67,19 +67,47 @@ export function sortByDateField(items: FactBaseRecordEntry[], fieldName: string)
 
 // ─── Display-name resolution (QUA-771) ──────────────────────────────
 //
-// These helpers replace ad-hoc `?? ?? ??` chains scattered across the wiki
+// These helpers replace ad-hoc fallback chains scattered across the wiki
 // frontend. Keep the derivation in one place so both write-side validation
 // and read-side rendering can refer to a single canonical function.
+//
+// Why `||` instead of `??`: empty strings should fall through to the
+// titleCase fallback (a record with `name: ""` should NOT render a blank
+// label). This matches the truthy-check semantics the original ad-hoc
+// chains used in `app/organizations/[slug]/_data/charts.ts`. `??` would
+// have returned the empty string and rendered nothing.
+
+/**
+ * Strict-typed read of a record field for display purposes. Returns
+ * `undefined` for:
+ *   - missing / null
+ *   - arrays / objects (so `name: [foo, bar]` doesn't render as `"foo,bar"`)
+ *   - JS-falsy primitives (`""`, `0`, `false`)
+ *
+ * This matches the original `r.fields.name ? String(r.fields.name) : ...`
+ * truthy-check semantics that ad-hoc fallback chains used in charts.ts
+ * and the defensive local `field()` in `FBAutoFacts.tsx`. Combine with
+ * `||` to fall through to a derived label.
+ */
+function recordFieldString(item: FactBaseRecordEntry, key: string): string | undefined {
+  const v = item.fields[key];
+  if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") return undefined;
+  return v ? String(v) : undefined;
+}
 
 /**
  * Canonical display name for a FactBase record entry.
  *
- * Replaces the `field(item, "name") ?? titleCase(item.key)` pattern that
- * was duplicated across record renderers (funding rounds, products, model
+ * Replaces the `field(item, "name") ?? titleCase(item.key)` and
+ * `r.fields.name ? String(r.fields.name) : titleCase(r.key)` patterns
+ * duplicated across record renderers (funding rounds, products, model
  * releases, etc.). Per QUA-771 / data-integrity tier 6.
+ *
+ * Empty-string and zero/false names fall through to the title-cased key
+ * — a blank or `"0"` label would be a worse display than the derived one.
  */
 export function getRecordDisplayName(item: FactBaseRecordEntry): string {
-  return field(item, "name") ?? titleCase(item.key);
+  return recordFieldString(item, "name") || titleCase(item.key);
 }
 
 /**
@@ -95,16 +123,17 @@ export function getPersonRecordName(
   personEntity?: { name: string } | null,
 ): string {
   return (
-    personEntity?.name ??
-    item.displayName ??
-    field(item, "display_name") ??
+    personEntity?.name ||
+    item.displayName ||
+    recordFieldString(item, "display_name") ||
     titleCase(item.key)
   );
 }
 
 /**
  * Canonical label for a FactBase property. Uses the property's `name` if
- * defined; otherwise derives a title-cased label from the property ID.
+ * defined and non-empty; otherwise derives a title-cased label from the
+ * property ID.
  *
  * Replaces the `prop?.name ?? titleCase(propertyId)` pattern duplicated
  * across fact tables, charts, sidebars, and stat cards.
@@ -113,5 +142,5 @@ export function getPropertyLabel(
   prop: { name?: string | null } | null | undefined,
   propertyId: string,
 ): string {
-  return prop?.name ?? titleCase(propertyId);
+  return prop?.name || titleCase(propertyId);
 }
