@@ -51,6 +51,11 @@ import {
   recomputeVerdict,
   recomputeVerdictBestEffort,
 } from "./recompute-verdict.js";
+import {
+  aggregateEvidence,
+  type AggregationResult,
+  type EvidenceRow,
+} from "./sourcing-aggregation.js";
 
 // ---- Constants ----
 
@@ -358,6 +363,7 @@ function mapEvidenceRow(e: {
   extractedQuote: string | null;
   verdict: string;
   confidence: number | null;
+  relevanceScore: number | null;
   isPrimarySource: boolean;
   checkerModel: string | null;
   notes: string | null;
@@ -376,6 +382,7 @@ function mapEvidenceRow(e: {
     extractedQuote: e.extractedQuote,
     verdict: e.verdict,
     confidence: e.confidence,
+    relevanceScore: e.relevanceScore,
     isPrimarySource: e.isPrimarySource,
     checkerModel: e.checkerModel,
     isStale: isStaleModel(e.checkerModel),
@@ -716,6 +723,29 @@ const sourcingApp = new Hono()
 
     const claimProvenance = await fetchClaimProvenance(db, recordType, recordId);
 
+    // QUA-792: re-run the canonical aggregation on read so the detail page
+    // can render the headline verdict and the disagree-explainer from the
+    // same `AggregationResult`. Keyed by `fieldName ?? ""` to mirror the
+    // COALESCE(field_name, '') key used by recomputeVerdict on write.
+    const verdictAggregations: Record<string, AggregationResult> = {};
+    const evidenceByFieldKey = new Map<string, EvidenceRow[]>();
+    for (const e of evidenceRows) {
+      const key = e.fieldName ?? "";
+      let bucket = evidenceByFieldKey.get(key);
+      if (!bucket) {
+        bucket = [];
+        evidenceByFieldKey.set(key, bucket);
+      }
+      bucket.push({
+        verdict: e.verdict as EvidenceRow["verdict"],
+        relevanceScore: e.relevanceScore,
+        confidence: e.confidence,
+      });
+    }
+    for (const [key, rows] of evidenceByFieldKey) {
+      verdictAggregations[key] = aggregateEvidence(rows);
+    }
+
     return c.json({
       verdicts: verdictRows.map((v) => ({
         recordType: v.recordType,
@@ -731,6 +761,7 @@ const sourcingApp = new Hono()
         lastComputedAt: v.lastComputedAt,
       })),
       evidence: evidenceRows.map(mapEvidenceRow),
+      verdictAggregations,
       claimProvenance,
       currentCheckerModel: CURRENT_CHECKER_MODEL,
     });
