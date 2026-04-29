@@ -352,12 +352,16 @@ console.log(`  Orphaned refs stripped: ${totalStripped}`);
 if (!APPLY_MODE) {
   console.log(`\n${colors.yellow}Dry run — no files modified. Use --apply to apply changes.${colors.reset}`);
 } else if (results.length > 0) {
-  await logBulkFixes(
+  // Best-effort telemetry — files are already written; don't fail the command
+  // if the wiki-server can't be reached.
+  logBulkFixes(
     results.map(r => r.filePath),
     {
       tool: 'crux-fix',
       agency: 'automated',
       note: 'Fixed orphaned footnotes (removed unreferenced definitions, stripped undefined refs)',
     },
-  );
+  ).catch((err) => {
+    console.warn(`Failed to record bulk fix log: ${err instanceof Error ? err.message : String(err)}`);
+  });
 }
