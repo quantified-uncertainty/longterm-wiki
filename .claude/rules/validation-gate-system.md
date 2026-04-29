@@ -79,6 +79,7 @@ Selected from `validate-gate.ts::parallelChecks`. Line numbers in the file.
 - `No inline limit clamping in routes (use clampedLimit)`
 - `Prompt XML interpolation escaping` — enforces `escapeXml()`
 - `Data-integrity anti-patterns` — silent catch, `as any` in routes, `skipEntityValidation` without reason
+- `Direct apiRequest<T> calls (QUA-770)` — must use typed wiki-server client or `// typed-client-ok: <reason>` marker
 
 ### TypeScript (blocking/advisory)
 - `TypeScript type check — app` (blocking)
@@ -148,7 +149,7 @@ Grouped by what they check. **Before writing a new validator, grep this list.**
 - **FactBase**: `factbase-entities`, `factbase-entity-ids`, `factbase-stableid`, `factbase-record-refs`, `factbase-schema`
 - **IDs / SIDs**: `rendered-sid`, `sid-display`, `display-names`
 - **Schema / compile**: `yaml-schema`, `mdx-compile`, `temporal`, `numeric-consistency`, `controlled-vocab`
-- **Code quality**: `no-console-log`, `returning-guard`, `untyped-rows`, `prompt-escaping`, `dangerous-patterns`, `drizzle-journal`
+- **Code quality**: `no-console-log`, `returning-guard`, `untyped-rows`, `prompt-escaping`, `dangerous-patterns`, `drizzle-journal`, `typed-client`
 - **Source-check**: `source-check-coverage`, `source-check-names`, `tablebase-completeness`, `dot-position`, `display-formatting`
 - **Content quality**: `hallucination-risk`, `financials`, `cross-base`, `cross-page-dates`, `stale-content`, `related-entry-types`, `directory-pages`
 - **Infra**: `inline-pagination`

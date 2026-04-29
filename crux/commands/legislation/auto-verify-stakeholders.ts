@@ -120,6 +120,7 @@ async function fetchStakeholderThingsMap(): Promise<Map<string, string>> {
   let offset = 0;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<ThingsListResponse>(
       'GET',
       `/api/things?thing_type=policy-stakeholder&limit=${pageSize}&offset=${offset}`,

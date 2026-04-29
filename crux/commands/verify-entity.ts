@@ -166,6 +166,7 @@ async function discoverRecordClaims(entityId: string): Promise<VerifiableClaim[]
 
   for (const ep of endpoints) {
     try {
+      // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
       const result = await apiRequest<Record<string, unknown>[]>('GET', ep.path);
       if (!result.ok || !result.data) continue;
 

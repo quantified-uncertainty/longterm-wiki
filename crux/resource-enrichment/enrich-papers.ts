@@ -191,6 +191,7 @@ export async function enrichPapersCommand(
     // Process in batches of 200
     for (let i = 0; i < paperBatch.length; i += 200) {
       const batch = paperBatch.slice(i, i + 200);
+      // typed-client-ok: QUA-770 baseline — resource enrichment pipeline, internal write path
       const result = await apiRequest<{ ok: boolean; upserted: { papers: number } }>(
         'POST',
         '/api/resources/batch-details',

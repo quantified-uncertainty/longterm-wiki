@@ -103,6 +103,7 @@ export async function buildEntityStableIdSet(): Promise<Set<string> | null> {
 
   // eslint-disable-next-line no-constant-condition
   while (true) {
+    // typed-client-ok: QUA-770 baseline — validator script, direct typing acceptable for ad-hoc integrity queries
     const result = await apiRequest<{
       entities: Array<{ id: string; stableId: string }>;
       total: number;

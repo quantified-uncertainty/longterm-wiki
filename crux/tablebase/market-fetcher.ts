@@ -271,6 +271,7 @@ export async function fetchMarketSnapshots(
     questionsPath = `/api/prediction-markets/questions/by-entity/${encodeURIComponent(entitySlug)}?isResolved=false&limit=500`;
   }
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const questionsResult = await apiRequest<{
     questions: PredictionQuestion[];
     total: number;
@@ -392,6 +393,7 @@ export async function fetchMarketSnapshots(
   }
 
   // Sync snapshots to wiki-server
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const syncResult = await apiRequest<{ upserted: number }>(
     "POST",
     "/api/prediction-markets/snapshots/sync",

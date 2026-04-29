@@ -342,6 +342,7 @@ async function discoverForEntity(
       }
 
       try {
+        // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
         const result = await apiRequest<{ upserted?: number; updated?: number }>(
           config.syncMethod,
           config.syncPath,

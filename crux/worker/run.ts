@@ -188,6 +188,7 @@ let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
 async function registerAgent(workerId: string, types: string[]): Promise<void> {
   const typeDesc = types.length > 0 ? types.join(', ') : 'all';
+  // typed-client-ok: QUA-770 baseline — worker control plane, internal endpoint
   const result = await apiRequest<{ id: number }>('POST', '/api/active-agents', {
     sessionId: workerId,
     task: `Job worker (types: ${typeDesc})`,

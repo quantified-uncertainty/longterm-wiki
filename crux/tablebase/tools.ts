@@ -361,6 +361,7 @@ async function handleQueryEntities(input: Record<string, unknown>): Promise<stri
   const params = new URLSearchParams({ q: query, limit: '10' });
   if (entityType) params.set('entityType', entityType);
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const result = await apiRequest<{
     results: Array<{ id: string; wikiId?: string; stableId?: string; entityType: string; title: string }>;
   }>('GET', `/api/entities/search?${params.toString()}`);
@@ -381,6 +382,7 @@ async function handleQueryExistingRecords(input: Record<string, unknown>): Promi
   const config = getTableConfig(table);
   if (!config) return `Error: Unknown table "${table}"`;
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const result = await apiRequest<Record<string, unknown>>('GET', `${config.fetchByEntityPath(entityId)}?limit=100`);
   if (!result.ok) return `Error: ${result.message}`;
   const records = result.data[config.resultKey];
@@ -432,6 +434,7 @@ async function handleCreateEntity(input: Record<string, unknown>): Promise<strin
   const stableId = generateSid();
 
   // Sync entity to wiki-server (lightweight — no wikiId)
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const syncResult = await apiRequest<{ upserted: number }>('POST', '/api/entities/sync', {
     entities: [{
       id: slug,
@@ -731,6 +734,7 @@ async function handleSubmitRecords(
   const syncQs = syncParams.toString();
   const syncUrl = syncQs ? `${syncConfig.syncPath}?${syncQs}` : syncConfig.syncPath;
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     syncConfig.syncMethod,
     syncUrl,
@@ -942,6 +946,7 @@ async function handleLinkSource(
     updatePayload.sourceResourceId = resourceId;
   }
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     config.syncMethod,
     config.syncPath,

@@ -92,6 +92,7 @@ export async function discoverMarkets(
   let entityName = entitySlug;
   let stableId: string | null = null;
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const searchResult = await apiRequest<{
     results: Array<{ id: string; stableId: string; title: string; entityType: string }>;
   }>("GET", `/api/entities/search?q=${encodeURIComponent(entitySlug)}&limit=5`);
@@ -313,6 +314,7 @@ export async function discoverMarkets(
     source: q.questionUrl,
   }));
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const syncResult = await apiRequest<{ upserted: number }>(
     "POST",
     "/api/prediction-markets/questions/sync",

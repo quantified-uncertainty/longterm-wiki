@@ -113,6 +113,7 @@ async function main() {
     }
 
     try {
+      // typed-client-ok: QUA-770 baseline — one-shot maintenance script
       const result = await apiRequest<{ id: string }>(
         'POST',
         '/api/resources',

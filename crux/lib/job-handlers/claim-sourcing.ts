@@ -153,6 +153,7 @@ export async function handleClaimSourcing(
   }
 
   // 1. Fetch claims from the database
+  // typed-client-ok: QUA-770 baseline — job handler, internal worker control plane
   const claimsResult = await apiRequest<{ claims: ClaimRow[] }>(
     'GET',
     `/api/claims/by-ids?ids=${claimIds.join(',')}`,
@@ -187,6 +188,7 @@ export async function handleClaimSourcing(
 
   if (resourceId) {
     // Try to get content via the resource's URL
+    // typed-client-ok: QUA-770 baseline — job handler, internal worker control plane
     const resourceResult = await apiRequest<{
       url: string;
       title: string | null;

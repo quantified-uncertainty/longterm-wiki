@@ -469,6 +469,7 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   }
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const result = await apiRequest<{ upserted?: number; updated?: number }>(
     tableConfig.syncMethod, syncPath, { [tableConfig.syncBodyKey]: recordsToSubmit },
   );
@@ -539,6 +540,7 @@ async function existingCommand(args: string[], options: CommandOptions): Promise
   const tableConfig = getTableConfig(table);
   if (!tableConfig) return { exitCode: 1, output: `Invalid table: ${table}` };
 
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const result = await apiRequest<Record<string, unknown>>('GET', `${tableConfig.fetchByEntityPath(entityId)}?limit=200`);
   if (!result.ok) {
     return { exitCode: 1, output: `Query failed: ${result.message}` };
@@ -807,6 +809,7 @@ async function verifyCommand(_args: string[], options: CommandOptions): Promise<
       // Uses raw apiRequest instead of syncPersonnel() because this is a generic
       // data-quality fix path, not a full personnel sync. The CLI-level --fix flag
       // already enforces the reason context. See issue #4017 Phase A.
+      // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
       const fixR = await apiRequest<{ upserted: number }>('POST', '/api/personnel/sync?forceSkipSourcing=true&reason=verify-fix%3A+personnel+data+normalization', { items: batch });
       if (fixR.ok) {
         fixed += fixR.data.upserted;
@@ -879,6 +882,7 @@ async function prepareCommand(args: string[], options: CommandOptions): Promise<
 
   let existingRecords: unknown[] = [];
   if (taskTableConfig) {
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const r = await apiRequest<Record<string, unknown>>('GET', `${taskTableConfig.fetchByEntityPath(task.entityId)}?limit=50`);
     if (r.ok) existingRecords = (r.data[taskTableConfig.resultKey] as unknown[]) || [];
   }
@@ -1246,6 +1250,7 @@ async function syncCareersCommand(_args: string[], options: CommandOptions): Pro
     const batch = syncItems.slice(i, i + PERSONNEL_SYNC_BATCH_SIZE);
     const batchNum = Math.floor(i / PERSONNEL_SYNC_BATCH_SIZE) + 1;
 
+    // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
     const result = await apiRequest<{ upserted: number }>(
       'POST',
       '/api/personnel/sync?forceSkipSourcing=true&reason=bulk-import%3A+career+data+sync+from+FactBase',

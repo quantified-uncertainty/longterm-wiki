@@ -162,6 +162,7 @@ type FindEntitiesResult =
 
 async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesResult> {
   // Fetch organizations with verdict summary
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const result = await apiRequest<{
     entities: Array<{
       id: string;
