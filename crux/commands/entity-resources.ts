@@ -540,7 +540,7 @@ async function seedCommand(
     `\nTotal: ${totalItems} items${dryRun ? " (dry run)" : `, ${totalSynced} synced`}, ${totalSkipped} skipped`,
   );
 
-  return { success: true };
+  return { exitCode: 0, output: '' };
 }
 
 // ---------------------------------------------------------------------------

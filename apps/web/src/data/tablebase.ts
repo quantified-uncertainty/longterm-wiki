@@ -37,6 +37,7 @@ import type { ValidSubcategory } from "./valid-subcategories";
 import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
 import { extractDomain } from "@/lib/resource-types";
 import { isCandidateRecordId } from "@wiki-server/api-types";
+import { SOURCE_CHECK_VERDICT_PRIORITY } from "@/components/shared/verdict-styles";
 
 // Re-export for consumers
 export type { WithSource };
@@ -1195,36 +1196,34 @@ export function getPolicyStakeholderId(
   return map[`${policyEntityStableId}:${stakeholderDisplayName}`] ?? null;
 }
 
-// Severity order for sourcing record verdicts. Lower index = worse.
-// Mirrors the display mapping in sourcing-status.ts:
-//   contradicted/unverifiable → failed (red)
-//   outdated/partial          → trouble (orange)
-//   confirmed                 → verified (green)
-// Any verdict string not in this list (including 'unchecked' or unknown
-// values) is treated as "no data" and excluded from aggregation.
-const VERDICT_SEVERITY = [
-  "contradicted",
-  "unverifiable",
-  "outdated",
-  "partial",
-  "confirmed",
-] as const;
-
 /**
  * Pick the worst-case verdict from a list of verdict strings, ignoring any
- * values not in the known severity ladder. Pure function — exported for unit
+ * values not in the canonical priority map. Pure function — exported for unit
  * tests and for any caller that has already resolved a list of verdicts.
+ *
+ * Routes through SOURCE_CHECK_VERDICT_PRIORITY (verdict-styles.ts) so this
+ * helper and rollupVerdictFromSummary stay in sync. Per QUA-429: ordering is
+ * `contradicted > outdated > partial > unverifiable > confirmed > unchecked`
+ * (lower number in the priority map = worse / more actionable).
+ *
+ * Note: `unchecked` is included in the canonical map but is dominated by every
+ * real verdict, so a list like ["confirmed", "unchecked"] still returns
+ * "confirmed".
  */
 export function pickWorstVerdict(
   verdicts: readonly string[],
 ): string | null {
-  let worstIdx = -1;
+  let worst: string | null = null;
+  let worstPriority = Infinity;
   for (const v of verdicts) {
-    const idx = VERDICT_SEVERITY.indexOf(v as (typeof VERDICT_SEVERITY)[number]);
-    if (idx === -1) continue;
-    if (worstIdx === -1 || idx < worstIdx) worstIdx = idx;
+    const p = SOURCE_CHECK_VERDICT_PRIORITY[v];
+    if (p === undefined) continue;
+    if (p < worstPriority) {
+      worstPriority = p;
+      worst = v;
+    }
   }
-  return worstIdx === -1 ? null : VERDICT_SEVERITY[worstIdx];
+  return worst;
 }
 
 /**

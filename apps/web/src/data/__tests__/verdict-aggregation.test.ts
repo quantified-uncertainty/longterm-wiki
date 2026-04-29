@@ -25,10 +25,24 @@ describe("pickWorstVerdict", () => {
     ).toBe("contradicted");
   });
 
-  it("ranks unverifiable above outdated, partial, confirmed", () => {
+  it("ranks outdated above partial, unverifiable, confirmed", () => {
+    // QUA-429: canonical order is contradicted > outdated > partial >
+    // unverifiable > confirmed > unchecked. Previously this helper had its
+    // own ladder with unverifiable above outdated, which conflicted with
+    // rollupVerdictFromSummary on the same record.
     expect(
       pickWorstVerdict(["confirmed", "partial", "unverifiable", "outdated"]),
-    ).toBe("unverifiable");
+    ).toBe("outdated");
+  });
+
+  it("ranks partial above unverifiable and confirmed", () => {
+    expect(
+      pickWorstVerdict(["confirmed", "unverifiable", "partial"]),
+    ).toBe("partial");
+  });
+
+  it("ranks unverifiable above confirmed", () => {
+    expect(pickWorstVerdict(["confirmed", "unverifiable"])).toBe("unverifiable");
   });
 
   it("ranks outdated above partial and confirmed", () => {
@@ -61,9 +75,11 @@ describe("pickWorstVerdict", () => {
     ).toBe("contradicted");
   });
 
-  it("returns null for an empty list containing a bare null equivalent", () => {
-    // Defensive: the severity ladder doesn't include "unchecked" or empty
-    // strings, so they should be ignored.
+  it("treats unchecked as the lowest-priority known verdict", () => {
+    // unchecked is in the canonical priority map (worst in the sense that it
+    // means "no data") but every real verdict outranks it as a "worst" pick.
     expect(pickWorstVerdict(["unchecked", "", "confirmed"])).toBe("confirmed");
+    expect(pickWorstVerdict(["unchecked"])).toBe("unchecked");
+    expect(pickWorstVerdict(["unchecked", "contradicted"])).toBe("contradicted");
   });
 });

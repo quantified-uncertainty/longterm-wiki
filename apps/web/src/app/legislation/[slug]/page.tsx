@@ -2,10 +2,9 @@ import { Suspense } from "react";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Breadcrumbs } from "@/components/directory";
 import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { computeLegislationCoverage, getLegislationSignals } from "@/components/coverage/coverage-score";
-import { ProfileTabs, type ProfileTab } from "@/components/directory/ProfileTabs";
+import { type ProfileTab } from "@/components/directory/ProfileTabs";
 import { RelatedPages } from "@/components/RelatedPages";
 import { FBAutoFacts } from "@/components/wiki/factbase/FBAutoFacts";
 import { getEntityHref } from "@/data/entity-nav";
@@ -19,11 +18,15 @@ import {
 } from "@/data/tablebase";
 import { OrgResourcesSection } from "@/app/organizations/[slug]/resources-section";
 import { resolveResourceAuthors, type OrgResourceRow } from "@/app/organizations/[slug]/org-data";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
 
 import {
   resolvePolicyBySlug,
   getPolicySlugs,
-  getCustomField,
   getRelatedPolicies,
   resolveEntityHref,
   getPolicyWikiHref,
@@ -42,7 +45,6 @@ import {
   buildUnifiedTimeline,
   type RawResource,
 } from "@/app/legislation/[slug]/timeline-utils";
-import { parseDisplayDateToISO } from "@/app/legislation/[slug]/date-utils";
 import { getPolicyStakeholderId, getRecordVerdict } from "@data/tablebase";
 import { StakeholderTable, type StakeholderRow } from "./stakeholder-table";
 import { ProvisionCard } from "./provision-card";
@@ -159,6 +161,14 @@ export default async function LegislationDetailPage({
 
   const wikiHref = getPolicyWikiHref(entity);
 
+  // Sourcing rollup verdict for the header badge
+  const sourcingSummary = await fetchEntitySourcingSummary([
+    entity.id,
+    entity.stableId ?? "",
+    slug,
+  ]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
+
   const importanceOrder: Record<string, number> = { high: 0, medium: 1, low: 2 };
   const byImportance = <T extends { importance?: string }>(a: T, b: T) =>
     (importanceOrder[a.importance ?? ""] ?? 3) - (importanceOrder[b.importance ?? ""] ?? 3);
@@ -212,59 +222,15 @@ export default async function LegislationDetailPage({
   // ── Build tabs ────────────────────────────────────────────
   const tabs: ProfileTab[] = [];
 
-  // ── Sidebar content (only rendered inside Overview tab) ──────
-  const sidebarContent = (
-    <div className="space-y-6">
-      <section className="rounded-xl border border-border p-4 space-y-3">
-        <h3 className="text-sm font-bold">Quick Facts</h3>
-        <dl className="space-y-2 text-sm">
-          {billNumber && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Bill Number</dt><dd className="font-semibold">{billNumber}</dd></div>}
-          {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
-          {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
-          {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
-          {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
-          {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
-          {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
-        </dl>
-      </section>
-      {entity.stakeholders.length > 0 && (
-        <section className="rounded-xl border border-border p-4">
-          <h3 className="text-sm font-bold mb-3">Position Summary</h3>
-          <div className="space-y-2">
-            {supporters.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-green-700 dark:text-green-400 font-medium">Support</span><span className="tabular-nums font-semibold">{supporters.length}</span></div>}
-            {opponents.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-red-700 dark:text-red-400 font-medium">Oppose</span><span className="tabular-nums font-semibold">{opponents.length}</span></div>}
-            {mixed.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-amber-700 dark:text-amber-400 font-medium">Mixed</span><span className="tabular-nums font-semibold">{mixed.length}</span></div>}
-            <div className="flex rounded-full overflow-hidden h-2 mt-1">
-              {supporters.length > 0 && <div className="bg-green-500" style={{ width: `${(supporters.length / entity.stakeholders.length) * 100}%` }} />}
-              {mixed.length > 0 && <div className="bg-amber-500" style={{ width: `${(mixed.length / entity.stakeholders.length) * 100}%` }} />}
-              {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
-            </div>
-          </div>
-        </section>
-      )}
-      {entity.tags.length > 0 && (
-        <section className="rounded-xl border border-border p-4">
-          <h3 className="text-sm font-bold mb-3">Tags</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {entity.tags.map((tag) => (
-              <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">{tag}</span>
-            ))}
-          </div>
-        </section>
-      )}
-    </div>
-  );
-
   // Overview tab (always present)
   const overviewContent = (
-    <div className="grid grid-cols-1 lg:grid-cols-[1fr_280px] gap-8">
-      <div className="space-y-6">
-        {/* Description */}
-        {entity.description && (
-          <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">{entity.description}</p>
-        )}
-        {/* Status pipeline */}
-        {showPipelineBar && (
+    <div className="space-y-6">
+      {/* Description */}
+      {entity.description && (
+        <p className="text-sm text-muted-foreground leading-relaxed max-w-prose">{entity.description}</p>
+      )}
+      {/* Status pipeline */}
+      {showPipelineBar && (
         <div className="flex items-center gap-1 overflow-x-auto pb-2">
           {PIPELINE_STAGES.map((stage, i) => {
             const reached = i <= reachedStage;
@@ -391,8 +357,6 @@ export default async function LegislationDetailPage({
       <FBAutoFacts entityId={entity.id} />
 
       <RelatedPages entityId={entity.id} entity={{ entityType: "policy" }} />
-      </div>
-      {sidebarContent}
     </div>
   );
   tabs.push({ id: "overview", label: "Overview", content: overviewContent });
@@ -561,8 +525,6 @@ export default async function LegislationDetailPage({
       ),
     });
   }
-
-  // ── Unified Timeline tab ────────────────────────────────────────────
 
   // ── Press / Documents tab ──────────────────────────────────
   const resourceIds = getResourcesForPage(entity.id);
@@ -742,96 +704,136 @@ export default async function LegislationDetailPage({
     });
   }
 
-  return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
-      <Breadcrumbs
-        items={[
-          { label: "Legislation", href: "/legislation" },
-          { label: billNumber ?? entity.title },
-        ]}
-      />
+  // ── Header pills, metadata, links ───────────────────────────
+  const titlePills = (
+    <>
+      {statusKey && (
+        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider capitalize ${STATUS_COLORS[statusKey] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>
+          {statusKey}
+        </span>
+      )}
+      {scope && (
+        <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${SCOPE_COLORS[scope.toLowerCase()] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>
+          {scope}
+        </span>
+      )}
+    </>
+  );
 
-      {/* Header */}
-      <div className="mb-6">
-        <div className="flex items-start gap-5">
-          <div className="shrink-0 w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center" aria-hidden="true">
-            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-600 dark:text-violet-400">
-              <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
-              <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
-              <path d="M7 21h10" />
-              <path d="M12 3v18" />
-              <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
-            </svg>
-          </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-3 mb-1 flex-wrap">
-              <h1 className="text-2xl font-extrabold tracking-tight">
-                {billNumber ? `${billNumber}: ` : ""}{entity.title}
-              </h1>
-              {statusKey && (
-                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider capitalize ${STATUS_COLORS[statusKey] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>
-                  {statusKey}
-                </span>
-              )}
-              {scope && (
-                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold uppercase tracking-wider ${SCOPE_COLORS[scope.toLowerCase()] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400"}`}>
-                  {scope}
-                </span>
-              )}
-              {(() => {
-                const covInput = {
-                  introduced,
-                  policyStatus: statusKey,
-                  author,
-                  jurisdiction,
-                  billNumber,
-                  fullTextUrl: entity.fullTextUrl,
-                  description: entity.description,
-                  tags: entity.tags,
-                  wikiId: entity.stableId,
-                };
-                return (
-                  <CoveragePopover
-                    score={computeLegislationCoverage(covInput)}
-                    signals={getLegislationSignals(covInput)}
-                    size="md"
-                  />
-                );
-              })()}
-            </div>
-            <div className="flex items-center gap-3 text-sm text-muted-foreground flex-wrap mt-1">
-              {jurisdiction && <span>{jurisdiction}</span>}
-              {author && (() => {
-                // Try to resolve author to a clickable entity link
-                const authorPolitician = entity.keyPoliticians.find((p) => author.includes(p.name) || p.role?.toLowerCase().includes("author"));
-                const authorHref = authorPolitician ? resolveEntityHref(authorPolitician.entityId) : null;
-                return authorHref ? (
-                  <span>by <Link href={authorHref} className="text-primary hover:underline">{author}</Link></span>
-                ) : (
-                  <span>by {author}</span>
-                );
-              })()}
-              {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
-              {entity.fullTextUrl && (
-                <a href={entity.fullTextUrl} target="_blank" rel="noopener noreferrer" className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  Full text &#8599;
-                </a>
-              )}
-              {wikiHref && (
-                <Link href={wikiHref} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                  Wiki article &rarr;
-                </Link>
-              )}
-              <Link href={`/legislation/${slug}/data`} className="text-primary hover:text-primary/80 font-medium transition-colors">
-                Data &rarr;
-              </Link>
-            </div>
-          </div>
-        </div>
-      </div>
+  // Author may match a key politician — link to that entity if so
+  const authorPolitician = author
+    ? entity.keyPoliticians.find((p) => author.includes(p.name) || p.role?.toLowerCase().includes("author"))
+    : null;
+  const authorHref = authorPolitician ? resolveEntityHref(authorPolitician.entityId) : null;
 
-      {/* Tabs — full width; sidebar is inside Overview tab only */}
-      <ProfileTabs tabs={tabs} ariaLabel="Legislation sections" />
+  const metadata = (
+    <>
+      {jurisdiction && <span>{jurisdiction}</span>}
+      {author && (authorHref ? (
+        <span>by <Link href={authorHref} className="text-primary hover:underline">{author}</Link></span>
+      ) : (
+        <span>by {author}</span>
+      ))}
+      {introduced && <span>Introduced {formatIntroducedDate(introduced)}</span>}
+    </>
+  );
+
+  const headerLinks = [
+    ...(entity.fullTextUrl
+      ? [{ label: "Full text", href: entity.fullTextUrl, external: true }]
+      : []),
+    ...(wikiHref ? [{ label: "Wiki article", href: wikiHref }] : []),
+    { label: "Data", href: `/legislation/${slug}/data` },
+  ];
+
+  const covInput = {
+    introduced,
+    policyStatus: statusKey,
+    author,
+    jurisdiction,
+    billNumber,
+    fullTextUrl: entity.fullTextUrl,
+    description: entity.description,
+    tags: entity.tags,
+    wikiId: entity.stableId,
+  };
+
+  // Avatar — violet legislation icon
+  const avatar = (
+    <div className="w-14 h-14 rounded-xl bg-gradient-to-br from-violet-500/20 to-violet-500/5 flex items-center justify-center" aria-hidden="true">
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-violet-600 dark:text-violet-400">
+        <path d="m16 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="m2 16 3-8 3 8c-.87.65-1.92 1-3 1s-2.13-.35-3-1Z" />
+        <path d="M7 21h10" />
+        <path d="M12 3v18" />
+        <path d="M3 7h2c2 0 5-1 7-2 2 1 5 2 7 2h2" />
+      </svg>
     </div>
+  );
+
+  // Sidebar — Quick Facts, Position Summary, Tags
+  const sidebar = (
+    <>
+      <section className="rounded-xl border border-border p-4 space-y-3">
+        <h3 className="text-sm font-bold">Quick Facts</h3>
+        <dl className="space-y-2 text-sm">
+          {billNumber && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Bill Number</dt><dd className="font-semibold">{billNumber}</dd></div>}
+          {jurisdiction && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Jurisdiction</dt><dd>{jurisdiction}</dd></div>}
+          {entity.session && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Session</dt><dd>{entity.session}</dd></div>}
+          {author && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Author / Sponsor</dt><dd>{author}</dd></div>}
+          {introduced && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Introduced</dt><dd>{formatIntroducedDate(introduced)}</dd></div>}
+          {statusKey && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Status</dt><dd className="capitalize">{statusKey}</dd></div>}
+          {scope && <div><dt className="text-xs text-muted-foreground/70 uppercase tracking-wider">Scope</dt><dd>{scope}</dd></div>}
+        </dl>
+      </section>
+      {entity.stakeholders.length > 0 && (
+        <section className="rounded-xl border border-border p-4">
+          <h3 className="text-sm font-bold mb-3">Position Summary</h3>
+          <div className="space-y-2">
+            {supporters.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-green-700 dark:text-green-400 font-medium">Support</span><span className="tabular-nums font-semibold">{supporters.length}</span></div>}
+            {opponents.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-red-700 dark:text-red-400 font-medium">Oppose</span><span className="tabular-nums font-semibold">{opponents.length}</span></div>}
+            {mixed.length > 0 && <div className="flex items-center justify-between text-sm"><span className="text-amber-700 dark:text-amber-400 font-medium">Mixed</span><span className="tabular-nums font-semibold">{mixed.length}</span></div>}
+            <div className="flex rounded-full overflow-hidden h-2 mt-1">
+              {supporters.length > 0 && <div className="bg-green-500" style={{ width: `${(supporters.length / entity.stakeholders.length) * 100}%` }} />}
+              {mixed.length > 0 && <div className="bg-amber-500" style={{ width: `${(mixed.length / entity.stakeholders.length) * 100}%` }} />}
+              {opponents.length > 0 && <div className="bg-red-500" style={{ width: `${(opponents.length / entity.stakeholders.length) * 100}%` }} />}
+            </div>
+          </div>
+        </section>
+      )}
+      {entity.tags.length > 0 && (
+        <section className="rounded-xl border border-border p-4">
+          <h3 className="text-sm font-bold mb-3">Tags</h3>
+          <div className="flex flex-wrap gap-1.5">
+            {entity.tags.map((tag) => (
+              <span key={tag} className="px-2 py-0.5 rounded-full text-[10px] font-medium bg-muted text-muted-foreground">{tag}</span>
+            ))}
+          </div>
+        </section>
+      )}
+    </>
+  );
+
+  return (
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "Legislation", href: "/legislation" },
+        { label: billNumber ?? entity.title },
+      ]}
+      entityId={entity.id}
+      avatar={avatar}
+      title={billNumber ? `${billNumber}: ${entity.title}` : entity.title}
+      titlePills={titlePills}
+      coverage={{
+        score: computeLegislationCoverage(covInput),
+        signals: getLegislationSignals(covInput),
+      }}
+      verdict={rollupVerdict}
+      metadata={metadata}
+      headerLinks={headerLinks}
+      tabs={tabs}
+      tabsAriaLabel="Legislation sections"
+      sidebar={sidebar}
+    />
   );
 }

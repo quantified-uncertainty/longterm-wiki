@@ -132,10 +132,13 @@ jobs:
 
       - name: Blocking validations
         run: |
-          pnpm crux validate unified --rules=comparison-operators,dollar-signs --errors-only
+          # Run all unified rules in errors-only mode (only ERROR-severity
+          # rules fail). This catches every rule the local gate runs, so CI
+          # and local gate stay in lock-step. Drift between the two caused
+          # QUA-755 — local pre-push gate failed on 117+ errors that CI never
+          # checked, blocking unrelated PRs because main "looked green."
+          pnpm crux validate unified --errors-only
           pnpm crux validate schema
-          pnpm crux validate unified --rules=frontmatter-schema --errors-only
-          pnpm crux validate unified --rules=wiki-id-integrity --errors-only
           pnpm crux validate refs
 
       - name: Auto-update orchestrator smoke test (dry-run)
@@ -367,10 +370,17 @@ jobs:
     needs: [ci]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     # Serialize syncs so concurrent pushes don't saturate the wiki-server rate limiter.
-    # cancel-in-progress: true drops stale queued runs — the latest state always subsumes them.
+    # cancel-in-progress: false — queue, don't cancel. Cancelling left the LATEST
+    # commit's sync incomplete (so the wiki-server missed that commit's content)
+    # AND turned the workflow rollup into FAILURE for cancelled commits, tripping
+    # the patrol's main-ci-red gate on phantom failures (QUA-731).
+    # Trade-off: an N-PR burst now serializes (≈N × sync duration ≈ 5 min for 5
+    # PRs) instead of cancel-and-replace (~1 min). Each queued run still
+    # checks-out at its own SHA and syncs that snapshot, so the queue tail's
+    # final state matches the latest main commit. Acceptable for the volume.
     concurrency:
       group: sync-content-main
-      cancel-in-progress: true
+      cancel-in-progress: false
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

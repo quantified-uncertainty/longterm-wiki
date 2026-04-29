@@ -126,9 +126,9 @@ export async function downloadAndExtract(
   writeFileSync(zipPath, buffer);
 
   // Extract using unzip command (available on macOS and Linux)
-  const { execSync } = await import("child_process");
+  const { execFileSync } = await import("child_process");
   mkdirSync(extractDir, { recursive: true });
-  execSync(`unzip -o "${zipPath}" -d "${extractDir}"`, {
+  execFileSync("unzip", ["-o", zipPath, "-d", extractDir], {
     stdio: "pipe",
   });
 

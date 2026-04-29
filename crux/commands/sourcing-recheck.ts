@@ -37,6 +37,7 @@ const { ESTIMATED_COST_PER_VERIFICATION } = SOURCE_CHECK_CONSTANTS;
 
 const LOG_PREFIX = '[recheck]';
 
+// verdict-priority-ok: recheck-day intervals, not a severity priority map.
 /** Next-check-due intervals by verdict (in days) */
 const RECHECK_INTERVALS: Record<string, number> = {
   confirmed: 90,
@@ -58,6 +59,10 @@ interface RecheckOptions extends BaseOptions {
   ci?: boolean;
 }
 
+// verdict-priority-ok: recheck scheduling weights (higher = recheck sooner).
+// Same severity intent as canonical SOURCE_CHECK_VERDICT_PRIORITY but uses
+// 0-100 weights instead of 0-5 priorities for budget allocation. Keep in sync
+// with canonical order if either changes.
 const VERDICT_PRIORITY: Record<string, number> = {
   contradicted: 100,
   outdated: 80,

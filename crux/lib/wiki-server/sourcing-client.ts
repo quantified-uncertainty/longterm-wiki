@@ -22,6 +22,10 @@ type RpcClient = ReturnType<typeof hc<SourcingRoute>>;
 
 export type StoreEvidenceResult = InferResponseType<RpcClient['evidence']['$post'], 201>;
 export type StoreVerdictResult = InferResponseType<RpcClient['verdicts']['$post'], 200>;
+export type RecomputeVerdictResult = InferResponseType<
+  RpcClient['verdicts']['recompute']['$post'],
+  200
+>;
 export type ListVerdictsResult = InferResponseType<RpcClient['verdicts']['$get'], 200>;
 export type VerdictByRecordResult = InferResponseType<RpcClient['verdicts'][':recordType'][':recordId']['$get'], 200>;
 export type DueForRecheckResult = InferResponseType<RpcClient['due-for-recheck']['$get'], 200>;
@@ -49,6 +53,32 @@ export async function storeVerdict(
   body: Record<string, unknown>,
 ): Promise<ApiResult<StoreVerdictResult>> {
   return apiRequest<StoreVerdictResult>('POST', '/api/sourcing/verdicts', body);
+}
+
+/**
+ * Recompute the aggregate verdict for one (recordType, recordId, fieldName)
+ * key from its evidence rows (QUA-791). Server reads
+ * `source_check_evidence`, applies the canonical relevance-weighted rule,
+ * and upserts `source_check_verdicts`. Use this whenever evidence has been
+ * added/changed and the aggregate must be brought in sync — replaces the
+ * old "construct a verdict body and POST /verdicts" pattern that was
+ * last-writer-wins.
+ */
+export async function recomputeVerdict(
+  body: {
+    recordType: string;
+    recordId: string;
+    fieldName?: string | null;
+    entityId?: string | null;
+    displayName?: string | null;
+    entityDisplayName?: string | null;
+  },
+): Promise<ApiResult<RecomputeVerdictResult>> {
+  return apiRequest<RecomputeVerdictResult>(
+    'POST',
+    '/api/sourcing/verdicts/recompute',
+    body,
+  );
 }
 
 /** List verdicts with optional filters. */

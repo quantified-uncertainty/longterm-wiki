@@ -22,9 +22,10 @@ import {
   mkdirSync,
   unlinkSync,
   utimesSync,
+  rmSync,
 } from 'fs';
 import { join, dirname } from 'path';
-import { execSync, spawnSync } from 'child_process';
+import { execSync, execFileSync, spawnSync } from 'child_process';
 import os from 'os';
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -152,7 +153,7 @@ function generateEnv(envBasePath: string, slot: number): string {
 /** Run a git command in a directory and return trimmed output */
 function git(dir: string, ...args: string[]): string {
   try {
-    return execSync(`git ${args.join(' ')}`, { cwd: dir, encoding: 'utf-8', timeout: 10000 }).trim();
+    return execFileSync('git', args, { cwd: dir, encoding: 'utf-8', timeout: 10000 }).trim();
   } catch {
     return '';
   }
@@ -257,7 +258,7 @@ Options:
 
   // Ensure lw/ exists
   if (!existsSync(lwDir)) {
-    execSync(`mkdir -p "${lwDir}"`);
+    mkdirSync(lwDir, { recursive: true });
   }
 
   // Check for .env.base
@@ -281,7 +282,7 @@ Options:
   } else {
     const remote = getGitRemoteUrl();
     console.error(`Cloning ${remote} → ${slotDir}...`);
-    execSync(`git clone "${remote}" "${slotDir}"`, { stdio: 'inherit', timeout: 300000 });
+    execFileSync('git', ['clone', remote, slotDir], { stdio: 'inherit', timeout: 300000 });
   }
 
   // Write .agent-slot
@@ -479,7 +480,7 @@ async function clean(args: string[], options: CommandOptions): Promise<CommandRe
       continue;
     }
 
-    execSync(`rm -rf "${dir}"`);
+    rmSync(dir, { recursive: true, force: true });
     cleaned.push(`  ✓ a${slot} removed`);
   }
 
@@ -532,7 +533,7 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
   for (const win of windows) {
     if (win.cwd === slotDir || win.cwd.startsWith(slotDir + '/')) {
       try {
-        execSync(`tmux select-window -t "${win.index}"`, { stdio: 'inherit' });
+        execFileSync('tmux', ['select-window', '-t', String(win.index)], { stdio: 'inherit' });
         return { exitCode: 0, output: `Switched to existing tmux window for slot a${slot}` };
       } catch { /* fall through to create */ }
     }
@@ -547,9 +548,9 @@ async function open(args: string[], _options: CommandOptions): Promise<CommandRe
 
   try {
     if (withClaude) {
-      execSync(`tmux new-window -n "${fullWindowName}" -c "${slotDir}" "claude"`, { stdio: 'inherit' });
+      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir, 'claude'], { stdio: 'inherit' });
     } else {
-      execSync(`tmux new-window -n "${fullWindowName}" -c "${slotDir}"`, { stdio: 'inherit' });
+      execFileSync('tmux', ['new-window', '-n', fullWindowName, '-c', slotDir], { stdio: 'inherit' });
     }
     return { exitCode: 0, output: `Opened tmux window ${fullWindowName} at ${slotDir}${withClaude ? ' (with claude)' : ''}` };
   } catch (e) {
@@ -606,7 +607,7 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
           try {
             execSync('git checkout main', { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
             execSync('git pull --ff-only origin main', { cwd: dir, encoding: 'utf-8', timeout: 30000, stdio: 'pipe' });
-            execSync(`git branch -d ${branch}`, { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+            execFileSync('git', ['branch', '-d', branch], { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
             // Repair .agent-slot — git operations may overwrite it if still tracked
             writeFileSync(join(dir, '.agent-slot'), String(slot) + '\n');
             updated.push(`  a${slot}: returned to main (${branch} was merged)`);
@@ -636,7 +637,7 @@ async function refresh(_args: string[], _options: CommandOptions): Promise<Comma
         .filter((b) => b && b !== 'main' && !b.startsWith('*'));
       for (const staleBranch of staleBranches) {
         try {
-          execSync(`git branch -d ${staleBranch}`, { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
+          execFileSync('git', ['branch', '-d', staleBranch], { cwd: dir, encoding: 'utf-8', timeout: 10000, stdio: 'pipe' });
           cleaned.push(`  a${slot}: pruned merged branch ${staleBranch}`);
         } catch { /* branch delete failed — skip */ }
       }
@@ -742,7 +743,7 @@ function renameTmuxWindows(lwDir: string): string[] {
     if (win.cwd === lwDir) {
       if (win.name !== 'LW') {
         try {
-          execSync(`tmux rename-window -t "${win.index}" "LW"`, { timeout: 5000 });
+          execFileSync('tmux', ['rename-window', '-t', String(win.index), 'LW'], { timeout: 5000 });
           renamed.push(`  LW: ${win.name} → LW`);
         } catch { /* ignore */ }
       }
@@ -762,7 +763,7 @@ function renameTmuxWindows(lwDir: string): string[] {
 
     if (win.name !== newName) {
       try {
-        execSync(`tmux rename-window -t "${win.index}" "${newName}"`, { timeout: 5000 });
+        execFileSync('tmux', ['rename-window', '-t', String(win.index), newName], { timeout: 5000 });
         renamed.push(`  A${slot}: ${win.name} → ${newName}`);
       } catch { /* tmux rename can fail if window was closed between query and rename */ }
     }
@@ -1171,7 +1172,7 @@ function makeSentinelEnv(): SentinelEnv {
     listTmuxPanes() {
       if (!process.env.TMUX) return null;
       try {
-        const r = execSync(`tmux list-panes -a -F '#{pane_id}'`, { encoding: 'utf-8', timeout: 3000 });
+        const r = execFileSync('tmux', ['list-panes', '-a', '-F', '#{pane_id}'], { encoding: 'utf-8', timeout: 3000 });
         return r.split('\n').map((s) => s.trim()).filter(Boolean);
       } catch { return null; }
     },

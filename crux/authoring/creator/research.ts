@@ -165,7 +165,7 @@ export async function runScryResearch(topic: string, { log, saveResult }: ScryCo
         WHERE title IS NOT NULL AND kind = 'post'
         LIMIT 10`;
 
-      const response = await fetch('https://api.exopriors.com/v1/scry/query', {
+      const response = await fetch('https://api.scry.io/v1/scry/query', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${SCRY_PUBLIC_KEY}`,

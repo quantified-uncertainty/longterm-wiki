@@ -30,6 +30,13 @@ overrides:
   "OpenAI (lab)": openai
   "DeepMind (lab)": deepmind
 
+  # AI Lab Watch (QUA-751) and SaferAI Ratings (QUA-750) both grade the
+  # parent company "Meta", but our frontier-lab entity is `meta-ai`
+  # (Meta AI / FAIR). Bare "Meta" is too generic to add as a real alias
+  # on the entity (would collide with entities like meta-atep,
+  # meta-california-pac), so override here only.
+  "Meta": meta-ai
+
   # Examples — uncomment + edit when you encounter unresolved names in
   # `analyze` output. Always check `data/entities/organizations.yaml` to
   # confirm the slug exists before committing.

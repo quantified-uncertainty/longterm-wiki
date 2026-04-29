@@ -89,3 +89,16 @@ When a PR changes infrastructure, CI config, Vercel settings, GitHub Actions, DN
 - **Ongoing audit** (`audits` section): If the property should be monitored permanently (e.g., "scheduled workflows keep running"), add it as an ongoing audit item.
 
 Run `pnpm crux sys audits list` to see current items. The maintenance sweep includes overdue audits in its report automatically.
+
+### Do NOT offer to `/schedule` verification agents
+
+The default Claude Code session-end behavior offers a one-line `/schedule` of a background agent for natural follow-ups (post-merge verification, soak windows, flag cleanup, gate ramps, etc.). **In this project, do not make that offer.** Instead:
+
+- **Post-merge verification needed?** File a Linear ticket via `pnpm crux linear create` with the verification details (PR number, what to check, deadline). PR patrol and the maintenance sweep will surface it.
+- **One-time verification of infra/CI/DNS behavior?** Add an entry to `.claude/audits.yaml` `post_merge` section.
+- **Ongoing property to monitor?** Add to `.claude/audits.yaml` `audits` section.
+- **Flag/gate cleanup with a date?** File a Linear ticket. Linear is the canonical place for "do this in N weeks" work.
+
+Why: scheduled background agents bypass the project's tracking surfaces (Linear, audits.yaml, maintenance sweeps). A Linear ticket is visible to humans, dedup-able, prioritizable, and discoverable by the next coordinator session. A `/schedule` agent fires once into the void and produces no audit trail.
+
+This rule overrides the generic Claude Code session-end guidance to offer `/schedule`. The offer should not appear in this project regardless of how natural the follow-up seems. If you genuinely believe a recurring scheduled job is the right answer (not a one-time verification), surface that as a Linear ticket too — the decision to schedule is the user's, not yours.

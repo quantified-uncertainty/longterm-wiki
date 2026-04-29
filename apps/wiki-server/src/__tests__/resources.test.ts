@@ -20,10 +20,13 @@ let nextJobId = 1;
 // Since the mock doesn't model citation_content, we check:
 //   1. An explicit has_content field (set directly by suggest tests), OR
 //   2. content_hash being non-null (proxy for content having been fetched)
+// QUA-329: also surface content_hash so the route can pass it as
+// previousContentHash when enqueueing resource-ingest jobs.
 function toSuggestShape(row: ResourceRow): {
   id: string;
   url: string;
   title: string | null;
+  content_hash: string | null;
   fetched_at: Date | null;
   has_content: boolean;
 } {
@@ -31,6 +34,7 @@ function toSuggestShape(row: ResourceRow): {
     id: row.id,
     url: row.url,
     title: row.title ?? null,
+    content_hash: row.content_hash ?? null,
     fetched_at: row.fetched_at ?? null,
     has_content:
       row.has_content === true || (row.content_hash != null && row.content_hash !== ""),
@@ -232,6 +236,8 @@ function dispatch(query: string, params: unknown[]): unknown[] {
         id: row.id,
         url: row.url,
         title: null,
+        // QUA-329: brand-new rows have no prior content hash.
+        content_hash: null,
         fetched_at: null,
         has_content: false,
       });
@@ -1056,6 +1062,58 @@ describe("Resources API", () => {
       const jobId = body.results[0].jobId;
       const job = jobStore.get(jobId);
       expect(job!.priority).toBe(100); // capped at 100
+    });
+
+    // QUA-329: when re-ingesting a stale resource that has a recorded
+    // content_hash, /suggest must pass it as previousContentHash so the
+    // resource-ingest handler can detect content drift and bypass the
+    // resource-enrich skip-guard (QUA-312 Phase 2).
+    it("passes previousContentHash on the resource-ingest job for stale resources", async () => {
+      // Stale resource: fetched 30 days ago (older than the default 7-day max age),
+      // has cached content (has_content=true), and a known content hash.
+      const STALE_DATE = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000);
+      store.seedResource({
+        id: "stale-res",
+        stable_id: "sid_stale-res",
+        url: "https://example.com/stale",
+        title: "Stale Resource",
+        fetched_at: STALE_DATE,
+        has_content: true,
+        content_hash: "abc123def4567890",
+      });
+
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/stale"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.results[0].contentStatus).toBe("stale");
+      expect(body.results[0].jobId).toBeTruthy();
+      expect(body.results[0].contentHash).toBe("abc123def4567890");
+
+      const job = jobStore.get(body.results[0].jobId);
+      expect(job).toBeDefined();
+      const params = job!.params as Record<string, unknown>;
+      expect(params.resourceId).toBe("stale-res");
+      expect(params.url).toBe("https://example.com/stale");
+      expect(params.previousContentHash).toBe("abc123def4567890");
+    });
+
+    it("omits previousContentHash for brand-new resources with no prior hash", async () => {
+      // Missing resource: brand-new URL, no content_hash on file.
+      const res = await postJson(app, "/api/resources/suggest", {
+        urls: ["https://example.com/brand-new"],
+      });
+      expect(res.status).toBe(200);
+      const body = await res.json();
+
+      expect(body.results[0].contentStatus).toBe("missing");
+      expect(body.results[0].contentHash).toBeNull();
+
+      const job = jobStore.get(body.results[0].jobId);
+      const params = job!.params as Record<string, unknown>;
+      expect(params).not.toHaveProperty("previousContentHash");
     });
   });
 

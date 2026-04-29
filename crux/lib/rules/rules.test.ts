@@ -1163,23 +1163,29 @@ describe('entitylink-ids rule', () => {
         'anthropic': 'E42',
         'nick-bostrom': 'E140',
         'miri': 'E100',
+        'cea': 'E517',
+        'open-philanthropy': 'E552',
       },
       byWikiId: {
         'E42': 'anthropic',
         'E140': 'nick-bostrom',
         'E100': 'miri',
+        'E517': 'cea',
+        'E552': 'open-philanthropy',
       },
     },
     pathRegistry: {
       'anthropic': '/knowledge-base/organizations/anthropic/',
       'nick-bostrom': '/knowledge-base/people/nick-bostrom/',
       'miri': '/knowledge-base/organizations/miri/',
+      'cea': '/knowledge-base/organizations/cea/',
     },
-    entities: {
-      'anthropic': { type: 'organization' },
-      'nick-bostrom': { type: 'person' },
-      'miri': { type: 'organization' },
-    },
+    entities: [
+      { id: 'anthropic', title: 'Anthropic', type: 'organization' },
+      { id: 'nick-bostrom', title: 'Nick Bostrom', type: 'person' },
+      { id: 'miri', title: 'MIRI', aliases: ['Machine Intelligence Research Institute'], type: 'organization' },
+      { id: 'cea', title: 'Centre for Effective Altruism', aliases: ['CEA'], type: 'organization' },
+    ],
   };
 
   it('errors when slug ID used instead of wiki ID, with auto-fix to numeric+name', () => {
@@ -1195,6 +1201,22 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
   });
 
+  it('normalizes bare numeric ID without injecting name= (QUA-761)', () => {
+    // Bare-numeric-ID auto-fix used to inject name="${currentSlug}", which
+    // had the same hallucination risk as the name-mismatch case if the wiki
+    // ID had been reassigned. Now the fix only normalizes the E-prefix.
+    const content = mockContent(
+      '<EntityLink id="42">Anthropic</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('bare wiki ID');
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.oldText).toBe('id="42"');
+    expect(issues[0].fix!.newText).toBe('id="E42"');
+  });
+
   it('passes for wiki ID with correct name', () => {
     const content = mockContent(
       '<EntityLink id="E42" name="anthropic">Anthropic</EntityLink>',
@@ -1203,7 +1225,10 @@ describe('entitylink-ids rule', () => {
     expect(issues.length).toBe(0);
   });
 
-  it('errors when wiki ID has wrong name (hallucination catch)', () => {
+  it('errors when wiki ID has wrong name, with NO auto-fix (QUA-761)', () => {
+    // No auto-fix: the wiki ID may have been reassigned. A mechanical
+    // name=→slug rewrite would silently corrupt prose like "MIRI is..."
+    // by renaming MIRI to "anthropic" because E42 now points there.
     const content = mockContent(
       '<EntityLink id="E42" name="miri">MIRI</EntityLink>',
     );
@@ -1212,9 +1237,27 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].severity).toBe(Severity.ERROR);
     expect(issues[0].message).toContain('name mismatch');
     expect(issues[0].message).toContain('"anthropic"');
-    expect(issues[0].fix).not.toBeNull();
-    expect(issues[0].fix!.oldText).toBe('name="miri"');
-    expect(issues[0].fix!.newText).toBe('name="anthropic"');
+    // Hint surfaces when the prose-name resolves to a different wiki ID,
+    // strongly suggesting the wiki ID was reassigned.
+    expect(issues[0].message).toContain('"miri" currently maps to E100');
+    expect(issues[0].message).toContain('reassigned');
+    expect(issues[0].message).toContain('Verify the prose');
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('errors with no hint when name does not match any known slug', () => {
+    // When the name attribute doesn't resolve to any current entity, the
+    // hint about reassignment is omitted (could be a typo, not necessarily
+    // a reassignment).
+    const content = mockContent(
+      '<EntityLink id="E42" name="some-old-name">Old Name</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.ERROR);
+    expect(issues[0].message).toContain('name mismatch');
+    expect(issues[0].message).not.toContain('reassigned');
+    expect(issues[0].fix).toBeNull();
   });
 
   it('warns when wiki ID used without name, with auto-fix to add name', () => {
@@ -1228,6 +1271,79 @@ describe('entitylink-ids rule', () => {
     expect(issues[0].fix).not.toBeNull();
     expect(issues[0].fix!.oldText).toBe('id="E140"');
     expect(issues[0].fix!.newText).toBe('id="E140" name="nick-bostrom"');
+  });
+
+  it('auto-fix when display matches entity title (acronym slug, QUA-759)', () => {
+    // CEA's slug is "cea" but display text is the full name "Centre for
+    // Effective Altruism" — that's the entity's title. Auto-fix should still
+    // fire because the display text identifies the same entity.
+    const content = mockContent(
+      '<EntityLink id="E517">Centre for Effective Altruism</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E517" name="cea"');
+  });
+
+  it('auto-fix when display matches an entity alias (QUA-759)', () => {
+    // MIRI's slug is "miri" but display text is the full name from aliases.
+    const content = mockContent(
+      '<EntityLink id="E100">Machine Intelligence Research Institute</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E100" name="miri"');
+  });
+
+  it('warns when display name disagrees with wiki ID, with NO auto-fix (QUA-759)', () => {
+    // E42 currently maps to anthropic but the prose says "Open Philanthropy".
+    // Same hallucination shape as QUA-761 — silently injecting name="anthropic"
+    // would lock in a "valid" cross-check on a link that visibly says "Open
+    // Philanthropy" but routes to anthropic's page. The load-bearing change
+    // is refusing the auto-fix; severity is WARNING (not ERROR) so the
+    // tens of latent mismatches don't block the gate while content owners
+    // work through the backlog.
+    const content = mockContent(
+      '<EntityLink id="E42">Open Philanthropy</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].message).toContain('display name');
+    expect(issues[0].message).toContain('"anthropic"');
+    expect(issues[0].message).toContain('reassigned');
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('auto-fix for self-closing EntityLink (no display text to compare)', () => {
+    // Self-closing tags get their display from the registry, so adding name=
+    // is trivially safe (the cross-check matches what the renderer will use).
+    const content = mockContent(
+      '<EntityLink id="E42" />',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
+  });
+
+  it('auto-fix when display contains JSX (cannot extract plain text)', () => {
+    // We can't reliably slugify JSX-containing children, so fall back to the
+    // safer "always cross-check" behavior. A reviewer of the diff still sees
+    // the surrounding prose for context.
+    const content = mockContent(
+      '<EntityLink id="E42"><strong>Anthropic</strong></EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
+    expect(issues[0].fix!.newText).toBe('id="E42" name="anthropic"');
   });
 
   it('warns for unregistered wiki ID', () => {
@@ -1257,6 +1373,65 @@ describe('entitylink-ids rule', () => {
     );
     const issues = check(entityLinkIdsRule, content, engineWithRegistry);
     expect(issues.length).toBe(0);
+  });
+
+  it('rejects substring false-positive of short slug inside unrelated word (QUA-759)', () => {
+    // "Miriam Cohen" slugified contains the substring "miri" but is a
+    // different entity. A naive `includes` check would silently accept
+    // this — the validator must require word-boundary matching for short
+    // single-word slugs.
+    const content = mockContent(
+      '<EntityLink id="E100">Miriam Cohen</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('detects display mismatch in multi-line EntityLink (QUA-759)', () => {
+    // Multi-line EntityLink tags are valid MDX and appear in real content.
+    // The line-by-line scan must not silently fall through to the safe
+    // auto-fix path when the closing tag is on a later line.
+    const content = mockContent(
+      '<EntityLink id="E42">\n  Open Philanthropy\n</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engineWithRegistry);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).toBeNull();
+  });
+
+  it('matches via page title when entity has no YAML record', () => {
+    // Internal dashboards and many wiki pages have no YAML entity record;
+    // their canonical title lives only in the MDX frontmatter. The matcher
+    // must consult page titles too.
+    const engine = {
+      ...engineWithRegistry,
+      idRegistry: {
+        bySlug: { ...engineWithRegistry.idRegistry.bySlug, 'source-checks-dashboard': 'E2200' },
+        byWikiId: { ...engineWithRegistry.idRegistry.byWikiId, 'E2200': 'source-checks-dashboard' },
+      },
+      pathRegistry: { ...engineWithRegistry.pathRegistry, 'source-checks-dashboard': '/internal/source-checks/' },
+      // Note: no entry in `entities` for E2200 — only the slug exists.
+      _pageTitleByWikiId: { 'E2200': 'Source Checks' },
+    };
+    // The validator reads page titles via the loadPages() helper from
+    // content-types, so this test exercises the title-matching path
+    // through the slug fallback (using entity title via `engine.entities`).
+    // We add a stub entity record with title="Source Checks" since the
+    // mock engine doesn't share state with the loadPages() module cache.
+    engine.entities = [
+      ...engineWithRegistry.entities,
+      { id: 'source-checks-dashboard', title: 'Source Checks', type: 'page' },
+    ];
+    const content = mockContent(
+      '<EntityLink id="E2200">Source Checks</EntityLink>',
+    );
+    const issues = check(entityLinkIdsRule, content, engine);
+    expect(issues.length).toBe(1);
+    expect(issues[0].severity).toBe(Severity.WARNING);
+    expect(issues[0].fix).not.toBeNull();
   });
 });
 

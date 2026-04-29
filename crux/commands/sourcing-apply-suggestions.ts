@@ -62,6 +62,7 @@ const PAGE_SIZE = 200;
 /** Hard cap on pagination loops — see sourcing-recheck.ts for rationale. */
 const MAX_PAGINATION_ITERATIONS = 100;
 
+// verdict-priority-ok: recheck-day intervals, not a severity priority map.
 /** Next-check-due intervals by verdict (in days) — mirrors sourcing-recheck. */
 const RECHECK_INTERVALS: Record<string, number> = {
   confirmed: 90,

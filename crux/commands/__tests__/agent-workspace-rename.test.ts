@@ -18,6 +18,16 @@ vi.mock('child_process', async () => {
       execCalls.push({ cmd, opts });
       return execScript(cmd);
     }),
+    // After QUA-755 converted template-literal execSync calls to execFileSync
+    // arg arrays, recreate a shell-style command string so the existing
+    // assertions (`-t "1"`, `"LW"`, `rename-window`, `A3:feature-x`) still
+    // match. Flags stay unquoted, value args get wrapped in quotes.
+    execFileSync: vi.fn((file: string, args: readonly string[], opts?: unknown) => {
+      const quote = (a: string) => (a.startsWith('-') ? a : `"${a}"`);
+      const cmd = [file, ...args.map(quote)].join(' ');
+      execCalls.push({ cmd, opts });
+      return execScript(cmd);
+    }),
   };
 });
 

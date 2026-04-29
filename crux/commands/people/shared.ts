@@ -7,6 +7,7 @@ import * as path from 'path';
 import * as yaml from 'yaml';
 import { CUSTOM_TAGS } from '../../../packages/factbase/src/loader.ts';
 import type { CommandOptions as BaseOptions } from '../../lib/command-types.ts';
+import { exportEntities } from '../../lib/wiki-server/entities.ts';
 
 export type { BaseOptions };
 
@@ -260,6 +261,57 @@ export function buildAuthorLookup(people: PersonEntity[]): Map<string, string> {
   }
 
   return lookup;
+}
+
+/**
+ * Bundle of person-entity lookups derived from a single PG fetch.
+ */
+export interface PersonEntityIndex {
+  people: PersonEntity[];
+  /** slug → stableId */
+  slugToStableId: Map<string, string>;
+  /** stableId → title */
+  titleByStableId: Map<string, string>;
+}
+
+/**
+ * Load all person entities from PG (the source of truth — the `entities`
+ * table has substantially more persons than `data/entities/people.yaml`,
+ * since not every person gets a checked-in YAML row).
+ *
+ * Uses the export endpoint and paginates so the caller never silently
+ * truncates when person count exceeds the page cap.
+ */
+export async function loadPersonEntitiesFromPg(): Promise<PersonEntityIndex> {
+  // Matches EXPORT_MAX_LIMIT on the server route.
+  const PAGE_SIZE = 5000;
+  const people: PersonEntity[] = [];
+  const slugToStableId = new Map<string, string>();
+  const titleByStableId = new Map<string, string>();
+
+  let offset = 0;
+  for (;;) {
+    const result = await exportEntities({
+      entityType: 'person',
+      limit: PAGE_SIZE,
+      offset,
+    });
+    if (!result.ok) {
+      throw new Error(
+        `Failed to load person entities from wiki-server: ${result.message}`,
+      );
+    }
+    const { entities, total } = result.data;
+    for (const e of entities) {
+      people.push({ id: e.id, title: e.title, wikiId: e.wikiId ?? undefined });
+      slugToStableId.set(e.id, e.stableId);
+      titleByStableId.set(e.stableId, e.title);
+    }
+    offset += entities.length;
+    if (entities.length === 0 || offset >= total) break;
+  }
+
+  return { people, slugToStableId, titleByStableId };
 }
 
 /**

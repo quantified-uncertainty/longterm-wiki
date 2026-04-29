@@ -1,0 +1,127 @@
+{
+  "publishedAt": "2025-07-17",
+  "waveLabel": "Summer 2025",
+  "sourceUrl": "https://futureoflife.org/ai-safety-index-summer-2025/",
+  "methodologyUrl": "https://futureoflife.org/document/ai-safety-index-summer-2025-2-page-summary/",
+  "license": null,
+  "notes": "Scoring completed in early July 2025. Domain scores shown on the main scorecard are the grades visible in the desktop scoreboard grid. Per-domain detailed grades are drawn from the modal popups. Survey Responses domain is not graded with letter grades.",
+  "dimensions": [
+    {
+      "slug": "risk-assessment",
+      "label": "Risk Assessment",
+      "weight": null
+    },
+    {
+      "slug": "current-harms",
+      "label": "Current Harms",
+      "weight": null
+    },
+    {
+      "slug": "safety-frameworks",
+      "label": "Safety Frameworks",
+      "weight": null
+    },
+    {
+      "slug": "existential-safety",
+      "label": "Existential Safety",
+      "weight": null
+    },
+    {
+      "slug": "governance-accountability",
+      "label": "Governance & Accountability",
+      "weight": null
+    },
+    {
+      "slug": "information-sharing",
+      "label": "Information Sharing",
+      "weight": null
+    }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "C+",
+        "risk-assessment": "C+",
+        "current-harms": "B-",
+        "safety-frameworks": "C",
+        "existential-safety": "D",
+        "governance-accountability": "A-",
+        "information-sharing": "A-"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "C",
+        "risk-assessment": "C",
+        "current-harms": "B",
+        "safety-frameworks": "C",
+        "existential-safety": "F",
+        "governance-accountability": "C-",
+        "information-sharing": "B"
+      }
+    },
+    {
+      "org": "Google Deepmind",
+      "scores": {
+        "overall": "C-",
+        "risk-assessment": "C-",
+        "current-harms": "C+",
+        "safety-frameworks": "D+",
+        "existential-safety": "D-",
+        "governance-accountability": "D",
+        "information-sharing": "B"
+      }
+    },
+    {
+      "org": "x.AI",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "F",
+        "current-harms": "D+",
+        "safety-frameworks": "D+",
+        "existential-safety": "F",
+        "governance-accountability": "C-",
+        "information-sharing": "C+"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D",
+        "current-harms": "D+",
+        "safety-frameworks": "D+",
+        "existential-safety": "F",
+        "governance-accountability": "D-",
+        "information-sharing": "D"
+      }
+    },
+    {
+      "org": "Zhipu AI",
+      "scores": {
+        "overall": "F",
+        "risk-assessment": "F",
+        "current-harms": "D",
+        "safety-frameworks": "F",
+        "existential-safety": "F",
+        "governance-accountability": "D+",
+        "information-sharing": "D"
+      }
+    },
+    {
+      "org": "DeepSeek",
+      "scores": {
+        "overall": "F",
+        "risk-assessment": "F",
+        "current-harms": "D-",
+        "safety-frameworks": "F",
+        "existential-safety": "F",
+        "governance-accountability": "D+",
+        "information-sharing": "F"
+      }
+    }
+  ],
+  "isLatest": false
+}

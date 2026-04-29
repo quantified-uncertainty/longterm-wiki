@@ -9,7 +9,7 @@
  * tracking, and claim labels. New subcommand: `crux pr-patrol parallel`.
  */
 
-import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync, mkdirSync, rmSync, statSync } from 'fs';
 import { join } from 'path';
 import { execSync } from 'child_process';
 import { tryRebaseAndVerify } from './rebase-verify.ts';
@@ -139,10 +139,8 @@ function cleanStaleWorktrees(worktreeDir: string): void {
       const wtPath = join(worktreeDir, name);
       // If the worktree is older than 2 hours, it's stale
       try {
-        // Use platform-appropriate stat flag: -f %m (macOS) vs -c %Y (Linux)
-        const statFlag = process.platform === 'darwin' ? '-f %m' : '-c %Y';
-        const stat = execSync(`stat ${statFlag} "${wtPath}"`, { encoding: 'utf-8' }).trim();
-        const age = Date.now() / 1000 - Number(stat);
+        const mtime = statSync(wtPath).mtimeMs / 1000;
+        const age = Date.now() / 1000 - mtime;
         if (age > 2 * 60 * 60) {
           log(`  ${cl.yellow}Cleaning stale worktree: ${name}${cl.reset}`);
           removePatrolWorktree(wtPath);

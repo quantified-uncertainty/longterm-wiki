@@ -31,6 +31,13 @@ import {
   upsertUrlSuggestions,
 } from '../lib/wiki-server/sourcing-client.ts';
 import { suggestUrls, GENERATOR_MODEL } from '../lib/sourcing/suggest-urls.ts';
+import {
+  gradeSuggestion,
+  DEFAULT_GRADER_MODEL,
+  MAX_REASONING_CHARS,
+} from '../lib/sourcing/grade-suggestion.ts';
+import { createClient as createAnthropicClient } from '../lib/anthropic.ts';
+import { getEntityWikidataQid } from '../lib/sourcing/entity-wikidata-qid.ts';
 import type { SourcingVerdict } from '../../apps/wiki-server/src/api-types.ts';
 
 const DEFAULT_LIMIT = 50;
@@ -42,6 +49,11 @@ const PREFETCH_PAGE_SIZE = 200;
 const PREFETCH_MAX = 2000;
 const UPSERT_CHUNK = 100;
 const DEFAULT_CONCURRENCY = 5;
+// Server schema (apps/wiki-server/.../url-suggestions.ts SuggestionInput) caps
+// these fields. Search providers occasionally return values that exceed them,
+// which would reject the entire batch upsert (~100 records). Truncate defensively.
+const MAX_TITLE_CHARS = 500;
+const MAX_SNIPPET_CHARS = 2000;
 
 const DEFAULT_VERDICT: SourcingVerdict = 'unverifiable';
 // Only verdicts where weak source URLs are the suspected root cause.
@@ -73,6 +85,14 @@ if (!ALLOWED_SUGGEST_VERDICTS.has(DEFAULT_VERDICT)) {
   throw new Error(`DEFAULT_VERDICT "${DEFAULT_VERDICT}" is not in ALLOWED_SUGGEST_VERDICTS`);
 }
 
+export function clampForUpsert(
+  value: string | null | undefined,
+  max: number,
+): string | null | undefined {
+  if (value == null) return value;
+  return value.length <= max ? value : value.slice(0, max);
+}
+
 interface SuggestOptions extends BaseOptions {
   limit?: string;
   budget?: string;
@@ -87,6 +107,10 @@ interface SuggestOptions extends BaseOptions {
   ci?: boolean;
   'skip-existing'?: boolean;
   skipExisting?: boolean;
+  'auto-approve-threshold'?: string;
+  autoApproveThreshold?: string;
+  'auto-approve-model'?: string;
+  autoApproveModel?: string;
 }
 
 /**
@@ -119,6 +143,28 @@ function parsePositiveFloat(raw: unknown, fallback: number, flag: string): numbe
   return n;
 }
 
+type ThresholdResult =
+  | { ok: true; value: number | null }
+  | { ok: false; error: string };
+
+/**
+ * Parse a [0, 1] confidence threshold. Returns `value: null` when the flag
+ * is absent (auto-approve disabled). Out-of-range or non-numeric values
+ * fail loudly because auto-approval bypasses human review — a typo must
+ * not silently disable the feature.
+ */
+function parseAutoApproveThreshold(raw: unknown): ThresholdResult {
+  if (raw === undefined || raw === null || raw === '') return { ok: true, value: null };
+  const n = parseFloat(String(raw));
+  if (!Number.isFinite(n) || n < 0 || n > 1) {
+    return {
+      ok: false,
+      error: `Invalid --auto-approve-threshold "${String(raw)}". Must be a number in [0, 1].`,
+    };
+  }
+  return { ok: true, value: n };
+}
+
 /**
  * Minimal concurrency pool: runs up to `concurrency` tasks in parallel,
  * resolves when all complete. No external dependency.
@@ -146,11 +192,15 @@ interface RunSummary {
   skippedNoClaim: number;
   generatedForRecords: number;
   suggestionsWritten: number;
+  /** Candidates dropped by the subject-identity gate (QUA-724). */
+  subjectMismatchesDropped: number;
   providerErrors: number;
   costUsd: number;
   budgetExhausted: boolean;
   providersUsed: Set<string>;
   providersSkipped: Set<string>;
+  autoApprovedCandidates: number;
+  autoApproveGraderErrors: number;
 }
 
 function makeSummary(): RunSummary {
@@ -160,11 +210,14 @@ function makeSummary(): RunSummary {
     skippedNoClaim: 0,
     generatedForRecords: 0,
     suggestionsWritten: 0,
+    subjectMismatchesDropped: 0,
     providerErrors: 0,
     costUsd: 0,
     budgetExhausted: false,
     providersUsed: new Set(),
     providersSkipped: new Set(),
+    autoApprovedCandidates: 0,
+    autoApproveGraderErrors: 0,
   };
 }
 
@@ -183,11 +236,14 @@ function summaryToJson(s: RunSummary, dryRun: boolean) {
     skipped_no_claim: s.skippedNoClaim,
     generated_for_records: s.generatedForRecords,
     suggestions_written: s.suggestionsWritten,
+    subject_mismatches_dropped: s.subjectMismatchesDropped,
     provider_errors: s.providerErrors,
     cost_usd: Number(s.costUsd.toFixed(4)),
     budget_exhausted: s.budgetExhausted,
     providers_used: used,
     providers_skipped: skipped,
+    auto_approved_candidates: s.autoApprovedCandidates,
+    auto_approve_grader_errors: s.autoApproveGraderErrors,
     dry_run: dryRun,
   };
 }
@@ -198,6 +254,12 @@ function formatSummary(s: RunSummary, dryRun: boolean): string {
   const skippedLine = skipped.length > 0
     ? `\nProviders skipped:      ${skipped.join(', ')}`
     : '';
+  // Only include auto-approve lines when the feature was actually used
+  // (i.e. at least one candidate was graded). Keeps default output unchanged.
+  const autoApproveLines =
+    s.autoApprovedCandidates > 0 || s.autoApproveGraderErrors > 0
+      ? `\nAuto-approved:          ${s.autoApprovedCandidates}\nGrader errors:          ${s.autoApproveGraderErrors}`
+      : '';
   return (
 `
 === Summary ===
@@ -206,10 +268,11 @@ Skipped (had pending):  ${s.skippedHadSuggestion}
 Skipped (no claim):     ${s.skippedNoClaim}
 Generated for records:  ${s.generatedForRecords}
 Suggestions written:    ${s.suggestionsWritten}${dryRun ? ' (dry-run)' : ''}
+Subject mismatch drops: ${s.subjectMismatchesDropped}
 Provider errors:        ${s.providerErrors}
 Cost:                   $${s.costUsd.toFixed(4)}
 Budget exhausted:       ${s.budgetExhausted ? 'yes' : 'no'}
-Providers used:         ${usedList}${skippedLine}`
+Providers used:         ${usedList}${skippedLine}${autoApproveLines}`
   );
 }
 
@@ -265,6 +328,31 @@ async function suggestCommand(
   const skipExisting = options['skip-existing'] ?? options.skipExisting ?? true;
   const isJson = Boolean(options.json || options.ci);
 
+  const thresholdParsed = parseAutoApproveThreshold(
+    options['auto-approve-threshold'] ?? options.autoApproveThreshold,
+  );
+  if (!thresholdParsed.ok) {
+    return { exitCode: 1, output: thresholdParsed.error };
+  }
+  const autoApproveThreshold = thresholdParsed.value;
+  const autoApproveModel =
+    (options['auto-approve-model'] ?? options.autoApproveModel)?.trim() ||
+    DEFAULT_GRADER_MODEL;
+
+  // Reuse one Anthropic client across grader calls — `required: false` keeps
+  // a missing key from crashing the sweep, and the warning below tells the
+  // user every candidate will fail-closed to 'pending' rather than silently
+  // succeeding with a $0.00 cost line.
+  const graderClient =
+    autoApproveThreshold !== null
+      ? createAnthropicClient({ required: false })
+      : null;
+  if (autoApproveThreshold !== null && !graderClient) {
+    process.stderr.write(
+      'warning: --auto-approve-threshold is set but ANTHROPIC_BILLING_KEY is missing — every candidate will fail-closed to status=pending\n',
+    );
+  }
+
   const log = (msg: string) => { if (!isJson) console.log(msg); };
 
   log(`Sourcing Suggest URLs (QUA-64)`);
@@ -274,6 +362,9 @@ async function suggestCommand(
   log(`  max-candidates: ${maxCandidates}`);
   if (recordTypeFilter) log(`  record type:    ${recordTypeFilter}`);
   if (entityFilter) log(`  entity:         ${entityFilter}`);
+  if (autoApproveThreshold !== null) {
+    log(`  auto-approve:   threshold=${autoApproveThreshold} model=${autoApproveModel}`);
+  }
   if (dryRun) log(`  dry-run:        yes`);
   log('');
 
@@ -385,12 +476,19 @@ async function suggestCommand(
       return;
     }
 
+    // QUA-724: pass the entity's Wikidata QID (if known) so suggestUrls'
+    // subject-identity gate can drop candidates that point at a different
+    // Wikidata entity. Fail-open for entities with no recorded QID — the gate
+    // returns all candidates unchanged in that case.
+    const entityWikidataQid = getEntityWikidataQid(v.entityId);
+
     const result = await suggestUrls({
       entityName,
       claimText,
       fieldName: v.fieldName ?? undefined,
       existingUrl,
       maxCandidates,
+      entityWikidataQid,
     });
 
     summary.costUsd += result.costUsd;
@@ -399,23 +497,74 @@ async function suggestCommand(
       summary.providersSkipped.add(p);
       if (!p.endsWith(':no-key')) summary.providerErrors++;
     }
+    if (result.subjectMismatches.length > 0) {
+      summary.subjectMismatchesDropped += result.subjectMismatches.length;
+      // Per-record line so the dropped URL + offending QID are auditable
+      // alongside the existing dry-run/processing log entries.
+      for (const mm of result.subjectMismatches) {
+        log(
+          `  [subject-mismatch] ${v.recordType}/${v.recordId} ` +
+            `entity=${v.entityId ?? '?'} (Q=${mm.entityQid}) dropped ${mm.url} (Q=${mm.candidateQid})`,
+        );
+      }
+    }
 
     if (result.candidates.length === 0) return;
     summary.generatedForRecords++;
 
+    // Sequential grading bounds effective LLM concurrency to the outer
+    // DEFAULT_CONCURRENCY (5). A Promise.all here would fan out to
+    // records × candidates simultaneous Haiku calls and trip rate limits.
+    //
+    // Notes audit-trail rule: emit `notes` only when promoting to
+    // auto_verified. The server upsert is `notes = COALESCE(EXCLUDED.notes,
+    // sourcing_url_suggestions.notes)` and `status = CASE WHEN status =
+    // 'pending' THEN EXCLUDED.status ELSE status END`. So a re-run that
+    // grades a previously-promoted row below threshold would leave the
+    // status as 'auto_verified' but flip its notes to "below-threshold..."
+    // — contradictory. Omitting notes on non-promotion preserves any
+    // prior audit note. Aggregate visibility lives in the run summary's
+    // auto_approve_* counters.
+    const threshold = autoApproveThreshold;
     for (const cand of result.candidates) {
+      let status: 'pending' | 'auto_verified' = 'pending';
+      let notes: string | undefined;
+
+      if (threshold !== null) {
+        const outcome = await gradeSuggestion(
+          {
+            entityName,
+            claimText,
+            fieldName: v.fieldName ?? null,
+            candidate: { url: cand.url, title: cand.title, snippet: cand.snippet },
+          },
+          { model: autoApproveModel, client: graderClient ?? undefined },
+        );
+        summary.costUsd += outcome.costUsd;
+        if (outcome.ok) {
+          if (outcome.confidence >= threshold) {
+            status = 'auto_verified';
+            summary.autoApprovedCandidates++;
+            notes = `auto-approve: confidence=${outcome.confidence.toFixed(2)} model=${autoApproveModel} reasoning=${outcome.reasoning.slice(0, MAX_REASONING_CHARS)}`;
+          }
+        } else {
+          summary.autoApproveGraderErrors++;
+        }
+      }
+
       toUpsert.push({
         recordType: v.recordType,
         recordId: v.recordId,
         fieldName: v.fieldName,
         entityId: v.entityId,
         suggestedUrl: cand.url,
-        title: cand.title,
-        snippet: cand.snippet,
+        title: clampForUpsert(cand.title, MAX_TITLE_CHARS),
+        snippet: clampForUpsert(cand.snippet, MAX_SNIPPET_CHARS),
         relevanceScore: cand.relevanceScore,
         sourceProvider: cand.sourceProvider,
         generatorModel: GENERATOR_MODEL,
-        status: 'pending',
+        status,
+        ...(notes !== undefined && { notes }),
       });
     }
   });
@@ -466,6 +615,11 @@ Options:
   --entity=X             Filter by entityId or entityDisplayName
   --max-candidates=N     Candidates per record (default: ${DEFAULT_MAX_CANDIDATES}, max: ${MAX_CANDIDATES_PER_RECORD})
   --skip-existing        Skip records with existing pending suggestions (default: on)
+  --auto-approve-threshold=N   LLM-grade each candidate (title+snippet only; no fetch)
+                         and write status='auto_verified' for confidence >= N (0..1).
+                         Default: off (all suggestions stay 'pending'). Grader failures
+                         fail-closed to 'pending'.
+  --auto-approve-model=X       Override the grader model (default: ${DEFAULT_GRADER_MODEL}).
   --dry-run              Enumerate records without calling providers or writing
   --json / --ci          Machine-readable JSON output
 
@@ -475,7 +629,9 @@ Workflow:
   3. Batch-upserts candidates to /api/sourcing/url-suggestions for human review
      or auto-recheck. Human decisions (approved/rejected) are preserved on re-runs.
 
-Requires EXA_API_KEY and/or OPENROUTER_API_KEY. Missing keys degrade gracefully.
+Requires EXA_API_KEY and/or OPENROUTER_API_KEY for URL discovery. Missing keys
+degrade gracefully (--auto-approve-threshold additionally requires
+ANTHROPIC_BILLING_KEY; missing it fails-closed: every grade returns "pending").
 Requires WIKI_SERVER_ENV=prod in agent slots.
 `.trim();
 }

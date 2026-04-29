@@ -23,6 +23,7 @@ import { summarizeRecordForManifest } from '../tablebase/manifest-record.ts';
 import { commands as backfillGranteeIdsCommands } from './backfill-grantee-ids.ts';
 import { commands as backfillProgramIdsCommands } from './backfill-program-ids.ts';
 import { commands as backfillStableIdsCommands } from './backfill-stable-ids.ts';
+import { commands as backfillSourcesCommands } from './backfill-sources.ts';
 import { commands as backfillYamlStableIdsCommands } from './backfill-yaml-stable-ids.ts';
 import { commands as importGrantsCommands } from './import-grants.ts';
 import { commands as importDivisionsCommands } from './import-divisions.ts';
@@ -605,8 +606,8 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
     return { exitCode: 1, output: 'Usage: crux tb tablebase fetch-page <url>\nExtracts rendered text from a page using Playwright (handles JavaScript-rendered content).' };
   }
 
-  const { execSync } = await import('child_process');
-  const { writeFileSync, unlinkSync } = await import('fs');
+  const { execSync, execFileSync } = await import('child_process');
+  const { writeFileSync, unlinkSync, realpathSync } = await import('fs');
   const { tmpdir } = await import('os');
   const { join } = await import('path');
 
@@ -629,9 +630,9 @@ async function fetchPageCommand(args: string[], _options: CommandOptions): Promi
   // Resolve playwright's node_modules path dynamically
   let nodePath: string | undefined;
   try {
-    const playwrightPath = execSync('which playwright', { encoding: 'utf-8' }).trim();
+    const playwrightPath = execFileSync('which', ['playwright'], { encoding: 'utf-8' }).trim();
     // Follow symlinks: /opt/homebrew/bin/playwright → ../lib/node_modules/playwright/...
-    const resolved = execSync(`realpath "${playwrightPath}"`, { encoding: 'utf-8' }).trim();
+    const resolved = realpathSync(playwrightPath);
     nodePath = resolved.replace(/\/playwright.*$/, '');
   } catch {
     // Fall back to common paths
@@ -1456,6 +1457,7 @@ export const commands = {
   'backfill-grantee-ids': backfillGranteeIdsCommands.default,
   'backfill-program-ids': backfillProgramIdsCommands.default,
   'backfill-stable-ids': backfillStableIdsCommands.run,
+  'backfill-sources': backfillSourcesCommands.default,
   'backfill-yaml-stable-ids': backfillYamlStableIdsCommands.run,
   // Consolidated from import-* orphan domains
   'import-grants': importGrantsCommands.default,
@@ -1541,6 +1543,7 @@ Commands:
   backfill-grantee-ids [--dry-run]       Link grants to grantee entity stableIds
   backfill-program-ids [--dry-run]       Link grants to funding programs
   backfill-stable-ids [--dry-run]        Push KB stableIds to wiki-server entity_ids
+  backfill-sources [--dry-run|--apply]   Find source URLs for records with no source
   backfill-yaml-stable-ids [--dry-run]   Insert stableIds into entity YAML files
 
   Import (consolidated from import-* domains):

@@ -2547,6 +2547,7 @@
   summaryPage: labs-overview
   title: Meta AI (FAIR)
   aliases:
+    - Meta
     - Meta AI
     - FAIR
     - Facebook AI Research
@@ -9451,4 +9452,128 @@
   orgType: startup
   title: Fathom Radiant
   description: AI hardware company.
+
+# QUA-750 — lightweight org entities for SaferAI scorecard ingest
+- id: cohere
+  stableId: sid_JDg4Sr7Cr1
+  type: organization
+  orgType: frontier-lab
+  title: Cohere
+  website: https://cohere.com
+  description: >-
+    Toronto-based AI company building large language models for enterprise
+    use, founded by ex-Google Brain researchers including Aidan Gomez (a
+    "Attention Is All You Need" co-author). Develops the Command family
+    of models with a focus on retrieval-augmented generation and
+    multilingual capability.
+
+- id: g42
+  stableId: sid_m2o07tj196
+  type: organization
+  orgType: frontier-lab
+  title: G42
+  aliases:
+    - G42 (Group 42)
+  website: https://g42.ai
+  description: >-
+    Abu Dhabi-based AI and cloud-computing holding company chaired by
+    Sheikh Tahnoon bin Zayed Al Nahyan. Builds the Falcon and Jais
+    foundation-model families and operates regional cloud infrastructure;
+    received a $1.5B Microsoft investment in April 2024.
+
+- id: magic
+  stableId: sid_lSkLLa6gqy
+  type: organization
+  orgType: startup
+  title: Magic
+  aliases:
+    - Magic.dev
+    - Magic AI
+  website: https://magic.dev
+  description: >-
+    San Francisco AI startup focused on training frontier coding-agent
+    models with very long context windows. Backed by Nat Friedman,
+    Daniel Gross, CapitalG, and others.
+
+- id: naver
+  stableId: sid_574DWqM1nU
+  type: organization
+  orgType: frontier-lab
+  title: Naver
+  aliases:
+    - NAVER
+    - Naver Corporation
+    - Naver Cloud
+  website: https://www.navercorp.com
+  description: >-
+    South Korean technology conglomerate operating the Naver search
+    portal, LINE messenger, and Naver Cloud. Develops the HyperCLOVA X
+    family of large language models, optimised for Korean and other
+    Asian languages.
+
+# QUA-752 — lightweight org entities for Seoul Commitment Tracker ingest
+- id: samsung-electronics
+  stableId: sid_vtVXpMSmLA
+  type: organization
+  orgType: frontier-lab
+  title: Samsung Electronics
+  aliases:
+    - Samsung
+  website: https://www.samsung.com
+  description: >-
+    South Korean multinational electronics conglomerate and the largest
+    Samsung Group affiliate. Operates Samsung Research, which develops
+    the Gauss family of generative-AI models (text, code, image) used
+    inside Galaxy devices and consumer software. Signed the Frontier AI
+    Safety Commitments at the 2024 AI Seoul Summit.
+
+- id: technology-innovation-institute
+  stableId: sid_vdiqZuY7zQ
+  type: organization
+  orgType: frontier-lab
+  title: Technology Innovation Institute
+  aliases:
+    - TII
+    - TII UAE
+  website: https://www.tii.ae
+  description: >-
+    Abu Dhabi government-backed applied research institute under the
+    Advanced Technology Research Council. Best known for the open-weight
+    Falcon family of large language models (Falcon-7B/40B/180B and
+    Falcon 2). Signed the Frontier AI Safety Commitments at the 2024
+    AI Seoul Summit.
+
+# QUA-749/QUA-752 — merged: FLI (rebranded Z.ai) + Seoul Commitment Tracker (Zhipu.ai)
+- id: zhipu-ai
+  stableId: sid_DjBpGIOiGQ
+  type: organization
+  orgType: frontier-lab
+  title: Z.ai
+  aliases:
+    - Z.ai
+    - Zhipu AI
+    - Zhipu
+    - 智谱AI
+    - Zhipu.ai
+    - 智谱 AI
+  website: https://z.ai
+  description: >-
+    Chinese AI lab founded as Zhipu AI in 2019, rebranded to Z.ai in 2025.
+    Develops the GLM family of large language models. Signed the Frontier
+    AI Safety Commitments at the 2024 AI Seoul Summit.
+
+# QUA-749 — lightweight org entity surfaced by FLI scorecard ingestion
+- id: alibaba-cloud
+  stableId: sid_eBJi3sqy7w
+  type: organization
+  orgType: frontier-lab
+  title: Alibaba Cloud
+  aliases:
+    - Alibaba
+    - Aliyun
+    - 阿里云
+  website: https://www.alibabacloud.com
+  description: >-
+    Cloud-computing arm of Alibaba Group. Develops the Qwen series of
+    foundation models. Surfaced through FLI AI Safety Index ingestion.
 

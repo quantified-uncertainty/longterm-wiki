@@ -15,7 +15,7 @@ import { EntityLink } from '@components/wiki';
 
 ## Overview
 
-Ordinary cyber damage — annual ransomware, fraud, breaches — extrapolates linearly. Even the most aggressive aggregate estimates surveyed in <EntityLink id="E2515" name="ai-cyber-damage-estimates">AI Cyber Damage Estimates</EntityLink> (Cybersecurity Ventures' \$10.5T/yr for 2025) reach a few percent of global GDP only by including productivity loss, IP theft, and reputational harm — categories that are largely already counted elsewhere in national accounts. Reaching damages of >10% of global GDP (≈\$11T+) plausibly requires a *cascading single-event failure* in a system that nearly every modern economy depends on.
+Ordinary cyber damage — annual ransomware, fraud, breaches — extrapolates linearly. Even the most aggressive aggregate estimates surveyed in AI Cyber Damage Estimates (Cybersecurity Ventures' \$10.5T/yr for 2025) reach a few percent of global GDP only by including productivity loss, IP theft, and reputational harm — categories that are largely already counted elsewhere in national accounts. Reaching damages of >10% of global GDP (≈\$11T+) plausibly requires a *cascading single-event failure* in a system that nearly every modern economy depends on.
 
 This page catalogs the candidate single points of failure. Each has the structural feature of high concentration (one or a few providers) and broad downstream coupling (many sectors depend on it), making cascade plausible. The page does not estimate probabilities of each scenario — that is the synthesis question for the forthcoming Bounding the Tail page (QUA-721). It asks the prior question: *which catastrophic scenarios are even reachable, given the structure of the affected systems?*
 
@@ -23,11 +23,11 @@ This page catalogs the candidate single points of failure. Each has the structur
 
 Three observations bound non-cascade scenarios:
 
-1. **The insurance market caps insurable cyber loss at ≈\$20-46B per Munich Re's 200-year return period estimate** (see <EntityLink id="E2516" name="cyber-insurance-market-signals">Cyber Insurance Market Signals</EntityLink>). The market's capacity reflects its read of the diversifiable upper bound. Above this point, losses become uninsurable — they require sovereign-scale backstops or do not get covered at all.
+1. **The insurance market caps insurable cyber loss at ≈\$20-46B per Munich Re's 200-year return period estimate** (see Cyber Insurance Market Signals). The market's capacity reflects its read of the diversifiable upper bound. Above this point, losses become uninsurable — they require sovereign-scale backstops or do not get covered at all.
 
 2. **Empirical aggregate cyber loss has stayed below ~1% of GDP** in every year for which reasonable estimates exist (Romanosky 2016 estimated ≈\$8.5B/yr documented; FBI IC3 reports ≈\$16.6B in 2024 US-only). Even adopting the aggressive Cybersecurity Ventures figures (\$10.5T/yr in 2025) puts cyber damage at ~9.5% of global GDP — and most of that figure is productivity and indirect costs that may double-count GDP itself.
 
-3. **Linear scaling of attack count cannot multiply 10x** without infrastructure that does not exist. The 2025 Anthropic-disclosed AI-orchestrated campaign (see <EntityLink id="E2514" name="cyber-incident-anthropic-disclosed-2025">incident</EntityLink>) reached ~30 targets with the AI [performing 80-90% of tactical operations autonomously and generating multiple requests per second](https://www.anthropic.com/news/disrupting-AI-espionage) — many orders of magnitude faster than a human team — yet only resulted in a small number of confirmed breaches. Even hypothetically scaling concurrent volume to attack every Fortune 500 simultaneously, plausible aggregate damages remain on the order of \$50-500B, not \$10T+, because the bottleneck is target validation and post-exploitation persistence rather than raw operation speed.
+3. **Linear scaling of attack count cannot multiply 10x** without infrastructure that does not exist. The 2025 Anthropic-disclosed AI-orchestrated campaign (see incident) reached ~30 targets with the AI [performing 80-90% of tactical operations autonomously and generating multiple requests per second](https://www.anthropic.com/news/disrupting-AI-espionage) — many orders of magnitude faster than a human team — yet only resulted in a small number of confirmed breaches. Even hypothetically scaling concurrent volume to attack every Fortune 500 simultaneously, plausible aggregate damages remain on the order of \$50-500B, not \$10T+, because the bottleneck is target validation and post-exploitation persistence rather than raw operation speed.
 
 Reaching the 10% GDP threshold therefore requires *cascade* — one event compromising a system that many other systems depend on, propagating through indirect economic channels.
 
@@ -73,7 +73,7 @@ Siemens, Rockwell, Schneider Electric, and Honeywell control ~70-80% of global i
 
 ### Healthcare clearinghouses
 
-The February 2024 Change Healthcare breach (see <EntityLink id="E2513" name="cyber-incident-change-healthcare">incident</EntityLink>) processed roughly one-third of US healthcare claims and froze pharmacy fulfillment and provider revenue for weeks. UnitedHealth has reported ≈\$2.87B in direct costs as of FY2024 reports. A coordinated attack hitting the top 3-5 healthcare clearinghouses simultaneously would freeze nearly all US healthcare claims processing — sector cumulative cascade plausibly reaching \$50-200B over weeks.
+The February 2024 Change Healthcare breach (see incident) processed roughly one-third of US healthcare claims and froze pharmacy fulfillment and provider revenue for weeks. UnitedHealth has reported ≈\$2.87B in direct costs as of FY2024 reports. A coordinated attack hitting the top 3-5 healthcare clearinghouses simultaneously would freeze nearly all US healthcare claims processing — sector cumulative cascade plausibly reaching \$50-200B over weeks.
 
 **GDP exposure:** 17% of US GDP is healthcare; clearinghouse layer touches most of that flow.
 **Plausible single-event range:** \$50B-\$500B.
@@ -87,7 +87,7 @@ The 13 root DNS servers and the small number of widely-trusted certificate autho
 
 ### Major SaaS dependencies
 
-Salesforce (~150K enterprise customers including most Fortune 500), ServiceNow (~75% of Fortune 500), and Workday (~50% of Fortune 500 for HR/payroll) form a SaaS triumvirate that runs significant fractions of enterprise back-office. The CDK Global precedent (see <EntityLink id="E2512" name="cyber-incident-cdk-global">incident</EntityLink>) showed that a 2-week disruption of dealer-management SaaS produces ≈\$1B in customer losses for ~15,000 dealerships. Salesforce or Workday-magnitude disruption (10x more customers, more critical workflows) would plausibly produce \$50-200B in downstream losses over comparable duration.
+Salesforce (~150K enterprise customers including most Fortune 500), ServiceNow (~75% of Fortune 500), and Workday (~50% of Fortune 500 for HR/payroll) form a SaaS triumvirate that runs significant fractions of enterprise back-office. The CDK Global precedent (see incident) showed that a 2-week disruption of dealer-management SaaS produces ≈\$1B in customer losses for ~15,000 dealerships. Salesforce or Workday-magnitude disruption (10x more customers, more critical workflows) would plausibly produce \$50-200B in downstream losses over comparable duration.
 
 **GDP exposure:** 10-15% (enterprise back-office).
 **Plausible single-event range:** \$50B-\$500B.
@@ -118,9 +118,9 @@ Windows runs ~70% of desktops; Chrome (with Chromium-derived browsers) dominates
 
 10% of \$110T global GDP is roughly \$11T. Of the eight scenarios cataloged, only **payment systems** approach this threshold within the cited range — at the aggressive high end (\$10T ≈ 9% of global GDP), it is just below 10% rather than crossing it. **Hyperscaler cloud**, **industrial control systems**, and **OS/browser monoculture** reach the 10% threshold only under above-aggressive assumptions that exceed the upper bounds in the table (simultaneous multi-target attack, multi-week duration, full data corruption rather than mere unavailability).
 
-This is consistent with the conclusion in <EntityLink id="E2516" name="cyber-insurance-market-signals">Cyber Insurance Market Signals</EntityLink>: the market does not believe such events are insurable at any reasonable price, and accordingly excludes them from cyber wordings (war / state-actor exclusions, capacity ceilings). The signal from market behavior is not "10% GDP cyber events are impossible" but "10% GDP cyber events are uninsurable, which means they belong in the sovereign-default / inflation / war risk bucket, not the insurable risk bucket."
+This is consistent with the conclusion in Cyber Insurance Market Signals: the market does not believe such events are insurable at any reasonable price, and accordingly excludes them from cyber wordings (war / state-actor exclusions, capacity ceilings). The signal from market behavior is not "10% GDP cyber events are impossible" but "10% GDP cyber events are uninsurable, which means they belong in the sovereign-default / inflation / war risk bucket, not the insurable risk bucket."
 
-For probability-weighted synthesis of these scenarios with capability-trajectory and attribution analysis, see <EntityLink id="E2520" name="ai-cyber-damage-bounding-tail">AI Cyber Damage: Bounding the Tail</EntityLink>.
+For probability-weighted synthesis of these scenarios with capability-trajectory and attribution analysis, see AI Cyber Damage: Bounding the Tail.
 
 ## Sources
 
@@ -132,5 +132,5 @@ For probability-weighted synthesis of these scenarios with capability-trajectory
 - Reuters. ["Cyber Heist on Bangladesh Bank"](https://www.reuters.com/article/cyber-heist-bangladesh-idINKBN17H1CG/) (April 2017).
 - Wikipedia. ["DigiNotar"](https://en.wikipedia.org/wiki/DigiNotar) — CA compromise 2011.
 - Munich Re. ["Cyber Insurance: Risks and Trends 2025"](https://www.munichre.com/en/insights/cyber/cyber-insurance-risks-and-trends-2025.html) — 200-year return period estimate.
-- See <EntityLink id="E2515" name="ai-cyber-damage-estimates">AI Cyber Damage Estimates</EntityLink> for damage-estimate methodology comparison.
-- See <EntityLink id="E2516" name="cyber-insurance-market-signals">Cyber Insurance Market Signals</EntityLink> for revealed-preference market analysis.
+- See AI Cyber Damage Estimates for damage-estimate methodology comparison.
+- See Cyber Insurance Market Signals for revealed-preference market analysis.

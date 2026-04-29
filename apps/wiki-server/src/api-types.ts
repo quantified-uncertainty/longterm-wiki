@@ -967,6 +967,18 @@ export const UpdateResourceFetchStatusSchema = z.object({
   fetchStatus: z.enum(["ok", "dead", "soft_404", "not_found", "timeout", "unreachable", "paywall", "error"]),
   lastFetchedAt: z.string().datetime(),
   fetchedTitle: z.string().max(1000).optional(),
+  /**
+   * SHA-256 prefix (lowercase hex) of the freshly-fetched content. When
+   * provided, persisted to `resources.content_hash` so subsequent re-ingest
+   * jobs can pass it as `previousContentHash` and detect content drift via
+   * the QUA-312 Phase 2 skip-guard bypass. Null/empty content (dead links,
+   * paywalls) skips this update. Soft-404 / cookie-wall responses also
+   * skip — see resource-ingest.ts persistedHash logic.
+   *
+   * Length cap of 64 accommodates any prefix of SHA-256 (production today
+   * uses the first 16 hex via CONTENT_HASH_PREFIX_LENGTH).
+   */
+  contentHash: z.string().regex(/^[0-9a-f]+$/, "must be lowercase hex").min(1).max(64).optional(),
 });
 export type UpdateResourceFetchStatus = z.infer<typeof UpdateResourceFetchStatusSchema>;
 
@@ -1007,6 +1019,13 @@ export type ContentStatus = (typeof CONTENT_STATUS_VALUES)[number];
 // Entities
 // ---------------------------------------------------------------------------
 
+/**
+ * Editorial status values for entities. Matches the EntityStatus Zod enum in
+ * data/schema.ts and the CHECK constraint chk_entities_status added in
+ * migration 0218 (QUA-526). Update all three together if values change.
+ */
+export const ENTITY_STATUS_VALUES = ["stub", "draft", "published", "verified"] as const;
+
 export const SyncEntitySchema = z.object({
   id: z.string().min(1).max(300),
   wikiId: z.string().max(20).nullable().optional(),
@@ -1017,7 +1036,7 @@ export const SyncEntitySchema = z.object({
   website: z.string().max(2000).nullable().optional(),
   tags: z.array(z.string().max(200)).max(100).nullable().optional(),
   clusters: z.array(z.string().max(200)).max(50).nullable().optional(),
-  status: z.string().max(100).nullable().optional(),
+  status: z.enum(ENTITY_STATUS_VALUES).nullable().optional(),
   lastUpdated: z.string().max(50).nullable().optional(),
   customFields: z
     .array(

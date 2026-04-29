@@ -681,11 +681,15 @@ const resourcesApp = new Hono()
       title: string | null;
       fetched_at: string | Date | null;
       has_content: boolean;
+      // QUA-329: include the resource's persisted content_hash so the
+      // resource-ingest job below can pass it as previousContentHash and
+      // detect content drift on re-fetch.
+      content_hash: string | null;
     }
     const existingRows: ResourceWithContent[] =
       allVariants.length > 0
         ? await rawDb<ResourceWithContent[]>`
-            SELECT r.id, r.url, r.title, cc.fetched_at,
+            SELECT r.id, r.url, r.title, r.content_hash, cc.fetched_at,
               (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
             FROM resources r
             LEFT JOIN citation_content cc ON cc.resource_id = r.id
@@ -723,7 +727,7 @@ const resourcesApp = new Hono()
           AS t(id, url, stable_id),
           LATERAL (SELECT 'web'::text AS type, now() AS created_at, now() AS updated_at) defaults
         ON CONFLICT (url) DO UPDATE SET updated_at = now()
-        RETURNING id, url, title, null::timestamptz AS fetched_at, false AS has_content
+        RETURNING id, url, title, content_hash, null::timestamptz AS fetched_at, false AS has_content
       `;
       for (const row of created) {
         // Find which input URL this row corresponds to
@@ -741,7 +745,7 @@ const resourcesApp = new Hono()
         if (!urlToResource.has(url)) {
           const variants = urlVariants(url);
           const fallback = await rawDb<ResourceWithContent[]>`
-            SELECT r.id, r.url, r.title, cc.fetched_at,
+            SELECT r.id, r.url, r.title, r.content_hash, cc.fetched_at,
               (cc.full_text IS NOT NULL AND length(cc.full_text) > 0) AS has_content
             FROM resources r
             LEFT JOIN citation_content cc ON cc.resource_id = r.id
@@ -753,7 +757,7 @@ const resourcesApp = new Hono()
           } else {
             logger.warn({ url, id: hashId(url) }, "suggest: could not resolve resource — using fallback");
             urlToResource.set(url, {
-              id: hashId(url), url, title: null, fetched_at: null, has_content: false,
+              id: hashId(url), url, title: null, fetched_at: null, has_content: false, content_hash: null,
             });
           }
         }
@@ -778,6 +782,9 @@ const resourcesApp = new Hono()
         resourceId: r.id,
         contentStatus,
         title: r.title,
+        // QUA-329: surface the previously-recorded content hash so the
+        // resource-ingest job below can pass it as previousContentHash.
+        contentHash: r.content_hash,
         jobId: null as number | null,
       };
     });
@@ -812,17 +819,29 @@ const resourcesApp = new Hono()
       }
 
       // Insert jobs with dedup keys using raw SQL for ON CONFLICT dedup
-      // (same pattern as jobs.ts DEDUP_INSERT_SQL)
+      // (same pattern as jobs.ts DEDUP_INSERT_SQL).
+      // QUA-329: when the resource has a previously-recorded content_hash
+      // (i.e. it's been fetched before — typical for "stale" status), pass
+      // it as previousContentHash so the ingest handler can detect drift.
+      // For "missing" content, contentHash is null and the field is omitted.
       for (const item of toIngest) {
         const citCount = citationCountMap.get(item.resourceId) ?? 0;
         const priority = Math.min(100, citCount * 5);
         const dedupKey = `batch:${batchId}:${item.resourceId}`;
 
+        const jobParams: Record<string, unknown> = {
+          resourceId: item.resourceId,
+          url: item.url,
+        };
+        if (item.contentHash) {
+          jobParams.previousContentHash = item.contentHash;
+        }
+
         const insertResult = await rawDb<{ id: number }[]>`
           INSERT INTO jobs (type, params, priority, max_retries, dedup_key)
           VALUES (
             'resource-ingest',
-            ${JSON.stringify({ resourceId: item.resourceId, url: item.url })}::jsonb,
+            ${JSON.stringify(jobParams)}::jsonb,
             ${priority},
             3,
             ${dedupKey}
@@ -1502,7 +1521,7 @@ const resourcesApp = new Hono()
     const id = c.req.param("id");
     const db = getDrizzleDb();
 
-    const { fetchStatus, lastFetchedAt, fetchedTitle } = c.req.valid("json");
+    const { fetchStatus, lastFetchedAt, fetchedTitle, contentHash } = c.req.valid("json");
 
     const updateSet: Record<string, unknown> = {
       fetchStatus,
@@ -1513,6 +1532,14 @@ const resourcesApp = new Hono()
     // Optionally update title if provided and resource has no title yet
     if (fetchedTitle) {
       updateSet.title = sql`COALESCE(${resources.title}, ${fetchedTitle})`;
+    }
+
+    // QUA-329: persist the freshly-computed content hash so future re-ingests
+    // can pass it as `previousContentHash` and the skip-guard bypass activates
+    // when content drifts. Always overwrite when provided — the most-recent
+    // fetch wins.
+    if (contentHash) {
+      updateSet.contentHash = contentHash;
     }
 
     const updated = await db

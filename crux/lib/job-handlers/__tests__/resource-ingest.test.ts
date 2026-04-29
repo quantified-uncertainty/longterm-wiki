@@ -46,7 +46,7 @@ vi.mock('../../wiki-server/resources.ts', () => ({
   findResourcesByContentHash: (...args: unknown[]) => mockFindResourcesByContentHash(...args),
 }));
 
-const mockCreateJob = vi.fn<() => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
+const mockCreateJob = vi.fn<(...args: unknown[]) => Promise<{ ok: boolean; data: Record<string, unknown> }>>();
 
 vi.mock('../../wiki-server/jobs.ts', () => ({
   createJob: (...args: unknown[]) => mockCreateJob(...args),
@@ -346,6 +346,94 @@ describe('handleResourceIngest — fetch_status persistence', () => {
       expect.objectContaining({ fetchStatus: 'not_found' }),
     );
   });
+
+  // QUA-329: persist freshly-computed contentHash so the next re-ingest can
+  // pass it as previousContentHash and detect drift.
+  it('persists contentHash to resources.content_hash on a reachable fetch', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    const content = 'A new article version about AI safety.';
+    mockFetchSource.mockResolvedValue(mockFetchResult({ content }));
+
+    await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/article' },
+      CTX,
+    );
+
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-1',
+      expect.objectContaining({
+        fetchStatus: 'ok',
+        contentHash: expectedHash(content),
+      }),
+    );
+  });
+
+  it('does NOT include contentHash in the patch when content is empty', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: '',
+    }));
+
+    await handleResourceIngest(
+      { resourceId: 'res-1', url: 'https://example.com/empty' },
+      CTX,
+    );
+
+    const call = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls[0];
+    expect(call?.[1]).not.toHaveProperty('contentHash');
+  });
+
+  // QUA-329 review: soft_404 / cookie_blocked pages still produce a content
+  // body and a hash, but it's the hash of the placeholder, not real content.
+  // Persisting it would lock future re-ingests into contentChanged:false even
+  // after the page recovers, permanently blocking re-enrichment.
+  it('does NOT persist contentHash for soft_404 status', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      status: 'ok' as FetchedSourceStatus,
+      httpStatus: 200,
+      content: 'Page not found. The page you requested does not exist.',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-soft404', url: 'https://example.com/missing' },
+      CTX,
+    );
+
+    expect(result.data.status).toBe('soft_404');
+
+    const calls = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls;
+    const softCall = calls.find((c) => (c?.[0] as string) === 'res-soft404');
+    expect(softCall, 'fetch-status patch should be issued for the resource').toBeTruthy();
+    expect(softCall?.[1]).not.toHaveProperty('contentHash');
+  });
+
+  it('does NOT persist contentHash for cookie_blocked status', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+    // A short page with cookie-consent text triggers cookie_blocked internal
+    // status. Note: toFetchStatus() maps cookie_blocked → 'error' for the
+    // wire format, so the patch's fetchStatus is 'error' (not 'cookie_blocked').
+    // The internal-status assertion lives on result.data.status separately.
+    mockFetchSource.mockResolvedValue(mockFetchResult({
+      content: '<html><body><h1>This site requires cookies</h1><p>Please enable cookies to continue.</p></body></html>',
+    }));
+
+    const result = await handleResourceIngest(
+      { resourceId: 'res-cookie', url: 'https://example.com/wall' },
+      CTX,
+    );
+
+    // Confirm the cookie path was actually exercised
+    expect(result.data.status).toBe('cookie_blocked');
+
+    // The persisted patch should NOT carry contentHash (status !== 'reachable')
+    const calls = (updateResourceFetchStatus as ReturnType<typeof vi.fn>).mock.calls;
+    const cookieCall = calls.find((c) => (c?.[0] as string) === 'res-cookie');
+    expect(cookieCall, 'fetch-status patch should be issued for the resource').toBeTruthy();
+    expect(cookieCall?.[1]).not.toHaveProperty('contentHash');
+  });
 });
 
 describe('handleResourceIngest — enrichment chaining', () => {
@@ -454,6 +542,70 @@ describe('handleResourceIngest — enrichment chaining', () => {
         // No contentChanged key on params when content is unchanged
         params: { resourceId: 'res-1', url: 'https://example.com/article' },
         dedupKey: 'resource-enrich:res-1',
+      }),
+    );
+  });
+
+  // QUA-329 end-to-end: this test simulates the temporal flow of the fix.
+  // Ingest #1 fetches initial content and persists its hash. Ingest #2 reads
+  // back the persisted hash (as previousContentHash) and detects a content
+  // change, which propagates contentChanged: true into the resource-enrich
+  // job — this is the bypass that activates QUA-312 Phase 2 in production.
+  it('round-trips contentHash from ingest #1 to previousContentHash on ingest #2', async () => {
+    const { updateResourceFetchStatus } = await import('../../wiki-server/resources.ts');
+
+    // ----- Ingest #1: initial fetch -----
+    const v1 = 'Original article content.';
+    mockFetchSource.mockResolvedValueOnce(mockFetchResult({ content: v1 }));
+
+    const result1 = await handleResourceIngest(
+      { resourceId: 'res-roundtrip', url: 'https://example.com/article' },
+      CTX,
+    );
+    expect(result1.success).toBe(true);
+    expect(result1.data.contentHash).toBe(expectedHash(v1));
+
+    // The hash from ingest #1 is what would be stored in resources.content_hash.
+    expect(updateResourceFetchStatus).toHaveBeenCalledWith(
+      'res-roundtrip',
+      expect.objectContaining({ contentHash: expectedHash(v1) }),
+    );
+
+    // The first ingest enqueued a resource-enrich job WITHOUT contentChanged
+    // (no previousContentHash was supplied) — initial enrichment runs normally.
+    expect(mockCreateJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-enrich',
+        params: { resourceId: 'res-roundtrip', url: 'https://example.com/article' },
+      }),
+    );
+
+    mockCreateJob.mockClear();
+
+    // ----- Ingest #2: re-ingest with the persisted hash and DIFFERENT content -----
+    const v2 = 'Updated article content with new claims.';
+    mockFetchSource.mockResolvedValueOnce(mockFetchResult({ content: v2 }));
+
+    const result2 = await handleResourceIngest(
+      {
+        resourceId: 'res-roundtrip',
+        url: 'https://example.com/article',
+        previousContentHash: expectedHash(v1), // what listResources / /suggest would supply
+      },
+      CTX,
+    );
+    expect(result2.success).toBe(true);
+    expect(result2.data.contentChanged).toBe(true);
+    expect(result2.data.contentHash).toBe(expectedHash(v2));
+
+    // The skip-guard bypass: contentChanged: true reaches resource-enrich.
+    expect(mockCreateJob).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: 'resource-enrich',
+        params: expect.objectContaining({
+          resourceId: 'res-roundtrip',
+          contentChanged: true,
+        }),
       }),
     );
   });
