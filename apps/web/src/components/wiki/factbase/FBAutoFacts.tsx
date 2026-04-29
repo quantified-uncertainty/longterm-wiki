@@ -21,6 +21,11 @@ import {
 import type { Fact, Property, FieldDef } from "@longterm-wiki/factbase";
 import type { FactBaseRecordEntry, FactBaseRecordSchema } from "@data/factbase";
 import { formatKBDate, isUrl, shortDomain, sortKBRecords, titleCase } from "@components/wiki/factbase/format";
+import {
+  getPersonRecordName,
+  getPropertyLabel,
+  getRecordDisplayName,
+} from "@components/factbase/entity-detail-shared";
 import { FBFactValueDisplay } from "@components/wiki/factbase/FBFactValueDisplay";
 import { FBCellValue } from "@components/wiki/factbase/FBCellValue";
 import { FBRefLink } from "@components/wiki/factbase/FBRefLink";
@@ -319,7 +324,7 @@ function StatCard({
     <div className="relative overflow-hidden rounded-xl border border-border/50 bg-gradient-to-br from-card to-muted/30 p-3.5 transition-shadow hover:shadow-md">
       <div className="absolute top-0 right-0 w-12 h-12 bg-primary/[0.03] rounded-bl-[2rem]" />
       <div className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground mb-1">
-        {prop?.name ?? titleCase(propertyId)}
+        {getPropertyLabel(prop, propertyId)}
       </div>
       <div className="text-lg font-bold tabular-nums tracking-tight text-foreground">
         <FBFactValueDisplay fact={fact} property={prop} />
@@ -337,7 +342,7 @@ function StatCard({
 function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
-  const name = personEntity?.name ?? item.displayName ?? field(item, "display_name") ?? titleCase(item.key);
+  const name = getPersonRecordName(item, personEntity);
   const title = field(item, "title");
   const start = field(item, "start");
   const end = field(item, "end");
@@ -402,7 +407,7 @@ function FundingHistoryTable({ items }: { items: FactBaseRecordEntry[] }) {
         </thead>
         <tbody>
           {items.map((item) => {
-            const name = field(item, "name") ?? titleCase(item.key);
+            const name = getRecordDisplayName(item);
             const date = field(item, "date");
             const raised = item.fields.raised;
             const valuation = item.fields.valuation;
@@ -453,7 +458,7 @@ function FundingHistoryTable({ items }: { items: FactBaseRecordEntry[] }) {
 
 /** Product card. */
 function ProductCard({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
+  const name = getRecordDisplayName(item);
   const launched = field(item, "launched");
   const description = field(item, "description");
   const source = field(item, "source");
@@ -491,7 +496,7 @@ function ProductCard({ item }: { item: FactBaseRecordEntry }) {
 
 /** Model release row. */
 function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
+  const name = getRecordDisplayName(item);
   const released = field(item, "released");
   const description = field(item, "description");
   const safetyLevel = field(item, "safety_level");
@@ -542,7 +547,7 @@ function TimeSeriesFactRow({
   items: FactWithProperty[];
 }) {
   const prop = items[0]?.property;
-  const label = prop?.name ?? titleCase(propertyId);
+  const label = getPropertyLabel(prop, propertyId);
 
   // Prefer non-expired active facts as "latest" — undated facts represent
   // current values and shouldn't be buried by older dated snapshots.
@@ -623,7 +628,7 @@ function SingleFactRow({
     : items;
   const sorted = sortFactsByAsOf(candidates);
   const prop = sorted[0]?.property;
-  const label = prop?.name ?? titleCase(propertyId);
+  const label = getPropertyLabel(prop, propertyId);
   const fact = sorted[0]?.fact;
 
   if (!fact) return null;

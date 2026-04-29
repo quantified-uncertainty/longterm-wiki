@@ -19,7 +19,7 @@ import {
   getKBEntity,
   getKBEntities,
 } from "@data/factbase";
-import { titleCase } from "./format";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { FBCompareChartClient, type ChartSeries } from "./FBCompareChartClient";
 
 // ── Color palette for multi-entity comparison ────────────────────────
@@ -76,7 +76,7 @@ export function FBCompareChart({
   format,
 }: FBCompareChartProps) {
   const prop = getKBProperty(propertyId);
-  const heading = title ?? prop?.name ?? titleCase(propertyId);
+  const heading = title ?? getPropertyLabel(prop, propertyId);
   const resolvedFormat = format ?? detectFormat(prop?.unit);
 
   // Get all facts for this property, scoped to the requested entities

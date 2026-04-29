@@ -1,4 +1,5 @@
 import type { FactBaseRecordEntry } from "@/data/factbase";
+import { titleCase } from "@/components/wiki/factbase/format";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -62,4 +63,41 @@ export function sortByDateField(items: FactBaseRecordEntry[], fieldName: string)
     const dateB = b.fields[fieldName] ? String(b.fields[fieldName]) : "";
     return dateB.localeCompare(dateA);
   });
+}
+
+// ─── Display-name resolution ────────────────────────────────────────
+// Helpers use `||` (truthy fallback) rather than `??` so empty strings,
+// `0`, and `false` fall through to the title-cased key. A record with
+// `name: ""` should render a derived label, not a blank.
+
+function recordFieldString(item: FactBaseRecordEntry, key: string): string | undefined {
+  const v = item.fields[key];
+  if (typeof v !== "string" && typeof v !== "number" && typeof v !== "boolean") return undefined;
+  return v ? String(v) : undefined;
+}
+
+/** Display name for a FactBase record entry. */
+export function getRecordDisplayName(item: FactBaseRecordEntry): string {
+  return recordFieldString(item, "name") || titleCase(item.key);
+}
+
+/** Display name for a person record. Prefers the linked entity, then explicit display fields. */
+export function getPersonRecordName(
+  item: FactBaseRecordEntry,
+  personEntity?: { name?: string | null } | null,
+): string {
+  return (
+    personEntity?.name ||
+    item.displayName ||
+    recordFieldString(item, "display_name") ||
+    titleCase(item.key)
+  );
+}
+
+/** Display label for a FactBase property. */
+export function getPropertyLabel(
+  prop: { name?: string | null } | null | undefined,
+  propertyId: string,
+): string {
+  return prop?.name || titleCase(propertyId);
 }

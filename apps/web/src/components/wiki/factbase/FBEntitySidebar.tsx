@@ -20,6 +20,7 @@ import { Card } from "@/components/ui/card";
 import { getKBEntity, getKBLatest, getKBProperties } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, titleCase } from "./format";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
 import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
@@ -183,7 +184,7 @@ export function FBEntitySidebar({
             className="flex py-1.5 border-b border-border last:border-b-0 px-4"
           >
             <span className="flex-shrink-0 w-[100px] min-w-[100px] text-muted-foreground font-medium pr-2 text-xs">
-              {property?.name ?? titleCase(propertyId)}
+              {getPropertyLabel(property, propertyId)}
             </span>
             <div className="flex-1 text-xs break-words">
               <span className="inline-flex items-center gap-1">

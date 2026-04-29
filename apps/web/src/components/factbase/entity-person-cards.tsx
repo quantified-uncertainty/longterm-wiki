@@ -2,15 +2,15 @@ import Link from "next/link";
 
 import { getKBEntity } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
-import { formatKBDate, titleCase } from "@/components/wiki/factbase/format";
+import { formatKBDate } from "@/components/wiki/factbase/format";
 
-import { field } from "./entity-detail-shared";
+import { field, getPersonRecordName } from "@/components/factbase/entity-detail-shared";
 
 /** Person card for key-persons collection. */
 export function PersonCard({ item }: { item: FactBaseRecordEntry }) {
   const personId = field(item, "person");
   const personEntity = personId ? getKBEntity(personId) : null;
-  const name = personEntity?.name ?? item.displayName ?? titleCase(item.key);
+  const name = getPersonRecordName(item, personEntity);
   const title = field(item, "title");
   const start = field(item, "start");
   const end = field(item, "end");
