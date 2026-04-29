@@ -347,6 +347,20 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-700: catches `${{ secrets.X }}` references in workflow YAMLs that
+    // don't resolve to a real repo or org-inherited secret (the QUA-676
+    // root cause). Advisory because (a) forks/local environments lack gh
+    // auth — the validator fails open in that case anyway — and (b) at
+    // ship time there are 17 pre-existing pending references being tracked
+    // for cleanup. Flip to blocking once the existing list is at zero.
+    id: 'workflow-secrets',
+    name: 'Workflow secret references resolve',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-workflow-secrets.ts'],
+    cwd: PROJECT_ROOT,
+    advisory: true,
+  },
+  {
     // QUA-388: ESLint with @typescript-eslint/no-floating-promises.
     // Blocking. Catches unhandled-promise patterns that ranked highest
     // in the PR-review survey (~18% of findings). Each future rule
