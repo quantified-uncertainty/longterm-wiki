@@ -34,7 +34,7 @@
  * get an advisory pass.
  */
 
-import { execSync } from 'child_process';
+import { execFileSync, execSync } from 'child_process';
 import { readFileSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -145,7 +145,7 @@ function readWorkflowFiles(): Array<{ path: string; content: string }> {
 function fetchKnownSecrets(repo: string): Set<string> | null {
   let raw: string;
   try {
-    raw = execSync(`gh secret list -R '${repo}' --json name`, {
+    raw = execFileSync('gh', ['secret', 'list', '-R', repo, '--json', 'name'], {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
     });
