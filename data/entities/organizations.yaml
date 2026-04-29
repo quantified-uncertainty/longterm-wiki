@@ -2547,6 +2547,7 @@
   summaryPage: labs-overview
   title: Meta AI (FAIR)
   aliases:
+    - Meta
     - Meta AI
     - FAIR
     - Facebook AI Research
@@ -9542,20 +9543,37 @@
     Falcon 2). Signed the Frontier AI Safety Commitments at the 2024
     AI Seoul Summit.
 
+# QUA-749/QUA-752 — merged: FLI (rebranded Z.ai) + Seoul Commitment Tracker (Zhipu.ai)
 - id: zhipu-ai
   stableId: sid_DjBpGIOiGQ
   type: organization
   orgType: frontier-lab
-  title: Zhipu AI
+  title: Z.ai
   aliases:
+    - Z.ai
+    - Zhipu AI
+    - Zhipu
+    - 智谱AI
     - Zhipu.ai
     - 智谱 AI
-    - Zhipu
-  website: https://www.zhipuai.cn
+  website: https://z.ai
   description: >-
-    Beijing-based AI lab spun out of Tsinghua University's Knowledge
-    Engineering Group. Develops the GLM (General Language Model) and
-    ChatGLM families of bilingual Chinese-English LLMs, plus the
-    GLM-4-Vision multimodal series. Signed the Frontier AI Safety
-    Commitments at the 2024 AI Seoul Summit.
+    Chinese AI lab founded as Zhipu AI in 2019, rebranded to Z.ai in 2025.
+    Develops the GLM family of large language models. Signed the Frontier
+    AI Safety Commitments at the 2024 AI Seoul Summit.
+
+# QUA-749 — lightweight org entity surfaced by FLI scorecard ingestion
+- id: alibaba-cloud
+  stableId: sid_eBJi3sqy7w
+  type: organization
+  orgType: frontier-lab
+  title: Alibaba Cloud
+  aliases:
+    - Alibaba
+    - Aliyun
+    - 阿里云
+  website: https://www.alibabacloud.com
+  description: >-
+    Cloud-computing arm of Alibaba Group. Develops the Qwen series of
+    foundation models. Surfaced through FLI AI Safety Index ingestion.
 

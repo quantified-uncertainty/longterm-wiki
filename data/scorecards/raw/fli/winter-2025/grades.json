@@ -1,0 +1,139 @@
+{
+  "publishedAt": "2025-12-02",
+  "waveLabel": "Winter 2025",
+  "sourceUrl": "https://futureoflife.org/ai-safety-index-winter-2025/",
+  "methodologyUrl": "https://futureoflife.org/document/ai-safety-index-winter-2025-2-page-summary/",
+  "license": null,
+  "notes": "Evidence collected up until November 8, 2025. Survey responses submitted by Anthropic, OpenAI, Google DeepMind, xAI, and Z.ai. Meta, DeepSeek, and Alibaba Cloud did not submit survey responses. The 'Survey Responses' dimension is not a scored domain but tracks participation.",
+  "dimensions": [
+    {
+      "slug": "risk-assessment",
+      "label": "Risk Assessment",
+      "weight": null
+    },
+    {
+      "slug": "current-harms",
+      "label": "Current Harms",
+      "weight": null
+    },
+    {
+      "slug": "safety-frameworks",
+      "label": "Safety Frameworks",
+      "weight": null
+    },
+    {
+      "slug": "existential-safety",
+      "label": "Existential Safety",
+      "weight": null
+    },
+    {
+      "slug": "governance-accountability",
+      "label": "Governance & Accountability",
+      "weight": null
+    },
+    {
+      "slug": "information-sharing",
+      "label": "Information Sharing",
+      "weight": null
+    }
+  ],
+  "grades": [
+    {
+      "org": "Anthropic",
+      "scores": {
+        "overall": "C+",
+        "risk-assessment": "B",
+        "current-harms": "C+",
+        "safety-frameworks": "C+",
+        "existential-safety": "D",
+        "governance-accountability": "B-",
+        "information-sharing": "A-"
+      }
+    },
+    {
+      "org": "OpenAI",
+      "scores": {
+        "overall": "C+",
+        "risk-assessment": "B",
+        "current-harms": "C-",
+        "safety-frameworks": "C+",
+        "existential-safety": "D",
+        "governance-accountability": "C+",
+        "information-sharing": "B"
+      }
+    },
+    {
+      "org": "Google DeepMind",
+      "scores": {
+        "overall": "C",
+        "risk-assessment": "C+",
+        "current-harms": "C",
+        "safety-frameworks": "C+",
+        "existential-safety": "D",
+        "governance-accountability": "C-",
+        "information-sharing": "C"
+      }
+    },
+    {
+      "org": "xAI",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D",
+        "current-harms": "F",
+        "safety-frameworks": "D+",
+        "existential-safety": "F",
+        "governance-accountability": "D",
+        "information-sharing": "C"
+      }
+    },
+    {
+      "org": "Z.ai",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D+",
+        "current-harms": "D",
+        "safety-frameworks": "D-",
+        "existential-safety": "F",
+        "governance-accountability": "D",
+        "information-sharing": "C-"
+      }
+    },
+    {
+      "org": "Meta",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D",
+        "current-harms": "D+",
+        "safety-frameworks": "D+",
+        "existential-safety": "F",
+        "governance-accountability": "D",
+        "information-sharing": "D-"
+      }
+    },
+    {
+      "org": "DeepSeek",
+      "scores": {
+        "overall": "D",
+        "risk-assessment": "D",
+        "current-harms": "D+",
+        "safety-frameworks": "F",
+        "existential-safety": "F",
+        "governance-accountability": "D",
+        "information-sharing": "C-"
+      }
+    },
+    {
+      "org": "Alibaba Cloud",
+      "scores": {
+        "overall": "D-",
+        "risk-assessment": "D",
+        "current-harms": "D+",
+        "safety-frameworks": "F",
+        "existential-safety": "F",
+        "governance-accountability": "D+",
+        "information-sharing": "D+"
+      }
+    }
+  ],
+  "isLatest": true
+}
