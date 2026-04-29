@@ -139,12 +139,12 @@ function scheduleMatViewRefresh(): void {
     refreshScheduled = true;
     setTimeout(() => {
       refreshScheduled = false;
-      runDebouncedRefresh();
+      void runDebouncedRefresh();
     }, REFRESH_COOLDOWN_MS - elapsed);
     return;
   }
 
-  runDebouncedRefresh();
+  void runDebouncedRefresh();
 }
 
 async function runDebouncedRefresh(): Promise<void> {

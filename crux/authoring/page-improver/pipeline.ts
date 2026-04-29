@@ -544,6 +544,8 @@ export async function runPipeline(pageId: string, options: PipelineOptions = {})
       note: directions
         ? `Improved (${tier})${adversarialNote}: ${directions.slice(0, 100)}`
         : `Improved (${tier})${adversarialNote}`,
+    }).catch((err) => {
+      console.warn(`Failed to record improve run in edit log: ${err instanceof Error ? err.message : String(err)}`);
     });
 
     // Auto-grade after applying changes

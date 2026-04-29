@@ -200,5 +200,8 @@ async function main(): Promise<void> {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((err) => {
+    console.error("validate-framework-versions crashed:", err);
+    process.exit(1);
+  });
 }

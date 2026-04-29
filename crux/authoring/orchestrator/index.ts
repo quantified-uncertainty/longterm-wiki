@@ -282,6 +282,8 @@ export async function runOrchestratorPipeline(
       note: directions
         ? `Orchestrator v2 (${tier}): ${directions.slice(0, 100)}`
         : `Orchestrator v2 (${tier})`,
+    }).catch((err) => {
+      console.warn(`Failed to record orchestrator run in edit log: ${err instanceof Error ? err.message : String(err)}`);
     });
 
     // Auto-grade

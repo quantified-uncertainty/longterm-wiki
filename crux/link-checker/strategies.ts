@@ -108,7 +108,9 @@ export function httpCheck(url: string, method: 'HEAD' | 'GET' = 'HEAD'): Promise
       }
 
       if (method === 'HEAD' && (status === 405 || status === 403)) {
-        httpCheck(url, 'GET').then(resolve);
+        // Fire-and-forget: the GET retry resolves the outer Promise via `resolve`,
+        // so failures land on the same path as a normal HTTP error.
+        void httpCheck(url, 'GET').then(resolve);
         return;
       }
 

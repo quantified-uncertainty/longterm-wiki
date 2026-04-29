@@ -1834,6 +1834,8 @@ async function main() {
                   tool: 'crux-fix-escalated',
                   agency: 'automated',
                   note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
+                }).catch((err) => {
+                  console.warn(`Failed to record fix-escalated in edit log: ${err instanceof Error ? err.message : String(err)}`);
                 });
                 if (!json && orphanResult.removed.length > 0) {
                   console.log(`  ${c.dim}Cleaned up ${orphanResult.removed.length} orphaned footnote(s): ${orphanResult.removed.map(n => `[^${n}]`).join(', ')}${c.reset}`);
@@ -1906,6 +1908,8 @@ async function main() {
               tool: 'crux-fix',
               agency: 'automated',
               note: `Fixed ${applyResult.applied} flagged citation inaccuracies`,
+            }).catch((err) => {
+              console.warn(`Failed to record fix in edit log: ${err instanceof Error ? err.message : String(err)}`);
             });
           }
 

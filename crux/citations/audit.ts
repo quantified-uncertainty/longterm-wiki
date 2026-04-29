@@ -190,6 +190,8 @@ async function main() {
           tool: 'crux-audit-escalated',
           agency: 'automated',
           note: `Escalated to Claude: rewrote ${rwResult.applied} section(s) to fix citation inaccuracies`,
+        }).catch((err) => {
+          console.warn(`Failed to record audit-escalated in edit log: ${err instanceof Error ? err.message : String(err)}`);
         });
         console.log(`  ${c.green}${rwResult.applied} section(s) rewritten${c.reset}`);
         if (rwResult.skipped > 0) {
@@ -232,6 +234,8 @@ async function main() {
         tool: 'crux-audit',
         agency: 'automated',
         note: `Fixed ${applyResult.applied} flagged citation inaccuracies via audit`,
+      }).catch((err) => {
+        console.warn(`Failed to record audit in edit log: ${err instanceof Error ? err.message : String(err)}`);
       });
       console.log(`  ${c.green}${applyResult.applied} fixes applied${c.reset}`);
       if (applyResult.skipped > 0) {
@@ -285,6 +289,8 @@ async function main() {
             tool: 'crux-audit-source-replace',
             agency: 'automated',
             note: `Replaced ${repResult.applied} unsupported source URL(s) with better matches`,
+          }).catch((err) => {
+            console.warn(`Failed to record audit-source-replace in edit log: ${err instanceof Error ? err.message : String(err)}`);
           });
           console.log(`\n  ${c.green}${repResult.applied} source(s) replaced${c.reset}`);
           fixesApplied = true;
@@ -350,6 +356,8 @@ async function main() {
             tool: 'crux-audit-pass2',
             agency: 'automated',
             note: `Second pass: fixed ${pass2Apply.applied} remaining citation inaccuracies`,
+          }).catch((err) => {
+            console.warn(`Failed to record audit-pass2 in edit log: ${err instanceof Error ? err.message : String(err)}`);
           });
 
           // Final re-verify

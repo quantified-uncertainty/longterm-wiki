@@ -496,4 +496,7 @@ async function main(): Promise<void> {
   process.exit(blockingFailed.length > 0 ? 1 : 0);
 }
 
-main();
+main().catch((err) => {
+  console.error("validate-daily crashed:", err);
+  process.exit(1);
+});

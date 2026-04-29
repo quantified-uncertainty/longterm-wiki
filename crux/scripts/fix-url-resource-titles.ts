@@ -143,4 +143,7 @@ async function main() {
   if (errors > 0) process.exit(1);
 }
 
-main();
+main().catch((err) => {
+  console.error("fix-url-resource-titles crashed:", err);
+  process.exit(1);
+});

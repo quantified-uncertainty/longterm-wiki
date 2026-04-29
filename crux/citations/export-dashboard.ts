@@ -430,5 +430,8 @@ async function main() {
 
 // Only run when executed directly (not when imported in tests)
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((err) => {
+    console.error("export-dashboard crashed:", err);
+    process.exit(1);
+  });
 }
