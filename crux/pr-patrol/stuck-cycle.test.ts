@@ -441,6 +441,51 @@ describe('applyStuckCycleDetection', () => {
     }
   });
 
+  it('does NOT escalate as stuck when fingerprint is MERGEABLE:PASS:0 (QUA-832)', async () => {
+    // QUA-832: A PR whose fingerprint is MERGEABLE:PASS:0 (mergeable, CI
+    // passing, no top-level blocking comments) is in a healthy state — the
+    // PR is awaiting human approval, not stuck on a problem the patrol can
+    // fix. Repeating this state across cycles should NOT push 'stuck' onto
+    // pr.issues; doing so leads to a no-op coordinator escalation that
+    // wastes cycles re-polling the same merge-ready PR.
+    const prNum = 100;
+    const healthyNode = (sha: string): GqlPrNode => makePrNode({
+      number: prNum,
+      headRefOid: sha,
+      mergeable: 'MERGEABLE',
+      // Replace the default failing rollup with a passing one so
+      // computeRollupConclusion() returns 'PASS'.
+      commits: {
+        nodes: [
+          {
+            commit: {
+              statusCheckRollup: {
+                contexts: {
+                  nodes: [{ conclusion: 'SUCCESS', name: 'build' }],
+                },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    // Run 5 consecutive cycles all with MERGEABLE:PASS:0. Even at cycle 5
+    // (well past STUCK_CYCLE_THRESHOLD = 3) the PR must NOT be flagged.
+    let last: DetectedPr | undefined;
+    for (let cycle = 1; cycle <= 5; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum, issues: ['bot-review-major'] })];
+      await applyStuckCycleDetection(detected, [healthyNode(`sha${cycle}`)], file);
+      last = detected[0];
+    }
+    expect(last).toBeDefined();
+    expect(last!.issues).not.toContain('stuck');
+    // stuckCycles is still annotated (so the prompt layer can warn) but
+    // 'stuck' is the issue tag that drives escalation.
+    expect(last!.stuckCycles).toBeGreaterThanOrEqual(STUCK_CYCLE_THRESHOLD);
+    expect(last!.stuckReason).toBe('MERGEABLE:PASS:0');
+  });
+
   it('persists a pr_cycle_snapshot entry to the JSONL file each cycle', async () => {
     const prNum = 6;
     await applyStuckCycleDetection(

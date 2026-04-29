@@ -128,24 +128,24 @@ const cl = getColors();
 
 import { join as joinPath } from 'path';
 
-const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
+export const PID_FILE = joinPath(process.env.HOME ?? '/tmp', '.cache', 'pr-patrol', 'daemon.pid');
 
-function writePidFile(): void {
+function writePidFile(file: string = PID_FILE): void {
   try {
-    writeFileSync(PID_FILE, String(process.pid));
+    writeFileSync(file, String(process.pid));
   } catch { /* best-effort */ }
 }
 
-function removePidFile(): void {
+function removePidFile(file: string = PID_FILE): void {
   try {
-    unlinkSync(PID_FILE);
+    unlinkSync(file);
   } catch { /* best-effort */ }
 }
 
 /** Read the PID of a running patrol daemon, or null if none. */
-export function getDaemonPid(): number | null {
+export function getDaemonPid(file: string = PID_FILE): number | null {
   try {
-    const pid = parseInt(readFileSync(PID_FILE, 'utf-8').trim(), 10);
+    const pid = parseInt(readFileSync(file, 'utf-8').trim(), 10);
     if (isNaN(pid)) return null;
     // Check if process is alive
     process.kill(pid, 0);
@@ -153,6 +153,26 @@ export function getDaemonPid(): number | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * QUA-835: Singleton guard for the daemon. Reads the PID file and reports
+ * whether a different live patrol process is already running.
+ *
+ * Returns:
+ *   - { running: false } when the PID file is missing, stale (process dead),
+ *     or points at the current process (idempotent re-entry).
+ *   - { running: true, pid } when another live process owns the file.
+ *
+ * `file` is parameterized so tests can drive it without touching the real
+ * `~/.cache/pr-patrol/daemon.pid`.
+ */
+export function checkSingletonDaemon(
+  file: string = PID_FILE,
+): { running: false } | { running: true; pid: number } {
+  const pid = getDaemonPid(file);
+  if (pid === null || pid === process.pid) return { running: false };
+  return { running: true, pid };
 }
 
 /** Stop a running patrol daemon. Returns true if one was stopped. */
@@ -604,6 +624,21 @@ export async function runDaemon(config: PatrolConfig): Promise<void> {
   }
 
   ensureDirs();
+
+  // QUA-835: refuse to start if another patrol daemon is already running.
+  // Without this, two `pr-patrol run` invocations spawn parallel loops that
+  // each maintain their own cycle counter (visible as cycle resets in the
+  // logs) and double-process the PR queue.
+  const singleton = checkSingletonDaemon();
+  if (singleton.running) {
+    console.error(
+      `${cl.red}ERROR: Another PR patrol daemon is already running (pid ${singleton.pid}).${cl.reset}`,
+    );
+    console.error(
+      `Run \`crux gh pr-patrol stop\` to stop it, or \`crux gh pr-patrol status\` to check.`,
+    );
+    process.exit(1);
+  }
 
   // Write PID file so `pr-patrol stop` can find us
   writePidFile();

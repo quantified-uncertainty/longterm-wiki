@@ -387,16 +387,30 @@ export async function applyStuckCycleDetection(
       log(`  ${cl.yellow}Warning: could not record cycle snapshot for PR #${pr.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`);
     });
 
-    if (stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+    // QUA-832: A PR with fingerprint MERGEABLE:PASS:0 (mergeable, CI passing,
+    // zero top-level blocking comments) is in a healthy "merge-ready" state,
+    // not stuck on a problem the patrol can fix. Repeating this fingerprint
+    // means the PR is awaiting human approval (stage:approved label or
+    // review). Don't push 'stuck' onto pr.issues — that would trigger a
+    // no-op coordinator escalation and waste cycles re-polling. The existing
+    // hasExceededMaxAttempts guard still catches dispatch churn on residual
+    // soft issues like bot-review-major.
+    const isHealthyFingerprint = fingerprint === 'MERGEABLE:PASS:0';
+
+    if (stuckCycles >= STUCK_CYCLE_THRESHOLD && !isHealthyFingerprint) {
       pr.stuckCycles = stuckCycles;
       pr.stuckReason = fingerprint;
       if (!pr.issues.includes('stuck')) pr.issues.push('stuck');
       log(`  ${cl.yellow}PR #${pr.number}: stuck for ${stuckCycles} cycles (fingerprint=${fingerprint}) — escalating${cl.reset}`);
     } else if (stuckCycles >= 2) {
       // Not yet at threshold but trending — annotate so the fix prompt can
-      // warn the agent.
+      // warn the agent. Healthy-fingerprint PRs land here too: stuckCycles
+      // is recorded for visibility but no escalation flag is set.
       pr.stuckCycles = stuckCycles;
       pr.stuckReason = fingerprint;
+      if (isHealthyFingerprint && stuckCycles >= STUCK_CYCLE_THRESHOLD) {
+        log(`  ${cl.dim}PR #${pr.number}: in healthy state (${fingerprint}) for ${stuckCycles} cycles — awaiting human approval${cl.reset}`);
+      }
     }
   }
 }
