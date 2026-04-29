@@ -6,7 +6,14 @@ facts:
         property: education,
         value: Mansfield College,
         source: https://www.wikidata.org/wiki/Q113084571,
-        notes: From Wikidata Q113084571
+        notes: From Wikidata Q113084571,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:04:08.199Z
+          }
       },
     {
         id: f_ooxW6RYt3A,

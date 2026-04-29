@@ -6,25 +6,47 @@ facts:
     source: https://x.ai/about
     notes: "Publicly launched and commonly cited as founded July 2023; incorporated
       earlier (March 2023) but operated in stealth until public announcement"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.748Z
 
   - id: f_8UM2NKwdUA
     property: headquarters
     value: "Palo Alto, CA"
     source: https://x.ai/about
-    notes: "Headquartered in Palo Alto per x.ai; operates a massive GPU cluster ('Colossus') in Memphis, TN. Previously listed as Austin, TX."
+    notes: "Headquartered in Palo Alto per x.ai; operates a massive GPU cluster
+      ('Colossus') in Memphis, TN. Previously listed as Austin, TX."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.747Z
 
   - id: f_2O4rOQsrZg
     property: legal-structure
     value: "Subsidiary of SpaceX"
     validStart: 2026-02
     source: https://x.ai/about
-    notes: "xAI was acquired by SpaceX in February 2026; previously operated as an independent private company"
+    notes: "xAI was acquired by SpaceX in February 2026; previously operated as an
+      independent private company"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.737Z
 
   - id: f_qr3MjbUa4Q
     property: founded-by
     value:
       - !ref sid_69vftmr1jg
     source: https://x.ai/about
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.721Z
 
   - id: f_Uxbvs82r3w
     property: total-funding
@@ -32,6 +54,11 @@ facts:
     asOf: 2024-12
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
     notes: "Approximately $12B raised across Series A and Series B rounds"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.695Z
 
   - id: f_tEkfJ3yreg
     property: valuation
@@ -40,6 +67,11 @@ facts:
     source: https://www.reuters.com/technology/artificial-intelligence/musks-xai-closes-6-bln-funding-round-2024-12-24/
     notes: "Post-money valuation at Series C close (December 2024). Earlier Series B
       in May 2024 was at $24B."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.652Z
 
   - id: f_CvDHaporPw
     property: valuation
@@ -47,6 +79,11 @@ facts:
     asOf: 2025-11
     source: https://www.wsj.com/tech/ai/elon-musks-xai-is-in-talks-to-raise-funds-at-a-valuation-of-up-to-75-billion-a57a2e66
     notes: "Reported valuation range of $75-80B in late 2025 funding discussions"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.651Z
 
   - id: f_CvkSn5txgw
     property: headcount
@@ -62,6 +99,11 @@ facts:
     asOf: 2026-01
     source: https://x.ai/news/series-e
     notes: "Post-money valuation at Series E round close"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.640Z
 
   - id: f_SV0k98iOOw
     property: total-funding
@@ -69,6 +111,11 @@ facts:
     asOf: 2026-01
     source: https://x.ai/news/series-e
     notes: "Over $26B total raised across all rounds"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:45.629Z
 
   - id: f_xKzq35cBzQ
     property: revenue
@@ -76,6 +123,11 @@ facts:
     asOf: "2025"
     source: https://sacra.com/c/xai/
     notes: "Annualized revenue run-rate at year-end 2025"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.596Z
 
   - id: f_u4ovo8uOzg
     property: headcount
@@ -83,6 +135,11 @@ facts:
     asOf: "2025"
     source: https://www.trueup.io/co/xai
     notes: "Headcount as of 2025 per TrueUp"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.558Z
 
   - id: f_5bVJIucEHg
     property: user-count
@@ -90,6 +147,11 @@ facts:
     asOf: "2025-12"
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Grok monthly active users as of Q4 2025"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.559Z
 
   - id: f_XLWbsNoong
     property: cumulative-downloads
@@ -97,6 +159,11 @@ facts:
     asOf: "2025"
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Close to 100 million Grok downloads since launch"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.540Z
 
   - id: f_FSDfBi1tjw
     property: product-revenue
@@ -104,6 +171,11 @@ facts:
     asOf: 2025-09
     source: https://www.businessofapps.com/data/grok-statistics/
     notes: "Quarterly revenue from Grok app in Q3 2025"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.510Z
 
   - id: f_tHAA1W30dw
     property: benchmark-score
@@ -111,6 +183,11 @@ facts:
     asOf: "2025"
     source: https://x.ai/news/grok-3
     notes: "Grok 3 AIME 2025 benchmark: 93.3% success rate"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:45.511Z
 
   - id: f_mwjUCVDWoA
     property: benchmark-score
@@ -118,6 +195,11 @@ facts:
     asOf: "2025"
     source: https://x.ai/news/grok-3
     notes: "Grok 3 Chatbot Arena Elo score"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:45.447Z
 
   - id: f_Tub2PPCgcw
     property: model-parameters
@@ -125,6 +207,11 @@ facts:
     asOf: "2025"
     source: https://x.ai/news/grok-3
     notes: "Grok 3: 2.7 trillion parameters"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.446Z
 
   - id: f_ywABbaXqQg
     property: revenue
@@ -132,6 +219,11 @@ facts:
     asOf: "2025"
     source: https://fedscoop.com/grok-government-gsa-onegov-artificial-intelligence-elon-musk-contract-agency/
     notes: "$200M in Department of Defense contracts"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.443Z
 
   - id: f_zlxDxDK2jA
     property: description
@@ -139,12 +231,22 @@ facts:
       other platforms (Dec 2025-Jan 2026)"
     source: https://www.cnn.com/2026/01/08/tech/elon-musk-xai-digital-undressing
     notes: "During deepfake scandal period"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.418Z
 
   - id: f_3HYN6TDpoA
     property: description
     value: "~3M sexualized images generated in 10 days during deepfake scandal (Dec
       2025-Jan 2026)"
     source: https://www.nbcnews.com/tech/internet/x-paywall-ai-image-grok-app-bikini-allows-sexual-deepfakes-rcna252647
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.414Z
   - id: f_OayVpDCXLO
     property: website
     value: https://x.ai

@@ -4,31 +4,63 @@ facts:
     property: founded-date
     value: "2023"
     source: https://www.axios.com/2024/03/06/ai-regulation-ari-biden-silicon-valley
-    notes: "Founded in late 2023 by former Congressman Brad Carson and tech entrepreneur Eric Gastfriend"
+    notes: "Founded in late 2023 by former Congressman Brad Carson and tech
+      entrepreneur Eric Gastfriend"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:01:46.148Z
 
   - id: f_Lp8gK4sW7b
     property: headquarters
     value: "Washington, DC"
     source: https://www.idealist.org/en/nonprofit/a502e6b55b704230a46f029d6c4fd704-americans-for-responsible-innovation-washington
     notes: "Headquartered in Washington, DC"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.97
+      checkedAt: 2026-04-29T16:04:07.943Z
 
   - id: f_Nq3vL9tN1c
     property: legal-structure
     value: "501(c)(4) nonprofit"
     source: https://ari.us/about-us/
-    notes: "501(c)(4) policy advocacy organization; also operates a separate 501(c)(3) research arm and a hybrid PAC"
+    notes: "501(c)(4) policy advocacy organization; also operates a separate
+      501(c)(3) research arm and a hybrid PAC"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.926Z
 
   - id: f_Pw7cJ2mQ5d
     property: website
     value: "https://ari.us/"
     source: https://ari.us/
     notes: "Official website"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:43.535Z
 
   - id: f_Ry1dR5wK8e
     property: description
-    value: "Nonprofit policy advocacy organization focused on helping U.S. policymakers develop governance frameworks for AI and emerging technologies. Founded by former Congressman Brad Carson (President) and tech entrepreneur Eric Gastfriend (Executive Director). Advisory board includes Stanford's Erik Brynjolfsson and former NTIA administrator Diane Rinaldo."
+    value: "Nonprofit policy advocacy organization focused on helping U.S.
+      policymakers develop governance frameworks for AI and emerging
+      technologies. Founded by former Congressman Brad Carson (President) and
+      tech entrepreneur Eric Gastfriend (Executive Director). Advisory board
+      includes Stanford's Erik Brynjolfsson and former NTIA administrator Diane
+      Rinaldo."
     asOf: 2026-03
     source: https://ari.us/about-us/
+    sourcing:
+      verdict: partial
+      evidence: 2 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:07.924Z
 
   - id: f_sVDGE7x4Yu
     property: lobbying-spend
@@ -36,7 +68,13 @@ facts:
     currency: USD
     asOf: 2024
     source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
-    notes: "Total 2024 federal lobbying ~$1.08M (in-house $700K + external firms $380K). Verified from Senate LDA filings."
+    notes: "Total 2024 federal lobbying ~$1.08M (in-house $700K + external firms
+      $380K). Verified from Senate LDA filings."
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.925Z
 
   - id: f_aFSIs1oXPv
     property: lobbying-spend
@@ -44,7 +82,13 @@ facts:
     currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Americans+for+Responsible+Innovation
-    notes: "Total 2025 federal lobbying ~$2.11M. Largest pro-safety AI lobbying spender. Verified from Senate LDA."
+    notes: "Total 2025 federal lobbying ~$2.11M. Largest pro-safety AI lobbying
+      spender. Verified from Senate LDA."
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.865Z
 
   - id: f_fT7iaHWSgm
     property: pac-fundraising
@@ -53,15 +97,33 @@ facts:
     asOf: 2024
     source: https://www.opensecrets.org/political-action-committees-pacs/americans-for-responsible-innovation/C00873356/summary/2024
     notes: "Hybrid PAC raised $91,661; contributed $60,300 to federal candidates"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.835Z
 
   - id: f_AZ4Q7EcOkQ
     property: campaign
-    value: "Co-led (with ITI) coalition of 60+ companies, universities, and nonprofits calling on Congress to codify US AI Safety Institute within NIST"
+    value: "Co-led (with ITI) coalition of 60+ companies, universities, and
+      nonprofits calling on Congress to codify US AI Safety Institute within
+      NIST"
     asOf: 2024-10
     source: https://www.itic.org/news-events/news-releases/iti-and-ari-lead-coalition-of-over-60-companies-universities-and-non-profits-calling-on-congress-to-enact-ai-safety-institute-legislation-this-year
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.834Z
 
   - id: f_akRoLGtd15
     property: campaign
-    value: "Co-organized letter signed by 260 bipartisan state lawmakers from 50 states (130R, 129D, 1I) opposing federal ban on state AI regulation"
+    value: "Co-organized letter signed by 260 bipartisan state lawmakers from 50
+      states (130R, 129D, 1I) opposing federal ban on state AI regulation"
     asOf: 2025
     source: https://www.transparencycoalition.ai/news/bipartisan-lawmakers-from-50-states-tell-congress-dont-stop-us-from-acting-on-ai
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.832Z

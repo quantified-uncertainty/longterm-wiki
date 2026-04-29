@@ -11,6 +11,11 @@ facts:
     property: founded-date
     value: !date 2016
     source: https://quantifieduncertainty.org
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.129Z
 
   - id: f_GE3webst01
     property: website

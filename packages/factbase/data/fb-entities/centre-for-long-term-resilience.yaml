@@ -12,6 +12,11 @@ facts:
     value: "2019"
     source: https://www.wikidata.org/wiki/Q126286020
     notes: From Wikidata Q126286020
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:03.621Z
   - id: f_80gzma2UJB
     property: website
     value: https://www.longtermresilience.org/
@@ -22,3 +27,8 @@ facts:
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q126286020
     notes: From Wikidata Q126286020
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:03.614Z

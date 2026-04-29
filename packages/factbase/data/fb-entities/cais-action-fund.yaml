@@ -5,18 +5,35 @@ facts:
     value: "2022"
     source: https://action.safe.ai
     notes: "Sister organization to Center for AI Safety"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.320Z
 
   - id: f_GQJuxCROVQ
     property: headquarters
     value: "Washington, DC"
     source: https://action.safe.ai
     notes: "DC-based policy arm; CAIS itself is in San Francisco"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.283Z
 
   - id: f_7QBsEsCWOi
     property: description
-    value: "Bipartisan policy advocacy organization focused on AI national security risks. Translates technical AI safety concerns from CAIS research into legislative and policy proposals."
+    value: "Bipartisan policy advocacy organization focused on AI national security
+      risks. Translates technical AI safety concerns from CAIS research into
+      legislative and policy proposals."
     asOf: 2026-03
     source: https://action.safe.ai
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.275Z
 
   - id: f_kWG7y5ECDN
     property: lobbying-spend
@@ -24,7 +41,13 @@ facts:
     currency: USD
     asOf: 2024
     source: https://www.opensecrets.org/federal-lobbying/clients/summary?cycle=2024&id=D000110584
-    notes: "Total 2024 federal lobbying ~$490K (in-house $270K + Akin Gump $160K + Michael Best $60K). Verified from Senate LDA filings."
+    notes: "Total 2024 federal lobbying ~$490K (in-house $270K + Akin Gump $160K +
+      Michael Best $60K). Verified from Senate LDA filings."
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.261Z
 
   - id: f_84KoWjirDP
     property: lobbying-spend
@@ -32,16 +55,35 @@ facts:
     currency: USD
     asOf: 2025
     source: https://lda.senate.gov/filings/public/filing/search/?client=Center+for+AI+Safety+Action+Fund
-    notes: "Total 2025 federal lobbying ~$420K (in-house $310K + Michael Best $110K). Verified from Senate LDA."
+    notes: "Total 2025 federal lobbying ~$420K (in-house $310K + Michael Best
+      $110K). Verified from Senate LDA."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.234Z
 
   - id: f_2DILdZQsx6
     property: campaign
-    value: "Co-sponsor of California SB 1047 (Safe and Secure Innovation for Frontier AI Models Act) alongside Encode Justice and Economic Security Action California"
+    value: "Co-sponsor of California SB 1047 (Safe and Secure Innovation for
+      Frontier AI Models Act) alongside Encode Justice and Economic Security
+      Action California"
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Safe_and_Secure_Innovation_for_Frontier_Artificial_Intelligence_Models_Act
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.233Z
 
   - id: f_8tLIyLE6H2
     property: campaign
-    value: "Submitted 15 proposals to congressional offices for adding AI safety measures to defense and general funding bills"
+    value: "Submitted 15 proposals to congressional offices for adding AI safety
+      measures to defense and general funding bills"
     asOf: 2024
     source: https://newsletter.safe.ai/p/ai-safety-newsletter-35-lobbying
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.197Z

@@ -5,16 +5,31 @@ facts:
     value: 2022-03
     source: https://www.conjecture.dev/
     notes: "Founded in 2022 by Connor Leahy, Sid Black, and Gabriel Alfour"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.541Z
 
   - id: f_z0kXfDgUiU
     property: headquarters
     value: "London, UK"
     source: https://www.conjecture.dev/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.508Z
 
   - id: f_zIr7FV665p
     property: legal-structure
     value: "Private company"
     source: https://www.conjecture.dev/
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.509Z
 
   - id: f_q5ovrpum9y
     property: total-funding
@@ -23,6 +38,11 @@ facts:
     source: https://www.conjecture.dev/
     notes: "Raised $25M seed round in 2022; investors included Nat Friedman and
       Daniel Gross"
+    sourcing:
+      verdict: unverifiable
+      evidence: 3 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.501Z
 
   - id: f_Tu50nzl3OA
     property: founded-by
@@ -31,6 +51,11 @@ facts:
       - !ref sid_kLIpOZtU1n
       - !ref sid_n0d7I3OAej
     source: https://www.conjecture.dev/
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.478Z
   - id: f_O5z0JSJLy4
     property: website
     value: https://www.conjecture.org

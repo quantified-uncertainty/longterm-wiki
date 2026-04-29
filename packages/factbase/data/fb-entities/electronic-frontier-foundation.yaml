@@ -5,11 +5,21 @@ facts:
     value: "1990-07"
     source: https://www.eff.org/about/history
     notes: "Founded July 1990 by John Gilmore, John Perry Barlow, Mitch Kapor"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.072Z
 
   - id: f_iiJDAyiPZg
     property: headquarters
     value: "815 Eddy Street, San Francisco, CA"
     source: https://www.eff.org/about
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.049Z
 
   - id: f_SOKVCVHlDw
     property: employee-count
@@ -17,27 +27,58 @@ facts:
     asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Frontier_Foundation
     notes: "Staff 125 (2025) per Wikipedia. Previously ~100 in 2024."
+    sourcing:
+      verdict: outdated
+      evidence: "1 → outdated; dissent: 1 → unverifiable, 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.048Z
 
   - id: f_77xsyIGOey
     property: investigation
-    value: "Investigated Axon's 'Draft One' AI-written police report product, designed to hinder audits"
+    value: "Investigated Axon's 'Draft One' AI-written police report product,
+      designed to hinder audits"
     asOf: 2025
     source: https://www.eff.org/press/releases/eff-investigation-ai-product-police-reports-designed-hinder-audits
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.030Z
 
   - id: f_cecTE57Tyx
     property: analysis
-    value: "Published analysis criticizing OpenAI's Pentagon deal for inadequate safeguards against AI-powered surveillance"
+    value: "Published analysis criticizing OpenAI's Pentagon deal for inadequate
+      safeguards against AI-powered surveillance"
     asOf: 2026-03
     source: https://www.eff.org/deeplinks/2026/03/weasel-words-openais-pentagon-deal-wont-stop-ai-powered-surveillance
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.993Z
 
   - id: f_RsKCJRPOlf
     property: analysis
-    value: "Argued privacy protections should not depend on decisions of a few powerful AI companies, analyzing Anthropic-DOD conflict"
+    value: "Argued privacy protections should not depend on decisions of a few
+      powerful AI companies, analyzing Anthropic-DOD conflict"
     asOf: 2026-03
     source: https://www.eff.org/deeplinks/2026/03/anthropic-dod-conflict-privacy-protections-shouldnt-depend-decisions-few-powerful
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.974Z
 
   - id: f_rke4YqGz4J
     property: litigation
-    value: "UAW v. U.S. Department of State (S.D.N.Y., filed Oct 16, 2025) — EFF represents UAW, CWA, AFT (with Muslim Advocates) challenging mass social media surveillance of visa holders using AI. Alleges First Amendment and APA violations. Seeks injunction and record purge."
+    value: "UAW v. U.S. Department of State (S.D.N.Y., filed Oct 16, 2025) — EFF
+      represents UAW, CWA, AFT (with Muslim Advocates) challenging mass social
+      media surveillance of visa holders using AI. Alleges First Amendment and
+      APA violations. Seeks injunction and record purge."
     asOf: 2025-10
     source: https://www.eff.org/cases/united-auto-workers-v-us-department-state
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.963Z

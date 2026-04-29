@@ -2,20 +2,40 @@ entity: sid_5Z1YE2bJbj
 facts:
   - id: f_9Cprm7Squ8
     property: description
-    value: "Policy staff at OpenAI. PhD in Computer Science from Harvard. Author of 'What does it take to catch a Chinchilla?' (2023), the first major compute monitoring framework proposing on-chip firmware snapshots for international AI governance verification."
+    value: "Policy staff at OpenAI. PhD in Computer Science from Harvard. Author of
+      'What does it take to catch a Chinchilla?' (2023), the first major compute
+      monitoring framework proposing on-chip firmware snapshots for
+      international AI governance verification."
     asOf: "2026-03"
     source: https://yonadavshavit.com/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:45.349Z
 
   - id: f_GH68Rrs47C
     property: notable-for
-    value: "Authored 'What does it take to catch a Chinchilla?' (arXiv:2303.11341, March 2023) — first major compute monitoring framework proposing on-chip firmware snapshots for international AI governance verification"
+    value: "Authored 'What does it take to catch a Chinchilla?' (arXiv:2303.11341,
+      March 2023) — first major compute monitoring framework proposing on-chip
+      firmware snapshots for international AI governance verification"
     source: https://arxiv.org/abs/2303.11341
     asOf: "2023-03"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:45.322Z
 
   - id: f_0Cl1yNUM48
     property: education
     value: "PhD Computer Science, Harvard University"
     source: https://yonadavshavit.com/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.323Z
 
   - id: f_h0UXrzjdpJ
     property: employed-by
@@ -23,6 +43,11 @@ facts:
     role: "Policy Staff"
     source: https://yonadavshavit.com/
     asOf: "2024"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.246Z
 
   - id: f_it9naaB0SG
     property: employed-by

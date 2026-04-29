@@ -6,14 +6,28 @@ facts:
         property: headquarters,
         value: Indianapolis,
         source: https://www.wikidata.org/wiki/Q6548359,
-        notes: From Wikidata Q6548359
+        notes: From Wikidata Q6548359,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:55.290Z
+          }
       },
     {
         id: f_8TcR4J2xib,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q6548359,
-        notes: From Wikidata Q6548359
+        notes: From Wikidata Q6548359,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:55.283Z
+          }
       },
     {
         id: f_GPh2Wie9sC,
@@ -27,21 +41,42 @@ facts:
         property: revenue,
         value: 284122066,
         source: https://www.wikidata.org/wiki/Q6548359,
-        notes: From Wikidata Q6548359
+        notes: From Wikidata Q6548359,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.274Z
+          }
       },
     {
         id: f_MxjWSdxsjm,
         property: founded-by-name,
         value: "Josiah K. Lilly, Sr.",
         source: https://www.wikidata.org/wiki/Q6548359,
-        notes: From Wikidata Q6548359; text value (not entity ref)
+        notes: From Wikidata Q6548359; text value (not entity ref),
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.242Z
+          }
       },
     {
         id: f_eqCsnbZss9,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q6548359,
-        notes: From Wikidata Q6548359
+        notes: From Wikidata Q6548359,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.217Z
+          }
       },
     {
         id: f_4RGQuCAenY,

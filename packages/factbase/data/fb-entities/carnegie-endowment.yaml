@@ -4,12 +4,22 @@ facts:
     property: founded-date
     value: "1910"
     source: https://en.wikipedia.org/wiki/Carnegie_Endowment_for_International_Peace
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:04.444Z
 
   - id: f_HAVS06QG35
     property: headquarters
     value: "Washington, DC"
     source: https://carnegieendowment.org/about
     notes: "Also offices in Palo Alto, Beirut, Berlin, Brussels, Singapore, New Delhi"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:04.417Z
 
   - id: f_ry7EKNUU3Y
     property: annual-revenue
@@ -18,6 +28,11 @@ facts:
     asOf: 2025
     source: https://projects.propublica.org/nonprofits/organizations/130552040
     notes: "FY ending June 2025. Total assets $602M."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:04.416Z
 
   - id: f_mmk5kMDIt9
     property: employee-count
@@ -25,6 +40,11 @@ facts:
     asOf: 2025
     source: https://carnegieendowment.org/about
     notes: "~375-400 employees; 170+ research experts across 6 continents"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:04.410Z
 
   - id: f_rW0PvDSZu9
     property: program
@@ -33,12 +53,22 @@ facts:
       Environment, Cybersecurity, Biotechnology."
     asOf: 2026-03
     source: https://carnegieendowment.org/programs/technology-and-international-affairs/about-the-technology-and-international-affairs-program
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:04.394Z
 
   - id: f_IzP2sg96TP
     property: publication
     value: "AI Global Surveillance (AIGS) Index covering 176 countries, created by
       Steven Feldstein"
     source: https://carnegieendowment.org/features/ai-global-surveillance-technology
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:04.356Z
   - id: f_7113lKmhsQ
     property: revenue
     value: 86800356

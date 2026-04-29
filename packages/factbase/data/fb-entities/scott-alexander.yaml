@@ -18,3 +18,8 @@ facts:
     value: 1963
     source: https://www.wikidata.org/wiki/Q3476164
     notes: From Wikidata Q3476164
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.490Z

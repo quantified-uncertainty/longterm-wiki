@@ -14,12 +14,22 @@ facts:
     value: 1986
     source: https://www.wikidata.org/wiki/Q102535772
     notes: From Wikidata Q102535772
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.123Z
   - id: f_Po9MZwki99
     property: education
     value: University of Chicago; University of Chicago; Chennai Mathematical
       Institute
     source: https://www.wikidata.org/wiki/Q102535772
     notes: From Wikidata Q102535772
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.066Z
   - id: f_vN6tN2pQ6v
     property: notable-for
     value: "Created Donations List Website tracking $72.8B in philanthropic

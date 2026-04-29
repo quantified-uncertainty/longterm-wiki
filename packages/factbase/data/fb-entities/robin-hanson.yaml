@@ -13,12 +13,22 @@ facts:
     value: 1959
     source: https://www.wikidata.org/wiki/Q2159779
     notes: From Wikidata Q2159779
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:48.858Z
   - id: f_mrt81NPljz
     property: education
     value: University of California, Irvine; University of Chicago; California
       Institute of Technology
     source: https://www.wikidata.org/wiki/Q2159779
     notes: From Wikidata Q2159779
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.773Z
   - id: f_rH6tN2pQ2v
     property: notable-for
     value: "Pioneered prediction markets (since 1988); invented Logarithmic Market
@@ -33,6 +43,11 @@ facts:
     value: 1959
     source: https://en.wikipedia.org/wiki/Robin_Hanson
     notes: Born August 28, 1959; enriched from wiki page
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:48.772Z
 
   - id: f_rHcY8fL8kA
     property: education

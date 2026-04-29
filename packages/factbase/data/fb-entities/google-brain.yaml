@@ -6,13 +6,27 @@ facts:
         property: founded-date,
         value: "2011",
         source: https://www.wikidata.org/wiki/Q16927616,
-        notes: From Wikidata Q16927616
+        notes: From Wikidata Q16927616,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:57.634Z
+          }
       },
     {
         id: f_Dc6V1X3W5r,
         property: headquarters,
         value: Mountain View,
         source: https://www.wikidata.org/wiki/Q16927616,
-        notes: From Wikidata Q16927616
+        notes: From Wikidata Q16927616,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:57.620Z
+          }
       }
   ]

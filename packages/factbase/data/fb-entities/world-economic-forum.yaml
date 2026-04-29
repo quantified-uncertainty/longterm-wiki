@@ -13,11 +13,21 @@ facts:
     value: 1971
     source: https://en.wikipedia.org/wiki/World_Economic_Forum
     notes: Founded by Klaus Schwab as the European Management Forum; renamed 1987
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:45.819Z
 
   - id: f_x4YN5cezT6
     property: headquarters
     value: "Cologny, Geneva, Switzerland"
     source: https://en.wikipedia.org/wiki/World_Economic_Forum
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:45.956Z
 
   - id: f_fxGx5H5JvL
     property: website

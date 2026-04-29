@@ -12,12 +12,22 @@ facts:
     notes: "Studied electrophysiology of neural circuits; thesis: 'Network-Scale
       Electrophysiology: Measuring and Understanding the Collective Behavior of
       Neural Circuits' (2011)"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.009Z
 
   - id: f_dA4jK5lM6n
     property: notable-for
     value: "CEO and co-founder of Anthropic; formerly VP of Research at OpenAI;
       leading proponent of responsible AI scaling"
     source: https://en.wikipedia.org/wiki/Dario_Amodei
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:01.982Z
 
   - id: f_dA7oP8qR9s
     property: social-media
@@ -47,7 +57,7 @@ facts:
 
   - id: f_606Pwh7C4Q
     property: ea-alignment-estimate
-    value: [0.8, 0.9]
+    value: [ 0.8, 0.9 ]
     asOf: "2026-04"
     notes: "Editorial estimate. Dario is a Giving What We Can signatory with
       documented EA community ties and an early GiveWell supporter; former

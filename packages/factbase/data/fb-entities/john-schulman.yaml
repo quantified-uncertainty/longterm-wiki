@@ -6,7 +6,14 @@ facts:
         property: education,
         value: "University of California, Berkeley; California Institute of Technology",
         source: https://www.wikidata.org/wiki/Q103236782,
-        notes: From Wikidata Q103236782
+        notes: From Wikidata Q103236782,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.899Z
+          }
       },
     {
         id: f_Ho2oLmylvg,

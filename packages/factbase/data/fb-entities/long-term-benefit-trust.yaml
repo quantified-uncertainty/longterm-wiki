@@ -6,10 +6,15 @@ facts:
     value: >-
       Delaware purpose trust established in 2023 to ensure Anthropic responsibly
       develops AI for humanity's long-term benefit. Holds Class T Common Stock
-      with negligible economic value but phased governance power over Anthropic's
-      board of directors. Trustees are financially disinterested.
+      with negligible economic value but phased governance power over
+      Anthropic's board of directors. Trustees are financially disinterested.
     asOf: 2026-03
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.199Z
 
   - id: f_dBsURz3zHz
     property: founded-date
@@ -18,6 +23,11 @@ facts:
     notes: >-
       Charter amended to create Class T stock at Series C close (May 2023).
       Public announcement September 2023.
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.201Z
 
   - id: f_GQTC3EDHXN
     property: legal-structure
@@ -26,11 +36,21 @@ facts:
     notes: >-
       Novel application of Delaware trust law. Purpose trusts serve a stated
       purpose rather than specific beneficiaries.
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.178Z
 
   - id: f_7IjcCU3Ou9
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.anthropic.com/company
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.158Z
 
   - id: f_niWDPXutXO
     property: country
@@ -45,6 +65,11 @@ facts:
     value: !ref sid_mK9pX3rQ7n
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Governance body of Anthropic PBC"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.133Z
 
   - id: f_Lm6yu2M0yQ
     property: notable-for
@@ -53,6 +78,11 @@ facts:
       board-majority appointment power. Designed to prioritize humanity's
       long-term interests over short-term financial pressures.
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.106Z
 
   # ── Governance Structure ──────────────────────────────────────
   - id: f_ULfCyqg3rw
@@ -60,8 +90,8 @@ facts:
     value: 0
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: >-
-      Class T Common Stock has negligible economic rights. Trustees have
-      zero financial interest in Anthropic.
+      Class T Common Stock has negligible economic rights. Trustees have zero
+      financial interest in Anthropic.
 
   - id: f_M8yq5Phedd
     property: board-seats-controlled
@@ -70,6 +100,11 @@ facts:
     validEnd: 2024-07
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Initial phase: power to elect 1 of 5 board directors"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.105Z
 
   - id: f_KPDPj4W0LK
     property: board-seats-controlled
@@ -78,6 +113,11 @@ facts:
     validEnd: 2024-11
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Phase 2: power to elect 2 of 5 board directors"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:55.092Z
 
   - id: f_pK2Bg9HBOA
     property: board-seats-controlled
@@ -85,9 +125,14 @@ facts:
     asOf: 2024-11
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: >-
-      Phase 3 (current): board majority. Remaining seats controlled by
-      Electing Preferred Holders (investors) and Voting Common Stock
+      Phase 3 (current): board majority. Remaining seats controlled by Electing
+      Preferred Holders (investors) and Voting Common Stock
       (founders/employees).
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:55.064Z
 
   - id: f_HT3AnKXbLt
     property: amendment-threshold
@@ -98,6 +143,11 @@ facts:
     notes: >-
       Supermajority of stockholder voting power required to amend trust
       provisions before November 2025.
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:55.047Z
 
   - id: f_k0D29Gu7r4
     property: amendment-threshold
@@ -105,8 +155,13 @@ facts:
     asOf: 2025-11
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
     notes: >-
-      Increased threshold after November 2025 makes amendment harder as
-      trust gains board majority.
+      Increased threshold after November 2025 makes amendment harder as trust
+      gains board majority.
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.019Z
 
   - id: f_q1WSfOS73d
     property: trustee-count
@@ -116,6 +171,11 @@ facts:
     notes: >-
       Designed for 5 voting trustees plus 1 administrative trustee (Delaware
       trust institution). Currently 2 seats vacant.
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.020Z
 
   # ── Current Trustees ──────────────────────────────────────────
   - id: f_t1VpyYvmWV
@@ -124,6 +184,11 @@ facts:
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Clinton Health Access Initiative. Serves as Trust Chair."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:55.003Z
 
   - id: f_4wUyWzudMH
     property: key-event
@@ -131,6 +196,11 @@ facts:
     asOf: 2025-06
     source: https://www.anthropic.com/news/national-security-expert-richard-fontaine-appointed-to-anthropic-s-long-term-benefit-trust
     notes: "CEO of Center for a New American Security (CNAS)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.959Z
 
   - id: f_nFD6uMsTsi
     property: key-event
@@ -138,6 +208,11 @@ facts:
     asOf: 2026-01
     source: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
     notes: "President of Carnegie Endowment. Former CA Supreme Court Justice."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.960Z
 
   # ── Former Trustees ───────────────────────────────────────────
   - id: f_z6WdvJL5Kt
@@ -146,6 +221,11 @@ facts:
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of RAND Corporation"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.932Z
 
   - id: f_XvgrhLWm5n
     property: key-event
@@ -153,6 +233,11 @@ facts:
     asOf: 2023-12
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Departed to avoid conflicts with RAND policy work"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.927Z
 
   - id: f_hywTEdE32h
     property: key-event
@@ -160,6 +245,11 @@ facts:
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Founder of Alignment Research Center (ARC)"
+    sourcing:
+      verdict: outdated
+      evidence: 1 → outdated
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.915Z
 
   - id: f_QvJbVark9E
     property: key-event
@@ -167,6 +257,11 @@ facts:
     asOf: 2024-04
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Left to become Head of AI Safety at U.S. AI Safety Institute"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.872Z
 
   - id: f_fE2Evp3RqO
     property: key-event
@@ -174,6 +269,11 @@ facts:
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Evidence Action"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.871Z
 
   - id: f_ihv8fYC5bd
     property: key-event
@@ -181,6 +281,11 @@ facts:
     asOf: 2026-01
     source: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
     notes: "Departed after completing founding term"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.840Z
 
   - id: f_hM9JdeeIWe
     property: key-event
@@ -188,6 +293,11 @@ facts:
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "CEO of Centre for Effective Altruism"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.838Z
 
   - id: f_jp86PthgGL
     property: key-event
@@ -195,14 +305,25 @@ facts:
     asOf: 2026-01
     source: https://www.anthropic.com/news/mariano-florentino-long-term-benefit-trust
     notes: "Departed after completing founding term"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.821Z
 
   # ── Board Appointments ────────────────────────────────────────
   - id: f_OsUSRqCAjJ
     property: key-event
-    value: "Jay Kreps appointed to Anthropic board by LTBT (first trust-elected director)"
+    value: "Jay Kreps appointed to Anthropic board by LTBT (first trust-elected
+      director)"
     asOf: 2024-05
     source: https://www.anthropic.com/news/jay-kreps-appointed-to-board-of-directors
     notes: "Co-founder and CEO of Confluent"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.785Z
 
   - id: f_ic0NaZUIlV
     property: key-event
@@ -210,6 +331,11 @@ facts:
     asOf: 2025-05
     source: https://www.anthropic.com/news/reed-hastings
     notes: "Co-founder and executive chairman of Netflix"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.782Z
 
   - id: f_ZwdNOHlvW0
     property: key-event
@@ -219,6 +345,11 @@ facts:
     notes: >-
       Former White House Deputy Chief of Staff. Whether appointed by LTBT or
       stockholders is not explicitly stated in the announcement.
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.750Z
 
   # ── Milestones & Concerns ─────────────────────────────────────
   - id: f_T93XbJHxdB
@@ -226,13 +357,24 @@ facts:
     value: "Long-Term Benefit Trust publicly announced with five founding trustees"
     asOf: 2023-09
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.746Z
 
   - id: f_ZFPeQyMqYa
     property: key-event
-    value: "Trust formally established at Series C close; charter amended to create Class T stock"
+    value: "Trust formally established at Series C close; charter amended to create
+      Class T stock"
     asOf: 2023-05
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
     notes: "Series C raised $450M"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.737Z
 
   - id: f_WFZGngTdrz
     property: notable-for
@@ -242,6 +384,11 @@ facts:
       Cuéllar). Two of five trustee seats remain vacant as of March 2026.
     asOf: 2026-03
     source: https://www.anthropic.com/company
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:54.697Z
 
   - id: f_kj3zNoU2PF
     property: notable-for
@@ -250,6 +397,11 @@ facts:
       assessment. The Certificate of Incorporation is publicly available via
       Delaware filing but contains less detail than the Trust Agreement.
     source: https://ailabwatch.org/blog/anthropic-certificate-of-incorporation
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.698Z
 
   - id: f_wWDzFKewep
     property: notable-for
@@ -258,3 +410,8 @@ facts:
       in consultation with Anthropic's directors and CEO. One-year terms with
       regular peer re-evaluation.
     source: https://www.anthropic.com/news/the-long-term-benefit-trust
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.664Z

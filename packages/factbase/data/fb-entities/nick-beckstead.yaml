@@ -35,6 +35,11 @@ facts:
     value: Founder, Secure AI Project (AI safety policy advocacy organization)
     asOf: "2024"
     source: https://secureaiproject.org/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.734Z
   - id: f_ylO6QcJMfw
     property: notable-for
     value: PhD dissertation defending longtermism; former Open Philanthropy program

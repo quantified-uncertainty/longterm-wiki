@@ -14,6 +14,11 @@ facts:
     value: "2018"
     source: https://www.wikidata.org/wiki/Q126277820
     notes: From Wikidata Q126277820
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.665Z
   - id: f_jeCGCciPsr
     property: website
     value: https://www.longview.org/
@@ -23,9 +28,20 @@ facts:
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q126277820
-    notes: "Longview is UK-based (London). Wikidata lists both UK and US; corrected to primary location."
+    notes: "Longview is UK-based (London). Wikidata lists both UK and US; corrected
+      to primary location."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.652Z
   - id: f_hKc0IS3oWj
     property: founded-by-name
     value: Natalie Cargill
     source: https://www.wikidata.org/wiki/Q126277820
     notes: From Wikidata Q126277820; text value (not entity ref)
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.610Z

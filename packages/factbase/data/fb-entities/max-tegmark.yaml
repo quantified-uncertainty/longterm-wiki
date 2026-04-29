@@ -13,12 +13,22 @@ facts:
     value: 1967
     source: https://www.wikidata.org/wiki/Q2076321
     notes: From Wikidata Q2076321
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.224Z
   - id: f_cneepuZr0c
     property: education
     value: Royal Institute of Technology; Stockholm School of Economics; University
       of California, Berkeley
     source: https://www.wikidata.org/wiki/Q2076321
     notes: From Wikidata Q2076321
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.204Z
   - id: f_mT6tN2pQ3v
     property: notable-for
     value: "Co-founded Future of Life Institute; developed 23 Asilomar AI
@@ -31,6 +41,11 @@ facts:
     value: 1967
     source: https://en.wikipedia.org/wiki/Max_Tegmark
     notes: Born May 5, 1967 in Stockholm, Sweden
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:54.184Z
 
   - id: f_mTfB4gN5mD
     property: education
@@ -39,6 +54,11 @@ facts:
       UC Berkeley (1994)"
     source: https://en.wikipedia.org/wiki/Max_Tegmark
     notes: Enriched from wiki page
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.183Z
   - id: f_AGyF3JFynu
     property: website
     value: http://space.mit.edu/home/tegmark/

@@ -13,7 +13,14 @@ facts:
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q17098689,
-        notes: From Wikidata Q17098689
+        notes: From Wikidata Q17098689,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.980Z
+          }
       },
     {
         id: f_rDCcj9ZRK7,

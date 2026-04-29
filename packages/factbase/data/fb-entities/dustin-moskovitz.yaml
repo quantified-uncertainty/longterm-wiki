@@ -5,6 +5,11 @@ facts:
     value: 1984
     source: https://www.bloomberg.com/billionaires/profiles/dustin-a-moskovitz/
     notes: "Born May 22, 1984 in Gainesville, Florida"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.139Z
 
   # ── Migrated from old facts system ─────────────────────────────
   - id: f_Bl2mI7ehdw
@@ -13,6 +18,11 @@ facts:
     asOf: 2025-05
     source: https://www.forbes.com/profile/dustin-moskovitz/
     notes: "Forbes estimate, May 2025; primarily from Meta and Asana stakes"
+    sourcing:
+      verdict: outdated
+      evidence: 1 → outdated
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.138Z
 
   - id: f_Vp6Cwbn1IQ
     property: net-worth
@@ -20,6 +30,11 @@ facts:
     asOf: 2026-02
     source: https://www.bloomberg.com/billionaires/profiles/dustin-a-moskovitz/
     notes: "Bloomberg estimate; Meta stake removed from calculation in May 2025"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.118Z
 
   - id: f_ERJeveCC4g
     property: equity-stake-percent
@@ -39,6 +54,11 @@ facts:
     value: Harvard University; Vanguard High School
     source: https://www.wikidata.org/wiki/Q370217
     notes: From Wikidata Q370217
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.082Z
   - id: f_7ZwsPlUQ6A
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Dustin_Moskovitz
@@ -57,7 +77,7 @@ facts:
 
   - id: f_cE6rp57HY8
     property: ea-alignment-estimate
-    value: [0.9, 0.95]
+    value: [ 0.9, 0.95 ]
     asOf: "2026-04"
     notes: "Editorial estimate. Co-founder of Good Ventures; Open Philanthropy is
       the single largest EA-aligned grantmaker. Very high confidence that

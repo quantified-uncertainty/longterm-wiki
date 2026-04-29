@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 1096-01,
         source: https://www.wikidata.org/wiki/Q34433,
-        notes: From Wikidata Q34433
+        notes: From Wikidata Q34433,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.488Z
+          }
       },
     {
         id: f_VF4sT4m4Eh,
         property: headquarters,
         value: Oxford,
         source: https://www.wikidata.org/wiki/Q34433,
-        notes: From Wikidata Q34433
+        notes: From Wikidata Q34433,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.453Z
+          }
       },
     {
         id: f_TQewFpLqkX,
         property: country,
         value: United Kingdom,
         source: https://www.wikidata.org/wiki/Q34433,
-        notes: From Wikidata Q34433
+        notes: From Wikidata Q34433,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:46.449Z
+          }
       },
     {
         id: f_WokpvCnnCp,

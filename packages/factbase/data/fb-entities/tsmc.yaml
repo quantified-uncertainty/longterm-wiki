@@ -6,22 +6,42 @@ facts:
     value: "1987-02"
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "Founded February 1987 by Morris Chang in Hsinchu, Taiwan"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.852Z
 
   - id: f_dpTloGMu4h
     property: headquarters
     value: "Hsinchu, Taiwan"
     source: https://en.wikipedia.org/wiki/TSMC
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.851Z
 
   - id: f_8kifh75eFV
     property: country
     value: Taiwan
     source: https://en.wikipedia.org/wiki/TSMC
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.830Z
 
   - id: f_gpFBLI9WPc
     property: founded-by-name
     value: Morris Chang
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "Pioneered the pure-play foundry business model"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.805Z
 
   - id: f_lMKMcV4iQu
     property: ceo
@@ -29,11 +49,21 @@ facts:
     asOf: 2026-03
     source: https://en.wikipedia.org/wiki/TSMC
     notes: "CEO since 2018; Mark Liu serves as Chairman"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.804Z
 
   - id: f_tctZX713vR
     property: legal-structure
     value: "Public company (TWSE: 2330, NYSE: TSM)"
     source: https://en.wikipedia.org/wiki/TSMC
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.765Z
 
   - id: f_iDxHyElMGq
     property: website
@@ -50,9 +80,10 @@ facts:
   - id: f_8emFThOqSy
     property: description
     value: >-
-      World's largest dedicated semiconductor foundry. Fabricates over 60% of all
-      semiconductors globally and more than 90% of the most advanced chips (sub-7nm).
-      Pioneered the pure-play foundry model. Key chokepoint in AI chip governance.
+      World's largest dedicated semiconductor foundry. Fabricates over 60% of
+      all semiconductors globally and more than 90% of the most advanced chips
+      (sub-7nm). Pioneered the pure-play foundry model. Key chokepoint in AI
+      chip governance.
     asOf: 2026-03
 
   # ── Headcount ───────────────────────────────────────────────────
@@ -62,6 +93,11 @@ facts:
     asOf: 2022-12
     source: https://www.macrotrends.net/stocks/charts/TSM/taiwan-semiconductor-manufacturing/number-of-employees
     notes: "73,090 employees at end of 2022; 12.2% increase from 2021"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.763Z
 
   - id: f_tsHc2023qv
     property: headcount
@@ -69,13 +105,24 @@ facts:
     asOf: 2023-12
     source: https://www.macrotrends.net/stocks/charts/TSM/taiwan-semiconductor-manufacturing/number-of-employees
     notes: "76,478 employees at end of 2023; 4.6% increase from 2022"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.743Z
 
   - id: f_HEkrndUQWM
     property: headcount
     value: 83825
     asOf: 2024-12
     source: https://investor.tsmc.com/static/annualReports/2024/english/index.html
-    notes: "83,825 employees worldwide at end of 2024 per annual report; 9.6% increase from 2023"
+    notes: "83,825 employees worldwide at end of 2024 per annual report; 9.6%
+      increase from 2023"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:46.720Z
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_tsRv2022wn
@@ -84,6 +131,11 @@ facts:
     asOf: 2022-12
     source: https://investor.tsmc.com/static/annualReports/2022/english/index.html
     notes: "2022 annual revenue ($75.88B); record year, 33.5% growth from 2021"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.715Z
 
   - id: f_Jo6eLIbvff
     property: revenue
@@ -91,6 +143,11 @@ facts:
     asOf: 2023-12
     source: https://investor.tsmc.com/english/annual-reports
     notes: "2023 annual revenue ($69.4B); decline from record 2022"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.677Z
 
   - id: f_199JysnpAk
     property: revenue
@@ -98,6 +155,11 @@ facts:
     asOf: 2024-12
     source: https://investor.tsmc.com/english/annual-reports
     notes: "2024 annual revenue ($87.8B); 26.5% YoY growth driven by AI chip demand"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.679Z
 
   - id: f_tsRv2025jt
     property: revenue
@@ -105,6 +167,11 @@ facts:
     asOf: 2025-12
     source: https://www.manufacturingdive.com/news/tsmc-q4-full-year-2025-earnings-ai-taiwan/809775/
     notes: "2025 annual revenue ($122.4B); 35.9% YoY growth driven by AI demand"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.659Z
 
   # ── Market share ────────────────────────────────────────────────
   - id: f_wIySb9OLoI
@@ -113,6 +180,11 @@ facts:
     asOf: 2024-12
     source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
     notes: "TSMC holds ~64% of global semiconductor foundry revenue"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.628Z
 
   - id: f_Lro8d6qLqd
     property: advanced-node-market-share
@@ -120,6 +192,11 @@ facts:
     asOf: 2024-12
     source: https://www.counterpointresearch.com/insight/global-semiconductor-foundry-market-share
     notes: "TSMC fabricates >90% of chips at sub-7nm nodes"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.627Z
 
   # ── Market cap ──────────────────────────────────────────────────
   - id: f_duaqN4OrM5
@@ -128,6 +205,11 @@ facts:
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/tsm/market-cap/
     notes: "Market cap ~$1.44T as of March 30, 2026"
+    sourcing:
+      verdict: outdated
+      evidence: 1 → outdated
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.591Z
 
   # ── Arizona fab investment ──────────────────────────────────────
   - id: f_Iv4BH22HoL
@@ -135,4 +217,10 @@ facts:
     value: "Announced $65B investment for three semiconductor fabs in Arizona"
     asOf: 2024-12
     source: https://pr.tsmc.com/english/news/3188
-    notes: "Under CHIPS Act incentives; first fab operational 2025, advanced packaging by 2028-2030"
+    notes: "Under CHIPS Act incentives; first fab operational 2025, advanced
+      packaging by 2028-2030"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.473Z

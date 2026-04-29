@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 1999-01,
         source: https://www.wikidata.org/wiki/Q6818817,
-        notes: From Wikidata Q6818817
+        notes: From Wikidata Q6818817,
+        sourcing:
+          {
+            verdict: partial,
+            evidence: 1 → partial,
+            confidence: 0.85,
+            checkedAt: 2026-04-29T16:03:54.119Z
+          }
       },
     {
         id: f_IOHkN9kEi9,
         property: headquarters,
         value: Los Angeles,
         source: https://www.wikidata.org/wiki/Q6818817,
-        notes: From Wikidata Q6818817
+        notes: From Wikidata Q6818817,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:54.057Z
+          }
       },
     {
         id: f_nb0vty2Iry,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q6818817,
-        notes: From Wikidata Q6818817
+        notes: From Wikidata Q6818817,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:54.011Z
+          }
       },
     {
         id: f_74kSv0tJat,
@@ -34,14 +55,28 @@ facts:
         property: revenue,
         value: 1675148,
         source: https://www.wikidata.org/wiki/Q6818817,
-        notes: From Wikidata Q6818817
+        notes: From Wikidata Q6818817,
+        sourcing:
+          {
+            verdict: unverifiable,
+            evidence: 1 → unverifiable,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:54.004Z
+          }
       },
     {
         id: f_uK2jJv3CcI,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q6818817,
-        notes: From Wikidata Q6818817
+        notes: From Wikidata Q6818817,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:54.003Z
+          }
       },
     {
         id: f_mAI2Sbnpl6,

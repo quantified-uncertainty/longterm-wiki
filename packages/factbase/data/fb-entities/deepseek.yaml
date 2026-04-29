@@ -6,43 +6,78 @@ facts:
     value: 2023-07
     source: https://en.wikipedia.org/wiki/DeepSeek
     notes: "Spun off from High-Flyer Quant as an independent AI research lab in July
-      2023; incorporated as Hangzhou DeepSeek Artificial Intelligence Basic Technology
-      Research Co., Ltd."
+      2023; incorporated as Hangzhou DeepSeek Artificial Intelligence Basic
+      Technology Research Co., Ltd."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.610Z
 
   - id: f_0xSCmDaZEg
     property: headquarters
     value: "Hangzhou, Zhejiang, China"
     source: https://en.wikipedia.org/wiki/DeepSeek
     notes: "Headquartered in Hangzhou; parent company High-Flyer is also based there"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.585Z
 
   - id: f_56WVveJOgA
     property: country
     value: China
     source: https://en.wikipedia.org/wiki/DeepSeek
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.581Z
 
   - id: f_eoRYwd1hVw
     property: founded-by-name
     value: Liang Wenfeng
     source: https://fortune.com/2025/01/27/deepseek-founder-liang-wenfeng-hedge-fund-manager-high-flyer-quant-trading/
-    notes: "Co-founder of High-Flyer hedge fund; serves as CEO of both High-Flyer and
-      DeepSeek"
+    notes: "Co-founder of High-Flyer hedge fund; serves as CEO of both High-Flyer
+      and DeepSeek"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.555Z
 
   - id: f_bdfkNTZIbw
     property: legal-structure
     value: "Private subsidiary of High-Flyer"
     source: https://en.wikipedia.org/wiki/DeepSeek
-    notes: "84% owned by Liang Wenfeng; remainder held by individuals affiliated with
-      High-Flyer. No external VC funding as of early 2026."
+    notes: "84% owned by Liang Wenfeng; remainder held by individuals affiliated
+      with High-Flyer. No external VC funding as of early 2026."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.516Z
 
   - id: f_enTjirXUUA
     property: website
     value: https://www.deepseek.com
     source: https://en.wikipedia.org/wiki/DeepSeek
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:42.328Z
 
   - id: f_7Z4yCQzbHQ
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/DeepSeek
     source: https://en.wikipedia.org/wiki/DeepSeek
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:42.308Z
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_Lm7wNd2kPg
@@ -50,8 +85,13 @@ facts:
     value: 100
     asOf: 2023-07
     source: https://www.scmp.com/tech/big-tech/article/3294357/chinas-ai-disrupter-deepseek-bets-low-key-team-young-geniuses-beat-us-giants
-    notes: "Nearly 100 AI engineers assembled by parent company High-Flyer by the time
-      DeepSeek spun off in mid-2023"
+    notes: "Nearly 100 AI engineers assembled by parent company High-Flyer by the
+      time DeepSeek spun off in mid-2023"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:01.528Z
 
   - id: f_nkY9Jq4aTg
     property: headcount
@@ -60,6 +100,11 @@ facts:
     source: https://www.scmp.com/tech/big-tech/article/3294357/chinas-ai-disrupter-deepseek-bets-low-key-team-young-geniuses-beat-us-giants
     notes: "Approximately 150 employees by mid-2024; team maintained flat hierarchy
       emphasizing collaboration over scale"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:01.485Z
 
   - id: f_VX3CZVjbug
     property: headcount
@@ -68,6 +113,11 @@ facts:
     source: https://seo.ai/blog/how-many-employees-does-deepseek-ai-have
     notes: "Approximately 200 employees as of January 2025; LinkedIn lists 51-200
       range. Relatively small team for a frontier lab."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.474Z
 
   # ── Funding ─────────────────────────────────────────────────────
   - id: f_2VCGO6sizA
@@ -78,14 +128,25 @@ facts:
     notes: "DeepSeek has raised zero external VC funding. Entirely funded by
       High-Flyer hedge fund. VCs were reluctant early on; company now declines
       offers."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.435Z
 
   - id: f_VNYzXpqOeg
     property: description
     value: "Parent company High-Flyer manages approximately $8-10B in assets; hedge
-      fund averaged 56.6% returns in 2025, indirectly funding DeepSeek operations"
+      fund averaged 56.6% returns in 2025, indirectly funding DeepSeek
+      operations"
     source: https://www.bloomberg.com/news/articles/2026-01-12/deepseek-founder-liang-s-funds-surge-57-as-china-quants-boom
     notes: "High-Flyer AUM peaked at $12B before shrinking; 2025 returns helped fund
       continued AI research"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:02:30.681Z
 
   # ── Revenue ─────────────────────────────────────────────────────
   - id: f_hTz8RqWm3g
@@ -94,8 +155,13 @@ facts:
     asOf: 2025-06
     source: https://www.businessofapps.com/data/deepseek-statistics/
     notes: "$220M annual revenue run rate by mid-2025; primarily from API usage and
-      enterprise licenses. Actual billed revenue lower than theoretical due to free
-      web/app access and nighttime discounts."
+      enterprise licenses. Actual billed revenue lower than theoretical due to
+      free web/app access and nighttime discounts."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.419Z
 
   # ── Model Details ───────────────────────────────────────────────
   - id: f_qbe0bnJl8Q
@@ -105,6 +171,11 @@ facts:
     source: https://arxiv.org/abs/2412.19437
     notes: "DeepSeek-V3: 671B total parameters (MoE architecture), 37B activated per
       token. Released December 2024."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.419Z
 
   - id: f_TCKCfktktg
     property: description
@@ -112,8 +183,13 @@ facts:
       hours over ~2 months on 2,048 H800 GPUs"
     asOf: 2024-12
     source: https://arxiv.org/abs/2412.19437
-    notes: "Dramatically lower than comparable frontier models; pre-training on 14.8T
-      tokens"
+    notes: "Dramatically lower than comparable frontier models; pre-training on
+      14.8T tokens"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:04:01.389Z
 
   - id: f_WjkJd6O9vA
     property: description
@@ -121,8 +197,13 @@ facts:
       pipeline including base model ~$5.6M"
     asOf: 2025-01
     source: https://mlq.ai/news/deepseek-reveals-r1-model-training-cost-just-294000-in-peer-reviewed-nature-publication/
-    notes: "The $294K figure (per Nature paper) covers only the R1 RL training stage,
-      not the $5.6M V3 base model it builds upon"
+    notes: "The $294K figure (per Nature paper) covers only the R1 RL training
+      stage, not the $5.6M V3 base model it builds upon"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:01.353Z
 
   # ── Users & Downloads ───────────────────────────────────────────
   - id: f_59Kp1EvULg
@@ -131,6 +212,11 @@ facts:
     asOf: 2025-05
     source: https://electroiq.com/stats/deepseek-ai-statistics/
     notes: "57.2 million total app downloads by May 2025"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:01.348Z
 
   - id: f_dgcemsZ6oQ
     property: monthly-active-users
@@ -138,6 +224,11 @@ facts:
     asOf: 2025-01
     source: https://www.demandsage.com/deepseek-statistics/
     notes: "33.7 million MAU in January 2025 after R1 launch"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:01.326Z
 
   - id: f_02T5BrSkPw
     property: monthly-active-users
@@ -145,3 +236,8 @@ facts:
     asOf: 2025-04
     source: https://www.demandsage.com/deepseek-statistics/
     notes: "96.88 million MAU in April 2025; 25.81% increase over March"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.327Z

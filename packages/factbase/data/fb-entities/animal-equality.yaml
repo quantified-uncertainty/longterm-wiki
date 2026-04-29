@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 2006-01,
         source: https://www.wikidata.org/wiki/Q3286916,
-        notes: From Wikidata Q3286916
+        notes: From Wikidata Q3286916,
+        sourcing:
+          {
+            verdict: partial,
+            evidence: 1 → partial,
+            confidence: 0.85,
+            checkedAt: 2026-04-29T16:04:07.833Z
+          }
       },
     {
         id: f_I17s0TbbcC,
         property: headquarters,
         value: Spain,
         source: https://www.wikidata.org/wiki/Q3286916,
-        notes: From Wikidata Q3286916
+        notes: From Wikidata Q3286916,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:04:07.778Z
+          }
       },
     {
         id: f_TSzyR80qPn,
         property: country,
         value: Spain,
         source: https://www.wikidata.org/wiki/Q3286916,
-        notes: From Wikidata Q3286916
+        notes: From Wikidata Q3286916,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:04:07.739Z
+          }
       },
     {
         id: f_gKwjueznPV,

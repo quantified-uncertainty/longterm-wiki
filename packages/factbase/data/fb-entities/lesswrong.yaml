@@ -14,6 +14,11 @@ facts:
     value: 2009-02
     source: https://www.wikidata.org/wiki/Q13980547
     notes: From Wikidata Q13980547
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.326Z
   - id: f_cnVW9W4SZw
     property: website
     value: https://www.lesswrong.com/
@@ -24,6 +29,11 @@ facts:
     value: Eliezer Yudkowsky
     source: https://www.wikidata.org/wiki/Q13980547
     notes: From Wikidata Q13980547; text value (not entity ref)
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:55.301Z
   - id: f_lFjInCSin5
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/LessWrong

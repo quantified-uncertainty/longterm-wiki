@@ -5,12 +5,22 @@ facts:
     value: "2019-03"
     source: https://news.stanford.edu/stories/2019/03/stanford_university_launches_human-centered_ai
     notes: "Stanford launched HAI in March 2019"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.663Z
 
   - id: f_Dp8gK2sW6b
     property: headquarters
     value: "Stanford, California"
     source: https://hai.stanford.edu/about
     notes: "Located on the Stanford University campus"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.662Z
 
   - id: f_Fq1vL5tN9c
     property: headcount
@@ -20,32 +30,65 @@ facts:
     asOf: 2025-06
     source: https://contactout.com/company/stanford-institute-for-human-centered-artificial-hai-3889
     notes: "Source lists 51-200 employees including staff, faculty, and fellows"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.600Z
 
   - id: f_Jy7dR9wK2e
     property: website
     value: "https://hai.stanford.edu/"
     source: https://hai.stanford.edu/
     notes: "Official website"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:34.304Z
 
   - id: f_Lz5aH1vB8f
     property: description
-    value: "Stanford's interdisciplinary institute for human-centered AI research, education, and policy. Co-directed by John Etchemendy and Fei-Fei Li, HAI publishes the annual AI Index Report tracking global AI trends and conducts research across 200+ faculty affiliates from all seven Stanford schools."
+    value: "Stanford's interdisciplinary institute for human-centered AI research,
+      education, and policy. Co-directed by John Etchemendy and Fei-Fei Li, HAI
+      publishes the annual AI Index Report tracking global AI trends and
+      conducts research across 200+ faculty affiliates from all seven Stanford
+      schools."
     asOf: 2026-03
     source: https://hai.stanford.edu/about
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:47.578Z
 
   - id: f_gGmHvFYFGj
     property: publication
-    value: "Annual AI Index Report — comprehensive data-driven analysis of global AI trends across R&D, economy, policy, ethics, and public opinion. Cited by governments, journalists, and researchers worldwide."
+    value: "Annual AI Index Report — comprehensive data-driven analysis of global AI
+      trends across R&D, economy, policy, ethics, and public opinion. Cited by
+      governments, journalists, and researchers worldwide."
     asOf: 2025
     source: https://aiindex.stanford.edu/
     notes: "One of the most influential annual AI publications; published since 2018"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.572Z
 
   - id: f_XaGAuLDuRH
     property: program
-    value: "Center for Research on Foundation Models (CRFM) — studies foundation model capabilities, risks, and societal implications. Approximately 175 affiliated researchers."
+    value: "Center for Research on Foundation Models (CRFM) — studies foundation
+      model capabilities, risks, and societal implications. Approximately 175
+      affiliated researchers."
     asOf: 2024
     source: https://crfm.stanford.edu/
     notes: "Produces HELM (Holistic Evaluation of Language Models) benchmarks"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:47.566Z
 
   - id: f_iGiGC4pZKB
     property: affiliated-faculty
@@ -53,11 +96,21 @@ facts:
     asOf: 2025
     source: https://hai.stanford.edu/about
     notes: "200+ affiliated faculty across all seven Stanford schools"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.564Z
 
   - id: f_kkTvpDXxYY
     property: country
     value: United States
     source: https://hai.stanford.edu/about
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.486Z
 
   - id: f_jiXzOc53q8
     property: key-person
@@ -67,3 +120,8 @@ facts:
     asOf: 2024
     source: https://hai.stanford.edu/about
     notes: "Co-directors since founding in 2019"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:47.485Z

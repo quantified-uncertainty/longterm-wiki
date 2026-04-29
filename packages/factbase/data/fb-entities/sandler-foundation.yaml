@@ -6,7 +6,14 @@ facts:
         property: founded-date,
         value: "1991",
         source: https://www.wikidata.org/wiki/Q7416399,
-        notes: From Wikidata Q7416399
+        notes: From Wikidata Q7416399,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:48.595Z
+          }
       },
     {
         id: f_hRTPvbX8TK,

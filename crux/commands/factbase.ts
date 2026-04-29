@@ -19,6 +19,7 @@ import type { Entity, Fact, ValidationResult } from '../../packages/factbase/src
 import { commands as kbMigrateCommands } from './factbase-migrate.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
 import { commands as sourceBackfillCommands } from './factbase-source-backfill.ts';
+import { commands as attachSourcingCommands } from './factbase-attach-sourcing.ts';
 import { commands as migrateEntitiesCommands } from './factbase-migrate-entities.ts';
 import { lookupResourceByUrl, upsertResource } from '../lib/wiki-server/resources.ts';
 import { hashId, guessResourceType } from '../resource-utils.ts';
@@ -1112,6 +1113,7 @@ export const commands = {
   'sync-sources': syncSourcesCommand,
   'sourcing': sourcingCommand,
   'source-backfill': sourceBackfillCommands.default,
+  'attach-sourcing': attachSourcingCommands.default,
   'add-fact': addFactCommand,
   // Consolidated from factbase-migrate-entities domain
   'migrate-entities': migrateEntitiesCommands.run,
@@ -1140,6 +1142,7 @@ Commands:
   sync-sources          Sync KB fact source URLs to wiki-server as Resources
   sourcing          Check KB facts against source URLs using LLM
   source-backfill       Suggest source URLs for facts that have none (QUA-545) [--apply]
+  attach-sourcing       Round-trip PG sourcing verdicts back into YAML (QUA-850) [--apply]
   migrate-entities [--dry-run]  Transform YAML files from thing: to entity: format
   migrate-entities-status       Show migration status (files in each format)
 

@@ -5,12 +5,23 @@ facts:
     value: "2018"
     source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
     notes: "Established in early 2018 by the Nuffield Foundation"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.282Z
 
   - id: f_Fq8gK3sW5b
     property: headquarters
     value: "London, England"
     source: https://www.nuffieldfoundation.org/news/we-have-moved
-    notes: "100 St John Street, London EC1M 4EH (moved from 28 Bedford Square in June 2021)"
+    notes: "100 St John Street, London EC1M 4EH (moved from 28 Bedford Square in
+      June 2021)"
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → unverifiable, 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.258Z
 
   - id: f_Hw1vL6tN9c
     property: total-funding
@@ -19,7 +30,13 @@ facts:
     usdEquivalent: 6700000
     asOf: 2018-01
     source: https://www.nuffieldfoundation.org/news/the-nuffield-foundation-announces-new-5-million-ada-lovelace-institute
-    notes: "Nuffield Foundation committed GBP 5 million over five years to establish the institute (~USD 6.7M at 2018 exchange rates)."
+    notes: "Nuffield Foundation committed GBP 5 million over five years to establish
+      the institute (~USD 6.7M at 2018 exchange rates)."
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:09.178Z
 
   - id: f_Jy4cJ7mQ3d
     property: legal-structure
@@ -27,12 +44,22 @@ facts:
     source: https://www.adalovelaceinstitute.org/about/
     notes: "Established by the Nuffield Foundation in collaboration with the Alan
       Turing Institute, Royal Society, British Academy, and others"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.177Z
 
   - id: f_Lz8dR2wK6e
     property: website
     value: "https://www.adalovelaceinstitute.org/"
     source: https://www.adalovelaceinstitute.org/
     notes: "Official website"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:43.718Z
 
   - id: f_Nw5aH9vB1f
     property: description
@@ -43,8 +70,18 @@ facts:
       including the Alan Turing Institute and Royal Society."
     asOf: 2026-03
     source: https://www.adalovelaceinstitute.org/about/
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.92
+      checkedAt: 2026-04-29T16:04:09.172Z
   - id: f_ghjTZTwljj
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q131907017
     notes: From Wikidata Q131907017
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.155Z

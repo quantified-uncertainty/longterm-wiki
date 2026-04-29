@@ -5,22 +5,42 @@ facts:
     value: 2021-10
     source: https://alignment.org/
     notes: "Focused on alignment research and evals"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.463Z
 
   - id: f_QaQmHPiYXu
     property: headquarters
     value: "Berkeley, CA"
     source: https://alignment.org/
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.461Z
 
   - id: f_BNGTSP3p6l
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://alignment.org/
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.447Z
 
   - id: f_tC3M5pbZUg
     property: founded-by
     value:
       - !ref sid_vzxfzxBITd
     source: https://alignment.org/
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.374Z
   - id: f_GPi8lgtZXI
     property: website
     value: http://alignment.org/
@@ -31,16 +51,31 @@ facts:
     value: 2021-04
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.374Z
   - id: f_T7ccXjSTpH
     property: headquarters
     value: Berkeley
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.363Z
   - id: f_AefxVIHGz2
     property: founded-by-name
     value: Paul Christiano
     source: https://www.wikidata.org/wiki/Q117834778
     notes: From Wikidata Q117834778; text value (not entity ref)
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.364Z
   - id: f_aOLa0LB5z7
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Alignment_Research_Center

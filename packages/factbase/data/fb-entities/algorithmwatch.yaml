@@ -5,17 +5,33 @@ facts:
     value: "2017"
     source: https://algorithmwatch.org/en/transparency/
     notes: "Initiative started end of 2015; registered as gGmbH in February 2017"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.383Z
 
   - id: f_Osygi4vPA6
     property: headquarters
     value: "Boyenstrasse 41, 10115 Berlin, Germany"
     source: https://algorithmwatch.org/en/transparency/
     notes: "Also has a Zurich presence"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.382Z
 
   - id: f_IDTqitSdPe
     property: legal-structure
-    value: "German nonprofit (gGmbH), tax-exempt through March 2026. Tax ID 27/640/02364."
+    value: "German nonprofit (gGmbH), tax-exempt through March 2026. Tax ID
+      27/640/02364."
     source: https://algorithmwatch.org/en/transparency/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.314Z
 
   - id: f_lGRSYGn2Xw
     property: annual-revenue
@@ -23,21 +39,41 @@ facts:
     currency: EUR
     asOf: 2022
     source: https://algorithmwatch.org/en/transparency/
-    notes: "2022: grants EUR 1.12M + donations EUR 60K + other EUR 17K. Major funders: Alfred Landecker Foundation, BMBF, BMUV, Deutsche Postcode Lotterie"
+    notes: "2022: grants EUR 1.12M + donations EUR 60K + other EUR 17K. Major
+      funders: Alfred Landecker Foundation, BMBF, BMUV, Deutsche Postcode
+      Lotterie"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.293Z
 
   - id: f_RLczMqjtDO
     property: employee-count
     value: "20"
     asOf: 2024-02
     source: https://algorithmwatch.org/en/transparency/
-    notes: "20 employees (full/part-time); team page lists 43 including fellows, interns, advisors"
+    notes: "20 employees (full/part-time); team page lists 43 including fellows,
+      interns, advisors"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.292Z
 
   - id: f_56IdYbEbXJ
     property: program
-    value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026): 8 European journalists/researchers, EUR 7,400 each, 6-month investigation with editorial support and mentorship"
+    value: "Algorithmic Accountability Reporting Fellowship (5th cohort 2025-2026):
+      8 European journalists/researchers, EUR 7,400 each, 6-month investigation
+      with editorial support and mentorship"
     asOf: 2025
     source: https://algorithmwatch.org/en/fellows-algorithmic-accountability-fifth-cohort/
     notes: "8 fellows per source (corrected from 'up to 6')"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.291Z
 
   - id: f_vdosFaef7s
     property: founded-by
@@ -47,13 +83,28 @@ facts:
       - !ref sid_g9Ytmyy1VI
       - !ref sid_gIDwNGCgo9
     source: https://algorithmwatch.org/de/about-en-alt/
-    notes: "Jaume-Palasi departed in October 2018. Spielkamp remains executive director."
+    notes: "Jaume-Palasi departed in October 2018. Spielkamp remains executive
+      director."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.293Z
 
   - id: f_jDoEh9WLQG
     property: description
-    value: "German nonprofit research and advocacy organization focused on the societal impacts of algorithmic decision-making (ADM). Investigates automated systems in hiring, credit scoring, social media, and public administration. Produces policy research, investigative journalism, and the Automating Society Report."
+    value: "German nonprofit research and advocacy organization focused on the
+      societal impacts of algorithmic decision-making (ADM). Investigates
+      automated systems in hiring, credit scoring, social media, and public
+      administration. Produces policy research, investigative journalism, and
+      the Automating Society Report."
     asOf: 2026-03
     source: https://algorithmwatch.org/en/about/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:08.227Z
 
   - id: f_9RM85VI9LS
     property: website
@@ -64,10 +115,23 @@ facts:
     property: country
     value: "Germany"
     source: https://algorithmwatch.org/en/transparency/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:08.207Z
 
   - id: f_X0bmFKg4d1
     property: funding-sources
-    value: "Alfred Landecker Foundation, Stiftung Mercator, Robert Bosch Foundation, Zeit Stiftung, German federal ministries (BMBF, BMUV, BMFSFJ, BMJV), Deutsche Postcode Lotterie, Schopflin Stiftung, European AI & Society Fund"
+    value: "Alfred Landecker Foundation, Stiftung Mercator, Robert Bosch Foundation,
+      Zeit Stiftung, German federal ministries (BMBF, BMUV, BMFSFJ, BMJV),
+      Deutsche Postcode Lotterie, Schopflin Stiftung, European AI & Society
+      Fund"
     asOf: 2024
     source: https://algorithmwatch.org/en/transparency/
     notes: "No individual donor exceeds 10% of annual income. Primarily grant-funded."
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:08.200Z

@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 1950-12,
         source: https://www.wikidata.org/wiki/Q6256434,
-        notes: From Wikidata Q6256434
+        notes: From Wikidata Q6256434,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.710Z
+          }
       },
     {
         id: f_MmHsVCrytD,
         property: headquarters,
         value: Miami,
         source: https://www.wikidata.org/wiki/Q6256434,
-        notes: From Wikidata Q6256434
+        notes: From Wikidata Q6256434,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.666Z
+          }
       },
     {
         id: f_tEvKHlHU39,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q6256434,
-        notes: From Wikidata Q6256434
+        notes: From Wikidata Q6256434,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:55.650Z
+          }
       },
     {
         id: f_znD1lPHMtn,
@@ -34,14 +55,28 @@ facts:
         property: founded-by-name,
         value: John S. Knight,
         source: https://www.wikidata.org/wiki/Q6256434,
-        notes: From Wikidata Q6256434; text value (not entity ref)
+        notes: From Wikidata Q6256434; text value (not entity ref),
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.646Z
+          }
       },
     {
         id: f_p6fL13Sgek,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q6256434,
-        notes: From Wikidata Q6256434
+        notes: From Wikidata Q6256434,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:55.627Z
+          }
       },
     {
         id: f_FbYa30mbFq,

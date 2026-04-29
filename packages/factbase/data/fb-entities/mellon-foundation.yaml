@@ -13,14 +13,28 @@ facts:
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q4758812,
-        notes: From Wikidata Q4758812
+        notes: From Wikidata Q4758812,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:54.149Z
+          }
       },
     {
         id: f_I4NJjt9Wlg,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q4758812,
-        notes: From Wikidata Q4758812
+        notes: From Wikidata Q4758812,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:54.120Z
+          }
       },
     {
         id: f_N8nL1NzzXJ,
@@ -34,14 +48,29 @@ facts:
         property: founded-by-name,
         value: Paul Mellon,
         source: https://www.wikidata.org/wiki/Q4758812,
-        notes: "Founded by Paul Mellon (corrected from Ailsa Mellon Bruce per Wikidata). Ailsa Mellon Bruce was involved but is not listed as founder."
+        notes: "Founded by Paul Mellon (corrected from Ailsa Mellon Bruce per Wikidata).
+          Ailsa Mellon Bruce was involved but is not listed as founder.",
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:54.098Z
+          }
       },
     {
         id: f_J82vcEqfHD,
         property: legal-structure,
         value: foundation,
         source: https://www.wikidata.org/wiki/Q4758812,
-        notes: From Wikidata Q4758812
+        notes: From Wikidata Q4758812,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:54.093Z
+          }
       },
     {
         id: f_7JebbsKw9H,

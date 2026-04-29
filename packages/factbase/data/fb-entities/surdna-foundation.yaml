@@ -6,14 +6,28 @@ facts:
         property: founded-date,
         value: "1917",
         source: https://www.wikidata.org/wiki/Q7395039,
-        notes: From Wikidata Q7395039
+        notes: From Wikidata Q7395039,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:47.398Z
+          }
       },
     {
         id: f_y3dCCFeKco,
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q7395039,
-        notes: From Wikidata Q7395039
+        notes: From Wikidata Q7395039,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:47.399Z
+          }
       },
     {
         id: f_gmUZmrBMcg,

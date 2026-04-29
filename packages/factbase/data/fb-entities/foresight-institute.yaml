@@ -5,11 +5,21 @@ facts:
     value: "1986"
     source: https://en.wikipedia.org/wiki/Foresight_Institute
     notes: "Founded by Christine Peterson, K. Eric Drexler, and James C. Bennett"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.534Z
 
   - id: f_WxpRXdBjAD
     property: headquarters
     value: San Francisco, CA
     source: https://foresight.org
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.517Z
 
   - id: f_Tmh4oo3HtS
     property: website
@@ -19,12 +29,18 @@ facts:
     property: description
     value: >-
       Nonprofit research organization and think tank focused on nanotechnology,
-      secure AI, neurotechnology, longevity biotechnology, space, and existential
-      hope. Operates through grants, prizes, fellowships, and conferences rather
-      than direct laboratory research. Known for the Feynman Prize in
-      Nanotechnology (since 1993) and recent expansion into AI safety grantmaking.
+      secure AI, neurotechnology, longevity biotechnology, space, and
+      existential hope. Operates through grants, prizes, fellowships, and
+      conferences rather than direct laboratory research. Known for the Feynman
+      Prize in Nanotechnology (since 1993) and recent expansion into AI safety
+      grantmaking.
     asOf: 2025
     source: https://foresight.org
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.516Z
 
   - id: f_qM9MOhiX3V
     property: total-assets
@@ -32,7 +48,13 @@ facts:
     currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
-    notes: "From IRS Form 990 filing (fiscal year ending Dec 2024, filed Nov 2025). EIN: 77-0119168."
+    notes: "From IRS Form 990 filing (fiscal year ending Dec 2024, filed Nov 2025).
+      EIN: 77-0119168."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.499Z
 
   - id: f_h0OSCecsVg
     property: annual-expenses
@@ -41,6 +63,11 @@ facts:
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.498Z
 
   - id: f_PwmzuTbNLQ
     property: annual-expenses
@@ -49,6 +76,11 @@ facts:
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.448Z
 
   - id: f_Kfhwhz9Iow
     property: annual-expenses
@@ -57,6 +89,11 @@ facts:
     asOf: "2023"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.428Z
 
   - id: f_3oG8SogVOI
     property: annual-expenses
@@ -64,7 +101,13 @@ facts:
     currency: USD
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
-    notes: "Total functional expenses from Form 990 (fiscal year ending Dec 2024, filed Nov 2025)"
+    notes: "Total functional expenses from Form 990 (fiscal year ending Dec 2024,
+      filed Nov 2025)"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.413Z
 
   - id: f_AYVFqVRNeG
     property: employee-count
@@ -77,10 +120,15 @@ facts:
     value: >-
       AI Safety Grants Program — launched August 2023 with $1M initial budget.
       Expanded to ~$1.5M in 2024 across seven research areas: AI security,
-      private AI, decentralized/cooperative AI, AI for science/epistemics,
-      AI for neurotechnology, AI for longevity biotech, AI for molecular nanotech.
+      private AI, decentralized/cooperative AI, AI for science/epistemics, AI
+      for neurotechnology, AI for longevity biotech, AI for molecular nanotech.
     asOf: 2024
     source: https://foresight.org/ai-safety-grants/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.766Z
 
   - id: f_y1IzIsfEAH
     property: program
@@ -90,6 +138,11 @@ facts:
       (2007, Nobel Prize 2016) and David Baker (2004, Nobel Prize 2024).
     asOf: 2024
     source: https://foresight.org/feynman-prize/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:59.413Z
 
   - id: f_seSdElHSv6
     property: program
@@ -103,33 +156,44 @@ facts:
     property: program
     value: >-
       AI Nodes — planned physical hubs in San Francisco and Berlin providing
-      grant funding, office/event space, and compute resources for AI safety
-      and AI-for-science researchers. ~$5M raised toward $7M target as of early 2026.
+      grant funding, office/event space, and compute resources for AI safety and
+      AI-for-science researchers. ~$5M raised toward $7M target as of early
+      2026.
     asOf: 2026
     source: https://foresight.org/ai-nodes/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.409Z
 
   - id: f_N5lXc1GdyD
     property: program
     value: >-
       Tech Trees — interactive technology roadmaps identifying key actors,
-      bottlenecks, and opportunities in Secure AI, Longevity, Human-AI Cooperation,
-      Whole Brain Emulation, Molecular Machines, and Space.
+      bottlenecks, and opportunities in Secure AI, Longevity, Human-AI
+      Cooperation, Whole Brain Emulation, Molecular Machines, and Space.
     asOf: 2025
     source: https://foresight.org/tech-trees/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.847Z
 
   - id: f_Xib6e7BJRs
     property: program
     value: >-
-      Norm Hardy Prize — $10,000 award for advances in usable security.
-      2025 winner: Dr. Pardis Emami-Naeini for cybersecurity labeling for
-      smart home devices that influenced the U.S. Cyber Trust Mark.
+      Norm Hardy Prize — $10,000 award for advances in usable security. 2025
+      winner: Dr. Pardis Emami-Naeini for cybersecurity labeling for smart home
+      devices that influenced the U.S. Cyber Trust Mark.
     asOf: 2025
 
   - id: f_A0hbFbdJLn
     property: program
     value: >-
-      Whole Brain Emulation Endowment — ~$2.3M raised to support fast grants
-      and a $20M grand prize for achieving the first complete human brain emulation.
+      Whole Brain Emulation Endowment — ~$2.3M raised to support fast grants and
+      a $20M grand prize for achieving the first complete human brain emulation.
     asOf: 2025
 
   - id: f_StP6Vh4wkV
@@ -138,7 +202,13 @@ facts:
     currency: USD
     asOf: "2023"
     source: https://futureoflife.org/grant/foresight-institute-existential-hope/
-    notes: "Grant from Future of Life Institute for Existential Hope and Tech Tree Programs, published October 2023"
+    notes: "Grant from Future of Life Institute for Existential Hope and Tech Tree
+      Programs, published October 2023"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.854Z
 
   - id: f_A3gqqlkvOg
     property: revenue
@@ -147,6 +217,11 @@ facts:
     asOf: "2021"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990. Growth year as organization expanded into AI safety."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.364Z
 
   - id: f_TSbd1JsuHw
     property: revenue
@@ -155,6 +230,11 @@ facts:
     asOf: "2022"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.340Z
 
   - id: f_wYlShSVHlQ
     property: revenue
@@ -163,6 +243,11 @@ facts:
     asOf: "2023"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.322Z
 
   - id: f_l8DspNqJJw
     property: revenue
@@ -171,6 +256,11 @@ facts:
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "From IRS Form 990. Significant growth year — nearly tripled from 2023."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:59.322Z
 
   - id: f_7mh2tQkFnF
     property: program-service-revenue
@@ -179,9 +269,19 @@ facts:
     asOf: "2024"
     source: https://projects.propublica.org/nonprofits/organizations/770119168
     notes: "Program service revenue from Form 990 (subset of total revenue)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:59.314Z
 
   - id: f_WOe9zxrdoK
     property: charity-rating
     value: "4 stars — Charity Navigator"
     asOf: "2024"
     source: https://www.charitynavigator.org/ein/770119168
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:59.267Z

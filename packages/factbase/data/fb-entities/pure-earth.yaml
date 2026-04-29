@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 1999-01,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: From Wikidata Q145590
+        notes: From Wikidata Q145590,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:49.951Z
+          }
       },
     {
         id: f_hZy9i63Axm,
         property: headquarters,
         value: New York City,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: From Wikidata Q145590
+        notes: From Wikidata Q145590,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:49.782Z
+          }
       },
     {
         id: f_KCrWY6Elwz,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: From Wikidata Q145590
+        notes: From Wikidata Q145590,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:49.780Z
+          }
       },
     {
         id: f_IxN9ajXJLS,
@@ -35,14 +56,29 @@ facts:
         value: 10512947,
         asOf: 2021,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: "Revenue $10.5M (2021). Wikidata listed $1.5M without year; actual range is $1.2M (2012) to $10.5M (2021)."
+        notes: "Revenue $10.5M (2021). Wikidata listed $1.5M without year; actual range
+          is $1.2M (2012) to $10.5M (2021).",
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:49.779Z
+          }
       },
     {
         id: f_lnZZAHmXU4,
         property: legal-structure,
         value: 501(c)(3) organization,
         source: https://www.wikidata.org/wiki/Q145590,
-        notes: From Wikidata Q145590
+        notes: From Wikidata Q145590,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:49.770Z
+          }
       },
     {
         id: f_XRNvpnoFws,

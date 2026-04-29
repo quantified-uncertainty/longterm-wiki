@@ -18,6 +18,11 @@ facts:
     asOf: 2026-03
     source: https://gwern.net
     notes: Enriched from wiki page; pseudonymous researcher, no born-year added
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:57.106Z
   - id: f_NkRlYhhmxw
     property: website
     value: https://www.gwern.net/

@@ -10,6 +10,11 @@ facts:
     value: "CEO of Conjecture; co-founder of EleutherAI; prominent AI safety
       advocate; testified before UK Parliament and EU on AI risks"
     source: https://en.wikipedia.org/wiki/Connor_Leahy
+    sourcing:
+      verdict: partial
+      evidence: 2 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:02.453Z
 
   - id: f_cL4fG5hI6j
     property: social-media

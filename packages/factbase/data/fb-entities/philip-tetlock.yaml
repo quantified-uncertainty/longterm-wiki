@@ -13,11 +13,21 @@ facts:
     value: 1954
     source: https://www.wikidata.org/wiki/Q2086480
     notes: From Wikidata Q2086480
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:50.127Z
   - id: f_FAYQhcZXdh
     property: education
     value: Yale University; University of British Columbia
     source: https://www.wikidata.org/wiki/Q2086480
     notes: From Wikidata Q2086480
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.071Z
   - id: f_pT6tN2pQ1v
     property: notable-for
     value: "Pioneered science of superforecasting; authored Expert Political

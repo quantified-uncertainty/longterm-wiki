@@ -6,15 +6,26 @@ facts:
     notes: "Born April 22, 1985 in Chicago, Illinois"
   - id: f_aR3kT8mW5q
     property: education
-    value: "Studied computer science at Stanford University for two years; dropped out in 2005"
+    value: "Studied computer science at Stanford University for two years; dropped
+      out in 2005"
     source: https://en.wikipedia.org/wiki/Sam_Altman
     notes: "Left Stanford to co-found Loopt, his first startup"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.760Z
 
   - id: f_bN7vQ2xJ4p
     property: notable-for
     value: "CEO of OpenAI; previously president of Y Combinator; central figure in
       the commercialization of large language models"
     source: https://en.wikipedia.org/wiki/Sam_Altman
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.760Z
 
   - id: f_cM6wP9rK3s
     property: social-media
@@ -37,7 +48,15 @@ facts:
     value: 3.3e+9
     asOf: "2026-03"
     source: https://en.wikipedia.org/wiki/Sam_Altman
-    notes: "Forbes March 2026: $3.3B. Derived from venture investments including Reddit (~$1.6B in shares), Stripe, Helion Energy, and other holdings. Altman holds zero OpenAI equity per the Oct 2025 PBC restructuring, despite earlier reports of a proposed 7% stake."
+    notes: "Forbes March 2026: $3.3B. Derived from venture investments including
+      Reddit (~$1.6B in shares), Stripe, Helion Energy, and other holdings.
+      Altman holds zero OpenAI equity per the Oct 2025 PBC restructuring,
+      despite earlier reports of a proposed 7% stake."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.759Z
 
   - id: f_kFUCZeA9vg
     property: description

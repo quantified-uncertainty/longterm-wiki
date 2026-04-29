@@ -5,6 +5,11 @@ facts:
     value: "2022"
     source: https://www.gladstone.ai/about
     notes: "Founded by Jeremie Harris (CEO) and Edouard Harris (CTO)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:57.754Z
 
   - id: f_jAh3sxgAw5
     property: founded-by
@@ -13,6 +18,11 @@ facts:
       - !ref sid_7lQpdb5nDg
     source: https://www.gladstone.ai/about
     notes: "Brothers with backgrounds in physics and AI startups; Y Combinator alumni"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.756Z
 
   - id: f_2a2wV4u2y5
     property: description
@@ -24,6 +34,11 @@ facts:
       including senior executives, generals, and admirals.
     asOf: 2025-12
     source: https://www.gladstone.ai/about
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:57.731Z
 
   - id: f_rrTE7WhInG
     property: headcount
@@ -33,6 +48,11 @@ facts:
     asOf: 2024-03
     source: https://time.com/6898967/ai-extinction-national-security-risks-report/
     notes: "Described as a four-person firm in early 2024; may have grown since"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.712Z
 
   - id: f_RO2UEc6GRY
     property: funding-received
@@ -41,17 +61,32 @@ facts:
     source: https://time.com/6898967/ai-extinction-national-security-risks-report/
     notes: "Federal contract worth $250,000 from U.S. State Department for the
       'Defense in Depth' report, commissioned November 2022"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.702Z
 
   - id: f_9Wvj44C569
     property: legal-structure
     value: "Private company"
     source: https://www.gladstone.ai/about
     notes: "Independent firm; no outside funding taken as of 2024"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.668Z
   - id: f_mAve7ppoeu
     property: country
     value: Australia
     source: https://www.wikidata.org/wiki/Q3275488
     notes: From Wikidata Q3275488
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:57.666Z
   - id: f_5nTHS4AgBE
     property: website
     value: http://www.gladstone.qld.gov.au/web/guest/gladstone-airport

@@ -7,6 +7,11 @@ facts:
     asOf: 2025-02
     source: https://digitalchew.com/2025/03/04/federal-tech-office-18f-shuts-down-85-employees-laid-off/
     notes: "Staff at time of shutdown; had been over 100 at peak"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:19.390Z
 
   - id: f_JOOAfnEGZM
     property: headcount
@@ -14,13 +19,24 @@ facts:
     asOf: 2025-03
     source: https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/
     notes: "Eliminated entirely on February 28/March 1, 2025"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T22:18:23.267Z
 
   # ── Founding ───────────────────────────────────────────────────
   - id: f_qitBEUD8xO
     property: founded-date
     value: "2014-03-19"
     source: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
-    notes: "Founded March 19, 2014 within GSA by Presidential Innovation Fellows; named after GSA's address at 1800 F Street NW"
+    notes: "Founded March 19, 2014 within GSA by Presidential Innovation Fellows;
+      named after GSA's address at 1800 F Street NW"
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:26.347Z
 
   # ── Financial model ────────────────────────────────────────────
   - id: f_ykUcR7cNwI
@@ -29,6 +45,11 @@ facts:
     asOf: 2024-12
     source: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
     notes: "Charged agencies $250/hour; was largely self-funding"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:29.896Z
 
   # ── Alumni retention ───────────────────────────────────────────
   - id: f_1773Lol7HT
@@ -38,6 +59,11 @@ facts:
     source: https://theconversation.com/how-18f-transformed-government-technology-and-why-its-elimination-matters-251333
     notes: "85% of departing 18F staff in 2023 moved to other government technology
       positions"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:33.122Z
 
   # ── Key events ─────────────────────────────────────────────────
   - id: f_RextZoJHAJ
@@ -47,6 +73,11 @@ facts:
     source: https://www.nextgov.com/people/2025/03/gsa-eliminates-18f/403400/
     notes: "GSA TTS Director Thomas Shedd emailed staff at 1:00 AM informing them
       positions were terminated"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:38.633Z
 
   - id: f_9hjyq30lVS
     property: key-event
@@ -55,11 +86,21 @@ facts:
     source: https://federalnewsnetwork.com/workforce/2025/05/gsa-shutting-down-18f-was-retaliation-by-doge-former-staff-claim-in-appeal-for-their-jobs-back/
     notes: "Claimed shutdown was retaliation by DOGE for political beliefs and
       whistleblowing"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:43.543Z
   - id: f_qdpsITP4nY
     property: headquarters
     value: United States General Services Administration Building
     source: https://www.wikidata.org/wiki/Q15984844
     notes: From Wikidata Q15984844
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:46.429Z
   - id: f_B3GCI9WdSx
     property: website
     value: https://18f.gsa.gov
@@ -70,3 +111,8 @@ facts:
     value: 18F is a subsidiary/division of General Services Administration.
     source: https://www.wikidata.org/wiki/Q15984844
     notes: Parent organization from Wikidata Q15984844
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T22:18:50.297Z

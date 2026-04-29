@@ -6,14 +6,28 @@ facts:
         property: born-year,
         value: 1969,
         source: https://www.wikidata.org/wiki/Q6178697,
-        notes: From Wikidata Q6178697
+        notes: From Wikidata Q6178697,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.985Z
+          }
       },
     {
         id: f_lqMZzFDzOw,
         property: education,
         value: Yale University,
         source: https://www.wikidata.org/wiki/Q6178697,
-        notes: From Wikidata Q6178697
+        notes: From Wikidata Q6178697,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.974Z
+          }
       },
     {
         id: f_vTdhGZzbxA,

@@ -14,6 +14,7 @@
  */
 
 import { z } from "zod";
+import { InlineSourcingSchema } from "./routes/tablebase/sourcing-schema.js";
 
 // ---------------------------------------------------------------------------
 // Shared constants
@@ -1107,6 +1108,12 @@ export const SyncFactSchema = z
     exchangeRate: z.number().nullable().optional(),
     exchangeRateDate: z.string().max(20).nullable().optional(),
     dollarYear: z.number().int().nullable().optional(),
+    /**
+     * QUA-729 Phase A: optional inline sourcing verdict. When present, the
+     * /sync route writes a `source_check_verdicts` row in the same transaction.
+     * Backwards-compatible — fail-open when absent.
+     */
+    sourcing: InlineSourcingSchema.optional(),
   })
   // Numeric formats must have populated numeric/low/high columns. Otherwise the
   // read path silently coerced NULL → 0, masking missing data as legitimate

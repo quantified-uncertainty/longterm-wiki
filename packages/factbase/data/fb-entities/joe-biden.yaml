@@ -5,6 +5,11 @@ facts:
     value: 1942
     source: https://en.wikipedia.org/wiki/Joe_Biden
     notes: "Born November 20, 1942 in Scranton, Pennsylvania"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:55.946Z
 
   - id: f_Ix3mkuMr35
     property: notable-for
@@ -13,6 +18,11 @@ facts:
       comprehensive federal AI policy action at the time"
     source: https://en.wikipedia.org/wiki/Joe_Biden
     notes: "EO 14110 was later revoked by the Trump administration in January 2025"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:55.945Z
 
   - id: f_QLtye0VpIp
     property: wikipedia-url

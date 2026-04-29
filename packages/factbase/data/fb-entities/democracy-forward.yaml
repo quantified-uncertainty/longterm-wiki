@@ -5,11 +5,21 @@ facts:
     value: "2016"
     source: https://democracyforward.org/about/
     notes: "Founded in 2016 in the wake of the 2016 election; publicly launched 2017"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.257Z
 
   - id: f_ixLgM3sWwA
     property: headquarters
     value: "Washington, DC"
     source: https://democracyforward.org/about/
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.225Z
 
   - id: f_0x5K8ac51g
     property: program
@@ -17,6 +27,11 @@ facts:
       12 lawyers"
     asOf: 2025-08
     source: https://democracyforward.org
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.224Z
 
   - id: f_xtn0QtEEfP
     property: litigation
@@ -26,6 +41,11 @@ facts:
     asOf: 2025-06-27
     source: https://democracyforward.org/updates/foia-ai-lawsuit/
     notes: "Filed June 27, 2025 (initial FOIA requests were submitted in March 2025)"
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.204Z
 
   - id: f_9aYCt6tEaG
     property: litigation
@@ -33,12 +53,22 @@ facts:
       of AI use in the Trump administration's deregulation agenda"
     asOf: 2025
     source: https://democracyforward.org/updates/ai-deregulation/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.167Z
   - id: f_G9GI99VAIj
     property: headcount
     value: 68
     asOf: 2025-01
     source: https://www.wikidata.org/wiki/Q56278847
     notes: From Wikidata Q56278847 (as of 2025-01)
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:01.162Z
   - id: f_9vAq9t36e1
     property: website
     value: http://democracyforward.org

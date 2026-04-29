@@ -6,14 +6,28 @@ facts:
         property: born-year,
         value: 1974,
         source: https://www.wikidata.org/wiki/Q6375450,
-        notes: From Wikidata Q6375450
+        notes: From Wikidata Q6375450,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.830Z
+          }
       },
     {
         id: f_BkyIw3U9Vf,
         property: education,
         value: University of Sydney,
         source: https://www.wikidata.org/wiki/Q6375450,
-        notes: From Wikidata Q6375450
+        notes: From Wikidata Q6375450,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:55.813Z
+          }
       },
     {
         id: f_ayiBY3bl0w,

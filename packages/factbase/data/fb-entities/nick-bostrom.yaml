@@ -5,6 +5,11 @@ facts:
     value: 1973
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
     notes: "Born March 10, 1973 in Helsingborg, Sweden"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.689Z
 
   - id: f_nB1aB2cD3e
     property: education
@@ -13,6 +18,11 @@ facts:
       College London"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
     notes: "One of the most extensively educated figures in AI safety"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.658Z
 
   - id: f_nB4fG5hI6j
     property: notable-for
@@ -20,6 +30,11 @@ facts:
       existential risk studies; influential philosopher on AI risk, simulation
       argument, and anthropic reasoning"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.657Z
 
   - id: f_nB7kL8mN9o
     property: social-media
@@ -49,7 +64,13 @@ facts:
     role: "Founder and Director, Future of Humanity Institute"
     validEnd: "2024-04"
     source: https://en.wikipedia.org/wiki/Nick_Bostrom
-    notes: "FHI closed in April 2024 due to administrative issues at Oxford University"
+    notes: "FHI closed in April 2024 due to administrative issues at Oxford
+      University"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.648Z
 
   - id: f_nBempl0x2b
     property: employed-by
@@ -58,3 +79,8 @@ facts:
     validStart: "2024-04"
     source: https://nickbostrom.com
     notes: "Founded Macrostrategy Research Initiative after FHI closure"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.645Z

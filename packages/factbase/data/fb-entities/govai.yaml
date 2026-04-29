@@ -16,12 +16,23 @@ facts:
     property: founded-date
     value: "2016"
     source: https://www.governance.ai/about-us
-    notes: "Founded 2016 at Yale University as the Governance of AI Program by Allan Dafoe; moved to Oxford FHI in 2018"
+    notes: "Founded 2016 at Yale University as the Governance of AI Program by Allan
+      Dafoe; moved to Oxford FHI in 2018"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.538Z
   - id: f_Fe31DdIV98
     property: country
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q116455360
     notes: From Wikidata Q116455360
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:57.532Z
   - id: f_gZmec0Lu03
     property: website
     value: https://www.governance.ai
@@ -34,7 +45,13 @@ facts:
     currency: USD
     asOf: 2023
     source: https://www.openphilanthropy.org/grants/centre-for-the-governance-of-ai-general-support-2/
-    notes: "Open Philanthropy general support grant, 2023. Original URL now redirects to coefficientgiving.org."
+    notes: "Open Philanthropy general support grant, 2023. Original URL now
+      redirects to coefficientgiving.org."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.526Z
 
   - id: f_scQniXpfbB
     property: grant-received
@@ -43,6 +60,11 @@ facts:
     asOf: 2024
     source: https://www.openphilanthropy.org/grants/govai-general-support-2024/
     notes: "Open Philanthropy general support grant, 2024"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.494Z
 
   - id: f_MSACv166LQ
     property: grant-received
@@ -51,6 +73,11 @@ facts:
     asOf: 2025-02
     source: https://www.openphilanthropy.org/grants/govai-general-support-february-2025/
     notes: "Open Philanthropy general support grant, February 2025"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.488Z
 
   - id: f_jrvBLfs2yz
     property: grant-received
@@ -59,26 +86,51 @@ facts:
     asOf: 2025
     source: https://survivalandflourishing.fund/2025/recommendations
     notes: "SFF 2025 grant for general support"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.454Z
 
   - id: f_Y8aeHmo3DP
     property: publication
-    value: "Computing Power and the Governance of Artificial Intelligence — argues compute is the most governable AI pillar, proposes international monitoring mechanisms"
+    value: "Computing Power and the Governance of Artificial Intelligence — argues
+      compute is the most governable AI pillar, proposes international
+      monitoring mechanisms"
     asOf: 2024-02
     source: https://arxiv.org/abs/2402.08797
     notes: "By Sastry, Heim, Anderljung et al. (19 co-authors)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.444Z
 
   - id: f_o2F5HoGbUu
     property: publication
-    value: "Frontier AI Regulation: Managing Emerging Risks to Public Safety — proposes three regulatory building blocks: standards, registration/reporting, compliance mechanisms"
+    value: "Frontier AI Regulation: Managing Emerging Risks to Public Safety —
+      proposes three regulatory building blocks: standards,
+      registration/reporting, compliance mechanisms"
     asOf: 2023-07
     source: https://arxiv.org/abs/2307.03718
     notes: "By Anderljung et al. (24 co-authors)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:57.436Z
 
   - id: f_qZ5qk95dkz
     property: independence-date
     value: "2021"
     source: https://www.governance.ai/about
-    notes: "GovAI began operating independently from FHI in 2021, formally incorporating as a separate entity. FHI itself closed in April 2024."
+    notes: "GovAI began operating independently from FHI in 2021, formally
+      incorporating as a separate entity. FHI itself closed in April 2024."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.401Z
 
   - id: f_wJtpNoNBDJ
     property: key-person
@@ -87,6 +139,11 @@ facts:
     asOf: 2024
     source: https://www.governance.ai/team
     notes: "Ben Garfinkel became Director after GovAI's transition to independence"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.407Z
 
   - id: f_UbvBHpwFpm
     property: key-person
@@ -95,6 +152,11 @@ facts:
     asOf: 2024
     source: https://www.governance.ai/team
     notes: "Markus Anderljung serves as Head of Policy"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.367Z
 
   - id: f_3XUZ2qRKG1
     property: headcount
@@ -103,60 +165,112 @@ facts:
       - 45
     asOf: 2025
     source: https://www.governance.ai/people
-    notes: "~40-45 named team members on People page including leadership, senior researchers, research fellows, research scholars, and operations staff"
+    notes: "~40-45 named team members on People page including leadership, senior
+      researchers, research fellows, research scholars, and operations staff"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.357Z
 
   - id: f_UK9G2EfK1I
     property: program
-    value: "GovAI Fellowship — competitive research fellowship program bringing early-career researchers to work on AI governance for 3-12 months. 100+ alumni placed across DeepMind, OpenAI, Anthropic, government agencies, and think tanks."
+    value: "GovAI Fellowship — competitive research fellowship program bringing
+      early-career researchers to work on AI governance for 3-12 months. 100+
+      alumni placed across DeepMind, OpenAI, Anthropic, government agencies, and
+      think tanks."
     asOf: 2025
     source: https://www.governance.ai/
     notes: "Key field-building program; alumni network is a significant output"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.350Z
 
   - id: f_eUWSvVFjob
     property: policy-influence
-    value: "Vice-Chair role on the EU GPAI Code of Practice drafting process (2024-2025)"
+    value: "Vice-Chair role on the EU GPAI Code of Practice drafting process
+      (2024-2025)"
     asOf: 2024
     source: https://www.governance.ai/
-    notes: "Significant policy influence — directly shaping EU AI regulation implementation"
+    notes: "Significant policy influence — directly shaping EU AI regulation
+      implementation"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.314Z
 
   - id: f_YvOAIAVmj6
     property: publication-count
     value: "50"
     asOf: 2025
-    notes: "50+ peer-reviewed publications; estimate from wiki page and governance.ai publications list"
+    notes: "50+ peer-reviewed publications; estimate from wiki page and
+      governance.ai publications list"
 
   - id: f_SLudI6NZAE
     property: publication
-    value: "Safety Cases for Frontier AI — argues for structured safety arguments analogous to safety cases in other high-risk industries"
+    value: "Safety Cases for Frontier AI — argues for structured safety arguments
+      analogous to safety cases in other high-risk industries"
     asOf: 2024
     source: https://arxiv.org/abs/2404.12241
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.314Z
 
   - id: f_U5uOohxwkj
     property: publication
-    value: "Risk Thresholds for Frontier AI — proposes framework for when frontier AI capabilities warrant regulatory intervention"
+    value: "Risk Thresholds for Frontier AI — proposes framework for when frontier
+      AI capabilities warrant regulatory intervention"
     asOf: 2024
     source: https://arxiv.org/abs/2406.14713
-    notes: "arXiv:2406.14713 (June 2024). Verified correct — sourcing flagged wrong arXiv ID (2311.14368 was a different paper)."
+    notes: "arXiv:2406.14713 (June 2024). Verified correct — sourcing flagged wrong
+      arXiv ID (2311.14368 was a different paper)."
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → unverifiable"
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:57.280Z
 
   - id: f_4BkaaQZD2q
     property: legal-identifier
     value: "UK Companies House #15883729 (Company Limited by Guarantee)"
     asOf: 2024-08-07
     source: https://find-and-update.company-information.service.gov.uk/company/15883729
-    notes: "GovAI UK formally incorporated August 7, 2024. Registered address: Third Floor, 20 Old Bailey, London, EC4M 7AN"
+    notes: "GovAI UK formally incorporated August 7, 2024. Registered address: Third
+      Floor, 20 Old Bailey, London, EC4M 7AN"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.270Z
 
   - id: f_xq34VuhFQT
     property: legal-identifier
     value: "US 501(c)(3) EIN: 99-4000294"
     source: https://www.governance.ai/about-us
     notes: "GovAI US entity is a 501(c)(3) nonprofit"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.241Z
 
   - id: f_oR8N4NAJhQ
     property: legal-identifier
     value: "EU Transparency Register ID: 644024391866-32"
     asOf: 2024-05
     source: https://www.lobbyfacts.eu/datacard/the-centre-for-the-governance-of-ai?rid=644024391866-32
-    notes: "Registered May 2024; 3 lobbyists / 1.1 FTE focused on EU AI Act Code of Practice"
+    notes: "Registered May 2024; 3 lobbyists / 1.1 FTE focused on EU AI Act Code of
+      Practice"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.225Z
 
   - id: f_FkWciW5Lpa
     property: total-funding
@@ -164,7 +278,13 @@ facts:
     currency: USD
     asOf: 2025
     source: https://www.openphilanthropy.org/grants/?q=govai
-    notes: "Total identified Open Philanthropy/Coefficient Giving funding ~$13.3M+ across multiple grants 2020-2025"
+    notes: "Total identified Open Philanthropy/Coefficient Giving funding ~$13.3M+
+      across multiple grants 2020-2025"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.226Z
 
   - id: f_N5d3TF1C6Q
     property: revenue
@@ -172,7 +292,14 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/994000294
-    notes: "From IRS Form 990 for the US entity (Centre for the Governance of AI Inc, EIN 99-4000294). First year of US filing; tax-exempt since September 2024. Nearly all revenue ($5.73M) from contributions."
+    notes: "From IRS Form 990 for the US entity (Centre for the Governance of AI
+      Inc, EIN 99-4000294). First year of US filing; tax-exempt since September
+      2024. Nearly all revenue ($5.73M) from contributions."
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.191Z
 
   - id: f_vBDNosn0YQ
     property: annual-expenses
@@ -180,10 +307,22 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/994000294
-    notes: "From IRS Form 990 for the US entity only. The UK entity (Companies House #15883729) has separate finances. Total organizational spending is significantly higher."
+    notes: "From IRS Form 990 for the US entity only. The UK entity (Companies House
+      #15883729) has separate finances. Total organizational spending is
+      significantly higher."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.185Z
 
   - id: f_2odDfMQpHD
     property: advisory-board
     value: "Ajeya Cotra, Allan Dafoe, Helen Toner, Tasha McCauley, Toby Ord"
     asOf: 2025
     source: https://www.governance.ai/people
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:57.154Z

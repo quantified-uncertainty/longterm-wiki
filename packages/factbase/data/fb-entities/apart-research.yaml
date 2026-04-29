@@ -5,23 +5,41 @@ facts:
     value: "2022"
     source: https://www.linkedin.com/company/apartresearch
     notes: "Founded by Esben Kran; no exact month confirmed on primary site"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:05:57.662Z
 
   - id: f_V6B3W78L6P
     property: headquarters
     value: "Copenhagen, Denmark"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "Remote-first organization with physical presence in Copenhagen (EnigmA co-working space)"
+    notes: "Remote-first organization with physical presence in Copenhagen (EnigmA
+      co-working space)"
+    sourcing:
+      verdict: unverifiable
+      evidence: "3 → unverifiable; dissent: 1 → partial"
+      confidence: 0.9166667
+      checkedAt: 2026-04-29T16:04:06.950Z
 
   - id: f_FDyq9EZAbL
     property: description
     value: >-
-      Independent AI safety research organization that accelerates safety research through
-      hackathons, fellowships, and collaborative sprints. Has hosted 42+ open-to-all research
-      sprints with 3,000+ participants across 50+ global locations, producing 22 peer-reviewed
-      publications at venues including NeurIPS, ICLR, and ACL.
+      Independent AI safety research organization that accelerates safety
+      research through hackathons, fellowships, and collaborative sprints. Has
+      hosted 42+ open-to-all research sprints with 3,000+ participants across
+      50+ global locations, producing 22 peer-reviewed publications at venues
+      including NeurIPS, ICLR, and ACL.
     asOf: 2026-03
     source: https://apartresearch.com/impact
-    notes: "Participant count from impact page (3,000) and donate page (3,500+); sprint count verified at 42"
+    notes: "Participant count from impact page (3,000) and donate page (3,500+);
+      sprint count verified at 42"
+    sourcing:
+      verdict: partial
+      evidence: "2 → partial; dissent: 2 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.903Z
 
   - id: f_UFFN6omUo5
     property: headcount
@@ -30,41 +48,78 @@ facts:
       - 8
     asOf: 2025-11
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "EA Forum post mentions ~4 full-time staff; budget plans for 8 FTE at $691,200 (73% of total)"
+    notes: "EA Forum post mentions ~4 full-time staff; budget plans for 8 FTE at
+      $691,200 (73% of total)"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.855Z
 
   - id: f_dpUiLVq0nA
     property: legal-structure
     value: "Nonprofit (501(c)(3) via fiscal sponsor Ashgro Inc)"
     source: https://apartresearch.com/donate
-    notes: "Tax-deductible donations through fiscal sponsor Ashgro Inc, a 501(c)(3) organization"
+    notes: "Tax-deductible donations through fiscal sponsor Ashgro Inc, a 501(c)(3)
+      organization"
+    sourcing:
+      verdict: confirmed
+      evidence: "2 → confirmed; dissent: 1 → partial, 1 → unverifiable"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.856Z
 
   - id: f_LMWMZbT6an
     property: founded-by
     value:
       - !ref sid_HwM6OF6Ewg
     source: https://apartresearch.com/impact
-    notes: "Founded by Esben Kran at age 22 after leaving grad school; currently Board Member per impact page"
+    notes: "Founded by Esben Kran at age 22 after leaving grad school; currently
+      Board Member per impact page"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.852Z
 
   - id: f_eUZm0ntEVw
     property: annual-budget
     value: 700000
     asOf: 2024
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "Raised approximately $700,000 in 2024. This was their biggest year; organization tripled core team size."
+    notes: "Raised approximately $700,000 in 2024. This was their biggest year;
+      organization tripled core team size."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.851Z
 
   - id: f_aR7kYmPfnZ
     property: annual-budget
     value: 954800
     asOf: 2025
     source: https://apartresearch.com/donate/2025
-    notes: "2025 fundraising target: $954,800. Breakdown: staff (73%, $691,200 for 8 FTE), programs (16%, $156,000), indirect/fiscal sponsorship (11%, $107,600)"
+    notes: "2025 fundraising target: $954,800. Breakdown: staff (73%, $691,200 for 8
+      FTE), programs (16%, $156,000), indirect/fiscal sponsorship (11%,
+      $107,600)"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.811Z
 
   - id: f_bQ8mNcRtYz
     property: total-funding
     value: 700000
     asOf: 2024-12
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "Raised approximately $700,000 in 2024. Prior 12 months (before mid-2025): ~$680,000"
+    notes: "Raised approximately $700,000 in 2024. Prior 12 months (before
+      mid-2025): ~$680,000"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.747Z
 
   - id: f_cT9pQdSwXa
     property: total-funding
@@ -72,13 +127,24 @@ facts:
     asOf: 2025-07
     source: https://apartresearch.com/donate/2025
     notes: "2025 Manifund campaign raised $619,921 of $954,800 goal by close"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:06.766Z
 
   - id: f_dV2rSfTxYb
     property: publication-count
     value: 22
     asOf: 2026-03
     source: https://apartresearch.com/impact
-    notes: "22 publications in AI safety; 2 received oral awards at ICLR 2025 (top 1.8% of accepted papers)"
+    notes: "22 publications in AI safety; 2 received oral awards at ICLR 2025 (top
+      1.8% of accepted papers)"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.734Z
 
   - id: f_eW3sTgUyZc
     property: sprint-count
@@ -86,6 +152,11 @@ facts:
     asOf: 2026-03
     source: https://apartresearch.com/impact
     notes: "42 open-to-all research sprints hosted"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.735Z
 
   - id: f_fX4tUhVzAd
     property: research-report-count
@@ -93,6 +164,11 @@ facts:
     asOf: 2026-03
     source: https://apartresearch.com/impact
     notes: "485 event research reports submitted across all sprints"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.719Z
 
   - id: f_gY5uViWaBe
     property: fellowship-count
@@ -100,6 +176,11 @@ facts:
     asOf: 2026-03
     source: https://apartresearch.com/impact
     notes: "100+ researchers through the Apart Fellowship program"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.654Z
 
   - id: f_hZ6vWjXbCf
     property: talent-placement-count
@@ -107,33 +188,64 @@ facts:
     asOf: 2025
     source: https://apartresearch.com/donate/2025
     notes: "30 placements at 20+ organizations in AI safety"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.655Z
 
   - id: f_iA7wXkYcDg
     property: funder
     value: "Long-Term Future Fund"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
-    notes: "Previously a primary funder; declined a recent grant despite high rating due to LTFF's own funding constraints"
+    notes: "Previously a primary funder; declined a recent grant despite high rating
+      due to LTFF's own funding constraints"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.646Z
 
   - id: f_jB8xYlZdEh
     property: funder
     value: "Survival and Flourishing Fund"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
     notes: "Previously a primary funder"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.647Z
 
   - id: f_kC9yZmAfFi
     property: funder
     value: "Open Philanthropy"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
     notes: "Minority funder with limited engagement"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.621Z
 
   - id: f_lD0zAnBgGj
     property: funder
     value: "OpenAI Inc 501(c)(3)"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
     notes: "Restricted funding for specific research projects"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.562Z
 
   - id: f_mE1aBoCxHk
     property: funder
     value: "Schmidt Sciences"
     source: https://forum.effectivealtruism.org/posts/suvWKJbwfPDsQK3PM/how-apart-research-would-use-marginal-funding-to-scale-ai
     notes: "Restricted funding for specific research projects"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:06.558Z

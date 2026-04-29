@@ -6,7 +6,14 @@ facts:
         property: founded-date,
         value: 2017-12,
         source: https://www.wikidata.org/wiki/Q47168504,
-        notes: From Wikidata Q47168504
+        notes: From Wikidata Q47168504,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:50.069Z
+          }
       },
     {
         id: f_C4p9c1TESg,
@@ -20,7 +27,14 @@ facts:
         property: founded-by-name,
         value: http://www.wikidata.org/.well-known/genid/dc6d2ee8b6fe1ebc84f277195aee64eb,
         source: https://www.wikidata.org/wiki/Q47168504,
-        notes: From Wikidata Q47168504; text value (not entity ref)
+        notes: From Wikidata Q47168504; text value (not entity ref),
+        sourcing:
+          {
+            verdict: contradicted,
+            evidence: 1 → contradicted,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:50.059Z
+          }
       },
     {
         id: f_EkjPeLIG9H,

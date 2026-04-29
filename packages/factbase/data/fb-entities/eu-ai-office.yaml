@@ -6,6 +6,11 @@ facts:
     source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
     notes: "Commission Decision of 24 January 2024; published in Official Journal 14
       February 2024; entered into force 21 February 2024"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.419Z
 
   - id: f_axGtTJnm8O
     property: headquarters
@@ -13,6 +18,11 @@ facts:
     source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
     notes: "Part of DG CNECT (Communications Networks, Content and Technology)
       within the European Commission"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.404Z
 
   - id: f_uRZtWLDynr
     property: headcount
@@ -21,6 +31,11 @@ facts:
     source: https://www.euronews.com/next/2024/02/01/commissions-staffing-and-financing-of-ai-office-raises-eyebrows-in-capitals
     notes: "Planned ~100 staff: 80 new hires plus 20 transferred from within the
       Commission, per Feb 2024 announcement"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.381Z
 
   - id: f_yhq1V8cJkV
     property: description
@@ -31,6 +46,11 @@ facts:
       Part of DG CNECT within the Commission.
     asOf: 2025-12
     source: https://digital-strategy.ec.europa.eu/en/policies/ai-office
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.366Z
 
   - id: f_EEhxxl3aOV
     property: legal-structure
@@ -38,16 +58,31 @@ facts:
     source: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office
     notes: "Established by Commission Decision; funded through reshuffled Digital
       Europe Programme budget"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.360Z
   - id: f_oWao7ls7jb
     property: headquarters
     value: Brussels
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.323Z
   - id: f_qPhTpCcSke
     property: country
     value: Belgium
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.312Z
   - id: f_1Cj5YikeQ5
     property: website
     value: https://digital-strategy.ec.europa.eu/en/policies/ai-office
@@ -58,11 +93,21 @@ facts:
     value: 140
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.285Z
   - id: f_YjRonl2flF
     property: parent-organization
     value: European Commission
     source: https://www.wikidata.org/wiki/Q135841125
     notes: From Wikidata Q135841125
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.268Z
   - id: f_n3MbkXUXqA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/European_Artificial_Intelligence_Office

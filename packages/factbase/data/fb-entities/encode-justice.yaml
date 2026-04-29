@@ -5,52 +5,109 @@ facts:
     value: "2020-07"
     source: https://en.wikipedia.org/wiki/Sneha_Revanur
     notes: "Founded July 2020 by Sneha Revanur"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.846Z
 
   - id: f_LrYHgIvNEX
     property: legal-structure
-    value: "501(c)(4) civic league. Operates as fiscal project of Future Incubator (joint program of March On and Future Coalition)."
+    value: "501(c)(4) civic league. Operates as fiscal project of Future Incubator
+      (joint program of March On and Future Coalition)."
     source: https://www.influencewatch.org/non-profit/encode-justice/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.814Z
 
   - id: f_Fn9Km3vHfI
     property: scale
-    value: "1,000+ members across 40+ US states and 30+ countries. 15,000+ students participated in workshops."
+    value: "1,000+ members across 40+ US states and 30+ countries. 15,000+ students
+      participated in workshops."
     asOf: 2025
     source: https://www.berkshireeagle.com/news/northern_berkshires/williams-college-sneha-revanur-encode-justice/article_8d506e62-ebca-11ee-8bea-f39f98185cf4.html
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:00.782Z
 
   - id: f_4mNeKyhDFp
     property: campaign
-    value: "AI 2030 Plan: 22 goals for global AI governance by 2030 (released ahead of Seoul AI Summit, 2024). Endorsed by Mary Robinson, Daron Acemoglu, Yoshua Bengio, Audrey Tang."
+    value: "AI 2030 Plan: 22 goals for global AI governance by 2030 (released ahead
+      of Seoul AI Summit, 2024). Endorsed by Mary Robinson, Daron Acemoglu,
+      Yoshua Bengio, Audrey Tang."
     asOf: 2024
     source: https://ai2030.encodejustice.org/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.776Z
 
   - id: f_qqn5qyqWP5
     property: campaign
     value: "Co-sponsored California SB 1047 alongside CAIS Action Fund."
     asOf: 2024
     source: https://fortune.com/2024/07/15/california-ai-bill-sb-1047-fierce-debate-regulation-safety/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.775Z
 
   - id: f_li04YnbGPx
     property: funding-sources
-    value: "Funders include Responsible Technology Youth Power Fund, Archewell Foundation, Heising-Simons Foundation, We Are Family Foundation. Does not accept corporate funding, foreign government funds, or donations from top AI company executives."
+    value: "Funders include Responsible Technology Youth Power Fund, Archewell
+      Foundation, Heising-Simons Foundation, We Are Family Foundation. Does not
+      accept corporate funding, foreign government funds, or donations from top
+      AI company executives."
     source: https://www.influencewatch.org/non-profit/encode-justice/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:04:00.756Z
 
   - id: f_ZGxWRTLPLP
     property: founded-by
     value: !ref sid_CROBNnPrIr
     source: https://en.wikipedia.org/wiki/Sneha_Revanur
-    notes: "Founded as a high school student at Evergreen Valley High School in San Jose, California. Currently a student at Williams College."
+    notes: "Founded as a high school student at Evergreen Valley High School in San
+      Jose, California. Currently a student at Williams College."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.713Z
 
   - id: f_SDWOSK3BOI
     property: headquarters
     value: "San Jose, CA (founded); Washington, DC (policy operations)"
     source: https://www.kqed.org/news/11982374/meet-the-19-year-old-from-silicon-valley-leading-the-youth-led-charge-on-ai
-    notes: "Distributed youth-led organization with members in 40+ US states and 30+ countries"
+    notes: "Distributed youth-led organization with members in 40+ US states and 30+
+      countries"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:00.690Z
 
   - id: f_0MDl465kgM
     property: description
-    value: "Youth-led AI policy advocacy organization. Campaigns for equitable AI regulation through grassroots organizing, policy advocacy, and public education. Known for the AI Bill of Rights campaign and AI 2030 Plan. One of the most prominent youth voices in AI governance."
+    value: "Youth-led AI policy advocacy organization. Campaigns for equitable AI
+      regulation through grassroots organizing, policy advocacy, and public
+      education. Known for the AI Bill of Rights campaign and AI 2030 Plan. One
+      of the most prominent youth voices in AI governance."
     asOf: 2026-03
     source: https://encodejustice.org/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:00.681Z
 
   - id: f_MSEg0BesLZ
     property: website
@@ -62,10 +119,24 @@ facts:
     property: country
     value: "United States"
     source: https://www.influencewatch.org/non-profit/encode-justice/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.680Z
 
   - id: f_BdJM5BZNra
     property: financial-disclosure
-    value: "No independent IRS Form 990 filings. Encode Justice operates as a fiscal project of Future Incubator (a program of March On / Future Coalition) and does not file its own financial reports. Revenue and employee figures are not publicly disclosed."
+    value: "No independent IRS Form 990 filings. Encode Justice operates as a fiscal
+      project of Future Incubator (a program of March On / Future Coalition) and
+      does not file its own financial reports. Revenue and employee figures are
+      not publicly disclosed."
     asOf: 2026-04
     source: https://www.influencewatch.org/non-profit/encode-justice/
-    notes: "ProPublica Nonprofit Explorer returns no record for 'Encode Justice'. Fiscal sponsorship confirmed by InfluenceWatch profile."
+    notes: "ProPublica Nonprofit Explorer returns no record for 'Encode Justice'.
+      Fiscal sponsorship confirmed by InfluenceWatch profile."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.662Z

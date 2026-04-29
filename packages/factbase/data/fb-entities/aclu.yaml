@@ -4,7 +4,13 @@ facts:
     property: founded-date
     value: "1920-01-19"
     source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
-    notes: "Founded January 19, 1920. aclu.org/about confirms founding context but not specific date."
+    notes: "Founded January 19, 1920. aclu.org/about confirms founding context but
+      not specific date."
+    sourcing:
+      verdict: confirmed
+      evidence: "2 → confirmed; dissent: 1 → partial"
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:09.396Z
 
   - id: f_2puku4DVng
     property: annual-revenue
@@ -14,18 +20,34 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/136213516
     notes: "ACLU Foundation revenue ~$307M (FY ending March 2025). Separate
       501(c)(4) entity adds additional revenue."
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.965
+      checkedAt: 2026-04-29T16:04:09.386Z
 
   - id: f_zeupuvzLWw
     property: employee-count
     value: "1400"
     asOf: 2024
     source: https://en.wikipedia.org/wiki/American_Civil_Liberties_Union
-    notes: "~1,400 staff nationally. aclu.org/about mentions 500 staff attorneys; total staff count from Wikipedia."
+    notes: "~1,400 staff nationally. aclu.org/about mentions 500 staff attorneys;
+      total staff count from Wikipedia."
+    sourcing:
+      verdict: partial
+      evidence: "2 → partial; dissent: 1 → unverifiable"
+      confidence: 0.8
+      checkedAt: 2026-04-29T16:04:09.385Z
 
   - id: f_EY6AhAlcaQ
     property: headquarters
     value: "125 Broad Street, New York, NY"
     source: https://www.aclu.org/about
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.396Z
 
   - id: f_EboYLGtPqS
     property: litigation
@@ -35,6 +57,11 @@ facts:
     source: https://www.aclu.org/cases/aclu-et-al-v-nsa-et-al-foia-lawsuit-seeking-records-about-the-nsas-use-of-artificial-intelligence
     notes: "Filed April 2024 after NSA failed to release records on AI use in spy
       programs"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.375Z
 
   - id: f_z8Enea407O
     property: foia-campaign
@@ -44,6 +71,11 @@ facts:
     asOf: 2025
     source: https://www.aclu.org/press-releases/aclu-seeks-records-on-doges-unrestricted-access-to-americans-data-urges-congress-to-step-up
     notes: "FOIA requests to 40+ agencies plus letters to Congress"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.284Z
 
   - id: f_evA8xqWi5I
     property: policy-position
@@ -52,6 +84,11 @@ facts:
     asOf: 2025-12
     source: https://www.aclu.org/press-releases/aclu-statement-on-president-trumps-unilateral-attack-on-state-regulation-of-artificial-intelligence
     notes: "Called executive order unconstitutional"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.97
+      checkedAt: 2026-04-29T16:04:09.284Z
 
   - id: f_FpG8BtUSCD
     property: policy-position
@@ -59,6 +96,11 @@ facts:
       state-level AI protections"
     asOf: 2025-07
     source: https://www.aclu.org/press-releases/aclu-comment-on-trump-administrations-ai-action-plan
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:09.283Z
   - id: f_SWmZP0aROF
     property: website
     value: https://www.aclu.org/

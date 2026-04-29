@@ -12,6 +12,11 @@ facts:
       Experimental Psychology, Cambridge University"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
     notes: "Also held postdoctoral positions at Sussex and UCSD"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.617Z
 
   - id: f_gH4fG5hI6j
     property: notable-for
@@ -19,6 +24,11 @@ facts:
       machines, and deep neural networks; Nobel Prize in Physics 2024; Turing
       Award 2018"
     source: https://en.wikipedia.org/wiki/Geoffrey_Hinton
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.616Z
 
   - id: f_gH7kL8mN9o
     property: social-media

@@ -6,14 +6,28 @@ facts:
         property: born-year,
         value: 1978,
         source: https://www.wikidata.org/wiki/Q524579,
-        notes: From Wikidata Q524579
+        notes: From Wikidata Q524579,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:57.080Z
+          }
       },
     {
         id: f_sKHEiLsv2L,
         property: education,
         value: University of Oulu; University of Edinburgh,
         source: https://www.wikidata.org/wiki/Q524579,
-        notes: From Wikidata Q524579
+        notes: From Wikidata Q524579,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:57.064Z
+          }
       },
     {
         id: f_Mg0POGyaOw,

@@ -4,21 +4,46 @@ facts:
     property: founded-date
     value: "2025"
     source: https://lucidcomputing.ai
-    notes: "Founded in 2025; dedicated hardware-rooted zero-trust verification startup"
+    notes: "Founded in 2025; dedicated hardware-rooted zero-trust verification
+      startup"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.586Z
 
   - id: f_eWz0ybdhC5
     property: headquarters
     value: "San Francisco, CA"
     source: https://lucidcomputing.ai
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.576Z
 
   - id: f_YO2Xv3qWYW
     property: description
-    value: "Startup building hardware-rooted zero-trust verification platform for AI compute using TEEs (Intel TDX, NVIDIA H100 Confidential Computing). Products include AI Passports for cryptographic certification, compliance marketplace, and Digital Embassies for sovereign AI infrastructure."
+    value: "Startup building hardware-rooted zero-trust verification platform for AI
+      compute using TEEs (Intel TDX, NVIDIA H100 Confidential Computing).
+      Products include AI Passports for cryptographic certification, compliance
+      marketplace, and Digital Embassies for sovereign AI infrastructure."
     source: https://lucidcomputing.ai
     asOf: "2026-03"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.575Z
 
   - id: f_NiVruYPvbO
     property: notable-for
-    value: "Only dedicated startup in the hardware-enabled AI governance space as of early 2026"
+    value: "Only dedicated startup in the hardware-enabled AI governance space as of
+      early 2026"
     asOf: "2026-03"
     source: https://lucidcomputing.ai
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.566Z

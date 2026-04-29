@@ -6,6 +6,13 @@ facts:
         property: education,
         value: The Commonwealth Medical College,
         source: https://www.wikidata.org/wiki/Q87523463,
-        notes: From Wikidata Q87523463
+        notes: From Wikidata Q87523463,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:04:02.079Z
+          }
       }
   ]

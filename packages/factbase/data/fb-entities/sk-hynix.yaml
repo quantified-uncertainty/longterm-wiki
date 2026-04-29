@@ -6,21 +6,41 @@ facts:
     value: "1983-02"
     source: https://en.wikipedia.org/wiki/SK_Hynix
     notes: "Founded as Hyundai Electronics; renamed SK Hynix in 2012"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.209Z
 
   - id: f_N4WXdFnzv1
     property: headquarters
     value: "Icheon, South Korea"
     source: https://en.wikipedia.org/wiki/SK_Hynix
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:48.204Z
 
   - id: f_bAb4EK891e
     property: country
     value: South Korea
     source: https://en.wikipedia.org/wiki/SK_Hynix
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:48.206Z
 
   - id: f_voUdrO6JoX
     property: legal-structure
     value: "Public company (KRX: 000660)"
     source: https://en.wikipedia.org/wiki/SK_Hynix
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:48.138Z
 
   - id: f_nrklXAqaQZ
     property: website
@@ -36,10 +56,11 @@ facts:
   - id: f_DvcFXsFRsL
     property: description
     value: >-
-      World's leading producer of high-bandwidth memory (HBM), a critical component
-      in AI training GPUs. HBM is a key bottleneck in the AI chip supply chain —
-      Nvidia's H100, H200, and Blackwell GPUs depend on HBM supplied primarily by
-      SK Hynix and Samsung. Also a major DRAM and NAND flash producer.
+      World's leading producer of high-bandwidth memory (HBM), a critical
+      component in AI training GPUs. HBM is a key bottleneck in the AI chip
+      supply chain — Nvidia's H100, H200, and Blackwell GPUs depend on HBM
+      supplied primarily by SK Hynix and Samsung. Also a major DRAM and NAND
+      flash producer.
     asOf: 2026-03
 
   # ── Revenue (USD, converted from KRW at approximate annual avg rates) ──
@@ -50,6 +71,11 @@ facts:
     source: https://news.skhynix.com/sk-hynix-reports-2022-and-fourth-quarter-financial-results/
     notes: "2022 annual revenue (~$33.5B; KRW 44.6T). Strong year before memory
       downturn."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.123Z
 
   - id: f_skRv2023dw
     property: revenue
@@ -58,14 +84,24 @@ facts:
     source: https://news.skhynix.com/sk-hynix-reports-fourth-quarter-2023-financial-results/
     notes: "2023 annual revenue (~$25.0B; KRW 32.8T at ~1,310 KRW/USD avg rate).
       Memory downturn year with operating loss."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.122Z
 
   - id: f_D15WFJrjRu
     property: revenue
     value: 4.7e+10
     asOf: 2024-12
     source: https://news.skhynix.com/sk-hynix-announces-4q24-financial-results/
-    notes: "2024 annual revenue (~$47B; KRW 66.2T). Record year driven by HBM
-      demand for AI chips."
+    notes: "2024 annual revenue (~$47B; KRW 66.2T). Record year driven by HBM demand
+      for AI chips."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.106Z
 
   - id: f_skRv2025bq
     property: revenue
@@ -74,6 +110,11 @@ facts:
     source: https://news.skhynix.com/sk-hynix-announces-fy25-financial-results/
     notes: "2025 annual revenue (~$72B; KRW 97.1T). Record year; HBM revenue more
       than doubled YoY. (source URL unverified)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.103Z
 
   # ── Headcount ───────────────────────────────────────────────────
   - id: f_skHc2024gv
@@ -82,6 +123,11 @@ facts:
     asOf: 2024-12
     source: https://pitchbook.com/profiles/company/10195-03
     notes: "Approximately 33,625 employees worldwide at end of 2024"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.033Z
 
   # ── HBM market share ────────────────────────────────────────────
   - id: f_YVrPBFl9Tf
@@ -90,3 +136,8 @@ facts:
     asOf: 2024-12
     source: https://www.trendforce.com/
     notes: "SK Hynix holds ~53% of HBM market; Samsung ~38%, Micron ~9%"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.026Z

@@ -8,6 +8,11 @@ facts:
     source: https://horizonpublicservice.org/horizons-2025-year-in-review/
     notes: "150+ early- and mid-career professionals placed into emerging technology
       policy across 3 years"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.841Z
 
   # ── Cohort sizes ───────────────────────────────────────────────
   - id: f_1t3Jia6d99
@@ -16,6 +21,11 @@ facts:
     asOf: 2025-01
     source: https://horizonpublicservice.org/horizons-2025-year-in-review/
     notes: "2025 cohort; largest at time of selection"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:56.836Z
 
   # ── Funding ────────────────────────────────────────────────────
   - id: f_UbQSHdO7BU
@@ -24,6 +34,11 @@ facts:
     asOf: 2022-01
     source: https://www.founderspledge.com/research/horizon-institute-for-public-service
     notes: "Seed funding from Open Philanthropy"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.815Z
 
   - id: f_lr9iUYtRyJ
     property: grant-received
@@ -31,6 +46,11 @@ facts:
     asOf: 2023-01
     source: https://www.founderspledge.com/research/horizon-institute-for-public-service
     notes: "From Good Ventures (Dustin Moskovitz / Cari Tuna)"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.806Z
 
   # ── Fellow compensation ────────────────────────────────────────
   - id: f_cGRMXGGkEz
@@ -40,6 +60,11 @@ facts:
     source: https://horizonpublicservice.org/horizon-fellowship-applicant-faqs/
     notes: "Annual stipend for fellows; $75K for junior fellows; plus $15K
       health/professional development"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.757Z
 
   # ── Placement rate ─────────────────────────────────────────────
   - id: f_VwmWkr3vSs
@@ -48,6 +73,11 @@ facts:
     asOf: 2025-12
     source: https://horizonpublicservice.org/horizons-2025-year-in-review/
     notes: "100% fellow placement rate at host organizations"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.763Z
 
   - id: f_oERGrOGkv0
     property: alumni-retention-rate
@@ -55,6 +85,11 @@ facts:
     asOf: 2025-12
     source: https://horizonpublicservice.org/horizons-2025-year-in-review/
     notes: "90%+ of alumni transitioned to full-time roles in policy/government"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.749Z
 
   # ── Founding ───────────────────────────────────────────────────
   - id: f_Dpeod1zok1
@@ -62,6 +97,11 @@ facts:
     value: "2022"
     source: https://horizonpublicservice.org/about-us/
     notes: "Founded by Remco Zwetsloot (ex-CSET Georgetown) and Joan Gass"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.730Z
   - id: f_cO6YE7TuyP
     property: website
     value: https://www.horizonpublicservice.org

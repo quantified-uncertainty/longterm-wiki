@@ -4,35 +4,72 @@ facts:
     property: founded-date
     value: "1962"
     source: https://en.wikipedia.org/wiki/Center_for_Strategic_and_International_Studies
-    notes: "CSIS founded in 1962 by Arleigh Burke and David Abshire at Georgetown University"
+    notes: "CSIS founded in 1962 by Arleigh Burke and David Abshire at Georgetown
+      University"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:02.229Z
 
   - id: f_Pw4gJ7sW3b
     property: headquarters
     value: "Washington, DC"
     source: https://en.wikipedia.org/wiki/Center_for_Strategic_and_International_Studies
     notes: "1616 Rhode Island Avenue NW, Washington, DC"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.171Z
 
   - id: f_Rq6vL1tN5c
     property: headcount
     value: 250
     asOf: 2025-06
     source: https://www.csis.org/about
-    notes: "Over 250 full-time staff plus a large network of affiliated scholars (CSIS-wide, not Wadhwani Center alone)"
+    notes: "Over 250 full-time staff plus a large network of affiliated scholars
+      (CSIS-wide, not Wadhwani Center alone)"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:02.127Z
 
   - id: f_Ty8cH3mQ9d
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://en.wikipedia.org/wiki/Center_for_Strategic_and_International_Studies
-    notes: "Independent nonprofit since 1987; previously affiliated with Georgetown University"
+    notes: "Independent nonprofit since 1987; previously affiliated with Georgetown
+      University"
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → unverifiable"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:02.131Z
 
   - id: f_Vz1dR6wK4e
     property: website
     value: "https://www.csis.org/"
     source: https://www.csis.org/
     notes: "Official website"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:42.503Z
 
   - id: f_Xw5aF2vB7f
     property: description
-    value: "Bipartisan policy research organization focused on defense, security, and global challenges. The Wadhwani Center for AI and Advanced Technologies, launched in April 2023 with a $5M commitment from Dr. Romesh Wadhwani, produces research on AI's national security implications under Director Gregory C. Allen."
+    value: "Bipartisan policy research organization focused on defense, security,
+      and global challenges. The Wadhwani Center for AI and Advanced
+      Technologies, launched in April 2023 with a $5M commitment from Dr. Romesh
+      Wadhwani, produces research on AI's national security implications under
+      Director Gregory C. Allen."
     asOf: 2026-03
     source: https://www.csis.org/programs/wadhwani-ai-center
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:02.118Z

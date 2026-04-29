@@ -19,16 +19,31 @@ facts:
     value: 2019-05
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.989Z
   - id: f_Apk9aTZXzx
     property: headquarters
     value: St. John's
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.968Z
   - id: f_O3PMkSepwc
     property: country
     value: Antigua and Barbuda
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.962Z
   - id: f_3IRDn7Nn49
     property: website
     value: https://ftx.com/
@@ -39,11 +54,21 @@ facts:
     value: !ref sid_sace2bALew
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:58.910Z
   - id: f_tvJUJTbJa4
     property: founded-by-name
     value: Sam Bankman-Fried
     source: https://www.wikidata.org/wiki/Q108864780
     notes: From Wikidata Q108864780; text value (not entity ref)
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:58.881Z
   - id: f_ZwzT5gTN5P
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/FTX

@@ -6,12 +6,22 @@ facts:
     source: https://jan.leike.name/
     notes: "PhD supervised by Marcus Hutter; research on universal reinforcement
       learning"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:56.122Z
 
   - id: f_jL4fG5hI6j
     property: notable-for
     value: "VP of Alignment Science at Anthropic; former co-lead of OpenAI
       Superalignment team; prominent advocate for AI safety resource allocation"
     source: https://en.wikipedia.org/wiki/Jan_Leike
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:56.069Z
 
   - id: f_jL7kL8mN9o
     property: social-media
@@ -36,8 +46,18 @@ facts:
       resource allocation.
     asOf: 2026-04
     source: https://en.wikipedia.org/wiki/Jan_Leike
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:56.059Z
   - id: f_9hQAFolmjQ
     property: role
     value: VP of Alignment Science, Anthropic
     asOf: 2024-05
     source: https://jan.leike.name/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:56.041Z

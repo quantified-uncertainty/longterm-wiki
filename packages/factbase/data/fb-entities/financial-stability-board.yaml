@@ -4,9 +4,9 @@ facts:
     property: description
     value: >-
       International body that monitors and makes recommendations about the
-      global financial system. Established in 2009 as successor to the
-      Financial Stability Forum. Hosted by the Bank for International
-      Settlements in Basel, Switzerland.
+      global financial system. Established in 2009 as successor to the Financial
+      Stability Forum. Hosted by the Bank for International Settlements in
+      Basel, Switzerland.
     asOf: 2026-03
 
   - id: f_tqtRCg9W6h
@@ -15,12 +15,23 @@ facts:
     source: https://en.wikipedia.org/wiki/Financial_Stability_Board
     notes: >-
       Formation: April 2009 per Wikipedia infobox. Decision made at G20 London
-      summit (April 2009); successor to the Financial Stability Forum (est. 1999).
+      summit (April 2009); successor to the Financial Stability Forum (est.
+      1999).
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.155Z
 
   - id: f_PLbv16FxaA
     property: headquarters
     value: "Basel, Switzerland"
     source: https://en.wikipedia.org/wiki/Financial_Stability_Board
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:00.190Z
 
   - id: f_4JmjIYlgUb
     property: website
@@ -29,8 +40,13 @@ facts:
   - id: f_yChDVp5KML
     property: membership
     value: >-
-      Representatives from 68 institutions: central banks, finance
-      ministries, supervisory authorities from 25 jurisdictions, plus
-      10 international organizations and standard-setting bodies.
+      Representatives from 68 institutions: central banks, finance ministries,
+      supervisory authorities from 25 jurisdictions, plus 10 international
+      organizations and standard-setting bodies.
     asOf: 2026-03
     source: https://www.fsb.org/about/organisation-and-governance/members-of-the-fsb/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.666Z

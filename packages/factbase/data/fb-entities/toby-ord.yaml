@@ -42,11 +42,21 @@ facts:
     value: 1979
     source: https://www.wikidata.org/wiki/Q7811863
     notes: From Wikidata Q7811863
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.892Z
   - id: f_u0z9E8i5aR
     property: education
     value: University of Melbourne
     source: https://www.wikidata.org/wiki/Q7811863
     notes: From Wikidata Q7811863
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.894Z
   - id: f_ghwqGOvSnD
     property: website
     value: https://www.tobyord.com/

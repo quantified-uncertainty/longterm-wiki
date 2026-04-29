@@ -4,18 +4,37 @@ facts:
     property: headquarters
     value: "Washington, DC"
     source: https://therevolvingdoorproject.org
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.039Z
 
   - id: f_IRpZN4T6YV
     property: legal-structure
     value: "Fiscally sponsored by Goodnation Foundation (EIN 81-4768448)"
     source: https://therevolvingdoorproject.org/about-us/
-    notes: "Per RDP's own about page. InfluenceWatch describes RDP as a 'project of CEPR' which may reflect an earlier arrangement."
+    notes: "Per RDP's own about page. InfluenceWatch describes RDP as a 'project of
+      CEPR' which may reflect an earlier arrangement."
+    sourcing:
+      verdict: contradicted
+      evidence: "2 → contradicted; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.033Z
 
   - id: f_pLAEnfZoee
     property: project
-    value: "Tracking Uses of AI in the Trump Administration — documents AI replacing federal workers, CMS AI-powered Medicare preapprovals, State Department 'Catch and Revoke' AI surveillance, ICE AI license plate scanning, DOE AI data center siting"
+    value: "Tracking Uses of AI in the Trump Administration — documents AI replacing
+      federal workers, CMS AI-powered Medicare preapprovals, State Department
+      'Catch and Revoke' AI surveillance, ICE AI license plate scanning, DOE AI
+      data center siting"
     asOf: 2026-03
     source: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.65
+      checkedAt: 2026-04-29T16:03:48.958Z
 
   - id: f_VoLIQWWqoh
     property: statistic
@@ -23,48 +42,108 @@ facts:
     asOf: 2026-03
     source: https://therevolvingdoorproject.org/tracking-uses-of-ai-in-the-trump-administration/
     notes: "Figure from their tracker; includes AI-driven workforce reductions"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:48.957Z
 
   - id: f_jLTglUXq8Z
     property: publication
-    value: "'The Chatbotification of the Federal Government' report (Oct 22, 2025) by Hannah Story Brown documented rapid AI deployment across federal agencies to replace human workers. Key finding: DoD contracted with Anthropic, Google, OpenAI, and xAI for up to $200M each for AI capabilities on 3 million desktops."
+    value: "'The Chatbotification of the Federal Government' report (Oct 22, 2025)
+      by Hannah Story Brown documented rapid AI deployment across federal
+      agencies to replace human workers. Key finding: DoD contracted with
+      Anthropic, Google, OpenAI, and xAI for up to $200M each for AI
+      capabilities on 3 million desktops."
     asOf: 2025-10
     source: https://therevolvingdoorproject.org/the-chatbotification-of-the-federal-government/
-    notes: "Report covers GSA, CBP, DHS, State Dept, DoD, SSA, FDA, VA, and HUD. Documents 300M+ Americans' SSNs uploaded to unprotected cloud server by DOGE."
+    notes: "Report covers GSA, CBP, DHS, State Dept, DoD, SSA, FDA, VA, and HUD.
+      Documents 300M+ Americans' SSNs uploaded to unprotected cloud server by
+      DOGE."
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:48.951Z
 
   - id: f_Cq0mJto6Oh
     property: recognition
-    value: "Named American Prospect's 'Best of 2025' partner organization, recognized for coverage of Silicon Valley's influence in Washington and the AI industry's embrace of cronyism and revolving door appointments"
+    value: "Named American Prospect's 'Best of 2025' partner organization,
+      recognized for coverage of Silicon Valley's influence in Washington and
+      the AI industry's embrace of cronyism and revolving door appointments"
     asOf: 2026-01
     source: https://prospect.org/2026/01/02/best-of-2025-revolving-door-project/
-    notes: "The American Prospect is a partner publication. Henry Burke (RDP senior researcher) authored the 'Best of' piece."
+    notes: "The American Prospect is a partner publication. Henry Burke (RDP senior
+      researcher) authored the 'Best of' piece."
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:48.951Z
 
   - id: f_srtvqcpQ5v
     property: project
-    value: "DOGE Agency Hit List tracker — compiles list of individuals affiliated with DOGE and agencies visited, documenting impacts including cancellation of enforcement orders worth millions in consumer restitution"
+    value: "DOGE Agency Hit List tracker — compiles list of individuals affiliated
+      with DOGE and agencies visited, documenting impacts including cancellation
+      of enforcement orders worth millions in consumer restitution"
     asOf: 2025
     source: https://therevolvingdoorproject.org/doge-agency-hit-list/
+    sourcing:
+      verdict: partial
+      evidence: 2 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:03:48.946Z
 
   - id: f_LbdCFmtVGY
     property: project
-    value: "DOGE Treasury Raid Tracker — monitors how Elon Musk and DOGE infiltrated the Treasury Department's payments system"
+    value: "DOGE Treasury Raid Tracker — monitors how Elon Musk and DOGE infiltrated
+      the Treasury Department's payments system"
     asOf: 2025
     source: https://therevolvingdoorproject.org/doge-treasury-raid-tracker/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.866Z
 
   - id: f_BSJWEJ5kte
     property: publication
-    value: "Published 'DOGE: From Meme to Government Erosion Machine' report documenting impacts including $48M Toyota Motor Credit enforcement cancellation, up to 33% of FEMA staff ousted, and thousands of unanswered calls during 2025 Central Texas floods"
+    value: "Published 'DOGE: From Meme to Government Erosion Machine' report
+      documenting impacts including $48M Toyota Motor Credit enforcement
+      cancellation, up to 33% of FEMA staff ousted, and thousands of unanswered
+      calls during 2025 Central Texas floods"
     asOf: 2025
     source: https://therevolvingdoorproject.org/rdp-releases-new-doge-report/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.865Z
 
   - id: f_GITUwslm4H
     property: funding-sources
-    value: "Received $100,000 grant from William and Flora Hewlett Foundation (September 2022). Also funded by Democracy Fund. Fiscally sponsored by the Goodnation Foundation."
+    value: "Received $100,000 grant from William and Flora Hewlett Foundation
+      (September 2022). Also funded by Democracy Fund. Fiscally sponsored by the
+      Goodnation Foundation."
     asOf: 2022
     source: https://hewlett.org/grants/the-goodnation-foundation-for-the-revolving-door-project/
-    notes: "Goodnation Foundation (EIN 81-4768448) reported $13.6M revenue and $3.5M in grants paid in 2023 across all its fiscally sponsored projects."
+    notes: "Goodnation Foundation (EIN 81-4768448) reported $13.6M revenue and $3.5M
+      in grants paid in 2023 across all its fiscally sponsored projects."
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.859Z
 
   - id: f_aWIjvO5ktE
     property: project
-    value: "Corporate Takeover tracker — monitors revolving door appointments and corporate capture of federal regulatory agencies across the executive branch"
+    value: "Corporate Takeover tracker — monitors revolving door appointments and
+      corporate capture of federal regulatory agencies across the executive
+      branch"
     asOf: 2025
     source: https://therevolvingdoorproject.org/corporate-takeover/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:48.858Z

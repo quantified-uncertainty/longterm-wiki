@@ -6,21 +6,42 @@ facts:
         property: founded-date,
         value: 1868-03,
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: From Wikidata Q168756
+        notes: From Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.590Z
+          }
       },
     {
         id: f_tMvyKtVZoe,
         property: headquarters,
         value: Berkeley,
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: From Wikidata Q168756
+        notes: From Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.576Z
+          }
       },
     {
         id: f_rLyJEJYt4b,
         property: country,
         value: United States,
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: From Wikidata Q168756
+        notes: From Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.99,
+            checkedAt: 2026-04-29T16:03:46.540Z
+          }
       },
     {
         id: f_doBdl4tczD,
@@ -34,14 +55,28 @@ facts:
         property: headcount,
         value: 12122,
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: From Wikidata Q168756
+        notes: From Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.539Z
+          }
       },
     {
         id: f_elaN5cT1wb,
         property: parent-organization,
         value: University of California,
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: From Wikidata Q168756
+        notes: From Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.505Z
+          }
       },
     {
         id: f_nqB9eYLnYk,
@@ -56,6 +91,13 @@ facts:
         value: "University of California, Berkeley is a subsidiary/division of
           University of California.",
         source: https://www.wikidata.org/wiki/Q168756,
-        notes: Parent organization from Wikidata Q168756
+        notes: Parent organization from Wikidata Q168756,
+        sourcing:
+          {
+            verdict: confirmed,
+            evidence: 1 → confirmed,
+            confidence: 0.95,
+            checkedAt: 2026-04-29T16:03:46.504Z
+          }
       }
   ]

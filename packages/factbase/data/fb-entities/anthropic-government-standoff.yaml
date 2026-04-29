@@ -7,7 +7,13 @@ facts:
     value: 200000000
     asOf: !date 2025-07
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
-    notes: "Up to $200M, two-year contract signed July 2025; shared with OpenAI, Google, and xAI"
+    notes: "Up to $200M, two-year contract signed July 2025; shared with OpenAI,
+      Google, and xAI"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:07.737Z
 
   - id: f_Tuf3eFU1Qg
     property: casualties
@@ -15,12 +21,23 @@ facts:
     asOf: !date 2026-01
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "83 killed including 47 Venezuelan soldiers during US special operation"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.731Z
 
   - id: f_4kajRFghbw
     property: description
-    value: "Anthropic donated $20M to Public First Action PAC supporting pro-AI-regulation candidates"
+    value: "Anthropic donated $20M to Public First Action PAC supporting
+      pro-AI-regulation candidates"
     asOf: !date 2026-02
     source: https://www.cnbc.com/2026/02/12/anthropic-gives-20-million-to-group-pushing-for-ai-regulations-.html
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.727Z
 
   # Additional structured facts from the MDX page
 
@@ -29,6 +46,11 @@ facts:
     value: !date 2026-02-27
     source: https://fortune.com/2026/02/27/trump-us-government-anthropic-claude-pentagon-6-months-phaseout-ai-standoff/
     notes: "Designation issued Feb 27, 2026; triggered by events starting Jan 2026"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:07.688Z
 
   - id: f_O44njDhfpA
     property: organizations-involved
@@ -38,10 +60,21 @@ facts:
       - !ref sid_GLXKjYAEKw
     source: https://www.nbcnews.com/tech/security/anthropic-ai-defense-war-venezuela-maduro-rcna259603
     notes: "Pentagon awarded AI contracts to Anthropic, OpenAI, Google, and xAI"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → unverifiable"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:07.649Z
 
   - id: f_ikjybLssfg
     property: incident-status
     value: "litigation"
     asOf: !date 2026-02-28
     source: https://www.cbsnews.com/news/anthropic-ceo-dario-amodei-calls-white-house-actions-retaliatory-and-punitive/
-    notes: "Anthropic filed lawsuit challenging supply chain risk designation on Feb 28, 2026"
+    notes: "Anthropic filed lawsuit challenging supply chain risk designation on Feb
+      28, 2026"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:07.646Z

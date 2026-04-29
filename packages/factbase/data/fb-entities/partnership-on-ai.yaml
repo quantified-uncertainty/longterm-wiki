@@ -6,12 +6,22 @@ facts:
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
     notes: "Publicly announced September 28, 2016 with founding members Amazon,
       Facebook, Google, DeepMind, Microsoft, and IBM"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:50.519Z
 
   - id: f_Cj7vN2xQ4b
     property: headquarters
     value: "San Francisco, California"
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
     notes: "Headquartered in San Francisco"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.513Z
 
   - id: f_Eu9gL1sW6c
     property: headcount
@@ -25,12 +35,22 @@ facts:
     value: "501(c)(3) nonprofit"
     source: https://partnershiponai.org/funding/
     notes: "Independent nonprofit funded by philanthropic and corporate contributions"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:50.505Z
 
   - id: f_Kz6dF3wM2e
     property: website
     value: "https://partnershiponai.org/"
     source: https://partnershiponai.org/
     notes: "Official website"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:35.943Z
 
   - id: f_Nr1hJ8vX5f
     property: description
@@ -40,6 +60,11 @@ facts:
       and focuses on responsible AI practices and guidelines."
     asOf: 2026-03
     source: https://partnershiponai.org/about/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:50.429Z
   - id: f_nRX8DIdvUb
     property: website
     value: https://www.partnershiponai.org
@@ -50,6 +75,11 @@ facts:
     value: Apple Inc.
     source: https://www.wikidata.org/wiki/Q27057835
     notes: From Wikidata Q27057835; text value (not entity ref)
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.428Z
   - id: f_FVhAxEGqPr
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Partnership_on_AI
@@ -63,11 +93,21 @@ facts:
     source: https://partnershiponai.org/partners/
     notes: "143 partner organizations across tech companies, civil society,
       academia, and media"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.422Z
 
   - id: f_7cjV8ehCYn
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.416Z
 
   - id: f_vNXxz4XBOd
     property: founding-members
@@ -75,6 +115,11 @@ facts:
     asOf: 2016-09
     source: https://en.wikipedia.org/wiki/Partnership_on_AI
     notes: "Apple joined as a founding member in January 2017"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.416Z
 
   - id: f_mzFQ2P1f6M
     property: program
@@ -83,6 +128,11 @@ facts:
     asOf: 2023
     source: https://partnershiponai.org/workstream/about-ml/
     notes: "Key PAI workstream on ML documentation and transparency"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:50.336Z
 
   - id: f_xxEEEDdNDP
     property: program
@@ -90,6 +140,11 @@ facts:
       development and use of synthetic media and deepfakes"
     asOf: 2023
     source: https://partnershiponai.org/workstream/synthetic-media/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.661Z
   - id: f_k9iKKHV3Lg
     property: revenue
     value: 6455261

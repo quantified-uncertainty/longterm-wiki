@@ -20,6 +20,11 @@ facts:
     value: Dalle Molle Institute for Artificial Intelligence Research
     source: https://www.wikidata.org/wiki/Q22278829
     notes: From Wikidata Q22278829
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.229Z
   - id: f_ZQMlFhM9Bc
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Shane_Legg

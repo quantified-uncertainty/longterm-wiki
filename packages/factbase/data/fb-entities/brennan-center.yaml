@@ -5,6 +5,11 @@ facts:
     value: "1995"
     source: https://www.brennancenter.org/about
     notes: "Founded 1995 at NYU School of Law"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.799Z
 
   - id: f_ZLxIVY8SBQ
     property: annual-revenue
@@ -12,7 +17,13 @@ facts:
     currency: USD
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Brennan_Center_for_Justice
-    notes: "Approximately $57.9M (FY 2023-2024). ProPublica URL 404; figure confirmed via Wikipedia."
+    notes: "Approximately $57.9M (FY 2023-2024). ProPublica URL 404; figure
+      confirmed via Wikipedia."
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.747Z
 
   - id: f_trbZTG1zGA
     property: employee-count
@@ -20,18 +31,33 @@ facts:
     asOf: 2024
     source: https://www.brennancenter.org/about/leadership
     notes: "180+ staff (attorneys, scholars, communications professionals)"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.724Z
 
   - id: f_Q8SPI26msQ
     property: headquarters
     value: "NYU School of Law, New York, NY"
     source: https://www.brennancenter.org/about
     notes: "Also has a Washington, DC office"
+    sourcing:
+      verdict: partial
+      evidence: "1 → partial; dissent: 1 → confirmed"
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:05.712Z
 
   - id: f_E7LaoG2qMo
     property: project
     value: "Maintains comprehensive AI Legislation Tracker covering all US states"
     asOf: 2026-03
     source: https://www.brennancenter.org/our-work/research-reports/artificial-intelligence-legislation-tracker
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:05.709Z
 
   - id: f_vtvKIx18hH
     property: publication
@@ -39,6 +65,11 @@ facts:
       federal and state policy recommendations"
     asOf: 2025
     source: https://www.brennancenter.org/our-work/policy-solutions/agenda-strengthen-us-democracy-age-ai
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.97
+      checkedAt: 2026-04-29T16:04:05.708Z
   - id: f_D2zHzlYx5M
     property: website
     value: http://www.brennancenter.org
@@ -49,4 +80,11 @@ facts:
     value: Brennan Center for Justice is an independent nonprofit organization
       affiliated with New York University School of Law.
     source: https://www.wikidata.org/wiki/Q4961241
-    notes: "Affiliated with NYU School of Law but operates as an independent 501(c)(3) nonprofit; Wikidata lists NYU as parent org but the relationship is affiliation, not subsidiary"
+    notes: "Affiliated with NYU School of Law but operates as an independent
+      501(c)(3) nonprofit; Wikidata lists NYU as parent org but the relationship
+      is affiliation, not subsidiary"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.648Z

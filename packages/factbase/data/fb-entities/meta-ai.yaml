@@ -6,6 +6,11 @@ facts:
     source: https://ai.meta.com/research/
     notes: "Founded December 2013 as Facebook AI Research (FAIR) by Yann LeCun;
       rebranded to Meta AI after Meta rebrand in 2021"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:53.916Z
 
   - id: f_S0d9WF0E8g
     property: headquarters
@@ -13,12 +18,22 @@ facts:
     source: https://ai.meta.com/
     notes: "Part of Meta Platforms; labs also in New York, Paris, Montreal, London,
       and Tel Aviv"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.917Z
 
   - id: f_lhQD26Idvw
     property: founded-by
     value:
       - !ref sid_cMbVUVK29Q
     source: https://ai.meta.com/research/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.917Z
 
   - id: f_Hh20Dvc90g
     property: legal-structure
@@ -26,6 +41,11 @@ facts:
     source: https://ai.meta.com/
     notes: "Not a separate legal entity; research division within Meta Platforms
       (formerly Facebook)"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.904Z
 
   - id: f_adIN3DEEYw
     property: headcount
@@ -41,6 +61,11 @@ facts:
     asOf: 2025-03
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
     notes: "Over 1 billion monthly active users across Meta platforms"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.876Z
 
   - id: f_Mb5ygFtjbA
     property: user-count
@@ -49,6 +74,11 @@ facts:
     source: https://resourcera.com/data/artificial-intelligence/meta-ai-users/
     notes: "630M active AI users on WhatsApp, representing 63% of all Meta AI
       interactions"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.826Z
 
   - id: f_4I3Dq2OGcQ
     property: infrastructure-investment
@@ -56,6 +86,11 @@ facts:
     asOf: "2025"
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
     notes: "$66-72B capital expenditure for AI infrastructure in 2025 (midpoint used)"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.821Z
 
   - id: f_Yc5dGApsJw
     property: infrastructure-investment
@@ -64,6 +99,11 @@ facts:
     source: https://about.fb.com/news/2026/01/2026-ai-drives-performance/
     notes: "Projected $115-135B CapEx for 2026 (midpoint used); includes Meta
       Superintelligence Labs and Prometheus supercluster"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.823Z
 
   - id: f_lCAFEOqqgQ
     property: cumulative-losses
@@ -71,7 +111,13 @@ facts:
     asOf: 2026-01
     source: https://www.cnbc.com/2026/01/13/meta-lays-off-vr-employees-underscoring-zuckerbergs-pivot-to-ai.html
     notes: "Reality Labs cumulative losses since late 2020 (~5 years); cited at time
-      of January 2026 layoffs. This is a cumulative total, NOT an annual figure."
+      of January 2026 layoffs. This is a cumulative total, NOT an annual
+      figure."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.815Z
 
   - id: f_bRw4Xn7K2g
     property: parent-revenue
@@ -81,6 +127,11 @@ facts:
     notes: "Meta Platforms parent company FY 2024 total revenue of $164.5B; 22%
       increase YoY. AI division revenue not separately reported. Moved from
       'revenue' to 'parent-revenue' — this is NOT Meta AI's own revenue."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:53.790Z
 
   - id: f_TWxhXOjkvg
     property: parent-revenue
@@ -103,6 +154,11 @@ facts:
     source: https://medium.com/@tarifabeach/metas-llamacon-2025-redefining-the-future-of-open-source-ai-fa6551826e50
     notes: "LLaMA model family 1 billion+ downloads; announced at LlamaCon April 29,
       2025"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.732Z
 
   - id: f_tbzBMB4UBA
     property: market-share
@@ -110,6 +166,11 @@ facts:
     asOf: "2025"
     source: https://www.metacareers.com/blog/how-pytorch-unlocks-ai-research-and-productization-at-scale
     notes: "63% of training models globally use PyTorch"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.729Z
 
   - id: f_l8ZXhqm3Mw
     property: infrastructure-investment
@@ -117,12 +178,22 @@ facts:
     asOf: 2025-10
     source: https://fortune.com/2025/10/31/metas-27-billion-bet-turns-ai-compute-into-wall-streets-hottest-new-investment/
     notes: "$27B partnership with Blue Owl Capital for Hyperion data center project"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.729Z
 
   - id: f_DXtu23aW3Q
     property: description
     value: "MTIA v3 Iris: 40-44% cost reduction vs GPUs for total cost of ownership
       (2026)"
     source: https://markets.financialcontent.com/stocks/article/tokenring-2026-2-5-silicon-sovereignty-meta-charges-into-2026-with-iris-mtia-rollout-and-rapid-custom-chip-roadmap
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:53.728Z
   - id: f_20l6zgnFlG
     property: website
     value: https://ai.meta.com/

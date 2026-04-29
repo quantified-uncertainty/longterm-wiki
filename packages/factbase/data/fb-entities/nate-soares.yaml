@@ -2,14 +2,18 @@ entity: sid_5MVd90lzCg
 facts:
   - id: f_MCKelTrhAw
     property: description
-    value: President of the Machine Intelligence Research Institute (MIRI) since June
-      2023, focused on mathematical foundations of AI alignment. Previously served
-      as Executive Director 2015-2023.
+    value: President of the Machine Intelligence Research Institute (MIRI) since
+      June 2023, focused on mathematical foundations of AI alignment. Previously
+      served as Executive Director 2015-2023.
     asOf: 2026-03
-    notes: Updated from Executive Director to President (transitioned June 2023 when Malo Bourgon became CEO)
+    notes: Updated from Executive Director to President (transitioned June 2023 when
+      Malo Bourgon became CEO)
   - id: f_nS6tN2pQ5v
     property: notable-for
-    value: "President of MIRI (since June 2023; previously Executive Director 2015-2023); focuses on mathematical foundations of AI alignment including logical uncertainty, decision theory, and corrigibility; author of MIRI technical agenda papers"
+    value: "President of MIRI (since June 2023; previously Executive Director
+      2015-2023); focuses on mathematical foundations of AI alignment including
+      logical uncertainty, decision theory, and corrigibility; author of MIRI
+      technical agenda papers"
     asOf: 2026-03
     notes: Updated role from Executive Director to President
   - id: f_nScY8fL1kA
@@ -17,11 +21,21 @@ facts:
     value: "B.S. in Computer Science, University of California, Berkeley"
     source: https://intelligence.org/team/
     notes: Enriched from public information
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.745Z
   - id: f_P4WQ3FZ54G
     property: born-year
     value: 1989
     source: https://www.wikidata.org/wiki/Q136721135
     notes: From Wikidata Q136721135
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.740Z
   - id: f_3SutwzJ9VB
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Nate_Soares

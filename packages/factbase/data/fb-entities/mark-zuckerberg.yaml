@@ -6,7 +6,8 @@ facts:
 
   - id: f_YbXRRr8Bcw
     property: notable-for
-    value: "CEO of Meta; leads Meta AI and open-source Llama model development; advocate for open-source AI"
+    value: "CEO of Meta; leads Meta AI and open-source Llama model development;
+      advocate for open-source AI"
 
   - id: f_RRcNwwrZzQ
     property: wikipedia-url
@@ -19,3 +20,8 @@ facts:
       College
     source: https://www.wikidata.org/wiki/Q36215
     notes: From Wikidata Q36215
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:03:54.237Z

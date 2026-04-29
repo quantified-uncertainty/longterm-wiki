@@ -5,23 +5,40 @@ facts:
     property: founded-date
     value: "2001"
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
-    notes: "Formed 2001 per Wikipedia; successor to Bureau of Export Administration (BXA)"
+    notes: "Formed 2001 per Wikipedia; successor to Bureau of Export Administration
+      (BXA)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.456Z
 
   - id: f_k7jt7Q5su7
     property: headquarters
     value: "Washington, DC"
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:05.443Z
 
   - id: f_1cEfBD7jt3
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:05.432Z
 
   - id: f_MnLH13hY62
     property: website
     value: https://www.bis.doc.gov
     source: https://en.wikipedia.org/wiki/Bureau_of_Industry_and_Security
-    notes: "bis.doc.gov is the canonical domain (under Department of Commerce); bis.gov redirects"
+    notes: "bis.doc.gov is the canonical domain (under Department of Commerce);
+      bis.gov redirects"
 
   - id: f_01CP6wxbhf
     property: wikipedia-url
@@ -32,10 +49,10 @@ facts:
   - id: f_YeDsDb5wb9
     property: description
     value: >-
-      U.S. Department of Commerce agency responsible for administering the Export
-      Administration Regulations (EAR). Maintains the Commerce Control List (CCL) and
-      Entity List. Primary regulatory body governing exports of advanced AI chips and
-      semiconductor equipment since October 2022.
+      U.S. Department of Commerce agency responsible for administering the
+      Export Administration Regulations (EAR). Maintains the Commerce Control
+      List (CCL) and Entity List. Primary regulatory body governing exports of
+      advanced AI chips and semiconductor equipment since October 2022.
     asOf: 2026-03
 
   # ── Leadership ──────────────────────────────────────────────────
@@ -45,28 +62,52 @@ facts:
     asOf: 2026-03
     source: https://www.bis.gov/about-bis
     notes: "Under Secretary of Commerce for Industry and Security"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.430Z
 
   # ── Key events ──────────────────────────────────────────────────
   - id: f_mn1CoTK5LG
     property: key-event
-    value: "Implemented sweeping export controls on AI chips and semiconductor equipment to China"
+    value: "Implemented sweeping export controls on AI chips and semiconductor
+      equipment to China"
     asOf: 2022-10
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
-    notes: "October 7, 2022 rules; described as 'new strategic approach' to export controls"
+    notes: "October 7, 2022 rules; described as 'new strategic approach' to export
+      controls"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.374Z
 
   - id: f_WZYxS3GE5W
     property: key-event
-    value: "Expanded chip export controls, closing loopholes exploited by Nvidia's A800/H800 China-specific chips"
+    value: "Expanded chip export controls, closing loopholes exploited by Nvidia's
+      A800/H800 China-specific chips"
     asOf: 2023-10
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
     notes: "Updated performance thresholds and expanded equipment restrictions"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.365Z
 
   - id: f_EvQcz9CdN6
     property: key-event
-    value: "Expanded FDPR to cover essentially all advanced chips manufactured anywhere using U.S.-origin equipment"
+    value: "Expanded FDPR to cover essentially all advanced chips manufactured
+      anywhere using U.S.-origin equipment"
     asOf: 2024-12
     source: https://en.wikipedia.org/wiki/United_States_export_controls_on_AI_chips_and_semiconductors
     notes: "December 2024 FDPR expansion extended U.S. regulatory reach globally"
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.75
+      checkedAt: 2026-04-29T16:04:05.347Z
 
   - id: f_4dBSrKFHUI
     property: key-event
@@ -74,3 +115,8 @@ facts:
     asOf: 2025-05
     source: https://www.bis.gov/press-release/department-commerce-announces-recission-biden-era-artificial-intelligence-diffusion-rule-strengthens-chip
     notes: "Rescinded on May 13, 2025, before May 15 compliance date"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:05.321Z

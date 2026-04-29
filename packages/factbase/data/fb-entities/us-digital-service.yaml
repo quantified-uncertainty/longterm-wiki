@@ -7,6 +7,11 @@ facts:
     asOf: 2024-10
     source: https://www.usds.gov/impact-report
     notes: "USDS 2024 Impact Report; approximate staffing at peak"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.665Z
 
   - id: f_GqBMKO3RVF
     property: headcount
@@ -14,6 +19,11 @@ facts:
     asOf: 2025-02
     source: https://www.nextgov.com/people/2025/02/dozens-employees-us-doge-service-dismissed/403053/
     notes: "After DOGE re-interviews and firings; before protest resignations"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.355Z
 
   - id: f_Z3iEZdCeWb
     property: headcount
@@ -21,6 +31,11 @@ facts:
     asOf: 2025-03
     source: https://fedscoop.com/usds-workers-quit-doge-tech-elon-musk/
     notes: "Estimated after 21 employees resigned in protest on Feb 25, 2025"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.335Z
 
   - id: f_soLZ43THVC
     property: headcount
@@ -28,6 +43,11 @@ facts:
     asOf: 2025-09
     source: https://federalnewsnetwork.com/it-modernization/2025/09/after-federal-workforce-cuts-doge-chief-says-we-need-to-hire/
     notes: "FY2025 reported staffing; DOGE chief acknowledged need to hire more"
+    sourcing:
+      verdict: contradicted
+      evidence: 1 → contradicted
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.329Z
 
   # ── Budget ─────────────────────────────────────────────────────
   - id: f_KwpzwFZjG5
@@ -36,6 +56,11 @@ facts:
     asOf: 2025-01
     source: https://federalnewsnetwork.com/it-modernization/2025/09/after-federal-workforce-cuts-doge-chief-says-we-need-to-hire/
     notes: "FY2025 budget of $20M"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.316Z
 
   - id: f_7VT6qCIxe7
     property: annual-budget
@@ -43,13 +68,24 @@ facts:
     asOf: 2026-01
     source: https://federalnewsnetwork.com/it-modernization/2025/09/after-federal-workforce-cuts-doge-chief-says-we-need-to-hire/
     notes: "Planned FY2026 budget increase to $45M"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.270Z
 
   # ── Founding ───────────────────────────────────────────────────
   - id: f_0vu85ZPtAO
     property: founded-date
     value: "2014-08"
     source: https://en.wikipedia.org/wiki/United_States_Digital_Service
-    notes: "Founded following the Healthcare.gov rescue; part of Executive Office of the President"
+    notes: "Founded following the Healthcare.gov rescue; part of Executive Office of
+      the President"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:46.266Z
 
   # ── Key events ─────────────────────────────────────────────────
   - id: f_qG9UxtAkA0
@@ -58,3 +94,8 @@ facts:
     asOf: 2025-01
     source: https://www.nextgov.com/people/2025/01/us-digital-service-employees-are-being-re-interviewed-under-doge-transition/402423/
     notes: "Trump EO moved USDS from OMB to White House Chief of Staff, renamed it"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:46.249Z

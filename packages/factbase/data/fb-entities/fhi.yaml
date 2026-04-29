@@ -11,11 +11,21 @@ facts:
     value: "2005"
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:00.232Z
   - id: f_08l43tEruD
     property: headquarters
     value: Oxford
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.220Z
   - id: f_IPXMnLB9tt
     property: website
     value: https://web.archive.org/web/2024/https://www.fhi.ox.ac.uk/
@@ -26,6 +36,11 @@ facts:
     value: United Kingdom
     source: https://www.wikidata.org/wiki/Q5510826
     notes: From Wikidata Q5510826
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.154Z
   - id: f_lim1qYsVcK
     property: website
     value: http://www.fhi.ox.ac.uk/

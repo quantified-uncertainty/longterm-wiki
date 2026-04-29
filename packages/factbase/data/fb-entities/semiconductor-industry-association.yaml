@@ -8,6 +8,11 @@ facts:
     asOf: 2023-12
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue $527B in 2023; decline from 2022 peak"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.470Z
 
   - id: f_puGJTXLsW9
     property: global-semiconductor-revenue
@@ -16,14 +21,24 @@ facts:
     asOf: 2024-12
     source: https://www.semiconductors.org/global-semiconductor-sales-increase-19-in-2024/
     notes: "Global semiconductor revenue ~$627B in 2024; 19% YoY growth"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.500Z
 
   - id: f_QxwvXepiT6
     property: global-semiconductor-revenue
-    value: 9.10e+11
+    value: 9.1e+11
     currency: USD
     asOf: 2026-12
     source: https://www.deloitte.com/global/en/Industries/tmt/analysis/semiconductor-industry-outlook.html
     notes: "Projected $910B by 2026; driven by AI chip demand"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.559Z
 
   # ── CHIPS Act ───────────────────────────────────────────────────
   - id: f_qvrs0X6RLc
@@ -33,22 +48,37 @@ facts:
     asOf: 2022-08
     source: https://en.wikipedia.org/wiki/CHIPS_and_Science_Act
     notes: "$52.7B in CHIPS Act funding for semiconductor manufacturing and R&D"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.491Z
 
   - id: f_dLU4O4AnWM
     property: chips-act-private-investment
-    value: 6.30e+11
+    value: 6.3e+11
     currency: USD
     asOf: 2025-12
     source: https://www.semiconductors.org/
     notes: "Over $630B in private investment catalyzed by CHIPS Act"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.468Z
 
   - id: f_OMqgmk6JJg
     property: chips-act-rd-allocation
-    value: 1.10e+10
+    value: 1.1e+10
     currency: USD
     asOf: 2022-08
     source: https://en.wikipedia.org/wiki/CHIPS_and_Science_Act
     notes: "$11B allocated for R&D, including $3.5B for defense 'secure enclave'"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.463Z
 
   # ── Export control enforcement ──────────────────────────────────
   - id: f_vd9fZ6f61O
@@ -56,13 +86,25 @@ facts:
     value: 140000
     asOf: 2024-12
     source: https://www.cnas.org/publications/reports/countering-ai-chip-smuggling-has-become-a-national-security-priority
-    notes: "CNAS median estimate of ~140,000 chips diverted to China in 2024, representing 6-10% of China's AI compute"
+    notes: "CNAS median estimate of ~140,000 chips diverted to China in 2024,
+      representing 6-10% of China's AI compute"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.462Z
 
   # ── Hyperscaler AI CapEx ────────────────────────────────────────
   - id: f_RrOoSNtMaR
     property: hyperscaler-ai-capex
-    value: 6.50e+11
+    value: 6.5e+11
     currency: USD
     asOf: 2025-12
     source: https://www.reuters.com/technology/
-    notes: "Combined projected CapEx of Google, Amazon, Microsoft, and Meta for AI infrastructure build-out"
+    notes: "Combined projected CapEx of Google, Amazon, Microsoft, and Meta for AI
+      infrastructure build-out"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.403Z

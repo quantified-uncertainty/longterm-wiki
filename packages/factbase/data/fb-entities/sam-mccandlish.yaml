@@ -2,13 +2,19 @@ entity: sid_ENl8sgChDQ
 facts:
   - id: f_ZN4oC3AUWw
     property: notable-for
-    value: "Co-founder of Anthropic; co-author of neural scaling laws research; formerly at OpenAI"
+    value: "Co-founder of Anthropic; co-author of neural scaling laws research;
+      formerly at OpenAI"
 
   - id: f_jof2ov99Qe
     property: education
     value: Stanford University
     source: https://www.wikidata.org/wiki/Q105285886
     notes: From Wikidata Q105285886
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:48.665Z
 
   - id: f_8MTYhQ6jZo
     property: equity-pledge-fraction
@@ -20,7 +26,7 @@ facts:
 
   - id: f_ZVloKY5FkQ
     property: ea-alignment-estimate
-    value: [0.15, 0.3]
+    value: [ 0.15, 0.3 ]
     asOf: "2026-04"
     notes: "Editorial estimate. Alignment researcher; no publicly documented EA
       pledge or EA community ties. Low confidence of EA-aligned cause-area

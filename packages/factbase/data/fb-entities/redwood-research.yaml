@@ -5,16 +5,31 @@ facts:
     value: 2021-06
     source: https://www.redwoodresearch.org/
     notes: "Founded in 2021 by Nate Thomas and Buck Shlegeris"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.393Z
 
   - id: f_gnQEBSrD2L
     property: headquarters
     value: "San Francisco, CA"
     source: https://www.redwoodresearch.org/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.394Z
 
   - id: f_72UoXSEqwe
     property: legal-structure
     value: "Nonprofit research lab"
     source: https://www.redwoodresearch.org/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.386Z
 
   - id: f_yii7fct7Gw
     property: founded-by
@@ -22,12 +37,22 @@ facts:
       - !ref sid_R8tDuupBTt
       - !ref sid_Z62bQynY4g
     source: https://www.redwoodresearch.org/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.386Z
 
   - id: f_D7mjGeS1zw
     property: legal-identifier
     value: "87-1702255 (EIN)"
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "IRS 501(c)(3) nonprofit. Tax-exempt since September 2021."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.332Z
 
   - id: f_djeGq9dqSA
     property: revenue
@@ -36,6 +61,11 @@ facts:
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. First year of operations."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.309Z
 
   - id: f_NRg485oCJw
     property: revenue
@@ -44,6 +74,11 @@ facts:
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.308Z
 
   - id: f_2Renvd6yYg
     property: revenue
@@ -52,6 +87,11 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.303Z
 
   - id: f_6L6LOTW5Hw
     property: revenue
@@ -59,7 +99,13 @@ facts:
     currency: USD
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
-    notes: "From IRS Form 990. Dramatic revenue decline; organization drawing down reserves."
+    notes: "From IRS Form 990. Dramatic revenue decline; organization drawing down
+      reserves."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.298Z
 
   - id: f_zUSEWyPxrA
     property: annual-expenses
@@ -68,6 +114,11 @@ facts:
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. First year; ramping up operations."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:49.219Z
 
   - id: f_C7KMno2g6Q
     property: annual-expenses
@@ -76,6 +127,11 @@ facts:
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:49.221Z
 
   - id: f_Zi6S0NWlVg
     property: annual-expenses
@@ -84,6 +140,11 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.216Z
 
   - id: f_kBjzUvpoiw
     property: annual-expenses
@@ -92,6 +153,11 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Significant reduction in spending."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.215Z
 
   - id: f_LwFpvv6x3w
     property: headcount
@@ -99,6 +165,11 @@ facts:
     asOf: 2021-10
     source: https://forum.effectivealtruism.org/posts/xDDggeXYgenAGSTyq/we-re-redwood-research-we-do-applied-alignment-research-ama
     notes: "Ten people on staff per October 2021 EA Forum AMA."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.207Z
 
   - id: f_DtgrUgJ68g
     property: headcount
@@ -106,6 +177,11 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Additionally 3 volunteers."
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.134Z
 
   - id: f_fuHk3Y2qpQ
     property: net-assets
@@ -114,6 +190,11 @@ facts:
     asOf: 2021
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.131Z
 
   - id: f_eUlrCHH4uQ
     property: net-assets
@@ -122,6 +203,11 @@ facts:
     asOf: 2022
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:49.128Z
 
   - id: f_4DFAHutX6Q
     property: net-assets
@@ -130,6 +216,11 @@ facts:
     asOf: 2023
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:49.123Z
 
   - id: f_6uYJTha67A
     property: net-assets
@@ -138,3 +229,8 @@ facts:
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/871702255
     notes: "From IRS Form 990. Declining reserves."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:49.121Z

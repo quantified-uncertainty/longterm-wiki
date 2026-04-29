@@ -6,35 +6,65 @@ facts:
     value: 1993-04
     source: https://www.wikidata.org/wiki/Q182477
     notes: "Founded by Jensen Huang, Chris Malachowsky, and Curtis Priem"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.350Z
 
   - id: f_jIlMURLoDU
     property: headquarters
     value: "Santa Clara, CA"
     source: https://nvidianews.nvidia.com/multimedia/santa-clara-headquarters
     notes: "NVIDIA headquarters campus in Santa Clara, California"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.347Z
 
   - id: f_JBwHOj65g9
     property: country
     value: United States
     source: https://www.wikidata.org/wiki/Q182477
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.315Z
 
   - id: f_w91mEWWG6u
     property: founded-by-name
     value: Jensen Huang
     source: https://www.wikidata.org/wiki/Q182477
-    notes: "Co-founded with Chris Malachowsky and Curtis Priem; Huang serves as
-      CEO since founding"
+    notes: "Co-founded with Chris Malachowsky and Curtis Priem; Huang serves as CEO
+      since founding"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.293Z
 
   - id: f_n3aNvt6ee9
     property: ceo
     value: !ref sid_So79iNy2sQ
     source: https://www.wikidata.org/wiki/Q182477
     notes: "CEO since founding in 1993"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.293Z
 
   - id: f_AyAhZKcBOK
     property: legal-structure
     value: "Public company (NASDAQ: NVDA)"
     source: https://www.wikidata.org/wiki/Q182477
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.265Z
 
   - id: f_ojxaymuN29
     property: website
@@ -51,7 +81,8 @@ facts:
     property: description
     value: "NVIDIA holds 90-95% of the AI accelerator market, with its H100, H200,
       and B200 GPUs powering virtually all frontier AI training. Its proprietary
-      CUDA software ecosystem creates deep lock-in across the AI training stack."
+      CUDA software ecosystem creates deep lock-in across the AI training
+      stack."
     asOf: 2026-03
     notes: "Migrated from old entity system"
 
@@ -62,6 +93,11 @@ facts:
     asOf: 2023-01
     source: https://www.macrotrends.net/stocks/charts/NVDA/nvidia/number-of-employees
     notes: "26,196 employees at end of FY2023 (January 2023)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.261Z
 
   - id: f_nvHcFY24rw
     property: headcount
@@ -69,6 +105,11 @@ facts:
     asOf: 2024-01
     source: https://www.macrotrends.net/stocks/charts/NVDA/nvidia/number-of-employees
     notes: "29,600 employees at end of FY2024 (January 2024); 13% YoY growth"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.232Z
 
   - id: f_1zAlcFXh8F
     property: headcount
@@ -76,14 +117,23 @@ facts:
     asOf: 2025-01
     source: https://stockanalysis.com/stocks/nvda/employees/
     notes: "~36,000 employees at end of FY2025 (January 2025)"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.207Z
 
   - id: f_YRduSJlWzg
     property: headcount
     value: 42000
     asOf: 2026-01
     source: https://stockanalysis.com/stocks/nvda/employees/
-    notes: "42,000 employees as of January 25, 2026 (end of FY2026); up 16.7%
-      YoY"
+    notes: "42,000 employees as of January 25, 2026 (end of FY2026); up 16.7% YoY"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.206Z
 
   # ── Revenue (fiscal year ending January) ────────────────────────
   - id: f_nvRvFY23mz
@@ -92,6 +142,11 @@ facts:
     asOf: 2023-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2023
     notes: "FY2023 annual revenue ($26.97B); flat YoY"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.98
+      checkedAt: 2026-04-29T16:03:52.178Z
 
   - id: f_lj02XiWATQ
     property: revenue
@@ -99,6 +154,11 @@ facts:
     asOf: 2024-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2024
     notes: "FY2024 annual revenue ($60.97B); 126% YoY growth"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.179Z
 
   - id: f_ESnkMeEsww
     property: revenue
@@ -107,14 +167,24 @@ facts:
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025
     notes: "FY2025 annual revenue ($130.5B); 114% YoY growth. Data Center segment
       was $115.2B (88% of total)."
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.145Z
 
   - id: f_C79eDoRE4g
     property: revenue
     value: 2.159e+11
     asOf: 2026-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026
-    notes: "FY2026 annual revenue ($215.9B); 65% YoY growth. Q4 FY2026 was a
-      record $68.1B."
+    notes: "FY2026 annual revenue ($215.9B); 65% YoY growth. Q4 FY2026 was a record
+      $68.1B."
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.123Z
 
   # ── Quarterly Data Center Revenue ───────────────────────────────
   - id: f_MF4yOqWUTI
@@ -124,6 +194,11 @@ facts:
     asOf: 2026-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2026
     notes: "FY2026 Q4 data center revenue of $62.3B; record quarterly segment revenue"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.121Z
 
   # ── Market Cap ──────────────────────────────────────────────────
   - id: f_wQYZkgMkGA
@@ -132,6 +207,11 @@ facts:
     asOf: 2023-12
     source: https://www.macrotrends.net/stocks/charts/NVDA/nvidia/market-cap
     notes: "Market cap at end of 2023; crossed $1T in June 2023"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.092Z
 
   - id: f_wW891XFHdA
     property: market-cap
@@ -139,13 +219,24 @@ facts:
     asOf: 2024-12
     source: https://www.macrotrends.net/stocks/charts/NVDA/nvidia/market-cap
     notes: "Market cap at end of 2024; crossed $2T in Feb 2024, $3T in June 2024"
+    sourcing:
+      verdict: outdated
+      evidence: 1 → outdated
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.093Z
 
   - id: f_3KsIoezT3A
     property: market-cap
     value: 4.27e+12
     asOf: 2026-03
     source: https://stockanalysis.com/stocks/nvda/market-cap/
-    notes: "Market cap as of March 24, 2026. Value fluctuates significantly; needs periodic re-verification."
+    notes: "Market cap as of March 24, 2026. Value fluctuates significantly; needs
+      periodic re-verification."
+    sourcing:
+      verdict: outdated
+      evidence: 1 → outdated
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:52.061Z
 
   # ── Gross Margin ────────────────────────────────────────────────
   - id: f_k3tgTSGXzg
@@ -154,3 +245,8 @@ facts:
     asOf: 2025-01
     source: https://nvidianews.nvidia.com/news/nvidia-announces-financial-results-for-fourth-quarter-and-fiscal-2025
     notes: "FY2025 gross margin of 75.0%, up from 72.7% in FY2024"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:52.039Z

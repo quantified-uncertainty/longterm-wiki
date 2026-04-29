@@ -5,6 +5,11 @@ facts:
     value: 1964
     source: https://en.wikipedia.org/wiki/Yoshua_Bengio
     notes: "Born March 5, 1964 in Paris, France"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:03:45.245Z
 
   - id: f_yB2nLw9pYr
     property: notable-for
@@ -18,6 +23,11 @@ facts:
       Institute of Technology
     source: https://www.wikidata.org/wiki/Q3572699
     notes: From Wikidata Q3572699
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:45.246Z
   - id: f_cWLCro5DnB
     property: website
     value: https://yoshuabengio.org/

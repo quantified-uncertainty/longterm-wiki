@@ -183,6 +183,75 @@ export function updateFactMetaById(
 }
 
 /**
+ * Set or replace the `sourcing` block on a fact, matched by fact ID.
+ *
+ * Used by `crux fb attach-sourcing` (QUA-850) to round-trip sourcing
+ * verdicts from PG back into YAML so the data is durable across re-syncs.
+ *
+ * Returns:
+ *   'updated'   — fact found and the sourcing block was written
+ *   'unchanged' — fact found and the existing sourcing block already matches
+ *                 (idempotent no-op — a second run produces zero diffs)
+ *   'not-found' — no fact with that id in the document
+ */
+export function setFactSourcing(
+  doc: Document,
+  factId: string,
+  sourcing: Record<string, unknown>,
+): 'updated' | 'unchanged' | 'not-found' {
+  const contents = doc.contents;
+  if (!isMap(contents)) return 'not-found';
+
+  const factsNode = contents.get('facts', true);
+  if (!isSeq(factsNode)) return 'not-found';
+
+  for (const item of factsNode.items) {
+    if (!isMap(item)) continue;
+    if (String(item.get('id') ?? '') !== factId) continue;
+
+    // Compare current vs. new sourcing for idempotency. The serialized form
+    // is what ends up in YAML, so use toJSON() (which strips Document/Node
+    // metadata and surfaces the plain values).
+    const existing = item.get('sourcing', true);
+    const existingPlain = existing
+      ? // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        (existing as any).toJSON?.() ?? existing
+      : null;
+    if (existingPlain && deepEqualPlain(existingPlain, sourcing)) {
+      return 'unchanged';
+    }
+
+    const sourcingNode = doc.createNode(sourcing);
+    item.set('sourcing', sourcingNode);
+    return 'updated';
+  }
+  return 'not-found';
+}
+
+/**
+ * Structural equality for plain JSON-shaped values. Used by `setFactSourcing`
+ * to decide whether a re-attach is a no-op. Order-independent for objects;
+ * order-sensitive for arrays (matches JSON semantics).
+ */
+function deepEqualPlain(a: unknown, b: unknown): boolean {
+  if (a === b) return true;
+  if (a == null || b == null) return false;
+  if (typeof a !== typeof b) return false;
+  if (typeof a !== 'object') return false;
+  if (Array.isArray(a) !== Array.isArray(b)) return false;
+  if (Array.isArray(a) && Array.isArray(b)) {
+    if (a.length !== b.length) return false;
+    return a.every((v, i) => deepEqualPlain(v, b[i]));
+  }
+  const ao = a as Record<string, unknown>;
+  const bo = b as Record<string, unknown>;
+  const ak = Object.keys(ao);
+  const bk = Object.keys(bo);
+  if (ak.length !== bk.length) return false;
+  return ak.every((k) => Object.prototype.hasOwnProperty.call(bo, k) && deepEqualPlain(ao[k], bo[k]));
+}
+
+/**
  * Write a YAML document back to file atomically (write to temp, rename).
  */
 export function writeEntityDocument(filepath: string, doc: Document): void {

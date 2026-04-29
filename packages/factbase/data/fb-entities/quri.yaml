@@ -14,6 +14,11 @@ facts:
     value: !date 2019
     source: https://quantifieduncertainty.org
     notes: Evolved from earlier Guesstimate work (2016)
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.680Z
 
   - id: f_FNxcwwwO26
     property: website
@@ -32,12 +37,22 @@ facts:
     notes: >-
       1 full-time staff (Ozzie Gooen); plus research collaborators (Nuño
       Sempere, Eli Lifland) and past contributors
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.674Z
 
   - id: f_QR8legal01
     property: legal-structure
     value: "501(c)(3) nonprofit"
     asOf: !date 2026-03
     source: https://quantifieduncertainty.org/about/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.671Z
 
   - id: f_yHCEWHt2rb
     property: fiscal-sponsor
@@ -46,6 +61,11 @@ facts:
     source: https://quantifieduncertainty.org/about/
     notes: Fiscally sponsored under Rethink Priorities Special Projects Program
       since 2023
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.672Z
 
   - id: f_QR9fndby01
     property: founded-by
@@ -58,6 +78,11 @@ facts:
     value: Ozzie Gooen
     source: https://quantifieduncertainty.org/about/
     notes: Text fallback for display when entity ref doesn't resolve
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:49.673Z
   - id: f_XX7xmr10QQ
     property: revenue
     value: 1498

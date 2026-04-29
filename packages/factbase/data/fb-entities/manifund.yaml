@@ -6,6 +6,11 @@ facts:
     asOf: "2025"
     source: https://manifund.org/about/regranting
     notes: "2025 AI safety regranting pool with first 10 regrantors announced"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:03:54.382Z
   - id: f_nV57pFAUtL
     property: website
     value: https://manifund.org/

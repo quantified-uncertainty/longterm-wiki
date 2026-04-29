@@ -11,17 +11,32 @@ facts:
     property: born-year
     value: 1966
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:05.834Z
 
   - id: f_EUVDgbJJYA
     property: education
     value: "B.A. Computer Science, Columbia University; M.S. Computer Science, UCLA"
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:05.803Z
 
   - id: f_2zrAA9YhWd
     property: role
     value: "Co-founder and General Partner, Andreessen Horowitz"
     asOf: 2009-07
     source: https://en.wikipedia.org/wiki/Ben_Horowitz
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.797Z
   - id: f_c8qDKFF8cA
     property: wikipedia-url
     value: https://en.wikipedia.org/wiki/Ben_Horowitz

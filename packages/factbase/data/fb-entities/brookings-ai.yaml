@@ -4,13 +4,24 @@ facts:
     property: founded-date
     value: "1916"
     source: https://en.wikipedia.org/wiki/Brookings_Institution
-    notes: "Founded in 1916 as the Institute for Government Research; reorganized as Brookings Institution in 1927"
+    notes: "Founded in 1916 as the Institute for Government Research; reorganized as
+      Brookings Institution in 1927"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.637Z
 
   - id: f_Mk9nH3sL6b
     property: headquarters
     value: "Washington, DC"
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "1775 Massachusetts Ave NW, Washington, DC 20036"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.616Z
 
   - id: f_Vr5gJ8tQ1c
     property: headcount
@@ -18,6 +29,11 @@ facts:
     asOf: 2024-06
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Over 300 experts; total staff approximately 350"
+    sourcing:
+      verdict: unverifiable
+      evidence: 2 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.615Z
 
   - id: f_Xn7aK2wF9d
     property: annual-expenses
@@ -25,30 +41,60 @@ facts:
     asOf: 2024-06
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Annual operating expenses of approximately $100M in FY2024"
+    sourcing:
+      verdict: outdated
+      evidence: "1 → outdated; dissent: 1 → unverifiable"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.613Z
 
   - id: f_Lq4cN6mY3e
     property: legal-structure
     value: "501(c)(3) nonprofit"
     source: https://en.wikipedia.org/wiki/Brookings_Institution
     notes: "Independent nonprofit think tank"
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.560Z
 
   - id: f_Zw1dR5vB8f
     property: website
     value: "https://www.brookings.edu/"
     source: https://www.brookings.edu/
     notes: "Official website"
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:43.136Z
 
   - id: f_Gj3hS9pE2g
     property: description
-    value: "One of the oldest and most influential American think tanks. Its Artificial Intelligence and Emerging Technology Initiative conducts interdisciplinary research on AI governance, convenes diverse stakeholders, and publishes policy recommendations on responsible AI development."
+    value: "One of the oldest and most influential American think tanks. Its
+      Artificial Intelligence and Emerging Technology Initiative conducts
+      interdisciplinary research on AI governance, convenes diverse
+      stakeholders, and publishes policy recommendations on responsible AI
+      development."
     asOf: 2026-03
     source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
+    sourcing:
+      verdict: partial
+      evidence: 2 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:05.542Z
 
   - id: f_1lajvorYmY
     property: program-founded
     value: "2018"
     source: https://www.brookings.edu/projects/artificial-intelligence-and-emerging-technology-initiative/
-    notes: "The AI and Emerging Technology Initiative launched in 2018 as part of Brookings Governance Studies"
+    notes: "The AI and Emerging Technology Initiative launched in 2018 as part of
+      Brookings Governance Studies"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.532Z
 
   - id: f_Cq7BVOPP2O
     property: revenue
@@ -56,15 +102,33 @@ facts:
     currency: USD
     asOf: 2024
     source: https://en.wikipedia.org/wiki/Brookings_Institution
-    notes: "Approximate annual operating expenses for the full Brookings Institution (~$100M)"
+    notes: "Approximate annual operating expenses for the full Brookings Institution
+      (~$100M)"
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.526Z
 
   - id: f_tkaEfcCmR9
     property: country
     value: United States
     source: https://en.wikipedia.org/wiki/Brookings_Institution
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:05.526Z
 
   - id: f_eNkxDKqUsq
     property: publication
-    value: "TechTank — regular blog series on technology policy, covering AI regulation, workforce impacts, privacy, and platform governance. One of the most-read policy blogs in DC."
+    value: "TechTank — regular blog series on technology policy, covering AI
+      regulation, workforce impacts, privacy, and platform governance. One of
+      the most-read policy blogs in DC."
     asOf: 2025
     source: https://www.brookings.edu/series/techtank/
+    sourcing:
+      verdict: partial
+      evidence: 1 → partial
+      confidence: 0.85
+      checkedAt: 2026-04-29T16:04:05.463Z

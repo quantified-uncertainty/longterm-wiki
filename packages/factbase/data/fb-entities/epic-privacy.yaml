@@ -5,11 +5,21 @@ facts:
     value: "1994"
     source: https://epic.org/about/
     notes: "Founded in 1994"
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:00.626Z
 
   - id: f_wBrZJlJvzg
     property: headquarters
     value: "Washington, DC"
     source: https://epic.org/about/
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.602Z
 
   - id: f_VI3re1fuer
     property: program
@@ -18,6 +28,11 @@ facts:
       comments to decision-makers"
     asOf: 2026-03
     source: https://epic.org/issues/ai/
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.579Z
 
   - id: f_xdoqCplX4h
     property: organizational-rating
@@ -25,6 +40,11 @@ facts:
       activity"
     asOf: 2024
     source: https://www.charitynavigator.org/ein/521436610
+    sourcing:
+      verdict: unverifiable
+      evidence: 1 → unverifiable
+      confidence: 1
+      checkedAt: 2026-04-29T16:02:30.750Z
 
   - id: f_dfqB9qU62s
     property: website
@@ -40,6 +60,11 @@ facts:
     source: https://projects.propublica.org/nonprofits/organizations/522225921
     notes: "FY 2024 Form 990 (EIN 52-2225921). Total expenses $3,368,137. Net assets
       $4,215,708. Revenue peaked at $3.8M in 2023."
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.99
+      checkedAt: 2026-04-29T16:04:00.565Z
 
   - id: f_EcOoH0xzDh
     property: litigation
@@ -51,6 +76,11 @@ facts:
     notes: "Filed Oct 1, 2024 with Richman Law & Policy and NACA. Alleges RentGrow
       generates screening reports with serious errors disproportionately
       affecting marginalized communities."
+    sourcing:
+      verdict: contradicted
+      evidence: "1 → contradicted; dissent: 1 → partial"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.550Z
 
   - id: f_nj2oAQYBTN
     property: litigation
@@ -60,6 +90,11 @@ facts:
       practices"
     asOf: 2024-11
     source: https://epic.org/press-release-epic-files-complaint-urging-the-ftc-to-investigate-openais-gpts-and-third-party-apis/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.532Z
 
   - id: f_twu71qJcbg
     property: litigation
@@ -68,6 +103,11 @@ facts:
       federal workers (2025)"
     asOf: 2025
     source: https://epic.org/documents/epic-v-opm-information-security-violations/
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.513Z
 
   - id: f_QTgB4VySkD
     property: executive-compensation
@@ -76,6 +116,11 @@ facts:
       $166,200; Senior Counsel John Davisson received $150,861"
     asOf: 2024
     source: https://projects.propublica.org/nonprofits/organizations/522225921
+    sourcing:
+      verdict: confirmed
+      evidence: 2 → confirmed
+      confidence: 0.97
+      checkedAt: 2026-04-29T16:04:00.484Z
 
   - id: f_N2luGXwXx2
     property: publications
@@ -84,6 +129,11 @@ facts:
       Open Government Laws. Also publishes monthly EPIC Alert newsletter."
     asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
+    sourcing:
+      verdict: unverifiable
+      evidence: "1 → unverifiable; dissent: 1 → confirmed"
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.470Z
 
   - id: f_BVwCCUQ2FG
     property: foia-track-record
@@ -93,6 +143,11 @@ facts:
       authority documents."
     asOf: 2025
     source: https://en.wikipedia.org/wiki/Electronic_Privacy_Information_Center
+    sourcing:
+      verdict: confirmed
+      evidence: 1 → confirmed
+      confidence: 0.95
+      checkedAt: 2026-04-29T16:04:00.459Z
   - id: f_j84p23kapg
     property: revenue
     value: 3816503
