@@ -1755,6 +1755,80 @@
     - id: iaps
       type: organization
   lastUpdated: 2026-03
+- id: fisa-702
+  stableId: sid_n7K9yVNCtg
+  wikiId: E2538
+  type: policy
+  summaryPage: governance-overview
+  title: FISA Section 702
+  introduced: 2008-07
+  policyStatus: enacted
+  author: US Congress
+  scope: Federal
+  billNumber: 50 U.S.C. § 1881a
+  jurisdiction: United States
+  fullTextUrl: https://www.law.cornell.edu/uscode/text/50/1881a
+  description: >-
+    Section 702 of the Foreign Intelligence Surveillance Act, codified at 50 U.S.C. §
+    1881a, was added to FISA by the FISA Amendments Act of 2008 (P.L. 110-261), signed
+    into law by President George W. Bush on July 10, 2008. Section 702 authorizes the
+    targeting of non-US persons reasonably believed to be located outside the United
+    States to acquire foreign intelligence information; the Director of National
+    Intelligence and the Attorney General jointly certify each annual collection
+    authority. Communications incidentally acquired about US persons may be queried
+    using US-person identifiers, a practice that has been the focus of successive
+    reform debates. (Entity seeded via the claims-first sourcing pipeline; only
+    independently verified facts are reflected here.)
+  provisions:
+    - title: Targeting of Non-US Persons Abroad
+      description: >-
+        Authorizes acquisition of foreign intelligence information by targeting persons
+        reasonably believed to be located outside the United States and not known to be
+        US persons. The Attorney General and the Director of National Intelligence
+        jointly authorize collection.
+      category: Authority
+      source: https://www.law.cornell.edu/uscode/text/50/1881a
+    - title: Backend US-Person Queries
+      description: >-
+        US-person identifiers may be used as search terms against the corpus of Section
+        702-acquired data. The FBI, CIA, NSA, and NCTC conduct these queries under
+        procedures reviewed by the Foreign Intelligence Surveillance Court.
+      category: US-person practices
+      source: https://www.brennancenter.org/our-work/research-reports/section-702-foreign-intelligence-surveillance-act
+    - title: ODNI Annual Statistical Transparency Report
+      description: >-
+        ODNI publishes an Annual Statistical Transparency Report disclosing aggregate
+        Section 702 targeting and query statistics.
+      category: Transparency
+      source: https://www.dni.gov/files/CLPT/documents/2023_ASTR_for_CY2022.pdf
+  stakeholders:
+    - name: Office of the Director of National Intelligence (ODNI)
+      position: support
+      importance: high
+      reason: >-
+        Co-authorizes annual Section 702 collection alongside the Attorney General and
+        publishes the Annual Statistical Transparency Report.
+      source: https://crsreports.congress.gov/product/pdf/R/R44457
+    - name: Center for Democracy and Technology (CDT)
+      entityId: sid_XkqcWk46oQ
+      position: reform
+      importance: medium
+      reason: >-
+        Pushes for stronger US-person query protections and shorter Section 702
+        reauthorization sunsets; led 2024 coalition push for FISA 702 reforms.
+      source: https://cdt.org/area-of-focus/government-surveillance/
+  relatedEntries:
+    - id: government-authority-commercial-ai-infrastructure
+      type: analysis
+    - id: us-executive-order
+      type: policy
+    - id: export-controls
+      type: policy
+  tags:
+    - ai-governance
+    - surveillance
+    - us-policy
+  lastUpdated: 2026-04
 - id: failed-stalled-proposals
   stableId: sid_dj6xnXmB7A
   wikiId: E137
