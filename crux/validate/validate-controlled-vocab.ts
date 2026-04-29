@@ -511,12 +511,22 @@ export async function validateControlledVocab(options?: {
 // CLI entry point
 // ---------------------------------------------------------------------------
 
+/**
+ * Exit code derivation for the CLI. Exported for testing — the historical
+ * bug was that main() never propagated `result.passed === false` to
+ * process.exitCode, silently flipping the gate to advisory (QUA-809).
+ */
+export function exitCodeForResult(result: { passed: boolean }): number {
+  return result.passed ? 0 : 1;
+}
+
 async function main(): Promise<void> {
   const args = process.argv.slice(2);
   const ci = args.includes("--ci");
   const verbose = args.includes("--verbose");
 
-  await validateControlledVocab({ ci, verbose });
+  const result = await validateControlledVocab({ ci, verbose });
+  process.exitCode = exitCodeForResult(result);
 }
 
 main().catch((err) => {
