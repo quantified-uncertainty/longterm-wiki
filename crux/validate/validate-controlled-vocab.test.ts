@@ -1,42 +1,14 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import type { ApiResult } from "../lib/wiki-server/client.ts";
-
-// Mock apiRequest before importing modules that use it
-vi.mock("../lib/wiki-server/client.ts", () => ({
-  apiRequest: vi.fn(),
-  getServerUrl: vi.fn(() => "http://localhost:3002"),
-  getApiKey: vi.fn(() => "test-key"),
-  buildHeaders: vi.fn(() => ({ "Content-Type": "application/json" })),
-}));
-
-import { apiRequest } from "../lib/wiki-server/client.ts";
+import { describe, it, expect } from "vitest";
 import {
   suggestCorrection,
   checkValue,
   checkYamlEntities,
-  checkPersonnel,
-  checkDivisions,
   VALID_ENTITY_TYPES,
   VALID_RELATIONSHIPS,
-  VALID_ORG_TYPES,
-  VALID_SEVERITIES,
   VALID_MATURITIES,
-  VALID_STATUSES,
-  VALID_CLUSTERS,
-  VALID_POLICY_STATUSES,
-  VALID_PROJECT_STATUSES,
-  VALID_ROLE_TYPES,
-  VALID_DIVISION_TYPES,
-  VALID_DIVISION_STATUSES,
   type VocabIssue,
   type EntityData,
 } from "./validate-controlled-vocab.ts";
-
-const mockApiRequest = vi.mocked(apiRequest);
-
-beforeEach(() => {
-  mockApiRequest.mockReset();
-});
 
 // ---------------------------------------------------------------------------
 // suggestCorrection
@@ -232,14 +204,8 @@ describe("checkYamlEntities", () => {
     expect(issues[0].field).toBe("maturity");
   });
 
-  it("flags invalid status", () => {
-    const entities = [
-      makeEntity({ id: "bad-status", type: "risk", status: "pending" }),
-    ];
-    const issues = checkYamlEntities(entities);
-    expect(issues).toHaveLength(1);
-    expect(issues[0].field).toBe("status");
-  });
+  // entity.status is no longer checked here — chk_entities_status (migration
+  // 0218) and SyncEntitySchema's z.enum() now own that contract.
 
   it("flags invalid cluster values", () => {
     const entities = [
@@ -357,223 +323,6 @@ describe("checkYamlEntities", () => {
 });
 
 // ---------------------------------------------------------------------------
-// checkPersonnel (PG checks with mocked API)
-// ---------------------------------------------------------------------------
-
-describe("checkPersonnel", () => {
-  it("returns no issues when all roleTypes are valid", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            roleType: "key-person",
-            personId: "alice",
-            organizationId: "org-a",
-            role: "CEO",
-          },
-          {
-            roleType: "board",
-            personId: "bob",
-            organizationId: "org-b",
-            role: "Director",
-          },
-        ],
-        total: 2,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkPersonnel();
-    expect(issues).toHaveLength(0);
-  });
-
-  it("flags invalid roleType values", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            roleType: "key_person",
-            personId: "alice",
-            organizationId: "org-a",
-            role: "CEO",
-          },
-        ],
-        total: 1,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkPersonnel();
-    expect(issues).toHaveLength(1);
-    expect(issues[0].field).toBe("personnel.roleType");
-    expect(issues[0].value).toBe("key_person");
-    expect(issues[0].suggestion).toBe("key-person");
-  });
-
-  it("returns empty issues when wiki-server is unavailable", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: false,
-      error: "server_error" as const,
-      message: "Connection refused",
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkPersonnel();
-    expect(issues).toHaveLength(0);
-  });
-
-  it("paginates through all personnel records", async () => {
-    // First page: 2 records with total=3
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            roleType: "key-person",
-            personId: "p1",
-            organizationId: "o1",
-            role: "CEO",
-          },
-          {
-            roleType: "board",
-            personId: "p2",
-            organizationId: "o2",
-            role: "Dir",
-          },
-        ],
-        total: 3,
-      },
-    } as ApiResult<Record<string, unknown>>);
-    // Second page: 1 record (invalid)
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            roleType: "invalid-type",
-            personId: "p3",
-            organizationId: "o3",
-            role: "Unknown",
-          },
-        ],
-        total: 3,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkPersonnel();
-    expect(mockApiRequest).toHaveBeenCalledTimes(2);
-    expect(issues).toHaveLength(1);
-    expect(issues[0].value).toBe("invalid-type");
-  });
-});
-
-// ---------------------------------------------------------------------------
-// checkDivisions (PG checks with mocked API)
-// ---------------------------------------------------------------------------
-
-describe("checkDivisions", () => {
-  it("returns no issues when all values are valid", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            divisionType: "team",
-            name: "Safety Team",
-            parentOrgId: "org-a",
-            status: "active",
-          },
-          {
-            divisionType: "fund",
-            name: "Grants Fund",
-            parentOrgId: "org-b",
-            status: null,
-          },
-        ],
-        total: 2,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkDivisions();
-    expect(issues).toHaveLength(0);
-  });
-
-  it("flags invalid divisionType", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            divisionType: "bureau",
-            name: "Some Bureau",
-            parentOrgId: "org-a",
-            status: "active",
-          },
-        ],
-        total: 1,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkDivisions();
-    expect(issues).toHaveLength(1);
-    expect(issues[0].field).toBe("divisions.divisionType");
-    expect(issues[0].value).toBe("bureau");
-  });
-
-  it("flags invalid division status", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            divisionType: "team",
-            name: "Dead Team",
-            parentOrgId: "org-a",
-            status: "closed",
-          },
-        ],
-        total: 1,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkDivisions();
-    expect(issues).toHaveLength(1);
-    expect(issues[0].field).toBe("divisions.status");
-    expect(issues[0].value).toBe("closed");
-  });
-
-  it("skips null division status without flagging", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: true,
-      data: {
-        items: [
-          {
-            divisionType: "team",
-            name: "No Status",
-            parentOrgId: "org-a",
-            status: null,
-          },
-        ],
-        total: 1,
-      },
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkDivisions();
-    expect(issues).toHaveLength(0);
-  });
-
-  it("returns empty issues when wiki-server is unavailable", async () => {
-    mockApiRequest.mockResolvedValueOnce({
-      ok: false,
-      error: "server_error" as const,
-      message: "Connection refused",
-    } as ApiResult<Record<string, unknown>>);
-
-    const issues = await checkDivisions();
-    expect(issues).toHaveLength(0);
-  });
-});
-
-// ---------------------------------------------------------------------------
 // Vocabulary set correctness — canonical source alignment
 // ---------------------------------------------------------------------------
 
@@ -608,13 +357,9 @@ describe("vocabulary sets align with canonical sources", () => {
     }
   });
 
-  it("VALID_STATUSES matches EntityStatus enum", () => {
-    expect(VALID_STATUSES.has("stub")).toBe(true);
-    expect(VALID_STATUSES.has("draft")).toBe(true);
-    expect(VALID_STATUSES.has("published")).toBe(true);
-    expect(VALID_STATUSES.has("verified")).toBe(true);
-    expect(VALID_STATUSES.size).toBe(4);
-  });
+  // entities.status / EntityStatus is now PG-enforced (chk_entities_status,
+  // migration 0218) so the matching set is no longer exported from the
+  // validator.
 
   it("VALID_MATURITIES matches ResearchMaturity enum", () => {
     expect(VALID_MATURITIES.has("Neglected")).toBe(true);
