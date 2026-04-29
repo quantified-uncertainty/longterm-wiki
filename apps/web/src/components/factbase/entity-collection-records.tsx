@@ -9,7 +9,7 @@ import {
 } from "@/components/wiki/factbase/format";
 import { formatAmount } from "@/lib/directory-utils";
 
-import { field, getRecordDisplayName } from "./entity-detail-shared";
+import { field, getRecordDisplayName } from "@/components/factbase/entity-detail-shared";
 
 /** Funding round row for timeline display. */
 export function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {

@@ -8,7 +8,7 @@ import {
   getPropertyLabel,
   getRecordDisplayName,
   sortByDateField,
-} from "../entity-detail-shared";
+} from "@/components/factbase/entity-detail-shared";
 
 function makeEntry(overrides: Partial<FactBaseRecordEntry> = {}): FactBaseRecordEntry {
   return {

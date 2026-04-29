@@ -4,7 +4,7 @@ import { getKBEntity } from "@/data/factbase";
 import type { FactBaseRecordEntry } from "@/data/factbase";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 
-import { field, getPersonRecordName } from "./entity-detail-shared";
+import { field, getPersonRecordName } from "@/components/factbase/entity-detail-shared";
 
 /** Person card for key-persons collection. */
 export function PersonCard({ item }: { item: FactBaseRecordEntry }) {

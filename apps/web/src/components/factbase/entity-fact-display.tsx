@@ -10,7 +10,7 @@ import {
 } from "@/components/wiki/factbase/format";
 import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
-import { getPropertyLabel } from "./entity-detail-shared";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { SectionHeader } from "./entity-section-header";
 
 export function SourceCell({ fact }: { fact: Fact }) {
