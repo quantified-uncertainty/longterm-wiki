@@ -24,6 +24,7 @@ import {
   BookOpen,
   CheckCircle2,
 } from "lucide-react";
+import { safeHref } from "@/lib/directory-utils";
 
 // Cache for 1 hour — on-demand rendered to reduce build size.
 export const revalidate = 3600;
@@ -114,7 +115,7 @@ export default async function PublicationDetailPage({ params }: PageProps) {
   );
 
   const headerLinks = pub.website
-    ? [{ label: "Website", href: pub.website, external: true }]
+    ? [{ label: "Website", href: safeHref(pub.website), external: true }]
     : [];
 
   const statCards = (
