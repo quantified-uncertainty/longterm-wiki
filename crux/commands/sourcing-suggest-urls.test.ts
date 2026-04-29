@@ -310,6 +310,7 @@ describe('sourcing-suggest-urls --auto-approve-threshold (QUA-592)', () => {
       providersSkipped: [],
       query: 'q',
       costUsd: 0,
+      subjectMismatches: [],
     });
     mockUpsertUrlSuggestions.mockResolvedValueOnce({
       ok: true,
@@ -571,6 +572,7 @@ describe('sourcing-suggest-urls field length clamping', () => {
       providersSkipped: [],
       query: 'test',
       costUsd: 0,
+      subjectMismatches: [],
     });
     mockUpsertUrlSuggestions.mockResolvedValueOnce({
       ok: true,
