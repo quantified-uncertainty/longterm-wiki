@@ -34,7 +34,8 @@ import {
   getKBEntity,
 } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
-import { formatKBDate, formatKBFactValue, titleCase } from "./format";
+import { formatKBDate, formatKBFactValue } from "./format";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { FBRefLink } from "./FBRefLink";
 
 // ── Types ────────────────────────────────────────────────────────────────────
@@ -231,7 +232,7 @@ export function FBCompareTable({
   mode = "auto",
 }: FBCompareTableProps) {
   const prop = getKBProperty(propertyId);
-  const heading = title ?? prop?.name ?? titleCase(propertyId);
+  const heading = title ?? getPropertyLabel(prop, propertyId);
 
   // Resolve which entities to include
   const allEntities = getKBEntities();

@@ -5,7 +5,10 @@ import {
   getKBProperty,
   getKBFactsByProperty,
 } from "@/data/factbase";
-import { titleCase } from "@/components/wiki/factbase/format";
+import {
+  getPropertyLabel,
+  getRecordDisplayName,
+} from "@/components/factbase/entity-detail-shared";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
 import { numericValue } from "./common";
 import type { ParsedEquityPositionRecord } from "./equity-positions";
@@ -92,7 +95,7 @@ export function buildChartData(
         if (prefix.length < 7) return false;
         return roundDate && roundDate.startsWith(prefix);
       });
-      const roundName = round ? (round.fields.name ? String(round.fields.name) : titleCase(round.key)) : undefined;
+      const roundName = round ? getRecordDisplayName(round) : undefined;
       return { date: f.asOf!, value: factNumericValue(f)!, label: roundName };
     })
     .sort((a, b) => a.date.localeCompare(b.date));
@@ -152,7 +155,7 @@ export function buildChartData(
     .filter((r) => r.fields.date)
     .map((r) => ({
       date: String(r.fields.date),
-      label: r.fields.name ? String(r.fields.name) : titleCase(r.key),
+      label: getRecordDisplayName(r),
       raised: typeof r.fields.raised === "number" ? r.fields.raised : undefined,
       valuation: typeof r.fields.valuation === "number" ? r.fields.valuation : undefined,
     }))
@@ -170,7 +173,7 @@ export function buildChartData(
       date,
       raised,
       cumulativeRaised: cumulative,
-      roundName: r.fields.name ? String(r.fields.name) : titleCase(r.key),
+      roundName: getRecordDisplayName(r),
       valuation: typeof r.fields.valuation === "number" ? r.fields.valuation : null,
     });
   }
@@ -229,7 +232,7 @@ export function buildChartData(
       }));
 
     return {
-      title: prop?.name ?? titleCase(propId.replace(/-/g, " ")),
+      title: getPropertyLabel(prop, propId),
       propertyId: propId,
       asOf: currentEntityFact?.asOf ?? undefined,
       entries,

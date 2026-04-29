@@ -1,4 +1,5 @@
 import type { FactBaseRecordEntry } from "@/data/factbase";
+import { titleCase } from "@/components/wiki/factbase/format";
 
 // ─── Types ──────────────────────────────────────────────────────────
 
@@ -62,4 +63,55 @@ export function sortByDateField(items: FactBaseRecordEntry[], fieldName: string)
     const dateB = b.fields[fieldName] ? String(b.fields[fieldName]) : "";
     return dateB.localeCompare(dateA);
   });
+}
+
+// ─── Display-name resolution (QUA-771) ──────────────────────────────
+//
+// These helpers replace ad-hoc `?? ?? ??` chains scattered across the wiki
+// frontend. Keep the derivation in one place so both write-side validation
+// and read-side rendering can refer to a single canonical function.
+
+/**
+ * Canonical display name for a FactBase record entry.
+ *
+ * Replaces the `field(item, "name") ?? titleCase(item.key)` pattern that
+ * was duplicated across record renderers (funding rounds, products, model
+ * releases, etc.). Per QUA-771 / data-integrity tier 6.
+ */
+export function getRecordDisplayName(item: FactBaseRecordEntry): string {
+  return field(item, "name") ?? titleCase(item.key);
+}
+
+/**
+ * Canonical display name for a person record entry. Prefers the linked
+ * KB entity's name, then the explicit `displayName`, then a `display_name`
+ * field, then the title-cased key.
+ *
+ * Replaces the `personEntity?.name ?? item.displayName ?? ... ?? titleCase(item.key)`
+ * chain duplicated across person-card components.
+ */
+export function getPersonRecordName(
+  item: FactBaseRecordEntry,
+  personEntity?: { name: string } | null,
+): string {
+  return (
+    personEntity?.name ??
+    item.displayName ??
+    field(item, "display_name") ??
+    titleCase(item.key)
+  );
+}
+
+/**
+ * Canonical label for a FactBase property. Uses the property's `name` if
+ * defined; otherwise derives a title-cased label from the property ID.
+ *
+ * Replaces the `prop?.name ?? titleCase(propertyId)` pattern duplicated
+ * across fact tables, charts, sidebars, and stat cards.
+ */
+export function getPropertyLabel(
+  prop: { name?: string | null } | null | undefined,
+  propertyId: string,
+): string {
+  return prop?.name ?? titleCase(propertyId);
 }

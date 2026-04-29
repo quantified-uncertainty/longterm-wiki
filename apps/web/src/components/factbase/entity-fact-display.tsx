@@ -6,11 +6,11 @@ import {
   formatKBFactValue,
   formatKBDate,
   shortDomain,
-  titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { FactSourcingDot } from "@/components/sourcing/FactSourcingDot";
 
+import { getPropertyLabel } from "./entity-detail-shared";
 import { SectionHeader } from "./entity-section-header";
 
 export function SourceCell({ fact }: { fact: Fact }) {
@@ -76,7 +76,7 @@ export function StatCard({ entityId, propertyId }: { entityId: string; propertyI
     <div className="relative overflow-hidden rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4 transition-shadow hover:shadow-md">
       <div className="absolute top-0 right-0 w-16 h-16 bg-primary/[0.03] rounded-bl-[2rem]" />
       <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1.5">
-        {prop?.name ?? titleCase(propertyId)}
+        {getPropertyLabel(prop, propertyId)}
       </div>
       <div className="text-xl font-bold tabular-nums tracking-tight text-foreground">
         <FactValueDisplay fact={fact} property={prop} />

@@ -5,16 +5,15 @@ import type { FactBaseRecordEntry } from "@/data/factbase";
 import {
   formatKBDate,
   shortDomain,
-  titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
 import { formatAmount } from "@/lib/directory-utils";
 
-import { field } from "./entity-detail-shared";
+import { field, getRecordDisplayName } from "./entity-detail-shared";
 
 /** Funding round row for timeline display. */
 export function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
+  const name = getRecordDisplayName(item);
   const date = field(item, "date");
   const raised = item.fields.raised;
   const valuation = item.fields.valuation;
@@ -79,7 +78,7 @@ export function FundingRoundRow({ item }: { item: FactBaseRecordEntry }) {
 
 /** Product card. */
 export function ProductCard({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
+  const name = getRecordDisplayName(item);
   const launched = field(item, "launched");
   const description = field(item, "description");
   const source = field(item, "source");
@@ -104,7 +103,7 @@ export function ProductCard({ item }: { item: FactBaseRecordEntry }) {
 
 /** Model release row. */
 export function ModelReleaseRow({ item }: { item: FactBaseRecordEntry }) {
-  const name = field(item, "name") ?? titleCase(item.key);
+  const name = getRecordDisplayName(item);
   const released = field(item, "released");
   const description = field(item, "description");
   const safetyLevel = field(item, "safety_level");
