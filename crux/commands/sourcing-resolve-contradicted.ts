@@ -1,7 +1,7 @@
 /**
  * Sourcing Resolve Contradicted — QUA-728
  *
- * Sweep tool for the existing `contradicted` source-check verdicts. The QUA-650
+ * Sweep tool for the existing `contradicted` sourcing verdicts. The QUA-650
  * retro-scan reasoning indicated many of these are subject-identity mismatches
  * (the source is about a different entity than the record's). This command
  * classifies each contradicted verdict by comparing the existing source URL's
@@ -603,7 +603,7 @@ export const commands = {
 export function getHelp(): string {
   return `
 Sourcing Resolve Contradicted — sweep + classify + queue URL replacements
-                                  for contradicted source-check verdicts (QUA-728).
+                                  for contradicted sourcing verdicts (QUA-728).
 
 Usage:
   crux sourcing-resolve-contradicted [options]
