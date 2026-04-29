@@ -59,6 +59,10 @@ const DEFAULT_CONCURRENCY = 5;
 // apps/wiki-server/src/routes/sourcing/url-suggestions.ts SuggestionInput.
 const MAX_TITLE_CHARS = 500;
 const MAX_SNIPPET_CHARS = 2000;
+// Server caps `suggestedUrl` at 2048; a candidate above this would fail the
+// whole batch upsert, so we drop the candidate client-side rather than
+// truncate (a truncated URL points at the wrong page).
+const MAX_URL_CHARS = 2048;
 
 // ── Types ─────────────────────────────────────────────────────────────
 
@@ -75,10 +79,17 @@ export interface ClassifiedRecord {
   existingUrl: string | null;
   /** Wikidata QID extracted from `existingUrl` (or null). */
   urlQid: string | null;
-  /** Wikidata QID for `verdict.entityId` (or null). */
+  /** Resolved entity slug (verdict.entityId or parsed from citation recordId). */
+  entitySlug: string | null;
+  /** Wikidata QID for `entitySlug` (or null). */
   entityQid: string | null;
   bucket: ContradictedBucket;
-  /** Set after `--apply` if suggestUrls produced ≥1 candidate. */
+  /** Set after `--apply`:
+   *   - `> 0`: suggestUrls returned candidates
+   *   - `0`: suggestUrls ran and returned no usable candidates
+   *   - `-1`: short-circuited by the budget gate before suggestUrls ran
+   *   - `undefined`: not in --apply mode, or not in the eligible bucket
+   */
   candidatesFound?: number;
 }
 
@@ -96,11 +107,15 @@ interface ResolveOptions extends BaseOptions {
 
 interface RunSummary {
   scanned: number;
-  bySource: Record<ContradictedBucket, number>;
+  byBucket: Record<ContradictedBucket, number>;
   /** Records where suggestUrls produced ≥1 candidate (subject-mismatch only). */
   replaceableUrlFound: number;
-  /** Records where suggestUrls returned 0 candidates after the gate. */
+  /** Records where suggestUrls ran AND returned 0 candidates after the gate. */
   noReplacement: number;
+  /** Subject-mismatch records that were short-circuited by the budget gate
+   *  before suggestUrls could run. Tracked separately so a stingy --budget
+   *  doesn't silently inflate the noReplacement count. */
+  budgetSkipped: number;
   /** Total candidate URLs upserted (across replaceableUrlFound records). */
   suggestionsWritten: number;
   costUsd: number;
@@ -108,12 +123,15 @@ interface RunSummary {
   providerErrors: number;
   /** Records that hit suggestUrls but the gate dropped some candidates. */
   subjectMismatchesDropped: number;
+  /** Suggestion candidates rejected client-side because their URL exceeded
+   *  the server's 2048-char cap (would otherwise fail the whole batch). */
+  oversizedUrlsDropped: number;
 }
 
 function makeSummary(): RunSummary {
   return {
     scanned: 0,
-    bySource: {
+    byBucket: {
       'subject-mismatch': 0,
       'subject-match': 0,
       indeterminate: 0,
@@ -121,11 +139,13 @@ function makeSummary(): RunSummary {
     },
     replaceableUrlFound: 0,
     noReplacement: 0,
+    budgetSkipped: 0,
     suggestionsWritten: 0,
     costUsd: 0,
     budgetExhausted: false,
     providerErrors: 0,
     subjectMismatchesDropped: 0,
+    oversizedUrlsDropped: 0,
   };
 }
 
@@ -211,8 +231,11 @@ async function fetchAllContradictedVerdicts(opts: {
     if (offset >= serverTotal) break;
   }
   // Optional client-side entity filter — same shape as sourcing-suggest-urls.
-  // The server's listVerdicts route doesn't accept an entity filter, so we
-  // page everything and trim here. Acceptable for our scale (<1k rows).
+  // The server route does support entity_id filtering, but the typed client
+  // wrapper (`crux/lib/wiki-server/sourcing-client.ts::listVerdicts`) doesn't
+  // expose it, and we additionally match against entityDisplayName
+  // case-insensitively which the server doesn't. Trimming here is acceptable
+  // at our scale (<1k contradicted rows).
   if (opts.entity) {
     const want = opts.entity;
     return {
@@ -268,44 +291,22 @@ export function resolveEntitySlug(verdict: VerdictListEntry): string | null {
 export function classifyContradicted(input: {
   verdict: VerdictListEntry;
   existingUrl: string | null;
+  entitySlug: string | null;
   entityQid: string | null;
 }): ClassifiedRecord {
-  const { verdict, existingUrl, entityQid } = input;
+  const { verdict, existingUrl, entitySlug, entityQid } = input;
+  const base = { verdict, existingUrl, entitySlug, entityQid };
   if (!existingUrl) {
-    return {
-      verdict,
-      existingUrl,
-      urlQid: null,
-      entityQid,
-      bucket: 'no-source-url',
-    };
+    return { ...base, urlQid: null, bucket: 'no-source-url' };
   }
   const urlQid = extractQid(existingUrl);
   if (!urlQid || !entityQid) {
-    return {
-      verdict,
-      existingUrl,
-      urlQid,
-      entityQid,
-      bucket: 'indeterminate',
-    };
+    return { ...base, urlQid, bucket: 'indeterminate' };
   }
   if (urlQid === entityQid) {
-    return {
-      verdict,
-      existingUrl,
-      urlQid,
-      entityQid,
-      bucket: 'subject-match',
-    };
+    return { ...base, urlQid, bucket: 'subject-match' };
   }
-  return {
-    verdict,
-    existingUrl,
-    urlQid,
-    entityQid,
-    bucket: 'subject-mismatch',
-  };
+  return { ...base, urlQid, bucket: 'subject-mismatch' };
 }
 
 // ── Output formatting ─────────────────────────────────────────────────
@@ -313,11 +314,13 @@ export function classifyContradicted(input: {
 function summaryToJson(s: RunSummary, dryRun: boolean) {
   return {
     scanned: s.scanned,
-    by_bucket: { ...s.bySource },
+    by_bucket: { ...s.byBucket },
     replaceable_url_found: s.replaceableUrlFound,
     no_replacement: s.noReplacement,
+    budget_skipped: s.budgetSkipped,
     suggestions_written: s.suggestionsWritten,
     subject_mismatches_dropped: s.subjectMismatchesDropped,
+    oversized_urls_dropped: s.oversizedUrlsDropped,
     cost_usd: Number(s.costUsd.toFixed(4)),
     budget_exhausted: s.budgetExhausted,
     provider_errors: s.providerErrors,
@@ -329,18 +332,22 @@ function formatSummary(s: RunSummary, dryRun: boolean): string {
   const writtenLine = dryRun
     ? '(dry-run; no writes)'
     : `${s.suggestionsWritten} suggestion(s) written across ${s.replaceableUrlFound} record(s)`;
+  const oversized = s.oversizedUrlsDropped > 0
+    ? `\nOversized URLs dropped: ${s.oversizedUrlsDropped} (>${MAX_URL_CHARS} chars)`
+    : '';
   return `
 === Summary ===
 Scanned:                ${s.scanned}
-  subject-mismatch:     ${s.bySource['subject-mismatch']} (URL is about wrong entity → repair)
-  subject-match:        ${s.bySource['subject-match']} (URL OK → likely value-mismatch, manual triage)
-  indeterminate:        ${s.bySource.indeterminate} (no QID on URL or entity)
-  no-source-url:        ${s.bySource['no-source-url']}
+  subject-mismatch:     ${s.byBucket['subject-mismatch']} (URL is about wrong entity → repair)
+  subject-match:        ${s.byBucket['subject-match']} (URL OK → likely value-mismatch, manual triage)
+  indeterminate:        ${s.byBucket.indeterminate} (no QID on URL or entity)
+  no-source-url:        ${s.byBucket['no-source-url']}
 Replaceable URL found:  ${s.replaceableUrlFound}
 No replacement:         ${s.noReplacement}
+Budget-skipped:         ${s.budgetSkipped} (subject-mismatch records short-circuited by budget gate)
 URL suggestions:        ${writtenLine}
 Provider gate drops:    ${s.subjectMismatchesDropped}
-Provider errors:        ${s.providerErrors}
+Provider errors:        ${s.providerErrors}${oversized}
 Cost:                   $${s.costUsd.toFixed(4)}
 Budget exhausted:       ${s.budgetExhausted ? 'yes' : 'no'}
 `.trim();
@@ -419,14 +426,27 @@ async function resolveContradictedCommand(
       };
     }
     for (const [key, rows] of Object.entries(evidenceRes.data.evidenceByKey)) {
-      // Pick the latest evidence row that carries a sourceUrl. Server returns
-      // rows ordered by `checked_at DESC` so `rows[0]` is the latest. We don't
-      // skip deterministic checkers here (unlike retro-scan-subjects) because
-      // a deterministic checker confirming a `contradicted` outcome already
-      // means the URL is OK and the value is wrong — i.e. the row will land
-      // in `subject-match` if the URL has a Wikidata QID, which is the
-      // correct disposition.
-      existingUrlByKey.set(key, rows.find((r) => r.sourceUrl)?.sourceUrl ?? null);
+      // Pick the most-recently-checked evidence row that carries a sourceUrl.
+      // The server orders by `(sourceUrl ASC, checkedAt DESC)` for grouping,
+      // so `rows[0]` is the latest entry of the alphabetically-first URL —
+      // NOT the globally-latest URL. Re-sort by checkedAt DESC client-side
+      // so multi-URL records classify against their actual most-recent URL.
+      //
+      // We don't skip deterministic checkers here (unlike retro-scan-subjects)
+      // because a deterministic checker confirming a `contradicted` outcome
+      // already means the URL is OK and the value is wrong — i.e. the row
+      // will land in `subject-match` if the URL has a Wikidata QID, which
+      // is the correct disposition.
+      const withUrl = rows.filter((r) => r.sourceUrl);
+      withUrl.sort((a, b) => {
+        // checkedAt comes back as an ISO string; lexicographic compare is
+        // safe for ISO-8601. Null checkedAt sorts oldest (least recent).
+        const ta = a.checkedAt ? String(a.checkedAt) : '';
+        const tb = b.checkedAt ? String(b.checkedAt) : '';
+        if (ta === tb) return 0;
+        return ta < tb ? 1 : -1;
+      });
+      existingUrlByKey.set(key, withUrl[0]?.sourceUrl ?? null);
     }
   }
 
@@ -435,11 +455,11 @@ async function resolveContradictedCommand(
     const existingUrl = existingUrlByKey.get(evidenceRecordKey(v.recordType, v.recordId)) ?? null;
     const entitySlug = resolveEntitySlug(v);
     const entityQid = getEntityWikidataQid(entitySlug);
-    return classifyContradicted({ verdict: v, existingUrl, entityQid });
+    return classifyContradicted({ verdict: v, existingUrl, entitySlug, entityQid });
   });
   for (const c of classified) {
     summary.scanned++;
-    summary.bySource[c.bucket]++;
+    summary.byBucket[c.bucket]++;
   }
 
   // ── Step 4: in --apply mode, suggest URL replacements for subject-mismatch ──
@@ -450,21 +470,26 @@ async function resolveContradictedCommand(
     log(`Generating URL suggestions for ${eligible.length} subject-mismatch record(s)…`);
 
     const tasks = eligible.map((c) => async () => {
-      // Shared budget gate.
+      // Shared soft budget gate. Note: this is a *soft* cap — with internal
+      // concurrency, up to N tasks already in flight may push past the cap
+      // before any of them notice. Tasks that haven't started yet
+      // short-circuit with `bucket: 'budget-skipped'` (NOT 'no-replacement',
+      // which would conflate "unable to search" with "searched and found
+      // nothing").
       if (summary.costUsd >= budgetCap) {
         if (!summary.budgetExhausted) {
           summary.budgetExhausted = true;
-          log(`Budget reached ($${summary.costUsd.toFixed(4)} >= $${budgetCap.toFixed(2)}); skipping remaining records.`);
+          log(`Budget reached ($${summary.costUsd.toFixed(4)} >= $${budgetCap.toFixed(2)}); short-circuiting remaining records.`);
         }
+        c.candidatesFound = -1; // sentinel: budget-skipped (distinguishes from 0 = searched-empty)
         return;
       }
       const v = c.verdict;
       const claimText = v.reasoning?.trim() || v.displayName?.trim() || '';
       // Prefer the verdict's display name; fall back to the resolved entity
       // slug. The slug isn't a perfect search query but beats nothing.
-      const resolvedSlug = resolveEntitySlug(v);
       const entityName =
-        v.entityDisplayName?.trim() || resolvedSlug || v.displayName?.trim() || '';
+        v.entityDisplayName?.trim() || c.entitySlug || v.displayName?.trim() || '';
       if (!claimText || !entityName) {
         // Treat as no-replacement; subject-mismatch with no usable text.
         c.candidatesFound = 0;
@@ -490,9 +515,19 @@ async function resolveContradictedCommand(
       if (result.subjectMismatches.length > 0) {
         summary.subjectMismatchesDropped += result.subjectMismatches.length;
       }
-      c.candidatesFound = result.candidates.length;
 
-      for (const cand of result.candidates) {
+      // Drop oversized URLs before counting — server caps at 2048 and would
+      // 400 the whole batch.
+      const accepted = result.candidates.filter((cand) => {
+        if (cand.url.length > MAX_URL_CHARS) {
+          summary.oversizedUrlsDropped++;
+          return false;
+        }
+        return true;
+      });
+      c.candidatesFound = accepted.length;
+
+      for (const cand of accepted) {
         toUpsert.push({
           recordType: v.recordType,
           recordId: v.recordId,
@@ -512,22 +547,31 @@ async function resolveContradictedCommand(
     });
     await runWithConcurrency(DEFAULT_CONCURRENCY, tasks);
 
-    // Tally replaceable vs no-replacement after suggestions ran.
+    // Tally replaceable vs no-replacement vs budget-skipped after suggestions ran.
     for (const c of classified) {
       if (c.bucket !== 'subject-mismatch') continue;
-      if ((c.candidatesFound ?? 0) > 0) summary.replaceableUrlFound++;
+      const found = c.candidatesFound;
+      if (found === -1) summary.budgetSkipped++;
+      else if ((found ?? 0) > 0) summary.replaceableUrlFound++;
       else summary.noReplacement++;
     }
 
     // Upsert in chunks (server caps at 200; chunk at 100 for headroom).
     if (toUpsert.length > 0) {
+      let chunkIdx = 0;
       for (let i = 0; i < toUpsert.length; i += UPSERT_CHUNK) {
+        chunkIdx++;
         const chunk = toUpsert.slice(i, i + UPSERT_CHUNK);
         const upsert = await upsertUrlSuggestions(chunk);
         if (!upsert.ok) {
+          // Partial-write observability: include the count of suggestions
+          // already persisted by prior successful chunks so operators know
+          // what's already in PG. (Chunks before this one wrote their full
+          // batch; the failing chunk wrote nothing per server transaction
+          // semantics.)
           return {
             exitCode: 1,
-            output: `upsert failed at chunk ${i / UPSERT_CHUNK + 1}: ${upsert.message ?? 'unknown error'}`,
+            output: `upsert failed at chunk ${chunkIdx}: ${upsert.message ?? 'unknown error'} (${summary.suggestionsWritten} suggestion(s) already persisted by prior chunks)`,
           };
         }
         summary.suggestionsWritten += upsert.data.upserted;
@@ -547,6 +591,7 @@ async function resolveContradictedCommand(
     record_type: c.verdict.recordType,
     record_id: c.verdict.recordId,
     entity_id: c.verdict.entityId,
+    entity_slug: c.entitySlug,
     entity_display_name: c.verdict.entityDisplayName,
     field_name: c.verdict.fieldName,
     existing_url: c.existingUrl,
@@ -615,7 +660,10 @@ Options:
   --apply              Write URL suggestions for the subject-mismatch bucket.
                        Without this flag the command runs as a dry-run that only
                        classifies and reports.
-  --budget=N           USD cap on suggestUrls provider spend (default: $${DEFAULT_BUDGET_USD.toFixed(2)}).
+  --budget=N           Soft USD cap on suggestUrls provider spend (default:
+                       $${DEFAULT_BUDGET_USD.toFixed(2)}). Tasks already in flight may push past
+                       the cap; pending tasks short-circuit once the running
+                       total reaches it.
   --max-candidates=N   Candidates per record (default: ${DEFAULT_MAX_CANDIDATES}, max: ${MAX_CANDIDATES_PER_RECORD})
   --json / --ci        Machine-readable JSON output
 

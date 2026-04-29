@@ -129,6 +129,7 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: null,
+      entitySlug: 'anthropic',
       entityQid: 'Q108542504',
     });
     expect(c.bucket).toBe('no-source-url');
@@ -139,6 +140,7 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: 'https://nytimes.com/article/123',
+      entitySlug: 'anthropic',
       entityQid: 'Q108542504',
     });
     expect(c.bucket).toBe('indeterminate');
@@ -150,6 +152,7 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: 'https://www.wikidata.org/wiki/Q42',
+      entitySlug: null,
       entityQid: null,
     });
     expect(c.bucket).toBe('indeterminate');
@@ -161,6 +164,7 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: 'https://www.wikidata.org/wiki/Q108542504',
+      entitySlug: 'anthropic',
       entityQid: 'Q108542504',
     });
     expect(c.bucket).toBe('subject-match');
@@ -171,6 +175,7 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: 'https://www.wikidata.org/wiki/Q63041604', // xAI
+      entitySlug: 'anthropic',
       entityQid: 'Q108542504', // Anthropic
     });
     expect(c.bucket).toBe('subject-mismatch');
@@ -182,9 +187,20 @@ describe('classifyContradicted (pure)', () => {
     const c = classifyContradicted({
       verdict: baseVerdict,
       existingUrl: 'https://www.wikidata.org/entity/Q42',
+      entitySlug: 'fortytwo',
       entityQid: 'Q42',
     });
     expect(c.bucket).toBe('subject-match');
+  });
+
+  it('threads entitySlug through onto the result', () => {
+    const c = classifyContradicted({
+      verdict: baseVerdict,
+      existingUrl: 'https://www.wikidata.org/wiki/Q42',
+      entitySlug: 'fortytwo',
+      entityQid: 'Q42',
+    });
+    expect(c.entitySlug).toBe('fortytwo');
   });
 });
 
@@ -483,6 +499,127 @@ describe('sourcing-resolve-contradicted command', () => {
     expect(mockGetEntityWikidataQid).toHaveBeenCalledWith('anthropic');
   });
 
+  it('picks the most recently checked source URL, not rows[0] (server orders by sourceUrl ASC)', async () => {
+    // The /evidence/by-records endpoint orders by (sourceUrl ASC, checkedAt DESC).
+    // For a record with two URLs, rows[0] is the latest checkedAt of the
+    // alphabetically-first URL — NOT the globally most-recently-checked URL.
+    // Bug surfaces here: A-prefixed Wikidata Q42 (older, matches entity)
+    // would beat Z-prefixed Wikidata Q9999 (newer, mismatches entity) under
+    // the naive `.find()` pick. The fix sorts by checkedAt DESC client-side.
+    stubVerdicts([
+      makeVerdict({ recordId: 'f_multi_url', entityId: 'fortytwo' }),
+    ]);
+    stubEvidence({
+      'fact|f_multi_url': [
+        // Alphabetically first URL, OLDER checkedAt — would be picked by buggy code
+        { sourceUrl: 'https://www.wikidata.org/wiki/Q42', checkedAt: '2026-01-01T00:00:00Z' as unknown as Date, checkerModel: 'haiku' } as never,
+        // Alphabetically second URL, NEWER checkedAt — should be picked
+        { sourceUrl: 'https://www.wikidata.org/wiki/Q9999', checkedAt: '2026-04-29T00:00:00Z' as unknown as Date, checkerModel: 'haiku' } as never,
+      ],
+    });
+    mockGetEntityWikidataQid.mockReturnValue('Q42');
+
+    const result = await run({ json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    const record = parsed.records[0];
+    // The latest URL was Q9999 ≠ entity Q42 → subject-mismatch (correct)
+    // Buggy version would have picked Q42 → subject-match (incorrect)
+    expect(record.bucket).toBe('subject-mismatch');
+    expect(record.url_qid).toBe('Q9999');
+  });
+
+  it('counts budget-skipped records separately (not rolled into no-replacement)', async () => {
+    // 8 subject-mismatch records, $0.60 each, $0.50 budget cap. After the
+    // first batch of 5 finishes (cost $3.0), the remaining tasks short-circuit.
+    // The fix: those short-circuited tasks count toward `budget_skipped`,
+    // not `no_replacement`, so a stingy --budget doesn't silently inflate
+    // the no-replacement number.
+    const verdicts = Array.from({ length: 8 }, (_, i) =>
+      makeVerdict({ recordId: `f_${i}`, entityId: 'anthropic', entityDisplayName: 'Anthropic' }),
+    );
+    stubVerdicts(verdicts);
+    const evidenceByKey: Record<string, Array<{ sourceUrl: string; checkerModel: string }>> = {};
+    for (const v of verdicts) {
+      evidenceByKey[`fact|${v.recordId}`] = [
+        { sourceUrl: 'https://www.wikidata.org/wiki/Q63041604', checkerModel: 'haiku' },
+      ];
+    }
+    stubEvidence(evidenceByKey);
+    mockGetEntityWikidataQid.mockReturnValue('Q108542504');
+    mockSuggestUrls.mockResolvedValue({
+      candidates: [],
+      providersUsed: ['exa'],
+      providersSkipped: [],
+      query: 'q',
+      costUsd: 0.6,
+      subjectMismatches: [],
+    });
+
+    const result = await run({ apply: true, budget: '0.5', json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    // budget_skipped + no_replacement should sum to 8 (the subject-mismatch count).
+    // budget_skipped MUST be > 0 (some tasks short-circuited).
+    expect(parsed.summary.budget_exhausted).toBe(true);
+    expect(parsed.summary.budget_skipped).toBeGreaterThan(0);
+    expect(parsed.summary.no_replacement + parsed.summary.budget_skipped + parsed.summary.replaceable_url_found).toBe(8);
+  });
+
+  it('drops candidates whose URL exceeds the server cap (2048 chars)', async () => {
+    // A pathological provider response can produce a URL longer than the
+    // server's z.string().url().max(2048) cap. Without client-side dropping,
+    // the entire batch upsert would fail with a Zod error, killing dozens
+    // of legitimate suggestions.
+    stubVerdicts([makeVerdict({ recordId: 'f_oversized', entityId: 'anthropic' })]);
+    stubEvidence({
+      'fact|f_oversized': [{ sourceUrl: 'https://www.wikidata.org/wiki/Q63041604', checkerModel: 'haiku' }],
+    });
+    mockGetEntityWikidataQid.mockReturnValue('Q108542504');
+    const oversizedUrl = 'https://anthropic.com/news?q=' + 'a'.repeat(2100);
+    mockSuggestUrls.mockResolvedValueOnce({
+      candidates: [
+        // Two candidates: one fits, one doesn't.
+        { url: 'https://anthropic.com/news/short', title: 't', snippet: 's', relevanceScore: null, sourceProvider: 'exa' },
+        { url: oversizedUrl, title: 'huge', snippet: 's', relevanceScore: null, sourceProvider: 'exa' },
+      ],
+      providersUsed: ['exa'], providersSkipped: [],
+      query: 'q', costUsd: 0, subjectMismatches: [],
+    });
+    mockUpsertUrlSuggestions.mockResolvedValueOnce({ ok: true, data: { upserted: 1 } });
+
+    const result = await run({ apply: true, json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.summary.oversized_urls_dropped).toBe(1);
+    // Only the short URL was upserted.
+    expect(mockUpsertUrlSuggestions).toHaveBeenCalledWith([
+      expect.objectContaining({ suggestedUrl: 'https://anthropic.com/news/short' }),
+    ]);
+  });
+
+  it('paginates verdicts across multiple pages (regression for fetchAll loop)', async () => {
+    // Server returns total: 250 with two pages (200 + 50). Confirms the loop
+    // continues past the first page and stops when offset >= serverTotal.
+    const page1 = Array.from({ length: 200 }, (_, i) =>
+      makeVerdict({ recordId: `f_${i}`, entityId: 'anthropic', entityDisplayName: 'Anthropic' }),
+    );
+    const page2 = Array.from({ length: 50 }, (_, i) =>
+      makeVerdict({ recordId: `f_${200 + i}`, entityId: 'anthropic', entityDisplayName: 'Anthropic' }),
+    );
+    mockListVerdicts
+      .mockResolvedValueOnce({ ok: true, data: { verdicts: page1, total: 250 } })
+      .mockResolvedValueOnce({ ok: true, data: { verdicts: page2, total: 250 } });
+    stubEvidence({});
+    mockGetEntityWikidataQid.mockReturnValue(null);
+
+    const result = await run({ limit: '300', json: true });
+    expect(result.exitCode).toBe(0);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.summary.scanned).toBe(250);
+    expect(mockListVerdicts).toHaveBeenCalledTimes(2);
+  });
+
   it('rejects --limit that is non-positive', async () => {
     stubVerdicts([]);
     const result = await run({ limit: 'abc' });
@@ -510,7 +647,12 @@ describe('sourcing-resolve-contradicted classification matrix', () => {
     { name: 'mismatching QIDs', existingUrl: 'https://www.wikidata.org/wiki/Q1', entityQid: 'Q2', expected: 'subject-mismatch' },
   ];
   it.each(cases)('$name → $expected', ({ existingUrl, entityQid, expected }) => {
-    const c = classifyContradicted({ verdict: baseVerdict, existingUrl, entityQid });
+    const c = classifyContradicted({
+      verdict: baseVerdict,
+      existingUrl,
+      entitySlug: entityQid ? 'some-slug' : null,
+      entityQid,
+    });
     expect(c.bucket).toBe(expected);
   });
 });
