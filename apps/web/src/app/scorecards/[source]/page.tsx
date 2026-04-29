@@ -267,8 +267,19 @@ export default async function ScorecardDetailPage({
               </thead>
               <tbody>
                 {orgRows.map((row) => (
-                  <tr key={row.entityId} className="hover:bg-muted/20">
-                    <td className="px-3 py-2 border-b border-border/30 sticky left-0 z-10 bg-background">
+                  <tr
+                    key={row.entityId}
+                    className="group hover:bg-muted/20"
+                  >
+                    {/*
+                      Sticky org column needs an opaque background so dimension
+                      cells don't paint over it under horizontal scroll, but a
+                      static `bg-background` blocks the row's :hover from
+                      reaching this cell. `group-hover:` re-applies the row's
+                      hover tint to the sticky cell so the row highlight stays
+                      visually contiguous.
+                    */}
+                    <td className="px-3 py-2 border-b border-border/30 sticky left-0 z-10 bg-background group-hover:bg-muted/20">
                       {row.slug ? (
                         <Link
                           href={`/organizations/${row.slug}`}
