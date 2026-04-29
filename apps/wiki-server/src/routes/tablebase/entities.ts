@@ -358,17 +358,21 @@ const entitiesApp = new Hono()
     )`;
 
     // Count of grants where this org is the grantor (entity acts as funder).
-    // Matches three columns to bridge mixed-state data:
-    //   - org_entity_id (canonical FK to entities.stable_id, set when migrated)
-    //   - organization_id (legacy: may contain a stableId or a slug)
-    // The conditions are an OR over the same row, so no double-counting.
-    // Uses idx_grants_org_entity + idx_grants_org; returns 0 for non-funder orgs.
+    // Bridges mixed-state data with precedence: prefer the canonical FK
+    // org_entity_id when set; only consult the legacy organization_id (which
+    // may hold a stableId or slug) when org_entity_id is NULL. This avoids
+    // double-attributing a single grant if its two columns happen to point
+    // at different orgs (e.g., legacy slug not matching the migrated FK).
+    // Uses idx_grants_org_entity + idx_grants_org; returns 0 for non-funders.
     const grantsGivenCountExpr = sql`(
       SELECT COUNT(*)::int
       FROM ${grants} g
-      WHERE g.org_entity_id = ${entities.stableId}
-         OR g.organization_id = ${entities.stableId}
-         OR g.organization_id = ${entities.id}
+      WHERE
+        (g.org_entity_id = ${entities.stableId})
+        OR (
+          g.org_entity_id IS NULL
+          AND g.organization_id IN (${entities.stableId}, ${entities.id})
+        )
     )`;
 
     // Build ORDER BY
@@ -504,7 +508,9 @@ const entitiesApp = new Hono()
         headcountDate: r.headcountDate,
         totalFundingNum: r.totalFundingNum != null ? Number(r.totalFundingNum) : null,
         foundedDate: r.foundedDate,
-        grantsGivenCount: r.grantsGivenCount != null ? Number(r.grantsGivenCount) : 0,
+        // COUNT(*) never returns NULL; the ?? 0 is purely a TypeScript
+        // narrow on the Drizzle-inferred `number | null`.
+        grantsGivenCount: Number(r.grantsGivenCount ?? 0),
       })),
       total,
       limit,
