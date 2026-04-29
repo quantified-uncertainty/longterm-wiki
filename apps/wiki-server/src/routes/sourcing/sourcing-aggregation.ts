@@ -1,23 +1,15 @@
 /**
- * Canonical source-check verdict aggregation (QUA-791 Phase 1).
+ * Canonical source-check verdict aggregation.
  *
  * Single source of truth for collapsing per-source `source_check_evidence`
- * rows into one `source_check_verdicts` row. Every code path that wants
- * to derive an aggregate verdict from raw evidence MUST go through
- * `aggregateEvidence()` here. Do not inline ad-hoc aggregation.
+ * rows into one `source_check_verdicts` row. Every code path that derives
+ * an aggregate verdict from raw evidence MUST go through `aggregateEvidence()`.
  *
- * The pre-Phase-1 behavior was last-writer-wins on `POST /verdicts`:
- * each evidence-writer call passed its own per-source verdict with
- * `sourcesChecked: 1`, and whoever wrote last set the aggregate. This
- * function replaces that with relevance-weighted aggregation that reads
- * the actual evidence rows.
- *
- * The priority ladder (`SOURCE_CHECK_VERDICT_PRIORITY`) lives in the
- * frontend `verdict-styles.ts`; we duplicate the same numeric ordering
- * here so the wiki-server doesn't depend on `apps/web`. Any change to
- * the ladder must be mirrored — the QUA-429 Phase 2 gate validator
- * `validate-verdict-priority` enforces that no other priority maps
- * exist outside these two files.
+ * `SOURCE_CHECK_VERDICT_PRIORITY` mirrors the canonical ladder in
+ * `apps/web/src/components/shared/verdict-styles.ts`; the wiki-server
+ * cannot import from apps/web, so the constant is duplicated. The
+ * `validate-verdict-priority` gate validator allowlists both files and
+ * blocks any third declaration.
  */
 
 import type {
@@ -82,6 +74,15 @@ interface AggregateOptions {
   minRelevance?: number;
 }
 
+interface Bucket {
+  weight: number;
+  rowCount: number;
+  /** Sum of `confidence × weight` for rows that reported a confidence. */
+  confidenceWeightedSum: number;
+  /** Sum of weights for the same rows (used as the denominator). */
+  confidenceWeightSum: number;
+}
+
 /**
  * Aggregate a set of evidence rows for a single
  * `(record_type, record_id, field_name)` key into one verdict.
@@ -140,22 +141,9 @@ export function aggregateEvidence(
   }
 
   // Step 4: per-verdict aggregates in one pass. Only rows above the
-  // threshold get to vote — otherwise low-relevance noise can swing
-  // ties between high-relevance verdicts. By construction, every row
-  // in `aboveThreshold` has verdict ∈ {confirmed, contradicted, outdated,
-  // partial, unverifiable} — `not_applicable` was filtered in step 1
-  // and `unchecked` is not a valid evidence verdict.
-  //
-  // Track confidence per bucket too (sum of `confidence × weight` and
-  // sum of weights for rows that reported a confidence value). Rows
-  // with NULL confidence are skipped from the average — they don't
-  // drag it toward zero, but they don't elevate it either.
-  interface Bucket {
-    weight: number;
-    rowCount: number;
-    confidenceWeightedSum: number;
-    confidenceWeightSum: number;
-  }
+  // threshold get to vote — low-relevance noise shouldn't swing ties.
+  // Rows with NULL confidence are skipped from the confidence average
+  // (don't drag it down, don't elevate it).
   const buckets = new Map<AggregateVerdict, Bucket>();
   for (const row of aboveThreshold) {
     const verdict = row.verdict as AggregateVerdict;
@@ -167,7 +155,7 @@ export function aggregateEvidence(
     }
     bucket.weight += w;
     bucket.rowCount += 1;
-    if (w > 0 && typeof row.confidence === "number") {
+    if (typeof row.confidence === "number") {
       bucket.confidenceWeightedSum += row.confidence * w;
       bucket.confidenceWeightSum += w;
     }

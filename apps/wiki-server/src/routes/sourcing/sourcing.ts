@@ -7,7 +7,6 @@ import {
   count,
   sql,
   desc,
-  lt,
   lte,
   gte,
   ne,
@@ -962,34 +961,15 @@ const sourcingApp = new Hono()
       }
     }
 
-    // Auto-flag corresponding verdicts for recheck.
-    //
-    // QUA-313: 7-day cooldown — skip verdicts whose `updated_at` is within the
-    // cooldown window. Without this, any burst of evidence writes (e.g.,
-    // `enrich --force` over already-enriched resources, or multiple source
-    // checks of the same record in quick succession) would spam
-    // `needs_recheck=true` on verdicts that were freshly rechecked.
-    // The cooldown interval matches the `--min-age=7d` default in
-    // `crux sourcing-mark`, so client-side and server-side layers agree.
-    const autoFlagCutoff = new Date(now.getTime() - AUTO_FLAG_COOLDOWN_MS);
-    const verdictUpdated = await db
-      .update(sourceVerdicts)
-      .set({ needsRecheck: true, updatedAt: now })
-      .where(
-        and(
-          eq(sourceVerdicts.recordType, body.recordType),
-          eq(sourceVerdicts.recordId, body.recordId),
-          lt(sourceVerdicts.updatedAt, autoFlagCutoff),
-        )
-      )
-      .returning({ recordId: sourceVerdicts.recordId });
-
     // QUA-791: recompute the aggregate so it reflects the row we just
-    // wrote (or updated). Best-effort: failure here does not fail the
-    // underlying evidence write — the next recompute call picks it up.
-    // Recompute clears `needs_recheck`; do this AFTER the auto-flag
-    // update so the recompute supersedes it (we just looked, no need
-    // to flag a recheck on this same write).
+    // wrote. Best-effort — failure here doesn't fail the evidence write;
+    // the next recompute call (or a periodic backfill) picks it up.
+    //
+    // The pre-QUA-791 handler also had a 7-day-cooldown auto-flag step
+    // that set `needs_recheck=true` on stale verdicts. Recompute now
+    // produces a fresh verdict from current evidence on every write, so
+    // the auto-flag is redundant and was removed; `verdictFlagged` is
+    // correspondingly dropped from the response (no callers consumed it).
     await recomputeVerdictBestEffort(db, {
       recordType: body.recordType,
       recordId: body.recordId,
@@ -1001,7 +981,6 @@ const sourcingApp = new Hono()
       {
         id: evidenceId,
         wasUpdated,
-        verdictFlagged: verdictUpdated.length > 0,
       },
       wasUpdated ? 200 : 201
     );
@@ -1425,37 +1404,18 @@ const sourcingApp = new Hono()
       }
     }
 
-    // QUA-791: trigger server-side recompute so the persisted aggregate
-    // reflects all evidence rows (not just whatever the last caller passed).
-    //
-    // **Only recompute when evidence rows exist** — preserves back-compat
-    // for callers that use POST /verdicts as a verdict-only write
-    // (e.g. metadata-only updates, manual marker writes). If we
-    // unconditionally recomputed, those writes would resolve to
-    // 'unchecked' because there's no evidence to roll up.
-    //
-    // Best-effort: a recompute failure does not fail the underlying write.
-    const fieldNameForRecompute = fieldNameVal ?? "";
-    const evidenceCount = await db
-      .select({ count: count() })
-      .from(recordSources)
-      .where(
-        and(
-          eq(recordSources.recordType, body.recordType),
-          eq(recordSources.recordId, body.recordId),
-          sql`COALESCE(${recordSources.fieldName}, '') = ${fieldNameForRecompute}`,
-        ),
-      );
-    if ((evidenceCount[0]?.count ?? 0) > 0) {
-      await recomputeVerdictBestEffort(db, {
-        recordType: body.recordType,
-        recordId: body.recordId,
-        fieldName: fieldNameVal,
-        entityId: entityIdVal,
-        displayName: displayNameVal,
-        entityDisplayName: entityDisplayNameVal,
-      });
-    }
+    // QUA-791: reconcile the persisted aggregate against all evidence rows.
+    // Best-effort. `recomputeVerdict` is a no-op (no DB writes) when the key
+    // has no evidence rows, which preserves back-compat for verdict-only
+    // marker writes.
+    await recomputeVerdictBestEffort(db, {
+      recordType: body.recordType,
+      recordId: body.recordId,
+      fieldName: fieldNameVal,
+      entityId: entityIdVal,
+      displayName: displayNameVal,
+      entityDisplayName: entityDisplayNameVal,
+    });
 
     return c.json({ ok: true }, 200);
   })

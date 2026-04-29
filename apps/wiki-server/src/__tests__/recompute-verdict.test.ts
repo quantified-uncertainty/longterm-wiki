@@ -32,17 +32,12 @@ describe("recomputeVerdict — end-to-end", () => {
     dispatch = () => [];
   });
 
-  it("returns 'unchecked' aggregate when no evidence rows exist", async () => {
-    let updateCalls = 0;
-    let insertCalls = 0;
+  it("returns 'unchecked' aggregate and skips writes when no evidence rows exist", async () => {
+    let writeCalls = 0;
     dispatch = (q) => {
       if (/select/i.test(q) && /source_check_evidence/i.test(q)) return [];
-      if (/^update/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
-        updateCalls++;
-        return []; // "no row updated" → falls through to INSERT
-      }
-      if (/^insert/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
-        insertCalls++;
+      if (/^(update|insert)/i.test(q.trim()) && /source_check_verdicts/i.test(q)) {
+        writeCalls++;
         return [];
       }
       return [];
@@ -57,7 +52,10 @@ describe("recomputeVerdict — end-to-end", () => {
     expect(result.aggregate.verdict).toBe("unchecked");
     expect(result.aggregate.sourcesChecked).toBe(0);
     expect(result.reasoning).toMatch(/no evidence/i);
-    expect(updateCalls + insertCalls).toBeGreaterThan(0);
+    // Short-circuit: no UPDATE/INSERT against source_check_verdicts when
+    // there's no evidence to roll up. Preserves back-compat for callers
+    // that use POST /verdicts as a verdict-only marker write.
+    expect(writeCalls).toBe(0);
   });
 
   it("aggregates relevance-weighted majority from multiple evidence rows", async () => {

@@ -1,18 +1,21 @@
 #!/usr/bin/env -S node --import tsx/esm
 /**
  * One-time backfill: recompute every source-check verdict from its
- * underlying evidence rows (QUA-791 Phase 1).
+ * underlying evidence rows (QUA-791).
  *
  * The pre-Phase-1 `POST /verdicts` endpoint was last-writer-wins —
  * whoever wrote last set the aggregate, regardless of the other
- * evidence rows. After QUA-791 lands, every new write triggers
- * server-side recompute. This script reconciles the *existing* table
- * by reading all distinct `(record_type, record_id, field_name)` keys
- * from `source_check_evidence` and POSTing
- * `/api/sourcing/verdicts/recompute` for each.
+ * evidence rows. Post-QUA-791, every new write triggers server-side
+ * recompute. This script reconciles the *existing* table by listing
+ * every `(record_type, record_id, field_name)` key with a verdict and
+ * POSTing `/api/sourcing/verdicts/recompute` for each.
  *
- * Reports a verdict-distribution diff (before vs after) so the operator
- * can see the impact before merging.
+ * **Concurrent-write caveat**: `/api/sourcing/verdicts` orders by
+ * `lastComputedAt desc`, so under active enrichment the cursor can
+ * skip rows. Recompute is idempotent — duplicates are harmless — but
+ * skipped keys remain on the legacy aggregate. Run during low-write
+ * periods or accept that ~1-5% of keys may need a follow-up POST
+ * /evidence to pick up the recompute.
  *
  * Usage:
  *   node --import tsx/esm crux/scripts/recompute-source-verdicts.ts             # dry run
@@ -24,14 +27,13 @@
  *   --apply           Actually call the recompute endpoint (default: dry-run, samples 5 keys)
  *   --limit=N         Process at most N keys
  *   --concurrency=N   Parallel requests (default: 5)
- *
- * Safe to re-run: each call is idempotent on the (recordType, recordId, fieldName) key.
  */
 
-import { config } from "dotenv";
-import { join } from "node:path";
-
-config({ path: join(import.meta.dirname, "../../.env") });
+import "dotenv/config";
+import {
+  listVerdicts,
+  recomputeVerdict,
+} from "../lib/wiki-server/sourcing-client.ts";
 
 const args = process.argv.slice(2);
 const APPLY = args.includes("--apply");
@@ -52,58 +54,6 @@ const CONCURRENCY = concurrencyArg
   ? parsePositiveInt(concurrencyArg.split("=")[1], "concurrency")
   : 5;
 
-const isProd = process.env.WIKI_SERVER_ENV === "prod";
-const BASE_URL = isProd
-  ? process.env.PROD_LONGTERMWIKI_SERVER_URL
-  : process.env.LONGTERMWIKI_SERVER_URL ?? "http://localhost:4850";
-const API_KEY = isProd
-  ? process.env.PROD_LONGTERMWIKI_SERVER_API_KEY
-  : process.env.LONGTERMWIKI_SERVER_API_KEY;
-
-if (!BASE_URL) {
-  console.error("ERROR: No wiki-server URL configured.");
-  process.exit(1);
-}
-
-function authHeaders(): Record<string, string> {
-  const h: Record<string, string> = { "Content-Type": "application/json" };
-  if (API_KEY) h["Authorization"] = `Bearer ${API_KEY}`;
-  return h;
-}
-
-interface DistributionRow {
-  verdict: string;
-  count: number;
-}
-
-/**
- * Pull current verdict distribution by paging through `/api/sourcing/verdicts`.
- * Aggregated client-side because there is no /stats endpoint that returns
- * raw verdict counts unfiltered by orphan-cleanup CTE.
- */
-async function fetchVerdictDistribution(): Promise<DistributionRow[]> {
-  const counts = new Map<string, number>();
-  let offset = 0;
-  const pageSize = 200;
-  while (true) {
-    const url = `${BASE_URL}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
-    const res = await fetch(url, { headers: authHeaders() });
-    if (!res.ok) {
-      throw new Error(`fetch verdicts failed: ${res.status} ${res.statusText}`);
-    }
-    const data = (await res.json()) as { verdicts: Array<{ verdict: string }>; total: number };
-    if (!data.verdicts || data.verdicts.length === 0) break;
-    for (const v of data.verdicts) {
-      counts.set(v.verdict, (counts.get(v.verdict) ?? 0) + 1);
-    }
-    offset += data.verdicts.length;
-    if (offset >= data.total) break;
-  }
-  return [...counts.entries()]
-    .map(([verdict, count]) => ({ verdict, count }))
-    .sort((a, b) => b.count - a.count);
-}
-
 interface EvidenceKey {
   recordType: string;
   recordId: string;
@@ -111,62 +61,78 @@ interface EvidenceKey {
 }
 
 /**
- * List every distinct (recordType, recordId, fieldName) key with at least
- * one evidence row. We page through `/api/sourcing/verdicts` because every
- * key with evidence almost certainly has a verdict row already (the old
- * code wrote them in lockstep). Anything we miss this pass — keys with
- * evidence but no verdict — gets picked up the next time POST /evidence
- * fires for that key (which now triggers recompute).
+ * Single paginated walk of `/api/sourcing/verdicts` that returns both
+ * the verdict-key list (input to recompute) and the verdict-distribution
+ * map (the "before" snapshot for diffing).
  */
-async function listKeys(): Promise<EvidenceKey[]> {
+async function fetchVerdictKeysAndDistribution(): Promise<{
+  keys: EvidenceKey[];
+  distribution: Map<string, number>;
+}> {
   const keys: EvidenceKey[] = [];
-  let offset = 0;
+  const distribution = new Map<string, number>();
   const pageSize = 500;
+  let offset = 0;
   while (true) {
-    const url = `${BASE_URL}/api/sourcing/verdicts?limit=${pageSize}&offset=${offset}`;
-    const res = await fetch(url, { headers: authHeaders() });
-    if (!res.ok) {
-      throw new Error(`list verdicts failed: ${res.status} ${res.statusText}`);
+    const result = await listVerdicts({ limit: pageSize, offset });
+    if (!result.ok) {
+      throw new Error(`list verdicts failed: ${result.error}`);
     }
-    const data = (await res.json()) as {
-      verdicts: Array<{ recordType: string; recordId: string; fieldName: string | null }>;
-      total: number;
-    };
-    if (!data.verdicts || data.verdicts.length === 0) break;
-    for (const v of data.verdicts) {
+    const { verdicts, total } = result.data;
+    if (!verdicts || verdicts.length === 0) break;
+    for (const v of verdicts) {
       keys.push({
         recordType: v.recordType,
         recordId: v.recordId,
         fieldName: v.fieldName ?? null,
       });
-      if (LIMIT && keys.length >= LIMIT) return keys;
+      distribution.set(v.verdict, (distribution.get(v.verdict) ?? 0) + 1);
+      if (LIMIT && keys.length >= LIMIT) {
+        return { keys, distribution };
+      }
     }
-    offset += data.verdicts.length;
-    if (offset >= data.total) break;
+    offset += verdicts.length;
+    if (offset >= total) break;
   }
-  return keys;
+  return { keys, distribution };
 }
 
-async function recompute(key: EvidenceKey): Promise<{ verdict: string; key: EvidenceKey } | null> {
-  const url = `${BASE_URL}/api/sourcing/verdicts/recompute`;
-  const res = await fetch(url, {
-    method: "POST",
-    headers: authHeaders(),
-    body: JSON.stringify({
-      recordType: key.recordType,
-      recordId: key.recordId,
-      fieldName: key.fieldName,
-    }),
+/** Diff-only walk for the "after" snapshot. */
+async function fetchVerdictDistribution(): Promise<Map<string, number>> {
+  const distribution = new Map<string, number>();
+  const pageSize = 500;
+  let offset = 0;
+  while (true) {
+    const result = await listVerdicts({ limit: pageSize, offset });
+    if (!result.ok) {
+      throw new Error(`list verdicts failed: ${result.error}`);
+    }
+    const { verdicts, total } = result.data;
+    if (!verdicts || verdicts.length === 0) break;
+    for (const v of verdicts) {
+      distribution.set(v.verdict, (distribution.get(v.verdict) ?? 0) + 1);
+    }
+    offset += verdicts.length;
+    if (offset >= total) break;
+  }
+  return distribution;
+}
+
+async function recomputeOne(
+  key: EvidenceKey,
+): Promise<{ verdict: string; key: EvidenceKey } | null> {
+  const result = await recomputeVerdict({
+    recordType: key.recordType,
+    recordId: key.recordId,
+    fieldName: key.fieldName,
   });
-  if (!res.ok) {
-    const text = await res.text().catch(() => "");
+  if (!result.ok) {
     console.error(
-      `recompute failed: ${res.status} ${res.statusText} for ${key.recordType}/${key.recordId}/${key.fieldName ?? "null"} — ${text.slice(0, 200)}`,
+      `recompute failed for ${key.recordType}/${key.recordId}/${key.fieldName ?? "null"}: ${result.error}`,
     );
     return null;
   }
-  const data = (await res.json()) as { verdict: string };
-  return { verdict: data.verdict, key };
+  return { verdict: result.data.verdict, key };
 }
 
 async function runWithConcurrency<T, R>(
@@ -190,29 +156,29 @@ async function runWithConcurrency<T, R>(
   return results;
 }
 
+function printDistribution(label: string, dist: Map<string, number>): void {
+  console.log(`${label}:`);
+  const sorted = [...dist.entries()].sort((a, b) => b[1] - a[1]);
+  for (const [verdict, count] of sorted) {
+    console.log(`  ${verdict.padEnd(15)} ${count}`);
+  }
+}
+
 async function main(): Promise<void> {
-  console.log(`Wiki-server: ${BASE_URL}`);
   console.log(`Mode: ${APPLY ? "APPLY (will write)" : "DRY RUN (samples 5 keys)"}`);
   if (LIMIT) console.log(`Limit: ${LIMIT}`);
   console.log("");
 
-  console.log("Fetching baseline verdict distribution...");
-  const before = await fetchVerdictDistribution();
-  console.log("Baseline:");
-  for (const { verdict, count } of before) {
-    console.log(`  ${verdict.padEnd(15)} ${count}`);
-  }
-  console.log("");
-
-  console.log("Listing keys to recompute...");
-  const keys = await listKeys();
+  console.log("Listing keys + baseline distribution...");
+  const { keys, distribution: before } = await fetchVerdictKeysAndDistribution();
   console.log(`  ${keys.length} keys`);
+  printDistribution("Baseline", before);
   console.log("");
 
   if (!APPLY) {
     console.log("DRY RUN — sampling 5 keys:");
     for (const key of keys.slice(0, 5)) {
-      const r = await recompute(key);
+      const r = await recomputeOne(key);
       if (r) {
         console.log(`  ${key.recordType}/${key.recordId}/${key.fieldName ?? "null"} → ${r.verdict}`);
       }
@@ -223,28 +189,21 @@ async function main(): Promise<void> {
 
   console.log(`Recomputing ${keys.length} keys with concurrency=${CONCURRENCY}...`);
   const t0 = Date.now();
-  const results = await runWithConcurrency(keys, CONCURRENCY, recompute);
+  const results = await runWithConcurrency(keys, CONCURRENCY, recomputeOne);
   const elapsedSec = Math.round((Date.now() - t0) / 1000);
   const ok = results.filter((r) => r !== null).length;
   const failed = results.length - ok;
-  console.log(`  ${ok} succeeded, ${failed} failed in ${elapsedSec}s`);
-  console.log("");
+  console.log(`  ${ok} succeeded, ${failed} failed in ${elapsedSec}s\n`);
 
-  console.log("Fetching post-recompute verdict distribution...");
+  console.log("Fetching post-recompute distribution...");
   const after = await fetchVerdictDistribution();
-  console.log("After:");
-  for (const { verdict, count } of after) {
-    console.log(`  ${verdict.padEnd(15)} ${count}`);
-  }
+  printDistribution("After", after);
 
   console.log("\nDiff (after - before):");
-  const verdicts = new Set([
-    ...before.map((r) => r.verdict),
-    ...after.map((r) => r.verdict),
-  ]);
+  const verdicts = new Set([...before.keys(), ...after.keys()]);
   for (const v of verdicts) {
-    const beforeCount = before.find((r) => r.verdict === v)?.count ?? 0;
-    const afterCount = after.find((r) => r.verdict === v)?.count ?? 0;
+    const beforeCount = before.get(v) ?? 0;
+    const afterCount = after.get(v) ?? 0;
     const delta = afterCount - beforeCount;
     if (delta === 0) continue;
     const sign = delta > 0 ? "+" : "";
