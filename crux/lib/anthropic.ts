@@ -184,7 +184,13 @@ export function sleep(ms: number): Promise<void> {
 }
 
 /**
- * Parse JSON from Claude response, handling markdown code blocks
+ * Parse JSON from Claude response, handling markdown code blocks.
+ *
+ * @deprecated Returns `unknown` and provides no runtime validation. New code
+ * should use `parseAndValidate(raw, schema, phase, fallback)` from
+ * `crux/lib/json-parsing.ts` with a Zod schema (QUA-158 / Tier 3). The
+ * older `as T` pattern lets malformed LLM output silently corrupt
+ * downstream data.
  */
 export function parseJsonResponse(text: string): unknown {
   // Remove markdown code blocks if present

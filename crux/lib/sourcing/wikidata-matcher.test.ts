@@ -861,4 +861,63 @@ describe('tryWikidataMatch', () => {
       expect(result).toBeNull();
     });
   });
+
+  // ── Schema validation (QUA-158 / Tier 3) ──
+
+  describe('schema validation', () => {
+    it('drops entities whose shape is wildly wrong (e.g. string instead of object)', async () => {
+      // Q500 returns a string in `entities[Q500]` instead of an object — schema must reject.
+      setMockEntity('Q500', 'not-an-object-just-a-string');
+      const item = makeFactItem({
+        propertyName: 'website',
+        formattedValue: 'https://example.com',
+        source: 'https://www.wikidata.org/wiki/Q500',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).toBeNull();
+    });
+
+    it('drops entities flagged with `missing`', async () => {
+      setMockEntity('Q501', { id: 'Q501', missing: '' });
+      const item = makeFactItem({
+        propertyName: 'website',
+        formattedValue: 'https://example.com',
+        source: 'https://www.wikidata.org/wiki/Q501',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).toBeNull();
+    });
+
+    it('drops entities whose `claims` field is wrong type (object instead of record-of-arrays)', async () => {
+      // claims[P856] is a number, not an array — schema must reject the entity.
+      setMockEntity('Q502', { id: 'Q502', claims: 'not-a-record' });
+      const item = makeFactItem({
+        propertyName: 'website',
+        formattedValue: 'https://example.com',
+        source: 'https://www.wikidata.org/wiki/Q502',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).toBeNull();
+    });
+
+    it('accepts entities with passthrough fields not in the schema', async () => {
+      // Wikidata adds new top-level fields over time; schema must not reject them.
+      setMockEntity('Q503', {
+        id: 'Q503',
+        labels: { en: { language: 'en', value: 'Q503 Label' } },
+        claims: { P856: [makeStringClaim('P856', 'https://example.com')] },
+        sitelinks: {},
+        // unknown top-level field added by a hypothetical future Wikidata change:
+        someNewField: { reading: true },
+      });
+      const item = makeFactItem({
+        propertyName: 'website',
+        formattedValue: 'https://example.com',
+        source: 'https://www.wikidata.org/wiki/Q503',
+      });
+      const result = await tryWikidataMatch(item);
+      expect(result).not.toBeNull();
+      expect(result!.verdict).toBe('confirmed');
+    });
+  });
 });

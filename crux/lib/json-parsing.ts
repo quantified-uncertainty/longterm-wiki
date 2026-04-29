@@ -4,8 +4,12 @@
  * Centralizes the try/catch JSON.parse pattern used across LLM-calling scripts.
  * Provides type-safe parsing with structured fallbacks and partial recovery for
  * truncated responses (e.g. when long output hits token limits).
+ *
+ * For Zod-validated parsing (QUA-158 / Tier 3), prefer `parseAndValidate()` —
+ * it adds runtime schema enforcement on top of `parseJsonFromLlm`'s salvage.
  */
 
+import type { ZodType } from 'zod';
 import { createPhaseLogger } from './output.ts';
 
 const log = createPhaseLogger();
@@ -147,4 +151,86 @@ export function parseJsonFromLlm<T>(
   const errorMsg = `Could not parse ${phase} result as JSON (response may have been truncated)`;
   log(phase, `Warning: ${errorMsg}`);
   return fallback(raw, errorMsg);
+}
+
+/**
+ * Parse and validate an LLM response against a Zod schema.
+ *
+ * This is the recommended way to handle untrusted LLM output across the
+ * codebase (QUA-158 / Tier 3). Combines `parseJsonFromLlm`'s truncation
+ * salvage with Zod runtime validation, so callers get a fully-typed value
+ * or a deterministic fallback — never an unsafe `as T` cast.
+ *
+ * On schema-validation failure, logs the validation error and returns the
+ * fallback rather than the raw parsed object — passing the malformed object
+ * through would defeat the validation.
+ *
+ * @example
+ * ```ts
+ * const Schema = z.object({ verdict: z.string(), confidence: z.number() });
+ * const result = parseAndValidate(
+ *   llmResult.text,
+ *   Schema,
+ *   'verify',
+ *   () => ({ verdict: 'unverifiable', confidence: 0 }),
+ * );
+ * ```
+ */
+export function parseAndValidate<T>(
+  raw: string,
+  schema: ZodType<T>,
+  phase: string,
+  fallback: (raw: string, error?: string) => T,
+): T {
+  // Use a sentinel object to detect "JSON parse failed" inside parseJsonFromLlm
+  // without sending the user-supplied fallback through schema.safeParse twice
+  // (which would either succeed silently or produce a confusing
+  // "schema validation failed" log line about the fallback's own shape).
+  const PARSE_FAILED = {} as const;
+  const parsed = parseJsonFromLlm<unknown>(raw, phase, () => PARSE_FAILED);
+  if (parsed === PARSE_FAILED) {
+    return fallback(raw, 'Could not parse JSON from LLM response');
+  }
+  const result = schema.safeParse(parsed);
+  if (result.success) {
+    return result.data;
+  }
+  log(phase, `Warning: ${phase} result failed schema validation: ${result.error.message.slice(0, 200)}`);
+  return fallback(raw, result.error.message);
+}
+
+/**
+ * Parse an LLM response as a top-level array, then validate each item
+ * individually with `itemSchema.safeParse`. Items that fail validation
+ * are dropped — the caller gets back the array of *successful* parses.
+ *
+ * Use this instead of `parseAndValidate(raw, z.array(itemSchema), ...)`
+ * when you want partial-batch recovery: a single malformed item from the
+ * LLM should drop only that item, not the entire batch.
+ *
+ * @example
+ * ```ts
+ * const ItemSchema = z.object({ id: z.number(), urls: z.array(z.string()) });
+ * const items = parseAndValidateArray(llmText, ItemSchema, 'research-urls');
+ * // items: Array<z.infer<typeof ItemSchema>>; malformed entries skipped
+ * ```
+ */
+export function parseAndValidateArray<T>(
+  raw: string,
+  itemSchema: ZodType<T>,
+  phase: string,
+): T[] {
+  const PARSE_FAILED = {} as const;
+  const parsed = parseJsonFromLlm<unknown>(raw, phase, () => PARSE_FAILED);
+  if (parsed === PARSE_FAILED) return [];
+  if (!Array.isArray(parsed)) {
+    log(phase, `Warning: ${phase} expected array, got ${typeof parsed}`);
+    return [];
+  }
+  const out: T[] = [];
+  for (const raw of parsed) {
+    const result = itemSchema.safeParse(raw);
+    if (result.success) out.push(result.data);
+  }
+  return out;
 }

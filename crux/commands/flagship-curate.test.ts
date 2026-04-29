@@ -78,13 +78,6 @@ vi.mock('../lib/llm.ts', async (importOriginal) => {
   };
 });
 
-vi.mock('../lib/anthropic.ts', () => ({
-  parseJsonResponse: vi.fn((text: string) => {
-    try { return JSON.parse(text); }
-    catch { return null; }
-  }),
-}));
-
 vi.mock('../lib/prompt-utils.ts', () => ({
   escapeXml: vi.fn((s: string) => s),
 }));
