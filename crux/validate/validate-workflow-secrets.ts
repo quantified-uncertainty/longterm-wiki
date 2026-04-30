@@ -34,7 +34,7 @@
  * get an advisory pass.
  */
 
-import { execFileSync, execSync } from 'child_process';
+import { execFileSync } from 'child_process';
 import { readFileSync, readdirSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -50,8 +50,21 @@ const AUTO_PROVIDED_SECRETS = new Set<string>([
   'GITHUB_TOKEN',
 ]);
 
-/** Regex matches `${{ secrets.NAME }}` with optional whitespace. */
-const SECRET_REF_RE = /\$\{\{\s*secrets\.([A-Z0-9_]+)\s*\}\}/g;
+/**
+ * Two-stage regex pair:
+ *
+ * 1. `EXPR_BLOCK_RE` finds each `${{ ... }}` expression on a line.
+ * 2. `SECRET_TOKEN_RE` extracts every `secrets.NAME` token inside that
+ *    expression block.
+ *
+ * The two-stage approach correctly handles:
+ * - Default values: `${{ secrets.X || 'fallback' }}`
+ * - Conditionals: `${{ secrets.X == 'a' && secrets.Y != '' }}`
+ * - Multiple refs per block: `${{ secrets.A || secrets.B }}` → both
+ * - Assigning a single regex to do both jobs falls down on these.
+ */
+const EXPR_BLOCK_RE = /\$\{\{[^}]*?\}\}/g;
+const SECRET_TOKEN_RE = /(?<![A-Za-z0-9_])secrets\.([A-Z0-9_]+)\b/g;
 
 export interface SecretRef {
   /** Workflow file path relative to PROJECT_ROOT. */
@@ -75,6 +88,10 @@ export interface CheckResult {
 /**
  * Pure function: scan workflow file contents for secrets references.
  * Exported for testing.
+ *
+ * Uses `matchAll` to keep regex `lastIndex` state local to each call —
+ * a global-flag regex shared at module scope plus mutable `lastIndex`
+ * is a known JS footgun.
  */
 export function findSecretRefs(
   files: Array<{ path: string; content: string }>,
@@ -84,13 +101,13 @@ export function findSecretRefs(
     const lines = content.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      // Reset lastIndex for global regex on each line.
-      SECRET_REF_RE.lastIndex = 0;
-      let m: RegExpExecArray | null;
-      while ((m = SECRET_REF_RE.exec(line)) !== null) {
-        const name = m[1];
-        if (AUTO_PROVIDED_SECRETS.has(name)) continue;
-        refs.push({ file: path, line: i + 1, name });
+      for (const blockMatch of line.matchAll(EXPR_BLOCK_RE)) {
+        const block = blockMatch[0];
+        for (const tokenMatch of block.matchAll(SECRET_TOKEN_RE)) {
+          const name = tokenMatch[1];
+          if (AUTO_PROVIDED_SECRETS.has(name)) continue;
+          refs.push({ file: path, line: i + 1, name });
+        }
       }
     }
   }
@@ -145,6 +162,9 @@ function readWorkflowFiles(): Array<{ path: string; content: string }> {
 function fetchKnownSecrets(repo: string): Set<string> | null {
   let raw: string;
   try {
+    // execFileSync (not execSync) so `repo` is passed as an argv entry,
+    // never interpolated into a shell string. Defense-in-depth even
+    // though the only current caller passes a hardcoded constant.
     raw = execFileSync('gh', ['secret', 'list', '-R', repo, '--json', 'name'], {
       encoding: 'utf-8',
       stdio: ['pipe', 'pipe', 'pipe'],
@@ -194,12 +214,12 @@ function readInheritedAllowlist(): Set<string> {
 
 function ghAvailable(): { ok: boolean; reason?: string } {
   try {
-    execSync('gh --version', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+    execFileSync('gh', ['--version'], { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
   } catch {
     return { ok: false, reason: 'gh CLI not installed' };
   }
   try {
-    execSync('gh auth status', { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
+    execFileSync('gh', ['auth', 'status'], { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] });
   } catch {
     return { ok: false, reason: 'gh CLI not authenticated' };
   }
