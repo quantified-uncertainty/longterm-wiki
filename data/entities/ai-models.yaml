@@ -95,6 +95,7 @@
   outputPrice: 24
   contextWindow: 100000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-2"
   openWeight: false
   modality:
     - text
@@ -140,6 +141,7 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-3-family"
   openWeight: false
   modality:
     - text
@@ -196,6 +198,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-3-family"
   openWeight: false
   modality:
     - text
@@ -253,6 +256,7 @@
   outputPrice: 1.25
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-3-haiku"
   openWeight: false
   modality:
     - text
@@ -310,6 +314,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-3-5-sonnet"
   openWeight: false
   modality:
     - text
@@ -399,6 +404,7 @@
   outputPrice: 4
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/3-5-models-and-computer-use"
   openWeight: false
   modality:
     - text
@@ -454,6 +460,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-3-7-sonnet"
   openWeight: false
   modality:
     - text
@@ -514,6 +521,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-4"
   openWeight: false
   modality:
     - text
@@ -567,6 +575,7 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-4"
   openWeight: false
   modality:
     - text
@@ -622,6 +631,7 @@
   outputPrice: 75
   contextWindow: 200000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-opus-4-1"
   openWeight: false
   modality:
     - text
@@ -671,6 +681,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-sonnet-4-5"
   openWeight: false
   modality:
     - text
@@ -730,6 +741,7 @@
   outputPrice: 5
   contextWindow: 200000
   safetyLevel: ASL-2
+  source: "https://www.anthropic.com/news/claude-haiku-4-5"
   openWeight: false
   modality:
     - text
@@ -773,6 +785,7 @@
   outputPrice: 25
   contextWindow: 200000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-opus-4-5"
   openWeight: false
   modality:
     - text
@@ -825,6 +838,7 @@
   outputPrice: 25
   contextWindow: 1000000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-opus-4-6"
   openWeight: false
   modality:
     - text
@@ -884,6 +898,7 @@
   outputPrice: 15
   contextWindow: 200000
   safetyLevel: ASL-3
+  source: "https://www.anthropic.com/news/claude-sonnet-4-6"
   openWeight: false
   modality:
     - text

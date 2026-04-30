@@ -61,8 +61,15 @@ async function statsCommand(): Promise<CommandResult> {
 
 // ── Record-type subcommand routing ────────────────────────────────────
 
-/** Map plural/singular CLI subcommand names to RecordType */
-const RECORD_TYPE_MAP: Record<string, RecordType> = {
+/**
+ * Map plural/singular CLI subcommand names to RecordType.
+ *
+ * Exported as `RECORD_TYPE_SUBCOMMAND_TO_TYPE` so `crux/commands/verify-entity.ts`
+ * (the `crux tb verify <subcommand>` entry point) can delegate record-type
+ * subcommands to the orchestrator. Both entry points use this map so they
+ * cannot drift apart.
+ */
+export const RECORD_TYPE_SUBCOMMAND_TO_TYPE: Record<string, RecordType> = {
   grant: 'grant',
   grants: 'grant',
   personnel: 'personnel',
@@ -86,6 +93,11 @@ const RECORD_TYPE_MAP: Record<string, RecordType> = {
   'entity-assessments': 'entity-assessment',
   'secondary-market-price': 'secondary-market-price',
   'secondary-market-prices': 'secondary-market-price',
+  // QUA-685: ai-model entities (claude, gpt-4, gemini, etc.) verified against
+  // their release announcement / model-card URL — see record-descriptions.ts
+  // for the five sourceable scalar fields.
+  'ai-model': 'ai-model',
+  'ai-models': 'ai-model',
 };
 
 /**
@@ -129,7 +141,7 @@ async function verifyCommand(
   }
 
   // Record type subcommands (grants, personnel, etc.)
-  const mapped = subcommand ? RECORD_TYPE_MAP[subcommand] : undefined;
+  const mapped = subcommand ? RECORD_TYPE_SUBCOMMAND_TO_TYPE[subcommand] : undefined;
   if (mapped) {
     // Route to orchestrate with --type=record and table filter for the specific record type
     const recordOptions: OrchestrateOptions = {
@@ -339,6 +351,7 @@ Usage:
   crux tb verify entity-events             Verify entity events
   crux tb verify entity-assessments        Verify entity assessments
   crux tb verify secondary-market-prices   Verify secondary market prices
+  crux tb verify ai-models                 Verify ai-model scalar fields (price, context, ASL, release date)
 
 Options:
   --budget=N             Max dollars to spend on LLM calls (est. ~$0.01/item)

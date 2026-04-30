@@ -210,6 +210,29 @@ describe('extractEntityId', () => {
     });
   });
 
+  // ── ai-model (QUA-685) ──
+
+  describe('ai-model', () => {
+    it('returns the model\'s own stableId so the rollup keys per-model', () => {
+      const item = {
+        id: 'claude-2',
+        stableId: 'sid_R3iYKUUe2g',
+        title: 'Claude 2',
+      };
+      expect(extractEntityId('ai-model', item)).toBe('sid_R3iYKUUe2g');
+    });
+
+    it('falls back to slug id when stableId is missing', () => {
+      const item = { id: 'claude-2', title: 'Claude 2' };
+      expect(extractEntityId('ai-model', item)).toBe('claude-2');
+    });
+
+    it('returns null when neither stableId nor id is present', () => {
+      const item = { title: 'Mystery' };
+      expect(extractEntityId('ai-model', item)).toBeNull();
+    });
+  });
+
   // ── Unknown record types ──
 
   describe('unknown record types', () => {
@@ -489,6 +512,18 @@ describe('extractEntityDisplayName', () => {
     it('falls back to stakeholderDisplayName', () => {
       const item = { stakeholderDisplayName: 'OpenAI LLC' };
       expect(extractEntityDisplayName('policy-stakeholder', item)).toBe('OpenAI LLC');
+    });
+  });
+
+  describe('ai-model (QUA-685)', () => {
+    it('returns the model title as the entity display name', () => {
+      const item = { title: 'Claude 2', id: 'claude-2' };
+      expect(extractEntityDisplayName('ai-model', item)).toBe('Claude 2');
+    });
+
+    it('returns null (not the slug) when title is missing — avoids slug-as-display-name', () => {
+      const item = { id: 'claude-2' };
+      expect(extractEntityDisplayName('ai-model', item)).toBeNull();
     });
   });
 

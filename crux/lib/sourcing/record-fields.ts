@@ -83,6 +83,13 @@ export function extractEntityDisplayName(recordType: string, item: Record<string
       return strOrNull(item, 'orgResolvedName') ?? strOrNull(item, 'orgDisplayName') ?? null;
     case 'policy-stakeholder':
       return strOrNull(item, 'stakeholderResolvedName') ?? strOrNull(item, 'stakeholderDisplayName') ?? null;
+    case 'ai-model':
+      // QUA-685: entityDisplayName is the model's title (used for grouping
+      // rollups by the model's own stableId, see extractEntityId).
+      // Returns null (not the slug) when the title is missing — slugs leak
+      // into source_check_verdicts.entity_display_name otherwise and render
+      // as "claude-2" instead of a human name.
+      return strOrNull(item, 'title');
     default:
       return null;
   }
@@ -106,6 +113,18 @@ export function extractEntityId(recordType: string, item: Record<string, unknown
       return strOrNull(item, 'orgEntityId');
     case 'policy-stakeholder':
       return strOrNull(item, 'stakeholderEntityId');
+    case 'ai-model':
+      // QUA-685: ai-model verdicts group under the model's own stableId, so
+      // `fetchEntitySourcingSummary(modelStableId)` returns the model's rollup.
+      // This differs from grants/personnel (which group under the parent org)
+      // because each ai-model row gets its own dot on the Products & Models table.
+      //
+      // Side effect: ai-model verdicts do NOT bubble into the developer org's
+      // headline rollup verdict. Per-model dots use a separate per-recordId
+      // lookup (see apps/web/src/app/organizations/[slug]/page.tsx). Whether to
+      // also dual-key by developer is tracked in QUA-870 — keeping the simpler
+      // per-model design here pending that decision.
+      return strOrNull(item, 'stableId') ?? strOrNull(item, 'id');
     default:
       return null;
   }
