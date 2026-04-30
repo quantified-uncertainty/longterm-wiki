@@ -1,10 +1,16 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { extractAllCareers } from "../extract.ts";
 
 describe("extractAllCareers", () => {
-  it("extracts career entries from KB data", () => {
-    const result = extractAllCareers();
+  // extractAllCareers reads ~550 YAML files and takes ~3s per call.
+  // Share a single result across tests so the suite completes within CI time limits.
+  let result: ReturnType<typeof extractAllCareers>;
 
+  beforeAll(() => {
+    result = extractAllCareers();
+  }, 10000);
+
+  it("extracts career entries from KB data", () => {
     // Should have a non-trivial number of entries
     expect(result.entries.length).toBeGreaterThan(30);
 
@@ -25,19 +31,17 @@ describe("extractAllCareers", () => {
     }
   });
 
-  it("produces deterministic IDs across runs", () => {
-    const result1 = extractAllCareers();
+  it("produces deterministic IDs across runs", { timeout: 10000 }, () => {
+    // Call a second time to verify output is stable across invocations.
     const result2 = extractAllCareers();
 
-    const ids1 = result1.entries.map((e) => e.id).sort();
+    const ids1 = result.entries.map((e) => e.id).sort();
     const ids2 = result2.entries.map((e) => e.id).sort();
 
     expect(ids1).toEqual(ids2);
   });
 
   it("deduplication does not increase entry count", () => {
-    const result = extractAllCareers();
-
     // Dedup should never increase the count (no duplicates introduced)
     // kb-record origin was removed when records migrated to PostgreSQL
     expect(result.stats.totalBeforeDedup).toBeGreaterThanOrEqual(
@@ -46,8 +50,6 @@ describe("extractAllCareers", () => {
   });
 
   it("resolves known org slugs to stableIds", () => {
-    const result = extractAllCareers();
-
     // Find Dario Amodei's Anthropic entry (should have stableId, not slug)
     const anthropicEntries = result.entries.filter(
       (e) => e.organizationId === "sid_mK9pX3rQ7n", // Anthropic's stableId
@@ -56,8 +58,6 @@ describe("extractAllCareers", () => {
   });
 
   it("marks founders correctly", () => {
-    const result = extractAllCareers();
-
     const founders = result.entries.filter((e) => e.isFounder);
     expect(founders.length).toBeGreaterThan(0);
 
