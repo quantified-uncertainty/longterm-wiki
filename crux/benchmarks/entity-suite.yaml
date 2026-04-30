@@ -1,0 +1,37 @@
+# Multi-entity benchmark suite — committed list of reference entities measured
+# by `pnpm crux tb benchmark-suite`. Editing this file is a deliberate review
+# action: changing the suite changes what "the pipeline measures" across PRs.
+#
+# v1 is policy-only (QUA-873). Organization, person, and ai-model rows arrive
+# in QUA-876 and follow-ups.
+#
+# expected_min_coverage is the floor for `coverage_score` from
+# crux/lib/research/gap-analyzer.ts::policyCoverageScore. Any snapshot whose
+# score drops below this counts toward `count_below_min` in the aggregate.
+# Set conservatively below current coverage so normal pipeline noise doesn't
+# immediately tip an entry into the "below min" bucket.
+
+- slug: fisa-702
+  type: policy
+  expected_min_coverage: 0.9
+- slug: eu-ai-act
+  type: policy
+  expected_min_coverage: 0.9
+- slug: california-sb1047
+  type: policy
+  expected_min_coverage: 0.85
+- slug: us-executive-order
+  type: policy
+  expected_min_coverage: 0.85
+- slug: colorado-ai-act
+  type: policy
+  expected_min_coverage: 0.8
+- slug: california-sb53
+  type: policy
+  expected_min_coverage: 0.8
+- slug: trump-ai-framework-2026
+  type: policy
+  expected_min_coverage: 0.75
+- slug: china-ai-regulations
+  type: policy
+  expected_min_coverage: 0.65
