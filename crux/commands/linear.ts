@@ -789,7 +789,9 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     shipped: {
       label: 'SHIPPED (state-update missed)',
       color: c.yellow,
-      action: 'PR merged. Move to Done: crux linear done QUA-NNN --pr=URL',
+      // `crux linear done QUA-NNN` (no --pr) moves directly to Done. The
+      // --pr variant moves to In Review, which is where these are stuck.
+      action: 'PR merged. Move to Done: crux linear done QUA-NNN  (or --fix to batch)',
     },
     'parent-epic': {
       label: 'PARENT EPIC (sub-issues resolved)',
@@ -841,7 +843,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   if (actionable > 0) {
     out += `${c.bold}${actionable} issue(s) need action.${c.reset} Use ${c.cyan}--bucket=shipped${c.reset}/etc. to filter, ${c.cyan}--fix${c.reset} to auto-close SHIPPED + PARENT EPIC, or ${c.cyan}--json${c.reset} for scripting.\n`;
   } else {
-    out += `${c.green}✓${c.reset} All In Progress issues look healthy.\n`;
+    out += `${c.green}✓${c.reset} All active issues look healthy.\n`;
   }
 
   let fixFailures = 0;

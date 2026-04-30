@@ -308,7 +308,15 @@ export function classifyEntry(
 export async function auditActive(): Promise<AuditEntry[]> {
   // Hard cap at 200 to bound concurrent fan-out; teams with more than that
   // many simultaneously-active issues have bigger problems than this audit.
-  const issues = await listIssuesByStateType(['started'], 200);
+  const all = await listIssuesByStateType(['started'], 200);
+
+  // Linear's `started` state type currently maps 1:1 to {In Progress, In Review}
+  // on the QUA team, but a future custom workflow state could share the type
+  // (e.g., "Reviewing", "In QA"). Filter explicitly so the audit's behavior
+  // stays bounded to what's documented and tested.
+  const issues = all.filter(
+    (i) => i.state.name === 'In Progress' || i.state.name === 'In Review',
+  );
 
   if (issues.length === 0) return [];
 
