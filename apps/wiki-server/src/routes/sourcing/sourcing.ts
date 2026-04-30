@@ -46,6 +46,7 @@ import {
   SOURCING_EXEMPT_TYPES,
   isSourcingExempt,
 } from "../../api-types.js";
+import { getNonVerifiablePropertyIds } from "../../property-metadata.js";
 import { coerceDisplayName } from "../shared/display-name-coerce.js";
 import {
   recomputeVerdict,
@@ -105,6 +106,53 @@ const VALID_VERDICT_TYPES = [...VALID_VERDICTS, "unchecked"] as const;
  */
 export const CURRENT_CHECKER_MODEL = "claude-haiku-4-5-20251001";
 export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
+
+// ---- Coverage helpers (QUA-928) ----
+
+/**
+ * Round to one decimal place — used for percent values returned by the
+ * coverage endpoints. Centralised so all three percentages
+ * (`checkabilityPercent`, `checkableCoveragePercent`, `fullCoveragePercent`)
+ * share rounding behavior.
+ */
+function pct1(numerator: number, denominator: number): number {
+  if (denominator <= 0) return 0;
+  return Math.round((numerator / denominator) * 1000) / 10;
+}
+
+/**
+ * Count facts that are eligible for sourcing verification. Mirrors the inclusion
+ * logic in `crux/lib/sourcing/item-collectors.ts::collectFactItems`:
+ * facts must carry a source URL AND their property must not be flagged
+ * `verifiable: false` in properties.yaml. The set of non-verifiable
+ * property IDs is read from `properties.yaml` once at startup.
+ */
+async function countCheckableFacts(
+  db: ReturnType<typeof getDrizzleDb>,
+): Promise<number> {
+  const nonVerifiable = [...getNonVerifiablePropertyIds()];
+  const rows = (await db.execute(sql`
+    SELECT count(DISTINCT fact_id)::int AS checkable
+    FROM facts
+    WHERE source IS NOT NULL
+      AND (measure IS NULL OR NOT (measure = ANY(${nonVerifiable}::text[])))
+  `)) as Array<{ checkable: number | null }>;
+  return rows[0]?.checkable ?? 0;
+}
+
+/**
+ * For a given recordType, return the number of records that are eligible for
+ * sourcing. Currently only the `fact` recordType has per-record
+ * exclusion criteria; everything else is treated as fully checkable.
+ */
+function checkableCountFor(
+  recordType: string,
+  totalRecords: number,
+  checkableFacts: number,
+): number {
+  if (recordType === "fact") return Math.min(checkableFacts, totalRecords);
+  return totalRecords;
+}
 
 // ---- Shared CTE ----
 
@@ -1976,6 +2024,14 @@ const sourcingApp = new Hono()
       }
     }
 
+    // QUA-928: count "checkable" facts — those eligible for sourcing by
+    // collector design. A fact is checkable when it carries a source URL AND
+    // its property is not flagged `verifiable: false` in properties.yaml
+    // (e.g. social-media handles, wikipedia-url self-references, unsourced
+    // estimates). Non-fact record types have no per-record exclusion logic
+    // upstream, so checkable == total for them.
+    const checkableFactsCount = await countCheckableFacts(db);
+
     // Count distinct verified records per record_type from source_check_verdicts.
     //
     // QUA-422: INNER JOIN against LIVE_RECORDS_CTE to exclude orphan verdicts
@@ -2020,10 +2076,25 @@ const sourcingApp = new Hono()
       .map((recordType) => {
         const total = totalsByType[recordType] ?? 0;
         const verified = verifiedByType[recordType] ?? 0;
+        const checkable = checkableCountFor(recordType, total, checkableFactsCount);
         const exempt = isSourcingExempt(recordType);
+        // `percentage` retains its legacy semantics (verified / total, where
+        // "verified" includes verdict='unchecked') for the existing callers
+        // (`CoverageBars`, `EntitySourcingViewer`). New callers should consume
+        // the explicit `*Percent` fields below — see QUA-928.
         const percentage =
           total > 0 ? Math.round((verified / total) * 10000) / 100 : 0;
-        return { recordType, total, verified, percentage, exempt };
+        return {
+          recordType,
+          total,
+          checkable,
+          verified,
+          percentage,
+          checkabilityPercent: pct1(checkable, total),
+          checkableCoveragePercent: pct1(verified, checkable),
+          fullCoveragePercent: pct1(verified, total),
+          exempt,
+        };
       })
       .sort((a, b) => a.recordType.localeCompare(b.recordType));
 
@@ -2295,6 +2366,10 @@ const sourcingApp = new Hono()
       verdictsByType[row.record_type][row.verdict] = row.cnt;
     }
 
+    // QUA-928: count checkable facts (the only recordType with per-record
+    // exclusion logic — see countCheckableFacts above).
+    const checkableFactsCount = await countCheckableFacts(db);
+
     // 4. Merge into tables array
     const allTypes = new Set([
       ...Object.keys(totalsByType),
@@ -2303,6 +2378,7 @@ const sourcingApp = new Hono()
 
     // Grand totals exclude exempt types — they don't participate in coverage metrics
     let grandTotalRecords = 0;
+    let grandCheckableRecords = 0;
     let grandCheckedRecords = 0;
     let grandTotalVerdicts = 0;
     let grandConfirmed = 0;
@@ -2312,6 +2388,11 @@ const sourcingApp = new Hono()
         const totalRecords = totalsByType[recordType] ?? 0;
         const verdicts = verdictsByType[recordType] ?? {};
         const checkedRecords = checkedByType[recordType] ?? 0;
+        const checkableRecords = checkableCountFor(
+          recordType,
+          totalRecords,
+          checkableFactsCount,
+        );
         const exempt = isSourcingExempt(recordType);
 
         const confirmed = verdicts["confirmed"] ?? 0;
@@ -2324,19 +2405,12 @@ const sourcingApp = new Hono()
         const totalVerdicts =
           confirmed + partial + unverifiable + contradicted + outdated + unchecked;
 
-        // Coverage is based on distinct checked records, not verdict row counts
-        const coveragePercent =
-          totalRecords > 0
-            ? Math.round((checkedRecords / totalRecords) * 1000) / 10
-            : 0;
-        const greenPercent =
-          totalVerdicts > 0
-            ? Math.round((confirmed / totalVerdicts) * 1000) / 10
-            : 0;
+        const greenPercent = pct1(confirmed, totalVerdicts);
 
         // Only non-exempt types contribute to grand totals
         if (!exempt) {
           grandTotalRecords += totalRecords;
+          grandCheckableRecords += checkableRecords;
           grandCheckedRecords += checkedRecords;
           grandTotalVerdicts += totalVerdicts;
           grandConfirmed += confirmed;
@@ -2345,6 +2419,7 @@ const sourcingApp = new Hono()
         return {
           recordType,
           totalRecords,
+          checkableRecords,
           checkedRecords,
           verdicts: {
             confirmed,
@@ -2354,7 +2429,18 @@ const sourcingApp = new Hono()
             outdated,
             unchecked,
           },
-          coveragePercent,
+          // QUA-928: split coverage into three explicit percentages.
+          // - checkabilityPercent: authoring-quality metric (do facts have
+          //   sources? are properties verifiable?)
+          // - checkableCoveragePercent: verification-quality metric (of the
+          //   checkable subset, what fraction has a verdict?) — this is the
+          //   one the QUA-852 enforcement gate uses.
+          // - fullCoveragePercent: verified / total, the previous
+          //   `coveragePercent` field. Useful for tracking the joint metric
+          //   but mathematically capped by checkability.
+          checkabilityPercent: pct1(checkableRecords, totalRecords),
+          checkableCoveragePercent: pct1(checkedRecords, checkableRecords),
+          fullCoveragePercent: pct1(checkedRecords, totalRecords),
           greenPercent,
           exempt,
         };
@@ -2365,15 +2451,12 @@ const sourcingApp = new Hono()
       tables,
       totals: {
         totalRecords: grandTotalRecords,
+        checkableRecords: grandCheckableRecords,
         totalVerdicts: grandTotalVerdicts,
-        confirmedPercent:
-          grandTotalVerdicts > 0
-            ? Math.round((grandConfirmed / grandTotalVerdicts) * 1000) / 10
-            : 0,
-        coveragePercent:
-          grandTotalRecords > 0
-            ? Math.round((grandCheckedRecords / grandTotalRecords) * 1000) / 10
-            : 0,
+        confirmedPercent: pct1(grandConfirmed, grandTotalVerdicts),
+        checkabilityPercent: pct1(grandCheckableRecords, grandTotalRecords),
+        checkableCoveragePercent: pct1(grandCheckedRecords, grandCheckableRecords),
+        fullCoveragePercent: pct1(grandCheckedRecords, grandTotalRecords),
       },
       exemptTypes: [...SOURCING_EXEMPT_TYPES],
     });
