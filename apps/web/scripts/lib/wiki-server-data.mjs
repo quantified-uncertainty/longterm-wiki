@@ -1901,31 +1901,48 @@ export async function fetchAllEntityStableIds() {
   const headers = buildHeaders();
   const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
 
-  const stableIds = [];
+  // Dedupe at the source — offset-based pagination + concurrent inserts can
+  // return the same row twice or skip rows. The downstream Set-merge in
+  // build-data also handles dups, but doing it here keeps the function name
+  // honest and avoids surfacing duplicate counts to callers.
+  const stableIds = new Set();
   const pageSize = 500;
+  const SAFETY_BOUND = 50_000; // hard cap — log a warning if approached
   let offset = 0;
   try {
     while (true) {
       const url = `${serverUrl}/api/entities?limit=${pageSize}&offset=${offset}`;
       const resp = await fetch(url, fetchOpts);
       if (!resp.ok) {
+        // Mid-pagination failure → return null (matches the surrounding
+        // fetchAllPages pattern). Caller falls back to the YAML-only set;
+        // partial results would be worse than nothing because validators
+        // would mis-flag late-page entities as orphans.
         logWikiServerWarning('allEntityStableIds', `HTTP ${resp.status} at offset=${offset}`);
         return null;
       }
       const data = await resp.json();
       const items = data.entities || [];
       for (const e of items) {
-        if (e.stableId) stableIds.push(e.stableId);
+        if (e.stableId) stableIds.add(e.stableId);
       }
       if (items.length < pageSize) break;
       offset += pageSize;
-      if (offset > 50_000) break; // safety bound
+      if (offset >= SAFETY_BOUND) {
+        // Loud failure — silent truncation would let validators flag
+        // legitimate Tier 2 entities as orphans with no discoverable cause.
+        logWikiServerWarning(
+          'allEntityStableIds',
+          `safety-bound ${SAFETY_BOUND} reached — entities past offset ${offset} not loaded; raise SAFETY_BOUND in fetchAllEntityStableIds`,
+        );
+        break;
+      }
     }
   } catch (err) {
     logWikiServerWarning('allEntityStableIds', err instanceof Error ? err.message : String(err));
     return null;
   }
-  return stableIds;
+  return [...stableIds];
 }
 
 /**

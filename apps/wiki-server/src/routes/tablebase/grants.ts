@@ -421,6 +421,16 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // link stays consistent with the new granteeId. Without this, batch updates
   // would leave granteeEntityId pointing at the old entity (or stale display
   // name) — see QUA-788 for context.
+  //
+  // FK-resolution behavior: granteeId is a legacy field that may hold either
+  // a sid_-prefixed stableId, a slug, or a display-name string (the same
+  // contract as POST /sync). resolveEntityFKs matches granteeId against
+  // entities.stable_id OR entities.id (slug); a free-text granteeId that
+  // happens to equal an entity slug (e.g. "anthropic") will silently FK to
+  // that entity. This matches /sync's behavior exactly and is intentional —
+  // callers who want a free-text display name without entity linking should
+  // pass a value that doesn't collide with any slug (in practice, slugs are
+  // kebab-case-lowercase, so any string with spaces or capitalization is safe).
   .patch("/batch-update-grantee", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);

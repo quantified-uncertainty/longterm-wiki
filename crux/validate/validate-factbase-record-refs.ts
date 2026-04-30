@@ -171,17 +171,17 @@ export function buildEntityLookup(database: {
  *         surfaces them via idRegistry.pgEntityStableIds (QUA-788).
  *       - 2 cohort 2 missing-VC sids (Kleiner Perkins, Sequoia) →
  *         display-name string written to investorId.
- *     Unresolved (kept in baseline):
+ *     Unresolved (kept in baseline) → QUA-885:
  *       - 2 investment records (7ErgqWHiQf, xEh3nQtAaD) reference companies
  *         (sid_QwuDJJ2oCQ, sid_JSTlUS21fw) that don't exist in PG entities
- *         at all — see follow-up ticket. The investorIds (sid_F1bFJHm9RA,
- *         sid_B5JzHeWvow) can't be cleaned up via /sync because the
- *         upsertThings step fails the parent_thing_id FK on the missing
- *         company. Cleanup requires either creating stub company entities
- *         + things, or deleting the records.
+ *         at all. The investorIds (sid_F1bFJHm9RA, sid_B5JzHeWvow) can't be
+ *         cleaned up via /sync because the upsertThings step fails the
+ *         parent_thing_id FK on the missing company. Cleanup requires
+ *         either creating stub company entities + things, or deleting the
+ *         records.
  */
 const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set<string>([
-  // QUA-788 follow-up: dangling-company investment records
+  // QUA-885: dangling-company investment records (parent in QUA-788)
   "sid_F1bFJHm9RA", // Khosla Ventures, in 7ErgqWHiQf (Rejuvenation Technologies — company missing from PG)
   "sid_B5JzHeWvow", // Index Ventures, in xEh3nQtAaD (Curtsy — company missing from PG)
 ]);
