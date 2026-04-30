@@ -162,11 +162,22 @@ export async function BenchmarkQuarantineContent() {
         </div>
       )}
 
-      {/* Row table */}
-      {enriched.length > 0 ? (
+      {/* Row table — empty state branches on the server-side total so 0 rows of
+          any status renders the "queue is clear" copy, and rows-of-only-resolved/
+          rejected still show the table (with the default filter set to "all"). */}
+      {stats.total > 0 ? (
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-3">Quarantine rows</h2>
-          <BenchmarkQuarantineTable data={enriched} />
+          <BenchmarkQuarantineTable
+            data={enriched}
+            statusCounts={{
+              pending: pendingCount,
+              resolved: resolvedCount,
+              rejected: rejectedCount,
+            }}
+            totalRowCount={stats.total}
+            loadedRowCount={enriched.length}
+          />
         </div>
       ) : (
         <div className="rounded-lg border border-border/60 p-8 text-center text-muted-foreground my-6">

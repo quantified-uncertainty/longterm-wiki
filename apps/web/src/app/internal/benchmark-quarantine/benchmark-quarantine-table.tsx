@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState } from "react";
 import type { ColumnDef, SortingState } from "@tanstack/react-table";
 import {
@@ -12,6 +13,17 @@ import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
 import type { RpcBenchmarkResultsPendingRow } from "@lib/wiki-server";
+
+// ── Constants ─────────────────────────────────────────────────────────────
+
+/** Status values mirror VALID_STATUS in the wiki-server route + chk_brp_status migration. */
+const STATUS_VALUES = ["pending", "resolved", "rejected"] as const;
+
+/** Below this absolute value scores show 2 decimals; above it, integers (e.g. 91.34 vs 1024). */
+const SCORE_INTEGER_THRESHOLD = 100;
+
+/** Schemes accepted in the source-URL anchor; anything else (javascript:, data:) renders as plain text. */
+const SAFE_URL_SCHEMES = ["http:", "https:"];
 
 // ── Types ─────────────────────────────────────────────────────────────────
 
@@ -34,8 +46,21 @@ function formatScore(
   if (scoreText) return scoreText;
   if (score == null) return "—";
   const formatted =
-    Math.abs(score) >= 100 ? score.toFixed(0) : score.toFixed(2);
+    Math.abs(score) >= SCORE_INTEGER_THRESHOLD
+      ? score.toFixed(0)
+      : score.toFixed(2);
   return unit ? `${formatted} ${unit}` : formatted;
+}
+
+/** Returns the URL only if it's a safe scheme (http/https); otherwise null so the cell falls back to text. */
+export function safeExternalUrl(raw: string | null): string | null {
+  if (!raw) return null;
+  try {
+    const u = new URL(raw);
+    return SAFE_URL_SCHEMES.includes(u.protocol) ? raw : null;
+  } catch {
+    return null;
+  }
 }
 
 function formatDate(value: string | Date | null): string {
@@ -107,12 +132,12 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
       const slug = row.original.benchmarkSlug;
       const name = row.original.benchmarkName;
       return slug ? (
-        <a
+        <Link
           href={`/benchmarks/${slug}`}
           className="text-sm text-accent-foreground hover:underline"
         >
           {name}
-        </a>
+        </Link>
       ) : (
         <span className="text-sm text-muted-foreground" title={row.original.benchmarkId}>
           {name}
@@ -123,7 +148,8 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
   },
   {
     id: "score",
-    accessorFn: (r) => r.score,
+    // Coerce null → undefined so tanstack's `sortUndefined: "last"` actually fires.
+    accessorFn: (r) => r.score ?? undefined,
     header: ({ column }) => (
       <SortableHeader column={column} title="Reported score">
         Score
@@ -189,17 +215,29 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
     header: () => <span className="text-xs">Source URL</span>,
     enableSorting: false,
     cell: ({ row }) => {
-      const url = row.original.sourceUrl;
-      if (!url) return <span className="text-xs text-muted-foreground/50">—</span>;
+      const raw = row.original.sourceUrl;
+      if (!raw) return <span className="text-xs text-muted-foreground/50">—</span>;
+      const safe = safeExternalUrl(raw);
+      const display = raw.replace(/^https?:\/\//, "");
+      if (!safe) {
+        return (
+          <span
+            className="text-xs text-muted-foreground truncate max-w-[240px] block"
+            title={raw}
+          >
+            {display}
+          </span>
+        );
+      }
       return (
         <a
-          href={url}
+          href={safe}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-accent-foreground hover:underline truncate max-w-[240px] block"
-          title={url}
+          title={safe}
         >
-          {url.replace(/^https?:\/\//, "")}
+          {display}
         </a>
       );
     },
@@ -240,16 +278,32 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
 
 // ── Table component ───────────────────────────────────────────────────────
 
+export interface BenchmarkQuarantineTableProps {
+  data: BenchmarkQuarantineRow[];
+  /** Server-side counts so filter buttons reflect the full table, not just the loaded subset. */
+  statusCounts: { pending: number; resolved: number; rejected: number };
+  totalRowCount: number;
+  /** Number of rows the server returned (≤ totalRowCount when truncated). */
+  loadedRowCount: number;
+}
+
 export function BenchmarkQuarantineTable({
   data,
-}: {
-  data: BenchmarkQuarantineRow[];
-}) {
+  statusCounts: serverStatusCounts,
+  totalRowCount,
+  loadedRowCount,
+}: BenchmarkQuarantineTableProps) {
+  // Default to pending if there are pending rows, else "all" so an operator
+  // looking at a queue with only resolved/rejected rows doesn't see an empty
+  // table they have to manually un-filter.
+  const initialStatusFilter: StatusFilter =
+    serverStatusCounts.pending > 0 ? "pending" : "all";
+
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>("pending");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatusFilter);
   const [sourceFilter, setSourceFilter] = useState<string>("all");
 
   const sources = useMemo(() => {
@@ -258,17 +312,14 @@ export function BenchmarkQuarantineTable({
     return Array.from(set).sort();
   }, [data]);
 
-  // Status counts for the filter buttons (computed on the unfiltered set so
-  // the labels are stable while the user toggles between views).
-  const statusCounts = useMemo(() => {
-    const c = { pending: 0, resolved: 0, rejected: 0, all: data.length };
-    for (const r of data) {
-      if (r.status === "pending") c.pending++;
-      else if (r.status === "resolved") c.resolved++;
-      else if (r.status === "rejected") c.rejected++;
-    }
-    return c;
-  }, [data]);
+  // Filter button labels use server-side counts (the full PG table) so they
+  // stay accurate when the loaded subset is truncated by the API limit.
+  const statusCounts = {
+    ...serverStatusCounts,
+    all: totalRowCount,
+  };
+
+  const isTruncated = loadedRowCount < totalRowCount;
 
   const filteredData = useMemo(() => {
     return data.filter((r) => {
@@ -298,7 +349,7 @@ export function BenchmarkQuarantineTable({
       <div className="flex items-center gap-3 flex-wrap">
         {/* Status filter buttons */}
         <div className="flex items-center gap-1 rounded-lg border border-border/60 p-1">
-          {(["pending", "resolved", "rejected", "all"] as const).map((s) => (
+          {([...STATUS_VALUES, "all"] as const).map((s) => (
             <button
               key={s}
               type="button"
@@ -347,6 +398,14 @@ export function BenchmarkQuarantineTable({
             : `${visibleCount} of ${filteredData.length} rows`}
         </span>
       </div>
+
+      {isTruncated && (
+        <p className="text-xs text-amber-600">
+          Showing first {loadedRowCount.toLocaleString()} of{" "}
+          {totalRowCount.toLocaleString()} total rows. Apply a status or source
+          filter via the API to narrow further.
+        </p>
+      )}
 
       <DataTable table={table} />
     </div>
