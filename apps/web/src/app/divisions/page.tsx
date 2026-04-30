@@ -119,6 +119,10 @@ export default function DivisionsPage() {
   const totalDivisions = rows.length;
   const uniqueOrgs = new Set(rows.map((r) => r.parentName)).size;
   const divisionsWithData = rows.filter((r) => r.hasData).length;
+  // Each row's `key` is the dedup winner; verdicts on dropped duplicate keys
+  // are intentionally not counted so the banner stays consistent with the
+  // per-row verdict shown in the table.
+  const visibleDivisionIds = new Set(rows.map((r) => r.key));
 
   // Type breakdown (across all divisions)
   const typeCounts = new Map<string, number>();
@@ -145,7 +149,7 @@ export default function DivisionsPage() {
         </p>
       </div>
 
-      <SourcingSummaryBanner recordType="division" totalOverride={totalDivisions} />
+      <SourcingSummaryBanner recordType="division" recordIds={visibleDivisionIds} />
 
       <DivisionsTable
         rows={rows}

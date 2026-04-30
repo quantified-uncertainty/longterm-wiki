@@ -644,7 +644,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
           </h2>
           <div className="rounded-lg border border-dashed border-border/60 p-4">
             <p className="text-sm text-muted-foreground">
-              This record has not been sourcinged yet.
+              This record has not been sourced yet.
             </p>
             <Link
               href={getStoredVerdictHref(recordType, thing.sourceId)}

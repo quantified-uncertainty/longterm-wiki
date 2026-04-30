@@ -392,7 +392,7 @@ export async function SourcingCoverageContent() {
             Coverage Matrix
           </h2>
           <p className="text-sm text-muted-foreground mb-3">
-            Per-record-type breakdown: total records in each table vs how many have been sourcinged,
+            Per-record-type breakdown: total records in each table vs how many have been sourced,
             and what percentage are confirmed green.
             {exemptTables.length > 0 && (
               <> Exempt types (data ingested from canonical APIs) are shown separately and excluded from totals.</>

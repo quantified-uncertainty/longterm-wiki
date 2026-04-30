@@ -118,6 +118,7 @@ const SIMPLE_PAGES = [
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
+  "/divisions",  // QUA-897 sourcing-summary header
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -208,6 +209,35 @@ test.describe("Render audit — sidebar-only pages", () => {
       checkAntiPatterns(await getMainText(page), url);
     });
   }
+});
+
+test.describe("Render audit — QUA-897 sourcing summary banner", () => {
+  // Regression check: /divisions header used to render
+  //   "120 of 101 records sourcinged"
+  // Two defects: a non-word ("sourcinged" — botched mass rename of
+  // "source-checked") and an impossible ratio (numerator > denominator,
+  // because the page deduplicates raw division rows but the banner counted
+  // every verdict).
+  test("/divisions banner has no 'sourcinged' typo and checked <= total", async ({ page }) => {
+    await loadPage(page, "/divisions");
+    const text = await getMainText(page);
+
+    expect(text, "the non-word 'sourcinged' must not appear anywhere on /divisions")
+      .not.toContain("sourcinged");
+
+    // SourcingSummaryBanner returns null when no verdicts exist, so the regex
+    // may not match in fresh-data environments. When it DOES match, the
+    // numerator must not exceed the denominator (the QUA-897 invariant).
+    const m = text.match(/(\d+)\s+of\s+(\d+)\s+records\s+sourced/);
+    if (m) {
+      const checked = Number(m[1]);
+      const total = Number(m[2]);
+      expect(
+        checked,
+        `banner ratio inverted: ${checked} of ${total} (QUA-897 regression)`,
+      ).toBeLessThanOrEqual(total);
+    }
+  });
 });
 
 test.describe("Render audit — critical data tables", () => {
