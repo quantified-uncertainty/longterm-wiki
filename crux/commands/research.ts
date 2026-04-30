@@ -24,6 +24,10 @@ import type { ResearchRequest } from '../lib/search/research-agent.ts';
 // run — default command: research a topic and print structured results
 // ---------------------------------------------------------------------------
 
+// Wire `crux research <topic>` through the dispatcher: it expects a
+// commands.default mapping. Without this, topic args trip "Unknown command".
+// Exported at the bottom of the module.
+
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const log = createLogger(options.ci as boolean);
   const c = log.colors;
@@ -203,3 +207,7 @@ Environment:
     exitCode: 0,
   };
 }
+
+// Dispatcher requires a commands map; wire 'default' to run + 'help'.
+export const commands = { default: run, help };
+export const getHelp = () => help().output;
