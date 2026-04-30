@@ -206,6 +206,7 @@ Launch agents to fetch pages from `https://www.longtermwiki.com` using WebFetch.
 - Does it load (not 404/500)?
 - Count consistency: does the filter badge total match the body count?
 - Column fill rates: what percentage of rows have data in each column? Flag columns with >80% empty.
+  - **A cell is "filled" if it carries any of: text content, an `aria-label` (e.g. `aria-label="Coverage: 75%"`), a `title` attribute, a `role="img"` element (CoverageDots / SourceCheckDot / RecordStatusDots all render this), an `<svg>`, or a colored badge `<span>`.** Do NOT flag a column as empty just because the visible `<td>` has no plain text — many directory tables render coverage / verdict / status as small SVG-style dot indicators with no inline text. If you are unsure whether a cell renders a visual indicator, fetch the page and grep the HTML for `aria-label=` or `role="img"` inside its row before flagging the column. (False positives here led to QUA-900 being filed against /research-areas, /funding-programs, /publications, /projects, /approaches, /divisions when those columns actually rendered varied coverage dots for every row.)
 - Are there columns that should exist but don't? (e.g., tracked people count, completeness indicator, subentity counts)
 - Do any values show raw IDs or slugs instead of human-readable names?
 - Is the default sort order sensible?

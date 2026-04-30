@@ -360,3 +360,38 @@ test.describe("Render audit — no dead entity sourcing links (QUA-418)", () => 
     });
   }
 });
+
+test.describe("Render audit — directory Coverage/Status columns render dots (QUA-900)", () => {
+  // QA-900 was filed against six directory pages claiming the Coverage /
+  // Status column was 100% empty. The columns actually render a CoverageDots
+  // or RecordStatusDots indicator in every row — the QA sweep counted text
+  // content only and missed the aria-label / role="img" dots. This test
+  // pins down the invariant so the sweep tool can't false-positive again
+  // without a CI failure here.
+  for (const { url, label, allowZeroRows } of [
+    { url: "/research-areas", label: "Coverage" },
+    { url: "/funding-programs", label: "Coverage" },
+    { url: "/publications", label: "Coverage" },
+    { url: "/projects", label: "Coverage" },
+    { url: "/approaches", label: "Coverage" },
+    // /divisions filters by hasData by default; if the build has zero
+    // hasData rows (e.g., CI without PG access) the table is empty.
+    { url: "/divisions", label: "Coverage", allowZeroRows: true },
+  ] as Array<{ url: string; label: string; allowZeroRows?: boolean }>) {
+    test(`${url} has a ${label} dot in every row`, async ({ page }) => {
+      await loadPage(page, url);
+      const rowCount = await page.locator("table tbody tr").count();
+      if (rowCount === 0) {
+        if (allowZeroRows) return;
+        throw new Error(`${url} table rendered no rows`);
+      }
+      const dotCount = await page
+        .locator(`table tbody [aria-label^="${label}:"]`)
+        .count();
+      expect(
+        dotCount,
+        `${url} expected ${rowCount} ${label} dots but found ${dotCount}`,
+      ).toBe(rowCount);
+    });
+  }
+});
