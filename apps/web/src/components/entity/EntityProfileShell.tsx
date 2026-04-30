@@ -5,6 +5,7 @@ import {
   ProfileTabs,
   type ProfileTab,
   type ProfileTabGroup,
+  type TabRouting,
 } from "@/components/directory";
 import { CoveragePopover } from "@/components/coverage/CoveragePopover";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
@@ -99,6 +100,13 @@ export interface EntityProfileShellProps {
   /** Ordered group metadata for vertical tab nav. See `ProfileTabGroup`. */
   tabGroups?: ProfileTabGroup[];
   /**
+   * URL routing mode for the active tab. Defaults to `{ mode: "query" }`,
+   * which preserves the legacy `?tab=` behavior. Pass
+   * `{ mode: "path", basePath: "/organizations/anthropic" }` to read/write
+   * the active tab as a path segment after `basePath`.
+   */
+  tabRouting?: TabRouting;
+  /**
    * Body content for the main column. Used when the page has no tabs, or
    * when tabs are passed and additional content should render below them.
    */
@@ -129,6 +137,7 @@ export function EntityProfileShell({
   tabsAriaLabel = "Entity sections",
   tabsLayout = "horizontal",
   tabGroups,
+  tabRouting,
   children,
   sidebar,
 }: EntityProfileShellProps) {
@@ -137,7 +146,13 @@ export function EntityProfileShell({
 
   const horizontalBody = (
     <>
-      {hasTabs && <ProfileTabs tabs={tabs} ariaLabel={tabsAriaLabel} />}
+      {hasTabs && (
+        <ProfileTabs
+          tabs={tabs}
+          ariaLabel={tabsAriaLabel}
+          tabRouting={tabRouting}
+        />
+      )}
       {children}
     </>
   );
@@ -148,6 +163,7 @@ export function EntityProfileShell({
       ariaLabel={tabsAriaLabel}
       layout="vertical"
       groups={tabGroups}
+      tabRouting={tabRouting}
     />
   ) : null;
 

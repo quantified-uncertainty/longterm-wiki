@@ -480,6 +480,17 @@ const nextConfig: NextConfig = {
         destination: "/benchmarks/browsecomp",
         permanent: true,
       },
+      // QUA-878: Legacy `?tab=<id>` URLs on /organizations/<slug> redirect to
+      // the path-based form (`/organizations/<slug>/<id>`). Scoped to
+      // /organizations only — other directories still use query-mode tabs and
+      // would 404 if redirected to a path that doesn't exist yet. The sweep
+      // ticket (QUA-880) broadens this to the remaining 14 directories.
+      {
+        source: "/organizations/:slug",
+        has: [{ type: "query", key: "tab", value: "(?<tab>.+)" }],
+        destination: "/organizations/:slug/:tab",
+        permanent: true,
+      },
     ];
   },
 };

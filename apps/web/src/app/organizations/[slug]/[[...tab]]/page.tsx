@@ -24,7 +24,7 @@ import {
   FactsPanel,
 } from "@/components/directory";
 
-import { buildOrgShellSlots } from "./org-profile-header";
+import { buildOrgShellSlots } from "../org-profile-header";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
   fetchEntitySourcingSummary,
@@ -42,7 +42,7 @@ import {
   SectionHeader,
   field,
   safeHref,
-} from "./org-shared";
+} from "../org-shared";
 
 // Data loading & constants
 import {
@@ -55,23 +55,23 @@ import {
   ORG_STATUS_LABELS,
   ORG_STATUS_COLORS,
   type OrgEntity,
-} from "./org-data";
+} from "../org-data";
 
 // Section components
 
-import { EquityPositionsSection } from "./equity-section";
-import { DivisionsSection, DivisionsOverview } from "./divisions-section";
-import { FundingProgramsSection } from "./programs-section";
-import { AiModelsSection } from "./ai-models-section";
-import { PolicyPositionsSection, getOrgPolicyPositions } from "./policy-positions-section";
+import { EquityPositionsSection } from "../equity-section";
+import { DivisionsSection, DivisionsOverview } from "../divisions-section";
+import { FundingProgramsSection } from "../programs-section";
+import { AiModelsSection } from "../ai-models-section";
+import { PolicyPositionsSection, getOrgPolicyPositions } from "../policy-positions-section";
 
 // Section components — publications
 
 // Section components — grants (main content column)
-import { GrantsSection } from "./grants-section";
+import { GrantsSection } from "../grants-section";
 
 // Section components — resources
-import { OrgResourcesSection } from "./resources-section";
+import { OrgResourcesSection } from "../resources-section";
 
 // Section components — main content column
 import {
@@ -81,10 +81,10 @@ import {
   SafetyMilestonesSection,
   StrategicPartnershipsSection,
   OtherDataSection,
-} from "./main-content-sections";
+} from "../main-content-sections";
 
 // Charts
-import { ChartsSection } from "./charts-section";
+import { ChartsSection } from "../charts-section";
 
 // People section — PG personnel data integration
 import {
@@ -93,7 +93,7 @@ import {
   mergePgPersonnel,
   PeopleSection,
   type PersonEntry,
-} from "./people-section";
+} from "../people-section";
 
 // Market data section — secondary market prices + prediction markets
 import {
@@ -102,7 +102,7 @@ import {
   getMarketDataCount,
   MarketDataSection,
   MarketHighlights,
-} from "./market-data-section";
+} from "../market-data-section";
 
 // PG grants integration — fetch grants from wiki-server for orgs that are funders
 import { fetchFromWikiServer } from "@/lib/wiki-server";
@@ -113,9 +113,13 @@ import Markdown from "react-markdown";
 import {
   loadScorecardsForEntity,
   ScorecardsSection,
-} from "./scorecards-section";
+} from "../scorecards-section";
 
-import type { ProfileTab as OrgTab, ProfileTabGroup } from "@/components/directory";
+import type { ProfileTab as OrgTab } from "@/components/directory";
+import {
+  ORG_TAB_GROUPS,
+  ORG_TAB_ICON_CLASS as ICON_CLASS,
+} from "../tabs";
 import {
   Home,
   Users,
@@ -141,28 +145,21 @@ import {
   Award,
 } from "lucide-react";
 
-const ORG_TAB_GROUPS: ProfileTabGroup[] = [
-  { id: "entity", label: "Entity" },
-  { id: "about", label: "About" },
-  { id: "business", label: "Business" },
-  { id: "governance", label: "Policy & Governance" },
-  { id: "output", label: "Output & Research" },
-  { id: "data", label: "Data" },
-];
-
-const ICON_CLASS = "w-4 h-4";
-
 // ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
 export const revalidate = 3600;
 
+// Pre-render the bare profile URL for every org. Tab-segment URLs (e.g.
+// `/organizations/anthropic/people`) are served via ISR — they render the
+// same DOM and only differ in the active tab styling, so pre-rendering the
+// 5,500-page Cartesian product (orgs × tabs) is wasteful.
 export function generateStaticParams() {
-  return getOrgSlugs().map((slug) => ({ slug }));
+  return getOrgSlugs().map((slug) => ({ slug, tab: undefined }));
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; tab?: string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const resolved = resolveOrgBySlug(slug);
@@ -187,13 +184,19 @@ export async function generateMetadata({
 export default async function OrgProfilePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; tab?: string[] }>;
 }) {
-  const { slug } = await params;
+  const { slug, tab } = await params;
 
   const result = resolveOrgEntity(slug);
   if (!result) return notFound();
-  if ("redirect" in result) permanentRedirect(`/organizations/${result.redirect}`);
+  if ("redirect" in result) {
+    // Preserve the tab segment when an org slug aliases to its canonical
+    // form so deep links (e.g. /organizations/google-deepmind/people) keep
+    // pointing at the same tab after the redirect.
+    const tabSuffix = tab && tab.length > 0 ? `/${tab.join("/")}` : "";
+    permanentRedirect(`/organizations/${result.redirect}${tabSuffix}`);
+  }
 
   const { entity } = result;
   const data = loadOrgPageData(entity, slug);
@@ -960,6 +963,7 @@ export default async function OrgProfilePage({
       tabsAriaLabel="Organization sections"
       tabsLayout="vertical"
       tabGroups={ORG_TAB_GROUPS}
+      tabRouting={{ mode: "path", basePath: `/organizations/${slug}` }}
     />
   );
 }
