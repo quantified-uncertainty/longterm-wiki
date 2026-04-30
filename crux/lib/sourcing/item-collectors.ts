@@ -263,6 +263,11 @@ export async function collectRecordItems(
       // QUA-685: ai-model records are entities, not a per-type table. Use the
       // entities export endpoint and flatten metadata fields below.
       case 'ai-model': apiBasePath = '/api/entities/export?entityType=ai-model'; break;
+      // QUA-864: scorecard_grade rows live in scorecard_grades. Each row asserts
+      // "publisher X scored entity Y as Z on dimension D in wave W"; the parent
+      // snapshot's sourceUrl is used as fallback when the grade has no per-row
+      // deep link (handled below by the source ?? snapshotSourceUrl fallback).
+      case 'scorecard_grade': apiBasePath = '/api/scorecard-grades/all'; break;
       // citation and wiki-page are valid record types for verdicts but don't have
       // /all API endpoints for bulk collection — skip them intentionally.
       case 'citation':
@@ -330,8 +335,10 @@ export async function collectRecordItems(
       }
 
       for (const item of allRawItems) {
-        // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result)
-        const source = item.source ?? item.sourceUrl;
+        // Some record types use 'sourceUrl' instead of 'source' (e.g. benchmark-result).
+        // QUA-864: scorecard_grade falls back to the parent snapshot's sourceUrl when the
+        // per-row sourceUrl is null — most grades inherit evidence from the wave's PDF/page.
+        const source = item.source ?? item.sourceUrl ?? item.snapshotSourceUrl;
         if (typeof source !== 'string' || !source) continue;
 
         const id = String(item.id ?? '');
@@ -358,6 +365,13 @@ export async function collectRecordItems(
         } else if (recordType === 'benchmark-result') {
           const modelName = resolveName(item, 'modelResolvedName', 'modelDisplayName', 'modelId');
           if (!isResolvableName(modelName)) continue;
+        } else if (recordType === 'scorecard_grade') {
+          // QUA-864: the LLM can't verify "X scored sid_abc on Y" — needs the
+          // org name. The /api/scorecard-grades/all join populates entityTitle
+          // from the entities table; entityDisplayName is the denormalized
+          // backup. Skip rows where neither resolves to a human name.
+          const entity = resolveName(item, 'entityTitle', 'entityDisplayName');
+          if (!isResolvableName(entity)) continue;
         }
 
         const priority = computeRecordPriority(recordType, existing);

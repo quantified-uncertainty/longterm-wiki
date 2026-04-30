@@ -98,6 +98,14 @@ export const RECORD_TYPE_SUBCOMMAND_TO_TYPE: Record<string, RecordType> = {
   // for the five sourceable scalar fields.
   'ai-model': 'ai-model',
   'ai-models': 'ai-model',
+  // QUA-864: scorecard_grade rows verified against the publishing
+  // scorecard's PDF/page (or per-cell deep-link when the grade has its
+  // own sourceUrl). Underscored keyword aliases match the existing
+  // SCORECARD_GRADE_RECORD_TYPE constant on the wiki-server side.
+  'scorecard-grade': 'scorecard_grade',
+  'scorecard-grades': 'scorecard_grade',
+  'scorecard_grade': 'scorecard_grade',
+  'scorecard_grades': 'scorecard_grade',
 };
 
 /**
@@ -352,6 +360,7 @@ Usage:
   crux tb verify entity-assessments        Verify entity assessments
   crux tb verify secondary-market-prices   Verify secondary market prices
   crux tb verify ai-models                 Verify ai-model scalar fields (price, context, ASL, release date)
+  crux tb verify scorecard-grades          Verify scorecard cells against the publishing scorecard's page/PDF
 
 Options:
   --budget=N             Max dollars to spend on LLM calls (est. ~$0.01/item)

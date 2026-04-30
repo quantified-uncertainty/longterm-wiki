@@ -32,6 +32,7 @@ import {
   resources,
   researchAreas,
   facts,
+  scorecardGrades,
 } from "../../schema.js";
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { notFoundError, validationError } from "../shared/utils.js";
@@ -66,6 +67,10 @@ const VALID_SOURCE_TABLES = [
   "research_areas",
   "facts",
   "entities",
+  // QUA-864: scorecard cells need a record-lookup target so per-cell
+  // /sourcing/scorecard_grade/<id> URLs can resolve to the underlying row
+  // (matches the pattern other verdictable record types follow).
+  "scorecard_grades",
 ] as const;
 
 type SourceTableName = (typeof VALID_SOURCE_TABLES)[number];
@@ -90,6 +95,7 @@ const TABLE_MAP: Record<SourceTableName, PgTable> = {
   research_areas: researchAreas,
   facts,
   entities,
+  scorecard_grades: scorecardGrades,
 };
 
 const sourceTableSchema = z.enum(VALID_SOURCE_TABLES);

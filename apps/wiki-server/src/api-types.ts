@@ -82,6 +82,14 @@ export const VALID_RECORD_TYPES = [
   // collected from `/api/entities/export?entityType=ai-model` rather than
   // a dedicated /api/<type>/all endpoint — see crux/lib/sourcing/item-collectors.ts.
   "ai-model",
+  // QUA-864: each scorecard_grades row asserts "publisher X scored entity Y
+  // as Z on dimension D in wave W". The grade's own sourceUrl (when present)
+  // or the parent snapshot's sourceUrl is the evidence URL. Underscored to
+  // match the route's existing SCORECARD_GRADE_RECORD_TYPE constant
+  // (apps/wiki-server/src/routes/tablebase/scorecard-grades.ts), which is
+  // already what the LEFT JOIN against source_check_verdicts uses for the
+  // QUA-839 rendering layer on /scorecards and the org scorecards tab.
+  "scorecard_grade",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];
