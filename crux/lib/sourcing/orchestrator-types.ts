@@ -62,9 +62,21 @@ export interface FactItemData {
   entity: FBEntity;
   fact: Fact;
   propertyName: string;
+  /**
+   * Property ID (e.g. `wikipedia-url`, `revenue`). Distinct from `propertyName`,
+   * which is the human-readable display name. Used by the url-resolves verifier
+   * to dispatch property-specific behavior (Wikipedia title check vs plain HEAD).
+   * Optional for back-compat; `verifierKind: url-resolves` items always set it.
+   */
+  propertyId?: string;
   formattedValue: string;
   /** Raw numeric/text value from YAML, before display formatting (avoids rounding false positives) */
   rawValue?: string;
+  /**
+   * How this fact should be verified (QUA-927). Default `content-claim`.
+   * `url-resolves` triggers a cheap HTTP HEAD-only check instead of fetch+LLM.
+   */
+  verifierKind?: 'content-claim' | 'url-resolves';
 }
 
 export interface RecordItemData {

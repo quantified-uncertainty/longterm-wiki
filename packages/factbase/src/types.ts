@@ -110,6 +110,16 @@ export interface Property {
   temporal?: boolean;
   /** If false, skip automated source-checking (e.g., social media handles, self-referential URLs). Default: true. */
   verifiable?: boolean;
+  /**
+   * How to verify facts on this property (QUA-927).
+   * - `content-claim` (default): fetch source text + LLM checks the claim against it
+   * - `url-resolves`: HTTP HEAD only — verifies the URL itself resolves (cheap, ~10ms, $0)
+   *
+   * Properties with `verifierKind: url-resolves` are NOT skipped by `verifiable: false`
+   * filters — the URL-resolves verifier is precisely the cheap path that handles cases
+   * where content-claim verification would be tautological or impossible.
+   */
+  verifierKind?: 'content-claim' | 'url-resolves';
 }
 
 // ── Type Schemas ────────────────────────────────────────────────────
