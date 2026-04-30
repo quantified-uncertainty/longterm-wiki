@@ -110,10 +110,8 @@ export const DEAD_LINK_CHECKER_MODEL = "dead-link-detector";
 // ---- Coverage helpers (QUA-928) ----
 
 /**
- * Round to one decimal place — used for percent values returned by the
- * coverage endpoints. Centralised so all three percentages
- * (`checkabilityPercent`, `checkableCoveragePercent`, `fullCoveragePercent`)
- * share rounding behavior.
+ * Round to one decimal place. Returns 0 for zero/negative denominators
+ * (avoids NaN / Infinity in JSON output).
  */
 function pct1(numerator: number, denominator: number): number {
   if (denominator <= 0) return 0;
@@ -121,11 +119,40 @@ function pct1(numerator: number, denominator: number): number {
 }
 
 /**
+ * Compute the three QUA-928 coverage percentages from a (total, checkable,
+ * checked) triple. Centralised so `/coverage` and `/coverage-matrix` cannot
+ * silently diverge — same field names, same definitions on both endpoints.
+ *
+ * Numerators are clamped so the percentages can never exceed 100% even if
+ * the three counts are inconsistent (e.g. a fact was deleted between the
+ * `count(facts)` and the verdict-count queries, or a property was flipped
+ * from `verifiable: true` to `verifiable: false` after verdicts were
+ * already written for it). The three queries are not transaction-wrapped,
+ * so this clamp is the cheap defence against the resulting >100% noise.
+ */
+function coveragePercents(
+  totalRecords: number,
+  checkableRecords: number,
+  checkedRecords: number,
+): {
+  checkabilityPercent: number;
+  checkableCoveragePercent: number;
+  fullCoveragePercent: number;
+} {
+  const checkable = Math.min(checkableRecords, totalRecords);
+  const checked = Math.min(checkedRecords, checkable);
+  return {
+    checkabilityPercent: pct1(checkable, totalRecords),
+    checkableCoveragePercent: pct1(checked, checkable),
+    fullCoveragePercent: pct1(checked, totalRecords),
+  };
+}
+
+/**
  * Count facts that are eligible for sourcing verification. Mirrors the inclusion
  * logic in `crux/lib/sourcing/item-collectors.ts::collectFactItems`:
  * facts must carry a source URL AND their property must not be flagged
- * `verifiable: false` in properties.yaml. The set of non-verifiable
- * property IDs is read from `properties.yaml` once at startup.
+ * `verifiable: false` in properties.yaml.
  */
 async function countCheckableFacts(
   db: ReturnType<typeof getDrizzleDb>,
@@ -134,7 +161,7 @@ async function countCheckableFacts(
   const rows = (await db.execute(sql`
     SELECT count(DISTINCT fact_id)::int AS checkable
     FROM facts
-    WHERE source IS NOT NULL
+    WHERE source IS NOT NULL AND source <> ''
       AND (measure IS NULL OR NOT (measure = ANY(${nonVerifiable}::text[])))
   `)) as Array<{ checkable: number | null }>;
   return rows[0]?.checkable ?? 0;
@@ -2066,6 +2093,28 @@ const sourcingApp = new Hono()
       verifiedByType[row.record_type] = row.verified;
     }
 
+    // QUA-928: separate "checked" count for the new percentages, using the
+    // strict semantic that matches /coverage-matrix (excludes both
+    // 'unchecked' and 'not_applicable'). Without this, /coverage and
+    // /coverage-matrix would emit different `checkableCoveragePercent`
+    // numbers under the same field name. The legacy `verified` count
+    // (above) is preserved for the unchanged `percentage` field that
+    // `CoverageBars` + `EntitySourcingViewer` consume.
+    const checkedRowsRaw = (await db.execute(sql`
+      WITH ${LIVE_RECORDS_CTE}
+      SELECT v.record_type, count(DISTINCT v.record_id)::int AS checked_records
+      FROM source_check_verdicts v
+      INNER JOIN live_records lr
+        ON lr.record_type = v.record_type AND lr.record_id = v.record_id
+      WHERE v.verdict NOT IN ('unchecked', 'not_applicable')
+      GROUP BY v.record_type
+    `)) as Array<{ record_type: string; checked_records: number }>;
+
+    const checkedByType: Record<string, number> = {};
+    for (const row of checkedRowsRaw) {
+      checkedByType[row.record_type] = row.checked_records;
+    }
+
     // Merge into coverage array — include all known types
     const allTypes = new Set([
       ...Object.keys(totalsByType),
@@ -2076,6 +2125,7 @@ const sourcingApp = new Hono()
       .map((recordType) => {
         const total = totalsByType[recordType] ?? 0;
         const verified = verifiedByType[recordType] ?? 0;
+        const checked = checkedByType[recordType] ?? 0;
         const checkable = checkableCountFor(recordType, total, checkableFactsCount);
         const exempt = isSourcingExempt(recordType);
         // `percentage` retains its legacy semantics (verified / total, where
@@ -2090,9 +2140,7 @@ const sourcingApp = new Hono()
           checkable,
           verified,
           percentage,
-          checkabilityPercent: pct1(checkable, total),
-          checkableCoveragePercent: pct1(verified, checkable),
-          fullCoveragePercent: pct1(verified, total),
+          ...coveragePercents(total, checkable, checked),
           exempt,
         };
       })
@@ -2429,18 +2477,11 @@ const sourcingApp = new Hono()
             outdated,
             unchecked,
           },
-          // QUA-928: split coverage into three explicit percentages.
-          // - checkabilityPercent: authoring-quality metric (do facts have
-          //   sources? are properties verifiable?)
-          // - checkableCoveragePercent: verification-quality metric (of the
-          //   checkable subset, what fraction has a verdict?) — this is the
-          //   one the QUA-852 enforcement gate uses.
-          // - fullCoveragePercent: verified / total, the previous
-          //   `coveragePercent` field. Useful for tracking the joint metric
-          //   but mathematically capped by checkability.
-          checkabilityPercent: pct1(checkableRecords, totalRecords),
-          checkableCoveragePercent: pct1(checkedRecords, checkableRecords),
-          fullCoveragePercent: pct1(checkedRecords, totalRecords),
+          // QUA-928: three explicit percentages — see coveragePercents().
+          // - checkabilityPercent: authoring quality (sources present? properties verifiable?)
+          // - checkableCoveragePercent: verification quality (gate metric for QUA-852)
+          // - fullCoveragePercent: joint metric, capped by checkability
+          ...coveragePercents(totalRecords, checkableRecords, checkedRecords),
           greenPercent,
           exempt,
         };
@@ -2454,9 +2495,11 @@ const sourcingApp = new Hono()
         checkableRecords: grandCheckableRecords,
         totalVerdicts: grandTotalVerdicts,
         confirmedPercent: pct1(grandConfirmed, grandTotalVerdicts),
-        checkabilityPercent: pct1(grandCheckableRecords, grandTotalRecords),
-        checkableCoveragePercent: pct1(grandCheckedRecords, grandCheckableRecords),
-        fullCoveragePercent: pct1(grandCheckedRecords, grandTotalRecords),
+        ...coveragePercents(
+          grandTotalRecords,
+          grandCheckableRecords,
+          grandCheckedRecords,
+        ),
       },
       exemptTypes: [...SOURCING_EXEMPT_TYPES],
     });

@@ -31,26 +31,41 @@ const PROPERTIES_YAML_PATH = resolve(
   "../../../packages/factbase/data/properties.yaml",
 );
 
-interface PropertiesFile {
-  properties?: Record<string, { verifiable?: boolean }>;
-}
-
 let cachedNonVerifiable: ReadonlySet<string> | null = null;
+
+function isObject(x: unknown): x is Record<string, unknown> {
+  return typeof x === "object" && x !== null && !Array.isArray(x);
+}
 
 /**
  * Returns the set of property IDs that are marked `verifiable: false` in
  * `properties.yaml`. Throws if the file can't be read or parsed — these are
  * load-bearing for sourcing coverage metrics, so a silent empty set would
  * skew dashboards.
+ *
+ * Read once on first call and cached for the lifetime of the process. Call
+ * site is also reachable at server boot (see `index.ts`) so that a missing
+ * or malformed file fails the deploy rather than the first request.
  */
 export function getNonVerifiablePropertyIds(): ReadonlySet<string> {
   if (cachedNonVerifiable !== null) return cachedNonVerifiable;
 
   const raw = readFileSync(PROPERTIES_YAML_PATH, "utf-8");
-  const parsed = parseYaml(raw) as PropertiesFile;
+  const parsed = parseYaml(raw);
+  if (!isObject(parsed)) {
+    throw new Error(
+      `properties.yaml: expected an object at the root, got ${typeof parsed}`,
+    );
+  }
+  const properties = parsed.properties;
+  if (properties !== undefined && !isObject(properties)) {
+    throw new Error(
+      `properties.yaml: \`properties\` must be a map, got ${typeof properties}`,
+    );
+  }
   const ids = new Set<string>();
-  for (const [id, def] of Object.entries(parsed.properties ?? {})) {
-    if (def.verifiable === false) ids.add(id);
+  for (const [id, def] of Object.entries(properties ?? {})) {
+    if (isObject(def) && def.verifiable === false) ids.add(id);
   }
   cachedNonVerifiable = ids;
   return ids;

@@ -128,9 +128,12 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
 
   it("returns the new checkability fields for the fact recordType", async () => {
     // Mirror the prod numbers from the QUA-928 description: 2,744 total
-    // facts, ~1,834 checkable, ~1,816 actually checked.
+    // facts, ~1,834 checkable, ~1,816 actually checked. The new strict-
+    // checked count (excluding 'unchecked' + 'not_applicable') drives the
+    // new percentages; `verified` is kept only for the legacy `percentage`.
     tableTotals = [{ table_name: "fact", total: 2744 }];
     verifiedCounts = [{ record_type: "fact", verified: 1816 }];
+    checkedCounts = [{ record_type: "fact", checked_records: 1816 }];
     checkableFacts = 1834;
 
     const res = await app.request("/api/sourcing/coverage");
@@ -158,6 +161,10 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
       { record_type: "grant", verified: 5873 },
       { record_type: "personnel", verified: 1124 },
     ];
+    checkedCounts = [
+      { record_type: "grant", checked_records: 5873 },
+      { record_type: "personnel", checked_records: 1124 },
+    ];
     checkableFacts = 0; // no facts in this test
 
     const res = await app.request("/api/sourcing/coverage");
@@ -178,6 +185,7 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
   it("guards against divide-by-zero for empty tables", async () => {
     tableTotals = [{ table_name: "wiki-page", total: 0 }];
     verifiedCounts = [];
+    checkedCounts = [];
     checkableFacts = 0;
 
     const res = await app.request("/api/sourcing/coverage");
@@ -197,6 +205,7 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     // checkable must not exceed total — that would push percentages > 100%.
     tableTotals = [{ table_name: "fact", total: 100 }];
     verifiedCounts = [{ record_type: "fact", verified: 80 }];
+    checkedCounts = [{ record_type: "fact", checked_records: 80 }];
     checkableFacts = 105; // stale; higher than current total
 
     const res = await app.request("/api/sourcing/coverage");
@@ -206,6 +215,65 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     expect(fact!.total).toBe(100);
     expect(fact!.checkable).toBe(100);
     expect(fact!.checkabilityPercent).toBe(100);
+  });
+
+  it("clamps the numerator so percentages cannot exceed 100% under race conditions", async () => {
+    // Race: a verdict still exists for a record whose property was just
+    // flipped from `verifiable: true` to `verifiable: false`, so
+    // `checked_records > checkable`. Without the clamp,
+    // `checkableCoveragePercent` would render as e.g. 105%, looking like
+    // a bug. The clamp inside coveragePercents() caps it at 100.
+    tableTotals = [{ table_name: "fact", total: 100 }];
+    verifiedCounts = [{ record_type: "fact", verified: 95 }];
+    checkedCounts = [{ record_type: "fact", checked_records: 90 }];
+    checkableFacts = 80; // intentionally lower than checked_records
+
+    const res = await app.request("/api/sourcing/coverage");
+    const body = (await res.json()) as CoverageResponse;
+    const fact = body.coverage.find((r) => r.recordType === "fact");
+
+    expect(fact!.checkable).toBe(80);
+    // Without the clamp this would be 90/80 = 112.5%
+    expect(fact!.checkableCoveragePercent).toBe(100);
+    // fullCoveragePercent is checked / total but the clamp pulls checked
+    // down to 80 too, so it lands at 80% (matches the cap on numerator).
+    expect(fact!.fullCoveragePercent).toBe(80);
+    expect(fact!.fullCoveragePercent).toBeLessThanOrEqual(100);
+  });
+
+  it("never reports `checkableCoveragePercent` numbers that disagree between /coverage and /coverage-matrix", async () => {
+    // Pin the cross-endpoint consistency contract: same recordType, same
+    // input data, same percentage value on both endpoints. Under the bug
+    // /coverage used `verified` (which counts unchecked rows) and
+    // /coverage-matrix used the strict `checked_records`, producing
+    // different numbers under the same field name.
+    tableTotals = [{ table_name: "fact", total: 100 }];
+    verifiedCounts = [{ record_type: "fact", verified: 90 }]; // includes 'unchecked'
+    checkedCounts = [{ record_type: "fact", checked_records: 70 }]; // strict
+    checkableFacts = 80;
+
+    const coverageRes = await app.request("/api/sourcing/coverage");
+    const coverageBody = (await coverageRes.json()) as CoverageResponse;
+    const coverageFact = coverageBody.coverage.find(
+      (r) => r.recordType === "fact",
+    );
+
+    // Reset for the matrix call (handlers share dispatch but query
+    // shapes differ — same canned data drives both).
+    tableTotals = [{ record_type: "fact", total: 100 }];
+    checkedCounts = [{ record_type: "fact", checked_records: 70 }];
+    verdictRows = [];
+    checkableFacts = 80;
+
+    const matrixRes = await app.request("/api/sourcing/coverage-matrix");
+    const matrixBody = (await matrixRes.json()) as MatrixResponse;
+    const matrixFact = matrixBody.tables.find((t) => t.recordType === "fact");
+
+    expect(coverageFact!.checkableCoveragePercent).toBe(
+      matrixFact!.checkableCoveragePercent,
+    );
+    expect(coverageFact!.fullCoveragePercent).toBe(matrixFact!.fullCoveragePercent);
+    expect(coverageFact!.checkabilityPercent).toBe(matrixFact!.checkabilityPercent);
   });
 
   it("never emits a `coveragePercent` field — the ambiguous name is removed", async () => {
