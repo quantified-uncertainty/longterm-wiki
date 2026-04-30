@@ -1,5 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
+import { ORG_TAB_IDS } from "../tabs";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 
@@ -116,10 +117,12 @@ import {
 } from "../scorecards-section";
 
 import type { ProfileTab as OrgTab } from "@/components/directory";
-import {
-  ORG_TAB_GROUPS,
-  ORG_TAB_ICON_CLASS as ICON_CLASS,
-} from "../tabs";
+import { ORG_TAB_GROUPS, ORG_TAB_ICON_CLASS as ICON_CLASS } from "../tabs";
+
+// `ORG_TAB_IDS` is the canonical list of path-routable tab ids — link-tabs
+// (e.g. `wiki`, which navigates to `/wiki/E<N>`) are excluded by construction,
+// so a `Set` over the catalog is the validation surface.
+const PATH_ROUTABLE_TAB_IDS: ReadonlySet<string> = new Set(ORG_TAB_IDS);
 import {
   Home,
   Users,
@@ -153,7 +156,9 @@ export const revalidate = 3600;
 // same DOM and only differ in the active tab styling, so pre-rendering the
 // 5,500-page Cartesian product (orgs × tabs) is wasteful.
 export function generateStaticParams() {
-  return getOrgSlugs().map((slug) => ({ slug, tab: undefined }));
+  // Empty array tells Next.js "no extra path segments" for the optional
+  // catch-all — pre-renders the bare `/organizations/<slug>` URL only.
+  return getOrgSlugs().map((slug) => ({ slug, tab: [] as string[] }));
 }
 
 export async function generateMetadata({
@@ -188,13 +193,26 @@ export default async function OrgProfilePage({
 }) {
   const { slug, tab } = await params;
 
+  // Defensive: Next.js 15 always passes an array for `[[...tab]]`, but guard
+  // against unexpected shapes leaking through (e.g. middleware tampering).
+  const tabSegments: string[] = Array.isArray(tab) ? tab : [];
+
   const result = resolveOrgEntity(slug);
   if (!result) return notFound();
   if ("redirect" in result) {
-    // Preserve the tab segment when an org slug aliases to its canonical
+    // Preserve the first tab segment when an org slug aliases to its canonical
     // form so deep links (e.g. /organizations/google-deepmind/people) keep
-    // pointing at the same tab after the redirect.
-    const tabSuffix = tab && tab.length > 0 ? `/${tab.join("/")}` : "";
+    // pointing at the same tab after the redirect. Only forward known-valid
+    // tab ids — an attacker-controlled or stale segment falls back to the
+    // bare canonical URL rather than producing a redirect chain into a
+    // suspicious path. Sub-record routes (`data`, `db`, `divisions/<slug>`,
+    // `funding`, `grants/<id>`) never reach this catch-all because Next.js
+    // resolves the more-specific route first.
+    const firstSegment = tabSegments[0];
+    const tabSuffix =
+      firstSegment && PATH_ROUTABLE_TAB_IDS.has(firstSegment)
+        ? `/${firstSegment}`
+        : "";
     permanentRedirect(`/organizations/${result.redirect}${tabSuffix}`);
   }
 

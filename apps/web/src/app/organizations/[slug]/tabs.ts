@@ -24,14 +24,12 @@ export const ORG_TAB_GROUPS: ProfileTabGroup[] = [
  *   - validate-tab-routes gate check (QUA-881)
  *
  * Keep in sync with the conditional `tabs.push(...)` calls in the catch-all
- * `[[...tab]]/page.tsx` builder. The "wiki" tab is included because it's
- * mounted as a link-tab — its URL is `/wiki/E<N>` rather than a tab segment,
- * so it never appears in the path, but the id is still part of the surface
- * area.
+ * `[[...tab]]/page.tsx` builder. The "wiki" link-tab is intentionally
+ * excluded — it navigates to `/wiki/E<N>` rather than a tab segment, so
+ * `/organizations/<slug>/wiki` is not a meaningful URL.
  */
 export const ORG_TAB_IDS = [
   "overview",
-  "wiki",
   "facts",
   "database",
   "people",

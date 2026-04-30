@@ -34,8 +34,22 @@ describe("organizations/[slug]/tabs", () => {
 
   // The `divisions` tab id intentionally matches the `divisions/[divSlug]`
   // route, but the sub-record route requires a divSlug — bare `/divisions`
-  // falls through to the catch-all. Document that allowance here.
+  // falls through to the catch-all. Document that allowance here. The actual
+  // routing precedence (bare `/divisions` → catch-all, `/divisions/<slug>` →
+  // sub-record) is verified by the Playwright e2e at
+  // `apps/web/e2e/organizations-path-tabs.spec.ts`.
   it("allows `divisions` because the sub-record route requires a divSlug", () => {
     expect(ORG_TAB_IDS).toContain("divisions");
+  });
+
+  // The `wiki` tab is rendered as a link-tab pointing at `/wiki/E<N>`. It is
+  // intentionally NOT a path-routable id — `/organizations/<slug>/wiki`
+  // would surface "Unknown tab" rather than navigating to the wiki page.
+  it("excludes `wiki` (link-tab, not path-routable)", () => {
+    expect(ORG_TAB_IDS).not.toContain("wiki");
+  });
+
+  it("declares the default tab id `overview`", () => {
+    expect(ORG_DEFAULT_TAB_ID).toBe("overview");
   });
 });
