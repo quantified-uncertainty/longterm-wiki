@@ -138,6 +138,7 @@ export function ScorecardsSection({
         const overallRow = group.rows.find(
           (r) => r.dimensionSlug === DIMENSION_OVERALL,
         );
+        const overallText = overallRow ? formatScoreCell(overallRow) : null;
         const dimensionRows = group.rows.filter(
           (r) => r.dimensionSlug !== DIMENSION_OVERALL,
         );
@@ -192,25 +193,22 @@ export function ScorecardsSection({
               ) : null}
             </header>
 
-            {overallRow ? (() => {
-              const overallText = formatScoreCell(overallRow);
-              return (
-                <div className="mb-3 flex items-baseline gap-3">
-                  <span className="text-sm text-muted-foreground">Overall:</span>
-                  <span className="inline-flex items-baseline gap-2">
-                    <span className={`text-2xl ${gradeCellFontClass(overallText)}`}>
-                      {overallText}
-                    </span>
-                    <SourcingDot
-                      status={recordVerdictToStatus(overallRow.sourcing?.verdict)}
-                      originalVerdict={overallRow.sourcing?.verdict ?? null}
-                      lastChecked={overallRow.sourcing?.checkedAt ?? null}
-                      size="md"
-                    />
+            {overallRow && overallText !== null ? (
+              <div className="mb-3 flex items-baseline gap-3">
+                <span className="text-sm text-muted-foreground">Overall:</span>
+                <span className="inline-flex items-baseline gap-2">
+                  <span className={`text-2xl ${gradeCellFontClass(overallText)}`}>
+                    {overallText}
                   </span>
-                </div>
-              );
-            })() : null}
+                  <SourcingDot
+                    status={recordVerdictToStatus(overallRow.sourcing?.verdict)}
+                    originalVerdict={overallRow.sourcing?.verdict ?? null}
+                    lastChecked={overallRow.sourcing?.checkedAt ?? null}
+                    size="md"
+                  />
+                </span>
+              </div>
+            ) : null}
 
             {dimensionRows.length > 0 ? (
               <dl className="w-full text-sm grid grid-cols-[1fr_auto] gap-x-3">

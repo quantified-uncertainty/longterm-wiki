@@ -128,17 +128,26 @@ export function formatScoreCell(cell: {
 
 /**
  * Whether a rendered grade value looks like a code (`A`, `B+`, `D-`, `84`,
- * `75/100`) versus a prose verdict (`Weak`, `Fulfilled`, `Very Weak`).
+ * `75/100`, `75%`) versus a prose verdict (`Weak`, `Fulfilled`, `Very Weak`,
+ * `100% achieved`, `5 stars met`).
  *
  * Used to decide whether to apply `font-mono tabular-nums`: monospace looks
  * right for letter / numeric grades, but rendering prose words like
  * "Fulfilled" in monospace reads like a literal/code and looks wrong.
+ *
+ * Both branches are anchored to end-of-string so prose that *starts* with a
+ * digit ("5 stars met", "100% achieved") or a single letter is not treated
+ * as a code. Letter grades are uppercase-only — actual scorecards (FLI,
+ * SaferAI) publish "C+", never "c+".
  */
 export function isCodeLikeGrade(value: string): boolean {
   const trimmed = value.trim();
   if (!trimmed) return false;
-  if (/^[A-F][+-]?$/i.test(trimmed)) return true;
-  if (/^[\d]/.test(trimmed)) return true;
+  // Letter grade: A, A-, B+, F. Uppercase only, anchored.
+  if (/^[A-F][+-]?$/.test(trimmed)) return true;
+  // Numeric: 84, 84.5, 100%, 75/100, 1.0. Anchored to reject "5 stars",
+  // "100% milk", "1.0xfoo", etc.
+  if (/^\d+(?:\.\d+)?(?:%|\/\d+)?$/.test(trimmed)) return true;
   return false;
 }
 

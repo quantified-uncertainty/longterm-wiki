@@ -87,7 +87,6 @@ describe("scorecards-constants", () => {
       "C", "C+", "C-",
       "D", "D+", "D-",
       "F",
-      "a", "b+", "f",
     ])("treats letter grade %s as code-like", (grade) => {
       expect(isCodeLikeGrade(grade)).toBe(true);
     });
@@ -125,6 +124,32 @@ describe("scorecards-constants", () => {
       // Real verdict labels we've seen on prod scorecards.
       expect(isCodeLikeGrade("Acceptable")).toBe(false);
       expect(isCodeLikeGrade("Bad")).toBe(false);
+    });
+
+    it("does not match lowercase letter grades", () => {
+      // Actual scorecards publish "C+", never "c+". Rejecting lowercase
+      // keeps single-letter article ("a") and other prose out.
+      expect(isCodeLikeGrade("a")).toBe(false);
+      expect(isCodeLikeGrade("b+")).toBe(false);
+      expect(isCodeLikeGrade("f")).toBe(false);
+    });
+
+    it("does not match prose that starts with a digit", () => {
+      // Critical: regex must be anchored to end-of-string so a leading
+      // digit doesn't trick us into rendering prose in monospace.
+      expect(isCodeLikeGrade("5 stars met")).toBe(false);
+      expect(isCodeLikeGrade("100% achieved")).toBe(false);
+      expect(isCodeLikeGrade("75 of 100")).toBe(false);
+      expect(isCodeLikeGrade("1.0xfoo")).toBe(false);
+      expect(isCodeLikeGrade("42 things")).toBe(false);
+    });
+
+    it("does not match malformed numeric shapes", () => {
+      // Trailing letters, mixed forms — must not classify as code.
+      expect(isCodeLikeGrade("84%foo")).toBe(false);
+      expect(isCodeLikeGrade("75/")).toBe(false);
+      expect(isCodeLikeGrade(".5")).toBe(false);
+      expect(isCodeLikeGrade("1..0")).toBe(false);
     });
   });
 
