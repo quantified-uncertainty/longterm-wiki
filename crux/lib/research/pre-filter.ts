@@ -9,11 +9,15 @@ export interface PreFilterClaim {
   proposedValue?: string | null;
   resourceId: string;
   sourceUrl: string;
-  /** Tokens that MUST appear in the source content for the claim to survive
-   *  pre-filtering, regardless of whether other extracted tokens hit. Used
-   *  for stakeholder position validation: if the LLM classifies "oppose" we
-   *  require an "oppos*" stem in the source. Case-insensitive substring. */
-  requiredTokens?: string[];
+  /** Regex source patterns that MUST match the source content for the
+   *  claim to survive pre-filtering, regardless of whether other extracted
+   *  tokens hit. Used for stakeholder position validation: if the LLM
+   *  classifies "oppose" we require an `\boppos` stem to appear in the
+   *  source. Compiled with the `i` flag for case-insensitive matching.
+   *  Word boundaries (`\b`) are recommended to avoid false positives like
+   *  "neutralize" satisfying a "neutral" requirement. Invalid regexes are
+   *  treated as missing (claim is dropped). */
+  requiredPatterns?: string[];
   // Anything else passes through unchanged.
   [k: string]: unknown;
 }
@@ -30,8 +34,9 @@ export interface PreFilterDecision {
   missing: string[];
   /** Tokens that were found and their first-occurrence index. */
   hits: Array<{ token: string; idx: number }>;
-  /** When the claim was dropped because a requiredToken was missing,
-   *  this is the missing required token. Empty otherwise. */
+  /** When the claim was dropped because a `requiredPatterns` entry was
+   *  missing or invalid, this lists the missing pattern source strings.
+   *  Empty otherwise. */
   missingRequired: string[];
 }
 
@@ -67,13 +72,23 @@ export function decide(
   const tokens = extractKeyTokens(text);
   const lc = sourceContent.toLowerCase();
 
-  // Required-token check — runs first because a missing required token is
-  // a hard drop regardless of how many discriminating tokens hit.
-  const required = claim.requiredTokens ?? [];
+  // Required-pattern check — runs first because a missing required pattern
+  // is a hard drop regardless of how many discriminating tokens hit.
+  // Patterns are regex source strings, compiled with `i` flag. An invalid
+  // pattern is treated as missing (fail-closed: a malformed required-token
+  // requirement should never silently succeed).
+  const required = claim.requiredPatterns ?? [];
   const missingRequired: string[] = [];
   for (const r of required) {
     if (!r) continue;
-    if (lc.indexOf(r.toLowerCase()) === -1) missingRequired.push(r);
+    let re: RegExp;
+    try {
+      re = new RegExp(r, "i");
+    } catch {
+      missingRequired.push(r);
+      continue;
+    }
+    if (!re.test(sourceContent)) missingRequired.push(r);
   }
 
   if (tokens.length === 0) {
@@ -117,7 +132,26 @@ export function preFilterBatch(
   for (const c of claims) {
     const content = contentByResourceId.get(c.resourceId) ?? "";
     if (!content) {
-      // No content — we can't pre-filter. Let the verifier handle it.
+      // No content — we can't pre-filter. For most claims, let the verifier
+      // handle it. But a claim with `requiredPatterns` (e.g. a stakeholder
+      // claim with a classified position) is uniquely susceptible to
+      // fabrication: the LLM was told to ensure the position word appears
+      // in the source. If we can't verify that here, downstream can't
+      // either. Drop these defensively.
+      const requiresContent = (c.requiredPatterns ?? []).some((p) => !!p);
+      if (requiresContent) {
+        const dec: PreFilterDecision = {
+          claim: c,
+          keep: false,
+          tokens: [],
+          missing: c.requiredPatterns ?? [],
+          hits: [],
+          missingRequired: c.requiredPatterns ?? [],
+        };
+        decisions.push(dec);
+        dropped.push(dec);
+        continue;
+      }
       const dec: PreFilterDecision = {
         claim: c, keep: true, tokens: [], missing: [], hits: [], missingRequired: [],
       };

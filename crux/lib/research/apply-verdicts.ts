@@ -45,9 +45,9 @@ export interface VerifiedVerdict {
 }
 
 /** Minimum extractor confidence required to commit a position to YAML.
- *  Below this we leave the field unset rather than guessing. Mirrored in
- *  research-improve-entity.ts as MIN_POSITION_CONFIDENCE — they MUST stay
- *  in sync. */
+ *  Below this we leave the field unset rather than guessing. Imported by
+ *  research-improve-entity.ts (extractor prompt + plumbing); this file is
+ *  the single source of truth. */
 export const MIN_POSITION_CONFIDENCE = 0.6;
 
 export interface ApplyResult<T> {
