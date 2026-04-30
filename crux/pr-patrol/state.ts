@@ -365,6 +365,78 @@ export function isCircuitOpen(): boolean {
 /** Threshold in seconds below which a failure is considered "instant". */
 export const INSTANT_FAILURE_THRESHOLD_SECONDS = INSTANT_FAILURE_THRESHOLD_S;
 
+// ── Auto-merge availability circuit breaker (QUA-858) ───────────────────────
+// When GitHub returns "Auto merge is not allowed for this repository", the
+// repository setting is disabled. Retrying every cycle wastes API calls and
+// pollutes PR threads with failure comments. Pause auto-merge attempts for
+// 1 hour so a fix to the repo setting is auto-detected on next attempt.
+
+const AUTO_MERGE_DISABLED_FILE = join(STATE_DIR, 'auto-merge-disabled');
+const AUTO_MERGE_DISABLED_COOLDOWN_MS = 60 * 60 * 1000; // 1 hour
+
+/** Substring of the GitHub error message that indicates a repo-level disable. */
+export const REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT =
+  'Auto merge is not allowed for this repository';
+
+interface AutoMergeDisabledState {
+  reason: string;
+  disabledAt: string; // ISO timestamp
+}
+
+/**
+ * Mark auto-merge as disabled at the repository level. Subsequent calls to
+ * `isAutoMergeDisabled()` return `disabled: true` until the cooldown elapses.
+ * Idempotent — repeated calls do not extend the cooldown beyond the first
+ * mark, so a flapping setting still self-heals after one cooldown window.
+ */
+export function markAutoMergeDisabled(reason: string): void {
+  if (existsSync(AUTO_MERGE_DISABLED_FILE)) {
+    // Already marked — preserve the original disabledAt so cooldown is bounded
+    return;
+  }
+  const state: AutoMergeDisabledState = {
+    reason,
+    disabledAt: new Date().toISOString(),
+  };
+  writeFileSync(AUTO_MERGE_DISABLED_FILE, JSON.stringify(state));
+}
+
+/**
+ * Returns whether auto-merge is currently paused due to a prior repo-level
+ * failure. Auto-clears the state file once the cooldown has elapsed.
+ */
+export function isAutoMergeDisabled():
+  | { disabled: false }
+  | { disabled: true; reason: string; disabledAt: string } {
+  if (!existsSync(AUTO_MERGE_DISABLED_FILE)) return { disabled: false };
+  try {
+    const state = JSON.parse(
+      readFileSync(AUTO_MERGE_DISABLED_FILE, 'utf-8'),
+    ) as AutoMergeDisabledState;
+    const elapsed = Date.now() - new Date(state.disabledAt).getTime();
+    if (elapsed >= AUTO_MERGE_DISABLED_COOLDOWN_MS) {
+      try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
+      return { disabled: false };
+    }
+    return { disabled: true, reason: state.reason, disabledAt: state.disabledAt };
+  } catch {
+    // Corrupt file — treat as cleared
+    try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
+    return { disabled: false };
+  }
+}
+
+/** Manually clear the auto-merge-disabled state (useful for tests / operators). */
+export function clearAutoMergeDisabled(): void {
+  if (existsSync(AUTO_MERGE_DISABLED_FILE)) {
+    try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
+  }
+}
+
+/** Cooldown duration exposed for tests. */
+export const AUTO_MERGE_DISABLED_COOLDOWN_SECONDS =
+  AUTO_MERGE_DISABLED_COOLDOWN_MS / 1000;
+
 // ── Total fix attempt tracking (anti-oscillation) ───────────────────────────
 // Tracks cumulative fix attempts per PR regardless of intermediate successes.
 // Prevents the fix→verify-fail→fix→verify-fail oscillation pattern (#3755, #3757)

@@ -28,6 +28,7 @@ import {
   ensureDirs,
   getFailCount,
   isAbandoned,
+  isAutoMergeDisabled,
   isRecentlyProcessed,
   JSONL_FILE,
   log,
@@ -657,15 +658,29 @@ export async function runParallelCycle(config: ParallelConfig): Promise<CycleRes
       .catch((e: unknown) => log(`  ${cl.yellow}Warning: could not upsert status comment on PR #${mc.number}: ${e instanceof Error ? e.message : String(e)}${cl.reset}`));
   }
 
-  // Enqueue eligible PRs (skip if deploy is failing)
+  // Enqueue eligible PRs (skip if deploy is failing or auto-merge is repo-disabled)
   const enqueuedPrs: number[] = [];
+  const autoMergeStatus = isAutoMergeDisabled();
   if (!deployHealth.healthy) {
     log(`  ${cl.yellow}Skipping merge enqueue — deploy pipeline is failing${cl.reset}`);
+  } else if (autoMergeStatus.disabled && eligibleForMerge.length > 0) {
+    log(
+      `  ${cl.yellow}Skipping ${eligibleForMerge.length} merge enqueue(s) — auto-merge is disabled at the repository level (since ${autoMergeStatus.disabledAt}). Re-enable in repo Settings → Pull Requests → Allow auto-merge.${cl.reset}`,
+    );
   } else {
     for (const candidate of eligibleForMerge) {
       const outcome = await enqueuePr(candidate, config);
       if (outcome === 'enqueued' || outcome === 'dry-run') {
         enqueuedPrs.push(candidate.number);
+      }
+      // If the first attempt tripped the repo-level circuit breaker, skip the
+      // remaining candidates this cycle — they would all hit the same error.
+      if (isAutoMergeDisabled().disabled) {
+        const remaining = eligibleForMerge.length - eligibleForMerge.indexOf(candidate) - 1;
+        if (remaining > 0) {
+          log(`  ${cl.yellow}Skipping ${remaining} remaining merge enqueue(s) this cycle — auto-merge disabled at repo level${cl.reset}`);
+        }
+        break;
       }
     }
   }

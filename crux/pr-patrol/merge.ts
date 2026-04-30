@@ -20,7 +20,14 @@ import type {
   MergeOutcome,
   PatrolConfig,
 } from './types.ts';
-import { appendJsonl, cl, JSONL_FILE, log } from './state.ts';
+import {
+  appendJsonl,
+  cl,
+  JSONL_FILE,
+  log,
+  markAutoMergeDisabled,
+  REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT,
+} from './state.ts';
 import {
   buildEnqueuedComment,
   buildEnqueueFailedComment,
@@ -184,6 +191,36 @@ export async function enqueuePr(
   } catch (e) {
     const msg = e instanceof Error ? e.message : String(e);
     log(`${cl.red}✗ Failed to enqueue PR #${candidate.number}: ${msg}${cl.reset}`);
+
+    // Detect repository-level auto-merge disable. This is a permanent setting,
+    // not a transient error — retrying every cycle wastes API calls and posts
+    // duplicate failure comments on every approved PR (QUA-858). Mark a global
+    // cooldown so callers skip the enqueue loop until the setting is fixed or
+    // the 1-hour cooldown elapses.
+    if (msg.includes(REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT)) {
+      markAutoMergeDisabled(msg);
+      log(
+        `${cl.yellow}⚠ Auto-merge is disabled at the repository level — pausing auto-merge attempts for 1 hour. Re-enable in repo Settings → Pull Requests → Allow auto-merge.${cl.reset}`,
+      );
+      appendJsonl(JSONL_FILE, {
+        type: 'auto_merge_repo_disabled',
+        pr_num: candidate.number,
+        reason: msg,
+      });
+      // No need to probe isInMergeQueue — a rejected mutation cannot have
+      // enabled auto-merge. Remove the stage:merging label we just added,
+      // post the failure comment, and exit.
+      await removeLabel(candidate.number, config.repo, LABELS.STAGE_MERGING);
+      await postEventComment(candidate.number, config.repo, buildEnqueueFailedComment(msg))
+        .catch((e2: unknown) => log(`  Warning: could not post enqueue failure comment: ${e2 instanceof Error ? e2.message : String(e2)}`));
+      appendJsonl(JSONL_FILE, {
+        type: 'merge_result',
+        pr_num: candidate.number,
+        outcome: 'error' as MergeOutcome,
+        reason: msg,
+      });
+      return 'error';
+    }
 
     // The enqueue may have succeeded despite the thrown error (e.g. transport
     // error after GitHub accepted the mutation). Check actual queue state

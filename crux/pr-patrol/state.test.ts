@@ -23,6 +23,11 @@ import {
   getProcessedBlockingCommentIds,
   markBlockingCommentsProcessed,
   clearProcessedBlockingComments,
+  markAutoMergeDisabled,
+  isAutoMergeDisabled,
+  clearAutoMergeDisabled,
+  AUTO_MERGE_DISABLED_COOLDOWN_SECONDS,
+  REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT,
   STATE_DIR,
 } from './state.ts';
 
@@ -284,5 +289,91 @@ describe('processed blocking comments (QUA-514)', () => {
     writeFileSync(file, 'not valid json{{{');
     const ids = getProcessedBlockingCommentIds(testPrNumber, shaA);
     expect(ids.size).toBe(0);
+  });
+});
+
+// ── Auto-merge disabled circuit breaker (QUA-858) ──────────────────────────
+
+describe('auto-merge disabled circuit breaker', () => {
+  const STATE_FILE = join(STATE_DIR, 'auto-merge-disabled');
+
+  afterEach(() => {
+    clearAutoMergeDisabled();
+  });
+
+  it('exposes the GitHub error fragment used for detection', () => {
+    expect(REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT).toBe(
+      'Auto merge is not allowed for this repository',
+    );
+  });
+
+  it('uses a 1-hour cooldown', () => {
+    expect(AUTO_MERGE_DISABLED_COOLDOWN_SECONDS).toBe(3600);
+  });
+
+  it('isAutoMergeDisabled() returns disabled:false when no state exists', () => {
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+  });
+
+  it('markAutoMergeDisabled() persists reason and timestamp', () => {
+    markAutoMergeDisabled('GitHub GraphQL error: Auto merge is not allowed for this repository');
+    const status = isAutoMergeDisabled();
+    expect(status.disabled).toBe(true);
+    if (!status.disabled) throw new Error('expected disabled');
+    expect(status.reason).toContain('Auto merge is not allowed');
+    expect(typeof status.disabledAt).toBe('string');
+    expect(new Date(status.disabledAt).toString()).not.toBe('Invalid Date');
+  });
+
+  it('markAutoMergeDisabled() is idempotent — does not extend cooldown on repeated calls', () => {
+    markAutoMergeDisabled('reason A');
+    const first = isAutoMergeDisabled();
+    if (!first.disabled) throw new Error('expected disabled after first mark');
+    const firstAt = first.disabledAt;
+
+    // Wait a tick, mark again with a different reason
+    markAutoMergeDisabled('reason B');
+    const second = isAutoMergeDisabled();
+    if (!second.disabled) throw new Error('expected disabled after second mark');
+    expect(second.disabledAt).toBe(firstAt); // unchanged
+    expect(second.reason).toContain('reason A'); // first reason preserved
+  });
+
+  it('clearAutoMergeDisabled() removes the state file', () => {
+    markAutoMergeDisabled('test');
+    expect(isAutoMergeDisabled().disabled).toBe(true);
+    clearAutoMergeDisabled();
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+  });
+
+  it('auto-clears state when cooldown has elapsed', () => {
+    // Manually write a state file with a timestamp in the distant past
+    const expired = {
+      reason: 'expired',
+      disabledAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+    };
+    writeFileSync(STATE_FILE, JSON.stringify(expired));
+
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+    // The check itself should have unlinked the expired file
+    expect(existsSync(STATE_FILE)).toBe(false);
+  });
+
+  it('keeps state when cooldown has NOT elapsed', () => {
+    const fresh = {
+      reason: 'still fresh',
+      disabledAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(), // 5 min ago
+    };
+    writeFileSync(STATE_FILE, JSON.stringify(fresh));
+
+    const status = isAutoMergeDisabled();
+    expect(status.disabled).toBe(true);
+    expect(existsSync(STATE_FILE)).toBe(true);
+  });
+
+  it('treats corrupt state file as cleared', () => {
+    writeFileSync(STATE_FILE, 'not json{{{');
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+    expect(existsSync(STATE_FILE)).toBe(false);
   });
 });
