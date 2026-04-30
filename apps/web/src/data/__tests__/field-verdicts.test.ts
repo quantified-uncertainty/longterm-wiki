@@ -250,15 +250,7 @@ describe("getRecordVerdict / getFieldVerdict — QUA-423 composite-key guard", (
   });
 });
 
-// ── QUA-897: scoped stats for deduped/filtered directories ────────────────
-//
-// /divisions dedupes raw division records by (owner, name), so 120 raw rows
-// collapse to 101 visible rows. The unscoped getRecordVerdictStats counts all
-// 120 verdicts, producing the impossible "120 of 101 records sourced" header.
-// getRecordVerdictStatsForIds restricts the count to a caller-supplied set of
-// record IDs (the visible rows) so the ratio stays sane.
-
-describe("getRecordVerdictStatsForIds — QUA-897 scoped counting", () => {
+describe("getRecordVerdictStatsForIds — scoped counting", () => {
   beforeEach(() => {
     vi.resetModules();
     const mockVerdicts = buildMockVerdicts();
@@ -311,7 +303,7 @@ describe("getRecordVerdictStatsForIds — QUA-897 scoped counting", () => {
     expect(stats.contradicted).toBe(0);
   });
 
-  it("returns checked <= total for any ID set (the QUA-897 invariant)", async () => {
+  it("returns checked <= total for any ID set", async () => {
     const { getRecordVerdictStatsForIds } = await import("../tablebase");
     const stats = getRecordVerdictStatsForIds(
       "grant",

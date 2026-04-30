@@ -119,12 +119,9 @@ export default function DivisionsPage() {
   const totalDivisions = rows.length;
   const uniqueOrgs = new Set(rows.map((r) => r.parentName)).size;
   const divisionsWithData = rows.filter((r) => r.hasData).length;
-  // Restrict the sourcing-summary banner to visible (deduped) division keys —
-  // raw rows count includes merged duplicates and would produce checked>total
-  // (QUA-897). Each row's `key` is the dedup winner; verdicts on dropped
-  // duplicate keys are intentionally not counted so the banner stays
-  // consistent with the per-row verdict shown in the table (which also uses
-  // the winner key).
+  // Each row's `key` is the dedup winner; verdicts on dropped duplicate keys
+  // are intentionally not counted so the banner stays consistent with the
+  // per-row verdict shown in the table.
   const visibleDivisionIds = new Set(rows.map((r) => r.key));
 
   // Type breakdown (across all divisions)

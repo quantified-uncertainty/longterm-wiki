@@ -37,7 +37,10 @@ import type { ValidSubcategory } from "./valid-subcategories";
 import { isSid, isAnySid, SID_PREFIX } from "@/lib/stable-id";
 import { extractDomain } from "@/lib/resource-types";
 import { isCandidateRecordId } from "@wiki-server/api-types";
-import { SOURCE_CHECK_VERDICT_PRIORITY } from "@/components/shared/verdict-styles";
+import {
+  SOURCE_CHECK_VERDICT_PRIORITY,
+  type SourcingVerdictType,
+} from "@/components/shared/verdict-styles";
 
 // Re-export for consumers
 export type { WithSource };
@@ -1156,16 +1159,9 @@ export function getFieldVerdicts(recordType: string, recordId: string): Record<s
 
 export type RecordVerdictStats = {
   total: number;
-  confirmed: number;
-  contradicted: number;
-  unverifiable: number;
-  outdated: number;
-  partial: number;
-  unchecked: number;
-};
+} & Record<SourcingVerdictType, number>;
 
-type VerdictKey = Exclude<keyof RecordVerdictStats, "total">;
-const VALID_VERDICT_KEYS: ReadonlySet<string> = new Set<VerdictKey>([
+const VALID_VERDICT_KEYS: ReadonlySet<string> = new Set<SourcingVerdictType>([
   "confirmed",
   "contradicted",
   "unverifiable",
@@ -1174,48 +1170,47 @@ const VALID_VERDICT_KEYS: ReadonlySet<string> = new Set<VerdictKey>([
   "unchecked",
 ]);
 
+function emptyVerdictStats(): RecordVerdictStats {
+  return { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+}
+
 /** Get sourcing stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): RecordVerdictStats {
   const verdicts = getRecordVerdicts();
-  const stats: RecordVerdictStats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+  const stats = emptyVerdictStats();
   for (const [key, v] of Object.entries(verdicts)) {
     if (!key.startsWith(`${recordType}:`)) continue;
-    // Skip per-field entries (three segments: "grant:g_abc123:amount")
-    // Only count row-level entries (two segments: "grant:g_abc123")
+    // Per-field entries are three-segment keys ("grant:g_abc:amount") — skip.
     if (key.split(":").length > 2) continue;
     stats.total++;
     if (VALID_VERDICT_KEYS.has(v.verdict)) {
-      stats[v.verdict as VerdictKey]++;
+      stats[v.verdict as SourcingVerdictType]++;
     }
   }
   return stats;
 }
 
 /**
- * Sourcing stats restricted to a caller-supplied set of record IDs (QUA-897).
+ * Sourcing stats restricted to a caller-supplied set of record IDs.
  *
  * Use this when the directory page deduplicates or filters records before
- * rendering — the unscoped getRecordVerdictStats counts every verdict in the
- * record-verdicts map, which can exceed the visible row count and produce an
- * impossible "120 of 101" header. /divisions is the canonical case (raw rows
- * with the same owner+name collapse to a single visible row).
- *
- * IDs absent from the verdict map are counted as `unchecked` so total always
- * equals the size of `recordIds`. Per-field verdicts (3-segment keys like
- * `grant:g_001:amount`) are ignored — only row-level verdicts count.
+ * rendering, so the count of recorded verdicts cannot exceed the visible row
+ * total. IDs absent from the verdict map are counted as `unchecked` so total
+ * always equals `recordIds.size`. Per-field verdicts (3-segment keys) are
+ * ignored.
  */
 export function getRecordVerdictStatsForIds(
   recordType: string,
   recordIds: ReadonlySet<string>,
 ): RecordVerdictStats {
   const verdicts = getRecordVerdicts();
-  const stats: RecordVerdictStats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+  const stats = emptyVerdictStats();
   for (const id of recordIds) {
     stats.total++;
     const v = verdicts[`${recordType}:${id}`];
-    const verdictName: VerdictKey =
+    const verdictName: SourcingVerdictType =
       v && VALID_VERDICT_KEYS.has(v.verdict)
-        ? (v.verdict as VerdictKey)
+        ? (v.verdict as SourcingVerdictType)
         : "unchecked";
     stats[verdictName]++;
   }

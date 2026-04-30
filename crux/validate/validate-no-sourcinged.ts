@@ -10,7 +10,7 @@
  * This validator catches a regression if a future rename re-introduces
  * the artifact.
  *
- * Scoped to user-visible content surfaces (TS/TSX/MDX/MD/YAML). The dist/
+ * Scoped to user-visible content surfaces (TS/TSX/MDX/YAML). The dist/
  * `.next/`, `node_modules/`, and `.cache/` trees are skipped.
  *
  * Usage: npx tsx crux/validate/validate-no-sourcinged.ts
