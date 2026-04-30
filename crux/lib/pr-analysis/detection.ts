@@ -496,7 +496,7 @@ export function detectIssues(
 
   const body = pr.body ?? '';
   if (!/## Test [Pp]lan/.test(body)) issues.push('missing-testplan');
-  if (!/(Closes|Fixes|Resolves) #\d/i.test(body)) issues.push('missing-issue-ref');
+  if (!/(Closes|Fixes|Resolves)\s+(#\d+|QUA-\d+)/i.test(body)) issues.push('missing-issue-ref');
 
   const updatedMs = new Date(pr.updatedAt || pr.createdAt).getTime();
   if (updatedMs < staleThresholdMs) issues.push('stale');
