@@ -317,6 +317,60 @@ describe('parseDiscoveryResponse', () => {
     expect(result.candidates[0].url).toBe('https://clean.example.com');
   });
 
+  it('rejects URLs with userinfo (phishing pattern: https://good.com@evil.com)', () => {
+    const text = JSON.stringify({
+      candidates: [
+        // Classic phishing URL: hostname is actually 'evil.example.com'
+        // but a casual reader sees "good.example.com" first.
+        { url: 'https://good.example.com@evil.example.com/path', confidence: 0.9, summary: 's' },
+        { url: 'https://user:pass@evil.example.com/path', confidence: 0.9, summary: 's' },
+        { url: 'https://clean.example.com', confidence: 0.9, summary: 'ok' },
+      ],
+      best: 'https://clean.example.com',
+      reason: 'r',
+    });
+    const result = parseDiscoveryResponse(text);
+    expect(result.candidates).toHaveLength(1);
+    expect(result.candidates[0].url).toBe('https://clean.example.com');
+  });
+
+  it('rejects URLs with zero-width spaces and word-joiners (silent hostname mutation)', () => {
+    const text = JSON.stringify({
+      candidates: [
+        // U+200B (ZWSP) is stripped from the hostname by `new URL()`,
+        // so https://goo<ZWSP>gle.com appears to point to google.com but
+        // the literal URL string contains the invisible char.
+        { url: 'https://goo​gle.example.com/', confidence: 0.9, summary: 's' },
+        // U+2060 (Word Joiner) — same problem.
+        { url: 'https://goo⁠gle.example.com/', confidence: 0.9, summary: 's' },
+        { url: 'https://clean.example.com', confidence: 0.9, summary: 'ok' },
+      ],
+      best: 'https://clean.example.com',
+      reason: 'r',
+    });
+    const result = parseDiscoveryResponse(text);
+    expect(result.candidates).toHaveLength(1);
+    expect(result.candidates[0].url).toBe('https://clean.example.com');
+  });
+
+  it('does not spoof parse-failure detection when LLM returns reason starting with "parse error"', () => {
+    // A successful LLM response whose `reason` happens to start with "parse error"
+    // must NOT be treated as a parse failure (which would skip the override
+    // branches for empty candidates / threshold demotion). Tracking parse
+    // status via a closure flag instead of string-sniffing fixes this.
+    const text = JSON.stringify({
+      candidates: [], // empty candidates — should hit the "no candidates discovered" override
+      best: null,
+      reason: 'parse error: this is a valid LLM-supplied reason that starts with the sentinel',
+    });
+    const result = parseDiscoveryResponse(text);
+    // The empty-candidates branch fires correctly because parseFailed is false.
+    // The LLM reason is preserved (non-empty), not replaced.
+    expect(result.candidates).toEqual([]);
+    expect(result.best).toBeNull();
+    expect(result.reason).toBe('parse error: this is a valid LLM-supplied reason that starts with the sentinel');
+  });
+
   it('returns null best when no candidate meets the threshold', () => {
     const text = JSON.stringify({
       candidates: [

@@ -114,12 +114,26 @@ describe('sourceDiscoverCommand', () => {
     expect(mockDiscover).not.toHaveBeenCalled();
   });
 
-  // Inverse-fact rejection (foundFact.id.startsWith('inv_') branch) is
-  // unreachable from the real graph — the CLI only finds primary facts via
-  // `find(f => f.id === factId)` after iterating entities, and inverse facts
-  // aren't keyed by the user-provided ID. The branch is defensive guarding
-  // for future graph changes that might surface inverse IDs to the CLI.
-  // Tested upstream in factbase-loader / inverse-computation tests.
+  it('rejects inverse facts with a clear error message', async () => {
+    // Inverse facts ARE keyed in the per-entity facts list (computeInverses
+    // calls graph.addFact for each derived fact), so the user CAN reach this
+    // branch by passing an inverse fact ID. Sample a real one from the
+    // loaded graph (Buck Shlegeris's "founder-of" inverse).
+    const result = await sourceDiscover([], { 'fact-id': 'inv_10a6c0b04195' });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Cannot discover sources for inverse facts');
+    expect(result.output).toContain('inv_10a6c0b04195');
+    expect(mockDiscover).not.toHaveBeenCalled();
+  });
+
+  it('rejects inverse facts with JSON shape when --json is set', async () => {
+    const result = await sourceDiscover([], { 'fact-id': 'inv_10a6c0b04195', json: true });
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.error).toContain('inverse');
+    expect(parsed.factId).toBe('inv_10a6c0b04195');
+    expect(mockDiscover).not.toHaveBeenCalled();
+  });
 
   it('runs the engine and returns a human-readable report on success', async () => {
     mockDiscover.mockResolvedValueOnce({

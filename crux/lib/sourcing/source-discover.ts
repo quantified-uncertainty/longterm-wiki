@@ -299,11 +299,19 @@ export function parseDiscoveryResponse(
   text: string,
   threshold: number = DEFAULT_CONFIDENCE_THRESHOLD,
 ): Omit<DiscoverResult, 'costUsd'> {
-  const fallback = (_raw: string, error?: string): RawResponse => ({
-    candidates: [],
-    best: null,
-    reason: error ? `parse error: ${error}` : 'parse error',
-  });
+  // Track parse failure via closure flag, not by sniffing the resulting
+  // reason string. A successful LLM response with `reason: "parse error: ..."`
+  // would have spoofed the string-sniff approach and skipped legitimate
+  // override branches (no-candidates / threshold-failure / demotion).
+  let parseFailed = false;
+  const fallback = (_raw: string, error?: string): RawResponse => {
+    parseFailed = true;
+    return {
+      candidates: [],
+      best: null,
+      reason: error ? `parse error: ${error}` : 'parse error',
+    };
+  };
 
   const parsed = parseAndValidate<RawResponse>(text, ResponseSchema, 'source-discover', fallback);
   const parsedReason = parsed.reason ?? '';
@@ -340,13 +348,15 @@ export function parseDiscoveryResponse(
 
   // Reason resolution:
   //   - Parse failure: preserve the "parse error: ..." text from fallback
+  //     (parseFailed flag set inside the closure above — do NOT sniff the
+  //     string, an LLM-supplied reason that starts with "parse error" would
+  //     spoof the sniff and skip legitimate override branches)
   //   - Empty candidates: preserve LLM's reason (e.g., "no candidates found")
   //     or fall back to a default if absent
   //   - Candidates exist but none above threshold: override with explicit
   //     threshold-failure reason — the LLM's reason may praise a demoted URL
   //   - Best demoted from LLM's pick: override with demotion explanation
   //   - Best matches LLM's pick: preserve LLM's reason
-  const parseFailed = parsedReason.startsWith('parse error');
   let reason = parsedReason;
   if (parseFailed) {
     // keep parse error text — don't pretend we ran threshold logic
@@ -366,25 +376,31 @@ export function parseDiscoveryResponse(
 }
 
 /**
- * Validate that a candidate URL is parseable and uses http/https. Rejects
- * `javascript:`, `data:`, `file:`, `chrome:`, etc., as well as malformed
- * inputs. Also rejects URLs containing control or bidi-override codepoints
- * that could be used for display spoofing in the CLI or in any downstream
- * surface that renders the candidate.
+ * Validate that a candidate URL is parseable and uses http/https. Rejects:
+ *   - non-http(s) schemes (`javascript:`, `data:`, `file:`, `chrome:`, ...)
+ *   - C0 controls + bidi-override codepoints (display spoofing)
+ *   - zero-width spaces and word-joiners (U+200B, U+2060) which are
+ *     stripped from the hostname by `new URL()` and can hide redirections
+ *   - userinfo (`https://good.example.com@evil.example.com/path` would
+ *     parse as hostname `evil.example.com`; classic phishing pattern)
  */
 function isLikelyUrl(s: string): boolean {
   if (typeof s !== 'string') return false;
   const trimmed = s.trim();
   if (trimmed.length === 0) return false;
-  // C0 control chars, U+202E RTL override, U+200E/F LRM/RLM, BOM
-  if (/[\x00-\x1F\x7F‎‏‪-‮﻿]/.test(trimmed)) return false;
+  // C0 controls, DEL, U+200B (ZWSP), U+200E/F (LRM/RLM),
+  // U+202A-E (bidi embedding/override), U+2060 (word joiner), U+FEFF (BOM)
+  if (/[\x00-\x1F\x7F​‎‏‪-‮⁠﻿]/.test(trimmed)) return false;
   let url: URL;
   try {
     url = new URL(trimmed);
   } catch {
     return false;
   }
-  return url.protocol === 'http:' || url.protocol === 'https:';
+  if (url.protocol !== 'http:' && url.protocol !== 'https:') return false;
+  // Reject userinfo — phishing classic: https://goodsite.com@evilsite.com/
+  if (url.username !== '' || url.password !== '') return false;
+  return true;
 }
 
 // ── Real-time call ───────────────────────────────────────────────────
