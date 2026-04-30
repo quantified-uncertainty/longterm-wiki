@@ -28,7 +28,7 @@ export function InfoBoxDescription({ description }: InfoBoxDescriptionProps) {
 
     // Re-check after fonts finish loading (line heights may change)
     if (typeof document !== "undefined" && document.fonts?.ready) {
-      document.fonts.ready.then(checkOverflow);
+      void document.fonts.ready.then(checkOverflow);
     }
 
     // Re-check on resize (InfoBox width can change between mobile/desktop)

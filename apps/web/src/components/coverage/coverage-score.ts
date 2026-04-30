@@ -248,6 +248,19 @@ export function computeBenchmarkCoverage(row: BenchmarkCoverageInput): number {
   return 1;
 }
 
+export function getBenchmarkSignals(row: BenchmarkCoverageInput): string[] {
+  const signals: string[] = [];
+  if (row.description) signals.push("Description");
+  if (row.category) signals.push("Category");
+  if (row.scoringMethod) signals.push("Scoring method");
+  if (row.introducedDate) signals.push("Introduced date");
+  if (row.maintainer) signals.push("Maintainer");
+  if ((row.modelsCount ?? 0) >= 3) signals.push("3+ models tested");
+  if ((row.modelsCount ?? 0) >= 10) signals.push("10+ models tested");
+  if (row.wikiId) signals.push("Wiki page");
+  return signals;
+}
+
 // ── Grant scoring ───────────────────────────────────────────────────
 
 export interface GrantCoverageInput {

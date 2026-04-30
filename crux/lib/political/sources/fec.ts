@@ -479,6 +479,7 @@ export async function syncFinanceToServer(
       notes: r.notes,
     }));
 
+    // typed-client-ok: QUA-770 baseline — political ingest pipeline, internal write path
     const apiResult = await apiRequest<{ upserted: number }>(
       "POST",
       "/api/campaign-finance/sync",

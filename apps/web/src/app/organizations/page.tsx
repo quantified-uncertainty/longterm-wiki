@@ -114,6 +114,7 @@ interface ApiOrg {
   headcountDate: string | null;
   totalFundingNum: number | null;
   foundedDate: string | null;
+  grantsGivenCount?: number | null;
 }
 
 interface ApiOrgsResponse {
@@ -204,6 +205,7 @@ async function loadFromApi(
       foundedDate: org.foundedDate,
 
       peopleCount: null, // Not available from API; column hidden in picker.
+      grantsGivenCount: org.grantsGivenCount ?? null,
       completionScore: computeOrgCoverage(org),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -256,6 +258,7 @@ async function loadFromApi(
       foundedDate,
 
       peopleCount: null, // Not available from API; column hidden in picker.
+      grantsGivenCount: null, // Local-only fallback row — server hasn't enriched yet.
       completionScore: computeOrgCoverage({ foundedDate }),
       verdictString: null, // entity has no sourcing verdicts yet; needs server-side roll-up (QUA-136)
 
@@ -341,6 +344,7 @@ function loadFromLocal(): OrgPageData {
       foundedDate,
 
       peopleCount,
+      grantsGivenCount: getKBRecords(org.id, "grants").length,
       completionScore: computeOrgCoverage({
         revenueNum, valuationNum, headcount: headcountVal, totalFundingNum, foundedDate,
         peopleCount,

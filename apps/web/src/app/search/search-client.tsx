@@ -298,7 +298,7 @@ export function SearchPageClient({ browseData, coverageMap }: { browseData: Brow
   }, []);
 
   useEffect(() => {
-    if (initialQuery) performSearch(initialQuery);
+    if (initialQuery) void performSearch(initialQuery);
     inputRef.current?.focus();
     return () => {
       if (debounceRef.current) clearTimeout(debounceRef.current);
@@ -319,7 +319,7 @@ export function SearchPageClient({ browseData, coverageMap }: { browseData: Brow
     if (debounceRef.current) clearTimeout(debounceRef.current);
     debounceRef.current = setTimeout(() => {
       syncUrl(value);
-      performSearch(value);
+      void performSearch(value);
     }, 200);
   }, [performSearch, syncUrl]);
 
@@ -327,7 +327,7 @@ export function SearchPageClient({ browseData, coverageMap }: { browseData: Brow
     e.preventDefault();
     if (debounceRef.current) clearTimeout(debounceRef.current);
     syncUrl(query);
-    performSearch(query);
+    void performSearch(query);
   }, [query, performSearch, syncUrl]);
 
   // ── Split into columns ─────────────────────────────────────────────

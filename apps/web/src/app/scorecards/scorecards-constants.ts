@@ -12,6 +12,12 @@ export interface ScorecardSourceMeta {
   fullLabel: string;
   /** Org/maintainer of the scorecard. */
   publisher: string;
+  /**
+   * Slug for /organizations/<slug> linking when the publisher has a wiki
+   * entity. Optional — sources whose publisher isn't yet in the catalog
+   * render the publisher as plain text.
+   */
+  publisherSlug?: string;
   /** Default canonical URL for the source's home page. */
   homeUrl: string;
   /**
@@ -39,6 +45,7 @@ export const SCORECARD_SOURCES: readonly ScorecardSourceMeta[] = [
     shortLabel: "FLI Index",
     fullLabel: "FLI AI Safety Index",
     publisher: "Future of Life Institute",
+    publisherSlug: "fli",
     homeUrl: "https://futureoflife.org/ai-safety-index-summer-2025/",
     description:
       "Letter-grade ratings of frontier AI labs across six safety domains: risk assessment, current harms, safety frameworks, existential safety, governance, and information sharing.",

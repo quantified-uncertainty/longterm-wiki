@@ -62,6 +62,7 @@ async function fetchActionableVerdicts(
   // Fetch all combinations in parallel (typically 2-3 entity IDs × 2 verdict types = 4-6 requests)
   const fetches = entityIds.flatMap((entityId) =>
     ACTIONABLE_VERDICTS.map((verdict) =>
+      // typed-client-ok: QUA-770 baseline — sourcing pipeline internals
       apiRequest<VerdictsResponse>(
         'GET',
         `/api/sourcing/verdicts?entity_id=${encodeURIComponent(entityId)}&verdict=${verdict}&limit=50`,

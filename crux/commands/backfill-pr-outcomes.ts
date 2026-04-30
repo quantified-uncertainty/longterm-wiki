@@ -56,6 +56,7 @@ async function runCommand(args: string[], options: CommandOptions): Promise<Comm
   const includeAll = !!options.all;
 
   // Fetch agent sessions from wiki-server
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const sessionsResult = await apiRequest<AgentSessionListResponse>(
     'GET',
     '/api/agent-sessions?limit=200',

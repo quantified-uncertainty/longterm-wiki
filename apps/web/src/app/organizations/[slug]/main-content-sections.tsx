@@ -15,6 +15,7 @@ import {
   titleCase,
   isUrl,
 } from "@/components/wiki/factbase/format";
+import { getRecordDisplayName } from "@/components/factbase/entity-detail-shared";
 import { FBRecordCollection } from "@/components/wiki/factbase/FBRecordCollection";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeFundingRoundCoverage, computeGenericCoverage } from "@/components/coverage/coverage-score";
@@ -67,7 +68,7 @@ export function FundingHistorySection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {[...rounds].reverse().map((round) => {
-              const name = field(round, "name") ?? titleCase(round.key);
+              const name = getRecordDisplayName(round);
               const date = field(round, "date");
               const raised = round.fields.raised;
               const valuation = round.fields.valuation;
@@ -268,7 +269,7 @@ export function ProductsSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {products.map((prod) => {
-              const name = field(prod, "name") ?? titleCase(prod.key);
+              const name = getRecordDisplayName(prod);
               const launched = field(prod, "launched");
               const description = field(prod, "description");
               const source = field(prod, "source");
@@ -350,7 +351,7 @@ export function SafetyMilestonesSection({
           </thead>
           <tbody className="divide-y divide-border/50">
             {milestones.map((ms) => {
-              const name = field(ms, "name") ?? titleCase(ms.key);
+              const name = getRecordDisplayName(ms);
               const date = field(ms, "date");
               const msType = field(ms, "type");
               const description = field(ms, "description");

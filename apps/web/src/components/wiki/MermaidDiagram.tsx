@@ -160,7 +160,7 @@ export function MermaidDiagram({ chart, children }: MermaidProps) {
 
   useEffect(() => {
     cancelledRef.current = false;
-    renderChart(0);
+    void renderChart(0);
     return () => { cancelledRef.current = true; };
   }, [chartText, retryCount, renderChart]);
 

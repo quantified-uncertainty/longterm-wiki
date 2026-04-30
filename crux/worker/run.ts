@@ -106,7 +106,9 @@ for (const sig of ['SIGTERM', 'SIGINT'] as const) {
     shuttingDown = true;
     // If idle (no jobs in flight), exit immediately
     if (activeJobIds.size === 0) {
-      cleanup().then(() => process.exit(0));
+      cleanup()
+        .then(() => process.exit(0))
+        .catch(() => process.exit(0));
     }
     // Otherwise, the main loop will exit after in-flight jobs complete
   });
@@ -186,6 +188,7 @@ let heartbeatInterval: ReturnType<typeof setInterval> | null = null;
 
 async function registerAgent(workerId: string, types: string[]): Promise<void> {
   const typeDesc = types.length > 0 ? types.join(', ') : 'all';
+  // typed-client-ok: QUA-770 baseline — worker control plane, internal endpoint
   const result = await apiRequest<{ id: number }>('POST', '/api/active-agents', {
     sessionId: workerId,
     task: `Job worker (types: ${typeDesc})`,
@@ -741,6 +744,8 @@ if (config.smokeTest) {
     .then(() => process.exit(0))
     .catch(err => {
       console.error(`[worker] Fatal error: ${err}`);
-      cleanup().then(() => process.exit(1));
+      cleanup()
+        .then(() => process.exit(1))
+        .catch(() => process.exit(1));
     });
 }

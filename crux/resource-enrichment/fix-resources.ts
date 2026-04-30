@@ -300,6 +300,7 @@ async function applyFixes(fixes: ResourceFix[], resources: Resource[]): Promise<
     }
 
     try {
+      // typed-client-ok: QUA-770 baseline — resource enrichment pipeline, internal write path
       const result = await apiRequest<{ id: string }>('POST', '/api/resources', body);
       if (result.ok) {
         applied++;

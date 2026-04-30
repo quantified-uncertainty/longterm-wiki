@@ -545,6 +545,7 @@ export async function defaultIngestDeps(opts: {
 
   async function postSync(path: string, items: unknown[]): Promise<void> {
     if (items.length === 0) return;
+    // typed-client-ok: QUA-770 baseline — framework ingest pipeline, internal write path
     const res = await apiRequest<{ upserted: number }>('POST', path, { items });
     if (!res.ok) {
       throw new Error(`${path} sync failed: ${res.error} — ${res.message}`);
@@ -556,6 +557,7 @@ export async function defaultIngestDeps(opts: {
     extractFrameworkThresholds: (o) => extractFrameworkThresholds(o),
     diffFrameworkVersions: (before, after, o) => diffFrameworkVersions(before, after, o),
     fetchExistingVersion: async (id) => {
+      // typed-client-ok: QUA-770 baseline — framework ingest pipeline, internal write path
       const res = await apiRequest<{ id: string }>(
         'GET',
         `/api/safety-framework-versions/${encodeURIComponent(id)}`,

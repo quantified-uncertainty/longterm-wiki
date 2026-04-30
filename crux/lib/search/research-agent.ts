@@ -515,6 +515,7 @@ interface PGSearchResponse {
  * and avoid redundant web searches for already-known content.
  */
 async function searchPGResources(query: string, limit: number = 20): Promise<SearchHit[]> {
+  // typed-client-ok: QUA-770 baseline — research agent, internal search tool
   const result = await apiRequest<PGSearchResponse>(
     'GET',
     `/api/resources/search?q=${encodeURIComponent(query)}&limit=${limit}`,

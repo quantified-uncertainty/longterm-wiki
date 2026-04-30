@@ -268,10 +268,14 @@ async function main(): Promise<void> {
   }
 
   if (APPLY_MODE && modifiedFiles.length > 0) {
+    // Best-effort telemetry — files are already written; don't fail the
+    // command if the wiki-server can't be reached.
     logBulkFixes(modifiedFiles, {
       tool: 'crux-fix',
       agency: 'automated',
       note: 'Fixed missing component imports',
+    }).catch((err) => {
+      console.warn(`Failed to record bulk fix log: ${err instanceof Error ? err.message : String(err)}`);
     });
   }
 

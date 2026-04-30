@@ -115,6 +115,7 @@ async function discoverCommand(options: Record<string, unknown>): Promise<Comman
 
   // Step 3: Fetch forum post author data
   console.log('  Loading forum post authors...');
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const forumPostsResult = await apiRequest<{ forumPosts: ForumPostRow[] }>(
     'GET', '/api/resources/forum-posts/all?limit=50000',
   );

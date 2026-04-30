@@ -84,6 +84,7 @@ async function fetchAllPersonnel(): Promise<PersonnelRecord[]> {
   let offset = 0;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
     const r = await apiRequest<{
       personnel: PersonnelRecord[];
       total: number;
@@ -102,6 +103,7 @@ async function fetchAllPersonnel(): Promise<PersonnelRecord[]> {
 }
 
 async function fetchAllGrantIds(): Promise<GrantRecord[]> {
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const r = await apiRequest<{
     grants: GrantRecord[];
     total: number;
@@ -297,6 +299,7 @@ export async function normalizeIds(
       const SKIP_REASON = encodeURIComponent("normalize-ids: fixing broken FK refs in-place; refs may not yet exist as entities");
       for (let i = 0; i < items.length; i += BATCH_SIZE) {
         const batch = items.slice(i, i + BATCH_SIZE);
+        // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
         const r = await apiRequest<{ upserted: number }>(
           "POST",
           `/api/personnel/sync?skipEntityValidation=true&skipEntityValidationReason=${SKIP_REASON}&forceSkipSourcing=true&reason=normalize-ids%3A+fixing+broken+FK+refs`, // skipEntityValidation-ok: normalize-ids backfill, see SKIP_REASON above
@@ -327,6 +330,7 @@ export async function normalizeIds(
       const BATCH_SIZE = 200;
       for (let i = 0; i < grantItems.length; i += BATCH_SIZE) {
         const batch = grantItems.slice(i, i + BATCH_SIZE);
+        // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
         const r = await apiRequest<{ updated: number }>(
           "PATCH",
           "/api/grants/batch-update-grantee",

@@ -2605,7 +2605,7 @@
     Meta AI agent achieving human-level performance in Diplomacy — a game requiring
     negotiation, alliance formation, and multi-party coordination. Published in Science
     (2022). Demonstrated AI can learn complex multi-party coordination with humans.
-  projectStatus: completed
+  projectStatus: archived
   tags:
     - game-theory
     - negotiation
@@ -2627,7 +2627,7 @@
     policy while agents learn economic behavior. Published in Science Advances (2022).
     Showed RL-designed tax policies improved equality-productivity tradeoffs over US tax
     schedules.
-  projectStatus: completed
+  projectStatus: archived
   tags:
     - mechanism-design
     - reinforcement-learning

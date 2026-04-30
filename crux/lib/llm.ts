@@ -24,6 +24,7 @@ import { createClient, MODELS, resolveModel } from './anthropic.ts';
 import { withRetry, startHeartbeat } from './resilience.ts';
 import type { CostTracker } from './cost-tracker.ts';
 import { getApiKey } from './api-keys.ts';
+import { OpenRouterChatResponseSchema } from './openrouter-schemas.ts';
 
 // ---------------------------------------------------------------------------
 // OpenRouter routing
@@ -196,19 +197,20 @@ async function callOpenRouterAsAnthropic(
     }),
   });
 
-  const data = await response.json() as {
-    error?: { message?: string };
-    choices: Array<{ message: { content: string }; finish_reason: string }>;
-    model: string;
-    usage: { prompt_tokens: number; completion_tokens: number; cost?: number };
-  };
+  const rawJson: unknown = await response.json().catch(() => ({}));
+  const parsedResponse = OpenRouterChatResponseSchema.safeParse(rawJson);
+  if (!parsedResponse.success) {
+    throw new Error(`OpenRouter response failed schema validation: ${parsedResponse.error.message.slice(0, 200)}`);
+  }
+  const data = parsedResponse.data;
 
   if (!response.ok || data.error) {
     const msg = data.error?.message || `HTTP ${response.status}`;
     throw new Error(`OpenRouter error: ${msg}`);
   }
 
-  const text = data.choices[0]?.message?.content || '';
+  const firstChoice = data.choices[0];
+  const text = firstChoice?.message?.content || '';
   const usage = {
     input_tokens: data.usage?.prompt_tokens || 0,
     output_tokens: data.usage?.completion_tokens || 0,
@@ -230,7 +232,7 @@ async function callOpenRouterAsAnthropic(
     role: 'assistant',
     content: [{ type: 'text', text }],
     model: data.model || model,
-    stop_reason: data.choices[0]?.finish_reason === 'length' ? 'max_tokens' : 'end_turn',
+    stop_reason: firstChoice?.finish_reason === 'length' ? 'max_tokens' : 'end_turn',
     stop_sequence: null,
     usage,
   } as Anthropic.Messages.Message;

@@ -115,7 +115,7 @@ function CauseEffectGraphInner({
   // Fit view handler for the "Fit All" button
   const handleFitView = useCallback(() => {
     if (reactFlowInstance.current) {
-      reactFlowInstance.current.fitView({ padding: fitViewPadding, duration: 300 });
+      void reactFlowInstance.current.fitView({ padding: fitViewPadding, duration: 300 });
     }
   }, [fitViewPadding]);
   const [isFullscreen, setIsFullscreen] = useState(false);

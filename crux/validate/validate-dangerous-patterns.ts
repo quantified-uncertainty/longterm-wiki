@@ -37,10 +37,20 @@
  * Usage: npx tsx crux/validate/validate-dangerous-patterns.ts
  */
 
-import { readFileSync, readdirSync, statSync } from 'fs';
+import { readFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import {
+  extractInlineComment as sharedExtractInlineComment,
+  buildSuppressionRegex as sharedBuildSuppressionRegex,
+} from './lib/comment-utils.ts';
+import { collectTsFiles } from './lib/file-walker.ts';
+
+// Re-export for backward-compat with this validator's test file. The shared
+// implementation lives in `./lib/comment-utils.ts` and is used by both
+// `validate-dangerous-patterns.ts` and `validate-typed-client.ts`.
+export const extractInlineComment = sharedExtractInlineComment;
 
 /** Directories to scan (relative to PROJECT_ROOT). */
 const SCAN_DIRS = [
@@ -157,75 +167,16 @@ const AS_ANY_PATTERN = /\bas\s+any\b|\bas\s+unknown\s+as\b/;
 // skipEntityValidation-ok: regex pattern references the bypass keyword by design
 const SKIP_ENTITY_VALIDATION_PATTERN = /["'`][^"'`]*[?&]skipEntityValidation=true/;
 
-/**
- * Build a strict suppression-marker regex. The marker MUST appear in the form
- * `<marker>: <reason>` (with a non-empty reason after the colon). The caller
- * passes only the comment portion of a line, so this regex never sees code
- * outside of comments.
- *
- * Reviewed from the diff subagent finding HIGH#1 — `String.includes()` was
- * too permissive.
- */
-function buildSuppressionRegex(marker: string): RegExp {
-  const escaped = marker.replace(/[-/\\^$*+?.()|[\]{}]/g, '\\$&');
-  return new RegExp(`\\b${escaped}\\s*:\\s*\\S`);
-}
-
+// Suppression-marker regexes, one per pattern. Built from the shared
+// `buildSuppressionRegex` helper in `./lib/comment-utils.ts`. The marker
+// MUST appear as `<marker>: <reason>` (non-empty reason) — see
+// `lib/comment-utils.ts` for the regex shape.
 const SUPPRESSION_REGEXES: Record<PatternId, RegExp> = Object.fromEntries(
   Object.entries(PATTERN_META).map(([id, meta]) => [
     id,
-    buildSuppressionRegex(meta.suppressionMarker),
+    sharedBuildSuppressionRegex(meta.suppressionMarker),
   ]),
 ) as Record<PatternId, RegExp>;
-
-/**
- * Extract the inline comment portion of a line, ignoring `//` sequences that
- * appear inside string or template literals. Returns the comment text (the
- * substring after the `//`) or `null` if there is no real inline comment.
- *
- * Implementation: walk the line character-by-character tracking string state.
- * Handles single quotes, double quotes, backticks, and escape sequences.
- *
- * This protects suppression detection from false positives where a marker
- * keyword appears inside a string literal (PR review HIGH#1 follow-up).
- *
- * Exported for unit tests.
- */
-export function extractInlineComment(line: string): string | null {
-  let i = 0;
-  let inSingle = false;
-  let inDouble = false;
-  let inBacktick = false;
-  while (i < line.length) {
-    const ch = line[i];
-    const next = line[i + 1];
-    if (inSingle) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === "'") inSingle = false;
-    } else if (inDouble) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '"') inDouble = false;
-    } else if (inBacktick) {
-      if (ch === '\\') { i += 2; continue; }
-      if (ch === '`') inBacktick = false;
-    } else {
-      if (ch === "'") inSingle = true;
-      else if (ch === '"') inDouble = true;
-      else if (ch === '`') inBacktick = true;
-      else if (ch === '/' && next === '/') {
-        return line.slice(i + 2);
-      }
-      else if (ch === '/' && next === '*') {
-        // Block comment — return everything after `/*`. The regex tolerates
-        // trailing `*/` because the marker form is `<marker>: <reason>` and
-        // a trailing `*/` doesn't match `\b<marker>`.
-        return line.slice(i + 2);
-      }
-    }
-    i++;
-  }
-  return null;
-}
 
 /**
  * Check a single line for all enabled patterns. Returns the patterns matched,
@@ -289,46 +240,6 @@ export function checkLine(
     if (prevComment !== null && re.test(prevComment)) return false;
     return true;
   });
-}
-
-// ---------------------------------------------------------------------------
-// File walking
-// ---------------------------------------------------------------------------
-
-/** Recursively collect .ts files, excluding tests and node_modules. */
-function collectTsFiles(dir: string): string[] {
-  const results: string[] = [];
-
-  function walk(current: string): void {
-    let entries: string[];
-    try {
-      entries = readdirSync(current);
-    } catch {
-      return;
-    }
-
-    for (const entry of entries) {
-      const fullPath = join(current, entry);
-      let stat;
-      try {
-        stat = statSync(fullPath);
-      } catch {
-        continue;
-      }
-
-      if (stat.isDirectory()) {
-        if (entry === '__tests__' || entry === 'node_modules' || entry === 'dist') {
-          continue;
-        }
-        walk(fullPath);
-      } else if (entry.endsWith('.ts') && !entry.endsWith('.test.ts')) {
-        results.push(fullPath);
-      }
-    }
-  }
-
-  walk(dir);
-  return results;
 }
 
 function isRouteFile(absPath: string): boolean {

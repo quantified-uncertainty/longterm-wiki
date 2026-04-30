@@ -74,6 +74,7 @@ import {
   getWikiServerWarningCount,
   getSkippedDataSources,
   setFullBuildMode,
+  isStrictWikiServerMode,
 } from './lib/wiki-server-data.mjs';
 import {
   buildPagesRegistry,
@@ -1220,10 +1221,39 @@ async function main() {
   // =========================================================================
   // PRE-WRITE SAFETY CHECK — abort before writing if data is corrupt
   // =========================================================================
+  // Two classes of fail-closed errors block the build before output is written:
+  //   1. YAML parse errors (always fatal — the YAML files are authoritative,
+  //      and a parse error means we'd silently drop data the wiki depends on).
+  //   2. Wiki-server unreachable IN CI (full build only). CI runs against
+  //      authenticated prod, so a missed fetch indicates a real regression —
+  //      shipping a partial database.json would surface as broken UI in prod.
+  //      Local dev / agent slots fall through to a warning so offline iteration
+  //      keeps working. See `isStrictWikiServerMode()` for the policy.
   const totalYamlErrors = yamlParseErrorCount + getPagesBuilderYamlErrors();
   if (totalYamlErrors > 0) {
     console.error(`\n❌ Build aborted: ${totalYamlErrors} YAML parse error(s) found. Fix them before building.`);
     console.error('database.json was NOT written — the previous version is preserved.');
+    process.exit(1);
+  }
+  const totalWikiServerWarningsPreWrite = getWikiServerWarningCount();
+  if (
+    totalWikiServerWarningsPreWrite > 0 &&
+    isStrictWikiServerMode({ contentOnly: CONTENT_ONLY })
+  ) {
+    const skipped = getSkippedDataSources();
+    console.error(
+      `\n❌ Build aborted: ${totalWikiServerWarningsPreWrite} wiki-server API call(s) failed in CI.`,
+    );
+    console.error('   CI builds require complete wiki-server data; the missing sources were:');
+    for (const source of skipped) {
+      console.error(`     - ${source}`);
+    }
+    console.error(
+      '   Investigate wiki-server availability and retry. To bypass for an emergency build,',
+    );
+    console.error(
+      '   re-run with `CI=` (unset). database.json was NOT written — the previous version is preserved.',
+    );
     process.exit(1);
   }
 
@@ -1306,8 +1336,10 @@ async function main() {
   // ==========================================================================
   // BUILD HEALTH REPORT
   // ==========================================================================
-  // Note: YAML errors are already checked before writing output files above.
-  // If we reach this point, totalYamlErrors is guaranteed to be 0.
+  // Note: YAML errors AND (in CI) wiki-server warnings were already checked
+  // pre-write above. If we reach this point, the build either had no failures,
+  // or wiki-server warnings were encountered outside CI (degraded but not
+  // fatal). The summary below is informational.
   const totalWikiServerWarnings = getWikiServerWarningCount();
 
   console.log('\n--- Build Health ---');
@@ -1323,7 +1355,7 @@ async function main() {
     for (const source of skipped) {
       console.warn(`     - ${source}`);
     }
-    console.warn('   If this is CI, the build output is incomplete — investigate wiki-server availability.');
+    console.warn('   This is non-fatal outside CI; in CI the pre-write check would have aborted the build.');
   } else if (totalWikiServerWarnings > 0) {
     console.warn(`\nNote: ${totalWikiServerWarnings} wiki-server API call(s) failed (expected in content-only mode).`);
   }

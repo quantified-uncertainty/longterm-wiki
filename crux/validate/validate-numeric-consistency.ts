@@ -455,5 +455,8 @@ async function main() {
 }
 
 if (process.argv[1] === fileURLToPath(import.meta.url)) {
-  main();
+  main().catch((err) => {
+    console.error("validate-numeric-consistency crashed:", err);
+    process.exit(1);
+  });
 }

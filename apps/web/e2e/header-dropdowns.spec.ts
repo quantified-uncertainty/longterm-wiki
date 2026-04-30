@@ -36,6 +36,37 @@ test.describe("Header dropdown menus", () => {
     ).toBeVisible();
   });
 
+  test("Policy dropdown surfaces Safety Scorecards (QUA-840)", async ({ page }) => {
+    await page.goto("/");
+
+    const policyButton = page.locator("header button", { hasText: "Policy" });
+    await expect(policyButton).toBeVisible({ timeout: 10000 });
+    await policyButton.click();
+
+    const scorecardsLink = page.locator("header a", {
+      hasText: "Safety Scorecards",
+    });
+    await expect(scorecardsLink).toBeVisible({ timeout: 10000 });
+    await expect(scorecardsLink).toHaveAttribute("href", "/scorecards");
+
+    await expect(
+      page.locator("header a", { hasText: "Legislation" })
+    ).toBeVisible();
+    await expect(
+      page.locator("header a", { hasText: "Politicians" })
+    ).toBeVisible();
+  });
+
+  test("Safety Scorecards link navigates to /scorecards (QUA-840)", async ({
+    page,
+  }) => {
+    await page.goto("/");
+
+    await page.locator("header button", { hasText: "Policy" }).click();
+    await page.locator("header a", { hasText: "Safety Scorecards" }).click();
+    await expect(page).toHaveURL(/\/scorecards/, { timeout: 15000 });
+  });
+
   test("dropdown items are not clipped by overflow", async ({ page }) => {
     await page.goto("/");
 

@@ -668,7 +668,7 @@ export function EntitySourcingViewer() {
 
   // Load all verdicts on mount (paginated), then resolve names
   useEffect(() => {
-    (async () => {
+    void (async () => {
       try {
         // Fetch verdicts and coverage in parallel
         const coveragePromise = fetch("/api/sourcing-coverage-proxy")

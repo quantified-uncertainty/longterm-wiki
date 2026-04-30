@@ -147,6 +147,7 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
   const limit = 200;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — resource pipeline I/O, internal data flow
     const result = await apiRequest<PGResourcesResponse>(
       'GET',
       `/api/resources/all?limit=${limit}&offset=${offset}`,
@@ -163,6 +164,7 @@ async function fetchResourcesFromPG(): Promise<Resource[] | null> {
 
   // Fetch bulk citations
   let citationsIndex: Record<string, string[]> = {};
+  // typed-client-ok: QUA-770 baseline — resource pipeline I/O, internal data flow
   const citResult = await apiRequest<PGCitationsResponse>(
     'GET',
     '/api/resources/citations/all',

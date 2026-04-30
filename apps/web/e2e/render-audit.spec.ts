@@ -116,6 +116,8 @@ const SIMPLE_PAGES = [
   "/data-sources/ea-funds",  // Data source detail page (QUA-81)
   "/frontier-safety-frameworks",  // QUA-709 directory page
   "/frontier-safety-frameworks/methodology",  // QUA-709 methodology
+  "/scorecards",  // QUA-688 scorecards directory
+  "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -154,13 +156,16 @@ test.describe("Render audit — tabbed pages", () => {
       // access (QUA-763).
       if (STAT_CARD_PAGES.includes(url)) {
         const cards = page.locator('[data-testid="stat-card"]');
+        // Auto-retry until at least one stat-card is attached. Pages in
+        // STAT_CARD_PAGES are guaranteed to have them (Microsoft is excluded);
+        // if none appear within the timeout, that's a real regression and
+        // toBeAttached fails the test with a clear message. The previous
+        // count > 0 snapshot check flaked on the render-monitor cron when
+        // hitting prod from CI — Suspense boundaries / hydration timing
+        // could produce a transient count of 0 even when the markup was
+        // present (QUA-822).
+        await expect(cards.first()).toBeAttached({ timeout: 5000 });
         const count = await cards.count();
-        // Guard against silent no-op if data-testid is removed by a refactor.
-        // Pages in STAT_CARD_PAGES are guaranteed to have stat cards (see the
-        // list comment above — Microsoft is excluded for that reason).
-        expect
-          .soft(count > 0, `No [data-testid="stat-card"] elements on ${url}`)
-          .toBe(true);
         for (let i = 0; i < count; i++) {
           const value = (await cards.nth(i).locator(".text-xl, .text-2xl, .text-3xl, .tabular-nums").first().textContent())?.trim() ?? "";
           expect.soft(value.length > 0, `Empty stat card in ${url} (${i + 1}/${count})`).toBe(true);
@@ -256,6 +261,83 @@ test.describe("Render audit — critical data tables", () => {
         `Dario row should have 2 fact sourcing links (pledge + ea align). hrefs: ${dariohrefs.join(", ")}`,
       ).toBe(2);
     }
+  });
+});
+
+test.describe("Render audit — scorecards sourcing dots (QUA-839)", () => {
+  // Scorecard grades got SourceCheckDot indicators in QUA-839. Each
+  // populated matrix cell renders one dot via SourcingDot
+  // (role="img", aria-label starts with "Sourcing:"). Empty cells (em-dash
+  // placeholders) render no dot. Regression check: at least one dot must
+  // appear on /scorecards once any grade has been ingested.
+  test("/scorecards renders sourcing dots in matrix cells", async ({ page }) => {
+    await loadPage(page, "/scorecards");
+
+    // Gate on the matrix's own h2, which only renders when `orgRows.length > 0`.
+    // Three failure modes look different in the page text and we want to skip
+    // all of them, not just the "no grades ingested" one:
+    //   1. wiki-server unreachable in CI (LONGTERMWIKI_SERVER_URL unset) →
+    //      "The wiki-server was unreachable" panel
+    //   2. wiki-server reachable but no grades ingested →
+    //      "No scorecard grades ingested yet" panel
+    //   3. wiki-server reachable + grades ingested → matrix h2 visible
+    // A negation check on the "no grades" string falsely passes case 1.
+    const matrixHeading = page.getByRole("heading", {
+      name: /overall grades.*latest wave/i,
+    });
+    if ((await matrixHeading.count()) === 0) return;
+
+    const dots = await page
+      .locator('[role="img"][aria-label^="Sourcing:"]')
+      .count();
+    expect(
+      dots,
+      "/scorecards should render at least one sourcing dot once grades are ingested",
+    ).toBeGreaterThan(0);
+  });
+
+  // Org-tab scorecards section must also render a dot for each panel grade.
+  // Anthropic is a stable target — it's covered by all five scorecard sources.
+  test("/organizations/anthropic ?tab=scorecards renders sourcing dots", async ({ page }) => {
+    await loadPage(page, "/organizations/anthropic");
+
+    // Positive load assertion — fail loudly if the org page itself broke
+    // (vs. silently passing every "no scorecards tab" branch below).
+    await expect(page.locator("h1, h2").first()).toBeVisible({ timeout: 10000 });
+
+    // Click the Scorecards tab if present. The tab is suppressed when the
+    // org has no grades, so a missing tab is acceptable in CI builds where
+    // wiki-server isn't reachable.
+    const scorecardsTab = page.getByRole("tab", { name: /scorecards/i });
+    if ((await scorecardsTab.count()) === 0) return;
+
+    await scorecardsTab.click();
+
+    // Scope to the scorecards panels rather than the whole page — the
+    // EntityProfileShell header always renders its own rollup sourcing
+    // dot, so a global page count would pass even without QUA-839's
+    // per-grade dots. Each scorecard panel is keyed by its publisher
+    // ("by Future of Life Institute"), so we look for sourcing dots that
+    // live inside one of those panels.
+    //
+    // Use toBeAttached() polling instead of a hardcoded waitForTimeout —
+    // QUA-822 retrospective showed fixed timeouts flake on slow renders
+    // and waste time on fast ones.
+    const fliPanel = page.locator("article", {
+      hasText: "Future of Life Institute",
+    });
+    try {
+      await expect(fliPanel.first()).toBeAttached({ timeout: 5000 });
+    } catch {
+      return; // tab present but no FLI grades — acceptable; nothing to assert
+    }
+    const dotsInPanel = await fliPanel
+      .locator('[role="img"][aria-label^="Sourcing:"]')
+      .count();
+    expect(
+      dotsInPanel,
+      "FLI scorecard panel should render at least one sourcing dot",
+    ).toBeGreaterThan(0);
   });
 });
 

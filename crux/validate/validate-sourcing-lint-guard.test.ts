@@ -115,18 +115,13 @@ describe('countInText', () => {
   });
 
   it('runCheck passes on the current codebase (baseline must not regress)', () => {
-    // Regression guard: enforce the ratchet only on main. Feature branches
-    // that add source-check-related code naturally increase the count
-    // temporarily; the ratchet catches it when they merge to main via the
-    // gate check. Running it on every PR branch causes cascading CI failures
-    // for PRs that aren't part of the rename effort (see QUA-238).
-    const branch = process.env.GITHUB_REF ?? '';
-    if (branch && !branch.includes('refs/heads/main')) {
-      // On a PR branch — skip the ratchet assertion, just verify the check runs
-      const result = runCheck();
-      expect(result.baseline).not.toBeNull();
-      return;
-    }
+    // Enforced on every branch (QUA-820). Previously this was advisory on PR
+    // branches per QUA-238 — with baseline at ~1,400 references, every rebase
+    // inherited stale counts and broke unrelated PRs. Now that baseline is
+    // frozen at 1, the only legitimate way to fail is to add a new
+    // sourcing-check reference, which is exactly what we want PR CI to catch.
+    // The 2026-04-28/29 incident (3 fix-PRs in 12h) showed that deferring
+    // enforcement to main causes a fix-cycle pattern instead of preventing it.
     const result = runCheck();
     expect(result.passed).toBe(true);
     expect(result.baseline).not.toBeNull();

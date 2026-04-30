@@ -15,6 +15,7 @@ import {
 } from "../shared/utils.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
+import { writeInlineVerdicts, logSourcingCoverage } from "../tablebase/write-inline-verdicts.js";
 import { logger } from "../../logger.js";
 
 // ---- Constants ----
@@ -493,7 +494,7 @@ const factsApp = new Hono()
         `[facts/sync] Skipping ${skipped.length} facts for ${missingEntities.length} missing entities: ${missingEntities.slice(0, 10).join(", ")}${missingEntities.length > 10 ? ` ... (+${missingEntities.length - 10} more)` : ""}`
       );
       if (items.length === 0) {
-        return c.json({ upserted: 0, skipped: skipped.length });
+        return c.json({ upserted: 0, verdictsWritten: 0, skipped: skipped.length });
       }
     }
 
@@ -521,6 +522,7 @@ const factsApp = new Hono()
     }
 
     let upserted = 0;
+    let verdictsWritten = 0;
 
     try {
       await db.transaction(async (tx) => {
@@ -593,13 +595,32 @@ const factsApp = new Hono()
           })
         );
 
+        // QUA-729 Phase A: persist inline sourcing verdicts. Keyed on
+        // (record_type='fact', record_id=factId) to match the convention used
+        // by `factbase-sourcing` and the read path. recordId is the YAML
+        // factId (10-char), not the bigserial PG id, so the verdict survives
+        // a full re-sync.
+        const verdictRecords = items
+          .filter((f) => f.sourcing != null)
+          .map((f) => ({
+            recordType: "fact" as const,
+            recordId: f.factId,
+            entityId: f.entityId,
+            sourceUrl: f.source ?? null,
+            sourcing: f.sourcing!,
+          }));
+        const verdictsResult = await writeInlineVerdicts(tx, verdictRecords);
+        verdictsWritten = verdictsResult.written;
+
         upserted = allVals.length;
       });
     } catch (err) {
       return dbError(c, "facts sync", err, { factCount: items.length });
     }
 
-    return c.json({ upserted });
+    logSourcingCoverage("facts/sync", items.length, verdictsWritten);
+
+    return c.json({ upserted, verdictsWritten });
   })
 
   // ---- POST /prune ----

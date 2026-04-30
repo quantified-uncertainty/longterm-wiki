@@ -347,6 +347,32 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-700: catches `${{ secrets.X }}` references in workflow YAMLs that
+    // don't resolve to a real repo or org-inherited secret (the QUA-676
+    // root cause). Advisory because (a) forks/local environments lack gh
+    // auth — the validator fails open in that case anyway — and (b) at
+    // ship time there are 17 pre-existing pending references being tracked
+    // for cleanup. Flip to blocking once the existing list is at zero.
+    id: 'workflow-secrets',
+    name: 'Workflow secret references resolve',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-workflow-secrets.ts'],
+    cwd: PROJECT_ROOT,
+    advisory: true,
+  },
+  {
+    // QUA-388: ESLint with @typescript-eslint/no-floating-promises.
+    // Blocking. Catches unhandled-promise patterns that ranked highest
+    // in the PR-review survey (~18% of findings). Each future rule
+    // (no-misused-promises, import/no-unresolved, etc.) lands as its
+    // own follow-up PR.
+    id: 'eslint',
+    name: 'ESLint (no-floating-promises)',
+    command: 'pnpm',
+    args: ['lint'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     id: 'no-anthropic-api-key-read',
     name: 'No raw Anthropic CLI env-var reads in source (QUA-612)',
     command: 'npx',
@@ -403,6 +429,17 @@ const PARALLEL_STEPS: Step[] = [
     command: 'npx',
     args: ['tsx', 'crux/validate/validate-dangerous-patterns.ts'],
     cwd: PROJECT_ROOT,
+  },
+  {
+    id: 'typed-client',
+    name: 'Direct apiRequest<T> calls (QUA-770) — must use typed wiki-server client or // typed-client-ok marker',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-typed-client.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: prevents new hand-written apiRequest<T> calls from
+    // bypassing the typed wiki-server client modules. Existing callers
+    // are annotated with // typed-client-ok: <reason> as a baseline;
+    // see QUA-770 for the migration plan.
   },
   {
     id: 'factbase-stableid',

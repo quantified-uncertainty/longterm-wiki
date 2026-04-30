@@ -20,11 +20,12 @@
  * Linear: QUA-220
  */
 
+import { z } from 'zod';
 import type { CommandResult } from '../lib/command-types.ts';
 import { CostTracker } from '../lib/cost-tracker.ts';
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { CreditExhaustedError, isCreditExhaustedError } from '../lib/resilience.ts';
-import { parseJsonResponse } from '../lib/anthropic.ts';
+import { parseAndValidateArray } from '../lib/json-parsing.ts';
 import { getEntity, searchEntities } from '../lib/wiki-server/entities.ts';
 import { getPersonnelByEntity, syncPersonnel } from '../lib/wiki-server/personnel.ts';
 import { getVerdictsByEntity, type ByEntityResponse } from '../lib/wiki-server/sourcing.ts';
@@ -54,6 +55,17 @@ const NEEDS_CURATION_VERDICTS = new Set([
   'outdated',
   'contradicted',
 ]);
+
+/**
+ * Schema for a single URL-research result item. The outer response is an
+ * array; `parseAndValidateArray` validates each item individually so a
+ * single malformed entry doesn't drop the entire batch.
+ */
+const ResearchUrlItemSchema = z.object({
+  index: z.number().int().nonnegative(),
+  urls: z.array(z.string()),
+  reasoning: z.string().optional().default(''),
+}).passthrough();
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -162,6 +174,7 @@ type FindEntitiesResult =
 
 async function findEntitiesNeedingCuration(limit: number): Promise<FindEntitiesResult> {
   // Fetch organizations with verdict summary
+  // typed-client-ok: QUA-770 baseline — CLI command, follow-up migration to typed client tracked
   const result = await apiRequest<{
     entities: Array<{
       id: string;
@@ -375,19 +388,13 @@ If you cannot find a good URL for a record, omit it from the array.`;
       label: 'flagship-curate-research',
     });
 
-    const parsed = parseJsonResponse(result.text) as Array<{
-      index: number;
-      urls: string[];
-      reasoning: string;
-    }> | null;
-
-    if (!parsed || !Array.isArray(parsed)) {
+    const items = parseAndValidateArray(result.text, ResearchUrlItemSchema, 'flagship-curate-research');
+    if (items.length === 0) {
       console.warn(`${LOG_PREFIX} Failed to parse research response`);
       return [];
     }
 
-    for (const item of parsed) {
-      if (typeof item.index !== 'number' || !Array.isArray(item.urls)) continue;
+    for (const item of items) {
       const record = records[item.index];
       if (!record) continue;
 

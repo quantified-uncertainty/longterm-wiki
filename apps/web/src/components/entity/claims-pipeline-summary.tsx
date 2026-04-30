@@ -25,7 +25,7 @@ export function ClaimsPipelineSummary({ entityId }: { entityId: string }) {
   useEffect(() => {
     setData(null);
     const ac = new AbortController();
-    (async () => {
+    void (async () => {
       try {
         const res = await fetch(
           `/api/claims-by-entity-proxy?entity_id=${encodeURIComponent(entityId)}&limit=200`,

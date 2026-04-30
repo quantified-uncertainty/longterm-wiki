@@ -277,6 +277,7 @@ export async function collectRecordItems(
 
       while (true) {
         const apiPath = `${apiBasePath}?limit=${API_PAGE_LIMIT}&offset=${offset}`;
+        // typed-client-ok: QUA-770 baseline — sourcing pipeline, internal write path
         const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
         if (!response.ok) {
           console.warn(`[sourcing] Failed to fetch ${recordType}: ${response.message}`);

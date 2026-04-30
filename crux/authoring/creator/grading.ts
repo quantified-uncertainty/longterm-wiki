@@ -220,6 +220,8 @@ Respond with JSON:
       tool: 'crux-grade',
       agency: 'automated',
       note: `Initial creation grading: quality=${quality}, readerImportance=${grades.readerImportance}`,
+    }).catch((err) => {
+      console.warn(`Failed to record grading in edit log: ${err instanceof Error ? err.message : String(err)}`);
     });
 
     log('grade', `Graded: readerImp=${grades.readerImportance}, qual=${quality}`);

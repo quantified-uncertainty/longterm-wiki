@@ -7,6 +7,16 @@ import {
   getBenchmarkResultsFromModels,
 } from "../benchmark-utils";
 import { resolveSlugAlias } from "@/data/factbase";
+import { ProfileStatCard } from "@/components/directory";
+import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
+import {
+  fetchEntitySourcingSummary,
+  rollupVerdictFromSummary,
+} from "@/components/entity/entity-sourcing";
+import {
+  computeBenchmarkCoverage,
+  getBenchmarkSignals,
+} from "@/components/coverage/coverage-score";
 
 export function generateStaticParams() {
   return getBenchmarkSlugs().map((slug) => ({ slug }));
@@ -119,213 +129,199 @@ export default async function BenchmarkDetailPage({
       : []),
   ];
 
+  // Sourcing rollup verdict
+  const sourcingSummary = await fetchEntitySourcingSummary([
+    entity.id,
+    entity.stableId ?? "",
+    slug,
+  ]);
+  const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
+
+  const coverageInput = {
+    category: entity.category,
+    scoringMethod: entity.scoringMethod,
+    introducedDate: entity.introducedDate,
+    maintainer: entity.maintainer,
+    description: entity.description,
+    modelsCount: modelCount,
+    wikiId: entity.wikiId,
+  };
+  const coverageScore = computeBenchmarkCoverage(coverageInput);
+  const coverageSignals = getBenchmarkSignals(coverageInput);
+
+  const titlePills = entity.category ? (
+    <span
+      className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+        CATEGORY_COLORS[entity.category] ?? "bg-gray-100 text-gray-600"
+      }`}
+    >
+      {entity.category.charAt(0).toUpperCase() + entity.category.slice(1)}
+    </span>
+  ) : null;
+
+  const headerLinks = [
+    ...(entity.wikiId
+      ? [{ label: "Wiki page", href: `/wiki/${entity.wikiId}` }]
+      : []),
+    ...(entity.website
+      ? [{ label: "Website", href: entity.website, external: true }]
+      : []),
+    { label: "Data", href: `/benchmarks/${slug}/data` },
+  ];
+
+  const statCards = stats.length > 0 && (
+    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+      {stats.map((stat) => (
+        <ProfileStatCard key={stat.label} label={stat.label} value={stat.value} />
+      ))}
+    </div>
+  );
+
   return (
-    <div className="max-w-[70rem] mx-auto px-6 py-8">
-      {/* Breadcrumbs */}
-      <nav className="flex items-center gap-1.5 text-xs text-muted-foreground mb-6">
-        <Link href="/benchmarks" className="hover:text-foreground transition-colors">
-          Benchmarks
-        </Link>
-        <span>/</span>
-        <span className="text-foreground font-medium">{entity.title}</span>
-      </nav>
-
-      {/* Header */}
-      <div className="mb-8">
-        <div className="flex items-center gap-3 mb-2">
-          <h1 className="text-3xl font-extrabold tracking-tight">
-            {entity.title}
-          </h1>
-          {entity.category && (
-            <span
-              className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                CATEGORY_COLORS[entity.category] ?? "bg-gray-100 text-gray-600"
-              }`}
-            >
-              {entity.category.charAt(0).toUpperCase() + entity.category.slice(1)}
-            </span>
-          )}
-        </div>
-        {entity.description && (
-          <p className="text-muted-foreground text-sm max-w-3xl leading-relaxed">
-            {entity.description}
-          </p>
-        )}
-        <div className="flex items-center gap-4 mt-3 text-sm">
-          {entity.wikiId && (
-            <Link
-              href={`/wiki/${entity.wikiId}`}
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Wiki page &rarr;
-            </Link>
-          )}
-          {entity.website && (
-            <a
-              href={entity.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-primary hover:text-primary/80 font-medium transition-colors"
-            >
-              Website &rarr;
-            </a>
-          )}
-          <Link
-            href={`/benchmarks/${slug}/data`}
-            className="text-primary hover:text-primary/80 font-medium transition-colors"
-          >
-            Data &rarr;
-          </Link>
-        </div>
-      </div>
-
-      {/* Stat cards */}
-      {stats.length > 0 && (
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-8">
-          {stats.map((stat) => (
-            <div
-              key={stat.label}
-              className="rounded-xl border border-border/60 bg-gradient-to-br from-card to-muted/30 p-4"
-            >
-              <div className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground/70 mb-1">
-                {stat.label}
-              </div>
-              <div className="text-2xl font-bold tabular-nums tracking-tight">
-                {stat.value}
-              </div>
+    <EntityProfileShell
+      breadcrumbs={[
+        { label: "Benchmarks", href: "/benchmarks" },
+        { label: entity.title },
+      ]}
+      entityId={entity.id}
+      title={entity.title}
+      titlePills={titlePills}
+      coverage={{ score: coverageScore, signals: coverageSignals }}
+      verdict={rollupVerdict}
+      subtitle={entity.description || undefined}
+      headerLinks={headerLinks}
+      statCards={statCards}
+    >
+      <div className="space-y-8">
+        {/* Details */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+          {entity.scoringMethod && (
+            <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
+              <span className="text-muted-foreground">Scoring: </span>
+              <span className="font-medium">{entity.scoringMethod}</span>
             </div>
-          ))}
+          )}
+          {entity.introducedDate && (
+            <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
+              <span className="text-muted-foreground">Introduced: </span>
+              <span className="font-medium">{entity.introducedDate}</span>
+            </div>
+          )}
+          {entity.maintainer && (
+            <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
+              <span className="text-muted-foreground">Maintainer: </span>
+              <span className="font-medium">{entity.maintainer}</span>
+            </div>
+          )}
         </div>
-      )}
 
-      {/* Details */}
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-8 text-sm">
-        {entity.scoringMethod && (
-          <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
-            <span className="text-muted-foreground">Scoring: </span>
-            <span className="font-medium">{entity.scoringMethod}</span>
-          </div>
-        )}
-        {entity.introducedDate && (
-          <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
-            <span className="text-muted-foreground">Introduced: </span>
-            <span className="font-medium">{entity.introducedDate}</span>
-          </div>
-        )}
-        {entity.maintainer && (
-          <div className="px-4 py-3 rounded-lg border border-border/60 bg-card">
-            <span className="text-muted-foreground">Maintainer: </span>
-            <span className="font-medium">{entity.maintainer}</span>
-          </div>
-        )}
-      </div>
+        {/* Leaderboard */}
+        {sorted.length > 0 ? (
+          <section>
+            <h2 className="text-lg font-bold tracking-tight mb-4">
+              Leaderboard
+              <span className="ml-2 text-sm font-normal text-muted-foreground">
+                {sorted.length} {sorted.length === 1 ? "model" : "models"}
+              </span>
+            </h2>
+            <div className="border border-border rounded-xl overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
+                    <th className="py-2.5 px-3 text-center w-12">#</th>
+                    <th className="py-2.5 px-3 text-left font-medium">Model</th>
+                    <th className="py-2.5 px-3 text-left font-medium">Developer</th>
+                    <th className="py-2.5 px-3 text-left font-medium w-[40%]">Score</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-border/50">
+                  {sorted.map((row, i) => {
+                    // Bar width: normalize score relative to range, with min bar at 15%
+                    // For lower-is-better benchmarks, invert so lower scores get wider bars
+                    const rawNormalized =
+                      maxScore > minScore
+                        ? (row.score - minScore) / (maxScore - minScore)
+                        : 0.5;
+                    const adjusted = entity.higherIsBetter ? rawNormalized : 1 - rawNormalized;
+                    const barPct = 15 + adjusted * 85;
+                    const barColor =
+                      DEVELOPER_BAR_COLORS[row.developer ?? ""] ??
+                      "bg-primary/20 dark:bg-primary/15";
 
-      {/* Leaderboard */}
-      {sorted.length > 0 ? (
-        <section>
-          <h2 className="text-lg font-bold tracking-tight mb-4">
-            Leaderboard
-            <span className="ml-2 text-sm font-normal text-muted-foreground">
-              {sorted.length} {sorted.length === 1 ? "model" : "models"}
-            </span>
-          </h2>
-          <div className="border border-border rounded-xl overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-xs text-muted-foreground border-b border-border bg-muted/30">
-                  <th className="py-2.5 px-3 text-center w-12">#</th>
-                  <th className="py-2.5 px-3 text-left font-medium">Model</th>
-                  <th className="py-2.5 px-3 text-left font-medium">Developer</th>
-                  <th className="py-2.5 px-3 text-left font-medium w-[40%]">Score</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-border/50">
-                {sorted.map((row, i) => {
-                  // Bar width: normalize score relative to range, with min bar at 15%
-                  // For lower-is-better benchmarks, invert so lower scores get wider bars
-                  const rawNormalized =
-                    maxScore > minScore
-                      ? (row.score - minScore) / (maxScore - minScore)
-                      : 0.5;
-                  const adjusted = entity.higherIsBetter ? rawNormalized : 1 - rawNormalized;
-                  const barPct = 15 + adjusted * 85;
-                  const barColor =
-                    DEVELOPER_BAR_COLORS[row.developer ?? ""] ??
-                    "bg-primary/20 dark:bg-primary/15";
-
-                  return (
-                    <tr
-                      key={row.modelId}
-                      className={`hover:bg-muted/20 transition-colors ${
-                        i < 3 ? "font-medium" : ""
-                      }`}
-                    >
-                      <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
-                        {i === 0 ? (
-                          <span className="text-amber-500" title="1st place">
-                            {"\uD83E\uDD47"}
-                          </span>
-                        ) : i === 1 ? (
-                          <span className="text-gray-400" title="2nd place">
-                            {"\uD83E\uDD48"}
-                          </span>
-                        ) : i === 2 ? (
-                          <span className="text-orange-400" title="3rd place">
-                            {"\uD83E\uDD49"}
-                          </span>
-                        ) : (
-                          i + 1
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <Link
-                          href={`/ai-models/${row.modelId}`}
-                          className="hover:text-primary transition-colors"
-                        >
-                          {row.modelTitle}
-                        </Link>
-                      </td>
-                      <td className="py-2.5 px-3">
-                        {row.developer && row.developerName && (
-                          <span
-                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
-                              DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
-                            }`}
+                    return (
+                      <tr
+                        key={row.modelId}
+                        className={`hover:bg-muted/20 transition-colors ${
+                          i < 3 ? "font-medium" : ""
+                        }`}
+                      >
+                        <td className="py-2.5 px-3 text-center text-muted-foreground tabular-nums">
+                          {i === 0 ? (
+                            <span className="text-amber-500" title="1st place">
+                              {"🥇"}
+                            </span>
+                          ) : i === 1 ? (
+                            <span className="text-gray-400" title="2nd place">
+                              {"🥈"}
+                            </span>
+                          ) : i === 2 ? (
+                            <span className="text-orange-400" title="3rd place">
+                              {"🥉"}
+                            </span>
+                          ) : (
+                            i + 1
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <Link
+                            href={`/ai-models/${row.modelId}`}
+                            className="hover:text-primary transition-colors"
                           >
-                            {row.developerName}
-                          </span>
-                        )}
-                      </td>
-                      <td className="py-2.5 px-3">
-                        <div className="flex items-center gap-2">
-                          <div className="flex-1 relative h-5 rounded-md bg-muted/30 overflow-hidden">
-                            <div
-                              className={`absolute inset-y-0 left-0 rounded-md ${barColor} transition-all`}
-                              style={{ width: `${barPct}%` }}
-                            />
+                            {row.modelTitle}
+                          </Link>
+                        </td>
+                        <td className="py-2.5 px-3">
+                          {row.developer && row.developerName && (
                             <span
-                              className={`absolute inset-y-0 flex items-center px-2 text-xs tabular-nums ${
-                                i < 3 ? "font-bold" : "font-semibold"
+                              className={`inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold ${
+                                DEVELOPER_COLORS[row.developer] ?? "bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-300"
                               }`}
                             >
-                              {formatScore(row.score, row.unit)}
+                              {row.developerName}
                             </span>
+                          )}
+                        </td>
+                        <td className="py-2.5 px-3">
+                          <div className="flex items-center gap-2">
+                            <div className="flex-1 relative h-5 rounded-md bg-muted/30 overflow-hidden">
+                              <div
+                                className={`absolute inset-y-0 left-0 rounded-md ${barColor} transition-all`}
+                                style={{ width: `${barPct}%` }}
+                              />
+                              <span
+                                className={`absolute inset-y-0 flex items-center px-2 text-xs tabular-nums ${
+                                  i < 3 ? "font-bold" : "font-semibold"
+                                }`}
+                              >
+                                {formatScore(row.score, row.unit)}
+                              </span>
+                            </div>
                           </div>
-                        </div>
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+                        </td>
+                      </tr>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          <div className="text-center py-12 text-muted-foreground border border-border/60 rounded-xl bg-card">
+            No model scores recorded for this benchmark yet.
           </div>
-        </section>
-      ) : (
-        <div className="text-center py-12 text-muted-foreground border border-border/60 rounded-xl bg-card">
-          No model scores recorded for this benchmark yet.
-        </div>
-      )}
-    </div>
+        )}
+      </div>
+    </EntityProfileShell>
   );
 }
 

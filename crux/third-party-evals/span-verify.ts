@@ -12,6 +12,7 @@
  */
 
 import type { ExtractedReport } from "./extract-eval-report.ts";
+import type { InlineSourcing } from "../lib/wiki-server/inline-sourcing.ts";
 
 export interface VerifyOptions {
   jaccardThreshold?: number;
@@ -154,8 +155,7 @@ export function verifyExtractedReport(
       continue;
     }
 
-    const excerptKey = camelToSnake(field);
-    const excerpt = report.excerpts[excerptKey] ?? report.excerpts[field] ?? "";
+    const excerpt = lookupExcerpt(report.excerpts, field);
     const verdict = verifyExcerpt(excerpt, sourceText, options);
     verdicts[field] = verdict;
     confidenceMap[field] = Number(verdict.confidence.toFixed(2));
@@ -181,4 +181,101 @@ export function verifyExtractedReport(
 /** "publishedDate" → "published_date". The extractor emits snake_case excerpt keys. */
 function camelToSnake(s: string): string {
   return s.replace(/[A-Z]/g, (m) => "_" + m.toLowerCase());
+}
+
+/** Look up an excerpt by field name, accepting both snake_case (extractor) and camelCase. */
+function lookupExcerpt(excerpts: Record<string, string>, field: string): string {
+  return excerpts[camelToSnake(field)] ?? excerpts[field] ?? "";
+}
+
+// ---------------------------------------------------------------------------
+// Map span-verify output → inline sourcing verdict (QUA-727)
+// ---------------------------------------------------------------------------
+
+/** Identifier written to InlineSourcing.checkedBy for span-verify verdicts. */
+export const SPAN_VERIFY_CHECKER = "span-verify-v1";
+
+/**
+ * Aggregate per-field span-verify output into a record-level inline sourcing
+ * verdict. Used by ingesters to populate the `sourcing` block on /sync so
+ * source_check_verdicts get written atomically with the row.
+ *
+ * Verdict mapping (semantics: "is the data we extracted grounded in the
+ * source", NOT "is the report fully covered" — coverage is a separate
+ * concern handled by entity-coverage scoring):
+ *   - confirmed: at least one core field verified, no fields dropped after
+ *     initially being non-null. A `confirmed` verdict on a sparse extraction
+ *     means "the few fields we extracted are grounded", not "the report is
+ *     comprehensively covered".
+ *   - partial:   some fields verified, some dropped (the LLM gave us mixed-
+ *     quality output and span-verify rescued only part of it)
+ *   - unverifiable: nothing verified — every excerpt failed to ground
+ *
+ * Returns null when only bypassed fields exist (URL/metadata/list), so the
+ * caller can omit `sourcing` entirely rather than record a meaningless
+ * verdict.
+ *
+ * `evidence` is the highest-confidence verified excerpt — `verifyExcerpt()`
+ * only returns `verified: true` when confidence ≥ jaccardThreshold (default
+ * 0.7), so any verified field's excerpt is fair game.
+ *
+ * `confidence` is the mean of verified-field confidences over span-checked
+ * fields. Bypassed fields are excluded so their fixed 0.5 doesn't drag
+ * confirmed verdicts toward the middle.
+ */
+export function spanVerifyToInlineSourcing(
+  verify: VerifyResult,
+  options: { sourceContentHash?: string; checkedAt?: string } = {},
+): InlineSourcing | null {
+  // Bypassed fields (URL/metadata/list) carry `verified: true, confidence: 0.5`
+  // with reason "skipped" but didn't go through real span-check, so they
+  // don't tell us anything about whether the extraction matches the source.
+  const checkedFields = Object.entries(verify.verdicts).filter(
+    ([, v]) => v.reason !== "skipped",
+  );
+  const droppedCount = verify.droppedFields.length;
+
+  // Nothing span-checked AND nothing dropped — the extractor returned only
+  // bypassed fields. We have no signal about whether the record matches the
+  // source, so return null and let the caller decide.
+  if (checkedFields.length === 0 && droppedCount === 0) return null;
+
+  const verifiedCheckedFields = checkedFields.filter(([, v]) => v.verified);
+
+  let verdict: InlineSourcing["verdict"];
+  if (verifiedCheckedFields.length === 0) {
+    verdict = "unverifiable";
+  } else if (droppedCount === 0) {
+    verdict = "confirmed";
+  } else {
+    verdict = "partial";
+  }
+
+  const verifiedConfidences = verifiedCheckedFields.map(([, v]) => v.confidence);
+  const meanConfidence =
+    verifiedConfidences.length > 0
+      ? verifiedConfidences.reduce((a, b) => a + b, 0) /
+        verifiedConfidences.length
+      : 0;
+
+  let bestExcerpt: string | undefined;
+  let bestExcerptConfidence = 0;
+  for (const [f, fieldVerdict] of verifiedCheckedFields) {
+    const excerpt = lookupExcerpt(verify.verifiedReport.excerpts, f);
+    if (excerpt && fieldVerdict.confidence > bestExcerptConfidence) {
+      bestExcerpt = excerpt;
+      bestExcerptConfidence = fieldVerdict.confidence;
+    }
+  }
+
+  const sourcing: InlineSourcing = {
+    verdict,
+    confidence: Number(meanConfidence.toFixed(2)),
+    checkedAt: options.checkedAt ?? new Date().toISOString(),
+    checkedBy: SPAN_VERIFY_CHECKER,
+  };
+  if (bestExcerpt) sourcing.evidence = bestExcerpt;
+  if (options.sourceContentHash) sourcing.sourceContentHash = options.sourceContentHash;
+
+  return sourcing;
 }

@@ -429,7 +429,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     if (!fallbackToLocal) {
       if (fetchDebounceRef.current) clearTimeout(fetchDebounceRef.current);
       fetchDebounceRef.current = setTimeout(() => {
-        fetchFromServer({ search: value });
+        void fetchFromServer({ search: value });
       }, 300);
     }
   }, [updateUrlParams, fallbackToLocal, fetchFromServer]);
@@ -439,7 +439,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     setVisibleCount(60);
     const cluster = FIELD_GROUPS[index].cluster;
     updateUrlParams({ cluster: cluster || null });
-    if (!fallbackToLocal) fetchFromServer({ activeField: index });
+    if (!fallbackToLocal) void fetchFromServer({ activeField: index });
   }
 
   function handleSectionChange(index: number) {
@@ -447,13 +447,13 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     setVisibleCount(60);
     const group = SECTION_GROUPS[index];
     updateUrlParams({ section: group.categories.length > 0 ? group.label.toLowerCase() : null });
-    if (!fallbackToLocal) fetchFromServer({ activeSection: index });
+    if (!fallbackToLocal) void fetchFromServer({ activeSection: index });
   }
 
   function handleEntityChange(index: number) {
     setActiveEntity(index);
     setVisibleCount(60);
-    if (!fallbackToLocal) fetchFromServer({ activeEntity: index });
+    if (!fallbackToLocal) void fetchFromServer({ activeEntity: index });
   }
 
   function handleRiskCatChange(index: number) {
@@ -461,7 +461,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     setVisibleCount(60);
     const value = RISK_CATEGORY_GROUPS[index].value;
     updateUrlParams({ riskCategory: value });
-    if (!fallbackToLocal) fetchFromServer({ activeRiskCat: index });
+    if (!fallbackToLocal) void fetchFromServer({ activeRiskCat: index });
   }
 
   function handleViewChange(mode: ViewMode) {
@@ -473,7 +473,7 @@ export function ExploreGrid({ initialItems, initialTotal, initialFacets, allItem
     setSortKey(key);
     setVisibleCount(60);
     updateUrlParams({ sort: key === "recommended" ? null : key });
-    if (!fallbackToLocal) fetchFromServer({ sortKey: key });
+    if (!fallbackToLocal) void fetchFromServer({ sortKey: key });
   }
 
 

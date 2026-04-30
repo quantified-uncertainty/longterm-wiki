@@ -113,6 +113,7 @@ async function main() {
     }
 
     try {
+      // typed-client-ok: QUA-770 baseline — one-shot maintenance script
       const result = await apiRequest<{ id: string }>(
         'POST',
         '/api/resources',
@@ -143,4 +144,7 @@ async function main() {
   if (errors > 0) process.exit(1);
 }
 
-main();
+main().catch((err) => {
+  console.error("fix-url-resource-titles crashed:", err);
+  process.exit(1);
+});

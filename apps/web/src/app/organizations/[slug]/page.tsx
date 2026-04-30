@@ -32,6 +32,7 @@ import {
 } from "@/components/entity/entity-sourcing";
 import { RelatedPages } from "@/components/RelatedPages";
 import { FactBaseEntityBody } from "@/components/factbase/FactBaseEntityBody";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { EntityDbPage } from "@/components/directory/EntityDbPage";
 import { EntityTimeline } from "@/components/wiki/EntityTimeline";
 
@@ -234,7 +235,7 @@ export default async function OrgProfilePage({
     return (
       <StatCard
         key={propId}
-        label={prop?.name ?? titleCase(propId)}
+        label={getPropertyLabel(prop, propId)}
         value={<FactValueDisplay fact={fact} property={prop} />}
         sub={fact.asOf ? `as of ${formatKBDate(fact.asOf)}` : undefined}
       />

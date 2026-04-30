@@ -178,6 +178,7 @@ async function fetchAllPaginated<T>(
 
   while (offset < total) {
     const separator = path.includes('?') ? '&' : '?';
+    // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
     const result = await apiRequest<Record<string, unknown>>(
       'GET',
       `${path}${separator}limit=${pageSize}&offset=${offset}`,
@@ -215,6 +216,7 @@ async function fetchEntitiesByType(entityType: string): Promise<EntityListRespon
 
 async function scanGrantCompleteness(prefetchedOrgs?: EntityListResponse['entities']): Promise<TableScanResult> {
   // Get org-level summary
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const summaryResult = await apiRequest<GrantOrgSummary>('GET', '/api/grants/by-org-summary');
   const orgs = summaryResult.ok ? summaryResult.data.organizations : [];
 
@@ -264,6 +266,7 @@ async function scanGrantCompleteness(prefetchedOrgs?: EntityListResponse['entiti
     });
   }
 
+  // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
   const statsResult = await apiRequest<StatsResponse>('GET', '/api/grants/stats');
   const totalRecords = statsResult.ok ? statsResult.data.total : allGrants.length;
 
@@ -679,6 +682,7 @@ async function scanSourceQuality(): Promise<TableScanResult> {
   const pageSize = 200;
 
   while (true) {
+    // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
     const result = await apiRequest<{ verdicts: VerdictRow[]; total: number }>(
       'GET',
       `/api/sourcing/verdicts?verdict=unverifiable&limit=${pageSize}&offset=${offset}`,
@@ -723,6 +727,7 @@ async function scanSourceQuality(): Promise<TableScanResult> {
   // Entity type is always missing (verdicts don't carry it), so look up all entities.
   // This also fills in missing display names.
   for (const [entityId, entry] of byEntity) {
+    // typed-client-ok: QUA-770 baseline — tablebase tooling, follow-up migration to typed client tracked
     const entityResult = await apiRequest<{ id: string; title: string; entityType: string }>(
       'GET',
       `/api/entities/${encodeURIComponent(entityId)}`,

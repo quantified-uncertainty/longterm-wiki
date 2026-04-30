@@ -1,22 +1,14 @@
-import { z } from "zod";
-
 /**
- * Optional sourcing data that can be submitted alongside any TableBase record.
- * When present, a sourcing_verdict is written atomically with the record.
+ * Inline sourcing schema — re-exports from `api-types.ts`.
+ *
+ * The canonical definition lives in `api-types.ts` (so it can be safely
+ * bundled by `apps/web/` without webpack hitting a deep `.js` relative-path
+ * resolution failure). Route files keep importing from this path because it
+ * was the historical home of the schema; renaming every import is not
+ * worth the churn.
  */
-export const InlineSourcingSchema = z.object({
-  verdict: z.enum([
-    "confirmed",
-    "contradicted",
-    "outdated",
-    "partial",
-    "unverifiable",
-  ]),
-  evidence: z.string().max(5000).optional(),
-  confidence: z.number().min(0).max(1).optional(),
-  sourceContentHash: z.string().max(100).optional(),
-  checkedAt: z.string().datetime().optional(),
-  checkedBy: z.string().max(100).optional(),
-});
 
-export type InlineSourcing = z.infer<typeof InlineSourcingSchema>;
+export {
+  InlineSourcingSchema,
+  type InlineSourcing,
+} from "../../api-types.js";

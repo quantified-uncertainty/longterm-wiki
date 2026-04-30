@@ -106,6 +106,7 @@ async function fetchDbStats(): Promise<DbStats | null> {
   if (_dbStats !== undefined) return _dbStats;
 
   try {
+    // typed-client-ok: QUA-770 baseline — entity-matrix scanner, internal tool
     const entityResult = await apiRequest<{ total: number; byType: Record<string, number> }>(
       "GET", "/api/entities/stats",
     );
@@ -130,6 +131,7 @@ async function fetchDbStats(): Promise<DbStats | null> {
 
     await Promise.all(
       subEntityEndpoints.map(async ({ route, key }) => {
+        // typed-client-ok: QUA-770 baseline — entity-matrix scanner, internal tool
         const result = await apiRequest<{ total: number }>("GET", `${route}/stats`);
         if (result.ok && typeof result.data.total === "number") {
           tableCounts[key] = result.data.total;

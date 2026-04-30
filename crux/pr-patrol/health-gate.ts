@@ -42,6 +42,19 @@ export const HEALTH_GATE_COOLDOWN_MINUTES = 30;
  */
 export const MAX_CONSECUTIVE_SCAN_ERRORS = 3;
 
+/**
+ * Maximum wall-clock time the gate is allowed to halt PR work due to a scan-
+ * failure streak. Once the streak has been ongoing for this long, the gate
+ * flips from "halt" back to "proceed with caution" so patrol can resume PR
+ * processing even though we still can't see fleet health.
+ *
+ * Trade-off: prolonged halt vs blind patrol. QUA-823 documented a 3+ hour
+ * outage where the count-based halt blocked every cycle while no real prod
+ * issue existed — the GitHub API was just intermittently unreachable. After
+ * 30min we have to assume the scanner is the broken thing, not prod.
+ */
+export const SCAN_FAILURE_PROCEED_AFTER_MINUTES = 30;
+
 /** Env var to bypass the gate. Value `1` disables it. */
 export const DISABLE_ENV_VAR = 'PATROL_DISABLE_HEALTH_GATE';
 
@@ -50,6 +63,15 @@ const HEALTH_GATE_STATE_FILE = join(STATE_DIR, 'health-gate-cooldown.json');
 
 /** Reserved fingerprint used to track consecutive scan-error count. */
 const SCAN_ERROR_COUNTER_KEY = '__scan_error_count__';
+
+/**
+ * Reserved fingerprint used to track the wall-clock start of the current
+ * scan-failure streak. Stored as a unix-epoch millisecond timestamp via the
+ * count store. `0` means "no streak active" (set on the first success after
+ * a streak ends). Used by `SCAN_FAILURE_PROCEED_AFTER_MINUTES` to decide
+ * when prolonged halts should fail-open instead.
+ */
+const SCAN_ERROR_FIRST_AT_KEY = '__scan_error_first_at_ms__';
 
 // ── Types ────────────────────────────────────────────────────────────────────
 
@@ -262,13 +284,17 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
   let result: HealthScanResult;
   try {
     result = await scan();
-    // Successful scan — reset the consecutive-error counter so the halt-
-    // threshold only fires on a true streak, not cumulative failures over days.
+    // Successful scan — reset the consecutive-error counter and the streak
+    // start time so the halt-threshold only fires on a true streak, not
+    // cumulative failures over days.
     cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
+    cooldown.setCount?.(SCAN_ERROR_FIRST_AT_KEY, 0);
   } catch (e) {
     // Scanner failed. Policy: a transient GitHub hiccup shouldn't halt PR
     // work. But if the scanner fails N consecutive times, something's wrong
     // with our observability — flip to halt to prevent silent forever-proceed.
+    // Past SCAN_FAILURE_PROCEED_AFTER_MINUTES we flip back to fail-open so a
+    // multi-hour API outage doesn't block patrol indefinitely (QUA-823).
     const message = e instanceof Error ? e.message : String(e);
 
     // Missing-token errors are permanent config faults, not transient.
@@ -279,6 +305,7 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
     // process.env directly and finds it missing.
     if (isMissingTokenError(e)) {
       cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, 0);
+      cooldown.setCount?.(SCAN_ERROR_FIRST_AT_KEY, 0);
       writeEvent({
         type: 'health_gate_missing_token',
         timestamp: now.toISOString(),
@@ -301,12 +328,50 @@ export async function runHealthGate(deps: HealthGateDeps = {}): Promise<HealthGa
     const newCount = prevCount + 1;
     cooldown.setCount?.(SCAN_ERROR_COUNTER_KEY, newCount);
 
+    // Track when the streak began so prolonged failures fail-open by wall
+    // clock, not by cycle count (which depends on patrol interval).
+    const prevFirstAt = cooldown.getCount?.(SCAN_ERROR_FIRST_AT_KEY) ?? 0;
+    const firstAtMs = prevFirstAt > 0 ? prevFirstAt : now.getTime();
+    if (prevFirstAt === 0) {
+      cooldown.setCount?.(SCAN_ERROR_FIRST_AT_KEY, firstAtMs);
+    }
+    const streakDurationMin = (now.getTime() - firstAtMs) / 60_000;
+
     writeEvent({
       type: 'health_scan_error',
       timestamp: now.toISOString(),
       error: message,
       consecutive_errors: newCount,
+      streak_duration_minutes: Math.round(streakDurationMin * 10) / 10,
     });
+
+    // Time-based fail-open: after SCAN_FAILURE_PROCEED_AFTER_MINUTES we
+    // assume the scanner is the broken thing (intermittent network, GitHub
+    // partial outage, DNS hiccup) rather than a real prod incident, and let
+    // patrol resume with a loud warning. The streak markers are kept so a
+    // subsequent successful scan still resets cleanly.
+    if (streakDurationMin >= SCAN_FAILURE_PROCEED_AFTER_MINUTES) {
+      log(
+        `${cl.yellow}⚠ Health scan has been failing for ${streakDurationMin.toFixed(0)}min ` +
+          `(${newCount} cycles) — proceeding WITHOUT fleet-health visibility. ` +
+          `Last error: ${message}${cl.reset}`,
+      );
+      writeEvent({
+        type: 'health_gate_proceed_blind',
+        timestamp: now.toISOString(),
+        consecutive_errors: newCount,
+        streak_duration_minutes: Math.round(streakDurationMin * 10) / 10,
+        last_error: message,
+      });
+      return {
+        proceed: true,
+        reason: '',
+        result: syntheticScanFailureResult(message),
+        emittedIssues: [],
+        suppressedIssues: [],
+        bypassed: false,
+      };
+    }
 
     if (newCount >= MAX_CONSECUTIVE_SCAN_ERRORS) {
       log(

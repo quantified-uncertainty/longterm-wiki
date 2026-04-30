@@ -132,7 +132,7 @@
   wikiId: E200
   type: project
   title: Metaforecast
-  projectStatus: unmaintained
+  projectStatus: abandoned
   projectUrl: https://metaforecast.org
   organization: quri
   description: Forecast aggregation platform combining predictions from 10+ sources into a unified search interface.
@@ -264,7 +264,7 @@
   stableId: sid_pF3vNTBCmg
   type: project
   title: Foretold.io
-  projectStatus: deprecated
+  projectStatus: abandoned
   projectUrl: https://www.foretold.io
   organization: quri
   description: >-

@@ -4,6 +4,13 @@ import {
   formatScoreCell,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
+import { SourcingDot } from "@/components/sourcing/SourcingDot";
+import { recordVerdictToStatus } from "@/components/sourcing/sourcing-status";
+
+export interface ScorecardCellSourcing {
+  verdict: string | null;
+  checkedAt: string | null;
+}
 
 export interface ScorecardCell {
   source: ScorecardSourceKey;
@@ -11,6 +18,13 @@ export interface ScorecardCell {
   scoreLetter: string | null;
   scoreRaw: string;
   publishedAt: string | null;
+  /**
+   * Sourcing verdict for this grade (QUA-839). Null when no verdict
+   * row exists yet — the verdict-generation pipeline is a separate ticket
+   * (see `.claude/rules/sourcing-system.md`). Renders an `unchecked`
+   * white dot in that case.
+   */
+  sourcing: ScorecardCellSourcing | null;
 }
 
 export interface ScorecardOrgRow {
@@ -85,7 +99,15 @@ export function ScorecardsMatrix({
                       cell.publishedAt ? ` — ${cell.publishedAt}` : ""
                     }`}
                   >
-                    {formatScoreCell(cell)}
+                    <span className="inline-flex items-center gap-1.5">
+                      <span>{formatScoreCell(cell)}</span>
+                      <SourcingDot
+                        status={recordVerdictToStatus(cell.sourcing?.verdict)}
+                        originalVerdict={cell.sourcing?.verdict ?? null}
+                        lastChecked={cell.sourcing?.checkedAt ?? null}
+                        size="sm"
+                      />
+                    </span>
                   </td>
                 );
               })}

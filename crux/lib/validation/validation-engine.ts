@@ -392,6 +392,8 @@ export class ValidationEngine {
         tool: 'crux-fix',
         agency: 'automated',
         note: 'Auto-fixed validation issues (escaping, markdown, etc.)',
+      }).catch((err) => {
+        console.warn(`Failed to record validation fixes in edit log: ${err instanceof Error ? err.message : String(err)}`);
       });
     }
 

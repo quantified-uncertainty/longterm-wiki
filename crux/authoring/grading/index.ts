@@ -150,6 +150,8 @@ async function processPage(
             agency: 'automated',
             requestedBy: getDefaultRequestedBy(),
             note: `Quality graded: ${derivedQuality}, readerImportance: ${grades.readerImportance.toFixed(1)}`,
+          }).catch((err) => {
+            console.warn(`Failed to record grading in edit log: ${err instanceof Error ? err.message : String(err)}`);
           });
         } else {
           console.error(`  Failed to apply grades to ${page.filePath}`);

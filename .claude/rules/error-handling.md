@@ -91,6 +91,27 @@ Every fail-open exception in the gate must have a comment explaining why. Curren
 - **mdx-compile**: Advisory smoke-test; full Next.js build is authoritative
 - **gate-triage LLM call**: Optimization only; timeout/error means run everything
 
+### Fail-Closed in `build-data.mjs` (QUA-772)
+
+The build pipeline (`apps/web/scripts/build-data.mjs`) abandons output and exits 1 BEFORE writing `database.json` when any of the following hold. The previous `database.json` is preserved on disk, so a failed build never overwrites a known-good one with a partial copy.
+
+| Condition | Detection | When fatal |
+|-----------|-----------|------------|
+| YAML parse error in `data/*.yaml` or `data/entities/*.yaml` | `loadYaml` / `loadYamlDir` increment `yamlParseErrorCount` | always |
+| YAML parse error in MDX frontmatter | `extractFrontmatter` increments `getPagesBuilderYamlErrors()` | always |
+| YAML parse error in `packages/factbase/data/**/*.yaml` | `parseYamlWithPath` re-throws with the file path prepended (`[kb/loader] YAML parse error in <path>: <yaml-msg>`) | always |
+| Duplicate entity IDs across YAML | counted at line ~580; exits 1 | always |
+| `wikiId` collision between an entity and a page | `pageIdConflicts` array; exits 1 | always |
+| Wiki-server fetch failure (any of the `logWikiServerWarning` callsites) | `getWikiServerWarningCount() > 0` | only when `isStrictWikiServerMode()` returns true — i.e. `CI=true` AND `--scope=content` is NOT in use |
+
+**Why CI-only for wiki-server failures.** CI runs against authenticated prod, so a missed fetch indicates a real regression worth halting the build over. Local dev / agent slots may legitimately lack server access (offline iteration, slot doesn't have prod creds, transient prod outage), and treating that as fatal would block the agent's iteration loop for reasons unrelated to the change being tested. Hence the split: warn locally, abort in CI.
+
+**Why content-only opts out.** `--scope=content` (alias `--quick`) explicitly tells build-data to skip server-dependent steps. Treating wiki-server unavailability as fatal there would defeat the flag's purpose.
+
+**Bypass for emergency builds.** If a CI run must complete despite wiki-server warnings (e.g. to ship a hotfix unrelated to the failing data source), unset `CI` for the build step. Don't add a `STRICT_WIKI_SERVER=0` escape hatch — past experience (the QUA-448 removal of `STRICT_VERDICTS=0`) is that "panic button" env vars become load-bearing over time and silently defeat the fail-closed intent.
+
+The aggregate post-build summary in `--- Build Health ---` is informational only — by the time it runs, the pre-write fail-closed checks have already aborted any build that would ship corrupt data.
+
 ### Fail-Open (only for non-critical paths)
 
 Fail-open is appropriate when:

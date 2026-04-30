@@ -528,10 +528,14 @@ async function main(): Promise<void> {
   } else if (FIX_MODE) {
     console.log(`${colors.green}Fixed ${results.fixed} broken links${colors.reset}`);
     if (fixedFiles.length > 0) {
+      // Best-effort telemetry — files are already written; don't fail the
+      // command if the wiki-server can't be reached.
       logBulkFixes(fixedFiles, {
         tool: 'crux-fix',
         agency: 'automated',
         note: 'Fixed broken internal links',
+      }).catch((err) => {
+        console.warn(`Failed to record bulk fix log: ${err instanceof Error ? err.message : String(err)}`);
       });
     }
   }

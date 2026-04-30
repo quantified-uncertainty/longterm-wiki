@@ -14,6 +14,7 @@ import {
   formatKBFactValue,
   titleCase,
 } from "@/components/wiki/factbase/format";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -133,7 +134,7 @@ function FactRow({
   return (
     <div className="flex items-baseline gap-1 py-[3px] group/row">
       <span className="text-muted-foreground text-[12px] shrink-0 whitespace-nowrap">
-        {property?.name ?? titleCase(propId)}
+        {getPropertyLabel(property, propId)}
       </span>
       <span
         className="flex-1 border-b border-dotted border-border/40 min-w-[16px] translate-y-[-3px]"

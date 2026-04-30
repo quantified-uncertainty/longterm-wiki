@@ -356,4 +356,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
   }
 });
 
-client.login(process.env.DISCORD_TOKEN);
+client.login(process.env.DISCORD_TOKEN).catch((err) => {
+  console.error("Discord client login failed:", err);
+  process.exit(1);
+});

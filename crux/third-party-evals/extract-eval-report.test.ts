@@ -221,4 +221,50 @@ describe("toSyncItem", () => {
     });
     expect(item.models).toEqual([]);
   });
+
+  it("includes sourcing block when provided (QUA-727)", () => {
+    const item = toSyncItem(makeExtract(), {
+      id: "abc1234567",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      reportUrl: "https://aisi.gov.uk/blog/foo",
+      sourceSystem: "sitemap",
+      confidenceMap: {},
+      sourcing: {
+        verdict: "confirmed",
+        confidence: 0.95,
+        evidence: "Pre-deployment evaluation excerpt",
+        checkedBy: "span-verify-v1",
+        checkedAt: "2026-04-25T10:30:00.000Z",
+        sourceContentHash: "deadbeef",
+      },
+    });
+
+    expect(item.sourcing).toMatchObject({
+      verdict: "confirmed",
+      checkedBy: "span-verify-v1",
+    });
+  });
+
+  it("omits sourcing block when not provided", () => {
+    const item = toSyncItem(makeExtract(), {
+      id: "abc1234567",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      reportUrl: "https://aisi.gov.uk/blog/foo",
+      sourceSystem: "sitemap",
+      confidenceMap: {},
+    });
+    expect("sourcing" in item).toBe(false);
+  });
+
+  it("omits sourcing block when null is passed", () => {
+    const item = toSyncItem(makeExtract(), {
+      id: "abc1234567",
+      evaluatorOrgId: "sid_aX0jkoaekQ",
+      reportUrl: "https://aisi.gov.uk/blog/foo",
+      sourceSystem: "sitemap",
+      confidenceMap: {},
+      sourcing: null,
+    });
+    expect("sourcing" in item).toBe(false);
+  });
 });

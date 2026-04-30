@@ -15,6 +15,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { getKBFacts, getKBEntity, getKBProperties, isFactExpired, getKBFactSourcing } from "@data/factbase";
 import type { Fact, Property } from "@longterm-wiki/factbase";
 import { formatKBDate, isUrl, shortDomain, titleCase } from "./format";
+import { getPropertyLabel } from "@/components/factbase/entity-detail-shared";
 import { FBFactValueDisplay } from "./FBFactValueDisplay";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
 import { factbaseVerdictToStatus } from "@/components/sourcing/sourcing-status";
@@ -73,7 +74,7 @@ function TimeSeriesProperty({
   items: FactWithProperty[];
 }) {
   const prop = items[0]?.property;
-  const label = prop?.name ?? titleCase(propertyId);
+  const label = getPropertyLabel(prop, propertyId);
 
   // Sort by asOf descending
   const sorted = [...items].sort((a, b) => {
@@ -142,7 +143,7 @@ function SingleValueProperty({
     return b.fact.asOf.localeCompare(a.fact.asOf);
   });
   const prop = sorted[0]?.property;
-  const label = prop?.name ?? titleCase(propertyId);
+  const label = getPropertyLabel(prop, propertyId);
   const fact = sorted[0]?.fact;
 
   if (!fact) return null;

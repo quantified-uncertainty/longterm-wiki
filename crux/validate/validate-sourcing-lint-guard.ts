@@ -28,7 +28,6 @@
  */
 
 import { readFileSync, readdirSync, statSync, writeFileSync, existsSync } from 'fs';
-import { execSync } from 'child_process';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
@@ -311,26 +310,17 @@ function main(): void {
   const result = runCheck();
 
   if (!result.passed) {
-    // On non-main branches, the ratchet is advisory — PRs that add
-    // sourcing features naturally increase the count temporarily.
-    // The ratchet enforces on main merges. See QUA-238.
-    const branch = process.env.GITHUB_HEAD_REF
-      || process.env.GITHUB_REF
-      || execSync('git rev-parse --abbrev-ref HEAD 2>/dev/null || echo unknown').toString().trim();
-    const isMain = branch === 'main' || branch === 'refs/heads/main';
-
-    if (!isMain) {
-      console.log(`${c.yellow}${result.message} (advisory on branch "${branch}")${c.reset}`);
-      console.log(`  ${c.dim}Ratchet only blocks on main. See QUA-238.${c.reset}`);
-      // Exit 0 so the gate check doesn't block PR pushes
-    } else {
-      console.log(`${c.red}${result.message}${c.reset}`);
-      console.log(`\n  Current: ${result.current.total} total`);
-      if (result.baseline) {
-        console.log(`  Baseline: ${result.baseline.total} total`);
-      }
-      process.exit(1);
+    // Blocking on every branch (QUA-820): with baseline frozen at 1, the only
+    // legitimate growth path is the QUA-303 column rename. Any baseline rise
+    // in a PR is exactly the violation we want to surface — catching it on the
+    // PR avoids the cycle of "merge → main red → cosmetic-fix PR" (3 cycles
+    // in 12h on 2026-04-28/29).
+    console.log(`${c.red}${result.message}${c.reset}`);
+    console.log(`\n  Current: ${result.current.total} total`);
+    if (result.baseline) {
+      console.log(`  Baseline: ${result.baseline.total} total`);
     }
+    process.exit(1);
   }
 
   console.log(`${c.green}${result.message}${c.reset}`);

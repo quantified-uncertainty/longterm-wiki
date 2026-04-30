@@ -24,8 +24,9 @@ import { readFileSync, writeFileSync } from 'fs';
 import { CONTENT_DIR_ABS, PROJECT_ROOT } from '../lib/content-types.ts';
 import { findMdxFiles, findPageFile } from '../lib/file-utils.ts';
 import { buildEntityLookupForContent } from '../lib/entity-lookup.ts';
+import { z } from 'zod';
 import { createLlmClient, MODELS, callLlm } from '../lib/llm.ts';
-import { parseJsonResponse } from '../lib/anthropic.ts';
+import { parseAndValidate } from '../lib/json-parsing.ts';
 import { parseCliArgs } from '../lib/cli.ts';
 import { getColors } from '../lib/output.ts';
 import { WIKI_ID_RE } from '../lib/patterns.ts';
@@ -53,13 +54,20 @@ export interface EntityLinkEnrichResult {
   replacements: EntityLinkReplacement[];
 }
 
-interface LlmEntityLinkResponse {
-  replacements?: Array<{
-    searchText?: string;
-    entityId?: string;
-    displayName?: string;
-  }>;
-}
+/**
+ * Zod schemas for the entity-link enrichment LLM response. The outer
+ * envelope is validated, then each replacement is individually safeParsed
+ * so one malformed item doesn't drop the entire batch.
+ */
+const LlmEntityLinkEnvelopeSchema = z.object({
+  replacements: z.array(z.unknown()).optional(),
+}).passthrough();
+
+const LlmEntityLinkReplacementSchema = z.object({
+  searchText: z.string().min(1),
+  entityId: z.string().min(1),
+  displayName: z.string().min(1),
+}).passthrough();
 
 // ---------------------------------------------------------------------------
 // Core logic (exportable library functions)
@@ -309,22 +317,28 @@ Identify entity mentions and return replacement instructions as JSON.`;
     temperature: 0,
   });
 
-  let parsed: LlmEntityLinkResponse | null = null;
-  try {
-    parsed = parseJsonResponse(result.text) as LlmEntityLinkResponse | null;
-  } catch {
-    // LLM returned invalid JSON — return empty replacements rather than crashing
-    return [];
-  }
-  if (!parsed?.replacements || !Array.isArray(parsed.replacements)) return [];
+  // Zod-validated parse; on outer parse failure, returns empty replacements.
+  // Each replacement is then individually safeParsed so a single malformed
+  // item doesn't drop the whole batch.
+  const envelope = parseAndValidate(
+    result.text,
+    LlmEntityLinkEnvelopeSchema,
+    'entity-links',
+    () => ({ replacements: [] as unknown[] }),
+  );
+  const rawReplacements = envelope.replacements ?? [];
 
-  return parsed.replacements
-    .filter(r => r.searchText && r.entityId && r.displayName)
-    .map(r => ({
-      searchText: r.searchText!,
-      entityId: r.entityId!,
-      displayName: r.displayName!,
-    }));
+  const out: EntityLinkReplacement[] = [];
+  for (const raw of rawReplacements) {
+    const parsed = LlmEntityLinkReplacementSchema.safeParse(raw);
+    if (!parsed.success) continue;
+    out.push({
+      searchText: parsed.data.searchText,
+      entityId: parsed.data.entityId,
+      displayName: parsed.data.displayName,
+    });
+  }
+  return out;
 }
 
 /**

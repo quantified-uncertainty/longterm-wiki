@@ -120,22 +120,43 @@ export function aggregateEvidence(
       confidence: null,
       sourcesChecked: 0,
       contributing: [],
+      droppedLowRelevance: [],
       droppedNotApplicable: rows.length,
     };
   }
 
   const droppedNotApplicable = rows.length - considered.length;
 
-  // Step 3: any row above the relevance threshold?
-  const aboveThreshold = considered.filter(
-    (r) => effectiveWeight(r) >= minRelevance,
-  );
+  // Step 3: split into above/below threshold. Below-threshold rows are
+  // filtered out from the headline but their per-verdict counts are
+  // surfaced separately so QUA-792's explainer can mention low-relevance
+  // dissent.
+  const aboveThreshold: EvidenceRow[] = [];
+  const belowThresholdBuckets = new Map<AggregateVerdict, ContributingVerdict>();
+  for (const r of considered) {
+    const w = effectiveWeight(r);
+    if (w >= minRelevance) {
+      aboveThreshold.push(r);
+      continue;
+    }
+    const v = r.verdict as AggregateVerdict;
+    const existing = belowThresholdBuckets.get(v);
+    if (existing) {
+      existing.weight += w;
+      existing.rowCount += 1;
+    } else {
+      belowThresholdBuckets.set(v, { verdict: v, weight: w, rowCount: 1 });
+    }
+  }
+  const droppedLowRelevance = sortContributing([...belowThresholdBuckets.values()]);
+
   if (aboveThreshold.length === 0) {
     return {
       verdict: "unchecked",
       confidence: null,
       sourcesChecked: considered.length,
       contributing: [],
+      droppedLowRelevance,
       droppedNotApplicable,
     };
   }
@@ -166,19 +187,21 @@ export function aggregateEvidence(
       confidence: null,
       sourcesChecked: considered.length,
       contributing: [],
+      droppedLowRelevance,
       droppedNotApplicable,
     };
   }
 
   // Step 5: pick winner. Score desc, then priority asc.
-  const ranked = [...buckets.entries()].sort((a, b) => {
-    if (a[1].weight !== b[1].weight) return b[1].weight - a[1].weight;
-    const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a[0]] ?? 99;
-    const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b[0]] ?? 99;
-    return aPri - bPri;
-  });
-  const winningVerdict = ranked[0][0];
-  const winningBucket = ranked[0][1];
+  const contributing = sortContributing(
+    [...buckets.entries()].map(([verdict, b]) => ({
+      verdict,
+      weight: b.weight,
+      rowCount: b.rowCount,
+    })),
+  );
+  const winningVerdict = contributing[0].verdict;
+  const winningBucket = buckets.get(winningVerdict)!;
 
   // Step 6: confidence = weighted average of the winning bucket's rows
   // that reported a confidence value (computed in step 4).
@@ -187,17 +210,22 @@ export function aggregateEvidence(
       ? winningBucket.confidenceWeightedSum / winningBucket.confidenceWeightSum
       : null;
 
-  const contributing: ContributingVerdict[] = ranked.map(([verdict, b]) => ({
-    verdict,
-    weight: b.weight,
-    rowCount: b.rowCount,
-  }));
-
   return {
     verdict: winningVerdict,
     confidence,
     sourcesChecked: considered.length,
     contributing,
+    droppedLowRelevance,
     droppedNotApplicable,
   };
+}
+
+/** Sort contributing buckets by weight desc, ties broken by priority. */
+function sortContributing(items: ContributingVerdict[]): ContributingVerdict[] {
+  return [...items].sort((a, b) => {
+    if (a.weight !== b.weight) return b.weight - a.weight;
+    const aPri = SOURCE_CHECK_VERDICT_PRIORITY[a.verdict] ?? 99;
+    const bPri = SOURCE_CHECK_VERDICT_PRIORITY[b.verdict] ?? 99;
+    return aPri - bPri;
+  });
 }

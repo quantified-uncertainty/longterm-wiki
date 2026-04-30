@@ -14,6 +14,7 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { getApiKey } from './api-keys.ts';
+import { OpenRouterChatResponseSchema, type OpenRouterChatResponse } from './openrouter-schemas.ts';
 
 const OPENROUTER_API_KEY = getApiKey('OPENROUTER_API_KEY');
 const BASE_URL = 'https://openrouter.ai/api/v1/chat/completions';
@@ -42,11 +43,14 @@ export interface OpenRouterOptions {
   systemPrompt?: string | null;
 }
 
+/** Token-usage fields returned by OpenRouter (subset of OpenRouterChatResponse). */
+export type OpenRouterUsage = NonNullable<OpenRouterChatResponse['usage']>;
+
 export interface OpenRouterResult {
   content: string;
   citations: string[];
   model: string;
-  usage: Record<string, unknown>;
+  usage: OpenRouterUsage;
   cost: number;
 }
 
@@ -87,13 +91,12 @@ async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): 
     })
   });
 
-  const data = await response.json() as {
-    error?: { message?: string };
-    citations?: string[];
-    choices: Array<{ message: { content: string; citations?: string[] } }>;
-    model: string;
-    usage: Record<string, unknown> & { cost?: number };
-  };
+  const rawJson: unknown = await response.json().catch(() => ({}));
+  const parsed = OpenRouterChatResponseSchema.safeParse(rawJson);
+  if (!parsed.success) {
+    throw new Error(`OpenRouter response failed schema validation: ${parsed.error.message.slice(0, 200)}`);
+  }
+  const data = parsed.data;
 
   if (!response.ok || data.error) {
     const msg = data.error?.message || JSON.stringify(data.error) || `HTTP ${response.status}`;
@@ -107,14 +110,19 @@ async function callOpenRouter(prompt: string, options: OpenRouterOptions = {}): 
     throw new Error(`OpenRouter error: ${msg}`);
   }
 
+  const firstChoice = data.choices[0];
+  if (!firstChoice) {
+    throw new Error('OpenRouter returned no choices');
+  }
+
   // Perplexity includes citations in the response - extract them
-  const citations = data.citations || data.choices[0]?.message?.citations || [];
+  const citations = data.citations || firstChoice.message.citations || [];
 
   return {
-    content: data.choices[0].message.content,
+    content: firstChoice.message.content || '',
     citations,  // Array of source URLs that [1], [2], etc. refer to
     model: data.model,
-    usage: data.usage,
+    usage: data.usage ?? {},
     cost: data.usage?.cost || 0,
   };
 }

@@ -18,6 +18,7 @@ import {
   appendJsonl,
   appendJsonlLocked,
   countConsecutiveCycles,
+  isHealthyState,
   readRecentPrCycles,
   stateFingerprint,
 } from './state.ts';
@@ -439,6 +440,110 @@ describe('applyStuckCycleDetection', () => {
         expect(detected[0].stuckCycles).toBeGreaterThanOrEqual(STUCK_CYCLE_THRESHOLD);
       }
     }
+  });
+
+  it.each([
+    { mergeable: 'MERGEABLE',  rollupConclusion: 'PASS',    blockingCommentCount: 0, expected: true,  desc: 'mergeable + CI pass + no blocking comments' },
+    { mergeable: 'MERGEABLE',  rollupConclusion: 'NONE',    blockingCommentCount: 0, expected: true,  desc: 'mergeable + no CI configured (docs PR) + no blockers' },
+    { mergeable: 'UNKNOWN',    rollupConclusion: 'PASS',    blockingCommentCount: 0, expected: true,  desc: 'GitHub still computing mergeability + CI pass' },
+    { mergeable: 'MERGEABLE',  rollupConclusion: 'PENDING', blockingCommentCount: 0, expected: true,  desc: 'CI still in progress is treated as not-failing' },
+    { mergeable: 'MERGEABLE',  rollupConclusion: 'PASS',    blockingCommentCount: 1, expected: false, desc: 'has a blocking comment' },
+    { mergeable: 'MERGEABLE',  rollupConclusion: 'FAIL',    blockingCommentCount: 0, expected: false, desc: 'CI is failing' },
+    { mergeable: 'CONFLICTING', rollupConclusion: 'PASS',   blockingCommentCount: 0, expected: false, desc: 'has merge conflicts' },
+    { mergeable: 'UNKNOWN',    rollupConclusion: 'FAIL',    blockingCommentCount: 0, expected: false, desc: 'CI is failing even if mergeability unknown' },
+  ])('isHealthyState($desc) = $expected', ({ mergeable, rollupConclusion, blockingCommentCount, expected }) => {
+    expect(isHealthyState({ mergeable, rollupConclusion, blockingCommentCount })).toBe(expected);
+  });
+
+  // A PR in a "healthy" state (mergeable in {MERGEABLE, UNKNOWN}, CI not
+  // failing, zero top-level blocking comments) is awaiting human approval,
+  // not stuck on a problem the patrol can fix.
+  it.each([
+    {
+      label: 'MERGEABLE:PASS:0',
+      mergeable: 'MERGEABLE',
+      rollupContexts: [{ conclusion: 'SUCCESS', name: 'build' }],
+      expectedFingerprint: 'MERGEABLE:PASS:0',
+    },
+    {
+      label: 'MERGEABLE:NONE:0 (docs PR with no CI)',
+      mergeable: 'MERGEABLE',
+      rollupContexts: [],
+      expectedFingerprint: 'MERGEABLE:NONE:0',
+    },
+    {
+      label: 'UNKNOWN:PASS:0 (mergeability lookup racing)',
+      mergeable: 'UNKNOWN',
+      rollupContexts: [{ conclusion: 'SUCCESS', name: 'build' }],
+      expectedFingerprint: 'UNKNOWN:PASS:0',
+    },
+  ])('does NOT escalate as stuck for healthy fingerprint $label', async ({ mergeable, rollupContexts, expectedFingerprint }) => {
+    const prNum = 100;
+    const healthyNode = (sha: string): GqlPrNode => makePrNode({
+      number: prNum,
+      headRefOid: sha,
+      mergeable,
+      commits: {
+        nodes: [
+          {
+            commit: {
+              statusCheckRollup: {
+                contexts: { nodes: rollupContexts },
+              },
+            },
+          },
+        ],
+      },
+    });
+
+    // Run 5 consecutive cycles. EVERY cycle must not escalate, not just
+    // the last one — a transient flip at cycle 3 followed by an unflip
+    // at cycle 4 would otherwise pass.
+    for (let cycle = 1; cycle <= 5; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum, issues: ['bot-review-major'] })];
+      await applyStuckCycleDetection(detected, [healthyNode(`sha${cycle}`)], file);
+      expect(detected[0].issues, `cycle ${cycle}`).not.toContain('stuck');
+      if (cycle >= STUCK_CYCLE_THRESHOLD) {
+        expect(detected[0].stuckCycles, `cycle ${cycle}`).toBeGreaterThanOrEqual(STUCK_CYCLE_THRESHOLD);
+        expect(detected[0].stuckReason, `cycle ${cycle}`).toBe(expectedFingerprint);
+      }
+    }
+  });
+
+  it('still escalates as stuck when fingerprint transitions from healthy to unhealthy', async () => {
+    // 3 healthy cycles followed by 3 conflicting cycles: must escalate at
+    // the 3rd conflicting cycle. Verifies the healthy-fingerprint guard
+    // doesn't somehow leak across fingerprint transitions.
+    const prNum = 101;
+
+    for (let cycle = 1; cycle <= 3; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum })];
+      await applyStuckCycleDetection(
+        detected,
+        [makePrNode({
+          number: prNum,
+          headRefOid: `sha${cycle}`,
+          mergeable: 'MERGEABLE',
+          commits: { nodes: [{ commit: { statusCheckRollup: { contexts: { nodes: [{ conclusion: 'SUCCESS', name: 'build' }] } } } }] },
+        })],
+        file,
+      );
+      expect(detected[0].issues).not.toContain('stuck');
+    }
+
+    let last: DetectedPr | undefined;
+    for (let cycle = 4; cycle <= 6; cycle++) {
+      const detected = [makeDetectedPr({ number: prNum })];
+      await applyStuckCycleDetection(
+        detected,
+        [makePrNode({ number: prNum, headRefOid: `sha${cycle}` })], // CONFLICTING:FAIL default
+        file,
+      );
+      last = detected[0];
+    }
+    expect(last).toBeDefined();
+    expect(last!.issues).toContain('stuck');
+    expect(last!.stuckReason).toBe('CONFLICTING:FAIL:0');
   });
 
   it('persists a pr_cycle_snapshot entry to the JSONL file each cycle', async () => {

@@ -11,6 +11,7 @@
  * QUA-92: Wikidata deterministic matcher for sourcing pipeline.
  */
 
+import { z } from 'zod';
 import type { VerifyItem, VerifyResult, FactItemData } from './orchestrator-types.ts';
 import type { SourcingVerdict } from '../../../apps/wiki-server/src/api-types.ts';
 import { nameMatches, dateMatches } from './fuzzy-match.ts';
@@ -39,10 +40,47 @@ interface WikidataEntity {
   sitelinks?: Record<string, { site: string; title: string }>;
 }
 
-/** Wikidata API response for wbgetentities */
-interface WbGetEntitiesResponse {
-  entities: Record<string, WikidataEntity>;
-}
+/**
+ * Zod schema for the wbgetentities response. Validates each entity's
+ * top-level shape (`id`, `labels`, `claims`, `sitelinks`) and each claim's
+ * `mainsnak` + `rank`, so the downstream `as WikidataEntity` cast is
+ * structurally honest. Per-claim narrowing on `datavalue.type` is still
+ * done by `getStringValue` / `getTimeValue` / `getEntityRefQid` /
+ * `getQuantityValue` below.
+ */
+const WikidataClaimSchema = z.object({
+  mainsnak: z.object({
+    snaktype: z.string(),
+    property: z.string(),
+    datavalue: z.object({
+      type: z.string(),
+      value: z.unknown(),
+    }).optional(),
+  }).passthrough(),
+  rank: z.enum(['preferred', 'normal', 'deprecated']),
+}).passthrough();
+
+const WikidataLabelSchema = z.object({
+  language: z.string(),
+  value: z.string(),
+}).passthrough();
+
+const WikidataSitelinkSchema = z.object({
+  site: z.string(),
+  title: z.string(),
+}).passthrough();
+
+const WikidataEntitySchema = z.object({
+  id: z.string().optional(),
+  missing: z.unknown().optional(),
+  labels: z.record(z.string(), WikidataLabelSchema).optional(),
+  claims: z.record(z.string(), z.array(WikidataClaimSchema)).optional(),
+  sitelinks: z.record(z.string(), WikidataSitelinkSchema).optional(),
+}).passthrough();
+
+const WbGetEntitiesResponseSchema = z.object({
+  entities: z.record(z.string(), z.unknown()),
+}).passthrough();
 
 /** Match strategy for a property */
 type MatchStrategy =
@@ -197,10 +235,21 @@ export async function fetchEntities(qids: string[]): Promise<Map<string, Wikidat
         continue;
       }
 
-      const data = (await response.json()) as WbGetEntitiesResponse;
+      const rawJson: unknown = await response.json().catch(() => null);
+      const parsed = WbGetEntitiesResponseSchema.safeParse(rawJson);
+      if (!parsed.success) {
+        console.warn(`[wikidata-matcher] Invalid wbgetentities response for batch ${i / 50 + 1}: ${parsed.error.message.slice(0, 200)}`);
+        for (const qid of batch) entityCache.set(qid, null);
+        continue;
+      }
+      const data = parsed.data;
       for (const qid of batch) {
-        const entity = data.entities[qid];
-        if (entity && !('missing' in entity)) {
+        const rawEntity = data.entities[qid];
+        const entityParse = WikidataEntitySchema.safeParse(rawEntity);
+        // Drop entities that fail shape validation OR are flagged `missing`
+        // by Wikidata. Strategy matchers below tolerate undefined fields.
+        if (entityParse.success && entityParse.data.missing === undefined) {
+          const entity = entityParse.data as WikidataEntity;
           entityCache.set(qid, entity);
           result.set(qid, entity);
         } else {

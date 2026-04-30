@@ -9577,3 +9577,58 @@
     Cloud-computing arm of Alibaba Group. Develops the Qwen series of
     foundation models. Surfaced through FLI AI Safety Index ingestion.
 
+# QUA-836 — backfill missing scorecard publisher entities (Stanford CRFM, Midas Project)
+- id: stanford-crfm
+  stableId: sid_sZYjreyZPA
+  wikiId: E2535
+  type: organization
+  orgType: academic
+  title: Stanford Center for Research on Foundation Models (CRFM)
+  aliases:
+    - CRFM
+    - Stanford CRFM
+    - Center for Research on Foundation Models
+  website: https://crfm.stanford.edu
+  description: >-
+    Interdisciplinary research center at Stanford HAI founded in 2021 to
+    advance research on foundation models. Coined the term "foundation model"
+    in its 2021 report "On the Opportunities and Risks of Foundation Models."
+    Publishes the Foundation Model Transparency Index (FMTI), a recurring
+    scorecard evaluating major model developers across domains, resources,
+    and downstream impact. Led by Percy Liang.
+  tags:
+    - ai-safety
+    - ai-governance
+    - foundation-models
+    - academic
+    - transparency
+  relatedEntries:
+    - id: stanford-university
+      type: organization
+      relationship: part-of
+    - id: stanford-hai
+      type: organization
+      relationship: part-of
+  lastUpdated: 2026-04
+
+- id: the-midas-project
+  stableId: sid_iIWDCVhdBw
+  wikiId: E2536
+  type: organization
+  orgType: safety-org
+  title: The Midas Project
+  aliases:
+    - Midas Project
+  website: https://www.themidasproject.com
+  description: >-
+    Nonprofit AI corporate accountability watchdog. Tracks AI labs' safety
+    commitments and policy positions, publishes the Seoul Tracker monitoring
+    signatories' implementation of the 2024 AI Seoul Summit Frontier AI
+    Safety Commitments.
+  tags:
+    - ai-safety
+    - ai-governance
+    - corporate-accountability
+    - transparency
+  lastUpdated: 2026-04
+

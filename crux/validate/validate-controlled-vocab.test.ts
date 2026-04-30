@@ -3,6 +3,7 @@ import {
   suggestCorrection,
   checkValue,
   checkYamlEntities,
+  exitCodeForResult,
   VALID_ENTITY_TYPES,
   VALID_RELATIONSHIPS,
   VALID_MATURITIES,
@@ -418,5 +419,19 @@ describe("suggestCorrection edge cases", () => {
 
   it("handles the exact match edge case (distance=0)", () => {
     expect(suggestCorrection("ab", smallVocab)).toBe("ab");
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Exit code propagation (QUA-809 regression)
+// ---------------------------------------------------------------------------
+
+describe("exitCodeForResult", () => {
+  it("returns 0 when validation passed", () => {
+    expect(exitCodeForResult({ passed: true })).toBe(0);
+  });
+
+  it("returns 1 when validation failed (gate must block)", () => {
+    expect(exitCodeForResult({ passed: false })).toBe(1);
   });
 });

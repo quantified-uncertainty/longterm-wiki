@@ -13,7 +13,7 @@ import {
   extractEvalReport,
   toSyncItem,
 } from "./extract-eval-report.ts";
-import { verifyExtractedReport } from "./span-verify.ts";
+import { verifyExtractedReport, spanVerifyToInlineSourcing } from "./span-verify.ts";
 import { dispatchIngest } from "./ingesters/dispatch.ts";
 import type { IngestCandidate } from "./ingesters/types.ts";
 
@@ -117,6 +117,9 @@ async function extractOne(
       .filter((x): x is NonNullable<typeof x> => x !== null);
 
     const id = generateId(`third-party-eval:${candidate.url}:${extract.sourceHash}`);
+    const sourcing = spanVerifyToInlineSourcing(verify, {
+      sourceContentHash: extract.sourceHash,
+    });
     const item = toSyncItem(extract, {
       id,
       evaluatorOrgId: options.evaluatorOrgId,
@@ -124,6 +127,7 @@ async function extractOne(
       sourceSystem: candidate.sourceSystem,
       models: modelLinks,
       confidenceMap: verify.confidenceMap,
+      sourcing,
     });
 
     return { kind: "ok", item };

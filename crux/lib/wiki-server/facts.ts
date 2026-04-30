@@ -71,6 +71,8 @@ export async function syncFacts(
   if (!serverUrl) return { ok: false, error: 'unavailable', message: 'LONGTERMWIKI_SERVER_URL not set' };
 
   let totalUpserted = 0;
+  // QUA-850 Phase A: track verdict writes alongside upserts.
+  let totalVerdictsWritten = 0;
 
   for (let i = 0; i < items.length; i += FACT_BATCH_SIZE) {
     const batch = items.slice(i, i + FACT_BATCH_SIZE);
@@ -87,9 +89,13 @@ export async function syncFacts(
     }
 
     totalUpserted += result.data.upserted;
+    // `verdictsWritten` is always present in the server response (both the
+    // happy path and the early-exit "all entities missing" path return it).
+    // Default to 0 defensively in case an older server is in front.
+    totalVerdictsWritten += result.data.verdictsWritten ?? 0;
   }
 
-  return { ok: true, data: { upserted: totalUpserted } };
+  return { ok: true, data: { upserted: totalUpserted, verdictsWritten: totalVerdictsWritten } };
 }
 
 export async function getFactsByEntity(

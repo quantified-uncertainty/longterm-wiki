@@ -1295,7 +1295,7 @@ export function EntityProfileViewer({
         lastManualSearchRef.current = null;
         return;
       }
-      doSearch(target);
+      void doSearch(target);
     }
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams, initialData, doSearch]);
@@ -1306,7 +1306,7 @@ export function EntityProfileViewer({
       const params = new URLSearchParams(searchParams.toString());
       params.set("entity", query);
       router.push(`?${params.toString()}`, { scroll: false });
-      doSearch(query);
+      void doSearch(query);
     },
     [router, searchParams, doSearch]
   );

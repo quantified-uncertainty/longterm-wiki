@@ -46,6 +46,11 @@ export interface OrgRow {
 
   /** Number of tracked people (from employed-by facts). Null when unknown (API mode). */
   peopleCount: number | null;
+  /**
+   * Number of grants where this org is the grantor. 0 means non-funder; null means
+   * the data wasn't loaded (e.g. local-only fallback row not yet enriched server-side).
+   */
+  grantsGivenCount: number | null;
   /** Completeness score 1-4 based on available data */
   completionScore: number;
   /** Source-check verdict string (confirmed, contradicted, etc.) or null */
@@ -97,6 +102,7 @@ const ServerOrgSchema = z.object({
   headcountDate: z.string().nullable(),
   totalFundingNum: z.number().nullable(),
   foundedDate: z.string().nullable(),
+  grantsGivenCount: z.number().nullable().optional(),
   verdictString: z.string().nullable().optional(),
 });
 
@@ -116,6 +122,7 @@ const SORT_KEY_TO_SERVER_FIELD: Partial<Record<SortKey, string>> = {
   headcount: "headcount",
   totalFunding: "totalFunding",
   founded: "founded",
+  grantsGiven: "grantsGiven",
 };
 
 const PAGE_SIZE = 50;
@@ -149,6 +156,7 @@ function transformOrgsResponse(json: unknown): { rows: OrgRow[]; total: number }
       totalFundingNum: org.totalFundingNum,
       foundedDate: org.foundedDate,
       peopleCount: null, // Not available from API
+      grantsGivenCount: org.grantsGivenCount ?? null,
       completionScore: computeOrgCoverage(org),
       verdictString: org.verdictString ?? null,
       searchText: "",
@@ -406,12 +414,13 @@ export function OrganizationsTable({
   // peopleCount is intentionally NOT exposed: the API doesn't return it and
   // the local FactBase data is too sparse to be useful. Re-add when there's
   // a server-side rollup of personnel/career counts per org.
-  type OptionalColumnKey = "peopleCount" | "completionScore";
+  type OptionalColumnKey = "peopleCount" | "grantsGiven" | "completionScore";
   const OPTIONAL_COLUMNS: { key: OptionalColumnKey; label: string }[] = [
+    { key: "grantsGiven", label: "Grants given" },
     { key: "completionScore", label: "Coverage" },
   ];
   const [visibleColumns, setVisibleColumns] = useState<Set<OptionalColumnKey>>(
-    () => new Set(["completionScore"]),
+    () => new Set(["grantsGiven", "completionScore"]),
   );
   const toggleColumn = (key: OptionalColumnKey) => {
     setVisibleColumns((prev) => {
@@ -422,7 +431,10 @@ export function OrganizationsTable({
     });
   };
   // Base column count: Name + Type + Revenue + Valuation + Headcount + Funding + Founded = 7
-  const activeColCount = 7 + (visibleColumns.has("completionScore") ? 1 : 0) + (visibleColumns.has("peopleCount") ? 1 : 0);
+  const activeColCount = 7
+    + (visibleColumns.has("completionScore") ? 1 : 0)
+    + (visibleColumns.has("peopleCount") ? 1 : 0)
+    + (visibleColumns.has("grantsGiven") ? 1 : 0);
 
   return (
     <div>
@@ -533,6 +545,13 @@ export function OrganizationsTable({
               <SortHeader label="Headcount" sortKey="headcount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Total Funding" sortKey="totalFunding" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
               <SortHeader label="Founded" sortKey="founded" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-center" />
+              {visibleColumns.has("grantsGiven") && (
+                isSortable("grantsGiven") ? (
+                  <SortHeader label="Grants given" sortKey="grantsGiven" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
+                ) : (
+                  <th scope="col" className="py-2.5 px-3 font-medium text-right">Grants given</th>
+                )
+              )}
               {visibleColumns.has("peopleCount") && (
                 isSortable("peopleCount") ? (
                   <SortHeader label="People" sortKey="peopleCount" currentSort={sortKey} currentDir={sortDir} onSort={handleSort} className="text-right" />
@@ -661,6 +680,19 @@ export function OrganizationsTable({
                     <td className="py-2.5 px-3 text-center text-muted-foreground">
                       {row.foundedDate ?? <span className="text-muted-foreground/40">{"\u2014"}</span>}
                     </td>
+
+                    {/* Grants given */}
+                    {visibleColumns.has("grantsGiven") && (
+                      <td className="py-2.5 px-3 text-right tabular-nums">
+                        {row.grantsGivenCount != null && row.grantsGivenCount > 0 ? (
+                          <span title={`${row.grantsGivenCount} grants given by ${row.name}`}>
+                            {formatCompactNum(row.grantsGivenCount)}
+                          </span>
+                        ) : (
+                          <span className="text-muted-foreground/40">{"\u2014"}</span>
+                        )}
+                      </td>
+                    )}
 
                     {/* People Count */}
                     {visibleColumns.has("peopleCount") && (
