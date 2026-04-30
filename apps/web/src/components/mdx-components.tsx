@@ -86,6 +86,7 @@ import { DataSourcesContent } from "@/app/data-sources/data-sources-content";
 import { TablebaseCoverageContent } from "@/app/internal/tablebase-coverage/tablebase-coverage-content";
 import { AutomationLandscapeContent } from "@/app/internal/automation-landscape/automation-landscape-content";
 import { FrameworkReviewContent } from "@/app/internal/framework-review/framework-review-content";
+import { BenchmarkQuarantineContent } from "@/app/internal/benchmark-quarantine/benchmark-quarantine-content";
 
 // Ported stub components — high priority
 import { Section } from "@/components/wiki/Section";
@@ -254,6 +255,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   TablebaseCoverageContent,
   AutomationLandscapeContent,
   FrameworkReviewContent,
+  BenchmarkQuarantineContent,
 
   // Table view components
   SafetyApproachesTableView,
