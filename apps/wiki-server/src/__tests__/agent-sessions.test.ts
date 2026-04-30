@@ -18,6 +18,8 @@ let store: Array<{
   task: string;
   session_type: string;
   issue_number: number | null;
+  linear_id: string | null;
+  slot_number: number | null;
   checklist_md: string;
   status: string;
   started_at: Date;
@@ -89,13 +91,19 @@ const dispatch: SqlDispatcher = (query, params) => {
 
   // ---- INSERT INTO agent_sessions ----
   if (q.includes("insert into") && q.includes("agent_sessions")) {
+    // The route's INSERT lists columns in this order (Drizzle preserves
+    // the order of the `values()` object): branch, task, session_type,
+    // issue_number, linear_id, slot_number, checklist_md, worktree.
+    // The remaining fields are filled by DB defaults.
     const row = {
       id: nextId++,
       branch: params[0] as string,
       task: params[1] as string,
       session_type: params[2] as string,
-      issue_number: params[3] as number | null,
-      checklist_md: params[4] as string,
+      issue_number: (params[3] as number | null) ?? null,
+      linear_id: (params[4] as string | null) ?? null,
+      slot_number: (params[5] as number | null) ?? null,
+      checklist_md: params[6] as string,
       status: "active",
       started_at: new Date(),
       completed_at: null,
@@ -113,6 +121,42 @@ const dispatch: SqlDispatcher = (query, params) => {
     };
     store.push(row);
     return [row];
+  }
+
+  // ---- SELECT id, branch, linear_id, ... FROM agent_sessions WHERE
+  // linear_id IS NOT NULL AND status != 'completed' AND updated_at < cutoff
+  // ORDER BY updated_at DESC LIMIT N (QUA-815 stale-claims) ----
+  // Drizzle's `ne()` operator emits SQL `<>`, not `!=`. The matcher uses
+  // `<>` to remain robust against unrelated SELECTs that include `!=` in
+  // some other context.
+  if (
+    q.includes("agent_sessions") &&
+    q.includes("select") &&
+    q.includes("linear_id") &&
+    /"linear_id"\s+is not null/i.test(q) &&
+    /"status"\s*<>/.test(q) &&
+    /"updated_at"\s*</.test(q)
+  ) {
+    const toDate = (p: unknown): Date =>
+      p instanceof Date ? p : new Date(p as string);
+    const excludeStatus = params[0] as string;
+    const cutoff = toDate(params[1]);
+    const matches = store
+      .filter((r) =>
+        r.linear_id !== null &&
+        r.status !== excludeStatus &&
+        r.updated_at < cutoff
+      )
+      .sort((a, b) => b.updated_at.getTime() - a.updated_at.getTime());
+    return matches.map((r) => ({
+      id: r.id,
+      branch: r.branch,
+      linear_id: r.linear_id,
+      slot_number: r.slot_number,
+      status: r.status,
+      started_at: r.started_at,
+      updated_at: r.updated_at,
+    }));
   }
 
   // ---- UPDATE agent_sessions SET ... WHERE "updated_at" < $ (sweep handler) ----
@@ -855,6 +899,108 @@ describe("Agent Sessions API", () => {
         body: "",
       });
       expect(res.status).toBe(200);
+    });
+  });
+
+  // ================================================================
+  // GET /stale-claims — stale Linear-claiming sessions (QUA-815)
+  // ================================================================
+
+  describe("GET /api/agent-sessions/stale-claims", () => {
+    /** Seed a session with the given linearId and an `updated_at` skew. */
+    async function seedClaim(
+      branch: string,
+      linearId: string | null,
+      staleMinutesAgo: number,
+      status: string = "active",
+    ) {
+      await postJson(app, "/api/agent-sessions", {
+        ...sampleSession,
+        branch,
+        linearId,
+      });
+      const row = store.find((r) => r.branch === branch)!;
+      row.updated_at = new Date(Date.now() - staleMinutesAgo * 60 * 1000);
+      row.status = status;
+    }
+
+    it("returns sessions with linear_id stale past staleMinutes (default 30)", async () => {
+      await seedClaim("claude/qua-100-stale", "QUA-100", 60); // 60min stale, eligible
+      await seedClaim("claude/qua-101-fresh", "QUA-101", 5);  // 5min, not stale
+      await seedClaim("claude/no-linear", null, 60);          // stale but no linear_id
+
+      const res = await app.request("/api/agent-sessions/stale-claims");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.staleMinutes).toBe(30);
+      expect(body.sessions).toHaveLength(1);
+      expect(body.sessions[0].branch).toBe("claude/qua-100-stale");
+      expect(body.sessions[0].linearId).toBe("QUA-100");
+    });
+
+    it("includes status='stale' rows (post-sweep cleanup pass)", async () => {
+      await seedClaim("claude/qua-200-active-stale", "QUA-200", 60, "active");
+      await seedClaim("claude/qua-201-marked-stale", "QUA-201", 1440, "stale");
+
+      const res = await app.request("/api/agent-sessions/stale-claims");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessions).toHaveLength(2);
+      const ids = body.sessions.map((s: { linearId: string }) => s.linearId).sort();
+      expect(ids).toEqual(["QUA-200", "QUA-201"]);
+    });
+
+    it("excludes status='completed' (graceful exit)", async () => {
+      await seedClaim("claude/qua-300-completed", "QUA-300", 60, "completed");
+      await seedClaim("claude/qua-301-active", "QUA-301", 60, "active");
+
+      const res = await app.request("/api/agent-sessions/stale-claims");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessions).toHaveLength(1);
+      expect(body.sessions[0].linearId).toBe("QUA-301");
+    });
+
+    it("honors custom staleMinutes", async () => {
+      await seedClaim("claude/qua-400-1h", "QUA-400", 60);     // 1h stale
+      await seedClaim("claude/qua-401-3h", "QUA-401", 180);    // 3h stale
+
+      const res = await app.request(
+        "/api/agent-sessions/stale-claims?staleMinutes=120",
+      );
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      // Only the 3h-stale row exceeds 2h cutoff
+      expect(body.sessions).toHaveLength(1);
+      expect(body.sessions[0].linearId).toBe("QUA-401");
+    });
+
+    it("orders results by updated_at descending (newest stale first)", async () => {
+      await seedClaim("claude/qua-501-old", "QUA-501", 1440); // 1d
+      await seedClaim("claude/qua-502-recent", "QUA-502", 35); // 35min
+
+      const res = await app.request("/api/agent-sessions/stale-claims");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessions[0].linearId).toBe("QUA-502");
+      expect(body.sessions[1].linearId).toBe("QUA-501");
+    });
+
+    it("rejects out-of-range staleMinutes", async () => {
+      // 43200 (30d) is the upper bound; > 43200 must be rejected.
+      const res = await app.request(
+        "/api/agent-sessions/stale-claims?staleMinutes=99999",
+      );
+      expect(res.status).toBe(400);
+    });
+
+    it("returns empty list when no sessions are stale", async () => {
+      await seedClaim("claude/qua-600-fresh", "QUA-600", 5);
+
+      const res = await app.request("/api/agent-sessions/stale-claims");
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.sessions).toEqual([]);
     });
   });
 
