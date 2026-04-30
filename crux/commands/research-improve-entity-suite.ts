@@ -206,6 +206,30 @@ function gitSha(): string | null {
   }
 }
 
+/** Zero-row for entities that never ran (skipped_budget) or threw (failed). */
+function emptyRecord(
+  entry: SuiteEntry,
+  status: "skipped_budget" | "failed",
+  error?: string,
+): PerEntityRecord {
+  return {
+    slug: entry.slug,
+    type: entry.type,
+    status,
+    iterations: [],
+    claims_proposed: 0,
+    claims_verified: 0,
+    claims_partial: 0,
+    claims_contradicted: 0,
+    claims_unverifiable: 0,
+    verified_rate: 0,
+    applied_to_yaml: 0,
+    cost_usd: 0,
+    duration_s: 0,
+    error,
+  };
+}
+
 /**
  * Run the suite. Returns the snapshot. Side effects:
  *   - Calls `improver()` once per supported entity in suite order.
@@ -229,21 +253,7 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
   for (const entry of supported) {
     const remaining = opts.totalBudgetUsd - totalSpent;
     if (remaining <= MIN_USEFUL_BUDGET_USD) {
-      records.push({
-        slug: entry.slug,
-        type: entry.type,
-        status: "skipped_budget",
-        iterations: [],
-        claims_proposed: 0,
-        claims_verified: 0,
-        claims_partial: 0,
-        claims_contradicted: 0,
-        claims_unverifiable: 0,
-        verified_rate: 0,
-        applied_to_yaml: 0,
-        cost_usd: 0,
-        duration_s: 0,
-      });
+      records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
     // Hard cap is the per-entity 2× expected; never let it exceed remaining.
@@ -273,22 +283,7 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       console.warn(`[suite] FAILED: ${entry.slug}: ${msg}`);
-      records.push({
-        slug: entry.slug,
-        type: entry.type,
-        status: "failed",
-        iterations: [],
-        claims_proposed: 0,
-        claims_verified: 0,
-        claims_partial: 0,
-        claims_contradicted: 0,
-        claims_unverifiable: 0,
-        verified_rate: 0,
-        applied_to_yaml: 0,
-        cost_usd: 0,
-        duration_s: 0,
-        error: msg,
-      });
+      records.push(emptyRecord(entry, "failed", msg));
     }
   }
 
