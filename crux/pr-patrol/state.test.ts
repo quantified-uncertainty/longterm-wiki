@@ -325,18 +325,19 @@ describe('auto-merge disabled circuit breaker', () => {
     expect(new Date(status.disabledAt).toString()).not.toBe('Invalid Date');
   });
 
-  it('markAutoMergeDisabled() is idempotent — does not extend cooldown on repeated calls', () => {
+  it('markAutoMergeDisabled() is idempotent — preserves the original reason and timestamp on re-mark', () => {
     markAutoMergeDisabled('reason A');
     const first = isAutoMergeDisabled();
     if (!first.disabled) throw new Error('expected disabled after first mark');
     const firstAt = first.disabledAt;
 
-    // Wait a tick, mark again with a different reason
+    // A second mark with a different reason should NOT overwrite — the
+    // existing file stays in place so the original disabledAt is preserved.
     markAutoMergeDisabled('reason B');
     const second = isAutoMergeDisabled();
     if (!second.disabled) throw new Error('expected disabled after second mark');
-    expect(second.disabledAt).toBe(firstAt); // unchanged
-    expect(second.reason).toContain('reason A'); // first reason preserved
+    expect(second.disabledAt).toBe(firstAt);
+    expect(second.reason).toContain('reason A');
   });
 
   it('clearAutoMergeDisabled() removes the state file', () => {
@@ -373,6 +374,32 @@ describe('auto-merge disabled circuit breaker', () => {
 
   it('treats corrupt state file as cleared', () => {
     writeFileSync(STATE_FILE, 'not json{{{');
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+    expect(existsSync(STATE_FILE)).toBe(false);
+  });
+
+  it('treats malformed-but-parseable JSON as cleared (missing disabledAt)', () => {
+    // Without shape validation, missing disabledAt would parse as undefined,
+    // making `NaN >= cooldown` false and trapping the breaker indefinitely.
+    writeFileSync(STATE_FILE, JSON.stringify({ reason: 'no timestamp' }));
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+    expect(existsSync(STATE_FILE)).toBe(false);
+  });
+
+  it('treats malformed-but-parseable JSON as cleared (wrong-typed disabledAt)', () => {
+    writeFileSync(
+      STATE_FILE,
+      JSON.stringify({ reason: 'wrong type', disabledAt: 12345 }),
+    );
+    expect(isAutoMergeDisabled()).toEqual({ disabled: false });
+    expect(existsSync(STATE_FILE)).toBe(false);
+  });
+
+  it('treats unparseable disabledAt date string as cleared', () => {
+    writeFileSync(
+      STATE_FILE,
+      JSON.stringify({ reason: 'bad date', disabledAt: 'not-a-real-date' }),
+    );
     expect(isAutoMergeDisabled()).toEqual({ disabled: false });
     expect(existsSync(STATE_FILE)).toBe(false);
   });

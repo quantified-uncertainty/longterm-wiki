@@ -627,7 +627,8 @@ async function runCheckCycle(
       `  ${cl.yellow}Skipping ${eligibleForMerge.length} merge enqueue(s) — auto-merge is disabled at the repository level (since ${autoMergeStatus.disabledAt}). Re-enable in repo Settings → Pull Requests → Allow auto-merge.${cl.reset}`,
     );
   } else {
-    for (const candidate of eligibleForMerge) {
+    for (let i = 0; i < eligibleForMerge.length; i++) {
+      const candidate = eligibleForMerge[i];
       const outcome = await enqueuePr(candidate, config);
       if (outcome === 'enqueued' || outcome === 'dry-run') {
         enqueuedPrs.push(candidate.number);
@@ -635,7 +636,7 @@ async function runCheckCycle(
       // If the first attempt tripped the repo-level circuit breaker, skip the
       // remaining candidates this cycle — they would all hit the same error.
       if (isAutoMergeDisabled().disabled) {
-        const remaining = eligibleForMerge.length - eligibleForMerge.indexOf(candidate) - 1;
+        const remaining = eligibleForMerge.length - i - 1;
         if (remaining > 0) {
           log(`  ${cl.yellow}Skipping ${remaining} remaining merge enqueue(s) this cycle — auto-merge disabled at repo level${cl.reset}`);
         }

@@ -410,10 +410,28 @@ export function isAutoMergeDisabled():
   | { disabled: true; reason: string; disabledAt: string } {
   if (!existsSync(AUTO_MERGE_DISABLED_FILE)) return { disabled: false };
   try {
-    const state = JSON.parse(
+    const raw: unknown = JSON.parse(
       readFileSync(AUTO_MERGE_DISABLED_FILE, 'utf-8'),
-    ) as AutoMergeDisabledState;
-    const elapsed = Date.now() - new Date(state.disabledAt).getTime();
+    );
+    if (
+      typeof raw !== 'object' ||
+      raw === null ||
+      typeof (raw as { disabledAt?: unknown }).disabledAt !== 'string' ||
+      typeof (raw as { reason?: unknown }).reason !== 'string'
+    ) {
+      // Malformed but parseable JSON (e.g., missing or wrong-typed fields)
+      // would leave disabledAt as `undefined`, making `NaN >= cooldown` false
+      // and trapping the breaker indefinitely. Treat as cleared.
+      try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
+      return { disabled: false };
+    }
+    const state = raw as AutoMergeDisabledState;
+    const disabledAtMs = new Date(state.disabledAt).getTime();
+    if (Number.isNaN(disabledAtMs)) {
+      try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
+      return { disabled: false };
+    }
+    const elapsed = Date.now() - disabledAtMs;
     if (elapsed >= AUTO_MERGE_DISABLED_COOLDOWN_MS) {
       try { unlinkSync(AUTO_MERGE_DISABLED_FILE); } catch { /* best-effort */ }
       return { disabled: false };
