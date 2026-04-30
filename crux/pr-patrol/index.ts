@@ -90,6 +90,7 @@ import {
   getCodeRabbitRetryTime,
   getTrackedMainFixPr,
   isAbandoned,
+  isAutoMergeDisabled,
   isCircuitOpen,
   isRecentlyProcessed,
   JSONL_FILE as JSONL_FILE_INTERNAL,
@@ -617,13 +618,29 @@ async function runCheckCycle(
 
   // Enqueue ALL eligible PRs — the merge queue handles serialization
   // Skip if deploy pipeline is failing — don't merge into a broken pipeline
+  // Skip if auto-merge has been disabled at the repo level (QUA-858)
+  const autoMergeStatus = isAutoMergeDisabled();
   if (!deployHealth.healthy) {
     log(`  ${cl.yellow}Skipping merge enqueue — deploy pipeline is failing since ${deployHealth.failingSince ?? 'unknown'}${cl.reset}`);
+  } else if (autoMergeStatus.disabled && eligibleForMerge.length > 0) {
+    log(
+      `  ${cl.yellow}Skipping ${eligibleForMerge.length} merge enqueue(s) — auto-merge is disabled at the repository level (since ${autoMergeStatus.disabledAt}). Re-enable in repo Settings → Pull Requests → Allow auto-merge.${cl.reset}`,
+    );
   } else {
-    for (const candidate of eligibleForMerge) {
+    for (let i = 0; i < eligibleForMerge.length; i++) {
+      const candidate = eligibleForMerge[i];
       const outcome = await enqueuePr(candidate, config);
       if (outcome === 'enqueued' || outcome === 'dry-run') {
         enqueuedPrs.push(candidate.number);
+      }
+      // If the first attempt tripped the repo-level circuit breaker, skip the
+      // remaining candidates this cycle — they would all hit the same error.
+      if (isAutoMergeDisabled().disabled) {
+        const remaining = eligibleForMerge.length - i - 1;
+        if (remaining > 0) {
+          log(`  ${cl.yellow}Skipping ${remaining} remaining merge enqueue(s) this cycle — auto-merge disabled at repo level${cl.reset}`);
+        }
+        break;
       }
     }
   }

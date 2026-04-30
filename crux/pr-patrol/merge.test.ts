@@ -27,6 +27,9 @@ vi.mock('./state.ts', () => ({
   cl: new Proxy({}, { get: () => '' }),
   JSONL_FILE: '/tmp/test-runs.jsonl',
   log: vi.fn(),
+  markAutoMergeDisabled: vi.fn(),
+  REPO_AUTO_MERGE_DISABLED_ERROR_FRAGMENT:
+    'Auto merge is not allowed for this repository',
 }));
 
 // Mock comments.ts to avoid real comment-posting over HTTP.
@@ -45,10 +48,12 @@ vi.mock('../lib/pr-analysis/index.ts', () => ({
 
 import { enqueuePr } from './merge.ts';
 import * as githubLib from '../lib/github.ts';
+import * as stateLib from './state.ts';
 import type { MergeCandidate, PatrolConfig } from './types.ts';
 
 const mockGraphQL = vi.mocked(githubLib.githubGraphQL);
 const mockApi = vi.mocked(githubLib.githubApi);
+const mockMarkAutoMergeDisabled = vi.mocked(stateLib.markAutoMergeDisabled);
 
 function makeCandidate(overrides: Partial<MergeCandidate> = {}): MergeCandidate {
   return {
@@ -152,5 +157,70 @@ describe('enqueuePr (QUA-473)', () => {
     );
     expect(outcome).toBe('dry-run');
     expect(mockGraphQL).not.toHaveBeenCalled();
+  });
+});
+
+describe('enqueuePr — repo-level auto-merge disabled (QUA-858)', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    mockApi.mockResolvedValue(undefined);
+  });
+
+  it('marks auto-merge disabled when GitHub returns the repo-disabled error', async () => {
+    mockGraphQL.mockRejectedValueOnce(
+      new Error(
+        'GitHub GraphQL error: Auto merge is not allowed for this repository',
+      ),
+    );
+
+    const outcome = await enqueuePr(makeCandidate(), makeConfig());
+
+    expect(outcome).toBe('error');
+    expect(mockMarkAutoMergeDisabled).toHaveBeenCalledTimes(1);
+    expect(mockMarkAutoMergeDisabled).toHaveBeenCalledWith(
+      expect.stringContaining('Auto merge is not allowed for this repository'),
+    );
+  });
+
+  it('skips the isInMergeQueue probe when the repo-level error fires', async () => {
+    // Only one mock response queued — if isInMergeQueue is called it throws,
+    // proving the probe was bypassed for this specific error class.
+    mockGraphQL.mockRejectedValueOnce(
+      new Error(
+        'GitHub GraphQL error: Auto merge is not allowed for this repository',
+      ),
+    );
+
+    await enqueuePr(makeCandidate(), makeConfig());
+
+    // Only one GraphQL call (the mutation), no follow-up probe
+    expect(mockGraphQL).toHaveBeenCalledTimes(1);
+  });
+
+  it('does NOT mark auto-merge disabled on unrelated errors', async () => {
+    // Mutation fails with a different error
+    mockGraphQL.mockRejectedValueOnce(
+      new Error('GitHub GraphQL error: Pull request is already merged'),
+    );
+    // Subsequent isInMergeQueue probe returns "not in queue"
+    mockGraphQL.mockResolvedValueOnce({
+      node: { autoMergeRequest: null },
+    } as unknown as never);
+
+    const outcome = await enqueuePr(makeCandidate(), makeConfig());
+
+    expect(outcome).toBe('error');
+    expect(mockMarkAutoMergeDisabled).not.toHaveBeenCalled();
+  });
+
+  it('does NOT mark auto-merge disabled on success', async () => {
+    mockGraphQL.mockResolvedValueOnce({
+      enablePullRequestAutoMerge: {
+        pullRequest: { id: 'x', autoMergeRequest: { enabledAt: 'x' } },
+      },
+    } as unknown as never);
+
+    await enqueuePr(makeCandidate(), makeConfig());
+    expect(mockMarkAutoMergeDisabled).not.toHaveBeenCalled();
   });
 });
