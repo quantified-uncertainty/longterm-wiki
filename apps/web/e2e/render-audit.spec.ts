@@ -393,7 +393,10 @@ test.describe("Render audit — directory Coverage columns render dots (QUA-900)
       // that empty the table for a real reason rather than data absence).
       await expect(page.locator("h1").first()).toBeVisible();
 
-      const rows = page.locator("table tbody tr");
+      // Exclude empty-state rows (single <td colspan=N> "No X match" rows).
+      // CI without PG data hits these — they're a UI placeholder, not a real
+      // table row, so they have no Coverage dot by design.
+      const rows = page.locator("table tbody tr:not(:has(td[colspan]))");
       const rowCount = await rows.count();
       if (rowCount === 0) {
         // Trivially passes — no data to check. CI without PG access
