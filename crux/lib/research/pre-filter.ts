@@ -9,6 +9,11 @@ export interface PreFilterClaim {
   proposedValue?: string | null;
   resourceId: string;
   sourceUrl: string;
+  /** Tokens that MUST appear in the source content for the claim to survive
+   *  pre-filtering, regardless of whether other extracted tokens hit. Used
+   *  for stakeholder position validation: if the LLM classifies "oppose" we
+   *  require an "oppos*" stem in the source. Case-insensitive substring. */
+  requiredTokens?: string[];
   // Anything else passes through unchanged.
   [k: string]: unknown;
 }
@@ -20,10 +25,14 @@ export interface PreFilterDecision {
   keep: boolean;
   /** Tokens we extracted from claimText + proposedValue. */
   tokens: string[];
-  /** Tokens that were not found in the source content. */
+  /** Tokens that were not found in the source content. Includes both
+   *  extracted tokens and any missing requiredTokens. */
   missing: string[];
   /** Tokens that were found and their first-occurrence index. */
   hits: Array<{ token: string; idx: number }>;
+  /** When the claim was dropped because a requiredToken was missing,
+   *  this is the missing required token. Empty otherwise. */
+  missingRequired: string[];
 }
 
 const MIN_TOKEN_LEN = 4;
@@ -56,11 +65,29 @@ export function decide(
   const minHits = options.minHits ?? 1;
   const text = `${claim.claimText}\n${claim.proposedValue ?? ""}`;
   const tokens = extractKeyTokens(text);
-  if (tokens.length === 0) {
-    // No distinguishing tokens — let it through; we have no signal either way.
-    return { claim, keep: true, tokens, missing: [], hits: [] };
-  }
   const lc = sourceContent.toLowerCase();
+
+  // Required-token check — runs first because a missing required token is
+  // a hard drop regardless of how many discriminating tokens hit.
+  const required = claim.requiredTokens ?? [];
+  const missingRequired: string[] = [];
+  for (const r of required) {
+    if (!r) continue;
+    if (lc.indexOf(r.toLowerCase()) === -1) missingRequired.push(r);
+  }
+
+  if (tokens.length === 0) {
+    // No distinguishing tokens — let it through unless a required token is missing.
+    const keep = missingRequired.length === 0;
+    return {
+      claim,
+      keep,
+      tokens,
+      missing: [...missingRequired],
+      hits: [],
+      missingRequired,
+    };
+  }
   const hits: Array<{ token: string; idx: number }> = [];
   const missing: string[] = [];
   for (const t of tokens) {
@@ -68,8 +95,15 @@ export function decide(
     if (idx === -1) missing.push(t);
     else hits.push({ token: t, idx });
   }
-  const keep = hits.length >= minHits;
-  return { claim, keep, tokens, missing, hits };
+  const keep = hits.length >= minHits && missingRequired.length === 0;
+  return {
+    claim,
+    keep,
+    tokens,
+    missing: [...missing, ...missingRequired],
+    hits,
+    missingRequired,
+  };
 }
 
 /** Filter a batch of claims given a map of resourceId → fetched content. */
@@ -85,7 +119,7 @@ export function preFilterBatch(
     if (!content) {
       // No content — we can't pre-filter. Let the verifier handle it.
       const dec: PreFilterDecision = {
-        claim: c, keep: true, tokens: [], missing: [], hits: [],
+        claim: c, keep: true, tokens: [], missing: [], hits: [], missingRequired: [],
       };
       decisions.push(dec);
       kept.push(c);
