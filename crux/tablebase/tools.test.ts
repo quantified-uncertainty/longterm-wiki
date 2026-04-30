@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ensureSidPrefix, __testing__ } from './tools.ts';
+import { ensureSidPrefix, __testing__, buildToolHandlers } from './tools.ts';
+import type { EnrichmentTask } from './types.ts';
 
 describe('ensureSidPrefix', () => {
   it('adds sid_ prefix to a bare 10-char stableId', () => {
@@ -84,5 +85,50 @@ describe('resolveNonEntityForeignKeys', () => {
     const records = [{ benchmarkId: 'sid_pDqehtEoiw', modelId: 'sid_cMKB5i2WZQ' }];
     resolveNonEntityForeignKeys('benchmark-results', records, slugMap);
     expect(records[0].modelId).toBe('sid_cMKB5i2WZQ');
+  });
+});
+
+describe('buildToolHandlers — skip-sourcing reason contract (QUA-730)', () => {
+  const task: EnrichmentTask = {
+    id: 't1',
+    taskType: 'personnel-fill',
+    entityId: 'sid_test',
+    entityName: 'Test Org',
+    entityType: 'organization',
+    table: 'personnel',
+    impactScore: 0,
+    reasons: [],
+    existingRecordCount: 0,
+  };
+
+  it('throws when skipSourcing is set without a reason', () => {
+    expect(() =>
+      buildToolHandlers(task, false, { skipSourcing: true }),
+    ).toThrow(/--skip-sourcing-reason/);
+  });
+
+  it('throws when the reason is outside the controlled vocabulary', () => {
+    expect(() =>
+      buildToolHandlers(task, false, {
+        skipSourcing: true,
+        skipSourcingReason: 'because-i-said-so',
+      }),
+    ).toThrow(/controlled vocabulary/);
+  });
+
+  it('accepts each value from the allowlist', () => {
+    const allowlist = ['migration', 'backfill', 'testing', 'key-unavailable', 'manual-verified'];
+    for (const reason of allowlist) {
+      expect(() =>
+        buildToolHandlers(task, false, { skipSourcing: true, skipSourcingReason: reason }),
+      ).not.toThrow();
+    }
+  });
+
+  it('does not require a reason when skipSourcing is false', () => {
+    expect(() => buildToolHandlers(task, false, {})).not.toThrow();
+    expect(() =>
+      buildToolHandlers(task, false, { skipSourcing: false }),
+    ).not.toThrow();
   });
 });

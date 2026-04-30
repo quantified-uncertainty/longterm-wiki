@@ -260,6 +260,9 @@ export async function collectRecordItems(
       case 'entity-event': apiBasePath = '/api/entity-events/all'; break;
       case 'entity-assessment': apiBasePath = '/api/entity-assessments/all'; break;
       case 'secondary-market-price': apiBasePath = '/api/secondary-market-prices/all'; break;
+      // QUA-685: ai-model records are entities, not a per-type table. Use the
+      // entities export endpoint and flatten metadata fields below.
+      case 'ai-model': apiBasePath = '/api/entities/export?entityType=ai-model'; break;
       // citation and wiki-page are valid record types for verdicts but don't have
       // /all API endpoints for bulk collection — skip them intentionally.
       case 'citation':
@@ -276,7 +279,8 @@ export async function collectRecordItems(
       let offset = 0;
 
       while (true) {
-        const apiPath = `${apiBasePath}?limit=${API_PAGE_LIMIT}&offset=${offset}`;
+        const sep = apiBasePath.includes('?') ? '&' : '?';
+        const apiPath = `${apiBasePath}${sep}limit=${API_PAGE_LIMIT}&offset=${offset}`;
         // typed-client-ok: QUA-770 baseline — sourcing pipeline, internal write path
         const response = await apiRequest<Record<string, unknown>>('GET', apiPath);
         if (!response.ok) {
@@ -297,10 +301,27 @@ export async function collectRecordItems(
           data.events ?? data.entityEvents ??
           data.assessments ?? data.entityAssessments ??
           data.prices ?? data.secondaryMarketPrices ??
+          // QUA-685: /api/entities/export returns { entities, total, returned }
+          data.entities ??
           (Array.isArray(data) ? data : [])
         ) as Record<string, unknown>[];
 
-        allRawItems.push(...rawItems);
+        // QUA-685: ai-model rows come from the entities table, with the
+        // sourceable scalar fields nested under `metadata`. Flatten them
+        // so the rest of the loop (source extraction, field extraction,
+        // description) works the same as for a typical record row.
+        // The Array.isArray guard rejects JSONB array values, which would
+        // otherwise spread into integer keys (`{0: 'x', 1: 'y', ...row}`).
+        const normalizedItems = recordType === 'ai-model'
+          ? rawItems.map((row) => {
+              const md = (row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata))
+                ? row.metadata as Record<string, unknown>
+                : {};
+              return { ...row, ...md };
+            })
+          : rawItems;
+
+        allRawItems.push(...normalizedItems);
 
         // Stop if we got fewer items than the page size, or we've reached the total
         const total = typeof data.total === 'number' ? data.total : undefined;

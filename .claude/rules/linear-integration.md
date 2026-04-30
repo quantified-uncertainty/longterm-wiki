@@ -92,6 +92,8 @@ Linear has built-in Git automation that triggers state changes independent of th
 
 These are configured in Linear's team settings (not in this repo). The `crux` commands duplicate some of these transitions intentionally -- belt-and-suspenders for cases where Linear's automation doesn't fire (e.g., branch created before Linear integration was installed, or PR body reference without branch name match).
 
+**The In-Review → Done transition is empirically unreliable.** Even when a PR has both a `claude/qua-NNN-*` branch name AND a `Fixes QUA-NNN` body line, ~1.4–5% of merged PRs leave their issue stuck in "In Review" indefinitely (QUA-812 measurement). The fallback is `crux linear audit --fix` (see § 6), which classifies any active issue (In Progress + In Review) with a merged PR as `shipped` and moves it to Done. Run after every batch of merges, or include it in the maintenance sweep.
+
 ## 6. Available commands
 
 ```bash
@@ -108,11 +110,44 @@ crux linear done QUA-NNN [--pr=URL]   # Move to In Review (with PR) or Done
 crux linear comment QUA-NNN <message>           # Post a comment
 crux linear comment QUA-NNN --body-file=<path>  # Comment from file (multiline-safe)
 
+# Maintenance
+crux linear audit                     # Classify active issues (In Progress + In Review) by PR health
+crux linear audit --fix               # Auto-close SHIPPED + PARENT-EPIC (covers In-Review → Done failures, QUA-812)
+crux linear audit --bucket=shipped --json  # Machine-readable shipped list
+
+# Stale-claim sweep (QUA-815)
+crux linear release-stale [--dry-run] [--stale-minutes=N] [--limit=N] [--json]
+
 # Admin
 crux linear states-list               # Show current QUA team workflow state IDs
 ```
 
 **Environment**: requires `LINEAR_API_KEY` (synced from `.env.base` at the workspace root). All Linear calls are best-effort in the agent pipeline -- a missing key or network error never blocks `agent-checklist init` or `/agent-ship`.
+
+## 6a. Stale-claim sweep — `crux linear release-stale` (QUA-815)
+
+Sometimes an agent runs `crux sys agent-checklist init --linear=QUA-NNN`, posts the `🤖 Claude Code starting work` claim comment, and then **crashes before creating `claude/qua-NNN-*` and pushing a PR** — out-of-context, kernel kill, network drop. The PG `agent_sessions` heartbeat shows the session is dead, but Linear stays "In Progress" indefinitely. This pollutes dispatch decisions: a coordinator running pre-flight (`.claude/rules/dispatched-agent-review.md` § Dispatcher pre-flight) sees "ticket already In Progress" and skips dispatch, even though no work is happening.
+
+`crux linear release-stale` finds these claims and auto-releases them. Per candidate it runs three protective checks before acting:
+
+1. **Branch on origin** — if `git ls-remote --heads origin claude/qua-NNN claude/qua-NNN-*` returns any ref, skip. This protects long-running parent epics like QUA-408 (data-model unwind) that always have *some* branch in flight.
+2. **Open PR mention** — if any open PR in the wiki repo references the ticket in title or body, skip. Broader than the close-keyword search the audit uses (`Fixes QUA-NNN`) — even a `follow-up to QUA-NNN` mention should protect the ticket.
+3. **Linear state** — only acts when `state.type === 'started'` (In Progress / In Review). Tickets in `triage`, `completed`, `canceled`, `backlog`, `unstarted` are skipped — we don't re-open closed work, and we don't second-guess human triage.
+
+Surviving candidates get a `🤖 Auto-released claim — session went stale without producing a branch.` comment + a state move to **Backlog**. The session row stays as-is (the periodic `crux sys agents sweep` flips it to `status='stale'` independently).
+
+```bash
+# Preview without mutating Linear:
+WIKI_SERVER_ENV=prod pnpm crux linear release-stale --dry-run
+
+# Run it (default 30-min staleness window, 100-candidate cap):
+WIKI_SERVER_ENV=prod pnpm crux linear release-stale
+
+# Tighter window, larger batch:
+WIKI_SERVER_ENV=prod pnpm crux linear release-stale --stale-minutes=120 --limit=200
+```
+
+Source: `crux/lib/linear/release-stale-claims.ts` + `crux/commands/linear.ts::releaseStale`. Backed by `GET /api/agent-sessions/stale-claims` (returns `linear_id IS NOT NULL AND status != 'completed' AND updated_at < cutoff`).
 
 ## 7. ID parsing -- `parseLinearId()`
 
@@ -151,6 +186,8 @@ See **`.claude/rules/linear-project-ownership.md`** for the decision rules on wh
 | `crux/lib/linear/parse-id.ts` | `parseLinearId()`, `resolveLinearId()`, team key allowlist |
 | `crux/lib/linear/workflow-states.ts` | QUA team workflow state IDs, `getWorkflowStateId()` |
 | `crux/lib/linear/issues.ts` | `getIssue()`, `searchIssues()`, `commentOnIssue()`, `updateIssueState()` |
+| `crux/lib/linear/release-stale-claims.ts` | QUA-815 stale-claim sweep — branch + PR + state checks before auto-release |
+| `apps/wiki-server/src/routes/operational/agent-sessions.ts` | `GET /stale-claims` endpoint that the sweep consumes |
 | `crux/commands/pr.ts` | `injectLinearRefs()` -- auto-injection into PR bodies |
 | `.claude/commands/agent-ship.md` | Step 5b -- Linear done on ship |
 | `.claude/commands/agent-end.md` | Step 2b -- Linear done on end |

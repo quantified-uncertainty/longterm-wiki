@@ -30,6 +30,11 @@ export const RECORD_TYPE_TO_TABLE = {
   citation: "citation_quotes",
   "wiki-page": "wiki_pages",
   fact: "facts",
+  // QUA-685: ai-model verdicts reference the `entities` table (one entity
+  // row per model). The wiki-server's record-lookup already supports
+  // `entities` and matches by slug, so /sourcing/ai-model/<slug> resolves
+  // to the model's entity row.
+  "ai-model": "entities",
 } as const satisfies Record<string, string>;
 
 export type KnownRecordType = keyof typeof RECORD_TYPE_TO_TABLE;

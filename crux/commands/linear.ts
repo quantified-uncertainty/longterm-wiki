@@ -36,12 +36,20 @@ import {
   type UpdateProjectInput,
 } from '../lib/linear/projects.ts';
 import {
-  auditInProgress,
+  auditActive,
   extractFixesIds,
   STALE_DAYS,
   type AuditBucket,
   type AuditEntry,
 } from '../lib/linear/audit.ts';
+import {
+  runStaleClaimSweep,
+  formatSlot,
+  DEFAULT_STALE_MINUTES,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+  MAX_STALE_MINUTES,
+} from '../lib/linear/release-stale-claims.ts';
 import { runHygieneAudit, formatHygieneReport } from '../lib/linear/hygiene.ts';
 import { githubApi } from '../lib/github.ts';
 import { resolve as resolvePath } from 'path';
@@ -766,7 +774,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
-  const entries = await auditInProgress();
+  const entries = await auditActive();
 
   if (options.json) {
     const filtered = bucketFilter ? entries.filter((e) => e.bucket === bucketFilter) : entries;
@@ -775,7 +783,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
 
   if (entries.length === 0) {
     return {
-      output: `${c.green}✓${c.reset} No issues currently In Progress.\n`,
+      output: `${c.green}✓${c.reset} No issues currently In Progress or In Review.\n`,
       exitCode: 0,
     };
   }
@@ -789,7 +797,9 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     shipped: {
       label: 'SHIPPED (state-update missed)',
       color: c.yellow,
-      action: 'PR merged. Move to Done: crux linear done QUA-NNN --pr=URL',
+      // `crux linear done QUA-NNN` (no --pr) moves directly to Done. The
+      // --pr variant moves to In Review, which is where these are stuck.
+      action: 'PR merged. Move to Done: crux linear done QUA-NNN  (or --fix to batch)',
     },
     'parent-epic': {
       label: 'PARENT EPIC (sub-issues resolved)',
@@ -821,7 +831,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   let out = '';
-  out += `${c.bold}Linear In-Progress audit (${entries.length} issues)${c.reset}\n\n`;
+  out += `${c.bold}Linear active-issue audit (${entries.length} issues — In Progress + In Review)${c.reset}\n\n`;
 
   const order: AuditBucket[] = ['shipped', 'parent-epic', 'orphan', 'stuck', 'active'];
   for (const bucket of order) {
@@ -841,7 +851,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   if (actionable > 0) {
     out += `${c.bold}${actionable} issue(s) need action.${c.reset} Use ${c.cyan}--bucket=shipped${c.reset}/etc. to filter, ${c.cyan}--fix${c.reset} to auto-close SHIPPED + PARENT EPIC, or ${c.cyan}--json${c.reset} for scripting.\n`;
   } else {
-    out += `${c.green}✓${c.reset} All In Progress issues look healthy.\n`;
+    out += `${c.green}✓${c.reset} All active issues look healthy.\n`;
   }
 
   let fixFailures = 0;
@@ -1241,6 +1251,84 @@ async function project(args: string[], options: CommandOptions): Promise<Command
 }
 
 // ---------------------------------------------------------------------------
+// release-stale — auto-release Linear claims whose session crashed (QUA-815)
+// ---------------------------------------------------------------------------
+
+async function releaseStale(args: string[], options: CommandOptions): Promise<CommandResult> {
+  const log = createLogger(options.ci);
+  const c = log.colors;
+
+  const dryRun = args.includes('--dry-run');
+
+  function parseClampedInt(
+    flag: string,
+    min: number,
+    max: number,
+    fallback: number,
+  ): { ok: true; value: number } | { ok: false; error: string } {
+    const raw = args.find((a) => a.startsWith(`${flag}=`))?.split('=')[1];
+    if (!raw) return { ok: true, value: fallback };
+    const n = parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < min || n > max) {
+      return { ok: false, error: `${flag} must be ${min}..${max}` };
+    }
+    return { ok: true, value: n };
+  }
+
+  const staleParse = parseClampedInt('--stale-minutes', 1, MAX_STALE_MINUTES, DEFAULT_STALE_MINUTES);
+  if (!staleParse.ok) {
+    return { output: `${c.red}${staleParse.error}${c.reset}\n`, exitCode: 1 };
+  }
+  const limitParse = parseClampedInt('--limit', 1, MAX_LIMIT, DEFAULT_LIMIT);
+  if (!limitParse.ok) {
+    return { output: `${c.red}${limitParse.error}${c.reset}\n`, exitCode: 1 };
+  }
+  const staleMinutes = staleParse.value;
+  const limit = limitParse.value;
+
+  let out = '';
+  out += `${c.bold}Stale-claim sweep${c.reset} ${c.dim}(staleMinutes=${staleMinutes}, limit=${limit}${dryRun ? ', dry-run' : ''})${c.reset}\n\n`;
+
+  const report = await runStaleClaimSweep({
+    staleMinutes,
+    limit,
+    dryRun,
+    onResult: (r) => {
+      const tag = r.decision.released
+        ? `${c.green}✓ released${c.reset}`
+        : r.decision.reason.startsWith('error')
+          ? `${c.red}✗ error  ${c.reset}`
+          : `${c.dim}- skipped ${c.reset}`;
+      out += `  ${tag} ${r.claim.linearId} ${c.dim}(slot=${formatSlot(r.claim.slotNumber, '-')}, branch=${r.claim.branch}) — ${r.decision.reason}${c.reset}\n`;
+    },
+  });
+
+  out += `\n${c.bold}Summary${c.reset}: `;
+  out += `${report.candidates} candidate(s), `;
+  out += `${c.green}${report.released} released${c.reset}, `;
+  out += `${c.dim}${report.skipped} skipped${c.reset}`;
+  if (report.errors > 0) {
+    out += `, ${c.red}${report.errors} error(s)${c.reset}`;
+  }
+  out += `\n`;
+
+  if (options.json) {
+    return {
+      output: JSON.stringify(report, null, 2) + '\n',
+      exitCode: report.errors > 0 ? 1 : 0,
+    };
+  }
+
+  return {
+    output: out,
+    // Non-zero exit on any classification/release error so a CI cron run
+    // surfaces the failure. Successful sweeps with all-skipped (no eligible
+    // releases) still exit 0 — that's the expected state most of the time.
+    exitCode: report.errors > 0 ? 1 : 0,
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Command registry
 // ---------------------------------------------------------------------------
 
@@ -1255,6 +1343,7 @@ export const commands = {
   done,
   audit,
   hygiene,
+  'release-stale': releaseStale,
   'verify-pr': verifyPr,
   'leak-check': leakCheck,
   'states-list': statesList,
@@ -1274,8 +1363,9 @@ Commands:
   comment <QUA-NNN> <message>   Post a comment on an issue
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
-  audit                         Classify In Progress issues by PR health (shipped/orphan/epic/active)
+  audit                         Classify active issues (In Progress + In Review) by PR health
   hygiene                       Metadata hygiene scan: orphans, label coverage, priority gaps, stuck tickets
+  release-stale                 Auto-release tickets whose agent session went stale without producing a branch (QUA-815)
   verify-pr <PR>                Watchdog: ensure merged PR's Fixes QUA-NNN issues are actually Done
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks
   states-list                   Show current QUA team workflow state IDs
@@ -1314,6 +1404,12 @@ Options (audit):
   --bucket=<name>     Filter to one bucket: shipped, parent-epic, orphan, stuck, active
   --fix               Auto-close SHIPPED and PARENT-EPIC issues (move to Done with comment)
   --json              Machine-readable output
+
+Options (release-stale):
+  --dry-run                  Show what would be released without mutating Linear
+  --stale-minutes=N          Heartbeat staleness threshold in minutes (default 30, max 43200)
+  --limit=N                  Max candidates to process per run (default 100, max 200)
+  --json                     Machine-readable output
 
 Global options:
   --json              Machine-readable output where supported

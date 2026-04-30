@@ -1,5 +1,6 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
+import { ORG_TAB_IDS } from "../tabs";
 import { resolveOrgBySlug, getOrgSlugs } from "@/app/organizations/org-utils";
 import { getTypedEntityById, getTypedEntityByStableId, getTypedEntities, isOrganization, isProject } from "@/data";
 
@@ -24,7 +25,7 @@ import {
   FactsPanel,
 } from "@/components/directory";
 
-import { buildOrgShellSlots } from "./org-profile-header";
+import { buildOrgShellSlots } from "../org-profile-header";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import {
   fetchEntitySourcingSummary,
@@ -42,7 +43,7 @@ import {
   SectionHeader,
   field,
   safeHref,
-} from "./org-shared";
+} from "../org-shared";
 
 // Data loading & constants
 import {
@@ -55,23 +56,23 @@ import {
   ORG_STATUS_LABELS,
   ORG_STATUS_COLORS,
   type OrgEntity,
-} from "./org-data";
+} from "../org-data";
 
 // Section components
 
-import { EquityPositionsSection } from "./equity-section";
-import { DivisionsSection, DivisionsOverview } from "./divisions-section";
-import { FundingProgramsSection } from "./programs-section";
-import { AiModelsSection } from "./ai-models-section";
-import { PolicyPositionsSection, getOrgPolicyPositions } from "./policy-positions-section";
+import { EquityPositionsSection } from "../equity-section";
+import { DivisionsSection, DivisionsOverview } from "../divisions-section";
+import { FundingProgramsSection } from "../programs-section";
+import { AiModelsSection } from "../ai-models-section";
+import { PolicyPositionsSection, getOrgPolicyPositions } from "../policy-positions-section";
 
 // Section components — publications
 
 // Section components — grants (main content column)
-import { GrantsSection } from "./grants-section";
+import { GrantsSection } from "../grants-section";
 
 // Section components — resources
-import { OrgResourcesSection } from "./resources-section";
+import { OrgResourcesSection } from "../resources-section";
 
 // Section components — main content column
 import {
@@ -81,10 +82,10 @@ import {
   SafetyMilestonesSection,
   StrategicPartnershipsSection,
   OtherDataSection,
-} from "./main-content-sections";
+} from "../main-content-sections";
 
 // Charts
-import { ChartsSection } from "./charts-section";
+import { ChartsSection } from "../charts-section";
 
 // People section — PG personnel data integration
 import {
@@ -93,7 +94,7 @@ import {
   mergePgPersonnel,
   PeopleSection,
   type PersonEntry,
-} from "./people-section";
+} from "../people-section";
 
 // Market data section — secondary market prices + prediction markets
 import {
@@ -102,7 +103,7 @@ import {
   getMarketDataCount,
   MarketDataSection,
   MarketHighlights,
-} from "./market-data-section";
+} from "../market-data-section";
 
 // PG grants integration — fetch grants from wiki-server for orgs that are funders
 import { fetchFromWikiServer } from "@/lib/wiki-server";
@@ -113,9 +114,15 @@ import Markdown from "react-markdown";
 import {
   loadScorecardsForEntity,
   ScorecardsSection,
-} from "./scorecards-section";
+} from "../scorecards-section";
 
-import type { ProfileTab as OrgTab, ProfileTabGroup } from "@/components/directory";
+import type { ProfileTab as OrgTab } from "@/components/directory";
+import { ORG_TAB_GROUPS, ORG_TAB_ICON_CLASS as ICON_CLASS } from "../tabs";
+
+// `ORG_TAB_IDS` is the canonical list of path-routable tab ids — link-tabs
+// (e.g. `wiki`, which navigates to `/wiki/E<N>`) are excluded by construction,
+// so a `Set` over the catalog is the validation surface.
+const PATH_ROUTABLE_TAB_IDS: ReadonlySet<string> = new Set(ORG_TAB_IDS);
 import {
   Home,
   Users,
@@ -141,28 +148,23 @@ import {
   Award,
 } from "lucide-react";
 
-const ORG_TAB_GROUPS: ProfileTabGroup[] = [
-  { id: "entity", label: "Entity" },
-  { id: "about", label: "About" },
-  { id: "business", label: "Business" },
-  { id: "governance", label: "Policy & Governance" },
-  { id: "output", label: "Output & Research" },
-  { id: "data", label: "Data" },
-];
-
-const ICON_CLASS = "w-4 h-4";
-
 // ISR revalidation: refresh PG personnel data every hour (matches divisions/grants pages)
 export const revalidate = 3600;
 
+// Pre-render the bare profile URL for every org. Tab-segment URLs (e.g.
+// `/organizations/anthropic/people`) are served via ISR — they render the
+// same DOM and only differ in the active tab styling, so pre-rendering the
+// 5,500-page Cartesian product (orgs × tabs) is wasteful.
 export function generateStaticParams() {
-  return getOrgSlugs().map((slug) => ({ slug }));
+  // Empty array tells Next.js "no extra path segments" for the optional
+  // catch-all — pre-renders the bare `/organizations/<slug>` URL only.
+  return getOrgSlugs().map((slug) => ({ slug, tab: [] as string[] }));
 }
 
 export async function generateMetadata({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; tab?: string[] }>;
 }): Promise<Metadata> {
   const { slug } = await params;
   const resolved = resolveOrgBySlug(slug);
@@ -187,20 +189,39 @@ export async function generateMetadata({
 export default async function OrgProfilePage({
   params,
 }: {
-  params: Promise<{ slug: string }>;
+  params: Promise<{ slug: string; tab?: string[] }>;
 }) {
-  const { slug } = await params;
+  const { slug, tab } = await params;
+
+  // Defensive: Next.js 15 always passes an array for `[[...tab]]`, but guard
+  // against unexpected shapes leaking through (e.g. middleware tampering).
+  const tabSegments: string[] = Array.isArray(tab) ? tab : [];
 
   const result = resolveOrgEntity(slug);
   if (!result) return notFound();
-  if ("redirect" in result) permanentRedirect(`/organizations/${result.redirect}`);
+  if ("redirect" in result) {
+    // Preserve the first tab segment when an org slug aliases to its canonical
+    // form so deep links (e.g. /organizations/google-deepmind/people) keep
+    // pointing at the same tab after the redirect. Only forward known-valid
+    // tab ids — an attacker-controlled or stale segment falls back to the
+    // bare canonical URL rather than producing a redirect chain into a
+    // suspicious path. Sub-record routes (`data`, `db`, `divisions/<slug>`,
+    // `funding`, `grants/<id>`) never reach this catch-all because Next.js
+    // resolves the more-specific route first.
+    const firstSegment = tabSegments[0];
+    const tabSuffix =
+      firstSegment && PATH_ROUTABLE_TAB_IDS.has(firstSegment)
+        ? `/${firstSegment}`
+        : "";
+    permanentRedirect(`/organizations/${result.redirect}${tabSuffix}`);
+  }
 
   const { entity } = result;
   const data = loadOrgPageData(entity, slug);
 
   // ── Fetch PG data (personnel + market data + grants + sourcing) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData, aiModelVerdictsRaw] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
@@ -213,8 +234,41 @@ export default async function OrgProfilePage({
     ),
     fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
     loadScorecardsForEntity(entityStableId),
+    // QUA-685: pull all ai-model verdicts so the Products & Models table dots
+    // can render real sourcing status. A single shared fetch (capped at the
+    // wiki-server's MAX_PAGE_SIZE=200) is cheaper than per-model lookups even
+    // when only a couple of models match this org. The truncation check
+    // below logs a warning if the verdicts table grows past 200 rows so we
+    // catch it before silent data loss (~50 entities × multiple verdict
+    // rounds could approach the cap as more labs are backfilled).
+    // typed-client-ok: QUA-685 baseline — single ad-hoc list call against
+    // /api/sourcing/verdicts. A typed client wrapper would be appropriate
+    // when more callers consume this endpoint with a similar shape.
+    fetchFromWikiServer<{ verdicts: Array<{ recordType: string; recordId: string; verdict: string; fieldName: string | null }>; total: number }>(
+      `/api/sourcing/verdicts?record_type=ai-model&limit=200`,
+      { revalidate: 300, timeoutMs: 10_000 },
+    ),
   ]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
+
+  // QUA-685: build a recordId → verdict map so AiModelsSection can render the
+  // sourcing dot per row without making per-model network calls.
+  const aiModelVerdictByModelId = new Map<string, string>();
+  if (aiModelVerdictsRaw) {
+    if (aiModelVerdictsRaw.total > aiModelVerdictsRaw.verdicts.length) {
+      console.warn(
+        `[org-profile] ai-model verdicts truncated: total=${aiModelVerdictsRaw.total} ` +
+        `received=${aiModelVerdictsRaw.verdicts.length}. Bump the page-size or paginate ` +
+        `/api/sourcing/verdicts?record_type=ai-model.`,
+      );
+    }
+    for (const v of aiModelVerdictsRaw.verdicts) {
+      // Skip per-field verdicts (fieldName != null); we display the row-level
+      // rollup so each model has at most one dot.
+      if (v.fieldName) continue;
+      aiModelVerdictByModelId.set(v.recordId, v.verdict);
+    }
+  }
 
   // PG grants: check if wiki-server has grants for this org (as funder)
   if (!pgGrantsData && entityStableId) {
@@ -643,7 +697,11 @@ export default async function OrgProfilePage({
       icon: <Package className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
-          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
+          <AiModelsSection
+            models={data.orgModels}
+            benchmarksByModel={data.modelBenchmarks}
+            verdictByModelId={aiModelVerdictByModelId}
+          />
           <ProductsSection products={data.products} />
         </div>
       ),
@@ -923,6 +981,7 @@ export default async function OrgProfilePage({
       tabsAriaLabel="Organization sections"
       tabsLayout="vertical"
       tabGroups={ORG_TAB_GROUPS}
+      tabRouting={{ mode: "path", basePath: `/organizations/${slug}` }}
     />
   );
 }

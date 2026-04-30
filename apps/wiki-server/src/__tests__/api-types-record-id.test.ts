@@ -39,7 +39,11 @@ describe("VALID_RECORD_TYPES", () => {
   });
 
   it("is frozen in length — adding a type is a schema change", () => {
-    expect(VALID_RECORD_TYPES.length).toBe(16);
+    // QUA-685: ai-model added (17th type) — wired into the source-check
+    // orchestrator with a special `/api/entities/export?entityType=ai-model`
+    // collection path since ai-model lives in the entities table rather than
+    // a per-type record table.
+    expect(VALID_RECORD_TYPES.length).toBe(17);
   });
 });
 

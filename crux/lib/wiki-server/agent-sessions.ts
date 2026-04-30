@@ -91,6 +91,29 @@ export async function getAgentSessionsByLinearId(
   );
 }
 
+/** Shape returned by GET /stale-claims (200 success). */
+export type StaleClaimsResponse = InferResponseType<
+  RpcClient['stale-claims']['$get'],
+  200
+>;
+
+/**
+ * QUA-815: Query stale Linear-claiming sessions for the auto-release sweep.
+ *
+ * Returns sessions where `linear_id IS NOT NULL` AND `status != 'completed'`
+ * AND `updated_at < now() - staleMinutes`. Includes both `active` and `stale`
+ * rows so a re-run after the periodic agent_sessions sweep also surfaces
+ * pre-existing stale rows for retry.
+ */
+export async function getStaleClaims(
+  staleMinutes: number = 30,
+): Promise<ApiResult<StaleClaimsResponse>> {
+  return apiRequest<StaleClaimsResponse>(
+    'GET',
+    `/api/agent-sessions/stale-claims?staleMinutes=${staleMinutes}`,
+  );
+}
+
 /**
  * Update an agent session's checklist or status.
  */

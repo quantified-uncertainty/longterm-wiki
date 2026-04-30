@@ -24,6 +24,13 @@ import { toSlug } from './types.ts';
 import { getTableConfig } from './table-registry.ts';
 import type { EnrichmentTask, TaskType } from './types.ts';
 import {
+  isSkipSourcingReason,
+  formatSkipSourcingReasonError,
+  formatSkipSourcingAuditReason,
+  formatSkipSourcingBanner,
+  type SkipSourcingReason,
+} from './skip-sourcing-reasons.ts';
+import {
   dedupPersonnel,
   dedupFundingRounds,
   dedupInvestments,
@@ -544,6 +551,7 @@ async function handleSubmitRecords(
   dryRun: boolean,
   skipSourcing: boolean = false,
   viaPropose: boolean = false,
+  skipSourcingReason?: SkipSourcingReason,
 ): Promise<string> {
   const table = input.table as string;
   const records = input.records as Array<Record<string, unknown>>;
@@ -728,8 +736,21 @@ async function handleSubmitRecords(
   const syncParams = new URLSearchParams();
   if (syncConfig.requireSourcing) syncParams.set('requireSourcing', 'true');
   if (skipSourcing) {
+    // QUA-730: skipSourcingReason was validated against the allowlist in buildToolHandlers.
+    // Defensive re-check so this entry point fails closed if a future caller adds a path
+    // that bypasses buildToolHandlers.
+    if (!isSkipSourcingReason(skipSourcingReason)) {
+      return `Error: --skipSourcing requires a controlled-vocabulary reason (QUA-730). ${formatSkipSourcingReasonError(skipSourcingReason)}`;
+    }
     syncParams.set('forceSkipSourcing', 'true');
-    syncParams.set('reason', 'agent-tool: --skipSourcing flag set by caller');
+    syncParams.set('reason', formatSkipSourcingAuditReason(skipSourcingReason, 'agent-tool'));
+
+    console.warn(formatSkipSourcingBanner({
+      source: 'agent',
+      recordCount: recordsToSubmit.length,
+      table,
+      reason: skipSourcingReason,
+    }));
   }
   const syncQs = syncParams.toString();
   const syncUrl = syncQs ? `${syncConfig.syncPath}?${syncQs}` : syncConfig.syncPath;
@@ -967,11 +988,23 @@ async function handleLinkSource(
 export function buildToolHandlers(
   task: EnrichmentTask,
   dryRun: boolean,
-  options: { skipSourcing?: boolean; apply?: boolean; viaPropose?: boolean } = {},
+  options: { skipSourcing?: boolean; skipSourcingReason?: string; apply?: boolean; viaPropose?: boolean } = {},
 ): Record<string, (input: Record<string, unknown>) => Promise<string>> {
   const skipSourcing = options.skipSourcing ?? false;
+  const skipSourcingReason = options.skipSourcingReason;
   const viaPropose = options.viaPropose ?? false;
   const isSourceDiscovery = task.taskType === 'source-discovery';
+
+  // QUA-730: enforce the skip-sourcing reason allowlist at the agent-tool entry point.
+  // We throw synchronously rather than per-call so a misconfigured loop fails before
+  // the LLM agent starts, not after it has already burned a budget on tool calls.
+  let validatedReason: SkipSourcingReason | undefined;
+  if (skipSourcing) {
+    if (!isSkipSourcingReason(skipSourcingReason)) {
+      throw new Error(formatSkipSourcingReasonError(skipSourcingReason));
+    }
+    validatedReason = skipSourcingReason;
+  }
 
   const handlers: Record<string, (input: Record<string, unknown>) => Promise<string>> = {
     query_entities: handleQueryEntities,
@@ -980,7 +1013,7 @@ export function buildToolHandlers(
     create_entity: async (input) => dryRun
       ? `[DRY RUN] Would create ${input.entityType} entity: "${input.name}"`
       : handleCreateEntity(input),
-    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing, viaPropose),
+    submit_records: async (input) => handleSubmitRecords(input, task, dryRun, skipSourcing, viaPropose, validatedReason),
     submit_claims: async (input) => dryRun
       ? `[DRY RUN] Would submit ${(input.claims as unknown[])?.length ?? 0} claims for ${input.targetTable}`
       : handleSubmitClaims(input, task),

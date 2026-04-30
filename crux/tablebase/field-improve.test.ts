@@ -126,10 +126,16 @@ describe('runFieldTargetedImprove', () => {
       budgetUsd: 1,
       dryRun: true,
       skipSourcing: true,
+      // QUA-730: skipSourcing now requires a reason; use 'testing' for the test path.
+      skipSourcingReason: 'testing',
     });
 
     expect(runLoopMock).toHaveBeenCalledWith(
-      expect.objectContaining({ dryRun: true, skipSourcing: true }),
+      expect.objectContaining({
+        dryRun: true,
+        skipSourcing: true,
+        skipSourcingReason: 'testing',
+      }),
     );
   });
 });

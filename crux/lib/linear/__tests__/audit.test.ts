@@ -314,6 +314,20 @@ describe('classifyEntry — parent epic with open children', () => {
     const e = classifyEntry(issue, items, makeChildrenResult([]));
     expect(e.bucket).toBe('shipped');
   });
+
+  it('In-Review issue with merged PR classifies as SHIPPED (QUA-812)', () => {
+    // Linear's GitHub integration occasionally fails the In-Review → Done
+    // transition on PR merge (~1.4–5% of merges). The audit must detect
+    // these so `--fix` can auto-close them; In-Review and In-Progress share
+    // Linear's `started` workflow type, so classifyEntry is state-agnostic.
+    const issue = makeIssue({ state: { name: 'In Review', type: 'started' } });
+    const items = [
+      makePr({ number: 4573, state: 'closed', mergedAt: '2026-04-24T21:05:10Z' }),
+    ];
+    const e = classifyEntry(issue, items, makeChildrenResult([]));
+    expect(e.bucket).toBe('shipped');
+    expect(e.reason).toContain('#4573');
+  });
 });
 
 describe('classifyEntry — no-auto-close label', () => {

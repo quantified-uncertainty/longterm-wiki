@@ -110,7 +110,7 @@ pnpm crux sys maintain triage-linear
 
 This replaces the manual GraphQL queries. If `LINEAR_API_KEY` is not set, it reports that and skips gracefully.
 
-**4b. Actionable In Progress audit** — correlates Linear In Progress state with GitHub PR activity. Surfaces `SHIPPED` (PR merged but state not updated) and `PARENT-EPIC` (all sub-issues resolved) — these are one-keystroke cleanups that `triage-linear` doesn't catch because it only looks at staleness by time.
+**4b. Actionable active-issue audit** — correlates Linear In Progress + In Review state with GitHub PR activity. Surfaces `SHIPPED` (PR merged but state not updated) and `PARENT-EPIC` (all sub-issues resolved) — these are one-keystroke cleanups that `triage-linear` doesn't catch because it only looks at staleness by time. The In-Review case is QUA-812: Linear's GitHub integration occasionally drops the In-Review → Done transition on PR merge (~1.4–5% rate), and the audit catches the gap mechanically.
 
 ```bash
 # Run the audit once and split by bucket in Python to avoid doubling the
@@ -122,7 +122,7 @@ try:
   shipped = [e for e in entries if e.get('bucket') == 'shipped']
   parent_epics = [e for e in entries if e.get('bucket') == 'parent-epic']
   if shipped:
-    print(f'⚠ {len(shipped)} issue(s) SHIPPED but still In Progress:')
+    print(f'⚠ {len(shipped)} issue(s) SHIPPED but still In Progress / In Review:')
     for e in shipped:
       print(f\"  {e['issue']['identifier']} — {e['reason']}\")
     print('  Run: pnpm crux linear audit --fix')

@@ -1151,6 +1151,7 @@ Options:
   --rule=X              Filter by rule name (validate)
   --entity=X            (sourcing) Check all facts for one entity
   --fact=X              (sourcing) Check a single fact by ID
+  --where-no-verdict    (sourcing) Skip facts that already have a row-level verdict
   --dry-run             Preview changes without writing (sourcing, import-990)
   --ein=XXXXXXXXX       (import-990) Specify EIN directly
   --force               (import-990, add-fact) Overwrite existing facts
@@ -1174,5 +1175,6 @@ Examples:
   crux fb sync-sources                Sync source URLs to wiki-server resources
   crux fb sourcing --entity=anthropic   Check Anthropic facts against sources
   crux fb sourcing --dry-run --limit=5  Preview 5 facts that would be checked
+  crux fb sourcing --where-no-verdict --limit=50  Check 50 facts that have no verdict yet (QUA-851)
 `;
 }

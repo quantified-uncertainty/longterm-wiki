@@ -154,3 +154,69 @@ describe("ScorecardsMatrix — source-check dots", () => {
     expect(screen.getAllByText("—").length).toBeGreaterThan(0);
   });
 });
+
+/**
+ * QUA-861: matrix column headers must link to the per-source detail page
+ * (`/scorecards/[source]`). Without this, the directory page is a dead-end
+ * — users can't navigate from cross-org comparison into a single scorecard's
+ * full grades + snapshot history.
+ */
+describe("ScorecardsMatrix — column header links", () => {
+  it("each scorecard column header links to /scorecards/<source>", () => {
+    render(<ScorecardsMatrix orgRows={[]} />);
+
+    const fliLink = screen.getByRole("link", { name: /FLI Index/i });
+    expect(fliLink).toHaveAttribute("href", "/scorecards/fli_index");
+
+    const saferAiLink = screen.getByRole("link", { name: /SaferAI/i });
+    expect(saferAiLink).toHaveAttribute("href", "/scorecards/saferai");
+
+    const seoulLink = screen.getByRole("link", { name: /Seoul Tracker/i });
+    expect(seoulLink).toHaveAttribute("href", "/scorecards/seoul_tracker");
+  });
+});
+
+/**
+ * QUA-861: prose verdicts ("Weak", "Fulfilled") must NOT render in monospace
+ * — letter grades and numbers stay mono, but prose looks wrong as mono and
+ * should fall back to the default sans-serif.
+ */
+describe("ScorecardsMatrix — conditional cell font", () => {
+  function rowWithCell(scoreLetter: string | null, scoreRaw: string) {
+    return {
+      entityId: "sid_test",
+      displayName: "Test Org",
+      slug: "test-org",
+      cells: {
+        seoul_tracker: {
+          source: "seoul_tracker" as const,
+          scoreNumeric: null,
+          scoreLetter,
+          scoreRaw,
+          publishedAt: null,
+          sourcing: null,
+        },
+      },
+    };
+  }
+
+  it("renders letter grades in monospace+tabular-nums", () => {
+    render(<ScorecardsMatrix orgRows={[rowWithCell("C+", "C+")]} />);
+    const cell = screen.getByText("C+").closest("td");
+    expect(cell?.className).toMatch(/font-mono/);
+    expect(cell?.className).toMatch(/tabular-nums/);
+  });
+
+  it("does NOT render prose verdicts in monospace", () => {
+    render(<ScorecardsMatrix orgRows={[rowWithCell(null, "Fulfilled")]} />);
+    const cell = screen.getByText("Fulfilled").closest("td");
+    expect(cell?.className).not.toMatch(/font-mono/);
+    expect(cell?.className).not.toMatch(/tabular-nums/);
+  });
+
+  it("does NOT render multi-word verdicts in monospace", () => {
+    render(<ScorecardsMatrix orgRows={[rowWithCell(null, "Very Weak")]} />);
+    const cell = screen.getByText("Very Weak").closest("td");
+    expect(cell?.className).not.toMatch(/font-mono/);
+  });
+});

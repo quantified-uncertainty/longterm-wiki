@@ -32,6 +32,8 @@ export interface FieldTargetOptions {
   dryRun?: boolean;
   /** Skip sourcing gate before submission (advisory). */
   skipSourcing?: boolean;
+  /** QUA-730: required when skipSourcing is true. */
+  skipSourcingReason?: string;
 }
 
 export interface ScanReportOptions {
@@ -47,6 +49,8 @@ export interface ScanReportOptions {
   dryRun?: boolean;
   /** Skip sourcing gate before submission. */
   skipSourcing?: boolean;
+  /** QUA-730: required when skipSourcing is true. */
+  skipSourcingReason?: string;
 }
 
 export interface FieldImproveResult {
@@ -112,6 +116,7 @@ export async function runFieldTargetedImprove(
     taskTypes: [taskType],
     model: options.model ?? 'auto',
     skipSourcing: !!options.skipSourcing,
+    skipSourcingReason: options.skipSourcingReason,
   };
 
   const result = await runLoop(loopOptions);
@@ -196,6 +201,7 @@ export async function runScanReportImprove(
     taskTypes: [...taskTypes],
     model: options.model ?? 'auto',
     skipSourcing: !!options.skipSourcing,
+    skipSourcingReason: options.skipSourcingReason,
   };
 
   const result = await runLoop(loopOptions);

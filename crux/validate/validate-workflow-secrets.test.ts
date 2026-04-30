@@ -67,6 +67,56 @@ describe('validate-workflow-secrets', () => {
       expect(refs.map((r) => r.name)).toEqual(['QUX']);
     });
 
+    it('matches secrets with || fallback expression syntax', () => {
+      // Real-world example from .github/workflows/database-backup.yml:
+      //   AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}
+      // The earlier regex required `}}` to immediately follow the name
+      // and silently missed this — exactly the QUA-676 footgun.
+      const refs = findSecretRefs([
+        {
+          path: 'database-backup.yml',
+          content: "AWS_REGION: ${{ secrets.AWS_REGION || 'us-east-1' }}\n",
+        },
+      ]);
+      expect(refs).toEqual([
+        { file: 'database-backup.yml', line: 1, name: 'AWS_REGION' },
+      ]);
+    });
+
+    it('matches secrets in conditional expressions (== / && / ?:)', () => {
+      const refs = findSecretRefs([
+        { path: 'a.yml', content: "if: ${{ secrets.A == 'foo' && secrets.B != '' }}\n" },
+      ]);
+      expect(refs.map((r) => r.name).sort()).toEqual(['A', 'B']);
+    });
+
+    it('matches multiple secrets inside a single expression block', () => {
+      const refs = findSecretRefs([
+        { path: 'a.yml', content: '${{ secrets.PRIMARY || secrets.FALLBACK }}\n' },
+      ]);
+      expect(refs.map((r) => r.name)).toEqual(['PRIMARY', 'FALLBACK']);
+    });
+
+    it('does not match `notsecrets.X` or `mysecrets.X` (word boundary)', () => {
+      const refs = findSecretRefs([
+        {
+          path: 'a.yml',
+          content: '${{ notsecrets.A }}\n${{ mysecrets.B }}\n${{ secrets.C }}\n',
+        },
+      ]);
+      expect(refs.map((r) => r.name)).toEqual(['C']);
+    });
+
+    it('does not match `secrets.X` outside a ${{ ... }} block', () => {
+      const refs = findSecretRefs([
+        {
+          path: 'a.yml',
+          content: '# This is a comment about secrets.FOO bar\n# secrets.BAR also\n${{ secrets.REAL }}\n',
+        },
+      ]);
+      expect(refs.map((r) => r.name)).toEqual(['REAL']);
+    });
+
     it('returns empty array for files with no secret refs', () => {
       const refs = findSecretRefs([{ path: 'a.yml', content: 'name: hello\non: push\n' }]);
       expect(refs).toEqual([]);

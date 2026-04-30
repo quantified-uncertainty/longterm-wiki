@@ -12,6 +12,12 @@
  *   crux fb sourcing --fact=f_dW5cR9mJ8q        Check a single fact
  *   crux fb sourcing --dry-run                   Show what would be checked
  *   crux fb sourcing --limit=10                  Check at most 10 facts
+ *   crux fb sourcing --where-no-verdict --limit=50
+ *                                                 (QUA-851) Skip facts that
+ *                                                 already have a row-level verdict.
+ *                                                 Used by the multi-week backfill
+ *                                                 to target only the ~1,353 facts
+ *                                                 with no verdict at all.
  */
 
 import type { CommandOptions as BaseOptions, CommandResult } from '../lib/command-types.ts';
@@ -22,6 +28,7 @@ import type { Entity, Fact, Property } from '../../packages/factbase/src/types.t
 import { createLlmClient, callLlm, MODELS } from '../lib/llm.ts';
 import { parseJsonResponse } from '../lib/anthropic.ts';
 import { storeSourcingEvidence, storeAggregateVerdict } from '../lib/sourcing/verdict-handler.ts';
+import { fetchVerdictRecordIds } from '../lib/wiki-server/sourcing-client.ts';
 import type { SourceFetchErrorType } from '../lib/search/paywall-detection.ts';
 import { fetchSourceContent } from '../lib/sourcing/source-fetcher.ts';
 import {
@@ -49,6 +56,14 @@ interface VerifyCommandOptions extends BaseOptions {
   dryRun?: boolean;
   limit?: string;
   ci?: boolean;
+  /**
+   * QUA-851: skip facts that already have a row-level verdict in
+   * source_check_verdicts. Used by the multi-week backfill to avoid
+   * re-checking the ~1,400 facts that are already verified and target
+   * only the ~1,353 with no verdict at all.
+   */
+  'where-no-verdict'?: boolean;
+  whereNoVerdict?: boolean;
 }
 
 interface SourcingResult {
@@ -277,9 +292,17 @@ function isNonVerifiable(graph: Graph, fact: Fact): boolean {
 function collectFacts(
   kb: LoadedKB,
   options: VerifyCommandOptions,
+  alreadyVerifiedFactIds?: ReadonlySet<string>,
 ): Array<{ entity: Entity; fact: Fact }> {
   const graph = kb.graph;
   const factsToVerify: Array<{ entity: Entity; fact: Fact }> = [];
+  // Only filter by verified-set when caller has provided a populated set AND
+  // we're in batch mode (entity-scoped or all-entities). For an explicit
+  // --fact=X lookup the user is asking for that specific fact; respect it.
+  const verified =
+    !options.fact && alreadyVerifiedFactIds && alreadyVerifiedFactIds.size > 0
+      ? alreadyVerifiedFactIds
+      : null;
 
   if (options.fact) {
     // Find a specific fact by ID
@@ -300,7 +323,9 @@ function collectFacts(
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
         if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
-          factsToVerify.push({ entity, fact });
+          if (!verified || !verified.has(fact.id)) {
+            factsToVerify.push({ entity, fact });
+          }
         }
       }
     }
@@ -310,7 +335,9 @@ function collectFacts(
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
         if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
-          factsToVerify.push({ entity, fact });
+          if (!verified || !verified.has(fact.id)) {
+            factsToVerify.push({ entity, fact });
+          }
         }
       }
     }
@@ -335,7 +362,31 @@ export async function sourcingCommand(
 
   const kb = await loadGraphFull();
   const graph = kb.graph;
-  const factsToVerify = collectFacts(kb, options);
+
+  // QUA-851: when --where-no-verdict is set, fetch the set of fact IDs that
+  // already have a row-level verdict from the wiki-server and skip them.
+  // Targets the ~1,353 unverified facts directly instead of re-checking all
+  // 2,744. Fail-closed: if we can't fetch verdicts, abort rather than silently
+  // re-verify everything.
+  const whereNoVerdict = options['where-no-verdict'] || options.whereNoVerdict;
+  let alreadyVerifiedFactIds: Set<string> | undefined;
+  if (whereNoVerdict && !options.fact) {
+    const res = await fetchVerdictRecordIds('fact');
+    if (!res.ok) {
+      const detail = res.message || res.error;
+      return {
+        exitCode: 1,
+        output: `Failed to fetch existing fact verdicts (--where-no-verdict): ${detail}`,
+      };
+    }
+    alreadyVerifiedFactIds = res.data;
+    // Log to stderr so --ci JSON output stays parseable.
+    console.error(
+      `[where-no-verdict] ${alreadyVerifiedFactIds.size} fact(s) already have a verdict; will skip them.`,
+    );
+  }
+
+  const factsToVerify = collectFacts(kb, options, alreadyVerifiedFactIds);
 
   if (factsToVerify.length === 0) {
     const hint = options.entity

@@ -97,6 +97,53 @@ export async function listVerdicts(
   );
 }
 
+/**
+ * Fetch the set of record IDs that already have a row-level verdict for the
+ * given recordType. Skips per-field verdicts (fieldName != null) — designed
+ * for record types where a row-level verdict means "fully checked" (e.g.,
+ * facts). Record types that primarily store field-level verdicts (e.g.,
+ * personnel) need a different filter.
+ *
+ * Paginates against the server's natural page size, terminating when
+ * `offset + page.length >= total` so the client doesn't need to know
+ * MAX_PAGE_SIZE (avoids silent truncation if the server tightens it).
+ *
+ * Concurrency note: between page fetches, concurrent verdict writes can
+ * shift row ordering (rows are sorted by lastComputedAt desc) and
+ * skip/duplicate rows across pages. The Set deduplicates duplicates;
+ * skipped rows mean a few facts may be re-verified on the next backfill
+ * run — wasted work but not incorrect output. Acceptable for the
+ * QUA-851 use case.
+ *
+ * Used by `crux fb sourcing --where-no-verdict` to skip already-verified
+ * facts.
+ */
+export async function fetchVerdictRecordIds(
+  recordType: string,
+): Promise<ApiResult<Set<string>>> {
+  // Request the server's max page size; if the server clamps it lower,
+  // we still terminate correctly via `total`.
+  const REQUESTED_LIMIT = 200;
+  const ids = new Set<string>();
+  let offset = 0;
+
+  while (true) {
+    const res = await listVerdicts({ recordType, limit: REQUESTED_LIMIT, offset });
+    if (!res.ok) return res;
+
+    for (const v of res.data.verdicts) {
+      if (v.fieldName != null) continue;
+      ids.add(v.recordId);
+    }
+
+    const fetchedSoFar = offset + res.data.verdicts.length;
+    if (res.data.verdicts.length === 0 || fetchedSoFar >= res.data.total) break;
+    offset = fetchedSoFar;
+  }
+
+  return { ok: true, data: ids };
+}
+
 /** Get verdicts for a specific record. */
 export async function getVerdictByRecord(
   recordType: string,

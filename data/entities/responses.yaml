@@ -1755,6 +1755,202 @@
     - id: iaps
       type: organization
   lastUpdated: 2026-03
+- id: fisa-702
+  stableId: sid_n7K9yVNCtg
+  wikiId: E2538
+  type: policy
+  summaryPage: governance-overview
+  title: FISA Section 702
+  introduced: 2008-07
+  policyStatus: enacted
+  author: US Congress
+  scope: Federal
+  billNumber: 50 U.S.C. § 1881a
+  jurisdiction: United States
+  fullTextUrl: https://www.law.cornell.edu/uscode/text/50/1881a
+  description: >-
+    Section 702 of the Foreign Intelligence Surveillance Act, codified at 50 U.S.C. § 1881a, was added to FISA by the
+    FISA Amendments Act of 2008 (P.L. 110-261), signed into law by President George W. Bush on July 10, 2008. Section
+    702 authorizes the targeting of non-US persons reasonably believed to be located outside the United States to
+    acquire foreign intelligence information; the Director of National Intelligence and the Attorney General jointly
+    certify each annual collection authority. Communications incidentally acquired about US persons may be queried using
+    US-person identifiers, a practice that has been the focus of successive reform debates. (Entity seeded via the
+    claims-first sourcing pipeline; only independently verified facts are reflected here.)
+  provisions:
+    - title: Targeting of Non-US Persons Abroad
+      description: >-
+        Authorizes acquisition of foreign intelligence information by targeting persons reasonably believed to be
+        located outside the United States and not known to be US persons. The Attorney General and the Director of
+        National Intelligence jointly authorize collection.
+      category: Authority
+      source: https://www.law.cornell.edu/uscode/text/50/1881a
+    - title: Backend US-Person Queries
+      description: >-
+        US-person identifiers may be used as search terms against the corpus of Section 702-acquired data. The FBI, CIA,
+        NSA, and NCTC conduct these queries under procedures reviewed by the Foreign Intelligence Surveillance Court.
+      category: US-person practices
+      source: https://www.brennancenter.org/our-work/research-reports/section-702-foreign-intelligence-surveillance-act
+    - title: ODNI Annual Statistical Transparency Report
+      description: >-
+        ODNI publishes an Annual Statistical Transparency Report disclosing aggregate Section 702 targeting and query
+        statistics.
+      category: Transparency
+      source: https://www.dni.gov/files/CLPT/documents/2023_ASTR_for_CY2022.pdf
+    - title: Prohibition on Reverse Targeting
+      description: >-
+        Section 702 also prohibits "reverse targeting"—the IC may not target a non-U.S. person located outside the U.S.
+        if the purpose of the collection is to collect information about a United States person or anyone located in the
+        United States.
+      source: https://intelligence.gov/foreign-intelligence-surveillance-act/fisa-section-702
+    - title: Minimization Procedures for U.S. Person Information
+      description: >-
+        Section 702 requires specific procedures to minimize the acquisition, retention, and sharing of any information
+        concerning United States persons.
+      source: https://intelligence.gov/foreign-intelligence-surveillance-act/fisa-section-702
+    - title: Fourth Amendment Querying Procedures
+      description: >-
+        Congress also amended Section 702 to require specific procedures to ensure the querying of any Section
+        702-acquired information is consistent with the Fourth Amendment.
+      source: https://intelligence.gov/foreign-intelligence-surveillance-act/fisa-section-702
+    - title: FISC Certification and Court Approval
+      description: >-
+        These officials submit to the Foreign Intelligence Surveillance Court a certification specifying categories of
+        foreign intelligence information the government can collect using the authorities of FISA section 702. Once
+        approved by the court, the certification is good for one year, and individual court orders are not required for
+        surveillance efforts fitting the statutory parameters of the program.
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - title: Targeting and Minimization Procedures
+      description: >-
+        The DNI and attorney general also submit for the court's review the program's targeting and minimization
+        procedures. The targeting procedures are designed to ensure that these statutory limitations are carried out in
+        practice, namely that only non-U.S. persons outside the United States believed to have foreign intelligence
+        information are targeted for collection.
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - title: Prohibited Targeting Limitations
+      description: >-
+        The statute further provides limitations on what may not be done under this program, namely that the government
+        may not intentionally target: a U.S. person reasonably believed to be located outside the United States; any
+        person known at the time of acquisition to be located inside the United States; or a person reasonably believed
+        to be located outside the United States if the purpose of the acquisition is to target a particular, known
+        person reasonably believed to be in the United States (reverse targeting).
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - title: Minimization Procedures
+      description: >-
+        Targeting, minimization, and querying procedures are also submitted. Every year, the FISC reviews these
+        certifications and procedures to ensure they comply with FISA and the Fourth Amendment.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+    - title: Annual FISC Certification
+      description: >-
+        Every year, the Attorney General and Director of National Intelligence submit to the FISC certifications that
+        specify categories of foreign intelligence that the IC can use Section 702 to collect.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+    - title: Querying Procedures and Oversight
+      description: >-
+        DOJ reviews IC compliance with Section 702 targeting, minimization, and querying procedures. DOJ also reviews
+        100% of all Section 702 tasking sheets. After the FBI implemented a series of reforms in 2021 and 2022 to
+        address concerns about query compliance, the FBI's U.S. person queries of Section 702 information dropped over
+        93% from 2021 to 2022.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+  stakeholders:
+    - name: Office of the Director of National Intelligence (ODNI)
+      position: support
+      importance: high
+      reason: >-
+        Co-authorizes annual Section 702 collection alongside the Attorney General and publishes the Annual Statistical
+        Transparency Report.
+      source: https://crsreports.congress.gov/product/pdf/R/R44457
+    - name: Center for Democracy and Technology (CDT)
+      entityId: sid_XkqcWk46oQ
+      position: reform
+      importance: medium
+      reason: >-
+        Pushes for stronger US-person query protections and shorter Section 702 reauthorization sunsets; led 2024
+        coalition push for FISA 702 reforms.
+      source: https://cdt.org/area-of-focus/government-surveillance/
+    - name: Foreign Intelligence Surveillance Court (FISC)
+      position: reform
+      importance: medium
+      reason: >-
+        The Attorney General must approve the targeting, minimization, and querying procedures, each of which are
+        annually reviewed by the Foreign Intelligence Surveillance Court (FISC) for consistency with the FISA statute
+        and the Fourth Amendment. Any identified compliance errors are remedied and reported to the FISC and Congress.
+      source: https://intelligence.gov/foreign-intelligence-surveillance-act/fisa-section-702
+    - name: Department of Justice (DOJ)
+      position: reform
+      importance: medium
+      reason: >-
+        The Department of Justice and the Office of the Director of National Intelligence conduct extensive, regular,
+        and independent reviews of Section 702 activities.
+      source: https://intelligence.gov/foreign-intelligence-surveillance-act/fisa-section-702
+    - name: National Security Agency (NSA)
+      position: reform
+      importance: medium
+      reason: >-
+        A 2013 statement on the National Security Agency website calls the program 'the most significant tool' in the
+        NSA arsenal for the detection and disruption of terrorist threats. The NSA director has publicly said, 'there is
+        no alternative way' to replicate the collection under this program, and the information gained under it cannot
+        be replaced 'via other collection sources, via other legal means.'
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - name: Privacy and Civil Liberties Oversight Board (PCLOB)
+      position: reform
+      importance: medium
+      reason: >-
+        Najibullah Zazi is in prison for planning to attack the New York City subway system with explosives in 2009. He
+        received explosives training in Pakistan from al Qaeda. The Privacy and Civil Liberties Oversight Board
+        concluded in 2014: 'without the initial tip-off about Zazi and his plans, which came about by monitoring an
+        overseas foreigner under Section 702, the subway-bombing plot might have succeeded.'
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - name: Senate Intelligence Committee
+      position: reform
+      importance: medium
+      reason: >-
+        At a hearing of the Senate Intelligence Committee on May 11, 2017, the NSA director bluntly said, 'if we were to
+        lose 702 authorities, we would be significantly degraded in our abilities to provide timely warning and insight
+        as to what terrorist actors, nation-states, [and] criminal elements are doing that is of concern to our nation.'
+      source: https://rpc.senate.gov/policy-papers/fisa-section-702
+    - name: Foreign Intelligence Surveillance Court (FISC)
+      position: reform
+      importance: medium
+      reason: >-
+        Every year, the FISC reviews these certifications and procedures to ensure they comply with FISA and the Fourth
+        Amendment. Every federal court to ever review the Section 702 program has found that it is constitutional.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+    - name: Department of Justice (DOJ)
+      position: reform
+      importance: medium
+      reason: >-
+        DOJ reviews IC compliance with Section 702 targeting, minimization, and querying procedures. DOJ also reviews
+        100% of all Section 702 tasking sheets. DOJ reports all identified compliance incidents to the Foreign
+        Intelligence Surveillance Court (FISC) and Congress.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+    - name: National Security Agency (NSA)
+      position: reform
+      importance: medium
+      reason: >-
+        In calendar year (CY) 2022, 59% of President's Daily Brief (PDB) Articles contained Section 702 information
+        reported by the National Security Agency (NSA).
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+    - name: Federal Bureau of Investigation (FBI)
+      position: reform
+      importance: medium
+      reason: >-
+        The FBI only receives collection on Section 702 targets relevant to full FBI national security investigations,
+        which amounts to 3.22% of the IC's total targets under 702. After the FBI implemented a series of reforms in
+        2021 and 2022 to address concerns about query compliance, the FBI's U.S. person queries of Section 702
+        information dropped over 93% from 2021 to 2022.
+      source: https://intel.gov/assets/documents/702-documents/FISA_Section_702_Fact_Sheet_JUN2023.pdf
+  relatedEntries:
+    - id: government-authority-commercial-ai-infrastructure
+      type: analysis
+    - id: us-executive-order
+      type: policy
+    - id: export-controls
+      type: policy
+  tags:
+    - ai-governance
+    - surveillance
+    - us-policy
+  lastUpdated: 2026-04
 - id: failed-stalled-proposals
   stableId: sid_dj6xnXmB7A
   wikiId: E137

@@ -281,6 +281,20 @@ describe('detectIssues', () => {
       expect(result.issues).not.toContain('missing-issue-ref');
     }
   });
+
+  it('accepts Linear refs (Closes QUA-NNN) as issue refs (QUA-884)', () => {
+    for (const keyword of ['Closes QUA-815', 'Fixes QUA-876', 'Resolves QUA-1', 'closes qua-42']) {
+      const pr = makePrNode({ body: `## Test plan\n\n${keyword}` });
+      const result = detectIssues(pr, 0);
+      expect(result.issues).not.toContain('missing-issue-ref');
+    }
+  });
+
+  it('still rejects bare QUA-NNN without a closing keyword', () => {
+    const pr = makePrNode({ body: `## Test plan\n\nThis relates to QUA-815 but doesn't close it.` });
+    const result = detectIssues(pr, 0);
+    expect(result.issues).toContain('missing-issue-ref');
+  });
 });
 
 // ── detectAllPrIssuesFromNodes — bot/release PR skipping ──────────────────
