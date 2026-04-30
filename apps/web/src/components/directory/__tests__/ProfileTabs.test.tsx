@@ -7,12 +7,13 @@ import { render, screen, within, fireEvent } from "@testing-library/react";
 // Per-test mutable state so we can drive the mocked router/searchParams.
 const mockState = {
   search: "",
+  pathname: "/organizations/x",
   replace: vi.fn() as ReturnType<typeof vi.fn>,
 };
 
 vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams(mockState.search),
-  usePathname: () => "/organizations/x",
+  usePathname: () => mockState.pathname,
   useRouter: () => ({ replace: mockState.replace, push: vi.fn() }),
 }));
 
@@ -24,6 +25,7 @@ import {
 
 beforeEach(() => {
   mockState.search = "";
+  mockState.pathname = "/organizations/x";
   mockState.replace = vi.fn();
 });
 
@@ -240,6 +242,252 @@ describe("ProfileTabs", () => {
         />,
       );
       expect(screen.queryByRole("status")).toBeNull();
+    });
+  });
+
+  describe("path-mode routing (QUA-877)", () => {
+    const basePath = "/organizations/anthropic";
+
+    it("derives default tab when pathname equals basePath (no segment)", () => {
+      mockState.pathname = basePath;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      const activeTab = screen.getByRole("tab", { selected: true });
+      expect(activeTab.textContent).toMatch(/Overview/);
+      expect(screen.getByTestId("overview-content")).toBeTruthy();
+    });
+
+    it("derives active tab from a known segment in the pathname", () => {
+      mockState.pathname = `${basePath}/facts`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div data-testid="facts-content">f</div>),
+          ]}
+        />,
+      );
+      const activeTab = screen.getByRole("tab", { selected: true });
+      expect(activeTab.textContent).toMatch(/Facts/);
+      expect(screen.getByTestId("facts-content")).toBeTruthy();
+    });
+
+    it("falls back to default tab + shows notice when segment is unknown", () => {
+      mockState.pathname = `${basePath}/shareholders`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      // Banner names the requested unknown segment + the fallback target.
+      const banner = screen.getByRole("status");
+      expect(banner.textContent).toMatch(/shareholders/);
+      expect(banner.textContent).toMatch(/Overview/);
+      // Default tab is active and its content renders.
+      expect(screen.getByTestId("overview-content")).toBeTruthy();
+    });
+
+    it("renders tab triggers as <a> Links with the expected hrefs", () => {
+      mockState.pathname = basePath;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+            tab("people", "People", <div>p</div>),
+          ]}
+        />,
+      );
+      const triggers = screen.getAllByRole("tab");
+      expect(triggers).toHaveLength(3);
+      // Default tab → bare basePath (no segment).
+      expect(triggers[0].tagName).toBe("A");
+      expect(triggers[0].getAttribute("href")).toBe(basePath);
+      // Non-default tabs → ${basePath}/${id}.
+      expect(triggers[1].getAttribute("href")).toBe(`${basePath}/facts`);
+      expect(triggers[2].getAttribute("href")).toBe(`${basePath}/people`);
+    });
+
+    it("active state on the Link trigger matches the pathname segment", () => {
+      mockState.pathname = `${basePath}/people`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+            tab("people", "People", <div>p</div>),
+          ]}
+        />,
+      );
+      const triggers = screen.getAllByRole("tab");
+      // Only the matching segment's trigger is data-state="active".
+      const states = triggers.map((t) => t.getAttribute("data-state"));
+      expect(states).toEqual(["inactive", "inactive", "active"]);
+    });
+
+    it("normalizes basePath with a trailing slash", () => {
+      mockState.pathname = "/organizations/anthropic";
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath: "/organizations/anthropic/" }}
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      // Default tab is active without double-slash in the href either.
+      expect(screen.getByTestId("overview-content")).toBeTruthy();
+      const triggers = screen.getAllByRole("tab");
+      expect(triggers[0].getAttribute("href")).toBe("/organizations/anthropic");
+      expect(triggers[1].getAttribute("href")).toBe("/organizations/anthropic/facts");
+    });
+
+    it("treats trailing slash on pathname as bare basePath", () => {
+      mockState.pathname = `${basePath}/`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      expect(screen.getByTestId("overview-content")).toBeTruthy();
+    });
+
+    it("does not call router.replace in path mode (Link drives navigation)", () => {
+      mockState.pathname = basePath;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      // Click would normally fire navigation; the Link itself handles it via
+      // next/navigation, not via router.replace.
+      fireEvent.click(screen.getByRole("tab", { name: /Facts/ }));
+      expect(mockState.replace).not.toHaveBeenCalled();
+    });
+
+    it("preserves explicit tab.href in path mode (vertical link-tabs)", () => {
+      mockState.pathname = basePath;
+      render(
+        <ProfileTabs
+          layout="vertical"
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("wiki", "Wiki", null, undefined, { href: "/wiki/E1" }),
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div>f</div>),
+          ]}
+        />,
+      );
+      const wikiLink = screen.getByRole("link", { name: /Wiki/ });
+      expect(wikiLink.getAttribute("href")).toBe("/wiki/E1");
+    });
+
+    it("query mode (default) is regression-free when tabRouting is omitted", () => {
+      // No tabRouting prop → query-mode behavior unchanged from baseline tests.
+      mockState.search = "tab=facts";
+      render(
+        <ProfileTabs
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("facts", "Facts", <div data-testid="facts-content">f</div>),
+          ]}
+        />,
+      );
+      const activeTab = screen.getByRole("tab", { selected: true });
+      expect(activeTab.textContent).toMatch(/Facts/);
+      expect(screen.getByTestId("facts-content")).toBeTruthy();
+    });
+
+    it("hydration parity: tablist structure is stable across pathname changes", () => {
+      // Path mode skips Suspense, so there's no Fallback↔Inner swap. The
+      // structural QUA-656 invariant for path mode is: the rendered tablist
+      // (tab count, tag, role, hrefs) must NOT change as the URL changes.
+      // Only `data-state` / `aria-selected` should differ between paths.
+      const tabsArr = [
+        tab("overview", "Overview", <div>o</div>),
+        tab("facts", "Facts", <div>f</div>),
+        tab("people", "People", <div>p</div>),
+      ];
+
+      mockState.pathname = basePath;
+      const { rerender, container } = render(
+        <ProfileTabs tabRouting={{ mode: "path", basePath }} tabs={tabsArr} />,
+      );
+
+      function shape() {
+        const triggers = Array.from(
+          container.querySelectorAll('[role="tab"]'),
+        ) as HTMLElement[];
+        return triggers.map((t) => ({
+          tag: t.tagName,
+          id: t.getAttribute("data-tab-id"),
+          href: t.getAttribute("href"),
+          label: t.textContent,
+        }));
+      }
+      const before = shape();
+
+      // Switch to a different known segment — same tabs, different active.
+      mockState.pathname = `${basePath}/people`;
+      rerender(
+        <ProfileTabs tabRouting={{ mode: "path", basePath }} tabs={tabsArr} />,
+      );
+      expect(shape()).toEqual(before);
+      // But the active state DID change.
+      const states = (
+        Array.from(container.querySelectorAll('[role="tab"]')) as HTMLElement[]
+      ).map((t) => t.getAttribute("data-state"));
+      expect(states).toEqual(["inactive", "inactive", "active"]);
+    });
+
+    it("throws when basePath is empty or just root", () => {
+      // basePath must be a real mount point so default-tab href and segment
+      // parsing are unambiguous. Catch this at render time, not silently in
+      // the URL.
+      const baseTabs = [
+        tab("a", "A", <div>a</div>),
+        tab("b", "B", <div>b</div>),
+      ];
+      // suppress React's error-boundary console output for this assertion
+      const origError = console.error;
+      console.error = () => {};
+      try {
+        expect(() =>
+          render(
+            <ProfileTabs tabRouting={{ mode: "path", basePath: "" }} tabs={baseTabs} />,
+          ),
+        ).toThrow(/non-root basePath/);
+        expect(() =>
+          render(
+            <ProfileTabs tabRouting={{ mode: "path", basePath: "/" }} tabs={baseTabs} />,
+          ),
+        ).toThrow(/non-root basePath/);
+      } finally {
+        console.error = origError;
+      }
     });
   });
 

@@ -38,6 +38,18 @@ export interface ProfileTabGroup {
   label: string;
 }
 
+/**
+ * URL-routing mode for the active tab.
+ * - `"query"` (default): active tab read from `?tab=<id>`; clicks call
+ *   `router.replace` to update the query.
+ * - `"path"`: active tab read from the path segment after `basePath`; tab
+ *   triggers render as `<Link>` so navigation is SSR-friendly and the URL
+ *   is shareable as `${basePath}/${tabId}` (the default tab is `${basePath}`).
+ */
+export type TabRouting =
+  | { mode: "query" }
+  | { mode: "path"; basePath: string };
+
 export interface ProfileTabsProps {
   tabs: ProfileTab[];
   /** Accessible label for the tab list, e.g. "Organization sections" */
@@ -50,6 +62,8 @@ export interface ProfileTabsProps {
   layout?: "horizontal" | "vertical";
   /** Ordered groups (vertical layout only). */
   groups?: ProfileTabGroup[];
+  /** URL routing mode. Defaults to `{ mode: "query" }` (existing behavior). */
+  tabRouting?: TabRouting;
 }
 
 // ─── Shared helpers ─────────────────────────────────────────────────────
@@ -155,21 +169,107 @@ function bucketByGroup(
   return result;
 }
 
+// ─── Path-mode helpers ─────────────────────────────────────────────────
+
+// Strip a single trailing slash so `${basePath}/${id}` doesn't double-slash
+// when callers pass `basePath="/organizations/anthropic/"`. Empty string and
+// bare `/` are not valid mount points — see invariant in `ProfileTabsPathMode`.
+function normalizeBasePath(basePath: string): string {
+  return basePath.endsWith("/") && basePath.length > 1
+    ? basePath.slice(0, -1)
+    : basePath;
+}
+
+// URL the trigger Link should navigate to. The default tab lives at the bare
+// basePath (no segment); other tabs get `${basePath}/${id}`. Tabs with an
+// explicit `href` keep their own destination — those are link-tabs (e.g. wiki
+// pages) and override path-mode routing.
+function tabHrefFor(tab: ProfileTab, basePath: string, defaultTabId: string): string {
+  if (tab.href) return tab.href;
+  const base = normalizeBasePath(basePath);
+  return tab.id === defaultTabId ? base : `${base}/${tab.id}`;
+}
+
+// Pick the active tab + flag any unknown segment so we can surface a notice.
+function pickActiveTabFromPath(
+  pathname: string,
+  basePath: string,
+  tabs: ProfileTab[],
+  defaultTabId: string,
+): { activeTab: string; unknownRequested: string | null } {
+  const base = normalizeBasePath(basePath);
+  // Bare basePath (or basePath + trailing slash) → default tab.
+  if (pathname === base || pathname === `${base}/`) {
+    return { activeTab: defaultTabId, unknownRequested: null };
+  }
+  if (pathname.startsWith(`${base}/`)) {
+    const remainder = pathname.slice(base.length + 1);
+    const segment = remainder.split("/")[0] ?? "";
+    if (segment === "") {
+      return { activeTab: defaultTabId, unknownRequested: null };
+    }
+    const selectableIds = new Set(tabs.filter((t) => !t.href).map((t) => t.id));
+    if (selectableIds.has(segment)) {
+      return { activeTab: segment, unknownRequested: null };
+    }
+    return { activeTab: defaultTabId, unknownRequested: segment };
+  }
+  // pathname doesn't share the basePath prefix at all (shouldn't happen in
+  // practice, but be tolerant — fall back to default rather than blow up).
+  return { activeTab: defaultTabId, unknownRequested: null };
+}
+
 // ─── Renderers ──────────────────────────────────────────────────────────
 
-function HorizontalTabsList({ tabs, ariaLabel }: { tabs: ProfileTab[]; ariaLabel?: string }) {
+// In path mode, render a Radix-styled Link that visually matches a TabsTrigger
+// but doesn't participate in TabsRoot's controlled value. Active state is
+// driven by aria-selected so the existing CSS targeting `[data-state="active"]`
+// keeps working without coupling to Radix's internal state machine.
+const HORIZONTAL_LINK_TRIGGER = `${HORIZONTAL_TRIGGER} no-underline`;
+const VERTICAL_LINK_TRIGGER = `profile-tab-vertical ${VERTICAL_ROW_BASE} no-underline`;
+
+function HorizontalTabsList({
+  tabs,
+  ariaLabel,
+  pathRouting,
+}: {
+  tabs: ProfileTab[];
+  ariaLabel?: string;
+  /** Set in path mode. Triggers render as `<Link>` with active state derived from `activeTab`. */
+  pathRouting?: { basePath: string; activeTab: string; defaultTabId: string };
+}) {
   return (
     <TabsList aria-label={ariaLabel ?? "Page sections"} className={HORIZONTAL_TABLIST}>
-      {tabs.map((tab) => (
-        <TabsTrigger
-          key={tab.id}
-          value={tab.id}
-          className={HORIZONTAL_TRIGGER}
-          aria-label={ariaLabelFor(tab)}
-        >
-          <TabLabel tab={tab} layout="horizontal" />
-        </TabsTrigger>
-      ))}
+      {tabs.map((tab) => {
+        if (pathRouting) {
+          const isActive = tab.id === pathRouting.activeTab;
+          return (
+            <Link
+              key={tab.id}
+              href={tabHrefFor(tab, pathRouting.basePath, pathRouting.defaultTabId)}
+              prefetch
+              role="tab"
+              aria-label={ariaLabelFor(tab)}
+              aria-selected={isActive}
+              data-state={isActive ? "active" : "inactive"}
+              data-tab-id={tab.id}
+              className={HORIZONTAL_LINK_TRIGGER}
+            >
+              <TabLabel tab={tab} layout="horizontal" />
+            </Link>
+          );
+        }
+        return (
+          <TabsTrigger
+            key={tab.id}
+            value={tab.id}
+            className={HORIZONTAL_TRIGGER}
+            aria-label={ariaLabelFor(tab)}
+          >
+            <TabLabel tab={tab} layout="horizontal" />
+          </TabsTrigger>
+        );
+      })}
     </TabsList>
   );
 }
@@ -182,10 +282,13 @@ function VerticalTabsNav({
   tabs,
   groups,
   ariaLabel,
+  pathRouting,
 }: {
   tabs: ProfileTab[];
   groups?: ProfileTabGroup[];
   ariaLabel?: string;
+  /** Set in path mode. Non-link tabs render as `<Link>` with active state derived from `activeTab`. */
+  pathRouting?: { basePath: string; activeTab: string; defaultTabId: string };
 }) {
   const buckets = bucketByGroup(tabs, groups);
   // TabsList supplies the RovingFocusGroup context that TabsTrigger needs.
@@ -207,17 +310,41 @@ function VerticalTabsNav({
               {bucket.label}
             </div>
           )}
-          {bucket.tabs.map((tab) =>
-            tab.href ? (
-              <Link
-                key={tab.id}
-                href={tab.href}
-                aria-label={ariaLabelFor(tab)}
-                className={VERTICAL_LINK}
-              >
-                <TabLabel tab={tab} layout="vertical" />
-              </Link>
-            ) : (
+          {bucket.tabs.map((tab) => {
+            // Tabs with an explicit `href` are link-tabs in either mode — they
+            // navigate to a fixed destination (e.g. wiki page) rather than
+            // participating in tab routing.
+            if (tab.href) {
+              return (
+                <Link
+                  key={tab.id}
+                  href={tab.href}
+                  aria-label={ariaLabelFor(tab)}
+                  className={VERTICAL_LINK}
+                >
+                  <TabLabel tab={tab} layout="vertical" />
+                </Link>
+              );
+            }
+            if (pathRouting) {
+              const isActive = tab.id === pathRouting.activeTab;
+              return (
+                <Link
+                  key={tab.id}
+                  href={tabHrefFor(tab, pathRouting.basePath, pathRouting.defaultTabId)}
+                  prefetch
+                  role="tab"
+                  aria-label={ariaLabelFor(tab)}
+                  aria-selected={isActive}
+                  data-state={isActive ? "active" : "inactive"}
+                  data-tab-id={tab.id}
+                  className={VERTICAL_LINK_TRIGGER}
+                >
+                  <TabLabel tab={tab} layout="vertical" />
+                </Link>
+              );
+            }
+            return (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
@@ -226,8 +353,8 @@ function VerticalTabsNav({
               >
                 <TabLabel tab={tab} layout="vertical" />
               </TabsTrigger>
-            ),
-          )}
+            );
+          })}
         </div>
       ))}
     </TabsList>
@@ -265,16 +392,22 @@ function HorizontalLayout({
   onChange,
   ariaLabel,
   notice,
+  pathRouting,
 }: {
   tabs: ProfileTab[];
   activeTab: string;
   onChange: (value: string) => void;
   ariaLabel?: string;
   notice?: React.ReactNode;
+  pathRouting?: { basePath: string; defaultTabId: string };
 }) {
   return (
     <Tabs value={activeTab} onValueChange={onChange}>
-      <HorizontalTabsList tabs={tabs} ariaLabel={ariaLabel} />
+      <HorizontalTabsList
+        tabs={tabs}
+        ariaLabel={ariaLabel}
+        pathRouting={pathRouting ? { ...pathRouting, activeTab } : undefined}
+      />
       {notice}
       <TabsContentList tabs={tabs} layout="horizontal" />
     </Tabs>
@@ -288,6 +421,7 @@ function VerticalLayout({
   ariaLabel,
   groups,
   notice,
+  pathRouting,
 }: {
   tabs: ProfileTab[];
   activeTab: string;
@@ -295,6 +429,7 @@ function VerticalLayout({
   ariaLabel?: string;
   groups?: ProfileTabGroup[];
   notice?: React.ReactNode;
+  pathRouting?: { basePath: string; defaultTabId: string };
 }) {
   return (
     <Tabs
@@ -305,7 +440,12 @@ function VerticalLayout({
     >
       <div className="grid grid-cols-1 md:grid-cols-[16rem_minmax(0,1fr)] gap-x-10 gap-y-6">
         <div className="md:sticky md:top-4 md:self-start">
-          <VerticalTabsNav tabs={tabs} groups={groups} ariaLabel={ariaLabel} />
+          <VerticalTabsNav
+            tabs={tabs}
+            groups={groups}
+            ariaLabel={ariaLabel}
+            pathRouting={pathRouting ? { ...pathRouting, activeTab } : undefined}
+          />
         </div>
         <div className="min-w-0">
           {notice}
@@ -466,20 +606,103 @@ function ProfileTabsFallback({
   );
 }
 
+// Path-mode renderer. Skips Suspense — `usePathname()` is sync on both server
+// and client, so the rendered DOM is identical across SSR and hydration. The
+// QUA-656 invariant (Fallback/Inner shape parity) is satisfied trivially:
+// there's no Fallback, and the single render path is structurally stable.
+function ProfileTabsPathMode({
+  tabs,
+  ariaLabel,
+  layout,
+  groups,
+  basePath,
+}: {
+  tabs: ProfileTab[];
+  ariaLabel?: string;
+  layout: "horizontal" | "vertical";
+  groups?: ProfileTabGroup[];
+  basePath: string;
+}) {
+  // basePath must be a non-root absolute path (`/organizations/anthropic`,
+  // not `""` or `"/"`). Mounting at root would produce empty hrefs for the
+  // default tab and ambiguous segment parsing for non-default tabs.
+  if (!basePath || basePath === "/") {
+    throw new Error(
+      `ProfileTabs path mode requires a non-root basePath, got ${JSON.stringify(basePath)}`,
+    );
+  }
+  const pathname = usePathname();
+  const defaultTab = pickDefaultTab(tabs);
+  const { activeTab, unknownRequested } = pickActiveTabFromPath(
+    pathname ?? "",
+    basePath,
+    tabs,
+    defaultTab.id,
+  );
+
+  const notice = unknownRequested ? (
+    <UnknownTabNotice requested={unknownRequested} fallback={defaultTab.label} />
+  ) : null;
+
+  // Triggers are <Link>s, so they handle navigation themselves. Pass noop to
+  // satisfy the controlled <Tabs> wire shape.
+  const pathRouting = { basePath, defaultTabId: defaultTab.id };
+  return layout === "vertical" ? (
+    <VerticalLayout
+      tabs={tabs}
+      activeTab={activeTab}
+      onChange={noop}
+      ariaLabel={ariaLabel}
+      groups={groups}
+      notice={notice}
+      pathRouting={pathRouting}
+    />
+  ) : (
+    <HorizontalLayout
+      tabs={tabs}
+      activeTab={activeTab}
+      onChange={noop}
+      ariaLabel={ariaLabel}
+      notice={notice}
+      pathRouting={pathRouting}
+    />
+  );
+}
+
 /**
  * Reusable tabbed layout for profile pages (organizations, people, etc.).
  * - Filters out tabs where `count === 0`
  * - Renders content directly (no tab chrome) when only one tab remains
- * - Syncs active tab to `?tab=` URL query param for shareable links
+ * - `tabRouting={{ mode: "query" }}` (default) syncs active tab to `?tab=`
+ * - `tabRouting={{ mode: "path", basePath }}` reads/writes the active tab as
+ *   a path segment after `basePath`, with triggers rendered as `<Link>` for
+ *   SSR-friendliness and shareable URLs
  * - `layout="vertical"` renders a grouped left-side nav (see `groups`)
  */
-export function ProfileTabs({ tabs, ariaLabel, layout = "horizontal", groups }: ProfileTabsProps) {
+export function ProfileTabs({
+  tabs,
+  ariaLabel,
+  layout = "horizontal",
+  groups,
+  tabRouting = { mode: "query" },
+}: ProfileTabsProps) {
   const visibleTabs = tabs.filter((t) => t.count !== 0);
   if (visibleTabs.length === 0) return null;
   // Single-tab short-circuit — matches QUA-463 hydration fix: skip Suspense
   // so server and client agree on a plain fragment.
   if (visibleTabs.length === 1) {
     return <>{visibleTabs[0].content}</>;
+  }
+  if (tabRouting.mode === "path") {
+    return (
+      <ProfileTabsPathMode
+        tabs={visibleTabs}
+        ariaLabel={ariaLabel}
+        layout={layout}
+        groups={groups}
+        basePath={tabRouting.basePath}
+      />
+    );
   }
   return (
     <Suspense

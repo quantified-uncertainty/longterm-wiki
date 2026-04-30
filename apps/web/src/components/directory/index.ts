@@ -11,7 +11,12 @@ export {
   groupByCategory,
   FACT_CATEGORIES,
 } from "./FactsSection";
-export { ProfileTabs, type ProfileTab, type ProfileTabGroup } from "./ProfileTabs";
+export {
+  ProfileTabs,
+  type ProfileTab,
+  type ProfileTabGroup,
+  type TabRouting,
+} from "./ProfileTabs";
 export {
   PaginationControls,
   type PaginationControlsProps,
