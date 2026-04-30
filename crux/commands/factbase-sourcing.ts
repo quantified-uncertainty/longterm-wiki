@@ -289,14 +289,20 @@ function isNonVerifiable(graph: Graph, fact: Fact): boolean {
   return property?.verifiable === false;
 }
 
-export function collectFacts(
+function collectFacts(
   kb: LoadedKB,
   options: VerifyCommandOptions,
   alreadyVerifiedFactIds?: ReadonlySet<string>,
 ): Array<{ entity: Entity; fact: Fact }> {
   const graph = kb.graph;
   const factsToVerify: Array<{ entity: Entity; fact: Fact }> = [];
-  const skipVerified = alreadyVerifiedFactIds && alreadyVerifiedFactIds.size > 0;
+  // Only filter by verified-set when caller has provided a populated set AND
+  // we're in batch mode (entity-scoped or all-entities). For an explicit
+  // --fact=X lookup the user is asking for that specific fact; respect it.
+  const verified =
+    !options.fact && alreadyVerifiedFactIds && alreadyVerifiedFactIds.size > 0
+      ? alreadyVerifiedFactIds
+      : null;
 
   if (options.fact) {
     // Find a specific fact by ID
@@ -305,9 +311,7 @@ export function collectFacts(
       const match = facts.find((f: Fact) => f.id === options.fact);
       if (match) {
         if (match.source && !isNonVerifiable(graph, match)) {
-          if (!skipVerified || !alreadyVerifiedFactIds!.has(match.id)) {
-            factsToVerify.push({ entity, fact: match });
-          }
+          factsToVerify.push({ entity, fact: match });
         }
         break;
       }
@@ -319,7 +323,7 @@ export function collectFacts(
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
         if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
-          if (!skipVerified || !alreadyVerifiedFactIds!.has(fact.id)) {
+          if (!verified || !verified.has(fact.id)) {
             factsToVerify.push({ entity, fact });
           }
         }
@@ -331,7 +335,7 @@ export function collectFacts(
       const facts = graph.getFacts(entity.id);
       for (const fact of facts) {
         if (fact.source && !fact.id.startsWith('inv_') && !isNonVerifiable(graph, fact)) {
-          if (!skipVerified || !alreadyVerifiedFactIds!.has(fact.id)) {
+          if (!verified || !verified.has(fact.id)) {
             factsToVerify.push({ entity, fact });
           }
         }
@@ -376,7 +380,8 @@ export async function sourcingCommand(
       };
     }
     alreadyVerifiedFactIds = res.data;
-    console.log(
+    // Log to stderr so --ci JSON output stays parseable.
+    console.error(
       `[where-no-verdict] ${alreadyVerifiedFactIds.size} fact(s) already have a verdict; will skip them.`,
     );
   }

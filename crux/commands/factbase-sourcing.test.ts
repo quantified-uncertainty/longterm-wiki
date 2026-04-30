@@ -186,6 +186,82 @@ describe('crux fb sourcing --dry-run', () => {
     expect(result.output).toContain('wiki-server unreachable');
   });
 
+  it('--where-no-verdict --limit=N counts AFTER filtering (QUA-851 headline use case)', async () => {
+    // Get baseline list of fact IDs for the entity
+    const baseline = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+    });
+    const baselineFacts = JSON.parse(baseline.output) as Array<{ factId: string }>;
+    expect(baselineFacts.length).toBeGreaterThanOrEqual(3);
+
+    // Mark the first two as already-verified
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([baselineFacts[0].factId, baselineFacts[1].factId]),
+    });
+
+    // Ask for 3 — we should get 3 _unverified_ facts, none being the skipped two
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+      limit: '3',
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.length).toBe(3);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(baselineFacts[0].factId);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(baselineFacts[1].factId);
+  });
+
+  it('--where-no-verdict --fact=X bypasses the filter (explicit fact lookup)', async () => {
+    const factId = 'f_dW5cR9mJ8q';
+    // Even if the fact's ID is in the verified set, --fact=X should still find it.
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([factId]),
+    });
+
+    const result = await sourcing([], {
+      fact: factId,
+      'dry-run': true,
+      'where-no-verdict': true,
+    });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('1 fact(s)');
+  });
+
+  it('--where-no-verdict applied to all-entities branch (no entity/fact filter)', async () => {
+    // Get a sample fact ID that exists in the global pool
+    const sample = await sourcing([], {
+      'dry-run': true,
+      ci: true,
+      limit: '1',
+    });
+    const sampleFacts = JSON.parse(sample.output) as Array<{ factId: string }>;
+    expect(sampleFacts.length).toBe(1);
+    const skipId = sampleFacts[0].factId;
+
+    // Ask for 5 facts globally, with the sample one in the verified set.
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([skipId]),
+    });
+    const result = await sourcing([], {
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+      limit: '5',
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.length).toBe(5);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(skipId);
+  });
+
   it('--where-no-verdict with empty verdict set returns all facts unchanged', async () => {
     // Default mock returns empty set
     mockFetchVerdictRecordIds.mockResolvedValueOnce({

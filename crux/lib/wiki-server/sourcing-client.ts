@@ -99,22 +99,36 @@ export async function listVerdicts(
 
 /**
  * Fetch the set of record IDs that already have a row-level verdict for the
- * given recordType. Skips per-field verdicts (fieldName != null) since a
- * record with only field-level verdicts has no row-level coverage and should
- * still be considered "no verdict" for the QUA-851 backfill flow.
+ * given recordType. Skips per-field verdicts (fieldName != null) — designed
+ * for record types where a row-level verdict means "fully checked" (e.g.,
+ * facts). Record types that primarily store field-level verdicts (e.g.,
+ * personnel) need a different filter.
  *
- * Paginates server-side at MAX_PAGE_SIZE (200). Used by
- * `crux fb sourcing --where-no-verdict` to skip already-verified facts.
+ * Paginates against the server's natural page size, terminating when
+ * `offset + page.length >= total` so the client doesn't need to know
+ * MAX_PAGE_SIZE (avoids silent truncation if the server tightens it).
+ *
+ * Concurrency note: between page fetches, concurrent verdict writes can
+ * shift row ordering (rows are sorted by lastComputedAt desc) and
+ * skip/duplicate rows across pages. The Set deduplicates duplicates;
+ * skipped rows mean a few facts may be re-verified on the next backfill
+ * run — wasted work but not incorrect output. Acceptable for the
+ * QUA-851 use case.
+ *
+ * Used by `crux fb sourcing --where-no-verdict` to skip already-verified
+ * facts.
  */
 export async function fetchVerdictRecordIds(
   recordType: string,
 ): Promise<ApiResult<Set<string>>> {
-  const PAGE_SIZE = 200;
+  // Request the server's max page size; if the server clamps it lower,
+  // we still terminate correctly via `total`.
+  const REQUESTED_LIMIT = 200;
   const ids = new Set<string>();
   let offset = 0;
 
   while (true) {
-    const res = await listVerdicts({ recordType, limit: PAGE_SIZE, offset });
+    const res = await listVerdicts({ recordType, limit: REQUESTED_LIMIT, offset });
     if (!res.ok) return res;
 
     for (const v of res.data.verdicts) {
@@ -122,8 +136,9 @@ export async function fetchVerdictRecordIds(
       ids.add(v.recordId);
     }
 
-    if (res.data.verdicts.length < PAGE_SIZE) break;
-    offset += PAGE_SIZE;
+    const fetchedSoFar = offset + res.data.verdicts.length;
+    if (res.data.verdicts.length === 0 || fetchedSoFar >= res.data.total) break;
+    offset = fetchedSoFar;
   }
 
   return { ok: true, data: ids };
