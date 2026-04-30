@@ -71,9 +71,10 @@ export async function tryUrlResolvesVerify(item: VerifyItem): Promise<VerifyResu
   const data = item.data;
   if (data.verifierKind !== 'url-resolves') return null;
 
-  // Use rawValue only — formattedValue can include display formatting (units,
-  // wrappers) that would parse as garbage.
-  const urlToCheck = data.rawValue;
+  // Prefer rawValue; fall back to formattedValue for legacy/external producers
+  // that didn't populate rawValue. For URL-typed properties they are the same
+  // string — the display-formatting concern only applies to numeric fields.
+  const urlToCheck = data.rawValue ?? data.formattedValue;
   if (!urlToCheck || !looksLikeUrl(urlToCheck)) {
     return {
       itemId: item.id,
@@ -140,6 +141,31 @@ export async function resolveFromResourcePipeline(
     }
 
     if (httpStatus != null && httpStatus >= 400) {
+      // Distinguish "URL alive, body blocked" from "URL gone". 401/403/451 mean
+      // the resource exists but the server refuses to serve the body to us
+      // (auth required, anti-bot block, legal removal). For url-resolves
+      // properties the truth being verified is "this URL is the canonical
+      // pointer for the entity" — body access is not required. Match the
+      // paywall branch below: confirmed at HIGH confidence.
+      // 429 + 5xx are transient (rate limit / server error) — unverifiable so
+      // we re-check next pass instead of flipping a previously-confirmed URL
+      // to contradicted on a hiccup.
+      if (httpStatus === 401 || httpStatus === 403 || httpStatus === 451) {
+        return {
+          verdict: 'confirmed' as SourcingVerdict,
+          confidence: CONFIDENCE_HIGH,
+          reasoning: `[url-resolves] resource-ingest recorded HTTP ${httpStatus} (URL alive, body blocked)`,
+          finalUrl: url,
+        };
+      }
+      if (httpStatus === 429 || httpStatus >= 500) {
+        return {
+          verdict: 'unverifiable' as SourcingVerdict,
+          confidence: CONFIDENCE_MEDIUM,
+          reasoning: `[url-resolves] resource-ingest recorded HTTP ${httpStatus} — transient, re-check on next pass`,
+          finalUrl: url,
+        };
+      }
       return {
         verdict: 'contradicted' as SourcingVerdict,
         confidence: CONFIDENCE_DEFINITE,
@@ -218,7 +244,9 @@ function verdictFromWikipediaCachedContent(
   cached: { httpStatus: number | null; pageTitle: string | null; fetchedAt: string },
   entityName: string,
 ): ResolveResult {
-  const title = (cached.pageTitle ?? '').replace(/\s*[-–]\s*Wikipedia\s*$/i, '').trim();
+  // Strip trailing " - Wikipedia" / " – Wikipedia" / " — Wikipedia" suffix.
+  // Wikipedia uses hyphen-minus, en-dash, or em-dash depending on locale/render.
+  const title = (cached.pageTitle ?? '').replace(/\s*[-‐-―]\s*Wikipedia\s*$/i, '').trim();
   if (!title) {
     return {
       verdict: 'confirmed' as SourcingVerdict,

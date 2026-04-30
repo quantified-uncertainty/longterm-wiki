@@ -188,9 +188,21 @@ describe('URL pre-validation', () => {
   });
 
   it('returns unverifiable on empty rawValue', async () => {
-    const item = makeFactItem({ rawValue: '' });
+    const item = makeFactItem({ rawValue: '', formattedValue: '' });
     const result = await tryUrlResolvesVerify(item);
     expect(result?.verdict).toBe('unverifiable');
+  });
+
+  it('falls back to formattedValue when rawValue is undefined', async () => {
+    getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: 200 }) as never);
+    const item = makeFactItem({
+      propertyId: 'github-profile',
+      rawValue: undefined,
+      formattedValue: 'https://github.com/anthropics',
+    });
+    const result = await tryUrlResolvesVerify(item);
+    expect(result?.verdict).toBe('confirmed');
+    expect(getCitationContentByUrlMock).toHaveBeenCalledWith('https://github.com/anthropics');
   });
 });
 
@@ -217,7 +229,7 @@ describe('cached citation_content', () => {
     expect(result?.verdict).toBe('confirmed');
   });
 
-  it.each([400, 403, 404, 410, 500, 503])('contradicted on %i (link rot)', async (status) => {
+  it.each([400, 404, 410])('contradicted on %i (link rot)', async (status) => {
     getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: status }) as never);
     const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
     const result = await tryUrlResolvesVerify(item);
@@ -225,8 +237,40 @@ describe('cached citation_content', () => {
     expect(result?.reasoning).toMatch(new RegExp(`HTTP ${status}`));
   });
 
+  it.each([401, 403, 451])('confirmed on %i (URL alive, body blocked)', async (status) => {
+    getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: status }) as never);
+    const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
+    const result = await tryUrlResolvesVerify(item);
+    expect(result?.verdict).toBe('confirmed');
+    expect(result?.confidence).toBe(0.85);
+    expect(result?.reasoning).toContain('URL alive, body blocked');
+  });
+
+  it.each([429, 500, 502, 503, 504])('unverifiable on %i (transient — retry next pass)', async (status) => {
+    getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: status }) as never);
+    const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
+    const result = await tryUrlResolvesVerify(item);
+    expect(result?.verdict).toBe('unverifiable');
+    expect(result?.confidence).toBe(0.7);
+    expect(result?.reasoning).toContain('transient');
+  });
+
   it('contradicted does NOT enqueue a fresh ingest job', async () => {
     getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: 404 }) as never);
+    const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
+    await tryUrlResolvesVerify(item);
+    expect(suggestResourcesApiMock).not.toHaveBeenCalled();
+  });
+
+  it('confirmed-on-403 does NOT enqueue a fresh ingest job', async () => {
+    getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: 403 }) as never);
+    const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
+    await tryUrlResolvesVerify(item);
+    expect(suggestResourcesApiMock).not.toHaveBeenCalled();
+  });
+
+  it('unverifiable-on-503 does NOT enqueue a fresh ingest job (info already cached)', async () => {
+    getCitationContentByUrlMock.mockResolvedValueOnce(citationContent({ httpStatus: 503 }) as never);
     const item = makeFactItem({ propertyId: 'github-profile', rawValue: 'https://github.com/x' });
     await tryUrlResolvesVerify(item);
     expect(suggestResourcesApiMock).not.toHaveBeenCalled();
@@ -268,9 +312,13 @@ describe('Wikipedia title check', () => {
     expect(result?.reasoning).toMatch(/does not contain/);
   });
 
-  it('handles em-dash separator in pageTitle', async () => {
+  it.each([
+    ['hyphen-minus', 'Anthropic - Wikipedia'],
+    ['en-dash', 'Anthropic – Wikipedia'],
+    ['em-dash', 'Anthropic — Wikipedia'],
+  ])('strips trailing Wikipedia suffix with %s separator', async (_label, pageTitle) => {
     getCitationContentByUrlMock.mockResolvedValueOnce(
-      citationContent({ httpStatus: 200, pageTitle: 'Anthropic – Wikipedia' }) as never,
+      citationContent({ httpStatus: 200, pageTitle }) as never,
     );
     const item = makeFactItem();
     const result = await tryUrlResolvesVerify(item);
