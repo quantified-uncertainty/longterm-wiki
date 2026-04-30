@@ -28,6 +28,7 @@ import { formatEntityRef } from "../shared/entity-ref.js";
 import { InlineSourcingSchema } from "./sourcing-schema.js";
 import { deleteBatchHandler } from "../shared/delete-batch.js";
 import { shouldSkipEntityValidation } from "../shared/validate-entity-refs.js";
+import { resolveEntityFKs } from "../shared/resolve-entity-fks.js";
 import { createSyncHandler } from "./sync-factory.js";
 
 // ---- Constants ----
@@ -414,6 +415,22 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
   // ---- PATCH /batch-update-grantee ----
   // Updates granteeId for multiple grants in a single transaction.
   // Used by the backfill command to link grantees to entity stableIds.
+  //
+  // Also resets the resolved FK fields (granteeEntityId, granteeDisplayName)
+  // for the affected rows and re-runs resolveEntityFKs so the resolved entity
+  // link stays consistent with the new granteeId. Without this, batch updates
+  // would leave granteeEntityId pointing at the old entity (or stale display
+  // name) — see QUA-788 for context.
+  //
+  // FK-resolution behavior: granteeId is a legacy field that may hold either
+  // a sid_-prefixed stableId, a slug, or a display-name string (the same
+  // contract as POST /sync). resolveEntityFKs matches granteeId against
+  // entities.stable_id OR entities.id (slug); a free-text granteeId that
+  // happens to equal an entity slug (e.g. "anthropic") will silently FK to
+  // that entity. This matches /sync's behavior exactly and is intentional —
+  // callers who want a free-text display name without entity linking should
+  // pass a value that doesn't collide with any slug (in practice, slugs are
+  // kebab-case-lowercase, so any string with spaces or capitalization is safe).
   .patch("/batch-update-grantee", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -438,11 +455,38 @@ const grantsApp = new Hono<{ Variables: ResolvedEntityVars }>()
     );
 
     const result = await db.transaction(async (tx) => {
+      // Update grantee_id AND clear stale FK / display-name fields whenever
+      // the value actually changes. resolveEntityFKs (below) will re-populate
+      // them based on the new grantee_id.
       const res = await tx.execute(sql`
-        UPDATE grants SET grantee_id = v.grantee_id, updated_at = now()
+        UPDATE grants
+        SET grantee_id = v.grantee_id,
+            grantee_entity_id = CASE
+              WHEN grants.grantee_id IS DISTINCT FROM v.grantee_id THEN NULL
+              ELSE grants.grantee_entity_id
+            END,
+            grantee_display_name = CASE
+              WHEN grants.grantee_id IS DISTINCT FROM v.grantee_id THEN NULL
+              ELSE grants.grantee_display_name
+            END,
+            updated_at = now()
         FROM (VALUES ${valuesList}) AS v(id, grantee_id)
         WHERE grants.id = v.id
       `);
+
+      // Re-resolve FKs for the touched rows so granteeEntityId reflects the
+      // new granteeId. Scoped to grantIds to avoid sweeping the whole table.
+      await resolveEntityFKs(tx, {
+        tableName: "grants",
+        fields: [
+          {
+            rawIdColumn: "grantee_id",
+            entityIdColumn: "grantee_entity_id",
+            displayNameColumn: "grantee_display_name",
+          },
+        ],
+        scopeIds: grantIds,
+      });
 
       // Touch things.updatedAt for affected grants
       await tx.execute(sql`
