@@ -336,13 +336,16 @@ describe('scorecard_grade collection', () => {
     });
   }
 
-  it('queries /api/scorecard-grades/all when filtered to scorecard_grade', async () => {
+  it('queries /api/scorecard-grades/all?latest=true when filtered to scorecard_grade', async () => {
     setupScorecardGradesMock([]);
     await collectRecordItems(new Map(), undefined, 'scorecard_grade');
     const calls = mockApiRequest.mock.calls.filter(([, p]) =>
       String(p).startsWith('/api/scorecard-grades/all'),
     );
     expect(calls.length).toBeGreaterThan(0);
+    // QUA-864: scope to the current wave per source. Historic waves are
+    // immutable and don't need re-checking.
+    expect(calls.every(([, p]) => String(p).includes('latest=true'))).toBe(true);
   });
 
   it('uses the per-grade sourceUrl when present', async () => {

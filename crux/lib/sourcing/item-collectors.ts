@@ -267,7 +267,12 @@ export async function collectRecordItems(
       // "publisher X scored entity Y as Z on dimension D in wave W"; the parent
       // snapshot's sourceUrl is used as fallback when the grade has no per-row
       // deep link (handled below by the source ?? snapshotSourceUrl fallback).
-      case 'scorecard_grade': apiBasePath = '/api/scorecard-grades/all'; break;
+      // `latest=true` scopes to the current wave per source (one row per
+      // source/snapshot has isLatest=true) — historic immutable waves don't
+      // need re-checking, since their grade values can never change once a
+      // newer wave supersedes them. Cuts ~2k+ stale-wave grades from the
+      // collection on each run.
+      case 'scorecard_grade': apiBasePath = '/api/scorecard-grades/all?latest=true'; break;
       // citation and wiki-page are valid record types for verdicts but don't have
       // /all API endpoints for bulk collection — skip them intentionally.
       case 'citation':
