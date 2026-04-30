@@ -24,13 +24,18 @@ interface UnifiedSourcingStatsResult {
  * `coveragePercent` field was ambiguous — it equaled
  * `checkedRecords / totalRecords`, which conflated "no source supplied" with
  * "source supplied but not yet checked".
+ *
+ * The new fields are typed as optional so the dashboard can render against
+ * a wiki-server that hasn't been deployed yet (the web build fetches data
+ * from prod at SSG time). Once the server-side change ships and the next
+ * web build runs, the `??` fallbacks become no-ops.
  */
 interface CoverageMatrixResult {
   tables: Array<{
     recordType: string;
     totalRecords: number;
-    checkableRecords: number;
-    checkedRecords: number;
+    checkableRecords?: number;
+    checkedRecords?: number;
     verdicts: {
       confirmed: number;
       partial: number;
@@ -40,23 +45,27 @@ interface CoverageMatrixResult {
       unchecked: number;
     };
     /** checkable / total — what fraction of authored records are eligible for sourcing */
-    checkabilityPercent: number;
+    checkabilityPercent?: number;
     /** checked / checkable — what fraction of checkable records have a verdict */
-    checkableCoveragePercent: number;
+    checkableCoveragePercent?: number;
     /** checked / total — joint metric (capped by checkability) */
-    fullCoveragePercent: number;
+    fullCoveragePercent?: number;
+    /** @deprecated Use fullCoveragePercent. Kept here for the SSG-against-old-prod transition window. */
+    coveragePercent?: number;
     greenPercent: number;
     /** Whether this record type is exempt from sourcing verification */
     exempt?: boolean;
   }>;
   totals: {
     totalRecords: number;
-    checkableRecords: number;
+    checkableRecords?: number;
     totalVerdicts: number;
     confirmedPercent: number;
-    checkabilityPercent: number;
-    checkableCoveragePercent: number;
-    fullCoveragePercent: number;
+    checkabilityPercent?: number;
+    checkableCoveragePercent?: number;
+    fullCoveragePercent?: number;
+    /** @deprecated Use fullCoveragePercent. */
+    coveragePercent?: number;
   };
   /** Record types that are exempt from sourcing verification */
   exemptTypes?: string[];
@@ -458,9 +467,30 @@ export async function SourcingCoverageContent() {
               </thead>
               <tbody>
                 {nonExemptTables.map((t) => {
+                  // Fall back to legacy field shape during the
+                  // wiki-server-not-yet-deployed window. Once both ship,
+                  // the `??` paths become unreachable.
+                  const checkable = t.checkableRecords ?? t.totalRecords;
+                  const checked = t.checkedRecords ?? 0;
+                  const checkability =
+                    t.checkabilityPercent ??
+                    (t.totalRecords > 0
+                      ? Math.round((checkable / t.totalRecords) * 1000) / 10
+                      : 0);
+                  const checkableCov =
+                    t.checkableCoveragePercent ??
+                    (checkable > 0
+                      ? Math.round((checked / checkable) * 1000) / 10
+                      : 0);
+                  const fullCov =
+                    t.fullCoveragePercent ??
+                    t.coveragePercent ??
+                    (t.totalRecords > 0
+                      ? Math.round((checked / t.totalRecords) * 1000) / 10
+                      : 0);
                   const checkabilityGap =
                     t.totalRecords > 0
-                      ? Math.round(((t.totalRecords - t.checkableRecords) / t.totalRecords) * 1000) / 10
+                      ? Math.round(((t.totalRecords - checkable) / t.totalRecords) * 1000) / 10
                       : 0;
                   return (
                     <tr
@@ -472,16 +502,16 @@ export async function SourcingCoverageContent() {
                         {t.totalRecords.toLocaleString()}
                       </td>
                       <td className="text-right py-2 px-3 tabular-nums">
-                        {t.checkableRecords.toLocaleString()}
+                        {checkable.toLocaleString()}
                       </td>
                       <td className="text-right py-2 px-3 tabular-nums">
-                        {t.checkedRecords.toLocaleString()}
+                        {checked.toLocaleString()}
                       </td>
                       <td
                         className={`text-right py-2 px-3 tabular-nums font-medium ${
-                          t.checkabilityPercent >= 95
+                          checkability >= 95
                             ? "text-muted-foreground"
-                            : t.checkabilityPercent >= 80
+                            : checkability >= 80
                               ? "text-amber-600"
                               : "text-red-600"
                         }`}
@@ -491,29 +521,29 @@ export async function SourcingCoverageContent() {
                             : undefined
                         }
                       >
-                        {t.checkabilityPercent}%
+                        {checkability}%
                       </td>
                       <td
                         className={`text-right py-2 px-3 tabular-nums font-medium ${
-                          t.checkableCoveragePercent >= 90
+                          checkableCov >= 90
                             ? "text-emerald-600"
-                            : t.checkableCoveragePercent >= 60
+                            : checkableCov >= 60
                               ? "text-amber-600"
                               : "text-red-600"
                         }`}
                       >
-                        {t.checkableCoveragePercent}%
+                        {checkableCov}%
                       </td>
                       <td
                         className={`text-right py-2 px-3 tabular-nums ${
-                          t.fullCoveragePercent >= 80
+                          fullCov >= 80
                             ? "text-emerald-600"
-                            : t.fullCoveragePercent >= 40
+                            : fullCov >= 40
                               ? "text-amber-600"
                               : "text-muted-foreground"
                         }`}
                       >
-                        {t.fullCoveragePercent}%
+                        {fullCov}%
                       </td>
                       <td
                         className={`text-right py-2 px-3 tabular-nums font-medium ${
@@ -568,19 +598,19 @@ export async function SourcingCoverageContent() {
                     {coverageMatrix.totals.totalRecords.toLocaleString()}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.checkableRecords.toLocaleString()}
+                    {(coverageMatrix.totals.checkableRecords ?? coverageMatrix.totals.totalRecords).toLocaleString()}
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
                     {coverageMatrix.totals.totalVerdicts.toLocaleString()} verdicts
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.checkabilityPercent}%
+                    {coverageMatrix.totals.checkabilityPercent ?? "—"}%
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.checkableCoveragePercent}%
+                    {coverageMatrix.totals.checkableCoveragePercent ?? "—"}%
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
-                    {coverageMatrix.totals.fullCoveragePercent}%
+                    {coverageMatrix.totals.fullCoveragePercent ?? coverageMatrix.totals.coveragePercent ?? "—"}%
                   </td>
                   <td className="text-right py-2 px-3 tabular-nums">
                     {coverageMatrix.totals.confirmedPercent}%
