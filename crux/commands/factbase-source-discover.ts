@@ -69,11 +69,10 @@ async function sourceDiscoverCommand(
   _args: string[],
   options: DiscoverOptions,
 ): Promise<CommandResult> {
+  const isJson = Boolean(options.ci || options.json);
   const factId = (options['fact-id'] ?? options.factId)?.toString().trim();
   if (!factId) {
-    return {
-      exitCode: 1,
-      output: `Usage: crux fb source-discover --fact-id=<id> [options]
+    const usage = `Usage: crux fb source-discover --fact-id=<id> [options]
 
   Find canonical source URL candidates for one FactBase fact via LLM + web search.
 
@@ -89,8 +88,10 @@ Options:
 Examples:
   crux fb source-discover --fact-id=f_qR5tY9wE1a
   crux fb source-discover --fact-id=f_qR5tY9wE1a --json
-  crux fb source-discover --fact-id=f_qR5tY9wE1a --threshold=0.75 --pass-existing-url`,
-    };
+  crux fb source-discover --fact-id=f_qR5tY9wE1a --threshold=0.75 --pass-existing-url`;
+    return isJson
+      ? { exitCode: 1, output: JSON.stringify({ error: 'fact-id is required', usage }) }
+      : { exitCode: 1, output: usage };
   }
 
   const threshold = parseThreshold(options.threshold);
@@ -99,7 +100,6 @@ Examples:
     options['max-web-search-uses'] ?? options.maxWebSearchUses,
   );
   const passExisting = Boolean(options['pass-existing-url'] ?? options.passExistingUrl);
-  const isJson = Boolean(options.ci || options.json);
 
   // ── Load fact ──────────────────────────────────────────────────────
   const kb = await loadGraphFull();

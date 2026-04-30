@@ -89,6 +89,15 @@ describe('sourceDiscoverCommand', () => {
     expect(mockDiscover).not.toHaveBeenCalled();
   });
 
+  it('returns JSON-shaped error when --fact-id is missing AND --json is set', async () => {
+    const result = await sourceDiscover([], { json: true });
+    expect(result.exitCode).toBe(1);
+    const parsed = JSON.parse(result.output);
+    expect(parsed.error).toContain('fact-id is required');
+    expect(parsed.usage).toContain('Usage: crux fb source-discover');
+    expect(mockDiscover).not.toHaveBeenCalled();
+  });
+
   it('returns fact-not-found error for an unknown fact id', async () => {
     const result = await sourceDiscover([], { 'fact-id': 'f_NONEXISTENT123' });
     expect(result.exitCode).toBe(1);
@@ -105,17 +114,12 @@ describe('sourceDiscoverCommand', () => {
     expect(mockDiscover).not.toHaveBeenCalled();
   });
 
-  it('rejects inverse facts', async () => {
-    // Pick a fact ID with the inverse prefix. The graph won't have one with
-    // this exact ID, but we just need to confirm the prefix-rejection branch
-    // fires before fact lookup. Since "inv_..." won't exist either, the
-    // not-found path catches it first — re-test with a known inverse fact.
-    // Actually we hit not-found before the inverse check because graph
-    // lookup happens first. Skip this test — see the integration test for
-    // real inverse-fact handling. (Documented design: the inverse-prefix
-    // check is in factCommand for real facts, not synthesized ones.)
-    expect(true).toBe(true);
-  });
+  // Inverse-fact rejection (foundFact.id.startsWith('inv_') branch) is
+  // unreachable from the real graph — the CLI only finds primary facts via
+  // `find(f => f.id === factId)` after iterating entities, and inverse facts
+  // aren't keyed by the user-provided ID. The branch is defensive guarding
+  // for future graph changes that might surface inverse IDs to the CLI.
+  // Tested upstream in factbase-loader / inverse-computation tests.
 
   it('runs the engine and returns a human-readable report on success', async () => {
     mockDiscover.mockResolvedValueOnce({
