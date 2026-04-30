@@ -48,9 +48,11 @@ import {
   applyVerdictsToOrganization,
   applyVerdictsToPolicy,
   canonicalizePersonKey,
+  MIN_POSITION_CONFIDENCE,
   type ApplyResult,
   type PersonEntityResolver,
   type StakeholderEntityResolver,
+  type StakeholderPosition,
   type VerifiedVerdict,
 } from "../lib/research/apply-verdicts.ts";
 import { canonicalSlug } from "../lib/research/canonical-names.ts";
@@ -114,21 +116,48 @@ export interface ImproveOptions {
   quiet?: boolean;
 }
 
+/** Zod runtime guard for {@link StakeholderPosition}. The literal list MUST
+ *  match the type alias exported from `apply-verdicts.ts`; the
+ *  `satisfies readonly StakeholderPosition[]` assertion makes a typo a
+ *  compile error. */
+const STAKEHOLDER_POSITIONS = ["support", "oppose", "reform", "neutral"] as const satisfies readonly StakeholderPosition[];
+const StakeholderPositionSchema = z.enum(STAKEHOLDER_POSITIONS);
+
 const ExtractedSchema = z.array(
   z.object({
     targetField: z.string().min(1),
     claimText: z.string().min(1),
     proposedValue: z.string().nullable().optional(),
     displayHint: z.string().nullable().optional(),
+    position: StakeholderPositionSchema.nullable().optional(),
+    positionConfidence: z.number().min(0).max(1).nullable().optional(),
   }),
 );
 
-interface ExtractedClaim {
+export interface ExtractedClaim {
   targetField: string;
   claimText: string;
   proposedValue: string | null;
   displayHint: string | null;
+  position: StakeholderPosition | null;
+  positionConfidence: number | null;
 }
+
+/** Stem patterns (with word boundaries) to look for in source content for
+ *  each classified position. Used by the pre-filter to drop stakeholder
+ *  claims whose claimed position has no textual support in the source
+ *  (e.g. "ACLU opposes" with no "oppos*" word in the source).
+ *
+ *  Word boundaries (`\b`) prevent false positives like "neutralize"
+ *  matching "neutral" or "supportive technologies" matching "support".
+ *  These are regex source strings — the pre-filter compiles them with
+ *  the `i` flag for case-insensitive matching. */
+const POSITION_STEM_PATTERNS: Record<StakeholderPosition, string[]> = {
+  support: ["\\bsupport"],   // support, supports, supported, supporter, supporting
+  oppose: ["\\boppos"],       // oppose, opposes, opposed, opposition, opposing
+  reform: ["\\breform"],      // reform, reforms, reformer, reforming
+  neutral: ["\\bneutral\\b"], // neutral, neutrality (NOT neutralize/neutralized)
+};
 
 // ──────────────────────────────────────────────────────────────────────────────
 // YAML I/O — locate the entity's source file by scanning data/entities/
@@ -387,10 +416,20 @@ For each fact you can extract from the source that fills one of the gaps, return
 - claimText: a concise, paraphrased assertion that can be verified against the source. Avoid overly-specific dates or figures unless the source states them verbatim.
 - proposedValue: the actual value to write into YAML (a sentence for product/keyDate description / provision / stakeholder / description, a short string for billNumber/dates/etc., a date string for keyDate.*).
 - displayHint: human label for new array entries (e.g. "Claude 3.5 Sonnet", "Dario Amodei", "Founded as Anthropic PBC").
+- position (stakeholder claims ONLY): one of "support" | "oppose" | "reform" | "neutral", or null if the source does not support a confident classification. Apply these rules strictly:
+    * "support"  — the stakeholder endorses, defends, advocates for, lobbies for, or formally votes in favor of the policy. Example: a senator who introduced/co-sponsored the bill, an industry group that filed a brief in its favor.
+    * "oppose"   — the stakeholder challenges, litigates against, sues over, votes against, or publicly campaigns to repeal/strike down the policy. Example: ACLU suing the NSA over surveillance, a senator voting "no", a group filing an amicus brief against the law.
+    * "reform"   — the stakeholder accepts the policy's existence but pushes for meaningful changes (sunset provisions, narrower scope, added safeguards, additional oversight) — NOT outright repeal. Example: a coalition urging stronger warrant requirements without seeking to abolish the program.
+    * "neutral"  — the stakeholder has an oversight or implementation role with no public position, is described as merely "on-record" or "involved", or whose role is procedural. Example: a court that adjudicates cases under the policy, an executive agency that implements it.
+- positionConfidence (stakeholder claims ONLY): a number from 0 to 1 reflecting how strongly the source language supports the classification.
+    * ≥0.8 — the source uses unambiguous language ("ACLU sued", "voted in favor", "endorsed").
+    * ${MIN_POSITION_CONFIDENCE.toFixed(1)}–0.8 — strong implication (filed an amicus, joined a coalition).
+    * <${MIN_POSITION_CONFIDENCE.toFixed(1)} — return position: null. We will leave the position empty rather than guess.
 
 CRITICAL:
 - Only extract claims explicitly supported by the source.
-- Do NOT fabricate data, positions, valuations, or vote tallies.
+- Do NOT fabricate data, positions, valuations, or vote tallies. If the source doesn't clearly state a stakeholder's stance, return position: null.
+- The position word's stem must appear as a whole-word match in the source content for the classification to be valid. Required stems: "support" (matches support/supports/supporting), "oppos" (matches oppose/opposes/opposed/opposition), "reform" (matches reform/reforms/reformer), "neutral" (matches only the exact word neutral or neutrality — NOT neutralize/neutralized). If the required stem is missing, return position: null instead.
 - Prefer paraphrased claims over exact quotes; the verifier will reject claims whose specific tokens aren't in the source.
 - Return at most 8 claims per call.
 
@@ -423,25 +462,50 @@ async function extractGapClaims(
   }
 
   const cost = (inT / 1_000_000) * HAIKU_PRICING.inputPerM + (outT / 1_000_000) * HAIKU_PRICING.outputPerM;
+  return { claims: parseExtractedClaims(raw), cost };
+}
 
+/** Parse Haiku's JSON-array response into normalized {@link ExtractedClaim}s.
+ *  Exported for testing — handles leading/trailing prose, malformed JSON,
+ *  Zod-mismatched payloads, and the position normalization rules:
+ *  - position fields on non-stakeholder claims are stripped (Haiku occasionally
+ *    leaks them onto provision claims by mistake)
+ *  - position is nulled when no confidence was provided (a position without
+ *    any confidence signal is not useful downstream) */
+export function parseExtractedClaims(raw: string): ExtractedClaim[] {
   const match = raw.match(/\[[\s\S]*\]/);
-  if (!match) return { claims: [], cost };
+  if (!match) return [];
   let parsed: unknown;
   try {
     parsed = JSON.parse(match[0]);
   } catch {
-    return { claims: [], cost };
+    return [];
   }
   const result = ExtractedSchema.safeParse(parsed);
-  if (!result.success) return { claims: [], cost };
-  const claims: ExtractedClaim[] = result.data.map((c) => ({
-    targetField: c.targetField,
-    claimText: c.claimText,
-    proposedValue: c.proposedValue ?? null,
-    displayHint: c.displayHint ?? null,
-  }));
-  return { claims, cost };
+  if (!result.success) return [];
+  return result.data.map((c) => {
+    // Position only applies to stakeholder claims. Discard it for any other
+    // targetField — Haiku occasionally returns it on provision claims by mistake.
+    const isStakeholder = c.targetField.startsWith("stakeholder.");
+    const rawPosition = isStakeholder ? c.position ?? null : null;
+    const rawConfidence = isStakeholder ? c.positionConfidence ?? null : null;
+    // Normalize: a position without any confidence signal is not useful
+    // downstream. Carry sub-threshold confidence through — the apply step
+    // owns the threshold gate so changing one place changes both.
+    const position = rawConfidence == null && rawPosition != null ? null : rawPosition;
+    return {
+      targetField: c.targetField,
+      claimText: c.claimText,
+      proposedValue: c.proposedValue ?? null,
+      displayHint: c.displayHint ?? null,
+      position,
+      positionConfidence: rawConfidence,
+    };
+  });
 }
+
+/** Exported for testing — see {@link parseExtractedClaims}. */
+export { POSITION_STEM_PATTERNS };
 
 // ──────────────────────────────────────────────────────────────────────────────
 // One iteration of the loop
@@ -538,16 +602,32 @@ async function runIteration(
     return { entity, metrics: m };
   }
 
-  // 4. Pre-submission token filter — key by sourceUrl.
-  const preFilterInput: PreFilterClaim[] = allClaims.map((c) => ({
-    claimText: c.claimText,
-    proposedValue: c.proposedValue,
-    resourceId: c.sourceUrl,
-    sourceUrl: c.sourceUrl,
-    realResourceId: c.resourceId,
-    targetField: c.targetField,
-    displayHint: c.displayHint,
-  }));
+  // 4. Pre-submission token filter — key by sourceUrl (not resourceId).
+  const preFilterInput: PreFilterClaim[] = allClaims.map((c) => {
+    // For stakeholder claims with a classified position, require the
+    // position word's stem to appear in the source as a whole-word match
+    // (e.g. `\boppos` for oppose). This catches cases where Haiku
+    // synthesizes a position from context that doesn't actually use the
+    // position word.
+    const requiredPatterns =
+      c.targetField.startsWith("stakeholder.") && c.position
+        ? POSITION_STEM_PATTERNS[c.position]
+        : undefined;
+    return {
+      claimText: c.claimText,
+      proposedValue: c.proposedValue,
+      // Stuff sourceUrl into the resourceId slot so preFilterBatch's content
+      // lookup hits our contentByKey map (which keys on URL).
+      resourceId: c.sourceUrl,
+      sourceUrl: c.sourceUrl,
+      realResourceId: c.resourceId,
+      targetField: c.targetField,
+      displayHint: c.displayHint,
+      position: c.position,
+      positionConfidence: c.positionConfidence,
+      requiredPatterns,
+    };
+  });
   const filterResult = preFilterBatch(preFilterInput, contentByKey);
   m.claims_filtered_out = filterResult.dropped.length;
   console.log(`[iter ${iter}] pre-filter: kept ${filterResult.kept.length}, dropped ${filterResult.dropped.length}`);
@@ -626,14 +706,20 @@ async function runIteration(
     else if (status === "contradicted") m.claims_contradicted++;
     else if (status === "unverifiable") m.claims_unverifiable++;
     if (status === "verified" || status === "partial") {
+      const submitted = submittedByOrder[i] as PreFilterClaim & {
+        position?: StakeholderPosition | null;
+        positionConfidence?: number | null;
+      };
       verifiedVerdicts.push({
-        targetField: String(submittedByOrder[i].targetField ?? ""),
+        targetField: String(submitted.targetField ?? ""),
         claimText: v.claimText,
         extractedValue: v.extractedValue,
-        proposedValue: submittedByOrder[i].proposedValue as string | null | undefined,
-        sourceUrl: String(submittedByOrder[i].sourceUrl),
+        proposedValue: submitted.proposedValue as string | null | undefined,
+        sourceUrl: String(submitted.sourceUrl),
         status,
-        displayHint: (submittedByOrder[i].displayHint as string | null) ?? undefined,
+        displayHint: (submitted.displayHint as string | null) ?? undefined,
+        position: submitted.position ?? null,
+        positionConfidence: submitted.positionConfidence ?? null,
       });
     }
   }

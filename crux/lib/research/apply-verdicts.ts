@@ -15,6 +15,8 @@
 import type { OrganizationEntity, OrganizationKeyPerson, PolicyEntity } from "./gap-analyzer.ts";
 import { canonicalSlug } from "./canonical-names.ts";
 
+export type StakeholderPosition = "support" | "oppose" | "reform" | "neutral";
+
 export interface VerifiedVerdict {
   /** The seed key — encodes target type + identifier. */
   targetField: string;
@@ -30,7 +32,23 @@ export interface VerifiedVerdict {
   status: string;
   /** Optional: human display name of the stakeholder/provision (for new items). */
   displayHint?: string;
+  /** For stakeholder claims: the position classified by the extractor. The
+   *  apply step is the single source of truth for what lands in YAML — the
+   *  hardcoded "reform" default is gone (QUA-875). When this is null or
+   *  positionConfidence is below MIN_POSITION_CONFIDENCE, the new
+   *  stakeholder is created with no position field, leaving it for human
+   *  curation rather than guessing. */
+  position?: StakeholderPosition | null;
+  /** 0–1 confidence from the extractor; below MIN_POSITION_CONFIDENCE the
+   *  position is treated as unset. */
+  positionConfidence?: number | null;
 }
+
+/** Minimum extractor confidence required to commit a position to YAML.
+ *  Below this we leave the field unset rather than guessing. Imported by
+ *  research-improve-entity.ts (extractor prompt + plumbing); this file is
+ *  the single source of truth. */
+export const MIN_POSITION_CONFIDENCE = 0.6;
 
 export interface ApplyResult<T> {
   entity: T;
@@ -178,41 +196,71 @@ export function applyVerdictsToPolicy(
         return c === canonFromSlug || c === canonFromName;
       };
       const existing = next.stakeholders.find((s) => matchKey(s.name));
+      // Decide whether the extractor gave us a confident-enough position to
+      // commit. Below the threshold (or if null), leave the field unset so
+      // a human can curate. The extractor is the single source of truth —
+      // the apply step never invents a default.
+      const confidentPosition: StakeholderPosition | null =
+        v.position && (v.positionConfidence ?? 0) >= MIN_POSITION_CONFIDENCE
+          ? v.position
+          : null;
       if (existing) {
-        let updated = false;
+        // Position backfill is independent of reason replacement: a long
+        // human-curated reason should still receive a missing position from
+        // a confident extractor verdict. (Hostile-review HIGH #1, QUA-875.)
+        // Never overwrite an existing position — first-write-wins by design,
+        // since YAML carries no confidence to compare against.
+        let positionBackfilled = false;
+        if (!existing.position && confidentPosition) {
+          existing.position = confidentPosition;
+          positionBackfilled = true;
+        }
+        let reasonUpdated = false;
         if (!existing.reason || existing.reason.length < value.length) {
           existing.reason = value;
           if (!existing.source) existing.source = v.sourceUrl;
-          updated = true;
+          reasonUpdated = true;
         }
         // Backfill entityId on the existing entry when a resolver is supplied.
+        let entityBackfilled = false;
         if (!existing.entityId && options.resolveStakeholderEntity) {
           const eid = options.resolveStakeholderEntity(canonFromName || canonFromSlug, name);
           if (eid) {
             existing.entityId = eid;
-            updated = true;
+            entityBackfilled = true;
           }
         }
-        applied.push({
-          targetField: tf,
-          action: updated ? "updated" : "skipped",
-          reason: updated ? undefined : "existing reason longer",
-        });
+        if (reasonUpdated) {
+          applied.push({ targetField: tf, action: "updated" });
+        } else if (positionBackfilled || entityBackfilled) {
+          const reason = positionBackfilled
+            ? entityBackfilled
+              ? "position + entityId backfilled"
+              : "position backfilled"
+            : "entityId backfilled";
+          applied.push({ targetField: tf, action: "updated", reason });
+        } else {
+          applied.push({ targetField: tf, action: "skipped", reason: "existing reason longer" });
+        }
         continue;
       }
-      // Default to position=reform when unknown — least-controversial.
-      const newEntry: NonNullable<PolicyEntity["stakeholders"]>[number] = {
+      // New stakeholder: omit `position` entirely when the extractor is
+      // unsure. The YAML field is optional; downstream consumers must
+      // tolerate stakeholders without a position. Previously this defaulted
+      // to "reform", which produced obviously-wrong values like NSA marked
+      // "reform" — see QUA-875.
+      const newStakeholder: NonNullable<PolicyEntity["stakeholders"]>[number] = {
         name,
-        position: "reform",
         importance: "medium",
         reason: value,
         source: v.sourceUrl,
       };
+      if (confidentPosition) newStakeholder.position = confidentPosition;
       if (options.resolveStakeholderEntity) {
         const eid = options.resolveStakeholderEntity(canonFromName || canonFromSlug, name);
-        if (eid) newEntry.entityId = eid;
+        if (eid) newStakeholder.entityId = eid;
       }
-      next.stakeholders.push(newEntry);
+      next.stakeholders.push(newStakeholder);
       applied.push({ targetField: tf, action: "added" });
       continue;
     }

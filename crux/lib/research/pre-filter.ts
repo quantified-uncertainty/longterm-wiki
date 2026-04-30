@@ -9,6 +9,15 @@ export interface PreFilterClaim {
   proposedValue?: string | null;
   resourceId: string;
   sourceUrl: string;
+  /** Regex source patterns that MUST match the source content for the
+   *  claim to survive pre-filtering, regardless of whether other extracted
+   *  tokens hit. Used for stakeholder position validation: if the LLM
+   *  classifies "oppose" we require an `\boppos` stem to appear in the
+   *  source. Compiled with the `i` flag for case-insensitive matching.
+   *  Word boundaries (`\b`) are recommended to avoid false positives like
+   *  "neutralize" satisfying a "neutral" requirement. Invalid regexes are
+   *  treated as missing (claim is dropped). */
+  requiredPatterns?: string[];
   // Anything else passes through unchanged.
   [k: string]: unknown;
 }
@@ -20,10 +29,15 @@ export interface PreFilterDecision {
   keep: boolean;
   /** Tokens we extracted from claimText + proposedValue. */
   tokens: string[];
-  /** Tokens that were not found in the source content. */
+  /** Tokens that were not found in the source content. Includes both
+   *  extracted tokens and any missing requiredTokens. */
   missing: string[];
   /** Tokens that were found and their first-occurrence index. */
   hits: Array<{ token: string; idx: number }>;
+  /** When the claim was dropped because a `requiredPatterns` entry was
+   *  missing or invalid, this lists the missing pattern source strings.
+   *  Empty otherwise. */
+  missingRequired: string[];
 }
 
 const MIN_TOKEN_LEN = 4;
@@ -56,11 +70,39 @@ export function decide(
   const minHits = options.minHits ?? 1;
   const text = `${claim.claimText}\n${claim.proposedValue ?? ""}`;
   const tokens = extractKeyTokens(text);
-  if (tokens.length === 0) {
-    // No distinguishing tokens — let it through; we have no signal either way.
-    return { claim, keep: true, tokens, missing: [], hits: [] };
-  }
   const lc = sourceContent.toLowerCase();
+
+  // Required-pattern check — runs first because a missing required pattern
+  // is a hard drop regardless of how many discriminating tokens hit.
+  // Patterns are regex source strings, compiled with `i` flag. An invalid
+  // pattern is treated as missing (fail-closed: a malformed required-token
+  // requirement should never silently succeed).
+  const required = claim.requiredPatterns ?? [];
+  const missingRequired: string[] = [];
+  for (const r of required) {
+    if (!r) continue;
+    let re: RegExp;
+    try {
+      re = new RegExp(r, "i");
+    } catch {
+      missingRequired.push(r);
+      continue;
+    }
+    if (!re.test(sourceContent)) missingRequired.push(r);
+  }
+
+  if (tokens.length === 0) {
+    // No distinguishing tokens — let it through unless a required token is missing.
+    const keep = missingRequired.length === 0;
+    return {
+      claim,
+      keep,
+      tokens,
+      missing: [...missingRequired],
+      hits: [],
+      missingRequired,
+    };
+  }
   const hits: Array<{ token: string; idx: number }> = [];
   const missing: string[] = [];
   for (const t of tokens) {
@@ -68,8 +110,15 @@ export function decide(
     if (idx === -1) missing.push(t);
     else hits.push({ token: t, idx });
   }
-  const keep = hits.length >= minHits;
-  return { claim, keep, tokens, missing, hits };
+  const keep = hits.length >= minHits && missingRequired.length === 0;
+  return {
+    claim,
+    keep,
+    tokens,
+    missing: [...missing, ...missingRequired],
+    hits,
+    missingRequired,
+  };
 }
 
 /** Filter a batch of claims given a map of resourceId → fetched content. */
@@ -83,9 +132,28 @@ export function preFilterBatch(
   for (const c of claims) {
     const content = contentByResourceId.get(c.resourceId) ?? "";
     if (!content) {
-      // No content — we can't pre-filter. Let the verifier handle it.
+      // No content — we can't pre-filter. For most claims, let the verifier
+      // handle it. But a claim with `requiredPatterns` (e.g. a stakeholder
+      // claim with a classified position) is uniquely susceptible to
+      // fabrication: the LLM was told to ensure the position word appears
+      // in the source. If we can't verify that here, downstream can't
+      // either. Drop these defensively.
+      const requiresContent = (c.requiredPatterns ?? []).some((p) => !!p);
+      if (requiresContent) {
+        const dec: PreFilterDecision = {
+          claim: c,
+          keep: false,
+          tokens: [],
+          missing: c.requiredPatterns ?? [],
+          hits: [],
+          missingRequired: c.requiredPatterns ?? [],
+        };
+        decisions.push(dec);
+        dropped.push(dec);
+        continue;
+      }
       const dec: PreFilterDecision = {
-        claim: c, keep: true, tokens: [], missing: [], hits: [],
+        claim: c, keep: true, tokens: [], missing: [], hits: [], missingRequired: [],
       };
       decisions.push(dec);
       kept.push(c);
