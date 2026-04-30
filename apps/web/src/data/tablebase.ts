@@ -1164,14 +1164,15 @@ export type RecordVerdictStats = {
   unchecked: number;
 };
 
-const VALID_VERDICT_KEYS = new Set([
+type VerdictKey = Exclude<keyof RecordVerdictStats, "total">;
+const VALID_VERDICT_KEYS: ReadonlySet<string> = new Set<VerdictKey>([
   "confirmed",
   "contradicted",
   "unverifiable",
   "outdated",
   "partial",
   "unchecked",
-] as const);
+]);
 
 /** Get sourcing stats for a specific record type */
 export function getRecordVerdictStats(recordType: string): RecordVerdictStats {
@@ -1183,8 +1184,8 @@ export function getRecordVerdictStats(recordType: string): RecordVerdictStats {
     // Only count row-level entries (two segments: "grant:g_abc123")
     if (key.split(":").length > 2) continue;
     stats.total++;
-    if (VALID_VERDICT_KEYS.has(v.verdict as never)) {
-      stats[v.verdict as keyof RecordVerdictStats]++;
+    if (VALID_VERDICT_KEYS.has(v.verdict)) {
+      stats[v.verdict as VerdictKey]++;
     }
   }
   return stats;
@@ -1212,9 +1213,10 @@ export function getRecordVerdictStatsForIds(
   for (const id of recordIds) {
     stats.total++;
     const v = verdicts[`${recordType}:${id}`];
-    const verdictName = v && VALID_VERDICT_KEYS.has(v.verdict as never)
-      ? (v.verdict as keyof RecordVerdictStats)
-      : "unchecked";
+    const verdictName: VerdictKey =
+      v && VALID_VERDICT_KEYS.has(v.verdict)
+        ? (v.verdict as VerdictKey)
+        : "unchecked";
     stats[verdictName]++;
   }
   return stats;

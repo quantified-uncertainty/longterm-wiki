@@ -30,8 +30,20 @@ const SKIP_DIRS = new Set([
   "playwright-report",
   "test-results",
 ]);
-const SCAN_EXTENSIONS = [".ts", ".tsx", ".mdx", ".md", ".yaml", ".yml"];
+// .json intentionally omitted: build outputs (database.json, factbase-data.json)
+// are generated and not edited by hand. .md is omitted because user-visible
+// content lives in .mdx; .md files outside this validator's scope are docs.
+const SCAN_EXTENSIONS = [".ts", ".tsx", ".mdx", ".yaml", ".yml"];
 const BANNED = "sourcinged";
+
+// Path-equality allowlist (relative to PROJECT_ROOT) for files that must
+// reference the banned string by name (the validator itself, its test, and
+// the gate registry entry that points at it).
+const ALLOWLIST = new Set([
+  "crux/validate/validate-no-sourcinged.ts",
+  "crux/validate/validate-no-sourcinged.test.ts",
+  "crux/validate/validate-gate.ts",
+]);
 
 interface Violation {
   file: string;
@@ -71,16 +83,12 @@ function collectFiles(dir: string): string[] {
 function checkFile(filePath: string): Violation[] {
   const content = readFileSync(filePath, "utf-8");
   if (!content.includes(BANNED)) return [];
+  const relPath = relative(PROJECT_ROOT, filePath);
+  if (ALLOWLIST.has(relPath)) return [];
   const violations: Violation[] = [];
   const lines = content.split("\n");
-  const relPath = relative(PROJECT_ROOT, filePath);
   for (let i = 0; i < lines.length; i++) {
     if (lines[i].includes(BANNED)) {
-      // Allow this validator file itself to mention the banned string.
-      if (relPath.endsWith("validate-no-sourcinged.ts")) continue;
-      if (relPath.endsWith("validate-no-sourcinged.test.ts")) continue;
-      // Allow the gate registry to reference the validator's id/comments.
-      if (relPath.endsWith("validate-gate.ts")) continue;
       violations.push({ file: relPath, line: i + 1, text: lines[i].trim() });
     }
   }

@@ -14,16 +14,14 @@ import { getRecordVerdictStats, getRecordVerdictStatsForIds } from "@data/tableb
 
 export function SourcingSummaryBanner({
   recordType,
-  totalOverride,
   recordIds,
 }: {
   recordType: string;
-  /** Override the total count (useful when the table filters records). */
-  totalOverride?: number;
   /**
-   * If supplied, sourcing stats are restricted to these record IDs and the
-   * unscoped totalOverride is ignored. Use this whenever the page dedupes or
-   * filters rows so the banner ratio always satisfies checked <= total.
+   * If supplied, sourcing stats are restricted to these record IDs. Pass this
+   * whenever the page dedupes or filters rows so the banner ratio always
+   * satisfies checked <= total. When omitted, the banner counts every verdict
+   * for `recordType` and uses (checked + unchecked) as the total.
    */
   recordIds?: ReadonlySet<string>;
 }) {
@@ -31,9 +29,7 @@ export function SourcingSummaryBanner({
     ? getRecordVerdictStatsForIds(recordType, recordIds)
     : getRecordVerdictStats(recordType);
   const checked = stats.confirmed + stats.contradicted + stats.outdated + stats.partial + stats.unverifiable;
-  const total = recordIds
-    ? stats.total
-    : totalOverride ?? checked + stats.unchecked;
+  const total = recordIds ? stats.total : checked + stats.unchecked;
 
   if (checked === 0) return null;
 
