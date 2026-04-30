@@ -35,6 +35,12 @@ export const RECORD_TYPE_TO_TABLE = {
   // `entities` and matches by slug, so /sourcing/ai-model/<slug> resolves
   // to the model's entity row.
   "ai-model": "entities",
+  // QUA-864: scorecard_grade verdicts reference the `scorecard_grades`
+  // table (one row per (snapshot, entity, dimension)). Used by the
+  // /sourcing/scorecard_grade/<id> record-lookup page if/when that
+  // detail view exists; for now the dot rendering on /scorecards reads
+  // verdicts via the scorecard-grades sync handler's LEFT JOIN.
+  scorecard_grade: "scorecard_grades",
 } as const satisfies Record<string, string>;
 
 export type KnownRecordType = keyof typeof RECORD_TYPE_TO_TABLE;

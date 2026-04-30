@@ -43,7 +43,11 @@ describe("VALID_RECORD_TYPES", () => {
     // orchestrator with a special `/api/entities/export?entityType=ai-model`
     // collection path since ai-model lives in the entities table rather than
     // a per-type record table.
-    expect(VALID_RECORD_TYPES.length).toBe(17);
+    // QUA-864: scorecard_grade added (18th type) — wired through
+    // /api/scorecard-grades/all with snapshotSourceUrl fallback. The
+    // underscored slug matches the existing SCORECARD_GRADE_RECORD_TYPE
+    // constant on the route side (predates QUA-864).
+    expect(VALID_RECORD_TYPES.length).toBe(18);
   });
 });
 

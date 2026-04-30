@@ -311,6 +311,147 @@ describe('benchmark-result name resolution guard', () => {
   });
 });
 
+// ── scorecard_grade collection (QUA-864) ────────────────────────────
+
+describe('scorecard_grade collection', () => {
+  function mockScorecardGradesResponse(rows: Record<string, unknown>[]) {
+    return {
+      ok: true as const,
+      data: {
+        items: rows,
+        total: rows.length,
+        limit: 200,
+        offset: 0,
+      },
+    };
+  }
+
+  function setupScorecardGradesMock(rows: Record<string, unknown>[]) {
+    mockApiRequest.mockImplementation(async (_method: unknown, path: unknown) => {
+      const pathStr = String(path);
+      if (pathStr.startsWith('/api/scorecard-grades/all')) {
+        return mockScorecardGradesResponse(rows);
+      }
+      return mockEmptyResponse();
+    });
+  }
+
+  it('queries /api/scorecard-grades/all?latest=true when filtered to scorecard_grade', async () => {
+    setupScorecardGradesMock([]);
+    await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    const calls = mockApiRequest.mock.calls.filter(([, p]) =>
+      String(p).startsWith('/api/scorecard-grades/all'),
+    );
+    expect(calls.length).toBeGreaterThan(0);
+    // QUA-864: scope to the current wave per source. Historic waves are
+    // immutable and don't need re-checking.
+    expect(calls.every(([, p]) => String(p).includes('latest=true'))).toBe(true);
+  });
+
+  it('uses the per-grade sourceUrl when present', async () => {
+    setupScorecardGradesMock([{
+      id: 'fli-summer-2025__sid_anthropic__overall',
+      entityId: 'sid_anthropic',
+      entityTitle: 'Anthropic',
+      entityDisplayName: 'Anthropic',
+      scorecardSource: 'fli_index',
+      publishedAt: '2025-06-15T00:00:00.000Z',
+      dimensionSlug: 'overall',
+      dimensionLabel: 'Overall',
+      scoreLetter: 'C',
+      scoreRaw: 'C',
+      scoreNumeric: 60,
+      sourceUrl: 'https://example.com/fli/summer-2025#anthropic-overall',
+      snapshotSourceUrl: 'https://example.com/fli/summer-2025',
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    expect(items).toHaveLength(1);
+
+    const item = items[0];
+    expect(item.id).toBe('record:scorecard_grade:fli-summer-2025__sid_anthropic__overall');
+    expect(item.sourceUrl).toBe('https://example.com/fli/summer-2025#anthropic-overall');
+    expect(item.entityType).toBe('scorecard_grade');
+
+    if (item.data.kind !== 'record') return;
+    expect(item.data.recordType).toBe('scorecard_grade');
+    expect(item.data.entityId).toBe('sid_anthropic');
+    expect(item.data.entityDisplayName).toBe('Anthropic');
+    expect(item.data.fields).toMatchObject({
+      publisher: 'fli_index',
+      entity: 'Anthropic',
+      dimension: 'Overall',
+      scoreLetter: 'C',
+    });
+  });
+
+  it('falls back to snapshotSourceUrl when the grade has no per-row sourceUrl', async () => {
+    setupScorecardGradesMock([{
+      id: 'fli-summer-2025__sid_anthropic__overall',
+      entityId: 'sid_anthropic',
+      entityTitle: 'Anthropic',
+      scorecardSource: 'fli_index',
+      dimensionSlug: 'overall',
+      scoreLetter: 'C',
+      sourceUrl: null,
+      snapshotSourceUrl: 'https://example.com/fli/summer-2025',
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    expect(items).toHaveLength(1);
+    expect(items[0].sourceUrl).toBe('https://example.com/fli/summer-2025');
+  });
+
+  it('skips rows with neither sourceUrl nor snapshotSourceUrl', async () => {
+    setupScorecardGradesMock([{
+      id: 'fli-summer-2025__sid_x__overall',
+      entityId: 'sid_x',
+      entityTitle: 'Some Org',
+      scorecardSource: 'fli_index',
+      dimensionSlug: 'overall',
+      sourceUrl: null,
+      snapshotSourceUrl: null,
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    expect(items).toHaveLength(0);
+  });
+
+  it('skips rows where the entity name is unresolvable (LLM cannot verify "X scored sid_abc on Y")', async () => {
+    setupScorecardGradesMock([{
+      id: 'fli-summer-2025__sid_unknown__overall',
+      entityId: 'sid_unknown',
+      entityTitle: null,
+      entityDisplayName: 'sid_unknown',
+      scorecardSource: 'fli_index',
+      dimensionSlug: 'overall',
+      scoreLetter: 'C',
+      sourceUrl: 'https://example.com/fli/summer-2025#unknown',
+      snapshotSourceUrl: 'https://example.com/fli/summer-2025',
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    expect(items).toHaveLength(0);
+  });
+
+  it('rolls up verdicts under the scored entityId so org rollups include scorecards', async () => {
+    setupScorecardGradesMock([{
+      id: 'g1',
+      entityId: 'sid_anthropic',
+      entityTitle: 'Anthropic',
+      scorecardSource: 'fli_index',
+      dimensionSlug: 'overall',
+      scoreLetter: 'C',
+      sourceUrl: 'https://example.com/x',
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'scorecard_grade');
+    expect(items).toHaveLength(1);
+    if (items[0].data.kind !== 'record') return;
+    expect(items[0].data.entityId).toBe('sid_anthropic');
+  });
+});
+
 // ── Exempt type filtering ────────────────────────────────────────────
 
 describe('exempt type filtering', () => {

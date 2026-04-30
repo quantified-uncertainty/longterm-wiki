@@ -90,6 +90,14 @@ export function extractEntityDisplayName(recordType: string, item: Record<string
       // into source_check_verdicts.entity_display_name otherwise and render
       // as "claude-2" instead of a human name.
       return strOrNull(item, 'title');
+    case 'scorecard_grade':
+      // QUA-864: scorecard_grade verdicts roll up under the scored entity
+      // (the org being graded), not the publishing scorecard, so each org's
+      // sourcing summary aggregates verdicts about its own grades. Use the
+      // joined entityTitle when present (human-readable) and only fall back
+      // to entityDisplayName — never to the raw stableId — for the same
+      // reason ai-model returns null on missing title (avoid sid_ leak).
+      return strOrNull(item, 'entityTitle') ?? strOrNull(item, 'entityDisplayName');
     default:
       return null;
   }
@@ -125,6 +133,13 @@ export function extractEntityId(recordType: string, item: Record<string, unknown
       // also dual-key by developer is tracked in QUA-870 — keeping the simpler
       // per-model design here pending that decision.
       return strOrNull(item, 'stableId') ?? strOrNull(item, 'id');
+    case 'scorecard_grade':
+      // QUA-864: scorecard_grade.entityId is already the scored org's stableId
+      // (FK to entities.stable_id, see scorecard_grades schema). Verdicts
+      // grouped under this entity surface in the org's sourcing rollup
+      // alongside its other records, so the org-level dot reflects whether
+      // its scorecard cells have been verified.
+      return strOrNull(item, 'entityId');
     default:
       return null;
   }

@@ -233,6 +233,24 @@ describe('extractEntityId', () => {
     });
   });
 
+  // ── scorecard_grade (QUA-864) ──
+
+  describe('scorecard_grade', () => {
+    it('returns entityId so the verdict rolls up under the scored org', () => {
+      const item = {
+        id: 'fli-summer-2025__sid_anthropic__overall',
+        entityId: 'sid_anthropic',
+        entityDisplayName: 'Anthropic',
+      };
+      expect(extractEntityId('scorecard_grade', item)).toBe('sid_anthropic');
+    });
+
+    it('returns null when entityId is missing', () => {
+      const item = { id: 'fli-summer-2025____overall' };
+      expect(extractEntityId('scorecard_grade', item)).toBeNull();
+    });
+  });
+
   // ── Unknown record types ──
 
   describe('unknown record types', () => {
@@ -524,6 +542,32 @@ describe('extractEntityDisplayName', () => {
     it('returns null (not the slug) when title is missing — avoids slug-as-display-name', () => {
       const item = { id: 'claude-2' };
       expect(extractEntityDisplayName('ai-model', item)).toBeNull();
+    });
+  });
+
+  describe('scorecard_grade (QUA-864)', () => {
+    it('returns the joined entityTitle from /api/scorecard-grades/all', () => {
+      const item = {
+        id: 'fli-summer-2025__sid_anthropic__overall',
+        entityId: 'sid_anthropic',
+        entityTitle: 'Anthropic',
+        entityDisplayName: 'Anthropic Inc',
+      };
+      expect(extractEntityDisplayName('scorecard_grade', item)).toBe('Anthropic');
+    });
+
+    it('falls back to entityDisplayName when entityTitle is missing', () => {
+      const item = {
+        id: 'fli-summer-2025__sid_anthropic__overall',
+        entityId: 'sid_anthropic',
+        entityDisplayName: 'Anthropic Inc',
+      };
+      expect(extractEntityDisplayName('scorecard_grade', item)).toBe('Anthropic Inc');
+    });
+
+    it('returns null when both name fields are missing', () => {
+      const item = { id: 'x', entityId: 'sid_anthropic' };
+      expect(extractEntityDisplayName('scorecard_grade', item)).toBeNull();
     });
   });
 

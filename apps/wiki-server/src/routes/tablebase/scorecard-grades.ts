@@ -78,6 +78,7 @@ interface GradeRow extends VerdictJoinFields {
   scorecardSource: string | null;
   publishedAt: string | null;
   isLatest: boolean | null;
+  snapshotSourceUrl: string | null;
 }
 
 function formatRow(r: GradeRow) {
@@ -102,6 +103,11 @@ function formatRow(r: GradeRow) {
     scoreRaw: g.scoreRaw,
     notes: g.notes,
     sourceUrl: g.sourceUrl,
+    // QUA-864: parent snapshot's sourceUrl used as fallback by the
+    // sourcing orchestrator when a per-grade sourceUrl is missing.
+    // Most grades inherit evidence from the wave's PDF/page rather than
+    // having a unique deep-link.
+    snapshotSourceUrl: r.snapshotSourceUrl,
     syncedAt: g.syncedAt,
     sourcing: formatSourcing(r),
   };
@@ -136,6 +142,7 @@ const scorecardGradesApp = new Hono()
         scorecardSource: scorecardSnapshots.scorecardSource,
         publishedAt: scorecardSnapshots.publishedAt,
         isLatest: scorecardSnapshots.isLatest,
+        snapshotSourceUrl: scorecardSnapshots.sourceUrl,
         ...verdictSelectFields,
       })
       .from(scorecardGrades)
@@ -190,6 +197,7 @@ const scorecardGradesApp = new Hono()
         scorecardSource: scorecardSnapshots.scorecardSource,
         publishedAt: scorecardSnapshots.publishedAt,
         isLatest: scorecardSnapshots.isLatest,
+        snapshotSourceUrl: scorecardSnapshots.sourceUrl,
         ...verdictSelectFields,
       })
       .from(scorecardGrades)

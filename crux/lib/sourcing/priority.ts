@@ -75,6 +75,11 @@ export function computeRecordPriority(
     'entity-assessment': 10,
     'equity-position': 10,
     'policy-stakeholder': 10,
+    // QUA-864: scorecards are public, dimensional org assessments. Same
+    // priority tier as benchmark-result (15) — both are third-party
+    // measurements of an org/model, both have high downstream visibility
+    // (rendered as colored dots on the directory pages).
+    'scorecard_grade': 15,
   };
   priority += recordTypePriority[recordType] ?? 0;
 
