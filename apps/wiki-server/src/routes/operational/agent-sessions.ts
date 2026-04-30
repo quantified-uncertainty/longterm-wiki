@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { eq, desc, and, lt, count, sql, inArray, gte, like } from "drizzle-orm";
+import { eq, desc, and, lt, ne, count, sql, inArray, gte, like, isNotNull } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
 import { logger } from "../../logger.js";
 import { agentSessions, agentSessionPages, agentSessionEntities, wikiPages } from "../../schema.js";
@@ -179,6 +179,55 @@ const agentSessionsApp = new Hono()
         .orderBy(desc(agentSessions.updatedAt))
         .limit(50);
       return c.json({ sessions: rows, freshMinutes });
+    },
+  )
+  // QUA-815: "which Linear-claiming sessions are now stale?" The
+  // `crux linear release-stale` command consumes this list, runs branch
+  // + open-PR + Linear-state checks, and posts an auto-release comment for
+  // sessions whose claim never produced a feature branch.
+  //
+  // Stale = updated_at < now() - staleMinutes AND linear_id IS NOT NULL.
+  // Includes both status='active' and status='stale' so a re-run after the
+  // periodic sweep also surfaces pre-existing rows. Excludes 'completed'
+  // (graceful exit) and 'errored' (already-handled failure).
+  .get(
+    "/stale-claims",
+    zv(
+      "query",
+      z.object({
+        // How long ago `updated_at` must be to count as stale. Default 30 min
+        // matches the active_agents stale timeout. Cap at 30 days so a bad
+        // query doesn't blow up scanning the entire history.
+        staleMinutes: z.coerce.number().int().min(1).max(43200).default(30),
+      }),
+    ),
+    async (c) => {
+      const { staleMinutes } = c.req.valid("query");
+      const cutoff = new Date(Date.now() - staleMinutes * 60_000);
+      const db = getDrizzleDb();
+      // 200 is plenty for normal operation. If the result is ever truncated
+      // it indicates a separate problem (sweep stopped running, init-storm)
+      // — better to surface that as a partial release rather than process
+      // thousands of rows in one call and time out.
+      const rows = await db
+        .select({
+          id: agentSessions.id,
+          branch: agentSessions.branch,
+          linearId: agentSessions.linearId,
+          slotNumber: agentSessions.slotNumber,
+          status: agentSessions.status,
+          startedAt: agentSessions.startedAt,
+          updatedAt: agentSessions.updatedAt,
+        })
+        .from(agentSessions)
+        .where(and(
+          isNotNull(agentSessions.linearId),
+          ne(agentSessions.status, "completed"),
+          lt(agentSessions.updatedAt, cutoff),
+        ))
+        .orderBy(desc(agentSessions.updatedAt))
+        .limit(200);
+      return c.json({ sessions: rows, staleMinutes, cutoff: cutoff.toISOString() });
     },
   )
   .get("/stats", async (c) => {
