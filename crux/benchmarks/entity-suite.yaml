@@ -1,0 +1,41 @@
+# Entity Benchmark Suite (v1, policy-only)
+#
+# Owned canonically by QUA-873 (read-only benchmark-suite). The runner in
+# QUA-882 (`crux tb improve-entity-suite`) reads this file to drive a
+# closed-loop sweep over every supported entity. Editing this file is a
+# deliberate review action, not a casual change.
+#
+# v1 caveat: policy entities only. Non-policy types are added as analyzers
+# land (QUA-876 for organization, follow-ups for person, ai-model). Each
+# entry must point at a slug present in `data/entities/responses.yaml`.
+#
+# Fields:
+#   slug                  — id in responses.yaml
+#   type                  — policy | organization | person | ai-model
+#   expected_min_coverage — coverage_score floor (0..1) for benchmark-suite
+#                           regression checks (QUA-871). Informational here;
+#                           the runner does not enforce it directly.
+- slug: fisa-702
+  type: policy
+  expected_min_coverage: 0.9
+- slug: eu-ai-act
+  type: policy
+  expected_min_coverage: 0.9
+- slug: california-sb1047
+  type: policy
+  expected_min_coverage: 0.85
+- slug: nist-ai-rmf
+  type: policy
+  expected_min_coverage: 0.8
+- slug: us-executive-order
+  type: policy
+  expected_min_coverage: 0.85
+- slug: seoul-declaration
+  type: policy
+  expected_min_coverage: 0.75
+- slug: voluntary-commitments
+  type: policy
+  expected_min_coverage: 0.75
+- slug: colorado-ai-act
+  type: policy
+  expected_min_coverage: 0.8
