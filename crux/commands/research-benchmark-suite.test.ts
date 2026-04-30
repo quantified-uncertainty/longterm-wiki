@@ -7,7 +7,7 @@
  * real responses.yaml to confirm the integration path works.
  */
 
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, vi } from "vitest";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
@@ -204,6 +204,17 @@ describe("computeAggregate", () => {
     expect(agg.below_min_slugs).toEqual(["low"]);
   });
 
+  it("filters out non-finite coverage_score values defensively", () => {
+    const records: PerEntityRecord[] = [
+      makeRecord("a", 0.5),
+      // NaN is a valid `number` per TS but should not poison the median.
+      { ...makeRecord("b", 0.0), coverage_score: NaN },
+    ];
+    const agg = computeAggregate(records);
+    expect(agg.scored_count).toBe(1);
+    expect(agg.median_coverage_score).toBe(0.5);
+  });
+
   it("returns null medians when nothing is scored", () => {
     const records: PerEntityRecord[] = [
       makeRecord("a", null, undefined, "unsupported_type"),
@@ -243,6 +254,58 @@ describe("snapshot persistence", () => {
     expect(findSnapshotByTag(path.join(os.tmpdir(), "bench-suite-nonexistent-xyz"), "x")).toBeNull();
   });
 
+  it("findSnapshotByTag returns the latest snapshot when multiple share a tag", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const old = { ...buildSnapshot("baseline", [makeRecord("x", 0.5)]), timestamp: "2025-01-01T00:00:00.000Z" };
+      const recent = { ...buildSnapshot("baseline", [makeRecord("x", 0.9)]), timestamp: "2026-01-01T00:00:00.000Z" };
+      writeSnapshot(tmp, old);
+      writeSnapshot(tmp, recent);
+      const found = findSnapshotByTag(tmp, "baseline");
+      expect(found?.timestamp).toBe("2026-01-01T00:00:00.000Z");
+      expect(found?.entities[0].coverage_score).toBe(0.9);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("listSnapshotsInDir skips malformed JSON files instead of crashing", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const good = buildSnapshot("good", [makeRecord("x", 0.5)]);
+      writeSnapshot(tmp, good);
+      fs.writeFileSync(path.join(tmp, "bad__broken.json"), "{not json");
+      const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+      try {
+        const list = listSnapshotsInDir(tmp);
+        expect(list).toHaveLength(1);
+        expect(list[0].tag).toBe("good");
+        expect(warn).toHaveBeenCalled();
+      } finally {
+        warn.mockRestore();
+      }
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("writeSnapshot appends a numeric suffix on filename collision", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const ts = "2026-01-01T00:00:00.000Z";
+      const a = { ...buildSnapshot("baseline", [makeRecord("x", 0.5)]), timestamp: ts };
+      const b = { ...buildSnapshot("baseline", [makeRecord("x", 0.7)]), timestamp: ts };
+      const fileA = writeSnapshot(tmp, a);
+      const fileB = writeSnapshot(tmp, b);
+      expect(fileA).not.toBe(fileB);
+      expect(fs.existsSync(fileA)).toBe(true);
+      expect(fs.existsSync(fileB)).toBe(true);
+      expect(fileB).toMatch(/__1\.json$/);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
   it("listSnapshotsInDir sorts by timestamp ascending", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
     try {
@@ -255,6 +318,21 @@ describe("snapshot persistence", () => {
       writeSnapshot(tmp, aOld);
       const list = listSnapshotsInDir(tmp);
       expect(list.map((s) => s.tag)).toEqual(["a", "b"]);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+});
+
+// ── loadResponses validation ────────────────────────────────────────────────
+
+describe("loadResponses", () => {
+  it("throws a clear error when YAML is not an array", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const file = path.join(tmp, "bad.yaml");
+      fs.writeFileSync(file, yaml.dump({ id: "not-an-array" }));
+      expect(() => loadResponses(file)).toThrow(/must be an array/);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
@@ -369,6 +447,17 @@ describe("formatters", () => {
     expect(out).toContain("(+0.40)");
     expect(out).toContain("Aggregate:");
     expect(out).toContain("median");
+  });
+
+  it("formatSnapshotSummary renders em-dash for an all-unsupported suite", () => {
+    const snap = buildSnapshot("baseline", [
+      makeRecord("only-org", null, undefined, "unsupported_type"),
+    ]);
+    const out = formatSnapshotSummary(snap);
+    expect(out).toContain("median=—");
+    expect(out).toContain("p25=—");
+    expect(out).toContain("scored=0");
+    expect(out).toContain("unsupported=1");
   });
 
   it("formatDiff handles a slug present in only one snapshot", () => {

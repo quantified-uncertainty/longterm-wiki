@@ -58,13 +58,20 @@ export function loadSuite(filePath: string = DEFAULT_SUITE_YAML): SuiteEntry[] {
 }
 
 export function loadResponses(filePath: string = DEFAULT_RESPONSES_YAML): PolicyEntity[] {
-  return yaml.load(fs.readFileSync(filePath, "utf8")) as PolicyEntity[];
+  const parsed = yaml.load(fs.readFileSync(filePath, "utf8"));
+  if (!Array.isArray(parsed)) {
+    throw new Error(`responses YAML at ${filePath} must be an array of entities`);
+  }
+  return parsed as PolicyEntity[];
 }
 
 function gitSha(): string | null {
   try {
     return execSync("git rev-parse --short HEAD", { cwd: ROOT, encoding: "utf8" }).trim();
-  } catch {
+  } catch (e) {
+    // Not in a git checkout, or git not installed. Snapshot is still valid;
+    // git_sha is informational. Don't crash the command.
+    void e;
     return null;
   }
 }
@@ -112,7 +119,10 @@ export function scoreSuite(
   suite: SuiteEntry[],
   responses: PolicyEntity[],
 ): PerEntityRecord[] {
-  const bySlug = new Map(responses.map((r) => [r.id, r]));
+  // responses.yaml stores its primary key as `id` but the suite YAML calls
+  // the same string `slug` — they're the same value, just renamed at the
+  // boundary. Index by the `id` column.
+  const responsesById = new Map(responses.map((r) => [r.id, r]));
   return suite.map((entry) => {
     if (!SUPPORTED_TYPES.has(entry.type)) {
       return {
@@ -125,7 +135,7 @@ export function scoreSuite(
         status: "unsupported_type" as const,
       };
     }
-    const ent = bySlug.get(entry.slug);
+    const ent = responsesById.get(entry.slug);
     if (!ent) {
       return {
         slug: entry.slug,
@@ -163,7 +173,12 @@ export interface AggregateMetrics {
 }
 
 export function computeAggregate(records: PerEntityRecord[]): AggregateMetrics {
-  const scored = records.filter((r) => r.status === "scored" && r.coverage_score !== null);
+  const scored = records.filter(
+    (r) =>
+      r.status === "scored" &&
+      r.coverage_score !== null &&
+      Number.isFinite(r.coverage_score),
+  );
   const scores = scored.map((r) => r.coverage_score as number);
   const belowMin = scored.filter((r) => {
     if (r.expected_min_coverage === undefined || r.coverage_score === null) return false;
@@ -212,22 +227,46 @@ export function snapshotPath(snapshotDir: string, snap: SuiteSnapshot): string {
 
 export function writeSnapshot(snapshotDir: string, snap: SuiteSnapshot): string {
   fs.mkdirSync(snapshotDir, { recursive: true });
-  const file = snapshotPath(snapshotDir, snap);
-  fs.writeFileSync(file, JSON.stringify(snap, null, 2) + "\n");
+  let file = snapshotPath(snapshotDir, snap);
+  // Two writes within the same millisecond with the same tag would otherwise
+  // overwrite each other silently. Append a numeric suffix on collision.
+  if (fs.existsSync(file)) {
+    const base = file.replace(/\.json$/, "");
+    let i = 1;
+    while (fs.existsSync(`${base}__${i}.json`)) i++;
+    file = `${base}__${i}.json`;
+  }
+  fs.writeFileSync(file, JSON.stringify(snap, null, 2) + "\n", { flag: "wx" });
   return file;
 }
 
 export function listSnapshotsInDir(snapshotDir: string): SuiteSnapshot[] {
   if (!fs.existsSync(snapshotDir)) return [];
-  return fs
-    .readdirSync(snapshotDir)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => JSON.parse(fs.readFileSync(path.join(snapshotDir, f), "utf8")) as SuiteSnapshot)
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  const out: SuiteSnapshot[] = [];
+  for (const f of fs.readdirSync(snapshotDir)) {
+    if (!f.endsWith(".json")) continue;
+    const full = path.join(snapshotDir, f);
+    try {
+      const parsed = JSON.parse(fs.readFileSync(full, "utf8")) as SuiteSnapshot;
+      out.push(parsed);
+    } catch (e) {
+      // Skip malformed snapshot files rather than crashing --list / --diff.
+      console.warn(
+        `[benchmark-suite] skipping malformed snapshot ${f}: ${e instanceof Error ? e.message : String(e)}`,
+      );
+    }
+  }
+  return out.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 }
 
+/**
+ * Returns the **latest** snapshot for a given tag (last write wins).
+ * Same-tag re-runs (e.g. recomputing `baseline` after a pull) are common
+ * enough that returning the earliest match would be surprising.
+ */
 export function findSnapshotByTag(snapshotDir: string, tag: string): SuiteSnapshot | null {
-  return listSnapshotsInDir(snapshotDir).find((s) => s.tag === tag) ?? null;
+  const snaps = listSnapshotsInDir(snapshotDir).filter((s) => s.tag === tag);
+  return snaps.length === 0 ? null : snaps[snaps.length - 1];
 }
 
 // ── Output formatting ───────────────────────────────────────────────────────
@@ -357,6 +396,13 @@ export async function run(
       .map((s) => s.trim());
     if (!a || !b) {
       return { output: "Usage: --diff=<beforeTag>,<afterTag>", exitCode: 1 };
+    }
+    // Symmetric with the write-side allowlist — keeps the contract consistent.
+    if (!isValidTag(a) || !isValidTag(b)) {
+      return {
+        output: `Invalid tag in --diff: tags must match ${VALID_TAG_RE} and be 1-80 chars.`,
+        exitCode: 1,
+      };
     }
     const before = findSnapshotByTag(snapshotDir, a);
     const after = findSnapshotByTag(snapshotDir, b);
