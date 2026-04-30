@@ -18,6 +18,7 @@ import {
   computeAggregate,
   computePerEntityCap,
   filterToSupportedTypes,
+  isValidTag,
   loadSuite,
   median,
   p25,
@@ -126,6 +127,43 @@ describe("filterToSupportedTypes", () => {
       { slug: "b", type: "ai-model" },
     ];
     expect(filterToSupportedTypes(entries)).toEqual([]);
+  });
+});
+
+// ── isValidTag ─────────────────────────────────────────────────────────────
+
+describe("isValidTag", () => {
+  it("accepts plain alphanumerics, dot, underscore, hyphen", () => {
+    expect(isValidTag("baseline")).toBe(true);
+    expect(isValidTag("after-token-filter")).toBe(true);
+    expect(isValidTag("v1.0_run-2")).toBe(true);
+    expect(isValidTag("ABC123")).toBe(true);
+  });
+
+  it("rejects path traversal sequences", () => {
+    expect(isValidTag("../etc/passwd")).toBe(false);
+    expect(isValidTag("..\\\\windows")).toBe(false);
+    expect(isValidTag("foo/bar")).toBe(false);
+    expect(isValidTag("foo\\bar")).toBe(false);
+  });
+
+  it("rejects shell/filesystem metacharacters", () => {
+    expect(isValidTag("foo;rm -rf /")).toBe(false);
+    expect(isValidTag("foo bar")).toBe(false); // space
+    expect(isValidTag("foo$bar")).toBe(false);
+    expect(isValidTag("foo`bar`")).toBe(false);
+    expect(isValidTag("foo|bar")).toBe(false);
+  });
+
+  it("rejects empty and oversize tags", () => {
+    expect(isValidTag("")).toBe(false);
+    expect(isValidTag("a".repeat(81))).toBe(false);
+    expect(isValidTag("a".repeat(80))).toBe(true);
+  });
+
+  it("rejects unicode-control / null bytes", () => {
+    expect(isValidTag("foo\x00bar")).toBe(false);
+    expect(isValidTag("foo\nbar")).toBe(false);
   });
 });
 
@@ -422,7 +460,11 @@ describe("runSuite", () => {
 
   it("returns a snapshot with empty entities when the suite has no supported types", async () => {
     const { suitePath, snapshotDir } = writeFixtureSuite({ slug: "x", type: "organization" });
-    const improver = async () => makeResult("never-called");
+    let calls = 0;
+    const improver = async () => {
+      calls++;
+      return makeResult("never-called");
+    };
     const snap = await runSuite({
       tag: "empty",
       totalBudgetUsd: 1.0,
@@ -431,10 +473,33 @@ describe("runSuite", () => {
       snapshotDir,
       improver,
     });
+    expect(calls).toBe(0);
     expect(snap.entities).toEqual([]);
     expect(snap.aggregate.entities_completed).toBe(0);
     // per_entity_cap_usd is 0 when N=0.
     expect(snap.per_entity_cap_usd).toBe(0);
+  });
+
+  it("rejects an invalid tag before doing any work", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite({ slug: "alpha", type: "policy" });
+    let calls = 0;
+    const improver = async () => {
+      calls++;
+      return makeResult("alpha");
+    };
+    await expect(
+      runSuite({
+        tag: "../etc/passwd",
+        totalBudgetUsd: 4.0,
+        maxIters: 1,
+        suitePath,
+        snapshotDir,
+        improver,
+      }),
+    ).rejects.toThrow(/Invalid --tag/);
+    expect(calls).toBe(0);
+    // No snapshot file written.
+    expect(fs.existsSync(snapshotDir) ? fs.readdirSync(snapshotDir) : []).toEqual([]);
   });
 });
 

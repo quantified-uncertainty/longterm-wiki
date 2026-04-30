@@ -44,6 +44,17 @@ const SUPPORTED_TYPES = new Set<string>(["policy"]);
 /** Per-entity floor below which the inner loop is guaranteed to no-op. */
 export const MIN_USEFUL_BUDGET_USD = 0.05;
 
+/**
+ * Tag flows into the snapshot filename. Reject anything that could escape
+ * the snapshot dir (path separators, traversal sequences) or cause shell /
+ * filesystem surprises. Allowlist matches typical labels: alphanumeric,
+ * dot, underscore, hyphen.
+ */
+const VALID_TAG_RE = /^[a-zA-Z0-9._-]+$/;
+export function isValidTag(tag: string): boolean {
+  return tag.length > 0 && tag.length <= 80 && VALID_TAG_RE.test(tag);
+}
+
 // ── Pure helpers (exported for tests) ───────────────────────────────────────
 
 /** Load + validate the suite YAML. Throws on schema violation. */
@@ -240,9 +251,24 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
   const snapshotDir = opts.snapshotDir ?? SNAPSHOT_DIR;
   const improver = opts.improver ?? improveSingleEntity;
 
+  if (!isValidTag(opts.tag)) {
+    throw new Error(
+      `Invalid --tag value: ${JSON.stringify(opts.tag)}. ` +
+        `Tags are interpolated into the snapshot filename and must match ${VALID_TAG_RE} (≤80 chars).`,
+    );
+  }
+
   const startedAt = new Date().toISOString();
   const all = loadSuite(suitePath);
   const supported = filterToSupportedTypes(all);
+
+  if (all.length !== supported.length) {
+    const dropped = all.filter((e) => !SUPPORTED_TYPES.has(e.type));
+    console.log(
+      `[suite] Skipping ${dropped.length} unsupported ${dropped.length === 1 ? "entry" : "entries"}: ` +
+        dropped.map((e) => `${e.slug} (${e.type})`).join(", "),
+    );
+  }
 
   const N = supported.length;
   const perEntityCap = computePerEntityCap(opts.totalBudgetUsd, N);
@@ -256,7 +282,10 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       records.push(emptyRecord(entry, "skipped_budget"));
       continue;
     }
-    // Hard cap is the per-entity 2× expected; never let it exceed remaining.
+    // Per-entity soft cap: 2× the equal-share allocation. The inner loop's
+    // own budget guard runs *between* iterations, so a single iteration that
+    // overshoots the cap is allowed to complete — see `improveSingleEntity`.
+    // The post-iter warning below catches actual cap-hits.
     const entityBudget = Math.min(perEntityCap, remaining);
     console.log(
       `\n=== [${records.length + 1}/${N}] improve-entity-suite: ${entry.slug} ` +
@@ -322,6 +351,13 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
       exitCode: 1,
     };
   }
+  if (!isValidTag(tag)) {
+    return {
+      output:
+        `--tag must match ${VALID_TAG_RE} (≤80 chars). It is interpolated into the snapshot filename.`,
+      exitCode: 1,
+    };
+  }
   const totalBudgetUsd = options.budget != null ? parseFloat(options.budget as string) : 10.0;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 2;
   const target = options.target != null ? parseInt(options.target as string, 10) : undefined;
@@ -333,8 +369,17 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
   if (!Number.isFinite(maxIters) || maxIters <= 0) {
     return { output: `--max-iters must be a positive integer; got ${options.maxIters}`, exitCode: 1 };
   }
+  if (target != null && (!Number.isFinite(target) || target <= 0)) {
+    return { output: `--target must be a positive integer; got ${options.target}`, exitCode: 1 };
+  }
 
-  const snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun });
+  let snapshot;
+  try {
+    snapshot = await runSuite({ tag, totalBudgetUsd, maxIters, target, dryRun });
+  } catch (err) {
+    const msg = err instanceof Error ? err.message : String(err);
+    return { output: `improve-entity-suite failed: ${msg}`, exitCode: 1 };
+  }
 
   console.log("\n=== improve-entity-suite result ===");
   console.log(`tag:                       ${snapshot.tag}`);
