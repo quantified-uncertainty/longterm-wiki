@@ -212,6 +212,7 @@ import type { PoliticalVotesRoute } from "@wiki-server/political-votes-route";
 import type { CampaignFinanceRoute } from "@wiki-server/campaign-finance-route";
 import type { ModelSystemCardsRoute } from "@wiki-server/model-system-cards-route";
 import type { FrameworkReviewRoute } from "@wiki-server/framework-review-route";
+import type { BenchmarkResultsPendingRoute } from "@wiki-server/benchmark-results-pending-route";
 
 /**
  * Create a typed Hono RPC client for the facts API.
@@ -625,6 +626,27 @@ export type RpcModelSystemCardRow = RpcModelSystemCardsAllResult['items'][number
 
 /** Inferred response type for GET /api/model-system-cards/by-model/:modelId */
 export type RpcModelSystemCardsByModelResult = InferResponseType<ModelSystemCardsClient['by-model'][':modelId']['$get'], 200>;
+
+// ============================================================================
+// Hono RPC client — Benchmark Results Pending API (QUA-689 Phase 2 / QUA-742)
+// ============================================================================
+
+type BenchmarkResultsPendingClient = ReturnType<typeof hc<BenchmarkResultsPendingRoute>>;
+
+/** Inferred response type for GET /api/benchmark-results-pending/stats */
+export type RpcBenchmarkResultsPendingStatsResult = InferResponseType<
+  BenchmarkResultsPendingClient['stats']['$get'],
+  200
+>;
+
+/** Inferred response type for GET /api/benchmark-results-pending/all */
+export type RpcBenchmarkResultsPendingAllResult = InferResponseType<
+  BenchmarkResultsPendingClient['all']['$get'],
+  200
+>;
+
+/** A single quarantine row from the all endpoint */
+export type RpcBenchmarkResultsPendingRow = RpcBenchmarkResultsPendingAllResult['items'][number];
 
 // ============================================================================
 // Hono RPC client — Framework Review API (QUA-710)
