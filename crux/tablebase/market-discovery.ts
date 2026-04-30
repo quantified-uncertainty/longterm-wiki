@@ -96,13 +96,36 @@ export async function discoverMarkets(
     results: Array<{ id: string; stableId: string; title: string; entityType: string }>;
   }>("GET", `/api/entities/search?q=${encodeURIComponent(entitySlug)}&limit=5`);
 
+  // Detect explicit identifiers — sid_-prefixed stableIds and dash/numeric slugs.
+  // For these, we MUST find an exact match. Otherwise the entity-search title-prefix
+  // fallback misattributes markets (e.g. sid_n7K9yVNCtg → "Sid Black", fisa-702 → "Tim Fist").
+  const looksLikeId = /^sid_[A-Za-z0-9]+$/.test(entitySlug) || /-/.test(entitySlug);
+
   if (searchResult.ok && searchResult.data.results.length > 0) {
     const exact = searchResult.data.results.find(
       (r) => r.id === entitySlug || r.stableId === entitySlug
     );
-    const match = exact ?? searchResult.data.results[0];
-    entityName = match.title;
-    stableId = match.stableId;
+    if (exact) {
+      entityName = exact.title;
+      stableId = exact.stableId;
+    } else if (looksLikeId) {
+      return {
+        output: `Could not resolve "${entitySlug}" to an exact entity.id or stableId. ` +
+          `Top fuzzy result was "${searchResult.data.results[0].title}" — refusing to misattribute. ` +
+          `Pass an exact entity slug or use --by-name "<title>" to override.`,
+        exitCode: 1,
+      };
+    } else {
+      // Free-form name — accept the top fuzzy match.
+      const match = searchResult.data.results[0];
+      entityName = match.title;
+      stableId = match.stableId;
+    }
+  } else if (looksLikeId) {
+    return {
+      output: `Could not resolve "${entitySlug}" to a known entity.`,
+      exitCode: 1,
+    };
   } else {
     console.warn(
       `Could not resolve entity "${entitySlug}", using as display name.`
