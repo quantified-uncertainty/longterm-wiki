@@ -10,6 +10,7 @@ import {
   sourceVerdicts,
   recordSources,
   sourcingUrlSuggestions,
+  claimRecordLinks,
 } from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
@@ -707,6 +708,7 @@ const factsApp = new Hono()
               cascadedVerdicts: 0,
               cascadedEvidence: 0,
               cascadedSuggestions: 0,
+              cascadedClaimLinks: 0,
             };
           }
 
@@ -760,6 +762,20 @@ const factsApp = new Hono()
               ),
             )
             .returning({ recordId: sourcingUrlSuggestions.recordId });
+          // claim_record_links uses the same (record_type, record_id) pattern.
+          // It is NOT cleaned up by /api/sourcing/cleanup-orphans (which only
+          // covers verdicts/evidence/suggestions), so without this cascade
+          // deleted facts leak link rows that point at non-existent claim
+          // verifications. Same class of bug as the rest of the cascade.
+          const claimLinkRows = await tx
+            .delete(claimRecordLinks)
+            .where(
+              and(
+                eq(claimRecordLinks.recordType, "fact"),
+                inArray(claimRecordLinks.recordId, staleFactIds),
+              ),
+            )
+            .returning({ recordId: claimRecordLinks.recordId });
 
           await tx.delete(facts).where(inArray(facts.id, staleRowIds));
 
@@ -768,6 +784,7 @@ const factsApp = new Hono()
             cascadedVerdicts: verdictRows.length,
             cascadedEvidence: evidenceRows.length,
             cascadedSuggestions: suggestionRows.length,
+            cascadedClaimLinks: claimLinkRows.length,
           };
         });
 
@@ -776,6 +793,7 @@ const factsApp = new Hono()
           cascadedVerdicts,
           cascadedEvidence,
           cascadedSuggestions,
+          cascadedClaimLinks,
         } = result;
 
         if (stale.length === 0) {
@@ -783,7 +801,12 @@ const factsApp = new Hono()
             deleted: 0,
             ids: [],
             truncated: false,
-            cascaded: { verdicts: 0, evidence: 0, suggestions: 0 },
+            cascaded: {
+              verdicts: 0,
+              evidence: 0,
+              suggestions: 0,
+              claimLinks: 0,
+            },
           });
         }
 
@@ -798,12 +821,13 @@ const factsApp = new Hono()
             cascadedVerdicts,
             cascadedEvidence,
             cascadedSuggestions,
+            cascadedClaimLinks,
             sample: stale
               .slice(0, 100)
               .map((r) => `${r.entityId}/${r.factId}`),
           },
           `Pruned ${stale.length} stale facts across ${entityIds.length} entities` +
-            ` (cascaded ${cascadedVerdicts} verdicts, ${cascadedEvidence} evidence, ${cascadedSuggestions} suggestions)`,
+            ` (cascaded ${cascadedVerdicts} verdicts, ${cascadedEvidence} evidence, ${cascadedSuggestions} suggestions, ${cascadedClaimLinks} claim links)`,
         );
 
         // Cap the response payload. The server already paid the cost of
@@ -823,6 +847,7 @@ const factsApp = new Hono()
             verdicts: cascadedVerdicts,
             evidence: cascadedEvidence,
             suggestions: cascadedSuggestions,
+            claimLinks: cascadedClaimLinks,
           },
         });
       } catch (err) {

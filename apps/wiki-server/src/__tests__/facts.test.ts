@@ -12,6 +12,8 @@ let verdictsStore: Map<string, Record<string, unknown>>;
 let evidenceStore: Map<string, Record<string, unknown>>;
 /** key: `${recordType}::${recordId}::${suggestedUrl}` */
 let suggestionsStore: Map<string, Record<string, unknown>>;
+/** key: `${claimId}::${recordType}::${recordId}` (matches uq_crl_claim_record) */
+let claimLinksStore: Map<string, Record<string, unknown>>;
 let nextId: number;
 
 function resetStores() {
@@ -20,6 +22,7 @@ function resetStores() {
   verdictsStore = new Map();
   evidenceStore = new Map();
   suggestionsStore = new Map();
+  claimLinksStore = new Map();
   nextId = 1;
 }
 
@@ -81,6 +84,23 @@ function injectSuggestion(
     source_provider: "exa",
     generator_model: null,
     status: "pending",
+    ...extra,
+  });
+}
+
+/** Inject a claim_record_links row directly. */
+function injectClaimLink(
+  recordType: string,
+  recordId: string,
+  claimId: number,
+  extra: Record<string, unknown> = {},
+) {
+  claimLinksStore.set(`${claimId}::${recordType}::${recordId}`, {
+    claim_id: claimId,
+    record_type: recordType,
+    record_id: recordId,
+    match_verdict: null,
+    match_confidence: null,
     ...extra,
   });
 }
@@ -444,67 +464,39 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- DELETE source_check_verdicts ---
-  // Two callers:
-  //   - recomputeVerdict (no IN clause, single-row by composite PK) → no-op for tests
-  //   - QUA-930 prune cascade (record_type=$1 AND record_id IN ($2,...)) → actually delete
-  if (q.includes("delete") && q.includes("source_check_verdicts")) {
-    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
-      const recordType = String(params[0] ?? "");
-      const recordIds = new Set(params.slice(1) as string[]);
-      const deleted: Array<{ record_id: string }> = [];
-      for (const [key, row] of verdictsStore) {
-        if (
-          row.record_type === recordType &&
-          recordIds.has(row.record_id as string)
-        ) {
-          verdictsStore.delete(key);
-          deleted.push({ record_id: row.record_id as string });
+  // --- DELETE FROM <table> WHERE record_type=$1 AND record_id IN ($2..) (QUA-930 cascade) ---
+  // Shared handler for all five (record_type, record_id)-keyed cascade tables.
+  // Also handles the existing recomputeVerdict DELETE on source_check_verdicts
+  // (no IN clause) by falling through to the no-op path.
+  const cascadeStores: Array<[string, Map<string, Record<string, unknown>>]> = [
+    ["source_check_verdicts", verdictsStore],
+    ["source_check_evidence", evidenceStore],
+    ["sourcing_url_suggestions", suggestionsStore],
+    ["claim_record_links", claimLinksStore],
+  ];
+  for (const [tableName, store] of cascadeStores) {
+    if (q.includes("delete") && q.includes(tableName)) {
+      if (
+        q.includes("record_type") &&
+        q.includes("record_id") &&
+        q.includes(" in ")
+      ) {
+        const recordType = String(params[0] ?? "");
+        const recordIds = new Set(params.slice(1) as string[]);
+        const deleted: Array<{ record_id: string }> = [];
+        for (const [key, row] of store) {
+          if (
+            row.record_type === recordType &&
+            recordIds.has(row.record_id as string)
+          ) {
+            store.delete(key);
+            deleted.push({ record_id: row.record_id as string });
+          }
         }
+        return deleted;
       }
-      return deleted;
+      return [];
     }
-    return [];
-  }
-
-  // --- DELETE source_check_evidence (QUA-930 cascade) ---
-  if (q.includes("delete") && q.includes("source_check_evidence")) {
-    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
-      const recordType = String(params[0] ?? "");
-      const recordIds = new Set(params.slice(1) as string[]);
-      const deleted: Array<{ record_id: string }> = [];
-      for (const [key, row] of evidenceStore) {
-        if (
-          row.record_type === recordType &&
-          recordIds.has(row.record_id as string)
-        ) {
-          evidenceStore.delete(key);
-          deleted.push({ record_id: row.record_id as string });
-        }
-      }
-      return deleted;
-    }
-    return [];
-  }
-
-  // --- DELETE sourcing_url_suggestions (QUA-930 cascade) ---
-  if (q.includes("delete") && q.includes("sourcing_url_suggestions")) {
-    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
-      const recordType = String(params[0] ?? "");
-      const recordIds = new Set(params.slice(1) as string[]);
-      const deleted: Array<{ record_id: string }> = [];
-      for (const [key, row] of suggestionsStore) {
-        if (
-          row.record_type === recordType &&
-          recordIds.has(row.record_id as string)
-        ) {
-          suggestionsStore.delete(key);
-          deleted.push({ record_id: row.record_id as string });
-        }
-      }
-      return deleted;
-    }
-    return [];
   }
 
   // --- entity_ids: COUNT (for health check) ---
@@ -1409,8 +1401,9 @@ describe("Facts API", () => {
         "ids",
         "truncated",
       ]);
-      // Cascaded sub-shape: {evidence, suggestions, verdicts} numbers.
+      // Cascaded sub-shape — all 4 cascade-target tables represented.
       expect(Object.keys(body.cascaded).sort()).toEqual([
+        "claimLinks",
         "evidence",
         "suggestions",
         "verdicts",
@@ -1418,6 +1411,7 @@ describe("Facts API", () => {
       expect(typeof body.cascaded.verdicts).toBe("number");
       expect(typeof body.cascaded.evidence).toBe("number");
       expect(typeof body.cascaded.suggestions).toBe("number");
+      expect(typeof body.cascaded.claimLinks).toBe("number");
     });
 
     it("caps the returned `ids` at MAX_PRUNE_RESPONSE_IDS and sets truncated=true", async () => {
@@ -1456,21 +1450,24 @@ describe("Facts API", () => {
   // ---- QUA-930: cascade deletion of dependent sourcing rows ----
 
   describe("POST /api/facts/prune cascade (QUA-930)", () => {
-    it("deletes dependent verdicts/evidence/suggestions when a fact is pruned", async () => {
+    it("deletes dependent verdicts/evidence/suggestions/claim-links when a fact is pruned", async () => {
       // Seed a fact and inject the dependent sourcing rows that the
       // sourcing pipeline would have produced for it.
       await seedFact(app, "anthropic", "f_stale", { measure: "revenue" });
       injectVerdict("fact", "f_stale");
       injectEvidence("fact", "f_stale", "https://example.com/source");
       injectSuggestion("fact", "f_stale", "https://example.com/suggested");
+      injectClaimLink("fact", "f_stale", 100);
       // Also seed an unrelated fact + its dependents to confirm the cascade
       // is scoped to deleted facts only.
       await seedFact(app, "anthropic", "f_keep", { measure: "valuation" });
       injectVerdict("fact", "f_keep");
       injectEvidence("fact", "f_keep", "https://example.com/keep-source");
+      injectClaimLink("fact", "f_keep", 200);
       expect(verdictsStore.size).toBe(2);
       expect(evidenceStore.size).toBe(2);
       expect(suggestionsStore.size).toBe(1);
+      expect(claimLinksStore.size).toBe(2);
 
       const res = await postJson(app, "/api/facts/prune", {
         entries: [{ entityId: "anthropic", factIds: ["f_keep"] }],
@@ -1485,18 +1482,21 @@ describe("Facts API", () => {
         verdicts: 1,
         evidence: 1,
         suggestions: 1,
+        claimLinks: 1,
       });
-      // The kept fact's verdict / evidence are untouched.
+      // The kept fact's verdict / evidence / claim-link are untouched.
       expect(verdictsStore.size).toBe(1);
       expect(Array.from(verdictsStore.values())[0].record_id).toBe("f_keep");
       expect(evidenceStore.size).toBe(1);
       expect(Array.from(evidenceStore.values())[0].record_id).toBe("f_keep");
       expect(suggestionsStore.size).toBe(0);
+      expect(claimLinksStore.size).toBe(1);
+      expect(Array.from(claimLinksStore.values())[0].record_id).toBe("f_keep");
     });
 
     it("returns zero cascade counts when there are no dependents", async () => {
       await seedFact(app, "anthropic", "f_stale", { measure: "revenue" });
-      // No verdicts/evidence/suggestions injected.
+      // No verdicts/evidence/suggestions/claim-links injected.
 
       const res = await postJson(app, "/api/facts/prune", {
         entries: [{ entityId: "anthropic", factIds: [] }],
@@ -1509,6 +1509,7 @@ describe("Facts API", () => {
         verdicts: 0,
         evidence: 0,
         suggestions: 0,
+        claimLinks: 0,
       });
     });
 
@@ -1536,7 +1537,7 @@ describe("Facts API", () => {
       expect(remaining.record_type).toBe("personnel");
     });
 
-    it("returns cascaded={0,0,0} when no facts are stale", async () => {
+    it("returns all-zero cascade counts when no facts are stale", async () => {
       await seedFact(app, "anthropic", "f_keep", { measure: "x" });
       injectVerdict("fact", "f_keep");
 
@@ -1551,6 +1552,7 @@ describe("Facts API", () => {
         verdicts: 0,
         evidence: 0,
         suggestions: 0,
+        claimLinks: 0,
       });
       // Verdict still there.
       expect(verdictsStore.size).toBe(1);
@@ -1566,6 +1568,10 @@ describe("Facts API", () => {
       injectEvidence("fact", "f_a", "https://example.com/a");
       injectEvidence("fact", "f_b", "https://example.com/b1");
       injectEvidence("fact", "f_b", "https://example.com/b2");
+      injectSuggestion("fact", "f_c", "https://example.com/suggested-c");
+      injectClaimLink("fact", "f_a", 10);
+      injectClaimLink("fact", "f_a", 11); // a fact can have multiple links
+      injectClaimLink("fact", "f_b", 12);
 
       const res = await postJson(app, "/api/facts/prune", {
         entries: [{ entityId: "anthropic", factIds: [] }],
@@ -1576,8 +1582,33 @@ describe("Facts API", () => {
       expect(body.deleted).toBe(3);
       expect(body.cascaded.verdicts).toBe(3);
       expect(body.cascaded.evidence).toBe(3);
+      expect(body.cascaded.suggestions).toBe(1);
+      expect(body.cascaded.claimLinks).toBe(3);
       expect(verdictsStore.size).toBe(0);
       expect(evidenceStore.size).toBe(0);
+      expect(suggestionsStore.size).toBe(0);
+      expect(claimLinksStore.size).toBe(0);
+    });
+
+    it("cascades claim_record_links scoped by record_type='fact' only", async () => {
+      // QUA-930: same defense-in-depth check as the verdict test —
+      // claim_record_links rows for a different record_type must survive.
+      await seedFact(app, "anthropic", "f_stale", { measure: "x" });
+      injectClaimLink("fact", "f_stale", 1);
+      injectClaimLink("personnel", "f_stale", 2); // same id, different type
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.cascaded.claimLinks).toBe(1);
+      // The personnel link survives.
+      expect(claimLinksStore.size).toBe(1);
+      const remaining = Array.from(claimLinksStore.values())[0];
+      expect(remaining.record_type).toBe("personnel");
     });
   });
 });

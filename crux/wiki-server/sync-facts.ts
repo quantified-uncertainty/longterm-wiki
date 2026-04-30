@@ -262,12 +262,13 @@ export interface PruneFactsOutcome {
   /** Number of batches that failed (HTTP error or thrown exception). */
   errors: number;
   /**
-   * QUA-930 cascade totals — sourcing rows deleted alongside the facts.
+   * QUA-930 cascade totals — dependent rows deleted alongside the facts.
    * Aggregated across all batches.
    */
   cascadedVerdicts: number;
   cascadedEvidence: number;
   cascadedSuggestions: number;
+  cascadedClaimLinks: number;
 }
 
 /**
@@ -301,6 +302,7 @@ export async function pruneFacts(
       cascadedVerdicts: 0,
       cascadedEvidence: 0,
       cascadedSuggestions: 0,
+      cascadedClaimLinks: 0,
     };
   }
 
@@ -309,6 +311,7 @@ export async function pruneFacts(
   let totalCascadedVerdicts = 0;
   let totalCascadedEvidence = 0;
   let totalCascadedSuggestions = 0;
+  let totalCascadedClaimLinks = 0;
   const allDeletedIds: Array<{ entityId: string; factId: string }> = [];
 
   for (let i = 0; i < entries.length; i += batchSize) {
@@ -337,13 +340,21 @@ export async function pruneFacts(
       // client and server cannot drift silently — see PruneFactsResult in
       // crux/lib/wiki-server/facts.ts.
       const result = (await res.json()) as PruneFactsResult;
-      // QUA-930: cascade is always present from a current server, but an older
-      // server in front would emit { deleted, ids, truncated } only. Default
-      // to zero counts so a server lag does not crash the CLI.
-      const cascaded =
-        ("cascaded" in result && result.cascaded)
-          ? result.cascaded
-          : { verdicts: 0, evidence: 0, suggestions: 0 };
+      // QUA-930: cascade is always present from a current server, but an
+      // older server in front would emit { deleted, ids, truncated } only,
+      // and a still-deploying mid-version could emit a partial cascade
+      // object missing some keys. Read each field with `?? 0` so a partial
+      // object never produces NaN aggregation downstream.
+      const rawCascaded =
+        ("cascaded" in result && result.cascaded) || {};
+      const cascaded = {
+        verdicts: (rawCascaded as { verdicts?: number }).verdicts ?? 0,
+        evidence: (rawCascaded as { evidence?: number }).evidence ?? 0,
+        suggestions:
+          (rawCascaded as { suggestions?: number }).suggestions ?? 0,
+        claimLinks:
+          (rawCascaded as { claimLinks?: number }).claimLinks ?? 0,
+      };
       if (result.deleted > 0) {
         const sample = result.ids
           .slice(0, 5)
@@ -351,9 +362,14 @@ export async function pruneFacts(
           .join(", ");
         const more = result.deleted > 5 ? ` ...(+${result.deleted - 5} more)` : "";
         const truncatedNote = result.truncated ? " [ids truncated]" : "";
+        const cascadedTotal =
+          cascaded.verdicts +
+          cascaded.evidence +
+          cascaded.suggestions +
+          cascaded.claimLinks;
         const cascadedNote =
-          cascaded.verdicts + cascaded.evidence + cascaded.suggestions > 0
-            ? ` [cascaded: ${cascaded.verdicts}v/${cascaded.evidence}e/${cascaded.suggestions}s]`
+          cascadedTotal > 0
+            ? ` [cascaded: ${cascaded.verdicts}v/${cascaded.evidence}e/${cascaded.suggestions}s/${cascaded.claimLinks}cl]`
             : "";
         console.log(
           `  Prune batch ${batchNum}: removed ${result.deleted} stale facts: ${sample}${more}${truncatedNote}${cascadedNote}`,
@@ -364,6 +380,7 @@ export async function pruneFacts(
       totalCascadedVerdicts += cascaded.verdicts;
       totalCascadedEvidence += cascaded.evidence;
       totalCascadedSuggestions += cascaded.suggestions;
+      totalCascadedClaimLinks += cascaded.claimLinks;
     } catch (err) {
       console.error(
         `  Prune batch ${batchNum}: failed — ${err instanceof Error ? err.message : err}`,
@@ -379,6 +396,7 @@ export async function pruneFacts(
     cascadedVerdicts: totalCascadedVerdicts,
     cascadedEvidence: totalCascadedEvidence,
     cascadedSuggestions: totalCascadedSuggestions,
+    cascadedClaimLinks: totalCascadedClaimLinks,
   };
 }
 
@@ -475,16 +493,18 @@ async function main() {
       const cascadedTotal =
         pruneResult.cascadedVerdicts +
         pruneResult.cascadedEvidence +
-        pruneResult.cascadedSuggestions;
+        pruneResult.cascadedSuggestions +
+        pruneResult.cascadedClaimLinks;
       if (cascadedTotal > 0) {
         // QUA-930: surface the cascade so operators see the dependent
-        // sourcing rows that disappeared with the facts. Without this, a
-        // routine sync silently drops verdicts and the operator notices
-        // only via dashboard delta.
+        // rows that disappeared with the facts. Without this, a routine
+        // sync silently drops verdicts and the operator notices only via
+        // dashboard delta.
         console.log(
           `  Cascade: ${pruneResult.cascadedVerdicts} verdicts, ` +
             `${pruneResult.cascadedEvidence} evidence, ` +
-            `${pruneResult.cascadedSuggestions} suggestions`,
+            `${pruneResult.cascadedSuggestions} suggestions, ` +
+            `${pruneResult.cascadedClaimLinks} claim links`,
         );
       }
     } else {
