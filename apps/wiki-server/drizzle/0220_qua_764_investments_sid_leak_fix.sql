@@ -61,18 +61,28 @@
 -- for a 10-row data fix; the deleted sids never appeared in user-friendly
 -- search anyway (they were displayed as raw `sid_*`).
 
--- Phase 0: pre-flight — verify target entities exist before normalizing.
--- The UPDATE in Phase 1 would otherwise fail loudly on a FK violation, but
--- raising an explicit exception here gives operators a clearer error
--- (and keeps the migration loudly fail-closed rather than silently
--- skipping rows if someone, e.g., dropped these entities from YAML).
+-- Phase 0: pre-flight — verify target entities exist before normalizing,
+-- but ONLY if bad rows are present. On a fresh DB (CI/test) or after an
+-- idempotent re-run, no bad investment rows exist, so the entity check is
+-- skipped entirely. On prod where the bad rows do exist, the check aborts
+-- loudly if the entity was somehow removed before the migration ran.
 DO $$
 BEGIN
-  IF NOT EXISTS (SELECT 1 FROM "entities" WHERE "stable_id" = 'sid_kT85f91plA') THEN
-    RAISE EXCEPTION 'QUA-764 aborted: entity sid_kT85f91plA (storyworth) not found in entities. Cannot link sid_Storyworth investments rows.';
+  IF EXISTS (
+    SELECT 1 FROM "investments"
+    WHERE "company_id" = 'sid_Storyworth' AND "company_entity_id" IS NULL
+  ) THEN
+    IF NOT EXISTS (SELECT 1 FROM "entities" WHERE "stable_id" = 'sid_kT85f91plA') THEN
+      RAISE EXCEPTION 'QUA-764 aborted: entity sid_kT85f91plA (storyworth) not found in entities. Cannot link sid_Storyworth investments rows.';
+    END IF;
   END IF;
-  IF NOT EXISTS (SELECT 1 FROM "entities" WHERE "stable_id" = 'sid_kh5x0eezrQ') THEN
-    RAISE EXCEPTION 'QUA-764 aborted: entity sid_kh5x0eezrQ (playground-ai) not found in entities. Cannot link sid_Playground investments rows.';
+  IF EXISTS (
+    SELECT 1 FROM "investments"
+    WHERE "company_id" = 'sid_Playground' AND "company_entity_id" IS NULL
+  ) THEN
+    IF NOT EXISTS (SELECT 1 FROM "entities" WHERE "stable_id" = 'sid_kh5x0eezrQ') THEN
+      RAISE EXCEPTION 'QUA-764 aborted: entity sid_kh5x0eezrQ (playground-ai) not found in entities. Cannot link sid_Playground investments rows.';
+    END IF;
   END IF;
 END $$;
 
