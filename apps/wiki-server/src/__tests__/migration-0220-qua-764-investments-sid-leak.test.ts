@@ -35,6 +35,38 @@ describe("migration 0220 — QUA-764 investments sid_ leak fix", () => {
     );
   });
 
+  it("rewrites things.parent_thing_id for the 2 normalized rows", () => {
+    // The route's toThing writes parent_thing_id = companyId at sync time,
+    // so things rows for these investments still point at 'sid_Storyworth' /
+    // 'sid_Playground' until we update them. Otherwise the things_search
+    // MV refresh propagates the bad sids into search results.
+    expect(sql).toMatch(
+      /UPDATE "things"[\s\S]+SET "parent_thing_id" = 'storyworth'[\s\S]+WHERE "source_table" = 'investments'[\s\S]+AND "parent_thing_id" = 'sid_Storyworth'/,
+    );
+    expect(sql).toMatch(
+      /UPDATE "things"[\s\S]+SET "parent_thing_id" = 'playground-ai'[\s\S]+WHERE "source_table" = 'investments'[\s\S]+AND "parent_thing_id" = 'sid_Playground'/,
+    );
+  });
+
+  it("documents the F3 trade-off (single-side investor leaks)", () => {
+    // Reviewer flagged that `OR` between company-leak and investor-leak
+    // predicates would delete rows where the company side is valid but
+    // the investor is orphan. The migration's header comment must
+    // explicitly acknowledge this trade-off so future readers don't think
+    // it's an oversight.
+    expect(sql).toMatch(/F3 trade-off — single-side investor leaks/);
+    expect(sql).toMatch(/Algolia/);
+    expect(sql).toMatch(/Rippling/);
+  });
+
+  it("notes things_search MV staleness expectation", () => {
+    // We deliberately don't REFRESH MATERIALIZED VIEW in the migration —
+    // the comment explains why and reassures operators that the hourly
+    // groundskeeper refresh will catch up.
+    expect(sql).toMatch(/things_search materialized view/);
+    expect(sql).toMatch(/groundskeeper REFRESH/);
+  });
+
   it("deletes things rows BEFORE investments rows (FK-safe ordering)", () => {
     const thingsDeleteIdx = sql.indexOf('DELETE FROM "things"');
     const investmentsDeleteIdx = sql.indexOf('DELETE FROM "investments"');
