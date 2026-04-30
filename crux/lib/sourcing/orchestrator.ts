@@ -310,7 +310,33 @@ async function runBatchExecution(
           return;
         }
       } catch (e: unknown) {
-        console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+        // Don't fall through to LLM batch — these properties have no claim text.
+        // Record an unverifiable verdict so the orchestrator counts it correctly,
+        // and skip the rest of the prepare flow for this item.
+        const message = e instanceof Error ? e.message : String(e);
+        console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${message}`);
+        const errorVerdict: VerifyResult = {
+          itemId: item.id,
+          kind: item.kind,
+          description: item.description,
+          verdict: 'unverifiable',
+          confidence: 0.7,
+          extractedValue: '',
+          reasoning: `[url-resolves] verifier threw: ${message}`,
+          sourceUrl: item.sourceUrl ?? '',
+          checkerModel: 'url-resolves',
+        };
+        summary.unverifiable++;
+        summary.actualVerified++;
+        summary.byKind[item.kind].verified++;
+        summary.results.push(errorVerdict);
+        try {
+          await storeResult(item, errorVerdict);
+        } catch (storageErr: unknown) {
+          summary.storageErrors++;
+          console.warn(`[sourcing] Storage failed: ${storageErr instanceof Error ? storageErr.message : String(storageErr)}`);
+        }
+        return;
       }
     }
 

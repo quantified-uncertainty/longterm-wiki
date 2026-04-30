@@ -297,7 +297,23 @@ export async function verifySingleItem(
       const urlResolvesResult = await tryUrlResolvesVerify(item);
       if (urlResolvesResult) return urlResolvesResult;
     } catch (e: unknown) {
-      console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${e instanceof Error ? e.message : String(e)}`);
+      // Don't fall through to LLM content-claim — these properties (wikipedia-url,
+      // github-profile, …) have no claim text to verify; the LLM path is meaningless
+      // here. Return unverifiable so the orchestrator records *something* and a
+      // future pass retries.
+      const message = e instanceof Error ? e.message : String(e);
+      console.warn(`[sourcing] url-resolves verifier failed for ${item.id}: ${message}`);
+      return {
+        itemId: item.id,
+        kind: item.kind,
+        description: item.description,
+        verdict: 'unverifiable' as SourcingVerdict,
+        confidence: 0.7,
+        extractedValue: '',
+        reasoning: `[url-resolves] verifier threw: ${message}`,
+        sourceUrl: item.sourceUrl ?? '',
+        checkerModel: 'url-resolves',
+      };
     }
   }
 
