@@ -140,6 +140,11 @@ export interface LoopOptions {
   /** Skip sourcing before submitting records */
   skipSourcing?: boolean;
   /**
+   * QUA-730: required when skipSourcing is true. Must be in
+   * SKIP_SOURCING_REASONS. Validated by the agent-tool entry point.
+   */
+  skipSourcingReason?: string;
+  /**
    * QUA-655: route supported record types through
    * `POST /api/enrichment/propose` (tier-aware defensive gate) instead of the
    * direct `/sync` endpoint. Phase 1 supports grants only; non-T1 sources are

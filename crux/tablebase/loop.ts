@@ -88,6 +88,7 @@ export async function runLoop(options: LoopOptions): Promise<LoopResult> {
         dryRun: options.dryRun,
         model,
         skipSourcing: options.skipSourcing,
+        skipSourcingReason: options.skipSourcingReason,
         viaPropose: options.viaPropose,
       });
       results.push(result);

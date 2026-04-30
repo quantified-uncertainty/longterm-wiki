@@ -18,6 +18,11 @@ export interface AgentRunOptions {
   model?: string;
   /** Skip sourcing before submitting records */
   skipSourcing?: boolean;
+  /**
+   * QUA-730: required when skipSourcing is true. Must be in
+   * SKIP_SOURCING_REASONS. Forwarded to the agent tool layer.
+   */
+  skipSourcingReason?: string;
   /** For source-discovery: also link discovered resources to records */
   apply?: boolean;
   /**
@@ -39,6 +44,7 @@ export async function runEnrichmentAgent(
     dryRun = false,
     model = MODELS.sonnet,
     skipSourcing = false,
+    skipSourcingReason,
     apply = false,
     viaPropose = false,
   } = options;
@@ -49,7 +55,7 @@ export async function runEnrichmentAgent(
   const systemPrompt = getSystemPrompt(task);
   const userPrompt = getUserPrompt(task);
   const { tools: regularTools, serverTools } = getToolDefinitions({ taskType: task.taskType, apply });
-  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourcing, apply, viaPropose });
+  const toolHandlers = buildToolHandlers(task, dryRun, { skipSourcing, skipSourcingReason, apply, viaPropose });
 
   let totalRecordsCreated = 0;
 

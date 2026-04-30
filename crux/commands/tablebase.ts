@@ -48,6 +48,8 @@ interface CommandOptions extends BaseOptions {
   /** Required when --skipEntityValidation is set. */
   skipEntityValidationReason?: string;
   skipSourcing?: boolean;
+  /** Required when --skipSourcing is set. Must be in SKIP_SOURCING_REASONS (QUA-730). */
+  skipSourcingReason?: string;
   /** QUA-655: route supported record types through `/api/enrichment/propose` */
   viaPropose?: boolean;
   fix?: boolean;
@@ -71,6 +73,24 @@ interface CommandOptions extends BaseOptions {
   /** QUA-552: dollar budget cap for the whole run */
   budgetUsd?: string;
   fields?: boolean;
+}
+
+/**
+ * QUA-730: shared --skip-sourcing reason check for any tablebase command that
+ * forwards `skipSourcing` into the agent / loop / field-improve layers.
+ * Returns a CommandResult to surface as exit-2 if the reason is missing or
+ * outside the controlled vocabulary, or null when the flag is absent.
+ */
+async function checkSkipSourcingReason(options: CommandOptions): Promise<CommandResult | null> {
+  if (!options.skipSourcing) return null;
+  const { isSkipSourcingReason, formatSkipSourcingReasonError } = await import(
+    '../tablebase/skip-sourcing-reasons.ts'
+  );
+  const provided = options.skipSourcingReason?.trim();
+  if (!isSkipSourcingReason(provided)) {
+    return { exitCode: 2, output: formatSkipSourcingReasonError(provided) };
+  }
+  return null;
 }
 
 async function persistScanResults(scan: import('../tablebase/types.ts').ScanSummary): Promise<void> {
@@ -251,6 +271,9 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
     };
   }
 
+  const skipSourcingErr = await checkSkipSourcingReason(options);
+  if (skipSourcingErr) return skipSourcingErr;
+
   const { findTaskById } = await import('../tablebase/loop.ts');
   const { runEnrichmentAgent } = await import('../tablebase/agent.ts');
 
@@ -265,6 +288,7 @@ async function improveCommand(args: string[], options: CommandOptions): Promise<
     dryRun,
     model,
     skipSourcing: !!options.skipSourcing,
+    skipSourcingReason: options.skipSourcingReason,
   });
 
   if (!dryRun) {
@@ -291,6 +315,9 @@ async function fieldImproveCommand(options: CommandOptions): Promise<CommandResu
     };
   }
 
+  const skipSourcingErr = await checkSkipSourcingReason(options);
+  if (skipSourcingErr) return skipSourcingErr;
+
   const maxTasks = options.max ? parseInt(options.max, 10) : undefined;
   const model = (options.model as string | undefined) ?? 'auto';
 
@@ -313,6 +340,7 @@ async function fieldImproveCommand(options: CommandOptions): Promise<CommandResu
           model,
           dryRun: !!options.dryRun,
           skipSourcing: !!options.skipSourcing,
+          skipSourcingReason: options.skipSourcingReason,
         })
       : await runScanReportImprove({
           reportPath: options.fromScanReport as string,
@@ -321,6 +349,7 @@ async function fieldImproveCommand(options: CommandOptions): Promise<CommandResu
           model,
           dryRun: !!options.dryRun,
           skipSourcing: !!options.skipSourcing,
+          skipSourcingReason: options.skipSourcingReason,
         });
 
     if (options.ci) {
@@ -372,6 +401,17 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   const validTables = ['personnel', 'grants', 'funding-rounds', 'investments', 'benchmark-results', 'publications', 'divisions'];
   if (!validTables.includes(table)) {
     return { exitCode: 1, output: `Invalid table: ${table}. Valid: ${validTables.join(', ')}` };
+  }
+
+  // QUA-730: --skip-sourcing requires a controlled-vocabulary reason.
+  let skipSourcingReason: import('../tablebase/skip-sourcing-reasons.ts').SkipSourcingReason | undefined;
+  if (options.skipSourcing) {
+    const { isSkipSourcingReason, formatSkipSourcingReasonError } = await import('../tablebase/skip-sourcing-reasons.ts');
+    const provided = options.skipSourcingReason?.trim();
+    if (!isSkipSourcingReason(provided)) {
+      return { exitCode: 1, output: formatSkipSourcingReasonError(provided) };
+    }
+    skipSourcingReason = provided;
   }
 
   // Read records from --records-file or stdin
@@ -463,9 +503,23 @@ async function submitCommand(args: string[], options: CommandOptions): Promise<C
   }
   if (tableConfig.requireSourcing) params.set('requireSourcing', 'true');
   if (options.skipSourcing) {
-    // forceSkipSourcing bypasses server-side sourcing enforcement (used when source URLs aren't cached yet)
+    // forceSkipSourcing bypasses server-side sourcing enforcement.
+    // QUA-730: skipSourcingReason was validated against the allowlist at the top of submitCommand.
+    if (!skipSourcingReason) {
+      // Defensive — the earlier check should have rejected this path. Belt + suspenders.
+      return { exitCode: 1, output: 'Internal error: --skip-sourcing reached submission without a validated reason (QUA-730).' };
+    }
+    const { formatSkipSourcingAuditReason } = await import('../tablebase/skip-sourcing-reasons.ts');
     params.set('forceSkipSourcing', 'true');
-    params.set('reason', 'cli: --skip-sourcing flag set by caller');
+    params.set('reason', formatSkipSourcingAuditReason(skipSourcingReason, 'cli'));
+
+    // Loud warning so CI logs and reviewers see what's about to ship unverified.
+    const banner = '═'.repeat(72);
+    console.warn(`\x1b[33m${banner}\x1b[0m`);
+    console.warn(`\x1b[33m  ⚠  --skip-sourcing: shipping ${recordsToSubmit.length} ${table} record(s)\x1b[0m`);
+    console.warn(`\x1b[33m     to production WITHOUT sourcing verification.\x1b[0m`);
+    console.warn(`\x1b[33m     Reason: ${skipSourcingReason}\x1b[0m`);
+    console.warn(`\x1b[33m${banner}\x1b[0m`);
   }
   const qs = params.toString();
   const syncPath = qs ? `${tableConfig.syncPath}?${qs}` : tableConfig.syncPath;
@@ -1113,6 +1167,9 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     : undefined;
   const entityTypes = options.entityType ? [options.entityType as string] : undefined;
 
+  const skipSourcingErr = await checkSkipSourcingReason(options);
+  if (skipSourcingErr) return skipSourcingErr;
+
   const result = await runLoop({
     maxTasks,
     budgetDollars,
@@ -1121,6 +1178,7 @@ async function loopCommand(_args: string[], options: CommandOptions): Promise<Co
     entityTypes,
     model,
     skipSourcing: !!options.skipSourcing,
+    skipSourcingReason: options.skipSourcingReason,
     viaPropose: !!options.viaPropose,
   });
 
@@ -1601,7 +1659,9 @@ Options:
   --budget=N                Budget limit in USD for loop (default: 30)
   --model=<name>            LLM model: haiku, sonnet, opus, or auto (tier by task type)
   --records-file=<path>     JSON file for submit command
-  --skip-sourcing       Skip sourcing before submit (for testing)
+  --skip-sourcing       Skip sourcing before submit. Requires
+                            --skip-sourcing-reason=<migration|backfill|testing|key-unavailable|manual-verified> (QUA-730).
+  --skip-sourcing-reason=<value>   Controlled-vocabulary justification for --skip-sourcing.
   --via-propose             Route supported record types (grants, Phase 1) through
                             /api/enrichment/propose instead of direct /sync (QUA-655)
   --apply                   For source-discover: also link discovered resources to records

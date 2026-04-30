@@ -347,6 +347,17 @@ const PARALLEL_STEPS: Step[] = [
     cwd: PROJECT_ROOT,
   },
   {
+    // QUA-730: any newly added/modified manifest in data/tablebase-manifests/
+    // must have at least one record with sourcing data. Catches the
+    // "agent ran with --skip-sourcing because the billing key was missing"
+    // failure mode (PR #4612, all 81 records shipped with verdict=none).
+    id: 'manifest-sourcing',
+    name: 'TableBase manifest sourcing (no all-unverified bulk drops)',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-manifest-sourcing.ts'],
+    cwd: PROJECT_ROOT,
+  },
+  {
     // QUA-700: catches `${{ secrets.X }}` references in workflow YAMLs that
     // don't resolve to a real repo or org-inherited secret (the QUA-676
     // root cause). Advisory because (a) forks/local environments lack gh
