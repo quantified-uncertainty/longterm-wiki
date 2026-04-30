@@ -116,6 +116,7 @@ import * as tablebaseCommands from './commands/tablebase.ts';
 import * as improveEntityCommands from './commands/research-improve-entity.ts';
 import * as improveEntitySuiteCommands from './commands/research-improve-entity-suite.ts';
 import * as benchmarkCommands from './commands/research-benchmark.ts';
+import * as benchmarkSuiteCommands from './commands/research-benchmark-suite.ts';
 import * as pagesCommands from './commands/pages.ts';
 import * as legislationCommands from './commands/legislation.ts';
 import * as extractStructuredDataCommands from './commands/extract-structured-data.ts';
@@ -222,6 +223,7 @@ const domains = {
   'improve-entity': improveEntityCommands,
   'improve-entity-suite': improveEntitySuiteCommands,
   benchmark: benchmarkCommands,
+  'benchmark-suite': benchmarkSuiteCommands,
   pages: pagesCommands,
   legislation: legislationCommands,
   'extract-structured-data': extractStructuredDataCommands,
