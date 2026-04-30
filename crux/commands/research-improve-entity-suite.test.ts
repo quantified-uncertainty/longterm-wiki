@@ -56,6 +56,7 @@ function makeResult(slug: string, overrides: Partial<ImproveResult> = {}): Impro
   return {
     entity_slug: slug,
     entity_id: slug,
+    entity_type: "policy",
     iterations,
     final_coverage: 0.9,
     final_facts: { provisions: 6, stakeholders: 5 },
