@@ -206,6 +206,13 @@ Launch agents to fetch pages from `https://www.longtermwiki.com` using WebFetch.
 - Does it load (not 404/500)?
 - Count consistency: does the filter badge total match the body count?
 - Column fill rates: what percentage of rows have data in each column? Flag columns with >80% empty.
+  - **Definition of "filled": a `<td>` is filled if it contains any of the following.** Many directory columns render visual-only indicators with no inline text — do NOT count those as empty.
+    - Visible text content (the obvious case).
+    - A descendant element with `role="img"` (`CoverageDots`, `SourcingDot`, `RecordStatusDots`, `FactSourceCheckDot` all set this).
+    - A descendant element with `aria-label` whose value names data (e.g. `aria-label="Coverage: 75%"`, `aria-label="Sourcing: confirmed"`). Ignore decorative `aria-label` like `"chevron"`.
+    - A descendant `<svg>` (icons, indicators).
+    - A descendant `<span>` whose `class` matches a badge / pill pattern (e.g. `bg-*-100`, `rounded-full`, `inline-flex` color classes). Ignore plain `<span>` with no semantic class — those are layout wrappers.
+  - When in doubt, fetch the raw HTML and grep for the criteria above inside the row's `<td>`. Do not rely on rendered text alone. (Background: QUA-900 was filed in error against /research-areas, /funding-programs, /publications, /projects, /approaches, /divisions because the agent only counted text and missed the per-row Coverage dots.)
 - Are there columns that should exist but don't? (e.g., tracked people count, completeness indicator, subentity counts)
 - Do any values show raw IDs or slugs instead of human-readable names?
 - Is the default sort order sensible?
