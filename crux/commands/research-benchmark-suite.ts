@@ -1,13 +1,6 @@
 // crux tb benchmark-suite — read-only multi-entity coverage measurement.
-//
-// QUA-873. Pairs with `crux tb improve-entity-suite` (QUA-882) and the
-// CI gate (QUA-871). This command does NOT call any LLM; it reads YAML
-// state and computes per-entity + aggregate coverage scores.
-//
-// Usage:
-//   pnpm crux tb benchmark-suite --tag=baseline
-//   pnpm crux tb benchmark-suite --diff=before,after
-//   pnpm crux tb benchmark-suite --list
+// Snapshots every entity in crux/benchmarks/entity-suite.yaml using
+// policyCoverageScore, persists JSON, supports --tag, --diff, --list.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -41,9 +34,11 @@ export type SuiteEntry = z.infer<typeof SuiteEntrySchema>;
 /** Types that have a coverage scorer. v1: policy-only. */
 const SUPPORTED_TYPES = new Set<string>(["policy"]);
 
-/** Tag flows into the snapshot filename. Reject anything that could escape
- *  the snapshot dir (path separators, traversal sequences) or cause shell /
- *  filesystem surprises. Allowlist matches typical labels. */
+/** Per-entity outcome status. */
+export type EntityStatus = "scored" | "missing_entity" | "unsupported_type";
+
+/** Tag flows into the snapshot filename. Allowlist prevents path traversal
+ *  and shell/filesystem surprises. */
 const VALID_TAG_RE = /^[a-zA-Z0-9._-]+$/;
 export function isValidTag(tag: string): boolean {
   return tag.length > 0 && tag.length <= 80 && VALID_TAG_RE.test(tag);
@@ -107,56 +102,42 @@ export interface PerEntityRecord {
   components: Record<string, number>;
   facts_in_yaml: Record<string, number>;
   expected_min_coverage?: number;
-  status: "scored" | "missing_entity" | "unsupported_type";
+  status: EntityStatus;
+}
+
+function makeRecord(
+  entry: SuiteEntry,
+  status: EntityStatus,
+  cov: CoverageScore | null,
+): PerEntityRecord {
+  return {
+    slug: entry.slug,
+    type: entry.type,
+    coverage_score: cov?.score ?? null,
+    components: cov?.components ?? {},
+    facts_in_yaml: cov?.facts_in_yaml ?? {},
+    expected_min_coverage: entry.expected_min_coverage,
+    status,
+  };
 }
 
 /**
- * Score every entry in `suite` against `responses`. Returns a record per entry.
- * Entries with unsupported types or missing responses get `status` set and
- * `coverage_score: null`.
+ * Score every entry in `suite` against `responses`. Entries with unsupported
+ * types or missing responses get `status` set and `coverage_score: null`.
+ *
+ * `responses.yaml` keys entities under `id`; the suite YAML calls the same
+ * string `slug`. We look up by `id`.
  */
 export function scoreSuite(
   suite: SuiteEntry[],
   responses: PolicyEntity[],
 ): PerEntityRecord[] {
-  // responses.yaml stores its primary key as `id` but the suite YAML calls
-  // the same string `slug` — they're the same value, just renamed at the
-  // boundary. Index by the `id` column.
   const responsesById = new Map(responses.map((r) => [r.id, r]));
   return suite.map((entry) => {
-    if (!SUPPORTED_TYPES.has(entry.type)) {
-      return {
-        slug: entry.slug,
-        type: entry.type,
-        coverage_score: null,
-        components: {},
-        facts_in_yaml: {},
-        expected_min_coverage: entry.expected_min_coverage,
-        status: "unsupported_type" as const,
-      };
-    }
+    if (!SUPPORTED_TYPES.has(entry.type)) return makeRecord(entry, "unsupported_type", null);
     const ent = responsesById.get(entry.slug);
-    if (!ent) {
-      return {
-        slug: entry.slug,
-        type: entry.type,
-        coverage_score: null,
-        components: {},
-        facts_in_yaml: {},
-        expected_min_coverage: entry.expected_min_coverage,
-        status: "missing_entity" as const,
-      };
-    }
-    const cov: CoverageScore = policyCoverageScore(ent);
-    return {
-      slug: entry.slug,
-      type: entry.type,
-      coverage_score: cov.score,
-      components: cov.components,
-      facts_in_yaml: cov.facts_in_yaml,
-      expected_min_coverage: entry.expected_min_coverage,
-      status: "scored" as const,
-    };
+    if (!ent) return makeRecord(entry, "missing_entity", null);
+    return makeRecord(entry, "scored", policyCoverageScore(ent));
   });
 }
 
@@ -227,17 +208,19 @@ export function snapshotPath(snapshotDir: string, snap: SuiteSnapshot): string {
 
 export function writeSnapshot(snapshotDir: string, snap: SuiteSnapshot): string {
   fs.mkdirSync(snapshotDir, { recursive: true });
-  let file = snapshotPath(snapshotDir, snap);
-  // Two writes within the same millisecond with the same tag would otherwise
-  // overwrite each other silently. Append a numeric suffix on collision.
-  if (fs.existsSync(file)) {
-    const base = file.replace(/\.json$/, "");
-    let i = 1;
-    while (fs.existsSync(`${base}__${i}.json`)) i++;
-    file = `${base}__${i}.json`;
+  // Same-millisecond + same-tag would overwrite silently. Open exclusive (wx)
+  // and increment a numeric suffix on EEXIST until we land a unique filename.
+  const base = snapshotPath(snapshotDir, snap).replace(/\.json$/, "");
+  const body = JSON.stringify(snap, null, 2) + "\n";
+  for (let i = 0; ; i++) {
+    const file = i === 0 ? `${base}.json` : `${base}__${i}.json`;
+    try {
+      fs.writeFileSync(file, body, { flag: "wx" });
+      return file;
+    } catch (e) {
+      if ((e as NodeJS.ErrnoException).code !== "EEXIST") throw e;
+    }
   }
-  fs.writeFileSync(file, JSON.stringify(snap, null, 2) + "\n", { flag: "wx" });
-  return file;
 }
 
 export function listSnapshotsInDir(snapshotDir: string): SuiteSnapshot[] {
@@ -310,7 +293,6 @@ export function formatDiff(before: SuiteSnapshot, after: SuiteSnapshot): string 
   lines.push(`  before sha=${before.git_sha ?? "?"} (${before.timestamp})`);
   lines.push(`  after  sha=${after.git_sha ?? "?"} (${after.timestamp})`);
   lines.push("");
-  // Per-entity table.
   const slugWidth = Math.max(
     8,
     ...before.entities.map((e) => e.slug.length),
@@ -318,7 +300,6 @@ export function formatDiff(before: SuiteSnapshot, after: SuiteSnapshot): string 
   );
   lines.push(`  ${"slug".padEnd(slugWidth)}  coverage`);
   lines.push(`  ${"-".repeat(slugWidth)}  ${"-".repeat(28)}`);
-  // Index by slug.
   const beforeBySlug = new Map(before.entities.map((e) => [e.slug, e]));
   const afterBySlug = new Map(after.entities.map((e) => [e.slug, e]));
   const allSlugs = Array.from(new Set([...beforeBySlug.keys(), ...afterBySlug.keys()])).sort();
