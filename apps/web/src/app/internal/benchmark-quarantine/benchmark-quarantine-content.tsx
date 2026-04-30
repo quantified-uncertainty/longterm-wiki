@@ -1,17 +1,6 @@
-/**
- * Benchmark Quarantine Dashboard — triage queue for `benchmark_results_pending`
- * (QUA-689 Phase 2 / QUA-742).
- *
- * Surfaces:
- *   1. Pending row count + breakdown by status (pending / resolved / rejected)
- *   2. Per-source breakdown (which ingester is producing the most unresolved rows)
- *   3. Row table — model/benchmark/score/source URL/ingested-at + filters
- *
- * Resolution today is via the crux CLI (`crux tb model-aliases sync` +
- * `crux tb benchmark-results sync`); the table surfaces source URL and a
- * link to the entity-profile viewer for the parent benchmark so reviewers
- * can identify the right canonical model entity.
- */
+// Triage queue for benchmark_results_pending (QUA-689 Phase 2 / QUA-742).
+// Resolution path: crux tb model-aliases sync → next ingester run promotes
+// the row from this queue into benchmark_results.
 
 import {
   fetchDetailed,
@@ -22,20 +11,17 @@ import {
   type RpcBenchmarkResultsPendingRow,
 } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
+import { StatCard } from "@/app/data-sources/data-sources-shared";
 import { getBenchmarkEntities } from "@/app/benchmarks/benchmark-utils";
 import {
   BenchmarkQuarantineTable,
   type BenchmarkQuarantineRow,
 } from "./benchmark-quarantine-table";
 
-// ── Types ─────────────────────────────────────────────────────────────────
-
 interface DashboardData {
   stats: RpcBenchmarkResultsPendingStatsResult;
   rows: RpcBenchmarkResultsPendingRow[];
 }
-
-// ── Data Loading ──────────────────────────────────────────────────────────
 
 async function loadFromApi(): Promise<FetchResult<DashboardData>> {
   const [statsResult, allResult] = await Promise.all([
@@ -65,21 +51,25 @@ function emptyFallback(): DashboardData {
   };
 }
 
-// ── Benchmark name resolution ────────────────────────────────────────────
+// Benchmark entities are build-time data — cache the id/stableId lookup map
+// so we don't rebuild it on every server render.
+let benchmarkLookupCache: Map<string, { name: string; slug: string }> | null = null;
 
-function buildBenchmarkLookup(): Map<string, { name: string; slug: string }> {
+function getBenchmarkLookup(): Map<string, { name: string; slug: string }> {
+  if (benchmarkLookupCache) return benchmarkLookupCache;
   const map = new Map<string, { name: string; slug: string }>();
   for (const b of getBenchmarkEntities()) {
     map.set(b.id, { name: b.title, slug: b.id });
     if (b.stableId) map.set(b.stableId, { name: b.title, slug: b.id });
   }
+  benchmarkLookupCache = map;
   return map;
 }
 
 function enrichRows(
   rows: RpcBenchmarkResultsPendingRow[],
 ): BenchmarkQuarantineRow[] {
-  const lookup = buildBenchmarkLookup();
+  const lookup = getBenchmarkLookup();
   return rows.map((r) => {
     const benchmark = lookup.get(r.benchmarkId);
     return {
@@ -90,8 +80,6 @@ function enrichRows(
   });
 }
 
-// ── Content Component ────────────────────────────────────────────────────
-
 export async function BenchmarkQuarantineContent() {
   const { data, source, apiError } = await withApiFallback(
     loadFromApi,
@@ -100,11 +88,12 @@ export async function BenchmarkQuarantineContent() {
   const { stats, rows } = data;
   const enriched = enrichRows(rows);
 
-  const statusCounts = new Map<string, number>();
-  for (const s of stats.byStatus) statusCounts.set(s.status, s.total);
-  const pendingCount = statusCounts.get("pending") ?? 0;
-  const resolvedCount = statusCounts.get("resolved") ?? 0;
-  const rejectedCount = statusCounts.get("rejected") ?? 0;
+  const serverStatusCounts = { pending: 0, resolved: 0, rejected: 0 };
+  for (const s of stats.byStatus) {
+    if (s.status in serverStatusCounts) {
+      serverStatusCounts[s.status as keyof typeof serverStatusCounts] = s.total;
+    }
+  }
 
   return (
     <>
@@ -125,19 +114,13 @@ export async function BenchmarkQuarantineContent() {
         rejected with a reason.
       </p>
 
-      {/* Summary stats */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 my-6">
-        <StatCard label="Pending" value={pendingCount.toString()} tone="warn" />
-        <StatCard label="Resolved" value={resolvedCount.toString()} tone="ok" />
-        <StatCard
-          label="Rejected"
-          value={rejectedCount.toString()}
-          tone="muted"
-        />
-        <StatCard label="Total" value={stats.total.toString()} />
+        <StatCard label="Pending" value={serverStatusCounts.pending} color="text-amber-600" />
+        <StatCard label="Resolved" value={serverStatusCounts.resolved} color="text-emerald-600" />
+        <StatCard label="Rejected" value={serverStatusCounts.rejected} color="text-muted-foreground" />
+        <StatCard label="Total" value={stats.total} />
       </div>
 
-      {/* Per-source breakdown */}
       {stats.bySource.length > 0 && (
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-3">By Ingester Source</h2>
@@ -162,21 +145,16 @@ export async function BenchmarkQuarantineContent() {
         </div>
       )}
 
-      {/* Row table — empty state branches on the server-side total so 0 rows of
-          any status renders the "queue is clear" copy, and rows-of-only-resolved/
-          rejected still show the table (with the default filter set to "all"). */}
+      {/* Empty state branches on server-side total so 0 rows of any status
+          shows "Queue is clear", and a queue with only non-pending rows still
+          shows the table (the table's initial filter handles that case). */}
       {stats.total > 0 ? (
         <div className="my-6">
           <h2 className="text-lg font-semibold mb-3">Quarantine rows</h2>
           <BenchmarkQuarantineTable
             data={enriched}
-            statusCounts={{
-              pending: pendingCount,
-              resolved: resolvedCount,
-              rejected: rejectedCount,
-            }}
+            serverStatusCounts={serverStatusCounts}
             totalRowCount={stats.total}
-            loadedRowCount={enriched.length}
           />
         </div>
       ) : (
@@ -196,32 +174,5 @@ export async function BenchmarkQuarantineContent() {
 
       <DataSourceBanner source={source} apiError={apiError} />
     </>
-  );
-}
-
-// ── Helper Components ────────────────────────────────────────────────────
-
-function StatCard({
-  label,
-  value,
-  tone,
-}: {
-  label: string;
-  value: string;
-  tone?: "ok" | "warn" | "muted";
-}) {
-  const valueColor =
-    tone === "warn"
-      ? "text-amber-600"
-      : tone === "ok"
-        ? "text-emerald-600"
-        : tone === "muted"
-          ? "text-muted-foreground"
-          : "text-foreground";
-  return (
-    <div className="rounded-lg border border-border/60 p-4">
-      <p className="text-xs text-muted-foreground mb-1">{label}</p>
-      <p className={`text-2xl font-bold tabular-nums ${valueColor}`}>{value}</p>
-    </div>
   );
 }

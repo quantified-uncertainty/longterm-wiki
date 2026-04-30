@@ -12,20 +12,23 @@ import {
 import { Search } from "lucide-react";
 import { DataTable } from "@/components/ui/data-table";
 import { SortableHeader } from "@/components/ui/sortable-header";
+import { isSafeUrl } from "@/lib/url-utils";
 import type { RpcBenchmarkResultsPendingRow } from "@lib/wiki-server";
-
-// ── Constants ─────────────────────────────────────────────────────────────
 
 /** Status values mirror VALID_STATUS in the wiki-server route + chk_brp_status migration. */
 const STATUS_VALUES = ["pending", "resolved", "rejected"] as const;
 
+/** Filter-button order in the toolbar. Hoisted so the array isn't reallocated per render. */
+const STATUS_FILTER_OPTIONS = [...STATUS_VALUES, "all"] as const;
+
 /** Below this absolute value scores show 2 decimals; above it, integers (e.g. 91.34 vs 1024). */
 const SCORE_INTEGER_THRESHOLD = 100;
 
-/** Schemes accepted in the source-URL anchor; anything else (javascript:, data:) renders as plain text. */
-const SAFE_URL_SCHEMES = ["http:", "https:"];
-
-// ── Types ─────────────────────────────────────────────────────────────────
+const STATUS_TEXT_COLOR: Record<(typeof STATUS_VALUES)[number], string> = {
+  pending: "text-amber-600",
+  resolved: "text-emerald-600",
+  rejected: "text-muted-foreground",
+};
 
 export type BenchmarkQuarantineRow = RpcBenchmarkResultsPendingRow & {
   /** Resolved benchmark display name (set by server component) */
@@ -34,9 +37,7 @@ export type BenchmarkQuarantineRow = RpcBenchmarkResultsPendingRow & {
   benchmarkSlug: string | null;
 };
 
-type StatusFilter = "all" | "pending" | "resolved" | "rejected";
-
-// ── Formatting ────────────────────────────────────────────────────────────
+type StatusFilter = (typeof STATUS_VALUES)[number] | "all";
 
 function formatScore(
   score: number | null,
@@ -52,38 +53,13 @@ function formatScore(
   return unit ? `${formatted} ${unit}` : formatted;
 }
 
-/** Returns the URL only if it's a safe scheme (http/https); otherwise null so the cell falls back to text. */
-export function safeExternalUrl(raw: string | null): string | null {
-  if (!raw) return null;
-  try {
-    const u = new URL(raw);
-    return SAFE_URL_SCHEMES.includes(u.protocol) ? raw : null;
-  } catch {
-    return null;
-  }
-}
-
-function formatDate(value: string | Date | null): string {
+/** ISO YYYY-MM-DD slice for tabular display (locale-independent, sortable as text). */
+function formatDateISO(value: string | Date | null): string {
   if (!value) return "—";
   const d = typeof value === "string" ? new Date(value) : value;
   if (isNaN(d.getTime())) return "—";
   return d.toISOString().slice(0, 10);
 }
-
-function statusColor(status: string): string {
-  switch (status) {
-    case "pending":
-      return "text-amber-600";
-    case "resolved":
-      return "text-emerald-600";
-    case "rejected":
-      return "text-muted-foreground";
-    default:
-      return "text-muted-foreground";
-  }
-}
-
-// ── Columns ───────────────────────────────────────────────────────────────
 
 const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
   {
@@ -95,7 +71,7 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
     ),
     cell: ({ row }) => (
       <span
-        className={`text-xs font-medium capitalize ${statusColor(row.original.status)}`}
+        className={`text-xs font-medium capitalize ${STATUS_TEXT_COLOR[row.original.status as (typeof STATUS_VALUES)[number]] ?? "text-muted-foreground"}`}
       >
         {row.original.status}
       </span>
@@ -204,7 +180,7 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
     ),
     cell: ({ row }) => (
       <span className="text-xs tabular-nums text-muted-foreground">
-        {formatDate(row.original.createdAt)}
+        {formatDateISO(row.original.createdAt)}
       </span>
     ),
     size: 100,
@@ -217,9 +193,10 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
     cell: ({ row }) => {
       const raw = row.original.sourceUrl;
       if (!raw) return <span className="text-xs text-muted-foreground/50">—</span>;
-      const safe = safeExternalUrl(raw);
       const display = raw.replace(/^https?:\/\//, "");
-      if (!safe) {
+      // Only render as href when the scheme passes isSafeUrl (XSS guard for
+      // DB-sourced URLs from third-party ingesters).
+      if (!isSafeUrl(raw)) {
         return (
           <span
             className="text-xs text-muted-foreground truncate max-w-[240px] block"
@@ -231,11 +208,11 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
       }
       return (
         <a
-          href={safe}
+          href={raw}
           target="_blank"
           rel="noopener noreferrer"
           className="text-xs text-accent-foreground hover:underline truncate max-w-[240px] block"
-          title={safe}
+          title={raw}
         >
           {display}
         </a>
@@ -276,34 +253,28 @@ const columns: ColumnDef<BenchmarkQuarantineRow>[] = [
   },
 ];
 
-// ── Table component ───────────────────────────────────────────────────────
-
 export interface BenchmarkQuarantineTableProps {
   data: BenchmarkQuarantineRow[];
   /** Server-side counts so filter buttons reflect the full table, not just the loaded subset. */
-  statusCounts: { pending: number; resolved: number; rejected: number };
+  serverStatusCounts: Record<(typeof STATUS_VALUES)[number], number>;
   totalRowCount: number;
-  /** Number of rows the server returned (≤ totalRowCount when truncated). */
-  loadedRowCount: number;
 }
 
 export function BenchmarkQuarantineTable({
   data,
-  statusCounts: serverStatusCounts,
+  serverStatusCounts,
   totalRowCount,
-  loadedRowCount,
 }: BenchmarkQuarantineTableProps) {
-  // Default to pending if there are pending rows, else "all" so an operator
-  // looking at a queue with only resolved/rejected rows doesn't see an empty
-  // table they have to manually un-filter.
-  const initialStatusFilter: StatusFilter =
-    serverStatusCounts.pending > 0 ? "pending" : "all";
-
   const [sorting, setSorting] = useState<SortingState>([
     { id: "createdAt", desc: true },
   ]);
   const [globalFilter, setGlobalFilter] = useState("");
-  const [statusFilter, setStatusFilter] = useState<StatusFilter>(initialStatusFilter);
+  // Default to "pending" when there's something to triage, else "all" so an
+  // operator looking at a queue of only resolved/rejected rows doesn't see
+  // an empty table they have to manually un-filter.
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>(() =>
+    serverStatusCounts.pending > 0 ? "pending" : "all",
+  );
   const [sourceFilter, setSourceFilter] = useState<string>("all");
 
   const sources = useMemo(() => {
@@ -312,14 +283,7 @@ export function BenchmarkQuarantineTable({
     return Array.from(set).sort();
   }, [data]);
 
-  // Filter button labels use server-side counts (the full PG table) so they
-  // stay accurate when the loaded subset is truncated by the API limit.
-  const statusCounts = {
-    ...serverStatusCounts,
-    all: totalRowCount,
-  };
-
-  const isTruncated = loadedRowCount < totalRowCount;
+  const isTruncated = data.length < totalRowCount;
 
   const filteredData = useMemo(() => {
     return data.filter((r) => {
@@ -347,25 +311,26 @@ export function BenchmarkQuarantineTable({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-3 flex-wrap">
-        {/* Status filter buttons */}
         <div className="flex items-center gap-1 rounded-lg border border-border/60 p-1">
-          {([...STATUS_VALUES, "all"] as const).map((s) => (
-            <button
-              key={s}
-              type="button"
-              onClick={() => setStatusFilter(s)}
-              className={`text-xs px-2.5 py-1 rounded capitalize transition-colors ${
-                statusFilter === s
-                  ? "bg-accent text-accent-foreground font-medium"
-                  : "text-muted-foreground hover:bg-muted"
-              }`}
-            >
-              {s} <span className="tabular-nums opacity-70">({statusCounts[s]})</span>
-            </button>
-          ))}
+          {STATUS_FILTER_OPTIONS.map((s) => {
+            const count = s === "all" ? totalRowCount : serverStatusCounts[s];
+            return (
+              <button
+                key={s}
+                type="button"
+                onClick={() => setStatusFilter(s)}
+                className={`text-xs px-2.5 py-1 rounded capitalize transition-colors ${
+                  statusFilter === s
+                    ? "bg-accent text-accent-foreground font-medium"
+                    : "text-muted-foreground hover:bg-muted"
+                }`}
+              >
+                {s} <span className="tabular-nums opacity-70">({count})</span>
+              </button>
+            );
+          })}
         </div>
 
-        {/* Source filter */}
         {sources.length > 1 && (
           <select
             value={sourceFilter}
@@ -381,7 +346,6 @@ export function BenchmarkQuarantineTable({
           </select>
         )}
 
-        {/* Free-text search */}
         <div className="relative flex-1 min-w-[200px] max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
@@ -401,7 +365,7 @@ export function BenchmarkQuarantineTable({
 
       {isTruncated && (
         <p className="text-xs text-amber-600">
-          Showing first {loadedRowCount.toLocaleString()} of{" "}
+          Showing first {data.length.toLocaleString()} of{" "}
           {totalRowCount.toLocaleString()} total rows. Apply a status or source
           filter via the API to narrow further.
         </p>
