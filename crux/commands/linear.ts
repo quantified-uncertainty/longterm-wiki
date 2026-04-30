@@ -36,7 +36,7 @@ import {
   type UpdateProjectInput,
 } from '../lib/linear/projects.ts';
 import {
-  auditInProgress,
+  auditActive,
   extractFixesIds,
   STALE_DAYS,
   type AuditBucket,
@@ -766,7 +766,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     };
   }
 
-  const entries = await auditInProgress();
+  const entries = await auditActive();
 
   if (options.json) {
     const filtered = bucketFilter ? entries.filter((e) => e.bucket === bucketFilter) : entries;
@@ -775,7 +775,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
 
   if (entries.length === 0) {
     return {
-      output: `${c.green}✓${c.reset} No issues currently In Progress.\n`,
+      output: `${c.green}✓${c.reset} No issues currently In Progress or In Review.\n`,
       exitCode: 0,
     };
   }
@@ -789,7 +789,9 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
     shipped: {
       label: 'SHIPPED (state-update missed)',
       color: c.yellow,
-      action: 'PR merged. Move to Done: crux linear done QUA-NNN --pr=URL',
+      // `crux linear done QUA-NNN` (no --pr) moves directly to Done. The
+      // --pr variant moves to In Review, which is where these are stuck.
+      action: 'PR merged. Move to Done: crux linear done QUA-NNN  (or --fix to batch)',
     },
     'parent-epic': {
       label: 'PARENT EPIC (sub-issues resolved)',
@@ -821,7 +823,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   }
 
   let out = '';
-  out += `${c.bold}Linear In-Progress audit (${entries.length} issues)${c.reset}\n\n`;
+  out += `${c.bold}Linear active-issue audit (${entries.length} issues — In Progress + In Review)${c.reset}\n\n`;
 
   const order: AuditBucket[] = ['shipped', 'parent-epic', 'orphan', 'stuck', 'active'];
   for (const bucket of order) {
@@ -841,7 +843,7 @@ async function audit(args: string[], options: CommandOptions): Promise<CommandRe
   if (actionable > 0) {
     out += `${c.bold}${actionable} issue(s) need action.${c.reset} Use ${c.cyan}--bucket=shipped${c.reset}/etc. to filter, ${c.cyan}--fix${c.reset} to auto-close SHIPPED + PARENT EPIC, or ${c.cyan}--json${c.reset} for scripting.\n`;
   } else {
-    out += `${c.green}✓${c.reset} All In Progress issues look healthy.\n`;
+    out += `${c.green}✓${c.reset} All active issues look healthy.\n`;
   }
 
   let fixFailures = 0;
@@ -1274,7 +1276,7 @@ Commands:
   comment <QUA-NNN> <message>   Post a comment on an issue
   start <QUA-NNN>               Move issue to In Progress + post start comment
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
-  audit                         Classify In Progress issues by PR health (shipped/orphan/epic/active)
+  audit                         Classify active issues (In Progress + In Review) by PR health
   hygiene                       Metadata hygiene scan: orphans, label coverage, priority gaps, stuck tickets
   verify-pr <PR>                Watchdog: ensure merged PR's Fixes QUA-NNN issues are actually Done
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks

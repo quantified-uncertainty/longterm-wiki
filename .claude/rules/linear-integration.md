@@ -92,6 +92,8 @@ Linear has built-in Git automation that triggers state changes independent of th
 
 These are configured in Linear's team settings (not in this repo). The `crux` commands duplicate some of these transitions intentionally -- belt-and-suspenders for cases where Linear's automation doesn't fire (e.g., branch created before Linear integration was installed, or PR body reference without branch name match).
 
+**The In-Review → Done transition is empirically unreliable.** Even when a PR has both a `claude/qua-NNN-*` branch name AND a `Fixes QUA-NNN` body line, ~1.4–5% of merged PRs leave their issue stuck in "In Review" indefinitely (QUA-812 measurement). The fallback is `crux linear audit --fix` (see § 6), which classifies any active issue (In Progress + In Review) with a merged PR as `shipped` and moves it to Done. Run after every batch of merges, or include it in the maintenance sweep.
+
 ## 6. Available commands
 
 ```bash
@@ -107,6 +109,11 @@ crux linear done QUA-NNN [--pr=URL]   # Move to In Review (with PR) or Done
 # Communication
 crux linear comment QUA-NNN <message>           # Post a comment
 crux linear comment QUA-NNN --body-file=<path>  # Comment from file (multiline-safe)
+
+# Maintenance
+crux linear audit                     # Classify active issues (In Progress + In Review) by PR health
+crux linear audit --fix               # Auto-close SHIPPED + PARENT-EPIC (covers In-Review → Done failures, QUA-812)
+crux linear audit --bucket=shipped --json  # Machine-readable shipped list
 
 # Admin
 crux linear states-list               # Show current QUA team workflow state IDs
