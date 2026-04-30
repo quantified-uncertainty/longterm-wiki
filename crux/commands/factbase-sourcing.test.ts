@@ -24,6 +24,20 @@ vi.mock('../lib/sourcing/verdict-handler.ts', () => ({
   storeAggregateVerdict: (...args: unknown[]) => mockStoreAggregateVerdict(...args),
 }));
 
+// QUA-851: mock fetchVerdictRecordIds so --where-no-verdict tests don't hit
+// the wiki-server. The default returns an empty set (no verdicts yet).
+const mockFetchVerdictRecordIds = vi.fn<
+  (...args: unknown[]) => Promise<{ ok: true; data: Set<string> } | { ok: false; error: string; message: string }>
+>(async () => ({ ok: true, data: new Set<string>() }));
+
+vi.mock('../lib/wiki-server/sourcing-client.ts', async (importOriginal) => {
+  const actual = (await importOriginal()) as Record<string, unknown>;
+  return {
+    ...actual,
+    fetchVerdictRecordIds: (...args: unknown[]) => mockFetchVerdictRecordIds(...args),
+  };
+});
+
 describe('crux fb sourcing --dry-run', () => {
   it('lists facts to verify for a specific entity', async () => {
     const result = await sourcing([], {
@@ -121,6 +135,155 @@ describe('crux fb sourcing --dry-run', () => {
       expect(fact.source).toBeTruthy();
       expect(fact.source).toMatch(/^https?:\/\//);
     }
+  });
+
+  it('--where-no-verdict skips facts whose IDs are in the verdict set (QUA-851)', async () => {
+    // Get the full list of fact IDs first, no filter
+    const baseline = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+    });
+    expect(baseline.exitCode).toBe(0);
+    const baselineFacts = JSON.parse(baseline.output) as Array<{ factId: string }>;
+    expect(baselineFacts.length).toBeGreaterThan(1);
+
+    // Mark the first one as already-verified; it should be skipped
+    const skipId = baselineFacts[0].factId;
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([skipId]),
+    });
+
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(skipId);
+    expect(filteredFacts.length).toBe(baselineFacts.length - 1);
+
+    expect(mockFetchVerdictRecordIds).toHaveBeenCalledWith('fact');
+  });
+
+  it('--where-no-verdict aborts when verdict fetch fails (fail-closed)', async () => {
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: false,
+      error: 'unavailable',
+      message: 'wiki-server unreachable',
+    });
+
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      'where-no-verdict': true,
+    });
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('Failed to fetch existing fact verdicts');
+    expect(result.output).toContain('wiki-server unreachable');
+  });
+
+  it('--where-no-verdict --limit=N counts AFTER filtering (QUA-851 headline use case)', async () => {
+    // Get baseline list of fact IDs for the entity
+    const baseline = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+    });
+    const baselineFacts = JSON.parse(baseline.output) as Array<{ factId: string }>;
+    expect(baselineFacts.length).toBeGreaterThanOrEqual(3);
+
+    // Mark the first two as already-verified
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([baselineFacts[0].factId, baselineFacts[1].factId]),
+    });
+
+    // Ask for 3 — we should get 3 _unverified_ facts, none being the skipped two
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+      limit: '3',
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.length).toBe(3);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(baselineFacts[0].factId);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(baselineFacts[1].factId);
+  });
+
+  it('--where-no-verdict --fact=X bypasses the filter (explicit fact lookup)', async () => {
+    const factId = 'f_dW5cR9mJ8q';
+    // --fact=X skips the verdict fetch entirely so single-fact lookups remain
+    // self-contained and don't fail-close on an unrelated wiki-server outage.
+    mockFetchVerdictRecordIds.mockClear();
+
+    const result = await sourcing([], {
+      fact: factId,
+      'dry-run': true,
+      'where-no-verdict': true,
+    });
+    expect(result.exitCode).toBe(0);
+    expect(result.output).toContain('1 fact(s)');
+    expect(mockFetchVerdictRecordIds).not.toHaveBeenCalled();
+  });
+
+  it('--where-no-verdict applied to all-entities branch (no entity/fact filter)', async () => {
+    // Get a sample fact ID that exists in the global pool
+    const sample = await sourcing([], {
+      'dry-run': true,
+      ci: true,
+      limit: '1',
+    });
+    const sampleFacts = JSON.parse(sample.output) as Array<{ factId: string }>;
+    expect(sampleFacts.length).toBe(1);
+    const skipId = sampleFacts[0].factId;
+
+    // Ask for 5 facts globally, with the sample one in the verified set.
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set([skipId]),
+    });
+    const result = await sourcing([], {
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+      limit: '5',
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.length).toBe(5);
+    expect(filteredFacts.map((f) => f.factId)).not.toContain(skipId);
+  });
+
+  it('--where-no-verdict with empty verdict set returns all facts unchanged', async () => {
+    // Default mock returns empty set
+    mockFetchVerdictRecordIds.mockResolvedValueOnce({
+      ok: true,
+      data: new Set<string>(),
+    });
+
+    const baseline = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+    });
+    const baselineFacts = JSON.parse(baseline.output) as Array<{ factId: string }>;
+
+    const result = await sourcing([], {
+      entity: 'anthropic',
+      'dry-run': true,
+      ci: true,
+      'where-no-verdict': true,
+    });
+    expect(result.exitCode).toBe(0);
+    const filteredFacts = JSON.parse(result.output) as Array<{ factId: string }>;
+    expect(filteredFacts.length).toBe(baselineFacts.length);
   });
 
   it('skips facts with non-verifiable properties (QUA-247)', async () => {
