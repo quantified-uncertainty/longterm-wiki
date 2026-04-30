@@ -67,7 +67,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -110,7 +110,7 @@ describe('submit_records via /api/enrichment/propose', () => {
   it('skips records whose source URL is not on the T1 allowlist', async () => {
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -151,7 +151,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -187,7 +187,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -229,7 +229,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(personnelTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true, // enabled, but personnel is not in VIA_PROPOSE_TABLES
     });
 
@@ -270,7 +270,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -295,7 +295,7 @@ describe('submit_records via /api/enrichment/propose', () => {
   it('records without source URL are rejected before hitting /propose', async () => {
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: true,
     });
 
@@ -324,7 +324,7 @@ describe('submit_records via /api/enrichment/propose', () => {
 
     const { buildToolHandlers } = await import('./tools.ts');
     const handlers = buildToolHandlers(grantBackfillTask, false, {
-      skipSourcing: true,
+      skipSourcing: true, skipSourcingReason: 'testing',
       viaPropose: false,
     });
 
