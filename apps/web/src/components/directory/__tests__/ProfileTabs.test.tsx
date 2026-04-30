@@ -463,6 +463,63 @@ describe("ProfileTabs", () => {
       expect(states).toEqual(["inactive", "inactive", "active"]);
     });
 
+    it("URL-encodes tab ids with special characters in the rendered href", () => {
+      mockState.pathname = basePath;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            // Pathological id with characters that would break the URL.
+            tab("a/b c", "Slashes & spaces", <div>s</div>),
+          ]}
+        />,
+      );
+      const triggers = screen.getAllByRole("tab");
+      expect(triggers[1].getAttribute("href")).toBe(`${basePath}/a%2Fb%20c`);
+    });
+
+    it("decodes encoded segments when matching them back to a tab id", () => {
+      mockState.pathname = `${basePath}/a%2Fb%20c`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div>o</div>),
+            tab("a/b c", "Slashes & spaces", <div data-testid="weird-content">s</div>),
+          ]}
+        />,
+      );
+      // The encoded segment should be decoded and matched to the registered id.
+      expect(screen.getByTestId("weird-content")).toBeTruthy();
+    });
+
+    it("renders the active TabsContent panel even though triggers are <Link>s, not <TabsTrigger>s", () => {
+      // Critical guarantee for path mode: Radix <TabsContent value=X> renders
+      // when the parent <Tabs value=X> matches, regardless of whether any
+      // <TabsTrigger> with value=X is registered. Without this, path mode
+      // would render the tab list but no panel content at all.
+      mockState.pathname = `${basePath}/facts`;
+      render(
+        <ProfileTabs
+          tabRouting={{ mode: "path", basePath }}
+          tabs={[
+            tab("overview", "Overview", <div data-testid="overview-content">o</div>),
+            tab("facts", "Facts", <div data-testid="facts-content">f</div>),
+          ]}
+        />,
+      );
+      // Active panel content renders, wrapped in a Radix tabpanel.
+      const facts = screen.getByTestId("facts-content");
+      expect(facts).toBeTruthy();
+      const factsPanel = facts.closest('[role="tabpanel"]');
+      expect(factsPanel).not.toBeNull();
+      expect(factsPanel?.getAttribute("data-state")).toBe("active");
+      // Inactive panel: Radix returns null for non-matching values, so its
+      // testid should not be in the DOM.
+      expect(screen.queryByTestId("overview-content")).toBeNull();
+    });
+
     it("throws when basePath is empty or just root", () => {
       // basePath must be a real mount point so default-tab href and segment
       // parsing are unambiguous. Catch this at render time, not silently in

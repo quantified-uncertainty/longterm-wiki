@@ -183,11 +183,13 @@ function normalizeBasePath(basePath: string): string {
 // URL the trigger Link should navigate to. The default tab lives at the bare
 // basePath (no segment); other tabs get `${basePath}/${id}`. Tabs with an
 // explicit `href` keep their own destination — those are link-tabs (e.g. wiki
-// pages) and override path-mode routing.
+// pages) and override path-mode routing. Tab ids are URL-encoded so an id
+// containing `/`, `?`, or whitespace can't break the path or be misparsed
+// back into a different segment by `pickActiveTabFromPath`.
 function tabHrefFor(tab: ProfileTab, basePath: string, defaultTabId: string): string {
   if (tab.href) return tab.href;
   const base = normalizeBasePath(basePath);
-  return tab.id === defaultTabId ? base : `${base}/${tab.id}`;
+  return tab.id === defaultTabId ? base : `${base}/${encodeURIComponent(tab.id)}`;
 }
 
 // Pick the active tab + flag any unknown segment so we can surface a notice.
@@ -204,9 +206,18 @@ function pickActiveTabFromPath(
   }
   if (pathname.startsWith(`${base}/`)) {
     const remainder = pathname.slice(base.length + 1);
-    const segment = remainder.split("/")[0] ?? "";
-    if (segment === "") {
+    const rawSegment = remainder.split("/")[0] ?? "";
+    if (rawSegment === "") {
       return { activeTab: defaultTabId, unknownRequested: null };
+    }
+    // Decode so an encoded id (e.g. "foo%2Fbar") matches the registered tab
+    // id ("foo/bar"). Falls back to the raw segment if decoding throws on
+    // malformed input.
+    let segment = rawSegment;
+    try {
+      segment = decodeURIComponent(rawSegment);
+    } catch {
+      // Malformed percent-encoding — keep raw, will surface as unknown.
     }
     const selectableIds = new Set(tabs.filter((t) => !t.href).map((t) => t.id));
     if (selectableIds.has(segment)) {
@@ -223,10 +234,18 @@ function pickActiveTabFromPath(
 
 // In path mode, render a Radix-styled Link that visually matches a TabsTrigger
 // but doesn't participate in TabsRoot's controlled value. Active state is
-// driven by aria-selected so the existing CSS targeting `[data-state="active"]`
+// driven by data-state so the existing CSS targeting `[data-state="active"]`
 // keeps working without coupling to Radix's internal state machine.
 const HORIZONTAL_LINK_TRIGGER = `${HORIZONTAL_TRIGGER} no-underline`;
 const VERTICAL_LINK_TRIGGER = `profile-tab-vertical ${VERTICAL_ROW_BASE} no-underline`;
+
+// Resolved path-mode metadata threaded through the layout components when the
+// triggers should render as Links rather than Radix TabsTriggers.
+type PathRoutingContext = {
+  basePath: string;
+  activeTab: string;
+  defaultTabId: string;
+};
 
 function HorizontalTabsList({
   tabs,
@@ -236,7 +255,7 @@ function HorizontalTabsList({
   tabs: ProfileTab[];
   ariaLabel?: string;
   /** Set in path mode. Triggers render as `<Link>` with active state derived from `activeTab`. */
-  pathRouting?: { basePath: string; activeTab: string; defaultTabId: string };
+  pathRouting?: PathRoutingContext;
 }) {
   return (
     <TabsList aria-label={ariaLabel ?? "Page sections"} className={HORIZONTAL_TABLIST}>
@@ -247,7 +266,6 @@ function HorizontalTabsList({
             <Link
               key={tab.id}
               href={tabHrefFor(tab, pathRouting.basePath, pathRouting.defaultTabId)}
-              prefetch
               role="tab"
               aria-label={ariaLabelFor(tab)}
               aria-selected={isActive}
@@ -288,7 +306,7 @@ function VerticalTabsNav({
   groups?: ProfileTabGroup[];
   ariaLabel?: string;
   /** Set in path mode. Non-link tabs render as `<Link>` with active state derived from `activeTab`. */
-  pathRouting?: { basePath: string; activeTab: string; defaultTabId: string };
+  pathRouting?: PathRoutingContext;
 }) {
   const buckets = bucketByGroup(tabs, groups);
   // TabsList supplies the RovingFocusGroup context that TabsTrigger needs.
@@ -399,7 +417,7 @@ function HorizontalLayout({
   onChange: (value: string) => void;
   ariaLabel?: string;
   notice?: React.ReactNode;
-  pathRouting?: { basePath: string; defaultTabId: string };
+  pathRouting?: Omit<PathRoutingContext, "activeTab">;
 }) {
   return (
     <Tabs value={activeTab} onValueChange={onChange}>
@@ -429,7 +447,7 @@ function VerticalLayout({
   ariaLabel?: string;
   groups?: ProfileTabGroup[];
   notice?: React.ReactNode;
-  pathRouting?: { basePath: string; defaultTabId: string };
+  pathRouting?: Omit<PathRoutingContext, "activeTab">;
 }) {
   return (
     <Tabs
