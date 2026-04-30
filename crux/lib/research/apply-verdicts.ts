@@ -74,8 +74,11 @@ export function canonicalizePersonKey(input: string): string {
  * (stableId or slug). Called once per added/updated stakeholder. Return null
  * if no match. The applier stores the result on the stakeholder's `entityId`
  * field when matched.
+ *
+ * Parameter is named `canonical` (not `canonicalSlug`) to avoid shadowing
+ * the imported `canonicalSlug` function in callers.
  */
-export type StakeholderEntityResolver = (canonicalSlug: string, displayName: string) => string | null;
+export type StakeholderEntityResolver = (canonical: string, displayName: string) => string | null;
 
 export interface ApplyPolicyOptions {
   resolveStakeholderEntity?: StakeholderEntityResolver;
@@ -171,6 +174,7 @@ export function applyVerdictsToPolicy(
       const canonFromName = canonicalSlug(name);
       const matchKey = (existingName: string) => {
         const c = canonicalSlug(existingName);
+        if (!c) return false; // an existing entry with empty name shouldn't gobble new entries
         return c === canonFromSlug || c === canonFromName;
       };
       const existing = next.stakeholders.find((s) => matchKey(s.name));

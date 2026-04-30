@@ -216,8 +216,8 @@ async function applyVerdictsToEntity(
 ): Promise<ApplyResult<EntityWithType>> {
   if (entity.type === "policy") {
     // Build a stakeholder resolver from verdict displayHints. Pre-fetch entity
-    // search once per unique candidate; the resolver closure is synchronous
-    // because the applier is pure.
+    // search once per unique candidate (in parallel) — the resolver closure
+    // itself is synchronous because the applier is pure.
     const candidateNames = new Set<string>();
     for (const v of verdicts) {
       if (!v.targetField.startsWith("stakeholder.")) continue;
@@ -225,23 +225,27 @@ async function applyVerdictsToEntity(
       if (name) candidateNames.add(name);
     }
     const resolved = new Map<string, string>();
-    for (const name of candidateNames) {
-      try {
-        const sr = await searchEntities(name, 5);
-        if (!sr.ok) continue;
-        const data = sr.data as { results?: Array<{ id: string; title?: string; entityType?: string }> };
-        const results = data.results ?? [];
-        const targetCanon = canonicalSlug(name);
-        // Match if any search result's title or id canonicalizes to the same slug.
-        const match = results.find((r) => {
-          const rcanon = canonicalSlug(r.title ?? "") || canonicalSlug(r.id);
-          return rcanon === targetCanon;
-        });
-        if (match) resolved.set(targetCanon, match.id);
-      } catch {
-        // network/api error — skip cross-ref for this candidate
-      }
-    }
+    await Promise.all(
+      Array.from(candidateNames).map(async (name) => {
+        try {
+          const sr = await searchEntities(name, 5);
+          if (!sr.ok) return;
+          const data = sr.data as { results?: Array<{ id: string; title?: string; entityType?: string }> };
+          const results = data.results ?? [];
+          const targetCanon = canonicalSlug(name);
+          if (!targetCanon) return;
+          // Match if any search result's title or id canonicalizes to the same slug.
+          const match = results.find((r) => {
+            const rcanon = canonicalSlug(r.title ?? "") || canonicalSlug(r.id);
+            return rcanon === targetCanon;
+          });
+          if (match) resolved.set(targetCanon, match.id);
+        } catch (e) {
+          // network/api error — skip cross-ref for this candidate
+          void e;
+        }
+      }),
+    );
     const stakeholderResolver: StakeholderEntityResolver = (canon) =>
       resolved.get(canon) ?? null;
     const r = applyVerdictsToPolicy(entity as unknown as PolicyEntity, verdicts, {

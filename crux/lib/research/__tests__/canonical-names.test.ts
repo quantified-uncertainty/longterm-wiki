@@ -107,6 +107,48 @@ describe("generateSlugCandidates", () => {
   });
 });
 
+describe("canonicalSlug — edge cases & no-false-match", () => {
+  it("'FBI Warning' (compound name with FBI prefix) does NOT match FBI", () => {
+    expect(canonicalSlug("FBI Warning")).toBe("fbi-warning");
+  });
+
+  it("'Senate cafeteria' does NOT match the senate canonical", () => {
+    expect(canonicalSlug("Senate cafeteria")).toBe("senate-cafeteria");
+  });
+
+  it("'Treasury bonds' does NOT match treasury canonical", () => {
+    expect(canonicalSlug("Treasury bonds")).toBe("treasury-bonds");
+  });
+
+  it("does not truncate long compound names (slugify-60-char-cap regression)", () => {
+    // Build a long name that, under apply-verdicts.ts's 60-char slugify, would
+    // truncate. canonicalSlug uses fullSlug to avoid silent alias misses.
+    const long =
+      "Office of the Director of National Intelligence and Other Offices and Bodies";
+    // The substring "office of the director of national intelligence" still
+    // matches via the prefix-stripped path? Actually no — the candidate
+    // generator only does parens-split + U.S.-prefix-strip, not arbitrary
+    // substring splitting. So this should slug to its full form (no truncation).
+    const got = canonicalSlug(long);
+    expect(got.length).toBeGreaterThan(60);
+    expect(got).toBe(
+      "office-of-the-director-of-national-intelligence-and-other-offices-and-bodies",
+    );
+  });
+
+  it("handles unicode (non-ASCII) input by collapsing to slug", () => {
+    expect(canonicalSlug("Comisión Federal")).toBe("comisi-n-federal");
+  });
+
+  it("handles trailing/leading whitespace", () => {
+    expect(canonicalSlug("  FBI  ")).toBe("federal-bureau-of-investigation");
+  });
+
+  it("returns the raw slug when no alias matches and no candidates collide", () => {
+    expect(canonicalSlug("Some Brand New Org")).toBe("some-brand-new-org");
+  });
+});
+
 describe("STAKEHOLDER_ALIASES dictionary integrity", () => {
   it("every canonical key is itself in its alias list", () => {
     for (const [canonical, aliases] of Object.entries(STAKEHOLDER_ALIASES)) {

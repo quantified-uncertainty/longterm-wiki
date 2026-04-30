@@ -11,15 +11,26 @@
 //   1. Generate slug candidates from the input (full slug, parenthetical
 //      splits like "FBI (Federal Bureau of Investigation)" → "fbi" + "federal-bureau-of-investigation",
 //      and prefix-stripped variants like "U.S. Department of Justice" → "department-of-justice").
-//   2. Look each candidate up in STAKEHOLDER_ALIASES.
+//   2. Look each candidate up in STAKEHOLDER_ALIASES (via a reverse-index Map
+//      built once at module load — O(1) lookups).
 //   3. Return the canonical slug if any candidate matches; else the first candidate.
 //
-// The dictionary is a hand-curated allowlist, seeded from common federal
+// The dictionary is a hand-curated allowlist scoped to **U.S. federal**
 // agencies, civil-liberties orgs, and major intelligence/justice bodies that
-// recur in policy stakeholder lists. Extend it over time as new aliases are
-// observed in pipeline runs.
+// recur in U.S. policy stakeholder lists. Extend it over time as new aliases
+// are observed in pipeline runs. Bare aliases like "senate", "treasury",
+// "congress" mean the U.S. ones — non-US institutions should not use this
+// module without scoping (see comment on STAKEHOLDER_ALIASES below).
 
-import { slugify } from "./apply-verdicts.ts";
+// Slug helper, intentionally separate from apply-verdicts.ts::slugify which
+// truncates at 60 chars. Truncation can silently break alias lookups when
+// long compound names are run through this module, so we use the full slug.
+function fullSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+}
 
 /**
  * Map of canonical slug → list of accepted aliases (already in slug form).
@@ -27,7 +38,13 @@ import { slugify } from "./apply-verdicts.ts";
  * so we can also use this dictionary for cross-base entityId linking.
  *
  * Always include the canonical slug itself in its own alias list for
- * symmetry — we look up by `aliases.includes(candidate)`.
+ * symmetry — we look up via the reverse index built below, which seeds
+ * itself from each (canonical, alias) pair.
+ *
+ * **Scope: U.S. federal institutions only.** Bare aliases like "senate",
+ * "congress", "treasury" are interpreted as the U.S. ones. Do not extend
+ * this dictionary with non-U.S. institutions sharing those names without
+ * also re-scoping the existing entries (e.g. rename "senate" → "us-senate").
  */
 export const STAKEHOLDER_ALIASES: Record<string, string[]> = {
   // ── Intelligence community ────────────────────────────────────────────────
@@ -121,9 +138,35 @@ export const STAKEHOLDER_ALIASES: Record<string, string[]> = {
     "us-house-of-representatives",
     "u-s-house-of-representatives",
   ],
-  senate: ["senate", "us-senate", "u-s-senate", "united-states-senate"],
-  congress: ["congress", "us-congress", "u-s-congress", "united-states-congress"],
+  "senate": ["senate", "us-senate", "u-s-senate", "united-states-senate"],
+  "congress": ["congress", "us-congress", "u-s-congress", "united-states-congress"],
 };
+
+/**
+ * Reverse index: alias slug → canonical slug. Built once at module load,
+ * so canonicalSlug() does an O(1) Map lookup instead of an O(N×M) scan.
+ *
+ * Throws on duplicate alias (two canonicals claiming the same alias) — the
+ * dictionary integrity test enforces this, but the runtime check provides
+ * a second line of defense.
+ */
+const ALIAS_INDEX: Map<string, string> = (() => {
+  const index = new Map<string, string>();
+  for (const [canonical, aliases] of Object.entries(STAKEHOLDER_ALIASES)) {
+    for (const alias of aliases) {
+      const prev = index.get(alias);
+      if (prev !== undefined && prev !== canonical) {
+        throw new Error(
+          `STAKEHOLDER_ALIASES: alias "${alias}" claimed by both "${prev}" and "${canonical}"`,
+        );
+      }
+      index.set(alias, canonical);
+    }
+    // Also ensure canonical maps to itself.
+    if (!index.has(canonical)) index.set(canonical, canonical);
+  }
+  return index;
+})();
 
 /**
  * Generate slug candidates from a name. Tries:
@@ -131,7 +174,8 @@ export const STAKEHOLDER_ALIASES: Record<string, string[]> = {
  *  - Parenthetical split: "FBI (Federal Bureau of Investigation)" yields "fbi" and "federal-bureau-of-investigation".
  *  - Prefix-stripped variants: "U.S. Department of Justice" yields "department-of-justice".
  *
- * Used by canonicalSlug() to widen the alias-lookup search.
+ * Used by canonicalSlug() to widen the alias-lookup search. Uses fullSlug
+ * (no truncation) so long compound names match correctly.
  */
 export function generateSlugCandidates(input: string): string[] {
   if (!input) return [];
@@ -139,7 +183,7 @@ export function generateSlugCandidates(input: string): string[] {
   const seen = new Set<string>();
   const add = (s: string | undefined | null) => {
     if (!s) return;
-    const slug = slugify(s);
+    const slug = fullSlug(s);
     if (slug && !seen.has(slug)) {
       seen.add(slug);
       out.push(slug);
@@ -165,17 +209,16 @@ export function generateSlugCandidates(input: string): string[] {
  * Resolve a name (display string or slug) to a canonical slug. Returns the
  * canonical slug if any candidate (full slug, parenthetical split, prefix-
  * stripped variant) matches an alias in STAKEHOLDER_ALIASES; otherwise
- * returns the first candidate slug, or the slugified input as a last resort.
+ * returns the first candidate slug, or the full slug as a last resort.
+ *
+ * Returns "" only when the input is empty/whitespace-only.
  */
 export function canonicalSlug(input: string): string {
   if (!input) return "";
   const candidates = generateSlugCandidates(input);
   for (const candidate of candidates) {
-    for (const [canonical, aliases] of Object.entries(STAKEHOLDER_ALIASES)) {
-      if (canonical === candidate || aliases.includes(candidate)) {
-        return canonical;
-      }
-    }
+    const canonical = ALIAS_INDEX.get(candidate);
+    if (canonical) return canonical;
   }
-  return candidates[0] ?? slugify(input);
+  return candidates[0] ?? fullSlug(input);
 }
