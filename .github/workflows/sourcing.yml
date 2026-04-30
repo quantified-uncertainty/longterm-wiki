@@ -15,7 +15,7 @@ on:
         default: '50'
         type: string
       table:
-        description: 'Table to check (personnel|grants|funding-rounds|divisions|funding-programs|policy-stakeholders|all)'
+        description: 'Table to check (fact|personnel|grants|funding-rounds|divisions|funding-programs|policy-stakeholders|all)'
         required: false
         default: 'all'
         type: string
@@ -74,7 +74,13 @@ jobs:
         run: |
           ARGS="--budget=${INPUT_BUDGET} --batch --verbose"
 
-          if [ "${INPUT_TABLE}" != "all" ]; then
+          # `fact` is not a record type — verify-orchestrate routes facts via
+          # --type=fact, while --table= filters records to a specific record type
+          # (personnel, grant, etc). Translating here keeps the workflow input
+          # uniform for callers (QUA-887).
+          if [ "${INPUT_TABLE}" = "fact" ]; then
+            ARGS="$ARGS --type=fact"
+          elif [ "${INPUT_TABLE}" != "all" ]; then
             ARGS="$ARGS --table=${INPUT_TABLE}"
           fi
 
