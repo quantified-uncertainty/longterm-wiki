@@ -12,8 +12,13 @@
 //   6. polls until settled, then applies verified+partial verdicts to YAML
 //   7. records per-iteration metrics; exits when target hit / iters / budget
 //
+// Supported entity types:
+//   - policy        (data/entities/responses.yaml)
+//   - organization  (data/entities/organizations.yaml)
+//
 // Usage:
 //   pnpm crux tb improve-entity fisa-702 --target=15 --budget=2 --max-iters=3
+//   pnpm crux tb improve-entity anthropic --target=10 --max-iters=1
 
 import fs from "node:fs";
 import path from "node:path";
@@ -24,16 +29,43 @@ import { type CommandResult } from "../lib/cli.ts";
 import { runResearch } from "../lib/search/research-agent.ts";
 import { proposeClaims, getClaimStatus } from "../lib/wiki-server/claims.ts";
 import { suggestResourcesApi } from "../lib/wiki-server/resources.ts";
+import { searchEntities } from "../lib/wiki-server/entities.ts";
 import { createLlmClient, streamingCreate, extractText, MODELS } from "../lib/llm.ts";
 import { escapeXml } from "../lib/prompt-utils.ts";
 
-import { analyzePolicyGaps, policyCoverageScore, type Gap, type PolicyEntity } from "../lib/research/gap-analyzer.ts";
+import {
+  analyzePolicyGaps,
+  analyzeOrganizationGaps,
+  policyCoverageScore,
+  organizationCoverageScore,
+  type CoverageScore,
+  type Gap,
+  type OrganizationEntity,
+  type PolicyEntity,
+} from "../lib/research/gap-analyzer.ts";
 import { preFilterBatch, type PreFilterClaim } from "../lib/research/pre-filter.ts";
-import { applyVerdictsToPolicy, type VerifiedVerdict } from "../lib/research/apply-verdicts.ts";
+import {
+  applyVerdictsToOrganization,
+  applyVerdictsToPolicy,
+  canonicalizePersonKey,
+  type ApplyResult,
+  type PersonEntityResolver,
+  type VerifiedVerdict,
+} from "../lib/research/apply-verdicts.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
-const RESPONSES_YAML = path.join(ROOT, "data/entities/responses.yaml");
+const ENTITIES_DIR = path.join(ROOT, "data/entities");
 const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
+
+const SUPPORTED_TYPES = new Set(["policy", "organization"]);
+
+interface EntityWithType {
+  id: string;
+  stableId?: string;
+  type: string;
+  title?: string;
+  [k: string]: unknown;
+}
 
 interface IterationMetrics {
   iter: number;
@@ -56,6 +88,7 @@ interface IterationMetrics {
 interface ImproveResult {
   entity_slug: string;
   entity_id: string;
+  entity_type: string;
   iterations: IterationMetrics[];
   final_coverage: number;
   final_facts: Record<string, number>;
@@ -82,30 +115,48 @@ interface ExtractedClaim {
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
-// YAML I/O — load/save the entity record from data/entities/responses.yaml
+// YAML I/O — locate the entity's source file by scanning data/entities/
 // ──────────────────────────────────────────────────────────────────────────────
 
-function loadResponsesYaml(): unknown[] {
-  const raw = fs.readFileSync(RESPONSES_YAML, "utf8");
-  return yaml.load(raw) as unknown[];
+interface FoundEntity {
+  entity: EntityWithType;
+  filePath: string;
+  index: number;
 }
 
-function findPolicyEntity(slug: string): { entity: PolicyEntity; index: number } | null {
-  const all = loadResponsesYaml();
-  const idx = all.findIndex((e) => (e as PolicyEntity).id === slug);
-  if (idx === -1) return null;
-  return { entity: all[idx] as PolicyEntity, index: idx };
+/** Find an entity by slug across all data/entities/*.yaml files. */
+function findEntity(slug: string): FoundEntity | null {
+  const files = fs
+    .readdirSync(ENTITIES_DIR)
+    .filter((f) => f.endsWith(".yaml"))
+    .map((f) => path.join(ENTITIES_DIR, f));
+  for (const filePath of files) {
+    let parsed: unknown;
+    try {
+      parsed = yaml.load(fs.readFileSync(filePath, "utf8"));
+    } catch {
+      continue;
+    }
+    if (!Array.isArray(parsed)) continue;
+    const idx = parsed.findIndex((e) => (e as EntityWithType).id === slug);
+    if (idx !== -1) {
+      return { entity: parsed[idx] as EntityWithType, filePath, index: idx };
+    }
+  }
+  return null;
 }
 
-function saveEntity(slug: string, entity: PolicyEntity): void {
-  // Surgical splice: replace ONLY the bytes for this entity's block, leaving
-  // the rest of the file byte-identical. Avoids the diff-bomb that
-  // yaml.dump(allEntities) creates by reformatting every other entity.
-  const raw = fs.readFileSync(RESPONSES_YAML, "utf8");
+/**
+ * Surgical splice: replace ONLY the bytes for this entity's block, leaving
+ * the rest of the file byte-identical. Avoids the diff-bomb that
+ * yaml.dump(allEntities) creates by reformatting every other entity.
+ */
+function saveEntity(filePath: string, slug: string, entity: EntityWithType): void {
+  const raw = fs.readFileSync(filePath, "utf8");
   const lines = raw.split("\n");
   const startMarker = `- id: ${slug}`;
   const startIdx = lines.findIndex((l) => l.startsWith(startMarker));
-  if (startIdx === -1) throw new Error(`Entity ${slug} not found in YAML`);
+  if (startIdx === -1) throw new Error(`Entity ${slug} not found in ${filePath}`);
   // The block ends at the next "- id:" or EOF.
   let endIdx = lines.length;
   for (let i = startIdx + 1; i < lines.length; i++) {
@@ -114,14 +165,93 @@ function saveEntity(slug: string, entity: PolicyEntity): void {
       break;
     }
   }
-  // Serialize JUST this entity wrapped in a list, then strip the leading "- ".
   const blockYaml = yaml
     .dump([entity], { indent: 2, lineWidth: 120, noRefs: true, sortKeys: false })
     .trimEnd();
   const before = lines.slice(0, startIdx).join("\n");
   const after = lines.slice(endIdx).join("\n");
   const out = (before ? before + "\n" : "") + blockYaml + "\n" + after;
-  fs.writeFileSync(RESPONSES_YAML, out, "utf8");
+  fs.writeFileSync(filePath, out, "utf8");
+}
+
+// ──────────────────────────────────────────────────────────────────────────────
+// Type-aware dispatch
+// ──────────────────────────────────────────────────────────────────────────────
+
+function gapsFor(entity: EntityWithType): Gap[] {
+  if (entity.type === "policy") return analyzePolicyGaps(entity as unknown as PolicyEntity);
+  if (entity.type === "organization")
+    return analyzeOrganizationGaps(entity as unknown as OrganizationEntity);
+  return [];
+}
+
+function coverageFor(entity: EntityWithType): CoverageScore {
+  if (entity.type === "policy") return policyCoverageScore(entity as unknown as PolicyEntity);
+  if (entity.type === "organization")
+    return organizationCoverageScore(entity as unknown as OrganizationEntity);
+  return { score: 0, components: {}, facts_in_yaml: {} };
+}
+
+function progressMetric(entity: EntityWithType): number {
+  if (entity.type === "policy") {
+    const e = entity as unknown as PolicyEntity;
+    return (e.provisions?.length ?? 0) + (e.stakeholders?.length ?? 0);
+  }
+  if (entity.type === "organization") {
+    const e = entity as unknown as OrganizationEntity;
+    return (
+      (e.products?.length ?? 0) +
+      (e.keyPeople?.length ?? 0) +
+      (e.keyDates?.length ?? 0)
+    );
+  }
+  return 0;
+}
+
+async function applyVerdictsToEntity(
+  entity: EntityWithType,
+  verdicts: VerifiedVerdict[],
+): Promise<ApplyResult<EntityWithType>> {
+  if (entity.type === "policy") {
+    const r = applyVerdictsToPolicy(entity as unknown as PolicyEntity, verdicts);
+    return r as unknown as ApplyResult<EntityWithType>;
+  }
+  if (entity.type === "organization") {
+    // Build a person resolver from the verdicts' display names. We pre-fetch
+    // search results once per unique candidate to keep the closure synchronous.
+    const candidateNames = new Set<string>();
+    for (const v of verdicts) {
+      if (!v.targetField.startsWith("keyPerson.")) continue;
+      const name = v.displayHint ?? v.targetField.slice("keyPerson.".length);
+      if (name) candidateNames.add(name);
+    }
+    const resolved = new Map<string, string>();
+    for (const name of candidateNames) {
+      try {
+        const sr = await searchEntities(name, 5);
+        if (!sr.ok) continue;
+        const data = sr.data as { results?: Array<{ id: string; title?: string; entityType?: string }> };
+        const results = data.results ?? [];
+        const targetCanon = canonicalizePersonKey(name);
+        const match = results.find(
+          (r) => r.entityType === "person" && canonicalizePersonKey(r.title ?? r.id) === targetCanon,
+        );
+        if (match) resolved.set(targetCanon, match.id);
+      } catch {
+        // network/api error — skip cross-ref for this candidate
+      }
+    }
+    const resolver: PersonEntityResolver = (canon) => resolved.get(canon) ?? null;
+    const r = applyVerdictsToOrganization(entity as unknown as OrganizationEntity, verdicts, {
+      resolvePersonEntity: resolver,
+    });
+    return r as unknown as ApplyResult<EntityWithType>;
+  }
+  return {
+    entity,
+    applied: [],
+    warnings: [`unsupported entity type for verdict applier: ${entity.type}`],
+  };
 }
 
 // ──────────────────────────────────────────────────────────────────────────────
@@ -136,19 +266,59 @@ function llm() {
   return _llm;
 }
 
-function buildExtractPrompt(entity: PolicyEntity, gaps: Gap[], sourceUrl: string, sourceContent: string): string {
+interface ExtractFieldGuide {
+  scalarFieldsHint: string;
+  arrayTargetsHint: string;
+}
+
+function extractFieldGuide(entityType: string): ExtractFieldGuide {
+  if (entityType === "organization") {
+    return {
+      scalarFieldsHint:
+        '"scalar.<field>" where <field> is description/website/orgType/founded/headquarters/employees/funding/parentOrg/orgStatus/safetyFocus',
+      arrayTargetsHint:
+        '"product.<name-slug>"      e.g. "product.claude-3-5-sonnet"\n' +
+        '    "keyPerson.<name-slug>"    e.g. "keyPerson.dario-amodei"\n' +
+        '    "keyDate.<event-slug>"     e.g. "keyDate.founded-2021"\n' +
+        '    "tag.<value>"\n' +
+        '    "relatedEntry.<entity-slug>"\n' +
+        '    "factbase.revenue" or "factbase.valuation"  (will be routed to FactBase, separate ticket)',
+    };
+  }
+  // policy
+  return {
+    scalarFieldsHint:
+      '"scalar.<field>" where <field> is description/billNumber/introduced/policyStatus/author/jurisdiction/fullTextUrl',
+    arrayTargetsHint:
+      '"provision.<title-slug>"    e.g. "provision.targeting-non-us-persons"\n' +
+      '    "stakeholder.<name-slug>"   e.g. "stakeholder.american-civil-liberties-union"\n' +
+      '    "tag.<value>"\n' +
+      '    "relatedEntry.<entity-slug>"',
+  };
+}
+
+function buildExtractPrompt(
+  entity: EntityWithType,
+  gaps: Gap[],
+  sourceUrl: string,
+  sourceContent: string,
+): string {
   const truncated = sourceContent.slice(0, 8000);
   const gapsXml = gaps
     .map((g) =>
       `  <gap key="${escapeXml(g.key)}" target="${escapeXml(g.target)}">${escapeXml(g.description)}</gap>`,
     )
     .join("\n");
-  return `Extract structured facts from the source document below to fill gaps in the policy entity "${escapeXml(entity.title ?? entity.id)}".
+  const guide = extractFieldGuide(entity.type);
+  const description = typeof entity.description === "string" ? entity.description : "";
+  return `Extract structured facts from the source document below to fill gaps in the ${escapeXml(
+    entity.type,
+  )} entity "${escapeXml(entity.title ?? entity.id)}".
 
 <entity id="${escapeXml(entity.id)}">
   <type>${escapeXml(entity.type)}</type>
   <title>${escapeXml(entity.title ?? "")}</title>
-  <description>${escapeXml((entity.description ?? "").slice(0, 500))}</description>
+  <description>${escapeXml(description.slice(0, 500))}</description>
 </entity>
 
 <gaps_to_fill>
@@ -161,18 +331,15 @@ ${escapeXml(truncated)}
 
 For each fact you can extract from the source that fills one of the gaps, return a JSON object with:
 - targetField: one of:
-    "scalar.<field>"           where <field> is description/billNumber/introduced/policyStatus/author/jurisdiction/fullTextUrl
-    "provision.<title-slug>"    e.g. "provision.targeting-non-us-persons"
-    "stakeholder.<name-slug>"   e.g. "stakeholder.american-civil-liberties-union"
-    "tag.<value>"
-    "relatedEntry.<entity-slug>"
-- claimText: a concise, paraphrased assertion that can be verified against the source. Avoid overly-specific dates or vote tallies unless the source states them verbatim.
-- proposedValue: the actual value to write into YAML (a sentence for provision/stakeholder/description, a short string for billNumber/dates/etc.).
-- displayHint: human title for new provisions/stakeholders (e.g. "Targeting Non-US Persons Abroad", "American Civil Liberties Union (ACLU)").
+    ${guide.scalarFieldsHint}
+    ${guide.arrayTargetsHint}
+- claimText: a concise, paraphrased assertion that can be verified against the source. Avoid overly-specific dates or figures unless the source states them verbatim.
+- proposedValue: the actual value to write into YAML (a sentence for product/keyDate description / provision / stakeholder / description, a short string for billNumber/dates/etc., a date string for keyDate.*).
+- displayHint: human label for new array entries (e.g. "Claude 3.5 Sonnet", "Dario Amodei", "Founded as Anthropic PBC").
 
 CRITICAL:
 - Only extract claims explicitly supported by the source.
-- Do NOT fabricate stakeholder positions or vote tallies.
+- Do NOT fabricate data, positions, valuations, or vote tallies.
 - Prefer paraphrased claims over exact quotes; the verifier will reject claims whose specific tokens aren't in the source.
 - Return at most 8 claims per call.
 
@@ -180,7 +347,7 @@ Return ONLY a JSON array. No prose, no markdown fences.`;
 }
 
 async function extractGapClaims(
-  entity: PolicyEntity,
+  entity: EntityWithType,
   gaps: Gap[],
   sourceUrl: string,
   sourceContent: string,
@@ -206,7 +373,6 @@ async function extractGapClaims(
 
   const cost = (inT / 1_000_000) * HAIKU_PRICING.inputPerM + (outT / 1_000_000) * HAIKU_PRICING.outputPerM;
 
-  // Parse — tolerant of leading/trailing prose.
   const match = raw.match(/\[[\s\S]*\]/);
   if (!match) return { claims: [], cost };
   let parsed: unknown;
@@ -231,10 +397,10 @@ async function extractGapClaims(
 // ──────────────────────────────────────────────────────────────────────────────
 
 async function runIteration(
-  entity: PolicyEntity,
+  entity: EntityWithType,
   iter: number,
   budgetRemainingUsd: number,
-): Promise<{ entity: PolicyEntity; metrics: IterationMetrics }> {
+): Promise<{ entity: EntityWithType; metrics: IterationMetrics }> {
   const t0 = Date.now();
   const m: IterationMetrics = {
     iter,
@@ -254,7 +420,7 @@ async function runIteration(
     duration_s: 0,
   };
 
-  const gaps = analyzePolicyGaps(entity);
+  const gaps = gapsFor(entity);
   m.gaps_identified = gaps.length;
   if (gaps.length === 0) {
     console.log(`[iter ${iter}] No gaps. Done.`);
@@ -287,9 +453,7 @@ async function runIteration(
   m.cost_research_usd = research.metadata.totalCost ?? 0;
   console.log(`[iter ${iter}] research: ${m.sources_found} sources, $${m.cost_research_usd.toFixed(4)}`);
 
-  // 2. Resolve resourceIds for each source by suggesting them again (idempotent).
-  //    runResearch already registered them in PG but doesn't expose the resourceId
-  //    on the SourceCacheEntry; suggestResourcesApi returns the canonical IDs.
+  // 2. Resolve resourceIds for each source.
   const sourceUrls = research.sources.map((s) => s.url);
   const resourceIdByUrl = new Map<string, string>();
   if (sourceUrls.length > 0) {
@@ -301,14 +465,13 @@ async function runIteration(
     }
   }
 
-  // 3. Extract claims from each source — content is already in SourceCacheEntry.content.
+  // 3. Extract claims from each source.
   const allClaims: Array<ExtractedClaim & { resourceId: string; sourceUrl: string }> = [];
   const contentByKey = new Map<string, string>();
   for (const src of research.sources) {
     const content = src.content ?? "";
     if (!content || content.length < 200) continue;
     const resourceId = resourceIdByUrl.get(src.url) ?? "";
-    // Key the pre-filter map by sourceUrl (always present), not resourceId.
     contentByKey.set(src.url, content);
     const ex = await extractGapClaims(entity, gaps, src.url, content);
     m.cost_extract_usd += ex.cost;
@@ -324,12 +487,10 @@ async function runIteration(
     return { entity, metrics: m };
   }
 
-  // 4. Pre-submission token filter — key by sourceUrl (not resourceId).
+  // 4. Pre-submission token filter — key by sourceUrl.
   const preFilterInput: PreFilterClaim[] = allClaims.map((c) => ({
     claimText: c.claimText,
     proposedValue: c.proposedValue,
-    // Stuff sourceUrl into the resourceId slot so preFilterBatch's content
-    // lookup hits our contentByKey map (which keys on URL).
     resourceId: c.sourceUrl,
     sourceUrl: c.sourceUrl,
     realResourceId: c.resourceId,
@@ -374,17 +535,22 @@ async function runIteration(
   m.claims_proposed = data.claims.length;
   console.log(`[iter ${iter}] submitted batch ${data.batchId} (${m.claims_proposed} claims)`);
 
-  // 6. Poll until settled (max ~30 minutes — when no local worker is running,
-  //    prod workers can be slow to claim a 20-claim batch).
+  // 6. Poll until settled.
   let settled = false;
   let rounds = 0;
   const MAX_POLL_ROUNDS = 60;
-  let lastVerdicts: Array<{ id: number; status: string; verdictReasoning: string | null; extractedValue: string | null; claimText: string }> = [];
+  let lastVerdicts: Array<{
+    id: number;
+    status: string;
+    verdictReasoning: string | null;
+    extractedValue: string | null;
+    claimText: string;
+  }> = [];
   while (!settled && rounds < MAX_POLL_ROUNDS) {
     await new Promise((r) => setTimeout(r, 30000));
     const sr = await getClaimStatus(data.batchId);
     if (!sr.ok) break;
-    const sd = sr.data as { allSettled: boolean; claims: typeof lastVerdicts };
+    const sd = sr.data as unknown as { allSettled: boolean; claims: typeof lastVerdicts };
     lastVerdicts = sd.claims;
     settled = sd.allSettled;
     rounds++;
@@ -394,10 +560,9 @@ async function runIteration(
     if (settled) break;
   }
 
-  // 6. Apply verified+partial to YAML.
+  // 7. Apply verified+partial to YAML.
   const verdictsByClaimId = new Map(lastVerdicts.map((v) => [v.id, v]));
   const submittedByOrder = filterResult.kept;
-  // Hono's propose endpoint returns inserted claims in the same order as submitted.
   const verifiedVerdicts: VerifiedVerdict[] = [];
   for (let i = 0; i < submittedByOrder.length; i++) {
     const insertedId = data.claims[i]?.id;
@@ -423,7 +588,7 @@ async function runIteration(
   }
   m.verified_rate = m.claims_proposed > 0 ? (m.claims_verified + m.claims_partial) / m.claims_proposed : 0;
 
-  const apply = applyVerdictsToPolicy(entity, verifiedVerdicts);
+  const apply = await applyVerdictsToEntity(entity, verifiedVerdicts);
   m.applied_to_yaml = apply.applied.filter((a) => a.action === "added" || a.action === "updated").length;
   console.log(`[iter ${iter}] applied ${m.applied_to_yaml} new facts to YAML`);
   if (apply.warnings.length > 0) {
@@ -441,17 +606,28 @@ async function runIteration(
 export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
   const slug = (args[0] || "").trim();
   if (!slug) {
-    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N]", exitCode: 1 };
+    return {
+      output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N]",
+      exitCode: 1,
+    };
   }
   const target = options.target != null ? parseInt(options.target as string, 10) : 12;
   const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
   const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
   const noWrite = !!options.dryRun;
 
-  const found = findPolicyEntity(slug);
-  if (!found) return { output: `Entity not found in responses.yaml: ${slug}`, exitCode: 1 };
-  if (found.entity.type !== "policy") {
-    return { output: `Only type=policy supported in v1; ${slug} is ${found.entity.type}`, exitCode: 1 };
+  const found = findEntity(slug);
+  if (!found) {
+    return {
+      output: `Entity not found in data/entities/*.yaml: ${slug}`,
+      exitCode: 1,
+    };
+  }
+  if (!SUPPORTED_TYPES.has(found.entity.type)) {
+    return {
+      output: `Unsupported entity type "${found.entity.type}" for ${slug}. Supported: ${[...SUPPORTED_TYPES].join(", ")}.`,
+      exitCode: 1,
+    };
   }
 
   let entity = found.entity;
@@ -470,25 +646,27 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
     entity = out.entity;
     iterations.push(out.metrics);
     budgetRemaining -= out.metrics.cost_research_usd + out.metrics.cost_extract_usd;
-    const cov = policyCoverageScore(entity);
-    console.log(`[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, budget=$${budgetRemaining.toFixed(2)}`);
+    const cov = coverageFor(entity);
+    console.log(
+      `[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, budget=$${budgetRemaining.toFixed(2)}`,
+    );
     if (out.metrics.applied_to_yaml === 0 && i > 1) {
       reason = "no-progress";
       break;
     }
-    const totalProvStake = (entity.provisions?.length ?? 0) + (entity.stakeholders?.length ?? 0);
-    if (totalProvStake >= target) {
+    if (progressMetric(entity) >= target) {
       reason = "target-hit";
       hitTarget = true;
       break;
     }
   }
 
-  if (!noWrite) saveEntity(slug, entity);
-  const finalCov = policyCoverageScore(entity);
+  if (!noWrite) saveEntity(found.filePath, slug, entity);
+  const finalCov = coverageFor(entity);
   const result: ImproveResult = {
     entity_slug: slug,
     entity_id: entity.stableId ?? entity.id,
+    entity_type: entity.type,
     iterations,
     final_coverage: finalCov.score,
     final_facts: finalCov.facts_in_yaml,
@@ -515,10 +693,12 @@ export function help(): CommandResult {
 Closed-loop iterative entity improver. Discovers sources via runResearch,
 extracts gap-targeted claims with Haiku, pre-filters by token presence,
 submits via the claims-first pipeline, and applies verified+partial verdicts
-to data/entities/responses.yaml.
+to the entity's source YAML file under data/entities/.
+
+Supported entity types: policy, organization.
 
 Options:
-  --target=N      Stop when (provisions + stakeholders) ≥ N (default: 12)
+  --target=N      Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
   --budget=N      Max LLM spend in USD (default: 2.0)
   --max-iters=N   Max iterations (default: 3)
   --dry-run       Don't write YAML
