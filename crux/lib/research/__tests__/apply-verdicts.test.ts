@@ -64,6 +64,257 @@ describe("applyVerdictsToPolicy", () => {
     expect(result.entity.billNumber).toBeUndefined();
     expect(result.applied).toEqual([]);
   });
+
+  // ─── Stakeholder canonicalization (QUA-872) ──────────────────────────────
+  describe("stakeholder canonicalization", () => {
+    it("collapses FISC and foreign-intelligence-surveillance-court targetFields", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fisc",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Approves Section 702 targeting procedures.",
+        }),
+        v({
+          targetField: "stakeholder.foreign-intelligence-surveillance-court",
+          displayHint: "Foreign Intelligence Surveillance Court",
+          extractedValue: "Reviews FBI queries of US-person data.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.applied[0].action).toBe("added");
+      expect(result.applied[1].action).toMatch(/updated|skipped/);
+    });
+
+    it("collapses FBI vs Federal Bureau of Investigation vs FBI (Federal Bureau of Investigation)", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fbi",
+          displayHint: "FBI",
+          extractedValue: "Queries Section 702 data for FBI investigations.",
+        }),
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "A much more comprehensive description of FBI's role here.",
+        }),
+        v({
+          targetField: "stakeholder.fbi-federal-bureau-of-investigation",
+          displayHint: "FBI (Federal Bureau of Investigation)",
+          extractedValue: "Performs queries of 702 data.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+    });
+
+    it("collapses DOJ vs U.S. Department of Justice vs Department of Justice", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.doj",
+          displayHint: "DOJ",
+          extractedValue: "Oversight role in 702.",
+        }),
+        v({
+          targetField: "stakeholder.us-department-of-justice",
+          displayHint: "U.S. Department of Justice",
+          extractedValue: "Oversees compliance.",
+        }),
+        v({
+          targetField: "stakeholder.department-of-justice",
+          displayHint: "Department of Justice",
+          extractedValue: "Reports semiannually to Congress.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+    });
+
+    it("collapses ACLU and EFF aliases", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.aclu",
+          displayHint: "ACLU",
+          extractedValue: "Opposes Section 702 reauthorization.",
+        }),
+        v({
+          targetField: "stakeholder.american-civil-liberties-union",
+          displayHint: "American Civil Liberties Union",
+          extractedValue: "Litigates FISA cases.",
+        }),
+        v({
+          targetField: "stakeholder.eff",
+          displayHint: "EFF",
+          extractedValue: "Advocates for end to backdoor searches.",
+        }),
+        v({
+          targetField: "stakeholder.electronic-frontier-foundation",
+          displayHint: "Electronic Frontier Foundation",
+          extractedValue: "Files amicus briefs in FISC.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(2);
+      const names = result.entity.stakeholders!.map((s) => s.name).sort();
+      // Display names come from the *first* verdict that won the slot.
+      expect(names).toEqual(["ACLU", "EFF"]);
+    });
+
+    it("collapses NSA, ODNI, CIA aliases", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({ targetField: "stakeholder.nsa", displayHint: "NSA", extractedValue: "Collects signals." }),
+        v({
+          targetField: "stakeholder.national-security-agency",
+          displayHint: "National Security Agency",
+          extractedValue: "Operates upstream collection.",
+        }),
+        v({ targetField: "stakeholder.odni", displayHint: "ODNI", extractedValue: "Coordinates IC." }),
+        v({ targetField: "stakeholder.dni", displayHint: "DNI", extractedValue: "Reports to Congress." }),
+        v({ targetField: "stakeholder.cia", displayHint: "CIA", extractedValue: "Targets foreigners." }),
+        v({
+          targetField: "stakeholder.central-intelligence-agency",
+          displayHint: "Central Intelligence Agency",
+          extractedValue: "Operates abroad.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(3);
+      const names = result.entity.stakeholders!.map((s) => s.name).sort();
+      expect(names).toEqual(["CIA", "NSA", "ODNI"]);
+    });
+
+    it("FISA-702 adversarial input — full duplicate scenario from QUA-872", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      // Two slugs proposed for FISC, two for DOJ, three for FBI — the case
+      // documented in the ticket. Should collapse to 3 entries total.
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.fisc",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Approves targeting procedures.",
+        }),
+        v({
+          targetField: "stakeholder.foreign-intelligence-surveillance-court",
+          displayHint: "Foreign Intelligence Surveillance Court (FISC)",
+          extractedValue: "Reviews queries.",
+        }),
+        v({
+          targetField: "stakeholder.doj",
+          displayHint: "Department of Justice (DOJ)",
+          extractedValue: "Oversight reports.",
+        }),
+        v({
+          targetField: "stakeholder.us-department-of-justice",
+          displayHint: "Department of Justice (DOJ)",
+          extractedValue: "Compliance oversight.",
+        }),
+        v({
+          targetField: "stakeholder.fbi",
+          displayHint: "FBI",
+          extractedValue: "Queries 702 data.",
+        }),
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "FBI (Federal Bureau of Investigation)",
+          extractedValue: "Investigates threats.",
+        }),
+        v({
+          targetField: "stakeholder.fbi-federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "Performs U.S.-person queries.",
+        }),
+      ]);
+      // Three canonical stakeholders, no duplicates.
+      expect(result.entity.stakeholders).toHaveLength(3);
+      const names = result.entity.stakeholders!.map((s) => s.name);
+      // Each name should be unique under canonicalSlug.
+      const canonicals = new Set(names.map((n) =>
+        n.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, ""),
+      ));
+      expect(canonicals.size).toBe(3);
+    });
+
+    it("dedupes against pre-existing stakeholders with alias name", () => {
+      const entity: PolicyEntity = {
+        id: "fisa-702",
+        type: "policy",
+        stakeholders: [{ name: "FBI", position: "support", reason: "Existing" }],
+      };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.federal-bureau-of-investigation",
+          displayHint: "Federal Bureau of Investigation",
+          extractedValue: "Much more detailed and comprehensive description of FBI role here.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.entity.stakeholders![0].name).toBe("FBI");
+      expect(result.entity.stakeholders![0].reason).toMatch(/comprehensive description/);
+      expect(result.applied[0].action).toBe("updated");
+    });
+
+    it("uses resolveStakeholderEntity to attach entityId on new stakeholder", () => {
+      const entity: PolicyEntity = { id: "fisa-702", type: "policy" };
+      const result = applyVerdictsToPolicy(
+        entity,
+        [
+          v({
+            targetField: "stakeholder.fbi",
+            displayHint: "FBI",
+            extractedValue: "Queries 702 data.",
+          }),
+        ],
+        {
+          resolveStakeholderEntity: (canon) =>
+            canon === "federal-bureau-of-investigation" ? "sid_fbi123" : null,
+        },
+      );
+      expect(result.entity.stakeholders).toHaveLength(1);
+      expect(result.entity.stakeholders![0].entityId).toBe("sid_fbi123");
+    });
+
+    it("backfills entityId on existing stakeholder match", () => {
+      const entity: PolicyEntity = {
+        id: "fisa-702",
+        type: "policy",
+        stakeholders: [{ name: "FBI", position: "support", reason: "Long enough existing reason." }],
+      };
+      const result = applyVerdictsToPolicy(
+        entity,
+        [
+          v({
+            targetField: "stakeholder.federal-bureau-of-investigation",
+            displayHint: "Federal Bureau of Investigation",
+            // Shorter than existing — would normally skip.
+            extractedValue: "Short.",
+          }),
+        ],
+        {
+          resolveStakeholderEntity: (canon) =>
+            canon === "federal-bureau-of-investigation" ? "sid_fbi123" : null,
+        },
+      );
+      expect(result.entity.stakeholders![0].entityId).toBe("sid_fbi123");
+      expect(result.applied[0].action).toBe("updated");
+    });
+
+    it("does not corrupt entries with no canonical match", () => {
+      const entity: PolicyEntity = { id: "x", type: "policy" };
+      const result = applyVerdictsToPolicy(entity, [
+        v({
+          targetField: "stakeholder.some-novel-org",
+          displayHint: "Some Novel Org",
+          extractedValue: "Reason 1.",
+        }),
+        v({
+          targetField: "stakeholder.another-novel-org",
+          displayHint: "Another Novel Org",
+          extractedValue: "Reason 2.",
+        }),
+      ]);
+      expect(result.entity.stakeholders).toHaveLength(2);
+    });
+  });
 });
 
 // ─── applyVerdictsToOrganization ───────────────────────────────────────────

@@ -13,6 +13,7 @@
 // rather than writing them into local YAML.
 
 import type { OrganizationEntity, OrganizationKeyPerson, PolicyEntity } from "./gap-analyzer.ts";
+import { canonicalSlug } from "./canonical-names.ts";
 
 export interface VerifiedVerdict {
   /** The seed key — encodes target type + identifier. */
@@ -68,10 +69,23 @@ export function canonicalizePersonKey(input: string): string {
   return slugify(s);
 }
 
+/**
+ * Resolves a stakeholder canonical slug + display name to a wiki entityId
+ * (stableId or slug). Called once per added/updated stakeholder. Return null
+ * if no match. The applier stores the result on the stakeholder's `entityId`
+ * field when matched.
+ */
+export type StakeholderEntityResolver = (canonicalSlug: string, displayName: string) => string | null;
+
+export interface ApplyPolicyOptions {
+  resolveStakeholderEntity?: StakeholderEntityResolver;
+}
+
 /** Apply a batch of verdicts to a PolicyEntity. Returns updated entity + change log. */
 export function applyVerdictsToPolicy(
   entity: PolicyEntity,
   verdicts: VerifiedVerdict[],
+  options: ApplyPolicyOptions = {},
 ): ApplyResult<PolicyEntity> {
   // Deep-clone the parts we mutate.
   const next: PolicyEntity = {
@@ -148,31 +162,53 @@ export function applyVerdictsToPolicy(
       const slug = tf.slice("stakeholder.".length);
       const name = v.displayHint ?? titleCase(slug);
       next.stakeholders ??= [];
-      // Dedupe by both targetField slug AND displayHint slug — the LLM
-      // sometimes produces different targetField slugs ("foreign-intelligence-surveillance-court"
-      // vs "...-fisc") that map to the same display name.
-      const nameSlug = slugify(name);
-      const existing = next.stakeholders.find(
-        (s) => slugify(s.name) === slug || slugify(s.name) === nameSlug,
-      );
+      // Canonicalize both the targetField slug and the display name. This
+      // collapses aliases like "fbi" + "federal-bureau-of-investigation"
+      // and "FBI (Federal Bureau of Investigation)" + "FBI" + "Federal Bureau
+      // of Investigation" to a single canonical slug, so the LLM extractor
+      // can no longer produce duplicates by varying the surface form.
+      const canonFromSlug = canonicalSlug(slug);
+      const canonFromName = canonicalSlug(name);
+      const matchKey = (existingName: string) => {
+        const c = canonicalSlug(existingName);
+        return c === canonFromSlug || c === canonFromName;
+      };
+      const existing = next.stakeholders.find((s) => matchKey(s.name));
       if (existing) {
+        let updated = false;
         if (!existing.reason || existing.reason.length < value.length) {
           existing.reason = value;
           if (!existing.source) existing.source = v.sourceUrl;
-          applied.push({ targetField: tf, action: "updated" });
-        } else {
-          applied.push({ targetField: tf, action: "skipped", reason: "existing reason longer" });
+          updated = true;
         }
+        // Backfill entityId on the existing entry when a resolver is supplied.
+        if (!existing.entityId && options.resolveStakeholderEntity) {
+          const eid = options.resolveStakeholderEntity(canonFromName || canonFromSlug, name);
+          if (eid) {
+            existing.entityId = eid;
+            updated = true;
+          }
+        }
+        applied.push({
+          targetField: tf,
+          action: updated ? "updated" : "skipped",
+          reason: updated ? undefined : "existing reason longer",
+        });
         continue;
       }
       // Default to position=reform when unknown — least-controversial.
-      next.stakeholders.push({
+      const newEntry: NonNullable<PolicyEntity["stakeholders"]>[number] = {
         name,
         position: "reform",
         importance: "medium",
         reason: value,
         source: v.sourceUrl,
-      });
+      };
+      if (options.resolveStakeholderEntity) {
+        const eid = options.resolveStakeholderEntity(canonFromName || canonFromSlug, name);
+        if (eid) newEntry.entityId = eid;
+      }
+      next.stakeholders.push(newEntry);
       applied.push({ targetField: tf, action: "added" });
       continue;
     }
