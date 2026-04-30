@@ -370,7 +370,7 @@ export async function sourcingCommand(
   // re-verify everything.
   const whereNoVerdict = options['where-no-verdict'] || options.whereNoVerdict;
   let alreadyVerifiedFactIds: Set<string> | undefined;
-  if (whereNoVerdict) {
+  if (whereNoVerdict && !options.fact) {
     const res = await fetchVerdictRecordIds('fact');
     if (!res.ok) {
       const detail = res.message || res.error;

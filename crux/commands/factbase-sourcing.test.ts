@@ -219,11 +219,9 @@ describe('crux fb sourcing --dry-run', () => {
 
   it('--where-no-verdict --fact=X bypasses the filter (explicit fact lookup)', async () => {
     const factId = 'f_dW5cR9mJ8q';
-    // Even if the fact's ID is in the verified set, --fact=X should still find it.
-    mockFetchVerdictRecordIds.mockResolvedValueOnce({
-      ok: true,
-      data: new Set([factId]),
-    });
+    // --fact=X skips the verdict fetch entirely so single-fact lookups remain
+    // self-contained and don't fail-close on an unrelated wiki-server outage.
+    mockFetchVerdictRecordIds.mockClear();
 
     const result = await sourcing([], {
       fact: factId,
@@ -232,6 +230,7 @@ describe('crux fb sourcing --dry-run', () => {
     });
     expect(result.exitCode).toBe(0);
     expect(result.output).toContain('1 fact(s)');
+    expect(mockFetchVerdictRecordIds).not.toHaveBeenCalled();
   });
 
   it('--where-no-verdict applied to all-entities branch (no entity/fact filter)', async () => {
