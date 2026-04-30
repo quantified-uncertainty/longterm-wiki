@@ -67,7 +67,7 @@ interface EntityWithType {
   [k: string]: unknown;
 }
 
-interface IterationMetrics {
+export interface IterationMetrics {
   iter: number;
   gaps_identified: number;
   sources_found: number;
@@ -85,7 +85,7 @@ interface IterationMetrics {
   duration_s: number;
 }
 
-interface ImproveResult {
+export interface ImproveResult {
   entity_slug: string;
   entity_id: string;
   entity_type: string;
@@ -96,6 +96,20 @@ interface ImproveResult {
   total_duration_s: number;
   hit_target: boolean;
   reason: string;
+}
+
+export interface ImproveOptions {
+  slug: string;
+  /** Stop when (provisions + stakeholders) ≥ target. Default 12. */
+  target?: number;
+  /** Max LLM spend in USD across all iterations. Default 2.0. */
+  budgetUsd?: number;
+  /** Max iterations. Default 3. */
+  maxIters?: number;
+  /** When true, don't write YAML back. */
+  dryRun?: boolean;
+  /** When true, suppress the per-entity result dump. Used by the suite runner. */
+  quiet?: boolean;
 }
 
 const ExtractedSchema = z.array(
@@ -603,31 +617,27 @@ async function runIteration(
 // CLI entry point
 // ──────────────────────────────────────────────────────────────────────────────
 
-export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
-  const slug = (args[0] || "").trim();
-  if (!slug) {
-    return {
-      output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N]",
-      exitCode: 1,
-    };
-  }
-  const target = options.target != null ? parseInt(options.target as string, 10) : 12;
-  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
-  const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
-  const noWrite = !!options.dryRun;
+/**
+ * Run the closed-loop improvement on a single entity.
+ *
+ * Throws if the entity is missing from `data/entities/*.yaml` or if its type
+ * is not yet supported by the loop. The caller (CLI or suite runner) is
+ * responsible for catching and surfacing these as user-facing errors.
+ */
+export async function improveSingleEntity(opts: ImproveOptions): Promise<ImproveResult> {
+  const slug = opts.slug.trim();
+  if (!slug) throw new Error("improveSingleEntity: slug is required");
+  const target = opts.target ?? 12;
+  const maxIters = opts.maxIters ?? 3;
+  const budgetUsd = opts.budgetUsd ?? 2.0;
+  const noWrite = !!opts.dryRun;
 
   const found = findEntity(slug);
-  if (!found) {
-    return {
-      output: `Entity not found in data/entities/*.yaml: ${slug}`,
-      exitCode: 1,
-    };
-  }
+  if (!found) throw new Error(`Entity not found in data/entities/*.yaml: ${slug}`);
   if (!SUPPORTED_TYPES.has(found.entity.type)) {
-    return {
-      output: `Unsupported entity type "${found.entity.type}" for ${slug}. Supported: ${[...SUPPORTED_TYPES].join(", ")}.`,
-      exitCode: 1,
-    };
+    throw new Error(
+      `Unsupported entity type "${found.entity.type}" for ${slug}. Supported: ${[...SUPPORTED_TYPES].join(", ")}.`,
+    );
   }
 
   let entity = found.entity;
@@ -676,14 +686,35 @@ export async function run(args: string[], options: Record<string, unknown>): Pro
     reason,
   };
 
-  // Persist run snapshot.
+  // Persist per-entity run snapshot.
   fs.mkdirSync(path.join(SNAPSHOTS, slug), { recursive: true });
   const stamp = new Date().toISOString().replace(/[:.]/g, "-");
   fs.writeFileSync(path.join(SNAPSHOTS, slug, `${stamp}.json`), JSON.stringify(result, null, 2) + "\n");
 
-  console.log("\n=== improve-entity result ===");
-  console.log(JSON.stringify(result, null, 2));
-  return { output: "", exitCode: hitTarget ? 0 : 2 };
+  if (!opts.quiet) {
+    console.log("\n=== improve-entity result ===");
+    console.log(JSON.stringify(result, null, 2));
+  }
+  return result;
+}
+
+export async function run(args: string[], options: Record<string, unknown>): Promise<CommandResult> {
+  const slug = (args[0] || "").trim();
+  if (!slug) {
+    return { output: "Usage: crux tb improve-entity <slug> [--target=N] [--budget=$] [--max-iters=N]", exitCode: 1 };
+  }
+  const target = options.target != null ? parseInt(options.target as string, 10) : 12;
+  const maxIters = options.maxIters != null ? parseInt(options.maxIters as string, 10) : 3;
+  const budgetUsd = options.budget != null ? parseFloat(options.budget as string) : 2.0;
+  const noWrite = !!options.dryRun;
+
+  let result: ImproveResult;
+  try {
+    result = await improveSingleEntity({ slug, target, maxIters, budgetUsd, dryRun: noWrite });
+  } catch (err) {
+    return { output: err instanceof Error ? err.message : String(err), exitCode: 1 };
+  }
+  return { output: "", exitCode: result.hit_target ? 0 : 2 };
 }
 
 export function help(): CommandResult {

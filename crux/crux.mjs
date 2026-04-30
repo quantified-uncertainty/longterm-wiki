@@ -114,6 +114,7 @@ import * as qaChecksCommands from './commands/qa-checks.ts';
 import * as matrixCommands from './commands/matrix.ts';
 import * as tablebaseCommands from './commands/tablebase.ts';
 import * as improveEntityCommands from './commands/research-improve-entity.ts';
+import * as improveEntitySuiteCommands from './commands/research-improve-entity-suite.ts';
 import * as benchmarkCommands from './commands/research-benchmark.ts';
 import * as pagesCommands from './commands/pages.ts';
 import * as legislationCommands from './commands/legislation.ts';
@@ -219,6 +220,7 @@ const domains = {
   matrix: matrixCommands,
   tablebase: tablebaseCommands,
   'improve-entity': improveEntityCommands,
+  'improve-entity-suite': improveEntitySuiteCommands,
   benchmark: benchmarkCommands,
   pages: pagesCommands,
   legislation: legislationCommands,
