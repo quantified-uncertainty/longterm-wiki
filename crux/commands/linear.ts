@@ -42,7 +42,14 @@ import {
   type AuditBucket,
   type AuditEntry,
 } from '../lib/linear/audit.ts';
-import { runStaleClaimSweep } from '../lib/linear/release-stale-claims.ts';
+import {
+  runStaleClaimSweep,
+  formatSlot,
+  DEFAULT_STALE_MINUTES,
+  DEFAULT_LIMIT,
+  MAX_LIMIT,
+  MAX_STALE_MINUTES,
+} from '../lib/linear/release-stale-claims.ts';
 import { runHygieneAudit, formatHygieneReport } from '../lib/linear/hygiene.ts';
 import { githubApi } from '../lib/github.ts';
 import { resolve as resolvePath } from 'path';
@@ -1252,36 +1259,32 @@ async function releaseStale(args: string[], options: CommandOptions): Promise<Co
   const c = log.colors;
 
   const dryRun = args.includes('--dry-run');
-  const staleArg = args.find((a) => a.startsWith('--stale-minutes='))?.split('=')[1];
-  const limitArg = args.find((a) => a.startsWith('--limit='))?.split('=')[1];
 
-  // Lower bound matches the active_agents stale timeout — anything tighter
-  // would race against in-flight init writes. Upper bound 30 days mirrors
-  // the wiki-server endpoint cap, so the CLI doesn't promise a wider
-  // window than the API can serve.
-  let staleMinutes = 30;
-  if (staleArg) {
-    const n = parseInt(staleArg, 10);
-    if (!Number.isFinite(n) || n < 1 || n > 43200) {
-      return {
-        output: `${c.red}--stale-minutes must be 1..43200 (1min..30d)${c.reset}\n`,
-        exitCode: 1,
-      };
+  function parseClampedInt(
+    flag: string,
+    min: number,
+    max: number,
+    fallback: number,
+  ): { ok: true; value: number } | { ok: false; error: string } {
+    const raw = args.find((a) => a.startsWith(`${flag}=`))?.split('=')[1];
+    if (!raw) return { ok: true, value: fallback };
+    const n = parseInt(raw, 10);
+    if (!Number.isFinite(n) || n < min || n > max) {
+      return { ok: false, error: `${flag} must be ${min}..${max}` };
     }
-    staleMinutes = n;
+    return { ok: true, value: n };
   }
 
-  let limit = 100;
-  if (limitArg) {
-    const n = parseInt(limitArg, 10);
-    if (!Number.isFinite(n) || n < 1 || n > 200) {
-      return {
-        output: `${c.red}--limit must be 1..200${c.reset}\n`,
-        exitCode: 1,
-      };
-    }
-    limit = n;
+  const staleParse = parseClampedInt('--stale-minutes', 1, MAX_STALE_MINUTES, DEFAULT_STALE_MINUTES);
+  if (!staleParse.ok) {
+    return { output: `${c.red}${staleParse.error}${c.reset}\n`, exitCode: 1 };
   }
+  const limitParse = parseClampedInt('--limit', 1, MAX_LIMIT, DEFAULT_LIMIT);
+  if (!limitParse.ok) {
+    return { output: `${c.red}${limitParse.error}${c.reset}\n`, exitCode: 1 };
+  }
+  const staleMinutes = staleParse.value;
+  const limit = limitParse.value;
 
   let out = '';
   out += `${c.bold}Stale-claim sweep${c.reset} ${c.dim}(staleMinutes=${staleMinutes}, limit=${limit}${dryRun ? ', dry-run' : ''})${c.reset}\n\n`;
@@ -1296,7 +1299,7 @@ async function releaseStale(args: string[], options: CommandOptions): Promise<Co
         : r.decision.reason.startsWith('error')
           ? `${c.red}✗ error  ${c.reset}`
           : `${c.dim}- skipped ${c.reset}`;
-      out += `  ${tag} ${r.claim.linearId} ${c.dim}(slot=${r.claim.slotNumber !== null ? `a${r.claim.slotNumber}` : '-'}, branch=${r.claim.branch}) — ${r.decision.reason}${c.reset}\n`;
+      out += `  ${tag} ${r.claim.linearId} ${c.dim}(slot=${formatSlot(r.claim.slotNumber, '-')}, branch=${r.claim.branch}) — ${r.decision.reason}${c.reset}\n`;
     },
   });
 

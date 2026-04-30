@@ -267,7 +267,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
     mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
 
     const claim = makeClaim();
-    const { decision } = await classifyStaleClaim(claim);
+    const decision = await classifyStaleClaim(claim);
 
     expect(decision.released).toBe(true);
     expect(decision.reason).toMatch(/stale .+, no branch, no open PR/);
@@ -279,7 +279,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
     );
     // The other checks should NOT be invoked once the branch check fires.
     const claim = makeClaim({ linearId: 'QUA-408' });
-    const { decision } = await classifyStaleClaim(claim);
+    const decision = await classifyStaleClaim(claim);
 
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/branch claude\/qua-408\(-\*\)\? exists/);
@@ -289,7 +289,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
 
   it("skips protectively when git ls-remote fails (network/auth error)", async () => {
     mockGit.mockReturnValue(failResult('fatal: could not read from remote'));
-    const { decision } = await classifyStaleClaim(makeClaim());
+    const decision = await classifyStaleClaim(makeClaim());
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/branch lookup failed/);
     // Must NOT proceed to the Linear/GitHub checks — protective skip is
@@ -304,7 +304,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('Done', 'completed'));
 
-    const { decision } = await classifyStaleClaim(makeClaim());
+    const decision = await classifyStaleClaim(makeClaim());
 
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/state is Done/);
@@ -315,7 +315,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('Triage', 'triage'));
 
-    const { decision } = await classifyStaleClaim(makeClaim());
+    const decision = await classifyStaleClaim(makeClaim());
 
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/state is Triage/);
@@ -336,7 +336,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
       ],
     });
 
-    const { decision } = await classifyStaleClaim(makeClaim());
+    const decision = await classifyStaleClaim(makeClaim());
 
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/open PR #4567/);
@@ -348,7 +348,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(null);
 
-    const { decision } = await classifyStaleClaim(makeClaim());
+    const decision = await classifyStaleClaim(makeClaim());
 
     expect(decision.released).toBe(false);
     expect(decision.reason).toMatch(/not found/);
@@ -393,7 +393,10 @@ describe('executeRelease', () => {
     expect(mockCommentOnIssue).not.toHaveBeenCalled();
   });
 
-  it('strips backticks from branch name in the comment body (markdown safety)', async () => {
+  it('sanitizes branch name backticks in the comment body (markdown safety)', async () => {
+    // sanitizeForCodeSpan substitutes backticks with `'` (not strips) so
+    // the rendered code span stays intact and visually obvious. See
+    // session-context.ts::sanitizeForCodeSpan.
     mockUpdateIssueState.mockResolvedValue({ identifier: 'QUA-184', state: 'Backlog' });
     mockCommentOnIssue.mockResolvedValue(undefined);
     await executeRelease(
@@ -401,8 +404,9 @@ describe('executeRelease', () => {
       'reason',
     );
     const body = mockCommentOnIssue.mock.calls[0][1];
-    expect(body).not.toMatch(/`evil`/);
-    expect(body).toContain('claude/qua-184-evil-name');
+    // The branch is wrapped in `…` in the comment; the inner backticks
+    // must NOT survive (they would break the markdown code span).
+    expect(body).toMatch(/branch=`claude\/qua-184-'evil'-name`/);
   });
 });
 
@@ -543,6 +547,54 @@ describe('runStaleClaimSweep', () => {
       message: 'connection refused',
     });
     await expect(runStaleClaimSweep({})).rejects.toThrow(/connection refused/);
+  });
+
+  it('aborts the sweep after 3 consecutive lookup-failed results (persistent git failure)', async () => {
+    // If `git ls-remote` fails on every candidate (bad origin, missing
+    // auth), the sweep should bail early rather than burn through 100
+    // candidates and 100 cron-tick retries against a known-broken setup.
+    setupClaimsResponse([
+      makeClaim({ id: 1, linearId: 'QUA-901' }),
+      makeClaim({ id: 2, linearId: 'QUA-902' }),
+      makeClaim({ id: 3, linearId: 'QUA-903' }),
+      makeClaim({ id: 4, linearId: 'QUA-904' }),
+    ]);
+    mockGit.mockReturnValue(failResult('fatal: could not read from remote'));
+    await expect(runStaleClaimSweep({})).rejects.toThrow(
+      /git ls-remote failed on 3 consecutive candidates/,
+    );
+    // Should NOT have proceeded to the GitHub or Linear checks for any
+    // of the candidates.
+    expect(mockGithubApi).not.toHaveBeenCalled();
+    expect(mockGetIssue).not.toHaveBeenCalled();
+  });
+
+  it('does NOT abort if lookup-failures are interleaved with successes', async () => {
+    // Counter must reset on any non-lookup-failed result. Otherwise a
+    // sweep with sporadic transient failures (1-2 in a row) gets aborted
+    // unnecessarily.
+    setupClaimsResponse([
+      makeClaim({ id: 1, linearId: 'QUA-905' }),
+      makeClaim({ id: 2, linearId: 'QUA-906' }),
+      makeClaim({ id: 3, linearId: 'QUA-907' }),
+      makeClaim({ id: 4, linearId: 'QUA-908' }),
+    ]);
+    let callIdx = 0;
+    mockGit.mockImplementation(() => {
+      // fail, fail, success, fail — counter should reset on the success.
+      callIdx += 1;
+      if (callIdx === 3) return okResult('');
+      return failResult();
+    });
+    mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
+    mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
+    mockCommentOnIssue.mockResolvedValue(undefined);
+    mockUpdateIssueState.mockResolvedValue({ identifier: 'QUA-907', state: 'Backlog' });
+
+    const report = await runStaleClaimSweep({});
+    expect(report.candidates).toBe(4);
+    // Sweep completes normally; the third candidate (QUA-907) is released.
+    expect(report.released).toBe(1);
   });
 
   it('skips sessions where wiki-server returned a null linearId', async () => {

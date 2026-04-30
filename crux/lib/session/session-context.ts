@@ -89,7 +89,7 @@ export function findSlotFromAncestors(cwd: string): number | null {
  * with such characters are rare but valid under git's ref rules, so strip
  * rather than reject. Caps length to guard against pathological input.
  */
-function sanitizeForCodeSpan(value: string): string {
+export function sanitizeForCodeSpan(value: string): string {
   // eslint-disable-next-line no-control-regex
   return value.replace(/`/g, "'").replace(/[\x00-\x1f\x7f]/g, '').slice(0, 200);
 }

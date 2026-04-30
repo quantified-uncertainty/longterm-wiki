@@ -32,31 +32,36 @@
 
 import { gitSafe, type GitResult } from '../git.ts';
 import { githubApi, REPO } from '../github.ts';
-import {
-  getIssue,
-  updateIssueState,
-  commentOnIssue,
-  type LinearIssue,
-} from './issues.ts';
+import { getIssue, updateIssueState, commentOnIssue } from './issues.ts';
+import { sanitizeForCodeSpan } from '../session/session-context.ts';
 import { getStaleClaims } from '../wiki-server/agent-sessions.ts';
 
+/** Default heartbeat-staleness window. Matches `active_agents` sweep timeout. */
+export const DEFAULT_STALE_MINUTES = 30;
+/** Default cap on candidates per sweep run. Larger values surface as errors. */
+export const DEFAULT_LIMIT = 100;
+/** Hard cap on `--limit` — the wiki-server endpoint returns at most 200 rows. */
+export const MAX_LIMIT = 200;
+/** Hard cap on `--stale-minutes` — matches the server-side endpoint cap. */
+export const MAX_STALE_MINUTES = 43200; // 30 days
+
 /**
- * Linear ID format guard. Same shape as the wiki-server's
- * `LinearIdParamSchema` and the audit module's allowlist (currently just
- * QUA, but the regex permits any all-uppercase team key).
- *
- * We re-validate at this layer because the wiki-server endpoint returns
- * `linear_id` as text and only filters `IS NOT NULL` — a malformed string
- * could in theory leak through if the row was written before the format
- * CHECK constraint was added. Accepting it would interpolate junk into a
- * branch glob or a GitHub search query.
+ * Linear ID format guard. We re-validate here because the wiki-server
+ * `stale-claims` endpoint filters `linear_id IS NOT NULL` only — malformed
+ * strings written before the format CHECK constraint was added could leak
+ * through and would interpolate junk into a branch glob or GitHub search.
  */
-const LINEAR_ID_RE = /^[A-Z][A-Z0-9]*-\d+$/;
+const LINEAR_ID_RE = /^[A-Z]+-\d+$/;
 
 function assertValidLinearId(linearId: string): void {
   if (!LINEAR_ID_RE.test(linearId)) {
     throw new Error(`Invalid Linear ID format: ${linearId}`);
   }
+}
+
+/** Render `slotNumber` as `aN` or a fallback when null. */
+export function formatSlot(slotNumber: number | null, fallback = '(none)'): string {
+  return slotNumber !== null ? `a${slotNumber}` : fallback;
 }
 
 /** A candidate row pulled from `GET /api/agent-sessions/stale-claims`. */
@@ -245,78 +250,52 @@ const NON_RELEASABLE_STATE_TYPES = new Set([
  * with a human-readable reason. Does NOT mutate Linear — the caller passes
  * this to `executeRelease()` to apply.
  *
- * Order of checks is intentional: cheapest → most expensive. A branch
- * existence check is local (one git call); the PR search is a GitHub HTTP
- * call; the Linear state check is a Linear GraphQL call. Skip on the
- * cheapest signal first to preserve API budget.
+ * Order of checks is intentional: cheapest → most expensive (local git →
+ * GitHub HTTP → Linear GraphQL). Skip on the cheapest signal first to
+ * preserve API budget.
  */
-export async function classifyStaleClaim(
-  claim: StaleClaim,
-): Promise<{ decision: ReleaseDecision; issue?: LinearIssue }> {
-  // 1. Local: any matching branch on origin?
+export async function classifyStaleClaim(claim: StaleClaim): Promise<ReleaseDecision> {
   const branchCheck = branchExistsForLinearId(claim.linearId);
   if (branchCheck === 'lookup-failed') {
-    // Conservative: a transient `git ls-remote` failure (network, auth,
-    // missing remote) must NOT be treated as "no branch exists". Skip the
-    // claim and let the next sweep retry once the lookup recovers.
     return {
-      decision: {
-        released: false,
-        reason: `branch lookup failed for ${claim.linearId} — skipping protectively`,
-      },
+      released: false,
+      reason: `branch lookup failed for ${claim.linearId} — skipping protectively`,
     };
   }
   if (branchCheck) {
     return {
-      decision: {
-        released: false,
-        // The ls-remote globs check both exact + suffixed forms, so the
-        // user-facing reason should reflect both possibilities. (The actual
-        // matched ref is not surfaced here because gitSafe doesn't parse it
-        // out — the caller can ls-remote manually to inspect.)
-        reason: `branch claude/${claim.linearId.toLowerCase()}(-*)? exists on origin`,
-      },
+      released: false,
+      reason: `branch claude/${claim.linearId.toLowerCase()}(-*)? exists on origin`,
     };
   }
 
-  // 2. GitHub: any open PR auto-closing this ticket?
   const openPRs = await findOpenPRsForLinearId(claim.linearId);
   if (openPRs.length > 0) {
     const refs = openPRs.map((p) => `#${p.number}`).join(', ');
     return {
-      decision: {
-        released: false,
-        reason: `open PR ${refs} references ${claim.linearId}`,
-      },
+      released: false,
+      reason: `open PR ${refs} references ${claim.linearId}`,
     };
   }
 
-  // 3. Linear: is the ticket actually in a state we should touch?
   const issue = await getIssue(claim.linearId);
   if (!issue) {
     return {
-      decision: {
-        released: false,
-        reason: `Linear ticket ${claim.linearId} not found (deleted?)`,
-      },
+      released: false,
+      reason: `Linear ticket ${claim.linearId} not found (deleted?)`,
     };
   }
 
   if (NON_RELEASABLE_STATE_TYPES.has(issue.state.type)) {
     return {
-      decision: {
-        released: false,
-        reason: `state is ${issue.state.name} (type=${issue.state.type}) — not eligible`,
-      },
+      released: false,
+      reason: `state is ${issue.state.name} (type=${issue.state.type}) — not eligible`,
     };
   }
 
   return {
-    decision: {
-      released: true,
-      reason: `stale ${humanizeStaleAge(claim.updatedAt)}, no branch, no open PR, state=${issue.state.name}`,
-    },
-    issue,
+    released: true,
+    reason: `stale ${humanizeStaleAge(claim.updatedAt)}, no branch, no open PR, state=${issue.state.name}`,
   };
 }
 
@@ -341,14 +320,11 @@ export async function executeRelease(
   reason: string,
 ): Promise<void> {
   await updateIssueState(claim.linearId, 'Backlog');
-  // Use a stricter `claim.branch` interpolation — backticks in the
-  // branch name would break the markdown code span. Branch names from
-  // PG are constrained, but defend against accidental contamination.
-  const safeBranch = claim.branch.replace(/`/g, '');
+  const safeBranch = sanitizeForCodeSpan(claim.branch);
   const body =
     `${AUTO_RELEASE_COMMENT_PREFIX} Re-claim if still relevant.\n\n` +
     `**Detected by:** \`crux linear release-stale\`\n` +
-    `**Session row:** id=${claim.id}, branch=\`${safeBranch}\`, slot=${claim.slotNumber !== null ? `a${claim.slotNumber}` : '(none)'}\n` +
+    `**Session row:** id=${claim.id}, branch=\`${safeBranch}\`, slot=${formatSlot(claim.slotNumber)}\n` +
     `**Last heartbeat:** ${claim.updatedAt}\n` +
     `**Reason:** ${reason}`;
   await commentOnIssue(claim.linearId, body);
@@ -369,6 +345,9 @@ export function humanizeStaleAge(updatedAt: string): string {
   return `${days}d`;
 }
 
+/** Consecutive `lookup-failed` results that abort the sweep — see runStaleClaimSweep. */
+const MAX_CONSECUTIVE_LOOKUP_FAILURES = 3;
+
 /**
  * Run the full stale-claim sweep: query candidates, classify each, and
  * release the eligible ones (unless `dryRun`). Returns a structured report
@@ -376,12 +355,23 @@ export function humanizeStaleAge(updatedAt: string): string {
  *
  * Failures classifying or releasing one claim do NOT abort the run — they
  * count toward the `errors` total in the report. The next sweep retries.
+ *
+ * Early-out: if `git ls-remote` fails (lookup-failed) on
+ * `MAX_CONSECUTIVE_LOOKUP_FAILURES` candidates in a row, the sweep aborts
+ * with an error. A persistent local git failure (bad remote, missing auth)
+ * would otherwise re-attempt on every candidate every cron tick — better
+ * to surface it once and stop.
+ *
+ * Concurrency: do NOT run multiple coordinators simultaneously. The
+ * GitHub `/search/issues` rate limit (30 req/min) is per-token, so two
+ * concurrent runs share the budget and trip mid-sweep. Per-claim errors
+ * surface gracefully (`errors` count) but partial runs are wasteful.
  */
 export async function runStaleClaimSweep(
   options: StaleClaimSweepOptions = {},
 ): Promise<StaleClaimSweepReport> {
-  const staleMinutes = options.staleMinutes ?? 30;
-  const limit = options.limit ?? 100;
+  const staleMinutes = options.staleMinutes ?? DEFAULT_STALE_MINUTES;
+  const limit = options.limit ?? DEFAULT_LIMIT;
   const dryRun = options.dryRun ?? false;
 
   const claimsResp = await getStaleClaims(staleMinutes);
@@ -408,17 +398,27 @@ export async function runStaleClaimSweep(
   let released = 0;
   let skipped = 0;
   let errors = 0;
+  let consecutiveLookupFailures = 0;
 
   for (const claim of candidates) {
     let result: ReleaseResult;
     try {
-      const { decision } = await classifyStaleClaim(claim);
+      const decision = await classifyStaleClaim(claim);
       if (decision.released && !dryRun) {
         await executeRelease(claim, decision.reason);
       }
       result = { claim, decision };
-      if (decision.released) released += 1;
-      else skipped += 1;
+      if (decision.released) {
+        released += 1;
+        consecutiveLookupFailures = 0;
+      } else {
+        skipped += 1;
+        if (decision.reason.startsWith('branch lookup failed')) {
+          consecutiveLookupFailures += 1;
+        } else {
+          consecutiveLookupFailures = 0;
+        }
+      }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       result = {
@@ -429,9 +429,18 @@ export async function runStaleClaimSweep(
         },
       };
       errors += 1;
+      consecutiveLookupFailures = 0;
     }
     results.push(result);
     options.onResult?.(result);
+
+    if (consecutiveLookupFailures >= MAX_CONSECUTIVE_LOOKUP_FAILURES) {
+      throw new Error(
+        `git ls-remote failed on ${MAX_CONSECUTIVE_LOOKUP_FAILURES} consecutive candidates — ` +
+        `local git is broken (bad origin? missing auth?). Aborting sweep. ` +
+        `Processed ${results.length}/${candidates.length}.`,
+      );
+    }
   }
 
   return {
