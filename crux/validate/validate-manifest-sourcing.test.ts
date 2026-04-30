@@ -87,6 +87,77 @@ describe('validate-manifest-sourcing (QUA-730)', () => {
       const v = evaluateManifest(REL, { table: 'personnel', recordCount: 50 });
       expect(v).toBeNull();
     });
+
+    it('flags newly-added manifests using the pre-2026-04-09 verificationSummary schema as a regression', () => {
+      // Without this branch, a writer that emits the old schema would slip
+      // through the "absent sourcingSummary → skip" carve-out — exactly the
+      // bug the gate is meant to catch. See QUA-730 review feedback.
+      const v = evaluateManifest(REL, {
+        table: 'personnel',
+        recordCount: 20,
+        verificationSummary: { withVerification: 0, withoutVerification: 20 },
+      });
+      expect(v).not.toBeNull();
+      expect(v?.reason).toBe('legacy-schema');
+      expect(v?.withSourcing).toBe(0);
+      expect(v?.withoutSourcing).toBe(20);
+    });
+
+    it('does not flag legacy-schema manifests when sourcingSummary is also present (writer bridging)', () => {
+      // If a writer emits BOTH summaries (e.g. during a migration), trust
+      // the new schema. Only the no-sourcingSummary branch is a regression.
+      const v = evaluateManifest(REL, {
+        table: 'personnel',
+        recordCount: 20,
+        verificationSummary: { withVerification: 0, withoutVerification: 20 },
+        sourcingSummary: { withSourcing: 20, withoutSourcing: 0 },
+      });
+      expect(v).toBeNull();
+    });
+
+    it('flags violations with reason="no-sourcing" for the standard failure mode', () => {
+      const v = evaluateManifest(REL, {
+        table: 'personnel',
+        recordCount: 20,
+        sourcingSummary: { withSourcing: 0, withoutSourcing: 20 },
+      });
+      expect(v?.reason).toBe('no-sourcing');
+    });
+
+    it('treats string values for recordCount/withSourcing as zero (adversarial-input guard)', () => {
+      // Without coercion, a JSON authoring bug like `recordCount: "20"` could
+      // either silently pass or silently fail. We coerce non-numbers to 0 so
+      // the manifest never sneaks past with a stringified count.
+      const v = evaluateManifest(REL, {
+        table: 'personnel',
+        // @ts-expect-error testing wrong-type input
+        recordCount: '20',
+        // @ts-expect-error testing wrong-type input
+        sourcingSummary: { withSourcing: '0', withoutSourcing: '20' },
+      });
+      // recordCount becomes 0 → below MIN_RECORDS_FOR_GATE → skipped.
+      expect(v).toBeNull();
+    });
+
+    it('rejects null/undefined data without throwing', () => {
+      expect(evaluateManifest(REL, null)).toBeNull();
+      // @ts-expect-error testing wrong-type input
+      expect(evaluateManifest(REL, undefined)).toBeNull();
+    });
+
+    it('handles a legacy-schema manifest where the summary fields are stringified', () => {
+      // Coercion still applies on the legacy branch — withSourcing should
+      // surface as 0, not "0".
+      const v = evaluateManifest(REL, {
+        table: 'personnel',
+        recordCount: 20,
+        // @ts-expect-error testing wrong-type input
+        verificationSummary: { withVerification: '0', withoutVerification: '20' },
+      });
+      expect(v?.reason).toBe('legacy-schema');
+      expect(v?.withSourcing).toBe(0);
+      expect(v?.withoutSourcing).toBe(0); // both stringified → both coerce to 0
+    });
   });
 
   describe('runCheck', () => {

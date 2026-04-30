@@ -27,6 +27,7 @@ import {
   isSkipSourcingReason,
   formatSkipSourcingReasonError,
   formatSkipSourcingAuditReason,
+  formatSkipSourcingBanner,
   type SkipSourcingReason,
 } from './skip-sourcing-reasons.ts';
 import {
@@ -744,12 +745,12 @@ async function handleSubmitRecords(
     syncParams.set('forceSkipSourcing', 'true');
     syncParams.set('reason', formatSkipSourcingAuditReason(skipSourcingReason, 'agent-tool'));
 
-    const banner = '═'.repeat(72);
-    console.warn(`\x1b[33m${banner}\x1b[0m`);
-    console.warn(`\x1b[33m  ⚠  agent --skipSourcing: shipping ${recordsToSubmit.length} ${table} record(s)\x1b[0m`);
-    console.warn(`\x1b[33m     to production WITHOUT sourcing verification.\x1b[0m`);
-    console.warn(`\x1b[33m     Reason: ${skipSourcingReason}\x1b[0m`);
-    console.warn(`\x1b[33m${banner}\x1b[0m`);
+    console.warn(formatSkipSourcingBanner({
+      source: 'agent',
+      recordCount: recordsToSubmit.length,
+      table,
+      reason: skipSourcingReason,
+    }));
   }
   const syncQs = syncParams.toString();
   const syncUrl = syncQs ? `${syncConfig.syncPath}?${syncQs}` : syncConfig.syncPath;

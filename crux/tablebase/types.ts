@@ -140,8 +140,10 @@ export interface LoopOptions {
   /** Skip sourcing before submitting records */
   skipSourcing?: boolean;
   /**
-   * QUA-730: required when skipSourcing is true. Must be in
-   * SKIP_SOURCING_REASONS. Validated by the agent-tool entry point.
+   * QUA-730: required when skipSourcing is true. Validated by the agent-tool
+   * entry point. Typed as `string` here (not `SkipSourcingReason`) because
+   * CLI string values are forwarded raw from `options.skipSourcingReason`;
+   * the runtime check in `buildToolHandlers` narrows them.
    */
   skipSourcingReason?: string;
   /**

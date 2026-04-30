@@ -72,3 +72,65 @@ export function formatSkipSourcingAuditReason(
 ): string {
   return `${callerLabel}: skip-sourcing reason=${reason}`;
 }
+
+/**
+ * Subset of the CLI options used by the reason check. Defined narrowly so the
+ * helper can live next to the vocabulary instead of the CLI-options interface.
+ */
+interface SkipSourcingOptions {
+  skipSourcing?: boolean;
+  skipSourcingReason?: string;
+}
+
+/**
+ * Result returned by `checkSkipSourcingReason` — shaped to match the CLI
+ * `CommandResult` contract so callers can `if (err) return err` without
+ * importing extra types.
+ */
+export interface SkipSourcingCheckError {
+  exitCode: 2;
+  output: string;
+}
+
+/**
+ * Pre-flight reason check shared by every CLI command that forwards the
+ * `--skip-sourcing` flag (submit, improve, field-improve, loop). Exit code 2
+ * matches `crux linear`'s "policy rejection" convention; exit 1 is reserved
+ * for runtime errors.
+ *
+ * Returns `null` when the call is well-formed (or `--skip-sourcing` is
+ * absent). Returns a CommandResult-shaped object that the CLI command should
+ * forward as its own return value when the reason is missing or invalid.
+ */
+export function checkSkipSourcingReason(
+  options: SkipSourcingOptions,
+): SkipSourcingCheckError | null {
+  if (!options.skipSourcing) return null;
+  const provided = options.skipSourcingReason?.trim();
+  if (!isSkipSourcingReason(provided)) {
+    return { exitCode: 2, output: formatSkipSourcingReasonError(provided) };
+  }
+  return null;
+}
+
+/**
+ * Yellow ANSI banner emitted by both the CLI submit command and the agent
+ * tool handler before a `--skip-sourcing` submission. Single source of truth
+ * so the two paths can't drift on width / wording.
+ */
+export function formatSkipSourcingBanner(args: {
+  source: 'cli' | 'agent';
+  recordCount: number;
+  table: string;
+  reason: SkipSourcingReason;
+}): string {
+  const bar = '═'.repeat(72);
+  const sourceLabel = args.source === 'cli' ? '--skip-sourcing' : 'agent --skipSourcing';
+  return [
+    `\x1b[33m${bar}\x1b[0m`,
+    `\x1b[33m  ⚠  ${sourceLabel}: shipping ${args.recordCount} ${args.table} record(s)\x1b[0m`,
+    `\x1b[33m     to production WITHOUT sourcing verification.\x1b[0m`,
+    `\x1b[33m     Reason: ${args.reason}\x1b[0m`,
+    `\x1b[33m${bar}\x1b[0m`,
+  ].join('\n');
+}

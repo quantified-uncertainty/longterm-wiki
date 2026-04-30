@@ -38,9 +38,22 @@ const MIN_RECORDS_FOR_GATE = 5;
 interface ManifestSummary {
   table?: string;
   recordCount?: number;
+  /**
+   * Current schema (post-2026-04-09). The legacy schema below is rejected
+   * for any newly-added manifest because it implies the writer regressed.
+   */
   sourcingSummary?: {
     withSourcing?: number;
     withoutSourcing?: number;
+  };
+  /**
+   * Pre-2026-04-09 schema. Still appears on grandfathered manifests in main,
+   * but new manifests in the diff using this schema are flagged as a
+   * regression — see `evaluateManifest`.
+   */
+  verificationSummary?: {
+    withVerification?: number;
+    withoutVerification?: number;
   };
 }
 
@@ -50,6 +63,12 @@ interface Violation {
   recordCount: number;
   withSourcing: number;
   withoutSourcing: number;
+  /**
+   * Why the manifest failed: 'no-sourcing' = recorded but every record is
+   * unverified; 'legacy-schema' = uses pre-QUA-730 verificationSummary in
+   * a newly-added file (regression).
+   */
+  reason: 'no-sourcing' | 'legacy-schema';
 }
 
 /**
@@ -94,6 +113,14 @@ export function getAddedManifestFiles(): string[] {
     addLines(
       tryGit(['diff', '--name-only', '--diff-filter=AM', base, 'HEAD', '--', `${MANIFEST_DIR}/*.json`]),
     );
+  } else {
+    // Shallow clones / detached HEAD without origin/main: the committed-vs-main
+    // branch is silently dropped. Staged + unstaged + untracked still fire,
+    // which is enough for pre-push gate runs but leaves a coverage gap in CI
+    // environments that lose the merge base. Surface that visibly.
+    console.warn(
+      '[validate-manifest-sourcing] No merge base for HEAD vs origin/main or main — skipping committed-diff scan',
+    );
   }
 
   // 2. Staged changes (vs HEAD) — catches manifests that have been git-add'd
@@ -119,9 +146,18 @@ function loadManifest(absPath: string): ManifestSummary | null {
   try {
     const raw = readFileSync(absPath, 'utf-8');
     return JSON.parse(raw) as ManifestSummary;
-  } catch {
+  } catch (err: unknown) {
+    // Surface malformed manifests instead of silently treating them as
+    // legacy-and-skip. A JSON parse failure in PR review is an authoring bug.
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[validate-manifest-sourcing] Could not parse ${absPath}: ${msg}`);
     return null;
   }
+}
+
+/** Coerce a possibly-non-numeric JSON value to a finite integer (or 0). */
+function toCount(v: unknown): number {
+  return typeof v === 'number' && Number.isFinite(v) ? v : 0;
 }
 
 /**
@@ -134,24 +170,46 @@ export function evaluateManifest(
 ): Violation | null {
   if (!data) return null;
 
-  const recordCount = data.recordCount ?? 0;
+  const recordCount = toCount(data.recordCount);
   if (recordCount <= MIN_RECORDS_FOR_GATE) return null;
 
-  const summary = data.sourcingSummary ?? {};
-  const withSourcing = summary.withSourcing ?? 0;
-  const withoutSourcing = summary.withoutSourcing ?? 0;
+  const table = data.table ?? basename(relPath, '.json');
 
-  // Manifests written before the sourcingSummary field existed don't have
-  // either count populated; skip them.
+  // QUA-730 regression guard: the legacy `verificationSummary` schema (used
+  // pre-2026-04-09) is grandfathered on main but must NOT appear in newly
+  // added manifests. If a future writer regresses to the old schema, the
+  // current validator's "skip when sourcingSummary is empty" logic would
+  // pass it silently — exactly the failure mode this gate is meant to catch.
+  if (data.verificationSummary && !data.sourcingSummary) {
+    const v = data.verificationSummary;
+    return {
+      file: relPath,
+      table,
+      recordCount,
+      withSourcing: toCount(v.withVerification),
+      withoutSourcing: toCount(v.withoutVerification),
+      reason: 'legacy-schema',
+    };
+  }
+
+  const summary = data.sourcingSummary ?? {};
+  const withSourcing = toCount(summary.withSourcing);
+  const withoutSourcing = toCount(summary.withoutSourcing);
+
+  // Pre-2026-04-09 manifests have neither field populated; skip them. (A new
+  // manifest with no sourcingSummary at all is treated the same — there's
+  // nothing to gate on. The legacy-schema branch above catches the obvious
+  // regression of writing verificationSummary on purpose.)
   if (withSourcing === 0 && withoutSourcing === 0) return null;
 
   if (withSourcing === 0) {
     return {
       file: relPath,
-      table: data.table ?? basename(relPath, '.json'),
+      table,
       recordCount,
       withSourcing,
       withoutSourcing,
+      reason: 'no-sourcing',
     };
   }
   return null;
@@ -194,20 +252,21 @@ export function runCheck(): ValidationResult {
     );
   } else {
     console.log(
-      `${c.red}Found ${violations.length} manifest(s) shipping records WITHOUT any sourcing verification:${c.reset}\n`,
+      `${c.red}Found ${violations.length} manifest(s) failing the sourcing gate:${c.reset}\n`,
     );
     for (const v of violations) {
-      console.log(`  ${c.red}${v.file}${c.reset}`);
+      const tag = v.reason === 'legacy-schema' ? 'legacy-schema regression' : 'all records unverified';
+      console.log(`  ${c.red}${v.file} — ${tag}${c.reset}`);
       console.log(
-        `    ${c.dim}table=${v.table} recordCount=${v.recordCount} withSourcing=0 withoutSourcing=${v.withoutSourcing}${c.reset}`,
+        `    ${c.dim}table=${v.table} recordCount=${v.recordCount} withSourcing=${v.withSourcing} withoutSourcing=${v.withoutSourcing}${c.reset}`,
       );
     }
     console.log('');
     console.log(
-      `${c.dim}This usually means the run used --skip-sourcing (e.g. missing ANTHROPIC_BILLING_KEY).${c.reset}`,
+      `${c.dim}'all records unverified' usually means --skip-sourcing was used (e.g. missing ANTHROPIC_BILLING_KEY).${c.reset}`,
     );
     console.log(
-      `${c.dim}Re-run with sourcing enabled, or split the unverified records out of the PR until they can be sourcing-verified.${c.reset}`,
+      `${c.dim}'legacy-schema regression' means the writer emitted the pre-2026-04-09 verificationSummary field; rewrite to sourcingSummary.${c.reset}`,
     );
     console.log(
       `${c.dim}Manifests with ≤${MIN_RECORDS_FOR_GATE} records are exempt; this gate fires only on bulk drops.${c.reset}`,

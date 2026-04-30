@@ -4,6 +4,8 @@ import {
   isSkipSourcingReason,
   formatSkipSourcingReasonError,
   formatSkipSourcingAuditReason,
+  formatSkipSourcingBanner,
+  checkSkipSourcingReason,
 } from './skip-sourcing-reasons.ts';
 
 describe('skip-sourcing-reasons (QUA-730)', () => {
@@ -60,6 +62,73 @@ describe('skip-sourcing-reasons (QUA-730)', () => {
       expect(formatSkipSourcingAuditReason('key-unavailable', 'agent-tool')).toBe(
         'agent-tool: skip-sourcing reason=key-unavailable',
       );
+    });
+  });
+
+  describe('checkSkipSourcingReason', () => {
+    it('returns null when skipSourcing is absent', () => {
+      expect(checkSkipSourcingReason({})).toBeNull();
+      expect(checkSkipSourcingReason({ skipSourcing: false })).toBeNull();
+    });
+
+    it('returns null when skipSourcing is set with a valid reason', () => {
+      expect(
+        checkSkipSourcingReason({ skipSourcing: true, skipSourcingReason: 'migration' }),
+      ).toBeNull();
+      expect(
+        checkSkipSourcingReason({ skipSourcing: true, skipSourcingReason: 'key-unavailable' }),
+      ).toBeNull();
+    });
+
+    it('returns exit code 2 when skipSourcing is set without a reason', () => {
+      const err = checkSkipSourcingReason({ skipSourcing: true });
+      expect(err).not.toBeNull();
+      expect(err?.exitCode).toBe(2);
+      expect(err?.output).toContain('--skip-sourcing-reason');
+    });
+
+    it('returns exit code 2 when skipSourcing is set with an invalid reason', () => {
+      const err = checkSkipSourcingReason({
+        skipSourcing: true,
+        skipSourcingReason: 'because',
+      });
+      expect(err).not.toBeNull();
+      expect(err?.exitCode).toBe(2);
+      expect(err?.output).toContain('"because"');
+    });
+
+    it('trims whitespace before validating', () => {
+      // Trailing whitespace from manual flag invocation should not reject.
+      expect(
+        checkSkipSourcingReason({ skipSourcing: true, skipSourcingReason: '  testing  ' }),
+      ).toBeNull();
+    });
+  });
+
+  describe('formatSkipSourcingBanner', () => {
+    it('produces a yellow CLI banner', () => {
+      const out = formatSkipSourcingBanner({
+        source: 'cli',
+        recordCount: 20,
+        table: 'personnel',
+        reason: 'key-unavailable',
+      });
+      expect(out).toContain('--skip-sourcing');
+      expect(out).toContain('20 personnel record(s)');
+      expect(out).toContain('Reason: key-unavailable');
+      expect(out).toContain('\x1b[33m'); // yellow
+      expect(out).toContain('═'.repeat(72));
+    });
+
+    it('produces an agent-prefixed banner for the agent path', () => {
+      const out = formatSkipSourcingBanner({
+        source: 'agent',
+        recordCount: 5,
+        table: 'grants',
+        reason: 'testing',
+      });
+      expect(out).toContain('agent --skipSourcing');
+      expect(out).toContain('5 grants record(s)');
     });
   });
 });
