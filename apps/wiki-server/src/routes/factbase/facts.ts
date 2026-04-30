@@ -2,7 +2,15 @@ import { Hono } from "hono";
 import { z } from "zod";
 import { eq, and, count, asc, sql, isNotNull, lte, inArray } from "drizzle-orm";
 import { getDrizzleDb } from "../../db.js";
-import { facts, entities, resources, things } from "../../schema.js";
+import {
+  facts,
+  entities,
+  resources,
+  things,
+  sourceVerdicts,
+  recordSources,
+  sourcingUrlSuggestions,
+} from "../../schema.js";
 import { checkRefsExist } from "../shared/ref-check.js";
 import { resolveEntityStableId } from "../shared/entity-resolution.js";
 import {
@@ -668,11 +676,18 @@ const factsApp = new Hono()
       }
 
       try {
-        // Both the SELECT and the two DELETEs run inside one transaction so
-        // concurrent writers see a consistent snapshot. In practice sync-facts
-        // is the only writer in the deploy pipeline, but the transactional
-        // read is cheap and prevents TOCTOU edge cases.
-        const stale = await db.transaction(async (tx) => {
+        // Both the SELECT and the cascading DELETEs run inside one transaction
+        // so concurrent writers see a consistent snapshot. In practice
+        // sync-facts is the only writer in the deploy pipeline, but the
+        // transactional read is cheap and prevents TOCTOU edge cases.
+        //
+        // QUA-930 cascade: when a fact is deleted, also drop its dependent
+        // source_check_verdicts / source_check_evidence /
+        // sourcing_url_suggestions rows (record_type='fact', record_id=fact_id).
+        // Without this the /sourcing/coverage-matrix totals stay inflated by
+        // orphan verdicts forever (505 → 1092 between 2026-04 ticket filing
+        // and 2026-04-30).
+        const result = await db.transaction(async (tx) => {
           const currentRows = await tx
             .select({
               id: facts.id,
@@ -686,9 +701,17 @@ const factsApp = new Hono()
             (r) => !keepSet.has(`${r.entityId}\u0000${r.factId}`),
           );
 
-          if (staleRows.length === 0) return staleRows;
+          if (staleRows.length === 0) {
+            return {
+              staleRows,
+              cascadedVerdicts: 0,
+              cascadedEvidence: 0,
+              cascadedSuggestions: 0,
+            };
+          }
 
           const staleRowIds = staleRows.map((r) => r.id);
+          const staleFactIds = staleRows.map((r) => r.factId);
           const staleThingIds = staleRows.map((r) =>
             factThingKey(r.entityId, r.factId),
           );
@@ -704,13 +727,64 @@ const factsApp = new Hono()
               ),
             );
 
+          // QUA-930 cascade: drop dependent sourcing rows. record_id for
+          // fact-typed rows stores fact_id (not the serial PK) — see
+          // LIVE_RECORDS_CTE in the sourcing route. Done before the facts
+          // DELETE so any future FK from these tables → facts.fact_id would
+          // not block the delete; today there is no FK so order is
+          // semantic-only but deliberate.
+          const verdictRows = await tx
+            .delete(sourceVerdicts)
+            .where(
+              and(
+                eq(sourceVerdicts.recordType, "fact"),
+                inArray(sourceVerdicts.recordId, staleFactIds),
+              ),
+            )
+            .returning({ recordId: sourceVerdicts.recordId });
+          const evidenceRows = await tx
+            .delete(recordSources)
+            .where(
+              and(
+                eq(recordSources.recordType, "fact"),
+                inArray(recordSources.recordId, staleFactIds),
+              ),
+            )
+            .returning({ recordId: recordSources.recordId });
+          const suggestionRows = await tx
+            .delete(sourcingUrlSuggestions)
+            .where(
+              and(
+                eq(sourcingUrlSuggestions.recordType, "fact"),
+                inArray(sourcingUrlSuggestions.recordId, staleFactIds),
+              ),
+            )
+            .returning({ recordId: sourcingUrlSuggestions.recordId });
+
           await tx.delete(facts).where(inArray(facts.id, staleRowIds));
 
-          return staleRows;
+          return {
+            staleRows,
+            cascadedVerdicts: verdictRows.length,
+            cascadedEvidence: evidenceRows.length,
+            cascadedSuggestions: suggestionRows.length,
+          };
         });
 
+        const {
+          staleRows: stale,
+          cascadedVerdicts,
+          cascadedEvidence,
+          cascadedSuggestions,
+        } = result;
+
         if (stale.length === 0) {
-          return c.json({ deleted: 0, ids: [], truncated: false });
+          return c.json({
+            deleted: 0,
+            ids: [],
+            truncated: false,
+            cascaded: { verdicts: 0, evidence: 0, suggestions: 0 },
+          });
         }
 
         // Log AFTER commit (a pre-commit log lies if the transaction aborts).
@@ -721,11 +795,15 @@ const factsApp = new Hono()
           {
             count: stale.length,
             entities: entityIds.length,
+            cascadedVerdicts,
+            cascadedEvidence,
+            cascadedSuggestions,
             sample: stale
               .slice(0, 100)
               .map((r) => `${r.entityId}/${r.factId}`),
           },
-          `Pruned ${stale.length} stale facts across ${entityIds.length} entities`,
+          `Pruned ${stale.length} stale facts across ${entityIds.length} entities` +
+            ` (cascaded ${cascadedVerdicts} verdicts, ${cascadedEvidence} evidence, ${cascadedSuggestions} suggestions)`,
         );
 
         // Cap the response payload. The server already paid the cost of
@@ -737,7 +815,16 @@ const factsApp = new Hono()
           .slice(0, MAX_PRUNE_RESPONSE_IDS)
           .map((r) => ({ entityId: r.entityId, factId: r.factId }));
 
-        return c.json({ deleted: stale.length, ids, truncated });
+        return c.json({
+          deleted: stale.length,
+          ids,
+          truncated,
+          cascaded: {
+            verdicts: cascadedVerdicts,
+            evidence: cascadedEvidence,
+            suggestions: cascadedSuggestions,
+          },
+        });
       } catch (err) {
         return dbError(c, "facts prune", err, { entityCount: entityIds.length });
       }

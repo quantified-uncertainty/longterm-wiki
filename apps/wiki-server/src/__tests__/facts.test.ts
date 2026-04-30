@@ -10,6 +10,8 @@ let thingsStore: Map<string, Record<string, unknown>>; // key: `${source_table}:
 let verdictsStore: Map<string, Record<string, unknown>>;
 /** key: `${recordType}::${recordId}::${sourceUrl ?? ''}::${checkerModel ?? ''}` */
 let evidenceStore: Map<string, Record<string, unknown>>;
+/** key: `${recordType}::${recordId}::${suggestedUrl}` */
+let suggestionsStore: Map<string, Record<string, unknown>>;
 let nextId: number;
 
 function resetStores() {
@@ -17,7 +19,70 @@ function resetStores() {
   thingsStore = new Map();
   verdictsStore = new Map();
   evidenceStore = new Map();
+  suggestionsStore = new Map();
   nextId = 1;
+}
+
+/** Inject a verdict row directly. Used by the QUA-930 cascade tests. */
+function injectVerdict(
+  recordType: string,
+  recordId: string,
+  fieldName: string | null = null,
+  extra: Record<string, unknown> = {},
+) {
+  verdictsStore.set(`${recordType}::${recordId}::${fieldName ?? ""}`, {
+    record_type: recordType,
+    record_id: recordId,
+    field_name: fieldName,
+    entity_id: null,
+    verdict: "confirmed",
+    confidence: 0.9,
+    reasoning: null,
+    ...extra,
+  });
+}
+
+/** Inject an evidence row directly. */
+function injectEvidence(
+  recordType: string,
+  recordId: string,
+  sourceUrl: string,
+  extra: Record<string, unknown> = {},
+) {
+  evidenceStore.set(`${recordType}::${recordId}::${sourceUrl}::cm`, {
+    record_type: recordType,
+    record_id: recordId,
+    field_name: null,
+    entity_id: null,
+    source_url: sourceUrl,
+    verdict: "confirmed",
+    confidence: 0.9,
+    checker_model: "cm",
+    ...extra,
+  });
+}
+
+/** Inject a sourcing URL suggestion row directly. */
+function injectSuggestion(
+  recordType: string,
+  recordId: string,
+  suggestedUrl: string,
+  extra: Record<string, unknown> = {},
+) {
+  suggestionsStore.set(`${recordType}::${recordId}::${suggestedUrl}`, {
+    record_type: recordType,
+    record_id: recordId,
+    field_name: null,
+    entity_id: null,
+    suggested_url: suggestedUrl,
+    title: null,
+    snippet: null,
+    relevance_score: null,
+    source_provider: "exa",
+    generator_model: null,
+    status: "pending",
+    ...extra,
+  });
 }
 
 function thingsKey(sourceTable: string, sourceId: string) {
@@ -379,8 +444,66 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- recomputeVerdict: DELETE source_check_verdicts (when aggregate=unchecked) ---
+  // --- DELETE source_check_verdicts ---
+  // Two callers:
+  //   - recomputeVerdict (no IN clause, single-row by composite PK) → no-op for tests
+  //   - QUA-930 prune cascade (record_type=$1 AND record_id IN ($2,...)) → actually delete
   if (q.includes("delete") && q.includes("source_check_verdicts")) {
+    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
+      const recordType = String(params[0] ?? "");
+      const recordIds = new Set(params.slice(1) as string[]);
+      const deleted: Array<{ record_id: string }> = [];
+      for (const [key, row] of verdictsStore) {
+        if (
+          row.record_type === recordType &&
+          recordIds.has(row.record_id as string)
+        ) {
+          verdictsStore.delete(key);
+          deleted.push({ record_id: row.record_id as string });
+        }
+      }
+      return deleted;
+    }
+    return [];
+  }
+
+  // --- DELETE source_check_evidence (QUA-930 cascade) ---
+  if (q.includes("delete") && q.includes("source_check_evidence")) {
+    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
+      const recordType = String(params[0] ?? "");
+      const recordIds = new Set(params.slice(1) as string[]);
+      const deleted: Array<{ record_id: string }> = [];
+      for (const [key, row] of evidenceStore) {
+        if (
+          row.record_type === recordType &&
+          recordIds.has(row.record_id as string)
+        ) {
+          evidenceStore.delete(key);
+          deleted.push({ record_id: row.record_id as string });
+        }
+      }
+      return deleted;
+    }
+    return [];
+  }
+
+  // --- DELETE sourcing_url_suggestions (QUA-930 cascade) ---
+  if (q.includes("delete") && q.includes("sourcing_url_suggestions")) {
+    if (q.includes("record_type") && q.includes("record_id") && q.includes(" in ")) {
+      const recordType = String(params[0] ?? "");
+      const recordIds = new Set(params.slice(1) as string[]);
+      const deleted: Array<{ record_id: string }> = [];
+      for (const [key, row] of suggestionsStore) {
+        if (
+          row.record_type === recordType &&
+          recordIds.has(row.record_id as string)
+        ) {
+          suggestionsStore.delete(key);
+          deleted.push({ record_id: row.record_id as string });
+        }
+      }
+      return deleted;
+    }
     return [];
   }
 
@@ -1278,8 +1401,23 @@ describe("Facts API", () => {
       expect(body.ids[0]).toHaveProperty("factId");
       // Exactly these two keys on the id record — no accidental extra fields.
       expect(Object.keys(body.ids[0]).sort()).toEqual(["entityId", "factId"]);
-      // Top-level keys are {deleted, ids, truncated} — no accidental extras.
-      expect(Object.keys(body).sort()).toEqual(["deleted", "ids", "truncated"]);
+      // Top-level keys are {cascaded, deleted, ids, truncated} (QUA-930 added
+      // cascaded for sync-facts cli logging) — no accidental extras.
+      expect(Object.keys(body).sort()).toEqual([
+        "cascaded",
+        "deleted",
+        "ids",
+        "truncated",
+      ]);
+      // Cascaded sub-shape: {evidence, suggestions, verdicts} numbers.
+      expect(Object.keys(body.cascaded).sort()).toEqual([
+        "evidence",
+        "suggestions",
+        "verdicts",
+      ]);
+      expect(typeof body.cascaded.verdicts).toBe("number");
+      expect(typeof body.cascaded.evidence).toBe("number");
+      expect(typeof body.cascaded.suggestions).toBe("number");
     });
 
     it("caps the returned `ids` at MAX_PRUNE_RESPONSE_IDS and sets truncated=true", async () => {
@@ -1312,6 +1450,134 @@ describe("Facts API", () => {
       expect(body.ids).toHaveLength(1000);
       expect(body.truncated).toBe(true);
       expect(factsStore.size).toBe(0);
+    });
+  });
+
+  // ---- QUA-930: cascade deletion of dependent sourcing rows ----
+
+  describe("POST /api/facts/prune cascade (QUA-930)", () => {
+    it("deletes dependent verdicts/evidence/suggestions when a fact is pruned", async () => {
+      // Seed a fact and inject the dependent sourcing rows that the
+      // sourcing pipeline would have produced for it.
+      await seedFact(app, "anthropic", "f_stale", { measure: "revenue" });
+      injectVerdict("fact", "f_stale");
+      injectEvidence("fact", "f_stale", "https://example.com/source");
+      injectSuggestion("fact", "f_stale", "https://example.com/suggested");
+      // Also seed an unrelated fact + its dependents to confirm the cascade
+      // is scoped to deleted facts only.
+      await seedFact(app, "anthropic", "f_keep", { measure: "valuation" });
+      injectVerdict("fact", "f_keep");
+      injectEvidence("fact", "f_keep", "https://example.com/keep-source");
+      expect(verdictsStore.size).toBe(2);
+      expect(evidenceStore.size).toBe(2);
+      expect(suggestionsStore.size).toBe(1);
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_keep"] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.ids).toEqual([{ entityId: "anthropic", factId: "f_stale" }]);
+      // Cascade counts surfaced in response so the sync-facts CLI can log them.
+      expect(body.cascaded).toEqual({
+        verdicts: 1,
+        evidence: 1,
+        suggestions: 1,
+      });
+      // The kept fact's verdict / evidence are untouched.
+      expect(verdictsStore.size).toBe(1);
+      expect(Array.from(verdictsStore.values())[0].record_id).toBe("f_keep");
+      expect(evidenceStore.size).toBe(1);
+      expect(Array.from(evidenceStore.values())[0].record_id).toBe("f_keep");
+      expect(suggestionsStore.size).toBe(0);
+    });
+
+    it("returns zero cascade counts when there are no dependents", async () => {
+      await seedFact(app, "anthropic", "f_stale", { measure: "revenue" });
+      // No verdicts/evidence/suggestions injected.
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.cascaded).toEqual({
+        verdicts: 0,
+        evidence: 0,
+        suggestions: 0,
+      });
+    });
+
+    it("does NOT cascade across record types — only fact-typed rows are deleted", async () => {
+      // Seed a fact and a same-id dependent row of a different record type.
+      // The cascade must scope by record_type='fact' so a deleted fact_id
+      // does not collide with e.g. a personnel id that happens to share the
+      // same string. (Today PG primary keys make this unlikely, but the
+      // record_type filter is a defense-in-depth guarantee.)
+      await seedFact(app, "anthropic", "f_stale", { measure: "revenue" });
+      injectVerdict("fact", "f_stale");
+      injectVerdict("personnel", "f_stale"); // same id, different record_type
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(1);
+      expect(body.cascaded.verdicts).toBe(1);
+      // The personnel verdict survives — it's not a fact orphan.
+      expect(verdictsStore.size).toBe(1);
+      const remaining = Array.from(verdictsStore.values())[0];
+      expect(remaining.record_type).toBe("personnel");
+    });
+
+    it("returns cascaded={0,0,0} when no facts are stale", async () => {
+      await seedFact(app, "anthropic", "f_keep", { measure: "x" });
+      injectVerdict("fact", "f_keep");
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: ["f_keep"] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(0);
+      expect(body.cascaded).toEqual({
+        verdicts: 0,
+        evidence: 0,
+        suggestions: 0,
+      });
+      // Verdict still there.
+      expect(verdictsStore.size).toBe(1);
+    });
+
+    it("cascades across multiple stale facts in one call", async () => {
+      await seedFact(app, "anthropic", "f_a", { measure: "x" });
+      await seedFact(app, "anthropic", "f_b", { measure: "y" });
+      await seedFact(app, "anthropic", "f_c", { measure: "z" });
+      injectVerdict("fact", "f_a");
+      injectVerdict("fact", "f_b");
+      injectVerdict("fact", "f_c");
+      injectEvidence("fact", "f_a", "https://example.com/a");
+      injectEvidence("fact", "f_b", "https://example.com/b1");
+      injectEvidence("fact", "f_b", "https://example.com/b2");
+
+      const res = await postJson(app, "/api/facts/prune", {
+        entries: [{ entityId: "anthropic", factIds: [] }],
+      });
+
+      expect(res.status).toBe(200);
+      const body = await res.json();
+      expect(body.deleted).toBe(3);
+      expect(body.cascaded.verdicts).toBe(3);
+      expect(body.cascaded.evidence).toBe(3);
+      expect(verdictsStore.size).toBe(0);
+      expect(evidenceStore.size).toBe(0);
     });
   });
 });

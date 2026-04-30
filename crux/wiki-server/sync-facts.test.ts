@@ -578,4 +578,62 @@ describe("pruneFacts", () => {
     );
     expect(sizes.sort()).toEqual([1, 2, 2]);
   });
+
+  // ---- QUA-930: cascade counts surface in PruneFactsOutcome ----
+
+  it("aggregates cascade counts across batches (QUA-930)", async () => {
+    let call = 0;
+    const responses = [
+      { deleted: 1, ids: [{ entityId: "a", factId: "f_1" }], cascaded: { verdicts: 2, evidence: 5, suggestions: 1 } },
+      { deleted: 1, ids: [{ entityId: "b", factId: "f_1" }], cascaded: { verdicts: 0, evidence: 1, suggestions: 0 } },
+      { deleted: 1, ids: [{ entityId: "c", factId: "f_1" }], cascaded: { verdicts: 3, evidence: 0, suggestions: 4 } },
+    ];
+    vi.spyOn(globalThis, "fetch").mockImplementation(
+      async () => new Response(JSON.stringify(responses[call++]), { status: 200 }),
+    );
+
+    const items = [
+      makeSyncFact("a", "f_1"),
+      makeSyncFact("b", "f_1"),
+      makeSyncFact("c", "f_1"),
+    ];
+    const result = await pruneFacts("http://localhost:3000", items, [], {
+      batchSize: 1,
+    });
+
+    expect(result.deleted).toBe(3);
+    expect(result.cascadedVerdicts).toBe(5); // 2 + 0 + 3
+    expect(result.cascadedEvidence).toBe(6); // 5 + 1 + 0
+    expect(result.cascadedSuggestions).toBe(5); // 1 + 0 + 4
+  });
+
+  it("defaults cascade counts to zero when server omits them (older server compat)", async () => {
+    // Older server pre-QUA-930 returns only {deleted, ids, truncated}. The
+    // client must not crash and should report zero cascade counts.
+    vi.spyOn(globalThis, "fetch").mockResolvedValue(
+      new Response(
+        JSON.stringify({
+          deleted: 1,
+          ids: [{ entityId: "anthropic", factId: "f_old" }],
+        }),
+        { status: 200 },
+      ),
+    );
+
+    const items = [makeSyncFact("anthropic", "f_keep")];
+    const result = await pruneFacts("http://localhost:3000", items);
+
+    expect(result.deleted).toBe(1);
+    expect(result.cascadedVerdicts).toBe(0);
+    expect(result.cascadedEvidence).toBe(0);
+    expect(result.cascadedSuggestions).toBe(0);
+    expect(result.errors).toBe(0);
+  });
+
+  it("returns zero cascade counts when entries is empty", async () => {
+    const result = await pruneFacts("http://localhost:3000", [], []);
+    expect(result.cascadedVerdicts).toBe(0);
+    expect(result.cascadedEvidence).toBe(0);
+    expect(result.cascadedSuggestions).toBe(0);
+  });
 });
