@@ -191,8 +191,12 @@ export function collectFactItems(
       if (!fact.source || fact.id.startsWith('inv_')) continue;
 
       const property = graph.getProperty(fact.propertyId);
-      // Skip properties marked as not verifiable (e.g., social media handles, self-referential URLs)
-      if (property?.verifiable === false) continue;
+      // QUA-927: properties marked as `verifierKind: url-resolves` get a cheap
+      // HEAD-only check, bypassing the `verifiable: false` skip even if it was
+      // historically set (e.g., wikipedia-url / social-media). The url-resolves
+      // verifier kicks in below in item-verifier.ts based on the propagated
+      // verifierKind on FactItemData.
+      if (property?.verifiable === false && property?.verifierKind !== 'url-resolves') continue;
       const formattedValue = formatFactValue(fact, property, graph);
       const existing = existingVerdicts.get(fact.id);
 
@@ -213,8 +217,10 @@ export function collectFactItems(
           entity,
           fact,
           propertyName: property?.name ?? fact.propertyId,
+          propertyId: fact.propertyId,
           formattedValue,
           rawValue: extractRawValue(fact),
+          verifierKind: property?.verifierKind,
         },
       });
     }

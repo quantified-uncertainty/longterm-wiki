@@ -153,7 +153,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
-    verifiable: false  # X.com/Twitter blocks automated access
+    verifierKind: url-resolves  # QUA-927: cheap HEAD-resolves check; no content claim to verify
 
   google-scholar:
     name: Google Scholar
@@ -161,6 +161,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifierKind: url-resolves  # QUA-927: URL itself is the claim — verify via HEAD
 
   github-profile:
     name: GitHub
@@ -168,6 +169,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
+    verifierKind: url-resolves  # QUA-927: URL itself is the claim — verify via HEAD
 
   wikipedia-url:
     name: Wikipedia
@@ -175,7 +177,7 @@ properties:
     dataType: text
     category: biographical
     appliesTo: [person]
-    verifiable: false  # Self-referential: the fact IS the URL
+    verifierKind: url-resolves  # QUA-927: cheap HEAD + title check, replaces self-referential skip
 
   founded-by:
     name: Founded By
