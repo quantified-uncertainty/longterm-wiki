@@ -12,6 +12,7 @@ import {
   SCORECARD_SOURCES,
   getScorecardSourceMeta,
   formatScoreCell,
+  gradeCellFontClass,
   DIMENSION_OVERALL,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
@@ -137,6 +138,7 @@ export function ScorecardsSection({
         const overallRow = group.rows.find(
           (r) => r.dimensionSlug === DIMENSION_OVERALL,
         );
+        const overallText = overallRow ? formatScoreCell(overallRow) : null;
         const dimensionRows = group.rows.filter(
           (r) => r.dimensionSlug !== DIMENSION_OVERALL,
         );
@@ -148,11 +150,30 @@ export function ScorecardsSection({
           >
             <header className="flex flex-wrap items-baseline gap-x-3 gap-y-1 mb-3">
               <h3 className="font-semibold">
-                {meta?.fullLabel ?? group.source}
+                {meta ? (
+                  <Link
+                    href={`/scorecards/${meta.source}`}
+                    className="text-primary hover:underline"
+                  >
+                    {meta.fullLabel}
+                  </Link>
+                ) : (
+                  group.source
+                )}
               </h3>
               {meta?.publisher ? (
                 <span className="text-xs text-muted-foreground">
-                  by {meta.publisher}
+                  by{" "}
+                  {meta.publisherSlug ? (
+                    <Link
+                      href={`/organizations/${meta.publisherSlug}`}
+                      className="text-primary hover:underline"
+                    >
+                      {meta.publisher}
+                    </Link>
+                  ) : (
+                    meta.publisher
+                  )}
                 </span>
               ) : null}
               {group.publishedAt ? (
@@ -172,12 +193,12 @@ export function ScorecardsSection({
               ) : null}
             </header>
 
-            {overallRow ? (
+            {overallRow && overallText !== null ? (
               <div className="mb-3 flex items-baseline gap-3">
                 <span className="text-sm text-muted-foreground">Overall:</span>
                 <span className="inline-flex items-baseline gap-2">
-                  <span className="text-2xl font-mono tabular-nums">
-                    {formatScoreCell(overallRow)}
+                  <span className={`text-2xl ${gradeCellFontClass(overallText)}`}>
+                    {overallText}
                   </span>
                   <SourcingDot
                     status={recordVerdictToStatus(overallRow.sourcing?.verdict)}
@@ -191,25 +212,28 @@ export function ScorecardsSection({
 
             {dimensionRows.length > 0 ? (
               <dl className="w-full text-sm grid grid-cols-[1fr_auto] gap-x-3">
-                {dimensionRows.map((r) => (
-                  <div
-                    key={r.id}
-                    className="contents border-b border-border/30 last:border-b-0"
-                  >
-                    <dt className="py-1.5">{r.dimensionLabel}</dt>
-                    <dd className="py-1.5 font-mono tabular-nums text-right">
-                      <span className="inline-flex items-center gap-1.5 justify-end">
-                        <span>{formatScoreCell(r)}</span>
-                        <SourcingDot
-                          status={recordVerdictToStatus(r.sourcing?.verdict)}
-                          originalVerdict={r.sourcing?.verdict ?? null}
-                          lastChecked={r.sourcing?.checkedAt ?? null}
-                          size="sm"
-                        />
-                      </span>
-                    </dd>
-                  </div>
-                ))}
+                {dimensionRows.map((r) => {
+                  const formatted = formatScoreCell(r);
+                  return (
+                    <div
+                      key={r.id}
+                      className="contents border-b border-border/30 last:border-b-0"
+                    >
+                      <dt className="py-1.5">{r.dimensionLabel}</dt>
+                      <dd className={`py-1.5 text-right ${gradeCellFontClass(formatted)}`}>
+                        <span className="inline-flex items-center gap-1.5 justify-end">
+                          <span>{formatted}</span>
+                          <SourcingDot
+                            status={recordVerdictToStatus(r.sourcing?.verdict)}
+                            originalVerdict={r.sourcing?.verdict ?? null}
+                            lastChecked={r.sourcing?.checkedAt ?? null}
+                            size="sm"
+                          />
+                        </span>
+                      </dd>
+                    </div>
+                  );
+                })}
               </dl>
             ) : null}
           </article>

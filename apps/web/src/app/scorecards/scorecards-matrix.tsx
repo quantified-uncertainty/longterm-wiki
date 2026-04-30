@@ -2,6 +2,7 @@ import Link from "next/link";
 import {
   SCORECARD_SOURCES,
   formatScoreCell,
+  gradeCellFontClass,
   type ScorecardSourceKey,
 } from "@/app/scorecards/scorecards-constants";
 import { SourcingDot } from "@/components/sourcing/SourcingDot";
@@ -59,7 +60,13 @@ export function ScorecardsMatrix({
                 key={meta.source}
                 className="px-3 py-2 font-semibold border-b border-border/60 whitespace-nowrap"
               >
-                {meta.shortLabel}
+                <Link
+                  href={`/scorecards/${meta.source}`}
+                  className="text-primary hover:underline"
+                  title={meta.fullLabel}
+                >
+                  {meta.shortLabel}
+                </Link>
               </th>
             ))}
           </tr>
@@ -91,16 +98,17 @@ export function ScorecardsMatrix({
                     </td>
                   );
                 }
+                const formatted = formatScoreCell(cell);
                 return (
                   <td
                     key={meta.source}
-                    className="px-3 py-2 border-b border-border/30 font-mono tabular-nums"
+                    className={`px-3 py-2 border-b border-border/30 ${gradeCellFontClass(formatted)}`}
                     title={`${meta.fullLabel}${
                       cell.publishedAt ? ` — ${cell.publishedAt}` : ""
                     }`}
                   >
                     <span className="inline-flex items-center gap-1.5">
-                      <span>{formatScoreCell(cell)}</span>
+                      <span>{formatted}</span>
                       <SourcingDot
                         status={recordVerdictToStatus(cell.sourcing?.verdict)}
                         originalVerdict={cell.sourcing?.verdict ?? null}
