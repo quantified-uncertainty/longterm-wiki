@@ -16,7 +16,7 @@
 --     `company_id`/`investor_id` are NOT NULL so the ticket's "null both
 --     columns" option isn't available.
 --
--- F3 trade-off — single-side investor leaks: the 3 "investor-only" leak
+-- Trade-off — single-side investor leaks: the 3 "investor-only" leak
 -- rows (6GS_vh6msp Algolia/Seed/2014, G7xvfoDpI3 Rippling/Series A/$45M,
 -- Wq9J6mOQFe Rippling/Series C/2021) have valid resolved companies. The
 -- DELETE WHERE clause uses `OR` between company-leak and investor-leak
@@ -125,6 +125,25 @@ BEGIN
       "updated_at"      = NOW()
   WHERE "source_table" = 'investments'
     AND "parent_thing_id" = 'sid_Playground';
+
+  -- Phase 1d: defensive sanity check — confirm no row we just normalized
+  -- ALSO has an orphan investor sid. If one did, Phase 3's OR-predicate
+  -- would delete the row we just fixed (silently undoing Phase 1).
+  -- Verified false against prod 2026-04-29; this assertion converts a
+  -- future regression (e.g., new bad data of this exact shape) from a
+  -- silent data loss into a loud abort.
+  IF EXISTS (
+    SELECT 1 FROM "investments"
+    WHERE "company_id" IN ('storyworth', 'playground-ai')
+      AND "investor_id" LIKE 'sid_%'
+      AND "investor_entity_id" IS NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM "entities" e
+        WHERE e."stable_id" = "investments"."investor_id"
+      )
+  ) THEN
+    RAISE EXCEPTION 'QUA-764 aborted: a normalized investment row also has an orphan investor sid. Phase 3 OR-delete would silently destroy the just-normalized row. Investigate before re-running.';
+  END IF;
 
   -- Phase 2: Delete `things` rows for orphan investments first (FK-safe ordering).
   -- Match criteria: investments rows where either `company_id` or `investor_id`
