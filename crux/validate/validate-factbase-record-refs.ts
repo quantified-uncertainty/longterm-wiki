@@ -62,6 +62,14 @@ interface IdRegistry {
   stableIdToSlug?: Record<string, string>;
   stableIdBySlug?: Record<string, string>;
   byStableId?: Record<string, string>;
+  /**
+   * Superset of all stableIds known to PG, including Tier 2 entities
+   * (lightweight personnel, paper authors, minor people) that exist only
+   * in the PG `entities` table and have no YAML/MDX representation.
+   * Populated by build-data when wiki-server is reachable. Validators use
+   * this to recognize Tier 2 refs as resolvable (QUA-788).
+   */
+  pgEntityStableIds?: string[];
 }
 
 // ---------------------------------------------------------------------------
@@ -113,6 +121,15 @@ export function buildEntityLookup(database: {
       stableIds.add(sid);
     }
   }
+  // Tier 2 PG-only entities (QUA-788). build-data populates this with the
+  // full set of stableIds known to PG so refs to lightweight entities
+  // (personnel, paper authors) without YAML/MDX representation resolve
+  // here too.
+  if (database.idRegistry?.pgEntityStableIds) {
+    for (const sid of database.idRegistry.pgEntityStableIds) {
+      stableIds.add(sid);
+    }
+  }
   if (database.idRegistry?.stableIdBySlug) {
     for (const slug of Object.keys(database.idRegistry.stableIdBySlug)) {
       slugs.add(slug);
@@ -140,39 +157,33 @@ export function buildEntityLookup(database: {
 /**
  * Allow specific orphan refs through as warnings; populate per QUA ticket.
  *
- * Current entries: 34 sid_ references that resurfaced after the 2026-04-13
- * baseline clear (commit aded8ac69). Tracked in QUA-459 for cleanup. Each
- * entry is an orphan that exists in prod FactBase records but has no
- * matching entity in `packages/factbase/data/fb-entities/`. Do NOT add to this
- * list without a linked ticket — new orphans are bugs, not noise.
+ * Do NOT add to this list without a linked ticket — new orphans are bugs,
+ * not noise. Each entry is an orphan that exists in prod FactBase records
+ * but has no matching entity in PG.
+ *
+ * History:
+ *   - QUA-459 / QUA-788: 23 sid_ refs from grants/investments/personnel.
+ *     Resolved (2026-04-29):
+ *       - 8 grant pseudo-sids (sid_conjecture, sid_lighthaven, etc.) →
+ *         remapped to real entity sids or nullified via `crux grants/sync`.
+ *       - 11 cohort 2/3 sids (mina-foundation, aleph, james-fox, etc.) →
+ *         these always existed in PG as Tier 2 entities; build-data now
+ *         surfaces them via idRegistry.pgEntityStableIds (QUA-788).
+ *       - 2 cohort 2 missing-VC sids (Kleiner Perkins, Sequoia) →
+ *         display-name string written to investorId.
+ *     Unresolved (kept in baseline):
+ *       - 2 investment records (7ErgqWHiQf, xEh3nQtAaD) reference companies
+ *         (sid_QwuDJJ2oCQ, sid_JSTlUS21fw) that don't exist in PG entities
+ *         at all — see follow-up ticket. The investorIds (sid_F1bFJHm9RA,
+ *         sid_B5JzHeWvow) can't be cleaned up via /sync because the
+ *         upsertThings step fails the parent_thing_id FK on the missing
+ *         company. Cleanup requires either creating stub company entities
+ *         + things, or deleting the records.
  */
 const KNOWN_BASELINE_REFS: ReadonlySet<string> = new Set<string>([
-  // Grant recipient orphans (QUA-459)
-  "sid_GlobalGive",
-  "sid_Orthogonal",
-  "sid_conjecture",
-  "sid_Kurzgesagt",
-  "sid_Futurewise",
-  "sid_lighthaven",
-  "sid_Janaagraha",
-  "sid_Exscientia",
-  // Investment investor orphans (QUA-459)
-  "sid_B5JzHeWvow",
-  "sid_dbDEGrJbUp",
-  "sid_69J7QKcqyX",
-  "sid_Kvfo7x5bqf",
-  "sid_rWgCE08sfW",
-  "sid_dzlCIZ45dZ",
-  "sid_B6ZUV8iv17",
-  "sid_F1bFJHm9RA",
-  "sid_ntlgFVJrPg",
-  "sid_oEH5GwWtow",
-  // Personnel / board-seat person orphans (QUA-459)
-  "sid_QAmTpCO5iQ",
-  "sid_t1PPwNe3x7",
-  "sid_2WGRkU8nio",
-  "sid_L0huEH4GSF",
-  "sid_PUlCEEDFup",
+  // QUA-788 follow-up: dangling-company investment records
+  "sid_F1bFJHm9RA", // Khosla Ventures, in 7ErgqWHiQf (Rejuvenation Technologies — company missing from PG)
+  "sid_B5JzHeWvow", // Index Ventures, in xEh3nQtAaD (Curtsy — company missing from PG)
 ]);
 
 // ---------------------------------------------------------------------------

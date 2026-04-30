@@ -70,6 +70,7 @@ import {
   syncPolicyStakeholders,
   fetchResourcesFromPG,
   fetchEntityResourceLinks,
+  fetchAllEntityStableIds,
   buildPageReferenceIndex,
   getWikiServerWarningCount,
   getSkippedDataSources,
@@ -614,8 +615,34 @@ async function main() {
     stableIdToSlug,
     byStableId: { ...byStableId },
     stableIdBySlug: { ...stableIdBySlug },
+    // pgEntityStableIds: union of YAML stableIds + Tier 2 PG-only entities.
+    // Tier 2 entities (lightweight personnel, paper authors, minor people)
+    // are stored in the PG entities table but have no YAML/MDX representation.
+    // Validators (e.g. validate-factbase-record-refs) treat refs to them as
+    // resolvable via this list, even though they aren't routable wiki pages.
+    // Populated below; falls back to YAML-only set on wiki-server failure.
+    pgEntityStableIds: [...Object.keys(byStableId)],
   };
   database.idRegistry = idRegistryOutput;
+
+  // Augment pgEntityStableIds with Tier 2 PG-only entities (QUA-788).
+  if (!CONTENT_ONLY) {
+    const pgStableIds = await fetchAllEntityStableIds();
+    if (pgStableIds && pgStableIds.length > 0) {
+      const merged = new Set(idRegistryOutput.pgEntityStableIds);
+      for (const sid of pgStableIds) merged.add(sid);
+      idRegistryOutput.pgEntityStableIds = [...merged].sort();
+      const yamlCount = Object.keys(byStableId).length;
+      const tier2Count = idRegistryOutput.pgEntityStableIds.length - yamlCount;
+      console.log(
+        `  pgEntityStableIds: ${idRegistryOutput.pgEntityStableIds.length} total (${yamlCount} YAML + ${tier2Count} Tier 2 PG-only)`,
+      );
+    } else {
+      console.log(
+        `  pgEntityStableIds: ${idRegistryOutput.pgEntityStableIds.length} (YAML only — wiki-server unavailable for Tier 2)`,
+      );
+    }
+  }
 
   // Generate MDX stubs for entities with YAML-first content
   console.log('\nGenerating MDX from YAML content...');

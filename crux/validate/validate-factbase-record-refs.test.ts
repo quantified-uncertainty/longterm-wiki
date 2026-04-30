@@ -131,6 +131,26 @@ describe("buildEntityLookup", () => {
     expect(lookup.hasSid("sid_anything")).toBe(false);
     expect(lookup.hasSlug("anything")).toBe(false);
   });
+
+  // QUA-788: Tier 2 PG-only entities are surfaced via idRegistry.pgEntityStableIds
+  it("recognizes Tier 2 PG-only stableIds via pgEntityStableIds", () => {
+    const lookup = buildEntityLookup({
+      idRegistry: {
+        // Only one YAML entity in byStableId
+        byStableId: { sid_yaml000001: "yaml-entity" },
+        // pgEntityStableIds is the superset (YAML + Tier 2 PG-only)
+        pgEntityStableIds: [
+          "sid_yaml000001",
+          "sid_pgOnly0001", // Tier 2 person, no YAML
+          "sid_pgOnly0002", // Tier 2 org, no YAML
+        ],
+      },
+    });
+    expect(lookup.hasSid("sid_yaml000001")).toBe(true);
+    expect(lookup.hasSid("sid_pgOnly0001")).toBe(true);
+    expect(lookup.hasSid("sid_pgOnly0002")).toBe(true);
+    expect(lookup.hasSid("sid_notKnown01")).toBe(false);
+  });
 });
 
 // ---------------------------------------------------------------------------

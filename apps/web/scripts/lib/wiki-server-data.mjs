@@ -1883,6 +1883,52 @@ export async function buildPageReferenceIndex() {
 }
 
 /**
+ * Fetch the set of all entity stableIds known to PG (YAML + Tier 2).
+ *
+ * The build pipeline only loads YAML+frontmatter entities into idRegistry,
+ * but FactBase records (grants, investments, personnel) reference Tier 2
+ * entities that exist only in PG. Returning this superset lets validators
+ * (e.g. validate-factbase-record-refs) recognize Tier 2 stableIds as
+ * resolvable rather than flagging them as unresolvable orphans (QUA-788).
+ *
+ * Returns null on wiki-server failure (caller falls back to YAML-only set).
+ *
+ * @returns {Promise<string[] | null>}
+ */
+export async function fetchAllEntityStableIds() {
+  const serverUrl = getServerUrl();
+  if (!serverUrl) return null;
+  const headers = buildHeaders();
+  const fetchOpts = { headers, signal: AbortSignal.timeout(30_000) };
+
+  const stableIds = [];
+  const pageSize = 500;
+  let offset = 0;
+  try {
+    while (true) {
+      const url = `${serverUrl}/api/entities?limit=${pageSize}&offset=${offset}`;
+      const resp = await fetch(url, fetchOpts);
+      if (!resp.ok) {
+        logWikiServerWarning('allEntityStableIds', `HTTP ${resp.status} at offset=${offset}`);
+        return null;
+      }
+      const data = await resp.json();
+      const items = data.entities || [];
+      for (const e of items) {
+        if (e.stableId) stableIds.push(e.stableId);
+      }
+      if (items.length < pageSize) break;
+      offset += pageSize;
+      if (offset > 50_000) break; // safety bound
+    }
+  } catch (err) {
+    logWikiServerWarning('allEntityStableIds', err instanceof Error ? err.message : String(err));
+    return null;
+  }
+  return stableIds;
+}
+
+/**
  * Fetch entity_resources from wiki-server and group by entityId.
  * Returns: { [stableId]: { authored: resourceId[], subject: resourceId[] } }
  */
