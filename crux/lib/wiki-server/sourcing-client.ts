@@ -97,6 +97,38 @@ export async function listVerdicts(
   );
 }
 
+/**
+ * Fetch the set of record IDs that already have a row-level verdict for the
+ * given recordType. Skips per-field verdicts (fieldName != null) since a
+ * record with only field-level verdicts has no row-level coverage and should
+ * still be considered "no verdict" for the QUA-851 backfill flow.
+ *
+ * Paginates server-side at MAX_PAGE_SIZE (200). Used by
+ * `crux fb sourcing --where-no-verdict` to skip already-verified facts.
+ */
+export async function fetchVerdictRecordIds(
+  recordType: string,
+): Promise<ApiResult<Set<string>>> {
+  const PAGE_SIZE = 200;
+  const ids = new Set<string>();
+  let offset = 0;
+
+  while (true) {
+    const res = await listVerdicts({ recordType, limit: PAGE_SIZE, offset });
+    if (!res.ok) return res;
+
+    for (const v of res.data.verdicts) {
+      if (v.fieldName != null) continue;
+      ids.add(v.recordId);
+    }
+
+    if (res.data.verdicts.length < PAGE_SIZE) break;
+    offset += PAGE_SIZE;
+  }
+
+  return { ok: true, data: ids };
+}
+
 /** Get verdicts for a specific record. */
 export async function getVerdictByRecord(
   recordType: string,
