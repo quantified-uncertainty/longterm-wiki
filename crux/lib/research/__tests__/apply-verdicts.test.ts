@@ -3,6 +3,7 @@ import {
   applyVerdictsToOrganization,
   applyVerdictsToPolicy,
   canonicalizePersonKey,
+  extractStructuredDate,
   MIN_POSITION_CONFIDENCE,
   type VerifiedVerdict,
 } from "../apply-verdicts.ts";
@@ -38,6 +39,54 @@ describe("canonicalizePersonKey", () => {
 
   it("handles empty input", () => {
     expect(canonicalizePersonKey("")).toBe("");
+  });
+});
+
+// ─── extractStructuredDate (QUA-937) ──────────────────────────────────────
+
+describe("extractStructuredDate", () => {
+  it("returns full ISO when proposedValue is exactly an ISO date", () => {
+    expect(extractStructuredDate("2026-01-30")).toBe("2026-01-30");
+  });
+
+  it("finds ISO date embedded in narrative prose", () => {
+    expect(
+      extractStructuredDate(
+        "Claude helped NASA travel 400m. Source updated 2026-01-30 per release notes.",
+      ),
+    ).toBe("2026-01-30");
+  });
+
+  it("parses Month Day, Year written out", () => {
+    expect(extractStructuredDate("Date January 30, 2026")).toBe("2026-01-30");
+    expect(extractStructuredDate("Feb 12, 2026")).toBe("2026-02-12");
+    expect(extractStructuredDate("September 1 2024")).toBe("2024-09-01");
+  });
+
+  it("falls back to YYYY-MM for month-only precision", () => {
+    expect(extractStructuredDate("January 2021")).toBe("2021-01");
+    expect(extractStructuredDate("Sept 2024")).toBe("2024-09");
+  });
+
+  it("falls back to bare year when nothing tighter is available", () => {
+    expect(extractStructuredDate("Spun out of OpenAI in 2021")).toBe("2021");
+  });
+
+  it("returns null when no date is present", () => {
+    expect(extractStructuredDate("Claude helped the rover")).toBeNull();
+    expect(extractStructuredDate("")).toBeNull();
+    expect(extractStructuredDate(null)).toBeNull();
+    expect(extractStructuredDate(undefined)).toBeNull();
+  });
+
+  it("rejects out-of-range ISO dates and falls through", () => {
+    // Not a valid month — falls through to year fallback.
+    expect(extractStructuredDate("2026-13-30")).toBe("2026");
+  });
+
+  it("tries candidates in order, returning the first match", () => {
+    expect(extractStructuredDate(null, "2026-01-30", "Claude helped")).toBe("2026-01-30");
+    expect(extractStructuredDate("no date here", "January 2021")).toBe("2021-01");
   });
 });
 
@@ -465,31 +514,112 @@ describe("applyVerdictsToOrganization", () => {
     expect(kp.entityId).toBe("sam-altman");
   });
 
-  it("adds keyDate when extractedValue carries the date", () => {
+  it("adds keyDate when proposedValue is already a full ISO date", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "keyDate.claude-mars",
+        proposedValue: "2026-01-30",
+        displayHint: "Claude Assists NASA Mars Mission",
+      }),
+    ]);
+    expect(result.entity.keyDates).toEqual([
+      {
+        date: "2026-01-30",
+        description: "Claude Assists NASA Mars Mission",
+        source: "https://example.com",
+      },
+    ]);
+    expect(result.warnings).toEqual([]);
+  });
+
+  it("parses ISO date out of narrative proposedValue (QUA-937)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "keyDate.claude-mars",
+        proposedValue:
+          "Claude on Mars - The first AI-assisted drive on another planet. Claude helped NASA's Perseverance rover travel four hundred meters on Mars. Date January 30, 2026",
+        displayHint: "Claude Assists NASA Mars Mission",
+      }),
+    ]);
+    expect(result.entity.keyDates).toEqual([
+      {
+        date: "2026-01-30",
+        description: "Claude Assists NASA Mars Mission",
+        source: "https://example.com",
+      },
+    ]);
+  });
+
+  it("falls back to YYYY-MM when only month-precision is present", () => {
     const entity: OrganizationEntity = { id: "x", type: "organization" };
     const result = applyVerdictsToOrganization(entity, [
       v({
         targetField: "keyDate.founded",
-        extractedValue: "January 2021",
+        proposedValue: "January 2021",
         displayHint: "Founded as Anthropic PBC",
       }),
     ]);
     expect(result.entity.keyDates).toEqual([
       {
-        date: "January 2021",
+        date: "2021-01",
         description: "Founded as Anthropic PBC",
         source: "https://example.com",
       },
     ]);
   });
 
-  it("skips keyDate when no date value present", () => {
+  it("falls back to YYYY when only a bare year is present", () => {
     const entity: OrganizationEntity = { id: "x", type: "organization" };
     const result = applyVerdictsToOrganization(entity, [
-      v({ targetField: "keyDate.founded", extractedValue: null, proposedValue: null }),
+      v({
+        targetField: "keyDate.spinoff",
+        proposedValue: "Spun out of OpenAI in 2021",
+        displayHint: "Spun out of OpenAI",
+      }),
+    ]);
+    expect(result.entity.keyDates).toEqual([
+      {
+        date: "2021",
+        description: "Spun out of OpenAI",
+        source: "https://example.com",
+      },
+    ]);
+  });
+
+  it("drops keyDate with no parseable date, warns, and emits skip reason", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "keyDate.unknown",
+        proposedValue: "Claude assisted the rover",
+        claimText: "narrative without any date",
+        displayHint: "Mars Mission",
+      }),
     ]);
     expect(result.entity.keyDates ?? []).toHaveLength(0);
-    expect(result.applied[0]).toMatchObject({ action: "skipped", reason: "no date value" });
+    expect(result.applied[0]).toMatchObject({
+      action: "skipped",
+      reason: "no parseable date",
+    });
+    expect(result.warnings).toEqual([
+      expect.stringContaining("keyDate.unknown"),
+    ]);
+  });
+
+  it("skips keyDate when proposedValue and extractedValue are both null", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "keyDate.founded",
+        extractedValue: null,
+        proposedValue: null,
+        claimText: "no dates anywhere here",
+      }),
+    ]);
+    expect(result.entity.keyDates ?? []).toHaveLength(0);
+    expect(result.applied[0]).toMatchObject({ action: "skipped", reason: "no parseable date" });
   });
 
   it("dedupes tags", () => {

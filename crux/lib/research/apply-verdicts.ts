@@ -73,6 +73,78 @@ export function titleCase(slug: string): string {
     .join(" ");
 }
 
+const MONTH_NAMES: Record<string, string> = {
+  jan: "01", january: "01",
+  feb: "02", february: "02",
+  mar: "03", march: "03",
+  apr: "04", april: "04",
+  may: "05",
+  jun: "06", june: "06",
+  jul: "07", july: "07",
+  aug: "08", august: "08",
+  sep: "09", sept: "09", september: "09",
+  oct: "10", october: "10",
+  nov: "11", november: "11",
+  dec: "12", december: "12",
+};
+
+/**
+ * Best-effort extraction of a structured date string from prose. Returns the
+ * tightest representation available — preferring full ISO `YYYY-MM-DD`,
+ * falling back to `YYYY-MM`, then `YYYY`. Returns null when nothing parseable
+ * is found. Used by the keyDate applier to reject narrative prose like
+ * `"Claude on Mars - The first AI-assisted drive ..."` that the extractor
+ * sometimes returns in proposedValue (QUA-937).
+ */
+export function extractStructuredDate(...candidates: Array<string | null | undefined>): string | null {
+  for (const raw of candidates) {
+    if (!raw) continue;
+    const s = raw.trim();
+    if (!s) continue;
+
+    // Full ISO YYYY-MM-DD anywhere in the string.
+    const iso = s.match(/\b(\d{4})-(\d{2})-(\d{2})\b/);
+    if (iso) {
+      const [_, y, m, d] = iso;
+      if (Number(m) >= 1 && Number(m) <= 12 && Number(d) >= 1 && Number(d) <= 31) {
+        return `${y}-${m}-${d}`;
+      }
+    }
+
+    // "Month Day, Year" or "Month Day Year" — e.g. "January 30, 2026", "Feb 12 2026".
+    const monthDay = s.match(
+      /\b(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)\.?\s+(\d{1,2}),?\s+(\d{4})\b/i,
+    );
+    if (monthDay) {
+      const month = MONTH_NAMES[monthDay[1].toLowerCase()];
+      const day = monthDay[2].padStart(2, "0");
+      if (month && Number(day) >= 1 && Number(day) <= 31) {
+        return `${monthDay[3]}-${month}-${day}`;
+      }
+    }
+
+    // "Month Year" — e.g. "January 2021", "Sept 2024".
+    const monthYear = s.match(
+      /\b(jan|january|feb|february|mar|march|apr|april|may|jun|june|jul|july|aug|august|sep|sept|september|oct|october|nov|november|dec|december)\.?\s+(\d{4})\b/i,
+    );
+    if (monthYear) {
+      const month = MONTH_NAMES[monthYear[1].toLowerCase()];
+      if (month) return `${monthYear[2]}-${month}`;
+    }
+
+    // YYYY-MM (no day component).
+    const ym = s.match(/\b(\d{4})-(\d{2})\b/);
+    if (ym && Number(ym[2]) >= 1 && Number(ym[2]) <= 12) {
+      return `${ym[1]}-${ym[2]}`;
+    }
+
+    // Bare year as last resort.
+    const year = s.match(/\b(19|20)(\d{2})\b/);
+    if (year) return `${year[1]}${year[2]}`;
+  }
+  return null;
+}
+
 /**
  * Canonical comparison key for a person's display name. Strips suffixes
  * (Jr., Sr., III, PhD, MD), lowercases, and slugifies. Used for keyPerson
@@ -469,11 +541,16 @@ export function applyVerdictsToOrganization(
     }
 
     // ── keyDate.<slug> ──────────────────────────────────────────────────
+    // Only structured date strings (ISO `YYYY-MM-DD`, `YYYY-MM`, or `YYYY`)
+    // belong in `date:`. The Haiku extractor returns the source-paraphrase
+    // as proposedValue / extractedValue, which often includes prose like
+    // "Claude on Mars — Date January 30, 2026". Parse the date out before
+    // writing; drop the entry when nothing parseable is found rather than
+    // committing narrative prose to YAML (QUA-937).
     if (tf.startsWith("keyDate.")) {
       const slug = tf.slice("keyDate.".length);
-      // displayHint is the human description; extractedValue/claimText carries the date.
       const description = v.displayHint ?? titleCase(slug);
-      const date = (v.extractedValue?.trim() || v.proposedValue?.trim() || "").trim();
+      const date = extractStructuredDate(v.proposedValue, v.extractedValue, v.claimText);
       next.keyDates ??= [];
       const existing = next.keyDates.find((d) => slugify(d.description) === slug);
       if (existing) {
@@ -494,7 +571,10 @@ export function applyVerdictsToOrganization(
         continue;
       }
       if (!date) {
-        applied.push({ targetField: tf, action: "skipped", reason: "no date value" });
+        warnings.push(
+          `keyDate.${slug}: no parseable date in proposedValue/extractedValue/claimText — entry dropped`,
+        );
+        applied.push({ targetField: tf, action: "skipped", reason: "no parseable date" });
         continue;
       }
       next.keyDates.push({ date, description, source: v.sourceUrl });
