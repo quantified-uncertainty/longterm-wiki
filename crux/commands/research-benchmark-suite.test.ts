@@ -11,7 +11,12 @@ import path from "node:path";
 
 import {
   buildSnapshot,
+  formatDiff,
+  formatList,
+  formatSnapshotSummary,
   run,
+  type SuiteSnapshot,
+  type SuiteSnapshotEntity,
 } from "./research-benchmark-suite.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
@@ -186,4 +191,185 @@ describe("run — CLI surface", () => {
     expect(result.exitCode).toBe(1);
     expect(result.output).toContain("Provide");
   });
+
+  it("rejects tags with a leading dot (no hidden-dot files)", async () => {
+    const r1 = await run([], { tag: ".hidden" });
+    expect(r1.exitCode).toBe(1);
+    expect(r1.output).toContain("Tag must match");
+    const r2 = await run([], { tag: "..foo" });
+    expect(r2.exitCode).toBe(1);
+    expect(r2.output).toContain("Tag must match");
+  });
+
+  it("snapshot file is well-formed JSON ending with a newline", async () => {
+    const tag = nextTag("newline");
+    await run([], { tag });
+    const file = path.join(SNAPSHOT_DIR, `${tag}.json`);
+    const raw = fs.readFileSync(file, "utf8");
+    expect(raw.endsWith("\n")).toBe(true);
+    expect(() => JSON.parse(raw)).not.toThrow();
+  });
+
+  it("written snapshots include schema_version", async () => {
+    const tag = nextTag("schema");
+    await run([], { tag });
+    const file = path.join(SNAPSHOT_DIR, `${tag}.json`);
+    const onDisk = JSON.parse(fs.readFileSync(file, "utf8"));
+    expect(onDisk.schema_version).toBe(1);
+  });
 });
+
+// ---------------------------------------------------------------------------
+// Formatter unit tests — exercise rendering branches that the live 8-entity
+// suite doesn't naturally hit (added/removed entities, below-min flag,
+// empty-list output). Use hand-built SuiteSnapshot fixtures so the test
+// doesn't depend on ambient YAML state.
+// ---------------------------------------------------------------------------
+
+function fakeEntity(
+  slug: string,
+  score: number,
+  min: number,
+): SuiteSnapshotEntity {
+  return {
+    slug,
+    type: "policy",
+    coverage_score: score,
+    expected_min_coverage: min,
+    components: { top_level: 0, provisions: 0, stakeholders: 0, tags: 0, relatedEntries: 0 },
+    facts_in_yaml: {
+      provisions: 0,
+      stakeholders: 0,
+      tags: 0,
+      relatedEntries: 0,
+      top_level_filled: 0,
+    },
+  };
+}
+
+function fakeSnapshot(tag: string, entities: SuiteSnapshotEntity[]): SuiteSnapshot {
+  const below = entities.filter((e) => e.coverage_score < e.expected_min_coverage);
+  return {
+    schema_version: 1,
+    tag,
+    timestamp: "2026-01-01T00:00:00.000Z",
+    git_sha: "deadbeef",
+    suite_size: entities.length,
+    entities,
+    aggregate: {
+      count: entities.length,
+      median_coverage_score: 0.5,
+      p25_coverage_score: 0.25,
+      count_below_min: below.length,
+      below_min_slugs: below.map((e) => e.slug),
+    },
+  };
+}
+
+describe("formatList", () => {
+  it("returns the empty-state message when no snapshots exist", () => {
+    expect(formatList([])).toContain("No suite snapshots");
+  });
+
+  it("renders one row per snapshot with size + aggregate columns", () => {
+    const snaps = [
+      fakeSnapshot("baseline", [fakeEntity("a", 0.9, 0.5)]),
+      fakeSnapshot("after", [fakeEntity("a", 0.8, 0.5)]),
+    ];
+    const out = formatList(snaps);
+    expect(out).toContain("baseline");
+    expect(out).toContain("after");
+    expect(out).toContain("size=1");
+    expect(out).toContain("median=");
+    expect(out).toContain("p25=");
+    expect(out).toContain("below=");
+  });
+});
+
+describe("formatSnapshotSummary", () => {
+  it("flags entries below their expected_min_coverage", () => {
+    // 0.4 vs floor 0.5 → should appear with "✗ below min".
+    const snap = fakeSnapshot("low", [fakeEntity("thin-policy", 0.4, 0.5)]);
+    const out = formatSnapshotSummary(snap);
+    expect(out).toContain("thin-policy");
+    expect(out).toContain("✗ below min");
+  });
+
+  it("does not flag entries at or above the floor", () => {
+    const snap = fakeSnapshot("ok", [
+      fakeEntity("equal", 0.5, 0.5),
+      fakeEntity("above", 0.9, 0.5),
+    ]);
+    const out = formatSnapshotSummary(snap);
+    expect(out).not.toContain("✗ below min");
+  });
+
+  it("only lists below_min_slugs when there are any", () => {
+    const empty = fakeSnapshot("empty", [fakeEntity("a", 0.9, 0.5)]);
+    expect(formatSnapshotSummary(empty)).not.toContain("below_min_slugs:");
+    const withBelow = fakeSnapshot("with", [fakeEntity("bad", 0.1, 0.5)]);
+    expect(formatSnapshotSummary(withBelow)).toContain("below_min_slugs:");
+  });
+});
+
+describe("formatDiff", () => {
+  it("marks entities added between snapshots", () => {
+    const before = fakeSnapshot("a", [fakeEntity("only-before", 0.9, 0.5)]);
+    const after = fakeSnapshot("b", [
+      fakeEntity("only-before", 0.9, 0.5),
+      fakeEntity("only-after", 0.8, 0.5),
+    ]);
+    const out = formatDiff(before, after);
+    expect(out).toContain("only-after");
+    expect(out).toContain("(added)");
+  });
+
+  it("marks entities removed between snapshots", () => {
+    const before = fakeSnapshot("a", [
+      fakeEntity("only-before", 0.9, 0.5),
+      fakeEntity("dropped", 0.8, 0.5),
+    ]);
+    const after = fakeSnapshot("b", [fakeEntity("only-before", 0.9, 0.5)]);
+    const out = formatDiff(before, after);
+    expect(out).toContain("dropped");
+    expect(out).toContain("(removed)");
+  });
+
+  it("reports newly-below-min slugs but not pre-existing ones", () => {
+    const before = fakeSnapshot("a", [
+      fakeEntity("preexisting-below", 0.4, 0.5),
+      fakeEntity("regressed", 0.9, 0.5),
+    ]);
+    const after = fakeSnapshot("b", [
+      fakeEntity("preexisting-below", 0.4, 0.5),
+      fakeEntity("regressed", 0.4, 0.5),
+    ]);
+    const out = formatDiff(before, after);
+    expect(out).toContain("newly below min:");
+    expect(out).toContain("regressed");
+    // preexisting-below was already below; should NOT be listed as newly below.
+    const newlyBelowLine =
+      out.split("\n").find((l) => l.includes("newly below min:")) ?? "";
+    expect(newlyBelowLine).not.toContain("preexisting-below");
+  });
+
+  it("reports recovered slugs (below before, above after)", () => {
+    const before = fakeSnapshot("a", [fakeEntity("recovered", 0.4, 0.5)]);
+    const after = fakeSnapshot("b", [fakeEntity("recovered", 0.9, 0.5)]);
+    const out = formatDiff(before, after);
+    expect(out).toContain("recovered:");
+    expect(out).toContain("recovered");
+  });
+
+  it("zero-delta rendering does not include a stray sign character", () => {
+    const before = fakeSnapshot("a", [fakeEntity("steady", 0.5, 0.5)]);
+    const after = fakeSnapshot("b", [fakeEntity("steady", 0.5, 0.5)]);
+    const out = formatDiff(before, after);
+    // Zero deltas should be `( 0.00)` width-aligned without a "+" prefix.
+    // The current rule: `+` only on positive deltas; nothing prepended for
+    // zero or negative. So the parens contents must be exactly "0.00".
+    expect(out).toMatch(/\(0\.00\)/);
+    expect(out).not.toMatch(/\(\+0\.00\)/);
+  });
+});
+

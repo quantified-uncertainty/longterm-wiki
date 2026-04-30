@@ -34,17 +34,28 @@ const RESPONSES_YAML = path.join(ROOT, "data/entities/responses.yaml");
 const SNAPSHOT_DIR = path.join(ROOT, ".claude/snapshots/benchmark-suite");
 
 interface SuiteEntry {
+  // The suite YAML uses `slug:` for human readability; the YAML loader
+  // resolves this against `entities.id` in data/entities/responses.yaml,
+  // which is the same string today (kebab-case). If those concepts diverge
+  // (e.g. id becomes a numericId), update loadPolicies()'s key.
   slug: string;
   type: string;
   expected_min_coverage: number;
 }
 
-interface SuiteSnapshotEntity extends SuiteEntityResult {
+export interface SuiteSnapshotEntity extends SuiteEntityResult {
   components: Record<string, number>;
   facts_in_yaml: Record<string, number>;
 }
 
-interface SuiteSnapshot {
+const SNAPSHOT_SCHEMA_VERSION = 1;
+
+export interface SuiteSnapshot {
+  // Bump SNAPSHOT_SCHEMA_VERSION when changing the on-disk shape so old
+  // snapshots can be detected and either migrated or rejected by --diff /
+  // --list. Today every snapshot is the live shape; this field is a hook
+  // for the next breaking change.
+  schema_version: number;
   tag: string;
   timestamp: string;
   git_sha: string | null;
@@ -91,9 +102,17 @@ function loadSuite(): SuiteEntry[] {
 }
 
 function loadPolicies(): Map<string, PolicyEntity> {
-  const all = yaml.load(fs.readFileSync(RESPONSES_YAML, "utf8")) as PolicyEntity[];
+  const raw = yaml.load(fs.readFileSync(RESPONSES_YAML, "utf8")) as unknown;
+  if (!Array.isArray(raw)) {
+    throw new Error(`Expected ${RESPONSES_YAML} to be a YAML list, got ${typeof raw}`);
+  }
   const map = new Map<string, PolicyEntity>();
-  for (const e of all) map.set(e.id, e);
+  for (const e of raw) {
+    if (!e || typeof e !== "object") continue;
+    const r = e as Record<string, unknown>;
+    if (typeof r.id !== "string" || !r.id) continue;
+    map.set(r.id, e as PolicyEntity);
+  }
   return map;
 }
 
@@ -103,11 +122,19 @@ function snapshotPath(tag: string): string {
 
 function listSnapshots(): SuiteSnapshot[] {
   if (!fs.existsSync(SNAPSHOT_DIR)) return [];
-  return fs
-    .readdirSync(SNAPSHOT_DIR)
-    .filter((f) => f.endsWith(".json"))
-    .map((f) => JSON.parse(fs.readFileSync(path.join(SNAPSHOT_DIR, f), "utf8")) as SuiteSnapshot)
-    .sort((a, b) => a.timestamp.localeCompare(b.timestamp));
+  // Skip-and-warn corrupt files instead of throwing — a previous crash
+  // mid-write would otherwise wedge `--list` for everyone.
+  const out: SuiteSnapshot[] = [];
+  for (const f of fs.readdirSync(SNAPSHOT_DIR)) {
+    if (!f.endsWith(".json")) continue;
+    const p = path.join(SNAPSHOT_DIR, f);
+    try {
+      out.push(JSON.parse(fs.readFileSync(p, "utf8")) as SuiteSnapshot);
+    } catch (err) {
+      console.warn(`Skipping unreadable snapshot ${f}: ${(err as Error).message}`);
+    }
+  }
+  return out.sort((a, b) => a.timestamp.localeCompare(b.timestamp));
 }
 
 function findByTag(tag: string): SuiteSnapshot | null {
@@ -148,6 +175,7 @@ export function buildSnapshot(tag: string): SuiteSnapshot {
     });
   }
   return {
+    schema_version: SNAPSHOT_SCHEMA_VERSION,
     tag,
     timestamp: new Date().toISOString(),
     git_sha: gitSha(),
@@ -160,7 +188,12 @@ export function buildSnapshot(tag: string): SuiteSnapshot {
 function writeSnapshot(snap: SuiteSnapshot): string {
   fs.mkdirSync(SNAPSHOT_DIR, { recursive: true });
   const p = snapshotPath(snap.tag);
-  fs.writeFileSync(p, JSON.stringify(snap, null, 2) + "\n");
+  // Atomic write: write to a temp sibling and rename. Prevents a
+  // SIGINT/power-loss mid-write from leaving a half-JSON file behind that
+  // would later wedge `--list`.
+  const tmp = `${p}.${process.pid}.tmp`;
+  fs.writeFileSync(tmp, JSON.stringify(snap, null, 2) + "\n");
+  fs.renameSync(tmp, p);
   return p;
 }
 
@@ -170,17 +203,20 @@ function fmtScore(n: number): string {
 
 function fmtDelta(before: number, after: number, digits = 2): string {
   const d = after - before;
-  const sign = d > 0 ? "+" : d < 0 ? "" : " ";
+  // Negative numbers already render their own minus via toFixed; positive
+  // gets an explicit "+"; zero is bare. Keeps the `(+0.05)` / `(-0.05)` /
+  // `(0.00)` widths aligned without a stray leading space.
+  const sign = d > 0 ? "+" : "";
   return `${before.toFixed(digits)} → ${after.toFixed(digits)}  (${sign}${d.toFixed(digits)})`;
 }
 
 function fmtIntDelta(before: number, after: number): string {
   const d = after - before;
-  const sign = d > 0 ? "+" : d < 0 ? "" : " ";
+  const sign = d > 0 ? "+" : "";
   return `${before} → ${after}  (${sign}${d})`;
 }
 
-function formatSnapshotSummary(snap: SuiteSnapshot): string {
+export function formatSnapshotSummary(snap: SuiteSnapshot): string {
   const lines: string[] = [];
   lines.push(`Snapshot saved: ${snap.tag}`);
   lines.push(`  timestamp: ${snap.timestamp}`);
@@ -207,7 +243,7 @@ function formatSnapshotSummary(snap: SuiteSnapshot): string {
   return lines.join("\n");
 }
 
-function formatList(snaps: SuiteSnapshot[]): string {
+export function formatList(snaps: SuiteSnapshot[]): string {
   if (snaps.length === 0) return "No suite snapshots in .claude/snapshots/benchmark-suite/";
   const lines: string[] = ["Suite snapshots:"];
   const wTag = Math.max(...snaps.map((s) => s.tag.length), 3);
@@ -221,7 +257,7 @@ function formatList(snaps: SuiteSnapshot[]): string {
   return lines.join("\n");
 }
 
-function formatDiff(before: SuiteSnapshot, after: SuiteSnapshot): string {
+export function formatDiff(before: SuiteSnapshot, after: SuiteSnapshot): string {
   const lines: string[] = [];
   lines.push(`=== suite diff: ${before.tag} → ${after.tag} ===`);
   lines.push(`  before: ${before.timestamp}  git=${before.git_sha ?? "?"}`);
@@ -303,10 +339,11 @@ export async function run(
       exitCode: 1,
     };
   }
-  // Tag must be path-safe — it becomes a filename.
-  if (!/^[a-zA-Z0-9._-]+$/.test(tag)) {
+  // Tag must be path-safe — it becomes a filename. Also disallow leading
+  // "." so we don't accidentally write hidden-dot files (`.foo`, `..bar`).
+  if (!/^[a-zA-Z0-9_-][a-zA-Z0-9._-]*$/.test(tag)) {
     return {
-      output: `Tag must match [a-zA-Z0-9._-]+ (got: "${tag}")`,
+      output: `Tag must match [a-zA-Z0-9_-][a-zA-Z0-9._-]* (got: "${tag}")`,
       exitCode: 1,
     };
   }
