@@ -8,6 +8,7 @@ import {
   SCORECARD_SOURCES,
   formatScoreCell,
   getScorecardSourceMeta,
+  gradeCellFontClass,
 } from "@/app/scorecards/scorecards-constants";
 import { buildOrgDimensionMatrix, type MatrixGrade } from "@/app/scorecards/[source]/matrix";
 
@@ -330,7 +331,7 @@ export default async function ScorecardDetailPage({
                       return (
                         <td
                           key={dim.slug}
-                          className="px-3 py-2 border-b border-border/30 font-mono tabular-nums"
+                          className={`px-3 py-2 border-b border-border/30 ${gradeCellFontClass(formatted)}`}
                           title={`${dim.label}${rawSuffix}`}
                         >
                           {formatted}

@@ -3,6 +3,8 @@ import {
   SCORECARD_SOURCES,
   getScorecardSourceMeta,
   formatScoreCell,
+  isCodeLikeGrade,
+  gradeCellFontClass,
   DIMENSION_OVERALL,
 } from "../scorecards-constants";
 
@@ -76,5 +78,73 @@ describe("scorecards-constants", () => {
       const meta = getScorecardSourceMeta(slug);
       expect(meta?.active).toBe(true);
     }
+  });
+
+  describe("isCodeLikeGrade", () => {
+    it.each([
+      "A", "A+", "A-",
+      "B", "B+", "B-",
+      "C", "C+", "C-",
+      "D", "D+", "D-",
+      "F",
+      "a", "b+", "f",
+    ])("treats letter grade %s as code-like", (grade) => {
+      expect(isCodeLikeGrade(grade)).toBe(true);
+    });
+
+    it.each([
+      "84", "0", "100", "84.5", "75/100", "75%", "1.0",
+    ])("treats numeric/scored value %s as code-like", (value) => {
+      expect(isCodeLikeGrade(value)).toBe(true);
+    });
+
+    it.each([
+      "Weak", "Very Weak", "Fulfilled", "Partial", "Unfulfilled",
+      "Moderate", "Strong",
+    ])("treats prose verdict %s as NOT code-like", (verdict) => {
+      expect(isCodeLikeGrade(verdict)).toBe(false);
+    });
+
+    it("treats empty/whitespace as not code-like", () => {
+      expect(isCodeLikeGrade("")).toBe(false);
+      expect(isCodeLikeGrade("   ")).toBe(false);
+    });
+
+    it("trims surrounding whitespace before classifying", () => {
+      expect(isCodeLikeGrade("  C+  ")).toBe(true);
+      expect(isCodeLikeGrade("  Fulfilled  ")).toBe(false);
+    });
+
+    it("does not match alphabetic strings starting beyond F", () => {
+      // "Good" starts with G — must not be classified as a letter grade.
+      expect(isCodeLikeGrade("Good")).toBe(false);
+      expect(isCodeLikeGrade("Great")).toBe(false);
+    });
+
+    it("does not match multi-character letter codes that aren't grades", () => {
+      // Real verdict labels we've seen on prod scorecards.
+      expect(isCodeLikeGrade("Acceptable")).toBe(false);
+      expect(isCodeLikeGrade("Bad")).toBe(false);
+    });
+  });
+
+  describe("gradeCellFontClass", () => {
+    it("returns mono+tabular-nums for letter grades", () => {
+      expect(gradeCellFontClass("C+")).toBe("font-mono tabular-nums");
+    });
+
+    it("returns mono+tabular-nums for numeric values", () => {
+      expect(gradeCellFontClass("84")).toBe("font-mono tabular-nums");
+    });
+
+    it("returns empty string for prose verdicts", () => {
+      expect(gradeCellFontClass("Weak")).toBe("");
+      expect(gradeCellFontClass("Fulfilled")).toBe("");
+      expect(gradeCellFontClass("Very Weak")).toBe("");
+    });
+
+    it("returns empty for blank input", () => {
+      expect(gradeCellFontClass("")).toBe("");
+    });
   });
 });

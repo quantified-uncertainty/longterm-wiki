@@ -125,3 +125,27 @@ export function formatScoreCell(cell: {
     (cell.scoreNumeric != null ? String(cell.scoreNumeric) : cell.scoreRaw)
   );
 }
+
+/**
+ * Whether a rendered grade value looks like a code (`A`, `B+`, `D-`, `84`,
+ * `75/100`) versus a prose verdict (`Weak`, `Fulfilled`, `Very Weak`).
+ *
+ * Used to decide whether to apply `font-mono tabular-nums`: monospace looks
+ * right for letter / numeric grades, but rendering prose words like
+ * "Fulfilled" in monospace reads like a literal/code and looks wrong.
+ */
+export function isCodeLikeGrade(value: string): boolean {
+  const trimmed = value.trim();
+  if (!trimmed) return false;
+  if (/^[A-F][+-]?$/i.test(trimmed)) return true;
+  if (/^[\d]/.test(trimmed)) return true;
+  return false;
+}
+
+/**
+ * Tailwind classes for a grade cell's text — monospace+tabular-nums for
+ * code-like grades (letters/numbers), empty for prose verdicts.
+ */
+export function gradeCellFontClass(value: string): string {
+  return isCodeLikeGrade(value) ? "font-mono tabular-nums" : "";
+}
