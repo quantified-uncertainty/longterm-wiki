@@ -261,6 +261,14 @@ export interface PruneFactsOutcome {
   ids: Array<{ entityId: string; factId: string }>;
   /** Number of batches that failed (HTTP error or thrown exception). */
   errors: number;
+  /**
+   * QUA-930 cascade totals — dependent rows deleted alongside the facts.
+   * Aggregated across all batches.
+   */
+  cascadedVerdicts: number;
+  cascadedEvidence: number;
+  cascadedSuggestions: number;
+  cascadedClaimLinks: number;
 }
 
 /**
@@ -287,11 +295,23 @@ export async function pruneFacts(
   const entries = groupFactsByEntity(items, entityIdsWithNoFacts);
 
   if (entries.length === 0) {
-    return { deleted: 0, ids: [], errors: 0 };
+    return {
+      deleted: 0,
+      ids: [],
+      errors: 0,
+      cascadedVerdicts: 0,
+      cascadedEvidence: 0,
+      cascadedSuggestions: 0,
+      cascadedClaimLinks: 0,
+    };
   }
 
   let totalDeleted = 0;
   let totalErrors = 0;
+  let totalCascadedVerdicts = 0;
+  let totalCascadedEvidence = 0;
+  let totalCascadedSuggestions = 0;
+  let totalCascadedClaimLinks = 0;
   const allDeletedIds: Array<{ entityId: string; factId: string }> = [];
 
   for (let i = 0; i < entries.length; i += batchSize) {
@@ -320,6 +340,21 @@ export async function pruneFacts(
       // client and server cannot drift silently — see PruneFactsResult in
       // crux/lib/wiki-server/facts.ts.
       const result = (await res.json()) as PruneFactsResult;
+      // QUA-930: cascade is always present from a current server, but an
+      // older server in front would emit { deleted, ids, truncated } only,
+      // and a still-deploying mid-version could emit a partial cascade
+      // object missing some keys. Read each field with `?? 0` so a partial
+      // object never produces NaN aggregation downstream.
+      const rawCascaded =
+        ("cascaded" in result && result.cascaded) || {};
+      const cascaded = {
+        verdicts: (rawCascaded as { verdicts?: number }).verdicts ?? 0,
+        evidence: (rawCascaded as { evidence?: number }).evidence ?? 0,
+        suggestions:
+          (rawCascaded as { suggestions?: number }).suggestions ?? 0,
+        claimLinks:
+          (rawCascaded as { claimLinks?: number }).claimLinks ?? 0,
+      };
       if (result.deleted > 0) {
         const sample = result.ids
           .slice(0, 5)
@@ -327,12 +362,25 @@ export async function pruneFacts(
           .join(", ");
         const more = result.deleted > 5 ? ` ...(+${result.deleted - 5} more)` : "";
         const truncatedNote = result.truncated ? " [ids truncated]" : "";
+        const cascadedTotal =
+          cascaded.verdicts +
+          cascaded.evidence +
+          cascaded.suggestions +
+          cascaded.claimLinks;
+        const cascadedNote =
+          cascadedTotal > 0
+            ? ` [cascaded: ${cascaded.verdicts}v/${cascaded.evidence}e/${cascaded.suggestions}s/${cascaded.claimLinks}cl]`
+            : "";
         console.log(
-          `  Prune batch ${batchNum}: removed ${result.deleted} stale facts: ${sample}${more}${truncatedNote}`,
+          `  Prune batch ${batchNum}: removed ${result.deleted} stale facts: ${sample}${more}${truncatedNote}${cascadedNote}`,
         );
         totalDeleted += result.deleted;
         allDeletedIds.push(...result.ids);
       }
+      totalCascadedVerdicts += cascaded.verdicts;
+      totalCascadedEvidence += cascaded.evidence;
+      totalCascadedSuggestions += cascaded.suggestions;
+      totalCascadedClaimLinks += cascaded.claimLinks;
     } catch (err) {
       console.error(
         `  Prune batch ${batchNum}: failed — ${err instanceof Error ? err.message : err}`,
@@ -341,7 +389,15 @@ export async function pruneFacts(
     }
   }
 
-  return { deleted: totalDeleted, ids: allDeletedIds, errors: totalErrors };
+  return {
+    deleted: totalDeleted,
+    ids: allDeletedIds,
+    errors: totalErrors,
+    cascadedVerdicts: totalCascadedVerdicts,
+    cascadedEvidence: totalCascadedEvidence,
+    cascadedSuggestions: totalCascadedSuggestions,
+    cascadedClaimLinks: totalCascadedClaimLinks,
+  };
 }
 
 // --- CLI ---
@@ -434,6 +490,23 @@ async function main() {
     const pruneResult = await pruneFacts(serverUrl, facts, entityIdsWithNoFacts);
     if (pruneResult.deleted > 0) {
       console.log(`  Pruned: ${pruneResult.deleted} stale facts`);
+      const cascadedTotal =
+        pruneResult.cascadedVerdicts +
+        pruneResult.cascadedEvidence +
+        pruneResult.cascadedSuggestions +
+        pruneResult.cascadedClaimLinks;
+      if (cascadedTotal > 0) {
+        // QUA-930: surface the cascade so operators see the dependent
+        // rows that disappeared with the facts. Without this, a routine
+        // sync silently drops verdicts and the operator notices only via
+        // dashboard delta.
+        console.log(
+          `  Cascade: ${pruneResult.cascadedVerdicts} verdicts, ` +
+            `${pruneResult.cascadedEvidence} evidence, ` +
+            `${pruneResult.cascadedSuggestions} suggestions, ` +
+            `${pruneResult.cascadedClaimLinks} claim links`,
+        );
+      }
     } else {
       console.log("  No stale facts to prune");
     }
