@@ -30,11 +30,10 @@ export const RECORD_TYPE_TO_TABLE = {
   citation: "citation_quotes",
   "wiki-page": "wiki_pages",
   fact: "facts",
-  // QUA-685: ai-model verdicts reference the entities table (one entity row
-  // per model). The wiki-server's record-lookup likely doesn't support
-  // entities yet, so the detail page may fall through to notFound() for now —
-  // dots remain interactive at the table-row level via the standard
-  // /sourcing/<type>/<id> URL even when the detail page is bare.
+  // QUA-685: ai-model verdicts reference the `entities` table (one entity
+  // row per model). The wiki-server's record-lookup already supports
+  // `entities` and matches by slug, so /sourcing/ai-model/<slug> resolves
+  // to the model's entity row.
   "ai-model": "entities",
 } as const satisfies Record<string, string>;
 

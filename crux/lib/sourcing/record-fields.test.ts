@@ -521,9 +521,9 @@ describe('extractEntityDisplayName', () => {
       expect(extractEntityDisplayName('ai-model', item)).toBe('Claude 2');
     });
 
-    it('falls back to slug id when title is missing', () => {
+    it('returns null (not the slug) when title is missing — avoids slug-as-display-name', () => {
       const item = { id: 'claude-2' };
-      expect(extractEntityDisplayName('ai-model', item)).toBe('claude-2');
+      expect(extractEntityDisplayName('ai-model', item)).toBeNull();
     });
   });
 

@@ -546,8 +546,7 @@ ${c.bold}Examples:${c.reset}
     // would treat `ai-models` as an entity slug and silently report "no claims".
     // See QUA-685 for the gap.
     {
-      const { orchestrateCommand } = await import('./sourcing-orchestrate.ts');
-      const { RECORD_TYPE_SUBCOMMAND_TO_TYPE } = await import('./sourcing-orchestrate.ts');
+      const { orchestrateCommand, RECORD_TYPE_SUBCOMMAND_TO_TYPE } = await import('./sourcing-orchestrate.ts');
       const mappedRecordType = RECORD_TYPE_SUBCOMMAND_TO_TYPE[subcommand];
       if (mappedRecordType) {
         return orchestrateCommand(args.slice(1), {

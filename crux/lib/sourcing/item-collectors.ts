@@ -310,9 +310,11 @@ export async function collectRecordItems(
         // sourceable scalar fields nested under `metadata`. Flatten them
         // so the rest of the loop (source extraction, field extraction,
         // description) works the same as for a typical record row.
+        // The Array.isArray guard rejects JSONB array values, which would
+        // otherwise spread into integer keys (`{0: 'x', 1: 'y', ...row}`).
         const normalizedItems = recordType === 'ai-model'
           ? rawItems.map((row) => {
-              const md = (row.metadata && typeof row.metadata === 'object')
+              const md = (row.metadata && typeof row.metadata === 'object' && !Array.isArray(row.metadata))
                 ? row.metadata as Record<string, unknown>
                 : {};
               return { ...row, ...md };

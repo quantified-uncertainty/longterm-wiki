@@ -214,9 +214,15 @@ export default async function OrgProfilePage({
     fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
     loadScorecardsForEntity(entityStableId),
     // QUA-685: pull all ai-model verdicts so the Products & Models table dots
-    // can render real sourcing status. The full list is small (~50 rows
-    // total across all labs) so a single shared fetch is cheaper than
-    // per-model lookups, even when only a couple of models match this org.
+    // can render real sourcing status. A single shared fetch (capped at the
+    // wiki-server's MAX_PAGE_SIZE=200) is cheaper than per-model lookups even
+    // when only a couple of models match this org. The truncation check
+    // below logs a warning if the verdicts table grows past 200 rows so we
+    // catch it before silent data loss (~50 entities × multiple verdict
+    // rounds could approach the cap as more labs are backfilled).
+    // typed-client-ok: QUA-685 baseline — single ad-hoc list call against
+    // /api/sourcing/verdicts. A typed client wrapper would be appropriate
+    // when more callers consume this endpoint with a similar shape.
     fetchFromWikiServer<{ verdicts: Array<{ recordType: string; recordId: string; verdict: string; fieldName: string | null }>; total: number }>(
       `/api/sourcing/verdicts?record_type=ai-model&limit=200`,
       { revalidate: 300, timeoutMs: 10_000 },
@@ -228,6 +234,13 @@ export default async function OrgProfilePage({
   // sourcing dot per row without making per-model network calls.
   const aiModelVerdictByModelId = new Map<string, string>();
   if (aiModelVerdictsRaw) {
+    if (aiModelVerdictsRaw.total > aiModelVerdictsRaw.verdicts.length) {
+      console.warn(
+        `[org-profile] ai-model verdicts truncated: total=${aiModelVerdictsRaw.total} ` +
+        `received=${aiModelVerdictsRaw.verdicts.length}. Bump the page-size or paginate ` +
+        `/api/sourcing/verdicts?record_type=ai-model.`,
+      );
+    }
     for (const v of aiModelVerdictsRaw.verdicts) {
       // Skip per-field verdicts (fieldName != null); we display the row-level
       // rollup so each model has at most one dot.
