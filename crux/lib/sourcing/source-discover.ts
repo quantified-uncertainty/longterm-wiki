@@ -11,12 +11,15 @@
  *   // result = { candidates: [...], best: '...' | null, reason: '...', costUsd: 0.04 }
  *
  * Usage (batch — for QUA-933 / QUA-934 wrappers):
- *   const reqs = facts.map(f => buildDiscoveryBatchRequest(buildDiscoveryInput(f)));
+ *   const reqs = facts.map(f => buildDiscoveryBatchRequest({
+ *     entity: f.entity, fact: f.fact, property: f.property,
+ *     formattedValue: formatFactValue(f.fact, f.property, graph),
+ *   }));
  *   const batch = await submitBatch(client, reqs);
  *   const results = await getBatchResults(client, batch.id, reqs);
  *   for (const [customId, response] of results) {
  *     if (response.result.type === 'succeeded') {
- *       const text = extractMessageText(response.result.message);
+ *       const text = extractTextFromMessage(response.result.message);
  *       const parsed = parseDiscoveryResponse(text, threshold);
  *     }
  *   }
