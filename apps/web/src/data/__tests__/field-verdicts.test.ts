@@ -249,3 +249,88 @@ describe("getRecordVerdict / getFieldVerdict — QUA-423 composite-key guard", (
     warn.mockRestore();
   });
 });
+
+// ── QUA-897: scoped stats for deduped/filtered directories ────────────────
+//
+// /divisions dedupes raw division records by (owner, name), so 120 raw rows
+// collapse to 101 visible rows. The unscoped getRecordVerdictStats counts all
+// 120 verdicts, producing the impossible "120 of 101 records sourced" header.
+// getRecordVerdictStatsForIds restricts the count to a caller-supplied set of
+// record IDs (the visible rows) so the ratio stays sane.
+
+describe("getRecordVerdictStatsForIds — QUA-897 scoped counting", () => {
+  beforeEach(() => {
+    vi.resetModules();
+    const mockVerdicts = buildMockVerdicts();
+    vi.mocked(fs.readFileSync).mockImplementation((filePath: unknown) => {
+      const p = String(filePath);
+      if (p.includes("record-verdicts.json")) return JSON.stringify(mockVerdicts);
+      if (p.includes("database.json")) return JSON.stringify(mockDatabase);
+      if (p.includes("factbase-data.json")) {
+        return JSON.stringify({ entities: {}, facts: {}, slugToEntityId: {} });
+      }
+      return "{}";
+    });
+    vi.mocked(fs.existsSync).mockReturnValue(true);
+  });
+
+  it("only counts verdicts for the supplied record IDs", async () => {
+    const { getRecordVerdictStatsForIds } = await import("../tablebase");
+    // Mock has g_001 (confirmed), g_002 (contradicted), g_003 (partial).
+    // Restrict to g_001 + g_002 only.
+    const stats = getRecordVerdictStatsForIds(
+      "grant",
+      new Set(["g_001", "g_002"]),
+    );
+    expect(stats.total).toBe(2);
+    expect(stats.confirmed).toBe(1);
+    expect(stats.contradicted).toBe(1);
+    expect(stats.partial).toBe(0);
+    expect(stats.unchecked).toBe(0);
+  });
+
+  it("counts an ID with no verdict as unchecked", async () => {
+    const { getRecordVerdictStatsForIds } = await import("../tablebase");
+    const stats = getRecordVerdictStatsForIds(
+      "grant",
+      new Set(["g_001", "g_does_not_exist"]),
+    );
+    expect(stats.total).toBe(2);
+    expect(stats.confirmed).toBe(1);
+    expect(stats.unchecked).toBe(1);
+  });
+
+  it("ignores per-field verdicts even when the row ID matches", async () => {
+    const { getRecordVerdictStatsForIds } = await import("../tablebase");
+    // Mock has both grant:g_001 (row-level, confirmed) and
+    // grant:g_001:amount + grant:g_001:recipient (per-field). Only the
+    // row-level one should be counted.
+    const stats = getRecordVerdictStatsForIds("grant", new Set(["g_001"]));
+    expect(stats.total).toBe(1);
+    expect(stats.confirmed).toBe(1);
+    expect(stats.contradicted).toBe(0);
+  });
+
+  it("returns checked <= total for any ID set (the QUA-897 invariant)", async () => {
+    const { getRecordVerdictStatsForIds } = await import("../tablebase");
+    const stats = getRecordVerdictStatsForIds(
+      "grant",
+      new Set(["g_001", "g_002", "g_003"]),
+    );
+    const checked =
+      stats.confirmed +
+      stats.contradicted +
+      stats.outdated +
+      stats.partial +
+      stats.unverifiable;
+    expect(checked).toBeLessThanOrEqual(stats.total);
+  });
+
+  it("returns all-zero stats for an empty ID set", async () => {
+    const { getRecordVerdictStatsForIds } = await import("../tablebase");
+    const stats = getRecordVerdictStatsForIds("grant", new Set());
+    expect(stats.total).toBe(0);
+    expect(stats.confirmed).toBe(0);
+    expect(stats.unchecked).toBe(0);
+  });
+});

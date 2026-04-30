@@ -119,6 +119,10 @@ export default function DivisionsPage() {
   const totalDivisions = rows.length;
   const uniqueOrgs = new Set(rows.map((r) => r.parentName)).size;
   const divisionsWithData = rows.filter((r) => r.hasData).length;
+  // Restrict the sourcing-summary banner to visible (deduped) division keys —
+  // raw rows count includes merged duplicates and would produce checked>total
+  // (QUA-897).
+  const visibleDivisionIds = new Set(rows.map((r) => String(r.key)));
 
   // Type breakdown (across all divisions)
   const typeCounts = new Map<string, number>();
@@ -145,7 +149,7 @@ export default function DivisionsPage() {
         </p>
       </div>
 
-      <SourcingSummaryBanner recordType="division" totalOverride={totalDivisions} />
+      <SourcingSummaryBanner recordType="division" recordIds={visibleDivisionIds} />
 
       <DivisionsTable
         rows={rows}

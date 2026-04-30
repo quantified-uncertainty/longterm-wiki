@@ -1154,8 +1154,7 @@ export function getFieldVerdicts(recordType: string, recordId: string): Record<s
   return result;
 }
 
-/** Get sourcing stats for a specific record type */
-export function getRecordVerdictStats(recordType: string): {
+export type RecordVerdictStats = {
   total: number;
   confirmed: number;
   contradicted: number;
@@ -1163,19 +1162,60 @@ export function getRecordVerdictStats(recordType: string): {
   outdated: number;
   partial: number;
   unchecked: number;
-} {
+};
+
+const VALID_VERDICT_KEYS = new Set([
+  "confirmed",
+  "contradicted",
+  "unverifiable",
+  "outdated",
+  "partial",
+  "unchecked",
+] as const);
+
+/** Get sourcing stats for a specific record type */
+export function getRecordVerdictStats(recordType: string): RecordVerdictStats {
   const verdicts = getRecordVerdicts();
-  const stats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
-  const validVerdicts = new Set(['confirmed', 'contradicted', 'unverifiable', 'outdated', 'partial', 'unchecked']);
+  const stats: RecordVerdictStats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
   for (const [key, v] of Object.entries(verdicts)) {
     if (!key.startsWith(`${recordType}:`)) continue;
     // Skip per-field entries (three segments: "grant:g_abc123:amount")
     // Only count row-level entries (two segments: "grant:g_abc123")
     if (key.split(":").length > 2) continue;
     stats.total++;
-    if (validVerdicts.has(v.verdict)) {
-      stats[v.verdict as 'confirmed' | 'contradicted' | 'unverifiable' | 'outdated' | 'partial' | 'unchecked']++;
+    if (VALID_VERDICT_KEYS.has(v.verdict as never)) {
+      stats[v.verdict as keyof RecordVerdictStats]++;
     }
+  }
+  return stats;
+}
+
+/**
+ * Sourcing stats restricted to a caller-supplied set of record IDs (QUA-897).
+ *
+ * Use this when the directory page deduplicates or filters records before
+ * rendering — the unscoped getRecordVerdictStats counts every verdict in the
+ * record-verdicts map, which can exceed the visible row count and produce an
+ * impossible "120 of 101" header. /divisions is the canonical case (raw rows
+ * with the same owner+name collapse to a single visible row).
+ *
+ * IDs absent from the verdict map are counted as `unchecked` so total always
+ * equals the size of `recordIds`. Per-field verdicts (3-segment keys like
+ * `grant:g_001:amount`) are ignored — only row-level verdicts count.
+ */
+export function getRecordVerdictStatsForIds(
+  recordType: string,
+  recordIds: ReadonlySet<string>,
+): RecordVerdictStats {
+  const verdicts = getRecordVerdicts();
+  const stats: RecordVerdictStats = { total: 0, confirmed: 0, contradicted: 0, unverifiable: 0, outdated: 0, partial: 0, unchecked: 0 };
+  for (const id of recordIds) {
+    stats.total++;
+    const v = verdicts[`${recordType}:${id}`];
+    const verdictName = v && VALID_VERDICT_KEYS.has(v.verdict as never)
+      ? (v.verdict as keyof RecordVerdictStats)
+      : "unchecked";
+    stats[verdictName]++;
   }
   return stats;
 }

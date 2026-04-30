@@ -1,23 +1,39 @@
 /**
  * Section-level sourcing coverage summary.
  *
- * Shows "12 of 47 records sourcinged" above a table, with a breakdown
- * of verdict counts. Only renders when at least one record has been checked.
- * Server component — calls getRecordVerdictStats() directly.
+ * Shows "12 of 47 records sourced" above a table, with a breakdown of verdict
+ * counts. Only renders when at least one record has been checked. Server
+ * component — calls getRecordVerdictStats* directly.
+ *
+ * If the directory page deduplicates / filters before rendering (e.g.
+ * /divisions collapses raw rows by owner+name), pass `recordIds` so the stats
+ * are restricted to the visible rows. Otherwise the count of recorded
+ * verdicts can exceed the visible row total (QUA-897).
  */
-import { getRecordVerdictStats } from "@data/tablebase";
+import { getRecordVerdictStats, getRecordVerdictStatsForIds } from "@data/tablebase";
 
 export function SourcingSummaryBanner({
   recordType,
   totalOverride,
+  recordIds,
 }: {
   recordType: string;
   /** Override the total count (useful when the table filters records). */
   totalOverride?: number;
+  /**
+   * If supplied, sourcing stats are restricted to these record IDs and the
+   * unscoped totalOverride is ignored. Use this whenever the page dedupes or
+   * filters rows so the banner ratio always satisfies checked <= total.
+   */
+  recordIds?: ReadonlySet<string>;
 }) {
-  const stats = getRecordVerdictStats(recordType);
+  const stats = recordIds
+    ? getRecordVerdictStatsForIds(recordType, recordIds)
+    : getRecordVerdictStats(recordType);
   const checked = stats.confirmed + stats.contradicted + stats.outdated + stats.partial + stats.unverifiable;
-  const total = totalOverride ?? checked + stats.unchecked;
+  const total = recordIds
+    ? stats.total
+    : totalOverride ?? checked + stats.unchecked;
 
   if (checked === 0) return null;
 
@@ -44,7 +60,7 @@ export function SourcingSummaryBanner({
         <span className="font-medium text-foreground/80">{checked}</span>
         {" of "}
         <span className="font-medium text-foreground/80">{total}</span>
-        {" records sourcinged"}
+        {" records sourced"}
         {parts.length > 0 && (
           <span className="text-muted-foreground/80">
             {" \u00b7 "}
