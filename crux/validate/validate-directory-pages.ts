@@ -19,6 +19,7 @@
 
 import { join } from "path";
 import { readFileSync, existsSync } from "fs";
+import { fileURLToPath } from "url";
 import { PROJECT_ROOT, ensureDataLayer } from "../lib/content-types.ts";
 import { getColors } from "../lib/output.ts";
 
@@ -225,19 +226,21 @@ export function runValidation(opts: {
       // when found, so a slug that resolves never reaches the user. Only flag
       // slugs that don't resolve — those genuinely leak via the fallback path
       // in apps/web/src/app/<directory>/page.tsx (e.g. orgName = orgId).
+      // Use Map.has() (existence) rather than truthy-checking the value: an
+      // entity with an empty/undefined title is still a real entity that the
+      // rendering layer would resolve, just to a different display string.
       for (const field of config.displayFields) {
         if (field === "title") continue;
         const value = entity[field];
         if (typeof value === "string" && looksLikeSlug(value)) {
-          const resolvedTitle = entityTitleById.get(value);
-          if (resolvedTitle) continue;
+          if (entityTitleById.has(value)) continue;
           issues.push({
             entityId: id,
             entityTitle: title,
             issueType: "slug-in-display",
             field,
             value,
-            detail: field + " contains slug-like value \"" + value + "\" with no matching entity (will leak to user)",
+            detail: field + " contains slug-like value \"" + value + "\" with no matching entity (will leak to user via rendering fallback)",
           });
         }
       }
@@ -444,7 +447,11 @@ async function main(): Promise<void> {
   console.log("");
 }
 
-if (process.argv[1]?.includes("validate-directory-pages")) {
+// Only run main() when invoked as a script — not when imported by tests.
+// Use exact-path comparison rather than substring match so an importing test
+// file that happens to contain "validate-directory-pages" in its path doesn't
+// trigger the CLI side effects.
+if (process.argv[1] && fileURLToPath(import.meta.url) === process.argv[1]) {
   main().catch((err) => {
     console.error("Directory page validation crashed:", err);
     process.exit(1);

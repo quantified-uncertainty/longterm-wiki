@@ -78,4 +78,89 @@ describe("validate-directory-pages: slug-in-display", () => {
     const slugLeaks = projectIssues.filter((i) => i.issueType === "slug-in-display");
     expect(slugLeaks).toEqual([]);
   });
+
+  it("treats an entity with empty/undefined title as 'resolves' (existence-based, not truthy-based)", () => {
+    // Regression check: the resolved-title skip uses Map.has(slug), not
+    // truthy-checking the title string. An entity with title="" is still a
+    // real entity that the rendering layer can substitute for; flagging it
+    // would re-introduce the QUA-899 false positive.
+    const { results } = runValidation({
+      typedEntities: [
+        {
+          id: "stub-project",
+          entityType: "project",
+          title: "Stub Project",
+          description: "A project pointing at an entity with no title yet.",
+          organization: "placeholder-future-org",
+        },
+        {
+          id: "placeholder-future-org",
+          entityType: "organization",
+          title: "",
+          description: "Stub org awaiting enrichment.",
+          orgType: "generic",
+        },
+      ],
+      filterType: "project",
+    });
+
+    const projectIssues = results.find((r) => r.entityType === "project")?.issues ?? [];
+    const slugLeaks = projectIssues.filter((i) => i.issueType === "slug-in-display");
+    expect(slugLeaks).toEqual([]);
+  });
+});
+
+describe("validate-directory-pages: other issue types", () => {
+  it("flags an entity whose title looks like an unresolved slug", () => {
+    const { results } = runValidation({
+      typedEntities: [
+        {
+          id: "stuck-slug",
+          entityType: "project",
+          title: "stuck-slug-title-here",
+          description: "Title was never resolved from slug.",
+        },
+      ],
+      filterType: "project",
+    });
+
+    const issues = results.find((r) => r.entityType === "project")?.issues ?? [];
+    expect(issues.filter((i) => i.issueType === "title-is-slug")).toHaveLength(1);
+  });
+
+  it("flags entities missing required key fields", () => {
+    const { results } = runValidation({
+      typedEntities: [
+        {
+          id: "minimal-org",
+          entityType: "organization",
+          title: "Minimal Org",
+          // missing description and orgType
+        },
+      ],
+      filterType: "organization",
+    });
+
+    const issues = results.find((r) => r.entityType === "organization")?.issues ?? [];
+    const missing = issues.filter((i) => i.issueType === "missing-field");
+    expect(missing.map((i) => i.field).sort()).toEqual(["description", "orgType"]);
+  });
+
+  it("flags non-standard date formats", () => {
+    const { results } = runValidation({
+      typedEntities: [
+        {
+          id: "weird-event",
+          entityType: "event",
+          title: "Weird Event",
+          description: "An event with a malformed startDate.",
+          startDate: "March 2026",
+        },
+      ],
+      filterType: "event",
+    });
+
+    const issues = results.find((r) => r.entityType === "event")?.issues ?? [];
+    expect(issues.filter((i) => i.issueType === "bad-date-format")).toHaveLength(1);
+  });
 });
