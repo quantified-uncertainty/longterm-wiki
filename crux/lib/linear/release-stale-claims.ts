@@ -30,7 +30,7 @@
  * parent ticket itself sits "In Progress" for weeks.
  */
 
-import { git } from '../git.ts';
+import { gitSafe, type GitResult } from '../git.ts';
 import { githubApi, REPO } from '../github.ts';
 import {
   getIssue,
@@ -39,6 +39,25 @@ import {
   type LinearIssue,
 } from './issues.ts';
 import { getStaleClaims } from '../wiki-server/agent-sessions.ts';
+
+/**
+ * Linear ID format guard. Same shape as the wiki-server's
+ * `LinearIdParamSchema` and the audit module's allowlist (currently just
+ * QUA, but the regex permits any all-uppercase team key).
+ *
+ * We re-validate at this layer because the wiki-server endpoint returns
+ * `linear_id` as text and only filters `IS NOT NULL` — a malformed string
+ * could in theory leak through if the row was written before the format
+ * CHECK constraint was added. Accepting it would interpolate junk into a
+ * branch glob or a GitHub search query.
+ */
+const LINEAR_ID_RE = /^[A-Z][A-Z0-9]*-\d+$/;
+
+function assertValidLinearId(linearId: string): void {
+  if (!LINEAR_ID_RE.test(linearId)) {
+    throw new Error(`Invalid Linear ID format: ${linearId}`);
+  }
+}
 
 /** A candidate row pulled from `GET /api/agent-sessions/stale-claims`. */
 export interface StaleClaim {
@@ -101,27 +120,43 @@ export const AUTO_RELEASE_COMMENT_PREFIX =
  *
  * We ls-remote against `origin` to avoid a stale local cache misleading the
  * decision: the local clone may not have the branch yet even if the
- * dispatched session pushed one. Returns true iff at least one matching ref
- * is reported.
+ * dispatched session pushed one.
+ *
+ * Returns a tri-state result: `true` (at least one matching ref),
+ * `false` (clean — no matches), or `'lookup-failed'` (transient git/network
+ * error). Callers MUST treat lookup-failed as protective — skipping the
+ * release, not releasing — because we can't tell empty-output-for-no-match
+ * from empty-output-for-error otherwise.
+ *
+ * Uses `gitSafe()` instead of `git()` so a transient remote outage doesn't
+ * surface as an exception that the caller's try/catch reclassifies into a
+ * generic "errored" status — this distinction matters for the sweep's
+ * exit-code semantics (errors = real bugs to investigate).
  */
+export type BranchCheckResult = true | false | 'lookup-failed';
+
 export function branchExistsForLinearId(
   linearId: string,
-  runner: (...args: string[]) => string = git,
-): boolean {
+  runner: (...args: string[]) => GitResult = gitSafe,
+): BranchCheckResult {
+  assertValidLinearId(linearId);
   // Normalize to lowercase for the branch pattern. Linear IDs are uppercase
   // (`QUA-184`); branch convention is lowercase (`claude/qua-184-…`). Defend
   // against accidental casing mismatches.
   const slug = linearId.toLowerCase();
   // ls-remote returns one line per matching ref ("<sha>\trefs/heads/<name>")
-  // when matches exist, empty string otherwise.
-  const out = runner(
+  // when matches exist, empty string otherwise. Non-zero exit = error
+  // (auth, network, missing remote) — surface that as 'lookup-failed' so
+  // the caller can skip protectively.
+  const result = runner(
     'ls-remote',
     '--heads',
     'origin',
     `claude/${slug}`,
     `claude/${slug}-*`,
   );
-  return out.trim().length > 0;
+  if (!result.ok) return 'lookup-failed';
+  return result.output.trim().length > 0;
 }
 
 /**
@@ -143,9 +178,7 @@ export async function findOpenPRsForLinearId(
   // Allow-list QUA-NNN style ids only — any other format would be a caller
   // bug and we don't want to construct GitHub search queries from
   // arbitrary user input.
-  if (!/^[A-Z]+-\d+$/.test(linearId)) {
-    throw new Error(`Invalid Linear ID format: ${linearId}`);
-  }
+  assertValidLinearId(linearId);
   const q = `${linearId} repo:${REPO} is:pr is:open`;
   const encoded = encodeURIComponent(q);
   let resp: GhSearchResponse;
@@ -221,11 +254,27 @@ export async function classifyStaleClaim(
   claim: StaleClaim,
 ): Promise<{ decision: ReleaseDecision; issue?: LinearIssue }> {
   // 1. Local: any matching branch on origin?
-  if (branchExistsForLinearId(claim.linearId)) {
+  const branchCheck = branchExistsForLinearId(claim.linearId);
+  if (branchCheck === 'lookup-failed') {
+    // Conservative: a transient `git ls-remote` failure (network, auth,
+    // missing remote) must NOT be treated as "no branch exists". Skip the
+    // claim and let the next sweep retry once the lookup recovers.
     return {
       decision: {
         released: false,
-        reason: `branch claude/${claim.linearId.toLowerCase()}-* exists on origin`,
+        reason: `branch lookup failed for ${claim.linearId} — skipping protectively`,
+      },
+    };
+  }
+  if (branchCheck) {
+    return {
+      decision: {
+        released: false,
+        // The ls-remote globs check both exact + suffixed forms, so the
+        // user-facing reason should reflect both possibilities. (The actual
+        // matched ref is not surfaced here because gitSafe doesn't parse it
+        // out — the caller can ls-remote manually to inspect.)
+        reason: `branch claude/${claim.linearId.toLowerCase()}(-*)? exists on origin`,
       },
     };
   }
@@ -272,23 +321,37 @@ export async function classifyStaleClaim(
 }
 
 /**
- * Apply the release: post the auto-release comment, then move the ticket to
- * Backlog. The comment is posted FIRST so the audit trail captures the
- * reason even if the state-change call fails (the next sweep will retry the
- * state move).
+ * Apply the release: move the ticket to Backlog FIRST, then post the
+ * auto-release comment.
+ *
+ * State-first (not comment-first) is the idempotent ordering. With
+ * comment-first, a retry after a partial failure (state mutation crashed
+ * after the comment landed) would post a duplicate comment on the next
+ * sweep — the ticket is still `started`, so `classifyStaleClaim` would
+ * mark it eligible again and `executeRelease` would re-post.
+ *
+ * State-first inverts that: if the state move succeeds and the comment
+ * fails, the next sweep finds the ticket in `backlog` (a non-releasable
+ * state) and skips it. The audit trail loses the comment — accepted as
+ * the cost of idempotency, since Linear's own state-history records the
+ * Backlog move with a timestamp anyway.
  */
 export async function executeRelease(
   claim: StaleClaim,
   reason: string,
 ): Promise<void> {
+  await updateIssueState(claim.linearId, 'Backlog');
+  // Use a stricter `claim.branch` interpolation — backticks in the
+  // branch name would break the markdown code span. Branch names from
+  // PG are constrained, but defend against accidental contamination.
+  const safeBranch = claim.branch.replace(/`/g, '');
   const body =
     `${AUTO_RELEASE_COMMENT_PREFIX} Re-claim if still relevant.\n\n` +
     `**Detected by:** \`crux linear release-stale\`\n` +
-    `**Session row:** id=${claim.id}, branch=\`${claim.branch}\`, slot=${claim.slotNumber !== null ? `a${claim.slotNumber}` : '(none)'}\n` +
+    `**Session row:** id=${claim.id}, branch=\`${safeBranch}\`, slot=${claim.slotNumber !== null ? `a${claim.slotNumber}` : '(none)'}\n` +
     `**Last heartbeat:** ${claim.updatedAt}\n` +
     `**Reason:** ${reason}`;
   await commentOnIssue(claim.linearId, body);
-  await updateIssueState(claim.linearId, 'Backlog');
 }
 
 /**

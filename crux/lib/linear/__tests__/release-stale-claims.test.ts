@@ -42,7 +42,11 @@ vi.mock('../../wiki-server/agent-sessions.ts', () => ({
 const mockGit = vi.fn();
 
 vi.mock('../../git.ts', () => ({
-  git: mockGit,
+  // SUT only uses gitSafe; mock named export to match.
+  gitSafe: mockGit,
+  // Re-export `git` as a passthrough so any other transitive import doesn't
+  // crash. Not used by the SUT but kept for module-shape parity.
+  git: vi.fn(),
 }));
 
 // Now import the SUT — this evaluates the module body with mocks in place.
@@ -134,9 +138,17 @@ describe('humanizeStaleAge', () => {
 
 // ── branchExistsForLinearId ─────────────────────────────────────────────────
 
+const okResult = (output: string) => ({ ok: true as const, output, stderr: '', code: 0 });
+const failResult = (stderr = 'fatal: unable to access remote') => ({
+  ok: false as const,
+  output: '',
+  stderr,
+  code: 128,
+});
+
 describe('branchExistsForLinearId', () => {
   it('lowercases the linear-id and queries both exact + suffixed glob', () => {
-    const runner = vi.fn().mockReturnValue('');
+    const runner = vi.fn().mockReturnValue(okResult(''));
     branchExistsForLinearId('QUA-184', runner);
     expect(runner).toHaveBeenCalledWith(
       'ls-remote',
@@ -149,19 +161,34 @@ describe('branchExistsForLinearId', () => {
 
   it('returns true when ls-remote reports any matching ref', () => {
     const runner = vi.fn().mockReturnValue(
-      'abc123\trefs/heads/claude/qua-184-foo\n',
+      okResult('abc123\trefs/heads/claude/qua-184-foo\n'),
     );
     expect(branchExistsForLinearId('QUA-184', runner)).toBe(true);
   });
 
   it('returns false on empty output', () => {
-    const runner = vi.fn().mockReturnValue('');
+    const runner = vi.fn().mockReturnValue(okResult(''));
     expect(branchExistsForLinearId('QUA-184', runner)).toBe(false);
   });
 
   it('returns false on whitespace-only output', () => {
-    const runner = vi.fn().mockReturnValue('   \n  \n');
+    const runner = vi.fn().mockReturnValue(okResult('   \n  \n'));
     expect(branchExistsForLinearId('QUA-184', runner)).toBe(false);
+  });
+
+  it("returns 'lookup-failed' on non-zero git exit (network/auth error)", () => {
+    // Crucial: must NOT return false on transient git failure — empty output
+    // for-no-match looks identical to empty output for-error otherwise, and
+    // a network blip would cause every claim to look "no branch" and get
+    // released. Tri-state result lets the caller skip protectively.
+    const runner = vi.fn().mockReturnValue(failResult());
+    expect(branchExistsForLinearId('QUA-184', runner)).toBe('lookup-failed');
+  });
+
+  it('rejects malformed linear ids before invoking git', () => {
+    const runner = vi.fn();
+    expect(() => branchExistsForLinearId('bogus', runner)).toThrow(/Invalid Linear ID/);
+    expect(runner).not.toHaveBeenCalled();
   });
 });
 
@@ -235,7 +262,7 @@ describe('findOpenPRsForLinearId', () => {
 
 describe('classifyStaleClaim — acceptance scenarios', () => {
   it('releases a stale row with no branch, no open PR, ticket In Progress', async () => {
-    mockGit.mockReturnValue(''); // no branches
+    mockGit.mockReturnValue(okResult('')); // no branches
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
 
@@ -248,20 +275,32 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
 
   it('skips a stale row WITH a branch on origin (long-running parent epic protection)', async () => {
     mockGit.mockReturnValue(
-      'abc123\trefs/heads/claude/qua-408-phase-4b-things\n',
+      okResult('abc123\trefs/heads/claude/qua-408-phase-4b-things\n'),
     );
     // The other checks should NOT be invoked once the branch check fires.
     const claim = makeClaim({ linearId: 'QUA-408' });
     const { decision } = await classifyStaleClaim(claim);
 
     expect(decision.released).toBe(false);
-    expect(decision.reason).toMatch(/branch claude\/qua-408-\* exists/);
+    expect(decision.reason).toMatch(/branch claude\/qua-408\(-\*\)\? exists/);
+    expect(mockGithubApi).not.toHaveBeenCalled();
+    expect(mockGetIssue).not.toHaveBeenCalled();
+  });
+
+  it("skips protectively when git ls-remote fails (network/auth error)", async () => {
+    mockGit.mockReturnValue(failResult('fatal: could not read from remote'));
+    const { decision } = await classifyStaleClaim(makeClaim());
+    expect(decision.released).toBe(false);
+    expect(decision.reason).toMatch(/branch lookup failed/);
+    // Must NOT proceed to the Linear/GitHub checks — protective skip is
+    // load-bearing: a remote outage during the sweep would otherwise cause
+    // every candidate to be misclassified and released.
     expect(mockGithubApi).not.toHaveBeenCalled();
     expect(mockGetIssue).not.toHaveBeenCalled();
   });
 
   it('skips a stale row in a terminal Linear state (do not re-open closed work)', async () => {
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('Done', 'completed'));
 
@@ -272,7 +311,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
   });
 
   it('skips a stale row in triage (human triage in progress)', async () => {
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('Triage', 'triage'));
 
@@ -283,7 +322,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
   });
 
   it('skips a stale row with an open PR (paranoia layer)', async () => {
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({
       total_count: 1,
       items: [
@@ -305,7 +344,7 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
   });
 
   it('skips when the Linear ticket has been deleted', async () => {
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(null);
 
@@ -319,13 +358,13 @@ describe('classifyStaleClaim — acceptance scenarios', () => {
 // ── executeRelease ──────────────────────────────────────────────────────────
 
 describe('executeRelease', () => {
-  it('posts the release comment first, then moves to Backlog', async () => {
-    mockCommentOnIssue.mockResolvedValue(undefined);
-    mockUpdateIssueState.mockResolvedValue({
-      identifier: 'QUA-184',
-      state: 'Backlog',
-    });
-
+  it('moves state to Backlog first, then posts the release comment', async () => {
+    // State-first is the idempotent ordering. With comment-first, a retry
+    // after state-mutation failure would re-post the comment on the next
+    // sweep (ticket still `started` → still classified as eligible → comment
+    // re-posted). State-first means: state move succeeds first, and any
+    // subsequent sweep finds the ticket in `backlog` (a non-releasable
+    // state) and skips it. See the docstring on executeRelease.
     const order: string[] = [];
     mockCommentOnIssue.mockImplementation(async () => { order.push('comment'); });
     mockUpdateIssueState.mockImplementation(async () => {
@@ -335,14 +374,35 @@ describe('executeRelease', () => {
 
     await executeRelease(makeClaim(), 'stale 60min, no branch, no open PR');
 
-    // Comment must be posted before state is updated, so the audit trail
-    // captures the reason even if the state update later fails.
-    expect(order).toEqual(['comment', 'state']);
+    expect(order).toEqual(['state', 'comment']);
 
     const [identifier, body] = mockCommentOnIssue.mock.calls[0];
     expect(identifier).toBe('QUA-184');
     expect(body).toContain(AUTO_RELEASE_COMMENT_PREFIX);
     expect(body).toContain('stale 60min');
+  });
+
+  it('does NOT post a comment if state mutation fails (idempotency)', async () => {
+    mockUpdateIssueState.mockRejectedValue(new Error('Linear state-id missing'));
+    await expect(
+      executeRelease(makeClaim(), 'stale 60min, no branch, no open PR'),
+    ).rejects.toThrow(/Linear state-id missing/);
+    // Critical: with state-first ordering, comment is never posted on
+    // failure. With the old comment-first order, comment would have landed
+    // and the next sweep would re-post.
+    expect(mockCommentOnIssue).not.toHaveBeenCalled();
+  });
+
+  it('strips backticks from branch name in the comment body (markdown safety)', async () => {
+    mockUpdateIssueState.mockResolvedValue({ identifier: 'QUA-184', state: 'Backlog' });
+    mockCommentOnIssue.mockResolvedValue(undefined);
+    await executeRelease(
+      makeClaim({ branch: 'claude/qua-184-`evil`-name' }),
+      'reason',
+    );
+    const body = mockCommentOnIssue.mock.calls[0][1];
+    expect(body).not.toMatch(/`evil`/);
+    expect(body).toContain('claude/qua-184-evil-name');
   });
 });
 
@@ -374,9 +434,9 @@ describe('runStaleClaimSweep', () => {
       const pattern = _args.find((a) => a.startsWith('claude/'));
       // QUA-101 has a branch; others don't.
       if (pattern?.includes('qua-101')) {
-        return 'abc123\trefs/heads/claude/qua-101-foo\n';
+        return okResult('abc123\trefs/heads/claude/qua-101-foo\n');
       }
-      return '';
+      return okResult('');
     });
     mockGithubApi.mockImplementation(async (path: string) => {
       // QUA-102 has an open PR; others don't.
@@ -413,7 +473,7 @@ describe('runStaleClaimSweep', () => {
 
   it('dry-run does not mutate Linear even for releasable claims', async () => {
     setupClaimsResponse([makeClaim({ linearId: 'QUA-300' })]);
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
 
@@ -430,7 +490,7 @@ describe('runStaleClaimSweep', () => {
       makeClaim({ id: 2, linearId: 'QUA-401' }),
     ]);
     // QUA-400 succeeds; QUA-401 fails during getIssue.
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockImplementation(async (id: string) => {
       if (id === 'QUA-401') throw new Error('Linear API down');
@@ -453,7 +513,7 @@ describe('runStaleClaimSweep', () => {
       makeClaim({ id: 1, linearId: 'QUA-500' }),
       makeClaim({ id: 2, linearId: 'QUA-501' }),
     ]);
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
     mockCommentOnIssue.mockResolvedValue(undefined);
@@ -500,7 +560,7 @@ describe('runStaleClaimSweep', () => {
         cutoff: new Date().toISOString(),
       },
     });
-    mockGit.mockReturnValue('');
+    mockGit.mockReturnValue(okResult(''));
     mockGithubApi.mockResolvedValue({ total_count: 0, items: [] });
     mockGetIssue.mockResolvedValue(makeIssue('In Progress', 'started'));
     mockCommentOnIssue.mockResolvedValue(undefined);
