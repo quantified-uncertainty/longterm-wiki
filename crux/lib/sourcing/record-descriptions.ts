@@ -72,6 +72,13 @@ export function buildRecordDescription(recordType: RecordType, item: Record<stri
       const valuationStr = valuation != null ? ` ($${(valuation / 1e9).toFixed(1)}B)` : '';
       return `Market Price: ${company} on ${platform} (${date})${valuationStr}`;
     }
+    case 'ai-model': {
+      // QUA-685: items are flattened from /api/entities/export rows — the
+      // model's title is the entity title, fields live alongside.
+      const title = strOrNull(item, 'title') ?? str(item, 'id');
+      const developer = strOrNull(item, 'developer');
+      return developer ? `AI Model: ${title} (${developer})` : `AI Model: ${title}`;
+    }
     default:
       return `${recordType}: ${strOrNull(item, 'name') ?? strOrNull(item, 'title') ?? 'unknown'}`;
   }
@@ -148,6 +155,19 @@ export function extractRecordFields(recordType: RecordType, item: Record<string,
         impliedValuation: numOrNull(item, 'impliedValuation'),
         pricePerShare: numOrNull(item, 'pricePerShare'),
         priceType: strOrNull(item, 'priceType'),
+      };
+    case 'ai-model':
+      // QUA-685: the five scalar fields the LLM should verify against the
+      // model's release announcement / pricing page. Other fields like
+      // benchmarks[] have inline sources and are sourced separately.
+      return {
+        title: strOrNull(item, 'title') ?? str(item, 'id'),
+        developer: strOrNull(item, 'developer'),
+        releaseDate: strOrNull(item, 'releaseDate'),
+        inputPrice: numOrNull(item, 'inputPrice'),
+        outputPrice: numOrNull(item, 'outputPrice'),
+        contextWindow: numOrNull(item, 'contextWindow'),
+        safetyLevel: strOrNull(item, 'safetyLevel'),
       };
     default:
       return { name: strOrNull(item, 'name') ?? strOrNull(item, 'title') };

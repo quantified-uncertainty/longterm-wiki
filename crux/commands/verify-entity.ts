@@ -539,6 +539,25 @@ ${c.bold}Examples:${c.reset}
       return orchestrateCommand(args.slice(1), options);
     }
 
+    // Record-type subcommands (`grants`, `personnel`, `ai-models`, etc.)
+    // delegate to the orchestrator with a --table filter so the existing
+    // `crux tb verify <record-type>` syntax (documented in the orchestrator's
+    // help text) routes correctly. Without this, `crux tb verify ai-models`
+    // would treat `ai-models` as an entity slug and silently report "no claims".
+    // See QUA-685 for the gap.
+    {
+      const { orchestrateCommand } = await import('./sourcing-orchestrate.ts');
+      const { RECORD_TYPE_SUBCOMMAND_TO_TYPE } = await import('./sourcing-orchestrate.ts');
+      const mappedRecordType = RECORD_TYPE_SUBCOMMAND_TO_TYPE[subcommand];
+      if (mappedRecordType) {
+        return orchestrateCommand(args.slice(1), {
+          ...options,
+          type: 'record',
+          table: mappedRecordType,
+        });
+      }
+    }
+
     // Per-entity sourcing
     return verifyEntityCommand(subcommand, options);
   },

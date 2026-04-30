@@ -200,7 +200,7 @@ export default async function OrgProfilePage({
 
   // ── Fetch PG data (personnel + market data + grants + sourcing) in parallel ──
   const entityStableId = entity.stableId ?? entity.id;
-  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData] = await Promise.all([
+  const [pgPersonnelRows, marketData, pgGrantsData, pgReceivedData, sourcingSummary, scorecardsData, aiModelVerdictsRaw] = await Promise.all([
     fetchPgPersonnel(entityStableId),
     fetchMarketData(entity.id),
     fetchFromWikiServer<RpcGrantsByEntityResult>(
@@ -213,8 +213,28 @@ export default async function OrgProfilePage({
     ),
     fetchEntitySourcingSummary([entity.id, entityStableId, slug]),
     loadScorecardsForEntity(entityStableId),
+    // QUA-685: pull all ai-model verdicts so the Products & Models table dots
+    // can render real sourcing status. The full list is small (~50 rows
+    // total across all labs) so a single shared fetch is cheaper than
+    // per-model lookups, even when only a couple of models match this org.
+    fetchFromWikiServer<{ verdicts: Array<{ recordType: string; recordId: string; verdict: string; fieldName: string | null }>; total: number }>(
+      `/api/sourcing/verdicts?record_type=ai-model&limit=200`,
+      { revalidate: 300, timeoutMs: 10_000 },
+    ),
   ]);
   const rollupVerdict = rollupVerdictFromSummary(sourcingSummary);
+
+  // QUA-685: build a recordId → verdict map so AiModelsSection can render the
+  // sourcing dot per row without making per-model network calls.
+  const aiModelVerdictByModelId = new Map<string, string>();
+  if (aiModelVerdictsRaw) {
+    for (const v of aiModelVerdictsRaw.verdicts) {
+      // Skip per-field verdicts (fieldName != null); we display the row-level
+      // rollup so each model has at most one dot.
+      if (v.fieldName) continue;
+      aiModelVerdictByModelId.set(v.recordId, v.verdict);
+    }
+  }
 
   // PG grants: check if wiki-server has grants for this org (as funder)
   if (!pgGrantsData && entityStableId) {
@@ -643,7 +663,11 @@ export default async function OrgProfilePage({
       icon: <Package className={ICON_CLASS} />,
       content: (
         <div className="space-y-8">
-          <AiModelsSection models={data.orgModels} benchmarksByModel={data.modelBenchmarks} />
+          <AiModelsSection
+            models={data.orgModels}
+            benchmarksByModel={data.modelBenchmarks}
+            verdictByModelId={aiModelVerdictByModelId}
+          />
           <ProductsSection products={data.products} />
         </div>
       ),

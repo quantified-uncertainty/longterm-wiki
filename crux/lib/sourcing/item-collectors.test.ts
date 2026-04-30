@@ -325,3 +325,123 @@ describe('exempt type filtering', () => {
     expect(items).toEqual([]);
   });
 });
+
+// ── AI model collection (QUA-685) ───────────────────────────────────
+
+describe('ai-model collection', () => {
+  function mockAiModelEntitiesResponse(rows: Record<string, unknown>[]) {
+    return {
+      ok: true as const,
+      data: {
+        entities: rows,
+        total: rows.length,
+        returned: rows.length,
+      },
+    };
+  }
+
+  function setupAiModelMock(rows: Record<string, unknown>[]) {
+    mockApiRequest.mockImplementation(async (_method: unknown, path: unknown) => {
+      const pathStr = String(path);
+      // Match /api/entities/export?entityType=ai-model... — the endpoint we
+      // wired into collectRecordItems for ai-model.
+      if (pathStr.startsWith('/api/entities/export') && pathStr.includes('entityType=ai-model')) {
+        return mockAiModelEntitiesResponse(rows);
+      }
+      return mockEmptyResponse();
+    });
+  }
+
+  it('queries /api/entities/export?entityType=ai-model when filtered to ai-model', async () => {
+    setupAiModelMock([]);
+    await collectRecordItems(new Map(), undefined, 'ai-model');
+    const calls = mockApiRequest.mock.calls.filter(([, p]) =>
+      String(p).startsWith('/api/entities/export') && String(p).includes('entityType=ai-model'),
+    );
+    expect(calls.length).toBeGreaterThan(0);
+  });
+
+  it('flattens metadata fields and uses metadata.source as the source URL', async () => {
+    setupAiModelMock([{
+      id: 'claude-2',
+      stableId: 'sid_R3iYKUUe2g',
+      title: 'Claude 2',
+      entityType: 'ai-model',
+      metadata: {
+        developer: 'anthropic',
+        releaseDate: '2023-07-11',
+        inputPrice: 8,
+        outputPrice: 24,
+        contextWindow: 100000,
+        safetyLevel: 'ASL-2',
+        source: 'https://www.anthropic.com/news/claude-2',
+      },
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'ai-model');
+    expect(items).toHaveLength(1);
+
+    const item = items[0];
+    expect(item.id).toBe('record:ai-model:claude-2');
+    expect(item.kind).toBe('record');
+    expect(item.entityType).toBe('ai-model');
+    expect(item.sourceUrl).toBe('https://www.anthropic.com/news/claude-2');
+
+    expect(item.data.kind).toBe('record');
+    if (item.data.kind !== 'record') return;
+    expect(item.data.recordType).toBe('ai-model');
+    expect(item.data.recordId).toBe('claude-2');
+    // QUA-685: rollup keys off the model's own stableId so each ai-model row
+    // gets its own dot on the Products & Models table.
+    expect(item.data.entityId).toBe('sid_R3iYKUUe2g');
+    expect(item.data.entityDisplayName).toBe('Claude 2');
+
+    // The five sourceable scalar fields are extracted into data.fields.
+    expect(item.data.fields).toMatchObject({
+      title: 'Claude 2',
+      developer: 'anthropic',
+      releaseDate: '2023-07-11',
+      inputPrice: 8,
+      outputPrice: 24,
+      contextWindow: 100000,
+      safetyLevel: 'ASL-2',
+    });
+  });
+
+  it('skips ai-model rows without a source URL', async () => {
+    setupAiModelMock([
+      {
+        id: 'claude-2',
+        stableId: 'sid_R3iYKUUe2g',
+        title: 'Claude 2',
+        metadata: {
+          developer: 'anthropic',
+          source: 'https://www.anthropic.com/news/claude-2',
+        },
+      },
+      {
+        // No `source` in metadata — must be skipped to avoid a "No source URL" error.
+        id: 'claude-no-source',
+        stableId: 'sid_xyz',
+        title: 'Claude No-Source',
+        metadata: { developer: 'anthropic' },
+      },
+    ]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'ai-model');
+    expect(items).toHaveLength(1);
+    expect(items[0].id).toBe('record:ai-model:claude-2');
+  });
+
+  it('handles missing metadata gracefully (no crash, just skipped for lack of source)', async () => {
+    setupAiModelMock([{
+      id: 'no-metadata-model',
+      stableId: 'sid_xyz',
+      title: 'No-metadata Model',
+      // metadata omitted entirely
+    }]);
+
+    const items = await collectRecordItems(new Map(), undefined, 'ai-model');
+    expect(items).toHaveLength(0);
+  });
+});

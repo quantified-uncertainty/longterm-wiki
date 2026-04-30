@@ -76,6 +76,12 @@ export const VALID_RECORD_TYPES = [
   "citation",
   "wiki-page",
   "fact",
+  // QUA-685: ai-model is an entity type whose scalar fields (inputPrice,
+  // outputPrice, contextWindow, safetyLevel, releaseDate) are sourceable
+  // against the model's release announcement / docs page. Records are
+  // collected from `/api/entities/export?entityType=ai-model` rather than
+  // a dedicated /api/<type>/all endpoint — see crux/lib/sourcing/item-collectors.ts.
+  "ai-model",
 ] as const;
 
 export type RecordType = (typeof VALID_RECORD_TYPES)[number];

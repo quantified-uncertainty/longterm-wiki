@@ -83,6 +83,10 @@ export function extractEntityDisplayName(recordType: string, item: Record<string
       return strOrNull(item, 'orgResolvedName') ?? strOrNull(item, 'orgDisplayName') ?? null;
     case 'policy-stakeholder':
       return strOrNull(item, 'stakeholderResolvedName') ?? strOrNull(item, 'stakeholderDisplayName') ?? null;
+    case 'ai-model':
+      // QUA-685: entityDisplayName is the model itself (used for grouping rollups
+      // by the model's own stableId, see extractEntityId).
+      return strOrNull(item, 'title') ?? strOrNull(item, 'id');
     default:
       return null;
   }
@@ -106,6 +110,12 @@ export function extractEntityId(recordType: string, item: Record<string, unknown
       return strOrNull(item, 'orgEntityId');
     case 'policy-stakeholder':
       return strOrNull(item, 'stakeholderEntityId');
+    case 'ai-model':
+      // QUA-685: ai-model verdicts group under the model's own stableId, so
+      // `fetchEntitySourcingSummary(modelStableId)` returns the model's rollup.
+      // This differs from grants/personnel (which group under the parent org)
+      // because each ai-model row gets its own dot on the Products & Models table.
+      return strOrNull(item, 'stableId') ?? strOrNull(item, 'id');
     default:
       return null;
   }

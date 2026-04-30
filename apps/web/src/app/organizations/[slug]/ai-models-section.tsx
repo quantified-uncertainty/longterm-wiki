@@ -9,6 +9,7 @@ import { formatCompactNumber } from "@/lib/format-compact";
 import { formatKBDate } from "@/components/wiki/factbase/format";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeAiModelCoverage } from "@/components/coverage/coverage-score";
+import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
 import { SectionHeader, Badge } from "./org-shared";
 import { SAFETY_LEVEL_COLORS } from "./org-data";
 
@@ -92,9 +93,16 @@ function hasVariance<T>(values: (T | null | undefined)[]): boolean {
 export function AiModelsSection({
   models,
   benchmarksByModel,
+  verdictByModelId,
 }: {
   models: AiModelEntry[];
   benchmarksByModel?: Map<string, BenchmarkScore[]>;
+  /**
+   * QUA-685: per-model sourcing verdict keyed by model.id (the entity slug,
+   * which matches the recordId stored in source_check_verdicts). Pass null/undefined
+   * for models that have no verdict — the SourcingDot will render as "unchecked".
+   */
+  verdictByModelId?: Map<string, string>;
 }) {
   if (models.length === 0) return null;
 
@@ -146,7 +154,13 @@ export function AiModelsSection({
           <tbody className="divide-y divide-border/50">
             {models.map((model) => {
               const href = model.wikiId ? `/wiki/${model.wikiId}` : getEntityHref(model.id, model.entityType);
-              const modelVerdict = null; // model-release has no sourcing verdicts yet (QUA-211)
+              // QUA-685: ai-model verdicts are now keyed by model.id (the entity slug,
+              // matching source_check_verdicts.recordId). Falls back to null when no
+              // verdict has been computed yet — RecordStatusDots renders "unchecked".
+              const modelVerdict = verdictByModelId?.get(model.id) ?? null;
+              const modelSourcingHref = modelVerdict
+                ? getSourcingHref("ai-model", model.id)
+                : undefined;
               const benchmarks = benchmarksByModel?.get(model.id);
               const topBenchmarks = benchmarks
                 ? pickTopBenchmarks(benchmarks)
@@ -234,8 +248,7 @@ export function AiModelsSection({
                         wikiId: model.wikiId,
                       })}
                       verdict={modelVerdict}
-                      // QUA-540: model-release has no sourcing verdicts → /sourcing/model-release/:id 404s.
-                      sourcingHref={undefined}
+                      sourcingHref={modelSourcingHref}
                     />
                   </td>
                 </tr>
