@@ -293,19 +293,22 @@ export function classifyEntry(
 }
 
 /**
- * Fetch In Progress issues and classify each.
+ * Fetch active (In Progress + In Review) issues and classify each.
+ *
+ * Both states share Linear's `started` workflow type. The audit covers both
+ * because Linear's GitHub integration is empirically unreliable on the
+ * In-Review → Done transition: ~1.4–5% of merged PRs leave their issue stuck
+ * "In Review" indefinitely (QUA-812). Including In Review here lets the
+ * existing `shipped` bucket detect and auto-close the gap.
  *
  * Concurrency: Linear children queries run with a small concurrency cap to
  * stay under Linear's GraphQL rate limits even on teams with many issues.
  * GitHub PR search runs one query per id with the same cap.
  */
-export async function auditInProgress(): Promise<AuditEntry[]> {
-  // Linear's `started` state type covers In Progress AND In Review. Audit
-  // focuses on In Progress — In Review is naturally waiting on PR merge.
+export async function auditActive(): Promise<AuditEntry[]> {
   // Hard cap at 200 to bound concurrent fan-out; teams with more than that
   // many simultaneously-active issues have bigger problems than this audit.
-  const all = await listIssuesByStateType(['started'], 200);
-  const issues = all.filter((i) => i.state.name === 'In Progress');
+  const issues = await listIssuesByStateType(['started'], 200);
 
   if (issues.length === 0) return [];
 
@@ -326,6 +329,13 @@ export async function auditInProgress(): Promise<AuditEntry[]> {
     return classifyEntry(issue, items, children);
   });
 }
+
+/**
+ * @deprecated Use {@link auditActive} — preserved as a name-only alias for any
+ * external caller that imports `auditInProgress`. The behavior changed in
+ * QUA-812: this function now covers both In Progress and In Review.
+ */
+export const auditInProgress = auditActive;
 
 // ---------------------------------------------------------------------------
 // Watchdog: re-verify Linear state after a PR merge
