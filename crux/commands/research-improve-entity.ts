@@ -630,6 +630,15 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
   const target = opts.target ?? 12;
   const maxIters = opts.maxIters ?? 3;
   const budgetUsd = opts.budgetUsd ?? 2.0;
+  if (!Number.isInteger(target) || target <= 0) {
+    throw new Error(`improveSingleEntity: target must be a positive integer; got ${opts.target}`);
+  }
+  if (!Number.isInteger(maxIters) || maxIters <= 0) {
+    throw new Error(`improveSingleEntity: maxIters must be a positive integer; got ${opts.maxIters}`);
+  }
+  if (!Number.isFinite(budgetUsd) || budgetUsd <= 0) {
+    throw new Error(`improveSingleEntity: budgetUsd must be a positive number; got ${opts.budgetUsd}`);
+  }
   const noWrite = !!opts.dryRun;
 
   const found = findEntity(slug);

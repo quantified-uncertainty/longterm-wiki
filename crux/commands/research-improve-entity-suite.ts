@@ -427,9 +427,12 @@ Options:
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
 
 Budget governance:
-  Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.
-  Halts mid-suite if remaining budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)} —
-  remaining entities are recorded as \`skipped_budget\`.
+  Per-entity soft cap = 2 × (total_budget / N) where N = supported entities.
+  This is a soft cap: a single iteration may overshoot it, since runResearch
+  spends until its own budgetCap. The suite halts mid-run when remaining
+  budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)}; remaining entities
+  are recorded as \`skipped_budget\`. \`--budget\` is therefore a target, not
+  a strict bound.
 `,
     exitCode: 0,
   };
