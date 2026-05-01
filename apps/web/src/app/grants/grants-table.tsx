@@ -4,6 +4,8 @@ import { useState, useMemo, useCallback } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { SortHeader } from "@/components/directory/SortHeader";
+import { FilterChips } from "@/components/directory/FilterChips";
+import { DirectoryFilterDropdown } from "@/components/directory/DirectoryFilterDropdown";
 import { RecordStatusDots } from "@/components/coverage/RecordStatusDots";
 import { computeGrantCoverage } from "@/components/coverage/coverage-score";
 import { PaginationControls } from "@/components/directory/PaginationControls";
@@ -202,125 +204,64 @@ export function GrantsTable({
           />
           {/* Status filter — only shown when any grants have status data */}
           {hasAnyStatus && (
-            <div className="flex flex-wrap gap-1.5">
-              <button
-                type="button"
-                onClick={() => {
-                  setStatusFilter("all");
-                  setPage(0);
-                  updateUrl({ status: null, page: null });
-                }}
-                aria-pressed={statusFilter === "all"}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  statusFilter === "all"
-                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                All
-                <span className="ml-1 text-[10px] opacity-60">
-                  {statusCounts.all}
-                </span>
-              </button>
-              {statuses.map((s) => (
-                <button
-                  type="button"
-                  key={s}
-                  onClick={() => {
-                    const next = statusFilter === s ? "all" : s;
-                    setStatusFilter(next);
-                    setPage(0);
-                    updateUrl({ status: next, page: null });
-                  }}
-                  aria-pressed={statusFilter === s}
-                  className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                    statusFilter === s
-                      ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                      : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                  }`}
-                >
-                  {s}
-                  <span className="ml-1 text-[10px] opacity-60">
-                    {statusCounts[s] ?? 0}
-                  </span>
-                </button>
-              ))}
-            </div>
+            <FilterChips
+              items={statuses.map((s) => ({
+                key: s,
+                label: s,
+                count: statusCounts[s] ?? 0,
+              }))}
+              allCount={statusCounts.all}
+              selected={statusFilter}
+              onSelect={(key) => {
+                setStatusFilter(key);
+                setPage(0);
+                updateUrl({ status: key === "all" ? null : key, page: null });
+              }}
+              hideTautologyFacets
+              hideWhenTrivial
+            />
           )}
         </div>
 
-        {/* Data source filter */}
-        {dataSourceOptions.length >= 2 && (
-          <div className="flex items-center gap-2">
-            <span className="text-xs text-muted-foreground">Source:</span>
-            <select
-              aria-label="Filter by data source"
-              value={dataSourceFilter}
-              onChange={(e) => {
-                setDataSourceFilter(e.target.value);
-                setPage(0);
-                updateUrl({ dataSource: e.target.value === "all" ? null : e.target.value, page: null });
-              }}
-              className="text-xs px-2 py-1.5 rounded-lg border border-border bg-card"
-            >
-              <option value="all">All sources ({rows.length})</option>
-              {dataSourceOptions.map(({ id, name, count }) => (
-                <option key={id} value={id}>
-                  {name} ({count})
-                </option>
-              ))}
-            </select>
-          </div>
-        )}
+        {/* Data source filter — dropdown for compact ≥2-option list */}
+        <DirectoryFilterDropdown
+          ariaLabel="Filter by data source"
+          prefix="Source:"
+          items={dataSourceOptions.map(({ id, name, count }) => ({
+            key: id,
+            label: name,
+            count,
+          }))}
+          allLabel="All sources"
+          allCount={rows.length}
+          selected={dataSourceFilter}
+          onSelect={(key) => {
+            setDataSourceFilter(key);
+            setPage(0);
+            updateUrl({ dataSource: key === "all" ? null : key, page: null });
+          }}
+          hideWhenTrivial
+        />
 
         {/* Funder filter */}
-        {funders.length > 1 && (
-          <div className="flex flex-wrap gap-1.5">
-            <span className="text-xs text-muted-foreground self-center mr-1">Funder:</span>
-            <button
-              type="button"
-              onClick={() => {
-                setFunderFilter("all");
-                setPage(0);
-                updateUrl({ funder: null, page: null });
-              }}
-              aria-pressed={funderFilter === "all"}
-              className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                funderFilter === "all"
-                  ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                  : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-              }`}
-            >
-              All funders
-              <span className="ml-1 text-[10px] opacity-60">
-                {rows.length}
-              </span>
-            </button>
-            {funders.map((f) => (
-              <button
-                type="button"
-                key={f.id}
-                onClick={() => {
-                  const next = funderFilter === f.id ? "all" : f.id;
-                  setFunderFilter(next);
-                  setPage(0);
-                  updateUrl({ funder: next, page: null });
-                }}
-                aria-pressed={funderFilter === f.id}
-                className={`text-xs px-3 py-1.5 rounded-lg border transition-all ${
-                  funderFilter === f.id
-                    ? "bg-primary/10 border-primary/30 text-primary font-semibold"
-                    : "border-border/60 bg-card hover:bg-muted/50 text-muted-foreground"
-                }`}
-              >
-                {f.name}
-                <span className="ml-1 text-[10px] opacity-60">
-                  {f.count}
-                </span>
-              </button>
-            ))}
-          </div>
-        )}
+        <FilterChips
+          prefix="Funder:"
+          items={funders.map((f) => ({
+            key: f.id,
+            label: f.name,
+            count: f.count,
+          }))}
+          allLabel="All funders"
+          allCount={rows.length}
+          selected={funderFilter}
+          onSelect={(key) => {
+            setFunderFilter(key);
+            setPage(0);
+            updateUrl({ funder: key === "all" ? null : key, page: null });
+          }}
+          hideTautologyFacets
+          hideWhenTrivial
+        />
       </div>
 
       {/* Results count + pagination */}

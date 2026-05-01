@@ -477,3 +477,39 @@ test.describe("Render audit — directory Coverage columns render dots (QUA-900)
     });
   }
 });
+
+test.describe("Render audit — filter chip labels have a separator (QUA-1009)", () => {
+  // QUA-918 / QUA-1009: filter chips used to render `<button>{label}<span>{count}</span></button>`
+  // with no text-node space, producing concatenated textContent like `enacted18`,
+  // `Convertible_note3`, `Leaderboard2 models`. The fix renders `Label (count)`.
+  // This regression check asserts no chip on a directory page has a textContent
+  // ending in `<word><digit>` (i.e. a letter immediately followed by a number).
+  for (const url of [
+    "/legislation",
+    "/funding-rounds",
+    "/funding-programs",
+    "/grants",
+    "/benchmarks",
+    "/research-areas",
+    "/divisions",
+    "/politicians",
+    "/organizations",
+    "/people",
+    "/things",
+  ]) {
+    test(`${url} filter chips don't concatenate label and count`, async ({ page }) => {
+      await loadPage(page, url);
+      const chips = await page
+        .locator('[data-testid="filter-chip"]')
+        .allTextContents();
+      const concatenated = chips.filter((t) =>
+        // letter immediately followed by digit, i.e. no space/paren before count
+        /[A-Za-z][0-9]/.test(t.trim()),
+      );
+      expect(
+        concatenated,
+        `${url} has filter chips with concatenated text: ${concatenated.slice(0, 3).join(" | ")}`,
+      ).toEqual([]);
+    });
+  }
+});

@@ -487,6 +487,18 @@ const PARALLEL_STEPS: Step[] = [
     // see QUA-770 for the migration plan.
   },
   {
+    id: 'no-bespoke-filter-chips',
+    name: 'No new bespoke filter-chip rows (QUA-1009) — use <FilterChips> from @/components/directory',
+    command: 'npx',
+    args: ['tsx', 'crux/validate/validate-no-bespoke-filter-chips.ts'],
+    cwd: PROJECT_ROOT,
+    // Blocking: locks down the QUA-1009 sweep. Bans the
+    // `ml-1 text-[10px] opacity-60` chip-count signature anywhere
+    // outside the canonical components. Annotate per-line with
+    // `// filter-chip-ok: <reason>` for the rare bespoke chip with
+    // genuinely custom UX (see organizations-view.tsx).
+  },
+  {
     id: 'factbase-stableid',
     name: 'FactBase lookups use stableIds (not slugs)',
     command: 'npx',
