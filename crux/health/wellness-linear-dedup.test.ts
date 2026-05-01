@@ -19,9 +19,11 @@
 import { describe, it, expect, vi } from 'vitest';
 import {
   dedupLinearWellnessIssue,
+  createLinearWellnessIssue,
   closeLinearWellnessOnAllClear,
   isMissingLinearApiKeyError,
   REOPEN_WINDOW_MS,
+  WELLNESS_PROJECT_NAME,
 } from './wellness-linear-dedup.ts';
 import type { SearchedIssue } from '../lib/linear/issues.ts';
 
@@ -468,5 +470,134 @@ describe('isMissingLinearApiKeyError', () => {
     // the err.message access. The String(err) fallback covers it.
     expect(isMissingLinearApiKeyError('LINEAR_API_KEY not set in env')).toBe(true);
     expect(isMissingLinearApiKeyError({ toString: () => 'LINEAR_API_KEY not set yo' })).toBe(true);
+  });
+});
+
+describe('createLinearWellnessIssue (QUA-970)', () => {
+  const BODY = '## Wellness check failed\n\nSee details below.';
+
+  it('creates a Linear ticket with the wellness project', async () => {
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME });
+    const createIssue = vi
+      .fn()
+      .mockResolvedValue({ identifier: 'QUA-9999', url: 'https://linear.app/q/issue/QUA-9999' });
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result).toEqual({
+      kind: 'created',
+      identifier: 'QUA-9999',
+      url: 'https://linear.app/q/issue/QUA-9999',
+    });
+    // Project lookup is the load-bearing piece — without it we'd file a
+    // projectless orphan, which is exactly the leak this migration closes.
+    expect(getProject).toHaveBeenCalledWith(WELLNESS_PROJECT_NAME);
+    expect(createIssue).toHaveBeenCalledWith({
+      title: TITLE,
+      description: BODY,
+      projectId: 'project-uuid-aaaa',
+    });
+  });
+
+  it('returns failed/misconfig when LINEAR_API_KEY is missing during project lookup', async () => {
+    const apiKeyError = new Error('LINEAR_API_KEY not set. Required for Linear API calls.');
+    const getProject = vi.fn().mockRejectedValue(apiKeyError);
+    const createIssue = vi.fn();
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('misconfig');
+    // Critical: the create call must NOT have been attempted without a valid key.
+    expect(createIssue).not.toHaveBeenCalled();
+  });
+
+  it('returns failed/misconfig when LINEAR_API_KEY is missing during create call', async () => {
+    // Possible if the project lookup is mocked or cached but the create still hits the API.
+    const apiKeyError = new Error('LINEAR_API_KEY not set');
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME });
+    const createIssue = vi.fn().mockRejectedValue(apiKeyError);
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('misconfig');
+  });
+
+  it('returns failed/project-missing when the project name does not resolve', async () => {
+    // Exercises the rename-detection path — if someone renames the project in
+    // Linear, we surface it loudly instead of silently filing a projectless
+    // ticket. The fallback behavior in the caller is to drop to GitHub.
+    const getProject = vi.fn().mockResolvedValue(null);
+    const createIssue = vi.fn();
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('project-missing');
+    expect(createIssue).not.toHaveBeenCalled();
+  });
+
+  it('returns failed/api-error on a transient Linear outage during create', async () => {
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME });
+    const createIssue = vi.fn().mockRejectedValue(new Error('Linear 503'));
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('api-error');
+  });
+
+  it('returns failed/api-error on a transient Linear outage during project lookup', async () => {
+    const getProject = vi.fn().mockRejectedValue(new Error('Linear 503'));
+    const createIssue = vi.fn();
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('api-error');
+    expect(createIssue).not.toHaveBeenCalled();
+  });
+
+  it('returns failed/api-error when createIssue resolves with a malformed shape (missing identifier/url)', async () => {
+    // Linear's issueCreate mutation returns `success: true` even with an
+    // empty issue payload in some failure modes. Without this guard the
+    // caller would record a "Linear ticket created" with `identifier:undefined`,
+    // hiding the failure. Treat missing identifier/url as api-error so the
+    // resilience fallback fires.
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME });
+    // Deliberately malformed payload — exercises the response-shape guard
+    // in createLinearWellnessIssue. vi.fn() is loosely typed so the cast
+    // through the returned Mock is enough to satisfy the createIssue signature.
+    const createIssue = vi.fn().mockResolvedValue({ identifier: undefined, url: undefined });
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('api-error');
+  });
+
+  it('returns failed/project-missing when the project is in a non-active state (archived/completed)', async () => {
+    // A renamed-then-archived project would still resolve by name; filing
+    // into it produces tickets that are invisible in default views and
+    // defeats the migration. Defensive guard against that case.
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME, state: 'completed' });
+    const createIssue = vi.fn();
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('project-missing');
+    expect(createIssue).not.toHaveBeenCalled();
   });
 });

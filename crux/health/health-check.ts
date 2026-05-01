@@ -852,7 +852,12 @@ async function main(): Promise<void> {
         : undefined;
 
       const issueResult = await manageWellnessIssue(report, { runUrl });
-      console.log(`\nIssue management: ${issueResult.action}${issueResult.issueNumber ? ` (#${issueResult.issueNumber})` : ''}`);
+      const issueRef = issueResult.issueNumber
+        ? ` (#${issueResult.issueNumber})`
+        : issueResult.linearIdentifier
+          ? ` (${issueResult.linearIdentifier})`
+          : '';
+      console.log(`\nIssue management: ${issueResult.action}${issueRef}`);
     }
   } else {
     const allOk = results.every((r) => r.ok);
