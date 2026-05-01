@@ -33,20 +33,30 @@ interface ApiData {
 
 // ── Data Loading ──────────────────────────────────────────────────────────
 
+function safeIso(value: string | Date): string {
+  // Defensive: if startedAt comes back malformed, `new Date(...).toISOString()`
+  // throws RangeError and kills the entire dashboard render. Fall back to
+  // the original string representation rather than the page erroring out.
+  if (typeof value === "string") return value;
+  const t = value.getTime();
+  if (!Number.isFinite(t)) return String(value);
+  return value.toISOString();
+}
+
 function toDisplayRow(r: PipelineRunRow): PipelineRunDisplayRow {
-  // Drizzle returns Date | string depending on serialization; force string.
-  const startedAt =
-    typeof r.startedAt === "string" ? r.startedAt : new Date(r.startedAt).toISOString();
-  const endedAt =
-    r.endedAt == null
-      ? null
-      : typeof r.endedAt === "string"
-        ? r.endedAt
-        : new Date(r.endedAt).toISOString();
-  const durationMs =
-    endedAt != null
-      ? new Date(endedAt).getTime() - new Date(startedAt).getTime()
-      : null;
+  const startedAt = safeIso(r.startedAt);
+  const endedAt = r.endedAt == null ? null : safeIso(r.endedAt);
+
+  // Compute duration only when both timestamps parse cleanly.
+  let durationMs: number | null = null;
+  if (endedAt != null) {
+    const startMs = new Date(startedAt).getTime();
+    const endMs = new Date(endedAt).getTime();
+    if (Number.isFinite(startMs) && Number.isFinite(endMs)) {
+      durationMs = endMs - startMs;
+    }
+  }
+
   return {
     runId: r.runId,
     pipelineName: r.pipelineName,
@@ -63,7 +73,7 @@ function toDisplayRow(r: PipelineRunRow): PipelineRunDisplayRow {
 
 async function loadFromApi(): Promise<FetchResult<ApiData>> {
   const [runsResult, statsResult] = await Promise.all([
-    fetchDetailed<{ runs: PipelineRunRow[]; total: number }>(
+    fetchDetailed<{ runs: PipelineRunRow[]; count: number }>(
       "/api/pipeline-runs?limit=200",
       { revalidate: 30 }
     ),

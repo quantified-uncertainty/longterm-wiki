@@ -34,6 +34,7 @@ import {
   EndPipelineRunSchema,
   PipelineRunStatusSchema,
 } from "../../api-types.js";
+import { applyAuditContext } from "../../middleware/audit-context.js";
 
 const ListRunsQuery = z.object({
   status: PipelineRunStatusSchema.optional(),
@@ -43,6 +44,12 @@ const ListRunsQuery = z.object({
 
 const pipelineRunsApp = new Hono()
   // ---- POST / (start a run) ----
+  //
+  // Caller-minted runId: collision yields 409 atomically via
+  // INSERT ... ON CONFLICT DO NOTHING. The previous SELECT-then-INSERT
+  // pattern was a TOCTOU race — two concurrent POSTs with the same
+  // runId would both pass the SELECT and both attempt INSERT, with
+  // the second crashing on PK violation as 500 instead of 409.
   .post("/", async (c) => {
     const body = await parseJsonBody(c);
     if (!body) return invalidJsonError(c);
@@ -53,32 +60,31 @@ const pipelineRunsApp = new Hono()
     const d = parsed.data;
     const db = getDrizzleDb();
 
-    // Caller-minted run_id: if they collide they get 409, not a corrupt
-    // overwrite. Pipelines should always mint a unique id (nanoid/uuid)
-    // so this is a defensive guard, not a happy-path branch.
-    const existing = await db
-      .select({ runId: pipelineRuns.runId })
-      .from(pipelineRuns)
-      .where(eq(pipelineRuns.runId, d.runId))
-      .limit(1);
-    if (existing.length > 0) {
+    const inserted = await db.transaction(async (tx) => {
+      // QUA-442 audit attribution — without this, every pipeline_runs
+      // row would land in full_audit_log with NULL session/tool, breaking
+      // the cross-table audit join the migration header advertises.
+      await applyAuditContext(tx, c);
+      return tx
+        .insert(pipelineRuns)
+        .values({
+          runId: d.runId,
+          pipelineName: d.pipelineName,
+          agentSessionId: d.agentSessionId ?? null,
+          entityId: d.entityId ?? null,
+          shape: d.shape ?? null,
+          status: "running",
+        })
+        .onConflictDoNothing({ target: pipelineRuns.runId })
+        .returning();
+    });
+
+    if (inserted.length === 0) {
       return c.json(
         { error: "conflict", message: `Pipeline run already exists: ${d.runId}` },
         409,
       );
     }
-
-    const inserted = await db
-      .insert(pipelineRuns)
-      .values({
-        runId: d.runId,
-        pipelineName: d.pipelineName,
-        agentSessionId: d.agentSessionId ?? null,
-        entityId: d.entityId ?? null,
-        shape: d.shape ?? null,
-        status: "running",
-      })
-      .returning();
 
     return c.json(firstOrThrow(inserted, "pipeline run insert"), 201);
   })
@@ -102,7 +108,10 @@ const pipelineRunsApp = new Hono()
       .orderBy(desc(pipelineRuns.startedAt))
       .limit(limit);
 
-    return c.json({ runs: rows, total: rows.length });
+    // `count` is the page size, NOT a total-row count for the filter.
+    // Renaming from `total` to avoid the misleading "looks like a total
+    // matching rows" interpretation flagged in QUA-954 review.
+    return c.json({ runs: rows, count: rows.length });
   })
 
   // ---- GET /stats (aggregate by status + pipeline) ----
@@ -225,25 +234,30 @@ const pipelineRunsApp = new Hono()
     const db = getDrizzleDb();
     const now = new Date();
 
-    const updated = await db
-      .update(pipelineRuns)
-      .set({
-        status: d.status,
-        endedAt: now,
-        updatedAt: now,
-        failureReason: d.failureReason ?? null,
-        errorCode: d.errorCode ?? null,
-        errorPayload: d.errorPayload ?? null,
-        snapshotPath: d.snapshotPath ?? null,
-        // Only overwrite followup_actions when the caller passed them
-        // explicitly; otherwise preserve whatever was set in flight
-        // (default '[]' from insert).
-        ...(d.followupActions !== undefined
-          ? { followupActions: d.followupActions }
-          : {}),
-      })
-      .where(eq(pipelineRuns.runId, id))
-      .returning();
+    const updated = await db.transaction(async (tx) => {
+      // QUA-442 audit attribution — end-state writes (status, error_*)
+      // are durable history and must be attributed.
+      await applyAuditContext(tx, c);
+      return tx
+        .update(pipelineRuns)
+        .set({
+          status: d.status,
+          endedAt: now,
+          updatedAt: now,
+          failureReason: d.failureReason ?? null,
+          errorCode: d.errorCode ?? null,
+          errorPayload: d.errorPayload ?? null,
+          snapshotPath: d.snapshotPath ?? null,
+          // Only overwrite followup_actions when the caller passed them
+          // explicitly; otherwise preserve whatever was set in flight
+          // (default '[]' from insert).
+          ...(d.followupActions !== undefined
+            ? { followupActions: d.followupActions }
+            : {}),
+        })
+        .where(eq(pipelineRuns.runId, id))
+        .returning();
+    });
 
     if (updated.length === 0) {
       return notFoundError(c, `No pipeline run with id: ${id}`);

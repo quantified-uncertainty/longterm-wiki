@@ -337,5 +337,32 @@ describe('withPipelineRun', () => {
         expect.stringContaining('/end failed'),
       );
     });
+
+    it('rethrows the body error even if /end itself throws (review fix)', async () => {
+      // Regression for the QUA-954 hostile-review finding: if `finalize`
+      // throws (or, here, /end fails AND endPipelineRun rejects), the
+      // body's original exception must still reach the caller. Previously
+      // a rejected /end would mask the body's TypeError with the network
+      // error, which is exactly the situation where the original error
+      // matters most for debugging.
+      mockStart.mockResolvedValue({ ok: true, data: {} });
+      mockEnd.mockRejectedValue(new Error('network down'));
+
+      const { withPipelineRun } = await import('./lifecycle.ts');
+
+      const original = new TypeError('the actual bug');
+      await expect(
+        withPipelineRun(
+          { pipelineName: 'improve-page', heartbeatIntervalMs: 1_000_000_000 },
+          async () => {
+            throw original;
+          },
+        ),
+      ).rejects.toBe(original);
+
+      expect(consoleErrorSpy).toHaveBeenCalledWith(
+        expect.stringContaining('finalize threw after body abort'),
+      );
+    });
   });
 });

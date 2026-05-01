@@ -143,25 +143,37 @@ export async function withPipelineRun<T>(
   // the body is awaiting a long network call. Errors are best-effort:
   // a failed heartbeat doesn't kill the body, but we log so silent
   // outages are visible.
+  //
+  // Overlap guard: if the previous heartbeat is still in flight when
+  // the next interval fires (e.g. wiki-server is responding slowly),
+  // we skip rather than stack pending requests. Prevents unbounded
+  // queue growth during prod incidents.
+  let heartbeatInFlight = false;
   const heartbeatTimer = setInterval(() => {
-    void heartbeatPipelineRun(runId).then(
-      (res) => {
-        if (!res.ok) {
-          warn('withPipelineRun: heartbeat failed (non-fatal)', {
+    if (heartbeatInFlight) return;
+    heartbeatInFlight = true;
+    void heartbeatPipelineRun(runId)
+      .then(
+        (res) => {
+          if (!res.ok) {
+            warn('withPipelineRun: heartbeat failed (non-fatal)', {
+              runId,
+              pipelineName: options.pipelineName,
+              err: res.message,
+            });
+          }
+        },
+        (err: unknown) => {
+          warn('withPipelineRun: heartbeat threw (non-fatal)', {
             runId,
             pipelineName: options.pipelineName,
-            err: res.message,
+            err: err instanceof Error ? err.message : String(err),
           });
-        }
-      },
-      (err: unknown) => {
-        warn('withPipelineRun: heartbeat threw (non-fatal)', {
-          runId,
-          pipelineName: options.pipelineName,
-          err: err instanceof Error ? err.message : String(err),
-        });
-      },
-    );
+        },
+      )
+      .finally(() => {
+        heartbeatInFlight = false;
+      });
   }, heartbeatIntervalMs);
   // Don't keep the event loop alive on the heartbeat alone — if the
   // body returns and the end call is in flight, we still want the
@@ -183,17 +195,36 @@ export async function withPipelineRun<T>(
     return result;
   } catch (err: unknown) {
     clearInterval(heartbeatTimer);
-    await finalize({
-      runId,
-      pipelineName: options.pipelineName,
-      // overrideStatus wins so a body that did `markStatus('partial_failure')`
-      // and then threw still records the more specific status.
-      status: overrideStatus ?? 'aborted',
-      failureReason: overrideReason ?? errorReason(err),
-      errorCode: overrideErrorCode ?? errorCodeFor(err),
-      errorPayload: errorPayload(err),
-      followups,
-    });
+    // CRITICAL: the original `err` from the body must reach the caller
+    // even if `finalize` itself throws. Wrapping finalize in its own
+    // try/catch ensures the audit-trail failure is logged but never
+    // replaces the actionable exception.
+    try {
+      await finalize({
+        runId,
+        pipelineName: options.pipelineName,
+        // overrideStatus wins so a body that did `markStatus('partial_failure')`
+        // and then threw still records the more specific status.
+        status: overrideStatus ?? 'aborted',
+        failureReason: overrideReason ?? errorReason(err),
+        errorCode: overrideErrorCode ?? errorCodeFor(err),
+        errorPayload: errorPayload(err),
+        followups,
+      });
+    } catch (finalizeErr: unknown) {
+      error(
+        'withPipelineRun: finalize threw after body abort — audit trail lost; rethrowing original body error',
+        {
+          runId,
+          pipelineName: options.pipelineName,
+          finalizeErr:
+            finalizeErr instanceof Error
+              ? finalizeErr.message
+              : String(finalizeErr),
+          originalErr: err instanceof Error ? err.message : String(err),
+        },
+      );
+    }
     throw err;
   }
 }

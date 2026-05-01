@@ -1570,11 +1570,46 @@ export const VALID_PIPELINE_RUN_END_STATUSES = [
 export const PipelineRunEndStatusSchema = z.enum(VALID_PIPELINE_RUN_END_STATUSES);
 export type PipelineRunEndStatus = z.infer<typeof PipelineRunEndStatusSchema>;
 
+// Format constraint: alphanumeric + dash + underscore only. Matches
+// nanoid / uuid v4 / hex tokens but rejects whitespace, control chars,
+// and JSON/SQL/HTML injection vectors slipping through `.max(128)`.
+const PIPELINE_RUN_ID_RE = /^[A-Za-z0-9_-]+$/;
+
+// Cap structured payload size — `errorPayload` and `followupActions`
+// are JSONB columns and a buggy or malicious caller could otherwise
+// post a 100MB blob, blowing up audit log row size and dashboard
+// rendering. Bounds on the JSON-serialized form are checked via a
+// Zod refinement; the array also has an item count cap.
+const MAX_ERROR_PAYLOAD_BYTES = 32_768; // 32 KiB
+const MAX_FOLLOWUPS_COUNT = 50;
+const MAX_FOLLOWUP_BYTES = 4_096; // per item
+
+function jsonByteSize(value: unknown): number {
+  try {
+    return Buffer.byteLength(JSON.stringify(value), "utf8");
+  } catch {
+    // Circular or non-serializable — reject as oversize.
+    return Number.POSITIVE_INFINITY;
+  }
+}
+
+const BoundedJsonObjectSchema = z
+  .record(z.unknown())
+  .refine((v) => jsonByteSize(v) <= MAX_ERROR_PAYLOAD_BYTES, {
+    message: `errorPayload must serialize to <= ${MAX_ERROR_PAYLOAD_BYTES} bytes`,
+  });
+
+const BoundedFollowupSchema = z
+  .record(z.unknown())
+  .refine((v) => jsonByteSize(v) <= MAX_FOLLOWUP_BYTES, {
+    message: `followupActions item must serialize to <= ${MAX_FOLLOWUP_BYTES} bytes`,
+  });
+
 export const StartPipelineRunSchema = z.object({
   // The caller mints the run_id (typically nanoid/uuid v4 from
   // crux/lib/pipeline-runs/lifecycle.ts) so the helper can return it
   // synchronously without waiting for the server response.
-  runId: z.string().min(1).max(128),
+  runId: z.string().min(1).max(128).regex(PIPELINE_RUN_ID_RE),
   pipelineName: z.string().min(1).max(200),
   agentSessionId: z.number().int().positive().nullable().optional(),
   entityId: z.string().max(200).nullable().optional(),
@@ -1586,9 +1621,9 @@ export const EndPipelineRunSchema = z.object({
   status: PipelineRunEndStatusSchema,
   failureReason: z.string().max(200).nullable().optional(),
   errorCode: z.string().max(200).nullable().optional(),
-  errorPayload: z.record(z.unknown()).nullable().optional(),
+  errorPayload: BoundedJsonObjectSchema.nullable().optional(),
   snapshotPath: z.string().max(500).nullable().optional(),
-  followupActions: z.array(z.record(z.unknown())).optional(),
+  followupActions: z.array(BoundedFollowupSchema).max(MAX_FOLLOWUPS_COUNT).optional(),
 });
 export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
 
