@@ -42,14 +42,13 @@ jobs:
           PLAYWRIGHT_BASE_URL: https://www.longtermwiki.com
         run: cd apps/web && npx playwright test e2e/render-audit.spec.ts --reporter=list
 
-      - name: Manage GitHub issue on failure
+      - name: Upsert Linear ticket on failure
+        # QUA-970: Linear-first auto-filer. Comments on the existing open
+        # ticket if one exists, or creates a new one in the right project.
         if: steps.audit.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          # Search for existing open issue
-          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
-
           BODY_FILE=$(mktemp)
           cat >| "$BODY_FILE" <<BODYEOF
           Render quality audit failed against production.
@@ -57,31 +56,20 @@ jobs:
           **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BODYEOF
 
-          if [ -n "$EXISTING" ]; then
-            echo "Updating existing issue #${EXISTING}"
-            gh issue comment "$EXISTING" --body-file "$BODY_FILE"
-          else
-            echo "Creating new issue"
-            gh issue create \
-              --title "Render quality regression detected" \
-              --label "render-monitor" \
-              --body-file "$BODY_FILE"
-          fi
+          pnpm crux linear monitor upsert \
+            --title="Render quality regression detected" \
+            --body-file="$BODY_FILE" \
+            --project="Dashboards & Visibility"
           rm -f "$BODY_FILE"
 
-      - name: Close issue on success
+      - name: Resolve Linear ticket on success
         if: steps.audit.outcome == 'success'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
-          if [ -n "$EXISTING" ]; then
-            echo "Closing resolved issue #${EXISTING}"
-            gh issue comment "$EXISTING" --body "Render quality audit passing again. Closing.
-
-            **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            gh issue close "$EXISTING"
-          fi
+          pnpm crux linear monitor resolve \
+            --title="Render quality regression detected" \
+            --comment="Render quality audit passing again. Auto-closing. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Fail workflow if audit failed
         if: steps.audit.outcome == 'failure'

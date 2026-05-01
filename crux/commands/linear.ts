@@ -66,6 +66,7 @@ import { currentBranch } from '../lib/session/session-checklist.ts';
 import { buildStartCommentBody, getSessionContext } from '../lib/session/session-context.ts';
 import { execSync, execFileSync } from 'child_process';
 import { existsSync, readFileSync } from 'fs';
+import { monitor } from './linear-monitor.ts';
 
 interface CommandOptions extends BaseOptions {
   ci?: boolean;
@@ -1349,6 +1350,7 @@ export const commands = {
   'states-list': statesList,
   parse,
   project,
+  monitor,
 };
 
 export function getHelp(): string {
@@ -1365,6 +1367,7 @@ Commands:
   done <QUA-NNN> [--pr=URL]     Move to In Review (with PR) or Done, post comment
   audit                         Classify active issues (In Progress + In Review) by PR health
   hygiene                       Metadata hygiene scan: orphans, label coverage, priority gaps, stuck tickets
+  monitor <upsert|resolve>      Upsert or close a Linear ticket by exact title (used by automated monitors — render-monitor, server-health-monitor)
   release-stale                 Auto-release tickets whose agent session went stale without producing a branch (QUA-815)
   verify-pr <PR>                Watchdog: ensure merged PR's Fixes QUA-NNN issues are actually Done
   leak-check                    Scan current session for QUA refs beyond the primary; warn about leaks
