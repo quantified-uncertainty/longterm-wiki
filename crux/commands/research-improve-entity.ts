@@ -56,6 +56,11 @@ import {
   type VerifiedVerdict,
 } from "../lib/research/apply-verdicts.ts";
 import { canonicalSlug } from "../lib/research/canonical-names.ts";
+import {
+  withPipelineRun,
+  type WithPipelineRunOptions,
+} from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const ENTITIES_DIR = path.join(ROOT, "data/entities");
@@ -1025,6 +1030,60 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     );
   }
 
+  // Pull the active agent_session_id (primed by crux.mjs at startup) so the
+  // pipeline_runs row links back to the agent that triggered the run.
+  // `getCachedAuditSessionId` returns a string; agent_sessions.id is bigint
+  // — cast to number with NaN-fallback to null.
+  const cachedSid = getCachedAuditSessionId();
+  const parsedSid = cachedSid != null ? Number(cachedSid) : NaN;
+  const agentSessionId = Number.isFinite(parsedSid) ? parsedSid : null;
+
+  const runOptions = buildImproveEntityRunOptions(found.entity, agentSessionId);
+
+  return withPipelineRun(runOptions, async () =>
+    doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
+  );
+}
+
+/**
+ * Construct `WithPipelineRunOptions` for the improve-entity pipeline. Pure
+ * helper — exported so the wiring shape is unit-testable without driving
+ * the full closed-loop body. Phase 1 (QUA-957) of QUA-943.
+ *
+ * `allowOffline: true` so dev sessions without wiki-server creds can keep
+ * iterating against YAML; the helper still logs a visible warning when
+ * `/start` fails. Phase 2 may tighten this once the body performs real
+ * machine-writes that demand a mandatory audit trail.
+ */
+export function buildImproveEntityRunOptions(
+  entity: EntityWithType,
+  agentSessionId: number | null,
+): WithPipelineRunOptions {
+  return {
+    pipelineName: "improve-entity",
+    entityId: entity.stableId ?? entity.id,
+    shape: entity.type,
+    agentSessionId,
+    allowOffline: true,
+  };
+}
+
+/**
+ * Inner body of `improveSingleEntity` — runs inside `withPipelineRun` so the
+ * entire iteration loop, drain, and write are scoped to a single
+ * `pipeline_runs` lifecycle. Phase 1 establishes the run record; Phase 2
+ * will additionally invoke the typed sync client from inside this body.
+ */
+async function doImproveSingleEntity(args: {
+  found: { entity: EntityWithType; filePath: string };
+  slug: string;
+  target: number;
+  maxIters: number;
+  budgetUsd: number;
+  noWrite: boolean;
+  opts: ImproveOptions;
+}): Promise<ImproveResult> {
+  const { found, slug, target, maxIters, budgetUsd, noWrite, opts } = args;
   let entity = found.entity;
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
