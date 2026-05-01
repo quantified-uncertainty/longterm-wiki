@@ -9,9 +9,6 @@ describe("validate-entity-schema-drift checkLine", () => {
     expect(checkLine('const VALID_POSITIONS = ["support", "oppose"] as const;')).toBe("VALID_CONST");
   });
 
-  // Multi-line declarations (`const VALID_X\n  = [...]`) are caught by the
-  // file-level multi-line pass in checkFile, not by checkLine.
-
   it("flags exported VALID_*", () => {
     expect(checkLine('export const VALID_RISK_DOMAINS = [')).toBe("VALID_CONST");
   });
@@ -29,13 +26,23 @@ describe("validate-entity-schema-drift checkLine", () => {
     expect(checkLine(' * z.enum(["x"])')).toBeNull();
   });
 
-  it("respects // schema-drift-ok suppression", () => {
-    expect(checkLine('const VALID_QUERY_DIR = ["asc","desc"]; // schema-drift-ok')).toBeNull();
-    expect(checkLine('  dir: z.enum(["asc","desc"]), // schema-drift-ok')).toBeNull();
+  it("respects // schema-drift-ok: <reason> suppression", () => {
+    expect(checkLine('const VALID_QUERY_DIR = ["asc","desc"]; // schema-drift-ok: query enum, not entity wire shape')).toBeNull();
+    expect(checkLine('  dir: z.enum(["asc","desc"]), // schema-drift-ok: query enum')).toBeNull();
+  });
+
+  it("rejects bare suppression marker without reason", () => {
+    // buildSuppressionRegex requires `<marker>: <reason>`; a bare marker
+    // does not suppress.
+    expect(checkLine('const VALID_X = ["a"]; // schema-drift-ok')).toBe("VALID_CONST");
   });
 
   it("does not match VALID_ inside string literal", () => {
-    expect(checkLine('const msg = "Use a const VALID_FOO declaration"')).toBeNull();
+    expect(checkLine('const msg = "Use a const VALID_FOO = declaration"')).toBeNull();
+  });
+
+  it("does not match z.enum([ inside string literal", () => {
+    expect(checkLine('const msg = "see z.enum([\\"x\\"]) docs";')).toBeNull();
   });
 
   it("ignores plain `valid` (case-sensitive)", () => {
@@ -130,14 +137,22 @@ describe("validate-entity-schema-drift runCheck", () => {
     expect(result.newViolations[0].kind).toBe("INLINE_ENUM");
   });
 
-  it("respects per-line // schema-drift-ok suppression even outside allowlist", () => {
+  it("respects per-line // schema-drift-ok: <reason> suppression even outside allowlist", () => {
     writeFileSync(
       join(routesDir, "queries.ts"),
-      'const sortDir = z.enum(["asc","desc"]); // schema-drift-ok\n',
+      'const sortDir = z.enum(["asc","desc"]); // schema-drift-ok: query enum\n',
     );
     writeFileSync(allowlistPath, "");
     const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
     expect(result.passed).toBe(true);
+  });
+
+  it("attaches file path to violations in result.newViolations", () => {
+    writeFileSync(join(routesDir, "n.ts"), 'const VALID_N = ["a"];\n');
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations[0].file).toBe("routes/tablebase/n.ts");
+    expect(result.newViolations[0].line).toBe(1);
   });
 });
 

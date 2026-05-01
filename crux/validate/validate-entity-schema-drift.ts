@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 /**
- * Entity-schema drift validator (QUA-943 — Plan v2 step 0c).
+ * Entity-schema drift validator.
  *
  * Bans new `const VALID_*` declarations and inline `z.enum([...])` literals in
  * apps/wiki-server/src/routes/tablebase/ — both are markers of an entity wire
@@ -10,112 +10,93 @@
  *
  * The current baseline of files containing drift markers is recorded in
  * .entity-schema-drift-allowlist.txt. As routes migrate to canonical schemas
- * (Plan v2 PRs 5a/5b), entries are removed from the allowlist. This file
- * reaches zero entries when QUA-943 closes.
+ * entries are removed from the allowlist. The file reaches zero entries when
+ * QUA-943 closes.
  *
- * Suppression for legitimate inline enums (e.g., query-string enums that are
- * not entity wire shapes): add `// schema-drift-ok` on the same line as the
- * marker.
+ * Suppression: add `// schema-drift-ok: <reason>` on the same line. The
+ * reason is mandatory (matches the buildSuppressionRegex contract used by
+ * other validators).
  *
  * Usage:
  *   npx tsx crux/validate/validate-entity-schema-drift.ts            # check
  *   npx tsx crux/validate/validate-entity-schema-drift.ts --update   # rewrite allowlist
  */
 
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
+import {
+  buildSuppressionRegex,
+  findInlineCommentStart,
+  isInsideStringAt,
+} from './lib/comment-utils.ts';
+import { collectTsFiles } from './lib/file-walker.ts';
 
 const TABLEBASE_ROUTES_DIR = join(PROJECT_ROOT, 'apps/wiki-server/src/routes/tablebase');
 const ALLOWLIST_PATH = join(PROJECT_ROOT, 'crux/validate/.entity-schema-drift-allowlist.txt');
-const SUPPRESS_COMMENT = 'schema-drift-ok';
+const SUPPRESSION_MARKER = 'schema-drift-ok';
+const SUPPRESSION_REGEX = buildSuppressionRegex(SUPPRESSION_MARKER);
 
-// Single-line patterns. The trailing `\s*=` keeps these tight against
-// false-positive matches inside string literals (e.g.
-// `const msg = "Use a const VALID_FOO declaration"` doesn't end with
-// `=` after VALID_FOO so it is not flagged). Multi-line declarations
-// (`const VALID_X\n  = [...]`, formatter-induced) are caught by the
-// MULTILINE_PATTERNS pass below, which joins line N with line N+1.
-const VALID_CONST_RE = /\bconst\s+VALID_[A-Z_]+\s*=/;
-const INLINE_ENUM_RE = /z\.enum\(\[/;
+type Kind = 'VALID_CONST' | 'INLINE_ENUM';
 
-const MULTILINE_PATTERNS: Array<{ pattern: RegExp; kind: Violation['kind'] }> = [
-  { pattern: /\bconst\s+VALID_[A-Z_]+\s*=/, kind: 'VALID_CONST' },
-  { pattern: /z\.enum\(\s*\[/, kind: 'INLINE_ENUM' },
+/**
+ * Patterns shared between single-line and multi-line passes. The `\s*` after
+ * `z.enum(` is harmless on the single-line case and lets the joined-line
+ * pass catch formatter-induced splits like `z.enum(\n  [...])`.
+ */
+const PATTERNS: Array<{ pattern: RegExp; globalPattern: RegExp; kind: Kind }> = [
+  {
+    pattern: /\bconst\s+VALID_[A-Z_]+\s*=/,
+    globalPattern: /\bconst\s+VALID_[A-Z_]+\s*=/g,
+    kind: 'VALID_CONST',
+  },
+  {
+    pattern: /z\.enum\(\s*\[/,
+    globalPattern: /z\.enum\(\s*\[/g,
+    kind: 'INLINE_ENUM',
+  },
 ];
 
 export interface Violation {
-  file: string;
   line: number;
   text: string;
-  kind: 'VALID_CONST' | 'INLINE_ENUM';
+  kind: Kind;
 }
 
-function isSuppressed(line: string): boolean {
-  const commentIdx = findLineCommentStart(line);
-  if (commentIdx === -1) return false;
-  return line.slice(commentIdx).includes(SUPPRESS_COMMENT);
+function isCommentLine(trimmed: string): boolean {
+  return trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*');
 }
 
-function findLineCommentStart(line: string): number {
-  let inSingle = false;
-  let inDouble = false;
-  let inTemplate = false;
-  for (let i = 0; i < line.length; i++) {
-    if (i > 0 && line[i - 1] === '\\') continue;
-    const ch = line[i];
-    if (ch === "'" && !inDouble && !inTemplate) { inSingle = !inSingle; continue; }
-    if (ch === '"' && !inSingle && !inTemplate) { inDouble = !inDouble; continue; }
-    if (ch === '`' && !inSingle && !inDouble) { inTemplate = !inTemplate; continue; }
-    if (!inSingle && !inDouble && !inTemplate && ch === '/' && line[i + 1] === '/') {
-      return i;
+function lineIsSuppressed(line: string): boolean {
+  if (!line.includes(SUPPRESSION_MARKER)) return false;
+  const commentStart = findInlineCommentStart(line);
+  if (commentStart === -1) return false;
+  return SUPPRESSION_REGEX.test(line.slice(commentStart + 2));
+}
+
+/**
+ * Run all patterns against `line`, filtering out matches that fall inside a
+ * string literal. Returns the kind of the first real match, or null.
+ *
+ * Exported for unit tests.
+ */
+export function checkLine(line: string): Kind | null {
+  if (isCommentLine(line.trimStart())) return null;
+  if (lineIsSuppressed(line)) return null;
+  const commentStart = findInlineCommentStart(line);
+  for (const { globalPattern, kind } of PATTERNS) {
+    for (const match of line.matchAll(globalPattern)) {
+      const idx = match.index ?? 0;
+      if (commentStart !== -1 && idx >= commentStart) continue;
+      if (isInsideStringAt(line, idx)) continue;
+      return kind;
     }
   }
-  return -1;
-}
-
-export function checkLine(line: string): Violation['kind'] | null {
-  const trimmed = line.trimStart();
-  if (trimmed.startsWith('//') || trimmed.startsWith('*') || trimmed.startsWith('/*')) {
-    return null;
-  }
-  if (isSuppressed(line)) return null;
-  if (VALID_CONST_RE.test(line)) return 'VALID_CONST';
-  if (INLINE_ENUM_RE.test(line)) return 'INLINE_ENUM';
   return null;
 }
 
-function collectTsFiles(dir: string): string[] {
-  const results: string[] = [];
-  function walk(current: string): void {
-    let entries: string[];
-    try {
-      entries = readdirSync(current);
-    } catch {
-      return;
-    }
-    for (const entry of entries) {
-      const fullPath = join(current, entry);
-      let stat;
-      try {
-        stat = statSync(fullPath);
-      } catch {
-        continue;
-      }
-      if (stat.isDirectory()) {
-        if (entry === '__tests__' || entry === 'node_modules') continue;
-        walk(fullPath);
-      } else if (entry.endsWith('.ts') && !entry.endsWith('.test.ts')) {
-        results.push(fullPath);
-      }
-    }
-  }
-  walk(dir);
-  return results;
-}
-
-function checkFile(filePath: string, baseDir: string): Violation[] {
+function checkFile(filePath: string, baseDir: string): { relPath: string; violations: Violation[] } {
   const content = readFileSync(filePath, 'utf-8');
   const lines = content.split('\n');
   const violations: Violation[] = [];
@@ -123,21 +104,22 @@ function checkFile(filePath: string, baseDir: string): Violation[] {
   for (let i = 0; i < lines.length; i++) {
     const kind = checkLine(lines[i]);
     if (kind) {
-      violations.push({ file: relPath, line: i + 1, text: lines[i].trimStart(), kind });
+      violations.push({ line: i + 1, text: lines[i].trimStart(), kind });
       continue;
     }
-    // Multi-line check: join current line with next to catch declarations split
-    // across lines (e.g. `const VALID_X\n  = [...]`).
+    // Multi-line pass: catches formatter-induced splits like
+    // `const VALID_X\n  = [...]` or `z.enum(\n  ["a"])`.
     if (i + 1 >= lines.length) continue;
     const nextLine = lines[i + 1];
     const nextTrim = nextLine.trimStart();
-    if (nextTrim.startsWith('//') || nextTrim.startsWith('*') || nextTrim.startsWith('/*')) continue;
-    if (isSuppressed(lines[i]) || isSuppressed(nextLine)) continue;
+    if (isCommentLine(nextTrim)) continue;
+    if (lineIsSuppressed(lines[i]) || lineIsSuppressed(nextLine)) continue;
     const joined = lines[i].trimEnd() + ' ' + nextTrim;
-    for (const { pattern, kind: mlKind } of MULTILINE_PATTERNS) {
+    for (const { pattern, kind: mlKind } of PATTERNS) {
+      // Only report if the joined-line match wasn't already a single-line
+      // match on `lines[i]` (which would have been caught above).
       if (pattern.test(joined) && !pattern.test(lines[i])) {
         violations.push({
-          file: relPath,
           line: i + 1,
           text: `${lines[i].trimStart()} ${nextTrim}`.trim(),
           kind: mlKind,
@@ -146,7 +128,7 @@ function checkFile(filePath: string, baseDir: string): Violation[] {
       }
     }
   }
-  return violations;
+  return { relPath, violations };
 }
 
 export function readAllowlist(path: string = ALLOWLIST_PATH): Set<string> {
@@ -168,7 +150,7 @@ export function readAllowlist(path: string = ALLOWLIST_PATH): Set<string> {
 interface CheckResult {
   passed: boolean;
   errors: number;
-  newViolations: Violation[];
+  newViolations: Array<Violation & { file: string }>;
   staleEntries: string[];
   allowlistedFileCount: number;
   fileCountWithDrift: number;
@@ -195,8 +177,8 @@ export function runCheck(
 
   const filesWithDrift = new Map<string, Violation[]>();
   for (const file of allFiles) {
-    const v = checkFile(file, baseDir);
-    if (v.length > 0) filesWithDrift.set(v[0].file, v);
+    const { relPath, violations } = checkFile(file, baseDir);
+    if (violations.length > 0) filesWithDrift.set(relPath, violations);
   }
 
   if (opts.updateBaseline) {
@@ -207,12 +189,20 @@ export function runCheck(
     } catch {
       existing = '';
     }
-    const header = existing.split('\n')
-      .filter(l => l.startsWith('#') || l.trim() === '')
-      .join('\n')
-      .replace(/\n+$/, '\n');
+    // Preserve only the leading run of comment/blank lines as the header.
+    // A scan that keeps comments and blanks anywhere in the file would mix
+    // gaps between entries into the header and reorder them.
+    const headerLines: string[] = [];
+    for (const line of existing.split('\n')) {
+      if (line.startsWith('#') || line.trim() === '') {
+        headerLines.push(line);
+      } else {
+        break;
+      }
+    }
+    const header = headerLines.join('\n').replace(/\n+$/, '\n');
     const body = sorted.join('\n') + '\n';
-    writeFileSync(allowlistPath, header + body);
+    writeFileSync(allowlistPath, (header.length > 0 ? header : '') + body);
     console.log(`${c.green}Wrote ${sorted.length} entries to ${relative(baseDir, allowlistPath)}${c.reset}`);
     return {
       passed: true, errors: 0, newViolations: [], staleEntries: [],
@@ -221,9 +211,11 @@ export function runCheck(
   }
 
   const allowed = readAllowlist(allowlistPath);
-  const newViolations: Violation[] = [];
+  const newViolations: Array<Violation & { file: string }> = [];
   for (const [file, vs] of filesWithDrift) {
-    if (!allowed.has(file)) newViolations.push(...vs);
+    if (!allowed.has(file)) {
+      for (const v of vs) newViolations.push({ ...v, file });
+    }
   }
 
   const staleEntries: string[] = [];
@@ -239,13 +231,14 @@ export function runCheck(
     }
   } else {
     if (newViolations.length > 0) {
-      console.log(`${c.red}Found ${newViolations.length} drift marker(s) in ${new Set(newViolations.map(v => v.file)).size} non-allowlisted file(s):${c.reset}\n`);
+      const fileCount = new Set(newViolations.map(v => v.file)).size;
+      console.log(`${c.red}Found ${newViolations.length} drift marker(s) in ${fileCount} non-allowlisted file(s):${c.reset}\n`);
       for (const v of newViolations) {
         console.log(`  ${c.red}${v.file}:${v.line}${c.reset} [${v.kind}]`);
         console.log(`    ${c.dim}${v.text}${c.reset}`);
       }
       console.log(`\n${c.dim}Fix: import the canonical schema from packages/entity-schemas (QUA-943) instead of hand-writing.${c.reset}`);
-      console.log(`${c.dim}Suppress a single legitimate use (e.g., query-string enum): add \`// ${SUPPRESS_COMMENT}\` on the same line.${c.reset}`);
+      console.log(`${c.dim}Suppress a single legitimate use (e.g., query-string enum): add \`// ${SUPPRESSION_MARKER}: <reason>\` on the same line.${c.reset}`);
       console.log(`${c.dim}If migration to canonical schemas is not yet possible, add the file to ${relative(PROJECT_ROOT, allowlistPath)}.${c.reset}\n`);
     }
     if (staleEntries.length > 0) {
@@ -265,7 +258,7 @@ export function runCheck(
   };
 }
 
-const __isMain = process.argv[1]?.includes('validate-entity-schema-drift');
+const __isMain = process.argv[1]?.endsWith('validate-entity-schema-drift.ts');
 if (__isMain) {
   const updateBaseline = process.argv.includes('--update');
   const result = runCheck({ updateBaseline });

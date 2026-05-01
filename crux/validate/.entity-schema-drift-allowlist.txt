@@ -9,7 +9,8 @@
 # while migration is in progress. Goal: this file is empty when QUA-943 closes.
 #
 # Suppressing a single line (e.g., a legitimate query-string enum that should
-# not be migrated): add `// schema-drift-ok` on the same line as the marker.
+# not be migrated): add `// schema-drift-ok: <reason>` on the same line as the
+# marker. Reason is mandatory.
 #
 # Format: one file path per line, relative to repo root. Empty lines and
 # comments (lines starting with `#`) are ignored.
