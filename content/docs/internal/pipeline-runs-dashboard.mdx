@@ -1,0 +1,12 @@
+---
+wikiId: E2545
+title: "Pipeline Runs"
+description: "Per-run lifecycle history for generation / improve / sourcing pipelines — live status, failure-reason breakdown, drilldown by run id"
+subcategory: dashboards
+contentFormat: dashboard
+lastEdited: "2026-04-30"
+---
+
+Per-run lifecycle for pipeline executions wrapped by `withPipelineRun()` (QUA-954). Each row is one pipeline invocation: when it started, whether it committed cleanly, aborted, oscillated, or partial-failed, and the failure reason if any. Use this to spot recurring failure modes, stuck runs, or oscillations across the wiki's generation pipelines.
+
+<PipelineRunsContent />

@@ -1540,6 +1540,59 @@ export const RecordGroundskeeperRunBatchSchema = z.object({
 });
 
 // ---------------------------------------------------------------------------
+// Pipeline Runs (QUA-954)
+// ---------------------------------------------------------------------------
+
+/**
+ * v1 status enum. Mirrors the CHECK constraint on `pipeline_runs.status`.
+ * Widening requires a follow-up migration that enumerates prod row
+ * distribution first — see `.claude/rules/database-migrations.md`.
+ */
+export const VALID_PIPELINE_RUN_STATUSES = [
+  "running",
+  "committed",
+  "aborted",
+  "oscillation",
+  "partial_failure",
+] as const;
+
+export const PipelineRunStatusSchema = z.enum(VALID_PIPELINE_RUN_STATUSES);
+export type PipelineRunStatus = z.infer<typeof PipelineRunStatusSchema>;
+
+/** End-state set: the four statuses callers may move to from `running`. */
+export const VALID_PIPELINE_RUN_END_STATUSES = [
+  "committed",
+  "aborted",
+  "oscillation",
+  "partial_failure",
+] as const;
+
+export const PipelineRunEndStatusSchema = z.enum(VALID_PIPELINE_RUN_END_STATUSES);
+export type PipelineRunEndStatus = z.infer<typeof PipelineRunEndStatusSchema>;
+
+export const StartPipelineRunSchema = z.object({
+  // The caller mints the run_id (typically nanoid/uuid v4 from
+  // crux/lib/pipeline-runs/lifecycle.ts) so the helper can return it
+  // synchronously without waiting for the server response.
+  runId: z.string().min(1).max(128),
+  pipelineName: z.string().min(1).max(200),
+  agentSessionId: z.number().int().positive().nullable().optional(),
+  entityId: z.string().max(200).nullable().optional(),
+  shape: z.string().max(100).nullable().optional(),
+});
+export type StartPipelineRun = z.infer<typeof StartPipelineRunSchema>;
+
+export const EndPipelineRunSchema = z.object({
+  status: PipelineRunEndStatusSchema,
+  failureReason: z.string().max(200).nullable().optional(),
+  errorCode: z.string().max(200).nullable().optional(),
+  errorPayload: z.record(z.unknown()).nullable().optional(),
+  snapshotPath: z.string().max(500).nullable().optional(),
+  followupActions: z.array(z.record(z.unknown())).optional(),
+});
+export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
+
+// ---------------------------------------------------------------------------
 // Monitoring / Incident Tracking
 // ---------------------------------------------------------------------------
 

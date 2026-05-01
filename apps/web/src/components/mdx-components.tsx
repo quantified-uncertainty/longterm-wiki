@@ -67,6 +67,7 @@ import { CitationAccuracyContent } from "@/app/internal/citation-accuracy/citati
 import { CitationContentContent } from "@/app/internal/citation-content/citation-content-content";
 import { HallucinationRiskContent } from "@/app/internal/hallucination-risk/hallucination-risk-content";
 import { GroundskeeperRunsContent } from "@/app/internal/groundskeeper-runs/groundskeeper-runs-content";
+import { PipelineRunsContent } from "@/app/internal/pipeline-runs/pipeline-runs-content";
 import { SystemHealthContent } from "@/app/internal/system-health/system-health-content";
 import { PRDashboardContent } from "@/app/internal/pr-dashboard/pr-dashboard-content";
 import { GrantsDashboardContent } from "@/app/internal/grants-dashboard/grants-dashboard-content";
@@ -236,6 +237,7 @@ export const mdxComponents: Record<string, React.ComponentType<any>> = {
   CitationContentContent,
   HallucinationRiskContent,
   GroundskeeperRunsContent,
+  PipelineRunsContent,
   SystemHealthContent,
   PRDashboardContent,
   GrantsDashboardContent,
