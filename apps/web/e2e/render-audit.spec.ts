@@ -84,16 +84,12 @@ const SIDEBAR_ONLY_PAGES = [
  * Pages without sidebar or tabs (use children) — migrated to
  * EntityProfileShell. Loaded into the same body-render check as simple pages.
  */
-const NO_SIDEBAR_PAGES = [
-  // Resources/[id] — migrated to EntityProfileShell in QUA-490. The local
-  // (YAML literature) path is exercised here. The server-fetched (tabular)
-  // path is structurally similar to the local path and is covered by build
-  // (Next.js typechecks both branches) but cannot be reliably exercised by
-  // this test, since the resources-snapshot mirrors prod and any prod-known
-  // ID resolves locally — the server-fetch fallback only fires for IDs that
-  // exist on the wiki-server but were excluded from the snapshot, which we
-  // cannot pin down deterministically.
-  "/resources/2cc177984ead7389",  // ARIA Safeguarded AI Programme (local path)
+const NO_SIDEBAR_PAGES: string[] = [
+  // Resources/[id] — migrated to EntityProfileShell in QUA-490.
+  // Resources are PG-primary (data/resources-snapshot.json is gitignored).
+  // The e2e-pr.yml workflow runs build-data without LONGTERMWIKI_SERVER_URL,
+  // so resources.json is empty and any /resources/[id] URL returns 404 in CI.
+  // Validated locally with a dev server pointed at prod wiki-server.
 ];
 
 /**
