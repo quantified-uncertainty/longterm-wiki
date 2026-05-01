@@ -120,7 +120,7 @@ describe("dualWriteStakeholders — valid payload", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     const result = await dualWriteStakeholders({
       ctx,
@@ -151,7 +151,7 @@ describe("dualWriteStakeholders — valid payload", () => {
       v({ targetField: "scalar.description", claimText: "A description" }),
     ]);
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
     const result = await dualWriteStakeholders({
       ctx,
       policyEntityId: POLICY_ID,
@@ -200,7 +200,7 @@ describe("dualWriteStakeholders — deliberate ABORT (zod)", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     let thrown: unknown;
     try {
@@ -262,7 +262,7 @@ describe("dualWriteStakeholders — deliberate ABORT (zod)", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     await expect(
       dualWriteStakeholders({
@@ -310,7 +310,7 @@ describe("dualWriteStakeholders — partial (fk_missing)", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     const result = await dualWriteStakeholders({
       ctx,
@@ -359,7 +359,7 @@ describe("dualWriteStakeholders — HTTP failure", () => {
       message: "wiki-server unreachable",
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     let thrown: unknown;
     try {
@@ -408,7 +408,7 @@ describe("dualWriteStakeholders — comment failure", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {
       throw new Error("Linear is down");
     });
     const result = await dualWriteStakeholders({
@@ -444,7 +444,7 @@ describe("dualWriteStakeholders — comment failure", () => {
       },
     });
     const ctx = makeCtx();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
     await expect(
       dualWriteStakeholders({
         ctx,

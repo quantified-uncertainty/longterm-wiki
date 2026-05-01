@@ -1,6 +1,8 @@
 import { describe, it, expect, vi } from "vitest";
 import { checkCanaryHalt } from "../canary-halt-guard.ts";
 import { RECONCILIATION_STALE_THRESHOLD_HOURS } from "../../../pr-patrol/health-scan.ts";
+import type { ReconciliationSummaryResult } from "../../wiki-server/reconciliation-runs.ts";
+import type { ApiResult } from "../../wiki-server/client.ts";
 
 const NOW = new Date("2026-05-01T12:00:00Z");
 
@@ -8,12 +10,27 @@ function summary(
   startedAtIso: string,
   nonEmptyDiffsObserved: number | null,
   errorCode: string | null = null,
-) {
+): ApiResult<ReconciliationSummaryResult> {
   return {
-    ok: true as const,
+    ok: true,
     data: {
-      domain: "policy_stakeholders" as const,
-      latestRun: { startedAt: startedAtIso, nonEmptyDiffsObserved, errorCode },
+      domain: "policy_stakeholders",
+      latestRun: {
+        id: 1,
+        startedAt: startedAtIso,
+        completedAt: startedAtIso,
+        entitiesScanned: 0,
+        entitiesNonEmpty: 0,
+        diffsDetected: 0,
+        nonEmptyDiffsObserved,
+        errorCode,
+      },
+      window: {
+        days: 30,
+        runs: 1,
+        nonEmptyDiffsObservedTotal: 0,
+        runsWithNonEmptyDiff: 0,
+      },
     },
   };
 }
@@ -56,21 +73,34 @@ describe("checkCanaryHalt (QUA-958 health-gate guard)", () => {
   });
 
   it("halts when there's no completed run at all", async () => {
-    const fetchSummary = vi.fn(async () => ({
-      ok: true as const,
-      data: { domain: "policy_stakeholders" as const, latestRun: null },
-    }));
+    const fetchSummary = vi.fn(
+      async (): Promise<ApiResult<ReconciliationSummaryResult>> => ({
+        ok: true,
+        data: {
+          domain: "policy_stakeholders",
+          latestRun: null,
+          window: {
+            days: 30,
+            runs: 0,
+            nonEmptyDiffsObservedTotal: 0,
+            runsWithNonEmptyDiff: 0,
+          },
+        },
+      }),
+    );
     const r = await checkCanaryHalt({ fetchSummary, now: NOW });
     expect(r.halt).toBe(true);
     expect(r.reason).toMatch(/never run|no completed/);
   });
 
   it("does NOT halt (fail-soft) when fetch returns ok:false", async () => {
-    const fetchSummary = vi.fn(async () => ({
-      ok: false as const,
-      error: "unavailable" as const,
-      message: "wiki-server timeout",
-    }));
+    const fetchSummary = vi.fn(
+      async (): Promise<ApiResult<ReconciliationSummaryResult>> => ({
+        ok: false,
+        error: "unavailable",
+        message: "wiki-server timeout",
+      }),
+    );
     const r = await checkCanaryHalt({ fetchSummary, now: NOW });
     expect(r.halt).toBe(false);
     expect(r.reason).toMatch(/unavailable.*timeout/);

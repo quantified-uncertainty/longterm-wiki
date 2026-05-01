@@ -1,6 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
 import { runReconcile } from "../reconcile-stakeholders-cron.ts";
 import type { PgStakeholderRow, PolicyEntityForReconcile } from "../reconcile-stakeholders.ts";
+import type {
+  StartReconciliationInput,
+  CompleteReconciliationInput,
+  ReconciliationStartResult,
+  ReconciliationCompleteResult,
+} from "../../wiki-server/reconciliation-runs.ts";
+import type { ApiResult } from "../../wiki-server/client.ts";
 
 const POLICY_A = "sid_PolicyA";
 const POLICY_B = "sid_PolicyB";
@@ -25,22 +32,30 @@ function pgRow(over: Partial<PgStakeholderRow> = {}): PgStakeholderRow {
 }
 
 function makeOkStart(id = 42) {
-  return vi.fn(async () => ({
-    ok: true as const,
-    data: { id, domain: "policy_stakeholders" as const, startedAt: new Date().toISOString() },
-  }));
+  return vi.fn(
+    async (
+      _input: StartReconciliationInput,
+    ): Promise<ApiResult<ReconciliationStartResult>> => ({
+      ok: true,
+      data: { id, domain: "policy_stakeholders" as const, startedAt: new Date().toISOString() },
+    }),
+  );
 }
 
 function makeOkComplete() {
-  return vi.fn(async () => ({
-    ok: true as const,
-    data: {
-      id: 42,
-      completedAt: new Date().toISOString(),
-      diffsDetected: 0,
-      nonEmptyDiffsObserved: 0,
-    },
-  }));
+  return vi.fn(
+    async (
+      _input: CompleteReconciliationInput,
+    ): Promise<ApiResult<ReconciliationCompleteResult>> => ({
+      ok: true,
+      data: {
+        id: 42,
+        completedAt: new Date().toISOString(),
+        diffsDetected: 0,
+        nonEmptyDiffsObserved: 0,
+      },
+    }),
+  );
 }
 
 describe("runReconcile", () => {
@@ -49,7 +64,7 @@ describe("runReconcile", () => {
     const pgRows = [pgRow({ stakeholderDisplayName: "ACLU" })];
     const startFn = makeOkStart();
     const completeFn = makeOkComplete();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     const r = await runReconcile({
       trigger: "scheduled",
@@ -83,7 +98,7 @@ describe("runReconcile", () => {
     const pgRows: PgStakeholderRow[] = []; // PG missing the row
     const startFn = makeOkStart();
     const completeFn = makeOkComplete();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     const r = await runReconcile({
       trigger: "scheduled",
@@ -121,7 +136,7 @@ describe("runReconcile", () => {
   it("captures scan error in errorCode and posts failure comment", async () => {
     const startFn = makeOkStart();
     const completeFn = makeOkComplete();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
 
     const r = await runReconcile({
       trigger: "scheduled",
@@ -186,7 +201,7 @@ describe("runReconcile", () => {
   it("skips the comment when no trackingTicket is configured", async () => {
     const startFn = makeOkStart();
     const completeFn = makeOkComplete();
-    const postComment = vi.fn(async () => {});
+    const postComment = vi.fn(async (_ticket: string, _body: string) => {});
     const r = await runReconcile({
       trigger: "scheduled",
       trackingTicket: null,
@@ -227,6 +242,44 @@ describe("runReconcile", () => {
     // And the truncation marker is visible so operators know to look at the
     // full error in the agent's local log if needed.
     expect(completeArgs.errorMessage).toMatch(/truncated; original \d+ chars/);
+  });
+
+  it("does not truncate at exactly the cap (4500 chars passes through unchanged)", async () => {
+    const startFn = makeOkStart();
+    const completeFn = makeOkComplete();
+    const exact = "X".repeat(4500);
+    await runReconcile({
+      trigger: "scheduled",
+      trackingTicket: null,
+      startFn,
+      completeFn,
+      fetchPgRowsFn: async () => {
+        throw { toString: () => exact };
+      },
+      loadPoliciesFn: () => [],
+    });
+    const sent = completeFn.mock.calls[0][0].errorMessage;
+    expect(sent).toBe(exact); // unchanged — at-cap fits
+    expect(sent).not.toMatch(/truncated/);
+  });
+
+  it("does truncate one char over the cap (4501 chars → marker added)", async () => {
+    const startFn = makeOkStart();
+    const completeFn = makeOkComplete();
+    const overOne = "X".repeat(4501);
+    await runReconcile({
+      trigger: "scheduled",
+      trackingTicket: null,
+      startFn,
+      completeFn,
+      fetchPgRowsFn: async () => {
+        throw { toString: () => overOne };
+      },
+      loadPoliciesFn: () => [],
+    });
+    const sent = completeFn.mock.calls[0][0].errorMessage!;
+    expect(sent).toMatch(/truncated; original 4501 chars/);
+    expect(sent.length).toBeLessThanOrEqual(5000); // still within schema
   });
 
   it("buckets PG rows by policy correctly across multiple policies", async () => {

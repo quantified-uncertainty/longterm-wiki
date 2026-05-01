@@ -45,9 +45,14 @@ const MAX_DIFFS_IN_COMMENT = 10;
  * Zod schema rejects strings >5000 chars with a 400. Without this guard, a
  * scan error whose `String(e)` blew past the limit (rare but possible — a
  * non-Error thrown value with a huge `toString`) would cause the
- * `/complete` call to 400, losing the audit row entirely. Keep the cap
- * slightly under the schema limit to leave room for the `"; complete failed: ..."`
- * chained-error suffix that gets appended on a complete-fail follow-up.
+ * `/complete` call to 400, losing the audit row entirely.
+ *
+ * Cap = 5000 (schema limit) − 500 (headroom for the truncation marker, which
+ * adds ~35 chars but lets `String(e.length)` grow without us having to
+ * recompute the budget). If you tighten the Zod max in the route, lower
+ * this constant in lockstep — see
+ * `apps/wiki-server/src/routes/operational/reconciliation-runs.ts`'s
+ * `CompleteSchema.errorMessage` field.
  */
 const MAX_ERROR_MESSAGE_CHARS = 4500;
 
