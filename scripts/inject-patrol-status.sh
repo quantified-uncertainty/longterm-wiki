@@ -17,24 +17,27 @@ CACHE_FILE="/tmp/.patrol-status-open-prs"
 CACHE_TTL=300  # 5 min — open-PR list rarely changes faster
 
 # ─── Patrol liveness ──────────────────────────────────────────────────────────
-# Match any of:
-#   - the patrol process itself (`node ... gh pr-patrol run` or the pnpm parent)
-#   - the launchd supervisor in its 30s sleep window between patrol invocations
-# Without the supervisor case we'd flap into "patrol dead" reminders every 30s
-# whenever launchd-managed patrol is between cycles. The pattern is loose
-# (`pr-patrol run`) on purpose — it matches whether the launcher is `pnpm crux`,
-# direct `node`, or a future replacement, and `status` in pr-patrol.sh uses
-# the same loose pattern for consistency. See QUA-987.
-patrol_pid=$(pgrep -f "pr-patrol run" 2>/dev/null | head -1)
-if [ -z "$patrol_pid" ]; then
-  patrol_pid=$(pgrep -f "pr-patrol-supervisor.sh" 2>/dev/null | head -1)
-fi
+# Match either the patrol process (`node ... pr-patrol run` / pnpm parent) or
+# the launchd supervisor mid-sleep — without the supervisor case we'd false-
+# alarm every 30s during the launchd-managed restart cadence. Single pgrep
+# with alternation = one process-table walk per user prompt.
+patrol_pid=$(pgrep -f 'pr-patrol run|pr-patrol-supervisor\.sh' 2>/dev/null | head -1)
 
 # ─── Abandoned PR collection ──────────────────────────────────────────────────
+# Use a glob (with nullglob) instead of `ls | grep | sed | tr` — fewer forks
+# on every user prompt, no ls-parsing, and the existing files are exclusively
+# `abandoned-<N>` so there's nothing to filter further.
 abandoned=""
-if [ -d "$STATE_DIR" ]; then
-  abandoned=$(ls "$STATE_DIR" 2>/dev/null | grep -E '^abandoned-[0-9]+$' | sed 's/^abandoned-//' | tr '\n' ' ')
-fi
+shopt -s nullglob
+for f in "$STATE_DIR"/abandoned-*; do
+  n="${f##*/abandoned-}"
+  case "$n" in
+    ''|*[!0-9]*) ;;  # skip empty or non-numeric
+    *) abandoned="$abandoned $n" ;;
+  esac
+done
+shopt -u nullglob
+abandoned="${abandoned# }"
 
 # Fast exit: nothing to report
 if [ -z "$abandoned" ] && [ -n "$patrol_pid" ]; then
@@ -56,13 +59,14 @@ if [ -n "$abandoned" ]; then
   fi
 fi
 
+# Bash substring matching avoids forking `echo | grep -q` once per abandoned PR.
 still_open_abandoned=""
 for pr in $abandoned; do
-  if [ -z "$open_prs" ] || echo " $open_prs " | grep -q " $pr "; then
+  if [ -z "$open_prs" ] || [[ " $open_prs " == *" $pr "* ]]; then
     still_open_abandoned="$still_open_abandoned $pr"
   fi
 done
-still_open_abandoned=$(echo "$still_open_abandoned" | xargs)
+still_open_abandoned="${still_open_abandoned# }"
 
 # ─── Emit reminder if anything to report ──────────────────────────────────────
 if [ -z "$still_open_abandoned" ] && [ -n "$patrol_pid" ]; then

@@ -43,40 +43,48 @@ fi
 
 export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
-# ── Working directory + log ───────────────────────────────────────────────────
-# This script lives at <wiki-clone>/scripts/pr-patrol-supervisor.sh, so the
-# wiki clone is one directory up. Patrol creates worktrees under
-# .claude/worktrees/, so it must run from a wiki clone (typically lw/main/),
-# not from coord/ or a slot.
+# Patrol creates worktrees under .claude/worktrees/, so the supervisor must
+# run from a wiki clone (typically lw/main/), not from coord/ or a slot.
 WIKI_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-LOG_DIR="$HOME/.cache/pr-patrol"
-LOG="$LOG_DIR/run.log"
-mkdir -p "$LOG_DIR"
+CACHE_DIR="$HOME/.cache/pr-patrol"
+LOG="$CACHE_DIR/run.log"
+PIDFILE="$CACHE_DIR/daemon.pid"
+LOG_MAX_BYTES=$((50 * 1024 * 1024))  # 50 MB before rotating to .log.1
+mkdir -p "$CACHE_DIR"
+
+# Bash builtin %(...)T format avoids forking a `date` subshell per log line.
+# At ~30s cadence the supervisor logs hundreds of lines per hour; replacing
+# the subshell saves ~240 forks/hour at idle.
+ts() { printf '%(%Y-%m-%d %H:%M:%S)T' -1; }
+
+# Rotate run.log when it exceeds LOG_MAX_BYTES so an unattended supervisor
+# doesn't grow the log unbounded over weeks/months.
+maybe_rotate_log() {
+  [ -f "$LOG" ] || return 0
+  local size
+  size=$(/usr/bin/stat -f %z "$LOG" 2>/dev/null) || return 0
+  if [ "$size" -gt "$LOG_MAX_BYTES" ]; then
+    /bin/mv "$LOG" "$LOG.1" 2>/dev/null || true
+  fi
+}
 
 cd "$WIKI_ROOT" || {
   printf '%s ERROR: cannot cd to %s — exiting (launchd will throttle and retry)\n' \
-    "$(date '+%Y-%m-%d %H:%M:%S')" "$WIKI_ROOT" >> "$LOG"
+    "$(ts)" "$WIKI_ROOT" >> "$LOG"
   exit 1
 }
 
-# ── Shutdown handling ─────────────────────────────────────────────────────────
-# When launchd sends SIGTERM (e.g. on `launchctl unload` or system shutdown),
-# kill the patrol process group and exit cleanly. Without this, the SIGTERM is
-# delivered to bash but the patrol child (and its node grandchild via pnpm)
-# keep running until the OS escalates to SIGKILL.
-#
-# Job control (`set -m`) puts each `&`-spawned child in its own process group.
-# We then signal the whole group via `kill -- -PGID` so pnpm's node child gets
-# the signal too — pnpm's own signal forwarding is not guaranteed.
+# When launchd sends SIGTERM (`launchctl unload` or shutdown), kill the patrol
+# process group and exit cleanly. `set -m` puts each `&`-spawned child in its
+# own process group; signalling -PGID reaches pnpm's node grandchild too,
+# whose signal forwarding from pnpm is not guaranteed.
 set -m
 
 patrol_pid=""
 shutdown() {
   if [ -n "$patrol_pid" ] && kill -0 "$patrol_pid" 2>/dev/null; then
-    printf '%s ── supervisor received signal — terminating patrol pgid=%d ──\n' \
-      "$(date '+%Y-%m-%d %H:%M:%S')" "$patrol_pid" >> "$LOG"
-    # `-pid` = process group; thanks to `set -m` the spawned child is the
-    # group leader, so its PID equals the PGID.
+    printf '%s ── supervisor received signal — terminating child pgid=%d ──\n' \
+      "$(ts)" "$patrol_pid" >> "$LOG"
     kill -TERM -- "-$patrol_pid" 2>/dev/null || kill -TERM "$patrol_pid" 2>/dev/null || true
     wait "$patrol_pid" 2>/dev/null || true
   fi
@@ -84,16 +92,15 @@ shutdown() {
 }
 trap shutdown TERM INT
 
-# ── Main loop ─────────────────────────────────────────────────────────────────
 printf '%s ── supervisor starting (pid=%d, wiki=%s) ──\n' \
-  "$(date '+%Y-%m-%d %H:%M:%S')" "$$" "$WIKI_ROOT" >> "$LOG"
+  "$(ts)" "$$" "$WIKI_ROOT" >> "$LOG"
 
-PIDFILE="$HOME/.cache/pr-patrol/daemon.pid"
-
-# Run sleep as a backgrounded child + wait. Plain `sleep N` is an external
-# command — bash defers signal handlers until it returns, so a 30s sleep
-# delays SIGTERM by up to 30s, easily exceeding launchd's default 20s
-# ExitTimeout. `wait` IS interruptible, so this lets the trap fire promptly.
+# `wait` is interruptible by signals; bare `sleep N` is not (bash defers the
+# trap until the external sleep returns), so backgrounding sleep + wait lets
+# SIGTERM fire promptly during the inter-cycle pause. We share `patrol_pid`
+# with the foreground patrol invocation deliberately — `set -m` gives each
+# backgrounded child its own pgid, so `kill -- -patrol_pid` works for the
+# sleep child too (a no-op if sleep already finished).
 sleep_interruptible() {
   sleep "$1" &
   patrol_pid=$!
@@ -102,28 +109,28 @@ sleep_interruptible() {
 }
 
 while true; do
-  # Pre-check: if another live patrol owns daemon.pid (e.g. a stray tmux-based
-  # patrol from before the launchd migration), skip the launch and try again
-  # in 30s. This avoids spamming "Another PR patrol daemon is already running"
-  # into run.log every cycle while the user finishes the migration. Patrol's
-  # own EEXIST handling stays as the second line of defense.
+  maybe_rotate_log
+
+  # Skip the launch if another live patrol holds daemon.pid (e.g. a stray
+  # tmux-based patrol from before the launchd migration) — patrol's own
+  # EEXIST handling is the backstop, but pre-checking keeps the launch
+  # error out of run.log during the migration window.
   if [ -f "$PIDFILE" ]; then
     other=$(cat "$PIDFILE" 2>/dev/null || echo "")
     if [ -n "$other" ] && [ "$other" != "$$" ] && kill -0 "$other" 2>/dev/null; then
       printf '%s ── another patrol pid=%s holds daemon.pid, sleeping 30s ──\n' \
-        "$(date '+%Y-%m-%d %H:%M:%S')" "$other" >> "$LOG"
+        "$(ts)" "$other" >> "$LOG"
       sleep_interruptible 30
       continue
     fi
   fi
 
-  printf '%s ── pr-patrol starting ──\n' "$(date '+%Y-%m-%d %H:%M:%S')" >> "$LOG"
+  printf '%s ── pr-patrol starting ──\n' "$(ts)" >> "$LOG"
   pnpm crux gh pr-patrol run >> "$LOG" 2>&1 &
   patrol_pid=$!
   wait "$patrol_pid"
   ec=$?
   patrol_pid=""
-  printf '%s ── pr-patrol exited code=%d, sleeping 30s ──\n' \
-    "$(date '+%Y-%m-%d %H:%M:%S')" "$ec" >> "$LOG"
+  printf '%s ── pr-patrol exited code=%d, sleeping 30s ──\n' "$(ts)" "$ec" >> "$LOG"
   sleep_interruptible 30
 done
