@@ -261,6 +261,118 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
     );
   });
 
+  it('reopens a recently-closed Linear ticket when the dedup window applies (linear-reopened)', async () => {
+    // Coverage for the third dedup branch (commented + reopened + skipped).
+    // Verifies the wellness-report layer routes a `reopened` action correctly
+    // and never reaches the new createLinearWellnessIssue path.
+    const NOW = Date.parse('2026-04-19T20:00:00.000Z');
+    const closedRecently = NOW - 6 * 60 * 60 * 1000; // 6h ago, well under the 48h reopen window
+    const search = vi.fn().mockResolvedValue([
+      {
+        identifier: 'QUA-570',
+        title: WELLNESS_ISSUE_TITLE,
+        priority: 0,
+        state: { name: 'Done', type: 'completed' },
+        url: 'https://linear.app/q/issue/QUA-570',
+        createdAt: new Date(closedRecently).toISOString(),
+        updatedAt: new Date(closedRecently).toISOString(),
+      },
+    ]);
+    const comment = vi.fn().mockResolvedValue(undefined);
+    const setState = vi.fn().mockResolvedValue(undefined);
+    const createIssue = vi.fn();
+    const getProject = vi.fn();
+
+    const report = buildWellnessReport(failingChecks);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: { search, comment, setState, createIssue, getProject, now: () => NOW },
+    });
+
+    expect(result.action).toBe('linear-reopened');
+    expect(result.linearIdentifier).toBe('QUA-570');
+    // Critical: neither the new Linear-create path nor the GH fallback should fire.
+    expect(createIssue).not.toHaveBeenCalled();
+    expect(mockCreateIssue).not.toHaveBeenCalled();
+    expect(setState).toHaveBeenCalledWith('QUA-570', 'Backlog');
+  });
+
+  it('falls back to GitHub create on Linear lookup-failed without the misconfig banner', async () => {
+    // Regression lock: the misconfig banner must NOT stamp on transient
+    // lookup failures (Linear API down). The banner's "set the LINEAR_API_KEY
+    // secret" advice doesn't apply, so leaving it off keeps the GH issue
+    // accurate. If someone widens the misconfig predicate later, this test
+    // would catch it.
+    const search = vi.fn().mockRejectedValue(new Error('Linear API timed out'));
+    mockCreateIssue.mockResolvedValue({ number: 9999 });
+
+    vi.useFakeTimers();
+    try {
+      const report = buildWellnessReport(failingChecks);
+      const promise = manageWellnessIssue(report, {
+        linearDedupDeps: {
+          search,
+          comment: vi.fn(),
+          setState: vi.fn(),
+          createIssue: vi.fn(),
+          getProject: vi.fn(),
+          now: () => 0,
+        },
+      });
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      expect(result.action).toBe('created');
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.not.stringContaining(MISCONFIG_BANNER_MARKER),
+        }),
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it('falls back to GitHub create on project-missing without the misconfig banner', async () => {
+    // End-to-end coverage of the project-missing path: rename detection in
+    // Linear should drop us to GH fallback (so the alert isn't lost) but
+    // shouldn't stamp the misconfig banner (the cause is project rename,
+    // not missing secret).
+    const search = vi.fn().mockResolvedValue([]);
+    const createIssue = vi.fn();
+    const getProject = vi.fn().mockResolvedValue(null);
+    mockCreateIssue.mockResolvedValue({ number: 9999 });
+
+    vi.useFakeTimers();
+    try {
+      const report = buildWellnessReport(failingChecks);
+      const promise = manageWellnessIssue(report, {
+        linearDedupDeps: {
+          search,
+          comment: vi.fn(),
+          setState: vi.fn(),
+          createIssue,
+          getProject,
+          now: () => 0,
+        },
+      });
+      await vi.runAllTimersAsync();
+      const result = await promise;
+
+      expect(result.action).toBe('created');
+      expect(result.issueNumber).toBe(9999);
+      // GH fallback fires — but the misconfig banner does NOT stamp.
+      expect(mockCreateIssue).toHaveBeenCalledWith(
+        expect.objectContaining({
+          body: expect.not.stringContaining(MISCONFIG_BANNER_MARKER),
+        }),
+      );
+      // Linear create should not be reached because project resolution failed.
+      expect(createIssue).not.toHaveBeenCalled();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it('falls back to GitHub create when Linear create fails on api-error (no banner)', async () => {
     // Resilience: a transient Linear API error during create shouldn't drop
     // the alert. The GH fallback fires, but without the misconfig banner —

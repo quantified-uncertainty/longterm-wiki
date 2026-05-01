@@ -314,6 +314,15 @@ export async function createLinearWellnessIssue(
       console.warn(error);
       return { kind: 'failed', reason: 'project-missing', error };
     }
+    // Refuse archived projects: filing into one produces tickets that are
+    // invisible in Linear's default views, defeating the migration. The
+    // operator should rename the live project (or update WELLNESS_PROJECT_NAME)
+    // before this code can resume Linear-first filing.
+    if (project.state === 'completed' || project.state === 'canceled') {
+      const error = `Linear project "${WELLNESS_PROJECT_NAME}" is in state "${project.state}" — falling back to GitHub create. Update WELLNESS_PROJECT_NAME or unarchive the project.`;
+      console.warn(error);
+      return { kind: 'failed', reason: 'project-missing', error };
+    }
     projectId = project.id;
   } catch (err) {
     if (isMissingLinearApiKeyError(err)) {
@@ -331,6 +340,18 @@ export async function createLinearWellnessIssue(
       description: body,
       projectId,
     });
+    // Defensive: Linear's `issueCreate` mutation returns `success: true` even
+    // if the underlying issue payload is missing fields. The wrapping
+    // `createIssue` in lib/linear/issues.ts only checks `success`, so a
+    // malformed shape would leak through as `{identifier:undefined, url:undefined}`
+    // here and the caller would log a confusing "(undefined)" line. Treat
+    // missing identifier/url as an api-error so we drop to GH fallback
+    // instead of pretending we filed a Linear ticket.
+    if (!result.identifier || !result.url) {
+      const error = `Linear createIssue returned malformed response (missing identifier or url)`;
+      console.warn(`${error} — falling back to GitHub create`);
+      return { kind: 'failed', reason: 'api-error', error };
+    }
     return { kind: 'created', identifier: result.identifier, url: result.url };
   } catch (err) {
     if (isMissingLinearApiKeyError(err)) {

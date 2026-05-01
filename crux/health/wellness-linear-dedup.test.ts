@@ -564,4 +564,40 @@ describe('createLinearWellnessIssue (QUA-970)', () => {
     if (result.kind === 'failed') expect(result.reason).toBe('api-error');
     expect(createIssue).not.toHaveBeenCalled();
   });
+
+  it('returns failed/api-error when createIssue resolves with a malformed shape (missing identifier/url)', async () => {
+    // Linear's issueCreate mutation returns `success: true` even with an
+    // empty issue payload in some failure modes. Without this guard the
+    // caller would record a "Linear ticket created" with `identifier:undefined`,
+    // hiding the failure. Treat missing identifier/url as api-error so the
+    // resilience fallback fires.
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME });
+    // Deliberately malformed payload — exercises the response-shape guard
+    // in createLinearWellnessIssue. vi.fn() is loosely typed so the cast
+    // through the returned Mock is enough to satisfy the createIssue signature.
+    const createIssue = vi.fn().mockResolvedValue({ identifier: undefined, url: undefined });
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('api-error');
+  });
+
+  it('returns failed/project-missing when the project is in a non-active state (archived/completed)', async () => {
+    // A renamed-then-archived project would still resolve by name; filing
+    // into it produces tickets that are invisible in default views and
+    // defeats the migration. Defensive guard against that case.
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: WELLNESS_PROJECT_NAME, state: 'completed' });
+    const createIssue = vi.fn();
+
+    const result = await createLinearWellnessIssue(TITLE, BODY, { getProject, createIssue });
+
+    expect(result.kind).toBe('failed');
+    if (result.kind === 'failed') expect(result.reason).toBe('project-missing');
+    expect(createIssue).not.toHaveBeenCalled();
+  });
 });
