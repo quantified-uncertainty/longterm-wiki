@@ -833,6 +833,7 @@ export default async function LegislationDetailPage({
       headerLinks={headerLinks}
       tabs={tabs}
       tabsAriaLabel="Legislation sections"
+      tabsLayout="vertical"
       sidebar={sidebar}
     />
   );

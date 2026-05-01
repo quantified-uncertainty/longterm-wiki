@@ -298,6 +298,7 @@ export default async function FrameworkDetailPage({
       statCards={statCards}
       tabs={tabs}
       tabsAriaLabel="Framework sections"
+      tabsLayout="vertical"
       sidebar={sidebar}
     />
   );

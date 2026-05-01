@@ -444,6 +444,7 @@ export default async function PersonProfilePage({
       statCards={statCards}
       tabs={tabs}
       tabsAriaLabel="Person sections"
+      tabsLayout="vertical"
       sidebar={sidebar}
     />
   );

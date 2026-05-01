@@ -306,6 +306,7 @@ export default async function AiModelDetailPage({
       statCards={statCards}
       tabs={tabs}
       tabsAriaLabel="AI model sections"
+      tabsLayout="vertical"
       sidebar={sidebar}
     />
   );

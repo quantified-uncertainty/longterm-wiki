@@ -38,14 +38,15 @@ Adding a new "show on all entity pages" item is a one-line change inside
   `fetchEntitySourcingSummary()` + `rollupVerdictFromSummary()` for the
   sourcing rollup badge
 - Reference implementations:
-  - `apps/web/src/app/organizations/[slug]/page.tsx` (uses the shell with
-    `tabs` and no sidebar)
+  - `apps/web/src/app/organizations/[slug]/[[...tab]]/page.tsx` (canonical:
+    vertical tabs with `tabGroups`, path-based `tabRouting`, no sidebar)
   - `apps/web/src/app/organizations/[slug]/data/page.tsx` (uses the shell with
     `children` — the long-form data table — and the same slot-builder helper)
-  - `apps/web/src/app/people/[slug]/page.tsx` (uses `tabs` **and** `sidebar`
-    for the 2-column people layout)
-  - `apps/web/src/app/ai-models/[slug]/page.tsx` (uses `children` + `sidebar`
-    with no tabs)
+  - `apps/web/src/app/people/[slug]/page.tsx` (vertical tabs, no `tabGroups`)
+  - `apps/web/src/app/ai-models/[slug]/page.tsx` (vertical tabs)
+  - `apps/web/src/app/legislation/[slug]/page.tsx` (vertical tabs)
+  - `apps/web/src/app/projects/[slug]/page.tsx` (uses `children` only — no
+    tabs — so vertical layout doesn't apply)
 
 ## API at a glance
 
@@ -66,16 +67,32 @@ Adding a new "show on all entity pages" item is a one-line change inside
   statCards={<StatCardsGrid cards={cards} />}
   tabs={tabs}                         // ProfileTab[]
   tabsAriaLabel="Organization sections"
-  sidebar={<SidebarContent />}        // optional right-hand sidebar
+  tabsLayout="vertical"               // required when tabs has >1 entry — see below
+  tabGroups={tabGroups}               // optional — left-nav grouping (organization-style)
+  sidebar={<SidebarContent />}        // optional right-hand sidebar; ignored in vertical layout
 >
   {/* Optional children render inside the main column below tabs */}
 </EntityProfileShell>
 ```
 
+- **Multi-tab pages must use `tabsLayout="vertical"`.** Any page that passes
+  `tabs={...}` with more than one selectable tab is required to also pass
+  `tabsLayout="vertical"` so the tab nav renders on the left rail (the
+  `/organizations` look). Single-tab pages and pages that render their body
+  through `children` instead of `tabs` are exempt — `ProfileTabs` short-circuits
+  the layout choice in the single-tab case. The horizontal default is kept on
+  `EntityProfileShell` only as the fallback for the short-circuit path.
 - When `sidebar` is provided, the main column renders in a `lg:grid-cols-3`
-  2-column layout with the sidebar on the right.
+  2-column layout with the sidebar on the right. **In vertical-tabs mode the
+  `sidebar` slot is ignored** — the left nav takes the sidebar slot. If a page
+  has sidebar content that needs to remain visible, fold it into the Overview
+  tab content or add a dedicated tab.
 - When `tabs` is provided, `ProfileTabs` is rendered automatically — pages
   should not import `ProfileTabs` directly anymore.
+- `tabGroups` is optional. Use it on pages with many tabs that benefit from
+  labelled left-nav sections (see `ORG_TAB_GROUPS` in
+  `apps/web/src/app/organizations/[slug]/tabs.ts` for the canonical pattern).
+  Pages with 3-5 tabs typically don't need groups.
 - The sourcing rollup dot is **always** rendered in the header, using
   `SourcingDot` + `recordVerdictToStatus`, so every entity page has a
   consistent sourcing badge. Pass `verdict` as the raw verdict string
