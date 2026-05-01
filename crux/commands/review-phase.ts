@@ -10,7 +10,7 @@
  * See QUA-950 and `.claude/commands/agent-review-pr.md`.
  */
 
-import { existsSync, writeFileSync, unlinkSync } from 'fs';
+import { existsSync, writeFileSync, unlinkSync, appendFileSync } from 'fs';
 import { join } from 'path';
 import { createLogger } from '../lib/output.ts';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
@@ -79,8 +79,8 @@ async function record(args: string[], options: CommandOptions): Promise<CommandR
   const log = createLogger(options.ci);
   const c = log.colors;
 
-  const phaseId = args.find((a) => !a.startsWith('--'));
-  if (!phaseId) {
+  const positional = args.filter((a) => !a.startsWith('--'));
+  if (positional.length === 0) {
     return {
       output:
         `${c.red}Usage: crux sys review-phase record <phase-id> [--reason="..."]${c.reset}\n\n` +
@@ -88,6 +88,18 @@ async function record(args: string[], options: CommandOptions): Promise<CommandR
       exitCode: 1,
     };
   }
+  if (positional.length > 1) {
+    // Silently dropping extra positional args would let an agent type
+    // `record phase-1 phase-2` and only have phase-1 captured. Make it
+    // an explicit error so the second phase isn't lost.
+    return {
+      output:
+        `${c.red}record accepts exactly one phase ID, got ${positional.length}: ${positional.join(', ')}${c.reset}\n` +
+        `  Run \`crux sys review-phase record <id>\` once per phase.\n`,
+      exitCode: 1,
+    };
+  }
+  const phaseId = positional[0];
 
   const result = recordPhase(phaseId, { reason: options.reason });
   if (!result.ok) {
@@ -232,6 +244,31 @@ async function writeMarker(_args: string[], options: CommandOptions): Promise<Co
   }
 
   const result = validateTracker();
+  const reason = typeof options.reason === 'string' ? options.reason.trim() : '';
+
+  // The whole point of QUA-950 is that the marker write is gated on phase
+  // coverage. --force is the only escape hatch but must NOT be a silent
+  // bypass — same pattern as `pr.ts --skip-review-check`: require an
+  // explicit justification, log it loudly, and fail-loud if missing.
+  // Defended against by the hostile-reviewer pass before merge.
+  if (options.force) {
+    if (!reason) {
+      return {
+        output:
+          `${c.red}✗ --force requires --reason="<text>".${c.reset}\n` +
+          `  Bypassing phase coverage without a stated reason defeats the gate.\n` +
+          `  Acceptable reasons: "patrol-fix: targeted change, full review unnecessary",\n` +
+          `  "rebase: re-baselined diff, prior review still covers all changes", etc.\n`,
+        exitCode: 1,
+      };
+    }
+    if (/[\n\r]/.test(reason)) {
+      return {
+        output: `${c.red}✗ --reason must not contain newlines.${c.reset}\n`,
+        exitCode: 1,
+      };
+    }
+  }
 
   if (!result.ok && !options.force) {
     const missing = result.missing.join(', ');
@@ -251,21 +288,42 @@ async function writeMarker(_args: string[], options: CommandOptions): Promise<Co
       output:
         `${c.red}✗ Cannot write review marker — tracker is out of sync with HEAD.${c.reset}\n` +
         `  Either re-init and re-run any phases affected by the new commits,\n` +
-        `  or pass --force if you've reviewed the new diff and want to overwrite.\n`,
+        `  or pass --force --reason="..." if you've reviewed the new diff.\n`,
       exitCode: 2,
     };
   }
 
+  // Snapshot HEAD/diff-hash AFTER the validation check so the marker
+  // describes the same state validation just blessed. Avoids a TOCTOU
+  // window where a commit lands between validateTracker and writeFileSync.
   const headSha = getHeadSha();
   const diffHash = computeDiffHash();
   const timestamp = new Date().toISOString().replace(/\.\d{3}Z$/, 'Z');
   const line = `reviewed ${headSha} ${timestamp} ${diffHash}\n`;
   writeFileSync(MARKER_PATH, line, 'utf-8');
 
+  // Append a force-bypass audit line to the tracker so the bypass is
+  // visible in `crux sys review-phase validate` and via `summary --json`.
+  if (options.force) {
+    appendFileSync(
+      TRACKER_PATH,
+      `# force-bypass ${timestamp} reason=${reason}\n`,
+      'utf-8',
+    );
+  }
+
   if (options.json) {
     return {
       output:
-        JSON.stringify({ ok: true, commitSha: headSha, diffHash, timestamp, marker: MARKER_PATH }) + '\n',
+        JSON.stringify({
+          ok: true,
+          commitSha: headSha,
+          diffHash,
+          timestamp,
+          marker: MARKER_PATH,
+          forced: !!options.force,
+          reason: options.force ? reason : undefined,
+        }) + '\n',
       exitCode: 0,
     };
   }
@@ -274,6 +332,10 @@ async function writeMarker(_args: string[], options: CommandOptions): Promise<Co
   let output = `${c.green}✓${c.reset} Review marker written at ${MARKER_PATH}\n`;
   output += `  ${c.dim}Commit:${c.reset}    ${headSha.slice(0, 12)}\n`;
   output += `  ${c.dim}Diff hash:${c.reset} ${diffHash}\n`;
+  if (options.force) {
+    output += `\n  ${c.yellow}⚠ Forced past phase coverage check.${c.reset}\n`;
+    output += `  ${c.dim}Reason:${c.reset} ${reason}\n`;
+  }
   if (skippedSummary) {
     output += `\n  ${c.dim}Phases skipped:${c.reset}\n`;
     for (const skipLine of skippedSummary.split('\n')) {

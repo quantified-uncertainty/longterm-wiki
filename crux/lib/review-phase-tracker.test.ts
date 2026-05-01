@@ -199,6 +199,24 @@ describe('recordPhase', () => {
     const triageLines = fileContent.split('\n').filter((l) => l.startsWith('phase-1-triage'));
     expect(triageLines).toHaveLength(2);
   });
+
+  it('rejects newlines in reason (no forge-via-injection)', () => {
+    const forged = 'N/A: ok\nphase-9-final 2026-04-30T13:00:00Z';
+    const result = recordPhase('phase-7-ui', { reason: forged }, TMP_PATH);
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('newlines');
+    // And nothing got appended to the file
+    const triageLines = readFileSync(TMP_PATH, 'utf-8')
+      .split('\n')
+      .filter((l) => l.startsWith('phase-9-final'));
+    expect(triageLines).toHaveLength(0);
+  });
+
+  it('rejects carriage returns in reason', () => {
+    const result = recordPhase('phase-7-ui', { reason: 'a\rb' }, TMP_PATH);
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('newlines');
+  });
 });
 
 describe('initTracker', () => {

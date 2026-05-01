@@ -365,6 +365,16 @@ function scanCleanupItems(): CleanupItem[] {
     });
   }
 
+  // Stale review-phase tracker (QUA-950)
+  const reviewPhasesDonePath = join(process.cwd(), '.claude', 'review-phases-done');
+  if (existsSync(reviewPhasesDonePath)) {
+    items.push({
+      category: 'checklist',
+      description: 'Stale review-phase tracker (.claude/review-phases-done)',
+      detail: reviewPhasesDonePath,
+    });
+  }
+
   // Stale context file
   const contextPath = join(process.cwd(), '.claude', 'wip-context.md');
   if (existsSync(contextPath)) {

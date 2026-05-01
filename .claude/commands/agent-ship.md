@@ -131,16 +131,18 @@ Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary,
 
 ### Step 4a: Surface skipped review phases (QUA-950)
 
-If `/agent-review-pr` ran with any phases skipped via `reason=...`, surface that in the PR body so reviewers can see the coverage trail without trusting the agent's summary alone:
+If `/agent-review-pr` ran with any phases skipped via `reason=...`, surface that in the PR body so reviewers can see the coverage trail without trusting the agent's summary alone.
+
+`pnpm` prepends a multi-line prelude (`> longterm-wiki@...\n> DOTENV_CONFIG_QUIET=...`) to its child's stdout, which corrupts the snippet if you capture pnpm's output directly. Use `pnpm --silent` to suppress the prelude (or invoke `node` directly):
 
 ```bash
-SKIPPED=$(pnpm crux sys review-phase summary 2>/dev/null)
+SKIPPED=$(pnpm --silent crux sys review-phase summary 2>/dev/null | sed '/^$/d')
 if [ -n "$SKIPPED" ]; then
   printf '\n## Review Phases Skipped\n\n%s\n\nFull tracker: `.claude/review-phases-done` (gitignored, session-local).\n' "$SKIPPED"
 fi
 ```
 
-If the output is empty (every phase executed), no section is added. The `crux gh pr create` body editor accepts the snippet as a Markdown block — append it to the PR body alongside the test plan.
+When every phase executed, `summary` outputs nothing and the section is omitted. Append the printed block to the PR body alongside the test plan.
 
 ## Step 4b: Deploy task detection and injection (MANDATORY)
 

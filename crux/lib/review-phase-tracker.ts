@@ -6,10 +6,11 @@
  * and `.claude/commands/agent-review-pr.md`.
  */
 
-import { execSync } from 'child_process';
+import { execFileSync } from 'node:child_process';
 import { existsSync, readFileSync, writeFileSync, appendFileSync } from 'fs';
 import { join } from 'path';
 import { PROJECT_ROOT } from './content-types.ts';
+import { computeDiffHash as computeMarkerDiffHash } from './review-marker.ts';
 
 export const TRACKER_PATH = join(PROJECT_ROOT, '.claude/review-phases-done');
 
@@ -67,28 +68,21 @@ export interface TrackerState {
 }
 
 /**
- * Compute the diff hash for the current branch against main. Matches the
- * algorithm in agent-review-pr's marker write so the tracker and the marker
- * stay in sync — re-running review-phase init after a new commit invalidates
- * the previous state.
+ * Re-export the marker's canonical diff-hash so the tracker and the marker
+ * stay in lockstep — drift between the two would defeat the inSync check.
+ *
+ * The hostile-reviewer pass on QUA-950 caught a duplicate implementation
+ * here that used template-literal `execSync` (gate-failing under the
+ * `no-exec-sync` rule) and spawned `shasum` instead of `node:crypto`.
+ * Reuse is the simpler answer.
  */
-export function computeDiffHash(): string {
-  let mergeBase: string;
-  try {
-    mergeBase = execSync('git merge-base HEAD origin/main', {
-      stdio: ['ignore', 'pipe', 'ignore'],
-    })
-      .toString()
-      .trim();
-  } catch {
-    mergeBase = execSync('git merge-base HEAD main').toString().trim();
-  }
-  const diff = execSync(`git diff ${mergeBase}...HEAD`).toString();
-  return execSync('shasum -a 256', { input: diff }).toString().slice(0, 12);
-}
+export const computeDiffHash = computeMarkerDiffHash;
 
 export function getHeadSha(): string {
-  return execSync('git rev-parse HEAD').toString().trim();
+  return execFileSync('git', ['rev-parse', 'HEAD'], {
+    stdio: ['ignore', 'pipe', 'ignore'],
+    encoding: 'utf-8',
+  }).trim();
 }
 
 function nowIso(): string {
@@ -210,6 +204,17 @@ export function recordPhase(
     return {
       ok: false,
       error: `Phase ${phaseId} cannot be skipped — it must execute on every review.`,
+    };
+  }
+
+  // Reasons round-trip through a one-line file format. A `\n` in the
+  // reason would let the agent forge additional phase entries via a
+  // single --reason argument. Reject up front rather than escape:
+  // valid skip reasons are short prose, never multiline.
+  if (reason && /[\n\r]/.test(reason)) {
+    return {
+      ok: false,
+      error: `--reason must not contain newlines. Use a single-line justification.`,
     };
   }
 
