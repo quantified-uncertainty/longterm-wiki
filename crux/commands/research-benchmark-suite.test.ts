@@ -1,10 +1,10 @@
 /**
- * Tests for `crux tb benchmark-suite` (QUA-873).
+ * Tests for `crux tb benchmark-suite` (QUA-873, extended in QUA-936).
  *
  * Pure helpers (median, p25, scoreSuite, computeAggregate, isValidTag) are
  * tested directly. Snapshot read/write is exercised against tmpdir. End-to-end
- * `takeSnapshot` is tested against the committed v1 8-entity policy suite +
- * real responses.yaml to confirm the integration path works.
+ * `takeSnapshot` is tested against the committed v1 entity suite + the real
+ * `data/entities/` directory to confirm the integration path works.
  */
 
 import { describe, it, expect, vi } from "vitest";
@@ -21,7 +21,7 @@ import {
   formatSnapshotSummary,
   isValidTag,
   listSnapshotsInDir,
-  loadResponses,
+  loadAllEntities,
   loadSuite,
   median,
   p25,
@@ -31,11 +31,11 @@ import {
   type PerEntityRecord,
   type SuiteEntry,
 } from "./research-benchmark-suite.ts";
-import type { PolicyEntity } from "../lib/research/gap-analyzer.ts";
+import type { EntityWithType } from "../lib/research/entity-loader.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
-const RESPONSES_YAML = path.join(ROOT, "data/entities/responses.yaml");
+const ENTITIES_DIR = path.join(ROOT, "data/entities");
 
 // ── fixtures ────────────────────────────────────────────────────────────────
 
@@ -118,7 +118,7 @@ describe("p25", () => {
 // ── scoreSuite ──────────────────────────────────────────────────────────────
 
 describe("scoreSuite", () => {
-  const responses: PolicyEntity[] = [
+  const entities: EntityWithType[] = [
     {
       id: "fisa-702",
       type: "policy",
@@ -135,42 +135,97 @@ describe("scoreSuite", () => {
       tags: ["a", "b", "c"],
       relatedEntries: [{ id: "x", type: "policy" }, { id: "y", type: "policy" }, { id: "z", type: "policy" }],
     },
+    {
+      id: "anthropic",
+      type: "organization",
+      title: "Anthropic",
+      description: "AI safety lab",
+      website: "https://anthropic.com",
+      orgType: "frontier-lab",
+      founded: "2021",
+      headquarters: "San Francisco",
+      employees: "500+",
+      products: [
+        { name: "Claude" },
+        { name: "Claude API" },
+        { name: "Claude Code" },
+      ],
+      keyPeople: ["dario-amodei", "daniela-amodei", "jared-kaplan"],
+      keyDates: [
+        { date: "2021-05", description: "founded" },
+        { date: "2023-03", description: "Series C" },
+      ],
+      tags: ["frontier-lab", "safety", "us"],
+      relatedEntries: [
+        { id: "openai", type: "organization", relationship: "competitor" },
+        { id: "deepmind", type: "organization", relationship: "competitor" },
+        { id: "anthropic-pbc", type: "organization", relationship: "parent" },
+      ],
+    },
   ];
 
   it("scores supported policy entries", () => {
     const suite: SuiteEntry[] = [{ slug: "fisa-702", type: "policy", expected_min_coverage: 0.9 }];
-    const records = scoreSuite(suite, responses);
+    const records = scoreSuite(suite, entities);
     expect(records).toHaveLength(1);
     expect(records[0].status).toBe("scored");
     expect(records[0].coverage_score).toBe(1);
     expect(records[0].expected_min_coverage).toBe(0.9);
   });
 
+  it("scores supported organization entries (QUA-936)", () => {
+    const suite: SuiteEntry[] = [
+      { slug: "anthropic", type: "organization", expected_min_coverage: 0.7 },
+    ];
+    const records = scoreSuite(suite, entities);
+    expect(records).toHaveLength(1);
+    expect(records[0].status).toBe("scored");
+    // Org scorer caps factbase at 0; full top_level + products + keyPeople + keyDates → ~0.9.
+    expect(records[0].coverage_score).toBeGreaterThan(0.7);
+    expect(records[0].coverage_score).toBeLessThanOrEqual(1);
+    // Org-shaped components surface so diff/list work without re-lookup.
+    expect(records[0].components).toHaveProperty("top_level");
+    expect(records[0].components).toHaveProperty("products");
+    expect(records[0].components).toHaveProperty("keyPeople");
+    expect(records[0].components).toHaveProperty("keyDates");
+  });
+
   it("marks unsupported types without erroring", () => {
-    const suite: SuiteEntry[] = [{ slug: "openai", type: "organization" }];
-    const records = scoreSuite(suite, responses);
+    const suite: SuiteEntry[] = [{ slug: "fisa-702", type: "person" }];
+    const records = scoreSuite(suite, entities);
     expect(records[0].status).toBe("unsupported_type");
     expect(records[0].coverage_score).toBeNull();
   });
 
   it("marks missing-entity entries", () => {
     const suite: SuiteEntry[] = [{ slug: "no-such-policy", type: "policy" }];
-    const records = scoreSuite(suite, responses);
+    const records = scoreSuite(suite, entities);
     expect(records[0].status).toBe("missing_entity");
     expect(records[0].coverage_score).toBeNull();
+  });
+
+  it("treats suite/entity type disagreement as missing_entity", () => {
+    // Suite says fisa-702 is an organization, but the YAML says policy.
+    // The defensive check returns missing_entity rather than scoring with
+    // the wrong scorer (which would produce noise).
+    const suite: SuiteEntry[] = [{ slug: "fisa-702", type: "organization" }];
+    const records = scoreSuite(suite, entities);
+    expect(records[0].status).toBe("missing_entity");
   });
 
   it("does not throw on a mixed suite", () => {
     const suite: SuiteEntry[] = [
       { slug: "fisa-702", type: "policy" },
-      { slug: "openai", type: "organization" },
+      { slug: "anthropic", type: "organization" },
       { slug: "no-such-policy", type: "policy" },
+      { slug: "anything", type: "person" },
     ];
-    const records = scoreSuite(suite, responses);
+    const records = scoreSuite(suite, entities);
     expect(records.map((r) => r.status)).toEqual([
       "scored",
-      "unsupported_type",
+      "scored",
       "missing_entity",
+      "unsupported_type",
     ]);
   });
 });
@@ -324,15 +379,40 @@ describe("snapshot persistence", () => {
   });
 });
 
-// ── loadResponses validation ────────────────────────────────────────────────
+// ── loadAllEntities ─────────────────────────────────────────────────────────
 
-describe("loadResponses", () => {
-  it("throws a clear error when YAML is not an array", () => {
+describe("loadAllEntities", () => {
+  it("loads entities from every *.yaml file in the dir", () => {
     const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
     try {
-      const file = path.join(tmp, "bad.yaml");
-      fs.writeFileSync(file, yaml.dump({ id: "not-an-array" }));
-      expect(() => loadResponses(file)).toThrow(/must be an array/);
+      fs.writeFileSync(
+        path.join(tmp, "responses.yaml"),
+        yaml.dump([{ id: "p1", type: "policy" }]),
+      );
+      fs.writeFileSync(
+        path.join(tmp, "organizations.yaml"),
+        yaml.dump([{ id: "o1", type: "organization" }]),
+      );
+      const all = loadAllEntities(tmp);
+      const ids = all.map((e) => e.id).sort();
+      expect(ids).toEqual(["o1", "p1"]);
+      const types = new Set(all.map((e) => e.type));
+      expect(types).toEqual(new Set(["policy", "organization"]));
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("skips non-array YAML files instead of crashing", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      fs.writeFileSync(path.join(tmp, "bad.yaml"), yaml.dump({ id: "not-an-array" }));
+      fs.writeFileSync(
+        path.join(tmp, "ok.yaml"),
+        yaml.dump([{ id: "p1", type: "policy" }]),
+      );
+      const all = loadAllEntities(tmp);
+      expect(all.map((e) => e.id)).toEqual(["p1"]);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
@@ -356,9 +436,10 @@ describe("takeSnapshot end-to-end", () => {
           { slug: "tiny", type: "policy", expected_min_coverage: 0.5 },
         ]),
       );
-      const responsesFile = path.join(tmp, "responses.yaml");
+      const entitiesDir = path.join(tmp, "entities");
+      fs.mkdirSync(entitiesDir);
       fs.writeFileSync(
-        responsesFile,
+        path.join(entitiesDir, "responses.yaml"),
         yaml.dump([
           {
             id: "tiny",
@@ -372,7 +453,7 @@ describe("takeSnapshot end-to-end", () => {
       );
       const { snap, file } = takeSnapshot("baseline", {
         suitePath: suiteFile,
-        responsesPath: responsesFile,
+        entitiesDir,
         snapshotDir: tmp,
       });
       expect(snap.tag).toBe("baseline");
@@ -382,6 +463,66 @@ describe("takeSnapshot end-to-end", () => {
       expect(typeof snap.entities[0].coverage_score).toBe("number");
       expect(file.startsWith(tmp)).toBe(true);
       expect(fs.existsSync(file)).toBe(true);
+    } finally {
+      fs.rmSync(tmp, { recursive: true, force: true });
+    }
+  });
+
+  it("scores a mixed-type suite (policy + organization) end-to-end (QUA-936)", () => {
+    const tmp = fs.mkdtempSync(path.join(os.tmpdir(), "bench-suite-"));
+    try {
+      const suiteFile = path.join(tmp, "suite.yaml");
+      fs.writeFileSync(
+        suiteFile,
+        yaml.dump([
+          { slug: "tiny-policy", type: "policy" },
+          { slug: "tiny-org", type: "organization" },
+        ]),
+      );
+      const entitiesDir = path.join(tmp, "entities");
+      fs.mkdirSync(entitiesDir);
+      fs.writeFileSync(
+        path.join(entitiesDir, "responses.yaml"),
+        yaml.dump([
+          {
+            id: "tiny-policy",
+            type: "policy",
+            title: "Tiny Policy",
+            description: "abcd",
+            provisions: [{ title: "p" }],
+            stakeholders: [{ name: "s" }],
+          },
+        ]),
+      );
+      fs.writeFileSync(
+        path.join(entitiesDir, "organizations.yaml"),
+        yaml.dump([
+          {
+            id: "tiny-org",
+            type: "organization",
+            title: "Tiny Org",
+            description: "an org",
+            website: "https://example.com",
+            orgType: "frontier-lab",
+            founded: "2020",
+            headquarters: "SF",
+            products: [{ name: "Product A" }],
+            keyPeople: ["alice"],
+            keyDates: [{ date: "2020", description: "founded" }],
+          },
+        ]),
+      );
+      const { snap } = takeSnapshot("baseline", {
+        suitePath: suiteFile,
+        entitiesDir,
+        snapshotDir: tmp,
+      });
+      expect(snap.entities).toHaveLength(2);
+      const byType = Object.fromEntries(snap.entities.map((e) => [e.type, e]));
+      expect(byType.policy.status).toBe("scored");
+      expect(byType.organization.status).toBe("scored");
+      expect(byType.organization.components).toHaveProperty("products");
+      expect(snap.aggregate.scored_count).toBe(2);
     } finally {
       fs.rmSync(tmp, { recursive: true, force: true });
     }
@@ -400,21 +541,23 @@ describe("v1 entity-suite.yaml integration", () => {
     }
   });
 
-  it("every committed slug exists in responses.yaml", () => {
+  it("every committed slug exists in some data/entities/*.yaml file", () => {
     const suite = loadSuite(SUITE_YAML);
-    const responses = loadResponses(RESPONSES_YAML);
-    const ids = new Set(responses.map((r) => r.id));
-    const missing = suite.filter((e) => e.type === "policy" && !ids.has(e.slug)).map((e) => e.slug);
+    const entities = loadAllEntities(ENTITIES_DIR);
+    const ids = new Set(entities.map((e) => e.id));
+    const missing = suite.filter((e) => !ids.has(e.slug)).map((e) => e.slug);
     expect(missing).toEqual([]);
   });
 
   it("scoring + aggregation produces a sane snapshot for the v1 suite", () => {
     const suite = loadSuite(SUITE_YAML);
-    const responses = loadResponses(RESPONSES_YAML);
-    const records = scoreSuite(suite, responses);
+    const entities = loadAllEntities(ENTITIES_DIR);
+    const records = scoreSuite(suite, entities);
     expect(records).toHaveLength(suite.length);
     const agg = computeAggregate(records);
-    // v1 is policy-only, all 8 slugs exist, so expect 8 scored.
+    // Every committed suite entry should land in `scored` (since QUA-936
+    // expanded supported types to include organization). If a future suite
+    // entry is added with an unsupported type, the assertion will fail loudly.
     expect(agg.scored_count).toBe(suite.length);
     expect(agg.median_coverage_score).not.toBeNull();
     expect(agg.median_coverage_score!).toBeGreaterThan(0);

@@ -2,8 +2,11 @@ import { describe, it, expect } from "vitest";
 import {
   analyzePolicyGaps,
   analyzeOrganizationGaps,
-  policyCoverageScore,
+  coverageScoreForEntity,
+  isSupportedCoverageType,
   organizationCoverageScore,
+  policyCoverageScore,
+  SUPPORTED_COVERAGE_TYPES,
   type OrganizationEntity,
   type PolicyEntity,
 } from "../gap-analyzer.ts";
@@ -184,5 +187,43 @@ describe("organizationCoverageScore", () => {
     const cov = organizationCoverageScore(e);
     // 0.5*0.4 + 0*0.2 + 1*0.2 + 0*0.1 + 0 = 0.4
     expect(cov.score).toBe(0.4);
+  });
+});
+
+// ─── Type-aware dispatch (QUA-936) ─────────────────────────────────────────
+
+describe("coverageScoreForEntity", () => {
+  it("dispatches to policyCoverageScore for type=policy", () => {
+    const policy = { id: "p", type: "policy", title: "P" } as PolicyEntity;
+    const direct = policyCoverageScore(policy);
+    const dispatched = coverageScoreForEntity(policy);
+    expect(dispatched).toEqual(direct);
+  });
+
+  it("dispatches to organizationCoverageScore for type=organization", () => {
+    const org = { id: "o", type: "organization", title: "O" } as OrganizationEntity;
+    const direct = organizationCoverageScore(org);
+    const dispatched = coverageScoreForEntity(org);
+    expect(dispatched).toEqual(direct);
+  });
+
+  it("returns null for unsupported types", () => {
+    expect(coverageScoreForEntity({ type: "person" })).toBeNull();
+    expect(coverageScoreForEntity({ type: "ai-model" })).toBeNull();
+    expect(coverageScoreForEntity({ type: "" })).toBeNull();
+  });
+});
+
+describe("isSupportedCoverageType", () => {
+  it("accepts every type listed in SUPPORTED_COVERAGE_TYPES", () => {
+    for (const t of SUPPORTED_COVERAGE_TYPES) {
+      expect(isSupportedCoverageType(t)).toBe(true);
+    }
+  });
+
+  it("rejects unsupported types", () => {
+    expect(isSupportedCoverageType("person")).toBe(false);
+    expect(isSupportedCoverageType("benchmark")).toBe(false);
+    expect(isSupportedCoverageType("")).toBe(false);
   });
 });

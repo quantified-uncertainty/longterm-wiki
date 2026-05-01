@@ -1,6 +1,7 @@
 // crux tb benchmark-suite — read-only multi-entity coverage measurement.
-// Snapshots every entity in crux/benchmarks/entity-suite.yaml using
-// policyCoverageScore, persists JSON, supports --tag, --diff, --list.
+// Snapshots every entity in crux/benchmarks/entity-suite.yaml using a
+// type-aware coverage scorer (policy + organization, QUA-936), persists
+// JSON, supports --tag, --diff, --list.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -10,14 +11,19 @@ import { z } from "zod";
 
 import { type CommandResult } from "../lib/cli.ts";
 import {
-  policyCoverageScore,
+  coverageScoreForEntity,
+  isSupportedCoverageType,
+  SUPPORTED_COVERAGE_TYPES,
   type CoverageScore,
-  type PolicyEntity,
 } from "../lib/research/gap-analyzer.ts";
+import {
+  loadAllEntities as loadEntitiesFromDir,
+  DEFAULT_ENTITIES_DIR,
+  type EntityWithType,
+} from "../lib/research/entity-loader.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const DEFAULT_SUITE_YAML = path.join(ROOT, "crux/benchmarks/entity-suite.yaml");
-const DEFAULT_RESPONSES_YAML = path.join(ROOT, "data/entities/responses.yaml");
 const DEFAULT_SNAPSHOT_DIR = path.join(ROOT, ".claude/snapshots/benchmark-suite");
 
 // ── Suite YAML schema ───────────────────────────────────────────────────────
@@ -31,8 +37,8 @@ const SuiteSchema = z.array(SuiteEntrySchema);
 
 export type SuiteEntry = z.infer<typeof SuiteEntrySchema>;
 
-/** Types that have a coverage scorer. v1: policy-only. */
-const SUPPORTED_TYPES = new Set<string>(["policy"]);
+/** Types that have a coverage scorer. Sourced from gap-analyzer (QUA-936). */
+const SUPPORTED_TYPES: ReadonlySet<string> = new Set(SUPPORTED_COVERAGE_TYPES);
 
 /** Per-entity outcome status. */
 export type EntityStatus = "scored" | "missing_entity" | "unsupported_type";
@@ -52,12 +58,16 @@ export function loadSuite(filePath: string = DEFAULT_SUITE_YAML): SuiteEntry[] {
   return SuiteSchema.parse(parsed);
 }
 
-export function loadResponses(filePath: string = DEFAULT_RESPONSES_YAML): PolicyEntity[] {
-  const parsed = yaml.load(fs.readFileSync(filePath, "utf8"));
-  if (!Array.isArray(parsed)) {
-    throw new Error(`responses YAML at ${filePath} must be an array of entities`);
-  }
-  return parsed as PolicyEntity[];
+/**
+ * Load every entity from `data/entities/*.yaml`. Replaces the policy-only
+ * `loadResponses` (QUA-936) so the suite can score mixed-type rows.
+ *
+ * Files that don't parse as YAML or aren't a top-level array are skipped
+ * silently — gate validators are responsible for catching malformed YAML;
+ * the suite runner stays usable in the meantime.
+ */
+export function loadAllEntities(entitiesDir: string = DEFAULT_ENTITIES_DIR): EntityWithType[] {
+  return loadEntitiesFromDir(entitiesDir);
 }
 
 function gitSha(): string | null {
@@ -122,22 +132,35 @@ function makeRecord(
 }
 
 /**
- * Score every entry in `suite` against `responses`. Entries with unsupported
- * types or missing responses get `status` set and `coverage_score: null`.
+ * Score every entry in `suite` against `entities`. Entries with unsupported
+ * types, missing entities, or suite/YAML type mismatches get `status` set
+ * and `coverage_score: null`.
  *
- * `responses.yaml` keys entities under `id`; the suite YAML calls the same
- * string `slug`. We look up by `id`.
+ * Entity YAML files key under `id`; the suite YAML calls the same string
+ * `slug`. We look up by `id` across all `data/entities/*.yaml` files
+ * (QUA-936). Dispatch is by `entry.type` — the suite is canonical for what
+ * scorer to use; if `entity.type` disagrees, the entry is flagged as
+ * `missing_entity` rather than scored against the wrong shape.
  */
 export function scoreSuite(
   suite: SuiteEntry[],
-  responses: PolicyEntity[],
+  entities: EntityWithType[],
 ): PerEntityRecord[] {
-  const responsesById = new Map(responses.map((r) => [r.id, r]));
+  const byId = new Map(entities.map((e) => [e.id, e]));
   return suite.map((entry) => {
     if (!SUPPORTED_TYPES.has(entry.type)) return makeRecord(entry, "unsupported_type", null);
-    const ent = responsesById.get(entry.slug);
+    const ent = byId.get(entry.slug);
     if (!ent) return makeRecord(entry, "missing_entity", null);
-    return makeRecord(entry, "scored", policyCoverageScore(ent));
+    if (ent.type !== entry.type) {
+      // Defensive: suite says X but the YAML now says Y. The scorer would
+      // run on the wrong shape and produce noise. Treat as missing so the
+      // aggregate doesn't silently shift; surfaces the drift in --list/--diff.
+      return makeRecord(entry, "missing_entity", null);
+    }
+    if (!isSupportedCoverageType(ent.type)) {
+      return makeRecord(entry, "unsupported_type", null);
+    }
+    return makeRecord(entry, "scored", coverageScoreForEntity(ent));
   });
 }
 
@@ -327,7 +350,8 @@ export function formatDiff(before: SuiteSnapshot, after: SuiteSnapshot): string 
 
 export interface RunOptions {
   suitePath?: string;
-  responsesPath?: string;
+  /** Override `data/entities` (tests). Default: workspace `data/entities`. */
+  entitiesDir?: string;
   snapshotDir?: string;
 }
 
@@ -340,8 +364,8 @@ export function takeSnapshot(
     throw new Error(`Invalid --tag "${tag}": must match ${VALID_TAG_RE} and be 1-80 chars.`);
   }
   const suite = loadSuite(opts.suitePath ?? DEFAULT_SUITE_YAML);
-  const responses = loadResponses(opts.responsesPath ?? DEFAULT_RESPONSES_YAML);
-  const records = scoreSuite(suite, responses);
+  const entities = loadAllEntities(opts.entitiesDir ?? DEFAULT_ENTITIES_DIR);
+  const records = scoreSuite(suite, entities);
   const snap = buildSnapshot(tag, records);
   const file = writeSnapshot(opts.snapshotDir ?? DEFAULT_SNAPSHOT_DIR, snap);
   return { snap, file };
