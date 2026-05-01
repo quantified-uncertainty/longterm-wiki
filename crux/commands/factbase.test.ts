@@ -345,5 +345,20 @@ describe('crux kb add-fact', () => {
     // The error should include the existing fact's ID
     expect(result.output).toMatch(/fact ID: \w+/);
   }, 30_000);
+
+  // QUA-852 / QUA-729 Phase C: --source is required for facts on verifiable
+  // properties. The check runs after value/duplicate validation so existing
+  // tests that exercise those earlier branches don't have to learn about
+  // sourcing.
+  it('rejects new facts on verifiable properties without --source', async () => {
+    // Use a non-duplicate value/asOf so we reach the source check.
+    const result = await commands['add-fact'](
+      ['anthropic', 'revenue', '999e6'],
+      { asOf: '2099-01' },
+    );
+    expect(result.exitCode).toBe(1);
+    expect(result.output).toContain('--source=URL is required');
+    expect(result.output).toContain('verifiable');
+  }, 30_000);
 });
 

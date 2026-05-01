@@ -22,6 +22,7 @@ import {
   zv,
   clampedLimit,
 } from "../shared/utils.js";
+import { enforceSourcing } from "../shared/sourcing-enforcement.js";
 import { SyncFactsBatchSchema } from "../../api-types.js";
 import { upsertThingsInTx } from "../shared/thing-sync.js";
 import { writeInlineVerdicts, logSourcingCoverage } from "../tablebase/write-inline-verdicts.js";
@@ -488,6 +489,18 @@ const factsApp = new Hono()
     if (!parsed.success) return validationError(c, parsed.error.message);
 
     let items = parsed.data.facts;
+
+    // QUA-852 / QUA-729 Phase C: server-side sourcing enforcement.
+    // SOURCE_CHECK_REQUIRED.fact = true → reject items without a `sourcing`
+    // block. Bulk YAML re-sync uses `?forceSkipSourcing=true&reason=...` to
+    // bypass with audit logging — see crux/wiki-server/sync-facts.ts.
+    const enforcementError = enforceSourcing(
+      c,
+      "fact",
+      items as Array<{ sourcing?: unknown }>,
+    );
+    if (enforcementError) return enforcementError;
+
     const db = getDrizzleDb();
 
     // Validate entity references — skip facts whose entities don't exist in PG

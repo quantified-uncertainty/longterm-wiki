@@ -24,6 +24,15 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
   "funding-programs": true,
   divisions: true,
   "policy-stakeholders": true,
+  // QUA-852 / QUA-729 Phase C: enabled 2026-05-01.
+  // Gate: checkable-fact coverage 93.7% (1841 verdicts / 1964 checkable facts);
+  // QUA-928 split the metric so this is measured against the checkable subset
+  // (facts with a source URL on a `verifiable: true` property), not all-facts.
+  // Bulk YAML re-sync (crux/wiki-server/sync-facts.ts) uses the
+  // `forceSkipSourcing=true` escape hatch — ~33% of facts are non-checkable
+  // by design (verifiable: false properties or no source URL) and carry no
+  // verdict to attach. Direct callers must include a `sourcing` block.
+  fact: true,
 };
 
 /**
