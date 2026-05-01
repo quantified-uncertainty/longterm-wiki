@@ -196,11 +196,10 @@ describe('findActiveClaimsByOthers', () => {
           freshMinutes: 30,
         },
       });
-      // PG says "no cross-slot claims" → fall through to Linear, which is
-      // empty → return []. The same-slot session is not a collision.
-      getCommentsMock.mockResolvedValueOnce([]);
+      // PG returns ok with no cross-slot claims → return [] without Linear.
       const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
       expect(claims).toEqual([]);
+      expect(getCommentsMock).not.toHaveBeenCalled();
     });
 
     it('filters out same-branch sessions even when slot is unset', async () => {
@@ -222,23 +221,21 @@ describe('findActiveClaimsByOthers', () => {
           freshMinutes: 30,
         },
       });
-      getCommentsMock.mockResolvedValueOnce([]);
+      // PG filtered the same-branch session → ok-empty → return [] without Linear.
       const claims = await findActiveClaimsByOthers('QUA-406', slotlessCtx, now);
       expect(claims).toEqual([]);
+      expect(getCommentsMock).not.toHaveBeenCalled();
     });
 
-    it('falls through to Linear when PG returns an empty result', async () => {
+    it('returns [] without consulting Linear when PG returns ok-empty', async () => {
       getAgentSessionsByLinearIdMock.mockResolvedValueOnce({
         ok: true,
         data: { sessions: [], freshMinutes: 30 },
       });
-      getCommentsMock.mockResolvedValueOnce([
-        startComment({ slot: 'a9', branch: 'claude/qua-406-from-linear', hoursAgo: 2 }),
-      ]);
       const claims = await findActiveClaimsByOthers('QUA-406', baseCtx, now);
-      expect(claims).toHaveLength(1);
-      expect(claims[0].branch).toBe('claude/qua-406-from-linear');
-      expect(getCommentsMock).toHaveBeenCalledTimes(1);
+      expect(claims).toEqual([]);
+      // PG said clean — Linear should not be consulted at all.
+      expect(getCommentsMock).not.toHaveBeenCalled();
     });
 
     it('falls through to Linear when PG is unreachable (ok: false)', async () => {
