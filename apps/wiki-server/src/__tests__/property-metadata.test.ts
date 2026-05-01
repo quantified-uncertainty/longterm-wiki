@@ -24,19 +24,18 @@ describe("getNonVerifiablePropertyIds", () => {
     expect(ids.size).toBeGreaterThan(0);
   });
 
-  it("includes the well-known social-media + wikipedia + estimate properties", () => {
+  it("includes the well-known self-referential + estimate properties", () => {
     _resetPropertyMetadataCache();
     const ids = getNonVerifiablePropertyIds();
-    // These three families are the canonical reasons a property is flagged
-    // verifiable:false:
-    //   1. self-referential URLs (`wikipedia-url`, `social-media`)
-    //   2. third-party-blocking handles (`twitter-handle`/`x-handle`)
-    //   3. unsourced estimates (`safety-staffing-ratio`, `equity-stake-percent`)
+    // Two families that remain verifiable:false after QUA-927:
+    //   1. Self-referential URLs (`website`): the fact IS the URL, no external content to verify
+    //      (wikipedia-url and social-media moved to verifierKind:url-resolves in QUA-927)
+    //   2. Unsourced estimates (`safety-staffing-ratio`, `interpretability-team-size`)
     // Pick one canonical member of each family — losing any of these to a
     // YAML edit would silently expand the "checkable" set and break the gate.
-    expect(ids.has("wikipedia-url")).toBe(true);
-    expect(ids.has("social-media")).toBe(true);
+    expect(ids.has("website")).toBe(true);
     expect(ids.has("safety-staffing-ratio")).toBe(true);
+    expect(ids.has("interpretability-team-size")).toBe(true);
   });
 
   it("does NOT include verifiable properties", () => {
