@@ -86,6 +86,18 @@ const SIDEBAR_ONLY_PAGES = [
 ];
 
 /**
+ * Pages without sidebar or tabs (use children) — migrated to
+ * EntityProfileShell. Loaded into the same body-render check as simple pages.
+ */
+const NO_SIDEBAR_PAGES: string[] = [
+  // Resources/[id] — migrated to EntityProfileShell in QUA-490.
+  // Resources are PG-primary (data/resources-snapshot.json is gitignored).
+  // The e2e-pr.yml workflow runs build-data without LONGTERMWIKI_SERVER_URL,
+  // so resources.json is empty and any /resources/[id] URL returns 404 in CI.
+  // Validated locally with a dev server pointed at prod wiki-server.
+];
+
+/**
  * Pages that MUST render at least one [data-testid="stat-card"]. Used to
  * verify (a) stat cards are present and (b) each card has a non-empty value.
  *
@@ -214,6 +226,15 @@ test.describe("Render audit — simple pages", () => {
 
 test.describe("Render audit — sidebar-only pages", () => {
   for (const url of SIDEBAR_ONLY_PAGES) {
+    test(url, async ({ page }) => {
+      await loadPage(page, url);
+      checkAntiPatterns(await getMainText(page), url);
+    });
+  }
+});
+
+test.describe("Render audit — no-sidebar shell pages", () => {
+  for (const url of NO_SIDEBAR_PAGES) {
     test(url, async ({ page }) => {
       await loadPage(page, url);
       checkAntiPatterns(await getMainText(page), url);
