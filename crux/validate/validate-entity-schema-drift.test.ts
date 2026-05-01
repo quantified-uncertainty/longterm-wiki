@@ -9,9 +9,6 @@ describe("validate-entity-schema-drift checkLine", () => {
     expect(checkLine('const VALID_POSITIONS = ["support", "oppose"] as const;')).toBe("VALID_CONST");
   });
 
-  // Multi-line declarations (`const VALID_X\n  = [...]`) are caught by the
-  // file-level multi-line pass in checkFile, not by checkLine.
-
   it("flags exported VALID_*", () => {
     expect(checkLine('export const VALID_RISK_DOMAINS = [')).toBe("VALID_CONST");
   });
@@ -29,13 +26,23 @@ describe("validate-entity-schema-drift checkLine", () => {
     expect(checkLine(' * z.enum(["x"])')).toBeNull();
   });
 
-  it("respects // schema-drift-ok suppression", () => {
-    expect(checkLine('const VALID_QUERY_DIR = ["asc","desc"]; // schema-drift-ok')).toBeNull();
-    expect(checkLine('  dir: z.enum(["asc","desc"]), // schema-drift-ok')).toBeNull();
+  it("respects // schema-drift-ok: <reason> suppression", () => {
+    expect(checkLine('const VALID_QUERY_DIR = ["asc","desc"]; // schema-drift-ok: query enum, not entity wire shape')).toBeNull();
+    expect(checkLine('  dir: z.enum(["asc","desc"]), // schema-drift-ok: query enum')).toBeNull();
+  });
+
+  it("rejects bare suppression marker without reason", () => {
+    // buildSuppressionRegex requires `<marker>: <reason>`; a bare marker
+    // does not suppress.
+    expect(checkLine('const VALID_X = ["a"]; // schema-drift-ok')).toBe("VALID_CONST");
   });
 
   it("does not match VALID_ inside string literal", () => {
-    expect(checkLine('const msg = "Use a const VALID_FOO declaration"')).toBeNull();
+    expect(checkLine('const msg = "Use a const VALID_FOO = declaration"')).toBeNull();
+  });
+
+  it("does not match z.enum([ inside string literal", () => {
+    expect(checkLine('const msg = "see z.enum([\\"x\\"]) docs";')).toBeNull();
   });
 
   it("ignores plain `valid` (case-sensitive)", () => {
@@ -130,14 +137,62 @@ describe("validate-entity-schema-drift runCheck", () => {
     expect(result.newViolations[0].kind).toBe("INLINE_ENUM");
   });
 
-  it("respects per-line // schema-drift-ok suppression even outside allowlist", () => {
+  it("respects per-line // schema-drift-ok: <reason> suppression even outside allowlist", () => {
     writeFileSync(
       join(routesDir, "queries.ts"),
-      'const sortDir = z.enum(["asc","desc"]); // schema-drift-ok\n',
+      'const sortDir = z.enum(["asc","desc"]); // schema-drift-ok: query enum\n',
     );
     writeFileSync(allowlistPath, "");
     const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
     expect(result.passed).toBe(true);
+  });
+
+  it("attaches file path to violations in result.newViolations", () => {
+    writeFileSync(join(routesDir, "n.ts"), 'const VALID_N = ["a"];\n');
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations[0].file).toBe("routes/tablebase/n.ts");
+    expect(result.newViolations[0].line).toBe(1);
+  });
+
+  it("does not double-count when a comment precedes a real VALID_* declaration", () => {
+    // Regression: the multi-line pass used to join the comment line with the
+    // next code line and re-match the pattern, producing a phantom violation
+    // on the comment line in addition to the real one on line 2.
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      '// kept VALID_OLD comment\nconst VALID_X = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].line).toBe(2);
+  });
+
+  it("does not double-count when a JSDoc closer precedes a real declaration", () => {
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      '/**\n * doc\n */\nconst VALID_X = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].line).toBe(4);
+  });
+
+  it("multi-line match is not blocked by an unrelated string literal on the prior line", () => {
+    // Regression: the prior multi-line guard `pattern.test(joined) &&
+    // !pattern.test(lines[i])` mis-fired when lines[i] contained a string
+    // literal whose contents matched the pattern, suppressing the legit
+    // multi-line match that followed.
+    writeFileSync(
+      join(routesDir, "x.ts"),
+      'const msg = "see const VALID_FAKE = pattern"; const VALID_REAL\n  = ["a"];\n',
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].kind).toBe("VALID_CONST");
   });
 });
 
@@ -178,6 +233,26 @@ describe("validate-entity-schema-drift --update mode", () => {
     expect(() => runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true })).not.toThrow();
     const written = readFileSync(allowlistPath, "utf-8");
     expect(written).toContain("routes/tablebase/x.ts");
+  });
+
+  it("preserves header without gluing it to the first entry (production baseline shape)", () => {
+    // Regression: the prior implementation produced
+    // `# last comment\napps/.../first.ts...` (no newline) when the input
+    // header had no trailing blank line — corrupting the allowlist on next
+    // read. The shipped baseline file has exactly this shape.
+    writeFileSync(join(routesDir, "a.ts"), 'const VALID_A = ["x"];\n');
+    writeFileSync(join(routesDir, "b.ts"), 'const VALID_B = ["y"];\n');
+    writeFileSync(allowlistPath, "# header line 1\n# header line 2\n");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true });
+    expect(result.passed).toBe(true);
+    const written = readFileSync(allowlistPath, "utf-8");
+    expect(written).toBe(
+      "# header line 1\n# header line 2\nroutes/tablebase/a.ts\nroutes/tablebase/b.ts\n",
+    );
+    // And the readback round-trips:
+    const readBack = readAllowlist(allowlistPath);
+    expect(readBack.has("routes/tablebase/a.ts")).toBe(true);
+    expect(readBack.has("routes/tablebase/b.ts")).toBe(true);
   });
 
   it("writes empty list when no drift exists", () => {
