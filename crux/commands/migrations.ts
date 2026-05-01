@@ -137,9 +137,12 @@ async function renumberCommand(
   // Apply renames to the worktree.
   const repoRoot = findRepoRoot();
   try {
-    const { renamed, skipped } = applyRenames(result.renames, drizzleDir, repoRoot);
+    const { renamed, alreadyRenamed, skipped } = applyRenames(result.renames, drizzleDir, repoRoot);
     if (renamed > 0) {
       output += `${c.green}Renamed ${renamed} file${renamed === 1 ? '' : 's'}.${c.reset}\n`;
+    }
+    if (alreadyRenamed > 0) {
+      output += `${c.dim}${alreadyRenamed} file${alreadyRenamed === 1 ? '' : 's'} already at the new path (idempotent re-run).${c.reset}\n`;
     }
     for (const note of skipped) {
       output += `  ${c.dim}skipped: ${note}${c.reset}\n`;

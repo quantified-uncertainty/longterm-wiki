@@ -29,19 +29,38 @@ if [ -z "$REPO" ]; then exit 0; fi
 PENDING="$REPO/.git/MIGRATION_RENAMES_PENDING"
 if [ ! -f "$PENDING" ]; then exit 0; fi
 
-# Parse the marker JSON. We rely on Node being available — same prerequisite
-# as the merge driver itself.
-DRIZZLE_DIR="$(node -e 'process.stdout.write(JSON.parse(require("fs").readFileSync(process.argv[1],"utf-8")).drizzleDir)' "$PENDING" 2>/dev/null || echo '')"
-if [ -z "$DRIZZLE_DIR" ]; then
-  echo "drizzle-journal-merge: pending marker is corrupt — removing $PENDING" >&2
+# Parse the marker JSON in a single Node invocation (drizzleDir on the first
+# line, then one tab-separated `oldTag\tnewTag` per rename). We rely on Node
+# being available — same prerequisite as the merge driver itself. Tags are
+# validated against the same regex as the merge driver to defeat path
+# traversal via attacker-controlled journal content.
+PARSED="$(node -e '
+  const path = process.argv[1];
+  const j = JSON.parse(require("fs").readFileSync(path, "utf-8"));
+  if (typeof j.drizzleDir !== "string" || !j.drizzleDir) process.exit(2);
+  const SAFE = /^\d+_[A-Za-z0-9_]+$/;
+  console.log(j.drizzleDir);
+  for (const r of j.renames || []) {
+    if (typeof r?.oldTag !== "string" || typeof r?.newTag !== "string") continue;
+    if (!SAFE.test(r.oldTag) || !SAFE.test(r.newTag)) continue;
+    console.log(r.oldTag + "\t" + r.newTag);
+  }
+' "$PENDING" 2>/dev/null || true)"
+
+if [ -z "$PARSED" ]; then
+  echo "drizzle-journal-merge: pending marker is corrupt or empty — removing $PENDING" >&2
   rm -f "$PENDING"
   exit 0
 fi
 
-RENAMES_TSV="$(node -e '
-  const j = JSON.parse(require("fs").readFileSync(process.argv[1],"utf-8"));
-  for (const r of j.renames || []) console.log(r.oldTag + "\t" + r.newTag);
-' "$PENDING" 2>/dev/null || echo '')"
+DRIZZLE_DIR="$(printf '%s\n' "$PARSED" | head -n 1)"
+RENAMES_TSV="$(printf '%s\n' "$PARSED" | tail -n +2)"
+
+if [ -z "$DRIZZLE_DIR" ]; then
+  echo "drizzle-journal-merge: pending marker missing drizzleDir — removing $PENDING" >&2
+  rm -f "$PENDING"
+  exit 0
+fi
 
 cd "$REPO"
 

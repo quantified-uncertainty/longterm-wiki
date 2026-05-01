@@ -40,7 +40,24 @@
 
 import { execFileSync } from 'child_process';
 import { existsSync, readFileSync, renameSync, writeFileSync } from 'fs';
-import { dirname, join } from 'path';
+import { dirname, isAbsolute as isAbsolutePath, join } from 'path';
+
+/**
+ * Tag-format guard. Drizzle-kit only emits tags shaped `NNNN_word_word_…`,
+ * so we reject anything that doesn't match before letting it flow into
+ * filesystem operations. Without this, a malicious branch could craft a
+ * journal entry like `{tag: "../../../etc/passwd"}` and (via the .sql
+ * rename code path) cause the driver to mv a file outside the repo.
+ *
+ * The driver only fires for clones that have opted in via setup.sh, but
+ * the *content* of merged branches is untrusted — so this validation runs
+ * as defense in depth.
+ */
+const SAFE_TAG_RE = /^\d+_[A-Za-z0-9_]+$/;
+
+function isSafeTag(tag) {
+  return typeof tag === 'string' && SAFE_TAG_RE.test(tag);
+}
 
 /**
  * Resolve duplicate idx values and duplicate tag prefixes by renumbering the
@@ -95,7 +112,7 @@ export function renumberJournal(journal) {
     for (const i of group.slice(1)) {
       const a = entries[winner];
       const b = entries[i];
-      if (b.when < a.when || (b.when === a.when && b.tag.localeCompare(a.tag) < 0)) {
+      if (b.when < a.when || (b.when === a.when && b.tag < a.tag)) {
         winner = i;
       }
     }
@@ -133,7 +150,10 @@ export function renumberJournal(journal) {
   const toRenum = [...needsRenum].sort((a, b) => {
     const ea = entries[a];
     const eb = entries[b];
-    return (ea.when - eb.when) || ea.tag.localeCompare(eb.tag);
+    // Tie-break by tag using direct string comparison (NOT localeCompare,
+    // which is locale-sensitive and would produce different "winners" on
+    // different machines). Drizzle tags are ASCII so byte-order is fine.
+    return (ea.when - eb.when) || (ea.tag < eb.tag ? -1 : ea.tag > eb.tag ? 1 : 0);
   });
 
   const renames = [];
@@ -145,6 +165,16 @@ export function renumberJournal(journal) {
     if (m && m[1] !== newPrefix) {
       const oldTag = entry.tag;
       const newTag = `${newPrefix}_${entry.tag.slice(m[0].length)}`;
+      // Defense in depth: refuse to emit a rename whose old or new tag
+      // would escape the migrations directory. Drizzle-kit-generated tags
+      // always pass; a hand-crafted journal entry that tries to traverse
+      // is rejected here so the rename never reaches `git mv` / `mv`.
+      if (!isSafeTag(oldTag) || !isSafeTag(newTag)) {
+        throw new Error(
+          `Refusing to rename unsafe tag: ${JSON.stringify(oldTag)} → ${JSON.stringify(newTag)}. ` +
+            `Tags must match ${SAFE_TAG_RE}.`,
+        );
+      }
       renames.push({ oldTag, newTag });
       entry.tag = newTag;
     }
@@ -275,19 +305,33 @@ export function applyRenames(renames, drizzleDir, repoRoot) {
   const skipped = [];
   const deferred = [];
   let renamed = 0;
+  let alreadyRenamed = 0;
 
-  // Resolve drizzleDir relative to repoRoot so we don't depend on CWD.
-  const absDrizzleDir = drizzleDir.startsWith('/') ? drizzleDir : join(repoRoot, drizzleDir);
+  // Resolve drizzleDir relative to repoRoot so we don't depend on CWD. We
+  // use `path.isAbsolute` rather than a `startsWith('/')` check so the
+  // driver works correctly on Windows too.
+  const absDrizzleDir = isAbsolutePath(drizzleDir) ? drizzleDir : join(repoRoot, drizzleDir);
 
   for (const { oldTag, newTag } of renames) {
+    if (!isSafeTag(oldTag) || !isSafeTag(newTag)) {
+      // Should never happen — `renumberJournal` rejects unsafe tags before
+      // emitting a rename — but we re-check here in case `applyRenames`
+      // is invoked with externally-supplied input.
+      throw new Error(
+        `Refusing to apply unsafe rename: ${JSON.stringify(oldTag)} → ${JSON.stringify(newTag)}.`,
+      );
+    }
+
     const oldSql = join(absDrizzleDir, `${oldTag}.sql`);
     const newSql = join(absDrizzleDir, `${newTag}.sql`);
 
     if (!existsSync(oldSql)) {
       if (existsSync(newSql)) {
-        // Already renamed — idempotent.
+        // Already in the desired state — count separately so callers can
+        // report "renamed N, already-renamed M" honestly. Crucial during
+        // hook re-runs and idempotent CLI invocations.
         skipped.push(`${oldTag}.sql (already renamed to ${newTag}.sql)`);
-        renamed++;
+        alreadyRenamed++;
       } else {
         // File isn't in the worktree yet (e.g., mid-rebase the .sql will
         // arrive when git applies the commit's tree). Defer this rename
@@ -363,7 +407,7 @@ export function applyRenames(renames, drizzleDir, repoRoot) {
     }
   }
 
-  return { renamed, skipped, deferred };
+  return { renamed, alreadyRenamed, skipped, deferred };
 }
 
 /**
@@ -438,7 +482,19 @@ export function runMergeDriver(pathBase, pathOurs, pathTheirs, workingPath, cwd 
 
   // The .sql files we need to rename live in the directory containing the
   // conflicted journal's parent (e.g. apps/wiki-server/drizzle/meta/
-  // _journal.json → apps/wiki-server/drizzle/).
+  // _journal.json → apps/wiki-server/drizzle/). Validate the working path
+  // ends with `meta/_journal.json` before deriving — git invokes us with
+  // the path from `.gitattributes`, but a misconfigured attribute could
+  // route an unrelated file here, and `dirname(dirname(…))` would then
+  // produce a wrong (or even outside-the-repo) directory.
+  if (!/(?:^|\/)meta\/_journal\.json$/.test(workingPath)) {
+    return {
+      exitCode: 1,
+      message:
+        `drizzle-journal-merge: refusing to operate on unexpected path ${JSON.stringify(workingPath)} — ` +
+        `expected something ending in 'meta/_journal.json'. Check your .gitattributes configuration.`,
+    };
+  }
   const drizzleDir = dirname(dirname(workingPath));
 
   let deferredRenames = [];
@@ -457,15 +513,39 @@ export function runMergeDriver(pathBase, pathOurs, pathTheirs, workingPath, cwd 
 
   // Persist any renames we couldn't apply now (because git's index lock is
   // held and/or the source .sql file isn't in the worktree yet) so the
-  // post-rewrite / post-merge hook can finish them once the rebase /merge
+  // post-rewrite / post-merge hook can finish them once the rebase / merge
   // completes.
+  //
+  // A multi-commit rebase invokes the merge driver once per conflicting
+  // commit. Each invocation may need to defer renames, so we MERGE with any
+  // existing marker rather than overwriting — otherwise renames from
+  // earlier commits in the rebase chain are lost. Renames are deduped by
+  // `oldTag` (later occurrences win, since the merge driver only writes a
+  // rename when the source still has the old prefix).
   if (deferredRenames.length > 0) {
     try {
       const pendingPath = join(repoRoot, '.git', 'MIGRATION_RENAMES_PENDING');
+      let existingRenames = [];
+      if (existsSync(pendingPath)) {
+        try {
+          const prior = JSON.parse(readFileSync(pendingPath, 'utf-8'));
+          if (Array.isArray(prior?.renames)) existingRenames = prior.renames;
+        } catch {
+          // Corrupt prior marker — overwrite with our renames; better than
+          // failing the merge.
+        }
+      }
+      const merged = new Map();
+      for (const r of existingRenames) {
+        if (r && typeof r.oldTag === 'string' && typeof r.newTag === 'string') {
+          merged.set(r.oldTag, r);
+        }
+      }
+      for (const r of deferredRenames) merged.set(r.oldTag, r);
       const payload = {
         version: 1,
         drizzleDir, // path relative to repo root
-        renames: deferredRenames,
+        renames: [...merged.values()],
       };
       writeFileSync(pendingPath, JSON.stringify(payload, null, 2));
     } catch (err) {

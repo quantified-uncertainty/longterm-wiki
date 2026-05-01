@@ -310,6 +310,18 @@ describe('renumberJournal — single-journal fixup', () => {
     expect(result.renames).toEqual([{ oldTag: '0005_dup', newTag: '0007_dup' }]);
   });
 
+  it('refuses to rename tags containing path-traversal segments', () => {
+    // Defense in depth: a malicious branch could craft a journal entry
+    // like `{tag: "../../../../etc/passwd"}`. The merge driver renumbers
+    // and would emit a rename — without validation, that flows into
+    // `git mv` / `mv` and writes outside the migrations directory.
+    const j = journal([
+      entry(0, 100, '0000_a'),
+      entry(0, 200, '0000_../../../etc/passwd'), // duplicate idx forces renumber
+    ]);
+    expect(() => renumberJournal(j)).toThrow(/Refusing to rename unsafe tag/);
+  });
+
   it('does not mutate input', () => {
     const j = journal([
       entry(1, 200, '0001_a'),
@@ -466,6 +478,33 @@ describe('runMergeDriver — end to end', () => {
     expect(existsSync(join(metaDir, '0001_snapshot.json'))).toBe(false);
   });
 
+  it('reports alreadyRenamed (not renamed) when the source .sql is missing but destination exists', () => {
+    // Idempotent re-run scenario: the apply-migration-renames hook already
+    // moved the file, then something re-invokes applyRenames. We must not
+    // double-count it as a rename — the user-facing "Renamed N files"
+    // output would mislead.
+    const { repo, drizzleDir } = setupRepo('e2e-idempotent');
+
+    // Pre-stage the destination file.
+    writeFileSync(join(drizzleDir, '0002_b.sql'), '-- already moved\n');
+    execFileSync('git', ['add', '-A'], { cwd: repo });
+    commit(repo, 'pre-rename');
+
+    // applyRenames is called as if we tried to rename 0001_b → 0002_b
+    // again. Source missing, destination present.
+    // Use a dynamic import so we exercise the real exported function.
+    return import('../drizzle-journal-merge.mjs').then((mod) => {
+      const result = mod.applyRenames(
+        [{ oldTag: '0001_b', newTag: '0002_b' }],
+        'drizzle',
+        repo,
+      );
+      expect(result.renamed).toBe(0);
+      expect(result.alreadyRenamed).toBe(1);
+      expect(result.skipped[0]).toMatch(/already renamed/);
+    });
+  });
+
   it('writes a pending-renames marker when the source .sql is not in the worktree', () => {
     // This is the canonical mid-rebase scenario: git invokes the merge
     // driver before the rebase commit's tree has been written to the
@@ -507,6 +546,88 @@ describe('runMergeDriver — end to end', () => {
     const marker = JSON.parse(readFileSync(markerPath, 'utf-8'));
     expect(marker.renames).toEqual([{ oldTag: '0001_b', newTag: '0002_b' }]);
     expect(marker.drizzleDir).toBe('drizzle');
+  });
+
+  it('merges deferred renames across multiple invocations (multi-commit rebase)', () => {
+    // A multi-commit rebase invokes the merge driver once per conflicting
+    // commit. The marker file MUST accumulate renames across invocations,
+    // not overwrite — otherwise renames from earlier commits in the chain
+    // are silently lost and their .sql files keep their old prefix.
+    const { repo, drizzleDir, metaDir } = setupRepo('e2e-multi-defer');
+
+    const baseJournal = journal([entry(0, 100, '0000_base')]);
+    writeFileSync(join(metaDir, '_journal.json'), serializeJournal(baseJournal));
+    writeFileSync(join(drizzleDir, '0000_base.sql'), '-- base\n');
+    commit(repo, 'base');
+
+    // First invocation: ours adds 0001_alpha, theirs adds 0001_beta.
+    // No worktree files (mid-rebase), so the rename for the loser defers.
+    const firstOurs = journal([...baseJournal.entries, entry(1, 200, '0001_alpha')]);
+    const firstTheirs = journal([...baseJournal.entries, entry(1, 300, '0001_beta')]);
+    const pathBase1 = join(tmpRoot, 'mdefer1-base.json');
+    const pathOurs1 = join(tmpRoot, 'mdefer1-ours.json');
+    const pathTheirs1 = join(tmpRoot, 'mdefer1-theirs.json');
+    writeFileSync(pathBase1, serializeJournal(baseJournal));
+    writeFileSync(pathOurs1, serializeJournal(firstOurs));
+    writeFileSync(pathTheirs1, serializeJournal(firstTheirs));
+
+    const r1 = runMergeDriver(pathBase1, pathOurs1, pathTheirs1, 'drizzle/meta/_journal.json', repo);
+    expect(r1.exitCode).toBe(0);
+
+    const markerPath = join(repo, '.git', 'MIGRATION_RENAMES_PENDING');
+    let marker = JSON.parse(readFileSync(markerPath, 'utf-8'));
+    expect(marker.renames).toEqual([{ oldTag: '0001_beta', newTag: '0002_beta' }]);
+
+    // Second invocation: simulate a second conflicting commit with a
+    // different addition. Read what main looks like AFTER the first merge
+    // resolved, then simulate the next commit in the chain conflicting.
+    const afterFirstResolution = JSON.parse(readFileSync(pathOurs1, 'utf-8'));
+    const secondOurs = journal([
+      ...afterFirstResolution.entries,
+      entry(3, 400, '0003_gamma'),
+    ]);
+    const secondTheirs = journal([
+      ...afterFirstResolution.entries,
+      entry(3, 500, '0003_delta'),
+    ]);
+    const pathBase2 = join(tmpRoot, 'mdefer2-base.json');
+    const pathOurs2 = join(tmpRoot, 'mdefer2-ours.json');
+    const pathTheirs2 = join(tmpRoot, 'mdefer2-theirs.json');
+    writeFileSync(pathBase2, serializeJournal(afterFirstResolution));
+    writeFileSync(pathOurs2, serializeJournal(secondOurs));
+    writeFileSync(pathTheirs2, serializeJournal(secondTheirs));
+
+    const r2 = runMergeDriver(pathBase2, pathOurs2, pathTheirs2, 'drizzle/meta/_journal.json', repo);
+    expect(r2.exitCode).toBe(0);
+
+    // Marker now contains BOTH renames — neither is lost.
+    marker = JSON.parse(readFileSync(markerPath, 'utf-8'));
+    expect(marker.renames).toContainEqual({ oldTag: '0001_beta', newTag: '0002_beta' });
+    expect(marker.renames).toContainEqual({ oldTag: '0003_delta', newTag: '0004_delta' });
+    expect(marker.renames).toHaveLength(2);
+  });
+
+  it('refuses to operate when workingPath does not end in meta/_journal.json', () => {
+    const { repo } = setupRepo('e2e-bad-path');
+
+    const baseJournal = journal([entry(0, 100, '0000_a')]);
+    const pathBase = join(tmpRoot, 'badpath-base.json');
+    const pathOurs = join(tmpRoot, 'badpath-ours.json');
+    const pathTheirs = join(tmpRoot, 'badpath-theirs.json');
+    writeFileSync(pathBase, serializeJournal(baseJournal));
+    writeFileSync(pathOurs, serializeJournal(baseJournal));
+    writeFileSync(pathTheirs, serializeJournal(baseJournal));
+
+    const result = runMergeDriver(
+      pathBase,
+      pathOurs,
+      pathTheirs,
+      'some/other/file.json', // not the journal!
+      repo,
+    );
+
+    expect(result.exitCode).toBe(1);
+    expect(result.message).toMatch(/refusing to operate on unexpected path/);
   });
 
   it('exits 1 with helpful message when journal JSON is malformed', () => {
