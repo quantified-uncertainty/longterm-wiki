@@ -684,8 +684,9 @@ For each fact you can extract from the source that fills one of the gaps, return
     ${guide.scalarFieldsHint}
     ${guide.arrayTargetsHint}
 - claimText: a concise, paraphrased assertion that can be verified against the source. Avoid overly-specific dates or figures unless the source states them verbatim.
-- proposedValue: the actual value to write into YAML (a sentence for product/keyDate description / provision / stakeholder / description, a short string for billNumber/dates/etc., a date string for keyDate.*).
-- displayHint: human label for new array entries (e.g. "Claude 3.5 Sonnet", "Dario Amodei", "Founded as Anthropic PBC").
+- proposedValue: the actual value to write into YAML (a sentence for product / provision / stakeholder / description, a short string for billNumber, etc.).
+    * For keyDate.* claims: proposedValue MUST be a structured date string in ISO format — "YYYY-MM-DD" if a full date is given, "YYYY-MM" for month-precision, or "YYYY" for year-only. Do NOT put narrative prose in proposedValue for keyDate claims; the human-readable label goes in displayHint.
+- displayHint: human label for new array entries (e.g. "Claude 3.5 Sonnet", "Dario Amodei", "Founded as Anthropic PBC", "Series G Funding Round").
 - position (stakeholder claims ONLY): one of "support" | "oppose" | "reform" | "neutral", or null if the source does not support a confident classification. Apply these rules strictly:
     * "support"  — the stakeholder endorses, defends, advocates for, lobbies for, or formally votes in favor of the policy. Example: a senator who introduced/co-sponsored the bill, an industry group that filed a brief in its favor.
     * "oppose"   — the stakeholder challenges, litigates against, sues over, votes against, or publicly campaigns to repeal/strike down the policy. Example: ACLU suing the NSA over surveillance, a senator voting "no", a group filing an amicus brief against the law.
