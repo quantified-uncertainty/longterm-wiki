@@ -237,4 +237,40 @@ describe('safeSyncMain', () => {
     expect(result.error).toContain('git pull --ff-only origin main failed');
     expect(result.error).toContain('fast-forward');
   });
+
+  it('reports a non-empty pull summary when fast-forward applied real commits', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'main' },
+      { ok: true, stdout: '' },
+      // gitSafe trims trailing whitespace, so the in-memory output ends without
+      // a trailing newline. The summary parser picks `slice(-2)[0]`, which is
+      // "Fast-forward" here, NOT the file-change line. This is an existing
+      // quirk of the parser; the intent is just to surface a non-empty hint
+      // that something moved.
+      { ok: true, stdout: 'Updating abc..def\nFast-forward\n 3 files changed, 5 insertions(+)' },
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(true);
+    expect(result.steps).toHaveLength(1);
+    expect(result.steps[0]).toMatch(/^Pulled main \(/);
+    // It must NOT collapse to the "Already up to date" path or the "updated"
+    // fallback — we want concrete evidence that the parser walked the output.
+    expect(result.steps[0]).not.toBe('Pulled main (already up to date)');
+    expect(result.steps[0]).not.toBe('Pulled main (updated)');
+  });
+
+  it('aborts when `git status` itself fails (e.g. not a git repo)', () => {
+    stubGitCalls([
+      { ok: true, stdout: 'main' },
+      { ok: false, stderr: 'fatal: not a git repository' },
+    ]);
+
+    const result = safeSyncMain();
+    expect(result.ok).toBe(false);
+    expect(result.error).toContain('git status failed');
+    expect(result.error).toContain('not a git repository');
+    // No checkout, no pull — the precondition fails fast.
+    expect(mockExecFileSync).toHaveBeenCalledTimes(2);
+  });
 });

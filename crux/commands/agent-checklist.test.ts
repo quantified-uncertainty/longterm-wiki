@@ -73,22 +73,36 @@ vi.mock('../lib/wiki-server/agent-sessions.ts', () => ({
 }));
 
 // Mock the git sync helpers so we can observe which one init picks (QUA-403)
-// without actually shelling out to git.
-const { syncToMainMock, safeSyncMainMock } = vi.hoisted(() => ({
-  syncToMainMock: vi.fn(() => ({
-    ok: true as const,
-    steps: ['Switched claude/foo → main', 'Pulled main (already up to date)'],
-    switchedBranch: true,
-    startBranch: 'claude/foo',
-  })),
-  safeSyncMainMock: vi.fn(() => ({
-    ok: true as const,
-    steps: ['On feature branch claude/foo — skipping main sync'],
-    switchedBranch: false,
-    startBranch: 'claude/foo',
-    keptBranch: true,
-  })),
-}));
+// without actually shelling out to git. The return type is widened (boolean ok,
+// optional error/keptBranch) so tests can override with `ok: false` via
+// `mockReturnValueOnce`.
+const { syncToMainMock, safeSyncMainMock } = vi.hoisted(() => {
+  // The hoisted block runs before module imports, so we declare the type
+  // inline rather than referencing a top-level type alias.
+  type Result = {
+    ok: boolean;
+    steps: string[];
+    error?: string;
+    switchedBranch: boolean;
+    startBranch: string;
+    keptBranch?: boolean;
+  };
+  return {
+    syncToMainMock: vi.fn<() => Result>(() => ({
+      ok: true,
+      steps: ['Switched claude/foo → main', 'Pulled main (already up to date)'],
+      switchedBranch: true,
+      startBranch: 'claude/foo',
+    })),
+    safeSyncMainMock: vi.fn<() => Result>(() => ({
+      ok: true,
+      steps: ['On feature branch claude/foo — skipping main sync'],
+      switchedBranch: false,
+      startBranch: 'claude/foo',
+      keptBranch: true,
+    })),
+  };
+});
 vi.mock('../lib/git.ts', () => ({
   syncToMain: syncToMainMock,
   safeSyncMain: safeSyncMainMock,
@@ -703,12 +717,22 @@ describe('agent-checklist default (unknown subcommand)', () => {
     expect(result.output).toContain('init <task>');
   });
 
-  it('ignores leading flags and treats the first positional as the unknown subcommand', async () => {
-    // `agent-checklist --ci list` should still flag `list` as unknown.
-    const result = await commands.default(['--ci', 'list'], { ci: true });
+  it('finds the first positional as the unknown subcommand even when flags follow', async () => {
+    // The crux dispatcher passes positionals first, flags last:
+    // `agent-checklist list --ci` becomes args=['list', '--ci'].
+    const result = await commands.default(['list', '--ci'], { ci: true });
     expect(result.exitCode).toBe(2);
     expect(result.output).toContain('Unknown subcommand');
     expect(result.output).toContain('"list"');
+  });
+
+  it('quotes the suggested task safely even when it contains shell metacharacters', async () => {
+    // If a user types `agent-checklist Add "feature"`, we don't want the
+    // suggestion to break shell quoting. JSON.stringify handles this.
+    const result = await commands.default(['weird"name', '$VAR'], {});
+    expect(result.exitCode).toBe(2);
+    // The suggested command should JSON-quote the joined task attempt.
+    expect(result.output).toContain('"weird\\"name $VAR"');
   });
 });
 

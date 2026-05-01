@@ -691,21 +691,28 @@ async function prePushCheck(_args: string[], options: CommandOptions): Promise<C
 // with the typo as task description. That ran a destructive sync-to-main and
 // overwrote any existing checklist. This handler errors out instead — callers
 // must explicitly pick `init` for state-mutating work.
-const VALID_SUBCOMMANDS = ['init', 'check', 'verify', 'status', 'complete', 'snapshot', 'pre-push-check'] as const;
 
 async function defaultCmd(args: string[], options: CommandOptions): Promise<CommandResult> {
   const log = createLogger(options.ci);
   const c = log.colors;
-  const first = args.find(a => !a.startsWith('--'));
+  const positional = args.filter(a => !a.startsWith('--'));
+  const first = positional[0];
 
   if (first) {
-    const taskAttempt = args.filter(a => !a.startsWith('--')).join(' ');
+    // List valid subcommands derived from the registry below so they cannot
+    // drift. `default` is excluded — it's the dispatch fallback, not a name
+    // a user can type.
+    const validSubcommands = Object.keys(commands).filter(k => k !== 'default').join(', ');
+    // JSON.stringify quotes the suggestion safely even if `taskAttempt`
+    // contains `"`, `$`, or backslashes — the user can paste it without
+    // shell-quoting surprises.
+    const taskAttempt = positional.join(' ');
     return {
       output:
         `${c.red}✗ Unknown subcommand: "${first}"${c.reset}\n\n` +
-        `Valid subcommands: ${VALID_SUBCOMMANDS.join(', ')}\n\n` +
+        `Valid subcommands: ${validSubcommands}\n\n` +
         `${c.dim}If you meant to create a checklist with this as the task description, use:${c.reset}\n` +
-        `  ${c.cyan}crux sys agent-checklist init "${taskAttempt}"${c.reset}\n`,
+        `  ${c.cyan}crux sys agent-checklist init ${JSON.stringify(taskAttempt)}${c.reset}\n`,
       exitCode: 2,
     };
   }

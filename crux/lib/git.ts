@@ -275,9 +275,78 @@ export interface SyncToMainResult {
   switchedBranch: boolean;
   /** The branch we were on before syncing. */
   startBranch: string;
-  /** True if a feature branch was kept (not switched). */
+  /**
+   * True iff a non-main feature branch was deliberately kept (not switched).
+   * Set only by `safeSyncMain` on its skip-sync path. Callers can read this
+   * to label the operation differently in user output ("Kept feature branch"
+   * vs. "Synced to main"). `syncToMain` never sets it because it always
+   * either switches or was already on main.
+   */
   keptBranch?: boolean;
 }
+
+// ── Internal helpers (shared by safeSyncMain + syncToMain) ──────────────────
+
+/** Bail-out result for the clean-tree precondition. ok=null means proceed. */
+function ensureCleanTree(startBranch: string): SyncToMainResult | null {
+  const status = gitSafe('status', '--porcelain');
+  if (!status.ok) {
+    return {
+      ok: false,
+      steps: [],
+      error: `git status failed: ${status.stderr || status.output}`,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+  if (status.output.length > 0) {
+    return {
+      ok: false,
+      steps: [],
+      error:
+        `Working tree is not clean. Commit, stash, or discard before syncing:\n` +
+        status.output,
+      switchedBranch: false,
+      startBranch,
+    };
+  }
+  return null;
+}
+
+/**
+ * Run `git pull --ff-only origin main` and append a summary step.
+ *
+ * Returns null on success (steps is mutated). Returns an error result on
+ * failure — the caller should propagate it as-is.
+ */
+function pullMainFastForward(
+  steps: string[],
+  startBranch: string,
+  switchedBranch: boolean,
+): SyncToMainResult | null {
+  const pull = gitSafe('pull', '--ff-only', 'origin', 'main');
+  if (!pull.ok) {
+    return {
+      ok: false,
+      steps,
+      error: `git pull --ff-only origin main failed: ${pull.stderr || pull.output}`,
+      switchedBranch,
+      startBranch,
+    };
+  }
+  if (pull.output.includes('Already up to date')) {
+    steps.push('Pulled main (already up to date)');
+  } else {
+    // git's `pull` output ends with a blank line; the actual summary is the
+    // second-to-last line ("Fast-forward\n 1 file changed..."). Fall back to
+    // a generic word if the format ever shifts.
+    const summary = pull.output.split('\n').slice(-2)[0]?.trim() || 'updated';
+    steps.push(`Pulled main (${summary})`);
+  }
+  return null;
+}
+
+// ── Public API ──────────────────────────────────────────────────────────────
 
 /**
  * Safely sync without ever switching off a feature branch (QUA-403).
@@ -294,51 +363,19 @@ export interface SyncToMainResult {
  */
 export function safeSyncMain(): SyncToMainResult {
   const startBranch = currentBranch();
-  const steps: string[] = [];
 
-  const status = gitSafe('status', '--porcelain');
-  if (!status.ok) {
-    return {
-      ok: false,
-      steps,
-      error: `git status failed: ${status.stderr || status.output}`,
-      switchedBranch: false,
-      startBranch,
-    };
-  }
-  if (status.output.length > 0) {
-    return {
-      ok: false,
-      steps,
-      error:
-        `Working tree is not clean. Commit, stash, or discard before syncing:\n` +
-        status.output,
-      switchedBranch: false,
-      startBranch,
-    };
-  }
+  const treeError = ensureCleanTree(startBranch);
+  if (treeError) return treeError;
+
+  const steps: string[] = [];
 
   if (startBranch !== 'main') {
     steps.push(`On feature branch ${startBranch} — skipping main sync`);
     return { ok: true, steps, switchedBranch: false, startBranch, keptBranch: true };
   }
 
-  const pull = gitSafe('pull', '--ff-only', 'origin', 'main');
-  if (!pull.ok) {
-    return {
-      ok: false,
-      steps,
-      error: `git pull --ff-only origin main failed: ${pull.stderr || pull.output}`,
-      switchedBranch: false,
-      startBranch,
-    };
-  }
-  if (pull.output.includes('Already up to date')) {
-    steps.push('Pulled main (already up to date)');
-  } else {
-    const summary = pull.output.split('\n').slice(-2)[0]?.trim() || 'updated';
-    steps.push(`Pulled main (${summary})`);
-  }
+  const pullError = pullMainFastForward(steps, startBranch, false);
+  if (pullError) return pullError;
 
   return { ok: true, steps, switchedBranch: false, startBranch };
 }
@@ -358,33 +395,13 @@ export function safeSyncMain(): SyncToMainResult {
  */
 export function syncToMain(): SyncToMainResult {
   const startBranch = currentBranch();
+
+  const treeError = ensureCleanTree(startBranch);
+  if (treeError) return treeError;
+
   const steps: string[] = [];
-
-  // Step 1: clean tree check (porcelain catches both modified and untracked).
-  const status = gitSafe('status', '--porcelain');
-  if (!status.ok) {
-    return {
-      ok: false,
-      steps,
-      error: `git status failed: ${status.stderr || status.output}`,
-      switchedBranch: false,
-      startBranch,
-    };
-  }
-  if (status.output.length > 0) {
-    return {
-      ok: false,
-      steps,
-      error:
-        `Working tree is not clean. Commit, stash, or discard before syncing:\n` +
-        status.output,
-      switchedBranch: false,
-      startBranch,
-    };
-  }
-
-  // Step 2: switch to main if needed.
   let switchedBranch = false;
+
   if (startBranch !== 'main') {
     const checkout = gitSafe('checkout', 'main');
     if (!checkout.ok) {
@@ -402,23 +419,8 @@ export function syncToMain(): SyncToMainResult {
     steps.push('Already on main');
   }
 
-  // Step 3: pull (fast-forward only — diverged local main is a real problem).
-  const pull = gitSafe('pull', '--ff-only', 'origin', 'main');
-  if (!pull.ok) {
-    return {
-      ok: false,
-      steps,
-      error: `git pull --ff-only origin main failed: ${pull.stderr || pull.output}`,
-      switchedBranch,
-      startBranch,
-    };
-  }
-  if (pull.output.includes('Already up to date')) {
-    steps.push('Pulled main (already up to date)');
-  } else {
-    const summary = pull.output.split('\n').slice(-2)[0]?.trim() || 'updated';
-    steps.push(`Pulled main (${summary})`);
-  }
+  const pullError = pullMainFastForward(steps, startBranch, switchedBranch);
+  if (pullError) return pullError;
 
   return { ok: true, steps, switchedBranch, startBranch };
 }
