@@ -720,6 +720,134 @@ describe('crux fb backfill-sources — --batch path', () => {
     expect(parsed.summary.engineErrors).toBeGreaterThanOrEqual(1);
     expect(parsed.summary.discovered).toBe(0);
   });
+
+  it('counts missing batch responses as engineErrors with reconciliation (QUA-963 PR-B)', async () => {
+    // QUA-963 HIGH: when Anthropic accepts a batch but never returns a
+    // response for a customId, the work is silently dropped pre-fix.
+    // Post-fix, the wrapper walks customIdToFact at the end of the response
+    // loop and emits an engineError + missingResponses++ + a synthetic
+    // FactDiscovery so the report can name the dropped fact.
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_drop', processing_status: 'ended', request_counts: {} });
+
+    // Return ZERO responses despite however many we submitted. Worst case:
+    // every fact is dropped.
+    mockGetBatchResults.mockResolvedValue(new Map());
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: '2',
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    // Both facts must be reconciled as missing.
+    expect(parsed.summary.missingResponses).toBe(2);
+    expect(parsed.summary.engineErrors).toBe(2);
+    // scanned must equal the number of facts we submitted, NOT the number
+    // of responses (the pre-fix bug). Otherwise scanned < requested and the
+    // operator can't reconcile the report against the input.
+    expect(parsed.summary.scanned).toBe(2);
+    expect(parsed.summary.unknownCustomIds).toBe(0);
+    // Per-fact results array should have 2 entries with kind=error.
+    expect(parsed.results.length).toBe(2);
+    for (const r of parsed.results) {
+      expect(r.error).toContain('did not return a response');
+    }
+  });
+
+  it('counts unknown customIds separately from missing responses (QUA-963 PR-B)', async () => {
+    // The inverse case: Anthropic returns a customId we DIDN'T submit.
+    // Provider drift / response corruption — must be counted distinctly so
+    // operators can tell "we lost work" (missingResponses) from "they sent
+    // garbage" (unknownCustomIds).
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_drift', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_drift', processing_status: 'ended', request_counts: {} });
+
+    mockGetBatchResults.mockImplementation(async () => {
+      const results = new Map<string, unknown>();
+      // Return one valid response for the actual fact submitted.
+      for (const callArgs of mockBuildDiscoveryBatchRequest.mock.calls) {
+        const fact = (callArgs[0] as { fact: { id: string } }).fact;
+        results.set(`discover_${fact.id}`, {
+          custom_id: `discover_${fact.id}`,
+          result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+        });
+      }
+      // Plus one customId we never submitted.
+      results.set('discover_GHOST_FACT', {
+        custom_id: 'discover_GHOST_FACT',
+        result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+      });
+      return results;
+    });
+
+    mockParseDiscoveryResponse.mockReturnValue({
+      candidates: [{ url: 'https://x.example.com', confidence: 0.9, summary: 's' }],
+      best: 'https://x.example.com',
+      reason: 'good',
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: '1',
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.unknownCustomIds).toBe(1);
+    expect(parsed.summary.missingResponses).toBe(0);
+    // The legitimate fact still scanned and discovered.
+    expect(parsed.summary.scanned).toBe(1);
+    expect(parsed.summary.discovered).toBe(1);
+  });
+
+  it('mixed: some facts dropped + some unknown customIds (QUA-963 PR-B)', async () => {
+    // Combined edge case: submit 2 facts, get back 1 valid response + 1
+    // unknown customId, leaving 1 actual fact unaccounted for. The
+    // reconciliation pass should catch the dropped fact.
+    mockSubmitBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'in_progress', request_counts: {} });
+    mockPollBatch.mockResolvedValue({ id: 'batch_mix', processing_status: 'ended', request_counts: {} });
+
+    mockGetBatchResults.mockImplementation(async () => {
+      const results = new Map<string, unknown>();
+      // Return a response only for the FIRST submitted fact.
+      const calls = mockBuildDiscoveryBatchRequest.mock.calls;
+      if (calls.length > 0) {
+        const firstFact = (calls[0][0] as { fact: { id: string } }).fact;
+        results.set(`discover_${firstFact.id}`, {
+          custom_id: `discover_${firstFact.id}`,
+          result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+        });
+      }
+      // Plus an unknown customId.
+      results.set('discover_PHANTOM', {
+        custom_id: 'discover_PHANTOM',
+        result: { type: 'succeeded', message: { content: [{ type: 'text', text: 'mock' }] } },
+      });
+      return results;
+    });
+
+    mockParseDiscoveryResponse.mockReturnValue({
+      candidates: [{ url: 'https://x.example.com', confidence: 0.9, summary: 's' }],
+      best: 'https://x.example.com',
+      reason: 'good',
+    });
+
+    const res = await backfill([], {
+      property: 'born-year',
+      limit: '2',
+      batch: true,
+      json: true,
+    });
+    const parsed = JSON.parse(String(res.output));
+    expect(parsed.summary.unknownCustomIds).toBe(1);
+    expect(parsed.summary.missingResponses).toBe(1);
+    expect(parsed.summary.engineErrors).toBe(1);
+    expect(parsed.summary.discovered).toBe(1);
+    // Both facts accounted for in scanned (1 succeeded + 1 reconciled-as-error).
+    expect(parsed.summary.scanned).toBe(2);
+  });
 });
 
 describe('crux fb backfill-sources — option parsing', () => {
