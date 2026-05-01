@@ -200,6 +200,35 @@ describe("runReconcile", () => {
     expect(r.commentedOn).toBeNull();
   });
 
+  it("truncates oversized errorMessage before posting to /complete (regression: route Zod max=5000)", async () => {
+    const startFn = makeOkStart();
+    const completeFn = makeOkComplete();
+    const huge = "X".repeat(10_000);
+    const r = await runReconcile({
+      trigger: "scheduled",
+      trackingTicket: null,
+      startFn,
+      completeFn,
+      fetchPgRowsFn: async () => {
+        // Throw a non-Error with a huge String() form. The runReconcile
+        // catch path captures it via String(e) → exactly the failure mode
+        // that would 400 against a max(5000) Zod schema.
+        throw { toString: () => huge };
+      },
+      loadPoliciesFn: () => [],
+    });
+    // The local errorMessage retains the full string for the in-process
+    // return value, but the network payload is truncated.
+    expect(r.errorMessage).not.toBeNull();
+    const completeArgs = completeFn.mock.calls[0][0];
+    expect(completeArgs.errorMessage).not.toBeNull();
+    // Must fit within the 5000-char schema limit.
+    expect(completeArgs.errorMessage!.length).toBeLessThanOrEqual(5000);
+    // And the truncation marker is visible so operators know to look at the
+    // full error in the agent's local log if needed.
+    expect(completeArgs.errorMessage).toMatch(/truncated; original \d+ chars/);
+  });
+
   it("buckets PG rows by policy correctly across multiple policies", async () => {
     const policies = [
       policy(POLICY_A, [{ name: "ACLU", position: "oppose" }]),

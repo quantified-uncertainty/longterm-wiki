@@ -40,6 +40,23 @@ const MAX_PG_ROW_FETCH = 100_000;
 const MAX_DIFFS_IN_DETAILS = 100;
 const MAX_DIFFS_IN_COMMENT = 10;
 
+/**
+ * Hard cap on `errorMessage` length sent to `/complete`. The wiki-server's
+ * Zod schema rejects strings >5000 chars with a 400. Without this guard, a
+ * scan error whose `String(e)` blew past the limit (rare but possible — a
+ * non-Error thrown value with a huge `toString`) would cause the
+ * `/complete` call to 400, losing the audit row entirely. Keep the cap
+ * slightly under the schema limit to leave room for the `"; complete failed: ..."`
+ * chained-error suffix that gets appended on a complete-fail follow-up.
+ */
+const MAX_ERROR_MESSAGE_CHARS = 4500;
+
+function truncateForAudit(s: string | null): string | null {
+  if (s === null) return null;
+  if (s.length <= MAX_ERROR_MESSAGE_CHARS) return s;
+  return s.slice(0, MAX_ERROR_MESSAGE_CHARS) + ` …[truncated; original ${s.length} chars]`;
+}
+
 export interface RunReconcileOptions {
   /** "scheduled" for cron, "manual" for ad-hoc invocation. */
   trigger: "scheduled" | "manual";
@@ -205,7 +222,7 @@ export async function runReconcile(
       truncated: result.diffs.length > MAX_DIFFS_IN_DETAILS,
     },
     errorCode: errorMessage ? "scan_error" : null,
-    errorMessage,
+    errorMessage: truncateForAudit(errorMessage),
   });
   if (!completeRes.ok) {
     // Don't swallow — the row is the audit trail. We still post a heartbeat
