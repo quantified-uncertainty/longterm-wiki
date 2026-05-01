@@ -17,12 +17,15 @@ CACHE_FILE="/tmp/.patrol-status-open-prs"
 CACHE_TTL=300  # 5 min — open-PR list rarely changes faster
 
 # ─── Patrol liveness ──────────────────────────────────────────────────────────
-# Match either:
-#   - the patrol process itself (`node ... gh pr-patrol run` / `pnpm crux ...`)
+# Match any of:
+#   - the patrol process itself (`node ... gh pr-patrol run` or the pnpm parent)
 #   - the launchd supervisor in its 30s sleep window between patrol invocations
 # Without the supervisor case we'd flap into "patrol dead" reminders every 30s
-# whenever launchd-managed patrol is between cycles. See QUA-987.
-patrol_pid=$(pgrep -f "pnpm crux gh pr-patrol run" 2>/dev/null | head -1)
+# whenever launchd-managed patrol is between cycles. The pattern is loose
+# (`pr-patrol run`) on purpose — it matches whether the launcher is `pnpm crux`,
+# direct `node`, or a future replacement, and `status` in pr-patrol.sh uses
+# the same loose pattern for consistency. See QUA-987.
+patrol_pid=$(pgrep -f "pr-patrol run" 2>/dev/null | head -1)
 if [ -z "$patrol_pid" ]; then
   patrol_pid=$(pgrep -f "pr-patrol-supervisor.sh" 2>/dev/null | head -1)
 fi
@@ -66,16 +69,25 @@ if [ -z "$still_open_abandoned" ] && [ -n "$patrol_pid" ]; then
   exit 0
 fi
 
+# Derive the installer path from this script's own location. When deployed
+# from a wiki clone, this script lives at <wiki>/scripts/inject-patrol-status.sh
+# and the installer lives at <wiki>/scripts/launchd/pr-patrol.sh — siblings
+# under scripts/. Hardcoding the user's machine path was wrong both because
+# the path included the user's home dir AND because it pointed at the
+# now-defunct lw/scripts/launchd/ location instead of lw/main/scripts/launchd/.
+HOOK_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+INSTALLER="$HOOK_DIR/launchd/pr-patrol.sh"
+
 echo "<system-reminder>"
 if [ -z "$patrol_pid" ]; then
   echo "⚠ PR patrol is NOT running."
   if launchctl list 2>/dev/null | grep -q com.qu.pr-patrol; then
     echo "  launchd lists com.qu.pr-patrol but no patrol/supervisor process found —"
     echo "  check ~/.cache/pr-patrol/launchd.err and ~/.cache/pr-patrol/run.log."
-    echo "  Status: /Users/ozziegooen/Documents/GitHub.nosync/lw/scripts/launchd/pr-patrol.sh status"
+    echo "  Status: $INSTALLER status"
   else
     echo "  No launchd agent installed. Either install it (preferred):"
-    echo "    /Users/ozziegooen/Documents/GitHub.nosync/lw/scripts/launchd/pr-patrol.sh install"
+    echo "    $INSTALLER install"
     echo "  …or fall back to a tmux window:"
     echo '    tmux new-window -t 0: -n PATROL -d "while true; do pnpm crux gh pr-patrol run; sleep 30; done 2>&1 | tee -a ~/.cache/pr-patrol/run.log"'
   fi

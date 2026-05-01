@@ -61,15 +61,23 @@ cd "$WIKI_ROOT" || {
 
 # ── Shutdown handling ─────────────────────────────────────────────────────────
 # When launchd sends SIGTERM (e.g. on `launchctl unload` or system shutdown),
-# kill the patrol child and exit cleanly. Without this, the SIGTERM is delivered
-# to bash but the patrol child keeps running until the OS kills it.
+# kill the patrol process group and exit cleanly. Without this, the SIGTERM is
+# delivered to bash but the patrol child (and its node grandchild via pnpm)
+# keep running until the OS escalates to SIGKILL.
+#
+# Job control (`set -m`) puts each `&`-spawned child in its own process group.
+# We then signal the whole group via `kill -- -PGID` so pnpm's node child gets
+# the signal too — pnpm's own signal forwarding is not guaranteed.
+set -m
 
 patrol_pid=""
 shutdown() {
   if [ -n "$patrol_pid" ] && kill -0 "$patrol_pid" 2>/dev/null; then
-    printf '%s ── supervisor received signal — terminating patrol pid=%d ──\n' \
+    printf '%s ── supervisor received signal — terminating patrol pgid=%d ──\n' \
       "$(date '+%Y-%m-%d %H:%M:%S')" "$patrol_pid" >> "$LOG"
-    kill -TERM "$patrol_pid" 2>/dev/null || true
+    # `-pid` = process group; thanks to `set -m` the spawned child is the
+    # group leader, so its PID equals the PGID.
+    kill -TERM -- "-$patrol_pid" 2>/dev/null || kill -TERM "$patrol_pid" 2>/dev/null || true
     wait "$patrol_pid" 2>/dev/null || true
   fi
   exit 0
@@ -82,6 +90,17 @@ printf '%s ── supervisor starting (pid=%d, wiki=%s) ──\n' \
 
 PIDFILE="$HOME/.cache/pr-patrol/daemon.pid"
 
+# Run sleep as a backgrounded child + wait. Plain `sleep N` is an external
+# command — bash defers signal handlers until it returns, so a 30s sleep
+# delays SIGTERM by up to 30s, easily exceeding launchd's default 20s
+# ExitTimeout. `wait` IS interruptible, so this lets the trap fire promptly.
+sleep_interruptible() {
+  sleep "$1" &
+  patrol_pid=$!
+  wait "$patrol_pid" 2>/dev/null || true
+  patrol_pid=""
+}
+
 while true; do
   # Pre-check: if another live patrol owns daemon.pid (e.g. a stray tmux-based
   # patrol from before the launchd migration), skip the launch and try again
@@ -93,7 +112,7 @@ while true; do
     if [ -n "$other" ] && [ "$other" != "$$" ] && kill -0 "$other" 2>/dev/null; then
       printf '%s ── another patrol pid=%s holds daemon.pid, sleeping 30s ──\n' \
         "$(date '+%Y-%m-%d %H:%M:%S')" "$other" >> "$LOG"
-      sleep 30
+      sleep_interruptible 30
       continue
     fi
   fi
@@ -106,5 +125,5 @@ while true; do
   patrol_pid=""
   printf '%s ── pr-patrol exited code=%d, sleeping 30s ──\n' \
     "$(date '+%Y-%m-%d %H:%M:%S')" "$ec" >> "$LOG"
-  sleep 30
+  sleep_interruptible 30
 done
