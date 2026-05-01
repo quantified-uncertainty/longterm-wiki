@@ -8,6 +8,7 @@ import { BenchmarksView } from "./benchmarks-view";
 import { fetchDetailed, withApiFallback, type FetchResult } from "@lib/wiki-server";
 import { DataSourceBanner } from "@components/internal/DataSourceBanner";
 import { resolveEntityName } from "@/lib/resolve-entity-name";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export const metadata: Metadata = {
   title: "AI Benchmarks",
@@ -252,7 +253,7 @@ export default async function BenchmarksPage() {
         ))}
       </div>
 
-      <Suspense fallback={<div>Loading...</div>}>
+      <Suspense fallback={<TableSkeleton rows={10} columns={6} />}>
         <BenchmarksView
           rows={data.rows}
           matrixBenchmarks={data.matrixBenchmarks}

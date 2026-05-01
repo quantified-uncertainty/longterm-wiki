@@ -17,6 +17,10 @@ import { computeOrgCoverage } from "@/components/coverage/coverage-score";
 import { useServerTable } from "@/hooks/use-server-table";
 import { formatCompactCurrency, formatCompactNumber as formatCompactNum } from "@/lib/format-compact";
 import { stripMdxEscapes } from "@/lib/inline-markdown";
+import {
+  TableLoadingRow,
+  DEFAULT_LOADING_LABEL,
+} from "@/components/ui/table-states";
 
 export interface OrgRow {
   id: string;
@@ -388,7 +392,7 @@ export function OrganizationsTable({
   // ── Status text ──
   const statusText = (() => {
     if (serverMode) {
-      if (isLoading) return "Loading...";
+      if (isLoading) return DEFAULT_LOADING_LABEL;
       const fallbackNote = serverFailed && hasFallbackRows ? " (showing cached data)" : "";
       if (typeFilter !== "all" || statFilter !== "all") {
         return `${filteredTotal} of ${displayTotal} organizations (filtered)${fallbackNote}`;
@@ -563,16 +567,7 @@ export function OrganizationsTable({
           </thead>
           <tbody className="divide-y divide-border/50">
             {isInitialLoad ? (
-              <tr>
-                <td
-                  colSpan={activeColCount}
-                  role="status"
-                  aria-live="polite"
-                  className="py-8 text-center text-muted-foreground text-sm"
-                >
-                  Loading organizations...
-                </td>
-              </tr>
+              <TableLoadingRow colSpan={activeColCount} label="Loading organizations…" />
             ) : (
               <>
                 {displayRows.map((row) => (

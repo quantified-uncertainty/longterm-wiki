@@ -51,6 +51,7 @@ import { ProvisionCard } from "./provision-card";
 import { getSourceDisplayName } from "../source-display-names";
 import { LegislationVotes, fetchLegislationVotes } from "@/components/political";
 import { getSourcingHref } from "@/app/sourcing/sourcing-shared";
+import { TableSkeleton } from "@/components/ui/table-states";
 
 export function generateStaticParams() {
   return getPolicySlugs().map((slug) => ({ slug }));
@@ -350,7 +351,7 @@ export default async function LegislationDetailPage({
         </section>
       )}
 
-      <Suspense fallback={<div className="text-sm text-muted-foreground">Loading votes...</div>}>
+      <Suspense fallback={<TableSkeleton rows={5} columns={4} />}>
         <LegislationVotesSection entityId={entity.stableId ?? entity.id} />
       </Suspense>
 

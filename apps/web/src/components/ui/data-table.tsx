@@ -25,6 +25,7 @@ import {
   TableHeader,
   TableRow,
 } from "./table"
+import { TableEmptyRow } from "./table-states"
 
 // New API: accepts table instance directly
 interface DataTableWithTableProps<TData> {
@@ -153,11 +154,7 @@ function DataTableWithTable<TData>({
               )
             })
           ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
+            <TableEmptyRow colSpan={columns.length} className="h-24" />
           )}
         </TableBody>
       </Table>

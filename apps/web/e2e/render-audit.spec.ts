@@ -516,3 +516,64 @@ test.describe("Render audit — filter chip labels have a separator (QUA-1009)",
     });
   }
 });
+
+// ─── Canonical table states (QUA-1008 / QUA-916) ──────────────────────────────
+
+test.describe("Render audit — canonical table states", () => {
+  /**
+   * QUA-916 regression check: directory index pages used to render only the
+   * SSR string "Loading..." for crawlers and accessibility tools. After
+   * QUA-1008 the Suspense fallback is `<TableSkeleton>`, which renders an
+   * aria-busy region with structured rows so the page never bottoms out at a
+   * bare placeholder string.
+   */
+  for (const url of [
+    "/organizations",
+    "/people",
+    "/benchmarks",
+    "/grants",
+    "/ai-models",
+    "/projects",
+    "/approaches",
+    "/events",
+    "/legislation",
+    "/politicians",
+  ]) {
+    test(`${url} SSR has no bare 'Loading...' string`, async ({ request }) => {
+      const response = await request.get(url);
+      expect(response.status(), `${url} returned ${response.status()}`).toBeLessThan(400);
+      const html = await response.text();
+
+      // The validator-banned string. After QUA-1008, server-rendered HTML
+      // must never include bare "Loading..." — either the data resolved
+      // synchronously, or the Suspense fallback is the structured
+      // <TableSkeleton> (which uses the unicode ellipsis only inside an
+      // sr-only span, not a bare <div>Loading...</div>).
+      expect(
+        html,
+        `${url} SSR includes "<div>Loading...</div>" — QUA-916 regression`,
+      ).not.toContain("<div>Loading...</div>");
+    });
+  }
+
+  /**
+   * Empty state: filter to a query that matches nothing. The canonical
+   * `<TableEmptyRow>` is the only allowed empty pattern. /benchmarks renders
+   * a `<div>` empty state; we just verify that *some* form of "no matches"
+   * messaging appears, not bespoke React rendering.
+   */
+  test("/grants empty-after-filter renders consistent empty messaging", async ({ page }) => {
+    await loadPage(page, "/grants");
+    // Type in a search query no grant will match
+    const searchInput = page.locator('input[type="search"], input[placeholder*="earch" i]').first();
+    if ((await searchInput.count()) > 0) {
+      await searchInput.fill("zzzzzzzz_no_match_query_xyz");
+      await page.waitForTimeout(500);
+      const text = await getMainText(page);
+      // Must NOT contain the bespoke variants we replaced
+      expect(text).not.toContain("Loading grants table...");
+      // Must contain the canonical empty messaging variant
+      expect(text.toLowerCase()).toMatch(/no\s+(grants|matches|results)/);
+    }
+  });
+});
