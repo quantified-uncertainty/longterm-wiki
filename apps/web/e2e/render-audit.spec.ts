@@ -81,6 +81,19 @@ const SIDEBAR_ONLY_PAGES = [
 ];
 
 /**
+ * Pages without sidebar or tabs (use children) — migrated to
+ * EntityProfileShell. Loaded into the same body-render check as simple pages.
+ */
+const NO_SIDEBAR_PAGES = [
+  // Resources/[id] — migrated to EntityProfileShell in QUA-490. The page has
+  // two render paths: local YAML resource (literature) and server-fetched
+  // (tabular sources). The IDs below come from the resources-snapshot used at
+  // build time and exercise both shapes via the local path; the server path
+  // is exercised only for resources that have no local entry at all.
+  "/resources/2cc177984ead7389",  // ARIA Safeguarded AI Programme (tabular source, local thin)
+];
+
+/**
  * Pages that MUST render at least one [data-testid="stat-card"]. Used to
  * verify (a) stat cards are present and (b) each card has a non-empty value.
  *
@@ -204,6 +217,15 @@ test.describe("Render audit — simple pages", () => {
 
 test.describe("Render audit — sidebar-only pages", () => {
   for (const url of SIDEBAR_ONLY_PAGES) {
+    test(url, async ({ page }) => {
+      await loadPage(page, url);
+      checkAntiPatterns(await getMainText(page), url);
+    });
+  }
+});
+
+test.describe("Render audit — no-sidebar shell pages", () => {
+  for (const url of NO_SIDEBAR_PAGES) {
     test(url, async ({ page }) => {
       await loadPage(page, url);
       checkAntiPatterns(await getMainText(page), url);
