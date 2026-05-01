@@ -75,6 +75,7 @@ crux/coverage/
 .claude/session.pid
 .claude/last-heartbeat
 .claude/review-done
+.claude/review-phases-done
 .claude/simplify-done
 .claude/worktree-cleanup.log
 .claude/worktrees/

@@ -321,6 +321,10 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
       "expected a dedicated query that scopes facts to checkable subset",
     ).toBeDefined();
     expect(/source\s+IS\s+NOT\s+NULL/i.test(checkableQuery!)).toBe(true);
+    // QUA-928 review: `source IS NOT NULL` alone still lets `source = ''`
+    // through, so without the empty-string guard the metric would silently
+    // count facts with a blank source as checkable. Assert both halves.
+    expect(/source\s*<>\s*''/i.test(checkableQuery!)).toBe(true);
     expect(/measure\s*=\s*ANY/i.test(checkableQuery!)).toBe(true);
   });
 });

@@ -40,6 +40,7 @@ import {
   parseJsonBody,
   validationError,
   invalidJsonError,
+  zodErrorToValidationBody,
   type ValidationErrorBody,
 } from "../shared/utils.js";
 import {
@@ -570,11 +571,10 @@ export function createSyncHandler<
       for (let idx = 0; idx < rawItems.length; idx++) {
         const r = config.syncSchema.safeParse(rawItems[idx]);
         if (!r.success) {
-          rejected.push({
-            idx,
-            code: "zod",
-            message: r.error.message,
-          });
+          // QUA-952 (Phase 0a-ii): emit structured `code` (e.g. enum_violation)
+          // so canary callers can dispatch retry-with-feedback on the same
+          // discriminator the atomic path now uses.
+          rejected.push({ idx, ...zodErrorToValidationBody(r.error) });
         } else {
           accepted.push(r.data as TItem);
           indices.push(idx);
@@ -593,7 +593,9 @@ export function createSyncHandler<
         batchSchema.safeParse(body),
       );
       if (!parsed.success) {
-        return validationError(c, parsed.error.message);
+        // QUA-952 (Phase 0a-ii): emit structured `code` so canary callers
+        // can dispatch retry-with-feedback on `enum_violation` vs generic `zod`.
+        return validationError(c, zodErrorToValidationBody(parsed.error));
       }
       items = parsed.data.items as TItem[];
       originalIndices = items.map((_, i) => i);

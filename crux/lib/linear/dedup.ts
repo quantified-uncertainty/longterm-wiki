@@ -135,32 +135,18 @@ export async function findActiveClaimsByOthers(
   // 24-hour Linear-comment window (DEDUP_WINDOW_MS): PG has heartbeats
   // and can be precise about liveness, Linear comments cannot.
   const pgClaims = await findActiveClaimsByOthersFromPg(linearId, ctx, 30);
-  if (pgClaims !== null && pgClaims.length > 0) return pgClaims;
+  // When PG is reachable (non-null), trust its result — skip the Linear
+  // API round-trip. The paranoia-layer open-PR check still runs regardless.
+  // pgClaims === null means PG was unreachable; fall through to Linear then.
+  if (pgClaims !== null) return pgClaims;
 
-  // On empty PG result, fall through to Linear comments. Rationale:
-  //   - During rollout (first few weeks): existing sessions didn't
-  //     populate linear_id, so PG underreports.
-  //   - Post-rollout: PG should be authoritative and this fallthrough
-  //     pays an unnecessary Linear API round-trip on every clean init.
-  //
-  // TODO (post-rollout, ~2026-05-01): drop this fallthrough and return
-  // [] immediately when PG returns ok-empty. The paranoia-layer open-PR
-  // check still runs regardless.
-  //
-  // Note: we do NOT merge PG results with Linear results when PG returns
-  // non-empty above. That's intentional — PG's 30-min window is the
-  // authoritative "liveness" signal; a matching Linear comment from 6h
-  // ago but no heartbeat means the session crashed and should not block
-  // new work.
-
-  // ── Source 2: Linear start comments (fallback) ─────────────────────────
+  // ── Source 2: Linear start comments (fallback when PG unreachable) ────────
   let comments: LinearComment[];
   try {
     comments = await getComments(linearId, 30);
   } catch {
-    // PG was queried above; if it returned [], we trust that. If it was
-    // unreachable (null) AND Linear is also down, fail-open.
-    return pgClaims ?? [];
+    // PG was unreachable (pgClaims is null) AND Linear is also down — fail-open.
+    return [];
   }
 
   // Walk comments chronologically to track which starts have been superseded

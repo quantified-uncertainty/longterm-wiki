@@ -17,6 +17,14 @@ This skill triages the current branch's changes, builds a verification plan from
 
 **Prerequisite:** Verify the agent checklist exists (`.claude/wip-checklist.md`). If not, run `pnpm crux sys agent-checklist init "PR review" --type=infrastructure` before proceeding.
 
+**Initialize the phase tracker** (QUA-950 — required for the marker write at Step 7):
+
+```bash
+pnpm crux sys review-phase init
+```
+
+This wipes any prior tracker and anchors a new one to the current `HEAD` + diff hash. Every phase below records to `.claude/review-phases-done`; `crux sys review-phase write-marker` refuses to write the review marker until every required phase has either an execution timestamp or an explicit `reason=...` skip.
+
 Run these commands to understand what changed:
 
 ```bash
@@ -67,6 +75,12 @@ Select steps from the menu below. **The default is to INCLUDE a step** — only 
 ```
 
 Mark steps with `✓` (will execute) or `—` (skipping, with reason). For Phase 2a and 2d carve-outs, the reason must reference the diff property that triggered the skip (specific paths in scope, or a verified pre-push gate cache hit), not free-form text. Then execute them in order.
+
+After printing the plan, record Phase 1 completion:
+
+```bash
+pnpm crux sys review-phase record phase-1-triage
+```
 
 ---
 
@@ -138,6 +152,12 @@ If the cache hit is invalid (different SHA, missing file, file corrupted), fall 
 
 When recording the skip, the predicate must reference the cache (e.g. `Phase 2d — N/A: pre-push gate cache hit on $HEAD_SHA`).
 
+After all four 2x checks pass (or are documented as carved-out), record completion:
+
+```bash
+pnpm crux sys review-phase record phase-2-mechanical
+```
+
 ---
 
 ## Phase 3: Diff review (subagent) — ≥30 lines changed
@@ -153,6 +173,12 @@ npx tsx crux/pr-review/detect-narrow-patch.ts
 The detector fires at MEDIUM severity when the diff adds a conditional that *both* gates on a literal column name (`columnName === "..."`, `field.name === "..."`, etc.) *and* probes the value's signature (`.startsWith(`, `.test(`, `.match(`, `.includes(`). Pure formatting transforms (`toFixed`, `Intl.NumberFormat`, `formatCurrency`) are not flagged.
 
 **Action on a hit:** before proceeding with the rest of the review, ask explicitly whether the fix could be content-based (match the value's shape regardless of column) instead of column-name-gated. A content-based fix prevents the recurring per-column patch loop. If you confirm the column-gated version is correct (e.g. the column name genuinely carries meaning beyond the value's shape), document the reasoning in the PR body — otherwise rewrite it before shipping. See `.claude/rules/proactive-github-filing.md` § "N+ related symptoms in a narrow window" for the broader rule.
+
+After running the detector and acting on any hits, record completion:
+
+```bash
+pnpm crux sys review-phase record phase-3a-narrow
+```
 
 ### 3b. Hostile reviewer subagent
 
@@ -198,6 +224,14 @@ Provide it with the full diff (`git diff main...HEAD`) and this prompt:
 
 If the subagent fails (API error, timeout, disconnect), retry once with a chunked diff. If retry also fails, run the same prompt inline in your own context as a fallback — the inline review is weaker than a fresh subagent, but it catches the round-up-to-done loophole where a failed 3b is treated as completed.
 
+After the subagent (or fallback) runs AND any HIGH/CRITICAL fixes are applied, record completion:
+
+```bash
+pnpm crux sys review-phase record phase-3b-hostile
+# OR if the diff is below the 30-line threshold:
+pnpm crux sys review-phase record phase-3b-hostile --reason="N/A: diff under 30 lines"
+```
+
 ---
 
 ## Phase 4: Red-team — ≥100 lines changed, or security/API/data changes
@@ -240,6 +274,14 @@ If the red-team phase finds a bug:
 1. Write a failing test that reproduces it
 2. Fix the bug
 3. Verify the test passes
+
+After threat modeling + execution + any bug fixes, record completion:
+
+```bash
+pnpm crux sys review-phase record phase-4-redteam
+# OR for content-only or trivial diffs that don't meet the trigger:
+pnpm crux sys review-phase record phase-4-redteam --reason="N/A: <100 lines and no security/API/data changes"
+```
 
 ---
 
@@ -319,6 +361,14 @@ If a wiki-server route was modified:
 3. **Config changes**: Verify env vars are documented, defaults are sensible, and no secrets are hardcoded.
 4. **Docker**: Verify the image builds locally if feasible.
 
+After running the sub-categories that apply (5a-5e), record completion. Phase 5 covers all five sub-categories under one record line:
+
+```bash
+pnpm crux sys review-phase record phase-5-category
+# OR if no sub-category triggered:
+pnpm crux sys review-phase record phase-5-category --reason="N/A: no UI/API/CLI/data/infra files in diff"
+```
+
 ---
 
 ## Phase 6: Final verification
@@ -332,6 +382,12 @@ pnpm crux w validate gate --fix
 ```
 
 All three must pass. If no changes were made during review, this phase is redundant with Phase 2 — **skip it**, do not run defensively. Re-running tests on an unchanged tree feels safe but burns context for zero new signal.
+
+Then record completion (this phase is non-skippable — even when no review changes shipped, recording it confirms you considered the question):
+
+```bash
+pnpm crux sys review-phase record phase-6-final
+```
 
 ---
 
@@ -351,12 +407,25 @@ If the review wrote tests, applied simplifications, or fixed bugs, **commit thos
 # Only if there are uncommitted changes from the review:
 git add -A && git commit -m "review: tests, simplifications, and fixes from /agent-review-pr"
 
-# Then write the marker against the final state:
-DIFF_HASH=$(git diff $(git merge-base HEAD origin/main 2>/dev/null || git merge-base HEAD main)...HEAD | shasum -a 256 | cut -c1-12)
-echo "reviewed $(git rev-parse HEAD) $(date -u +%Y-%m-%dT%H:%M:%SZ) ${DIFF_HASH}" >| .claude/review-done
+# Validate phase coverage and write the marker in one step (QUA-950):
+pnpm crux sys review-phase write-marker
+```
+
+`crux sys review-phase write-marker` is the sanctioned path to write `.claude/review-done` for full reviews. It validates the phase tracker first and refuses (exit 2) when any of the 7 required phases is missing — each must have either an execution timestamp or an explicit `reason=...` skip.
+
+The marker file lives at a path the agent can also write directly (the auto-approve hook permits it for backwards-compat with `pr-patrol`'s lightweight-fix flow), so the gate is operationally enforced via this skill, not OS-level. If you bypass `write-marker` you also bypass the phase coverage check — don't do that for a real review. For `pr-patrol` lightweight fixes that don't run the full review, pass `--force --reason="patrol-fix: targeted change, full review unnecessary"` to record the bypass in the tracker.
+
+If you committed new changes after the last `record` call, the tracker's diff hash will no longer match HEAD and `write-marker` will refuse. Re-run any phases that need to repeat (typically just `phase-6-final`), then re-init if the diff has substantively changed:
+
+```bash
+pnpm crux sys review-phase init               # only if the diff itself changed
+pnpm crux sys review-phase record phase-6-final
+pnpm crux sys review-phase write-marker
 ```
 
 This file is gitignored. It persists for the life of the session and is read by `/agent-ship` to populate the `reviewed` field in the session log. Both the commit SHA and diff hash are verified — if new commits are added after review or the diff changes, the marker becomes stale.
+
+> **Why the structural enforcement exists.** Earlier reviews could declare "complete" after running phases 1-3 + 6-7, skipping phases 4-5 silently. The hostile reviewer subagent's findings looked thorough enough to anchor the perceived rigor of the whole review, but each phase actually catches a different class of issue — Phase 4 (red-team) found a path-traversal bug on QUA-936 that Phase 3b's passive review missed. The phase tracker turns "I ran the review" into a verifiable claim. See QUA-950 for the original incident write-up.
 
 ---
 

@@ -129,6 +129,21 @@ Pay special attention to:
 
 Check if a PR exists using `pnpm crux gh pr detect` and update it with: summary, key changes, test plan, issue references. If no PR exists yet, `/agent-push-and-verify` will create one using `crux gh pr create`.
 
+### Step 4a: Surface skipped review phases (QUA-950)
+
+If `/agent-review-pr` ran with any phases skipped via `reason=...`, surface that in the PR body so reviewers can see the coverage trail without trusting the agent's summary alone.
+
+`pnpm` prepends a multi-line prelude (`> longterm-wiki@...\n> DOTENV_CONFIG_QUIET=...`) to its child's stdout, which corrupts the snippet if you capture pnpm's output directly. Use `pnpm --silent` to suppress the prelude (or invoke `node` directly):
+
+```bash
+SKIPPED=$(pnpm --silent crux sys review-phase summary 2>/dev/null | sed '/^$/d')
+if [ -n "$SKIPPED" ]; then
+  printf '\n## Review Phases Skipped\n\n%s\n\nFull tracker: `.claude/review-phases-done` (gitignored, session-local).\n' "$SKIPPED"
+fi
+```
+
+When every phase executed, `summary` outputs nothing and the section is omitted. Append the printed block to the PR body alongside the test plan.
+
 ## Step 4b: Deploy task detection and injection (MANDATORY)
 
 Run the deploy task detector to check if this PR has post-deploy requirements:
@@ -245,6 +260,7 @@ Then clean up session artifacts and discard any unstaged changes (modified hooks
 ```bash
 rm -f .claude/wip-checklist.md .claude/wip-context.md
 git checkout -- .claude/review-done 2>/dev/null || rm -f .claude/review-done
+git checkout -- .claude/review-phases-done 2>/dev/null || rm -f .claude/review-phases-done
 git checkout -- .claude/simplify-done 2>/dev/null || rm -f .claude/simplify-done
 git checkout -- .claude/hooks/ 2>/dev/null || true
 ```

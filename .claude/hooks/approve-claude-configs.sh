@@ -27,7 +27,7 @@
 #   Session state (gitignored or agent-managed):
 #     sessions/, memory/, snapshots/, plans/, reviews/
 #     wip-checklist.md, wip-context.md
-#     review-done, simplify-done
+#     review-done, review-phases-done, simplify-done
 #     active-branch, session.pid, session-log.md
 #     maintain-last-run.txt, issue-creates.json
 #
@@ -52,7 +52,7 @@ if [[ "$FILE_PATH" =~ \.claude/(commands|agents|skills|sessions|memory|snapshots
 fi
 
 # Top-level session-state files inside .claude/ (no subdirectory).
-if [[ "$FILE_PATH" =~ \.claude/(wip-checklist\.md|wip-context\.md|review-done|simplify-done|active-branch|session\.pid|session-log\.md|maintain-last-run\.txt|issue-creates\.json)$ ]]; then
+if [[ "$FILE_PATH" =~ \.claude/(wip-checklist\.md|wip-context\.md|review-done|review-phases-done|simplify-done|active-branch|session\.pid|session-log\.md|maintain-last-run\.txt|issue-creates\.json)$ ]]; then
   echo '{"decision":"approve","reason":"auto-approved: .claude session state"}'
   exit 0
 fi
