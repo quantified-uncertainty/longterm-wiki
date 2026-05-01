@@ -223,4 +223,53 @@ describe('fetchWithPlaywright', () => {
     expect(result).not.toBeNull();
     expect(mockBrowser.newContext).toHaveBeenCalled();
   });
+
+  // ---- Browser launch failure (QUA-229) ----
+
+  it('returns null (does not throw) when chromium.launch fails', async () => {
+    // Reproduces QUA-229: chromium fails to launch (e.g. OOM-killed in worker
+    // pod during startup) and throws "browserType.launch: Target page, context
+    // or browser has been closed". The fetcher must honor its "returns null
+    // on failure" contract so source-fetcher can fall back to Firecrawl/built-in
+    // and the job doesn't fail.
+    await closeBrowser(); // reset singleton so the next call re-launches
+
+    const { chromium } = await import('playwright');
+    vi.mocked(chromium.launch).mockRejectedValueOnce(
+      new Error(
+        'browserType.launch: Target page, context or browser has been closed\n' +
+          'Browser logs:\n\n<launching> /usr/bin/chromium --disable-field-trial-config'
+      )
+    );
+
+    const result = await fetchWithPlaywright('https://example.com/launch-fails');
+
+    expect(result).toBeNull();
+    // No context creation since the browser never launched
+    expect(mockBrowser.newContext).not.toHaveBeenCalled();
+  });
+
+  it('retries the launch on the next call after a launch failure', async () => {
+    // After a failed launch, the singleton resets so subsequent calls retry.
+    // This handles transient OOMs where the next launch may succeed.
+    await closeBrowser();
+
+    const { chromium } = await import('playwright');
+    vi.mocked(chromium.launch)
+      .mockRejectedValueOnce(new Error('browserType.launch: Target page, context or browser has been closed'))
+      .mockResolvedValueOnce(mockBrowser);
+
+    const failed = await fetchWithPlaywright('https://example.com/first-attempt');
+    expect(failed).toBeNull();
+
+    mockPage.goto.mockResolvedValueOnce({ status: () => 200 });
+    mockPage.title.mockResolvedValueOnce('Recovered');
+    mockPage.evaluate.mockResolvedValueOnce(
+      'After the first launch failed, the second attempt succeeds and returns content.'
+    );
+
+    const recovered = await fetchWithPlaywright('https://example.com/second-attempt');
+    expect(recovered).not.toBeNull();
+    expect(recovered!.title).toBe('Recovered');
+  });
 });
