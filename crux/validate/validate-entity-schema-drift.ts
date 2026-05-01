@@ -22,7 +22,7 @@
  *   npx tsx crux/validate/validate-entity-schema-drift.ts --update   # rewrite allowlist
  */
 
-import { readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
+import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'fs';
 import { join, relative } from 'path';
 import { PROJECT_ROOT } from '../lib/content-types.ts';
 import { getColors } from '../lib/output.ts';
@@ -31,8 +31,19 @@ const TABLEBASE_ROUTES_DIR = join(PROJECT_ROOT, 'apps/wiki-server/src/routes/tab
 const ALLOWLIST_PATH = join(PROJECT_ROOT, 'crux/validate/.entity-schema-drift-allowlist.txt');
 const SUPPRESS_COMMENT = 'schema-drift-ok';
 
+// Single-line patterns. The trailing `\s*=` keeps these tight against
+// false-positive matches inside string literals (e.g.
+// `const msg = "Use a const VALID_FOO declaration"` doesn't end with
+// `=` after VALID_FOO so it is not flagged). Multi-line declarations
+// (`const VALID_X\n  = [...]`, formatter-induced) are caught by the
+// MULTILINE_PATTERNS pass below, which joins line N with line N+1.
 const VALID_CONST_RE = /\bconst\s+VALID_[A-Z_]+\s*=/;
 const INLINE_ENUM_RE = /z\.enum\(\[/;
+
+const MULTILINE_PATTERNS: Array<{ pattern: RegExp; kind: Violation['kind'] }> = [
+  { pattern: /\bconst\s+VALID_[A-Z_]+\s*=/, kind: 'VALID_CONST' },
+  { pattern: /z\.enum\(\s*\[/, kind: 'INLINE_ENUM' },
+];
 
 export interface Violation {
   file: string;
@@ -112,12 +123,27 @@ function checkFile(filePath: string, baseDir: string): Violation[] {
   for (let i = 0; i < lines.length; i++) {
     const kind = checkLine(lines[i]);
     if (kind) {
-      violations.push({
-        file: relPath,
-        line: i + 1,
-        text: lines[i].trimStart(),
-        kind,
-      });
+      violations.push({ file: relPath, line: i + 1, text: lines[i].trimStart(), kind });
+      continue;
+    }
+    // Multi-line check: join current line with next to catch declarations split
+    // across lines (e.g. `const VALID_X\n  = [...]`).
+    if (i + 1 >= lines.length) continue;
+    const nextLine = lines[i + 1];
+    const nextTrim = nextLine.trimStart();
+    if (nextTrim.startsWith('//') || nextTrim.startsWith('*') || nextTrim.startsWith('/*')) continue;
+    if (isSuppressed(lines[i]) || isSuppressed(nextLine)) continue;
+    const joined = lines[i].trimEnd() + ' ' + nextTrim;
+    for (const { pattern, kind: mlKind } of MULTILINE_PATTERNS) {
+      if (pattern.test(joined) && !pattern.test(lines[i])) {
+        violations.push({
+          file: relPath,
+          line: i + 1,
+          text: `${lines[i].trimStart()} ${nextTrim}`.trim(),
+          kind: mlKind,
+        });
+        break;
+      }
     }
   }
   return violations;
@@ -158,16 +184,14 @@ export function runCheck(
 
   console.log(`${c.blue}Checking entity-schema drift in ${relative(baseDir, rootDir)}/...${c.reset}\n`);
 
-  let allFiles: string[];
-  try {
-    allFiles = collectTsFiles(rootDir);
-  } catch {
+  if (!existsSync(rootDir)) {
     console.log(`${c.dim}Skipping: ${rootDir} not found${c.reset}`);
     return {
       passed: true, errors: 0, newViolations: [], staleEntries: [],
       allowlistedFileCount: 0, fileCountWithDrift: 0,
     };
   }
+  const allFiles = collectTsFiles(rootDir);
 
   const filesWithDrift = new Map<string, Violation[]>();
   for (const file of allFiles) {
@@ -177,7 +201,13 @@ export function runCheck(
 
   if (opts.updateBaseline) {
     const sorted = [...filesWithDrift.keys()].sort();
-    const header = readFileSync(allowlistPath, 'utf-8').split('\n')
+    let existing: string;
+    try {
+      existing = readFileSync(allowlistPath, 'utf-8');
+    } catch {
+      existing = '';
+    }
+    const header = existing.split('\n')
       .filter(l => l.startsWith('#') || l.trim() === '')
       .join('\n')
       .replace(/\n+$/, '\n');

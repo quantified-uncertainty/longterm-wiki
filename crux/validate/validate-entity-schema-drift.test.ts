@@ -1,5 +1,5 @@
 import { describe, expect, it, beforeEach, afterEach } from "vitest";
-import { mkdtempSync, rmSync, writeFileSync, mkdirSync } from "fs";
+import { mkdtempSync, readFileSync, rmSync, writeFileSync, mkdirSync } from "fs";
 import { tmpdir } from "os";
 import { join } from "path";
 import { checkLine, runCheck, readAllowlist } from "./validate-entity-schema-drift.ts";
@@ -8,6 +8,9 @@ describe("validate-entity-schema-drift checkLine", () => {
   it("flags const VALID_FOO declaration", () => {
     expect(checkLine('const VALID_POSITIONS = ["support", "oppose"] as const;')).toBe("VALID_CONST");
   });
+
+  // Multi-line declarations (`const VALID_X\n  = [...]`) are caught by the
+  // file-level multi-line pass in checkFile, not by checkLine.
 
   it("flags exported VALID_*", () => {
     expect(checkLine('export const VALID_RISK_DOMAINS = [')).toBe("VALID_CONST");
@@ -104,6 +107,29 @@ describe("validate-entity-schema-drift runCheck", () => {
     expect(result.passed).toBe(true);
   });
 
+  it("catches multi-line const VALID_* declarations split across two lines", () => {
+    writeFileSync(
+      join(routesDir, "split.ts"),
+      "const VALID_FOO\n  = [\"a\", \"b\"] as const;\n",
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.passed).toBe(false);
+    expect(result.newViolations).toHaveLength(1);
+    expect(result.newViolations[0].kind).toBe("VALID_CONST");
+  });
+
+  it("catches multi-line z.enum split across two lines", () => {
+    writeFileSync(
+      join(routesDir, "split-enum.ts"),
+      "const s = z.enum(\n  [\"a\", \"b\"]\n);\n",
+    );
+    writeFileSync(allowlistPath, "");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
+    expect(result.passed).toBe(false);
+    expect(result.newViolations[0].kind).toBe("INLINE_ENUM");
+  });
+
   it("respects per-line // schema-drift-ok suppression even outside allowlist", () => {
     writeFileSync(
       join(routesDir, "queries.ts"),
@@ -112,6 +138,56 @@ describe("validate-entity-schema-drift runCheck", () => {
     writeFileSync(allowlistPath, "");
     const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot });
     expect(result.passed).toBe(true);
+  });
+});
+
+describe("validate-entity-schema-drift --update mode", () => {
+  let tmpRoot: string;
+  let routesDir: string;
+  let allowlistPath: string;
+
+  beforeEach(() => {
+    tmpRoot = mkdtempSync(join(tmpdir(), "qua-944-update-"));
+    routesDir = join(tmpRoot, "routes/tablebase");
+    mkdirSync(routesDir, { recursive: true });
+    allowlistPath = join(tmpRoot, "allowlist.txt");
+  });
+
+  afterEach(() => {
+    rmSync(tmpRoot, { recursive: true, force: true });
+  });
+
+  it("rewrites allowlist with current files containing drift, sorted", () => {
+    writeFileSync(join(routesDir, "z-last.ts"), 'const VALID_X = ["a"];\n');
+    writeFileSync(join(routesDir, "a-first.ts"), 'const VALID_Y = ["b"];\n');
+    writeFileSync(allowlistPath, "# header preserved\n\n");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true });
+    expect(result.passed).toBe(true);
+    const written = readFileSync(allowlistPath, "utf-8");
+    expect(written).toContain("# header preserved");
+    const entries = written.split("\n").filter(l => l && !l.startsWith("#"));
+    expect(entries).toEqual([
+      "routes/tablebase/a-first.ts",
+      "routes/tablebase/z-last.ts",
+    ]);
+  });
+
+  it("does not crash when allowlist file does not exist", () => {
+    writeFileSync(join(routesDir, "x.ts"), 'const VALID_X = ["a"];\n');
+    // allowlistPath intentionally not created
+    expect(() => runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true })).not.toThrow();
+    const written = readFileSync(allowlistPath, "utf-8");
+    expect(written).toContain("routes/tablebase/x.ts");
+  });
+
+  it("writes empty list when no drift exists", () => {
+    writeFileSync(join(routesDir, "clean.ts"), "import { z } from 'zod';\n");
+    writeFileSync(allowlistPath, "# header\n");
+    const result = runCheck({ rootDir: routesDir, allowlistPath, baseDir: tmpRoot, updateBaseline: true });
+    expect(result.passed).toBe(true);
+    const written = readFileSync(allowlistPath, "utf-8");
+    const entries = written.split("\n").filter(l => l && !l.startsWith("#"));
+    expect(entries).toEqual([]);
   });
 });
 
