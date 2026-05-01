@@ -166,11 +166,58 @@ const mockListVerdicts = vi.fn(
   },
 );
 
+// Mock both `listVerdicts` (for code paths that call it directly) and
+// `fetchVerdictRecordIds` (the helper our wrapper now calls). vi.mock
+// replaces what consumers see, but other functions inside the same module
+// still close over their own module-level bindings — so we have to mock
+// both, not just the underlying primitive.
+const mockFetchVerdictRecordIds = vi.fn(
+  async (recordType: string, options?: { verdict?: string }) => {
+    if (!fakeListVerdictsResponse.ok) {
+      return {
+        ok: false as const,
+        error: fakeListVerdictsResponse.error ?? 'unavailable',
+        message: fakeListVerdictsResponse.message ?? 'mock failure',
+      };
+    }
+    const ids = new Set<string>();
+    for (const r of fakeVerdictRows) {
+      if (r.fieldName != null) continue; // matches the helper's per-field skip
+      ids.add(r.recordId);
+    }
+    return { ok: true as const, data: ids };
+  },
+);
+
 vi.mock('../lib/wiki-server/sourcing-client.ts', async (importOriginal) => {
   const actual = await importOriginal<typeof import('../lib/wiki-server/sourcing-client.ts')>();
   return {
     ...actual,
     listVerdicts: (...args: unknown[]) => mockListVerdicts(...(args as [Parameters<typeof mockListVerdicts>[0]])),
+    fetchVerdictRecordIds: (...args: unknown[]) =>
+      mockFetchVerdictRecordIds(...(args as [string, { verdict?: string }?])),
+  };
+});
+
+// ── Cached KB ────────────────────────────────────────────────────────
+//
+// `loadGraphFull()` reads ~700 entities and ~2700 facts from disk; cold-load
+// is ~440ms locally and ~5s in CI. The test file calls it indirectly ~28
+// times per `vitest run` (once per test that uses `seedOneSourcedFact`,
+// plus once per command invocation in production code). The cached KB is
+// read-only — YAML writes are intercepted by the `factbase-writer.ts`
+// mock (fakeFiles map), so sharing one graph across all tests is safe.
+// Saves ~12s local / ~140s CI per `vitest run`.
+
+vi.mock('../lib/factbase-loader.ts', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('../lib/factbase-loader.ts')>();
+  let cached: Awaited<ReturnType<typeof actual.loadGraphFull>> | undefined;
+  return {
+    ...actual,
+    loadGraphFull: async () => {
+      if (!cached) cached = await actual.loadGraphFull();
+      return cached;
+    },
   };
 });
 
@@ -180,9 +227,9 @@ import {
   commands,
   fetchUnverifiableFactIds,
   collectUnverifiableFacts,
-  canonicalizeUrl,
-  urlsEquivalent,
 } from './factbase-resource-unverifiables.ts';
+import { urlMatches } from '../lib/sourcing/fuzzy-match.ts';
+import { normalizeUrl } from '@longterm-wiki/url-utils';
 import { loadGraphFull } from '../lib/factbase-loader.ts';
 
 const run = commands.default;
@@ -200,6 +247,7 @@ beforeEach(() => {
   writeEntityDocumentMock.mockClear();
   findEntityFilePathMock.mockClear();
   mockListVerdicts.mockClear();
+  mockFetchVerdictRecordIds.mockClear();
   fakeFiles.clear();
   fakeVerdictRows = [];
   fakeListVerdictsResponse = { ok: true };
@@ -248,30 +296,21 @@ async function seedOneSourcedFact(): Promise<{
 // ── Tests ────────────────────────────────────────────────────────────
 
 describe('fetchUnverifiableFactIds', () => {
-  it('skips per-field verdicts (fieldName != null)', async () => {
+  // Pagination + per-field skipping live in `fetchVerdictRecordIds` itself
+  // (covered by `sourcing-client.test.ts`). The wrapper just forwards the
+  // recordType + verdict filter and converts a typed ApiResult error into
+  // a thrown Error so the command can fail-loud.
+
+  it('forwards recordType=fact and verdict=unverifiable to fetchVerdictRecordIds', async () => {
     fakeVerdictRows = [
       { recordId: 'f_aaa', fieldName: null },
-      { recordId: 'f_bbb', fieldName: 'value' }, // per-field, must be skipped
-      { recordId: 'f_ccc', fieldName: null },
+      { recordId: 'f_bbb', fieldName: 'value' }, // per-field skip handled by helper's own tests
     ];
     const ids = await fetchUnverifiableFactIds();
     expect(ids.has('f_aaa')).toBe(true);
+    // The helper itself enforces the per-field skip (mocked above to mirror).
     expect(ids.has('f_bbb')).toBe(false);
-    expect(ids.has('f_ccc')).toBe(true);
-    expect(ids.size).toBe(2);
-  });
-
-  it('paginates through all rows', async () => {
-    // Seed > one page worth (page size is 200).
-    const rows: FakeVerdictRow[] = [];
-    for (let i = 0; i < 250; i++) {
-      rows.push({ recordId: `f_${i.toString().padStart(4, '0')}`, fieldName: null });
-    }
-    fakeVerdictRows = rows;
-    const ids = await fetchUnverifiableFactIds();
-    expect(ids.size).toBe(250);
-    // Confirm pagination happened (called more than once).
-    expect(mockListVerdicts.mock.calls.length).toBeGreaterThanOrEqual(2);
+    expect(mockFetchVerdictRecordIds).toHaveBeenCalledWith('fact', { verdict: 'unverifiable' });
   });
 
   it('throws on wiki-server failure', async () => {
@@ -903,24 +942,30 @@ describe('crux fb resource-unverifiables — budget gating (real-time)', () => {
   });
 });
 
-describe('canonicalizeUrl + urlsEquivalent', () => {
+describe('URL equivalence (canonical urlMatches helper from @longterm-wiki/url-utils)', () => {
+  // These tests pin the URL-equivalence semantics this command relies on.
+  // The helper itself lives in `crux/lib/sourcing/fuzzy-match.ts` and is
+  // covered by its own tests; we re-assert the cases that matter for
+  // classifyDiscovery so a future change to the canonicalization rules
+  // is caught here too.
+
   it('treats trailing-slash variants as equivalent', () => {
-    expect(urlsEquivalent('https://example.com/path', 'https://example.com/path/')).toBe(true);
+    expect(urlMatches('https://example.com/path', 'https://example.com/path/')).toBe(true);
   });
 
   it('treats fragment-only differences as equivalent', () => {
-    expect(urlsEquivalent('https://example.com/x', 'https://example.com/x#section')).toBe(true);
+    expect(urlMatches('https://example.com/x', 'https://example.com/x#section')).toBe(true);
   });
 
   it('treats tracking-param-only differences as equivalent', () => {
     expect(
-      urlsEquivalent(
+      urlMatches(
         'https://example.com/x',
         'https://example.com/x?utm_source=foo&utm_medium=bar',
       ),
     ).toBe(true);
     expect(
-      urlsEquivalent(
+      urlMatches(
         'https://example.com/x?utm_source=foo&q=keep',
         'https://example.com/x?q=keep',
       ),
@@ -928,37 +973,40 @@ describe('canonicalizeUrl + urlsEquivalent', () => {
   });
 
   it('lower-cases the host', () => {
-    expect(urlsEquivalent('https://Example.COM/x', 'https://example.com/x')).toBe(true);
+    expect(urlMatches('https://Example.COM/x', 'https://example.com/x')).toBe(true);
   });
 
   it('strips default ports (80/443)', () => {
-    expect(urlsEquivalent('https://example.com:443/x', 'https://example.com/x')).toBe(true);
-    expect(urlsEquivalent('http://example.com:80/x', 'http://example.com/x')).toBe(true);
+    expect(urlMatches('https://example.com:443/x', 'https://example.com/x')).toBe(true);
+    expect(urlMatches('http://example.com:80/x', 'http://example.com/x')).toBe(true);
   });
 
   it('preserves functional query parameters', () => {
     // Different `q` values are real differences; not equivalent.
     expect(
-      urlsEquivalent(
+      urlMatches(
         'https://example.com/search?q=alpha',
         'https://example.com/search?q=beta',
       ),
     ).toBe(false);
   });
 
-  it('does NOT collapse http vs https', () => {
-    // http and https can be a real site change; conservative answer is that
-    // they are different URLs.
-    expect(urlsEquivalent('http://example.com/x', 'https://example.com/x')).toBe(false);
+  it('treats http and https as equivalent (canonical project semantics)', () => {
+    // urlMatches uses `stripProtocol: true` — the canonical project answer
+    // is that http and https on the same host+path are the same URL.
+    expect(urlMatches('http://example.com/x', 'https://example.com/x')).toBe(true);
   });
 
-  it('does NOT collapse www vs non-www', () => {
-    expect(urlsEquivalent('https://www.example.com/x', 'https://example.com/x')).toBe(false);
+  it('treats www and non-www as equivalent (canonical project semantics)', () => {
+    // normalizeUrl strips `www.` from the host; this matches what the
+    // resource-lookup map already does.
+    expect(urlMatches('https://www.example.com/x', 'https://example.com/x')).toBe(true);
   });
 
-  it('handles malformed URLs gracefully', () => {
-    expect(canonicalizeUrl('not a url')).toBe('not a url');
-    expect(urlsEquivalent('not a url', 'not a url')).toBe(true);
+  it('handles malformed URLs gracefully (falls back to trimmed lowercase)', () => {
+    // normalizeUrl returns trimmed-lowercased input for unparseable URLs.
+    expect(normalizeUrl('not a url', { stripProtocol: true })).toBe('not a url');
+    expect(urlMatches('not a url', 'not a url')).toBe(true);
   });
 
   it('classifies a trailing-slash-only LLM response as bestEqualsExisting (HIGH-1 fix)', async () => {
@@ -966,7 +1014,7 @@ describe('canonicalizeUrl + urlsEquivalent', () => {
     // response of `https://x.com/path` would be classified as a
     // "betterCandidate" against an existing `https://x.com/path/` and the
     // YAML would be cosmetically overwritten. Post-fix, classifyDiscovery
-    // and isActionable use urlsEquivalent so the engine's response is
+    // and isActionable use urlMatches so the engine's response is
     // recognized as the same URL.
     const target = await seedOneSourcedFact();
     if (!target) return;

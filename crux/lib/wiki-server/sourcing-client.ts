@@ -99,10 +99,11 @@ export async function listVerdicts(
 
 /**
  * Fetch the set of record IDs that already have a row-level verdict for the
- * given recordType. Skips per-field verdicts (fieldName != null) — designed
- * for record types where a row-level verdict means "fully checked" (e.g.,
- * facts). Record types that primarily store field-level verdicts (e.g.,
- * personnel) need a different filter.
+ * given recordType, optionally narrowed by a specific verdict value. Skips
+ * per-field verdicts (fieldName != null) — designed for record types where
+ * a row-level verdict means "fully checked" (e.g., facts). Record types
+ * that primarily store field-level verdicts (e.g., personnel) need a
+ * different filter.
  *
  * Paginates against the server's natural page size, terminating when
  * `offset + page.length >= total` so the client doesn't need to know
@@ -116,10 +117,12 @@ export async function listVerdicts(
  * QUA-851 use case.
  *
  * Used by `crux fb sourcing --where-no-verdict` to skip already-verified
- * facts.
+ * facts, and by `crux fb resource-unverifiables` (QUA-934) to find facts
+ * with `verdict: 'unverifiable'`.
  */
 export async function fetchVerdictRecordIds(
   recordType: string,
+  options?: { verdict?: string },
 ): Promise<ApiResult<Set<string>>> {
   // Request the server's max page size; if the server clamps it lower,
   // we still terminate correctly via `total`.
@@ -128,7 +131,12 @@ export async function fetchVerdictRecordIds(
   let offset = 0;
 
   while (true) {
-    const res = await listVerdicts({ recordType, limit: REQUESTED_LIMIT, offset });
+    const res = await listVerdicts({
+      recordType,
+      ...(options?.verdict ? { verdict: options.verdict } : {}),
+      limit: REQUESTED_LIMIT,
+      offset,
+    });
     if (!res.ok) return res;
 
     for (const v of res.data.verdicts) {

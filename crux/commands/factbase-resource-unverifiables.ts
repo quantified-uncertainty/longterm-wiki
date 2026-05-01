@@ -73,7 +73,8 @@ import {
   type MessageBatch,
 } from '../lib/anthropic-batch.ts';
 import { createLlmClient } from '../lib/llm.ts';
-import { listVerdicts } from '../lib/wiki-server/sourcing-client.ts';
+import { fetchVerdictRecordIds } from '../lib/wiki-server/sourcing-client.ts';
+import { urlMatches } from '../lib/sourcing/fuzzy-match.ts';
 import { sourcingCommand } from './factbase-sourcing.ts';
 
 // ── Constants ────────────────────────────────────────────────────────
@@ -111,10 +112,6 @@ const BATCH_POLL_TIMEOUT_MS = 60 * 60 * 1_000;
 /** Default path for the manual-review file when --manual-review is omitted.
  * Project-root-relative. Pass `-` to print to stdout instead. */
 const DEFAULT_MANUAL_REVIEW_PATH = 'manual-review-qua-934.txt';
-
-/** Page size for paginated listVerdicts. Matches the server's natural page
- * size (the route clamps to 200). */
-const VERDICT_PAGE_SIZE = 200;
 
 // ── Types ────────────────────────────────────────────────────────────
 
@@ -232,89 +229,6 @@ function parseThreshold(raw: unknown): number {
   return n;
 }
 
-/**
- * Tracking query parameters that the LLM (and most browsers) treat as
- * cosmetic noise. We strip them before URL equality so a search-result link
- * with `?utm_source=...` is recognized as the same URL as the canonical one.
- *
- * Conservative list — only well-known marketing/click-attribution params.
- * Don't add functional ones (e.g. `q`, `id`, `page`).
- */
-const TRACKING_QUERY_PARAMS = new Set<string>([
-  'utm_source',
-  'utm_medium',
-  'utm_campaign',
-  'utm_term',
-  'utm_content',
-  'fbclid',
-  'gclid',
-  'mc_cid',
-  'mc_eid',
-  'ref',
-  'ref_src',
-  'ref_url',
-]);
-
-/**
- * Canonicalize a URL for "is this the same URL?" comparison. Drops cosmetic
- * differences the LLM routinely re-emits:
- *   - lowercased host
- *   - default port stripped (80/443)
- *   - trailing slash on the path stripped (except root "/")
- *   - fragment dropped
- *   - well-known tracking query params dropped
- *
- * Falls back to the raw string if URL parsing fails (which can happen for
- * bare paths or malformed inputs); the caller can still compare those by
- * strict equality and won't get worse behavior than before this helper
- * existed.
- *
- * NOTE: deliberately does NOT normalize http→https or www.→non-www, because
- * those CAN reflect a real site change (the canonical URL really did move).
- */
-export function canonicalizeUrl(url: string): string {
-  if (!url) return url;
-  try {
-    const u = new URL(url);
-    u.hostname = u.hostname.toLowerCase();
-    if (
-      (u.protocol === 'http:' && u.port === '80') ||
-      (u.protocol === 'https:' && u.port === '443')
-    ) {
-      u.port = '';
-    }
-    u.hash = '';
-    // Filter tracking params; preserve insertion order of the rest.
-    const keep: Array<[string, string]> = [];
-    for (const [k, v] of u.searchParams) {
-      if (TRACKING_QUERY_PARAMS.has(k.toLowerCase())) continue;
-      keep.push([k, v]);
-    }
-    // searchParams is mutable — reset and re-add to preserve order.
-    const params = new URLSearchParams();
-    for (const [k, v] of keep) params.append(k, v);
-    u.search = params.toString() ? `?${params.toString()}` : '';
-    // Strip a trailing slash unless the path is just "/".
-    if (u.pathname.length > 1 && u.pathname.endsWith('/')) {
-      u.pathname = u.pathname.replace(/\/+$/, '');
-    }
-    return u.toString();
-  } catch {
-    return url;
-  }
-}
-
-/**
- * Compare two URLs for "is this the same URL?" after canonicalization. Used
- * by `classifyDiscovery` and `isActionable` to avoid overwriting a YAML
- * source URL when the engine returns a cosmetically-different but
- * functionally-equivalent URL.
- */
-export function urlsEquivalent(a: string, b: string): boolean {
-  if (a === b) return true;
-  return canonicalizeUrl(a) === canonicalizeUrl(b);
-}
-
 function zeroSummary(): RunSummary {
   return {
     scanned: 0,
@@ -386,43 +300,21 @@ async function runWithConcurrency<T>(
 
 /**
  * Fetch every fact ID with a row-level `unverifiable` verdict from the
- * wiki-server. Skips per-field verdicts (`fieldName != null`) — fact verdicts
- * are row-level by convention. Paginates against `total` so we don't depend
- * on knowing the server's max page size.
+ * wiki-server. Thin wrapper around `fetchVerdictRecordIds` (QUA-851 helper,
+ * extended in QUA-934 to accept a `verdict` filter); the wrapper exists
+ * only to convert the typed `ApiResult` into a thrown error so the command
+ * can fail-loud with a single try/catch site.
  *
  * Exported for unit testing.
- *
- * Concurrency note: rows are sorted by `lastComputedAt desc`, so concurrent
- * verdict writes between page fetches can shift ordering and cause a few
- * skipped rows or duplicates across pages. Set deduplicates duplicates;
- * skipped rows mean a few facts fall out of scope on this run — wasted work
- * (re-scanned next run) but never incorrect output. Same trade-off as
- * `fetchVerdictRecordIds` in QUA-851.
  */
 export async function fetchUnverifiableFactIds(): Promise<Set<string>> {
-  const ids = new Set<string>();
-  let offset = 0;
-  while (true) {
-    const res = await listVerdicts({
-      recordType: 'fact',
-      verdict: 'unverifiable',
-      limit: VERDICT_PAGE_SIZE,
-      offset,
-    });
-    if (!res.ok) {
-      throw new Error(
-        `wiki-server listVerdicts failed: ${res.message} (kind: ${res.error})`,
-      );
-    }
-    for (const v of res.data.verdicts) {
-      if (v.fieldName != null) continue; // skip per-field verdicts
-      ids.add(v.recordId);
-    }
-    const fetchedSoFar = offset + res.data.verdicts.length;
-    if (res.data.verdicts.length === 0 || fetchedSoFar >= res.data.total) break;
-    offset = fetchedSoFar;
+  const res = await fetchVerdictRecordIds('fact', { verdict: 'unverifiable' });
+  if (!res.ok) {
+    throw new Error(
+      `wiki-server listVerdicts failed: ${res.message} (kind: ${res.error})`,
+    );
   }
-  return ids;
+  return res.data;
 }
 
 // ── Fact filtering ───────────────────────────────────────────────────
@@ -571,7 +463,7 @@ function classifyDiscovery(
 ): void {
   if (!result.best) {
     summary.noBest++;
-  } else if (urlsEquivalent(result.best, existingSourceUrl)) {
+  } else if (urlMatches(result.best, existingSourceUrl)) {
     summary.bestEqualsExisting++;
   } else {
     summary.betterCandidatesFound++;
@@ -711,7 +603,7 @@ function isActionable(d: FactDiscovery): boolean {
   // future code path produces a partial result with both `error` and `best`.
   if (d.error) return false;
   if (!d.result?.best) return false;
-  return !urlsEquivalent(d.result.best, d.existingSourceUrl);
+  return !urlMatches(d.result.best, d.existingSourceUrl);
 }
 
 /**
@@ -1351,14 +1243,14 @@ function formatReport(
         lines.push(`    \x1b[33m(no candidates discovered)\x1b[0m`);
       } else {
         for (const c of d.result.candidates) {
-          const isBest = d.result.best ? urlsEquivalent(c.url, d.result.best) : false;
-          const isExisting = urlsEquivalent(c.url, d.existingSourceUrl);
+          const isBest = d.result.best ? urlMatches(c.url, d.result.best) : false;
+          const isExisting = urlMatches(c.url, d.existingSourceUrl);
           const marker = isBest ? '\x1b[32m★\x1b[0m' : isExisting ? '\x1b[2m=\x1b[0m' : ' ';
           lines.push(`    ${marker} [${c.confidence.toFixed(2)}] ${c.url}`);
         }
         if (!d.result.best) {
           lines.push(`    \x1b[33m(no candidate met threshold; reason: ${d.result.reason})\x1b[0m`);
-        } else if (urlsEquivalent(d.result.best, d.existingSourceUrl)) {
+        } else if (urlMatches(d.result.best, d.existingSourceUrl)) {
           lines.push(`    \x1b[33m(engine confirmed existing URL is best — ${d.result.reason})\x1b[0m`);
         } else {
           lines.push(`    \x1b[32m→ replace with ${d.result.best}\x1b[0m`);
