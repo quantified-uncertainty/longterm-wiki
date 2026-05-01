@@ -9,7 +9,7 @@ import { describe, it, expect, beforeAll, beforeEach, afterEach } from 'vitest';
 import { mkdtempSync, writeFileSync, readFileSync, mkdirSync, rmSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
-import { commands, resolveEntityArg } from './factbase.ts';
+import { commands, resolveEntityArg, checkSourceRequirement } from './factbase.ts';
 import { loadGraphFull } from '../lib/factbase-loader.ts';
 import {
   readEntityDocument,
@@ -360,5 +360,93 @@ describe('crux kb add-fact', () => {
     expect(result.output).toContain('--source=URL is required');
     expect(result.output).toContain('verifiable');
   }, 30_000);
+});
+
+// QUA-852: pure-function tests for the source-check helper. Live separately
+// from the integration tests above so we can assert every branch (including
+// the bypass success path) without mutating the on-disk YAML files.
+describe('checkSourceRequirement (QUA-852)', () => {
+  const verifiable = { verifiable: true };
+  const nonVerifiable = { verifiable: false };
+  const urlResolves = { verifiable: false, verifierKind: 'url-resolves' };
+
+  it('rejects when verifiable property is missing --source', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', {});
+    expect(r.error).toContain('--source=URL is required');
+    expect(r.bypassReason).toBeNull();
+  });
+
+  it('accepts when --source is provided', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', {
+      source: 'https://example.com',
+    });
+    expect(r.error).toBeNull();
+    expect(r.bypassReason).toBeNull();
+  });
+
+  it('treats empty-string --source as missing', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', { source: '' });
+    expect(r.error).toContain('--source=URL is required');
+  });
+
+  it('treats whitespace-only --source as missing', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', { source: '   ' });
+    expect(r.error).toContain('--source=URL is required');
+  });
+
+  it('reads --no-source-reason via the kebab key', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', {
+      'no-source-reason': 'estimate',
+    });
+    expect(r.error).toBeNull();
+    expect(r.bypassReason).toBe('estimate');
+  });
+
+  // Regression: the crux argv parser kebab-to-camels every option key, so
+  // `--no-source-reason=foo` arrives as `options.noSourceReason='foo'`.
+  // Reading only `options['no-source-reason']` made the bypass unreachable
+  // via the actual CLI (caught by hostile review on PR for QUA-852).
+  it('reads --no-source-reason via the camelCase key (CLI parser convention)', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', {
+      noSourceReason: 'estimate from secondary source',
+    });
+    expect(r.error).toBeNull();
+    expect(r.bypassReason).toBe('estimate from secondary source');
+  });
+
+  it('rejects when --no-source-reason is empty/whitespace', () => {
+    expect(
+      checkSourceRequirement(verifiable, 'revenue', {
+        'no-source-reason': '',
+      }).error,
+    ).toContain('--source=URL is required');
+    expect(
+      checkSourceRequirement(verifiable, 'revenue', {
+        noSourceReason: '   ',
+      }).error,
+    ).toContain('--source=URL is required');
+  });
+
+  it('exempts properties marked verifiable: false', () => {
+    const r = checkSourceRequirement(nonVerifiable, 'social-media', {});
+    expect(r.error).toBeNull();
+    expect(r.bypassReason).toBeNull();
+  });
+
+  // verifiable: false + verifierKind: url-resolves means the URL-resolves
+  // verifier handles the fact and it DOES need a source URL (per
+  // packages/factbase/src/types.ts:118). Latent today (no property in
+  // properties.yaml uses both flags) but enforced for future-proofing.
+  it('does NOT exempt verifiable: false when verifierKind: url-resolves', () => {
+    const r = checkSourceRequirement(urlResolves, 'wikipedia-url', {});
+    expect(r.error).toContain('--source=URL is required');
+  });
+
+  it('trims the bypass reason', () => {
+    const r = checkSourceRequirement(verifiable, 'revenue', {
+      noSourceReason: '  trim me  ',
+    });
+    expect(r.bypassReason).toBe('trim me');
+  });
 });
 
