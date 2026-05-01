@@ -99,15 +99,31 @@ export class DualWriteHttpError extends Error {
  */
 export const DEFAULT_OPS_TICKET = "QUA-975";
 
+/**
+ * Rejection codes that abort the entire improve-entity run (vs. treating as
+ * partial failure). Both `zod` and `enum_violation` mean a structural input
+ * violation: the YAML side has data the schema cannot accept, so writing the
+ * YAML half of the dual-write would create permanent PG/YAML divergence.
+ * Single source of truth so the dispatcher and the rejection-class detector
+ * cannot drift.
+ */
+const ABORT_REJECTION_CODES = new Set<string>(["zod", "enum_violation"]);
+
+/** The three failure modes that route a comment to the ops ticket. */
+type OpsCommentReason = 'aborted_zod' | 'partial_failure' | 'http_error';
+
+/** Diagnostic context attached to an ops-ticket comment. */
+interface OpsCommentPayload {
+  committedIds?: string[];
+  rejected?: DualWriteOutcome['rejected'];
+  httpMessage?: string;
+}
+
 function buildOpsCommentBody(
-  reason: 'aborted_zod' | 'partial_failure' | 'http_error',
+  reason: OpsCommentReason,
   policyEntityId: string,
   iter: number,
-  payload: {
-    committedIds?: string[];
-    rejected?: DualWriteOutcome['rejected'];
-    httpMessage?: string;
-  },
+  payload: OpsCommentPayload,
 ): string {
   const lines: string[] = [];
   lines.push(`## Stakeholder dual-write — \`${reason}\``);
@@ -135,8 +151,8 @@ function buildOpsCommentBody(
 
 async function tryComment(
   options: DualWriteOptions,
-  reason: 'aborted_zod' | 'partial_failure' | 'http_error',
-  payload: Parameters<typeof buildOpsCommentBody>[3],
+  reason: OpsCommentReason,
+  payload: OpsCommentPayload,
 ): Promise<void> {
   if (!options.opsTicket || !options.postComment) return;
   const body = buildOpsCommentBody(reason, options.policyEntityId, options.iter, payload);
@@ -197,9 +213,9 @@ export async function dualWriteStakeholders(
   const committed = data.committed ?? [];
 
   // Look for any code:"zod" rejection — that's an abort signal per spec §5.
-  const hasZodAbort = rejected.some((r) => r.code === 'zod' || r.code === 'enum_violation');
+  const hasAbortRejection = rejected.some((r) => ABORT_REJECTION_CODES.has(r.code));
 
-  if (hasZodAbort) {
+  if (hasAbortRejection) {
     ctx.markFollowup({
       kind: 'phase2_zod_abort',
       iter,
@@ -218,7 +234,7 @@ export async function dualWriteStakeholders(
       errorCode: 'DualWriteZodAbort',
     });
     throw new DualWriteZodAbort(
-      `policy-stakeholders sync rejected ${rejected.length} item(s) with code='zod' (or enum_violation)`,
+      `policy-stakeholders sync rejected ${rejected.length} item(s) with code in ${[...ABORT_REJECTION_CODES].join("|")}`,
       rejected,
     );
   }

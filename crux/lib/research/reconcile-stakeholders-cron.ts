@@ -99,7 +99,9 @@ export interface RunReconcileOutput {
  */
 async function fetchAllPgRows(): Promise<PgStakeholderRow[]> {
   const all: PgStakeholderRow[] = [];
-  const PAGE_SIZE = 200;
+  // Use the route's `/all` ceiling (raised in policy-stakeholders.ts so the
+  // daily cron pays ~5 RTTs instead of ~130 against the 26k-row corpus).
+  const PAGE_SIZE = 2000;
   let offset = 0;
   for (;;) {
     const res = await getAllPolicyStakeholders({ limit: PAGE_SIZE, offset });

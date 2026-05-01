@@ -132,39 +132,44 @@ const reconciliationRunsApp = new Hono()
     const { domain, windowDays } = c.req.valid("query");
     const db = getDrizzleDb();
 
-    // Latest completed run for this domain — drives "is the cron alive?" + "is
-    // there divergence right now?".
-    const [latest] = await db
-      .select()
-      .from(reconciliationRuns)
-      .where(
-        and(
-          eq(reconciliationRuns.domain, domain),
-          sql`${reconciliationRuns.completedAt} IS NOT NULL`,
-        ),
-      )
-      .orderBy(desc(reconciliationRuns.startedAt))
-      .limit(1);
-
-    // Rolling-window count of non-empty diffs observed across runs. Phase 4
-    // (QUA-960) cutover is gated on >=10. Includes failed runs zeroed-out so
-    // a broken cron doesn't accidentally trip the precondition.
+    // The two queries are independent; run them concurrently. The halt-guard
+    // hits this on every improve-entity run so the wall-clock matters.
     const windowStart = new Date(Date.now() - windowDays * 24 * 60 * 60 * 1000);
-    const [windowRollup] = await db
-      .select({
-        runs: sql<number>`count(*)::int`,
-        nonEmptyDiffsObservedTotal: sql<number>`coalesce(sum(${reconciliationRuns.nonEmptyDiffsObserved}), 0)::int`,
-        runsWithNonEmptyDiff: sql<number>`count(*) FILTER (WHERE ${reconciliationRuns.nonEmptyDiffsObserved} > 0)::int`,
-      })
-      .from(reconciliationRuns)
-      .where(
-        and(
-          eq(reconciliationRuns.domain, domain),
-          gte(reconciliationRuns.startedAt, windowStart),
-          sql`${reconciliationRuns.completedAt} IS NOT NULL`,
-          sql`${reconciliationRuns.errorCode} IS NULL`,
+    const [latestRows, windowRows] = await Promise.all([
+      // Latest completed run for this domain — drives "is the cron alive?" + "is
+      // there divergence right now?".
+      db
+        .select()
+        .from(reconciliationRuns)
+        .where(
+          and(
+            eq(reconciliationRuns.domain, domain),
+            sql`${reconciliationRuns.completedAt} IS NOT NULL`,
+          ),
+        )
+        .orderBy(desc(reconciliationRuns.startedAt))
+        .limit(1),
+      // Rolling-window count of non-empty diffs observed across runs. Phase 4
+      // (QUA-960) cutover is gated on >=10. Excludes failed runs so a broken
+      // cron doesn't accidentally trip the precondition.
+      db
+        .select({
+          runs: sql<number>`count(*)::int`,
+          nonEmptyDiffsObservedTotal: sql<number>`coalesce(sum(${reconciliationRuns.nonEmptyDiffsObserved}), 0)::int`,
+          runsWithNonEmptyDiff: sql<number>`count(*) FILTER (WHERE ${reconciliationRuns.nonEmptyDiffsObserved} > 0)::int`,
+        })
+        .from(reconciliationRuns)
+        .where(
+          and(
+            eq(reconciliationRuns.domain, domain),
+            gte(reconciliationRuns.startedAt, windowStart),
+            sql`${reconciliationRuns.completedAt} IS NOT NULL`,
+            sql`${reconciliationRuns.errorCode} IS NULL`,
+          ),
         ),
-      );
+    ]);
+    const [latest] = latestRows;
+    const [windowRollup] = windowRows;
 
     return c.json({
       domain,

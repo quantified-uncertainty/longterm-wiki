@@ -771,16 +771,17 @@ export function combineHealth(
 
   // Reconciliation is optional for back-compat: callers that don't pass it
   // can't have an unhealthy reconciliation signal so they aren't blocked by
-  // its absence. But if it WAS passed and is unhealthy, factor into the
-  // overall flag.
-  const reconciliationHealthy = reconciliation ? reconciliation.healthy : true;
-
+  // its absence (treat absent as healthy for the AND).
   return {
-    healthy: deploy.healthy && mainCi.healthy && ratchet.healthy && reconciliationHealthy,
+    healthy:
+      deploy.healthy &&
+      mainCi.healthy &&
+      ratchet.healthy &&
+      (reconciliation?.healthy ?? true),
     deploy,
     mainCi,
     ratchet,
-    ...(reconciliation ? { reconciliation } : {}),
+    reconciliation: reconciliation ?? undefined,
     issues,
   };
 }

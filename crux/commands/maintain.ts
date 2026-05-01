@@ -973,7 +973,7 @@ async function reconcileStakeholders(
     }
     // Exit non-zero on real divergence so the workflow's job summary is red
     // and the on-call sees it. A scan-error also exits non-zero.
-    const exitCode = r.errorMessage || r.hadDivergence ? 1 : 0;
+    const exitCode = (r.errorMessage || r.hadDivergence) ? 1 : 0;
     return { output, exitCode };
   } catch (e) {
     output += `${c.red}fatal: ${e instanceof Error ? e.message : String(e)}${c.reset}\n`;

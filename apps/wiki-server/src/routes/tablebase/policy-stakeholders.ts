@@ -18,6 +18,11 @@ import {
 // ---- Constants ----
 
 const MAX_PAGE_SIZE = 200;
+// Larger ceiling for /all because the QUA-958 reconciliation cron pages
+// through the entire table daily — at 200/page that's 130+ round-trips
+// against the 26k-row corpus. Default stays at 50 to keep dashboard
+// queries cheap.
+const ALL_MAX_PAGE_SIZE = 2000;
 
 const ByPolicyQuery = z.object({
   position: z.enum(VALID_POSITIONS).optional(),
@@ -33,7 +38,7 @@ const ByStakeholderQuery = z.object({
 // ---- Route ----
 
 const AllQuery = z.object({
-  limit: clampedLimit(MAX_PAGE_SIZE, 50),
+  limit: clampedLimit(ALL_MAX_PAGE_SIZE, 50),
   offset: z.coerce.number().int().min(0).default(0),
 });
 
@@ -132,17 +137,17 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     // length. Lives in `txStart` (not `preValidate`) because xact-scoped
     // advisory locks must be acquired inside the transaction that holds them.
     txStart: async (tx, _c, items) => {
-      // Sort to prevent multi-policy-batch deadlocks: two transactions
-      // posting items for {A,B} and {B,A} must acquire the per-entity locks
-      // in the same total order or they can wedge each other. The canary
-      // currently posts one policy at a time, but the route accepts
-      // multi-policy batches, so harden defensively.
+      // Acquire one per-entity advisory lock per unique policyEntityId to
+      // serialize concurrent same-entity writes. Sorted so two transactions
+      // posting items for {A,B} and {B,A} acquire locks in the same total
+      // order — otherwise they can wedge each other on multi-policy batches.
+      // Single SQL via unnest so a K-policy batch is one round-trip, not K.
       const entityIds = [...new Set(items.map((i) => i.policyEntityId))].sort();
-      for (const entityId of entityIds) {
-        await tx.execute(
-          sql`SELECT pg_advisory_xact_lock(hashtext(${entityId} || ':policy_stakeholders'))`,
-        );
-      }
+      if (entityIds.length === 0) return;
+      await tx.execute(
+        sql`SELECT pg_advisory_xact_lock(hashtext(eid || ':policy_stakeholders'))
+            FROM unnest(${entityIds}::text[]) AS t(eid) ORDER BY eid`,
+      );
     },
     toThing: (item) => ({
       id: item.id,

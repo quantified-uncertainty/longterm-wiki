@@ -1011,10 +1011,15 @@ async function runIteration(
   // Skipped under `noWrite` (dry-run) and for non-policy entity types.
   if (!noWrite && entity.type === "policy" && apply.applied.length > 0) {
     const policyEntityId = entity.stableId ?? entity.id;
+    // entity.type === "policy" guarantees the applier ran applyVerdictsToPolicy,
+    // so apply.entity is a PolicyEntity. The outer ApplyResult<EntityWithType>
+    // shape doesn't track that; declare a narrowed alias instead of an
+    // `as unknown as` double-cast (which silently swallows future shape drift).
+    const policyApply = apply as ApplyResult<PolicyEntity>;
     await dualWriteStakeholders({
       ctx,
       policyEntityId,
-      applyResult: apply as unknown as Parameters<typeof dualWriteStakeholders>[0]["applyResult"],
+      applyResult: policyApply,
       iter,
       // Default ticket (QUA-975, sibling of QUA-943) is in
       // dual-write-stakeholders.ts so the literal stays out of branching
