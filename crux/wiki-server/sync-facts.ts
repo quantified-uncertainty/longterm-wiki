@@ -183,6 +183,18 @@ export async function loadAndTransformFacts(
 }
 
 /**
+ * Audit reason logged on every bulk sync that bypasses server-side sourcing
+ * enforcement. QUA-852 / QUA-729 Phase C flipped `SOURCE_CHECK_REQUIRED.fact`
+ * to true, but ~33% of facts are non-checkable by design (verifiable: false
+ * properties or no source URL) and carry no verdict to attach inline. The
+ * bulk YAML re-sync therefore uses the audit-logged escape hatch; ad-hoc
+ * /sync callers without this bypass are still rejected unless they include
+ * a `sourcing` block.
+ */
+const BULK_SYNC_SKIP_REASON =
+  "bulk YAML re-sync (sync-facts.ts); ~33% of facts are non-checkable by design (verifiable=false properties or no source URL) and carry no verdict to attach inline";
+
+/**
  * Sync facts to the wiki-server in batches.
  * Exported for testing.
  */
@@ -194,8 +206,11 @@ export async function syncFactsBatch(
     _sleep?: (ms: number) => Promise<void>;
   } = {},
 ): Promise<{ upserted: number; errors: number }> {
+  const url =
+    `${serverUrl}/api/facts/sync` +
+    `?forceSkipSourcing=true&reason=${encodeURIComponent(BULK_SYNC_SKIP_REASON)}`;
   const result = await batchSync(
-    `${serverUrl}/api/facts/sync`,
+    url,
     items,
     batchSize,
     {

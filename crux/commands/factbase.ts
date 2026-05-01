@@ -999,6 +999,54 @@ function coerceValue(raw: string, dataType: string, graph: Graph): { ok: true; v
 
 // ── add-fact command ────────────────────────────────────────────────────
 
+/**
+ * QUA-852 / QUA-729 Phase C: gate `crux fb add-fact` so new facts on
+ * verifiable properties always carry `--source=URL`. Pure helper so it can
+ * be unit-tested without invoking the file-writing flow.
+ *
+ * Properties flagged `verifiable: false` (e.g. social-media handles,
+ * self-referential URLs) are exempt by design, *unless* they declare
+ * `verifierKind: 'url-resolves'` (per `packages/factbase/src/types.ts:118`
+ * the url-resolves verifier explicitly handles those facts and they DO
+ * need a source URL).
+ *
+ * Escape hatch: `--no-source-reason="<reason>"` lets curators add unsourced
+ * facts; the runner emits a stderr warning. Both kebab (`'no-source-reason'`)
+ * and camelCase (`noSourceReason`) keys are accepted because the crux argv
+ * parser (`crux.mjs`) kebab-to-camels every key — direct callers (tests,
+ * helpers) often pass the kebab form. An empty/whitespace reason is treated
+ * as missing so the bypass actually requires a real explanation.
+ *
+ * Exported for unit tests.
+ */
+export function checkSourceRequirement(
+  property: { verifiable?: boolean; verifierKind?: string },
+  propertyArg: string,
+  options: Record<string, unknown>,
+): { error: string | null; bypassReason: string | null } {
+  const hasSource =
+    options.source != null && String(options.source).trim() !== '';
+  const noSourceReasonRaw =
+    options['no-source-reason'] ?? options.noSourceReason;
+  const bypassReason =
+    noSourceReasonRaw != null && String(noSourceReasonRaw).trim() !== ''
+      ? String(noSourceReasonRaw).trim()
+      : null;
+  const requiresSource =
+    property.verifiable !== false || property.verifierKind === 'url-resolves';
+
+  if (!requiresSource || hasSource) {
+    return { error: null, bypassReason: null };
+  }
+  if (bypassReason) {
+    return { error: null, bypassReason };
+  }
+  return {
+    error: `--source=URL is required for property "${propertyArg}" (verifiable). Either:\n  • Provide --source=https://...\n  • Use --no-source-reason="<why this fact has no source>" (logs a stderr warning, no persistent audit trail — keep the reason short and meaningful)\n  • Mark the property \`verifiable: false\` in packages/factbase/data/properties.yaml if it should never carry a source URL`,
+    bypassReason: null,
+  };
+}
+
 async function addFactCommand(
   args: string[],
   options: KBCommandOptions,
@@ -1008,16 +1056,21 @@ async function addFactCommand(
   if (positionalArgs.length < 3) {
     return {
       exitCode: 1,
-      output: `Usage: crux fb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD] [--force]
+      output: `Usage: crux fb add-fact <entity> <property> <value> [--asOf=YYYY-MM] [--source=URL] [--notes=TEXT] [--currency=USD] [--force] [--no-source-reason=TEXT]
 
   Add a fact to a KB entity's YAML file.
   Detects duplicates by (property, value, asOf) and errors if a match exists.
   Use --force to skip the duplicate check.
 
+  --source=URL is required for facts on verifiable properties (QUA-852 / QUA-729 Phase C).
+  Use --no-source-reason="<reason>" as an escape hatch (logs a stderr warning, no
+  persistent audit trail). Properties marked \`verifiable: false\` (e.g. social-media
+  handles) are exempt unless they declare \`verifierKind: url-resolves\`.
+
 Examples:
   crux fb add-fact anthropic revenue 5e9 --asOf=2025-06 --source=https://example.com
-  crux fb add-fact dario-amodei employed-by mK9pX3rQ7n
-  crux fb add-fact openai headcount 3700 --asOf=2025-01 --notes="Approximate count"`,
+  crux fb add-fact dario-amodei employed-by mK9pX3rQ7n --source=https://anthropic.com/team
+  crux fb add-fact openai headcount 3700 --asOf=2025-01 --source=https://openai.com/about --notes="Approximate count"`,
     };
   }
 
@@ -1077,6 +1130,19 @@ Examples:
         output: `Duplicate fact: property "${propertyArg}" with value ${JSON.stringify(coerced.value)} and asOf "${asOf ?? '(none)'}" already exists (fact ID: ${duplicate.id}).\nUse --force to add anyway.`,
       };
     }
+  }
+
+  // QUA-852 / QUA-729 Phase C: require --source for verifiable properties so
+  // new facts carry a sourcing URL. See `checkSourceRequirement` for the
+  // full reasoning + escape-hatch semantics.
+  const sourcingGate = checkSourceRequirement(property, propertyArg, options);
+  if (sourcingGate.error) {
+    return { exitCode: 1, output: sourcingGate.error };
+  }
+  if (sourcingGate.bypassReason) {
+    console.warn(
+      `[add-fact] No --source provided; bypassing source requirement with reason: ${sourcingGate.bypassReason}`,
+    );
   }
 
   const factInput: RawFactInput = {
