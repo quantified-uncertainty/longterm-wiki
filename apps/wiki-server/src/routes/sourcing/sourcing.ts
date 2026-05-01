@@ -158,11 +158,15 @@ async function countCheckableFacts(
   db: ReturnType<typeof getDrizzleDb>,
 ): Promise<number> {
   const nonVerifiable = [...getNonVerifiablePropertyIds()];
+  // `sql.param(arr)` binds the JS array as a single `text[]` parameter.
+  // Plain `${nonVerifiable}` would expand into a row constructor
+  // `($1, $2, ..., $N)` which Postgres can't cast to `text[]` and which
+  // 500'd both /coverage and /coverage-matrix on prod (QUA-985).
   const rows = (await db.execute(sql`
     SELECT count(DISTINCT fact_id)::int AS checkable
     FROM facts
     WHERE source IS NOT NULL AND source <> ''
-      AND (measure IS NULL OR NOT (measure = ANY(${nonVerifiable}::text[])))
+      AND (measure IS NULL OR NOT (measure = ANY(${sql.param(nonVerifiable)}::text[])))
   `)) as Array<{ checkable: number | null }>;
   return rows[0]?.checkable ?? 0;
 }

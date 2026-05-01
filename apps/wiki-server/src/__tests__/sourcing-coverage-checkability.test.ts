@@ -20,6 +20,7 @@ import { Hono } from "hono";
 import { type SqlDispatcher, mockDbModule } from "./test-utils";
 
 let capturedQueries: string[] = [];
+let capturedParams: unknown[][] = [];
 
 let tableTotals: Array<{ table_name?: string; record_type?: string; total: number }> = [];
 let verifiedCounts: Array<{ record_type: string; verified: number }> = [];
@@ -27,8 +28,9 @@ let checkedCounts: Array<{ record_type: string; checked_records: number }> = [];
 let verdictRows: Array<{ record_type: string; verdict: string; cnt: number }> = [];
 let checkableFacts = 0;
 
-const dispatch: SqlDispatcher = (query, _params) => {
+const dispatch: SqlDispatcher = (query, params) => {
   capturedQueries.push(query);
+  capturedParams.push(params);
 
   // Order matters: the LIVE_RECORDS_CTE for the matrix queries also contains
   // `AS record_type` inside its CTE body, so the union-totals patterns must
@@ -117,6 +119,7 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
 
   beforeEach(() => {
     capturedQueries = [];
+    capturedParams = [];
     tableTotals = [];
     verifiedCounts = [];
     checkedCounts = [];
@@ -327,6 +330,46 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     expect(/source\s*<>\s*''/i.test(checkableQuery!)).toBe(true);
     expect(/measure\s*=\s*ANY/i.test(checkableQuery!)).toBe(true);
   });
+
+  it("binds the non-verifiable property list as a single text[] param (QUA-985)", async () => {
+    // Regression for QUA-985 prod 500.
+    //
+    // Drizzle's `sql` template tag spreads JS arrays as a row constructor
+    // `($1, $2, ..., $N)` rather than binding them as a postgres array
+    // parameter. With the broken binding the ANY clause renders as
+    // `ANY(($1, ..., $12)::text[])` — Postgres rejects the cast because a
+    // record is not an array, returning HTTP 500 to /coverage and
+    // /coverage-matrix on prod once properties.yaml grew to 12+ entries.
+    //
+    // The fix wraps the array in `sql.param(arr)` so it binds as a single
+    // `text[]` parameter, rendering as `ANY($1::text[])`.
+    tableTotals = [{ table_name: "fact", total: 100 }];
+    verifiedCounts = [];
+
+    const res = await app.request("/api/sourcing/coverage");
+    expect(res.status).toBe(200);
+
+    const idx = capturedQueries.findIndex(
+      (q) => /FROM\s+facts/i.test(q) && /AS\s+checkable/i.test(q),
+    );
+    expect(idx, "expected the checkable-facts query to be issued").toBeGreaterThanOrEqual(0);
+
+    const checkableQuery = capturedQueries[idx];
+    const checkableParams = capturedParams[idx];
+
+    // Must NOT spread the array as a row constructor (the QUA-985 prod bug).
+    expect(checkableQuery).not.toMatch(/ANY\(\s*\(\s*\$\d+\s*,/);
+    // Must bind as a single ::text[] parameter.
+    expect(checkableQuery).toMatch(/ANY\(\s*\$\d+::text\[\]\s*\)/);
+
+    // The params slot for the array binding must contain a single JS array
+    // (postgres-js then serialises it as `text[]`), not the spread elements.
+    const arrayParams = checkableParams.filter((p) => Array.isArray(p));
+    expect(arrayParams).toHaveLength(1);
+    // Sanity: properties.yaml has at least one verifiable:false entry, so the
+    // bound array isn't empty in prod-shaped runs.
+    expect((arrayParams[0] as unknown[]).length).toBeGreaterThan(0);
+  });
 });
 
 describe("QUA-928: GET /api/sourcing/coverage-matrix — checkability split", () => {
@@ -334,6 +377,7 @@ describe("QUA-928: GET /api/sourcing/coverage-matrix — checkability split", ()
 
   beforeEach(() => {
     capturedQueries = [];
+    capturedParams = [];
     tableTotals = [];
     verifiedCounts = [];
     checkedCounts = [];
