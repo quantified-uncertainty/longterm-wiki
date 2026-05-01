@@ -213,6 +213,15 @@ export function detectAllPrIssuesFromNodes(
         }
         return false;
       }
+      // Skip release PRs (main → production). Patrol's worktree of `main` would
+      // collide with coord's own checkout, and release PRs belong to the
+      // releases role, not slot-orchestration (CLAUDE.md split). QUA-971.
+      if (pr.baseRefName === 'production') {
+        if (config.verbose) {
+          log(`  ${cl.dim}Skipping PR #${pr.number} — release PR (base=production)${cl.reset}`);
+        }
+        return false;
+      }
       return true;
     })
     .map((pr) => {

@@ -9,6 +9,7 @@ function makePrNode(overrides: Partial<GqlPrNode> = {}): GqlPrNode {
     number: 1,
     title: 'Test PR',
     headRefName: 'claude/test',
+    baseRefName: 'main',
     headRefOid: 'abc123def456',
     mergeable: 'MERGEABLE',
     isDraft: false,
@@ -377,6 +378,22 @@ describe('detectAllPrIssuesFromNodes — bot/release PR skipping', () => {
     });
     const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
     expect(result.find((r) => r.number === 22)).toBeUndefined();
+  });
+
+  // QUA-971: release PRs use head=main, base=production. Patrol's worktree of
+  // main collides with coord's checkout, and release PRs belong to the
+  // releases role anyway. Skip by baseRefName.
+  it('skips release PRs (main → production) by baseRefName', () => {
+    const pr = makePrNode({
+      number: 23,
+      headRefName: 'main',
+      baseRefName: 'production',
+      title: 'release: 2026-05-01',
+      author: { login: 'someuser' },
+      body: 'Release rollup',
+    });
+    const result = detectAllPrIssuesFromNodes([pr], defaultConfig);
+    expect(result.find((r) => r.number === 23)).toBeUndefined();
   });
 
   it('does NOT skip normal human-authored PRs', () => {
