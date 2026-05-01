@@ -243,8 +243,8 @@ describe("strict-fail counter (QUA-953)", () => {
   it("counts hardFailCount when even GenericEntityPassthroughSchema fails", async () => {
     mockReadFile(
       buildMockDatabase([
-        // Missing required base fields (id, entityType, title) → strict + generic both fail
-        { description: "no id, no type, no title" },
+        // Missing required BaseEntity fields (id, title) → strict + generic both fail.
+        { description: "no id, no title" },
       ]),
     );
 
@@ -260,5 +260,62 @@ describe("strict-fail counter (QUA-953)", () => {
 
     expect(stats.fallthroughCount).toBe(1);
     expect(stats.hardFailCount).toBe(1);
+    // The fall-through is bucketed under "<unknown>" because entityType is missing,
+    // and the recorded message should reflect a base-field validation failure
+    // (id/title required) rather than something accidental.
+    const samples = stats.byType["<unknown>"]?.samples ?? [];
+    expect(samples.length).toBe(1);
+    expect(samples[0]?.id).toBe("<unknown>");
+    expect(samples[0]?.message.length).toBeGreaterThan(0);
+  });
+
+  it("getStrictFailStats returns a deep copy — mutating sample fields does not affect internal state", async () => {
+    mockReadFile(
+      buildMockDatabase([
+        {
+          id: "weird-1",
+          entityType: "weirdType",
+          title: "Weird",
+          description: "x",
+        },
+      ]),
+    );
+
+    const {
+      getTypedEntities,
+      getStrictFailStats,
+      _resetStrictFailStatsForTests,
+    } = await import("../tablebase");
+    _resetStrictFailStatsForTests();
+
+    getTypedEntities();
+    const a = getStrictFailStats();
+    if (a.byType.weirdType?.samples[0]) {
+      a.byType.weirdType.samples[0].id = "MUTATED";
+      a.byType.weirdType.samples[0].fieldPath = "MUTATED";
+      a.byType.weirdType.samples[0].message = "MUTATED";
+    }
+
+    const b = getStrictFailStats();
+    expect(b.byType.weirdType?.samples[0]?.id).toBe("weird-1");
+    expect(b.byType.weirdType?.samples[0]?.fieldPath).not.toBe("MUTATED");
+    expect(b.byType.weirdType?.samples[0]?.message).not.toBe("MUTATED");
+  });
+
+  it("_resetStrictFailStatsForTests throws outside test environments", async () => {
+    const { _resetStrictFailStatsForTests } = await import("../tablebase");
+    const env = process.env as Record<string, string | undefined>;
+    const originalNodeEnv = env.NODE_ENV;
+    const originalVitest = env.VITEST;
+    try {
+      env.NODE_ENV = "production";
+      delete env.VITEST;
+      expect(() => _resetStrictFailStatsForTests()).toThrow(
+        /only callable in test environments/,
+      );
+    } finally {
+      env.NODE_ENV = originalNodeEnv;
+      if (originalVitest !== undefined) env.VITEST = originalVitest;
+    }
   });
 });

@@ -497,10 +497,20 @@ let _typedEntities: AnyEntity[] | null = null;
 // requires this counter to read zero for 7 consecutive prod build cycles
 // before GenericEntityPassthroughSchema can be deleted.
 //
-// Stats are populated on the first call to getTypedEntities() in a process
-// and are stable thereafter (the function is memoized via _typedEntities).
+// Scope:
+// - Per-process and per-build-cycle. Stats are populated on the first call
+//   to getTypedEntities() in a process and are stable thereafter (the
+//   function is memoized via _typedEntities). Each Next.js build → fresh
+//   process → fresh stats, which is exactly the cadence Phase 6's
+//   "7 consecutive prod build cycles" check needs.
+// - Not aggregated across workers. A multi-worker deploy will give each
+//   worker its own snapshot; readers should expect identical values across
+//   workers because the input (database.json) is identical.
 // ============================================================================
 
+// Cap per-type sample arrays so a pathological "100 entities of bad type X"
+// build doesn't bloat the JSON response. 5 is enough to spot the failure
+// pattern (failing field path + message) without flooding the endpoint.
 const SAMPLE_LIMIT = 5;
 
 interface StrictFailSample {
@@ -539,21 +549,28 @@ let _strictFailStats: StrictFailStats = {
 };
 
 /** Get a snapshot of the strict-fail counter. Returns an empty stats object if
- * getTypedEntities() has not been called yet in this process. */
+ * getTypedEntities() has not been called yet in this process. The returned
+ * object is a deep copy — mutating it does not affect internal state. */
 export function getStrictFailStats(): StrictFailStats {
   return {
     ..._strictFailStats,
     byType: Object.fromEntries(
       Object.entries(_strictFailStats.byType).map(([k, v]) => [
         k,
-        { count: v.count, samples: [...v.samples] },
+        { count: v.count, samples: v.samples.map((s) => ({ ...s })) },
       ]),
     ),
   };
 }
 
-/** Reset the counter — for tests only. */
+/** Reset the counter — for tests only. Throws in non-test environments to
+ * prevent accidental cache invalidation in production bundles. */
 export function _resetStrictFailStatsForTests(): void {
+  if (process.env.NODE_ENV !== "test" && process.env.VITEST !== "true") {
+    throw new Error(
+      "_resetStrictFailStatsForTests() is only callable in test environments",
+    );
+  }
   _strictFailStats = {
     populated: false,
     fallthroughCount: 0,
@@ -626,8 +643,8 @@ export function getTypedEntities(): AnyEntity[] {
       // so Phase 6 of QUA-943 can verify zero strict-fails before deleting
       // GenericEntityPassthroughSchema.
       stats.fallthroughCount += 1;
-      const bucket =
-        stats.byType[type] ?? (stats.byType[type] = { count: 0, samples: [] });
+      stats.byType[type] ??= { count: 0, samples: [] };
+      const bucket = stats.byType[type]!;
       bucket.count += 1;
       if (bucket.samples.length < SAMPLE_LIMIT) {
         const firstIssue = result.error.issues[0];

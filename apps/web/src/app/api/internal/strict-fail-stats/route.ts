@@ -12,11 +12,26 @@ import { getStrictFailStats, getTypedEntities } from "@/data/tablebase";
  * The counter is process-local and is populated on the first call to
  * getTypedEntities(). This handler triggers that population if it has
  * not happened yet, so the endpoint is meaningful even on a cold process.
+ *
+ * The data exposed (entity IDs, schema field paths, Zod messages) is
+ * derived from publicly-available content in database.json and the
+ * open-source schema, so this endpoint matches the public-by-default
+ * convention of other Next.js API routes in this app.
  */
 export const dynamic = "force-dynamic";
 
 export function GET() {
-  // Force population if this process hasn't loaded entities yet.
-  getTypedEntities();
-  return NextResponse.json(getStrictFailStats());
+  try {
+    // Force population if this process hasn't loaded entities yet.
+    getTypedEntities();
+    return NextResponse.json(getStrictFailStats());
+  } catch (err) {
+    return NextResponse.json(
+      {
+        error: "Failed to load entities",
+        message: err instanceof Error ? err.message : String(err),
+      },
+      { status: 503 },
+    );
+  }
 }
