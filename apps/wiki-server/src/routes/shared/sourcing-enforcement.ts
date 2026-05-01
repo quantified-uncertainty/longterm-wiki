@@ -65,6 +65,28 @@ export function resolveSourcingRequirement(
 }
 
 /**
+ * Emit the audit-log warning for the `?forceSkipSourcing=true` escape hatch.
+ *
+ * Exported so the best-effort partition path (QUA-955) can log the bypass
+ * with the same shape the atomic path already does — without duplicating
+ * the message string and without forcing the partition path to call the
+ * full `enforceSourcing()` (which would also iterate the items).
+ *
+ * Returns silently if `req.kind !== "skipped"`.
+ */
+export function logSourcingSkipped(
+  tableName: string,
+  itemCount: number,
+  req: SourcingRequirement,
+): void {
+  if (req.kind !== "skipped") return;
+  logger.warn(
+    { table: tableName, itemCount, reason: req.reason },
+    `Source-check enforcement skipped via forceSkipSourcing`,
+  );
+}
+
+/**
  * Enforce sourcing requirements for a sync endpoint.
  *
  * Checks both the server-side config (SOURCE_CHECK_REQUIRED) and the legacy
@@ -86,10 +108,7 @@ export function enforceSourcing(
   if (req.kind === "not_required") return null;
 
   if (req.kind === "skipped") {
-    logger.warn(
-      { table: tableName, itemCount: items.length, reason: req.reason },
-      `Source-check enforcement skipped via forceSkipSourcing`,
-    );
+    logSourcingSkipped(tableName, items.length, req);
     return null;
   }
 

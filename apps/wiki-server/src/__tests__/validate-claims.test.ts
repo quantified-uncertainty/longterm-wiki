@@ -41,7 +41,7 @@ const dispatch: SqlDispatcher = (query, params) => {
 vi.mock("../db.js", () => mockDbModule(dispatch));
 
 // Import AFTER mock setup
-const { validateClaimRefs, linkClaimsToRecords } = await import(
+const { validateClaimRefs, classifyClaims, linkClaimsToRecords } = await import(
   "../routes/shared/validate-claims.js"
 );
 const { getDb } = await import("../db.js");
@@ -133,6 +133,72 @@ describe("validateClaimRefs", () => {
     // The SQL must include ::bigint[] cast to match bigserial column type.
     // Without this cast, postgres.js infers wrong type and returns 0 rows.
     expect(selectQuery!.query).toContain("::bigint[]");
+  });
+});
+
+describe("classifyClaims (QUA-955)", () => {
+  beforeEach(() => {
+    resetStores();
+  });
+
+  it("returns empty buckets for an empty claim list", async () => {
+    const db = getDb();
+    const result = await classifyClaims(db, []);
+    expect(result).toEqual({ missing: [], nonVerified: [] });
+  });
+
+  it("returns empty buckets when every claim is verified", async () => {
+    claimStore = [
+      { id: 1, status: "verified", entity_id: null },
+      { id: 2, status: "verified", entity_id: null },
+    ];
+    const db = getDb();
+    const result = await classifyClaims(db, [1, 2]);
+    expect(result).toEqual({ missing: [], nonVerified: [] });
+  });
+
+  it("identifies missing claims", async () => {
+    claimStore = [{ id: 1, status: "verified", entity_id: null }];
+    const db = getDb();
+    const result = await classifyClaims(db, [1, 99, 100]);
+    expect(result.missing).toEqual([99, 100]);
+    expect(result.nonVerified).toEqual([]);
+  });
+
+  it("identifies non-verified claims with their statuses", async () => {
+    claimStore = [
+      { id: 1, status: "verified", entity_id: null },
+      { id: 2, status: "pending", entity_id: null },
+      { id: 3, status: "contradicted", entity_id: null },
+    ];
+    const db = getDb();
+    const result = await classifyClaims(db, [1, 2, 3]);
+    expect(result.missing).toEqual([]);
+    expect(result.nonVerified).toEqual([
+      { id: 2, status: "pending" },
+      { id: 3, status: "contradicted" },
+    ]);
+  });
+
+  it("can return both missing and non-verified buckets in one call", async () => {
+    claimStore = [
+      { id: 1, status: "verified", entity_id: null },
+      { id: 2, status: "pending", entity_id: null },
+    ];
+    const db = getDb();
+    const result = await classifyClaims(db, [1, 2, 99]);
+    expect(result.missing).toEqual([99]);
+    expect(result.nonVerified).toEqual([{ id: 2, status: "pending" }]);
+  });
+
+  it("deduplicates claim IDs before querying", async () => {
+    claimStore = [{ id: 1, status: "verified", entity_id: null }];
+    const db = getDb();
+    await classifyClaims(db, [1, 1, 1]);
+    const selectQuery = capturedQueries.find((q) =>
+      q.query.toLowerCase().includes("proposed_claims"),
+    );
+    expect(selectQuery!.params[0]).toEqual([1]);
   });
 });
 

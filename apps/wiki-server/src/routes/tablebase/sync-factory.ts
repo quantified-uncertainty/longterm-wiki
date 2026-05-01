@@ -51,6 +51,7 @@ import {
 import {
   enforceSourcing,
   resolveSourcingRequirement,
+  logSourcingSkipped,
 } from "../shared/sourcing-enforcement.js";
 import {
   validateClaimRefs,
@@ -202,6 +203,12 @@ export interface SyncConfig<TItem, TTable extends PgTable> {
   /**
    * Entity FK fields to validate pre-insert. Returns one EntityRefField per
    * FK field. Each field's IDs are batch-checked against the entities table.
+   *
+   * **Contract**: callbacks MUST be pure (no side effects, no DB calls, no
+   * logging). In best-effort mode (QUA-955) the callback is invoked once
+   * over the full batch and then once per item to attribute missing FKs back
+   * to their owning item — at most N+1 invocations per request. A callback
+   * with side effects will surface them N+1 times in best-effort mode.
    */
   entityRefFields?: (items: TItem[]) => EntityRefField[];
 
@@ -371,7 +378,12 @@ export interface BestEffortRejected extends ValidationErrorBody {
  * branch on the request flag, not on response shape.
  */
 export interface BestEffortSyncResponse {
-  /** IDs of items that passed all validation and were upserted. */
+  /**
+   * IDs of items that passed all validation and were upserted. One entry per
+   * surviving item; the factory throws a SyncPhaseError if any surviving
+   * item lacks a string `id` field (composite-PK routes are not yet
+   * supported by best-effort mode).
+   */
   committed: string[];
   /** Items that failed pre-upsert validation. Order matches reject-time order. */
   rejected: BestEffortRejected[];
@@ -619,8 +631,15 @@ export function createSyncHandler<
           : name;
       if (bestEffort) {
         // Partition: items missing sourcing get rejected, the rest survive.
+        // The `?forceSkipSourcing=true` escape hatch must still emit its audit
+        // warning here — otherwise best-effort callers can bypass enforcement
+        // silently, defeating the compliance contract.
         await runPhase(name, "enforceSourcing", async () => {
           const req = resolveSourcingRequirement(c, tableName);
+          if (req.kind === "skipped") {
+            logSourcingSkipped(tableName, items.length, req);
+            return;
+          }
           if (req.kind === "required") {
             const drop = new Set<number>();
             for (let i = 0; i < items.length; i++) {
@@ -712,9 +731,12 @@ export function createSyncHandler<
             for (const m of missing) {
               missingByField.set(m.fieldName, new Set(m.missingIds));
             }
-            // Re-extract per-item field values to determine which item owns
-            // which missing ID. We call the callback with each [item] singleton
-            // — cheap because it's just array projection.
+            // We need to know which item owns each missing ID. The full
+            // callback form lets users compute IDs (e.g. prefix transforms),
+            // not just read fields, so we can't shortcut via
+            // `item[fieldName]` — that would silently misclassify ID-mapping
+            // callbacks. Instead, invoke the callback with each `[item]`
+            // singleton; this is the only contract-safe partition strategy.
             const drop = new Set<number>();
             const dropDetails = new Map<number, { fieldName: string; id: string }>();
             for (let i = 0; i < items.length; i++) {
@@ -783,12 +805,12 @@ export function createSyncHandler<
                   dropDetails.set(i, { claimId: cid, reason: "missing" });
                   break;
                 }
-                const status = nonVerifiedMap.get(cid);
-                if (status) {
+                const nonVerifiedStatus = nonVerifiedMap.get(cid);
+                if (nonVerifiedStatus) {
                   drop.add(i);
                   dropDetails.set(i, {
                     claimId: cid,
-                    reason: `not verified (status: ${status})`,
+                    reason: `not verified (status: ${nonVerifiedStatus})`,
                   });
                   break;
                 }
@@ -830,8 +852,12 @@ export function createSyncHandler<
       if (preErr) return preErr;
     }
 
-    // If best-effort partitioning ate everything, skip the transaction. Some
-    // downstream phases (writeInlineVerdicts, audit) crash on empty input.
+    // If best-effort partitioning ate everything, skip the transaction
+    // entirely. Going through the chunk loop with `allVals = []` produces a
+    // 0-column-count → degenerate chunkSize, and some Drizzle versions throw
+    // on `tx.insert(table).values([])` / `inArray(idCol, [])`. Returning early
+    // avoids that whole class of edge-case behavior on the empty input we
+    // already know we have nothing to do with.
     if (bestEffort && items.length === 0) {
       const emptyResponse: BestEffortSyncResponse = {
         committed: [],
@@ -1010,9 +1036,28 @@ export function createSyncHandler<
     }
 
     if (bestEffort) {
-      const committed = items
-        .map((i) => (i as { id?: string }).id)
-        .filter((id): id is string => typeof id === "string");
+      // Build the committed-IDs list. The contract is `committed: string[]` —
+      // one entry per surviving item. If an item has no string `id`, we throw
+      // rather than silently truncate (that would produce a response shape
+      // that disagrees with itself: claimsLinked covers all items, committed
+      // is shorter). Fail loudly so a future composite-PK route opting in
+      // hits this in dev, not in prod.
+      const committed: string[] = [];
+      for (let i = 0; i < items.length; i++) {
+        const id = (items[i] as { id?: unknown }).id;
+        if (typeof id !== "string") {
+          throw new SyncPhaseError(
+            name,
+            "upsert",
+            new Error(
+              `bestEffortAllowed routes must produce items with a string 'id' field; ` +
+                `surviving item at index ${i} (original idx ${originalIndices[i]}) has id=${typeof id}. ` +
+                `Composite-PK routes are not yet supported in best-effort mode.`,
+            ),
+          );
+        }
+        committed.push(id);
+      }
       const beResponse: BestEffortSyncResponse = {
         committed,
         rejected,
