@@ -119,6 +119,17 @@ export function unwrap<T>(result: ApiResult<T>): T | null {
   return result.ok ? result.data : null;
 }
 
+/**
+ * Format an ApiResult failure for log lines / error messages. Pure helper —
+ * pulls `error` + `message` out of the failure variant into one string. On
+ * the `ok: true` variant returns `"ok"` so callers don't have to special-case
+ * it (callers should normally only call this on the failure variant).
+ */
+export function formatApiError(result: ApiResult<unknown>): string {
+  if (result.ok) return "ok";
+  return `${result.error}: ${result.message}`;
+}
+
 // ---------------------------------------------------------------------------
 // Classify HTTP status codes into ApiError categories
 // ---------------------------------------------------------------------------

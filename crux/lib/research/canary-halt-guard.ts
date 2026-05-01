@@ -21,6 +21,7 @@ import {
   RECONCILIATION_STALE_THRESHOLD_HOURS,
 } from "../../pr-patrol/health-scan.ts";
 import { getReconciliationSummary } from "../wiki-server/reconciliation-runs.ts";
+import { formatApiError } from "../wiki-server/client.ts";
 
 export interface HaltGuardResult {
   /** True when the canary should HALT. */
@@ -69,7 +70,7 @@ export async function checkCanaryHalt(
   if (!summary.ok) {
     return {
       halt: false,
-      reason: `reconciliation summary unavailable: ${(summary as { error?: string; message?: string }).error ?? (summary as { message?: string }).message ?? 'unknown'}`,
+      reason: `reconciliation summary unavailable: ${formatApiError(summary)}`,
       lastRunAt: null,
       nonEmptyDiffs: null,
     };

@@ -62,7 +62,10 @@ import {
   type PipelineRunCtx,
 } from "../lib/pipeline-runs/lifecycle.ts";
 import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
-import { dualWriteStakeholders } from "../lib/research/dual-write-stakeholders.ts";
+import {
+  dualWriteStakeholders,
+  DEFAULT_OPS_TICKET,
+} from "../lib/research/dual-write-stakeholders.ts";
 import {
   checkCanaryHalt,
   CanaryHaltedError,
@@ -1013,12 +1016,14 @@ async function runIteration(
       policyEntityId,
       applyResult: apply as unknown as Parameters<typeof dualWriteStakeholders>[0]["applyResult"],
       iter,
-      // Filed as QUA-975 (sibling of QUA-943) per spec § "Ops ticket".
-      // Override via env if a different routing ticket is preferred.
+      // Default ticket (QUA-975, sibling of QUA-943) is in
+      // dual-write-stakeholders.ts so the literal stays out of branching
+      // application logic. Override via env if a different routing ticket
+      // is preferred.
       opsTicket:
         process.env.LINEAR_OPS_STAKEHOLDER_WRITES ??
         process.env.LINEAR_OPS_TICKET ??
-        "QUA-975",
+        DEFAULT_OPS_TICKET,
       postComment: commentOnIssue,
     });
   }

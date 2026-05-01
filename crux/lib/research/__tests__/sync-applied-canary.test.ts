@@ -34,6 +34,13 @@ vi.mock("../../wiki-server/client.ts", () => {
   return {
     apiRequest: fn,
     __mockApiRequest: fn,
+    // Provide a real-shaped formatApiError so the dual-write driver's
+    // error-message construction works the same as in production.
+    formatApiError: (res: unknown) => {
+      const r = res as { ok?: boolean; error?: string; message?: string };
+      if (r.ok) return "ok";
+      return `${r.error ?? "unknown"}: ${r.message ?? ""}`;
+    },
   };
 });
 

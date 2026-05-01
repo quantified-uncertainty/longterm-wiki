@@ -26,6 +26,19 @@ import {
   startReconciliationRun,
   completeReconciliationRun,
 } from "../wiki-server/reconciliation-runs.ts";
+import { formatApiError } from "../wiki-server/client.ts";
+
+/**
+ * Maximum number of policy stakeholder rows we'll page through in a single
+ * scan before declaring something is wrong. policy_stakeholders is
+ * fundamentally bounded by 151 policies × O(10) stakeholders each — running
+ * past 100k means a misbehaving server is paginating forever.
+ */
+const MAX_PG_ROW_FETCH = 100_000;
+
+/** Cap on how many per-entity diffs we persist into details_json / show in the heartbeat. */
+const MAX_DIFFS_IN_DETAILS = 100;
+const MAX_DIFFS_IN_COMMENT = 10;
 
 export interface RunReconcileOptions {
   /** "scheduled" for cron, "manual" for ad-hoc invocation. */
@@ -39,6 +52,13 @@ export interface RunReconcileOptions {
   postComment?: (ticket: string, body: string) => Promise<void>;
   /** Override the entities directory (test only). */
   entitiesDir?: string;
+  // Test seams for the wiki-server calls. Production uses the real clients
+  // (default values below). Tests pass mocks so the cron logic can be
+  // exercised without a live wiki-server.
+  startFn?: typeof startReconciliationRun;
+  completeFn?: typeof completeReconciliationRun;
+  fetchPgRowsFn?: () => Promise<PgStakeholderRow[]>;
+  loadPoliciesFn?: () => PolicyEntityForReconcile[];
 }
 
 export interface RunReconcileOutput {
@@ -63,20 +83,17 @@ async function fetchAllPgRows(): Promise<PgStakeholderRow[]> {
     const res = await getAllPolicyStakeholders({ limit: PAGE_SIZE, offset });
     if (!res.ok) {
       throw new Error(
-        `getAllPolicyStakeholders failed at offset=${offset}: ${
-          (res as { error?: string; message?: string }).error ??
-          (res as { message?: string }).message ??
-          "unknown error"
-        }`,
+        `getAllPolicyStakeholders failed at offset=${offset}: ${formatApiError(res)}`,
       );
     }
     const page = res.data.policyStakeholders as unknown as PgStakeholderRow[];
     all.push(...page);
     if (page.length < PAGE_SIZE) break;
     offset += PAGE_SIZE;
-    // Safety cap so a misbehaving server can't pull us into an infinite loop.
-    if (offset > 100_000) {
-      throw new Error(`fetchAllPgRows: aborting at offset=${offset} (>100k rows is unexpected for policy_stakeholders)`);
+    if (offset > MAX_PG_ROW_FETCH) {
+      throw new Error(
+        `fetchAllPgRows: aborting at offset=${offset} (>${MAX_PG_ROW_FETCH} rows is unexpected for policy_stakeholders)`,
+      );
     }
   }
   return all;
@@ -109,17 +126,18 @@ function buildHeartbeatBody(
     lines.push(`✅ Steady state — PG and YAML agree across all ${result.entitiesScanned} policy entities.`);
     return lines.join("\n");
   }
-  lines.push(`⚠ **Divergence detected.** First ${Math.min(result.diffs.length, 10)} entities:`);
+  const shown = Math.min(result.diffs.length, MAX_DIFFS_IN_COMMENT);
+  lines.push(`⚠ **Divergence detected.** First ${shown} entities:`);
   lines.push("");
-  for (const d of result.diffs.slice(0, 10)) {
+  for (const d of result.diffs.slice(0, MAX_DIFFS_IN_COMMENT)) {
     const bits: string[] = [];
     if (d.missingFromPg.length > 0) bits.push(`missing from PG: ${d.missingFromPg.join(", ")}`);
     if (d.missingFromYaml.length > 0) bits.push(`missing from YAML: ${d.missingFromYaml.join(", ")}`);
     if (d.fieldDiffs.length > 0) bits.push(`${d.fieldDiffs.length} field diff(s)`);
     lines.push(`- \`${d.policyEntityId}\` — ${bits.join("; ")}`);
   }
-  if (result.diffs.length > 10) {
-    lines.push(`- … and ${result.diffs.length - 10} more`);
+  if (result.diffs.length > MAX_DIFFS_IN_COMMENT) {
+    lines.push(`- … and ${result.diffs.length - MAX_DIFFS_IN_COMMENT} more`);
   }
   return lines.join("\n");
 }
@@ -134,21 +152,26 @@ function buildHeartbeatBody(
 export async function runReconcile(
   options: RunReconcileOptions,
 ): Promise<RunReconcileOutput> {
+  const startFn = options.startFn ?? startReconciliationRun;
+  const completeFn = options.completeFn ?? completeReconciliationRun;
+  const fetchPgRowsFn = options.fetchPgRowsFn ?? fetchAllPgRows;
+  const loadPoliciesFn =
+    options.loadPoliciesFn ??
+    (() => loadAllEntities(options.entitiesDir) as unknown as PolicyEntityForReconcile[]);
+
   const startedAt = new Date();
   // Open the run row first so a crash mid-scan still leaves a "running" row
   // (the wiki-server's row sweep can flag it).
-  const startRes = await startReconciliationRun({
+  const startRes = await startFn({
     domain: "policy_stakeholders",
     trigger: options.trigger,
     startedAt: startedAt.toISOString(),
   });
   if (!startRes.ok) {
     // Surface the error rather than silently running without an audit row.
-    const msg =
-      (startRes as { error?: string; message?: string }).error ??
-      (startRes as { message?: string }).message ??
-      "unknown error";
-    throw new Error(`reconcile-stakeholders: failed to open run row: ${msg}`);
+    throw new Error(
+      `reconcile-stakeholders: failed to open run row: ${formatApiError(startRes)}`,
+    );
   }
   const runId = startRes.data.id;
 
@@ -162,17 +185,15 @@ export async function runReconcile(
   };
 
   try {
-    const policies = (
-      loadAllEntities(options.entitiesDir) as unknown as PolicyEntityForReconcile[]
-    ).filter((e) => e.type === "policy");
-    const pgRows = await fetchAllPgRows();
+    const policies = loadPoliciesFn().filter((e) => e.type === "policy");
+    const pgRows = await fetchPgRowsFn();
     const bucketed = bucketByPolicy(pgRows);
     result = reconcilePolicyStakeholders(policies, bucketed);
   } catch (e) {
     errorMessage = e instanceof Error ? e.message : String(e);
   }
 
-  const completeRes = await completeReconciliationRun({
+  const completeRes = await completeFn({
     id: runId,
     entitiesScanned: result.entitiesScanned,
     entitiesNonEmpty: result.entitiesNonEmpty,
@@ -180,20 +201,17 @@ export async function runReconcile(
     nonEmptyDiffsObserved: result.entitiesNonEmptyWithDiff,
     detailsJson: {
       // Cap stored diffs so a runaway pathology doesn't blow up jsonb.
-      diffs: result.diffs.slice(0, 100),
-      truncated: result.diffs.length > 100,
+      diffs: result.diffs.slice(0, MAX_DIFFS_IN_DETAILS),
+      truncated: result.diffs.length > MAX_DIFFS_IN_DETAILS,
     },
     errorCode: errorMessage ? "scan_error" : null,
     errorMessage,
   });
   if (!completeRes.ok) {
-    // Don't swallow — the row is the audit trail.
-    const msg =
-      (completeRes as { error?: string; message?: string }).error ??
-      (completeRes as { message?: string }).message ??
-      "unknown error";
-    // We still post a heartbeat below if a ticket is configured, so the
-    // operator sees something. But the row didn't close — surface that.
+    // Don't swallow — the row is the audit trail. We still post a heartbeat
+    // below if a ticket is configured, so the operator sees something. But
+    // the row didn't close — surface that.
+    const msg = formatApiError(completeRes);
     errorMessage = errorMessage
       ? `${errorMessage}; complete failed: ${msg}`
       : `complete failed: ${msg}`;

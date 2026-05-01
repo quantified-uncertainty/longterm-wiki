@@ -629,11 +629,15 @@ function commitTimestamp(
  * Inputs are the shape returned by `/api/reconciliation-runs/summary`. The
  * function decides healthy/unhealthy without IO so it can be unit-tested.
  *
- * Two failure modes:
+ * Three failure modes:
  *   - Real divergence: the latest completed run reported
- *     `nonEmptyDiffsObserved > 0` AND no later clean run has overwritten that.
- *     ("Latest" here means most-recent completed; the summary endpoint
- *     filters out aborted runs.)
+ *     `nonEmptyDiffsObserved > 0`. ("Latest" = most-recent row whose
+ *     `completedAt IS NOT NULL` per the summary endpoint's filter — runs
+ *     that started but never finished are excluded.)
+ *   - Scan error: the latest completed run finished but with `errorCode` set
+ *     (the cron threw mid-scan and recorded the error rather than crashing
+ *     silently). We treat that as unhealthy too — divergence status is
+ *     unknown when the scanner failed.
  *   - Cron stale: no completed run in the last
  *     `RECONCILIATION_STALE_THRESHOLD_HOURS`. We treat absence-of-data as
  *     unhealthy, not healthy — silent cron is the failure mode QUA-31 caused.
@@ -1038,15 +1042,29 @@ export async function checkReconciliation(
   options: { now?: Date } = {},
 ): Promise<ReconciliationHealthResult | null> {
   try {
-    const { getReconciliationSummary } = await import(
-      '../lib/wiki-server/reconciliation-runs.ts'
-    );
+    const [{ getReconciliationSummary }, { formatApiError }] = await Promise.all([
+      import('../lib/wiki-server/reconciliation-runs.ts'),
+      import('../lib/wiki-server/client.ts'),
+    ]);
     const res = await getReconciliationSummary({ domain: 'policy_stakeholders' });
-    if (!res.ok) return null;
+    if (!res.ok) {
+      // Don't swallow silently — log so a sustained outage of this endpoint
+      // is visible. Returning null keeps the gate from blocking on a
+      // transient API failure (the canary's halt-guard is the inline gate).
+      console.warn(
+        `[health-scan] checkReconciliation: summary unavailable, skipping signal: ${formatApiError(res)}`,
+      );
+      return null;
+    }
     return evaluateReconciliation(res.data, options.now);
-  } catch {
-    // Wiki-server unavailable — return null so the patrol doesn't block on
-    // a transient outage of the reconciliation summary endpoint.
+  } catch (e) {
+    // Wiki-server unavailable / dynamic import failed — return null so the
+    // patrol doesn't block, but log so a real outage isn't invisible.
+    console.warn(
+      `[health-scan] checkReconciliation threw, skipping signal: ${
+        e instanceof Error ? e.message : String(e)
+      }`,
+    );
     return null;
   }
 }

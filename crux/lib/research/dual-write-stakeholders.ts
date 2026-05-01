@@ -27,6 +27,7 @@ import { convertAppliedToStakeholderSync } from "./sync-applied.ts";
 import type { ApplyResult } from "./apply-verdicts.ts";
 import type { PolicyEntity } from "./gap-analyzer.ts";
 import { syncPolicyStakeholdersBestEffort } from "../wiki-server/policy-stakeholders.ts";
+import { formatApiError } from "../wiki-server/client.ts";
 import type { PipelineRunCtx } from "../pipeline-runs/lifecycle.ts";
 
 export interface DualWriteOptions {
@@ -89,6 +90,14 @@ export class DualWriteHttpError extends Error {
     this.name = "DualWriteHttpError";
   }
 }
+
+/**
+ * Default Linear ticket where canary failure comments are routed when no
+ * env override is present. QUA-975 is the persistent ops ticket filed as a
+ * sibling of QUA-943; if you re-route this constant, also update its
+ * description so on-call knows where to look.
+ */
+export const DEFAULT_OPS_TICKET = "QUA-975";
 
 function buildOpsCommentBody(
   reason: 'aborted_zod' | 'partial_failure' | 'http_error',
@@ -175,10 +184,7 @@ export async function dualWriteStakeholders(
     // HTTP-level failure (5xx, network, parse). Treat as aborted — the
     // canary's safety contract is "if we can't validate the write, don't
     // write the YAML side either".
-    const errMsg =
-      (res as { error?: string; message?: string }).error ??
-      (res as { message?: string }).message ??
-      'unknown HTTP error';
+    const errMsg = formatApiError(res);
     await tryComment(options, 'http_error', {
       httpMessage: errMsg,
     });

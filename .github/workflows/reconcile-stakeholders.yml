@@ -58,6 +58,16 @@ jobs:
           LONGTERMWIKI_SERVER_URL: ${{ secrets.LONGTERMWIKI_SERVER_URL }}
           LONGTERMWIKI_SERVER_API_KEY: ${{ secrets.LONGTERMWIKI_SERVER_API_KEY }}
           LINEAR_RECONCILIATION_TICKET: ${{ vars.LINEAR_RECONCILIATION_TICKET }}
+          # Pass trigger via env (not direct interpolation into the run-script)
+          # to defuse the workflow_dispatch input → bash injection vector. See
+          # https://docs.github.com/en/actions/security-guides/security-hardening-for-github-actions
+          TRIGGER_INPUT: ${{ github.event.inputs.trigger || 'scheduled' }}
         run: |
-          TRIGGER="${{ github.event.inputs.trigger || 'scheduled' }}"
+          # Whitelist the value to one of the documented options; anything
+          # else falls back to "scheduled" without surfacing the raw input
+          # into the command line.
+          case "$TRIGGER_INPUT" in
+            scheduled|manual) TRIGGER="$TRIGGER_INPUT" ;;
+            *) TRIGGER="scheduled" ;;
+          esac
           pnpm crux maintain reconcile-stakeholders --trigger="$TRIGGER"

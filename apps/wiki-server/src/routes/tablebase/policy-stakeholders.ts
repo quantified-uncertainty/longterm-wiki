@@ -132,7 +132,12 @@ const policyStakeholdersApp = new Hono<{ Variables: ResolvedEntityVars }>()
     // length. Lives in `txStart` (not `preValidate`) because xact-scoped
     // advisory locks must be acquired inside the transaction that holds them.
     txStart: async (tx, _c, items) => {
-      const entityIds = [...new Set(items.map((i) => i.policyEntityId))];
+      // Sort to prevent multi-policy-batch deadlocks: two transactions
+      // posting items for {A,B} and {B,A} must acquire the per-entity locks
+      // in the same total order or they can wedge each other. The canary
+      // currently posts one policy at a time, but the route accepts
+      // multi-policy batches, so harden defensively.
+      const entityIds = [...new Set(items.map((i) => i.policyEntityId))].sort();
       for (const entityId of entityIds) {
         await tx.execute(
           sql`SELECT pg_advisory_xact_lock(hashtext(${entityId} || ':policy_stakeholders'))`,
