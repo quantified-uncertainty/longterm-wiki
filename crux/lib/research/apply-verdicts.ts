@@ -182,6 +182,156 @@ export function extractStructuredDate(
   return null;
 }
 
+// Verb stems used as a "is this a real sentence?" smoke test for product
+// descriptions. The Haiku extractor sometimes emits noun phrases or fragments
+// ("Claude large-language model", "the company's flagship product"); requiring
+// at least one common verb lets us reject those without leaning on full NLP.
+// This is a sanity floor, not a grammar checker — false negatives just leave
+// the slot for re-extraction next iteration.
+//
+// Design notes:
+//  - Auxiliaries / copulas are unambiguously verbs and listed bare.
+//  - For lexical verbs, prefer inflected forms (-s, -ed, -ing) over bare
+//    stems, because many bare stems double as common nouns ("a design",
+//    "a release", "a target") and would let pure noun phrases pass the check.
+//  - Bare forms are only included when the noun reading is uncommon
+//    ("provide", "include", "develop").
+const COMMON_VERBS = new Set([
+  // auxiliaries / copulas
+  "is", "are", "was", "were", "be", "been", "being", "am",
+  "has", "have", "had", "having",
+  "do", "does", "did", "doing", "done",
+  "will", "would", "shall", "should", "can", "could", "may", "might", "must",
+  // residues from contraction stripping (won't → wo, can't → ca, shan't → sha)
+  // — included so the verb check still recognizes the modal stem.
+  "wo", "ca", "sha",
+  // lexical verbs — prefer inflected forms
+  "provides", "provide", "provided", "providing",
+  "offers", "offered", "offering",
+  "supports", "supported", "supporting",
+  "enables", "enable", "enabled", "enabling",
+  "allows", "allow", "allowed", "allowing",
+  "creates", "create", "created", "creating",
+  "builds", "built", "building",
+  "develops", "develop", "developed", "developing",
+  "runs", "ran", "running",
+  "designed", "designs", "designing",
+  "used", "uses", "using",
+  "called", "calls", "calling",
+  "named", "names", "naming",
+  "includes", "include", "included", "including",
+  "focuses", "focused", "focusing",
+  "makes", "made", "making",
+  "lets", "letting",
+  "helps", "helped", "helping",
+  "generates", "generate", "generated", "generating",
+  "produces", "produce", "produced", "producing",
+  "performs", "performed", "performing",
+  "processes", "processed", "processing",
+  "trains", "trained", "training",
+  "launched", "launches", "launching",
+  "released", "releases", "releasing",
+  "powers", "powered", "powering",
+  "delivers", "deliver", "delivered", "delivering",
+  "combines", "combine", "combined", "combining",
+  "represents", "represent", "represented", "representing",
+  "serves", "served", "serving",
+  "operates", "operate", "operated", "operating",
+  "worked", "working",
+  "comprises", "comprise", "comprising",
+  "consists", "consist", "consisting",
+  "targets", "targeted", "targeting",
+  "handled", "handling",
+  "extends", "extend", "extended", "extending",
+  "deploys", "deployed", "deploying",
+]);
+
+// Strip trailing contraction suffix ("isn't" → "isn", then "'t" stripped by
+// the non-letter strip). Simpler: explicitly strip n't, 's, 're, 've, 'll, 'd
+// before the lookup so the base verb is detectable.
+const CONTRACTION_SUFFIX_RE = /(n['’]t|['’](?:s|re|ve|ll|d|m))$/i;
+
+const PRODUCT_DESC_MAX_LENGTH = 300;
+const PRODUCT_DESC_MIN_WORDS = 8;
+
+// Reject descriptions that mix in launch-date or revenue/valuation content.
+// These facts belong in keyDate.* and factbase.* respectively. "May" is
+// intentionally excluded — it is also a common modal verb ("Claude may be
+// used for...") and causes too many false positives.
+const PRODUCT_DATE_REVENUE_RE =
+  /\b(january|february|march|april|june|july|august|september|october|november|december)\b|\b(19|20)\d{2}\b|\$|\b(million|billion|run-rate|run rate|revenue|launched|made\s+available)\b/i;
+
+/**
+ * Normalize a Haiku-extracted product description before writing it to YAML.
+ *
+ * The Haiku extractor occasionally returns fragmentary excerpts (leading
+ * `...`, embedded ellipses, multi-paragraph blobs) because it copy-pastes
+ * the surrounding source instead of synthesizing a coherent sentence. This
+ * normalizer is the apply-step safety net for that — it strips obvious
+ * artifacts and rejects anything that still doesn't look like a sentence.
+ *
+ * Returns the cleaned description, or `null` if the input is too thin to
+ * write (caller should mark the verdict skipped). Decisions:
+ *   - Leading `[.,…\s]+` (extraction artifacts like "...exemplified by") → strip
+ *   - Mid-text `...` or `…` (source omissions) → collapse to a single space
+ *   - Length > 300 chars → keep up to the first sentence, else truncate
+ *   - < 8 words OR no recognized verb → null (slot left for re-extraction)
+ *
+ * Exported for testing. See QUA-938.
+ */
+export function normalizeProductDescription(input: string | null | undefined): string | null {
+  let s = (input ?? "").trim();
+  if (!s) return null;
+  // Strip leading extraction artifacts: dots, commas, ellipses, semicolons,
+  // colons, dashes, bullet markers ("- ", "* ", "• "), question/exclamation
+  // marks, and whitespace. Catches "...exemplified by...", ",and the company",
+  // "- Claude is...", "* Claude is...", "• Claude is..." etc.
+  s = s.replace(/^[-—*•:;?!.,\s…]+/u, "").trim();
+  if (!s) return null;
+  // Collapse mid-text ellipses (`...` or `…`) — these are almost always
+  // signals that the extractor stitched two non-adjacent source snippets.
+  // Replacing with a single space keeps the surrounding tokens but removes
+  // the visual "this was cut" tell.
+  s = s.replace(/\s*\.{3,}\s*/g, " ").replace(/\s*…\s*/g, " ");
+  // Strip trailing comma/fragment punctuation (e.g. "...the leading model,").
+  s = s.replace(/,\s*$/u, "").trim();
+  if (!s) return null;
+  // Normalize whitespace.
+  s = s.replace(/\s+/g, " ").trim();
+  if (!s) return null;
+  // If overly long, prefer the first sentence; otherwise truncate at the
+  // last word boundary within 300 chars and append `…` so the YAML reader
+  // can see the value was cut. Avoids mid-word truncation like "...mode".
+  if (s.length > PRODUCT_DESC_MAX_LENGTH) {
+    const firstSentence = s.match(/^[^.!?]+[.!?]/);
+    if (firstSentence) {
+      s = firstSentence[0].trim();
+    } else {
+      const truncated = s.slice(0, PRODUCT_DESC_MAX_LENGTH).replace(/\s+\S*$/, "").trim();
+      s = truncated ? `${truncated}…` : "";
+    }
+  }
+  if (!s) return null;
+  const words = s.split(/\s+/).filter(Boolean);
+  if (words.length < PRODUCT_DESC_MIN_WORDS) return null;
+  const hasVerb = words.some((raw) => {
+    // Lowercase, strip leading/trailing punctuation, then peel off any
+    // contraction suffix ("isn't" → "is", "claude's" → "claude") before
+    // looking up against COMMON_VERBS.
+    let w = raw.toLowerCase().replace(/^[^a-z]+|[^a-z'’]+$/g, "");
+    w = w.replace(CONTRACTION_SUFFIX_RE, "");
+    // Final strip of any remaining apostrophes (e.g. unmatched curly quote).
+    w = w.replace(/['’]/g, "");
+    return COMMON_VERBS.has(w);
+  });
+  if (!hasVerb) return null;
+  // Reject descriptions that mix in launch-date or revenue/valuation content.
+  // Aligns the write-path enforcement with the extraction-prompt guidance so
+  // a mixed blurb can never land in product.* even if the LLM ignores the prompt.
+  if (PRODUCT_DATE_REVENUE_RE.test(s)) return null;
+  return s;
+}
+
 /**
  * Canonical comparison key for a person's display name. Strips suffixes
  * (Jr., Sr., III, PhD, MD), lowercases, and slugifies. Used for keyPerson
@@ -491,9 +641,33 @@ export function applyVerdictsToOrganization(
       const existing = next.products.find(
         (p) => slugify(p.name) === slug || slugify(p.name) === nameSlug,
       );
+      // Normalize the candidate description before comparison/write — strips
+      // leading "..." extraction artifacts, collapses mid-text ellipses, and
+      // returns null for fragments under 8 words or without a verb. QUA-938.
+      //
+      // Intentional: this floor runs BEFORE the existing-product comparison.
+      // A thin candidate is skipped even when the existing description is
+      // even thinner — the slot is left for a later iteration to extract
+      // something coherent. Replacing a 3-char placeholder with a 7-word
+      // fragment is a pyrrhic victory we don't want.
+      const cleaned = normalizeProductDescription(value);
+      if (!cleaned) {
+        applied.push({ targetField: tf, action: "skipped", reason: "description too thin" });
+        continue;
+      }
       if (existing) {
-        if (!existing.description || existing.description.length < value.length) {
-          existing.description = value;
+        // Compare against the *normalized* existing description so a dirty
+        // legacy entry ("...exemplified by Claude...", 89 chars) cannot block
+        // a cleaner replacement just because the leading-artifact bytes
+        // inflated its length. If the existing description doesn't normalize
+        // (i.e. it's itself a fragment), treat it as length 0 so any clean
+        // candidate wins. QUA-938 review fix.
+        const existingClean = existing.description
+          ? normalizeProductDescription(existing.description)
+          : null;
+        const existingLen = existingClean?.length ?? 0;
+        if (existingLen < cleaned.length) {
+          existing.description = cleaned;
           if (!existing.source) existing.source = v.sourceUrl;
           applied.push({ targetField: tf, action: "updated" });
         } else {
@@ -501,7 +675,7 @@ export function applyVerdictsToOrganization(
         }
         continue;
       }
-      next.products.push({ name, description: value, source: v.sourceUrl });
+      next.products.push({ name, description: cleaned, source: v.sourceUrl });
       applied.push({ targetField: tf, action: "added" });
       continue;
     }

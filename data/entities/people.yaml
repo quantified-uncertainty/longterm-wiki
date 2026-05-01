@@ -6668,12 +6668,32 @@
     - id: sid_IFjdCevnFg
       type: organization
       relationship: leads-to
-  description: Co-founder and President of Americans for Responsible Innovation (ARI). Former U.S. Congressman (OK-2, 2001-2005). Former Under Secretary of the Army and Acting Under Secretary of Defense for Personnel and Readiness. Former President of the University of Tulsa.
+    - id: sid_NeUHBH9hGa
+      type: organization
+      relationship: leads-to
+  description: Co-founder and President of Americans for Responsible Innovation (ARI). Co-founder of Public First Action (2025), a bipartisan AI-safety 501(c)(4) network supporting pro-regulation candidates in the 2026 U.S. elections. Former U.S. Congressman (OK-2, 2001-2005). Former Under Secretary of the Army and Acting Under Secretary of Defense for Personnel and Readiness. Former President of the University of Tulsa.
   customFields:
     - label: Role
       value: Co-founder and President
     - label: Organization
       value: Americans for Responsible Innovation
+  tags:
+    - ai-governance
+    - ai-policy
+- id: chris-stewart
+  stableId: sid_TkeOMpAV5w
+  type: person
+  title: Chris Stewart
+  relatedEntries:
+    - id: sid_NeUHBH9hGa
+      type: organization
+      relationship: leads-to
+  description: Co-founder of Public First Action (2025), a bipartisan AI-safety 501(c)(4) network supporting pro-regulation candidates in the 2026 U.S. elections. Former Republican U.S. Congressman from Utah (UT-2, 2013-2023), where he served on the House Permanent Select Committee on Intelligence and the Appropriations Committee. Resigned from Congress in September 2023 due to family health reasons.
+  customFields:
+    - label: Role
+      value: Co-founder
+    - label: Organization
+      value: Public First Action
   tags:
     - ai-governance
     - ai-policy

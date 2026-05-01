@@ -665,3 +665,71 @@ describe("pruneFacts", () => {
     expect(result.cascadedClaimLinks).toBe(0);
   });
 });
+
+// QUA-852 / QUA-729 Phase C: bulk YAML re-sync uses the audit-logged
+// `forceSkipSourcing=true` escape hatch so SOURCE_CHECK_REQUIRED.fact = true
+// does not reject every sync (only ~67% of facts have inline-attachable
+// verdicts and ~33% are non-checkable by design — see sync-facts.ts).
+describe("syncFactsBatch (QUA-852 forceSkipSourcing)", () => {
+  let fetchSpy: ReturnType<typeof vi.spyOn>;
+
+  beforeEach(() => {
+    fetchSpy = vi
+      .spyOn(globalThis, "fetch")
+      .mockResolvedValue(
+        new Response(JSON.stringify({ upserted: 1, verdictsWritten: 0 }), {
+          status: 200,
+        }),
+      );
+  });
+
+  afterEach(() => {
+    fetchSpy.mockRestore();
+  });
+
+  it("appends ?forceSkipSourcing=true with an audit-logged reason", async () => {
+    // Imported here to avoid hoisting issues with vi.spyOn on globalThis.fetch.
+    const { syncFactsBatch } = await import("./sync-facts.ts");
+    await syncFactsBatch(
+      "https://wiki-server.example",
+      [
+        {
+          entityId: "anthropic",
+          factId: "f_test",
+          label: null,
+          value: "1",
+          numeric: 1,
+          low: null,
+          high: null,
+          asOf: null,
+          validEnd: null,
+          currency: null,
+          measure: "test",
+          subject: null,
+          note: null,
+          source: null,
+          format: "number",
+          formatDivisor: null,
+          sourceQuote: null,
+          usdEquivalent: null,
+          exchangeRate: null,
+          exchangeRateDate: null,
+          dollarYear: null,
+        },
+      ],
+      100,
+      // Skip the per-batch pacing delay so the test does not wait 500ms.
+      { _sleep: () => Promise.resolve() },
+    );
+
+    expect(fetchSpy).toHaveBeenCalled();
+    const url = String(fetchSpy.mock.calls[0]![0]);
+    expect(url).toContain("/api/facts/sync");
+    expect(url).toContain("forceSkipSourcing=true");
+    expect(url).toContain("reason=");
+    // The reason is URL-encoded — decoding it should mention "bulk".
+    const reasonMatch = url.match(/reason=([^&]+)/);
+    expect(reasonMatch).not.toBeNull();
+    expect(decodeURIComponent(reasonMatch![1]!)).toMatch(/bulk/i);
+  });
+});

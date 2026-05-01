@@ -78,6 +78,23 @@ const SIDEBAR_ONLY_PAGES = [
   // 404 in the CI build (LONGTERMWIKI_SERVER_URL unset → kb-pg merge skipped).
   // Validated locally with a dev server pointed at prod data.
   "/publications/nature",
+  // Events — migrated to EntityProfileShell in QUA-488. Uses YAML
+  // entity data so it's available in CI without PG access.
+  // Note: races/[id] was also migrated in QUA-488 but its records live
+  // only in PG, so it 404s in the CI build. Validated locally against prod.
+  "/events/cyber-incident-notpetya",
+];
+
+/**
+ * Pages without sidebar or tabs (use children) — migrated to
+ * EntityProfileShell. Loaded into the same body-render check as simple pages.
+ */
+const NO_SIDEBAR_PAGES: string[] = [
+  // Resources/[id] — migrated to EntityProfileShell in QUA-490.
+  // Resources are PG-primary (data/resources-snapshot.json is gitignored).
+  // The e2e-pr.yml workflow runs build-data without LONGTERMWIKI_SERVER_URL,
+  // so resources.json is empty and any /resources/[id] URL returns 404 in CI.
+  // Validated locally with a dev server pointed at prod wiki-server.
 ];
 
 /**
@@ -119,6 +136,11 @@ const SIMPLE_PAGES = [
   "/scorecards",  // QUA-688 scorecards directory
   "/scorecards/fli_index",  // QUA-837 per-scorecard detail route
   "/divisions",  // QUA-897 sourcing-summary header
+  // NOTE: /things/[id] was migrated to EntityProfileShell in QUA-489 but is
+  // not in this list — its records live only in PG, so the page 404s in the
+  // PR-CI build (LONGTERMWIKI_SERVER_URL unset). Validated locally with
+  // PLAYWRIGHT_BASE_URL=https://www.longtermwiki.com, same pattern as
+  // investments/funding-rounds/funding-programs from QUA-487.
 ];
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -204,6 +226,15 @@ test.describe("Render audit — simple pages", () => {
 
 test.describe("Render audit — sidebar-only pages", () => {
   for (const url of SIDEBAR_ONLY_PAGES) {
+    test(url, async ({ page }) => {
+      await loadPage(page, url);
+      checkAntiPatterns(await getMainText(page), url);
+    });
+  }
+});
+
+test.describe("Render audit — no-sidebar shell pages", () => {
+  for (const url of NO_SIDEBAR_PAGES) {
     test(url, async ({ page }) => {
       await loadPage(page, url);
       checkAntiPatterns(await getMainText(page), url);

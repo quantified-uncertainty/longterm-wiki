@@ -231,7 +231,20 @@ export async function fetchWithPlaywright(
     return null;
   }
 
-  const browser = await getBrowser();
+  // Catch launch failures here to honor the "returns null on failure" contract.
+  // QUA-229: chromium can be killed during launch (OOM in worker pod, container
+  // limits) and `getBrowser()` rethrows. Without this catch the error propagates
+  // up through source-fetcher and fails the resource-ingest job — Playwright is
+  // a fallback, so a launch failure should let the caller fall through to
+  // Firecrawl/built-in instead.
+  let browser: any = null;
+  try {
+    browser = await getBrowser();
+  } catch (err: unknown) {
+    const msg = err instanceof Error ? err.message : String(err);
+    console.warn(`[playwright-fetcher] Browser launch failed, skipping Playwright: ${msg.slice(0, 200)}`);
+    return null;
+  }
   if (!browser) return null;
 
   let context: any = null;

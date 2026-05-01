@@ -525,7 +525,7 @@ function seedFact(
   factId: string,
   opts: Record<string, unknown> = {}
 ) {
-  return postJson(app, "/api/facts/sync", {
+  return postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
     facts: [
       {
         entityId,
@@ -587,7 +587,7 @@ describe("Facts API", () => {
 
   describe("POST /api/facts/sync", () => {
     it("creates new facts", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -621,7 +621,7 @@ describe("Facts API", () => {
         value: "100",
       });
 
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -639,19 +639,19 @@ describe("Facts API", () => {
     });
 
     it("rejects empty batch", async () => {
-      const res = await postJson(app, "/api/facts/sync", { facts: [] });
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", { facts: [] });
       expect(res.status).toBe(400);
     });
 
     it("rejects facts without entityId", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [{ factId: "abc" }],
       });
       expect(res.status).toBe(400);
     });
 
     it("rejects invalid JSON", async () => {
-      const res = await app.request("/api/facts/sync", {
+      const res = await app.request("/api/facts/sync?forceSkipSourcing=true&reason=test", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: "not json",
@@ -664,7 +664,7 @@ describe("Facts API", () => {
     // Issue #4017 — numeric formats with NULL columns previously got
     // silently coerced to 0 on read. Reject them at the write boundary.
     it("rejects format=number with null numeric (issue #4017)", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -679,7 +679,7 @@ describe("Facts API", () => {
     });
 
     it("rejects format=min with null numeric (issue #4017)", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -694,7 +694,7 @@ describe("Facts API", () => {
     });
 
     it("rejects format=range with null low/high (issue #4017)", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -710,7 +710,7 @@ describe("Facts API", () => {
     });
 
     it("accepts format=number with explicit zero (real zero is not null)", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -727,7 +727,7 @@ describe("Facts API", () => {
     // ---- QUA-850: inline sourcing wiring ----
 
     it("writes a verdict row when a fact carries an inline `sourcing` block", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -771,7 +771,7 @@ describe("Facts API", () => {
     });
 
     it("is backwards-compatible: facts without sourcing succeed and write zero verdicts", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -793,7 +793,7 @@ describe("Facts API", () => {
     });
 
     it("writes verdicts for the subset of facts that carry sourcing in a mixed batch", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -830,7 +830,7 @@ describe("Facts API", () => {
     });
 
     it("rejects an invalid verdict enum value with 400 (not silent fail-open)", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -846,6 +846,97 @@ describe("Facts API", () => {
       // Schema rejection — no rows written.
       expect(factsStore.size).toBe(0);
       expect(verdictsStore.size).toBe(0);
+    });
+
+    // QUA-852 / QUA-729 Phase C: SOURCE_CHECK_REQUIRED.fact = true. Items
+    // without a `sourcing` block are rejected unless the caller passes
+    // `?forceSkipSourcing=true&reason=...` (audit-logged escape hatch).
+    describe("sourcing enforcement (QUA-852)", () => {
+      it("rejects fact items without sourcing when no bypass is provided", async () => {
+        const res = await postJson(app, "/api/facts/sync", {
+          facts: [
+            {
+              entityId: "anthropic",
+              factId: "no-source-1",
+              value: "100",
+              numeric: 100,
+              measure: "revenue",
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        const body = (await res.json()) as { message?: string };
+        expect(body.message ?? "").toMatch(/sourcing/i);
+        // Nothing should have been written.
+        expect(factsStore.size).toBe(0);
+        expect(verdictsStore.size).toBe(0);
+      });
+
+      it("rejects mixed batches where any item lacks sourcing", async () => {
+        const res = await postJson(app, "/api/facts/sync", {
+          facts: [
+            {
+              entityId: "anthropic",
+              factId: "with-sourcing",
+              value: "100",
+              numeric: 100,
+              measure: "revenue",
+              sourcing: { verdict: "confirmed" },
+            },
+            {
+              entityId: "anthropic",
+              factId: "no-sourcing",
+              value: "200",
+              numeric: 200,
+              measure: "revenue",
+            },
+          ],
+        });
+        expect(res.status).toBe(400);
+        // Whole batch fails — no partial writes.
+        expect(factsStore.size).toBe(0);
+        expect(verdictsStore.size).toBe(0);
+      });
+
+      it("accepts items with sourcing without bypass", async () => {
+        const res = await postJson(app, "/api/facts/sync", {
+          facts: [
+            {
+              entityId: "anthropic",
+              factId: "all-sourced",
+              value: "100",
+              numeric: 100,
+              measure: "revenue",
+              sourcing: { verdict: "confirmed", confidence: 0.9 },
+            },
+          ],
+        });
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { upserted: number; verdictsWritten: number };
+        expect(body.upserted).toBe(1);
+        expect(body.verdictsWritten).toBe(1);
+      });
+
+      it("accepts unsourced items when forceSkipSourcing=true is provided", async () => {
+        const res = await postJson(
+          app,
+          "/api/facts/sync?forceSkipSourcing=true&reason=bulk%20YAML%20re-sync",
+          {
+            facts: [
+              {
+                entityId: "anthropic",
+                factId: "bypass-1",
+                value: "100",
+                numeric: 100,
+                measure: "revenue",
+              },
+            ],
+          },
+        );
+        expect(res.status).toBe(200);
+        const body = (await res.json()) as { upserted: number };
+        expect(body.upserted).toBe(1);
+      });
     });
   });
 
@@ -1073,7 +1164,7 @@ describe("Facts API", () => {
 
   describe("Range value facts", () => {
     it("syncs facts with low/high range", async () => {
-      const res = await postJson(app, "/api/facts/sync", {
+      const res = await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -1101,7 +1192,7 @@ describe("Facts API", () => {
       process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
       const authedApp = createApp();
 
-      const res = await postJson(authedApp, "/api/facts/sync", {
+      const res = await postJson(authedApp, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           {
             entityId: "anthropic",
@@ -1118,7 +1209,7 @@ describe("Facts API", () => {
       process.env.LONGTERMWIKI_SERVER_API_KEY = "test-secret";
       const authedApp = createApp();
 
-      const res = await authedApp.request("/api/facts/sync", {
+      const res = await authedApp.request("/api/facts/sync?forceSkipSourcing=true&reason=test", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -1144,7 +1235,7 @@ describe("Facts API", () => {
   describe("POST /api/facts/prune (QUA-462)", () => {
     it("deletes facts whose factId is not in the keep list for an entity", async () => {
       // Seed three facts for anthropic.
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_keep1", label: "Keep 1", value: "1", numeric: 1, asOf: "2025-01", measure: "x" },
           { entityId: "anthropic", factId: "f_keep2", label: "Keep 2", value: "2", numeric: 2, asOf: "2025-02", measure: "x" },
@@ -1168,7 +1259,7 @@ describe("Facts API", () => {
     });
 
     it("deletes ALL facts for an entity when its keep list is empty (constellation case from QUA-462)", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "constellation", factId: "f_alcohol1", label: "Founded", value: "1945", numeric: 1945, asOf: "1945", measure: "founded" },
           { entityId: "constellation", factId: "f_alcohol2", label: "HQ", value: "Victor", measure: "hq" },
@@ -1193,7 +1284,7 @@ describe("Facts API", () => {
     });
 
     it("never touches facts for entities not in the request (cross-entity safety)", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
           { entityId: "openai", factId: "f_b", label: "B", value: "2", numeric: 2, measure: "x" },
@@ -1214,7 +1305,7 @@ describe("Facts API", () => {
     });
 
     it("removes the dual-write things rows for deleted facts", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "constellation", factId: "f_old", label: "Founded", value: "1945", numeric: 1945, measure: "founded" },
         ],
@@ -1238,7 +1329,7 @@ describe("Facts API", () => {
     });
 
     it("returns 0 deleted when all facts in the keep list match what is in PG", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
         ],
@@ -1255,7 +1346,7 @@ describe("Facts API", () => {
     });
 
     it("returns 0 deleted when entries is empty", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_a", label: "A", value: "1", numeric: 1, measure: "x" },
         ],
@@ -1282,7 +1373,7 @@ describe("Facts API", () => {
     });
 
     it("is idempotent — a second prune is a no-op", async () => {
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_keep", label: "K", value: "1", numeric: 1, measure: "x" },
           { entityId: "anthropic", factId: "f_stale", label: "S", value: "2", numeric: 2, measure: "x" },
@@ -1313,7 +1404,7 @@ describe("Facts API", () => {
       // dual-write row is found and deleted.
       const entityId = "sid_with:colon";
       const factId = "f_with space";
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId, factId, label: "X", value: "1", numeric: 1, measure: "x" },
         ],
@@ -1353,7 +1444,7 @@ describe("Facts API", () => {
           });
         }
       }
-      await postJson(app, "/api/facts/sync", { facts });
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", { facts });
       expect(factsStore.size).toBe(150);
 
       const entries = Array.from({ length: 50 }, (_, i) => ({
@@ -1377,7 +1468,7 @@ describe("Facts API", () => {
       // `PruneFactsResult` — inferred from this exact route via Hono RPC in
       // crux/lib/wiki-server/facts.ts. If a future refactor changes the
       // shape, this test catches it before the crux side silently breaks.
-      await postJson(app, "/api/facts/sync", {
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", {
         facts: [
           { entityId: "anthropic", factId: "f_stale", label: "S", value: "1", numeric: 1, measure: "x" },
         ],
@@ -1430,9 +1521,9 @@ describe("Facts API", () => {
       const batch1 = Array.from({ length: 500 }, (_, i) => makeFact(i));
       const batch2 = Array.from({ length: 500 }, (_, i) => makeFact(i + 500));
       const batch3 = Array.from({ length: 2 }, (_, i) => makeFact(i + 1000));
-      await postJson(app, "/api/facts/sync", { facts: batch1 });
-      await postJson(app, "/api/facts/sync", { facts: batch2 });
-      await postJson(app, "/api/facts/sync", { facts: batch3 });
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", { facts: batch1 });
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", { facts: batch2 });
+      await postJson(app, "/api/facts/sync?forceSkipSourcing=true&reason=test", { facts: batch3 });
       expect(factsStore.size).toBe(1002);
 
       const res = await postJson(app, "/api/facts/prune", {

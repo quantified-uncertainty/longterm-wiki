@@ -4,8 +4,14 @@ name: Render Quality Monitor
 # Catches display regressions (raw numbers, JSON leaks) between deploys.
 # Runs every 6 hours + manual trigger.
 #
-# On failure: creates or updates a GitHub issue with label "render-monitor".
-# On success after prior failure: closes the issue with a resolution comment.
+# On failure: upserts a Linear ticket in "Dashboards & Visibility" via
+#   `crux linear monitor upsert` (QUA-970). The job step fails non-zero on
+#   transient Linear errors; the next 6h cron tick re-attempts. We trade
+#   immediate redundancy for cleaner ticket management — a single missed
+#   alert at 6h cadence is acceptable. Wellness keeps a GH fallback because
+#   it runs every few minutes.
+# On success after prior failure: `crux linear monitor resolve` closes any
+#   open ticket with the same title.
 #
 # Phase 3 of Discussion #3768 (Rendering Quality & Test Infrastructure).
 
@@ -13,6 +19,19 @@ on:
   schedule:
     - cron: "0 */6 * * *"
   workflow_dispatch: {}
+
+# Prevent the cron tick and a manual workflow_dispatch from racing — both
+# would otherwise call upsert, miss each other's in-flight searches, and
+# create two Linear tickets. cancel-in-progress: false because the manual
+# trigger should serialize behind the cron, not abort it.
+concurrency:
+  group: render-monitor
+  cancel-in-progress: false
+
+# Least-privilege: workflow now writes to Linear (off-GitHub), so the
+# default GITHUB_TOKEN only needs read access for `actions/checkout`.
+permissions:
+  contents: read
 
 jobs:
   render-audit:
@@ -42,14 +61,13 @@ jobs:
           PLAYWRIGHT_BASE_URL: https://www.longtermwiki.com
         run: cd apps/web && npx playwright test e2e/render-audit.spec.ts --reporter=list
 
-      - name: Manage GitHub issue on failure
+      - name: Upsert Linear ticket on failure
+        # QUA-970: Linear-first auto-filer. Comments on the existing open
+        # ticket if one exists, or creates a new one in the right project.
         if: steps.audit.outcome == 'failure'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          # Search for existing open issue
-          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
-
           BODY_FILE=$(mktemp)
           cat >| "$BODY_FILE" <<BODYEOF
           Render quality audit failed against production.
@@ -57,31 +75,20 @@ jobs:
           **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
           BODYEOF
 
-          if [ -n "$EXISTING" ]; then
-            echo "Updating existing issue #${EXISTING}"
-            gh issue comment "$EXISTING" --body-file "$BODY_FILE"
-          else
-            echo "Creating new issue"
-            gh issue create \
-              --title "Render quality regression detected" \
-              --label "render-monitor" \
-              --body-file "$BODY_FILE"
-          fi
+          pnpm crux linear monitor upsert \
+            --title="Render quality regression detected" \
+            --body-file="$BODY_FILE" \
+            --project="Dashboards & Visibility"
           rm -f "$BODY_FILE"
 
-      - name: Close issue on success
+      - name: Resolve Linear ticket on success
         if: steps.audit.outcome == 'success'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          EXISTING=$(gh issue list --label render-monitor --state open --limit 1 --json number --jq '.[0].number // empty')
-          if [ -n "$EXISTING" ]; then
-            echo "Closing resolved issue #${EXISTING}"
-            gh issue comment "$EXISTING" --body "Render quality audit passing again. Closing.
-
-            **Run:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
-            gh issue close "$EXISTING"
-          fi
+          pnpm crux linear monitor resolve \
+            --title="Render quality regression detected" \
+            --comment="Render quality audit passing again. Auto-closing. Run: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
       - name: Fail workflow if audit failed
         if: steps.audit.outcome == 'failure'

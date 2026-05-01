@@ -263,6 +263,8 @@ export interface GqlPrNode {
   /** PR state: OPEN, CLOSED, or MERGED. Present when the GQL query requests it. */
   state?: string;
   headRefName: string;
+  /** PR base ref (e.g. 'main' or 'production'). Used to skip release PRs. */
+  baseRefName?: string;
   headRefOid: string;
   mergeable: string;
   /** GitHub's mergeStateStatus (DIRTY, BLOCKED, BEHIND, CLEAN, HAS_HOOKS, UNKNOWN, UNSTABLE). */

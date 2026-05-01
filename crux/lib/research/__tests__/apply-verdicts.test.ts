@@ -5,6 +5,7 @@ import {
   canonicalizePersonKey,
   extractStructuredDate,
   MIN_POSITION_CONFIDENCE,
+  normalizeProductDescription,
   type VerifiedVerdict,
 } from "../apply-verdicts.ts";
 import type { OrganizationEntity, OrganizationKeyPersonObject, PolicyEntity } from "../gap-analyzer.ts";
@@ -137,6 +138,221 @@ describe("extractStructuredDate", () => {
   it("tries candidates in order, returning the first match", () => {
     expect(extractStructuredDate(null, "2026-01-30", "Claude helped")).toBe("2026-01-30");
     expect(extractStructuredDate("no date here", "January 2021")).toBe("2021-01");
+  });
+});
+
+// ─── normalizeProductDescription (QUA-938) ─────────────────────────────────
+
+describe("normalizeProductDescription", () => {
+  it("strips leading dots and ellipses", () => {
+    expect(
+      normalizeProductDescription("...Claude is a model built for safety and helpfulness."),
+    ).toBe("Claude is a model built for safety and helpfulness.");
+    expect(
+      normalizeProductDescription("…Claude is a model built for safety and helpfulness."),
+    ).toBe("Claude is a model built for safety and helpfulness.");
+    expect(
+      normalizeProductDescription(",  Claude is a model built for safety and helpfulness."),
+    ).toBe("Claude is a model built for safety and helpfulness.");
+  });
+
+  it("collapses mid-text ellipses", () => {
+    expect(
+      normalizeProductDescription("Claude is...a model built for safety and honesty."),
+    ).toBe("Claude is a model built for safety and honesty.");
+    expect(
+      normalizeProductDescription("Claude is … a model built for safety and honesty."),
+    ).toBe("Claude is a model built for safety and honesty.");
+  });
+
+  it("returns null for empty/null/undefined inputs", () => {
+    expect(normalizeProductDescription(null)).toBeNull();
+    expect(normalizeProductDescription(undefined)).toBeNull();
+    expect(normalizeProductDescription("")).toBeNull();
+    expect(normalizeProductDescription("   ")).toBeNull();
+    expect(normalizeProductDescription("...")).toBeNull();
+    expect(normalizeProductDescription("...,, …")).toBeNull();
+  });
+
+  it("returns null for descriptions under 8 words", () => {
+    expect(normalizeProductDescription("Claude is good.")).toBeNull();
+    expect(normalizeProductDescription("Claude is a frontier model from Anthropic.")).toBeNull();
+  });
+
+  it("accepts descriptions with at least 8 words and a verb", () => {
+    expect(
+      normalizeProductDescription("Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+  });
+
+  it("returns null for noun-phrase fragments without a verb", () => {
+    expect(
+      normalizeProductDescription("An overview of the company's flagship items and consumer solutions worldwide today."),
+    ).toBeNull();
+  });
+
+  it("trims overlong descriptions to the first sentence", () => {
+    const long =
+      "Claude is a family of large language models from Anthropic built for helpfulness. " +
+      "It supports multiple modalities and has many use cases across industries. ".repeat(5);
+    const result = normalizeProductDescription(long);
+    expect(result).toBe(
+      "Claude is a family of large language models from Anthropic built for helpfulness.",
+    );
+  });
+
+  it("hard-truncates when no sentence terminator exists in the first 300 chars", () => {
+    const long = ("Claude is a family of language models from Anthropic " as string).repeat(20);
+    const result = normalizeProductDescription(long);
+    expect(result).not.toBeNull();
+    // Truncation appends "…" so the bound is 300 chars + 1 ellipsis.
+    expect(result!.length).toBeLessThanOrEqual(301);
+  });
+
+  it("normalizes whitespace", () => {
+    expect(
+      normalizeProductDescription("Claude   is\t a\nfamily   of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+  });
+
+  it("recognizes contractions as containing a verb (QUA-938 review fix)", () => {
+    // "isn't" / "doesn't" / "won't" / "can't" must all be detected as
+    // containing the verb stem after stripping the contraction suffix.
+    expect(
+      normalizeProductDescription("Claude isn't just a chatbot but a full coding assistant today."),
+    ).toBe("Claude isn't just a chatbot but a full coding assistant today.");
+    expect(
+      normalizeProductDescription("Claude doesn't merely answer queries — it writes complete code."),
+    ).toBe("Claude doesn't merely answer queries — it writes complete code.");
+    // Modal contractions: won't → wo, can't → ca, shan't → sha — all included
+    // in COMMON_VERBS as residue forms.
+    expect(
+      normalizeProductDescription("Claude won't be deployed without safety review across customer environments."),
+    ).toBe("Claude won't be deployed without safety review across customer environments.");
+    expect(
+      normalizeProductDescription("Claude can't be jailbroken because of constitutional AI training methods."),
+    ).toBe("Claude can't be jailbroken because of constitutional AI training methods.");
+    // Curly-quote apostrophes (U+2019) are common in copy-paste from web sources.
+    expect(
+      normalizeProductDescription("Claude isn’t just a chatbot but a full coding assistant today."),
+    ).toBe("Claude isn’t just a chatbot but a full coding assistant today.");
+  });
+
+  it("recognizes 'can' and 'shall' as verbs (QUA-938 review fix)", () => {
+    expect(
+      normalizeProductDescription("Claude can answer complex coding questions across many programming languages today."),
+    ).toBe("Claude can answer complex coding questions across many programming languages today.");
+    expect(
+      normalizeProductDescription("This product shall conform to all applicable regulations for the EU AI Act."),
+    ).toBe("This product shall conform to all applicable regulations for the EU AI Act.");
+  });
+
+  it("strips broader leading punctuation including bullets and dashes (QUA-938 review fix)", () => {
+    expect(
+      normalizeProductDescription("- Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("* Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("• Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription(": Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+    expect(
+      normalizeProductDescription("— Claude is a family of large language models from Anthropic."),
+    ).toBe("Claude is a family of large language models from Anthropic.");
+  });
+
+  it("hard-truncates at a word boundary with trailing ellipsis (QUA-938 review fix)", () => {
+    const long = ("Claude is a family of language models from Anthropic " as string).repeat(20);
+    const result = normalizeProductDescription(long);
+    expect(result).not.toBeNull();
+    expect(result!.length).toBeLessThanOrEqual(301); // 300 + "…"
+    // Trailing ellipsis signals the truncation.
+    expect(result!).toMatch(/…$/);
+    // Must end on a word boundary, not mid-word: every word in the source
+    // is one of {Claude, is, a, family, of, language, models, from, Anthropic}.
+    // Strip the trailing "…" and confirm the final token is one of these.
+    const stripped = result!.slice(0, -1).trim();
+    const lastToken = stripped.split(/\s+/).pop() ?? "";
+    expect(["Claude", "is", "a", "family", "of", "language", "models", "from", "Anthropic"]).toContain(
+      lastToken,
+    );
+  });
+
+  it("does not pass noun-only phrases that previously slipped through (QUA-938 review fix)", () => {
+    // These should NOT be accepted — bare-stem ambiguous nouns ("design",
+    // "support", "use", "release", "target", "process", "offer") were
+    // dropped from COMMON_VERBS so a noun phrase using them is rejected.
+    expect(
+      normalizeProductDescription("A clean design from Anthropic for the modern enterprise era today now."),
+    ).toBeNull();
+    expect(
+      normalizeProductDescription("A flexible support contract for enterprise customers and the public sector."),
+    ).toBeNull();
+    expect(
+      normalizeProductDescription("A new release of the open-source toolchain for developers in industry."),
+    ).toBeNull();
+  });
+
+  it("strips trailing comma fragments", () => {
+    expect(
+      normalizeProductDescription("Claude is a family of large language models from Anthropic,"),
+    ).toBe("Claude is a family of large language models from Anthropic");
+    expect(
+      normalizeProductDescription("Claude is a family of large language models from Anthropic,   "),
+    ).toBe("Claude is a family of large language models from Anthropic");
+  });
+
+  it("rejects descriptions containing launch-date or revenue indicators (QUA-938 write-path enforcement)", () => {
+    // Mixed launch-date + revenue blurb — the canonical bad example from QUA-938.
+    expect(
+      normalizeProductDescription(
+        "Claude Code was made available in June 2025 with run-rate revenue of $2.5 billion.",
+      ),
+    ).toBeNull();
+    // Four-digit year alone is sufficient to reject.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models released in 2024 by Anthropic.",
+      ),
+    ).toBeNull();
+    // Dollar sign (monetary indicator).
+    expect(
+      normalizeProductDescription(
+        "Claude is a subscription assistant priced at $20 per month for individual users.",
+      ),
+    ).toBeNull();
+    // Revenue keyword.
+    expect(
+      normalizeProductDescription(
+        "Claude is Anthropic's flagship model and the primary driver of revenue for the company.",
+      ),
+    ).toBeNull();
+    // Month name (non-May).
+    expect(
+      normalizeProductDescription(
+        "Claude is a model that was launched in January by the Anthropic team for safety researchers.",
+      ),
+    ).toBeNull();
+    // Clean description — should still pass.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models tuned for helpfulness, harmlessness, and honesty.",
+      ),
+    ).toBe(
+      "Claude is a family of large language models tuned for helpfulness, harmlessness, and honesty.",
+    );
+    // "may" as a modal verb (not a month) — should NOT be rejected.
+    expect(
+      normalizeProductDescription(
+        "Claude is a family of large language models that may be used across many enterprise workflows.",
+      ),
+    ).toBe(
+      "Claude is a family of large language models that may be used across many enterprise workflows.",
+    );
   });
 });
 
@@ -460,7 +676,7 @@ describe("applyVerdictsToOrganization", () => {
     const result = applyVerdictsToOrganization(entity, [
       v({
         targetField: "product.claude-3-5-sonnet",
-        extractedValue: "Claude 3.5 Sonnet is a frontier model.",
+        extractedValue: "Claude 3.5 Sonnet is a frontier large language model from Anthropic.",
         displayHint: "Claude 3.5 Sonnet",
         sourceUrl: "https://anthropic.com/news/claude-3-5",
       }),
@@ -468,7 +684,7 @@ describe("applyVerdictsToOrganization", () => {
     expect(result.entity.products).toHaveLength(1);
     expect(result.entity.products![0]).toEqual({
       name: "Claude 3.5 Sonnet",
-      description: "Claude 3.5 Sonnet is a frontier model.",
+      description: "Claude 3.5 Sonnet is a frontier large language model from Anthropic.",
       source: "https://anthropic.com/news/claude-3-5",
     });
   });
@@ -482,12 +698,14 @@ describe("applyVerdictsToOrganization", () => {
     const result = applyVerdictsToOrganization(entity, [
       v({
         targetField: "product.claude-3-5-sonnet",
-        extractedValue: "A much longer and more detailed description.",
+        extractedValue: "Claude 3.5 Sonnet is a much longer and more detailed description.",
         displayHint: "Claude 3.5 Sonnet",
       }),
     ]);
     expect(result.entity.products).toHaveLength(1);
-    expect(result.entity.products![0].description).toBe("A much longer and more detailed description.");
+    expect(result.entity.products![0].description).toBe(
+      "Claude 3.5 Sonnet is a much longer and more detailed description.",
+    );
     expect(result.applied[0].action).toBe("updated");
   });
 
@@ -500,9 +718,118 @@ describe("applyVerdictsToOrganization", () => {
       ],
     };
     const result = applyVerdictsToOrganization(entity, [
-      v({ targetField: "product.p", extractedValue: "short" }),
+      v({
+        targetField: "product.p",
+        extractedValue: "Shorter but it is a complete sentence about the product.",
+      }),
     ]);
-    expect(result.applied[0]).toMatchObject({ action: "skipped" });
+    expect(result.applied[0]).toMatchObject({ action: "skipped", reason: "existing description longer" });
+  });
+
+  it("strips leading ellipsis fragments from product descriptions (QUA-938)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: "...exemplified by Claude, a family of large language models built for safety.",
+        displayHint: "Claude",
+      }),
+    ]);
+    expect(result.entity.products).toHaveLength(1);
+    expect(result.entity.products![0].description).toBe(
+      "exemplified by Claude, a family of large language models built for safety.",
+    );
+    expect(result.applied[0].action).toBe("added");
+  });
+
+  it("collapses mid-text ellipses in product descriptions (QUA-938)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: "Claude is a family of models...trained for helpfulness, harmlessness, and honesty.",
+        displayHint: "Claude",
+      }),
+    ]);
+    expect(result.entity.products![0].description).toBe(
+      "Claude is a family of models trained for helpfulness, harmlessness, and honesty.",
+    );
+  });
+
+  it("skips product descriptions that are too thin (QUA-938)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: "Claude large-language model",
+        displayHint: "Claude",
+      }),
+    ]);
+    expect(result.entity.products ?? []).toHaveLength(0);
+    expect(result.applied[0]).toMatchObject({
+      action: "skipped",
+      reason: "description too thin",
+    });
+  });
+
+  it("skips product descriptions with no recognizable verb (QUA-938)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.thing",
+        extractedValue: "An overview of the company's flagship items and consumer solutions today.",
+        displayHint: "Thing",
+      }),
+    ]);
+    expect(result.entity.products ?? []).toHaveLength(0);
+    expect(result.applied[0]).toMatchObject({
+      action: "skipped",
+      reason: "description too thin",
+    });
+  });
+
+  it("replaces a non-normalizing (longer) existing description with a clean shorter one (QUA-938 review fix)", () => {
+    // Length asymmetry bug: a legacy description that's a noun-phrase
+    // fragment can be longer than its clean replacement. Old code compared
+    // raw lengths and skipped the update. New code normalizes the existing
+    // description first; when it fails normalization (no verb), its
+    // effective length is treated as 0, so any clean candidate wins.
+    const dirty =
+      "An overview of the company's flagship product line for enterprise customers worldwide today."; // 93 chars, no verb
+    const clean = "Claude is a family of language models from Anthropic."; // 53 chars
+    expect(dirty.length).toBeGreaterThan(clean.length);
+    const entity: OrganizationEntity = {
+      id: "x",
+      type: "organization",
+      products: [{ name: "Claude", description: dirty }],
+    };
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: clean,
+        displayHint: "Claude",
+      }),
+    ]);
+    expect(result.entity.products![0].description).toBe(clean);
+    expect(result.applied[0].action).toBe("updated");
+  });
+
+  it("trims overlong product descriptions to the first sentence (QUA-938)", () => {
+    const entity: OrganizationEntity = { id: "x", type: "organization" };
+    const longDesc =
+      "Claude is a family of large language models from Anthropic designed for helpfulness, harmlessness, and honesty across many domains. " +
+      "It was first released in 2023 and has since gone through several major versions. ".repeat(3);
+    const result = applyVerdictsToOrganization(entity, [
+      v({
+        targetField: "product.claude",
+        extractedValue: longDesc,
+        displayHint: "Claude",
+      }),
+    ]);
+    const desc = result.entity.products![0].description!;
+    expect(desc.length).toBeLessThanOrEqual(300);
+    expect(desc).toMatch(/^Claude is a family/);
+    expect(desc).toMatch(/\.$/);
   });
 
   it("adds keyPerson as an object with slug+name+source", () => {
@@ -804,7 +1131,7 @@ describe("applyVerdictsToOrganization", () => {
       v({ targetField: "tag.frontier-ai" }),
       v({
         targetField: "product.claude-3-5-sonnet",
-        extractedValue: "newer model",
+        extractedValue: "Claude 3.5 Sonnet is a newer model from Anthropic.",
         displayHint: "Claude 3.5 Sonnet",
       }),
     ]);

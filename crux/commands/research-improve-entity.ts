@@ -56,6 +56,11 @@ import {
   type VerifiedVerdict,
 } from "../lib/research/apply-verdicts.ts";
 import { canonicalSlug } from "../lib/research/canonical-names.ts";
+import {
+  withPipelineRun,
+  type WithPipelineRunOptions,
+} from "../lib/pipeline-runs/lifecycle.ts";
+import { getCachedAuditSessionId } from "../lib/wiki-server/audit-context.ts";
 
 const ROOT = path.resolve(import.meta.dirname, "../..");
 const ENTITIES_DIR = path.join(ROOT, "data/entities");
@@ -63,7 +68,7 @@ const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
 
 const SUPPORTED_TYPES = new Set(["policy", "organization"]);
 
-interface EntityWithType {
+export interface EntityWithType {
   id: string;
   stableId?: string;
   type: string;
@@ -685,7 +690,12 @@ For each fact you can extract from the source that fills one of the gaps, return
     ${guide.arrayTargetsHint}
 - claimText: a concise, paraphrased assertion that can be verified against the source. Avoid overly-specific dates or figures unless the source states them verbatim.
 - proposedValue: the actual value to write into YAML (a sentence for product / provision / stakeholder / description, a short string for billNumber, etc.).
-    * For keyDate.* claims: proposedValue MUST be a structured date string in ISO format — "YYYY-MM-DD" if a full date is given, "YYYY-MM" for month-precision, or "YYYY" for year-only. Do NOT put narrative prose in proposedValue for keyDate claims; the human-readable label goes in displayHint.
+    * For keyDate.* claims: proposedValue MUST be a structured date string in ISO format — "YYYY-MM-DD" if a full date is given, "YYYY-MM" for month-precision, or "YYYY" for year-only. Do NOT put narrative prose in proposedValue for keyDate claims; the human-readable label goes in displayHint.${
+      entity.type === "organization"
+        ? `
+    * For product.* claims: proposedValue MUST be a single coherent sentence describing what the product is (its purpose, category, or capability) — not a launch-date claim, not a revenue/valuation claim, not a press-release excerpt. Aim for 8-25 words. Do NOT begin with "...", do NOT include mid-sentence ellipses, do NOT include trailing comma fragments. Date and revenue facts about the product belong in keyDate.* and factbase.* claims respectively. Good: "Claude is a family of large language models tuned for helpfulness, harmlessness, and honesty." Bad: "...exemplified by its Claude large-language model" (leading ellipsis fragment). Bad: "Claude Code was made available in May 2025 with run-rate revenue of $2.5 billion." (mixes launch-date + revenue — neither belongs in a product description).`
+        : ""
+    }
 - displayHint: human label for new array entries (e.g. "Claude 3.5 Sonnet", "Dario Amodei", "Founded as Anthropic PBC", "Series G Funding Round").
 - position (stakeholder claims ONLY): one of "support" | "oppose" | "reform" | "neutral", or null if the source does not support a confident classification. Apply these rules strictly:
     * "support"  — the stakeholder endorses, defends, advocates for, lobbies for, or formally votes in favor of the policy. Example: a senator who introduced/co-sponsored the bill, an industry group that filed a brief in its favor.
@@ -1025,6 +1035,72 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     );
   }
 
+  // Pull the active agent_session_id (primed by crux.mjs at startup) so the
+  // pipeline_runs row links back to the agent that triggered the run.
+  // `getCachedAuditSessionId` returns a string; agent_sessions.id is bigint
+  // — coerce to number, falling back to null on missing or non-numeric.
+  const runOptions = buildImproveEntityRunOptions(
+    found.entity,
+    parseAgentSessionId(getCachedAuditSessionId()),
+  );
+
+  return withPipelineRun(runOptions, async () =>
+    doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
+  );
+}
+
+/**
+ * Construct `WithPipelineRunOptions` for the improve-entity pipeline. Pure
+ * helper — exported so the wiring shape is unit-testable without driving
+ * the full closed-loop body. Phase 1 (QUA-957) of QUA-943.
+ *
+ * `allowOffline: true` so dev sessions without wiki-server creds can keep
+ * iterating against YAML; the helper still logs a visible warning when
+ * `/start` fails. Phase 2 may tighten this once the body performs real
+ * machine-writes that demand a mandatory audit trail.
+ */
+export function buildImproveEntityRunOptions(
+  entity: EntityWithType,
+  agentSessionId: number | null,
+): WithPipelineRunOptions {
+  return {
+    pipelineName: "improve-entity",
+    entityId: entity.stableId ?? entity.id,
+    shape: entity.type,
+    agentSessionId,
+    allowOffline: true,
+  };
+}
+
+/**
+ * Coerce the cached audit session id (a string from
+ * `getCachedAuditSessionId()` because that's what's shipped on every
+ * X-Agent-Session-Id header) into a number for the bigint
+ * `agent_sessions.id` foreign key on `pipeline_runs`. Returns null when
+ * the cache is unset or the value is non-numeric.
+ */
+export function parseAgentSessionId(raw: string | null): number | null {
+  if (raw == null) return null;
+  const n = Number(raw);
+  return Number.isFinite(n) ? n : null;
+}
+
+/**
+ * Inner body of `improveSingleEntity` — runs inside `withPipelineRun` so the
+ * entire iteration loop, drain, and write are scoped to a single
+ * `pipeline_runs` lifecycle. Phase 1 establishes the run record; Phase 2
+ * will additionally invoke the typed sync client from inside this body.
+ */
+async function doImproveSingleEntity(args: {
+  found: { entity: EntityWithType; filePath: string };
+  slug: string;
+  target: number;
+  maxIters: number;
+  budgetUsd: number;
+  noWrite: boolean;
+  opts: ImproveOptions;
+}): Promise<ImproveResult> {
+  const { found, slug, target, maxIters, budgetUsd, noWrite, opts } = args;
   let entity = found.entity;
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];

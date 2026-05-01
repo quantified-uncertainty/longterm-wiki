@@ -1,6 +1,20 @@
-import type { Context } from "hono";
+import type { Context, TypedResponse } from "hono";
 import { logger as rootLogger } from "../../logger.js";
-import { validationError } from "./utils.js";
+import { validationError, VALIDATION_ERROR } from "./utils.js";
+
+/**
+ * Concrete TypedResponse shape returned on enforcement failure. Declared so
+ * Hono RPC routes that wire `enforceSourcing` directly (rather than going
+ * through `sync-factory`) keep their `InferResponseType<..., 200>` narrowed
+ * to the success branch — without this, the bare `Response | null` return
+ * type collapses the route's response inference to `{}`.
+ */
+export type EnforceSourcingError = Response &
+  TypedResponse<
+    { error: typeof VALIDATION_ERROR; message: string },
+    400,
+    "json"
+  >;
 
 const logger = rootLogger.child({ component: "sourcing-enforcement" });
 
@@ -24,6 +38,22 @@ const SOURCE_CHECK_REQUIRED: Record<string, boolean> = {
   "funding-programs": true,
   divisions: true,
   "policy-stakeholders": true,
+  // QUA-852 / QUA-729 Phase C: enabled 2026-05-01.
+  // Gate: checkable-fact coverage 93.7% (1841 verdicts / 1964 checkable facts);
+  // QUA-928 split the metric so this is measured against the checkable subset
+  // (facts with a source URL on a `verifiable: true` property), not all-facts.
+  //
+  // **Scope of enforcement.** Today the only existing /api/facts/sync caller
+  // is `crux/wiki-server/sync-facts.ts` (the CI bulk YAML re-sync), which
+  // hard-codes `?forceSkipSourcing=true&reason=...`. So this gate is *not*
+  // an enforcement against the bulk path — it is a tripwire for any future
+  // ad-hoc /sync POSTs (manual curl, new dashboards, third-party tooling).
+  // Real per-fact sourcing pressure is enforced upstream at fact-creation
+  // time by `crux fb add-fact`, which now requires `--source=URL` for facts
+  // on verifiable properties. The bulk path bypasses because ~33% of facts
+  // are non-checkable by design (`verifiable: false` properties or
+  // legitimately have no source URL) and carry no verdict to attach inline.
+  fact: true,
 };
 
 /**
@@ -102,7 +132,7 @@ export function enforceSourcing(
   c: Context,
   tableName: string,
   items: Array<{ sourcing?: unknown }>,
-): Response | null {
+): EnforceSourcingError | null {
   const req = resolveSourcingRequirement(c, tableName);
 
   if (req.kind === "not_required") return null;

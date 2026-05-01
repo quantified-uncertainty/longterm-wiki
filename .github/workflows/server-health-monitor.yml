@@ -14,9 +14,17 @@ on:
     - cron: "0 6 * * 1" # every Monday at 06:00 UTC
   workflow_dispatch:
 
+# Existing concurrency block already serializes runs of this workflow.
+# After QUA-970 the auto-filer is `crux linear monitor upsert` instead of
+# `gh issue create`, but the race-prevention motivation is identical.
 concurrency:
   group: server-health-monitor
   cancel-in-progress: false
+
+# Least-privilege: post-QUA-970 the workflow writes to Linear (off-GitHub),
+# so the default GITHUB_TOKEN only needs read access for actions/checkout.
+permissions:
+  contents: read
 
 jobs:
   paused-notice:
@@ -33,10 +41,24 @@ jobs:
     needs: [preflight]
     name: Verify monitoring is active
     runs-on: ubuntu-latest
-    permissions:
-      issues: write
 
     steps:
+      # Checkout + pnpm setup are needed for `pnpm crux linear monitor`
+      # invocations below. The previous bash `gh issue ...` flow needed
+      # nothing beyond the pre-installed `gh` CLI; the Linear-first flow
+      # has to compile + run our crux command.
+      - uses: actions/checkout@v4
+
+      - uses: pnpm/action-setup@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
       - name: Check wiki-server and groundskeeper status
         id: check
         env:
@@ -96,83 +118,61 @@ jobs:
             echo "error=Groundskeeper status is '${GK_STATUS}'. Health monitoring may be inactive." >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Create or update issue (monitoring gap detected)
+      - name: Upsert Linear ticket on monitoring gap
+        # QUA-970: Linear-first auto-filer. Title is intentionally stable
+        # ("Wiki server dead-man-switch alert") so consecutive runs in the
+        # same outage converge on the same Linear ticket regardless of
+        # which CHECK_STATUS variant fired. The status variant lives in the
+        # body, where it's still visible but doesn't fragment the dedup key.
         if: steps.check.outputs.status != 'ok'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           CHECK_STATUS: ${{ steps.check.outputs.status }}
           CHECK_ERROR: ${{ steps.check.outputs.error }}
         run: |
           TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          BODY_FILE=$(mktemp)
+          {
+            echo "## Dead-man-switch: monitoring gap detected"
+            echo ""
+            echo "| Field | Value |"
+            echo "|-------|-------|"
+            echo "| **Check** | ${CHECK_STATUS} |"
+            echo "| **Detected at** | ${TIMESTAMP} |"
+            echo "| **Detail** | ${CHECK_ERROR} |"
+            echo ""
+            echo "### What this means"
+            echo ""
+            echo "The weekly dead-man-switch detected a potential gap in health monitoring:"
+            echo ""
+            echo "- **\`server-down\`** — Wiki-server is unreachable. The groundskeeper should be creating issues for this, but if both are down, this is the fallback alert."
+            echo "- **\`server-unhealthy\`** — Wiki-server is up but degraded. The groundskeeper should have caught this already — if it didn't, the groundskeeper may be down too."
+            echo "- **\`groundskeeper-down\`** — Wiki-server is healthy but the groundskeeper daemon hasn't sent a heartbeat recently. Health monitoring is not running."
+            echo "- **\`monitoring-unavailable\`** — The monitoring status endpoint is not reachable. Cannot verify groundskeeper liveness."
+            echo "- **\`error\`** — Configuration issue (missing secrets)."
+            echo ""
+            echo "### Actions"
+            echo ""
+            echo "1. Check groundskeeper pod: \`kubectl get pods -n longtermwiki -l app=groundskeeper\`"
+            echo "2. Check groundskeeper logs: \`kubectl logs -n longtermwiki -l app=groundskeeper --tail=50\`"
+            echo "3. Check wiki-server pod: \`kubectl get pods -n longtermwiki -l app=longterm-wiki-server-wiki-server\`"
+            echo ""
+            echo "---"
+            echo "*Created by the [dead-man-switch workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Runs weekly to verify the groundskeeper health monitor is active.*"
+          } >| "$BODY_FILE"
 
-          EXISTING=$(gh issue list \
-            --repo "${{ github.repository }}" \
-            --label "server-health" \
-            --state open \
-            --json number \
-            --jq '.[0].number // empty')
+          pnpm crux linear monitor upsert \
+            --title="Wiki server dead-man-switch alert" \
+            --body-file="$BODY_FILE" \
+            --project="Automation & Infrastructure"
+          rm -f "$BODY_FILE"
 
-          if [ -n "$EXISTING" ]; then
-            gh issue comment "$EXISTING" \
-              --repo "${{ github.repository }}" \
-              --body "[Dead-man-switch] ${TIMESTAMP}: ${CHECK_ERROR}"
-          else
-            gh label create "server-health" --repo "${{ github.repository }}" \
-              --color "d73a4a" --description "Wiki server health monitoring" 2>/dev/null || true
-
-            {
-              echo "## Dead-man-switch: monitoring gap detected"
-              echo ""
-              echo "| Field | Value |"
-              echo "|-------|-------|"
-              echo "| **Check** | ${CHECK_STATUS} |"
-              echo "| **Detected at** | ${TIMESTAMP} |"
-              echo "| **Detail** | ${CHECK_ERROR} |"
-              echo ""
-              echo "### What this means"
-              echo ""
-              echo "The weekly dead-man-switch detected a potential gap in health monitoring:"
-              echo ""
-              echo "- **\`server-down\`** — Wiki-server is unreachable. The groundskeeper should be creating issues for this, but if both are down, this is the fallback alert."
-              echo "- **\`server-unhealthy\`** — Wiki-server is up but degraded. The groundskeeper should have caught this already — if it didn't, the groundskeeper may be down too."
-              echo "- **\`groundskeeper-down\`** — Wiki-server is healthy but the groundskeeper daemon hasn't sent a heartbeat recently. Health monitoring is not running."
-              echo "- **\`monitoring-unavailable\`** — The monitoring status endpoint is not reachable. Cannot verify groundskeeper liveness."
-              echo "- **\`error\`** — Configuration issue (missing secrets)."
-              echo ""
-              echo "### Actions"
-              echo ""
-              echo "1. Check groundskeeper pod: \`kubectl get pods -n longtermwiki -l app=groundskeeper\`"
-              echo "2. Check groundskeeper logs: \`kubectl logs -n longtermwiki -l app=groundskeeper --tail=50\`"
-              echo "3. Check wiki-server pod: \`kubectl get pods -n longtermwiki -l app=longterm-wiki-server-wiki-server\`"
-              echo ""
-              echo "---"
-              echo "*Created by the [dead-man-switch workflow](https://github.com/quantified-uncertainty/longterm-wiki/actions/workflows/server-health-monitor.yml). Runs weekly to verify the groundskeeper health monitor is active.*"
-            } > /tmp/issue_body.md
-
-            gh issue create \
-              --repo "${{ github.repository }}" \
-              --title "[Dead-man-switch] Monitoring gap: ${CHECK_STATUS}" \
-              --label "server-health,bug" \
-              --body-file /tmp/issue_body.md
-          fi
-
-      - name: Close resolved issue
+      - name: Resolve Linear ticket on recovery
         if: steps.check.outputs.status == 'ok'
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
         run: |
-          ISSUE=$(gh issue list \
-            --repo "${{ github.repository }}" \
-            --label "server-health" \
-            --state open \
-            --json number \
-            --jq '.[0].number // empty')
-
-          if [ -n "$ISSUE" ]; then
-            TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
-            gh issue comment "$ISSUE" \
-              --repo "${{ github.repository }}" \
-              --body "[Dead-man-switch] ${TIMESTAMP}: All clear — wiki-server healthy, groundskeeper active. Auto-closing."
-            gh issue close "$ISSUE" \
-              --repo "${{ github.repository }}"
-          fi
+          TIMESTAMP=$(date -u '+%Y-%m-%d %H:%M:%S UTC')
+          pnpm crux linear monitor resolve \
+            --title="Wiki server dead-man-switch alert" \
+            --comment="[Dead-man-switch] ${TIMESTAMP}: All clear — wiki-server healthy, groundskeeper active. Auto-closing."
