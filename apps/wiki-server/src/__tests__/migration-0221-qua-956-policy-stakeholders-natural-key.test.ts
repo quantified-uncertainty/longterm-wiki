@@ -61,9 +61,12 @@ describe("migration 0221 — QUA-956 policy_stakeholders natural-key + UNIQUE", 
   });
 
   it("does not skip the audit trigger (this is not a multi-million-row rewrite)", () => {
-    // 234 dupe rows + ~238 things rows = ~472 audit entries — small enough
-    // that the trigger overhead doesn't matter and the audit trail is
-    // useful for forensics. `app.audit_skip` is only for bulk migrations.
+    // ~234 dupe rows on policy_stakeholders → ~234 audit_trigger_fn rows
+    // in full_audit_log. (`things` is not on the audit allow-list — see
+    // `.claude/rules/audit-log.md` — so the things cleanup doesn't add to
+    // the count.) Small enough that the trigger overhead doesn't matter
+    // and the audit trail is useful for forensics. `app.audit_skip` is
+    // only for bulk migrations (millions of rows).
     expect(sql).not.toMatch(/audit_skip/);
   });
 });
