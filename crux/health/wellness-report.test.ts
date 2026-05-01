@@ -21,6 +21,7 @@ const mockCloseIssue = vi.fn();
 const mockCreateIssue = vi.fn();
 const mockEnsureLabel = vi.fn();
 const mockGetGitHubToken = vi.fn();
+const mockIsMissingTokenError = vi.fn().mockReturnValue(false);
 
 vi.mock('../lib/github.ts', () => ({
   REPO: 'quantified-uncertainty/longterm-wiki',
@@ -31,7 +32,7 @@ vi.mock('../lib/github.ts', () => ({
   createIssue: (...args: unknown[]) => mockCreateIssue(...args),
   ensureLabel: (...args: unknown[]) => mockEnsureLabel(...args),
   getGitHubToken: (...args: unknown[]) => mockGetGitHubToken(...args),
-  isMissingTokenError: () => false,
+  isMissingTokenError: (e: unknown) => mockIsMissingTokenError(e),
   MISSING_TOKEN_SUMMARY: 'GITHUB_TOKEN not set',
 }));
 
@@ -186,6 +187,7 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     mockGetGitHubToken.mockReturnValue('fake-token');
+    mockIsMissingTokenError.mockReturnValue(false);
     mockEnsureLabel.mockResolvedValue(undefined);
     mockListIssuesByLabel.mockResolvedValue([]);
     mockListRecentOpenIssues.mockResolvedValue([]);
@@ -485,6 +487,43 @@ describe('manageWellnessIssue — Linear dedup wiring (QUA-577)', () => {
       vi.useRealTimers();
       consoleLogSpy.mockRestore();
     }
+  });
+
+  it('still creates a Linear ticket when GitHub token is missing (GitHub-independent path)', async () => {
+    // New behaviour from the GitHub-decoupling fix: a missing GITHUB_TOKEN must
+    // NOT prevent the Linear-first create path from running. Without this fix,
+    // the early-return on missing token would silently drop the wellness alert
+    // even when Linear is fully available.
+    mockGetGitHubToken.mockImplementation(() => {
+      throw new Error('GITHUB_TOKEN not set');
+    });
+    mockIsMissingTokenError.mockReturnValue(true);
+
+    const search = vi.fn().mockResolvedValue([]);
+    const createIssue = vi
+      .fn()
+      .mockResolvedValue({ identifier: 'QUA-9999', url: 'https://linear.app/q/issue/QUA-9999' });
+    const getProject = vi
+      .fn()
+      .mockResolvedValue({ id: 'project-uuid-aaaa', name: 'Automation & Infrastructure' });
+
+    const report = buildWellnessReport(failingChecks);
+    const result = await manageWellnessIssue(report, {
+      linearDedupDeps: {
+        search,
+        comment: vi.fn(),
+        setState: vi.fn(),
+        createIssue,
+        getProject,
+        now: () => 0,
+      },
+    });
+
+    expect(result.action).toBe('linear-created');
+    expect(result.linearIdentifier).toBe('QUA-9999');
+    // The GitHub fallback must NOT have been reached.
+    expect(mockCreateIssue).not.toHaveBeenCalled();
+    expect(mockEnsureLabel).not.toHaveBeenCalled();
   });
 
   it('closes a lingering open Linear ticket when checks recover and no GitHub issue is open', async () => {

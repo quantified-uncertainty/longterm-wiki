@@ -298,22 +298,28 @@ export async function manageWellnessIssue(
   report: WellnessReport,
   options: ManageWellnessOptions = {},
 ): Promise<WellnessIssueResult> {
+  // Probe GitHub availability without blocking the Linear-first path. A missing
+  // token only disables GitHub operations — dedupLinearWellnessIssue /
+  // createLinearWellnessIssue run regardless.
+  let githubAvailable = true;
   try {
     getGitHubToken();
   } catch (e) {
     if (isMissingTokenError(e)) {
-      console.warn(`${MISSING_TOKEN_SUMMARY} — skipping wellness issue management`);
-      return { action: 'none' };
+      console.warn(`${MISSING_TOKEN_SUMMARY} — GitHub issue management disabled`);
+      githubAvailable = false;
+    } else {
+      throw e;
     }
-    throw e;
   }
 
-  const existingIssue = await findOpenWellnessIssue();
+  // Skip the GitHub lookup when unavailable to avoid needless API noise;
+  // findOpenWellnessIssue catches its own errors, but null is returned anyway.
+  const existingIssue = githubAvailable ? await findOpenWellnessIssue() : null;
   const runUrl = options.runUrl ?? '';
 
   if (!report.overallOk) {
     // ── Failure case ───────────────────────────────────────────────────
-    await ensureWellnessLabel();
 
     if (existingIssue) {
       // Update existing issue with a comment
@@ -371,6 +377,14 @@ export async function manageWellnessIssue(
       (linearAction.kind === 'skipped' && linearAction.reason === 'misconfig') ||
       (linearCreateResult?.kind === 'failed' && linearCreateResult.reason === 'misconfig');
     const issueBody = misconfig ? prependMisconfigBanner(report.issueBody) : report.issueBody;
+
+    if (!githubAvailable) {
+      console.warn('GitHub unavailable and Linear create did not produce a ticket — alert may be dropped');
+      return { action: 'none' };
+    }
+
+    // ensureWellnessLabel is deferred here — only needed for GitHub issue creation.
+    await ensureWellnessLabel();
 
     // Create new GitHub issue with a stable title (no timestamp) so concurrent
     // workflows can find it via findOpenWellnessIssue(). The timestamp is
