@@ -21,8 +21,18 @@
     <key>Label</key>
     <string>com.qu.pr-patrol</string>
 
+    <!--
+      Invoke /bin/bash explicitly rather than relying on the supervisor's
+      shebang. macOS attributes shell-script execution to the kernel-resolved
+      interpreter chain (`/usr/bin/env bash …`), and a Full Disk Access grant
+      on `/bin/bash` does NOT propagate through that chain — the supervisor
+      exits 126 ("Operation not permitted") on every cycle. Spelling bash
+      explicitly here makes /bin/bash the responsible exec, so the FDA grant
+      the install script tells users to add actually applies. See QUA-1004.
+    -->
     <key>ProgramArguments</key>
     <array>
+        <string>/bin/bash</string>
         <string>__SUPERVISOR__</string>
     </array>
 
