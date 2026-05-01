@@ -135,20 +135,18 @@ export async function findActiveClaimsByOthers(
   // 24-hour Linear-comment window (DEDUP_WINDOW_MS): PG has heartbeats
   // and can be precise about liveness, Linear comments cannot.
   const pgClaims = await findActiveClaimsByOthersFromPg(linearId, ctx, 30);
-  if (pgClaims !== null && pgClaims.length > 0) return pgClaims;
-  // When PG is reachable and returns no claims, trust it — skip the Linear
+  // When PG is reachable (non-null), trust its result — skip the Linear
   // API round-trip. The paranoia-layer open-PR check still runs regardless.
-  // (pgClaims === null means PG was unreachable; fall through to Linear then.)
-  if (pgClaims !== null) return [];
+  // pgClaims === null means PG was unreachable; fall through to Linear then.
+  if (pgClaims !== null) return pgClaims;
 
   // ── Source 2: Linear start comments (fallback when PG unreachable) ────────
   let comments: LinearComment[];
   try {
     comments = await getComments(linearId, 30);
   } catch {
-    // PG was queried above; if it returned [], we trust that. If it was
-    // unreachable (null) AND Linear is also down, fail-open.
-    return pgClaims ?? [];
+    // PG was unreachable (pgClaims is null) AND Linear is also down — fail-open.
+    return [];
   }
 
   // Walk comments chronologically to track which starts have been superseded
