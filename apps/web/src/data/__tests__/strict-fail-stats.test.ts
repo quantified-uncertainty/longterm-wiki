@@ -64,82 +64,55 @@ function mockReadFile(database: object) {
   });
 }
 
+async function loadFreshTablebase() {
+  const mod = await import("../tablebase");
+  mod._resetStrictFailStatsForTests();
+  return mod;
+}
+
 describe("strict-fail counter (QUA-953)", () => {
-  beforeEach(async () => {
+  beforeEach(() => {
     vi.resetModules();
     vi.clearAllMocks();
   });
 
   it("returns an empty stats object before getTypedEntities is called", async () => {
-    const { getStrictFailStats, _resetStrictFailStatsForTests } = await import(
-      "../tablebase"
-    );
-    _resetStrictFailStatsForTests();
+    const { getStrictFailStats } = await loadFreshTablebase();
     const stats = getStrictFailStats();
-    expect(stats.populated).toBe(false);
+    expect(stats.populatedAt).toBeNull();
     expect(stats.fallthroughCount).toBe(0);
     expect(stats.hardFailCount).toBe(0);
     expect(stats.totalEntities).toBe(0);
     expect(stats.byType).toEqual({});
-    expect(stats.populatedAt).toBeNull();
   });
 
   it("counts zero fall-throughs when all entities pass the strict schema", async () => {
     mockReadFile(buildMockDatabase());
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
+    const { getTypedEntities, getStrictFailStats } = await loadFreshTablebase();
 
     getTypedEntities();
     const stats = getStrictFailStats();
 
-    expect(stats.populated).toBe(true);
+    expect(stats.populatedAt).not.toBeNull();
     expect(stats.fallthroughCount).toBe(0);
     expect(stats.hardFailCount).toBe(0);
     expect(stats.totalEntities).toBe(1);
     expect(stats.byType).toEqual({});
-    expect(stats.populatedAt).not.toBeNull();
   });
 
   it("increments fallthroughCount and bucketing by entityType for unknown types", async () => {
     mockReadFile(
       buildMockDatabase([
-        // Unknown entity type → falls through to GenericEntityPassthroughSchema
-        {
-          id: "weird-1",
-          entityType: "weirdType",
-          title: "Weird One",
-          description: "first",
-        },
-        {
-          id: "weird-2",
-          entityType: "weirdType",
-          title: "Weird Two",
-          description: "second",
-        },
-        {
-          id: "other-1",
-          entityType: "otherWeirdType",
-          title: "Other Weird",
-          description: "third",
-        },
+        { id: "weird-1", entityType: "weirdType", title: "Weird One", description: "first" },
+        { id: "weird-2", entityType: "weirdType", title: "Weird Two", description: "second" },
+        { id: "other-1", entityType: "otherWeirdType", title: "Other Weird", description: "third" },
       ]),
     );
 
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
+    const { getTypedEntities, getStrictFailStats } = await loadFreshTablebase();
     getTypedEntities();
     const stats = getStrictFailStats();
 
-    expect(stats.populated).toBe(true);
     expect(stats.fallthroughCount).toBe(3);
     expect(stats.hardFailCount).toBe(0);
     expect(stats.totalEntities).toBe(4);
@@ -165,13 +138,7 @@ describe("strict-fail counter (QUA-953)", () => {
       ]),
     );
 
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
+    const { getTypedEntities, getStrictFailStats } = await loadFreshTablebase();
     getTypedEntities();
     const stats = getStrictFailStats();
 
@@ -191,13 +158,7 @@ describe("strict-fail counter (QUA-953)", () => {
     }));
     mockReadFile(buildMockDatabase(extras));
 
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
+    const { getTypedEntities, getStrictFailStats } = await loadFreshTablebase();
     getTypedEntities();
     const stats = getStrictFailStats();
 
@@ -205,39 +166,35 @@ describe("strict-fail counter (QUA-953)", () => {
     expect(stats.byType.manyWeird?.samples.length).toBe(5);
   });
 
-  it("returns a defensive copy from getStrictFailStats (mutating the result does not affect internal state)", async () => {
+  it("getStrictFailStats returns a deep copy — caller mutations never leak back", async () => {
     mockReadFile(
       buildMockDatabase([
-        {
-          id: "weird-1",
-          entityType: "weirdType",
-          title: "Weird",
-          description: "x",
-        },
+        { id: "weird-1", entityType: "weirdType", title: "Weird", description: "x" },
       ]),
     );
 
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
+    const { getTypedEntities, getStrictFailStats } = await loadFreshTablebase();
     getTypedEntities();
+
     const a = getStrictFailStats();
     a.fallthroughCount = 999;
-    a.byType.weirdType!.count = 999;
-    a.byType.weirdType!.samples.push({
-      id: "injected",
-      fieldPath: "x",
-      message: "x",
-    });
+    if (a.byType.weirdType) {
+      a.byType.weirdType.count = 999;
+      a.byType.weirdType.samples.push({ id: "injected", fieldPath: "x", message: "x" });
+      if (a.byType.weirdType.samples[0]) {
+        a.byType.weirdType.samples[0].id = "MUTATED";
+        a.byType.weirdType.samples[0].fieldPath = "MUTATED";
+        a.byType.weirdType.samples[0].message = "MUTATED";
+      }
+    }
 
     const b = getStrictFailStats();
     expect(b.fallthroughCount).toBe(1);
     expect(b.byType.weirdType?.count).toBe(1);
     expect(b.byType.weirdType?.samples.length).toBe(1);
+    expect(b.byType.weirdType?.samples[0]?.id).toBe("weird-1");
+    expect(b.byType.weirdType?.samples[0]?.fieldPath).not.toBe("MUTATED");
+    expect(b.byType.weirdType?.samples[0]?.message).not.toBe("MUTATED");
   });
 
   it("counts hardFailCount when even GenericEntityPassthroughSchema fails", async () => {
@@ -248,58 +205,20 @@ describe("strict-fail counter (QUA-953)", () => {
       ]),
     );
 
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
+    const { getTypedEntities, getStrictFailStats, STRICT_FAIL_UNKNOWN_LABEL } =
+      await loadFreshTablebase();
     getTypedEntities();
     const stats = getStrictFailStats();
 
     expect(stats.fallthroughCount).toBe(1);
     expect(stats.hardFailCount).toBe(1);
-    // The fall-through is bucketed under "<unknown>" because entityType is missing,
-    // and the recorded message should reflect a base-field validation failure
-    // (id/title required) rather than something accidental.
-    const samples = stats.byType["<unknown>"]?.samples ?? [];
+    // The fall-through is bucketed under the unknown-label sentinel because
+    // entityType is missing; sample message should reflect a base-field
+    // validation failure (id/title required) rather than something accidental.
+    const samples = stats.byType[STRICT_FAIL_UNKNOWN_LABEL]?.samples ?? [];
     expect(samples.length).toBe(1);
-    expect(samples[0]?.id).toBe("<unknown>");
+    expect(samples[0]?.id).toBe(STRICT_FAIL_UNKNOWN_LABEL);
     expect(samples[0]?.message.length).toBeGreaterThan(0);
-  });
-
-  it("getStrictFailStats returns a deep copy — mutating sample fields does not affect internal state", async () => {
-    mockReadFile(
-      buildMockDatabase([
-        {
-          id: "weird-1",
-          entityType: "weirdType",
-          title: "Weird",
-          description: "x",
-        },
-      ]),
-    );
-
-    const {
-      getTypedEntities,
-      getStrictFailStats,
-      _resetStrictFailStatsForTests,
-    } = await import("../tablebase");
-    _resetStrictFailStatsForTests();
-
-    getTypedEntities();
-    const a = getStrictFailStats();
-    if (a.byType.weirdType?.samples[0]) {
-      a.byType.weirdType.samples[0].id = "MUTATED";
-      a.byType.weirdType.samples[0].fieldPath = "MUTATED";
-      a.byType.weirdType.samples[0].message = "MUTATED";
-    }
-
-    const b = getStrictFailStats();
-    expect(b.byType.weirdType?.samples[0]?.id).toBe("weird-1");
-    expect(b.byType.weirdType?.samples[0]?.fieldPath).not.toBe("MUTATED");
-    expect(b.byType.weirdType?.samples[0]?.message).not.toBe("MUTATED");
   });
 
   it("_resetStrictFailStatsForTests throws outside test environments", async () => {
