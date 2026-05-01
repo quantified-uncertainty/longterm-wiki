@@ -54,6 +54,11 @@ function rowToSql(r: Row): Record<string, unknown> {
     error_code: r.errorCode,
     error_payload: r.errorPayload,
     followup_actions: r.followupActions,
+    cost_usd: r.costUsd,
+    tokens_input: r.tokensInput,
+    tokens_output: r.tokensOutput,
+    tokens_cache_read: r.tokensCacheRead,
+    tokens_cache_write: r.tokensCacheWrite,
     created_at: r.createdAt,
     updated_at: r.updatedAt,
   };
@@ -107,6 +112,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       error_code: "errorCode",
       error_payload: "errorPayload",
       followup_actions: "followupActions",
+      cost_usd: "costUsd",
+      tokens_input: "tokensInput",
+      tokens_output: "tokensOutput",
+      tokens_cache_read: "tokensCacheRead",
+      tokens_cache_write: "tokensCacheWrite",
       created_at: "createdAt",
       updated_at: "updatedAt",
     };
@@ -127,6 +137,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       errorCode: null,
       errorPayload: null,
       followupActions: [],
+      costUsd: null,
+      tokensInput: null,
+      tokensOutput: null,
+      tokensCacheRead: null,
+      tokensCacheWrite: null,
       createdAt: now,
       updatedAt: now,
     };
@@ -201,6 +216,11 @@ const dispatch: SqlDispatcher = (query, params) => {
       error_code: "errorCode",
       error_payload: "errorPayload",
       followup_actions: "followupActions",
+      cost_usd: "costUsd",
+      tokens_input: "tokensInput",
+      tokens_output: "tokensOutput",
+      tokens_cache_read: "tokensCacheRead",
+      tokens_cache_write: "tokensCacheWrite",
       created_at: "createdAt",
       updated_at: "updatedAt",
     };
@@ -497,6 +517,111 @@ describe("PATCH /api/pipeline-runs/:id/end", () => {
       body: JSON.stringify({ status: "committed" }),
     });
     expect(res.status).toBe(404);
+  });
+
+  it("persists costUsd + token counts when supplied (QUA-1012)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        status: "committed",
+        costUsd: 1.2345,
+        tokensInput: 1000,
+        tokensOutput: 500,
+        tokensCacheRead: 800,
+        tokensCacheWrite: 200,
+      }),
+    });
+    expect(res.status).toBe(200);
+    const body = (await res.json()) as Record<string, unknown>;
+    // numeric() returns the value as a string (Drizzle convention).
+    expect(body.costUsd).toBe("1.2345");
+    expect(body.tokensInput).toBe(1000);
+    expect(body.tokensOutput).toBe(500);
+    expect(body.tokensCacheRead).toBe(800);
+    expect(body.tokensCacheWrite).toBe(200);
+    // Verify the row was actually mutated (defends against the test
+    // dispatcher silently ignoring an unknown SET column).
+    expect(runStore[0].costUsd).toBe("1.2345");
+    expect(runStore[0].tokensInput).toBe(1000);
+  });
+
+  it("leaves cost telemetry NULL when omitted from end body", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "no-cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/no-cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed" }),
+    });
+    expect(res.status).toBe(200);
+    expect(runStore[0].costUsd).toBeNull();
+    expect(runStore[0].tokensInput).toBeNull();
+    expect(runStore[0].tokensOutput).toBeNull();
+    expect(runStore[0].tokensCacheRead).toBeNull();
+    expect(runStore[0].tokensCacheWrite).toBeNull();
+  });
+
+  it("rejects negative costUsd / token counts", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "neg-001",
+      pipelineName: "improve-page",
+    });
+
+    const r1 = await app.request("/api/pipeline-runs/neg-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: -0.01 }),
+    });
+    expect(r1.status).toBe(400);
+
+    const r2 = await app.request("/api/pipeline-runs/neg-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", tokensInput: -1 }),
+    });
+    expect(r2.status).toBe(400);
+  });
+
+  it("rejects costUsd over the 10k cap (overflow guard)", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "huge-cost-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/huge-cost-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", costUsd: 10_001 }),
+    });
+    expect(res.status).toBe(400);
+  });
+
+  it("rejects non-integer token counts", async () => {
+    const app = buildApp();
+    await postJson(app, "/api/pipeline-runs", {
+      runId: "frac-001",
+      pipelineName: "improve-page",
+    });
+
+    const res = await app.request("/api/pipeline-runs/frac-001/end", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ status: "committed", tokensInput: 1.5 }),
+    });
+    expect(res.status).toBe(400);
   });
 });
 

@@ -1617,6 +1617,13 @@ export const StartPipelineRunSchema = z.object({
 });
 export type StartPipelineRun = z.infer<typeof StartPipelineRunSchema>;
 
+// QUA-1012: cost-telemetry caps. costUsd is bounded well above any
+// realistic single-run spend ($10k) so a buggy CostTracker can't post
+// a billion-dollar value into prod; token counts are bounded below
+// signed-int32 max so the integer column never overflows.
+const MAX_COST_USD = 10_000;
+const MAX_TOKENS = 2_000_000_000;
+
 export const EndPipelineRunSchema = z.object({
   status: PipelineRunEndStatusSchema,
   failureReason: z.string().max(200).nullable().optional(),
@@ -1624,6 +1631,11 @@ export const EndPipelineRunSchema = z.object({
   errorPayload: BoundedJsonObjectSchema.nullable().optional(),
   snapshotPath: z.string().max(500).nullable().optional(),
   followupActions: z.array(BoundedFollowupSchema).max(MAX_FOLLOWUPS_COUNT).optional(),
+  costUsd: z.number().nonnegative().finite().max(MAX_COST_USD).nullable().optional(),
+  tokensInput: z.number().int().nonnegative().max(MAX_TOKENS).nullable().optional(),
+  tokensOutput: z.number().int().nonnegative().max(MAX_TOKENS).nullable().optional(),
+  tokensCacheRead: z.number().int().nonnegative().max(MAX_TOKENS).nullable().optional(),
+  tokensCacheWrite: z.number().int().nonnegative().max(MAX_TOKENS).nullable().optional(),
 });
 export type EndPipelineRun = z.infer<typeof EndPipelineRunSchema>;
 

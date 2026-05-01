@@ -254,6 +254,23 @@ const pipelineRunsApp = new Hono()
           ...(d.followupActions !== undefined
             ? { followupActions: d.followupActions }
             : {}),
+          // QUA-1012 cost telemetry. Drizzle's `numeric` column expects
+          // a string on write; integer columns take the number directly.
+          // Only set when the caller passed the field — undefined means
+          // "leave the existing value alone" (existing value is NULL on
+          // first end, but a partial-failure → retry → end-again caller
+          // shouldn't overwrite a previously-recorded cost with NULL).
+          ...(d.costUsd !== undefined
+            ? { costUsd: d.costUsd === null ? null : String(d.costUsd) }
+            : {}),
+          ...(d.tokensInput !== undefined ? { tokensInput: d.tokensInput } : {}),
+          ...(d.tokensOutput !== undefined ? { tokensOutput: d.tokensOutput } : {}),
+          ...(d.tokensCacheRead !== undefined
+            ? { tokensCacheRead: d.tokensCacheRead }
+            : {}),
+          ...(d.tokensCacheWrite !== undefined
+            ? { tokensCacheWrite: d.tokensCacheWrite }
+            : {}),
         })
         .where(eq(pipelineRuns.runId, id))
         .returning();

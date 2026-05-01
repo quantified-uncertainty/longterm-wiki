@@ -52,6 +52,14 @@ export interface EndPipelineRunInput {
   errorPayload?: Record<string, unknown> | null;
   snapshotPath?: string | null;
   followupActions?: Array<Record<string, unknown>>;
+  // QUA-1012 cost telemetry. All optional — pipelines that don't track
+  // cost simply omit them. Server caps: costUsd <= 10_000, each token
+  // count <= 2_000_000_000.
+  costUsd?: number | null;
+  tokensInput?: number | null;
+  tokensOutput?: number | null;
+  tokensCacheRead?: number | null;
+  tokensCacheWrite?: number | null;
 }
 
 // ---------------------------------------------------------------------------
