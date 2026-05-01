@@ -21,14 +21,17 @@
 import { describe, it, expect } from "vitest";
 
 import {
+  BudgetExhaustedError,
   buildImproveEntityRunOptions,
   buildVerifiedVerdictsFromBatch,
+  checkBudgetOrThrow,
   drainPendingBatches,
   parseAgentSessionId,
   parseExtractedClaims,
   type ClaimVerdictRow,
   type SubmittedBatchInfo,
 } from "./research-improve-entity.ts";
+import { CostTracker } from "../lib/cost-tracker.ts";
 import type { EntityWithType as ImportedEntityWithType } from "./research-improve-entity.ts";
 import type { PreFilterClaim } from "../lib/research/pre-filter.ts";
 import type { ApplyResult, VerifiedVerdict } from "../lib/research/apply-verdicts.ts";
@@ -552,5 +555,74 @@ describe("parseAgentSessionId", () => {
     // is bigserial starting at 1, so 0 won't appear in practice.
     expect(parseAgentSessionId("abc")).toBeNull();
     expect(parseAgentSessionId("not-a-number")).toBeNull();
+  });
+});
+
+// ── checkBudgetOrThrow + BudgetExhaustedError (QUA-1017) ───────────────────
+
+describe("checkBudgetOrThrow", () => {
+  /**
+   * Seed a CostTracker without going through streamingCreate by writing a
+   * record directly. Used to simulate a tracker that has already accumulated
+   * `usd` of LLM spend.
+   */
+  function trackerWithCost(usd: number): CostTracker {
+    const t = new CostTracker();
+    if (usd > 0) {
+      // record() expects token usage and computes cost via pricing.ts. We
+      // bypass that and push synthetic entries since the tests only care
+      // about totalCost. Double-cast through unknown is intentional — the
+      // entries array is readonly but vitest unit tests need direct seeding.
+      (t.entries as unknown as Array<unknown>).push({
+        model: "test",
+        inputTokens: 0,
+        outputTokens: 0,
+        cacheCreationInputTokens: 0,
+        cacheReadInputTokens: 0,
+        cost: usd,
+        label: "test",
+        timestamp: Date.now(),
+      });
+    }
+    return t;
+  }
+
+  it("does not throw when totalCost is below budget", () => {
+    const t = trackerWithCost(0.5);
+    expect(() => checkBudgetOrThrow(t, 1.0)).not.toThrow();
+  });
+
+  it("throws BudgetExhaustedError when totalCost exactly equals budget (>=, not >)", () => {
+    const t = trackerWithCost(1.0);
+    expect(() => checkBudgetOrThrow(t, 1.0)).toThrow(BudgetExhaustedError);
+  });
+
+  it("throws BudgetExhaustedError when totalCost has overshot budget", () => {
+    const t = trackerWithCost(1.5);
+    let caught: unknown;
+    try {
+      checkBudgetOrThrow(t, 1.0);
+    } catch (e) {
+      caught = e;
+    }
+    expect(caught).toBeInstanceOf(BudgetExhaustedError);
+    const err = caught as BudgetExhaustedError;
+    expect(err.spentUsd).toBe(1.5);
+    expect(err.budgetUsd).toBe(1.0);
+    expect(err.message).toContain("$1.5000");
+    expect(err.message).toContain("$1.00");
+    expect(err.name).toBe("BudgetExhaustedError");
+  });
+
+  it("does not throw on a fresh tracker against a positive budget", () => {
+    const t = new CostTracker();
+    expect(() => checkBudgetOrThrow(t, 5.0)).not.toThrow();
+  });
+
+  it("throws on a fresh tracker against a zero budget (degenerate but defined)", () => {
+    // A budget of 0 means "no spend allowed" — even an empty tracker should
+    // trip immediately so callers can't cheat the cap by setting it to 0.
+    const t = new CostTracker();
+    expect(() => checkBudgetOrThrow(t, 0)).toThrow(BudgetExhaustedError);
   });
 });

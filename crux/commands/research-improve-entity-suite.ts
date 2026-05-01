@@ -17,6 +17,7 @@ import { z } from "zod";
 
 import { type CommandResult } from "../lib/cli.ts";
 import {
+  BudgetExhaustedError,
   type ImproveOptions,
   type ImproveResult,
   improveSingleEntity,
@@ -311,8 +312,26 @@ export async function runSuite(opts: SuiteRunOptions): Promise<SuiteSnapshot> {
       }
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
+      // BudgetExhaustedError from the per-entity hard cap (QUA-1017): the
+      // entity hit its budget mid-iteration and aborted. Record as
+      // `skipped_budget` (the budget signal, not a real failure) and stop
+      // dispatching further entities — the suite's totalSpent has already
+      // consumed the per-entity allowance.
+      if (err instanceof BudgetExhaustedError) {
+        console.warn(`[suite] BUDGET-EXHAUSTED: ${entry.slug}: ${msg}; stopping suite`);
+        records.push(emptyRecord(entry, "skipped_budget", msg));
+        totalSpent += err.spentUsd;
+        break;
+      }
       console.warn(`[suite] FAILED: ${entry.slug}: ${msg}`);
       records.push(emptyRecord(entry, "failed", msg));
+    }
+  }
+  // Mark any entities not yet dispatched after a mid-suite break as
+  // `skipped_budget` so the snapshot still has a row per supported entry.
+  if (records.length < supported.length) {
+    for (const entry of supported.slice(records.length)) {
+      records.push(emptyRecord(entry, "skipped_budget"));
     }
   }
 
@@ -427,12 +446,13 @@ Options:
   --dry-run         Don't write YAML changes back to data/entities/responses.yaml.
 
 Budget governance:
-  Per-entity soft cap = 2 × (total_budget / N) where N = supported entities.
-  This is a soft cap: a single iteration may overshoot it, since runResearch
-  spends until its own budgetCap. The suite halts mid-run when remaining
-  budget falls below $${MIN_USEFUL_BUDGET_USD.toFixed(2)}; remaining entities
-  are recorded as \`skipped_budget\`. \`--budget\` is therefore a target, not
-  a strict bound.
+  Per-entity hard cap = 2 × (total_budget / N) where N = supported entities.
+  Enforced by a live CostTracker inside improveSingleEntity (QUA-1017): when
+  the tracker total reaches the per-entity cap mid-iteration, the entity
+  throws BudgetExhaustedError. The suite catches it, records the entity as
+  \`skipped_budget\`, and stops dispatching further entities. The suite also
+  short-circuits when remaining < $${MIN_USEFUL_BUDGET_USD.toFixed(2)} before
+  starting an entity. \`--budget\` is now a hard cap on total LLM spend.
 `,
     exitCode: 0,
   };

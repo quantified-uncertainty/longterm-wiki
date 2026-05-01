@@ -26,6 +26,7 @@ import {
   type PerEntityRecord,
   type SuiteEntry,
 } from "./research-improve-entity-suite.ts";
+import { BudgetExhaustedError } from "./research-improve-entity.ts";
 import type { ImproveResult, IterationMetrics } from "./research-improve-entity.ts";
 
 // ── fixtures ───────────────────────────────────────────────────────────────
@@ -433,6 +434,47 @@ describe("runSuite", () => {
       { slug: "a", budget: 2.0 },
       { slug: "b", budget: 2.0 },
     ]);
+  });
+
+  it("treats BudgetExhaustedError as skipped_budget and stops dispatching further entities (QUA-1017)", async () => {
+    const { suitePath, snapshotDir } = writeFixtureSuite(
+      { slug: "first", type: "policy" },
+      { slug: "burner", type: "policy" },
+      { slug: "third", type: "policy" },
+      { slug: "fourth", type: "policy" },
+    );
+    const calls: string[] = [];
+    const improver = async ({ slug }: { slug: string }) => {
+      calls.push(slug);
+      if (slug === "first") return makeResult(slug);
+      if (slug === "burner") {
+        // Simulate the per-entity hard cap firing inside improveSingleEntity.
+        throw new BudgetExhaustedError(2.5, 1.0);
+      }
+      // Should never be called — third/fourth must be skipped after the
+      // burner trips the cap.
+      throw new Error(`improver should not have been called for ${slug}`);
+    };
+    const snap = await runSuite({
+      tag: "budget-stop",
+      totalBudgetUsd: 8.0,
+      maxIters: 1,
+      suitePath,
+      snapshotDir,
+      improver,
+    });
+    expect(calls).toEqual(["first", "burner"]);
+    expect(snap.entities).toHaveLength(4);
+    expect(snap.entities[0].status).toBe("completed");
+    expect(snap.entities[1].status).toBe("skipped_budget");
+    expect(snap.entities[1].error).toMatch(/Spent \$2\.5000 of \$1\.00 budget/);
+    expect(snap.entities[2].status).toBe("skipped_budget");
+    expect(snap.entities[2].error).toBeUndefined();
+    expect(snap.entities[3].status).toBe("skipped_budget");
+    expect(snap.entities[3].error).toBeUndefined();
+    expect(snap.aggregate.entities_completed).toBe(1);
+    expect(snap.aggregate.entities_skipped_budget).toBe(3);
+    expect(snap.aggregate.entities_failed).toBe(0);
   });
 
   it("records failures without aborting subsequent entities", async () => {

@@ -31,6 +31,7 @@ import { proposeClaims, getClaimStatus } from "../lib/wiki-server/claims.ts";
 import { suggestResourcesApi } from "../lib/wiki-server/resources.ts";
 import { searchEntities } from "../lib/wiki-server/entities.ts";
 import { createLlmClient, streamingCreate, extractText, MODELS } from "../lib/llm.ts";
+import { CostTracker } from "../lib/cost-tracker.ts";
 import { escapeXml } from "../lib/prompt-utils.ts";
 
 import {
@@ -67,6 +68,37 @@ const ENTITIES_DIR = path.join(ROOT, "data/entities");
 const SNAPSHOTS = path.join(ROOT, ".claude/snapshots/improve-entity");
 
 const SUPPORTED_TYPES = new Set(["policy", "organization"]);
+
+/**
+ * Thrown when the live CostTracker total has reached the configured `--budget`
+ * cap. Caught by `doImproveSingleEntity` (which converts it to a graceful
+ * `reason: "budget-exhausted"` exit so the snapshot/YAML write still happens)
+ * and by the suite runner (which records the entity as `skipped_budget` and
+ * stops dispatching further entities). QUA-1017.
+ */
+export class BudgetExhaustedError extends Error {
+  readonly spentUsd: number;
+  readonly budgetUsd: number;
+  constructor(spentUsd: number, budgetUsd: number) {
+    super(`Spent $${spentUsd.toFixed(4)} of $${budgetUsd.toFixed(2)} budget`);
+    this.name = "BudgetExhaustedError";
+    this.spentUsd = spentUsd;
+    this.budgetUsd = budgetUsd;
+  }
+}
+
+/**
+ * Hard-cap guard: throws {@link BudgetExhaustedError} when the live tracker
+ * total has reached or exceeded `budgetUsd`. Called before every
+ * `streamingCreate`-bearing call inside the inner loop, and before every
+ * outer-loop iteration. Pure / synchronous so it's cheap to call repeatedly.
+ * Exported for testing. QUA-1017.
+ */
+export function checkBudgetOrThrow(tracker: CostTracker, budgetUsd: number): void {
+  if (tracker.totalCost >= budgetUsd) {
+    throw new BudgetExhaustedError(tracker.totalCost, budgetUsd);
+  }
+}
 
 export interface EntityWithType {
   id: string;
@@ -722,6 +754,7 @@ async function extractGapClaims(
   gaps: Gap[],
   sourceUrl: string,
   sourceContent: string,
+  tracker: CostTracker,
 ): Promise<{ claims: ExtractedClaim[]; cost: number }> {
   if (sourceContent.trim().length < 200) return { claims: [], cost: 0 };
   const prompt = buildExtractPrompt(entity, gaps, sourceUrl, sourceContent);
@@ -729,11 +762,15 @@ async function extractGapClaims(
   let inT = 0;
   let outT = 0;
   try {
-    const resp = await streamingCreate(llm(), {
-      model: MODELS.haiku,
-      max_tokens: 2000,
-      messages: [{ role: "user", content: prompt }],
-    });
+    const resp = await streamingCreate(
+      llm(),
+      {
+        model: MODELS.haiku,
+        max_tokens: 2000,
+        messages: [{ role: "user", content: prompt }],
+      },
+      { tracker, label: "improve-entity:extract-claims" },
+    );
     raw = extractText(resp);
     inT = resp.usage?.input_tokens ?? 0;
     outT = resp.usage?.output_tokens ?? 0;
@@ -795,8 +832,13 @@ export { POSITION_STEM_PATTERNS };
 async function runIteration(
   entity: EntityWithType,
   iter: number,
-  budgetRemainingUsd: number,
+  budgetUsd: number,
+  tracker: CostTracker,
 ): Promise<{ entity: EntityWithType; metrics: IterationMetrics; batch: SubmittedBatchInfo | null }> {
+  // Live remaining budget for this iteration's research-agent budgetCap. Floor
+  // at 0 so a tracker that is already over budget still produces a non-negative
+  // value (callers throw before reaching this point — see checkBudgetOrThrow).
+  const budgetRemainingUsd = Math.max(0, budgetUsd - tracker.totalCost);
   const t0 = Date.now();
   const m: IterationMetrics = {
     iter,
@@ -826,6 +868,8 @@ async function runIteration(
   console.log(`[iter ${iter}] gaps: ${gaps.map((g) => g.key).join(", ")}`);
 
   // 1. Discovery — focus on the top 3 gaps' research topics, joined.
+  // Hard-cap guard before the most expensive call in the iteration. QUA-1017.
+  checkBudgetOrThrow(tracker, budgetUsd);
   const topic = gaps.slice(0, 3).map((g) => g.researchTopic).join(" — ");
   const researchBudget = Math.min(0.5, budgetRemainingUsd * 0.2);
   console.log(`[iter ${iter}] research: "${topic.slice(0, 100)}" budget=$${researchBudget.toFixed(2)}`);
@@ -844,6 +888,7 @@ async function runIteration(
       extractFacts: false,
     },
     budgetCap: researchBudget,
+    tracker,
   });
   m.sources_found = research.sources.length;
   m.cost_research_usd = research.metadata.totalCost ?? 0;
@@ -869,7 +914,11 @@ async function runIteration(
     if (!content || content.length < 200) continue;
     const resourceId = resourceIdByUrl.get(src.url) ?? "";
     contentByKey.set(src.url, content);
-    const ex = await extractGapClaims(entity, gaps, src.url, content);
+    // Hard-cap guard before each streamingCreate inside the inner loop. If
+    // runResearch overshot its own budgetCap above, this stops further per-
+    // source extract spending. QUA-1017.
+    checkBudgetOrThrow(tracker, budgetUsd);
+    const ex = await extractGapClaims(entity, gaps, src.url, content, tracker);
     m.cost_extract_usd += ex.cost;
     for (const c of ex.claims) {
       allClaims.push({ ...c, resourceId, sourceUrl: src.url });
@@ -1044,9 +1093,27 @@ export async function improveSingleEntity(opts: ImproveOptions): Promise<Improve
     parseAgentSessionId(getCachedAuditSessionId()),
   );
 
-  return withPipelineRun(runOptions, async () =>
-    doImproveSingleEntity({ found, slug, target, maxIters, budgetUsd, noWrite, opts }),
-  );
+  return withPipelineRun(runOptions, async (ctx) => {
+    const result = await doImproveSingleEntity({
+      found,
+      slug,
+      target,
+      maxIters,
+      budgetUsd,
+      noWrite,
+      opts,
+    });
+    // Hard-cap exits aren't "committed" — the run stopped before completing
+    // its work. Mark the pipeline_runs row accordingly so dashboards distinguish
+    // budget-aborts from successful runs. QUA-1017.
+    if (result.reason === "budget-exhausted") {
+      ctx.markStatus("aborted", {
+        reason: "budget_exhausted",
+        errorCode: "budget_exhausted",
+      });
+    }
+    return result;
+  });
 }
 
 /**
@@ -1105,23 +1172,43 @@ async function doImproveSingleEntity(args: {
   const t0 = Date.now();
   const iterations: IterationMetrics[] = [];
   const submittedBatches: SubmittedBatchInfo[] = [];
-  let budgetRemaining = budgetUsd;
+  // Live cost tracker — every streamingCreate (claim extraction, research-agent
+  // internals via the `tracker` param) auto-records into this. tracker.totalCost
+  // is the canonical "spent so far" used for hard-cap enforcement. QUA-1014/1017.
+  const tracker = new CostTracker();
   let hitTarget = false;
   let reason = "max-iters";
 
   for (let i = 1; i <= maxIters; i++) {
-    if (budgetRemaining <= 0.05) {
+    // Hard-cap guard before kicking off a new iteration — cheap, prevents
+    // starting work that will obviously overshoot. QUA-1017.
+    if (tracker.totalCost >= budgetUsd) {
       reason = "budget-exhausted";
       break;
     }
-    const out = await runIteration(entity, i, budgetRemaining);
+    let out;
+    try {
+      out = await runIteration(entity, i, budgetUsd, tracker);
+    } catch (err) {
+      if (err instanceof BudgetExhaustedError) {
+        // The inner loop hit the hard cap mid-iteration. Treat as a clean exit
+        // so we still write the snapshot/YAML for whatever was applied.
+        console.warn(
+          `[iter ${i}] budget exhausted: ${err.message}. Stopping after this iteration's partial work.`,
+        );
+        reason = "budget-exhausted";
+        break;
+      }
+      throw err;
+    }
     entity = out.entity;
     iterations.push(out.metrics);
     if (out.batch) submittedBatches.push(out.batch);
-    budgetRemaining -= out.metrics.cost_research_usd + out.metrics.cost_extract_usd;
+    const budgetRemaining = Math.max(0, budgetUsd - tracker.totalCost);
     const cov = coverageFor(entity);
     console.log(
-      `[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, budget=$${budgetRemaining.toFixed(2)}`,
+      `[iter ${i}] coverage=${cov.score}, facts=${JSON.stringify(cov.facts_in_yaml)}, ` +
+        `spent=$${tracker.totalCost.toFixed(4)}, remaining=$${budgetRemaining.toFixed(2)}`,
     );
     if (out.metrics.applied_to_yaml === 0 && i > 1) {
       reason = "no-progress";
@@ -1220,7 +1307,12 @@ Supported entity types: policy, organization.
 
 Options:
   --target=N           Stop when (provisions+stakeholders for policy, products+keyPeople+keyDates for org) ≥ N (default: 12)
-  --budget=N           Max LLM spend in USD (default: 2.0)
+  --budget=N           Max LLM spend in USD — HARD cap, enforced by a live
+                       CostTracker before every streamingCreate call. When the
+                       tracker reaches this number mid-iteration, the loop
+                       throws BudgetExhaustedError, exits with reason
+                       "budget-exhausted", and the pipeline_runs row is marked
+                       aborted with errorCode=budget_exhausted (default: 2.0).
   --max-iters=N        Max iterations (default: 3)
   --dry-run            Don't write YAML
   --wait-for-settle    After the main loop exits (target/iters/budget), keep
