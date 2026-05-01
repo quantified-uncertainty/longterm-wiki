@@ -182,6 +182,107 @@ export function extractStructuredDate(
   return null;
 }
 
+// Verb stems used as a "is this a real sentence?" smoke test for product
+// descriptions. The Haiku extractor sometimes emits noun phrases or fragments
+// ("Claude large-language model", "the company's flagship product"); requiring
+// at least one common verb lets us reject those without leaning on full NLP.
+// This is a sanity floor, not a grammar checker — false negatives just leave
+// the slot for re-extraction next iteration.
+const COMMON_VERBS = new Set([
+  "is", "are", "was", "were", "be", "been", "being", "am",
+  "has", "have", "had", "having",
+  "do", "does", "did", "doing", "done",
+  "will", "would", "shall", "should", "can", "could", "may", "might", "must",
+  "provides", "provide", "provided", "providing",
+  "offers", "offer", "offered", "offering",
+  "supports", "support", "supported", "supporting",
+  "enables", "enable", "enabled", "enabling",
+  "allows", "allow", "allowed", "allowing",
+  "creates", "create", "created", "creating",
+  "builds", "build", "built", "building",
+  "develops", "develop", "developed", "developing",
+  "runs", "ran", "running",
+  "designed", "design", "designs", "designing",
+  "used", "use", "uses", "using",
+  "called", "calls", "calling",
+  "named", "naming",
+  "includes", "include", "included", "including",
+  "focuses", "focused", "focusing",
+  "makes", "make", "made", "making",
+  "lets", "let", "letting",
+  "helps", "help", "helped", "helping",
+  "generates", "generate", "generated", "generating",
+  "produces", "produce", "produced", "producing",
+  "performs", "perform", "performed", "performing",
+  "processes", "processed", "processing",
+  "trains", "trained", "training",
+  "launched", "launches", "launch", "launching",
+  "released", "releases", "release", "releasing",
+  "powers", "powered", "powering",
+  "delivers", "deliver", "delivered", "delivering",
+  "combines", "combine", "combined", "combining",
+  "represents", "represent", "represented", "representing",
+  "serves", "serve", "served", "serving",
+  "operates", "operate", "operated", "operating",
+  "works", "worked", "working",
+  "comprises", "comprise", "comprising",
+  "consists", "consist", "consisting",
+  "targets", "target", "targeted", "targeting",
+  "handles", "handle", "handled", "handling",
+  "extends", "extend", "extended", "extending",
+  "deploy", "deploys", "deployed", "deploying",
+]);
+
+const PRODUCT_DESC_MAX_LENGTH = 300;
+const PRODUCT_DESC_MIN_WORDS = 8;
+
+/**
+ * Normalize a Haiku-extracted product description before writing it to YAML.
+ *
+ * The Haiku extractor occasionally returns fragmentary excerpts (leading
+ * `...`, embedded ellipses, multi-paragraph blobs) because it copy-pastes
+ * the surrounding source instead of synthesizing a coherent sentence. This
+ * normalizer is the apply-step safety net for that — it strips obvious
+ * artifacts and rejects anything that still doesn't look like a sentence.
+ *
+ * Returns the cleaned description, or `null` if the input is too thin to
+ * write (caller should mark the verdict skipped). Decisions:
+ *   - Leading `[.,…\s]+` (extraction artifacts like "...exemplified by") → strip
+ *   - Mid-text `...` or `…` (source omissions) → collapse to a single space
+ *   - Length > 300 chars → keep up to the first sentence, else truncate
+ *   - < 8 words OR no recognized verb → null (slot left for re-extraction)
+ *
+ * Exported for testing. See QUA-938.
+ */
+export function normalizeProductDescription(input: string | null | undefined): string | null {
+  if (!input) return null;
+  let s = input.trim();
+  if (!s) return null;
+  // Strip leading extraction artifacts: dots, ellipses, commas, whitespace.
+  // Catches "...exemplified by..." and ",and the company..." and similar.
+  s = s.replace(/^[.,\s…]+/u, "").trim();
+  if (!s) return null;
+  // Collapse mid-text ellipses (`...` or `…`) — these are almost always
+  // signals that the extractor stitched two non-adjacent source snippets.
+  // Replacing with a single space keeps the surrounding tokens but removes
+  // the visual "this was cut" tell.
+  s = s.replace(/\s*\.{3,}\s*/g, " ").replace(/\s*…\s*/g, " ");
+  // Normalize whitespace.
+  s = s.replace(/\s+/g, " ").trim();
+  if (!s) return null;
+  // If overly long, prefer the first sentence; otherwise hard-truncate at 300.
+  if (s.length > PRODUCT_DESC_MAX_LENGTH) {
+    const firstSentence = s.match(/^[^.!?]+[.!?]/);
+    s = firstSentence ? firstSentence[0].trim() : s.slice(0, PRODUCT_DESC_MAX_LENGTH).trim();
+  }
+  if (!s) return null;
+  const words = s.split(/\s+/).filter(Boolean);
+  if (words.length < PRODUCT_DESC_MIN_WORDS) return null;
+  const hasVerb = words.some((w) => COMMON_VERBS.has(w.toLowerCase().replace(/[^a-z]/g, "")));
+  if (!hasVerb) return null;
+  return s;
+}
+
 /**
  * Canonical comparison key for a person's display name. Strips suffixes
  * (Jr., Sr., III, PhD, MD), lowercases, and slugifies. Used for keyPerson
@@ -491,9 +592,17 @@ export function applyVerdictsToOrganization(
       const existing = next.products.find(
         (p) => slugify(p.name) === slug || slugify(p.name) === nameSlug,
       );
+      // Normalize the candidate description before comparison/write — strips
+      // leading "..." extraction artifacts, collapses mid-text ellipses, and
+      // returns null for fragments under 8 words or without a verb. QUA-938.
+      const cleaned = normalizeProductDescription(value);
+      if (!cleaned) {
+        applied.push({ targetField: tf, action: "skipped", reason: "description too thin" });
+        continue;
+      }
       if (existing) {
-        if (!existing.description || existing.description.length < value.length) {
-          existing.description = value;
+        if (!existing.description || existing.description.length < cleaned.length) {
+          existing.description = cleaned;
           if (!existing.source) existing.source = v.sourceUrl;
           applied.push({ targetField: tf, action: "updated" });
         } else {
@@ -501,7 +610,7 @@ export function applyVerdictsToOrganization(
         }
         continue;
       }
-      next.products.push({ name, description: value, source: v.sourceUrl });
+      next.products.push({ name, description: cleaned, source: v.sourceUrl });
       applied.push({ targetField: tf, action: "added" });
       continue;
     }
