@@ -574,6 +574,31 @@ function applyToYaml(
 // ── Verify chain ─────────────────────────────────────────────────────
 
 /**
+ * Patterns sourcingCommand uses to signal "nothing to do" via exit code 0.
+ * These are NOT verify successes — they indicate the post-write reload
+ * couldn't find the fact (race, slug rename, atomic-rename lag, fact-id
+ * collision) or the fact lacks a source URL the verifier can fetch. The
+ * wrapper must NOT count these as verdicts landed.
+ *
+ * See `crux/commands/factbase-sourcing.ts` (sourcingCommand: "if
+ * factsToVerify.length === 0" branch) for the canonical message strings.
+ * The patterns here are anchored to the start-of-output to avoid matching
+ * legitimate verify output that happens to embed the substring.
+ */
+const VERIFY_NO_OP_PATTERNS = [
+  /^Fact not found or has no source URL:/,
+  /^No facts with source URLs found/,
+];
+
+function isVerifyNoOp(output: string | undefined): boolean {
+  if (!output) return false;
+  for (const pat of VERIFY_NO_OP_PATTERNS) {
+    if (pat.test(output)) return true;
+  }
+  return false;
+}
+
+/**
  * After --apply writes succeed, run the existing fact-sourcing pipeline
  * inline on the freshly-sourced facts. Calls `sourcingCommand({ fact: id })`
  * once per fact ID (the command reloads the KB on each call, so writes are
@@ -588,6 +613,14 @@ function applyToYaml(
  * fetches source content + calls the LLM + stores a verdict. Concurrency
  * here would race against per-fact storage and the wiki-server's verdict
  * upsert; sequential is simpler and matches how `crux fb sourcing` runs.
+ *
+ * QUA-963 CRITICAL fix: `sourcingCommand` returns exit code 0 with output
+ * `"Fact not found or has no source URL: <id>"` when the post-write reload
+ * doesn't see the fact (race, fact-id collision, slug rename, etc.). Without
+ * the no-op detection below, the wrapper would silently count those as
+ * `succeeded` while zero verdicts actually landed — operators would see
+ * "Verify succeeded: N" and trust it. Match the no-op patterns and re-classify
+ * as `failed` so the count reflects actual verdict landings.
  */
 async function runVerifyChain(
   factIds: string[],
@@ -601,8 +634,12 @@ async function runVerifyChain(
     summary.attempted++;
     try {
       const res = await sourcingCommand([], { fact: factId });
-      if (res.exitCode === 0) summary.succeeded++;
-      else {
+      if (res.exitCode === 0 && !isVerifyNoOp(res.output)) {
+        summary.succeeded++;
+      } else if (res.exitCode === 0 && isVerifyNoOp(res.output)) {
+        summary.failed++;
+        log(`  [verify] ${factId}: no-op (verifier did not see the fact post-write — race, collision, or missing source)`);
+      } else {
         summary.failed++;
         log(`  [verify] ${factId}: exit ${res.exitCode}`);
       }
