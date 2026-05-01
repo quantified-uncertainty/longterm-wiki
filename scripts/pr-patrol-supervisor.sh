@@ -41,7 +41,11 @@ if ! command -v pnpm >/dev/null 2>&1 && [ -d "$NVM_DIR/versions/node" ]; then
   [ -n "$fallback_bin" ] && export PATH="$fallback_bin:${PATH:-}"
 fi
 
-export PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
+# ~/.local/bin: Claude Code's CLI installer puts `claude` here. Without this
+# entry, patrol's `spawn claude ENOENT` errors on the very first fix attempt
+# even though the supervisor itself runs cleanly. Other tools that npm-install
+# globally land in homebrew/usr-local, which is already covered.
+export PATH="$HOME/.local/bin:/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:${PATH:-}"
 
 # ── Working directory + log ───────────────────────────────────────────────────
 # This script lives at <wiki-clone>/scripts/pr-patrol-supervisor.sh, so the
