@@ -366,9 +366,71 @@ describe("QUA-928: GET /api/sourcing/coverage — checkability split", () => {
     // (postgres-js then serialises it as `text[]`), not the spread elements.
     const arrayParams = checkableParams.filter((p) => Array.isArray(p));
     expect(arrayParams).toHaveLength(1);
-    // Sanity: properties.yaml has at least one verifiable:false entry, so the
-    // bound array isn't empty in prod-shaped runs.
+    // Content check, not just shape: the bound array must equal the spread
+    // of `getNonVerifiablePropertyIds()`. Without this, a future refactor
+    // that introduces a second array param to the same SELECT would silently
+    // pass the shape check while binding the wrong array.
+    const { getNonVerifiablePropertyIds } = await import("../property-metadata.js");
+    expect(arrayParams[0]).toEqual([...getNonVerifiablePropertyIds()]);
+    // Sanity: properties.yaml has at least one verifiable:false entry.
     expect((arrayParams[0] as unknown[]).length).toBeGreaterThan(0);
+  });
+
+  it("survives an empty non-verifiable property list (QUA-985 red-team)", async () => {
+    // Adversarial input: if properties.yaml has zero `verifiable: false`
+    // entries, `[...emptySet]` is `[]` and `sql.param([])` should bind as
+    // `'{}'::text[]`. The query `ANY('{}')` matches nothing, so the
+    // `NOT (measure = ANY(...))` clause is true for every row — every
+    // sourced fact counts as checkable. Verify the query still binds as
+    // a single text[] param (no row-constructor regression on empty input)
+    // and the endpoint still returns 200.
+    const { _resetPropertyMetadataCache } = await import("../property-metadata.js");
+    const propertyMetadata = await import("../property-metadata.js");
+    _resetPropertyMetadataCache();
+    const spy = vi
+      .spyOn(propertyMetadata, "getNonVerifiablePropertyIds")
+      .mockReturnValue(new Set<string>());
+
+    try {
+      tableTotals = [{ table_name: "fact", total: 100 }];
+      verifiedCounts = [];
+
+      const res = await app.request("/api/sourcing/coverage");
+      expect(res.status).toBe(200);
+
+      const idx = capturedQueries.findIndex(
+        (q) => /FROM\s+facts/i.test(q) && /AS\s+checkable/i.test(q),
+      );
+      expect(idx).toBeGreaterThanOrEqual(0);
+      expect(capturedQueries[idx]).toMatch(/ANY\(\s*\$\d+::text\[\]\s*\)/);
+      const arrayParams = capturedParams[idx].filter((p) => Array.isArray(p));
+      expect(arrayParams).toHaveLength(1);
+      expect(arrayParams[0]).toEqual([]);
+    } finally {
+      spy.mockRestore();
+      _resetPropertyMetadataCache();
+    }
+  });
+
+  it("/coverage-matrix shares the fix via countCheckableFacts (QUA-985)", async () => {
+    // /coverage-matrix and /coverage both call countCheckableFacts(db). The
+    // QUA-985 prod 500 affected both endpoints. This is a smoke test that
+    // /coverage-matrix also issues the checkable query in the fixed shape,
+    // so a future refactor that inlines the helper into one endpoint can't
+    // re-introduce the bug on the other.
+    tableTotals = [{ record_type: "fact", total: 100 }];
+    checkedCounts = [];
+    verdictRows = [];
+
+    const res = await app.request("/api/sourcing/coverage-matrix");
+    expect(res.status).toBe(200);
+
+    const idx = capturedQueries.findIndex(
+      (q) => /FROM\s+facts/i.test(q) && /AS\s+checkable/i.test(q),
+    );
+    expect(idx).toBeGreaterThanOrEqual(0);
+    expect(capturedQueries[idx]).not.toMatch(/ANY\(\s*\(\s*\$\d+\s*,/);
+    expect(capturedQueries[idx]).toMatch(/ANY\(\s*\$\d+::text\[\]\s*\)/);
   });
 });
 

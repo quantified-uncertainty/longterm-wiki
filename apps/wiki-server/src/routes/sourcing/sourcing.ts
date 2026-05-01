@@ -159,9 +159,13 @@ async function countCheckableFacts(
 ): Promise<number> {
   const nonVerifiable = [...getNonVerifiablePropertyIds()];
   // `sql.param(arr)` binds the JS array as a single `text[]` parameter.
-  // Plain `${nonVerifiable}` would expand into a row constructor
+  // Drizzle's `sql` template tag (used here via `db.execute(sql`...`)`)
+  // would otherwise expand `${nonVerifiable}` into a row constructor
   // `($1, $2, ..., $N)` which Postgres can't cast to `text[]` and which
-  // 500'd both /coverage and /coverage-matrix on prod (QUA-985).
+  // 500'd both /coverage and /coverage-matrix on prod (QUA-985). The
+  // postgres-js raw tagged template (`getDb()` callsites) handles JS
+  // arrays natively and does NOT need this wrapper — see
+  // `routes/shared/query-helpers.ts` for the canonical write-up.
   const rows = (await db.execute(sql`
     SELECT count(DISTINCT fact_id)::int AS checkable
     FROM facts
