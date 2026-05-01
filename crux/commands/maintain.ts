@@ -1013,6 +1013,7 @@ Commands:
   triage-linear    Triage Linear queue (stale In Progress, stuck In Review, dispatch queue)
   detect-cruft     Find dead code, TODOs, large files, commented-out code
   fix-chains       Detect feature PRs followed by fix PRs (quality signal)
+  reconcile-stakeholders  Daily PG↔YAML reconciliation for policy.stakeholders (QUA-958 canary)
   health-snapshot  Quantified code health metrics (TODOs, any types, fix ratio, etc.)
   status           Show last maintenance run info and recommended cadences
   mark-run         Update the last-run timestamp without running a report
