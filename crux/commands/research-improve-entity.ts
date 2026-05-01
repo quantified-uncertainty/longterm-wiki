@@ -133,6 +133,14 @@ export interface ImproveOptions {
 // Wait-for-settle: per-batch tracking + drain helper (QUA-939)
 // ──────────────────────────────────────────────────────────────────────────────
 
+/** Default global wall-clock cap for the post-loop drain (30 min). The drain
+ *  bounds total time spent waiting for stuck batches; matches the
+ *  `MAX_POLL_ROUNDS * 30s = 30 min` per-iteration polling cap. */
+const DEFAULT_DRAIN_MAX_DURATION_MS = 30 * 60 * 1000;
+/** Default sleep between drain polls (30s). Matches the per-iteration polling
+ *  cadence — the worker queue moves on a similar timescale. */
+const DEFAULT_DRAIN_POLL_INTERVAL_MS = 30_000;
+
 /** A claim verdict row as returned by `getClaimStatus`. Mirrors the shape we
  *  consume from `apps/wiki-server/src/routes/claims/claims.ts`. */
 export interface ClaimVerdictRow {
@@ -224,6 +232,18 @@ export function buildVerifiedVerdictsFromBatch(
   return { verdicts: out, counts };
 }
 
+/** Mark every claim ID in `batch` whose latest verdict is verified/partial as
+ *  `appliedClaimIds`. Idempotent — safe to call after each apply. */
+function markAppliedFromLastVerdicts(batch: SubmittedBatchInfo): void {
+  for (let i = 0; i < batch.submittedByOrder.length; i++) {
+    const id = batch.claimIds[i];
+    if (id == null) continue;
+    const v = batch.lastVerdicts.find((x) => x.id === id);
+    if (!v) continue;
+    if (v.status === "verified" || v.status === "partial") batch.appliedClaimIds.add(id);
+  }
+}
+
 /** Count claim verdicts in pending/verifying status across all tracked batches. */
 function countPending(batches: SubmittedBatchInfo[]): number {
   let n = 0;
@@ -269,16 +289,21 @@ export async function drainPendingBatches(
   appliedAfterDrain: number;
   timedOut: boolean;
 }> {
-  const maxDurationMs = opts.maxDurationMs ?? 30 * 60 * 1000;
-  const pollIntervalMs = opts.pollIntervalMs ?? 30_000;
+  const maxDurationMs = opts.maxDurationMs ?? DEFAULT_DRAIN_MAX_DURATION_MS;
+  const pollIntervalMs = opts.pollIntervalMs ?? DEFAULT_DRAIN_POLL_INTERVAL_MS;
   const pollFn =
     opts.pollFn ??
     (async (batchId: string) => {
       const r = await getClaimStatus(batchId);
       if (!r.ok) return null;
       // The route returns `{ batchId, totalClaims, byStatus, claims, allSettled, estimatedRemaining }`.
-      const d = r.data as unknown as { allSettled: boolean; claims: ClaimVerdictRow[] };
-      return { allSettled: d.allSettled, claims: d.claims };
+      // It returns the FULL claim set (LIMIT 1000) for the batch on every
+      // call — see `apps/wiki-server/src/routes/claims/claims.ts::/status/:batchId`.
+      // If that ever becomes paginated, the merge-vs-replace assumption below
+      // (and in the per-iteration polling) will need revisiting.
+      const d = r.data as unknown as { allSettled?: unknown; claims?: unknown };
+      if (typeof d.allSettled !== "boolean" || !Array.isArray(d.claims)) return null;
+      return { allSettled: d.allSettled, claims: d.claims as ClaimVerdictRow[] };
     });
   const applyFn = opts.applyFn ?? applyVerdictsToEntity;
 
@@ -290,6 +315,7 @@ export async function drainPendingBatches(
   let appliedAfterDrain = 0;
   let timedOut = false;
   const t0 = Date.now();
+  let pollFailureCount = 0;
 
   // Outer loop: keep polling until no batch is unsettled or we time out.
   // The first pass also captures any batches that finished between the
@@ -298,7 +324,8 @@ export async function drainPendingBatches(
   while (true) {
     const unsettled = batches.filter((b) => !b.settled);
     if (unsettled.length === 0) break;
-    if (Date.now() - t0 >= maxDurationMs) {
+    const elapsed = Date.now() - t0;
+    if (elapsed >= maxDurationMs) {
       timedOut = true;
       console.warn(
         `[drain] max duration ${(maxDurationMs / 1000).toFixed(0)}s reached; ` +
@@ -307,7 +334,21 @@ export async function drainPendingBatches(
       break;
     }
 
-    await new Promise((r) => setTimeout(r, pollIntervalMs));
+    // Cap the sleep to the remaining budget so a 30s default sleep can't
+    // overshoot a near-deadline check by up to 30s.
+    const sleepMs = Math.min(pollIntervalMs, maxDurationMs - elapsed);
+    await new Promise((r) => setTimeout(r, sleepMs));
+
+    // Re-check the deadline after the sleep so a clamped-to-zero sleep doesn't
+    // proceed to poll one more time past the cap.
+    if (Date.now() - t0 >= maxDurationMs) {
+      timedOut = true;
+      console.warn(
+        `[drain] max duration ${(maxDurationMs / 1000).toFixed(0)}s reached after sleep; ` +
+          `${unsettled.length} batch(es) still unsettled`,
+      );
+      break;
+    }
 
     for (const b of unsettled) {
       if (Date.now() - t0 >= maxDurationMs) {
@@ -315,7 +356,13 @@ export async function drainPendingBatches(
         break;
       }
       const sr = await pollFn(b.batchId);
-      if (!sr) continue;
+      if (!sr) {
+        pollFailureCount++;
+        // Log every transient failure at warn so debugging a stuck drain has
+        // a paper trail. The outer while-loop bound prevents indefinite spin.
+        console.warn(`[drain] pollFn returned null for batch ${b.batchId} (failure #${pollFailureCount})`);
+        continue;
+      }
       b.lastVerdicts = sr.claims;
       b.settled = sr.allSettled;
 
@@ -331,15 +378,7 @@ export async function drainPendingBatches(
         // Mark every verified/partial claim ID as applied so a subsequent
         // poll on the same batch (e.g. when the worker is still finalizing
         // others) doesn't re-build the same verdicts.
-        for (let i = 0; i < b.submittedByOrder.length; i++) {
-          const id = b.claimIds[i];
-          if (id == null) continue;
-          const v = b.lastVerdicts.find((x) => x.id === id);
-          if (!v) continue;
-          if (v.status === "verified" || v.status === "partial") {
-            b.appliedClaimIds.add(id);
-          }
-        }
+        markAppliedFromLastVerdicts(b);
       }
     }
   }
@@ -943,13 +982,7 @@ async function runIteration(
 
   // Mark every verified/partial claim ID as applied. The drain phase uses
   // this set to skip already-applied verdicts and only count NEW verifieds.
-  for (let i = 0; i < batch.submittedByOrder.length; i++) {
-    const id = batch.claimIds[i];
-    if (id == null) continue;
-    const v = lastVerdicts.find((x) => x.id === id);
-    if (!v) continue;
-    if (v.status === "verified" || v.status === "partial") batch.appliedClaimIds.add(id);
-  }
+  markAppliedFromLastVerdicts(batch);
 
   m.duration_s = (Date.now() - t0) / 1000;
   return { entity: apply.entity, metrics: m, batch };
