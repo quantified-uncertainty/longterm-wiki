@@ -143,6 +143,7 @@ import * as auditCommands from './commands/audit.ts';
 import { primeAuditSessionId } from './lib/wiki-server/audit-context.ts';
 import * as aiidCommands from './commands/ingest-aiid.ts';
 import * as oecdAimCommands from './commands/ingest-oecd-aim.ts';
+import * as migrationsCommands from './commands/migrations.ts';
 
 const domains = {
   validate: validateCommands,
@@ -249,6 +250,7 @@ const domains = {
   audit: auditCommands,
   aiid: aiidCommands,
   'oecd-aim': oecdAimCommands,
+  migrations: migrationsCommands,
 };
 
 const shortcutMap = buildShortcutMap();
