@@ -955,36 +955,55 @@ export async function syncPolicyStakeholders(typedEntities) {
       } else {
         // Batch failed — try items individually to skip bad FK references
         for (const item of batch) {
+          // Phase 1: send the request. Network/transport failures are the only
+          // legitimate skip-on-throw; anything else must fail loud.
+          let r;
           try {
-            const r = await fetch(`${serverUrl}/api/policy-stakeholders/sync?${skipSourcing}`, {
+            r = await fetch(`${serverUrl}/api/policy-stakeholders/sync?${skipSourcing}`, {
               method: 'POST',
               headers,
               body: JSON.stringify({ items: [item] }),
               signal: AbortSignal.timeout(10_000),
             });
-            if (r.ok) {
-              synced++;
-            } else {
-              // QUA-941 / QUA-964: distinguish FK-missing (legitimate skip — some
-              // YAML stakeholders reference entities not yet in PG) from Zod schema
-              // rejection (data corruption — must fail loud). FK errors from
-              // validateEntityRefs always contain the literal "Entity references
-              // not found"; any other 400 indicates real schema violation.
-              // TODO(QUA-951): switch to body.includes('"code":"fk_missing"') once
-              // the validationError discriminator lands.
-              const body = await r.text();
-              const isFkMissing = body.includes('Entity references not found');
-              if (!isFkMissing) {
-                process.stderr.write(
-                  `syncPolicyStakeholders: non-FK 400 for policy=${item.policyEntityId} stakeholder=${item.stakeholderEntityId ?? item.stakeholderDisplayName} — YAML data corruption (QUA-941).\nResponse: ${body}\n`,
-                );
-                process.exit(1);
-              }
-              skipped++;
-            }
           } catch {
             skipped++;
+            continue;
           }
+          if (r.ok) {
+            synced++;
+            continue;
+          }
+          // Phase 2: classify the 4xx/5xx. QUA-941 / QUA-964 — distinguish
+          // FK-missing (legitimate skip — some YAML stakeholders reference
+          // entities not yet in PG) from any other 400 (data corruption —
+          // must fail loud). FK errors from validateEntityRefs always contain
+          // the literal "Entity references not found"; for this specific
+          // route, any other 400 means a Zod schema rejection (no naturalKey,
+          // no claimSupport, sourcing forced off via forceSkipSourcing).
+          // TODO(QUA-951): switch to body.includes('"code":"fk_missing"') once
+          // the validationError discriminator lands.
+          //
+          // If r.text() itself throws after a non-2xx (rare — interrupted body
+          // stream), do NOT silently skip: we already know the route rejected
+          // the payload. Treat it as the fail-loud case so QUA-941's silent
+          // drop pattern cannot recur via a body-read race.
+          let body;
+          try {
+            body = await r.text();
+          } catch (e) {
+            process.stderr.write(
+              `syncPolicyStakeholders: ${r.status} response body unreadable for policy=${item.policyEntityId}: ${e instanceof Error ? e.message : String(e)} — failing loud (QUA-964).\n`,
+            );
+            process.exit(1);
+          }
+          const isFkMissing = body.includes('Entity references not found');
+          if (!isFkMissing) {
+            process.stderr.write(
+              `syncPolicyStakeholders: non-FK ${r.status} for policy=${item.policyEntityId} stakeholder=${item.stakeholderEntityId ?? item.stakeholderDisplayName} — YAML data corruption (QUA-941).\nResponse: ${body}\n`,
+            );
+            process.exit(1);
+          }
+          skipped++;
         }
       }
     }
