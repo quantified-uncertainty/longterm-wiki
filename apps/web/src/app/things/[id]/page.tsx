@@ -16,10 +16,18 @@ import {
 import { isAnySid } from "@longterm-wiki/id-utils";
 import { EntityProfileShell } from "@/components/entity/EntityProfileShell";
 import type { EntityProfileShellHeaderLink } from "@/components/entity/EntityProfileShell";
-import { SOURCE_CHECK_VERDICT_PRIORITY } from "@/components/shared/verdict-styles";
+import { rollupVerdictFromVerdictList } from "@/components/entity/entity-sourcing";
 
 export const revalidate = 300;
 export const dynamicParams = true;
+
+/**
+ * Wiki ID for the entity-profile dashboard route. The "View entity profile"
+ * header link routes through `/wiki/<id>?entity=<parent-thing-id>`. Hardcoded
+ * because there's no other lookup table for it; if the dashboard ever moves,
+ * grep for this constant.
+ */
+const ENTITY_PROFILE_WIKI_ID = "E1929";
 
 // ── Types ──────────────────────────────────────────────────────────────
 
@@ -78,27 +86,6 @@ const VERDICT_SOURCE_TABLES = new Set(Object.keys(SOURCE_TABLE_TO_RECORD_TYPE));
 
 function sourceTableToRecordType(sourceTable: string): string {
   return SOURCE_TABLE_TO_RECORD_TYPE[sourceTable] ?? sourceTable.replace(/_/g, "-");
-}
-
-/**
- * Reduce a list of per-field verdicts to a single rollup verdict, preferring
- * the most actionable (contradicted > outdated > partial > ...). Mirrors
- * `rollupVerdictFromSummary` from `@/components/entity/entity-sourcing` but
- * works on `RpcSourcingDetailResult.verdicts` directly so we don't need to
- * round-trip through the entity-summary endpoint.
- */
-function rollupRecordVerdict(verdicts: RpcSourcingDetailResult["verdicts"]): string | null {
-  if (verdicts.length === 0) return null;
-  let best: string | null = null;
-  let bestPriority = Infinity;
-  for (const v of verdicts) {
-    const p = SOURCE_CHECK_VERDICT_PRIORITY[v.verdict] ?? 99;
-    if (p < bestPriority) {
-      bestPriority = p;
-      best = v.verdict;
-    }
-  }
-  return best;
 }
 
 // ── Metadata ───────────────────────────────────────────────────────────
@@ -343,19 +330,40 @@ export default async function ThingDetailPage({ params }: PageProps) {
     recordPromise,
   ]);
 
-  let verdicts: RpcSourcingDetailResult | null = null;
-  if (verdictsSettled.status === "fulfilled" && verdictsSettled.value && verdictsSettled.value.ok) {
+  // Distinguish "fetch failed" from "successfully fetched, no verdicts": only
+  // the latter should render an "unchecked" SourcingDot. A failed fetch leaves
+  // `verdicts === undefined` so the dot is hidden entirely.
+  let verdicts: RpcSourcingDetailResult | undefined;
+  if (
+    verdictsSettled.status === "fulfilled" &&
+    verdictsSettled.value &&
+    verdictsSettled.value.ok
+  ) {
     verdicts = verdictsSettled.value.data;
   }
 
   let recordData: RecordLookupResult | null = null;
-  if (recordSettled.status === "fulfilled" && recordSettled.value.ok) {
+  if (
+    recordSettled.status === "fulfilled" &&
+    recordSettled.value &&
+    recordSettled.value.ok
+  ) {
     recordData = recordSettled.value.data;
   }
 
-  const hasVerdicts = verdicts && verdicts.verdicts.length > 0;
-  const rollupVerdict = supportsVerdicts && verdicts ? rollupRecordVerdict(verdicts.verdicts) : null;
-  const sourcingHref = supportsVerdicts ? getStoredVerdictHref(recordType, thing.sourceId) : null;
+  const hasVerdicts = verdicts != null && verdicts.verdicts.length > 0;
+  // verdict prop semantics:
+  //   undefined → shell hides the SourcingDot entirely (record table doesn't
+  //               support verdicts, OR the verdicts fetch failed)
+  //   null      → SourcingDot renders "unchecked" (fetch succeeded with no rows)
+  //   "<verdict>" → SourcingDot renders the rollup state
+  const rollupVerdict =
+    !supportsVerdicts || verdicts === undefined
+      ? undefined
+      : rollupVerdictFromVerdictList(verdicts.verdicts);
+  const sourcingHref: string | undefined = supportsVerdicts
+    ? getStoredVerdictHref(recordType, thing.sourceId)
+    : undefined;
 
   // Header pieces -----------------------------------------------------------
 
@@ -385,7 +393,7 @@ export default async function ThingDetailPage({ params }: PageProps) {
   if (thing.parentThingId) {
     headerLinks.push({
       label: "Entity profile",
-      href: `/wiki/E1929?entity=${encodeURIComponent(thing.parentThingId)}`,
+      href: `/wiki/${ENTITY_PROFILE_WIKI_ID}?entity=${encodeURIComponent(thing.parentThingId)}`,
     });
   }
   if (sourcingHref) {
@@ -514,8 +522,8 @@ export default async function ThingDetailPage({ params }: PageProps) {
       titlePills={titlePills}
       subtitle={subtitle}
       headerLinks={headerLinks}
-      verdict={supportsVerdicts ? rollupVerdict : undefined}
-      verdictHref={sourcingHref ?? undefined}
+      verdict={rollupVerdict}
+      verdictHref={sourcingHref}
     >
       <div className="space-y-8">
         {/* Thing Metadata table */}

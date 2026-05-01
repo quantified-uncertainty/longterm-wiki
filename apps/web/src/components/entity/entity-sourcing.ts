@@ -47,6 +47,23 @@ export async function fetchEntitySourcingSummary(
 }
 
 /**
+ * Picks the most actionable verdict (lowest `SOURCE_CHECK_VERDICT_PRIORITY`)
+ * from a non-empty list. Used by both rollup helpers below.
+ */
+function pickHighestPriorityVerdict(verdicts: readonly string[]): string | null {
+  let best: string | null = null;
+  let bestPriority = Infinity;
+  for (const v of verdicts) {
+    const p = SOURCE_CHECK_VERDICT_PRIORITY[v] ?? 99;
+    if (p < bestPriority) {
+      bestPriority = p;
+      best = v;
+    }
+  }
+  return best;
+}
+
+/**
  * Reduces a per-entity verdict count row to a single rollup verdict, preferring
  * the most actionable verdict present (contradicted > outdated > partial > ...).
  * Returns null when no verdicts are recorded.
@@ -58,20 +75,31 @@ export function rollupVerdictFromSummary(
   > | null | undefined,
 ): string | null {
   if (!summary) return null;
-  const counts: Array<[string, number]> = [
-    ["contradicted", summary.contradicted],
-    ["outdated", summary.outdated],
-    ["partial", summary.partial],
-    ["unverifiable", summary.unverifiable],
-    ["confirmed", summary.confirmed],
-    ["unchecked", summary.unchecked],
-  ];
-  const present = counts.filter(([, n]) => n > 0);
-  if (present.length === 0) return null;
-  present.sort(
-    ([a], [b]) =>
-      (SOURCE_CHECK_VERDICT_PRIORITY[a] ?? 99) -
-      (SOURCE_CHECK_VERDICT_PRIORITY[b] ?? 99),
-  );
-  return present[0][0];
+  const present = (
+    [
+      ["contradicted", summary.contradicted],
+      ["outdated", summary.outdated],
+      ["partial", summary.partial],
+      ["unverifiable", summary.unverifiable],
+      ["confirmed", summary.confirmed],
+      ["unchecked", summary.unchecked],
+    ] as const
+  )
+    .filter(([, n]) => n > 0)
+    .map(([k]) => k);
+  return pickHighestPriorityVerdict(present);
+}
+
+/**
+ * Reduces a per-record verdict list (one row per field) to a single rollup
+ * verdict, using the same priority order as `rollupVerdictFromSummary`.
+ * Used by record-level inspector pages (e.g. `/things/[id]`) that fetch the
+ * `/api/sourcing/verdicts/<recordType>/<recordId>` endpoint directly instead
+ * of going through `entity-summary`.
+ */
+export function rollupVerdictFromVerdictList(
+  verdicts: ReadonlyArray<{ verdict: string }>,
+): string | null {
+  if (verdicts.length === 0) return null;
+  return pickHighestPriorityVerdict(verdicts.map((v) => v.verdict));
 }
