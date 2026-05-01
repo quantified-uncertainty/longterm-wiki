@@ -34,12 +34,24 @@ import type { SyncPhaseError as SyncPhaseErrorType } from "../routes/tablebase/s
 let entitiesStore: Map<string, Record<string, unknown>>;
 let widgetsStore: Map<string, Record<string, unknown>>;
 let auditLogStore: Array<Record<string, unknown>>;
+// proposedClaimsStore: claim id → status. Tests that need claim partitioning
+// to actually fire seed rows here. Default empty store yields the same
+// behavior as before (validateClaimRefs / classifyClaims see "no rows" and
+// treat every claim as missing — but tests that don't pass claimSupport
+// never query the table, so this is opt-in per test).
+let proposedClaimsStore: Map<number, { id: number; status: string }>;
 
 function resetStores() {
   entitiesStore = new Map();
   widgetsStore = new Map();
   auditLogStore = [];
+  proposedClaimsStore = new Map();
 }
+
+// Initialize stores at import time so the mock dispatcher can read them
+// before any beforeEach runs (vitest may invoke the dispatcher during module
+// init, e.g. when a sync handler is constructed eagerly).
+resetStores();
 
 function dispatch(query: string, params: unknown[]): unknown[] {
   const q = query.toLowerCase();
@@ -83,9 +95,26 @@ function dispatch(query: string, params: unknown[]): unknown[] {
     return [];
   }
 
-  // --- proposed_claims: SELECT (validateClaimRefs) ---
+  // --- proposed_claims: SELECT (validateClaimRefs / classifyClaims) ---
+  // Returns rows for any seeded claim; missing IDs are absent so the caller
+  // treats them as "missing". Status drives the verified/non-verified split.
   if (q.includes("from proposed_claims") || q.includes("proposed_claims")) {
-    return [];
+    const rows: unknown[] = [];
+    for (const p of params) {
+      // The query uses `id = ANY($1::bigint[])` — Drizzle passes the array
+      // as a single param, so we may see one Array param or N number params
+      // depending on the binding shape. Handle both.
+      if (Array.isArray(p)) {
+        for (const cid of p) {
+          const row = proposedClaimsStore.get(Number(cid));
+          if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
+        }
+      } else {
+        const row = proposedClaimsStore.get(Number(p));
+        if (row) rows.push({ id: row.id, status: row.status, entity_id: null });
+      }
+    }
+    return rows;
   }
 
   // --- claim_record_links: INSERT ---
@@ -748,8 +777,9 @@ describe("createSyncHandler — bestEffortAllowed: true (opt-in)", () => {
   it("falls back to atomic Zod when bestEffortAllowed is set but only batchSchema is provided", async () => {
     // syncSchema is required to per-item-partition Zod failures. With only
     // batchSchema (which may include batch-level refinements), we can't
-    // disaggregate item failures, so the Zod phase stays atomic. Subsequent
-    // phases (natural key, FKs) still partition.
+    // disaggregate item failures — so the Zod phase stays atomic and a
+    // batch-level Zod failure still returns 400. Routes that want
+    // partitioned Zod must provide `syncSchema`.
     const handler = createSyncHandler<Item, typeof entities>({
       name: "test",
       table: entities,
@@ -765,5 +795,179 @@ describe("createSyncHandler — bestEffortAllowed: true (opt-in)", () => {
 
     // Atomic Zod fallback: 400 instead of 200
     expect(res.status).toBe(400);
+  });
+
+  it("partitions claims that are missing or non-verified", async () => {
+    // Seed a verified claim and a pending claim so partitioning has rows to
+    // classify. Claim id 999 is unseeded → treated as missing.
+    proposedClaimsStore.set(100, { id: 100, status: "verified" });
+    proposedClaimsStore.set(200, { id: 200, status: "pending" });
+
+    type ClaimItem = { id: string; title: string; claimIds: number[] };
+    const ClaimItemSchema = z.object({
+      id: z.string().length(10),
+      title: z.string().min(1),
+      claimIds: z.array(z.number()),
+    });
+    const handler = createSyncHandler<ClaimItem, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ClaimItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      claimSupport: {
+        recordType: "test",
+        getClaimIds: (item) => item.claimIds,
+      },
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha", claimIds: [100] }, // verified → committed
+        { id: "bbbbbbbbbb", title: "beta", claimIds: [999] }, // missing → rejected
+        { id: "cccccccccc", title: "gamma", claimIds: [200] }, // non-verified → rejected
+        { id: "dddddddddd", title: "delta", claimIds: [] }, // no claims → committed
+      ],
+    });
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    expect(body.committed).toEqual(["aaaaaaaaaa", "dddddddddd"]);
+    expect(body.rejected).toHaveLength(2);
+    expect(body.rejected[0]).toMatchObject({
+      idx: 1,
+      code: "claim_invalid",
+      field: "claimIds",
+      value: 999,
+    });
+    expect(body.rejected[0].message).toContain("missing");
+    expect(body.rejected[1]).toMatchObject({
+      idx: 2,
+      code: "claim_invalid",
+      field: "claimIds",
+      value: 200,
+    });
+    expect(body.rejected[1].message).toContain("not verified");
+    expect(body.rejected[1].message).toContain("pending");
+  });
+
+  it("returns the preValidate Response as-is in best-effort mode", async () => {
+    // preValidate is opaque user code; the factory does not partition around
+    // it. A Response from preValidate replaces any partitioned response —
+    // this is the documented "atomic in both modes" contract.
+    const handler = createSyncHandler<Item, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: ItemSchema,
+      toRow: (item, now) => ({ id: item.id, title: item.title, syncedAt: now, updatedAt: now }),
+      preValidate: async (c) =>
+        c.json({ error: "custom_block", reason: "policy" }, 422),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [
+        { id: "aaaaaaaaaa", title: "alpha" },
+        { id: "bbbbbbbbbb", title: "beta" },
+      ],
+    });
+
+    expect(res.status).toBe(422);
+    const body = await res.json();
+    expect(body).toMatchObject({ error: "custom_block", reason: "policy" });
+    // No partitioned shape — preValidate's Response wins entirely
+    expect(body.committed).toBeUndefined();
+    expect(body.rejected).toBeUndefined();
+  });
+
+  it("logs the forceSkipSourcing audit warning in best-effort mode", async () => {
+    // The atomic enforceSourcing helper emits a logger.warn when
+    // ?forceSkipSourcing=true is used. Best-effort must do the same so
+    // bypass usage is auditable; otherwise compliance drifts silently.
+    const SourcedSchema = z.object({
+      id: z.string().length(10),
+      title: z.string(),
+      sourcing: z.unknown().optional(),
+    });
+    type SourcedItem = z.infer<typeof SourcedSchema>;
+
+    const { logger } = await import("../logger.js");
+    const warnSpy = vi.spyOn(logger.child({ component: "sourcing-enforcement" }), "warn");
+    // The above creates a fresh child logger; the actual call site uses its
+    // own child. Spy on the root logger's child instead by spying directly
+    // on the module-level method. The simplest stable approach: spy on the
+    // base logger's `warn` since pino child loggers inherit.
+    const rootWarnSpy = vi.spyOn(logger, "warn");
+
+    const handler = createSyncHandler<SourcedItem, typeof entities>({
+      name: "personnel-test",
+      table: entities,
+      enforceSourcing: "personnel",
+      syncSchema: SourcedSchema,
+      toRow: (item, now) => ({
+        id: item.id,
+        title: item.title,
+        syncedAt: now,
+        updatedAt: now,
+      }),
+      bestEffortAllowed: true,
+    });
+    const app = buildApp(handler);
+
+    const res = await postJson(
+      app,
+      "/sync?mode=best_effort&forceSkipSourcing=true&reason=test-bypass",
+      {
+        items: [
+          { id: "aaaaaaaaaa", title: "alpha" }, // no sourcing — but bypass active
+          { id: "bbbbbbbbbb", title: "beta", sourcing: { url: "x" } },
+        ],
+      },
+    );
+
+    expect(res.status).toBe(200);
+    const body = await res.json();
+    // Bypass active → both items committed despite no sourcing
+    expect(body.committed).toEqual(["aaaaaaaaaa", "bbbbbbbbbb"]);
+    expect(body.rejected).toEqual([]);
+    // The bypass must have produced an audit-warning. Check that *some* warn
+    // call mentions "forceSkipSourcing" in the message string.
+    const sawAuditWarn = [warnSpy, rootWarnSpy].some((spy) =>
+      spy.mock.calls.some(([_obj, msg]) =>
+        typeof msg === "string" && msg.includes("forceSkipSourcing"),
+      ),
+    );
+    expect(sawAuditWarn).toBe(true);
+  });
+
+  it("throws SyncPhaseError when a surviving item lacks a string id", async () => {
+    // Best-effort mode requires every committed item to have a string id —
+    // otherwise the response shape would silently disagree with itself
+    // (claimsLinked covers all items, committed array is shorter). We fail
+    // loudly so a future composite-PK route opting in catches this in dev.
+    const NoIdSchema = z.object({
+      title: z.string().min(1),
+    });
+    type NoIdItem = z.infer<typeof NoIdSchema>;
+
+    const handler = createSyncHandler<NoIdItem, typeof entities>({
+      name: "test",
+      table: entities,
+      syncSchema: NoIdSchema,
+      toRow: (item, now) => ({ id: "fixed-id", title: item.title, syncedAt: now, updatedAt: now }),
+      bestEffortAllowed: true,
+    });
+    const { app, errors } = buildAppWithErrorCapture(handler);
+
+    const res = await postJson(app, "/sync?mode=best_effort", {
+      items: [{ title: "alpha" }],
+    });
+
+    expect(res.status).toBe(500);
+    expect(errors.length).toBe(1);
+    expect(errors[0]).toBeInstanceOf(SyncPhaseError);
+    expect((errors[0] as Error).message).toContain("must produce items with a string 'id' field");
   });
 });
